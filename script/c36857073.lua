@@ -2,7 +2,7 @@
 function c36857073.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure2(c,nil,aux.NonTuner(c36857073.sfilter))
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(36857073,0))

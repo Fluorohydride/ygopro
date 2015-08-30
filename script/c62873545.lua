@@ -1,7 +1,7 @@
 --究極竜騎士
 function c62873545.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,5405694,23995346,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

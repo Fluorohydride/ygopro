@@ -1,6 +1,6 @@
 --天界王 シナト
 function c86327225.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(86327225,0))

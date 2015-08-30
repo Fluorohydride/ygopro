@@ -1,7 +1,7 @@
 --有翼幻獣キマイラ
 function c4796100.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,5818798,77207191,true,true)
 	--Special summon
 	local e1=Effect.CreateEffect(c)

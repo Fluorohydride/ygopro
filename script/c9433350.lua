@@ -1,6 +1,6 @@
 --Sin 青眼の白龍
 function c9433350.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

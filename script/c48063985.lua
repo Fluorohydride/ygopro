@@ -1,7 +1,7 @@
 --聖霊獣騎 カンナホーク
 function c48063985.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x10b5),aux.FilterBoolFunction(Card.IsSetCard,0x20b5),true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --インフェルノイド・アドラメレク
 function c88301393.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

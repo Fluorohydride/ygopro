@@ -1,6 +1,6 @@
 --崇光なる宣告者
 function c48546368.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

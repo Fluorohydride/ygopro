@@ -1,6 +1,6 @@
 --E・HERO ブルーメ
 function c51085303.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

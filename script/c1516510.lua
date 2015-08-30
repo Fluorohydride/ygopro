@@ -1,7 +1,7 @@
 --ルーンアイズ・ペンデュラム・ドラゴン
 function c1516510.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,16178681,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),1,true,false)
 	--multi attack
 	local e1=Effect.CreateEffect(c)

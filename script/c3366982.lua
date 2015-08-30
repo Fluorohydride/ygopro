@@ -1,7 +1,7 @@
 --ドラゴンに乗るワイバーン
 function c3366982.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,88819587,64428736,true,true)
 	--direct attack
 	local e2=Effect.CreateEffect(c)

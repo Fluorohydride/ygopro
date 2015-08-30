@@ -1,6 +1,6 @@
 --イビリチュア・プシュケローネ
 function c30334522.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--confirm
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(30334522,0))

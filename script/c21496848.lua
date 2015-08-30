@@ -1,6 +1,6 @@
 --イビリチュア・テトラオーグル
 function c21496848.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--send to grave
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(21496848,0))

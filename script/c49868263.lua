@@ -1,7 +1,7 @@
 --ドラゴン・ウォリアー
 function c49868263.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,75953262,67957315,false,false)
 	--negate
 	local e1=Effect.CreateEffect(c)

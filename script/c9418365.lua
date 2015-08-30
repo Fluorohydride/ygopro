@@ -1,7 +1,7 @@
 --武神－ヒルメ
 function c9418365.initial_effect(c)
 	c:SetUniqueOnField(1,0,9418365)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(9418365,0))

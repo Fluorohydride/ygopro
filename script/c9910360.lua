@@ -1,7 +1,7 @@
 --ガエル・サンデス
 function c9910360.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeRep(c,84451804,3,false,false)
 	--atk
 	local e2=Effect.CreateEffect(c)

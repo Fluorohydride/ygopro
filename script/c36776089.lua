@@ -2,7 +2,7 @@
 function c36776089.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,2,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--indestructable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

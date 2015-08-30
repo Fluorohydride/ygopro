@@ -1133,14 +1133,6 @@ int32 scriptlib::card_copy_effect(lua_State *L) {
 	lua_pushinteger(L, pcard->copy_effect(code, reset, count));
 	return 1;
 }
-int32 scriptlib::card_enable_revive_limit(lua_State *L) {
-	check_param_count(L, 1);
-	check_param(L, PARAM_TYPE_CARD, 1);
-	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(!pcard->is_status(STATUS_COPYING_EFFECT))
-		pcard->set_status(STATUS_REVIVE_LIMIT, TRUE);
-	return 0;
-}
 int32 scriptlib::card_complete_procedure(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);

@@ -1,7 +1,7 @@
 --XY－ドラゴン・キャノン
 function c2111707.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,62651957,65622692,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

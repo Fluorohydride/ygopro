@@ -1,7 +1,7 @@
 --SNo.0 ホープ・ゼアル
 function c52653092.initial_effect(c)
 	--xyz summon
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)

@@ -1,7 +1,7 @@
 --鎧黒竜－サイバー・ダーク・ドラゴン
 function c40418351.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode3(c,41230939,77625948,3019642,true,true)
 	--equip
 	local e1=Effect.CreateEffect(c)

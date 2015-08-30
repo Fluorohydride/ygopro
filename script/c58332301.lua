@@ -1,7 +1,7 @@
 --E－HERO ダーク・ガイア
 function c58332301.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsRace,RACE_FIEND),aux.FilterBoolFunction(Card.IsRace,RACE_ROCK),true)
 	--spsummon condition
 	local e2=Effect.CreateEffect(c)

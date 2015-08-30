@@ -1,7 +1,7 @@
 --サウザンド・アイズ・サクリファイス
 function c63519819.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,64631466,27125110,true,true)
 	--equip
 	local e2=Effect.CreateEffect(c)

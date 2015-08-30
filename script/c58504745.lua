@@ -2,7 +2,7 @@
 function c58504745.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x79),4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--todeck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(58504745,0))

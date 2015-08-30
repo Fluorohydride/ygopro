@@ -1,6 +1,6 @@
 --伝説の爆炎使い
 function c60258960.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	c:EnableCounterPermit(0x3001)
 	--add counter
 	local e0=Effect.CreateEffect(c)

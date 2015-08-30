@@ -1,7 +1,7 @@
 --竜騎士ブラック・マジシャン・ガール
 function c43892408.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,38033121,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),1,false,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

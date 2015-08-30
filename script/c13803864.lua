@@ -1,7 +1,7 @@
 --キング・もけもけ
 function c13803864.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeRep(c,27288416,3,true,true)
 	--Special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --オレイカルコス・シュノロス
 function c7634581.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(7634581,0))

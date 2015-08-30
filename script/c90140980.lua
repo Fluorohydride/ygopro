@@ -1,7 +1,7 @@
 --おジャマ・キング
 function c90140980.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode3(c,12482652,42941100,79335209,true,true)
 	--disable field
 	local e1=Effect.CreateEffect(c)

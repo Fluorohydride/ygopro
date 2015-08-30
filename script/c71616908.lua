@@ -1,7 +1,7 @@
 --ジェムナイト・アメジス
 function c71616908.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x1047),aux.FilterBoolFunction(Card.IsRace,RACE_AQUA),true)
 	--spsummon condition
 	local e2=Effect.CreateEffect(c)

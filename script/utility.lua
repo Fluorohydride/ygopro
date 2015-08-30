@@ -87,6 +87,21 @@ function Auxiliary.EnableDualAttribute(c)
 	e3:SetValue(TYPE_EFFECT)
 	c:RegisterEffect(e3)
 end
+function Auxiliary.EnableUnsummonable(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_UNSUMMONABLE_CARD)
+	c:RegisterEffect(e1)
+end
+function Auxiliary.EnableReviveLimit(c)
+	Auxiliary.EnableUnsummonable(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_REVIVE_LIMIT)
+	c:RegisterEffect(e1)
+end
 function Auxiliary.TargetEqualFunction(f,value,a,b,c)
 	return	function(effect,target)
 				return f(target,a,b,c)==value

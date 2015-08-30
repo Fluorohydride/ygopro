@@ -1,6 +1,6 @@
 --D・スマホン
 function c15521027.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(15521027,0))

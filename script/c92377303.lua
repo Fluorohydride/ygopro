@@ -1,6 +1,6 @@
 --黒衣の大賢者
 function c92377303.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(92377303,0))

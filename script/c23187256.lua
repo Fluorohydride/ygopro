@@ -1,7 +1,7 @@
 --No.93 希望皇ホープ・カイザー
 function c23187256.initial_effect(c)
 	--xyz summon
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)

@@ -1,7 +1,7 @@
 --混沌幻魔アーミタイル
 function c43378048.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode3(c,6007213,32491822,69890967,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

@@ -2,7 +2,7 @@
 function c33413279.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_SPELLCASTER),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(33413279,0))

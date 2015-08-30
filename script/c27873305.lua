@@ -1,7 +1,7 @@
 --DDD怒濤壊薙王カエサル・ラグナロク
 function c27873305.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x10af),2,true)
 	--tohand
 	local e1=Effect.CreateEffect(c)

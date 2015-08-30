@@ -1,7 +1,7 @@
 --サイバー・ツイン・ドラゴン
 function c74157028.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeRep(c,70095154,2,false,false)
 	--extra att
 	local e2=Effect.CreateEffect(c)

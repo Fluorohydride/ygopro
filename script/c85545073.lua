@@ -1,7 +1,7 @@
 --デストーイ・シザー・ベアー
 function c85545073.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,30068120,3841833,true,true)
 	--equip
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --レプティレス・ヴァースキ
 function c16886617.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	c:SetUniqueOnField(1,1,16886617)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --E・HERO マッドボールマン
 function c52031567.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,79979666,84327329,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

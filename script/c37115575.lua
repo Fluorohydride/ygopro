@@ -1,6 +1,6 @@
 --Sin トゥルース・ドラゴン
 function c37115575.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(37115575,0))

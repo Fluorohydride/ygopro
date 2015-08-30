@@ -1,6 +1,6 @@
 --イビリチュア・ジールギガス
 function c66729231.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(66729231,0))

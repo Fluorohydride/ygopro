@@ -3,7 +3,7 @@ function c68618157.initial_effect(c)
 	c:SetUniqueOnField(1,0,68618157)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,4,3)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(68618157,0))

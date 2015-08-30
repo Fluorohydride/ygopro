@@ -2,7 +2,7 @@
 function c13995824.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),aux.NonTuner(nil),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--deckdes
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(13995824,0))

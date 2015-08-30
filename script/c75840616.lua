@@ -3,7 +3,7 @@ function c75840616.initial_effect(c)
 	c:SetUniqueOnField(1,0,75840616)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x88),4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--search
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(75840616,0))

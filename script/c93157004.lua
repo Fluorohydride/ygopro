@@ -1,7 +1,7 @@
 --ヴァイロン・オメガ
 function c93157004.initial_effect(c)
 	--synchro summon
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)

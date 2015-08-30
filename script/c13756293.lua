@@ -1,7 +1,7 @@
 --竜魔人 キングドラグーン
 function c13756293.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,17985575,62113340,true,true)
 	--cannot be target
 	local e1=Effect.CreateEffect(c)

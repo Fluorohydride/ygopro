@@ -1,7 +1,7 @@
 --レインボー・ネオス
 function c86346643.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,89943723,c86346643.fusfilter,1,false,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

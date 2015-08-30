@@ -1,7 +1,7 @@
 --ツイン・フォトン・リザード
 function c29455728.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x55),2,true)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

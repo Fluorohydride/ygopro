@@ -1,6 +1,6 @@
 --サクリファイス
 function c64631466.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(64631466,0))

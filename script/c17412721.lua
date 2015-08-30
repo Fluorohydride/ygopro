@@ -1,7 +1,7 @@
 --旧神ノーデン
 function c17412721.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,c17412721.ffilter,c17412721.ffilter,true)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

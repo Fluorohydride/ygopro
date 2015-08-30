@@ -2,7 +2,7 @@
 function c88722973.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_PENDULUM),4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--search
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)

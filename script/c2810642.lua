@@ -1,6 +1,6 @@
 --PSYフレームギア・β
 function c2810642.initial_effect(c)
-	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
+	aux.EnableUnsummonable(c)
 	--splimit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

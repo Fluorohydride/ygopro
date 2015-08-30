@@ -1,6 +1,6 @@
 --シンクロ・マグネーター
 function c50702124.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(50702124,0))

@@ -1,7 +1,7 @@
 --幻奏の音姫マイスタリン・シューベルト
 function c57594700.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x9b),2,true)
 	--remove
 	local e1=Effect.CreateEffect(c)

@@ -2,7 +2,7 @@
 function c70583986.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_WATER),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--to hand, atkup
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(70583986,0))

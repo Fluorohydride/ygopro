@@ -1,6 +1,6 @@
 --アーカナイト・マジシャン／バスター
 function c14553285.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	c:EnableCounterPermit(0x3001)
 	--Cannot special summon
 	local e1=Effect.CreateEffect(c)

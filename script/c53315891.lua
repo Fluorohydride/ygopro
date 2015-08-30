@@ -1,7 +1,7 @@
 --合神竜ティマイオス
 function c53315891.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode3(c,80019195,85800949,84565800,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

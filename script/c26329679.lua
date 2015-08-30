@@ -2,7 +2,7 @@
 function c26329679.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--immune
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(26329679,0))

@@ -2,7 +2,7 @@
 function c75779210.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),aux.NonTuner(nil),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--untargetable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

@@ -1,7 +1,7 @@
 --Dragoon D－END
 function c76263644.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,83965310,17132130,false,false)
 	--destroy
 	local e2=Effect.CreateEffect(c)

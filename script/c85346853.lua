@@ -1,6 +1,6 @@
 --光子竜の聖騎士
 function c85346853.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(85346853,0))

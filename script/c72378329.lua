@@ -1,7 +1,7 @@
 --ビーストアイズ・ペンデュラム・ドラゴン
 function c72378329.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,c72378329.ffilter,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

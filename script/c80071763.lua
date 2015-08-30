@@ -1,7 +1,7 @@
 --魔人 ダーク・バルター
 function c80071763.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,52860176,38742075,false,false)
 	--negate
 	local e1=Effect.CreateEffect(c)

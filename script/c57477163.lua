@@ -1,7 +1,7 @@
 --デストーイ・チェーン・シープ
 function c57477163.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,61173621,aux.FilterBoolFunction(Card.IsSetCard,0xa9),1,true,true)
 	--actlimit
 	local e1=Effect.CreateEffect(c)

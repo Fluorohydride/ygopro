@@ -1,7 +1,7 @@
 --ジェムナイト・アクアマリナ
 function c13108445.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,27126980,aux.FilterBoolFunction(Card.IsSetCard,0x1047),1,false,false)
 	--spsummon condition
 	local e2=Effect.CreateEffect(c)

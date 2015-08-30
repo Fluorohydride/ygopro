@@ -2,7 +2,7 @@
 function c42589641.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,c42589641.xyzfilter,4,3)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--summon limit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)

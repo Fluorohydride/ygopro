@@ -1,7 +1,7 @@
 --剣闘獣エセダリ
 function c73285669.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x19),2,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

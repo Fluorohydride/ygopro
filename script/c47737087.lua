@@ -1,7 +1,7 @@
 --E・HERO ランパートガンナー
 function c47737087.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,58932615,84327329,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

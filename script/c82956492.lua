@@ -2,7 +2,7 @@
 function c82956492.initial_effect(c)
 	--fustion material
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0xaf),2,true)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--damage conversion
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)

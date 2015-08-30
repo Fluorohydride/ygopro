@@ -1,6 +1,6 @@
 --カゲトカゲ
 function c94656263.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(94656263,0))

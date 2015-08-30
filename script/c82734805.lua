@@ -1,6 +1,6 @@
 --インフェルノイド・ティエラ
 function c82734805.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--fusion material
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

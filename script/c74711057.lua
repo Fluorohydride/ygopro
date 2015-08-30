@@ -1,7 +1,7 @@
 --E・HERO ジ・アース
 function c74711057.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,37195861,75434695,true,true)
 	--atkup
 	local e1=Effect.CreateEffect(c)

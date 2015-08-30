@@ -1,7 +1,7 @@
 --E・HERO ネクロイド・シャーマン
 function c81003500.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,86188410,89252153,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --ロード・オブ・ザ・レッド
 function c19025379.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--destroy monster
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(19025379,0))

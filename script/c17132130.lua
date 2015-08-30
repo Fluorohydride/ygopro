@@ -25,7 +25,7 @@ function c17132130.initial_effect(c)
 	e3:SetCondition(c17132130.lp)
 	e3:SetOperation(c17132130.lpop)
 	c:RegisterEffect(e3)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 end
 function c17132130.spcon(e,c)
 	if c==nil then return true end

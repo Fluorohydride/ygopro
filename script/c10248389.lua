@@ -1,7 +1,7 @@
 --サイバー・ブレイダー
 function c10248389.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,97023549,11460577,false,false)
 	--indes
 	local e1=Effect.CreateEffect(c)

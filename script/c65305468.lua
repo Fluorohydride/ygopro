@@ -1,7 +1,7 @@
 --FNo.0 未来皇ホープ
 function c65305468.initial_effect(c)
 	--xyz summon
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_FIELD)

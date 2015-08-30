@@ -2,7 +2,7 @@
 function c53451824.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--
 	local e1=Effect.CreateEffect(c)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)

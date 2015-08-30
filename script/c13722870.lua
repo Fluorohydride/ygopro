@@ -1,7 +1,7 @@
 --黒炎の騎士－ブラック・フレア・ナイト－
 function c13722870.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,46986414,45231177,true,true)
 	--Special summon
 	local e1=Effect.CreateEffect(c)

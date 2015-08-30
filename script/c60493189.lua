@@ -1,7 +1,7 @@
 --E・HERO プラズマヴァイスマン
 function c60493189.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,20721928,59793705,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

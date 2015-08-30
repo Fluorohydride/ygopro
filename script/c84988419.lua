@@ -1,7 +1,7 @@
 --幻奏の華歌聖ブルーム・ディーヴァ
 function c84988419.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x109b),aux.FilterBoolFunction(Card.IsSetCard,0x9b),true)
 	--indes
 	local e1=Effect.CreateEffect(c)

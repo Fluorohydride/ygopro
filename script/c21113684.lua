@@ -2,7 +2,7 @@
 function c21113684.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,c21113684.ffilter,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),true)
 	--attackup
 	local e2=Effect.CreateEffect(c)

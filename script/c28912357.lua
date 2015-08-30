@@ -2,7 +2,7 @@
 function c28912357.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--search
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)

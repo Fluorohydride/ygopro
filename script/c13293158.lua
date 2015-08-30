@@ -1,7 +1,7 @@
 --E－HERO ワイルド・サイクロン
 function c13293158.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,21844576,86188410,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

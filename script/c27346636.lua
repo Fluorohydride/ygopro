@@ -1,7 +1,7 @@
 --剣闘獣ヘラクレイノス
 function c27346636.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,78868776,aux.FilterBoolFunction(Card.IsSetCard,0x19),2,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

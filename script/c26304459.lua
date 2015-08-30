@@ -2,7 +2,7 @@
 function c26304459.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_FIRE),aux.NonTuner(Card.IsRace,RACE_PYRO),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--remove
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(26304459,0))

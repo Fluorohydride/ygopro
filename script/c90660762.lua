@@ -1,6 +1,6 @@
 --メテオ・ブラック・ドラゴン
 function c90660762.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,74677422,64271667,true,true)
 end

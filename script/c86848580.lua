@@ -2,7 +2,7 @@
 function c86848580.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WINDBEAST),4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--negate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(86848580,0))

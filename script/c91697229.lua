@@ -1,6 +1,6 @@
 --極星邪狼フェンリル
 function c91697229.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(91697229,0))

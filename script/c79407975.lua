@@ -1,6 +1,6 @@
 --究極宝玉神 レインボー・ダーク・ドラゴン
 function c79407975.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--splimit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

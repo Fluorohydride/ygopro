@@ -1,7 +1,7 @@
 --サイバー・オーガ・2
 function c37057012.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeRep(c,64268668,2,false,false)
 	--atk up
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --聖占術姫タロットレイ
 function c94997874.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--position change
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(94997874,0))

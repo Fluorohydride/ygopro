@@ -1,7 +1,7 @@
 --マルチ・ピース・ゴーレム
 function c71628381.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,25247218,58843503,true,true)
 	--special summon
 	local e1=Effect.CreateEffect(c)

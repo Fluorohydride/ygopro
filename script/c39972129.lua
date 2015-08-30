@@ -2,7 +2,7 @@
 function c39972129.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),2,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--token
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(39972129,0))

@@ -1,7 +1,7 @@
 --E－HERO ヘル・スナイパー
 function c50282757.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,84327329,58932615,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

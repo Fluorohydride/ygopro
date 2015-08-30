@@ -1,7 +1,7 @@
 --闇魔界の竜騎士 ダークソード
 function c86805855.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,11321183,47415292,true,true)
 	--remove
 	local e1=Effect.CreateEffect(c)

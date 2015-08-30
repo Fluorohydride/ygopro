@@ -2,7 +2,7 @@
 function c55067058.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,5,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--remove overlay replace
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(55067058,0))

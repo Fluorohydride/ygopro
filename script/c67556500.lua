@@ -4,7 +4,7 @@ function c67556500.initial_effect(c)
 	c:SetSPSummonOnce(67556500)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--level
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(67556500,0))

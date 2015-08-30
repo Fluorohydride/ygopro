@@ -1,7 +1,7 @@
 --ナイトメアを駆る死霊
 function c85684223.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,23205979,59290628,true,true)
 	--battle indestructable
 	local e1=Effect.CreateEffect(c)

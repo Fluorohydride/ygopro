@@ -1,6 +1,6 @@
 --大邪神レシェフ
 function c62420419.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--control
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(62420419,0))

@@ -1,6 +1,6 @@
 --メガロック・ドラゴン
 function c71544954.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(71544954,0))

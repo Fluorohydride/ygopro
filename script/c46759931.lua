@@ -1,7 +1,7 @@
 --V・HERO トリニティー
 function c46759931.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x8),3,true)
 	--summon success
 	local e1=Effect.CreateEffect(c)

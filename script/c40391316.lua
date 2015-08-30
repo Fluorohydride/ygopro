@@ -1,7 +1,7 @@
 --おジャマ・ナイト
 function c40391316.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0xf),2,true)
 	--disable field
 	local e2=Effect.CreateEffect(c)

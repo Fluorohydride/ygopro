@@ -1,6 +1,6 @@
 --スーパーバグマン
 function c86804246.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	c:SetUniqueOnField(1,1,86804246)
 	--special summon
 	local e1=Effect.CreateEffect(c)

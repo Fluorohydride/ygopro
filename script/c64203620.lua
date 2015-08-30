@@ -1,6 +1,6 @@
 --極星邪竜ヨルムンガンド
 function c64203620.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(64203620,0))

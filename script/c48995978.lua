@@ -3,7 +3,7 @@ function c48995978.initial_effect(c)
 	c:EnableCounterPermit(0x302b)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,8,3)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--counter
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_COUNTER)

@@ -1,7 +1,7 @@
 --超戦士カオス・ソルジャー
 function c54484652.initial_effect(c)
 	c:SetSPSummonOnce(54484652)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)

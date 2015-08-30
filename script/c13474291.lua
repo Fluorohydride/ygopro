@@ -1,6 +1,6 @@
 --雲魔物－ストーム・ドラゴン
 function c13474291.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--battle indestructable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

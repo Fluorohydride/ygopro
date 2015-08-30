@@ -1,6 +1,6 @@
 --神光の宣告者
 function c44665365.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--Negate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(44665365,0))

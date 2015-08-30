@@ -1,7 +1,7 @@
 --E・HERO Core
 function c95486586.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x3008),3,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

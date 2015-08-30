@@ -1,7 +1,7 @@
 --古代の機械究極巨人
 function c12652643.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,83104731,aux.FilterBoolFunction(Card.IsSetCard,0x7),2,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

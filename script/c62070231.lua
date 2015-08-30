@@ -2,7 +2,7 @@
 function c62070231.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),5,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--atk down
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(62070231,0))

@@ -2,7 +2,7 @@
 function c63504681.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4,2,nil,nil,5)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--remove material
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(63504681,0))

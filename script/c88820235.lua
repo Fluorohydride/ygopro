@@ -1,7 +1,7 @@
 --E・HERO シャイニング・フェニックスガイ
 function c88820235.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,41436536,20721928,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

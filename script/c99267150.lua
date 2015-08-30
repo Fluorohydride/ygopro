@@ -1,7 +1,7 @@
 --F・G・D
 function c99267150.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),5,true)
 	--battle indestructable
 	local e2=Effect.CreateEffect(c)

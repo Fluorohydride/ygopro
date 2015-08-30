@@ -2,7 +2,7 @@
 function c71612253.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,5,2,c71612253.ovfilter,aux.Stringid(71612253,0))
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--atk & def
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE+CATEGORY_DAMAGE)

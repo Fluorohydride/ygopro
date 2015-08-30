@@ -1,7 +1,7 @@
 --E・HERO テンペスター
 function c83121692.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode3(c,21844576,20721928,79979666,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

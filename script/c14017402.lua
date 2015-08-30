@@ -1,7 +1,7 @@
 --波動竜騎士 ドラゴエクィテス
 function c14017402.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,c14017402.ffilter,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),true)
 	--copy
 	local e2=Effect.CreateEffect(c)

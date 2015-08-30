@@ -1,4 +1,4 @@
 --ハングリーバーガー
 function c30243636.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 end

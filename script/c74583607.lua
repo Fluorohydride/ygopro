@@ -1,7 +1,7 @@
 --DDD烈火王テムジン
 function c74583607.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0xaf),2,true)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

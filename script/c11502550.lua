@@ -1,7 +1,7 @@
 --E・HERO エアー・ネオス
 function c11502550.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,89943723,54959865,false,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

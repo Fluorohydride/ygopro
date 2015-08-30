@@ -2,7 +2,7 @@
 function c88643579.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_DARK),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--send to grave
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(88643579,0))

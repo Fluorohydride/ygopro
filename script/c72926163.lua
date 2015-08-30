@@ -1,7 +1,7 @@
 --E・HERO ネオス・ナイト
 function c72926163.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,89943723,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),1,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --ナチュル・ガイアストライオ
 function c90555947.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,c90555947.ffilter,2,false)
 	--negate
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --イビリチュア・ガストクラーケ
 function c45222299.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--confirm
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(45222299,0))

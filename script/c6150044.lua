@@ -1,7 +1,7 @@
 --アルカナ ナイトジョーカー
 function c6150044.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode3(c,25652259,90876561,64788463,false,false)
 	--negate
 	local e1=Effect.CreateEffect(c)

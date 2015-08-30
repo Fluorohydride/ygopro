@@ -1,7 +1,7 @@
 --超合魔獣ラプテノス
 function c64463828.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsType,TYPE_DUAL),2,false)
 	--duel status
 	local e1=Effect.CreateEffect(c)

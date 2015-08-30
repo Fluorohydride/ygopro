@@ -1,7 +1,7 @@
 --重装機甲 パンツァードラゴン
 function c72959823.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),true)
 	--destroy
 	local e1=Effect.CreateEffect(c)

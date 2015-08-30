@@ -1,6 +1,6 @@
 --溶岩魔神ラヴァ・ゴーレム
 function c102380.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(102380,0))

@@ -2,7 +2,7 @@
 function c8198620.initial_effect(c)
 	c:SetUniqueOnField(1,0,8198620)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsRace,RACE_ZOMBIE),2,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

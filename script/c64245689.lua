@@ -2,7 +2,7 @@
 function c64245689.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),3,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--to grave
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(64245689,0))

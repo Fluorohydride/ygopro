@@ -1,7 +1,7 @@
 --E・HERO Great TORNADO
 function c3642509.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x3008),aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WIND),true)
 	--atk up
 	local e2=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --コアラッコアラ
 function c7243511.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,87685879,71759912,true,true)
 	--destroy
 	local e1=Effect.CreateEffect(c)

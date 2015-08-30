@@ -1,7 +1,7 @@
 --VW－タイガー・カタパルト
 function c58859575.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,51638941,96300057,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

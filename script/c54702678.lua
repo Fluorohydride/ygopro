@@ -1,7 +1,7 @@
 --極戦機王ヴァルバロイド
 function c54702678.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,c54702678.ffilter,5,true)
 	--extra attack
 	local e1=Effect.CreateEffect(c)

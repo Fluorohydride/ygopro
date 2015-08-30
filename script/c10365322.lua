@@ -1,7 +1,7 @@
 --起爆獣ヴァルカノン
 function c10365322.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),aux.FilterBoolFunction(Card.IsRace,RACE_PYRO),true)
 	--destroy
 	local e2=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --アルティメットサイキッカー
 function c40101111.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,c40101111.ffilter,aux.FilterBoolFunction(Card.IsRace,RACE_PSYCHO),true)
 	--pierce
 	local e2=Effect.CreateEffect(c)

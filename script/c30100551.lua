@@ -2,7 +2,7 @@
 function c30100551.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--discard deck & draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DECKDES+CATEGORY_DRAW)

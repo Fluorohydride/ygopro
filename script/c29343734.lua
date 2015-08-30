@@ -1,7 +1,7 @@
 --E・HERO エリクシーラー
 function c29343734.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode4(c,21844576,58932615,84327329,79979666,true,true)
 	--spsummon condition
 	local e2=Effect.CreateEffect(c)

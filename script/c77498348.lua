@@ -1,6 +1,6 @@
 --カオス・ソルジャー －宵闇の使者－
 function c77498348.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

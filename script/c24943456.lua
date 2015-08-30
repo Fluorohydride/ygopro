@@ -2,7 +2,7 @@
 function c24943456.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsSetCard,0x27),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--pierce
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

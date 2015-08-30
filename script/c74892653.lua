@@ -2,7 +2,7 @@
 function c74892653.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(Card.IsType,TYPE_SYNCHRO),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--disable spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(74892653,0))

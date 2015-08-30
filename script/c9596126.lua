@@ -1,6 +1,6 @@
 --カオス・ソーサラー
 function c9596126.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(9596126,0))

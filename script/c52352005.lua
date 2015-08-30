@@ -2,7 +2,7 @@
 function c52352005.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),1)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--handes
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(52352005,0))

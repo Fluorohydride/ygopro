@@ -1,7 +1,7 @@
 --E・HERO マグマ・ネオス
 function c78512663.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode3(c,89943723,89621922,80344569,false,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

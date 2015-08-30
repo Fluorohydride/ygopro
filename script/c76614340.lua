@@ -1,7 +1,7 @@
 --ジェムナイト・ルビーズ
 function c76614340.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,91731841,aux.FilterBoolFunction(Card.IsSetCard,0x1047),1,false,false)
 	--spsummon condition
 	local e2=Effect.CreateEffect(c)

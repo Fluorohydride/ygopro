@@ -1,7 +1,7 @@
 --重爆撃禽 ボム・フェネクス
 function c6602300.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),aux.FilterBoolFunction(Card.IsRace,RACE_PYRO),true)
 	--damage
 	local e2=Effect.CreateEffect(c)

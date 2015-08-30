@@ -1,7 +1,7 @@
 --ナチュル・エクストリオ
 function c99916754.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,33198837,2956282,false,false)
 	--negate
 	local e2=Effect.CreateEffect(c)

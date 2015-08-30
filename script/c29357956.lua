@@ -1,7 +1,7 @@
 --剣闘獣ネロキウス
 function c29357956.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x19),3,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

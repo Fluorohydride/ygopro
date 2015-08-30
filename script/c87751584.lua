@@ -1,7 +1,7 @@
 --ガトリング・ドラゴン
 function c87751584.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,81480460,25551951,true,true)
 	--destroy
 	local e1=Effect.CreateEffect(c)

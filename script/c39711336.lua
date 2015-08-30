@@ -1,6 +1,6 @@
 --不死王リッチー
 function c39711336.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--turn set
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(39711336,0))

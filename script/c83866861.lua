@@ -1,7 +1,7 @@
 --デストーイ・マッド・キマイラ
 function c83866861.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,c83866861.ffilter,3,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

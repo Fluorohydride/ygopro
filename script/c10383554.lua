@@ -1,7 +1,7 @@
 --デストーイ・ホイールソウ・ライオ
 function c10383554.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,34688023,aux.FilterBoolFunction(Card.IsSetCard,0xa9),1,true,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

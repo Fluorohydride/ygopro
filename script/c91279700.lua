@@ -2,7 +2,7 @@
 function c91279700.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xa),4,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--disable spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

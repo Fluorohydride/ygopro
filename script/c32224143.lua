@@ -2,7 +2,7 @@
 function c32224143.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,2,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(32224143,0))

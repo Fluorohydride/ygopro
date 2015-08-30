@@ -1,7 +1,7 @@
 --CNo.88 ギミック・パペット－ディザスター・レオ
 function c6165656.initial_effect(c)
 	--xyz summon
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

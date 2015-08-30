@@ -1,7 +1,7 @@
 --異星の最終戦士
 function c86099788.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,71466592,88472456,true,true)
 	--destroy
 	local e1=Effect.CreateEffect(c)

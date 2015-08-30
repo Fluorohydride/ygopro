@@ -1,7 +1,7 @@
 --超魔導剣士－ブラック・パラディン
 function c98502113.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,46986414,78193831,true,true)
 	--negate
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --ユベル－Das Extremer Traurig Drachen
 function c31764700.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--battle
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

@@ -2,7 +2,7 @@
 function c47579719.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),3,2)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--pos change
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_POSITION)

@@ -1,7 +1,7 @@
 --地天の騎士ガイアドレイク
 function c58601383.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,97204936,c58601383.ffilter,1,true,true)
 	--cannot be target
 	local e2=Effect.CreateEffect(c)

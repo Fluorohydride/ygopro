@@ -1,6 +1,6 @@
 --幻蝶の刺客オオルリ
 function c54582424.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(54582424,0))

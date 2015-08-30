@@ -1,6 +1,6 @@
 --イビリチュア・リヴァイアニマ
 function c71203602.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--confirm
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(71203602,0))

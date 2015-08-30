@@ -1,7 +1,7 @@
 --E・HERO フレイム・ウィングマン
 function c35809262.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,21844576,58932615,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --イビリチュア・マインドオーガス
 function c11877465.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--return to deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(11877465,0))

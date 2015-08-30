@@ -1,7 +1,7 @@
 --E・HERO ノヴァマスター
 function c1945387.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x3008),aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_FIRE),true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

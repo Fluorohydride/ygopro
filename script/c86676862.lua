@@ -1,7 +1,7 @@
 --E－HERO マリシャス・デビル
 function c86676862.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,58554959,c86676862.ffilter,1,true,true)
 	--spsummon condition
 	local e2=Effect.CreateEffect(c)

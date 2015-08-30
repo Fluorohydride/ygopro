@@ -1,7 +1,7 @@
 --E・HERO ワイルドジャギーマン
 function c10526791.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,86188410,59793705,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

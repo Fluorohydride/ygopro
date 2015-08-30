@@ -1,6 +1,6 @@
 --裁きの龍
 function c57774843.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(57774843,0))

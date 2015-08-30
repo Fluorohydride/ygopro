@@ -1,6 +1,6 @@
 --白竜の聖騎士
 function c73398797.initial_effect(c)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(73398797,0))

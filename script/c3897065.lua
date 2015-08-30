@@ -1,7 +1,7 @@
 --スーパービークロイド－ステルス・ユニオン
 function c3897065.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode4(c,61538782,98049038,71218746,984114,true,true)
 	--equip
 	local e1=Effect.CreateEffect(c)

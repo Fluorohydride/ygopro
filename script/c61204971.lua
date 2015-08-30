@@ -1,7 +1,7 @@
 --E・HERO サンダー・ジャイアント
 function c61204971.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,20721928,84327329,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

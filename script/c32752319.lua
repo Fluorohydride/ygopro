@@ -1,7 +1,7 @@
 --ユーフォロイド・ファイター
 function c32752319.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCodeFun(c,7602840,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),1,false,false)
 	--atk
 	local e1=Effect.CreateEffect(c)

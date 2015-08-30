@@ -1,7 +1,7 @@
 --デス・デーモン・ドラゴン
 function c66235877.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,93220472,16475472,false,false)
 	--disable
 	local e1=Effect.CreateEffect(c)

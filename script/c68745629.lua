@@ -1,7 +1,7 @@
 --E・HERO フレイム・ブラスト
 function c68745629.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcCode2(c,98266377,95362816,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)

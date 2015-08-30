@@ -1,7 +1,7 @@
 --エルシャドール・ミドラーシュ
 function c94977269.initial_effect(c)
 	Duel.EnableGlobalFlag(GLOBALFLAG_SPSUMMON_COUNT)
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	--fusion material
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

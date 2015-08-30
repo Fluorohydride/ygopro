@@ -1,7 +1,7 @@
 --ジェムナイトマスター・ダイヤ
 function c39512984.initial_effect(c)
 	--fusion material
-	c:EnableReviveLimit()
+	aux.EnableReviveLimit(c)
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x1047),3,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
