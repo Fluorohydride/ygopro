@@ -42,7 +42,7 @@ function c847915.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c847915.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c847915.dfilter(c,tp)
-	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0x48)
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0x48)
 end
 function c847915.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c847915.dfilter,1,nil,tp)

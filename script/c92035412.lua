@@ -18,7 +18,7 @@ function c92035412.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c92035412.cfilter(c,tp)
-	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0x30) 
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0x30)
 		and bit.band(c:GetPreviousTypeOnField(),TYPE_EQUIP)~=0
 end
 function c92035412.spcon(e,tp,eg,ep,ev,re,r,rp)

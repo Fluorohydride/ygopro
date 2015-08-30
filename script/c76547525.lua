@@ -21,8 +21,8 @@ function c76547525.cfilter(c,atk)
 	return c:IsFaceup() and c:GetAttack()>atk
 end
 function c76547525.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c76547525.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e:GetHandler():GetAttack())
-	and e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO	
+	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
+		and Duel.IsExistingMatchingCard(c76547525.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e:GetHandler():GetAttack())
 end
 function c76547525.desfilter(c)
 	return c:IsFaceup() and c:IsDestructable()

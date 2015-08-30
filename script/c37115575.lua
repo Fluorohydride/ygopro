@@ -80,8 +80,8 @@ function c37115575.excon(e)
 	return Duel.IsExistingMatchingCard(c37115575.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function c37115575.cfilter(c,tp)
-	return c:IsControler(tp) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousCodeOnField()~=37115575 
-		and c:IsPreviousSetCard(0x23) and not c:IsReason(REASON_RULE)
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
+		and c:IsPreviousSetCard(0x23) and c:GetPreviousCodeOnField()~=37115575 and not c:IsReason(REASON_RULE)
 end
 function c37115575.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c37115575.cfilter,1,nil,tp)

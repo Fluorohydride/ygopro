@@ -45,10 +45,10 @@ function c69750546.costfilter(c)
 end
 function c69750546.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c69750546.costfilter,tp,LOCATION_DECK+LOCATION_HAND,0,2,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.GetMatchingGroup(c69750546.costfilter,tp,LOCATION_DECK+LOCATION_HAND,0,nil)
 	if g:GetCount()>2 then
-		g=Duel.SelectMatchingCard(tp,c69750546.costfilter,tp,LOCATION_DECK+LOCATION_HAND,0,2,2,nil)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		g=g:Select(tp,2,2,nil)
 	end
 	Duel.SendtoGrave(g,REASON_COST)
 end

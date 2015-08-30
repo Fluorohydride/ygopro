@@ -30,7 +30,7 @@ function c74329404.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c74329404.ctfilter(c,tp)
-	return c:IsPreviousControler(tp) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0xc008)
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0xc008)
 end
 function c74329404.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c74329404.ctfilter,1,nil,tp)
