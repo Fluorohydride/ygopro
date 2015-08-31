@@ -1796,7 +1796,7 @@ int32 card::is_equipable(card* pcard) {
 int32 card::is_summonable() {
 	if(!(data.type & TYPE_MONSTER))
 		return FALSE;
-	return !(status & (STATUS_REVIVE_LIMIT | STATUS_UNSUMMONABLE_CARD));
+	return !is_affected_by_effect(EFFECT_UNSUMMONABLE_CARD);
 }
 int32 card::is_summonable(effect* peffect) {
 	effect* oreason = pduel->game_field->core.reason_effect;
@@ -1874,7 +1874,7 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 			return FALSE;
 		}
 	} else if(current.location == LOCATION_HAND) {
-		if(is_status(STATUS_REVIVE_LIMIT) || is_affected_by_effect(EFFECT_CANNOT_SUMMON)) {
+		if(is_affected_by_effect(EFFECT_CANNOT_SUMMON)) {
 			pduel->game_field->restore_lp_cost();
 			return FALSE;
 		}
@@ -2014,7 +2014,7 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 		return FALSE;
 	if(current.location == LOCATION_REMOVED && (current.position & POS_FACEDOWN))
 		return FALSE;
-	if(is_status(STATUS_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE)) {
+	if(is_affected_by_effect(EFFECT_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE)) {
 		if((!nolimit && (current.location & 0x38)) || (!nocheck && !nolimit && (current.location & 0x3)))
 			return FALSE;
 		if(!nolimit && (data.type & TYPE_PENDULUM) && current.location == LOCATION_EXTRA && (current.position & POS_FACEUP))
@@ -2070,7 +2070,7 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 int32 card::is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect, uint8 min_tribute) {
 	if(!(data.type & TYPE_MONSTER))
 		return FALSE;
-	if(status & (STATUS_REVIVE_LIMIT | STATUS_UNSUMMONABLE_CARD))
+	if(is_affected_by_effect(EFFECT_UNSUMMONABLE_CARD))
 		return FALSE;
 	if(current.location != LOCATION_HAND)
 		return FALSE;

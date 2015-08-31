@@ -1,6 +1,6 @@
 --ライトロード・アーチャー フェリス
 function c73176465.initial_effect(c)
-	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
+	c:EnableUnsummonable()
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(73176465,0))

@@ -1,6 +1,6 @@
 --魂食神龍ドレイン・ドラゴン
 function c55735315.initial_effect(c)
-	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
+	c:EnableUnsummonable()
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

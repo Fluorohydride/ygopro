@@ -1133,12 +1133,40 @@ int32 scriptlib::card_copy_effect(lua_State *L) {
 	lua_pushinteger(L, pcard->copy_effect(code, reset, count));
 	return 1;
 }
+int32 scriptlib::card_enable_unsummonable(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	duel* pduel = pcard->pduel;
+	if(!pcard->is_status(STATUS_COPYING_EFFECT)) {
+		effect* peffect = pduel->new_effect();
+		peffect->owner = pcard;
+		peffect->code = EFFECT_UNSUMMONABLE_CARD;
+		peffect->type = EFFECT_TYPE_SINGLE;
+		peffect->flag = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_UNCOPYABLE;
+		pcard->add_effect(peffect);
+	}
+	return 0;
+}
 int32 scriptlib::card_enable_revive_limit(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(!pcard->is_status(STATUS_COPYING_EFFECT))
-		pcard->set_status(STATUS_REVIVE_LIMIT, TRUE);
+	duel* pduel = pcard->pduel;
+	if(!pcard->is_status(STATUS_COPYING_EFFECT)) {
+		effect* peffect1 = pduel->new_effect();
+		peffect1->owner = pcard;
+		peffect1->code = EFFECT_UNSUMMONABLE_CARD;
+		peffect1->type = EFFECT_TYPE_SINGLE;
+		peffect1->flag = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_UNCOPYABLE;
+		pcard->add_effect(peffect1);
+		effect* peffect2 = pduel->new_effect();
+		peffect2->owner = pcard;
+		peffect2->code = EFFECT_REVIVE_LIMIT;
+		peffect2->type = EFFECT_TYPE_SINGLE;
+		peffect2->flag = EFFECT_FLAG_CANNOT_DISABLE | EFFECT_FLAG_UNCOPYABLE;
+		pcard->add_effect(peffect2);
+	}
 	return 0;
 }
 int32 scriptlib::card_complete_procedure(lua_State *L) {

@@ -1666,7 +1666,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, uint8 ignore_count, uint8 min_tribute) {
 	switch(step) {
 	case 0: {
-		if(target->is_status(STATUS_REVIVE_LIMIT))
+		if(target->is_affected_by_effect(EFFECT_UNSUMMONABLE_CARD))
 			return TRUE;
 		if(target->current.location != LOCATION_HAND)
 			return TRUE;
@@ -2412,7 +2412,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		returns.ivalue[0] = FALSE;
 		uint32 result = TRUE;
 		effect_set eset;
-		if(target->is_status(STATUS_REVIVE_LIMIT) && !target->is_status(STATUS_PROC_COMPLETE)) {
+		if(target->is_affected_by_effect(EFFECT_REVIVE_LIMIT) && !target->is_status(STATUS_PROC_COMPLETE)) {
 			if((!nolimit && (target->current.location & 0x38)) || (!nocheck && !nolimit && (target->current.location & 0x3)))
 				result = FALSE;
 		}

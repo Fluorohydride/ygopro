@@ -30,7 +30,7 @@ end
 function c40607210.condition(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	return rc and rc:IsRace(RACE_ZOMBIE) and eg:IsExists(c40607210.cfilter,1,nil,tp)
-		and (re:GetCode()~=EFFECT_SPSUMMON_PROC or not rc:IsStatus(STATUS_REVIVE_LIMIT))
+		and (re:GetCode()~=EFFECT_SPSUMMON_PROC or not rc:IsHasEffect(EFFECT_REVIVE_LIMIT))
 end
 function c40607210.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,2000) end

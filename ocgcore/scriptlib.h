@@ -137,6 +137,7 @@ public:
 	static int32 card_is_relate_to_card(lua_State *L);
 	static int32 card_is_relate_to_battle(lua_State *L);
 	static int32 card_copy_effect(lua_State *L);
+	static int32 card_enable_unsummonable(lua_State *L);
 	static int32 card_enable_revive_limit(lua_State *L);
 	static int32 card_complete_procedure(lua_State *L);
 	static int32 card_is_disabled(lua_State *L);
