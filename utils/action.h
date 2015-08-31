@@ -114,7 +114,7 @@ public:
     
 protected:
     template<typename... ARGS>
-    void Init(std::shared_ptr<Action<TIME_TYPE>> ptr, ARGS... args) { sequence.push_back(ptr); Init(args...); }
+    void Init(std::shared_ptr<Action<TIME_TYPE>> ptr, ARGS... args) { sequence.push_back(ptr); Init(std::forward<ARGS>(args)...); }
     void Init(std::shared_ptr<Action<TIME_TYPE>> ptr) { sequence.push_back(ptr); }
     
     int32_t perform_index = 0;

@@ -199,8 +199,12 @@ namespace base {
         "uniform sampler2D texid;\n"
         "uniform float alpha;\n"
         "void main() {\n"
+//        "if(gl_FrontFacing) {"
         "vec4 texcolor = texture(texid, texcoord);\n"
-        "frag_color = texcolor * color * vec4(1.0, 1.0, 1.0, alpha);\n"
+        "frag_color = mix(texcolor * color * vec4(1.0, 1.0, 1.0, alpha), vec4(hcolor.r, hcolor.g, hcolor.b, 1.0), hcolor.a);\n"
+//        "} else {"
+//        "discard;"
+//        "}"
         "}\n";
         
         if(!inited || reload) {

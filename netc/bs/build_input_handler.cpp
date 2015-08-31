@@ -18,6 +18,9 @@ namespace ygopro
         click_pos = std::make_pair(0, 0);
     }
     
+    BuildInputHandler::~BuildInputHandler() {
+    }
+    
     bool BuildInputHandler::UpdateInput() {
         if(show_info_begin) {
             auto pscene = build_scene.lock();
@@ -65,12 +68,15 @@ namespace ygopro
             }
             if(dcd) {
                 auto ptr = dcd->builder_card;
+                ptr->hl = 0x00ffffff;
                 auto act = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(0, ptr, [](BuilderCard* bc, double t)->bool {
                     if(bc->hl == 0)
                         return false;
-                    bc->SetHL((t * 0.6f + 0.2f) * 255 + 0xffffff00);
+                    uint32_t alpha = (uint32_t)((t * 0.6f + 0.2f) * 255);
+                    bc->SetHL((alpha << 24) | 0xffffff);
                     return true;
                 }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
+                pscene->PushAction(act);
             }
         }
         hover_pos = hov;

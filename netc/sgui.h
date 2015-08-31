@@ -1193,6 +1193,7 @@ namespace sgui
         }
         
         bool Init(const std::string& conf_file, v2i scr_size, bool use_vao) {
+            is_entity = false;
             InitGLState(use_vao);
             SetScreenSize(scr_size);
             InitSysClock();

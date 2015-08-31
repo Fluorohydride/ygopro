@@ -30,6 +30,7 @@ namespace ygopro
     int32_t current_sel_result = -1;
     int32_t result_show_size = 0;
     int64_t update_ver = 0;
+    bool remove_lock = false;
     DeckData current_deck;
     std::vector<std::shared_ptr<DeckCardData>> result_card;
     
@@ -143,14 +144,6 @@ namespace ygopro
             iter->builder_card->PushVertices();
         for(auto& iter : current_deck.side_deck)
             iter->builder_card->PushVertices();
-    }
-    
-    void CardRenderer::RefreshIndex() {
-        std::vector<int16_t> idx;
-        idx.reserve((current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size()) * 12);
-        for(auto& iter : current_deck.main_deck)
-            iter->builder_card->PushIndices(idx);
-        UpdateIndices(&idx[0], 0, idx.size());
     }
     
     BuildScene::BuildScene() {
@@ -358,13 +351,14 @@ namespace ygopro
                         return false;
                     bc->SetPos(bpos + (cpos - bpos) * t);
                     return true;
-                }, std::make_shared<TGenMove<int64_t>>(10, 10.0));
+                }, std::make_shared<TGenMove<int64_t>>(1000, 0.01));
                 PushAction(action);
             }
         };
         cb(current_deck.main_deck, CardLocation::Main);
         cb(current_deck.extra_deck, CardLocation::Extra);
         cb(current_deck.side_deck, CardLocation::Side);
+        card_renderer->RequestRedraw();
     }
     
     void BuildScene::RefreshParams() {
@@ -376,6 +370,7 @@ namespace ygopro
         dx[1] = (rc1 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc1 - 1);
         int32_t rc2 = std::max((int32_t)current_deck.side_deck.size(), max_row_count);
         dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
+        misc_renderer->RequestRedraw();
     }
     
     void BuildScene::RefreshAllCard() {
@@ -516,33 +511,37 @@ namespace ygopro
     }
     
     void BuildScene::RemoveCard(int32_t pos, int32_t index) {
-//        if(update_status == 1)
-//            return;
-//        update_status = 1;
-//        auto dcd = GetCard(pos, index);
-//        if(dcd == nullptr)
-//            return;
-//        uint32_t code = dcd->data->code;
-//        auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-//        v2f dst = ptr->pos.Get() + v2f{card_size.x / 2, -card_size.y / 2};
-//        v2f dsz = {0.0f, 0.0f};
-//        ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenLinear>>(ptr->pos.Get(), dst, SceneMgr::Get().GetGameTime(), 0.2));
-//        ptr->size.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenLinear>>(ptr->size.Get(), dsz, SceneMgr::Get().GetGameTime(), 0.2));
-//        ptr->show_limit = false;
-//        ptr->show_exclusive = false;
-//        AddUpdatingCard(dcd);
-//        GetSceneHandler<BuildSceneHandler>()->RegisterEvent([pos, index, code, this]() {
-//            if(current_deck.RemoveCard(pos, index)) {
-//                ImageMgr::Get().UnloadCardTexture(code);
-//                RefreshParams();
-//                RefreshAllIndex();
-//                UpdateAllCard();
-//                SetDeckDirty();
-//                if(input_handler)
-//                    input_handler->MouseMove({SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y});
-//                update_status = 0;
-//            }
-//        }, 0.2, 0, false);
+        if(remove_lock)
+            return;
+        remove_lock = true;
+        auto dcd = GetCard(pos, index);
+        if(dcd == nullptr)
+            return;
+        uint32_t code = dcd->data->code;
+        auto ptr = dcd->builder_card;
+        v2f cpos = ptr->pos;
+        v2f csz = ptr->size;
+        v2f dst = ptr->pos + v2f{card_size.x / 2, -card_size.y / 2};
+        v2f dsz = {0.0f, 0.0f};
+        ptr->SetLimit(3);
+        auto rm_act = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(200, ptr, [cpos, csz, dst, dsz](BuilderCard* bc, double t) ->bool {
+            bc->SetPos(cpos + (dst - cpos) * t);
+            bc->SetSize(csz + (dsz - csz) * t);
+            return true;
+        }, std::make_shared<TGenLinear<int64_t>>(200));
+        auto cb_act = std::make_shared<ActionCallback<int64_t>>([pos, index, code, this]() {
+            if(current_deck.RemoveCard(pos, index)) {
+                ImageMgr::Get().UnloadCardTexture(code);
+                current_deck.CalCount();
+                RefreshParams();
+                UpdateAllCard();
+                SetDeckDirty();
+                if(input_handler)
+                    input_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
+                remove_lock = false;
+            }
+        });
+        PushAction(std::make_shared<ActionSequence<int64_t>>(rm_act, cb_act));
     }
     
     void BuildScene::InsertSearchResult(int32_t index, bool is_side) {

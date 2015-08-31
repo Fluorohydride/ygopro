@@ -56,7 +56,6 @@ namespace ygopro
     public:
         CardRenderer() { InitGLState(true); }
         virtual void PushVerticesAll();
-        void RefreshIndex();
     };
     
     class BuildScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
