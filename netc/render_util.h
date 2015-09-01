@@ -327,7 +327,6 @@ namespace base
             if(iter != all_units.end()) {
                 update_units.erase(at);
                 all_units.erase(iter);
-                delete at;
                 return true;
             }
             return false;

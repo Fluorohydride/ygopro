@@ -56,9 +56,9 @@
       }
     }
   },
-  "popup menu width" : 100,
-  "popup menu height" : 100,
-  "popup menu margin" : [5, 5, 5, 5],
+  "popup menu width" : 200,
+  "popup menu height" : 50,
+  "popup menu margin" : [5, 5, 8, 5],
   "file dialog" : {
     "type" : "window",
     "close button" : false,
@@ -86,6 +86,7 @@
   },
   "filter dialog" : {
     "type" : "panel",
+    "is entity" : true,
     "position" : [0, 0, 500, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "keyword label" : {
@@ -208,6 +209,7 @@
   },
   "info dialog" : {
     "type" : "panel",
+    "is entity" : true,
     "position" : [0, 0, 600, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "card image" : {
@@ -234,31 +236,38 @@
   },
   "build panel" : {
     "type" : "panel",
-    "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "is entity" : true,
+    "position" : [10, 10, -20, 50, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0],
     "children" : {
       "deck name" : {
         "type" : "label",
-        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [10, 10, 200, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu deck" : {
-        "type" : "button",
+        "type" : "text button",
         "text" : "eui_menu_deck",
-        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [210, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu tool" : {
-        "type" : "button",
+        "type" : "text button",
         "text" : "eui_menu_tool",
-        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [310, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu list" : {
-        "type" : "button",
+        "type" : "text button",
         "text" : "eui_menu_list",
-        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [410, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "menu search" : {
+        "type" : "text button",
+        "text" : "eui_menu_list",
+        "position" : [510, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       }
     }
   },
   "result panel" : {
-    "type" : "panel"
+    "type" : "panel",
+    "is entity" : true
   },
   "menus" : {
     "menu deck" : {

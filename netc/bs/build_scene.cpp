@@ -94,7 +94,7 @@ namespace ygopro
         std::array<int16_t, 33 * 6> indices;
         auto msk = ImageMgr::Get().GetTexture("mmask");
         auto nbk = ImageMgr::Get().GetTexture("numback");
-        float yrate = 1.0f - 40.0f / screen_size.y;
+        float yrate = 1.0f - 50.0f / screen_size.y;
         float lx = 10.0f / screen_size.x * 2.0f - 1.0f;
         float rx = 0.5625f;
         float y0 = (0.95f + 1.0f) * yrate - 1.0f;
@@ -172,7 +172,6 @@ namespace ygopro
             scene_handler->BeginHandler();
         RefreshAllCard();
         InitActionTime(SceneMgr::Get().GetSysClock());
-        LoadDeckFromFile(L"./deck/807.ydk");
     }
     
     bool BuildScene::Update() {
@@ -193,7 +192,7 @@ namespace ygopro
     }
     
     void BuildScene::SetSceneSize(v2i sz) {
-        float yrate = 1.0f - 40.0f / sz.y;
+        float yrate = 1.0f - 50.0f / sz.y;
         card_size = {0.2f * yrate * sz.y / sz.x, 0.29f * yrate};
         icon_size = {0.08f * yrate * sz.y / sz.x, 0.08f * yrate};
         minx = 50.0f / sz.x * 2.0f - 1.0f;
@@ -256,15 +255,20 @@ namespace ygopro
         for(auto& dcd : current_deck.side_deck)
             ImageMgr::Get().UnloadCardTexture(dcd->data->code);
         current_deck.Clear();
+        card_renderer->RequestRedraw();
         SetDeckDirty();
     }
     
     void BuildScene::SortDeck() {
+        if(remove_lock)
+            return;
         current_deck.Sort();
         UpdateAllCard();
     }
     
     void BuildScene::ShuffleDeck() {
+        if(remove_lock)
+            return;
         current_deck.Shuffle();
         UpdateAllCard();
     }
@@ -274,6 +278,8 @@ namespace ygopro
     }
     
     bool BuildScene::LoadDeckFromFile(const std::wstring& file) {
+        if(remove_lock)
+            return false;
         DeckData tempdeck;
         if(tempdeck.LoadFromFile(FileSystem::WSTRToLocalFilename(file))) {
             ClearDeck();
@@ -300,6 +306,8 @@ namespace ygopro
     }
     
     bool BuildScene::LoadDeckFromString(const std::string& deck_string) {
+        if(remove_lock)
+            return false;
         DeckData tempdeck;
         if(deck_string.find("ydk://") == 0 && tempdeck.LoadFromString(deck_string.substr(6))) {
             ClearDeck();
@@ -346,13 +354,15 @@ namespace ygopro
                 auto ptr = lst[i]->builder_card;
                 auto bpos = ptr->pos;
                 auto cpos = ptr->GetCurrentPos(loc, (int32_t)i);
-                auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos, ver](BuilderCard* bc, double t) ->bool {
-                    if(ver != update_ver)
-                        return false;
-                    bc->SetPos(bpos + (cpos - bpos) * t);
-                    return true;
-                }, std::make_shared<TGenMove<int64_t>>(1000, 0.01));
-                PushAction(action);
+                if(std::abs((bpos.x - cpos.x) / bpos.x) > 0.001f || std::abs((bpos.y - cpos.y) / bpos.y) > 0.001f) {
+                    auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos, ver](BuilderCard* bc, double t) ->bool {
+                        if(ver != update_ver)
+                            return false;
+                        bc->SetPos(bpos + (cpos - bpos) * t);
+                        return true;
+                    }, std::make_shared<TGenMove<int64_t>>(1000, 0.01));
+                    PushAction(action);
+                }
             }
         };
         cb(current_deck.main_deck, CardLocation::Main);
@@ -390,6 +400,7 @@ namespace ygopro
             ptr->SetPos(ptr->GetCurrentPos(CardLocation::Side, (int32_t)i));
             ptr->SetSize(card_size);
         }
+        card_renderer->RequestRedraw();
     }
     
     void BuildScene::UpdateResult() {
@@ -428,6 +439,8 @@ namespace ygopro
     }
     
     void BuildScene::ChangeRegulation(int32_t index, int32_t view_regulation) {
+        if(remove_lock)
+            return;
         LimitRegulationMgr::Get().SetLimitRegulation(index);
         if(view_regulation)
             ViewRegulation(view_regulation - 1);
@@ -437,6 +450,8 @@ namespace ygopro
     }
     
     void BuildScene::ViewRegulation(int32_t limit) {
+        if(remove_lock)
+            return;
         ClearDeck();
         LimitRegulationMgr::Get().LoadCurrentListToDeck(current_deck, limit);
         for(auto& dcd : current_deck.main_deck) {
@@ -530,15 +545,17 @@ namespace ygopro
             return true;
         }, std::make_shared<TGenLinear<int64_t>>(200));
         auto cb_act = std::make_shared<ActionCallback<int64_t>>([pos, index, code, this]() {
+            auto ptr = GetCard(pos, index)->builder_card;
             if(current_deck.RemoveCard(pos, index)) {
                 ImageMgr::Get().UnloadCardTexture(code);
                 current_deck.CalCount();
                 RefreshParams();
                 UpdateAllCard();
                 SetDeckDirty();
+                card_renderer->DeleteObject(ptr.get());
+                remove_lock = false;
                 if(input_handler)
                     input_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
-                remove_lock = false;
             }
         });
         PushAction(std::make_shared<ActionSequence<int64_t>>(rm_act, cb_act));

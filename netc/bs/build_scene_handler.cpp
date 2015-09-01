@@ -30,6 +30,8 @@ namespace ygopro
                 build_scene.lock()->GetInputHandler()->KeyDown(key, mods);
                 return true;
             };
+            auto res = pnl_build->FindWidget("deck name");
+            deck_label = res ? res->CastPtr<sgui::SGLabel>() : nullptr;
             auto menu_deck = pnl_build->FindWidgetAs<sgui::SGTextButton>("menu deck");
             if(menu_deck) {
                 menu_deck->event_click += [this](sgui::SGWidget& sender)->bool {
@@ -87,6 +89,10 @@ namespace ygopro
                 build_scene.lock()->GetInputHandler()->KeyDown(key, mods);
                 return true;
             };
+            auto res = pnl_result->FindWidget("result label");
+            label_result = res ? res->CastPtr<sgui::SGLabel>() : nullptr;
+            res = pnl_result->FindWidget("page label");
+            label_page = res ? res->CastPtr<sgui::SGLabel>() : nullptr;
             auto btn_prev = pnl_result->FindWidgetAs<sgui::SGTextButton>("prev page");
             if(btn_prev) {
                 btn_prev->event_click += [this](sgui::SGWidget& sender)->bool {

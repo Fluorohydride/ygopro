@@ -75,7 +75,9 @@ namespace ygopro
                     } else if(name == "close button") {
                         wnd->SetCloseButtonVisible(sub_node.to_bool());
                     } else if(name == "children") {
-                        LoadChild(wnd, name, sub_node);
+                        sub_node.for_each([wnd](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                            LoadChild(wnd, c_name, c_node);
+                        });
                     }
                 });
                 return wnd;
@@ -90,7 +92,9 @@ namespace ygopro
                     } else if(name == "style") {
                         pnl->SetStyle(sub_node);
                     } else if(name == "children") {
-                        LoadChild(pnl, name, sub_node);
+                        sub_node.for_each([pnl](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                            LoadChild(pnl, c_name, c_node);
+                        });
                     }
                 });
                 return pnl;
@@ -111,8 +115,9 @@ namespace ygopro
                                 title_color = sgui::SGJsonUtil::ConvertRGBA(color_node);
                             auto tab = tab_control->AddTab(To<std::wstring>(name), title_color);
                             auto& child_node = tab_node["children"];
-                            if(!child_node.is_empty())
-                                LoadChild(tab, "", child_node);
+                            child_node.for_each([tab](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                                LoadChild(tab, c_name, c_node);
+                            });
                         });
                     }
                 });
@@ -399,7 +404,7 @@ namespace ygopro
     
     PopupMenu& PopupMenu::AddButton(const std::wstring& text, intptr_t cval) {
         auto btn = pnl->NewChild<sgui::SGTextButton>();
-        btn->SetPositionSize({margin.left, margin.top + (item_count + margin.top) * item_height}, {item_width, item_height});
+        btn->SetPositionSize({margin.left, margin.top + (item_height + margin.top) * item_count}, {item_width, item_height});
         btn->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]));
         btn->SetCustomValue(cval);
         btn->event_click += [this](sgui::SGWidget& sender)->bool {
@@ -413,7 +418,7 @@ namespace ygopro
     }
     
     void PopupMenu::End() {
-        pnl->SetPositionSize(pos, {item_width + margin.left + margin.width, (item_count + margin.top) * item_height + margin.height});
+        pnl->SetPositionSize(pos, {item_width + margin.left + margin.width, (item_height + margin.top) * item_count + margin.height});
         pnl->event_on_destroy += [this](sgui::SGWidget& sender)->bool {
             delete this;
             return true;

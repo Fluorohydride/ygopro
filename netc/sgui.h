@@ -1231,11 +1231,8 @@ namespace sgui
             return true;
         }
         
-        void Uninit() {}
-        
-        void ClearChilds() {
-            children.clear();
-        }
+        void Uninit() { ClearChilds(); }
+        void ClearChilds() { children.clear(); }
         
         virtual void SetScreenSize(v2i sz) {
             RenderObject2DLayout::SetScreenSize(sz);
