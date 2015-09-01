@@ -17,7 +17,6 @@ function c48497555.initial_effect(c)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,48497556)
-	e2:SetCondition(c48497555.spcon)
 	e2:SetTarget(c48497555.sptg)
 	e2:SetOperation(c48497555.spop)
 	c:RegisterEffect(e2)
@@ -41,9 +40,6 @@ function c48497555.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(c,POS_FACEDOWN)
 		Duel.RaiseEvent(c,EVENT_SSET,e,REASON_EFFECT,tp,tp,0)
 	end
-end
-function c48497555.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c48497555.spfilter(c,e,tp)
 	return c:IsSetCard(0x43) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

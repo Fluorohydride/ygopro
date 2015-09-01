@@ -6,7 +6,6 @@ function c69750546.initial_effect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c69750546.condition)
 	e1:SetTarget(c69750546.target)
 	e1:SetOperation(c69750546.operation)
 	c:RegisterEffect(e1)
@@ -23,9 +22,6 @@ function c69750546.initial_effect(c)
 	e2:SetOperation(c69750546.desop)
 	c:RegisterEffect(e2)
 end
-function c69750546.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
-end
 function c69750546.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
@@ -38,7 +34,7 @@ function c69750546.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c69750546.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN) and re and re:GetHandler():IsSetCard(0xb9)
+	return re and re:GetHandler():IsSetCard(0xb9)
 end
 function c69750546.costfilter(c)
 	return c:IsCode(69750546) and c:IsAbleToGraveAsCost()

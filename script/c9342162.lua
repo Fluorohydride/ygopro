@@ -25,9 +25,8 @@ function c9342162.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCountLimit(1,9342162)
-	e3:SetCondition(c9342162.tgcon)
 	e3:SetTarget(c9342162.tgtg)
 	e3:SetOperation(c9342162.tgop)
 	c:RegisterEffect(e3)
@@ -54,9 +53,6 @@ function c9342162.ssop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c9342162.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c9342162.tgfilter(c)
 	return c:IsSetCard(0xb1) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGrave()

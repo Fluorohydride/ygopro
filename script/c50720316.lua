@@ -15,7 +15,6 @@ function c50720316.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetDescription(aux.Stringid(50720316,1))
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(c50720316.thcon2)
 	e2:SetTarget(c50720316.thtg2)
 	e2:SetOperation(c50720316.tgop2)
 	c:RegisterEffect(e2)
@@ -38,9 +37,6 @@ function c50720316.tgop1(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-function c50720316.thcon2(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c50720316.thfilter2(c)
 	return c:IsSetCard(0x8) and c:IsType(TYPE_MONSTER) and not c:IsCode(50720316) and c:IsAbleToHand()
