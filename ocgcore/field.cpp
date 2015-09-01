@@ -41,6 +41,7 @@ field::field(duel* pduel) {
 		player[i].draw_count = 1;
 		player[i].disabled_location = 0;
 		player[i].used_location = 0;
+		player[i].extra_p_count = 0;
 		player[i].list_mzone.reserve(5);
 		player[i].list_szone.reserve(8);
 		player[i].list_main.reserve(45);
@@ -128,6 +129,7 @@ void field::reload_field_info() {
 		pduel->write_buffer8(player[playerid].list_grave.size());
 		pduel->write_buffer8(player[playerid].list_remove.size());
 		pduel->write_buffer8(player[playerid].list_extra.size());
+		pduel->write_buffer8(player[playerid].extra_p_count);
 	}
 	pduel->write_buffer8(core.current_chain.size());
 	for(auto chit = core.current_chain.begin(); chit != core.current_chain.end(); ++chit) {
