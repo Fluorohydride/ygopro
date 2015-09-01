@@ -20,7 +20,7 @@ function c14094090.cfilter(c,att)
 	return c:IsAttribute(att) and c:IsAbleToRemoveAsCost()
 end
 function c14094090.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
+	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c14094090.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
