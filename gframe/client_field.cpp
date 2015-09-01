@@ -58,6 +58,8 @@ void ClientField::Clear() {
 	for(auto sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
 		delete *sit;
 	overlay_cards.clear();
+	extra_p_count[0] = 0;
+	extra_p_count[1] = 0;
 	chains.clear();
 	disabled_field = 0;
 	deck_act = false;
@@ -194,6 +196,8 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			extra[controler][0] = pcard;
 			pcard->sequence = 0;
 		}
+		if ((pcard->type & TYPE_PENDULUM) && (pcard->position & POS_FACEUP))
+			extra_p_count[controler]++;
 		break;
 	}
 	}
@@ -262,6 +266,8 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 			extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
 		}
 		extra[controler].erase(extra[controler].end() - 1);
+		if ((pcard->type & TYPE_PENDULUM) && (pcard->position & POS_FACEUP))
+			extra_p_count[controler]--;
 		break;
 	}
 	}
@@ -495,6 +501,7 @@ void ClientField::ReplaySwap() {
 	std::swap(grave[0], grave[1]);
 	std::swap(remove[0], remove[1]);
 	std::swap(extra[0], extra[1]);
+	std::swap(extra_p_count[0], extra_p_count[1]);
 	for(int p = 0; p < 2; ++p) {
 		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
