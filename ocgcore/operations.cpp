@@ -2596,6 +2596,7 @@ int32 field::destroy(uint16 step, group * targets, card * target, uint8 battle) 
 			add_process(PROCESSOR_OPERATION_REPLACE, 10, eset[i], targets, (ptr)target, 1);
 	return TRUE;
 }
+// PROCESSOR_DESTROY goes here
 int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint32 reason, uint8 reason_player) {
 	switch (step) {
 	case 0: {
@@ -2953,6 +2954,7 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 	}
 	return TRUE;
 }
+// PROCESSOR_SENDTO_STEP goes here
 int32 field::send_to(uint16 step, group * targets, card * target) {
 	uint8 playerid = (target->operation_param >> 16) & 0xff;
 	uint8 dest = (target->operation_param >> 8) & 0xff;
@@ -2975,6 +2977,7 @@ int32 field::send_to(uint16 step, group * targets, card * target) {
 	}
 	return TRUE;
 }
+// PROCESSOR_SENDTO goes here
 int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint32 reason, uint8 reason_player) {
 	struct exargs {
 		group* targets;
@@ -3449,6 +3452,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		core.operated_set = targets->container;
 		returns.ivalue[0] = targets->container.size();
 		pduel->delete_group(targets);
+		adjust_all();
 		return TRUE;
 	}
 	}
