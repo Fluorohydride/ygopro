@@ -15,7 +15,7 @@ function c20057949.initial_effect(c)
 		c20057949[1]=false
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_DESTROY)
+		ge1:SetCode(EVENT_DESTROYED)
 		ge1:SetOperation(c20057949.checkop1)
 		Duel.RegisterEffect(ge1,0)
 		local ge2=Effect.CreateEffect(c)
@@ -28,10 +28,8 @@ end
 function c20057949.checkop1(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		local pos=tc:GetPosition()
-		if Duel.GetCurrentPhase()==PHASE_DAMAGE then pos=tc:GetBattlePosition() end
-		if tc:IsLocation(LOCATION_MZONE) and tc:IsSetCard(0x31) and bit.band(pos,POS_FACEUP)~=0 then
-			c20057949[tc:GetControler()]=true
+		if tc:IsPreviousLocation(LOCATION_MZONE) and tc:IsPreviousPosition(POS_FACEUP) and tc:IsPreviousSetCard(0x31) then
+			c20057949[tc:GetPreviousControler()]=true
 		end
 		tc=eg:GetNext()
 	end

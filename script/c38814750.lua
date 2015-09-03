@@ -1,6 +1,6 @@
 --PSYフレームギア・γ
 function c38814750.initial_effect(c)
-	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
+	c:EnableUnsummonable()
 	--splimit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -28,7 +28,7 @@ function c38814750.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 and ep~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
 function c38814750.spfilter(c,e,tp)
-	return c:IsCode(49036338) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsCode(49036338) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c38814750.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
@@ -44,7 +44,7 @@ function c38814750.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 or not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c38814750.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
-	if g:GetCount()==0 then return end
+	if g:FilterCount(aux.nvfilter,nil)==0 then return end
 	local tc=g:GetFirst()
 	local c=e:GetHandler()
 	local fid=c:GetFieldID()

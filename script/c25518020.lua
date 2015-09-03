@@ -19,7 +19,7 @@ function c25518020.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCode(EVENT_DESTROY)
+	e3:SetCode(EVENT_DESTROYED)
 	e3:SetCondition(c25518020.ctcon)
 	e3:SetOperation(c25518020.ctop)
 	c:RegisterEffect(e3)
@@ -36,7 +36,7 @@ function c25518020.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c25518020.ctfilter(c)
-	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsRace(RACE_MACHINE)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and bit.band(c:GetPreviousRaceOnField(),RACE_MACHINE)~=0
 end
 function c25518020.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c25518020.ctfilter,1,nil)

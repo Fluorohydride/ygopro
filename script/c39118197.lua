@@ -28,9 +28,8 @@ function c39118197.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_FIELD)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCategory(CATEGORY_ATKCHANGE)
-	e4:SetCode(EVENT_DESTROY)
+	e4:SetCode(EVENT_DESTROYED)
 	e4:SetCondition(c39118197.atkcon)
-	e4:SetTarget(c39118197.atktg)
 	e4:SetOperation(c39118197.atkop)
 	c:RegisterEffect(e4)
 end
@@ -47,19 +46,19 @@ function c39118197.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c39118197.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x11) and c:IsLocation(LOCATION_MZONE)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0x11) 
 end
 function c39118197.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c39118197.filter,1,nil)
 end
-function c39118197.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
-end
 function c39118197.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetReset(RESET_EVENT+0x1ff0000)
-	e1:SetValue(400)
-	e:GetHandler():RegisterEffect(e1)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetReset(RESET_EVENT+0x1ff0000)
+		e1:SetValue(400)
+		c:RegisterEffect(e1)
+	end
 end

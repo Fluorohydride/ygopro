@@ -62,9 +62,7 @@ function c56585883.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c56585883.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsReason(REASON_RETURN) then
-		c:RegisterFlagEffect(56585883,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-	end
+	c:RegisterFlagEffect(56585883,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c56585883.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(56585883)>0

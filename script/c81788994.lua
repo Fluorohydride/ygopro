@@ -33,7 +33,7 @@ function c81788994.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c81788994.cfilter(c)
-	return c:IsSetCard(0x9d) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_RETURN)
+	return c:IsSetCard(0x9d) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT)
 end
 function c81788994.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c81788994.cfilter,1,nil)

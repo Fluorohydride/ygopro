@@ -39,7 +39,7 @@ function c60879050.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c60879050.eqlimit(e,c)
-	return e:GetHandler():GetEquipTarget()==c
+	return e:GetHandler():GetEquipTarget()==c and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c60879050.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_EARTH)

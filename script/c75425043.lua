@@ -1,6 +1,6 @@
 --PSYフレームギア・α
 function c75425043.initial_effect(c)
-	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
+	c:EnableUnsummonable()
 	--splimit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -33,11 +33,13 @@ function c75425043.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 and eg:IsExists(c75425043.cfilter,1,nil,1-tp)
 end
 function c75425043.spfilter1(c,e,tp)
-	return c:IsCode(49036338) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
-		and Duel.IsExistingMatchingCard(c75425043.thfilter,tp,LOCATION_DECK,0,1,c)
+	return c:IsCode(49036338) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.IsExistingMatchingCard(c75425043.thfilter,tp,LOCATION_DECK,0,1,c)
 end
 function c75425043.spfilter2(c,e,tp)
-	return c:IsCode(49036338) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsCode(49036338) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.IsExistingMatchingCard(c75425043.thfilter0,tp,LOCATION_DECK,0,1,c)
+end
+function c75425043.thfilter0(c)
+	return c:IsSetCard(0xc1) and not c:IsCode(75425043)
 end
 function c75425043.thfilter(c)
 	return c:IsSetCard(0xc1) and not c:IsCode(75425043) and c:IsAbleToHand()
@@ -53,7 +55,7 @@ function c75425043.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 or not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c75425043.spfilter2,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
-	if g:GetCount()==0 then return end
+	if g:FilterCount(aux.nvfilter,nil)==0 then return end
 	local tc=g:GetFirst()
 	local c=e:GetHandler()
 	local fid=c:GetFieldID()

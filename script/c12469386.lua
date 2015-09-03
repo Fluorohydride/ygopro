@@ -7,17 +7,18 @@ function c12469386.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_DESTROY)
+	e1:SetCode(EVENT_DESTROYED)
 	e1:SetCondition(c12469386.spcon)
 	e1:SetTarget(c12469386.sptg)
 	e1:SetOperation(c12469386.spop)
 	c:RegisterEffect(e1)
 end
 function c12469386.filter(c,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsLevelAbove(5) and c:IsRace(RACE_PLANT)
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) 
+		and c:GetPreviousLevelOnField()>=5 and bit.band(c:GetPreviousRaceOnField(),RACE_PLANT)~=0
 end
 function c12469386.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c12469386.filter,1,nil,tp)
+	return eg:IsExists(c12469386.filter,1,e:GetHandler(),tp)
 end
 function c12469386.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0

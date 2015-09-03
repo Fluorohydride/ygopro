@@ -1666,7 +1666,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, uint8 ignore_count, uint8 min_tribute) {
 	switch(step) {
 	case 0: {
-		if(target->is_status(STATUS_REVIVE_LIMIT))
+		if(target->is_affected_by_effect(EFFECT_UNSUMMONABLE_CARD))
 			return TRUE;
 		if(target->current.location != LOCATION_HAND)
 			return TRUE;
@@ -2412,7 +2412,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		returns.ivalue[0] = FALSE;
 		uint32 result = TRUE;
 		effect_set eset;
-		if(target->is_status(STATUS_REVIVE_LIMIT) && !target->is_status(STATUS_PROC_COMPLETE)) {
+		if(target->is_affected_by_effect(EFFECT_REVIVE_LIMIT) && !target->is_status(STATUS_PROC_COMPLETE)) {
 			if((!nolimit && (target->current.location & 0x38)) || (!nocheck && !nolimit && (target->current.location & 0x3)))
 				result = FALSE;
 		}
@@ -2596,6 +2596,7 @@ int32 field::destroy(uint16 step, group * targets, card * target, uint8 battle) 
 			add_process(PROCESSOR_OPERATION_REPLACE, 10, eset[i], targets, (ptr)target, 1);
 	return TRUE;
 }
+// PROCESSOR_DESTROY goes here
 int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint32 reason, uint8 reason_player) {
 	switch (step) {
 	case 0: {
@@ -2953,6 +2954,7 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 	}
 	return TRUE;
 }
+// PROCESSOR_SENDTO_STEP goes here
 int32 field::send_to(uint16 step, group * targets, card * target) {
 	uint8 playerid = (target->operation_param >> 16) & 0xff;
 	uint8 dest = (target->operation_param >> 8) & 0xff;
@@ -2975,6 +2977,7 @@ int32 field::send_to(uint16 step, group * targets, card * target) {
 	}
 	return TRUE;
 }
+// PROCESSOR_SENDTO goes here
 int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint32 reason, uint8 reason_player) {
 	struct exargs {
 		group* targets;
@@ -3412,7 +3415,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				released.insert(pcard);
 				raise_single_event(pcard, 0, EVENT_RELEASE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 			}
-			if(pcard->current.reason & REASON_DESTROY) {
+			if(pcard->current.reason & REASON_DESTROY && !pcard->is_status(STATUS_BATTLE_DESTROYED)) {
 				destroyed.insert(pcard);
 				raise_single_event(pcard, 0, EVENT_DESTROYED, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 			}
@@ -3449,6 +3452,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		core.operated_set = targets->container;
 		returns.ivalue[0] = targets->container.size();
 		pduel->delete_group(targets);
+		adjust_all();
 		return TRUE;
 	}
 	}

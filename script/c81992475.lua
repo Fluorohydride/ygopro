@@ -24,10 +24,9 @@ function c81992475.initial_effect(c)
 	e3:SetDescription(aux.Stringid(81992475,1))
 	e3:SetCategory(CATEGORY_REMOVE+CATEGORY_DAMAGE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,81992475)
-	e3:SetCondition(c81992475.rmcon)
 	e3:SetTarget(c81992475.rmtg)
 	e3:SetOperation(c81992475.rmop)
 	c:RegisterEffect(e3)
@@ -54,9 +53,6 @@ function c81992475.ssop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c81992475.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c81992475.rmfilter(c)
 	return c:IsSetCard(0xb1) and not c:IsCode(81992475) and c:IsAbleToRemove()

@@ -1266,3 +1266,7 @@ function Auxiliary.qlifilter(e,te)
 		return false
 	end
 end
+--filter for necro_valley test
+function Auxiliary.nvfilter(c)
+	return not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+end

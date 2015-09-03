@@ -42,7 +42,7 @@ function c29795530.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c29795530.lvcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
+	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c29795530.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

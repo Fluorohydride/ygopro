@@ -27,10 +27,9 @@ function c72291078.initial_effect(c)
 	e4:SetDescription(aux.Stringid(72291078,1))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
 	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetCountLimit(1,72291078)
-	e4:SetCondition(c72291078.spcon)
 	e4:SetTarget(c72291078.sptg)
 	e4:SetOperation(c72291078.spop)
 	c:RegisterEffect(e4)
@@ -57,9 +56,6 @@ function c72291078.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		Duel.Summon(tp,tc,true,nil)
 	end
-end
-function c72291078.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c72291078.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

@@ -72,7 +72,7 @@ function c36970611.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c36970611.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
+	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c36970611.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

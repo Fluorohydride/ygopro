@@ -27,7 +27,6 @@ function c20758643.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,20758643)
-	e3:SetCondition(c20758643.spcon)
 	e3:SetTarget(c20758643.sptg)
 	e3:SetOperation(c20758643.spop)
 	c:RegisterEffect(e3)
@@ -54,9 +53,6 @@ function c20758643.ssop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c20758643.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c20758643.spfilter(c,e,tp)
 	return c:IsSetCard(0xb1) and not c:IsCode(20758643) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

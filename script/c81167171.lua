@@ -14,7 +14,7 @@ function c81167171.initial_effect(c)
 		c81167171[1]=false
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_DESTROY)
+		ge1:SetCode(EVENT_BATTLE_DESTROYED)
 		ge1:SetOperation(c81167171.checkop1)
 		Duel.RegisterEffect(ge1,0)
 		local ge2=Effect.CreateEffect(c)
@@ -27,8 +27,8 @@ end
 function c81167171.checkop1(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsLocation(LOCATION_MZONE) and tc:IsSetCard(0x3008) and tc:IsReason(REASON_BATTLE) then
-			c81167171[tc:GetControler()]=true
+		if tc:IsPreviousSetCard(0x3008) then
+			c81167171[tc:GetPreviousControler()]=true
 		end
 		tc=eg:GetNext()
 	end

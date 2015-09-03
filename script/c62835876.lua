@@ -14,7 +14,7 @@ function c62835876.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c62835876.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID()
+	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c62835876.cfilter(c)
 	return c:IsSetCard(0xb1) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()

@@ -25,7 +25,7 @@ end
 function c48210156.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if tc:IsRelateToEffect(e) and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
@@ -36,12 +36,18 @@ function c48210156.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_DEFENCE_FINAL)
 		tc:RegisterEffect(e2)
 		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e3:SetCode(EVENT_DESTROY)
-		e3:SetLabel(tp)
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetCode(EVENT_DESTROYED)
+		e3:SetCondition(c48210156.damcon)
 		e3:SetOperation(c48210156.damop)
-		e3:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e3)
+		Duel.RegisterEffect(e3,tp)
+		local e4=Effect.CreateEffect(c)
+		e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e4:SetCode(EVENT_DESTROY)
+		e4:SetLabelObject(e3)
+		e4:SetOperation(c48210156.checkop)
+		e4:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e4)
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -51,10 +57,20 @@ function c48210156.spop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(c48210156.splimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	Duel.SpecialSummonComplete()
 end
 function c48210156.splimit(e,c)
 	return c:GetRace()~=RACE_FIEND
 end
+function c48210156.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local e3=e:GetLabelObject()
+	e3:SetLabel(1)
+end
+function c48210156.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetLabel()==1
+end
 function c48210156.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Damage(e:GetLabel(),1000,REASON_EFFECT)
+	Duel.Damage(tp,1000,REASON_EFFECT)
+	e:SetLabel(0)
+	e:Reset()
 end
