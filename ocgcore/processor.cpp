@@ -4767,7 +4767,6 @@ void field::adjust_instant() {
 	adjust_disable_check_list();
 	adjust_self_destroy_set();
 }
-// this includes adjust_instant()
 void field::adjust_all() {
 	core.readjust_map.clear();
 	add_process(PROCESSOR_ADJUST, 0, 0, 0, 0, 0);
