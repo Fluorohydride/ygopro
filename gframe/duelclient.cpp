@@ -3105,8 +3105,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.AddCard(ccard, p, LOCATION_REMOVED, seq);
 				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 			}
-			val = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.extra_p_count[p] = val;
 		}
 		val = BufferIO::ReadInt8(pbuf); //chains
 		for(int i = 0; i < val; ++i) {
