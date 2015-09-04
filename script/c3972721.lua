@@ -1,4 +1,4 @@
---グリード·グラード
+--グリード・グラード
 function c3972721.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

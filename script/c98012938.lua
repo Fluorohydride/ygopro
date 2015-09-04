@@ -8,20 +8,16 @@ function c98012938.initial_effect(c)
 	e1:SetDescription(aux.Stringid(98012938,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCountLimit(1,98012938)
 	e1:SetCondition(c98012938.condition)
-	e1:SetCost(c98012938.cost)
 	e1:SetTarget(c98012938.target)
 	e1:SetOperation(c98012938.operation)
 	c:RegisterEffect(e1)
 end
 function c98012938.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
-end
-function c98012938.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,98012938)==0 end
-	Duel.RegisterFlagEffect(tp,98012938,RESET_PHASE+PHASE_END,0,1)
 end
 function c98012938.filter(c)
 	return c:IsFaceup() and c:IsAbleToHand()

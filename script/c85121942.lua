@@ -1,7 +1,7 @@
 --CNo.105 BK 彗星のカエストス
 function c85121942.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),4)
+	aux.AddXyzProcedure(c,nil,5,4)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)
@@ -28,6 +28,7 @@ function c85121942.initial_effect(c)
 	e2:SetOperation(c85121942.desop)
 	c:RegisterEffect(e2)
 end
+c85121942.xyz_number=105
 function c85121942.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()

@@ -1,4 +1,4 @@
---溶岩魔神ラヴァ·ゴーレム
+--溶岩魔神ラヴァ・ゴーレム
 function c102380.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon
@@ -19,7 +19,6 @@ function c102380.initial_effect(c)
 	e2:SetCategory(CATEGORY_DAMAGE)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c102380.damcon)
 	e2:SetTarget(c102380.damtg)
@@ -58,7 +57,7 @@ function c102380.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c102380.spcost(e,c,tp)
-	return not Duel.CheckNormalSummonActivity(tp)
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function c102380.spcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

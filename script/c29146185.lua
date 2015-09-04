@@ -22,32 +22,6 @@ function c29146185.initial_effect(c)
 	e2:SetTarget(c29146185.destg)
 	e2:SetOperation(c29146185.desop)
 	c:RegisterEffect(e2)
-	if not c29146185.global_check then
-		c29146185.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c29146185.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c29146185.checkop(e,tp,eg,ep,ev,re,r,rp)
-	c29146185[0]=Duel.GetFlagEffect(0,29146185)
-	c29146185[1]=Duel.GetFlagEffect(1,29146185)
-	local tc=eg:GetFirst()
-	while tc do
-		local sump=tc:GetSummonPlayer()
-		if c29146185[sump]==0 then
-			if tc:GetCode()==29146185 and Duel.GetFlagEffect(sump,29146186)==0 then
-				tc:RegisterFlagEffect(29146185,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-				Duel.RegisterFlagEffect(sump,29146186,RESET_PHASE+PHASE_END,0,1)
-			else
-				Duel.RegisterFlagEffect(sump,29146185,RESET_PHASE+PHASE_END,0,1)
-				c29146185[sump]=1
-			end
-		end
-		tc=eg:GetNext()
-	end
 end
 function c29146185.retcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
@@ -55,7 +29,7 @@ function c29146185.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return rc:IsRace(RACE_SPELLCASTER) or (rc:IsSetCard(0x106e) and rc:IsType(TYPE_SPELL))
 end
 function c29146185.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,29146185)==0 and e:GetHandler():GetFlagEffect(29146185)>0 end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==1 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -77,7 +51,7 @@ end
 function c29146185.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if g:GetCount()==2 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
+	if Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
 		Duel.ConfirmCards(1-tp,g)
 		if c:IsFaceup() and c:IsRelateToEffect(e) then
 			Duel.RaiseSingleEvent(c,29146185,re,r,rp,0,0)

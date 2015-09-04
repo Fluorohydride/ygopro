@@ -13,9 +13,12 @@ function c72580321.initial_effect(c)
 	e1:SetOperation(c72580321.spop)
 	c:RegisterEffect(e1)
 end
+function c72580321.cfilter(c)
+	return c:GetAttribute()~=ATTRIBUTE_EARTH
+end
 function c72580321.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
-	return g:GetCount()>0 and not g:IsExists(Card.IsAttribute,1,nil,0xffff-ATTRIBUTE_EARTH)
+	return g:GetCount()>0 and not g:IsExists(c72580321.cfilter,1,nil)
 end
 function c72580321.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end

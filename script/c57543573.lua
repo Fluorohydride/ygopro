@@ -1,4 +1,4 @@
---ワーム·イリダン
+--ワーム・イリダン
 function c57543573.initial_effect(c)
 	--add counter
 	local e1=Effect.CreateEffect(c)

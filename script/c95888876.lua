@@ -1,4 +1,4 @@
---ヘルカイザー·ドラゴン
+--ヘルカイザー・ドラゴン
 function c95888876.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--double atk

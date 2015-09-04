@@ -1,4 +1,4 @@
---¥¸¥§¥¹¥¿©`¡¤¥³¥ó¥Õ¥£
+--ã‚¸ã‚§ã‚¹ã‚¿ãƒ¼ãƒ»ã‚³ãƒ³ãƒ•ã‚£
 function c8487449.initial_effect(c)
 	c:SetUniqueOnField(1,0,8487449)
 	--special summon
@@ -31,7 +31,7 @@ function c8487449.regop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(8487449,0))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_REPEAT)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
@@ -49,14 +49,14 @@ function c8487449.filter(c)
 	return c:IsFaceup() and c:IsAbleToHand()
 end
 function c8487449.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c8487449.filter(chkc) end
-	if chk==0 then return true end
 	local c=e:GetHandler()
 	local sp=c:GetSummonPlayer()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-sp) and c8487449.filter(chkc) and chkc~=c end
+	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,c8487449.filter,sp,0,LOCATION_MZONE,1,1,e:GetHandler())
+	local g=Duel.SelectTarget(tp,c8487449.filter,sp,0,LOCATION_MZONE,1,1,c)
 	if g:GetCount()>0 then
-		g:AddCard(e:GetHandler())
+		g:AddCard(c)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,2,0,0)
 	end
 end

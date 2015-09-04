@@ -7,6 +7,7 @@ function c92609670.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,92609670)
 	e1:SetCondition(c92609670.spcon)
 	e1:SetCost(c92609670.spcost)
 	e1:SetTarget(c92609670.sptg)
@@ -26,9 +27,8 @@ function c92609670.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
 function c92609670.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,92609670)==0 and e:GetHandler():IsReleasable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
-	Duel.RegisterFlagEffect(tp,92609670,RESET_PHASE+PHASE_END,0,1)
 end
 function c92609670.filter(c,e,tp)
 	return c:GetCode()~=92609670 and c:IsSetCard(0x106f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)

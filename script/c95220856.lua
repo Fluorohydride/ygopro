@@ -15,5 +15,5 @@ function c95220856.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c95220856.target(e,c)
-	return c:IsStatus(STATUS_SUMMON_TURN)
+	return c:IsStatus(STATUS_SUMMON_TURN+STATUS_FLIP_SUMMON_TURN+STATUS_SPSUMMON_TURN)
 end

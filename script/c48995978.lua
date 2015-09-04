@@ -1,8 +1,8 @@
---No.88 ギミック·パペット－デステニー·レオ
+--No.88 ギミック・パペット－デステニー・レオ
 function c48995978.initial_effect(c)
 	c:EnableCounterPermit(0x302b)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),3)
+	aux.AddXyzProcedure(c,nil,8,3)
 	c:EnableReviveLimit()
 	--counter
 	local e1=Effect.CreateEffect(c)
@@ -17,8 +17,9 @@ function c48995978.initial_effect(c)
 	e1:SetOperation(c48995978.operation)
 	c:RegisterEffect(e1)
 end
+c48995978.xyz_number=88
 function c48995978.filter(c)
-	return c:GetSequence()~=5
+	return c:GetSequence()<5
 end
 function c48995978.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(c48995978.filter,tp,LOCATION_SZONE,0,1,nil)

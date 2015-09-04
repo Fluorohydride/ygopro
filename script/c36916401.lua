@@ -6,15 +6,15 @@ function c36916401.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,36916401+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c36916401.cost)
 	e1:SetTarget(c36916401.target)
 	e1:SetOperation(c36916401.operation)
 	c:RegisterEffect(e1)
 end
 function c36916401.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,36916401)==0 and Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
 	Duel.DiscardDeck(tp,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,36916401,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c36916401.filter(c,e,tp)
 	return c:IsSetCard(0x84) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

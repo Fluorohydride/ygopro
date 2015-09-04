@@ -1,4 +1,4 @@
---強化支援メカ·ヘビーウェポン
+--強化支援メカ・ヘビーウェポン
 function c23265594.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

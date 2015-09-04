@@ -2,11 +2,18 @@
 function c20630765.initial_effect(c)
 	c:SetCounterLimit(0x16,1)
 	--Add counter
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e0:SetCode(EVENT_CHAINING)
+	e0:SetRange(LOCATION_MZONE)
+	e0:SetOperation(aux.chainreg)
+	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e1:SetCode(EVENT_CHAIN_SOLVING)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_CHAIN_SOLVED)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
 	e1:SetOperation(c20630765.ctop)
 	c:RegisterEffect(e1)
 	--attackup
@@ -24,6 +31,7 @@ function c20630765.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCountLimit(1)
 	e3:SetCost(c20630765.rmcost)
 	e3:SetTarget(c20630765.rmtg)
 	e3:SetOperation(c20630765.rmop)
@@ -31,7 +39,7 @@ function c20630765.initial_effect(c)
 end
 function c20630765.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=re:GetHandler()
-	if c:IsType(TYPE_MONSTER) and c~=e:GetHandler() then
+	if re:IsActiveType(TYPE_MONSTER) and c~=e:GetHandler() and e:GetHandler():GetFlagEffect(1)>0 then
 		e:GetHandler():AddCounter(0x16,1)
 	end
 end
@@ -43,7 +51,7 @@ function c20630765.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RemoveCounter(tp,1,0,0x16,1,REASON_COST)
 end
 function c20630765.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,1,nil)

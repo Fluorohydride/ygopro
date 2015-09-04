@@ -1,4 +1,4 @@
---Mecha Phantom Beast Aerosguin
+--幻獣機エアロスバード
 function c16943770.initial_effect(c)
 	--level
 	local e1=Effect.CreateEffect(c)

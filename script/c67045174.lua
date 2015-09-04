@@ -9,11 +9,11 @@ function c67045174.initial_effect(c)
 	e1:SetTarget(c67045174.target)
 	e1:SetOperation(c67045174.activate)
 	c:RegisterEffect(e1)
-		if not c67045174.global_check then
+	if not c67045174.global_check then
 		c67045174.global_check=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_BATTLE_END)
+		ge1:SetCode(EVENT_BATTLED)
 		ge1:SetOperation(c67045174.checkop)
 		Duel.RegisterEffect(ge1,0)
 	end

@@ -1,4 +1,4 @@
---イクイップ·シュート
+--イクイップ・シュート
 function c62878208.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -39,14 +39,15 @@ function c62878208.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if eq==tc then tc=g:GetNext() end
 	if eqc and eq:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		Duel.Equip(tp,eq,tc)
+		if Duel.Equip(tp,eq,tc)==0 then return end
+		Duel.BreakEffect()
 		local a=eqc
 		local d=tc
 		if Duel.GetTurnPlayer()~=tp then
 			a=tc
 			d=eqc
 		end
-		if a:IsPosition(POS_FACEUP_ATTACK) then
+		if a:IsAttackable() and not a:IsImmuneToEffect(e) and not d:IsImmuneToEffect(e) then
 			Duel.CalculateDamage(a,d)
 		end
 	end

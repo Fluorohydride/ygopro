@@ -1,4 +1,4 @@
---シンクロ·バリアー
+--シンクロ・バリアー
 function c21879581.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -22,4 +22,8 @@ function c21879581.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(0)
 	e1:SetReset(RESET_PHASE+PHASE_END,2)
 	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e2:SetReset(RESET_PHASE+PHASE_END,2)
+	Duel.RegisterEffect(e2,tp)
 end

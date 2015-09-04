@@ -1,17 +1,15 @@
 --ゴーストリック・アルカード
 function c75367227.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--cannot be battle target
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetTarget(c75367227.tg)
-	e1:SetValue(1)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetValue(c75367227.tg)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
@@ -20,6 +18,7 @@ function c75367227.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,75367227)
 	e2:SetCost(c75367227.descost)
 	e2:SetTarget(c75367227.destg)
 	e2:SetOperation(c75367227.desop)
@@ -29,9 +28,8 @@ function c75367227.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetDescription(aux.Stringid(75367227,1))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCondition(c75367227.thcon)
 	e3:SetTarget(c75367227.thtg)
 	e3:SetOperation(c75367227.thop)
 	c:RegisterEffect(e3)
@@ -40,9 +38,8 @@ function c75367227.tg(e,c)
 	return c~=e:GetHandler() and (c:IsFacedown() or c:IsSetCard(0x8d))
 end
 function c75367227.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,75367227)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,75367227,RESET_PHASE+PHASE_END,0,1)
 end
 function c75367227.desfilter(c)
 	return c:IsFacedown() and c:IsDestructable()
@@ -59,9 +56,6 @@ function c75367227.desop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and tc:IsFacedown() then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
-end
-function c75367227.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c75367227.filter(c)
 	return c:IsSetCard(0x8d) and c:IsAbleToHand()

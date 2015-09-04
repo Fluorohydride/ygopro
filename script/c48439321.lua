@@ -1,4 +1,4 @@
---マドルチェ·ワルツ
+--マドルチェ・ワルツ
 function c48439321.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,7 +11,7 @@ function c48439321.initial_effect(c)
 	e2:SetCategory(CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_BATTLE_END)
+	e2:SetCode(EVENT_BATTLED)
 	e2:SetCondition(c48439321.damcon)
 	e2:SetTarget(c48439321.damtg)
 	e2:SetOperation(c48439321.damop)

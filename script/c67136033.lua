@@ -26,9 +26,9 @@ function c67136033.initial_effect(c)
 	e3:SetValue(c67136033.xyzlimit)
 	c:RegisterEffect(e3)
 end
-function c67136033.ntcon(e,c)
+function c67136033.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c67136033.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack

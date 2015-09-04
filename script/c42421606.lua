@@ -1,7 +1,7 @@
 --No.85 クレイジー・ボックス
 function c42421606.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)
@@ -20,6 +20,7 @@ function c42421606.initial_effect(c)
 	e2:SetOperation(c42421606.efop)
 	c:RegisterEffect(e2)
 end
+c42421606.xyz_number=85
 function c42421606.efcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

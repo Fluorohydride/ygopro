@@ -7,7 +7,7 @@ function c63012333.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c63012333.atklm)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--damage
 	local e2=Effect.CreateEffect(c)

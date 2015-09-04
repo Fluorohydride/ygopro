@@ -8,8 +8,8 @@ function c74329404.initial_effect(c)
 	--counter
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCondition(c74329404.ctcon)
 	e2:SetOperation(c74329404.ctop)
 	c:RegisterEffect(e2)
@@ -30,7 +30,7 @@ function c74329404.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c74329404.ctfilter(c,tp)
-	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousControler()==tp and c:IsSetCard(0xc008)
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0xc008)
 end
 function c74329404.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c74329404.ctfilter,1,nil,tp)

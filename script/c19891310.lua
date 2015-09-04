@@ -1,7 +1,7 @@
 --ギアギアギア XG
 function c19891310.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),3)
+	aux.AddXyzProcedure(c,nil,3,3)
 	c:EnableReviveLimit()
 	--disable
 	local e1=Effect.CreateEffect(c)
@@ -18,11 +18,17 @@ function c19891310.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c19891310.thcon)
 	e2:SetTarget(c19891310.thtg)
 	e2:SetOperation(c19891310.thop)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_REMOVE)
+	c:RegisterEffect(e3)
+	local e4=e2:Clone()
+	e4:SetCode(EVENT_TO_DECK)
+	c:RegisterEffect(e4)
 end
 function c19891310.condition(e,tp,eg,ep,ev,re,r,rp)
 	local bt=Duel.GetAttacker()
@@ -31,8 +37,10 @@ function c19891310.condition(e,tp,eg,ep,ev,re,r,rp)
 	return bt and bt:IsControler(tp) and bt:IsRace(RACE_MACHINE)
 end
 function c19891310.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) and c:GetFlagEffect(19891310)==0 end
+	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+	c:RegisterFlagEffect(19891310,RESET_CHAIN,0,1)
 end
 function c19891310.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -54,13 +62,13 @@ function c19891310.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER)
 end
 function c19891310.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsLocation(LOCATION_DECK) and e:GetHandler():IsPreviousPosition(POS_FACEUP)
+	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c19891310.thfilter(c)
 	return c:IsSetCard(0x72) and c:IsAbleToHand()
 end
 function c19891310.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c19891310.thfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c19891310.thfilter(chkc) and chkc~=e:GetHandler() end
 	if chk==0 then return Duel.IsExistingTarget(c19891310.thfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,c19891310.thfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())

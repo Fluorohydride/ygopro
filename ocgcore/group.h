@@ -25,7 +25,13 @@ public:
 	card_set::iterator it;
 	uint32 is_readonly;
 	
-	group();
+	inline bool has_card(card* c) {
+		return container.find(c) != container.end();
+	}
+	
+	explicit group(duel* pd);
+	group(duel* pd, card* pcard);
+	group(duel* pd, const card_set& cset);
 	~group();
 };
 

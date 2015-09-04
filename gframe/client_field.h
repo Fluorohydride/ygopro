@@ -36,9 +36,11 @@ public:
 	std::vector<ClientCard*> reposable_cards;
 	std::vector<ClientCard*> activatable_cards;
 	std::vector<ClientCard*> attackable_cards;
+	std::vector<ClientCard*> conti_cards;
 	std::vector<int> activatable_descs;
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
+	int extra_p_count[2];
 	
 	size_t selected_option;
 	ClientCard* attacker;
@@ -64,6 +66,7 @@ public:
 	bool remove_act;
 	bool deck_act;
 	bool extra_act;
+	bool pzone_act[2];
 	bool chain_forced;
 	ChainInfo current_chain;
 	bool last_chain;
@@ -80,7 +83,8 @@ public:
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
-	void ShowSelectCard(bool buttonok = false);
+	void ShowSelectCard(bool buttonok = false, bool chain = false);
+	void ShowChainCard();
 	void ReplaySwap();
 	void RefreshAllCards();
 	

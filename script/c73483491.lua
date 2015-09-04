@@ -1,4 +1,4 @@
---レアル·ジェネクス·ヴィンディカイト
+--レアル・ジェネクス・ヴィンディカイト
 function c73483491.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x2),aux.NonTuner(Card.IsAttribute,ATTRIBUTE_WIND),1)
@@ -9,7 +9,7 @@ function c73483491.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--search
 	local e2=Effect.CreateEffect(c)
@@ -17,9 +17,14 @@ function c73483491.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
+	e2:SetCondition(c73483491.thcon)
 	e2:SetTarget(c73483491.thtg)
 	e2:SetOperation(c73483491.thop)
 	c:RegisterEffect(e2)
+end
+function c73483491.thcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c73483491.filter(c)
 	return c:IsSetCard(0x2) and c:IsAbleToHand()

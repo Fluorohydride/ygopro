@@ -1,7 +1,7 @@
 --No.15 ギミック・パペット－ジャイアントキラー
 function c88120966.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),2)
+	aux.AddXyzProcedure(c,nil,8,2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -17,6 +17,7 @@ function c88120966.initial_effect(c)
 	e1:SetOperation(c88120966.operation)
 	c:RegisterEffect(e1)
 end
+c88120966.xyz_number=15
 function c88120966.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1
 end

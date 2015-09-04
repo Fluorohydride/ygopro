@@ -5,7 +5,7 @@ function c90238142.initial_effect(c)
 	e1:SetDescription(aux.Stringid(90238142,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,90238142)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(c90238142.spcost)
 	e1:SetTarget(c90238142.sptg)
@@ -33,10 +33,8 @@ function c90238142.cfilter(c)
 	return c:IsSetCard(0x64) and c:IsDiscardable()
 end
 function c90238142.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,90238142)==0
-		and Duel.IsExistingMatchingCard(c90238142.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c90238142.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,c90238142.cfilter,1,1,REASON_COST+REASON_DISCARD)
-	Duel.RegisterFlagEffect(tp,90238142,RESET_PHASE+PHASE_END,0,1)
 end
 function c90238142.filter(c,e,tp)
 	return c:IsSetCard(0x64) and c:GetCode()~=90238142 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

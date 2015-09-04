@@ -16,6 +16,7 @@ function c84650463.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,84650463)
 	e2:SetCondition(c84650463.spcon)
 	e2:SetCost(c84650463.spcost)
 	e2:SetTarget(c84650463.sptg)
@@ -43,9 +44,8 @@ function c84650463.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetMatchingGroupCount(c84650463.cfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)==3
 end
 function c84650463.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,84650463)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,84650463,RESET_PHASE+PHASE_END,0,1)
 end
 function c84650463.filter(c,e,tp)
 	return c:IsLevelAbove(5) and c:IsRace(RACE_SEASERPENT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

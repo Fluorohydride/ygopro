@@ -60,7 +60,7 @@ function c88190790.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c88190790.macon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 end
 function c88190790.macost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

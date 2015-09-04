@@ -1,10 +1,10 @@
---A·O·J ブラインド·サッカー
+--A・O・J ブラインド・サッカー
 function c76650663.initial_effect(c)
 	--Disable
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(76650663,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetCondition(c76650663.condition)
 	e1:SetOperation(c76650663.operation)
 	c:RegisterEffect(e1)

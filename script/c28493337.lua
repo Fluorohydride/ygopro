@@ -38,5 +38,5 @@ function c28493337.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c28493337.aclimit(e,re,tp)
-	return re:GetHandler():IsCode(e:GetLabel())
+	return re:GetHandler():IsCode(e:GetLabel()) and not re:GetHandler():IsImmuneToEffect(e)
 end

@@ -25,7 +25,7 @@ function c61757117.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_RITUAL
 end
 function c61757117.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsFaceup() end
+	if chkc then return chkc:IsOnField() and chkc:IsFaceup() and chkc~=e:GetHandler() end
 	if chk==0 then return true end
 	local c=e:GetHandler()
 	local ct=c:GetMaterialCount()

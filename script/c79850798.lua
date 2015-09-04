@@ -51,14 +51,16 @@ function c79850798.initial_effect(c)
 	e8:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e8:SetRange(LOCATION_MZONE)
 	e8:SetCountLimit(1)
+	e8:SetCondition(c79850798.mtcon)
 	e8:SetOperation(c79850798.mtop)
 	c:RegisterEffect(e8)
 end
 function c79850798.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
-		and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_ONFIELD,0,nil)==0
-		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	local tp=c:GetControler()
+	return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0
+		and Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function c79850798.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local e1=Effect.CreateEffect(c)
@@ -72,8 +74,10 @@ end
 function c79850798.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	return bit.band(sumpos,POS_FACEDOWN)~=0
 end
+function c79850798.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c79850798.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)~=0 and Duel.SelectYesNo(tp,aux.Stringid(79850798,1)) then
 		Duel.SendtoGrave(Duel.GetFieldGroup(tp,LOCATION_HAND,0),REASON_COST)
 	else

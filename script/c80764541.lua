@@ -1,7 +1,7 @@
 --No.44 白天馬スカイ・ペガサス
 function c80764541.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -16,6 +16,7 @@ function c80764541.initial_effect(c)
 	e1:SetOperation(c80764541.desop)
 	c:RegisterEffect(e1)
 end
+c80764541.xyz_number=44
 function c80764541.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -28,7 +29,7 @@ function c80764541.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(c80764541.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c80764541.filter,tp,0,LOCATION_MZONE,1,1,nil)
-	if not Duel.CheckLPCost(1-tp,1000) then
+	if Duel.GetLP(1-tp)>1000 then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end
 end

@@ -21,8 +21,8 @@ function c16279989.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_BATTLE_DAMAGE)
+	e3:SetCountLimit(1,16279989)
 	e3:SetCondition(c16279989.thcon)
-	e3:SetCost(c16279989.thcost)
 	e3:SetTarget(c16279989.thtg)
 	e3:SetOperation(c16279989.thop)
 	c:RegisterEffect(e3)
@@ -47,10 +47,6 @@ function c16279989.posop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c16279989.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp
-end
-function c16279989.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,16279989)==0 end
-	Duel.RegisterFlagEffect(tp,16279989,RESET_PHASE+PHASE_END,0,1)
 end
 function c16279989.filter(c)
 	return c:IsSetCard(0x8d) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()

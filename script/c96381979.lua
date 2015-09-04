@@ -1,7 +1,7 @@
 --魁炎星王－ソウコ
 function c96381979.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEASTWARRIOR),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEASTWARRIOR),4,2)
 	c:EnableReviveLimit()
 	--set
 	local e1=Effect.CreateEffect(c)

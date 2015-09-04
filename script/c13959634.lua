@@ -21,13 +21,14 @@ function c13959634.initial_effect(c)
 	e3:SetCategory(CATEGORY_HANDES)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetCountLimit(1,13959634)
 	e3:SetTarget(c13959634.hdtg)
 	e3:SetOperation(c13959634.hdop)
 	c:RegisterEffect(e3)
 	--leave
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetCode(EVENT_LEAVE_FIELD_P)
 	e4:SetOperation(c13959634.leaveop)
 	c:RegisterEffect(e4)
 end
@@ -37,16 +38,16 @@ function c13959634.spcon(e,c)
 		Duel.GetMatchingGroupCount(Card.IsAttribute,c:GetControler(),LOCATION_GRAVE,0,nil,ATTRIBUTE_WATER)==5
 end
 function c13959634.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,13959634)==0 end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,2)
-	Duel.RegisterFlagEffect(tp,13959634,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c13959634.hdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,2)
 	Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
 end
 function c13959634.leaveop(e,tp,eg,ep,ev,re,r,rp)
-	local effp=e:GetHandler():GetPreviousControler()
+	if e:GetHandler():IsFacedown() then return end
+	local effp=e:GetHandler():GetControler()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SKIP_BP)

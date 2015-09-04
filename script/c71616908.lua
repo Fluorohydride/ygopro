@@ -1,4 +1,4 @@
---ジェムナイト·アメジス
+--ジェムナイト・アメジス
 function c71616908.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

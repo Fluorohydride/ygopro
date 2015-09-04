@@ -13,7 +13,7 @@ function c44595286.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c44595286.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetEnvironment()==56433456
+	return Duel.IsEnvironment(56433456)
 end
 function c44595286.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsDiscardable() and c:IsAbleToGraveAsCost()

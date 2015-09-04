@@ -1,4 +1,4 @@
---トゥーン·ヂェミナイ·エルフ
+--トゥーン・ヂェミナイ・エルフ
 function c42386471.initial_effect(c)
 	--cannot attack
 	local e1=Effect.CreateEffect(c)
@@ -45,7 +45,7 @@ function c42386471.atklimit(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterEffect(e1)
 end
 function c42386471.sfilter(c)
-	return c:IsReason(REASON_DESTROY) and c:IsCode(15259703) and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c42386471.sdescon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c42386471.sfilter,1,nil)

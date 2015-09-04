@@ -1,4 +1,4 @@
---トランスフォーム·スフィア
+--トランスフォーム・スフィア
 function c66094973.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -26,7 +26,6 @@ function c66094973.initial_effect(c)
 	e3:SetDescription(aux.Stringid(66094973,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
@@ -111,7 +110,7 @@ function c66094973.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c66094973.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummon(tp) then
 		if Duel.SpecialSummon(tc,0,tp,1-tp,false,false,POS_FACEUP_DEFENCE)==0 then
 			Duel.SendtoGrave(tc,REASON_EFFECT)
 		end

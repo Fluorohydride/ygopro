@@ -260,6 +260,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case 1: {
+					wchar_t syntuner[32];
 					mainGame->cbCardType2->setEnabled(true);
 					mainGame->cbRace->setEnabled(true);
 					mainGame->cbAttribute->setEnabled(true);
@@ -273,7 +274,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1056), TYPE_MONSTER + TYPE_FUSION);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1057), TYPE_MONSTER + TYPE_RITUAL);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1063), TYPE_MONSTER + TYPE_SYNCHRO);
+					myswprintf(syntuner, L"%ls|%ls", dataManager.GetSysString(1063), dataManager.GetSysString(1062));
+					mainGame->cbCardType2->addItem(syntuner, TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1073), TYPE_MONSTER + TYPE_XYZ);
+					mainGame->cbCardType2->addItem(dataManager.GetSysString(1074), TYPE_MONSTER + TYPE_PENDULUM);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1062), TYPE_MONSTER + TYPE_TUNER);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1061), TYPE_MONSTER + TYPE_DUAL);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1060), TYPE_MONSTER + TYPE_UNION);
@@ -645,7 +649,7 @@ void DeckBuilder::FilterCards() {
 		myswprintf(result_string, L"%d", results.size());
 		return;
 	}
-	if(pstr[0] == 0)
+	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0))
 		pstr = 0;
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
@@ -708,8 +712,14 @@ void DeckBuilder::FilterCards() {
 				continue;
 		}
 		if(pstr) {
-			if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
-				continue;
+			if(pstr[0] == L'$') {
+				if(wcsstr(text.name, &pstr[1]) == 0)
+					continue;
+			}
+			else {
+				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
+					continue;
+			}
 		}
 		results.push_back(ptr);
 	}

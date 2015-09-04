@@ -34,7 +34,7 @@ function c64605089.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local at=Duel.GetAttacker()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
-		and at:IsFaceup() and at:GetAttack()<c:GetDefence() then
+		and at:IsFaceup() and at:IsRelateToBattle() and at:GetAttack()<c:GetDefence() then
 		Duel.BreakEffect()
 		Duel.Destroy(at,REASON_EFFECT)
 	end
@@ -45,9 +45,10 @@ end
 function c64605089.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(rc)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetDescription(aux.Stringid(64605089,1))
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e1:SetCountLimit(1)
@@ -57,10 +58,10 @@ function c64605089.efop(e,tp,eg,ep,ev,re,r,rp)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_CHANGE_TYPE)
-		e2:SetValue(TYPE_MONSTER+TYPE_EFFECT+TYPE_XYZ)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
-		rc:RegisterEffect(e2)
+		rc:RegisterEffect(e2,true)
 	end
 end
 function c64605089.valcon(e,re,r,rp)

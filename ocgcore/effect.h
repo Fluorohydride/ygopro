@@ -44,10 +44,12 @@ public:
 	uint16 o_range;
 	uint16 reset_count;
 	uint32 reset_flag;
+	uint32 count_code;
 	uint32 category;
 	uint32 label;
 	uint32 hint_timing[2];
 	uint32 card_type;
+	uint32 active_type;
 	uint16 field_ref;
 	uint16 status;
 	void* label_object;
@@ -57,11 +59,12 @@ public:
 	int32 value;
 	int32 operation;
 
-	effect();
+	explicit effect(duel* pd);
 	~effect();
 
 	int32 is_disable_related();
 	int32 is_available();
+	int32 check_count_limit(uint8 playerid);
 	int32 is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_action_check(uint8 playerid);
 	int32 is_activate_ready(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
@@ -73,7 +76,7 @@ public:
 	int32 is_immuned(effect_set_v* effects);
 	int32 is_chainable(uint8 tp);
 	int32 reset(uint32 reset_level, uint32 reset_type);
-	void dec_count();
+	void dec_count(uint32 playerid = 2);
 	void recharge();
 	int32 get_value(uint32 extraargs = 0);
 	int32 get_value(card* pcard, uint32 extraargs = 0);
@@ -82,10 +85,14 @@ public:
 	int32 get_speed();
 	uint8 get_owner_player();
 	uint8 get_handler_player();
+	int32 in_range(int32 loc, int32 seq);
 };
 
 //status
 #define EFFECT_STATUS_AVAILABLE	0x0001
+
+#define EFFECT_COUNT_CODE_OATH 0x10000000
+#define EFFECT_COUNT_CODE_DUEL 0x20000000
 
 //========== Reset ==========
 #define RESET_DRAW			PHASE_DRAW
@@ -142,7 +149,7 @@ public:
 #define EFFECT_FLAG_ABSOLUTE_TARGET	0x0040	//
 #define EFFECT_FLAG_IGNORE_IMMUNE	0x0080	//
 #define EFFECT_FLAG_SET_AVAILABLE	0x0100	//
-#define EFFECT_FLAG_MULTIACT_HAND	0x0200	//
+#define EFFECT_FLAG_CONTINUOUS		0x0200	//
 #define EFFECT_FLAG_CANNOT_DISABLE	0x0400	//
 #define EFFECT_FLAG_PLAYER_TARGET	0x0800	//
 #define EFFECT_FLAG_BOTH_SIDE		0x1000	//
@@ -164,6 +171,7 @@ public:
 #define EFFECT_FLAG_NAGA			0x10000000	//
 #define EFFECT_FLAG_COF				0x20000000	//
 #define EFFECT_FLAG_CVAL_CHECK		0x40000000	//
+#define EFFECT_FLAG_IMMEDIATELY_APPLY	0x80000000	//
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//
 #define EFFECT_DISABLE					2	//
@@ -217,6 +225,7 @@ public:
 #define EFFECT_CANNOT_DISCARD_HAND		55	//
 #define EFFECT_CANNOT_DISCARD_DECK		56	//
 #define EFFECT_CANNOT_USE_AS_COST		57	//
+#define EFFECT_CANNOT_PLACE_COUNTER		58	//
 
 #define EFFECT_LEAVE_FIELD_REDIRECT		60	//
 #define EFFECT_TO_HAND_REDIRECT			61	//
@@ -277,13 +286,19 @@ public:
 #define EFFECT_CHANGE_LEVEL				131	//
 #define EFFECT_UPDATE_RANK				132 //
 #define EFFECT_CHANGE_RANK				133 //
+#define EFFECT_UPDATE_LSCALE			134 //
+#define EFFECT_CHANGE_LSCALE			135 //
+#define EFFECT_UPDATE_RSCALE			136 //
+#define EFFECT_CHANGE_RSCALE			137 //
 #define EFFECT_SET_POSITION				140 //
 #define EFFECT_SELF_DESTROY				141 //
+#define EFFECT_SELF_TOGRAVE				142
 #define EFFECT_DOUBLE_TRIBUTE			150
 #define EFFECT_DECREASE_TRIBUTE			151
 #define EFFECT_DECREASE_TRIBUTE_SET		152
 #define EFFECT_EXTRA_RELEASE			153
 #define EFFECT_TRIBUTE_LIMIT			154
+#define EFFECT_EXTRA_RELEASE_SUM		155
 #define EFFECT_PUBLIC					160
 #define EFFECT_COUNTER_PERMIT			0x10000
 #define EFFECT_COUNTER_LIMIT			0x20000
@@ -352,6 +367,19 @@ public:
 #define EFFECT_UNIQUE_CHECK				297
 #define EFFECT_MATCH_KILL				300
 #define EFFECT_SYNCHRO_CHECK			310
+#define EFFECT_QP_ACT_IN_NTPHAND		311
+#define EFFECT_MUST_BE_SMATERIAL		312
+#define EFFECT_TO_GRAVE_REDIRECT_CB		313
+#define EFFECT_CHANGE_LEVEL_FINAL		314
+#define EFFECT_CHANGE_RANK_FINAL		315
+#define EFFECT_SPSUMMON_PROC_G			320
+#define EFFECT_SPSUMMON_COUNT_LIMIT		330
+#define EFFECT_LEFT_SPSUMMON_COUNT		331
+#define EFFECT_CANNOT_SELECT_BATTLE_TARGET	332
+#define EFFECT_CANNOT_SELECT_EFFECT_TARGET	333
+#define EFFECT_ADD_SETCODE				334
+#define EFFECT_NO_EFFECT_DAMAGE			335
+#define EFFECT_UNSUMMONABLE_CARD		336
 
 #define EVENT_STARTUP		1000
 #define EVENT_FLIP			1001
@@ -386,6 +414,7 @@ public:
 #define EVENT_MSET					1106
 #define EVENT_SSET					1107
 #define EVENT_BE_MATERIAL			1108
+#define EVENT_BE_PRE_MATERIAL			1109
 #define EVENT_DRAW					1110
 #define EVENT_DAMAGE				1111
 #define EVENT_RECOVER				1112
@@ -413,8 +442,7 @@ public:
 #define EVENT_LEVEL_UP				1200
 #define EVENT_PAY_LPCOST			1201
 #define EVENT_DETACH_MATERIAL		1202
-#define EVENT_CONFIRM_DECKTOP		1203
-#define EVENT_CONFIRM_CARDS			1204
+#define EVENT_RETURN_TO_GRAVE		1203
 #define EVENT_TURN_END				1210
 #define EVENT_PHASE					0x1000
 #define EVENT_PHASE_START			0x2000

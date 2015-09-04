@@ -1,4 +1,4 @@
---フェニキシアン·クラスター·アマリリス
+--フェニキシアン・クラスター・アマリリス
 function c23558733.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
@@ -10,7 +10,7 @@ function c23558733.initial_effect(c)
 	--damage
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_BATTLE_END)
+	e2:SetCode(EVENT_BATTLED)
 	e2:SetOperation(c23558733.desop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
@@ -30,6 +30,7 @@ function c23558733.initial_effect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetCode(EVENT_PHASE+PHASE_END)
 	e4:SetRange(LOCATION_GRAVE)
+	e4:SetCountLimit(1)
 	e4:SetCondition(c23558733.spcon)
 	e4:SetCost(c23558733.spcost)
 	e4:SetTarget(c23558733.sptg)

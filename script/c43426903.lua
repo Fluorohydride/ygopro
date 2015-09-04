@@ -1,11 +1,11 @@
---レプティレス·ゴルゴーン
+--レプティレス・ゴルゴーン
 function c43426903.initial_effect(c)
 	--atk change
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(43426903,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetCondition(c43426903.condition)
 	e1:SetOperation(c43426903.operation)
 	c:RegisterEffect(e1)

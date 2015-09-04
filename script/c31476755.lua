@@ -27,12 +27,15 @@ function c31476755.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetCondition(c31476755.descon)
 	e1:SetOperation(c31476755.desop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 	c:RegisterEffect(e1)
 end
+function c31476755.descon(e,tp,eg,ep,ev,re,r,rp)
+	return tp==Duel.GetTurnPlayer()
+end
 function c31476755.desop(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1
@@ -42,5 +45,5 @@ function c31476755.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c31476755.efilter(e,re)
-	return e:GetHandlerPlayer()~=re:GetHandlerPlayer() and re:IsActiveType(TYPE_SPELL)
+	return e:GetHandlerPlayer()~=re:GetOwnerPlayer() and re:IsActiveType(TYPE_SPELL)
 end

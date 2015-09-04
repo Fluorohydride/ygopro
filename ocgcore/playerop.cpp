@@ -139,11 +139,15 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(1);
 		else
 			pduel->write_buffer8(0);
+		if(infos.shuffle_count < 1 && player[playerid].list_hand.size() > 1)
+			pduel->write_buffer8(1);
+		else
+			pduel->write_buffer8(0);
 		return FALSE;
 	} else {
 		uint32 t = returns.ivalue[0] & 0xffff;
 		uint32 s = returns.ivalue[0] >> 16;
-		if(t < 0 || t > 7 || s < 0
+		if(t < 0 || t > 8 || s < 0
 		        || (t == 0 && s >= core.summonable_cards.size())
 		        || (t == 1 && s >= core.spsummonable_cards.size())
 		        || (t == 2 && s >= core.repositionable_cards.size())
@@ -151,7 +155,8 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 		        || (t == 4 && s >= core.ssetable_cards.size())
 		        || (t == 5 && s >= core.select_chains.size())
 		        || (t == 6 && (infos.phase != PHASE_MAIN1 || !core.to_bp))
-		        || (t == 7 && !core.to_ep)) {
+		        || (t == 7 && !core.to_ep)
+		        || (t == 8 && !(infos.shuffle_count < 1 && player[playerid].list_hand.size() > 1))) {
 			pduel->write_buffer8(MSG_RETRY);
 			return FALSE;
 		}
@@ -249,17 +254,7 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 		for(uint32 i = 0; i < core.select_cards.size(); ++i) {
 			pcard = core.select_cards[i];
 			pduel->write_buffer32(pcard->data.code);
-			if(pcard->overlay_target) {
-				pduel->write_buffer8(pcard->overlay_target->current.controler);
-				pduel->write_buffer8(pcard->overlay_target->current.location | LOCATION_OVERLAY);
-				pduel->write_buffer8(pcard->overlay_target->current.sequence);
-				pduel->write_buffer8(pcard->current.sequence);
-			} else {
-				pduel->write_buffer8(pcard->current.controler);
-				pduel->write_buffer8(pcard->current.location);
-				pduel->write_buffer8(pcard->current.sequence);
-				pduel->write_buffer8(pcard->current.position);
-			}
+			pduel->write_buffer32(pcard->get_info_location());
 		}
 		return FALSE;
 	} else {
@@ -312,10 +307,13 @@ int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 fo
 		for(uint32 i = 0; i < core.select_chains.size(); ++i) {
 			effect* peffect = core.select_chains[i].triggering_effect;
 			card* pcard = peffect->handler;
-			pduel->write_buffer32(pcard->data.code);
-			pduel->write_buffer8(pcard->current.controler);
-			pduel->write_buffer8(pcard->current.location);
-			pduel->write_buffer8(pcard->current.sequence);
+			if(!(peffect->type & EFFECT_TYPE_ACTIONS))
+				pcard = peffect->owner;
+			if(peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+				pduel->write_buffer32(1000000000 + pcard->data.code);
+			else
+				pduel->write_buffer32(pcard->data.code);
+			pduel->write_buffer32(pcard->get_info_location());
 			pduel->write_buffer32(peffect->description);
 		}
 		return FALSE;
@@ -446,6 +444,8 @@ int32 field::select_tribute(uint16 step, uint8 playerid, uint8 cancelable, uint8
 		}
 		return FALSE;
 	} else {
+		if(cancelable && returns.ivalue[0] == -1)
+			return TRUE;
 		byte c[64];
 		memset(c, 0, 64);
 		if(returns.bvalue[0] > max) {
@@ -528,7 +528,7 @@ int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 
 		if(core.select_cards.empty())
 			return TRUE;
 		pduel->write_buffer8(MSG_SELECT_SUM);
-		if(min)
+		if(max)
 			pduel->write_buffer8(0);
 		else
 			pduel->write_buffer8(1);
@@ -645,7 +645,7 @@ int32 field::sort_card(int16 step, uint8 playerid, uint8 is_chain) {
 int32 field::announce_race(int16 step, uint8 playerid, int32 count, int32 available) {
 	if(step == 0) {
 		int32 scount = 0;
-		for(int32 ft = 0x1; ft != 0x800000; ft <<= 1) {
+		for(int32 ft = 0x1; ft != 0x1000000; ft <<= 1) {
 			if(ft & available)
 				scount++;
 		}
@@ -661,7 +661,7 @@ int32 field::announce_race(int16 step, uint8 playerid, int32 count, int32 availa
 	} else {
 		int32 rc = returns.ivalue[0];
 		int32 sel = 0;
-		for(int32 ft = 0x1; ft != 0x800000; ft <<= 1) {
+		for(int32 ft = 0x1; ft != 0x1000000; ft <<= 1) {
 			if(!(ft & rc)) continue;
 			if(!(ft & available)) {
 				pduel->write_buffer8(MSG_RETRY);

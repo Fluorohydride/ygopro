@@ -23,7 +23,7 @@ function c70284332.filter(c,e,tp)
 end
 function c70284332.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return eg:IsContains(chkc) and c70284332.filter(chkc,e,1-tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and eg:IsExists(c70284332.filter,1,nil,e,1-tp) end
+	if chk==0 then return eg:IsExists(c70284332.filter,1,nil,e,1-tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=eg:FilterSelect(tp,c70284332.filter,1,1,nil,e,1-tp)
 	Duel.SetTargetCard(g)
@@ -37,7 +37,7 @@ function c70284332.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_CONTROL)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_OWNER_RELATE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_OWNER_RELATE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetValue(tp)
 		e1:SetReset(RESET_EVENT+0x1fc0000)

@@ -1,4 +1,4 @@
---ボーン·テンプル·ブロック
+--ボーン・テンプル・ブロック
 function c47778083.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -29,7 +29,7 @@ function c47778083.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local sc=sg:GetFirst()
 	local oc=og:GetFirst()
 	local g=Group.FromCards(sc,oc)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,PLAYER_ALL,1-g:GetFirst():GetOwner())
 	e:SetLabelObject(sc)
 end
 function c47778083.operation(e,tp,eg,ep,ev,re,r,rp)

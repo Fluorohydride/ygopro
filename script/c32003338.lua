@@ -1,7 +1,7 @@
---No.34 電算機獣テラ·バイト
+--No.34 電算機獣テラ・バイト
 function c32003338.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),3)
+	aux.AddXyzProcedure(c,nil,3,3)
 	c:EnableReviveLimit()
 	--control
 	local e1=Effect.CreateEffect(c)
@@ -16,6 +16,7 @@ function c32003338.initial_effect(c)
 	e1:SetOperation(c32003338.operation)
 	c:RegisterEffect(e1)
 end
+c32003338.xyz_number=34
 function c32003338.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

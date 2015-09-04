@@ -13,7 +13,7 @@ function c25262697.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c25262697.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetEnvironment()==47355498
+	return Duel.IsEnvironment(47355498)
 end
 function c25262697.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end

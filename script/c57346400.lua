@@ -1,4 +1,4 @@
---ガード·ドッグ
+--ガード・ドッグ
 function c57346400.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

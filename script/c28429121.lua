@@ -20,46 +20,37 @@ function c28429121.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function c28429121.mfilter1(c,e)
+function c28429121.mfilter(c,e)
 	return c:IsFaceup() and c:GetLevel()>0 and not c:IsImmuneToEffect(e) and c:IsReleasable()
 end
-function c28429121.mfilter2(c)
-	return c:IsHasEffect(EFFECT_EXTRA_RITUAL_MATERIAL) and c:IsAbleToRemove()
-end
-function c28429121.get_material(e,tp)
-	local g1=Duel.GetMatchingGroup(c28429121.mfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e)
-	local g2=Duel.GetMatchingGroup(c28429121.mfilter2,tp,LOCATION_GRAVE,0,nil)
-	g1:Merge(g2)
-	return g1
-end
 function c28429121.filter(c,e,tp,m)
-	if bit.band(c:GetType(),0x81)~=0x81 or not c:IsSetCard(0x3a) 
-		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
-	if m:IsContains(c) then
-		m:RemoveCard(c)
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
-		m:AddCard(c)
-	else
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
-	end
-	return result
+	if bit.band(c:GetType(),0x81)~=0x81 or not c:IsSetCard(0x3a)
+		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
+	local mg=m:Filter(Card.IsCanBeRitualMaterial,c,c)
+	return mg:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
 end
 function c28429121.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
-		local mg=c28429121.get_material(e,tp)
-		return Duel.IsExistingMatchingCard(c28429121.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg)
+		local mg1=Duel.GetRitualMaterial(tp)
+		mg1:Remove(Card.IsLocation,nil,LOCATION_HAND)
+		local mg2=Duel.GetMatchingGroup(c28429121.mfilter,tp,0,LOCATION_MZONE,nil,e)
+		mg1:Merge(mg2)
+		return Duel.IsExistingMatchingCard(c28429121.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg1)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c28429121.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local mg=c28429121.get_material(e,tp)
+	local mg1=Duel.GetRitualMaterial(tp)
+	mg1:Remove(Card.IsLocation,nil,LOCATION_HAND)
+	local mg2=Duel.GetMatchingGroup(c28429121.mfilter,tp,0,LOCATION_MZONE,nil,e)
+	mg1:Merge(mg2)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,c28429121.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
-	if tg:GetCount()>0 then
-		local tc=tg:GetFirst()
-		mg:RemoveCard(tc)
+	local tg=Duel.SelectMatchingCard(tp,c28429121.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg1)
+	local tc=tg:GetFirst()
+	if tc then
+		local mg=mg1:Filter(Card.IsCanBeRitualMaterial,tc,tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
 		tc:SetMaterial(mat)
@@ -71,7 +62,7 @@ function c28429121.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(tc:GetAttack()/2)
 		e1:SetReset(RESET_EVENT+0xfe0000)
 		tc:RegisterEffect(e1)
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
 	end
 end

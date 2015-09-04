@@ -22,7 +22,6 @@ function c94933468.initial_effect(c)
 	e3:SetDescription(aux.Stringid(94933468,0))
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCategory(CATEGORY_DECKDES)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCountLimit(1)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_SZONE)
@@ -69,7 +68,7 @@ function c94933468.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 function c94933468.deckcon(e,tp,eg,ep,ev,re,r,rp)
-	return tp~=Duel.GetTurnPlayer() and e:GetHandler():GetCardTarget()~=nil
+	return tp~=Duel.GetTurnPlayer() and e:GetHandler():GetFirstCardTarget()~=nil
 end
 function c94933468.decktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

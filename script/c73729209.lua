@@ -1,4 +1,4 @@
---スキル·サクセサー
+--スキル・サクセサー
 function c73729209.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -49,7 +49,7 @@ function c73729209.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c73729209.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
+	return Duel.GetTurnPlayer()==tp and (e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN))
 		and (Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
 end
 function c73729209.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)

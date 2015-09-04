@@ -1,9 +1,9 @@
---A·O·J リーサル·ウェポン
+--A・O・J リーサル・ウェポン
 function c45450218.initial_effect(c)
 	--check
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetOperation(c45450218.checkop)
 	c:RegisterEffect(e1)
 	--draw

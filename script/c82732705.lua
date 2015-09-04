@@ -4,7 +4,6 @@ function c82732705.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_DRAW_PHASE)
 	e1:SetCost(c82732705.cost)
 	c:RegisterEffect(e1)
 	--disable

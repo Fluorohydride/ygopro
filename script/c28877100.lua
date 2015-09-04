@@ -1,4 +1,4 @@
---ディフェンシブ·タクティクス
+--ディフェンシブ・タクティクス
 function c28877100.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

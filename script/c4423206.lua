@@ -1,7 +1,7 @@
 --M.X－セイバー インヴォーカー
 function c4423206.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -35,12 +35,13 @@ function c4423206.spop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENCE)~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetOperation(c4423206.desop)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetCountLimit(1)
-		g:GetFirst():RegisterEffect(e1)
+		g:GetFirst():RegisterEffect(e1,true)
 	end
 end
 function c4423206.desop(e,tp,eg,ep,ev,re,r,rp)

@@ -1,4 +1,4 @@
---TG レシプロ·ドラゴン·フライ
+--TG レシプロ・ドラゴン・フライ
 function c62560742.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure2(c,nil,aux.NonTuner(nil))

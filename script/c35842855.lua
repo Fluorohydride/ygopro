@@ -21,15 +21,15 @@ function c35842855.initial_effect(c)
 	e3:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
-	e3:SetCost(c35842855.descost)
+	e3:SetCountLimit(1,35842855)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetTarget(c35842855.destg)
 	e3:SetOperation(c35842855.desop)
 	c:RegisterEffect(e3)
 	--leave
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetCode(EVENT_LEAVE_FIELD_P)
 	e4:SetOperation(c35842855.leaveop)
 	c:RegisterEffect(e4)
 end
@@ -37,10 +37,6 @@ function c35842855.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
 		Duel.GetMatchingGroupCount(Card.IsAttribute,c:GetControler(),LOCATION_GRAVE,0,nil,ATTRIBUTE_FIRE)==5
-end
-function c35842855.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,35842855)==0 end
-	Duel.RegisterFlagEffect(tp,35842855,RESET_PHASE+PHASE_END,0,1)
 end
 function c35842855.filter(c)
 	return c:IsDestructable()
@@ -64,7 +60,8 @@ function c35842855.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c35842855.leaveop(e,tp,eg,ep,ev,re,r,rp)
-	local effp=e:GetHandler():GetPreviousControler()
+	if e:GetHandler():IsFacedown() then return end
+	local effp=e:GetHandler():GetControler()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SKIP_BP)

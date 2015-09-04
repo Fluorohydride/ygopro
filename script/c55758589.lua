@@ -1,4 +1,4 @@
---フォトン·ワイバーン
+--フォトン・ワイバーン
 function c55758589.initial_effect(c)
 	--Destroy
 	local e1=Effect.CreateEffect(c)

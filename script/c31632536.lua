@@ -1,4 +1,4 @@
---ラヴァル·ツインスレイヤー
+--ラヴァル・ツインスレイヤー
 function c31632536.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_FIRE),1)
@@ -6,7 +6,7 @@ function c31632536.initial_effect(c)
 	--chain attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetOperation(c31632536.caop1)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
@@ -31,8 +31,7 @@ end
 function c31632536.caop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabelObject():GetLabel()==1 and c:IsRelateToBattle() and c:IsChainAttackable()
-		and Duel.GetMatchingGroupCount(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0x39)>=2
-		and Duel.SelectYesNo(tp,aux.Stringid(31632536,0)) then
+		and Duel.GetMatchingGroupCount(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0x39)>=2 then
 		Duel.ChainAttack()
 	end
 end

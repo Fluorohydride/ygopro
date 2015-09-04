@@ -1,13 +1,12 @@
 --フォトン・ストリーク・バウンサー
 function c92661479.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
+	aux.AddXyzProcedure(c,nil,6,2)
 	c:EnableReviveLimit()
 	--negate activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(92661479,0))
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DAMAGE)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)

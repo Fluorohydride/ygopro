@@ -1,4 +1,4 @@
---機皇兵ワイゼル·アイン
+--機皇兵ワイゼル・アイン
 function c39648965.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

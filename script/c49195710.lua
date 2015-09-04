@@ -1,7 +1,7 @@
 --CNo.65 裁断魔王ジャッジ・デビル
 function c49195710.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),3),3)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),3,3)
 	c:EnableReviveLimit()
 	--addown
 	local e1=Effect.CreateEffect(c)
@@ -23,6 +23,7 @@ function c49195710.initial_effect(c)
 	e2:SetCondition(c49195710.accon)
 	c:RegisterEffect(e2)
 end
+c49195710.xyz_number=65
 function c49195710.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

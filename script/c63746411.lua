@@ -1,7 +1,7 @@
 --No.106 巨岩掌ジャイアント・ハンド
 function c63746411.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--negate
 	local e1=Effect.CreateEffect(c)
@@ -16,6 +16,7 @@ function c63746411.initial_effect(c)
 	e1:SetOperation(c63746411.operation)
 	c:RegisterEffect(e1)
 end
+c63746411.xyz_number=106
 function c63746411.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsActiveType(TYPE_MONSTER)
 		and Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)==LOCATION_MZONE

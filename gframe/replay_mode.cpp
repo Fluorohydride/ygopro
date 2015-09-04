@@ -153,6 +153,11 @@ int ReplayMode::ReplayThread(void* param) {
 			is_continuing = ReplayAnalyze(engineBuffer, len);
 		}
 	}
+	if(mainGame->dInfo.isReplaySkiping) {
+		mainGame->dInfo.isReplaySkiping = false;
+		mainGame->dField.RefreshAllCards();
+		mainGame->gMutex.Unlock();
+	}
 	end_duel(pduel);
 	if(!is_closing) {
 		mainGame->actionSignal.Reset();
@@ -196,6 +201,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
 			if(mainGame->dInfo.isReplaySkiping) {
+				mainGame->dInfo.isReplaySkiping = false;
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.Unlock();
 			}
@@ -214,6 +220,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_WIN: {
 			if(mainGame->dInfo.isReplaySkiping) {
+				mainGame->dInfo.isReplaySkiping = false;
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.Unlock();
 			}
@@ -243,7 +250,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 11 + 2;
+			pbuf += count * 11 + 3;
 			ReplayRefresh();
 			return ReadReplayResponse();
 		}
@@ -274,7 +281,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += 10 + count * 11;
+			pbuf += 10 + count * 12;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_PLACE:

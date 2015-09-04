@@ -16,5 +16,5 @@ function c91468551.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c91468551.atktg(e,c)
-	return bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0 and c:IsPreviousLocation(LOCATION_GRAVE)
+	return bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0 and c:GetSummonLocation()==LOCATION_GRAVE
 end

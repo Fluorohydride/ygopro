@@ -1,4 +1,4 @@
---XYZ－ドラゴン·キャノン
+--XYZ－ドラゴン・キャノン
 function c91998119.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

@@ -6,7 +6,7 @@ function c23893227.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCost(c23893227.cost)
+	e1:SetCountLimit(1,23893227)
 	e1:SetTarget(c23893227.target)
 	e1:SetOperation(c23893227.operation)
 	c:RegisterEffect(e1)
@@ -16,6 +16,7 @@ function c23893227.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,23893227)
 	e2:SetCondition(c23893227.spcon)
 	e2:SetCost(c23893227.spcost)
 	e2:SetTarget(c23893227.sptg)
@@ -29,10 +30,6 @@ function c23893227.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e3:SetValue(70095154)
 	c:RegisterEffect(e3)
-end
-function c23893227.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,23893227)==0 end
-	Duel.RegisterFlagEffect(tp,23893227,RESET_PHASE+PHASE_END,0,1)
 end
 function c23893227.filter(c)
 	return (c:IsSetCard(0x93) or c:IsSetCard(0x94)) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
@@ -53,9 +50,8 @@ function c23893227.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c23893227.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,23893227)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,23893227,RESET_PHASE+PHASE_END,0,1)
 end
 function c23893227.spfilter(c,e,tp)
 	return c:IsSetCard(0x1093) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

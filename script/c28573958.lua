@@ -57,7 +57,7 @@ function c28573958.atop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c28573958.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetEnvironment()==56433456
+	return Duel.IsEnvironment(56433456)
 end
 function c28573958.cfilter2(c)
 	return c:IsRace(RACE_FAIRY) and c:IsDiscardable()
@@ -78,7 +78,7 @@ function c28573958.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c28573958.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetEnvironment()~=56433456 then return end
+	if not Duel.IsEnvironment(56433456) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)

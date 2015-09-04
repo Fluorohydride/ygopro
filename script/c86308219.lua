@@ -1,4 +1,4 @@
---Harpie Lady Phoenix Formation
+--ハーピィ・レディ －鳳凰の陣－
 function c86308219.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,36 +11,20 @@ function c86308219.initial_effect(c)
 	e1:SetTarget(c86308219.target)
 	e1:SetOperation(c86308219.activate)
 	c:RegisterEffect(e1)
-	if not c86308219.global_check then
-		c86308219.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c86308219.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(86308219,ACTIVITY_SPSUMMON,c86308219.counterfilter)
 end
-function c86308219.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local p1=nil
-	local p2=nil
-	local tc=eg:GetFirst()
-	while tc do
-		if tc:IsPreviousLocation(LOCATION_DECK+LOCATION_EXTRA) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,86308219,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,86308219,RESET_PHASE+PHASE_END,0,1) end
+function c86308219.counterfilter(c)
+	return bit.band(c:GetSummonLocation(),LOCATION_DECK+LOCATION_EXTRA)==0
 end
 function c86308219.cfilter(c)
 	return c:IsFaceup() and (c:IsCode(76812113) or c:IsCode(12206212))
 end
 function c86308219.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c86308219.cfilter,tp,LOCATION_MZONE,0,3,nil)
+	return Duel.IsExistingMatchingCard(c86308219.cfilter,tp,LOCATION_ONFIELD,0,3,nil)
 end
 function c86308219.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,86308219)==0 and Duel.GetCurrentPhase()==PHASE_MAIN1 end
+	if chk==0 then return Duel.GetCustomActivityCount(86308219,tp,ACTIVITY_SPSUMMON)==0
+		and Duel.GetCurrentPhase()==PHASE_MAIN1 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

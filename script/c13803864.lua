@@ -1,4 +1,4 @@
---キング·もけもけ
+--キング・もけもけ
 function c13803864.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

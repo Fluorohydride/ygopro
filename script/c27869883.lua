@@ -1,4 +1,4 @@
---プリーステス·オーム
+--プリーステス・オーム
 function c27869883.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

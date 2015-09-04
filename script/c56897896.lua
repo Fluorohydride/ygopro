@@ -1,4 +1,4 @@
---モノ·シンクロン
+--モノ・シンクロン
 function c56897896.initial_effect(c)
 	--synchro custom
 	local e1=Effect.CreateEffect(c)

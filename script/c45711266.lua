@@ -1,11 +1,11 @@
---ジュラック·プティラ
+--ジュラック・プティラ
 function c45711266.initial_effect(c)
 	--tohand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(45711266,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetCondition(c45711266.condition)
 	e1:SetTarget(c45711266.target)
 	e1:SetOperation(c45711266.operation)

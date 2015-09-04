@@ -13,7 +13,6 @@ function c93260132.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SPELL) and c:IsDestructable()
 end
 function c93260132.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(c93260132.filter,tp,0,LOCATION_ONFIELD,1,nil) end
 	local sg=Duel.GetMatchingGroup(c93260132.filter,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)

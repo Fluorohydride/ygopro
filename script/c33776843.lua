@@ -1,7 +1,7 @@
 --CNo.15 ギミック・パペット－シリアルキラー
 function c33776843.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,9),3)
+	aux.AddXyzProcedure(c,nil,9,3)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -16,6 +16,7 @@ function c33776843.initial_effect(c)
 	e1:SetOperation(c33776843.operation)
 	c:RegisterEffect(e1)
 end
+c33776843.xyz_number=15
 function c33776843.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -29,8 +30,8 @@ function c33776843.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c33776843.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 and tc:IsType(TYPE_MONSTER) then
-		local atk=tc:GetAttack()
+	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 and tc:IsPreviousLocation(LOCATION_MZONE) then
+		local atk=tc:GetTextAttack()
 		if atk<0 then atk=0 end
 		Duel.Damage(1-tp,atk,REASON_EFFECT)
 	end

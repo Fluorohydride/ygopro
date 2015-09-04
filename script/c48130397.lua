@@ -11,6 +11,9 @@ function c48130397.initial_effect(c)
 	e1:SetOperation(c48130397.activate)
 	c:RegisterEffect(e1)
 end
+function c48130397.filter0(c,tp)
+	return (c:IsControler(tp) or c:IsFaceup()) and c:IsCanBeFusionMaterial()
+end
 function c48130397.filter1(c,e,tp)
 	return (c:IsControler(tp) or c:IsFaceup()) and c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
 end
@@ -25,7 +28,7 @@ end
 function c48130397.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c48130397.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e,tp)
+		local mg1=Duel.GetMatchingGroup(c48130397.filter0,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
 		local res=Duel.IsExistingMatchingCard(c48130397.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)

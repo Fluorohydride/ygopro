@@ -22,6 +22,24 @@ function c9348522.initial_effect(c)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e2:SetTarget(c9348522.limtg)
 	c:RegisterEffect(e2)
+	if not c9348522.global_check then
+		c9348522.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SUMMON_SUCCESS)
+		ge1:SetOperation(c9348522.checkop)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=ge1:Clone()
+		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		Duel.RegisterEffect(ge2,0)
+	end
+end
+function c9348522.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	while tc do
+		tc:RegisterFlagEffect(9348522,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
+		tc=eg:GetNext()
+	end
 end
 function c9348522.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
@@ -44,6 +62,5 @@ function c9348522.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c9348522.limtg(e,c)
-	return c:IsLevelBelow(8) and c:IsStatus(STATUS_SUMMON_TURN)
-		and bit.band(c:GetSummonType(),SUMMON_TYPE_NORMAL+SUMMON_TYPE_SPECIAL)~=0
+	return c:IsLevelBelow(8) and c:GetFlagEffect(9348522)~=0
 end

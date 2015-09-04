@@ -1,7 +1,7 @@
---No.17 リバイス·ドラゴン
+--No.17 リバイス・ドラゴン
 function c69610924.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -20,6 +20,7 @@ function c69610924.initial_effect(c)
 	e2:SetCondition(c69610924.dircon)
 	c:RegisterEffect(e2)
 end
+c69610924.xyz_number=17
 function c69610924.dircon(e)
 	return e:GetHandler():GetOverlayCount()==0
 end

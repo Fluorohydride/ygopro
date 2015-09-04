@@ -1,22 +1,23 @@
 --No.63 おしゃもじソルジャー
 function c89642993.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,1),2)
+	aux.AddXyzProcedure(c,nil,1,2)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(89642993,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,89642993)
 	e1:SetCost(c89642993.efcost)
 	e1:SetTarget(c89642993.eftg)
 	e1:SetOperation(c89642993.efop)
 	c:RegisterEffect(e1)
 end
+c89642993.xyz_number=63
 function c89642993.efcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,89642993)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,89642993,RESET_PHASE+PHASE_END,0,1)
 end
 function c89642993.eftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

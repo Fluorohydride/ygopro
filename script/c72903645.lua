@@ -1,4 +1,4 @@
---マグナ·スラッシュドラゴン
+--マグナ・スラッシュドラゴン
 function c72903645.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---アタック·リフレクター·ユニット
+--アタック・リフレクター・ユニット
 function c91989718.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

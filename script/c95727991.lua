@@ -1,4 +1,4 @@
---カタパルト·タートル
+--カタパルト・タートル
 function c95727991.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)
@@ -7,6 +7,7 @@ function c95727991.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
 	e1:SetCost(c95727991.cost)
 	e1:SetTarget(c95727991.target)
 	e1:SetOperation(c95727991.operation)

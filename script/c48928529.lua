@@ -1,7 +1,7 @@
---No.83 ギャラクシー·クィーン
+--No.83 ギャラクシー・クィーン
 function c48928529.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,1),3)
+	aux.AddXyzProcedure(c,nil,1,3)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -13,6 +13,7 @@ function c48928529.initial_effect(c)
 	e1:SetOperation(c48928529.operation)
 	c:RegisterEffect(e1)
 end
+c48928529.xyz_number=83
 function c48928529.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

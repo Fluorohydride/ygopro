@@ -6,6 +6,7 @@ function c41329458.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,41329458)
 	e1:SetCost(c41329458.spcost)
 	e1:SetTarget(c41329458.sptg)
 	e1:SetOperation(c41329458.spop)
@@ -38,10 +39,9 @@ function c41329458.indcon(e)
 	return Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,TYPE_TOKEN)
 end
 function c41329458.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,41329458)==0 and Duel.CheckReleaseGroup(tp,Card.IsSetCard,2,nil,0x101b) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,2,nil,0x101b) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,2,2,nil,0x101b)
 	Duel.Release(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,41329458,RESET_PHASE+PHASE_END,0,1)
 end
 function c41329458.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2

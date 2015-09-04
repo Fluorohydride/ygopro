@@ -1,4 +1,4 @@
---а�񥢥Х��`
+--邪神アバター
 function c21208154.initial_effect(c)
 	--summon with 3 tribute
 	local e1=Effect.CreateEffect(c)
@@ -32,7 +32,6 @@ function c21208154.initial_effect(c)
 	--aclimit
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e6:SetCode(EVENT_SUMMON_SUCCESS)
 	e6:SetOperation(c21208154.regop)
 	c:RegisterEffect(e6)

@@ -1,4 +1,4 @@
---邪悪なるワーム·ビースト
+--邪悪なるワーム・ビースト
 function c6285791.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(6285791,0))
@@ -6,7 +6,6 @@ function c6285791.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c6285791.retcon)
 	e1:SetTarget(c6285791.rettg)

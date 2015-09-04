@@ -1,4 +1,4 @@
---ジュラック·イグアノン
+--ジュラック・イグアノン
 function c71106375.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(71106375,0))
@@ -6,9 +6,14 @@ function c71106375.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(c71106375.thcon)
 	e1:SetTarget(c71106375.thtg)
 	e1:SetOperation(c71106375.thop)
 	c:RegisterEffect(e1)
+end
+function c71106375.thcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c71106375.filter(c)
 	return c:IsFacedown() and c:IsAbleToHand()

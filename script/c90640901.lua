@@ -1,10 +1,8 @@
 --リバース・バスター
 function c90640901.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(0,LOCATION_MZONE)
-	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e1:SetValue(c90640901.vala)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
@@ -29,7 +27,7 @@ function c90640901.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c90640901.vala(e,c)
-	return c==e:GetHandler()
+	return not c:IsFacedown()
 end
 function c90640901.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

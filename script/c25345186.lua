@@ -1,4 +1,4 @@
---ジェノサイド·ウォー
+--ジェノサイド・ウォー
 function c25345186.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -15,7 +15,7 @@ function c25345186.activate(e,tp,eg,ep,ev,re,r,rp)
 	--destroy
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetOperation(c25345186.regop)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)

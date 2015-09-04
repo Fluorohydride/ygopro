@@ -1,4 +1,4 @@
---E·HERO アクア·ネオス
+--E・HERO アクア・ネオス
 function c55171412.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -27,7 +27,6 @@ function c55171412.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCondition(c55171412.retcon1)
 	e3:SetTarget(c55171412.rettg)
 	e3:SetOperation(c55171412.retop)
@@ -53,9 +52,7 @@ function c55171412.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
 function c55171412.spfilter(c,code)
-	if c:GetCode()~=code then return false end
-	if c:IsType(TYPE_FUSION) then return c:IsAbleToExtraAsCost()
-	else return c:IsAbleToDeckAsCost() end
+	return c:IsAbleToDeckOrExtraAsCost() and c:GetCode()==code
 end
 function c55171412.spcon(e,c)
 	if c==nil then return true end 

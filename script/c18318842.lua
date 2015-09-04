@@ -1,4 +1,4 @@
---アビス·ソルジャー
+--アビス・ソルジャー
 function c18318842.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

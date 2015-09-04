@@ -1,4 +1,4 @@
---ジュラック·グアイバ
+--ジュラック・グアイバ
 function c11012887.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -6,6 +6,7 @@ function c11012887.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(aux.bdocon)
 	e1:SetTarget(c11012887.target)
 	e1:SetOperation(c11012887.operation)
 	c:RegisterEffect(e1)

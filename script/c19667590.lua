@@ -6,24 +6,14 @@ function c19667590.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_GRAVE)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE+EFFECT_FLAG_DELAY)
+	e1:SetCountLimit(1,19667590)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCondition(c19667590.spcon)
 	e1:SetCost(c19667590.spcost)
 	e1:SetTarget(c19667590.sptg)
 	e1:SetOperation(c19667590.spop)
 	c:RegisterEffect(e1)
-	if not c19667590.global_check then
-		c19667590.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_PHASE_START+PHASE_BATTLE)
-		ge1:SetOperation(c19667590.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c19667590.checkop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RegisterFlagEffect(Duel.GetTurnPlayer(),19667590,RESET_PHASE+PHASE_END,0,1)
 end
 function c19667590.cfilter(c,tp)
 	return c:IsFaceup() and c:GetSummonPlayer()==tp and c:IsSetCard(0x59)
@@ -32,7 +22,7 @@ function c19667590.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c19667590.cfilter,1,nil,tp)
 end
 function c19667590.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,19667590)==0 end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)
@@ -40,7 +30,6 @@ function c19667590.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,19667590,RESET_PHASE+PHASE_END,0,1)
 end
 function c19667590.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

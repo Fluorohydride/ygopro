@@ -1,4 +1,4 @@
---カップ·オブ·エース
+--カップ・オブ・エース
 function c37812118.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

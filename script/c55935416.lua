@@ -1,7 +1,7 @@
 --No.56 ゴールドラット
 function c55935416.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,1),3)
+	aux.AddXyzProcedure(c,nil,1,3)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)
@@ -15,6 +15,7 @@ function c55935416.initial_effect(c)
 	e1:SetOperation(c55935416.drop)
 	c:RegisterEffect(e1)
 end
+c55935416.xyz_number=56
 function c55935416.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

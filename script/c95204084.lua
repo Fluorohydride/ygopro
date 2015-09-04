@@ -1,4 +1,4 @@
---コアキメイル·トルネード
+--コアキメイル・トルネード
 function c95204084.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

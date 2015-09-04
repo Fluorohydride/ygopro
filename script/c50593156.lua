@@ -1,4 +1,4 @@
---サンド·ギャンブラー
+--サンド・ギャンブラー
 function c50593156.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

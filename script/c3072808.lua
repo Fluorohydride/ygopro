@@ -6,15 +6,16 @@ function c3072808.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BATTLE_DAMAGE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,3072808+EFFECT_COUNT_CODE_DUEL)
 	e1:SetCondition(c3072808.condition)
 	e1:SetTarget(c3072808.target)
 	e1:SetOperation(c3072808.operation)
 	c:RegisterEffect(e1)
 end
 function c3072808.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and ev>=2000 and Duel.GetAttackTarget()==nil and Duel.GetFlagEffect(tp,3072808)==0
+	return ep==tp and ev>=2000 and Duel.GetAttackTarget()==nil
 end
 function c3072808.filter(c,e,tp)
 	return c:IsLevelBelow(3) and c:IsSetCard(0x33) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -28,7 +29,6 @@ function c3072808.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c3072808.filter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler(),e,tp)
 	g:AddCard(e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,0,0)
-	Duel.RegisterFlagEffect(tp,3072808,0,0,0)
 end
 function c3072808.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

@@ -1,4 +1,4 @@
---ジャンク·サーバント
+--ジャンク・サーバント
 function c78922939.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

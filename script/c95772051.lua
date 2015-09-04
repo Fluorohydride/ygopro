@@ -17,6 +17,7 @@ function c95772051.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,95772051)
 	e2:SetCost(c95772051.thcost)
 	e2:SetTarget(c95772051.thtg)
 	e2:SetOperation(c95772051.thop)
@@ -46,10 +47,9 @@ function c95772051.thfilter(c)
 	return c:IsSetCard(0x207a) and c:IsAbleToHand()
 end
 function c95772051.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,95772051)==0 and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x107a) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x107a) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x107a)
 	Duel.Release(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,95772051,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c95772051.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c95772051.thfilter,tp,LOCATION_DECK,0,1,nil) end

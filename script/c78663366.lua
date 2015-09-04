@@ -7,13 +7,13 @@ function c78663366.initial_effect(c)
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,78663366)
 	e1:SetTarget(c78663366.target)
 	e1:SetOperation(c78663366.operation)
 	c:RegisterEffect(e1)
 end
 function c78663366.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,78663366)==0 and e:GetHandler():IsAbleToRemove() end
-	Duel.RegisterFlagEffect(tp,78663366,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return e:GetHandler():IsAbleToRemove() end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,0,0)
 end
 function c78663366.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -40,7 +40,9 @@ function c78663366.retcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c78663366.retop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if Duel.ReturnToField(tc) and tc:IsFaceup() then
+	if tc:IsForbidden() then 
+		Duel.SendtoGrave(tc,REASON_RULE)
+	elseif Duel.ReturnToField(tc) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(tc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)

@@ -18,7 +18,9 @@
 static const struct luaL_Reg cardlib[] = {
 	{ "GetCode", scriptlib::card_get_code },
 	{ "GetOriginalCode", scriptlib::card_get_origin_code },
+	{ "GetOriginalCodeRule", scriptlib::card_get_origin_code_rule },
 	{ "IsSetCard", scriptlib::card_is_set_card },
+	{ "IsPreviousSetCard", scriptlib::card_is_pre_set_card },
 	{ "GetType", scriptlib::card_get_type },
 	{ "GetOriginalType", scriptlib::card_get_origin_type },
 	{ "GetLevel", scriptlib::card_get_level },
@@ -26,7 +28,12 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetSynchroLevel", scriptlib::card_get_synchro_level },
 	{ "GetRitualLevel", scriptlib::card_get_ritual_level },
 	{ "GetOriginalLevel", scriptlib::card_get_origin_level },
+	{ "GetOriginalRank", scriptlib::card_get_origin_rank },
 	{ "IsXyzLevel", scriptlib::card_is_xyz_level },
+	{ "GetLeftScale", scriptlib::card_get_lscale },
+	{ "GetOriginalLeftScale", scriptlib::card_get_origin_lscale },
+	{ "GetRightScale", scriptlib::card_get_rscale },
+	{ "GetOriginalRightScale", scriptlib::card_get_origin_rscale },
 	{ "GetAttribute", scriptlib::card_get_attribute },
 	{ "GetOriginalAttribute", scriptlib::card_get_origin_attribute },
 	{ "GetRace", scriptlib::card_get_race },
@@ -60,6 +67,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetSequence", scriptlib::card_get_sequence },
 	{ "GetPreviousSequence", scriptlib::card_get_previous_sequence },
 	{ "GetSummonType", scriptlib::card_get_summon_type },
+	{ "GetSummonLocation", scriptlib::card_get_summon_location },
 	{ "GetSummonPlayer", scriptlib::card_get_summon_player },
 	{ "GetDestination", scriptlib::card_get_destination },
 	{ "GetLeaveFieldDest", scriptlib::card_get_leave_field_dest },
@@ -127,6 +135,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "IsRelateToCard", scriptlib::card_is_relate_to_card },
 	{ "IsRelateToBattle", scriptlib::card_is_relate_to_battle },
 	{ "CopyEffect", scriptlib::card_copy_effect },
+	{ "EnableUnsummonable", scriptlib::card_enable_unsummonable },
 	{ "EnableReviveLimit", scriptlib::card_enable_revive_limit },
 	{ "CompleteProcedure", scriptlib::card_complete_procedure },
 	{ "IsDisabled", scriptlib::card_is_disabled },
@@ -147,6 +156,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "IsAbleToHandAsCost", scriptlib::card_is_able_to_hand_as_cost },
 	{ "IsAbleToDeckAsCost", scriptlib::card_is_able_to_deck_as_cost },
 	{ "IsAbleToExtraAsCost", scriptlib::card_is_able_to_extra_as_cost },
+	{ "IsAbleToDeckOrExtraAsCost", scriptlib::card_is_able_to_deck_or_extra_as_cost },
 	{ "IsAbleToGraveAsCost", scriptlib::card_is_able_to_grave_as_cost },
 	{ "IsAbleToRemoveAsCost", scriptlib::card_is_able_to_remove_as_cost },
 	{ "IsReleasable", scriptlib::card_is_releasable },
@@ -186,6 +196,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "IsCanRemoveCounter", scriptlib::card_is_can_remove_counter },
 	{ "IsCanBeFusionMaterial", scriptlib::card_is_can_be_fusion_material },
 	{ "IsCanBeSynchroMaterial", scriptlib::card_is_can_be_synchro_material },
+	{ "IsCanBeRitualMaterial", scriptlib::card_is_can_be_ritual_material },
 	{ "IsCanBeXyzMaterial", scriptlib::card_is_can_be_xyz_material },
 	{ "CheckFusionMaterial", scriptlib::card_check_fusion_material },
 	{ "IsImmuneToEffect", scriptlib::card_is_immune_to_effect },
@@ -203,6 +214,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "CheckUniqueOnField", scriptlib::card_check_unique_onfield },
 	{ "ResetNegateEffect", scriptlib::card_reset_negate_effect },
 	{ "AssumeProperty", scriptlib::card_assume_prop },
+	{ "SetSPSummonOnce", scriptlib::card_set_spsummon_once },
 	{ NULL, NULL }
 };
 
@@ -339,6 +351,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "RaiseSingleEvent", scriptlib::duel_raise_single_event },
 	{ "CheckTiming", scriptlib::duel_check_timing },
 	{ "GetEnvironment", scriptlib::duel_get_environment },
+	{ "IsEnvironment", scriptlib::duel_is_environment },
 	{ "Win", scriptlib::duel_win },
 	{ "Draw", scriptlib::duel_draw },
 	{ "Damage", scriptlib::duel_damage },
@@ -424,7 +437,8 @@ static const struct luaL_Reg duellib[] = {
 	{ "SetOperationInfo", scriptlib::duel_set_operation_info },
 	{ "GetOperationInfo", scriptlib::duel_get_operation_info },
 	{ "GetOperationCount", scriptlib::duel_get_operation_count },
-	{ "GetXyzMaterial", scriptlib::duel_get_xyz_material },
+	{ "CheckXyzMaterial", scriptlib::duel_check_xyz_material },
+	{ "SelectXyzMaterial", scriptlib::duel_select_xyz_material },
 	{ "Overlay", scriptlib::duel_overlay },
 	{ "GetOverlayGroup", scriptlib::duel_get_overlay_group },
 	{ "GetOverlayCount", scriptlib::duel_get_overlay_count },
@@ -459,6 +473,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "IsPlayerCanSpecialSummon", scriptlib::duel_is_player_can_spsummon },
 	{ "IsPlayerCanFlipSummon", scriptlib::duel_is_player_can_flipsummon },
 	{ "IsPlayerCanSpecialSummonMonster", scriptlib::duel_is_player_can_spsummon_monster },
+	{ "IsPlayerCanSpecialSummonCount", scriptlib::duel_is_player_can_spsummon_count },
 	{ "IsPlayerCanRelease", scriptlib::duel_is_player_can_release },
 	{ "IsPlayerCanRemove", scriptlib::duel_is_player_can_remove },
 	{ "IsPlayerCanSendtoHand", scriptlib::duel_is_player_can_send_to_hand },
@@ -468,16 +483,11 @@ static const struct luaL_Reg duellib[] = {
 	{ "IsChainDisablable", scriptlib::duel_is_chain_disablable },
 	{ "CheckChainTarget", scriptlib::duel_check_chain_target },
 	{ "CheckChainUniqueness", scriptlib::duel_check_chain_uniqueness },
-	{ "CheckSummonActivity", scriptlib::duel_check_summon_activity },
-	{ "CheckNormalSummonActivity", scriptlib::duel_check_normal_summon_activity },
-	{ "CheckFlipSummonActivity", scriptlib::duel_check_flip_summon_activity },
-	{ "CheckSpecialSummonActivity", scriptlib::duel_check_special_summon_activity },
-	{ "CheckAttackActivity", scriptlib::duel_check_attack_activity },
+	{ "GetActivityCount", scriptlib::duel_get_activity_count },
 	{ "CheckPhaseActivity", scriptlib::duel_check_phase_activity },
-	{ "SummonedCardsThisTurn", scriptlib::duel_get_summoned_cards_this_turn },
-	{ "NormalSummonedCardsThisTurn", scriptlib::duel_get_normal_summoned_cards_this_turn },
-	{ "SpecialSummonedCardsThisTurn", scriptlib::duel_get_spsummoned_cards_this_turn },
-	{ "FlipSummonedCardsThisTurn", scriptlib::duel_get_flip_summoned_cards_this_turn },
+	{ "AddCustomActivityCounter", scriptlib::duel_add_custom_activity_counter },
+	{ "GetCustomActivityCount", scriptlib::duel_get_custom_activity_count },
+	{ "IsAbleToEnterBP", scriptlib::duel_is_able_to_enter_bp },
 	{ "VenomSwampCheck", scriptlib::duel_venom_swamp_check },
 	{ "SwapDeckAndGrave", scriptlib::duel_swap_deck_and_grave },
 	{ "MajesticCopy", scriptlib::duel_majestic_copy },
@@ -558,7 +568,7 @@ int32 interpreter::register_card(card *pcard) {
 	lua_setmetatable(current_state, -2);
 	lua_pop(current_state, 1);
 	//Initial
-	if(pcard->data.code && !(pcard->data.type & TYPE_NORMAL)) {
+	if(pcard->data.code && (!(pcard->data.type & TYPE_NORMAL) || (pcard->data.type & TYPE_PENDULUM))) {
 		pcard->set_status(STATUS_INITIALIZING, TRUE);
 		add_param(pcard, PARAM_TYPE_CARD);
 		call_card_function(pcard, (char*) "initial_effect", 1, 0);

@@ -22,7 +22,7 @@ function c47766694.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c47766694.filter(c)
-	return c:IsFaceup() and c:GetSequence()~=5 and c:IsDestructable()
+	return c:IsFaceup() and c:GetSequence()<5 and c:IsDestructable()
 end
 function c47766694.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and c47766694.filter(chkc) end

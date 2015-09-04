@@ -1,4 +1,4 @@
---レッド·デーモンズ·ドラゴン
+--レッド・デーモンズ・ドラゴン
 function c70902743.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
@@ -8,7 +8,7 @@ function c70902743.initial_effect(c)
 	e1:SetDescription(aux.Stringid(70902743,0))
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetCondition(c70902743.condition1)
 	e1:SetTarget(c70902743.target1)
 	e1:SetOperation(c70902743.operation1)
@@ -20,7 +20,6 @@ function c70902743.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetCondition(c70902743.condition2)
 	e2:SetTarget(c70902743.target2)

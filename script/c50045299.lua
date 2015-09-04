@@ -1,4 +1,4 @@
---ドラゴン族·封印の壺
+--ドラゴン族・封印の壺
 function c50045299.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

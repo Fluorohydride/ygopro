@@ -24,20 +24,25 @@ function c23689697.initial_effect(c)
 	e3:SetTarget(c23689697.destg)
 	e3:SetOperation(c23689697.desop)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_MATERIAL_CHECK)
+	e4:SetValue(c23689697.valcheck)
+	e4:SetLabelObject(e3)
+	c:RegisterEffect(e4)
 end
 function c23689697.otfilter(c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
 end
 function c23689697.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
+	local mg=Duel.GetMatchingGroup(c23689697.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
 	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(c23689697.otfilter,1,nil)
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c23689697.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,c23689697.otfilter,1,1,nil)
+	local mg=Duel.GetMatchingGroup(c23689697.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end
@@ -53,8 +58,7 @@ function c23689697.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c23689697.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,3,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-	local mg=e:GetHandler():GetMaterial()
-	if mg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_WATER) then
+	if e:GetLabel()==1 then
 		Duel.SetChainLimit(c23689697.chlimit)
 	end
 end
@@ -66,4 +70,12 @@ function c23689697.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
 	Duel.Destroy(sg,REASON_EFFECT)
+end
+function c23689697.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_WATER) then
+		e:GetLabelObject():SetLabel(1)
+	else
+		e:GetLabelObject():SetLabel(0)
+	end
 end

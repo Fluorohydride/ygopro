@@ -11,5 +11,5 @@ function c10963799.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c10963799.sumlimit(e,c,sump,sumtype,sumpos,targetp)
-	return c:IsAttribute(0xff-ATTRIBUTE_WATER)
+	return c:GetAttribute()~=ATTRIBUTE_WATER
 end

@@ -1,4 +1,4 @@
---地獄の門番イル·ブラッド
+--地獄の門番イル・ブラッド
 function c70595331.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--special summon

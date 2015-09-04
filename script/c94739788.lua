@@ -11,5 +11,6 @@ function c94739788.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_REMOVE_BRAINWASHING)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	c:RegisterEffect(e2)
 end

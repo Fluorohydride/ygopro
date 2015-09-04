@@ -1,4 +1,4 @@
---剣聖－ネイキッド·ギア·フリード
+--剣聖－ネイキッド・ギア・フリード
 function c57046845.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

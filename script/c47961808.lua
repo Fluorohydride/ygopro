@@ -11,5 +11,5 @@ function c47961808.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c47961808.sumlimit(e,c,sump,sumtype,sumpos,targetp)
-	return c:IsAttribute(0xff-ATTRIBUTE_FIRE)
+	return c:GetAttribute()~=ATTRIBUTE_FIRE
 end

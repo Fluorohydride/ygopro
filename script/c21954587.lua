@@ -69,7 +69,7 @@ function c21954587.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c21954587.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 end
 function c21954587.rfilter(c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsAttribute(ATTRIBUTE_WATER)
@@ -84,7 +84,7 @@ function c21954587.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c21954587.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)

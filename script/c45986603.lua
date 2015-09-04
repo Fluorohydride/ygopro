@@ -28,6 +28,12 @@ function c45986603.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetValue(c45986603.eqlimit)
 	c:RegisterEffect(e3)
+	--control
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_EQUIP)
+	e4:SetCode(EFFECT_SET_CONTROL)
+	e4:SetValue(c45986603.ctval)
+	c:RegisterEffect(e4)
 end
 function c45986603.filter(c)
 	return c:IsFaceup() and c:IsControlerCanBeChanged()
@@ -37,8 +43,7 @@ function c45986603.eqlimit(e,c)
 end
 function c45986603.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c45986603.filter(chkc) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(c45986603.filter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c45986603.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,c45986603.filter,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
@@ -49,12 +54,6 @@ function c45986603.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Equip(tp,c,tc)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_EQUIP)
-		e2:SetCode(EFFECT_SET_CONTROL)
-		e2:SetValue(tp)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
-		c:RegisterEffect(e2)
 	end
 end
 function c45986603.reccon(e,tp,eg,ep,ev,re,r,rp)
@@ -70,4 +69,7 @@ function c45986603.recop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Recover(p,d,REASON_EFFECT)
+end
+function c45986603.ctval(e,c)
+	return e:GetHandlerPlayer()
 end

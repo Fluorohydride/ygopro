@@ -4,20 +4,16 @@ function c97064649.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(97064649,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCountLimit(1,97064649)
 	e1:SetCondition(c97064649.setcon)
-	e1:SetCost(c97064649.setcost)
 	e1:SetTarget(c97064649.settg)
 	e1:SetOperation(c97064649.setop)
 	c:RegisterEffect(e1)
 end
 function c97064649.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-end
-function c97064649.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,97064649)==0 end
-	Duel.RegisterFlagEffect(tp,97064649,RESET_PHASE+PHASE_END,0,1)
 end
 function c97064649.filter(c)
 	return c:GetType()==TYPE_SPELL+TYPE_CONTINUOUS and c:IsSSetable()

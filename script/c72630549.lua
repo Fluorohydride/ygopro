@@ -1,4 +1,4 @@
---カオス·マジシャン
+--カオス・マジシャン
 function c72630549.initial_effect(c)
 	--disable
 	local e1=Effect.CreateEffect(c)

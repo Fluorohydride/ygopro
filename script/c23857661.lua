@@ -11,7 +11,7 @@ function c23857661.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c23857661.cfilter(c)
-	return c:IsSetCard(0x88) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x88) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
 end
 function c23857661.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
@@ -28,4 +28,8 @@ function c23857661.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
 end

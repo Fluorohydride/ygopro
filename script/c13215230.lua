@@ -1,4 +1,4 @@
---ドリーム·ピエロ
+--ドリーム・ピエロ
 function c13215230.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---スペーシア·ギフト
+--スペーシア・ギフト
 function c1539051.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

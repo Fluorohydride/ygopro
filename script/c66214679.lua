@@ -1,4 +1,4 @@
---ダーク·ホルス·ドラゴン
+--ダーク・ホルス・ドラゴン
 function c66214679.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---インフェルニティ·ブレイク
+--インフェルニティ・ブレイク
 function c51717541.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -32,7 +32,6 @@ function c51717541.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,ds,1,0,0)
 end
 function c51717541.activate(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local ex1,g1=Duel.GetOperationInfo(0,CATEGORY_REMOVE)
 	local rm=g1:GetFirst()
 	if not rm:IsRelateToEffect(e) then return end

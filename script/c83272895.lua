@@ -14,7 +14,7 @@ end
 function c83272895.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(rc)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_PIERCE)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
@@ -22,9 +22,9 @@ function c83272895.efop(e,tp,eg,ep,ev,re,r,rp)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_CHANGE_TYPE)
-		e2:SetValue(TYPE_MONSTER+TYPE_EFFECT+TYPE_XYZ)
-		e2:SetReset(RESET_EVENT+0x1ff0000)
-		rc:RegisterEffect(e2)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
+		rc:RegisterEffect(e2,true)
 	end
 end

@@ -3,6 +3,7 @@
 #include "data_manager.h"
 #include "image_manager.h"
 #include "game.h"
+#include "materials.h"
 #include "../ocgcore/field.h"
 
 namespace ygo {
@@ -16,11 +17,13 @@ ClientField::ClientField() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
 			mzone[p].push_back(0);
-		for(int i = 0; i < 6; ++i)
+		for(int i = 0; i < 8; ++i)
 			szone[p].push_back(0);
 	}
 }
@@ -55,12 +58,16 @@ void ClientField::Clear() {
 	for(auto sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
 		delete *sit;
 	overlay_cards.clear();
+	extra_p_count[0] = 0;
+	extra_p_count[1] = 0;
 	chains.clear();
 	disabled_field = 0;
 	deck_act = false;
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
@@ -83,6 +90,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->controler = player;
 		pcard->location = 0x40;
 		pcard->sequence = i;
+		pcard->position = POS_FACEDOWN_DEFENCE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 		pcard->mTransform.setTranslation(pcard->curPos);
 		pcard->mTransform.setRotationRadians(pcard->curRot);
@@ -176,8 +184,20 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		break;
 	}
 	case LOCATION_EXTRA: {
-		extra[controler].push_back(pcard);
-		pcard->sequence = extra[controler].size() - 1;
+		if (sequence != 0 || extra[controler].size() == 0) {
+			extra[controler].push_back(pcard);
+			pcard->sequence = extra[controler].size() - 1;
+		} else {
+			extra[controler].push_back(0);
+			for(int i = extra[controler].size() - 1; i > 0; --i) {
+				extra[controler][i] = extra[controler][i - 1];
+				extra[controler][i]->sequence++;
+			}
+			extra[controler][0] = pcard;
+			pcard->sequence = 0;
+		}
+		if ((pcard->type & TYPE_PENDULUM) && (pcard->position & POS_FACEUP))
+			extra_p_count[controler]++;
 		break;
 	}
 	}
@@ -246,6 +266,8 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 			extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
 		}
 		extra[controler].erase(extra[controler].end() - 1);
+		if ((pcard->type & TYPE_PENDULUM) && (pcard->position & POS_FACEUP))
+			extra_p_count[controler]--;
 		break;
 	}
 	}
@@ -313,6 +335,8 @@ void ClientField::ClearCommandFlag() {
 	extra_act = false;
 	grave_act = false;
 	remove_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 }
 void ClientField::ClearSelect() {
 	std::vector<ClientCard*>::iterator cit;
@@ -325,27 +349,37 @@ void ClientField::ClearChainSelect() {
 	std::vector<ClientCard*>::iterator cit;
 	for(cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
 		(*cit)->cmdFlag = 0;
+		(*cit)->chain_code = 0;
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
+		(*cit)->is_conti = false;
 	}
+	conti_cards.clear();
 	grave_act = false;
 	remove_act = false;
+	extra_act = false;
 }
-void ClientField::ShowSelectCard(bool buttonok) {
+void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	if(selectable_cards.size() <= 5) {
 		int startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		for(size_t i = 0; i < selectable_cards.size(); ++i) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else if(chain)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 			else
 				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
+				if(chain && selectable_cards[i]->is_conti)
+					myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+				else
+					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+						selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
-				mainGame->stCardPos[i]->setVisible(true);;
+				mainGame->stCardPos[i]->setVisible(true);
 				if(selectable_cards[i]->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
@@ -368,13 +402,19 @@ void ClientField::ShowSelectCard(bool buttonok) {
 		for(int i = 0; i < 5; ++i) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else if(chain)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 			else
 				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
+				if(chain && selectable_cards[i]->is_conti)
+					myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+				else
+					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+						selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);
 				if(selectable_cards[i]->controler)
@@ -399,6 +439,60 @@ void ClientField::ShowSelectCard(bool buttonok) {
 	else mainGame->btnSelectOK->setVisible(false);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
+void ClientField::ShowChainCard() {
+	if(selectable_cards.size() <= 5) {
+		int startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
+		for(size_t i = 0; i < selectable_cards.size(); ++i) {
+			if(selectable_cards[i]->code)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else
+				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+			mainGame->btnCardSelect[i]->setPressed(false);
+			mainGame->btnCardSelect[i]->setVisible(true);
+			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+				selectable_cards[i]->sequence + 1);
+			mainGame->stCardPos[i]->setText(formatBuffer);
+			mainGame->stCardPos[i]->setVisible(true);
+			if(selectable_cards[i]->controler)
+				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + 10 + i * 125, 30, startpos + 109 + i * 125, 50));
+		}
+		for(int i = selectable_cards.size(); i < 5; ++i) {
+			mainGame->btnCardSelect[i]->setVisible(false);
+			mainGame->stCardPos[i]->setVisible(false);
+		}
+		mainGame->scrCardList->setPos(0);
+		mainGame->scrCardList->setVisible(false);
+	} else {
+		for(int i = 0; i < 5; ++i) {
+			if(selectable_cards[i]->code)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else
+				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+			mainGame->btnCardSelect[i]->setPressed(false);
+			mainGame->btnCardSelect[i]->setVisible(true);
+			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+				selectable_cards[i]->sequence + 1);
+			mainGame->stCardPos[i]->setText(formatBuffer);
+			mainGame->stCardPos[i]->setVisible(true);
+			if(selectable_cards[i]->controler)
+				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(40 + i * 125, 30, 139 + i * 125, 50));
+		}
+		mainGame->scrCardList->setVisible(true);
+		mainGame->scrCardList->setMin(0);
+		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
+		mainGame->scrCardList->setPos(0);
+	}
+	if(!chain_forced)
+		mainGame->btnSelectOK->setVisible(true);
+	else mainGame->btnSelectOK->setVisible(false);
+	mainGame->PopupElement(mainGame->wCardSelect);
+}
 void ClientField::ReplaySwap() {
 	std::swap(deck[0], deck[1]);
 	std::swap(hand[0], hand[1]);
@@ -407,6 +501,7 @@ void ClientField::ReplaySwap() {
 	std::swap(grave[0], grave[1]);
 	std::swap(remove[0], remove[1]);
 	std::swap(extra[0], extra[1]);
+	std::swap(extra_p_count[0], extra_p_count[1]);
 	for(int p = 0; p < 2; ++p) {
 		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
@@ -544,12 +639,12 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	switch((location & 0x7f)) {
 	case LOCATION_DECK: {
 		if (controler == 0) {
-			t->X = 7.3f;
-			t->Y = 2.9f;
+			t->X = (matManager.vFields[0].Pos.X + matManager.vFields[1].Pos.X) / 2;
+			t->Y = (matManager.vFields[0].Pos.Y + matManager.vFields[2].Pos.Y) / 2;
 			t->Z = deck[controler].size() * 0.01f + 0.03f;
 		} else {
-			t->X = 0.6f;
-			t->Y = -2.9f;
+			t->X = (matManager.vFields[68].Pos.X + matManager.vFields[69].Pos.X) / 2;
+			t->Y = (matManager.vFields[68].Pos.Y + matManager.vFields[70].Pos.Y) / 2;
 			t->Z = deck[controler].size() * 0.01f + 0.03f;
 		}
 		break;
@@ -568,12 +663,12 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	}
 	case LOCATION_MZONE: {
 		if (controler == 0) {
-			t->X = 1.75f + 1.1f * sequence;
-			t->Y = 1.1f;
+			t->X = (matManager.vFields[16].Pos.X + matManager.vFields[17].Pos.X) / 2 + 1.1f * sequence;
+			t->Y = (matManager.vFields[16].Pos.Y + matManager.vFields[18].Pos.Y) / 2;
 			t->Z = 0.03f;
 		} else {
-			t->X = 6.15f - 1.1f * sequence;
-			t->Y = -1.1f;
+			t->X = (matManager.vFields[84].Pos.X + matManager.vFields[85].Pos.X) / 2 - 1.1f * sequence;
+			t->Y = (matManager.vFields[84].Pos.Y + matManager.vFields[86].Pos.Y) / 2;
 			t->Z = 0.03f;
 		}
 		break;
@@ -581,22 +676,38 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	case LOCATION_SZONE: {
 		if (controler == 0) {
 			if (sequence <= 4) {
-				t->X = 1.75f + 1.1f * sequence;
-				t->Y = 2.3f;
+				t->X = (matManager.vFields[36].Pos.X + matManager.vFields[37].Pos.X) / 2 + 1.1f * sequence;
+				t->Y = (matManager.vFields[36].Pos.Y + matManager.vFields[38].Pos.Y) / 2;
+				t->Z = 0.03f;
+			} else if (sequence == 5) {
+				t->X = (matManager.vFields[56].Pos.X + matManager.vFields[57].Pos.X) / 2;
+				t->Y = (matManager.vFields[56].Pos.Y + matManager.vFields[58].Pos.Y) / 2;
+				t->Z = 0.03f;
+			} else if (sequence == 6) {
+				t->X = (matManager.vFields[60].Pos.X + matManager.vFields[61].Pos.X) / 2;
+				t->Y = (matManager.vFields[60].Pos.Y + matManager.vFields[62].Pos.Y) / 2;
 				t->Z = 0.03f;
 			} else {
-				t->X = 0.6f;
-				t->Y = 1.7f;
+				t->X = (matManager.vFields[64].Pos.X + matManager.vFields[65].Pos.X) / 2;
+				t->Y = (matManager.vFields[64].Pos.Y + matManager.vFields[66].Pos.Y) / 2;
 				t->Z = 0.03f;
 			}
 		} else {
 			if (sequence <= 4) {
-				t->X = 6.15f - 1.1f * sequence;
-				t->Y = -2.3f;
+				t->X = (matManager.vFields[104].Pos.X + matManager.vFields[105].Pos.X) / 2 - 1.1f * sequence;
+				t->Y = (matManager.vFields[104].Pos.Y + matManager.vFields[106].Pos.Y) / 2;
+				t->Z = 0.03f;
+			} else if (sequence == 5) {
+				t->X = (matManager.vFields[124].Pos.X + matManager.vFields[125].Pos.X) / 2;
+				t->Y = (matManager.vFields[124].Pos.Y + matManager.vFields[126].Pos.Y) / 2;
+				t->Z = 0.03f;
+			} else if (sequence == 6) {
+				t->X = (matManager.vFields[128].Pos.X + matManager.vFields[129].Pos.X) / 2;
+				t->Y = (matManager.vFields[128].Pos.Y + matManager.vFields[130].Pos.Y) / 2;
 				t->Z = 0.03f;
 			} else {
-				t->X = 7.3f;
-				t->Y = -1.7f;
+				t->X = (matManager.vFields[132].Pos.X + matManager.vFields[133].Pos.X) / 2;
+				t->Y = (matManager.vFields[132].Pos.Y + matManager.vFields[134].Pos.Y) / 2;
 				t->Z = 0.03f;
 			}
 		}
@@ -604,25 +715,37 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	}
 	case LOCATION_GRAVE: {
 		if (controler == 0) {
-			t->X = 7.3f;
-			t->Y = 1.7f;
+			t->X = (matManager.vFields[4].Pos.X + matManager.vFields[5].Pos.X) / 2;
+			t->Y = (matManager.vFields[4].Pos.Y + matManager.vFields[6].Pos.Y) / 2;
 			t->Z = grave[controler].size() * 0.01f + 0.03f;
 		} else {
-			t->X = 0.6f;
-			t->Y = -1.7f;
+			t->X = (matManager.vFields[72].Pos.X + matManager.vFields[73].Pos.X) / 2;
+			t->Y = (matManager.vFields[72].Pos.Y + matManager.vFields[74].Pos.Y) / 2;
 			t->Z = grave[controler].size() * 0.01f + 0.03f;
 		}
 		break;
 	}
 	case LOCATION_REMOVED: {
 		if (controler == 0) {
-			t->X = 7.3f;
-			t->Y = 0.4f;
+			t->X = (matManager.vFields[12].Pos.X + matManager.vFields[13].Pos.X) / 2;
+			t->Y = (matManager.vFields[12].Pos.Y + matManager.vFields[14].Pos.Y) / 2;
 			t->Z = remove[controler].size() * 0.01f + 0.03f;
 		} else {
-			t->X = 0.6f;
-			t->Y = -0.4f;
+			t->X = (matManager.vFields[80].Pos.X + matManager.vFields[81].Pos.X) / 2;
+			t->Y = (matManager.vFields[80].Pos.Y + matManager.vFields[82].Pos.Y) / 2;
 			t->Z = remove[controler].size() * 0.01f + 0.03f;
+		}
+		break;
+	}
+	case LOCATION_EXTRA: {
+		if (controler == 0) {
+			t->X = (matManager.vFields[8].Pos.X + matManager.vFields[9].Pos.X) / 2;
+			t->Y = (matManager.vFields[8].Pos.Y + matManager.vFields[10].Pos.Y) / 2;
+			t->Z = extra[controler].size() * 0.01f + 0.03f;
+		} else {
+			t->X = (matManager.vFields[76].Pos.X + matManager.vFields[77].Pos.X) / 2;
+			t->Y = (matManager.vFields[76].Pos.Y + matManager.vFields[78].Pos.Y) / 2;
+			t->Z = extra[controler].size() * 0.01f + 0.03f;
 		}
 		break;
 	}
@@ -635,8 +758,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	switch (location) {
 	case LOCATION_DECK: {
 		if (controler == 0) {
-			t->X = 7.3f;
-			t->Y = 3.0f;
+			t->X = (matManager.vFields[0].Pos.X + matManager.vFields[1].Pos.X) / 2;
+			t->Y = (matManager.vFields[0].Pos.Y + matManager.vFields[2].Pos.Y) / 2;
 			t->Z = 0.01f + 0.01f * sequence;
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
@@ -648,8 +771,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			}
 		} else {
-			t->X = 0.6f;
-			t->Y = -3.0f;
+			t->X = (matManager.vFields[68].Pos.X + matManager.vFields[69].Pos.X) / 2;
+			t->Y = (matManager.vFields[68].Pos.Y + matManager.vFields[70].Pos.Y) / 2;
 			t->Z = 0.01f + 0.01f * sequence;
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
@@ -713,8 +836,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	}
 	case LOCATION_MZONE: {
 		if (controler == 0) {
-			t->X = 1.75f + 1.1f * sequence;
-			t->Y = 1.1f;
+			t->X = (matManager.vFields[16].Pos.X + matManager.vFields[17].Pos.X) / 2 + 1.1f * sequence;
+			t->Y = (matManager.vFields[16].Pos.Y + matManager.vFields[18].Pos.Y) / 2;
 			t->Z = 0.01f;
 			if (pcard->position & POS_DEFENCE) {
 				r->X = 0.0f;
@@ -730,8 +853,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				else r->Y = 0.0f;
 			}
 		} else {
-			t->X = 6.15f - 1.1f * sequence;
-			t->Y = -1.1f;
+			t->X = (matManager.vFields[84].Pos.X + matManager.vFields[85].Pos.X) / 2 - 1.1f * sequence;
+			t->Y = (matManager.vFields[84].Pos.Y + matManager.vFields[86].Pos.Y) / 2;
 			t->Z = 0.01f;
 			if (pcard->position & POS_DEFENCE) {
 				r->X = 0.0f;
@@ -752,12 +875,20 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	case LOCATION_SZONE: {
 		if (controler == 0) {
 			if (sequence <= 4) {
-				t->X = 1.75f + 1.1f * sequence;
-				t->Y = 2.3f;
+				t->X = (matManager.vFields[36].Pos.X + matManager.vFields[37].Pos.X) / 2 + 1.1f * sequence;
+				t->Y = (matManager.vFields[36].Pos.Y + matManager.vFields[38].Pos.Y) / 2;
+				t->Z = 0.01f;
+			} else if (sequence == 5) {
+				t->X = (matManager.vFields[56].Pos.X + matManager.vFields[57].Pos.X) / 2;
+				t->Y = (matManager.vFields[56].Pos.Y + matManager.vFields[58].Pos.Y) / 2;
+				t->Z = 0.01f;
+			} else if (sequence == 6) {
+				t->X = (matManager.vFields[60].Pos.X + matManager.vFields[61].Pos.X) / 2;
+				t->Y = (matManager.vFields[60].Pos.Y + matManager.vFields[62].Pos.Y) / 2;
 				t->Z = 0.01f;
 			} else {
-				t->X = 0.6f;
-				t->Y = 1.7f;
+				t->X = (matManager.vFields[64].Pos.X + matManager.vFields[65].Pos.X) / 2;
+				t->Y = (matManager.vFields[64].Pos.Y + matManager.vFields[66].Pos.Y) / 2;
 				t->Z = 0.01f;
 			}
 			r->X = 0.0f;
@@ -767,12 +898,20 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			else r->Y = 0.0f;
 		} else {
 			if (sequence <= 4) {
-				t->X = 6.15f - 1.1f * sequence;
-				t->Y = -2.3f;
+				t->X = (matManager.vFields[104].Pos.X + matManager.vFields[105].Pos.X) / 2 - 1.1f * sequence;
+				t->Y = (matManager.vFields[104].Pos.Y + matManager.vFields[106].Pos.Y) / 2;
+				t->Z = 0.01f;
+			} else if (sequence == 5) {
+				t->X = (matManager.vFields[124].Pos.X + matManager.vFields[125].Pos.X) / 2;
+				t->Y = (matManager.vFields[124].Pos.Y + matManager.vFields[126].Pos.Y) / 2;
+				t->Z = 0.01f;
+			} else if (sequence == 6) {
+				t->X = (matManager.vFields[128].Pos.X + matManager.vFields[129].Pos.X) / 2;
+				t->Y = (matManager.vFields[128].Pos.Y + matManager.vFields[130].Pos.Y) / 2;
 				t->Z = 0.01f;
 			} else {
-				t->X = 7.3f;
-				t->Y = -1.7f;
+				t->X = (matManager.vFields[132].Pos.X + matManager.vFields[133].Pos.X) / 2;
+				t->Y = (matManager.vFields[132].Pos.Y + matManager.vFields[134].Pos.Y) / 2;
 				t->Z = 0.01f;
 			}
 			r->X = 0.0f;
@@ -785,15 +924,15 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	}
 	case LOCATION_GRAVE: {
 		if (controler == 0) {
-			t->X = 7.3f;
-			t->Y = 1.7f;
+			t->X = (matManager.vFields[4].Pos.X + matManager.vFields[5].Pos.X) / 2;
+			t->Y = (matManager.vFields[4].Pos.Y + matManager.vFields[6].Pos.Y) / 2;
 			t->Z = 0.01f + 0.01f * sequence;
 			r->X = 0.0f;
 			r->Y = 0.0f;
 			r->Z = 0.0f;
 		} else {
-			t->X = 0.6f;
-			t->Y = -1.7f;
+			t->X = (matManager.vFields[72].Pos.X + matManager.vFields[73].Pos.X) / 2;
+			t->Y = (matManager.vFields[72].Pos.Y + matManager.vFields[74].Pos.Y) / 2;
 			t->Z = 0.01f + 0.01f * sequence;
 			r->X = 0.0f;
 			r->Y = 0.0f;
@@ -803,8 +942,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	}
 	case LOCATION_REMOVED: {
 		if (controler == 0) {
-			t->X = 7.3f;
-			t->Y = 0.4f;
+			t->X = (matManager.vFields[12].Pos.X + matManager.vFields[13].Pos.X) / 2;
+			t->Y = (matManager.vFields[12].Pos.Y + matManager.vFields[14].Pos.Y) / 2;
 			t->Z = 0.01f + 0.01f * sequence;
 			if(pcard->position & POS_FACEUP) {
 				r->X = 0.0f;
@@ -816,8 +955,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			}
 		} else {
-			t->X = 0.6f;
-			t->Y = -0.4f;
+			t->X = (matManager.vFields[80].Pos.X + matManager.vFields[81].Pos.X) / 2;
+			t->Y = (matManager.vFields[80].Pos.Y + matManager.vFields[82].Pos.Y) / 2;
 			t->Z = 0.01f + 0.01f * sequence;
 			if(pcard->position & POS_FACEUP) {
 				r->X = 0.0f;
@@ -833,18 +972,22 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	}
 	case LOCATION_EXTRA: {
 		if (controler == 0) {
-			t->X = 0.6f;
-			t->Y = 3.0f;
+			t->X = (matManager.vFields[8].Pos.X + matManager.vFields[9].Pos.X) / 2;
+			t->Y = (matManager.vFields[8].Pos.Y + matManager.vFields[10].Pos.Y) / 2;
 			t->Z = 0.01f + 0.01f * sequence;
 			r->X = 0.0f;
-			r->Y = 3.1415926f;
+			if(pcard->position & POS_FACEUP)
+				r->Y = 0.0f;
+			else r->Y = 3.1415926f;
 			r->Z = 0.0f;
 		} else {
-			t->X = 7.3f;
-			t->Y = -3.0f;
+			t->X = (matManager.vFields[76].Pos.X + matManager.vFields[77].Pos.X) / 2;
+			t->Y = (matManager.vFields[76].Pos.Y + matManager.vFields[78].Pos.Y) / 2;
 			t->Z = 0.01f * sequence;
 			r->X = 0.0f;
-			r->Y = 3.1415926f;
+			if(pcard->position & POS_FACEUP)
+				r->Y = 0.0f;
+			else r->Y = 3.1415926f;
 			r->Z = 3.1415926f;
 		}
 		break;
@@ -855,15 +998,15 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		}
 		int oseq = pcard->overlayTarget->sequence;
 		if (pcard->overlayTarget->controler == 0) {
-			t->X = 1.75f + 1.1f * oseq - 0.12f + 0.06f * sequence;
-			t->Y = 1.15f;
+			t->X = (matManager.vFields[16].Pos.X + matManager.vFields[17].Pos.X) / 2 + 1.1f * oseq - 0.12f + 0.06f * sequence;
+			t->Y = (matManager.vFields[16].Pos.Y + matManager.vFields[18].Pos.Y) / 2 + 0.05f;
 			t->Z = 0.005f + pcard->sequence * 0.0001f;
 			r->X = 0.0f;
 			r->Y = 0.0f;
 			r->Z = 0.0f;
 		} else {
-			t->X = 6.15f - 1.1f * oseq + 0.12f - 0.06f * sequence;
-			t->Y = -1.15f;
+			t->X = (matManager.vFields[84].Pos.X + matManager.vFields[85].Pos.X) / 2 - 1.1f * oseq + 0.12f - 0.06f * sequence;
+			t->Y = (matManager.vFields[84].Pos.Y + matManager.vFields[86].Pos.Y) / 2 - 0.05f;
 			t->Z = 0.005f + pcard->sequence * 0.0001f;
 			r->X = 0.0f;
 			r->Y = 0.0f;
@@ -1003,7 +1146,7 @@ bool ClientField::check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::
 	int m = (op2 > 0 && op1 > op2) ? op2 : op1;
 	if (m >= min && m <= max)
 		return true;
-	index++;
+	++index;
 	return (min > m && check_min(left, index, min - m, max - m))
 	        || check_min(left, index, min, max);
 }
@@ -1049,7 +1192,7 @@ bool ClientField::check_sum(std::set<ClientCard*>& testlist, std::set<ClientCard
 	int l2 = l >> 16;
 	if ((l1 == acc || (l2 > 0 && l2 == acc)) && (count + 1 >= select_min) && (count + 1 <= select_max))
 		return true;
-	index++;
+	++index;
 	return (acc > l1 && check_sum(testlist, index, acc - l1, count + 1))
 	       || (l2 > 0 && acc > l2 && check_sum(testlist, index, acc - l2, count + 1))
 	       || check_sum(testlist, index, acc, count);

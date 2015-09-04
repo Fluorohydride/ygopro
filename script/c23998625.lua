@@ -1,7 +1,7 @@
 --No.53 偽骸神 Heart－eartH
 function c23998625.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--atkup
 	local e1=Effect.CreateEffect(c)
@@ -31,6 +31,7 @@ function c23998625.initial_effect(c)
 	e3:SetOperation(c23998625.spop)
 	c:RegisterEffect(e3)
 end
+c23998625.xyz_number=53
 function c23998625.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetCard(Duel.GetAttacker())
@@ -79,5 +80,10 @@ function c23998625.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(tc,cg)
 		Duel.SpecialSummon(tc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		tc:CompleteProcedure()
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+		if cg:IsExists(Card.IsFacedown,1,nil) and Duel.IsPlayerCanSpecialSummon(tp) then
+			Duel.ConfirmCards(1-tp,cg)
+		end
 	end
 end

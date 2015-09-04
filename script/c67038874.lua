@@ -1,4 +1,4 @@
---スクラップ·マインドリーダー
+--スクラップ・マインドリーダー
 function c67038874.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

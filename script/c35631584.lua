@@ -13,6 +13,7 @@ function c35631584.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetCountLimit(1)
 	e2:SetCondition(c35631584.con)
 	e2:SetTarget(c35631584.tg)
 	e2:SetOperation(c35631584.op)
@@ -22,14 +23,13 @@ function c35631584.gfilter(c,tp)
 	return c:IsSetCard(0x53) and c:IsType(TYPE_XYZ) and c:IsControler(tp)
 end
 function c35631584.con(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(35631584)==0 and eg:IsExists(c35631584.gfilter,1,nil,tp)
+	return eg:IsExists(c35631584.gfilter,1,nil,tp)
 end
 function c35631584.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-	e:GetHandler():RegisterFlagEffect(35631584,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c35631584.op(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

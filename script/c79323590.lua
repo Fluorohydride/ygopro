@@ -22,7 +22,6 @@ function c79323590.initial_effect(c)
 	e3:SetCode(EFFECT_SUMMON_COST)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(LOCATION_HAND,LOCATION_HAND)
-	e3:SetCondition(c79323590.costcon)
 	e3:SetCost(c79323590.costchk)
 	e3:SetOperation(c79323590.costop)
 	c:RegisterEffect(e3)
@@ -36,27 +35,14 @@ function c79323590.initial_effect(c)
 	local e6=e3:Clone()
 	e6:SetCode(EFFECT_SSET_COST)
 	c:RegisterEffect(e6)
-	--accumulate
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_FIELD)
-	e7:SetCode(0x10000000+79323590)
-	e7:SetRange(LOCATION_SZONE)
-	e7:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e7:SetTargetRange(1,1)
-	c:RegisterEffect(e7)
 end
 function c79323590.actarget(e,te,tp)
 	return te:GetHandler():IsLocation(LOCATION_HAND)
-end
-function c79323590.costcon(e)
-	c79323590[0]=false
-	return true
 end
 function c79323590.costchk(e,te_or_c,tp)
 	return Duel.CheckLPCost(tp,500)
 end
 function c79323590.costop(e,tp,eg,ep,ev,re,r,rp)
-	if c79323590[0] then return end
-	Duel.PayLPCost(tp,Duel.GetFlagEffect(tp,79323590)*500)
-	c79323590[0]=true
+	Duel.Hint(HINT_CARD,0,79323590)
+	Duel.PayLPCost(tp,500)
 end

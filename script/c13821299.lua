@@ -1,4 +1,4 @@
---トラップ·イーター
+--トラップ・イーター
 function c13821299.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

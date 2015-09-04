@@ -1,4 +1,4 @@
---エナジー·ドレイン
+--エナジー・ドレイン
 function c56916805.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

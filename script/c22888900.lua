@@ -10,7 +10,10 @@ function c22888900.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c22888900.cfilter(c)
-	return c:IsFaceup() and (c:IsType(TYPE_FUSION+TYPE_RITUAL) or bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE)
+	local sumtype=c:GetSummonType()
+	return c:IsFaceup() and (bit.band(sumtype,SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
+		or bit.band(sumtype,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
+		or bit.band(sumtype,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION)
 end
 function c22888900.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c22888900.cfilter,tp,LOCATION_MZONE,0,1,nil)

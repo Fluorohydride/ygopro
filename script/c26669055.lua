@@ -5,6 +5,7 @@ function c26669055.initial_effect(c)
 	e1:SetDescription(aux.Stringid(26669055,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(aux.bdocon)
 	e1:SetOperation(c26669055.operation)
 	c:RegisterEffect(e1)
 end

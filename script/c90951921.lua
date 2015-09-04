@@ -6,41 +6,18 @@ function c90951921.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,90951921+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c90951921.cost)
 	e1:SetTarget(c90951921.target)
 	e1:SetOperation(c90951921.activate)
 	c:RegisterEffect(e1)
-	if not c90951921.global_check then
-		c90951921.global_check=true
-		c90951921[0]=true
-		c90951921[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c90951921.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c90951921.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(90951921,ACTIVITY_SPSUMMON,c90951921.counterfilter)
 end
-function c90951921.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		if not tc:IsSetCard(0x70) then
-			c90951921[tc:GetSummonPlayer()]=false
-		end
-		tc=eg:GetNext()
-	end
-end
-function c90951921.clear(e,tp,eg,ep,ev,re,r,rp)
-	c90951921[0]=true
-	c90951921[1]=true
+function c90951921.counterfilter(c)
+	return c:IsSetCard(0x70)
 end
 function c90951921.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c90951921[tp] and Duel.GetFlagEffect(tp,90951921)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(90951921,tp,ACTIVITY_SPSUMMON)==0 end
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -50,7 +27,6 @@ function c90951921.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(c90951921.splimit)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,90951921,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c90951921.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x70)
@@ -59,9 +35,9 @@ function c90951921.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x70) and c:IsAbleToRemove()
 end
 function c90951921.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c90951921.filter(chkc) end
 	if chk==0 then
-		if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3
+		if not Duel.IsPlayerCanDiscardDeck(tp,2)
 			or not Duel.IsExistingTarget(c90951921.filter,tp,LOCATION_GRAVE,0,1,nil) then return false end
 		local g=Duel.GetDecktopGroup(tp,2)
 		return g:FilterCount(Card.IsAbleToHand,nil)>0
@@ -73,7 +49,7 @@ function c90951921.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c90951921.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
+	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 and Duel.IsPlayerCanDiscardDeck(tp,2) then
 		Duel.BreakEffect()
 		local g=Duel.GetDecktopGroup(tp,2)
 		Duel.ConfirmCards(tp,g)

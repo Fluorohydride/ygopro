@@ -1,14 +1,14 @@
 --No.49 秘鳥フォーチュンチュン
 function c16259549.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--lpup
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(16259549,0))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCategory(CATEGORY_RECOVER)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_REPEAT)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
@@ -22,7 +22,7 @@ function c16259549.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(1)
+	e2:SetValue(aux.tgval)
 	c:RegisterEffect(e2)
 	--destroy replace
 	local e3=Effect.CreateEffect(c)
@@ -38,12 +38,14 @@ function c16259549.initial_effect(c)
 	e4:SetCategory(CATEGORY_TODECK)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e4:SetCountLimit(1,16259549)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCondition(c16259549.tdcon)
 	e4:SetTarget(c16259549.tdtg)
 	e4:SetOperation(c16259549.tdop)
 	c:RegisterEffect(e4)
 end
+c16259549.xyz_number=49
 function c16259549.reccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end

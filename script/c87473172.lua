@@ -5,7 +5,7 @@ function c87473172.initial_effect(c)
 	e1:SetDescription(aux.Stringid(87473172,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_FIELD)
-	e1:SetCode(EVENT_DESTROY)
+	e1:SetCode(EVENT_DESTROYED)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c87473172.atkcon)
 	e1:SetTarget(c87473172.atktg)
@@ -13,7 +13,8 @@ function c87473172.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c87473172.cfilter(c,tp)
-	return c:IsOnField() and c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_WINDBEAST)
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
+		and bit.band(c:GetPreviousRaceOnField(),RACE_WINDBEAST)~=0
 end
 function c87473172.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c87473172.cfilter,1,nil,tp)

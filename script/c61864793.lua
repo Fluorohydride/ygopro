@@ -1,4 +1,4 @@
---アースクエイク·ジャイアント
+--アースクエイク・ジャイアント
 function c61864793.initial_effect(c)
 	--pos
 	local e1=Effect.CreateEffect(c)

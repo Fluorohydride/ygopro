@@ -28,8 +28,9 @@ end
 function c77901552.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
-	e1:SetReset(RESET_EVENT+0xff0000+RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_EVENT+0xfe0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end
 function c77901552.spfilter(c,e,tp)
@@ -56,5 +57,13 @@ function c77901552.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_DEFENCE)
 		tc:RegisterEffect(e2)
 		Duel.SpecialSummonComplete()
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
+		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+		local cg2=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg1)
+		Duel.ConfirmCards(1-tp,cg2)
+		Duel.ConfirmCards(tp,cg2)
+		Duel.ShuffleHand(tp)
+		Duel.ShuffleDeck(tp)
 	end
 end

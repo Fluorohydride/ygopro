@@ -1,4 +1,4 @@
---ダークネス·ネオスフィア
+--ダークネス・ネオスフィア
 function c60417395.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

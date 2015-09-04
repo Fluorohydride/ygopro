@@ -1,4 +1,4 @@
---邪神ドレッド·ルート
+--邪神ドレッド・ルート
 function c62180201.initial_effect(c)
 	--summon with 3 tribute
 	local e1=Effect.CreateEffect(c)
@@ -24,7 +24,6 @@ function c62180201.initial_effect(c)
 	e4:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e4:SetProperty(EFFECT_FLAG_REPEAT)
 	e4:SetTarget(c62180201.atktg)
 	e4:SetValue(c62180201.atkval)
 	c:RegisterEffect(e4)

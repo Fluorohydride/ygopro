@@ -1,4 +1,4 @@
---スクラップ·ドラゴン
+--スクラップ・ドラゴン
 function c76774528.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

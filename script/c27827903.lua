@@ -1,4 +1,4 @@
---A·ジェネクス·クラッシャー
+--A・ジェネクス・クラッシャー
 function c27827903.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

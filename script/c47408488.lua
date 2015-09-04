@@ -37,7 +37,7 @@ function c47408488.initial_effect(c)
 end
 function c47408488.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return tc:IsFaceup() and tc:IsSetCard(0x34)
+	return tc:IsFaceup() and tc:IsSetCard(0x1034)
 end
 function c47408488.ctop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x6,1)
@@ -58,7 +58,7 @@ function c47408488.plop(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 then return end
 	if ft>e:GetLabel() then ft=e:GetLabel() end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,ft,ft,nil,0x34)
+	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,ft,ft,nil,0x1034)
 	if g:GetCount()>0 then
 		local tc=g:GetFirst()
 		while tc do

@@ -1,4 +1,4 @@
---ジェムナイト·アレキサンド
+--ジェムナイト・アレキサンド
 function c90019393.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

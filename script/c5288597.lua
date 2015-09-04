@@ -6,6 +6,7 @@ function c5288597.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetLabel(0)
+	e1:SetCountLimit(1,5288597)
 	e1:SetCost(c5288597.cost)
 	e1:SetTarget(c5288597.target)
 	e1:SetOperation(c5288597.activate)
@@ -13,13 +14,15 @@ function c5288597.initial_effect(c)
 end
 function c5288597.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(100)
-	if chk==0 then return Duel.GetFlagEffect(tp,5288597)==0 end
-	Duel.RegisterFlagEffect(tp,5288597,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return true end
 end
 function c5288597.cfilter(c,e,tp)
 	local lv=c:GetOriginalLevel()
-	return lv>0 and c:IsFaceup() and c:IsAbleToGraveAsCost()
-		and Duel.IsExistingMatchingCard(c5288597.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1,c:GetOriginalRace(),c:GetOriginalAttribute(),e,tp)
+	local rc=nil
+	if Duel.IsEnvironment(4064256) then rc=RACE_ZOMBIE
+	else rc=c:GetOriginalRace() end
+	return bit.band(c:GetOriginalType(),TYPE_MONSTER)~=0 and lv>0 and c:IsFaceup() and c:IsAbleToGraveAsCost()
+		and Duel.IsExistingMatchingCard(c5288597.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1,rc,c:GetOriginalAttribute(),e,tp)
 end
 function c5288597.spfilter(c,lv,rc,att,e,tp)
 	return c:GetLevel()==lv and c:IsRace(rc) and c:IsAttribute(att) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

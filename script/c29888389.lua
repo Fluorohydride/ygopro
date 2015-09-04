@@ -1,4 +1,4 @@
---シャドウ·リチュア
+--シャドウ・リチュア
 function c29888389.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

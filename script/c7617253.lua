@@ -16,7 +16,7 @@ function c7617253.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()
 end
 function c7617253.costfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsAbleToGraveAsCost()
 end
 function c7617253.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c7617253.costfilter,tp,LOCATION_SZONE,0,1,nil) end

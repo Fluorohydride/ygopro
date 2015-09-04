@@ -1,4 +1,4 @@
---スリップ·サモン
+--スリップ・サモン
 function c94484482.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

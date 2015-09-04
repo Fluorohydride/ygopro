@@ -1,4 +1,4 @@
---トゥーン·ゴブリン突撃部隊
+--トゥーン・ゴブリン突撃部隊
 function c15270885.initial_effect(c)
 	--cannot attack
 	local e1=Effect.CreateEffect(c)
@@ -44,7 +44,7 @@ function c15270885.atklimit(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterEffect(e1)
 end
 function c15270885.sfilter(c)
-	return c:IsReason(REASON_DESTROY) and c:IsCode(15259703) and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c15270885.sdescon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c15270885.sfilter,1,nil)

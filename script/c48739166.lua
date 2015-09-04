@@ -1,7 +1,7 @@
 --No.101 S・H・Ark Knight
 function c48739166.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)
@@ -9,6 +9,7 @@ function c48739166.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,48739166)
 	e1:SetCost(c48739166.cost)
 	e1:SetTarget(c48739166.target)
 	e1:SetOperation(c48739166.operation)
@@ -22,10 +23,10 @@ function c48739166.initial_effect(c)
 	e2:SetTarget(c48739166.reptg)
 	c:RegisterEffect(e2)
 end
+c48739166.xyz_number=101
 function c48739166.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,48739166)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
-	Duel.RegisterFlagEffect(tp,48739166,RESET_PHASE+PHASE_END,0,1)
 end
 function c48739166.filter(c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsAbleToChangeControler()

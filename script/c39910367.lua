@@ -43,7 +43,7 @@ function c39910367.initial_effect(c)
 end
 function c39910367.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=re:GetHandler()
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c:GetSequence()~=5 then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c~=e:GetHandler() then
 		e:GetHandler():AddCounter(0x3001,1)
 	end
 end

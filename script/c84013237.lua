@@ -1,7 +1,7 @@
 --Ｎｏ.３９ 希望皇ホープ
 function c84013237.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--disable attack
 	local e1=Effect.CreateEffect(c)
@@ -23,6 +23,7 @@ function c84013237.initial_effect(c)
 	e2:SetOperation(c84013237.desop)
 	c:RegisterEffect(e2)
 end
+c84013237.xyz_number=39
 function c84013237.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

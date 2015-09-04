@@ -168,7 +168,7 @@ public:
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stText;
-	irr::gui::IGUIScrollBar *scrCardText;
+	irr::gui::IGUIScrollBar* scrCardText;
 	irr::gui::IGUICheckBox* chkAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
@@ -287,7 +287,7 @@ public:
 	irr::gui::IGUICheckBox* chkAttribute[7];
 	//announce race
 	irr::gui::IGUIWindow* wANRace;
-	irr::gui::IGUICheckBox* chkRace[23];
+	irr::gui::IGUICheckBox* chkRace[24];
 	//cmd menu
 	irr::gui::IGUIWindow* wCmdMenu;
 	irr::gui::IGUIButton* btnActivate;
@@ -298,6 +298,7 @@ public:
 	irr::gui::IGUIButton* btnRepos;
 	irr::gui::IGUIButton* btnAttack;
 	irr::gui::IGUIButton* btnShowList;
+	irr::gui::IGUIButton* btnShuffle;
 	//chat window
 	irr::gui::IGUIWindow* wChat;
 	irr::gui::IGUIListBox* lstChatLog;
@@ -427,6 +428,7 @@ extern Game* mainGame;
 #define BUTTON_CMD_REPOS			245
 #define BUTTON_CMD_ATTACK			246
 #define BUTTON_CMD_SHOWLIST			247
+#define BUTTON_CMD_SHUFFLE			248
 #define BUTTON_ANNUMBER_OK			250
 #define BUTTON_ANCARD_OK			251
 #define EDITBOX_ANCARD				252

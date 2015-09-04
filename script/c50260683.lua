@@ -1,7 +1,7 @@
 --No.36 先史遺産－超機関フォーク＝ヒューク
 function c50260683.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x70),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x70),4,2)
 	c:EnableReviveLimit()
 	--atkdown
 	local e1=Effect.CreateEffect(c)
@@ -30,6 +30,7 @@ function c50260683.initial_effect(c)
 	e2:SetOperation(c50260683.desop)
 	c:RegisterEffect(e2)
 end
+c50260683.xyz_number=36
 function c50260683.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end

@@ -25,19 +25,21 @@ function c68933343.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c68933343.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x66) and c:IsLevelAbove(1)
+	return c:IsFaceup() and c:IsSetCard(0x1066) and c:IsLevelAbove(1)
 end
 function c68933343.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c68933343.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c68933343.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0
+		and Duel.IsExistingTarget(c68933343.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c68933343.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,c68933343.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function c68933343.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c68933343.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c68933343.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0
+		and Duel.IsExistingTarget(c68933343.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c68933343.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c68933343.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c68933343.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

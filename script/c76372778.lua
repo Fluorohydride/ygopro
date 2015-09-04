@@ -1,13 +1,13 @@
---イビリチュア·メロウガイスト
+--イビリチュア・メロウガイスト
 function c76372778.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--to deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(76372778,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetCondition(c76372778.condition)
 	e1:SetCost(c76372778.cost)
 	e1:SetOperation(c76372778.operation)

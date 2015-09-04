@@ -104,7 +104,11 @@ function c5861892.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:GetFlagEffectLabel(36690018)==0 and (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
 end
 function c5861892.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	local c=e:GetHandler()
+	if chk==0 then return c:GetFlagEffect(5861892)==0 end
+	if c:IsHasEffect(EFFECT_REVERSE_UPDATE) then
+		c:RegisterFlagEffect(5861892,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsRelateToEffect(re) and re:GetHandler():IsDestructable() then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)

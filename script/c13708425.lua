@@ -1,4 +1,4 @@
---フレア·リゾネーター
+--フレア・リゾネーター
 function c13708425.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

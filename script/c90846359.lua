@@ -4,7 +4,7 @@ function c90846359.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMING_DRAW_PHASE)
+	e1:SetHintTiming(0,TIMING_DRAW_PHASE+0x1c0)
 	e1:SetTarget(c90846359.acttg)
 	c:RegisterEffect(e1)
 	--adjust
@@ -53,7 +53,7 @@ function c90846359.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	local rc=c90846359[sump]
 	if targetp then rc=c90846359[targetp] end
 	if rc==0 then return false end
-	return c:IsRace(0xffffff-rc)
+	return c:GetRace()~=rc
 end
 function c90846359.getrace(g)
 	local arc=0
@@ -65,7 +65,7 @@ function c90846359.getrace(g)
 	return arc
 end
 function c90846359.rmfilter(c,rc)
-	return not c:IsRace(0xffffff-rc)
+	return c:GetRace()==rc
 end
 function c90846359.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()
@@ -99,7 +99,7 @@ function c90846359.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	g1:Merge(g2)
 	if g1:GetCount()>0 then
-		Duel.SendtoGrave(g1,REASON_EFFECT)
+		Duel.SendtoGrave(g1,REASON_RULE)
 		Duel.Readjust()
 	end
 end

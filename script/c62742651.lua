@@ -1,4 +1,4 @@
---アーマード·サイキッカー
+--アーマード・サイキッカー
 function c62742651.initial_effect(c)
 	--summon with no tribute
 	local e1=Effect.CreateEffect(c)
@@ -14,6 +14,7 @@ function c62742651.initial_effect(c)
 	e2:SetCategory(CATEGORY_DAMAGE+CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
+	e2:SetCondition(c62742651.damcon)
 	e2:SetTarget(c62742651.damtg)
 	e2:SetOperation(c62742651.damop)
 	c:RegisterEffect(e2)
@@ -21,10 +22,14 @@ end
 function c62742651.ntfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PSYCHO)
 end
-function c62742651.ntcon(e,c)
+function c62742651.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c62742651.ntfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
+end
+function c62742651.damcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c62742651.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

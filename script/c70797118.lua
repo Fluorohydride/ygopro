@@ -10,7 +10,7 @@ function c70797118.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c70797118.sdfilter(c)
-	return c:IsFaceup() and c:IsAttribute(0xff-ATTRIBUTE_LIGHT)
+	return c:IsFaceup() and c:GetAttribute()~=ATTRIBUTE_LIGHT
 end
 function c70797118.sdcon(e)
 	return Duel.IsExistingMatchingCard(c70797118.sdfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)

@@ -1,7 +1,7 @@
 --シャインエルフ
 function c97170107.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,2),2)
+	aux.AddXyzProcedure(c,nil,2,2)
 	c:EnableReviveLimit()
 	--atkdown
 	local e1=Effect.CreateEffect(c)

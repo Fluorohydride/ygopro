@@ -1,6 +1,6 @@
 --リチュアの儀水鏡
 function c46159582.initial_effect(c)
-	aux.AddRitualProcEqual(c,c46159582.ritual_filter)
+	aux.AddRitualProcEqual2(c,c46159582.ritual_filter)
 	--salvage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(46159582,0))

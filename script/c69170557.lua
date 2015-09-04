@@ -1,7 +1,7 @@
 --CNo.40 ギミック・パペット－デビルズ・ストリングス
 function c69170557.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,9),3)
+	aux.AddXyzProcedure(c,nil,9,3)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -24,6 +24,7 @@ function c69170557.initial_effect(c)
 	e2:SetOperation(c69170557.ctop)
 	c:RegisterEffect(e2)
 end
+c69170557.xyz_number=40
 function c69170557.desfilter(c)
 	return c:GetCounter(0x24)~=0 and c:IsDestructable()
 end

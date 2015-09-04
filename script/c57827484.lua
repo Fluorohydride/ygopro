@@ -1,4 +1,4 @@
---シャドウ·ダイバー
+--シャドウ・ダイバー
 function c57827484.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	local e1=Effect.CreateEffect(c)

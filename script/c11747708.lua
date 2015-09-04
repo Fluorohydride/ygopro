@@ -6,6 +6,7 @@ function c11747708.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,11747708+EFFECT_COUNT_CODE_DUEL)
 	e1:SetCost(c11747708.cost)
 	e1:SetTarget(c11747708.target)
 	e1:SetOperation(c11747708.operation)
@@ -22,11 +23,9 @@ function c11747708.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(g:GetFirst():GetLevel())
 end
 function c11747708.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return Duel.GetFlagEffect(tp,11747708)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-	Duel.RegisterFlagEffect(tp,11747708,0,0,0)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c11747708.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -1,4 +1,4 @@
---ヘル·アライアンス
+--ヘル・アライアンス
 function c46910446.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

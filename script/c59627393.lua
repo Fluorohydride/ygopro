@@ -1,7 +1,7 @@
 --No.105 BK 流星のセスタス
 function c59627393.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -16,6 +16,7 @@ function c59627393.initial_effect(c)
 	e1:SetOperation(c59627393.operation)
 	c:RegisterEffect(e1)
 end
+c59627393.xyz_number=105
 function c59627393.condition(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()

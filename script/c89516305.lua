@@ -1,7 +1,7 @@
 --No.87 雪月花美神クイーン・オブ・ナイツ
 function c89516305.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),3)
+	aux.AddXyzProcedure(c,nil,8,3)
 	c:EnableReviveLimit()
 	--s/t
 	local e1=Effect.CreateEffect(c)
@@ -10,6 +10,7 @@ function c89516305.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCost(c89516305.cost)
 	e1:SetTarget(c89516305.sttg)
 	e1:SetOperation(c89516305.stop)
@@ -21,6 +22,7 @@ function c89516305.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCost(c89516305.cost)
 	e2:SetTarget(c89516305.settg)
 	e2:SetOperation(c89516305.setop)
@@ -28,20 +30,23 @@ function c89516305.initial_effect(c)
 	--atkup
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(89516305,2))
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
+	e3:SetHintTiming(TIMING_DAMAGE_STEP)
+	e3:SetCondition(c89516305.atkcon)
 	e3:SetCost(c89516305.cost)
 	e3:SetTarget(c89516305.atktg)
 	e3:SetOperation(c89516305.atkop)
 	c:RegisterEffect(e3)
 end
+c89516305.xyz_number=87
 function c89516305.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(89516305)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	e:GetHandler():RegisterFlagEffect(89516305,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c89516305.sttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_SZONE) and chkc:IsFacedown() end
@@ -83,6 +88,9 @@ function c89516305.setop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
 	end
+end
+function c89516305.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c89516305.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end

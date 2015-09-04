@@ -42,15 +42,17 @@ function c86062400.tgop(e,tp,eg,ep,ev,re,r,rp)
 	if bc:IsFaceup() and bc:IsRelateToBattle() then
 		local rk=bc:GetRank()
 		local g=nil
+		local tg=Duel.GetFieldGroup(tp,0,LOCATION_EXTRA)
 		if rk<4 then
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
-			g=Duel.SelectMatchingCard(1-tp,nil,tp,0,LOCATION_EXTRA,1,1,nil)
+			g=tg:Select(1-tp,1,1,nil)
 		elseif rk==4 then
+			Duel.ConfirmCards(tp,tg)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-			g=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_EXTRA,1,1,nil)
+			g=tg:Select(tp,1,1,nil)
 		else
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
-			g=Duel.SelectMatchingCard(1-tp,nil,tp,0,LOCATION_EXTRA,rk,rk,nil)
+			g=tg:Select(1-tp,rk,rk,nil)
 		end
 		if g:GetCount()>0 then
 			Duel.SendtoGrave(g,REASON_EFFECT)

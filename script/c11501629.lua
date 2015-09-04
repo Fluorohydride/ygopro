@@ -30,11 +30,11 @@ function c11501629.initial_effect(c)
 	e3:SetOperation(c11501629.damop)
 	c:RegisterEffect(e3)
 end
-function c11501629.ctfilter(c)
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsReason(REASON_EFFECT)
+function c11501629.ctfilter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsReason(REASON_EFFECT)
 end
 function c11501629.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	local ct=eg:FilterCount(c11501629.ctfilter,nil)
+	local ct=eg:FilterCount(c11501629.ctfilter,nil,tp)
 	e:SetLabel(ct)
 	return ct>0
 end

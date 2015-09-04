@@ -7,14 +7,10 @@ function c72502414.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
-	e1:SetCost(c72502414.cost)
+	e1:SetCountLimit(1,72502414+EFFECT_COUNT_CODE_DUEL)
 	e1:SetTarget(c72502414.target)
 	e1:SetOperation(c72502414.operation)
 	c:RegisterEffect(e1)
-end
-function c72502414.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,72502414)==0 end
-	Duel.RegisterFlagEffect(tp,72502414,0,0,0)
 end
 function c72502414.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7f) and c:IsType(TYPE_XYZ)
@@ -28,7 +24,7 @@ end
 function c72502414.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		Duel.Overlay(tc,Group.FromCards(c))
 	end
 end

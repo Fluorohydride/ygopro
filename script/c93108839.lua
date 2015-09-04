@@ -1,7 +1,7 @@
 --No.58 炎圧鬼バーナー・バイサー
 function c93108839.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -32,11 +32,12 @@ function c93108839.initial_effect(c)
 	e3:SetOperation(c93108839.damop)
 	c:RegisterEffect(e3)
 end
+c93108839.xyz_number=58
 function c93108839.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c93108839.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c93108839.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c93108839.filter(chkc) and chkc~=e:GetHandler() end
 	if chk==0 then return e:GetHandler():GetFlagEffect(93108839)==0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingTarget(c93108839.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)

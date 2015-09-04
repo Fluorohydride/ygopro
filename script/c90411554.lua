@@ -6,6 +6,7 @@ function c90411554.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e1:SetCountLimit(1,90411554)
 	e1:SetCost(c90411554.hspcost)
 	e1:SetTarget(c90411554.hsptg)
 	e1:SetOperation(c90411554.hspop)
@@ -16,10 +17,9 @@ function c90411554.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
+	e2:SetCountLimit(1,90411554)
 	e2:SetCondition(c90411554.retcon)
-	e2:SetCost(c90411554.retcost)
 	e2:SetTarget(c90411554.rettg)
 	e2:SetOperation(c90411554.retop)
 	c:RegisterEffect(e2)
@@ -30,6 +30,7 @@ function c90411554.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCountLimit(1,90411554)
 	e3:SetCost(c90411554.spcost)
 	e3:SetTarget(c90411554.sptg)
 	e3:SetOperation(c90411554.spop)
@@ -40,8 +41,8 @@ function c90411554.initial_effect(c)
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_REMOVE)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
-	e4:SetCost(c90411554.thcost)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetCountLimit(1,90411554)
 	e4:SetTarget(c90411554.thtg)
 	e4:SetOperation(c90411554.thop)
 	c:RegisterEffect(e4)
@@ -50,19 +51,17 @@ function c90411554.rfilter(c)
 	return (c:IsRace(RACE_DRAGON) or c:IsAttribute(ATTRIBUTE_EARTH)) and c:IsAbleToRemoveAsCost()
 end
 function c90411554.hspcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,90411554)==0
-		and Duel.IsExistingMatchingCard(c90411554.rfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,2,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c90411554.rfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,2,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c90411554.rfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,2,2,e:GetHandler())
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,90411554,RESET_PHASE+PHASE_END,0,1)
 end
 function c90411554.hsptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function c90411554.hspop(e,tp,eg,ep,ev,re,r,rp,c)
+function c90411554.hspop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
@@ -71,10 +70,6 @@ end
 function c90411554.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 		and bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
-end
-function c90411554.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,90411554)==0 end
-	Duel.RegisterFlagEffect(tp,90411554,RESET_PHASE+PHASE_END,0,1)
 end
 function c90411554.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -90,14 +85,12 @@ function c90411554.dfilter(c)
 	return c:IsAttribute(ATTRIBUTE_EARTH) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
 end
 function c90411554.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,90411554)==0
-		and e:GetHandler():IsDiscardable() and e:GetHandler():IsAbleToGraveAsCost()
+	if chk==0 then return e:GetHandler():IsDiscardable() and e:GetHandler():IsAbleToGraveAsCost()
 		and Duel.IsExistingMatchingCard(c90411554.dfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g=Duel.SelectMatchingCard(tp,c90411554.dfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
 	g:AddCard(e:GetHandler())
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
-	Duel.RegisterFlagEffect(tp,90411554,RESET_PHASE+PHASE_END,0,1)
 end
 function c90411554.spfilter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -115,10 +108,6 @@ function c90411554.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c90411554.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,90411554)==0 end
-	Duel.RegisterFlagEffect(tp,90411554,RESET_PHASE+PHASE_END,0,1)
 end
 function c90411554.thfilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsAbleToHand()

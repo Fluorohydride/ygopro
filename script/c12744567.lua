@@ -1,7 +1,7 @@
 --CNo.101 S・H・Dark Knight
 function c12744567.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)
@@ -25,6 +25,7 @@ function c12744567.initial_effect(c)
 	e2:SetOperation(c12744567.spop)
 	c:RegisterEffect(e2)
 end
+c12744567.xyz_number=101
 function c12744567.filter(c)
 	return not c:IsType(TYPE_TOKEN) and c:IsAbleToChangeControler()
 		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
@@ -47,7 +48,8 @@ function c12744567.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c12744567.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_DESTROY) and e:GetHandler():GetOverlayCount()>0
+	local c=e:GetHandler()
+	return c:IsReason(REASON_DESTROY) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetOverlayCount()>0
 end
 function c12744567.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

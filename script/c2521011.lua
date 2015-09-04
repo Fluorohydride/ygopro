@@ -14,9 +14,8 @@ function c2521011.initial_effect(c)
 	e2:SetDescription(aux.Stringid(2521011,0))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CHAIN_UNIQUE)
-	e2:SetCountLimit(1)
-	e2:SetCost(c2521011.setcost)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCountLimit(1,2521011)
 	e2:SetTarget(c2521011.settg)
 	e2:SetOperation(c2521011.setop)
 	c:RegisterEffect(e2)
@@ -30,7 +29,7 @@ function c2521011.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_BEASTWARRIOR))
-	e4:SetValue(c2521011.tgvalue)
+	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 end
 function c2521011.spfilter(c)
@@ -46,10 +45,6 @@ function c2521011.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectMatchingCard(tp,c2521011.spfilter,tp,LOCATION_ONFIELD,0,3,3,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 end
-function c2521011.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,2521011)==0 end
-	Duel.RegisterFlagEffect(tp,2521011,RESET_PHASE+PHASE_END,0,1)
-end
 function c2521011.filter(c)
 	return c:IsSetCard(0x7c) and c:IsType(TYPE_TRAP) and c:IsSSetable()
 end
@@ -64,7 +59,4 @@ function c2521011.setop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,g:GetFirst())
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-function c2521011.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end

@@ -1,4 +1,4 @@
---シー·アーチャー
+--シー・アーチャー
 function c4252828.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -32,7 +32,7 @@ function c4252828.filter(c)
 	return c:IsFaceup() and c:IsLevelBelow(3)
 end
 function c4252828.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c4252828.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c4252828.filter(chkc) and chkc~=e:GetHandler() end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingTarget(c4252828.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
@@ -45,7 +45,7 @@ end
 function c4252828.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsType(TYPE_MONSTER) then
 		if c:IsFaceup() and c:IsRelateToEffect(e) then
 			if not Duel.Equip(tp,tc,c,false) then return end
 			--Add Equip limit

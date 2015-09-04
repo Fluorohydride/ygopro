@@ -1,4 +1,4 @@
---フォトン·サンクチュアリ
+--フォトン・サンクチュアリ
 function c17418744.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -9,40 +9,17 @@ function c17418744.initial_effect(c)
 	e1:SetTarget(c17418744.target)
 	e1:SetOperation(c17418744.activate)
 	c:RegisterEffect(e1)
-	if not c17418744.global_check then
-		c17418744.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SUMMON_SUCCESS)
-		ge1:SetOperation(c17418744.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
-		ge2:SetOperation(c17418744.checkop)
-		Duel.RegisterEffect(ge2,0)
-		local ge3=Effect.CreateEffect(c)
-		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge3:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge3:SetOperation(c17418744.checkop)
-		Duel.RegisterEffect(ge3,0)
-	end
+	Duel.AddCustomActivityCounter(17418744,ACTIVITY_SUMMON,c17418744.counterfilter)
+	Duel.AddCustomActivityCounter(17418744,ACTIVITY_SPSUMMON,c17418744.counterfilter)
+	Duel.AddCustomActivityCounter(17418744,ACTIVITY_FLIPSUMMON,c17418744.counterfilter)
 end
-function c17418744.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if tc:IsAttribute(0x6f) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,17418744,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,17418744,RESET_PHASE+PHASE_END,0,1) end
+function c17418744.counterfilter(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c17418744.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,17418744)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(17418744,tp,ACTIVITY_SUMMON)==0
+		and Duel.GetCustomActivityCount(17418744,tp,ACTIVITY_SPSUMMON)==0 
+		and Duel.GetCustomActivityCount(17418744,tp,ACTIVITY_FLIPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

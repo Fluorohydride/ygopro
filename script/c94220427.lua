@@ -15,22 +15,21 @@ function c94220427.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,94220427+EFFECT_COUNT_CODE_DUEL)
 	e2:SetCondition(c94220427.thcon)
-	e2:SetCost(c94220427.thcost)
 	e2:SetTarget(c94220427.thtg)
 	e2:SetOperation(c94220427.thop)
 	c:RegisterEffect(e2)
 end
 function c94220427.filter1(c,e,tp)
 	local rk=c:GetRank()
-	return rk>4 and c:IsFaceup()
-		and Duel.IsExistingMatchingCard(c94220427.filter2,tp,LOCATION_EXTRA,0,1,nil,rk+1,c:GetCode(),e,tp)
+	return rk>4 and c:IsFaceup() and c:IsType(TYPE_XYZ)
+		and Duel.IsExistingMatchingCard(c94220427.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1,c:GetCode())
 end
-function c94220427.filter2(c,rk,code,e,tp)
-	if c:IsCode(6165656) and code~=48995978 then return false end
-	return c:GetRank()==rk and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073))
+function c94220427.filter2(c,e,tp,mc,rk,code)
+	if c:GetOriginalCode()==6165656 and code~=48995978 then return false end
+	return c:GetRank()==rk and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073)) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c94220427.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -46,13 +45,14 @@ function c94220427.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c94220427.filter2,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank()+1,tc:GetCode(),e,tp)
+	local g=Duel.SelectMatchingCard(tp,c94220427.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()+1,tc:GetCode())
 	local sc=g:GetFirst()
 	if sc then
 		local mg=tc:GetOverlayGroup()
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(tc))
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
@@ -63,10 +63,6 @@ function c94220427.cfilter(c,tp)
 end
 function c94220427.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c94220427.cfilter,1,nil,tp)
-end
-function c94220427.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,94220427)==0 end
-	Duel.RegisterFlagEffect(tp,94220427,0,0,0)
 end
 function c94220427.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end

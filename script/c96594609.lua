@@ -17,7 +17,7 @@ function c96594609.initial_effect(c)
 	e2:SetDescription(aux.Stringid(96594609,1))
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c96594609.tgcon)
 	e2:SetTarget(c96594609.tgtg)
@@ -50,7 +50,7 @@ function c96594609.tgfilter(c)
 	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToGrave()
 end
 function c96594609.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(tgfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c96594609.tgfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function c96594609.tgop(e,tp,eg,ep,ev,re,r,rp)

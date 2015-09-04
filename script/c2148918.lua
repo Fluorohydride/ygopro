@@ -1,4 +1,4 @@
---機甲忍法ラスト·ミスト
+--機甲忍法ラスト・ミスト
 function c2148918.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

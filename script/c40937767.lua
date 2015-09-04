@@ -1,4 +1,4 @@
---グレイヴ·オージャ
+--グレイヴ・オージャ
 function c40937767.initial_effect(c)
 	--cannot be battle target
 	local e1=Effect.CreateEffect(c)
@@ -7,7 +7,7 @@ function c40937767.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetCondition(c40937767.ccon)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--damage
 	local e2=Effect.CreateEffect(c)

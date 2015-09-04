@@ -1,4 +1,4 @@
---レプティレス·アンガー
+--レプティレス・アンガー
 function c91580102.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

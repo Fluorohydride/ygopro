@@ -7,6 +7,7 @@ function c65844845.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,65844845)
 	e1:SetCost(c65844845.eqcost)
 	e1:SetTarget(c65844845.eqtg)
 	e1:SetOperation(c65844845.eqop)
@@ -36,11 +37,10 @@ function c65844845.filter(c)
 end
 function c65844845.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c65844845.filter(chkc) end
-	if chk==0 then return Duel.GetFlagEffect(tp,65844845)==0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingTarget(c65844845.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c65844845.filter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.RegisterFlagEffect(tp,65844845,RESET_PHASE+PHASE_END,0,1)
 end
 function c65844845.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -55,8 +55,9 @@ function c65844845.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c65844845.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 end
 function c65844845.eqlimit(e,c)
-	return c:IsSetCard(0x56)
+	return c==e:GetLabelObject()
 end

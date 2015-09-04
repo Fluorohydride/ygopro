@@ -1,4 +1,4 @@
---ガエル·サンデス
+--ガエル・サンデス
 function c9910360.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

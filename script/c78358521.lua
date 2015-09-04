@@ -1,4 +1,4 @@
---セイクリッド·ソンブレス
+--セイクリッド・ソンブレス
 function c78358521.initial_effect(c)
 	--salvage
 	local e1=Effect.CreateEffect(c)
@@ -7,6 +7,7 @@ function c78358521.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1,78358521)
 	e1:SetCost(c78358521.thcost)
 	e1:SetTarget(c78358521.thtg)
 	e1:SetOperation(c78358521.thop)
@@ -37,12 +38,10 @@ function c78358521.filter(c)
 	return c:IsSetCard(0x53) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c78358521.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,78358521)==0
-		and Duel.IsExistingMatchingCard(c78358521.rmfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c78358521.rmfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c78358521.rmfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,78358521,RESET_PHASE+PHASE_END,0,1)
 end
 function c78358521.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c78358521.filter(chkc) end
@@ -82,7 +81,7 @@ function c78358521.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c78358521.decop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsReason(REASON_RETURN) or Duel.GetFlagEffect(tp,78358522)~=0 then return end
+	if Duel.GetFlagEffect(tp,78358522)~=0 then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DECREASE_TRIBUTE)

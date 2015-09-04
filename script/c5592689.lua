@@ -1,4 +1,4 @@
---サクリファイス·ロータス
+--サクリファイス・ロータス
 function c5592689.initial_effect(c)
 	--Special Summon
 	local e1=Effect.CreateEffect(c)
@@ -7,6 +7,7 @@ function c5592689.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1)
 	e1:SetCondition(c5592689.sscon)
 	e1:SetTarget(c5592689.sstg)
 	e1:SetOperation(c5592689.ssop)
@@ -19,7 +20,7 @@ function c5592689.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_REPEAT)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCondition(c5592689.dmcon)
 	e2:SetTarget(c5592689.dmtg)
 	e2:SetOperation(c5592689.dmop)

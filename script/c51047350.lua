@@ -1,4 +1,4 @@
---カード·ブレイカー
+--カード・ブレイカー
 function c51047350.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon
@@ -13,7 +13,7 @@ function c51047350.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c51047350.filter(c)
-	return c:GetSequence()~=5 and c:IsAbleToGraveAsCost()
+	return c:GetSequence()<5 and c:IsAbleToGraveAsCost()
 end
 function c51047350.spcon(e,c)
 	if c==nil then return true end

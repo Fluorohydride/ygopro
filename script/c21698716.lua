@@ -1,14 +1,12 @@
---宝玉獣 コバルト·イーグル
+--宝玉獣 コバルト・イーグル
 function c21698716.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(21698716,0))
-	e1:SetCode(EFFECT_SEND_REPLACE)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(c21698716.reptarget)
-	e1:SetOperation(c21698716.repoperation)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_TO_GRAVE_REDIRECT_CB)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCondition(c21698716.repcon)
+	e1:SetOperation(c21698716.repop)
 	c:RegisterEffect(e1)
 	--return deck
 	local e2=Effect.CreateEffect(c)
@@ -22,15 +20,12 @@ function c21698716.initial_effect(c)
 	e2:SetOperation(c21698716.operation)
 	c:RegisterEffect(e2)
 end
-function c21698716.reptarget(e,tp,eg,ep,ev,re,r,rp,chk)
+function c21698716.repcon(e)
 	local c=e:GetHandler()
-	if chk==0 then return c:GetDestination()==LOCATION_GRAVE and c:IsReason(REASON_DESTROY) end
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return false end
-	return Duel.SelectEffectYesNo(tp,c)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)
 end
-function c21698716.repoperation(e,tp,eg,ep,ev,re,r,rp,chk)
+function c21698716.repop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCode(EFFECT_CHANGE_TYPE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -41,10 +36,10 @@ function c21698716.repoperation(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RaiseEvent(c,47408488,e,0,tp,0,0)
 end
 function c21698716.filter(c)
-	return c:IsSetCard(0x34) and c:IsAbleToDeck()  and c:IsFaceup()
+	return c:IsSetCard(0x1034) and c:IsAbleToDeck() and c:IsFaceup()
 end
 function c21698716.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c21698716.filter(chkc) end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c21698716.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c21698716.filter,tp,LOCATION_ONFIELD,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,c21698716.filter,tp,LOCATION_ONFIELD,0,1,1,nil)
@@ -52,7 +47,7 @@ function c21698716.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c21698716.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)
 	end
 end

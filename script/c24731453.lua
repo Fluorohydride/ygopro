@@ -22,17 +22,17 @@ function c24731453.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c24731453.splimit(e,c)
-	return not c:IsRace(RACE_MACHINE)
+	return c:GetRace()~=RACE_MACHINE
 end
 function c24731453.cfilter(c)
-	return c:GetSequence()~=5
+	return c:GetSequence()<5
 end
 function c24731453.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()==nil
 		and Duel.IsExistingMatchingCard(c24731453.cfilter,tp,LOCATION_SZONE,0,1,nil)
 end
 function c24731453.filter(c)
-	return c:GetSequence()~=5 and c:IsDestructable()
+	return c:GetSequence()<5 and c:IsDestructable()
 end
 function c24731453.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -44,11 +44,12 @@ end
 function c24731453.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-		Duel.BreakEffect()
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local g=Duel.GetMatchingGroup(c24731453.filter,tp,LOCATION_SZONE,0,nil)
-		local ct=Duel.Destroy(g,REASON_EFFECT)
-		Duel.Damage(1-tp,ct*200,REASON_EFFECT)
+		if g:GetCount()>0 then
+			Duel.BreakEffect()
+			local ct=Duel.Destroy(g,REASON_EFFECT)
+			Duel.Damage(1-tp,ct*200,REASON_EFFECT)
+		end
 	end
 end

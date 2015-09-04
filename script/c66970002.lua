@@ -1,7 +1,7 @@
 --CNo.39 希望皇ホープレイV
 function c66970002.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--todeck
 	local e1=Effect.CreateEffect(c)
@@ -28,6 +28,7 @@ function c66970002.initial_effect(c)
 	e2:SetOperation(c66970002.desop)
 	c:RegisterEffect(e2)
 end
+c66970002.xyz_number=39
 function c66970002.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp
 end

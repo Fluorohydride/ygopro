@@ -1,4 +1,4 @@
---XZ－キャタピラー·キャノン
+--XZ－キャタピラー・キャノン
 function c99724761.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

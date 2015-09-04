@@ -6,18 +6,14 @@ function c86686671.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,86686671+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c86686671.condition)
-	e1:SetCost(c86686671.cost)
 	e1:SetTarget(c86686671.target)
 	e1:SetOperation(c86686671.activate)
 	c:RegisterEffect(e1)
 end
 function c86686671.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,70095154)
-end
-function c86686671.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,86686671)==0 end
-	Duel.RegisterFlagEffect(tp,86686671,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c86686671.filter1(c)
 	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToHand()

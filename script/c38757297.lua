@@ -1,4 +1,4 @@
---フォトン·レオ
+--フォトン・レオ
 function c38757297.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

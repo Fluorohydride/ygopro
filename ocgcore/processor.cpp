@@ -35,7 +35,7 @@ int32 field::process() {
 		if (adjust_step(it->step))
 			core.units.pop_front();
 		else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
@@ -43,7 +43,7 @@ int32 field::process() {
 		if (process_turn(it->step, it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_WAIT: {
@@ -54,7 +54,7 @@ int32 field::process() {
 		if (refresh_location_info(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_BATTLECMD: {
@@ -62,7 +62,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -71,7 +71,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -80,7 +80,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -89,7 +89,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -98,7 +98,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -107,7 +107,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -116,7 +116,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -126,7 +126,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -135,7 +135,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -144,7 +144,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -152,7 +152,7 @@ int32 field::process() {
 		if (sort_chain(it->step, it->arg1)) {
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
@@ -161,7 +161,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -170,7 +170,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -179,7 +179,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -187,77 +187,77 @@ int32 field::process() {
 		if (select_release_cards(it->step, it->arg1 & 0xff, (it->arg1 >> 16) & 0xff, (it->arg1 >> 24) & 0xff, (it->arg2) & 0xff, (it->arg2 >> 16) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_TRIBUTE: {
 		if (select_tribute_cards(it->step, it->arg1 & 0xff, (it->arg1 >> 16) & 0xff, (it->arg2) & 0xff, (it->arg2 >> 16) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_POINT_EVENT: {
-		if(process_point_event(it->step, it->arg1, it->arg2))
+		if(process_point_event(it->step, it->arg1 & 0xff, (it->arg1 >> 8) & 0xff, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_QUICK_EFFECT: {
 		if(process_quick_effect(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_IDLE_COMMAND: {
 		if(process_idle_command(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_PHASE_EVENT: {
 		if(process_phase_event(it->step, it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_BATTLE_COMMAND: {
 		if(process_battle_command(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DAMAGE_STEP: {
 		if(process_damage_step(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_ADD_CHAIN: {
 		if (add_chain(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SOLVE_CHAIN: {
-		if (solve_chain(it->step, it->arg1))
+		if (solve_chain(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SOLVE_CONTINUOUS: {
 		if (solve_continuous(it->step, it->peffect, it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EXECUTE_COST: {
@@ -265,7 +265,7 @@ int32 field::process() {
 			core.units.pop_front();
 			core.solving_event.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EXECUTE_OPERATION: {
@@ -273,7 +273,7 @@ int32 field::process() {
 			core.units.pop_front();
 			core.solving_event.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EXECUTE_TARGET: {
@@ -281,119 +281,119 @@ int32 field::process() {
 			core.units.pop_front();
 			core.solving_event.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DESTROY: {
 		if (destroy(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_RELEASE: {
 		if (release(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SENDTO: {
 		if (send_to(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DESTROY_STEP: {
 		if(destroy(it->step, it->ptarget, (card*)it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_RELEASE_STEP: {
 		if (release(it->step, it->ptarget, (card*)it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SENDTO_STEP: {
 		if (send_to(it->step, it->ptarget, (card*)it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MOVETOFIELD: {
-		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2))
+		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_CHANGEPOS: {
 		if (change_position(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_OPERATION_REPLACE: {
 		if (operation_replace(it->step, it->peffect, it->ptarget, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SUMMON_RULE: {
-		if (summon(it->step, it->arg1, (card*)it->ptarget, it->peffect, it->arg2))
+		if (summon(it->step, it->arg1, (card*)it->ptarget, it->peffect, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SPSUMMON_RULE: {
-		if (special_summon_rule(it->step, it->arg1, (card*)it->ptarget))
+		if (special_summon_rule(it->step, it->arg1, (card*)it->ptarget, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SPSUMMON: {
 		if (special_summon(it->step, it->peffect, it->arg1, it->ptarget))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_FLIP_SUMMON: {
 		if (flip_summon(it->step, it->arg1, (card*)(it->ptarget)))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MSET: {
-		if (mset(it->step, it->arg1, (card*)(it->ptarget), it->peffect, it->arg2))
+		if (mset(it->step, it->arg1, (card*)(it->ptarget), it->peffect, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SSET: {
 		if (sset(it->step, it->arg1, it->arg2, (card*)(it->ptarget)))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SPSUMMON_STEP: {
 		if (special_summon_step(it->step, it->ptarget, (card*)(it->arg2)))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SSET_G: {
@@ -401,14 +401,14 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DRAW	: {
 		if (draw(it->step, it->peffect, it->arg1, (it->arg2 >> 28) & 0xf, (it->arg2 >> 24) & 0xf, it->arg2 & 0xffffff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DAMAGE: {
@@ -422,49 +422,56 @@ int32 field::process() {
 		if (damage(it->step, peffect, reason, (it->arg2 >> 28) & 0xf, pcard, (it->arg2 >> 24) & 0xf, it->arg2 & 0xffffff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_RECOVER: {
 		if (recover(it->step, it->peffect, it->arg1, (it->arg2 >> 28) & 0xf, (it->arg2 >> 24) & 0xf, it->arg2 & 0xffffff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EQUIP: {
 		if (equip(it->step, it->arg2 & 0xffff, (card*)it->arg1, (card*)it->ptarget, (it->arg2 >> 16) & 0xff, (it->arg2 >> 24) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_GET_CONTROL: {
 		if (get_control(it->step, it->peffect, (it->arg2 >> 28) & 0xf, (card*)it->ptarget, (it->arg2 >> 24) & 0xf, (it->arg2 >> 8) & 0x3ff, it->arg2 & 0xff)) {
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SWAP_CONTROL: {
 		if (swap_control(it->step, it->peffect, (it->arg2 >> 28) & 0xf, (card*)it->ptarget, (card*)it->arg1, (it->arg2 >> 8) & 0x3ff, it->arg2 & 0xff)) {
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_CONTROL_ADJUST: {
 		if (control_adjust(it->step)) {
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
+		return pduel->bufferlen;
+	}
+	case PROCESSOR_SELF_DESTROY: {
+		if (self_destroy(it->step)) {
+			core.units.pop_front();
+		} else
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_PAY_LPCOST: {
 		if (pay_lp_cost(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_REMOVE_COUNTER: {
@@ -472,7 +479,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_ATTACK_DISABLE: {
@@ -480,9 +487,8 @@ int32 field::process() {
 			card* attacker = core.attacker;
 			if(!attacker
 			        || (attacker->fieldid_r != core.pre_field[0])
-			        || (attacker->current.position & POS_FACEDOWN)
-				|| (attacker->current.position & POS_DEFENCE && !(attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
-			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
+			        || (attacker->current.location != LOCATION_MZONE)
+			        || !attacker->is_capable_attack()
 			        || !attacker->is_affect_by_effect(core.reason_effect)) {
 				returns.ivalue[0] = 0;
 				pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
@@ -495,7 +501,7 @@ int32 field::process() {
 				attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 				raise_event(attacker, EVENT_ATTACK_DISABLED, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
 				process_instant_event();
-				core.units.begin()->step++;
+				it->step++;
 			}
 		} else {
 			returns.ivalue[0] = 1;
@@ -507,7 +513,7 @@ int32 field::process() {
 	case PROCESSOR_DESTROY_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DESTROY, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -517,7 +523,7 @@ int32 field::process() {
 	case PROCESSOR_RELEASE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_RELEASE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -527,7 +533,7 @@ int32 field::process() {
 	case PROCESSOR_SENDTO_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SENDTO, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -537,7 +543,7 @@ int32 field::process() {
 	case PROCESSOR_CHANGEPOS_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_CHANGEPOS, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -549,7 +555,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
@@ -558,7 +564,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
@@ -567,26 +573,27 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
 	case PROCESSOR_ANNOUNCE_NUMBER: {
 		if(announce_number(it->step, it->arg1)) {
 			pduel->lua->add_param(core.select_options[returns.ivalue[0]], PARAM_TYPE_INT);
+			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
 	case PROCESSOR_TOSS_DICE: {
-		if (toss_dice(it->step, it->peffect, (it->arg1 >> 16), it->arg1 & 0xff, it->arg2)) {
-			for(int32 i = 0; i < it->arg2; ++i)
+		if(toss_dice(it->step, it->peffect, it->arg1 >> 16, it->arg1 & 0xff, it->arg2 & 0xff, it->arg2 >> 16)) {
+			for(int32 i = 0; i < (it->arg2 & 0xff) + (it->arg2 >> 16); ++i)
 				pduel->lua->add_param(core.dice_result[i], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_TOSS_COIN: {
@@ -595,13 +602,13 @@ int32 field::process() {
 				pduel->lua->add_param(core.coin_result[i], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_EFFECTYN_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_EFFECTYN, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -611,7 +618,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_YESNO_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_YESNO, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -621,12 +628,12 @@ int32 field::process() {
 	case PROCESSOR_SELECT_OPTION_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_OPTION, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_OPSELECTED);
-			pduel->write_buffer8(1 - it->arg1);
+			pduel->write_buffer8(it->arg1);
 			pduel->write_buffer32(core.select_options[returns.ivalue[0]]);
 			core.units.pop_front();
 		}
@@ -635,7 +642,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_CARD_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_CARD, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			card* pcard;
@@ -653,7 +660,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_POSITION_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_POSITION, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -663,7 +670,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_RELEASE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_RELEASE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			card* pcard;
@@ -679,7 +686,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_TRIBUTE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_TRIBUTE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			card* pcard;
@@ -698,7 +705,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_TARGET: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_CARD, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			if(core.continuous_chain.size()) {
 				if(!core.continuous_chain.rbegin()->target_cards) {
@@ -753,10 +760,9 @@ int32 field::process() {
 			pduel->lua->add_param(it->arg2, PARAM_TYPE_CARD);
 			pduel->lua->add_param(it->arg1 >> 16, PARAM_TYPE_INT);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, it->peffect, 0, it->arg1 & 0xffff, 0);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
-			group* pgroup = pduel->new_group();
-			pgroup->container.insert(core.fusion_materials.begin(), core.fusion_materials.end());
+			group* pgroup = pduel->new_group(core.fusion_materials);
 			if(it->arg2)
 				pgroup->container.insert((card*)it->arg2);
 			pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
@@ -765,16 +771,21 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_SYNCHRO: {
-		if (select_synchro_material(it->step, it->arg1,  (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16))
+		int32 ret = TRUE;
+		if(!(it->arg1 >> 16))
+			ret = select_synchro_material(it->step, it->arg1 & 0xffff,  (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16, 0, (group*)it->peffect);
+		else
+			ret = select_synchro_material(it->step, it->arg1 & 0xffff,  (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16, (card*)it->peffect, 0);
+		if(ret)
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_SUM_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_SUM, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			card* pcard;
@@ -790,7 +801,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_DISFIELD_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_DISFIELD, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			int32 playerid = it->arg1 & 0xffff;
 			int32 count = (it->arg1) >> 16;
@@ -811,7 +822,7 @@ int32 field::process() {
 	case PROCESSOR_SPSUMMON_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SPSUMMON, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -821,7 +832,7 @@ int32 field::process() {
 	case PROCESSOR_SPSUMMON_STEP_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SPSUMMON_STEP, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -831,7 +842,7 @@ int32 field::process() {
 	case PROCESSOR_SPSUMMON_COMP_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SPSUMMON, 1, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -870,10 +881,17 @@ int32 field::process() {
 		core.units.pop_front();
 		return pduel->bufferlen;
 	}
+	case PROCESSOR_SELECT_XMATERIAL: {
+		if (select_xyz_material(it->step, it->arg1 & 0xffff, it->arg1 >> 16, (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16))
+			core.units.pop_front();
+		else
+			it->step++;
+		return pduel->bufferlen;
+	}
 	case PROCESSOR_DRAW_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DRAW, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -883,7 +901,7 @@ int32 field::process() {
 	case PROCESSOR_DAMAGE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DAMAGE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -893,7 +911,7 @@ int32 field::process() {
 	case PROCESSOR_RECOVER_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_RECOVER, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -903,7 +921,7 @@ int32 field::process() {
 	case PROCESSOR_EQUIP_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_EQUIP, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -913,7 +931,7 @@ int32 field::process() {
 	case PROCESSOR_GET_CONTROL_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_GET_CONTROL, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -923,7 +941,7 @@ int32 field::process() {
 	case PROCESSOR_SWAP_CONTROL_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SWAP_CONTROL, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -940,7 +958,7 @@ int32 field::process() {
 			else
 				pduel->write_buffer32(504);
 			add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else if(it->step == 1) {
 			card_set cset;
 			card* pcard;
@@ -952,7 +970,7 @@ int32 field::process() {
 				send_to(&cset, core.reason_effect, (ptr)(it->ptarget), core.reason_player, it->arg1, LOCATION_GRAVE, 0, POS_FACEUP);
 			else
 				returns.ivalue[0] = 0;
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -964,7 +982,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
@@ -979,7 +997,7 @@ int32 field::process() {
 			for(auto clit = player[target_player].list_main.rbegin(); i < count; ++i, ++clit)
 				core.select_cards.push_back(*clit);
 			add_process(PROCESSOR_SORT_CARD, 0, 0, 0, sort_player, 0);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			if(returns.bvalue[0] != -1) {
 				card* tc[16];
@@ -1016,16 +1034,16 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MOVETOFIELD_S: {
-		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2)) {
+		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff)) {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	}
@@ -1211,9 +1229,8 @@ void field::raise_event(card_set* event_cards, uint32 event_code, effect* reason
 	tevent new_event;
 	new_event.trigger_card = 0;
 	if (event_cards) {
-		group* pgroup = pduel->new_group();
+		group* pgroup = pduel->new_group(*event_cards);
 		pgroup->is_readonly = TRUE;
-		pgroup->container = *event_cards;
 		new_event.event_cards = pgroup;
 	} else
 		new_event.event_cards = 0;
@@ -1229,9 +1246,8 @@ void field::raise_single_event(card* trigger_card, card_set* event_cards, uint32
 	tevent new_event;
 	new_event.trigger_card = trigger_card;
 	if (event_cards) {
-		group* pgroup = pduel->new_group();
+		group* pgroup = pduel->new_group(*event_cards);
 		pgroup->is_readonly = TRUE;
-		pgroup->container = *event_cards;
 		new_event.event_cards = pgroup;
 	} else
 		new_event.event_cards = 0;
@@ -1300,7 +1316,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	case 0: {
 		if((phase == PHASE_DRAW && is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_DP))
 		        || (phase == PHASE_STANDBY && is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_SP))) {
-			core.units.begin()->step = 14;
+			core.units.begin()->step = 24;
 			return FALSE;
 		}
 		int32 phase_event = EVENT_PHASE + phase;
@@ -1308,9 +1324,11 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		nil_event.event_code = phase_event;
 		nil_event.event_player = infos.turn_player;
 		int32 check_player = infos.turn_player;
+		if(core.units.begin()->arg2 & 0x2)
+			check_player = 1 - infos.turn_player;
 		chain newchain;
 		core.select_chains.clear();
-		int32 tf_count = 0, to_count = 0, fc_count = 0;
+		int32 tf_count = 0, to_count = 0, fc_count = 0, cn_count = 0;
 		auto pr = effects.trigger_f_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
@@ -1323,61 +1341,95 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.select_chains.push_back(newchain);
 			tf_count++;
 		}
+		pr = effects.continuous_effect.equal_range(phase_event);
+		for(; pr.first != pr.second;) {
+			peffect = pr.first->second;
+			++pr.first;
+			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
+				continue;
+			peffect->id = infos.field_id++;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			cn_count++;
+		}
+		for(auto eit = effects.pheff.begin(); eit != effects.pheff.end(); ++eit) {
+			peffect = *eit;
+			if(peffect->code != EFFECT_SET_CONTROL)
+				continue;
+			if(peffect->get_owner_player() != check_player)
+				continue;
+			if(!(peffect->reset_flag & phase))
+				continue;
+			uint8 pid = peffect->get_handler_player();
+			uint8 tp = infos.turn_player;
+			if(!(((peffect->reset_flag & RESET_SELF_TURN) && pid == tp) || ((peffect->reset_flag & RESET_OPPO_TURN) && pid != tp)))
+				continue;
+			if((peffect->reset_count & 0xff) != 1)
+				continue;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			cn_count++;
+		}
 		core.spe_effect[check_player] = 0;
-		pr = effects.trigger_o_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			core.select_chains.push_back(newchain);
-			to_count++;
-			core.spe_effect[check_player]++;
-		}
-		if(phase == PHASE_DRAW)
-			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
-		else if(phase == PHASE_STANDBY)
-			core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
-		else if(phase == PHASE_BATTLE)
-			core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
-		else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
-		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
+		if(!core.hand_adjusted) {
+			pr = effects.trigger_o_effect.equal_range(phase_event);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				core.select_chains.push_back(newchain);
+				to_count++;
 				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
-		}
-		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
-				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
+			}
+			if(phase == PHASE_DRAW)
+				core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
+			else if(phase == PHASE_STANDBY)
+				core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
+			else if(phase == PHASE_BATTLE)
+				core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
+			else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
+			pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				if(check_hint_timing(peffect))
+					core.spe_effect[check_player]++;
+				core.select_chains.push_back(newchain);
+				fc_count++;
+			}
+			pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				if(check_hint_timing(peffect))
+					core.spe_effect[check_player]++;
+				core.select_chains.push_back(newchain);
+				fc_count++;
+			}
 		}
 		if(core.select_chains.size() == 0) {
-			core.units.begin()->step = 3;
+			returns.ivalue[0] = -1;
+			core.units.begin()->step = 1;
 			return FALSE;
-		} else if(tf_count == 1 && to_count == 0 && fc_count == 0) {
+		} else if(tf_count == 0 && cn_count == 1 && to_count == 0 && fc_count == 0) {
 			returns.ivalue[0] = 0;
 			core.units.begin()->step = 1;
 			return FALSE;
-		} else if(tf_count == 0 && to_count == 1 && fc_count == 0) {
+		} else if(tf_count == 0 && to_count == 1 && fc_count == 0 && cn_count == 0) {
 			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)core.select_chains[0].triggering_effect->handler, check_player, 0);
 			return FALSE;
 		} else {
@@ -1392,7 +1444,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 				pduel->write_buffer32(25);
 			else
 				pduel->write_buffer32(26);
-			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count ? 0x10000 : 0));
+			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count + cn_count ? 0x10000 : 0));
 			core.units.begin()->step = 1;
 			return FALSE;
 		}
@@ -1403,28 +1455,55 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		return FALSE;
 	}
 	case 2: {
-		chain newchain;
+		int32 priority_passed = core.units.begin()->arg2 & 0x1;
+		int32 is_opponent = core.units.begin()->arg2 & 0x2;
 		if(returns.ivalue[0] == -1) {
-			core.units.begin()->step = 3;
+			if(priority_passed)
+				core.units.begin()->step = 19;
+			else {
+				priority_passed = 1;
+				is_opponent ^= 0x2;
+				core.units.begin()->arg2 = is_opponent | priority_passed;
+				core.units.begin()->step = -1;
+			}
 			return FALSE;
 		}
-		newchain = core.select_chains[returns.ivalue[0]];
+		priority_passed = 0;
+		core.units.begin()->arg2 = is_opponent | priority_passed;
+		chain newchain = core.select_chains[returns.ivalue[0]];
 		effect* peffect = newchain.triggering_effect;
-		newchain.flag = 0;
-		newchain.chain_id = infos.field_id++;
-		newchain.evt = nil_event;
-		newchain.triggering_effect = peffect;
-		newchain.triggering_controler = peffect->handler->current.controler;
-		newchain.triggering_location = peffect->handler->current.location;
-		newchain.triggering_sequence = peffect->handler->current.sequence;
-		newchain.triggering_player = infos.turn_player;
-		core.new_chains.push_back(newchain);
-		newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
-		core.select_chains.clear();
-		add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
-		add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
-		infos.priorities[0] = 0;
-		infos.priorities[1] = 0;
+		if(!(peffect->type & EFFECT_TYPE_ACTIONS)) {
+			if(peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+				remove_effect(peffect);
+			else
+				peffect->handler->remove_effect(peffect);
+			adjust_all();
+			core.units.begin()->step = 3;
+		} else if(!(peffect->type & EFFECT_TYPE_CONTINUOUS)) {
+			int32 check_player = infos.turn_player;
+			if(is_opponent)
+				check_player = 1 - infos.turn_player;
+			newchain.flag = 0;
+			newchain.chain_id = infos.field_id++;
+			newchain.evt = nil_event;
+			newchain.triggering_controler = peffect->handler->current.controler;
+			newchain.triggering_location = peffect->handler->current.location;
+			newchain.triggering_sequence = peffect->handler->current.sequence;
+			newchain.triggering_player = check_player;
+			core.new_chains.push_back(newchain);
+			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count(check_player);
+			core.select_chains.clear();
+			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - check_player);
+			infos.priorities[0] = 0;
+			infos.priorities[1] = 0;
+		} else {
+			core.select_chains.clear();
+			core.sub_solving_event.push_back(nil_event);
+			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, peffect, 0, peffect->get_handler_player(), 0);
+			core.units.begin()->step = 3;
+		}
 		return FALSE;
 	}
 	case 3: {
@@ -1439,182 +1518,23 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		return FALSE;
 	}
 	case 4: {
-		int32 phase_event = EVENT_PHASE + phase;
-		effect* peffect;
-		nil_event.event_code = phase_event;
-		nil_event.event_player = infos.turn_player;
-		int32 check_player = 1 - infos.turn_player;
-		chain newchain;
-		core.select_chains.clear();
-		int32 tf_count = 0, to_count = 0, fc_count = 0;
-		auto pr = effects.trigger_f_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			core.select_chains.push_back(newchain);
-			tf_count++;
-		}
-		core.spe_effect[check_player] = 0;
-		pr = effects.trigger_o_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			core.select_chains.push_back(newchain);
-			to_count++;
-			core.spe_effect[check_player]++;
-		}
-		if(phase == PHASE_DRAW)
-			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
-		else if(phase == PHASE_STANDBY)
-			core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
-		else if(phase == PHASE_BATTLE)
-			core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
-		else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
-		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
-				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
-		}
-		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
-				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
-		}
-		if(core.select_chains.size() == 0) {
-			core.units.begin()->step = 6;
-			return FALSE;
-		} else if(tf_count == 1 && to_count == 0 && fc_count == 0) {
-			returns.ivalue[0] = 0;
-			core.units.begin()->step = 5;
-			return FALSE;
-		} else if(tf_count == 0 && to_count == 1 && fc_count == 0) {
-			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)core.select_chains[0].triggering_effect->handler, check_player, 0);
-			return FALSE;
-		} else {
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(check_player);
-			if(infos.phase == PHASE_DRAW)
-				pduel->write_buffer32(20);
-			else if(infos.phase == PHASE_STANDBY)
-				pduel->write_buffer32(21);
-			else if(infos.phase == PHASE_BATTLE)
-				pduel->write_buffer32(25);
-			else
-				pduel->write_buffer32(26);
-			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count ? 0x10000 : 0));
-			core.units.begin()->step = 5;
-			return FALSE;
-		}
-		return FALSE;
-	}
-	case 5: {
-		returns.ivalue[0]--;
-		return FALSE;
-	}
-	case 6: {
-		chain newchain;
-		if(returns.ivalue[0] == -1) {
-			core.units.begin()->step = 6;
-			return FALSE;
-		}
-		newchain = core.select_chains[returns.ivalue[0]];
-		effect* peffect = newchain.triggering_effect;
-		newchain.flag = 0;
-		newchain.chain_id = infos.field_id++;
-		newchain.evt = nil_event;
-		newchain.triggering_effect = peffect;
-		newchain.triggering_controler = peffect->handler->current.controler;
-		newchain.triggering_location = peffect->handler->current.location;
-		newchain.triggering_sequence = peffect->handler->current.sequence;
-		newchain.triggering_player = 1 - infos.turn_player;
-		core.new_chains.push_back(newchain);
-		newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
-		core.select_chains.clear();
-		add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
-		add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, infos.turn_player);
-		infos.priorities[0] = 0;
-		infos.priorities[1] = 0;
-		core.units.begin()->step = 2;
-		return FALSE;
-	}
-	case 7: {
-		core.hint_timing[infos.turn_player] = 0;
-		int32 phase_event = EVENT_PHASE + phase;
-		auto pr = effects.continuous_effect.equal_range(phase_event);
-		effect_vector tp;
-		effect_vector ntp;
-		effect* peffect;
-		nil_event.event_code = phase_event;
-		nil_event.event_player = infos.turn_player;
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			uint8 owner_player = peffect->get_handler_player();
-			if(peffect->is_activateable(owner_player, nil_event)) {
-				if(owner_player == infos.turn_player)
-					tp.push_back(peffect);
-				else
-					ntp.push_back(peffect);
-			}
-		}
-		for(auto eit = tp.begin(); eit != tp.end(); ++eit) {
-			core.sub_solving_event.push_back(nil_event);
-			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, (*eit), 0, (*eit)->get_handler_player(), 0);
-		}
-		for(auto eit = ntp.begin(); eit != ntp.end(); ++eit) {
-			core.sub_solving_event.push_back(nil_event);
-			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, (*eit), 0, (*eit)->get_handler_player(), 0);
-		}
-		if(core.sub_solving_event.size() == 0)
-			core.units.begin()->step = 8;
-		return FALSE;
-	}
-	case 8: {
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}
-	case 9: {
+	case 20: {
 		if(phase != PHASE_END) {
-			core.units.begin()->step = 14;
+			core.units.begin()->step = 24;
 			return FALSE;
 		}
 		int32 limit = 6;
 		effect_set eset;
 		filter_player_effect(infos.turn_player, EFFECT_HAND_LIMIT, &eset);
-		if(eset.count)
+		if(eset.size())
 			limit = eset.get_last()->get_value();
 		int32 hd = player[infos.turn_player].list_hand.size();
 		if(hd <= limit) {
-			core.units.begin()->step = 14;
+			core.units.begin()->step = 24;
 			return FALSE;
 		}
 		core.select_cards.clear();
@@ -1627,30 +1547,27 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, infos.turn_player, hd - limit + ((hd - limit) << 16));
 		return FALSE;
 	}
-	case 10: {
+	case 21: {
 		card_set cset;
 		for(int32 i = 0; i < returns.bvalue[0]; ++i)
 			cset.insert(core.select_cards[returns.bvalue[i + 1]]);
 		send_to(&cset, 0, REASON_RULE + REASON_DISCARD + REASON_ADJUST, infos.turn_player, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
 		return FALSE;
 	}
-	case 11: {
+	case 22: {
+		core.hand_adjusted = TRUE;
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		core.units.begin()->step = -1;
+		core.units.begin()->arg2 = 0;
 		return FALSE;
 	}
-	case 15: {
+	case 25: {
 		core.hint_timing[infos.turn_player] = 0;
 		reset_phase(phase);
 		adjust_all();
 		return FALSE;
 	}
-	case 16: {
-		if(core.new_fchain.size() || core.new_ochain.size()) {
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			core.units.begin()->step = -1;
-			return FALSE;
-		}
+	case 26: {
 		core.quick_f_chain.clear();
 		core.instant_event.clear();
 		core.point_event.clear();
@@ -1659,44 +1576,26 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	}
 	return TRUE;
 }
-int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
+int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_freechain, int32 skip_new) {
 	switch(step) {
 	case 0: {
 		core.select_chains.clear();
 		core.point_event.splice(core.point_event.end(), core.instant_event);
-		if(special) {
+		if(skip_trigger) {
 			core.units.begin()->step = 7;
 			return FALSE;
 		}
 		core.new_fchain_s.splice(core.new_fchain_s.begin(), core.new_fchain);
 		core.new_ochain_s.splice(core.new_ochain_s.begin(), core.new_ochain);
-		//flip
 		core.tpchain.clear();
 		core.ntpchain.clear();
 		core.delayed_quick.clear();
 		core.delayed_quick_break.swap(core.delayed_quick);
-		for (auto clit = core.flip_chain.begin(); clit != core.flip_chain.end(); ++clit) {
-			if(clit->triggering_effect->is_chainable(clit->triggering_player)
-			        && clit->triggering_effect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
-				if(clit->triggering_player == infos.turn_player)
-					core.tpchain.push_back(*clit);
-				else
-					core.ntpchain.push_back(*clit);
-				clit->triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
-			}
-		}
-		if(core.tpchain.size() > 1)
-			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
-		if(core.ntpchain.size() > 1)
-			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
-		core.flip_chain.clear();
+		core.current_player = infos.turn_player;
+		core.units.begin()->step = 1;
 		return FALSE;
 	}
 	case 1: {
-		core.new_chains.splice(core.new_chains.end(), core.tpchain);
-		core.new_chains.splice(core.new_chains.end(), core.ntpchain);
-		if(core.new_chains.size())
-			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
 	case 2: {
@@ -1712,7 +1611,8 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			uint8 tp = clit->triggering_player;
 			bool act = true;
 			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-			        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3) || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
+			        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3) 
+						|| !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 					if(tp == infos.turn_player) {
 						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
@@ -1738,20 +1638,31 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				else
 					core.ntpchain.push_back(*clit);
 				peffect->handler->set_status(STATUS_CHAINING, TRUE);
+				peffect->dec_count(tp);
 			}
 		}
-		if(core.tpchain.size() > 1)
-			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
-		if(core.ntpchain.size() > 1)
-			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
 		core.new_fchain_s.clear();
+		if(core.current_player == infos.turn_player) {
+			if(core.tpchain.size() > 1)
+				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
+		} else {
+			if(core.ntpchain.size() > 1)
+				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
+		}
 		return FALSE;
 	}
 	case 3: {
-		core.new_chains.splice(core.new_chains.end(), core.tpchain);
-		core.new_chains.splice(core.new_chains.end(), core.ntpchain);
-		if(core.new_chains.size())
-			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		if(core.current_player == infos.turn_player) {
+			core.new_chains.splice(core.new_chains.end(), core.tpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+			core.current_player = 1 - infos.turn_player;
+			core.units.begin()->step = 1;
+		} else {
+			core.new_chains.splice(core.new_chains.end(), core.ntpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		}
 		return FALSE;
 	}
 	case 4: {
@@ -1781,14 +1692,20 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		core.new_ochain_s.splice(core.new_ochain_s.end(), core.tpchain);
 		core.new_ochain_s.splice(core.new_ochain_s.end(), core.ntpchain);
 		core.new_ochain_h.clear();
+		core.tmp_chain.clear();
+		core.current_player = infos.turn_player;
 		return FALSE;
 	}
 	case 5: {
 		if(core.new_ochain_s.size() == 0) {
-			if(core.tpchain.size() > 1)
-				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
-			if(core.ntpchain.size() > 1)
-				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
+			if(core.current_player == infos.turn_player) {
+				if(core.tpchain.size() > 1)
+					add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
+				core.new_ochain_s.splice(core.new_ochain_s.end(), core.tmp_chain);
+			} else {
+				if(core.ntpchain.size() > 1)
+					add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
+			}
 			core.units.begin()->step = 6;
 			return FALSE;
 		}
@@ -1797,14 +1714,15 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		uint8 tp = clit->triggering_player;
 		bool act = true;
 		if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-		        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3)
+		        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3)
 		            || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 			if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && clit->triggering_location == LOCATION_HAND
 			        && (((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) && peffect->handler->is_has_relation(peffect))
 			            || (peffect->range & LOCATION_HAND))) {
 				core.new_ochain_h.push_back(*clit);
 				act = false;
-			} else if((peffect->flag & EFFECT_FLAG_FIELD_ONLY) || !(peffect->type & EFFECT_TYPE_FIELD) || (clit->triggering_location & peffect->range)) {
+			} else if((peffect->flag & EFFECT_FLAG_FIELD_ONLY) || !(peffect->type & EFFECT_TYPE_FIELD)
+		            || peffect->in_range(clit->triggering_location, clit->triggering_sequence)) {
 				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 					if(tp == infos.turn_player) {
 						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
@@ -1825,41 +1743,108 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			} else
 				act = false;
 		} else act = false;
-		if(act)
-			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)peffect->handler, tp, 0);
-		else returns.ivalue[0] = FALSE;
+		if(act) {
+			if(tp == core.current_player)
+				add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)peffect->handler, tp, 0);
+			else {
+				core.tmp_chain.push_back(*clit);
+				returns.ivalue[0] = FALSE;
+			}
+		} else returns.ivalue[0] = FALSE;
 		return FALSE;
 	}
 	case 6: {
+		if(!returns.ivalue[0]) {
+			core.new_ochain_s.pop_front();
+			core.units.begin()->step = 4;
+			return FALSE;
+		}
 		auto clit = core.new_ochain_s.begin();
+		effect* peffect = clit->triggering_effect;
+		card* pcard = peffect->handler;
 		uint8 tp = clit->triggering_player;
-		if(returns.ivalue[0]) {
-			clit->triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
-			if(tp == infos.turn_player)
-				core.tpchain.push_back(*clit);
-			else
-				core.ntpchain.push_back(*clit);
-			if(clit->triggering_effect->flag & EFFECT_FLAG_CVAL_CHECK) {
-				clit->triggering_effect->get_value();
+		core.select_effects.clear();
+		core.select_options.clear();
+		uintptr_t index = 0;
+		core.select_effects.push_back((effect*)index);
+		core.select_options.push_back(peffect->description);
+		while(++clit != core.new_ochain_s.end()) {
+			++index;
+			peffect = clit->triggering_effect;
+			if(pcard != peffect->handler)
+				continue;
+			bool act = true;
+			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
+			        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3)
+			            || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
+				if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && clit->triggering_location == LOCATION_HAND
+				        && (((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) && peffect->handler->is_has_relation(peffect))
+				            || (peffect->range & LOCATION_HAND))) {
+					continue;
+				} else if((peffect->flag & EFFECT_FLAG_FIELD_ONLY) || !(peffect->type & EFFECT_TYPE_FIELD)
+			            || peffect->in_range(clit->triggering_location, clit->triggering_sequence)) {
+					if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+						if(tp == infos.turn_player) {
+							for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
+								if(tpit->triggering_effect->handler->data.code == peffect->handler->data.code) {
+									act = false;
+									break;
+								}
+							}
+						} else {
+							for(auto ntpit = core.ntpchain.begin(); ntpit != core.ntpchain.end(); ++ntpit) {
+								if(ntpit->triggering_effect->handler->data.code == peffect->handler->data.code) {
+									act = false;
+									break;
+								}
+							}
+						}
+					}
+				} else
+					continue;
+			} else continue;
+			if(act) {
+				core.select_effects.push_back((effect*)index);
+				core.select_options.push_back(peffect->description);
 			}
 		}
+		if(core.select_options.size() > 1) {
+			add_process(PROCESSOR_SELECT_OPTION, 0, 0, 0, tp, 0);
+			core.units.begin()->step = 19;
+			return FALSE;
+		}
+		clit = core.new_ochain_s.begin();
+		peffect = clit->triggering_effect;
+		peffect->handler->set_status(STATUS_CHAINING, TRUE);
+		peffect->dec_count(tp);
+		if(tp == infos.turn_player)
+			core.tpchain.push_back(*clit);
+		else
+			core.ntpchain.push_back(*clit);
+		if(peffect->flag & EFFECT_FLAG_CVAL_CHECK)
+			peffect->get_value();
 		core.new_ochain_s.pop_front();
 		core.units.begin()->step = 4;
 		return FALSE;
 	}
 	case 7: {
-		core.new_chains.splice(core.new_chains.end(), core.tpchain);
-		core.new_chains.splice(core.new_chains.end(), core.ntpchain);
-		if(core.new_chains.size())
-			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		if(core.current_player == infos.turn_player) {
+			core.new_chains.splice(core.new_chains.end(), core.tpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+			core.current_player = 1 - infos.turn_player;
+			core.units.begin()->step = 4;
+		} else {
+			core.new_chains.splice(core.new_chains.end(), core.ntpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		}
 		return FALSE;
 	}
 	case 8: {
-		if(!(core.duel_options & DUEL_ENABLE_PRIORITY) || (infos.phase != PHASE_MAIN1 && infos.phase != PHASE_MAIN2))
+		if(!(core.duel_options & DUEL_OBSOLETE_RULING) || (infos.phase != PHASE_MAIN1 && infos.phase != PHASE_MAIN2))
 			return FALSE;
-		// Due to the new official rules, the priority of ignition effects when summon, special summon, flip summon is canceled
-		// Use DUEL_ENABLE_PRIORITY to enable this feature (TCG)
-		// ignition effects
+		// Obsolete ignition effect ruling
 		tevent e;
 		if(core.current_chain.size() == 0 &&
 		        (check_event(EVENT_SUMMON_SUCCESS, &e) || check_event(EVENT_SPSUMMON_SUCCESS, &e) || check_event(EVENT_FLIP_SUMMON_SUCCESS, &e))
@@ -1894,10 +1879,11 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 	case 9: {
 		infos.priorities[0] = 0;
 		infos.priorities[1] = 0;
-		if(core.current_chain.size() == 0)
-			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, special, infos.turn_player);
-		else
-			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, special, 1 - core.current_chain.back().triggering_player);
+		if(core.current_chain.size() == 0) {
+			if(!core.hand_adjusted)
+				add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, infos.turn_player);
+		} else
+			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, 1 - core.current_chain.back().triggering_player);
 		return FALSE;
 	}
 	case 10: {
@@ -1909,7 +1895,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		if(core.current_chain.size()) {
 			for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 				cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
-			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, skip_new, 0);
+			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, skip_trigger | ((skip_freechain | skip_new) << 8), skip_new);
 		} else {
 			core.used_event.splice(core.used_event.end(), core.point_event);
 			if(core.chain_limit_p) {
@@ -1921,10 +1907,28 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		}
 		return TRUE;
 	}
+	case 20: {
+		uintptr_t index = (uintptr_t)core.select_effects[returns.ivalue[0]];
+		auto clit = core.new_ochain_s.begin();
+		std::advance(clit, index);
+		effect* peffect = clit->triggering_effect;
+		uint8 tp = clit->triggering_player;
+		peffect->handler->set_status(STATUS_CHAINING, TRUE);
+		peffect->dec_count(tp);
+		if(tp == infos.turn_player)
+			core.tpchain.push_back(*clit);
+		else
+			core.ntpchain.push_back(*clit);
+		if(peffect->flag & EFFECT_FLAG_CVAL_CHECK)
+			peffect->get_value();
+		core.new_ochain_s.erase(clit);
+		core.units.begin()->step = 4;
+		return FALSE;
+	}
 	}
 	return TRUE;
 }
-int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
+int32 field::process_quick_effect(int16 step, int32 skip_freechain, uint8 priority) {
 	pair<effect_container::iterator, effect_container::iterator> pr;
 	event_list::iterator evit;
 	effect* peffect;
@@ -1934,14 +1938,56 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 		core.ntpchain.clear();
 		if(!core.quick_f_chain.size())
 			return FALSE;
+		bool act = true;
 		for(auto ifit = core.quick_f_chain.begin(); ifit != core.quick_f_chain.end(); ++ifit) {
 			peffect = ifit->first;
-			if(peffect->is_chainable(ifit->second.triggering_player) && peffect->handler->is_has_relation(peffect)) {
-				if(ifit->second.triggering_player == infos.turn_player)
-					core.tpchain.push_back(ifit->second);
-				else
-					core.ntpchain.push_back(ifit->second);
-				peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			if(peffect->is_chainable(ifit->second.triggering_player) && peffect->check_count_limit(ifit->second.triggering_player)
+					&& peffect->handler->is_has_relation(peffect)) {
+				if(ifit->second.triggering_player == infos.turn_player) {
+					act = true;
+					if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+						for (auto cait = core.tpchain.begin(); cait != core.tpchain.end(); ++cait) {
+							if (cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
+								act = false;
+								break;
+							}
+						}
+						for (auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait) {
+							if ((cait->triggering_effect->handler->data.code == peffect->handler->data.code)
+							        && (cait->triggering_player == infos.turn_player)) {
+								act = false;
+								break;
+							}
+						}
+					}
+					if(act) {
+						core.tpchain.push_back(ifit->second);
+						peffect->handler->set_status(STATUS_CHAINING, TRUE);
+						peffect->dec_count(infos.turn_player);
+					}
+				} else {
+					act = true;
+					if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+						for (auto cait = core.ntpchain.begin(); cait != core.ntpchain.end(); ++cait) {
+							if (cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
+								act = false;
+								break;
+							}
+						}
+						for (auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait) {
+							if ((cait->triggering_effect->handler->data.code == peffect->handler->data.code)
+							        && (cait->triggering_player != infos.turn_player)) {
+								act = false;
+								break;
+							}
+						}
+					}
+					if(act) {
+						core.ntpchain.push_back(ifit->second);
+						peffect->handler->set_status(STATUS_CHAINING, TRUE);
+						peffect->dec_count(1 - infos.turn_player);
+					}
+				}
 			}
 		}
 		core.quick_f_chain.clear();
@@ -1964,6 +2010,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				pr = effects.activate_effect.equal_range(evit->event_code);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, *evit)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -1981,6 +2029,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				pr = effects.quick_o_effect.equal_range(evit->event_code);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, *evit)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -1995,7 +2045,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						core.delayed_quick_break.erase(make_pair(peffect, *evit));
 					}
 				}
-				evit++;
+				++evit;
 				if(pev && evit == core.point_event.end()) {
 					evit = core.instant_event.begin();
 					pev = false;
@@ -2008,11 +2058,12 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				        && peffect->is_chainable(priority) && peffect->is_activateable(priority, clit->evt, TRUE)) {
 					for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait) {
 						if(cait->triggering_player == priority) {
-							if(!(peffect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
-								if(cait->triggering_location == LOCATION_HAND || cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
-									act = false;
-									break;
-								}
+							effect* pchaineff = cait->triggering_effect;
+							if(!(pchaineff->flag & EFFECT_FLAG_FIELD_ONLY) && (pchaineff->type & EFFECT_TYPE_TRIGGER_O)
+							        && (!(pchaineff->type & EFFECT_TYPE_SINGLE) || (pchaineff->flag & EFFECT_FLAG_SINGLE_RANGE))
+							        && (pchaineff->range & LOCATION_HAND)) {
+								act = false;
+								break;
 							}
 							if((peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) && (cait->triggering_effect->handler->data.code == peffect->handler->data.code)) {
 								act = false;
@@ -2028,6 +2079,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			if(core.global_flag & GLOBALFLAG_DELAYED_QUICKEFFECT) {
 				for(auto eit = core.delayed_quick.begin(); eit != core.delayed_quick.end(); ++eit) {
 					peffect = eit->first;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					const tevent& evt = eit->second;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, evt, TRUE, FALSE, FALSE)) {
 						newchain.flag = 0;
@@ -2043,11 +2096,13 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				}
 			}
 			core.spe_effect[priority] = core.select_chains.size();
-			if(!special) {
+			if(!skip_freechain) {
 				nil_event.event_code = EVENT_FREE_CHAIN;
 				pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -2065,6 +2120,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -2080,7 +2137,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 					}
 				}
 			}
-			if(core.current_chain.size() || (core.hint_timing[0]&TIMING_ATTACK) || (core.hint_timing[1]&TIMING_ATTACK))
+			if(core.current_chain.size() || (core.hint_timing[0] & TIMING_ATTACK) || (core.hint_timing[1] & TIMING_ATTACK))
 				core.spe_effect[priority] = core.select_chains.size();
 			if(!(core.duel_options & DUEL_NO_CHAIN_HINT) || core.select_chains.size())
 				add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, priority, core.spe_effect[priority]);
@@ -2099,8 +2156,10 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 		if(core.select_chains.size() && returns.ivalue[0] != -1) {
 			chain newchain = core.select_chains[returns.ivalue[0]];
 			core.new_chains.push_back(newchain);
-			core.delayed_quick.erase(make_pair(newchain.triggering_effect, newchain.evt));
-			newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+			effect* peffect = newchain.triggering_effect;
+			core.delayed_quick.erase(make_pair(peffect, newchain.evt));
+			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count(priority);
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - priority);
 			infos.priorities[0] = 0;
@@ -2108,10 +2167,10 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 		} else {
 			infos.priorities[priority] = 1;
 			if(!infos.priorities[0] || !infos.priorities[1])
-				add_process(PROCESSOR_QUICK_EFFECT, 1, 0, 0, special, 1 - priority);
+				add_process(PROCESSOR_QUICK_EFFECT, 1, 0, 0, skip_freechain, 1 - priority);
 			else {
-				core.hint_timing[0] = 0;
-				core.hint_timing[1] = 0;
+				core.hint_timing[0] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
+				core.hint_timing[1] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
 				core.delayed_quick.clear();
 			}
 		}
@@ -2140,7 +2199,7 @@ int32 field::process_instant_event() {
 			peffect = pr.first->second;
 			uint8 owner_player = peffect->get_handler_player();
 			if(peffect->is_activateable(owner_player, *elit)) {
-				if((peffect->flag & EFFECT_FLAG_DELAY) && core.chain_solving) {
+				if((peffect->flag & EFFECT_FLAG_DELAY) && (core.chain_solving || core.conti_solving)) {
 					if(owner_player == infos.turn_player) {
 						core.delayed_tp.push_back(peffect);
 						core.delayed_tev.push_back(*elit);
@@ -2159,7 +2218,7 @@ int32 field::process_instant_event() {
 				}
 			}
 		}
-		if(elit->event_code == EVENT_ADJUST || ((elit->event_code & 0xf000) == EVENT_PHASE_START))
+		if(elit->event_code == EVENT_ADJUST || (((elit->event_code & 0xf000) == EVENT_PHASE_START) && (elit->event_code & 0xff) != PHASE_BATTLE))
 			continue;
 		//triggers
 		pr = effects.trigger_f_effect.equal_range(elit->event_code);
@@ -2187,7 +2246,10 @@ int32 field::process_instant_event() {
 			peffect = pr.first->second;
 			if(!peffect->is_condition_check(peffect->handler->current.controler, *elit))
 				continue;
-			peffect->handler->create_relation(peffect);
+			if((peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+			        || ((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE))
+			        || !(peffect->range & LOCATION_HAND) || (peffect->range & peffect->handler->current.location))
+				peffect->handler->create_relation(peffect);
 			peffect->s_range = peffect->handler->current.location;
 			peffect->o_range = peffect->handler->current.sequence;
 			newchain.flag = 0;
@@ -2278,7 +2340,7 @@ int32 field::process_single_event() {
 			if(peffect->type & EFFECT_TYPE_CONTINUOUS) {
 				uint8 owner_player = peffect->get_handler_player();
 				if(peffect->is_activateable(owner_player, e)) {
-					if((peffect->flag & EFFECT_FLAG_DELAY) && core.chain_solving) {
+					if((peffect->flag & EFFECT_FLAG_DELAY) && (core.chain_solving || core.conti_solving)) {
 						if(owner_player == infos.turn_player) {
 							core.delayed_tp.push_back(peffect);
 							core.delayed_tev.push_back(e);
@@ -2319,19 +2381,15 @@ int32 field::process_single_event() {
 						newchain.triggering_player = newchain.triggering_controler;
 				}
 				if(core.flip_delayed && ev == EVENT_FLIP) {
-					if (peffect->type & EFFECT_TYPE_TRIGGER_O) {
+					if (peffect->type & EFFECT_TYPE_TRIGGER_O)
 						core.new_ochain_b.push_back(newchain);
-					} else if (peffect->type & EFFECT_TYPE_TRIGGER_F) {
+					else
 						core.new_fchain_b.push_back(newchain);
-					} else
-						core.flip_chain_b.push_back(newchain);
 				} else {
-					if (peffect->type & EFFECT_TYPE_TRIGGER_O) {
+					if (peffect->type & EFFECT_TYPE_TRIGGER_O)
 						core.new_ochain.push_back(newchain);
-					} else if (peffect->type & EFFECT_TYPE_TRIGGER_F) {
+					else
 						core.new_fchain.push_back(newchain);
-					} else
-						core.flip_chain.push_back(newchain);
 				}
 			}
 		}
@@ -2351,15 +2409,13 @@ int32 field::process_idle_command(uint16 step) {
 	switch(step) {
 	case 0: {
 		card* pcard;
-		effect_container::iterator eit;
-		pair<effect_container::iterator, effect_container::iterator> pr;
 		effect* peffect;
 		core.select_chains.clear();
 		chain newchain;
 		nil_event.event_code = EVENT_FREE_CHAIN;
 		core.to_bp = TRUE;
 		core.to_ep = TRUE;
-		if((!(core.duel_options & DUEL_ATTACK_FIRST_TURN) && infos.turn_id == 1) ||  infos.phase == PHASE_MAIN2 || is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP))
+		if((!(core.duel_options & DUEL_ATTACK_FIRST_TURN) && infos.turn_id == 1) || infos.phase == PHASE_MAIN2 || is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP))
 			core.to_bp = FALSE;
 		if(core.to_bp && infos.phase == PHASE_MAIN1 && is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_EP))
 			core.to_ep = FALSE;
@@ -2389,9 +2445,11 @@ int32 field::process_idle_command(uint16 step) {
 			returns.ivalue[0] = 7;
 			return FALSE;
 		}
-		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
+		auto pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
@@ -2399,42 +2457,70 @@ int32 field::process_idle_command(uint16 step) {
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
 		}
-		for(eit = effects.ignition_effect.begin(); eit != effects.ignition_effect.end(); ++eit) {
+		for(auto eit = effects.ignition_effect.begin(); eit != effects.ignition_effect.end(); ++eit) {
 			peffect = eit->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
 		}
 		core.summonable_cards.clear();
 		for(auto clit = player[infos.turn_player].list_hand.begin(); clit != player[infos.turn_player].list_hand.end(); ++clit)
-			if((*clit)->is_can_be_summoned(infos.turn_player, FALSE, 0))
+			if((*clit)->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
 				core.summonable_cards.push_back(*clit);
 		for(int i = 0; i < 5; ++i) {
-			if(player[infos.turn_player].list_mzone[i] && player[infos.turn_player].list_mzone[i]->is_can_be_summoned(infos.turn_player, FALSE, 0))
+			if(player[infos.turn_player].list_mzone[i] && player[infos.turn_player].list_mzone[i]->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
 				core.summonable_cards.push_back(player[infos.turn_player].list_mzone[i]);
 		}
 		core.spsummonable_cards.clear();
 		effect_set eset;
 		filter_field_effect(EFFECT_SPSUMMON_PROC, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+		for(int32 i = 0; i < eset.size(); ++i) {
 			pcard = eset[i]->handler;
-			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player))
+			if(!eset[i]->check_count_limit(pcard->current.controler))
+				continue;
+			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player, 0))
 				core.spsummonable_cards.push_back(pcard);
+		}
+		eset.clear();
+		filter_field_effect(EFFECT_SPSUMMON_PROC_G, &eset);
+		for(int32 i = 0; i < eset.size(); ++i) {
+			pcard = eset[i]->handler;
+			if(!eset[i]->check_count_limit(infos.turn_player))
+				continue;
+			if(pcard->current.controler != infos.turn_player && !(eset[i]->flag & EFFECT_FLAG_BOTH_SIDE))
+				continue;
+			effect* oreason = core.reason_effect;
+			uint8 op = core.reason_player;
+			core.reason_effect = eset[i];
+			core.reason_player = pcard->current.controler;
+			save_lp_cost();
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
+			pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
+			if(pduel->lua->check_condition(eset[i]->condition, 2))
+				core.spsummonable_cards.push_back(pcard);
+			restore_lp_cost();
+			core.reason_effect = oreason;
+			core.reason_player = op;
 		}
 		core.repositionable_cards.clear();
 		for(int i = 0; i < 5; ++i) {
 			pcard = player[infos.turn_player].list_mzone[i];
-			if(pcard && ((pcard->is_position(POS_FACEUP) && pcard->is_capable_change_position(infos.turn_player)) || (pcard->is_position(POS_FACEDOWN) && pcard->is_can_be_flip_summoned(infos.turn_player))) )
+			if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player))
+		        || (pcard->is_position(POS_FACEDOWN) && pcard->is_can_be_flip_summoned(infos.turn_player))))
 				core.repositionable_cards.push_back(player[infos.turn_player].list_mzone[i]);
 		}
 		core.msetable_cards.clear();
 		core.ssetable_cards.clear();
 		for(auto clit = player[infos.turn_player].list_hand.begin(); clit != player[infos.turn_player].list_hand.end(); ++clit) {
-			if((*clit)->is_setable_mzone(infos.turn_player, FALSE, 0))
+			if((*clit)->is_setable_mzone(infos.turn_player, FALSE, 0, 0))
 				core.msetable_cards.push_back(*clit);
 			if((*clit)->is_setable_szone(infos.turn_player))
 				core.ssetable_cards.push_back(*clit);
@@ -2463,6 +2549,7 @@ int32 field::process_idle_command(uint16 step) {
 			newchain.triggering_player = infos.turn_player;
 			core.new_chains.push_back(newchain);
 			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count(infos.turn_player);
 			core.select_chains.clear();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
@@ -2484,6 +2571,11 @@ int32 field::process_idle_command(uint16 step) {
 			return FALSE;
 		} else if(ctype == 4) {
 			core.units.begin()->step = 8;
+			return FALSE;
+		} else if (ctype == 8) {
+			core.units.begin()->step = -1;
+			shuffle(infos.turn_player, LOCATION_HAND);
+			infos.shuffle_count++;
 			return FALSE;
 		} else {
 			core.units.begin()->step = 9;
@@ -2515,13 +2607,15 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 5: {
 		card* target = core.summonable_cards[returns.ivalue[0] >> 16];
-		summon(infos.turn_player, target, 0, FALSE);
+		core.summon_cancelable = TRUE;
+		summon(infos.turn_player, target, 0, FALSE, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}
 	case 6: {
 		card* target = core.spsummonable_cards[returns.ivalue[0] >> 16];
-		special_summon_rule(infos.turn_player, target);
+		core.summon_cancelable = TRUE;
+		special_summon_rule(infos.turn_player, target, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}
@@ -2537,13 +2631,25 @@ int32 field::process_idle_command(uint16 step) {
 			change_position(target, 0, infos.turn_player, POS_FACEUP_ATTACK, FALSE);
 			adjust_all();
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
-		} else add_process(PROCESSOR_FLIP_SUMMON, 0, 0, (group*)target, target->current.controler, 0);
+		} else if(target->is_position(POS_FACEDOWN_ATTACK)) {
+			core.units.begin()->ptarget = (group*)target;
+			int32 positions = 0;
+			if(target->is_capable_change_position(infos.turn_player))
+				positions |= POS_FACEDOWN_DEFENCE;
+			if(target->is_can_be_flip_summoned(infos.turn_player))
+				positions |= POS_FACEUP_ATTACK;
+			add_process(PROCESSOR_SELECT_POSITION, 0, 0, 0, infos.turn_player + (positions << 16), target->data.code);
+			core.units.begin()->step = 12;
+			return FALSE;
+		} else 
+			add_process(PROCESSOR_FLIP_SUMMON, 0, 0, (group*)target, target->current.controler, 0);
 		target->set_status(STATUS_FORM_CHANGED, TRUE);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}
 	case 8: {
 		card* target = core.msetable_cards[returns.ivalue[0] >> 16];
+		core.summon_cancelable = TRUE;
 		add_process(PROCESSOR_MSET, 0, 0, (group*)target, target->current.controler, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
@@ -2573,6 +2679,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 11: {
 		returns.ivalue[0] = core.units.begin()->arg1;
+		infos.shuffle_count = 0;
 		return TRUE;
 	}
 	case 12: {
@@ -2585,25 +2692,40 @@ int32 field::process_idle_command(uint16 step) {
 		core.units.begin()->step = 10;
 		return FALSE;
 	}
+	case 13: {
+		card* target = (card*)core.units.begin()->ptarget;
+		if(returns.ivalue[0] == POS_FACEUP_ATTACK)
+			add_process(PROCESSOR_FLIP_SUMMON, 0, 0, (group*)target, target->current.controler, 0);
+		else {
+			core.phase_action = TRUE;
+			change_position(target, 0, infos.turn_player, POS_FACEDOWN_DEFENCE, FALSE);
+			adjust_all();
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
+		}
+		target->set_status(STATUS_FORM_CHANGED, TRUE);
+		core.units.begin()->step = -1;
+		return FALSE;
+	}
 	}
 	return TRUE;
 }
 int32 field::process_battle_command(uint16 step) {
 	switch(step) {
 	case 0: {
-		pair<effect_container::iterator, effect_container::iterator> pr;
 		effect* peffect = 0;
 		card* pcard = 0;
 		core.select_chains.clear();
 		chain newchain;
 		nil_event.event_code = EVENT_FREE_CHAIN;
-		core.chain_attack = FALSE;
-		core.chain_attack_target = 0;
+		if(!core.chain_attack)
+			core.chain_attack_target = 0;
 		core.attacker = 0;
 		core.attack_target = 0;
 		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
 			core.units.begin()->step = 39;
-			core.units.begin()->arg1 = 2;
+			if(core.phase_action || core.battle_phase_action)
+				core.units.begin()->arg1 = 2;
+			else core.units.begin()->arg1 = 3;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
 				core.units.begin()->arg2 = 1;
 			else core.units.begin()->arg2 = 0;
@@ -2616,9 +2738,12 @@ int32 field::process_battle_command(uint16 step) {
 			}
 			return FALSE;
 		}
-		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
+		core.battle_phase_action = TRUE;
+		auto pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event) && peffect->get_speed() > 1)
 				core.select_chains.push_back(newchain);
@@ -2626,6 +2751,8 @@ int32 field::process_battle_command(uint16 step) {
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
@@ -2641,7 +2768,10 @@ int32 field::process_battle_command(uint16 step) {
 				if(!pcard->is_capable_attack_announce(infos.turn_player))
 					continue;
 				core.select_cards.clear();
-				get_attack_target(pcard, &core.select_cards);
+				uint8 chain_attack = FALSE;
+				if(core.chain_attack && core.pre_field[0] == pcard->fieldid_r)
+					chain_attack = TRUE;
+				get_attack_target(pcard, &core.select_cards, chain_attack);
 				if(core.select_cards.size() == 0 && pcard->operation_param == 0)
 					continue;
 				core.attackable_cards.push_back(pcard);
@@ -2684,6 +2814,7 @@ int32 field::process_battle_command(uint16 step) {
 			newchain.triggering_player = infos.turn_player;
 			core.new_chains.push_back(newchain);
 			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count(infos.turn_player);
 			core.select_chains.clear();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
@@ -2693,14 +2824,19 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		} else if(ctype == 1) {
 			core.units.begin()->step = 2;
-			core.attacker = core.attackable_cards[sel];
+			card* attacker = core.attackable_cards[sel];
+			if(core.chain_attack && core.pre_field[0] != attacker->fieldid_r) {
+				core.chain_attack = FALSE;
+				core.chain_attack_target = 0;
+			}
+			core.attacker = attacker;
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, FALSE);
 			core.pre_field[0] = core.attacker->fieldid_r;
 			core.phase_action = TRUE;
 			effect_set eset;
 			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
 			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
+			for(int32 i = 0; i < eset.size(); ++i) {
 				if(eset[i]->operation) {
 					core.attack_cancelable = FALSE;
 					core.sub_solving_event.push_back(nil_event);
@@ -2739,11 +2875,6 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		core.select_cards.clear();
 		core.units.begin()->arg1 = FALSE;
-		if(core.chain_attack && core.chain_attack_target) {
-			core.attack_target = core.chain_attack_target;
-			core.units.begin()->step = 6;
-			return FALSE;
-		}
 		core.units.begin()->arg2 = get_attack_target(core.attacker, &core.select_cards, core.chain_attack);
 		return FALSE;
 	}
@@ -2815,7 +2946,7 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 6: {
 		if(returns.ivalue[0] == -1) {
-			//roolback
+			//rollback
 			if(core.units.begin()->arg1) {
 				core.attacker->announce_count++;
 				if(core.attack_target)
@@ -2840,7 +2971,8 @@ int32 field::process_battle_command(uint16 step) {
 		core.attack_cancelable = TRUE;
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
-		core.attack_state[infos.turn_player] = TRUE;
+		core.attack_state_count[infos.turn_player]++;
+		check_card_counter(core.attacker, 5, infos.turn_player);
 		pduel->write_buffer8(MSG_ATTACK);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		if(core.attack_target) {
@@ -2853,6 +2985,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->step = -1;
 			return FALSE;
 		}
+		core.attack_rollback = FALSE;
 		for(uint32 i = 0; i < 5; ++i) {
 			if(player[1 - infos.turn_player].list_mzone[i])
 				core.opp_mzone[i] = player[1 - infos.turn_player].list_mzone[i]->fieldid_r;
@@ -2872,7 +3005,7 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 8: {
-		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP) || core.attack_rollback) {
 			core.units.begin()->step = 9;
 			return FALSE;
 		}
@@ -2897,7 +3030,7 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 10: {
-		bool rollback = false;
+		uint8 rollback = core.attack_rollback;
 		bool atk_disabled = false;
 		uint32 acon = core.units.begin()->arg2 >> 16;
 		uint32 afid = core.units.begin()->arg2 & 0xffff;
@@ -2922,7 +3055,6 @@ int32 field::process_battle_command(uint16 step) {
 					else
 						core.attacker->attacked_cards[0] = 0;
 				}
-				core.attacker->attacked_count++;
 				core.attacker->announce_count++;
 				attack_all_target_check();
 			}
@@ -2944,12 +3076,11 @@ int32 field::process_battle_command(uint16 step) {
 					core.attacker->announced_cards[0] = 0;
 				core.attacker->announce_count++;
 				attack_all_target_check();
-				if(!atk_disabled) {
+				if(!core.attacker->is_status(STATUS_ATTACK_CANCELED)) {
 					if(core.attack_target)
 						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 					else
 						core.attacker->attacked_cards[0] = 0;
-					core.attacker->attacked_count++;
 				}
 			}
 			core.units.begin()->step = -1;
@@ -2974,7 +3105,6 @@ int32 field::process_battle_command(uint16 step) {
 			core.sub_attacker = 0;
 			core.sub_attack_target = (card*)0xffffffff;
 			core.attacker->announce_count++;
-			core.attacker->attacked_count++;
 			attack_all_target_check();
 			pduel->write_buffer8(MSG_ATTACK);
 			pduel->write_buffer32(core.attacker->get_info_location());
@@ -2986,23 +3116,6 @@ int32 field::process_battle_command(uint16 step) {
 				core.attacker->announced_cards[0] = 0;
 				core.attacker->attacked_cards[0] = 0;
 				pduel->write_buffer32(0);
-			}
-			core.units.begin()->step = 19;
-			return FALSE;
-		}
-		if(core.chain_attack && core.chain_attack_target) {
-			core.attacker->announce_count++;
-			attack_all_target_check();
-			if(!(core.chain_attack_target->current.location & LOCATION_MZONE)) {
-				core.units.begin()->step = -1;
-				reset_phase(PHASE_DAMAGE);
-				return FALSE;
-			}
-			uint8 seq = core.chain_attack_target->current.sequence;
-			if(core.opp_mzone[seq] != core.chain_attack_target->fieldid_r) {
-				core.units.begin()->step = -1;
-				reset_phase(PHASE_DAMAGE);
-				return FALSE;
 			}
 			core.units.begin()->step = 19;
 			return FALSE;
@@ -3026,7 +3139,6 @@ int32 field::process_battle_command(uint16 step) {
 			rollback = true;
 		if(!rollback) {
 			core.attacker->announce_count++;
-			core.attacker->attacked_count++;
 			attack_all_target_check();
 			if(core.attack_target) {
 				core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
@@ -3092,43 +3204,32 @@ int32 field::process_battle_command(uint16 step) {
 			core.pre_field[1] = core.attack_target->fieldid_r;
 		else
 			core.pre_field[1] = 0;
+		core.attacker->attacked_count++;
 		raise_single_event(core.attacker, 0, EVENT_BATTLE_START, 0, 0, 0, 0, 0);
 		if(core.attack_target)
 			raise_single_event(core.attack_target, 0, EVENT_BATTLE_START, 0, 0, 0, 0, 1);
 		raise_event((card*)0, EVENT_BATTLE_START, 0, 0, 0, 0, 0);
 		process_single_event();
 		process_instant_event();
-		if(core.new_fchain.size() || core.new_ochain.size()) {
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			core.units.begin()->arg1 = TRUE;
-		}
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(40);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(40);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
 		core.temp_var[2] = 0;
 		return FALSE;
 	}
 	case 21: {
 		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
 		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
-			core.units.begin()->arg1 = 0;
-			core.damage_calculated = TRUE;
-			core.selfdes_disabled = FALSE;
-			core.units.begin()->step = 30;
+			core.units.begin()->step = 37;
 			return FALSE;
 		}
 		if(!core.attack_target) {
-			core.units.begin()->step = 23;
-			if(!core.units.begin()->arg1) {
-				pduel->write_buffer8(MSG_HINT);
-				pduel->write_buffer8(HINT_EVENT);
-				pduel->write_buffer8(0);
-				pduel->write_buffer32(40);
-				pduel->write_buffer8(MSG_HINT);
-				pduel->write_buffer8(HINT_EVENT);
-				pduel->write_buffer8(1);
-				pduel->write_buffer32(40);
-				core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			}
 			return FALSE;
 		}
 		core.sub_attacker = 0;
@@ -3152,23 +3253,16 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 0);
 		process_single_event();
 		process_instant_event();
-		if(core.new_fchain.size() || core.new_ochain.size()) {
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			core.units.begin()->arg1 = TRUE;
-		}
-		if(!core.units.begin()->arg1) {
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(0);
-			pduel->write_buffer32(40);
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(1);
-			pduel->write_buffer32(40);
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		}
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(41);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(41);
+		core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
 	case 23: {
@@ -3187,17 +3281,16 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		}
 		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
+		        || ((core.attacker->current.position & POS_DEFENCE) && !(core.attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
 		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
-			core.units.begin()->arg1 = 0;
-			core.damage_calculated = TRUE;
-			core.selfdes_disabled = FALSE;
-			core.units.begin()->step = 30;
+			core.units.begin()->step = 37;
 			return FALSE;
 		}
 		return FALSE;
 	}
 	case 24: {
 		infos.phase = PHASE_DAMAGE_CAL;
+		calculate_battle_damage(0, 0, 0);
 		raise_single_event(core.attacker, 0, EVENT_PRE_DAMAGE_CALCULATE, 0, 0, 0, 0, 0);
 		if(core.attack_target)
 			raise_single_event(core.attack_target, 0, EVENT_PRE_DAMAGE_CALCULATE, 0, 0, 0, 0, 1);
@@ -3207,11 +3300,11 @@ int32 field::process_battle_command(uint16 step) {
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_EVENT);
 		pduel->write_buffer8(0);
-		pduel->write_buffer32(41);
+		pduel->write_buffer32(42);
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_EVENT);
 		pduel->write_buffer8(1);
-		pduel->write_buffer32(41);
+		pduel->write_buffer32(42);
 		core.hint_timing[infos.turn_player] = TIMING_DAMAGE_CAL;
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
 		return FALSE;
@@ -3219,10 +3312,7 @@ int32 field::process_battle_command(uint16 step) {
 	case 25: {
 		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
 		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
-			core.units.begin()->arg1 = 0;
-			core.damage_calculated = TRUE;
-			core.selfdes_disabled = FALSE;
-			core.units.begin()->step = 30;
+			core.units.begin()->step = 37;
 			return FALSE;
 		}
 		raise_single_event(core.attacker, 0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
@@ -3231,21 +3321,17 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
 		process_single_event();
 		process_instant_event();
+		//this timing does not exist in Master Rule 3
 		core.new_ochain.clear();
 		core.new_fchain.clear();
 		return FALSE;
 	}
 	case 26: {
 		uint32 aa = core.attacker->get_attack(), ad = core.attacker->get_defence();
+		uint32 da = 0, dd = 0;
+		uint8 pa = core.attacker->current.controler, pd;
 		core.attacker->q_cache.attack = aa;
 		core.attacker->q_cache.defence = ad;
-		uint32 da = 0, dd = 0, a = aa, d;
-		uint8 pa = core.attacker->current.controler, pd;
-		uint8 damp = 0;
-		effect* damchange = 0;
-		core.battle_damage[0] = core.battle_damage[1] = 0;
-		card* reason_card = 0;
-		uint8 bd[2] = {FALSE};
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(core.attack_target) {
 			da = core.attack_target->get_attack();
@@ -3254,125 +3340,37 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->q_cache.defence = dd;
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			pd = core.attack_target->current.controler;
-			if(core.attack_target->is_position(POS_ATTACK)) {
-				d = da;
-				if(a > d) {
-					damchange = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
-					if(damchange) {
-						damp = pd;
-						core.battle_damage[damp] = a - d;
-						reason_card = core.attacker;
-					} else if(!core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
-					          && !core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)
-					          && !is_player_affected_by_effect(pd, EFFECT_AVOID_BATTLE_DAMAGE)) {
-						if(core.attack_target->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attacker))
-							damp = 1 - pd;
-						else damp = pd;
-						if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
-							damp = 1 - damp;
-						core.battle_damage[damp] = a - d;
-						reason_card = core.attacker;
-					}
-					if(core.attack_target->is_destructable_by_battle(core.attacker))
-						bd[1] = TRUE;
-				} else if (a < d) {
-					damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
-					if(damchange) {
-						damp = pa;
-						core.battle_damage[damp] = d - a;
-						reason_card = core.attack_target;
-					} else if(!core.attack_target->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
-					          && !core.attacker->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attack_target)
-					          && !is_player_affected_by_effect(pa, EFFECT_AVOID_BATTLE_DAMAGE)) {
-						if(core.attacker->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attack_target))
-							damp = 1 - pa;
-						else damp = pa;
-						if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
-							damp = 1 - damp;
-						core.battle_damage[damp] = d - a;
-						reason_card = core.attack_target;
-					}
-					if(core.attacker->is_destructable_by_battle(core.attack_target))
-						bd[0] = TRUE;
-				} else {
-					if(a != 0) {
-						if(core.attack_target->is_destructable_by_battle(core.attacker))
-							bd[1] = TRUE;
-						if(core.attacker->is_destructable_by_battle(core.attack_target))
-							bd[0] = TRUE;
-					}
-				}
-			} else {
-				d = dd;
-				if(a > d) {
-					effect_set eset;
-					uint8 dp[2];
-					dp[0] = dp[1] = 0;
-					core.attacker->filter_effect(EFFECT_PIERCE, &eset);
-					if(eset.count && !core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
-					        && !core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)) {
-						for(int32 i = 0; i < eset.count; ++i)
-							dp[1 - eset[i]->get_handler_player()] = 1;
-						if(dp[0] && is_player_affected_by_effect(0, EFFECT_AVOID_BATTLE_DAMAGE))
-							dp[0] = 0;
-						if(dp[1] && is_player_affected_by_effect(1, EFFECT_AVOID_BATTLE_DAMAGE))
-							dp[1] = 0;
-						if(dp[pd] && core.attack_target->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attacker)) {
-							dp[pd] = 0;
-							dp[1 - pd] = 1;
-						}
-						if(dp[pd] && is_player_affected_by_effect(pd, EFFECT_REFLECT_BATTLE_DAMAGE)) {
-							dp[pd] = 0;
-							dp[1 - pd] = 1;
-						}
-						if(dp[1 - pd] && is_player_affected_by_effect(1 - pd, EFFECT_REFLECT_BATTLE_DAMAGE)) {
-							dp[pd] = 1;
-							dp[1 - pd] = 0;
-						}
-						if(dp[0]) core.battle_damage[0] = a - d;
-						if(dp[1]) core.battle_damage[1] = a - d;
-						reason_card = core.attacker;
-					}
-					if(core.attack_target->is_destructable_by_battle(core.attacker))
-						bd[1] = TRUE;
-				} else if (a < d) {
-					damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
-					if(damchange) {
-						damp = pa;
-						core.battle_damage[damp] = d - a;
-						reason_card = core.attack_target;
-					} else if(!core.attack_target->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
-					          && !core.attacker->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attack_target)
-					          && !is_player_affected_by_effect(pa, EFFECT_AVOID_BATTLE_DAMAGE)) {
-						if(core.attacker->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attack_target))
-							damp = 1 - pa;
-						else damp = pa;
-						if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
-							damp = 1 - damp;
-						core.battle_damage[damp] = d - a;
-						reason_card = core.attack_target;
-					}
-				}
-			}
-		} else {
-			damchange = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
-			if(damchange) {
-				damp = 1 - pa;
-				core.battle_damage[damp] = a;
-				reason_card = core.attacker;
-			} else if(!core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
-			          && !is_player_affected_by_effect(1 - pa, EFFECT_AVOID_BATTLE_DAMAGE)) {
-				damp = 1 - pa;
-				if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
-					damp = 1 - damp;
-				core.battle_damage[damp] = a;
-				reason_card = core.attacker;
+			if(pa != pd) {
+				core.attacker->set_status(STATUS_OPPO_BATTLE, TRUE);
+				core.attack_target->set_status(STATUS_OPPO_BATTLE, TRUE);
 			}
 		}
-		if(bd[0])
-			core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
-		if(bd[1])
-			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+		effect* damchange = 0;
+		card* reason_card = 0;
+		uint8 bd[2];
+		calculate_battle_damage(&damchange, &reason_card, bd);
+		if(bd[0]) {
+			effect* indestructable_effect = core.attacker->is_affected_by_effect(EFFECT_INDESTRUCTABLE_BATTLE, core.attack_target);
+			if(indestructable_effect) {
+				pduel->write_buffer8(MSG_HINT);
+				pduel->write_buffer8(HINT_CARD);
+				pduel->write_buffer8(0);
+				pduel->write_buffer32(indestructable_effect->owner->data.code);
+				bd[0] = FALSE;
+			} else
+				core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+		}
+		if(bd[1]) {
+			effect* indestructable_effect = core.attack_target->is_affected_by_effect(EFFECT_INDESTRUCTABLE_BATTLE, core.attacker);
+			if(indestructable_effect) {
+				pduel->write_buffer8(MSG_HINT);
+				pduel->write_buffer8(HINT_CARD);
+				pduel->write_buffer8(0);
+				pduel->write_buffer32(indestructable_effect->owner->data.code);
+				bd[1] = FALSE;
+			} else
+				core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+		}
 		pduel->write_buffer8(MSG_BATTLE);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		pduel->write_buffer32(aa);
@@ -3402,33 +3400,20 @@ int32 field::process_battle_command(uint16 step) {
 				raise_single_event(core.attacker, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
 				if(core.attack_target)
 					raise_single_event(core.attack_target, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
-				raise_event((card*)reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
+				raise_event(reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
 			}
 			if(core.battle_damage[1 - infos.turn_player]) {
 				raise_single_event(core.attacker, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
 				if(core.attack_target)
 					raise_single_event(core.attack_target, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
-				raise_event((card*)reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
+				raise_event(reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
 			}
 		}
 		process_single_event();
 		process_instant_event();
-		if(!core.effect_damage_step) {
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(0);
-			pduel->write_buffer32(43);
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(1);
-			pduel->write_buffer32(43);
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_CAL;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		} else {
-			break_effect();
-		}
+		//this timing does not exist in Master Rule 3
 		core.damage_calculated = TRUE;
-		if(core.effect_damage_step && core.current_chain.size() <= 1)
+		if(core.effect_damage_step)
 			return TRUE;
 		return FALSE;
 	}
@@ -3480,7 +3465,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->current.reason_player = core.attack_target->current.controler;
 			dest = LOCATION_GRAVE;
 			seq = 0;
-			if((peffect = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT))) {
+			if((peffect = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) && (core.attacker->data.type & TYPE_MONSTER)) {
 				dest = peffect->get_value(core.attacker);
 				seq = dest >> 16;
 				dest &= 0xffff;
@@ -3500,7 +3485,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->current.reason_player = core.attacker->current.controler;
 			dest = LOCATION_GRAVE;
 			seq = 0;
-			if((peffect = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT))) {
+			if((peffect = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) && (core.attack_target->data.type & TYPE_MONSTER)) {
 				dest = peffect->get_value(core.attack_target);
 				seq = dest >> 16;
 				dest &= 0xffff;
@@ -3514,7 +3499,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.desrep_chain.clear();
 		if(des.size()) {
 			group* ng = pduel->new_group();
-			ng->container = des;
+			ng->container.swap(des);
 			ng->is_readonly = TRUE;
 			add_process(PROCESSOR_DESTROY, 10, 0, ng, REASON_BATTLE, PLAYER_NONE);
 			core.units.begin()->ptarget = ng;
@@ -3534,39 +3519,29 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 30: {
-		raise_single_event(core.attacker, 0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
-		if(core.attack_target)
-			raise_single_event(core.attack_target, 0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 1);
-		raise_event((card*)0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
-		process_single_event();
-		process_instant_event();
-		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
-			core.units.begin()->arg1 = 1;
-		} else {
-			break_effect();
-		}
+		//EVENT_BATTLE_END was here, but this timing does not exist in Master Rule 3
+		core.units.begin()->arg1 = 1;
 		return FALSE;
 	}
 	case 31: {
 		core.flip_delayed = FALSE;
 		core.new_fchain.splice(core.new_fchain.begin(), core.new_fchain_b);
 		core.new_ochain.splice(core.new_ochain.begin(), core.new_ochain_b);
-		core.flip_chain.splice(core.flip_chain.begin(), core.flip_chain_b);
-		if(core.units.begin()->arg1) {
-			raise_single_event(core.attacker, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
-			if(core.attack_target)
-				raise_single_event(core.attack_target, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 1);
-			raise_event((card*)0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
-			process_single_event();
-			process_instant_event();
-		}
-		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
-			if(core.flip_chain.size() || core.new_fchain.size() || core.new_ochain.size())
-				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
-		} else {
-			break_effect();
-		}
+		raise_single_event(core.attacker, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
+		if(core.attack_target)
+			raise_single_event(core.attack_target, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 1);
+		raise_event((card*)0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
+		process_single_event();
+		process_instant_event();
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(43);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(43);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
 		return FALSE;
 	}
 	case 32: {
@@ -3590,22 +3565,30 @@ int32 field::process_battle_command(uint16 step) {
 		core.units.begin()->ptarget = 0;
 		card_set ing;
 		card_set ed;
-		if(core.attacker->is_status(STATUS_BATTLE_DESTROYED)) {
+		if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) 
+				&& !(core.attacker->current.reason & REASON_RULE) 
+				&& !((core.attacker->current.reason & REASON_EFFECT + REASON_DESTROY) == REASON_EFFECT + REASON_DESTROY)) {
 			raise_single_event(core.attack_target, 0, EVENT_BATTLE_DESTROYING, 0, core.attacker->current.reason, core.attack_target->current.controler, 0, 1);
 			raise_single_event(core.attacker, 0, EVENT_BATTLE_DESTROYED, 0, core.attacker->current.reason, core.attack_target->current.controler, 0, 0);
+			raise_single_event(core.attacker, 0, EVENT_DESTROYED, 0, core.attacker->current.reason, core.attack_target->current.controler, 0, 0);
 			ing.insert(core.attack_target);
 			ed.insert(core.attacker);
 		}
-		if(core.attack_target && core.attack_target->is_status(STATUS_BATTLE_DESTROYED)) {
+		if(core.attack_target && core.attack_target->is_status(STATUS_BATTLE_DESTROYED) 
+				&& !(core.attack_target->current.reason & REASON_RULE) 
+				&& !((core.attack_target->current.reason & REASON_EFFECT + REASON_DESTROY) == REASON_EFFECT + REASON_DESTROY)) {
 			raise_single_event(core.attacker, 0, EVENT_BATTLE_DESTROYING, 0, core.attack_target->current.reason, core.attacker->current.controler, 0, 0);
 			raise_single_event(core.attack_target, 0, EVENT_BATTLE_DESTROYED, 0, core.attack_target->current.reason, core.attacker->current.controler, 0, 1);
+			raise_single_event(core.attack_target, 0, EVENT_DESTROYED, 0, core.attack_target->current.reason, core.attacker->current.controler, 0, 1);
 			ing.insert(core.attacker);
 			ed.insert(core.attack_target);
 		}
 		if(ing.size())
 			raise_event(&ing, EVENT_BATTLE_DESTROYING, 0, 0, 0, 0, 0);
-		if(ed.size())
+		if(ed.size()) {
 			raise_event(&ed, EVENT_BATTLE_DESTROYED, 0, 0, 0, 0, 0);
+			raise_event(&ed, EVENT_DESTROYED, 0, 0, 0, 0, 0);
+		}
 		raise_single_event(core.attacker, 0, EVENT_DAMAGE_STEP_END, 0, 0, 0, 0, 0);
 		if(core.attack_target)
 			raise_single_event(core.attack_target, 0, EVENT_DAMAGE_STEP_END, 0, 0, 0, 0, 1);
@@ -3613,17 +3596,36 @@ int32 field::process_battle_command(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-		if(core.attack_target)
+		core.attacker->set_status(STATUS_OPPO_BATTLE, FALSE);
+		if(core.attack_target) {
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
-			core.units.begin()->step = 38;
-		} else {
-			break_effect();
+			core.attack_target->set_status(STATUS_OPPO_BATTLE, FALSE);
 		}
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(44);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(44);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
+		core.units.begin()->step = 38;
+		return FALSE;
+	}
+	case 38: {
+		core.units.begin()->arg1 = 0;
+		core.damage_calculated = TRUE;
+		core.selfdes_disabled = FALSE;
+		core.flip_delayed = FALSE;
+		core.new_fchain.splice(core.new_fchain.begin(), core.new_fchain_b);
+		core.new_ochain.splice(core.new_ochain.begin(), core.new_ochain_b);
+		if(core.new_fchain.size() || core.new_ochain.size())
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
 	case 39: {
+		//end of damage step
 		core.units.begin()->step = -1;
 		infos.phase = PHASE_BATTLE;
 		pduel->write_buffer8(MSG_DAMAGE_STEP_END);
@@ -3631,31 +3633,6 @@ int32 field::process_battle_command(uint16 step) {
 		adjust_all();
 		if(core.effect_damage_step)
 			return TRUE;
-		if(core.chain_attack) {
-			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid_r != core.pre_field[0]
-			        || (core.attacker->current.controler != infos.turn_player) || !core.attacker->is_capable_attack_announce(infos.turn_player))
-				return FALSE;
-			if(core.chain_attack_target) {
-				if(!core.chain_attack_target->is_capable_be_battle_target(core.attacker)
-				        || core.chain_attack_target->current.location != LOCATION_MZONE)
-					return FALSE;
-			} else {
-				core.select_cards.clear();
-				get_attack_target(core.attacker, &core.select_cards, TRUE);
-				if(core.select_cards.size() == 0 && core.attacker->operation_param == 0)
-					return FALSE;
-			}
-			effect_set eset;
-			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
-			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
-				if(eset[i]->operation) {
-					core.sub_solving_event.push_back(nil_event);
-					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
-				}
-			}
-			core.units.begin()->step = 2;
-		}
 		return FALSE;
 	}
 	case 40: {
@@ -3689,6 +3666,7 @@ int32 field::process_damage_step(uint16 step) {
 		infos.phase = PHASE_DAMAGE;
 		pduel->write_buffer8(MSG_DAMAGE_STEP_START);
 		core.pre_field[0] = core.attacker->fieldid_r;
+		core.attacker->attacked_count++;
 		if(core.attack_target)
 			core.pre_field[1] = core.attack_target->fieldid_r;
 		else
@@ -3708,16 +3686,9 @@ int32 field::process_damage_step(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		add_process(PROCESSOR_BATTLE_COMMAND, 26, 0, 0, 0, 0);
-		if(core.current_chain.size() > 1 || core.units.begin()->arg2) {	//skip timing
-			core.units.begin()->step = 2;
-			core.effect_damage_step = 3;
-			add_process(PROCESSOR_BATTLE_COMMAND, 27, 0, 0, 0, 0);
-			return FALSE;
-		} else {
-			core.units.begin()->step = 2;
-			core.reserved = core.units.front();
-			return TRUE;
-		}
+		core.units.begin()->step = 2;
+		core.reserved = core.units.front();
+		return TRUE;
 	}
 	case 2: {
 		core.effect_damage_step = 2;
@@ -3738,6 +3709,159 @@ int32 field::process_damage_step(uint16 step) {
 	}
 	return TRUE;
 }
+void field::calculate_battle_damage(effect** pdamchange, card** preason_card, uint8* battle_destroyed)
+{
+	uint32 aa = core.attacker->get_attack(), ad = core.attacker->get_defence();
+	uint32 da = 0, dd = 0, a = aa, d;
+	uint8 pa = core.attacker->current.controler, pd;
+	uint8 damp = 0;
+	effect* damchange = 0;
+	card* reason_card = 0;
+	uint8 bd[2] = {FALSE, FALSE};
+	core.battle_damage[0] = core.battle_damage[1] = 0;
+	if(core.attacker->is_position(POS_FACEUP_DEFENCE)) {
+		effect* defattack = core.attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK);
+		if(defattack && defattack->get_value(core.attacker))
+			a = ad;
+	}
+	if(core.attack_target) {
+		da = core.attack_target->get_attack();
+		dd = core.attack_target->get_defence();
+		pd = core.attack_target->current.controler;
+		if(core.attack_target->is_position(POS_ATTACK)) {
+			d = da;
+			if(a > d) {
+				damchange = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
+				if(damchange) {
+					damp = pd;
+					core.battle_damage[damp] = a - d;
+					reason_card = core.attacker;
+				} else if(!core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
+				          && !core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)
+				          && !is_player_affected_by_effect(pd, EFFECT_AVOID_BATTLE_DAMAGE)) {
+					if(core.attack_target->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attacker))
+						damp = 1 - pd;
+					else damp = pd;
+					if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
+						damp = 1 - damp;
+					if(damp == pd || (!core.attacker->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attack_target)
+					        && !is_player_affected_by_effect(damp, EFFECT_AVOID_BATTLE_DAMAGE))) {
+						core.battle_damage[damp] = a - d;
+						reason_card = core.attacker;
+					}
+				}
+				bd[1] = TRUE;
+			} else if (a < d) {
+				damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
+				if(damchange) {
+					damp = pa;
+					core.battle_damage[damp] = d - a;
+					reason_card = core.attack_target;
+				} else if(!core.attack_target->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
+				          && !core.attacker->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attack_target)
+				          && !is_player_affected_by_effect(pa, EFFECT_AVOID_BATTLE_DAMAGE)) {
+					if(core.attacker->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attack_target))
+						damp = 1 - pa;
+					else damp = pa;
+					if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
+						damp = 1 - damp;
+					if(damp == pa || (!core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)
+					        && !is_player_affected_by_effect(damp, EFFECT_AVOID_BATTLE_DAMAGE))) {
+						core.battle_damage[damp] = d - a;
+						reason_card = core.attack_target;
+					}
+				}
+				bd[0] = TRUE;
+			} else {
+				if(a != 0) {
+					bd[0] = TRUE;
+					bd[1] = TRUE;
+				}
+			}
+		} else {
+			d = dd;
+			if(a > d) {
+				effect_set eset;
+				uint8 dp[2];
+				dp[0] = dp[1] = 0;
+				core.attacker->filter_effect(EFFECT_PIERCE, &eset);
+				if(eset.size() && !core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
+				        && !core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)) {
+					for(int32 i = 0; i < eset.size(); ++i)
+						dp[1 - eset[i]->get_handler_player()] = 1;
+					if(dp[0] && is_player_affected_by_effect(0, EFFECT_AVOID_BATTLE_DAMAGE))
+						dp[0] = 0;
+					if(dp[1] && is_player_affected_by_effect(1, EFFECT_AVOID_BATTLE_DAMAGE))
+						dp[1] = 0;
+					if(dp[pd] && core.attack_target->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attacker)) {
+						dp[pd] = 0;
+						dp[1 - pd] = 1;
+					}
+					if(dp[pd] && is_player_affected_by_effect(pd, EFFECT_REFLECT_BATTLE_DAMAGE)) {
+						dp[pd] = 0;
+						dp[1 - pd] = 1;
+					}
+					if(dp[1 - pd] && is_player_affected_by_effect(1 - pd, EFFECT_REFLECT_BATTLE_DAMAGE)) {
+						dp[pd] = 1;
+						dp[1 - pd] = 0;
+					}
+					if(dp[pd] && !core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)
+					        && !is_player_affected_by_effect(pd, EFFECT_AVOID_BATTLE_DAMAGE))
+						core.battle_damage[pd] = a - d;
+					if(dp[1 - pd] && !core.attacker->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attack_target)
+					        && !is_player_affected_by_effect(1 - pd, EFFECT_AVOID_BATTLE_DAMAGE))
+						core.battle_damage[1 - pd] = a - d;
+					reason_card = core.attacker;
+				}
+				bd[1] = TRUE;
+			} else if (a < d) {
+				damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
+				if(damchange) {
+					damp = pa;
+					core.battle_damage[damp] = d - a;
+					reason_card = core.attack_target;
+				} else if(!core.attack_target->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
+				          && !core.attacker->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attack_target)
+				          && !is_player_affected_by_effect(pa, EFFECT_AVOID_BATTLE_DAMAGE)) {
+					if(core.attacker->is_affected_by_effect(EFFECT_REFLECT_BATTLE_DAMAGE, core.attack_target))
+						damp = 1 - pa;
+					else damp = pa;
+					if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
+						damp = 1 - damp;
+					if(damp == pa || (!core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)
+					        && !is_player_affected_by_effect(damp, EFFECT_AVOID_BATTLE_DAMAGE))) {
+						core.battle_damage[damp] = d - a;
+						reason_card = core.attack_target;
+					}
+				}
+			}
+		}
+	} else {
+		damchange = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
+		if(damchange) {
+			damp = 1 - pa;
+			core.battle_damage[damp] = a;
+			reason_card = core.attacker;
+		} else if(!core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
+		          && !is_player_affected_by_effect(1 - pa, EFFECT_AVOID_BATTLE_DAMAGE)) {
+			damp = 1 - pa;
+			if(is_player_affected_by_effect(damp, EFFECT_REFLECT_BATTLE_DAMAGE))
+				damp = 1 - damp;
+			if(!is_player_affected_by_effect(damp, EFFECT_AVOID_BATTLE_DAMAGE)) {
+				core.battle_damage[damp] = a;
+				reason_card = core.attacker;
+			}
+		}
+	}
+	if(pdamchange)
+		*pdamchange = damchange;
+	if(preason_card)
+		*preason_card = reason_card;
+	if(battle_destroyed) {
+		battle_destroyed[0] = bd[0];
+		battle_destroyed[1] = bd[1];
+	}
+}
 int32 field::process_turn(uint16 step, uint8 turn_player) {
 	switch(step) {
 	case 0: {
@@ -3745,22 +3869,24 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		card* pcard;
 		for(auto elit = core.used_event.begin(); elit != core.used_event.end(); ++elit) {
 			if(elit->event_cards)
-				pduel->delete_group((group*)elit->event_cards);
+				pduel->delete_group(elit->event_cards);
 		}
 		core.used_event.clear();
 		for(auto eit = core.reseted_effects.begin(); eit != core.reseted_effects.end(); ++eit) {
 			pduel->delete_effect(*eit);
 		}
 		core.reseted_effects.clear();
+		core.effect_count_code.clear();
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
 				pcard = player[p].list_mzone[i];
 				if(!pcard)
 					continue;
 				pcard->set_status(STATUS_SUMMON_TURN, FALSE);
+				pcard->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
+				pcard->set_status(STATUS_SPSUMMON_TURN, FALSE);
 				pcard->set_status(STATUS_SET_TURN, FALSE);
 				pcard->set_status(STATUS_FORM_CHANGED, FALSE);
-				pcard->set_status(STATUS_ATTACKED, FALSE);
 				pcard->announce_count = 0;
 				pcard->attacked_count = 0;
 				pcard->announced_cards.clear();
@@ -3768,27 +3894,50 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 				pcard->battled_cards.clear();
 				pcard->attack_all_target = TRUE;
 			}
-			for(uint8 i = 0; i < 6; ++i) {
+			for(uint8 i = 0; i < 8; ++i) {
 				pcard = player[p].list_szone[i];
 				if(!pcard)
 					continue;
 				pcard->set_status(STATUS_SET_TURN, FALSE);
 			}
-			core.summon_state[p] = 0;
-			core.normalsummon_state[p] = 0;
-			core.flipsummon_state[p] = 0;
-			core.spsummon_state[p] = 0;
-			core.summoned_cards_pt[p].clear();
-			core.normalsummoned_cards_pt[p].clear();
-			core.spsummoned_cards_pt[p].clear();
-			core.flipsummoned_cards_pt[p].clear();
-			core.attack_state[p] = 0;
+			core.summon_state_count[p] = 0;
+			core.normalsummon_state_count[p] = 0;
+			core.flipsummon_state_count[p] = 0;
+			core.spsummon_state_count[p] = 0;
+			core.spsummon_state_count_rst[p] = 0;
+			core.attack_state_count[p] = 0;
+			core.battle_phase_count[p] = 0;
 			core.summon_count[p] = 0;
 			core.extra_summon[p] = 0;
+			core.spsummon_once_map[p].clear();
+			core.spsummon_once_map_rst[p].clear();
 		}
+		core.spsummon_rst = false;
 		for(auto rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)
 			if(!((*rit)->flag & EFFECT_FLAG_NO_TURN_RESET))
 				(*rit)->recharge();
+		for(auto iter = core.summon_counter.begin(); iter != core.summon_counter.end(); ++iter)
+			iter->second.second = 0;
+		for(auto iter = core.normalsummon_counter.begin(); iter != core.normalsummon_counter.end(); ++iter)
+			iter->second.second = 0;
+		for(auto iter = core.spsummon_counter.begin(); iter != core.spsummon_counter.end(); ++iter)
+			iter->second.second = 0;
+		for(auto iter = core.flipsummon_counter.begin(); iter != core.flipsummon_counter.end(); ++iter)
+			iter->second.second = 0;
+		for(auto iter = core.attack_counter.begin(); iter != core.attack_counter.end(); ++iter)
+			iter->second.second = 0;
+		for(auto iter = core.chain_counter.begin(); iter != core.chain_counter.end(); ++iter)
+			iter->second.second = 0;
+		if(core.global_flag & GLOBALFLAG_SPSUMMON_COUNT) {
+			for(auto iter = effects.spsummon_count_eff.begin(); iter != effects.spsummon_count_eff.end(); ++iter) {
+				effect* peffect = *iter;
+				card* pcard = peffect->handler;
+				if(!(peffect->flag & EFFECT_FLAG_NO_TURN_RESET)) {
+					pcard->spsummon_counter[0] = pcard->spsummon_counter[1] = 0;
+					pcard->spsummon_counter_rst[0] = pcard->spsummon_counter_rst[1] = 0;
+				}
+			}
+		}
 		infos.turn_id++;
 		infos.turn_player = turn_player;
 		pduel->write_buffer8(MSG_NEW_TURN);
@@ -3805,6 +3954,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		}
 		infos.phase = PHASE_DRAW;
 		core.phase_action = FALSE;
+		core.hand_adjusted = FALSE;
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_DRAW, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
@@ -3825,16 +3975,18 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		pduel->write_buffer8(infos.phase);
 		raise_event((card*)0, EVENT_PREDRAW, 0, 0, 0, turn_player, 0);
 		process_instant_event();
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
 	case 2: {
-		//Draw
-		int32 count = get_draw_count(infos.turn_player);
-		if(count > 0) {
-			draw(0, REASON_RULE, turn_player, turn_player, count);
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+		// Draw, new ruling
+		if((core.duel_options & DUEL_OBSOLETE_RULING) || (infos.turn_id > 1)) {
+			int32 count = get_draw_count(infos.turn_player);
+			if(count > 0) {
+				draw(0, REASON_RULE, turn_player, turn_player, count);
+				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+			}
 		}
 		add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_DRAW, 0);
 		return FALSE;
@@ -3854,6 +4006,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		core.quick_f_chain.clear();
 		core.delayed_quick_tmp.clear();
 		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_SP)) {
+			core.units.begin()->step = 5;
 			reset_phase(PHASE_STANDBY);
 			adjust_all();
 			return FALSE;
@@ -3865,7 +4018,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 5: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size() || core.instant_event.back().event_code != EVENT_PHASE_START + PHASE_STANDBY)
+		if(core.new_fchain.size() || core.new_ochain.size() || core.instant_event.back().event_code != EVENT_PHASE_START + PHASE_STANDBY)
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_STANDBY, 0);
 		return FALSE;
@@ -3880,7 +4033,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 7: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -3901,6 +4054,8 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		}
 		infos.phase = PHASE_BATTLE;
 		core.phase_action = FALSE;
+		core.battle_phase_action = FALSE;
+		core.battle_phase_count[infos.turn_player]++;
 		pduel->write_buffer8(MSG_NEW_PHASE);
 		pduel->write_buffer8(infos.phase);
 		pduel->write_buffer8(MSG_HINT);
@@ -3926,6 +4081,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		core.new_ochain.clear();
 		core.quick_f_chain.clear();
 		core.delayed_quick_tmp.clear();
+		core.chain_attack = FALSE;
 		add_process(PROCESSOR_BATTLE_COMMAND, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -3960,7 +4116,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 13: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -3986,7 +4142,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 16: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -4019,26 +4175,56 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 int32 field::add_chain(uint16 step) {
 	switch (step) {
 	case 0: {
-		chain_list::iterator clit = core.new_chains.begin();
-		effect* peffect = clit->triggering_effect;
+		auto& clit = core.new_chains.front();
+		effect* peffect = clit.triggering_effect;
 		if (!core.new_chains.size())
 			return TRUE;
 		effect_set eset;
-		filter_player_effect(clit->triggering_player, EFFECT_ACTIVATE_COST, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+		filter_player_effect(clit.triggering_player, EFFECT_ACTIVATE_COST, &eset);
+		for(int32 i = 0; i < eset.size(); ++i) {
 			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
-			pduel->lua->add_param(clit->triggering_effect, PARAM_TYPE_EFFECT);
-			pduel->lua->add_param(clit->triggering_player, PARAM_TYPE_INT);
+			pduel->lua->add_param(clit.triggering_effect, PARAM_TYPE_EFFECT);
+			pduel->lua->add_param(clit.triggering_player, PARAM_TYPE_INT);
 			if(!pduel->lua->check_condition(eset[i]->target, 3))
 				continue;
 			if(eset[i]->operation) {
-				core.sub_solving_event.push_back(clit->evt);
-				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, clit->triggering_player, 0);
+				core.sub_solving_event.push_back(clit.evt);
+				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, clit.triggering_player, 0);
 			}
 		}
-		if (peffect->type & EFFECT_TYPE_ACTIVATE) {
+		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
 			break_effect();
-			if (peffect->handler->current.location == LOCATION_HAND) {
+			int32 ecode = 0;
+			if(peffect->handler->current.location == LOCATION_HAND) {
+				if(peffect->handler->data.type & TYPE_TRAP)
+					ecode = EFFECT_TRAP_ACT_IN_HAND;
+				else if((peffect->handler->data.type & TYPE_SPELL) && (peffect->handler->data.type & TYPE_QUICKPLAY)
+				        && infos.turn_player != peffect->handler->current.controler)
+					ecode = EFFECT_QP_ACT_IN_NTPHAND;
+			} else if(peffect->handler->current.location == LOCATION_SZONE) {
+				if((peffect->handler->data.type & TYPE_TRAP) && peffect->handler->get_status(STATUS_SET_TURN))
+					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
+			}
+			if(ecode) {
+				eset.clear();
+				peffect->handler->filter_effect(ecode, &eset);
+				effect* pactin = 0;
+				for(int32 i = 0; i < eset.size(); ++i) {
+					if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
+						pactin = eset[i];
+						break;
+					}
+				}
+				if(!pactin) {
+					for(int32 i = 0; i < eset.size(); ++i) {
+						if(eset[i]->check_count_limit(peffect->handler->current.controler)) {
+							eset[i]->dec_count(peffect->handler->current.controler);
+							break;
+						}
+					}
+				}
+			}
+			if(peffect->handler->current.location == LOCATION_HAND) {
 				peffect->handler->enable_field_effect(FALSE);
 				peffect->handler->set_status(STATUS_ACT_FROM_HAND, TRUE);
 				move_to_field(peffect->handler, peffect->handler->current.controler, peffect->handler->current.controler, LOCATION_SZONE, POS_FACEUP);
@@ -4052,20 +4238,20 @@ int32 field::add_chain(uint16 step) {
 		return FALSE;
 	}
 	case 1: {
-		chain_list::iterator clit = core.new_chains.begin();
-		effect* peffect = clit->triggering_effect;
+		auto& clit = core.new_chains.front();
+		effect* peffect = clit.triggering_effect;
 		card* phandler = peffect->handler;
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
-			clit->triggering_controler = phandler->current.controler;
-			clit->triggering_location = phandler->current.location;
-			clit->triggering_sequence = phandler->current.sequence;
+			clit.triggering_controler = phandler->current.controler;
+			clit.triggering_location = phandler->current.location;
+			clit.triggering_sequence = phandler->current.sequence;
 		}
 		pduel->write_buffer8(MSG_CHAINING);
 		pduel->write_buffer32(phandler->data.code);
 		pduel->write_buffer32(phandler->get_info_location());
-		pduel->write_buffer8(clit->triggering_controler);
-		pduel->write_buffer8(clit->triggering_location);
-		pduel->write_buffer8(clit->triggering_sequence);
+		pduel->write_buffer8(clit.triggering_controler);
+		pduel->write_buffer8(clit.triggering_location);
+		pduel->write_buffer8(clit.triggering_sequence);
 		pduel->write_buffer32(peffect->description);
 		pduel->write_buffer8(core.current_chain.size() + 1);
 		break_effect();
@@ -4082,63 +4268,99 @@ int32 field::add_chain(uint16 step) {
 			negeff->reset_flag = RESET_CHAIN | RESET_EVENT | deffect->get_value();
 			phandler->add_effect(negeff);
 		}
-		clit->triggering_effect->card_type = peffect->handler->get_type();
-		if((clit->triggering_effect->card_type & 0x5) == 0x5)
-			clit->triggering_effect->card_type -= TYPE_TRAP;
-		clit->chain_count = core.current_chain.size() + 1;
-		clit->target_cards = 0;
-		clit->target_player = PLAYER_NONE;
-		clit->target_param = 0;
-		clit->disable_reason = 0;
-		clit->disable_player = PLAYER_NONE;
-		clit->replace_op = 0;
-		if((phandler->current.location == LOCATION_HAND))
-			clit->flag |= CHAIN_HAND_EFFECT;
-		core.current_chain.push_back(*clit);
+		peffect->card_type = peffect->handler->get_type();
+		if((peffect->card_type & 0x5) == 0x5)
+			peffect->card_type -= TYPE_TRAP;
+		peffect->active_type = peffect->card_type;
+		clit.chain_count = core.current_chain.size() + 1;
+		clit.target_cards = 0;
+		clit.target_player = PLAYER_NONE;
+		clit.target_param = 0;
+		clit.disable_reason = 0;
+		clit.disable_player = PLAYER_NONE;
+		clit.replace_op = 0;
+		if(phandler->current.location == LOCATION_HAND)
+			clit.flag |= CHAIN_HAND_EFFECT;
+		core.current_chain.push_back(clit);
+		check_chain_counter(peffect, clit.triggering_player, clit.chain_count);
 		// triggered events which are not caused by RaiseEvent create relation with the handler
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (!(peffect->type & 0x2a0) || (peffect->code & EVENT_PHASE) == EVENT_PHASE)) {
 			peffect->handler->create_relation(peffect);
 		}
+		peffect->effect_owner = clit.triggering_player;
 		if(peffect->cost) {
-			core.sub_solving_event.push_back(clit->evt);
-			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit->triggering_player, 0);
+			core.sub_solving_event.push_back(clit.evt);
+			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit.triggering_player, 0);
 		}
 		core.new_chains.pop_front();
 		return FALSE;
 	}
 	case 2: {
-		chain_array::iterator clit = --(core.current_chain.end());
-		effect* peffect = clit->triggering_effect;
+		auto& clit = core.current_chain.back();
+		effect* peffect = clit.triggering_effect;
 		if(peffect->target) {
-			core.sub_solving_event.push_back(clit->evt);
-			add_process(PROCESSOR_EXECUTE_TARGET, 0, peffect, 0, clit->triggering_player, 0);
+			core.sub_solving_event.push_back(clit.evt);
+			add_process(PROCESSOR_EXECUTE_TARGET, 0, peffect, 0, clit.triggering_player, 0);
 		}
 		return FALSE;
 	}
 	case 3: {
 		break_effect();
-		chain_array::iterator clit = --(core.current_chain.end());
-		effect* peffect = clit->triggering_effect;
-		if(clit->target_cards && clit->target_cards->container.size()) {
-			if(clit->triggering_effect->flag & EFFECT_FLAG_CARD_TARGET) {
-				for(auto cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
-					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, 0, clit->chain_count);
+		auto& clit = core.current_chain.back();
+		effect* peffect = clit.triggering_effect;
+		if(clit.target_cards && clit.target_cards->container.size()) {
+			if(peffect->flag & EFFECT_FLAG_CARD_TARGET) {
+				for(auto cit = clit.target_cards->container.begin(); cit != clit.target_cards->container.end(); ++cit)
+					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, peffect, 0, clit.triggering_player, 0, clit.chain_count);
 				process_single_event();
-				if(clit->target_cards->container.size())
-					raise_event(&clit->target_cards->container, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
+				if(clit.target_cards->container.size())
+					raise_event(&clit.target_cards->container, EVENT_BECOME_TARGET, peffect, 0, clit.triggering_player, clit.triggering_player, clit.chain_count);
 			}
 		}
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
 			core.leave_confirmed.insert(peffect->handler);
-			if(!(peffect->handler->data.type & (TYPE_CONTINUOUS + TYPE_FIELD + TYPE_EQUIP))
+			if(!(peffect->handler->data.type & (TYPE_CONTINUOUS + TYPE_FIELD + TYPE_EQUIP + TYPE_PENDULUM))
 			        && !peffect->handler->is_affected_by_effect(EFFECT_REMAIN_FIELD))
 				peffect->handler->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 		}
-		clit->triggering_effect->dec_count();
 		core.phase_action = TRUE;
+		if(clit.opinfos.count(0x200)) {
+			core.spsummon_rst = true;
+			set_spsummon_counter(clit.triggering_player, true, true);
+			if(clit.opinfos[0x200].op_player == PLAYER_ALL)
+				set_spsummon_counter(1 - clit.triggering_player, true, true);
+			if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
+				auto& optarget = clit.opinfos[0x200];
+				if(optarget.op_cards) {
+					if(optarget.op_player == PLAYER_ALL) {
+						auto opit = optarget.op_cards->container.begin();
+						uint32 sumplayer = optarget.op_param;
+						if((*opit)->spsummon_code) {
+							core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+							core.spsummon_once_map_rst[sumplayer][(*opit)->spsummon_code]++;
+						}
+						++opit;
+						if((*opit)->spsummon_code) {
+							core.spsummon_once_map[1 - sumplayer][(*opit)->spsummon_code]++;
+							core.spsummon_once_map_rst[1 - sumplayer][(*opit)->spsummon_code]++;
+						}
+					} else {
+						uint32 sumplayer = clit.triggering_player;
+						if(optarget.op_player == 1)
+							sumplayer = 1 - sumplayer;
+						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+							if((*opit)->spsummon_code) {
+								core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								core.spsummon_once_map_rst[sumplayer][(*opit)->spsummon_code]++;
+							}
+						}
+					}
+				}
+			}
+		}
 		pduel->write_buffer8(MSG_CHAINED);
-		pduel->write_buffer8(clit->chain_count);
-		raise_event(clit->triggering_effect->handler, EVENT_CHAINING, clit->triggering_effect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
+		pduel->write_buffer8(clit.chain_count);
+		raise_event(peffect->handler, EVENT_CHAINING, peffect, 0, clit.triggering_player, clit.triggering_player, clit.chain_count);
 		process_instant_event();
 		if(core.new_chains.size())
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
@@ -4190,8 +4412,12 @@ int32 field::sort_chain(uint16 step, uint8 tp) {
 int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_player) {
 	switch(step) {
 	case 0: {
-		chain newchain;
 		core.solving_event.splice(core.solving_event.begin(), core.sub_solving_event);
+		if(!peffect->check_count_limit(triggering_player)) {
+			core.solving_event.pop_front();
+			return TRUE;
+		}
+		chain newchain;
 		newchain.chain_id = 0;
 		newchain.chain_count = 0;
 		newchain.triggering_effect = peffect;
@@ -4204,6 +4430,8 @@ int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_pl
 		newchain.disable_reason = 0;
 		newchain.flag = 0;
 		core.continuous_chain.push_back(newchain);
+		if(peffect->flag & EFFECT_FLAG_DELAY)
+			core.conti_solving = TRUE;
 		if(!peffect->target)
 			return FALSE;
 		core.sub_solving_event.push_back(core.solving_event.front());
@@ -4216,7 +4444,7 @@ int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_pl
 	case 2: {
 		if(!peffect->operation)
 			return FALSE;
-		peffect->dec_count();
+		peffect->dec_count(triggering_player);
 		core.sub_solving_event.push_back(core.solving_event.front());
 		add_process(PROCESSOR_EXECUTE_OPERATION, 0, peffect, 0, triggering_player, 0);
 		return FALSE;
@@ -4230,17 +4458,60 @@ int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_pl
 		}
 		core.continuous_chain.pop_back();
 		core.solving_event.pop_front();
+		if(peffect->flag & EFFECT_FLAG_DELAY) {
+			core.conti_solving = FALSE;
+			adjust_all();
+			if(core.conti_player == infos.turn_player) {
+				if(core.delayed_tp.size()) {
+					core.sub_solving_event.push_back(core.delayed_tev.front());
+					add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, core.delayed_tp.front(), 0, infos.turn_player, 0);
+					core.delayed_tp.pop_front();
+					core.delayed_tev.pop_front();
+				}
+				else
+					core.conti_player = 1 - infos.turn_player;
+			}
+			if(core.conti_player == 1 - infos.turn_player) {
+				if(core.delayed_ntp.size()) {
+					core.sub_solving_event.push_back(core.delayed_ntev.front());
+					add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, core.delayed_ntp.front(), 0, 1 - infos.turn_player, 0);
+					core.delayed_ntp.pop_front();
+					core.delayed_ntev.pop_front();
+				}
+				else if(core.delayed_tp.size()) {
+					core.conti_player = infos.turn_player;
+					core.sub_solving_event.push_back(core.delayed_tev.front());
+					add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, core.delayed_tp.front(), 0, infos.turn_player, 0);
+					core.delayed_tp.pop_front();
+					core.delayed_tev.pop_front();
+				}
+				else
+					core.conti_player = PLAYER_NONE;
+			}
+		}
 		return TRUE;
 	}
 	}
 	return TRUE;
 }
-int32 field::solve_chain(uint16 step, uint32 skip_new) {
+int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2) {
 	if(core.current_chain.size() == 0 && step == 0)
 		return TRUE;
 	chain_array::reverse_iterator cait = core.current_chain.rbegin();
 	switch(step) {
 	case 0: {
+		if(core.spsummon_rst) {
+			set_spsummon_counter(0, false, true);
+			set_spsummon_counter(1, false, true);
+			for(int plr = 0; plr < 2; ++plr) {
+				for(auto iter = core.spsummon_once_map[plr].begin(); iter != core.spsummon_once_map[plr].end(); ++iter) {
+					auto spcode = iter->first;
+					core.spsummon_once_map[plr][spcode] -= core.spsummon_once_map_rst[plr][spcode];
+					core.spsummon_once_map_rst[plr][spcode] = 0;
+				}
+			}
+			core.spsummon_rst = false;
+		}
 		pduel->write_buffer8(MSG_CHAIN_SOLVING);
 		pduel->write_buffer8(cait->chain_count);
 		add_to_disable_check_list(cait->triggering_effect->handler);
@@ -4253,8 +4524,10 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		effect* peffect = cait->triggering_effect;
 		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_negatable(cait->chain_count)) {
 			remove_oath_effect(peffect);
-			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->flag & EFFECT_FLAG_REPEAT))
-				peffect->reset_count += 0x100;
+			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->count_code & EFFECT_COUNT_CODE_OATH)) {
+				dec_effect_code(peffect->count_code, cait->triggering_player);
+			}
+			check_chain_counter(peffect, cait->triggering_player, cait->chain_count, true);
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
@@ -4265,16 +4538,16 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				oeit->second = 0;
 		break_effect();
 		core.chain_solving = TRUE;
-		if(cait->opinfos.count(0x200))
-			core.spsummon_state[cait->triggering_player] = TRUE;
 		card* pcard = peffect->handler;
 		if((peffect->type & EFFECT_TYPE_ACTIVATE) && pcard->is_has_relation(peffect)) {
 			pcard->set_status(STATUS_ACTIVATED, TRUE);
 			pcard->enable_field_effect(TRUE);
-			if(pcard->data.type & TYPE_FIELD) {
-				card* fscard = player[1 - pcard->current.controler].list_szone[5];
-				if(fscard && fscard->is_position(POS_FACEUP))
-					fscard->enable_field_effect(FALSE);
+			if(core.duel_options & DUEL_OBSOLETE_RULING) {
+				if(pcard->data.type & TYPE_FIELD) {
+					card* fscard = player[1 - pcard->current.controler].list_szone[5];
+					if(fscard && fscard->is_position(POS_FACEUP))
+						fscard->enable_field_effect(FALSE);
+				}
 			}
 			adjust_instant();
 		}
@@ -4283,6 +4556,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 2: {
+		core.spsummon_state_count_tmp[0] = core.spsummon_state_count[0];
+		core.spsummon_state_count_tmp[1] = core.spsummon_state_count[1];
 		card* pcard = cait->triggering_effect->handler;
 		if(is_chain_disablable(cait->chain_count)) {
 			if((cait->flag & CHAIN_DISABLE_EFFECT) || pcard->is_affected_by_effect(EFFECT_DISABLE_CHAIN)
@@ -4297,9 +4572,11 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				return FALSE;
 			}
 		}
-		core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
-		if(cait->replace_op)
+		if(cait->replace_op) {
+			core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
 			cait->triggering_effect->operation = cait->replace_op;
+		} else
+			core.units.begin()->peffect = 0;
 		if(cait->triggering_effect->operation) {
 			core.sub_solving_event.push_back(cait->evt);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, cait->triggering_effect, 0, cait->triggering_player, 0);
@@ -4308,29 +4585,73 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	}
 	case 3: {
 		effect* peffect = cait->triggering_effect;
-		peffect->operation = (ptr)core.units.begin()->peffect;
-		if(core.special_summoning.size())
-			core.special_summoning.clear();
-		if(core.equiping_cards.size())
-			core.equiping_cards.clear();
+		if(core.units.begin()->peffect) {
+			peffect->operation = (ptr)core.units.begin()->peffect;
+		}
+		core.special_summoning.clear();
+		core.equiping_cards.clear();
 		return FALSE;
 	}
 	case 4: {
+		if(core.units.begin()->peffect == 0) {
+			if(cait->opinfos.count(0x200)) {
+				if(core.spsummon_state_count_tmp[cait->triggering_player] == core.spsummon_state_count[cait->triggering_player])
+					set_spsummon_counter(cait->triggering_player);
+				if(cait->opinfos[0x200].op_player == PLAYER_ALL && core.spsummon_state_count_tmp[1 - cait->triggering_player] == core.spsummon_state_count[1 - cait->triggering_player])
+					set_spsummon_counter(1 - cait->triggering_player);
+				//sometimes it may add twice, only works for once per turn
+				if(cait->triggering_effect->flag & EFFECT_FLAG_CARD_TARGET) {
+					auto& optarget = cait->opinfos[0x200];
+					if(optarget.op_cards) {
+						if(optarget.op_player == PLAYER_ALL) {
+							uint32 sumplayer = optarget.op_param;
+							if(core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) {
+								auto opit = optarget.op_cards->container.begin();
+								if((*opit)->spsummon_code)
+									core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								++opit;
+								if((*opit)->spsummon_code)
+									core.spsummon_once_map[1 - sumplayer][(*opit)->spsummon_code]++;
+							}
+							auto opit = optarget.op_cards->container.begin();
+							check_card_counter(*opit, 3, sumplayer);
+							++opit;
+							check_card_counter(*opit, 3, 1 - sumplayer);
+						} else {
+							uint32 sumplayer = cait->triggering_player;
+							if(optarget.op_player == 1)
+								sumplayer = 1 - sumplayer;
+							for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+								if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (*opit)->spsummon_code)
+									core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								check_card_counter(*opit, 3, sumplayer);
+							}
+						}
+					}
+				}
+			}
+		}
+		core.spsummon_state_count_tmp[0] = 0;
+		core.spsummon_state_count_tmp[1] = 0;
 		core.chain_solving = FALSE;
 		effect_vector::iterator eit;
 		event_list::iterator evit;
-		for(eit = core.delayed_tp.begin(), evit = core.delayed_tev.begin(); eit != core.delayed_tp.end(); ++eit, ++evit) {
-			core.sub_solving_event.push_back(*evit);
-			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, (*eit), 0, infos.turn_player, 0);
+		if(core.delayed_tp.size()) {
+			core.conti_player = infos.turn_player;
+			core.sub_solving_event.push_back(core.delayed_tev.front());
+			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, core.delayed_tp.front(), 0, infos.turn_player, 0);
+			core.delayed_tp.pop_front();
+			core.delayed_tev.pop_front();
 		}
-		for(eit = core.delayed_ntp.begin(), evit = core.delayed_ntev.begin(); eit != core.delayed_ntp.end(); ++eit, ++evit) {
-			core.sub_solving_event.push_back(*evit);
-			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, (*eit), 0, 1 - infos.turn_player, 0);
+		else if(core.delayed_ntp.size()) {
+			core.conti_player = 1 - infos.turn_player;
+			core.sub_solving_event.push_back(core.delayed_ntev.front());
+			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, core.delayed_ntp.front(), 0, 1 - infos.turn_player, 0);
+			core.delayed_ntp.pop_front();
+			core.delayed_ntev.pop_front();
 		}
-		core.delayed_tp.clear();
-		core.delayed_ntp.clear();
-		core.delayed_tev.clear();
-		core.delayed_ntev.clear();
+		else
+			core.conti_player = PLAYER_NONE;
 		pduel->write_buffer8(MSG_CHAIN_SOLVED);
 		pduel->write_buffer8(cait->chain_count);
 		raise_event((card*)0, EVENT_CHAIN_SOLVED, cait->triggering_effect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
@@ -4340,29 +4661,38 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 10: {
-		card* pcard = cait->triggering_effect->handler;
+		effect* peffect = cait->triggering_effect;
+		card* pcard = peffect->handler;
 		if((cait->flag & CHAIN_HAND_EFFECT) && !pcard->is_status(STATUS_IS_PUBLIC) && (pcard->current.location == LOCATION_HAND))
 			shuffle(pcard->current.controler, LOCATION_HAND);
 		if(cait->target_cards && cait->target_cards->container.size()) {
 			for(auto cit = cait->target_cards->container.begin(); cit != cait->target_cards->container.end(); ++cit)
-				(*cit)->release_relation(cait->triggering_effect);
+				(*cit)->release_relation(peffect);
 		}
-		if((pcard->data.type & TYPE_EQUIP) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
+		if((pcard->data.type & TYPE_EQUIP) && (peffect->type & EFFECT_TYPE_ACTIVATE)
 		        && !pcard->equiping_target && (pcard->current.location == LOCATION_SZONE))
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
-		if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
-		        && !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(cait->triggering_effect)) {
-			card* fscard = player[1 - pcard->current.controler].list_szone[5];
-			if(fscard && fscard->is_position(POS_FACEUP))
-				destroy(fscard, 0, REASON_RULE, 1 - pcard->current.controler);
+		if(core.duel_options & DUEL_OBSOLETE_RULING) {
+			if((pcard->data.type & TYPE_FIELD) && (peffect->type & EFFECT_TYPE_ACTIVATE)
+					&& !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(peffect)) {
+				card* fscard = player[1 - pcard->current.controler].list_szone[5];
+				if(fscard && fscard->is_position(POS_FACEUP))
+					destroy(fscard, 0, REASON_RULE, 1 - pcard->current.controler);
+			}
 		}
-		pcard->release_relation(cait->triggering_effect);
+		peffect->active_type = 0;
+		pcard->release_relation(peffect);
 		if(cait->target_cards)
 			pduel->delete_group(cait->target_cards);
 		for(auto oit = cait->opinfos.begin(); oit != cait->opinfos.end(); ++oit) {
 			if(oit->second.op_cards)
 				pduel->delete_group(oit->second.op_cards);
 		}
+		for(auto cit = core.delayed_enable_set.begin(); cit != core.delayed_enable_set.end(); ++cit) {
+			if((*cit)->current.location == LOCATION_MZONE)
+				(*cit)->enable_field_effect(TRUE);
+		}
+		core.delayed_enable_set.clear();
 		adjust_all();
 		core.current_chain.pop_back();
 		if(!core.current_chain.size()) {
@@ -4400,11 +4730,9 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	case 13: {
 		raise_event((card*)0, EVENT_CHAIN_END, 0, 0, 0, 0, 0);
 		process_instant_event();
-		if(!skip_new) {
-			core.hint_timing[0] |= TIMING_CHAIN_END;
-			core.hint_timing[1] |= TIMING_CHAIN_END;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		}
+		core.hint_timing[0] |= TIMING_CHAIN_END;
+		core.hint_timing[1] |= TIMING_CHAIN_END;
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, chainend_arg1, chainend_arg2);
 		returns.ivalue[0] = TRUE;
 		return TRUE;
 	}
@@ -4412,14 +4740,14 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	return TRUE;
 }
 int32 field::break_effect() {
-	core.hint_timing[0] = 0;
-	core.hint_timing[1] = 0;
+	core.hint_timing[0] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
+	core.hint_timing[1] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
 	for (auto chit = core.new_ochain.begin(); chit != core.new_ochain.end();) {
 		auto rm = chit++;
 		effect* peffect = rm->triggering_effect;
 		if (!(peffect->flag & EFFECT_FLAG_DELAY)) {
 			if ((peffect->flag & EFFECT_FLAG_FIELD_ONLY)
-			        || !(peffect->type & EFFECT_TYPE_FIELD) || (peffect->range & rm->triggering_location)) {
+			        || !(peffect->type & EFFECT_TYPE_FIELD) || peffect->in_range(rm->triggering_location, rm->triggering_sequence)) {
 				pduel->write_buffer8(MSG_MISSED_EFFECT);
 				pduel->write_buffer32(peffect->handler->get_info_location());
 				pduel->write_buffer32(peffect->handler->data.code);
@@ -4437,7 +4765,9 @@ int32 field::break_effect() {
 }
 void field::adjust_instant() {
 	adjust_disable_check_list();
+	adjust_self_destroy_set();
 }
+// this includes adjust_instant()
 void field::adjust_all() {
 	core.readjust_map.clear();
 	add_process(PROCESSOR_ADJUST, 0, 0, 0, 0, 0);
@@ -4449,21 +4779,21 @@ void field::refresh_location_info_instant() {
 	player[0].disabled_location = 0;
 	player[1].disabled_location = 0;
 	filter_field_effect(EFFECT_DISABLE_FIELD, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		value = eset[i]->get_value();
 		player[0].disabled_location |= value & 0x1f1f;
 		player[1].disabled_location |= (value >> 16) & 0x1f1f;
 	}
 	eset.clear();
 	filter_field_effect(EFFECT_USE_EXTRA_MZONE, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		p = eset[i]->get_handler_player();
 		value = eset[i]->get_value();
 		player[p].disabled_location |= (value >> 16) & 0x1f;
 	}
 	eset.clear();
 	filter_field_effect(EFFECT_USE_EXTRA_SZONE, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		p = eset[i]->get_handler_player();
 		value = eset[i]->get_value();
 		player[p].disabled_location |= (value >> 8) & 0x1f00;
@@ -4487,7 +4817,7 @@ int32 field::refresh_location_info(uint16 step) {
 		core.extraz_effects.clear();
 		core.extraz_effects_e.clear();
 		filter_field_effect(EFFECT_DISABLE_FIELD, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			value = eset[i]->get_value();
 			if(value) {
 				player[0].disabled_location |= value & 0x1f1f;
@@ -4497,7 +4827,7 @@ int32 field::refresh_location_info(uint16 step) {
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_USE_EXTRA_MZONE, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			p = eset[i]->get_handler_player();
 			value = eset[i]->get_value();
 			player[p].disabled_location |= (value >> 16) & 0x1f;
@@ -4508,7 +4838,7 @@ int32 field::refresh_location_info(uint16 step) {
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_USE_EXTRA_SZONE, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			p = eset[i]->get_handler_player();
 			value = eset[i]->get_value();
 			player[p].disabled_location |= (value >> 8) & 0x1f00;
@@ -4582,6 +4912,7 @@ int32 field::refresh_location_info(uint16 step) {
 			flag = ((flag << 8) & 0xff00) | 0xffff00ff;
 		else
 			flag = (flag & 0xff) | 0xffffff00;
+		flag |= 0xe0e0e0e0;
 		add_process(PROCESSOR_SELECT_DISFIELD, 0, 0, 0, p + (count1 << 16), flag);
 		return FALSE;
 	}
@@ -4633,6 +4964,7 @@ int32 field::refresh_location_info(uint16 step) {
 			flag = ((flag << 8) & 0xff00) | 0xffff00ff;
 		else
 			flag = (flag & 0xff) | 0xffffff00;
+		flag |= 0xe0e0e0e0;
 		add_process(PROCESSOR_SELECT_DISFIELD, 0, 0, 0, p + (count1 << 16), flag);
 		return FALSE;
 	}
@@ -4726,7 +5058,7 @@ int32 field::adjust_step(uint16 step) {
 				if(pcard)
 					add_to_disable_check_list(pcard);
 			}
-			for(uint8 i = 0; i < 6; ++i) {
+			for(uint8 i = 0; i < 8; ++i) {
 				pcard = player[tp].list_szone[i];
 				if(pcard)
 					add_to_disable_check_list(pcard);
@@ -4757,7 +5089,28 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 4: {
-		//1-4 control
+		//remove brainwashing
+		effect_set eset;
+		uint32 res = 0;
+		if(core.global_flag & GLOBALFLAG_BRAINWASHING_CHECK) {
+			filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
+			res = eset.size() ? TRUE : FALSE;
+			if(res) {
+				card* pcard;
+				for(uint8 p = 0; p < 2; ++p) {
+					for(uint8 i = 0; i < 5; ++i) {
+						pcard = player[p].list_mzone[i];
+						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING))
+							pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
+					}
+				}
+			}
+			core.remove_brainwashing = res;
+		}
+		return FALSE;
+	}
+	case 5: {
+		//1-5 control
 		card* pcard;
 		uint8 cur, ref;
 		core.control_adjust_set[0].clear();
@@ -4781,9 +5134,6 @@ int32 field::adjust_step(uint16 step) {
 		core.units.begin()->step = 7;
 		return FALSE;
 	}
-	case 5: {
-		return FALSE;
-	}
 	case 6: {
 		return FALSE;
 	}
@@ -4792,50 +5142,23 @@ int32 field::adjust_step(uint16 step) {
 	}
 	case 8: {
 		if(core.selfdes_disabled) {
-			core.units.begin()->step = 9;
+			core.units.begin()->step = 10;
 			return FALSE;
 		}
 		//self destroy
-		uint8 tp = infos.turn_player;
-		effect* peffect;
-		core.destroy_set.clear();
-		for(uint8 p = 0; p < 2; ++p) {
-			for(uint8 i = 0; i < 5; ++i) {
-				card* pcard = player[tp].list_mzone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, tp)))
-				        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
-					core.destroy_set.insert(pcard);
-					pcard->current.reason_effect = peffect;
-					pcard->current.reason_player = peffect->get_handler_player();
-				}
-			}
-			for(uint8 i = 0; i < 6; ++i) {
-				card* pcard = player[tp].list_szone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, tp)))
-				        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
-					core.destroy_set.insert(pcard);
-					pcard->current.reason_effect = peffect;
-					pcard->current.reason_player = peffect->get_handler_player();
-				}
-			}
-			tp = 1 - tp;
-		}
-		if(core.destroy_set.size()) {
-			destroy(&core.destroy_set, 0, REASON_EFFECT, 5);
-		} else {
-			returns.ivalue[0] = 0;
-		}
+		adjust_self_destroy_set();
 		return FALSE;
 	}
 	case 9: {
-		if(returns.ivalue[0] > 0)
-			core.re_adjust = TRUE;
+		return FALSE;
+	}
+	case 10: {
 		//equip check
 		uint8 tp = infos.turn_player;
 		card* pcard;
 		core.destroy_set.clear();
 		for(uint8 p = 0; p < 2; ++p) {
-			for(uint8 i = 0; i < 6; ++i) {
+			for(uint8 i = 0; i < 5; ++i) {
 				pcard = player[tp].list_szone[i];
 				if(pcard && pcard->equiping_target && !pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target))
 					core.destroy_set.insert(pcard);
@@ -4848,7 +5171,7 @@ int32 field::adjust_step(uint16 step) {
 		}
 		return FALSE;
 	}
-	case 10: {
+	case 11: {
 		//position
 		uint32 tp = infos.turn_player, pos;
 		card* pcard;
@@ -4861,7 +5184,7 @@ int32 field::adjust_step(uint16 step) {
 					continue;
 				eset.clear();
 				pcard->filter_effect(EFFECT_SET_POSITION, &eset);
-				if(eset.count) {
+				if(eset.size()) {
 					pos = eset.get_last()->get_value();
 					if((pos & 0xff) != pcard->current.position) {
 						pos_adjust.insert(pcard);
@@ -4880,13 +5203,13 @@ int32 field::adjust_step(uint16 step) {
 		if(pos_adjust.size()) {
 			core.re_adjust = TRUE;
 			group* ng = pduel->new_group();
-			ng->container = pos_adjust;
+			ng->container.swap(pos_adjust);
 			ng->is_readonly = TRUE;
 			add_process(PROCESSOR_CHANGEPOS, 0, 0, ng, PLAYER_NONE, TRUE);
 		}
 		return FALSE;
 	}
-	case 11: {
+	case 12: {
 		//shuffle check
 		for(uint32 i = 0; i < player[0].list_hand.size(); ++i) {
 			card* pcard = player[0].list_hand[i];
@@ -4908,13 +5231,13 @@ int32 field::adjust_step(uint16 step) {
 			shuffle(1 - infos.turn_player, LOCATION_HAND);
 		return FALSE;
 	}
-	case 12: {
-		//reverse_deck && remove brainwashing
+	case 13: {
+		//reverse_deck
 		effect_set eset;
 		uint32 res = 0;
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 			filter_field_effect(EFFECT_REVERSE_DECK, &eset, FALSE);
-			res = eset.count ? TRUE : FALSE;
+			res = eset.size() ? TRUE : FALSE;
 			if(core.deck_reversed ^ res) {
 				reverse_deck(0);
 				reverse_deck(1);
@@ -4943,34 +5266,40 @@ int32 field::adjust_step(uint16 step) {
 				}
 			}
 			core.deck_reversed = res;
-			eset.clear();
-		}
-		if(core.global_flag & GLOBALFLAG_BRAINWASHING_CHECK) {
-			filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
-			res = eset.count ? TRUE : FALSE;
-			if(res && !core.remove_brainwashing) {
-				for(int i = 0; i < 5; ++i) {
-					card* pcard = player[0].list_mzone[i];
-					if(pcard)
-						pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-				}
-				for(int i = 0; i < 5; ++i) {
-					card* pcard = player[1].list_mzone[i];
-					if(pcard)
-						pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-				}
-				core.re_adjust = TRUE;
-			}
-			core.remove_brainwashing = res;
 		}
 		return FALSE;
 	}
-	case 13: {
+	case 14: {
+		//attack cancel
+		card* attacker = core.attacker;
+		if(!attacker)
+			return FALSE;
+		if(attacker->is_affected_by_effect(EFFECT_CANNOT_ATTACK))
+			attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
+		if(core.attack_rollback)
+			return FALSE;
+		for(uint32 i = 0; i < 5; ++i) {
+			card* pcard = player[1 - infos.turn_player].list_mzone[i];
+			if(pcard) {
+				if(!core.opp_mzone[i] || core.opp_mzone[i] != pcard->fieldid_r) {
+					core.attack_rollback = TRUE;
+					break;
+				}
+			} else {
+				if(core.opp_mzone[i]) {
+					core.attack_rollback = TRUE;
+					break;
+				}
+			}
+		}
+		return FALSE;
+	}
+	case 15: {
 		raise_event((card*)0, EVENT_ADJUST, 0, 0, PLAYER_NONE, PLAYER_NONE, 0);
 		process_instant_event();
 		return FALSE;
 	}
-	case 14: {
+	case 16: {
 		if(core.re_adjust) {
 			core.units.begin()->step = -1;
 			return FALSE;

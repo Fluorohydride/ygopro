@@ -1,4 +1,4 @@
---ライカン·スロープ
+--ライカン・スロープ
 function c84385264.initial_effect(c)
 	c:EnableReviveLimit()
 	--damage

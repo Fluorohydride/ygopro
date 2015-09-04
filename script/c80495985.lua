@@ -1,4 +1,4 @@
---¥Õ¥©¥È¥ó¡¤¥µ©`¥Ù¥ë¥¿¥¤¥¬©`
+--ãƒ•ã‚©ãƒˆãƒ³ãƒ»ã‚µãƒ¼ãƒ™ãƒ«ã‚¿ã‚¤ã‚¬ãƒ¼
 function c80495985.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

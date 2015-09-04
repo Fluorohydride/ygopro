@@ -27,18 +27,21 @@ end
 function c91078716.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
 end
+function c91078716.filter(c)
+	return c:IsRace(RACE_PLANT) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+end
 function c91078716.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_PLANT) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsRace,1,1,nil,RACE_PLANT)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c91078716.filter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,c91078716.filter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c91078716.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 end
 function c91078716.activate1(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateSummon(eg:GetFirst())
+	Duel.NegateSummon(eg)
 	Duel.Destroy(eg,REASON_EFFECT)
 end
 function c91078716.condition2(e,tp,eg,ep,ev,re,r,rp)

@@ -1,7 +1,7 @@
 --FA－ブラック・レイ・ランサー
 function c25853045.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),4),3,c25853045.ovfilter,aux.Stringid(25853045,0))
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),4,3,c25853045.ovfilter,aux.Stringid(25853045,0))
 	c:EnableReviveLimit()
 	--atk
 	local e1=Effect.CreateEffect(c)
@@ -26,6 +26,7 @@ function c25853045.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_BATTLE_DESTROYING)
+	e3:SetCondition(aux.bdocon)
 	e3:SetTarget(c25853045.destg)
 	e3:SetOperation(c25853045.desop)
 	c:RegisterEffect(e3)

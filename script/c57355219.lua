@@ -1,4 +1,4 @@
---パラドックス·フュージョン
+--パラドックス・フュージョン
 function c57355219.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -25,7 +25,7 @@ function c57355219.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
 end
 function c57355219.cfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsAbleToRemoveAsCost()
+	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsAbleToRemoveAsCost() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c57355219.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c57355219.cfilter,tp,LOCATION_MZONE,0,1,nil) end
@@ -36,11 +36,11 @@ function c57355219.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c57355219.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 end
 function c57355219.activate1(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateSummon(eg:GetFirst())
+	Duel.NegateSummon(eg)
 	Duel.Destroy(eg,REASON_EFFECT)
 	local tc=e:GetLabelObject()
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -49,6 +49,7 @@ function c57355219.activate1(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
 	e1:SetLabelObject(tc)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c57355219.retcon)
 	e1:SetOperation(c57355219.retop)
 	tc:SetTurnCounter(0)
 	Duel.RegisterEffect(e1,tp)
@@ -75,17 +76,19 @@ function c57355219.activate2(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
 	e1:SetLabelObject(tc)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c57355219.retcon)
 	e1:SetOperation(c57355219.retop)
 	tc:SetTurnCounter(0)
 	Duel.RegisterEffect(e1,tp)
 end
+function c57355219.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c57355219.retop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		local c=e:GetLabelObject()
-		local ct=c:GetTurnCounter()
-		c:SetTurnCounter(ct+1)
-		if ct==1 then
-			Duel.ReturnToField(c,POS_FACEUP_ATTACK)
-		end
+	local c=e:GetLabelObject()
+	local ct=c:GetTurnCounter()
+	c:SetTurnCounter(ct+1)
+	if ct==1 then
+		Duel.ReturnToField(c,POS_FACEUP_ATTACK)
 	end
 end

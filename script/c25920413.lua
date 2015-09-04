@@ -1,4 +1,4 @@
---エーリアン·スカル
+--エーリアン・スカル
 function c25920413.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -33,8 +33,9 @@ function c25920413.spfilter(c)
 end
 function c25920413.spcon(e,c)
 	if c==nil then return true end
-	return not Duel.CheckNormalSummonActivity(c:GetControler())
-		and Duel.IsExistingMatchingCard(c25920413.spfilter,c:GetControler(),0,LOCATION_MZONE,1,nil)
+	local tp=c:GetControler()
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
+		and Duel.IsExistingMatchingCard(c25920413.spfilter,tp,0,LOCATION_MZONE,1,nil)
 end
 function c25920413.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
@@ -47,7 +48,7 @@ function c25920413.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetReset(RESET_PHASE+RESET_END)
 	e1:SetTargetRange(1,0)
 	Duel.RegisterEffect(e1,tp)
-	local e2=e1:Clone(e1)
+	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_MSET)
 	Duel.RegisterEffect(e2,tp)
 end

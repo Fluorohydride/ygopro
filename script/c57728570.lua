@@ -19,63 +19,50 @@ function c57728570.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectReleaseGroup(tp,c57728570.costfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
+function c57728570.filter(c)
+	return c:IsAttackAbove(1500) and c:IsDestructable()
+end
+function c57728570.hgfilter(c)
+	return not c:IsPublic() or c57728570.filter(c)
+end
+function c57728570.fgfilter(c)
+	return c:IsFacedown() or c57728570.filter(c)
+end
 function c57728570.tgfilter(c)
-	return c:IsFaceup() and c:GetAttack()>=1500 and c:IsDestructable()
+	return ((c:IsLocation(LOCATION_HAND) and c:IsPublic()) or (c:IsLocation(LOCATION_MZONE) and c:IsFaceup())) and c57728570.filter(c)
 end
 function c57728570.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(c57728570.tgfilter,tp,0,LOCATION_MZONE,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(c57728570.hgfilter,tp,0,LOCATION_HAND,1,nil)
+		or Duel.IsExistingMatchingCard(c57728570.fgfilter,tp,0,LOCATION_MZONE,1,nil) end
+	local g=Duel.GetMatchingGroup(c57728570.tgfilter,tp,0,LOCATION_MZONE+LOCATION_HAND,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-end
-function c57728570.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAttackAbove(1500)
 end
 function c57728570.activate(e,tp,eg,ep,ev,re,r,rp)
 	local conf=Duel.GetFieldGroup(tp,0,LOCATION_MZONE+LOCATION_HAND)
+	local ct=0
 	if conf:GetCount()>0 then
 		Duel.ConfirmCards(tp,conf)
 		local dg=conf:Filter(c57728570.filter,nil)
-		Duel.Destroy(dg,REASON_EFFECT)
+		ct=Duel.Destroy(dg,REASON_EFFECT)
 		Duel.ShuffleHand(1-tp)
 	end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_DRAW)
-	e1:SetOperation(c57728570.desop)
-	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
-	Duel.RegisterEffect(e1,tp)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetCountLimit(1)
-	e2:SetCondition(c57728570.turncon)
-	e2:SetOperation(c57728570.turnop)
-	e2:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
-	Duel.RegisterEffect(e2,tp)
-	e2:SetLabelObject(e1)
-	e:GetHandler():RegisterFlagEffect(1082946,RESET_PHASE+PHASE_END+RESET_OPPO_TURN,0,3)
-	c57728570[e:GetHandler()]=e2
-end
-function c57728570.desop(e,tp,eg,ep,ev,re,r,rp)
-	if ep==e:GetOwnerPlayer() then return end
-	local hg=eg:Filter(Card.IsLocation,nil,LOCATION_HAND)
-	if hg:GetCount()==0 then return end
-	Duel.ConfirmCards(1-ep,hg)
-	local dg=hg:Filter(c57728570.filter,nil)
-	Duel.Destroy(dg,REASON_EFFECT)
-	Duel.ShuffleHand(ep)
-end
-function c57728570.turncon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
-end
-function c57728570.turnop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=e:GetLabel()
-	ct=ct+1
-	e:SetLabel(ct)
-	e:GetHandler():SetTurnCounter(ct)
-	if ct==3 then
-		e:GetLabelObject():Reset()
-		e:GetOwner():ResetFlagEffect(1082946)
+	local g=Duel.GetMatchingGroup(c57728570.filter,1-tp,LOCATION_DECK,0,nil)
+	if ct>0 and g:GetCount()>0 and Duel.SelectYesNo(1-tp,aux.Stringid(57728570,0)) then
+		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_DESTROY)
+		local dg=g:Select(1-tp,1,3,nil)
+		Duel.Destroy(dg,REASON_EFFECT)
 	end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CHANGE_DAMAGE)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetTargetRange(0,1)
+	e1:SetValue(0)
+	e1:SetReset(RESET_PHASE+PHASE_END,2)
+	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e2:SetReset(RESET_PHASE+PHASE_END,2)
+	Duel.RegisterEffect(e2,tp)
 end

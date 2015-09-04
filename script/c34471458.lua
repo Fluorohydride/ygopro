@@ -1,4 +1,4 @@
---フォーチュンレディ·ライティー
+--フォーチュンレディ・ライティー
 function c34471458.initial_effect(c)
 	--atk,def
 	local e1=Effect.CreateEffect(c)
@@ -15,7 +15,6 @@ function c34471458.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(34471458,0))
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
@@ -38,11 +37,11 @@ function c34471458.value(e,c)
 	return c:GetLevel()*200
 end
 function c34471458.lvcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetLevel()<12
+	return Duel.GetTurnPlayer()==tp and e:GetHandler():IsLevelAbove(1) and e:GetHandler():IsLevelBelow(11)
 end
 function c34471458.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
+	if c:IsFacedown() or not c:IsRelateToEffect(e) or c:IsLevelAbove(12) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_LEVEL)

@@ -1,7 +1,7 @@
---No.96 ブラック·ミスト
+--No.96 ブラック・ミスト
 function c55727845.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,2),3)
+	aux.AddXyzProcedure(c,nil,2,3)
 	c:EnableReviveLimit()
 	--atk u/d
 	local e1=Effect.CreateEffect(c)
@@ -14,6 +14,7 @@ function c55727845.initial_effect(c)
 	e1:SetOperation(c55727845.atkop)
 	c:RegisterEffect(e1)
 end
+c55727845.xyz_number=96
 function c55727845.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -27,7 +28,7 @@ end
 function c55727845.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsImmuneToEffect(e) then
 		local atk=tc:GetAttack()/2
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

@@ -2,13 +2,9 @@
 function c9024367.initial_effect(c)
 	--atklimit
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(0,LOCATION_MZONE)
-	e1:SetTarget(c9024367.bttg)
-	e1:SetValue(c9024367.btval)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
+	e1:SetValue(c9024367.bttg)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -35,9 +31,6 @@ function c9024367.initial_effect(c)
 end
 function c9024367.bttg(e,c)
 	return c:IsFacedown() or not c:IsRace(RACE_DRAGON)
-end
-function c9024367.btval(e,c)
-	return c==e:GetHandler()
 end
 function c9024367.atkcon(e)
 	local ph=Duel.GetCurrentPhase()

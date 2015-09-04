@@ -12,7 +12,7 @@ function c63806265.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c63806265.cfilter(c)
-	return c:IsSetCard(0x34) and (not c:IsOnField() or c:IsFaceup())
+	return c:IsSetCard(0x1034) and (not c:IsOnField() or c:IsFaceup())
 end
 function c63806265.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c63806265.cfilter,tp,LOCATION_ONFIELD+LOCATION_GRAVE,0,nil)

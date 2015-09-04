@@ -1,7 +1,7 @@
 --CX 風紀大宮司サイモン
 function c41147577.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3)
+	aux.AddXyzProcedure(c,nil,7,3)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)
@@ -27,7 +27,7 @@ function c41147577.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c41147577.efilter(e,te)
-	return te:IsActiveType(TYPE_MONSTER)
+	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end
 function c41147577.poscon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,14152862)

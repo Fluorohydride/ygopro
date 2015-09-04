@@ -1,7 +1,7 @@
 --CNo.9 天蓋妖星カオス・ダイソン・スフィア
 function c32559361.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,10),3)
+	aux.AddXyzProcedure(c,nil,10,3)
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)
@@ -36,10 +36,11 @@ function c32559361.initial_effect(c)
 	e3:SetOperation(c32559361.damop2)
 	c:RegisterEffect(e3)
 end
+c32559361.xyz_number=9
 function c32559361.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local tc=c:GetBattleTarget()
-	if chk==0 then return c:IsType(TYPE_XYZ) and not tc:IsType(TYPE_TOKEN) and tc:IsAbleToChangeControler() end
+	if chk==0 then return tc and c:IsType(TYPE_XYZ) and not tc:IsType(TYPE_TOKEN) and tc:IsAbleToChangeControler() end
 end
 function c32559361.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

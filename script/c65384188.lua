@@ -25,21 +25,28 @@ function c65384188.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc1,tc2=Duel.GetFirstTarget()
 	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and tc2:IsRelateToEffect(e) and tc2:IsFaceup() then
+		local a=0
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc1:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
-		tc1:RegisterEffect(e2)
-		local e3=e1:Clone()
-		tc2:RegisterEffect(e3)
-		local e4=e2:Clone()
-		tc2:RegisterEffect(e4)
-		if tc1:IsDefencePos() or tc2:IsDefencePos() then return end
+		if not tc1:IsDisabled() then
+			tc1:RegisterEffect(e1)
+			tc1:RegisterEffect(e2)
+			a=a+1
+		end
+		if not tc2:IsDisabled() then
+			local e3=e1:Clone()
+			local e4=e2:Clone()
+			tc2:RegisterEffect(e3)
+			tc2:RegisterEffect(e4)
+			a=a+1
+		end
+		if tc1:IsDefencePos() or tc2:IsDefencePos() or a~=2 then return end
 		Duel.BreakEffect()
 		c65384188.reg(c,tc1,tc2)
 		c65384188.reg(c,tc2,tc1)
@@ -70,6 +77,7 @@ function c65384188.reg(c,tc1,tc2)
 	tc1:RegisterEffect(e4)
 	local e5=e2:Clone()
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
+	e5:SetValue(c65384188.efilter)
 	tc1:RegisterEffect(e5)
 end
 function c65384188.posop(e,tp,eg,ep,ev,re,r,rp)
@@ -80,4 +88,7 @@ function c65384188.posop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c65384188.effcon(e)
 	return e:GetHandler():GetFlagEffect(65384188)~=0 and e:GetLabelObject():GetFlagEffect(65384188)~=0
+end
+function c65384188.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end

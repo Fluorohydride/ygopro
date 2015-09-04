@@ -1,4 +1,4 @@
---ワーム·アグリィ
+--ワーム・アグリィ
 function c76683171.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

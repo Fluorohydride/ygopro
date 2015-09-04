@@ -11,10 +11,9 @@ function c27971137.initial_effect(c)
 	e2:SetDescription(aux.Stringid(27971137,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c27971137.spcon)
-	e2:SetCost(c27971137.spcost)
 	e2:SetTarget(c27971137.sptg)
 	e2:SetOperation(c27971137.spop)
 	c:RegisterEffect(e2)
@@ -30,10 +29,6 @@ function c27971137.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c27971137.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsReason(REASON_DESTROY)
-end
-function c27971137.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,27971137)==0 end
-	Duel.RegisterFlagEffect(tp,27971137,RESET_PHASE+PHASE_END,0,1)
 end
 function c27971137.filter(c,e,tp)
 	return c:GetLevel()==1 and (c:GetAttack()==0 and c:GetDefence()==0) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -65,22 +60,25 @@ function c27971137.spop(e,tp,eg,ep,ev,re,r,rp)
 		de:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		de:SetCode(EVENT_PHASE+PHASE_END)
 		de:SetCountLimit(1)
+		de:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		de:SetLabelObject(tc)
 		de:SetCondition(c27971137.descon)
 		de:SetOperation(c27971137.desop)
 		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_END then
 			de:SetLabel(Duel.GetTurnCount())
-		else de:SetLabel(0) end
+			de:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
+		else
+			de:SetLabel(0)
+			de:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN)
+		end
 		Duel.RegisterEffect(de,tp)
 	end
 end
 function c27971137.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel()
+	local tc=e:GetLabelObject()
+	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel() and tc:GetFlagEffect(27971137)~=0
 end
 function c27971137.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:GetFlagEffect(27971137)>0 then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
-	e:Reset()
+	Duel.Destroy(tc,REASON_EFFECT)
 end

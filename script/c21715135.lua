@@ -5,38 +5,22 @@ function c21715135.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,21715135+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c21715135.condition)
 	e1:SetCost(c21715135.cost)
 	e1:SetTarget(c21715135.target)
 	e1:SetOperation(c21715135.activate)
 	c:RegisterEffect(e1)
-	if not c21715135.global_check then
-		c21715135.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c21715135.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(21715135,ACTIVITY_SPSUMMON,c21715135.counterfilter)
 end
-function c21715135.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if tc:GetSummonType()~=SUMMON_TYPE_XYZ then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,21715135,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,21715135,RESET_PHASE+PHASE_END,0,1) end
+function c21715135.counterfilter(c)
+	return c:GetSummonType()==SUMMON_TYPE_XYZ
 end
 function c21715135.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c21715135.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,21715135)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(21715135,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -46,7 +30,6 @@ function c21715135.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetLabelObject(e)
 	e1:SetTarget(c21715135.splimit)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,21715135,RESET_PHASE+PHASE_END,0,1)
 end
 function c21715135.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return sumtype~=SUMMON_TYPE_XYZ and e:GetLabelObject()~=se

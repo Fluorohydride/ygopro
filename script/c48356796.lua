@@ -1,4 +1,4 @@
---éW¹â¤Î±¦Ôý
+--é–ƒå…‰ã®å®æœ­
 function c48356796.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -28,7 +28,7 @@ end
 function c48356796.accon(e,tp,eg,ep,ev,re,r,rp)
 	local c=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:GetHandler():IsFacedown() then return c>0 end
-	return c>1		 
+	return c>1
 end
 function c48356796.filter(c)
 	return c:IsCode(48356796) and c:IsFaceup()

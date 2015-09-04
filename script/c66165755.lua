@@ -1,4 +1,4 @@
---A·ジェネクス·アクセル
+--A・ジェネクス・アクセル
 function c66165755.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x2),aux.NonTuner(nil),1)
@@ -24,7 +24,7 @@ function c66165755.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_MACHINE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c66165755.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c66165755.spfilter(chkc,e,tp) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c66165755.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c66165755.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -50,14 +50,16 @@ function c66165755.spop(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetCondition(c66165755.rmcon)
 	e3:SetOperation(c66165755.rmop)
 	e3:SetReset(RESET_EVENT+0xfe0000)
 	e3:SetCountLimit(1)
 	tc:RegisterEffect(e3)
 	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 end
+function c66165755.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c66165755.rmop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
-	end
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end

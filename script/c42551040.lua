@@ -1,6 +1,6 @@
 --武神器－イクタ
 function c42551040.initial_effect(c)
-	--destroy
+	--position
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(42551040,0))
 	e1:SetCategory(CATEGORY_POSITION)
@@ -35,17 +35,12 @@ function c42551040.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c42551040.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		if tc:IsPosition(POS_FACEUP_ATTACK) then
-			Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
-			if tc:GetDefence()>0 then
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_SET_DEFENCE_FINAL)
-				e1:SetValue(0)
-				e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-				tc:RegisterEffect(e1)
-			end
-		end
+	if tc:IsRelateToEffect(e) and Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)~=0 then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_DEFENCE_FINAL)
+		e1:SetValue(0)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
 	end
 end

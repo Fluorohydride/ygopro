@@ -1,4 +1,4 @@
---ノーブル·ド·ノワール
+--ノーブル・ド・ノワール
 function c19153634.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -13,7 +13,7 @@ function c51912531.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCost(c51912531.cost)
+	e2:SetCountLimit(2,51912531)
 	e2:SetTarget(c51912531.target)
 	e2:SetOperation(c51912531.operation)
 	c:RegisterEffect(e2)
@@ -21,10 +21,6 @@ end
 function c51912531.synlimit(e,c)
 	if not c then return false end
 	return not c:IsAttribute(ATTRIBUTE_EARTH)
-end
-function c51912531.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,51912531)<2 end
-	Duel.RegisterFlagEffect(tp,51912531,RESET_PHASE+PHASE_END,0,1)
 end
 function c51912531.filter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_EARTH) and c:GetLevel()>1

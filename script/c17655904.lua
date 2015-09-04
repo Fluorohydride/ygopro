@@ -10,20 +10,10 @@ function c17655904.initial_effect(c)
 	e1:SetTarget(c17655904.target)
 	e1:SetOperation(c17655904.activate)
 	c:RegisterEffect(e1)
-	if not c17655904.global_check then
-		c17655904.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
-		ge1:SetOperation(c17655904.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(17655904,ACTIVITY_ATTACK,c17655904.counterfilter)
 end
-function c17655904.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	if tc:IsCode(89631139) then
-		Duel.RegisterFlagEffect(tc:GetControler(),17655904,RESET_PHASE+PHASE_END,0,1)
-	end
+function c17655904.counterfilter(c)
+    return not c:IsCode(89631139)
 end
 function c17655904.cfilter(c)
 	return c:IsFaceup() and c:IsCode(89631139)
@@ -32,11 +22,11 @@ function c17655904.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c17655904.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c17655904.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,17655904)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(17655904,tp,ACTIVITY_ATTACK)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	e1:SetProperty(EFFECT_FLAG_OATH)
+	e1:SetProperty(EFFECT_FLAG_OATH+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsCode,89631139))
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetReset(RESET_PHASE+RESET_END)

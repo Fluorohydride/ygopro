@@ -1,4 +1,4 @@
---Xyz Encore
+--エクシーズ・オーバーディレイ
 function c78610936.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -23,13 +23,13 @@ function c78610936.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetChainLimit(aux.FALSE)
 end
 function c78610936.spfilter(c,e,tp)
-	return c:IsLocation(LOCATION_GRAVE) and c:GetLevel()>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
-		and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c78610936.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
 	local mg=tc:GetOverlayGroup()
+	Duel.SendtoGrave(mg,REASON_EFFECT)
 	if Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)>0 then
 		local g=mg:Filter(c78610936.spfilter,nil,e,tp)
 		local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
@@ -41,12 +41,14 @@ function c78610936.activate(e,tp,eg,ep,ev,re,r,rp)
 			local tc=g:GetFirst()
 			while tc do
 				Duel.SpecialSummonStep(tc,0,tp,1-tp,false,false,POS_FACEUP_DEFENCE)
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_UPDATE_LEVEL)
-				e1:SetValue(-1)
-				e1:SetReset(RESET_EVENT+0x1fe0000)
-				tc:RegisterEffect(e1)
+				if tc:GetLevel()>0 then
+					local e1=Effect.CreateEffect(e:GetHandler())
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetCode(EFFECT_UPDATE_LEVEL)
+					e1:SetValue(-1)
+					e1:SetReset(RESET_EVENT+0x1fe0000)
+					tc:RegisterEffect(e1)
+				end
 				tc=g:GetNext()
 			end
 			Duel.SpecialSummonComplete()

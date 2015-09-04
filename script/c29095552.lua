@@ -1,4 +1,4 @@
---M·HERO アシッド
+--M・HERO アシッド
 function c29095552.initial_effect(c)
 	c:EnableReviveLimit()
 	--spsummon condition
@@ -43,4 +43,3 @@ function c29095552.desop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-

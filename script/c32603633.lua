@@ -1,4 +1,4 @@
---究極·背水の陣
+--究極・背水の陣
 function c32603633.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
@@ -25,7 +25,6 @@ function c32603633.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
 function c32603633.op(e,tp,eg,ep,ev,re,r,rp)
-	local count=0
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
 	local g=Duel.GetMatchingGroup(c32603633.filter,tp,LOCATION_GRAVE,0,nil,e,tp)

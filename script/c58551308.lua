@@ -2,7 +2,8 @@
 function c58551308.initial_effect(c)
 	--flip effect
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_FLIP)
 	e1:SetOperation(c58551308.flipop)
 	c:RegisterEffect(e1)
 	--special summon
@@ -19,7 +20,7 @@ end
 function c58551308.flipop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) then
-		c:RegisterFlagEffect(58551308,RESET_EVENT+0x57a0000,0,0)
+		c:RegisterFlagEffect(58551308,RESET_EVENT+0x57a0000,0,1)
 	end
 end
 function c58551308.filter(c,e,tp)
@@ -33,8 +34,14 @@ function c58551308.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g1=Duel.SelectTarget(tp,c58551308.filter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler(),e,tp)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
 	local g2=Duel.SelectTarget(1-tp,c58551308.filter,1-tp,LOCATION_GRAVE,0,1,1,e:GetHandler(),e,1-tp)
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,g1:GetCount(),0,0)
+	if g1:GetCount()>0 and g2:GetCount()>0 then
+		g1:Merge(g2)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,PLAYER_ALL,g1:GetFirst():GetOwner())
+	elseif g1:GetCount()>0 then
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,1,0,0)
+	elseif g2:GetCount()>0 then
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g2,1,1,0)
+	end
 end
 function c58551308.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)

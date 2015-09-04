@@ -1,4 +1,4 @@
---ジュラック·インパクト
+--ジュラック・インパクト
 function c5479217.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

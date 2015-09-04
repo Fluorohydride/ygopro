@@ -45,13 +45,15 @@ function c47349310.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e1:SetCountLimit(1)
 		e1:SetLabelObject(c)
+		e1:SetCondition(c47349310.retcon)
 		e1:SetOperation(c47349310.retop)
 		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
+function c47349310.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c47349310.retop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.ReturnToField(e:GetLabelObject())
-	end
+	Duel.ReturnToField(e:GetLabelObject())
 end

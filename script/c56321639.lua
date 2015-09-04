@@ -7,10 +7,16 @@ function c56321639.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 	--Add counter
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e0:SetCode(EVENT_CHAINING)
+	e0:SetRange(LOCATION_SZONE)
+	e0:SetOperation(aux.chainreg)
+	c:RegisterEffect(e0)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e2:SetCode(EVENT_CHAIN_SOLVING)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_CHAIN_SOLVED)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCondition(c56321639.ctcon)
 	e2:SetOperation(c56321639.ctop)
@@ -39,7 +45,7 @@ end
 function c56321639.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local c=re:GetHandler()
-	return e:GetHandler()~=re:GetHandler() and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c:IsSetCard(0x106e)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c:IsSetCard(0x106e) and e:GetHandler():GetFlagEffect(1)>0
 end
 function c56321639.ctop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x3001,1)

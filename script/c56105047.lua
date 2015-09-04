@@ -6,15 +6,11 @@ function c56105047.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetCost(c56105047.spcost)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCountLimit(1,56105047)
 	e1:SetTarget(c56105047.sptg)
 	e1:SetOperation(c56105047.spop)
 	c:RegisterEffect(e1)
-end
-function c56105047.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,56105047)==0 end
-	Duel.RegisterFlagEffect(tp,56105047,RESET_PHASE+PHASE_END,0,1)
 end
 function c56105047.filter(c,e,tp)
 	return c:GetCode()==62476815 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

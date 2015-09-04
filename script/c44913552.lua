@@ -1,4 +1,4 @@
---タイム·イーター
+--タイム・イーター
 function c44913552.initial_effect(c)
 	--skip draw
 	local e2=Effect.CreateEffect(c)

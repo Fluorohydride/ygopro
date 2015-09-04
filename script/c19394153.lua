@@ -1,4 +1,4 @@
---フェザー·ショット
+--フェザー・ショット
 function c19394153.initial_effect(c)
 	--multi atk
 	local e1=Effect.CreateEffect(c)
@@ -11,7 +11,7 @@ function c19394153.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c19394153.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 end
 function c19394153.filter(c)
 	return c:IsFaceup() and c:IsCode(21844576)
@@ -33,7 +33,7 @@ function c19394153.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c19394153.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local ct=Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)
 		if ct>1 then
 			local e1=Effect.CreateEffect(e:GetHandler())

@@ -1,4 +1,4 @@
---スクラップ·ポリッシュ
+--スクラップ・ポリッシュ
 function c74439492.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

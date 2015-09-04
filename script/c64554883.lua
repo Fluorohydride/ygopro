@@ -1,7 +1,7 @@
 --No.25 重装光学撮影機フォーカス・フォース
 function c64554883.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
+	aux.AddXyzProcedure(c,nil,6,2)
 	c:EnableReviveLimit()
 	--disable
 	local e1=Effect.CreateEffect(c)
@@ -18,6 +18,7 @@ function c64554883.initial_effect(c)
 	e1:SetOperation(c64554883.operation)
 	c:RegisterEffect(e1)
 end
+c64554883.xyz_number=25
 function c64554883.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

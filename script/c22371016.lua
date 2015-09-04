@@ -1,11 +1,11 @@
---A·O·J アンノウン·クラッシャー
+--A・O・J アンノウン・クラッシャー
 function c22371016.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(22371016,0))
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetTarget(c22371016.rmtg)
 	e1:SetOperation(c22371016.rmop)
 	c:RegisterEffect(e1)

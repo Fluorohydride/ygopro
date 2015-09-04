@@ -1,4 +1,4 @@
---A·ジェネクス·パワーコール
+--A・ジェネクス・パワーコール
 function c94622638.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

@@ -59,7 +59,7 @@ function c12510878.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c12510878.val(e,c)
-	if Duel.GetEnvironment()~=56433456 then return 0 end
+	if not Duel.IsEnvironment(56433456) then return 0 end
 	local v=Duel.GetLP(c:GetControler())-Duel.GetLP(1-c:GetControler())
 	if v>0 then return v else return 0 end
 end

@@ -46,7 +46,7 @@ end
 function c93016201.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	e:SetLabel(0)
-	if Duel.GetLP(tp)<=800 then return end
+	if not Duel.CheckLPCost(tp,800) then return end
 	local ct=Duel.GetCurrentChain()
 	if ct==1 then return end
 	local pe=Duel.GetChainInfo(ct-1,CHAININFO_TRIGGERING_EFFECT)
@@ -72,7 +72,7 @@ function c93016201.activate1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabel()~=1 then return end
 	if not c:IsRelateToEffect(e) then return end
-	local ct,tg=Duel.GetChainInfo(0,CHAININFO_CHAIN_COUNT,CHAININFO_TARGET_CARDS)
+	local ct=Duel.GetChainInfo(0,CHAININFO_CHAIN_COUNT)
 	local te=Duel.GetChainInfo(ct-1,CHAININFO_TRIGGERING_EFFECT)
 	local tc=te:GetHandler()
 	Duel.NegateEffect(ct-1)
@@ -84,26 +84,25 @@ function c93016201.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
 end
 function c93016201.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,800)
-	else Duel.PayLPCost(tp,800)	end
+	if chk==0 then return Duel.CheckLPCost(tp,800) end
+	Duel.PayLPCost(tp,800)
 end
 function c93016201.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 end
 function c93016201.activate2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.NegateSummon(eg:GetFirst())
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	Duel.NegateSummon(eg)
 	Duel.Destroy(eg,REASON_EFFECT)
 end
-function c93016201.condition3(e,tp,eg,ep,ev,re,r,rp,chk)
+function c93016201.condition3(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasCategory(CATEGORY_SPECIAL_SUMMON) and Duel.IsChainDisablable(ev)
 end
 function c93016201.cost3(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,800)
-	else Duel.PayLPCost(tp,800)	end
+	if chk==0 then return Duel.CheckLPCost(tp,800) end
+	Duel.PayLPCost(tp,800)
 end
 function c93016201.target3(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -113,8 +112,7 @@ function c93016201.target3(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c93016201.activate3(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.NegateEffect(ev)
 	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)

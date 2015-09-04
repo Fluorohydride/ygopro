@@ -6,47 +6,30 @@ function c45286019.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCountLimit(1,45286019)
 	e1:SetCondition(c45286019.spcon)
 	e1:SetCost(c45286019.spcost)
 	e1:SetTarget(c45286019.sptg)
 	e1:SetOperation(c45286019.spop)
 	c:RegisterEffect(e1)
-	if not c45286019.global_check then
-		c45286019.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c45286019.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(45286019,ACTIVITY_SPSUMMON,c45286019.counterfilter)
 end
-function c45286019.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if not tc:IsSetCard(0x72) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,45286019,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,45286019,RESET_PHASE+PHASE_END,0,1) end
+function c45286019.counterfilter(c)
+	return c:IsSetCard(0x72)
 end
 function c45286019.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:GetHandler():IsSetCard(0x72)
 end
 function c45286019.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,45286019)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(45286019,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(c45286019.splimit)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,45286019,RESET_PHASE+PHASE_END,0,1)
 end
 function c45286019.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x72)

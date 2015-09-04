@@ -1,7 +1,7 @@
 --No.10 白輝士イルミネーター
 function c11411223.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -15,6 +15,7 @@ function c11411223.initial_effect(c)
 	e1:SetOperation(c11411223.operation)
 	c:RegisterEffect(e1)
 end
+c11411223.xyz_number=10
 function c11411223.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

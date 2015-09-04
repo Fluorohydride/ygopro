@@ -1,4 +1,4 @@
---Sin レインボー·ドラゴン
+--Sin レインボー・ドラゴン
 function c598988.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

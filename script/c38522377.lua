@@ -51,22 +51,21 @@ end
 function c38522377.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c38522377.atkfilter,nil,e)
 	Duel.SendtoGrave(g,REASON_EFFECT)
-	local tc=g:GetFirst()
+	local og=Duel.GetOperatedGroup()
+	local tc=og:GetFirst()
 	local atk=0
 	while tc do
 		local oatk=tc:GetTextAttack()
 		if oatk<0 then oatk=0 end
 		atk=atk+oatk
-		tc=g:GetNext()
+		tc=og:GetNext()
 	end
-	if atk~=0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK)
-		e1:SetValue(atk)
-		e1:SetReset(RESET_EVENT+0x1ff0000)
-		e:GetHandler():RegisterEffect(e1)
-	end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e1:SetValue(atk)
+	e1:SetReset(RESET_EVENT+0x1ff0000)
+	e:GetHandler():RegisterEffect(e1)
 end
 function c38522377.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsType,1,nil,TYPE_SYNCHRO)

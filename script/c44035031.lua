@@ -1,4 +1,4 @@
---グラヴィティ·ウォリアー
+--グラヴィティ・ウォリアー
 function c44035031.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

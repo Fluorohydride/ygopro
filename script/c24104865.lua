@@ -1,10 +1,10 @@
---エーリアン·マザー
+--エーリアン・マザー
 function c24104865.initial_effect(c)
 	--check
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetOperation(c24104865.checkop)
 	c:RegisterEffect(e1)
 	local g=Group.CreateGroup()
@@ -23,7 +23,6 @@ function c24104865.initial_effect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
 	e3:SetCondition(c24104865.spcon)
@@ -48,14 +47,13 @@ end
 function c24104865.checkop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabelObject():GetLabel()==0 then return end
-	local t=Duel.GetAttackTarget()
-	if t==c then t=Duel.GetAttacker() end
+	local t=c:GetBattleTarget()
 	local g=e:GetLabelObject():GetLabelObject()
 	if c:GetFieldID()~=e:GetLabel() then
 		g:Clear()
 		e:SetLabel(c:GetFieldID())
 	end
-	if c:IsRelateToBattle() and t:IsLocation(LOCATION_GRAVE) and t:IsReason(REASON_BATTLE) then
+	if aux.bdgcon(e,tp,eg,ep,ev,re,r,rp) then
 		g:AddCard(t)
 		t:RegisterFlagEffect(24104865,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE,0,1)
 	end

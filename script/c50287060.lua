@@ -1,4 +1,4 @@
---暗黒魔族ギルファー·デーモン
+--暗黒魔族ギルファー・デーモン
 function c50287060.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -7,13 +7,9 @@ function c50287060.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c50287060.eqcon)
 	e1:SetTarget(c50287060.eqtg)
 	e1:SetOperation(c50287060.eqop)
 	c:RegisterEffect(e1)
-end
-function c50287060.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c50287060.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
@@ -39,7 +35,7 @@ function c50287060.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(c50287060.eqlimit)
 		c:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(tc)
+		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_EQUIP)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
 		e2:SetValue(-500)

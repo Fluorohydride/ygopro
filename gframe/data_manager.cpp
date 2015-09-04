@@ -31,7 +31,10 @@ bool DataManager::LoadDB(const char* file) {
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defence = sqlite3_column_int(pStmt, 6);
-			cd.level = sqlite3_column_int(pStmt, 7);
+			unsigned int level = sqlite3_column_int(pStmt, 7);
+			cd.level = level & 0xff;
+			cd.lscale = (level >> 24) & 0xff;
+			cd.rscale = (level >> 16) & 0xff;
 			cd.race = sqlite3_column_int(pStmt, 8);
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
@@ -179,10 +182,25 @@ const wchar_t* DataManager::GetCounterName(int code) {
 		return unknown_string;
 	return csit->second;
 }
-const wchar_t* DataManager::GetNumString(int num) {
-	return numStrings[num];
+const wchar_t* DataManager::GetNumString(int num, bool bracket) {
+	if(!bracket)
+		return numStrings[num];
+	wchar_t* p = numBuffer;
+	*p++ = L'(';
+	BufferIO::CopyWStrRef(numStrings[num], p, 4);
+	*p = L')';
+	*++p = 0;
+	return numBuffer;
 }
-const wchar_t* DataManager::FormatLocation(int location) {
+const wchar_t* DataManager::FormatLocation(int location, int sequence) {
+	if(location == 0x8) {
+		if(sequence < 5)
+			return GetSysString(1003);
+		else if(sequence == 5)
+			return GetSysString(1008);
+		else
+			return GetSysString(1009);
+	}
 	int filter = 1, i = 1000;
 	while(filter != location) {
 		filter <<= 1;
@@ -212,7 +230,7 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 const wchar_t* DataManager::FormatRace(int race) {
 	wchar_t* p = racBuffer;
 	int filter = 1, i = 1020;
-	for(; filter != 0x800000; filter <<= 1, ++i) {
+	for(; filter != 0x1000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
@@ -228,7 +246,7 @@ const wchar_t* DataManager::FormatRace(int race) {
 const wchar_t* DataManager::FormatType(int type) {
 	wchar_t* p = tpBuffer;
 	int filter = 1, i = 1050;
-	for(; filter != 0x1000000; filter <<= 1, ++i) {
+	for(; filter != 0x2000000; filter <<= 1, ++i) {
 		if(type & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';

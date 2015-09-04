@@ -1,4 +1,4 @@
---ネオフレムベル·サーベル
+--ネオフレムベル・サーベル
 function c91554542.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---M·HERO ダイアン
+--M・HERO ダイアン
 function c62624486.initial_effect(c)
 	c:EnableReviveLimit()
 	--spsummon condition
@@ -41,4 +41,3 @@ function c62624486.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-

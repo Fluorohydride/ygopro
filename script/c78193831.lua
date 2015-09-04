@@ -1,4 +1,4 @@
---バスター·ブレイダー
+--バスター・ブレイダー
 function c78193831.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

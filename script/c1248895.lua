@@ -32,13 +32,8 @@ function c1248895.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c1248895.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local dg=nil
 	local tpe=tc:GetType()
 	if bit.band(tpe,TYPE_TOKEN)~=0 then return end
-	if bit.band(tpe,0x802040)~=0 then
-		dg=Duel.GetMatchingGroup(Card.IsCode,tc:GetControler(),LOCATION_EXTRA,0,nil,tc:GetCode())
-	else
-		dg=Duel.GetMatchingGroup(Card.IsCode,tc:GetControler(),LOCATION_DECK+LOCATION_HAND,0,nil,tc:GetCode())
-	end
+	local dg=Duel.GetMatchingGroup(Card.IsCode,tc:GetControler(),LOCATION_DECK+LOCATION_HAND,0,nil,tc:GetCode())
 	Duel.Destroy(dg,REASON_EFFECT)
 end

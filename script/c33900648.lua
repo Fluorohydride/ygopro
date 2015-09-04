@@ -1,4 +1,4 @@
---クリアー·ワールド
+--クリアー・ワールド
 function c33900648.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
@@ -12,6 +12,7 @@ function c33900648.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
+	e2:SetCondition(c33900648.mtcon)
 	e2:SetOperation(c33900648.mtop)
 	c:RegisterEffect(e2)
 	--adjust
@@ -49,7 +50,7 @@ function c33900648.initial_effect(c)
 	e7:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e7:SetRange(LOCATION_SZONE)
-	e7:SetProperty(EFFECT_FLAG_REPEAT+EFFECT_FLAG_CARD_TARGET)
+	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e7:SetCountLimit(1)
 	e7:SetCondition(c33900648.descon)
 	e7:SetTarget(c33900648.destg)
@@ -62,7 +63,6 @@ function c33900648.initial_effect(c)
 	e8:SetCode(EVENT_PHASE+PHASE_END)
 	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e8:SetRange(LOCATION_SZONE)
-	e8:SetProperty(EFFECT_FLAG_REPEAT)
 	e8:SetCountLimit(1)
 	e8:SetCondition(c33900648.hdcon)
 	e8:SetTarget(c33900648.hdtg)
@@ -75,7 +75,6 @@ function c33900648.initial_effect(c)
 	e9:SetCode(EVENT_PHASE+PHASE_END)
 	e9:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e9:SetRange(LOCATION_SZONE)
-	e9:SetProperty(EFFECT_FLAG_REPEAT)
 	e9:SetCountLimit(1)
 	e9:SetCondition(c33900648.damcon)
 	e9:SetTarget(c33900648.damtg)
@@ -98,8 +97,10 @@ function c33900648.initial_effect(c)
 	e11:SetCondition(c33900648.windcon2)
 	c:RegisterEffect(e11)
 end
+function c33900648.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c33900648.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>500 and Duel.SelectYesNo(tp,aux.Stringid(33900648,0)) then
 		Duel.PayLPCost(tp,500)
 	else
@@ -194,7 +195,7 @@ function c33900648.windcon2(e)
 	return bit.band(c33900648[1-e:GetHandlerPlayer()],ATTRIBUTE_WIND)~=0
 end
 function c33900648.actarget(e,te,tp)
-	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:GetHandler():IsType(TYPE_SPELL)
+	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:IsActiveType(TYPE_SPELL)
 end
 function c33900648.costchk(e,te_or_c,tp)
 	return Duel.CheckLPCost(tp,500)

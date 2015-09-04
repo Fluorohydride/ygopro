@@ -1,4 +1,4 @@
---ヴィクトリー·ドラゴン
+--ヴィクトリー・ドラゴン
 function c44910027.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
@@ -32,6 +32,7 @@ function c44910027.initial_effect(c)
 	--match kill
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e4:SetCode(EFFECT_MATCH_KILL)
 	c:RegisterEffect(e4)
 end

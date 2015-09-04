@@ -20,9 +20,8 @@ function c51196805.initial_effect(c)
 	e3:SetDescription(aux.Stringid(51196805,1))
 	e3:SetCategory(CATEGORY_REMOVE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
+	e3:SetCountLimit(1,51196805)
 	e3:SetCode(EVENT_FLIP)
-	e3:SetCost(c51196805.rmcost)
 	e3:SetTarget(c51196805.rmtg)
 	e3:SetOperation(c51196805.rmop)
 	c:RegisterEffect(e3)
@@ -44,10 +43,6 @@ function c51196805.posop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		Duel.ChangePosition(c,POS_FACEDOWN_DEFENCE)
 	end
-end
-function c51196805.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,51196805)==0 end
-	Duel.RegisterFlagEffect(tp,51196805,RESET_PHASE+PHASE_END,0,1)
 end
 function c51196805.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

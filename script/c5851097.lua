@@ -4,7 +4,7 @@ function c5851097.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,0x1c1)
+	e1:SetHintTiming(0,0x1c0)
 	c:RegisterEffect(e1)
 	--disable spsummon
 	local e2=Effect.CreateEffect(c)
@@ -33,7 +33,7 @@ function c5851097.descon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c5851097.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return true end
+	if chk==0 then return c:IsRelateToEffect(e) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,c,1,0,0)
 end
 function c5851097.desop(e,tp,eg,ep,ev,re,r,rp)

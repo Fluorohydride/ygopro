@@ -46,14 +46,11 @@ function c48156348.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 function c48156348.spfilter1(c,tp)
-	return c:IsCode(41470137) and c:IsAbleToDeckAsCost() and c:IsCanBeFusionMaterial(true)
+	return c:IsCode(41470137) and c:IsAbleToDeckOrExtraAsCost() and c:IsCanBeFusionMaterial(true)
 		and Duel.IsExistingMatchingCard(c48156348.spfilter2,tp,LOCATION_MZONE,0,1,c)
 end
 function c48156348.spfilter2(c)
-	local tpe=c:GetOriginalType()
-	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial() and
-		((bit.band(tpe,TYPE_FUSION)>0 and c:IsAbleToExtraAsCost()) or 
-		(bit.band(tpe,TYPE_FUSION)==0 and c:IsAbleToDeckAsCost()))
+	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial() and c:IsAbleToDeckOrExtraAsCost()
 end
 function c48156348.sprcon(e,c)
 	if c==nil then return true end 
@@ -105,25 +102,17 @@ function c48156348.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function c48156348.spop(e,tp,eg,ep,ev,re,r,rp)
-	local zc=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if zc==0 then return end
-	if not Duel.IsExistingMatchingCard(c48156348.filter,tp,LOCATION_DECK,0,2,nil,e,tp) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c48156348.filter,tp,LOCATION_DECK,0,2,2,nil,e,tp)
-	if zc==1 then
-		local sg=g:Select(tp,1,1,nil)
-		local sc=sg:GetFirst()
-		g:RemoveCard(sc)
-		Duel.SpecialSummon(sc,120,tp,tp,false,false,POS_FACEUP)
-		sc:RegisterFlagEffect(sc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-		Duel.Destroy(g,REASON_EFFECT)
-	else
-		local tc=g:GetFirst()
-		while tc do
-			Duel.SpecialSummonStep(tc,120,tp,tp,false,false,POS_FACEUP)
-			tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-			tc=g:GetNext()
-		end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
+	local g=Duel.GetMatchingGroup(c48156348.filter,tp,LOCATION_DECK,0,nil,e,tp)
+	if g:GetCount()>=2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,2,2,nil)
+		local tc=sg:GetFirst()
+		Duel.SpecialSummonStep(tc,120,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
+		tc=sg:GetNext()
+		Duel.SpecialSummonStep(tc,120,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
 		Duel.SpecialSummonComplete()
 	end
 end

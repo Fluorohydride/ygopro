@@ -29,9 +29,9 @@ function c4022819.initial_effect(c)
 	e3:SetOperation(c4022819.spop)
 	c:RegisterEffect(e3)
 end
-function c4022819.ntcon(e,c)
+function c4022819.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c4022819.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack
@@ -45,7 +45,7 @@ function c4022819.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e1)
 end
 function c4022819.lvfilter(c)
-	return c:IsType(TYPE_NORMAL) and c:IsRace(RACE_DRAGON)
+	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsRace(RACE_DRAGON)
 end
 function c4022819.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c4022819.lvfilter(chkc) end
@@ -96,5 +96,13 @@ function c4022819.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_DEFENCE)
 		tc:RegisterEffect(e2)
 		Duel.SpecialSummonComplete()
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
+		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+		local cg2=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg1)
+		Duel.ConfirmCards(1-tp,cg2)
+		Duel.ConfirmCards(tp,cg2)
+		Duel.ShuffleHand(tp)
+		Duel.ShuffleDeck(tp)
 	end
 end

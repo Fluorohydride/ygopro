@@ -1,4 +1,4 @@
---E·HERO エアーマン
+--E・HERO エアーマン
 function c40044918.initial_effect(c)
 	--effect
 	local e1=Effect.CreateEffect(c)
@@ -37,9 +37,15 @@ function c40044918.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if sel==3 then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(40044918,0))
 		sel=Duel.SelectOption(tp,aux.Stringid(40044918,1),aux.Stringid(40044918,2))+1
+	elseif sel==1 then
+		Duel.SelectOption(tp,aux.Stringid(40044918,1))
+	else
+		Duel.SelectOption(tp,aux.Stringid(40044918,2))
 	end
 	e:SetLabel(sel)
 	if sel==1 then
+		local g=Duel.GetMatchingGroup(c40044918.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	else Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK) end
 end
 function c40044918.op(e,tp,eg,ep,ev,re,r,rp)
@@ -48,7 +54,7 @@ function c40044918.op(e,tp,eg,ep,ev,re,r,rp)
 	if sel==1 then
 		local ct=Duel.GetMatchingGroupCount(c40044918.ctfilter,tp,LOCATION_MZONE,0,c)
 		local g=Duel.GetMatchingGroup(c40044918.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-		if ct>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(40044918,3)) then
+		if ct>0 and g:GetCount()>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 			local dg=g:Select(tp,1,ct,nil)
 			Duel.HintSelection(dg)

@@ -1,4 +1,4 @@
---スクラップ·サーチャー
+--スクラップ・サーチャー
 function c92901944.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -26,10 +26,10 @@ function c92901944.cfilter(c,tp)
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c92901944.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c92901944.cfilter,1,e:GetHandler(),tp)
+	return eg:IsExists(c92901944.cfilter,1,e:GetHandler(),tp) and not eg:IsContains(e:GetHandler())
 end
 function c92901944.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0		
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end

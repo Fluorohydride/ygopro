@@ -37,7 +37,7 @@ function c66947414.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c66947414.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.CheckNormalSummonActivity(tp)
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function c66947414.chkfilter(c,tp)
 	return c:IsSetCard(0x15) and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE)

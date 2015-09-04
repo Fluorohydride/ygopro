@@ -1,7 +1,7 @@
 --ヴェルズ・タナトス
 function c65884091.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),4,2)
 	c:EnableReviveLimit()
 	--immune
 	local e1=Effect.CreateEffect(c)
@@ -32,5 +32,5 @@ function c65884091.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c65884091.efilter(e,te)
-	return te:IsActiveType(TYPE_EFFECT)
+	return te:IsActiveType(TYPE_EFFECT) and te:GetOwner()~=e:GetOwner()
 end

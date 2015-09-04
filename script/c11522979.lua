@@ -1,7 +1,7 @@
 --CNo.69 紋章死神カオス・オブ・アームズ
 function c11522979.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),4)
+	aux.AddXyzProcedure(c,nil,5,4)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -27,6 +27,7 @@ function c11522979.initial_effect(c)
 	e2:SetOperation(c11522979.operation)
 	c:RegisterEffect(e2)
 end
+c11522979.xyz_number=69
 function c11522979.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
 end

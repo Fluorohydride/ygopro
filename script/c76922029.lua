@@ -1,4 +1,4 @@
---首領·ザルーグ
+--首領・ザルーグ
 function c76922029.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(76922029,0))

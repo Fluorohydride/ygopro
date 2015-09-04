@@ -1,4 +1,4 @@
---アーマード·ビー
+--アーマード・ビー
 function c86915847.initial_effect(c)
 	--atk down
 	local e1=Effect.CreateEffect(c)

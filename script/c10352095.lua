@@ -1,4 +1,4 @@
---»Ã»óÖ®¾íÎï
+--å¹»æƒ‘ã®å·»ç‰©
 function c10352095.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -9,7 +9,7 @@ function c10352095.initial_effect(c)
 	e1:SetTarget(c10352095.target)
 	e1:SetOperation(c10352095.operation)
 	c:RegisterEffect(e1)
-	--ATTRIBUTE	
+	--ATTRIBUTE
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_CHANGE_ATTRIBUTE)

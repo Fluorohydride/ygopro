@@ -1,4 +1,4 @@
---超電磁稼動ボルテック·ドラゴン
+--超電磁稼動ボルテック・ドラゴン
 function c20529766.initial_effect(c)
 	--summon success
 	local e1=Effect.CreateEffect(c)
