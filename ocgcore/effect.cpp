@@ -47,6 +47,7 @@ effect::effect(duel* pd) {
 	target = 0;
 	value = 0;
 	operation = 0;
+	reason_effect = 0;
 }
 effect::~effect() {
 

@@ -1252,9 +1252,8 @@ function Auxiliary.damcon1(e,tp,eg,ep,ev,re,r,rp)
 end
 --filter for the immune effetc of qli monsters
 function Auxiliary.qlifilter(e,te)
-	if te:IsActiveType(TYPE_MONSTER) 
-		and (te:IsHasType(0x7e0) or (te:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) and not te:IsHasProperty(EFFECT_FLAG_CONTINUOUS)) 
-			or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
+	if te:IsActiveType(TYPE_MONSTER)
+		and (te:IsActivated() or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
 		local lv=e:GetHandler():GetLevel()
 		local ec=te:GetOwner()
 		if ec:IsType(TYPE_XYZ) then
