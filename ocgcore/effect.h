@@ -58,6 +58,7 @@ public:
 	int32 target;
 	int32 value;
 	int32 operation;
+	effect* reason_effect;
 
 	explicit effect(duel* pd);
 	~effect();

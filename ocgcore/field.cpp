@@ -707,6 +707,7 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 		peffect->flag |= EFFECT_FLAG_FIELD_ONLY;
 		peffect->handler = peffect->owner;
 		peffect->effect_owner = owner_player;
+		peffect->reason_effect = core.reason_effect;
 		peffect->id = infos.field_id++;
 	}
 	peffect->card_type = peffect->owner->data.type;
