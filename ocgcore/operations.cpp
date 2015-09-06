@@ -2773,7 +2773,6 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 		}
 		returns.ivalue[0] = core.operated_set.size();
 		pduel->delete_group(targets);
-		adjust_all();
 		return TRUE;
 	}
 	case 10: {

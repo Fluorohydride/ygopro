@@ -369,7 +369,7 @@ uint32 card::get_type() {
 int32 card::get_base_attack(uint8 swap) {
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE || status & STATUS_SUMMONING)
 		return data.attack;
 	if (temp.base_attack != -1)
 		return temp.base_attack;
@@ -397,7 +397,7 @@ int32 card::get_attack() {
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE || status & STATUS_SUMMONING)
 		return data.attack;
 	if (temp.attack != -1)
 		return temp.attack;
@@ -408,7 +408,7 @@ int32 card::get_attack() {
 int32 card::get_base_defence(uint8 swap) {
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE || status & STATUS_SUMMONING)
 		return data.defence;
 	if (temp.base_defence != -1)
 		return temp.base_defence;
@@ -436,7 +436,7 @@ int32 card::get_defence() {
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE || status & STATUS_SUMMONING)
 		return data.defence;
 	if (temp.defence != -1)
 		return temp.defence;

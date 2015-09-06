@@ -3559,6 +3559,7 @@ int32 field::process_battle_command(uint16 step) {
 			}
 			add_process(PROCESSOR_DESTROY, 3, 0, des, REASON_BATTLE, PLAYER_NONE);
 		}
+		adjust_all();
 		return FALSE;
 	}
 	case 33: {
