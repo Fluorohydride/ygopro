@@ -530,7 +530,7 @@ int32 scriptlib::effect_is_activated(lua_State * L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
-	lua_pushboolean(L, (peffect->status & EFFECT_STATUS_ACTIVATED));
+	lua_pushboolean(L, (peffect->status & EFFECT_STATUS_ACTIVATED) || (peffect->flag & EFFECT_FLAG_OWNER_RELATE));
 	return 1;
 }
 
