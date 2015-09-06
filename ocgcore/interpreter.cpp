@@ -265,6 +265,7 @@ static const struct luaL_Reg effectlib[] = {
 	{ "IsHasCategory", scriptlib::effect_is_has_category },
 	{ "IsHasType", scriptlib::effect_is_has_type },
 	{ "IsActivatable", scriptlib::effect_is_activatable },
+	{ "IsActivated", scriptlib::effect_is_activated },
 	{ "GetActivateLocation", scriptlib::effect_get_activate_location },
 	{ NULL, NULL }
 };

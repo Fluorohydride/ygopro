@@ -709,6 +709,9 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 		peffect->effect_owner = owner_player;
 		peffect->id = infos.field_id++;
 	}
+	if((peffect->type & 0x7e0)
+		|| (core.reason_effect && (core.reason_effect->status & EFFECT_STATUS_ACTIVATED)))
+		peffect->status |= EFFECT_STATUS_ACTIVATED;
 	peffect->card_type = peffect->owner->data.type;
 	effect_container::iterator it;
 	if (!(peffect->type & EFFECT_TYPE_ACTIONS)) {
