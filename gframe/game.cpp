@@ -35,13 +35,13 @@ unsigned short time_limit;
 unsigned char start_hand;
 unsigned char draw_count;
 
-void Game::MainServerLoop(int bDuel_mode) {
+void Game::MainServerLoop(int bDuel_mode, int lflist) {
 	deckManager.LoadLFList();
     dataManager.LoadDB("cards.cdb");
     aServerPort = NetServer::StartServer(aServerPort);
     printf("%u\n", aServerPort);
     fflush(stdout);
-    NetServer::Initduel(bDuel_mode);
+    NetServer::Initduel(bDuel_mode, lflist);
 	while(NetServer::net_evbase) {
 #ifdef WIN32
         Sleep(200);

@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 			ygo::time_limit=atoi(argv[11]);
 		}
 		ygo::mainGame = &_game;
-		ygo::mainGame->MainServerLoop(ygo::mode);
+		ygo::mainGame->MainServerLoop(ygo::mode, ygo::lflist);
 		
 		return 0;
 	}
