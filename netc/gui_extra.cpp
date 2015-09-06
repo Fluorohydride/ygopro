@@ -74,6 +74,8 @@ namespace ygopro
                         wnd->GetCaption()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "close button") {
                         wnd->SetCloseButtonVisible(sub_node.to_bool());
+                    } else if(name == "min size") {
+                        wnd->SetMinSize({(int32_t)sub_node[0].to_integer(), (int32_t)sub_node[1].to_integer()});
                     } else if(name == "children") {
                         sub_node.for_each([wnd](const std::string& c_name, jaweson::JsonNode<>& c_node) {
                             LoadChild(wnd, c_name, c_node);
@@ -108,7 +110,7 @@ namespace ygopro
                     } else if(name == "style") {
                         tab_control->SetStyle(sub_node);
                     } else if(name == "tabs") {
-                        sub_node.for_each([&name, tab_control](const std::string& name, jaweson::JsonNode<>& tab_node) {
+                        sub_node.for_each([tab_control](const std::string& name, jaweson::JsonNode<>& tab_node) {
                             int32_t title_color = 0xff000000;
                             auto& color_node = tab_node["title color"];
                             if(!color_node.is_empty())
@@ -132,6 +134,8 @@ namespace ygopro
                     } else if(name == "text") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         lbl->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                    } else if(name == "max width") {
+                        lbl->GetTextUI()->SetMaxWidth((int32_t)sub_node.to_integer());
                     }
                 });
                 return lbl;
@@ -329,77 +333,50 @@ namespace ygopro
         return static_cast<sgui::SGWidgetContainer*>(LoadChild(&sgui::SGGUIRoot::GetSingleton(), templ, node));
     }
     
-    void MessageBox::ShowOK(const std::wstring& title, const std::wstring msg, std::function<void ()> cb) {
-        auto wnd = LoadDialogAs<sgui::SGWindow>("messagebox ok");
-        auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]);
-        if(wnd)
-            return;
-        wnd->GetCaption()->SetText(title, color);
-        auto label = wnd->FindWidgetAs<sgui::SGLabel>("msg label");
-        if(label)
-            label->GetTextUI()->SetText(msg, color);
-        auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
-        if(ok_button) {
-            ok_button->event_click += [wnd, cb](sgui::SGWidget& sender)->bool {
+    void AddMessageButton(sgui::SGWindow* wnd) {}
+    
+    template<typename... ARGS>
+    void AddMessageButton(sgui::SGWindow* wnd, const std::string& btnname, std::function<void ()> cb, ARGS... args) {
+        auto btn = wnd->FindWidgetAs<sgui::SGTextButton>(btnname);
+        if(btn) {
+            btn->event_click += [wnd, cb](sgui::SGWidget& sender)->bool {
                 if(cb) cb();
                 wnd->RemoveFromParent();
                 return true;
             };
         }
+        AddMessageButton(wnd, std::forward<ARGS>(args)...);
     }
     
-    void MessageBox::ShowOKCancel(const std::wstring& title, const std::wstring msg, std::function<void ()> cb1, std::function<void ()> cb2) {
-        auto wnd = LoadDialogAs<sgui::SGWindow>("messagebox ok");
+    template<typename... ARGS>
+    void ShowMessageBox(const std::string& templ, const std::wstring& title, const std::wstring& msg, ARGS... args) {
+        auto wnd = LoadDialogAs<sgui::SGWindow>(templ);
         auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]);
         if(!wnd)
             return;
+        auto wnd_sz = wnd->GetAbsoluteSize();
         wnd->GetCaption()->SetText(title, color);
         auto label = wnd->FindWidgetAs<sgui::SGLabel>("msg label");
-        if(label)
+        if(label) {
             label->GetTextUI()->SetText(msg, color);
-        auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
-        if(ok_button) {
-            ok_button->event_click += [wnd, cb1](sgui::SGWidget& sender)->bool {
-                if(cb1) cb1();
-                wnd->RemoveFromParent();
-                return true;
-            };
+            label->SetDragTarget(wnd->shared_from_this());
+            auto lbl_sz = label->GetAbsoluteSize();
+            auto width = (wnd_sz.x > lbl_sz.x + 40) ? wnd_sz.x : (lbl_sz.x + 40);
+            wnd->SetSize({width, wnd_sz.y + lbl_sz.y});
         }
-        auto cancel_button = wnd->FindWidgetAs<sgui::SGTextButton>("cancel button");
-        if(cancel_button) {
-            cancel_button->event_click += [wnd, cb2](sgui::SGWidget& sender)->bool {
-                if(cb2) cb2();
-                wnd->RemoveFromParent();
-                return true;
-            };
-        }
+        AddMessageButton(wnd, std::forward<ARGS>(args)...);
     }
     
-    void MessageBox::ShowYesNo(const std::wstring& title, const std::wstring msg, std::function<void ()> cb1, std::function<void ()> cb2) {
-        auto wnd = LoadDialogAs<sgui::SGWindow>("messagebox ok");
-        auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]);
-        if(!wnd)
-            return;
-        wnd->GetCaption()->SetText(title, color);
-        auto label = wnd->FindWidgetAs<sgui::SGLabel>("msg label");
-        if(label)
-            label->GetTextUI()->SetText(msg, color);
-        auto yes_button = wnd->FindWidgetAs<sgui::SGTextButton>("yes button");
-        if(yes_button) {
-            yes_button->event_click += [wnd, cb1](sgui::SGWidget& sender)->bool {
-                if(cb1) cb1();
-                wnd->RemoveFromParent();
-                return true;
-            };
-        }
-        auto no_button = wnd->FindWidgetAs<sgui::SGTextButton>("no button");
-        if(no_button) {
-            no_button->event_click += [wnd, cb2](sgui::SGWidget& sender)->bool {
-                if(cb2) cb2();
-                wnd->RemoveFromParent();
-                return true;
-            };
-        }
+    void MessageBox::ShowOK(const std::wstring& title, const std::wstring& msg, std::function<void ()> cb) {
+        ShowMessageBox("messagebox ok", title, msg, "ok button", cb);
+    }
+    
+    void MessageBox::ShowOKCancel(const std::wstring& title, const std::wstring& msg, std::function<void ()> cb1, std::function<void ()> cb2) {
+        ShowMessageBox("messagebox ok,cancel", title, msg, "ok button", cb1, "cancel button", cb2);
+    }
+    
+    void MessageBox::ShowYesNo(const std::wstring& title, const std::wstring& msg, std::function<void ()> cb1, std::function<void ()> cb2) {
+        ShowMessageBox("messagebox yes,no", title, msg, "yes button", cb1, "no button", cb2);
     }
     
     PopupMenu& PopupMenu::AddButton(const std::wstring& text, intptr_t cval) {
@@ -467,8 +444,10 @@ namespace ygopro
         auto lst = wnd->FindWidgetAs<sgui::SGListBox>("file list");
         auto ffile = wnd->FindWidgetAs<sgui::SGTextEdit>("file");
         auto btn = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
-        if(!lst || !ffile || !btn)
+        if(!lst || !ffile || !btn) {
+            wnd->RemoveFromParent();
             return;
+        }
         btn->event_click.Bind([this, wnd, ffile](sgui::SGWidget& sender)->bool {
             auto file = ffile->GetTextUI()->GetText();
             if(file.length() == 0)
@@ -481,18 +460,18 @@ namespace ygopro
         lst->event_sel_change.Bind([this, ffile, lst](sgui::SGWidget& sender, int32_t index)->bool {
             if(index < 0)
                 return true;
-            if(lst->GetItemCustomValue(index) == 141)
-                ffile->GetTextUI()->SetText(lst->GetItemText(index), 0xff000000);
+            if(lst->GetItemCustomValue(index) == 2)
+                ffile->GetTextUI()->SetText(lst->GetItemText(index).substr(1), 0xff000000);
             return true;
         });
         lst->event_item_double_click += [this, ffile, lst, fpath](sgui::SGWidget& sender, int32_t index)->bool {
-            if(lst->GetItemCustomValue(index) == 142) {
+            if(lst->GetItemCustomValue(index) == 0) {
                 size_t pos = path.rfind(L'/');
                 path = path.substr(0, pos);
                 fpath->GetTextUI()->SetText(path, 0xff000000);
                 RefreshList(lst);
-            } else if(lst->GetItemCustomValue(index) == 140) {
-                path.append(L"/").append(lst->GetItemText(index));
+            } else if(lst->GetItemCustomValue(index) == 1) {
+                path.append(L"/").append(lst->GetItemText(index).substr(1));
                 fpath->GetTextUI()->SetText(path, 0xff000000);
                 RefreshList(lst);
             } else {
@@ -502,6 +481,7 @@ namespace ygopro
             }
             return true;
         };
+        window = wnd->CastPtr<sgui::SGWindow>();
         RefreshList(lst);
     }
     
@@ -511,21 +491,21 @@ namespace ygopro
         FileSystem::TraversalDir(path, [this, &dirs, &files](const std::wstring& name, bool isdir) {
             if(isdir) {
                 if(name != L"." && name != L"..")
-                    dirs.push_back(name);
+                    dirs.push_back(std::wstring(L"\ue08b").append(name));
             } else {
                 if(name.find(filter) == (name.size() - filter.size()))
-                    files.push_back(name);
+                    files.push_back(std::wstring(L"\ue08c").append(name));
             }
         });
         std::sort(dirs.begin(), dirs.end());
         std::sort(files.begin(), files.end());
         list->ClearItems();
         if(path != root)
-            list->AddItem(To<std::wstring>(stringCfg["eui_updir"].to_string()), 0xff000000, 142);
+            list->AddItem(std::wstring(L"\ue08d").append(To<std::wstring>(stringCfg["eui_updir"].to_string())), 0xff000000, 0);
         for(size_t i = 0; i < dirs.size(); ++i)
-            list->AddItem(dirs[i], 0xff000000, 140);
+            list->AddItem(dirs[i], 0xff000000, 1);
         for(size_t i = 0; i < files.size(); ++i)
-            list->AddItem(files[i], 0xff000000, 141);
+            list->AddItem(files[i], 0xff000000, 2);
     }
     
     void FilterDialog::Show(v2i pos) {

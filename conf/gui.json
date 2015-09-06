@@ -164,7 +164,7 @@
     "client_hover" : [62, 74, 29, 32],
     "sel_tex" : [41, 4, 10, 10],
     "cursor_tex" : [40, 22, 2, 14],
-    "text_area" : [5, 10, 5, 10],
+    "text_area" : [5, 5, 5, 5],
     "max_cursor_offset" : 5,
     "font" : "default",
     "text_offset" : [0, 0]

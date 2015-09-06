@@ -11,8 +11,6 @@ struct TimerEvent {
     static bool Comp(const TimerEvent<TIME_TYPE>& a, const TimerEvent<TIME_TYPE>& b) {
         return a.end_time > b.end_time;
     }
-    
-    typedef decltype(&Comp) comp_type;
 };
 
 template<typename TIME_TYPE>

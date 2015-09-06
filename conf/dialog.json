@@ -4,6 +4,8 @@
   "messagebox ok" : {
     "type" : "window",
     "close button" : false,
+    "position" : [0, 0, 500, 150, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "min size" : [500, 150],
     "children" : {
       "msg label" : {
         "type" : "label",
@@ -12,13 +14,15 @@
       "ok button" : {
         "type" : "text button",
         "text" : ["eui_button_ok", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -60, 160, 45, 0.5, 1.0, 0.0, 0.0, -0.5, 0.0]
       }
     }
   },
   "messagebox ok,cancel" : {
     "type" : "window",
     "close button" : false,
+    "position" : [0, 0, 500, 150, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "min size" : [500, 150],
     "children" : {
       "msg label" : {
         "type" : "label",
@@ -27,18 +31,20 @@
       "ok button" : {
         "type" : "text button",
         "text" : ["eui_button_ok", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -60, 160, 45, 0.3, 1.0, 0.0, 0.0, -0.5, 0.0]
       },
       "cancel button" : {
         "type" : "text button",
         "text" : ["eui_button_cancel", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -60, 160, 45, 0.7, 1.0, 0.0, 0.0, -0.5, 0.0]
       }
     }
   },
   "messagebox yes,no" : {
     "type" : "window",
     "close button" : false,
+    "position" : [0, 0, 500, 150, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "min size" : [500, 150],
     "children" : {
       "msg label" : {
         "type" : "label",
@@ -47,12 +53,12 @@
       "yes button" : {
         "type" : "text button",
         "text" : ["eui_button_yes", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -60, 160, 45, 0.3, 1.0, 0.0, 0.0, -0.5, 0.0]
       },
       "no button" : {
         "type" : "text button",
         "text" : ["eui_button_no", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -60, 160, 45, 0.7, 1.0, 0.0, 0.0, -0.5, 0.0]
       }
     }
   },
@@ -61,26 +67,28 @@
   "popup menu margin" : [5, 5, 8, 5],
   "file dialog" : {
     "type" : "window",
-    "close button" : false,
+    "close button" : true,
+    "min size" : [400, 400],
     "position" : [0, 0, 500, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "path" : {
         "type" : "textedit",
         "readonly" : true,
-        "position" : [10, 50, -20, 40, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "position" : [10, 40, -20, 45, 0, 0, 1.0, 0.0, 0.0, 0.0]
       },
       "file list" : {
         "type" : "listbox",
-        "position" : [10, 100, -20, 200, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "position" : [10, 90, -20, -200, 0, 0, 1.0, 1.0, 0.0, 0.0]
       },
       "file" : {
         "type" : "textedit",
-        "position" : [10, 50, -20, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "input color" : "0x000000ff",
+        "position" : [10, -105, -20, 45, 0, 1.0, 1.0, 0.0, 0.0, 0.0]
       },
       "ok button" : {
         "type" : "text button",
         "text" : ["eui_button_ok", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -55, 0, 40, 0.5, 1.0, 0.5, 0.0, -0.5, 0.0]
       }
     }
   },
@@ -241,27 +249,27 @@
     "children" : {
       "deck name" : {
         "type" : "label",
-        "position" : [10, 10, 200, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [10, 10, 300, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu deck" : {
         "type" : "text button",
-        "text" : "eui_menu_deck",
-        "position" : [210, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_menu_deck", "0x000000ff"],
+        "position" : [310, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu tool" : {
         "type" : "text button",
-        "text" : "eui_menu_tool",
-        "position" : [310, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_menu_tool", "0x000000ff"],
+        "position" : [440, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu list" : {
         "type" : "text button",
-        "text" : "eui_menu_list",
-        "position" : [410, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_menu_list", "0x000000ff"],
+        "position" : [570, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu search" : {
         "type" : "text button",
-        "text" : "eui_menu_list",
-        "position" : [510, 5, 90, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_menu_search", "0x000000ff"],
+        "position" : [700, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       }
     }
   },
@@ -280,8 +288,8 @@
     "menu tool" : {
       "eui_tool_sort" : 0,
       "eui_tool_shuffle" : 1,
-      "eui_deck_clear" : 2,
-      "eui_deck_browser" : 3
+      "eui_tool_clear" : 2,
+      "eui_tool_browser" : 3
     },
     "menu list" : {
       "eui_list_forbidden" : 0,

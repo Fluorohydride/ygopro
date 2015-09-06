@@ -135,7 +135,7 @@ namespace ygopro
         if(unused_block.size() == 0) {
             if(reserved_block.size() == 0)
                 return 0xffff;
-            uint16_t ret = reserved_block.front();
+            ret = reserved_block.front();
             reserved_id.erase(ref_count[ret].second);
             card_textures.erase(ref_count[ret].second);
             reserved_block.pop_front();

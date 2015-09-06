@@ -1081,10 +1081,13 @@ namespace sgui
                     focus_widget = hoving_widget;
                 }
                 return choving->OnMouseDown(button, mods, x, y) || ret;
-            } else {
-                auto dr = GetDragTarget();
-                if(dr && (button == GLFW_MOUSE_BUTTON_LEFT))
-                    ret = SGClickingMgr::Get().DragBegin(dr, x, y) || ret;
+            } else {                
+                if(button == GLFW_MOUSE_BUTTON_LEFT) {
+                    SGClickingMgr::Get().SetClickingObject(ptr);
+                    auto dr = GetDragTarget();
+                    if(dr)
+                        ret = SGClickingMgr::Get().DragBegin(dr, x, y) || ret;
+                }
                 return ret;
             }
         }
@@ -1094,6 +1097,10 @@ namespace sgui
             bool ret = event_mouse_up.Trigger(*this, button, mods,x, y) || is_entity;
             if(!hoving_widget.expired())
                 ret = hoving_widget.lock()->OnMouseUp(button, mods, x, y) || ret;
+            if(button == GLFW_MOUSE_BUTTON_LEFT) {
+                if(SGClickingMgr::Get().GetClickingObject().get() == this)
+                    event_click.Trigger(*this);
+            }
             return ret;
         }
         
@@ -1151,6 +1158,8 @@ namespace sgui
         }
         
         virtual SGWidget* FindWidget(const std::string& nm) {
+            if(name == nm)
+                return this;
             for(auto& iter : children) {
                 auto ret = iter->FindWidget(nm);
                 if(ret)
@@ -1508,7 +1517,7 @@ namespace sgui
         virtual void InitUIComponents() {
             SGCommonUIText::InitUIComponents();
             common_ui->SetSizeChangeCallback([this](v2i new_sz) {
-                OnPositionSizeChange(false, true);
+                OnPositionSizeChange(true, true);
             });
         }
         
@@ -2270,6 +2279,7 @@ namespace sgui
         
         UIText* GetCaption() { return static_cast<UIText*>(this->ui_components[1]); }
         inline void SetCloseButtonVisible(bool v) { return this->children[0]->SetVisible(v); }
+        inline void SetMinSize(v2i msz) { min_size = msz; }
         
     protected:
         int8_t drag_status = 0;
@@ -2501,7 +2511,7 @@ namespace sgui
             int32_t index = -1;
             this->event_click += [this, index, last_click_time](SGWidget& sender) mutable ->bool {
                 int64_t tm = SGGUIRoot::GetSingleton().GetSysClock();
-                if(selection == index && tm - last_click_time < 200) {
+                if(selection == index && tm - last_click_time < 300) {
                     event_item_double_click.Trigger(sender, selection);
                     index = -1;
                 } else
@@ -3282,6 +3292,7 @@ namespace sgui
                 if(display_offset > max_display_offset)
                     ChangeDisplayOffset(max_display_offset);
             });
+            cur->SetPositionR({text_area.left + text_offset.x - display_offset, 0});
         }
         
         virtual void PushUIComponents() {
@@ -3379,7 +3390,7 @@ namespace sgui
         }
         
         inline std::wstring GetSelectedText() {
-            return static_cast<UIText*>(this->ui_components[2])->GetText().substr(selection.x, selection.y - selection.x);
+            return std::move(static_cast<UIText*>(this->ui_components[2])->GetText().substr(selection.x, selection.y - selection.x));
         }
         
         inline UIText* GetTextUI() { return static_cast<UIText*>(ui_components[2]); }

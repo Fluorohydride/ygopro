@@ -190,6 +190,12 @@ int32_t main(int32_t argc, char* argv[]) {
         glfwSwapInterval(0);
     
     sgui::SGGUIRoot::GetSingleton().SetShader(&base::Shader::GetDefaultShader());
+    sgui::SGGUIRoot::GetSingleton().SetClipboardCallback([window]()->std::string {
+        std::string str = glfwGetClipboardString(window);
+        return std::move(str);
+    }, [window](const std::string& str) {
+        glfwSetClipboardString(window, str.c_str());
+    });
     SceneMgr::Get().InitFrameControler();
     SceneMgr::Get().SetFrameRate(60);
     

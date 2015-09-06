@@ -94,7 +94,7 @@ namespace ygopro
         std::array<int16_t, 33 * 6> indices;
         auto msk = ImageMgr::Get().GetTexture("mmask");
         auto nbk = ImageMgr::Get().GetTexture("numback");
-        float yrate = 1.0f - 50.0f / screen_size.y;
+        float yrate = 1.0f - 40.0f / screen_size.y;
         float lx = 10.0f / screen_size.x * 2.0f - 1.0f;
         float rx = 0.5625f;
         float y0 = (0.95f + 1.0f) * yrate - 1.0f;
@@ -192,7 +192,7 @@ namespace ygopro
     }
     
     void BuildScene::SetSceneSize(v2i sz) {
-        float yrate = 1.0f - 50.0f / sz.y;
+        float yrate = 1.0f - 40.0f / sz.y;
         card_size = {0.2f * yrate * sz.y / sz.x, 0.29f * yrate};
         icon_size = {0.08f * yrate * sz.y / sz.x, 0.08f * yrate};
         minx = 50.0f / sz.x * 2.0f - 1.0f;
@@ -287,16 +287,19 @@ namespace ygopro
             for(auto& dcd : current_deck.main_deck) {
                 auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->LoadCardTexture(dcd->data->code);
+                bc->SetLimit(dcd->limit);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.extra_deck) {
                 auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->LoadCardTexture(dcd->data->code);
+                bc->SetLimit(dcd->limit);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.side_deck) {
                 auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->LoadCardTexture(dcd->data->code);
+                bc->SetLimit(dcd->limit);
                 dcd->builder_card = bc;
             }
             RefreshAllCard();
@@ -316,16 +319,19 @@ namespace ygopro
             for(auto& dcd : current_deck.main_deck) {
                 auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->LoadCardTexture(dcd->data->code);
+                bc->SetLimit(dcd->limit);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.extra_deck) {
                 auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->LoadCardTexture(dcd->data->code);
+                bc->SetLimit(dcd->limit);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.side_deck) {
                 auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->LoadCardTexture(dcd->data->code);
+                bc->SetLimit(dcd->limit);
                 dcd->builder_card = bc;
             }
             RefreshAllCard();
@@ -354,6 +360,7 @@ namespace ygopro
                 auto ptr = lst[i]->builder_card;
                 auto bpos = ptr->pos;
                 auto cpos = ptr->GetCurrentPos(loc, (int32_t)i);
+                ptr->SetSize(card_size);
                 if(std::abs((bpos.x - cpos.x) / bpos.x) > 0.001f || std::abs((bpos.y - cpos.y) / bpos.y) > 0.001f) {
                     auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos, ver](BuilderCard* bc, double t) ->bool {
                         if(ver != update_ver)
@@ -457,16 +464,19 @@ namespace ygopro
         for(auto& dcd : current_deck.main_deck) {
             auto bc = card_renderer->NewSharedObject<BuilderCard>();
             bc->LoadCardTexture(dcd->data->code);
+            bc->SetLimit(dcd->limit);
             dcd->builder_card = bc;
         }
         for(auto& dcd : current_deck.extra_deck) {
             auto bc = card_renderer->NewSharedObject<BuilderCard>();
             bc->LoadCardTexture(dcd->data->code);
+            bc->SetLimit(dcd->limit);
             dcd->builder_card = bc;
         }
         for(auto& dcd : current_deck.side_deck) {
             auto bc = card_renderer->NewSharedObject<BuilderCard>();
             bc->LoadCardTexture(dcd->data->code);
+            bc->SetLimit(dcd->limit);
             dcd->builder_card = bc;
         }
         RefreshAllCard();
