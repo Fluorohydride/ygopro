@@ -36,9 +36,9 @@ void Game::MainServerLoop(int bDuel_mode) {
 	deckManager.LoadLFList();
     dataManager.LoadDB("cards.cdb");
     aServerPort = NetServer::StartServer(aServerPort);
+    NetServer::Initduel(bDuel_mode);
     printf("%u\n", aServerPort);
     fflush(stdout);
-    NetServer::Initduel(bDuel_mode);
 	while(NetServer::net_evbase) {
 #ifdef WIN32
         Sleep(200);
