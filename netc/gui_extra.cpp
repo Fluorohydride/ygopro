@@ -33,7 +33,7 @@ namespace ygopro
     
     void LoadItemList(sgui::SGItemListWidget* widget, jaweson::JsonNode<>& node) {
         node.for_each([widget](const std::string& name, jaweson::JsonNode<>& item_node) {
-            widget->AddItem(To<std::wstring>(stringCfg[name].to_string()), (uint32_t)item_node[0].to_integer(), (int32_t)item_node[1].to_integer());
+            widget->AddItem(To<std::wstring>(stringCfg[name].to_string()), sgui::SGJsonUtil::ConvertRGBA(item_node[0]), (uint32_t)item_node[1].to_integer());
         });
     }
     
@@ -246,7 +246,7 @@ namespace ygopro
                     } else if(name == "style") {
                         lb->SetStyle(sub_node);
                     } else if(name == "items") {
-                        LoadItemList(lb, dialogCfg[sub_node.to_string()]);
+                        LoadItemList(lb, dialogCfg["item lists"][sub_node.to_string()]);
                     } else if(name == "selection") {
                         lb->SetSelection((int32_t)sub_node.to_integer());
                     }
@@ -262,7 +262,7 @@ namespace ygopro
                     } else if(name == "style") {
                         cb->SetStyle(sub_node);
                     } else if(name == "items") {
-                        LoadItemList(cb, dialogCfg[sub_node.to_string()]);
+                        LoadItemList(cb, dialogCfg["item lists"][sub_node.to_string()]);
                     } else if(name == "selection") {
                         cb->SetSelection((int32_t)sub_node.to_integer());
                     }
@@ -514,6 +514,7 @@ namespace ygopro
         auto wnd = LoadDialogAs<sgui::SGPanel>("filter dialog");
         if(!wnd)
             return;
+        wnd->SetPosition(pos);
         window = wnd->CastPtr<sgui::SGWidgetContainer>();
         keyword = wnd->FindWidgetAs<sgui::SGTextEdit>("keyword");
         arctype = wnd->FindWidgetAs<sgui::SGComboBox>("arctype");
@@ -525,7 +526,13 @@ namespace ygopro
         attack = wnd->FindWidgetAs<sgui::SGTextEdit>("attack");
         defence = wnd->FindWidgetAs<sgui::SGTextEdit>("defence");
         star = wnd->FindWidgetAs<sgui::SGTextEdit>("star");
-        scale = wnd->FindWidgetAs<sgui::SGTextEdit>("pscale");
+        pscale = wnd->FindWidgetAs<sgui::SGTextEdit>("pscale");
+        extra_label[0] = wnd->FindWidgetAs<sgui::SGLabel>("attrib label");
+        extra_label[1] = wnd->FindWidgetAs<sgui::SGLabel>("race label");
+        extra_label[2] = wnd->FindWidgetAs<sgui::SGLabel>("attack label");
+        extra_label[3] = wnd->FindWidgetAs<sgui::SGLabel>("defence label");
+        extra_label[4] = wnd->FindWidgetAs<sgui::SGLabel>("star label");
+        extra_label[5] = wnd->FindWidgetAs<sgui::SGLabel>("pscale label");
         auto sch = wnd->FindWidgetAs<sgui::SGTextButton>("search");
         auto clr = wnd->FindWidgetAs<sgui::SGTextButton>("clear");
         if(sch)
@@ -541,31 +548,35 @@ namespace ygopro
         if(attack)
             attack->GetTextUI()->SetText(con_text[1], 0xff000000);
         if(defence)
-            defence->GetTextUI()->SetText(con_text[1], 0xff000000);
+            defence->GetTextUI()->SetText(con_text[2], 0xff000000);
         if(star)
-            star->GetTextUI()->SetText(con_text[1], 0xff000000);
-        if(scale)
-            scale->GetTextUI()->SetText(con_text[1], 0xff000000);
-        if(arctype)
-            arctype->SetSelection(sel[0]);
-        if(subtype)
-            subtype->SetSelection(sel[1]);
+            star->GetTextUI()->SetText(con_text[3], 0xff000000);
+        if(pscale)
+            pscale->GetTextUI()->SetText(con_text[4], 0xff000000);
         if(arctype && subtype) {
-            arctype->event_sel_change += [this](sgui::SGWidget& sender, int32_t index)->bool {
+            arctype->event_sel_change += [this, wnd](sgui::SGWidget& sender, int32_t index)->bool {
                 subtype->ClearItems();
                 if(index == 0) {
-                    LoadItemList(subtype, dialogCfg["no type"]);
+                    LoadItemList(subtype, dialogCfg["item lists"]["no type"]);
+                    ShowExtraInfo(false);
                 } else if(index == 1) {
-                    LoadItemList(subtype, dialogCfg["monster types"]);
+                    LoadItemList(subtype, dialogCfg["item lists"]["monster types"]);
+                    ShowExtraInfo(true);
                 } else if(index == 2) {
-                    LoadItemList(subtype, dialogCfg["spell types"]);
+                    LoadItemList(subtype, dialogCfg["item lists"]["spell types"]);
+                    ShowExtraInfo(false);
                 } else {
-                    LoadItemList(subtype, dialogCfg["trap types"]);
+                    LoadItemList(subtype, dialogCfg["item lists"]["trap types"]);
+                    ShowExtraInfo(false);
                 }
                 subtype->SetSelection(0);
                 return true;
             };
         }
+        if(arctype)
+            arctype->SetSelection(sel[0]);
+        if(subtype)
+            subtype->SetSelection(sel[1]);
         if(limit_type)
             limit_type->SetSelection(sel[2]);
         if(pool_type)
@@ -574,6 +585,29 @@ namespace ygopro
             attribute->SetSelection(sel[4]);
         if(race)
             race->SetSelection(sel[5]);
+    }
+    
+    void FilterDialog::ShowExtraInfo(bool show) {
+        auto wnd = window.lock();
+        if(!wnd)
+            return;
+        auto sz = wnd->GetAbsoluteSize();
+        wnd->SetSize({sz.x, (int32_t)dialogCfg["filter dialog"]["dialog height"][show ? 1 : 0].to_integer()});
+        for(int32_t i = 0; i < 6; ++i)
+            if(extra_label[i])
+                extra_label[i]->SetVisible(show);
+        if(attribute)
+            attribute->SetVisible(show);
+        if(race)
+            race->SetVisible(show);
+        if(attack)
+            attack->SetVisible(show);
+        if(defence)
+            defence->SetVisible(show);
+        if(star)
+            star->SetVisible(show);
+        if(pscale)
+            pscale->SetVisible(show);
     }
     
     void FilterDialog::BeginSearch() {
@@ -653,8 +687,8 @@ namespace ygopro
                     default: break;
                 }
             }
-            if(scale) {
-                auto t4 = ParseValue(scale->GetTextUI()->GetText());
+            if(pscale) {
+                auto t4 = ParseValue(pscale->GetTextUI()->GetText());
                 switch(std::get<0>(t4)) {
                     case 0: case 1: break;
                     case 2: fc.scalemin = fc.scalemax = std::get<1>(t4); break;
@@ -676,8 +710,8 @@ namespace ygopro
             defence->GetTextUI()->Clear();
         if(star)
             star->GetTextUI()->Clear();
-        if(scale)
-            scale->GetTextUI()->Clear();
+        if(pscale)
+            pscale->GetTextUI()->Clear();
         if(arctype)
             arctype->SetSelection(0);
         if(subtype)

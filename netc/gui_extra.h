@@ -66,7 +66,8 @@ namespace ygopro
     class FilterDialog : public CommonDialog {
     public:
         void Show(v2i pos);
-        void SetOKCallback(std::function<void (const FilterCondition&, int32_t)> cb = nullptr) { cbOK = cb; }
+        void ShowExtraInfo(bool show);
+        void SetOKCallback(std::function<void (const FilterCondition&, int32_t)> cb = nullptr) { cbOK = cb; }        
         void BeginSearch();
         void ClearCondition();
         static std::tuple<int32_t, int32_t, int32_t> ParseValue(const std::wstring& valstr);
@@ -84,7 +85,8 @@ namespace ygopro
         sgui::SGTextEdit* attack = nullptr;
         sgui::SGTextEdit* defence = nullptr;
         sgui::SGTextEdit* star = nullptr;
-        sgui::SGTextEdit* scale = nullptr;
+        sgui::SGTextEdit* pscale = nullptr;
+        sgui::SGLabel* extra_label[6] = {nullptr};
         std::wstring con_text[5];
         int32_t sel[6] = {0};
     };

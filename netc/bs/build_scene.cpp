@@ -18,6 +18,7 @@ namespace ygopro
     int32_t main_row_count = 0;
     v2f card_size = {0.0f, 0.0f};
     v2f icon_size = {0.0f, 0.0f};
+    float icon_offset = 0.0f;
     float minx = 0.0f;
     float maxx = 0.0f;
     float miny = 0.0f;
@@ -44,7 +45,7 @@ namespace ygopro
         vt2::Fill(&vertices[0], pos, {size.x, -size.y}, card_tex, 0xffffffff, hl);
         if(limit < 3) {
             auto& lti = limit_tex[limit];
-            vt2::Fill(&vertices[4], pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
+            vt2::Fill(&vertices[4], pos + v2f{-icon_offset, icon_offset}, {icon_size.x, -icon_size.y}, lti);
             vt2::GenQuadIndex(indices.data(), 2, vert_index);
         } else {
             vt2::GenQuadIndex(indices.data(), 1, vert_index);
@@ -162,6 +163,8 @@ namespace ygopro
         PushObject(misc_renderer.get());
         PushObject(card_renderer.get());
         PushObject(sgui::SGGUIRoot::GetSingleton());
+        bg_renderer->ClearVertices();
+        bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), rectf{-1.0f, 1.0f, 2.0f, -2.0f}, ImageMgr::Get().GetTexture("bg"));
     }
     
     BuildScene::~BuildScene() {
@@ -192,11 +195,12 @@ namespace ygopro
     }
     
     void BuildScene::SetSceneSize(v2i sz) {
+        minx = 50.0f / sz.x * 2.0f - 1.0f;
+        maxx = 0.541f;
         float yrate = 1.0f - 40.0f / sz.y;
         card_size = {0.2f * yrate * sz.y / sz.x, 0.29f * yrate};
         icon_size = {0.08f * yrate * sz.y / sz.x, 0.08f * yrate};
-        minx = 50.0f / sz.x * 2.0f - 1.0f;
-        maxx = 0.541f;
+        icon_offset = 0.01f * yrate * sz.y / sz.x;
         main_y_spacing = 0.3f * yrate;
         offsety[0] = (0.92f + 1.0f) * yrate - 1.0f;
         offsety[1] = (-0.31f + 1.0f) * yrate - 1.0f;
@@ -216,8 +220,6 @@ namespace ygopro
         bg_renderer->SetScreenSize(sz);
         misc_renderer->SetScreenSize(sz);
         card_renderer->SetScreenSize(sz);
-        bg_renderer->ClearVertices();
-        bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), recti{0, 0, sz.x, sz.y}, ImageMgr::Get().GetTexture("bg"));
         UpdateAllCard();
     }
     

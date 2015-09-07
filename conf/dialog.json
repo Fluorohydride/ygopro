@@ -95,123 +95,123 @@
   "filter dialog" : {
     "type" : "panel",
     "is entity" : true,
-    "position" : [0, 0, 500, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "position" : [0, 0, 500, 560, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "dialog height" : [290, 560],
     "children" : {
       "keyword label" : {
         "type" : "label",
-        "text" : "eui_filter_keyword",
-        "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_keyword", "0x000000ff"],
+        "position" : [10, 15, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "type label" : {
         "type" : "label",
-        "text" : "eui_filter_type",
-        "position" : [0, 60, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_type", "0x000000ff"],
+        "position" : [10, 60, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "limit label" : {
         "type" : "label",
-        "text" : "eui_filter_limit",
-        "position" : [0, 150, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_limit", "0x000000ff"],
+        "position" : [10, 150, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "pool label" : {
         "type" : "label",
-        "text" : "eui_filter_limit",
-        "position" : [0, 195, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_pool", "0x000000ff"],
+        "position" : [10, 195, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "attrib label" : {
         "type" : "label",
-        "text" : "eui_filter_attribute",
-        "position" : [0, 240, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_attribute", "0x000000ff"],
+        "position" : [10, 240, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "race label" : {
         "type" : "label",
-        "text" : "eui_filter_race",
-        "position" : [0, 285, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_race", "0x000000ff"],
+        "position" : [10, 285, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "attack label" : {
         "type" : "label",
-        "text" : "eui_filter_attack",
-        "position" : [0, 330, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_attack", "0x000000ff"],
+        "position" : [10, 330, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "defence label" : {
         "type" : "label",
-        "text" : "eui_filter_defence",
-        "position" : [0, 375, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_defence", "0x000000ff"],
+        "position" : [10, 375, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "star label" : {
         "type" : "label",
-        "text" : "eui_filter_star",
-        "position" : [0, 420, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_star", "0x000000ff"],
+        "position" : [10, 420, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
-      "scale label" : {
+      "pscale label" : {
         "type" : "label",
-        "text" : "eui_filter_pscale",
-        "position" : [0, 465, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "text" : ["eui_filter_pscale", "0x000000ff"],
+        "position" : [10, 465, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "keyword" : {
         "type" : "textedit",
-        "position" : [120, 15, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "input color" : "0x000000ff",
+        "position" : [-10, 10, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
       },
       "arctype" : {
         "type" : "combobox",
-        "position" : [120, 60, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
-        "items" : "type list",
-        "selection" : 0
+        "position" : [-10, 55, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "type list"
       },
       "subtype" : {
         "type" : "combobox",
-        "position" : [120, 105, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
-        "items" : "no type",
-        "selection" : 0
+        "position" : [-10, 100, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "no type"
       },
       "limit" : {
         "type" : "combobox",
-        "position" : [120, 150, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
-        "items" : "limit list",
-        "selection" : 0
+        "position" : [-10, 145, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "limit list"
       },
       "pool" : {
         "type" : "combobox",
-        "position" : [120, 195, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
-        "items" : "pool list",
-        "selection" : 0
+        "position" : [-10, 190, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "pool list"
       },
       "attribute" : {
         "type" : "combobox",
-        "position" : [120, 240, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
-        "items" : "attribute list",
-        "selection" : 0
+        "position" : [-10, 235, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "attribute list"
       },
       "race" : {
         "type" : "combobox",
-        "position" : [120, 285, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
-        "items" : "race list",
-        "selection" : 0
+        "position" : [-10, 280, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "race list"
       },
       "attack" : {
         "type" : "textedit",
-        "position" : [120, 330, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "input color" : "0x000000ff",
+        "position" : [-10, 325, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
       },
       "defence" : {
         "type" : "textedit",
-        "position" : [120, 375, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "input color" : "0x000000ff",
+        "position" : [-10, 370, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
       },
       "star" : {
         "type" : "textedit",
-        "position" : [120, 420, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "input color" : "0x000000ff",
+        "position" : [-10, 415, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
       },
       "pscale" : {
         "type" : "textedit",
-        "position" : [120, 465, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+        "input color" : "0x000000ff",
+        "position" : [-10, 460, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
       },
       "search" : {
         "type" : "text button",
         "text" : ["eui_filter_search", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -50, 160, 40, 0.3, 1.0, 0.0, 0.0, -0.5, 0.0]
       },
       "clear" : {
         "type" : "text button",
         "text" : ["eui_filter_clear", "0x000000ff"],
-        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+        "position" : [0, -50, 160, 40, 0.7, 1.0, 0.0, 0.0, -0.5, 0.0]
       }
     }
   },
@@ -270,6 +270,10 @@
         "type" : "text button",
         "text" : ["eui_menu_search", "0x000000ff"],
         "position" : [700, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "limit reg" : {
+        "type" : "combobox",
+        "position" : [850, 0, 400, 50, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       }
     }
   },
@@ -340,9 +344,9 @@
     },
     "limit list" : {
       "eui_filter_na" : ["0x000000ff", 0],
-      "pool_limit0" : ["0x000000ff", 1],
-      "pool_limit1" : ["0x000000ff", 2],
-      "pool_limit2" : ["0x000000ff", 3]
+      "limit_0" : ["0x000000ff", 1],
+      "limit_1" : ["0x000000ff", 2],
+      "limit_2" : ["0x000000ff", 3]
     },
     "pool list" : {
       "pool_all" : ["0x000000ff", 7],

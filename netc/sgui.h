@@ -2831,7 +2831,7 @@ namespace sgui
                 if(status == STATUS_DOWN) {
                     //static_cast<UISprite*>(this->ui_components[1])->SetTextureRect(button_style[STATUS_HOVING]);
                     //status = STATUS_HOVING;
-                } else {
+                } else if(SGGUIRoot::GetSingleton().GetSysClock() != reset_time) {
                     static_cast<UISprite*>(this->ui_components[1])->SetTextureRect(button_style[STATUS_DOWN]);
                     status = STATUS_DOWN;
                     auto ptr = SGGUIRoot::GetSingleton().NewChild<SGListBox>();
@@ -2859,7 +2859,7 @@ namespace sgui
                             auto& lb = static_cast<SGListBox&>(sender);
                             auto index = lb.CheckItemIndex(y);
                             if(index >= 0 && !combo_ptr.expired()) {
-                                static_cast<SGComboBox*>(combo_ptr.lock().get())->SetSelection(index);
+                                combo_ptr.lock()->SetSelection(index);
                                 sender.RemoveFromParent();
                             }
                         }
@@ -2876,6 +2876,7 @@ namespace sgui
                 status = hover ? STATUS_HOVING : STATUS_NORMAL;
                 static_cast<UISprite*>(this->ui_components[1])->SetTextureRect(button_style[status]);
             }
+            reset_time = SGGUIRoot::GetSingleton().GetSysClock();
         }
         
         virtual void AddItem(const std::wstring& it, uint32_t cl, int32_t cvalue = 0) {
@@ -2938,6 +2939,7 @@ namespace sgui
         int8_t status = 0;
         int32_t drop_offset = 0;
         int32_t drop_height = 100;
+        int64_t reset_time = 0;
         std::vector<std::wstring> items;
         std::vector<uint32_t> color;
         std::vector<int32_t> custom_value;
