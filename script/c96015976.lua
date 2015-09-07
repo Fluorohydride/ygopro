@@ -22,8 +22,7 @@ end
 function c96015976.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c96015976.filter(chkc) end
 	if chk==0 then return true end
-	if Duel.IsExistingTarget(c96015976.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
-		and Duel.SelectYesNo(tp,aux.Stringid(96015976,1)) then
+	if Duel.IsExistingTarget(c96015976.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) and Duel.SelectYesNo(tp,94) then
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		Duel.SelectTarget(tp,c96015976.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
