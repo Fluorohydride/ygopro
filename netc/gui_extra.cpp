@@ -888,11 +888,14 @@ namespace ygopro
 //                pushvert({mw - 15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale % 10)), 0xff000000);
 //            } else
 //                pushvert({mw - 22, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->rscale), 0xff000000);
-        } else
-            pen_text->GetTextUI()->Clear();
-        v.BuildSprite({0, 0, 0, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
-        misc_image->GetSpriteUI()->AddSprite(v.Ptr());
-        
+        } else {
+            if(pen_text)
+                pen_text->GetTextUI()->Clear();
+        }
+        if(misc_image) {
+            v.BuildSprite({0, 0, 0, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
+            misc_image->GetSpriteUI()->AddSprite(v.Ptr());
+        }
     }
     
     void InfoPanel::Destroy() {

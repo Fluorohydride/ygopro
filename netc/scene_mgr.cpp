@@ -63,15 +63,15 @@ namespace ygopro
             int32_t offset = scene_size.x * 4 * (scene_size.y - 1 - clip.top - h);
             memcpy(&clip_buff[clip.width * 4 * h], &image_buff[offset], clip.width * 4);
         }
-        auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        auto tm = std::localtime(&t);
-        char file[256];
-        sprintf(file, "/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, t);
         std::string path = commonCfg["screenshot_path"].to_string();
-        path.append(file);
-        auto localfile = FileSystem::UTF8ToLocalFilename(path);
-        stbi_write_png(localfile.c_str(), clip.width, clip.height, 4, clip_buff, 0);
-        delete[] clip_buff;
-        delete[] image_buff;
+        std::thread([path, clip, clip_buff, image_buff]() {
+            auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            auto tm = std::localtime(&t);
+            std::string file = To<std::string>("/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, t);
+            auto localfile = FileSystem::UTF8ToLocalFilename(path + file);
+            stbi_write_png(localfile.c_str(), clip.width, clip.height, 4, clip_buff, 0);
+            delete[] clip_buff;
+            delete[] image_buff;
+        }).detach();
     }
 }

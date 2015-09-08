@@ -79,6 +79,7 @@ namespace ygopro
         bool LoadDeckFromString(const std::string& deck_str);
         bool SaveDeckToFile(const std::wstring& file);
         std::string SaveDeckToString();
+        void LoadDeck(DeckData& new_deck);
         
         void UpdateAllCard();
         void RefreshParams();

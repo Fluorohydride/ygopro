@@ -18,11 +18,10 @@ namespace ygopro
     int32_t main_row_count = 0;
     v2f card_size = {0.0f, 0.0f};
     v2f icon_size = {0.0f, 0.0f};
+    rectf deck_area = {0.0f};
     float icon_offset = 0.0f;
-    float minx = 0.0f;
-    float maxx = 0.0f;
-    float miny = 0.0f;
-    float maxy = 0.0f;
+    float x_left = 0.0f;
+    float x_right = 0.0f;
     float main_y_spacing = 0.0f;
     float offsety[3] = {0.0f, 0.0f, 0.0f};
     float dx[3] = {0.0f, 0.0f, 0.0f};
@@ -57,11 +56,11 @@ namespace ygopro
     v2f BuilderCard::GetCurrentPos(CardLocation loc, int32_t seq) {
         switch(loc) {
             case CardLocation::Main:
-                return (v2f){minx + dx[0] * (seq % main_row_count), offsety[0] - main_y_spacing * (seq / main_row_count)};
+                return (v2f){x_left + dx[0] * (seq % main_row_count), offsety[0] - main_y_spacing * (seq / main_row_count)};
             case CardLocation::Extra:
-                return (v2f){minx + dx[1] * seq, offsety[1]};
+                return (v2f){x_left + dx[1] * seq, offsety[1]};
             case CardLocation::Side:
-                return (v2f){minx + dx[2] * seq, offsety[2]};
+                return (v2f){x_left + dx[2] * seq, offsety[2]};
             default:
                 return {0.0f, 0.0f};
         }
@@ -95,16 +94,16 @@ namespace ygopro
         std::array<int16_t, 33 * 6> indices;
         auto msk = ImageMgr::Get().GetTexture("mmask");
         auto nbk = ImageMgr::Get().GetTexture("numback");
-        float yrate = 1.0f - 40.0f / screen_size.y;
-        float lx = 10.0f / screen_size.x * 2.0f - 1.0f;
-        float rx = 0.5625f;
-        float y0 = (0.95f + 1.0f) * yrate - 1.0f;
+        float yrate = deck_area.height / 2.0f;
+        float lx = deck_area.left;
+        float rx = deck_area.left + deck_area.width;
+        float y0 = deck_area.top;
         float y1 = (offsety[0] - main_y_spacing * 3 - card_size.y + offsety[1]) / 2;
         float y2 = (offsety[1] - card_size.y + offsety[2]) / 2;
         float y3 = offsety[2] - card_size.y - 0.03f * yrate;
         float nw = 60.0f / screen_size.x;
         float nh = 60.0f / screen_size.y;
-        float nx = 15.0f / screen_size.x * 2.0f - 1.0f;
+        float nx = lx + 10.0f / screen_size.x * 2.0f;
         float ndy = 64.0f / screen_size.y;
         float th = 120.0f / screen_size.y;
         float my = offsety[0] - main_y_spacing * 3 - card_size.y + th;
@@ -195,27 +194,20 @@ namespace ygopro
     }
     
     void BuildScene::SetSceneSize(v2i sz) {
-        minx = 50.0f / sz.x * 2.0f - 1.0f;
-        maxx = 0.541f;
-        float yrate = 1.0f - 40.0f / sz.y;
+        float h1 = 0.038333f;
+        float h2 = 0.01f;
+        deck_area = {-1.0f + 10.0f / sz.x * 2.0f, 1.0f - 70.0f / sz.y * 2.0f, 1.5f, 2.0f - 80.0f / sz.y * 2.0f};
+        float yrate = deck_area.height / 2;
+        x_left = deck_area.left + 50.0f / sz.x * 2.0f;
+        x_right = deck_area.left + deck_area.width - h1 * yrate * sz.y / sz.x;
         card_size = {0.2f * yrate * sz.y / sz.x, 0.29f * yrate};
         icon_size = {0.08f * yrate * sz.y / sz.x, 0.08f * yrate};
         icon_offset = 0.01f * yrate * sz.y / sz.x;
         main_y_spacing = 0.3f * yrate;
-        offsety[0] = (0.92f + 1.0f) * yrate - 1.0f;
-        offsety[1] = (-0.31f + 1.0f) * yrate - 1.0f;
-        offsety[2] = (-0.64f + 1.0f) * yrate - 1.0f;
-        max_row_count = (maxx - minx - card_size.x) / (card_size.x * 1.1f);
-        if(max_row_count < 10)
-            max_row_count = 10;
-        main_row_count = max_row_count;
-        if((int32_t)current_deck.main_deck.size() > main_row_count * 4)
-            main_row_count = (int32_t)((current_deck.main_deck.size() - 1) / 4 + 1);
-        dx[0] = (maxx - minx - card_size.x) / (main_row_count - 1);
-        int32_t rc1 = std::max((int32_t)current_deck.extra_deck.size(), max_row_count);
-        dx[1] = (rc1 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc1 - 1);
-        int32_t rc2 = std::max((int32_t)current_deck.side_deck.size(), max_row_count);
-        dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
+        offsety[0] = deck_area.top - h1 * yrate;
+        offsety[1] = offsety[0] - card_size.y * 4 - h2 * yrate * 3 - h1 * yrate * 2;
+        offsety[2] = offsety[1] - card_size.y - h1 * yrate * 2;
+        RefreshParams();
         SetViewport({0, 0, sz.x, sz.y});
         bg_renderer->SetScreenSize(sz);
         misc_renderer->SetScreenSize(sz);
@@ -224,8 +216,12 @@ namespace ygopro
     }
     
     recti BuildScene::GetScreenshotClip() {
-        int32_t maxx = (int32_t)(viewport.width * 0.795f) - 1;
-        return {0, 40, maxx, viewport.height - 40};
+        return {
+            (int32_t)((deck_area.left + 1.0f) / 2.0f * viewport.width),
+            (int32_t)((-deck_area.top + 1.0f) / 2.0f * viewport.height),
+            (int32_t)((deck_area.width) / 2.0f * viewport.width),
+            (int32_t)((deck_area.height) / 2.0f * viewport.height)
+        };
     }
     
     void BuildScene::ShowSelectedInfo(uint32_t pos, uint32_t index) {
@@ -284,27 +280,7 @@ namespace ygopro
             return false;
         DeckData tempdeck;
         if(tempdeck.LoadFromFile(FileSystem::WSTRToLocalFilename(file))) {
-            ClearDeck();
-            current_deck = tempdeck;
-            for(auto& dcd : current_deck.main_deck) {
-                auto bc = card_renderer->NewSharedObject<BuilderCard>();
-                bc->LoadCardTexture(dcd->data->code);
-                bc->SetLimit(dcd->limit);
-                dcd->builder_card = bc;
-            }
-            for(auto& dcd : current_deck.extra_deck) {
-                auto bc = card_renderer->NewSharedObject<BuilderCard>();
-                bc->LoadCardTexture(dcd->data->code);
-                bc->SetLimit(dcd->limit);
-                dcd->builder_card = bc;
-            }
-            for(auto& dcd : current_deck.side_deck) {
-                auto bc = card_renderer->NewSharedObject<BuilderCard>();
-                bc->LoadCardTexture(dcd->data->code);
-                bc->SetLimit(dcd->limit);
-                dcd->builder_card = bc;
-            }
-            RefreshAllCard();
+            LoadDeck(tempdeck);
             return true;
         }
         return false;
@@ -315,28 +291,8 @@ namespace ygopro
             return false;
         DeckData tempdeck;
         if(deck_string.find("ydk://") == 0 && tempdeck.LoadFromString(deck_string.substr(6))) {
-            ClearDeck();
-            current_deck = tempdeck;
+            LoadDeck(tempdeck);
             SetDeckDirty();
-            for(auto& dcd : current_deck.main_deck) {
-                auto bc = card_renderer->NewSharedObject<BuilderCard>();
-                bc->LoadCardTexture(dcd->data->code);
-                bc->SetLimit(dcd->limit);
-                dcd->builder_card = bc;
-            }
-            for(auto& dcd : current_deck.extra_deck) {
-                auto bc = card_renderer->NewSharedObject<BuilderCard>();
-                bc->LoadCardTexture(dcd->data->code);
-                bc->SetLimit(dcd->limit);
-                dcd->builder_card = bc;
-            }
-            for(auto& dcd : current_deck.side_deck) {
-                auto bc = card_renderer->NewSharedObject<BuilderCard>();
-                bc->LoadCardTexture(dcd->data->code);
-                bc->SetLimit(dcd->limit);
-                dcd->builder_card = bc;
-            }
-            RefreshAllCard();
             return true;
         }
         return false;
@@ -352,6 +308,30 @@ namespace ygopro
     
     std::string BuildScene::SaveDeckToString() {
         return std::move(current_deck.SaveToString());
+    }
+    
+    void BuildScene::LoadDeck(DeckData& new_deck) {
+        ClearDeck();
+        current_deck = new_deck;
+        for(auto& dcd : current_deck.main_deck) {
+            auto bc = card_renderer->NewSharedObject<BuilderCard>();
+            bc->LoadCardTexture(dcd->data->code);
+            bc->SetLimit(dcd->limit);
+            dcd->builder_card = bc;
+        }
+        for(auto& dcd : current_deck.extra_deck) {
+            auto bc = card_renderer->NewSharedObject<BuilderCard>();
+            bc->LoadCardTexture(dcd->data->code);
+            bc->SetLimit(dcd->limit);
+            dcd->builder_card = bc;
+        }
+        for(auto& dcd : current_deck.side_deck) {
+            auto bc = card_renderer->NewSharedObject<BuilderCard>();
+            bc->LoadCardTexture(dcd->data->code);
+            bc->SetLimit(dcd->limit);
+            dcd->builder_card = bc;
+        }
+        RefreshAllCard();
     }
     
     void BuildScene::UpdateAllCard() {
@@ -372,6 +352,7 @@ namespace ygopro
                     }, std::make_shared<TGenMove<int64_t>>(1000, 0.01));
                     PushAction(action);
                 }
+                ptr->SetLimit(lst[i]->limit);
             }
         };
         cb(current_deck.main_deck, CardLocation::Main);
@@ -381,14 +362,21 @@ namespace ygopro
     }
     
     void BuildScene::RefreshParams() {
+        max_row_count = (x_right - x_left - card_size.x) / (card_size.x * 1.1f);
         main_row_count = max_row_count;
+        if(main_row_count < 10)
+            main_row_count = 10;
         if((int32_t)current_deck.main_deck.size() > main_row_count * 4)
             main_row_count = (int32_t)((current_deck.main_deck.size() - 1) / 4 + 1);
-        dx[0] = (maxx - minx - card_size.x) / (main_row_count - 1);
+        dx[0] = (x_right - x_left - card_size.x) / (main_row_count - 1);
         int32_t rc1 = std::max((int32_t)current_deck.extra_deck.size(), max_row_count);
-        dx[1] = (rc1 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc1 - 1);
+        dx[1] = (rc1 == 1) ? 0.0f : (x_right - x_left - card_size.x) / (rc1 - 1);
+        if(dx[1] > card_size.x * 1.1f)
+            dx[1] = card_size.x * 1.1f;
         int32_t rc2 = std::max((int32_t)current_deck.side_deck.size(), max_row_count);
-        dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
+        dx[2] = (rc2 == 1) ? 0.0f : (x_right - x_left - card_size.x) / (rc2 - 1);
+        if(dx[2] > card_size.x * 1.1f)
+            dx[2] = card_size.x * 1.1f;
         misc_renderer->RequestRedraw();
     }
     
@@ -398,16 +386,19 @@ namespace ygopro
             auto ptr = current_deck.main_deck[i]->builder_card;
             ptr->SetPos(ptr->GetCurrentPos(CardLocation::Main, (int32_t)i));
             ptr->SetSize(card_size);
+            ptr->SetLimit(current_deck.main_deck[i]->limit);
         }
         for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
             auto ptr = current_deck.extra_deck[i]->builder_card;
             ptr->SetPos(ptr->GetCurrentPos(CardLocation::Extra, (int32_t)i));
             ptr->SetSize(card_size);
+            ptr->SetLimit(current_deck.extra_deck[i]->limit);
         }
         for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
             auto ptr = current_deck.side_deck[i]->builder_card;
             ptr->SetPos(ptr->GetCurrentPos(CardLocation::Side, (int32_t)i));
             ptr->SetSize(card_size);
+            ptr->SetLimit(current_deck.side_deck[i]->limit);
         }
         card_renderer->RequestRedraw();
     }
@@ -625,22 +616,27 @@ namespace ygopro
         }
         float x = (float)posx / viewport.width * 2.0f - 1.0f;
         float y = 1.0f - (float)posy / viewport.height * 2.0f;
-        if(x >= minx && x <= maxx) {
+        if(x >= x_left && x <= x_right) {
             if(y <= offsety[0] && y >= offsety[0] - main_y_spacing * 4) {
                 uint32_t row = (uint32_t)((offsety[0] - y) / main_y_spacing);
                 if(row > 3)
                     row = 3;
                 int32_t index = 0;
-                if(x > maxx - card_size.x)
+                if(x > x_right - card_size.x)
                     index = main_row_count - 1;
                 else
-                    index = (int32_t)((x - minx) / dx[0]);
+                    index = (int32_t)((x - x_left) / dx[0]);
                 int32_t cindex = index;
                 index += row * main_row_count;
-                if(index >= (int32_t)current_deck.main_deck.size())
+                if(index >= (int32_t)current_deck.main_deck.size()) {
+                    if(!current_deck.main_deck.empty()) {
+                        auto bc = current_deck.main_deck.back()->builder_card.get();
+                        if(x >= bc->pos.x && x <= bc->pos.x + card_size.x && y <= bc->pos.y && y >= bc->pos.y - card_size.y)
+                            return std::make_pair(1, (int32_t)current_deck.main_deck.size() - 1);
+                    }
                     return std::make_pair(0, 0);
-                else {
-                    if(y < offsety[0] - main_y_spacing * row - card_size.y || x > minx + cindex * dx[0] + card_size.x)
+                } else {
+                    if(y < offsety[0] - main_y_spacing * row - card_size.y || x > x_left + cindex * dx[0] + card_size.x)
                         return std::make_pair(0, 0);
                     else
                         return std::make_pair(1, index);
@@ -648,14 +644,19 @@ namespace ygopro
             } else if(y <= offsety[1] && y >= offsety[1] - card_size.y) {
                 int32_t rc = std::max((int32_t)current_deck.extra_deck.size(), max_row_count);
                 int32_t index = 0;
-                if(x > maxx - card_size.x)
+                if(x > x_right - card_size.x)
                     index = rc - 1;
                 else
-                    index = (int32_t)((x - minx) / dx[1]);
-                if(index >= (int32_t)current_deck.extra_deck.size())
+                    index = (int32_t)((x - x_left) / dx[1]);
+                if(index >= (int32_t)current_deck.extra_deck.size()) {
+                    if(!current_deck.extra_deck.empty()) {
+                        auto bc = current_deck.extra_deck.back()->builder_card.get();
+                        if(x >= bc->pos.x && x <= bc->pos.x + card_size.x)
+                            return std::make_pair(2, (int32_t)current_deck.extra_deck.size() - 1);
+                    }
                     return std::make_pair(0, 0);
-                else {
-                    if(x > minx + index * dx[1] + card_size.x)
+                } else {
+                    if(x > x_left + index * dx[1] + card_size.x)
                         return std::make_pair(0, 0);
                     else
                         return std::make_pair(2, index);
@@ -663,14 +664,19 @@ namespace ygopro
             } else if(y <= offsety[2] && y >= offsety[2] - card_size.y) {
                 int32_t rc = std::max((int32_t)current_deck.side_deck.size(), max_row_count);
                 int32_t index = 0;
-                if(x > maxx - card_size.x)
+                if(x > x_right - card_size.x)
                     index = rc - 1;
                 else
-                    index = (int32_t)((x - minx) / dx[2]);
-                if(index >= (int32_t)current_deck.side_deck.size())
+                    index = (int32_t)((x - x_left) / dx[2]);
+                if(index >= (int32_t)current_deck.side_deck.size()) {
+                    if(!current_deck.side_deck.empty()) {
+                        auto bc = current_deck.side_deck.back()->builder_card.get();
+                        if(x >= bc->pos.x && x <= bc->pos.x + card_size.x)
+                            return std::make_pair(3, (int32_t)current_deck.side_deck.size() - 1);
+                    }
                     return std::make_pair(0, 0);
-                else {
-                    if(x > minx + index * dx[2] + card_size.x)
+                } else {
+                    if(x > x_left + index * dx[2] + card_size.x)
                         return std::make_pair(0, 0);
                     else
                         return std::make_pair(3, index);
