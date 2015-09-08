@@ -35,7 +35,7 @@ function c37209439.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local b1=c37209439.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local b2=c37209439.damcon(e,tp,eg,ep,ev,re,r,rp) and Duel.GetCurrentPhase()==PHASE_STANDBY
-	if (b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(37209439,2)) then
+	if (b1 or b2) and Duel.SelectYesNo(tp,94) then
 		local c=e:GetHandler()
 		local op=0
 		if b1 and b2 then

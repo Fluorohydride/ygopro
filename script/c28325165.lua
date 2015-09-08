@@ -62,5 +62,5 @@ function c28325165.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c28325165.efilter(e,te)
-	return te:GetOwnerPlayer()~=e:GetHandlerPlayer()
+	return te:GetOwnerPlayer()~=e:GetOwnerPlayer()
 end

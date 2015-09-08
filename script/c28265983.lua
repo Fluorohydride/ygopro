@@ -40,7 +40,7 @@ function c28265983.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local res,teg,tep,tev,tre,tr,trp=Duel.CheckEvent(EVENT_RECOVER,true)
 	local b1=res and c28265983.descon1(e,tp,teg,tep,tev,tre,tr,trp) and c28265983.destg1(e,tp,teg,tep,tev,tre,tr,trp,0)
 	local b2=c28265983.descon2(e,tp,eg,ep,ev,re,r,rp) and c28265983.descost2(e,tp,eg,ep,ev,re,r,rp,0) and c28265983.destg2(e,tp,eg,ep,ev,re,r,rp,0)
-	if (b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(28265983,0)) then
+	if (b1 or b2) and Duel.SelectYesNo(tp,94) then
 		local opt=0
 		if b1 and b2 then
 			opt=Duel.SelectOption(tp,aux.Stringid(28265983,1),aux.Stringid(28265983,2))
