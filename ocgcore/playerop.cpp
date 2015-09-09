@@ -139,7 +139,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(1);
 		else
 			pduel->write_buffer8(0);
-		if(infos.shuffle_count < 1 && player[playerid].list_hand.size() > 1)
+		if(infos.shuffle_count < 2 && player[playerid].list_hand.size() > 1)
 			pduel->write_buffer8(1);
 		else
 			pduel->write_buffer8(0);
