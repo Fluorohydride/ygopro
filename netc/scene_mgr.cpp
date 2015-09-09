@@ -60,7 +60,7 @@ namespace ygopro
         uint8_t* clip_buff = new uint8_t[clip.width * clip.height * 4];
         glReadPixels(0, 0, scene_size.x, scene_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
         for(int32_t h = 0; h < clip.height; ++h) {
-            int32_t offset = scene_size.x * 4 * (scene_size.y - 1 - clip.top - h);
+            int32_t offset = scene_size.x * 4 * (scene_size.y - 1 - clip.top - h) + clip.left * 4;
             memcpy(&clip_buff[clip.width * 4 * h], &image_buff[offset], clip.width * 4);
         }
         std::string path = commonCfg["screenshot_path"].to_string();

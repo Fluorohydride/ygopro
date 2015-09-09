@@ -779,18 +779,12 @@ namespace ygopro
         auto star = ImageMgr::Get().GetTexture("mstar");
         this->code = code;
         auto data = DataMgr::Get()[code];
-        int32_t card_image_width = 0;
         if(card_image) {
             auto ctex = ImageMgr::Get().LoadBigCardTexture(code);
             if(ctex) {
                 card_image->GetSpriteUI()->SetTexture(ctex);
                 card_image->GetSpriteUI()->SetTextureRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
-                card_image_width = ctex->GetImgWidth() + info_margin;
             }
-        }
-        if(scroll_area) {
-            scroll_area->SetPositionSize({-info_margin, -info_margin}, {-card_image_width - info_margin * 2, -info_margin * 2},
-                                         {0.0f, 0.0f}, {1.0f, 1.0f}, {-1.0f, -1.0f});
         }
         int32_t info_text_height = 0;
         if(info_text) {

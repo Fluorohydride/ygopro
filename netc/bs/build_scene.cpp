@@ -94,13 +94,12 @@ namespace ygopro
         std::array<int16_t, 33 * 6> indices;
         auto msk = ImageMgr::Get().GetTexture("mmask");
         auto nbk = ImageMgr::Get().GetTexture("numback");
-        float yrate = deck_area.height / 2.0f;
         float lx = deck_area.left;
         float rx = deck_area.left + deck_area.width;
         float y0 = deck_area.top;
         float y1 = (offsety[0] - main_y_spacing * 3 - card_size.y + offsety[1]) / 2;
         float y2 = (offsety[1] - card_size.y + offsety[2]) / 2;
-        float y3 = offsety[2] - card_size.y - 0.03f * yrate;
+        float y3 = deck_area.top - deck_area.height;
         float nw = 60.0f / screen_size.x;
         float nh = 60.0f / screen_size.y;
         float nx = lx + 10.0f / screen_size.x * 2.0f;
@@ -186,10 +185,17 @@ namespace ygopro
     }
     
     bool BuildScene::Draw() {
+        static bool render_twice = false;
         ImageMgr::Get().LoadCardTextureFromList(3);
         auto need_render = PrepareRender();
-        if(need_render)
+        if(need_render) {
             Render();
+            render_twice = false;
+        } else if(!render_twice) {
+            Render();
+            need_render = true;
+            render_twice = true;
+        }
         return need_render;
     }
     

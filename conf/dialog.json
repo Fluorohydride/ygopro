@@ -63,7 +63,7 @@
     }
   },
   "popup menu width" : 200,
-  "popup menu height" : 50,
+  "popup menu height" : 40,
   "popup menu margin" : [5, 5, 8, 5],
   "file dialog" : {
     "type" : "window",
@@ -221,10 +221,12 @@
     "position" : [0, 0, 600, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "card image" : {
-        "type" : "sprite"
+        "type" : "sprite",
+        "position" : [5, 5, 269, 390, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "scroll area" : {
         "type" : "scrollarea",
+        "position" : [280, 5, 310, 390, 0, 0, 0.0, 0.0, 0.0, 0.0],
         "children" : {
           "misc image" : {
             "type" : "spritelist",
