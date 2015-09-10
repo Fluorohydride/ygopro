@@ -311,7 +311,9 @@ namespace ygopro
                     } else if(name == "scroll size") {
                         area->SetScrollSize(sgui::SGJsonUtil::ConvertV2i(sub_node, 0));
                     } else if(name == "children") {
-                        LoadChild(area, name, sub_node);
+                        sub_node.for_each([area](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                            LoadChild(area, c_name, c_node);
+                        });
                     }
                 });
                 return area;
@@ -763,7 +765,7 @@ namespace ygopro
                 return;
             card_image = wnd->FindWidgetAs<sgui::SGImage>("card image");
             scroll_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
-            misc_image = wnd->FindWidgetAs<sgui::SGImageList>("misc");
+            misc_image = wnd->FindWidgetAs<sgui::SGImageList>("misc image");
             info_text = wnd->FindWidgetAs<sgui::SGLabel>("info text");
             pen_text = wnd->FindWidgetAs<sgui::SGLabel>("pendulum text");
             desc_text = wnd->FindWidgetAs<sgui::SGLabel>("card text");
@@ -842,10 +844,16 @@ namespace ygopro
         std::wstring pdelimiter = To<std::wstring>(stringCfg["pendulum_delimiter"].to_string());
         auto pd = data->texts.find(pdelimiter);
         if(desc_text) {
-            desc_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+            desc_text->GetTextUI()->SetMaxWidth(scroll_area->GetViewSize().x);
+            if(pd != std::wstring::npos)
+                desc_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+            else
+                desc_text->GetTextUI()->SetText(data->texts, 0xff000000);
+            desc_text->SetPosition({0, info_text_height + 10});
             desc_height = desc_text->GetAbsoluteSize().y;
         }
         if(misc_image) {
+            misc_image->GetSpriteUI()->Clear();
             misc_image->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawMiscTexture());
             v.BuildSprite({0, 0, 0, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
             misc_image->GetSpriteUI()->AddSprite(v.Ptr());

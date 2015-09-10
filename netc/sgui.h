@@ -356,8 +356,12 @@ namespace sgui
             capacity = sz;
             vertices.resize(capacity * 4);
             indices.resize(capacity * 6);
-            points.resize(capacity * 4);
             SetRedraw(true);
+        }
+        
+        void Clear() {
+            points.clear();
+            SetUpdate();
         }
         
         void AddSprite(UIVertex* v) {
@@ -391,7 +395,6 @@ namespace sgui
                 }
                 vertices.resize(capacity * 4);
                 indices.resize(capacity * 6);
-                points.resize(capacity * 4);
                 SetRedraw(true);
             } else
                 SetUpdate();
@@ -578,7 +581,7 @@ namespace sgui
             for(auto ch : txt) {
                 text_pos.push_back(v2i{evaluate_info.x, area_size.absolute.y - evaluate_info.y});
                 if(ch < L' ') {
-                    if((ch == L'\n') && (max_width != 0xffffffff)) {
+                    if(ch == L'\n') {
                         if(evaluate_info.x > area_size.absolute.x)
                             area_size.absolute.x = evaluate_info.x;
                         if(evaluate_info.x == 0)
@@ -2220,8 +2223,9 @@ namespace sgui
         
         virtual bool OnDragBegin(int32_t x, int32_t y) {
             drag_status = 0;
-            if(x >= area_pos.absolute.x + area_size.absolute.x - border.width &&
-               y >= area_pos.absolute.y + area_size.absolute.y - border.height)
+            if(allow_resize
+               && x >= area_pos.absolute.x + area_size.absolute.x - border.width
+               && y >= area_pos.absolute.y + area_size.absolute.y - border.height)
                 drag_status = 1;
             return true;
         }
@@ -2280,9 +2284,11 @@ namespace sgui
         UIText* GetCaption() { return static_cast<UIText*>(this->ui_components[1]); }
         inline void SetCloseButtonVisible(bool v) { return this->children[0]->SetVisible(v); }
         inline void SetMinSize(v2i msz) { min_size = msz; }
+        inline void SetResizable(bool r) { allow_resize = r; }
         
     protected:
         int8_t drag_status = 0;
+        bool allow_resize = true;
         v2i min_size = {0, 0};
         recti border = {0, 0, 0, 0};
     };
@@ -2414,6 +2420,9 @@ namespace sgui
                 static_cast<SGScrollBar<>*>(children[1].get())->SetValue((float)view_offset.y / (scroll_size.y - view_size.y), false);
             }
         }
+        
+        inline v2i GetViewSize() { return view_size; }
+        inline v2i GetViewOffset() { return view_offset; }
         
     protected:
         v2i scroll_size = {0, 0};
@@ -2698,8 +2707,6 @@ namespace sgui
             auto sel_texf = SGGUIRoot::GetSingleton().GetGuiTexture()->ConvTextureInfo(sel_tex);
             for(int32_t i = 0; i < back_surface->GetCapacity(); ++i) {
                 auto item_color = ((i + item_begin) == selection) ? color[2] : ((i + item_begin) % 2) ? color[0] : color[1];
-                //UpdateBackSprite(i, item_color, &v[0]);
-                //back_surface->SetSprite(&v[0], i);
                 v.BuildSprite({0, item_height * i, 0, item_height}, {0.0f, 0.0f, 1.0f, 0.0f}, sel_texf, item_color);
                 back_surface->SetSprite(v.Ptr(), i);
             }
@@ -2707,25 +2714,6 @@ namespace sgui
             auto item_count = (area_size.absolute.y - bounds.top - bounds.height) / item_height + 1;
             back_surface->SetPositionSizeR({bounds.left, back_offset}, {-bounds.left - bounds.width, item_count * item_height});
         }
-        
-//        void UpdateBackSprite(int32_t index, int32_t bcolor, UIVertex* v) {
-//            v[0].offset = {0, item_height * index};
-//            v[0].prop = {0.0f, 0.0f};
-//            v[0].texcoord = {sel_tex.left, sel_tex.top},
-//            v[0].color = bcolor;
-//            v[1].offset = {0, item_height * index};
-//            v[1].prop = {1.0f, 0.0f};
-//            v[1].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top},
-//            v[1].color = bcolor;
-//            v[2].offset = {0, item_height * index + item_height};
-//            v[2].prop = {0.0f, 0.0f};
-//            v[2].texcoord = {sel_tex.left, sel_tex.top + sel_tex.width},
-//            v[2].color = bcolor;
-//            v[3].offset = {0, item_height * index + item_height};
-//            v[3].prop = {1.0f, 0.0f};
-//            v[3].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top + sel_tex.width};
-//            v[3].color = bcolor;
-//        }
         
         virtual void SetSelection(int32_t sel, bool trigger = true) {
             if(selection == sel)
@@ -2829,8 +2817,7 @@ namespace sgui
         virtual bool OnMouseDown(int32_t button, int32_t mods, int32_t x, int32_t y) {
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
                 if(status == STATUS_DOWN) {
-                    //static_cast<UISprite*>(this->ui_components[1])->SetTextureRect(button_style[STATUS_HOVING]);
-                    //status = STATUS_HOVING;
+                    
                 } else if(SGGUIRoot::GetSingleton().GetSysClock() != reset_time) {
                     static_cast<UISprite*>(this->ui_components[1])->SetTextureRect(button_style[STATUS_DOWN]);
                     status = STATUS_DOWN;

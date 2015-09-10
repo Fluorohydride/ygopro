@@ -218,23 +218,24 @@
   "info dialog" : {
     "type" : "panel",
     "is entity" : true,
-    "position" : [0, 0, 600, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "position" : [0, 0, 1000, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "card image" : {
         "type" : "sprite",
-        "position" : [5, 5, 269, 390, 0, 0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [5, 5, 338, 490, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "scroll area" : {
         "type" : "scrollarea",
-        "position" : [280, 5, 310, 390, 0, 0, 0.0, 0.0, 0.0, 0.0],
+        "position" : [350, 5, 640, 490, 0, 0, 0.0, 0.0, 0.0, 0.0],
         "children" : {
           "misc image" : {
-            "type" : "spritelist",
-            "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+            "type" : "spritelist"
           },
-          "card name" : {
-            "type" : "label",
-            "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+          "info text" : {
+            "type" : "label"
+          },
+          "card text" : {
+            "type" : "label"
           }
         }
       }
