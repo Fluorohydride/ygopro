@@ -15,7 +15,7 @@ function c96223501.initial_effect(c)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(1,0)
 	e2:SetTarget(c96223501.splimit)
-	e2:SetCondition(c96223501.splimcon)
+	e2:SetCondition(aux.nfbdncon)
 	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
@@ -38,9 +38,6 @@ end
 function c96223501.splimit(e,c,sump,sumtype,sumpos,targetp)
 	if c:IsSetCard(0x9c) or c:IsSetCard(0xc4) then return false end
 	return bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
-end
-function c96223501.splimcon(e)
-	return not e:GetHandler():IsForbidden()
 end
 function c96223501.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_PENDULUM
