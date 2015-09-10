@@ -1180,7 +1180,7 @@ function Auxiliary.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
---condition of handler not forbidden
+--condition of "cannot be negated"
 function Auxiliary.nfbdncon(e)
 	return not e:GetHandler():IsForbidden()
 end
