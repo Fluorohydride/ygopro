@@ -294,8 +294,8 @@ namespace base {
         const FontGlyph& GetGlyph(uint32_t ch);
         inline Texture& GetTexture() { return char_tex; }
         inline int32_t GetFontSize() { return font_size; }
-        inline int32_t GetLineSpacing(uint32_t ch) { return (ch < 0xe000) ? font_size : emoji_spacing; }
-        inline int32_t IsEmoji(uint32_t ch) { return ch >= 0xe000; }
+        inline int32_t GetLineSpacing(uint32_t ch) { return IsEmoji(ch) ? emoji_spacing : font_size; }
+        inline int32_t IsEmoji(uint32_t ch) { return ch >= 0xe000 && ch < 0xefff; }
         inline vector2<int32_t> GetTextOffset() { return text_offset; }
         
     protected:

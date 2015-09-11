@@ -350,12 +350,14 @@ namespace sgui
                 indices[i] = 0;
         }
         
-        void SetCapacity(int32_t sz) {
+        void SetCapacity(int32_t sz, bool reserve_points = false) {
             if(sz == capacity)
                 return;
             capacity = sz;
             vertices.resize(capacity * 4);
             indices.resize(capacity * 6);
+            if(reserve_points)
+                points.resize(capacity * 4);
             SetRedraw(true);
         }
         
@@ -523,15 +525,15 @@ namespace sgui
             static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
             advance.x = 0;
             advance.y = 0;
-            line_spacing = 0;
+            int32_t line_height = 0;
             int32_t actual_size = 0;
             for(size_t i = 0; i < texts.length(); ++i) {
                 auto ch = texts[i];
                 if(ch < L' ') {
                     if(ch == L'\n') {
                         advance.x = 0;
-                        advance.y += line_spacing;
-                        line_spacing = 0;
+                        advance.y += line_height + line_spacing;
+                        line_height = 0;
                     }
                     continue;
                 }
@@ -539,8 +541,8 @@ namespace sgui
                 auto& gl = text_font->GetGlyph(ch);
                 if((uint32_t)(advance.x + gl.advance) > max_width) {
                     advance.x = 0;
-                    advance.y += line_spacing;
-                    line_spacing = 0;
+                    advance.y += line_height + line_spacing;
+                    line_height = 0;
                 }
                 auto final_offset = area_pos.absolute + advance + offset;
                 auto v = &vertices[actual_size * 4];
@@ -559,7 +561,7 @@ namespace sgui
                     for(int16_t j = 0; j < 4; ++j)
                         v[j].color = color;
                 advance.x += gl.advance;
-                line_spacing = std::max(text_font->GetLineSpacing(ch), line_spacing);
+                line_height = std::max(text_font->GetLineSpacing(ch), line_height);
                 actual_size++;
             }
             for(int32_t i = vert_size; i < vert_cap; ++i) {
@@ -584,6 +586,7 @@ namespace sgui
                     if(ch == L'\n') {
                         if(evaluate_info.x > area_size.absolute.x)
                             area_size.absolute.x = evaluate_info.x;
+                        area_size.absolute.y += line_spacing;
                         if(evaluate_info.x == 0)
                             area_size.absolute.y += text_font->GetFontSize();
                         evaluate_info = v2i{0, 0};
@@ -594,6 +597,7 @@ namespace sgui
                 if((max_width != 0xffffffff) && ((uint32_t)(evaluate_info.x + gl.advance) > max_width)) {
                     if(evaluate_info.x > area_size.absolute.x)
                         area_size.absolute.x = evaluate_info.x;
+                    area_size.absolute.y += line_spacing;
                     evaluate_info = v2i{0, 0};
                 }
                 evaluate_info.x += gl.advance;
@@ -614,13 +618,14 @@ namespace sgui
         
         inline void SetFont(base::Font* ft) { if(!ft || ft == text_font) return; text_font = ft; EvaluateSize(); SetRedraw(true); }
         inline void SetMaxWidth(int32_t mw) { if(max_width == mw) return; max_width = mw; EvaluateSize(); SetUpdate(); }
+        inline void SetLinespacing(int32_t ls) { if(line_spacing == ls) return; line_spacing = ls; EvaluateSize(); SetUpdate(); }
         inline void SetText(const std::wstring& t, uint32_t cl) { Clear(); AppendText(t, cl); }
         inline void Clear() { texts.clear(); colors.clear(); vert_size = 0; EvaluateSize(); SetUpdate(); }
         inline const std::wstring& GetText() { return texts; }
         inline void SetSizeChangeCallback(std::function<void(v2i)> cb) { size_cb = cb;}
         inline int32_t GetFontSize() { return text_font ? text_font->GetFontSize() : 0; }
         inline v2i GetTextPosition(int32_t index) { return (index >= 0 && index < text_pos.size()) ? text_pos[index] : last_text_pos; }
-        
+
         void SetCapacity(int32_t cap) {
             if(vert_cap >= cap)
                 return;
@@ -1561,6 +1566,8 @@ namespace sgui
         
         virtual void InitUIComponents() {
             SGCommonUISpriteList::InitUIComponents();
+            auto& image_node = SGGUIRoot::GetSingleton().GetConfig()["imagelist"];
+            InitUIComponentsExtra(image_node);
         }
     };
     
@@ -2301,6 +2308,7 @@ namespace sgui
         
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto pre_act_pos = area_pos.absolute;
+            auto pre_act_size = area_size.absolute;
             area_pos.absolute = view_pos;
             area_size.absolute = view_size;
             auto ret = SGWidget::OnPositionSizeChange(re_pos, re_size);
@@ -2314,9 +2322,11 @@ namespace sgui
             view_size = area_size.absolute;
             area_size.absolute = scroll_size;
             area_pos.absolute -= view_offset;
-            if(pre_act_pos != area_pos.absolute) {
+            bool act_pos_change = pre_act_pos != area_pos.absolute;
+            bool act_size_change = pre_act_size != area_size.absolute;
+            if(act_pos_change || act_size_change) {
                 for(size_t i = 2; i < children.size(); ++i)
-                    children[i]->OnPositionSizeChange(true, false);
+                    children[i]->OnPositionSizeChange(act_pos_change || act_size_change, act_size_change);
             }
             if(view_size_change)
                 CheckViewSize();
@@ -2485,7 +2495,7 @@ namespace sgui
                 auto item_count = (area_size.absolute.y - bounds.top - bounds.height) / item_height + 2;
                 if(item_count != back_surface->GetCapacity()) {
                     if(item_count > back_surface->GetCapacity()) {
-                        back_surface->SetCapacity(item_count);
+                        back_surface->SetCapacity(item_count, true);
                         UpdateBackTex();
                         SetRedraw();
                     }

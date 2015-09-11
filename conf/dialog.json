@@ -218,7 +218,7 @@
   "info dialog" : {
     "type" : "panel",
     "is entity" : true,
-    "position" : [0, 0, 1000, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "position" : [0, 0, 1200, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "card image" : {
         "type" : "sprite",
@@ -226,12 +226,15 @@
       },
       "scroll area" : {
         "type" : "scrollarea",
-        "position" : [350, 5, 640, 490, 0, 0, 0.0, 0.0, 0.0, 0.0],
+        "position" : [350, 10, -360, 480, 0, 0, 1.0, 0.0, 0.0, 0.0],
         "children" : {
           "misc image" : {
             "type" : "spritelist"
           },
           "info text" : {
+            "type" : "label"
+          },
+          "pendulum text" : {
             "type" : "label"
           },
           "card text" : {
@@ -241,9 +244,13 @@
       }
     },
     "info margin" : 5,
-    "min pendilum text height" : 55,
-    "pendilum scale blank" : 20,
-    "pendilum scale size" : [14, 20]
+    "star offset" : [10, 30, 28, 28],
+    "slider width" : 30,
+    "min pendilum text height" : 90,
+    "scale blank" : 60,
+    "scale icon" : [46, 35],
+    "scale size" : [21, 30],
+    "info backcolor" : "0xffffffc0"
   },
   "build panel" : {
     "type" : "panel",

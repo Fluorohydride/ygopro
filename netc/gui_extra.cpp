@@ -773,14 +773,25 @@ namespace ygopro
         }
         auto& dlg_node = dialogCfg["info dialog"];
         int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();
+        recti star_offset = sgui::SGJsonUtil::ConvertRect(dlg_node["star offset"]);
+        int32_t slider_width = (int32_t)dlg_node["slider width"].to_integer();
         int32_t min_pen_height = (int32_t)dlg_node["min pendilum text height"].to_integer();
-        int32_t scale_width = (int32_t)dlg_node["pendilum scale blank"].to_integer();
-        v2i scale_size = sgui::SGJsonUtil::ConvertV2i(dlg_node["pendilum scale size"], 0);
+        int32_t scale_width = (int32_t)dlg_node["scale blank"].to_integer();
+        v2i scale_icon = sgui::SGJsonUtil::ConvertV2i(dlg_node["scale icon"], 0);
+        v2i scale_size = sgui::SGJsonUtil::ConvertV2i(dlg_node["scale size"], 0);
+        uint32_t info_backcolor = sgui::SGJsonUtil::ConvertRGBA(dlg_node["info backcolor"]);
         
         auto hmask = ImageMgr::Get().GetTexture("mmask");
         auto star = ImageMgr::Get().GetTexture("mstar");
         this->code = code;
         auto data = DataMgr::Get()[code];
+        uint64_t setcode = data->setcode;
+        if(data->alias) {
+            auto aliasdata = DataMgr::Get()[data->alias];
+            if(aliasdata)
+                setcode = aliasdata->setcode;
+        }
+        
         if(card_image) {
             auto ctex = ImageMgr::Get().LoadBigCardTexture(code);
             if(ctex) {
@@ -788,116 +799,141 @@ namespace ygopro
                 card_image->GetSpriteUI()->SetTextureRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
             }
         }
+        if(misc_image) {
+            misc_image->GetSpriteUI()->Clear();
+            misc_image->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+        }
+        sgui::UIVertexArray<4> v;
         int32_t info_text_height = 0;
         if(info_text) {
             info_text->GetTextUI()->Clear();
+            info_text->SetPosition({info_margin, info_margin});
+            info_text->GetTextUI()->SetLinespacing(2);
             //card name
             info_text->GetTextUI()->AppendText(data->name, 0xff000000);
-            info_text->GetTextUI()->AppendText(L"\n", 0xff000000);
+            
+            uint32_t ccode = (data->alias == 0
+                              || (data->alias > data->code && data->alias - data->code > 10)
+                              || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
+            info_text->GetTextUI()->AppendText(L" [", 0xff000000);
+            info_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
+            
+//            if(setcode) {
+//                info_text->GetTextUI()->AppendText(To<std::wstring>(stringCfg["eui_msg_setcode"].to_string()), 0xff000000);
+//                for(int32_t i = 0; i < 4; ++i) {
+//                    uint16_t sd = (setcode >> (i * 16)) & 0xffff;
+//                    if(sd) {
+//                        info_text->GetTextUI()->AppendText(L" @", 0xff000000);
+//                        info_text->GetTextUI()->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
+//                        info_text->GetTextUI()->AppendText(L" ", 0xff000000);
+//                    }
+//                }
+//            }
+            
+            info_text->GetTextUI()->AppendText(L"]\n", 0xff000000);
             // types
             info_text->GetTextUI()->AppendText(DataMgr::Get().GetTypeString(data->type), 0xff000000);
             if(data->type & 0x1) {
-                info_text->GetTextUI()->AppendText(L" ", 0xff000000);
+                info_text->GetTextUI()->AppendText(L"\n", 0xff000000);
                 info_text->GetTextUI()->AppendText(DataMgr::Get().GetAttributeString(data->attribute), 0xff000000);
                 info_text->GetTextUI()->AppendText(L"/", 0xff000000);
                 info_text->GetTextUI()->AppendText(DataMgr::Get().GetRaceString(data->race), 0xff000000);
-                info_text->GetTextUI()->AppendText(L" ", 0xff000000);
+                info_text->GetTextUI()->AppendText(L"    ", 0xff000000);
                 std::string adstr;
                 if(data->attack >= 0)
                     adstr.append(To<std::string>("ATK/% 4ld", data->attack));
                 else
                     adstr.append("ATK/  ? ");
                 if(data->defence >= 0)
-                    adstr.append(To<std::string>(" DEF/% 4ld", data->defence));
+                    adstr.append(To<std::string>("  DEF/% 4ld", data->defence));
                 else
                     adstr.append(" DEF/  ? ");
                 info_text->GetTextUI()->AppendText(To<std::wstring>(adstr), 0xff000000);
             }
-            uint64_t setcode = data->setcode;
-            if(data->alias) {
-                auto aliasdata = DataMgr::Get()[data->alias];
-                if(aliasdata)
-                    setcode = aliasdata->setcode;
-            }
-            uint32_t ccode = (data->alias == 0
-                              || (data->alias > data->code && data->alias - data->code > 10)
-                              || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
-            info_text->GetTextUI()->AppendText(L"\n=", 0xff000000);
-            info_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
-            if(setcode) {
-                info_text->GetTextUI()->AppendText(To<std::wstring>(stringCfg["eui_msg_setcode"].to_string()), 0xff000000);
-                for(int32_t i = 0; i < 4; ++i) {
-                    uint16_t sd = (setcode >> (i * 16)) & 0xffff;
-                    if(sd) {
-                        info_text->GetTextUI()->AppendText(L" @", 0xff000000);
-                        info_text->GetTextUI()->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
-                        info_text->GetTextUI()->AppendText(L" ", 0xff000000);
+            info_text_height = info_text->GetAbsoluteSize().y;
+            if(misc_image) {
+                v.BuildSprite({0, 0, -slider_width, info_text_height + info_margin * 2}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, info_backcolor);
+                misc_image->GetSpriteUI()->AddSprite(v.Ptr());
+                if(data->type & 0x1) {
+                    for(uint32_t i = 0; i < data->star; ++i) {
+                        int32_t starx = -slider_width - star_offset.left - star_offset.width * (i + 1);
+                        v.BuildSprite({starx, star_offset.top, star_offset.width, star_offset.height}, {1.0f, 0.0f, 0.0f, 0.0f}, star, 0xffffffff);
+                        misc_image->GetSpriteUI()->AddSprite(v.Ptr());
                     }
                 }
             }
-            info_text_height = info_text->GetAbsoluteSize().y;
+            info_text_height += info_margin * 3;
         }
         
-        sgui::UIVertexArray<4> v;
         int32_t pen_height = 0;
-        int32_t desc_height = 0;
         std::wstring pdelimiter = To<std::wstring>(stringCfg["pendulum_delimiter"].to_string());
         auto pd = data->texts.find(pdelimiter);
-        if(desc_text) {
-            desc_text->GetTextUI()->SetMaxWidth(scroll_area->GetViewSize().x);
-            if(pd != std::wstring::npos)
-                desc_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
-            else
-                desc_text->GetTextUI()->SetText(data->texts, 0xff000000);
-            desc_text->SetPosition({0, info_text_height + 10});
-            desc_height = desc_text->GetAbsoluteSize().y;
-        }
-        if(misc_image) {
-            misc_image->GetSpriteUI()->Clear();
-            misc_image->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawMiscTexture());
-            v.BuildSprite({0, 0, 0, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
-            misc_image->GetSpriteUI()->AddSprite(v.Ptr());
-            if(data->type & 0x1) {
-//                for(uint32_t i = 0; i < data->star; ++i)
-//                    pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
-            }
-        }
-        int32_t ph = 0;
         if(data->lscale || data->rscale) {
+            int32_t ph = 0;
             if(pen_text) {
+                pen_text->GetTextUI()->Clear();
+                pen_text->SetPosition({info_margin + scale_width, info_text_height + info_margin});
+                pen_text->GetTextUI()->SetLinespacing(2);
+                pen_text->GetTextUI()->SetMaxWidth(scroll_area->GetViewSize().x - slider_width - scale_width * 2);
                 if(pd > 0)
                     pen_text->GetTextUI()->SetText(data->texts.substr(0, pd - 1), 0xff000000);
-                else
-                    pen_text->GetTextUI()->Clear();
                 ph = pen_text->GetAbsoluteSize().y;
-                if(ph < min_pen_height)
-                    ph = min_pen_height;
             }
-            v.BuildSprite({0, desc_height + info_margin, 0, ph}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
+            if(ph < min_pen_height)
+                ph = min_pen_height;
+            v.BuildSprite({0, info_text_height, -slider_width, ph + info_margin * 2}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, info_backcolor);
             misc_image->GetSpriteUI()->AddSprite(v.Ptr());
+            pen_height = ph + info_margin * 3;
             
             auto lscale = ImageMgr::Get().GetTexture("lscale");
             auto rscale = ImageMgr::Get().GetTexture("rscale");
-//            pushvert({0, 50}, {30, 23}, lscale);
-//            pushvert({mw - 30, 50}, {30, 23}, rscale);
-//            if(data->lscale >= 10) {
-//                pushvert({1, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale / 10)), 0xff000000);
-//                pushvert({15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale % 10)), 0xff000000);
-//            } else
-//                pushvert({8, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->lscale), 0xff000000);
-//            if(data->rscale >= 10) {
-//                pushvert({mw - 29, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale / 10)), 0xff000000);
-//                pushvert({mw - 15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale % 10)), 0xff000000);
-//            } else
-//                pushvert({mw - 22, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->rscale), 0xff000000);
+            auto push_num = [&v, &scale_size, this](v2i pos, float px, int32_t i, uint32_t cl) {
+                v.BuildSprite({pos.x, pos.y, scale_size.x, scale_size.y}, {px, 0.0f, 0.0f, 0.0f}, ImageMgr::Get().GetCharTex(L'0' + i), cl);
+                misc_image->GetSpriteUI()->AddSprite(v.Ptr());
+            };
+            int32_t scale_y = info_text_height + info_margin + scale_icon.y;
+            int32_t left_midx = scale_width / 2;
+            v.BuildSprite({left_midx - scale_icon.x / 2, info_text_height + info_margin, scale_icon.x, scale_icon.y}, {0.0f, 0.0f, 0.0f, 0.0f}, lscale, 0xffffffff);
+            misc_image->GetSpriteUI()->AddSprite(v.Ptr());
+            if(data->lscale >= 10) {
+                push_num({left_midx - scale_size.x, scale_y}, 0.0f, data->lscale / 10, 0xff000000);
+                push_num({left_midx, scale_y}, 0.0f, data->lscale % 10, 0xff000000);
+            } else {
+                push_num({left_midx - scale_size.x / 2, scale_y}, 0.0f, data->lscale, 0xff000000);
+            }
+            int32_t right_midx = -slider_width - scale_width / 2;
+            v.BuildSprite({right_midx - scale_icon.x / 2, info_text_height + info_margin, scale_icon.x, scale_icon.y}, {1.0f, 0.0f, 0.0f, 0.0f}, rscale, 0xffffffff);
+            misc_image->GetSpriteUI()->AddSprite(v.Ptr());
+            if(data->rscale >= 10) {
+                push_num({right_midx - scale_size.x, scale_y}, 1.0f, data->rscale / 10, 0xff000000);
+                push_num({right_midx, scale_y}, 1.0f, data->rscale % 10, 0xff000000);
+            } else {
+                push_num({right_midx - scale_size.x / 2, scale_y}, 1.0f, data->rscale, 0xff000000);
+            }
         } else {
             if(pen_text)
                 pen_text->GetTextUI()->Clear();
         }
+        
+        int32_t desc_height = 0;
+        if(desc_text) {
+            desc_text->GetTextUI()->Clear();
+            desc_text->SetPosition({info_margin, info_text_height + pen_height + info_margin});
+            desc_text->GetTextUI()->SetLinespacing(2);
+            desc_text->GetTextUI()->SetMaxWidth(scroll_area->GetViewSize().x - slider_width - info_margin * 2);
+            if(pd != std::wstring::npos)
+                desc_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+            else
+                desc_text->GetTextUI()->SetText(data->texts, 0xff000000);
+            desc_height = desc_text->GetAbsoluteSize().y + info_margin * 2;
+            if(info_text_height + pen_height + desc_height < scroll_area->GetViewSize().y)
+                desc_height = scroll_area->GetViewSize().y - info_text_height - pen_height;
+        }
         if(misc_image) {
-            v.BuildSprite({0, 0, 0, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
+            v.BuildSprite({0, info_text_height + pen_height, -slider_width, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, info_backcolor);
             misc_image->GetSpriteUI()->AddSprite(v.Ptr());
         }
+        scroll_area->SetScrollSize({scroll_area->GetViewSize().x, info_text_height + pen_height + desc_height});
     }
     
     void InfoPanel::Destroy() {
