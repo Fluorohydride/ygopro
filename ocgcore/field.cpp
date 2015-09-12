@@ -41,6 +41,7 @@ field::field(duel* pduel) {
 		player[i].draw_count = 1;
 		player[i].disabled_location = 0;
 		player[i].used_location = 0;
+		player[i].extra_p_count = 0;
 		player[i].list_mzone.reserve(5);
 		player[i].list_szone.reserve(8);
 		player[i].list_main.reserve(45);
@@ -128,6 +129,7 @@ void field::reload_field_info() {
 		pduel->write_buffer8(player[playerid].list_grave.size());
 		pduel->write_buffer8(player[playerid].list_remove.size());
 		pduel->write_buffer8(player[playerid].list_extra.size());
+		pduel->write_buffer8(player[playerid].extra_p_count);
 	}
 	pduel->write_buffer8(core.current_chain.size());
 	for(auto chit = core.current_chain.begin(); chit != core.current_chain.end(); ++chit) {
@@ -148,6 +150,7 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		return;
 	if((pcard->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && (location & (LOCATION_HAND | LOCATION_DECK))) {
 		location = LOCATION_EXTRA;
+		sequence = 1;
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
 	}
 	pcard->current.controler = playerid;
@@ -193,8 +196,13 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		pcard->current.sequence = player[playerid].list_remove.size() - 1;
 		break;
 	case LOCATION_EXTRA:
-		player[playerid].list_extra.push_back(pcard);
-		pcard->current.sequence = player[playerid].list_extra.size() - 1;
+		if (sequence == 1) {
+			player[playerid].list_extra.insert(player[playerid].list_extra.begin(), pcard);
+			reset_sequence(playerid, LOCATION_EXTRA);
+		} else {
+			player[playerid].list_extra.push_back(pcard);
+			pcard->current.sequence = player[playerid].list_extra.size() - 1;
+		}
 		break;
 	}
 	pcard->apply_field_effect();
@@ -260,6 +268,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	uint8 presequence = pcard->current.sequence;
 	if((pcard->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && (location & (LOCATION_HAND | LOCATION_DECK))) {
 		location = LOCATION_EXTRA;
+		sequence = 1;
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
 	}
 	if (pcard->current.location) {
@@ -367,6 +376,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 			        && (((pcard->current.location == LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
 			        || ((pcard->current.location == LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
 				location = LOCATION_EXTRA;
+				sequence = 0;
 				pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEUP_DEFENCE << 24);
 			}
 			remove_card(pcard);
