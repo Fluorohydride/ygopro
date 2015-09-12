@@ -115,7 +115,7 @@ struct field_info {
 	uint8 phase;
 	uint8 turn_player;
 	uint8 priorities[2];
-	uint8 shuffle_count;
+	uint8 can_shuffle;
 };
 struct lpcost {
 	int32 count;
