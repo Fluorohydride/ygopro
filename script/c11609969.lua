@@ -14,7 +14,7 @@ function c11609969.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetTargetRange(1,0)
-	e2:SetCondition(c11609969.splimcon)
+	e2:SetCondition(aux.nfbdncon)
 	e2:SetTarget(c11609969.splimit)
 	c:RegisterEffect(e2)
 	--scale change
@@ -41,9 +41,6 @@ function c11609969.initial_effect(c)
 	local e5=e4:Clone()
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e5)
-end
-function c11609969.splimcon(e)
-	return not e:GetHandler():IsForbidden()
 end
 function c11609969.splimit(e,c,tp,sumtp,sumpos)
 	return not c:IsSetCard(0xaf) and bit.band(sumtp,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM

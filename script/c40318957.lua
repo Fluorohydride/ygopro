@@ -14,7 +14,7 @@ function c40318957.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetTargetRange(1,0)
-	e2:SetCondition(c40318957.splimcon)
+	e2:SetCondition(aux.nfbdncon)
 	e2:SetTarget(c40318957.splimit)
 	c:RegisterEffect(e2)
 	--search
@@ -29,9 +29,6 @@ function c40318957.initial_effect(c)
 end
 function c40318957.filter(c)
 	return c:IsSetCard(0x9f) or (c:IsSetCard(0x98) and c:IsType(TYPE_PENDULUM)) or c:IsSetCard(0x99)
-end
-function c40318957.splimcon(e)
-	return not e:GetHandler():IsForbidden()
 end
 function c40318957.splimit(e,c,tp,sumtp,sumpos)
 	return not c40318957.filter(c) and bit.band(sumtp,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM

@@ -139,7 +139,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(1);
 		else
 			pduel->write_buffer8(0);
-		if(infos.shuffle_count < 1 && player[playerid].list_hand.size() > 1)
+		if(infos.can_shuffle && player[playerid].list_hand.size() > 1)
 			pduel->write_buffer8(1);
 		else
 			pduel->write_buffer8(0);
@@ -156,7 +156,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 		        || (t == 5 && s >= core.select_chains.size())
 		        || (t == 6 && (infos.phase != PHASE_MAIN1 || !core.to_bp))
 		        || (t == 7 && !core.to_ep)
-		        || (t == 8 && !(infos.shuffle_count < 1 && player[playerid].list_hand.size() > 1))) {
+		        || (t == 8 && !(infos.can_shuffle && player[playerid].list_hand.size() > 1))) {
 			pduel->write_buffer8(MSG_RETRY);
 			return FALSE;
 		}

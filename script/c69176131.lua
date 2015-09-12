@@ -15,7 +15,7 @@ function c69176131.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetMatchingGroup(Card.CheckRemoveOverlayCard,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp,1,REASON_EFFECT)
 	if sg:GetCount()==0 then return end
 	if sg:GetCount()>1 then
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(69176131,0))
+		Duel.Hint(HINT_SELECTMSG,tp,532)
 		sg=sg:Select(tp,1,1,nil)
 		Duel.HintSelection(sg)
 	end

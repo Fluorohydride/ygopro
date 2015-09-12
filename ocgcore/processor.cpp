@@ -2575,7 +2575,7 @@ int32 field::process_idle_command(uint16 step) {
 		} else if (ctype == 8) {
 			core.units.begin()->step = -1;
 			shuffle(infos.turn_player, LOCATION_HAND);
-			infos.shuffle_count++;
+			infos.can_shuffle = FALSE;
 			return FALSE;
 		} else {
 			core.units.begin()->step = 9;
@@ -2679,7 +2679,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 11: {
 		returns.ivalue[0] = core.units.begin()->arg1;
-		infos.shuffle_count = 0;
+		infos.can_shuffle = TRUE;
 		return TRUE;
 	}
 	case 12: {
@@ -4045,6 +4045,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		core.delayed_quick_tmp.clear();
 		pduel->write_buffer8(MSG_NEW_PHASE);
 		pduel->write_buffer8(infos.phase);
+		
 		add_process(PROCESSOR_IDLE_COMMAND, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -4128,6 +4129,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		core.delayed_quick_tmp.clear();
 		pduel->write_buffer8(MSG_NEW_PHASE);
 		pduel->write_buffer8(infos.phase);
+		infos.can_shuffle = TRUE;
 		add_process(PROCESSOR_IDLE_COMMAND, 0, 0, 0, 0, 0);
 		return FALSE;
 	}

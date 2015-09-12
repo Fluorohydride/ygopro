@@ -243,11 +243,7 @@ void field::send_to(card_set* targets, effect* reason_effect, uint32 reason, uin
 		pcard->current.reason_effect = reason_effect;
 		pcard->current.reason_player = reason_player;
 		p = playerid;
-		/*
-		 * if playerid not given, will send card from Deck to Hand,
-		 * also that card is in Triggering Player's Deck,
-		 * then send it to Triggering Player's Hand, insdead of Owner's Hand. 
-		 */
+		// send to hand from deck  & playerid not given => send to the hand of controler
 		if(p == PLAYER_NONE && (destination & LOCATION_HAND) && (pcard->current.location & LOCATION_DECK) && pcard->current.controler == reason_player)
 			p = reason_player;
 		if(destination & (LOCATION_GRAVE + LOCATION_REMOVED) || p == PLAYER_NONE)

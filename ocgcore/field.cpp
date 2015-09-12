@@ -27,7 +27,7 @@ field::field(duel* pduel) {
 	this->pduel = pduel;
 	infos.field_id = 1;
 	infos.copy_id = 1;
-	infos.shuffle_count = 0;
+	infos.can_shuffle = TRUE;
 	infos.turn_id = 0;
 	infos.card_id = 1;
 	infos.phase = 0;
@@ -150,7 +150,6 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		return;
 	if((pcard->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && (location & (LOCATION_HAND | LOCATION_DECK))) {
 		location = LOCATION_EXTRA;
-		sequence = 1;
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
 	}
 	pcard->current.controler = playerid;
@@ -196,13 +195,8 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		pcard->current.sequence = player[playerid].list_remove.size() - 1;
 		break;
 	case LOCATION_EXTRA:
-		if (sequence == 1) {
-			player[playerid].list_extra.insert(player[playerid].list_extra.begin(), pcard);
-			reset_sequence(playerid, LOCATION_EXTRA);
-		} else {
-			player[playerid].list_extra.push_back(pcard);
-			pcard->current.sequence = player[playerid].list_extra.size() - 1;
-		}
+		player[playerid].list_extra.push_back(pcard);
+		pcard->current.sequence = player[playerid].list_extra.size() - 1;
 		break;
 	}
 	pcard->apply_field_effect();
@@ -268,7 +262,6 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	uint8 presequence = pcard->current.sequence;
 	if((pcard->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && (location & (LOCATION_HAND | LOCATION_DECK))) {
 		location = LOCATION_EXTRA;
-		sequence = 1;
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
 	}
 	if (pcard->current.location) {
@@ -376,7 +369,6 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 			        && (((pcard->current.location == LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
 			        || ((pcard->current.location == LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
 				location = LOCATION_EXTRA;
-				sequence = 0;
 				pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEUP_DEFENCE << 24);
 			}
 			remove_card(pcard);

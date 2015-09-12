@@ -14,7 +14,7 @@ function c51194046.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(1,0)
-	e2:SetCondition(c51194046.splimcon)
+	e2:SetCondition(aux.nfbdncon)
 	e2:SetTarget(c51194046.splimit)
 	c:RegisterEffect(e2)
 	--draw
@@ -56,9 +56,6 @@ function c51194046.initial_effect(c)
 		ge4:SetOperation(c51194046.clearop)
 		Duel.RegisterEffect(ge4,0)
 	end
-end
-function c51194046.splimcon(e)
-	return not e:GetHandler():IsForbidden()
 end
 function c51194046.splimit(e,c)
 	return not c:IsSetCard(0xaa)

@@ -423,8 +423,9 @@ void Game::DrawMisc() {
 		adFont->draw(pcard->rscstring, recti(464, 246, 496, 266), 0xffffffff, true, false, 0);
 	}
 	if(dField.extra[0].size()) {
-		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(320, 562, 371, 552), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(320, 563, 373, 553), 0xffffff00, true, false, 0);
+		int offset = (dField.extra[0].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
+		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(320 + offset, 562, 371, 552), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(320 + offset, 563, 373, 553), 0xffffff00, true, false, 0);
 		numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), recti(340, 562, 391, 552), 0xff000000, true, false, 0);
 		numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), recti(340, 563, 393, 553), 0xffffff00, true, false, 0);
 	}
@@ -441,8 +442,9 @@ void Game::DrawMisc() {
 		numFont->draw(dataManager.GetNumString(dField.remove[0].size()), recti(1015, 376, 959, 381), 0xffffff00, true, false, 0);
 	}
 	if(dField.extra[1].size()) {
-		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(808, 207, 898, 232), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(808, 208, 900, 233), 0xffffff00, true, false, 0);
+		int offset = (dField.extra[1].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
+		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(808 + offset, 207, 898, 232), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(808 + offset, 208, 900, 233), 0xffffff00, true, false, 0);
 		numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), recti(828, 207, 918, 232), 0xff000000, true, false, 0);
 		numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), recti(828, 208, 920, 233), 0xffffff00, true, false, 0);
 	}

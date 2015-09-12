@@ -16,7 +16,7 @@ function c84388461.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetTargetRange(1,0)
 	e2:SetTarget(c84388461.splimit)
-	e2:SetCondition(c84388461.splimcon)
+	e2:SetCondition(aux.nfbdncon)
 	c:RegisterEffect(e2)
 	--spsummon
 	local e3=Effect.CreateEffect(c)
@@ -33,9 +33,6 @@ end
 function c84388461.splimit(e,c,sump,sumtype,sumpos,targetp)
 	if c:IsSetCard(0xb4) or c:IsSetCard(0xc4) then return false end
 	return bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
-end
-function c84388461.splimcon(e)
-	return not e:GetHandler():IsForbidden()
 end
 function c84388461.filter(c,e,tp,m)
 	if not c:IsSetCard(0xb4) or bit.band(c:GetType(),0x81)~=0x81
