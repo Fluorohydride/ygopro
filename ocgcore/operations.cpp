@@ -1017,19 +1017,13 @@ int32 field::control_adjust(uint16 step) {
 		card_set* adjust_set = (card_set*)core.units.begin()->ptarget;
 		delete adjust_set;
 		core.control_adjust_set[0].insert(core.control_adjust_set[1].begin(), core.control_adjust_set[1].end());
-		for(auto cit = core.control_adjust_set[0].begin(); cit != core.control_adjust_set[0].end(); ) {
-			card* pcard = *cit++;
-			if(!(pcard->current.location & LOCATION_ONFIELD)) {
-				core.control_adjust_set[0].erase(pcard);
-				continue;
-			}
-			pcard->filter_disable_related_cards();
-			if(pcard->unique_code)
-				add_unique_card(pcard);
-			raise_single_event(pcard, 0, EVENT_CONTROL_CHANGED, 0, REASON_RULE, 0, 0, 0);
+		for(auto cit = core.control_adjust_set[0].begin(); cit != core.control_adjust_set[0].end(); ++cit) {
+			(*cit)->filter_disable_related_cards();
+			if((*cit)->unique_code)
+				add_unique_card(*cit);
+			raise_single_event((*cit), 0, EVENT_CONTROL_CHANGED, 0, REASON_RULE, 0, 0, 0);
 		}
-		if(core.control_adjust_set[0].size())
-			raise_event(&core.control_adjust_set[0], EVENT_CONTROL_CHANGED, 0, 0, 0, 0, 0);
+		raise_event(&core.control_adjust_set[0], EVENT_CONTROL_CHANGED, 0, 0, 0, 0, 0);
 		process_single_event();
 		process_instant_event();
 		return FALSE;
@@ -3727,7 +3721,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			target->unequip();
 		if(enable || ((ret == 1) && target->is_position(POS_FACEUP)))
 			target->enable_field_effect(TRUE);
-		adjust_instant();
+		adjust_disable_check_list(); //part of adjust_instant
 		return FALSE;
 	}
 	case 3: {
