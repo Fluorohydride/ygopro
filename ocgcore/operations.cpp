@@ -3727,7 +3727,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			target->unequip();
 		if(enable || ((ret == 1) && target->is_position(POS_FACEUP)))
 			target->enable_field_effect(TRUE);
-		adjust_instant();
+		adjust_disable_check_list();
 		return FALSE;
 	}
 	case 3: {
