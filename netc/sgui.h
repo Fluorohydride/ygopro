@@ -2331,7 +2331,7 @@ namespace sgui
             if(view_size_change)
                 CheckViewSize();
             if(cmd && (view_pos_change || view_size_change)) {
-                recti clip_region = {view_pos.x, view_pos.y, view_pos.x + view_size.x, view_pos.y + view_size.y};
+                recti clip_region = {view_pos.x, view_pos.y, view_size.x, view_size.y};
                 cmd->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             }
             return ret;
@@ -2361,7 +2361,7 @@ namespace sgui
                 return;
             auto shader = SGGUIRoot::GetSingleton().GetShader();
             alpha_cmd = SGGUIRoot::GetSingleton().PushCommand<base::RenderCmdBeginGlobalAlpha>(shader, container_alpha);
-            recti clip_region = {view_pos.x, view_pos.y, view_pos.x + view_size.x, view_pos.y + view_size.y};
+            recti clip_region = {view_pos.x, view_pos.y, view_size.x, view_size.y};
             auto scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             cmd = SGGUIRoot::GetSingleton().PushCommand<base::RenderCmdBeginScissor>(scissor_rect);
             for(size_t i = 2; i < children.size(); ++i)

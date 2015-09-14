@@ -798,6 +798,7 @@ namespace ygopro
                 card_image->GetSpriteUI()->SetTexture(ctex);
                 card_image->GetSpriteUI()->SetTextureRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
             }
+            card_image->SetDragTarget(window.lock());
         }
         if(misc_image) {
             misc_image->GetSpriteUI()->Clear();

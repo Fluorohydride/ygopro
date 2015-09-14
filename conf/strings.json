@@ -22,6 +22,8 @@
   "eui_list_limit" : "限制卡",
   "eui_list_semilimit" : "准限制卡",
   "eui_list_default" : "[ 无限制 ]",
+  "eui_popup_remove" : "删除",
+  "eui_popup_addsame" : "增加",
   "eui_menu_search" : "搜索",
   "eui_filter_title" : "卡片搜索",
   "eui_filter_keyword" : "关键字",

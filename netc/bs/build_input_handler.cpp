@@ -30,16 +30,16 @@ namespace ygopro
                 show_info_begin = false;
                 click_pos.first = 0;
                 pscene->ShowSelectedInfo(hover_pos.first, hover_pos.second);
-                sgui::SGGUIRoot::GetSingleton().event_mouse_up.Bind([this](sgui::SGWidget& sender, int32_t btn, int32_t mods, int32_t x, int32_t y)->bool {
-                    if(btn == GLFW_MOUSE_BUTTON_LEFT) {
-                        show_info = false;
-                        show_info_begin = false;
-                        build_scene.lock()->HideCardInfo();
-                        sgui::SGGUIRoot::GetSingleton().event_mouse_move.Remove(this);
-                        sgui::SGGUIRoot::GetSingleton().event_mouse_up.Remove(this);
-                    }
-                    return true;
-                }, this);
+//                sgui::SGGUIRoot::GetSingleton().event_mouse_up.Bind([this](sgui::SGWidget& sender, int32_t btn, int32_t mods, int32_t x, int32_t y)->bool {
+//                    if(btn == GLFW_MOUSE_BUTTON_LEFT) {
+//                        show_info = false;
+//                        show_info_begin = false;
+//                        build_scene.lock()->HideCardInfo();
+//                        sgui::SGGUIRoot::GetSingleton().event_mouse_move.Remove(this);
+//                        sgui::SGGUIRoot::GetSingleton().event_mouse_up.Remove(this);
+//                    }
+//                    return true;
+//                }, this);
                 sgui::SGGUIRoot::GetSingleton().event_mouse_move.Bind([this](sgui::SGWidget& sender, int32_t x, int32_t y)->bool {
                     MouseMove(x, y);
                     return true;
