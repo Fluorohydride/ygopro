@@ -1190,6 +1190,7 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	pduel->uncopy.clear();
 	return pduel->game_field->infos.copy_id - 1;
 }
+// add EFFECT_SET_CONTROL
 void card::reset(uint32 id, uint32 reset_type) {
 	effect* peffect;
 	if (reset_type != RESET_EVENT && reset_type != RESET_PHASE && reset_type != RESET_CODE && reset_type != RESET_COPY && reset_type != RESET_CARD)

@@ -20,7 +20,7 @@ function c17078030.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	local lp=Duel.GetLP(tp)
 	local t={}
-	local f=math.floor((lp-1)/1000)
+	local f=math.floor((lp)/1000)
 	local l=1
 	while l<=f and l<=20 do
 		t[l]=l*1000
