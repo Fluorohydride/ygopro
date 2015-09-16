@@ -176,10 +176,10 @@ namespace ygopro
     }
     
     bool BuildScene::Update() {
-        if(input_handler)
-            input_handler->UpdateInput();
-        if(scene_handler)
+        if(scene_handler) {
+            scene_handler->UpdateInput();
             scene_handler->UpdateEvent();
+        }
         UpdateActionTime(SceneMgr::Get().GetSysClock());
         return IsActive();
     }
@@ -231,22 +231,14 @@ namespace ygopro
     }
     
     void BuildScene::ShowSelectedInfo(uint32_t pos, uint32_t index) {
-        if(pos > 0 && pos < 4) {
-            auto dcd = GetCard(pos, index);
-            if(dcd != nullptr)
-                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(dcd->data->code);
-        } else if(pos == 4) {
-            if(result_data[index] != 0)
-                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(result_data[index]->code);
-        }
-    }
-    
-    void BuildScene::ShowCardInfo(uint32_t code) {
-        std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(code);
-    }
-    
-    void BuildScene::HideCardInfo() {
-        std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->HideCardInfo();
+//        if(pos > 0 && pos < 4) {
+//            auto dcd = GetCard(pos, index);
+//            if(dcd != nullptr)
+//                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(dcd->data->code);
+//        } else if(pos == 4) {
+//            if(result_data[index] != 0)
+//                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(result_data[index]->code);
+//        }
     }
     
     void BuildScene::ClearDeck() {
@@ -458,27 +450,9 @@ namespace ygopro
     void BuildScene::ViewRegulation(int32_t limit) {
         if(remove_lock)
             return;
-        ClearDeck();
-        LimitRegulationMgr::Get().LoadCurrentListToDeck(current_deck, limit);
-        for(auto& dcd : current_deck.main_deck) {
-            auto bc = card_renderer->NewSharedObject<BuilderCard>();
-            bc->LoadCardTexture(dcd->data->code);
-            bc->SetLimit(dcd->limit);
-            dcd->builder_card = bc;
-        }
-        for(auto& dcd : current_deck.extra_deck) {
-            auto bc = card_renderer->NewSharedObject<BuilderCard>();
-            bc->LoadCardTexture(dcd->data->code);
-            bc->SetLimit(dcd->limit);
-            dcd->builder_card = bc;
-        }
-        for(auto& dcd : current_deck.side_deck) {
-            auto bc = card_renderer->NewSharedObject<BuilderCard>();
-            bc->LoadCardTexture(dcd->data->code);
-            bc->SetLimit(dcd->limit);
-            dcd->builder_card = bc;
-        }
-        RefreshAllCard();
+        DeckData new_deck;
+        LimitRegulationMgr::Get().LoadCurrentListToDeck(new_deck, limit);
+        LoadDeck(new_deck);
     }
     
     void BuildScene::RefreshSearchResult(const std::array<CardData*, 10> new_results) {
@@ -494,11 +468,11 @@ namespace ygopro
     }
     
     void BuildScene::SetCurrentSelection(int32_t sel, bool show_info) {
-        if(sel != current_sel_result) {
-            current_sel_result = sel;
-            if(current_sel_result >= 0 && show_info && result_data[current_sel_result] != nullptr)
-                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(result_data[current_sel_result]->code);
-        }
+//        if(sel != current_sel_result) {
+//            current_sel_result = sel;
+//            if(current_sel_result >= 0 && show_info && result_data[current_sel_result] != nullptr)
+//                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(result_data[current_sel_result]->code);
+//        }
     }
     
     void BuildScene::MoveCard(int32_t pos, int32_t index) {
@@ -530,8 +504,8 @@ namespace ygopro
         RefreshParams();
         UpdateAllCard();
         SetDeckDirty();
-        if(input_handler)
-            input_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
+        if(scene_handler)
+            scene_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
     }
     
     void BuildScene::RemoveCard(int32_t pos, int32_t index) {
@@ -563,8 +537,8 @@ namespace ygopro
                 SetDeckDirty();
                 card_renderer->DeleteObject(ptr.get());
                 remove_lock = false;
-                if(input_handler)
-                    input_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
+                if(scene_handler)
+                    scene_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
             }
         });
         PushAction(std::make_shared<ActionSequence<int64_t>>(rm_act, cb_act));

@@ -12,7 +12,6 @@
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
-#include "bs/build_input_handler.h"
 #include "bs/build_scene_handler.h"
 #include "bs/build_scene.h"
 //#include "ds/duel_input_handler.h"
@@ -111,9 +110,7 @@ int32_t main(int32_t argc, char* argv[]) {
     SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
     
     auto sc = std::make_shared<BuildScene>();
-    auto ih = std::make_shared<BuildInputHandler>(sc);
     auto sh = std::make_shared<BuildSceneHandler>(sc);
-    sc->SetInputHandler(ih);
     sc->SetSceneHandler(sh);
     SceneMgr::Get().SetScene(sc);
     
@@ -131,10 +128,10 @@ int32_t main(int32_t argc, char* argv[]) {
             if(key == GLFW_KEY_GRAVE_ACCENT && (mods & GLFW_MOD_ALT))
                 SceneMgr::Get().ScreenShot();
             if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(key, mods))
-                SceneMgr::Get().GetScene()->GetInputHandler()->KeyDown(key, mods);
+                SceneMgr::Get().GetScene()->GetSceneHandler()->KeyDown(key, mods);
         } else if(action == GLFW_RELEASE) {
             if(!sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent(key, mods))
-                SceneMgr::Get().GetScene()->GetInputHandler()->KeyUp(key, mods);
+                SceneMgr::Get().GetScene()->GetSceneHandler()->KeyUp(key, mods);
         }
     });
     glfwSetCharCallback(window, [](GLFWwindow* wnd, uint32_t unichar) {
@@ -157,7 +154,7 @@ int32_t main(int32_t argc, char* argv[]) {
     glfwSetCursorPosCallback(window, [](GLFWwindow* wnd, double xpos, double ypos) {
         SceneMgr::Get().SetMousePosition({(int32_t)(xpos * xrate), (int32_t)(ypos * yrate)});
         if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent((int32_t)(xpos * xrate), (int32_t)(ypos * yrate)))
-            SceneMgr::Get().GetScene()->GetInputHandler()->MouseMove((int32_t)(xpos * xrate), (int32_t)(ypos * yrate));
+            SceneMgr::Get().GetScene()->GetSceneHandler()->MouseMove((int32_t)(xpos * xrate), (int32_t)(ypos * yrate));
     });
     glfwSetMouseButtonCallback(window, [](GLFWwindow* wnd, int32_t button, int32_t action, int32_t mods) {
         double xpos, ypos;
@@ -167,15 +164,15 @@ int32_t main(int32_t argc, char* argv[]) {
         SceneMgr::Get().SetMousePosition({(int32_t)xpos, (int32_t)ypos});
         if(action == GLFW_PRESS) {
             if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent(button, mods, (int32_t)xpos, (int32_t)ypos))
-                SceneMgr::Get().GetScene()->GetInputHandler()->MouseButtonDown(button, mods, (int32_t)xpos, (int32_t)ypos);
+                SceneMgr::Get().GetScene()->GetSceneHandler()->MouseButtonDown(button, mods, (int32_t)xpos, (int32_t)ypos);
         } else {
             if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonUpEvent(button, mods, (int32_t)xpos, (int32_t)ypos))
-                SceneMgr::Get().GetScene()->GetInputHandler()->MouseButtonUp(button, mods, (int32_t)xpos, (int32_t)ypos);
+                SceneMgr::Get().GetScene()->GetSceneHandler()->MouseButtonUp(button, mods, (int32_t)xpos, (int32_t)ypos);
         }
     });
     glfwSetScrollCallback(window, [](GLFWwindow* wnd, double xoffset, double yoffset) {
         if(!sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent((float)xoffset, (float)yoffset))
-            SceneMgr::Get().GetScene()->GetInputHandler()->MouseWheel((float)xoffset, (float)yoffset);
+            SceneMgr::Get().GetScene()->GetSceneHandler()->MouseWheel((float)xoffset, (float)yoffset);
     });
     glfwSetWindowIconifyCallback(window, [](GLFWwindow* wnd, int32_t iconified) {
         need_draw = (iconified == GL_FALSE);

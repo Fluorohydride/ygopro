@@ -93,8 +93,9 @@ namespace ygopro
 
     class InfoPanel : public CommonDialog {
     public:
-        void ShowInfo(uint32_t code, v2i pos);
+        void ShowInfo(uint32_t code);
         void Destroy();
+        inline bool IsOpen() { return !window.expired(); }
         
     protected:
         uint32_t code = 0;

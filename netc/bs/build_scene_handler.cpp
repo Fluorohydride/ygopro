@@ -5,7 +5,6 @@
 #include "../card_data.h"
 #include "build_scene.h"
 #include "build_scene_handler.h"
-#include "build_input_handler.h"
 
 namespace ygopro
 {
@@ -15,19 +14,19 @@ namespace ygopro
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
         info_panel = std::make_shared<InfoPanel>();
+        hover_pos = {0, 0};
+        click_pos = {0, 0};
     }
     
     bool BuildSceneHandler::UpdateEvent() {
-        UpdateActionTime(SceneMgr::Get().GetSysClock());
         return true;
     }
     
     void BuildSceneHandler::BeginHandler() {
-        InitActionTime(SceneMgr::Get().GetSysClock());
         auto pnl_build = LoadDialogAs<sgui::SGPanel>("build panel");
         if(pnl_build) {
             pnl_build->event_key_down += [this](sgui::SGWidget& sender, int32_t key, int32_t mods)->bool {
-                build_scene.lock()->GetInputHandler()->KeyDown(key, mods);
+                KeyDown(key, mods);
                 return true;
             };
             auto res = pnl_build->FindWidget("deck name");
@@ -86,7 +85,7 @@ namespace ygopro
         auto pnl_result = LoadDialogAs<sgui::SGPanel>("result panel");
         if(pnl_result) {
             pnl_result->event_key_down += [this](sgui::SGWidget& sender, int32_t key, int32_t mods)->bool {
-                build_scene.lock()->GetInputHandler()->KeyDown(key, mods);
+                KeyDown(key, mods);
                 return true;
             };
             auto res = pnl_result->FindWidget("result label");
@@ -108,6 +107,134 @@ namespace ygopro
                 };
             }
         }
+    }
+    
+    bool BuildSceneHandler::UpdateInput() {
+        if(show_info_begin) {
+            auto pscene = build_scene.lock();
+            auto now = SceneMgr::Get().GetSysClock();
+            if(now - show_info_time >= 500) {
+                show_info_begin = false;
+                click_pos.first = 0;
+                pscene->ShowSelectedInfo(hover_pos.first, hover_pos.second);
+            }
+        }
+        return true;
+    }
+    
+    void BuildSceneHandler::MouseMove(int32_t x, int32_t y) {
+        std::shared_ptr<DeckCardData> dcd = nullptr;
+        auto pscene = build_scene.lock();
+        auto pre = hover_obj.lock();
+        auto hov = pscene->GetHoverPos(x, y);
+        if(hov.first == 4) {
+            //pscene->SetCurrentSelection(hov.second, show_info);
+        } else {
+            dcd = pscene->GetCard(hov.first, hov.second);
+            pscene->SetCurrentSelection(-1, false);
+            if(dcd && info_panel->IsOpen())
+                info_panel->ShowInfo(dcd->data->code);
+        }
+        if(dcd != pre) {
+            if(pre) {
+                pre->builder_card->SetHL(0);
+            }
+            if(dcd) {
+                auto ptr = dcd->builder_card;
+                ptr->hl = 0x00ffffff;
+                auto act = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(0, ptr, [](BuilderCard* bc, double t)->bool {
+                    if(bc->hl == 0)
+                        return false;
+                    uint32_t alpha = (uint32_t)((t * 0.6f + 0.2f) * 255);
+                    bc->SetHL((alpha << 24) | 0xffffff);
+                    return true;
+                }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
+                pscene->PushAction(act);
+            }
+        }
+        hover_pos = hov;
+        hover_obj = dcd;
+    }
+    
+    void BuildSceneHandler::MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y) {
+        click_pos = hover_pos;
+        if(button == GLFW_MOUSE_BUTTON_LEFT) {
+            show_info_begin = true;
+            show_info_time = SceneMgr::Get().GetSysClock();
+        }
+    }
+    
+    void BuildSceneHandler::MouseButtonUp(int32_t button, int32_t mods, int32_t x, int32_t y) {
+        if(button == GLFW_MOUSE_BUTTON_LEFT)
+            show_info_begin = false;
+        if(hover_pos != click_pos)
+            return;
+        auto pscene = build_scene.lock();
+        click_pos.first = 0;
+        int32_t pos = hover_pos.first;
+        int32_t index = hover_pos.second;
+        if(pos > 0 && pos < 4) {
+            if(index < 0)
+                return;
+            if(button == GLFW_MOUSE_BUTTON_LEFT) {
+                pscene->MoveCard(pos, index);
+            } else {
+                pscene->RemoveCard(pos, index);
+            }
+        } else if(pos == 4) {
+            pscene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);
+        }
+    }
+    
+    void BuildSceneHandler::MouseWheel(float deltax, float deltay) {
+        
+    }
+    
+    void BuildSceneHandler::KeyDown(int32_t key, int32_t mods) {
+        auto pscene = build_scene.lock();
+        switch(key) {
+            case GLFW_KEY_1:
+                if(mods & GLFW_MOD_CONTROL)
+                    pscene->SortDeck();
+                else if(mods & GLFW_MOD_ALT)
+                    ViewRegulation(0);
+                break;
+            case GLFW_KEY_2:
+                if(mods & GLFW_MOD_CONTROL)
+                    pscene->ShuffleDeck();
+                else if(mods & GLFW_MOD_ALT)
+                    ViewRegulation(1);
+                break;
+            case GLFW_KEY_3:
+                if(mods & GLFW_MOD_CONTROL) {
+                    pscene->ClearDeck();
+                    pscene->SetDeckDirty();
+                } else if(mods & GLFW_MOD_ALT)
+                    ViewRegulation(2);
+                break;
+            case GLFW_KEY_C:
+                if(mods & GLFW_MOD_CONTROL) {
+                    std::string deck_string;
+                    deck_string.append("ydk://").append(build_scene.lock()->SaveDeckToString());
+                    glfwSetClipboardString(nullptr, deck_string.c_str());
+                    MessageBox::ShowOK(L"", To<std::wstring>(stringCfg["eui_msg_deck_tostr_ok"].to_string()), nullptr);
+                }
+                break;
+            case GLFW_KEY_V:
+                if(mods & GLFW_MOD_CONTROL) {
+                    auto pscene = build_scene.lock();
+                    std::string deck_string = glfwGetClipboardString(nullptr);
+                    pscene->LoadDeckFromString(deck_string);
+                    StopViewRegulation();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    
+    void BuildSceneHandler::KeyUp(int32_t key, int32_t mods) {
+        
     }
     
     void BuildSceneHandler::ViewRegulation(int32_t limit) {
@@ -254,17 +381,6 @@ namespace ygopro
             default:
                 break;
         }
-    }
-    
-    void BuildSceneHandler::ShowCardInfo(uint32_t code) {
-        int32_t w = 700;
-        int32_t h = 320;
-        auto scene_size = SceneMgr::Get().GetSceneSize();
-        info_panel->ShowInfo(code, {scene_size.x / 2 - w / 2, scene_size.y / 2 - h / 2});
-    }
-    
-    void BuildSceneHandler::HideCardInfo() {
-        info_panel->Destroy();
     }
     
     void BuildSceneHandler::SetDeckLabel(const std::wstring& str, uint32_t cl) {

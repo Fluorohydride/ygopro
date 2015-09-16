@@ -26,7 +26,7 @@ namespace ygopro
     };
     
 	struct DeckData {
-        
+
 		std::vector<std::shared_ptr<DeckCardData>> main_deck;
 		std::vector<std::shared_ptr<DeckCardData>> extra_deck;
 		std::vector<std::shared_ptr<DeckCardData>> side_deck;

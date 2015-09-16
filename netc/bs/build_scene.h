@@ -68,8 +68,6 @@ namespace ygopro
         virtual void SetSceneSize(v2i sz);
         virtual recti GetScreenshotClip();
         void ShowSelectedInfo(uint32_t pos, uint32_t index);
-        void ShowCardInfo(uint32_t code);
-        void HideCardInfo();
         
         void ClearDeck();
         void SortDeck();

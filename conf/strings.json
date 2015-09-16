@@ -3,6 +3,7 @@
   "pendulum_delimiter" : "[----]",
   "eui_button_ok" : "确定",
   "eui_button_cancel" : "取消",
+  "eui_button_close" : "关闭",
   "eui_button_yes" : "是",
   "eui_button_no" : "否",
   "eui_updir" : "返回上一层目录",

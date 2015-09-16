@@ -211,6 +211,9 @@ namespace ygopro
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, chk, {0, 0});
                     } else if(name == "style") {
                         chk->SetStyle(sub_node);
+                    } else if(name == "text") {
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
+                        chk->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "checked") {
                         chk->SetChecked(sub_node.to_bool());
                     }
@@ -225,6 +228,9 @@ namespace ygopro
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, rdo, {0, 0});
                     } else if(name == "style") {
                         rdo->SetStyle(sub_node);
+                    } else if(name == "text") {
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
+                        rdo->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "group") {
                         int32_t gp = (int32_t)sub_node.to_integer();
                         auto& prev_rdo = radio_groups[gp];
@@ -755,7 +761,7 @@ namespace ygopro
         return v;
     }
 	
-    void InfoPanel::ShowInfo(uint32_t code, v2i pos) {
+    void InfoPanel::ShowInfo(uint32_t code) {
         if(this->code == code)
             return;
         sgui::SGPanel* wnd = nullptr;
@@ -770,6 +776,13 @@ namespace ygopro
             pen_text = wnd->FindWidgetAs<sgui::SGLabel>("pendulum text");
             desc_text = wnd->FindWidgetAs<sgui::SGLabel>("card text");
             window = wnd->CastPtr<sgui::SGWidgetContainer>();
+            auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
+            if(ok_button) {
+                ok_button->event_click += [wnd](sgui::SGWidget& sender) {
+                    wnd->RemoveFromParent();
+                    return true;
+                };
+            }
         }
         auto& dlg_node = dialogCfg["info dialog"];
         int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();

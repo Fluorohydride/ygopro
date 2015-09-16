@@ -19,7 +19,7 @@ namespace ygopro
         virtual void KeyUp(int32_t key, int32_t mods) = 0;
     };
     
-    class SceneHandler {
+    class SceneHandler : public InputHandler {
     public:
         virtual bool UpdateEvent() = 0;
         virtual void BeginHandler() = 0;
@@ -36,13 +36,10 @@ namespace ygopro
         virtual bool IsActive() { return is_active; }
         virtual void Exit() { is_active = false; }
         
-        inline void SetInputHandler(std::shared_ptr<InputHandler> ih) { input_handler = ih; }
-        inline std::shared_ptr<InputHandler> GetInputHandler() { return input_handler; }
         inline void SetSceneHandler(std::shared_ptr<SceneHandler> sh) { scene_handler = sh; }
         inline std::shared_ptr<SceneHandler> GetSceneHandler() { return scene_handler; }
         
     protected:
-        std::shared_ptr<InputHandler> input_handler;
         std::shared_ptr<SceneHandler> scene_handler;
         bool is_active = true;
     };

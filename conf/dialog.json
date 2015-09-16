@@ -218,7 +218,7 @@
   "info dialog" : {
     "type" : "panel",
     "is entity" : true,
-    "position" : [0, 0, 900, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "position" : [0, 0, 1200, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "card image" : {
         "type" : "sprite",
@@ -226,7 +226,7 @@
       },
       "scroll area" : {
         "type" : "scrollarea",
-        "position" : [350, 10, -360, 480, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "position" : [350, 10, -360, -65, 0, 0, 1.0, 1.0, 0.0, 0.0],
         "children" : {
           "misc image" : {
             "type" : "spritelist"
@@ -241,6 +241,11 @@
             "type" : "label"
           }
         }
+      },
+      "ok button" : {
+        "type" : "text button",
+        "position" : [-40, -10, 160, 40, 1.0, 1.0, 0, 0, -1.0, -1.0],
+        "text" : ["eui_button_close", "0x000000ff"]
       }
     },
     "info margin" : 5,
