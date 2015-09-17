@@ -12,14 +12,6 @@ namespace ygopro
     
     struct FilterCondition;
     
-    enum class CardLocation {
-        Main = 0,
-        Extra = 1,
-        Side = 2,
-        Result = 3,
-        Null = 4,
-    };
-    
     class BuilderCard : public base::RenderUnit<vt2>, public std::enable_shared_from_this<BuilderCard> {
     public:
         virtual ~BuilderCard() {}
@@ -67,7 +59,6 @@ namespace ygopro
         virtual bool Draw();
         virtual void SetSceneSize(v2i sz);
         virtual recti GetScreenshotClip();
-        void ShowSelectedInfo(uint32_t pos, uint32_t index);
         
         void ClearDeck();
         void SortDeck();
@@ -88,13 +79,12 @@ namespace ygopro
         void ViewRegulation(int32_t limit);
         void RefreshSearchResult(const std::array<CardData*, 10> new_results);
         
-        void SetCurrentSelection(int32_t sel, bool show_info);
-        void MoveCard(int32_t pos, int32_t index);
-        void RemoveCard(int32_t pos, int32_t index);
+        void MoveCard(CardLocation pos, int32_t index);
+        void RemoveCard(CardLocation pos, int32_t index);
         void InsertSearchResult(int32_t index, bool is_side);
         
-        std::shared_ptr<DeckCardData> GetCard(int32_t pos, int32_t index);
-        std::pair<int32_t, int32_t> GetHoverPos(int32_t posx, int32_t posy);
+        std::shared_ptr<DeckCardData> GetCard(CardLocation pos, int32_t index);
+        std::pair<CardLocation, int32_t> GetHoverPos(int32_t posx, int32_t posy);
         
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;

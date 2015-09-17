@@ -6,6 +6,7 @@
 #include "../image_mgr.h"
 #include "../card_data.h"
 #include "../deck_data.h"
+#include "../config.h"
 
 #include "build_scene_handler.h"
 #include "build_scene.h"
@@ -18,17 +19,17 @@ namespace ygopro
     int32_t main_row_count = 0;
     v2f card_size = {0.0f, 0.0f};
     v2f icon_size = {0.0f, 0.0f};
+    v2f res_card_size = {0.0f, 0.0f};
+    v2f res_offset = {0.0f, 0.0f};
+    v2i res_count = {1, 1};
     rectf deck_area = {0.0f};
+    rectf res_area = {0.0f};
     float icon_offset = 0.0f;
     float x_left = 0.0f;
     float x_right = 0.0f;
     float main_y_spacing = 0.0f;
     float offsety[3] = {0.0f, 0.0f, 0.0f};
     float dx[3] = {0.0f, 0.0f, 0.0f};
-    std::array<CardData*, 10> result_data;
-    std::array<texf4, 10> result_tex;
-    int32_t current_sel_result = -1;
-    int32_t result_show_size = 0;
     int64_t update_ver = 0;
     bool remove_lock = false;
     DeckData current_deck;
@@ -61,6 +62,8 @@ namespace ygopro
                 return (v2f){x_left + dx[1] * seq, offsety[1]};
             case CardLocation::Side:
                 return (v2f){x_left + dx[2] * seq, offsety[2]};
+            case CardLocation::Result:
+                return {0.0f, 0.0f};
             default:
                 return {0.0f, 0.0f};
         }
@@ -88,10 +91,11 @@ namespace ygopro
     }
     
     void MiscRenderer::PushVerticesAll() {
+        static const int32_t quad_count = 34;
         base::RenderObject2DLayout::PushVerticesAll();
         BeginPrimitive(GL_TRIANGLES, ImageMgr::Get().GetRawMiscTexture()->GetTextureId());
-        std::array<vt2, 33 * 4> verts;
-        std::array<int16_t, 33 * 6> indices;
+        std::array<vt2, quad_count * 4> verts;
+        std::array<int16_t, quad_count * 6> indices;
         auto msk = ImageMgr::Get().GetTexture("mmask");
         auto nbk = ImageMgr::Get().GetTexture("numback");
         float lx = deck_area.left;
@@ -131,8 +135,10 @@ namespace ygopro
         numblock(&verts[96], {nx, my + card_size.y - th}, 0x80ffffff, 0xff000000, (int32_t)current_deck.main_deck.size());
         numblock(&verts[108], {nx, ey + card_size.y - th}, 0x80ffffff, 0xff000000, (int32_t)current_deck.extra_deck.size());
         numblock(&verts[120], {nx, sy + card_size.y - th}, 0x80ffffff, 0xff000000, (int32_t)current_deck.side_deck.size());
-        vt2::GenQuadIndex(indices.data(), 33);
-        PushVertices(verts.data(), indices.data(), 33 * 4, 33 * 6);
+        
+        vt2::Fill(&verts[132], {res_area.left, res_area.top}, {res_area.width, -res_area.height}, msk, 0x80000000);
+        vt2::GenQuadIndex(indices.data(), quad_count);
+        PushVertices(verts.data(), indices.data(), quad_count * 4, quad_count * 6);
     }
     
     void CardRenderer::PushVerticesAll() {
@@ -150,7 +156,6 @@ namespace ygopro
         limit_tex[1] = ImageMgr::Get().GetTexture("limit1");
         limit_tex[2] = ImageMgr::Get().GetTexture("limit2");
         hmask = ImageMgr::Get().GetTexture("cmask");
-        result_data.fill(nullptr);
         bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
         misc_renderer = std::make_shared<MiscRenderer>();
         card_renderer = std::make_shared<CardRenderer>();
@@ -202,7 +207,16 @@ namespace ygopro
     void BuildScene::SetSceneSize(v2i sz) {
         float h1 = 0.038333f;
         float h2 = 0.01f;
-        deck_area = {-1.0f + 10.0f / sz.x * 2.0f, 1.0f - 70.0f / sz.y * 2.0f, 1.5f, 2.0f - 80.0f / sz.y * 2.0f};
+        auto& da_node = layoutCfg["deck area"];
+        deck_area.left = da_node[0].to_integer() * 2.0f / sz.x + (float)da_node[4].to_double() * 2.0f - 1.0f;
+        deck_area.top = 1.0f - da_node[1].to_integer() * 2.0f / sz.y - (float)da_node[5].to_double() * 2.0f;
+        deck_area.width = da_node[2].to_integer() * 2.0f / sz.x + (float)da_node[6].to_double() * 2.0f;
+        deck_area.height = da_node[3].to_integer() * 2.0f / sz.y + (float)da_node[7].to_double() * 2.0f;
+        auto& sa_node = layoutCfg["search area"];
+        res_area.left = sa_node[0].to_integer() * 2.0f / sz.x + (float)sa_node[4].to_double() * 2.0f - 1.0f;
+        res_area.top = 1.0f - sa_node[1].to_integer() * 2.0f / sz.y - (float)sa_node[5].to_double() * 2.0f;
+        res_area.width = sa_node[2].to_integer() * 2.0f / sz.x + (float)sa_node[6].to_double() * 2.0f;
+        res_area.height = sa_node[3].to_integer() * 2.0f / sz.y + (float)sa_node[7].to_double() * 2.0f;
         float yrate = deck_area.height / 2;
         x_left = deck_area.left + 50.0f / sz.x * 2.0f;
         x_right = deck_area.left + deck_area.width - h1 * yrate * sz.y / sz.x;
@@ -213,6 +227,15 @@ namespace ygopro
         offsety[0] = deck_area.top - h1 * yrate;
         offsety[1] = offsety[0] - card_size.y * 4 - h2 * yrate * 3 - h1 * yrate * 2;
         offsety[2] = offsety[1] - card_size.y - h1 * yrate * 2;
+        res_count = sgui::SGJsonUtil::ConvertV2i(layoutCfg["search count"], 0);
+        res_count.x = res_count.x ? res_count.x : 1;
+        res_count.y = res_count.y ? res_count.y : 1;
+        float resw = res_area.width / (res_count.x ? res_count.x : 1) * 1.45f * sz.y / sz.x;
+        float resh = res_area.height / (res_count.y ? res_count.y : 1);
+        res_card_size.y = std::max(resw, resh);
+        res_card_size.x = res_card_size.y * sz.x / sz.y / 1.45f;
+        res_offset.x = (res_count.x > 1) ? ((res_area.width - res_card_size.x) / (res_count.x - 1)) : 0;
+        res_offset.y = (res_count.y > 1) ? ((res_area.height - res_card_size.y) / (res_count.y - 1)) : 0;
         RefreshParams();
         SetViewport({0, 0, sz.x, sz.y});
         bg_renderer->SetScreenSize(sz);
@@ -228,17 +251,6 @@ namespace ygopro
             (int32_t)((deck_area.width) / 2.0f * viewport.width),
             (int32_t)((deck_area.height) / 2.0f * viewport.height)
         };
-    }
-    
-    void BuildScene::ShowSelectedInfo(uint32_t pos, uint32_t index) {
-//        if(pos > 0 && pos < 4) {
-//            auto dcd = GetCard(pos, index);
-//            if(dcd != nullptr)
-//                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(dcd->data->code);
-//        } else if(pos == 4) {
-//            if(result_data[index] != 0)
-//                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(result_data[index]->code);
-//        }
     }
     
     void BuildScene::ClearDeck() {
@@ -402,38 +414,38 @@ namespace ygopro
     }
     
     void BuildScene::UpdateResult() {
-        result_show_size = 0;
-        float left = 0.59f;
-        float right = 1.0f - 10.0f / viewport.width * 2.0f;
-        float width = (right - left) / 2.0f;
-        float top = 1.0f - 110.0f / viewport.height * 2.0f;
-        float down = 10.0f / viewport.height * 2.0f - 1.0f;
-        float height = (top - down) / 5.0f;
-        float cheight = height * 0.9f;
-        float cwidth = cheight / 2.9f * 2.0f * viewport.height / viewport.width;
-        if(cwidth >= (right - left) / 2.0f) {
-            cwidth = (right - left) / 2.0f;
-            cheight = cwidth * 2.9f / 2.0f * viewport.width / viewport.height;
-        }
-        float offy = (height - cheight) * 0.5f;
-        float iheight = 0.08f / 0.29f * cheight;
-        float iwidth = iheight * viewport.height / viewport.width;
-        std::array<vt2, 160> verts;
-        for(int32_t i = 0; i < 10 ; ++i) {
-            if(result_data[i] == nullptr)
-                continue;
-            result_show_size++;
-            auto pvert = &verts[i * 16];
-            uint32_t cl = (i == current_sel_result) ? 0xc0ffffff : 0xc0000000;
-            vt2::Fill(&pvert[0], {left + (i % 2) * width, top - (i / 2) * height}, {width, -height}, hmask, cl);
-            CardData* pdata = result_data[i];
-            vt2::Fill(&pvert[4], {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy}, {cwidth, -cheight}, result_tex[i]);
-            uint32_t lmt = LimitRegulationMgr::Get().GetCardLimitCount(pdata->alias ? pdata->alias : pdata->code);
-            if(lmt < 3) {
-                vt2::Fill(&pvert[8], {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f},
-                                   {iwidth, -iheight}, limit_tex[lmt]);
-            }
-        }
+//        result_show_size = 0;
+//        float left = 0.59f;
+//        float right = 1.0f - 10.0f / viewport.width * 2.0f;
+//        float width = (right - left) / 2.0f;
+//        float top = 1.0f - 110.0f / viewport.height * 2.0f;
+//        float down = 10.0f / viewport.height * 2.0f - 1.0f;
+//        float height = (top - down) / 5.0f;
+//        float cheight = height * 0.9f;
+//        float cwidth = cheight / 2.9f * 2.0f * viewport.height / viewport.width;
+//        if(cwidth >= (right - left) / 2.0f) {
+//            cwidth = (right - left) / 2.0f;
+//            cheight = cwidth * 2.9f / 2.0f * viewport.width / viewport.height;
+//        }
+//        float offy = (height - cheight) * 0.5f;
+//        float iheight = 0.08f / 0.29f * cheight;
+//        float iwidth = iheight * viewport.height / viewport.width;
+//        std::array<vt2, 160> verts;
+//        for(int32_t i = 0; i < 10 ; ++i) {
+//            if(result_data[i] == nullptr)
+//                continue;
+//            result_show_size++;
+//            auto pvert = &verts[i * 16];
+//            uint32_t cl = (i == current_sel_result) ? 0xc0ffffff : 0xc0000000;
+//            vt2::Fill(&pvert[0], {left + (i % 2) * width, top - (i / 2) * height}, {width, -height}, hmask, cl);
+//            CardData* pdata = result_data[i];
+//            vt2::Fill(&pvert[4], {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy}, {cwidth, -cheight}, result_tex[i]);
+//            uint32_t lmt = LimitRegulationMgr::Get().GetCardLimitCount(pdata->alias ? pdata->alias : pdata->code);
+//            if(lmt < 3) {
+//                vt2::Fill(&pvert[8], {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f},
+//                                   {iwidth, -iheight}, limit_tex[lmt]);
+//            }
+//        }
     }
     
     void BuildScene::ChangeRegulation(int32_t index, int32_t view_regulation) {
@@ -444,6 +456,10 @@ namespace ygopro
             ViewRegulation(view_regulation - 1);
         else
             LimitRegulationMgr::Get().GetDeckCardLimitCount(current_deck);
+        for(auto& ptr : result_card) {
+            if(ptr)
+                ptr->limit = LimitRegulationMgr::Get().GetCardLimitCount(ptr->data->code);
+        }
         RefreshAllCard();
     }
     
@@ -456,49 +472,57 @@ namespace ygopro
     }
     
     void BuildScene::RefreshSearchResult(const std::array<CardData*, 10> new_results) {
-//        for(int32_t i = 0; i < 10; ++i) {
-//            if(new_results[i] != nullptr)
-//                result_tex[i] = ImageMgr::Get().GetCardTexture(new_results[i]->code);
-//        }
-//        for(int32_t i = 0; i < 10; ++i) {
-//            if(result_data[i] != nullptr)
-//                ImageMgr::Get().UnloadCardTexture(result_data[i]->code);
-//            result_data[i] = new_results[i];
-//        }
+        std::vector<std::shared_ptr<DeckCardData>> result;
+        for(int32_t i = 0; i < 10; ++i) {
+            if(new_results[i] != nullptr) {
+                result[i] = std::make_shared<DeckCardData>(new_results[i], LimitRegulationMgr::Get().GetCardLimitCount(new_results[i]->code));
+                auto bc = card_renderer->NewSharedObject<BuilderCard>();
+                bc->LoadCardTexture(new_results[i]->code);
+                bc->SetLimit(result[i]->limit);
+                result[i]->builder_card = bc;
+            }
+        }
+        for(auto& rc : result_card) {
+            if(rc!= nullptr)
+                ImageMgr::Get().UnloadCardTexture(rc->data->code);
+        }
+        result_card.clear();
+        result_card = std::move(result);
     }
     
-    void BuildScene::SetCurrentSelection(int32_t sel, bool show_info) {
-//        if(sel != current_sel_result) {
-//            current_sel_result = sel;
-//            if(current_sel_result >= 0 && show_info && result_data[current_sel_result] != nullptr)
-//                std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->ShowCardInfo(result_data[current_sel_result]->code);
-//        }
-    }
-    
-    void BuildScene::MoveCard(int32_t pos, int32_t index) {
+    void BuildScene::MoveCard(CardLocation pos, int32_t index) {
         auto dcd = GetCard(pos, index);
         if(dcd == nullptr)
             return;
-        if(pos == 1) {
-            auto ptr = current_deck.main_deck[index]->builder_card;
-            ptr->SetHL(0);
-            current_deck.side_deck.push_back(current_deck.main_deck[index]);
-            current_deck.main_deck.erase(current_deck.main_deck.begin() + index);
-        } else if(pos == 2) {
-            auto ptr = current_deck.extra_deck[index]->builder_card;
-            ptr->SetHL(0);
-            current_deck.side_deck.push_back(current_deck.extra_deck[index]);
-            current_deck.extra_deck.erase(current_deck.extra_deck.begin() + index);
-        } else if(dcd->data->type & 0x802040) {
-            auto ptr = current_deck.side_deck[index]->builder_card;
-            ptr->SetHL(0);
-            current_deck.extra_deck.push_back(current_deck.side_deck[index]);
-            current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
-        } else {
-            auto ptr = current_deck.side_deck[index]->builder_card;
-            ptr->SetHL(0);
-            current_deck.main_deck.push_back(current_deck.side_deck[index]);
-            current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
+        switch(pos) {
+            case CardLocation::Main: {
+                auto ptr = current_deck.main_deck[index]->builder_card;
+                ptr->SetHL(0);
+                current_deck.side_deck.push_back(current_deck.main_deck[index]);
+                current_deck.main_deck.erase(current_deck.main_deck.begin() + index);
+                break;
+            }
+            case CardLocation::Extra: {
+                auto ptr = current_deck.extra_deck[index]->builder_card;
+                ptr->SetHL(0);
+                current_deck.side_deck.push_back(current_deck.extra_deck[index]);
+                current_deck.extra_deck.erase(current_deck.extra_deck.begin() + index);
+            }
+            case CardLocation::Side: {
+                if(dcd->data->type & 0x802040) {
+                    auto ptr = current_deck.side_deck[index]->builder_card;
+                    ptr->SetHL(0);
+                    current_deck.extra_deck.push_back(current_deck.side_deck[index]);
+                    current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
+                } else {
+                    auto ptr = current_deck.side_deck[index]->builder_card;
+                    ptr->SetHL(0);
+                    current_deck.main_deck.push_back(current_deck.side_deck[index]);
+                    current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
+                }
+            }
+            default:
+                break;
         }
         current_deck.CalCount();
         RefreshParams();
@@ -508,7 +532,7 @@ namespace ygopro
             scene_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
     }
     
-    void BuildScene::RemoveCard(int32_t pos, int32_t index) {
+    void BuildScene::RemoveCard(CardLocation pos, int32_t index) {
         if(remove_lock)
             return;
         remove_lock = true;
@@ -545,57 +569,64 @@ namespace ygopro
     }
     
     void BuildScene::InsertSearchResult(int32_t index, bool is_side) {
-        if(result_data[index] == nullptr)
-            return;
-        auto data = result_data[index];
-        std::shared_ptr<DeckCardData> ptr;
-        if(!is_side)
-            ptr = current_deck.InsertCard(1, -1, data->code, true);
-        else
-            ptr = current_deck.InsertCard(3, -1, data->code, true);
-        if(ptr != nullptr) {
-            auto bc = card_renderer->NewSharedObject<BuilderCard>();
-            auto mpos = SceneMgr::Get().GetMousePosition();
-            bc->pos = (v2f){(float)mpos.x / viewport.width * 2.0f - 1.0f, 1.0f - (float)mpos.y / viewport.height * 2.0f};
-            bc->size = card_size;
-            bc->hl = 0;
-            ptr->builder_card = bc;
-            bc->LoadCardTexture(data->code);
-            RefreshParams();
-            UpdateAllCard();
-            SetDeckDirty();
-        }
+//        if(result_data[index] == nullptr)
+//            return;
+//        auto data = result_data[index];
+//        std::shared_ptr<DeckCardData> ptr;
+//        if(!is_side)
+//            ptr = current_deck.InsertCard(CardLocation::Main, -1, data->code, true);
+//        else
+//            ptr = current_deck.InsertCard(CardLocation::Side, -1, data->code, true);
+//        if(ptr != nullptr) {
+//            auto bc = card_renderer->NewSharedObject<BuilderCard>();
+//            auto mpos = SceneMgr::Get().GetMousePosition();
+//            bc->pos = (v2f){(float)mpos.x / viewport.width * 2.0f - 1.0f, 1.0f - (float)mpos.y / viewport.height * 2.0f};
+//            bc->size = card_size;
+//            bc->hl = 0;
+//            ptr->builder_card = bc;
+//            bc->LoadCardTexture(data->code);
+//            RefreshParams();
+//            UpdateAllCard();
+//            SetDeckDirty();
+//        }
     }
     
-    std::shared_ptr<DeckCardData> BuildScene::GetCard(int32_t pos, int32_t index) {
+    std::shared_ptr<DeckCardData> BuildScene::GetCard(CardLocation pos, int32_t index) {
         if(index < 0)
             return nullptr;
-        if(pos == 1) {
-            if(index >= (int32_t)current_deck.main_deck.size())
+        switch(pos) {
+            case CardLocation::Main:
+                if(index >= (int32_t)current_deck.main_deck.size())
+                    return nullptr;
+                return current_deck.main_deck[index];
+            case CardLocation::Extra:
+                if(index >= (int32_t)current_deck.extra_deck.size())
+                    return nullptr;
+                return current_deck.extra_deck[index];
+            case CardLocation::Side:
+                if(index >= (int32_t)current_deck.side_deck.size())
+                    return nullptr;
+                return current_deck.side_deck[index];
+            case CardLocation::Result:
+                if(index >= (int32_t)result_card.size())
+                    return nullptr;
+                return result_card[index];
+            default:
                 return nullptr;
-            return current_deck.main_deck[index];
-        } else if(pos == 2) {
-            if(index >= (int32_t)current_deck.extra_deck.size())
-                return nullptr;
-            return current_deck.extra_deck[index];
-        } else if(pos == 3) {
-            if(index >= (int32_t)current_deck.side_deck.size())
-                return nullptr;
-            return current_deck.side_deck[index];
         }
         return nullptr;
     }
     
-    std::pair<int32_t, int32_t> BuildScene::GetHoverPos(int32_t posx, int32_t posy) {
-        if(posx >= (int32_t)(viewport.width * 0.795f) && posx <= viewport.width - 10 && posy >= 110 && posy <= viewport.height - 10) {
+    std::pair<CardLocation, int32_t> BuildScene::GetHoverPos(int32_t posx, int32_t posy) {
+        float x = (float)posx / viewport.width * 2.0f - 1.0f;
+        float y = 1.0f - (float)posy / viewport.height * 2.0f;
+        if(x >= res_area.left && x <= res_area.left + res_area.width && y <= res_area.top && y >= res_area.top - res_area.height) {
             int32_t sel = (int32_t)((posy - 110.0f) / ((viewport.height - 120.0f) / 5.0f)) * 2;
             if(sel > 8)
                 sel = 8;
             sel += (posx >= ((int32_t)(viewport.width * 0.795f) + viewport.width - 10) / 2) ? 1 : 0;
-            return std::make_pair(4, sel);
+            return std::make_pair(CardLocation::Result, sel);
         }
-        float x = (float)posx / viewport.width * 2.0f - 1.0f;
-        float y = 1.0f - (float)posy / viewport.height * 2.0f;
         if(x >= x_left && x <= x_right) {
             if(y <= offsety[0] && y >= offsety[0] - main_y_spacing * 4) {
                 uint32_t row = (uint32_t)((offsety[0] - y) / main_y_spacing);
@@ -612,14 +643,14 @@ namespace ygopro
                     if(!current_deck.main_deck.empty()) {
                         auto bc = current_deck.main_deck.back()->builder_card.get();
                         if(x >= bc->pos.x && x <= bc->pos.x + card_size.x && y <= bc->pos.y && y >= bc->pos.y - card_size.y)
-                            return std::make_pair(1, (int32_t)current_deck.main_deck.size() - 1);
+                            return std::make_pair(CardLocation::Main, (int32_t)current_deck.main_deck.size() - 1);
                     }
-                    return std::make_pair(0, 0);
+                    return std::make_pair(CardLocation::Null, 0);
                 } else {
                     if(y < offsety[0] - main_y_spacing * row - card_size.y || x > x_left + cindex * dx[0] + card_size.x)
-                        return std::make_pair(0, 0);
+                        return std::make_pair(CardLocation::Null, 0);
                     else
-                        return std::make_pair(1, index);
+                        return std::make_pair(CardLocation::Main, index);
                 }
             } else if(y <= offsety[1] && y >= offsety[1] - card_size.y) {
                 int32_t rc = std::max((int32_t)current_deck.extra_deck.size(), max_row_count);
@@ -632,14 +663,14 @@ namespace ygopro
                     if(!current_deck.extra_deck.empty()) {
                         auto bc = current_deck.extra_deck.back()->builder_card.get();
                         if(x >= bc->pos.x && x <= bc->pos.x + card_size.x)
-                            return std::make_pair(2, (int32_t)current_deck.extra_deck.size() - 1);
+                            return std::make_pair(CardLocation::Extra, (int32_t)current_deck.extra_deck.size() - 1);
                     }
-                    return std::make_pair(0, 0);
+                    return std::make_pair(CardLocation::Null, 0);
                 } else {
                     if(x > x_left + index * dx[1] + card_size.x)
-                        return std::make_pair(0, 0);
+                        return std::make_pair(CardLocation::Null, 0);
                     else
-                        return std::make_pair(2, index);
+                        return std::make_pair(CardLocation::Extra, index);
                 }
             } else if(y <= offsety[2] && y >= offsety[2] - card_size.y) {
                 int32_t rc = std::max((int32_t)current_deck.side_deck.size(), max_row_count);
@@ -652,18 +683,18 @@ namespace ygopro
                     if(!current_deck.side_deck.empty()) {
                         auto bc = current_deck.side_deck.back()->builder_card.get();
                         if(x >= bc->pos.x && x <= bc->pos.x + card_size.x)
-                            return std::make_pair(3, (int32_t)current_deck.side_deck.size() - 1);
+                            return std::make_pair(CardLocation::Side, (int32_t)current_deck.side_deck.size() - 1);
                     }
-                    return std::make_pair(0, 0);
+                    return std::make_pair(CardLocation::Null, 0);
                 } else {
                     if(x > x_left + index * dx[2] + card_size.x)
-                        return std::make_pair(0, 0);
+                        return std::make_pair(CardLocation::Null, 0);
                     else
-                        return std::make_pair(3, index);
+                        return std::make_pair(CardLocation::Side, index);
                 }
             }
         }
-        return std::make_pair(0, 0);
+        return std::make_pair(CardLocation::Null, 0);
     }
     
 }

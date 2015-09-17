@@ -18,6 +18,14 @@ namespace ygopro
     struct FilterCondition;
     class BuilderCard;
     
+    enum class CardLocation {
+        Main = 0,
+        Extra = 1,
+        Side = 2,
+        Result = 3,
+        Null = 4,
+    };
+    
     struct DeckCardData {
         DeckCardData(CardData* d, uint32_t l): data(d), limit(l) {}
         CardData* data;
@@ -41,8 +49,8 @@ namespace ygopro
         void SaveToFile(const std::string& file);
         std::string SaveToString();
         
-        std::shared_ptr<DeckCardData> InsertCard(uint32_t pos, uint32_t index, uint32_t code, bool checkc);
-        bool RemoveCard(uint32_t pos, uint32_t index);
+        std::shared_ptr<DeckCardData> InsertCard(CardLocation pos, uint32_t index, uint32_t code, bool checkc);
+        bool RemoveCard(CardLocation pos, uint32_t index);
         
         uint32_t mcount = 0;
         uint32_t scount = 0;

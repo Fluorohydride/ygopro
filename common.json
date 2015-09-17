@@ -1,6 +1,6 @@
 {
-  "window_width" : 1024,
-  "window_height" : 640,
+  "window_width" : 800,
+  "window_height" : 540,
   "vertical_sync" : 0,
   "fsaa" : 0,
   "frame_rate" : 60,

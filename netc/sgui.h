@@ -1357,6 +1357,15 @@ namespace sgui
         inline base::Texture* GetGuiTexture() { return gui_texture.get(); };
         inline jaweson::JsonRoot<>& GetConfig() { return *config_root; }
         inline void PopupObject(std::shared_ptr<SGWidget> obj) { popup_objects.push_back(obj); }
+        inline void PopupCancel(std::shared_ptr<SGWidget> obj) {
+            for(auto iter = popup_objects.begin(); iter != popup_objects.end(); ) {
+                auto ptr = (*iter).lock();
+                if(ptr == obj)
+                    popup_objects.erase(iter++);
+                else
+                    iter++;
+            }
+        }
         inline base::Font* GetGuiFont(const std::string& name) {
             auto iter = gui_fonts.find(name);
             if(iter == gui_fonts.end())

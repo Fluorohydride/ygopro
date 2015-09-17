@@ -522,7 +522,7 @@ namespace ygopro
         auto wnd = LoadDialogAs<sgui::SGPanel>("filter dialog");
         if(!wnd)
             return;
-        wnd->SetPosition(pos);
+        wnd->SetPosition({pos.x - wnd->GetAbsoluteSize().x, pos.y});
         window = wnd->CastPtr<sgui::SGWidgetContainer>();
         keyword = wnd->FindWidgetAs<sgui::SGTextEdit>("keyword");
         arctype = wnd->FindWidgetAs<sgui::SGComboBox>("arctype");
@@ -762,8 +762,6 @@ namespace ygopro
     }
 	
     void InfoPanel::ShowInfo(uint32_t code) {
-        if(this->code == code)
-            return;
         sgui::SGPanel* wnd = nullptr;
         if(window.expired()) {
             wnd = LoadDialogAs<sgui::SGPanel>("info dialog");
@@ -776,13 +774,23 @@ namespace ygopro
             pen_text = wnd->FindWidgetAs<sgui::SGLabel>("pendulum text");
             desc_text = wnd->FindWidgetAs<sgui::SGLabel>("card text");
             window = wnd->CastPtr<sgui::SGWidgetContainer>();
-            auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
-            if(ok_button) {
-                ok_button->event_click += [wnd](sgui::SGWidget& sender) {
-                    wnd->RemoveFromParent();
+            auto pin_panel = wnd->FindWidgetAs<sgui::SGCheckBox<>>("pin panel");
+            if(pin_panel) {
+                pin_panel->event_check_change += [wnd, this](sgui::SGWidget& sender, bool chk) {
+                    if(chk)
+                        sgui::SGGUIRoot::GetSingleton().PopupCancel(wnd->shared_from_this());
+                    else
+                        sgui::SGGUIRoot::GetSingleton().PopupObject(wnd->shared_from_this());
                     return true;
                 };
+                if(lock_panel)
+                    pin_panel->SetChecked(lock_panel);
+                else
+                    sgui::SGGUIRoot::GetSingleton().PopupObject(wnd->shared_from_this());
             }
+        } else {
+            if(this->code == code)
+                return;
         }
         auto& dlg_node = dialogCfg["info dialog"];
         int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();

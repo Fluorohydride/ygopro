@@ -53,9 +53,9 @@ namespace ygopro
                             cti.tex_info.vert[2] = {bx / 2048.0f, (by + bh) / 2048.0f};
                             cti.tex_info.vert[3] = {(bx + bw) / 2048.0f, (by + bh) / 2048.0f};
                             cti.ref_block = blockid;
-                            card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
+                            render_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                             image_render->ClearVertices();
-                            image_render->AddVertices(&card_image, recti{bx, by, bw, bh}, recti{0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
+                            image_render->AddVertices(&render_image, recti{bx, by, bw, bh}, recti{0, 0, render_image.GetImgWidth(), render_image.GetImgHeight()});
                             PrepareRender();
                             Render();
                         } else

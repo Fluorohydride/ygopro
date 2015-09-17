@@ -15,6 +15,7 @@ namespace ygopro
     class BuildSceneHandler : public SceneHandler {
     public:
         BuildSceneHandler(std::shared_ptr<BuildScene> pscene);
+        ~BuildSceneHandler();
         virtual bool UpdateEvent();
         virtual void BeginHandler();
         
@@ -55,8 +56,8 @@ namespace ygopro
         std::vector<CardData*> search_result;
         int32_t result_page = 0;
         
-        std::pair<int32_t, int32_t> hover_pos;
-        std::pair<int32_t, int32_t> click_pos;
+        std::pair<CardLocation, int32_t> hover_pos;
+        std::pair<CardLocation, int32_t> click_pos;
         std::weak_ptr<DeckCardData> hover_obj;
         bool show_info_begin = false;
         int64_t show_info_time = 0;

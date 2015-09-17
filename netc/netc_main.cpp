@@ -121,7 +121,7 @@ int32_t main(int32_t argc, char* argv[]) {
 //    sh->SetProtoHandler(ph);
 //    sc->SetInputHandler(ih);
 //    sc->SetSceneHandler(sh);
-    SceneMgr::Get().SetScene(sc);
+//    SceneMgr::Get().SetScene(sc);
     
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int32_t key, int32_t scan, int32_t action, int32_t mods) {
         if(action == GLFW_PRESS) {

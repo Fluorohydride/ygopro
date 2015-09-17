@@ -249,99 +249,116 @@ namespace ygopro
         return std::move(deckstr);
     }
     
-    std::shared_ptr<DeckCardData> DeckData::InsertCard(uint32_t pos, uint32_t index, uint32_t code, bool checkc) {
+    std::shared_ptr<DeckCardData> DeckData::InsertCard(CardLocation pos, uint32_t index, uint32_t code, bool checkc) {
         CardData* cd = DataMgr::Get()[code];
         if(cd == nullptr || (cd->type & 0x4000))
+            return nullptr;
+        if(pos > CardLocation::Side)
             return nullptr;
         uint32_t limit = LimitRegulationMgr::Get().GetCardLimitCount(code);
         if(checkc && ((cd->alias && counts[cd->alias] >= limit) || (!cd->alias && counts[code] >= limit)))
            return nullptr;
         std::shared_ptr<DeckCardData> ret = nullptr;
-        if(pos == 1 || pos == 2) {
-            if(cd->type & 0x802040) {
-                if(index >= extra_deck.size()) {
+        switch(pos) {
+            case CardLocation::Main:
+            case CardLocation::Extra: {
+                if(cd->type & 0x802040) {
+                    if(index >= extra_deck.size()) {
+                        auto tp = std::make_shared<DeckCardData>(cd, limit);
+                        extra_deck.push_back(tp);
+                        ret = *extra_deck.rbegin();
+                    } else {
+                        auto tp = std::make_shared<DeckCardData>(cd, limit);
+                        extra_deck.insert(extra_deck.begin() + index, tp);
+                        ret = extra_deck[index];
+                    }
+                    if(cd->type & 0x800000)
+                        xyzcount++;
+                    else if(cd->type & 0x2000)
+                        syncount++;
+                    else
+                        fuscount++;
+                } else {
+                    if(index >= main_deck.size()) {
+                        auto tp = std::make_shared<DeckCardData>(cd, limit);
+                        main_deck.push_back(tp);
+                        ret = *main_deck.rbegin();
+                    } else {
+                        auto tp = std::make_shared<DeckCardData>(cd, limit);
+                        main_deck.insert(main_deck.begin() + index, tp);
+                        ret = main_deck[index];
+                    }
+                    if(cd->type & 0x1)
+                        mcount++;
+                    else if(cd->type & 0x2)
+                        scount++;
+                    else
+                        tcount++;
+                }
+                break;
+            }
+            case CardLocation::Side: {
+                if(index >= side_deck.size()) {
                     auto tp = std::make_shared<DeckCardData>(cd, limit);
-                    extra_deck.push_back(tp);
-                    ret = *extra_deck.rbegin();
+                    side_deck.push_back(tp);
+                    ret = *side_deck.rbegin();
                 } else {
                     auto tp = std::make_shared<DeckCardData>(cd, limit);
-                    extra_deck.insert(extra_deck.begin() + index, tp);
-                    ret = extra_deck[index];
+                    side_deck.insert(side_deck.begin() + index, tp);
+                    ret = side_deck[index];
                 }
-                if(cd->type & 0x800000)
-                    xyzcount++;
-                else if(cd->type & 0x2000)
-                    syncount++;
-                else
-                    fuscount++;
-            } else {
-                if(index >= main_deck.size()) {
-                    auto tp = std::make_shared<DeckCardData>(cd, limit);
-                    main_deck.push_back(tp);
-                    ret = *main_deck.rbegin();
-                } else {
-                    auto tp = std::make_shared<DeckCardData>(cd, limit);
-                    main_deck.insert(main_deck.begin() + index, tp);
-                    ret = main_deck[index];
-                }
-                if(cd->type & 0x1)
-                    mcount++;
-                else if(cd->type & 0x2)
-                    scount++;
-                else
-                    tcount++;
+                break;
             }
-        } else if(pos == 3) {
-            if(index >= side_deck.size()) {
-                auto tp = std::make_shared<DeckCardData>(cd, limit);
-                side_deck.push_back(tp);
-                ret = *side_deck.rbegin();
-            } else {
-                auto tp = std::make_shared<DeckCardData>(cd, limit);
-                side_deck.insert(side_deck.begin() + index, tp);
-                ret = side_deck[index];
-            }
+            default:
+                break;
         }
         counts[cd->alias ? cd->alias : code]++;
         return ret;
     }
     
-    bool DeckData::RemoveCard(uint32_t pos, uint32_t index) {
-        if(pos == 0)
-            return false;
-        if(pos == 1) {
-            if(index >= main_deck.size())
+    bool DeckData::RemoveCard(CardLocation pos, uint32_t index) {
+        switch(pos) {
+            case CardLocation::Main: {
+                if(index >= main_deck.size())
+                    return false;
+                auto& ecd = main_deck[index];
+                CardData* cd = ecd->data;
+                if(cd->type & 0x1)
+                    mcount--;
+                else if(cd->type & 0x2)
+                    scount--;
+                else
+                    tcount--;
+                main_deck.erase(main_deck.begin() + index);
+                counts[cd->alias ? cd->alias : cd->code]--;
+                break;
+            }
+            case CardLocation::Extra: {
+                if(index >= extra_deck.size())
+                    return false;
+                auto& ecd = extra_deck[index];
+                CardData* cd = ecd->data;
+                if(cd->type & 0x800000)
+                    xyzcount--;
+                else if(cd->type & 0x2000)
+                    syncount--;
+                else
+                    fuscount--;
+                extra_deck.erase(extra_deck.begin() + index);
+                counts[cd->alias ? cd->alias : cd->code]--;
+                break;
+            }
+            case CardLocation::Side: {
+                if(index >= side_deck.size())
+                    return false;
+                auto& ecd = side_deck[index];
+                CardData* cd = ecd->data;
+                side_deck.erase(side_deck.begin() + index);
+                counts[cd->alias ? cd->alias : cd->code]--;
+                break;
+            }
+            default:
                 return false;
-            auto& ecd = main_deck[index];
-            CardData* cd = ecd->data;
-            if(cd->type & 0x1)
-                mcount--;
-            else if(cd->type & 0x2)
-                scount--;
-            else
-                tcount--;
-            main_deck.erase(main_deck.begin() + index);
-            counts[cd->alias ? cd->alias : cd->code]--;
-        } else if(pos == 2) {
-            if(index >= extra_deck.size())
-                return false;
-            auto& ecd = extra_deck[index];
-            CardData* cd = ecd->data;
-            if(cd->type & 0x800000)
-                xyzcount--;
-            else if(cd->type & 0x2000)
-                syncount--;
-            else
-                fuscount--;
-            extra_deck.erase(extra_deck.begin() + index);
-            counts[cd->alias ? cd->alias : cd->code]--;
-        } else if(pos == 3) {
-            if(index >= side_deck.size())
-                return false;
-            auto& ecd = side_deck[index];
-            CardData* cd = ecd->data;
-            side_deck.erase(side_deck.begin() + index);
-            counts[cd->alias ? cd->alias : cd->code]--;
         }
         return true;
     }

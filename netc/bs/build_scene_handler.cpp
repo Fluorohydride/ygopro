@@ -14,8 +14,12 @@ namespace ygopro
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
         info_panel = std::make_shared<InfoPanel>();
-        hover_pos = {0, 0};
-        click_pos = {0, 0};
+        hover_pos = {CardLocation::Null, 0};
+        click_pos = {CardLocation::Null, 0};
+    }
+    
+    BuildSceneHandler::~BuildSceneHandler() {
+        sgui::SGGUIRoot::GetSingleton().event_key_down.Remove(this);
     }
     
     bool BuildSceneHandler::UpdateEvent() {
@@ -25,10 +29,6 @@ namespace ygopro
     void BuildSceneHandler::BeginHandler() {
         auto pnl_build = LoadDialogAs<sgui::SGPanel>("build panel");
         if(pnl_build) {
-            pnl_build->event_key_down += [this](sgui::SGWidget& sender, int32_t key, int32_t mods)->bool {
-                KeyDown(key, mods);
-                return true;
-            };
             auto res = pnl_build->FindWidget("deck name");
             deck_label = res ? res->CastPtr<sgui::SGLabel>() : nullptr;
             auto menu_deck = pnl_build->FindWidgetAs<sgui::SGTextButton>("menu deck");
@@ -58,16 +58,6 @@ namespace ygopro
                     return true;
                 };
             }
-            auto menu_search = pnl_build->FindWidgetAs<sgui::SGTextButton>("menu search");
-            if(menu_search) {
-                menu_search->event_click += [this](sgui::SGWidget& sender)->bool {
-                    filter_dialog->Show(SceneMgr::Get().GetMousePosition());
-                    filter_dialog->SetOKCallback([this](const FilterCondition fc, int32_t lmt)->void {
-                        Search(fc, lmt);
-                    });
-                    return true;
-                };
-            }
             auto limit_reg = pnl_build->FindWidgetAs<sgui::SGComboBox>("limit reg");
             if(limit_reg) {
                 auto& lrs = LimitRegulationMgr::Get().GetLimitRegulations();
@@ -82,12 +72,18 @@ namespace ygopro
                 };
             }
         }
-        auto pnl_result = LoadDialogAs<sgui::SGPanel>("result panel");
+        auto pnl_result = LoadDialogAs<sgui::SGPanel>("search panel");
         if(pnl_result) {
-            pnl_result->event_key_down += [this](sgui::SGWidget& sender, int32_t key, int32_t mods)->bool {
-                KeyDown(key, mods);
-                return true;
-            };
+            auto menu_search = pnl_result->FindWidgetAs<sgui::SGTextButton>("menu search");
+            if(menu_search) {
+                menu_search->event_click += [this](sgui::SGWidget& sender)->bool {
+                    filter_dialog->Show(SceneMgr::Get().GetMousePosition());
+                    filter_dialog->SetOKCallback([this](const FilterCondition fc, int32_t lmt)->void {
+                        Search(fc, lmt);
+                    });
+                    return true;
+                };
+            }
             auto res = pnl_result->FindWidget("result label");
             label_result = res ? res->CastPtr<sgui::SGLabel>() : nullptr;
             res = pnl_result->FindWidget("page label");
@@ -107,6 +103,10 @@ namespace ygopro
                 };
             }
         }
+        sgui::SGGUIRoot::GetSingleton().event_key_down.Bind([this](sgui::SGWidget& sender, int32_t key, int32_t mods)->bool {
+            KeyDown(key, mods);
+            return true;
+        }, this);
     }
     
     bool BuildSceneHandler::UpdateInput() {
@@ -115,26 +115,20 @@ namespace ygopro
             auto now = SceneMgr::Get().GetSysClock();
             if(now - show_info_time >= 500) {
                 show_info_begin = false;
-                click_pos.first = 0;
-                pscene->ShowSelectedInfo(hover_pos.first, hover_pos.second);
+                click_pos.first = CardLocation::Null;
+                auto ptr = pscene->GetCard(hover_pos.first, hover_pos.second);
+                if(ptr)
+                    info_panel->ShowInfo(ptr->data->code);
             }
         }
         return true;
     }
     
     void BuildSceneHandler::MouseMove(int32_t x, int32_t y) {
-        std::shared_ptr<DeckCardData> dcd = nullptr;
         auto pscene = build_scene.lock();
         auto pre = hover_obj.lock();
         auto hov = pscene->GetHoverPos(x, y);
-        if(hov.first == 4) {
-            //pscene->SetCurrentSelection(hov.second, show_info);
-        } else {
-            dcd = pscene->GetCard(hov.first, hov.second);
-            pscene->SetCurrentSelection(-1, false);
-            if(dcd && info_panel->IsOpen())
-                info_panel->ShowInfo(dcd->data->code);
-        }
+        auto dcd = pscene->GetCard(hov.first, hov.second);
         if(dcd != pre) {
             if(pre) {
                 pre->builder_card->SetHL(0);
@@ -149,6 +143,10 @@ namespace ygopro
                     bc->SetHL((alpha << 24) | 0xffffff);
                     return true;
                 }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
+                if(info_panel->IsOpen()) {
+                    show_info_begin = true;
+                    show_info_time = SceneMgr::Get().GetSysClock() - 200;
+                }
                 pscene->PushAction(act);
             }
         }
@@ -170,10 +168,10 @@ namespace ygopro
         if(hover_pos != click_pos)
             return;
         auto pscene = build_scene.lock();
-        click_pos.first = 0;
-        int32_t pos = hover_pos.first;
+        click_pos.first = CardLocation::Null;
+        CardLocation pos = hover_pos.first;
         int32_t index = hover_pos.second;
-        if(pos > 0 && pos < 4) {
+        if(pos < CardLocation::Result) {
             if(index < 0)
                 return;
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -181,7 +179,7 @@ namespace ygopro
             } else {
                 pscene->RemoveCard(pos, index);
             }
-        } else if(pos == 4) {
+        } else if(pos == CardLocation::Result) {
             pscene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);
         }
     }

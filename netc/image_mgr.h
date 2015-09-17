@@ -50,6 +50,7 @@ namespace ygopro
         base::Texture misc_texture;
         base::Texture bg_texture;
         base::Texture card_image;
+        base::Texture render_image;
         ZipReader imageZip;
         std::shared_ptr<base::SimpleTextureRenderer> image_render;
         std::list<std::pair<uint32_t, std::function<void(texf4)>>> loading_card;

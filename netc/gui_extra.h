@@ -99,6 +99,7 @@ namespace ygopro
         
     protected:
         uint32_t code = 0;
+        bool lock_panel = false;
         sgui::SGImage* card_image = nullptr;
         sgui::SGScrollArea* scroll_area = nullptr;
         sgui::SGImageList* misc_image = nullptr;
