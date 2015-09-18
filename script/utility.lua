@@ -1184,7 +1184,7 @@ end
 function Auxiliary.nfbdncon(e)
 	return not e:GetHandler():IsForbidden()
 end
---condition of not the turn which handler sent to grave (to grave delay condition)
+--condition of not during the turn which handler sent to grave (to grave delay condition)
 function Auxiliary.tgrvdlycon(e)
 	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID() or e:GetHandler():IsReason(REASON_RETURN)
 end
