@@ -1027,6 +1027,7 @@ namespace sgui
         }
         
         virtual void SetFocusWidget(SGWidget* child) {
+            SetFocus();
             if((child->parent.lock().get() == this) && (focus_widget.lock().get() != child)) {
                 focus_widget = child->shared_from_this();
                 child->OnGetFocus();
@@ -1176,6 +1177,14 @@ namespace sgui
             return nullptr;
         }
         
+        virtual std::shared_ptr<SGWidget> GetHovingWidget(int32_t x, int32_t y) {
+            for(auto iter = children.rbegin(); iter != children.rend(); ++iter) {
+                if((*iter)->IsVisible() && (*iter)->AllowFocus() && (*iter)->CheckInside(x, y))
+                    return (*iter);
+            }
+            return nullptr;
+        }
+        
         void SetContainerAlpha(float f) {
             container_alpha = f;
             if(alpha_cmd)
@@ -1183,14 +1192,8 @@ namespace sgui
             SetUpdate();
         }
         
-    protected:
-        virtual std::shared_ptr<SGWidget> GetHovingWidget(int32_t x, int32_t y) {
-            for(auto iter = children.rbegin(); iter != children.rend(); ++iter) {
-                if((*iter)->IsVisible() && (*iter)->CheckInside(x, y))
-                    return (*iter);
-            }
-            return nullptr;
-        }
+        inline SGWidget* CurrentHovingWidget() { return hoving_widget.lock().get(); }
+        inline SGWidget* CurrentFocusWidget() { return focus_widget.lock().get(); }
         
     protected:
         float container_alpha = 1.0f;
@@ -2386,7 +2389,7 @@ namespace sgui
                 if(children[i]->IsVisible() && children[i]->CheckInside(x, y))
                     return children[i];
             for(size_t i = children.size() - 1; i > 1; --i)
-                if(children[i]->IsVisible() && children[i]->CheckInside(x, y))
+                if(children[i]->IsVisible() && children[i]->AllowFocus() && children[i]->CheckInside(x, y))
                     return children[i];
             return nullptr;
         }
@@ -2442,6 +2445,7 @@ namespace sgui
         
         inline v2i GetViewSize() { return view_size; }
         inline v2i GetViewOffset() { return view_offset; }
+        inline SGScrollBar<>* GetScrollBar(bool hori) { return static_cast<SGScrollBar<>*>(children[hori ? 0 : 1].get()); }
         
     protected:
         v2i scroll_size = {0, 0};

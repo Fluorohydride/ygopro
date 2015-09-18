@@ -55,6 +55,7 @@ namespace ygopro
         int32_t view_regulation = 0;
         std::vector<CardData*> search_result;
         int32_t result_page = 0;
+        int32_t page_count = 1;
         
         std::pair<CardLocation, int32_t> hover_pos;
         std::pair<CardLocation, int32_t> click_pos;

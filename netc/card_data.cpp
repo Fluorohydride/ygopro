@@ -18,7 +18,7 @@ namespace ygopro
             return false;
         if(fc.subtype != 0 && (type & fc.subtype) == 0)
             return false;
-        if(fc.pool != 0 && pool != fc.pool)
+        if(fc.pool != 0 && (pool & fc.pool) == 0)
             return false;
         if((fc.type == 0) || (fc.type & 0x1)) {
             if(fc.atkmin != -1 && attack < fc.atkmin)
@@ -36,6 +36,10 @@ namespace ygopro
             if(fc.race != 0 && (race & fc.race) == 0)
                 return false;
             if(fc.attribute != 0 && (attribute & fc.attribute) == 0)
+                return false;
+            if(fc.scalemin != 0 && lscale < (uint32_t)fc.scalemin)
+                return false;
+            if(fc.scalemax != 0 && (lscale == 0 || lscale > (uint32_t)fc.scalemax))
                 return false;
         }
         if(fc.setcode != 0) {

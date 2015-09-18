@@ -45,10 +45,10 @@ namespace ygopro
 		std::wstring texts;
         std::wstring desc[16];
         
+        inline uint32_t GetRawCode() { return alias ? alias : code; }
         bool CheckCondition(const FilterCondition& fc);
         
         static bool card_sort(const CardData* c1, const CardData* c2);
-        
 	};
     
 	class DataMgr : public Singleton<DataMgr> {

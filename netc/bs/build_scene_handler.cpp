@@ -107,6 +107,8 @@ namespace ygopro
             KeyDown(key, mods);
             return true;
         }, this);
+        v2i rc = sgui::SGJsonUtil::ConvertV2i(layoutCfg["search count"], 0);
+        page_count = rc.x * rc.y;
     }
     
     bool BuildSceneHandler::UpdateInput() {
@@ -115,10 +117,14 @@ namespace ygopro
             auto now = SceneMgr::Get().GetSysClock();
             if(now - show_info_time >= 500) {
                 show_info_begin = false;
+                auto mp = SceneMgr::Get().GetMousePosition();
+                auto cur = pscene->GetHoverPos(mp.x, mp.y);
                 click_pos.first = CardLocation::Null;
-                auto ptr = pscene->GetCard(hover_pos.first, hover_pos.second);
-                if(ptr)
-                    info_panel->ShowInfo(ptr->data->code);
+                if(cur == hover_pos) {
+                    auto ptr = pscene->GetCard(hover_pos.first, hover_pos.second);
+                    if(ptr)
+                        info_panel->ShowInfo(ptr->data->code);
+                }
             }
         }
         return true;
@@ -131,6 +137,8 @@ namespace ygopro
         auto dcd = pscene->GetCard(hov.first, hov.second);
         if(dcd != pre) {
             if(pre) {
+                if(hover_pos.first == CardLocation::Result)
+                    pscene->HighlightCancel();
                 pre->builder_card->SetHL(0);
             }
             if(dcd) {
@@ -148,6 +156,8 @@ namespace ygopro
                     show_info_time = SceneMgr::Get().GetSysClock() - 200;
                 }
                 pscene->PushAction(act);
+                if(hov.first == CardLocation::Result)
+                    pscene->HighlightCode(dcd->data->GetRawCode());
             }
         }
         hover_pos = hov;
@@ -176,8 +186,11 @@ namespace ygopro
                 return;
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
                 pscene->MoveCard(pos, index);
+                SetDeckEdited();
+                MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
             } else {
                 pscene->RemoveCard(pos, index);
+                SetDeckEdited();
             }
         } else if(pos == CardLocation::Result) {
             pscene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);
@@ -206,7 +219,7 @@ namespace ygopro
             case GLFW_KEY_3:
                 if(mods & GLFW_MOD_CONTROL) {
                     pscene->ClearDeck();
-                    pscene->SetDeckDirty();
+                    SetDeckEdited();
                 } else if(mods & GLFW_MOD_ALT)
                     ViewRegulation(2);
                 break;
@@ -222,8 +235,10 @@ namespace ygopro
                 if(mods & GLFW_MOD_CONTROL) {
                     auto pscene = build_scene.lock();
                     std::string deck_string = glfwGetClipboardString(nullptr);
-                    pscene->LoadDeckFromString(deck_string);
-                    StopViewRegulation();
+                    if(pscene->LoadDeckFromString(deck_string)) {
+                        SetDeckEdited();
+                        StopViewRegulation();
+                    }                    
                 }
                 break;
             default:
@@ -330,7 +345,7 @@ namespace ygopro
                 break;
             case 2:
                 build_scene.lock()->ClearDeck();
-                build_scene.lock()->SetDeckDirty();
+                SetDeckEdited();
                 break;
             case 3: {
                 std::wstring neturl = To<std::wstring>(commonCfg["deck_neturl"].to_string());
@@ -390,37 +405,39 @@ namespace ygopro
         if(result_page == 0)
             return;
         result_page--;
-        std::array<CardData*, 10> new_results;
-        for(int32_t i = 0; i < 10; ++i) {
-            if((size_t)(result_page * 10 + i) < search_result.size())
-                new_results[i] = search_result[result_page * 10 + i];
+        std::vector<CardData*> new_results;
+        new_results.resize(page_count);
+        for(int32_t i = 0; i < page_count; ++i) {
+            if((size_t)(result_page * page_count + i) < search_result.size())
+                new_results[i] = search_result[result_page * page_count + i];
             else
                 new_results[i] = nullptr;
         }
-        build_scene.lock()->RefreshSearchResult(new_results);
+        build_scene.lock()->UpdateResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
-            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / 10) + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
             ptr->GetTextUI()->SetText(s, 0xff000000);
         }
     }
     
     void BuildSceneHandler::ResultNextPage() {
-        if((size_t)(result_page * 10 + 10) >= search_result.size())
+        if((size_t)(result_page * page_count + page_count) >= search_result.size())
             return;
         result_page++;
-        std::array<CardData*, 10> new_results;
-        for(int32_t i = 0; i < 10; ++i) {
-            if((size_t)(result_page * 10 + i) < search_result.size())
-                new_results[i] = search_result[result_page * 10 + i];
+        std::vector<CardData*> new_results;
+        new_results.resize(page_count);
+        for(int32_t i = 0; i < page_count; ++i) {
+            if((size_t)(result_page * page_count + i) < search_result.size())
+                new_results[i] = search_result[result_page * page_count + i];
             else
                 new_results[i] = nullptr;
         }
-        build_scene.lock()->RefreshSearchResult(new_results);
+        build_scene.lock()->UpdateResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
-            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / 10) + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
             ptr->GetTextUI()->SetText(s, 0xff000000);
         }
@@ -433,14 +450,15 @@ namespace ygopro
             search_result = LimitRegulationMgr::Get().FilterCard(lmt - 1, fc);
         std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
         result_page = 0;
-        std::array<CardData*, 10> new_results;
-        for(int32_t i = 0; i < 10; ++i) {
+        std::vector<CardData*> new_results;
+        new_results.resize(page_count);
+        for(int32_t i = 0; i < page_count; ++i) {
             if((size_t)(i) < search_result.size())
                 new_results[i] = search_result[i];
             else
                 new_results[i] = nullptr;
         }
-        build_scene.lock()->RefreshSearchResult(new_results);
+        build_scene.lock()->UpdateResult(new_results);
         auto ptr = label_result.lock();
         if(ptr != nullptr) {
             std::wstring s = To<std::wstring>(stringCfg["eui_filter_count"].to_string());
@@ -452,7 +470,7 @@ namespace ygopro
         }
         auto ptr2 = label_page.lock();
         if(ptr2 != nullptr) {
-            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / 10) + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
             ptr2->GetTextUI()->SetText(s, 0xff000000);
         }

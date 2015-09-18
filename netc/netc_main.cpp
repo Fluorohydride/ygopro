@@ -52,8 +52,8 @@ int32_t main(int32_t argc, char* argv[]) {
         if(!dialogCfg.parse(jsonfile.Data(), jsonfile.Length()))
             return 0;
         stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
-            std::wstring setname = To<std::wstring>(name);
-            DataMgr::Get().RegisterSetCode(To<uint32_t>(node.to_string()), setname);
+            std::wstring setname = To<std::wstring>(node.to_string());
+            DataMgr::Get().RegisterSetCode(To<uint32_t>(name), setname);
         });
     }
     int32_t width = (int32_t)commonCfg["window_width"].to_integer();

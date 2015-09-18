@@ -131,6 +131,8 @@ namespace ygopro
                 node.for_each([lbl](const std::string& name, jaweson::JsonNode<>& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, lbl, {0, 0});
+                    } else if(name == "allow focus") {
+                        lbl->SetAllowFocus(sub_node.to_bool());
                     } else if(name == "text") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         lbl->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
@@ -146,6 +148,8 @@ namespace ygopro
                 node.for_each([img](const std::string& name, jaweson::JsonNode<>& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, img, {0, 0});
+                    } else if(name == "allow focus") {
+                        img->SetAllowFocus(sub_node.to_bool());
                     } else if(name == "image") {
                         img->GetSpriteUI()->SetTextureRect(sgui::SGJsonUtil::ConvertRect(sub_node));
                     }
@@ -327,6 +331,7 @@ namespace ygopro
             case WidgetType::SpriteList: {
                 auto sl = parent->NewChild<sgui::SGImageList>();
                 sl->SetName(child_name);
+                sl->SetAllowFocus(false);
                 sl->SetPositionSize({0, 0}, {0, 0}, {0.0f, 0.0f}, {1.0f, 1.0f});
                 return sl;
             }
@@ -620,7 +625,7 @@ namespace ygopro
     
     void FilterDialog::BeginSearch() {
         FilterCondition fc;
-        std::wstring keystr = keyword? L"" : keyword->GetTextUI()->GetText();
+        std::wstring keystr = keyword ? keyword->GetTextUI()->GetText() : L"";
         con_text[0] = keystr;
         Tokenizer<wchar_t> tokens(keystr, L" ");
         for(size_t i = 0; i < tokens.size(); ++i) {
@@ -631,11 +636,15 @@ namespace ygopro
                     if(fc.code == 0)
                         fc.code = 1;
                 } else if(sep_keyword[0] == L'@') {
-                    auto setcode = DataMgr::Get().GetSetCode(sep_keyword.substr(1));
-                    if(setcode)
-                        fc.setcode = setcode;
-                    else
-                        fc.setcode = 0xffff;
+                    if(sep_keyword[1] == L'@') {
+                        fc.setcode = To<int32_t>(To<std::string>(sep_keyword.substr(2)));
+                    } else {
+                        auto setcode = DataMgr::Get().GetSetCode(sep_keyword.substr(1));
+                        if(setcode)
+                            fc.setcode = setcode;
+                        else
+                            fc.setcode = 0xffff;
+                    }
                 } else if(sep_keyword[0] == L'#') {
                     fc.tags.push_back(sep_keyword.substr(1));
                 } else
@@ -663,8 +672,8 @@ namespace ygopro
                 fc.attribute = attribute->GetItemCustomValue(sel[4]);
             }
             if(race) {
-                sel[4] = race->GetSelection();
-                fc.race = race->GetItemCustomValue(sel[4]);
+                sel[5] = race->GetSelection();
+                fc.race = race->GetItemCustomValue(sel[5]);
             }
             if(attack) {
                 auto t1 = ParseValue(attack->GetTextUI()->GetText());
@@ -743,7 +752,7 @@ namespace ygopro
             return std::make_tuple(0, 0, 0);
         if(valstr == L"?")
             return std::make_tuple(1, 0, 0);
-        int32_t pos = (int32_t)valstr.find(L':');
+        int32_t pos = (int32_t)valstr.find(L'-');
         if(pos == std::wstring::npos)
             return std::make_tuple(2, ParseInt(&valstr[0], (int32_t)valstr.length()), 0);
         else
@@ -767,6 +776,7 @@ namespace ygopro
             wnd = LoadDialogAs<sgui::SGPanel>("info dialog");
             if(!wnd)
                 return;
+            wnd->SetDragable(true);
             card_image = wnd->FindWidgetAs<sgui::SGImage>("card image");
             scroll_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
             misc_image = wnd->FindWidgetAs<sgui::SGImageList>("misc image");
@@ -787,6 +797,15 @@ namespace ygopro
                     pin_panel->SetChecked(lock_panel);
                 else
                     sgui::SGGUIRoot::GetSingleton().PopupObject(wnd->shared_from_this());
+            }
+            if(scroll_area) {
+                scroll_area->event_mouse_wheel += [this](sgui::SGWidget& sender, float dx, float dy)->bool {
+                    auto vbar = scroll_area->GetScrollBar(false);
+                    if(scroll_area->CurrentHovingWidget() != vbar)
+                        vbar->OnMouseWheel(dx, dy);
+                    return true;
+                };
+                scroll_area->SetDragTarget(wnd->shared_from_this());
             }
         } else {
             if(this->code == code)
@@ -819,7 +838,6 @@ namespace ygopro
                 card_image->GetSpriteUI()->SetTexture(ctex);
                 card_image->GetSpriteUI()->SetTextureRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
             }
-            card_image->SetDragTarget(window.lock());
         }
         if(misc_image) {
             misc_image->GetSpriteUI()->Clear();
@@ -840,18 +858,6 @@ namespace ygopro
             info_text->GetTextUI()->AppendText(L" [", 0xff000000);
             info_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
             
-//            if(setcode) {
-//                info_text->GetTextUI()->AppendText(To<std::wstring>(stringCfg["eui_msg_setcode"].to_string()), 0xff000000);
-//                for(int32_t i = 0; i < 4; ++i) {
-//                    uint16_t sd = (setcode >> (i * 16)) & 0xffff;
-//                    if(sd) {
-//                        info_text->GetTextUI()->AppendText(L" @", 0xff000000);
-//                        info_text->GetTextUI()->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
-//                        info_text->GetTextUI()->AppendText(L" ", 0xff000000);
-//                    }
-//                }
-//            }
-            
             info_text->GetTextUI()->AppendText(L"]\n", 0xff000000);
             // types
             info_text->GetTextUI()->AppendText(DataMgr::Get().GetTypeString(data->type), 0xff000000);
@@ -871,6 +877,17 @@ namespace ygopro
                 else
                     adstr.append(" DEF/  ? ");
                 info_text->GetTextUI()->AppendText(To<std::wstring>(adstr), 0xff000000);
+            }
+            if(setcode) {
+                info_text->GetTextUI()->AppendText(L"\n", 0xff000000);
+                info_text->GetTextUI()->AppendText(To<std::wstring>(stringCfg["eui_msg_setcode"].to_string()), 0xff000000);
+                for(int32_t i = 0; i < 4; ++i) {
+                    uint16_t sd = (setcode >> (i * 16)) & 0xffff;
+                    if(sd) {
+                        info_text->GetTextUI()->AppendText(L"  @", 0xff000000);
+                        info_text->GetTextUI()->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
+                    }
+                }
             }
             info_text_height = info_text->GetAbsoluteSize().y;
             if(misc_image) {

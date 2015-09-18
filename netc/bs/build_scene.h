@@ -63,7 +63,6 @@ namespace ygopro
         void ClearDeck();
         void SortDeck();
         void ShuffleDeck();
-        void SetDeckDirty();
         bool LoadDeckFromFile(const std::wstring& file);
         bool LoadDeckFromString(const std::string& deck_str);
         bool SaveDeckToFile(const std::wstring& file);
@@ -73,14 +72,16 @@ namespace ygopro
         void UpdateAllCard();
         void RefreshParams();
         void RefreshAllCard();
-        void UpdateResult();
+        void RefreshResult();
+        void HighlightCode(int32_t code);
+        void HighlightCancel();
         
         void ChangeRegulation(int32_t index, int32_t vr);
         void ViewRegulation(int32_t limit);
-        void RefreshSearchResult(const std::array<CardData*, 10> new_results);
         
         void MoveCard(CardLocation pos, int32_t index);
         void RemoveCard(CardLocation pos, int32_t index);
+        void UpdateResult(const std::vector<CardData*> new_results);
         void InsertSearchResult(int32_t index, bool is_side);
         
         std::shared_ptr<DeckCardData> GetCard(CardLocation pos, int32_t index);
