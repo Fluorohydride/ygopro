@@ -448,20 +448,20 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 	uint32 base_atk = get_base_attack();
 	uint32 base_def = get_base_defence();
 	temp.base_attack = base_atk;
-	temp.attack = base_atk;
 	temp.base_defence = base_def;
-	temp.defence = base_def;
 	int32 up_atk = 0, upc_atk = 0;
 	int32 up_def = 0, upc_def = 0;
 	effect_set eset;
 	filter_effect(EFFECT_SWAP_AD, &eset, FALSE);
 	int32 swap = eset.size();
 	if(swap || patk) {
+		temp.attack = base_atk;
 		filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
 		filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
 		filter_effect(EFFECT_SET_ATTACK_FINAL, &eset, FALSE);
 	}
 	if(swap || pdef) {
+		temp.defence = base_def;
 		filter_effect(EFFECT_UPDATE_DEFENCE, &eset, FALSE);
 		filter_effect(EFFECT_SET_DEFENCE, &eset, FALSE);
 		filter_effect(EFFECT_SET_DEFENCE_FINAL, &eset, FALSE);
@@ -527,11 +527,15 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 			break;
 		}
 		if (!rev) {
-			temp.attack = base_atk + up_atk + upc_atk;
-			temp.defence = base_def + up_def + upc_def;
+			if (temp.attack != -1)
+				temp.attack = base_atk + up_atk + upc_atk;
+			if (temp.defence != -1)
+				temp.defence = base_def + up_def + upc_def;
 		} else {
-			temp.attack = base_atk - up_atk - upc_atk;
-			temp.defence = base_def - up_def - upc_def;
+			if (temp.attack != -1)
+				temp.attack = base_atk - up_atk - upc_atk;
+			if (temp.defence != -1)
+				temp.defence = base_def - up_def - upc_def;
 		}
 	}
 	if (swap_final) {

@@ -47,11 +47,11 @@ function c81907872.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c81907872.cfilter1(c,tp)
-	return c:IsControler(tp) and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY+REASON_EFFECT) and c:IsSetCard(0x8d) and c:IsType(TYPE_MONSTER)
-		and not c:IsPreviousLocation(LOCATION_SZONE)
+	return c:IsControler(tp) and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY) and c:IsReason(REASON_EFFECT)
+		and c:IsSetCard(0x8d) and c:IsType(TYPE_MONSTER) and not c:IsPreviousLocation(LOCATION_SZONE)
 end
 function c81907872.cfilter2(c)
-	return c:IsReason(REASON_BATTLE) and c:IsStatus(STATUS_OPPO_BATTLE) and c==Duel.GetAttackTarget() 
+	return c:IsReason(REASON_BATTLE) and c:IsStatus(STATUS_OPPO_BATTLE) and c==Duel.GetAttackTarget()
 end
 function c81907872.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return (rp~=tp and eg:IsExists(c81907872.cfilter1,1,nil,tp)) or eg:IsExists(c81907872.cfilter2,1,nil)
