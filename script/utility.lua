@@ -1184,6 +1184,10 @@ end
 function Auxiliary.nfbdncon(e)
 	return not e:GetHandler():IsForbidden()
 end
+--condition of not during the turn which handler sent to grave (to grave delay condition)
+function Auxiliary.tgrvdlycon(e)
+	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID() or e:GetHandler():IsReason(REASON_RETURN)
+end
 --flag effect for spell counter
 function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(1)==0 then

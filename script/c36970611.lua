@@ -26,7 +26,7 @@ function c36970611.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetRange(LOCATION_GRAVE)
 	e3:SetCode(EVENT_FREE_CHAIN)
-	e3:SetCondition(c36970611.thcon)
+	e3:SetCondition(aux.tgrvdlycon)
 	e3:SetCost(c36970611.thcost)
 	e3:SetTarget(c36970611.thtg)
 	e3:SetOperation(c36970611.thop)
@@ -70,9 +70,6 @@ function c36970611.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.Remove(tc,POS_FACEDOWN,REASON_EFFECT)
 	end
-end
-function c36970611.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c36970611.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
