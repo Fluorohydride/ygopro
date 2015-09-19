@@ -1,4 +1,4 @@
---큐분
+--キューブン
 function c17530001.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)
@@ -30,11 +30,8 @@ function c17530001.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CANNOT_MSET)
+	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	c:RegisterEffect(e2)
-	local e3=e1:Clone()
-	e3:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	c:RegisterEffect(e3)
 end
 function c17530001.tglimit(e,c)
 	return c:GetLevel()==e:GetLabel()
