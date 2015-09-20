@@ -20,9 +20,8 @@ function c43698897.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCountLimit(1,43698898)
-	e3:SetCondition(c43698897.thcon)
 	e3:SetTarget(c43698897.thtg)
 	e3:SetOperation(c43698897.thop)
 	c:RegisterEffect(e3)
@@ -103,9 +102,6 @@ function c43698897.spop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ShuffleHand(tp)
 		end
 	end
-end
-function c43698897.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c43698897.thfilter(c)
 	return c:IsFaceup() and c:IsCode(6077601) and c:IsAbleToHand()

@@ -42,7 +42,7 @@ function c37445295.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c37445295.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_EFFECT) and not e:GetHandler():IsReason(REASON_RETURN)
+	return e:GetHandler():IsReason(REASON_EFFECT)
 end
 function c37445295.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

@@ -57,7 +57,7 @@ function c96345188.lvop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c96345188.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()==Duel.GetTurnCount() and not e:GetHandler():IsReason(REASON_RETURN)
+	return e:GetHandler():GetTurnID()==Duel.GetTurnCount()
 end
 function c96345188.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

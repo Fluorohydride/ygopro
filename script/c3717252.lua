@@ -45,7 +45,7 @@ function c3717252.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c3717252.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_EFFECT) and not e:GetHandler():IsReason(REASON_RETURN)
+	return e:GetHandler():IsReason(REASON_EFFECT)
 end
 function c3717252.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

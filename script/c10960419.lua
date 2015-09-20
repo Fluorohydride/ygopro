@@ -122,5 +122,6 @@ function c10960419.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return false
 end
 function c10960419.retop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetLabelObject()
 	Duel.ReturnToField(tc)
 end

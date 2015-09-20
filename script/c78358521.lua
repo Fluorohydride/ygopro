@@ -81,7 +81,7 @@ function c78358521.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c78358521.decop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsReason(REASON_RETURN) or Duel.GetFlagEffect(tp,78358522)~=0 then return end
+	if Duel.GetFlagEffect(tp,78358522)~=0 then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DECREASE_TRIBUTE)

@@ -28,9 +28,9 @@ function c5026221.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if ((tn==tp and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)) or (tn~=tp and ph==PHASE_BATTLE)) 
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c5026221.filter,tp,LOCATION_HAND,0,1,nil,e,tp)
-		and Duel.SelectYesNo(tp,aux.Stringid(5026221,1)) then
+		and Duel.SelectYesNo(tp,94) then
 		e:GetHandler():RegisterFlagEffect(5026221,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(5026221,2))
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,65)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 	end
 end

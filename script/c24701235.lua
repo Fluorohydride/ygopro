@@ -31,7 +31,6 @@ function c24701235.initial_effect(c)
 	e6:SetCategory(CATEGORY_DRAW)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e6:SetCode(EVENT_TO_GRAVE)
-	e6:SetCondition(c24701235.condition)
 	e6:SetTarget(c24701235.target)
 	e6:SetOperation(c24701235.operation)
 	c:RegisterEffect(e6)
@@ -85,9 +84,6 @@ function c24701235.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c24701235.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SPIRIT)
-end
-function c24701235.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c24701235.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c24701235.cfilter,tp,LOCATION_MZONE,0,1,nil) end

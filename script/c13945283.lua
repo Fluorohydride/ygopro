@@ -12,7 +12,7 @@ function c13945283.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c13945283.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttackTarget()==e:GetHandler()
+	return Duel.GetAttackTarget()==e:GetHandler() and not Duel.GetAttacker():IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c13945283.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

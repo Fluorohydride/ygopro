@@ -33,7 +33,7 @@ function c10530913.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c10530913.cfilter(c)
-	return c:IsSetCard(0x90) and c:IsType(TYPE_MONSTER) and not c:IsReason(REASON_RETURN)
+	return c:IsSetCard(0x90) and c:IsType(TYPE_MONSTER)
 end
 function c10530913.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c10530913.cfilter,1,nil)

@@ -667,6 +667,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
 				}
+				val = BufferIO::ReadInt8(pbuf);
+				mainGame->dField.extra_p_count[p] = val;
 			}
 			BufferIO::ReadInt8(pbuf); //chain count, always 0
 			SinglePlayReload();

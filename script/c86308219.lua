@@ -20,7 +20,7 @@ function c86308219.cfilter(c)
 	return c:IsFaceup() and (c:IsCode(76812113) or c:IsCode(12206212))
 end
 function c86308219.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c86308219.cfilter,tp,LOCATION_MZONE,0,3,nil)
+	return Duel.IsExistingMatchingCard(c86308219.cfilter,tp,LOCATION_ONFIELD,0,3,nil)
 end
 function c86308219.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(86308219,tp,ACTIVITY_SPSUMMON)==0

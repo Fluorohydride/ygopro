@@ -40,6 +40,7 @@ function c79766336.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if tg then tg(e,tp,ceg,cep,cev,cre,cr,crp,1) end
 	te:SetLabelObject(e:GetLabelObject())
 	e:SetLabelObject(te)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,0,0,0)
 end
 function c79766336.operation(e,tp,eg,ep,ev,re,r,rp)
 	local te=e:GetLabelObject()

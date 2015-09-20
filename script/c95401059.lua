@@ -15,7 +15,7 @@ function c95401059.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetTargetRange(1,0)
 	e2:SetTarget(c95401059.splimit)
-	e2:SetCondition(c95401059.splimcon)
+	e2:SetCondition(aux.nfbdncon)
 	c:RegisterEffect(e2)
 	--spsummon
 	local e3=Effect.CreateEffect(c)
@@ -30,21 +30,15 @@ function c95401059.initial_effect(c)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
 	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCondition(c95401059.condition2)
+	e4:SetCondition(aux.TRUE)
 	c:RegisterEffect(e4)
 end
 function c95401059.splimit(e,c,sump,sumtype,sumpos,targetp)
 	if c:IsSetCard(0x9d) or c:IsSetCard(0xc4) then return false end
 	return bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
-function c95401059.splimcon(e)
-	return not e:GetHandler():IsForbidden()
-end
 function c95401059.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_PENDULUM
-end
-function c95401059.condition2(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c95401059.filter(c,e,tp)
 	return (c:GetSequence()==6 or c:GetSequence()==7)

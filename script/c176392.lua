@@ -15,7 +15,7 @@ function c176392.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_DESTROY)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCondition(c176392.spcon)
 	e2:SetTarget(c176392.sptg)
 	e2:SetOperation(c176392.spop)
@@ -37,8 +37,11 @@ end
 function c176392.repval(e,c)
 	return c:IsFaceup() and c:IsSetCard(0x1d) and c~=e:GetHandler()
 end
+function c176392.spfilter(c)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0x1d)
+end
 function c176392.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_END and eg:IsExists(c176392.rfilter,1,nil)
+	return Duel.GetCurrentPhase()==PHASE_END and eg:IsExists(c176392.spfilter,1,nil)
 end
 function c176392.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

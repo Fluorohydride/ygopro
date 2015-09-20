@@ -32,6 +32,22 @@ function c20644748.initial_effect(c)
 	e4:SetTargetRange(1,1)
 	e4:SetValue(c20644748.svalue)
 	c:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetRange(LOCATION_SZONE)
+	e5:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e5:SetTargetRange(1,1)
+	e5:SetValue(c20644748.aclimit)
+	c:RegisterEffect(e5)
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_FIELD)
+	e6:SetRange(LOCATION_SZONE)
+	e6:SetCode(EFFECT_CANNOT_SSET)
+	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e6:SetTargetRange(1,1)
+	e6:SetTarget(c20644748.setlimit)
+	c:RegisterEffect(e6)
 end
 function c20644748.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)<=5
@@ -67,4 +83,16 @@ function c20644748.svalue(e,fp,rp,r)
 		if Duel.GetFieldCard(fp,LOCATION_SZONE,i) then ct=ct-1 end
 	end
 	return ct-Duel.GetFieldGroupCount(fp,LOCATION_MZONE,0)
+end
+function c20644748.aclimit(e,re,tp)
+	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
+	if re:IsActiveType(TYPE_FIELD) then
+		return not Duel.GetFieldCard(tp,LOCATION_SZONE,5) and Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)>4
+	elseif re:IsActiveType(TYPE_PENDULUM) then
+		return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)>4
+	end
+	return false
+end
+function c20644748.setlimit(e,c,tp)
+	return c:IsType(TYPE_FIELD) and not Duel.GetFieldCard(tp,LOCATION_SZONE,5) and Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)>4
 end

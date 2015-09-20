@@ -6,13 +6,9 @@ function c79814787.initial_effect(c)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c79814787.condition)
 	e1:SetTarget(c79814787.target)
 	e1:SetOperation(c79814787.operation)
 	c:RegisterEffect(e1)
-end
-function c79814787.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c79814787.filter(c)
 	return c:GetCode()==89631139 and c:IsAbleToHand()

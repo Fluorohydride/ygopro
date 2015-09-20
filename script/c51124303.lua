@@ -23,6 +23,7 @@ end
 function c51124303.spfilter(c,e,tp,mc)
 	return c:IsSetCard(0xb4) and bit.band(c:GetType(),0x81)==0x81 and (not c.mat_filter or c.mat_filter(mc))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
+		and mc:IsCanBeRitualMaterial(c)
 end
 function c51124303.rfilter(c,mc)
 	local mlv=mc:GetRitualLevel(c)
@@ -39,6 +40,9 @@ end
 function c51124303.mfilter(c)
 	return c:GetLevel()>0 and c:IsAbleToGrave()
 end
+function c51124303.mzfilter(c,tp)
+	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
+end
 function c51124303.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -48,7 +52,7 @@ function c51124303.target(e,tp,eg,ep,ev,re,r,rp,chk)
 			local mg2=Duel.GetMatchingGroup(c51124303.mfilter,tp,LOCATION_EXTRA,0,nil)
 			mg:Merge(mg2)
 		else
-			mg=mg:Filter(Card.IsLocation,nil,LOCATION_MZONE)
+			mg=mg:Filter(c51124303.mzfilter,nil,tp)
 		end
 		return mg:IsExists(c51124303.filter,1,nil,e,tp)
 	end

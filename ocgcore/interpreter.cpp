@@ -18,7 +18,9 @@
 static const struct luaL_Reg cardlib[] = {
 	{ "GetCode", scriptlib::card_get_code },
 	{ "GetOriginalCode", scriptlib::card_get_origin_code },
+	{ "GetOriginalCodeRule", scriptlib::card_get_origin_code_rule },
 	{ "IsSetCard", scriptlib::card_is_set_card },
+	{ "IsPreviousSetCard", scriptlib::card_is_pre_set_card },
 	{ "GetType", scriptlib::card_get_type },
 	{ "GetOriginalType", scriptlib::card_get_origin_type },
 	{ "GetLevel", scriptlib::card_get_level },
@@ -133,6 +135,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "IsRelateToCard", scriptlib::card_is_relate_to_card },
 	{ "IsRelateToBattle", scriptlib::card_is_relate_to_battle },
 	{ "CopyEffect", scriptlib::card_copy_effect },
+	{ "EnableUnsummonable", scriptlib::card_enable_unsummonable },
 	{ "EnableReviveLimit", scriptlib::card_enable_revive_limit },
 	{ "CompleteProcedure", scriptlib::card_complete_procedure },
 	{ "IsDisabled", scriptlib::card_is_disabled },
@@ -193,6 +196,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "IsCanRemoveCounter", scriptlib::card_is_can_remove_counter },
 	{ "IsCanBeFusionMaterial", scriptlib::card_is_can_be_fusion_material },
 	{ "IsCanBeSynchroMaterial", scriptlib::card_is_can_be_synchro_material },
+	{ "IsCanBeRitualMaterial", scriptlib::card_is_can_be_ritual_material },
 	{ "IsCanBeXyzMaterial", scriptlib::card_is_can_be_xyz_material },
 	{ "CheckFusionMaterial", scriptlib::card_check_fusion_material },
 	{ "IsImmuneToEffect", scriptlib::card_is_immune_to_effect },
@@ -261,6 +265,7 @@ static const struct luaL_Reg effectlib[] = {
 	{ "IsHasCategory", scriptlib::effect_is_has_category },
 	{ "IsHasType", scriptlib::effect_is_has_type },
 	{ "IsActivatable", scriptlib::effect_is_activatable },
+	{ "IsActivated", scriptlib::effect_is_activated },
 	{ "GetActivateLocation", scriptlib::effect_get_activate_location },
 	{ NULL, NULL }
 };

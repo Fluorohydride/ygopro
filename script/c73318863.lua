@@ -26,42 +26,21 @@ function c73318863.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and c:IsFaceup() and tc and tc:IsRelateToEffect(e) and c73318863.filter(tc) then
-		c:CreateRelation(tc,RESET_EVENT+0x5fe0000)
+		c:SetCardTarget(tc)
 		local e1=Effect.CreateEffect(c)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_CONTROL)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE+EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetRange(LOCATION_MZONE)
 		e1:SetValue(tp)
 		e1:SetLabel(0)
 		e1:SetReset(RESET_EVENT+0x1fc0000)
 		e1:SetCondition(c73318863.ctcon)
 		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_CHANGE_POS)
-		e2:SetReset(RESET_EVENT+0x1fc0000)
-		e2:SetOperation(c73318863.posop)
-		e2:SetLabelObject(e1)
-		tc:RegisterEffect(e2)
 	end
 end
 function c73318863.ctcon(e)
-	if e:GetLabel()==1 then return true end
-	if e:GetLabel()==2 then return false end
 	local c=e:GetOwner()
 	local h=e:GetHandler()
-	if h:IsAttribute(ATTRIBUTE_LIGHT) and not c:IsDisabled() and c:IsRelateToCard(h) then
-		return true
-	else
-		e:SetLabel(2)
-		return false
-	end
-end
-function c73318863.posop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabelObject():GetLabel()~=0 then return end
-	local h=e:GetHandler()
-	if h:IsPreviousPosition(POS_FACEUP) and h:IsFacedown() then
-		e:GetLabelObject():SetLabel(1)
-	end
+	return h:IsAttribute(ATTRIBUTE_LIGHT) and c:IsHasCardTarget(h)
 end

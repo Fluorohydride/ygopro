@@ -6,12 +6,8 @@ function c89609515.initial_effect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c89609515.condition)
 	e1:SetOperation(c89609515.operation)
 	c:RegisterEffect(e1)
-end
-function c89609515.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c89609515.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x39)

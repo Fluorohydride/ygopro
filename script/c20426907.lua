@@ -53,22 +53,22 @@ function c20426907.distg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if res then
 		local tc=teg:GetFirst()
 		if tc:IsLevelBelow(4) and not tc:IsType(TYPE_NORMAL)
-			and Duel.SelectYesNo(tp,aux.Stringid(20426907,0)) then
+			and Duel.SelectYesNo(tp,94) then
 			e:SetLabel(1)
 			Duel.SetTargetCard(teg)
 			Duel.SetOperationInfo(0,CATEGORY_DISABLE,teg,1,0,0)
-			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(20426907,1))
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,65)
 		end
 		return
 	end
 	res,teg,tep,tev,tre,tr,trp=Duel.CheckEvent(EVENT_SPSUMMON_SUCCESS,true)
 	if res then
 		local g=teg:Filter(c20426907.filter,nil)
-		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(20426907,0)) then
+		if g:GetCount()>0 and Duel.SelectYesNo(tp,94) then
 			e:SetLabel(2)
 			Duel.SetTargetCard(g)
 			Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,g:GetCount(),0,0)
-			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(20426907,1))
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,65)
 		end
 	end
 end

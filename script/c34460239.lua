@@ -12,10 +12,13 @@ function c34460239.initial_effect(c)
 end
 function c34460239.filter(c,tp)
 	return c:IsFaceup() and c:IsDestructable()
-		and Duel.IsExistingMatchingCard(c34460239.filter2,tp,LOCATION_DECK,0,1,nil,c:GetCode())
+		and Duel.IsExistingMatchingCard(c34460239.nfilter1,tp,LOCATION_DECK,0,1,nil,c)
 end
-function c34460239.filter2(c,code)
-	return c:IsCode(code) and c:IsAbleToHand()
+function c34460239.nfilter1(c,tc)
+	return c:IsCode(tc:GetCode()) and c:IsAbleToHand()
+end
+function c34460239.nfilter2(c,tc)
+	return c:IsCode(tc:GetPreviousCodeOnField()) and c:IsAbleToHand()
 end
 function c34460239.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c34460239.filter(chkc,tp) end
@@ -29,7 +32,8 @@ function c34460239.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		Duel.BreakEffect()
-		local hc=Duel.GetFirstMatchingCard(c34460239.filter2,tp,LOCATION_DECK,0,nil,tc:GetCode())
+		local g=Duel.SelectMatchingCard(tp,c34460239.nfilter2,tp,LOCATION_DECK,0,1,1,nil,tc)
+		local hc=g:GetFirst()
 		if hc then
 			Duel.SendtoHand(hc,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,hc)

@@ -17,7 +17,7 @@ function c35448319.initial_effect(c)
 	e2:SetDescription(aux.Stringid(35448319,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_DESTROY)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCondition(c35448319.spcon)
 	e2:SetTarget(c35448319.sptg)
@@ -46,7 +46,7 @@ function c35448319.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c35448319.spfilter(c)
-	return c:IsOnField() and c:IsRace(RACE_PLANT)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and bit.band(c:GetPreviousRaceOnField(),RACE_PLANT)~=0
 end
 function c35448319.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c35448319.spfilter,1,nil)

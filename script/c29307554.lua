@@ -13,7 +13,7 @@ function c29307554.initial_effect(c)
 		c29307554.global_check=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_DESTROY)
+		ge1:SetCode(EVENT_DESTROYED)
 		ge1:SetOperation(c29307554.checkop)
 		Duel.RegisterEffect(ge1,0)
 	end
@@ -23,9 +23,9 @@ function c29307554.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local p1=false
 	local p2=false
 	while tc do
-		if tc:IsLocation(LOCATION_MZONE) and tc:IsDefencePos() then
-			if tc:GetReasonPlayer()==0 and tc:IsControler(1) then p1=true end
-			if tc:GetReasonPlayer()==1 and tc:IsControler(0) then p2=true end
+		if tc:IsPreviousLocation(LOCATION_MZONE) and tc:IsPreviousPosition(POS_DEFENCE) then
+			if tc:GetReasonPlayer()==0 and tc:GetPreviousControler()==1 then p1=true end
+			if tc:GetReasonPlayer()==1 and tc:GetPreviousControler()==0 then p2=true end
 		end
 		tc=eg:GetNext()
 	end

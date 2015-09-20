@@ -28,14 +28,11 @@ function c712559.initial_effect(c)
 	e3:SetOperation(c712559.operation)
 	c:RegisterEffect(e3)
 end
-function c712559.cfilter(c)
-	return c:IsReason(REASON_DESTROY) and c:IsLevelAbove(1) and c:IsSetCard(0x4)
-end
 function c712559.condition(e,tp,eg,ep,ev,re,r,rp)
 	local lv=0
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsReason(REASON_DESTROY) and tc:IsSetCard(0x4) then
+		if tc:IsReason(REASON_DESTROY) and tc:IsSetCard(0x4) and not tc:IsPreviousLocation(LOCATION_SZONE) then
 			local tlv=tc:GetLevel()
 			if tlv>lv then lv=tlv end
 		end

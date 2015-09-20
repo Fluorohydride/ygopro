@@ -20,14 +20,29 @@ function c49441499.initial_effect(c)
 	e2:SetTarget(c49441499.sptg)
 	e2:SetOperation(c49441499.spop)
 	c:RegisterEffect(e2)
+	--reg
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetOperation(c49441499.regop)
+	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e4)
+	local e5=e3:Clone()
+	e5:SetCode(EVENT_FLIP)
+	c:RegisterEffect(e5)
 end
 c49441499.lvupcount=1
 c49441499.lvup={34088136}
 function c49441499.efilter(e,te)
 	return te:IsActiveType(TYPE_SPELL)
 end
+function c49441499.regop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(49441499,RESET_EVENT+0x1ec0000+RESET_PHASE+RESET_END,0,1)
+end
 function c49441499.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer() and not e:GetHandler():IsStatus(STATUS_SUMMON_TURN)
+	return tp==Duel.GetTurnPlayer() and e:GetHandler():GetFlagEffect(49441499)==0
 end
 function c49441499.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end

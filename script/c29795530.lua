@@ -16,7 +16,7 @@ function c29795530.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(0,0x1c0)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCondition(c29795530.lvcon)
+	e2:SetCondition(aux.exccon)
 	e2:SetCost(c29795530.lvcost)
 	e2:SetTarget(c29795530.lvtg)
 	e2:SetOperation(c29795530.lvop)
@@ -40,9 +40,6 @@ function c29795530.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
 	end
-end
-function c29795530.lvcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
 end
 function c29795530.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

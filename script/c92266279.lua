@@ -39,7 +39,7 @@ function c92266279.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local b1=c92266279.thcost(e,tp,eg,ep,ev,re,r,rp,0) and c92266279.thtg(e,tp,eg,ep,ev,re,r,rp,0)
 	local b2=c92266279.reccon(e,tp,eg,ep,ev,re,r,rp) and c92266279.rectg(e,tp,eg,ep,ev,re,r,rp,0)
-	if (b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(92266279,0)) then
+	if (b1 or b2) and Duel.SelectYesNo(tp,94) then
 		local opt=0
 		if b1 and b2 then
 			opt=Duel.SelectOption(tp,aux.Stringid(92266279,1),aux.Stringid(92266279,2))

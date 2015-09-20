@@ -9,16 +9,11 @@ function c45410988.initial_effect(c)
 	e1:SetOperation(c45410988.activate)
 	c:RegisterEffect(e1)
 end
-function c45410988.filter(c,e,tp,m)
+function c45410988.filter(c,e,tp,m1,m2)
 	if not c:IsCode(19025379) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
-	if m:IsContains(c) then
-		m:RemoveCard(c)
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,8,c)
-		m:AddCard(c)
-	else
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,8,c)
-	end
-	return result
+	local mg=m1:Filter(Card.IsCanBeRitualMaterial,c,c)
+	mg:Merge(m2)
+	return mg:CheckWithSumGreater(Card.GetRitualLevel,8,c)
 end
 function c45410988.mfilter(c)
 	return c:IsSetCard(0x3b) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
@@ -27,22 +22,21 @@ function c45410988.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local mg1=Duel.GetRitualMaterial(tp)
 		local mg2=Duel.GetMatchingGroup(c45410988.mfilter,tp,LOCATION_GRAVE,0,nil)
-		mg1:Merge(mg2)
-		return Duel.IsExistingMatchingCard(c45410988.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg1)
+		return Duel.IsExistingMatchingCard(c45410988.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg1,mg2)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c45410988.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mg1=Duel.GetRitualMaterial(tp)
 	local mg2=Duel.GetMatchingGroup(c45410988.mfilter,tp,LOCATION_GRAVE,0,nil)
-	mg1:Merge(mg2)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c45410988.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg1)
+	local g=Duel.SelectMatchingCard(tp,c45410988.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg1,mg2)
 	local tc=g:GetFirst()
 	if tc then
-		mg1:RemoveCard(tc)
+		local mg=mg1:Filter(Card.IsCanBeRitualMaterial,tc,tc)
+		mg:Merge(mg2)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local mat=mg1:SelectWithSumGreater(tp,Card.GetRitualLevel,8,tc)
+		local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,8,tc)
 		tc:SetMaterial(mat)
 		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()

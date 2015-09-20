@@ -6,6 +6,7 @@ function c28325165.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetCondition(c28325165.condition)
 	e1:SetTarget(c28325165.target)
 	e1:SetOperation(c28325165.activate)
@@ -61,5 +62,5 @@ function c28325165.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c28325165.efilter(e,te)
-	return te:GetOwnerPlayer()~=e:GetHandlerPlayer()
+	return te:GetOwnerPlayer()~=e:GetOwnerPlayer()
 end

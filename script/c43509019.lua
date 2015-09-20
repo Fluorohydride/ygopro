@@ -21,7 +21,7 @@ function c43509019.cbtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local bt=Duel.GetAttackTarget()
 	if Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and bt and bt:IsFaceup() and bt:IsLevelBelow(4) and bt:IsType(TYPE_TOON)
-		and bt:GetControler()==e:GetHandlerPlayer() and Duel.SelectYesNo(tp,aux.Stringid(43509019,1)) then
+		and bt:GetControler()==e:GetHandlerPlayer() and Duel.SelectYesNo(tp,94) then
 		e:SetLabel(1)
 	else e:SetLabel(0) end
 end

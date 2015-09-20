@@ -15,13 +15,6 @@ function c74506079.initial_effect(c)
 	e2:SetCode(EFFECT_MATERIAL_CHECK)
 	e2:SetValue(c74506079.matcheck)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetCondition(c74506079.regcon)
-	e3:SetOperation(c74506079.regop)
-	e3:SetLabelObject(e2)
-	c:RegisterEffect(e3)
 end
 function c74506079.ffilter(c)
 	return c:IsSetCard(0x3e) and c:IsRace(RACE_REPTILE)
@@ -36,21 +29,15 @@ function c74506079.fsoperation(e,tp,eg,ep,ev,re,r,rp,gc)
 	Duel.SetFusionMaterial(eg:FilterSelect(tp,c74506079.ffilter,2,63,nil))
 end
 function c74506079.matcheck(e,c)
-	local g=c:GetMaterial()
-	e:SetLabel(g:GetClassCount(Card.GetCode))
-end
-function c74506079.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
-end
-function c74506079.regop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=e:GetLabelObject():GetLabel()
-	local c=e:GetHandler()
-	local ae=Effect.CreateEffect(c)
-	ae:SetType(EFFECT_TYPE_SINGLE)
-	ae:SetCode(EFFECT_UPDATE_ATTACK)
-	ae:SetValue(ct*500)
-	ae:SetReset(RESET_EVENT+0x1ff0000)
-	c:RegisterEffect(ae)
+	local ct=c:GetMaterial():GetClassCount(Card.GetCode)
+	if ct>0 then
+		local ae=Effect.CreateEffect(c)
+		ae:SetType(EFFECT_TYPE_SINGLE)
+		ae:SetCode(EFFECT_SET_ATTACK)
+		ae:SetValue(ct*500)
+		ae:SetReset(RESET_EVENT+0xff0000)
+		c:RegisterEffect(ae)
+	end
 	if ct>=2 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(74506079,0))
@@ -61,7 +48,7 @@ function c74506079.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetTarget(c74506079.sptg)
 		e1:SetOperation(c74506079.spop)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+0xfe0000)
 		c:RegisterEffect(e1)
 	end
 	if ct>=4 then
@@ -74,7 +61,7 @@ function c74506079.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCost(c74506079.tgcost)
 		e1:SetTarget(c74506079.tgtg)
 		e1:SetOperation(c74506079.tgop)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+0xfe0000)
 		c:RegisterEffect(e1)
 	end
 	if ct>=6 then
@@ -87,7 +74,7 @@ function c74506079.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetTarget(c74506079.drtg)
 		e1:SetOperation(c74506079.drop)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+0xfe0000)
 		c:RegisterEffect(e1)
 	end
 end
