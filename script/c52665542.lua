@@ -1,4 +1,4 @@
---Lightsworn Sanctuary
+--ライトロードの神域
 function c52665542.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
@@ -56,12 +56,12 @@ function c52665542.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(c52665542.tgfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local sg=Duel.SelectTarget(tp,c52665542.tgfilter,tp,LOCATION_GRAVE,0,1,1,cc)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,sg,sg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,sg,1,0,0)
 end
 function c52665542.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	end

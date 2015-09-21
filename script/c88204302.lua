@@ -17,7 +17,7 @@ function c88204302.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCondition(c88204302.thcon)
+	e2:SetCondition(aux.exccon)
 	e2:SetCost(c88204302.thcost)
 	e2:SetTarget(c88204302.thtg)
 	e2:SetOperation(c88204302.thop)
@@ -39,9 +39,6 @@ function c88204302.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c88204302.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c88204302.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

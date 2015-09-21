@@ -1,4 +1,4 @@
---고신 크투그아
+--古神クトグア
 function c12948099.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

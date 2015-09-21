@@ -18,7 +18,7 @@ function c5133471.initial_effect(c)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1,5133471)
-	e2:SetCondition(c5133471.descon)
+	e2:SetCondition(aux.exccon)
 	e2:SetCost(c5133471.descost)
 	e2:SetTarget(c5133471.destg)
 	e2:SetOperation(c5133471.activate)
@@ -39,9 +39,6 @@ function c5133471.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
-end
-function c5133471.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID()
 end
 function c5133471.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

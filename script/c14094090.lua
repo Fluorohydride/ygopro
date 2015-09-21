@@ -7,7 +7,7 @@ function c14094090.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetCountLimit(1,14094090)
-	e1:SetCondition(c14094090.spcon)
+	e1:SetCondition(aux.exccon)
 	e1:SetCost(c14094090.spcost)
 	e1:SetTarget(c14094090.sptg)
 	e1:SetOperation(c14094090.spop)
@@ -18,9 +18,6 @@ function c14094090.ritual_filter(c)
 end
 function c14094090.cfilter(c,att)
 	return c:IsAttribute(att) and c:IsAbleToRemoveAsCost()
-end
-function c14094090.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c14094090.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()

@@ -1,4 +1,4 @@
---드림랜드
+--幻夢境
 function c26920296.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -96,20 +96,23 @@ function c26920296.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c26920296.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,TYPE_XYZ)
 		and Duel.GetTurnPlayer()==tp
 end
-function c26920296.desfilter(c,lv)
-	return c:IsFaceup() and c:GetLevel()==lv and c:GetLevel()>0 and c:IsDestructable()
-end
 function c26920296.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g,lv=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetMaxGroup(Card.GetLevel)
-	local dg=Duel.GetMatchingGroup(c26920296.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,lv)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,dg:GetCount(),0,0)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	if g:GetCount()==0 then return end
+	local mg,lv=g:GetMaxGroup(Card.GetLevel)
+	if lv==0 then return end
+	local dg=mg:Filter(Card.IsDestructable,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,dg:GetCount(),0,0)
 end
 function c26920296.desop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g,lv=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetMaxGroup(Card.GetLevel)
-	local dg=Duel.GetMatchingGroup(c26920296.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,lv)
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	if g:GetCount()==0 then return end
+	local mg,lv=g:GetMaxGroup(Card.GetLevel)
+	if lv==0 then return end
+	local dg=mg:Filter(Card.IsDestructable,nil)
 	if dg:GetCount()>0 then
 		Duel.Destroy(dg,REASON_EFFECT)
 	end

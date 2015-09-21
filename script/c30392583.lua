@@ -6,14 +6,11 @@ function c30392583.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
-	e1:SetCondition(c30392583.thcon)
+	e1:SetCondition(aux.exccon)
 	e1:SetCost(c30392583.thcost)
 	e1:SetTarget(c30392583.thtg)
 	e1:SetOperation(c30392583.thop)
 	c:RegisterEffect(e1)
-end
-function c30392583.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() or e:GetHandler():IsReason(REASON_RETURN)
 end
 function c30392583.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

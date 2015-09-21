@@ -12,7 +12,8 @@ function c37383714.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c37383714.cfilter(c,tp)
-	return c:IsReason(REASON_DESTROY) and c:IsType(TYPE_MONSTER) and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE)
+	return c:IsReason(REASON_EFFECT) and c:IsReason(REASON_DESTROY) and c:IsType(TYPE_MONSTER)
+		and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function c37383714.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c37383714.cfilter,1,nil,tp)

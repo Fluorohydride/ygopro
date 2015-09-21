@@ -389,6 +389,19 @@ bool Game::Initialize() {
 	}
 	scrCardList = env->addScrollBar(true, rect<s32>(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
 	btnSelectOK = env->addButton(rect<s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, dataManager.GetSysString(1211));
+	//card display
+	wCardDisplay = env->addWindow(rect<s32>(320, 100, 1000, 400), false, L"");
+	wCardDisplay->getCloseButton()->setVisible(false);
+	wCardDisplay->setVisible(false);
+	for(int i = 0; i < 5; ++i) {
+		stDisplayPos[i] = env->addStaticText(L"", rect<s32>(40 + 125 * i, 30, 139 + 125 * i, 50), true, false, wCardDisplay, -1, true);
+		stDisplayPos[i]->setBackgroundColor(0xffffffff);
+		stDisplayPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+		btnCardDisplay[i] = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
+		btnCardDisplay[i]->setImageScale(core::vector2df(0.6f, 0.6f));
+	}
+	scrDisplayList = env->addScrollBar(true, rect<s32>(30, 235, 650, 255), wCardDisplay, SCROLL_CARD_DISPLAY);
+	btnDisplayOK = env->addButton(rect<s32>(300, 265, 380, 290), wCardDisplay, BUTTON_CARD_DISP_OK, dataManager.GetSysString(1211));
 	//announce number
 	wANNumber = env->addWindow(rect<s32>(550, 200, 780, 295), false, L"");
 	wANNumber->getCloseButton()->setVisible(false);
@@ -996,11 +1009,10 @@ void Game::ClearTextures() {
 	mainGame->imgCard->setImage(0);
 	mainGame->btnPSAU->setImage();
 	mainGame->btnPSDU->setImage();
-	mainGame->btnCardSelect[0]->setImage();
-	mainGame->btnCardSelect[1]->setImage();
-	mainGame->btnCardSelect[2]->setImage();
-	mainGame->btnCardSelect[3]->setImage();
-	mainGame->btnCardSelect[4]->setImage();
+	for(int i=0; i<=4; ++i) {
+		mainGame->btnCardSelect[i]->setImage();
+		mainGame->btnCardDisplay[i]->setImage();
+	}
 	imageManager.ClearTexture();
 }
 void Game::CloseDuelWindow() {
@@ -1015,6 +1027,7 @@ void Game::CloseDuelWindow() {
 	wANRace->setVisible(false);
 	wCardImg->setVisible(false);
 	wCardSelect->setVisible(false);
+	wCardDisplay->setVisible(false);
 	wCmdMenu->setVisible(false);
 	wFTSelect->setVisible(false);
 	wHand->setVisible(false);

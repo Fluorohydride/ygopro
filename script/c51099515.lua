@@ -1,4 +1,4 @@
---Ghosts From the Past
+--恐撃
 function c51099515.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -26,7 +26,7 @@ function c51099515.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(cg,POS_FACEUP,REASON_COST)
 end
 function c51099515.tfilter(c)
-	return c:IsFaceup() and c:GetAttack()>0
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:GetAttack()>0
 end
 function c51099515.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c51099515.tfilter(chkc) end

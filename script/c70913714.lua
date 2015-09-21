@@ -1,4 +1,4 @@
---고신 하스톨
+--古神ハストール
 function c70913714.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

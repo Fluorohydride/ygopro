@@ -1,4 +1,4 @@
---Malacoda, Netherlord of the Burning Abyss
+--彼岸の鬼神 ヘルレイカー
 function c35330871.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon condition

@@ -1,4 +1,4 @@
---다이노소어잉
+--ダイナソーイング
 function c27143874.initial_effect(c)
 	--indes
 	local e1=Effect.CreateEffect(c)

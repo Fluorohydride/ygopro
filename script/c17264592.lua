@@ -1,4 +1,4 @@
---U.A. Rival Rebounder
+--U.A.コリバルリバウンダー
 function c17264592.initial_effect(c)
 	--special summon rule
 	local e1=Effect.CreateEffect(c)

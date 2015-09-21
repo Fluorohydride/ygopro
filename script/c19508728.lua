@@ -1,4 +1,4 @@
---Moon Mirror Shield
+--月鏡の盾
 function c19508728.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

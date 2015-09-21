@@ -1,4 +1,4 @@
---U.A. Midfielder
+--U.A.ファンタジスタ
 function c72491806.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -59,6 +59,7 @@ function c72491806.tsop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=Duel.SelectMatchingCard(tp,c72491806.spfilter2,tp,LOCATION_HAND,0,1,1,nil,e,tp,tc:GetCode())
 		if sg:GetCount()>0 then
+			Duel.BreakEffect()
 			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
