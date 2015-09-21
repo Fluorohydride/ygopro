@@ -2,7 +2,7 @@
 function c95457011.initial_effect(c)
 	--summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(95457012,0))
+	e1:SetDescription(aux.Stringid(95457011,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -16,13 +16,12 @@ function c95457011.initial_effect(c)
 	c:RegisterEffect(e2)
 	--to hand
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(95457012,1))
+	e3:SetDescription(aux.Stringid(95457011,1))
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,95457012)
-	e3:SetCondition(c95457011.thcon)
 	e3:SetTarget(c95457011.thtg)
 	e3:SetOperation(c95457011.thop)
 	c:RegisterEffect(e3)
@@ -53,9 +52,6 @@ function c95457011.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c95457011.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsLocation(LOCATION_EXTRA)
-end
-function c95457011.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c95457011.thfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xbe) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
