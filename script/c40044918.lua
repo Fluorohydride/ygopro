@@ -43,6 +43,7 @@ function c40044918.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SelectOption(tp,aux.Stringid(40044918,2))
 	end
 	e:SetLabel(sel)
+	Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(40044918,sel))
 	if sel==1 then
 		local g=Duel.GetMatchingGroup(c40044918.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
