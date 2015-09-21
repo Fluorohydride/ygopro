@@ -38,7 +38,7 @@ function c22842126.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c22842126.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	local dr=Duel.Draw(p,d,REASON_EFFECT)
+	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c22842126.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

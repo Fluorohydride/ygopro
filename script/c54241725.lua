@@ -32,14 +32,14 @@ function c54241725.initial_effect(c)
 	e3:SetOperation(c54241725.spop)
 	c:RegisterEffect(e3)
 end
-function c54241725.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c54241725.acttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
-	if c54241725.drcost(e,tp,eg,ep,ev,re,r,rp,0) and c54241725.drtg(e,tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,94) then
+	if c54241725.drcost(e,tp,eg,ep,ev,re,r,rp,0) and c54241725.drtg(e,tp,eg,ep,ev,re,r,rp,0,chkc) and Duel.SelectYesNo(tp,94) then
 		e:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e:SetOperation(c54241725.drop)
 		c54241725.drcost(e,tp,eg,ep,ev,re,r,rp,1)
-		c54241725.drtg(e,tp,eg,ep,ev,re,r,rp,1)
+		c54241725.drtg(e,tp,eg,ep,ev,re,r,rp,1,chkc)
 		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,65)
 	else
 		e:SetCategory(0)
@@ -54,7 +54,7 @@ end
 function c54241725.tdfilter(c)
 	return c:IsSetCard(0xbe) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToDeck()
 end
-function c54241725.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c54241725.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c54241725.tdfilter(chkc) end
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)
 		and Duel.IsExistingTarget(c54241725.tdfilter,tp,LOCATION_GRAVE,0,2,nil) end
