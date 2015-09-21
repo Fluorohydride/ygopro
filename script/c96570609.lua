@@ -81,6 +81,8 @@ function c96570609.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tg2=g:Select(tp,1,1,nil)
 	tg1:Merge(tg2)
 	if Duel.SendtoGrave(tg1,REASON_EFFECT)~=0 then
+		local og=Duel.GetOperatedGroup()
+		if og:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)==0 then return end
 		local g=Duel.SelectMatchingCard(tp,c96570609.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		local tc=g:GetFirst()
 		if tc then

@@ -79,15 +79,18 @@ function c23064604.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tg2=g:Select(tp,1,1,nil)
 	tg1:Merge(tg2)
 	if Duel.SendtoGrave(tg1,REASON_EFFECT)~=0 then
+		local og=Duel.GetOperatedGroup()
+		if og:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)==0 then return end
 		local tg=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_HAND,nil)
+		local sg=nil
 		if tg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(23064604,3)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-			local sg=tg:RandomSelect(tp,1)
+			sg=tg:RandomSelect(tp,1)
 		else
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-			local sg=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,1,nil)
+			sg=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,1,nil)
 		end
-		if sg:GetCount()>0 then
+		if sg and sg:GetCount()>0 then
 			Duel.SendtoDeck(sg,nil,2,REASON_EFFECT)
 		end
 	end

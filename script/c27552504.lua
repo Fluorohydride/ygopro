@@ -10,6 +10,7 @@ function c27552504.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c27552504.tgcon)
 	e1:SetCost(c27552504.tgcost)
 	e1:SetTarget(c27552504.tgtg)
 	e1:SetOperation(c27552504.tgop)
@@ -36,19 +37,23 @@ function c27552504.xyzop(e,tp,chk)
 	Duel.DiscardHand(tp,c27552504.cfilter,1,1,REASON_COST,nil)
 	e:GetHandler():RegisterFlagEffect(27552504,RESET_EVENT+0xfe0000+RESET_PHASE+PHASE_END,0,1)
 end
+function c27552504.tgcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(27552504)==0
+end
 function c27552504.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c27552504.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(27552504)==0
-		and Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,0,1,tp,LOCATION_DECK)
 end
 function c27552504.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_DECK,0,1,1,nil)
-	Duel.SendtoGrave(g,REASON_EFFECT)
+	if g:GetCount()>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
+	end
 end
 function c27552504.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

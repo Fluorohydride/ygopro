@@ -60,7 +60,7 @@ function c54241725.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingTarget(c54241725.tdfilter,tp,LOCATION_GRAVE,0,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,c54241725.tdfilter,tp,LOCATION_GRAVE,0,2,2,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c54241725.drop(e,tp,eg,ep,ev,re,r,rp)
@@ -76,12 +76,10 @@ function c54241725.cfilter(c)
 	return c:IsSetCard(0xbe) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToRemoveAsCost()
 end
 function c54241725.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c54241725.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler())
-		and e:GetHandler():GetFlagEffect(54241725)==0 end
+	if chk==0 then return Duel.IsExistingMatchingCard(c54241725.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c54241725.cfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	e:GetHandler():RegisterFlagEffect(54241725,RESET_CHAIN,0,1)
 end
 function c54241725.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
