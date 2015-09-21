@@ -1,4 +1,4 @@
---Lancephorhynchus
+--ランスフォリンクス
 function c48940337.initial_effect(c)
 	--pendulum summon
 	aux.AddPendulumProcedure(c)

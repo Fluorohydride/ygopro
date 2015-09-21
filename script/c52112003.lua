@@ -1,4 +1,4 @@
---Card Advance
+--カード・アドバンス
 function c52112003.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

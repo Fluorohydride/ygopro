@@ -1,4 +1,4 @@
---Barbar, Malebranche of the Burning Abyss
+--彼岸の悪鬼 バルバリッチャ
 function c81992475.initial_effect(c)
 	--self destroy
 	local e1=Effect.CreateEffect(c)
@@ -49,7 +49,6 @@ function c81992475.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c81992475.ssop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(c81992475.filter,tp,LOCATION_ONFIELD,0,1,nil) then return end
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end

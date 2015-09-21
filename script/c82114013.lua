@@ -1,4 +1,4 @@
---Sea Dragoons of Draconia
+--ドラコニアの海竜騎兵
 function c82114013.initial_effect(c)
 	--pendulum summon
 	aux.AddPendulumProcedure(c)

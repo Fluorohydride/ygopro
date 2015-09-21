@@ -1,4 +1,4 @@
---Stegocyber
+--盾航戦車ステゴサイバー
 function c99733359.initial_effect(c)
 	--no damage
 	local e1=Effect.CreateEffect(c)

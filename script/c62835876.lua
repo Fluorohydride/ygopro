@@ -1,4 +1,4 @@
---Good & Evil in the Burning Abyss
+--善悪の彼岸
 function c62835876.initial_effect(c)
 	aux.AddRitualProcGreater(c,aux.FilterBoolFunction(Card.IsCode,35330871))
 	--search

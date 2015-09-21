@@ -1,4 +1,4 @@
---U.A. Signing Deal
+--U.A.フラッグシップ・ディール
 function c43658697.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

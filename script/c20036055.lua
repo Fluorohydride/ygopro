@@ -1,4 +1,4 @@
---The Traveler and the Burning Abyss
+--旅人の到彼岸
 function c20036055.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -16,7 +16,7 @@ function c20036055.filter(c,e,tp,id)
 	return c:IsSetCard(0xb1) and c:GetTurnID()==id and not c:IsReason(REASON_RETURN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c20036055.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and chkc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c20036055.filter(chkc,e,tp,Duel.GetTurnCount()) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c20036055.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp,Duel.GetTurnCount()) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)

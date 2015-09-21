@@ -1,4 +1,4 @@
---Mischief of the Gnomes
+--小人のいたずら
 function c164710.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -23,7 +23,7 @@ function c164710.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c164710.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,LOCATION_HAND):Filter(Card.IsLevelAbove,nil,1)
+	local hg=Duel.GetMatchingGroup(Card.IsLevelAbove,tp,LOCATION_HAND,LOCATION_HAND,nil,1)
 	local tc=hg:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)

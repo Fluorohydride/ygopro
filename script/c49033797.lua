@@ -1,4 +1,4 @@
---금단의 트라페조헤드론
+--禁断のトラペゾヘドロン
 function c49033797.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

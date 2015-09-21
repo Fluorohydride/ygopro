@@ -1,4 +1,4 @@
---Dragoons of Draconia
+--ドラコニアの獣竜騎兵
 function c73779005.initial_effect(c)
 	--pendulum summon
 	aux.AddPendulumProcedure(c)

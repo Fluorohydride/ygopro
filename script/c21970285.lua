@@ -1,4 +1,4 @@
---Dragon Horn Hunter
+--竜角の狩猟者
 function c21970285.initial_effect(c)
 	--pendulum summon
 	aux.AddPendulumProcedure(c)

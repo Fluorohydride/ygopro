@@ -1,4 +1,4 @@
---당근인
+--にん人
 function c44928016.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
