@@ -27,7 +27,7 @@ function c91718579.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x59)
 end
 function c91718579.tgcon(e)
-	return Duel.IsExistingMatchingCard(c91718579.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
+	return Duel.IsExistingMatchingCard(c91718579.cfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
 function c91718579.atlimit(e,c)
 	return c:IsFaceup() and c:IsSetCard(0x59)
@@ -57,10 +57,10 @@ function c91718579.effop(e,tp,eg,ep,ev,re,r,rp)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_CHANGE_TYPE)
-		e2:SetValue(TYPE_MONSTER+TYPE_EFFECT+TYPE_XYZ)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
-		rc:RegisterEffect(e2)
+		rc:RegisterEffect(e2,true)
 	end
 end
 function c91718579.poscon(e,tp,eg,ep,ev,re,r,rp)
@@ -75,7 +75,7 @@ function c91718579.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c91718579.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc or tc:IsDefencePos() or not tc:IsRelateToEffect(e) then return end
+	if tc:IsDefencePos() or not tc:IsRelateToEffect(e) then return end
 	if Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)==0 then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)

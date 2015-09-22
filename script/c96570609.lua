@@ -56,7 +56,7 @@ end
 function c96570609.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE
 end
-function c96570609.tgfilter(c,tp)
+function c96570609.tgfilter(c)
 	return c:IsSetCard(0xbe) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGrave()
 end
 function c96570609.spfilter(c,e,tp)
@@ -80,7 +80,8 @@ function c96570609.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tg2=g:Select(tp,1,1,nil)
 	tg1:Merge(tg2)
-	if Duel.SendtoGrave(tg1,REASON_EFFECT)~=0 then
+	if Duel.SendtoGrave(tg1,REASON_EFFECT)~=0 and tg1:IsExists(Card.IsLocation,2,nil,LOCATION_GRAVE) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c96570609.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		local tc=g:GetFirst()
 		if tc then
@@ -101,7 +102,7 @@ function c96570609.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c96570609.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	return Duel.GetTurnPlayer()~=tp and ph==PHASE_MAIN1 or ph==PHASE_MAIN2
+	return Duel.GetTurnPlayer()~=tp and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function c96570609.cfilter(c)
 	return c:IsSetCard(0xbe) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToRemoveAsCost()
