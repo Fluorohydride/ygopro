@@ -29,6 +29,7 @@ end
 function c36776089.retcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
+	e:SetLabelObject(bc)
 	return bc and c:IsRelateToBattle() and bc:IsRelateToBattle()
 end
 function c36776089.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
