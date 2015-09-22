@@ -1,4 +1,4 @@
---P・M 캡처
+--P・M・キャプチャー
 function c13760677.initial_effect(c)
 	--pendulum summon
 	aux.AddPendulumProcedure(c)

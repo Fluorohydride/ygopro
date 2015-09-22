@@ -1,4 +1,4 @@
---Farfa, Malebranche of the Burning Abyss
+--彼岸の悪鬼 ファーファレル
 function c36553319.initial_effect(c)
 	--self destroy
 	local e1=Effect.CreateEffect(c)
@@ -49,7 +49,6 @@ function c36553319.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c36553319.ssop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(c36553319.filter,tp,LOCATION_ONFIELD,0,1,nil) then return end
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
@@ -63,16 +62,21 @@ function c36553319.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c36553319.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Remove(tc,tc:GetPosition(),REASON_EFFECT+REASON_TEMPORARY)~=0 then
+	if tc:IsRelateToEffect(e) and Duel.Remove(tc,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
+		tc:RegisterFlagEffect(36553319,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetLabelObject(tc)
 		e1:SetCountLimit(1)
+		e1:SetCondition(c36553319.retcon)
 		e1:SetOperation(c36553319.retop)
 		Duel.RegisterEffect(e1,tp)
 	end
+end
+function c36553319.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetLabelObject():GetFlagEffect(36553319)~=0
 end
 function c36553319.retop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ReturnToField(e:GetLabelObject())

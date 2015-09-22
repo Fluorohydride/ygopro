@@ -1,4 +1,4 @@
---The Terminus of the Burning Abyss
+--旅人の結彼岸
 function c44771289.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

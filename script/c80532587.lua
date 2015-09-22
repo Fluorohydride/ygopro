@@ -1,4 +1,4 @@
---구신 누토스
+--旧神ヌトス
 function c80532587.initial_effect(c)
 	c:SetSPSummonOnce(80532587)
 	--fusion material

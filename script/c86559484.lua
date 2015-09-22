@@ -1,4 +1,4 @@
---X-레이 피어스
+--X－レイ・ピアース
 function c86559484.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

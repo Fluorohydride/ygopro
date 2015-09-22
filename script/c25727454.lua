@@ -1,4 +1,4 @@
---Master Craftsman Gamil
+--名匠 ガミル
 function c25727454.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

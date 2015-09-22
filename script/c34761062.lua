@@ -1,4 +1,4 @@
---업화의 중기사
+--業火の重騎士
 function c34761062.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--remove

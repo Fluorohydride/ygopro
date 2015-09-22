@@ -1,4 +1,4 @@
---U.A. Powered Jersey
+--U.A.パワードギプス
 function c35884610.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

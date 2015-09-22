@@ -1,4 +1,4 @@
---Dante, Pilgrim of the Burning Abyss
+--彼岸の巡礼者 ダンテ
 function c18386170.initial_effect(c)
 	c:EnableReviveLimit()
 	--fusion material
@@ -76,8 +76,10 @@ function c18386170.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 end
 function c18386170.hdop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,1)
-	Duel.SendtoGrave(g,REASON_EFFECT)
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
+	if g:GetCount()==0 then return end
+	local sg=g:RandomSelect(tp,1)
+	Duel.SendtoGrave(sg,REASON_EFFECT)
 end
 function c18386170.fscon(e,g,gc,chkf)
 	if g==nil then return true end

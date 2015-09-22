@@ -1,4 +1,4 @@
---마주사이의 전사
+--魔サイの戦士
 function c81035362.initial_effect(c)
 	--indes
 	local e1=Effect.CreateEffect(c)
