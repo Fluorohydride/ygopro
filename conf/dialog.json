@@ -273,21 +273,21 @@
       "menu deck" : {
         "type" : "text button",
         "text" : ["eui_menu_deck", "0x000000ff"],
-        "position" : [310, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [-680, 5, 120, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu tool" : {
         "type" : "text button",
         "text" : ["eui_menu_tool", "0x000000ff"],
-        "position" : [440, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [-560, 5, 120, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "menu list" : {
         "type" : "text button",
         "text" : ["eui_menu_list", "0x000000ff"],
-        "position" : [570, 5, 120, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [-440, 5, 120, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       },
       "limit reg" : {
         "type" : "combobox",
-        "position" : [700, 2, 300, 45, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        "position" : [-310, 2, 300, 45, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
       }
     }
   },

@@ -15,6 +15,7 @@ namespace ygopro
 {
 
     void SceneMgr::Init() {
+        InitActionTime(GetSysClock());
     }
     
     void SceneMgr::Uninit() {
@@ -24,6 +25,7 @@ namespace ygopro
     
     bool SceneMgr::Update() {
         UpdateSysClock();
+        UpdateActionTime(GetSysClock());
         if(current_scene != nullptr)
             return current_scene->Update();
         return true;
@@ -44,7 +46,9 @@ namespace ygopro
     void SceneMgr::SetScene(std::shared_ptr<Scene> sc) {
         if(current_scene == sc)
             return;
-        sgui::SGGUIRoot::GetSingleton().ClearChilds();
+        if(current_scene)
+            current_scene->Terminate();
+        ClearAllActions();
         current_scene = sc;
         if(current_scene != nullptr) {
             current_scene->SetSceneSize(scene_size);

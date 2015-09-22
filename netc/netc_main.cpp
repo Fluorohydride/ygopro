@@ -14,10 +14,9 @@
 #include "deck_data.h"
 #include "bs/build_scene_handler.h"
 #include "bs/build_scene.h"
-//#include "ds/duel_input_handler.h"
 //#include "ds/duel_scene_handler.h"
 //#include "ds/duel_network.h"
-//#include "ds/duel_scene.h"
+#include "ds/duel_scene.h"
 
 using namespace ygopro;
 
@@ -115,11 +114,9 @@ int32_t main(int32_t argc, char* argv[]) {
     SceneMgr::Get().SetScene(sc);
     
 //    auto sc = std::make_shared<DuelScene>();
-//    auto ih = std::make_shared<DuelInputHandler>(sc);
 //    auto sh = std::make_shared<DuelSceneHandler>(sc);
 //    auto ph = std::make_shared<DuelProtoTcp>();
 //    sh->SetProtoHandler(ph);
-//    sc->SetInputHandler(ih);
 //    sc->SetSceneHandler(sh);
 //    SceneMgr::Get().SetScene(sc);
     

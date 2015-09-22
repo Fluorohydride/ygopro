@@ -211,6 +211,11 @@ namespace base {
             default_shader.LoadVertShader(vert_shader);
             default_shader.LoadFragShader(frag_shader);
             default_shader.Link();
+            auto pshader = &default_shader;
+            default_shader.SetDefaultParamCallback([pshader]() {
+                pshader->SetParam1i("texid", 0);
+                pshader->SetParam1f("alpha", 1.0);
+            });
             inited = true;
         }
         return default_shader;

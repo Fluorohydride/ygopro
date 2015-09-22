@@ -207,15 +207,15 @@ class ActionMgr {
 public:
     inline void InitActionTime(TIME_TYPE tm) { cur_time = tm; }
     
-    ActionMgr& PushAction(std::shared_ptr<Action<TIME_TYPE>> ani) {
+    ActionMgr& PushAction(std::shared_ptr<Action<TIME_TYPE>> ani, void* obj = nullptr, int32_t acttype = 0) {
         ani->InitStartTime(cur_time);
-        actions.push_back(ani);
+        actions.push_back(std::make_tuple(ani, obj, acttype));
         return *this;
     }
     
     ActionMgr& operator << (std::shared_ptr<Action<TIME_TYPE>> ani) {
         ani->InitStartTime(cur_time);
-        actions.push_back(ani);
+        actions.push_back(std::make_tuple<ani, nullptr, 0>);
         return *this;
     }
     
@@ -223,15 +223,33 @@ public:
         auto iter = actions.begin();
         while(iter != actions.end()) {
             auto cur = iter++;
-            if(!(*cur)->Perform(tm))
+            if(!(std::get<0>(*cur))->Perform(tm))
                 actions.erase(cur);
         }
         cur_time = tm;
     }
     
+    void ClearAllActions() { actions.clear(); }
+    void RemoveAction(void* obj) {
+        auto iter = actions.begin();
+        while(iter != actions.end()) {
+            auto cur = iter++;
+            if(std::get<1>(*cur) == obj)
+                actions.erase(cur);
+        }
+    }
+    void RemoveAction(void* obj, int32_t acttype) {
+        auto iter = actions.begin();
+        while(iter != actions.end()) {
+            auto cur = iter++;
+            if(std::get<1>(*cur) == obj && std::get<2>(*cur) == acttype)
+                actions.erase(cur);
+        }
+    }
+    
 protected:
     TIME_TYPE cur_time = TIME_TYPE();
-    std::list<std::shared_ptr<Action<TIME_TYPE>>> actions;
+    std::list<std::tuple<std::shared_ptr<Action<TIME_TYPE>>, void*, int32_t>> actions;
 };
 
 #endif

@@ -1,8 +1,6 @@
 #ifndef _BUILD_SCENE_H_
 #define _BUILD_SCENE_H_
 
-#include "utils/action.h"
-
 #include "../render_util.h"
 #include "../deck_data.h"
 #include "../scene_mgr.h"
@@ -11,6 +9,7 @@ namespace ygopro
 {
     
     struct FilterCondition;
+    class BuildSceneHandler;
     
     class BuilderCard : public base::RenderUnit<vt2>, public std::enable_shared_from_this<BuilderCard> {
     public:
@@ -50,11 +49,12 @@ namespace ygopro
         virtual void PushVerticesAll();
     };
     
-    class BuildScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
+    class BuildScene : public Scene, public base::RenderCompositorWithViewport {
     public:
         BuildScene();
         virtual ~BuildScene();
         virtual void Activate();
+        virtual void Terminate();
         virtual bool Update();
         virtual bool Draw();
         virtual void SetSceneSize(v2i sz);
@@ -84,6 +84,7 @@ namespace ygopro
         void UpdateResult(const std::vector<CardData*> new_results);
         void InsertSearchResult(int32_t index, bool is_side);
         
+        std::shared_ptr<DeckCardData> InsertCardFromPos(int32_t code, v2f pos, bool is_side);
         std::shared_ptr<DeckCardData> GetCard(CardLocation pos, int32_t index);
         std::pair<CardLocation, int32_t> GetHoverPos(int32_t posx, int32_t posy);
         

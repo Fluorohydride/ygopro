@@ -22,10 +22,6 @@ namespace ygopro
         sgui::SGGUIRoot::GetSingleton().event_key_down.Remove(this);
     }
     
-    bool BuildSceneHandler::UpdateEvent() {
-        return true;
-    }
-    
     void BuildSceneHandler::BeginHandler() {
         auto pnl_build = LoadDialogAs<sgui::SGPanel>("build panel");
         if(pnl_build) {
@@ -111,7 +107,7 @@ namespace ygopro
         page_count = rc.x * rc.y;
     }
     
-    bool BuildSceneHandler::UpdateInput() {
+    bool BuildSceneHandler::UpdateHandler() {
         if(show_info_begin) {
             auto pscene = build_scene.lock();
             auto now = SceneMgr::Get().GetSysClock();
@@ -140,22 +136,21 @@ namespace ygopro
                 if(hover_pos.first == CardLocation::Result)
                     pscene->HighlightCancel();
                 pre->builder_card->SetHL(0);
+                SceneMgr::Get().RemoveAction(pre->builder_card.get());
             }
             if(dcd) {
                 auto ptr = dcd->builder_card;
                 ptr->hl = 0x00ffffff;
                 auto act = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(0, ptr, [](BuilderCard* bc, double t)->bool {
-                    if(bc->hl == 0)
-                        return false;
                     uint32_t alpha = (uint32_t)((t * 0.6f + 0.2f) * 255);
                     bc->SetHL((alpha << 24) | 0xffffff);
                     return true;
                 }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
+                SceneMgr::Get().PushAction(act, ptr.get());
                 if(info_panel->IsOpen()) {
                     show_info_begin = true;
                     show_info_time = SceneMgr::Get().GetSysClock() - 200;
                 }
-                pscene->PushAction(act);
                 if(hov.first == CardLocation::Result)
                     pscene->HighlightCode(dcd->data->GetRawCode());
             }
@@ -177,7 +172,7 @@ namespace ygopro
             show_info_begin = false;
         if(hover_pos != click_pos)
             return;
-        auto pscene = build_scene.lock();
+        auto pscene = build_scene.lock().get();
         click_pos.first = CardLocation::Null;
         CardLocation pos = hover_pos.first;
         int32_t index = hover_pos.second;
@@ -189,8 +184,25 @@ namespace ygopro
                 SetDeckEdited();
                 MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
             } else {
-                pscene->RemoveCard(pos, index);
-                SetDeckEdited();
+                PopupMenu::Load("menu build popup", SceneMgr::Get().GetMousePosition(), [this, pscene, pos, index](int32_t id) {
+                    switch(id) {
+                        case 0:
+                            pscene->RemoveCard(pos, index);
+                            SetDeckEdited();
+                            break;
+                        case 1: {
+                            auto pcard = pscene->GetCard(pos, index);
+                            if(pcard) {
+                                pscene->InsertCardFromPos(pcard->data->code, pcard->builder_card->pos, pos == CardLocation::Side);
+                                SetDeckEdited();
+                                auto pt = SceneMgr::Get().GetMousePosition();
+                                MouseMove(pt.x, pt.y);
+                            }
+                            break;
+                        }
+                    }
+                });
+                
             }
         } else if(pos == CardLocation::Result) {
             pscene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);

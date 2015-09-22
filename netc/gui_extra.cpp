@@ -151,7 +151,7 @@ namespace ygopro
                     } else if(name == "allow focus") {
                         img->SetAllowFocus(sub_node.to_bool());
                     } else if(name == "image") {
-                        img->GetSpriteUI()->SetTextureRect(sgui::SGJsonUtil::ConvertRect(sub_node));
+                        img->GetSpriteUI()->SetTextureRect(sgui::SGJsonUtil::ConvertRecti(sub_node));
                     }
                 });
                 return img;
@@ -421,7 +421,7 @@ namespace ygopro
         menu->pos = pos;
         menu->item_width = (int32_t)dialogCfg["popup menu width"].to_integer();
         menu->item_height = (int32_t)dialogCfg["popup menu height"].to_integer();
-        menu->margin = sgui::SGJsonUtil::ConvertRect(dialogCfg["popup menu margin"]);
+        menu->margin = sgui::SGJsonUtil::ConvertRecti(dialogCfg["popup menu margin"]);
         menu->pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
         menu->btn_cb = cb;
         return *menu;
@@ -813,7 +813,7 @@ namespace ygopro
         }
         auto& dlg_node = dialogCfg["info dialog"];
         int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();
-        recti star_offset = sgui::SGJsonUtil::ConvertRect(dlg_node["star offset"]);
+        recti star_offset = sgui::SGJsonUtil::ConvertRecti(dlg_node["star offset"]);
         int32_t slider_width = (int32_t)dlg_node["slider width"].to_integer();
         int32_t min_pen_height = (int32_t)dlg_node["min pendilum text height"].to_integer();
         int32_t scale_width = (int32_t)dlg_node["scale blank"].to_integer();

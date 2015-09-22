@@ -76,8 +76,13 @@ namespace base
                 vao_id = VTYPE::InitVao(vbo_id, vbo_idx);
         }
         
-        inline void SetShader(base::Shader* shader) { render_shader = shader; }
+        inline void SetShader(base::Shader* shader) {
+            render_shader = shader;
+            if(shader && !shader_setting_callback)
+                shader_setting_callback = shader->GetDefaultParamCallback();
+        }
         inline base::Shader* GetShader() { return render_shader; }
+        inline void SetShaderSettingCallback(std::function<void()> cb) { shader_setting_callback = cb; }
         
         std::vector<recti> scissor_stack;
         std::vector<float> global_alpha;
@@ -85,6 +90,7 @@ namespace base
         uint32_t vbo_idx = 0;
         uint32_t vao_id = 0;
         base::Shader* render_shader = nullptr;
+        std::function<void()> shader_setting_callback;
     };
     
     template<typename VTYPE>
@@ -225,7 +231,7 @@ namespace base
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int16_t) * start_index, sizeof(int16_t) * count, index_data);
         }
         
-        virtual void PushVerticesAll() { Clear(); }
+        virtual void PushVerticesAll() { ClearCommandVertices(); }
         
         void UploadVertices() {
             glBindBuffer(GL_ARRAY_BUFFER, IRenderState<VTYPE>::vbo_id);
@@ -263,11 +269,6 @@ namespace base
         
         virtual void Render() {
             RenderSetting();
-            if(IRenderState<VTYPE>::render_shader) {
-                IRenderState<VTYPE>::render_shader->Use();
-                IRenderState<VTYPE>::render_shader->SetParam1i("texid", 0);
-                IRenderState<VTYPE>::render_shader->SetParam1f("alpha", 1.0);
-            }
             GLCheckError(__FILE__, __LINE__);
             VTYPE::DrawBegin(IRenderState<VTYPE>::vbo_id, IRenderState<VTYPE>::vbo_idx, IRenderState<VTYPE>::vao_id);
             GLCheckError(__FILE__, __LINE__);
@@ -288,14 +289,17 @@ namespace base
             glDisable(GL_DEPTH_TEST);
             SetBlendFunc(blend_mode);
             glActiveTexture(GL_TEXTURE0);
+            if(IRenderState<VTYPE>::render_shader) {
+                IRenderState<VTYPE>::render_shader->Use();
+                if(IRenderState<VTYPE>::shader_setting_callback)
+                    IRenderState<VTYPE>::shader_setting_callback();
+            }
             GLCheckError(__FILE__, __LINE__);
         }
         
-        void Clear() {
+        void ClearCommandVertices() {
             vertex_buffer.clear();
             index_buffer.clear();
-            pre_vert_size = 0;
-            pre_index_size = 0;
             for(auto& rc : render_commands)
                 delete rc;
             render_commands.clear();
@@ -330,6 +334,12 @@ namespace base
                 return true;
             }
             return false;
+        }
+        
+        void ClearAllObjects() {
+            all_units.clear();
+            update_units.clear();
+            need_redraw = true;
         }
         
         inline void AddUpdateUnit(RenderUnit<VTYPE>* unit) { if(!need_redraw) update_units.insert(unit); }
@@ -491,12 +501,17 @@ namespace base
             clear_color[2] = b;
             clear_color[3] = a;
         }
+        inline void SetRenderCountRequired(int16_t ct) { render_count_required = 2; }
         
         virtual bool PrepareRender() {
             bool need_render = false;
             for(auto& r : renderer)
                 need_render = r->PrepareRender() || need_render;
-            return need_render;
+            if(need_render) {
+                render_count = 0;
+                return true;
+            } else
+                return render_count < render_count_required;
         }
         
         virtual void Render() {
@@ -506,9 +521,12 @@ namespace base
             GLCheckError(__FILE__, __LINE__);
             for(auto& r : renderer)
                 r->Render();
+            render_count++;
         }
         
     protected:
+        int16_t render_count = 0;
+        int16_t render_count_required = 2;
         float clear_color[4] = {0.2f, 0.2f, 0.2f, 1.0f};
         std::vector<IRenderer*> renderer;
     };
@@ -593,7 +611,7 @@ namespace base
             InitGLState(with_vao);
         }
         
-        inline void ClearVertices() { this->Clear(); }
+        inline void ClearVertices() { ClearCommandVertices(); }
         
         template<typename V, typename T>
         void AddVertices(Texture* texture, rect<V> vert, rect<T> tex_rect, uint32_t cl = 0xffffffff) {

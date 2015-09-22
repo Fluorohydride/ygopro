@@ -16,10 +16,8 @@ namespace ygopro
     public:
         BuildSceneHandler(std::shared_ptr<BuildScene> pscene);
         ~BuildSceneHandler();
-        virtual bool UpdateEvent();
         virtual void BeginHandler();
-        
-        virtual bool UpdateInput();
+        virtual bool UpdateHandler();
         virtual void MouseMove(int32_t x, int32_t y);
         virtual void MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y);
         virtual void MouseButtonUp(int32_t button, int32_t mods, int32_t x, int32_t y);

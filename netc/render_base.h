@@ -194,6 +194,7 @@ namespace base {
     };
 
     class Shader {
+        using param_cb = std::function<void()>;
     public:
         ~Shader();
         bool LoadVertShader(const char* buffer);
@@ -201,6 +202,8 @@ namespace base {
         bool Link();
         bool Use();
         void Unload();
+        inline void SetDefaultParamCallback(param_cb cb) { default_cb = cb; }
+        inline param_cb GetDefaultParamCallback() { return default_cb; }
         void SetParam1i(const char* varname, const int32_t value);
         void SetParam1f(const char* varname, const float value);
         void SetParamMat4(const char* varname, const float m[]);
@@ -213,6 +216,7 @@ namespace base {
         uint32_t vert_shader = 0;
         uint32_t frag_shader = 0;
         uint32_t program = 0;
+        param_cb default_cb;
     };
     
     class Image {

@@ -183,30 +183,23 @@ namespace ygopro
         if(scene_handler)
             scene_handler->BeginHandler();
         RefreshAllCard();
-        InitActionTime(SceneMgr::Get().GetSysClock());
+    }
+    
+    void BuildScene::Terminate() {
+        sgui::SGGUIRoot::GetSingleton().ClearChilds();
     }
     
     bool BuildScene::Update() {
-        if(scene_handler) {
-            scene_handler->UpdateInput();
-            scene_handler->UpdateEvent();
-        }
-        UpdateActionTime(SceneMgr::Get().GetSysClock());
+        if(scene_handler)
+            scene_handler->UpdateHandler();
         return IsActive();
     }
     
     bool BuildScene::Draw() {
-        static bool render_twice = false;
         ImageMgr::Get().LoadCardTextureFromList(3);
         auto need_render = PrepareRender();
-        if(need_render) {
+        if(need_render)
             Render();
-            render_twice = false;
-        } else if(!render_twice) {
-            Render();
-            need_render = true;
-            render_twice = true;
-        }
         return need_render;
     }
     
@@ -361,7 +354,7 @@ namespace ygopro
                         bc->SetPos(bpos + (cpos - bpos) * t);
                         return true;
                     }, std::make_shared<TGenMove<int64_t>>(1000, 0.01));
-                    PushAction(action);
+                    SceneMgr::Get().PushAction(action);
                 }
                 ptr->SetLimit(lst[i]->limit);
             }
@@ -489,6 +482,7 @@ namespace ygopro
                 ptr->SetHL(0);
                 current_deck.side_deck.push_back(current_deck.extra_deck[index]);
                 current_deck.extra_deck.erase(current_deck.extra_deck.begin() + index);
+                break;
             }
             case CardLocation::Side: {
                 if(dcd->data->type & 0x802040) {
@@ -502,6 +496,7 @@ namespace ygopro
                     current_deck.main_deck.push_back(current_deck.side_deck[index]);
                     current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
                 }
+                break;
             }
             default:
                 break;
@@ -543,7 +538,7 @@ namespace ygopro
                     scene_handler->MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
             }
         });
-        PushAction(std::make_shared<ActionSequence<int64_t>>(rm_act, cb_act));
+        SceneMgr::Get().PushAction(std::make_shared<ActionSequence<int64_t>>(rm_act, cb_act));
     }
     
     void BuildScene::UpdateResult(const std::vector<CardData*> new_results) {
@@ -570,20 +565,26 @@ namespace ygopro
         if(index >= result_card.size() || result_card[index] == nullptr)
             return;
         auto dcd = result_card[index];
+        auto ptr = InsertCardFromPos(dcd->data->code, dcd->builder_card->pos, is_side);
+        if(ptr)
+            ptr->builder_card->SetHL(0xc0ffffff);
+    }
+    
+    std::shared_ptr<DeckCardData> BuildScene::InsertCardFromPos(int32_t code, v2f pos, bool is_side) {
         std::shared_ptr<DeckCardData> ptr;
         if(!is_side)
-            ptr = current_deck.InsertCard(CardLocation::Main, -1, dcd->data->code, true);
+            ptr = current_deck.InsertCard(CardLocation::Main, -1, code, true);
         else
-            ptr = current_deck.InsertCard(CardLocation::Side, -1, dcd->data->code, true);
+            ptr = current_deck.InsertCard(CardLocation::Side, -1, code, true);
         if(ptr != nullptr) {
             auto bc = card_renderer->NewSharedObject<BuilderCard>();
-            bc->LoadCardTexture(dcd->data->code);
-            bc->SetPos(dcd->builder_card->pos);
-            bc->SetHL(0xc0ffffff);
+            bc->LoadCardTexture(code);
+            bc->SetPos(pos);
             ptr->builder_card = bc;
             RefreshParams();
             UpdateAllCard();
         }
+        return ptr;
     }
     
     std::shared_ptr<DeckCardData> BuildScene::GetCard(CardLocation pos, int32_t index) {
