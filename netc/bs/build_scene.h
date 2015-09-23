@@ -51,7 +51,7 @@ namespace ygopro
     
     class BuildScene : public Scene, public base::RenderCompositorWithViewport {
     public:
-        BuildScene();
+        BuildScene(base::Shader* _2dshader);
         virtual ~BuildScene();
         virtual void Activate();
         virtual void Terminate();

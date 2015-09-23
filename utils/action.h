@@ -204,18 +204,25 @@ protected:
 
 template<typename TIME_TYPE>
 class ActionMgr {
+protected:
+    struct ActionStatus {
+        std::shared_ptr<Action<TIME_TYPE>> act;
+        void* object;
+        int32_t acttype;
+        bool pending_remove;
+    };
 public:
     inline void InitActionTime(TIME_TYPE tm) { cur_time = tm; }
     
     ActionMgr& PushAction(std::shared_ptr<Action<TIME_TYPE>> ani, void* obj = nullptr, int32_t acttype = 0) {
         ani->InitStartTime(cur_time);
-        actions.push_back(std::make_tuple(ani, obj, acttype));
+        actions.push_back(ActionStatus{ani, obj, acttype, false});
         return *this;
     }
     
     ActionMgr& operator << (std::shared_ptr<Action<TIME_TYPE>> ani) {
         ani->InitStartTime(cur_time);
-        actions.push_back(std::make_tuple<ani, nullptr, 0>);
+        actions.push_back(ActionStatus{ani, nullptr, 0, false});
         return *this;
     }
     
@@ -223,7 +230,7 @@ public:
         auto iter = actions.begin();
         while(iter != actions.end()) {
             auto cur = iter++;
-            if(!(std::get<0>(*cur))->Perform(tm))
+            if(cur->pending_remove || !cur->act->Perform(tm))
                 actions.erase(cur);
         }
         cur_time = tm;
@@ -234,22 +241,22 @@ public:
         auto iter = actions.begin();
         while(iter != actions.end()) {
             auto cur = iter++;
-            if(std::get<1>(*cur) == obj)
-                actions.erase(cur);
+            if(cur->object == obj)
+                cur->pending_remove = true;
         }
     }
     void RemoveAction(void* obj, int32_t acttype) {
         auto iter = actions.begin();
         while(iter != actions.end()) {
             auto cur = iter++;
-            if(std::get<1>(*cur) == obj && std::get<2>(*cur) == acttype)
-                actions.erase(cur);
+            if(cur->object == obj && cur->acttype == acttype)
+                cur->pending_remove = true;
         }
     }
     
 protected:
     TIME_TYPE cur_time = TIME_TYPE();
-    std::list<std::tuple<std::shared_ptr<Action<TIME_TYPE>>, void*, int32_t>> actions;
+    std::list<ActionStatus> actions;
 };
 
 #endif

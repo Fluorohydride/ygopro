@@ -16,27 +16,27 @@ namespace ygopro
     }
     
     void DuelSceneHandler::BeginHandler() {
-        proto_handler->BeginProto();
+//        proto_handler->BeginProto();
     }
     
     bool DuelSceneHandler::UpdateHandler() {
-        auto pscene = duel_scene.lock();
-        if(cur_commands.IsEmpty()) {
-            auto cmd = proto_handler->GetCommand();
-            if(cmd)
-                cur_commands.PushCommand(cmd);
-        } else {
-            while(!cur_commands.IsEmpty()) {
-                auto cmd = cur_commands.PullCommand();
-                bool finished = cmd->Handle(pscene);
-                if(finished)
-                    cur_commands.PopCommand();
-                else
-                    break;
-            }
-            if(cur_commands.IsEmpty())
-                proto_handler->EndCommand();
-        }
+//        auto pscene = duel_scene.lock();
+//        if(cur_commands.IsEmpty()) {
+//            auto cmd = proto_handler->GetCommand();
+//            if(cmd)
+//                cur_commands.PushCommand(cmd);
+//        } else {
+//            while(!cur_commands.IsEmpty()) {
+//                auto cmd = cur_commands.PullCommand();
+//                bool finished = cmd->Handle(pscene);
+//                if(finished)
+//                    cur_commands.PopCommand();
+//                else
+//                    break;
+//            }
+//            if(cur_commands.IsEmpty())
+//                proto_handler->EndCommand();
+//        }
         return true;
     }
 

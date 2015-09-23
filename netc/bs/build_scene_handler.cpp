@@ -136,7 +136,7 @@ namespace ygopro
                 if(hover_pos.first == CardLocation::Result)
                     pscene->HighlightCancel();
                 pre->builder_card->SetHL(0);
-                SceneMgr::Get().RemoveAction(pre->builder_card.get());
+                SceneMgr::Get().RemoveAction(pre->builder_card.get(), 1);
             }
             if(dcd) {
                 auto ptr = dcd->builder_card;
@@ -146,7 +146,7 @@ namespace ygopro
                     bc->SetHL((alpha << 24) | 0xffffff);
                     return true;
                 }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
-                SceneMgr::Get().PushAction(act, ptr.get());
+                SceneMgr::Get().PushAction(act, ptr.get(), 1);
                 if(info_panel->IsOpen()) {
                     show_info_begin = true;
                     show_info_time = SceneMgr::Get().GetSysClock() - 200;
@@ -202,7 +202,6 @@ namespace ygopro
                         }
                     }
                 });
-                
             }
         } else if(pos == CardLocation::Result) {
             pscene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);

@@ -61,52 +61,48 @@ namespace base {
             glDeleteProgram(program);
     }
     
-    bool Shader::LoadVertShader(const char* buffer) {
-        vert_shader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vert_shader, 1, &buffer, nullptr);
-        glCompileShader(vert_shader);
-        int32_t result;
-        glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &result);
-        if(result == GL_FALSE) {
-            std::cerr << "Vertex shader compilation failed!" << std::endl;
-            GLint logLen;
-            glGetShaderiv(vert_shader, GL_INFO_LOG_LENGTH, &logLen);
-            if(logLen > 0) {
-                char* log = new char[logLen];
-                GLsizei written;
-                glGetShaderInfoLog(vert_shader, logLen, &written, log);
-                std::cerr << "Shader log:" << log << std::endl;
-                delete[] log;
-            }
-            glDeleteShader(vert_shader);
-            vert_shader = 0;
+    bool Shader::LoadSource(const std::string& source) {
+        int32_t vert_begin = (int32_t)source.find("#version");
+        if(vert_begin == source.npos)
             return false;
-        }
+        int32_t frag_begin = (int32_t)source.find("#version", vert_begin + 8);
+        if(frag_begin == source.npos)
+            return false;
+        vert_shader = LoadShader(source.data() + vert_begin, frag_begin - vert_begin, GL_VERTEX_SHADER);
+        if(!vert_shader)
+            return false;
+        frag_shader = LoadShader(source.data() + frag_begin, (int32_t)source.size() - frag_begin, GL_FRAGMENT_SHADER);
+        if(!vert_shader)
+            return false;
+        if(Link())
+            return false;
         return true;
     }
     
-    bool Shader::LoadFragShader(const char* buffer) {
-        frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(frag_shader, 1, &buffer, nullptr);
-        glCompileShader(frag_shader);
+    int32_t Shader::LoadShader(const char* buffer, int32_t length, int32_t shader_type) {
+        int32_t shader_id = glCreateShader(shader_type);
+        glShaderSource(shader_id, 1, &buffer, &length);
+        glCompileShader(shader_id);
         int32_t result;
-        glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &result);
+        glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result);
         if(result == GL_FALSE) {
-            std::cerr << "Fragment shader compilation failed!" << std::endl;
+            if(shader_type == GL_VERTEX_SHADER)
+                std::cerr << "Vertex shader compilation failed!" << std::endl;
+            else
+                std::cerr << "Fragment shader compilation failed!" << std::endl;
             GLint logLen;
-            glGetShaderiv(frag_shader, GL_INFO_LOG_LENGTH, &logLen);
+            glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &logLen);
             if(logLen > 0) {
                 char* log = new char[logLen];
                 GLsizei written;
-                glGetShaderInfoLog(frag_shader, logLen, &written, log);
+                glGetShaderInfoLog(shader_id, logLen, &written, log);
                 std::cerr << "Shader log:" << log << std::endl;
                 delete[] log;
             }
-            glDeleteShader(frag_shader);
-            frag_shader = 0;
-            return false;
+            glDeleteShader(shader_id);
+            shader_id = 0;
         }
-        return true;
+        return shader_id;
     }
     
     bool Shader::Link() {
@@ -170,55 +166,6 @@ namespace base {
         vert_shader = 0;
         frag_shader = 0;
         program = 0;
-    }
-    
-    Shader& Shader::GetDefaultShader(bool reload) {
-        static Shader default_shader;
-        static bool inited = false;
-        static const char* vert_shader =
-        "#version 330\n"
-        "layout (location = 0) in vec2 v_position;\n"
-        "layout (location = 1) in vec2 v_texcoord;\n"
-        "layout (location = 2) in vec4 v_color;\n"
-        "layout (location = 3) in vec4 v_hcolor;\n"
-        "out vec2 texcoord;\n"
-        "out vec4 color;\n"
-        "out vec4 hcolor;\n"
-        "void main() {\n"
-        "texcoord = v_texcoord;\n"
-        "color = v_color;\n"
-        "hcolor = v_hcolor;\n"
-        "gl_Position = vec4(v_position, 0.0, 1.0);\n"
-        "}\n";
-        static const char* frag_shader =
-        "#version 330\n"
-        "in vec2 texcoord;\n"
-        "in vec4 color;\n"
-        "in vec4 hcolor;\n"
-        "layout (location = 0) out vec4 frag_color;\n"
-        "uniform sampler2D texid;\n"
-        "uniform float alpha;\n"
-        "void main() {\n"
-//        "if(gl_FrontFacing) {"
-        "vec4 texcolor = texture(texid, texcoord);\n"
-        "frag_color = mix(texcolor * color * vec4(1.0, 1.0, 1.0, alpha), vec4(hcolor.r, hcolor.g, hcolor.b, 1.0), hcolor.a);\n"
-//        "} else {"
-//        "discard;"
-//        "}"
-        "}\n";
-        
-        if(!inited || reload) {
-            default_shader.LoadVertShader(vert_shader);
-            default_shader.LoadFragShader(frag_shader);
-            default_shader.Link();
-            auto pshader = &default_shader;
-            default_shader.SetDefaultParamCallback([pshader]() {
-                pshader->SetParam1i("texid", 0);
-                pshader->SetParam1f("alpha", 1.0);
-            });
-            inited = true;
-        }
-        return default_shader;
     }
     
     void Shader::Unuse() {

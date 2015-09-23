@@ -20,6 +20,8 @@
   "layout_conf" : "./conf/layout.json",
   "dialog_conf" : "./conf/dialog.json",
   "limit_regulation" : "./conf/lflist.conf",
+  "2d_shader" : "./conf/2d.shader",
+  "3d_shader" : "./conf/3d.shader",
   "hover_info_delay" : 300,
   "server_ip" : "127.0.0.1",
   "server_port" : 7911,

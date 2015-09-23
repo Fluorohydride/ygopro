@@ -14,7 +14,7 @@
 #include "deck_data.h"
 #include "bs/build_scene_handler.h"
 #include "bs/build_scene.h"
-//#include "ds/duel_scene_handler.h"
+#include "ds/duel_scene_handler.h"
 //#include "ds/duel_network.h"
 #include "ds/duel_scene.h"
 
@@ -34,21 +34,21 @@ int32_t main(int32_t argc, char* argv[]) {
     if(!glfwInit())
         return 0;
     {
-        TextFile jsonfile;
-        jsonfile.Load("common.json");
-        if(!commonCfg.parse(jsonfile.Data(), jsonfile.Length()))
+        TextFile textfile;
+        textfile.Load("common.json");
+        if(!commonCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["string_conf"].to_string()));
-        if(!stringCfg.parse(jsonfile.Data(), jsonfile.Length()))
+        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["string_conf"].to_string()));
+        if(!stringCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["layout_conf"].to_string()));
-        if(!layoutCfg.parse(jsonfile.Data(), jsonfile.Length()))
+        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["layout_conf"].to_string()));
+        if(!layoutCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["textures_conf"].to_string()));
-        if(!textureCfg.parse(jsonfile.Data(), jsonfile.Length()))
+        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["textures_conf"].to_string()));
+        if(!textureCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["dialog_conf"].to_string()));
-        if(!dialogCfg.parse(jsonfile.Data(), jsonfile.Length()))
+        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["dialog_conf"].to_string()));
+        if(!dialogCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
         stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
             std::wstring setname = To<std::wstring>(node.to_string());
@@ -88,12 +88,31 @@ int32_t main(int32_t argc, char* argv[]) {
     std::cout << "GLSL Version : " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     glGetError();
     
+    std::shared_ptr<base::Shader> _2dshader;
+    std::shared_ptr<base::Shader> _3dshader;
+    {
+        TextFile textfile;
+        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["2d_shader"].to_string()));
+        _2dshader = std::make_shared<base::Shader>();
+        _2dshader->LoadSource(textfile.Data());
+        _2dshader->SetDefaultParamCallback([](base::Shader* shader) {
+            shader->SetParam1i("texid", 0);
+            shader->SetParam1f("alpha", 1.0);
+        });
+        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["3d_shader"].to_string()));
+        _3dshader = std::make_shared<base::Shader>();
+        _3dshader->LoadSource(textfile.Data());
+        _3dshader->SetDefaultParamCallback([](base::Shader* shader) {
+            shader->SetParam1i("texid", 0);
+            shader->SetParamMat4("mvp", glm::value_ptr(glm::mat4(1.0f)));
+        });
+    }
+    
     int32_t bwidth, bheight;
     glfwGetFramebufferSize(window, &bwidth, &bheight);
     xrate = (float)bwidth / width;
     yrate = (float)bheight / height;
-    
-    ImageMgr::Get().InitTextures(FileSystem::UTF8ToLocalFilename(commonCfg["image_path"].to_string()));
+    ImageMgr::Get().InitTextures(FileSystem::UTF8ToLocalFilename(commonCfg["image_path"].to_string()), _2dshader.get());
     if(DataMgr::Get().LoadDatas(FileSystem::UTF8ToLocalFilename(commonCfg["database_file"].to_string()))
        || !ImageMgr::Get().LoadImageConfig()
        || !sgui::SGGUIRoot::GetSingleton().Init(FileSystem::UTF8ToLocalFilename(commonCfg["gui_conf"].to_string()), {bwidth, bheight}, true)) {
@@ -103,22 +122,6 @@ int32_t main(int32_t argc, char* argv[]) {
     }
     LimitRegulationMgr::Get().LoadLimitRegulation(FileSystem::UTF8ToLocalFilename(commonCfg["limit_regulation"].to_string()),
                                                   To<std::wstring>(stringCfg["eui_list_default"].to_string()));
-    
-    SceneMgr::Get().Init();
-    SceneMgr::Get().SetSceneSize({bwidth, bheight});
-    SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
-    
-    auto sc = std::make_shared<BuildScene>();
-    auto sh = std::make_shared<BuildSceneHandler>(sc);
-    sc->SetSceneHandler(sh);
-    SceneMgr::Get().SetScene(sc);
-    
-//    auto sc = std::make_shared<DuelScene>();
-//    auto sh = std::make_shared<DuelSceneHandler>(sc);
-//    auto ph = std::make_shared<DuelProtoTcp>();
-//    sh->SetProtoHandler(ph);
-//    sc->SetSceneHandler(sh);
-//    SceneMgr::Get().SetScene(sc);
     
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int32_t key, int32_t scan, int32_t action, int32_t mods) {
         if(action == GLFW_PRESS) {
@@ -183,13 +186,29 @@ int32_t main(int32_t argc, char* argv[]) {
     else
         glfwSwapInterval(0);
     
-    sgui::SGGUIRoot::GetSingleton().SetShader(&base::Shader::GetDefaultShader());
+    sgui::SGGUIRoot::GetSingleton().SetShader(_2dshader.get());
     sgui::SGGUIRoot::GetSingleton().SetClipboardCallback([window]()->std::string {
         std::string str = glfwGetClipboardString(window);
         return std::move(str);
     }, [window](const std::string& str) {
         glfwSetClipboardString(window, str.c_str());
     });
+    
+    SceneMgr::Get().Init();
+    SceneMgr::Get().SetSceneSize({bwidth, bheight});
+    SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
+    
+//    auto sc = std::make_shared<BuildScene>(_2dshader.get());
+//    auto sh = std::make_shared<BuildSceneHandler>(sc);
+//    sc->SetSceneHandler(sh);
+//    SceneMgr::Get().SetScene(sc);
+    
+    auto sc = std::make_shared<DuelScene>(_2dshader.get(), _3dshader.get());
+    auto sh = std::make_shared<DuelSceneHandler>(sc);
+//    auto ph = std::make_shared<DuelProtoTcp>();
+//    sh->SetProtoHandler(ph);
+    sc->SetSceneHandler(sh);
+    SceneMgr::Get().SetScene(sc);
     SceneMgr::Get().InitFrameControler();
     SceneMgr::Get().SetFrameRate(60);
     
@@ -205,7 +224,8 @@ int32_t main(int32_t argc, char* argv[]) {
     SceneMgr::Get().Uninit();
     sgui::SGGUIRoot::GetSingleton().Uninit();
     ImageMgr::Get().UninitTextures();
-    base::Shader::GetDefaultShader().Unload();
+    _2dshader.reset();
+    _3dshader.reset();
     
     glfwDestroyWindow(window);
     glfwTerminate();

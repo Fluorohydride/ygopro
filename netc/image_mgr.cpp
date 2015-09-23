@@ -180,7 +180,7 @@ namespace ygopro
         ref_count[blockid].first++;
     }
     
-    void ImageMgr::InitTextures(const std::string& image_path) {
+    void ImageMgr::InitTextures(const std::string& image_path, base::Shader* _2dshader) {
         for(int16_t i = 7; i < 280; ++i)
             unused_block.push_back(i);
         ref_count.resize(280);
@@ -196,7 +196,7 @@ namespace ygopro
         image_render = std::make_shared<base::SimpleTextureRenderer>();
         image_render->SetFlip(true);
         image_render->SetScreenSize({2048, 2048});
-        image_render->SetShader(&base::Shader::GetDefaultShader());
+        image_render->SetShader(_2dshader);
         SetRenderObject(image_render.get());
     }
 

@@ -157,7 +157,7 @@ namespace ygopro
                 iter->builder_card->PushVertices();
     }
     
-    BuildScene::BuildScene() {
+    BuildScene::BuildScene(base::Shader* _2dshader) {
         limit_tex[0] = ImageMgr::Get().GetTexture("limit0");
         limit_tex[1] = ImageMgr::Get().GetTexture("limit1");
         limit_tex[2] = ImageMgr::Get().GetTexture("limit2");
@@ -165,9 +165,9 @@ namespace ygopro
         bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
         misc_renderer = std::make_shared<MiscRenderer>();
         card_renderer = std::make_shared<CardRenderer>();
-        bg_renderer->SetShader(&base::Shader::GetDefaultShader());
-        misc_renderer->SetShader(&base::Shader::GetDefaultShader());
-        card_renderer->SetShader(&base::Shader::GetDefaultShader());
+        bg_renderer->SetShader(_2dshader);
+        misc_renderer->SetShader(_2dshader);
+        card_renderer->SetShader(_2dshader);
         PushObject(bg_renderer.get());
         PushObject(misc_renderer.get());
         PushObject(card_renderer.get());

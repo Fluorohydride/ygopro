@@ -35,7 +35,7 @@ namespace ygopro
         bool FreeBlock(uint16_t, bool reserve);
         void IncreaseRef(uint16_t);
         
-		void InitTextures(const std::string& image_path);
+        void InitTextures(const std::string& image_path, base::Shader* _2dshader);
         void UninitTextures();
 		bool LoadImageConfig();
         

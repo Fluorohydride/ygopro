@@ -29,7 +29,12 @@ namespace ygopro
         
         inline void SetPosition(rectf pos) { translation = {pos.left, pos.top}; quad_size = {pos.width, pos.height}; SetUpdate(); }
         inline void SetTexture(texf4 tex) { block_texture = tex; SetUpdate(); }
-        inline void Mirror(FieldBlock* fb) { translation = fb->translation * -1.0f; quad_size = fb->quad_size * -1.0f; SetUpdate(); }
+        inline void Mirror(FieldBlock* fb) {
+            translation = fb->translation * -1.0f;
+            quad_size = fb->quad_size * -1.0f;
+            block_texture = fb->block_texture;
+            SetUpdate();
+        }
         inline v2f GetCenter() { return translation; }
         
         bool CheckInside(float px, float py);
@@ -52,8 +57,6 @@ namespace ygopro
         void Attach(std::shared_ptr<FieldCard> target);
         void Detach();
         
-        inline void SetCardQuad(rectf r) { card_quad = r; update_vert = true; SetUpdate(); }
-        inline void SetIconQuad(rectf r) { icon_quad = r; update_vert = true; SetUpdate(); }
         inline void SetTranslation(v3f tr) { translation = tr; update_vert = true; SetUpdate(); }
         inline void SetRotation(glm::quat rot) { rotation = rot; update_vert = true; SetUpdate(); }
         inline void SetYOffset(float yo) { yoffset = yo; update_vert = true; SetUpdate(); }
@@ -65,8 +68,6 @@ namespace ygopro
         float yoffset = 0.0f;
         v3f translation = {0.0f, 0.0f, 0.0f};
         glm::quat rotation;
-        rectf card_quad = {0.0f, 0.0f, 0.0f, 0.0f};
-        rectf icon_quad = {0.0f, 0.0f, 0.0f, 0.0f};
         texf4 card_texture;
         texf4 sleeve_texture;
         texf4 icon_texture;
@@ -93,6 +94,7 @@ namespace ygopro
         float cameray = 0.0f;
         float cameraz = 0.0f;
         rectf cardrect;
+        rectf iconrect;
         float handmin = 0.0f;
         float handmax = 0.0f;
         float handy[2];
@@ -118,7 +120,7 @@ namespace ygopro
     
     class DuelScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
     public:
-        DuelScene();
+        DuelScene(base::Shader* _2dshader, base::Shader* _3dshader);
         virtual ~DuelScene();
         virtual void Activate();
         virtual void Terminate();
@@ -151,7 +153,6 @@ namespace ygopro
         std::shared_ptr<FieldCard> GetFieldCard(int32_t x, int32_t y);
         
     protected:
-        std::shared_ptr<base::Shader> duel_shader = nullptr;
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
         std::shared_ptr<FieldRenderer> field_renderer;
         std::shared_ptr<FieldCardRenderer> fieldcard_renderer;

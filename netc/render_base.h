@@ -194,11 +194,11 @@ namespace base {
     };
 
     class Shader {
-        using param_cb = std::function<void()>;
+        using param_cb = std::function<void(Shader*)>;
     public:
         ~Shader();
-        bool LoadVertShader(const char* buffer);
-        bool LoadFragShader(const char* buffer);
+        bool LoadSource(const std::string& source);
+        int32_t LoadShader(const char* buffer, int32_t length, int32_t shader_type);
         bool Link();
         bool Use();
         void Unload();
@@ -209,7 +209,6 @@ namespace base {
         void SetParamMat4(const char* varname, const float m[]);
         
     public:
-        static Shader& GetDefaultShader(bool reload = false);
         static void Unuse();
         
     protected:

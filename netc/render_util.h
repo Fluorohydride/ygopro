@@ -78,11 +78,11 @@ namespace base
         
         inline void SetShader(base::Shader* shader) {
             render_shader = shader;
-            if(shader && !shader_setting_callback)
+            if(shader_setting_callback == nullptr)
                 shader_setting_callback = shader->GetDefaultParamCallback();
         }
         inline base::Shader* GetShader() { return render_shader; }
-        inline void SetShaderSettingCallback(std::function<void()> cb) { shader_setting_callback = cb; }
+        inline void SetShaderSettingCallback(std::function<void(base::Shader*)> cb) { shader_setting_callback = cb; }
         
         std::vector<recti> scissor_stack;
         std::vector<float> global_alpha;
@@ -90,7 +90,7 @@ namespace base
         uint32_t vbo_idx = 0;
         uint32_t vao_id = 0;
         base::Shader* render_shader = nullptr;
-        std::function<void()> shader_setting_callback;
+        std::function<void(base::Shader*)> shader_setting_callback;
     };
     
     template<typename VTYPE>
@@ -287,12 +287,13 @@ namespace base
         virtual void RenderSetting() {
             glEnable(GL_BLEND);
             glDisable(GL_DEPTH_TEST);
+            glFrontFace(GL_CW);
             SetBlendFunc(blend_mode);
             glActiveTexture(GL_TEXTURE0);
             if(IRenderState<VTYPE>::render_shader) {
                 IRenderState<VTYPE>::render_shader->Use();
                 if(IRenderState<VTYPE>::shader_setting_callback)
-                    IRenderState<VTYPE>::shader_setting_callback();
+                    IRenderState<VTYPE>::shader_setting_callback(IRenderState<VTYPE>::render_shader);
             }
             GLCheckError(__FILE__, __LINE__);
         }

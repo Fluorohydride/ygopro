@@ -39,7 +39,7 @@ namespace ygopro
     }
     
     bool FieldBlock::CheckInside(float px, float py) {
-        return std::abs(px - translation.x) <= quad_size.x / 2.0f && std::abs(py - translation.y) <= quad_size.y / 2.0f;
+        return std::abs(px - translation.x) <= std::abs(quad_size.x / 2.0f) && std::abs(py - translation.y) <= std::abs(quad_size.y / 2.0f);
     }
     
     FieldCard::~FieldCard() {
@@ -56,18 +56,20 @@ namespace ygopro
         indices.resize(18);
         if(update_vert) {
             std::array<v3f, 12> origin_vert;
-            origin_vert[0] = {card_quad.left, card_quad.top, 0.001f};
-            origin_vert[1] = {card_quad.left + card_quad.width, card_quad.top, 0.001f};
-            origin_vert[2] = {card_quad.left, card_quad.top - card_quad.height, 0.001f};
-            origin_vert[3] = {card_quad.left + card_quad.width, card_quad.top - card_quad.height, 0.001f};
-            origin_vert[4] = {card_quad.left + card_quad.width, card_quad.top, -0.001f};
-            origin_vert[5] = {card_quad.left, card_quad.top, -0.001f};
-            origin_vert[6] = {card_quad.left + card_quad.width, card_quad.top - card_quad.height, -0.001f};
-            origin_vert[7] = {card_quad.left, card_quad.top - card_quad.height, -0.001f};
-            origin_vert[8] = {icon_quad.left, icon_quad.top, 0.001f};
-            origin_vert[9] = {icon_quad.left + icon_quad.width, icon_quad.top, 0.001f};
-            origin_vert[10] = {icon_quad.left, icon_quad.top - icon_quad.height, 0.001f};
-            origin_vert[11] = {icon_quad.left + icon_quad.width, icon_quad.top - icon_quad.height, 0.001f};
+            origin_vert[0] = {vparam.cardrect.left, vparam.cardrect.top, 0.001f};
+            origin_vert[1] = {vparam.cardrect.left + vparam.cardrect.width, vparam.cardrect.top, 0.001f};
+            origin_vert[2] = {vparam.cardrect.left, vparam.cardrect.top - vparam.cardrect.height, 0.001f};
+            origin_vert[3] = {vparam.cardrect.left + vparam.cardrect.width, vparam.cardrect.top - vparam.cardrect.height, 0.001f};
+            
+            origin_vert[4] = {vparam.cardrect.left + vparam.cardrect.width, vparam.cardrect.top, -0.001f};
+            origin_vert[5] = {vparam.cardrect.left, vparam.cardrect.top, -0.001f};
+            origin_vert[6] = {vparam.cardrect.left + vparam.cardrect.width, vparam.cardrect.top - vparam.cardrect.height, -0.001f};
+            origin_vert[7] = {vparam.cardrect.left, vparam.cardrect.top - vparam.cardrect.height, -0.001f};
+            
+            origin_vert[8] = {vparam.iconrect.left, vparam.iconrect.top, 0.001f};
+            origin_vert[9] = {vparam.iconrect.left + vparam.iconrect.width, vparam.iconrect.top, 0.001f};
+            origin_vert[10] = {vparam.iconrect.left, vparam.iconrect.top - vparam.iconrect.height, 0.001f};
+            origin_vert[11] = {vparam.iconrect.left + vparam.iconrect.width, vparam.iconrect.top - vparam.iconrect.height, 0.001f};
             for(int32_t i = 0; i < 12; ++i) {
                 glm::vec3 v(origin_vert[i].x, origin_vert[i].y + yoffset, origin_vert[i].z);
                 auto c = rotation * v;
@@ -85,13 +87,14 @@ namespace ygopro
             vertices[i].color = color;
             vertices[i].hcolor = hl;
         }
-        vt3::GenQuadIndex(indices.data(), 3, vert_index);
+        vt3::GenQuadIndex(indices.data(), 2, vert_index);
     }
     
     void FieldCard::SetCode(uint32_t code) {
         if(this->code == code)
             return;
-        ImageMgr::Get().UnloadCardTexture(this->code);
+        if(this->code)
+            ImageMgr::Get().UnloadCardTexture(this->code);
         this->code = code;
         if(code) {
             std::weak_ptr<FieldCard> thiscard = shared_from_this();
@@ -306,6 +309,10 @@ namespace ygopro
     }
 
     void FieldRenderer::PushVerticesAll() {
+        for(auto& iter : field_blocks[0])
+            iter->PushVertices();
+        for(auto& iter : field_blocks[1])
+            iter->PushVertices();
     }
     
     void FieldCardRenderer::PushVerticesAll() {
@@ -316,14 +323,15 @@ namespace ygopro
         for(auto& iter : extra[1])
             iter->PushVertices();
         for(auto& iter : s_zone[1])
-            iter->PushVertices();
+            if(iter)
+                iter->PushVertices();
         for(auto& iter : m_zone[1]) {
-            for(auto& att : iter->attached_cards)
-                att->PushVertices();
-            iter->PushVertices();
+            if(iter) {
+                for(auto& att : iter->attached_cards)
+                    att->PushVertices();
+                iter->PushVertices();
+            }
         }
-        for(auto& iter : m_zone[1])
-            iter->PushVertices();
         for(auto& iter : grave[1])
             iter->PushVertices();
         for(auto& iter : banished[1])
@@ -334,12 +342,15 @@ namespace ygopro
         for(auto& iter : banished[0])
             iter->PushVertices();
         for(auto& iter : m_zone[0]) {
-            for(auto& att : iter->attached_cards)
-                att->PushVertices();
-            iter->PushVertices();
+            if(iter) {
+                for(auto& att : iter->attached_cards)
+                    att->PushVertices();
+                iter->PushVertices();
+            }
         }
         for(auto& iter : s_zone[0])
-            iter->PushVertices();
+            if(iter)
+                iter->PushVertices();
         for(auto& iter : deck[0])
             iter->PushVertices();
         for(auto& iter : extra[0])
@@ -348,8 +359,7 @@ namespace ygopro
             iter->PushVertices();
     }
     
-    DuelScene::DuelScene() {
-        InitField();
+    DuelScene::DuelScene(base::Shader* _2dshader, base::Shader* _3dshader) {
         vparam.fovy = (float)layoutCfg["fovy"].to_double();
         vparam.cnear = (float)layoutCfg["near"].to_double();
         vparam.cfar = (float)layoutCfg["far"].to_double();
@@ -357,30 +367,25 @@ namespace ygopro
         vparam.radius = (float)layoutCfg["radius"].to_double();
         vparam.xoffset = (float)layoutCfg["xoffset"].to_double();
         vparam.yoffset = (float)layoutCfg["yoffset"].to_double();
-        vparam.cardrect = sgui::SGJsonUtil::ConvertRectf(layoutCfg["yoffset"]);
+        vparam.cardrect = sgui::SGJsonUtil::ConvertRectf(layoutCfg["card"]);
         vparam.handmin = (float)layoutCfg["handmin"].to_double();
         vparam.handmax = (float)layoutCfg["handmax"].to_double();
         vparam.handy[0] = (float)layoutCfg["handy1"].to_double();
         vparam.handy[1] = (float)layoutCfg["handy2"].to_double();
         
-        TextFile vert_shader("./conf/vert.shader");
-        TextFile frag_shader("./conf/frag.shader");
-        duel_shader = std::make_shared<base::Shader>();
-        duel_shader->LoadVertShader(vert_shader.Data());
-        duel_shader->LoadFragShader(frag_shader.Data());
-        duel_shader->Link();
-        
         bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
-        bg_renderer->SetShader(&base::Shader::GetDefaultShader());
+        bg_renderer->SetShader(_2dshader);
         field_renderer = std::make_shared<FieldRenderer>();
-        field_renderer->SetShader(duel_shader.get());
-        field_renderer->SetShaderSettingCallback([this]() {
-            duel_shader->SetParamMat4("mvp", glm::value_ptr(vparam.mvp));
+        field_renderer->SetShader(_3dshader);
+        field_renderer->SetShaderSettingCallback([](base::Shader* shader) {
+            shader->SetParam1i("texid", 0);
+            shader->SetParamMat4("mvp", glm::value_ptr(vparam.mvp));
         });
         fieldcard_renderer = std::make_shared<FieldCardRenderer>();
-        fieldcard_renderer->SetShader(duel_shader.get());
-        fieldcard_renderer->SetShaderSettingCallback([this](){
-            duel_shader->SetParamMat4("mvp", glm::value_ptr(glm::mat4(1.0f)));
+        fieldcard_renderer->SetShader(_3dshader);
+        fieldcard_renderer->SetShaderSettingCallback([](base::Shader* shader) {
+            shader->SetParam1i("texid", 0);
+            shader->SetParamMat4("mvp", glm::value_ptr(vparam.mvp));
         });
         PushObject(bg_renderer.get());
         PushObject(field_renderer.get());
@@ -388,14 +393,25 @@ namespace ygopro
         PushObject(sgui::SGGUIRoot::GetSingleton());
         bg_renderer->ClearVertices();
         bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), rectf{-1.0f, 1.0f, 2.0f, -2.0f}, ImageMgr::Get().GetTexture("bg"));
+        
+        InitField();
     }
     
     DuelScene::~DuelScene() {
+        ClearField();
     }
     
     void DuelScene::Activate() {
         if(scene_handler)
             scene_handler->BeginHandler();
+        AddCard(83764718, 0, 0x2, 0, 0);
+        AddCard(0, 0, 0x2, 0, 0);
+        AddCard(83764718, 1, 0x2, 1, 0);
+        AddCard(0, 1, 0x2, 1, 0);
+        for(auto& iter : hand[0])
+            iter->UpdatePosition(0);
+        for(auto& iter : hand[1])
+            iter->UpdatePosition(0);
     }
     
     void DuelScene::Terminate() {
@@ -466,6 +482,7 @@ namespace ygopro
             iter->UpdatePosition(0);
         for(auto& iter : hand[1])
             iter->UpdatePosition(0);
+        
     }
     
     void DuelScene::UpdateViewOffset(v2f offset) {
@@ -595,6 +612,8 @@ namespace ygopro
                 extra[side].push_back(ptr);
                 break;
         }
+        ptr->SetCode(code);
+        ptr->SetSleeveTex(ImageMgr::Get().GetTexture((side == 0) ? "sleeve1" : "sleeve2"));
         fieldcard_renderer->RequestRedraw();
         return ptr;
     }
