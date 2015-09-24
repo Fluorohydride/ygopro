@@ -1501,7 +1501,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 								str.append(formatBuffer);
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
-									myswprintf(formatBuffer, L"\n%ls", dataManager.GetName(mcard->alias));
+									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
 								if(mcard->location == LOCATION_SZONE && (mcard->sequence == 6 || mcard->sequence == 7)) {
