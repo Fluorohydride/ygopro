@@ -58,7 +58,6 @@ namespace ygopro
         std::pair<CardLocation, int32_t> hover_pos;
         std::pair<CardLocation, int32_t> click_pos;
         std::weak_ptr<DeckCardData> hover_obj;
-        bool show_info_begin = false;
         int64_t show_info_time = 0;
         
     };

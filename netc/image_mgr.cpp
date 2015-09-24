@@ -17,7 +17,7 @@ namespace ygopro
             return iter->second.tex_info;
         } else {
             loading_card.push_back(std::make_pair(id, loaded_cb));
-            return misc_textures["unknown"];
+            return misc_textures["loading"];
         }
 	}
     

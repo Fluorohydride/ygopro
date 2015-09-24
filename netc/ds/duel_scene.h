@@ -149,8 +149,9 @@ namespace ygopro
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);
         v2i GetHoverPos(int32_t posx, int32_t posy);
+        v3i GetHoverCardPos(v2i hp);
+        std::shared_ptr<FieldCard> GetHoverCard(int32_t side, int32_t zone, int32_t seq);
         std::shared_ptr<FieldBlock> GetFieldBlock(int32_t x, int32_t y);
-        std::shared_ptr<FieldCard> GetFieldCard(int32_t x, int32_t y);
         
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;

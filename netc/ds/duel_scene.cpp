@@ -405,9 +405,9 @@ namespace ygopro
         if(scene_handler)
             scene_handler->BeginHandler();
         AddCard(83764718, 0, 0x2, 0, 0);
-        AddCard(0, 0, 0x2, 0, 0);
-        AddCard(83764718, 1, 0x2, 1, 0);
-        AddCard(0, 1, 0x2, 1, 0);
+        AddCard(64496451, 0, 0x2, 0, 0);
+        AddCard(57728570, 1, 0x2, 1, 0);
+        AddCard(97268402, 1, 0x2, 1, 0);
         for(auto& iter : hand[0])
             iter->UpdatePosition(0);
         for(auto& iter : hand[1])
@@ -892,17 +892,49 @@ namespace ygopro
         return {0, 0};
     }
     
+    v3i DuelScene::GetHoverCardPos(v2i hp) {
+        if(hp.x == 0)
+            return {0, 0, 0};
+        if(hp.x > 2)
+            return {hp.x - 3, 0x2, hp.y};
+        int32_t side = hp.x - 1;
+        int32_t loc = 0, seq = 0;
+        if(hp.y < 5) {
+            loc = 0x4;
+            seq = hp.y;
+        } else if(hp.y < 13) {
+            loc = 0x8;
+            seq = hp.y - 5;
+        } else {
+            switch(hp.y) {
+                case 13: loc = 0x1; break;
+                case 14: loc = 0x40; break;
+                case 15: loc = 0x10; break;
+                case 16: loc = 0x20; break;
+            }
+        }
+        return {side, loc, seq};
+    }
+    
+    std::shared_ptr<FieldCard> DuelScene::GetHoverCard(int32_t side, int32_t zone, int32_t seq) {
+        if(zone == 0)
+            return nullptr;
+        switch(zone) {
+            case 0x1: return deck[side].empty() ? nullptr : deck[side].back();
+            case 0x2: return hand[side].empty() ? nullptr : hand[side][seq];
+            case 0x4: return m_zone[side][seq];
+            case 0x8: return s_zone[side][seq];
+            case 0x10: return grave[side].empty() ? nullptr : grave[side].back();
+            case 0x20: return banished[side].empty() ? nullptr : banished[side].back();
+            case 0x40: return extra[side].empty() ? nullptr : extra[side].back();
+        }
+        return nullptr;
+    }
+    
     std::shared_ptr<FieldBlock> DuelScene::GetFieldBlock(int32_t x, int32_t y) {
         if(x == 1 || x == 2)
             if(y < 17)
                 return field_blocks[x - 1][y];
-        return nullptr;
-    }
-    
-    std::shared_ptr<FieldCard> DuelScene::GetFieldCard(int32_t x, int32_t y) {
-        if(x == 3 || x == 4)
-            if(y < hand[x - 3].size())
-                return hand[x - 3][y];
         return nullptr;
     }
     

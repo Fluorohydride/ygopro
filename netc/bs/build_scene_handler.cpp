@@ -108,11 +108,11 @@ namespace ygopro
     }
     
     bool BuildSceneHandler::UpdateHandler() {
-        if(show_info_begin) {
+        if(show_info_time) {
             auto pscene = build_scene.lock();
             auto now = SceneMgr::Get().GetSysClock();
             if(now - show_info_time >= 500) {
-                show_info_begin = false;
+                show_info_time = 0;
                 auto mp = SceneMgr::Get().GetMousePosition();
                 auto cur = pscene->GetHoverPos(mp.x, mp.y);
                 click_pos.first = CardLocation::Null;
@@ -147,10 +147,8 @@ namespace ygopro
                     return true;
                 }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
                 SceneMgr::Get().PushAction(act, ptr.get(), 1);
-                if(info_panel->IsOpen()) {
-                    show_info_begin = true;
+                if(info_panel->IsOpen())
                     show_info_time = SceneMgr::Get().GetSysClock() - 200;
-                }
                 if(hov.first == CardLocation::Result)
                     pscene->HighlightCode(dcd->data->GetRawCode());
             }
@@ -161,15 +159,13 @@ namespace ygopro
     
     void BuildSceneHandler::MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y) {
         click_pos = hover_pos;
-        if(button == GLFW_MOUSE_BUTTON_LEFT) {
-            show_info_begin = true;
+        if(button == GLFW_MOUSE_BUTTON_LEFT)
             show_info_time = SceneMgr::Get().GetSysClock();
-        }
     }
     
     void BuildSceneHandler::MouseButtonUp(int32_t button, int32_t mods, int32_t x, int32_t y) {
         if(button == GLFW_MOUSE_BUTTON_LEFT)
-            show_info_begin = false;
+            show_info_time = 0;
         if(hover_pos != click_pos)
             return;
         auto pscene = build_scene.lock().get();

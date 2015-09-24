@@ -13,6 +13,7 @@ namespace ygopro
     class DuelScene;
     class FieldBlock;
     class FieldCard;
+    class InfoPanel;
     
     class DuelProtoHandler {
     public:
@@ -76,9 +77,11 @@ namespace ygopro
         
         bool btnDown[2] = {false};
         v2i btnPos[2];
+        v2i click_pos = {0, 0};
+        int64_t show_info_time = 0;
         std::weak_ptr<FieldBlock> pre_block;
         std::weak_ptr<FieldCard> pre_card;
-        v2i click_pos = {0, 0};
+        std::shared_ptr<InfoPanel> info_panel;
     };
     
 }

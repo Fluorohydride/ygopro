@@ -772,6 +772,9 @@ namespace ygopro
 	
     void InfoPanel::ShowInfo(uint32_t code) {
         sgui::SGPanel* wnd = nullptr;
+        auto data = DataMgr::Get()[code];
+        if(data == nullptr)
+            return;
         if(window.expired()) {
             wnd = LoadDialogAs<sgui::SGPanel>("info dialog");
             if(!wnd)
@@ -824,7 +827,6 @@ namespace ygopro
         auto hmask = ImageMgr::Get().GetTexture("mmask");
         auto star = ImageMgr::Get().GetTexture("mstar");
         this->code = code;
-        auto data = DataMgr::Get()[code];
         uint64_t setcode = data->setcode;
         if(data->alias) {
             auto aliasdata = DataMgr::Get()[data->alias];
