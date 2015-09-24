@@ -70,5 +70,6 @@ function c98263709.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x47e0000)
 		e1:SetValue(LOCATION_REMOVED)
 		tc:RegisterEffect(e1,true)
+		Duel.SpecialSummonComplete()
 	end
 end
