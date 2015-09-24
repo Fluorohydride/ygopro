@@ -4564,7 +4564,8 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 		card* pcard = cait->triggering_effect->handler;
 		if(is_chain_disablable(cait->chain_count)) {
 			if((cait->flag & CHAIN_DISABLE_EFFECT) || pcard->is_affected_by_effect(EFFECT_DISABLE_CHAIN)
-			        || (pcard->is_status(STATUS_DISABLED) && pcard->is_has_relation(cait->triggering_effect))) {
+					|| ((cait->triggering_location & LOCATION_ONFIELD) && pcard->is_affected_by_effect(EFFECT_DISABLE_CHAIN_FIELD))
+					|| (pcard->is_status(STATUS_DISABLED) && pcard->is_has_relation(cait->triggering_effect))) {
 				if(!(cait->flag & CHAIN_DISABLE_EFFECT)) {
 					pduel->write_buffer8(MSG_CHAIN_DISABLED);
 					pduel->write_buffer8(cait->chain_count);

@@ -281,7 +281,7 @@ EFFECT_CANNOT_CHANGE_CONTROL	=5		--不能改变控制权
 EFFECT_CANNOT_ACTIVATE			=6		--玩家不能发动效果
 EFFECT_CANNOT_TRIGGER			=7		--不能发动效果
 EFFECT_DISABLE_EFFECT			=8		--效果无效 （聖杯）
-EFFECT_DISABLE_CHAIN			=9		--不能连锁
+EFFECT_DISABLE_CHAIN			=9		--在連鎖串中無效(processor.cpp)
 EFFECT_DISABLE_TRAPMONSTER		=10		--陷阱怪兽无效
 EFFECT_CANNOT_INACTIVATE		=12		--不能发动
 EFFECT_CANNOT_DISEFFECT			=13		--效果不能被无效（魔法·陷阱）
@@ -480,6 +480,7 @@ EFFECT_CANNOT_SELECT_EFFECT_TARGET	=333	--對手不能選擇為效果對象
 EFFECT_ADD_SETCODE				=334	--规则上视为「XX」字段
 EFFECT_NO_EFFECT_DAMAGE			=335	--玩家已受到"效果傷害變成0"的效果影響
 EFFECT_UNSUMMONABLE_CARD		=336	--不能通常召唤的怪獸
+EFFECT_DISABLE_CHAIN_FIELD		=337	--連鎖串中場上發動的效果無效(Duel.NegateRelatedChain())
 
 --下面是诱发效果的诱发事件、时点 （如果是TYPE_SINGLE则自己发生以下事件后触发，如果TYPE_FIELD则场上任何卡发生以下事件都触发）
 EVENT_STARTUP					=1000	--游戏开始时
