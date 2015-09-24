@@ -48,6 +48,7 @@ function c70043345.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if bc:IsRelateToBattle() and bc:IsControler(1-tp) and Duel.Remove(bc,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
 		bc:SetTurnCounter(0)
 		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(aux.Stringid(70043345,0))
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetReset(RESET_PHASE+RESET_END+RESET_OPPO_TURN,2)
