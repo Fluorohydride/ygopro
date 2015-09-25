@@ -1,0 +1,17 @@
+/bin
+/lib
+/dep
+/deck
+/screenshot
+/images
+/build
+/_cache
+/_res
+/dependencies
+*.cdb
+*.ttf
+*.ttc
+*.exe
+*.log
+*.DS_Store
+

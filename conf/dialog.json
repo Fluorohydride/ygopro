@@ -1,0 +1,438 @@
+{
+  "default text color" : "0x000000ff",
+  "default input color" : "0x000000ff",
+  "messagebox ok" : {
+    "type" : "window",
+    "close button" : false,
+    "position" : [0, 0, 500, 150, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "min size" : [500, 150],
+    "children" : {
+      "msg label" : {
+        "type" : "label",
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "ok button" : {
+        "type" : "text button",
+        "text" : ["eui_button_ok", "0x000000ff"],
+        "position" : [0, -60, 160, 45, 0.5, 1.0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
+  },
+  "messagebox ok,cancel" : {
+    "type" : "window",
+    "close button" : false,
+    "position" : [0, 0, 500, 150, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "min size" : [500, 150],
+    "children" : {
+      "msg label" : {
+        "type" : "label",
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "ok button" : {
+        "type" : "text button",
+        "text" : ["eui_button_ok", "0x000000ff"],
+        "position" : [0, -60, 160, 45, 0.3, 1.0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "cancel button" : {
+        "type" : "text button",
+        "text" : ["eui_button_cancel", "0x000000ff"],
+        "position" : [0, -60, 160, 45, 0.7, 1.0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
+  },
+  "messagebox yes,no" : {
+    "type" : "window",
+    "close button" : false,
+    "position" : [0, 0, 500, 150, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "min size" : [500, 150],
+    "children" : {
+      "msg label" : {
+        "type" : "label",
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "yes button" : {
+        "type" : "text button",
+        "text" : ["eui_button_yes", "0x000000ff"],
+        "position" : [0, -60, 160, 45, 0.3, 1.0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "no button" : {
+        "type" : "text button",
+        "text" : ["eui_button_no", "0x000000ff"],
+        "position" : [0, -60, 160, 45, 0.7, 1.0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
+  },
+  "popup menu width" : 200,
+  "popup menu height" : 40,
+  "popup menu margin" : [5, 5, 8, 5],
+  "file dialog" : {
+    "type" : "window",
+    "close button" : true,
+    "min size" : [400, 400],
+    "position" : [0, 0, 500, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "path" : {
+        "type" : "textedit",
+        "readonly" : true,
+        "position" : [10, 40, -20, 45, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "file list" : {
+        "type" : "listbox",
+        "position" : [10, 90, -20, -200, 0, 0, 1.0, 1.0, 0.0, 0.0]
+      },
+      "file" : {
+        "type" : "textedit",
+        "input color" : "0x000000ff",
+        "position" : [10, -105, -20, 45, 0, 1.0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "ok button" : {
+        "type" : "text button",
+        "text" : ["eui_button_ok", "0x000000ff"],
+        "position" : [0, -55, 0, 40, 0.5, 1.0, 0.5, 0.0, -0.5, 0.0]
+      }
+    }
+  },
+  "filter dialog" : {
+    "type" : "panel",
+    "is entity" : true,
+    "position" : [0, 0, 500, 560, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "dialog height" : [290, 560],
+    "children" : {
+      "keyword label" : {
+        "type" : "label",
+        "text" : ["eui_filter_keyword", "0x000000ff"],
+        "position" : [10, 15, 0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "type label" : {
+        "type" : "label",
+        "text" : ["eui_filter_type", "0x000000ff"],
+        "position" : [10, 60, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "limit label" : {
+        "type" : "label",
+        "text" : ["eui_filter_limit", "0x000000ff"],
+        "position" : [10, 150, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "pool label" : {
+        "type" : "label",
+        "text" : ["eui_filter_pool", "0x000000ff"],
+        "position" : [10, 195, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "attrib label" : {
+        "type" : "label",
+        "text" : ["eui_filter_attribute", "0x000000ff"],
+        "position" : [10, 240, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "race label" : {
+        "type" : "label",
+        "text" : ["eui_filter_race", "0x000000ff"],
+        "position" : [10, 285, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "attack label" : {
+        "type" : "label",
+        "text" : ["eui_filter_attack", "0x000000ff"],
+        "position" : [10, 330, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "defence label" : {
+        "type" : "label",
+        "text" : ["eui_filter_defence", "0x000000ff"],
+        "position" : [10, 375, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "star label" : {
+        "type" : "label",
+        "text" : ["eui_filter_star", "0x000000ff"],
+        "position" : [10, 420, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "pscale label" : {
+        "type" : "label",
+        "text" : ["eui_filter_pscale", "0x000000ff"],
+        "position" : [10, 465, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "keyword" : {
+        "type" : "textedit",
+        "input color" : "0x000000ff",
+        "position" : [-10, 10, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
+      },
+      "arctype" : {
+        "type" : "combobox",
+        "position" : [-10, 55, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "type list"
+      },
+      "subtype" : {
+        "type" : "combobox",
+        "position" : [-10, 100, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "no type"
+      },
+      "limit" : {
+        "type" : "combobox",
+        "position" : [-10, 145, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "limit list"
+      },
+      "pool" : {
+        "type" : "combobox",
+        "position" : [-10, 190, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "pool list"
+      },
+      "attribute" : {
+        "type" : "combobox",
+        "position" : [-10, 235, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "attribute list"
+      },
+      "race" : {
+        "type" : "combobox",
+        "position" : [-10, 280, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0],
+        "items" : "race list"
+      },
+      "attack" : {
+        "type" : "textedit",
+        "input color" : "0x000000ff",
+        "position" : [-10, 325, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
+      },
+      "defence" : {
+        "type" : "textedit",
+        "input color" : "0x000000ff",
+        "position" : [-10, 370, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
+      },
+      "star" : {
+        "type" : "textedit",
+        "input color" : "0x000000ff",
+        "position" : [-10, 415, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
+      },
+      "pscale" : {
+        "type" : "textedit",
+        "input color" : "0x000000ff",
+        "position" : [-10, 460, -200, 45, 1.0, 0, 1.0, 0.0, -1.0, 0.0]
+      },
+      "search" : {
+        "type" : "text button",
+        "text" : ["eui_filter_search", "0x000000ff"],
+        "position" : [0, -50, 160, 40, 0.3, 1.0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "clear" : {
+        "type" : "text button",
+        "text" : ["eui_filter_clear", "0x000000ff"],
+        "position" : [0, -50, 160, 40, 0.7, 1.0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
+  },
+  "info dialog" : {
+    "type" : "panel",
+    "is entity" : true,
+    "position" : [0, 0, 1100, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "card image" : {
+        "type" : "sprite",
+        "allow focus" : false,
+        "position" : [5, 5, 338, 490, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "scroll area" : {
+        "type" : "scrollarea",
+        "position" : [350, 10, -360, -60, 0, 0, 1.0, 1.0, 0.0, 0.0],
+        "children" : {
+          "misc image" : {
+            "type" : "spritelist"
+          },
+          "info text" : {
+            "type" : "label",
+            "allow focus" : false
+          },
+          "pendulum text" : {
+            "type" : "label",
+            "allow focus" : false
+          },
+          "card text" : {
+            "type" : "label",
+            "allow focus" : false
+          }
+        }
+      },
+      "pin panel" : {
+        "type" : "checkbox",
+        "position" : [-50, -15, 160, 40, 1.0, 1.0, 0, 0, -1.0, -1.0],
+        "text" : ["eui_pin_info", "0x000000ff"]
+      }
+    },
+    "info margin" : 5,
+    "star offset" : [10, 30, 28, 28],
+    "slider width" : 30,
+    "min pendilum text height" : 90,
+    "scale blank" : 60,
+    "scale icon" : [46, 35],
+    "scale size" : [21, 30],
+    "info backcolor" : "0xffffffc0"
+  },
+  "build panel" : {
+    "type" : "panel",
+    "is entity" : true,
+    "position" : [10, 10, -10, 50, 0.0, 0.0, 0.75, 0.0, 0.0, 0.0],
+    "children" : {
+      "deck name" : {
+        "type" : "label",
+        "position" : [10, 10, 300, 40, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "menu deck" : {
+        "type" : "text button",
+        "text" : ["eui_menu_deck", "0x000000ff"],
+        "position" : [-680, 5, 120, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "menu tool" : {
+        "type" : "text button",
+        "text" : ["eui_menu_tool", "0x000000ff"],
+        "position" : [-560, 5, 120, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "menu list" : {
+        "type" : "text button",
+        "text" : ["eui_menu_list", "0x000000ff"],
+        "position" : [-440, 5, 120, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "limit reg" : {
+        "type" : "combobox",
+        "position" : [-310, 2, 300, 45, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      }
+    }
+  },
+  "search panel" : {
+    "type" : "panel",
+    "is entity" : true,
+    "position" : [-10, 10, -20, 150, 1.0, 0, 0.25, 0, -1.0, 0],
+    "children" : {
+      "menu search" : {
+        "type" : "text button",
+        "text" : ["eui_menu_search", "0x000000ff"],
+        "position" : [0, 10, 200, 40, 0.5, 0.0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "result label" : {
+        "type" : "label",
+        "position" : [0, -55, 0, 0, 0.5, 1.0, 0.0, 0.0, -0.5, -1.0]
+      },
+      "page label" : {
+        "type" : "label",
+        "position" : [0, -15, 0, 0, 0.5, 1.0, 0.0, 0.0, -0.5, -1.0]
+      },
+      "prev page" : {
+        "type" : "text button",
+        "text" : ["eui_filter_prevpage", "0x000000ff"],
+        "position" : [10, -10, 60, 35, 0, 1.0, 0.0, 0.0, 0, -1.0]
+      },
+      "next page" : {
+        "type" : "text button",
+        "text" : ["eui_filter_nextpage", "0x000000ff"],
+        "position" : [-10, -10, 60, 35, 1.0, 1.0, 0.0, 0.0, -1.0, -1.0]
+      }
+    }
+  },
+  "menus" : {
+    "menu deck" : {
+      "eui_deck_load" : 0,
+      "eui_deck_save" : 1,
+      "eui_deck_saveas" : 2,
+      "eui_deck_loadstr" : 3,
+      "eui_deck_savestr" : 4
+    },
+    "menu tool" : {
+      "eui_tool_sort" : 0,
+      "eui_tool_shuffle" : 1,
+      "eui_tool_clear" : 2
+    },
+    "menu list" : {
+      "eui_list_forbidden" : 0,
+      "eui_list_limit" : 1,
+      "eui_list_semilimit" : 2
+    },
+    "menu build popup" : {
+      "eui_popup_remove" : 0,
+      "eui_popup_addsame" : 1
+    }
+  },
+  "item lists" : {
+    "type list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "type_monster" : ["0x000000ff", 1],
+      "type_spell" : ["0x000000ff", 2],
+      "type_trap" : ["0x000000ff", 4]
+    },
+    "no type" : {
+      "eui_filter_na" : ["0x000000ff", 0]
+    },
+    "monster types" : {
+      "eui_filter_na" : ["0x000000ff", 31458287],
+      "type_normal" : ["0x000000ff", 16],
+      "type_effect" : ["0x000000ff", 32],
+      "type_fusion" : ["0x000000ff", 64],
+      "type_ritual" : ["0x000000ff", 128],
+      "type_tuner" : ["0x000000ff", 4096],
+      "type_synchro" : ["0x000000ff", 8192],
+      "type_xyz" : ["0x000000ff", 8388608],
+      "type_pendulum" : ["0x000000ff", 16777216],
+      "type_flip" : ["0x000000ff", 2097152],
+      "type_dual" : ["0x000000ff", 2048],
+      "type_spirit" : ["0x000000ff", 512],
+      "type_union" : ["0x000000ff", 1024],
+      "type_toon" : ["0x000000ff", 4194304]
+    },
+    "spell types" : {
+      "eui_filter_na" : ["0x000000ff", 983170],
+      "type_normal" : ["0x000000ff", 2],
+      "type_ritual" : ["0x000000ff", 128],
+      "type_quickplay" : ["0x000000ff", 65536],
+      "type_continuous" : ["0x000000ff", 131072],
+      "type_equip" : ["0x000000ff", 262144],
+      "type_field" : ["0x000000ff", 524288]
+    },
+    "trap types" : {
+      "eui_filter_na" : ["0x000000ff", 1179652],
+      "type_normal" : ["0x000000ff", 4],
+      "type_continuous" : ["0x000000ff", 131072],
+      "type_counter" : ["0x000000ff", 1048576]
+    },
+    "limit list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "limit_0" : ["0x000000ff", 1],
+      "limit_1" : ["0x000000ff", 2],
+      "limit_2" : ["0x000000ff", 3]
+    },
+    "pool list" : {
+      "pool_all" : ["0x000000ff", 7],
+      "pool_ocg" : ["0x000000ff", 1],
+      "pool_tcg" : ["0x000000ff", 2],
+      "pool_kcg" : ["0x000000ff", 4]
+    },
+    "attribute list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "attribtue_earth" : ["0x000000ff", 1],
+      "attribtue_water" : ["0x000000ff", 2],
+      "attribtue_fire" : ["0x000000ff", 4],
+      "attribtue_wind" : ["0x000000ff", 8],
+      "attribtue_light" : ["0x000000ff", 16],
+      "attribtue_dark" : ["0x000000ff", 32],
+      "attribtue_divine" : ["0x000000ff", 64]
+    },
+    "race list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "race_warrior" : ["0x000000ff", 1],
+      "race_spellcaster" : ["0x000000ff", 2],
+      "race_fairy" : ["0x000000ff", 4],
+      "race_fiend" : ["0x000000ff", 8],
+      "race_zombie" : ["0x000000ff", 16],
+      "race_machine" : ["0x000000ff", 32],
+      "race_aqua" : ["0x000000ff", 64],
+      "race_pyro" : ["0x000000ff", 128],
+      "race_rock" : ["0x000000ff", 256],
+      "race_windbeast" : ["0x000000ff", 512],
+      "race_plant" : ["0x000000ff", 1024],
+      "race_insect" : ["0x000000ff", 2048],
+      "race_thunder" : ["0x000000ff", 4096],
+      "race_dragon" : ["0x000000ff", 8192],
+      "race_beast" : ["0x000000ff", 16384],
+      "race_beastwarrior" : ["0x000000ff", 32768],
+      "race_dinosaur" : ["0x000000ff", 65536],
+      "race_fish" : ["0x000000ff", 131072],
+      "race_seaserpent" : ["0x000000ff", 262144],
+      "race_reptile" : ["0x000000ff", 524288],
+      "race_psychic" : ["0x000000ff", 1048576],
+      "race_divine" : ["0x000000ff", 2097152],
+      "race_creatorgod" : ["0x000000ff", 4194304],
+      "race_phantomdragon" : ["0x000000ff", 8388608]
+    }
+  }
+}

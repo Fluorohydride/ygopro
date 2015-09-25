@@ -1,0 +1,172 @@
+{
+  "gui_texture": "./conf/gui.png",
+  "emoji": {
+    "texture" : "./conf/emoji.png",
+    "size" : [20, 20],
+    "count" : [12, 12]
+  },
+  "fonts" : {
+    "default" : ["./conf/wqy-zenhei.ttc", 28, "regular", 0, 24]
+  },
+  "image" : {
+    "sprite_offset" : [0, 0, 0, 0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+  },
+  "label" : {
+    "back_tex" : [47, 89, 10, 10],
+    "font" : "default",
+    "text_offset" : [0, 0, 0, 0, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5]
+  },
+  "button" : {
+    "color" : "0xddddffff",
+    "border" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "normal_tex" : [82, 2, 32, 21],
+    "hover_tex" : [82, 26, 32, 21],
+    "down_tex" : [82, 50, 32, 21],    
+    "press_offset" : [1, 3],
+    "font" : "default",
+    "text_offset" : [0, 0, 0, 0, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "region_offset" : [0, 0, 0, 0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]
+  },
+  "checkbox" : {
+    "color" : "0xddddffff",
+    "border" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "button_offset" : [1, 3, 21, 21],
+    "normal1" : [117, 2, 21, 21],
+    "hover1" : [117, 24, 21, 21],
+    "down1" : [117, 46, 21, 21],
+    "normal2" : [141, 2, 21, 21],
+    "hover2" : [141, 24, 21, 21],
+    "down2" : [141, 46, 21, 21],
+    "font" : "default",
+    "text_offset" : [0, 0, 0, 0, 1.0, 0.5, 0.0, 0.0, -1.0, -0.5]
+  },
+  "radio" : {
+    "color" : "0xddddffff",
+    "border" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "button_offset" : [1, 3, 21, 21],
+    "normal1" : [166, 2, 21, 21],
+    "hover1" : [166, 23, 21, 21],
+    "down1" : [166, 44, 21, 21],
+    "normal2" : [187, 2, 21, 21],
+    "hover2" : [187, 23, 21, 21],
+    "down2" : [187, 44, 21, 21],
+    "font" : "default",
+    "text_offset" : [0, 0, 0, 0, 1.0, 0.5, 0.0, 0.0, -1.0, -0.5]
+  },
+  "panel" : {
+    "color" : "0xffffc0ff",
+    "border" : [5, 5, 5, 5],
+    "border_tex" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "client_area" : [100, 122, 45, 41]
+  },
+  "window" : {
+    "color" : "0xffffc0ff",
+    "border" : [12, 36, 12, 12],
+    "border_tex" : [12, 24, 12, 12],
+    "back_border" : [4, 36, 4, 4],
+    "back_tex" : [1, 50, 50, 45],
+    "client_area" : [0, 0, 30, 47],
+    "minimum_size" : [200, 100],
+    "font" : "default",
+    "text_offset" : [0, 4, 0, 0, 0.5, 0.0, 0.0, 0.0, -0.5, 0.0],
+    "close_button_offset" : [-5, 5, 25, 25, 1.0, 0.0, 0.0, 0.0, -1.0, 0.0],
+    "close_button_style" : {
+      "color" : "0xddddffff",
+      "normal_tex" : [58, 0, 19, 18],
+      "hover_tex" : [58, 19, 19, 18],
+      "down_tex" : [58, 38, 19, 18]
+    }
+  },
+  "scroll" : {
+    "color" : "0xddddffff",
+    "border" : [3, 3, 3, 3],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "slider_size" : [30, 30],
+    "back_size" : [28, 28],    
+    "backh_tex" : [1, 100, 16, 14],
+    "backv_tex" : [1, 115, 14, 16],
+    "sliderh1" : [37, 100, 19, 14],
+    "sliderh2" : [37, 115, 19, 14],
+    "sliderh3" : [37, 130, 19, 14],
+    "sliderv1" : [20, 100, 14, 19],
+    "sliderv2" : [20, 120, 14, 19],
+    "sliderv3" : [20, 140, 14, 19]
+  },
+  "listbox" : {
+    "color" : "0xffffc0ff",
+    "item_bcolor1" : "0x00ffff80",
+    "item_bcolor2" : "0x00bbbb80",
+    "sel_bcolor" : "0x00000080",
+    "sel_tex" : [41, 4, 10, 10],
+    "border" : [5, 5, 5, 5],
+    "border_tex" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "scroll_area" : [-3, 7, 0, -13, 1.0, 0.0, 0.0, 1.0, -1.0, 0.0],
+    "item_height" : 30,
+    "client_normal" : [62, 106, 29, 32],
+    "client_hover" : [62, 74, 29, 32],
+    "text_area" : [5, 10, 5, 10],
+    "font" : "default",
+    "text_offset" : [5, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+  },
+  "combobox" : {
+    "color" : "0xffffc0ff",
+    "border" : [5, 5, 5, 5],
+    "border_tex" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "client_normal" : [62, 106, 29, 32],
+    "client_hover" : [62, 74, 29, 32],
+    "button_color" : "0xddddffff",
+    "button_normal" : [100, 80, 15, 12],
+    "button_hover" : [100, 93, 15, 12],
+    "button_down" : [100, 106, 15, 12],
+    "button_offset" : [-10, 0, 20, 16, 1.0, 0.5, 0.0, 0.0, -1.0, -0.5],
+    "drop_offset" : 0,
+    "drop_height" : 150,
+    "font" : "default",
+    "text_offset" : [5, 0, 0, 0, 0.0, 0.5, 0.0, 0.0, 0.0, -0.5]
+  },
+  "tab": {
+    "tab_offset" : 40,
+    "title_height" : 43,
+    "title_indent" : 10,
+    "title_rblank" : 10,
+    "color" : "0xffffc0ff",
+    "border" : [5, 5, 5, 5],
+    "border_tex" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "client_area" : [100, 122, 45, 41],
+    "tab_down" : [149, 124, 24, 29],
+    "tab_normal" : [176, 124, 24, 29],
+    "tab_hover" : [203, 124, 24, 29],
+    "font" : "default",
+    "text_offset" : [0, 6]
+  },
+  "editbox" : {
+    "color" : "0xffffc0ff",
+    "border" : [5, 5, 5, 5],
+    "border_tex" : [5, 5, 5, 5],
+    "back_border" : [0, 0, 0, 0],
+    "back_tex" : [40, 40, 0, 0],
+    "client_normal" : [62, 106, 29, 32],
+    "client_hover" : [62, 74, 29, 32],
+    "sel_tex" : [41, 4, 10, 10],
+    "cursor_tex" : [40, 22, 2, 14],
+    "text_area" : [5, 5, 5, 5],
+    "max_cursor_offset" : 5,
+    "font" : "default",
+    "text_offset" : [0, 0]
+  }
+}
