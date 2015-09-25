@@ -17,6 +17,12 @@ function c16825874.initial_effect(c)
 	e2:SetCondition(c16825874.ccon)
 	e2:SetOperation(c16825874.cop)
 	c:RegisterEffect(e2)
+	--hand synchro for Yang Zing
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(77783947)
+	c:RegisterEffect(e3)
 end
 c16825874.tuner_filter=aux.FALSE
 function c16825874.filter(c,syncard,tuner,f,lv)

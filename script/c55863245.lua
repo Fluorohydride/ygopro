@@ -28,6 +28,13 @@ function c55863245.initial_effect(c)
 	e3:SetCondition(c55863245.syncon)
 	e3:SetCode(55863245)
 	c:RegisterEffect(e3)
+	--hand synchro for Yang Zing
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e4:SetCondition(c55863245.syncon)
+	e4:SetCode(77783947)
+	c:RegisterEffect(e4)
 end
 function c55863245.synfilter1(c,syncard,tuner,f)
 	return c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard,tuner) and (f==nil or f(c))
