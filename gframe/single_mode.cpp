@@ -598,7 +598,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_TAG_SWAP: {
 			player = pbuf[0];
-			pbuf += pbuf[3] * 4 + 8;
+			pbuf += pbuf[2] * 4 + pbuf[4] * 4 + 9;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayRefreshDeck(player);
 			SinglePlayRefreshExtra(player);
