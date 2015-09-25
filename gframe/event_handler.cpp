@@ -1577,7 +1577,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_KEY_R: {
-			if(!event.KeyInput.PressedDown)
+			if(!event.KeyInput.PressedDown && !mainGame->env->hasFocus(mainGame->ebChatInput))
 				mainGame->textFont->setTransparency(true);
 			break;
 		}
@@ -1588,7 +1588,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_F6:
 		case irr::KEY_F7: {
 			if(!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isStarted
-					&& !mainGame->wCardDisplay->isVisible()) {
+					&& !mainGame->wCardDisplay->isVisible() && !mainGame->env->hasFocus(mainGame->ebChatInput)) {
 				int loc_id = 0;
 				display_cards.clear();
 				switch(event.KeyInput.Key) {
