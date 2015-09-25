@@ -63,7 +63,6 @@ function c4068622.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc and c:IsFaceup() and c:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0 then
 		local code=tc:GetOriginalCode()
 		local ba=tc:GetBaseAttack()
-		local bd=tc:GetBaseDefence()
 		local reset_flag=RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END
 		c:CopyEffect(code, reset_flag, 1)
 		local e1=Effect.CreateEffect(c)
@@ -80,12 +79,5 @@ function c4068622.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_BASE_ATTACK)
 		e2:SetValue(ba)
 		c:RegisterEffect(e2)
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e3:SetReset(reset_flag)
-		e3:SetCode(EFFECT_SET_BASE_DEFENCE)
-		e3:SetValue(bd)
-		c:RegisterEffect(e3)
 	end
 end

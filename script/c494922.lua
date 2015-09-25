@@ -21,6 +21,13 @@ function c494922.initial_effect(c)
 	e2:SetTarget(c494922.settg)
 	e2:SetOperation(c494922.setop)
 	c:RegisterEffect(e2)
+	--add setcode
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_ADD_SETCODE)
+	e3:SetValue(0x9a)
+	c:RegisterEffect(e3)
 end
 function c494922.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)

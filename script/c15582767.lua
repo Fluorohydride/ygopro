@@ -9,7 +9,7 @@ function c15582767.initial_effect(c)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(15582767,1))
+	e2:SetDescription(aux.Stringid(15582767,0))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_SZONE)
@@ -30,7 +30,7 @@ function c15582767.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	if Duel.GetFlagEffect(tp,15582767)==0 and Duel.IsPlayerCanDraw(tp,1)
 		and Duel.IsExistingTarget(c15582767.filter,tp,LOCATION_SZONE,0,1,nil)
-		and Duel.SelectYesNo(tp,aux.Stringid(15582767,0)) then
+		and Duel.SelectYesNo(tp,94) then
 		e:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		Duel.RegisterFlagEffect(tp,15582767,RESET_PHASE+PHASE_END,0,1)

@@ -50,6 +50,7 @@ function c87008374.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c87008374.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -75,5 +76,5 @@ function c87008374.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c87008374.eqlimit(e,c)
-	return c:IsCode(56840427)
+	return c==e:GetLabelObject()
 end

@@ -36,17 +36,18 @@ function c36076683.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
 		c:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-		e2:SetCondition(c36076683.rdcon)
-		e2:SetOperation(c36076683.rdop)
+		e2:SetType(EFFECT_TYPE_FIELD)
+		e2:SetCode(EFFECT_CHANGE_DAMAGE)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e2:SetTargetRange(0,1)
+		e2:SetValue(c36076683.damval)
 		e2:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e2)
 	end
 end
-function c36076683.rdcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp
-end
-function c36076683.rdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,ev/2)
+function c36076683.damval(e,re,dam,r,rp,rc)
+	if bit.band(r,REASON_BATTLE)~=0 and rc==e:GetHandler() then
+		return dam/2
+	else return dam end
 end

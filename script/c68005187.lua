@@ -11,7 +11,7 @@ function c68005187.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c68005187.filter(c)
-	return not (c:IsHasEffect(EFFECT_UNRELEASABLE_SUM) or c:IsHasEffect(EFFECT_UNRELEASABLE_NONSUM))
+	return not (c:IsHasEffect(EFFECT_UNRELEASABLE_SUM) and c:IsHasEffect(EFFECT_UNRELEASABLE_NONSUM))
 end
 function c68005187.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCurrentPhase()~=PHASE_MAIN2 end

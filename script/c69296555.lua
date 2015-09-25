@@ -24,5 +24,5 @@ function c69296555.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():SetHint(CHINT_RACE,rc)
 end
 function c69296555.atktg(e,c)
-	return c:IsStatus(STATUS_SUMMON_TURN) and c:IsRace(e:GetLabel())
+	return c:IsStatus(STATUS_SUMMON_TURN+STATUS_FLIP_SUMMON_TURN+STATUS_SPSUMMON_TURN) and c:IsRace(e:GetLabel())
 end

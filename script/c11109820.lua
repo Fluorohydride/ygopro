@@ -49,9 +49,11 @@ function c11109820.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc1:IsControler(tp) then ft=ft+1 end
 	if tc2:IsControler(tp) then ft=ft+1 end
 	if ft<=0 then return end
+	Duel.SendtoGrave(g,REASON_EFFECT)
+	local og=Duel.GetOperatedGroup()
+	if og:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)<2 then return end
 	local sg=Duel.GetMatchingGroup(c11109820.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp,tc1:GetRank()+tc2:GetRank())
 	if sg:GetCount()==0 then return end
-	Duel.SendtoGrave(g,REASON_EFFECT)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local ssg=sg:Select(tp,1,1,nil)
 	local sc=ssg:GetFirst()
@@ -70,4 +72,8 @@ function c11109820.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
 end

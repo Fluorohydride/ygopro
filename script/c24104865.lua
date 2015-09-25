@@ -47,14 +47,13 @@ end
 function c24104865.checkop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabelObject():GetLabel()==0 then return end
-	local t=Duel.GetAttackTarget()
-	if t==c then t=Duel.GetAttacker() end
+	local t=c:GetBattleTarget()
 	local g=e:GetLabelObject():GetLabelObject()
 	if c:GetFieldID()~=e:GetLabel() then
 		g:Clear()
 		e:SetLabel(c:GetFieldID())
 	end
-	if c:IsRelateToBattle() and t:IsLocation(LOCATION_GRAVE) and t:IsReason(REASON_BATTLE) then
+	if aux.bdgcon(e,tp,eg,ep,ev,re,r,rp) then
 		g:AddCard(t)
 		t:RegisterFlagEffect(24104865,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE,0,1)
 	end

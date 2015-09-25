@@ -34,13 +34,10 @@ function c17286057.initial_effect(c)
 	c:RegisterEffect(e4)
 	--chain attack
 	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(17286057,1))
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1)
-	e5:SetCode(EVENT_BATTLE_DESTROYING)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_EXTRA_ATTACK)
+	e5:SetValue(1)
 	e5:SetCondition(c17286057.atcon)
-	e5:SetOperation(c17286057.atop)
 	c:RegisterEffect(e5)
 end
 function c17286057.hspcon(e,c)
@@ -83,9 +80,6 @@ function c17286057.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.SpecialSummonComplete()
 end
-function c17286057.atcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 and e:GetHandler():IsChainAttackable()
-end
-function c17286057.atop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChainAttack()
+function c17286057.atcon(e)
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)>0
 end

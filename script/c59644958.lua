@@ -19,5 +19,12 @@ function c59644958.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,1,1,REASON_EFFECT) end
 end
 function c59644958.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RemoveOverlayCard(tp,1,1,1,1,REASON_EFFECT)
+	local sg=Duel.GetMatchingGroup(Card.CheckRemoveOverlayCard,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp,1,REASON_EFFECT)
+	if sg:GetCount()==0 then return end
+	if sg:GetCount()>1 then
+		Duel.Hint(HINT_SELECTMSG,tp,532)
+		sg=sg:Select(tp,1,1,nil)
+		Duel.HintSelection(sg)
+	end
+	sg:GetFirst():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 end

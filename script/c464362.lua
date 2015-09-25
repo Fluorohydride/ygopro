@@ -36,7 +36,7 @@ function c464362.mfilter(c,mg)
 	return (c:IsCode(30068120) or c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)) and mg:IsExists(Card.IsSetCard,1,c,0xa9)
 end
 function c464362.fscon(e,mg,gc)
-	if mg==nil then return false end
+	if mg==nil then return true end
 	if gc then return (gc:IsCode(30068120) or gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
 		and mg:IsExists(Card.IsSetCard,1,gc,0xa9) end
 	return mg:IsExists(c464362.mfilter,1,nil,mg)

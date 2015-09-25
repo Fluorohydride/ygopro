@@ -19,8 +19,7 @@ function c71564150.filter(c)
 	return c:IsFaceup() and c:IsLevelBelow(3) and c:IsControlerCanBeChanged()
 end
 function c71564150.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c71564150.filter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c71564150.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,1,1-tp,LOCATION_MZONE)
 end
 function c71564150.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -54,6 +53,8 @@ function c71564150.operation(e,tp,eg,ep,ev,re,r,rp)
 			e4:SetReset(RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END)
 			e4:SetValue(1)
 			tc:RegisterEffect(e4)
+		elseif not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
+			Duel.Destroy(tc,REASON_EFFECT)
 		end
 		tc=g:GetNext()
 	end

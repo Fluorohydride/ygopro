@@ -2,7 +2,8 @@
 function c84932271.initial_effect(c)
 	--flip effect
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_FLIP)
 	e1:SetOperation(c84932271.flipop)
 	c:RegisterEffect(e1)
 	--special summon
@@ -19,7 +20,7 @@ end
 function c84932271.flipop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) then
-		c:RegisterFlagEffect(84932271,RESET_EVENT+0x17a0000+RESET_PHASE+PHASE_END,0,0)
+		c:RegisterFlagEffect(84932271,RESET_EVENT+0x17a0000+RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function c84932271.spcon(e,tp,eg,ep,ev,re,r,rp)

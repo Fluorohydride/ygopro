@@ -4,6 +4,8 @@ function c63881033.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(c63881033.lvtg1)
+	e1:SetOperation(c63881033.lvop)
 	c:RegisterEffect(e1)
 	--disable spsummon
 	local e2=Effect.CreateEffect(c)
@@ -17,10 +19,11 @@ function c63881033.initial_effect(c)
 	--lv change
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(63881033,0))
-	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCountLimit(1)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetTarget(c63881033.lvtg)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetTarget(c63881033.lvtg2)
 	e3:SetOperation(c63881033.lvop)
 	c:RegisterEffect(e3)
 	--destroy replace
@@ -44,27 +47,42 @@ function c63881033.initial_effect(c)
 	e5:SetOperation(c63881033.thop)
 	c:RegisterEffect(e5)
 end
+function c63881033.lvtg1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	if Duel.IsExistingMatchingCard(c63881033.filter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.SelectYesNo(tp,aux.Stringid(63881033,4)) then
+		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(63881033,1))
+		local lv=Duel.AnnounceNumber(tp,5,6,7,8,9)
+		e:SetLabel(lv)
+		e:GetHandler():RegisterFlagEffect(63881033,RESET_PHASE+PHASE_END,0,1)
+	else
+		e:SetLabel(0)
+	end
+end
 function c63881033.splimit(e,c)
 	return c:GetRace()~=RACE_MACHINE
 end
 function c63881033.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(5) and c:IsRace(RACE_MACHINE)
 end
-function c63881033.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c63881033.filter,tp,LOCATION_MZONE,0,1,nil) end
+function c63881033.lvtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(63881033)==0
+		and Duel.IsExistingMatchingCard(c63881033.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(63881033,1))
 	local lv=Duel.AnnounceNumber(tp,5,6,7,8,9)
 	e:SetLabel(lv)
+	e:GetHandler():RegisterFlagEffect(63881033,RESET_PHASE+PHASE_END,0,1)
 end
 function c63881033.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
+	if e:GetLabel()==0 then return end
 	local g=Duel.GetMatchingGroup(c63881033.filter,tp,LOCATION_MZONE,0,nil)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CHANGE_LEVEL)
+		e1:SetCode(EFFECT_CHANGE_LEVEL_FINAL)
 		e1:SetValue(e:GetLabel())
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)

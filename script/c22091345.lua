@@ -13,7 +13,7 @@ function c22091345.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c22091345.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 end
 function c22091345.filter(c)
 	return c:IsFaceup() and not c:IsHasEffect(EFFECT_PIERCE)

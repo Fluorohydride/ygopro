@@ -65,7 +65,7 @@ function c53334471.getattribute(g)
 	return aat
 end
 function c53334471.rmfilter(c,at)
-	return not c:GetAttribute()~=at
+	return c:GetAttribute()==at
 end
 function c53334471.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()
@@ -99,7 +99,7 @@ function c53334471.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	g1:Merge(g2)
 	if g1:GetCount()>0 then
-		Duel.SendtoGrave(g1,REASON_EFFECT)
+		Duel.SendtoGrave(g1,REASON_RULE)
 		Duel.Readjust()
 	end
 end

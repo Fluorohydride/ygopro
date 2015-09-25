@@ -21,9 +21,8 @@ function c70245411.initial_effect(c)
 	e3:SetDescription(aux.Stringid(70245411,1))
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCondition(c70245411.thcon)
 	e3:SetTarget(c70245411.thtg)
 	e3:SetOperation(c70245411.thop)
 	c:RegisterEffect(e3)
@@ -44,22 +43,20 @@ function c70245411.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Draw(tp,1,REASON_EFFECT)==0 then return end
 	local tc=Duel.GetOperatedGroup():GetFirst()
 	Duel.ConfirmCards(1-tp,tc)
-	Duel.BreakEffect()
-	if tc:IsSetCard(0xa9) then
+	if tc:IsSetCard(0xa9) and tc:IsType(TYPE_MONSTER) then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		local g=Duel.GetMatchingGroup(c70245411.spfilter,tp,LOCATION_HAND,0,nil,e,tp)
 		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(70245411,2)) then
+			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sc=g:Select(tp,1,1,nil)
 			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 		end
 	else
+		Duel.BreakEffect()
 		Duel.SendtoGrave(tc,REASON_EFFECT+REASON_DISCARD)
 	end
 	Duel.ShuffleHand(tp)
-end
-function c70245411.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c70245411.filter(c)
 	return (c:IsCode(30068120) or (c:IsSetCard(0xa9) and c:IsType(TYPE_MONSTER))) and c:IsAbleToHand()

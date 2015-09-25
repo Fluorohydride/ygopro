@@ -19,7 +19,7 @@ function c691925.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,c691925.costfilter,1,1,REASON_COST+REASON_DISCARD,nil)
 end
 function c691925.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,4) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,4) and Duel.IsPlayerCanDiscardDeck(tp,2) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(2)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)

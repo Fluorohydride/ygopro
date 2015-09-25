@@ -50,7 +50,7 @@ function c33823832.cacon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if not d then return false end
-	if d:IsControler(tp) then a,d=d,a end
+	if a:IsStatus(STATUS_OPPO_BATTLE) and d:IsControler(tp) then a,d=d,a end
 	if a:IsType(TYPE_PENDULUM)
 		and not a:IsStatus(STATUS_BATTLE_DESTROYED) and d:IsStatus(STATUS_BATTLE_DESTROYED) then
 		e:SetLabelObject(a)

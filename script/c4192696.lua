@@ -31,8 +31,12 @@ function c4192696.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,1)
 		e1:SetValue(c4192696.damval)
-		e1:SetReset(RESET_PHASE+PHASE_END,1)
+		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+		e2:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e2,tp)
 	end
 end
 function c4192696.damval(e,re,val,r,rp,rc)

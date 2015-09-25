@@ -15,7 +15,7 @@ function c6165656.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(1)
+	e2:SetValue(aux.tgval)
 	c:RegisterEffect(e2)
 	--damage
 	local e3=Effect.CreateEffect(c)
@@ -41,8 +41,9 @@ function c6165656.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 c6165656.xyz_number=88
+--target check is in RUM magic cards
 function c6165656.splimit(e,se,sp,st)
-	return se:GetHandler():IsSetCard(0x95)
+	return se:GetHandler():IsSetCard(0x95) and se:GetHandler():IsType(TYPE_SPELL)
 end
 function c6165656.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

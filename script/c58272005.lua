@@ -66,14 +66,17 @@ function c58272005.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()
 	if not eg:IsContains(ec) then return false end
 	local bc=ec:GetBattleTarget()
-	return bc:IsReason(REASON_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and ec:IsChainAttackable(2,true)
+	return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER) and ec:IsChainAttackable(2,true) and ec:IsStatus(STATUS_OPPO_BATTLE)
 end
 function c58272005.atop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ec=c:GetEquipTarget()
+	if not ec:IsRelateToBattle() then return end
 	Duel.ChainAttack()
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-	e:GetHandler():RegisterEffect(e1)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
+	ec:RegisterEffect(e1)
 end

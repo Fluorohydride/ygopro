@@ -31,8 +31,7 @@ end
 function c31632536.caop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabelObject():GetLabel()==1 and c:IsRelateToBattle() and c:IsChainAttackable()
-		and Duel.GetMatchingGroupCount(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0x39)>=2
-		and Duel.SelectYesNo(tp,aux.Stringid(31632536,0)) then
+		and Duel.GetMatchingGroupCount(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0x39)>=2 then
 		Duel.ChainAttack()
 	end
 end

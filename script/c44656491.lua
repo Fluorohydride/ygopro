@@ -20,14 +20,17 @@ function c44656491.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c44656491.mtcon)
 	e3:SetOperation(c44656491.mtop)
 	c:RegisterEffect(e3)
 end
 function c44656491.atktarget(e,c)
 	return c:GetAttack()>=1500
 end
+function c44656491.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c44656491.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>100 and Duel.SelectYesNo(tp,aux.Stringid(44656491,0)) then
 		Duel.PayLPCost(tp,100)
 	else

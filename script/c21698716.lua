@@ -47,7 +47,7 @@ function c21698716.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c21698716.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)
 	end
 end

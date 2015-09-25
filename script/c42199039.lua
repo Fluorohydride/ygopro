@@ -34,7 +34,6 @@ function c42199039.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCondition(c42199039.thcon)
 	e4:SetTarget(c42199039.thtg)
 	e4:SetOperation(c42199039.thop)
 	c:RegisterEffect(e4)
@@ -74,9 +73,6 @@ function c42199039.dtop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
 	end
-end
-function c42199039.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c42199039.thfilter(c)
 	return c:IsSetCard(0x60) and not c:IsCode(42199039) and c:IsAbleToHand()

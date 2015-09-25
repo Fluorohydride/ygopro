@@ -10,7 +10,7 @@ function c3280747.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c3280747.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=6 end
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,2)
 end
 function c3280747.activate(e,tp,eg,ep,ev,re,r,rp)

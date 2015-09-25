@@ -29,25 +29,38 @@ function c1845204.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c1845204.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
-	if tc and Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)~=0 then
+	if not tc then return end
+	tc:SetMaterial(nil)
+	if Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_ATTACK)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1,true)
+		tc:RegisterFlagEffect(1845204,RESET_EVENT+0x1fe0000,0,1)
+		tc:CompleteProcedure()
 		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
 		e2:SetCountLimit(1)
-		e2:SetRange(LOCATION_MZONE)
 		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetLabelObject(tc)
+		e2:SetCondition(c1845204.descon)
 		e2:SetOperation(c1845204.desop)
-		tc:RegisterEffect(e2,true)
-		tc:CompleteProcedure()
+		Duel.RegisterEffect(e2,tp)
+	end
+end
+function c1845204.descon(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetLabelObject()
+	if tc:GetFlagEffect(1845204)~=0 then
+		return true
+	else
+		e:Reset()
+		return false
 	end
 end
 function c1845204.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	local tc=e:GetLabelObject()
+	Duel.Destroy(tc,REASON_EFFECT)
 end

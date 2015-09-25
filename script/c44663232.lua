@@ -33,5 +33,5 @@ function c44663232.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c44663232.val(e,re,tp)
-	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsLevelAbove(e:GetLabel())
+	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsLevelAbove(e:GetLabel()) and not re:GetHandler():IsImmuneToEffect(e)
 end

@@ -10,9 +10,8 @@ function c17896384.initial_effect(c)
 	--add counter
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_DESTROY)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCondition(c17896384.ctcon)
 	e2:SetOperation(c17896384.ctop)
 	c:RegisterEffect(e2)
@@ -29,7 +28,7 @@ function c17896384.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c17896384.ctfilter(c)
-	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsRace(RACE_SPELLCASTER)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and bit.band(c:GetPreviousRaceOnField(),RACE_SPELLCASTER)~=0
 end
 function c17896384.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c17896384.ctfilter,1,nil)

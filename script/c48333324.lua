@@ -12,13 +12,16 @@ function c48333324.initial_effect(c)
 end
 function c48333324.filter1(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and c:IsFaceup()
+	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 		and Duel.IsExistingMatchingCard(c48333324.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1,c:GetRace(),c:GetCode())
 end
 function c48333324.filter2(c,e,tp,mc,rk,rc,code)
-	if c:IsCode(6165656) and code~=48995978 then return false end
-	return c:GetRank()==rk and c:IsRace(rc) and c:IsSetCard(0x1048) and mc:IsCanBeXyzMaterial(c,true)
+	if c:GetOriginalCode()==6165656 and code~=48995978 then return false end
+	return c:GetRank()==rk and c:IsRace(rc) and c:IsSetCard(0x1048) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+end
+function c48333324.disfilter(c)
+	return (not c:IsDisabled() or c:IsType(TYPE_TRAPMONSTER)) and not (c:IsType(TYPE_NORMAL) and bit.band(c:GetOriginalType(),TYPE_NORMAL))
 end
 function c48333324.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c48333324.filter1(chkc,e,tp) end
@@ -27,9 +30,6 @@ function c48333324.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,c48333324.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function c48333324.negfilter(c)
-	return not c:IsDisabled()
 end
 function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
@@ -44,15 +44,16 @@ function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(tc))
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
 		local g1=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,sc)
 		g1:RemoveCard(c)
-		if g1:GetFirst() then
+		if g1:GetCount()>0 then
 			Duel.BreakEffect()
 		end
-		local ng=g1:Filter(c48333324.negfilter,nil)
+		local ng=g1:Filter(c48333324.disfilter,nil)
 		local nc=ng:GetFirst()
 		while nc do
 			local e1=Effect.CreateEffect(c)
@@ -65,6 +66,13 @@ function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetCode(EFFECT_DISABLE_EFFECT)
 			e2:SetReset(RESET_EVENT+0x1fe0000)
 			nc:RegisterEffect(e2)
+			if nc:IsType(TYPE_TRAPMONSTER) then
+				local e3=Effect.CreateEffect(c)
+				e3:SetType(EFFECT_TYPE_SINGLE)
+				e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+				e3:SetReset(RESET_EVENT+0x1fe0000)
+				nc:RegisterEffect(e3)
+			end
 			nc=ng:GetNext()
 		end
 	end

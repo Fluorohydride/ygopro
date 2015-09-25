@@ -14,6 +14,7 @@ function c90885155.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(1,0)
+	e2:SetCondition(aux.nfbdncon)
 	e2:SetTarget(c90885155.splimit)
 	c:RegisterEffect(e2)
 	--atk down
@@ -47,10 +48,10 @@ function c90885155.initial_effect(c)
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
 	e7:SetCode(EFFECT_IMMUNE_EFFECT)
-	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE)
 	e7:SetRange(LOCATION_MZONE)
 	e7:SetCondition(c90885155.immcon)
-	e7:SetValue(c90885155.efilter)
+	e7:SetValue(aux.qlifilter)
 	c:RegisterEffect(e7)
 	--effect
 	local e8=Effect.CreateEffect(c)
@@ -121,18 +122,6 @@ function c90885155.lvop2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c90885155.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
-end
-function c90885155.efilter(e,te)
-	if te:IsActiveType(TYPE_MONSTER) and (te:IsHasType(0x7e0) or te:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
-		local lv=e:GetHandler():GetLevel()
-		local ec=te:GetOwner()
-		if ec:IsType(TYPE_XYZ) then
-			return ec:GetOriginalRank()<lv
-		else
-			return ec:GetOriginalLevel()<lv
-		end
-	end
-	return false
 end
 function c90885155.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE and e:GetLabel()==1

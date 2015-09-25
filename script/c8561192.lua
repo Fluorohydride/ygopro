@@ -10,12 +10,9 @@ function c8561192.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetCondition(c8561192.tgcon)
-	e1:SetValue(c8561192.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 end
 function c8561192.tgcon(e)
 	return Duel.GetTurnPlayer()~=e:GetHandlerPlayer() or Duel.GetCurrentPhase()~=PHASE_MAIN2
-end
-function c8561192.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end

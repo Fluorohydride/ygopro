@@ -34,7 +34,7 @@ function c89181369.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local rg=Duel.GetMatchingGroup(c89181369.rmfilter,tp,LOCATION_GRAVE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c89181369.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,rg)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c89181369.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

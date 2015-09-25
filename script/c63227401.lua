@@ -18,7 +18,7 @@ function c63227401.initial_effect(c)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCondition(c63227401.condition)
+	e2:SetCondition(aux.exccon)
 	e2:SetCost(c63227401.cost)
 	e2:SetTarget(c63227401.target)
 	e2:SetOperation(c63227401.activate)
@@ -53,9 +53,6 @@ function c63227401.discon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c63227401.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
-end
-function c63227401.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
 end
 function c63227401.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

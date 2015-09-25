@@ -13,9 +13,7 @@ function c4906301.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c4906301.condition(e,tp,eg,ep,ev,re,r,rp)
-	local ph=Duel.GetCurrentPhase()
-	return Duel.GetTurnPlayer()~=tp and ph~=PHASE_MAIN2 and ph~=PHASE_END
-		and Duel.IsExistingMatchingCard(Card.IsAttackable,tp,0,LOCATION_MZONE,1,nil)
+	return Duel.GetTurnPlayer()~=tp and (Duel.IsAbleToEnterBP() or Duel.GetCurrentPhase()==PHASE_BATTLE)
 end
 function c4906301.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
@@ -34,5 +32,6 @@ function c4906301.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c4906301.disop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,4906301)
 	Duel.NegateAttack()
 end

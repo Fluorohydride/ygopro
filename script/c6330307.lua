@@ -17,7 +17,7 @@ function c6330307.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	--
+	--chain attack
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(6330307,1))
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -52,10 +52,11 @@ function c6330307.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c6330307.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 end
 function c6330307.eqlimit(e,c)
-	return c:IsSetCard(0x7f) and c:IsSetCard(0x1048)
+	return c==e:GetLabelObject()
 end
 function c6330307.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
@@ -64,7 +65,9 @@ function c6330307.atkcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c6330307.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
-	if at:IsRelateToBattle() and not at:IsImmuneToEffect(e) then
+	local c=e:GetHandler()
+	local ec=c:GetEquipTarget()
+	if at:IsRelateToBattle() and not at:IsImmuneToEffect(e) and at:GetAttack()>0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)

@@ -8,7 +8,6 @@ function c35629124.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TO_GRAVE)
 	e1:SetCountLimit(1,35629124)
-	e1:SetCondition(c35629124.spcon)
 	e1:SetCost(c35629124.spcost)
 	e1:SetTarget(c35629124.sptg)
 	e1:SetOperation(c35629124.spop)
@@ -17,9 +16,6 @@ function c35629124.initial_effect(c)
 end
 function c35629124.counterfilter(c)
 	return c:IsRace(RACE_DRAGON)
-end
-function c35629124.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c35629124.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0

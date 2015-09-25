@@ -1,13 +1,12 @@
 --切り込み隊長
 function c2460565.initial_effect(c)
-	--cannot be battle target
+	--cannot select battle target
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e1:SetTarget(c2460565.tg)
-	e1:SetValue(1)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
+	e1:SetValue(c2460565.atlimit)
 	c:RegisterEffect(e1)
 	--summon success
 	local e2=Effect.CreateEffect(c)
@@ -19,8 +18,8 @@ function c2460565.initial_effect(c)
 	e2:SetOperation(c2460565.sumop)
 	c:RegisterEffect(e2)
 end
-function c2460565.tg(e,c)
-	return c~=e:GetHandler() and c:IsRace(RACE_WARRIOR)
+function c2460565.atlimit(e,c)
+	return c~=e:GetHandler() and c:IsFaceup() and c:IsRace(RACE_WARRIOR)
 end
 function c2460565.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

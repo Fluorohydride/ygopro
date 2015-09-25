@@ -6,7 +6,7 @@ function c31303283.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c31303283.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -18,9 +18,6 @@ function c31303283.initial_effect(c)
 	e2:SetCost(c31303283.atkcost)
 	e2:SetOperation(c31303283.atkop)
 	c:RegisterEffect(e2)
-end
-function c31303283.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c31303283.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsAttribute,1,e:GetHandler(),ATTRIBUTE_FIRE) end

@@ -77,6 +77,12 @@ function c81587028.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c81587028.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c81587028.desfilter,1,nil) then
+		g:DeleteGroup()
+		e:Reset()
+		return false
+	end
 	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel()
 end
 function c81587028.desfilter(c)

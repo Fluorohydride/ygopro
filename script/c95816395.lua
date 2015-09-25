@@ -9,7 +9,7 @@ function c95816395.initial_effect(c)
 end
 function c95816395.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if rp~=tp and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_RETURN) then
+	if rp~=tp and c:IsReason(REASON_EFFECT) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(95816395,0))
 		e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)

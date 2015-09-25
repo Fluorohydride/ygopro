@@ -23,9 +23,10 @@ function c99429730.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c99429730.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
 function c99429730.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
 	if ct==0 then return end
 	if ct>3 then ct=3 end

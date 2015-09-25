@@ -7,7 +7,7 @@ function c17985575.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetTarget(c17985575.etarget)
-	e1:SetValue(1)
+	e1:SetValue(aux.tgval)
 	c:RegisterEffect(e1)
 end
 function c17985575.etarget(e,c)

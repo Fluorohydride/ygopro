@@ -1,6 +1,6 @@
 --E－HERO ヘル・ゲイナー
 function c95943058.initial_effect(c)
-	-- extra atk
+	--extra atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(95943058,0))
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -13,26 +13,26 @@ function c95943058.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c95943058.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 end
 function c95943058.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c95943058.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_FIEND)
+	return c:IsFaceup() and c:IsRace(RACE_FIEND) and not c:IsHasEffect(EFFECT_EXTRA_ATTACK)
 end
 function c95943058.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c95943058.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c95943058.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c95943058.filter,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
+	Duel.SelectTarget(tp,c95943058.filter,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
 end
 function c95943058.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--extra atk
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)

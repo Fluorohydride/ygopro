@@ -9,17 +9,14 @@ function c68170903.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c68170903.activate(e,tp,eg,ep,ev,re,r,rp)
-	--
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
+	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetTarget(c68170903.target)
-	e1:SetValue(1)
+	e1:SetValue(c68170903.atlimit)
 	e1:SetReset(RESET_PHASE+PHASE_END,1)
 	Duel.RegisterEffect(e1,tp)
 end
-function c68170903.target(e,c)
+function c68170903.atlimit(e,c)
 	return c:IsFacedown()
 end

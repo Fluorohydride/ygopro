@@ -21,7 +21,7 @@ function c40583194.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
 end
-function c40583194.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+function c40583194.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
@@ -36,18 +36,13 @@ end
 function c40583194.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetOwner())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(c40583194.etarget)
-	e1:SetValue(c40583194.evalue)
-	e1:SetLabel(tp)
+	e1:SetCode(EFFECT_CANNOT_SELECT_EFFECT_TARGET)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetTargetRange(0,0xff)
+	e1:SetValue(c40583194.etarget)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
 end
-function c40583194.etarget(e,c)
-	return c:IsType(TYPE_MONSTER)
-end
-function c40583194.evalue(e,re,rp)
-	return rp~=e:GetLabel()
+function c40583194.etarget(e,re,c)
+	return c:IsType(TYPE_MONSTER) and (c:IsFaceup() or c:IsLocation(LOCATION_MZONE))
 end

@@ -21,7 +21,7 @@ function c50920465.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c50920465.filter(c,e,tp)
 	return c:IsRace(RACE_WINDBEAST) and c:IsAttribute(ATTRIBUTE_WATER)
-		and not c:IsCode(50920465) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and not c:IsCode(50920465) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c50920465.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1

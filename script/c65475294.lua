@@ -7,11 +7,14 @@ function c65475294.initial_effect(c)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c65475294.costcon)
 	e1:SetOperation(c65475294.costop)
 	c:RegisterEffect(e1)
 end
+function c65475294.costcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c65475294.costop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	local c=e:GetHandler()
 	if Duel.CheckReleaseGroup(tp,nil,1,c) and Duel.SelectYesNo(tp,aux.Stringid(65475294,0)) then
 		local g=Duel.SelectReleaseGroup(tp,nil,1,1,c)

@@ -12,10 +12,16 @@ function c74402414.initial_effect(c)
 	e1:SetLabelObject(g)
 	c:RegisterEffect(e1)
 	--add counter
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e0:SetCode(EVENT_CHAINING)
+	e0:SetRange(LOCATION_SZONE)
+	e0:SetOperation(aux.chainreg)
+	c:RegisterEffect(e0)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e2:SetCode(EVENT_CHAIN_SOLVING)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_CHAIN_SOLVED)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(c74402414.ctop)
 	c:RegisterEffect(e2)
@@ -68,7 +74,7 @@ function c74402414.activate(e,tp,eg,ep,ev,re,r,rp)
 	e:GetLabelObject():Merge(rg)
 end
 function c74402414.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if rp~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) then
+	if rp~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and e:GetHandler():GetFlagEffect(1)>0 then
 		e:GetHandler():AddCounter(0x25,1)
 	end
 end

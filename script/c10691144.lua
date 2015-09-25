@@ -20,12 +20,14 @@ function c10691144.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,10691144,RESET_PHASE+PHASE_END,0,1)
 end
 function c10691144.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	if not (re:GetOwnerPlayer()==1-tp and re:IsActiveType(TYPE_MONSTER) and re:IsActivated()) then 
+		return false
+	end
 	local flag=0
 	local tc=eg:GetFirst()
 	while tc do
 		local ploc=tc:GetPreviousLocation()
-		if tc:IsReason(REASON_EFFECT) and not tc:IsReason(REASON_REDIRECT) and bit.band(ploc,0x1e)~=0
-			and tc:GetPreviousControler()==tp and tc:GetReasonEffect():GetOwner():IsType(TYPE_MONSTER) then
+		if tc:GetPreviousControler()==tp and bit.band(ploc,0x1e)~=0 then
 			flag=bit.bor(flag,ploc)
 		end
 		tc=eg:GetNext()

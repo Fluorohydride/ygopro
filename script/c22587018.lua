@@ -6,17 +6,10 @@ function c22587018.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCondition(c22587018.spcon)
+	e1:SetCondition(aux.bdogcon)
 	e1:SetTarget(c22587018.sptg)
 	e1:SetOperation(c22587018.spop)
 	c:RegisterEffect(e1)
-end
-function c22587018.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local t=Duel.GetAttackTarget()
-	if ev==1 then t=Duel.GetAttacker() end
-	if not c:IsRelateToBattle() or c:IsFacedown() then return false end
-	return t:GetLocation()==LOCATION_GRAVE and t:IsType(TYPE_MONSTER)
 end
 function c22587018.filter(c,e,tp)
 	return c:IsCode(22587018) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

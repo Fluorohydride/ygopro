@@ -2,11 +2,13 @@
 function c69764158.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(69764158,0))
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_DAMAGE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1)
 	e1:SetCondition(c69764158.descon)
 	e1:SetCost(c69764158.descost)
 	e1:SetTarget(c69764158.destg)

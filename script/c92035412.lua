@@ -11,14 +11,15 @@ function c92035412.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_DESTROY)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCondition(c92035412.spcon)
 	e2:SetTarget(c92035412.sptg)
 	e2:SetOperation(c92035412.spop)
 	c:RegisterEffect(e2)
 end
 function c92035412.cfilter(c,tp)
-	return c:IsSetCard(0x30) and c:IsType(TYPE_EQUIP) and c:IsFaceup() and c:IsControler(tp)
+	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousSetCard(0x30)
+		and bit.band(c:GetPreviousTypeOnField(),TYPE_EQUIP)~=0
 end
 function c92035412.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ct=eg:FilterCount(c92035412.cfilter,nil,tp)

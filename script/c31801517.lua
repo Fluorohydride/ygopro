@@ -7,11 +7,9 @@ function c31801517.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(31801517,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetHintTiming(TIMING_DAMAGE_CAL)
 	e1:SetCondition(c31801517.atkcon)
 	e1:SetCost(c31801517.atkcost)
 	e1:SetOperation(c31801517.atkop)
@@ -36,8 +34,7 @@ end
 c31801517.xyz_number=62
 function c31801517.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return (c==Duel.GetAttacker() or c==Duel.GetAttackTarget())
-		and Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL and not Duel.IsDamageCalculated()
+	return c==Duel.GetAttacker() or c==Duel.GetAttackTarget()
 end
 function c31801517.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -59,8 +56,10 @@ function c31801517.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c31801517.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and e:GetHandler():IsReason(REASON_EFFECT)
-		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,93717133)
+	local c=e:GetHandler()
+	return c:GetPreviousControler()==tp and rp~=tp and c:IsReason(REASON_EFFECT)
+		and c:IsPreviousLocation(LOCATION_MZONE) and c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,93717133)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c31801517.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -74,12 +73,15 @@ function c31801517.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 	end
 	e1:SetCountLimit(1)
+	e1:SetCondition(c31801517.spcon2)
 	e1:SetOperation(c31801517.spop2)
 	c:RegisterEffect(e1)
 	c:SetTurnCounter(0)
 end
+function c31801517.spcon2(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c31801517.spop2(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1
@@ -89,7 +91,7 @@ function c31801517.spop2(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
-		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetCode(EFFECT_SET_ATTACK)
 		e1:SetValue(c:GetAttack()*2)
 		e1:SetReset(RESET_EVENT+0x1ff0000)
 		c:RegisterEffect(e1)

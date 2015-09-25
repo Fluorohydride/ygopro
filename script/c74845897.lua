@@ -52,6 +52,7 @@ function c74845897.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	if not g:IsExists(c74845897.rmfilter,1,nil,e:GetLabel()) then
 		g:DeleteGroup()
+		e:Reset()
 		return false
 	else return true end
 end

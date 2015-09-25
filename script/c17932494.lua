@@ -6,12 +6,8 @@ function c17932494.initial_effect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c17932494.condition)
 	e1:SetOperation(c17932494.operation)
 	c:RegisterEffect(e1)
-end
-function c17932494.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c17932494.filter(c)
 	return c:IsFaceup() and c:IsLevelBelow(2)

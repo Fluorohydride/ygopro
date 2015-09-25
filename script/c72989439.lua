@@ -77,7 +77,8 @@ end
 function c72989439.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return bc and c:GetFlagEffect(72989439)==0 and bc:IsStatus(STATUS_BATTLE_DESTROYED) and c:IsChainAttackable()
+	return bc and bc:IsStatus(STATUS_BATTLE_DESTROYED) and c:GetFlagEffect(72989439)==0
+		and c:IsChainAttackable() and c:IsStatus(STATUS_OPPO_BATTLE) 
 end
 function c72989439.atop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChainAttack()

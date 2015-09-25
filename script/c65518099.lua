@@ -14,6 +14,7 @@ function c65518099.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(1,0)
+	e2:SetCondition(aux.nfbdncon)
 	e2:SetTarget(c65518099.splimit)
 	c:RegisterEffect(e2)
 	--tohand

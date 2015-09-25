@@ -30,7 +30,7 @@ function c42592719.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c42592719.splimit(e,se,sp,st)
-	return st==(SUMMON_TYPE_SPECIAL+107)
+	return st==(SUMMON_TYPE_SPECIAL+107) or bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
 function c42592719.imcon(e)
 	return e:GetHandler():GetFlagEffect(42592719)>0

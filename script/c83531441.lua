@@ -1,4 +1,4 @@
---Dante, Traveler of the Burning Abyss
+--彼岸の旅人 ダンテ
 function c83531441.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,3,2)
@@ -27,9 +27,8 @@ function c83531441.initial_effect(c)
 	e3:SetDescription(aux.Stringid(83531441,1))
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCondition(c83531441.thcon)
 	e3:SetTarget(c83531441.thtg)
 	e3:SetOperation(c83531441.thop)
 	c:RegisterEffect(e3)
@@ -44,8 +43,8 @@ function c83531441.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	else
 		local ac=0
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(83531441,2))
-		if ct==2 then ac=Duel.AnnounceNumber(tp,1,2)
-		else ac=Duel.AnnounceNumber(tp,1,2,3) end
+		if ct==2 then ac=Duel.AnnounceNumber(tp,2,1)
+		else ac=Duel.AnnounceNumber(tp,3,2,1) end
 		Duel.DiscardDeck(tp,ac,REASON_COST)
 		e:SetLabel(ac)
 	end
@@ -70,9 +69,6 @@ function c83531441.posop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsAttackPos() then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 	end
-end
-function c83531441.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c83531441.filter(c)
 	return c:IsSetCard(0xb1) and c:IsAbleToHand()

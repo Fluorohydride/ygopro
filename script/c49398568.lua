@@ -28,7 +28,7 @@ function c49398568.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return not ftg or ftg(e,tp,eg,ep,ev,re,r,rp,chk) end
 	if re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	else e:SetProperty(0) end
+	end
 	if ftg then
 		ftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end

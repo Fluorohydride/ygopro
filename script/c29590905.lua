@@ -30,6 +30,10 @@ function c29590905.activate(e,tp,eg,ep,ev,re,r,rp)
 		gd=gd:Select(tp,1,1,nil)
 	end
 	Duel.NegateAttack()
-	Duel.CalculateDamage(ga:GetFirst(),gd:GetFirst())
-	Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
+	local a=ga:GetFirst()
+	local d=gd:GetFirst()
+	if a:IsAttackable() and not a:IsImmuneToEffect(e) and not d:IsImmuneToEffect(e) then 
+		Duel.CalculateDamage(a,d)
+		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
+	end
 end

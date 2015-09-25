@@ -52,7 +52,7 @@ function c78474168.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c78474168.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
+	return aux.exccon(e) and Duel.GetTurnPlayer()==tp
 end
 function c78474168.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

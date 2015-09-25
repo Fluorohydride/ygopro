@@ -25,6 +25,9 @@ end
 function c54283059.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return e:GetLabelObject()~=se
 end
+function c54283059.filter0(c)
+	return c:IsFaceup() and c:IsCanBeFusionMaterial() and c:IsAbleToDeck()
+end
 function c54283059.filter1(c,e)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial() and c:IsAbleToDeck() and not c:IsImmuneToEffect(e)
 end
@@ -35,7 +38,7 @@ end
 function c54283059.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
-		local mg=Duel.GetMatchingGroup(c54283059.filter1,tp,LOCATION_REMOVED,0,nil,e)
+		local mg=Duel.GetMatchingGroup(c54283059.filter0,tp,LOCATION_REMOVED,0,nil)
 		return Duel.IsExistingMatchingCard(c54283059.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)

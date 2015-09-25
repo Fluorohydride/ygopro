@@ -22,10 +22,25 @@ function c39853199.initial_effect(c)
 	c:RegisterEffect(e2)
 	--return
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetOperation(c39853199.regop)
+	e3:SetDescription(aux.Stringid(39853199,2))
+	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetCondition(c39853199.retcon)
+	e3:SetTarget(c39853199.rettg)
+	e3:SetOperation(c39853199.retop)
 	c:RegisterEffect(e3)
+	if not c39853199.global_check then
+		c39853199.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetLabel(39853199)
+		ge1:SetOperation(aux.sumreg)
+		Duel.RegisterEffect(ge1,0)
+	end
 end
 function c39853199.destg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetHandler():GetBattleTarget()
@@ -54,19 +69,8 @@ function c39853199.desop2(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-function c39853199.regop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(39853199,2))
-	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetTarget(c39853199.rettg)
-	e1:SetOperation(c39853199.retop)
-	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
-	c:RegisterEffect(e1)
+function c39853199.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(39853199)~=0
 end
 function c39853199.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

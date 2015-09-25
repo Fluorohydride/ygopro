@@ -10,7 +10,7 @@ function c75779210.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_SZONE,LOCATION_SZONE)
 	e1:SetTarget(c75779210.uttg)
-	e1:SetValue(1)
+	e1:SetValue(aux.tgval)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)

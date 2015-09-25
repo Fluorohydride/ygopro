@@ -23,7 +23,10 @@ function c63323539.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=eg:FilterSelect(tp,c63323539.filter,1,1,nil,e,tp)
 	local tc=g:GetFirst()
-	if tc and Duel.Destroy(tc,REASON_EFFECT)~=0 then
-		Duel.Damage(1-tp,tc:GetAttack(),REASON_EFFECT)
+	if not tc then return end
+	local atk=tc:GetAttack()
+	if atk<0 or tc:IsFacedown() then atk=0 end
+	if Duel.Destroy(tc,REASON_EFFECT)~=0 then
+		Duel.Damage(1-tp,atk,REASON_EFFECT)
 	end
 end

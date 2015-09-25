@@ -42,10 +42,11 @@ function c32754886.activate(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetCode(EFFECT_IMMUNE_EFFECT)
 		e4:SetValue(c32754886.efilter)
 		e4:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+		e4:SetOwnerPlayer(tp)
 		tc:RegisterEffect(e4)
 		tc=g:GetNext()
 	end
 end
 function c32754886.efilter(e,re)
-	return e:GetHandlerPlayer()~=re:GetHandlerPlayer()
+	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end

@@ -22,12 +22,12 @@ function c2407234.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 c2407234.xyz_number=69
-function c2407234.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ)
+function c2407234.negfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and not c:IsDisabled()
 end
 function c2407234.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(c2407234.filter,tp,LOCATION_MZONE,LOCATION_MZONE,c)
+	local g=Duel.GetMatchingGroup(c2407234.negfilter,tp,LOCATION_MZONE,LOCATION_MZONE,c)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)
@@ -42,6 +42,9 @@ function c2407234.negop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 		tc=g:GetNext()
 	end
+end
+function c2407234.filter(c)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c2407234.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c2407234.filter(chkc) and chkc~=e:GetHandler() end

@@ -37,7 +37,6 @@ function c3734202.initial_effect(c)
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetCondition(c3734202.thcon)
 	e4:SetTarget(c3734202.thtg)
 	e4:SetOperation(c3734202.thop)
 	c:RegisterEffect(e4)
@@ -49,7 +48,7 @@ function c3734202.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b2=Duel.CheckReleaseGroup(tp,c3734202.cfilter2,1,nil)
 		and Duel.IsExistingMatchingCard(c3734202.spfilter2,tp,LOCATION_DECK,0,1,nil,e,tp)
 	if Duel.GetFlagEffect(tp,3734202)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and (b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(3734202,3)) then
+		and (b1 or b2) and Duel.SelectYesNo(tp,94) then
 		local opt=0
 		if b1 and b2 then
 			opt=Duel.SelectOption(tp,aux.Stringid(3734202,0),aux.Stringid(3734202,1))
@@ -146,9 +145,6 @@ function c3734202.spop2(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c3734202.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c3734202.thfilter(c)
 	return c:IsSetCard(0x2a) and not c:IsCode(3734202) and c:IsAbleToHand()

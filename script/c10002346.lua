@@ -21,6 +21,7 @@ function c10002346.initial_effect(c)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTarget(c10002346.reptg)
+	e3:SetOperation(c10002346.repop)
 	c:RegisterEffect(e3)
 end
 function c10002346.val(e,c)
@@ -28,8 +29,8 @@ function c10002346.val(e,c)
 end
 function c10002346.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_EFFECT) end
-	if Duel.SelectYesNo(tp,aux.Stringid(10002346,0)) then
-		e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
-		return true
-	else return false end
+	return Duel.SelectYesNo(tp,aux.Stringid(10002346,0))
+end
+function c10002346.repop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 end

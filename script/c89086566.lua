@@ -24,7 +24,7 @@ function c89086566.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dt=Duel.Destroy(g,REASON_EFFECT)
 	if dt==0 then return end
 	local dg=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
-	if dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(89086566,0)) then
+	if dg:GetCount()>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local sg=dg:Select(tp,1,dt,nil)

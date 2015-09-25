@@ -4,6 +4,7 @@ function c11224103.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(aux.bdcon)
 	e1:SetOperation(c11224103.bdop)
 	c:RegisterEffect(e1)
 	--immune spell

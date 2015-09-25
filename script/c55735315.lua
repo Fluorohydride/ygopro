@@ -1,6 +1,6 @@
 --魂食神龍ドレイン・ドラゴン
 function c55735315.initial_effect(c)
-	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
+	c:EnableUnsummonable()
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -47,4 +47,8 @@ function c55735315.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetValue(0)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e2,tp)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e3:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e3,tp)
 end

@@ -93,7 +93,7 @@ end
 function c88301393.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return bc:IsReason(REASON_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and c:IsChainAttackable()
+	return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER) and c:IsChainAttackable() and c:IsStatus(STATUS_OPPO_BATTLE)
 end
 function c88301393.atop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChainAttack()

@@ -1,4 +1,4 @@
---Quantum Cat
+--量子猫
 function c87772572.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

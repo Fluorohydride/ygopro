@@ -19,11 +19,13 @@ function c63120904.dfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c63120904.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsDestructable() end
-	if chk==0 then return (Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,90337190) and Duel.IsExistingTarget(Card.IsDestructable,tp,0,LOCATION_MZONE,1,nil))
-		or (Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,95614612) and Duel.IsExistingTarget(c63120904.dfilter,tp,0,LOCATION_ONFIELD,1,nil)) end
-	local b1=Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,90337190) and Duel.IsExistingTarget(Card.IsDestructable,tp,0,LOCATION_MZONE,1,nil)
-	local b2=Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,95614612) and Duel.IsExistingTarget(c63120904.dfilter,tp,0,LOCATION_ONFIELD,1,nil)
+	if chkc then
+		if e:GetLabel()==90337190 then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsDestructable()
+		else return chkc:IsOnField() and c63120904.dfilter(chkc) end
+	end
+	local b1=Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,90337190) and Duel.IsExistingTarget(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	local b2=Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,95614612) and Duel.IsExistingTarget(c63120904.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	if chk==0 then return b1 or b2 end
 	local code=0
 	if b1 and b2 then
 		local rg=Duel.SelectReleaseGroup(tp,c63120904.rfilter,1,1,nil)
@@ -38,13 +40,14 @@ function c63120904.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		code=95614612
 		Duel.Release(rg,REASON_COST)
 	end
+	e:SetLabel(code)
 	if code==90337190 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local g=Duel.SelectTarget(tp,Card.IsDestructable,tp,0,LOCATION_MZONE,1,1,nil)
+		local g=Duel.SelectTarget(tp,Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local g=Duel.SelectTarget(tp,c63120904.dfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
+		local g=Duel.SelectTarget(tp,c63120904.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end
 end

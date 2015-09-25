@@ -13,11 +13,10 @@ function c75363626.initial_effect(c)
 	--cannot be battle target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e2:SetTarget(c75363626.atktg)
-	e2:SetValue(1)
+	e2:SetTargetRange(0,LOCATION_MZONE)
+	e2:SetValue(c75363626.atktg)
 	c:RegisterEffect(e2)
 end
 function c75363626.retcon(e,tp,eg,ep,ev,re,r,rp)
@@ -34,5 +33,5 @@ function c75363626.retop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c75363626.atktg(e,c)
-	return c:GetCode()~=75363626 and c:IsSetCard(0x71)
+	return c:IsFaceup() and c:GetCode()~=75363626 and c:IsSetCard(0x71)
 end

@@ -1,4 +1,4 @@
---Rubic, Malebranche of the Burning Abyss
+--彼岸の悪鬼 ラビキャント
 function c734741.initial_effect(c)
 	--self destroy
 	local e1=Effect.CreateEffect(c)
@@ -49,7 +49,6 @@ function c734741.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c734741.ssop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(c734741.filter,tp,LOCATION_ONFIELD,0,1,nil) then return end
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end

@@ -15,7 +15,7 @@ function c66540884.initial_effect(c)
 end
 function c66540884.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return (c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_RETURN)) or c:IsReason(REASON_BATTLE)
+	return c:IsReason(REASON_EFFECT) or c:IsReason(REASON_BATTLE)
 end
 function c66540884.thfilter(c)
 	return c:IsSetCard(0x45) and c:GetCode()~=66540884 and c:IsAbleToHand()

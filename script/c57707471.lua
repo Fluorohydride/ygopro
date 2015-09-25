@@ -29,14 +29,14 @@ function c57707471.initial_effect(c)
 	e3:SetTarget(c57707471.destg)
 	e3:SetOperation(c57707471.desop)
 	c:RegisterEffect(e3)
-	if c57707471.xyz_filter then
+	if not c57707471.xyz_filter then
 		c57707471.xyz_filter=function(mc) return mc:IsXyzLevel(c,6) end
 	end
 end
 c57707471.xyz_number=21
 c57707471.xyz_count=2
 function c57707471.ovfilter(c,tp,xyzc)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetRank()==5 and c:IsCanBeXyzMaterial(xyzc,true)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetRank()==5 and c:IsCanBeXyzMaterial(xyzc)
 		and c:CheckRemoveOverlayCard(tp,1,REASON_COST)
 end
 function c57707471.xyzcon(e,c,og)
@@ -45,7 +45,7 @@ function c57707471.xyzcon(e,c,og)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local ct=-ft
 	if 2<=ct then return false end
-	if ct<1 and Duel.IsExistingMatchingCard(c57707471.ovfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) then
+	if ct<1 and not og and Duel.IsExistingMatchingCard(c57707471.ovfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) then
 		return true
 	end
 	return Duel.CheckXyzMaterial(c,nil,6,2,2,og)

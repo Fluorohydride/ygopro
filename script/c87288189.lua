@@ -50,7 +50,7 @@ function c87288189.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE
 end
 function c87288189.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsAbleToRemove() end
+	if chkc then return chkc:IsOnField() end
 	if chk==0 then return true end
 	local ct=1
 	if e:GetLabel()==1 then ct=2 end

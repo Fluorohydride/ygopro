@@ -47,13 +47,15 @@ function c47295267.retop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCountLimit(1)
+		e2:SetCondition(c47295267.descon)
 		e2:SetOperation(c47295267.desop)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		tc:RegisterEffect(e2)
 	end
 end
+function c47295267.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp and e:GetHandler():IsRace(RACE_MACHINE)
+end
 function c47295267.desop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp and e:GetHandler():IsRace(RACE_MACHINE) then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end

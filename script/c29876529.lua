@@ -20,7 +20,7 @@ function c29876529.costfilter(c)
 		and Duel.IsExistingMatchingCard(c29876529.dfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,c)
 end
 function c29876529.dfilter(c)
-	return c:GetTurnID()==Duel.GetTurnCount() and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0 and c:IsDestructable()
+	return c:IsStatus(STATUS_SPSUMMON_TURN) and c:IsDestructable()
 end
 function c29876529.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

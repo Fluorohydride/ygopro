@@ -11,10 +11,11 @@ function c64681432.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetOperation(c64681432.tgreg)
+	e2:SetOperation(c64681432.tgreg1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	e3:SetOperation(c64681432.tgreg2)
 	c:RegisterEffect(e3)
 	--destroy
 	local e4=Effect.CreateEffect(c)
@@ -26,6 +27,18 @@ function c64681432.initial_effect(c)
 	e4:SetTarget(c64681432.destg)
 	e4:SetOperation(c64681432.desop)
 	c:RegisterEffect(e4)
+	--to grave
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e5:SetDescription(aux.Stringid(64681432,1))
+	e5:SetCategory(CATEGORY_TOGRAVE)
+	e5:SetCode(EVENT_PHASE+PHASE_END)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e5:SetCondition(c64681432.tgcon)
+	e5:SetTarget(c64681432.tgtg)
+	e5:SetOperation(c64681432.tgop)
+	c:RegisterEffect(e5)
 end
 function c64681432.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -50,20 +63,14 @@ function c64681432.desop(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterEffect(e1)
 	end
 end
-function c64681432.tgreg(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	--to grave
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetDescription(aux.Stringid(64681432,1))
-	e1:SetCategory(CATEGORY_TOGRAVE)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
-	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
-	e1:SetTarget(c64681432.tgtg)
-	e1:SetOperation(c64681432.tgop)
-	c:RegisterEffect(e1)
+function c64681432.tgreg1(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(64681432,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
+end
+function c64681432.tgreg2(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(64681432,RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END,0,1)
+end
+function c64681432.tgcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(64681432)~=0
 end
 function c64681432.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -6,7 +6,7 @@ function c83555666.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,0x1e1)
+	e1:SetHintTiming(0,0x1e0)
 	e1:SetCountLimit(1,83555666+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c83555666.condition)
 	e1:SetTarget(c83555666.target)
@@ -34,7 +34,7 @@ function c83555666.activate(e,tp,eg,ep,ev,re,r,rp)
 		local atk=tc:GetTextAttack()
 		if atk<0 then atk=0 end
 		local val=Duel.Damage(tp,atk,REASON_EFFECT)
-		if val>0 then
+		if val>0 and Duel.GetLP(tp)>0 then
 			Duel.BreakEffect()
 			Duel.Damage(1-tp,val,REASON_EFFECT)
 		end

@@ -58,10 +58,10 @@ function c68396121.negop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c68396121.aclimit(e,re,tp)
-	return re:GetHandler():IsOnField()
+	return re:GetHandler():IsOnField() and not re:GetHandler():IsImmuneToEffect(e)
 end
 function c68396121.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,88177324)
 end
 function c68396121.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -6,13 +6,9 @@ function c12467005.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c12467005.condition)
 	e1:SetTarget(c12467005.target)
 	e1:SetOperation(c12467005.operation)
 	c:RegisterEffect(e1)
-end
-function c12467005.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c12467005.filter1(c)
 	return c:IsFaceup() and c:IsCanTurnSet()

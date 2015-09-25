@@ -14,7 +14,7 @@ function c52738610.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(c52738610.tgtg)
-	e2:SetValue(c52738610.tgval)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--tohand
 	local e3=Effect.CreateEffect(c)
@@ -40,14 +40,11 @@ end
 function c52738610.tgtg(e,c)
 	return c:IsSetCard(0xb4) and c:IsType(TYPE_RITUAL)
 end
-function c52738610.tgval(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
-end
 function c52738610.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0
 end
 function c52738610.thfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xb4) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsSetCard(0xb4) and c:IsType(TYPE_MONSTER) and not c:IsCode(52738610) and c:IsAbleToHand()
 end
 function c52738610.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c52738610.thfilter(chkc) end

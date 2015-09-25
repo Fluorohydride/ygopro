@@ -6,13 +6,9 @@ function c92450185.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c92450185.thcon)
 	e1:SetTarget(c92450185.thtg)
 	e1:SetOperation(c92450185.thop)
 	c:RegisterEffect(e1)
-end
-function c92450185.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c92450185.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

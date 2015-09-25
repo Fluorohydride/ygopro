@@ -14,7 +14,7 @@ function c87475570.initial_effect(c)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(LOCATION_ONFIELD,0)
 	e2:SetTarget(c87475570.tgtg)
-	e2:SetValue(c87475570.tgval)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--tohand
 	local e3=Effect.CreateEffect(c)
@@ -29,9 +29,6 @@ function c87475570.initial_effect(c)
 end
 function c87475570.tgtg(e,c)
 	return c:IsSetCard(0x1034) or (c:IsLocation(LOCATION_MZONE) and (c:IsCode(79407975) or c:IsCode(79856792)))
-end
-function c87475570.tgval(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c87475570.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end

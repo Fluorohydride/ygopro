@@ -6,7 +6,6 @@ function c51858306.initial_effect(c)
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(c51858306.condition)
 	e1:SetTarget(c51858306.target)
 	e1:SetOperation(c51858306.operation)
 	c:RegisterEffect(e1)
@@ -22,9 +21,6 @@ function c51858306.initial_effect(c)
 	e2:SetOperation(c51858306.thop)
 	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
-end
-function c51858306.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c51858306.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -47,6 +43,7 @@ function c51858306.operation(e,tp,eg,ep,ev,re,r,rp)
 	else
 		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
 		Duel.ShuffleDeck(tp)
 	end
 end

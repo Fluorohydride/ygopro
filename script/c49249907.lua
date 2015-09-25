@@ -11,10 +11,24 @@ function c49249907.initial_effect(c)
 	c:RegisterEffect(e1)
 	--return
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetOperation(c49249907.regop)
+	e2:SetCategory(CATEGORY_TOHAND)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetCode(EVENT_PHASE+PHASE_END)
+	e2:SetCondition(c49249907.retcon)
+	e2:SetTarget(c49249907.rettg)
+	e2:SetOperation(c49249907.retop)
 	c:RegisterEffect(e2)
+	if not c49249907.global_check then
+		c49249907.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetLabel(49249907)
+		ge1:SetOperation(aux.sumreg)
+		Duel.RegisterEffect(ge1,0)
+	end
 end
 function c49249907.filter(c,e,tp)
 	return c:IsSetCard(0xb3) and not c:IsCode(49249907) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -32,18 +46,8 @@ function c49249907.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c49249907.regop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetTarget(c49249907.rettg)
-	e1:SetOperation(c49249907.retop)
-	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
-	c:RegisterEffect(e1)
+function c49249907.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(49249907)~=0
 end
 function c49249907.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

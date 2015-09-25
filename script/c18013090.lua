@@ -35,7 +35,7 @@ function c18013090.tfilter(c)
 end
 function c18013090.atop1(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetTurnPlayer()~=tp or ep~=tp then return end
-	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) or not re:GetHandler():IsType(TYPE_SPELL) then return end
+	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) or not re:IsActiveType(TYPE_SPELL) then return end
 	e:GetHandler():RegisterFlagEffect(18013090,RESET_EVENT+0x2fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c18013090.atcon2(e,tp,eg,ep,ev,re,r,rp)

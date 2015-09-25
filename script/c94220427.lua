@@ -24,12 +24,12 @@ function c94220427.initial_effect(c)
 end
 function c94220427.filter1(c,e,tp)
 	local rk=c:GetRank()
-	return rk>4 and c:IsFaceup()
+	return rk>4 and c:IsFaceup() and c:IsType(TYPE_XYZ)
 		and Duel.IsExistingMatchingCard(c94220427.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1,c:GetCode())
 end
 function c94220427.filter2(c,e,tp,mc,rk,code)
-	if c:IsCode(6165656) and code~=48995978 then return false end
-	return c:GetRank()==rk and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073)) and mc:IsCanBeXyzMaterial(c,true)
+	if c:GetOriginalCode()==6165656 and code~=48995978 then return false end
+	return c:GetRank()==rk and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073)) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c94220427.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -52,6 +52,7 @@ function c94220427.activate(e,tp,eg,ep,ev,re,r,rp)
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(tc))
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()

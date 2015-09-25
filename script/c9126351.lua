@@ -30,6 +30,7 @@ function c9126351.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1)
 	e5:SetCost(c9126351.excost)
+	e5:SetTarget(c9126351.extg)
 	e5:SetOperation(c9126351.exop)
 	c:RegisterEffect(e5)
 end
@@ -67,6 +68,9 @@ function c9126351.excost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHandAsCost,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SendtoHand(g,nil,REASON_COST)
 	Duel.RegisterFlagEffect(tp,9126352,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+end
+function c9126351.extg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanSummon(tp) end
 end
 function c9126351.exop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

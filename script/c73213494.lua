@@ -1,4 +1,4 @@
---Calcab, Malebranche of the Burning Abyss
+--彼岸の悪鬼 ハックルスパー
 function c73213494.initial_effect(c)
 	--self destroy
 	local e1=Effect.CreateEffect(c)
@@ -24,10 +24,9 @@ function c73213494.initial_effect(c)
 	e3:SetDescription(aux.Stringid(73213494,1))
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,73213494)
-	e3:SetCondition(c73213494.thcon)
 	e3:SetTarget(c73213494.thtg)
 	e3:SetOperation(c73213494.thop)
 	c:RegisterEffect(e3)
@@ -50,16 +49,12 @@ function c73213494.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c73213494.ssop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(c73213494.filter,tp,LOCATION_ONFIELD,0,1,nil) then return end
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function c73213494.thfilter(c)
 	return c:IsFacedown() and c:IsAbleToHand()
-end
-function c73213494.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c73213494.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and c73213494.thfilter(chkc) end

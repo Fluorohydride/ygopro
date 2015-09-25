@@ -37,4 +37,8 @@ function c46132282.effop(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetValue(0)
 	e3:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e3,tp)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e4:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e4,tp)
 end

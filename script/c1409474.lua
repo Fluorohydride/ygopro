@@ -6,7 +6,7 @@ function c1409474.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c1409474.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--guess
 	local e2=Effect.CreateEffect(c)
@@ -17,9 +17,6 @@ function c1409474.initial_effect(c)
 	e2:SetTarget(c1409474.target)
 	e2:SetOperation(c1409474.operation)
 	c:RegisterEffect(e2)
-end
-function c1409474.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c1409474.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end

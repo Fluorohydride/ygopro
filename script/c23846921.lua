@@ -39,6 +39,7 @@ function c23846921.arcanareg(c,coin)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c23846921.skipcon)
 	e1:SetCost(c23846921.skipcost)
+	e1:SetTarget(c23846921.skiptg)
 	e1:SetOperation(c23846921.skipop)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
@@ -65,6 +66,9 @@ function c23846921.skipcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_MZONE,0,2,2,nil)
 	Duel.SendtoGrave(g,REASON_COST)
+end
+function c23846921.skiptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_SKIP_TURN) end
 end
 function c23846921.skipop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

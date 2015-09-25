@@ -92,7 +92,7 @@ function c71645242.desfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT) and c:IsDestructable()
 end
 function c71645242.filter2(c,atk,e,tp)
-	return c:GetAttack()==atk and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetAttack()==atk and c:IsCanBeSpecialSummoned(e,0x20,tp,false,false)
 end
 function c71645242.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c71645242.filter2(chkc,e:GetLabel(),e,tp) end
@@ -100,7 +100,7 @@ function c71645242.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local atk=g:GetSum(Card.GetAttack)
 	local sc=g:FilterCount(Card.IsControler,nil,tp)
 	if chk==0 then return e:GetHandler():IsDestructable() and e:GetHandler():IsDestructable(e) and g:GetCount()>0
-		and (Duel.GetLocationCount(tp,LOCATION_MZONE)>-sc)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>-sc
 		and Duel.IsExistingTarget(c71645242.filter2,tp,LOCATION_GRAVE,0,1,nil,atk,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tg=Duel.SelectTarget(tp,c71645242.filter2,tp,LOCATION_GRAVE,0,1,1,nil,atk,e,tp)
@@ -113,10 +113,13 @@ function c71645242.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not (c:IsRelateToEffect(e) and c:IsDestructable() and c:IsDestructable(e)) then return end
 	local dg=Duel.GetMatchingGroup(c71645242.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local atk=dg:GetSum(Card.GetAttack)
 	dg:AddCard(c)
 	Duel.Destroy(dg,REASON_EFFECT)
 	Duel.BreakEffect()
+	local og=Duel.GetOperatedGroup()
+	if not og:IsContains(c) then return end
+	og:RemoveCard(c)
+	local atk=og:GetSum(Card.GetPreviousAttackOnField)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:GetAttack()==atk then
 		Duel.SpecialSummon(tc,0x20,tp,tp,false,false,POS_FACEUP)

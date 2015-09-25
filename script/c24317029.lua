@@ -22,9 +22,10 @@ function c24317029.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c24317029.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-	else
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
 		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
 		Duel.ShuffleDeck(tp)
 	end
 end

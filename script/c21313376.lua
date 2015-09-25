@@ -17,7 +17,7 @@ function c21313376.initial_effect(c)
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetCondition(c21313376.descon)
+	e2:SetCondition(aux.bdogcon)
 	e2:SetCost(c21313376.descost)
 	e2:SetTarget(c21313376.destg)
 	e2:SetOperation(c21313376.desop)
@@ -26,11 +26,6 @@ end
 c21313376.xyz_number=14
 function c21313376.refcon(e,re,val,r,rp,rc)
 	return bit.band(r,REASON_EFFECT)~=0 and rp~=e:GetHandlerPlayer()
-end
-function c21313376.descon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c21313376.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
