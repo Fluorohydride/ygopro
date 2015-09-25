@@ -14,14 +14,14 @@ function c11366199.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCost(c11366199.spcost1)
+	e2:SetCost(c11366199.spcost(LOCATION_GRAVE))
 	e2:SetTarget(c11366199.sptg)
 	e2:SetOperation(c11366199.spop)
 	c:RegisterEffect(e2)
 	--special summon(grave)
 	local e3=e2:Clone()
 	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCost(c11366199.spcost2)
+	e3:SetCost(c11366199.spcost(LOCATION_HAND))
 	c:RegisterEffect(e3)
 	--cannot set
 	local e4=Effect.CreateEffect(c)
@@ -46,28 +46,23 @@ end
 function c11366199.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	return bit.band(sumpos,POS_FACEDOWN)>0
 end
-function c11366199.spfilter(c,att)
-	return c:IsAttribute(att) and c:IsAbleToRemoveAsCost()
+function c11366199.spfilter1(c,tp,loc)
+	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsAbleToRemoveAsCost()
+		and Duel.IsExistingMatchingCard(c11366199.spfilter2,tp,loc,0,1,c)
 end
-function c11366199.spcost1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c11366199.spfilter,tp,LOCATION_GRAVE,0,1,nil,ATTRIBUTE_WIND)
-		and Duel.IsExistingMatchingCard(c11366199.spfilter,tp,LOCATION_GRAVE,0,1,nil,ATTRIBUTE_DARK) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g1=Duel.SelectMatchingCard(tp,c11366199.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,ATTRIBUTE_WIND)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=Duel.SelectMatchingCard(tp,c11366199.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,ATTRIBUTE_DARK)
-	g1:Merge(g2)
-	Duel.Remove(g1,POS_FACEUP,REASON_COST)
+function c11366199.spfilter2(c)
+	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
 end
-function c11366199.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c11366199.spfilter,tp,LOCATION_HAND,0,1,nil,ATTRIBUTE_WIND)
-		and Duel.IsExistingMatchingCard(c11366199.spfilter,tp,LOCATION_HAND,0,1,nil,ATTRIBUTE_DARK) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g1=Duel.SelectMatchingCard(tp,c11366199.spfilter,tp,LOCATION_HAND,0,1,1,nil,ATTRIBUTE_WIND)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=Duel.SelectMatchingCard(tp,c11366199.spfilter,tp,LOCATION_HAND,0,1,1,nil,ATTRIBUTE_DARK)
-	g1:Merge(g2)
-	Duel.Remove(g1,POS_FACEUP,REASON_COST)
+function c11366199.spcost(loc)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+			if chk==0 then return Duel.IsExistingMatchingCard(c11366199.spfilter1,tp,loc,0,1,nil,tp,loc) end
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g1=Duel.SelectMatchingCard(tp,c11366199.spfilter1,tp,loc,0,1,1,nil,tp,loc)
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g2=Duel.SelectMatchingCard(tp,c11366199.spfilter2,tp,loc,0,1,1,g1:GetFirst())
+			g1:Merge(g2)
+			Duel.Remove(g1,POS_FACEUP,REASON_COST)
+		end
 end
 function c11366199.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
