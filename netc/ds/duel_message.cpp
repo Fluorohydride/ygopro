@@ -11,19 +11,6 @@
 namespace ygopro
 {
     
-    void DuelProtoHandler::ProcessMsg(uint32_t sz) {
-        BufferUtil reader(&msg_buffer[0], sz);
-        while(!IsEnd() && !reader.IsEnd()) {
-            uint8_t msg_type = reader.Read<uint8_t>();
-            MessageToCmd(msg_type, reader);
-        }
-    }
-    
-    int32_t DuelProtoHandler::MessageToCmd(uint8_t msg_type, BufferUtil& reader) {
-        //PushCommand(std::make_shared<DuelCmdMsg>(msg_type, reader));
-        return 0;
-    }
-    
     int32_t DuelSceneHandler::SolveMessage(uint8_t msg_type, BufferUtil& reader) {
         auto pscene = duel_scene.lock();
         switch(msg_type) {

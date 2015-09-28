@@ -637,7 +637,7 @@ namespace ygopro
                         fc.code = 1;
                 } else if(sep_keyword[0] == L'@') {
                     if(sep_keyword[1] == L'@') {
-                        fc.setcode = To<int32_t>(To<std::string>(sep_keyword.substr(2)));
+                        fc.setcode = To<int32_t>(sep_keyword.substr(2));
                     } else {
                         auto setcode = DataMgr::Get().GetSetCode(sep_keyword.substr(1));
                         if(setcode)
@@ -858,7 +858,7 @@ namespace ygopro
                               || (data->alias > data->code && data->alias - data->code > 10)
                               || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
             info_text->GetTextUI()->AppendText(L" [", 0xff000000);
-            info_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
+            info_text->GetTextUI()->AppendText(To<std::wstring>(L"%08d", ccode), 0xffff0000);
             
             info_text->GetTextUI()->AppendText(L"]\n", 0xff000000);
             // types
@@ -869,16 +869,16 @@ namespace ygopro
                 info_text->GetTextUI()->AppendText(L"/", 0xff000000);
                 info_text->GetTextUI()->AppendText(DataMgr::Get().GetRaceString(data->race), 0xff000000);
                 info_text->GetTextUI()->AppendText(L"    ", 0xff000000);
-                std::string adstr;
+                std::wstring adstr;
                 if(data->attack >= 0)
-                    adstr.append(To<std::string>("ATK/% 4ld", data->attack));
+                    adstr.append(To<std::wstring>(L"ATK/% 4ld", data->attack));
                 else
-                    adstr.append("ATK/  ? ");
+                    adstr.append(L"ATK/  ? ");
                 if(data->defence >= 0)
-                    adstr.append(To<std::string>("  DEF/% 4ld", data->defence));
+                    adstr.append(To<std::wstring>(L"  DEF/% 4ld", data->defence));
                 else
-                    adstr.append(" DEF/  ? ");
-                info_text->GetTextUI()->AppendText(To<std::wstring>(adstr), 0xff000000);
+                    adstr.append(L" DEF/  ? ");
+                info_text->GetTextUI()->AppendText(adstr, 0xff000000);
             }
             if(setcode) {
                 info_text->GetTextUI()->AppendText(L"\n", 0xff000000);

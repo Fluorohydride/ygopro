@@ -424,7 +424,7 @@ namespace ygopro
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
             int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
-            std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
+            std::wstring s = To<std::wstring>(L"%d/%d", result_page + 1, pageall);
             ptr->GetTextUI()->SetText(s, 0xff000000);
         }
     }
@@ -445,7 +445,7 @@ namespace ygopro
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
             int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
-            std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
+            std::wstring s = To<std::wstring>(L"%d/%d", result_page + 1, pageall);
             ptr->GetTextUI()->SetText(s, 0xff000000);
         }
     }
@@ -469,7 +469,7 @@ namespace ygopro
         auto ptr = label_result.lock();
         if(ptr != nullptr) {
             std::wstring s = To<std::wstring>(stringCfg["eui_filter_count"].to_string());
-            std::wstring ct = To<std::wstring>(To<std::string>("%ld", search_result.size()));
+            std::wstring ct = To<std::wstring>(L"%ld", search_result.size());
             size_t pos = s.find(L"{count}");
             if(pos != std::wstring::npos)
                 s.replace(pos, 7, ct);
@@ -478,7 +478,7 @@ namespace ygopro
         auto ptr2 = label_page.lock();
         if(ptr2 != nullptr) {
             int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
-            std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
+            std::wstring s = To<std::wstring>(L"%d/%d", result_page + 1, pageall);
             ptr2->GetTextUI()->SetText(s, 0xff000000);
         }
     }

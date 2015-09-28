@@ -226,7 +226,6 @@ int32_t main(int32_t argc, char* argv[]) {
     ImageMgr::Get().UninitTextures();
     _2dshader.reset();
     _3dshader.reset();
-    
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

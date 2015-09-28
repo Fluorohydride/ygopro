@@ -3,23 +3,17 @@
 
 #include "common.h"
 
-template<typename T>
-struct ConverteImpl {
-    static T ConvertVal(const char* str) {
-        if(std::is_integral<T>::value) {
-            const char* s = str;
-            int radix = (str[0] == '0' && (str[1] == 'X' || str[1] == 'x')) ? 16 : 10;
-            return static_cast<T>(strtoull(s, nullptr, radix));
-        } else
-            return static_cast<T>(atof(str));
+template<typename T, typename STYPE, bool INTTYPE = true>
+struct SConverter {
+    static T Convert(const STYPE& str) {
+        return static_cast<T>(std::stoull(str, nullptr, 0));
     }
-    static std::string ConvertStr(const T& val) {
-        char buf[256];
-        if(std::is_integral<T>::value)
-            sprintf(buf, "%ld", static_cast<long>(val));
-        else
-            sprintf(buf, "%lf", static_cast<double>(val));
-        return std::move(std::string(buf));
+};
+
+template<typename T, typename STYPE>
+struct SConverter<T, STYPE, false> {
+    static T Convert(const STYPE& str) {
+        return static_cast<T>(std::stod(str));
     }
 };
 
@@ -31,30 +25,30 @@ struct ToInner {
 };
 
 template<typename TOTYPE>
-struct ToInner<char*, TOTYPE> {
-    static TOTYPE C(const char* str) {
-        return static_cast<TOTYPE>(ConverteImpl<TOTYPE>::ConvertVal(str));
-    };
-};
-
-template<typename TOTYPE>
-struct ToInner<const char*, TOTYPE> {
-    static TOTYPE C(const char* str) {
-        return static_cast<TOTYPE>(ConverteImpl<TOTYPE>::ConvertVal(str));
-    };
-};
-
-template<typename TOTYPE>
 struct ToInner<std::string, TOTYPE> {
     static TOTYPE C(const std::string& str) {
-        return static_cast<TOTYPE>(ConverteImpl<TOTYPE>::ConvertVal(str.c_str()));
+        return static_cast<TOTYPE>(SConverter<TOTYPE, std::string, std::is_integral<TOTYPE>::value>::Convert(str));
+    };
+};
+
+template<typename TOTYPE>
+struct ToInner<std::wstring, TOTYPE> {
+    static TOTYPE C(const std::wstring& str) {
+        return static_cast<TOTYPE>(SConverter<TOTYPE, std::wstring, std::is_integral<TOTYPE>::value>::Convert(str));
     };
 };
 
 template<typename T>
 struct ToInner<T, std::string> {
     static std::string C(const T& val) {
-        return std::move(ConverteImpl<T>::ConvertStr(val));
+        return std::move(std::to_string(val));
+    }
+};
+
+template<typename T>
+struct ToInner<T, std::wstring> {
+    static std::wstring C(const T& val) {
+        return std::move(std::to_wstring(val));
     }
 };
 
@@ -117,10 +111,17 @@ TOTYPE To(const T& val) {
 }
 
 template<typename TOTYPE, typename T, typename... REST>
-TOTYPE To(const char* format, T val, REST... r) {
+std::string To(const char* format, T val, REST... r) {
     char buf[256];
-    sprintf(buf, format, val, std::forward<REST>(r)...);
+    snprintf(buf, 256, format, val, std::forward<REST>(r)...);
     return std::move(std::string(buf));
+}
+
+template<typename TOTYPE, typename T, typename... REST>
+std::wstring To(const wchar_t* format, T val, REST... r) {
+    wchar_t buf[256];
+    swprintf(buf, 256, format, val, std::forward<REST>(r)...);
+    return std::move(std::wstring(buf));
 }
 
 #endif
