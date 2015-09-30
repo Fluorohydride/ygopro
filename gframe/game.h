@@ -98,6 +98,11 @@ public:
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
+	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
+		irr::gui::IGUIElement* focus = env->getFocus();
+		return focus && focus->hasType(type);
+	}
+
 	Mutex gMutex;
 	Mutex gBuffer;
 	Signal frameSignal;
