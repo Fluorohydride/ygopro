@@ -1,0 +1,6 @@
+[submodule "ocgcore"]
+	path = ocgcore
+	url = https://github.com/mercury233/ygopro-core.git
+[submodule "script"]
+	path = script
+	url = https://github.com/mercury233/ygopro-scripts.git
