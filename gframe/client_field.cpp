@@ -184,18 +184,8 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		break;
 	}
 	case LOCATION_EXTRA: {
-		if (sequence != 0 || extra[controler].size() == 0) {
-			extra[controler].push_back(pcard);
-			pcard->sequence = extra[controler].size() - 1;
-		} else {
-			extra[controler].push_back(0);
-			for(int i = extra[controler].size() - 1; i > 0; --i) {
-				extra[controler][i] = extra[controler][i - 1];
-				extra[controler][i]->sequence++;
-			}
-			extra[controler][0] = pcard;
-			pcard->sequence = 0;
-		}
+		extra[controler].push_back(pcard);
+		pcard->sequence = extra[controler].size() - 1;
 		if ((pcard->type & TYPE_PENDULUM) && (pcard->position & POS_FACEUP))
 			extra_p_count[controler]++;
 		break;
@@ -492,6 +482,58 @@ void ClientField::ShowChainCard() {
 		mainGame->btnSelectOK->setVisible(true);
 	else mainGame->btnSelectOK->setVisible(false);
 	mainGame->PopupElement(mainGame->wCardSelect);
+}
+void ClientField::ShowLocationCard() {
+	if(display_cards.size() <= 5) {
+		int startpos = 30 + 125 * (5 - display_cards.size()) / 2;
+		for(size_t i = 0; i < display_cards.size(); ++i) {
+			if(display_cards[i]->code)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
+			else
+				mainGame->btnCardDisplay[i]->setImage(imageManager.tCover);
+			mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+			mainGame->btnCardDisplay[i]->setPressed(false);
+			mainGame->btnCardDisplay[i]->setVisible(true);
+			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i]->location, display_cards[i]->sequence),
+				display_cards[i]->sequence + 1);
+			mainGame->stDisplayPos[i]->setText(formatBuffer);
+			mainGame->stDisplayPos[i]->setVisible(true);
+			if(display_cards[i]->controler)
+				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
+			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(startpos + 10 + i * 125, 30, startpos + 109 + i * 125, 50));
+		}
+		for(int i = display_cards.size(); i < 5; ++i) {
+			mainGame->btnCardDisplay[i]->setVisible(false);
+			mainGame->stDisplayPos[i]->setVisible(false);
+		}
+		mainGame->scrDisplayList->setPos(0);
+		mainGame->scrDisplayList->setVisible(false);
+	} else {
+		for(int i = 0; i < 5; ++i) {
+			if(display_cards[i]->code)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
+			else
+				mainGame->btnCardDisplay[i]->setImage(imageManager.tCover);
+			mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+			mainGame->btnCardDisplay[i]->setPressed(false);
+			mainGame->btnCardDisplay[i]->setVisible(true);
+			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i]->location, display_cards[i]->sequence),
+				display_cards[i]->sequence + 1);
+			mainGame->stDisplayPos[i]->setText(formatBuffer);
+			mainGame->stDisplayPos[i]->setVisible(true);
+			if(display_cards[i]->controler)
+				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
+			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(40 + i * 125, 30, 139 + i * 125, 50));
+		}
+		mainGame->scrDisplayList->setVisible(true);
+		mainGame->scrDisplayList->setMin(0);
+		mainGame->scrDisplayList->setMax((display_cards.size() - 5) * 10 + 9);
+		mainGame->scrDisplayList->setPos(0);
+	}
+	mainGame->btnDisplayOK->setVisible(true);
+	mainGame->PopupElement(mainGame->wCardDisplay);
 }
 void ClientField::ReplaySwap() {
 	std::swap(deck[0], deck[1]);
