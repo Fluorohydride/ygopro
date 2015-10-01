@@ -25,7 +25,7 @@ public:
 	const wchar_t* GetCounterName(int code);
 	const wchar_t* GetSetName(int code);
 	unsigned int GetSetCode(const wchar_t* setname);
-	const wchar_t* GetNumString(int num);
+	const wchar_t* GetNumString(int num, bool bracket = false);
 	const wchar_t* FormatLocation(int location, int sequence);
 	const wchar_t* FormatAttribute(int attribute);
 	const wchar_t* FormatRace(int race);
@@ -40,6 +40,7 @@ public:
 
 	wchar_t* _sysStrings[2048];
 	wchar_t numStrings[256][4];
+	wchar_t numBuffer[6];
 	wchar_t attBuffer[128];
 	wchar_t racBuffer[128];
 	wchar_t tpBuffer[128];

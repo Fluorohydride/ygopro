@@ -40,6 +40,7 @@ public:
 	std::vector<int> activatable_descs;
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
+	int extra_p_count[2];
 	
 	size_t selected_option;
 	ClientCard* attacker;
@@ -60,6 +61,7 @@ public:
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
+	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	bool grave_act;
 	bool remove_act;
@@ -84,6 +86,7 @@ public:
 	void ClearChainSelect();
 	void ShowSelectCard(bool buttonok = false, bool chain = false);
 	void ShowChainCard();
+	void ShowLocationCard();
 	void ReplaySwap();
 	void RefreshAllCards();
 	
