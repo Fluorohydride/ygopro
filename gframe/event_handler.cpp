@@ -928,6 +928,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				selectable_cards.clear();
 				switch(hovered_location) {
 				case LOCATION_DECK: {
+					if(deck[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)deck[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1000), deck[hovered_controler].size());
@@ -935,6 +937,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_MZONE: {
+					if(clicked_card->overlayed.size() == 0)
+						break;
 					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
 						selectable_cards.push_back(clicked_card->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), clicked_card->overlayed.size());
@@ -942,6 +946,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_GRAVE: {
+					if(grave[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
@@ -949,6 +955,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_REMOVED: {
+					if(remove[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)remove[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[hovered_controler].size());
@@ -956,6 +964,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_EXTRA: {
+					if(extra[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
@@ -972,7 +982,18 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				selectable_cards.clear();
 				switch(hovered_location) {
+				case LOCATION_MZONE: {
+					if(clicked_card->overlayed.size() == 0)
+						break;
+					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
+						selectable_cards.push_back(clicked_card->overlayed[i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), clicked_card->overlayed.size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
 				case LOCATION_GRAVE: {
+					if(grave[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
@@ -1632,7 +1653,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_ESCAPE: {
-			mainGame->device->minimizeWindow();
+			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
+				mainGame->device->minimizeWindow();
 			break;
 		}
 		default: break;
