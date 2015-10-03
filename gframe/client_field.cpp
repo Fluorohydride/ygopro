@@ -365,6 +365,10 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
 				if(chain && selectable_cards[i]->is_conti)
 					myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+				else if(selectable_cards[i]->location == LOCATION_OVERLAY)
+					myswprintf(formatBuffer, L"%ls[%d]", 
+						dataManager.FormatLocation(selectable_cards[i]->overlayTarget->location, selectable_cards[i]->overlayTarget->sequence),
+						selectable_cards[i]->overlayTarget->sequence + 1);
 				else
 					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
 						selectable_cards[i]->sequence + 1);
@@ -402,6 +406,10 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
 				if(chain && selectable_cards[i]->is_conti)
 					myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+				else if(selectable_cards[i]->location == LOCATION_OVERLAY)
+					myswprintf(formatBuffer, L"%ls[%d]", 
+						dataManager.FormatLocation(selectable_cards[i]->overlayTarget->location, selectable_cards[i]->overlayTarget->sequence),
+						selectable_cards[i]->overlayTarget->sequence + 1);
 				else
 					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
 						selectable_cards[i]->sequence + 1);
