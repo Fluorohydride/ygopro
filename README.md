@@ -6,8 +6,15 @@ A script engine for "yu-gi-oh!" and sample gui
 * A: Holding down this buton will let the system stop at every timing.
 * S: Holding down this butoon will let the system skip every timing.
 * R: Fix the font error.
-* F1~F3: Show the cards in your grave, removed cards, extra deck.
-* F5~F7: Show the cards in your opponent's grave, removed cards, extra deck.
+* F1~F3: Show the cards in your grave, banished zone, extra deck.
+* F5~F7: Show the cards in your opponent's grave, banished zone, extra deck.
+
+###Sequence:
+* Monster Zone: 1~5, starting from the left hand side.
+* Spell & Trap Zone: 1~5, starting from the left hand side.
+* Spell Zone: 6
+* Pendulum Zone: 7~8, starting from the left hand side.
+* The others: 1~n, starting from the bottom.
 
 ###Deck edit page:
 * All numeric textboxs: They suuport >, =, <, >=, <= signs.
