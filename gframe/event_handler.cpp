@@ -943,7 +943,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_MZONE: {
-					if(clicked_card->overlayed.size() == 0)
+					if(!clicked_card || clicked_card->overlayed.size() == 0)
 						break;
 					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
 						selectable_cards.push_back(clicked_card->overlayed[i]);
@@ -989,7 +989,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				selectable_cards.clear();
 				switch(hovered_location) {
 				case LOCATION_MZONE: {
-					if(clicked_card->overlayed.size() == 0)
+					if(!clicked_card || clicked_card->overlayed.size() == 0)
 						break;
 					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
 						selectable_cards.push_back(clicked_card->overlayed[i]);
