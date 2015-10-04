@@ -742,9 +742,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(selectable_cards[i + pos]->is_conti)
 							myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
 						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY)
-							myswprintf(formatBuffer, L"%ls[%d]",
+							myswprintf(formatBuffer, L"%ls[%d](%d)",
 								dataManager.FormatLocation(selectable_cards[i + pos]->overlayTarget->location, selectable_cards[i + pos]->overlayTarget->sequence),
-								selectable_cards[i + pos]->overlayTarget->sequence + 1);
+								selectable_cards[i + pos]->overlayTarget->sequence + 1, selectable_cards[i + pos]->sequence + 1);
 						else
 							myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location, selectable_cards[i + pos]->sequence),
 								selectable_cards[i + pos]->sequence + 1);
