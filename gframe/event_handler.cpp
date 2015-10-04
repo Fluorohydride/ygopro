@@ -804,7 +804,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ancard.clear();
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
-						auto cp = dataManager.GetCodePointer(cit->first);
+						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+						//datas.alias can be double card names or alias
 						if(cp->second.code == 78734254 || cp->second.code == 13857930 
 								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
@@ -838,7 +839,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ancard.clear();
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
-						auto cp = dataManager.GetCodePointer(cit->first);
+						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+						//datas.alias can be double card names or alias
 						if(cp->second.code == 78734254 || cp->second.code == 13857930 
 								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
