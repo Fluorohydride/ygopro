@@ -349,6 +349,7 @@ void ClientField::ClearChainSelect() {
 	remove_act = false;
 	extra_act = false;
 }
+// needs to be synchronized with EGET_SCROLL_BAR_CHANGED
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	if(selectable_cards.size() <= 5) {
 		int startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
@@ -384,7 +385,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 				} else mainGame->stCardPos[i]->setText(L"");
 				mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			}
-			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + 10 + i * 125, 30, startpos + 109 + i * 125, 50));
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 		}
 		for(int i = selectable_cards.size(); i < 5; ++i) {
 			mainGame->btnCardSelect[i]->setVisible(false);
@@ -425,7 +426,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 				} else mainGame->stCardPos[i]->setText(L"");
 				mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			}
-			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(40 + i * 125, 30, 139 + i * 125, 50));
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(30 + i * 125, 30, 150 + i * 125, 50));
 		}
 		mainGame->scrCardList->setVisible(true);
 		mainGame->scrCardList->setMin(0);
@@ -455,7 +456,7 @@ void ClientField::ShowChainCard() {
 			if(selectable_cards[i]->controler)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + 10 + i * 125, 30, startpos + 109 + i * 125, 50));
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 		}
 		for(int i = selectable_cards.size(); i < 5; ++i) {
 			mainGame->btnCardSelect[i]->setVisible(false);
@@ -479,7 +480,7 @@ void ClientField::ShowChainCard() {
 			if(selectable_cards[i]->controler)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(40 + i * 125, 30, 139 + i * 125, 50));
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(30 + i * 125, 30, 150 + i * 125, 50));
 		}
 		mainGame->scrCardList->setVisible(true);
 		mainGame->scrCardList->setMin(0);
@@ -509,7 +510,7 @@ void ClientField::ShowLocationCard() {
 			if(display_cards[i]->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
-			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(startpos + 10 + i * 125, 30, startpos + 109 + i * 125, 50));
+			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 		}
 		for(int i = display_cards.size(); i < 5; ++i) {
 			mainGame->btnCardDisplay[i]->setVisible(false);
@@ -533,7 +534,7 @@ void ClientField::ShowLocationCard() {
 			if(display_cards[i]->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
-			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(40 + i * 125, 30, 139 + i * 125, 50));
+			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(30 + i * 125, 30, 150 + i * 125, 50));
 		}
 		mainGame->scrDisplayList->setVisible(true);
 		mainGame->scrDisplayList->setMin(0);
