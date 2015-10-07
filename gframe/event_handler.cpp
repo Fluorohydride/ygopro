@@ -555,7 +555,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						int i = 0;
 						while(selected_cards[i] != command_card) i++;
 						selected_cards.erase(selected_cards.begin() + i);
-						if(command_card->overlayTarget ? command_card->overlayTarget->controler : command_card->controler)
+						if(command_card->overlayTarget ? command_card->owner : command_card->controler)
 							mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffffff);
 					} else {
@@ -752,7 +752,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->stCardPos[i]->setText(formatBuffer);
 					if(selectable_cards[i + pos]->is_selected)
 						mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
-					else if(selectable_cards[i + pos]->overlayTarget ? selectable_cards[i + pos]->overlayTarget->controler : selectable_cards[i + pos]->controler)
+					else if(selectable_cards[i + pos]->overlayTarget ? selectable_cards[i + pos]->owner : selectable_cards[i + pos]->controler)
 						mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 					else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 				}
@@ -769,7 +769,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
 						display_cards[i + pos]->sequence + 1);
 					mainGame->stDisplayPos[i]->setText(formatBuffer);
-					if(display_cards[i + pos]->overlayTarget ? display_cards[i + pos]->overlayTarget->controler : display_cards[i + pos]->controler)
+					if(display_cards[i + pos]->overlayTarget ? display_cards[i + pos]->owner : : display_cards[i + pos]->controler)
 						mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 					else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 				}
