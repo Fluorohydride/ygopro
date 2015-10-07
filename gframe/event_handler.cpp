@@ -769,7 +769,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
 						display_cards[i + pos]->sequence + 1);
 					mainGame->stDisplayPos[i]->setText(formatBuffer);
-					if(display_cards[i + pos]->overlayTarget ? display_cards[i + pos]->owner : : display_cards[i + pos]->controler)
+					if(display_cards[i + pos]->overlayTarget ? display_cards[i + pos]->owner : display_cards[i + pos]->controler)
 						mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 					else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 				}
