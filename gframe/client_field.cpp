@@ -375,7 +375,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 						selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);
-				if(selectable_cards[i]->controler)
+				if(selectable_cards[i]->overlayTarget ? selectable_cards[i]->owner : selectable_cards[i]->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			} else {
@@ -416,7 +416,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 						selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);
-				if(selectable_cards[i]->controler)
+				if(selectable_cards[i]->overlayTarget ? selectable_cards[i]->owner : selectable_cards[i]->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			} else {
@@ -453,7 +453,7 @@ void ClientField::ShowChainCard() {
 				selectable_cards[i]->sequence + 1);
 			mainGame->stCardPos[i]->setText(formatBuffer);
 			mainGame->stCardPos[i]->setVisible(true);
-			if(selectable_cards[i]->controler)
+			if(selectable_cards[i]->overlayTarget ? selectable_cards[i]->owner : selectable_cards[i]->controler)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
@@ -477,7 +477,7 @@ void ClientField::ShowChainCard() {
 				selectable_cards[i]->sequence + 1);
 			mainGame->stCardPos[i]->setText(formatBuffer);
 			mainGame->stCardPos[i]->setVisible(true);
-			if(selectable_cards[i]->controler)
+			if(selectable_cards[i]->overlayTarget ? selectable_cards[i]->owner : selectable_cards[i]->controler)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(30 + i * 125, 30, 150 + i * 125, 50));
@@ -507,7 +507,7 @@ void ClientField::ShowLocationCard() {
 				display_cards[i]->sequence + 1);
 			mainGame->stDisplayPos[i]->setText(formatBuffer);
 			mainGame->stDisplayPos[i]->setVisible(true);
-			if(display_cards[i]->controler)
+			if(display_cards[i]->overlayTarget ? display_cards[i]->owner : display_cards[i]->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
@@ -531,7 +531,7 @@ void ClientField::ShowLocationCard() {
 				display_cards[i]->sequence + 1);
 			mainGame->stDisplayPos[i]->setText(formatBuffer);
 			mainGame->stDisplayPos[i]->setVisible(true);
-			if(display_cards[i]->controler)
+			if(display_cards[i]->overlayTarget ? display_cards[i]->owner : display_cards[i]->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 			mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(30 + i * 125, 30, 150 + i * 125, 50));
