@@ -135,29 +135,22 @@ namespace ygopro
         void UpdateViewAngle(float angle);
         void UpdateViewRadius(float radius);
         
-        void InitField();
-        std::shared_ptr<FieldCard> AddCard(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs);
-        std::shared_ptr<FieldCard> GetCard(int32_t side, int32_t zone, int32_t seq, int32_t subs);
-        std::shared_ptr<FieldCard> RemoveCard(int32_t side, int32_t zone, int32_t seq, int32_t subs);
-        void MoveCard(std::shared_ptr<FieldCard> pcard, int32_t toside, int32_t tozone, int32_t toseq, int32_t tosubs, int32_t tm);
-        void ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos, int32_t tm);
-        void ClearField();
-        void InitHp(int32_t local_pl, int32_t hp);
-        void AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq);
-        void DrawCard(int32_t pl, int32_t data);
-        
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);
         v2i GetHoverPos(int32_t posx, int32_t posy);
         v3i GetHoverCardPos(v2i hp);
         std::shared_ptr<FieldCard> GetHoverCard(int32_t side, int32_t zone, int32_t seq);
         std::shared_ptr<FieldBlock> GetFieldBlock(int32_t x, int32_t y);
+        std::shared_ptr<FieldCard> CreateCard() {
+            fieldcard_renderer->RequestRedraw();
+            return fieldcard_renderer->NewSharedObject<FieldCard>();
+        }
+        std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
         
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
         std::shared_ptr<FieldRenderer> field_renderer;
         std::shared_ptr<FieldCardRenderer> fieldcard_renderer;
-        
     };
     
 }

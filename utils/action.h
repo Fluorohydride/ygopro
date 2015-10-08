@@ -92,8 +92,10 @@ public:
 template<typename TIME_TYPE>
 class ActionSequence : public Action<TIME_TYPE> {
 public:
+    ActionSequence() {}
+    
     template<typename... ARGS>
-    ActionSequence(ARGS... args) { Init(std::forward<ARGS>(args)...); }
+    ActionSequence(ARGS... args) { Push(std::forward<ARGS>(args)...); }
     
     virtual void InitStartTime(TIME_TYPE tm) {
         if(!sequence.empty())
@@ -112,11 +114,11 @@ public:
         return false;
     }
     
-protected:
     template<typename... ARGS>
-    void Init(std::shared_ptr<Action<TIME_TYPE>> ptr, ARGS... args) { sequence.push_back(ptr); Init(std::forward<ARGS>(args)...); }
-    void Init(std::shared_ptr<Action<TIME_TYPE>> ptr) { sequence.push_back(ptr); }
+    void Push(std::shared_ptr<Action<TIME_TYPE>> ptr, ARGS... args) { sequence.push_back(ptr); Push(std::forward<ARGS>(args)...); }
+    void Push(std::shared_ptr<Action<TIME_TYPE>> ptr) { sequence.push_back(ptr); }
     
+protected:
     int32_t perform_index = 0;
     std::vector<std::shared_ptr<Action<TIME_TYPE>>> sequence;
 };

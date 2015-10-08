@@ -163,10 +163,83 @@ namespace ygopro
                 break;
             case MSG_CONFIRM_CARDS:
                 break;
-            case MSG_SHUFFLE_DECK:
+            case MSG_SHUFFLE_DECK: {
+//                int32_t player = LocalPlayer(reader.Read<uint8_t>());
+//                if(mainGame->dField.deck[player].size() < 2)
+//                    return true;
+//                bool rev = mainGame->dField.deck_reversed;
+//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+//                    mainGame->dField.deck_reversed = false;
+//                    if(rev) {
+//                        for (size_t i = 0; i < mainGame->dField.deck[player].size(); ++i)
+//                            mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
+//                        mainGame->WaitFrameSignal(10);
+//                    }
+//                }
+//                for (size_t i = 0; i < mainGame->dField.deck[player].size(); ++i) {
+//                    mainGame->dField.deck[player][i]->code = 0;
+//                    mainGame->dField.deck[player][i]->is_reversed = false;
+//                }
+//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+//                    for (int i = 0; i < 5; ++i) {
+//                        for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+//                            (*cit)->dPos = irr::core::vector3df(rand() * 0.4f / RAND_MAX - 0.2f, 0, 0);
+//                            (*cit)->dRot = irr::core::vector3df(0, 0, 0);
+//                            (*cit)->is_moving = true;
+//                            (*cit)->aniFrame = 3;
+//                        }
+//                        mainGame->WaitFrameSignal(3);
+//                        for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
+//                            mainGame->dField.MoveCard(*cit, 3);
+//                        mainGame->WaitFrameSignal(3);
+//                    }
+//                    mainGame->dField.deck_reversed = rev;
+//                    if(rev) {
+//                        for (size_t i = 0; i < mainGame->dField.deck[player].size(); ++i)
+//                            mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
+//                    }
+//                }
                 break;
-            case MSG_SHUFFLE_HAND:
+            }
+            case MSG_SHUFFLE_HAND: {
+//                int32_t player = LocalPlayer(reader.Read<uint8_t>());
+//                /*int count = */BufferIO::ReadInt8(pbuf);
+//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+//                    mainGame->WaitFrameSignal(5);
+//                    if(player == 1 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
+//                        bool flip = false;
+//                        for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
+//                            if((*cit)->code) {
+//                                (*cit)->dPos = irr::core::vector3df(0, 0, 0);
+//                                (*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
+//                                (*cit)->is_moving = true;
+//                                (*cit)->is_hovered = false;
+//                                (*cit)->aniFrame = 5;
+//                                flip = true;
+//                            }
+//                        if(flip)
+//                            mainGame->WaitFrameSignal(5);
+//                    }
+//                    for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+//                        (*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
+//                        (*cit)->dRot = irr::core::vector3df(0, 0, 0);
+//                        (*cit)->is_moving = true;
+//                        (*cit)->is_hovered = false;
+//                        (*cit)->aniFrame = 5;
+//                    }
+//                    mainGame->WaitFrameSignal(11);
+//                }
+//                for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
+//                    (*cit)->SetCode(BufferIO::ReadInt32(pbuf));
+//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+//                    for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+//                        (*cit)->is_hovered = false;
+//                        mainGame->dField.MoveCard(*cit, 5);
+//                    }
+//                    mainGame->WaitFrameSignal(5);
+//                }
                 break;
+            }
             case MSG_REFRESH_DECK:
                 break;
             case MSG_SWAP_GRAVE_DECK:
@@ -264,13 +337,22 @@ namespace ygopro
             case MSG_BECOME_TARGET:
                 break;
             case MSG_DRAW: {
-//                uint32_t playerid = reader.Read<uint8_t>();
-//                uint32_t count = reader.Read<uint8_t>();
-//                for(uint32_t i = 0; i < count; ++i) {
-//                    uint32_t data = reader.Read<uint32_t>();
-//                    cur_commands.InsertCommand(std::make_shared<DuelCmdDraw>(playerid, data));
-//                    cur_commands.InsertCommand(std::make_shared<DuelCmdWait>(0.5));
-//                }
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                uint32_t count = reader.Read<uint8_t>();
+                std::vector<std::shared_ptr<Action<int64_t>>> acts;
+                for(uint32_t i = 0; i < count; ++i) {
+                    uint32_t data = reader.Read<uint32_t>();
+                    acts.push_back(std::make_shared<ActionCallback<int64_t>>([playerid, count, data, this]() {
+                        auto pscene = duel_scene.lock();
+                        if(deck[playerid].empty())
+                            return;
+                        auto ptr = deck[playerid].back();
+                        MoveCard(ptr, playerid, LOCATION_HAND, 0, 0);
+                        UpdateHandpos(playerid, 500);
+                    }));
+                    acts.push_back(std::make_shared<ActionWait<int64>>(300));
+                }
+                PushMessageActions(acts);
                 break;
             }
             case MSG_DAMAGE:
@@ -329,39 +411,39 @@ namespace ygopro
                 break;
             case MSG_RELOAD_FIELD: {
                 for(int32_t p = 0; p < 2; ++p) {
-                    pscene->InitHp(p, reader.Read<int32_t>());
+                    InitHp(p, reader.Read<int32_t>());
                     for(int32_t i = 0; i < 5; ++i) {
                         uint32_t exist_card = reader.Read<uint8_t>();
                         if(exist_card) {
                             uint32_t pos = reader.Read<uint8_t>();
                             uint32_t sz = reader.Read<uint8_t>();
-                            pscene->AddCard(0, p, LOCATION_MZONE, i, pos);
+                            AddCard(0, p, LOCATION_MZONE, i, pos);
                             for(int32_t ov = 0; ov < sz; ++ov)
-                                pscene->AddCard(0, p, LOCATION_MZONE | LOCATION_OVERLAY, i, ov);
+                                AddCard(0, p, LOCATION_MZONE | LOCATION_OVERLAY, i, ov);
                         }
                     }
                     for(int32_t i = 0; i < 8; ++i) {
                         uint32_t exist_card = reader.Read<uint8_t>();
                         if(exist_card) {
                             uint32_t pos = reader.Read<uint8_t>();
-                            pscene->AddCard(0, p, LOCATION_SZONE, i, pos);
+                            AddCard(0, p, LOCATION_SZONE, i, pos);
                         }
                     }
                     int32_t main_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < main_sz; ++i)
-                        pscene->AddCard(0, p, LOCATION_DECK, i, POS_FACEDOWN);
+                        AddCard(0, p, LOCATION_DECK, i, POS_FACEDOWN);
                     int32_t hand_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < hand_sz; ++i)
-                        pscene->AddCard(0, p, LOCATION_HAND, i, POS_FACEDOWN);
+                        AddCard(0, p, LOCATION_HAND, i, POS_FACEDOWN);
                     int32_t grave_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < grave_sz; ++i)
-                        pscene->AddCard(0, p, LOCATION_GRAVE, i, POS_FACEUP);
+                        AddCard(0, p, LOCATION_GRAVE, i, POS_FACEUP);
                     int32_t remove_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < remove_sz; ++i)
-                        pscene->AddCard(0, p, LOCATION_REMOVED, i, POS_FACEUP);
+                        AddCard(0, p, LOCATION_REMOVED, i, POS_FACEUP);
                     int32_t extra_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < extra_sz; ++i)
-                        pscene->AddCard(0, p, LOCATION_EXTRA, i, POS_FACEDOWN);
+                        AddCard(0, p, LOCATION_EXTRA, i, POS_FACEDOWN);
                 }
                 int32_t chain_sz = reader.Read<uint8_t>();
                 for(int32_t i = 0; i < chain_sz; ++i) {
