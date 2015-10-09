@@ -420,11 +420,6 @@ namespace ygopro
         
     }
     
-    void DuelSceneHandler::UpdateHandpos(int32_t pid, int32_t tm) {
-        for(auto& iter : hand[pid])
-            iter->UpdatePosition(tm);
-    }
-    
     void DuelSceneHandler::ClearField() {
         for(int32_t i = 0; i < 2; ++i) {
             deck[i].clear();
@@ -437,8 +432,7 @@ namespace ygopro
             m_zone[i].resize(5);
             s_zone[i].resize(8);
         }
-        //fieldcard_renderer->ClearAllObjects();
-        ImageMgr::Get().UnloadAllCardTexture();
+        duel_scene.lock()->ClearAllCards();
     }
     
     void DuelSceneHandler::InitHp(int32_t local_pl, int32_t hp) {

@@ -13,10 +13,23 @@ namespace ygopro
     class FieldBlock;
     class FieldCard;
     class InfoPanel;
+    
     struct DuelMessage {
         uint8_t msg_type = 0;
         uint8_t* msg = nullptr;
         size_t len = 0;
+    };
+    
+    struct PositionInfo {
+        union {
+            uint32_t info;
+            struct {
+                uint8_t controler;
+                uint8_t location;
+                uint8_t sequence;
+                uint8_t extra;
+            };
+        };
     };
     
     extern int32_t host_player;
@@ -48,7 +61,6 @@ namespace ygopro
         std::shared_ptr<FieldCard> RemoveCard(int32_t side, int32_t zone, int32_t seq, int32_t subs);
         void MoveCard(std::shared_ptr<FieldCard> pcard, int32_t toside, int32_t tozone, int32_t toseq, int32_t tosubs);
         void ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos);
-        void UpdateHandpos(int32_t pid, int32_t tm);
         
         inline int32_t LocalPlayer(int32_t pid) { return (host_player == 0) ? pid : (1 - pid); }
         void ClearField();

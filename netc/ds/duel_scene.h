@@ -9,20 +9,21 @@
 namespace ygopro
 {
     
-    class FieldObject : public base::RenderUnit<vt3> {
+    template<typename VTYPE>
+    class DuelObject : public base::RenderUnit<VTYPE> {
     public:
-        virtual ~FieldObject() {}
+        virtual ~DuelObject() {}
         virtual bool CheckAvailable() { return true; }
         virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
         
-        inline void SetColor(uint32_t cl) { color = cl; SetUpdate(); }
-        inline void SetHL(uint32_t h) { hl = h; SetUpdate(); }
+        inline void SetColor(uint32_t cl) { color = cl; this->SetUpdate(); }
+        inline void SetHL(uint32_t h) { hl = h; this->SetUpdate(); }
         
         uint32_t color = 0xffffffff;
         uint32_t hl = 0;
     };
     
-    class FieldBlock : public FieldObject {
+    class FieldBlock : public DuelObject<vt3> {
     public:
         virtual int32_t GetTextureId();
         virtual void RefreshVertices();
@@ -44,7 +45,7 @@ namespace ygopro
         texf4 block_texture;
     };
     
-    class FieldCard : public FieldObject, public std::enable_shared_from_this<FieldCard> {
+    class FieldCard : public DuelObject<vt3>, public std::enable_shared_from_this<FieldCard> {
     public:
         virtual ~FieldCard();
         virtual int32_t GetTextureId();
@@ -80,6 +81,11 @@ namespace ygopro
         int32_t card_pos = 0;
         std::vector<std::shared_ptr<FieldCard>> attached_cards;
         std::shared_ptr<FieldCard> attaching_card;
+    };
+    
+    class FloatingNumber : public DuelObject<vt2>, public std::enable_shared_from_this<FieldCard> {
+    public:
+        
     };
     
     struct ViewParam {
@@ -141,11 +147,13 @@ namespace ygopro
         v3i GetHoverCardPos(v2i hp);
         std::shared_ptr<FieldCard> GetHoverCard(int32_t side, int32_t zone, int32_t seq);
         std::shared_ptr<FieldBlock> GetFieldBlock(int32_t x, int32_t y);
-        std::shared_ptr<FieldCard> CreateCard() {
+        
+        void ClearAllCards();
+        inline std::shared_ptr<FieldCard> CreateCard() {
             fieldcard_renderer->RequestRedraw();
             return fieldcard_renderer->NewSharedObject<FieldCard>();
         }
-        std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
+        inline std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
         
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;

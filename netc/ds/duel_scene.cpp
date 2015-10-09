@@ -629,4 +629,8 @@ namespace ygopro
         return nullptr;
     }
     
+    void DuelScene::ClearAllCards() {
+        fieldcard_renderer->ClearAllObjects();
+        ImageMgr::Get().UnloadAllCardTexture();
+    }
 }

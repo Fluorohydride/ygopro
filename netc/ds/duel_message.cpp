@@ -255,45 +255,54 @@ namespace ygopro
             case MSG_NEW_PHASE:
                 break;
             case MSG_MOVE: {
-//                uint32_t code = reader.Read<uint32_t>();
-//                uint32_t pcon = reader.Read<uint8_t>();
-//                uint32_t ploc = reader.Read<uint8_t>();
-//                uint32_t pseq = reader.Read<uint8_t>();
-//                uint32_t psubs = reader.Read<uint8_t>();
-//                uint32_t con = reader.Read<uint8_t>();
-//                uint32_t loc = reader.Read<uint8_t>();
-//                uint32_t seq = reader.Read<uint8_t>();
-//                uint32_t subs = reader.Read<uint8_t>();
-//                uint32_t reason = reader.Read<uint32_t>();
-//                auto ptr = pscene->GetCard(pcon, ploc, pseq, psubs);
-//                if(ptr != nullptr) {
-//                    if(code)
-//                        ptr->SetCode(code);
-//                    if((ploc & 0x80) && (loc & 0x80)) {
-//                        cur_commands.InsertCommand(std::make_shared<DuelCmdMove>(ptr, code, con, loc, seq, subs, reason));
-//                    } else if((ploc & 0x80) && !(loc & 0x80)) {
-//                        cur_commands.InsertCommand(std::make_shared<DuelCmdMove>(ptr, code, con, loc, seq, subs, reason));
-//                    } else if(!(ploc & 0x80) && (loc & 0x80)) {
-//                        auto attach_ptr = pscene->GetCard(con, loc, seq, subs);
-//                        if(attach_ptr) {
-//                            if(loc == LOCATION_EXTRA) {
-//
-//                            }
-//                        }
-//                    } else {
-//                        if(!ptr->attached_cards.empty()) {
-//                            if(ploc == LOCATION_EXTRA) {
-//                                for(auto pcard : ptr->attached_cards) {
-//                                    cur_commands.InsertCommand(std::make_shared<DuelCmdRefreshPos>(pcard, false, 0.5f));
-//                                    cur_commands.InsertCommand(std::make_shared<DuelCmdWait>(0.5f));
-//                                }
-//                                cur_commands.InsertCommand(std::make_shared<DuelCmdMove>(ptr, code, con, loc, seq, subs, reason));
-//                            } else {
-//
-//                            }
-//                        }
-//                    }
-//                }
+                uint32_t code = reader.Read<uint32_t>();
+                uint32_t pcon = reader.Read<uint8_t>();
+                uint32_t ploc = reader.Read<uint8_t>();
+                uint32_t pseq = reader.Read<uint8_t>();
+                uint32_t psubs = reader.Read<uint8_t>();
+                uint32_t con = reader.Read<uint8_t>();
+                uint32_t loc = reader.Read<uint8_t>();
+                uint32_t seq = reader.Read<uint8_t>();
+                uint32_t subs = reader.Read<uint8_t>();
+                uint32_t reason = reader.Read<uint32_t>();
+                auto ptr = GetCard(pcon, ploc, pseq, psubs);
+                if(ptr != nullptr) {
+                    if(code)
+                        ptr->SetCode(code);
+                    if((ploc & 0x80) && (loc & 0x80)) {
+                        MoveCard(ptr, con, loc, seq, subs);
+                        ptr->UpdatePosition(500);
+                        PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
+                    } else if((ploc & 0x80) && !(loc & 0x80)) {
+                        MoveCard(ptr, con, loc, seq, subs);
+                        ptr->UpdatePosition(500);
+                        PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
+                    } else if(!(ploc & 0x80) && (loc & 0x80)) {
+                        auto attach_card = GetCard(con, loc, seq, subs);
+                        if(attach_card) {
+                            if(loc != LOCATION_EXTRA) {
+                                MoveCard(ptr, con, loc, seq, subs);
+                                ptr->UpdatePosition(500);
+                                PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
+                            }
+                        }
+                    } else {
+                        if(!ptr->attached_cards.empty()) {
+                            if(ploc == LOCATION_EXTRA) {
+                                MoveCard(ptr, con, loc, seq, subs);
+                                for(auto olcard : ptr->attached_cards)
+                                    olcard->UpdatePosition(500);
+                                auto wait_action = std::make_shared<ActionWait<int64_t>>(500);
+                                auto update_action = std::make_shared<ActionCallback<int64_t>>([ptr](){ ptr->UpdatePosition(500); });
+                                PushMessageActions(wait_action, update_action);
+                            } else {
+                                MoveCard(ptr, con, loc, seq, subs);
+                                ptr->UpdatePosition(500);
+                                PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
+                            }
+                        }
+                    }
+                }
                 break;
             }
             case MSG_POS_CHANGE:
@@ -348,7 +357,8 @@ namespace ygopro
                             return;
                         auto ptr = deck[playerid].back();
                         MoveCard(ptr, playerid, LOCATION_HAND, 0, 0);
-                        UpdateHandpos(playerid, 500);
+                        for(auto& iter : hand[playerid])
+                            iter->UpdatePosition(500);
                     }));
                     acts.push_back(std::make_shared<ActionWait<int64>>(300));
                 }
