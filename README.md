@@ -6,8 +6,14 @@ A script engine for "yu-gi-oh!" and sample gui
 * A: Holding down this buton will let the system stop at every timing.
 * S: Holding down this butoon will let the system skip every timing.
 * R: Fix the font error.
-* F1~F3: Show the cards in your grave, banished zone, extra deck.
-* F5~F7: Show the cards in your opponent's grave, banished zone, extra deck.
+* F1~F4: Show the cards in your grave, banished zone, extra deck, xyz materials.
+* F5~F8: Show the cards in your opponent's grave, banished zone, extra deck, xyz materials.
+
+###Color:
+* Background: 
+* White = your card, Grey = your opponent's card
+* Text: 
+* Black = default, Blue = the owner of the xyz material is different from its controller
 
 ###Sequence:
 * Monster Zone: 1~5, starting from the left hand side.
