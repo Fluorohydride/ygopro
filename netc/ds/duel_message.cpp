@@ -12,7 +12,6 @@ namespace ygopro
 {
     
     int32_t DuelSceneHandler::SolveMessage(uint8_t msg_type, BufferUtil& reader) {
-        auto pscene = duel_scene.lock();
         switch(msg_type) {
             case MSG_RETRY:
                 break;
@@ -202,8 +201,11 @@ namespace ygopro
                 break;
             }
             case MSG_SHUFFLE_HAND: {
-//                int32_t player = LocalPlayer(reader.Read<uint8_t>());
-//                /*int count = */BufferIO::ReadInt8(pbuf);
+                int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                /*int32_t count = */reader.Read<uint8_t>();
+                for(auto& pcard : hand[playerid]) {
+                    
+                }
 //                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 //                    mainGame->WaitFrameSignal(5);
 //                    if(player == 1 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
@@ -255,48 +257,48 @@ namespace ygopro
             case MSG_NEW_PHASE:
                 break;
             case MSG_MOVE: {
+                CardPosInfo pi_from, pi_to;
                 uint32_t code = reader.Read<uint32_t>();
-                uint32_t pcon = reader.Read<uint8_t>();
-                uint32_t ploc = reader.Read<uint8_t>();
-                uint32_t pseq = reader.Read<uint8_t>();
-                uint32_t psubs = reader.Read<uint8_t>();
-                uint32_t con = reader.Read<uint8_t>();
-                uint32_t loc = reader.Read<uint8_t>();
-                uint32_t seq = reader.Read<uint8_t>();
-                uint32_t subs = reader.Read<uint8_t>();
+                pi_from.info = reader.Read<int32_t>();
+                pi_to.info = reader.Read<int32_t>();
                 uint32_t reason = reader.Read<uint32_t>();
-                auto ptr = GetCard(pcon, ploc, pseq, psubs);
+                auto ptr = GetCard(pi_from);
                 if(ptr != nullptr) {
                     if(code)
                         ptr->SetCode(code);
-                    if((ploc & 0x80) && (loc & 0x80)) {
-                        MoveCard(ptr, con, loc, seq, subs);
+                    ptr->reason = reason;
+                    if(pi_from.location == 0) {
+                        
+                    } else if(pi_to.location == 0) {
+                        
+                    } else if((pi_from.location & 0x80) && (pi_to.location & 0x80)) {
+                        MoveCard(ptr, pi_to);
                         ptr->UpdatePosition(500);
                         PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
-                    } else if((ploc & 0x80) && !(loc & 0x80)) {
-                        MoveCard(ptr, con, loc, seq, subs);
+                    } else if((pi_from.location & 0x80) && !(pi_to.location & 0x80)) {
+                        MoveCard(ptr, pi_to);
                         ptr->UpdatePosition(500);
                         PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
-                    } else if(!(ploc & 0x80) && (loc & 0x80)) {
-                        auto attach_card = GetCard(con, loc, seq, subs);
+                    } else if(!(pi_from.location & 0x80) && (pi_to.location & 0x80)) {
+                        auto attach_card = GetCard(pi_to);
                         if(attach_card) {
-                            if(loc != LOCATION_EXTRA) {
-                                MoveCard(ptr, con, loc, seq, subs);
+                            if(pi_to.location != LOCATION_EXTRA) {
+                                MoveCard(ptr, pi_to);
                                 ptr->UpdatePosition(500);
                                 PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
                             }
                         }
                     } else {
                         if(!ptr->attached_cards.empty()) {
-                            if(ploc == LOCATION_EXTRA) {
-                                MoveCard(ptr, con, loc, seq, subs);
+                            if(pi_from.location == LOCATION_EXTRA) {
+                                MoveCard(ptr, pi_to);
                                 for(auto olcard : ptr->attached_cards)
                                     olcard->UpdatePosition(500);
                                 auto wait_action = std::make_shared<ActionWait<int64_t>>(500);
                                 auto update_action = std::make_shared<ActionCallback<int64_t>>([ptr](){ ptr->UpdatePosition(500); });
                                 PushMessageActions(wait_action, update_action);
                             } else {
-                                MoveCard(ptr, con, loc, seq, subs);
+                                MoveCard(ptr, pi_to);
                                 ptr->UpdatePosition(500);
                                 PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
                             }
@@ -352,11 +354,10 @@ namespace ygopro
                 for(uint32_t i = 0; i < count; ++i) {
                     uint32_t data = reader.Read<uint32_t>();
                     acts.push_back(std::make_shared<ActionCallback<int64_t>>([playerid, count, data, this]() {
-                        auto pscene = duel_scene.lock();
                         if(deck[playerid].empty())
                             return;
                         auto ptr = deck[playerid].back();
-                        MoveCard(ptr, playerid, LOCATION_HAND, 0, 0);
+                        MoveCard(ptr, CardPosInfo(playerid, LOCATION_HAND, 0, 0));
                         for(auto& iter : hand[playerid])
                             iter->UpdatePosition(500);
                     }));
@@ -427,33 +428,33 @@ namespace ygopro
                         if(exist_card) {
                             uint32_t pos = reader.Read<uint8_t>();
                             uint32_t sz = reader.Read<uint8_t>();
-                            AddCard(0, p, LOCATION_MZONE, i, pos);
+                            AddCard(0, CardPosInfo(p, LOCATION_MZONE, i, pos));
                             for(int32_t ov = 0; ov < sz; ++ov)
-                                AddCard(0, p, LOCATION_MZONE | LOCATION_OVERLAY, i, ov);
+                                AddCard(0, CardPosInfo(p, LOCATION_MZONE | LOCATION_OVERLAY, i, ov));
                         }
                     }
                     for(int32_t i = 0; i < 8; ++i) {
                         uint32_t exist_card = reader.Read<uint8_t>();
                         if(exist_card) {
                             uint32_t pos = reader.Read<uint8_t>();
-                            AddCard(0, p, LOCATION_SZONE, i, pos);
+                            AddCard(0, CardPosInfo(p, LOCATION_SZONE, i, pos));
                         }
                     }
                     int32_t main_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < main_sz; ++i)
-                        AddCard(0, p, LOCATION_DECK, i, POS_FACEDOWN);
+                        AddCard(0, CardPosInfo(p, LOCATION_DECK, i, POS_FACEDOWN));
                     int32_t hand_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < hand_sz; ++i)
-                        AddCard(0, p, LOCATION_HAND, i, POS_FACEDOWN);
+                        AddCard(0, CardPosInfo(p, LOCATION_HAND, i, POS_FACEDOWN));
                     int32_t grave_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < grave_sz; ++i)
-                        AddCard(0, p, LOCATION_GRAVE, i, POS_FACEUP);
+                        AddCard(0, CardPosInfo(p, LOCATION_GRAVE, i, POS_FACEUP));
                     int32_t remove_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < remove_sz; ++i)
-                        AddCard(0, p, LOCATION_REMOVED, i, POS_FACEUP);
+                        AddCard(0, CardPosInfo(p, LOCATION_REMOVED, i, POS_FACEUP));
                     int32_t extra_sz = reader.Read<uint8_t>();
                     for(int32_t i = 0; i < extra_sz; ++i)
-                        AddCard(0, p, LOCATION_EXTRA, i, POS_FACEDOWN);
+                        AddCard(0, CardPosInfo(p, LOCATION_EXTRA, i, POS_FACEDOWN));
                 }
                 int32_t chain_sz = reader.Read<uint8_t>();
                 for(int32_t i = 0; i < chain_sz; ++i) {

@@ -19,8 +19,10 @@ namespace ygopro
     }
     
     void SceneMgr::Uninit() {
-        if(current_scene != nullptr)
+        if(current_scene != nullptr) {
+            current_scene->Terminate();
             current_scene.reset();
+        }
     }
     
     bool SceneMgr::Update() {

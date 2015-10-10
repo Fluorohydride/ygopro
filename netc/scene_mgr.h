@@ -12,6 +12,7 @@ namespace ygopro
     class SceneHandler {
     public:
         virtual void BeginHandler() = 0;
+        virtual void EndHandler() = 0;
         virtual bool UpdateHandler() = 0;
         virtual void MouseMove(int32_t x, int32_t y) = 0;
         virtual void MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y) = 0;
@@ -33,7 +34,6 @@ namespace ygopro
         virtual bool IsActive() { return is_active; }
         virtual void Exit() { is_active = false; }
         
-        inline void SetSceneHandler(std::shared_ptr<SceneHandler> sh) { scene_handler = sh; }
         inline std::shared_ptr<SceneHandler> GetSceneHandler() { return scene_handler; }
         
     protected:

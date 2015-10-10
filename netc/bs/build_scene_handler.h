@@ -14,9 +14,10 @@ namespace ygopro
     
     class BuildSceneHandler : public SceneHandler {
     public:
-        BuildSceneHandler(std::shared_ptr<BuildScene> pscene);
+        BuildSceneHandler(BuildScene* pscene);
         ~BuildSceneHandler();
         virtual void BeginHandler();
+        virtual void EndHandler();
         virtual bool UpdateHandler();
         virtual void MouseMove(int32_t x, int32_t y);
         virtual void MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y);
@@ -39,7 +40,7 @@ namespace ygopro
         void Search(const FilterCondition& fc, int32_t lmt);
         
     protected:
-        std::weak_ptr<BuildScene> build_scene;
+        BuildScene* build_scene = nullptr;
         
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;

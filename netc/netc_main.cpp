@@ -204,10 +204,7 @@ int32_t main(int32_t argc, char* argv[]) {
 //    SceneMgr::Get().SetScene(sc);
     
     auto sc = std::make_shared<DuelScene>(_2dshader.get(), _3dshader.get());
-    auto sh = std::make_shared<DuelSceneHandler>(sc);
-//    auto ph = std::make_shared<DuelProtoTcp>();
-//    sh->SetProtoHandler(ph);
-    sc->SetSceneHandler(sh);
+
     SceneMgr::Get().SetScene(sc);
     SceneMgr::Get().InitFrameControler();
     SceneMgr::Get().SetFrameRate(60);

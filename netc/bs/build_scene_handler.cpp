@@ -9,7 +9,7 @@
 namespace ygopro
 {
     
-    BuildSceneHandler::BuildSceneHandler(std::shared_ptr<BuildScene> pscene) {
+    BuildSceneHandler::BuildSceneHandler(BuildScene* pscene) {
         build_scene = pscene;
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
@@ -19,7 +19,6 @@ namespace ygopro
     }
     
     BuildSceneHandler::~BuildSceneHandler() {
-        sgui::SGGUIRoot::GetSingleton().event_key_down.Remove(this);
     }
     
     void BuildSceneHandler::BeginHandler() {
@@ -62,7 +61,7 @@ namespace ygopro
                 limit_reg->SetSelection(0);
                 limit_reg->event_sel_change += [this](sgui::SGWidget& sender, int32_t index)->bool {
                     auto v = view_regulation;
-                    build_scene.lock()->ChangeRegulation(index, view_regulation);
+                    build_scene->ChangeRegulation(index, view_regulation);
                     view_regulation = v;
                     return true;
                 };
@@ -107,17 +106,20 @@ namespace ygopro
         page_count = rc.x * rc.y;
     }
     
+    void BuildSceneHandler::EndHandler() {
+        sgui::SGGUIRoot::GetSingleton().event_key_down.Remove(this);
+    }
+    
     bool BuildSceneHandler::UpdateHandler() {
         if(show_info_time) {
-            auto pscene = build_scene.lock();
             auto now = SceneMgr::Get().GetSysClock();
             if(now - show_info_time >= 500) {
                 show_info_time = 0;
                 auto mp = SceneMgr::Get().GetMousePosition();
-                auto cur = pscene->GetHoverPos(mp.x, mp.y);
+                auto cur = build_scene->GetHoverPos(mp.x, mp.y);
                 click_pos.first = CardLocation::Null;
                 if(cur == hover_pos) {
-                    auto ptr = pscene->GetCard(hover_pos.first, hover_pos.second);
+                    auto ptr = build_scene->GetCard(hover_pos.first, hover_pos.second);
                     if(ptr)
                         info_panel->ShowInfo(ptr->data->code);
                 }
@@ -127,14 +129,13 @@ namespace ygopro
     }
     
     void BuildSceneHandler::MouseMove(int32_t x, int32_t y) {
-        auto pscene = build_scene.lock();
         auto pre = hover_obj.lock();
-        auto hov = pscene->GetHoverPos(x, y);
-        auto dcd = pscene->GetCard(hov.first, hov.second);
+        auto hov = build_scene->GetHoverPos(x, y);
+        auto dcd = build_scene->GetCard(hov.first, hov.second);
         if(dcd != pre) {
             if(pre) {
                 if(hover_pos.first == CardLocation::Result)
-                    pscene->HighlightCancel();
+                    build_scene->HighlightCancel();
                 pre->builder_card->SetHL(0);
                 SceneMgr::Get().RemoveAction(pre->builder_card.get(), 1);
             }
@@ -150,7 +151,7 @@ namespace ygopro
                 if(info_panel->IsOpen())
                     show_info_time = SceneMgr::Get().GetSysClock() - 200;
                 if(hov.first == CardLocation::Result)
-                    pscene->HighlightCode(dcd->data->GetRawCode());
+                    build_scene->HighlightCode(dcd->data->GetRawCode());
             }
         }
         hover_pos = hov;
@@ -168,7 +169,6 @@ namespace ygopro
             show_info_time = 0;
         if(hover_pos != click_pos)
             return;
-        auto pscene = build_scene.lock().get();
         click_pos.first = CardLocation::Null;
         CardLocation pos = hover_pos.first;
         int32_t index = hover_pos.second;
@@ -176,20 +176,20 @@ namespace ygopro
             if(index < 0)
                 return;
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
-                pscene->MoveCard(pos, index);
+                build_scene->MoveCard(pos, index);
                 SetDeckEdited();
                 MouseMove(SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y);
             } else {
-                PopupMenu::Load("menu build popup", SceneMgr::Get().GetMousePosition(), [this, pscene, pos, index](int32_t id) {
+                PopupMenu::Load("menu build popup", SceneMgr::Get().GetMousePosition(), [this, pos, index](int32_t id) {
                     switch(id) {
                         case 0:
-                            pscene->RemoveCard(pos, index);
+                            build_scene->RemoveCard(pos, index);
                             SetDeckEdited();
                             break;
                         case 1: {
-                            auto pcard = pscene->GetCard(pos, index);
+                            auto pcard = build_scene->GetCard(pos, index);
                             if(pcard) {
-                                pscene->InsertCardFromPos(pcard->data->code, pcard->builder_card->pos, pos == CardLocation::Side);
+                                build_scene->InsertCardFromPos(pcard->data->code, pcard->builder_card->pos, pos == CardLocation::Side);
                                 SetDeckEdited();
                                 auto pt = SceneMgr::Get().GetMousePosition();
                                 MouseMove(pt.x, pt.y);
@@ -200,7 +200,7 @@ namespace ygopro
                 });
             }
         } else if(pos == CardLocation::Result) {
-            pscene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);
+            build_scene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);
         }
     }
     
@@ -209,23 +209,22 @@ namespace ygopro
     }
     
     void BuildSceneHandler::KeyDown(int32_t key, int32_t mods) {
-        auto pscene = build_scene.lock();
         switch(key) {
             case GLFW_KEY_1:
                 if(mods & GLFW_MOD_CONTROL)
-                    pscene->SortDeck();
+                    build_scene->SortDeck();
                 else if(mods & GLFW_MOD_ALT)
                     ViewRegulation(0);
                 break;
             case GLFW_KEY_2:
                 if(mods & GLFW_MOD_CONTROL)
-                    pscene->ShuffleDeck();
+                    build_scene->ShuffleDeck();
                 else if(mods & GLFW_MOD_ALT)
                     ViewRegulation(1);
                 break;
             case GLFW_KEY_3:
                 if(mods & GLFW_MOD_CONTROL) {
-                    pscene->ClearDeck();
+                    build_scene->ClearDeck();
                     SetDeckEdited();
                 } else if(mods & GLFW_MOD_ALT)
                     ViewRegulation(2);
@@ -233,16 +232,15 @@ namespace ygopro
             case GLFW_KEY_C:
                 if(mods & GLFW_MOD_CONTROL) {
                     std::string deck_string;
-                    deck_string.append("ydk://").append(build_scene.lock()->SaveDeckToString());
+                    deck_string.append("ydk://").append(build_scene->SaveDeckToString());
                     glfwSetClipboardString(nullptr, deck_string.c_str());
                     MessageBox::ShowOK(L"", To<std::wstring>(stringCfg["eui_msg_deck_tostr_ok"].to_string()), nullptr);
                 }
                 break;
             case GLFW_KEY_V:
                 if(mods & GLFW_MOD_CONTROL) {
-                    auto pscene = build_scene.lock();
                     std::string deck_string = glfwGetClipboardString(nullptr);
-                    if(pscene->LoadDeckFromString(deck_string)) {
+                    if(build_scene->LoadDeckFromString(deck_string)) {
                         SetDeckEdited();
                         StopViewRegulation();
                     }                    
@@ -258,7 +256,7 @@ namespace ygopro
     }
     
     void BuildSceneHandler::ViewRegulation(int32_t limit) {
-        build_scene.lock()->ViewRegulation(limit);
+        build_scene->ViewRegulation(limit);
         view_regulation = limit + 1;
         current_file.clear();
         deck_edited = false;
@@ -289,7 +287,7 @@ namespace ygopro
                 file_dialog->Show(To<std::wstring>(stringCfg["eui_msg_deck_load"].to_string()), To<std::wstring>(commonCfg["deck_path"].to_string()), L".ydk");
                 file_dialog->SetOKCallback([this](const std::wstring& deck_file)->void {
                     if(deck_edited || deck_file != current_file) {
-                        build_scene.lock()->LoadDeckFromFile(deck_file);
+                        build_scene->LoadDeckFromFile(deck_file);
                         current_file = deck_file;
                         deck_edited = false;
                         view_regulation = 0;
@@ -301,14 +299,14 @@ namespace ygopro
                 if(current_file.length() == 0) {
                     file_dialog->Show(To<std::wstring>(stringCfg["eui_msg_deck_save"].to_string()), To<std::wstring>(commonCfg["deck_path"].to_string()), L".ydk");
                     file_dialog->SetOKCallback([this](const std::wstring& deck_file)->void {
-                        if(build_scene.lock()->SaveDeckToFile(deck_file)) {
+                        if(build_scene->SaveDeckToFile(deck_file)) {
                             current_file = deck_file;
                             deck_edited = false;
                             SetDeckLabel(std::wstring(L"\ue08c").append(current_file), 0xff000000);
                         }
                     });
                 } else {
-                    if(build_scene.lock()->SaveDeckToFile(current_file)) {
+                    if(build_scene->SaveDeckToFile(current_file)) {
                         deck_edited = false;
                         SetDeckLabel(std::wstring(L"\ue08c").append(current_file), 0xff000000);
                     }
@@ -317,7 +315,7 @@ namespace ygopro
             case 2:
                 file_dialog->Show(To<std::wstring>(stringCfg["eui_msg_deck_save"].to_string()), To<std::wstring>(commonCfg["deck_path"].to_string()), L".ydk");
                 file_dialog->SetOKCallback([this](const std::wstring& deck_file)->void {
-                    if(build_scene.lock()->SaveDeckToFile(deck_file)) {
+                    if(build_scene->SaveDeckToFile(deck_file)) {
                         current_file = deck_file;
                         deck_edited = false;
                         SetDeckLabel(std::wstring(L"\ue08c").append(current_file), 0xff000000);
@@ -326,13 +324,13 @@ namespace ygopro
                 break;
             case 3: {
                 std::string deck_string = glfwGetClipboardString(nullptr);
-                build_scene.lock()->LoadDeckFromString(deck_string);
+                build_scene->LoadDeckFromString(deck_string);
                 view_regulation = 0;
             }
                 break;
             case 4: {
                 std::string deck_string;
-                deck_string.append("ydk://").append(build_scene.lock()->SaveDeckToString());
+                deck_string.append("ydk://").append(build_scene->SaveDeckToString());
                 glfwSetClipboardString(nullptr, deck_string.c_str());
                 MessageBox::ShowOK(L"", To<std::wstring>(stringCfg["eui_msg_deck_tostr_ok"].to_string()), nullptr);
             }
@@ -345,18 +343,18 @@ namespace ygopro
     void BuildSceneHandler::OnMenuTool(int32_t id) {
         switch(id) {
             case 0:
-                build_scene.lock()->SortDeck();
+                build_scene->SortDeck();
                 break;
             case 1:
-                build_scene.lock()->ShuffleDeck();
+                build_scene->ShuffleDeck();
                 break;
             case 2:
-                build_scene.lock()->ClearDeck();
+                build_scene->ClearDeck();
                 SetDeckEdited();
                 break;
             case 3: {
                 std::wstring neturl = To<std::wstring>(commonCfg["deck_neturl"].to_string());
-                std::wstring deck_string = To<std::wstring>(build_scene.lock()->SaveDeckToString());
+                std::wstring deck_string = To<std::wstring>(build_scene->SaveDeckToString());
                 auto ntpos = neturl.find(L"{amp}");
                 while(ntpos != std::wstring::npos) {
                     neturl.replace(ntpos, 5, L"&");
@@ -420,7 +418,7 @@ namespace ygopro
             else
                 new_results[i] = nullptr;
         }
-        build_scene.lock()->UpdateResult(new_results);
+        build_scene->UpdateResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
             int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
@@ -441,7 +439,7 @@ namespace ygopro
             else
                 new_results[i] = nullptr;
         }
-        build_scene.lock()->UpdateResult(new_results);
+        build_scene->UpdateResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
             int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / page_count) + 1;
@@ -465,7 +463,7 @@ namespace ygopro
             else
                 new_results[i] = nullptr;
         }
-        build_scene.lock()->UpdateResult(new_results);
+        build_scene->UpdateResult(new_results);
         auto ptr = label_result.lock();
         if(ptr != nullptr) {
             std::wstring s = To<std::wstring>(stringCfg["eui_filter_count"].to_string());

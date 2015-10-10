@@ -20,16 +20,24 @@ namespace ygopro
         size_t len = 0;
     };
     
-    struct PositionInfo {
+    struct CardPosInfo {
+        CardPosInfo() {}
+        CardPosInfo(int8_t c, int8_t l, int8_t s, int8_t ps) : controler(c), location(l), sequence(s), position(ps) {}
+        
         union {
-            uint32_t info;
             struct {
-                uint8_t controler;
-                uint8_t location;
-                uint8_t sequence;
-                uint8_t extra;
+                int8_t controler;
+                int8_t location;
+                int8_t sequence;
+                union {
+                    int8_t position;
+                    int8_t subsequence;
+                };
             };
+            int32_t info;
         };
+        
+        bool operator == (CardPosInfo& p) { return info == p.info; }
     };
     
     extern int32_t host_player;
@@ -44,9 +52,10 @@ namespace ygopro
     
     class DuelSceneHandler : public SceneHandler {
     public:
-        DuelSceneHandler(std::shared_ptr<DuelScene> pscene);
+        DuelSceneHandler(DuelScene* pscene);
         ~DuelSceneHandler();
         virtual void BeginHandler();
+        virtual void EndHandler();
         virtual bool UpdateHandler();
         virtual void MouseMove(int32_t x, int32_t y);
         virtual void MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y);
@@ -56,10 +65,10 @@ namespace ygopro
         virtual void KeyUp(int32_t key, int32_t mods);
         
         void InitField();
-        std::shared_ptr<FieldCard> AddCard(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs);
-        std::shared_ptr<FieldCard> GetCard(int32_t side, int32_t zone, int32_t seq, int32_t subs);
-        std::shared_ptr<FieldCard> RemoveCard(int32_t side, int32_t zone, int32_t seq, int32_t subs);
-        void MoveCard(std::shared_ptr<FieldCard> pcard, int32_t toside, int32_t tozone, int32_t toseq, int32_t tosubs);
+        std::shared_ptr<FieldCard> AddCard(uint32_t code, CardPosInfo pos_info);
+        std::shared_ptr<FieldCard> GetCard(CardPosInfo pos_info);
+        std::shared_ptr<FieldCard> RemoveCard(CardPosInfo pos_info);
+        void MoveCard(std::shared_ptr<FieldCard> pcard, CardPosInfo pos_info);
         void ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos);
         
         inline int32_t LocalPlayer(int32_t pid) { return (host_player == 0) ? pid : (1 - pid); }
@@ -86,7 +95,7 @@ namespace ygopro
         int32_t SolveMessage(uint8_t msg_type, BufferUtil& reader);
         
     protected:
-        std::weak_ptr<DuelScene> duel_scene;
+        DuelScene* duel_scene = nullptr;
         
         bool btnDown[2] = {false};
         v2i btnPos[2];

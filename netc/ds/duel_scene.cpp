@@ -4,7 +4,6 @@
 #include "../image_mgr.h"
 #include "../config.h"
 
-#include "duel_scene_handler.h"
 #include "duel_scene.h"
 
 namespace ygopro
@@ -107,11 +106,11 @@ namespace ygopro
         // POS_FACEDOWN_DEFENCE     0x8
         v3f tl = {0.0f, 0.0f, 0.0f};
         glm::quat rot = {0.0f, 0.0f, 0.0f, 0.0f};
-        int32_t side = attaching_card ? attaching_card->card_side : card_side;
-        int32_t loc = attaching_card ? attaching_card->card_loc : card_loc;
-        int32_t seq = attaching_card ? attaching_card->card_seq : card_seq;
-        int32_t pos = attaching_card ? 0x5 : card_pos;
-        int32_t subs = card_pos;
+        int32_t side = attaching_card ? attaching_card->pos_info.controler : pos_info.controler;
+        int32_t loc = attaching_card ? attaching_card->pos_info.location : pos_info.location;
+        int32_t seq = attaching_card ? attaching_card->pos_info.sequence : pos_info.sequence;
+        int32_t pos = attaching_card ? 0x5 : pos_info.position;
+        int32_t subs = pos_info.subsequence;
         switch(loc) {
             case 0x1: { //deck
                 auto fb_pos = field_blocks[side][13]->GetCenter();
@@ -285,18 +284,18 @@ namespace ygopro
         target->attached_cards.push_back(shared_from_this());
         int32_t i = 0;
         for(auto pcard : target->attached_cards)
-            pcard->card_pos = i++;
-        card_pos = (int32_t)target->attached_cards.size() - 1;
+            pcard->pos_info.subsequence = i++;
+        pos_info.subsequence = (int32_t)target->attached_cards.size() - 1;
     }
     
     void FieldCard::Detach() {
         if(!attaching_card)
             return;
         auto target = attaching_card;
-        target->attached_cards.erase(target->attached_cards.begin() + card_pos);
+        target->attached_cards.erase(target->attached_cards.begin() + pos_info.subsequence);
         int32_t i = 0;
         for(auto pcard : target->attached_cards)
-            pcard->card_pos = i++;
+            pcard->pos_info.subsequence = i++;
         attaching_card = nullptr;
     }
 
@@ -385,23 +384,23 @@ namespace ygopro
         PushObject(sgui::SGGUIRoot::GetSingleton());
         bg_renderer->ClearVertices();
         bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), rectf{-1.0f, 1.0f, 2.0f, -2.0f}, ImageMgr::Get().GetTexture("bg"));
+        scene_handler = std::make_shared<DuelSceneHandler>(this);
     }
     
     DuelScene::~DuelScene() {
     }
     
     void DuelScene::Activate() {
-        if(scene_handler)
-            scene_handler->BeginHandler();
+        scene_handler->BeginHandler();
     }
     
     void DuelScene::Terminate() {
+        scene_handler->EndHandler();
         sgui::SGGUIRoot::GetSingleton().ClearChilds();
     }
     
     bool DuelScene::Update() {
-        if(scene_handler)
-            scene_handler->UpdateHandler();
+        scene_handler->UpdateHandler();
         return IsActive();
     }
     
@@ -583,11 +582,11 @@ namespace ygopro
         return {0, 0};
     }
     
-    v3i DuelScene::GetHoverCardPos(v2i hp) {
+    CardPosInfo DuelScene::GetHoverCardPos(v2i hp) {
         if(hp.x == 0)
-            return {0, 0, 0};
+            return CardPosInfo(0, 0, 0, 0);
         if(hp.x > 2)
-            return {hp.x - 3, 0x2, hp.y};
+            return CardPosInfo(hp.x - 3, 0x2, hp.y, 0);
         int32_t side = hp.x - 1;
         int32_t loc = 0, seq = 0;
         if(hp.y < 5) {
@@ -604,20 +603,20 @@ namespace ygopro
                 case 16: loc = 0x20; break;
             }
         }
-        return {side, loc, seq};
+        return CardPosInfo(side, loc, seq, 0);
     }
     
-    std::shared_ptr<FieldCard> DuelScene::GetHoverCard(int32_t side, int32_t zone, int32_t seq) {
-        if(zone == 0)
+    std::shared_ptr<FieldCard> DuelScene::GetHoverCard(CardPosInfo pos_info) {
+        if(pos_info.location == 0)
             return nullptr;
-        switch(zone) {
-            case 0x1: return deck[side].empty() ? nullptr : deck[side].back();
-            case 0x2: return hand[side].empty() ? nullptr : hand[side][seq];
-            case 0x4: return m_zone[side][seq];
-            case 0x8: return s_zone[side][seq];
-            case 0x10: return grave[side].empty() ? nullptr : grave[side].back();
-            case 0x20: return banished[side].empty() ? nullptr : banished[side].back();
-            case 0x40: return extra[side].empty() ? nullptr : extra[side].back();
+        switch(pos_info.location) {
+            case 0x1: return deck[pos_info.controler].empty() ? nullptr : deck[pos_info.controler].back();
+            case 0x2: return hand[pos_info.controler].empty() ? nullptr : hand[pos_info.controler][pos_info.sequence];
+            case 0x4: return m_zone[pos_info.controler][pos_info.sequence];
+            case 0x8: return s_zone[pos_info.controler][pos_info.sequence];
+            case 0x10: return grave[pos_info.controler].empty() ? nullptr : grave[pos_info.controler].back();
+            case 0x20: return banished[pos_info.controler].empty() ? nullptr : banished[pos_info.controler].back();
+            case 0x40: return extra[pos_info.controler].empty() ? nullptr : extra[pos_info.controler].back();
         }
         return nullptr;
     }

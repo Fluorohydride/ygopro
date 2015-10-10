@@ -174,24 +174,24 @@ namespace ygopro
         PushObject(sgui::SGGUIRoot::GetSingleton());
         bg_renderer->ClearVertices();
         bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), rectf{-1.0f, 1.0f, 2.0f, -2.0f}, ImageMgr::Get().GetTexture("bg"));
+        scene_handler = std::make_shared<BuildSceneHandler>(this);
     }
     
     BuildScene::~BuildScene() {
     }
     
     void BuildScene::Activate() {
-        if(scene_handler)
-            scene_handler->BeginHandler();
+        scene_handler->BeginHandler();
         RefreshAllCard();
     }
     
     void BuildScene::Terminate() {
+        scene_handler->EndHandler();
         sgui::SGGUIRoot::GetSingleton().ClearChilds();
     }
     
     bool BuildScene::Update() {
-        if(scene_handler)
-            scene_handler->UpdateHandler();
+        scene_handler->UpdateHandler();
         return IsActive();
     }
     
