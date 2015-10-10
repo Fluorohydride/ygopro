@@ -741,10 +741,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						if(selectable_cards[i + pos]->is_conti)
 							myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
-						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY)
+						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
 								dataManager.FormatLocation(selectable_cards[i + pos]->overlayTarget->location, selectable_cards[i + pos]->overlayTarget->sequence),
 								selectable_cards[i + pos]->overlayTarget->sequence + 1, selectable_cards[i + pos]->sequence + 1);
+						}
 						else
 							myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location, selectable_cards[i + pos]->sequence),
 								selectable_cards[i + pos]->sequence + 1);
@@ -1613,9 +1614,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_F1:
 		case irr::KEY_F2:
 		case irr::KEY_F3:
+		case irr::KEY_F4:
 		case irr::KEY_F5:
 		case irr::KEY_F6:
-		case irr::KEY_F7: {
+		case irr::KEY_F7:
+		case irr::KEY_F8: {
 			if(!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isStarted
 					&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
 				int loc_id = 0;
@@ -1636,6 +1639,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						for(int32 i = (int32)extra[0].size() - 1; i >= 0 ; --i)
 							display_cards.push_back(extra[0][i]);
 						break;
+					case irr::KEY_F4:
+						loc_id = 1007;
+						for(int32 i = 0; i <= 4 ; ++i) {
+							if(mzone[0][i] && mzone[0][i]->overlayed.size()) {
+								for(int32 j = 0; j <= (int32)mzone[0][i]->overlayed.size() - 1 ; ++j)
+									display_cards.push_back(mzone[0][i]->overlayed[j]);
+							}
+						}
+						break;
 					case irr::KEY_F5:
 						loc_id = 1004;
 						for(int32 i = (int32)grave[1].size() - 1; i >= 0 ; --i)
@@ -1650,6 +1662,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						loc_id = 1006;
 						for(int32 i = (int32)extra[1].size() - 1; i >= 0 ; --i)
 							display_cards.push_back(extra[1][i]);
+						break;
+					case irr::KEY_F8:
+						loc_id = 1007;
+						for(int32 i = 0; i <= 4 ; ++i) {
+							if(mzone[1][i] && mzone[1][i]->overlayed.size()) {
+								for(int32 j = 0; j <= (int32)mzone[1][i]->overlayed.size() - 1 ; ++j)
+									display_cards.push_back(mzone[1][i]->overlayed[j]);
+							}
+						}
 						break;
 				}
 				if(display_cards.size()) {
