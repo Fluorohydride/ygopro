@@ -18,7 +18,7 @@ A script engine for "yu-gi-oh!" and sample gui
 ###Sequence:
 * Monster Zone: 1~5, starting from the left hand side.
 * Spell & Trap Zone: 1~5, starting from the left hand side.
-* Spell Zone: 6
+* Field Zone: 6
 * Pendulum Zone: 7~8, starting from the left hand side.
 * The others: 1~n, starting from the bottom.
 

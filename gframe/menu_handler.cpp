@@ -307,7 +307,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
-					                   mainGame->gameConf.lastdeck, 20);
+					                   mainGame->gameConf.lastdeck, 64);
 					char deckbuf[1024];
 					char* pdeck = deckbuf;
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
