@@ -54,7 +54,8 @@ namespace ygopro
         virtual void RefreshVertices();
         
         void SetCode(uint32_t code);
-        std::pair<v3f, glm::quat> GetPositionInfo();
+        std::pair<v3f, glm::quat> GetPositionInfo(int32_t param = 0);
+        void UpdatePosition(int32_t tm, std::pair<v3f, glm::quat> npos);
         void UpdatePosition(int32_t tm);
         
         void Attach(std::shared_ptr<FieldCard> target);

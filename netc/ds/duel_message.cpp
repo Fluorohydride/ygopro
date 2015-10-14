@@ -203,43 +203,58 @@ namespace ygopro
             case MSG_SHUFFLE_HAND: {
                 int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 /*int32_t count = */reader.Read<uint8_t>();
+                std::vector<uint32_t> code_after_shuffle;
+                bool need_flip = false;
                 for(auto& pcard : hand[playerid]) {
-                    
+                    if(pcard->code == 0)
+                        need_flip = true;
+                    uint32_t ac = reader.Read<uint32_t>();
+                    if(ac == 0)
+                        need_flip = true;
+                    code_after_shuffle.push_back(ac);
                 }
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->WaitFrameSignal(5);
-//                    if(player == 1 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
-//                        bool flip = false;
-//                        for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
-//                            if((*cit)->code) {
-//                                (*cit)->dPos = irr::core::vector3df(0, 0, 0);
-//                                (*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
-//                                (*cit)->is_moving = true;
-//                                (*cit)->is_hovered = false;
-//                                (*cit)->aniFrame = 5;
-//                                flip = true;
-//                            }
-//                        if(flip)
-//                            mainGame->WaitFrameSignal(5);
-//                    }
-//                    for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-//                        (*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
-//                        (*cit)->dRot = irr::core::vector3df(0, 0, 0);
-//                        (*cit)->is_moving = true;
-//                        (*cit)->is_hovered = false;
-//                        (*cit)->aniFrame = 5;
-//                    }
-//                    mainGame->WaitFrameSignal(11);
-//                }
-//                for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
-//                    (*cit)->SetCode(BufferIO::ReadInt32(pbuf));
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-//                        (*cit)->is_hovered = false;
-//                        mainGame->dField.MoveCard(*cit, 5);
-//                    }
-//                    mainGame->WaitFrameSignal(5);
-//                }
+                if(need_flip) {
+                    for(auto& pcard : hand[playerid]) {
+                        auto npos = pcard->GetPositionInfo(1);
+                        pcard->UpdatePosition(200, npos);
+                    }
+                    auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
+                    auto cb_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
+                        auto npos = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo();
+                        for(auto& pcard : hand[playerid])
+                            pcard->UpdatePosition(200, npos);
+                    });
+                    auto wait2 = std::make_shared<ActionWait<int64_t>>(200);
+                    auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid, code_after_shuffle]() {
+                        for(size_t i = 0; i < hand[playerid].size(); ++i) {
+                            hand[playerid][i]->SetCode(code_after_shuffle[i]);
+                            auto npos = hand[playerid][i]->GetPositionInfo(1);
+                            hand[playerid][i]->UpdatePosition(200, npos);
+                        }
+                    });
+                    auto wait3 = std::make_shared<ActionWait<int64_t>>(200);
+                    auto cb_action3 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
+                        for(auto& pcard : hand[playerid]) {
+                            auto npos = pcard->GetPositionInfo();
+                            pcard->UpdatePosition(200, npos);
+                        }
+                    });
+                    auto wait4 = std::make_shared<ActionWait<int64_t>>(200);
+                    PushMessageActions(wait1, cb_action1, wait2, cb_action2, wait3, cb_action3, wait4);
+                } else {
+                    auto npos = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo();
+                    for(auto& pcard : hand[playerid])
+                        pcard->UpdatePosition(200, npos);
+                    auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
+                    auto cb_action = std::make_shared<ActionCallback<int64_t>>([playerid, code_after_shuffle]() {
+                        for(size_t i = 0; i < hand[playerid].size(); ++i) {
+                            hand[playerid][i]->SetCode(code_after_shuffle[i]);
+                            hand[playerid][i]->UpdatePosition(200);
+                        }
+                    });
+                    auto wait2 = std::make_shared<ActionWait<int64_t>>(200);
+                    PushMessageActions(wait1, cb_action, wait2);
+                }
                 break;
             }
             case MSG_REFRESH_DECK:

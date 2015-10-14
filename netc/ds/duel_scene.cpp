@@ -99,7 +99,7 @@ namespace ygopro
         }
     }
     
-    std::pair<v3f, glm::quat> FieldCard::GetPositionInfo() {
+    std::pair<v3f, glm::quat> FieldCard::GetPositionInfo(int32_t param) {
         // POS_FACEUP_ATTACK		0x1
         // POS_FACEDOWN_ATTACK		0x2
         // POS_FACEUP_DEFENCE		0x4
@@ -153,7 +153,7 @@ namespace ygopro
                         tl = {lst - seq * vparam.cardrect.width * 1.1f - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.0f};
                     }
                 }
-                if(this->code != 0)
+                if(this->code != 0 && (param == 0))
                     rot = vparam.hand_quat[0];
                 else
                     rot = vparam.hand_quat[1];
@@ -255,8 +255,7 @@ namespace ygopro
         return std::make_pair(tl, rot);
     }
     
-    void FieldCard::UpdatePosition(int32_t tm) {
-        auto npos = GetPositionInfo();
+    void FieldCard::UpdatePosition(int32_t tm, std::pair<v3f, glm::quat> npos) {
         if(tm == 0) {
             SetTranslation(npos.first);
             SetRotation(npos.second);
@@ -273,6 +272,10 @@ namespace ygopro
             SceneMgr::Get().RemoveAction(ptr.get());
             SceneMgr::Get().PushAction(action, ptr.get(), 1);
         }
+    }
+    
+    void FieldCard::UpdatePosition(int32_t tm) {
+        UpdatePosition(tm, GetPositionInfo());
     }
     
     void FieldCard::Attach(std::shared_ptr<FieldCard> target) {

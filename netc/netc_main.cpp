@@ -198,12 +198,11 @@ int32_t main(int32_t argc, char* argv[]) {
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
     
-//    auto sc = std::make_shared<BuildScene>(_2dshader.get());
-//    auto sh = std::make_shared<BuildSceneHandler>(sc);
+    auto sc = std::make_shared<BuildScene>(_2dshader.get());
 //    sc->SetSceneHandler(sh);
 //    SceneMgr::Get().SetScene(sc);
     
-    auto sc = std::make_shared<DuelScene>(_2dshader.get(), _3dshader.get());
+//    auto sc = std::make_shared<DuelScene>(_2dshader.get(), _3dshader.get());
 
     SceneMgr::Get().SetScene(sc);
     SceneMgr::Get().InitFrameControler();

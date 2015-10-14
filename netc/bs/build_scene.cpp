@@ -57,11 +57,11 @@ namespace ygopro
     v2f BuilderCard::GetCurrentPos(CardLocation loc, int32_t seq) {
         switch(loc) {
             case CardLocation::Main:
-                return (v2f){x_left + dx[0] * (seq % main_row_count), offsety[0] - main_y_spacing * (seq / main_row_count)};
+                return {x_left + dx[0] * (seq % main_row_count), offsety[0] - main_y_spacing * (seq / main_row_count)};
             case CardLocation::Extra:
-                return (v2f){x_left + dx[1] * seq, offsety[1]};
+                return {x_left + dx[1] * seq, offsety[1]};
             case CardLocation::Side:
-                return (v2f){x_left + dx[2] * seq, offsety[2]};
+                return {x_left + dx[2] * seq, offsety[2]};
             case CardLocation::Result: {
                 int32_t y = seq / res_count.x;
                 int32_t x = seq % res_count.x;

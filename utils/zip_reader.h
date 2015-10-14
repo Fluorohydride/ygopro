@@ -104,7 +104,7 @@ public:
             if(!zip_file)
                 continue;
             zip_file.seekg(0, zip_file.end);
-            auto file_size = zip_file.tellg();
+            size_t file_size = zip_file.tellg();
             if(file_size == 0)
                 continue;
             zip_file.seekg(-ZIP_END_BLOCK_SIZE, zip_file.end);
