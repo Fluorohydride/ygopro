@@ -2698,7 +2698,7 @@ namespace sgui
         }
         
         virtual int32_t GetItemCustomValue(int32_t index) {
-            if(index >= (int32_t)ui_components.size() - 2)
+            if(index < 0 || index >= (int32_t)ui_components.size() - 2)
                 return 0;
             return custom_value[index];
         }

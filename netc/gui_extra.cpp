@@ -478,6 +478,8 @@ namespace ygopro
             return true;
         });
         lst->event_item_double_click += [this, ffile, lst, fpath](sgui::SGWidget& sender, int32_t index)->bool {
+            if(index < 0)
+                return true;
             if(lst->GetItemCustomValue(index) == 0) {
                 size_t pos = path.rfind(L'/');
                 path = path.substr(0, pos);
