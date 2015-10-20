@@ -16,6 +16,7 @@ namespace ygopro
 
     void SceneMgr::Init() {
         InitActionTime(GetSysClock());
+        rnd_engine.seed((int32_t)EpochTime());
     }
     
     void SceneMgr::Uninit() {
@@ -80,4 +81,15 @@ namespace ygopro
             delete[] image_buff;
         }).detach();
     }
+    
+    int32_t SceneMgr::GetRandomInt(int32_t a, int32_t b) {
+        std::uniform_int_distribution<int32_t> dis(a, b);
+        return dis(rnd_engine);
+    }
+    
+    float SceneMgr::GetRandomReal(float a, float b) {
+        std::uniform_real_distribution<float> dis(a, b);
+        return dis(rnd_engine);
+    }
+    
 }

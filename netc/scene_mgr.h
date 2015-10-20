@@ -53,6 +53,8 @@ namespace ygopro
         void ScreenShot();
         inline void SetMousePosition(v2i pos) { mouse_pos = pos; }
         inline v2i GetMousePosition() { return mouse_pos; }
+        int32_t GetRandomInt(int32_t a, int32_t b);
+        float GetRandomReal(float a, float b);
         
         void SetScene(std::shared_ptr<Scene> sc);
         inline std::shared_ptr<Scene> GetScene() { return current_scene; };
@@ -60,6 +62,7 @@ namespace ygopro
     protected:
         v2i scene_size = {1, 1};
         v2i mouse_pos = {0, 0};
+        std::mt19937 rnd_engine;
         std::shared_ptr<Scene> current_scene = nullptr;
         
     };

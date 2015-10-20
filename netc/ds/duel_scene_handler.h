@@ -40,6 +40,7 @@ namespace ygopro
         bool operator == (CardPosInfo& p) { return info == p.info; }
     };
     
+    extern bool deck_reversed;
     extern int32_t host_player;
     extern std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];
     extern std::vector<std::shared_ptr<FieldCard>> m_zone[2];

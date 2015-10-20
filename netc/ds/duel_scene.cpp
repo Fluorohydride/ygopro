@@ -115,12 +115,15 @@ namespace ygopro
             case 0x1: { //deck
                 auto fb_pos = field_blocks[side][13]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, 0.001f * subs};
-                if(pos & 0x5) {
+                if(param == 1)
+                    tl.x += vparam.cardrect.width * SceneMgr::Get().GetRandomReal(-1.0f, 1.0f);
+                bool faceup = deck_reversed ? (pos & 0xa) : (pos & 0x5);
+                if(faceup) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                } else if(pos & 0xa) {
+                } else {
                     if(side == 0)
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
                     else

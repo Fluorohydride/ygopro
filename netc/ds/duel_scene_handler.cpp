@@ -11,6 +11,7 @@
 namespace ygopro
 {
     
+    bool deck_reversed = false;
     int32_t host_player = 0;
     std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];
     std::vector<std::shared_ptr<FieldCard>> m_zone[2];

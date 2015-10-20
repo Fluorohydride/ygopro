@@ -671,41 +671,36 @@ namespace ygopro
                 break;
             }
             case MSG_SHUFFLE_DECK: {
-//                int32_t player = LocalPlayer(reader.Read<uint8_t>());
-//                if(mainGame->dField.deck[player].size() < 2)
-//                    return true;
-//                bool rev = mainGame->dField.deck_reversed;
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->dField.deck_reversed = false;
-//                    if(rev) {
-//                        for (size_t i = 0; i < mainGame->dField.deck[player].size(); ++i)
-//                            mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
-//                        mainGame->WaitFrameSignal(10);
-//                    }
-//                }
-//                for (size_t i = 0; i < mainGame->dField.deck[player].size(); ++i) {
-//                    mainGame->dField.deck[player][i]->code = 0;
-//                    mainGame->dField.deck[player][i]->is_reversed = false;
-//                }
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    for (int i = 0; i < 5; ++i) {
-//                        for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-//                            (*cit)->dPos = irr::core::vector3df(rand() * 0.4f / RAND_MAX - 0.2f, 0, 0);
-//                            (*cit)->dRot = irr::core::vector3df(0, 0, 0);
-//                            (*cit)->is_moving = true;
-//                            (*cit)->aniFrame = 3;
-//                        }
-//                        mainGame->WaitFrameSignal(3);
-//                        for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
-//                            mainGame->dField.MoveCard(*cit, 3);
-//                        mainGame->WaitFrameSignal(3);
-//                    }
-//                    mainGame->dField.deck_reversed = rev;
-//                    if(rev) {
-//                        for (size_t i = 0; i < mainGame->dField.deck[player].size(); ++i)
-//                            mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
-//                    }
-//                }
+                int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                if(deck[playerid].size() < 2)
+                    break;
+                auto cb_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
+                    for(auto& pcard : deck[playerid])
+                        pcard->UpdatePosition(200, pcard->GetPositionInfo(1));
+                });
+                auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
+                auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
+                    for(auto& pcard : deck[playerid])
+                        pcard->UpdatePosition(200, pcard->GetPositionInfo());
+                });
+                auto wait2 = std::make_shared<ActionWait<int64_t>>(200);
+                auto shuffle_action = std::make_shared<ActionSequence<int64_t>>(cb_action1, wait1, cb_action2, wait2);
+                auto rep_action = std::make_shared<ActionRepeat<int64_t>>(shuffle_action, 2);
+                if(deck_reversed) {
+                    deck_reversed = false;
+                    for(auto& pcard : deck[playerid])
+                        pcard->UpdatePosition(200, pcard->GetPositionInfo());
+                    auto wait_rev1 = std::make_shared<ActionWait<int64_t>>(200);
+                    auto flip_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
+                        deck_reversed = true;
+                        for(auto& pcard : deck[playerid])
+                            pcard->UpdatePosition(200, pcard->GetPositionInfo());
+                    });
+                    auto wait_rev2 = std::make_shared<ActionWait<int64_t>>(200);
+                    PushMessageActions(wait_rev1, rep_action, flip_action1, wait_rev2);
+                } else {
+                    PushMessageActions(rep_action);
+                }
                 break;
             }
             case MSG_SHUFFLE_HAND: {
