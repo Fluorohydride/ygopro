@@ -3,60 +3,50 @@
 
 #include "common.h"
 
-class BufferUtil {
+class BufferReader {
 public:
-    BufferUtil(void* base, size_t sz) {
-        ptr = static_cast<uint8_t*>(base);
+    BufferReader(void* base, size_t sz) {
+        ptr = reinterpret_cast<uint8_t*>(base);
         end = ptr + sz;
     }
     
     template<typename T>
     inline T Read() {
-        T ret = *(T*)ptr;
+        if(ptr + sizeof(T) > end) {
+            ptr = end;
+            return T();
+        }
+        T ret;
+        memcpy(&ret, ptr, sizeof(T));
         ptr += sizeof(T);
         return ret;
     }
     
     template<typename T>
     inline void Read(T* val) {
+        if(ptr + sizeof(T) > end) {
+            ptr = end;
+            return;
+        }
         memcpy(val, ptr, sizeof(T));
         ptr += sizeof(T);
     }
     
-    template<typename T>
-    inline void Write(T val) {
-        (*(T*)ptr) = val;
-        ptr += sizeof(T);
-    }
-    
-    inline std::string Read() {
-        std::string str = (char*)ptr;
-        return std::move(str);
-    }
-    
     inline std::string Read(size_t sz) {
-        if(sz == 0)
-            return "";
-        char buf[1024];
-        if(sz > 1024)
-            sz = 1024;
-        memcpy(buf, ptr, sz);
-        buf[sz - 1] = 0;
-        std::string str = buf;
+        auto endptr = ptr;
+        while(endptr < end && *endptr != 0 && (sz && endptr < ptr + sz))
+            endptr++;
+        std::string str;
+        str.insert(str.end(), ptr, endptr);
+        ptr = endptr;
         return std::move(str);
     }
     
     inline void Read(void* buf, size_t sz) {
+        if(ptr + sz > end)
+            sz = end - ptr;
         memcpy(buf, ptr, sz);
         ptr += sz;
-    }
-    
-    inline void Write(const std::string& str) {
-        size_t length = str.length();
-        memcpy(ptr, str.c_str(), length);
-        ptr += length;
-        *ptr = 0;
-        ptr++;
     }
     
     inline void Skip(size_t offset) {
@@ -77,4 +67,24 @@ private:
 
 };
 
-#endif //BUFFERIO_H
+class BufferWriter {
+public:
+    BufferWriter(std::vector<uint8_t>& buffer) {
+        buffer_ptr = &buffer;
+    }
+    
+    template<typename T>
+    inline void Write(const T& val) {
+        const uint8_t* data_ptr = reinterpret_cast<const uint8_t*>(&val);
+        buffer_ptr->insert(buffer_ptr->end(), data_ptr, data_ptr + sizeof(T));
+    }
+    
+    inline void Write(const std::string& str) {
+        buffer_ptr->insert(buffer_ptr->end(), &str.front(), &str.back());
+    }
+    
+protected:
+    std::vector<uint8_t>* buffer_ptr = nullptr;
+};
+
+#endif //BUFFERUTIL_H

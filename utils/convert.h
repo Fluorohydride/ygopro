@@ -6,14 +6,22 @@
 template<typename T, typename STYPE, bool INTTYPE = true>
 struct SConverter {
     static T Convert(const STYPE& str) {
-        return static_cast<T>(std::stoull(str, nullptr, 0));
+        try{
+            return static_cast<T>(std::stoll(str, nullptr, 0));
+        } catch(...) {
+            return 0;
+        }
     }
 };
 
 template<typename T, typename STYPE>
 struct SConverter<T, STYPE, false> {
     static T Convert(const STYPE& str) {
-        return static_cast<T>(std::stod(str));
+        try{
+            return static_cast<T>(std::stod(str));
+        } catch(...) {
+            return 0.0;
+        }
     }
 };
 

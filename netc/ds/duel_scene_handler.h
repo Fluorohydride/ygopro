@@ -16,8 +16,7 @@ namespace ygopro
     
     struct DuelMessage {
         uint8_t msg_type = 0;
-        uint8_t* msg = nullptr;
-        size_t len = 0;
+        std::vector<uint8_t> msg_buffer;
     };
     
     struct CardPosInfo {
@@ -93,7 +92,9 @@ namespace ygopro
             ptr->Push(std::make_shared<ActionCallback<int64_t>>([this](){ message_lock = false; }));
             SceneMgr::Get() << ptr;
         }
-        int32_t SolveMessage(uint8_t msg_type, BufferUtil& reader);
+        
+        void Test();
+        int32_t SolveMessage(uint8_t msg_type, BufferReader& reader);
         
     protected:
         DuelScene* duel_scene = nullptr;

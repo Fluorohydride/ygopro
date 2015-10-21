@@ -70,19 +70,26 @@ public:
         FindClose(fh);
     }
     
-    static std::string UTF8ToLocalFilename(const std::string& utf8_name) {
-        char buffer[2048];
-        std::wstring wname = To<std::wstring>(utf8_name);
-        size_t count = wcstombs(buffer, wname.c_str(), 2047);
-        buffer[count] = 0;
-        return std::move(std::string(buffer));
+    static std::string UTF8ToLocalCharset(const std::string& utf8_name) {
+        return WSTRToLocalCharset(To<std::wstring>(utf8_name));
     }
     
-    static std::string WSTRToLocalFilename(const std::wstring& wstr_name) {
+    static std::string WSTRToLocalCharset(const std::wstring& wstr_name) {
         char buffer[2048];
         size_t count = wcstombs(buffer, wstr_name.c_str(), 2047);
         buffer[count] = 0;
         return std::move(std::string(buffer));
+    }
+    
+    static std::string LocalCharsetToUTF8(const std::string& local) {
+        return To<std::string>(LocalCharsetToWSTR(local));
+    }
+    
+    static std::wstring LocalCharsetToWSTR(const std::string& local) {
+        wchar_t buffer[1024];
+        size_t count = mbstowcs(buffer, local.c_str(), 1023);
+        buffer[count] = 0;
+        return std::move(std::wstring(buffer));
     }
     
 };
@@ -148,12 +155,20 @@ public:
         closedir(dir);
     }
     
-    static std::string UTF8ToLocalFilename(const std::string& utf8_name) {
+    static std::string UTF8ToLocalCharset(const std::string& utf8_name) {
         return utf8_name;
     }
     
-    static std::string WSTRToLocalFilename(const std::wstring& wstr_name) {
+    static std::string WSTRToLocalCharset(const std::wstring& wstr_name) {
         return std::move(To<std::string>(wstr_name));
+    }
+    
+    static std::string LocalCharsetToUTF8(const std::string& local) {
+        return local;
+    }
+    
+    static std::wstring LocalCharsetToWSTR(const std::string& local) {
+        return std::move(To<std::wstring>(local));
     }
     
 };

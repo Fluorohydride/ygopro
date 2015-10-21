@@ -61,7 +61,7 @@
 //    void DuelProtoReplay::ReplayLoop() {
 //        replay_duel = std::make_shared<duelAdapter>(seed);
 //        replay_duel->set_adapter(this);
-//        BufferUtil rep_reader(rep_data, rep_size);
+//        BufferReader rep_reader(rep_data, rep_size);
 //        if(flag & REPLAY_TAG) {
 //            std::string hostname = rep_reader.Read(40);
 //            std::string hostname_tag = rep_reader.Read(40);

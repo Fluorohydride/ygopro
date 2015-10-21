@@ -284,7 +284,7 @@ namespace ygopro
         if(remove_lock)
             return false;
         DeckData tempdeck;
-        if(tempdeck.LoadFromFile(FileSystem::WSTRToLocalFilename(file))) {
+        if(tempdeck.LoadFromFile(FileSystem::WSTRToLocalCharset(file))) {
             LoadDeck(tempdeck);
             return true;
         }
@@ -306,7 +306,7 @@ namespace ygopro
         auto deckfile = file;
         if(deckfile.find(L".ydk") != deckfile.length() - 4)
             deckfile.append(L".ydk");
-        current_deck.SaveToFile(FileSystem::WSTRToLocalFilename(file));
+        current_deck.SaveToFile(FileSystem::WSTRToLocalCharset(file));
         return true;
     }
     

@@ -75,7 +75,7 @@ namespace ygopro
             auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             auto tm = std::localtime(&t);
             std::string file = To<std::string>("/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, t);
-            auto localfile = FileSystem::UTF8ToLocalFilename(path + file);
+            auto localfile = FileSystem::UTF8ToLocalCharset(path + file);
             stbi_write_png(localfile.c_str(), clip.width, clip.height, 4, clip_buff, 0);
             delete[] clip_buff;
             delete[] image_buff;

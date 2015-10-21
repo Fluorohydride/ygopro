@@ -30,6 +30,10 @@ jaweson::JsonRoot<> layoutCfg;
 jaweson::JsonRoot<> textureCfg;
 jaweson::JsonRoot<> dialogCfg;
 
+int32_t node2int(jaweson::JsonNode<>& node) {
+    return node.is_number() ? (int32_t)node.to_integer() : To<int32_t>(node.to_string());
+};
+
 int32_t main(int32_t argc, char* argv[]) {
     if(!glfwInit())
         return 0;
@@ -38,16 +42,27 @@ int32_t main(int32_t argc, char* argv[]) {
         textfile.Load("common.json");
         if(!commonCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["string_conf"].to_string()));
+        for(int32_t i = 1; i < argc; ++i) {
+            std::string argstr = FileSystem::LocalCharsetToUTF8(argv[i]);
+            if(argstr.length() < 2)
+                continue;
+            if(argstr[0] != '-' || argstr[1] != '-')
+                continue;
+            auto epos = argstr.find('=');
+            if(epos == argstr.npos)
+                continue;
+            commonCfg[argstr.substr(2, epos - 2)].set_value<jaweson::JsonString>(argstr.substr(epos + 0));
+        }
+        textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["string_conf"].to_string()));
         if(!stringCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["layout_conf"].to_string()));
+        textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["layout_conf"].to_string()));
         if(!layoutCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["textures_conf"].to_string()));
+        textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["textures_conf"].to_string()));
         if(!textureCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["dialog_conf"].to_string()));
+        textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["dialog_conf"].to_string()));
         if(!dialogCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
         stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
@@ -55,10 +70,10 @@ int32_t main(int32_t argc, char* argv[]) {
             DataMgr::Get().RegisterSetCode(To<uint32_t>(name), setname);
         });
     }
-    int32_t width = (int32_t)commonCfg["window_width"].to_integer();
-    int32_t height = (int32_t)commonCfg["window_height"].to_integer();;
-	int32_t fsaa = (int32_t)commonCfg["fsaa"].to_integer();;
-    int32_t vsync = (int32_t)commonCfg["vertical_sync"].to_integer();;
+    int32_t width = node2int(commonCfg["window_width"]);
+    int32_t height = node2int(commonCfg["window_height"]);
+	int32_t fsaa = node2int(commonCfg["fsaa"]);
+    int32_t vsync = node2int(commonCfg["vertical_sync"]);
 	if(fsaa)
 		glfwWindowHint(GLFW_SAMPLES, fsaa);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -92,14 +107,14 @@ int32_t main(int32_t argc, char* argv[]) {
     std::shared_ptr<base::Shader> _3dshader;
     {
         TextFile textfile;
-        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["2d_shader"].to_string()));
+        textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["2d_shader"].to_string()));
         _2dshader = std::make_shared<base::Shader>();
         _2dshader->LoadSource(textfile.Data());
         _2dshader->SetDefaultParamCallback([](base::Shader* shader) {
             shader->SetParam1i("texid", 0);
             shader->SetParam1f("alpha", 1.0);
         });
-        textfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["3d_shader"].to_string()));
+        textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["3d_shader"].to_string()));
         _3dshader = std::make_shared<base::Shader>();
         _3dshader->LoadSource(textfile.Data());
         _3dshader->SetDefaultParamCallback([](base::Shader* shader) {
@@ -112,15 +127,15 @@ int32_t main(int32_t argc, char* argv[]) {
     glfwGetFramebufferSize(window, &bwidth, &bheight);
     xrate = (float)bwidth / width;
     yrate = (float)bheight / height;
-    ImageMgr::Get().InitTextures(FileSystem::UTF8ToLocalFilename(commonCfg["image_path"].to_string()), _2dshader.get());
-    if(DataMgr::Get().LoadDatas(FileSystem::UTF8ToLocalFilename(commonCfg["database_file"].to_string()))
+    ImageMgr::Get().InitTextures(FileSystem::UTF8ToLocalCharset(commonCfg["image_path"].to_string()), _2dshader.get());
+    if(DataMgr::Get().LoadDatas(FileSystem::UTF8ToLocalCharset(commonCfg["database_file"].to_string()))
        || !ImageMgr::Get().LoadImageConfig()
-       || !sgui::SGGUIRoot::GetSingleton().Init(FileSystem::UTF8ToLocalFilename(commonCfg["gui_conf"].to_string()), {bwidth, bheight}, true)) {
+       || !sgui::SGGUIRoot::GetSingleton().Init(FileSystem::UTF8ToLocalCharset(commonCfg["gui_conf"].to_string()), {bwidth, bheight}, true)) {
         glfwDestroyWindow(window);
         glfwTerminate();
         return 0;
     }
-    LimitRegulationMgr::Get().LoadLimitRegulation(FileSystem::UTF8ToLocalFilename(commonCfg["limit_regulation"].to_string()),
+    LimitRegulationMgr::Get().LoadLimitRegulation(FileSystem::UTF8ToLocalCharset(commonCfg["limit_regulation"].to_string()),
                                                   To<std::wstring>(stringCfg["eui_list_default"].to_string()));
     
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int32_t key, int32_t scan, int32_t action, int32_t mods) {
@@ -177,7 +192,7 @@ int32_t main(int32_t argc, char* argv[]) {
     glfwSetWindowIconifyCallback(window, [](GLFWwindow* wnd, int32_t iconified) {
         need_draw = (iconified == GL_FALSE);
         if(need_draw)
-            SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
+            SceneMgr::Get().SetFrameRate(node2int(commonCfg["frame_rate"]));
         else
             SceneMgr::Get().SetFrameRate(10);
     });
@@ -196,10 +211,10 @@ int32_t main(int32_t argc, char* argv[]) {
     
     SceneMgr::Get().Init();
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
-    SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
+    SceneMgr::Get().SetFrameRate(node2int(commonCfg["frame_rate"]));
     
-    auto sc = std::make_shared<BuildScene>(_2dshader.get());
-//    auto sc = std::make_shared<DuelScene>(_2dshader.get(), _3dshader.get());
+//    auto sc = std::make_shared<BuildScene>(_2dshader.get());
+    auto sc = std::make_shared<DuelScene>(_2dshader.get(), _3dshader.get());
 
     SceneMgr::Get().SetScene(sc);
     SceneMgr::Get().InitFrameControler();

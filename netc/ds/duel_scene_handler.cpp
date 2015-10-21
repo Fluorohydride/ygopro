@@ -34,8 +34,8 @@ namespace ygopro
     void DuelSceneHandler::BeginHandler() {
         AddCard(83764718, CardPosInfo(0, 0x2, 0, 0));
         AddCard(64496451, CardPosInfo(0, 0x2, 0, 0));
-        AddCard(57728570, CardPosInfo(1, 0x2, 1, 0));
-        AddCard(97268402, CardPosInfo(1, 0x2, 1, 0));
+        AddCard(57728570, CardPosInfo(0, 0x2, 1, 0));
+        AddCard(97268402, CardPosInfo(0, 0x2, 1, 0));
         for(auto& iter : hand[0])
             iter->UpdatePosition(0);
         for(auto& iter : hand[1])
@@ -61,8 +61,9 @@ namespace ygopro
         if(!message_lock) {
             auto cmd = messages.PullCommand();
             if(cmd) {
-                BufferUtil bu(cmd->msg, cmd->len);
+                BufferReader bu(cmd->msg_buffer.data(), cmd->msg_buffer.size());
                 SolveMessage(cmd->msg_type, bu);
+                messages.PopCommand();
             }
         }
         return true;
@@ -153,7 +154,8 @@ namespace ygopro
     }
     
     void DuelSceneHandler::KeyUp(int32_t key, int32_t mods) {
-        
+        if(key == GLFW_KEY_T)
+            Test();
     }
     
     void DuelSceneHandler::InitField() {

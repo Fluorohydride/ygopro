@@ -11,7 +11,20 @@
 namespace ygopro
 {
     
-    int32_t DuelSceneHandler::SolveMessage(uint8_t msg_type, BufferUtil& reader) {
+    void DuelSceneHandler::Test() {
+        auto dm = std::make_shared<DuelMessage>();
+        dm->msg_type = MSG_SHUFFLE_HAND;
+        BufferWriter writer(dm->msg_buffer);
+        writer.Write<uint8_t>(0);
+        writer.Write<uint8_t>(4);
+        writer.Write<uint32_t>(83764718);
+        writer.Write<uint32_t>(64496451);
+        writer.Write<uint32_t>(57728570);
+        writer.Write<uint32_t>(97268402);
+        messages.PushCommand(dm);
+    }
+    
+    int32_t DuelSceneHandler::SolveMessage(uint8_t msg_type, BufferReader& reader) {
         switch(msg_type) {
             case MSG_RETRY:
                 break;
@@ -676,12 +689,12 @@ namespace ygopro
                     break;
                 auto cb_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
                     for(auto& pcard : deck[playerid])
-                        pcard->UpdatePosition(200, pcard->GetPositionInfo(1));
+                        pcard->UpdateTo(200, pcard->GetPositionInfo(1));
                 });
                 auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
                 auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
                     for(auto& pcard : deck[playerid])
-                        pcard->UpdatePosition(200, pcard->GetPositionInfo());
+                        pcard->UpdateTo(200, pcard->GetPositionInfo());
                 });
                 auto wait2 = std::make_shared<ActionWait<int64_t>>(200);
                 auto shuffle_action = std::make_shared<ActionSequence<int64_t>>(cb_action1, wait1, cb_action2, wait2);
@@ -689,12 +702,12 @@ namespace ygopro
                 if(deck_reversed) {
                     deck_reversed = false;
                     for(auto& pcard : deck[playerid])
-                        pcard->UpdatePosition(200, pcard->GetPositionInfo());
+                        pcard->UpdateTo(200, pcard->GetPositionInfo());
                     auto wait_rev1 = std::make_shared<ActionWait<int64_t>>(200);
                     auto flip_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
                         deck_reversed = true;
                         for(auto& pcard : deck[playerid])
-                            pcard->UpdatePosition(200, pcard->GetPositionInfo());
+                            pcard->UpdateTo(200, pcard->GetPositionInfo());
                     });
                     auto wait_rev2 = std::make_shared<ActionWait<int64_t>>(200);
                     PushMessageActions(wait_rev1, rep_action, flip_action1, wait_rev2);
@@ -719,36 +732,43 @@ namespace ygopro
                 if(need_flip) {
                     for(auto& pcard : hand[playerid]) {
                         auto npos = pcard->GetPositionInfo(1);
-                        pcard->UpdatePosition(200, npos);
+                        pcard->UpdateTo(200, npos);
                     }
                     auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
                     auto cb_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
                         auto npos = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo();
                         for(auto& pcard : hand[playerid])
-                            pcard->UpdatePosition(200, npos);
+                            pcard->UpdateTo(200, npos);
                     });
                     auto wait2 = std::make_shared<ActionWait<int64_t>>(200);
                     auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid, code_after_shuffle]() {
                         for(size_t i = 0; i < hand[playerid].size(); ++i) {
                             hand[playerid][i]->SetCode(code_after_shuffle[i]);
                             auto npos = hand[playerid][i]->GetPositionInfo(1);
-                            hand[playerid][i]->UpdatePosition(200, npos);
+                            hand[playerid][i]->UpdateTo(200, npos);
                         }
                     });
                     auto wait3 = std::make_shared<ActionWait<int64_t>>(200);
                     auto cb_action3 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
                         for(auto& pcard : hand[playerid]) {
                             auto npos = pcard->GetPositionInfo();
-                            pcard->UpdatePosition(200, npos);
+                            pcard->UpdateTo(200, npos);
                         }
                     });
                     auto wait4 = std::make_shared<ActionWait<int64_t>>(200);
                     PushMessageActions(wait1, cb_action1, wait2, cb_action2, wait3, cb_action3, wait4);
                 } else {
-                    auto npos = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo();
+                    std::pair<v3f, glm::quat> npos;
+                    if(hand[playerid].size() % 2)
+                        npos = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo();
+                    else {
+                        auto n1 = hand[playerid][hand[playerid].size() / 2 - 1]->GetPositionInfo();
+                        auto n2 = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo();
+                        npos = {(n1.first + n2.first) * 0.5f, n1.second};
+                    }
                     for(auto& pcard : hand[playerid])
-                        pcard->UpdatePosition(200, npos);
-                    auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
+                        pcard->UpdateTo(200, npos);
+                    auto wait1 = std::make_shared<ActionWait<int64_t>>(300);
                     auto cb_action = std::make_shared<ActionCallback<int64_t>>([playerid, code_after_shuffle]() {
                         for(size_t i = 0; i < hand[playerid].size(); ++i) {
                             hand[playerid][i]->SetCode(code_after_shuffle[i]);

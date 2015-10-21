@@ -55,8 +55,12 @@ namespace ygopro
         
         void SetCode(uint32_t code);
         std::pair<v3f, glm::quat> GetPositionInfo(int32_t param = 0);
-        void UpdatePosition(int32_t tm, std::pair<v3f, glm::quat> npos);
+        void UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos);
+        void TranslateTo(int32_t tm, v3f tl);
+        void RotateTo(int32_t tm, glm::quat rot);
         void UpdatePosition(int32_t tm);
+        void UpdateTranslation(int32_t tm);
+        void UpdateRotation(int32_t tm);
         
         void Attach(std::shared_ptr<FieldCard> target);
         void Detach();

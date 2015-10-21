@@ -117,6 +117,10 @@ namespace ygopro
                 tl = {fb_pos.x, fb_pos.y, 0.001f * subs};
                 if(param == 1)
                     tl.x += vparam.cardrect.width * SceneMgr::Get().GetRandomReal(-1.0f, 1.0f);
+                else if(param == 2)
+                    tl.x += -vparam.cardrect.width;
+                else if(param == 3)
+                    tl.x += vparam.cardrect.width;
                 bool faceup = deck_reversed ? (pos & 0xa) : (pos & 0x5);
                 if(faceup) {
                     if(side == 0)
@@ -258,7 +262,7 @@ namespace ygopro
         return std::make_pair(tl, rot);
     }
     
-    void FieldCard::UpdatePosition(int32_t tm, std::pair<v3f, glm::quat> npos) {
+    void FieldCard::UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos) {
         if(tm == 0) {
             SetTranslation(npos.first);
             SetRotation(npos.second);
@@ -277,8 +281,48 @@ namespace ygopro
         }
     }
     
+    void FieldCard::TranslateTo(int32_t tm, v3f tl) {
+        if(tm == 0) {
+            SetTranslation(tl);
+            return;
+        } else {
+            auto ptr = shared_from_this();
+            auto cur_tl = translation;
+            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(1000, ptr, [cur_tl, tl](FieldCard* fc, double t) ->bool {
+                fc->SetTranslation(cur_tl + (tl - cur_tl) * t);
+                return true;
+            }, std::make_shared<TGenMove<int64_t>>(tm, 0.01));
+            SceneMgr::Get().RemoveAction(ptr.get());
+            SceneMgr::Get().PushAction(action, ptr.get(), 1);
+        }
+    }
+    
+    void FieldCard::RotateTo(int32_t tm, glm::quat rot) {
+        if(tm == 0) {
+            SetRotation(rot);
+            return;
+        } else {
+            auto ptr = shared_from_this();
+            auto crot = rotation;
+            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(1000, ptr, [crot, rot](FieldCard* fc, double t) ->bool {
+                fc->SetRotation(glm::slerp(crot, rot, (float)t));
+                return true;
+            }, std::make_shared<TGenLinear<int64_t>>(tm));
+            SceneMgr::Get().RemoveAction(ptr.get());
+            SceneMgr::Get().PushAction(action, ptr.get(), 1);
+        }
+    }
+    
     void FieldCard::UpdatePosition(int32_t tm) {
-        UpdatePosition(tm, GetPositionInfo());
+        UpdateTo(tm, GetPositionInfo());
+    }
+    
+    void FieldCard::UpdateTranslation(int32_t tm) {
+        TranslateTo(tm, GetPositionInfo().first);
+    }
+    
+    void FieldCard::UpdateRotation(int32_t tm) {
+        RotateTo(tm, GetPositionInfo().second);
     }
     
     void FieldCard::Attach(std::shared_ptr<FieldCard> target) {

@@ -4,10 +4,6 @@
   "vertical_sync" : 0,
   "fsaa" : 0,
   "frame_rate" : 60,
-  "card_size_x" : 100,
-  "card_size_y" : 145,
-  "tex_size_x" : 2048,
-  "tex_size_y" : 2048,
   "image_path" : "./images",
   "database_file" : "./conf/cards.cdb",
   "screenshot_path" : "./screenshot",
@@ -22,7 +18,6 @@
   "limit_regulation" : "./conf/lflist.conf",
   "2d_shader" : "./conf/2d.shader",
   "3d_shader" : "./conf/3d.shader",
-  "hover_info_delay" : 300,
   "server_ip" : "127.0.0.1",
   "server_port" : 7911,
   "server_timeout" : 5000

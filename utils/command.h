@@ -60,7 +60,9 @@ public:
     
     virtual std::shared_ptr<T> PullCommand() {
         std::lock_guard<std::mutex> lck(cmd_mutex);
-        if(cmd_queue.empty() && sub_queue.empty())
+        if(!sub_queue.empty())
+            cmd_queue.splice(cmd_queue.begin(), sub_queue, sub_queue.begin(), sub_queue.end());
+        if(cmd_queue.empty())
             return nullptr;
         return cmd_queue.front();
     }
