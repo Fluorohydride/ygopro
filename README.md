@@ -5,8 +5,8 @@ A script engine for "yu-gi-oh!" and sample gui
 
 ###Keys:
 * ESC: Minimize the window.
-* A: Holding down this buton will let the system stop at every timing.
-* S: Holding down this butoon will let the system skip every timing.
+* A: Holding down this button will let the system stop at every timing.
+* S: Holding down this button will let the system skip every timing.
 * R: Fix the font error.
 * F1~F4: Show the cards in your grave, banished zone, extra deck, xyz materials.
 * F5~F8: Show the cards in your opponent's grave, banished zone, extra deck, xyz materials.
@@ -25,7 +25,7 @@ A script engine for "yu-gi-oh!" and sample gui
 * The others: 1~n, starting from the bottom.
 
 ###Deck edit page:
-* All numeric textboxs: They suuport >, =, <, >=, <= signs.
+* All numeric textboxs: They support >, =, <, >=, <= signs.
 * Card name: Search card names and texts by default, and $foo will only search foo in card names.
 
 ### Command-line options:
@@ -42,4 +42,4 @@ A script engine for "yu-gi-oh!" and sample gui
 * textures: Other image files.
 * deck: .ydk deck files.
 * replay: .yrp replay files.
-* expansions: *.cdb will be loaded as extra databaes.
+* expansions: *.cdb will be loaded as extra databases.
