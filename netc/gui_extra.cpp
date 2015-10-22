@@ -815,6 +815,8 @@ namespace ygopro
         } else {
             if(this->code == code)
                 return;
+            if(scroll_area)
+                scroll_area->ChangeViewOffset({0, 0});
         }
         auto& dlg_node = dialogCfg["info dialog"];
         int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();

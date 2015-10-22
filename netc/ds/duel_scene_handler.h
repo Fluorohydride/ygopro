@@ -21,6 +21,7 @@ namespace ygopro
     
     struct CardPosInfo {
         CardPosInfo() {}
+        CardPosInfo(int32_t inf) { info = inf; }
         CardPosInfo(int8_t c, int8_t l, int8_t s, int8_t ps) : controler(c), location(l), sequence(s), position(ps) {}
         
         union {
@@ -93,7 +94,7 @@ namespace ygopro
             SceneMgr::Get() << ptr;
         }
         
-        void Test();
+        void Test(int32_t param);
         int32_t SolveMessage(uint8_t msg_type, BufferReader& reader);
         
     protected:

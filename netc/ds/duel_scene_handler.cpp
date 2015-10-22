@@ -32,13 +32,13 @@ namespace ygopro
     }
     
     void DuelSceneHandler::BeginHandler() {
-        AddCard(83764718, CardPosInfo(0, 0x2, 0, 0));
-        AddCard(64496451, CardPosInfo(0, 0x2, 0, 0));
-        AddCard(57728570, CardPosInfo(0, 0x2, 1, 0));
-        AddCard(97268402, CardPosInfo(0, 0x2, 1, 0));
-        for(auto& iter : hand[0])
+        AddCard(83764718, CardPosInfo(0, 0x1, 0, 0xa));
+        AddCard(64496451, CardPosInfo(0, 0x1, 0, 0xa));
+        AddCard(57728570, CardPosInfo(0, 0x1, 1, 0xa));
+        AddCard(97268402, CardPosInfo(0, 0x1, 1, 0xa));
+        for(auto& iter : deck[0])
             iter->UpdatePosition(0);
-        for(auto& iter : hand[1])
+        for(auto& iter : deck[1])
             iter->UpdatePosition(0);
     }
     
@@ -154,8 +154,8 @@ namespace ygopro
     }
     
     void DuelSceneHandler::KeyUp(int32_t key, int32_t mods) {
-        if(key == GLFW_KEY_T)
-            Test();
+        if(key >= GLFW_KEY_0 && key <= GLFW_KEY_9)
+            Test(key - GLFW_KEY_0);
     }
     
     void DuelSceneHandler::InitField() {

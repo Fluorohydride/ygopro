@@ -132,7 +132,7 @@ public:
         int32_t cur_count = 0;
         callback = [cur_count, count](bool init) mutable ->bool {
             if(init) { cur_count = 0; return true; }
-            return ++cur_count >= count;
+            return ++cur_count <= count;
         };
     }
     

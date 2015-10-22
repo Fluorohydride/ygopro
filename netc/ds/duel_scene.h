@@ -55,11 +55,11 @@ namespace ygopro
         
         void SetCode(uint32_t code);
         std::pair<v3f, glm::quat> GetPositionInfo(int32_t param = 0);
-        void UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos);
-        void TranslateTo(int32_t tm, v3f tl);
+        void UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos, int32_t act_type = action_type_linear);
+        void TranslateTo(int32_t tm, v3f tl, int32_t act_type = action_type_linear);
         void RotateTo(int32_t tm, glm::quat rot);
-        void UpdatePosition(int32_t tm);
-        void UpdateTranslation(int32_t tm);
+        void UpdatePosition(int32_t tm, int32_t act_type = action_type_linear);
+        void UpdateTranslation(int32_t tm, int32_t act_type = action_type_linear);
         void UpdateRotation(int32_t tm);
         
         void Attach(std::shared_ptr<FieldCard> target);
@@ -86,6 +86,9 @@ namespace ygopro
         CardPosInfo pos_info;
         std::vector<std::shared_ptr<FieldCard>> attached_cards;
         std::shared_ptr<FieldCard> attaching_card;
+        
+        static const int32_t action_type_linear = 0;
+        static const int32_t action_type_asymptotic = 1;
     };
     
     class FloatingNumber : public DuelObject<vt2>, public std::enable_shared_from_this<FieldCard> {

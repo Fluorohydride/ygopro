@@ -262,7 +262,7 @@ namespace ygopro
         return std::make_pair(tl, rot);
     }
     
-    void FieldCard::UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos) {
+    void FieldCard::UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos, int32_t act_type) {
         if(tm == 0) {
             SetTranslation(npos.first);
             SetRotation(npos.second);
@@ -270,28 +270,38 @@ namespace ygopro
         } else {
             auto ptr = shared_from_this();
             auto cpos = std::make_pair(translation, rotation);
-            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(1000, ptr, [cpos, npos](FieldCard* fc, double t) ->bool {
+            std::shared_ptr<TGen<int64_t>> tgen;
+            if(act_type == action_type_linear)
+                tgen = std::make_shared<TGenLinear<int64_t>>(tm);
+            else
+                tgen = std::make_shared<TGenMove<int64_t>>(tm, 0.01);
+            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(tm, ptr, [cpos, npos](FieldCard* fc, double t) ->bool {
                 fc->SetTranslation(cpos.first + (npos.first - cpos.first) * t);
                 fc->SetRotation(glm::slerp(cpos.second, npos.second, (float)t));
                 return true;
-            }, std::make_shared<TGenMove<int64_t>>(tm, 0.01));
+            }, tgen);
             ptr->SetYOffset(0.0f);
             SceneMgr::Get().RemoveAction(ptr.get());
             SceneMgr::Get().PushAction(action, ptr.get(), 1);
         }
     }
     
-    void FieldCard::TranslateTo(int32_t tm, v3f tl) {
+    void FieldCard::TranslateTo(int32_t tm, v3f tl, int32_t act_type) {
         if(tm == 0) {
             SetTranslation(tl);
             return;
         } else {
             auto ptr = shared_from_this();
             auto cur_tl = translation;
-            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(1000, ptr, [cur_tl, tl](FieldCard* fc, double t) ->bool {
+            std::shared_ptr<TGen<int64_t>> tgen;
+            if(act_type == action_type_linear)
+                tgen = std::make_shared<TGenLinear<int64_t>>(tm);
+            else
+                tgen = std::make_shared<TGenMove<int64_t>>(tm, 0.01);
+            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(tm, ptr, [cur_tl, tl](FieldCard* fc, double t) ->bool {
                 fc->SetTranslation(cur_tl + (tl - cur_tl) * t);
                 return true;
-            }, std::make_shared<TGenMove<int64_t>>(tm, 0.01));
+            }, tgen);
             SceneMgr::Get().RemoveAction(ptr.get());
             SceneMgr::Get().PushAction(action, ptr.get(), 1);
         }
@@ -304,7 +314,7 @@ namespace ygopro
         } else {
             auto ptr = shared_from_this();
             auto crot = rotation;
-            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(1000, ptr, [crot, rot](FieldCard* fc, double t) ->bool {
+            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(tm, ptr, [crot, rot](FieldCard* fc, double t) ->bool {
                 fc->SetRotation(glm::slerp(crot, rot, (float)t));
                 return true;
             }, std::make_shared<TGenLinear<int64_t>>(tm));
@@ -313,12 +323,12 @@ namespace ygopro
         }
     }
     
-    void FieldCard::UpdatePosition(int32_t tm) {
-        UpdateTo(tm, GetPositionInfo());
+    void FieldCard::UpdatePosition(int32_t tm, int32_t act_type) {
+        UpdateTo(tm, GetPositionInfo(), act_type);
     }
     
-    void FieldCard::UpdateTranslation(int32_t tm) {
-        TranslateTo(tm, GetPositionInfo().first);
+    void FieldCard::UpdateTranslation(int32_t tm, int32_t act_type) {
+        TranslateTo(tm, GetPositionInfo().first, act_type);
     }
     
     void FieldCard::UpdateRotation(int32_t tm) {

@@ -2366,7 +2366,6 @@ namespace sgui
             scrh->SetPositionSize({0, 0}, {0, 0}, {0.0f, 1.0f}, {1.0f, 0.0f}, {0.0f, -1.0f});
             scrv->SetPositionSize({0, 0}, {0, 0}, {1.0f, 0.0f}, {0.0f, 1.0f}, {-1.0f, 0.0f});
             scrh->SetSizeR({-scrv->GetAbsoluteSize().x, 0});
-            scrv->SetSizeR({0, -scrh->GetAbsoluteSize().y});
             scrh->event_value_change += [this](SGWidget& sender, float val)->bool {
                 int32_t x = val * (scroll_size.x - view_size.x);
                 ChangeViewOffset({x, view_offset.y});
