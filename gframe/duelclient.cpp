@@ -2932,6 +2932,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		size_t mcount = (size_t)BufferIO::ReadInt8(pbuf);
 		size_t ecount = (size_t)BufferIO::ReadInt8(pbuf);
+		size_t pcount = (size_t)BufferIO::ReadInt8(pbuf);
 		size_t hcount = (size_t)BufferIO::ReadInt8(pbuf);
 		int topcode = BufferIO::ReadInt32(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
@@ -3006,6 +3007,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.extra[player].push_back(ccard);
 			}
 		}
+		mainGame->dField.extra_p_count[player] = pcount;
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
 			mainGame->gMutex.Unlock();
 		//
@@ -3029,7 +3031,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			}
 			for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 				ClientCard* pcard = *cit;
-				pcard->code = 0;
+				pcard->code = BufferIO::ReadInt32(pbuf) & 0x7fffffff;
 				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
