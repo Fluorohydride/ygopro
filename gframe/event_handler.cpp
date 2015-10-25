@@ -728,44 +728,78 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_CARD_SELECT: {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
+					mainGame->stCardPos[i]->enableOverrideColor(false);
 					if(selectable_cards[i + pos]->code)
 						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
 					else
 						mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
-					if (sort_list.size()){
-						if (sort_list[pos + i]> 0)
+					if(sort_list.size()) {
+						if(sort_list[pos + i] > 0)
 							myswprintf(formatBuffer, L"%d", sort_list[pos + i]);
 						else
 							myswprintf(formatBuffer, L"");
-					}
-					else{
-						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location,
-							selectable_cards[i + pos]->sequence), selectable_cards[i + pos]->sequence + 1);
+					} else {
+						if(selectable_cards[i + pos]->is_conti)
+							myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY)
+							myswprintf(formatBuffer, L"%ls[%d](%d)",
+								dataManager.FormatLocation(selectable_cards[i + pos]->overlayTarget->location, selectable_cards[i + pos]->overlayTarget->sequence),
+								selectable_cards[i + pos]->overlayTarget->sequence + 1, selectable_cards[i + pos]->sequence + 1);
+						else
+							myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location, selectable_cards[i + pos]->sequence),
+								selectable_cards[i + pos]->sequence + 1);
 					}
 					mainGame->stCardPos[i]->setText(formatBuffer);
-					if(selectable_cards[i + pos]->is_selected)
-						mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
-					else if(selectable_cards[i + pos]->controler)
-						mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-					else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+					if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
+						if(selectable_cards[i + pos]->owner != selectable_cards[i + pos]->overlayTarget->controler)
+							mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
+						if(selectable_cards[i + pos]->is_selected)
+							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
+						else if(selectable_cards[i + pos]->overlayTarget->controler)
+							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+						else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+					}
+					else {
+						if(selectable_cards[i + pos]->is_selected)
+							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
+						else if(selectable_cards[i + pos]->controler)
+							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+						else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+					}
 				}
 				break;
 			}
 			case SCROLL_CARD_DISPLAY: {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
+					mainGame->stDisplayPos[i]->enableOverrideColor(false);
 					if(display_cards[i + pos]->code)
 						mainGame->btnCardDisplay[i]->setImage(imageManager.GetTexture(display_cards[i + pos]->code));
 					else
 						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover);
 					mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
-					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
-						display_cards[i + pos]->sequence + 1);
+					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
+							myswprintf(formatBuffer, L"%ls[%d](%d)",
+								dataManager.FormatLocation(display_cards[i + pos]->overlayTarget->location, display_cards[i + pos]->overlayTarget->sequence),
+								display_cards[i + pos]->overlayTarget->sequence + 1, display_cards[i + pos]->sequence + 1);
+					}
+					else
+						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
+							display_cards[i + pos]->sequence + 1);
 					mainGame->stDisplayPos[i]->setText(formatBuffer);
-					if(display_cards[i + pos]->controler)
-						mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-					else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
+						if(display_cards[i + pos]->owner != display_cards[i + pos]->overlayTarget->controler)
+							mainGame->stDisplayPos[i]->setOverrideColor(0xff0000ff);
+						if(display_cards[i + pos]->overlayTarget->controler)
+							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
+						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+					}
+					else {
+						if(display_cards[i + pos]->controler)
+							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
+						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+					}
 				}
 				break;
 			}
@@ -798,7 +832,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ancard.clear();
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
-						auto cp = dataManager.GetCodePointer(cit->first);
+						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+						//datas.alias can be double card names or alias
 						if(cp->second.code == 78734254 || cp->second.code == 13857930 
 								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
@@ -832,7 +867,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ancard.clear();
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
-						auto cp = dataManager.GetCodePointer(cit->first);
+						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+						//datas.alias can be double card names or alias
 						if(cp->second.code == 78734254 || cp->second.code == 13857930 
 								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
@@ -928,6 +964,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				selectable_cards.clear();
 				switch(hovered_location) {
 				case LOCATION_DECK: {
+					if(deck[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)deck[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1000), deck[hovered_controler].size());
@@ -935,6 +973,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_MZONE: {
+					if(!clicked_card || clicked_card->overlayed.size() == 0)
+						break;
 					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
 						selectable_cards.push_back(clicked_card->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), clicked_card->overlayed.size());
@@ -942,6 +982,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_GRAVE: {
+					if(grave[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
@@ -949,6 +991,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_REMOVED: {
+					if(remove[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)remove[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[hovered_controler].size());
@@ -956,6 +1000,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_EXTRA: {
+					if(extra[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
@@ -972,7 +1018,18 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				selectable_cards.clear();
 				switch(hovered_location) {
+				case LOCATION_MZONE: {
+					if(!clicked_card || clicked_card->overlayed.size() == 0)
+						break;
+					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
+						selectable_cards.push_back(clicked_card->overlayed[i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), clicked_card->overlayed.size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
 				case LOCATION_GRAVE: {
+					if(grave[hovered_controler].size() == 0)
+						break;
 					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
@@ -1584,9 +1641,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_F1:
 		case irr::KEY_F2:
 		case irr::KEY_F3:
+		case irr::KEY_F4:
 		case irr::KEY_F5:
 		case irr::KEY_F6:
-		case irr::KEY_F7: {
+		case irr::KEY_F7:
+		case irr::KEY_F8: {
 			if(!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isStarted
 					&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
 				int loc_id = 0;
@@ -1607,6 +1666,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						for(int32 i = (int32)extra[0].size() - 1; i >= 0 ; --i)
 							display_cards.push_back(extra[0][i]);
 						break;
+					case irr::KEY_F4:
+						loc_id = 1007;
+						for(int32 i = 0; i <= 4 ; ++i) {
+							if(mzone[0][i] && mzone[0][i]->overlayed.size()) {
+								for(int32 j = 0; j <= (int32)mzone[0][i]->overlayed.size() - 1 ; ++j)
+									display_cards.push_back(mzone[0][i]->overlayed[j]);
+							}
+						}
+						break;
 					case irr::KEY_F5:
 						loc_id = 1004;
 						for(int32 i = (int32)grave[1].size() - 1; i >= 0 ; --i)
@@ -1622,6 +1690,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						for(int32 i = (int32)extra[1].size() - 1; i >= 0 ; --i)
 							display_cards.push_back(extra[1][i]);
 						break;
+					case irr::KEY_F8:
+						loc_id = 1007;
+						for(int32 i = 0; i <= 4 ; ++i) {
+							if(mzone[1][i] && mzone[1][i]->overlayed.size()) {
+								for(int32 j = 0; j <= (int32)mzone[1][i]->overlayed.size() - 1 ; ++j)
+									display_cards.push_back(mzone[1][i]->overlayed[j]);
+							}
+						}
+						break;
 				}
 				if(display_cards.size()) {
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(loc_id), display_cards.size());
@@ -1632,7 +1709,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_ESCAPE: {
-			mainGame->device->minimizeWindow();
+			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
+				mainGame->device->minimizeWindow();
 			break;
 		}
 		default: break;

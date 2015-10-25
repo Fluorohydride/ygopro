@@ -17,7 +17,7 @@
 #include <unistd.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1336;
+const unsigned short PRO_VERSION = 0x1337;
 
 namespace ygo {
 
@@ -381,7 +381,7 @@ bool Game::Initialize() {
 	wCardSelect->getCloseButton()->setVisible(false);
 	wCardSelect->setVisible(false);
 	for(int i = 0; i < 5; ++i) {
-		stCardPos[i] = env->addStaticText(L"", rect<s32>(40 + 125 * i, 30, 139 + 125 * i, 50), true, false, wCardSelect, -1, true);
+		stCardPos[i] = env->addStaticText(L"", rect<s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardSelect, -1, true);
 		stCardPos[i]->setBackgroundColor(0xffffffff);
 		stCardPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardSelect[i] = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardSelect, BUTTON_CARD_0 + i);
@@ -394,7 +394,7 @@ bool Game::Initialize() {
 	wCardDisplay->getCloseButton()->setVisible(false);
 	wCardDisplay->setVisible(false);
 	for(int i = 0; i < 5; ++i) {
-		stDisplayPos[i] = env->addStaticText(L"", rect<s32>(40 + 125 * i, 30, 139 + 125 * i, 50), true, false, wCardDisplay, -1, true);
+		stDisplayPos[i] = env->addStaticText(L"", rect<s32>(30 + 125 * i, 30, 150 + 125 * i, 50), true, false, wCardDisplay, -1, true);
 		stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		stDisplayPos[i]->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		btnCardDisplay[i] = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(30 + 125 * i, 55, 150 + 125 * i, 225), wCardDisplay, BUTTON_DISPLAY_0 + i);
