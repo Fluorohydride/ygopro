@@ -352,11 +352,15 @@ void ClientField::ClearChainSelect() {
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	int startpos;
-	if(selectable_cards.size() <= 5)
+	size_t ct;
+	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
-	else
+		ct = selectable_cards.size();
+	} else {
 		startpos = 30;
-	for(size_t i = 0; i < min(selectable_cards.size(), 5); ++i) {
+		ct = 5;
+	}
+	for(size_t i = 0; i < ct; ++i) {
 		mainGame->stCardPos[i]->enableOverrideColor(false);
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
@@ -421,11 +425,15 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 }
 void ClientField::ShowChainCard() {
 	int startpos;
-	if(selectable_cards.size() <= 5)
+	size_t ct;
+	if(selectable_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
-	else
+		ct = selectable_cards.size();
+	} else {
 		startpos = 30;
-	for(size_t i = 0; i < min(selectable_cards.size(), 5); ++i) {
+		ct = 5;
+	}
+	for(size_t i = 0; i < ct; ++i) {
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 		else
@@ -472,11 +480,15 @@ void ClientField::ShowChainCard() {
 }
 void ClientField::ShowLocationCard() {
 	int startpos;
-	if(display_cards.size() <= 5)
+	size_t ct;
+	if(display_cards.size() <= 5) {
 		startpos = 30 + 125 * (5 - display_cards.size()) / 2;
-	else
+		ct = display_cards.size();
+	} else {
 		startpos = 30;
-	for(size_t i = 0; i < min(display_cards.size(), 5); ++i) {
+		ct = 5;
+	}
+	for(size_t i = 0; i < ct; ++i) {
 		mainGame->stDisplayPos[i]->enableOverrideColor(false);
 		if(display_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
