@@ -32,14 +32,12 @@ namespace ygopro
     }
     
     void DuelSceneHandler::BeginHandler() {
-        AddCard(83764718, CardPosInfo(0, 0x1, 0, 0xa));
-        AddCard(64496451, CardPosInfo(0, 0x1, 0, 0xa));
-        AddCard(57728570, CardPosInfo(0, 0x1, 1, 0xa));
-        AddCard(97268402, CardPosInfo(0, 0x1, 1, 0xa));
-        for(auto& iter : deck[0])
-            iter->UpdatePosition(0);
-        for(auto& iter : deck[1])
-            iter->UpdatePosition(0);
+        AddCard(83764718, CardPosInfo(0, 0x4, 1, 0x1))->UpdatePosition(0);
+        AddCard(64496451, CardPosInfo(0, 0x84, 1, 0x0))->UpdatePosition(0);
+        AddCard(57728570, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x2, 1, 0xa))->UpdatePosition(0);
+        for(auto& pc : hand[0])
+            pc->UpdatePosition(0);
     }
     
     void DuelSceneHandler::EndHandler() {
@@ -208,7 +206,7 @@ namespace ygopro
     std::shared_ptr<FieldCard> DuelSceneHandler::AddCard(uint32_t code, CardPosInfo pos_info) {
         if(pos_info.controler > 1)
             return nullptr;
-        if(pos_info.location & 0x4) {
+        if((pos_info.location & 0x7f) == 0x4) {
             if(pos_info.sequence > 4)
                 return nullptr;
             auto pre = m_zone[pos_info.controler][pos_info.sequence];
@@ -217,7 +215,7 @@ namespace ygopro
             if(pre == nullptr && (pos_info.location & 0x80))
                 return nullptr;
         }
-        if(pos_info.location & 0x8) {
+        if((pos_info.location & 0x7f) == 0x8) {
             if(pos_info.sequence > 7)
                 return nullptr;
             auto pre = s_zone[pos_info.controler][pos_info.sequence];
@@ -239,6 +237,7 @@ namespace ygopro
                 if(pos_info.location & 0x80) {
                     auto pre = m_zone[pos_info.controler][pos_info.sequence];
                     pre->attached_cards.push_back(ptr);
+                    ptr->attaching_card = pre.get();
                 } else
                     m_zone[pos_info.controler][pos_info.sequence] = ptr;
                 break;
@@ -311,10 +310,8 @@ namespace ygopro
                 ret = hand[pos_info.controler][pos_info.sequence];
                 hand[pos_info.controler].erase(hand[pos_info.controler].begin() + pos_info.sequence);
                 int8_t index = 0;
-                for(auto& iter : hand[pos_info.controler]) {
+                for(auto& iter : hand[pos_info.controler])
                     iter->pos_info.sequence = index++;
-                    iter->UpdatePosition(0);
-                }
                 break;
             }
             case 0x4: {

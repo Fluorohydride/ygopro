@@ -15,20 +15,16 @@ namespace ygopro
         switch(param) {
             case 0: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_REVERSE_DECK;
+                dm->msg_type = MSG_MOVE;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint32_t>(57728570);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x2, 0, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x84, 1, 0).info);
                 writer.Write<uint32_t>(0);
                 messages.PushCommand(dm);
                 break;
             }
             case 1: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_SHUFFLE_DECK;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(0);
-                writer.Write<uint32_t>(deck_reversed ? 64496451 : 0);
-                messages.PushCommand(dm);
                 break;
             }
         }
@@ -991,6 +987,19 @@ namespace ygopro
                 CardPosInfo pi_to(reader.Read<int32_t>());
                 uint32_t reason = reader.Read<uint32_t>();
                 auto ptr = GetCard(pi_from);
+                auto move_inner = [this](std::shared_ptr<FieldCard> ptr, CardPosInfo from, CardPosInfo to) {
+                    MoveCard(ptr, to);
+                    if(from.location == LOCATION_HAND) {
+                        for(auto& iter : hand[from.controler])
+                            iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                    }
+                    if(to.location == LOCATION_HAND) {
+                        for(auto& iter : hand[to.controler])
+                            iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                    } else
+                        ptr->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                    PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
+                };
                 if(ptr != nullptr) {
                     if(code)
                         ptr->SetCode(code);
@@ -999,38 +1008,25 @@ namespace ygopro
                         
                     } else if(pi_to.location == 0) {
                         
-                    } else if((pi_from.location & 0x80) && (pi_to.location & 0x80)) {
-                        MoveCard(ptr, pi_to);
-                        ptr->UpdatePosition(500);
-                        PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
-                    } else if((pi_from.location & 0x80) && !(pi_to.location & 0x80)) {
-                        MoveCard(ptr, pi_to);
-                        ptr->UpdatePosition(500);
-                        PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
-                    } else if(!(pi_from.location & 0x80) && (pi_to.location & 0x80)) {
-                        auto attach_card = GetCard(pi_to);
-                        if(attach_card) {
-                            if(pi_to.location != LOCATION_EXTRA) {
-                                MoveCard(ptr, pi_to);
-                                ptr->UpdatePosition(500);
-                                PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
-                            }
-                        }
+                    } else if(pi_from.location & 0x80) {
+                        move_inner(ptr, pi_from, pi_to);
+                    } else if(pi_to.location & 0x80) {
+                        CardPosInfo att_pos(pi_to.controler, pi_to.location & 0x7f, pi_to.sequence, 0);
+                        auto attach_card = GetCard(att_pos);
+                        if(attach_card && (pi_to.location & 0x7f) != LOCATION_EXTRA)
+                            move_inner(ptr, pi_from, pi_to);
                     } else {
-                        if(!ptr->attached_cards.empty()) {
-                            if(pi_from.location == LOCATION_EXTRA) {
-                                MoveCard(ptr, pi_to);
-                                for(auto olcard : ptr->attached_cards)
-                                    olcard->UpdatePosition(500);
-                                auto wait_action = std::make_shared<ActionWait<int64_t>>(500);
-                                auto update_action = std::make_shared<ActionCallback<int64_t>>([ptr](){ ptr->UpdatePosition(500); });
-                                PushMessageActions(wait_action, update_action);
-                            } else {
-                                MoveCard(ptr, pi_to);
-                                ptr->UpdatePosition(500);
-                                PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
-                            }
-                        }
+                        if(!ptr->attached_cards.empty() && pi_from.location == LOCATION_EXTRA) {
+                            for(auto olcard : ptr->attached_cards)
+                                olcard->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                            auto wait_action = std::make_shared<ActionWait<int64_t>>(300);
+                            auto update_action = std::make_shared<ActionCallback<int64_t>>([ptr](){
+                                ptr->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                            });
+                            auto wait_action2 = std::make_shared<ActionWait<int64_t>>(300);
+                            PushMessageActions(wait_action, update_action, wait_action2);
+                        } else
+                            move_inner(ptr, pi_from, pi_to);
                     }
                 }
                 break;

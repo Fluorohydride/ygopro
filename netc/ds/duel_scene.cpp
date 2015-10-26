@@ -36,6 +36,8 @@ namespace ygopro
     FieldCard::~FieldCard() {
         if(code)
             ImageMgr::Get().UnloadCardTexture(code);
+        for(auto& att_cards : attached_cards)
+            att_cards->attaching_card = nullptr;
     }
     
     int32_t FieldCard::GetTextureId() {
@@ -336,11 +338,11 @@ namespace ygopro
     }
     
     void FieldCard::Attach(std::shared_ptr<FieldCard> target) {
-        if(attaching_card == target)
+        if(attaching_card == target.get())
             return;
         if(attaching_card)
             Detach();
-        attaching_card = target;
+        attaching_card = target.get();
         target->attached_cards.push_back(shared_from_this());
         int32_t i = 0;
         for(auto pcard : target->attached_cards)

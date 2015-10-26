@@ -85,7 +85,7 @@ namespace ygopro
         uint32_t reason = 0;
         CardPosInfo pos_info;
         std::vector<std::shared_ptr<FieldCard>> attached_cards;
-        std::shared_ptr<FieldCard> attaching_card;
+        FieldCard* attaching_card = nullptr;
         
         static const int32_t action_type_linear = 0;
         static const int32_t action_type_asymptotic = 1;
