@@ -64,6 +64,12 @@ namespace ygopro
         
         void Attach(std::shared_ptr<FieldCard> target);
         void Detach();
+        void AddCounter() {}
+        void RemoveCounter() {}
+        void ClearCounter() {}
+        void AddContinuousTarget() {}
+        void RemoveContinuousTarget() {}
+        void ClearContinuousTarget() {}
         
         inline void SetTranslation(v3f tr) { translation = tr; update_vert = true; SetUpdate(); }
         inline void SetRotation(glm::quat rot) { rotation = rot; update_vert = true; SetUpdate(); }

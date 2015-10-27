@@ -33,9 +33,9 @@ namespace ygopro
     
     void DuelSceneHandler::BeginHandler() {
         AddCard(83764718, CardPosInfo(0, 0x4, 1, 0x1))->UpdatePosition(0);
-        AddCard(64496451, CardPosInfo(0, 0x84, 1, 0x0))->UpdatePosition(0);
-        AddCard(57728570, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
-        AddCard(97268402, CardPosInfo(0, 0x2, 1, 0xa))->UpdatePosition(0);
+        AddCard(64496451, CardPosInfo(0, 0x2, 2, 0x1))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x4, 2, 0x1))->UpdatePosition(0);
         for(auto& pc : hand[0])
             pc->UpdatePosition(0);
     }
@@ -204,62 +204,68 @@ namespace ygopro
     }
     
     std::shared_ptr<FieldCard> DuelSceneHandler::AddCard(uint32_t code, CardPosInfo pos_info) {
-        if(pos_info.controler > 1)
+        if(pos_info.controler > 1 || pos_info.location == 0)
             return nullptr;
-        if((pos_info.location & 0x7f) == 0x4) {
-            if(pos_info.sequence > 4)
+        std::shared_ptr<FieldCard> ptr;
+        if(pos_info.location & 0x80) {
+            if(((pos_info.location & 0x7f) != 0x4) || (pos_info.sequence > 4))
                 return nullptr;
-            auto pre = m_zone[pos_info.controler][pos_info.sequence];
-            if(pre != nullptr && pos_info.location == 0x4)
-                return nullptr;
-            if(pre == nullptr && (pos_info.location & 0x80))
-                return nullptr;
-        }
-        if((pos_info.location & 0x7f) == 0x8) {
-            if(pos_info.sequence > 7)
-                return nullptr;
-            auto pre = s_zone[pos_info.controler][pos_info.sequence];
-            if(pre != nullptr)
-                return nullptr;
-        }
-        auto ptr = duel_scene->CreateCard();
-        ptr->pos_info = pos_info;
-        switch(pos_info.location & 0x7f) {
-            case 0x1:
-                ptr->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
-                deck[pos_info.controler].push_back(ptr);
-                break;
-            case 0x2:
-                ptr->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
-                hand[pos_info.controler].push_back(ptr);
-                break;
-            case 0x4:
-                if(pos_info.location & 0x80) {
-                    auto pre = m_zone[pos_info.controler][pos_info.sequence];
-                    pre->attached_cards.push_back(ptr);
-                    ptr->attaching_card = pre.get();
-                } else
+            auto attach_card = m_zone[pos_info.controler][pos_info.sequence];
+            if(attach_card) {
+                ptr = duel_scene->CreateCard();
+                ptr->pos_info = pos_info;
+                ptr->Attach(attach_card);
+                attach_card->UpdatePosition(0);
+            }
+        } else {
+            if(pos_info.location == 0x4) {
+                if(pos_info.sequence > 4)
+                    return nullptr;
+                if(m_zone[pos_info.controler][pos_info.sequence] != nullptr)
+                    return nullptr;
+            }
+            if(pos_info.location == 0x8) {
+                if(pos_info.sequence > 7)
+                    return nullptr;
+                if(s_zone[pos_info.controler][pos_info.sequence] != nullptr)
+                    return nullptr;
+            }
+            ptr = duel_scene->CreateCard();
+            ptr->pos_info = pos_info;
+            switch(pos_info.location & 0x7f) {
+                case 0x1:
+                    ptr->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
+                    deck[pos_info.controler].push_back(ptr);
+                    break;
+                case 0x2:
+                    ptr->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
+                    hand[pos_info.controler].push_back(ptr);
+                    break;
+                case 0x4:
                     m_zone[pos_info.controler][pos_info.sequence] = ptr;
-                break;
-            case 0x8:
-                s_zone[pos_info.controler][pos_info.sequence] = ptr;
-                break;
-            case 0x10:
-                ptr->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
-                grave[pos_info.controler].push_back(ptr);
-                break;
-            case 0x20:
-                ptr->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
-                banished[pos_info.controler].push_back(ptr);
-                break;
-            case 0x40:
-                ptr->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
-                extra[pos_info.controler].push_back(ptr);
-                break;
+                    break;
+                case 0x8:
+                    s_zone[pos_info.controler][pos_info.sequence] = ptr;
+                    break;
+                case 0x10:
+                    ptr->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
+                    grave[pos_info.controler].push_back(ptr);
+                    break;
+                case 0x20:
+                    ptr->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
+                    banished[pos_info.controler].push_back(ptr);
+                    break;
+                case 0x40:
+                    ptr->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
+                    extra[pos_info.controler].push_back(ptr);
+                    break;
+            }
         }
-        ptr->SetCode(code);
-        ptr->SetSleeveTex(ImageMgr::Get().GetTexture((pos_info.controler == 0) ? "sleeve1" : "sleeve2"));
-        duel_scene->RedrawAllCards();
+        if(ptr) {
+            ptr->SetCode(code);
+            ptr->SetSleeveTex(ImageMgr::Get().GetTexture((pos_info.controler == 0) ? "sleeve1" : "sleeve2"));
+            duel_scene->RedrawAllCards();
+        }
         return ptr;
     }
     
@@ -367,47 +373,60 @@ namespace ygopro
     void DuelSceneHandler::MoveCard(std::shared_ptr<FieldCard> pcard, CardPosInfo pos_info) {
         if(pcard->pos_info == pos_info)
             return;
-        RemoveCard(pcard->pos_info);
-        pcard->pos_info = pos_info;
-        switch(pos_info.location & 0x7f) {
-            case 0x1:
-                pcard->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
-                deck[pos_info.controler].push_back(pcard);
-                break;
-            case 0x2:
-                pcard->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
-                hand[pos_info.controler].push_back(pcard);
-                break;
-            case 0x4:
-                if(pos_info.location & 0x80) {
-                    auto target = m_zone[pos_info.controler][pos_info.sequence];
-                    if(target) {
-                        pcard->Attach(target);
-                        if(target->pos_info.location == 0x4) {
-                            for(auto& iter : target->attached_cards)
-                                iter->UpdatePosition(0);
-                            target->UpdatePosition(0);
-                        }
+        if(pos_info.location & 0x80) {
+            auto target = GetCard(CardPosInfo(pos_info.controler, pos_info.location & 0x7f, pos_info.sequence, 0));
+            if(target) {
+                RemoveCard(pcard->pos_info);
+                pcard->pos_info = pos_info;
+                pcard->Attach(target);
+                if((pos_info.location & 0x7f) == 0x4)
+                    target->UpdatePosition(0);
+                duel_scene->RedrawAllCards();
+            }
+        } else {
+            if(pos_info.location != 0x4 && pos_info.location != 0x8) {
+                RemoveCard(pcard->pos_info);
+                pcard->pos_info = pos_info;
+                duel_scene->RedrawAllCards();
+            }
+            switch(pos_info.location & 0x7f) {
+                case 0x1:
+                    pcard->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
+                    deck[pos_info.controler].push_back(pcard);
+                    break;
+                case 0x2:
+                    pcard->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
+                    hand[pos_info.controler].push_back(pcard);
+                    break;
+                case 0x4:
+                    if(m_zone[pos_info.controler][pos_info.sequence] == nullptr) {
+                        RemoveCard(pcard->pos_info);
+                        pcard->pos_info = pos_info;
+                        m_zone[pos_info.controler][pos_info.sequence] = pcard;
+                        duel_scene->RedrawAllCards();
                     }
-                } else {
-                    m_zone[pos_info.controler][pos_info.sequence] = pcard;
-                }
-                break;
-            case 0x8:
-                s_zone[pos_info.controler][pos_info.sequence] = pcard;
-                break;
-            case 0x10:
-                pcard->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
-                grave[pos_info.controler].push_back(pcard);
-                break;
-            case 0x20:
-                pcard->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
-                banished[pos_info.controler].push_back(pcard);
-                break;
-            case 0x40:
-                pcard->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
-                extra[pos_info.controler].push_back(pcard);
-                break;
+                    break;
+                case 0x8:
+                    if(s_zone[pos_info.controler][pos_info.sequence] == nullptr) {
+                        RemoveCard(pcard->pos_info);
+                        pcard->pos_info = pos_info;
+                        s_zone[pos_info.controler][pos_info.sequence] = pcard;
+                        duel_scene->RedrawAllCards();
+                    }
+                    break;
+                case 0x10:
+                    pcard->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
+                    grave[pos_info.controler].push_back(pcard);
+                    break;
+                case 0x20:
+                    pcard->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
+                    banished[pos_info.controler].push_back(pcard);
+                    break;
+                case 0x40:
+                    pcard->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
+                    extra[pos_info.controler].push_back(pcard);
+                    break;
+            }
         }
     }
     

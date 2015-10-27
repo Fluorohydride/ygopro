@@ -174,6 +174,7 @@ namespace ygopro
                 tl.y = fb_pos.y;
                 if(attaching_card != nullptr) {
                     tl.z = 0.001f * subs;
+                    tl.x -= vparam.cardrect.width * 0.1f;
                 } else {
                     tl.z = 0.001f * attached_cards.size();
                     if(pos == 1) {
@@ -344,9 +345,6 @@ namespace ygopro
             Detach();
         attaching_card = target.get();
         target->attached_cards.push_back(shared_from_this());
-        int32_t i = 0;
-        for(auto pcard : target->attached_cards)
-            pcard->pos_info.subsequence = i++;
         pos_info.subsequence = (int32_t)target->attached_cards.size() - 1;
     }
     
@@ -362,6 +360,7 @@ namespace ygopro
     }
 
     void FieldRenderer::PushVerticesAll() {
+        base::RenderObject<vt3>::PushVerticesAll();
         for(auto& iter : field_blocks[0])
             iter->PushVertices();
         for(auto& iter : field_blocks[1])
@@ -369,6 +368,7 @@ namespace ygopro
     }
     
     void FieldCardRenderer::PushVerticesAll() {
+        base::RenderObject<vt3>::PushVerticesAll();
         for(auto& iter : hand[1])
             iter->PushVertices();
         for(auto& iter : deck[1])

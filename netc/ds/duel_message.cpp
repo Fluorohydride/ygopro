@@ -18,13 +18,21 @@ namespace ygopro
                 dm->msg_type = MSG_MOVE;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x2, 0, 0).info);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x84, 1, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0, 0, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x2, 1, POS_FACEDOWN).info);
                 writer.Write<uint32_t>(0);
                 messages.PushCommand(dm);
                 break;
             }
             case 1: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_MOVE;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint32_t>(57728570);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x2, 2, POS_FACEUP).info);
+                writer.Write<uint32_t>(CardPosInfo(0).info);
+                writer.Write<uint32_t>(0);
+                messages.PushCommand(dm);
                 break;
             }
         }
@@ -985,7 +993,28 @@ namespace ygopro
                 uint32_t code = reader.Read<uint32_t>();
                 CardPosInfo pi_from(reader.Read<int32_t>());
                 CardPosInfo pi_to(reader.Read<int32_t>());
+                pi_from.controler = LocalPlayer(pi_from.controler);
+                pi_to.controler = LocalPlayer(pi_to.controler);
                 uint32_t reason = reader.Read<uint32_t>();
+                if(pi_from.location == 0) {
+                    auto new_card = AddCard(code, pi_to);
+                    if(new_card) {
+                        new_card->UpdatePosition(0);
+                        new_card->reason = reason;
+                        new_card->SetColor(0xffffff);
+                        auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(500, new_card, [](FieldCard* fc, double t) ->bool {
+                            int32_t alpha = (int32_t)(255 * t) << 24;
+                            fc->SetColor(0xffffff | alpha);
+                            return true;
+                        }, std::make_shared<TGenLinear<int64_t>>(500));
+                        if(pi_to.location == LOCATION_HAND) {
+                            for(auto& iter : hand[pi_to.controler])
+                                iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                        }
+                        PushMessageActions(action);
+                    }
+                    break;
+                }
                 auto ptr = GetCard(pi_from);
                 auto move_inner = [this](std::shared_ptr<FieldCard> ptr, CardPosInfo from, CardPosInfo to) {
                     MoveCard(ptr, to);
@@ -1004,19 +1033,48 @@ namespace ygopro
                     if(code)
                         ptr->SetCode(code);
                     ptr->reason = reason;
-                    if(pi_from.location == 0) {
-                        
-                    } else if(pi_to.location == 0) {
-                        
+                    if(pi_to.location == 0) {
+                        auto rm_card = GetCard(pi_from);
+                        if(rm_card) {
+                            auto action = std::make_shared<LerpAnimator<int64_t, FieldCard>>(500, rm_card, [](FieldCard* fc, double t) ->bool {
+                                int32_t alpha = (int32_t)(255 * (1 - t)) << 24;
+                                fc->SetColor(0xffffff | alpha);
+                                return true;
+                            }, std::make_shared<TGenLinear<int64_t>>(500));
+                            auto remove_action = std::make_shared<ActionCallback<int64_t>>([this, pi_from](){
+                                auto rm_card = RemoveCard(pi_from);
+                                if(rm_card) {
+                                    if(pi_from.location == LOCATION_HAND) {
+                                        for(auto& iter : hand[pi_from.controler])
+                                            iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                                    }
+                                    duel_scene->RemoveCard(rm_card);
+                                    duel_scene->RedrawAllCards();
+                                }
+                            });
+                            PushMessageActions(action, remove_action);
+                        }
                     } else if(pi_from.location & 0x80) {
                         move_inner(ptr, pi_from, pi_to);
                     } else if(pi_to.location & 0x80) {
                         CardPosInfo att_pos(pi_to.controler, pi_to.location & 0x7f, pi_to.sequence, 0);
                         auto attach_card = GetCard(att_pos);
-                        if(attach_card && (pi_to.location & 0x7f) != LOCATION_EXTRA)
-                            move_inner(ptr, pi_from, pi_to);
+                        if(attach_card) {
+                            if((pi_to.location & 0x7f) != LOCATION_EXTRA)
+                                move_inner(ptr, pi_from, pi_to);
+                            else {
+                                bool move_hand = pi_from.location == LOCATION_HAND;
+                                RemoveCard(pi_from);
+                                ptr->Attach(attach_card);
+                                if(move_hand) {
+                                    for(auto& iter : hand[pi_from.controler])
+                                        iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                                }
+                            }
+                        }
                     } else {
                         if(!ptr->attached_cards.empty() && pi_from.location == LOCATION_EXTRA) {
+                            MoveCard(ptr, pi_to);
                             for(auto olcard : ptr->attached_cards)
                                 olcard->UpdatePosition(300, FieldCard::action_type_asymptotic);
                             auto wait_action = std::make_shared<ActionWait<int64_t>>(300);
@@ -1032,33 +1090,30 @@ namespace ygopro
                 break;
             }
             case MSG_POS_CHANGE: {
-//                unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-//                int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int cl = BufferIO::ReadInt8(pbuf);
-//                int cs = BufferIO::ReadInt8(pbuf);
-//                int pp = BufferIO::ReadInt8(pbuf);
-//                int cp = BufferIO::ReadInt8(pbuf);
-//                ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
-//                if((pp & POS_FACEUP) && (cp & POS_FACEDOWN)) {
-//                    pcard->counters.clear();
-//                    pcard->ClearTarget();
-//                }
-//                if (code != 0 && pcard->code != code)
-//                    pcard->SetCode(code);
-//                pcard->position = cp;
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    myswprintf(event_string, dataManager.GetSysString(1600));
-//                    mainGame->dField.MoveCard(pcard, 10);
-//                    mainGame->WaitFrameSignal(11);
-//                }
+                uint32_t code = reader.Read<uint32_t>();
+                CardPosInfo pi(reader.Read<int32_t>());
+                pi.controler = LocalPlayer(pi.controler);
+                uint32_t np = reader.Read<uint8_t>();
+                auto ptr = GetCard(pi);
+                if(ptr) {
+                    if(code != 0)
+                        ptr->SetCode(code);
+                    if(ptr->pos_info.position != np) {
+                        if((pi.position & POS_FACEUP) && (np & POS_FACEDOWN)) {
+                            ptr->ClearCounter();
+                            ptr->ClearContinuousTarget();
+                        }
+                        ptr->pos_info.position = np;
+                        ptr->UpdateRotation(300);
+                        PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
+                    }
+                }
                 break;
             }
             case MSG_SET: {
-//                /*int code = */BufferIO::ReadInt32(pbuf);
-//                /*int cc = mainGame->LocalPlayer*/(BufferIO::ReadInt8(pbuf));
-//                /*int cl = */BufferIO::ReadInt8(pbuf);
-//                /*int cs = */BufferIO::ReadInt8(pbuf);
-//                /*int cp = */BufferIO::ReadInt8(pbuf);
+                uint32_t code = reader.Read<uint32_t>();
+                CardPosInfo pi(reader.Read<int32_t>());
+                pi.controler = LocalPlayer(pi.controler);
 //                myswprintf(event_string, dataManager.GetSysString(1601));
                 break;
             }
