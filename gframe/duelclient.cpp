@@ -3085,18 +3085,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.AddCard(ccard, p, LOCATION_DECK, seq);
 				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 			}
+
 			val = BufferIO::ReadInt8(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
 				mainGame->dField.AddCard(ccard, p, LOCATION_HAND, seq);
+			}
+			// Use another loop to refresh the hand locations to prevent incorrect positioning
+			for (int seq = 0; seq < val; ++seq) {
+				ClientCard* ccard = mainGame->dField.hand[p][seq];
 				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 			}
-			val = BufferIO::ReadInt8(pbuf);
-			for(int seq = 0; seq < val; ++seq) {
-				ClientCard* ccard = new ClientCard;
-				mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
-				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
-			}
+			
 			val = BufferIO::ReadInt8(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
@@ -3107,6 +3107,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
 				mainGame->dField.AddCard(ccard, p, LOCATION_REMOVED, seq);
+				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
+			}
+			val = BufferIO::ReadInt8(pbuf);
+			for(int seq = 0; seq < val; ++seq) {
+				ClientCard* ccard = new ClientCard;
+				mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
 				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 			}
 			val = BufferIO::ReadInt8(pbuf);
