@@ -14,7 +14,7 @@
  * libGL
  * libGLU
  * gcc
-* 可参考https://github.com/mycard/mycard.github.io/tree/master/server中的脚本
+* 可参考 https://github.com/mycard/mycard.github.io/tree/master/server 中的脚本
 
 ###运行
 * 使用[ygopro-server-lite](https://github.com/mercury233/ygopro-server)运行
