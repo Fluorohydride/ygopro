@@ -97,9 +97,20 @@ namespace ygopro
         static const int32_t action_type_asymptotic = 1;
     };
     
-    class FloatingNumber : public DuelObject<vt2>, public std::enable_shared_from_this<FieldCard> {
+    class FloatingNumber : public DuelObject<vt2> {
     public:
+        virtual int32_t GetTextureId();
+        virtual void RefreshVertices();
         
+        void SetValue(int32_t val);
+        void SetValueStr(const std::string& val_str);
+        void SetCharSize(v2i sz) { char_size = sz; SetUpdate(); }
+        inline void SetPosition(v2i pos) { char_pos = pos; SetUpdate(); }
+        
+    protected:
+        std::string val_string;
+        v2i char_size = {0, 0};
+        v2i char_pos = {0, 0};
     };
     
     struct ViewParam {
@@ -138,6 +149,12 @@ namespace ygopro
         virtual void PushVerticesAll();
     };
     
+    class MiscObjectRenderer : public base::RenderObject2DLayout {
+    public:
+        MiscObjectRenderer() { InitGLState(true); }
+        virtual void PushVerticesAll();
+    };
+    
     class DuelScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
     public:
         DuelScene(base::Shader* _2dshader, base::Shader* _3dshader);
@@ -168,10 +185,13 @@ namespace ygopro
         inline void RemoveCard(std::shared_ptr<FieldCard> ptr) { fieldcard_renderer->DeleteObject(ptr.get()); }
         inline std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
         
+        std::shared_ptr<FloatingNumber> AddFloatingNumber();
+        
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
         std::shared_ptr<FieldRenderer> field_renderer;
         std::shared_ptr<FieldCardRenderer> fieldcard_renderer;
+        std::shared_ptr<MiscObjectRenderer> miscobject_renderer;
     };
     
 }

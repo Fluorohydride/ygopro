@@ -358,7 +358,46 @@ namespace ygopro
             pcard->pos_info.subsequence = i++;
         attaching_card = nullptr;
     }
-
+    
+    int32_t FloatingNumber::GetTextureId() {
+        return ImageMgr::Get().GetRawMiscTexture()->GetTextureId();
+    }
+    
+    void FloatingNumber::RefreshVertices() {
+        vertices.resize(val_string.length() * 8);
+        indices.resize(val_string.length() * 12);
+        auto pos = char_pos;
+        int32_t i = 0;
+        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
+        for(auto iter : val_string) {
+            auto tex = ImageMgr::Get().GetCharTex(iter);
+            vt2::Fill(&vertices[i], mgr->ConvScreenCoord({pos.x - 1, pos.y - 1}) , mgr->ConvScreenSize(char_size), tex, color);
+            vt2::Fill(&vertices[i + val_string.length() * 4], mgr->ConvScreenCoord(pos) , mgr->ConvScreenSize(char_size), tex, color);
+            i += 4;
+            pos.x += char_size.x + 1;
+        }
+        vt2::GenQuadIndex(indices.data(), (int32_t)val_string.length() * 2, vert_index);
+    }
+    
+    void FloatingNumber::SetValue(int32_t val) {
+        std::string new_str = To<std::string>(val);
+        bool redraw = val_string.length() != new_str.length();
+        val_string = std::move(new_str);
+        if(redraw)
+            SetRedraw(true);
+        else
+            SetUpdate();
+    }
+    
+    void FloatingNumber::SetValueStr(const std::string& val_str) {
+        bool redraw = val_string.length() != val_str.length();
+        val_string = val_str;
+        if(redraw)
+            SetRedraw(true);
+        else
+            SetUpdate();
+    }
+    
     void FieldRenderer::PushVerticesAll() {
         base::RenderObject<vt3>::PushVerticesAll();
         for(auto& iter : field_blocks[0])
@@ -412,6 +451,10 @@ namespace ygopro
             iter->PushVertices();
     }
     
+    void MiscObjectRenderer::PushVerticesAll() {
+        base::RenderObject<vt2>::PushVerticesAll();
+    }
+    
     DuelScene::DuelScene(base::Shader* _2dshader, base::Shader* _3dshader) {
         vparam.fovy = (float)layoutCfg["fovy"].to_double();
         vparam.cnear = (float)layoutCfg["near"].to_double();
@@ -440,9 +483,12 @@ namespace ygopro
             shader->SetParam1i("texid", 0);
             shader->SetParamMat4("mvp", glm::value_ptr(vparam.mvp));
         });
+        miscobject_renderer = std::make_shared<MiscObjectRenderer>();
+        miscobject_renderer->SetShader(_2dshader);
         PushObject(bg_renderer.get());
         PushObject(field_renderer.get());
         PushObject(fieldcard_renderer.get());
+        PushObject(miscobject_renderer.get());
         PushObject(sgui::SGGUIRoot::GetSingleton());
         bg_renderer->ClearVertices();
         bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), rectf{-1.0f, 1.0f, 2.0f, -2.0f}, ImageMgr::Get().GetTexture("bg"));

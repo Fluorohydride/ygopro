@@ -321,6 +321,19 @@
       }
     }
   },
+  "log dialog" : {
+    "type" : "window",
+    "close button" : true,
+    "min size" : [800, 400],
+    "position" : [0, 0, 800, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "path" : {
+        "type" : "textedit",
+        "readonly" : true,
+        "position" : [10, 40, -20, 45, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      }
+    }
+  },
   "menus" : {
     "menu deck" : {
       "eui_deck_load" : 0,

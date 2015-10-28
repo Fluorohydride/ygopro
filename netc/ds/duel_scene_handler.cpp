@@ -21,6 +21,33 @@ namespace ygopro
     std::vector<std::shared_ptr<FieldCard>> extra[2];
     std::vector<std::shared_ptr<FieldCard>> grave[2];
     std::vector<std::shared_ptr<FieldCard>> banished[2];
+    std::array<std::shared_ptr<FloatingNumber>, 23> fixed_numbers[2];
+    
+    enum class FloatingNumberType {
+        DeckCount = 0,
+        GraveCount,
+        BanishCount,
+        ExtraCount,
+        LScale,
+        RScale,
+        Star1,
+        Star2,
+        Star3,
+        Star4,
+        Star5,
+        ATK1,
+        ATK2,
+        ATK3,
+        ATK4,
+        ATK5,
+        DEF1,
+        DEF2,
+        DEF3,
+        DEF4,
+        DEF5,
+        LPValue,
+        LPChange,
+    };
     
     DuelSceneHandler::DuelSceneHandler(DuelScene* pscene) {
         duel_scene = pscene;

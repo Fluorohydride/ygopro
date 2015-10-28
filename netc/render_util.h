@@ -463,6 +463,11 @@ namespace base
                 return v2f{pos.x * 2.0f / screen_size.x - 1.0f, pos.y * 2.0f / screen_size.y - 1.0f};
             return v2f{pos.x * 2.0f / screen_size.x - 1.0f, 1.0f - pos.y * 2.0f / screen_size.y};
         }
+        inline v2f ConvScreenSize(v2i sz) {
+            if(flip_ycoord)
+                return v2f{sz.x * 2.0f / screen_size.x, sz.y * 2.0f / screen_size.y};
+            return v2f{sz.x * 2.0f / screen_size.x, -sz.y * 2.0f / screen_size.y};
+        }
         
     protected:
         bool flip_ycoord = false;

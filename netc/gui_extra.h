@@ -107,6 +107,12 @@ namespace ygopro
         sgui::SGLabel* pen_text = nullptr;
         sgui::SGLabel* desc_text = nullptr;
     };
+    
+    class LogPanel : CommonDialog {
+    public:
+        void Show();
+        void AddLog(int32_t msg_type, const std::wstring& msg);
+    };
 }
 
 #endif
