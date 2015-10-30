@@ -115,6 +115,7 @@
   "type_toon" : "卡通",
   "type_xyz" : "超量",
   "type_pendulum" : "灵摆",
+  "msg_card_set" : "{card}",
   "setname" : {
     "0x1" : "正义盟军",
     "0x2" : "次世代",

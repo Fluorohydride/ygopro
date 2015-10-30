@@ -453,6 +453,11 @@ namespace ygopro
     
     void MiscObjectRenderer::PushVerticesAll() {
         base::RenderObject<vt2>::PushVerticesAll();
+        for(int32_t i = 0; i < 2; ++i) {
+            for(auto& iter : fixed_numbers[i])
+                if(iter)
+                    iter->PushVertices();
+        }
     }
     
     DuelScene::DuelScene(base::Shader* _2dshader, base::Shader* _3dshader) {
