@@ -819,7 +819,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				CardString cstr;
 				CardData cd;
 				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
-					&& (cd.code == 78734254 || cd.code == 13857930 || !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
+					&& (cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS 
+							|| !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -834,7 +835,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(wcsstr(cit->second.name, pname) != 0) {
 						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 						//datas.alias can be double card names or alias
-						if(cp->second.code == 78734254 || cp->second.code == 13857930 
+						if(cp->second.code == CARD_MARINE_DOLPHIN || cp->second.code == CARD_TWINKLE_MOSS 
 								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
 							ancard.push_back(cit->first);
@@ -854,7 +855,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				CardString cstr;
 				CardData cd;
 				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
-					&& (cd.code == 78734254 || cd.code == 13857930 || !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
+					&& (cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS 
+							|| !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -869,7 +871,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(wcsstr(cit->second.name, pname) != 0) {
 						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 						//datas.alias can be double card names or alias
-						if(cp->second.code == 78734254 || cp->second.code == 13857930 
+						if(cp->second.code == CARD_MARINE_DOLPHIN || cp->second.code == CARD_TWINKLE_MOSS 
 								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
 							ancard.push_back(cit->first);
