@@ -9,6 +9,8 @@
 #include <vector>
 #include <list>
 
+class CGUISkinSystem;
+
 namespace ygo {
 
 struct Config {
@@ -16,6 +18,7 @@ struct Config {
 	unsigned short antialias;
 	unsigned short serverport;
 	unsigned char textfontsize;
+	int skin_index;
 	wchar_t lastip[20];
 	wchar_t lastport[10];
 	wchar_t nickname[20];
@@ -101,6 +104,7 @@ public:
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearTextures();
 	void CloseDuelWindow();
+	void LoadSkin();
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
@@ -378,6 +382,7 @@ public:
 	//surrender/leave
 	irr::gui::IGUIButton* btnLeaveGame;
 
+	CGUISkinSystem* skinSystem;
 };
 
 extern Game* mainGame;

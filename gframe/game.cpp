@@ -8,6 +8,8 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include "CGUISkinSystem/CGUISkinSystem.h"
+#include <sstream>
 
 #ifdef _WIN32
 #include <io.h>
@@ -546,6 +548,7 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
+	LoadSkin();
 	hideChat = false;
 	hideChatTimer = 0;
 	return true;
@@ -795,7 +798,7 @@ void Game::LoadConfig() {
 	char strbuf[32];
 	char valbuf[256];
 	wchar_t wstr[256];
-	gameConf.antialias = 0;
+	std::memset(&gameConf, 0, sizeof Config);
 	gameConf.serverport = 7911;
 	gameConf.textfontsize = 12;
 	gameConf.nickname[0] = 0;
@@ -835,8 +838,10 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
-		} else if(!strcmp(strbuf, "serverport")) {
+		} else if (!strcmp(strbuf, "serverport")) {
 			gameConf.serverport = atoi(valbuf);
+		} else if (!strcmp(strbuf, "skin_index")) {
+			gameConf.skin_index = atoi(valbuf);
 		} else if(!strcmp(strbuf, "lastip")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lastip, 20);
@@ -1070,6 +1075,34 @@ int Game::LocalPlayer(int player) {
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
+}
+void Game::LoadSkin() {
+	if (gameConf.skin_index >= 0)
+	{
+		skinSystem = new CGUISkinSystem("skins", device);
+		core::array<core::stringw> skins = skinSystem->listSkins();
+		if ((size_t)gameConf.skin_index < skins.size())
+		{
+			int index = skins.size() - gameConf.skin_index - 1; // reverse index
+			if (skinSystem->applySkin(skins[index].c_str()))
+			{
+				// Convert and apply special color
+				stringw header_color = skinSystem->getProperty(L"CardInfoHeaderColor");
+				if (!header_color.empty())
+				{
+					unsigned int color_value;
+					std::wstringstream ss;
+					ss << std::hex << header_color.c_str();
+					ss >> color_value;
+					if (!ss.fail())
+					{
+						stInfo->setOverrideColor(color_value);
+						stDataInfo->setOverrideColor(color_value);
+					}
+				}
+			}
+		}
+	}
 }
 
 }
