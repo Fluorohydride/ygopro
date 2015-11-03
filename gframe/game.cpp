@@ -838,9 +838,9 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
-		} else if (!strcmp(strbuf, "serverport")) {
+		} else if(!strcmp(strbuf, "serverport")) {
 			gameConf.serverport = atoi(valbuf);
-		} else if (!strcmp(strbuf, "skin_index")) {
+		} else if(!strcmp(strbuf, "skin_index")) {
 			gameConf.skin_index = atoi(valbuf);
 		} else if(!strcmp(strbuf, "lastip")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
@@ -871,12 +871,10 @@ void Game::LoadConfig() {
 			if (!strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
-			}
-			else if (!strcmp(strbuf, "gamename")) {
+			} else if(!strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
-			}
-			else if (!strcmp(strbuf, "lastdeck")) {
+			} else if(!strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 			}
