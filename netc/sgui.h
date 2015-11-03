@@ -1198,8 +1198,8 @@ namespace sgui
         
         void SetContainerAlpha(float f) {
             container_alpha = f;
-            if(alpha_cmd)
-                alpha_cmd->global_alpha = container_alpha;
+            if(!alpha_cmd.expired())
+                alpha_cmd.lock()->global_alpha = container_alpha;
             SetUpdate();
         }
         
@@ -1211,7 +1211,7 @@ namespace sgui
         std::weak_ptr<SGWidget> hoving_widget;
         std::weak_ptr<SGWidget> focus_widget;
         std::vector<std::shared_ptr<SGWidget>> children;
-        base::RenderCmdBeginGlobalAlpha<vt2>* alpha_cmd = nullptr;
+        std::weak_ptr<base::RenderCmdBeginGlobalAlpha<vt2>> alpha_cmd;
     };
     
     class SGGUIRoot : public SGWidgetContainer, public base::RenderObject2DLayout, public SysClock, public Timer<uint64_t> {
@@ -2353,9 +2353,9 @@ namespace sgui
             }
             if(view_size_change)
                 CheckViewSize();
-            if(cmd && (view_pos_change || view_size_change)) {
+            if(!cmd.expired() && (view_pos_change || view_size_change)) {
                 recti clip_region = {view_pos.x, view_pos.y, view_size.x, view_size.y};
-                cmd->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
+                cmd.lock()->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             }
             return ret;
         }
@@ -2462,7 +2462,7 @@ namespace sgui
         v2i view_pos = {0, 0};
         v2i view_size = {0, 0};
         v2i view_offset = {0, 0};
-        base::RenderCmdBeginScissor<vt2>* cmd = nullptr;
+        std::weak_ptr<base::RenderCmdBeginScissor<vt2>> cmd;
     };
     
     class SGItemListWidget {
@@ -2488,14 +2488,14 @@ namespace sgui
     public:
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto ret = SGWidgetContainer::OnPositionSizeChange(re_pos, re_size);
-            if(cmd && (ret.first || ret.second)) {
+            if(!cmd.expired() && (ret.first || ret.second)) {
                 recti clip_region = {
                     area_pos.absolute.x + bounds.left,
                     area_pos.absolute.y + bounds.top,
                     area_size.absolute.x - bounds.left - bounds.width,
                     area_size.absolute.y - bounds.top - bounds.height
                 };
-                cmd->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
+                cmd.lock()->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             }
             if(ret.second) {
                 int32_t new_offset = item_offset;
@@ -2772,6 +2772,19 @@ namespace sgui
             static_cast<SGScrollBar<>*>(children[0].get())->SetValue((float)offset / max_offset);
         }
         
+        void SetItemBackColor(uint32_t bcolor1, uint32_t bcolor2, uint32_t bcolor_sel) {
+            color[0] = bcolor1;
+            color[1] = bcolor2;
+            color[2] = bcolor_sel;
+            UpdateBackTex();
+        }
+        
+        UIText* GetItemUI(int32_t idx) {
+            if(idx < 0 || idx + 2 >= ui_components.size())
+                return nullptr;
+            return static_cast<UIText*>(ui_components[idx + 2]);
+        }
+        
     protected:
         recti bounds = {0, 0, 0, 0};
         recti sel_tex = {0, 0, 0, 0};
@@ -2786,7 +2799,7 @@ namespace sgui
         v2i item_size_rel = {0, 0};
         v2f item_size_pro = {0, 0};
         v2f item_self_factor = {0, 0};
-        base::RenderCmdBeginScissor<vt2>* cmd = nullptr;
+        std::weak_ptr<base::RenderCmdBeginScissor<vt2>> cmd;
         std::vector<int32_t> custom_value;
     };
     
@@ -3050,6 +3063,8 @@ namespace sgui
         }
         
         virtual SGWidget* FindWidget(const std::string& nm) {
+            if(nm == name)
+                return this;
             for(auto& iter : tabs) {
                 auto ret = iter->FindWidget(nm);
                 if(ret)
@@ -3163,25 +3178,31 @@ namespace sgui
         
         virtual bool OnMouseDown(int32_t button, int32_t mods, int32_t x, int32_t y) {
             auto ptr = shared_from_this();
-            bool ret = event_mouse_down.Trigger(*this, button, mods,x, y) || is_entity;
+            event_mouse_down.Trigger(*this, button, mods,x, y);
             if(on_tab) {
                 if(current_tab >= 0)
-                    ret = tabs[current_tab]->OnMouseDown(button, mods, x, y) || ret;
+                    tabs[current_tab]->OnMouseDown(button, mods, x, y);
             } else {
                 if(hoving_title >= 0 && hoving_title != current_tab) {
                     SetCurrentTab(hoving_title);
                     SetRedraw();
                 }
+                if(button == GLFW_MOUSE_BUTTON_LEFT) {
+                    SGClickingMgr::Get().SetClickingObject(ptr);
+                    auto dr = GetDragTarget();
+                    if(dr)
+                        SGClickingMgr::Get().DragBegin(dr, x, y);
+                }
             }
-            return ret;
+            return true;
         }
         
         virtual bool OnMouseUp(int32_t button, int32_t mods, int32_t x, int32_t y) {
             auto ptr = shared_from_this();
-            bool ret = event_mouse_up.Trigger(*this, button, mods,x, y) || is_entity;
+            event_mouse_up.Trigger(*this, button, mods,x, y);
             if(current_tab >= 0)
-                ret = tabs[current_tab]->OnMouseUp(button, mods, x, y) || ret;
-            return ret;
+                tabs[current_tab]->OnMouseUp(button, mods, x, y);
+            return true;
         }
         
         virtual bool OnMouseWheel(float deltax, float deltay) {
@@ -3273,14 +3294,14 @@ namespace sgui
     public:
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto ret = SGWidget::OnPositionSizeChange(re_pos, re_size);
-            if(cmd && (ret.first || ret.second)) {
+            if(!cmd.expired() && (ret.first || ret.second)) {
                 recti clip_region = {
                     area_pos.absolute.x + text_area.left,
                     area_pos.absolute.y + text_area.top,
                     area_size.absolute.x - text_area.left - text_area.width,
                     area_size.absolute.y - text_area.top - text_area.height
                 };
-                cmd->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
+                cmd.lock()->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             }
             return ret;
         }
@@ -3635,7 +3656,7 @@ namespace sgui
         recti sel_tex = {0, 0, 0, 0};
         recti cursor_tex = {0, 0, 0, 0};
         recti text_area = {0, 0, 0, 0};
-        base::RenderCmdBeginScissor<vt2>* cmd = nullptr;
+        std::weak_ptr<base::RenderCmdBeginScissor<vt2>> cmd;
     };
     
 }

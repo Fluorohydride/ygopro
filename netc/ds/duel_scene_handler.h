@@ -109,6 +109,7 @@ namespace ygopro
         std::weak_ptr<FieldBlock> pre_block;
         std::weak_ptr<FieldCard> pre_card;
         std::shared_ptr<InfoPanel> info_panel;
+        std::shared_ptr<LogPanel> log_panel;
         bool message_lock = false;
         CommandListMT<DuelMessage> messages;
     };

@@ -25,14 +25,11 @@ namespace ygopro
                 break;
             }
             case 1: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_MOVE;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x2, 2, POS_FACEUP).info);
-                writer.Write<uint32_t>(CardPosInfo(0).info);
-                writer.Write<uint32_t>(0);
-                messages.PushCommand(dm);
+                log_panel->Show();
+                break;
+            }
+            case 2: {
+                log_panel->AddLog(0, L"ASDASD");
                 break;
             }
         }

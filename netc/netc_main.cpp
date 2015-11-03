@@ -142,11 +142,11 @@ int32_t main(int32_t argc, char* argv[]) {
         if(action == GLFW_PRESS) {
             if(key == GLFW_KEY_GRAVE_ACCENT && (mods & GLFW_MOD_ALT))
                 SceneMgr::Get().ScreenShot();
-            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(key, mods))
-                SceneMgr::Get().GetScene()->GetSceneHandler()->KeyDown(key, mods);
+            sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(key, mods);
+            SceneMgr::Get().GetScene()->GetSceneHandler()->KeyDown(key, mods);
         } else if(action == GLFW_RELEASE) {
-            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent(key, mods))
-                SceneMgr::Get().GetScene()->GetSceneHandler()->KeyUp(key, mods);
+            sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent(key, mods);
+            SceneMgr::Get().GetScene()->GetSceneHandler()->KeyUp(key, mods);
         }
     });
     glfwSetCharCallback(window, [](GLFWwindow* wnd, uint32_t unichar) {

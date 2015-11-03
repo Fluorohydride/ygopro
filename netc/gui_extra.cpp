@@ -987,4 +987,39 @@ namespace ygopro
         code = 0;
     }
     
+    void LogPanel::Show() {
+        sgui::SGPanel* wnd = nullptr;
+        if(window.expired()) {
+            wnd = LoadDialogAs<sgui::SGPanel>("log dialog");
+            if(!wnd)
+                return;
+            window = wnd->CastPtr<sgui::SGWidgetContainer>();
+            auto tab = wnd->FindWidgetAs<sgui::SGTabControl>("log tab");
+            if(tab)
+                tab->SetDragTarget(wnd->shared_from_this());
+            log_list[0] = wnd->FindWidgetAs<sgui::SGListBox>("chat list");
+            log_list[1] = wnd->FindWidgetAs<sgui::SGListBox>("duel list");
+            log_list[2] = wnd->FindWidgetAs<sgui::SGListBox>("sys list");
+            chat_box = wnd->FindWidgetAs<sgui::SGTextEdit>("chat box");
+            auto& back_color_node = dialogCfg["log dialog"]["item back color"];
+            default_item_color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["log dialog"]["item color"]);
+            uint32_t bcolor[3] = {0xc0000000, 0xc0000000, 0xc0404040};
+            for(int32_t i = 0; i < 3; ++i)
+                bcolor[i] = sgui::SGJsonUtil::ConvertRGBA(back_color_node[i]);
+            for(int32_t i = 0; i < 3; ++i) {
+                if(log_list[i])
+                    log_list[i]->SetItemBackColor(bcolor[0], bcolor[1], bcolor[2]);
+            }
+        }
+    }
+    
+    void LogPanel::AddLog(int32_t msg_type, const std::wstring& msg) {
+        if(msg_type >= 3)
+            return;
+        if(log_list[msg_type]) {
+            log_list[msg_type]->AddItem(msg, default_item_color);
+            logs[msg_type].push_back(msg);
+        }
+    }
+    
 }

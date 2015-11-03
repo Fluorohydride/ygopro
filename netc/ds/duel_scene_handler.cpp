@@ -52,6 +52,7 @@ namespace ygopro
     DuelSceneHandler::DuelSceneHandler(DuelScene* pscene) {
         duel_scene = pscene;
         info_panel = std::make_shared<InfoPanel>();
+        log_panel = std::make_shared<LogPanel>();
         InitField();
     }
     

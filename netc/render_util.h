@@ -195,8 +195,6 @@ namespace base
         }
         
         virtual ~RenderObject() {
-            for(auto& rc : render_commands)
-                delete rc;
         }
         
         std::tuple<int16_t, int16_t> BeginPrimitive(int16_t pri_type, int16_t texid) {
@@ -204,7 +202,7 @@ namespace base
             if(!render_commands.empty() && render_commands.back()->CheckPrimitive(pri_type, texid))
                 merge = true;
             if(!merge)
-                render_commands.push_back(new RenderCmdDraw<VTYPE>(pri_type, texid, (int16_t)index_buffer.size()));
+                render_commands.push_back(std::make_shared<RenderCmdDraw<VTYPE>>(pri_type, texid, (int16_t)index_buffer.size()));
             return std::make_tuple((int16_t)vertex_buffer.size(), (int16_t)index_buffer.size());
         }
         
@@ -213,7 +211,7 @@ namespace base
                 vertex_buffer.insert(vertex_buffer.end(), vert_data, vert_data + vcount);
             if(icount > 0)
                 index_buffer.insert(index_buffer.end(), index_data, index_data + icount);
-            static_cast<RenderCmdDraw<VTYPE>*>(render_commands.back())->count += icount;
+            std::static_pointer_cast<RenderCmdDraw<VTYPE>>(render_commands.back())->count += icount;
         }
         
         void BeginUpdate() {
@@ -249,9 +247,9 @@ namespace base
         }
         
         template<template<typename> class CMD_TYPE, typename... TR>
-        CMD_TYPE<VTYPE>* PushCommand(TR... tr) {
+        std::shared_ptr<CMD_TYPE<VTYPE>> PushCommand(TR... tr) {
             static_assert(std::is_base_of<RenderCmd<VTYPE>, CMD_TYPE<VTYPE>>::value, "command type should be subclass of RenderCmd.");
-            auto ptr = new CMD_TYPE<VTYPE>(std::forward<TR>(tr)...);
+            auto ptr = std::make_shared<CMD_TYPE<VTYPE>>(std::forward<TR>(tr)...);
             render_commands.push_back(ptr);
             return ptr;
         }
@@ -301,8 +299,6 @@ namespace base
         void ClearCommandVertices() {
             vertex_buffer.clear();
             index_buffer.clear();
-            for(auto& rc : render_commands)
-                delete rc;
             render_commands.clear();
             update_units.clear();
         }
@@ -379,7 +375,7 @@ namespace base
         bool need_redraw = true;
         bool need_update = false;
         bool all_need_update = false;
-        std::vector<RenderCmd<VTYPE>*> render_commands;
+        std::vector<std::shared_ptr<RenderCmd<VTYPE>>> render_commands;
         std::map<RenderUnit<VTYPE>*, std::shared_ptr<RenderUnit<VTYPE>>> all_units;     // owner
         std::set<RenderUnit<VTYPE>*> update_units;  // weak reference
     };

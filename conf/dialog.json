@@ -322,17 +322,51 @@
     }
   },
   "log dialog" : {
-    "type" : "window",
-    "close button" : true,
-    "min size" : [800, 400],
-    "position" : [0, 0, 800, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "type" : "panel",
+    "is entity" : false,
+    "position" : [0, 0, 0, 400, 0.5, 0.5, 0.8, 0.0, -0.5, -0.5],
     "children" : {
-      "path" : {
-        "type" : "textedit",
-        "readonly" : true,
-        "position" : [10, 40, -20, 45, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      "log tab" : {
+        "type" : "tab",
+        "position" : [0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.0, 0.0],
+        "tabs" : {
+          "chat log" : {
+            "title color" : "0x0000ffff",
+            "children" : {
+              "chat list" : {
+                "type" : "listbox",
+                "position" : [10, 10, -20, -70, 0, 0, 1.0, 1.0, 0.0, 0.0]
+              },
+              "chat box" : {
+                "type" : "textedit",
+                "input color" : "0x000000ff",
+                "position" : [10, -60, -20, 50, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+              }
+            }
+          },
+          "duel log" : {
+            "title color" : "0x0000ffff",
+            "children" : {
+              "duel list" : {
+                "type" : "listbox",
+                "position" : [10, 10, -20, -20, 0, 0, 1.0, 1.0, 0.0, 0.0]
+              }
+            }
+          },
+          "system log" : {
+            "title color" : "0x0000ffff",
+            "children" : {
+              "sys list" : {
+                "type" : "listbox",
+                "position" : [10, 10, -20, -20, 0, 0, 1.0, 1.0, 0.0, 0.0]
+              }
+            }
+          }
+        }
       }
-    }
+    },
+    "item color" : "0xffffffff",
+    "item back color" : ["0x000000c0", "0x000000c0", "0x404040c0"]
   },
   "menus" : {
     "menu deck" : {

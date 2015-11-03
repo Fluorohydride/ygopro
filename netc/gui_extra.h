@@ -110,12 +110,19 @@ namespace ygopro
     
     class LogPanel : CommonDialog {
     public:
-        void Show() {}
-        void AddLog(int32_t msg_type, const std::wstring& msg) {}
+        void Show();
+        void AddLog(int32_t msg_type, const std::wstring& msg);
         
-        static const int32_t msg_type_system = 0;
+    protected:
+        uint32_t default_item_color = 0xffffffff;
+        std::list<std::wstring> logs[3];
+        sgui::SGListBox* log_list[3] = {nullptr, nullptr, nullptr};
+        sgui::SGTextEdit* chat_box = nullptr;
+        
+    public:
+        static const int32_t msg_type_chat = 0;
         static const int32_t msg_type_duel = 1;
-        static const int32_t msg_type_chat = 2;
+        static const int32_t msg_type_system = 2;
     };
 }
 
