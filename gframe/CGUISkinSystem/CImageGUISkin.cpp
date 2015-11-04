@@ -335,48 +335,6 @@ void CImageGUISkin::drawIcon(IGUIElement* element, EGUI_DEFAULT_ICON icon,
     else FallbackSkin->drawIcon(element,icon,position,starttime,currenttime,loop,clip);
 }
 
-void CImageGUISkin::drawHorizontalProgressBar( IGUIElement* element, const core::rect<s32>& rectangle, const core::rect<s32>* clip,
-            f32 filledRatio, video::SColor fillColor, video::SColor emptyColor )
-{
-    if ( !Config.ProgressBar.Texture || !Config.ProgressBarFilled.Texture )
-    {
-        return;
-    }
-
-    // Draw empty progress bar
-    drawElementStyle( Config.ProgressBar, rectangle, clip, &emptyColor );
-
-    // Draw filled progress bar on top
-    if ( filledRatio < 0.0f )
-        filledRatio = 0.0f;
-    else
-    if ( filledRatio > 1.0f )
-        filledRatio = 1.0f;
-
-    if ( filledRatio > 0.0f )
-    {
-        s32 filledPixels = (s32)( filledRatio * rectangle.getSize().Width );
-        s32 height = rectangle.getSize().Height;
-
-        core::rect<s32> clipRect = clip? *clip:rectangle;
-        if ( filledPixels < height )
-        {
-            if ( clipRect.LowerRightCorner.X > rectangle.UpperLeftCorner.X + filledPixels )
-                clipRect.LowerRightCorner.X = rectangle.UpperLeftCorner.X + filledPixels;
-
-            filledPixels = height;
-        }
-
-        core::rect<s32> filledRect = core::rect<s32>( 
-            rectangle.UpperLeftCorner.X, 
-            rectangle.UpperLeftCorner.Y, 
-            rectangle.UpperLeftCorner.X + filledPixels, 
-            rectangle.LowerRightCorner.Y );
-        
-        drawElementStyle( Config.ProgressBarFilled, filledRect, &clipRect, &fillColor );
-    }
-}
-
 void CImageGUISkin::drawElementStyle( const SImageGUIElementStyle& elem, const core::rect<s32>& rect, const core::rect<s32>* clip, video::SColor* pcolor  )
 {
     core::rect<s32> srcRect;

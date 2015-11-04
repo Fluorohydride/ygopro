@@ -1,6 +1,6 @@
 #include "CGUISkinSystem.h"
 
-CGUISkinSystem::CGUISkinSystem(core::string<char*> path,IrrlichtDevice *dev) {
+CGUISkinSystem::CGUISkinSystem(core::stringw path,IrrlichtDevice *dev) {
 	device = dev;
 	skinsPath = path;
 	fs = dev->getFileSystem();	
@@ -43,14 +43,6 @@ bool CGUISkinSystem::loadSkinList() {
 	else 
 		return false;
 }
-gui::CGUIProgressBar *CGUISkinSystem::addProgressBar(gui::IGUIElement *parent,core::rect<s32> rect, bool bindColorsToSkin) {
-	gui::CGUIProgressBar* bar = new gui::CGUIProgressBar(parent,device->getGUIEnvironment(), rect,bindColorsToSkin);
-	//gui::CImageGUISkin* skin = (gui::CImageGUISkin*)device->getGUIEnvironment()->getSkin();
-	parent->addChild(bar);    
-	bar->drop();
-	return bar;
-}
-
 
 bool CGUISkinSystem::populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname) {
 	bool ret = false;
@@ -133,11 +125,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const c8 *skinname) {
 	if(tmp.equals_ignore_case("EGST_WINDOWS_CLASSIC"))
 		fallbackType = gui::EGST_WINDOWS_CLASSIC;
 	else if(tmp.equals_ignore_case("EGST_BURNING_SKIN"))
-		fallbackType = gui::EGST_BURNING_SKIN;	
-	// I'm not dealing with the 'unknown skin'
-	fallbackSkin = device->getGUIEnvironment()->createSkin(fallbackType);
-	device->getGUIEnvironment()->setSkin(fallbackSkin);
-	fallbackSkin->drop();
+		fallbackType = gui::EGST_BURNING_SKIN;
 
 	skin = new gui::CImageGUISkin(device->getVideoDriver(), device->getGUIEnvironment()->getSkin());
 	fs->changeWorkingDirectoryTo(path.c_str());
@@ -283,7 +271,4 @@ bool CGUISkinSystem::applySkin(const wchar_t *skinname) {
 }
 CGUISkinSystem::~CGUISkinSystem() {
 	skinsList.clear();
-	
-
-	
 }

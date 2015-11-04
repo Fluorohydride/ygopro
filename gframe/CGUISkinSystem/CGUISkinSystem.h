@@ -5,7 +5,6 @@
 #include <irrlicht.h>
 #endif
 #include "CImageGUISkin.h"
-#include "CGUIProgressBar.h"
 //#include "SkinLoader.h"
 #include "../CXMLRegistry/CXMLRegistry.h"
 
@@ -38,12 +37,11 @@ public:
 	// Constructor
 	// path = Path to skins
 	// dev = Irrlicht device
-	CGUISkinSystem(core::string<char*> path,IrrlichtDevice *dev);
+	CGUISkinSystem(core::stringw path,IrrlichtDevice *dev);
 	~CGUISkinSystem();
 	core::array<core::stringw> listSkins();
 	bool loadSkinList();
 	bool applySkin(const wchar_t *skinname);
-	gui::CGUIProgressBar *addProgressBar(gui::IGUIElement *parent,core::rect<s32> rect,bool bindColorsToSkin=true);
 	// Gets property from current skin
 	core::stringw getProperty(core::stringw key);	
 	bool populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname);

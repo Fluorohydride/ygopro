@@ -125,10 +125,6 @@ public:
 	// Exposes config so we can get the progress bar colors
 	virtual SImageGUISkinConfig getConfig() { return Config; }
 
-	// End Madoc adds
-    virtual void drawHorizontalProgressBar( IGUIElement* element, const core::rect<s32>& rectangle, const core::rect<s32>* clip,
-            f32 filledRatio, video::SColor fillColor, video::SColor emptyColor );
-
 	virtual void draw2DRectangle(IGUIElement* element, const video::SColor &color, 
 		const core::rect<s32>& pos, const core::rect<s32>* clip = 0);
 	virtual void setProperty(core::stringw key, core::stringw value);
