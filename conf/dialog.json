@@ -324,7 +324,7 @@
   "log dialog" : {
     "type" : "panel",
     "is entity" : false,
-    "position" : [0, 0, 0, 400, 0.5, 0.5, 0.8, 0.0, -0.5, -0.5],
+    "position" : [0, 0, 800, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
       "log tab" : {
         "type" : "tab",
@@ -340,7 +340,12 @@
               "chat box" : {
                 "type" : "textedit",
                 "input color" : "0x000000ff",
-                "position" : [10, -60, -20, 50, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+                "position" : [10, -60, -120, 50, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0]
+              },
+              "send" : {
+                "type" : "text button",
+                "text" : ["eui_log_send", "0x000000ff"],
+                "position" : [-110, -60, 100, 50, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0]
               }
             }
           },
@@ -362,6 +367,16 @@
               }
             }
           }
+        }
+      },
+      "close button" : {
+        "type" : "simple button",
+        "position" : [-15, 5, 30, 30, 1.0, 0.0, 0, 0, -1.0, 0],
+        "style" : {
+          "color" : "0xddddffff",
+          "normal_tex" : [58, 0, 19, 18],
+          "hover_tex" : [58, 19, 19, 18],
+          "down_tex" : [58, 38, 19, 18]
         }
       }
     },

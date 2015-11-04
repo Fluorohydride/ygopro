@@ -718,6 +718,29 @@ namespace sgui
                 return (int32_t)texts.size();;
         }
         
+        using format_callback = std::function<void(UIText* ui, const std::wstring& type, const std::wstring& value, uint32_t color)>;
+        void PushStringWithFormat(const std::wstring& str, uint32_t cur_color, format_callback unknown_format_cb) {
+            std::wstring match_str = str;
+            std::wregex re(L"\\[ *(\\w+) *: *(\\w+) *\\]");
+            std::wsmatch m;
+            while(std::regex_search(match_str, m, re)) {
+                AppendText(m.prefix(), cur_color);
+                match_str = m.suffix();
+                std::wstring type = m[1].str();
+                if(type == L"c") {
+                    uint32_t agbr = To<uint32_t>(m[2].str());
+                    cur_color = ((agbr >> 24) & 0xff) | (((agbr >> 8) & 0xff00)) | ((agbr << 8) & 0xff0000) | ((agbr << 24) & 0xff000000);
+                } else if(type == L"m") {
+                    std::wstring em;
+                    em.push_back(0xe000 + To<uint32_t>(m[2].str()));
+                    AppendText(em, cur_color);
+                } else if(unknown_format_cb) {
+                    unknown_format_cb(this, type, m[2].str(), cur_color);
+                }
+            }
+            AppendText(match_str, cur_color);
+        }
+        
     protected:
         base::Font* text_font = nullptr;
         int32_t vert_cap = 0;
@@ -2471,6 +2494,7 @@ namespace sgui
         
         virtual void AddItem(const std::wstring& str, uint32_t cl, int32_t cvalue) = 0;
         virtual void RemoveItem(int32_t index) = 0;
+        virtual int32_t GetItemCount() = 0;
         virtual const std::wstring& GetItemText(int32_t index) = 0;
         virtual int32_t GetItemCustomValue(int32_t) = 0;
         virtual void ClearItems() = 0;
@@ -2687,6 +2711,10 @@ namespace sgui
             sc->SetVisible(false);
             sc->SetValue(0.0f);
             SetSelection(-1);
+        }
+        
+        virtual int32_t GetItemCount() {
+            return (int32_t)ui_components.size() - 2;
         }
         
         virtual const std::wstring& GetItemText(int32_t index) {
@@ -2925,6 +2953,10 @@ namespace sgui
             color.erase(color.begin() + index);
             if(selection == index)
                 SetSelection(-1);
+        }
+        
+        virtual int32_t GetItemCount() {
+            return (int32_t)items.size();
         }
         
         virtual const std::wstring& GetItemText(int32_t index) {

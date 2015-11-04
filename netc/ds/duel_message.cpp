@@ -25,11 +25,12 @@ namespace ygopro
                 break;
             }
             case 1: {
-                log_panel->Show();
+                log_panel->Show(1);
+                
                 break;
             }
             case 2: {
-                log_panel->AddLog(0, L"ASDASD");
+                log_panel->AddLog(0, L"[set:123]Hello[c:0xff0000ff] world![m:67]");
                 break;
             }
         }
@@ -1111,7 +1112,9 @@ namespace ygopro
                 uint32_t code = reader.Read<uint32_t>();
                 CardPosInfo pi(reader.Read<int32_t>());
                 pi.controler = LocalPlayer(pi.controler);
-//                myswprintf(event_string, dataManager.GetSysString(1601));
+                auto ptr = GetCard(pi);
+                if(ptr && code)
+                    ptr->SetCode(code);
                 break;
             }
             case MSG_SWAP: {

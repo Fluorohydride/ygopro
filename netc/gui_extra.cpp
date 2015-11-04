@@ -987,16 +987,16 @@ namespace ygopro
         code = 0;
     }
     
-    void LogPanel::Show() {
+    void LogPanel::Show(int32_t type) {
         sgui::SGPanel* wnd = nullptr;
         if(window.expired()) {
             wnd = LoadDialogAs<sgui::SGPanel>("log dialog");
             if(!wnd)
                 return;
             window = wnd->CastPtr<sgui::SGWidgetContainer>();
-            auto tab = wnd->FindWidgetAs<sgui::SGTabControl>("log tab");
-            if(tab)
-                tab->SetDragTarget(wnd->shared_from_this());
+            tabs = wnd->FindWidgetAs<sgui::SGTabControl>("log tab");
+            if(tabs)
+                tabs->SetDragTarget(wnd->shared_from_this());
             log_list[0] = wnd->FindWidgetAs<sgui::SGListBox>("chat list");
             log_list[1] = wnd->FindWidgetAs<sgui::SGListBox>("duel list");
             log_list[2] = wnd->FindWidgetAs<sgui::SGListBox>("sys list");
@@ -1007,19 +1007,45 @@ namespace ygopro
             for(int32_t i = 0; i < 3; ++i)
                 bcolor[i] = sgui::SGJsonUtil::ConvertRGBA(back_color_node[i]);
             for(int32_t i = 0; i < 3; ++i) {
-                if(log_list[i])
+                if(log_list[i]) {
                     log_list[i]->SetItemBackColor(bcolor[0], bcolor[1], bcolor[2]);
+                    for(auto& iter : logs[i])
+                        AddLog(i, iter, false);
+                }
             }
+            sgui::SGWidget* button = wnd->FindWidgetAs<sgui::SGWidget>("close button");
+            if(button) {
+                button->event_click += [wnd](sgui::SGWidget& sender)->bool {
+                    wnd->RemoveFromParent();
+                    return true;
+                };
+            }
+            sgui::SGWidget* send_button = wnd->FindWidgetAs<sgui::SGWidget>("send");
+            if(chat_box && send_button) {
+                send_button->event_click += [this](sgui::SGWidget& sender)->bool {
+                    AddLog(0, chat_box->GetTextUI()->GetText(), true);
+                    chat_box->GetTextUI()->Clear();
+                    return true;
+                };
+            }
+        }
+        if(tabs) {
+            tabs->SetCurrentTab(type);
         }
     }
     
-    void LogPanel::AddLog(int32_t msg_type, const std::wstring& msg) {
+    void LogPanel::AddLog(int32_t msg_type, const std::wstring& msg, bool newlog) {
         if(msg_type >= 3)
             return;
         if(log_list[msg_type]) {
-            log_list[msg_type]->AddItem(msg, default_item_color);
-            logs[msg_type].push_back(msg);
+            log_list[msg_type]->AddItem(L"", default_item_color);
+            auto count = log_list[msg_type]->GetItemCount();
+            auto ui = log_list[msg_type]->GetItemUI(count - 1);
+            ui->PushStringWithFormat(msg, default_item_color, nullptr);
+            log_list[msg_type]->SetBeginItem(count);
         }
+        if(newlog)
+            logs[msg_type].push_back(msg);
     }
     
 }

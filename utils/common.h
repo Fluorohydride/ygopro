@@ -20,6 +20,7 @@
 #include <functional>
 #include <algorithm>
 #include <type_traits>
+#include <regex>
 #include <cstring>
 #include <ctime>
 #include <cmath>

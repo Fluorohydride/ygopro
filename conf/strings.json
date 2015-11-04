@@ -43,6 +43,7 @@
   "eui_filter_count" : "找到{count}张卡.",
   "eui_filter_prevpage" : "<<",
   "eui_filter_nextpage" : ">>",
+  "eui_log_send" : "发送",
   "eui_msg_new_deck" : "(新卡组)",
   "eui_msg_deck_load" : "请选择要载入的卡组",
   "eui_msg_deck_save" : "卡组保存为",
@@ -115,7 +116,6 @@
   "type_toon" : "卡通",
   "type_xyz" : "超量",
   "type_pendulum" : "灵摆",
-  "msg_card_set" : "{card}",
   "setname" : {
     "0x1" : "正义盟军",
     "0x2" : "次世代",
