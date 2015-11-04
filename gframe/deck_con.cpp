@@ -534,8 +534,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_MOVED: {
-			int x = event.MouseInput.X;
-			int y = event.MouseInput.Y;
+			position2di gamepos = mainGame->Resize(event.MouseInput.X, event.MouseInput.Y, true);
+			int x = gamepos.X;
+			int y = gamepos.Y;
 			int pre_code = hovered_code;
 			if(x >= 314 && x <= 794 && y >= 164 && y <= 435) {
 				int lx = 10, px, py = (y - 164) / 68;

@@ -15,6 +15,7 @@ namespace ygo {
 
 struct Config {
 	bool use_d3d;
+	bool allow_resize;
 	unsigned short antialias;
 	unsigned short serverport;
 	unsigned char textfontsize;
@@ -96,7 +97,7 @@ public:
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist);
+	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool is_dragging = false);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
@@ -113,6 +114,13 @@ public:
 		irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
 	}
+
+	void OnResize();
+	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
+	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
+	position2di Resize(s32 x, s32 y, bool reverse = false);
+	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
+	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2);
 
 	Mutex gMutex;
 	Mutex gBuffer;
@@ -161,10 +169,14 @@ public:
 	ClientField dField;
 	DeckBuilder deckBuilder;
 	MenuHandler menuHandler;
+	
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
+
+	irr::core::dimension2d<irr::u32> window_size;
+
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;
@@ -350,6 +362,17 @@ public:
 	irr::gui::IGUIButton* btnDBExit;
 	irr::gui::IGUIButton* btnSideOK;
 	irr::gui::IGUIEditBox* ebDeckname;
+	//deck edit labels
+	irr::gui::IGUIStaticText* stBanlist;
+	irr::gui::IGUIStaticText* stDeck;
+	irr::gui::IGUIStaticText* stCategory;
+	irr::gui::IGUIStaticText* stLimit;
+	irr::gui::IGUIStaticText* stAttribute;
+	irr::gui::IGUIStaticText* stType;
+	irr::gui::IGUIStaticText* stAtk;
+	irr::gui::IGUIStaticText* stDef;
+	irr::gui::IGUIStaticText* stLevel;
+	irr::gui::IGUIStaticText* stSearch;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
