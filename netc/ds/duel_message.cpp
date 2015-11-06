@@ -13,24 +13,20 @@ namespace ygopro
     
     void DuelSceneHandler::Test(int32_t param) {
         switch(param) {
-            case 0: {
+            case 1: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_MOVE;
+                dm->msg_type = MSG_CONFIRM_DECKTOP;
                 BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint8_t>(3);
                 writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(CardPosInfo(0, 0, 0, 0).info);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x2, 1, POS_FACEDOWN).info);
-                writer.Write<uint32_t>(0);
+                writer.Write<uint32_t>(57728570);
+                writer.Write<uint32_t>(57728570);
                 messages.PushCommand(dm);
                 break;
             }
-            case 1: {
-                log_panel->Show(1);
-                
-                break;
-            }
-            case 2: {
-                log_panel->AddLog(0, L"[set:123]Hello[c:0xff0000ff] world![m:67]");
+            case 9: {
+                log_panel->Show(0);
                 break;
             }
         }
@@ -562,42 +558,26 @@ namespace ygopro
                 break;
             }
             case MSG_CONFIRM_DECKTOP: {
-//                int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int count = BufferIO::ReadInt8(pbuf);
-//                int code;
-//                ClientCard* pcard;
-//                mainGame->dField.selectable_cards.clear();
-//                for (int i = 0; i < count; ++i) {
-//                    code = BufferIO::ReadInt32(pbuf);
-//                    pbuf += 3;
-//                    pcard = *(mainGame->dField.deck[player].rbegin() + i);
-//                    if (code != 0)
-//                        pcard->SetCode(code);
-//                }
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                myswprintf(textBuffer, dataManager.GetSysString(207), count);
-//                mainGame->lstLog->addItem(textBuffer);
-//                mainGame->logParam.push_back(0);
-//                for (int i = 0; i < count; ++i) {
-//                    pcard = *(mainGame->dField.deck[player].rbegin() + i);
-//                    mainGame->gMutex.Lock();
-//                    myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(pcard->code));
-//                    mainGame->lstLog->addItem(textBuffer);
-//                    mainGame->logParam.push_back(pcard->code);
-//                    mainGame->gMutex.Unlock();
-//                    float shift = -0.15f;
-//                    if (player == 1) shift = 0.15f;
-//                    pcard->dPos = irr::core::vector3df(shift, 0, 0);
-//                    if(!mainGame->dField.deck_reversed)
-//                        pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-//                    else pcard->dRot = irr::core::vector3df(0, 0, 0);
-//                    pcard->is_moving = true;
-//                    pcard->aniFrame = 5;
-//                    mainGame->WaitFrameSignal(45);
-//                    mainGame->dField.MoveCard(pcard, 5);
-//                    mainGame->WaitFrameSignal(5);
-//                }
+                int8_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                int32_t count = reader.Read<uint8_t>();
+                int32_t dsize = (int32_t)deck[playerid].size();
+                for(int32_t i = 0; i < count && i < dsize; ++i) {
+                    int32_t code = reader.Read<uint32_t>();
+                    deck[playerid][dsize - 1 - i]->SetCode(code);
+                }
+                std::vector<std::shared_ptr<Action<int64_t>>> acts;
+                for(int32_t i = 0; i < count && i < dsize; ++i) {
+                    auto ptr = deck[playerid][dsize - 1 - i];
+                    acts.push_back(std::make_shared<ActionCallback<int64_t>>([ptr](){
+                       ptr->UpdateTo(100, ptr->GetPositionInfo(2));
+                    }));
+                    acts.push_back(std::make_shared<ActionWait<int64_t>>(800));
+                    acts.push_back(std::make_shared<ActionCallback<int64_t>>([ptr](){
+                        ptr->UpdateTo(100, ptr->GetPositionInfo());
+                    }));
+                    acts.push_back(std::make_shared<ActionWait<int64_t>>(100));
+                }
+                PushMessageActions(acts);
                 break;
             }
             case MSG_CONFIRM_CARDS: {
@@ -989,10 +969,8 @@ namespace ygopro
             }
             case MSG_MOVE: {
                 uint32_t code = reader.Read<uint32_t>();
-                CardPosInfo pi_from(reader.Read<int32_t>());
-                CardPosInfo pi_to(reader.Read<int32_t>());
-                pi_from.controler = LocalPlayer(pi_from.controler);
-                pi_to.controler = LocalPlayer(pi_to.controler);
+                CardPosInfo pi_from(LocalPosInfo(reader.Read<int32_t>()));
+                CardPosInfo pi_to(LocalPosInfo(reader.Read<int32_t>()));
                 uint32_t reason = reader.Read<uint32_t>();
                 if(pi_from.location == 0) {
                     auto new_card = AddCard(code, pi_to);
@@ -1089,8 +1067,7 @@ namespace ygopro
             }
             case MSG_POS_CHANGE: {
                 uint32_t code = reader.Read<uint32_t>();
-                CardPosInfo pi(reader.Read<int32_t>());
-                pi.controler = LocalPlayer(pi.controler);
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
                 uint32_t np = reader.Read<uint8_t>();
                 auto ptr = GetCard(pi);
                 if(ptr) {
@@ -1110,8 +1087,7 @@ namespace ygopro
             }
             case MSG_SET: {
                 uint32_t code = reader.Read<uint32_t>();
-                CardPosInfo pi(reader.Read<int32_t>());
-                pi.controler = LocalPlayer(pi.controler);
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
                 auto ptr = GetCard(pi);
                 if(ptr && code)
                     ptr->SetCode(code);

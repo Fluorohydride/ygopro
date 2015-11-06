@@ -3011,14 +3011,22 @@ namespace sgui
     };
     
     class SGTabControl : public SGWidget {
+    public:
+        SGEventHandler<SGWidget, int32_t> event_tab_change;
+        
     protected:
         class SGTab : public SGWidgetContainer {
         public:
-            SGTab(UIText* t) : title(t) {}
+            SGTab(SGTabControl* ctrl, UIText* t) : control(ctrl), title(t) {}
             virtual void RemoveFromParent() {}
+            virtual void SetFocusWidget(SGWidget* child) {
+                control->SetFocus();
+                SGWidgetContainer::SetFocusWidget(child);
+            }
             inline UIText* GetTitle() { return title; }
             
         protected:
+            SGTabControl* control = nullptr;
             UIText* title = nullptr;
         };
         
@@ -3124,7 +3132,7 @@ namespace sgui
             tt->SetCapacity(16);
             tt->SetText(title, cl);
             title_text.push_back(tt);
-            auto ptr = std::make_shared<SGTab>(tt);
+            auto ptr = std::make_shared<SGTab>(this, tt);
             ptr->SetContainer(this);
             ptr->InitUIComponents();
             ptr->SetPositionSize({0, tab_offset}, {0, -tab_offset}, {0.0f, 0.0f}, {1.0f, 1.0f});
@@ -3290,6 +3298,7 @@ namespace sgui
             title_back[index]->SetTextureRect(tab_style[STATUS_DOWN]);
             current_tab = index;
             SetRedraw();
+            event_tab_change.Trigger(*this, current_tab);
         }
         
         void RefreshTitle() {
@@ -3324,6 +3333,8 @@ namespace sgui
     
     class SGTextEdit : public SGWidget {
     public:
+        SGEventHandler<SGWidget> event_entered;
+        
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto ret = SGWidget::OnPositionSizeChange(re_pos, re_size);
             if(!cmd.expired() && (ret.first || ret.second)) {
@@ -3468,6 +3479,12 @@ namespace sgui
             return std::move(static_cast<UIText*>(this->ui_components[2])->GetText().substr(selection.x, selection.y - selection.x));
         }
         
+        inline void Clear() {
+            static_cast<UIText*>(this->ui_components[2])->Clear();
+            if(timer_version)
+                SetCursorPos(0);
+        }
+        
         inline UIText* GetTextUI() { return static_cast<UIText*>(ui_components[2]); }
         
         virtual bool OnMouseEnter() {
@@ -3498,7 +3515,8 @@ namespace sgui
                         SetCursorPos(selection.y);
                     break;
                 case GLFW_KEY_BACKSPACE:
-                    if(read_only) break;
+                    if(read_only)
+                        break;
                     if(selection.x == selection.y) {
                         if(selection.x > 0) {
                             txt->RemoveText(selection.x - 1, 1);
@@ -3510,7 +3528,8 @@ namespace sgui
                     }
                     break;
                 case GLFW_KEY_DELETE:
-                    if(read_only) break;
+                    if(read_only)
+                        break;
                     if(selection.x == selection.y) {
                         if(selection.x < txt->GetText().size())
                             txt->RemoveText(selection.x, 1);
@@ -3534,7 +3553,8 @@ namespace sgui
                     break;
                 }
                 case GLFW_KEY_V: {
-                    if(read_only) break;
+                    if(read_only)
+                        break;
                     if(mods & GLFW_MOD_SUPER) {
                         std::string str = SGGUIRoot::GetSingleton().GetClipboardString();
                         std::wstring wstr = To<std::wstring>(str);
@@ -3547,6 +3567,13 @@ namespace sgui
                             SetCursorPos(selection.x + (int32_t)wstr.length());
                         }
                     }
+                    break;
+                }
+                case GLFW_KEY_ENTER: {
+                    if(read_only)
+                        break;
+                    if(mods & GLFW_MOD_SUPER)
+                        event_entered.Trigger(*this);
                     break;
                 }
                 default:

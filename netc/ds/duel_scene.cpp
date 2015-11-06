@@ -117,13 +117,15 @@ namespace ygopro
             case 0x1: { //deck
                 auto fb_pos = field_blocks[side][13]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, 0.001f * subs};
-                if(param == 1)
+                if(param == 1) // shuffle
                     tl.x += vparam.cardrect.width * SceneMgr::Get().GetRandomReal(-1.0f, 1.0f);
-                else if(param == 2)
-                    tl.x += -vparam.cardrect.width;
-                else if(param == 3)
-                    tl.x += vparam.cardrect.width;
+                else if(param == 2) // confirm deck
+                    tl.x += -vparam.cardrect.width * 1.1f;
+                else if(param == 3) // confirm extra
+                    tl.x += vparam.cardrect.width * 1.1f;
                 bool faceup = deck_reversed ? (pos & 0xa) : (pos & 0x5);
+                if(param == 2 || param == 3)
+                    faceup = true;
                 if(faceup) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));

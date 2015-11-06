@@ -1020,17 +1020,23 @@ namespace ygopro
                     return true;
                 };
             }
-            sgui::SGWidget* send_button = wnd->FindWidgetAs<sgui::SGWidget>("send");
-            if(chat_box && send_button) {
-                send_button->event_click += [this](sgui::SGWidget& sender)->bool {
+            auto send_callback = [this](sgui::SGWidget& sender)->bool {
+                if(chat_box->GetTextUI()->GetText().size() > 0) {
                     AddLog(0, chat_box->GetTextUI()->GetText(), true);
-                    chat_box->GetTextUI()->Clear();
-                    return true;
-                };
-            }
+                    chat_box->Clear();
+                }
+                return true;
+            };
+            if(chat_box)
+                chat_box->event_entered += send_callback;
+            sgui::SGWidget* send_button = wnd->FindWidgetAs<sgui::SGWidget>("send");
+            if(chat_box && send_button)
+                send_button->event_click += send_callback;
         }
         if(tabs) {
             tabs->SetCurrentTab(type);
+            if(type == 0 && chat_box)
+                chat_box->SetFocus();
         }
     }
     

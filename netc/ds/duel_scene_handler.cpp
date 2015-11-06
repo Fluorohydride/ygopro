@@ -60,9 +60,15 @@ namespace ygopro
     }
     
     void DuelSceneHandler::BeginHandler() {
+        AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
+        AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
+        AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
         AddCard(83764718, CardPosInfo(0, 0x4, 1, 0x1))->UpdatePosition(0);
         AddCard(64496451, CardPosInfo(0, 0x2, 2, 0x1))->UpdatePosition(0);
         AddCard(97268402, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x4, 2, 0x1))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x4, 2, 0x1))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x4, 2, 0x1))->UpdatePosition(0);
         AddCard(97268402, CardPosInfo(0, 0x4, 2, 0x1))->UpdatePosition(0);
         for(auto& pc : hand[0])
             pc->UpdatePosition(0);

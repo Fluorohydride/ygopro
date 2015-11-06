@@ -75,6 +75,8 @@ namespace ygopro
         void ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos);
         
         inline int32_t LocalPlayer(int32_t pid) { return (host_player == 0) ? pid : (1 - pid); }
+        inline int32_t LocalPosInfo(int32_t ipos) { return (host_player == 0) ? ipos : ((ipos & 0xffffff00) | (1 - (ipos & 0xff))); }
+        
         void ClearField();
         void InitHp(int32_t pid, int32_t hp);
         void AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq);
