@@ -803,22 +803,13 @@ void Game::LoadConfig() {
 	fseek(fp, 0, SEEK_SET);
 	while(ftell(fp) < fsize) {
 		fgets(linebuf, 256, fp);
-		sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
+		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
 			enable_log = atoi(valbuf);
-		} else if(!strcmp(strbuf, "nickname")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
-		} else if(!strcmp(strbuf, "gamename")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
-		} else if(!strcmp(strbuf, "lastdeck")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 		} else if(!strcmp(strbuf, "textfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			int textfontsize;
@@ -839,6 +830,21 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
+		} else {
+			// options allowing multiple words
+			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
+			if (!strcmp(strbuf, "nickname")) {
+				BufferIO::DecodeUTF8(valbuf, wstr);
+				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
+			}
+			else if (!strcmp(strbuf, "gamename")) {
+				BufferIO::DecodeUTF8(valbuf, wstr);
+				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
+			}
+			else if (!strcmp(strbuf, "lastdeck")) {
+				BufferIO::DecodeUTF8(valbuf, wstr);
+				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
+			}
 		}
 	}
 	fclose(fp);
