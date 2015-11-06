@@ -85,19 +85,19 @@ bool DataManager::LoadStrings(const char* file) {
 			continue;
 		sscanf(linebuf, "!%s", strbuf);
 		if(!strcmp(strbuf, "system")) {
-			sscanf(&linebuf[7], "%d %99[^\n]", &value, strbuf);
+			sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
 			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
 			_sysStrings[value] = pbuf;
 		} else if(!strcmp(strbuf, "victory")) {
-			sscanf(&linebuf[8], "%x %99[^\n]", &value, strbuf);
+			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
 			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
 			_victoryStrings[value] = pbuf;
 		} else if(!strcmp(strbuf, "counter")) {
-			sscanf(&linebuf[8], "%x %99[^\n]", &value, strbuf);
+			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
 			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
