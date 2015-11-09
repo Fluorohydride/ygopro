@@ -569,7 +569,7 @@ namespace ygopro
                 for(int32_t i = 0; i < count && i < dsize; ++i) {
                     auto ptr = deck[playerid][dsize - 1 - i];
                     acts.push_back(std::make_shared<ActionCallback<int64_t>>([ptr](){
-                       ptr->UpdateTo(100, ptr->GetPositionInfo(2));
+                        ptr->UpdateTo(100, ptr->GetPositionInfo(CardPosParam::Confirm));
                     }));
                     acts.push_back(std::make_shared<ActionWait<int64_t>>(800));
                     acts.push_back(std::make_shared<ActionCallback<int64_t>>([ptr](){
@@ -581,98 +581,53 @@ namespace ygopro
                 break;
             }
             case MSG_CONFIRM_CARDS: {
-//                /*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int count = BufferIO::ReadInt8(pbuf);
-//                int code, c, l, s;
-//                std::vector<ClientCard*> field_confirm;
-//                std::vector<ClientCard*> panel_confirm;
-//                ClientCard* pcard;
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    pbuf += count * 7;
-//                    return true;
-//                }
-//                myswprintf(textBuffer, dataManager.GetSysString(208), count);
-//                mainGame->lstLog->addItem(textBuffer);
-//                mainGame->logParam.push_back(0);
-//                for (int i = 0; i < count; ++i) {
-//                    code = BufferIO::ReadInt32(pbuf);
-//                    c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                    l = BufferIO::ReadInt8(pbuf);
-//                    s = BufferIO::ReadInt8(pbuf);
-//                    pcard = mainGame->dField.GetCard(c, l, s);
-//                    if (code != 0)
-//                        pcard->SetCode(code);
-//                    mainGame->gMutex.Lock();
-//                    myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(code));
-//                    mainGame->lstLog->addItem(textBuffer);
-//                    mainGame->logParam.push_back(code);
-//                    mainGame->gMutex.Unlock();
-//                    if (l & 0x41) {
-//                        if(count == 1) {
-//                            float shift = -0.15f;
-//                            if (c == 0 && l == 0x40) shift = 0.15f;
-//                            pcard->dPos = irr::core::vector3df(shift, 0, 0);
-//                            if((l == LOCATION_DECK) && mainGame->dField.deck_reversed)
-//                                pcard->dRot = irr::core::vector3df(0, 0, 0);
-//                            else pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-//                            pcard->is_moving = true;
-//                            pcard->aniFrame = 5;
-//                            mainGame->WaitFrameSignal(45);
-//                            mainGame->dField.MoveCard(pcard, 5);
-//                            mainGame->WaitFrameSignal(5);
-//                        } else {
-//                            if(!mainGame->dInfo.isReplay)
-//                                panel_confirm.push_back(pcard);
-//                        }
-//                    } else {
-//                        if(!mainGame->dInfo.isReplay || (l & LOCATION_ONFIELD))
-//                            field_confirm.push_back(pcard);
-//                    }
-//                }
-//                if (field_confirm.size() > 0) {
-//                    mainGame->WaitFrameSignal(5);
-//                    for(size_t i = 0; i < field_confirm.size(); ++i) {
-//                        pcard = field_confirm[i];
-//                        c = pcard->controler;
-//                        l = pcard->location;
-//                        if (l == LOCATION_HAND) {
-//                            mainGame->dField.MoveCard(pcard, 5);
-//                        } else if (l == LOCATION_MZONE) {
-//                            if (pcard->position & POS_FACEUP)
-//                                continue;
-//                            pcard->dPos = irr::core::vector3df(0, 0, 0);
-//                            if (pcard->position == POS_FACEDOWN_ATTACK)
-//                                pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-//                            else
-//                                pcard->dRot = irr::core::vector3df(3.14159f / 5.0f, 0, 0);
-//                            pcard->is_moving = true;
-//                            pcard->aniFrame = 5;
-//                        } else if (l == LOCATION_SZONE) {
-//                            if (pcard->position & POS_FACEUP)
-//                                continue;
-//                            pcard->dPos = irr::core::vector3df(0, 0, 0);
-//                            pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-//                            pcard->is_moving = true;
-//                            pcard->aniFrame = 5;
-//                        }
-//                    }
-//                    mainGame->WaitFrameSignal(90);
-//                    for(size_t i = 0; i < field_confirm.size(); ++i) {
-//                        mainGame->dField.MoveCard(field_confirm[i], 5);
-//                    }
-//                    mainGame->WaitFrameSignal(5);
-//                }
-//                if (panel_confirm.size()) {
-//                    std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
-//                    mainGame->gMutex.Lock();
-//                    mainGame->dField.selectable_cards = panel_confirm;
-//                    myswprintf(textBuffer, dataManager.GetSysString(208), panel_confirm.size());
-//                    mainGame->wCardSelect->setText(textBuffer);
-//                    mainGame->dField.ShowSelectCard(true);
-//                    mainGame->gMutex.Unlock();
-//                    mainGame->actionSignal.Reset();
-//                    mainGame->actionSignal.Wait();
-//                }
+                /*int8_t playerid = */LocalPlayer(reader.Read<uint8_t>());
+                int32_t count = reader.Read<uint8_t>();
+                std::vector<FieldCard*> panel_confirm;
+                std::vector<FieldCard*> field_confirm;
+                for(int32_t i = 0; i < count; ++i) {
+                    int32_t code = reader.Read<uint32_t>();
+                    CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                    auto ptr = GetCard(pi);
+                    if(ptr) {
+                        if(code)
+                            ptr->SetCode(code);
+                        if(pi.location & 0x41) {
+                            if(count == 1)
+                                field_confirm.push_back(ptr.get());
+                            else
+                                panel_confirm.push_back(ptr.get());
+                        } else if((pi.location & (LOCATION_ONFIELD | LOCATION_HAND)) && (pi.position & POS_FACEDOWN))
+                            field_confirm.push_back(ptr.get());
+                    }
+                }
+                std::vector<std::shared_ptr<Action<int64_t>>> acts;
+                if(field_confirm.size()) {
+                    for(auto iter : field_confirm) {
+                        auto npos = iter->GetPositionInfo(CardPosParam::Confirm);
+                        iter->UpdateTo(100, npos);
+                    }
+                    acts.push_back(std::make_shared<ActionWait<int64_t>>(1000));
+                    acts.push_back(std::make_shared<ActionCallback<int64_t>>([field_confirm]() {
+                        for(auto iter : field_confirm) {
+                            auto npos = iter->GetPositionInfo();
+                            iter->UpdateTo(100, npos);
+                        }
+                    }));
+                    acts.push_back(std::make_shared<ActionWait<int64_t>>(100));
+                }
+                if(panel_confirm.size()) {
+                    message_lock = true;
+                    acts.push_back(std::make_shared<ActionCallback<int64_t>>([this, panel_confirm]() {
+                        std::vector<uint32_t> codes;
+                        for(auto iter : panel_confirm)
+                            codes.push_back(iter->code);
+                        OperationPanel::Confirm(codes, [this]() { message_lock = false; });
+                    }));
+                    PushMessageActionsNoLock(acts);
+                } else {
+                    PushMessageActions(acts);
+                }
                 break;
             }
             case MSG_SHUFFLE_DECK: {
@@ -682,7 +637,7 @@ namespace ygopro
                     break;
                 auto cb_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
                     for(auto& pcard : deck[playerid])
-                        pcard->TranslateTo(50, pcard->GetPositionInfo(1).first);
+                        pcard->TranslateTo(50, pcard->GetPositionInfo(CardPosParam::Shuffle).first);
                 });
                 auto wait1 = std::make_shared<ActionWait<int64_t>>(50);
                 auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
@@ -738,19 +693,19 @@ namespace ygopro
                         npos = (n1 + n2) * 0.5f;
                     }
                     for(auto& pcard : hand[playerid])
-                        pcard->TranslateTo(100, npos, FieldCard::action_type_linear);
+                        pcard->TranslateTo(100, npos, CardActType::Linear);
                 });
                 auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
                 auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid, code_after_shuffle]() {
                     for(size_t i = 0; i < hand[playerid].size(); ++i) {
                         hand[playerid][i]->SetCode(code_after_shuffle[i] & 0x7fffffff);
-                        hand[playerid][i]->UpdateTranslation(100, FieldCard::action_type_linear);
+                        hand[playerid][i]->UpdateTranslation(100, CardActType::Linear);
                     }
                 });
                 auto wait2 = std::make_shared<ActionWait<int64_t>>(100);
                 if(need_flip) {
                     for(auto& pcard : hand[playerid]) {
-                        auto rot = pcard->GetPositionInfo(1).second;
+                        auto rot = pcard->GetPositionInfo(CardPosParam::Shuffle).second;
                         pcard->RotateTo(100, rot);
                     }
                     auto wait_flip1 = std::make_shared<ActionWait<int64_t>>(150);
@@ -985,7 +940,7 @@ namespace ygopro
                         }, std::make_shared<TGenLinear<int64_t>>(500));
                         if(pi_to.location == LOCATION_HAND) {
                             for(auto& iter : hand[pi_to.controler])
-                                iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                                iter->UpdatePosition(300, CardActType::Asymptotic);
                         }
                         PushMessageActions(action);
                     }
@@ -996,13 +951,13 @@ namespace ygopro
                     MoveCard(ptr, to);
                     if(from.location == LOCATION_HAND) {
                         for(auto& iter : hand[from.controler])
-                            iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                            iter->UpdatePosition(300, CardActType::Asymptotic);
                     }
                     if(to.location == LOCATION_HAND) {
                         for(auto& iter : hand[to.controler])
-                            iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                            iter->UpdatePosition(300, CardActType::Asymptotic);
                     } else
-                        ptr->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                        ptr->UpdatePosition(300, CardActType::Asymptotic);
                     PushMessageActions(std::make_shared<ActionWait<int64_t>>(300));
                 };
                 if(ptr != nullptr) {
@@ -1022,7 +977,7 @@ namespace ygopro
                                 if(rm_card) {
                                     if(pi_from.location == LOCATION_HAND) {
                                         for(auto& iter : hand[pi_from.controler])
-                                            iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                                            iter->UpdatePosition(300, CardActType::Asymptotic);
                                     }
                                     duel_scene->RemoveCard(rm_card);
                                     duel_scene->RedrawAllCards();
@@ -1044,7 +999,7 @@ namespace ygopro
                                 ptr->Attach(attach_card);
                                 if(move_hand) {
                                     for(auto& iter : hand[pi_from.controler])
-                                        iter->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                                        iter->UpdatePosition(300, CardActType::Asymptotic);
                                 }
                             }
                         }
@@ -1052,10 +1007,10 @@ namespace ygopro
                         if(!ptr->attached_cards.empty() && pi_from.location == LOCATION_EXTRA) {
                             MoveCard(ptr, pi_to);
                             for(auto olcard : ptr->attached_cards)
-                                olcard->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                                olcard->UpdatePosition(300, CardActType::Asymptotic);
                             auto wait_action = std::make_shared<ActionWait<int64_t>>(300);
                             auto update_action = std::make_shared<ActionCallback<int64_t>>([ptr](){
-                                ptr->UpdatePosition(300, FieldCard::action_type_asymptotic);
+                                ptr->UpdatePosition(300, CardActType::Asymptotic);
                             });
                             auto wait_action2 = std::make_shared<ActionWait<int64_t>>(300);
                             PushMessageActions(wait_action, update_action, wait_action2);

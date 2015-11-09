@@ -125,6 +125,11 @@ namespace ygopro
         static const int32_t msg_type_duel = 1;
         static const int32_t msg_type_system = 2;
     };
+    
+    class OperationPanel {
+    public:
+        static void Confirm(const std::vector<uint32_t>& code, std::function<void()> close_callback = nullptr);
+    };
 }
 
 #endif

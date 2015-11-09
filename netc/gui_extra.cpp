@@ -1054,4 +1054,8 @@ namespace ygopro
             logs[msg_type].push_back(msg);
     }
     
+    void OperationPanel::Confirm(const std::vector<uint32_t>& code, std::function<void()> close_callback) {
+        
+    }
+    
 }

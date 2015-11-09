@@ -47,6 +47,17 @@ namespace ygopro
         texf4 block_texture;
     };
     
+    enum class CardPosParam {
+        None = 0,
+        Confirm = 1,
+        Shuffle = 2,
+    };
+    
+    enum class CardActType {
+        Linear = 0,
+        Asymptotic = 1,
+    };
+    
     class FieldCard : public DuelObject<vt3>, public std::enable_shared_from_this<FieldCard> {
     public:
         virtual ~FieldCard();
@@ -54,12 +65,12 @@ namespace ygopro
         virtual void RefreshVertices();
         
         void SetCode(uint32_t code);
-        std::pair<v3f, glm::quat> GetPositionInfo(int32_t param = 0);
-        void UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos, int32_t act_type = action_type_linear);
-        void TranslateTo(int32_t tm, v3f tl, int32_t act_type = action_type_linear);
+        std::pair<v3f, glm::quat> GetPositionInfo(CardPosParam param = CardPosParam::None);
+        void UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos, CardActType act_type = CardActType::Linear);
+        void TranslateTo(int32_t tm, v3f tl, CardActType act_type = CardActType::Linear);
         void RotateTo(int32_t tm, glm::quat rot);
-        void UpdatePosition(int32_t tm, int32_t act_type = action_type_linear);
-        void UpdateTranslation(int32_t tm, int32_t act_type = action_type_linear);
+        void UpdatePosition(int32_t tm, CardActType act_type = CardActType::Linear);
+        void UpdateTranslation(int32_t tm, CardActType act_type = CardActType::Linear);
         void UpdateRotation(int32_t tm);
         
         void Attach(std::shared_ptr<FieldCard> target);
@@ -92,9 +103,6 @@ namespace ygopro
         CardPosInfo pos_info;
         std::vector<std::shared_ptr<FieldCard>> attached_cards;
         FieldCard* attaching_card = nullptr;
-        
-        static const int32_t action_type_linear = 0;
-        static const int32_t action_type_asymptotic = 1;
     };
     
     class FloatingNumber : public DuelObject<vt2> {

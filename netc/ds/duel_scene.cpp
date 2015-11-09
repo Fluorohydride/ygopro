@@ -101,7 +101,7 @@ namespace ygopro
         }
     }
     
-    std::pair<v3f, glm::quat> FieldCard::GetPositionInfo(int32_t param) {
+    std::pair<v3f, glm::quat> FieldCard::GetPositionInfo(CardPosParam param) {
         // POS_FACEUP_ATTACK		0x1
         // POS_FACEDOWN_ATTACK		0x2
         // POS_FACEUP_DEFENCE		0x4
@@ -117,15 +117,12 @@ namespace ygopro
             case 0x1: { //deck
                 auto fb_pos = field_blocks[side][13]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, 0.001f * subs};
-                if(param == 1) // shuffle
-                    tl.x += vparam.cardrect.width * SceneMgr::Get().GetRandomReal(-1.0f, 1.0f);
-                else if(param == 2) // confirm deck
-                    tl.x += -vparam.cardrect.width * 1.1f;
-                else if(param == 3) // confirm extra
-                    tl.x += vparam.cardrect.width * 1.1f;
                 bool faceup = deck_reversed ? (pos & 0xa) : (pos & 0x5);
-                if(param == 2 || param == 3)
+                if(param == CardPosParam::Confirm) {    // confirm deck
+                    tl.x += -vparam.cardrect.width * 1.1f;
                     faceup = true;
+                } else if(param == CardPosParam::Shuffle) // shuffle
+                    tl.x += vparam.cardrect.width * SceneMgr::Get().GetRandomReal(-1.0f, 1.0f);
                 if(faceup) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -164,7 +161,7 @@ namespace ygopro
                         tl = {lst - seq * vparam.cardrect.width * 1.1f - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.0f};
                     }
                 }
-                if(this->code != 0 && (param == 0))
+                if(this->code != 0 && (param == CardPosParam::None))
                     rot = vparam.hand_quat[0];
                 else
                     rot = vparam.hand_quat[1];
@@ -179,26 +176,30 @@ namespace ygopro
                     tl.x -= vparam.cardrect.width * 0.1f;
                 } else {
                     tl.z = 0.001f * attached_cards.size();
-                    if(pos == 1) {
-                        if(side == 0)
-                            rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-                        else
-                            rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                    } else if(pos == 0x2) {
-                        if(side == 0)
-                            rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
-                        else
-                            rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
-                    } else if(pos == 0x4) {
-                        if(side == 0)
-                            rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
-                        else
-                            rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, -1.0f));
-                    } else if(pos == 0x8) {
-                        if(side == 0)
-                            rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
-                        else
-                            rot = glm::angleAxis(3.1415926f, glm::vec3(0.70710678f, 0.70710678f, 0.0f));
+                    if(pos & 0x3) {
+                        if(pos == 0x1 || param == CardPosParam::Confirm) {
+                            if(side == 0)
+                                rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                            else
+                                rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+                        } else {
+                            if(side == 0)
+                                rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
+                            else
+                                rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
+                        }
+                    } else {
+                        if(pos == 0x4 || param == CardPosParam::Confirm) {
+                            if(side == 0)
+                                rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
+                            else
+                                rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, -1.0f));
+                        } else {
+                            if(side == 0)
+                                rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
+                            else
+                                rot = glm::angleAxis(3.1415926f, glm::vec3(0.70710678f, 0.70710678f, 0.0f));
+                        }
                     }
                 }
                 break;
@@ -207,7 +208,7 @@ namespace ygopro
                 auto fb_pos = field_blocks[side][seq + 5]->GetCenter();
                 tl.x = fb_pos.x;
                 tl.y = fb_pos.y;
-                if(pos & 0x5) {
+                if(pos & 0x5 || param == CardPosParam::Confirm) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
@@ -232,7 +233,7 @@ namespace ygopro
             case 0x20: { //banish
                 auto fb_pos = field_blocks[side][16]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, seq * 0.001f};
-                if(pos & 0x5) {
+                if(pos & 0x5 || param == CardPosParam::Confirm) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
@@ -248,7 +249,9 @@ namespace ygopro
             case 0x40: { //extra
                 auto fb_pos = field_blocks[side][14]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, seq * 0.001f};
-                if(pos & 0x5) {
+                if(param == CardPosParam::Confirm) // confirm extra
+                    tl.x += vparam.cardrect.width * 1.1f;
+                if(pos & 0x5 || param == CardPosParam::Confirm) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
@@ -267,7 +270,7 @@ namespace ygopro
         return std::make_pair(tl, rot);
     }
     
-    void FieldCard::UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos, int32_t act_type) {
+    void FieldCard::UpdateTo(int32_t tm, std::pair<v3f, glm::quat> npos, CardActType act_type) {
         if(tm == 0) {
             SetTranslation(npos.first);
             SetRotation(npos.second);
@@ -276,7 +279,7 @@ namespace ygopro
             auto ptr = shared_from_this();
             auto cpos = std::make_pair(translation, rotation);
             std::shared_ptr<TGen<int64_t>> tgen;
-            if(act_type == action_type_linear)
+            if(act_type == CardActType::Linear)
                 tgen = std::make_shared<TGenLinear<int64_t>>(tm);
             else
                 tgen = std::make_shared<TGenMove<int64_t>>(tm, 0.01);
@@ -291,7 +294,7 @@ namespace ygopro
         }
     }
     
-    void FieldCard::TranslateTo(int32_t tm, v3f tl, int32_t act_type) {
+    void FieldCard::TranslateTo(int32_t tm, v3f tl, CardActType act_type) {
         if(tm == 0) {
             SetTranslation(tl);
             return;
@@ -299,7 +302,7 @@ namespace ygopro
             auto ptr = shared_from_this();
             auto cur_tl = translation;
             std::shared_ptr<TGen<int64_t>> tgen;
-            if(act_type == action_type_linear)
+            if(act_type == CardActType::Linear)
                 tgen = std::make_shared<TGenLinear<int64_t>>(tm);
             else
                 tgen = std::make_shared<TGenMove<int64_t>>(tm, 0.01);
@@ -328,11 +331,11 @@ namespace ygopro
         }
     }
     
-    void FieldCard::UpdatePosition(int32_t tm, int32_t act_type) {
+    void FieldCard::UpdatePosition(int32_t tm, CardActType act_type) {
         UpdateTo(tm, GetPositionInfo(), act_type);
     }
     
-    void FieldCard::UpdateTranslation(int32_t tm, int32_t act_type) {
+    void FieldCard::UpdateTranslation(int32_t tm, CardActType act_type) {
         TranslateTo(tm, GetPositionInfo().first, act_type);
     }
     

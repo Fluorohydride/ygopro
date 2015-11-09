@@ -98,6 +98,19 @@ namespace ygopro
             SceneMgr::Get() << ptr;
         }
         
+        template<typename... ACTS>
+        void PushMessageActionsNoLock(ACTS... acts) {
+            auto ptr = std::make_shared<ActionSequence<int64_t>>(std::forward<ACTS>(acts)...);
+            SceneMgr::Get() << ptr;
+        }
+        
+        void PushMessageActionsNoLock(const std::vector<std::shared_ptr<Action<int64_t>>>& lst) {
+            auto ptr = std::make_shared<ActionSequence<int64_t>>();
+            for(auto& act : lst)
+                ptr->Push(act);
+            SceneMgr::Get() << ptr;
+        }
+        
         void Test(int32_t param);
         int32_t SolveMessage(uint8_t msg_type, BufferReader& reader);
         

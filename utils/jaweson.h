@@ -1,14 +1,15 @@
 #ifndef _JAWESON_H_
 #define _JAWESON_H_
 
-// version 0.3
+// version 0.4
 // sample code:
 //    jaweson::JsonRoot<> root;
 //    if(!root.parse(buffer, len)) {
 //        auto info = root.get_error_info();
-//        auto& pos = std::get<0>(info);
-//        auto& msg = std::get<1>(info);
-//        std::cout << msg << " " << pos << std::endl;
+//        auto& err_line = std::get<0>(info);
+//        auto& err_col = std::get<1>(info);
+//        auto& msg = std::get<2>(info);
+//        std::cout << msg << " " << err_line << "," << err_col << std::endl;
 //    } else {
 //        root["nodename"].set_value<jaweson::JsonString>("teststring");
 //        std::cout << root.get_string() << std::endl;
@@ -587,14 +588,17 @@ namespace jaweson
         
         bool parse(const char* text, size_t len) {
             JsonParseStatus status;
-            error_pos = 0;
-            error_msg.clear();
+            err_line = 0;
+            err_col = 0;
+            err_msg.clear();
             if(status.parse(text, (int32_t)len)) {
                 JsonNode<ALLOC_TYPE>::ref_value = status.ret_value;
                 return true;
             } else {
-                error_pos = (int32_t)(status.cur_ptr - status.begin_ptr);
-                error_msg = status.error_msg;
+                uintptr_t error_pos = (uintptr_t)(status.cur_ptr - status.begin_ptr);
+                err_line = status.err_line;
+                err_col = (int32_t)(error_pos - status.err_col);
+                err_msg = std::move(status.error_msg);
                 return false;
             }
         }
@@ -603,21 +607,26 @@ namespace jaweson
             return parse(text.c_str(), text.length());
         }
         
-        std::tuple<int32_t, std::string> get_error_info() {
-            return std::make_tuple(error_pos, error_msg);
+        std::tuple<int32_t, int32_t, std::string> get_error_info() {
+            return std::make_tuple(err_line + 1, err_col + 1, err_msg);
         }
         
     protected:
-        int32_t error_pos = 0;
-        std::string error_msg;
+        int32_t err_line = 0;
+        int32_t err_col = 0;
+        std::string err_msg;
         
         class JsonParseStatus {
         public:
             bool parse(const char* text, int32_t len) {
                 begin_ptr = text;
                 end_ptr = text + len;
-                if((len >= 3) && (begin_ptr[0] == (char)0xef) && (begin_ptr[1] == (char)0xbb) && (begin_ptr[2] == (char)0xbf))
+                err_line = 0;
+                err_col = 0;
+                if((len >= 3) && (begin_ptr[0] == (char)0xef) && (begin_ptr[1] == (char)0xbb) && (begin_ptr[2] == (char)0xbf)) {
                     begin_ptr += 3;
+                    err_col = 3;
+                }
                 cur_ptr = begin_ptr;
                 error_msg.clear();
                 if(begin_ptr >= end_ptr) {
@@ -667,8 +676,13 @@ namespace jaweson
             }
             
             inline int32_t check_next_token() {
-                while(cur_ptr < end_ptr && ((uint8_t)(*cur_ptr) <= ' '))
+                while(cur_ptr < end_ptr && ((uint8_t)(*cur_ptr) <= ' ')) {
+                    if(*cur_ptr == '\n') {
+                        err_line++;
+                        err_col = cur_ptr - begin_ptr;
+                    }
                     cur_ptr++;
+                }
                 if(cur_ptr == end_ptr)
                     return TOKEN_EOF;
                 return JsonUtil::get_token_type(*cur_ptr);
@@ -872,12 +886,20 @@ namespace jaweson
                     cur_ptr++;
                     return obj;
                 }
-                while(1) {
+                int32_t warn_line;
+                int32_t warn_col;
+                while(true) {
                     uint32_t token_type = check_next_token();
                     if(token_type != TOKEN_STRING) {
-                        log_expecting_error(TOKEN_STRING_FLAG);
-                        obj->free();
-                        return nullptr;
+                        if(token_type == TOKEN_RBRACE) {
+                            std::cerr << "Warning: redundant \",\" detected at line " << warn_line << ", column " << warn_col << std::endl;
+                            cur_ptr++;
+                            return obj;
+                        } else {
+                            log_expecting_error(TOKEN_STRING_FLAG);
+                            obj->free();
+                            return nullptr;
+                        }
                     }
                     cur_ptr++;
                     std::string key;
@@ -903,6 +925,8 @@ namespace jaweson
                         cur_ptr++;
                         return obj;
                     } else if(token_type == TOKEN_COMMA) {
+                        warn_line = err_line;
+                        warn_col = (int32_t)((cur_ptr - begin_ptr) - err_col);
                         cur_ptr++;
                     } else {
                         log_expecting_error(TOKEN_COMMA_FLAG | TOKEN_RBRACE_FLAG);
@@ -921,11 +945,20 @@ namespace jaweson
                     cur_ptr++;
                     return obj;
                 }
+                int32_t warn_line;
+                int32_t warn_col;
                 while(true) {
                     JsonValue<ALLOC_TYPE>* val = parse_value();
                     if(!val) {
-                        obj->free();
-                        return nullptr;
+                        token_type = check_next_token();
+                        if(token_type == TOKEN_RBRACKET) {
+                            std::cerr << "Warning: redundant \",\" detected at line " << warn_line << ", column " << warn_col << std::endl;
+                            cur_ptr++;
+                            return obj;
+                        } else {
+                            obj->free();
+                            return nullptr;
+                        }
                     }
                     obj->insert(val);
                     token_type = check_next_token();
@@ -933,6 +966,8 @@ namespace jaweson
                         cur_ptr++;
                         return obj;
                     } else if(token_type == TOKEN_COMMA) {
+                        warn_line = err_line;
+                        warn_col = (int32_t)((cur_ptr - begin_ptr) - err_col);
                         cur_ptr++;
                     } else {
                         log_expecting_error(TOKEN_COMMA_FLAG | TOKEN_RBRACKET_FLAG);
@@ -946,6 +981,8 @@ namespace jaweson
             const char* begin_ptr = nullptr;
             const char* end_ptr = nullptr;
             const char* cur_ptr = nullptr;
+            int32_t err_line = 0;
+            uintptr_t err_col = 0;
             std::string error_msg;
             JsonValue<ALLOC_TYPE>* ret_value = nullptr;
         };

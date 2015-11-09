@@ -383,6 +383,29 @@
     "item color" : "0xffffffff",
     "item back color" : ["0x000000c0", "0x000000c0", "0x404040c0"]
   },
+  "confirm dialog" : {
+    "type" : "window",
+    "close button" : false,
+    "position" : [0, 0, 800, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "scroll area" : {
+        "type" : "scrollarea",
+        "position" : [10, 10, -20, -60, 0, 0, 1.0, 1.0, 0.0, 0.0],
+        "children" : {
+          "misc image" : {
+            "type" : "spritelist",
+            "position" : [0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.0, 0.0]
+          }
+        }
+      },
+      "ok button" : {
+        "type" : "text button",
+        "text" : ["eui_button_ok", "0x000000ff"],
+        "position" : [-15, 5, 30, 30, 1.0, 0.0, 0, 0, -1.0, 0]
+      }
+    },
+    "item size" : [100, 145]
+  },
   "menus" : {
     "menu deck" : {
       "eui_deck_load" : 0,
