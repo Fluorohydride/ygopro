@@ -394,7 +394,6 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			}
-			mainGame->stCardPos[i]->setVisible(true);
 		} else {
 			if(sort_list[i]) {
 				myswprintf(formatBuffer, L"%d", sort_list[i]);
@@ -402,6 +401,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			} else mainGame->stCardPos[i]->setText(L"");
 			mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
+		mainGame->stCardPos[i]->setVisible(true);
 		mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	}
 	if(selectable_cards.size() <= 5) {
