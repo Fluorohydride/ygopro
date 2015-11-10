@@ -1055,7 +1055,21 @@ namespace ygopro
     }
     
     void OperationPanel::Confirm(const std::vector<uint32_t>& code, std::function<void()> close_callback) {
-        
+        if(code.empty())
+            return;
+        auto item_size = sgui::SGJsonUtil::ConvertV2i(dialogCfg["confirm dialog"]["item size"], 0);
+        v2i area_size = {(int32_t)(item_size.x * code.size()), item_size.y};
+        auto wnd = LoadDialogAs<sgui::SGWidgetContainer>("confirm dialog");
+        if(!wnd)
+            return;
+        wnd->event_on_destroy += [close_callback](sgui::SGWidget& sender)->bool { if(close_callback) close_callback(); return true; };
+        auto card_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
+        if(card_area) {
+            card_area->SetScrollSize(area_size);
+        }
+        auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
+        if(ok_button)
+            ok_button->event_click += [wnd](sgui::SGWidget& sender)->bool { wnd->RemoveFromParent(); return true; };
     }
     
 }

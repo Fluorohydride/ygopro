@@ -988,6 +988,11 @@ namespace sgui
                 && y >= area_pos.absolute.y && y <= area_pos.absolute.y + area_size.absolute.y;
         }
         
+        virtual bool CheckInRect(recti rct) {
+            return !(area_pos.absolute.x > rct.left + rct.width) && !(area_pos.absolute.x + area_size.absolute.x < rct.left)
+                && !(area_pos.absolute.y > rct.top + rct.height) && !(area_pos.absolute.y + area_size.absolute.y < rct.top);
+        }
+        
         virtual void SetFocus() {
             if(!parent.expired())
                 parent.lock()->SetFocusWidget(this);
@@ -2352,6 +2357,11 @@ namespace sgui
             return x >= view_pos.x && x <= view_pos.x + view_size.x && y >= view_pos.y && y <= view_pos.y + view_size.y;
         }
         
+        virtual bool CheckInRect(recti rct) {
+            return !(view_pos.x > rct.left + rct.width) && !(view_pos.x + view_size.x < rct.left)
+                && !(view_pos.y > rct.top + rct.height) && !(view_pos.y + view_size.y < rct.top);
+        }
+        
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto pre_act_pos = area_pos.absolute;
             auto pre_act_size = area_size.absolute;
@@ -2381,6 +2391,10 @@ namespace sgui
                 cmd.lock()->scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             }
             return ret;
+        }
+        
+        virtual void SetRedraw() {
+            SGWidgetContainer::SetRedraw();
         }
         
         virtual void InitUIComponents() {
