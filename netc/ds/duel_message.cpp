@@ -15,13 +15,16 @@ namespace ygopro
         switch(param) {
             case 1: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_CONFIRM_DECKTOP;
+                dm->msg_type = MSG_CONFIRM_CARDS;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint8_t>(0);
                 writer.Write<uint8_t>(3);
                 writer.Write<uint32_t>(57728570);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x1, 0, 0).info);
+                writer.Write<uint32_t>(64496451);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x1, 1, 0).info);
                 writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(57728570);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x1, 2, 0).info);
                 messages.PushCommand(dm);
                 break;
             }

@@ -74,6 +74,8 @@ namespace ygopro
                         wnd->GetCaption()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "close button") {
                         wnd->SetCloseButtonVisible(sub_node.to_bool());
+                    } else if(name == "allow resize") {
+                        wnd->SetResizable(sub_node.to_bool());
                     } else if(name == "min size") {
                         wnd->SetMinSize({(int32_t)sub_node[0].to_integer(), (int32_t)sub_node[1].to_integer()});
                     } else if(name == "children") {
@@ -1064,8 +1066,36 @@ namespace ygopro
             return;
         wnd->event_on_destroy += [close_callback](sgui::SGWidget& sender)->bool { if(close_callback) close_callback(); return true; };
         auto card_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
+        auto card_image = wnd->FindWidgetAs<sgui::SGImageList>("card image");
         if(card_area) {
             card_area->SetScrollSize(area_size);
+            auto vs = card_area->GetViewSize();
+            if(area_size.x < vs.x)
+                card_area->BeginModify().PosRX(0).PosPX(0.5f).SizeRX(area_size.x).SizePX(0.0f).AlignX(-0.5f).End();
+        }
+        if(card_image) {
+            sgui::UISpriteList* spl = card_image->GetSpriteUI();
+            spl->SetTexture(ImageMgr::Get().GetRawCardTexture());
+            rectf rp = {0.0f, 0.0f, 0.0f, 0.0f};
+            for(int32_t i = 0; i < (int32_t)code.size(); ++i) {
+                std::weak_ptr<sgui::SGImageList> ref_image = std::static_pointer_cast<sgui::SGImageList>(card_image->shared_from_this());
+                texf4 card_tex = ImageMgr::Get().GetCardTexture(code[i], [i, item_size, ref_image](texf4 tex) {
+                    auto ptr = ref_image.lock();
+                    if(!ptr)
+                        return;
+                    sgui::UIVertexArray<4> va;
+                    va.BuildSprite({i * item_size.x, 0, item_size.x, item_size.y}, {0.0f, 0.0f, 0.0f, 0.0f}, tex, 0xffffffff);
+                    ptr->GetSpriteUI()->SetSprite(va.Ptr(), i);
+                });
+                spl->AddSprite(sgui::UIVertexArray<4>().BuildSprite({i * item_size.x, 0, item_size.x, item_size.y}, rp, card_tex, 0xffffffff).Ptr());
+                if(card_area) {
+                    auto ptr = card_area->NewChild<sgui::SGLabel>();
+                    ptr->GetTextUI()->SetText(L"TEST", 0xff00ffff);
+                    ptr->SetPosition({i * item_size.x - item_size.x / 2, item_size.y}, {0.0f, 0.0f}, {-0.5f, 0.0f});
+                }
+            }
+            if(card_area && card_area->RefreshVisibleWidgets())
+                card_area->SetRedraw();
         }
         auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
         if(ok_button)

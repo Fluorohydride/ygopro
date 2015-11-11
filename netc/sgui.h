@@ -105,6 +105,27 @@ namespace sgui
             v2i absolute = {0, 0};
         };
         
+        class RegionModifier {
+        public:
+            RegionModifier(RegionObject* obj) : object(obj) {}
+            inline RegionModifier& PosRX(int32_t x) { object->area_pos.relative.x = x; pos_changed = true; return *this; }
+            inline RegionModifier& PosRY(int32_t y) { object->area_pos.relative.y = y; pos_changed = true; return *this; }
+            inline RegionModifier& PosPX(float x) { object->area_pos.proportion.x = x; pos_changed = true; return *this; }
+            inline RegionModifier& PosPY(float y) { object->area_pos.proportion.y = y; pos_changed = true; return *this; }
+            inline RegionModifier& SizeRX(int32_t x) { object->area_size.relative.x = x; size_changed = true; return *this; }
+            inline RegionModifier& SizeRY(int32_t y) { object->area_size.relative.y = y; size_changed = true; return *this; }
+            inline RegionModifier& SizePX(float x) { object->area_size.proportion.x = x; size_changed = true; return *this; }
+            inline RegionModifier& SizePY(float y) { object->area_size.proportion.y = y; size_changed = true; return *this; }
+            inline RegionModifier& AlignX(float x) { object->self_factor.x = x; pos_changed = true; return *this; }
+            inline RegionModifier& AlignY(float y) { object->self_factor.y = y; pos_changed = true; return *this; }
+            void End() { object->OnPositionSizeChange(pos_changed, size_changed); }
+            
+        protected:
+            RegionObject* object = nullptr;
+            bool pos_changed = false;
+            bool size_changed = false;
+        };
+        
     public:
         void SetPositionSize(v2i pos, v2i sz, v2f ppos = {0.0f, 0.0f}, v2f psz = {0.0f, 0.0f}, v2f af = {0.0f, 0.0f}) {
             area_pos.relative = pos;
@@ -152,6 +173,10 @@ namespace sgui
             area_size.proportion = sz;
             OnPositionSizeChange(false, true);
         }
+        void SetAlignFactor(v2f af) {
+            self_factor = af;
+            OnPositionSizeChange(true, false);
+        }
         
         inline v2i DotFactor(v2i v, v2f f) { return v2i{(int32_t)(v.x * f.x), (int32_t)(v.y * f.y)}; }
         inline v2i GetAbsolutePosition() { return area_pos.absolute; }
@@ -159,6 +184,8 @@ namespace sgui
         inline void SetContainer(RegionObject* ct) { container = ct; }
         inline const AreaAttr& GetPosAttr() { return area_pos; }
         inline const AreaAttr& GetSizeAttr() { return area_size; }
+        inline const v2f& GetAlignFactor() { return self_factor; }
+        inline RegionModifier BeginModify() { return RegionModifier(this); }
         
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto pre_pos = area_pos.absolute;
@@ -1047,12 +1074,16 @@ namespace sgui
         WIDGET_TYPE* NewChild(TR... tr) {
             static_assert(std::is_base_of<SGWidget, WIDGET_TYPE>::value, "widget type should be subclass of SGWidget.");
             auto ptr = std::make_shared<WIDGET_TYPE>(std::forward<TR>(tr)...);
-            ptr->parent = std::static_pointer_cast<SGWidgetParent>(std::static_pointer_cast<SGWidgetContainer>(shared_from_this()));
-            ptr->SetContainer(this);
-            ptr->InitUIComponents();
-            children.push_back(ptr);
-            SetRedraw();
+            AddChild(ptr);
             return ptr.get();
+        }
+        
+        virtual void AddChild(std::shared_ptr<SGWidget> child) {
+            child->parent = std::static_pointer_cast<SGWidgetParent>(std::static_pointer_cast<SGWidgetContainer>(shared_from_this()));
+            child->SetContainer(this);
+            child->InitUIComponents();
+            children.push_back(child);
+            SetRedraw();
         }
         
         virtual void RemoveChild(SGWidget* child) {
@@ -2357,11 +2388,6 @@ namespace sgui
             return x >= view_pos.x && x <= view_pos.x + view_size.x && y >= view_pos.y && y <= view_pos.y + view_size.y;
         }
         
-        virtual bool CheckInRect(recti rct) {
-            return !(view_pos.x > rct.left + rct.width) && !(view_pos.x + view_size.x < rct.left)
-                && !(view_pos.y > rct.top + rct.height) && !(view_pos.y + view_size.y < rct.top);
-        }
-        
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto pre_act_pos = area_pos.absolute;
             auto pre_act_size = area_size.absolute;
@@ -2393,8 +2419,15 @@ namespace sgui
             return ret;
         }
         
-        virtual void SetRedraw() {
-            SGWidgetContainer::SetRedraw();
+        virtual void AddChild(std::shared_ptr<SGWidget> child) {
+            SGWidgetContainer::AddChild(child);
+            if(child->CheckInRect({view_pos.x, view_pos.y, view_size.x, view_size.y}))
+                visible_widgets.push_back(child.get());
+        }
+        
+        virtual void RemoveChild(SGWidget* child) {
+            SGWidgetContainer::RemoveChild(child);
+            RefreshVisibleWidgets();
         }
         
         virtual void InitUIComponents() {
@@ -2423,8 +2456,8 @@ namespace sgui
             recti clip_region = {view_pos.x, view_pos.y, view_size.x, view_size.y};
             auto scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             cmd = SGGUIRoot::GetSingleton().PushCommand<base::RenderCmdBeginScissor>(scissor_rect);
-            for(size_t i = 2; i < children.size(); ++i)
-                children[i]->PushUIComponents();
+            for(auto iter : visible_widgets)
+                iter->PushUIComponents();
             SGGUIRoot::GetSingleton().PushCommand<base::RenderCmdEndScissor>();
             children[0]->PushUIComponents();
             children[1]->PushUIComponents();
@@ -2439,6 +2472,28 @@ namespace sgui
                 if(children[i]->IsVisible() && children[i]->AllowFocus() && children[i]->CheckInside(x, y))
                     return children[i];
             return nullptr;
+        }
+        
+        bool RefreshVisibleWidgets() {
+            bool widget_changed = false;
+            int32_t index = 0;
+            for(size_t i = 2; i < children.size(); ++i) {
+                auto ptr = children[i].get();
+                if(ptr->CheckInRect({view_pos.x, view_pos.y, view_size.x, view_size.y})) {
+                    if(widget_changed)
+                        visible_widgets.push_back(ptr);
+                    else {
+                        if(index < visible_widgets.size() && ptr == visible_widgets[index])
+                            index++;
+                        else {
+                            visible_widgets.resize(index);
+                            visible_widgets.push_back(ptr);
+                            widget_changed = true;
+                        }
+                    }
+                }
+            }
+            return widget_changed;
         }
         
         void SetScrollSize(v2i ssize) {
@@ -2460,6 +2515,8 @@ namespace sgui
                 return;
             view_offset = off;
             OnPositionSizeChange(true, false);
+            if(RefreshVisibleWidgets())
+                SetRedraw();
         }
         
         void CheckViewSize() {
@@ -2488,6 +2545,8 @@ namespace sgui
                     view_offset.y = scroll_size.y - view_size.y;
                 static_cast<SGScrollBar<>*>(children[1].get())->SetValue((float)view_offset.y / (scroll_size.y - view_size.y), false);
             }
+            if(RefreshVisibleWidgets())
+                SetRedraw();
         }
         
         inline v2i GetViewSize() { return view_size; }
@@ -2500,6 +2559,7 @@ namespace sgui
         v2i view_size = {0, 0};
         v2i view_offset = {0, 0};
         std::weak_ptr<base::RenderCmdBeginScissor<vt2>> cmd;
+        std::vector<SGWidget*> visible_widgets;
     };
     
     class SGItemListWidget {
