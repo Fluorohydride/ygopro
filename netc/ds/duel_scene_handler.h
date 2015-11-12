@@ -14,6 +14,7 @@ namespace ygopro
     class FieldCard;
     class FloatingNumber;
     class InfoPanel;
+    class LogPanel;
     
     struct DuelMessage {
         uint8_t msg_type = 0;
@@ -39,6 +40,7 @@ namespace ygopro
         };
         
         bool operator == (CardPosInfo& p) { return info == p.info; }
+        std::wstring ToString();
     };
     
     extern bool deck_reversed;

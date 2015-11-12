@@ -49,6 +49,69 @@ namespace ygopro
         LPChange,
     };
     
+    std::wstring CardPosInfo::ToString() {
+        std::string locstr = stringCfg["eui_location_format"].to_string();
+        auto pos = locstr.find("{controler}");
+        if(pos != std::string::npos) {
+            if(controler == 0)
+                locstr.replace(pos, 11, stringCfg["eui_controler1"].to_string());
+            else
+                locstr.replace(pos, 11, stringCfg["eui_controler2"].to_string());
+        }
+        pos = locstr.find("{location}");
+        std::string seqstr;
+        std::string xyzstr;
+        if(pos != std::string::npos) {
+            switch(location & 0x7f) {
+                case 0x1:
+                    locstr.replace(pos, 10, stringCfg["eui_location_deck"].to_string());
+                    seqstr = To<std::string>("[%d]", sequence);
+                    break;
+                case 0x2:
+                    locstr.replace(pos, 10, stringCfg["eui_location_hand"].to_string());
+                    seqstr = To<std::string>("[%d]", sequence);
+                    break;
+                case 0x4:
+                    locstr.replace(pos, 10, stringCfg["eui_location_szone"].to_string());
+                    seqstr = To<std::string>("[%d]", sequence);
+                    if(location & 0x80)
+                        xyzstr = stringCfg["eui_location_xyz"].to_string();
+                    break;
+                case 0x8:
+                    if(sequence < 5) {
+                        locstr.replace(pos, 10, stringCfg["eui_location_szone"].to_string());
+                        seqstr = To<std::string>("[%d]", sequence);
+                    } else if(sequence == 5)
+                        locstr.replace(pos, 10, stringCfg["eui_location_fzone"].to_string());
+                    else {
+                        locstr.replace(pos, 10, stringCfg["eui_location_pzone"].to_string());
+                        seqstr = To<std::string>("[%d]", sequence - 6);
+                    }
+                    break;
+                case 0x10:
+                    locstr.replace(pos, 10, stringCfg["eui_location_deck"].to_string());
+                    seqstr = To<std::string>("[%d]", sequence);
+                    break;
+                case 0x20:
+                    locstr.replace(pos, 10, stringCfg["eui_location_deck"].to_string());
+                    seqstr = To<std::string>("[%d]", sequence);
+                    break;
+                case 0x40:
+                    locstr.replace(pos, 10, stringCfg["eui_location_deck"].to_string());
+                    seqstr = To<std::string>("[%d]", sequence);
+                    break;
+            }
+            
+        }
+        pos = locstr.find("{sequence}");
+        if(pos != std::string::npos)
+           locstr.replace(pos, 10, seqstr);
+        pos = locstr.find("{xyz}");
+        if(pos != std::string::npos)
+            locstr.replace(pos, 10, xyzstr);
+        return To<std::wstring>(locstr);
+    }
+    
     DuelSceneHandler::DuelSceneHandler(DuelScene* pscene) {
         duel_scene = pscene;
         info_panel = std::make_shared<InfoPanel>();

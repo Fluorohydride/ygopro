@@ -126,9 +126,11 @@ namespace ygopro
         static const int32_t msg_type_system = 2;
     };
     
+    class FieldCard;
+    
     class OperationPanel {
     public:
-        static void Confirm(const std::vector<uint32_t>& code, std::function<void()> close_callback = nullptr);
+        static void Confirm(const std::vector<FieldCard*>& cards, std::function<void()> close_callback = nullptr);
     };
 }
 

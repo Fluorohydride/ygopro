@@ -5,6 +5,7 @@
 #include "config.h"
 #include "card_data.h"
 #include "scene_mgr.h"
+#include "ds/duel_scene.h"
 #include "image_mgr.h"
 #include "gui_extra.h"
 
@@ -71,7 +72,7 @@ namespace ygopro
                         wnd->SetStyle(sub_node);
                     } else if(name == "caption") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
-                        wnd->GetCaption()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        wnd->GetCaption()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "close button") {
                         wnd->SetCloseButtonVisible(sub_node.to_bool());
                     } else if(name == "allow resize") {
@@ -137,7 +138,7 @@ namespace ygopro
                         lbl->SetAllowFocus(sub_node.to_bool());
                     } else if(name == "text") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
-                        lbl->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        lbl->GetTextUI()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "max width") {
                         lbl->GetTextUI()->SetMaxWidth((int32_t)sub_node.to_integer());
                     }
@@ -180,7 +181,7 @@ namespace ygopro
                         btn->SetStyle(sub_node);
                     } else if(name == "text") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
-                        btn->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        btn->GetTextUI()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     }
                 });
                 return btn;
@@ -219,7 +220,7 @@ namespace ygopro
                         chk->SetStyle(sub_node);
                     } else if(name == "text") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
-                        chk->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        chk->GetTextUI()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "checked") {
                         chk->SetChecked(sub_node.to_bool());
                     }
@@ -236,7 +237,7 @@ namespace ygopro
                         rdo->SetStyle(sub_node);
                     } else if(name == "text") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
-                        rdo->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        rdo->GetTextUI()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "group") {
                         int32_t gp = (int32_t)sub_node.to_integer();
                         auto& prev_rdo = radio_groups[gp];
@@ -293,7 +294,7 @@ namespace ygopro
                         te->SetDefaultTextColor(sgui::SGJsonUtil::ConvertRGBA(sub_node));
                     } else if(name == "text") {
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
-                        te->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        te->GetTextUI()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "readonly") {
                         te->SetReadonly(sub_node.to_bool());
                     }
@@ -1056,46 +1057,40 @@ namespace ygopro
             logs[msg_type].push_back(msg);
     }
     
-    void OperationPanel::Confirm(const std::vector<uint32_t>& code, std::function<void()> close_callback) {
-        if(code.empty())
+    void OperationPanel::Confirm(const std::vector<FieldCard*>& cards, std::function<void()> close_callback) {
+        if(cards.empty())
             return;
         auto item_size = sgui::SGJsonUtil::ConvertV2i(dialogCfg["confirm dialog"]["item size"], 0);
-        v2i area_size = {(int32_t)(item_size.x * code.size()), item_size.y};
+        auto item_margin = (int32_t)dialogCfg["confirm dialog"]["item margin"].to_integer();
+        v2i area_size = {(int32_t)(item_size.x * cards.size() + item_margin * (cards.size() - 1)), item_size.y};
         auto wnd = LoadDialogAs<sgui::SGWidgetContainer>("confirm dialog");
         if(!wnd)
             return;
         wnd->event_on_destroy += [close_callback](sgui::SGWidget& sender)->bool { if(close_callback) close_callback(); return true; };
         auto card_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
-        auto card_image = wnd->FindWidgetAs<sgui::SGImageList>("card image");
         if(card_area) {
             card_area->SetScrollSize(area_size);
             auto vs = card_area->GetViewSize();
             if(area_size.x < vs.x)
                 card_area->BeginModify().PosRX(0).PosPX(0.5f).SizeRX(area_size.x).SizePX(0.0f).AlignX(-0.5f).End();
-        }
-        if(card_image) {
-            sgui::UISpriteList* spl = card_image->GetSpriteUI();
-            spl->SetTexture(ImageMgr::Get().GetRawCardTexture());
-            rectf rp = {0.0f, 0.0f, 0.0f, 0.0f};
-            for(int32_t i = 0; i < (int32_t)code.size(); ++i) {
-                std::weak_ptr<sgui::SGImageList> ref_image = std::static_pointer_cast<sgui::SGImageList>(card_image->shared_from_this());
-                texf4 card_tex = ImageMgr::Get().GetCardTexture(code[i], [i, item_size, ref_image](texf4 tex) {
+            for(int32_t i = 0; i < (int32_t)cards.size(); ++i) {
+                auto img = card_area->NewChild<sgui::SGImage>();
+                img->SetPositionSize({i * (item_size.x + item_margin), 0}, item_size);
+                img->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawCardTexture());
+                std::weak_ptr<sgui::SGImage> ref_image = img->CastPtr<sgui::SGImage>();
+                texf4 card_tex = ImageMgr::Get().GetCardTexture(cards[i]->code, [i, item_size, item_margin, ref_image](texf4 tex) {
                     auto ptr = ref_image.lock();
                     if(!ptr)
                         return;
-                    sgui::UIVertexArray<4> va;
-                    va.BuildSprite({i * item_size.x, 0, item_size.x, item_size.y}, {0.0f, 0.0f, 0.0f, 0.0f}, tex, 0xffffffff);
-                    ptr->GetSpriteUI()->SetSprite(va.Ptr(), i);
+                    ptr->GetSpriteUI()->SetTexcoords(tex);
                 });
-                spl->AddSprite(sgui::UIVertexArray<4>().BuildSprite({i * item_size.x, 0, item_size.x, item_size.y}, rp, card_tex, 0xffffffff).Ptr());
-                if(card_area) {
-                    auto ptr = card_area->NewChild<sgui::SGLabel>();
-                    ptr->GetTextUI()->SetText(L"TEST", 0xff00ffff);
-                    ptr->SetPosition({i * item_size.x - item_size.x / 2, item_size.y}, {0.0f, 0.0f}, {-0.5f, 0.0f});
-                }
+                img->GetSpriteUI()->SetDirectCoord(true);
+                img->GetSpriteUI()->SetTexcoords(card_tex);
+                
+                auto lbl = card_area->NewChild<sgui::SGLabel>();
+                lbl->GetTextUI()->PushStringWithFormat(cards[i]->pos_info.ToString(), 0xffffffff, nullptr);
+                lbl->SetPosition({i * (item_size.x + item_margin) + item_size.x / 2, item_size.y + 10}, {0.0f, 0.0f}, {-0.5f, 0.0f});
             }
-            if(card_area && card_area->RefreshVisibleWidgets())
-                card_area->SetRedraw();
         }
         auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
         if(ok_button)

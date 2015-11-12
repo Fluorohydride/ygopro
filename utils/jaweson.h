@@ -621,7 +621,7 @@ namespace jaweson
             bool parse(const char* text, int32_t len) {
                 begin_ptr = text;
                 end_ptr = text + len;
-                err_line = 0;
+                err_line = 1;
                 err_col = 0;
                 if((len >= 3) && (begin_ptr[0] == (char)0xef) && (begin_ptr[1] == (char)0xbb) && (begin_ptr[2] == (char)0xbf)) {
                     begin_ptr += 3;

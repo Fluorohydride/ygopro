@@ -205,7 +205,7 @@ namespace sgui
             }
             return std::make_pair(pre_pos != area_pos.absolute, pre_size != area_size.absolute);
         }
-        
+
     protected:
         RegionObject* container = nullptr;
         v2f self_factor = {0.0f, 0.0f};
@@ -435,12 +435,22 @@ namespace sgui
         int32_t capacity = 0;
     };
     
-    class UISprite : public UIComponent {
+    class UISpriteBase : public UIComponent {
     public:
         virtual bool CheckAvailable() { return texture != nullptr; }
         virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
         virtual int32_t GetTextureId() { return texture ? texture->GetTextureId() : 0; }
         
+        inline void SetTexture(base::Texture* tex) { if(texture == tex) return; texture = tex; SetRedraw(true); }
+        inline void SetTextureRect(recti rct) { tex_rect = rct; SetUpdate(); }
+        
+    protected:
+        recti tex_rect = {0, 0, 0, 0};
+        base::Texture* texture = nullptr;
+    };
+    
+    class UISprite : public UISpriteBase {
+    public:
         virtual void RefreshVertices() {
             vertices.resize(4);
             indices.resize(6);
@@ -453,24 +463,32 @@ namespace sgui
             v[1].vertex = ConvScreenCoord({area_pos.absolute.x + area_size.absolute.x, area_pos.absolute.y});
             v[2].vertex = ConvScreenCoord({area_pos.absolute.x, area_pos.absolute.y + area_size.absolute.y});
             v[3].vertex = ConvScreenCoord({area_pos.absolute.x + area_size.absolute.x, area_pos.absolute.y + area_size.absolute.y});
-            v[0].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
-            v[1].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top});
-            v[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
-            v[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
+            if(direct_texcoord) {
+                v[0].texcoord = texcoords.vert[0];
+                v[1].texcoord = texcoords.vert[1];
+                v[2].texcoord = texcoords.vert[2];
+                v[3].texcoord = texcoords.vert[3];
+            } else {
+                v[0].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
+                v[1].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top});
+                v[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
+                v[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
+            }
             for(int16_t i = 0; i < 6; ++i)
                 idx[i] = vert_index + quad_idx[i];
             for(int16_t i = 0; i < 4; ++i)
                 v[i].color = color;
         }
         
-        inline void SetTexture(base::Texture* tex) { if(texture == tex) return; texture = tex; SetRedraw(true); }
-        inline void SetTextureRect(recti rct) { tex_rect = rct; SetUpdate(); }
+        inline void SetDirectCoord(bool d) { direct_texcoord = d; SetUpdate(); }
+        inline void SetTexcoords(texf4 tex) { texcoords = tex; SetUpdate(); }
+        
     protected:
-        recti tex_rect = {0, 0, 0, 0};
-        base::Texture* texture = nullptr;
+        texf4 texcoords;
+        bool direct_texcoord = false;
     };
     
-    class UISprite9 : public UISprite {
+    class UISprite9 : public UISpriteBase {
     public:
         virtual void RefreshVertices() {
             vertices.resize(20);
@@ -746,7 +764,7 @@ namespace sgui
         }
         
         using format_callback = std::function<void(UIText* ui, const std::wstring& type, const std::wstring& value, uint32_t color)>;
-        void PushStringWithFormat(const std::wstring& str, uint32_t cur_color, format_callback unknown_format_cb) {
+        void PushStringWithFormat(const std::wstring& str, uint32_t cur_color, format_callback unknown_format_cb = nullptr) {
             std::wstring match_str = str;
             std::wregex re(L"\\[ *(\\w+) *: *(\\w+) *\\]");
             std::wsmatch m;
@@ -2421,8 +2439,7 @@ namespace sgui
         
         virtual void AddChild(std::shared_ptr<SGWidget> child) {
             SGWidgetContainer::AddChild(child);
-            if(child->CheckInRect({view_pos.x, view_pos.y, view_size.x, view_size.y}))
-                visible_widgets.push_back(child.get());
+            need_refresh_widgets = true;
         }
         
         virtual void RemoveChild(SGWidget* child) {
@@ -2456,6 +2473,8 @@ namespace sgui
             recti clip_region = {view_pos.x, view_pos.y, view_size.x, view_size.y};
             auto scissor_rect = SGGUIRoot::GetSingleton().ConvertScissorRect(clip_region);
             cmd = SGGUIRoot::GetSingleton().PushCommand<base::RenderCmdBeginScissor>(scissor_rect);
+            if(need_refresh_widgets)
+                RefreshVisibleWidgets();
             for(auto iter : visible_widgets)
                 iter->PushUIComponents();
             SGGUIRoot::GetSingleton().PushCommand<base::RenderCmdEndScissor>();
@@ -2493,6 +2512,7 @@ namespace sgui
                     }
                 }
             }
+            need_refresh_widgets = false;
             return widget_changed;
         }
         
@@ -2560,6 +2580,7 @@ namespace sgui
         v2i view_offset = {0, 0};
         std::weak_ptr<base::RenderCmdBeginScissor<vt2>> cmd;
         std::vector<SGWidget*> visible_widgets;
+        bool need_refresh_widgets = false;
     };
     
     class SGItemListWidget {
@@ -2747,7 +2768,7 @@ namespace sgui
             item_surface->SetContainer(this);
             item_surface->SetCapacity(16);
             item_surface->SetFont(item_font);
-            item_surface->SetText(str, cl);
+            item_surface->PushStringWithFormat(str, cl);
             item_surface->SetPositionSize(item_pos_rel, item_size_rel, item_pos_pro, item_size_pro, item_self_factor);
             item_surface->SetPositionR(item_pos_rel + v2i{bounds.left, bounds.top - item_offset + (int32_t)(ui_components.size() - 2) * item_height});
             ui_components.push_back(item_surface);

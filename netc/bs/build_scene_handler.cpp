@@ -355,12 +355,7 @@ namespace ygopro
             case 3: {
                 std::wstring neturl = To<std::wstring>(commonCfg["deck_neturl"].to_string());
                 std::wstring deck_string = To<std::wstring>(build_scene->SaveDeckToString());
-                auto ntpos = neturl.find(L"{amp}");
-                while(ntpos != std::wstring::npos) {
-                    neturl.replace(ntpos, 5, L"&");
-                    ntpos = neturl.find(L"{amp}");
-                }
-                ntpos = neturl.find(L"{deck}");
+                auto ntpos = neturl.find(L"{deck}");
                 if(ntpos != std::wstring::npos)
                     neturl.replace(ntpos, 6, deck_string);
                 ntpos = neturl.find(L"{name}");

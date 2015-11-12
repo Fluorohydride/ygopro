@@ -18,13 +18,17 @@ namespace ygopro
                 dm->msg_type = MSG_CONFIRM_CARDS;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint8_t>(0);
-                writer.Write<uint8_t>(3);
+                writer.Write<uint8_t>(5);
                 writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x1, 0, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 0, 0).info);
                 writer.Write<uint32_t>(64496451);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x1, 1, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 1, 0).info);
+                writer.Write<uint32_t>(64496451);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 2, 0).info);
+                writer.Write<uint32_t>(64496451);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 3, 0).info);
                 writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x1, 2, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 4, 0).info);
                 messages.PushCommand(dm);
                 break;
             }
@@ -622,10 +626,7 @@ namespace ygopro
                 if(panel_confirm.size()) {
                     message_lock = true;
                     acts.push_back(std::make_shared<ActionCallback<int64_t>>([this, panel_confirm]() {
-                        std::vector<uint32_t> codes;
-                        for(auto iter : panel_confirm)
-                            codes.push_back(iter->code);
-                        OperationPanel::Confirm(codes, [this]() { message_lock = false; });
+                        OperationPanel::Confirm(panel_confirm, [this]() { message_lock = false; });
                     }));
                     PushMessageActionsNoLock(acts);
                 } else {

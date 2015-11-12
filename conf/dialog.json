@@ -391,20 +391,15 @@
     "children" : {
       "scroll area" : {
         "type" : "scrollarea",
-        "position" : [10, 40, -20, -60, 0, 0, 1.0, 1.0, 0.0, 0.0],
-        "children" : {
-          "card image" : {
-            "type" : "spritelist",
-            "position" : [0, 0, 0, 0, 0, 0, 1.0, 1.0, 0.0, 0.0]
-          }
-        }
+        "position" : [20, 50, -40, -120, 0, 0, 1.0, 1.0, 0.0, 0.0]
       },
       "ok button" : {
         "type" : "text button",
         "text" : ["eui_button_ok", "0x000000ff"],
-        "position" : [0, -10, 100, 40, 0.5, 1.0, 0, 0, -0.5, -1.0]
+        "position" : [0, -20, 150, 40, 0.5, 1.0, 0, 0, -0.5, -1.0]
       }
     },
+    "item margin" : 20,
     "item size" : [200, 290]
   },
   "menus" : {
