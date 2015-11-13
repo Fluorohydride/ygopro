@@ -281,6 +281,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[0]));
 						selected_option = 0;
 						command_card = clicked_card;
+						if(mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
+							mainGame->btnBP->setVisible(false);
+							mainGame->btnEP->setVisible(false);
+							mainGame->btnShuffle->setVisible(false);
+						} else if(mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
+							mainGame->btnM2->setVisible(false);
+							mainGame->btnEP->setVisible(false);
+						}
 						mainGame->btnOptionp->setVisible(false);
 						mainGame->btnOptionn->setVisible(true);
 						mainGame->ShowElement(mainGame->wOptions);
@@ -1331,6 +1339,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->wOptions->isVisible()) {
 					mainGame->HideElement(mainGame->wOptions);
 				}
+				mainGame->btnM2->setVisible(true);
+				mainGame->btnEP->setVisible(true);
 				break;
 			}
 			case MSG_SELECT_IDLECMD: {
@@ -1340,6 +1350,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->wOptions->isVisible()) {
 					mainGame->HideElement(mainGame->wOptions);
 				}
+				mainGame->btnBP->setVisible(true);
+				mainGame->btnEP->setVisible(true);
+				mainGame->btnShuffle->setVisible(true);
 				break;
 			}
 			case MSG_SELECT_YESNO:
