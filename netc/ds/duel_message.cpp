@@ -730,46 +730,33 @@ namespace ygopro
                 break;
             }
             case MSG_SWAP_GRAVE_DECK: {
-//                int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
-//                    for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
-//                        (*cit)->location = LOCATION_GRAVE;
-//                    for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
-//                        if ((*cit)->type & 0x802040) {
-//                            (*cit)->location = LOCATION_EXTRA;
-//                            mainGame->dField.extra[player].push_back(*cit);
-//                            cit = mainGame->dField.deck[player].erase(cit);
-//                        } else {
-//                            (*cit)->location = LOCATION_DECK;
-//                            ++cit;
-//                        }
-//                    }
-//                } else {
-//                    mainGame->gMutex.Lock();
-//                    mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
-//                    for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit) {
-//                        (*cit)->location = LOCATION_GRAVE;
-//                        mainGame->dField.MoveCard(*cit, 10);
-//                    }
-//                    for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
-//                        ClientCard* pcard = *cit;
-//                        if (pcard->type & 0x802040) {
-//                            pcard->location = LOCATION_EXTRA;
-//                            mainGame->dField.extra[player].push_back(pcard);
-//                            cit = mainGame->dField.deck[player].erase(cit);
-//                        } else {
-//                            pcard->location = LOCATION_DECK;
-//                            ++cit;
-//                        }
-//                        mainGame->dField.MoveCard(pcard, 10);
-//                    }
-//                    mainGame->gMutex.Unlock();
-//                    mainGame->WaitFrameSignal(11);
-//                }
+                int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                std::vector<std::shared_ptr<FieldCard>> tmp_grave;
+                for(auto& iter : grave[playerid]) {
+                    if(iter->pos_info.location & 0x802040) {
+                        iter->pos_info = {(int8_t)playerid, LOCATION_EXTRA, (int8_t)extra[playerid].size(), POS_FACEDOWN};
+                        extra[playerid].push_back(iter);
+                        iter->UpdateTo(200, iter->GetPositionInfo());
+                    } else
+                        tmp_grave.push_back(iter);
+                }
+                grave[playerid] = std::move(tmp_grave);
+                grave[playerid].swap(deck[playerid]);
+                for(size_t i = 0; i < grave[playerid].size(); ++i) {
+                    auto& pcard = grave[playerid][i];
+                    pcard->pos_info = {(int8_t)playerid, LOCATION_GRAVE, (int8_t)i, POS_FACEUP};
+                    pcard->UpdateTo(200, pcard->GetPositionInfo());
+                }
+                for(size_t i = 0; i < deck[playerid].size(); ++i) {
+                    auto& pcard = deck[playerid][i];
+                    pcard->pos_info = {(int8_t)playerid, LOCATION_DECK, (int8_t)i, POS_FACEDOWN};
+                    pcard->UpdateTo(200, pcard->GetPositionInfo());
+                }
+                PushMessageActions(std::make_shared<ActionWait<int64_t>>(200));
                 break;
             }
             case MSG_SHUFFLE_SET_CARD: {
+//                int32_t count = reader.Read<uint8_t>();
 //                std::vector<ClientCard*>::iterator cit;
 //                int count = BufferIO::ReadInt8(pbuf);
 //                ClientCard* mc[5];
