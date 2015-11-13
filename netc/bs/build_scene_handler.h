@@ -44,7 +44,6 @@ namespace ygopro
         
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;
-        std::shared_ptr<InfoPanel> info_panel;
         
         std::weak_ptr<sgui::SGLabel> deck_label;
         std::weak_ptr<sgui::SGLabel> label_result;

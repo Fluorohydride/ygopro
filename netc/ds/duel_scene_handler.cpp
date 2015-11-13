@@ -114,7 +114,6 @@ namespace ygopro
     
     DuelSceneHandler::DuelSceneHandler(DuelScene* pscene) {
         duel_scene = pscene;
-        info_panel = std::make_shared<InfoPanel>();
         log_panel = std::make_shared<LogPanel>();
         InitField();
     }
@@ -150,7 +149,7 @@ namespace ygopro
                 auto cpos = duel_scene->GetHoverCardPos(duel_scene->GetHoverPos(mp.x, mp.y));
                 auto ptr = duel_scene->GetHoverCard(cpos);
                 if(ptr && ptr->code)
-                    info_panel->ShowInfo(ptr->code);
+                    InfoPanel::Get().ShowInfo(ptr->code);
             }
         }
         if(!message_lock) {
@@ -216,7 +215,7 @@ namespace ygopro
                 }, std::make_shared<TGenMove<int64_t>>(500, 0.01));
                 SceneMgr::Get().PushAction(act, hover_card.get(), 2);
             }
-            if(hover_card && hover_card->code && info_panel->IsOpen())
+            if(hover_card && hover_card->code && InfoPanel::Get().IsOpen())
                 show_info_time = SceneMgr::Get().GetSysClock() - 200;
             pre_card = hover_card;
         }

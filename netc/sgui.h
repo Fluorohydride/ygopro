@@ -108,6 +108,9 @@ namespace sgui
         class RegionModifier {
         public:
             RegionModifier(RegionObject* obj) : object(obj) {}
+            RegionModifier(const RegionModifier&) = delete;
+            RegionModifier(RegionModifier&& obj) { object = obj.object; obj.object = nullptr; }
+            ~RegionModifier() { if(object) object->OnPositionSizeChange(pos_changed, size_changed); }
             inline RegionModifier& PosRX(int32_t x) { object->area_pos.relative.x = x; pos_changed = true; return *this; }
             inline RegionModifier& PosRY(int32_t y) { object->area_pos.relative.y = y; pos_changed = true; return *this; }
             inline RegionModifier& PosPX(float x) { object->area_pos.proportion.x = x; pos_changed = true; return *this; }
@@ -118,7 +121,6 @@ namespace sgui
             inline RegionModifier& SizePY(float y) { object->area_size.proportion.y = y; size_changed = true; return *this; }
             inline RegionModifier& AlignX(float x) { object->self_factor.x = x; pos_changed = true; return *this; }
             inline RegionModifier& AlignY(float y) { object->self_factor.y = y; pos_changed = true; return *this; }
-            void End() { object->OnPositionSizeChange(pos_changed, size_changed); }
             
         protected:
             RegionObject* object = nullptr;
@@ -185,7 +187,7 @@ namespace sgui
         inline const AreaAttr& GetPosAttr() { return area_pos; }
         inline const AreaAttr& GetSizeAttr() { return area_size; }
         inline const v2f& GetAlignFactor() { return self_factor; }
-        inline RegionModifier BeginModify() { return RegionModifier(this); }
+        inline RegionModifier BatchModifyPosSize() { return std::move(RegionModifier(this)); }
         
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto pre_pos = area_pos.absolute;
@@ -226,9 +228,11 @@ namespace sgui
         
         inline v2f ConvScreenCoord(v2i pos) { return (static_cast<base::RenderObject2DLayout*>(manager))->ConvScreenCoord(pos);}
         inline void SetColor(uint32_t cl)   { if(color == cl) return; color = cl; SetUpdate(); }
+        inline void SetHColor(uint32_t cl)   { if(hcolor == cl) return; hcolor = cl; SetUpdate(); }
         
     protected:
         uint32_t color = 0xffffffff;
+        uint32_t hcolor = 0;
     };
     
     struct UIVertex {
@@ -236,15 +240,16 @@ namespace sgui
         v2f prop = {0.0f, 0.0f};
         v2f texcoord = {0, 0};
         uint32_t color = 0xffffffff;
+        uint32_t hcolor = 0;
     };
     
     template<int32_t VERT_COUNT>
     struct UIVertexArray {
-        inline UIVertexArray& BuildSprite(recti o, rectf p, rectf t, uint32_t c) {
-            SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); return *this;
+        inline UIVertexArray& BuildSprite(recti o, rectf p, rectf t, uint32_t c, uint32_t hc = 0) {
+            SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); SpriteHColor(hc); return *this;
         }
-        inline UIVertexArray& BuildSprite(recti o, rectf p, texf4 t, uint32_t c) {
-            SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); return *this;
+        inline UIVertexArray& BuildSprite(recti o, rectf p, texf4 t, uint32_t c, uint32_t hc = 0) {
+            SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); SpriteHColor(hc); return *this;
         }
         
         inline UIVertexArray& SpriteOffset(recti pos) {
@@ -289,6 +294,12 @@ namespace sgui
             return *this;
         }
         
+        inline UIVertexArray& SpriteHColor(uint32_t cl) {
+            static_assert(VERT_COUNT >= 4, "");
+            verts[0].hcolor = verts[1].hcolor = verts[2].hcolor = verts[3].hcolor = cl;
+            return *this;
+        }
+        
         inline UIVertex* Ptr() { return verts; }
         
         UIVertex verts[VERT_COUNT];
@@ -326,6 +337,7 @@ namespace sgui
                 vertices[i].vertex = CalUIVertex(points[i]);
                 vertices[i].texcoord = texture->ConvTexCoord(points[i].texcoord);
                 vertices[i].color = points[i].color;
+                vertices[i].hcolor = points[i].hcolor;
                 indices[i] = vert_index + i;
             }
         }
@@ -347,6 +359,7 @@ namespace sgui
                     vertices[i].vertex = CalUIVertex(points[i]);
                     vertices[i].texcoord = points[i].texcoord;
                     vertices[i].color = points[i].color;
+                    vertices[i].hcolor = points[i].hcolor;
                 }
                 for(size_t i = 0; i < vsize - 2; ++i) {
                     indices[i * 3] = vert_index;
@@ -362,17 +375,14 @@ namespace sgui
         virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
         
         virtual void RefreshVertices() {
-            static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
             for(size_t i = 0; i < points.size(); ++i) {
                 vertices[i].vertex = CalUIVertex(points[i]);
                 vertices[i].texcoord = points[i].texcoord;
                 vertices[i].color = points[i].color;
+                vertices[i].hcolor = points[i].hcolor;
             }
             size_t pt_size = points.size() / 4;
-            for(size_t i = 0; i < pt_size; ++i) {
-                for(size_t j = 0; j < 6; ++j)
-                    indices[i * 6 + j] = vert_index + i * 4 + quad_idx[j];
-            }
+            vt2::GenQuadIndex(indices.data(), (int32_t)pt_size, vert_index);
             for(size_t i = pt_size * 6; i < indices.size(); ++i)
                 indices[i] = 0;
         }
@@ -458,7 +468,6 @@ namespace sgui
         }
         
         void FillQuad(vt2* v, int16_t* idx) {
-            static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
             v[0].vertex = ConvScreenCoord({area_pos.absolute.x, area_pos.absolute.y});
             v[1].vertex = ConvScreenCoord({area_pos.absolute.x + area_size.absolute.x, area_pos.absolute.y});
             v[2].vertex = ConvScreenCoord({area_pos.absolute.x, area_pos.absolute.y + area_size.absolute.y});
@@ -474,10 +483,11 @@ namespace sgui
                 v[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
                 v[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
             }
-            for(int16_t i = 0; i < 6; ++i)
-                idx[i] = vert_index + quad_idx[i];
-            for(int16_t i = 0; i < 4; ++i)
+            vt2::GenQuadIndex(idx, 1, vert_index);
+            for(int16_t i = 0; i < 4; ++i) {
                 v[i].color = color;
+                v[i].hcolor = hcolor;
+            }
         }
         
         inline void SetDirectCoord(bool d) { direct_texcoord = d; SetUpdate(); }
@@ -527,8 +537,10 @@ namespace sgui
             v[19].texcoord = texture->ConvTexCoord({back_tex.left + back_tex.width, back_tex.top + back_tex.height});
             for(int32_t i = 0; i < 60; ++i)
                 idx[i] = vert_index + quad9_idx[i];
-            for(int16_t i = 0; i < 20; ++i)
+            for(int16_t i = 0; i < 20; ++i) {
                 v[i].color = color;
+                v[i].hcolor = hcolor;
+            }
         }
         
         inline void SetBackRect(recti bk, recti bkt) { back = bk; back_tex = bkt; SetUpdate(); }
@@ -1024,9 +1036,11 @@ namespace sgui
         inline bool IsEntity() { return is_entity; }
         inline bool AllowFocus() { return allow_focus; }
         inline void SetAllowFocus(bool foc) { allow_focus = foc; }
-        inline void SetColor(uint32_t cl) { for(auto& ui : ui_components) ui->SetColor(cl); }
         inline void SetCustomValue(intptr_t val) { custom_value = val; }
         inline intptr_t GetCustomValue() { return custom_value; }
+        
+        virtual void SetColor(uint32_t cl) { for(auto& ui : ui_components) ui->SetColor(cl); }
+        virtual void SetHColor(uint32_t cl) { for(auto& ui : ui_components) ui->SetHColor(cl); }
         
         virtual bool CheckInside(int32_t x, int32_t y) {
             return x >= area_pos.absolute.x && x <= area_pos.absolute.x + area_size.absolute.x
@@ -1507,6 +1521,18 @@ namespace sgui
             SGGUIRoot::GetSingleton().DeleteObject(common_ui);
         }
         
+        virtual void SetColor(uint32_t cl) {
+            for(auto& ui : ui_components)
+                ui->SetColor(cl);
+            common_ui->SetColor(cl);
+        }
+        
+        virtual void SetHColor(uint32_t cl) {
+            for(auto& ui : ui_components)
+                ui->SetHColor(cl);
+            common_ui->SetHColor(cl);
+        }
+        
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto ret = SGWidget::OnPositionSizeChange(re_pos, re_size);
             if(ret.first || ret.second)
@@ -1634,7 +1660,7 @@ namespace sgui
     
     class SGLabel : public SGAutoSizeTextWidget {
     public:
-        SGLabel() { allow_focus = false; }
+        SGLabel(bool focus = false) { allow_focus = focus; }
         
         virtual void InitUIComponents() {
             SGAutoSizeTextWidget::InitUIComponents();
@@ -1650,7 +1676,7 @@ namespace sgui
     
     class SGImage : public SGCommonUISprite {
     public:
-        SGImage() { allow_focus = false; }
+        SGImage(bool focus = false) { allow_focus = focus; }
         
         virtual void InitUIComponents() {
             SGCommonUISprite::InitUIComponents();
@@ -1662,7 +1688,7 @@ namespace sgui
     
     class SGImageList : public SGCommonUISpriteList {
     public:
-        SGImageList() { allow_focus = false; }
+        SGImageList(bool focus = false) { allow_focus = focus; }
         
         virtual void InitUIComponents() {
             SGCommonUISpriteList::InitUIComponents();
@@ -2455,12 +2481,12 @@ namespace sgui
             scrh->SetSizeR({-scrv->GetAbsoluteSize().x, 0});
             scrh->event_value_change += [this](SGWidget& sender, float val)->bool {
                 int32_t x = val * (scroll_size.x - view_size.x);
-                ChangeViewOffset({x, view_offset.y});
+                ChangeViewOffset({x, view_offset.y}, false);
                 return true;
             };
             scrv->event_value_change += [this](SGWidget& sender, float val)->bool {
                 int32_t y = val * (scroll_size.y - view_size.y);
-                ChangeViewOffset({view_offset.x, y});
+                ChangeViewOffset({view_offset.x, y}, false);
                 return true;
             };
         }
@@ -2524,7 +2550,7 @@ namespace sgui
             CheckViewSize();
         }
         
-        void ChangeViewOffset(v2i off) {
+        void ChangeViewOffset(v2i off, bool scroll = true) {
             if(off.x < 0) off.x = 0;
             if(off.y < 0) off.y = 0;
             if(scroll_size.x >= view_size.x && off.x > scroll_size.x - view_size.x)
@@ -2535,6 +2561,10 @@ namespace sgui
                 return;
             view_offset = off;
             OnPositionSizeChange(true, false);
+            if(scroll) {
+                static_cast<SGScrollBar<>*>(children[0].get())->SetValue((float)off.x / (scroll_size.x - view_size.x), false);
+                static_cast<SGScrollBar<>*>(children[1].get())->SetValue((float)off.y / (scroll_size.y - view_size.y), false);
+            }
             if(RefreshVisibleWidgets())
                 SetRedraw();
         }
@@ -2572,6 +2602,31 @@ namespace sgui
         inline v2i GetViewSize() { return view_size; }
         inline v2i GetViewOffset() { return view_offset; }
         inline SGScrollBar<>* GetScrollBar(bool hori) { return static_cast<SGScrollBar<>*>(children[hori ? 0 : 1].get()); }
+        
+        class ScrollBarModifier {
+        public:
+            ScrollBarModifier(SGScrollBar<>* p, std::function<void()> cb) : ptr(p), des_cb(cb) {}
+            ScrollBarModifier(const ScrollBarModifier&) = delete;
+            ScrollBarModifier(ScrollBarModifier&& obj) { ptr = obj.ptr; des_cb = std::move(obj.des_cb); obj.ptr = nullptr; }
+            ~ScrollBarModifier() { if(ptr) des_cb(); }
+            SGScrollBar<>* operator->() { return ptr; }
+            
+        protected:
+            SGScrollBar<>* ptr = nullptr;
+            std::function<void()> des_cb;
+        };
+        
+        inline ScrollBarModifier ModifyScrollBarPosSize(bool hori) {
+            auto bar = static_cast<SGScrollBar<>*>(children[hori ? 0 : 1].get());
+            auto pre_act_pos = area_pos.absolute;
+            auto pre_act_size = area_size.absolute;
+            area_pos.absolute = view_pos;
+            area_size.absolute = view_size;
+            return std::move(ScrollBarModifier(bar, [this, pre_act_pos, pre_act_size]() {
+                area_pos.absolute = pre_act_pos;
+                area_size.absolute = pre_act_size;
+            }));
+        }
         
     protected:
         v2i scroll_size = {0, 0};

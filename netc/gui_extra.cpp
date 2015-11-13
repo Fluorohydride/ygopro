@@ -1070,15 +1070,26 @@ namespace ygopro
         auto card_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
         if(card_area) {
             card_area->SetScrollSize(area_size);
+            card_area->ModifyScrollBarPosSize(true)->BatchModifyPosSize().PosRX(0).PosPX(0.0f).SizeRX(0).SizePX(1.0f);
             auto vs = card_area->GetViewSize();
-            if(area_size.x < vs.x)
-                card_area->BeginModify().PosRX(0).PosPX(0.5f).SizeRX(area_size.x).SizePX(0.0f).AlignX(-0.5f).End();
+            bool dragable = true;
+            if(area_size.x < vs.x) {
+                dragable = false;
+                card_area->BatchModifyPosSize().PosRX(0).PosPX(0.5f).SizeRX(area_size.x).SizePX(0.0f).AlignX(-0.5f);
+            } else {
+                card_area->SetDragTarget(card_area->CastPtr<sgui::SGClickableObject>());
+                card_area->event_drag_update += [card_area](sgui::SGClickableObject& sender, int32_t sx, int32_t sy, int32_t dx, int32_t dy)->bool {
+                    card_area->ChangeViewOffset(card_area->GetViewOffset() + v2i{sx - dx, 0});
+                    return true;
+                };
+            }
             for(int32_t i = 0; i < (int32_t)cards.size(); ++i) {
-                auto img = card_area->NewChild<sgui::SGImage>();
+                uint32_t code = cards[i]->code;
+                auto img = card_area->NewChild<sgui::SGImage>(true);
                 img->SetPositionSize({i * (item_size.x + item_margin), 0}, item_size);
                 img->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawCardTexture());
                 std::weak_ptr<sgui::SGImage> ref_image = img->CastPtr<sgui::SGImage>();
-                texf4 card_tex = ImageMgr::Get().GetCardTexture(cards[i]->code, [i, item_size, item_margin, ref_image](texf4 tex) {
+                texf4 card_tex = ImageMgr::Get().GetCardTexture(code, [i, item_size, item_margin, ref_image](texf4 tex) {
                     auto ptr = ref_image.lock();
                     if(!ptr)
                         return;
@@ -1086,7 +1097,27 @@ namespace ygopro
                 });
                 img->GetSpriteUI()->SetDirectCoord(true);
                 img->GetSpriteUI()->SetTexcoords(card_tex);
-                
+                img->event_mouse_enter += [img, code, ref_image](sgui::SGWidget& sender)->bool {
+                    img->SetHColor(0x80ffffff);
+                    if(InfoPanel::Get().IsOpen()) {
+                        auto wait = std::make_shared<ActionWait<int64_t>>(300);
+                        auto show = std::make_shared<ActionCallback<int64_t>>([code, ref_image]() {
+                            if(!ref_image.expired())
+                                InfoPanel::Get().ShowInfo(code);
+                        });
+                        SceneMgr::Get().PushAction(std::make_shared<ActionSequence<int64_t>>(wait, show), img, 0);
+                    }
+                    return true;
+                };
+                img->event_mouse_leave += [img](sgui::SGWidget& sender)->bool {
+                    img->SetHColor(0);
+                    SceneMgr::Get().RemoveAction(img);
+                    return true;
+                };
+                if(dragable)
+                    img->SetDragTarget(card_area->CastPtr<sgui::SGClickableObject>());
+            }
+            for(int32_t i = 0; i < (int32_t)cards.size(); ++i) {
                 auto lbl = card_area->NewChild<sgui::SGLabel>();
                 lbl->GetTextUI()->PushStringWithFormat(cards[i]->pos_info.ToString(), 0xffffffff, nullptr);
                 lbl->SetPosition({i * (item_size.x + item_margin) + item_size.x / 2, item_size.y + 10}, {0.0f, 0.0f}, {-0.5f, 0.0f});

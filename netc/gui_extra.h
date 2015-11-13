@@ -91,7 +91,7 @@ namespace ygopro
         int32_t sel[6] = {0};
     };
 
-    class InfoPanel : public CommonDialog {
+    class InfoPanel : public CommonDialog, public Singleton<InfoPanel> {
     public:
         void ShowInfo(uint32_t code);
         void Destroy();

@@ -13,7 +13,6 @@ namespace ygopro
         build_scene = pscene;
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
-        info_panel = std::make_shared<InfoPanel>();
         hover_pos = {CardLocation::Null, 0};
         click_pos = {CardLocation::Null, 0};
     }
@@ -121,7 +120,7 @@ namespace ygopro
                 if(cur == hover_pos) {
                     auto ptr = build_scene->GetCard(hover_pos.first, hover_pos.second);
                     if(ptr)
-                        info_panel->ShowInfo(ptr->data->code);
+                        InfoPanel::Get().ShowInfo(ptr->data->code);
                 }
             }
         }
@@ -148,7 +147,7 @@ namespace ygopro
                     return true;
                 }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
                 SceneMgr::Get().PushAction(act, ptr.get(), 1);
-                if(info_panel->IsOpen())
+                if(InfoPanel::Get().IsOpen())
                     show_info_time = SceneMgr::Get().GetSysClock() - 200;
                 if(hov.first == CardLocation::Result)
                     build_scene->HighlightCode(dcd->data->GetRawCode());
