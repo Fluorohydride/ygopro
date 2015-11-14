@@ -681,6 +681,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->gMutex.Unlock();
 			mainGame->WaitFrameSignal(11);
 		}
+		if(mainGame->wOptions->isVisible()) {
+			mainGame->gMutex.Lock();
+			mainGame->HideElement(mainGame->wOptions);
+			mainGame->gMutex.Unlock();
+			mainGame->WaitFrameSignal(11);
+		}
 	}
 	if(mainGame->dInfo.time_player == 1)
 		mainGame->dInfo.time_player = 2;
