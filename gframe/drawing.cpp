@@ -942,6 +942,8 @@ void Game::DrawDeckBd() {
 				wcscat(textBuffer, L" [OCG]");
 			else if((ptr->second.ot & 0x3) == 2)
 				wcscat(textBuffer, L" [TCG]");
+			else if((ptr->second.ot & 0x7) == 4)
+				wcscat(textBuffer, L" [Custom]");
 			textFont->draw(textBuffer, recti(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 		} else {
@@ -956,6 +958,8 @@ void Game::DrawDeckBd() {
 				wcscat(textBuffer, L"[OCG]");
 			else if((ptr->second.ot & 0x3) == 2)
 				wcscat(textBuffer, L"[TCG]");
+			else if((ptr->second.ot & 0x7) == 4)
+				wcscat(textBuffer, L"[Custom]");
 			textFont->draw(textBuffer, recti(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 		}
