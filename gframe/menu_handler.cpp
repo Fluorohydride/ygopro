@@ -54,7 +54,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					inet_ntop(AF_INET, &(((struct sockaddr_in *)servinfo->ai_addr)->sin_addr), ip, 20);
 				freeaddrinfo(servinfo);
 			#else
-				//int status;
 				char hostname[100];
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinIP->getText();
