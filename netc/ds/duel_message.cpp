@@ -756,50 +756,50 @@ namespace ygopro
                 break;
             }
             case MSG_SHUFFLE_SET_CARD: {
-//                int32_t count = reader.Read<uint8_t>();
-//                std::vector<ClientCard*>::iterator cit;
-//                int count = BufferIO::ReadInt8(pbuf);
-//                ClientCard* mc[5];
-//                ClientCard* swp;
-//                int c, l, s, ps;
-//                for (int i = 0; i < count; ++i) {
-//                    c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                    l = BufferIO::ReadInt8(pbuf);
-//                    s = BufferIO::ReadInt8(pbuf);
-//                    BufferIO::ReadInt8(pbuf);
-//                    mc[i] = mainGame->dField.mzone[c][s];
-//                    mc[i]->SetCode(0);
-//                    if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                        mc[i]->dPos = irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f);
-//                        mc[i]->dRot = irr::core::vector3df(0, 0, 0);
-//                        mc[i]->is_moving = true;
-//                        mc[i]->aniFrame = 10;
-//                    }
-//                }
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
-//                    mainGame->WaitFrameSignal(20);
-//                for (int i = 0; i < count; ++i) {
-//                    c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                    l = BufferIO::ReadInt8(pbuf);
-//                    s = BufferIO::ReadInt8(pbuf);
-//                    BufferIO::ReadInt8(pbuf);
-//                    ps = mc[i]->sequence;
-//                    if (l > 0) {
-//                        swp = mainGame->dField.mzone[c][s];
-//                        mainGame->dField.mzone[c][ps] = swp;
-//                        mainGame->dField.mzone[c][s] = mc[i];
-//                        mc[i]->sequence = s;
-//                        swp->sequence = ps;
-//                    }
-//                }
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    for (int i = 0; i < count; ++i) {
-//                        mainGame->dField.MoveCard(mc[i], 10);
-//                        for (cit = mc[i]->overlayed.begin(); cit != mc[i]->overlayed.end(); ++cit)
-//                            mainGame->dField.MoveCard(*cit, 10);
-//                    }
-//                    mainGame->WaitFrameSignal(11);
-//                }
+                int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                int32_t count = reader.Read<uint8_t>();
+                std::list<std::shared_ptr<FieldCard>> mc;
+                std::vector<uint8_t> preseq;
+                std::vector<uint8_t> seq;
+                for(int32_t i = 0; i < count; ++i) {
+                    preseq.push_back(reader.Read<uint8_t>());
+                    auto ptr = m_zone[playerid][preseq[i]];
+                    mc.push_back(ptr);
+                    m_zone[playerid][preseq[i]] = nullptr;
+                    ptr->UpdateTo(100, ptr->GetPositionInfo(CardPosParam::Shuffle));
+                }
+                auto wait1 = std::make_shared<ActionWait<int64_t>>(100);
+                for(int32_t i = 0; i < count; ++i)
+                    seq.push_back(reader.Read<uint8_t>() & 0xf);
+                auto cb = std::make_shared<ActionCallback<int64_t>>([this, playerid, mc, preseq, seq]() mutable {
+                    auto iter = mc.begin();
+                    int32_t count = (int32_t)preseq.size();
+                    for(int32_t i = 0; i < count; ++i) {
+                        if(seq[i] < 5) {
+                            auto& ptr = *iter;
+                            ptr->pos_info.sequence = seq[i];
+                            m_zone[playerid][seq[i]] = ptr;
+                            ptr->UpdateTo(100, ptr->GetPositionInfo());
+                            for(auto att_card : ptr->attached_cards) {
+                                att_card->pos_info.sequence = seq[i];
+                                att_card->UpdateTo(100, att_card->GetPositionInfo());
+                            }
+                            mc.erase(iter++);
+                        } else
+                            iter++;
+                    }
+                    for(int32_t i = 0; i < count; ++i) {
+                        if(m_zone[playerid][preseq[i]] == nullptr) {
+                            mc.front()->pos_info.sequence = preseq[i];
+                            mc.front()->UpdateTo(100, mc.front()->GetPositionInfo());
+                            m_zone[playerid][preseq[i]] = mc.front();
+                            mc.pop_front();
+                        }
+                    }
+                    duel_scene->RedrawAllCards();
+                });
+                auto wait2 = std::make_shared<ActionWait<int64_t>>(100);
+                PushMessageActions(wait1, cb, wait2);
                 break;
             }
             case MSG_REVERSE_DECK: {
