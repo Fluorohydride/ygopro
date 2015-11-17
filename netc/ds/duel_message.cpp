@@ -4,6 +4,7 @@
 
 #include "../sgui.h"
 #include "../gui_extra.h"
+#include "../card_data.h"
 
 #include "duel_scene.h"
 #include "duel_scene_handler.h"
@@ -15,20 +16,16 @@ namespace ygopro
         switch(param) {
             case 1: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_CONFIRM_CARDS;
+                dm->msg_type = MSG_SHUFFLE_SET_CARD;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint8_t>(0);
-                writer.Write<uint8_t>(5);
-                writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 0, 0).info);
-                writer.Write<uint32_t>(64496451);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 1, 0).info);
-                writer.Write<uint32_t>(64496451);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 2, 0).info);
-                writer.Write<uint32_t>(64496451);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 3, 0).info);
-                writer.Write<uint32_t>(57728570);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x40, 4, 0).info);
+                writer.Write<uint8_t>(3);
+                writer.Write<uint8_t>(1);
+                writer.Write<uint8_t>(3);
+                writer.Write<uint8_t>(4);
+                writer.Write<uint8_t>(4);
+                writer.Write<uint8_t>(1);
+                writer.Write<uint8_t>(3);
                 messages.PushCommand(dm);
                 break;
             }
@@ -733,7 +730,8 @@ namespace ygopro
                 int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 std::vector<std::shared_ptr<FieldCard>> tmp_grave;
                 for(auto& iter : grave[playerid]) {
-                    if(iter->pos_info.location & 0x802040) {
+                    auto data = DataMgr::Get()[iter->code];
+                    if(data && (data->type & 0x802040)) {
                         iter->pos_info = {(int8_t)playerid, LOCATION_EXTRA, (int8_t)extra[playerid].size(), POS_FACEDOWN};
                         extra[playerid].push_back(iter);
                         iter->UpdateTo(200, iter->GetPositionInfo());
@@ -768,7 +766,7 @@ namespace ygopro
                     m_zone[playerid][preseq[i]] = nullptr;
                     ptr->UpdateTo(100, ptr->GetPositionInfo(CardPosParam::Shuffle));
                 }
-                auto wait1 = std::make_shared<ActionWait<int64_t>>(100);
+                auto wait1 = std::make_shared<ActionWait<int64_t>>(300);
                 for(int32_t i = 0; i < count; ++i)
                     seq.push_back(reader.Read<uint8_t>() & 0xf);
                 auto cb = std::make_shared<ActionCallback<int64_t>>([this, playerid, mc, preseq, seq]() mutable {
@@ -790,9 +788,11 @@ namespace ygopro
                     }
                     for(int32_t i = 0; i < count; ++i) {
                         if(m_zone[playerid][preseq[i]] == nullptr) {
-                            mc.front()->pos_info.sequence = preseq[i];
-                            mc.front()->UpdateTo(100, mc.front()->GetPositionInfo());
-                            m_zone[playerid][preseq[i]] = mc.front();
+                            auto& ptr = mc.front();
+                            ptr->SetCode(0);
+                            ptr->pos_info.sequence = preseq[i];
+                            ptr->UpdateTo(100, ptr->GetPositionInfo());
+                            m_zone[playerid][preseq[i]] = ptr;
                             mc.pop_front();
                         }
                     }

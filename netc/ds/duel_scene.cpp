@@ -168,39 +168,48 @@ namespace ygopro
                 break;
             }
             case 0x4: { //mzone
-                auto fb_pos = field_blocks[side][seq]->GetCenter();
-                tl.x = fb_pos.x;
-                tl.y = fb_pos.y;
-                if(attaching_card != nullptr) {
-                    tl.z = 0.001f * subs;
-                    tl.x -= vparam.cardrect.width * 0.1f;
-                } else {
-                    tl.z = 0.001f * attached_cards.size();
-                    if(pos & 0x3) {
-                        if(pos == 0x1 || param == CardPosParam::Confirm) {
-                            if(side == 0)
-                                rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-                            else
-                                rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                        } else {
-                            if(side == 0)
-                                rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
-                            else
-                                rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
-                        }
+                if(param != CardPosParam::Shuffle) {
+                    auto fb_pos = field_blocks[side][seq]->GetCenter();
+                    tl.x = fb_pos.x;
+                    tl.y = fb_pos.y;
+                    if(attaching_card != nullptr) {
+                        tl.z = 0.001f * subs;
+                        tl.x -= vparam.cardrect.width * 0.1f;
                     } else {
-                        if(pos == 0x4 || param == CardPosParam::Confirm) {
-                            if(side == 0)
-                                rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
-                            else
-                                rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, -1.0f));
+                        tl.z = 0.001f * attached_cards.size();
+                        if(pos & 0x3) {
+                            if(pos == 0x1 || param == CardPosParam::Confirm) {
+                                if(side == 0)
+                                    rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                                else
+                                    rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+                            } else {
+                                if(side == 0)
+                                    rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
+                                else
+                                    rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
+                            }
                         } else {
-                            if(side == 0)
-                                rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
-                            else
-                                rot = glm::angleAxis(3.1415926f, glm::vec3(0.70710678f, 0.70710678f, 0.0f));
+                            if(pos == 0x4 || param == CardPosParam::Confirm) {
+                                if(side == 0)
+                                    rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
+                                else
+                                    rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, -1.0f));
+                            } else {
+                                if(side == 0)
+                                    rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
+                                else
+                                    rot = glm::angleAxis(3.1415926f, glm::vec3(0.70710678f, 0.70710678f, 0.0f));
+                            }
                         }
                     }
+                } else {
+                    auto fb_pos = field_blocks[side][2]->GetCenter();
+                    tl = {fb_pos.x, fb_pos.y, 1};
+                    if(side == 0)
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.70710678f, 0.70710678f, 0.0f));
                 }
                 break;
             }
@@ -403,6 +412,44 @@ namespace ygopro
             SetUpdate();
     }
     
+    int32_t FloatingSprite::GetTextureId() {
+        return texture->GetTextureId();
+    }
+    
+    void FloatingSprite::RefreshVertices() {
+        vertices.resize(4);
+        indices.resize(6);
+        vt2::GenQuadIndex(&indices[0], 1, index_index);
+        for(int32_t i = 0; i < 4; ++i) {
+            vertices[i].color = color;
+            vertices[i].hcolor = hl;
+        }
+    }
+    
+    void FloatingSprite::BuildSprite(recti rct, texf4 tex) {
+        vertices.resize(4);
+        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
+        vertices[0].vertex = mgr->ConvScreenCoord({rct.left, rct.top});
+        vertices[0].texcoord = tex.vert[0];
+        vertices[1].vertex = mgr->ConvScreenCoord({rct.left + rct.width, rct.top});
+        vertices[1].texcoord = tex.vert[1];
+        vertices[2].vertex = mgr->ConvScreenCoord({rct.left, rct.top + rct.height});
+        vertices[2].texcoord = tex.vert[2];
+        vertices[3].vertex = mgr->ConvScreenCoord({rct.left + rct.width, rct.top + rct.height});
+        vertices[3].texcoord = tex.vert[3];
+        SetUpdate();
+    }
+    
+    void FloatingSprite::BuildSprite(v2i* verts, texf4 tex) {
+        vertices.resize(4);
+        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
+        for(int32_t i = 0; i < 4; ++i) {
+            vertices[i].vertex = mgr->ConvScreenCoord(verts[i]);
+            vertices[i].texcoord = tex.vert[i];
+        }
+        SetUpdate();
+    }
+    
     void FieldRenderer::PushVerticesAll() {
         base::RenderObject<vt3>::PushVerticesAll();
         for(auto& iter : field_blocks[0])
@@ -458,10 +505,39 @@ namespace ygopro
     
     void MiscObjectRenderer::PushVerticesAll() {
         base::RenderObject<vt2>::PushVerticesAll();
-        for(int32_t i = 0; i < 2; ++i) {
-            for(auto& iter : fixed_numbers[i])
-                if(iter)
-                    iter->PushVertices();
+        for(auto& iter : numbers)
+            iter.second->PushVertices();
+        for(auto& iter : sprites)
+            iter.second->PushVertices();
+    }
+    
+    FloatingNumber* MiscObjectRenderer::AddFloatingNumber() {
+        auto ptr = NewObject<FloatingNumber>(number_ref);
+        numbers[number_ref] = ptr;
+        RequestRedraw();
+        return ptr;
+    }
+    
+    FloatingSprite* MiscObjectRenderer::AddFloatingSprite() {
+        auto ptr = NewObject<FloatingSprite>(sprite_ref);
+        sprites[sprite_ref] = ptr;
+        RequestRedraw();
+        return ptr;
+    }
+    
+    void MiscObjectRenderer::RemoveFloatingNumber(FloatingNumber* ptr) {
+        uint32_t ref_id = ptr->GetRefId();
+        if(DeleteObject(ptr)) {
+            numbers.erase(ref_id);
+            RequestRedraw();
+        }
+    }
+    
+    void MiscObjectRenderer::RemoveFloatingSprite(FloatingSprite* ptr) {
+        uint32_t ref_id = ptr->GetRefId();
+        if(DeleteObject(ptr)) {
+            sprites.erase(ref_id);
+            RequestRedraw();
         }
     }
     

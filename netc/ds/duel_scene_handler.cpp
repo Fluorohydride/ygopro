@@ -125,13 +125,18 @@ namespace ygopro
         AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
         AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
         AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
-        AddCard(83764718, CardPosInfo(0, 0x4, 1, 0x8))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x4, 1, 0x8))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
+        AddCard(83764718, CardPosInfo(0, 0x4, 3, 0x8))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x4, 4, 0x8))->UpdatePosition(0);
         AddCard(64496451, CardPosInfo(0, 0x2, 2, 0x1))->UpdatePosition(0);
-        AddCard(97268402, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
-        AddCard(97268402, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
-        AddCard(97268402, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
-        AddCard(97268402, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
-        AddCard(97268402, CardPosInfo(0, 0x40, 2, 0xa))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
         for(auto& pc : hand[0])
             pc->UpdatePosition(0);
     }

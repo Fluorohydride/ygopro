@@ -107,6 +107,7 @@ namespace ygopro
     
     class FloatingNumber : public DuelObject<vt2> {
     public:
+        FloatingNumber(uint32_t rid) : ref_id(rid) {}
         virtual int32_t GetTextureId();
         virtual void RefreshVertices();
         
@@ -114,11 +115,30 @@ namespace ygopro
         void SetValueStr(const std::string& val_str);
         void SetCharSize(v2i sz) { char_size = sz; SetUpdate(); }
         inline void SetPosition(v2i pos) { char_pos = pos; SetUpdate(); }
+        inline uint32_t GetRefId() { return ref_id; }
         
     protected:
         std::string val_string;
         v2i char_size = {0, 0};
         v2i char_pos = {0, 0};
+        uint32_t ref_id = 0;
+    };
+    
+    class FloatingSprite : public DuelObject<vt2> {
+    public:
+        FloatingSprite(uint32_t rid) : ref_id(rid) {}
+        virtual int32_t GetTextureId();
+        virtual void RefreshVertices();
+        
+        inline uint32_t GetRefId() { return ref_id; }
+        
+        void BuildSprite(recti rct, texf4 tex);
+        void BuildSprite(v2i* verts, texf4 tex);
+        inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
+        
+    protected:
+        base::Texture* texture = nullptr;
+        uint32_t ref_id = 0;
     };
     
     struct ViewParam {
@@ -161,6 +181,17 @@ namespace ygopro
     public:
         MiscObjectRenderer() { InitGLState(true); }
         virtual void PushVerticesAll();
+        
+        FloatingNumber* AddFloatingNumber();
+        FloatingSprite* AddFloatingSprite();
+        void RemoveFloatingNumber(FloatingNumber* ptr);
+        void RemoveFloatingSprite(FloatingSprite* ptr);
+        
+    protected:
+        std::map<uint32_t, FloatingNumber*> numbers;
+        std::map<uint32_t, FloatingSprite*> sprites;
+        uint32_t number_ref = 0;
+        uint32_t sprite_ref = 0;
     };
     
     class DuelScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
@@ -192,8 +223,6 @@ namespace ygopro
         inline std::shared_ptr<FieldCard> CreateCard() { return fieldcard_renderer->NewSharedObject<FieldCard>(); }
         inline void RemoveCard(std::shared_ptr<FieldCard> ptr) { fieldcard_renderer->DeleteObject(ptr.get()); }
         inline std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
-        
-        std::shared_ptr<FloatingNumber> AddFloatingNumber();
         
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
