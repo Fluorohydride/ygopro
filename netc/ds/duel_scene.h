@@ -39,6 +39,7 @@ namespace ygopro
             SetUpdate();
         }
         inline v2f GetCenter() { return translation; }
+        inline v2f GetSize() { return quad_size; }
         
         bool CheckInside(float px, float py);
         
@@ -105,40 +106,59 @@ namespace ygopro
         FieldCard* attaching_card = nullptr;
     };
     
-    class FloatingNumber : public DuelObject<vt2> {
+    class FloatingObject : public DuelObject<vt2> {
     public:
-        FloatingNumber(uint32_t rid) : ref_id(rid) {}
+        FloatingObject(uint32_t rid) : ref_id(rid) {}
+        inline uint32_t GetRefId() { return ref_id; }
+        inline void SetCenter(v2i pos) { center_pos = pos; SetUpdate(); }
+        inline void SetRotation(float rot) {
+            rot_matrix[0] = std::cosf(rot);
+            rot_matrix[1] = std::sinf(rot);
+            SetUpdate();
+        }
+        inline v2i RotPoint(v2i point, v2i center) {
+            v2i tr1 = point - center;
+            v2i tr2 = {(int32_t)(tr1.x * rot_matrix[0] + tr1.y * rot_matrix[1]), (int32_t)(tr1.x * -rot_matrix[1] + tr1.y * rot_matrix[0])};
+            return tr2 + center;
+        };
+        
+    protected:
+        v2i center_pos = {0, 0};
+        uint32_t ref_id = 0;
+        float rot_matrix[2] = {1.0f, 0.0f};
+    };
+    
+    class FloatingNumber : public FloatingObject {
+    public:
+        FloatingNumber(uint32_t rid) : FloatingObject(rid) {}
         virtual int32_t GetTextureId();
         virtual void RefreshVertices();
         
         void SetValue(int32_t val);
         void SetValueStr(const std::string& val_str);
-        void SetCharSize(v2i sz) { char_size = sz; SetUpdate(); }
-        inline void SetPosition(v2i pos) { char_pos = pos; SetUpdate(); }
-        inline uint32_t GetRefId() { return ref_id; }
+        inline void SetCharSize(v2i sz) { char_size = sz; SetUpdate(); }
+        inline void SetSColor(uint32_t cl) { scolor = cl; SetUpdate(); }
         
     protected:
         std::string val_string;
         v2i char_size = {0, 0};
-        v2i char_pos = {0, 0};
-        uint32_t ref_id = 0;
+        uint32_t scolor = 0xff000000;
     };
     
-    class FloatingSprite : public DuelObject<vt2> {
+    class FloatingSprite : public FloatingObject {
     public:
-        FloatingSprite(uint32_t rid) : ref_id(rid) {}
+        FloatingSprite(uint32_t rid) : FloatingObject(rid) {}
         virtual int32_t GetTextureId();
         virtual void RefreshVertices();
         
-        inline uint32_t GetRefId() { return ref_id; }
-        
         void BuildSprite(recti rct, texf4 tex);
-        void BuildSprite(v2i* verts, texf4 tex);
+        void BuildSprite(v2i* verts, texf4 tex, v2i center);
         inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
         
     protected:
         base::Texture* texture = nullptr;
-        uint32_t ref_id = 0;
+        std::array<v2i, 4> points;
+        texf4 texcoord;
     };
     
     struct ViewParam {
@@ -180,18 +200,32 @@ namespace ygopro
     class MiscObjectRenderer : public base::RenderObject2DLayout {
     public:
         MiscObjectRenderer() { InitGLState(true); }
-        virtual void PushVerticesAll();
+        virtual void PushVerticesAll() {
+            base::RenderObject2DLayout::PushVerticesAll();
+            for(auto& iter : objects)
+                iter.second->PushVertices();
+        }
         
-        FloatingNumber* AddFloatingNumber();
-        FloatingSprite* AddFloatingSprite();
-        void RemoveFloatingNumber(FloatingNumber* ptr);
-        void RemoveFloatingSprite(FloatingSprite* ptr);
+        template<typename T>
+        std::shared_ptr<T> AddFloatingObject() {
+            auto ptr = NewSharedObject<T>(count_ref);
+            objects[count_ref++] = ptr.get();
+            RequestRedraw();
+            return ptr;
+        }
+
+        template<typename T>
+        void RemoveFloatingObject(T* ptr) {
+            uint32_t ref_id = ptr->GetRefId();
+            if(DeleteObject(ptr)) {
+                objects.erase(ref_id);
+                RequestRedraw();
+            }
+        }
         
     protected:
-        std::map<uint32_t, FloatingNumber*> numbers;
-        std::map<uint32_t, FloatingSprite*> sprites;
-        uint32_t number_ref = 0;
-        uint32_t sprite_ref = 0;
+        std::map<uint32_t, FloatingObject*> objects;
+        uint32_t count_ref = 0;
     };
     
     class DuelScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
@@ -223,6 +257,11 @@ namespace ygopro
         inline std::shared_ptr<FieldCard> CreateCard() { return fieldcard_renderer->NewSharedObject<FieldCard>(); }
         inline void RemoveCard(std::shared_ptr<FieldCard> ptr) { fieldcard_renderer->DeleteObject(ptr.get()); }
         inline std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
+        
+        inline std::shared_ptr<FloatingNumber> AddFloatingNumber() { return miscobject_renderer->AddFloatingObject<FloatingNumber>(); }
+        inline std::shared_ptr<FloatingSprite> AddFloatingSprite() { return miscobject_renderer->AddFloatingObject<FloatingSprite>(); }
+        inline void RemoveFloatingNumber(FloatingNumber* ptr) { miscobject_renderer->RemoveFloatingObject(ptr); }
+        inline void RemoveFloatingSprite(FloatingSprite* ptr) { miscobject_renderer->RemoveFloatingObject(ptr); }
         
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;

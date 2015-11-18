@@ -5,6 +5,7 @@
 #include "../sgui.h"
 #include "../gui_extra.h"
 #include "../card_data.h"
+#include "../image_mgr.h"
 
 #include "duel_scene.h"
 #include "duel_scene_handler.h"
@@ -15,18 +16,34 @@ namespace ygopro
     void DuelSceneHandler::Test(int32_t param) {
         switch(param) {
             case 1: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_SHUFFLE_SET_CARD;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(0);
-                writer.Write<uint8_t>(3);
-                writer.Write<uint8_t>(1);
-                writer.Write<uint8_t>(3);
-                writer.Write<uint8_t>(4);
-                writer.Write<uint8_t>(4);
-                writer.Write<uint8_t>(1);
-                writer.Write<uint8_t>(3);
-                messages.PushCommand(dm);
+//                auto dm = std::make_shared<DuelMessage>();
+//                dm->msg_type = MSG_SHUFFLE_SET_CARD;
+//                BufferWriter writer(dm->msg_buffer);
+//                writer.Write<uint8_t>(0);
+//                writer.Write<uint8_t>(3);
+//                writer.Write<uint8_t>(1);
+//                writer.Write<uint8_t>(3);
+//                writer.Write<uint8_t>(4);
+//                writer.Write<uint8_t>(4);
+//                writer.Write<uint8_t>(1);
+//                writer.Write<uint8_t>(3);
+//                messages.PushCommand(dm);
+                
+                auto ptr = duel_scene->AddFloatingNumber();
+                ptr->SetValueStr("-12345/+6789");
+                ptr->SetCenter({300, 300});
+                ptr->SetCharSize({40, 80});
+                ptr->SetColor(0xff00ffff);
+                ptr->SetSColor(0xff004040);
+                auto ptr2 = duel_scene->AddFloatingSprite();
+                ptr2->SetTexture(ImageMgr::Get().GetRawCardTexture());
+                ptr2->BuildSprite({200, 200, 100, 100}, ImageMgr::Get().GetTexture("limit0"));
+                auto act = std::make_shared<LerpAnimator<int64_t, FloatingSprite>>(0, ptr2, [](FloatingSprite* obj, double t)->bool {
+                    obj->SetRotation(3.1415926f * 2 * -t);
+                    return true;
+                }, std::make_shared<TGenPeriodic<int64_t>>(1000));
+                SceneMgr::Get() << act;
+                
                 break;
             }
             case 9: {

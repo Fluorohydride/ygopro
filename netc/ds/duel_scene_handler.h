@@ -52,7 +52,7 @@ namespace ygopro
     extern std::vector<std::shared_ptr<FieldCard>> extra[2];
     extern std::vector<std::shared_ptr<FieldCard>> grave[2];
     extern std::vector<std::shared_ptr<FieldCard>> banished[2];
-    extern std::array<std::shared_ptr<FloatingNumber>, 23> fixed_numbers[2];
+    extern std::array<std::shared_ptr<FloatingNumber>, 21> fixed_numbers[2];
     
     class DuelSceneHandler : public SceneHandler {
     public:

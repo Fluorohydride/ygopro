@@ -378,15 +378,32 @@ namespace ygopro
     }
     
     void FloatingNumber::RefreshVertices() {
+        if(val_string.empty())
+            return;
         vertices.resize(val_string.length() * 8);
         indices.resize(val_string.length() * 12);
-        auto pos = char_pos;
+        v2i all_size = {(int32_t)val_string.length() * (char_size.x + 1) - 1, char_size.y};
+        v2i pos = {center_pos.x - all_size.x / 2, center_pos.y - all_size.y / 2};
+        v2i off = {(int32_t)(char_size.x * 0.05f), (int32_t)(char_size.y * 0.05f)};
+        off.x = off.x > 0 ? off.x : 1;
+        off.y = off.y > 0 ? off.y : 1;
         int32_t i = 0;
         base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
+        auto push_rotated_vert = [this, mgr](vt2* vt, v2i pos, v2i sz, v2i center, texf4 tex, uint32_t cl) {
+            vt[0].vertex = mgr->ConvScreenCoord(RotPoint(pos, center));
+            vt[1].vertex = mgr->ConvScreenCoord(RotPoint({pos.x + sz.x, pos.y}, center));
+            vt[2].vertex = mgr->ConvScreenCoord(RotPoint({pos.x, pos.y + sz.y}, center));
+            vt[3].vertex = mgr->ConvScreenCoord(RotPoint(pos + sz, center));
+            for(int32_t i = 0; i < 4; ++i) {
+                vt[i].texcoord = tex.vert[i];
+                vt[i].color = cl;
+                vt[i].hcolor = hl;
+            }
+        };
         for(auto iter : val_string) {
             auto tex = ImageMgr::Get().GetCharTex(iter);
-            vt2::Fill(&vertices[i], mgr->ConvScreenCoord({pos.x - 1, pos.y - 1}) , mgr->ConvScreenSize(char_size), tex, color);
-            vt2::Fill(&vertices[i + val_string.length() * 4], mgr->ConvScreenCoord(pos) , mgr->ConvScreenSize(char_size), tex, color);
+            push_rotated_vert(&vertices[i], {pos.x - off.x, pos.y - off.y}, char_size, {center_pos.x - off.x, center_pos.y - off.y}, tex, scolor);
+            push_rotated_vert(&vertices[i + val_string.length() * 4], pos, char_size, center_pos, tex, color);
             i += 4;
             pos.x += char_size.x + 1;
         }
@@ -419,34 +436,31 @@ namespace ygopro
     void FloatingSprite::RefreshVertices() {
         vertices.resize(4);
         indices.resize(6);
-        vt2::GenQuadIndex(&indices[0], 1, index_index);
+        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
         for(int32_t i = 0; i < 4; ++i) {
+            vertices[i].vertex = mgr->ConvScreenCoord(RotPoint(points[i], center_pos));
+            vertices[i].texcoord = texcoord.vert[i];
             vertices[i].color = color;
             vertices[i].hcolor = hl;
         }
+        vt2::GenQuadIndex(&indices[0], 1, vert_index);
     }
     
     void FloatingSprite::BuildSprite(recti rct, texf4 tex) {
-        vertices.resize(4);
-        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
-        vertices[0].vertex = mgr->ConvScreenCoord({rct.left, rct.top});
-        vertices[0].texcoord = tex.vert[0];
-        vertices[1].vertex = mgr->ConvScreenCoord({rct.left + rct.width, rct.top});
-        vertices[1].texcoord = tex.vert[1];
-        vertices[2].vertex = mgr->ConvScreenCoord({rct.left, rct.top + rct.height});
-        vertices[2].texcoord = tex.vert[2];
-        vertices[3].vertex = mgr->ConvScreenCoord({rct.left + rct.width, rct.top + rct.height});
-        vertices[3].texcoord = tex.vert[3];
+        points[0] = {rct.left, rct.top};
+        points[1] = {rct.left + rct.width, rct.top};
+        points[2] = {rct.left, rct.top + rct.height};
+        points[3] = {rct.left + rct.width, rct.top + rct.height};
+        texcoord = tex;
+        center_pos = {rct.left + rct.width / 2, rct.top + rct.height / 2};
         SetUpdate();
     }
     
-    void FloatingSprite::BuildSprite(v2i* verts, texf4 tex) {
-        vertices.resize(4);
-        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
-        for(int32_t i = 0; i < 4; ++i) {
-            vertices[i].vertex = mgr->ConvScreenCoord(verts[i]);
-            vertices[i].texcoord = tex.vert[i];
-        }
+    void FloatingSprite::BuildSprite(v2i* verts, texf4 tex, v2i center) {
+        for(int32_t i = 0; i < 4; ++i)
+            points[i] = verts[i];
+        texcoord = tex;
+        center_pos = center;
         SetUpdate();
     }
     
@@ -501,44 +515,6 @@ namespace ygopro
             iter->PushVertices();
         for(auto& iter : hand[0])
             iter->PushVertices();
-    }
-    
-    void MiscObjectRenderer::PushVerticesAll() {
-        base::RenderObject<vt2>::PushVerticesAll();
-        for(auto& iter : numbers)
-            iter.second->PushVertices();
-        for(auto& iter : sprites)
-            iter.second->PushVertices();
-    }
-    
-    FloatingNumber* MiscObjectRenderer::AddFloatingNumber() {
-        auto ptr = NewObject<FloatingNumber>(number_ref);
-        numbers[number_ref] = ptr;
-        RequestRedraw();
-        return ptr;
-    }
-    
-    FloatingSprite* MiscObjectRenderer::AddFloatingSprite() {
-        auto ptr = NewObject<FloatingSprite>(sprite_ref);
-        sprites[sprite_ref] = ptr;
-        RequestRedraw();
-        return ptr;
-    }
-    
-    void MiscObjectRenderer::RemoveFloatingNumber(FloatingNumber* ptr) {
-        uint32_t ref_id = ptr->GetRefId();
-        if(DeleteObject(ptr)) {
-            numbers.erase(ref_id);
-            RequestRedraw();
-        }
-    }
-    
-    void MiscObjectRenderer::RemoveFloatingSprite(FloatingSprite* ptr) {
-        uint32_t ref_id = ptr->GetRefId();
-        if(DeleteObject(ptr)) {
-            sprites.erase(ref_id);
-            RequestRedraw();
-        }
     }
     
     DuelScene::DuelScene(base::Shader* _2dshader, base::Shader* _3dshader) {
@@ -608,6 +584,7 @@ namespace ygopro
     
     void DuelScene::SetSceneSize(v2i sz) {
         SetViewport({0, 0, sz.x, sz.y});
+        miscobject_renderer->SetScreenSize(sz);
         UpdateParams();
     }
     
@@ -656,7 +633,36 @@ namespace ygopro
             iter->UpdatePosition(0);
         for(auto& iter : hand[1])
             iter->UpdatePosition(0);
-        
+        auto set_number_pos = [this](FloatingNumber* num, FieldBlock* pb, int32_t rel, v2i off = {0, 0}) {
+            v2f pos = pb->GetCenter() + v2f{0.0f, pb->GetSize().y / 2.0f * rel};
+            glm::vec4 scr = vparam.mvp * glm::vec4(pos.x, pos.y, 0.0f, 1.0f);
+            scr /= scr.w;
+            num->SetCenter({(int32_t)((scr.x + 1.0f) / 2.0f * viewport.width) + off.x, (int32_t)((1.0f - scr.y) / 2.0f * viewport.height) + off.y});
+        };
+        static const int32_t relp[] = {-1, 1};
+        for(int32_t p = 0; p < 2; ++p) {
+            set_number_pos(fixed_numbers[p][ 0].get(), field_blocks[p][13].get(), relp[p]);
+            set_number_pos(fixed_numbers[p][ 1].get(), field_blocks[p][15].get(), relp[p]);
+            set_number_pos(fixed_numbers[p][ 2].get(), field_blocks[p][16].get(), relp[p]);
+            set_number_pos(fixed_numbers[p][ 3].get(), field_blocks[p][14].get(), relp[p]);
+            set_number_pos(fixed_numbers[p][ 4].get(), field_blocks[p][11].get(), relp[p]);
+            set_number_pos(fixed_numbers[p][ 5].get(), field_blocks[p][12].get(), relp[p]);
+            set_number_pos(fixed_numbers[p][ 6].get(), field_blocks[p][ 0].get(), relp[1]);
+            set_number_pos(fixed_numbers[p][ 7].get(), field_blocks[p][ 1].get(), relp[1]);
+            set_number_pos(fixed_numbers[p][ 8].get(), field_blocks[p][ 2].get(), relp[1]);
+            set_number_pos(fixed_numbers[p][ 9].get(), field_blocks[p][ 3].get(), relp[1]);
+            set_number_pos(fixed_numbers[p][10].get(), field_blocks[p][ 4].get(), relp[1]);
+            set_number_pos(fixed_numbers[p][11].get(), field_blocks[p][ 0].get(), relp[0], {0, 12 * relp[p]});
+            set_number_pos(fixed_numbers[p][12].get(), field_blocks[p][ 1].get(), relp[0], {0, 12 * relp[p]});
+            set_number_pos(fixed_numbers[p][13].get(), field_blocks[p][ 2].get(), relp[0], {0, 12 * relp[p]});
+            set_number_pos(fixed_numbers[p][14].get(), field_blocks[p][ 3].get(), relp[0], {0, 12 * relp[p]});
+            set_number_pos(fixed_numbers[p][15].get(), field_blocks[p][ 4].get(), relp[0], {0, 12 * relp[p]});
+            set_number_pos(fixed_numbers[p][16].get(), field_blocks[p][ 0].get(), relp[0], {0, -5 * relp[p]});
+            set_number_pos(fixed_numbers[p][17].get(), field_blocks[p][ 1].get(), relp[0], {0, -5 * relp[p]});
+            set_number_pos(fixed_numbers[p][18].get(), field_blocks[p][ 2].get(), relp[0], {0, -5 * relp[p]});
+            set_number_pos(fixed_numbers[p][19].get(), field_blocks[p][ 3].get(), relp[0], {0, -5 * relp[p]});
+            set_number_pos(fixed_numbers[p][20].get(), field_blocks[p][ 4].get(), relp[0], {0, -5 * relp[p]});
+        }
     }
     
     void DuelScene::UpdateViewOffset(v2f offset) {

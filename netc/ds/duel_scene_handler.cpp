@@ -21,7 +21,7 @@ namespace ygopro
     std::vector<std::shared_ptr<FieldCard>> extra[2];
     std::vector<std::shared_ptr<FieldCard>> grave[2];
     std::vector<std::shared_ptr<FieldCard>> banished[2];
-    std::array<std::shared_ptr<FloatingNumber>, 23> fixed_numbers[2];
+    std::array<std::shared_ptr<FloatingNumber>, 21> fixed_numbers[2];
     
     enum class FloatingNumberType {
         DeckCount = 0,
@@ -45,8 +45,6 @@ namespace ygopro
         DEF3,
         DEF4,
         DEF5,
-        LPValue,
-        LPChange,
     };
     
     std::wstring CardPosInfo::ToString() {
@@ -302,6 +300,21 @@ namespace ygopro
         m_zone[1].resize(5);
         s_zone[0].resize(8);
         s_zone[1].resize(8);
+        for(int32_t i = 0 ; i < 21; ++i) {
+            for(int32_t p = 0; p < 2; ++p) {
+                fixed_numbers[p][i] = duel_scene->AddFloatingNumber();
+                fixed_numbers[p][i]->SetColor(0xff00ffff);
+                fixed_numbers[p][i]->SetSColor(0xff000000);
+                if(i < 6)
+                    fixed_numbers[p][i]->SetCharSize({15, 24});
+                else
+                    fixed_numbers[p][i]->SetCharSize({12, 15});
+                if(i < 11)
+                    fixed_numbers[p][i]->SetValueStr("*99");
+                else
+                    fixed_numbers[p][i]->SetValueStr("4000");
+            }
+        }
     }
     
     std::shared_ptr<FieldCard> DuelSceneHandler::AddCard(uint32_t code, CardPosInfo pos_info) {
