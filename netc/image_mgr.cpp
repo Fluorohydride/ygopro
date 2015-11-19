@@ -106,9 +106,9 @@ namespace ygopro
     }
     
     texf4& ImageMgr::GetCharTex(wchar_t ch) {
-        if(ch < L'*' || ch > L'9')
-            return char_textures[2];
-        return char_textures[ch - L'*'];
+        if(ch < L' ' || ch > L'?')
+            return char_textures[0];
+        return char_textures[ch - L' '];
     }
     
     void ImageMgr::UnloadCardTexture(uint32_t id) {
@@ -265,11 +265,11 @@ namespace ygopro
             }
         });
         auto& char_tex = misc_textures["char"];
-        float difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
+        float difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 8;
         float dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;
-        for(int32_t i = 0; i < 16; ++i) {
-            int32_t x = i % 4;
-            int32_t y = i / 4;
+        for(int32_t i = 0; i < 32; ++i) {
+            int32_t x = i % 8;
+            int32_t y = i / 8;
             char_textures[i].vert[0] = char_tex.vert[0] + v2f{difx * x, dify * y};
             char_textures[i].vert[1] = char_tex.vert[0] + v2f{difx * (x + 1), dify * y};
             char_textures[i].vert[2] = char_tex.vert[0] + v2f{difx * x, dify * (y + 1)};

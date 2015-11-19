@@ -31,14 +31,14 @@ namespace ygopro
                 
                 auto ptr = duel_scene->AddFloatingNumber();
                 ptr->SetValueStr("-12345/+6789");
-                ptr->SetCenter({300, 300});
+                ptr->SetCenter({0, 0}, {0.5f, 0.5f});
                 ptr->SetCharSize({40, 80});
                 ptr->SetColor(0xff00ffff);
                 ptr->SetSColor(0xff004040);
                 auto ptr2 = duel_scene->AddFloatingSprite();
                 ptr2->SetTexture(ImageMgr::Get().GetRawCardTexture());
                 ptr2->BuildSprite({200, 200, 100, 100}, ImageMgr::Get().GetTexture("limit0"));
-                auto act = std::make_shared<LerpAnimator<int64_t, FloatingSprite>>(0, ptr2, [](FloatingSprite* obj, double t)->bool {
+                auto act = std::make_shared<LerpAnimator<int64_t, FloatingSprite>>(10000, ptr2, [](FloatingSprite* obj, double t)->bool {
                     obj->SetRotation(3.1415926f * 2 * -t);
                     return true;
                 }, std::make_shared<TGenPeriodic<int64_t>>(1000));

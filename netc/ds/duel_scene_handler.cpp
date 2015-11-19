@@ -300,21 +300,35 @@ namespace ygopro
         m_zone[1].resize(5);
         s_zone[0].resize(8);
         s_zone[1].resize(8);
-        for(int32_t i = 0 ; i < 21; ++i) {
-            for(int32_t p = 0; p < 2; ++p) {
+        for(int32_t p = 0; p < 2; ++p) {
+            for(int32_t i = 0 ; i < 21; ++i) {
                 fixed_numbers[p][i] = duel_scene->AddFloatingNumber();
                 fixed_numbers[p][i]->SetColor(0xff00ffff);
                 fixed_numbers[p][i]->SetSColor(0xff000000);
                 if(i < 6)
-                    fixed_numbers[p][i]->SetCharSize({15, 24});
+                    fixed_numbers[p][i]->SetCharSize({18, 24});
                 else
                     fixed_numbers[p][i]->SetCharSize({12, 15});
-                if(i < 11)
-                    fixed_numbers[p][i]->SetValueStr("*99");
-                else
-                    fixed_numbers[p][i]->SetValueStr("4000");
             }
+            fixed_numbers[p][4]->SetColor(0xffff00ff);
+            fixed_numbers[p][5]->SetColor(0xff0000ff);
+            for(int32_t i = 0; i < 4; ++i)
+                fixed_numbers[p][i]->SetValueStr("40");
+            if(p == 0) {
+                fixed_numbers[p][4]->SetValueStr("<9");
+                fixed_numbers[p][5]->SetValueStr("12>");
+            } else {
+                fixed_numbers[p][4]->SetValueStr("9>");
+                fixed_numbers[p][5]->SetValueStr("<12");
+            }
+            for(int32_t i = 6; i < 11; ++i)
+                fixed_numbers[p][i]->SetValueStr("*40");
+            for(int32_t i = 11; i < 16; ++i)
+                fixed_numbers[p][i]->SetValueStr(", +4000");
+            for(int32_t i = 16; i < 21; ++i)
+                fixed_numbers[p][i]->SetValueStr(". -3000");
         }
+        
     }
     
     std::shared_ptr<FieldCard> DuelSceneHandler::AddCard(uint32_t code, CardPosInfo pos_info) {

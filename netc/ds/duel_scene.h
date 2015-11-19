@@ -110,7 +110,7 @@ namespace ygopro
     public:
         FloatingObject(uint32_t rid) : ref_id(rid) {}
         inline uint32_t GetRefId() { return ref_id; }
-        inline void SetCenter(v2i pos) { center_pos = pos; SetUpdate(); }
+        inline void SetCenter(v2i pos, v2f prop = {0.0f, 0.0f}) { center_pos = pos; center_prop = prop; SetUpdate(); }
         inline void SetRotation(float rot) {
             rot_matrix[0] = std::cosf(rot);
             rot_matrix[1] = std::sinf(rot);
@@ -121,9 +121,16 @@ namespace ygopro
             v2i tr2 = {(int32_t)(tr1.x * rot_matrix[0] + tr1.y * rot_matrix[1]), (int32_t)(tr1.x * -rot_matrix[1] + tr1.y * rot_matrix[0])};
             return tr2 + center;
         };
+        inline v2i PosInScreen(v2i rel, v2f prop, v2i scr) {
+            return {rel.x + (int32_t)(prop.x * scr.x), rel.y + (int32_t)(prop.y * scr.y)};
+        }
+        inline v2i CenterPosInScreen(v2i scr) {
+            return {center_pos.x + (int32_t)(center_prop.x * scr.x), center_pos.y + (int32_t)(center_prop.y * scr.y)};
+        }        
         
     protected:
         v2i center_pos = {0, 0};
+        v2f center_prop = {0.0f, 0.0f};
         uint32_t ref_id = 0;
         float rot_matrix[2] = {1.0f, 0.0f};
     };
@@ -151,13 +158,14 @@ namespace ygopro
         virtual int32_t GetTextureId();
         virtual void RefreshVertices();
         
-        void BuildSprite(recti rct, texf4 tex);
-        void BuildSprite(v2i* verts, texf4 tex, v2i center);
+        void BuildSprite(recti rct, texf4 tex, rectf rct_prop = {0.0f, 0.0f, 0.0f, 0.0f});
+        void BuildSprite(v2i* verts, texf4 tex, v2f* vert_prop = nullptr);
         inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
         
     protected:
         base::Texture* texture = nullptr;
         std::array<v2i, 4> points;
+        std::array<v2f, 4> points_prop;
         texf4 texcoord;
     };
     

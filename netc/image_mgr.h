@@ -42,7 +42,7 @@ namespace ygopro
     protected:
         std::unordered_map<uint32_t, CardTextureInfo> card_textures;
         std::unordered_map<std::string, texf4> misc_textures;
-        std::array<texf4, 16> char_textures;
+        std::array<texf4, 32> char_textures;
         std::list<uint16_t> unused_block;
         std::list<uint16_t> reserved_block;
         std::vector<std::pair<int32_t, uint32_t>> ref_count;

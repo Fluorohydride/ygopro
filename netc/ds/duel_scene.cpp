@@ -382,13 +382,14 @@ namespace ygopro
             return;
         vertices.resize(val_string.length() * 8);
         indices.resize(val_string.length() * 12);
+        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
         v2i all_size = {(int32_t)val_string.length() * (char_size.x + 1) - 1, char_size.y};
-        v2i pos = {center_pos.x - all_size.x / 2, center_pos.y - all_size.y / 2};
+        v2i center = CenterPosInScreen(mgr->GetScreenSize());
+        v2i pos = {center.x - all_size.x / 2, center.y - all_size.y / 2};
         v2i off = {(int32_t)(char_size.x * 0.05f), (int32_t)(char_size.y * 0.05f)};
         off.x = off.x > 0 ? off.x : 1;
         off.y = off.y > 0 ? off.y : 1;
         int32_t i = 0;
-        base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
         auto push_rotated_vert = [this, mgr](vt2* vt, v2i pos, v2i sz, v2i center, texf4 tex, uint32_t cl) {
             vt[0].vertex = mgr->ConvScreenCoord(RotPoint(pos, center));
             vt[1].vertex = mgr->ConvScreenCoord(RotPoint({pos.x + sz.x, pos.y}, center));
@@ -402,8 +403,8 @@ namespace ygopro
         };
         for(auto iter : val_string) {
             auto tex = ImageMgr::Get().GetCharTex(iter);
-            push_rotated_vert(&vertices[i], {pos.x - off.x, pos.y - off.y}, char_size, {center_pos.x - off.x, center_pos.y - off.y}, tex, scolor);
-            push_rotated_vert(&vertices[i + val_string.length() * 4], pos, char_size, center_pos, tex, color);
+            push_rotated_vert(&vertices[i], {pos.x - off.x, pos.y - off.y}, char_size, {center.x - off.x, center.y - off.y}, tex, scolor);
+            push_rotated_vert(&vertices[i + val_string.length() * 4], pos, char_size, center, tex, color);
             i += 4;
             pos.x += char_size.x + 1;
         }
@@ -437,8 +438,10 @@ namespace ygopro
         vertices.resize(4);
         indices.resize(6);
         base::RenderObject2DLayout* mgr = static_cast<base::RenderObject2DLayout*>(this->manager);
+        auto scr = mgr->GetScreenSize();
+        v2i center = CenterPosInScreen(scr);
         for(int32_t i = 0; i < 4; ++i) {
-            vertices[i].vertex = mgr->ConvScreenCoord(RotPoint(points[i], center_pos));
+            vertices[i].vertex = mgr->ConvScreenCoord(RotPoint(PosInScreen(points[i], points_prop[i], scr), center));
             vertices[i].texcoord = texcoord.vert[i];
             vertices[i].color = color;
             vertices[i].hcolor = hl;
@@ -446,21 +449,28 @@ namespace ygopro
         vt2::GenQuadIndex(&indices[0], 1, vert_index);
     }
     
-    void FloatingSprite::BuildSprite(recti rct, texf4 tex) {
+    void FloatingSprite::BuildSprite(recti rct, texf4 tex, rectf rct_prop) {
         points[0] = {rct.left, rct.top};
         points[1] = {rct.left + rct.width, rct.top};
         points[2] = {rct.left, rct.top + rct.height};
         points[3] = {rct.left + rct.width, rct.top + rct.height};
+        points_prop[0] = {rct_prop.left, rct_prop.top};
+        points_prop[1] = {rct_prop.left + rct_prop.width, rct_prop.top};
+        points_prop[2] = {rct_prop.left, rct_prop.top + rct_prop.height};
+        points_prop[3] = {rct_prop.left + rct_prop.width, rct_prop.top + rct_prop.height};
         texcoord = tex;
         center_pos = {rct.left + rct.width / 2, rct.top + rct.height / 2};
+        center_prop = {rct_prop.left + rct_prop.width / 2, rct_prop.top + rct_prop.height / 2};
         SetUpdate();
     }
     
-    void FloatingSprite::BuildSprite(v2i* verts, texf4 tex, v2i center) {
-        for(int32_t i = 0; i < 4; ++i)
+    void FloatingSprite::BuildSprite(v2i* verts, texf4 tex, v2f* vert_prop) {
+        for(int32_t i = 0; i < 4; ++i) {
             points[i] = verts[i];
+            if(vert_prop)
+                points_prop[i] = vert_prop[i];
+        }
         texcoord = tex;
-        center_pos = center;
         SetUpdate();
     }
     
@@ -640,6 +650,8 @@ namespace ygopro
             num->SetCenter({(int32_t)((scr.x + 1.0f) / 2.0f * viewport.width) + off.x, (int32_t)((1.0f - scr.y) / 2.0f * viewport.height) + off.y});
         };
         static const int32_t relp[] = {-1, 1};
+        static const v2i offsetA[] = {{0, -7}, {0, -9}};
+        static const v2i offsetD[] = {{0, 10}, {0, 8}};
         for(int32_t p = 0; p < 2; ++p) {
             set_number_pos(fixed_numbers[p][ 0].get(), field_blocks[p][13].get(), relp[p]);
             set_number_pos(fixed_numbers[p][ 1].get(), field_blocks[p][15].get(), relp[p]);
@@ -652,16 +664,16 @@ namespace ygopro
             set_number_pos(fixed_numbers[p][ 8].get(), field_blocks[p][ 2].get(), relp[1]);
             set_number_pos(fixed_numbers[p][ 9].get(), field_blocks[p][ 3].get(), relp[1]);
             set_number_pos(fixed_numbers[p][10].get(), field_blocks[p][ 4].get(), relp[1]);
-            set_number_pos(fixed_numbers[p][11].get(), field_blocks[p][ 0].get(), relp[0], {0, 12 * relp[p]});
-            set_number_pos(fixed_numbers[p][12].get(), field_blocks[p][ 1].get(), relp[0], {0, 12 * relp[p]});
-            set_number_pos(fixed_numbers[p][13].get(), field_blocks[p][ 2].get(), relp[0], {0, 12 * relp[p]});
-            set_number_pos(fixed_numbers[p][14].get(), field_blocks[p][ 3].get(), relp[0], {0, 12 * relp[p]});
-            set_number_pos(fixed_numbers[p][15].get(), field_blocks[p][ 4].get(), relp[0], {0, 12 * relp[p]});
-            set_number_pos(fixed_numbers[p][16].get(), field_blocks[p][ 0].get(), relp[0], {0, -5 * relp[p]});
-            set_number_pos(fixed_numbers[p][17].get(), field_blocks[p][ 1].get(), relp[0], {0, -5 * relp[p]});
-            set_number_pos(fixed_numbers[p][18].get(), field_blocks[p][ 2].get(), relp[0], {0, -5 * relp[p]});
-            set_number_pos(fixed_numbers[p][19].get(), field_blocks[p][ 3].get(), relp[0], {0, -5 * relp[p]});
-            set_number_pos(fixed_numbers[p][20].get(), field_blocks[p][ 4].get(), relp[0], {0, -5 * relp[p]});
+            set_number_pos(fixed_numbers[p][11].get(), field_blocks[p][ 0].get(), relp[0], offsetA[p]);
+            set_number_pos(fixed_numbers[p][12].get(), field_blocks[p][ 1].get(), relp[0], offsetA[p]);
+            set_number_pos(fixed_numbers[p][13].get(), field_blocks[p][ 2].get(), relp[0], offsetA[p]);
+            set_number_pos(fixed_numbers[p][14].get(), field_blocks[p][ 3].get(), relp[0], offsetA[p]);
+            set_number_pos(fixed_numbers[p][15].get(), field_blocks[p][ 4].get(), relp[0], offsetA[p]);
+            set_number_pos(fixed_numbers[p][16].get(), field_blocks[p][ 0].get(), relp[0], offsetD[p]);
+            set_number_pos(fixed_numbers[p][17].get(), field_blocks[p][ 1].get(), relp[0], offsetD[p]);
+            set_number_pos(fixed_numbers[p][18].get(), field_blocks[p][ 2].get(), relp[0], offsetD[p]);
+            set_number_pos(fixed_numbers[p][19].get(), field_blocks[p][ 3].get(), relp[0], offsetD[p]);
+            set_number_pos(fixed_numbers[p][20].get(), field_blocks[p][ 4].get(), relp[0], offsetD[p]);
         }
     }
     
