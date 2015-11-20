@@ -204,6 +204,8 @@ namespace ygopro
         misc_texture.Unload();
         bg_texture.Unload();
         card_image.Unload();
+        avatar[0].Unload();
+        avatar[1].Unload();
     }
     
 	bool ImageMgr::LoadImageConfig() {
@@ -278,4 +280,29 @@ namespace ygopro
         return true;
 	}
 
+    void ImageMgr::LoadAvatar(int32_t playerid, const std::string& image_path) {
+        if(playerid < 0 || playerid > 1)
+            return;
+        base::Image img;
+        if(img.LoadFile(image_path))
+            avatar[playerid].Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
+    }
+    
+    void ImageMgr::LoadSleeve(int32_t playerid, const std::string& image_path) {
+        if(playerid < 0 || playerid > 1)
+            return;
+        base::Image img;
+        int32_t blockid = playerid + 5;
+        if(img.LoadFile(image_path)) {
+            int32_t bx = (blockid % 20) * 100;
+            int32_t by = (blockid / 20) * 145;
+            int32_t bw = 100;
+            int32_t bh = 145;
+            render_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
+            image_render->ClearVertices();
+            image_render->AddVertices(&render_image, recti{bx, by, bw, bh}, recti{0, 0, render_image.GetImgWidth(), render_image.GetImgHeight()});
+            PrepareRender();
+            Render();
+        }
+    }
 }

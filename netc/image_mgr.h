@@ -27,6 +27,8 @@ namespace ygopro
         base::Texture* GetRawMiscTexture() { return &misc_texture; }
         base::Texture* GetRawBGTexture() { return &bg_texture; }
         base::Texture* GetRawCardImage() { return &card_image; }
+        base::Texture* GetAvatarTexture(int32_t pl) { return &avatar[pl]; }
+        
         texf4& GetCharTex(wchar_t ch);
         void UnloadCardTexture(uint32_t id);
 		void UnloadAllCardTexture();
@@ -38,6 +40,8 @@ namespace ygopro
         void InitTextures(const std::string& image_path, base::Shader* _2dshader);
         void UninitTextures();
 		bool LoadImageConfig();
+        void LoadAvatar(int32_t playerid, const std::string& image_path);
+        void LoadSleeve(int32_t playerid, const std::string& image_path);
         
     protected:
         std::unordered_map<uint32_t, CardTextureInfo> card_textures;
@@ -51,6 +55,7 @@ namespace ygopro
         base::Texture bg_texture;
         base::Texture card_image;
         base::Texture render_image;
+        base::Texture avatar[2];
         ZipReader imageZip;
         std::shared_ptr<base::SimpleTextureRenderer> image_render;
         std::list<std::pair<uint32_t, std::function<void(texf4)>>> loading_card;

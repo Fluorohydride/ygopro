@@ -96,8 +96,10 @@ namespace ygopro
                     thiscard.lock()->SetCardTex(tex);
             });
             SetCardTex(ti);
+            data = DataMgr::Get()[code];
         } else {
             SetCardTex(ImageMgr::Get().GetTexture("unknown"));
+            data = nullptr;
         }
     }
     
@@ -116,7 +118,7 @@ namespace ygopro
         switch(loc) {
             case 0x1: { //deck
                 auto fb_pos = field_blocks[side][13]->GetCenter();
-                tl = {fb_pos.x, fb_pos.y, 0.001f * subs};
+                tl = {fb_pos.x, fb_pos.y, 0.005f * seq};
                 bool faceup = deck_reversed ? (pos & 0xa) : (pos & 0x5);
                 if(param == CardPosParam::Confirm) {    // confirm deck
                     tl.x += -vparam.cardrect.width * 1.1f;
@@ -148,7 +150,7 @@ namespace ygopro
                     } else {
                         float whand = ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f;
                         float lst = vparam.handmin + (wmax - whand) * 0.5f;
-                        tl = {lst + seq * vparam.cardrect.width * 1.1f + vparam.cardrect.width * 0.5f, vparam.handy[0], 0.0f};
+                        tl = {lst + seq * vparam.cardrect.width * 1.1f + vparam.cardrect.width * 0.5f, vparam.handy[0], 0.001f};
                     }
                 } else {
                     float wmax = vparam.handmax - vparam.handmin;
@@ -158,7 +160,7 @@ namespace ygopro
                     } else {
                         float whand = ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f;
                         float lst = -vparam.handmin - (wmax - whand) * 0.5f;
-                        tl = {lst - seq * vparam.cardrect.width * 1.1f - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.0f};
+                        tl = {lst - seq * vparam.cardrect.width * 1.1f - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.001f};
                     }
                 }
                 if(this->code != 0 && (param == CardPosParam::None))
@@ -173,10 +175,10 @@ namespace ygopro
                     tl.x = fb_pos.x;
                     tl.y = fb_pos.y;
                     if(attaching_card != nullptr) {
-                        tl.z = 0.001f * subs;
+                        tl.z = 0.005f * subs;
                         tl.x -= vparam.cardrect.width * 0.1f;
                     } else {
-                        tl.z = 0.001f * attached_cards.size();
+                        tl.z = 0.005f * attached_cards.size();
                         if(pos & 0x3) {
                             if(pos == 0x1 || param == CardPosParam::Confirm) {
                                 if(side == 0)
@@ -232,7 +234,7 @@ namespace ygopro
             }
             case 0x10: { //grave
                 auto fb_pos = field_blocks[side][15]->GetCenter();
-                tl = {fb_pos.x, fb_pos.y, seq * 0.001f};
+                tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
                 if(side == 0)
                     rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                 else
@@ -241,7 +243,7 @@ namespace ygopro
             }
             case 0x20: { //banish
                 auto fb_pos = field_blocks[side][16]->GetCenter();
-                tl = {fb_pos.x, fb_pos.y, seq * 0.001f};
+                tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
                 if(pos & 0x5 || param == CardPosParam::Confirm) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -257,7 +259,7 @@ namespace ygopro
             }
             case 0x40: { //extra
                 auto fb_pos = field_blocks[side][14]->GetCenter();
-                tl = {fb_pos.x, fb_pos.y, seq * 0.001f};
+                tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
                 if(param == CardPosParam::Confirm) // confirm extra
                     tl.x += vparam.cardrect.width * 1.1f;
                 if(pos & 0x5 || param == CardPosParam::Confirm) {

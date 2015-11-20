@@ -5,6 +5,7 @@
 
 #include "../render_util.h"
 #include "../scene_mgr.h"
+#include "../card_data.h"
 
 #include "duel_scene_handler.h"
 
@@ -103,6 +104,7 @@ namespace ygopro
         uint32_t reason = 0;
         CardPosInfo pos_info;
         std::vector<std::shared_ptr<FieldCard>> attached_cards;
+        CardData* data = nullptr;
         FieldCard* attaching_card = nullptr;
     };
     

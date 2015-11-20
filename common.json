@@ -20,5 +20,9 @@
   "3d_shader" : "./conf/3d.shader",
   "server_ip" : "127.0.0.1",
   "server_port" : 7911,
-  "server_timeout" : 5000
+  "server_timeout" : 5000,
+  "avatar1" : "",
+  "avatar2" : "",
+  "sleeve1" : "",
+  "sleeve2" : "",
 }

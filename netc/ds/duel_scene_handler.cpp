@@ -22,6 +22,7 @@ namespace ygopro
     std::vector<std::shared_ptr<FieldCard>> grave[2];
     std::vector<std::shared_ptr<FieldCard>> banished[2];
     std::array<std::shared_ptr<FloatingNumber>, 21> fixed_numbers[2];
+    int32_t extra_faceup_count[2] = {0, 0};
     
     enum class FloatingNumberType {
         DeckCount = 0,
@@ -120,10 +121,11 @@ namespace ygopro
     }
     
     void DuelSceneHandler::BeginHandler() {
-        AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
-        AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
-        AddCard(83764718, CardPosInfo(0, 0x1, 1, 0xa))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x4, 1, 0x8))->UpdatePosition(0);
+        for(int32_t i = 0; i < 40; ++i) {
+            AddCard(83764718, CardPosInfo(0, 0x2, 1, 0x1))->UpdatePosition(0);
+        }
+            
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
@@ -312,23 +314,7 @@ namespace ygopro
             }
             fixed_numbers[p][4]->SetColor(0xffff00ff);
             fixed_numbers[p][5]->SetColor(0xff0000ff);
-            for(int32_t i = 0; i < 4; ++i)
-                fixed_numbers[p][i]->SetValueStr("40");
-            if(p == 0) {
-                fixed_numbers[p][4]->SetValueStr("<9");
-                fixed_numbers[p][5]->SetValueStr("12>");
-            } else {
-                fixed_numbers[p][4]->SetValueStr("9>");
-                fixed_numbers[p][5]->SetValueStr("<12");
-            }
-            for(int32_t i = 6; i < 11; ++i)
-                fixed_numbers[p][i]->SetValueStr("*40");
-            for(int32_t i = 11; i < 16; ++i)
-                fixed_numbers[p][i]->SetValueStr(", +4000");
-            for(int32_t i = 16; i < 21; ++i)
-                fixed_numbers[p][i]->SetValueStr(". -3000");
         }
-        
     }
     
     std::shared_ptr<FieldCard> DuelSceneHandler::AddCard(uint32_t code, CardPosInfo pos_info) {
@@ -361,32 +347,46 @@ namespace ygopro
             ptr = duel_scene->CreateCard();
             ptr->pos_info = pos_info;
             switch(pos_info.location & 0x7f) {
-                case 0x1:
+                case 0x1: {
                     ptr->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
                     deck[pos_info.controler].push_back(ptr);
+                    fixed_numbers[pos_info.controler][0]->SetValue((int32_t)deck[pos_info.controler].size());
                     break;
-                case 0x2:
+                }
+                case 0x2: {
                     ptr->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
                     hand[pos_info.controler].push_back(ptr);
                     break;
-                case 0x4:
+                }
+                case 0x4: {
                     m_zone[pos_info.controler][pos_info.sequence] = ptr;
                     break;
-                case 0x8:
+                }
+                case 0x8: {
                     s_zone[pos_info.controler][pos_info.sequence] = ptr;
                     break;
-                case 0x10:
+                }
+                case 0x10: {
                     ptr->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
                     grave[pos_info.controler].push_back(ptr);
+                    fixed_numbers[pos_info.controler][1]->SetValue((int32_t)grave[pos_info.controler].size());
                     break;
-                case 0x20:
+                }
+                case 0x20: {
                     ptr->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
                     banished[pos_info.controler].push_back(ptr);
+                    fixed_numbers[pos_info.controler][2]->SetValue((int32_t)banished[pos_info.controler].size());
                     break;
-                case 0x40:
+                }
+                case 0x40: {
                     ptr->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
                     extra[pos_info.controler].push_back(ptr);
+                    if(pos_info.position & 0x5)
+                        extra_faceup_count[pos_info.controler]++;
+                    std::string str = To<std::string>("%d(%d)", extra[pos_info.controler].size(), extra_faceup_count[pos_info.controler]);
+                    fixed_numbers[pos_info.controler][3]->SetValueStr(str.c_str());
                     break;
+                }
             }
         }
         if(ptr) {
@@ -438,6 +438,8 @@ namespace ygopro
                     deck[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
                     deck[pos_info.controler][i]->UpdatePosition(0);
                 }
+                if(!deck[pos_info.controler].empty())
+                    fixed_numbers[pos_info.controler][0]->SetValue((int32_t)deck[pos_info.controler].size());
                 break;
             }
             case 0x2: {
@@ -474,6 +476,8 @@ namespace ygopro
                     grave[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
                     grave[pos_info.controler][i]->UpdatePosition(0);
                 }
+                if(!grave[pos_info.controler].empty())
+                    fixed_numbers[pos_info.controler][1]->SetValue((int32_t)grave[pos_info.controler].size());
                 break;
             }
             case 0x20: {
@@ -483,6 +487,8 @@ namespace ygopro
                     banished[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
                     banished[pos_info.controler][i]->UpdatePosition(0);
                 }
+                if(!banished[pos_info.controler].empty())
+                    fixed_numbers[pos_info.controler][2]->SetValue((int32_t)banished[pos_info.controler].size());
                 break;
             }
             case 0x40: {
@@ -491,6 +497,12 @@ namespace ygopro
                 for(size_t i = pos_info.sequence; i < extra[pos_info.controler].size(); ++i) {
                     extra[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
                     extra[pos_info.controler][i]->UpdatePosition(0);
+                }
+                if(ret->pos_info.position & 0x5)
+                    extra_faceup_count[pos_info.controler]--;
+                if(!extra[pos_info.controler].empty()) {
+                    std::string str = To<std::string>("%d(%d)", extra[pos_info.controler].size(), extra_faceup_count[pos_info.controler]);
+                    fixed_numbers[pos_info.controler][3]->SetValueStr(str.c_str());
                 }
                 break;
             }
@@ -521,6 +533,7 @@ namespace ygopro
                 case 0x1:
                     pcard->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
                     deck[pos_info.controler].push_back(pcard);
+                    fixed_numbers[pos_info.controler][0]->SetValue((int32_t)deck[pos_info.controler].size());
                     break;
                 case 0x2:
                     pcard->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
@@ -545,15 +558,22 @@ namespace ygopro
                 case 0x10:
                     pcard->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
                     grave[pos_info.controler].push_back(pcard);
+                    fixed_numbers[pos_info.controler][1]->SetValue((int32_t)grave[pos_info.controler].size());
                     break;
                 case 0x20:
                     pcard->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
                     banished[pos_info.controler].push_back(pcard);
+                    fixed_numbers[pos_info.controler][2]->SetValue((int32_t)banished[pos_info.controler].size());
                     break;
-                case 0x40:
+                case 0x40: {
                     pcard->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
                     extra[pos_info.controler].push_back(pcard);
+                    if(pos_info.position & 0x5)
+                        extra_faceup_count[pos_info.controler]++;
+                    std::string str = To<std::string>("%d(%d)", extra[pos_info.controler].size(), extra_faceup_count[pos_info.controler]);
+                    fixed_numbers[pos_info.controler][3]->SetValueStr(str.c_str());
                     break;
+                }
             }
         }
     }

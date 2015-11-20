@@ -12,7 +12,15 @@
 //        std::cout << msg << " " << err_line << "," << err_col << std::endl;
 //    } else {
 //        root["nodename"].set_value<jaweson::JsonString>("teststring");
-//        std::cout << root.get_string() << std::endl;
+//        std::cout << root << std::endl;
+//        // this is equivalent to
+//        // jaweson::JsonStreamWriter<> writer(std::cout);
+//        // root.write_to(writer);
+//        // or
+//        // std::string str;
+//        // jaweson::JsonStringWriter<> writer(str);
+//        // root.write_to(writer);
+//        // std::cout << str;
 //    }
 // the parser uses a simple allocator in default which can be replaced with a custom allocator easily.
 
@@ -62,6 +70,17 @@ namespace jaweson
         
         template<typename T>
         static inline void recycle(T* obj) { delete obj; }
+    };
+    
+    class JsonWriter {
+    public:
+        virtual JsonWriter& operator << (const char* buf) = 0;
+        virtual JsonWriter& operator << (const char ch) = 0;
+        virtual JsonWriter& PushRepeat(char ch, int32_t times) = 0;
+        // >0 : increase indent;
+        // =0 : no change
+        // <0 : decrease indent;
+        virtual JsonWriter& PushNewline(int32_t indent_dif) = 0;
     };
     
     class JsonUtil {
@@ -199,8 +218,7 @@ namespace jaweson
         virtual void for_each(const std::function<void(const std::string&, JsonNode<ALLOC_TYPE>&)>& fun) {}
         virtual void for_each(const std::function<void(int32_t, JsonNode<ALLOC_TYPE>&)>& fun) {}
         virtual size_t size() { return 0; }
-        virtual void push_string(std::string& str) = 0;
-        virtual std::string get_string() { std::string str; push_string(str); return std::move(str); }
+        virtual void write_to(JsonWriter& writer) = 0;
         virtual JsonValue<ALLOC_TYPE>* clone() = 0;
         virtual void free() = 0;
     protected:
@@ -214,10 +232,10 @@ namespace jaweson
         inline virtual bool is_number() { return true; }
         inline virtual int64_t to_integer() { return static_cast<int64_t>(ref_value); }
         inline virtual double to_double() { return ref_value; }
-        virtual void push_string(std::string& str) {
+        virtual void write_to(JsonWriter& writer) {
             char buffer[32];
-            sprintf(buffer, "%.9le", ref_value);
-            str.append(buffer);
+            sprintf(buffer, "%.9lg", ref_value);
+            writer << buffer;
         }
         virtual JsonValue<ALLOC_TYPE>* clone() { return ALLOC_TYPE::template alloc<JsonDouble>(ref_value); }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
@@ -233,10 +251,10 @@ namespace jaweson
         inline virtual bool is_number() { return true; }
         inline virtual int64_t to_integer() { return ref_value; }
         inline virtual double to_double() { return static_cast<double>(ref_value); }
-        virtual void push_string(std::string& str) {
+        virtual void write_to(JsonWriter& writer) {
             char buffer[32];
             sprintf(buffer, "%lld", ref_value);
-            str.append(buffer);
+            writer << buffer;
         }
         virtual JsonValue<ALLOC_TYPE>* clone() { return ALLOC_TYPE::template alloc<JsonInteger>(ref_value); }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
@@ -252,10 +270,8 @@ namespace jaweson
         inline JsonString(std::string&& value) : ref_value(std::move(value)) {}
         inline virtual bool is_string() { return true; }
         inline virtual const std::string& to_string() { return ref_value; }
-        virtual void push_string(std::string& str) {
-            str.push_back('\"');
-            str.append(JsonUtil::raw_string_to_text(ref_value));
-            str.push_back('\"');
+        virtual void write_to(JsonWriter& writer) {
+            writer << '\"' << JsonUtil::raw_string_to_text(ref_value).c_str() << '\"';
         }
         virtual JsonValue<ALLOC_TYPE>* clone() { return ALLOC_TYPE::template alloc<JsonString>(ref_value); }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
@@ -271,8 +287,8 @@ namespace jaweson
         inline JsonBool(bool value) : ref_value(value) {}
         virtual bool is_bool() { return true; }
         virtual bool to_bool() { return ref_value; }
-        virtual void push_string(std::string& str) {
-            str.append(ref_value ? "true" : "false");
+        virtual void write_to(JsonWriter& writer) {
+            writer << (ref_value ? "true" : "false");
         }
         virtual JsonValue<ALLOC_TYPE>* clone() { return create(ref_value); }
         virtual void free() {}
@@ -290,8 +306,8 @@ namespace jaweson
     public:
         inline JsonNull() {}
         virtual bool is_null() { return true; }
-        virtual void push_string(std::string& str) {
-            str.append("null");
+        virtual void write_to(JsonWriter& writer) {
+            writer << "null";
         }
         virtual JsonValue<ALLOC_TYPE>* clone() { return create(); }
         virtual void free() {}
@@ -329,8 +345,7 @@ namespace jaweson
         inline void for_each(const std::function<void(const std::string&, JsonNode<ALLOC_TYPE>&)>& fun) { ref_value->for_each(fun); }
         inline void for_each(const std::function<void(int32_t, JsonNode<ALLOC_TYPE>&)>& fun) { ref_value->for_each(fun); }
         inline size_t size() { return ref_value->size(); }
-        inline void push_string(std::string& str) { ref_value->push_string(str); }
-        inline std::string get_string() { return std::move(ref_value->get_string()); }
+        inline void write_to(JsonWriter& writer) { ref_value->write_to(writer); }
         inline JsonValue<ALLOC_TYPE>* clone() { return ref_value->clone(); }
         inline void attach(JsonNode<ALLOC_TYPE>& node) {
             if(ref_value->is_empty()|| !node.ref_value) return;
@@ -371,7 +386,7 @@ namespace jaweson
         class JsonEmptyValue : public JsonValue<ALLOC_TYPE> {
         public:
             virtual bool is_empty() { return true; }
-            virtual void push_string(std::string& str) {};
+            virtual void write_to(JsonWriter& writer) {}
             virtual JsonValue<ALLOC_TYPE>* clone() { return nullptr; }
             virtual void free() { delete this; }
         };
@@ -452,19 +467,26 @@ namespace jaweson
         }
         
         virtual size_t size() { return values.size(); }
-        virtual void push_string(std::string& str) {
-            str.append("{");
-            for(auto& iter : values) {
-                if(iter) {
-                    str.append("\"").append(JsonUtil::raw_string_to_text(iter->ref_key)).append("\"");
-                    str.append(":");
-                    iter->push_string(str);
-                    str.append(",");
+        virtual void write_to(JsonWriter& writer) {
+            writer << '{';
+            if(values.empty()) {
+                writer << '}';
+            } else {
+                writer.PushNewline(1);
+                for(size_t i = 0; i < values.size(); ++i) {
+                    auto& value_node = values[i];
+                    if(value_node) {
+                        writer << '\"' << JsonUtil::raw_string_to_text(value_node->ref_key).c_str() << "\" : ";
+                        value_node->write_to(writer);
+                        if(i != values.size() - 1) {
+                            writer << ',';
+                            writer.PushNewline(0);
+                        } else
+                            writer.PushNewline(-1);
+                    }
                 }
+                writer << '}';
             }
-            if(!values.empty())
-                str.pop_back();
-            str.append("}");
         }
         
         virtual JsonValue<ALLOC_TYPE>* clone() {
@@ -551,15 +573,16 @@ namespace jaweson
         }
         
         virtual size_t size() { return values.size(); }
-        virtual void push_string(std::string& str) {
-            str.append("[");
-            for(auto& iter : values) {
-                iter->push_string(str);
-                str.append(",");
+        virtual void write_to(JsonWriter& writer) {
+            writer << '[';
+            for(size_t i = 0; i < values.size(); ++i) {
+                auto& value_node = values[i];
+                if(value_node)
+                    value_node->write_to(writer);
+                if(i != values.size() - 1)
+                    writer << ',' << ' ';
             }
-            if(!values.empty())
-                str.pop_back();
-            str.append("]");
+            writer << ']';
         }
         
         virtual JsonValue<ALLOC_TYPE>* clone() {
@@ -987,6 +1010,77 @@ namespace jaweson
             JsonValue<ALLOC_TYPE>* ret_value = nullptr;
         };
     };
+    
+    template<char INDENT_CHAR = ' ', int32_t INDENT_COUNT = 2>
+    class JsonStreamWriter : public JsonWriter {
+    public:
+        JsonStreamWriter(std::ostream& stream) {
+            streamptr = &stream;
+        }
+        virtual JsonWriter& operator << (const char* buf) {
+            *streamptr << buf;
+            return static_cast<JsonWriter&>(*this);
+        }
+        virtual JsonWriter& operator << (const char ch) {
+            *streamptr << ch;
+            return static_cast<JsonWriter&>(*this);
+        }
+        virtual JsonWriter& PushRepeat(char ch, int32_t times) {
+            for(int32_t i = 0; i < times; ++i)
+                *streamptr << ch;
+            return static_cast<JsonWriter&>(*this);
+        }
+        virtual JsonWriter& PushNewline(int32_t indent_dif) {
+            *streamptr << '\n';
+            if(indent_dif > 0)
+                indent += INDENT_COUNT;
+            else if(indent_dif < 0 && indent > 0)
+                indent -= INDENT_COUNT;
+            PushRepeat(INDENT_CHAR, indent);
+            return static_cast<JsonWriter&>(*this);
+        }
+    protected:
+        int32_t indent = 0;
+        std::ostream* streamptr = nullptr;
+    };
+    
+    template<char INDENT_CHAR = ' ', int32_t INDENT_COUNT = 2>
+    class JsonStringWriter : public JsonWriter {
+    public:
+        JsonStringWriter(std::string& str) {
+            stringptr = &str;
+        }
+        virtual JsonWriter& operator << (const char* buf) {
+            stringptr->append(buf);
+            return static_cast<JsonWriter&>(*this);
+        }
+        virtual JsonWriter& operator << (const char ch) {
+            stringptr->append(1, ch);
+            return static_cast<JsonWriter&>(*this);
+        }
+        virtual JsonWriter& PushRepeat(char ch, int32_t times) {
+            stringptr->append(times, ch);
+            return static_cast<JsonWriter&>(*this);
+        }
+        virtual JsonWriter& PushNewline(int32_t indent_dif) {
+            stringptr->append(1, '\n');
+            if(indent_dif > 0)
+                indent += INDENT_COUNT;
+            else if(indent_dif < 0 && indent > 0)
+                indent -= INDENT_COUNT;
+            stringptr->append(indent, INDENT_CHAR);
+            return static_cast<JsonWriter&>(*this);
+        }
+    protected:
+        int32_t indent = 0;
+        std::string* stringptr = nullptr;
+    };
+    
+    inline std::ostream& operator << (std::ostream& stream, JsonNode<>& node) {
+        JsonStreamWriter<> writer(stream);
+        node.write_to(writer);
+        return stream;
+    }
     
 }
 

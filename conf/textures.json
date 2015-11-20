@@ -33,7 +33,14 @@
     "mdeck" : ["misc", 420, 220, 24, 32],
     "exdeck" : ["misc", 420, 220, 24, 32],
     "grave" : ["misc", 420, 220, 24, 32],
-    "banish" : ["misc", 420, 220, 24, 32]
+    "banish" : ["misc", 420, 220, 24, 32],
+    "next player" : ["misc", 435, 0, 72, 128],
+    "draw phase" : ["misc", 435, 0, 72, 128],
+    "standby phase" : ["misc", 435, 0, 72, 128],
+    "main phase 1" : ["misc", 435, 0, 72, 128],
+    "battle phase" : ["misc", 435, 0, 72, 128],
+    "main phase2" : ["misc", 435, 0, 72, 128],
+    "end phase" : ["misc", 435, 0, 72, 128]
   },
   "points" : {
     "main_t" : ["misc", 500, 130, 500, 156, 440, 130, 440, 156],

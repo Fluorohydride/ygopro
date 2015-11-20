@@ -53,6 +53,7 @@ namespace ygopro
     extern std::vector<std::shared_ptr<FieldCard>> grave[2];
     extern std::vector<std::shared_ptr<FieldCard>> banished[2];
     extern std::array<std::shared_ptr<FloatingNumber>, 21> fixed_numbers[2];
+    extern int32_t extra_faceup_count[2];
     
     class DuelSceneHandler : public SceneHandler {
     public:

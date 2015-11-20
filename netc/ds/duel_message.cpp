@@ -29,21 +29,6 @@ namespace ygopro
 //                writer.Write<uint8_t>(3);
 //                messages.PushCommand(dm);
                 
-                auto ptr = duel_scene->AddFloatingNumber();
-                ptr->SetValueStr("-12345/+6789");
-                ptr->SetCenter({0, 0}, {0.5f, 0.5f});
-                ptr->SetCharSize({40, 80});
-                ptr->SetColor(0xff00ffff);
-                ptr->SetSColor(0xff004040);
-                auto ptr2 = duel_scene->AddFloatingSprite();
-                ptr2->SetTexture(ImageMgr::Get().GetRawCardTexture());
-                ptr2->BuildSprite({200, 200, 100, 100}, ImageMgr::Get().GetTexture("limit0"));
-                auto act = std::make_shared<LerpAnimator<int64_t, FloatingSprite>>(10000, ptr2, [](FloatingSprite* obj, double t)->bool {
-                    obj->SetRotation(3.1415926f * 2 * -t);
-                    return true;
-                }, std::make_shared<TGenPeriodic<int64_t>>(1000));
-                SceneMgr::Get() << act;
-                
                 break;
             }
             case 9: {
@@ -747,7 +732,7 @@ namespace ygopro
                 int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 std::vector<std::shared_ptr<FieldCard>> tmp_grave;
                 for(auto& iter : grave[playerid]) {
-                    auto data = DataMgr::Get()[iter->code];
+                    auto data = iter->data;
                     if(data && (data->type & 0x802040)) {
                         iter->pos_info = {(int8_t)playerid, LOCATION_EXTRA, (int8_t)extra[playerid].size(), POS_FACEDOWN};
                         extra[playerid].push_back(iter);
@@ -762,11 +747,21 @@ namespace ygopro
                     pcard->pos_info = {(int8_t)playerid, LOCATION_GRAVE, (int8_t)i, POS_FACEUP};
                     pcard->UpdateTo(200, pcard->GetPositionInfo());
                 }
+                if(grave[playerid].empty())
+                    fixed_numbers[playerid][1]->SetValueStr("");
+                else
+                    fixed_numbers[playerid][1]->SetValue((int32_t)grave[playerid].size());
                 for(size_t i = 0; i < deck[playerid].size(); ++i) {
                     auto& pcard = deck[playerid][i];
                     pcard->pos_info = {(int8_t)playerid, LOCATION_DECK, (int8_t)i, POS_FACEDOWN};
                     pcard->UpdateTo(200, pcard->GetPositionInfo());
                 }
+                if(deck[playerid].empty())
+                    fixed_numbers[playerid][0]->SetValueStr("");
+                else
+                    fixed_numbers[playerid][0]->SetValue((int32_t)deck[playerid].size());
+                std::string str = To<std::string>("%d(%d)", extra[playerid].size(), extra_faceup_count[playerid]);
+                fixed_numbers[playerid][3]->SetValueStr(str.c_str());
                 PushMessageActions(std::make_shared<ActionWait<int64_t>>(200));
                 break;
             }
