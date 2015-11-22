@@ -103,7 +103,7 @@ bool DataManager::LoadStrings(const char* file) {
 			wcscpy(pbuf, strBuffer);
 			_counterStrings[value] = pbuf;
 		} else if(!strcmp(strbuf, "setname")) {
-			sscanf(&linebuf[8], "%x %[^\t^\n]", &value, strbuf);//using tab for comment
+			sscanf(&linebuf[8], "%x %240[^\t^\n]", &value, strbuf);//using tab for comment
 			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
