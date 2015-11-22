@@ -14,4 +14,5 @@
 *.exe
 *.log
 *.DS_Store
-
+.gitattributes
+common.json

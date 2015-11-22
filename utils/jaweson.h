@@ -76,16 +76,17 @@ namespace jaweson
     public:
         virtual JsonWriter& operator << (const char* buf) = 0;
         virtual JsonWriter& operator << (const char ch) = 0;
-        virtual JsonWriter& PushRepeat(char ch, int32_t times) = 0;
+        virtual JsonWriter& push_repeat(char ch, int32_t times) = 0;
         // >0 : increase indent;
         // =0 : no change
         // <0 : decrease indent;
-        virtual JsonWriter& PushNewline(int32_t indent_dif) = 0;
+        virtual JsonWriter& push_newline(int32_t indent_dif) = 0;
+        virtual bool need_escape_slash() = 0;
     };
     
     class JsonUtil {
     public:
-        static std::string raw_string_to_text(const std::string& raw) {
+        static std::string raw_string_to_text(const std::string& raw, bool escape_slash) {
             std::string result;
             const char* p = raw.c_str();
             while(*p != 0) {
@@ -93,7 +94,7 @@ namespace jaweson
                 switch(ch) {
                     case '"': result.append("\\\""); break;
                     case '\\': result.append("\\\\"); break;
-                    case '/': result.append("\\/"); break;
+                    case '/': result.append(escape_slash ? "\\/" : "/"); break;
                     case '\b': result.append("\\b"); break;
                     case '\f': result.append("\\f"); break;
                     case '\n': result.append("\\n"); break;
@@ -271,7 +272,7 @@ namespace jaweson
         inline virtual bool is_string() { return true; }
         inline virtual const std::string& to_string() { return ref_value; }
         virtual void write_to(JsonWriter& writer) {
-            writer << '\"' << JsonUtil::raw_string_to_text(ref_value).c_str() << '\"';
+            writer << '\"' << JsonUtil::raw_string_to_text(ref_value, writer.need_escape_slash()).c_str() << '\"';
         }
         virtual JsonValue<ALLOC_TYPE>* clone() { return ALLOC_TYPE::template alloc<JsonString>(ref_value); }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
@@ -472,17 +473,17 @@ namespace jaweson
             if(values.empty()) {
                 writer << '}';
             } else {
-                writer.PushNewline(1);
+                writer.push_newline(1);
                 for(size_t i = 0; i < values.size(); ++i) {
                     auto& value_node = values[i];
                     if(value_node) {
-                        writer << '\"' << JsonUtil::raw_string_to_text(value_node->ref_key).c_str() << "\" : ";
+                        writer << '\"' << JsonUtil::raw_string_to_text(value_node->ref_key, writer.need_escape_slash()).c_str() << "\" : ";
                         value_node->write_to(writer);
                         if(i != values.size() - 1) {
                             writer << ',';
-                            writer.PushNewline(0);
+                            writer.push_newline(0);
                         } else
-                            writer.PushNewline(-1);
+                            writer.push_newline(-1);
                     }
                 }
                 writer << '}';
@@ -1011,7 +1012,7 @@ namespace jaweson
         };
     };
     
-    template<char INDENT_CHAR = ' ', int32_t INDENT_COUNT = 2>
+    template<char INDENT_CHAR = ' ', int32_t INDENT_COUNT = 2, bool ESCAPE_SLASH = false>
     class JsonStreamWriter : public JsonWriter {
     public:
         JsonStreamWriter(std::ostream& stream) {
@@ -1025,26 +1026,28 @@ namespace jaweson
             *streamptr << ch;
             return static_cast<JsonWriter&>(*this);
         }
-        virtual JsonWriter& PushRepeat(char ch, int32_t times) {
+        virtual JsonWriter& push_repeat(char ch, int32_t times) {
             for(int32_t i = 0; i < times; ++i)
                 *streamptr << ch;
             return static_cast<JsonWriter&>(*this);
         }
-        virtual JsonWriter& PushNewline(int32_t indent_dif) {
+        virtual JsonWriter& push_newline(int32_t indent_dif) {
             *streamptr << '\n';
             if(indent_dif > 0)
                 indent += INDENT_COUNT;
             else if(indent_dif < 0 && indent > 0)
                 indent -= INDENT_COUNT;
-            PushRepeat(INDENT_CHAR, indent);
+            push_repeat(INDENT_CHAR, indent);
             return static_cast<JsonWriter&>(*this);
         }
+        virtual bool need_escape_slash() { return ESCAPE_SLASH; }
+        
     protected:
         int32_t indent = 0;
         std::ostream* streamptr = nullptr;
     };
     
-    template<char INDENT_CHAR = ' ', int32_t INDENT_COUNT = 2>
+    template<char INDENT_CHAR = ' ', int32_t INDENT_COUNT = 2, bool ESCAPE_SLASH = false>
     class JsonStringWriter : public JsonWriter {
     public:
         JsonStringWriter(std::string& str) {
@@ -1058,11 +1061,11 @@ namespace jaweson
             stringptr->append(1, ch);
             return static_cast<JsonWriter&>(*this);
         }
-        virtual JsonWriter& PushRepeat(char ch, int32_t times) {
+        virtual JsonWriter& push_repeat(char ch, int32_t times) {
             stringptr->append(times, ch);
             return static_cast<JsonWriter&>(*this);
         }
-        virtual JsonWriter& PushNewline(int32_t indent_dif) {
+        virtual JsonWriter& push_newline(int32_t indent_dif) {
             stringptr->append(1, '\n');
             if(indent_dif > 0)
                 indent += INDENT_COUNT;
@@ -1071,6 +1074,8 @@ namespace jaweson
             stringptr->append(indent, INDENT_CHAR);
             return static_cast<JsonWriter&>(*this);
         }
+        virtual bool need_escape_slash() { return ESCAPE_SLASH; }
+        
     protected:
         int32_t indent = 0;
         std::string* stringptr = nullptr;

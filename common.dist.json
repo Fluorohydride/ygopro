@@ -1,4 +1,6 @@
 {
+  "comment" : "rename this file to common.json",
+  "save_config_on_exit" : false,
   "window_width" : 800,
   "window_height" : 500,
   "vertical_sync" : 0,

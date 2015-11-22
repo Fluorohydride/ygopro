@@ -51,7 +51,7 @@ int32_t main(int32_t argc, char* argv[]) {
             auto epos = argstr.find('=');
             if(epos == argstr.npos)
                 continue;
-            commonCfg[argstr.substr(2, epos - 2)].set_value<jaweson::JsonString>(argstr.substr(epos + 0));
+            commonCfg[argstr.substr(2, epos - 2)].set_value<jaweson::JsonString>(argstr.substr(epos + 1));
         }
         textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["string_conf"].to_string()));
         if(!stringCfg.parse(textfile.Data(), textfile.Length()))
@@ -236,5 +236,9 @@ int32_t main(int32_t argc, char* argv[]) {
     _3dshader.reset();
     glfwDestroyWindow(window);
     glfwTerminate();
+    if(commonCfg["save_config_on_exit"].to_bool()) {
+        std::ofstream conf_file("common.json");
+        conf_file << commonCfg;
+    }
     return 0;
 }
