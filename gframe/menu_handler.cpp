@@ -54,7 +54,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					inet_ntop(AF_INET, &(((struct sockaddr_in *)servinfo->ai_addr)->sin_addr), ip, 20);
 				freeaddrinfo(servinfo);
 			#else
-				//int status;
 				char hostname[100];
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinIP->getText();
@@ -307,7 +306,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
-					                   mainGame->gameConf.lastdeck, 20);
+					                   mainGame->gameConf.lastdeck, 64);
 					char deckbuf[1024];
 					char* pdeck = deckbuf;
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
@@ -364,12 +363,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_R: {
-			if(!event.KeyInput.PressedDown)
+			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
 			break;
 		}
 		case irr::KEY_ESCAPE: {
-			mainGame->device->minimizeWindow();
+			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
+				mainGame->device->minimizeWindow();
 			break;
 		}
 		default: break;
