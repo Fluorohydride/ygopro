@@ -86,25 +86,25 @@ int ReplayMode::ReplayThread(void* param) {
 	if(!(opt & DUEL_TAG_MODE)) {
 		int main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENCE);
 		int extra = cur_replay.ReadInt32();
 		for(int i = 0; i < extra; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENCE);
 		mainGame->dField.Initial(0, main, extra);
 		main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENCE);
 		extra = cur_replay.ReadInt32();
 		for(int i = 0; i < extra; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENCE);
 		mainGame->dField.Initial(1, main, extra);
 	} else {
 		int main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENCE);
 		int extra = cur_replay.ReadInt32();
 		for(int i = 0; i < extra; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENCE);
 		mainGame->dField.Initial(0, main, extra);
 		main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
@@ -114,10 +114,10 @@ int ReplayMode::ReplayThread(void* param) {
 			new_tag_card(pduel, cur_replay.ReadInt32(), 0, LOCATION_EXTRA);
 		main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENCE);
 		extra = cur_replay.ReadInt32();
 		for(int i = 0; i < extra; ++i)
-			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, 0);
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENCE);
 		mainGame->dField.Initial(1, main, extra);
 		main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
