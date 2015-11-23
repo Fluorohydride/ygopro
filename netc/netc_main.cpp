@@ -135,6 +135,10 @@ int32_t main(int32_t argc, char* argv[]) {
         glfwTerminate();
         return 0;
     }
+    ImageMgr::Get().LoadAvatar(0, FileSystem::UTF8ToLocalCharset(commonCfg["avatar1"].to_string()));
+    ImageMgr::Get().LoadAvatar(1, FileSystem::UTF8ToLocalCharset(commonCfg["avatar2"].to_string()));
+    ImageMgr::Get().LoadSleeve(0, FileSystem::UTF8ToLocalCharset(commonCfg["sleeve1"].to_string()));
+    ImageMgr::Get().LoadSleeve(1, FileSystem::UTF8ToLocalCharset(commonCfg["sleeve2"].to_string()));
     LimitRegulationMgr::Get().LoadLimitRegulation(FileSystem::UTF8ToLocalCharset(commonCfg["limit_regulation"].to_string()),
                                                   To<std::wstring>(stringCfg["eui_list_default"].to_string()));
     

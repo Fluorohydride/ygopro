@@ -122,10 +122,8 @@ namespace ygopro
     
     void DuelSceneHandler::BeginHandler() {
         AddCard(84013237, CardPosInfo(0, 0x4, 1, 0x8))->UpdatePosition(0);
-        for(int32_t i = 0; i < 40; ++i) {
+        for(int32_t i = 0; i < 3; ++i)
             AddCard(83764718, CardPosInfo(0, 0x2, 1, 0x1))->UpdatePosition(0);
-        }
-            
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
@@ -302,6 +300,25 @@ namespace ygopro
         m_zone[1].resize(5);
         s_zone[0].resize(8);
         s_zone[1].resize(8);
+        auto add_avatar = [this](jaweson::JsonNode<>& node, int32_t pl) {
+            std::array<v2i, 4> rel;
+            std::array<v2f, 4> prop;
+            for(int32_t i = 0; i < 4; ++i) {
+                auto& avatar_node = node[i];
+                rel[i] = {(int32_t)avatar_node[0].to_integer(), (int32_t)avatar_node[2].to_integer()};
+                prop[i] = {(float)avatar_node[1].to_double(), (float)avatar_node[3].to_double()};
+            }
+            auto f1 = duel_scene->AddFloatingSprite();
+            auto ava_tex = ImageMgr::Get().GetAvatarTexture(pl);
+            f1->SetTexture(ava_tex);
+            f1->BuildSprite(rel.data(), ava_tex->GetTextureInfo(), prop.data());
+            auto f2 = duel_scene->AddFloatingSprite();
+            auto misc_tex = ImageMgr::Get().GetAvatarTexture(pl);
+            f2->SetTexture(misc_tex);
+            f2->BuildSprite(rel.data(), ImageMgr::Get().GetTexture("avatar frame"), prop.data());
+        };
+        add_avatar(layoutCfg["avatar1"], 0);
+        add_avatar(layoutCfg["avatar2"], 1);
         for(int32_t p = 0; p < 2; ++p) {
             for(int32_t i = 0 ; i < 21; ++i) {
                 fixed_numbers[p][i] = duel_scene->AddFloatingNumber();
