@@ -1,8 +1,8 @@
 {
   "comment" : "rename this file to common.json",
   "save_config_on_exit" : false,
-  "window_width" : 800,
-  "window_height" : 500,
+  "window_width" : 1600,
+  "window_height" : 1000,
   "vertical_sync" : 0,
   "fsaa" : 0,
   "frame_rate" : 60,
@@ -23,8 +23,8 @@
   "server_ip" : "127.0.0.1",
   "server_port" : 7911,
   "server_timeout" : 5000,
-  "avatar1" : "",
-  "avatar2" : "",
-  "sleeve1" : "",
-  "sleeve2" : "",
+  "avatar1" : "./conf/avatar.png",
+  "avatar2" : "./conf/avatar.png",
+  "sleeve1" : "./conf/sleeve.jpg",
+  "sleeve2" : "./conf/sleeve.jpg"
 }

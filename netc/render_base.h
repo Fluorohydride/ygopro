@@ -68,6 +68,11 @@ namespace base {
         return vector2<T>{(T)(a.x * scalar), (T)(a.y * scalar)};
     }
     
+    template<typename T, typename S>
+    inline vector2<T> interpolate (const vector2<T>& a, const vector2<T>& b, S s) {
+        return vector2<T>{(T)(a.x * (1 - s) + b.x * s), (T)(a.y * (1 - s) + b.y * s)};
+    }
+    
     template<typename T>
     inline vector3<T> operator + (const vector3<T>& a, const vector3<T>& b) {
         return vector3<T>{a.x + b.x, a.y + b.y, a.z + b.z};
@@ -81,6 +86,11 @@ namespace base {
     template<typename T, typename S>
     inline vector3<T> operator * (const vector3<T>& a, S scalar) {
         return vector3<T>{(T)(a.x * scalar), (T)(a.y * scalar), (T)(a.z * scalar)};
+    }
+    
+    template<typename T, typename S>
+    inline vector3<T> interpolate (const vector3<T>& a, const vector3<T>& b, S s) {
+        return vector3<T>{(T)(a.x * (1 - s) + b.x * s), (T)(a.y * (1 - s) + b.y * s), (T)(a.z * (1 - s) + b.z * s)};
     }
     
     template<typename T>

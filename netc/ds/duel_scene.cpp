@@ -117,9 +117,9 @@ namespace ygopro
         int32_t subs = pos_info.subsequence;
         switch(loc) {
             case 0x1: { //deck
-                auto fb_pos = field_blocks[side][13]->GetCenter();
+                auto fb_pos = g_player[side].field_blocks[13]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, 0.005f * seq};
-                bool faceup = deck_reversed ? (pos & 0xa) : (pos & 0x5);
+                bool faceup = g_duel.deck_reversed ? (pos & 0xa) : (pos & 0x5);
                 if(param == CardPosParam::Confirm) {    // confirm deck
                     tl.x += -vparam.cardrect.width * 1.1f;
                     faceup = true;
@@ -139,7 +139,7 @@ namespace ygopro
                 break;
             }
             case 0x2: { //hand
-                int32_t ct = (int32_t)hand[side].size();
+                int32_t ct = (int32_t)g_player[side].hand.size();
                 if(ct == 0)
                     break;;
                 if(side == 0) {
@@ -171,7 +171,7 @@ namespace ygopro
             }
             case 0x4: { //mzone
                 if(param != CardPosParam::Shuffle) {
-                    auto fb_pos = field_blocks[side][seq]->GetCenter();
+                    auto fb_pos = g_player[side].field_blocks[seq]->GetCenter();
                     tl.x = fb_pos.x;
                     tl.y = fb_pos.y;
                     if(attaching_card != nullptr) {
@@ -206,7 +206,7 @@ namespace ygopro
                         }
                     }
                 } else {
-                    auto fb_pos = field_blocks[side][2]->GetCenter();
+                    auto fb_pos = g_player[side].field_blocks[2]->GetCenter();
                     tl = {fb_pos.x, fb_pos.y, 1};
                     if(side == 0)
                         rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
@@ -216,7 +216,7 @@ namespace ygopro
                 break;
             }
             case 0x8: { //szone
-                auto fb_pos = field_blocks[side][seq + 5]->GetCenter();
+                auto fb_pos = g_player[side].field_blocks[seq + 5]->GetCenter();
                 tl.x = fb_pos.x;
                 tl.y = fb_pos.y;
                 if(pos & 0x5 || param == CardPosParam::Confirm) {
@@ -233,7 +233,7 @@ namespace ygopro
                 break;
             }
             case 0x10: { //grave
-                auto fb_pos = field_blocks[side][15]->GetCenter();
+                auto fb_pos = g_player[side].field_blocks[15]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
                 if(side == 0)
                     rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -242,7 +242,7 @@ namespace ygopro
                 break;
             }
             case 0x20: { //banish
-                auto fb_pos = field_blocks[side][16]->GetCenter();
+                auto fb_pos = g_player[side].field_blocks[16]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
                 if(pos & 0x5 || param == CardPosParam::Confirm) {
                     if(side == 0)
@@ -258,7 +258,7 @@ namespace ygopro
                 break;
             }
             case 0x40: { //extra
-                auto fb_pos = field_blocks[side][14]->GetCenter();
+                auto fb_pos = g_player[side].field_blocks[14]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
                 if(param == CardPosParam::Confirm) // confirm extra
                     tl.x += vparam.cardrect.width * 1.1f;
@@ -478,54 +478,54 @@ namespace ygopro
     
     void FieldRenderer::PushVerticesAll() {
         base::RenderObject<vt3>::PushVerticesAll();
-        for(auto& iter : field_blocks[0])
+        for(auto& iter : g_player[0].field_blocks)
             iter->PushVertices();
-        for(auto& iter : field_blocks[1])
+        for(auto& iter : g_player[1].field_blocks)
             iter->PushVertices();
     }
     
     void FieldCardRenderer::PushVerticesAll() {
         base::RenderObject<vt3>::PushVerticesAll();
-        for(auto& iter : hand[1])
+        for(auto& iter : g_player[1].hand)
             iter->PushVertices();
-        for(auto& iter : deck[1])
+        for(auto& iter : g_player[1].deck)
             iter->PushVertices();
-        for(auto& iter : extra[1])
+        for(auto& iter : g_player[1].extra)
             iter->PushVertices();
-        for(auto& iter : s_zone[1])
+        for(auto& iter : g_player[1].s_zone)
             if(iter)
                 iter->PushVertices();
-        for(auto& iter : m_zone[1]) {
+        for(auto& iter : g_player[1].m_zone) {
             if(iter) {
                 for(auto& att : iter->attached_cards)
                     att->PushVertices();
                 iter->PushVertices();
             }
         }
-        for(auto& iter : grave[1])
+        for(auto& iter : g_player[1].grave)
             iter->PushVertices();
-        for(auto& iter : banished[1])
+        for(auto& iter : g_player[1].banished)
             iter->PushVertices();
 
-        for(auto& iter : grave[0])
+        for(auto& iter : g_player[0].grave)
             iter->PushVertices();
-        for(auto& iter : banished[0])
+        for(auto& iter : g_player[0].banished)
             iter->PushVertices();
-        for(auto& iter : m_zone[0]) {
+        for(auto& iter : g_player[0].m_zone) {
             if(iter) {
                 for(auto& att : iter->attached_cards)
                     att->PushVertices();
                 iter->PushVertices();
             }
         }
-        for(auto& iter : s_zone[0])
+        for(auto& iter : g_player[0].s_zone)
             if(iter)
                 iter->PushVertices();
-        for(auto& iter : deck[0])
+        for(auto& iter : g_player[0].deck)
             iter->PushVertices();
-        for(auto& iter : extra[0])
+        for(auto& iter : g_player[0].extra)
             iter->PushVertices();
-        for(auto& iter : hand[0])
+        for(auto& iter : g_player[0].hand)
             iter->PushVertices();
     }
     
@@ -641,9 +641,9 @@ namespace ygopro
         vparam.scry = 2.0f * tanf(vparam.fovy * 0.5f) * vparam.cnear;
         vparam.scrx = vparam.scry * viewport.width / viewport.height;
         UpdateHandRect();
-        for(auto& iter : hand[0])
+        for(auto& iter : g_player[0].hand)
             iter->UpdatePosition(0);
-        for(auto& iter : hand[1])
+        for(auto& iter : g_player[1].hand)
             iter->UpdatePosition(0);
         auto set_number_pos = [this](FloatingNumber* num, FieldBlock* pb, int32_t rel, v2i off = {0, 0}) {
             v2f pos = pb->GetCenter() + v2f{0.0f, pb->GetSize().y / 2.0f * rel};
@@ -655,27 +655,27 @@ namespace ygopro
         static const v2i offsetA[] = {{0, -7}, {0, -9}};
         static const v2i offsetD[] = {{0, 10}, {0, 8}};
         for(int32_t p = 0; p < 2; ++p) {
-            set_number_pos(fixed_numbers[p][ 0].get(), field_blocks[p][13].get(), relp[p]);
-            set_number_pos(fixed_numbers[p][ 1].get(), field_blocks[p][15].get(), relp[p]);
-            set_number_pos(fixed_numbers[p][ 2].get(), field_blocks[p][16].get(), relp[p]);
-            set_number_pos(fixed_numbers[p][ 3].get(), field_blocks[p][14].get(), relp[p]);
-            set_number_pos(fixed_numbers[p][ 4].get(), field_blocks[p][11].get(), relp[p]);
-            set_number_pos(fixed_numbers[p][ 5].get(), field_blocks[p][12].get(), relp[p]);
-            set_number_pos(fixed_numbers[p][ 6].get(), field_blocks[p][ 0].get(), relp[1]);
-            set_number_pos(fixed_numbers[p][ 7].get(), field_blocks[p][ 1].get(), relp[1]);
-            set_number_pos(fixed_numbers[p][ 8].get(), field_blocks[p][ 2].get(), relp[1]);
-            set_number_pos(fixed_numbers[p][ 9].get(), field_blocks[p][ 3].get(), relp[1]);
-            set_number_pos(fixed_numbers[p][10].get(), field_blocks[p][ 4].get(), relp[1]);
-            set_number_pos(fixed_numbers[p][11].get(), field_blocks[p][ 0].get(), relp[0], offsetA[p]);
-            set_number_pos(fixed_numbers[p][12].get(), field_blocks[p][ 1].get(), relp[0], offsetA[p]);
-            set_number_pos(fixed_numbers[p][13].get(), field_blocks[p][ 2].get(), relp[0], offsetA[p]);
-            set_number_pos(fixed_numbers[p][14].get(), field_blocks[p][ 3].get(), relp[0], offsetA[p]);
-            set_number_pos(fixed_numbers[p][15].get(), field_blocks[p][ 4].get(), relp[0], offsetA[p]);
-            set_number_pos(fixed_numbers[p][16].get(), field_blocks[p][ 0].get(), relp[0], offsetD[p]);
-            set_number_pos(fixed_numbers[p][17].get(), field_blocks[p][ 1].get(), relp[0], offsetD[p]);
-            set_number_pos(fixed_numbers[p][18].get(), field_blocks[p][ 2].get(), relp[0], offsetD[p]);
-            set_number_pos(fixed_numbers[p][19].get(), field_blocks[p][ 3].get(), relp[0], offsetD[p]);
-            set_number_pos(fixed_numbers[p][20].get(), field_blocks[p][ 4].get(), relp[0], offsetD[p]);
+            set_number_pos(g_player[p].fixed_numbers[ 0].get(), g_player[p].field_blocks[13].get(), relp[p]);
+            set_number_pos(g_player[p].fixed_numbers[ 1].get(), g_player[p].field_blocks[15].get(), relp[p]);
+            set_number_pos(g_player[p].fixed_numbers[ 2].get(), g_player[p].field_blocks[16].get(), relp[p]);
+            set_number_pos(g_player[p].fixed_numbers[ 3].get(), g_player[p].field_blocks[14].get(), relp[p]);
+            set_number_pos(g_player[p].fixed_numbers[ 4].get(), g_player[p].field_blocks[11].get(), relp[p]);
+            set_number_pos(g_player[p].fixed_numbers[ 5].get(), g_player[p].field_blocks[12].get(), relp[p]);
+            set_number_pos(g_player[p].fixed_numbers[ 6].get(), g_player[p].field_blocks[ 0].get(), relp[1]);
+            set_number_pos(g_player[p].fixed_numbers[ 7].get(), g_player[p].field_blocks[ 1].get(), relp[1]);
+            set_number_pos(g_player[p].fixed_numbers[ 8].get(), g_player[p].field_blocks[ 2].get(), relp[1]);
+            set_number_pos(g_player[p].fixed_numbers[ 9].get(), g_player[p].field_blocks[ 3].get(), relp[1]);
+            set_number_pos(g_player[p].fixed_numbers[10].get(), g_player[p].field_blocks[ 4].get(), relp[1]);
+            set_number_pos(g_player[p].fixed_numbers[11].get(), g_player[p].field_blocks[ 0].get(), relp[0], offsetA[p]);
+            set_number_pos(g_player[p].fixed_numbers[12].get(), g_player[p].field_blocks[ 1].get(), relp[0], offsetA[p]);
+            set_number_pos(g_player[p].fixed_numbers[13].get(), g_player[p].field_blocks[ 2].get(), relp[0], offsetA[p]);
+            set_number_pos(g_player[p].fixed_numbers[14].get(), g_player[p].field_blocks[ 3].get(), relp[0], offsetA[p]);
+            set_number_pos(g_player[p].fixed_numbers[15].get(), g_player[p].field_blocks[ 4].get(), relp[0], offsetA[p]);
+            set_number_pos(g_player[p].fixed_numbers[16].get(), g_player[p].field_blocks[ 0].get(), relp[0], offsetD[p]);
+            set_number_pos(g_player[p].fixed_numbers[17].get(), g_player[p].field_blocks[ 1].get(), relp[0], offsetD[p]);
+            set_number_pos(g_player[p].fixed_numbers[18].get(), g_player[p].field_blocks[ 2].get(), relp[0], offsetD[p]);
+            set_number_pos(g_player[p].fixed_numbers[19].get(), g_player[p].field_blocks[ 3].get(), relp[0], offsetD[p]);
+            set_number_pos(g_player[p].fixed_numbers[20].get(), g_player[p].field_blocks[ 4].get(), relp[0], offsetD[p]);
         }
     }
     
@@ -705,9 +705,9 @@ namespace ygopro
     
     v2i DuelScene::CheckHoverBlock(float px, float py) {
         for(int32_t i = 0 ; i < 17; ++i) {
-            if(field_blocks[0][i]->CheckInside(px, py))
+            if(g_player[0].field_blocks[i]->CheckInside(px, py))
                 return {1, i};
-            if(field_blocks[1][i]->CheckInside(px, py))
+            if(g_player[1].field_blocks[i]->CheckInside(px, py))
                 return {2, i};
         }
         return {0, 0};
@@ -732,7 +732,7 @@ namespace ygopro
         if(sx > vparam.hand_rect[0].left && sx < vparam.hand_rect[0].left + vparam.hand_rect[0].width &&
            sy < vparam.hand_rect[0].top && sy > vparam.hand_rect[0].top - vparam.hand_rect[0].height) {
             float wwidth = vparam.hand_rect[0].width;
-            int32_t ct = (int32_t)hand[0].size();
+            int32_t ct = (int32_t)g_player[0].hand.size();
             if(ct > 0) {
                 float whand = ct * vparam.hand_width[0] + (ct - 1) * vparam.hand_width[0] * 0.1f;
                 if(whand >= wwidth) {
@@ -762,7 +762,7 @@ namespace ygopro
         if(sx > vparam.hand_rect[1].left - vparam.hand_rect[1].width && sx < vparam.hand_rect[1].left &&
            sy < vparam.hand_rect[1].top && sy > vparam.hand_rect[1].top - vparam.hand_rect[1].height) {
             float wwidth = vparam.hand_rect[1].width;
-            int32_t ct = (int32_t)hand[1].size();
+            int32_t ct = (int32_t)g_player[1].hand.size();
             if(ct > 0) {
                 float whand = ct * vparam.hand_width[1] + (ct - 1) * vparam.hand_width[1] * 0.1f;
                 if(whand >= wwidth) {
@@ -824,13 +824,13 @@ namespace ygopro
         if(pos_info.location == 0)
             return nullptr;
         switch(pos_info.location) {
-            case 0x1: return deck[pos_info.controler].empty() ? nullptr : deck[pos_info.controler].back();
-            case 0x2: return hand[pos_info.controler].empty() ? nullptr : hand[pos_info.controler][pos_info.sequence];
-            case 0x4: return m_zone[pos_info.controler][pos_info.sequence];
-            case 0x8: return s_zone[pos_info.controler][pos_info.sequence];
-            case 0x10: return grave[pos_info.controler].empty() ? nullptr : grave[pos_info.controler].back();
-            case 0x20: return banished[pos_info.controler].empty() ? nullptr : banished[pos_info.controler].back();
-            case 0x40: return extra[pos_info.controler].empty() ? nullptr : extra[pos_info.controler].back();
+            case 0x1: return g_player[pos_info.controler].deck.empty() ? nullptr : g_player[pos_info.controler].deck.back();
+            case 0x2: return g_player[pos_info.controler].hand.empty() ? nullptr : g_player[pos_info.controler].hand[pos_info.sequence];
+            case 0x4: return g_player[pos_info.controler].m_zone[pos_info.sequence];
+            case 0x8: return g_player[pos_info.controler].s_zone[pos_info.sequence];
+            case 0x10: return g_player[pos_info.controler].grave.empty() ? nullptr : g_player[pos_info.controler].grave.back();
+            case 0x20: return g_player[pos_info.controler].banished.empty() ? nullptr : g_player[pos_info.controler].banished.back();
+            case 0x40: return g_player[pos_info.controler].extra.empty() ? nullptr : g_player[pos_info.controler].extra.back();
         }
         return nullptr;
     }
@@ -838,7 +838,7 @@ namespace ygopro
     std::shared_ptr<FieldBlock> DuelScene::GetFieldBlock(int32_t x, int32_t y) {
         if(x == 1 || x == 2)
             if(y < 17)
-                return field_blocks[x - 1][y];
+                return g_player[x - 1].field_blocks[y];
         return nullptr;
     }
     

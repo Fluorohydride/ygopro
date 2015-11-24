@@ -180,7 +180,7 @@ protected:
     cb_type callback;
 };
 
-template<typename TIME_TYPE, typename OBJ_TYPE>
+template<typename TIME_TYPE, typename OBJ_TYPE = void>
 class LerpAnimator : public Action<TIME_TYPE> {
     using lerp_cb = std::function<bool(OBJ_TYPE*, double)>; // return false to exit
 public:
@@ -200,6 +200,28 @@ protected:
     TIME_TYPE start_time;
     TIME_TYPE last_time;
     std::weak_ptr<OBJ_TYPE> ani_obj;
+    lerp_cb callback;
+    std::shared_ptr<TGen<TIME_TYPE>> tgen_obj;
+};
+
+template<typename TIME_TYPE>
+class LerpAnimator<TIME_TYPE, void> : public Action<TIME_TYPE> {
+    using lerp_cb = std::function<bool(double)>; // return false to exit
+public:
+    LerpAnimator(TIME_TYPE tm, lerp_cb cb, std::shared_ptr<TGen<TIME_TYPE>> gobj)
+        : last_time(tm), callback(cb), tgen_obj(gobj) {}
+    virtual void InitStartTime(TIME_TYPE tm) { start_time = tm; }
+    virtual bool Perform(TIME_TYPE cur_time) {
+        if(callback == nullptr || tgen_obj == nullptr)
+            return false;
+        bool result = callback(tgen_obj->GetT(start_time, cur_time));
+        bool end = last_time > TIME_TYPE() && cur_time >= start_time + last_time;
+        return result && !end;
+    }
+    
+protected:
+    TIME_TYPE start_time;
+    TIME_TYPE last_time;
     lerp_cb callback;
     std::shared_ptr<TGen<TIME_TYPE>> tgen_obj;
 };

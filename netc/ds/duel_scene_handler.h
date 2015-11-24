@@ -13,6 +13,7 @@ namespace ygopro
     class FieldBlock;
     class FieldCard;
     class FloatingNumber;
+    class FloatingSprite;
     class LogPanel;
     
     struct DuelMessage {
@@ -42,18 +43,56 @@ namespace ygopro
         std::wstring ToString();
     };
     
-    extern bool deck_reversed;
-    extern int32_t host_player;
-    extern std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];
-    extern std::vector<std::shared_ptr<FieldCard>> m_zone[2];
-    extern std::vector<std::shared_ptr<FieldCard>> s_zone[2];
-    extern std::vector<std::shared_ptr<FieldCard>> deck[2];
-    extern std::vector<std::shared_ptr<FieldCard>> hand[2];
-    extern std::vector<std::shared_ptr<FieldCard>> extra[2];
-    extern std::vector<std::shared_ptr<FieldCard>> grave[2];
-    extern std::vector<std::shared_ptr<FieldCard>> banished[2];
-    extern std::array<std::shared_ptr<FloatingNumber>, 21> fixed_numbers[2];
-    extern int32_t extra_faceup_count[2];
+    struct LocalPlayerData {
+        std::array<std::shared_ptr<FieldBlock>, 17> field_blocks;
+        std::vector<std::shared_ptr<FieldCard>> m_zone;
+        std::vector<std::shared_ptr<FieldCard>> s_zone;
+        std::vector<std::shared_ptr<FieldCard>> deck;
+        std::vector<std::shared_ptr<FieldCard>> hand;
+        std::vector<std::shared_ptr<FieldCard>> extra;
+        std::vector<std::shared_ptr<FieldCard>> grave;
+        std::vector<std::shared_ptr<FieldCard>> banished;
+        std::array<std::shared_ptr<FloatingNumber>, 22> fixed_numbers;
+        std::shared_ptr<FloatingSprite> lpbar;
+        int32_t lp = 0;
+        int32_t extra_faceup_count = 0;
+        std::array<v2i, 4> lp_verts_rel;
+        std::array<v2f, 4> lp_verts_prop;
+        std::string name;
+    };
+    
+    enum class FloatingNumberType {
+        DeckCount = 0,
+        GraveCount,
+        BanishCount,
+        ExtraCount,
+        LScale,
+        RScale,
+        Star1,
+        Star2,
+        Star3,
+        Star4,
+        Star5,
+        ATK1,
+        ATK2,
+        ATK3,
+        ATK4,
+        ATK5,
+        DEF1,
+        DEF2,
+        DEF3,
+        DEF4,
+        DEF5,
+        LP,
+    };
+    
+    struct LocalDuelData {
+        bool deck_reversed = false;
+        int32_t host_player = 0;
+    };
+    
+    extern LocalDuelData g_duel;
+    extern LocalPlayerData g_player[2];
     
     class DuelSceneHandler : public SceneHandler {
     public:
@@ -76,11 +115,11 @@ namespace ygopro
         void MoveCard(std::shared_ptr<FieldCard> pcard, CardPosInfo pos_info);
         void ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos);
         
-        inline int32_t LocalPlayer(int32_t pid) { return (host_player == 0) ? pid : (1 - pid); }
-        inline int32_t LocalPosInfo(int32_t ipos) { return (host_player == 0) ? ipos : ((ipos & 0xffffff00) | (1 - (ipos & 0xff))); }
+        inline int32_t LocalPlayer(int32_t pid) { return (g_duel.host_player == 0) ? pid : (1 - pid); }
+        inline int32_t LocalPosInfo(int32_t ipos) { return (g_duel.host_player == 0) ? ipos : ((ipos & 0xffffff00) | (1 - (ipos & 0xff))); }
         
         void ClearField();
-        void InitHp(int32_t pid, int32_t hp);
+        void SetLP(int32_t pid, int32_t lp);
         void AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq);
         
         template<typename... ACTS>

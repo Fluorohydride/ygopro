@@ -11,42 +11,8 @@
 namespace ygopro
 {
     
-    bool deck_reversed = false;
-    int32_t host_player = 0;
-    std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];
-    std::vector<std::shared_ptr<FieldCard>> m_zone[2];
-    std::vector<std::shared_ptr<FieldCard>> s_zone[2];
-    std::vector<std::shared_ptr<FieldCard>> deck[2];
-    std::vector<std::shared_ptr<FieldCard>> hand[2];
-    std::vector<std::shared_ptr<FieldCard>> extra[2];
-    std::vector<std::shared_ptr<FieldCard>> grave[2];
-    std::vector<std::shared_ptr<FieldCard>> banished[2];
-    std::array<std::shared_ptr<FloatingNumber>, 21> fixed_numbers[2];
-    int32_t extra_faceup_count[2] = {0, 0};
-    
-    enum class FloatingNumberType {
-        DeckCount = 0,
-        GraveCount,
-        BanishCount,
-        ExtraCount,
-        LScale,
-        RScale,
-        Star1,
-        Star2,
-        Star3,
-        Star4,
-        Star5,
-        ATK1,
-        ATK2,
-        ATK3,
-        ATK4,
-        ATK5,
-        DEF1,
-        DEF2,
-        DEF3,
-        DEF4,
-        DEF5,
-    };
+    LocalDuelData g_duel;
+    LocalPlayerData g_player[2];
     
     std::wstring CardPosInfo::ToString() {
         std::string locstr = stringCfg["eui_location_format"].to_string();
@@ -135,7 +101,7 @@ namespace ygopro
         AddCard(97268402, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
         AddCard(97268402, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
-        for(auto& pc : hand[0])
+        for(auto& pc : g_player[0].hand)
             pc->UpdatePosition(0);
     }
     
@@ -257,80 +223,98 @@ namespace ygopro
     
     void DuelSceneHandler::InitField() {
         for(int32_t i = 0 ; i < 17; ++i) {
-            field_blocks[0][i] = duel_scene->CreateFieldBlock();
-            field_blocks[1][i] = duel_scene->CreateFieldBlock();
+            g_player[0].field_blocks[i] = duel_scene->CreateFieldBlock();
+            g_player[1].field_blocks[i] = duel_scene->CreateFieldBlock();
         }
-        field_blocks[0][0 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone1"]));
-        field_blocks[0][1 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone2"]));
-        field_blocks[0][2 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone3"]));
-        field_blocks[0][3 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone4"]));
-        field_blocks[0][4 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone5"]));
-        field_blocks[0][5 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone1"]));
-        field_blocks[0][6 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone2"]));
-        field_blocks[0][7 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone3"]));
-        field_blocks[0][8 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone4"]));
-        field_blocks[0][9 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone5"]));
-        field_blocks[0][10]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["fdzone"]));
-        field_blocks[0][11]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["pzonel"]));
-        field_blocks[0][12]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["pzoner"]));
-        field_blocks[0][13]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mdeck"]));
-        field_blocks[0][14]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["exdeck"]));
-        field_blocks[0][15]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["grave"]));
-        field_blocks[0][16]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["banish"]));
-        field_blocks[0][0 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        field_blocks[0][1 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        field_blocks[0][2 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        field_blocks[0][3 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        field_blocks[0][4 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        field_blocks[0][5 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        field_blocks[0][6 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        field_blocks[0][7 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        field_blocks[0][8 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        field_blocks[0][9 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        field_blocks[0][10]->SetTexture(ImageMgr::Get().GetTexture("fdzone"));
-        field_blocks[0][11]->SetTexture(ImageMgr::Get().GetTexture("pzonel"));
-        field_blocks[0][12]->SetTexture(ImageMgr::Get().GetTexture("pzoner"));
-        field_blocks[0][13]->SetTexture(ImageMgr::Get().GetTexture("mdeck"));
-        field_blocks[0][14]->SetTexture(ImageMgr::Get().GetTexture("exdeck"));
-        field_blocks[0][15]->SetTexture(ImageMgr::Get().GetTexture("grave"));
-        field_blocks[0][16]->SetTexture(ImageMgr::Get().GetTexture("banish"));
+        g_player[0].field_blocks[0 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone1"]));
+        g_player[0].field_blocks[1 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone2"]));
+        g_player[0].field_blocks[2 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone3"]));
+        g_player[0].field_blocks[3 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone4"]));
+        g_player[0].field_blocks[4 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone5"]));
+        g_player[0].field_blocks[5 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone1"]));
+        g_player[0].field_blocks[6 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone2"]));
+        g_player[0].field_blocks[7 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone3"]));
+        g_player[0].field_blocks[8 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone4"]));
+        g_player[0].field_blocks[9 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone5"]));
+        g_player[0].field_blocks[10]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["fdzone"]));
+        g_player[0].field_blocks[11]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["pzonel"]));
+        g_player[0].field_blocks[12]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["pzoner"]));
+        g_player[0].field_blocks[13]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mdeck"]));
+        g_player[0].field_blocks[14]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["exdeck"]));
+        g_player[0].field_blocks[15]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["grave"]));
+        g_player[0].field_blocks[16]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["banish"]));
+        g_player[0].field_blocks[0 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[1 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[2 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[3 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[4 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[5 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[6 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[7 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[8 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[9 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[10]->SetTexture(ImageMgr::Get().GetTexture("fdzone"));
+        g_player[0].field_blocks[11]->SetTexture(ImageMgr::Get().GetTexture("pzonel"));
+        g_player[0].field_blocks[12]->SetTexture(ImageMgr::Get().GetTexture("pzoner"));
+        g_player[0].field_blocks[13]->SetTexture(ImageMgr::Get().GetTexture("mdeck"));
+        g_player[0].field_blocks[14]->SetTexture(ImageMgr::Get().GetTexture("exdeck"));
+        g_player[0].field_blocks[15]->SetTexture(ImageMgr::Get().GetTexture("grave"));
+        g_player[0].field_blocks[16]->SetTexture(ImageMgr::Get().GetTexture("banish"));
         for(int32_t i = 0; i < 17; ++i)
-            field_blocks[1][i]->Mirror(field_blocks[0][i].get());
-        m_zone[0].resize(5);
-        m_zone[1].resize(5);
-        s_zone[0].resize(8);
-        s_zone[1].resize(8);
-        auto add_avatar = [this](jaweson::JsonNode<>& node, int32_t pl) {
+            g_player[1].field_blocks[i]->Mirror(g_player[0].field_blocks[i].get());
+        g_player[0].m_zone.resize(5);
+        g_player[1].m_zone.resize(5);
+        g_player[0].s_zone.resize(8);
+        g_player[1].s_zone.resize(8);
+        auto add_avatar_lp = [this](jaweson::JsonNode<>& avatar_node, jaweson::JsonNode<>& lp_node, int32_t pl) {
             std::array<v2i, 4> rel;
             std::array<v2f, 4> prop;
             for(int32_t i = 0; i < 4; ++i) {
-                auto& avatar_node = node[i];
-                rel[i] = {(int32_t)avatar_node[0].to_integer(), (int32_t)avatar_node[2].to_integer()};
-                prop[i] = {(float)avatar_node[1].to_double(), (float)avatar_node[3].to_double()};
+                auto& point_node = avatar_node[i];
+                rel[i] = {(int32_t)point_node[0].to_integer(), (int32_t)point_node[2].to_integer()};
+                prop[i] = {(float)point_node[1].to_double(), (float)point_node[3].to_double()};
             }
             auto f1 = duel_scene->AddFloatingSprite();
             auto ava_tex = ImageMgr::Get().GetAvatarTexture(pl);
             f1->SetTexture(ava_tex);
             f1->BuildSprite(rel.data(), ava_tex->GetTextureInfo(), prop.data());
             auto f2 = duel_scene->AddFloatingSprite();
-            auto misc_tex = ImageMgr::Get().GetAvatarTexture(pl);
+            auto misc_tex = ImageMgr::Get().GetRawMiscTexture();
             f2->SetTexture(misc_tex);
             f2->BuildSprite(rel.data(), ImageMgr::Get().GetTexture("avatar frame"), prop.data());
-        };
-        add_avatar(layoutCfg["avatar1"], 0);
-        add_avatar(layoutCfg["avatar2"], 1);
-        for(int32_t p = 0; p < 2; ++p) {
-            for(int32_t i = 0 ; i < 21; ++i) {
-                fixed_numbers[p][i] = duel_scene->AddFloatingNumber();
-                fixed_numbers[p][i]->SetColor(0xff00ffff);
-                fixed_numbers[p][i]->SetSColor(0xff000000);
-                if(i < 6)
-                    fixed_numbers[p][i]->SetCharSize({18, 24});
-                else
-                    fixed_numbers[p][i]->SetCharSize({12, 15});
+            for(int32_t i = 0; i < 4; ++i) {
+                auto& point_node = lp_node[i];
+                g_player[pl].lp_verts_rel[i] = {(int32_t)point_node[0].to_integer(), (int32_t)point_node[2].to_integer()};
+                g_player[pl].lp_verts_prop[i] = {(float)point_node[1].to_double(), (float)point_node[3].to_double()};
             }
-            fixed_numbers[p][4]->SetColor(0xffff00ff);
-            fixed_numbers[p][5]->SetColor(0xff0000ff);
+            g_player[pl].lpbar = duel_scene->AddFloatingSprite();
+            g_player[pl].lpbar->SetTexture(misc_tex);
+            auto f4 = duel_scene->AddFloatingSprite();
+            f4->SetTexture(misc_tex);
+            f4->BuildSprite(g_player[pl].lp_verts_rel.data(), ImageMgr::Get().GetTexture("lp frame"), g_player[pl].lp_verts_prop.data());
+        };
+        add_avatar_lp(layoutCfg["avatar1"], layoutCfg["lpbar1"], 0);
+        add_avatar_lp(layoutCfg["avatar2"], layoutCfg["lpbar2"], 1);
+        for(int32_t p = 0; p < 2; ++p) {
+            for(int32_t i = 0 ; i < 22; ++i) {
+                g_player[p].fixed_numbers[i] = duel_scene->AddFloatingNumber();
+                g_player[p].fixed_numbers[i]->SetColor(0xff00ffff);
+                g_player[p].fixed_numbers[i]->SetSColor(0xff000000);
+                if(i < 6)
+                    g_player[p].fixed_numbers[i]->SetCharSize({18, 24});
+                else
+                    g_player[p].fixed_numbers[i]->SetCharSize({12, 15});
+            }
+            g_player[p].fixed_numbers[4]->SetColor(0xffff00ff);
+            g_player[p].fixed_numbers[5]->SetColor(0xff0000ff);
+            jaweson::JsonNode<>& val_node = layoutCfg[p == 0 ? "lpval1" : "lpval2"];
+            v2i pos = {(int32_t)val_node[0].to_integer(), (int32_t)val_node[2].to_integer()};
+            v2f prop = {(float)val_node[1].to_double(), (float)val_node[3].to_double()};
+            v2i csize = {(int32_t)val_node[4].to_integer(), (int32_t)val_node[5].to_integer()};
+            g_player[p].fixed_numbers[21]->SetCenter(pos, prop);
+            g_player[p].fixed_numbers[21]->SetCharSize(csize);
+            g_player[p].fixed_numbers[21]->SetRotation((float)val_node[6].to_double());
+            SetLP(p, 4000);
         }
     }
     
@@ -341,7 +325,7 @@ namespace ygopro
         if(pos_info.location & 0x80) {
             if(((pos_info.location & 0x7f) != 0x4) || (pos_info.sequence > 4))
                 return nullptr;
-            auto attach_card = m_zone[pos_info.controler][pos_info.sequence];
+            auto attach_card = g_player[pos_info.controler].m_zone[pos_info.sequence];
             if(attach_card) {
                 ptr = duel_scene->CreateCard();
                 ptr->pos_info = pos_info;
@@ -352,56 +336,56 @@ namespace ygopro
             if(pos_info.location == 0x4) {
                 if(pos_info.sequence > 4)
                     return nullptr;
-                if(m_zone[pos_info.controler][pos_info.sequence] != nullptr)
+                if(g_player[pos_info.controler].m_zone[pos_info.sequence] != nullptr)
                     return nullptr;
             }
             if(pos_info.location == 0x8) {
                 if(pos_info.sequence > 7)
                     return nullptr;
-                if(s_zone[pos_info.controler][pos_info.sequence] != nullptr)
+                if(g_player[pos_info.controler].s_zone[pos_info.sequence] != nullptr)
                     return nullptr;
             }
             ptr = duel_scene->CreateCard();
             ptr->pos_info = pos_info;
             switch(pos_info.location & 0x7f) {
                 case 0x1: {
-                    ptr->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
-                    deck[pos_info.controler].push_back(ptr);
-                    fixed_numbers[pos_info.controler][0]->SetValue((int32_t)deck[pos_info.controler].size());
+                    ptr->pos_info.sequence = (int32_t)g_player[pos_info.controler].deck.size();
+                    g_player[pos_info.controler].deck.push_back(ptr);
+                    g_player[pos_info.controler].fixed_numbers[0]->SetValue((int32_t)g_player[pos_info.controler].deck.size());
                     break;
                 }
                 case 0x2: {
-                    ptr->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
-                    hand[pos_info.controler].push_back(ptr);
+                    ptr->pos_info.sequence = (int32_t)g_player[pos_info.controler].hand.size();
+                    g_player[pos_info.controler].hand.push_back(ptr);
                     break;
                 }
                 case 0x4: {
-                    m_zone[pos_info.controler][pos_info.sequence] = ptr;
+                    g_player[pos_info.controler].m_zone[pos_info.sequence] = ptr;
                     break;
                 }
                 case 0x8: {
-                    s_zone[pos_info.controler][pos_info.sequence] = ptr;
+                    g_player[pos_info.controler].s_zone[pos_info.sequence] = ptr;
                     break;
                 }
                 case 0x10: {
-                    ptr->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
-                    grave[pos_info.controler].push_back(ptr);
-                    fixed_numbers[pos_info.controler][1]->SetValue((int32_t)grave[pos_info.controler].size());
+                    ptr->pos_info.sequence = (int32_t)g_player[pos_info.controler].grave.size();
+                    g_player[pos_info.controler].grave.push_back(ptr);
+                    g_player[pos_info.controler].fixed_numbers[1]->SetValue((int32_t)g_player[pos_info.controler].grave.size());
                     break;
                 }
                 case 0x20: {
-                    ptr->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
-                    banished[pos_info.controler].push_back(ptr);
-                    fixed_numbers[pos_info.controler][2]->SetValue((int32_t)banished[pos_info.controler].size());
+                    ptr->pos_info.sequence = (int32_t)g_player[pos_info.controler].banished.size();
+                    g_player[pos_info.controler].banished.push_back(ptr);
+                    g_player[pos_info.controler].fixed_numbers[2]->SetValue((int32_t)g_player[pos_info.controler].banished.size());
                     break;
                 }
                 case 0x40: {
-                    ptr->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
-                    extra[pos_info.controler].push_back(ptr);
+                    ptr->pos_info.sequence = (int32_t)g_player[pos_info.controler].extra.size();
+                    g_player[pos_info.controler].extra.push_back(ptr);
                     if(pos_info.position & 0x5)
-                        extra_faceup_count[pos_info.controler]++;
-                    std::string str = To<std::string>("%d(%d)", extra[pos_info.controler].size(), extra_faceup_count[pos_info.controler]);
-                    fixed_numbers[pos_info.controler][3]->SetValueStr(str.c_str());
+                        g_player[pos_info.controler].extra_faceup_count++;
+                    std::string str = To<std::string>("%d(%d)", g_player[pos_info.controler].extra.size(), g_player[pos_info.controler].extra_faceup_count);
+                    g_player[pos_info.controler].fixed_numbers[3]->SetValueStr(str.c_str());
                     break;
                 }
             }
@@ -417,11 +401,11 @@ namespace ygopro
     std::shared_ptr<FieldCard> DuelSceneHandler::GetCard(CardPosInfo pos_info) {
         std::vector<std::shared_ptr<FieldCard>>* plist = nullptr;
         switch(pos_info.location & 0x7f) {
-            case 0x1: plist = &deck[pos_info.controler]; break;
-            case 0x2: plist = &hand[pos_info.controler]; break;
+            case 0x1: plist = &g_player[pos_info.controler].deck; break;
+            case 0x2: plist = &g_player[pos_info.controler].hand; break;
             case 0x4:
                 if(pos_info.location & 0x80) {
-                    auto pcard = m_zone[pos_info.controler][pos_info.sequence];
+                    auto pcard = g_player[pos_info.controler].m_zone[pos_info.sequence];
                     if(pcard) {
                         plist = &pcard->attached_cards;
                         pos_info.sequence = pos_info.subsequence;
@@ -429,12 +413,12 @@ namespace ygopro
                     } else
                         return nullptr;
                 } else
-                    return m_zone[pos_info.controler][pos_info.sequence];
+                    return g_player[pos_info.controler].m_zone[pos_info.sequence];
             case 0x8:
-                return s_zone[pos_info.controler][pos_info.sequence];
-            case 0x10: plist = &grave[pos_info.controler]; break;
-            case 0x20: plist = &banished[pos_info.controler]; break;
-            case 0x40: plist = &extra[pos_info.controler]; break;
+                return g_player[pos_info.controler].s_zone[pos_info.sequence];
+            case 0x10: plist = &g_player[pos_info.controler].grave; break;
+            case 0x20: plist = &g_player[pos_info.controler].banished; break;
+            case 0x40: plist = &g_player[pos_info.controler].extra; break;
         }
         if(plist) {
             if(pos_info.sequence >= 0)
@@ -449,77 +433,77 @@ namespace ygopro
         std::shared_ptr<FieldCard> ret;
         switch(pos_info.location & 0x7f) {
             case 0x1: {
-                ret = deck[pos_info.controler][pos_info.sequence];
-                deck[pos_info.controler].erase(deck[pos_info.controler].begin() + pos_info.sequence);
-                for(size_t i = pos_info.sequence; i < deck[pos_info.controler].size(); ++i) {
-                    deck[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
-                    deck[pos_info.controler][i]->UpdatePosition(0);
+                ret = g_player[pos_info.controler].deck[pos_info.sequence];
+                g_player[pos_info.controler].deck.erase(g_player[pos_info.controler].deck.begin() + pos_info.sequence);
+                for(size_t i = pos_info.sequence; i < g_player[pos_info.controler].deck.size(); ++i) {
+                    g_player[pos_info.controler].deck[i]->pos_info.sequence = (int8_t)i;
+                    g_player[pos_info.controler].deck[i]->UpdatePosition(0);
                 }
-                if(!deck[pos_info.controler].empty())
-                    fixed_numbers[pos_info.controler][0]->SetValue((int32_t)deck[pos_info.controler].size());
+                if(!g_player[pos_info.controler].deck.empty())
+                    g_player[pos_info.controler].fixed_numbers[0]->SetValue((int32_t)g_player[pos_info.controler].deck.size());
                 break;
             }
             case 0x2: {
-                ret = hand[pos_info.controler][pos_info.sequence];
-                hand[pos_info.controler].erase(hand[pos_info.controler].begin() + pos_info.sequence);
+                ret = g_player[pos_info.controler].hand[pos_info.sequence];
+                g_player[pos_info.controler].hand.erase(g_player[pos_info.controler].hand.begin() + pos_info.sequence);
                 int8_t index = 0;
-                for(auto& iter : hand[pos_info.controler])
+                for(auto& iter : g_player[pos_info.controler].hand)
                     iter->pos_info.sequence = index++;
                 break;
             }
             case 0x4: {
                 if(pos_info.location & 0x80) {
-                    auto pcard = m_zone[pos_info.controler][pos_info.sequence];
+                    auto pcard = g_player[pos_info.controler].m_zone[pos_info.sequence];
                     ret = pcard->attached_cards[pos_info.subsequence];
                     ret->Detach();
                     for(auto& iter : pcard->attached_cards)
                         iter->UpdatePosition(0);
                     pcard->UpdatePosition(0);
                 } else {
-                    ret = m_zone[pos_info.controler][pos_info.sequence];
-                    m_zone[pos_info.controler][pos_info.sequence] = nullptr;
+                    ret = g_player[pos_info.controler].m_zone[pos_info.sequence];
+                    g_player[pos_info.controler].m_zone[pos_info.sequence] = nullptr;
                 }
                 break;
             }
             case 0x8: {
-                ret = s_zone[pos_info.controler][pos_info.sequence];
-                s_zone[pos_info.controler][pos_info.sequence] = nullptr;
+                ret = g_player[pos_info.controler].s_zone[pos_info.sequence];
+                g_player[pos_info.controler].s_zone[pos_info.sequence] = nullptr;
                 break;
             }
             case 0x10: {
-                ret = grave[pos_info.controler][pos_info.sequence];
-                grave[pos_info.controler].erase(grave[pos_info.controler].begin() + pos_info.sequence);
-                for(size_t i = pos_info.sequence; i < grave[pos_info.controler].size(); ++i) {
-                    grave[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
-                    grave[pos_info.controler][i]->UpdatePosition(0);
+                ret = g_player[pos_info.controler].grave[pos_info.sequence];
+                g_player[pos_info.controler].grave.erase(g_player[pos_info.controler].grave.begin() + pos_info.sequence);
+                for(size_t i = pos_info.sequence; i < g_player[pos_info.controler].grave.size(); ++i) {
+                    g_player[pos_info.controler].grave[i]->pos_info.sequence = (int8_t)i;
+                    g_player[pos_info.controler].grave[i]->UpdatePosition(0);
                 }
-                if(!grave[pos_info.controler].empty())
-                    fixed_numbers[pos_info.controler][1]->SetValue((int32_t)grave[pos_info.controler].size());
+                if(!g_player[pos_info.controler].grave.empty())
+                    g_player[pos_info.controler].fixed_numbers[1]->SetValue((int32_t)g_player[pos_info.controler].grave.size());
                 break;
             }
             case 0x20: {
-                ret = banished[pos_info.controler][pos_info.sequence];
-                banished[pos_info.controler].erase(banished[pos_info.controler].begin() + pos_info.sequence);
-                for(size_t i = pos_info.sequence; i < banished[pos_info.controler].size(); ++i) {
-                    banished[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
-                    banished[pos_info.controler][i]->UpdatePosition(0);
+                ret = g_player[pos_info.controler].banished[pos_info.sequence];
+                g_player[pos_info.controler].banished.erase(g_player[pos_info.controler].banished.begin() + pos_info.sequence);
+                for(size_t i = pos_info.sequence; i < g_player[pos_info.controler].banished.size(); ++i) {
+                    g_player[pos_info.controler].banished[i]->pos_info.sequence = (int8_t)i;
+                    g_player[pos_info.controler].banished[i]->UpdatePosition(0);
                 }
-                if(!banished[pos_info.controler].empty())
-                    fixed_numbers[pos_info.controler][2]->SetValue((int32_t)banished[pos_info.controler].size());
+                if(!g_player[pos_info.controler].banished.empty())
+                    g_player[pos_info.controler].fixed_numbers[2]->SetValue((int32_t)g_player[pos_info.controler].banished.size());
                 break;
             }
             case 0x40: {
-                ret = extra[pos_info.controler][pos_info.sequence];
-                extra[pos_info.controler].erase(extra[pos_info.controler].begin() + pos_info.sequence);
-                for(size_t i = pos_info.sequence; i < extra[pos_info.controler].size(); ++i) {
-                    extra[pos_info.controler][i]->pos_info.sequence = (int8_t)i;
-                    extra[pos_info.controler][i]->UpdatePosition(0);
+                ret = g_player[pos_info.controler].extra[pos_info.sequence];
+                g_player[pos_info.controler].extra.erase(g_player[pos_info.controler].extra.begin() + pos_info.sequence);
+                for(size_t i = pos_info.sequence; i < g_player[pos_info.controler].extra.size(); ++i) {
+                    g_player[pos_info.controler].extra[i]->pos_info.sequence = (int8_t)i;
+                    g_player[pos_info.controler].extra[i]->UpdatePosition(0);
                 }
                 if(ret->pos_info.position & 0x5)
-                    extra_faceup_count[pos_info.controler]--;
-                if(!extra[pos_info.controler].empty()) {
-                    std::string str = To<std::string>("%d(%d)", extra[pos_info.controler].size(), extra_faceup_count[pos_info.controler]);
-                    fixed_numbers[pos_info.controler][3]->SetValueStr(str.c_str());
+                    g_player[pos_info.controler].extra_faceup_count--;
+                if(!g_player[pos_info.controler].extra.empty()) {
+                    std::string str = To<std::string>("%d(%d)", g_player[pos_info.controler].extra.size(), g_player[pos_info.controler].extra_faceup_count);
+                    g_player[pos_info.controler].fixed_numbers[3]->SetValueStr(str.c_str());
                 }
                 break;
             }
@@ -548,47 +532,47 @@ namespace ygopro
             }
             switch(pos_info.location & 0x7f) {
                 case 0x1:
-                    pcard->pos_info.sequence = (int32_t)deck[pos_info.controler].size();
-                    deck[pos_info.controler].push_back(pcard);
-                    fixed_numbers[pos_info.controler][0]->SetValue((int32_t)deck[pos_info.controler].size());
+                    pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].deck.size();
+                    g_player[pos_info.controler].deck.push_back(pcard);
+                    g_player[pos_info.controler].fixed_numbers[0]->SetValue((int32_t)g_player[pos_info.controler].deck.size());
                     break;
                 case 0x2:
-                    pcard->pos_info.sequence = (int32_t)hand[pos_info.controler].size();
-                    hand[pos_info.controler].push_back(pcard);
+                    pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].hand.size();
+                    g_player[pos_info.controler].hand.push_back(pcard);
                     break;
                 case 0x4:
-                    if(m_zone[pos_info.controler][pos_info.sequence] == nullptr) {
+                    if(g_player[pos_info.controler].m_zone[pos_info.sequence] == nullptr) {
                         RemoveCard(pcard->pos_info);
                         pcard->pos_info = pos_info;
-                        m_zone[pos_info.controler][pos_info.sequence] = pcard;
+                        g_player[pos_info.controler].m_zone[pos_info.sequence] = pcard;
                         duel_scene->RedrawAllCards();
                     }
                     break;
                 case 0x8:
-                    if(s_zone[pos_info.controler][pos_info.sequence] == nullptr) {
+                    if(g_player[pos_info.controler].s_zone[pos_info.sequence] == nullptr) {
                         RemoveCard(pcard->pos_info);
                         pcard->pos_info = pos_info;
-                        s_zone[pos_info.controler][pos_info.sequence] = pcard;
+                        g_player[pos_info.controler].s_zone[pos_info.sequence] = pcard;
                         duel_scene->RedrawAllCards();
                     }
                     break;
                 case 0x10:
-                    pcard->pos_info.sequence = (int32_t)grave[pos_info.controler].size();
-                    grave[pos_info.controler].push_back(pcard);
-                    fixed_numbers[pos_info.controler][1]->SetValue((int32_t)grave[pos_info.controler].size());
+                    pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].grave.size();
+                    g_player[pos_info.controler].grave.push_back(pcard);
+                    g_player[pos_info.controler].fixed_numbers[1]->SetValue((int32_t)g_player[pos_info.controler].grave.size());
                     break;
                 case 0x20:
-                    pcard->pos_info.sequence = (int32_t)banished[pos_info.controler].size();
-                    banished[pos_info.controler].push_back(pcard);
-                    fixed_numbers[pos_info.controler][2]->SetValue((int32_t)banished[pos_info.controler].size());
+                    pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].banished.size();
+                    g_player[pos_info.controler].banished.push_back(pcard);
+                    g_player[pos_info.controler].fixed_numbers[2]->SetValue((int32_t)g_player[pos_info.controler].banished.size());
                     break;
                 case 0x40: {
-                    pcard->pos_info.sequence = (int32_t)extra[pos_info.controler].size();
-                    extra[pos_info.controler].push_back(pcard);
+                    pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].extra.size();
+                    g_player[pos_info.controler].extra.push_back(pcard);
                     if(pos_info.position & 0x5)
-                        extra_faceup_count[pos_info.controler]++;
-                    std::string str = To<std::string>("%d(%d)", extra[pos_info.controler].size(), extra_faceup_count[pos_info.controler]);
-                    fixed_numbers[pos_info.controler][3]->SetValueStr(str.c_str());
+                        g_player[pos_info.controler].extra_faceup_count++;
+                    std::string str = To<std::string>("%d(%d)", g_player[pos_info.controler].extra.size(), g_player[pos_info.controler].extra_faceup_count);
+                    g_player[pos_info.controler].fixed_numbers[3]->SetValueStr(str.c_str());
                     break;
                 }
             }
@@ -601,21 +585,43 @@ namespace ygopro
     
     void DuelSceneHandler::ClearField() {
         for(int32_t i = 0; i < 2; ++i) {
-            deck[i].clear();
-            hand[i].clear();
-            m_zone[i].clear();
-            s_zone[i].clear();
-            grave[i].clear();
-            banished[i].clear();
-            extra[i].clear();
-            m_zone[i].resize(5);
-            s_zone[i].resize(8);
+            g_player[i].deck.clear();
+            g_player[i].hand.clear();
+            g_player[i].m_zone.clear();
+            g_player[i].s_zone.clear();
+            g_player[i].grave.clear();
+            g_player[i].banished.clear();
+            g_player[i].extra.clear();
+            g_player[i].m_zone.resize(5);
+            g_player[i].s_zone.resize(8);
         }
         duel_scene->ClearAllCards();
     }
     
-    void DuelSceneHandler::InitHp(int32_t local_pl, int32_t hp) {
-        
+    void DuelSceneHandler::SetLP(int32_t local_pl, int32_t lp) {
+        if(local_pl > 1)
+            return;
+        float rate = lp / 8000.0f;
+        if(rate < 0.0f)
+            rate = 0.0f;
+        if(rate > 1.0f)
+            rate = 1.0f;
+        std::array<v2i, 4> rel;
+        std::array<v2f, 4> prop;
+        rel[0] = g_player[local_pl].lp_verts_rel[0];
+        rel[1] = base::interpolate(g_player[local_pl].lp_verts_rel[0], g_player[local_pl].lp_verts_rel[1], rate);
+        rel[2] = g_player[local_pl].lp_verts_rel[2];
+        rel[3] = base::interpolate(g_player[local_pl].lp_verts_rel[2], g_player[local_pl].lp_verts_rel[3], rate);
+        prop[0] = g_player[local_pl].lp_verts_prop[0];
+        prop[1] = base::interpolate(g_player[local_pl].lp_verts_prop[0], g_player[local_pl].lp_verts_prop[1], rate);
+        prop[2] = g_player[local_pl].lp_verts_prop[2];
+        prop[3] = base::interpolate(g_player[local_pl].lp_verts_prop[2], g_player[local_pl].lp_verts_prop[3], rate);
+        texf4 tex = ImageMgr::Get().GetTexture("lp bar");
+        tex.vert[1] = base::interpolate(tex.vert[0], tex.vert[1], rate);
+        tex.vert[3] = base::interpolate(tex.vert[2], tex.vert[3], rate);
+        g_player[local_pl].lpbar->BuildSprite(rel.data(), tex, prop.data());
+        g_player[local_pl].fixed_numbers[(int32_t)FloatingNumberType::LP]->SetValue(lp);
+        g_player[local_pl].lp = lp;
     }
     
     void DuelSceneHandler::AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq) {

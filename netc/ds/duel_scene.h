@@ -106,6 +106,7 @@ namespace ygopro
         std::vector<std::shared_ptr<FieldCard>> attached_cards;
         CardData* data = nullptr;
         FieldCard* attaching_card = nullptr;
+        std::map<uint16_t, uint32_t> counter_map;
     };
     
     class FloatingObject : public DuelObject<vt2> {
@@ -113,6 +114,7 @@ namespace ygopro
         FloatingObject(uint32_t rid) : ref_id(rid) {}
         inline uint32_t GetRefId() { return ref_id; }
         inline void SetCenter(v2i pos, v2f prop = {0.0f, 0.0f}) { center_pos = pos; center_prop = prop; SetUpdate(); }
+        inline std::pair<v2i, v2f> GetCenter() { return std::make_pair(center_pos, center_prop); }
         inline void SetRotation(float rot) {
             rot_matrix[0] = std::cosf(rot);
             rot_matrix[1] = std::sinf(rot);
@@ -145,8 +147,9 @@ namespace ygopro
         
         void SetValue(int32_t val);
         void SetValueStr(const std::string& val_str);
-        inline void SetCharSize(v2i sz) { char_size = sz; SetUpdate(); }
+        inline void SetCharSize(v2i sz) { char_size = sz; SetUpdate(); }        
         inline void SetSColor(uint32_t cl) { scolor = cl; SetUpdate(); }
+        inline v2i GetCharSize() { return char_size; }
         
     protected:
         std::string val_string;

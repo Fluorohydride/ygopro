@@ -2,6 +2,7 @@
 
 #include "ocgcore/common.h"
 
+#include "../config.h"
 #include "../sgui.h"
 #include "../gui_extra.h"
 #include "../card_data.h"
@@ -16,19 +17,47 @@ namespace ygopro
     void DuelSceneHandler::Test(int32_t param) {
         switch(param) {
             case 1: {
-//                auto dm = std::make_shared<DuelMessage>();
-//                dm->msg_type = MSG_SHUFFLE_SET_CARD;
-//                BufferWriter writer(dm->msg_buffer);
-//                writer.Write<uint8_t>(0);
-//                writer.Write<uint8_t>(3);
-//                writer.Write<uint8_t>(1);
-//                writer.Write<uint8_t>(3);
-//                writer.Write<uint8_t>(4);
-//                writer.Write<uint8_t>(4);
-//                writer.Write<uint8_t>(1);
-//                writer.Write<uint8_t>(3);
-//                messages.PushCommand(dm);
-                
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_DAMAGE;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint32_t>(1000);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 2: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_RECOVER;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint32_t>(1000);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 3: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_PAY_LPCOST;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint32_t>(1000);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 4: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_LPUPDATE;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint32_t>(7777);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 5: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_BECOME_TARGET;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x4, 1, 0).info);
+                messages.PushCommand(dm);
                 break;
             }
             case 9: {
@@ -566,14 +595,14 @@ namespace ygopro
             case MSG_CONFIRM_DECKTOP: {
                 int8_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 int32_t count = reader.Read<uint8_t>();
-                int32_t dsize = (int32_t)deck[playerid].size();
+                int32_t dsize = (int32_t)g_player[playerid].deck.size();
                 for(int32_t i = 0; i < count && i < dsize; ++i) {
                     int32_t code = reader.Read<uint32_t>();
-                    deck[playerid][dsize - 1 - i]->SetCode(code);
+                    g_player[playerid].deck[dsize - 1 - i]->SetCode(code);
                 }
                 std::vector<std::shared_ptr<Action<int64_t>>> acts;
                 for(int32_t i = 0; i < count && i < dsize; ++i) {
-                    auto ptr = deck[playerid][dsize - 1 - i];
+                    auto ptr = g_player[playerid].deck[dsize - 1 - i];
                     acts.push_back(std::make_shared<ActionCallback<int64_t>>([ptr](){
                         ptr->UpdateTo(100, ptr->GetPositionInfo(CardPosParam::Confirm));
                     }));
@@ -636,34 +665,34 @@ namespace ygopro
             case MSG_SHUFFLE_DECK: {
                 int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 uint32_t top_code = reader.Read<uint32_t>();
-                if(deck[playerid].size() < 2)
+                if(g_player[playerid].deck.size() < 2)
                     break;
                 auto cb_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
-                    for(auto& pcard : deck[playerid])
+                    for(auto& pcard : g_player[playerid].deck)
                         pcard->TranslateTo(50, pcard->GetPositionInfo(CardPosParam::Shuffle).first);
                 });
                 auto wait1 = std::make_shared<ActionWait<int64_t>>(50);
                 auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
-                    for(auto& pcard : deck[playerid])
+                    for(auto& pcard : g_player[playerid].deck)
                         pcard->TranslateTo(50, pcard->GetPositionInfo().first);
                 });
                 auto wait2 = std::make_shared<ActionWait<int64_t>>(50);
                 auto shuffle_action = std::make_shared<ActionSequence<int64_t>>(cb_action1, wait1, cb_action2, wait2);
                 auto rep_action = std::make_shared<ActionRepeat<int64_t>>(shuffle_action, 2);
-                if(deck_reversed) {
-                    deck_reversed = false;
-                    for(auto& pcard : deck[playerid]) {
+                if(g_duel.deck_reversed) {
+                    g_duel.deck_reversed = false;
+                    for(auto& pcard : g_player[playerid].deck) {
                         pcard->pos_info.position = POS_FACEDOWN;
                         pcard->RotateTo(100, pcard->GetPositionInfo().second);
                     }
                     auto wait_rev1 = std::make_shared<ActionWait<int64_t>>(150);
                     auto wait_int = std::make_shared<ActionWait<int64_t>>(100);
                     auto flip_action1 = std::make_shared<ActionCallback<int64_t>>([playerid, top_code]() {
-                        deck_reversed = true;
-                        deck[playerid].back()->SetCode(top_code & 0x7fffffff);
+                        g_duel.deck_reversed = true;
+                        g_player[playerid].deck.back()->SetCode(top_code & 0x7fffffff);
                         if(top_code & 0x80000000)
-                            deck[playerid].back()->pos_info.position = POS_FACEUP;
-                        for(auto& pcard : deck[playerid])
+                            g_player[playerid].deck.back()->pos_info.position = POS_FACEUP;
+                        for(auto& pcard : g_player[playerid].deck)
                             pcard->RotateTo(100, pcard->GetPositionInfo().second);
                     });
                     auto wait_rev2 = std::make_shared<ActionWait<int64_t>>(100);
@@ -678,7 +707,7 @@ namespace ygopro
                 /*int32_t count = */reader.Read<uint8_t>();
                 std::vector<uint32_t> code_after_shuffle;
                 bool need_flip = false;
-                for(auto& pcard : hand[playerid]) {
+                for(auto& pcard : g_player[playerid].hand) {
                     if(pcard->code == 0)
                         need_flip = true;
                     uint32_t ac = reader.Read<uint32_t>();
@@ -688,32 +717,32 @@ namespace ygopro
                 }
                 auto cb_action1 = std::make_shared<ActionCallback<int64_t>>([playerid]() {
                     v3f npos;
-                    if(hand[playerid].size() % 2)
-                        npos = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo().first;
+                    if(g_player[playerid].hand.size() % 2)
+                        npos = g_player[playerid].hand[g_player[playerid].hand.size() / 2]->GetPositionInfo().first;
                     else {
-                        auto n1 = hand[playerid][hand[playerid].size() / 2 - 1]->GetPositionInfo().first;
-                        auto n2 = hand[playerid][hand[playerid].size() / 2]->GetPositionInfo().first;
+                        auto n1 = g_player[playerid].hand[g_player[playerid].hand.size() / 2 - 1]->GetPositionInfo().first;
+                        auto n2 = g_player[playerid].hand[g_player[playerid].hand.size() / 2]->GetPositionInfo().first;
                         npos = (n1 + n2) * 0.5f;
                     }
-                    for(auto& pcard : hand[playerid])
+                    for(auto& pcard : g_player[playerid].hand)
                         pcard->TranslateTo(100, npos, CardActType::Linear);
                 });
                 auto wait1 = std::make_shared<ActionWait<int64_t>>(200);
                 auto cb_action2 = std::make_shared<ActionCallback<int64_t>>([playerid, code_after_shuffle]() {
-                    for(size_t i = 0; i < hand[playerid].size(); ++i) {
-                        hand[playerid][i]->SetCode(code_after_shuffle[i] & 0x7fffffff);
-                        hand[playerid][i]->UpdateTranslation(100, CardActType::Linear);
+                    for(size_t i = 0; i < g_player[playerid].hand.size(); ++i) {
+                        g_player[playerid].hand[i]->SetCode(code_after_shuffle[i] & 0x7fffffff);
+                        g_player[playerid].hand[i]->UpdateTranslation(100, CardActType::Linear);
                     }
                 });
                 auto wait2 = std::make_shared<ActionWait<int64_t>>(100);
                 if(need_flip) {
-                    for(auto& pcard : hand[playerid]) {
+                    for(auto& pcard : g_player[playerid].hand) {
                         auto rot = pcard->GetPositionInfo(CardPosParam::Shuffle).second;
                         pcard->RotateTo(100, rot);
                     }
                     auto wait_flip1 = std::make_shared<ActionWait<int64_t>>(150);
                     auto cb_flip= std::make_shared<ActionCallback<int64_t>>([playerid]() {
-                        for(auto& pcard : hand[playerid]) {
+                        for(auto& pcard : g_player[playerid].hand) {
                             pcard->UpdateRotation(100);
                         }
                     });
@@ -731,37 +760,37 @@ namespace ygopro
             case MSG_SWAP_GRAVE_DECK: {
                 int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 std::vector<std::shared_ptr<FieldCard>> tmp_grave;
-                for(auto& iter : grave[playerid]) {
+                for(auto& iter : g_player[playerid].grave) {
                     auto data = iter->data;
                     if(data && (data->type & 0x802040)) {
-                        iter->pos_info = {(int8_t)playerid, LOCATION_EXTRA, (int8_t)extra[playerid].size(), POS_FACEDOWN};
-                        extra[playerid].push_back(iter);
+                        iter->pos_info = {(int8_t)playerid, LOCATION_EXTRA, (int8_t)g_player[playerid].extra.size(), POS_FACEDOWN};
+                        g_player[playerid].extra.push_back(iter);
                         iter->UpdateTo(200, iter->GetPositionInfo());
                     } else
                         tmp_grave.push_back(iter);
                 }
-                grave[playerid] = std::move(tmp_grave);
-                grave[playerid].swap(deck[playerid]);
-                for(size_t i = 0; i < grave[playerid].size(); ++i) {
-                    auto& pcard = grave[playerid][i];
+                g_player[playerid].grave = std::move(tmp_grave);
+                g_player[playerid].grave.swap(g_player[playerid].deck);
+                for(size_t i = 0; i < g_player[playerid].grave.size(); ++i) {
+                    auto& pcard = g_player[playerid].grave[i];
                     pcard->pos_info = {(int8_t)playerid, LOCATION_GRAVE, (int8_t)i, POS_FACEUP};
                     pcard->UpdateTo(200, pcard->GetPositionInfo());
                 }
-                if(grave[playerid].empty())
-                    fixed_numbers[playerid][1]->SetValueStr("");
+                if(g_player[playerid].grave.empty())
+                    g_player[playerid].fixed_numbers[1]->SetValueStr("");
                 else
-                    fixed_numbers[playerid][1]->SetValue((int32_t)grave[playerid].size());
-                for(size_t i = 0; i < deck[playerid].size(); ++i) {
-                    auto& pcard = deck[playerid][i];
+                    g_player[playerid].fixed_numbers[1]->SetValue((int32_t)g_player[playerid].grave.size());
+                for(size_t i = 0; i < g_player[playerid].deck.size(); ++i) {
+                    auto& pcard = g_player[playerid].deck[i];
                     pcard->pos_info = {(int8_t)playerid, LOCATION_DECK, (int8_t)i, POS_FACEDOWN};
                     pcard->UpdateTo(200, pcard->GetPositionInfo());
                 }
-                if(deck[playerid].empty())
-                    fixed_numbers[playerid][0]->SetValueStr("");
+                if(g_player[playerid].deck.empty())
+                    g_player[playerid].fixed_numbers[0]->SetValueStr("");
                 else
-                    fixed_numbers[playerid][0]->SetValue((int32_t)deck[playerid].size());
-                std::string str = To<std::string>("%d(%d)", extra[playerid].size(), extra_faceup_count[playerid]);
-                fixed_numbers[playerid][3]->SetValueStr(str.c_str());
+                    g_player[playerid].fixed_numbers[0]->SetValue((int32_t)g_player[playerid].deck.size());
+                std::string str = To<std::string>("%d(%d)", g_player[playerid].extra.size(), g_player[playerid].extra_faceup_count);
+                g_player[playerid].fixed_numbers[3]->SetValueStr(str.c_str());
                 PushMessageActions(std::make_shared<ActionWait<int64_t>>(200));
                 break;
             }
@@ -773,9 +802,9 @@ namespace ygopro
                 std::vector<uint8_t> seq;
                 for(int32_t i = 0; i < count; ++i) {
                     preseq.push_back(reader.Read<uint8_t>());
-                    auto ptr = m_zone[playerid][preseq[i]];
+                    auto ptr = g_player[playerid].m_zone[preseq[i]];
                     mc.push_back(ptr);
-                    m_zone[playerid][preseq[i]] = nullptr;
+                    g_player[playerid].m_zone[preseq[i]] = nullptr;
                     ptr->UpdateTo(100, ptr->GetPositionInfo(CardPosParam::Shuffle));
                 }
                 auto wait1 = std::make_shared<ActionWait<int64_t>>(300);
@@ -788,7 +817,7 @@ namespace ygopro
                         if(seq[i] < 5) {
                             auto& ptr = *iter;
                             ptr->pos_info.sequence = seq[i];
-                            m_zone[playerid][seq[i]] = ptr;
+                            g_player[playerid].m_zone[seq[i]] = ptr;
                             ptr->UpdateTo(100, ptr->GetPositionInfo());
                             for(auto att_card : ptr->attached_cards) {
                                 att_card->pos_info.sequence = seq[i];
@@ -799,12 +828,12 @@ namespace ygopro
                             iter++;
                     }
                     for(int32_t i = 0; i < count; ++i) {
-                        if(m_zone[playerid][preseq[i]] == nullptr) {
+                        if(g_player[playerid].m_zone[preseq[i]] == nullptr) {
                             auto& ptr = mc.front();
                             ptr->SetCode(0);
                             ptr->pos_info.sequence = preseq[i];
                             ptr->UpdateTo(100, ptr->GetPositionInfo());
-                            m_zone[playerid][preseq[i]] = ptr;
+                            g_player[playerid].m_zone[preseq[i]] = ptr;
                             mc.pop_front();
                         }
                     }
@@ -818,20 +847,20 @@ namespace ygopro
                 int32_t top_code[2];
                 top_code[0] = reader.Read<uint32_t>();
                 top_code[1] = reader.Read<uint32_t>();
-                deck_reversed = !deck_reversed;
-                if(deck_reversed) {
+                g_duel.deck_reversed = !g_duel.deck_reversed;
+                if(g_duel.deck_reversed) {
                     for(int32_t i = 0; i < 1; ++i) {
-                        if(!deck[LocalPlayer(i)].empty()) {
-                            auto pcard = deck[LocalPlayer(i)].back();
+                        if(!g_player[LocalPlayer(i)].deck.empty()) {
+                            auto pcard = g_player[LocalPlayer(i)].deck.back();
                             pcard->SetCode(top_code[i] & 0x7fffffff);
                             if(top_code[i] & 0x80000000)
                                 pcard->pos_info.position = POS_FACEUP;
                         }
                     }
                 }
-                for(auto& pcard : deck[0])
+                for(auto& pcard : g_player[0].deck)
                     pcard->RotateTo(100, pcard->GetPositionInfo().second);
-                for(auto& pcard : deck[1])
+                for(auto& pcard : g_player[1].deck)
                     pcard->RotateTo(100, pcard->GetPositionInfo().second);
                 auto wait = std::make_shared<ActionWait<int64_t>>(100);
                 PushMessageActions(wait);
@@ -841,9 +870,9 @@ namespace ygopro
                 int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 int32_t seq = reader.Read<uint8_t>();
                 uint32_t code = reader.Read<uint32_t>();
-                if(deck[playerid].size() > seq)
+                if(g_player[playerid].deck.size() > seq)
                     break;
-                auto pcard = *(deck[playerid].rbegin() + seq);
+                auto pcard = *(g_player[playerid].deck.rbegin() + seq);
                 pcard->SetCode(code & 0x7fffffff);
                 if(code & 0x80000000) {
                     pcard->pos_info.position = POS_FACEUP;
@@ -942,7 +971,7 @@ namespace ygopro
                             return true;
                         }, std::make_shared<TGenLinear<int64_t>>(500));
                         if(pi_to.location == LOCATION_HAND) {
-                            for(auto& iter : hand[pi_to.controler])
+                            for(auto& iter : g_player[pi_to.controler].hand)
                                 iter->UpdatePosition(300, CardActType::Asymptotic);
                         }
                         PushMessageActions(action);
@@ -953,11 +982,11 @@ namespace ygopro
                 auto move_inner = [this](std::shared_ptr<FieldCard> ptr, CardPosInfo from, CardPosInfo to) {
                     MoveCard(ptr, to);
                     if(from.location == LOCATION_HAND) {
-                        for(auto& iter : hand[from.controler])
+                        for(auto& iter : g_player[from.controler].hand)
                             iter->UpdatePosition(300, CardActType::Asymptotic);
                     }
                     if(to.location == LOCATION_HAND) {
-                        for(auto& iter : hand[to.controler])
+                        for(auto& iter : g_player[to.controler].hand)
                             iter->UpdatePosition(300, CardActType::Asymptotic);
                     } else
                         ptr->UpdatePosition(300, CardActType::Asymptotic);
@@ -979,7 +1008,7 @@ namespace ygopro
                                 auto rm_card = RemoveCard(pi_from);
                                 if(rm_card) {
                                     if(pi_from.location == LOCATION_HAND) {
-                                        for(auto& iter : hand[pi_from.controler])
+                                        for(auto& iter : g_player[pi_from.controler].hand)
                                             iter->UpdatePosition(300, CardActType::Asymptotic);
                                     }
                                     duel_scene->RemoveCard(rm_card);
@@ -1001,7 +1030,7 @@ namespace ygopro
                                 RemoveCard(pi_from);
                                 ptr->Attach(attach_card);
                                 if(move_hand) {
-                                    for(auto& iter : hand[pi_from.controler])
+                                    for(auto& iter : g_player[pi_from.controler].hand)
                                         iter->UpdatePosition(300, CardActType::Asymptotic);
                                 }
                             }
@@ -1113,7 +1142,6 @@ namespace ygopro
                 break;
             }
             case MSG_SUMMONED: {
-//                myswprintf(event_string, dataManager.GetSysString(1604));
                 break;
             }
             case MSG_SPSUMMONING: {
@@ -1134,7 +1162,6 @@ namespace ygopro
                 break;
             }
             case MSG_SPSUMMONED: {
-//                myswprintf(event_string, dataManager.GetSysString(1606));
                 break;
             }
             case MSG_FLIPSUMMONING: {
@@ -1161,7 +1188,6 @@ namespace ygopro
                 break;
             }
             case MSG_FLIPSUMMONED: {
-//                myswprintf(event_string, dataManager.GetSysString(1608));
                 break;
             }
             case MSG_CHAINING: {
@@ -1290,33 +1316,17 @@ namespace ygopro
                 break;
             }
             case MSG_BECOME_TARGET: {
-//                int count = BufferIO::ReadInt8(pbuf);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    pbuf += count * 4;
-//                    return true;
-//                }
-//                ClientCard* pcard;
-//                for (int i = 0; i < count; ++i) {
-//                    int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                    int l = BufferIO::ReadInt8(pbuf);
-//                    int s = BufferIO::ReadInt8(pbuf);
-//                    /*int ss = */BufferIO::ReadInt8(pbuf);
-//                    pcard = mainGame->dField.GetCard(c, l, s);
-//                    pcard->is_highlighting = true;
-//                    if(pcard->location & LOCATION_ONFIELD) {
-//                        for (int j = 0; j < 3; ++j) {
-//                            mainGame->dField.FadeCard(pcard, 5, 5);
-//                            mainGame->WaitFrameSignal(5);
-//                            mainGame->dField.FadeCard(pcard, 255, 5);
-//                            mainGame->WaitFrameSignal(5);
-//                        }
-//                    } else
-//                        mainGame->WaitFrameSignal(30);
-//                    myswprintf(textBuffer, dataManager.GetSysString(1610), dataManager.GetName(pcard->code), dataManager.FormatLocation(l, s), s + 1);
-//                    mainGame->lstLog->addItem(textBuffer);
-//                    mainGame->logParam.push_back(pcard->code);
-//                    pcard->is_highlighting = false;
-//                }
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                auto pcard = GetCard(pi);
+                auto fadeact = std::make_shared<LerpAnimator<int64_t>>(900, [pcard](double t)->bool {
+                    uint32_t color = 0x00ffffff | ((int32_t)(255 * (1 - t) + 5 * t) << 24);
+                    pcard->SetColor(color);
+                    return true;
+                }, std::make_shared<TGenPeriodicRet<int64_t>>(300));
+                auto cbact = std::make_shared<ActionCallback<int64_t>>([pcard]() {
+                    pcard->SetColor(0xffffffff);
+                });
+                PushMessageActions(fadeact, cbact);
                 break;
             }
             case MSG_DRAW: {
@@ -1326,11 +1336,11 @@ namespace ygopro
                 for(uint32_t i = 0; i < count; ++i) {
                     uint32_t data = reader.Read<uint32_t>();
                     acts.push_back(std::make_shared<ActionCallback<int64_t>>([playerid, count, data, this]() {
-                        if(deck[playerid].empty())
+                        if(g_player[playerid].deck.empty())
                             return;
-                        auto ptr = deck[playerid].back();
+                        auto ptr = g_player[playerid].deck.back();
                         MoveCard(ptr, CardPosInfo(playerid, LOCATION_HAND, 0, 0));
-                        for(auto& iter : hand[playerid])
+                        for(auto& iter : g_player[playerid].hand)
                             iter->UpdatePosition(500);
                     }));
                     acts.push_back(std::make_shared<ActionWait<int64>>(300));
@@ -1338,62 +1348,77 @@ namespace ygopro
                 PushMessageActions(acts);
                 break;
             }
-            case MSG_DAMAGE: {
-//                int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int val = BufferIO::ReadInt32(pbuf);
-//                int final = mainGame->dInfo.lp[player] - val;
-//                if (final < 0)
-//                    final = 0;
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->dInfo.lp[player] = final;
-//                    myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                    return true;
-//                }
-//                mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
-//                if (player == 0)
-//                    myswprintf(event_string, dataManager.GetSysString(1613), val);
-//                else
-//                    myswprintf(event_string, dataManager.GetSysString(1614), val);
-//                mainGame->lpccolor = 0xffff0000;
-//                mainGame->lpplayer = player;
-//                myswprintf(textBuffer, L"-%d", val);
-//                mainGame->lpcstring = textBuffer;
-//                mainGame->WaitFrameSignal(30);
-//                mainGame->lpframe = 10;
-//                mainGame->WaitFrameSignal(11);
-//                mainGame->lpcstring = 0;
-//                mainGame->dInfo.lp[player] = final;
-//                mainGame->gMutex.Lock();
-//                myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                mainGame->gMutex.Unlock();
+            case MSG_DAMAGE:
+            case MSG_PAY_LPCOST: {
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                int32_t val = reader.Read<int32_t>();
+                int32_t beginlp = g_player[playerid].lp;
+                int32_t endlp = (beginlp > val) ? (beginlp - val) : 0;
+                auto changesp = duel_scene->AddFloatingNumber();
+                jaweson::JsonNode<>& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
+                v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
+                v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
+                v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
+                auto move_inf = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCenter();
+                auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCharSize();
+                changesp->SetCenter(pos, prop);
+                changesp->SetCharSize(csize);
+                changesp->SetRotation((float)lp_node[6].to_double());
+                changesp->SetValue(-val);
+                changesp->SetColor((msg_type == MSG_DAMAGE) ? 0xff0000ff : 0xffff0000);
+                changesp->SetSColor(0xff000000);
+                auto waitact = std::make_shared<ActionWait<int64_t>>(300);
+                auto moveact = std::make_shared<LerpAnimator<int64_t, FloatingNumber>>(200, changesp, [=](FloatingNumber* obj, double t)->bool {
+                    v2i cpos = base::interpolate(pos, move_inf.first, float(t));
+                    v2f cprop = base::interpolate(prop, move_inf.second, float(t));
+                    obj->SetCenter(cpos, cprop);
+                    obj->SetCharSize(base::interpolate(csize, char_sz, float(t)));
+                    uint32_t ahpha = ((uint32_t)(255 * (1 - t))) << 24;
+                    obj->SetColor(((msg_type == MSG_DAMAGE) ? 0x000000ff : 0x00ff0000) | ahpha);
+                    obj->SetSColor(0x00000000 | ahpha);
+                    SetLP(playerid, (int32_t)(beginlp * (1 - t) + endlp * t));
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(200));
+                auto cbact = std::make_shared<ActionCallback<int64_t>>([=]() {
+                    SetLP(playerid, endlp);
+                });
+                PushMessageActions(waitact, moveact, cbact);
                 break;
             }
             case MSG_RECOVER: {
-//                int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int val = BufferIO::ReadInt32(pbuf);
-//                int final = mainGame->dInfo.lp[player] + val;
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->dInfo.lp[player] = final;
-//                    myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                    return true;
-//                }
-//                mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
-//                if (player == 0)
-//                    myswprintf(event_string, dataManager.GetSysString(1615), val);
-//                else
-//                    myswprintf(event_string, dataManager.GetSysString(1616), val);
-//                mainGame->lpccolor = 0xff00ff00;
-//                mainGame->lpplayer = player;
-//                myswprintf(textBuffer, L"+%d", val);
-//                mainGame->lpcstring = textBuffer;
-//                mainGame->WaitFrameSignal(30);
-//                mainGame->lpframe = 10;
-//                mainGame->WaitFrameSignal(11);
-//                mainGame->lpcstring = 0;
-//                mainGame->dInfo.lp[player] = final;
-//                mainGame->gMutex.Lock();
-//                myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                mainGame->gMutex.Unlock();
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                int32_t val = reader.Read<int32_t>();
+                int32_t beginlp = g_player[playerid].lp;
+                int32_t endlp = beginlp + val;
+                auto changesp = duel_scene->AddFloatingNumber();
+                jaweson::JsonNode<>& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
+                v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
+                v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
+                v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
+                auto move_inf = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCenter();
+                auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCharSize();
+                changesp->SetCenter(pos, prop);
+                changesp->SetCharSize(csize);
+                changesp->SetRotation((float)lp_node[6].to_double());
+                changesp->SetValueStr(To<std::string>("+%d", val).c_str());
+                changesp->SetColor(0xff00ff00);
+                changesp->SetSColor(0xff000000);
+                auto waitact = std::make_shared<ActionWait<int64_t>>(300);
+                auto moveact = std::make_shared<LerpAnimator<int64_t, FloatingNumber>>(200, changesp, [=](FloatingNumber* obj, double t)->bool {
+                    v2i cpos = base::interpolate(pos, move_inf.first, float(t));
+                    v2f cprop = base::interpolate(prop, move_inf.second, float(t));
+                    obj->SetCenter(cpos, cprop);
+                    obj->SetCharSize(base::interpolate(csize, char_sz, float(t)));
+                    uint32_t ahpha = ((uint32_t)(255 * (1 - t))) << 24;
+                    obj->SetColor(0x0000ff00 | ahpha);
+                    obj->SetSColor(0x00000000 | ahpha);
+                    SetLP(playerid, (int32_t)(beginlp * (1 - t) + endlp * t));
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(200));
+                auto cbact = std::make_shared<ActionCallback<int64_t>>([=]() {
+                    SetLP(playerid, endlp);
+                });
+                PushMessageActions(waitact, moveact, cbact);
                 break;
             }
             case MSG_EQUIP: {
@@ -1423,21 +1448,17 @@ namespace ygopro
                 break;
             }
             case MSG_LPUPDATE: {
-//                int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int val = BufferIO::ReadInt32(pbuf);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->dInfo.lp[player] = val;
-//                    myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                    return true;
-//                }
-//                mainGame->lpd = (mainGame->dInfo.lp[player] - val) / 10;
-//                mainGame->lpplayer = player;
-//                mainGame->lpframe = 10;
-//                mainGame->WaitFrameSignal(11);
-//                mainGame->dInfo.lp[player] = val;
-//                mainGame->gMutex.Lock();
-//                myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                mainGame->gMutex.Unlock();
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                int32_t beginlp = g_player[playerid].lp;
+                int32_t endlp = reader.Read<int32_t>();
+                auto setact = std::make_shared<LerpAnimator<int64_t>>(200, [=](double t)->bool {
+                    SetLP(playerid, (int32_t)(beginlp * (1 - t) + endlp * t));
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(200));
+                auto cbact = std::make_shared<ActionCallback<int64_t>>([=]() {
+                    SetLP(playerid, endlp);
+                });
+                PushMessageActions(setact, cbact);
                 break;
             }
             case MSG_UNEQUIP: {
@@ -1511,32 +1532,6 @@ namespace ygopro
 //                        pc1->is_showtarget = false;
 //                    mainGame->gMutex.Unlock();
 //                }
-                break;
-            }
-            case MSG_PAY_LPCOST: {
-//                int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int cost = BufferIO::ReadInt32(pbuf);
-//                int final = mainGame->dInfo.lp[player] - cost;
-//                if (final < 0)
-//                    final = 0;
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->dInfo.lp[player] = final;
-//                    myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                    return true;
-//                }
-//                mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
-//                mainGame->lpccolor = 0xff0000ff;
-//                mainGame->lpplayer = player;
-//                myswprintf(textBuffer, L"-%d", cost);
-//                mainGame->lpcstring = textBuffer;
-//                mainGame->WaitFrameSignal(30);
-//                mainGame->lpframe = 10;
-//                mainGame->WaitFrameSignal(11);
-//                mainGame->lpcstring = 0;
-//                mainGame->dInfo.lp[player] = final;
-//                mainGame->gMutex.Lock();
-//                myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
-//                mainGame->gMutex.Unlock();
                 break;
             }
             case MSG_ADD_COUNTER: {
@@ -1861,21 +1856,21 @@ namespace ygopro
 //                size_t hcount = (size_t)BufferIO::ReadInt8(pbuf);
 //                int topcode = BufferIO::ReadInt32(pbuf);
 //                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+//                    for (auto cit = mainGame->dField.g_player[player].deck.begin(); cit != mainGame->dField.g_player[player].deck.end(); ++cit) {
 //                        if(player == 0) (*cit)->dPos.Y = 0.4f;
 //                        else (*cit)->dPos.Y = -0.6f;
 //                        (*cit)->dRot = irr::core::vector3df(0, 0, 0);
 //                        (*cit)->is_moving = true;
 //                        (*cit)->aniFrame = 5;
 //                    }
-//                    for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+//                    for (auto cit = mainGame->dField.g_player[player].hand.begin(); cit != mainGame->dField.g_player[player].hand.end(); ++cit) {
 //                        if(player == 0) (*cit)->dPos.Y = 0.4f;
 //                        else (*cit)->dPos.Y = -0.6f;
 //                        (*cit)->dRot = irr::core::vector3df(0, 0, 0);
 //                        (*cit)->is_moving = true;
 //                        (*cit)->aniFrame = 5;
 //                    }
-//                    for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
+//                    for (auto cit = mainGame->dField.g_player[player].extra.begin(); cit != mainGame->dField.g_player[player].extra.end(); ++cit) {
 //                        if(player == 0) (*cit)->dPos.Y = 0.4f;
 //                        else (*cit)->dPos.Y = -0.6f;
 //                        (*cit)->dRot = irr::core::vector3df(0, 0, 0);
@@ -1887,49 +1882,49 @@ namespace ygopro
 //                //
 //                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
 //                    mainGame->gMutex.Lock();
-//                if(mainGame->dField.deck[player].size() > mcount) {
-//                    while(mainGame->dField.deck[player].size() > mcount) {
-//                        ClientCard* ccard = *mainGame->dField.deck[player].rbegin();
-//                        mainGame->dField.deck[player].pop_back();
+//                if(mainGame->dField.g_player[player].deck.size() > mcount) {
+//                    while(mainGame->dField.g_player[player].deck.size() > mcount) {
+//                        ClientCard* ccard = *mainGame->dField.g_player[player].deck.rbegin();
+//                        mainGame->dField.g_player[player].deck.pop_back();
 //                        delete ccard;
 //                    }
 //                } else {
-//                    while(mainGame->dField.deck[player].size() < mcount) {
+//                    while(mainGame->dField.g_player[player].deck.size() < mcount) {
 //                        ClientCard* ccard = new ClientCard();
 //                        ccard->controler = player;
 //                        ccard->location = LOCATION_DECK;
-//                        ccard->sequence = mainGame->dField.deck[player].size();
-//                        mainGame->dField.deck[player].push_back(ccard);
+//                        ccard->sequence = mainGame->dField.g_player[player].deck.size();
+//                        mainGame->dField.g_player[player].deck.push_back(ccard);
 //                    }
 //                }
-//                if(mainGame->dField.hand[player].size() > hcount) {
-//                    while(mainGame->dField.hand[player].size() > hcount) {
-//                        ClientCard* ccard = *mainGame->dField.hand[player].rbegin();
-//                        mainGame->dField.hand[player].pop_back();
+//                if(mainGame->dField.g_player[player].hand.size() > hcount) {
+//                    while(mainGame->dField.g_player[player].hand.size() > hcount) {
+//                        ClientCard* ccard = *mainGame->dField.g_player[player].hand.rbegin();
+//                        mainGame->dField.g_player[player].hand.pop_back();
 //                        delete ccard;
 //                    }
 //                } else {
-//                    while(mainGame->dField.hand[player].size() < hcount) {
+//                    while(mainGame->dField.g_player[player].hand.size() < hcount) {
 //                        ClientCard* ccard = new ClientCard();
 //                        ccard->controler = player;
 //                        ccard->location = LOCATION_HAND;
-//                        ccard->sequence = mainGame->dField.hand[player].size();
-//                        mainGame->dField.hand[player].push_back(ccard);
+//                        ccard->sequence = mainGame->dField.g_player[player].hand.size();
+//                        mainGame->dField.g_player[player].hand.push_back(ccard);
 //                    }
 //                }
-//                if(mainGame->dField.extra[player].size() > ecount) {
-//                    while(mainGame->dField.extra[player].size() > ecount) {
-//                        ClientCard* ccard = *mainGame->dField.extra[player].rbegin();
-//                        mainGame->dField.extra[player].pop_back();
+//                if(mainGame->dField.g_player[player].extra.size() > ecount) {
+//                    while(mainGame->dField.g_player[player].extra.size() > ecount) {
+//                        ClientCard* ccard = *mainGame->dField.g_player[player].extra.rbegin();
+//                        mainGame->dField.g_player[player].extra.pop_back();
 //                        delete ccard;
 //                    }
 //                } else {
-//                    while(mainGame->dField.extra[player].size() < ecount) {
+//                    while(mainGame->dField.g_player[player].extra.size() < ecount) {
 //                        ClientCard* ccard = new ClientCard();
 //                        ccard->controler = player;
 //                        ccard->location = LOCATION_EXTRA;
-//                        ccard->sequence = mainGame->dField.extra[player].size();
-//                        mainGame->dField.extra[player].push_back(ccard);
+//                        ccard->sequence = mainGame->dField.g_player[player].extra.size();
+//                        mainGame->dField.g_player[player].extra.push_back(ccard);
 //                    }
 //                }
 //                mainGame->dField.extra_p_count[player] = pcount;
@@ -1937,16 +1932,16 @@ namespace ygopro
 //                    mainGame->gMutex.Unlock();
 //                //
 //                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+//                    for (auto cit = mainGame->dField.g_player[player].deck.begin(); cit != mainGame->dField.g_player[player].deck.end(); ++cit) {
 //                        ClientCard* pcard = *cit;
 //                        mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 //                        if(player == 0) pcard->curPos.Y += 2.0f;
 //                        else pcard->curPos.Y -= 3.0f;
 //                        mainGame->dField.MoveCard(*cit, 5);
 //                    }
-//                    if(mainGame->dField.deck[player].size())
-//                        (*mainGame->dField.deck[player].rbegin())->code = topcode;
-//                    for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+//                    if(mainGame->dField.g_player[player].deck.size())
+//                        (*mainGame->dField.g_player[player].deck.rbegin())->code = topcode;
+//                    for (auto cit = mainGame->dField.g_player[player].hand.begin(); cit != mainGame->dField.g_player[player].hand.end(); ++cit) {
 //                        ClientCard* pcard = *cit;
 //                        pcard->code = BufferIO::ReadInt32(pbuf);
 //                        mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
@@ -1954,7 +1949,7 @@ namespace ygopro
 //                        else pcard->curPos.Y -= 3.0f;
 //                        mainGame->dField.MoveCard(*cit, 5);
 //                    }
-//                    for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
+//                    for (auto cit = mainGame->dField.g_player[player].extra.begin(); cit != mainGame->dField.g_player[player].extra.end(); ++cit) {
 //                        ClientCard* pcard = *cit;
 //                        pcard->code = BufferIO::ReadInt32(pbuf) & 0x7fffffff;
 //                        mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
@@ -1968,7 +1963,7 @@ namespace ygopro
             }
             case MSG_RELOAD_FIELD: {
                 for(int32_t p = 0; p < 2; ++p) {
-                    InitHp(p, reader.Read<int32_t>());
+                    SetLP(p, reader.Read<int32_t>());
                     for(int32_t i = 0; i < 5; ++i) {
                         uint32_t exist_card = reader.Read<uint8_t>();
                         if(exist_card) {
