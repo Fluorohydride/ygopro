@@ -186,7 +186,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	case LOCATION_EXTRA: {
 		extra[controler].push_back(pcard);
 		pcard->sequence = extra[controler].size() - 1;
-		if ((pcard->type & TYPE_PENDULUM) && (pcard->position & POS_FACEUP))
+		if (/*(pcard->type & TYPE_PENDULUM) &&*/ (pcard->position & POS_FACEUP))
 			extra_p_count[controler]++;
 		break;
 	}
