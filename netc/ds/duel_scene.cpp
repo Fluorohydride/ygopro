@@ -59,10 +59,11 @@ namespace ygopro
             origin_vert[6] = {vparam.cardrect.left + vparam.cardrect.width, vparam.cardrect.top - vparam.cardrect.height, -0.001f};
             origin_vert[7] = {vparam.cardrect.left, vparam.cardrect.top - vparam.cardrect.height, -0.001f};
             
-            origin_vert[8] = {vparam.iconrect.left, vparam.iconrect.top, 0.001f};
-            origin_vert[9] = {vparam.iconrect.left + vparam.iconrect.width, vparam.iconrect.top, 0.001f};
-            origin_vert[10] = {vparam.iconrect.left, vparam.iconrect.top - vparam.iconrect.height, 0.001f};
-            origin_vert[11] = {vparam.iconrect.left + vparam.iconrect.width, vparam.iconrect.top - vparam.iconrect.height, 0.001f};
+            float icon_height = (pos_info.position & 0x5) ? 0.0015 : -0.0015;
+            origin_vert[8] = {vparam.iconrect.left, vparam.iconrect.top, icon_height};
+            origin_vert[9] = {vparam.iconrect.left + vparam.iconrect.width, vparam.iconrect.top, icon_height};
+            origin_vert[10] = {vparam.iconrect.left, vparam.iconrect.top - vparam.iconrect.height, icon_height};
+            origin_vert[11] = {vparam.iconrect.left + vparam.iconrect.width, vparam.iconrect.top - vparam.iconrect.height, icon_height};
             for(int32_t i = 0; i < 12; ++i) {
                 glm::vec3 v(origin_vert[i].x, origin_vert[i].y + yoffset, origin_vert[i].z);
                 auto c = rotation * v;
@@ -235,6 +236,8 @@ namespace ygopro
             case 0x10: { //grave
                 auto fb_pos = g_player[side].field_blocks[15]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
+                if(param == CardPosParam::Confirm)
+                    tl.x += -vparam.cardrect.width * 1.1f;
                 if(side == 0)
                     rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                 else
@@ -244,6 +247,8 @@ namespace ygopro
             case 0x20: { //banish
                 auto fb_pos = g_player[side].field_blocks[16]->GetCenter();
                 tl = {fb_pos.x, fb_pos.y, seq * 0.005f};
+                if(param == CardPosParam::Confirm)
+                    tl.x += -vparam.cardrect.width * 1.1f;
                 if(pos & 0x5 || param == CardPosParam::Confirm) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -373,6 +378,57 @@ namespace ygopro
         for(auto pcard : target->attached_cards)
             pcard->pos_info.subsequence = i++;
         attaching_card = nullptr;
+    }
+    
+    void FieldCard::AddCounter(uint16_t counter_type, uint32_t count) {
+        counter_map[counter_type] += count;
+    }
+    
+    void FieldCard::RemoveCounter(uint16_t counter_type, uint32_t count) {
+        auto iter = counter_map.find(counter_type);
+        if(iter != counter_map.end()) {
+            if(iter->second > count)
+                iter->second -= count;
+            else
+                counter_map.erase(iter);
+        }
+    }
+    
+    void FieldCard::ClearCounter() {
+        counter_map.clear();
+    }
+    
+    void FieldCard::AddContinuousTarget(FieldCard* target) {
+        targeting_cards.insert(target);
+        target->target_this.insert(this);
+    }
+    
+    void FieldCard::RemoveContinuousTarget(FieldCard* target) {
+        target->target_this.erase(this);
+        targeting_cards.erase(target);
+    }
+    
+    void FieldCard::ClearContinuousTarget() {
+        for(auto target : targeting_cards)
+            target->target_this.erase(this);
+        for(auto target : target_this)
+            target->targeting_cards.erase(this);
+        targeting_cards.clear();
+        target_this.clear();
+    }
+    
+    void FieldCard::Equip(FieldCard* target) {
+        if(equiping_card)
+            equiping_card->equip_this.erase(this);
+        target->equip_this.insert(this);
+        equiping_card = target;
+    }
+    
+    void FieldCard::Unequip() {
+        if(!equiping_card)
+            return;
+        equiping_card->equip_this.erase(this);
+        equiping_card = nullptr;
     }
     
     int32_t FloatingNumber::GetTextureId() {

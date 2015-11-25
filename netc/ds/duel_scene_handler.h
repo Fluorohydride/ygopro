@@ -86,9 +86,18 @@ namespace ygopro
         LP,
     };
     
+    struct LocalChainInfo {
+        bool solved = false;
+        uint32_t code = 0;
+        uint32_t desc = 0;
+        FieldCard* chaining_card = nullptr;
+        CardPosInfo triggering_pos;
+    };
+    
     struct LocalDuelData {
         bool deck_reversed = false;
         int32_t host_player = 0;
+        std::vector<LocalChainInfo> chains;
     };
     
     extern LocalDuelData g_duel;

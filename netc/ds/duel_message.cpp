@@ -18,45 +18,11 @@ namespace ygopro
         switch(param) {
             case 1: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_DAMAGE;
+                dm->msg_type = MSG_RANDOM_SELECTED;
                 BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(0);
-                writer.Write<uint32_t>(1000);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 2: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_RECOVER;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(0);
-                writer.Write<uint32_t>(1000);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 3: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_PAY_LPCOST;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(0);
-                writer.Write<uint32_t>(1000);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 4: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_LPUPDATE;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(0);
-                writer.Write<uint32_t>(7777);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 5: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_BECOME_TARGET;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x4, 1, 0).info);
+                writer.Write<uint8_t>(2);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x02, 1, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x02, 3, 0).info);
                 messages.PushCommand(dm);
                 break;
             }
@@ -704,7 +670,6 @@ namespace ygopro
             }
             case MSG_SHUFFLE_HAND: {
                 int32_t playerid = LocalPlayer(reader.Read<uint8_t>());
-                /*int32_t count = */reader.Read<uint8_t>();
                 std::vector<uint32_t> code_after_shuffle;
                 bool need_flip = false;
                 for(auto& pcard : g_player[playerid].hand) {
@@ -1191,16 +1156,16 @@ namespace ygopro
                 break;
             }
             case MSG_CHAINING: {
-//                unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-//                int pcc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int pcl = BufferIO::ReadInt8(pbuf);
-//                int pcs = BufferIO::ReadInt8(pbuf);
-//                int subs = BufferIO::ReadInt8(pbuf);
-//                int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int cl = BufferIO::ReadInt8(pbuf);
-//                int cs = BufferIO::ReadInt8(pbuf);
-//                int desc = BufferIO::ReadInt32(pbuf);
-//                /*int ct = */BufferIO::ReadInt8(pbuf);
+//                g_duel.chains.emplace_back();
+//                auto& chain = g_duel.chains.back();
+//                
+//                chain.code = reader.Read<uint32_t>();
+//                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+//                chain.chaining_card = GetCard(pi).get();
+//                chain.triggering_pos.info = LocalPosInfo(reader.Read<int32_t>());
+//                chain.desc = reader.Read<uint32_t>();
+//                chain.chaining_card->SetCode(chain.code);
+                
 //                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 //                    return true;
 //                ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
@@ -1278,13 +1243,27 @@ namespace ygopro
             }
             case MSG_CHAIN_NEGATED:
             case MSG_CHAIN_DISABLED: {
-//                int ct = BufferIO::ReadInt8(pbuf);
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->showcardcode = mainGame->dField.chains[ct - 1].code;
-//                    mainGame->showcarddif = 0;
-//                    mainGame->showcard = 3;
-//                    mainGame->WaitFrameSignal(30);
-//                    mainGame->showcard = 0;
+//                uint32_t chain_ct = reader.Read<uint8_t>();
+//                if(chain_ct - 1 < (uint32_t)g_duel.chains.size()) {
+//                    uint32_t neg_code = g_duel.chains[chain_ct - 1].code;
+//                    uint32_t neg_code = 84013237;
+//                    auto cardsp = duel_scene->AddFloatingSprite();
+//                    auto negsp = duel_scene->AddFloatingSprite();
+//                    std::array<v2i, 4> rel;
+//                    std::array<v2f, 4> prop;
+//                    auto& cardsp_node = layoutCfg["showcard"];
+//                    for(int32_t i = 0; i < 4; ++i) {
+//                        auto& point_node = cardsp_node[i];
+//                        rel[i] = {(int32_t)point_node[0].to_integer(), (int32_t)point_node[2].to_integer()};
+//                        prop[i] = {(float)point_node[1].to_double(), (float)point_node[3].to_double()};
+//                    }
+//                    cardsp->SetTexture(ImageMgr::Get().GetRawCardTexture());
+//                    negsp->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+//                    std::weak_ptr<FloatingSprite> wptr = cardsp;
+//                    cardsp->BuildSprite(rel.data(), ImageMgr::Get().GetCardTexture(neg_code, [wptr](texf4 tex) {
+//                        if(!wptr.expired())
+//                            wptr.lock()->SetTexcoord(tex);
+//                    }), prop.data());
 //                }
                 break;
             }
@@ -1292,41 +1271,57 @@ namespace ygopro
                 break;
             }
             case MSG_RANDOM_SELECTED: {
-//                /*int player = */BufferIO::ReadInt8(pbuf);
-//                int count = BufferIO::ReadInt8(pbuf);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    pbuf += count * 4;
-//                    return true;
-//                }
-//                ClientCard* pcards[10];
-//                for (int i = 0; i < count; ++i) {
-//                    int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                    int l = BufferIO::ReadInt8(pbuf);
-//                    int s = BufferIO::ReadInt8(pbuf);
-//                    int ss = BufferIO::ReadInt8(pbuf);
-//                    if ((l & 0x80) > 0)
-//                        pcards[i] = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
-//                    else
-//                        pcards[i] = mainGame->dField.GetCard(c, l, s);
-//                    pcards[i]->is_highlighting = true;
-//                }
-//                mainGame->WaitFrameSignal(30);
-//                for(int i = 0; i < count; ++i)
-//                    pcards[i]->is_highlighting = false;
+                uint32_t count = reader.Read<uint8_t>();
+                std::vector<std::shared_ptr<FieldCard>> cards;
+                for(int32_t i = 0; i < count; ++i) {
+                    CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                    auto pcard = GetCard(pi);
+                    if(pcard)
+                        cards.push_back(pcard);
+                }
+                if(!cards.empty()) {
+                    auto fadeact = std::make_shared<LerpAnimator<int64_t>>(900, [cards](double t)->bool {
+                        uint32_t color = 0x00ffffff | ((int32_t)(255 * (1 - t) + 5 * t) << 24);
+                        for(auto& pcard : cards)
+                            pcard->SetColor(color);
+                        return true;
+                    }, std::make_shared<TGenPeriodicRet<int64_t>>(300));
+                    auto cbact = std::make_shared<ActionCallback<int64_t>>([cards]() {
+                        for(auto& pcard : cards)
+                            pcard->SetColor(0xffffffff);
+                    });
+                    PushMessageActions(fadeact, cbact);
+                }
                 break;
             }
             case MSG_BECOME_TARGET: {
                 CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
                 auto pcard = GetCard(pi);
-                auto fadeact = std::make_shared<LerpAnimator<int64_t>>(900, [pcard](double t)->bool {
-                    uint32_t color = 0x00ffffff | ((int32_t)(255 * (1 - t) + 5 * t) << 24);
-                    pcard->SetColor(color);
-                    return true;
-                }, std::make_shared<TGenPeriodicRet<int64_t>>(300));
-                auto cbact = std::make_shared<ActionCallback<int64_t>>([pcard]() {
-                    pcard->SetColor(0xffffffff);
-                });
-                PushMessageActions(fadeact, cbact);
+                if(pcard->pos_info.location & 0x30) {
+                    pcard->UpdateTo(100, pcard->GetPositionInfo(CardPosParam::Confirm));
+                    auto wait1 = std::make_shared<ActionWait<int64_t>>(50);
+                    auto fadeact = std::make_shared<LerpAnimator<int64_t>>(600, [pcard](double t)->bool {
+                        uint32_t color = 0x00ffffff | ((int32_t)(255 * (1 - t) + 5 * t) << 24);
+                        pcard->SetColor(color);
+                        return true;
+                    }, std::make_shared<TGenPeriodicRet<int64_t>>(200));
+                    auto cbact = std::make_shared<ActionCallback<int64_t>>([pcard]() {
+                        pcard->SetColor(0xffffffff);
+                        pcard->UpdatePosition(50);
+                    });
+                    auto wait2 = std::make_shared<ActionWait<int64_t>>(50);
+                    PushMessageActions(wait1, fadeact, cbact, wait2);
+                } else {
+                    auto fadeact = std::make_shared<LerpAnimator<int64_t>>(900, [pcard](double t)->bool {
+                        uint32_t color = 0x00ffffff | ((int32_t)(255 * (1 - t) + 5 * t) << 24);
+                        pcard->SetColor(color);
+                        return true;
+                    }, std::make_shared<TGenPeriodicRet<int64_t>>(300));
+                    auto cbact = std::make_shared<ActionCallback<int64_t>>([pcard]() {
+                        pcard->SetColor(0xffffffff);
+                    });
+                    PushMessageActions(fadeact, cbact);
+                }
                 break;
             }
             case MSG_DRAW: {
@@ -1421,32 +1416,6 @@ namespace ygopro
                 PushMessageActions(waitact, moveact, cbact);
                 break;
             }
-            case MSG_EQUIP: {
-//                int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l1 = BufferIO::ReadInt8(pbuf);
-//                int s1 = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l2 = BufferIO::ReadInt8(pbuf);
-//                int s2 = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-//                ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    pc1->equipTarget = pc2;
-//                    pc2->equipped.insert(pc1);
-//                } else {
-//                    mainGame->gMutex.Lock();
-//                    pc1->equipTarget = pc2;
-//                    pc2->equipped.insert(pc1);
-//                    if (mainGame->dField.hovered_card == pc1)
-//                        pc2->is_showequip = true;
-//                    else if (mainGame->dField.hovered_card == pc2)
-//                        pc1->is_showequip = true;
-//                    mainGame->gMutex.Unlock();
-//                }
-                break;
-            }
             case MSG_LPUPDATE: {
                 uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 int32_t beginlp = g_player[playerid].lp;
@@ -1461,121 +1430,53 @@ namespace ygopro
                 PushMessageActions(setact, cbact);
                 break;
             }
+            case MSG_EQUIP: {
+                CardPosInfo pie(LocalPosInfo(reader.Read<int32_t>()));
+                CardPosInfo pit(LocalPosInfo(reader.Read<int32_t>()));
+                auto equip_card = GetCard(pie);
+                auto target = GetCard(pit);
+                equip_card->Equip(target.get());
+                break;
+            }
+            
             case MSG_UNEQUIP: {
-//                int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l1 = BufferIO::ReadInt8(pbuf);
-//                int s1 = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                ClientCard* pc = mainGame->dField.GetCard(c1, l1, s1);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    pc->equipTarget->equipped.erase(pc);
-//                    pc->equipTarget = 0;
-//                } else {
-//                    mainGame->gMutex.Lock();
-//                    if (mainGame->dField.hovered_card == pc)
-//                        pc->equipTarget->is_showequip = false;
-//                    else if (mainGame->dField.hovered_card == pc->equipTarget)
-//                        pc->is_showequip = false;
-//                    pc->equipTarget->equipped.erase(pc);
-//                    pc->equipTarget = 0;
-//                    mainGame->gMutex.Unlock();
-//                }
+                CardPosInfo pie(LocalPosInfo(reader.Read<int32_t>()));
+                auto equip_card = GetCard(pie);
+                equip_card->Unequip();
                 break;
             }
             case MSG_CARD_TARGET: {
-//                int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l1 = BufferIO::ReadInt8(pbuf);
-//                int s1 = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l2 = BufferIO::ReadInt8(pbuf);
-//                int s2 = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-//                ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    pc1->cardTarget.insert(pc2);
-//                    pc2->ownerTarget.insert(pc1);
-//                } else {
-//                    mainGame->gMutex.Lock();
-//                    pc1->cardTarget.insert(pc2);
-//                    pc2->ownerTarget.insert(pc1);
-//                    if (mainGame->dField.hovered_card == pc1)
-//                        pc2->is_showtarget = true;
-//                    else if (mainGame->dField.hovered_card == pc2)
-//                        pc1->is_showtarget = true;
-//                    mainGame->gMutex.Unlock();
-//                }
+                CardPosInfo pic(LocalPosInfo(reader.Read<int32_t>()));
+                CardPosInfo pit(LocalPosInfo(reader.Read<int32_t>()));
+                auto ct_card = GetCard(pic);
+                auto target = GetCard(pit);
+                ct_card->AddContinuousTarget(target.get());
                 break;
             }
             case MSG_CANCEL_TARGET: {
-//                int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l1 = BufferIO::ReadInt8(pbuf);
-//                int s1 = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l2 = BufferIO::ReadInt8(pbuf);
-//                int s2 = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-//                ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-//                    pc1->cardTarget.erase(pc2);
-//                    pc2->ownerTarget.erase(pc1);
-//                } else {
-//                    mainGame->gMutex.Lock();
-//                    pc1->cardTarget.erase(pc2);
-//                    pc2->ownerTarget.erase(pc1);
-//                    if (mainGame->dField.hovered_card == pc1)
-//                        pc2->is_showtarget = false;
-//                    else if (mainGame->dField.hovered_card == pc2)
-//                        pc1->is_showtarget = false;
-//                    mainGame->gMutex.Unlock();
-//                }
+                CardPosInfo pic(LocalPosInfo(reader.Read<int32_t>()));
+                CardPosInfo pit(LocalPosInfo(reader.Read<int32_t>()));
+                auto ct_card = GetCard(pic);
+                auto target = GetCard(pit);
+                ct_card->RemoveContinuousTarget(target.get());
                 break;
             }
             case MSG_ADD_COUNTER: {
-//                int type = BufferIO::ReadInt16(pbuf);
-//                int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l = BufferIO::ReadInt8(pbuf);
-//                int s = BufferIO::ReadInt8(pbuf);
-//                int count = BufferIO::ReadInt8(pbuf);
-//                ClientCard* pc = mainGame->dField.GetCard(c, l, s);
-//                if (pc->counters.count(type))
-//                    pc->counters[type] += count;
-//                else pc->counters[type] = count;
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                myswprintf(textBuffer, dataManager.GetSysString(1617), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
-//                pc->is_highlighting = true;
-//                mainGame->gMutex.Lock();
-//                mainGame->stACMessage->setText(textBuffer);
-//                mainGame->PopupElement(mainGame->wACMessage, 20);
-//                mainGame->gMutex.Unlock();
-//                mainGame->WaitFrameSignal(40);
-//                pc->is_highlighting = false;
+                uint16_t counter_type = reader.Read<uint16_t>();
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                uint32_t count = reader.Read<uint8_t>();
+                auto pcard = GetCard(pi);
+                if(pcard)
+                    pcard->AddCounter(counter_type, count);
                 break;
             }
             case MSG_REMOVE_COUNTER: {
-//                int type = BufferIO::ReadInt16(pbuf);
-//                int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l = BufferIO::ReadInt8(pbuf);
-//                int s = BufferIO::ReadInt8(pbuf);
-//                int count = BufferIO::ReadInt8(pbuf);
-//                ClientCard* pc = mainGame->dField.GetCard(c, l, s);
-//                pc->counters[type] -= count;
-//                if (pc->counters[type] <= 0)
-//                    pc->counters.erase(type);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                myswprintf(textBuffer, dataManager.GetSysString(1618), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
-//                pc->is_highlighting = true;
-//                mainGame->gMutex.Lock();
-//                mainGame->stACMessage->setText(textBuffer);
-//                mainGame->PopupElement(mainGame->wACMessage, 20);
-//                mainGame->gMutex.Unlock();
-//                mainGame->WaitFrameSignal(40);
-//                pc->is_highlighting = false;
+                uint16_t counter_type = reader.Read<uint16_t>();
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                uint32_t count = reader.Read<uint8_t>();
+                auto pcard = GetCard(pi);
+                if(pcard)
+                    pcard->RemoveCounter(counter_type, count);
                 break;
             }
             case MSG_ATTACK: {

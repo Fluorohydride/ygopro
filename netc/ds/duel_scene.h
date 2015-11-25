@@ -77,12 +77,14 @@ namespace ygopro
         
         void Attach(std::shared_ptr<FieldCard> target);
         void Detach();
-        void AddCounter() {}
-        void RemoveCounter() {}
-        void ClearCounter() {}
-        void AddContinuousTarget() {}
-        void RemoveContinuousTarget() {}
-        void ClearContinuousTarget() {}
+        void AddCounter(uint16_t counter_type, uint32_t count);
+        void RemoveCounter(uint16_t counter_type, uint32_t count);
+        void ClearCounter();
+        void AddContinuousTarget(FieldCard* target);
+        void RemoveContinuousTarget(FieldCard* target);
+        void ClearContinuousTarget();
+        void Equip(FieldCard* target);
+        void Unequip();
         
         inline void SetTranslation(v3f tr) { translation = tr; update_vert = true; SetUpdate(); }
         inline void SetRotation(glm::quat rot) { rotation = rot; update_vert = true; SetUpdate(); }
@@ -102,11 +104,33 @@ namespace ygopro
         uint32_t code = 0;
         uint32_t status = 0;
         uint32_t reason = 0;
+        CardData* data = nullptr;
         CardPosInfo pos_info;
         std::vector<std::shared_ptr<FieldCard>> attached_cards;
-        CardData* data = nullptr;
         FieldCard* attaching_card = nullptr;
+        FieldCard* equiping_card = nullptr;
+        std::set<FieldCard*> equip_this;
+        std::set<FieldCard*> targeting_cards;
+        std::set<FieldCard*> target_this;
         std::map<uint16_t, uint32_t> counter_map;
+    };
+    
+    class FieldSprite : public DuelObject<vt3> {
+    public:
+        virtual ~FieldSprite();
+        virtual int32_t GetTextureId();
+        virtual void RefreshVertices();
+        
+        inline void SetTexcoord(texf4 tex) { texcoord = tex; SetUpdate(); }
+        inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
+        
+    protected:
+        base::Texture* texture = nullptr;
+        texf4 texcoord;
+        float scale = 1.0f;
+        v3f translation = {0.0f, 0.0f};
+        glm::quat rotation;
+        glm::mat4 local_matrix;
     };
     
     class FloatingObject : public DuelObject<vt2> {
@@ -165,6 +189,7 @@ namespace ygopro
         
         void BuildSprite(recti rct, texf4 tex, rectf rct_prop = {0.0f, 0.0f, 0.0f, 0.0f});
         void BuildSprite(v2i* verts, texf4 tex, v2f* vert_prop = nullptr);
+        inline void SetTexcoord(texf4 tex) { texcoord = tex; SetUpdate(); }
         inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
         
     protected:
