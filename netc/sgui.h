@@ -782,7 +782,6 @@ namespace sgui
             std::wsmatch m;
             while(std::regex_search(match_str, m, re)) {
                 AppendText(m.prefix(), cur_color);
-                match_str = m.suffix();
                 std::wstring type = m[1].str();
                 if(type == L"c") {
                     uint32_t agbr = To<uint32_t>(m[2].str());
@@ -794,6 +793,7 @@ namespace sgui
                 } else if(unknown_format_cb) {
                     unknown_format_cb(this, type, m[2].str(), cur_color);
                 }
+                match_str = m.suffix();
             }
             AppendText(match_str, cur_color);
         }

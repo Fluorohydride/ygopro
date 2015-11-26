@@ -87,7 +87,7 @@ namespace ygopro
     }
     
     void DuelSceneHandler::BeginHandler() {
-        AddCard(84013237, CardPosInfo(0, 0x4, 1, 0x8))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x4, 1, 0x1))->UpdatePosition(0);
         for(int32_t i = 0; i < 3; ++i)
             AddCard(83764718, CardPosInfo(0, 0x2, 1, 0x1))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
@@ -225,6 +225,8 @@ namespace ygopro
         for(int32_t i = 0 ; i < 17; ++i) {
             g_player[0].field_blocks[i] = duel_scene->CreateFieldBlock();
             g_player[1].field_blocks[i] = duel_scene->CreateFieldBlock();
+            g_player[0].field_blocks[i]->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+            g_player[1].field_blocks[i]->SetTexture(ImageMgr::Get().GetRawMiscTexture());
         }
         g_player[0].field_blocks[0 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone1"]));
         g_player[0].field_blocks[1 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone2"]));
@@ -243,23 +245,23 @@ namespace ygopro
         g_player[0].field_blocks[14]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["exdeck"]));
         g_player[0].field_blocks[15]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["grave"]));
         g_player[0].field_blocks[16]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["banish"]));
-        g_player[0].field_blocks[0 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        g_player[0].field_blocks[1 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        g_player[0].field_blocks[2 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        g_player[0].field_blocks[3 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        g_player[0].field_blocks[4 ]->SetTexture(ImageMgr::Get().GetTexture("mzone"));
-        g_player[0].field_blocks[5 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        g_player[0].field_blocks[6 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        g_player[0].field_blocks[7 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        g_player[0].field_blocks[8 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        g_player[0].field_blocks[9 ]->SetTexture(ImageMgr::Get().GetTexture("szone"));
-        g_player[0].field_blocks[10]->SetTexture(ImageMgr::Get().GetTexture("fdzone"));
-        g_player[0].field_blocks[11]->SetTexture(ImageMgr::Get().GetTexture("pzonel"));
-        g_player[0].field_blocks[12]->SetTexture(ImageMgr::Get().GetTexture("pzoner"));
-        g_player[0].field_blocks[13]->SetTexture(ImageMgr::Get().GetTexture("mdeck"));
-        g_player[0].field_blocks[14]->SetTexture(ImageMgr::Get().GetTexture("exdeck"));
-        g_player[0].field_blocks[15]->SetTexture(ImageMgr::Get().GetTexture("grave"));
-        g_player[0].field_blocks[16]->SetTexture(ImageMgr::Get().GetTexture("banish"));
+        g_player[0].field_blocks[0 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[1 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[2 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[3 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[4 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
+        g_player[0].field_blocks[5 ]->SetTexcoord(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[6 ]->SetTexcoord(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[7 ]->SetTexcoord(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[8 ]->SetTexcoord(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[9 ]->SetTexcoord(ImageMgr::Get().GetTexture("szone"));
+        g_player[0].field_blocks[10]->SetTexcoord(ImageMgr::Get().GetTexture("fdzone"));
+        g_player[0].field_blocks[11]->SetTexcoord(ImageMgr::Get().GetTexture("pzonel"));
+        g_player[0].field_blocks[12]->SetTexcoord(ImageMgr::Get().GetTexture("pzoner"));
+        g_player[0].field_blocks[13]->SetTexcoord(ImageMgr::Get().GetTexture("mdeck"));
+        g_player[0].field_blocks[14]->SetTexcoord(ImageMgr::Get().GetTexture("exdeck"));
+        g_player[0].field_blocks[15]->SetTexcoord(ImageMgr::Get().GetTexture("grave"));
+        g_player[0].field_blocks[16]->SetTexcoord(ImageMgr::Get().GetTexture("banish"));
         for(int32_t i = 0; i < 17; ++i)
             g_player[1].field_blocks[i]->Mirror(g_player[0].field_blocks[i].get());
         g_player[0].m_zone.resize(5);

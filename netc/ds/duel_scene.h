@@ -26,27 +26,52 @@ namespace ygopro
         uint32_t hl = 0;
     };
     
-    class FieldBlock : public DuelObject<vt3> {
+    class FieldSprite : public DuelObject<vt3> {
     public:
+        FieldSprite(uint32_t rid) : ref_id(rid) {}
         virtual int32_t GetTextureId();
         virtual void RefreshVertices();
         
-        inline void SetPosition(rectf pos) { translation = {pos.left, pos.top}; quad_size = {pos.width, pos.height}; SetUpdate(); }
-        inline void SetTexture(texf4 tex) { block_texture = tex; SetUpdate(); }
+        inline void SetTexcoord(texf4 tex) { texcoord = tex; SetUpdate(); }
+        inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
+        inline void SetSize(v2f sz) { sprite_size = sz; update_vert = true; SetUpdate(); }
+        inline void SetTranslation(v3f trans) { translation = trans; update_vert = true; SetUpdate(); }
+        inline void SetRotation(glm::quat rot) { rotation = rot; update_vert = true; SetUpdate(); }
+        inline v3f GetTranslation() { return translation; }
+        inline v2f GetSize() { return sprite_size; }
+        inline uint32_t GetRefId() { return ref_id; }
+        
+    protected:
+        base::Texture* texture = nullptr;
+        texf4 texcoord;
+        bool update_vert = true;
+        v2f sprite_size = {0.0f, 0.0f};
+        v3f translation = {0.0f, 0.0f, 0.0f};
+        glm::quat rotation;
+        uint32_t ref_id = 0;
+    };
+    
+    class FieldBlock : public FieldSprite {
+    public:
+        FieldBlock() : FieldSprite(0) {}
+        
         inline void Mirror(FieldBlock* fb) {
+            texture = fb->texture;
+            texcoord = fb->texcoord;
             translation = fb->translation * -1.0f;
-            quad_size = fb->quad_size * -1.0f;
-            block_texture = fb->block_texture;
+            sprite_size = fb->sprite_size * -1.0f;
+            update_vert = true;
             SetUpdate();
         }
-        inline v2f GetCenter() { return translation; }
-        inline v2f GetSize() { return quad_size; }
-        
-        bool CheckInside(float px, float py);
-        
-        v2f translation = {0.0f, 0.0f};
-        v2f quad_size = {0.0f, 0.0f};
-        texf4 block_texture;
+        inline void SetPosition(rectf rct) {
+            translation = {rct.left, rct.top, 0.0f};
+            sprite_size = {rct.width, rct.height};
+            SetUpdate();
+        }
+        inline v2f GetCenter() { return {translation.x, translation.y}; }
+        inline bool CheckInside(float px, float py) {
+            return std::abs(px - translation.x) <= std::abs(sprite_size.x / 2.0f) && std::abs(py - translation.y) <= std::abs(sprite_size.y / 2.0f);
+        }
     };
     
     enum class CardPosParam {
@@ -113,24 +138,6 @@ namespace ygopro
         std::set<FieldCard*> targeting_cards;
         std::set<FieldCard*> target_this;
         std::map<uint16_t, uint32_t> counter_map;
-    };
-    
-    class FieldSprite : public DuelObject<vt3> {
-    public:
-        virtual ~FieldSprite();
-        virtual int32_t GetTextureId();
-        virtual void RefreshVertices();
-        
-        inline void SetTexcoord(texf4 tex) { texcoord = tex; SetUpdate(); }
-        inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
-        
-    protected:
-        base::Texture* texture = nullptr;
-        texf4 texcoord;
-        float scale = 1.0f;
-        v3f translation = {0.0f, 0.0f};
-        glm::quat rotation;
-        glm::mat4 local_matrix;
     };
     
     class FloatingObject : public DuelObject<vt2> {
@@ -235,36 +242,40 @@ namespace ygopro
         virtual void PushVerticesAll();
     };
     
-    class MiscObjectRenderer : public base::RenderObject2DLayout {
+    template<typename RENDER_OBJECT_BASE, typename OBJECT_TYPE>
+    class RefObjectRenderer : public RENDER_OBJECT_BASE {
     public:
-        MiscObjectRenderer() { InitGLState(true); }
+        RefObjectRenderer() { RENDER_OBJECT_BASE::InitGLState(true); }
         virtual void PushVerticesAll() {
-            base::RenderObject2DLayout::PushVerticesAll();
+            RENDER_OBJECT_BASE::PushVerticesAll();
             for(auto& iter : objects)
                 iter.second->PushVertices();
         }
         
-        template<typename T>
-        std::shared_ptr<T> AddFloatingObject() {
-            auto ptr = NewSharedObject<T>(count_ref);
+        template<typename OBJ>
+        std::shared_ptr<OBJ> AddRefObject() {
+            auto ptr = RENDER_OBJECT_BASE::template NewSharedObject<OBJ>(count_ref);
             objects[count_ref++] = ptr.get();
-            RequestRedraw();
+            RENDER_OBJECT_BASE::RequestRedraw();
             return ptr;
         }
-
-        template<typename T>
-        void RemoveFloatingObject(T* ptr) {
+        
+        template<typename OBJ>
+        void RemoveRefObject(OBJ* ptr) {
             uint32_t ref_id = ptr->GetRefId();
-            if(DeleteObject(ptr)) {
+            if(RENDER_OBJECT_BASE::DeleteObject(ptr)) {
                 objects.erase(ref_id);
-                RequestRedraw();
+                RENDER_OBJECT_BASE::RequestRedraw();
             }
         }
         
     protected:
-        std::map<uint32_t, FloatingObject*> objects;
+        std::map<uint32_t, OBJECT_TYPE*> objects;
         uint32_t count_ref = 0;
     };
+    
+    using FloatingObjectRenderer = RefObjectRenderer<base::RenderObject2DLayout, FloatingObject>;
+    using FieldSpriteRenderer = RefObjectRenderer<base::RenderObject<vt3>, FieldSprite>;
     
     class DuelScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
     public:
@@ -296,16 +307,19 @@ namespace ygopro
         inline void RemoveCard(std::shared_ptr<FieldCard> ptr) { fieldcard_renderer->DeleteObject(ptr.get()); }
         inline std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
         
-        inline std::shared_ptr<FloatingNumber> AddFloatingNumber() { return miscobject_renderer->AddFloatingObject<FloatingNumber>(); }
-        inline std::shared_ptr<FloatingSprite> AddFloatingSprite() { return miscobject_renderer->AddFloatingObject<FloatingSprite>(); }
-        inline void RemoveFloatingNumber(FloatingNumber* ptr) { miscobject_renderer->RemoveFloatingObject(ptr); }
-        inline void RemoveFloatingSprite(FloatingSprite* ptr) { miscobject_renderer->RemoveFloatingObject(ptr); }
+        inline std::shared_ptr<FieldSprite> AddFieldSprite() { return fieldsprite_renderer->AddRefObject<FieldSprite>(); }
+        inline void RemoveFieldSprite(FieldSprite* ptr) { fieldsprite_renderer->RemoveRefObject(ptr); }
+        inline std::shared_ptr<FloatingNumber> AddFloatingNumber() { return floatingobject_renderer->AddRefObject<FloatingNumber>(); }
+        inline void RemoveFloatingNumber(FloatingNumber* ptr) { floatingobject_renderer->RemoveRefObject(ptr); }
+        inline std::shared_ptr<FloatingSprite> AddFloatingSprite() { return floatingobject_renderer->AddRefObject<FloatingSprite>(); }
+        inline void RemoveFloatingSprite(FloatingSprite* ptr) { floatingobject_renderer->RemoveRefObject(ptr); }
         
     protected:
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
         std::shared_ptr<FieldRenderer> field_renderer;
         std::shared_ptr<FieldCardRenderer> fieldcard_renderer;
-        std::shared_ptr<MiscObjectRenderer> miscobject_renderer;
+        std::shared_ptr<FieldSpriteRenderer> fieldsprite_renderer;
+        std::shared_ptr<FloatingObjectRenderer> floatingobject_renderer;
     };
     
 }

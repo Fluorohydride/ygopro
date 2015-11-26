@@ -419,6 +419,8 @@ namespace base
     
     template<typename VTYPE>
     inline void RenderUnit<VTYPE>::SetUpdate() {
+        if(need_update)
+            return;
         need_update = true;
         if(this->render_version != manager->GetRenderVersion())
             return;

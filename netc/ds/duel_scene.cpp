@@ -10,27 +10,33 @@ namespace ygopro
 {
     ViewParam vparam;
     
-    int32_t FieldBlock::GetTextureId() {
-        return ImageMgr::Get().GetRawMiscTexture()->GetTextureId();
+    int32_t FieldSprite::GetTextureId() {
+        return texture ? texture->GetTextureId() : 0;
     }
     
-    void FieldBlock::RefreshVertices() {
+    void FieldSprite::RefreshVertices() {
         vertices.resize(4);
         indices.resize(6);
-        vertices[0].vertex = {translation.x - quad_size.x * 0.5f, translation.y + quad_size.y * 0.5f, 0.0f};
-        vertices[1].vertex = {translation.x + quad_size.x * 0.5f, translation.y + quad_size.y * 0.5f, 0.0f};
-        vertices[2].vertex = {translation.x - quad_size.x * 0.5f, translation.y - quad_size.y * 0.5f, 0.0f};
-        vertices[3].vertex = {translation.x + quad_size.x * 0.5f, translation.y - quad_size.y * 0.5f, 0.0f};
-        for(int32_t i = 0; i < 4; ++i) {
-            vertices[i].texcoord = block_texture.vert[i];;
+        if(update_vert) {
+            std::array<v3f, 4> origin_vert;
+            origin_vert[0] = {-sprite_size.x / 2.0f, sprite_size.y / 2.0f, 0.0f};
+            origin_vert[1] = {sprite_size.x / 2.0f, sprite_size.y / 2.0f, 0.0f};
+            origin_vert[2] = {-sprite_size.x / 2.0f, -sprite_size.y / 2.0f, 0.0f};
+            origin_vert[3] = {sprite_size.x / 2.0f, -sprite_size.y / 2.0f, 0.0f};
+            for(int32_t i = 0; i < 4; ++i) {
+                glm::vec3 v(origin_vert[i].x, origin_vert[i].y, origin_vert[i].z);
+                auto c = rotation * v;
+                vertices[i].vertex = v3f{c.x, c.y, c.z} + translation;
+            }
+            update_vert = false;
+        }
+        for(size_t i = 0; i < 4; ++i)
+            vertices[i].texcoord = texcoord.vert[i];
+        for(size_t i = 0; i < 4; ++i) {
             vertices[i].color = color;
             vertices[i].hcolor = hl;
         }
         vt3::GenQuadIndex(indices.data(), 1, vert_index);
-    }
-    
-    bool FieldBlock::CheckInside(float px, float py) {
-        return std::abs(px - translation.x) <= std::abs(quad_size.x / 2.0f) && std::abs(py - translation.y) <= std::abs(quad_size.y / 2.0f);
     }
     
     FieldCard::~FieldCard() {
@@ -613,12 +619,19 @@ namespace ygopro
             shader->SetParam1i("texid", 0);
             shader->SetParamMat4("mvp", glm::value_ptr(vparam.mvp));
         });
-        miscobject_renderer = std::make_shared<MiscObjectRenderer>();
-        miscobject_renderer->SetShader(_2dshader);
+        fieldsprite_renderer = std::make_shared<FieldSpriteRenderer>();
+        fieldsprite_renderer->SetShader(_3dshader);
+        fieldsprite_renderer->SetShaderSettingCallback([](base::Shader* shader) {
+            shader->SetParam1i("texid", 0);
+            shader->SetParamMat4("mvp", glm::value_ptr(vparam.mvp));
+        });
+        floatingobject_renderer = std::make_shared<FloatingObjectRenderer>();
+        floatingobject_renderer->SetShader(_2dshader);
         PushObject(bg_renderer.get());
         PushObject(field_renderer.get());
         PushObject(fieldcard_renderer.get());
-        PushObject(miscobject_renderer.get());
+        PushObject(fieldsprite_renderer.get());
+        PushObject(floatingobject_renderer.get());
         PushObject(sgui::SGGUIRoot::GetSingleton());
         bg_renderer->ClearVertices();
         bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), rectf{-1.0f, 1.0f, 2.0f, -2.0f}, ImageMgr::Get().GetTexture("bg"));
@@ -652,7 +665,7 @@ namespace ygopro
     
     void DuelScene::SetSceneSize(v2i sz) {
         SetViewport({0, 0, sz.x, sz.y});
-        miscobject_renderer->SetScreenSize(sz);
+        floatingobject_renderer->SetScreenSize(sz);
         UpdateParams();
     }
     

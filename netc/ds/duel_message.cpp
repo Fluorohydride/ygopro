@@ -18,11 +18,12 @@ namespace ygopro
         switch(param) {
             case 1: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_RANDOM_SELECTED;
+                dm->msg_type = MSG_CHAINING;
                 BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(2);
+                writer.Write<uint32_t>(84013237);
                 writer.Write<uint32_t>(CardPosInfo(0, 0x02, 1, 0).info);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x02, 3, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x02, 1, 0).info);
+                writer.Write<uint32_t>(84013237);
                 messages.PushCommand(dm);
                 break;
             }
@@ -1156,51 +1157,49 @@ namespace ygopro
                 break;
             }
             case MSG_CHAINING: {
-//                g_duel.chains.emplace_back();
-//                auto& chain = g_duel.chains.back();
-//                
-//                chain.code = reader.Read<uint32_t>();
-//                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
-//                chain.chaining_card = GetCard(pi).get();
-//                chain.triggering_pos.info = LocalPosInfo(reader.Read<int32_t>());
-//                chain.desc = reader.Read<uint32_t>();
-//                chain.chaining_card->SetCode(chain.code);
+                g_duel.chains.emplace_back();
+                auto& chain = g_duel.chains.back();
+                chain.code = reader.Read<uint32_t>();
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                auto pcard = GetCard(pi).get();
+                chain.chaining_card = pcard;
+                chain.triggering_pos.info = LocalPosInfo(reader.Read<int32_t>());
+                chain.desc = reader.Read<uint32_t>();
+                if(chain.code)
+                    pcard->SetCode(chain.code);
                 
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
-//                if(pcard->code != code) {
-//                    pcard->code = code;
-//                    mainGame->dField.MoveCard(pcard, 10);
-//                }
-//                mainGame->showcardcode = code;
-//                mainGame->showcarddif = 0;
-//                mainGame->showcard = 1;
-//                pcard->is_highlighting = true;
-//                mainGame->WaitFrameSignal(30);
-//                pcard->is_highlighting = false;
-//                mainGame->dField.current_chain.chain_card = pcard;
-//                mainGame->dField.current_chain.code = code;
-//                mainGame->dField.current_chain.desc = desc;
-//                mainGame->dField.current_chain.controler = cc;
-//                mainGame->dField.current_chain.location = cl;
-//                mainGame->dField.current_chain.sequence = cs;
-//                mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
-//                mainGame->dField.current_chain.solved = false;
-//                int chc = 0;
-//                for(size_t i = 0; i < mainGame->dField.chains.size(); ++i) {
-//                    if (cl == 0x10 || cl == 0x20) {
-//                        if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
-//                            chc++;
-//                    } else {
-//                        if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
-//                            chc++;
-//                    }
-//                }
-//                if(cl == LOCATION_HAND)
-//                    mainGame->dField.current_chain.chain_pos.X += 0.35f;
-//                else
-//                    mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
+                rectf rct = sgui::SGJsonUtil::ConvertRectf(layoutCfg["activate param"]);
+                auto aura1 = duel_scene->AddFieldSprite();
+                aura1->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+                aura1->SetTexcoord(ImageMgr::Get().GetTexture("act aura1"));
+                aura1->SetTranslation(pcard->translation);
+                aura1->SetSize({rct.left, rct.left});
+                aura1->SetRotation(pcard->rotation);
+                auto aura2 = duel_scene->AddFieldSprite();
+                aura2->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+                aura2->SetTexcoord(ImageMgr::Get().GetTexture("act aura2"));
+                aura2->SetTranslation(pcard->translation);
+                aura2->SetSize({rct.width, rct.width});
+                aura2->SetRotation(pcard->rotation);
+                auto action = std::make_shared<LerpAnimator<int64_t>>(1000, [rct, aura1, aura2, pcard](double t) ->bool {
+                    uint32_t cl = (t > 0.5f) ? (((int32_t)(255 * (2 - t * 2)) << 24) | 0xffffff) : 0xffffffff;
+                    float rad1 = rct.left * (1 - t) + rct.top * t;
+                    aura1->SetSize({rad1, rad1});
+                    aura1->SetColor(cl);
+                    float rad2 = (t > 0.5f) ? (rct.height * (2 - t * 2) + rct.width * (t - 0.5f) * 2) : (rct.width * (1 - t * 2) + rct.height * t * 2);
+                    aura2->SetSize({rad2, rad2});
+                    aura2->SetColor(cl);
+                    aura2->SetRotation(pcard->rotation * glm::angleAxis(3.1415926f * (float)t, glm::vec3(0.0f, 0.0f, 1.0f)));
+                    uint32_t hl = (t > 0.5f) ? (((int32_t)(240 * (2 - t * 2)) << 24) | 0xffffff) : (((int32_t)(240 * t * 2) << 24) | 0xffffff);
+                    pcard->SetHL(hl);
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(1000));
+                auto rmact = std::make_shared<ActionCallback<int64_t>>([this, aura1, aura2, pcard]() {
+                    duel_scene->RemoveFieldSprite(aura1.get());
+                    duel_scene->RemoveFieldSprite(aura2.get());
+                    pcard->SetHL(0);
+                });
+                PushMessageActions(action, rmact);
                 break;
             }
             case MSG_CHAINED: {
