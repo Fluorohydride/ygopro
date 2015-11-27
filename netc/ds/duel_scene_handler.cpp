@@ -228,23 +228,23 @@ namespace ygopro
             g_player[0].field_blocks[i]->SetTexture(ImageMgr::Get().GetRawMiscTexture());
             g_player[1].field_blocks[i]->SetTexture(ImageMgr::Get().GetRawMiscTexture());
         }
-        g_player[0].field_blocks[0 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone1"]));
-        g_player[0].field_blocks[1 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone2"]));
-        g_player[0].field_blocks[2 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone3"]));
-        g_player[0].field_blocks[3 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone4"]));
-        g_player[0].field_blocks[4 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mzone5"]));
-        g_player[0].field_blocks[5 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone1"]));
-        g_player[0].field_blocks[6 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone2"]));
-        g_player[0].field_blocks[7 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone3"]));
-        g_player[0].field_blocks[8 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone4"]));
-        g_player[0].field_blocks[9 ]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["szone5"]));
-        g_player[0].field_blocks[10]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["fdzone"]));
-        g_player[0].field_blocks[11]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["pzonel"]));
-        g_player[0].field_blocks[12]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["pzoner"]));
-        g_player[0].field_blocks[13]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["mdeck"]));
-        g_player[0].field_blocks[14]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["exdeck"]));
-        g_player[0].field_blocks[15]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["grave"]));
-        g_player[0].field_blocks[16]->SetPosition(sgui::SGJsonUtil::ConvertRectf(layoutCfg["banish"]));
+        g_player[0].field_blocks[0 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["mzone1"]));
+        g_player[0].field_blocks[1 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["mzone2"]));
+        g_player[0].field_blocks[2 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["mzone3"]));
+        g_player[0].field_blocks[3 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["mzone4"]));
+        g_player[0].field_blocks[4 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["mzone5"]));
+        g_player[0].field_blocks[5 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["szone1"]));
+        g_player[0].field_blocks[6 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["szone2"]));
+        g_player[0].field_blocks[7 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["szone3"]));
+        g_player[0].field_blocks[8 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["szone4"]));
+        g_player[0].field_blocks[9 ]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["szone5"]));
+        g_player[0].field_blocks[10]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["fdzone"]));
+        g_player[0].field_blocks[11]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["pzonel"]));
+        g_player[0].field_blocks[12]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["pzoner"]));
+        g_player[0].field_blocks[13]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["mdeck"]));
+        g_player[0].field_blocks[14]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["exdeck"]));
+        g_player[0].field_blocks[15]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["grave"]));
+        g_player[0].field_blocks[16]->SetPosition(sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["banish"]));
         g_player[0].field_blocks[0 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
         g_player[0].field_blocks[1 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
         g_player[0].field_blocks[2 ]->SetTexcoord(ImageMgr::Get().GetTexture("mzone"));
@@ -268,7 +268,7 @@ namespace ygopro
         g_player[1].m_zone.resize(5);
         g_player[0].s_zone.resize(8);
         g_player[1].s_zone.resize(8);
-        auto add_avatar_lp = [this](jaweson::JsonNode<>& avatar_node, jaweson::JsonNode<>& lp_node, int32_t pl) {
+        auto add_avatar_lp = [this](jaweson::JsonValue& avatar_node, jaweson::JsonValue& lp_node, int32_t pl) {
             std::array<v2i, 4> rel;
             std::array<v2f, 4> prop;
             for(int32_t i = 0; i < 4; ++i) {
@@ -309,7 +309,7 @@ namespace ygopro
             }
             g_player[p].fixed_numbers[4]->SetColor(0xffff00ff);
             g_player[p].fixed_numbers[5]->SetColor(0xff0000ff);
-            jaweson::JsonNode<>& val_node = layoutCfg[p == 0 ? "lpval1" : "lpval2"];
+            jaweson::JsonValue& val_node = layoutCfg[p == 0 ? "lpval1" : "lpval2"];
             v2i pos = {(int32_t)val_node[0].to_integer(), (int32_t)val_node[2].to_integer()};
             v2f prop = {(float)val_node[1].to_double(), (float)val_node[3].to_double()};
             v2i csize = {(int32_t)val_node[4].to_integer(), (int32_t)val_node[5].to_integer()};
@@ -626,7 +626,83 @@ namespace ygopro
         g_player[local_pl].lp = lp;
     }
     
-    void DuelSceneHandler::AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq) {
+    void DuelSceneHandler::AddChain(int32_t ct) {
+        auto param = sgui::SGJsonUtil::ConvertArray<float, 4>(layoutCfg["chain param"]);
+        auto& ch = g_duel.chains[ct];
+        auto chain_sp = duel_scene->AddFieldSprite().get();
+        chain_sp->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+        chain_sp->SetTexcoord(ImageMgr::Get().GetTexture("chain"));
+        chain_sp->SetColor(0xff0000ff);
+        v3f translation;
+        auto check_rep = [](int32_t ct, uint8_t loc, uint8_t seq)->int32_t {
+            int32_t repc = 0;
+            for(int32_t i = 0; i < ct; ++i)
+                if((g_duel.chains[i].triggering_pos.location == loc)
+                   && (seq != 0xff || g_duel.chains[i].triggering_pos.sequence == seq))
+                    repc++;
+            return repc;
+        };
+        switch(ch.triggering_pos.location) {
+            case 0x1:
+                translation = g_player[ch.triggering_pos.controler].field_blocks[13]->GetTranslation();
+                translation.y += check_rep(ct, 0x1, 0xf) * 0.2f * translation.y;
+                break;
+            case 0x2:
+                break;
+            case 0x4:
+                translation = g_player[ch.triggering_pos.controler].field_blocks[ch.triggering_pos.sequence]->GetTranslation();
+                translation.y += check_rep(ct, 0x4, ch.triggering_pos.sequence) * 0.2f * translation.y;
+                break;
+            case 0x8:
+                translation = g_player[ch.triggering_pos.controler].field_blocks[ch.triggering_pos.sequence + 5]->GetTranslation();
+                translation.y += check_rep(ct, 0x8, ch.triggering_pos.sequence) * 0.2f * translation.y;
+                break;
+            case 0x10:
+                translation = g_player[ch.triggering_pos.controler].field_blocks[15]->GetTranslation();
+                translation.y += check_rep(ct, 0x10, 0xf) * 0.2f * translation.y;
+                break;
+            case 0x20:
+                translation = g_player[ch.triggering_pos.controler].field_blocks[16]->GetTranslation();
+                translation.y += check_rep(ct, 0x20, 0xf) * 0.2f * translation.y;
+                break;
+            case 0x40:
+                translation = g_player[ch.triggering_pos.controler].field_blocks[14]->GetTranslation();
+                translation.y += check_rep(ct, 0x40, 0xf) * 0.2f * translation.y;
+                break;
+        }
+        chain_sp->SetTranslation(translation);
+        chain_sp->SetSize({param[0], param[1]});
+        g_duel.chains[ct].chain_sprites.push_back(chain_sp);
+        auto rotact = std::make_shared<LerpAnimator<int64_t>>(0, [chain_sp](double t)->bool {
+            chain_sp->SetRotation(glm::angleAxis(-3.1415926f * 2 * (float)t, glm::vec3(0.0f, 0.0f, 1.0f)));
+            return true;
+        }, std::make_shared<TGenPeriodic<int64_t>>(4000));
+        SceneMgr::Get().PushAction(rotact, chain_sp);
+        if(ct < 9) {
+            auto num_sp = duel_scene->AddFieldSprite().get();
+            num_sp->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+            num_sp->SetTexcoord(ImageMgr::Get().GetCharTex(L'0' + ct + 1));
+            num_sp->SetTranslation(translation);
+            num_sp->SetSize({param[2], param[3]});
+            num_sp->SetColor(0xff00ffff);
+        } else {
+            auto num_sp1 = duel_scene->AddFieldSprite().get();
+            num_sp1->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+            num_sp1->SetTexcoord(ImageMgr::Get().GetCharTex(L'0' + (ct + 1) / 10));
+            num_sp1->SetTranslation(translation - v3f{param[2] * 0.25f, 0.0f, 0.0f});
+            num_sp1->SetSize({param[2] * 0.5f, param[3]});
+            num_sp1->SetColor(0xff00ffff);
+            auto num_sp2 = duel_scene->AddFieldSprite().get();
+            num_sp2->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+            num_sp2->SetTexcoord(ImageMgr::Get().GetCharTex(L'0' + (ct + 1) % 10));
+            num_sp2->SetTranslation(translation + v3f{param[2] * 0.25f, 0.0f, 0.0f});
+            num_sp2->SetSize({param[2] * 0.5f, param[3]});
+            num_sp2->SetColor(0xff00ffff);
+        }
+        
+    }
+    
+    void DuelSceneHandler::SolveChain(int32_t ct) {
         
     }
     

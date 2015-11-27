@@ -101,7 +101,7 @@ namespace ygopro
             KeyDown(key, mods);
             return true;
         }, this);
-        v2i rc = sgui::SGJsonUtil::ConvertV2i(layoutCfg["search count"], 0);
+        v2i rc = sgui::SGJsonUtil::ConvertVec2<int32_t>(layoutCfg["search count"], 0);
         page_count = rc.x * rc.y;
     }
     

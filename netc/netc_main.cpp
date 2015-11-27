@@ -30,7 +30,7 @@ jaweson::JsonRoot<> layoutCfg;
 jaweson::JsonRoot<> textureCfg;
 jaweson::JsonRoot<> dialogCfg;
 
-int32_t node2int(jaweson::JsonNode<>& node) {
+int32_t node2int(jaweson::JsonValue& node) {
     return node.is_number() ? (int32_t)node.to_integer() : To<int32_t>(node.to_string());
 };
 
@@ -51,7 +51,7 @@ int32_t main(int32_t argc, char* argv[]) {
             auto epos = argstr.find('=');
             if(epos == argstr.npos)
                 continue;
-            commonCfg[argstr.substr(2, epos - 2)].set_value<jaweson::JsonString>(argstr.substr(epos + 1));
+            commonCfg[argstr.substr(2, epos - 2)].set_value<jaweson::JsonString<>>(argstr.substr(epos + 1));
         }
         textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["string_conf"].to_string()));
         if(!stringCfg.parse(textfile.Data(), textfile.Length()))
@@ -65,7 +65,7 @@ int32_t main(int32_t argc, char* argv[]) {
         textfile.Load(FileSystem::UTF8ToLocalCharset(commonCfg["dialog_conf"].to_string()));
         if(!dialogCfg.parse(textfile.Data(), textfile.Length()))
             return 0;
-        stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
+        stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonValue& node) {
             std::wstring setname = To<std::wstring>(node.to_string());
             DataMgr::Get().RegisterSetCode(To<uint32_t>(name), setname);
         });

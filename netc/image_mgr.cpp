@@ -209,7 +209,7 @@ namespace ygopro
     }
     
 	bool ImageMgr::LoadImageConfig() {
-        textureCfg["image"].for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
+        textureCfg["image"].for_each([this](const std::string& name, jaweson::JsonValue& node) {
             std::string path = node.to_string();
             if(FileSystem::IsFileExists(path)) {
                 base::Image img;
@@ -223,7 +223,7 @@ namespace ygopro
                 }
             }
         });
-        textureCfg["texture"].for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
+        textureCfg["texture"].for_each([this](const std::string& name, jaweson::JsonValue& node) {
             base::Texture* ptex = nullptr;
             std::string src = node[0].to_string();
             if(src == "card")
@@ -244,7 +244,7 @@ namespace ygopro
                 ti.vert[3] = {x + w, y + h};
             }
         });
-        textureCfg["points"].for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
+        textureCfg["points"].for_each([this](const std::string& name, jaweson::JsonValue& node) {
             base::Texture* ptex = nullptr;
             std::string src = node[0].to_string();
             if(src == "card")

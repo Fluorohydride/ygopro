@@ -226,7 +226,7 @@ namespace ygopro
         offsety[0] = deck_area.top - h1 * yrate;
         offsety[1] = offsety[0] - card_size.y * 4 - h2 * yrate * 3 - h1 * yrate * 2;
         offsety[2] = offsety[1] - card_size.y - h1 * yrate * 2;
-        res_count = sgui::SGJsonUtil::ConvertV2i(layoutCfg["search count"], 0);
+        res_count = sgui::SGJsonUtil::ConvertVec2<int32_t>(layoutCfg["search count"], 0);
         res_count.x = res_count.x ? res_count.x : 1;
         res_count.y = res_count.y ? res_count.y : 1;
         float resw = res_area.width / res_count.x * 1.45f * sz.x / sz.y;

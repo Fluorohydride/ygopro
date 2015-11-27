@@ -1,7 +1,7 @@
 #ifndef _JAWESON_H_
 #define _JAWESON_H_
 
-// version 0.4
+// version 0.5
 // sample code:
 //    jaweson::JsonRoot<> root;
 //    if(!root.parse(buffer, len)) {
@@ -11,7 +11,7 @@
 //        auto& msg = std::get<2>(info);
 //        std::cout << msg << " " << err_line << "," << err_col << std::endl;
 //    } else {
-//        root["nodename"].set_value<jaweson::JsonString>("teststring");
+//        root["nodename"].set_value<jaweson::JsonString<>>("teststring");
 //        std::cout << root << std::endl;
 //        // this is equivalent to
 //        // jaweson::JsonStreamWriter<> writer(std::cout);
@@ -191,14 +191,12 @@ namespace jaweson
         }
     };
     
-    template<typename ALLOC_TYPE>
-    class JsonNode;
+    class JsonValue;
     
-    template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonValue {
+    class JsonType {
     public:
-        JsonValue() {};
-        virtual ~JsonValue() {};
+        JsonType() {};
+        virtual ~JsonType() {};
         virtual bool is_number() { return false; }
         virtual bool is_string() { return false; }
         virtual bool is_null() { return false; }
@@ -210,24 +208,33 @@ namespace jaweson
         virtual double to_double() { return 0.0; }
         virtual bool to_bool() { return false; }
         virtual const std::string& to_string() { static std::string empty_str; return empty_str; }
-        virtual JsonNode<ALLOC_TYPE>& operator [] (const std::string& key);
-        virtual JsonNode<ALLOC_TYPE>& operator [] (int32_t index);
-        virtual bool insert(const std::string& key, JsonValue<ALLOC_TYPE>* value) { return false; }
-        virtual bool insert(JsonValue* value) { return false; }
+        virtual JsonValue& operator [] (const std::string& key);
+        virtual JsonValue& operator [] (int32_t index);
+        virtual bool insert(const std::string& key, JsonType* value) { return false; }
+        virtual bool insert(JsonType* value) { return false; }
         virtual bool erase(const std::string& key) { return false; }
         virtual bool erase(int32_t index) { return false; }
-        virtual void for_each(const std::function<void(const std::string&, JsonNode<ALLOC_TYPE>&)>& fun) {}
-        virtual void for_each(const std::function<void(int32_t, JsonNode<ALLOC_TYPE>&)>& fun) {}
+        virtual void for_each(const std::function<void(const std::string&, JsonValue&)>& fun) {}
+        virtual void for_each(const std::function<void(int32_t, JsonValue&)>& fun) {}
         virtual size_t size() { return 0; }
         virtual void write_to(JsonWriter& writer) = 0;
-        virtual JsonValue<ALLOC_TYPE>* clone() = 0;
+        virtual JsonType* clone() = 0;
         virtual void free() = 0;
+        
+        template<typename CONV_TYPE>
+        inline CONV_TYPE to_value() { return static_cast<CONV_TYPE>(to_integer()); }
+        
     protected:
-        JsonValue(const JsonValue&){};
+        JsonType(const JsonType&){};
     };
     
+    template<> inline bool JsonType::to_value<bool>() { return to_bool(); }
+    template<> inline float JsonType::to_value<float>() { return (float)to_double(); }
+    template<> inline double JsonType::to_value<double>() { return to_double(); }
+    template<> inline std::string JsonType::to_value<std::string>() { return to_string(); }
+    
     template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonDouble : public JsonValue<ALLOC_TYPE> {
+    class JsonDouble : public JsonType {
     public:
         inline JsonDouble(double value) : ref_value(value) {}
         inline virtual bool is_number() { return true; }
@@ -238,7 +245,7 @@ namespace jaweson
             sprintf(buffer, "%.9lg", ref_value);
             writer << buffer;
         }
-        virtual JsonValue<ALLOC_TYPE>* clone() { return ALLOC_TYPE::template alloc<JsonDouble>(ref_value); }
+        virtual JsonType* clone() { return ALLOC_TYPE::template alloc<JsonDouble>(ref_value); }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
         static inline JsonDouble<ALLOC_TYPE>* create(double val) { return ALLOC_TYPE::template alloc<JsonDouble>(val); }
     protected:
@@ -246,7 +253,7 @@ namespace jaweson
     };
     
     template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonInteger : public JsonValue<ALLOC_TYPE> {
+    class JsonInteger : public JsonType {
     public:
         inline JsonInteger(int64_t value) : ref_value(value) {}
         inline virtual bool is_number() { return true; }
@@ -257,7 +264,7 @@ namespace jaweson
             sprintf(buffer, "%lld", ref_value);
             writer << buffer;
         }
-        virtual JsonValue<ALLOC_TYPE>* clone() { return ALLOC_TYPE::template alloc<JsonInteger>(ref_value); }
+        virtual JsonType* clone() { return ALLOC_TYPE::template alloc<JsonInteger>(ref_value); }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
         static inline JsonInteger<ALLOC_TYPE>* create(int64_t val) { return ALLOC_TYPE::template alloc<JsonInteger>(val); }
     protected:
@@ -265,7 +272,7 @@ namespace jaweson
     };
     
     template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonString : public JsonValue<ALLOC_TYPE> {
+    class JsonString : public JsonType {
     public:
         inline JsonString(const std::string& value) : ref_value(value) {}
         inline JsonString(std::string&& value) : ref_value(std::move(value)) {}
@@ -274,7 +281,7 @@ namespace jaweson
         virtual void write_to(JsonWriter& writer) {
             writer << '\"' << JsonUtil::raw_string_to_text(ref_value, writer.need_escape_slash()).c_str() << '\"';
         }
-        virtual JsonValue<ALLOC_TYPE>* clone() { return ALLOC_TYPE::template alloc<JsonString>(ref_value); }
+        virtual JsonType* clone() { return ALLOC_TYPE::template alloc<JsonString>(ref_value); }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
         static inline JsonString<ALLOC_TYPE>* create(const std::string& val) { return ALLOC_TYPE::template alloc<JsonString>(val); }
         static inline JsonString<ALLOC_TYPE>* create(std::string&& val) { return ALLOC_TYPE::template alloc<JsonString>(std::move(val)); }
@@ -283,7 +290,7 @@ namespace jaweson
     };
     
     template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonBool : public JsonValue<ALLOC_TYPE> {
+    class JsonBool : public JsonType {
     public:
         inline JsonBool(bool value) : ref_value(value) {}
         virtual bool is_bool() { return true; }
@@ -291,7 +298,7 @@ namespace jaweson
         virtual void write_to(JsonWriter& writer) {
             writer << (ref_value ? "true" : "false");
         }
-        virtual JsonValue<ALLOC_TYPE>* clone() { return create(ref_value); }
+        virtual JsonType* clone() { return create(ref_value); }
         virtual void free() {}
         static JsonBool<ALLOC_TYPE>* create(bool val) {
             static JsonBool<ALLOC_TYPE> stTrue(true);
@@ -302,28 +309,26 @@ namespace jaweson
         bool ref_value = 0;
     };
     
-    template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonNull : public JsonValue<ALLOC_TYPE> {
+    class JsonNull : public JsonType {
     public:
         inline JsonNull() {}
         virtual bool is_null() { return true; }
         virtual void write_to(JsonWriter& writer) {
             writer << "null";
         }
-        virtual JsonValue<ALLOC_TYPE>* clone() { return create(); }
+        virtual JsonType* clone() { return create(); }
         virtual void free() {}
-        static JsonNull<ALLOC_TYPE>* create() {
-            static JsonNull<ALLOC_TYPE> stNull;
+        static JsonNull* create() {
+            static JsonNull stNull;
             return &stNull;
         }
     };
     
-    template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonNode {
+    class JsonValue {
     public:
-        JsonNode(const JsonNode&) = delete;
-        inline JsonNode(JsonValue<ALLOC_TYPE>* value) { ref_value = value; }
-        virtual ~JsonNode() { if(ref_value) ref_value->free(); }
+        JsonValue(const JsonValue&) = delete;
+        inline JsonValue(JsonType* value) { ref_value = value; }
+        virtual ~JsonValue() { if(ref_value) ref_value->free(); }
         virtual void free() = 0;
         
         inline bool is_number() { return ref_value->is_number(); }
@@ -337,25 +342,25 @@ namespace jaweson
         inline double to_double() { return ref_value->to_double(); }
         virtual bool to_bool() { return ref_value->to_bool(); }
         inline const std::string& to_string() { return ref_value->to_string(); }
-        inline JsonNode<ALLOC_TYPE>& operator [] (const std::string& key) { return (*ref_value)[key]; }
-        inline JsonNode<ALLOC_TYPE>& operator [] (int32_t index) { return (*ref_value)[index]; }
-        inline bool insert(const std::string& key, JsonValue<ALLOC_TYPE>* value) { return ref_value->insert(key, value); }
-        inline bool insert(JsonValue<ALLOC_TYPE>* value) { return ref_value->insert(value); }
+        inline JsonValue& operator [] (const std::string& key) { return (*ref_value)[key]; }
+        inline JsonValue& operator [] (int32_t index) { return (*ref_value)[index]; }
+        inline bool insert(const std::string& key, JsonType* value) { return ref_value->insert(key, value); }
+        inline bool insert(JsonType* value) { return ref_value->insert(value); }
         inline bool erase(const std::string& key) { return ref_value->erase(key); }
         inline bool erase(int32_t index) { return ref_value->erase(index); }
-        inline void for_each(const std::function<void(const std::string&, JsonNode<ALLOC_TYPE>&)>& fun) { ref_value->for_each(fun); }
-        inline void for_each(const std::function<void(int32_t, JsonNode<ALLOC_TYPE>&)>& fun) { ref_value->for_each(fun); }
+        inline void for_each(const std::function<void(const std::string&, JsonValue&)>& fun) { ref_value->for_each(fun); }
+        inline void for_each(const std::function<void(int32_t, JsonValue&)>& fun) { ref_value->for_each(fun); }
         inline size_t size() { return ref_value->size(); }
         inline void write_to(JsonWriter& writer) { ref_value->write_to(writer); }
-        inline JsonValue<ALLOC_TYPE>* clone() { return ref_value->clone(); }
-        inline void attach(JsonNode<ALLOC_TYPE>& node) {
+        inline JsonType* clone() { return ref_value->clone(); }
+        inline void attach(JsonValue& node) {
             if(ref_value->is_empty()|| !node.ref_value) return;
             if(ref_value)
                 ref_value->free();
             ref_value = node.ref_value;
-            node.ref_value = JsonNull<ALLOC_TYPE>::create();
+            node.ref_value = JsonNull::create();
         }
-        inline void operator = (JsonNode<ALLOC_TYPE>& node) {
+        inline void operator = (JsonValue& node) {
             if(ref_value->is_empty()) return;
             auto val = node.clone();
             if(val == nullptr)
@@ -364,51 +369,53 @@ namespace jaweson
                 ref_value->free();
             ref_value = node.clone();
         }
-        template<template<typename> class VALUE_TYPE, typename... TR>
+        template<typename VALUE_TYPE, typename... TR>
         inline void set_value(TR&&... params) {
+            static_assert(std::is_base_of<JsonType, VALUE_TYPE>::value, "VALUE_TYPE should be subclass of JsonType.");
             if(ref_value->is_empty()) return;
             if(ref_value != nullptr)
                 ref_value->free();
-            ref_value = VALUE_TYPE<ALLOC_TYPE>::create(std::forward<TR>(params)...);
+            ref_value = VALUE_TYPE::create(std::forward<TR>(params)...);
         }
+        template<typename CONV_TYPE>
+        inline CONV_TYPE to_value() { return ref_value->template to_value<CONV_TYPE>(); }
+        
     protected:
-        JsonValue<ALLOC_TYPE>* ref_value = nullptr;
+        JsonType* ref_value = nullptr;
     };
     
-    template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonEmptyNode : public JsonNode<ALLOC_TYPE> {
+    class JsonEmptyValue : public JsonValue {
     public:
         virtual void free() {}
-        static JsonEmptyNode& Get() {
-            static JsonEmptyNode<ALLOC_TYPE> empty_value;
+        static JsonEmptyValue& Get() {
+            static JsonEmptyValue empty_value;
             return empty_value;
         }
     protected:
-        class JsonEmptyValue : public JsonValue<ALLOC_TYPE> {
+        class JsonEmptyType : public JsonType {
         public:
             virtual bool is_empty() { return true; }
             virtual void write_to(JsonWriter& writer) {}
-            virtual JsonValue<ALLOC_TYPE>* clone() { return nullptr; }
-            virtual void free() { delete this; }
+            virtual JsonType* clone() { return nullptr; }
+            virtual void free() {}
         };
         
-        inline JsonEmptyNode() : JsonNode<ALLOC_TYPE>(nullptr) {
-            JsonNode<ALLOC_TYPE>::ref_value = new JsonEmptyNode<ALLOC_TYPE>::JsonEmptyValue;
+        inline JsonEmptyValue() : JsonValue(nullptr) {
+            static JsonEmptyType empty_val;
+            JsonValue::ref_value = &empty_val;
         };
     };
     
-    template<typename ALLOC_TYPE>
-    JsonNode<ALLOC_TYPE>& JsonValue<ALLOC_TYPE>::operator [] (const std::string& key) {
-        return JsonEmptyNode<ALLOC_TYPE>::Get();
+    inline JsonValue& JsonType::operator [] (const std::string& key) {
+        return JsonEmptyValue::Get();
     }
     
-    template<typename ALLOC_TYPE>
-    JsonNode<ALLOC_TYPE>& JsonValue<ALLOC_TYPE>::operator [] (int32_t index) {
-        return JsonEmptyNode<ALLOC_TYPE>::Get();
+    inline JsonValue& JsonType::operator [] (int32_t index) {
+        return JsonEmptyValue::Get();
     }
     
     template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonObject : public JsonValue<ALLOC_TYPE> {
+    class JsonObject : public JsonType {
     public:
         inline JsonObject() { values.reserve(16); }
         ~JsonObject() {
@@ -417,32 +424,32 @@ namespace jaweson
                     iter->free();
         }
         virtual bool is_object() { return true; }
-        virtual JsonNode<ALLOC_TYPE>& operator [] (const std::string& key) {
+        virtual JsonValue& operator [] (const std::string& key) {
             if(!has_index)
                 build_index();
             auto iter = indices.find(key);
             if(iter == indices.end()) {
                 std::string inner_key = key;
-                auto null_value = JsonNull<ALLOC_TYPE>::create();
-                values.push_back(ALLOC_TYPE::template alloc<JsonNodeObject>(inner_key, null_value));
+                auto null_value = JsonNull::create();
+                values.push_back(ALLOC_TYPE::template alloc<JsonValueObject>(inner_key, null_value));
                 return *values.back();
             } else
                 return *values[iter->second];
         }
         
-        virtual bool insert(const std::string& key, JsonValue<ALLOC_TYPE>* value) {
+        virtual bool insert(const std::string& key, JsonType* value) {
             if(has_index) {
                 auto iter = indices.find(key);
                 if(iter == indices.end()) {
                     std::string inner_key = key;
-                    auto null_value = JsonNull<ALLOC_TYPE>::create();
-                    values.push_back(ALLOC_TYPE::template alloc<JsonNodeObject>(inner_key, null_value));
+                    auto null_value = JsonNull::create();
+                    values.push_back(ALLOC_TYPE::template alloc<JsonValueObject>(inner_key, null_value));
                     indices[key] = (int32_t)values.size() - 1;
                 } else
                     return false;
             } else {
                 std::string inner_key = key;
-                values.push_back(ALLOC_TYPE::template alloc<JsonNodeObject>(inner_key, value));
+                values.push_back(ALLOC_TYPE::template alloc<JsonValueObject>(inner_key, value));
             }
             return true;
         }
@@ -459,7 +466,7 @@ namespace jaweson
             return true;
         }
         
-        virtual void for_each(const std::function<void(const std::string&, JsonNode<ALLOC_TYPE>&)>& fun) {
+        virtual void for_each(const std::function<void(const std::string&, JsonValue&)>& fun) {
             if(!fun)
                 return;
             for(auto& iter : values)
@@ -490,7 +497,7 @@ namespace jaweson
             }
         }
         
-        virtual JsonValue<ALLOC_TYPE>* clone() {
+        virtual JsonType* clone() {
             JsonObject<ALLOC_TYPE>* obj = ALLOC_TYPE::template alloc<JsonObject>();
             for(auto& iter : values)
                 if(iter)
@@ -501,27 +508,27 @@ namespace jaweson
         static JsonObject<ALLOC_TYPE>* create() { return ALLOC_TYPE::template alloc<JsonObject>(); }
         
         inline void reserve_value(std::string& key) {
-            values.push_back(ALLOC_TYPE::template alloc<JsonNodeObject>(key, nullptr));
+            values.push_back(ALLOC_TYPE::template alloc<JsonValueObject>(key, nullptr));
         }
         
-        inline void fulfill_value(JsonValue<ALLOC_TYPE>* value) {
+        inline void fulfill_value(JsonType* value) {
             values.back()->set_value(value);
         }
         
-        inline void init(std::string& key, JsonValue<ALLOC_TYPE>* value) {
-            values.push_back(ALLOC_TYPE::template alloc<JsonNodeObject>(key, value));
+        inline void init(std::string& key, JsonType* value) {
+            values.push_back(ALLOC_TYPE::template alloc<JsonValueObject>(key, value));
         }
         
     protected:
-        class JsonNodeObject : public JsonNode<ALLOC_TYPE> {
+        class JsonValueObject : public JsonValue {
         public:
-            inline JsonNodeObject(std::string& key, JsonValue<ALLOC_TYPE>* val = nullptr) : JsonNode<ALLOC_TYPE>(val), ref_key(std::move(key)) {}
+            inline JsonValueObject(std::string& key, JsonType* val = nullptr) : JsonValue(val), ref_key(std::move(key)) {}
             virtual void free() { ALLOC_TYPE::template recycle(this); }
             
-            inline void set_value(JsonValue<ALLOC_TYPE>* value) {
-                if(JsonNode<ALLOC_TYPE>::ref_value)
-                    JsonNode<ALLOC_TYPE>::ref_value->free();
-                JsonNode<ALLOC_TYPE>::ref_value = value;
+            inline void set_value(JsonType* value) {
+                if(JsonValue::ref_value)
+                    JsonValue::ref_value->free();
+                JsonValue::ref_value = value;
             }
             std::string ref_key;
         };
@@ -535,13 +542,13 @@ namespace jaweson
         }
         
         bool has_index = false;
-        std::vector<typename JsonObject<ALLOC_TYPE>::JsonNodeObject*> values;
+        std::vector<typename JsonObject<ALLOC_TYPE>::JsonValueObject*> values;
         std::map<std::string, int32_t> indices;
         
     };
     
     template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonArray : public JsonValue<ALLOC_TYPE> {
+    class JsonArray : public JsonType {
     public:
         inline JsonArray() { values.reserve(16); }
         ~JsonArray() {
@@ -549,13 +556,13 @@ namespace jaweson
                 iter->free();
         }
         virtual bool is_array() { return true; }
-        virtual JsonNode<ALLOC_TYPE>& operator [] (int32_t index) {
+        virtual JsonValue& operator [] (int32_t index) {
             if(index < 0 || index >= values.size())
-                return JsonEmptyNode<ALLOC_TYPE>::Get();
+                return JsonEmptyValue::Get();
             return *values[index];
         }
-        virtual bool insert(JsonValue<ALLOC_TYPE>* value) {
-            values.push_back(ALLOC_TYPE::template alloc<JsonNodeArray>(value));
+        virtual bool insert(JsonType* value) {
+            values.push_back(ALLOC_TYPE::template alloc<JsonValueArray>(value));
             return true;
         }
         
@@ -566,7 +573,7 @@ namespace jaweson
             return true;
         }
         
-        virtual void for_each(const std::function<void(int32_t, JsonNode<ALLOC_TYPE>&)>& fun) {
+        virtual void for_each(const std::function<void(int32_t, JsonValue&)>& fun) {
             if(!fun)
                 return;
             for(size_t i = 0; i < values.size(); ++i)
@@ -586,28 +593,28 @@ namespace jaweson
             writer << ']';
         }
         
-        virtual JsonValue<ALLOC_TYPE>* clone() {
+        virtual JsonType* clone() {
             JsonArray<ALLOC_TYPE>* obj = ALLOC_TYPE::template alloc<JsonArray>();
             for(auto& iter : values)
-                obj->values.push_back(ALLOC_TYPE::template alloc<JsonNodeArray>(iter->clone()));
+                obj->values.push_back(ALLOC_TYPE::template alloc<JsonValueArray>(iter->clone()));
             return obj;
         }
         virtual void free() { ALLOC_TYPE::template recycle(this); }
         static JsonArray<ALLOC_TYPE>* create() { return ALLOC_TYPE::template alloc<JsonArray>(); }
         
     protected:
-        class JsonNodeArray : public JsonNode<ALLOC_TYPE> {
+        class JsonValueArray : public JsonValue {
         public:
-            JsonNodeArray(JsonValue<ALLOC_TYPE>* val = nullptr) : JsonNode<ALLOC_TYPE>(val) {}
+            JsonValueArray(JsonType* val = nullptr) : JsonValue(val) {}
             virtual void free() { ALLOC_TYPE::template recycle(this); }
         };
-        std::vector<JsonNodeArray*> values;
+        std::vector<JsonValueArray*> values;
     };
     
     template<typename ALLOC_TYPE = DefaultAllocator>
-    class JsonRoot : public JsonNode<ALLOC_TYPE> {
+    class JsonRoot : public JsonValue {
     public:
-        JsonRoot() : JsonNode<ALLOC_TYPE>(nullptr) {}
+        JsonRoot() : JsonValue(nullptr) {}
         virtual void free() {}
         
         bool parse(const char* text, size_t len) {
@@ -616,7 +623,7 @@ namespace jaweson
             err_col = 0;
             err_msg.clear();
             if(status.parse(text, (int32_t)len)) {
-                JsonNode<ALLOC_TYPE>::ref_value = status.ret_value;
+                JsonValue::ref_value = status.ret_value;
                 return true;
             } else {
                 uintptr_t error_pos = (uintptr_t)(status.cur_ptr - status.begin_ptr);
@@ -712,7 +719,7 @@ namespace jaweson
                 return JsonUtil::get_token_type(*cur_ptr);
             }
             
-            inline JsonValue<ALLOC_TYPE>* parse_true() {
+            inline JsonType* parse_true() {
                 if(cur_ptr + 4 < end_ptr && *(uint32_t*)cur_ptr == 0x65757274) {
                     cur_ptr += 4;
                     return JsonBool<ALLOC_TYPE>::create(true);
@@ -720,7 +727,7 @@ namespace jaweson
                 log_expecting_error(TOKEN_ALLVALUE_FLAG);
                 return nullptr;
             }
-            inline JsonValue<ALLOC_TYPE>* parse_false() {
+            inline JsonType* parse_false() {
                 if(cur_ptr + 5 < end_ptr && *(uint32_t*)(cur_ptr + 1) == 0x65736c61) {
                     cur_ptr += 5;
                     return JsonBool<ALLOC_TYPE>::create(false);
@@ -728,10 +735,10 @@ namespace jaweson
                 log_expecting_error(TOKEN_ALLVALUE_FLAG);
                 return nullptr;
             }
-            inline JsonValue<ALLOC_TYPE>* parse_null() {
+            inline JsonType* parse_null() {
                 if(cur_ptr + 4 < end_ptr && *(uint32_t*)cur_ptr == 0x6c6c756e) {
                     cur_ptr += 4;
-                    return JsonNull<ALLOC_TYPE>::create();
+                    return JsonNull::create();
                 }
                 log_expecting_error(TOKEN_ALLVALUE_FLAG);
                 return nullptr;
@@ -739,7 +746,7 @@ namespace jaweson
             
 #define RETURN_ERR(x) {error_msg = x; return nullptr; }
             
-            JsonValue<ALLOC_TYPE>* parse_number() {
+            JsonType* parse_number() {
                 bool is_integer = true;
                 int64_t int_value = 0;
                 double double_value = 0.0;
@@ -822,7 +829,7 @@ namespace jaweson
                     return JsonDouble<ALLOC_TYPE>::create(double_value);
             }
             
-            JsonValue<ALLOC_TYPE>* parse_string() {
+            JsonType* parse_string() {
                 cur_ptr++;
                 std::string str;
                 if(parse_string(str))
@@ -875,7 +882,7 @@ namespace jaweson
                 return nullptr;
             }
             
-            JsonValue<ALLOC_TYPE>* parse_value() {
+            JsonType* parse_value() {
                 uint32_t token_type = check_next_token();
                 if((1 << token_type) & TOKEN_ALLVALUE_FLAG) {
                     switch (token_type) {
@@ -902,7 +909,7 @@ namespace jaweson
                 }
             }
             
-            JsonValue<ALLOC_TYPE>* parse_object() {
+            JsonType* parse_object() {
                 cur_ptr++;
                 uint32_t token_type = check_next_token();
                 JsonObject<ALLOC_TYPE>* obj = JsonObject<ALLOC_TYPE>::create();
@@ -938,7 +945,7 @@ namespace jaweson
                         return nullptr;
                     }
                     cur_ptr++;
-                    JsonValue<ALLOC_TYPE>* val = parse_value();
+                    JsonType* val = parse_value();
                     if(!val) {
                         obj->free();
                         return nullptr;
@@ -961,7 +968,7 @@ namespace jaweson
                 return nullptr;
             }
             
-            JsonValue<ALLOC_TYPE>* parse_array() {
+            JsonType* parse_array() {
                 cur_ptr++;
                 int32_t token_type = check_next_token();
                 JsonArray<ALLOC_TYPE>* obj = JsonArray<ALLOC_TYPE>::create();
@@ -972,7 +979,7 @@ namespace jaweson
                 int32_t warn_line;
                 int32_t warn_col;
                 while(true) {
-                    JsonValue<ALLOC_TYPE>* val = parse_value();
+                    JsonType* val = parse_value();
                     if(!val) {
                         token_type = check_next_token();
                         if(token_type == TOKEN_RBRACKET) {
@@ -1008,7 +1015,7 @@ namespace jaweson
             int32_t err_line = 0;
             uintptr_t err_col = 0;
             std::string error_msg;
-            JsonValue<ALLOC_TYPE>* ret_value = nullptr;
+            JsonType* ret_value = nullptr;
         };
     };
     
@@ -1081,7 +1088,7 @@ namespace jaweson
         std::string* stringptr = nullptr;
     };
     
-    inline std::ostream& operator << (std::ostream& stream, JsonNode<>& node) {
+    inline std::ostream& operator << (std::ostream& stream, JsonValue& node) {
         JsonStreamWriter<> writer(stream);
         node.write_to(writer);
         return stream;

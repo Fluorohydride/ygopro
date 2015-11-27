@@ -21,9 +21,16 @@ namespace ygopro
                 dm->msg_type = MSG_CHAINING;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint32_t>(84013237);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x02, 1, 0).info);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x02, 1, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
                 writer.Write<uint32_t>(84013237);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 2: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_CHAINED;
+                BufferWriter writer(dm->msg_buffer);
                 messages.PushCommand(dm);
                 break;
             }
@@ -1168,25 +1175,25 @@ namespace ygopro
                 if(chain.code)
                     pcard->SetCode(chain.code);
                 
-                rectf rct = sgui::SGJsonUtil::ConvertRectf(layoutCfg["activate param"]);
+                auto rct = sgui::SGJsonUtil::ConvertArray<float, 4>(layoutCfg["activate param"]);
                 auto aura1 = duel_scene->AddFieldSprite();
                 aura1->SetTexture(ImageMgr::Get().GetRawMiscTexture());
                 aura1->SetTexcoord(ImageMgr::Get().GetTexture("act aura1"));
                 aura1->SetTranslation(pcard->translation);
-                aura1->SetSize({rct.left, rct.left});
+                aura1->SetSize({rct[0], rct[0]});
                 aura1->SetRotation(pcard->rotation);
                 auto aura2 = duel_scene->AddFieldSprite();
                 aura2->SetTexture(ImageMgr::Get().GetRawMiscTexture());
                 aura2->SetTexcoord(ImageMgr::Get().GetTexture("act aura2"));
                 aura2->SetTranslation(pcard->translation);
-                aura2->SetSize({rct.width, rct.width});
+                aura2->SetSize({rct[2], rct[2]});
                 aura2->SetRotation(pcard->rotation);
                 auto action = std::make_shared<LerpAnimator<int64_t>>(1000, [rct, aura1, aura2, pcard](double t) ->bool {
                     uint32_t cl = (t > 0.5f) ? (((int32_t)(255 * (2 - t * 2)) << 24) | 0xffffff) : 0xffffffff;
-                    float rad1 = rct.left * (1 - t) + rct.top * t;
+                    float rad1 = rct[0] * (1 - t) + rct[1] * t;
                     aura1->SetSize({rad1, rad1});
                     aura1->SetColor(cl);
-                    float rad2 = (t > 0.5f) ? (rct.height * (2 - t * 2) + rct.width * (t - 0.5f) * 2) : (rct.width * (1 - t * 2) + rct.height * t * 2);
+                    float rad2 = (t > 0.5f) ? (rct[3] * (2 - t * 2) + rct[2] * (t - 0.5f) * 2) : (rct[2] * (1 - t * 2) + rct[3] * t * 2);
                     aura2->SetSize({rad2, rad2});
                     aura2->SetColor(cl);
                     aura2->SetRotation(pcard->rotation * glm::angleAxis(3.1415926f * (float)t, glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -1203,16 +1210,17 @@ namespace ygopro
                 break;
             }
             case MSG_CHAINED: {
-//                int ct = BufferIO::ReadInt8(pbuf);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
-//                mainGame->gMutex.Lock();
-//                mainGame->dField.chains.push_back(mainGame->dField.current_chain);
-//                mainGame->gMutex.Unlock();
-//                if (ct > 1)
-//                    mainGame->WaitFrameSignal(20);
-//                mainGame->dField.last_chain = true;
+                if(g_duel.chains.empty())
+                    break;
+                if(g_duel.chains.size() == 1) {
+                    
+                } else if(g_duel.chains.size() == 2) {
+                    AddChain(0);
+                    AddChain(1);
+                } else {
+                    AddChain((int32_t)g_duel.chains.size() - 1);
+                }
+                g_duel.last_chain = true;
                 break;
             }
             case MSG_CHAIN_SOLVING: {
@@ -1233,7 +1241,6 @@ namespace ygopro
                 break;
             }
             case MSG_CHAIN_SOLVED: {
-//                /*int ct = */BufferIO::ReadInt8(pbuf);
                 break;
             }
             case MSG_CHAIN_END: {
@@ -1349,7 +1356,7 @@ namespace ygopro
                 int32_t beginlp = g_player[playerid].lp;
                 int32_t endlp = (beginlp > val) ? (beginlp - val) : 0;
                 auto changesp = duel_scene->AddFloatingNumber();
-                jaweson::JsonNode<>& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
+                jaweson::JsonValue& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
                 v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
                 v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
                 v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
@@ -1385,7 +1392,7 @@ namespace ygopro
                 int32_t beginlp = g_player[playerid].lp;
                 int32_t endlp = beginlp + val;
                 auto changesp = duel_scene->AddFloatingNumber();
-                jaweson::JsonNode<>& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
+                jaweson::JsonValue& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
                 v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
                 v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
                 v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
@@ -1437,7 +1444,6 @@ namespace ygopro
                 equip_card->Equip(target.get());
                 break;
             }
-            
             case MSG_UNEQUIP: {
                 CardPosInfo pie(LocalPosInfo(reader.Read<int32_t>()));
                 auto equip_card = GetCard(pie);

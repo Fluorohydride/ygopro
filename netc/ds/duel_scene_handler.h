@@ -12,6 +12,7 @@ namespace ygopro
     class DuelScene;
     class FieldBlock;
     class FieldCard;
+    class FieldSprite;
     class FloatingNumber;
     class FloatingSprite;
     class LogPanel;
@@ -92,11 +93,13 @@ namespace ygopro
         uint32_t desc = 0;
         FieldCard* chaining_card = nullptr;
         CardPosInfo triggering_pos;
+        std::vector<FieldSprite*> chain_sprites;
     };
     
     struct LocalDuelData {
         bool deck_reversed = false;
         int32_t host_player = 0;
+        bool last_chain = false;
         std::vector<LocalChainInfo> chains;
     };
     
@@ -129,7 +132,8 @@ namespace ygopro
         
         void ClearField();
         void SetLP(int32_t pid, int32_t lp);
-        void AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq);
+        void AddChain(int32_t ct);
+        void SolveChain(int32_t ct);
         
         template<typename... ACTS>
         void PushMessageActions(ACTS... acts) {

@@ -599,7 +599,7 @@ namespace ygopro
         vparam.radius = (float)layoutCfg["radius"].to_double();
         vparam.xoffset = (float)layoutCfg["xoffset"].to_double();
         vparam.yoffset = (float)layoutCfg["yoffset"].to_double();
-        vparam.cardrect = sgui::SGJsonUtil::ConvertRectf(layoutCfg["card"]);
+        vparam.cardrect = sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["card"]);
         vparam.handmin = (float)layoutCfg["handmin"].to_double();
         vparam.handmax = (float)layoutCfg["handmax"].to_double();
         vparam.handy[0] = (float)layoutCfg["handy1"].to_double();

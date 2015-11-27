@@ -32,13 +32,13 @@ namespace ygopro
         SpriteList = 17,
     };
     
-    void LoadItemList(sgui::SGItemListWidget* widget, jaweson::JsonNode<>& node) {
-        node.for_each([widget](const std::string& name, jaweson::JsonNode<>& item_node) {
+    void LoadItemList(sgui::SGItemListWidget* widget, jaweson::JsonValue& node) {
+        node.for_each([widget](const std::string& name, jaweson::JsonValue& item_node) {
             widget->AddItem(To<std::wstring>(stringCfg[name].to_string()), sgui::SGJsonUtil::ConvertRGBA(item_node[0]), (uint32_t)item_node[1].to_integer());
         });
     }
     
-    sgui::SGWidget* LoadChild(sgui::SGWidgetContainer* parent, const std::string& child_name, jaweson::JsonNode<>& node) {
+    sgui::SGWidget* LoadChild(sgui::SGWidgetContainer* parent, const std::string& child_name, jaweson::JsonValue& node) {
         static std::map<std::string, WidgetType> widget_type_id = {
             {"window", WidgetType::Window},
             {"panel", WidgetType::Panel},
@@ -65,7 +65,7 @@ namespace ygopro
             case WidgetType::Window: {
                 auto wnd = parent->NewChild<sgui::SGWindow>();
                 wnd->SetName(child_name);
-                node.for_each([wnd](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([wnd](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, wnd, {0, 0});
                     } else if(name == "style") {
@@ -80,7 +80,7 @@ namespace ygopro
                     } else if(name == "min size") {
                         wnd->SetMinSize({(int32_t)sub_node[0].to_integer(), (int32_t)sub_node[1].to_integer()});
                     } else if(name == "children") {
-                        sub_node.for_each([wnd](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                        sub_node.for_each([wnd](const std::string& c_name, jaweson::JsonValue& c_node) {
                             LoadChild(wnd, c_name, c_node);
                         });
                     }
@@ -91,13 +91,13 @@ namespace ygopro
                 auto ent = node["is entity"].to_bool();
                 auto pnl = parent->NewChild<sgui::SGPanel>(ent);
                 pnl->SetName(child_name);
-                node.for_each([pnl](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([pnl](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, pnl, {0, 0});
                     } else if(name == "style") {
                         pnl->SetStyle(sub_node);
                     } else if(name == "children") {
-                        sub_node.for_each([pnl](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                        sub_node.for_each([pnl](const std::string& c_name, jaweson::JsonValue& c_node) {
                             LoadChild(pnl, c_name, c_node);
                         });
                     }
@@ -107,20 +107,20 @@ namespace ygopro
             case WidgetType::TabControl: {
                 auto tab_control = parent->NewChild<sgui::SGTabControl>();
                 tab_control->SetName(child_name);
-                node.for_each([tab_control](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([tab_control](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, tab_control, {0, 0});
                     } else if(name == "style") {
                         tab_control->SetStyle(sub_node);
                     } else if(name == "tabs") {
-                        sub_node.for_each([tab_control](const std::string& name, jaweson::JsonNode<>& tab_node) {
+                        sub_node.for_each([tab_control](const std::string& name, jaweson::JsonValue& tab_node) {
                             int32_t title_color = 0xff000000;
                             auto& color_node = tab_node["title color"];
                             if(!color_node.is_empty())
                                 title_color = sgui::SGJsonUtil::ConvertRGBA(color_node);
                             auto tab = tab_control->AddTab(To<std::wstring>(name), title_color);
                             auto& child_node = tab_node["children"];
-                            child_node.for_each([tab](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                            child_node.for_each([tab](const std::string& c_name, jaweson::JsonValue& c_node) {
                                 LoadChild(tab, c_name, c_node);
                             });
                         });
@@ -131,7 +131,7 @@ namespace ygopro
             case WidgetType::Label: {
                 auto lbl = parent->NewChild<sgui::SGLabel>();
                 lbl->SetName(child_name);
-                node.for_each([lbl](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([lbl](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, lbl, {0, 0});
                     } else if(name == "allow focus") {
@@ -148,13 +148,13 @@ namespace ygopro
             case WidgetType::Sprite: {
                 auto img = parent->NewChild<sgui::SGImage>();
                 img->SetName(child_name);
-                node.for_each([img](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([img](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, img, {0, 0});
                     } else if(name == "allow focus") {
                         img->SetAllowFocus(sub_node.to_bool());
                     } else if(name == "image") {
-                        img->GetSpriteUI()->SetTextureRect(sgui::SGJsonUtil::ConvertRecti(sub_node));
+                        img->GetSpriteUI()->SetTextureRect(sgui::SGJsonUtil::ConvertRect<int32_t>(sub_node));
                     }
                 });
                 return img;
@@ -162,7 +162,7 @@ namespace ygopro
             case WidgetType::SimpleButton: {
                 auto btn = parent->NewChild<sgui::SGSimpleButton>(node["push button"].to_bool());
                 btn->SetName(child_name);
-                node.for_each([btn](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([btn](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, btn, {0, 0});
                     } else if(name == "style") {
@@ -174,7 +174,7 @@ namespace ygopro
             case WidgetType::TextButton: {
                 auto btn = parent->NewChild<sgui::SGTextButton>(node["push button"].to_bool());
                 btn->SetName(child_name);
-                node.for_each([btn](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([btn](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, btn, {0, 0});
                     } else if(name == "style") {
@@ -189,7 +189,7 @@ namespace ygopro
             case WidgetType::ImageButton: {
                 auto btn = parent->NewChild<sgui::SGImageButton>(node["push button"].to_bool());
                 btn->SetName(child_name);
-                node.for_each([btn](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([btn](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, btn, {0, 0});
                     } else if(name == "style") {
@@ -201,7 +201,7 @@ namespace ygopro
             case WidgetType::TextureButton: {
                 auto btn = parent->NewChild<sgui::SGTextureButton>(node["push button"].to_bool());
                 btn->SetName(child_name);
-                node.for_each([btn](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([btn](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, btn, {0, 0});
                     } else if(name == "style") {
@@ -213,7 +213,7 @@ namespace ygopro
             case WidgetType::CheckBox: {
                 auto chk = parent->NewChild<sgui::SGCheckBox<>>();
                 chk->SetName(child_name);
-                node.for_each([chk](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([chk](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, chk, {0, 0});
                     } else if(name == "style") {
@@ -230,7 +230,7 @@ namespace ygopro
             case WidgetType::Radio: {
                 auto rdo = parent->NewChild<sgui::SGRadio<>>();
                 rdo->SetName(child_name);
-                node.for_each([rdo, &radio_groups](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([rdo, &radio_groups](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, rdo, {0, 0});
                     } else if(name == "style") {
@@ -253,7 +253,7 @@ namespace ygopro
             case WidgetType::ListBox: {
                 auto lb = parent->NewChild<sgui::SGListBox>();
                 lb->SetName(child_name);
-                node.for_each([lb](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([lb](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, lb, {0, 0});
                     } else if(name == "style") {
@@ -269,7 +269,7 @@ namespace ygopro
             case WidgetType::ComboBox: {
                 auto cb = parent->NewChild<sgui::SGComboBox>();
                 cb->SetName(child_name);
-                node.for_each([cb](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([cb](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, cb, {0, 0});
                     } else if(name == "style") {
@@ -285,7 +285,7 @@ namespace ygopro
             case WidgetType::TextEdit: {
                 auto te = parent->NewChild<sgui::SGTextEdit>();
                 te->SetName(child_name);
-                node.for_each([te](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([te](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, te, {0, 0});
                     } else if(name == "style") {
@@ -304,7 +304,7 @@ namespace ygopro
             case WidgetType::ScrollBar: {
                 auto bar = parent->NewChild<sgui::SGScrollBar<>>(node["horizontal"].to_bool());
                 bar->SetName(child_name);
-                node.for_each([bar](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([bar](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, bar, {0, 0});
                     } else if(name == "style") {
@@ -318,13 +318,13 @@ namespace ygopro
             case WidgetType::ScrollArea: {
                 auto area = parent->NewChild<sgui::SGScrollArea>();
                 area->SetName(child_name);
-                node.for_each([area](const std::string& name, jaweson::JsonNode<>& sub_node) {
+                node.for_each([area](const std::string& name, jaweson::JsonValue& sub_node) {
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, area, {0, 0});
                     } else if(name == "scroll size") {
-                        area->SetScrollSize(sgui::SGJsonUtil::ConvertV2i(sub_node, 0));
+                        area->SetScrollSize(sgui::SGJsonUtil::ConvertVec2<int32_t>(sub_node, 0));
                     } else if(name == "children") {
-                        sub_node.for_each([area](const std::string& c_name, jaweson::JsonNode<>& c_node) {
+                        sub_node.for_each([area](const std::string& c_name, jaweson::JsonValue& c_node) {
                             LoadChild(area, c_name, c_node);
                         });
                     }
@@ -424,7 +424,7 @@ namespace ygopro
         menu->pos = pos;
         menu->item_width = (int32_t)dialogCfg["popup menu width"].to_integer();
         menu->item_height = (int32_t)dialogCfg["popup menu height"].to_integer();
-        menu->margin = sgui::SGJsonUtil::ConvertRecti(dialogCfg["popup menu margin"]);
+        menu->margin = sgui::SGJsonUtil::ConvertRect<int32_t>(dialogCfg["popup menu margin"]);
         menu->pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
         menu->btn_cb = cb;
         return *menu;
@@ -434,7 +434,7 @@ namespace ygopro
         auto& menu_node = dialogCfg["menus"][name];
         auto& menu = Create(pos, cb);
         if(!menu_node.is_empty()) {
-            menu_node.for_each([&menu](const std::string& key, jaweson::JsonNode<>& node)->void {
+            menu_node.for_each([&menu](const std::string& key, jaweson::JsonValue& node)->void {
                 menu.AddButton(To<std::wstring>(stringCfg[key].to_string()), (intptr_t)node.to_integer());
             });
         }
@@ -823,12 +823,12 @@ namespace ygopro
         }
         auto& dlg_node = dialogCfg["info dialog"];
         int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();
-        recti star_offset = sgui::SGJsonUtil::ConvertRecti(dlg_node["star offset"]);
+        recti star_offset = sgui::SGJsonUtil::ConvertRect<int32_t>(dlg_node["star offset"]);
         int32_t slider_width = (int32_t)dlg_node["slider width"].to_integer();
         int32_t min_pen_height = (int32_t)dlg_node["min pendilum text height"].to_integer();
         int32_t scale_width = (int32_t)dlg_node["scale blank"].to_integer();
-        v2i scale_icon = sgui::SGJsonUtil::ConvertV2i(dlg_node["scale icon"], 0);
-        v2i scale_size = sgui::SGJsonUtil::ConvertV2i(dlg_node["scale size"], 0);
+        v2i scale_icon = sgui::SGJsonUtil::ConvertVec2<int32_t>(dlg_node["scale icon"], 0);
+        v2i scale_size = sgui::SGJsonUtil::ConvertVec2<int32_t>(dlg_node["scale size"], 0);
         uint32_t info_backcolor = sgui::SGJsonUtil::ConvertRGBA(dlg_node["info backcolor"]);
         
         auto hmask = ImageMgr::Get().GetTexture("mmask");
@@ -1060,7 +1060,7 @@ namespace ygopro
     void OperationPanel::Confirm(const std::vector<FieldCard*>& cards, std::function<void()> close_callback) {
         if(cards.empty())
             return;
-        auto item_size = sgui::SGJsonUtil::ConvertV2i(dialogCfg["confirm dialog"]["item size"], 0);
+        auto item_size = sgui::SGJsonUtil::ConvertVec2<int32_t>(dialogCfg["confirm dialog"]["item size"], 0);
         auto item_margin = (int32_t)dialogCfg["confirm dialog"]["item margin"].to_integer();
         v2i area_size = {(int32_t)(item_size.x * cards.size() + item_margin * (cards.size() - 1)), item_size.y};
         auto wnd = LoadDialogAs<sgui::SGWidgetContainer>("confirm dialog");

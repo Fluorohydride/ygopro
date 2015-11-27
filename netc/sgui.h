@@ -816,61 +816,52 @@ namespace sgui
     };
 
     // Json helper
-    
     class SGJsonUtil {
     public:
-        static v2i ConvertV2i(jaweson::JsonNode<>& node, int32_t index) {
-            v2i ret = {0, 0};
+        template<typename T>
+        static base::vector2<T> ConvertVec2(jaweson::JsonValue& node, int32_t index = 0) {
+            base::vector2<T> ret = {T(), T()};
             if(node.is_array()) {
-                ret.x = (int32_t)node[index].to_integer();
-                ret.y = (int32_t)node[index + 1].to_integer();
+                ret.x = node[index].to_value<T>();
+                ret.y = node[index + 1].to_value<T>();
             }
             return ret;
         }
         
-        static v2f ConvertV2f(jaweson::JsonNode<>& node, int32_t index) {
-            v2f ret = {0.0f, 0.0f};
+        template<typename T>
+        static base::rect<T> ConvertRect(jaweson::JsonValue& node, int32_t index = 0) {
+            base::rect<T> ret = {T(), T(), T(), T()};
             if(node.is_array()) {
-                ret.x = node[index].to_double();
-                ret.y = node[index + 1].to_double();
+                ret.left = node[index].to_value<T>();
+                ret.top = node[index + 1].to_value<T>();
+                ret.width = node[index + 2].to_value<T>();
+                ret.height = node[index + 3].to_value<T>();
             }
             return ret;
         }
         
-        static recti ConvertRecti(jaweson::JsonNode<>& node) {
-            recti ret = {0, 0, 0, 0};
+        template<typename T, int32_t len>
+        static std::array<T, len> ConvertArray(jaweson::JsonValue& node, int32_t index = 0) {
+            std::array<T, len> ret;
             if(node.is_array()) {
-                ret.left = (int32_t)node[0].to_integer();
-                ret.top = (int32_t)node[1].to_integer();
-                ret.width = (int32_t)node[2].to_integer();
-                ret.height = (int32_t)node[3].to_integer();
+                for(int32_t i = 0; i < len; ++i)
+                    ret[i] = node[index + i].to_value<T>();
             }
-            return ret;
+            return std::move(ret);
         }
         
-        static rectf ConvertRectf(jaweson::JsonNode<>& node) {
-            rectf ret = {0, 0, 0, 0};
-            if(node.is_array()) {
-                ret.left = (float)node[0].to_double();
-                ret.top = (float)node[1].to_double();
-                ret.width = (float)node[2].to_double();
-                ret.height = (float)node[3].to_double();
-            }
-            return ret;
-        }
-        
-        static uint32_t ConvertRGBA(jaweson::JsonNode<>& node) {
+        static uint32_t ConvertRGBA(jaweson::JsonValue& node) {
             std::string rgba = node.to_string();
             uint32_t agbr = To<uint32_t>(rgba);
             return ((agbr >> 24) & 0xff) | (((agbr >> 8) & 0xff00)) | ((agbr << 8) & 0xff0000) | ((agbr << 24) & 0xff000000);
         }
         
-        static void SetUIPositionSize(jaweson::JsonNode<>& node, RegionObject* obj, v2i offset) {
-            v2i pos_relative = SGJsonUtil::ConvertV2i(node, 0);
-            v2i sz_relative = SGJsonUtil::ConvertV2i(node, 2);
-            v2f pos_prop = SGJsonUtil::ConvertV2f(node, 4);
-            v2f sz_prop = SGJsonUtil::ConvertV2f(node, 6);
-            v2f self_factor = SGJsonUtil::ConvertV2f(node, 8);
+        static void SetUIPositionSize(jaweson::JsonValue& node, RegionObject* obj, v2i offset) {
+            v2i pos_relative = SGJsonUtil::ConvertVec2<int32_t>(node, 0);
+            v2i sz_relative = SGJsonUtil::ConvertVec2<int32_t>(node, 2);
+            v2f pos_prop = SGJsonUtil::ConvertVec2<float>(node, 4);
+            v2f sz_prop = SGJsonUtil::ConvertVec2<float>(node, 6);
+            v2f self_factor = SGJsonUtil::ConvertVec2<float>(node, 8);
             obj->SetPositionSize(pos_relative + offset, sz_relative, pos_prop, sz_prop, self_factor);
         }
     };
@@ -1336,13 +1327,13 @@ namespace sgui
             auto& emoji_node = (*config_root)["emoji"];
             base::Image emoji;
             emoji.LoadFile(emoji_node["texture"].to_string());
-            auto sz = SGJsonUtil::ConvertV2i(emoji_node["size"], 0);
-            auto ct = SGJsonUtil::ConvertV2i(emoji_node["count"], 0);
-            font_node.for_each([this, &emoji, &sz, &ct](const std::string& name, jaweson::JsonNode<>& info) {
+            auto sz = SGJsonUtil::ConvertVec2<int32_t>(emoji_node["size"], 0);
+            auto ct = SGJsonUtil::ConvertVec2<int32_t>(emoji_node["count"], 0);
+            font_node.for_each([this, &emoji, &sz, &ct](const std::string& name, jaweson::JsonValue& info) {
                 std::string font_file = info[0].to_string();
                 int32_t font_size = (int32_t)info[1].to_integer();
                 std::string style = info[2].to_string();
-                auto off = SGJsonUtil::ConvertV2i(info, 3);
+                auto off = SGJsonUtil::ConvertVec2<int32_t>(info, 3);
                 auto ft = std::make_shared<base::Font>();
                 if(ft->Load(font_file, font_size, style, off)) {
                     ft->LoadEmoji(emoji, sz, ct, {off.x, -off.y, font_size, font_size}, 0);
@@ -1551,7 +1542,7 @@ namespace sgui
                 common_ui->PushVertices();
         }
         
-        virtual void InitUIComponentsExtra(jaweson::JsonNode<>&) = 0;
+        virtual void InitUIComponentsExtra(jaweson::JsonValue&) = 0;
         
     protected:
         UI_TYPE* common_ui = nullptr;
@@ -1561,14 +1552,14 @@ namespace sgui
     class SGCommonUIWidget<void> : public SGWidget {
     public:
         virtual void InitUIComponents() {}
-        virtual void InitUIComponentsExtra(jaweson::JsonNode<>&) {}
+        virtual void InitUIComponentsExtra(jaweson::JsonValue&) {}
     protected:
         UIComponent* common_ui = nullptr;
     };
     
     class SGCommonUISprite: public SGCommonUIWidget<UISprite> {
     public:
-        virtual void InitUIComponentsExtra(jaweson::JsonNode<>& node) {
+        virtual void InitUIComponentsExtra(jaweson::JsonValue& node) {
             SGJsonUtil::SetUIPositionSize(node["sprite_offset"], common_ui, {0, 0});
         }
         inline UISprite* GetSpriteUI() { return common_ui; }
@@ -1600,7 +1591,7 @@ namespace sgui
     
     class SGCommonUISpriteList: public SGCommonUIWidget<UISpriteList> {
     public:
-        virtual void InitUIComponentsExtra(jaweson::JsonNode<>& node) {
+        virtual void InitUIComponentsExtra(jaweson::JsonValue& node) {
             common_ui->SetPositionSize({0, 0}, {0, 0}, {0.0f, 0.0f}, {1.0f, 1.0f});
         }
         inline UISpriteList* GetSpriteUI() { return common_ui; }
@@ -1608,7 +1599,7 @@ namespace sgui
     
     class SGCommonUIText : public SGCommonUIWidget<UIText> {
     public:
-        virtual void InitUIComponentsExtra(jaweson::JsonNode<>& node) {
+        virtual void InitUIComponentsExtra(jaweson::JsonValue& node) {
             auto ft = SGGUIRoot::GetSingleton().GetGuiFont(node["font"].to_string());
             common_ui->SetFont(ft);
             common_ui->SetCapacity(16);
@@ -1619,7 +1610,7 @@ namespace sgui
     
     class SGCommonUIRegion: public SGCommonUIWidget<UIConvexRegion> {
     public:
-        virtual void InitUIComponentsExtra(jaweson::JsonNode<>& node) {
+        virtual void InitUIComponentsExtra(jaweson::JsonValue& node) {
             SGJsonUtil::SetUIPositionSize(node["region_offset"], common_ui, {0, 0});
         }
         inline UIConvexRegion* GetConvex() { return common_ui; }
@@ -1811,31 +1802,31 @@ namespace sgui
             return true;
         }
         
-        void SetStyle(jaweson::JsonNode<>& button_node) {
+        void SetStyle(jaweson::JsonValue& button_node) {
             auto button_surface = static_cast<UISprite*>(this->ui_components[0]);
-            style[0] = SGJsonUtil::ConvertRecti(button_node["normal_tex"]);
-            style[1] = SGJsonUtil::ConvertRecti(button_node["hover_tex"]);
-            style[2] = SGJsonUtil::ConvertRecti(button_node["down_tex"]);
-            press_offset = SGJsonUtil::ConvertV2i(button_node["press_offset"], 0);
+            style[0] = SGJsonUtil::ConvertRect<int32_t>(button_node["normal_tex"]);
+            style[1] = SGJsonUtil::ConvertRect<int32_t>(button_node["hover_tex"]);
+            style[2] = SGJsonUtil::ConvertRect<int32_t>(button_node["down_tex"]);
+            press_offset = SGJsonUtil::ConvertVec2<int32_t>(button_node["press_offset"], 0);
             auto cl = SGJsonUtil::ConvertRGBA(button_node["color"]);
             auto styleindex = (status <= STATUS_DOWN) ? status : STATUS_DOWN;
             button_surface->SetColor(cl);
             button_surface->SetTextureRect(style[styleindex]);
             if(USE_SPRITE9) {
                 auto button_surface9 = static_cast<UISprite9*>(this->ui_components[0]);
-                auto border_rect = SGJsonUtil::ConvertRecti(button_node["border"]);
-                auto back_border = SGJsonUtil::ConvertRecti(button_node["back_border"]);
-                auto back_rect = SGJsonUtil::ConvertRecti(button_node["back_tex"]);
+                auto border_rect = SGJsonUtil::ConvertRect<int32_t>(button_node["border"]);
+                auto back_border = SGJsonUtil::ConvertRect<int32_t>(button_node["back_border"]);
+                auto back_rect = SGJsonUtil::ConvertRect<int32_t>(button_node["back_tex"]);
                 button_surface9->SetBackRect(back_border, back_rect);
                 button_surface9->SetBorderRect(border_rect, border_rect);
             }
         }
         
-        void SetSimpleStyle(jaweson::JsonNode<>& button_node) {
+        void SetSimpleStyle(jaweson::JsonValue& button_node) {
             auto cl = SGJsonUtil::ConvertRGBA(button_node["color"]);
-            style[0] = SGJsonUtil::ConvertRecti(button_node["normal_tex"]);
-            style[1] = SGJsonUtil::ConvertRecti(button_node["hover_tex"]);
-            style[2] = SGJsonUtil::ConvertRecti(button_node["down_tex"]);
+            style[0] = SGJsonUtil::ConvertRect<int32_t>(button_node["normal_tex"]);
+            style[1] = SGJsonUtil::ConvertRect<int32_t>(button_node["hover_tex"]);
+            style[2] = SGJsonUtil::ConvertRect<int32_t>(button_node["down_tex"]);
             auto styleindex = (status <= STATUS_DOWN) ? status : STATUS_DOWN;
             static_cast<UISprite*>(this->ui_components[0])->SetColor(cl);
             static_cast<UISprite*>(this->ui_components[0])->SetTextureRect(style[styleindex]);
@@ -1890,18 +1881,18 @@ namespace sgui
             SetStyle(cb_node);
         }
         
-        void SetStyle(jaweson::JsonNode<>& cb_node) {
+        void SetStyle(jaweson::JsonValue& cb_node) {
             auto cb_surface = static_cast<UISprite*>(this->ui_components[0]);
-            style[0] = SGJsonUtil::ConvertRecti(cb_node["normal1"]);
-            style[1] = SGJsonUtil::ConvertRecti(cb_node["hover1"]);
-            style[2] = SGJsonUtil::ConvertRecti(cb_node["down1"]);
-            style[3] = SGJsonUtil::ConvertRecti(cb_node["normal2"]);
-            style[4] = SGJsonUtil::ConvertRecti(cb_node["hover2"]);
-            style[5] = SGJsonUtil::ConvertRecti(cb_node["down2"]);
+            style[0] = SGJsonUtil::ConvertRect<int32_t>(cb_node["normal1"]);
+            style[1] = SGJsonUtil::ConvertRect<int32_t>(cb_node["hover1"]);
+            style[2] = SGJsonUtil::ConvertRect<int32_t>(cb_node["down1"]);
+            style[3] = SGJsonUtil::ConvertRect<int32_t>(cb_node["normal2"]);
+            style[4] = SGJsonUtil::ConvertRect<int32_t>(cb_node["hover2"]);
+            style[5] = SGJsonUtil::ConvertRect<int32_t>(cb_node["down2"]);
             auto cl = SGJsonUtil::ConvertRGBA(cb_node["color"]);
             auto& offset_node = cb_node["button_offset"];
-            image_offset = SGJsonUtil::ConvertV2i(offset_node, 0);
-            image_size = SGJsonUtil::ConvertV2i(offset_node, 2);
+            image_offset = SGJsonUtil::ConvertVec2<int32_t>(offset_node, 0);
+            image_size = SGJsonUtil::ConvertVec2<int32_t>(offset_node, 2);
             auto ftsz = common_ui->GetFontSize();
             if(image_size.y < ftsz)
                 image_size = v2i{ftsz, ftsz};
@@ -1911,9 +1902,9 @@ namespace sgui
             cb_surface->SetTextureRect(style[styleindex]);
             if(USE_SPRITE9) {
                 auto cb_surface9 = static_cast<UISprite9*>(this->ui_components[0]);
-                auto border_rect = SGJsonUtil::ConvertRecti(cb_node["border"]);
-                auto back_border = SGJsonUtil::ConvertRecti(cb_node["back_border"]);
-                auto back_rect = SGJsonUtil::ConvertRecti(cb_node["back_tex"]);
+                auto border_rect = SGJsonUtil::ConvertRect<int32_t>(cb_node["border"]);
+                auto back_border = SGJsonUtil::ConvertRect<int32_t>(cb_node["back_border"]);
+                auto back_rect = SGJsonUtil::ConvertRect<int32_t>(cb_node["back_tex"]);
                 cb_surface9->SetBackRect(back_border, back_rect);
                 cb_surface9->SetBorderRect(border_rect, border_rect);
             }
@@ -2125,22 +2116,22 @@ namespace sgui
             SetDragTarget(shared_from_this());
         }
         
-        void SetStyle(jaweson::JsonNode<>& sc_node) {
+        void SetStyle(jaweson::JsonValue& sc_node) {
             if(is_horizontal) {
-                style[0] = SGJsonUtil::ConvertRecti(sc_node["sliderh1"]);
-                style[1] = SGJsonUtil::ConvertRecti(sc_node["sliderh2"]);
-                style[2] = SGJsonUtil::ConvertRecti(sc_node["sliderh3"]);
+                style[0] = SGJsonUtil::ConvertRect<int32_t>(sc_node["sliderh1"]);
+                style[1] = SGJsonUtil::ConvertRect<int32_t>(sc_node["sliderh2"]);
+                style[2] = SGJsonUtil::ConvertRect<int32_t>(sc_node["sliderh3"]);
             } else {
-                style[0] = SGJsonUtil::ConvertRecti(sc_node["sliderv1"]);
-                style[1] = SGJsonUtil::ConvertRecti(sc_node["sliderv2"]);
-                style[2] = SGJsonUtil::ConvertRecti(sc_node["sliderv3"]);
+                style[0] = SGJsonUtil::ConvertRect<int32_t>(sc_node["sliderv1"]);
+                style[1] = SGJsonUtil::ConvertRect<int32_t>(sc_node["sliderv2"]);
+                style[2] = SGJsonUtil::ConvertRect<int32_t>(sc_node["sliderv3"]);
             }
             auto cl = SGJsonUtil::ConvertRGBA(sc_node["color"]);
-            v2i slider_sz = SGJsonUtil::ConvertV2i(sc_node["slider_size"], 0);
+            v2i slider_sz = SGJsonUtil::ConvertVec2<int32_t>(sc_node["slider_size"], 0);
             slength = is_horizontal ? slider_sz.x : slider_sz.y;
-            v2i back_sz = SGJsonUtil::ConvertV2i(sc_node["back_size"], 0);
+            v2i back_sz = SGJsonUtil::ConvertVec2<int32_t>(sc_node["back_size"], 0);
             fix_size = is_horizontal ? back_sz.y : back_sz.x;
-            auto back_tex = SGJsonUtil::ConvertRecti(sc_node[is_horizontal ? "backh_tex" : "backv_tex"]);
+            auto back_tex = SGJsonUtil::ConvertRect<int32_t>(sc_node[is_horizontal ? "backh_tex" : "backv_tex"]);
             UISprite* slot_surface = static_cast<UISprite*>(this->ui_components[0]);
             UISprite* slider_surface = static_cast<UISprite*>(this->ui_components[1]);
             slot_surface->SetColor(cl);
@@ -2155,9 +2146,9 @@ namespace sgui
             if(USE_SPRITE9) {
                 auto slot_surface9 = static_cast<UISprite9*>(this->ui_components[0]);
                 auto slider_surface9 = static_cast<UISprite9*>(this->ui_components[1]);
-                auto border_rect = SGJsonUtil::ConvertRecti(sc_node["border"]);
-                auto back_border = SGJsonUtil::ConvertRecti(sc_node["back_border"]);
-                auto back_rect = SGJsonUtil::ConvertRecti(sc_node["back_tex"]);
+                auto border_rect = SGJsonUtil::ConvertRect<int32_t>(sc_node["border"]);
+                auto back_border = SGJsonUtil::ConvertRect<int32_t>(sc_node["back_border"]);
+                auto back_rect = SGJsonUtil::ConvertRect<int32_t>(sc_node["back_tex"]);
                 slot_surface9->SetBackRect(back_border, back_rect);
                 slot_surface9->SetBorderRect(border_rect, border_rect);
                 slider_surface9->SetBackRect(back_border, back_rect);
@@ -2331,15 +2322,15 @@ namespace sgui
             }
         }
         
-        void SetStyle(jaweson::JsonNode<>& panel_node) {
+        void SetStyle(jaweson::JsonValue& panel_node) {
             if(is_entity) {
                 auto panel_surface = static_cast<UISprite9*>(this->ui_components[0]);
                 auto cl = SGJsonUtil::ConvertRGBA(panel_node["color"]);
-                auto border_rect = SGJsonUtil::ConvertRecti(panel_node["border"]);
-                auto border_tex = SGJsonUtil::ConvertRecti(panel_node["border_tex"]);
-                auto back_border = SGJsonUtil::ConvertRecti(panel_node["back_border"]);
-                auto back_rect = SGJsonUtil::ConvertRecti(panel_node["back_tex"]);
-                auto client_tex = SGJsonUtil::ConvertRecti(panel_node["client_area"]);
+                auto border_rect = SGJsonUtil::ConvertRect<int32_t>(panel_node["border"]);
+                auto border_tex = SGJsonUtil::ConvertRect<int32_t>(panel_node["border_tex"]);
+                auto back_border = SGJsonUtil::ConvertRect<int32_t>(panel_node["back_border"]);
+                auto back_rect = SGJsonUtil::ConvertRect<int32_t>(panel_node["back_tex"]);
+                auto client_tex = SGJsonUtil::ConvertRect<int32_t>(panel_node["client_area"]);
                 panel_surface->SetColor(cl);
                 panel_surface->SetTextureRect(client_tex);
                 panel_surface->SetBackRect(back_border, back_rect);
@@ -2409,8 +2400,8 @@ namespace sgui
                 RemoveFromParent();
                 return true;
             };
-            min_size = SGJsonUtil::ConvertV2i(window_node["minimum_size"], 0);
-            border = SGJsonUtil::ConvertRecti(window_node["border"]);
+            min_size = SGJsonUtil::ConvertVec2<int32_t>(window_node["minimum_size"], 0);
+            border = SGJsonUtil::ConvertRect<int32_t>(window_node["border"]);
             SetDragable(true);
         }
         
@@ -2788,15 +2779,15 @@ namespace sgui
             return static_cast<SGScrollBar<>*>(children[0].get())->OnMouseWheel(deltax, deltay);
         }
         
-        void SetStyle(jaweson::JsonNode<>& lb_node) {
+        void SetStyle(jaweson::JsonValue& lb_node) {
             auto panel_surface = static_cast<UISprite9*>(this->ui_components[0]);
             auto cl = SGJsonUtil::ConvertRGBA(lb_node["color"]);
-            auto border_rect = SGJsonUtil::ConvertRecti(lb_node["border"]);
-            auto border_tex = SGJsonUtil::ConvertRecti(lb_node["border_tex"]);
-            auto back_border = SGJsonUtil::ConvertRecti(lb_node["back_border"]);
-            auto back_rect = SGJsonUtil::ConvertRecti(lb_node["back_tex"]);
-            client_tex[0] = SGJsonUtil::ConvertRecti(lb_node["client_normal"]);
-            client_tex[1] = SGJsonUtil::ConvertRecti(lb_node["client_hover"]);
+            auto border_rect = SGJsonUtil::ConvertRect<int32_t>(lb_node["border"]);
+            auto border_tex = SGJsonUtil::ConvertRect<int32_t>(lb_node["border_tex"]);
+            auto back_border = SGJsonUtil::ConvertRect<int32_t>(lb_node["back_border"]);
+            auto back_rect = SGJsonUtil::ConvertRect<int32_t>(lb_node["back_tex"]);
+            client_tex[0] = SGJsonUtil::ConvertRect<int32_t>(lb_node["client_normal"]);
+            client_tex[1] = SGJsonUtil::ConvertRect<int32_t>(lb_node["client_hover"]);
             panel_surface->SetColor(cl);
             panel_surface->SetTextureRect(client_tex[0]);
             panel_surface->SetBackRect(back_border, back_rect);
@@ -2805,14 +2796,14 @@ namespace sgui
             SGJsonUtil::SetUIPositionSize(lb_node["scroll_area"], scroll, {0, 0});
             item_font = SGGUIRoot::GetSingleton().GetGuiFont(lb_node["font"].to_string());
             auto& offset_node = lb_node["text_offset"];
-            item_pos_rel = SGJsonUtil::ConvertV2i(offset_node, 0) + item_font->GetTextOffset();
-            item_size_rel = SGJsonUtil::ConvertV2i(offset_node, 2);
-            item_pos_pro = SGJsonUtil::ConvertV2f(offset_node, 4);
-            item_size_pro = SGJsonUtil::ConvertV2f(offset_node, 6);
-            item_self_factor = SGJsonUtil::ConvertV2f(offset_node, 8);
+            item_pos_rel = SGJsonUtil::ConvertVec2<int32_t>(offset_node, 0) + item_font->GetTextOffset();
+            item_size_rel = SGJsonUtil::ConvertVec2<int32_t>(offset_node, 2);
+            item_pos_pro = SGJsonUtil::ConvertVec2<float>(offset_node, 4);
+            item_size_pro = SGJsonUtil::ConvertVec2<float>(offset_node, 6);
+            item_self_factor = SGJsonUtil::ConvertVec2<float>(offset_node, 8);
             item_height = (int32_t)lb_node["item_height"].to_integer();
-            bounds = SGJsonUtil::ConvertRecti(lb_node["text_area"]);
-            sel_tex = SGJsonUtil::ConvertRecti(lb_node["sel_tex"]);
+            bounds = SGJsonUtil::ConvertRect<int32_t>(lb_node["text_area"]);
+            sel_tex = SGJsonUtil::ConvertRect<int32_t>(lb_node["sel_tex"]);
             color[0] = SGJsonUtil::ConvertRGBA(lb_node["item_bcolor1"]);
             color[1] = SGJsonUtil::ConvertRGBA(lb_node["item_bcolor2"]);
             color[2] = SGJsonUtil::ConvertRGBA(lb_node["sel_bcolor"]);
@@ -2999,22 +2990,22 @@ namespace sgui
             InitUIComponentsExtra(combo_node);
         }
         
-        void SetStyle(jaweson::JsonNode<>& cb_node) {
+        void SetStyle(jaweson::JsonValue& cb_node) {
             auto back_surface = static_cast<UISprite9*>(this->ui_components[0]);
             auto button_surface = static_cast<UISprite*>(this->ui_components[1]);
-            auto border_rect = SGJsonUtil::ConvertRecti(cb_node["border"]);
-            auto border_tex = SGJsonUtil::ConvertRecti(cb_node["border_tex"]);
-            auto back_border = SGJsonUtil::ConvertRecti(cb_node["back_border"]);
-            auto back_rect = SGJsonUtil::ConvertRecti(cb_node["back_tex"]);
-            client_tex[0] = SGJsonUtil::ConvertRecti(cb_node["client_normal"]);
-            client_tex[1] = SGJsonUtil::ConvertRecti(cb_node["client_hover"]);
+            auto border_rect = SGJsonUtil::ConvertRect<int32_t>(cb_node["border"]);
+            auto border_tex = SGJsonUtil::ConvertRect<int32_t>(cb_node["border_tex"]);
+            auto back_border = SGJsonUtil::ConvertRect<int32_t>(cb_node["back_border"]);
+            auto back_rect = SGJsonUtil::ConvertRect<int32_t>(cb_node["back_tex"]);
+            client_tex[0] = SGJsonUtil::ConvertRect<int32_t>(cb_node["client_normal"]);
+            client_tex[1] = SGJsonUtil::ConvertRect<int32_t>(cb_node["client_hover"]);
             back_surface->SetColor(SGJsonUtil::ConvertRGBA(cb_node["color"]));
             back_surface->SetTextureRect(client_tex[0]);
             back_surface->SetBackRect(back_border, back_rect);
             back_surface->SetBorderRect(border_rect, border_tex);
-            button_style[0] = SGJsonUtil::ConvertRecti(cb_node["button_normal"]);
-            button_style[1] = SGJsonUtil::ConvertRecti(cb_node["button_hover"]);
-            button_style[2] = SGJsonUtil::ConvertRecti(cb_node["button_down"]);
+            button_style[0] = SGJsonUtil::ConvertRect<int32_t>(cb_node["button_normal"]);
+            button_style[1] = SGJsonUtil::ConvertRect<int32_t>(cb_node["button_hover"]);
+            button_style[2] = SGJsonUtil::ConvertRect<int32_t>(cb_node["button_down"]);
             button_surface->SetColor(SGJsonUtil::ConvertRGBA(cb_node["button_color"]));
             button_surface->SetTextureRect(button_style[status]);
             SGJsonUtil::SetUIPositionSize(cb_node["button_offset"], button_surface, {0, 0});
@@ -3213,27 +3204,27 @@ namespace sgui
             SetStyle(tab_node);
         }
         
-        void SetStyle(jaweson::JsonNode<>& tab_node) {
+        void SetStyle(jaweson::JsonValue& tab_node) {
             auto back_surface = static_cast<UISprite9*>(this->ui_components[0]);
-            sprite_style[2] = SGJsonUtil::ConvertRecti(tab_node["border"]);
-            sprite_style[3] = SGJsonUtil::ConvertRecti(tab_node["border_tex"]);
-            sprite_style[0] = SGJsonUtil::ConvertRecti(tab_node["back_border"]);
-            sprite_style[1] = SGJsonUtil::ConvertRecti(tab_node["back_tex"]);
+            sprite_style[2] = SGJsonUtil::ConvertRect<int32_t>(tab_node["border"]);
+            sprite_style[3] = SGJsonUtil::ConvertRect<int32_t>(tab_node["border_tex"]);
+            sprite_style[0] = SGJsonUtil::ConvertRect<int32_t>(tab_node["back_border"]);
+            sprite_style[1] = SGJsonUtil::ConvertRect<int32_t>(tab_node["back_tex"]);
             tab_color = SGJsonUtil::ConvertRGBA(tab_node["color"]);
             back_surface->SetColor(tab_color);
-            back_surface->SetTextureRect(SGJsonUtil::ConvertRecti(tab_node["client_area"]));
+            back_surface->SetTextureRect(SGJsonUtil::ConvertRect<int32_t>(tab_node["client_area"]));
             back_surface->SetBackRect(sprite_style[0], sprite_style[1]);
             back_surface->SetBorderRect(sprite_style[2], sprite_style[3]);
-            tab_style[0] = SGJsonUtil::ConvertRecti(tab_node["tab_normal"]);
-            tab_style[1] = SGJsonUtil::ConvertRecti(tab_node["tab_hover"]);
-            tab_style[2] = SGJsonUtil::ConvertRecti(tab_node["tab_down"]);
+            tab_style[0] = SGJsonUtil::ConvertRect<int32_t>(tab_node["tab_normal"]);
+            tab_style[1] = SGJsonUtil::ConvertRect<int32_t>(tab_node["tab_hover"]);
+            tab_style[2] = SGJsonUtil::ConvertRect<int32_t>(tab_node["tab_down"]);
             tab_offset = (int32_t)tab_node["tab_offset"].to_integer();
             title_indent = (int32_t)tab_node["title_indent"].to_integer();
             title_height = (int32_t)tab_node["title_height"].to_integer();
             title_rblank = (int32_t)tab_node["title_rblank"].to_integer();
             back_surface->SetPositionSize({0, tab_offset}, {0, -tab_offset}, {0.0f, 0.0f}, {1.0f, 1.0f});
             text_font = SGGUIRoot::GetSingleton().GetGuiFont(tab_node["font"].to_string());
-            text_offset = SGJsonUtil::ConvertV2i(tab_node["text_offset"], 0) + text_font->GetTextOffset();
+            text_offset = SGJsonUtil::ConvertVec2<int32_t>(tab_node["text_offset"], 0) + text_font->GetTextOffset();
         }
         
         virtual void PushUIComponents() {
@@ -3549,30 +3540,30 @@ namespace sgui
             SGGUIRoot::GetSingleton().PushCommand<base::RenderCmdEndScissor>();
         }
         
-        void SetStyle(jaweson::JsonNode<>& eb_node) {
+        void SetStyle(jaweson::JsonValue& eb_node) {
             auto back_surface = static_cast<UISprite9*>(this->ui_components[0]);
-            auto border = SGJsonUtil::ConvertRecti(eb_node["border"]);
-            auto border_tex = SGJsonUtil::ConvertRecti(eb_node["border_tex"]);
-            auto back_border = SGJsonUtil::ConvertRecti(eb_node["back_border"]);
-            auto back_tex = SGJsonUtil::ConvertRecti(eb_node["back_tex"]);
+            auto border = SGJsonUtil::ConvertRect<int32_t>(eb_node["border"]);
+            auto border_tex = SGJsonUtil::ConvertRect<int32_t>(eb_node["border_tex"]);
+            auto back_border = SGJsonUtil::ConvertRect<int32_t>(eb_node["back_border"]);
+            auto back_tex = SGJsonUtil::ConvertRect<int32_t>(eb_node["back_tex"]);
             auto color = SGJsonUtil::ConvertRGBA(eb_node["color"]);
             back_surface->SetColor(color);
             back_surface->SetBackRect(back_border, back_tex);
             back_surface->SetBorderRect(border, border_tex);
-            client_style[0] = SGJsonUtil::ConvertRecti(eb_node["client_normal"]);
-            client_style[1] = SGJsonUtil::ConvertRecti(eb_node["client_hover"]);
+            client_style[0] = SGJsonUtil::ConvertRect<int32_t>(eb_node["client_normal"]);
+            client_style[1] = SGJsonUtil::ConvertRect<int32_t>(eb_node["client_hover"]);
             back_surface->SetTextureRect(client_style[0]);
             back_surface->SetPositionSize({0, 0}, {0, 0}, {0.0f, 0.0f}, {1.0f, 1.0f});
-            text_area = SGJsonUtil::ConvertRecti(eb_node["text_area"]);
+            text_area = SGJsonUtil::ConvertRect<int32_t>(eb_node["text_area"]);
             auto txt = static_cast<UIText*>(this->ui_components[2]);
             auto text_font = SGGUIRoot::GetSingleton().GetGuiFont(eb_node["font"].to_string());
-            text_offset = SGJsonUtil::ConvertV2i(eb_node["text_offset"], 0) + text_font->GetTextOffset();
+            text_offset = SGJsonUtil::ConvertVec2<int32_t>(eb_node["text_offset"], 0) + text_font->GetTextOffset();
             txt->SetFont(text_font);
             txt->SetPosition({text_offset.x + text_area.left, text_offset.y}, {0.0, 0.5}, {0.0, -0.5});
-            sel_tex = SGJsonUtil::ConvertRecti(eb_node["sel_tex"]);
+            sel_tex = SGJsonUtil::ConvertRect<int32_t>(eb_node["sel_tex"]);
             static_cast<UISprite*>(this->ui_components[1])->SetTextureRect(sel_tex);
             static_cast<UISprite*>(this->ui_components[1])->SetColor(0x80000000);
-            cursor_tex = SGJsonUtil::ConvertRecti(eb_node["cursor_tex"]);
+            cursor_tex = SGJsonUtil::ConvertRect<int32_t>(eb_node["cursor_tex"]);
             static_cast<UISprite*>(this->ui_components[3])->SetTextureRect(cursor_tex);
             static_cast<UISprite*>(this->ui_components[3])->SetSize({cursor_tex.width, 0}, {0.0, 1.0});
             static_cast<UISprite*>(this->ui_components[3])->SetColor(0x0);
