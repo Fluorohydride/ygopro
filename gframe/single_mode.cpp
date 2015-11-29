@@ -62,6 +62,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->stName->setText(L"");
 	mainGame->stInfo->setText(L"");
 	mainGame->stDataInfo->setText(L"");
+	mainGame->stSetName->setText(L"");
 	mainGame->stText->setText(L"");
 	mainGame->scrCardText->setVisible(false);
 	mainGame->wPhase->setVisible(true);
