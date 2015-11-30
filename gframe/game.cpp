@@ -858,7 +858,8 @@ void Game::LoadConfig() {
 			gameConf.chkIgnore1 = atoi(valbuf);
 		} else if(!strcmp(strbuf, "chkIgnore2")) {
 			gameConf.chkIgnore2 = atoi(valbuf);
-		
+		} else if(!strcmp(strbuf, "chkHideSetname")) {
+			gameConf.chkHideSetname = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
