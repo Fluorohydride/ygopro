@@ -510,6 +510,8 @@ namespace ygopro
                 break;
             }
         }
+        if(ret)
+            ret->pos_info.info = 0;
         return ret;
     }
     
@@ -527,18 +529,19 @@ namespace ygopro
                 duel_scene->RedrawAllCards();
             }
         } else {
-            if(pos_info.location != 0x4 && pos_info.location != 0x8) {
-                RemoveCard(pcard->pos_info);
-                pcard->pos_info = pos_info;
-                duel_scene->RedrawAllCards();
-            }
             switch(pos_info.location & 0x7f) {
                 case 0x1:
+                    RemoveCard(pcard->pos_info);
+                    pcard->pos_info = pos_info;
+                    duel_scene->RedrawAllCards();
                     pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].deck.size();
                     g_player[pos_info.controler].deck.push_back(pcard);
                     g_player[pos_info.controler].fixed_numbers[0]->SetValue((int32_t)g_player[pos_info.controler].deck.size());
                     break;
                 case 0x2:
+                    RemoveCard(pcard->pos_info);
+                    pcard->pos_info = pos_info;
+                    duel_scene->RedrawAllCards();
                     pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].hand.size();
                     g_player[pos_info.controler].hand.push_back(pcard);
                     break;
@@ -559,16 +562,25 @@ namespace ygopro
                     }
                     break;
                 case 0x10:
+                    RemoveCard(pcard->pos_info);
+                    pcard->pos_info = pos_info;
+                    duel_scene->RedrawAllCards();
                     pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].grave.size();
                     g_player[pos_info.controler].grave.push_back(pcard);
                     g_player[pos_info.controler].fixed_numbers[1]->SetValue((int32_t)g_player[pos_info.controler].grave.size());
                     break;
                 case 0x20:
+                    RemoveCard(pcard->pos_info);
+                    pcard->pos_info = pos_info;
+                    duel_scene->RedrawAllCards();
                     pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].banished.size();
                     g_player[pos_info.controler].banished.push_back(pcard);
                     g_player[pos_info.controler].fixed_numbers[2]->SetValue((int32_t)g_player[pos_info.controler].banished.size());
                     break;
                 case 0x40: {
+                    RemoveCard(pcard->pos_info);
+                    pcard->pos_info = pos_info;
+                    duel_scene->RedrawAllCards();
                     pcard->pos_info.sequence = (int32_t)g_player[pos_info.controler].extra.size();
                     g_player[pos_info.controler].extra.push_back(pcard);
                     if(pos_info.position & 0x5)
@@ -579,10 +591,6 @@ namespace ygopro
                 }
             }
         }
-    }
-    
-    void DuelSceneHandler::ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos) {
-        
     }
     
     void DuelSceneHandler::ClearField() {
@@ -627,12 +635,15 @@ namespace ygopro
     }
     
     void DuelSceneHandler::AddChain(int32_t ct) {
-        auto param = sgui::SGJsonUtil::ConvertArray<float, 4>(layoutCfg["chain param"]);
+        auto& param_node = layoutCfg["chain param"];
+        auto param = sgui::SGJsonUtil::ConvertArray<float, 4>(param_node);
         auto& ch = g_duel.chains[ct];
         auto chain_sp = duel_scene->AddFieldSprite().get();
         chain_sp->SetTexture(ImageMgr::Get().GetRawMiscTexture());
         chain_sp->SetTexcoord(ImageMgr::Get().GetTexture("chain"));
-        chain_sp->SetColor(0xff0000ff);
+        auto ccolor = sgui::SGJsonUtil::ConvertRGBA(param_node[4]);
+        auto ncolor = sgui::SGJsonUtil::ConvertRGBA(param_node[5]);
+        chain_sp->SetColor(ccolor);
         v3f translation;
         auto check_rep = [](int32_t ct, uint8_t loc, uint8_t seq)->int32_t {
             int32_t repc = 0;
@@ -684,26 +695,24 @@ namespace ygopro
             num_sp->SetTexcoord(ImageMgr::Get().GetCharTex(L'0' + ct + 1));
             num_sp->SetTranslation(translation);
             num_sp->SetSize({param[2], param[3]});
-            num_sp->SetColor(0xff00ffff);
+            num_sp->SetColor(ncolor);
+            g_duel.chains[ct].chain_sprites.push_back(num_sp);
         } else {
             auto num_sp1 = duel_scene->AddFieldSprite().get();
             num_sp1->SetTexture(ImageMgr::Get().GetRawMiscTexture());
             num_sp1->SetTexcoord(ImageMgr::Get().GetCharTex(L'0' + (ct + 1) / 10));
             num_sp1->SetTranslation(translation - v3f{param[2] * 0.25f, 0.0f, 0.0f});
             num_sp1->SetSize({param[2] * 0.5f, param[3]});
-            num_sp1->SetColor(0xff00ffff);
+            num_sp1->SetColor(ncolor);
             auto num_sp2 = duel_scene->AddFieldSprite().get();
             num_sp2->SetTexture(ImageMgr::Get().GetRawMiscTexture());
             num_sp2->SetTexcoord(ImageMgr::Get().GetCharTex(L'0' + (ct + 1) % 10));
             num_sp2->SetTranslation(translation + v3f{param[2] * 0.25f, 0.0f, 0.0f});
             num_sp2->SetSize({param[2] * 0.5f, param[3]});
-            num_sp2->SetColor(0xff00ffff);
+            num_sp2->SetColor(ncolor);
+            g_duel.chains[ct].chain_sprites.push_back(num_sp1);
+            g_duel.chains[ct].chain_sprites.push_back(num_sp2);
         }
-        
-    }
-    
-    void DuelSceneHandler::SolveChain(int32_t ct) {
-        
     }
     
 }

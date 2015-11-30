@@ -98,6 +98,7 @@ namespace ygopro
     
     struct LocalDuelData {
         bool deck_reversed = false;
+        int32_t turn_count = 0;
         int32_t host_player = 0;
         bool last_chain = false;
         std::vector<LocalChainInfo> chains;
@@ -125,7 +126,6 @@ namespace ygopro
         std::shared_ptr<FieldCard> GetCard(CardPosInfo pos_info);
         std::shared_ptr<FieldCard> RemoveCard(CardPosInfo pos_info);
         void MoveCard(std::shared_ptr<FieldCard> pcard, CardPosInfo pos_info);
-        void ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos);
         
         inline int32_t LocalPlayer(int32_t pid) { return (g_duel.host_player == 0) ? pid : (1 - pid); }
         inline int32_t LocalPosInfo(int32_t ipos) { return (g_duel.host_player == 0) ? ipos : ((ipos & 0xffffff00) | (1 - (ipos & 0xff))); }
@@ -133,7 +133,6 @@ namespace ygopro
         void ClearField();
         void SetLP(int32_t pid, int32_t lp);
         void AddChain(int32_t ct);
-        void SolveChain(int32_t ct);
         
         template<typename... ACTS>
         void PushMessageActions(ACTS... acts) {

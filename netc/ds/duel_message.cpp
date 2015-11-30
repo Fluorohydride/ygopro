@@ -34,6 +34,13 @@ namespace ygopro
                 messages.PushCommand(dm);
                 break;
             }
+            case 3: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_CHAIN_SOLVING;
+                BufferWriter writer(dm->msg_buffer);
+                messages.PushCommand(dm);
+                break;
+            }
             case 9: {
                 log_panel->Show(0);
                 break;
@@ -1054,39 +1061,31 @@ namespace ygopro
                 break;
             }
             case MSG_SWAP: {
-//                /*int code1 = */BufferIO::ReadInt32(pbuf);
-//                int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l1 = BufferIO::ReadInt8(pbuf);
-//                int s1 = BufferIO::ReadInt8(pbuf);
-//                /*int p1 = */BufferIO::ReadInt8(pbuf);
-//                /*int code2 = */BufferIO::ReadInt32(pbuf);
-//                int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int l2 = BufferIO::ReadInt8(pbuf);
-//                int s2 = BufferIO::ReadInt8(pbuf);
-//                /*int p2 = */BufferIO::ReadInt8(pbuf);
-//                myswprintf(event_string, dataManager.GetSysString(1602));
-//                ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-//                ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    mainGame->gMutex.Lock();
-//                    mainGame->dField.RemoveCard(c1, l1, s1);
-//                    mainGame->dField.RemoveCard(c2, l2, s2);
-//                    mainGame->dField.AddCard(pc1, c2, l2, s2);
-//                    mainGame->dField.AddCard(pc2, c1, l1, s1);
-//                    mainGame->dField.MoveCard(pc1, 10);
-//                    mainGame->dField.MoveCard(pc2, 10);
-//                    for (size_t i = 0; i < pc1->overlayed.size(); ++i)
-//                        mainGame->dField.MoveCard(pc1->overlayed[i], 10);
-//                    for (size_t i = 0; i < pc2->overlayed.size(); ++i)
-//                        mainGame->dField.MoveCard(pc2->overlayed[i], 10);
-//                    mainGame->gMutex.Unlock();
-//                    mainGame->WaitFrameSignal(11);
-//                } else {
-//                    mainGame->dField.RemoveCard(c1, l1, s1);
-//                    mainGame->dField.RemoveCard(c2, l2, s2);
-//                    mainGame->dField.AddCard(pc1, c2, l2, s2);
-//                    mainGame->dField.AddCard(pc2, c1, l1, s1);
-//                }
+                uint32_t code1 = reader.Read<uint32_t>();
+                CardPosInfo pi1(LocalPosInfo(reader.Read<int32_t>()));
+                uint32_t code2 = reader.Read<uint32_t>();
+                CardPosInfo pi2(LocalPosInfo(reader.Read<int32_t>()));
+                auto pcard1 = GetCard(pi1);
+                auto pcard2 = GetCard(pi2);
+                if(pcard1 && pcard2) {
+                    if(code1)
+                        pcard1->SetCode(code1);
+                    if(code2)
+                        pcard2->SetCode(code2);
+                    pi2.position = pcard1->pos_info.position;
+                    pi1.position = pcard2->pos_info.position;
+                    RemoveCard(pi1);
+                    RemoveCard(pi2);
+                    MoveCard(pcard1, pi2);
+                    MoveCard(pcard2, pi1);
+                    pcard1->UpdatePosition(200);
+                    pcard2->UpdatePosition(200);
+                    for(auto& iter : pcard1->attached_cards)
+                        iter->UpdatePosition(200);
+                    for(auto& iter : pcard2->attached_cards)
+                        iter->UpdatePosition(200);
+                    PushMessageActions(std::make_shared<ActionWait<int64_t>>(200));
+                }
                 break;
             }
             case MSG_FIELD_DISABLED: {
@@ -1224,27 +1223,49 @@ namespace ygopro
                 break;
             }
             case MSG_CHAIN_SOLVING: {
-//                int ct = BufferIO::ReadInt8(pbuf);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                if (mainGame->dField.chains.size() > 1) {
-//                    if (mainGame->dField.last_chain)
-//                        mainGame->WaitFrameSignal(11);
-//                    for(int i = 0; i < 5; ++i) {
-//                        mainGame->dField.chains[ct - 1].solved = false;
-//                        mainGame->WaitFrameSignal(3);
-//                        mainGame->dField.chains[ct - 1].solved = true;
-//                        mainGame->WaitFrameSignal(3);
-//                    }
-//                }
-//                mainGame->dField.last_chain = false;
+                if(g_duel.chains.empty())
+                    break;
+                auto& sps = g_duel.chains.back().chain_sprites;
+                std::vector<std::shared_ptr<Action<int64_t>>> acts;
+                if(g_duel.last_chain) {
+                    acts.push_back(std::make_shared<ActionWait<int64_t>>(500));
+                    g_duel.last_chain = false;
+                }
+                if(sps.size()) {
+                    acts.push_back(std::make_shared<ActionCallback<int64_t>>([&sps]() {
+                        auto sz = sps.front()->GetSize();
+                        auto act = std::make_shared<LerpAnimator<int64_t>>(1000, [&sps, sz](double t)->bool {
+                            sps.front()->SetSize(sz * (1 + 2 * t));
+                            uint32_t alpha = (int32_t)(255 * (1 - t)) << 24;
+                            for(auto& iter : sps)
+                                iter->SetColor((iter->color & 0xffffff) | alpha);
+                            return true;
+                        }, std::make_shared<TGenLinear<int64_t>>(1000));
+                        SceneMgr::Get().PushAction(act, sps.front());
+                    }));
+                    acts.push_back(std::make_shared<ActionWait<int64_t>>(1000));
+                }
+                acts.push_back(std::make_shared<ActionCallback<int64_t>>([this]() {
+                    for(auto& iter : g_duel.chains.back().chain_sprites) {
+                        SceneMgr::Get().RemoveAction(iter);
+                        duel_scene->RemoveFieldSprite(iter);
+                    }
+                    g_duel.chains.pop_back();
+                }));
+                PushMessageActions(acts);
                 break;
             }
             case MSG_CHAIN_SOLVED: {
                 break;
             }
             case MSG_CHAIN_END: {
-//                mainGame->dField.chains.clear();
+                for(auto& ch : g_duel.chains) {
+                    for(auto& iter : ch.chain_sprites) {
+                        SceneMgr::Get().RemoveAction(iter);
+                        duel_scene->RemoveFieldSprite(iter);
+                    }
+                }
+                g_duel.chains.clear();
                 break;
             }
             case MSG_CHAIN_NEGATED:
