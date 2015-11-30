@@ -24,6 +24,13 @@ struct Config {
 	wchar_t textfont[256];
 	wchar_t numfont[256];
 	wchar_t roompass[20];
+	//settings
+	int chkAutoPos;
+	int chkRandomPos;
+	int chkAutoChain;
+	int chkWaitChain;
+	int chkIgnore1;
+	int chkIgnore2;
 };
 
 struct DuelInfo {
