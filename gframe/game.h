@@ -31,6 +31,7 @@ struct Config {
 	int chkWaitChain;
 	int chkIgnore1;
 	int chkIgnore2;
+	int chkHideSetname;
 };
 
 struct DuelInfo {
