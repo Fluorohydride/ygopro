@@ -270,6 +270,8 @@ bool Game::Initialize() {
 	chkIgnore1->setChecked(gameConf.chkIgnore1 >= 1);
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 >= 1);
+	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 200, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
+	chkHideSetname->setChecked(gameConf.chkHideSetname >= 1);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -811,6 +813,7 @@ void Game::LoadConfig() {
 	gameConf.chkWaitChain = 0;
 	gameConf.chkIgnore1 = 0;
 	gameConf.chkIgnore2 = 0;
+	gameConf.chkHideSetname = 0;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -905,6 +908,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "chkWaitChain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
 	fprintf(fp, "chkIgnore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
 	fprintf(fp, "chkIgnore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "chkHideSetname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
@@ -925,7 +929,7 @@ void Game::ShowCardInfo(int code) {
 		if(aptr != dataManager._datas.end())
 			sc = aptr->second.setcode;
 	}
-	if(sc) {
+	if(sc && (!mainGame->chkHideSetname->isChecked())) {
 		offset = 23;
 		myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
 		stSetName->setText(formatBuffer);
