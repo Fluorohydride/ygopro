@@ -26,7 +26,7 @@ A script engine for "yu-gi-oh!" and sample gui
 
 ###Deck edit page:
 * All numeric textboxs: They support >, =, <, >=, <= signs.
-* Card name: Search card names and texts by default, $foo will only search foo in card names, and #foo will search cards of "foo" archetype(due to translation, card name contains "foo" does not mean that card is "foo" card).
+* Card name: Search card names and texts by default, $foo will only search foo in card names, and @foo will search cards of "foo" archetype(due to translation, card name contains "foo" does not mean that card is "foo" card).
 
 ### Command-line options:
 * -j: Join the host in system.conf file.
