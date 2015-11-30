@@ -259,13 +259,19 @@ bool Game::Initialize() {
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	chkAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274));
-	chkAutoPos->setChecked(true);
+	chkAutoPos->setChecked(gameConf.chkAutoPos >= 1);
 	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 50, 300, 75), tabSystem, -1, dataManager.GetSysString(1275));
+	chkRandomPos->setChecked(gameConf.chkRandomPos >= 1);
 	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
+	chkAutoChain->setChecked(gameConf.chkAutoChain >= 1);
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
+	chkWaitChain->setChecked(gameConf.chkWaitChain >= 1);
 	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
+	chkIgnore1->setChecked(gameConf.chkIgnore1 >= 1);
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
-	chkIgnore2->setChecked(false);
+	chkIgnore2->setChecked(gameConf.chkIgnore2 >= 1);
+	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 200, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
+	chkHideSetname->setChecked(gameConf.chkHideSetname >= 1);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -800,6 +806,14 @@ void Game::LoadConfig() {
 	gameConf.lastip[0] = 0;
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
+	//settings
+	gameConf.chkAutoPos = 1;
+	gameConf.chkRandomPos = 0;
+	gameConf.chkAutoChain = 0;
+	gameConf.chkWaitChain = 0;
+	gameConf.chkIgnore1 = 0;
+	gameConf.chkIgnore2 = 0;
+	gameConf.chkHideSetname = 0;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -832,6 +846,20 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
+		} else if(!strcmp(strbuf, "chkAutoPos")) {
+			gameConf.chkAutoPos = atoi(valbuf);
+		} else if(!strcmp(strbuf, "chkRandomPos")) {
+			gameConf.chkRandomPos = atoi(valbuf);
+		} else if(!strcmp(strbuf, "chkAutoChain")) {
+			gameConf.chkAutoChain = atoi(valbuf);
+		} else if(!strcmp(strbuf, "chkWaitChain")) {
+			gameConf.chkWaitChain = atoi(valbuf);
+		} else if(!strcmp(strbuf, "chkIgnore1")) {
+			gameConf.chkIgnore1 = atoi(valbuf);
+		} else if(!strcmp(strbuf, "chkIgnore2")) {
+			gameConf.chkIgnore2 = atoi(valbuf);
+		} else if(!strcmp(strbuf, "chkHideSetname")) {
+			gameConf.chkHideSetname = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -874,6 +902,14 @@ void Game::SaveConfig() {
 	fprintf(fp, "lastip = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
+	//settings
+	fprintf(fp, "chkAutoPos = %d\n", ((mainGame->chkAutoPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "chkRandomPos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "chkAutoChain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "chkWaitChain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "chkIgnore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
+	fprintf(fp, "chkIgnore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "chkHideSetname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
@@ -894,7 +930,7 @@ void Game::ShowCardInfo(int code) {
 		if(aptr != dataManager._datas.end())
 			sc = aptr->second.setcode;
 	}
-	if(sc) {
+	if(sc && (!mainGame->chkHideSetname->isChecked())) {
 		offset = 23;
 		myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
 		stSetName->setText(formatBuffer);
