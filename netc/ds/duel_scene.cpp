@@ -39,6 +39,44 @@ namespace ygopro
         vt3::GenQuadIndex(indices.data(), 1, vert_index);
     }
     
+    void FieldSummonEffect::RefreshVertices() {
+        vertices.resize(24);
+        indices.resize(144);
+        if(update_vert) {
+            std::array<v3f, 24> origin_vert;
+            for(int32_t i = 0; i < 12; ++i) {
+                float angle = 3.1415925f / 6.0f * i;
+                origin_vert[i * 2 + 0] = {sprite_size.x * cosf(angle), sprite_size.x * sinf(angle), 0.0f};
+                origin_vert[i * 2 + 1] = {sprite_size.y * cosf(angle), sprite_size.y * sinf(angle), outer_z};
+            }
+            for(int32_t i = 0; i < 24; ++i) {
+                glm::vec3 v(origin_vert[i].x, origin_vert[i].y, origin_vert[i].z);
+                auto c = rotation * v;
+                vertices[i].vertex = v3f{c.x, c.y, c.z} + translation;
+            }
+            update_vert = false;
+        }
+        for(size_t i = 0; i < 24; ++i) {
+            v2f center = {(texcoord.vert[0].x + texcoord.vert[1].x) * 0.5f, (texcoord.vert[0].y + texcoord.vert[2].y) * 0.5f};
+            float r1 = center.x - texcoord.vert[0].x;
+            float r2 = center.y - texcoord.vert[0].y;
+            for(int32_t i = 0; i < 12; ++i) {
+                float angle = 3.1415925f / 6.0f * i;
+                vertices[i * 2 + 0].texcoord = v2f{r1 * tex_r * cosf(angle), r2 * tex_r * sinf(angle)} + center;
+                vertices[i * 2 + 1].texcoord = v2f{r1 * tex_o * cosf(angle), r2 * tex_o * sinf(angle)} + center;
+            }
+        }
+        for(size_t i = 0; i < 24; ++i) {
+            vertices[i].color = color;
+            vertices[i].hcolor = hl;
+        }
+        static const int16_t idx[] = {0, 1, 2, 0, 2, 1};
+        for(int32_t i = 0; i < 24; ++i) {
+            for(int32_t j = 0; j < 6; ++j)
+                indices[i * 6 + j] = (idx[j] + i) % 24 + vert_index;
+        }
+    }
+    
     FieldCard::~FieldCard() {
         if(code)
             ImageMgr::Get().UnloadCardTexture(code);
@@ -715,7 +753,7 @@ namespace ygopro
         for(auto& iter : g_player[1].hand)
             iter->UpdatePosition(0);
         auto set_number_pos = [this](FloatingNumber* num, FieldBlock* pb, int32_t rel, v2i off = {0, 0}) {
-            v2f pos = pb->GetCenter() + v2f{0.0f, pb->GetSize().y / 2.0f * rel};
+            v2f pos = pb->GetCenter() + v2f{0.0f, pb->sprite_size.y / 2.0f * rel};
             glm::vec4 scr = vparam.mvp * glm::vec4(pos.x, pos.y, 0.0f, 1.0f);
             scr /= scr.w;
             num->SetCenter({(int32_t)((scr.x + 1.0f) / 2.0f * viewport.width) + off.x, (int32_t)((1.0f - scr.y) / 2.0f * viewport.height) + off.y});

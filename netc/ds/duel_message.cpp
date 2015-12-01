@@ -18,26 +18,37 @@ namespace ygopro
         switch(param) {
             case 1: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_CHAINING;
+                dm->msg_type = MSG_SUMMONING;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint32_t>(84013237);
                 writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
-                writer.Write<uint32_t>(84013237);
                 messages.PushCommand(dm);
                 break;
             }
             case 2: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_CHAINED;
+                dm->msg_type = MSG_SPSUMMONING;
                 BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
                 messages.PushCommand(dm);
                 break;
             }
             case 3: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_CHAIN_SOLVING;
+                dm->msg_type = MSG_FLIPSUMMONING;
                 BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 4: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_SET;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 3, 0).info);
                 messages.PushCommand(dm);
                 break;
             }
@@ -1055,9 +1066,28 @@ namespace ygopro
             case MSG_SET: {
                 uint32_t code = reader.Read<uint32_t>();
                 CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
-                auto ptr = GetCard(pi);
-                if(ptr && code)
-                    ptr->SetCode(code);
+                auto pcard = GetCard(pi);
+                if(pcard && code)
+                    pcard->SetCode(code);
+                auto& param_node = layoutCfg["set param"];
+                v2f rad = sgui::SGJsonUtil::ConvertVec2<float>(param_node, 0);
+                auto aura = duel_scene->AddFieldSprite();
+                aura->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+                aura->SetTexcoord(ImageMgr::Get().GetTexture("sum aura1"));
+                aura->SetTranslation(pcard->translation);
+                aura->SetSize({rad.x, rad.x});
+                aura->SetColor(sgui::SGJsonUtil::ConvertRGBA(param_node[2]));
+                auto action = std::make_shared<LerpAnimator<int64_t>>(500, [rad, aura](double t) ->bool {
+                    uint32_t cl = (t > 0.5f) ? ((int32_t)(255 * (2 - t * 2)) << 24) : 0xff000000;
+                    float sz = rad.x * (1 - t) + rad.y * t;
+                    aura->SetSize({sz, sz});
+                    aura->SetColor((aura->color & 0xffffff) | cl);
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(500));
+                auto rmact = std::make_shared<ActionCallback<int64_t>>([this, aura]() {
+                    duel_scene->RemoveFieldSprite(aura.get());
+                });
+                PushMessageActions(action, rmact);
                 break;
             }
             case MSG_SWAP: {
@@ -1096,72 +1126,105 @@ namespace ygopro
                 break;
             }
             case MSG_SUMMONING: {
-//                unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-//                /*int cc = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                /*int cl = */BufferIO::ReadInt8(pbuf);
-//                /*int cs = */BufferIO::ReadInt8(pbuf);
-//                /*int cp = */BufferIO::ReadInt8(pbuf);
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    myswprintf(event_string, dataManager.GetSysString(1603), dataManager.GetName(code));
-//                    mainGame->showcardcode = code;
-//                    mainGame->showcarddif = 0;
-//                    mainGame->showcardp = 0;
-//                    mainGame->showcard = 7;
-//                    mainGame->WaitFrameSignal(30);
-//                    mainGame->showcard = 0;
-//                    mainGame->WaitFrameSignal(11);
-//                }
+                uint32_t code = reader.Read<uint32_t>();
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                auto pcard = GetCard(pi);
+                if(code)
+                    pcard->SetCode(code);
+                auto& param_node = layoutCfg["summon param"];
+                v2f beg = sgui::SGJsonUtil::ConvertVec2<float>(param_node, 3);
+                v2f end = sgui::SGJsonUtil::ConvertVec2<float>(param_node, 5);
+                float outerz = param_node[2].to_value<float>();
+                auto eff = duel_scene->AddFieldSprite<FieldSummonEffect>();
+                eff->SetTranslation(pcard->translation);
+                eff->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+                eff->SetTexcoord(ImageMgr::Get().GetTexture("sum aura2"));
+                eff->SetTexParam(sgui::SGJsonUtil::ConvertVec2<float>(param_node, 0));
+                eff->SetSize(beg);
+                eff->SetOuterZ(outerz);
+                eff->SetColor(sgui::SGJsonUtil::ConvertRGBA(param_node[7]));
+                auto action = std::make_shared<LerpAnimator<int64_t>>(800, [beg, end, eff](double t) ->bool {
+                    uint32_t cl = (t > 0.5f) ? ((int32_t)(255 * (2 - t * 2)) << 24) : 0xff000000;
+                    v2f sz = beg * (1 - t) + end * t;
+                    eff->SetSize(sz);
+                    eff->SetColor((eff->color & 0xffffff) | cl);
+                    eff->SetRotation(glm::angleAxis(-3.1415926f * (float)t, glm::vec3(0.0f, 0.0f, 1.0f)));
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(800));
+                auto rmact = std::make_shared<ActionCallback<int64_t>>([this, eff]() {
+                    duel_scene->RemoveFieldSprite(eff.get());
+                });
+                PushMessageActions(action, rmact);
                 break;
             }
-            case MSG_SUMMONED: {
+            case MSG_SUMMONED:
                 break;
-            }
             case MSG_SPSUMMONING: {
-//                unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-//                /*int cc = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                /*int cl = */BufferIO::ReadInt8(pbuf);
-//                /*int cs = */BufferIO::ReadInt8(pbuf);
-//                /*int cp = */BufferIO::ReadInt8(pbuf);
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
-//                    mainGame->showcardcode = code;
-//                    mainGame->showcarddif = 1;
-//                    mainGame->showcard = 5;
-//                    mainGame->WaitFrameSignal(30);
-//                    mainGame->showcard = 0;
-//                    mainGame->WaitFrameSignal(11);
-//                }
+                uint32_t code = reader.Read<uint32_t>();
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                auto pcard = GetCard(pi);
+                if(code)
+                    pcard->SetCode(code);
+                auto& param_node = layoutCfg["spsummon param"];
+                v2f beg = sgui::SGJsonUtil::ConvertVec2<float>(param_node, 3);
+                v2f end = sgui::SGJsonUtil::ConvertVec2<float>(param_node, 5);
+                float outerz = param_node[2].to_value<float>();
+                auto eff = duel_scene->AddFieldSprite<FieldSummonEffect>();
+                eff->SetTranslation(pcard->translation);
+                eff->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+                eff->SetTexcoord(ImageMgr::Get().GetTexture("sum aura1"));
+                eff->SetTexParam(sgui::SGJsonUtil::ConvertVec2<float>(param_node, 0));
+                eff->SetSize(beg);
+                eff->SetOuterZ(outerz);
+                eff->SetColor(sgui::SGJsonUtil::ConvertRGBA(param_node[7]));
+                auto action = std::make_shared<LerpAnimator<int64_t>>(800, [beg, end, outerz, eff](double t) ->bool {
+                    uint32_t cl = (t > 0.5f) ? ((int32_t)(255 * (2 - t * 2)) << 24) : 0xff000000;
+                    v2f sz = beg * (1 - t) + end * t;
+                    float z = (t < 0.5f) ? outerz : (outerz * (2 - t * 2));
+                    eff->SetSize(sz);
+                    eff->SetOuterZ(z);
+                    eff->SetColor((eff->color & 0xffffff) | cl);
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(800));
+                auto rmact = std::make_shared<ActionCallback<int64_t>>([this, eff]() {
+                    duel_scene->RemoveFieldSprite(eff.get());
+                });
+                PushMessageActions(action, rmact);
                 break;
             }
-            case MSG_SPSUMMONED: {
+            case MSG_SPSUMMONED:
                 break;
-            }
             case MSG_FLIPSUMMONING: {
-//                unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-//                int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int cl = BufferIO::ReadInt8(pbuf);
-//                int cs = BufferIO::ReadInt8(pbuf);
-//                int cp = BufferIO::ReadInt8(pbuf);
-//                ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
-//                pcard->SetCode(code);
-//                pcard->position = cp;
-//                if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-//                    myswprintf(event_string, dataManager.GetSysString(1607), dataManager.GetName(code));
-//                    mainGame->dField.MoveCard(pcard, 10);
-//                    mainGame->WaitFrameSignal(11);
-//                    mainGame->showcardcode = code;
-//                    mainGame->showcarddif = 0;
-//                    mainGame->showcardp = 0;
-//                    mainGame->showcard = 7;
-//                    mainGame->WaitFrameSignal(30);
-//                    mainGame->showcard = 0;
-//                    mainGame->WaitFrameSignal(11);
-//                }
+                uint32_t code = reader.Read<uint32_t>();
+                CardPosInfo pi(LocalPosInfo(reader.Read<int32_t>()));
+                auto pcard = GetCard(pi);
+                if(pcard && code)
+                    pcard->SetCode(code);
+                auto& param_node = layoutCfg["flip param"];
+                v2f rad = sgui::SGJsonUtil::ConvertVec2<float>(param_node, 0);
+                auto aura = duel_scene->AddFieldSprite();
+                aura->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+                aura->SetTexcoord(ImageMgr::Get().GetTexture("sum aura3"));
+                aura->SetTranslation(pcard->translation);
+                aura->SetSize({rad.x, rad.x});
+                aura->SetColor(sgui::SGJsonUtil::ConvertRGBA(param_node[2]));
+                auto action = std::make_shared<LerpAnimator<int64_t>>(600, [rad, aura](double t) ->bool {
+                    uint32_t cl = (t > 0.5f) ? ((int32_t)(255 * (2 - t * 2)) << 24) : 0xff000000;
+                    float sz = (t < 0.5) ? (rad.x * (1 - t * 2) + rad.y * t * 2) : rad.y;
+                    aura->SetSize({sz, sz});
+                    aura->SetColor((aura->color & 0xffffff) | cl);
+                    float angle = (t < 0.5) ? 0 : -3.1415926f * ((float)t * 2 - 1);
+                    aura->SetRotation(glm::angleAxis(angle, glm::vec3(0.0f, 0.0f, 1.0f)));
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(600));
+                auto rmact = std::make_shared<ActionCallback<int64_t>>([this, aura]() {
+                    duel_scene->RemoveFieldSprite(aura.get());
+                });
+                PushMessageActions(action, rmact);
                 break;
             }
-            case MSG_FLIPSUMMONED: {
+            case MSG_FLIPSUMMONED:
                 break;
-            }
             case MSG_CHAINING: {
                 g_duel.chains.emplace_back();
                 auto& chain = g_duel.chains.back();
@@ -1174,27 +1237,30 @@ namespace ygopro
                 if(chain.code)
                     pcard->SetCode(chain.code);
                 
-                auto rct = sgui::SGJsonUtil::ConvertArray<float, 4>(layoutCfg["activate param"]);
+                auto& param_node = layoutCfg["activate param"];
+                auto rct = sgui::SGJsonUtil::ConvertArray<float, 4>(param_node);
                 auto aura1 = duel_scene->AddFieldSprite();
                 aura1->SetTexture(ImageMgr::Get().GetRawMiscTexture());
                 aura1->SetTexcoord(ImageMgr::Get().GetTexture("act aura1"));
                 aura1->SetTranslation(pcard->translation);
-                aura1->SetSize({rct[0], rct[0]});
                 aura1->SetRotation(pcard->rotation);
+                aura1->SetSize({rct[0], rct[0]});
+                aura1->SetColor(sgui::SGJsonUtil::ConvertRGBA(param_node[4]));
                 auto aura2 = duel_scene->AddFieldSprite();
                 aura2->SetTexture(ImageMgr::Get().GetRawMiscTexture());
                 aura2->SetTexcoord(ImageMgr::Get().GetTexture("act aura2"));
                 aura2->SetTranslation(pcard->translation);
-                aura2->SetSize({rct[2], rct[2]});
                 aura2->SetRotation(pcard->rotation);
+                aura2->SetSize({rct[2], rct[2]});
+                aura2->SetColor(sgui::SGJsonUtil::ConvertRGBA(param_node[5]));
                 auto action = std::make_shared<LerpAnimator<int64_t>>(1000, [rct, aura1, aura2, pcard](double t) ->bool {
-                    uint32_t cl = (t > 0.5f) ? (((int32_t)(255 * (2 - t * 2)) << 24) | 0xffffff) : 0xffffffff;
+                    uint32_t cl = (t > 0.5f) ? ((int32_t)(255 * (2 - t * 2)) << 24) : 0xff000000;
                     float rad1 = rct[0] * (1 - t) + rct[1] * t;
                     aura1->SetSize({rad1, rad1});
-                    aura1->SetColor(cl);
+                    aura1->SetColor((aura1->color & 0xffffff) | cl);
                     float rad2 = (t > 0.5f) ? (rct[3] * (2 - t * 2) + rct[2] * (t - 0.5f) * 2) : (rct[2] * (1 - t * 2) + rct[3] * t * 2);
                     aura2->SetSize({rad2, rad2});
-                    aura2->SetColor(cl);
+                    aura2->SetColor((aura2->color & 0xffffff) | cl);
                     aura2->SetRotation(pcard->rotation * glm::angleAxis(3.1415926f * (float)t, glm::vec3(0.0f, 0.0f, 1.0f)));
                     uint32_t hl = (t > 0.5f) ? (((int32_t)(240 * (2 - t * 2)) << 24) | 0xffffff) : (((int32_t)(240 * t * 2) << 24) | 0xffffff);
                     pcard->SetHL(hl);
@@ -1233,7 +1299,7 @@ namespace ygopro
                 }
                 if(sps.size()) {
                     acts.push_back(std::make_shared<ActionCallback<int64_t>>([&sps]() {
-                        auto sz = sps.front()->GetSize();
+                        auto sz = sps.front()->sprite_size;
                         auto act = std::make_shared<LerpAnimator<int64_t>>(1000, [&sps, sz](double t)->bool {
                             sps.front()->SetSize(sz * (1 + 2 * t));
                             uint32_t alpha = (int32_t)(255 * (1 - t)) << 24;
@@ -1255,9 +1321,8 @@ namespace ygopro
                 PushMessageActions(acts);
                 break;
             }
-            case MSG_CHAIN_SOLVED: {
+            case MSG_CHAIN_SOLVED:
                 break;
-            }
             case MSG_CHAIN_END: {
                 for(auto& ch : g_duel.chains) {
                     for(auto& iter : ch.chain_sprites) {
@@ -1381,8 +1446,9 @@ namespace ygopro
                 v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
                 v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
                 v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
-                auto move_inf = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCenter();
-                auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCharSize();
+                auto move_pos = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_pos;
+                auto move_prop = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_prop;
+                auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->char_size;
                 changesp->SetCenter(pos, prop);
                 changesp->SetCharSize(csize);
                 changesp->SetRotation((float)lp_node[6].to_double());
@@ -1391,8 +1457,8 @@ namespace ygopro
                 changesp->SetSColor(0xff000000);
                 auto waitact = std::make_shared<ActionWait<int64_t>>(300);
                 auto moveact = std::make_shared<LerpAnimator<int64_t, FloatingNumber>>(200, changesp, [=](FloatingNumber* obj, double t)->bool {
-                    v2i cpos = base::interpolate(pos, move_inf.first, float(t));
-                    v2f cprop = base::interpolate(prop, move_inf.second, float(t));
+                    v2i cpos = base::interpolate(pos, move_pos, float(t));
+                    v2f cprop = base::interpolate(prop, move_prop, float(t));
                     obj->SetCenter(cpos, cprop);
                     obj->SetCharSize(base::interpolate(csize, char_sz, float(t)));
                     uint32_t ahpha = ((uint32_t)(255 * (1 - t))) << 24;
@@ -1417,8 +1483,9 @@ namespace ygopro
                 v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
                 v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
                 v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
-                auto move_inf = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCenter();
-                auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->GetCharSize();
+                auto move_pos = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_pos;
+                auto move_prop = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_prop;
+                auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->char_size;
                 changesp->SetCenter(pos, prop);
                 changesp->SetCharSize(csize);
                 changesp->SetRotation((float)lp_node[6].to_double());
@@ -1427,8 +1494,8 @@ namespace ygopro
                 changesp->SetSColor(0xff000000);
                 auto waitact = std::make_shared<ActionWait<int64_t>>(300);
                 auto moveact = std::make_shared<LerpAnimator<int64_t, FloatingNumber>>(200, changesp, [=](FloatingNumber* obj, double t)->bool {
-                    v2i cpos = base::interpolate(pos, move_inf.first, float(t));
-                    v2f cprop = base::interpolate(prop, move_inf.second, float(t));
+                    v2i cpos = base::interpolate(pos, move_pos, float(t));
+                    v2f cprop = base::interpolate(prop, move_prop, float(t));
                     obj->SetCenter(cpos, cprop);
                     obj->SetCharSize(base::interpolate(csize, char_sz, float(t)));
                     uint32_t ahpha = ((uint32_t)(255 * (1 - t))) << 24;

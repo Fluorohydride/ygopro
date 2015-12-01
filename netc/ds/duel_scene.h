@@ -37,11 +37,8 @@ namespace ygopro
         inline void SetSize(v2f sz) { sprite_size = sz; update_vert = true; SetUpdate(); }
         inline void SetTranslation(v3f trans) { translation = trans; update_vert = true; SetUpdate(); }
         inline void SetRotation(glm::quat rot) { rotation = rot; update_vert = true; SetUpdate(); }
-        inline v3f GetTranslation() { return translation; }
-        inline v2f GetSize() { return sprite_size; }
         inline uint32_t GetRefId() { return ref_id; }
         
-    protected:
         base::Texture* texture = nullptr;
         texf4 texcoord;
         bool update_vert = true;
@@ -49,6 +46,23 @@ namespace ygopro
         v3f translation = {0.0f, 0.0f, 0.0f};
         glm::quat rotation;
         uint32_t ref_id = 0;
+    };
+    
+    class FieldSummonEffect : public FieldSprite {
+    public:
+        FieldSummonEffect(int32_t rid) : FieldSprite(rid) {}
+        virtual void RefreshVertices();
+        inline void SetOuterZ(float z) { outer_z = z; update_vert = true; SetUpdate(); }
+        inline void SetTexParam(v2f tp) { tex_r = tp.x; tex_o = tp.y; SetUpdate(); }
+        
+        float outer_z = 0.0f;
+        float tex_r = 0.0f;
+        float tex_o = 0.0f;
+    };
+    
+    class FieldParticles : public FieldSprite {
+    public:
+        FieldParticles(int32_t rid) : FieldSprite(rid) {}
     };
     
     class FieldBlock : public FieldSprite {
@@ -145,7 +159,6 @@ namespace ygopro
         FloatingObject(uint32_t rid) : ref_id(rid) {}
         inline uint32_t GetRefId() { return ref_id; }
         inline void SetCenter(v2i pos, v2f prop = {0.0f, 0.0f}) { center_pos = pos; center_prop = prop; SetUpdate(); }
-        inline std::pair<v2i, v2f> GetCenter() { return std::make_pair(center_pos, center_prop); }
         inline void SetRotation(float rot) {
             rot_matrix[0] = std::cosf(rot);
             rot_matrix[1] = std::sinf(rot);
@@ -163,7 +176,6 @@ namespace ygopro
             return {center_pos.x + (int32_t)(center_prop.x * scr.x), center_pos.y + (int32_t)(center_prop.y * scr.y)};
         }        
         
-    protected:
         v2i center_pos = {0, 0};
         v2f center_prop = {0.0f, 0.0f};
         uint32_t ref_id = 0;
@@ -180,9 +192,7 @@ namespace ygopro
         void SetValueStr(const std::string& val_str);
         inline void SetCharSize(v2i sz) { char_size = sz; SetUpdate(); }        
         inline void SetSColor(uint32_t cl) { scolor = cl; SetUpdate(); }
-        inline v2i GetCharSize() { return char_size; }
         
-    protected:
         std::string val_string;
         v2i char_size = {0, 0};
         uint32_t scolor = 0xff000000;
@@ -199,7 +209,6 @@ namespace ygopro
         inline void SetTexcoord(texf4 tex) { texcoord = tex; SetUpdate(); }
         inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(false); }
         
-    protected:
         base::Texture* texture = nullptr;
         std::array<v2i, 4> points;
         std::array<v2f, 4> points_prop;
@@ -307,7 +316,8 @@ namespace ygopro
         inline void RemoveCard(std::shared_ptr<FieldCard> ptr) { fieldcard_renderer->DeleteObject(ptr.get()); }
         inline std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
         
-        inline std::shared_ptr<FieldSprite> AddFieldSprite() { return fieldsprite_renderer->AddRefObject<FieldSprite>(); }
+        template<typename T = FieldSprite>
+        inline std::shared_ptr<T> AddFieldSprite() { return fieldsprite_renderer->AddRefObject<T>(); }
         inline void RemoveFieldSprite(FieldSprite* ptr) { fieldsprite_renderer->RemoveRefObject(ptr); }
         inline std::shared_ptr<FloatingNumber> AddFloatingNumber() { return floatingobject_renderer->AddRefObject<FloatingNumber>(); }
         inline void RemoveFloatingNumber(FloatingNumber* ptr) { floatingobject_renderer->RemoveRefObject(ptr); }

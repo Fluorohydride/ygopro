@@ -655,29 +655,29 @@ namespace ygopro
         };
         switch(ch.triggering_pos.location) {
             case 0x1:
-                translation = g_player[ch.triggering_pos.controler].field_blocks[13]->GetTranslation();
+                translation = g_player[ch.triggering_pos.controler].field_blocks[13]->translation;
                 translation.y += check_rep(ct, 0x1, 0xf) * 0.2f * translation.y;
                 break;
             case 0x2:
                 break;
             case 0x4:
-                translation = g_player[ch.triggering_pos.controler].field_blocks[ch.triggering_pos.sequence]->GetTranslation();
+                translation = g_player[ch.triggering_pos.controler].field_blocks[ch.triggering_pos.sequence]->translation;
                 translation.y += check_rep(ct, 0x4, ch.triggering_pos.sequence) * 0.2f * translation.y;
                 break;
             case 0x8:
-                translation = g_player[ch.triggering_pos.controler].field_blocks[ch.triggering_pos.sequence + 5]->GetTranslation();
+                translation = g_player[ch.triggering_pos.controler].field_blocks[ch.triggering_pos.sequence + 5]->translation;
                 translation.y += check_rep(ct, 0x8, ch.triggering_pos.sequence) * 0.2f * translation.y;
                 break;
             case 0x10:
-                translation = g_player[ch.triggering_pos.controler].field_blocks[15]->GetTranslation();
+                translation = g_player[ch.triggering_pos.controler].field_blocks[15]->translation;
                 translation.y += check_rep(ct, 0x10, 0xf) * 0.2f * translation.y;
                 break;
             case 0x20:
-                translation = g_player[ch.triggering_pos.controler].field_blocks[16]->GetTranslation();
+                translation = g_player[ch.triggering_pos.controler].field_blocks[16]->translation;
                 translation.y += check_rep(ct, 0x20, 0xf) * 0.2f * translation.y;
                 break;
             case 0x40:
-                translation = g_player[ch.triggering_pos.controler].field_blocks[14]->GetTranslation();
+                translation = g_player[ch.triggering_pos.controler].field_blocks[14]->translation;
                 translation.y += check_rep(ct, 0x40, 0xf) * 0.2f * translation.y;
                 break;
         }
