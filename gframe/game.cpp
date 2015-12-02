@@ -924,18 +924,22 @@ void Game::ShowCardInfo(int code) {
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
 	int offset = 0;
-	unsigned long long sc = cd.setcode;
-	if(cd.alias) {
-		auto aptr = dataManager._datas.find(cd.alias);
-		if(aptr != dataManager._datas.end())
-			sc = aptr->second.setcode;
-	}
-	if(sc) {
-		offset = 23;
-		myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
-		stSetName->setText(formatBuffer);
-	} else
+	if(!mainGame->chkHideSetname->isChecked())) {
+		unsigned long long sc = cd.setcode;
+		if(cd.alias) {
+			auto aptr = dataManager._datas.find(cd.alias);
+			if(aptr != dataManager._datas.end())
+				sc = aptr->second.setcode;
+		}
+		if(sc) {
+			offset = 23;
+			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
+			stSetName->setText(formatBuffer);
+		} else
+			stSetName->setText(L"");
+	} else {
 		stSetName->setText(L"");
+	}
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
