@@ -262,7 +262,7 @@ bool Game::Initialize() {
 	chkAutoPos->setChecked(gameConf.chkAutoPos >= 1);
 	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 50, 300, 75), tabSystem, -1, dataManager.GetSysString(1275));
 	chkRandomPos->setChecked(gameConf.chkRandomPos >= 1);
- 	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
+	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
 	chkAutoChain->setChecked(gameConf.chkAutoChain >= 1);
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
 	chkWaitChain->setChecked(gameConf.chkWaitChain >= 1);
@@ -270,7 +270,7 @@ bool Game::Initialize() {
 	chkIgnore1->setChecked(gameConf.chkIgnore1 >= 1);
  	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 >= 1);
-	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 200, 280, 285), tabSystem, -1, dataManager.GetSysString(1291));
+	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 200, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
 	chkHideSetname->setChecked(gameConf.chkHideSetname >= 1);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
