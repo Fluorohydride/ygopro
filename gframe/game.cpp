@@ -924,7 +924,7 @@ void Game::ShowCardInfo(int code) {
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
 	int offset = 0;
-	if(!mainGame->chkHideSetname->isChecked())) {
+	if(!mainGame->chkHideSetname->isChecked()) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
 			auto aptr = dataManager._datas.find(cd.alias);
