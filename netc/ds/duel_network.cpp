@@ -9,9 +9,9 @@ namespace ygopro
     
     void DuelNetwork::Init(int16_t max_proto_count) {
         server_ip = commonCfg["server_ip"].to_string();
-        server_port = (int32_t)commonCfg["server_port"].to_integer();
-        server_timeout = (int32_t)commonCfg["server_timeout"].to_integer();
-        retry_interval = (int32_t)commonCfg["retry_interval"].to_integer();
+        server_port = commonCfg["server_port"].to_value<int32_t>();
+        server_timeout = commonCfg["server_timeout"].to_value<int32_t>();
+        retry_interval = commonCfg["retry_interval"].to_value<int32_t>();
         SetConnectionHandler(this);
         proto_handlers.resize(max_proto_count);
     }

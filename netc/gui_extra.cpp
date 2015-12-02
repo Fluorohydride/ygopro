@@ -34,7 +34,7 @@ namespace ygopro
     
     void LoadItemList(sgui::SGItemListWidget* widget, jaweson::JsonValue& node) {
         node.for_each([widget](const std::string& name, jaweson::JsonValue& item_node) {
-            widget->AddItem(To<std::wstring>(stringCfg[name].to_string()), sgui::SGJsonUtil::ConvertRGBA(item_node[0]), (uint32_t)item_node[1].to_integer());
+            widget->AddItem(To<std::wstring>(stringCfg[name].to_string()), sgui::SGJsonUtil::ConvertRGBA(item_node[0]), item_node[1].to_value<uint32_t>());
         });
     }
     
@@ -78,7 +78,7 @@ namespace ygopro
                     } else if(name == "allow resize") {
                         wnd->SetResizable(sub_node.to_bool());
                     } else if(name == "min size") {
-                        wnd->SetMinSize({(int32_t)sub_node[0].to_integer(), (int32_t)sub_node[1].to_integer()});
+                        wnd->SetMinSize({sub_node[0].to_value<int32_t>(), sub_node[1].to_value<int32_t>()});
                     } else if(name == "children") {
                         sub_node.for_each([wnd](const std::string& c_name, jaweson::JsonValue& c_node) {
                             LoadChild(wnd, c_name, c_node);
@@ -140,7 +140,7 @@ namespace ygopro
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         lbl->GetTextUI()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "max width") {
-                        lbl->GetTextUI()->SetMaxWidth((int32_t)sub_node.to_integer());
+                        lbl->GetTextUI()->SetMaxWidth(sub_node.to_value<int32_t>());
                     }
                 });
                 return lbl;
@@ -239,7 +239,7 @@ namespace ygopro
                         auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         rdo->GetTextUI()->PushStringWithFormat(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "group") {
-                        int32_t gp = (int32_t)sub_node.to_integer();
+                        int32_t gp = sub_node.to_value<int32_t>();
                         auto& prev_rdo = radio_groups[gp];
                         if(prev_rdo)
                             rdo->AttackGroup(prev_rdo);
@@ -261,7 +261,7 @@ namespace ygopro
                     } else if(name == "items") {
                         LoadItemList(lb, dialogCfg["item lists"][sub_node.to_string()]);
                     } else if(name == "selection") {
-                        lb->SetSelection((int32_t)sub_node.to_integer());
+                        lb->SetSelection(sub_node.to_value<int32_t>());
                     }
                 });
                 return lb;
@@ -277,7 +277,7 @@ namespace ygopro
                     } else if(name == "items") {
                         LoadItemList(cb, dialogCfg["item lists"][sub_node.to_string()]);
                     } else if(name == "selection") {
-                        cb->SetSelection((int32_t)sub_node.to_integer());
+                        cb->SetSelection(sub_node.to_value<int32_t>());
                     }
                 });
                 return cb;
@@ -310,7 +310,7 @@ namespace ygopro
                     } else if(name == "style") {
                         bar->SetStyle(sub_node);
                     } else if(name == "value") {
-                        bar->SetValue((float)sub_node.to_double());
+                        bar->SetValue(sub_node.to_value<float>());
                     }
                 });
                 return bar;
@@ -422,8 +422,8 @@ namespace ygopro
     PopupMenu& PopupMenu::Create(v2i pos, std::function<void (int32_t)> cb) {
         PopupMenu* menu = new PopupMenu();
         menu->pos = pos;
-        menu->item_width = (int32_t)dialogCfg["popup menu width"].to_integer();
-        menu->item_height = (int32_t)dialogCfg["popup menu height"].to_integer();
+        menu->item_width = dialogCfg["popup menu width"].to_value<int32_t>();
+        menu->item_height = dialogCfg["popup menu height"].to_value<int32_t>();
         menu->margin = sgui::SGJsonUtil::ConvertRect<int32_t>(dialogCfg["popup menu margin"]);
         menu->pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
         menu->btn_cb = cb;
@@ -610,7 +610,7 @@ namespace ygopro
         if(!wnd)
             return;
         auto sz = wnd->GetAbsoluteSize();
-        wnd->SetSize({sz.x, (int32_t)dialogCfg["filter dialog"]["dialog height"][show ? 1 : 0].to_integer()});
+        wnd->SetSize({sz.x, dialogCfg["filter dialog"]["dialog height"][show ? 1 : 0].to_value<int32_t>()});
         for(int32_t i = 0; i < 6; ++i)
             if(extra_label[i])
                 extra_label[i]->SetVisible(show);
@@ -822,11 +822,11 @@ namespace ygopro
                 scroll_area->ChangeViewOffset({0, 0});
         }
         auto& dlg_node = dialogCfg["info dialog"];
-        int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();
+        int32_t info_margin = dlg_node["info margin"].to_value<int32_t>();
         recti star_offset = sgui::SGJsonUtil::ConvertRect<int32_t>(dlg_node["star offset"]);
-        int32_t slider_width = (int32_t)dlg_node["slider width"].to_integer();
-        int32_t min_pen_height = (int32_t)dlg_node["min pendilum text height"].to_integer();
-        int32_t scale_width = (int32_t)dlg_node["scale blank"].to_integer();
+        int32_t slider_width = dlg_node["slider width"].to_value<int32_t>();
+        int32_t min_pen_height = dlg_node["min pendilum text height"].to_value<int32_t>();
+        int32_t scale_width = dlg_node["scale blank"].to_value<int32_t>();
         v2i scale_icon = sgui::SGJsonUtil::ConvertVec2<int32_t>(dlg_node["scale icon"], 0);
         v2i scale_size = sgui::SGJsonUtil::ConvertVec2<int32_t>(dlg_node["scale size"], 0);
         uint32_t info_backcolor = sgui::SGJsonUtil::ConvertRGBA(dlg_node["info backcolor"]);
@@ -1061,7 +1061,7 @@ namespace ygopro
         if(cards.empty())
             return;
         auto item_size = sgui::SGJsonUtil::ConvertVec2<int32_t>(dialogCfg["confirm dialog"]["item size"], 0);
-        auto item_margin = (int32_t)dialogCfg["confirm dialog"]["item margin"].to_integer();
+        auto item_margin = dialogCfg["confirm dialog"]["item margin"].to_value<int32_t>();
         v2i area_size = {(int32_t)(item_size.x * cards.size() + item_margin * (cards.size() - 1)), item_size.y};
         auto wnd = LoadDialogAs<sgui::SGWidgetContainer>("confirm dialog");
         if(!wnd)

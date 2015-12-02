@@ -31,7 +31,7 @@ jaweson::JsonRoot<> textureCfg;
 jaweson::JsonRoot<> dialogCfg;
 
 int32_t node2int(jaweson::JsonValue& node) {
-    return node.is_number() ? (int32_t)node.to_integer() : To<int32_t>(node.to_string());
+    return node.is_number() ? node.to_value<int32_t>() : To<int32_t>(node.to_string());
 };
 
 int32_t main(int32_t argc, char* argv[]) {

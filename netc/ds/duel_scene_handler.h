@@ -100,6 +100,7 @@ namespace ygopro
         bool deck_reversed = false;
         int32_t turn_count = 0;
         int32_t host_player = 0;
+        uint32_t disabled_field = 0;
         bool last_chain = false;
         std::vector<LocalChainInfo> chains;
     };
@@ -133,6 +134,7 @@ namespace ygopro
         void ClearField();
         void SetLP(int32_t pid, int32_t lp);
         void AddChain(int32_t ct);
+        void SetDisabledField(uint32_t fd_info);
         
         template<typename... ACTS>
         void PushMessageActions(ACTS... acts) {

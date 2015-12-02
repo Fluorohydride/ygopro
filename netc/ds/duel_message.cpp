@@ -52,6 +52,14 @@ namespace ygopro
                 messages.PushCommand(dm);
                 break;
             }
+            case 5: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_FIELD_DISABLED;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint32_t>(0x1f1f);
+                messages.PushCommand(dm);
+                break;
+            }
             case 9: {
                 log_panel->Show(0);
                 break;
@@ -1119,10 +1127,7 @@ namespace ygopro
                 break;
             }
             case MSG_FIELD_DISABLED: {
-//                int disabled = BufferIO::ReadInt32(pbuf);
-//                if (!mainGame->dInfo.isFirst)
-//                    disabled = (disabled >> 16) | (disabled << 16);
-//                mainGame->dField.disabled_field = disabled;
+                SetDisabledField(reader.Read<uint32_t>());
                 break;
             }
             case MSG_SUMMONING: {
@@ -1346,8 +1351,8 @@ namespace ygopro
 //                    auto& cardsp_node = layoutCfg["showcard"];
 //                    for(int32_t i = 0; i < 4; ++i) {
 //                        auto& point_node = cardsp_node[i];
-//                        rel[i] = {(int32_t)point_node[0].to_integer(), (int32_t)point_node[2].to_integer()};
-//                        prop[i] = {(float)point_node[1].to_double(), (float)point_node[3].to_double()};
+//                        rel[i] = {point_node[0].to_value<int32_t>(), point_node[2].to_value<int32_t>()};
+//                        prop[i] = {point_node[1].to_value<float>(), point_node[3].to_value<float>()};
 //                    }
 //                    cardsp->SetTexture(ImageMgr::Get().GetRawCardTexture());
 //                    negsp->SetTexture(ImageMgr::Get().GetRawMiscTexture());
@@ -1443,15 +1448,15 @@ namespace ygopro
                 int32_t endlp = (beginlp > val) ? (beginlp - val) : 0;
                 auto changesp = duel_scene->AddFloatingNumber();
                 jaweson::JsonValue& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
-                v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
-                v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
-                v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
+                v2i pos = {lp_node[0].to_value<int32_t>(), lp_node[2].to_value<int32_t>()};
+                v2f prop = {lp_node[1].to_value<float>(), lp_node[3].to_value<float>()};
+                v2i csize = {lp_node[4].to_value<int32_t>(), lp_node[5].to_value<int32_t>()};
                 auto move_pos = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_pos;
                 auto move_prop = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_prop;
                 auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->char_size;
                 changesp->SetCenter(pos, prop);
                 changesp->SetCharSize(csize);
-                changesp->SetRotation((float)lp_node[6].to_double());
+                changesp->SetRotation(lp_node[6].to_value<float>());
                 changesp->SetValue(-val);
                 changesp->SetColor((msg_type == MSG_DAMAGE) ? 0xff0000ff : 0xffff0000);
                 changesp->SetSColor(0xff000000);
@@ -1480,15 +1485,15 @@ namespace ygopro
                 int32_t endlp = beginlp + val;
                 auto changesp = duel_scene->AddFloatingNumber();
                 jaweson::JsonValue& lp_node = layoutCfg[playerid == 0 ? "lpchange1" : "lpchange2"];
-                v2i pos = {(int32_t)lp_node[0].to_integer(), (int32_t)lp_node[2].to_integer()};
-                v2f prop = {(float)lp_node[1].to_double(), (float)lp_node[3].to_double()};
-                v2i csize = {(int32_t)lp_node[4].to_integer(), (int32_t)lp_node[5].to_integer()};
+                v2i pos = {lp_node[0].to_value<int32_t>(), lp_node[2].to_value<int32_t>()};
+                v2f prop = {lp_node[1].to_value<float>(), lp_node[3].to_value<float>()};
+                v2i csize = {lp_node[4].to_value<int32_t>(), lp_node[5].to_value<int32_t>()};
                 auto move_pos = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_pos;
                 auto move_prop = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->center_prop;
                 auto char_sz = g_player[playerid].fixed_numbers[(int32_t)FloatingNumberType::LP]->char_size;
                 changesp->SetCenter(pos, prop);
                 changesp->SetCharSize(csize);
-                changesp->SetRotation((float)lp_node[6].to_double());
+                changesp->SetRotation(lp_node[6].to_value<float>());
                 changesp->SetValueStr(To<std::string>("+%d", val).c_str());
                 changesp->SetColor(0xff00ff00);
                 changesp->SetSColor(0xff000000);

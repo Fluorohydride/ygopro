@@ -630,18 +630,18 @@ namespace ygopro
     }
     
     DuelScene::DuelScene(base::Shader* _2dshader, base::Shader* _3dshader) {
-        vparam.fovy = (float)layoutCfg["fovy"].to_double();
-        vparam.cnear = (float)layoutCfg["near"].to_double();
-        vparam.cfar = (float)layoutCfg["far"].to_double();
-        vparam.angle = (float)layoutCfg["angle"].to_double();
-        vparam.radius = (float)layoutCfg["radius"].to_double();
-        vparam.xoffset = (float)layoutCfg["xoffset"].to_double();
-        vparam.yoffset = (float)layoutCfg["yoffset"].to_double();
+        vparam.fovy = layoutCfg["fovy"].to_value<float>();
+        vparam.cnear = layoutCfg["near"].to_value<float>();
+        vparam.cfar = layoutCfg["far"].to_value<float>();
+        vparam.angle = layoutCfg["angle"].to_value<float>();
+        vparam.radius = layoutCfg["radius"].to_value<float>();
+        vparam.xoffset = layoutCfg["xoffset"].to_value<float>();
+        vparam.yoffset = layoutCfg["yoffset"].to_value<float>();
         vparam.cardrect = sgui::SGJsonUtil::ConvertRect<float>(layoutCfg["card"]);
-        vparam.handmin = (float)layoutCfg["handmin"].to_double();
-        vparam.handmax = (float)layoutCfg["handmax"].to_double();
-        vparam.handy[0] = (float)layoutCfg["handy1"].to_double();
-        vparam.handy[1] = (float)layoutCfg["handy2"].to_double();
+        vparam.handmin = layoutCfg["handmin"].to_value<float>();
+        vparam.handmax = layoutCfg["handmax"].to_value<float>();
+        vparam.handy[0] = layoutCfg["handy1"].to_value<float>();
+        vparam.handy[1] = layoutCfg["handy2"].to_value<float>();
         
         bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
         bg_renderer->SetShader(_2dshader);
@@ -903,6 +903,14 @@ namespace ygopro
         return {0, 0};
     }
     
+    v2i DuelScene::ProjectToScreen(v3f coods) {
+        glm::vec4 scr = vparam.mvp * glm::vec4(coods.x, coods.y, coods.z, 1.0f);
+        scr /= scr.w;
+        int32_t x = (int32_t)((scr.x + 1.0f) / 2.0f * viewport.width);
+        int32_t y = (int32_t)((-scr.y + 1.0f) / 2.0f * viewport.height);
+        return {x, y};
+    }
+    
     CardPosInfo DuelScene::GetHoverCardPos(v2i hp) {
         if(hp.x == 0)
             return CardPosInfo(0, 0, 0, 0);
@@ -953,4 +961,5 @@ namespace ygopro
         fieldcard_renderer->ClearAllObjects();
         ImageMgr::Get().UnloadAllCardTexture();
     }
+    
 }

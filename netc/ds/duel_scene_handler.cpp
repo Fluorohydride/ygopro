@@ -273,8 +273,8 @@ namespace ygopro
             std::array<v2f, 4> prop;
             for(int32_t i = 0; i < 4; ++i) {
                 auto& point_node = avatar_node[i];
-                rel[i] = {(int32_t)point_node[0].to_integer(), (int32_t)point_node[2].to_integer()};
-                prop[i] = {(float)point_node[1].to_double(), (float)point_node[3].to_double()};
+                rel[i] = {point_node[0].to_value<int32_t>(), point_node[2].to_value<int32_t>()};
+                prop[i] = {point_node[1].to_value<float>(), point_node[3].to_value<float>()};
             }
             auto f1 = duel_scene->AddFloatingSprite();
             auto ava_tex = ImageMgr::Get().GetAvatarTexture(pl);
@@ -286,8 +286,8 @@ namespace ygopro
             f2->BuildSprite(rel.data(), ImageMgr::Get().GetTexture("avatar frame"), prop.data());
             for(int32_t i = 0; i < 4; ++i) {
                 auto& point_node = lp_node[i];
-                g_player[pl].lp_verts_rel[i] = {(int32_t)point_node[0].to_integer(), (int32_t)point_node[2].to_integer()};
-                g_player[pl].lp_verts_prop[i] = {(float)point_node[1].to_double(), (float)point_node[3].to_double()};
+                g_player[pl].lp_verts_rel[i] = {point_node[0].to_value<int32_t>(), point_node[2].to_value<int32_t>()};
+                g_player[pl].lp_verts_prop[i] = {point_node[1].to_value<float>(), point_node[3].to_value<float>()};
             }
             g_player[pl].lpbar = duel_scene->AddFloatingSprite();
             g_player[pl].lpbar->SetTexture(misc_tex);
@@ -310,12 +310,12 @@ namespace ygopro
             g_player[p].fixed_numbers[4]->SetColor(0xffff00ff);
             g_player[p].fixed_numbers[5]->SetColor(0xff0000ff);
             jaweson::JsonValue& val_node = layoutCfg[p == 0 ? "lpval1" : "lpval2"];
-            v2i pos = {(int32_t)val_node[0].to_integer(), (int32_t)val_node[2].to_integer()};
-            v2f prop = {(float)val_node[1].to_double(), (float)val_node[3].to_double()};
-            v2i csize = {(int32_t)val_node[4].to_integer(), (int32_t)val_node[5].to_integer()};
+            v2i pos = {val_node[0].to_value<int32_t>(), val_node[2].to_value<int32_t>()};
+            v2f prop = {val_node[1].to_value<float>(), val_node[3].to_value<float>()};
+            v2i csize = {val_node[4].to_value<int32_t>(), val_node[5].to_value<int32_t>()};
             g_player[p].fixed_numbers[21]->SetCenter(pos, prop);
             g_player[p].fixed_numbers[21]->SetCharSize(csize);
-            g_player[p].fixed_numbers[21]->SetRotation((float)val_node[6].to_double());
+            g_player[p].fixed_numbers[21]->SetRotation(val_node[6].to_value<float>());
             SetLP(p, 4000);
         }
     }
@@ -712,6 +712,34 @@ namespace ygopro
             num_sp2->SetColor(ncolor);
             g_duel.chains[ct].chain_sprites.push_back(num_sp1);
             g_duel.chains[ct].chain_sprites.push_back(num_sp2);
+        }
+    }
+    
+    void DuelSceneHandler::SetDisabledField(uint32_t fd_info) {
+        if(g_duel.disabled_field == fd_info)
+            return;
+        g_duel.disabled_field = fd_info;
+        uint32_t fd_playerinf[2] = {fd_info & 0xffff, fd_info >> 16};
+        auto m_tex = ImageMgr::Get().GetTexture("mzone");
+        auto m_tex_d = ImageMgr::Get().GetTexture("mzone_d");
+        auto s_tex = ImageMgr::Get().GetTexture("szone");
+        auto s_tex_d = ImageMgr::Get().GetTexture("szone_d");
+        for(int32_t i = 0; i < 2; ++i) {
+            int32_t pid = LocalPlayer(i);
+            uint32_t d_mzone = fd_playerinf[i] & 0x1f;
+            uint32_t d_szone = (fd_playerinf[i] >> 8) & 0x1f;
+            for(int32_t s = 0; s < 5; ++s) {
+                if(d_mzone & (1 << s))
+                    g_player[pid].field_blocks[s]->SetTexcoord(m_tex_d);
+                else
+                    g_player[pid].field_blocks[s]->SetTexcoord(m_tex);
+            }
+            for(int32_t s = 0; s < 5; ++s) {
+                if(d_szone & (1 << s))
+                    g_player[pid].field_blocks[s + 5]->SetTexcoord(s_tex_d);
+                else
+                    g_player[pid].field_blocks[s + 5]->SetTexcoord(s_tex);
+            }
         }
     }
     

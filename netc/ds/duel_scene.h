@@ -306,12 +306,13 @@ namespace ygopro
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);
         v2i GetHoverPos(int32_t posx, int32_t posy);
+        v2i ProjectToScreen(v3f coods);
         CardPosInfo GetHoverCardPos(v2i hp);
         std::shared_ptr<FieldCard> GetHoverCard(CardPosInfo pos_info);
         std::shared_ptr<FieldBlock> GetFieldBlock(int32_t x, int32_t y);
         
         void ClearAllCards();
-        void RedrawAllCards() { fieldcard_renderer->RequestRedraw(); }
+        inline void RedrawAllCards() { fieldcard_renderer->RequestRedraw(); }
         inline std::shared_ptr<FieldCard> CreateCard() { return fieldcard_renderer->NewSharedObject<FieldCard>(); }
         inline void RemoveCard(std::shared_ptr<FieldCard> ptr) { fieldcard_renderer->DeleteObject(ptr.get()); }
         inline std::shared_ptr<FieldBlock> CreateFieldBlock() { return field_renderer->NewSharedObject<FieldBlock>(); }
