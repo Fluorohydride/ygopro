@@ -658,9 +658,9 @@ void DeckBuilder::FilterCards() {
 		return;
 	}
 	unsigned int set_code = 0;
-	if(pstr[0] == L'#')
+	if(pstr[0] == L'@')
 		set_code = dataManager.GetSetCode(&pstr[1]);
-	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'#' && pstr[1] == 0))
+	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
 		pstr = 0;
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
@@ -726,7 +726,7 @@ void DeckBuilder::FilterCards() {
 			if(pstr[0] == L'$') {
 				if(wcsstr(text.name, &pstr[1]) == 0)
 					continue;
-			} else if(pstr[0] == L'#' && set_code) {
+			} else if(pstr[0] == L'@' && set_code) {
 				unsigned long long sc = data.setcode;
 				if(data.alias) {
 					auto aptr = dataManager._datas.find(data.alias);
