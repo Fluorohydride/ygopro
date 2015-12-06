@@ -270,7 +270,7 @@ bool Game::Initialize() {
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
-	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 200, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
+	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 260, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
 	chkHideSetname->setChecked(gameConf.chkHideSetname != 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
