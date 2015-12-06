@@ -259,19 +259,19 @@ bool Game::Initialize() {
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	chkAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274));
-	chkAutoPos->setChecked(gameConf.chkAutoPos >= 1);
+	chkAutoPos->setChecked(gameConf.chkAutoPos);
 	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 50, 300, 75), tabSystem, -1, dataManager.GetSysString(1275));
-	chkRandomPos->setChecked(gameConf.chkRandomPos >= 1);
+	chkRandomPos->setChecked(gameConf.chkRandomPos);
 	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
-	chkAutoChain->setChecked(gameConf.chkAutoChain >= 1);
+	chkAutoChain->setChecked(gameConf.chkAutoChain);
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
-	chkWaitChain->setChecked(gameConf.chkWaitChain >= 1);
+	chkWaitChain->setChecked(gameConf.chkWaitChain);
 	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
-	chkIgnore1->setChecked(gameConf.chkIgnore1 >= 1);
+	chkIgnore1->setChecked(gameConf.chkIgnore1);
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
-	chkIgnore2->setChecked(gameConf.chkIgnore2 >= 1);
+	chkIgnore2->setChecked(gameConf.chkIgnore2);
 	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 200, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
-	chkHideSetname->setChecked(gameConf.chkHideSetname >= 1);
+	chkHideSetname->setChecked(gameConf.chkHideSetname);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);

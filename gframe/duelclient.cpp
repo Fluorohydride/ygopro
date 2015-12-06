@@ -826,7 +826,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else if(type < 0x10)
 				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.clientname, dataManager.GetVictoryString(type));
 			else
-				myswprintf(vic_buf, dataManager.GetVictoryString(0x10), dataManager.GetName(BufferIO::ReadInt32(pbuf)));
+				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
 			mainGame->dInfo.vic_string = vic_buf;
 		} else {
 			mainGame->showcardcode = 2;
@@ -835,7 +835,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else if(type < 0x10)
 				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.hostname, dataManager.GetVictoryString(type));
 			else
-				myswprintf(vic_buf, dataManager.GetVictoryString(0x10), dataManager.GetName(BufferIO::ReadInt32(pbuf)));
+				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
 			mainGame->dInfo.vic_string = vic_buf;
 		}
 		mainGame->showcard = 101;
