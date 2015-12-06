@@ -24,6 +24,14 @@ struct Config {
 	wchar_t textfont[256];
 	wchar_t numfont[256];
 	wchar_t roompass[20];
+	//settings
+	int chkAutoPos;
+	int chkRandomPos;
+	int chkAutoChain;
+	int chkWaitChain;
+	int chkIgnore1;
+	int chkIgnore2;
+	int chkHideSetname;
 };
 
 struct DuelInfo {
@@ -179,6 +187,7 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
