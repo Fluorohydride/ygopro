@@ -54,9 +54,9 @@ namespace ygopro
             }
             case 5: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_FIELD_DISABLED;
+                dm->msg_type = MSG_CHAIN_NEGATED;
                 BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint32_t>(0x1f1f);
+                writer.Write<uint8_t>(1);
                 messages.PushCommand(dm);
                 break;
             }
@@ -1340,33 +1340,54 @@ namespace ygopro
             }
             case MSG_CHAIN_NEGATED:
             case MSG_CHAIN_DISABLED: {
-//                uint32_t chain_ct = reader.Read<uint8_t>();
-//                if(chain_ct - 1 < (uint32_t)g_duel.chains.size()) {
-//                    uint32_t neg_code = g_duel.chains[chain_ct - 1].code;
-//                    uint32_t neg_code = 84013237;
-//                    auto cardsp = duel_scene->AddFloatingSprite();
-//                    auto negsp = duel_scene->AddFloatingSprite();
-//                    std::array<v2i, 4> rel;
-//                    std::array<v2f, 4> prop;
-//                    auto& cardsp_node = layoutCfg["showcard"];
-//                    for(int32_t i = 0; i < 4; ++i) {
-//                        auto& point_node = cardsp_node[i];
-//                        rel[i] = {point_node[0].to_value<int32_t>(), point_node[2].to_value<int32_t>()};
-//                        prop[i] = {point_node[1].to_value<float>(), point_node[3].to_value<float>()};
-//                    }
-//                    cardsp->SetTexture(ImageMgr::Get().GetRawCardTexture());
-//                    negsp->SetTexture(ImageMgr::Get().GetRawMiscTexture());
-//                    std::weak_ptr<FloatingSprite> wptr = cardsp;
-//                    cardsp->BuildSprite(rel.data(), ImageMgr::Get().GetCardTexture(neg_code, [wptr](texf4 tex) {
-//                        if(!wptr.expired())
-//                            wptr.lock()->SetTexcoord(tex);
-//                    }), prop.data());
-//                }
+                uint32_t chain_ct = reader.Read<uint8_t>();
+                if(chain_ct - 1 < (uint32_t)g_duel.chains.size()) {
+                    auto& cnode = layoutCfg["show card"];
+                    uint32_t neg_code = g_duel.chains[chain_ct - 1].code;
+                    auto cardsp = duel_scene->AddFloatingSprite();
+                    cardsp->SetTexture(ImageMgr::Get().GetRawCardTexture());
+                    recti cardrct = {cnode[0].to_value<int32_t>(), cnode[1].to_value<int32_t>(), cnode[4].to_value<int32_t>(), cnode[5].to_value<int32_t>()};
+                    rectf cardrctp = {cnode[2].to_value<float>(), cnode[3].to_value<float>(), cnode[6].to_value<float>(), cnode[7].to_value<float>()};
+                    cardrct.left -= cardrct.width / 2;
+                    cardrct.top -= cardrct.height / 2;
+                    cardrctp.left -= cardrctp.width / 2;
+                    cardrctp.top -= cardrctp.height / 2;
+                    std::weak_ptr<FloatingSprite> wptr = cardsp;
+                    cardsp->BuildSprite(cardrct, ImageMgr::Get().GetCardTexture(neg_code, [wptr](texf4 tex) {
+                        if(!wptr.expired())
+                            wptr.lock()->SetTexcoord(tex);
+                    }), cardrctp);
+                    auto negsp = duel_scene->AddFloatingSprite();
+                    negsp->SetTexture(ImageMgr::Get().GetRawCardTexture());
+                    auto& nnode = layoutCfg["neg param"];
+                    v2i npos = sgui::SGJsonUtil::ConvertVec2<int32_t>(nnode, 0);
+                    v2f nposp = sgui::SGJsonUtil::ConvertVec2<float>(nnode, 2);
+                    v2i nsz1 = sgui::SGJsonUtil::ConvertVec2<int32_t>(nnode, 4);
+                    v2f nsz1p = sgui::SGJsonUtil::ConvertVec2<float>(nnode, 6);
+                    v2i nsz2 = sgui::SGJsonUtil::ConvertVec2<int32_t>(nnode, 8);
+                    v2f nsz2p = sgui::SGJsonUtil::ConvertVec2<float>(nnode, 10);
+                    auto szact = std::make_shared<LerpAnimator<int64_t>>(300, [=](double t)->bool {
+                        v2i sz = nsz1 * (1 - t) + nsz2 * t;
+                        v2f szp = nsz1p * (1 - t) + nsz2p * t;
+                        recti nrct = {npos.x, npos.y, sz.x, sz.y};
+                        rectf nrctp = {nposp.x, nposp.y, szp.x, szp.y};
+                        nrct.left -= nrct.width / 2;
+                        nrct.top -= nrct.height / 2;
+                        nrctp.left -= nrctp.width / 2;
+                        nrctp.top -= nrctp.height / 2;
+                        negsp->BuildSprite(nrct, ImageMgr::Get().GetTexture("negated"), nrctp);
+                        return true;
+                    }, std::make_shared<TGenLinear<int64_t>>(300));
+                    auto waitact = std::make_shared<ActionWait<int64_t>>(200);
+                    auto cbact = std::make_shared<ActionCallback<int64_t>>([this, cardsp, negsp]() {
+                        duel_scene->RemoveFloatingSprite(cardsp.get());
+                        duel_scene->RemoveFloatingSprite(negsp.get());
+                    });
+                    PushMessageActions(szact, waitact, cbact);
+                }
                 break;
             }
-            case MSG_CARD_SELECTED: {
-                break;
-            }
+            case MSG_CARD_SELECTED: break;
             case MSG_RANDOM_SELECTED: {
                 uint32_t count = reader.Read<uint8_t>();
                 std::vector<std::shared_ptr<FieldCard>> cards;
@@ -1671,12 +1692,8 @@ namespace ygopro
 //                myswprintf(event_string, dataManager.GetSysString(1621), dataManager.GetName(mainGame->dField.attacker->code));
                 break;
             }
-            case MSG_DAMAGE_STEP_START: {
-                break;
-            }
-            case MSG_DAMAGE_STEP_END: {
-                break;
-            }
+            case MSG_DAMAGE_STEP_START: break;
+            case MSG_DAMAGE_STEP_END: break;
             case MSG_MISSED_EFFECT: {
 //                BufferIO::ReadInt32(pbuf);
 //                unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
@@ -1685,12 +1702,9 @@ namespace ygopro
 //                mainGame->logParam.push_back(code);
                 break;
             }
-            case MSG_BE_CHAIN_TARGET:
-                break;
-            case MSG_CREATE_RELATION:
-                break;
-            case MSG_RELEASE_RELATION:
-                break;
+            case MSG_BE_CHAIN_TARGET: break;
+            case MSG_CREATE_RELATION: break;
+            case MSG_RELEASE_RELATION: break;
             case MSG_TOSS_COIN: {
 //                /*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 //                int count = BufferIO::ReadInt8(pbuf);
