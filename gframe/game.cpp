@@ -846,19 +846,19 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
-		} else if(!strcmp(strbuf, "chkAutoPos")) {
+		} else if(!strcmp(strbuf, "autopos")) {
 			gameConf.chkAutoPos = atoi(valbuf);
-		} else if(!strcmp(strbuf, "chkRandomPos")) {
+		} else if(!strcmp(strbuf, "randompos")) {
 			gameConf.chkRandomPos = atoi(valbuf);
-		} else if(!strcmp(strbuf, "chkAutoChain")) {
+		} else if(!strcmp(strbuf, "autochain")) {
 			gameConf.chkAutoChain = atoi(valbuf);
-		} else if(!strcmp(strbuf, "chkWaitChain")) {
+		} else if(!strcmp(strbuf, "waitchain")) {
 			gameConf.chkWaitChain = atoi(valbuf);
-		} else if(!strcmp(strbuf, "chkIgnore1")) {
+		} else if(!strcmp(strbuf, "ignore1")) {
 			gameConf.chkIgnore1 = atoi(valbuf);
-		} else if(!strcmp(strbuf, "chkIgnore2")) {
+		} else if(!strcmp(strbuf, "ignore2")) {
 			gameConf.chkIgnore2 = atoi(valbuf);
-		} else if(!strcmp(strbuf, "chkHideSetname")) {
+		} else if(!strcmp(strbuf, "hide_setname")) {
 			gameConf.chkHideSetname = atoi(valbuf);
 		} else {
 			// options allowing multiple words
@@ -903,13 +903,13 @@ void Game::SaveConfig() {
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
 	//settings
-	fprintf(fp, "chkAutoPos = %d\n", ((mainGame->chkAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "chkRandomPos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "chkAutoChain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "chkWaitChain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "chkIgnore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "chkIgnore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
-	fprintf(fp, "chkHideSetname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
+	fprintf(fp, "autopos = %d\n", ((mainGame->chkAutoPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "ignore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
+	fprintf(fp, "ignore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
