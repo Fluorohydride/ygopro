@@ -168,11 +168,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_CARD:
 				case MSG_SELECT_TRIBUTE:
 				case MSG_SELECT_SUM: {
-					unsigned char respbuf[64];
-					respbuf[0] = selected_cards.size();
-					for (size_t i = 0; i < selected_cards.size(); ++i)
-						respbuf[i + 1] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					SetResponseSelectedCards();
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
@@ -566,11 +562,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					int sel = selected_cards.size();
 					if (sel >= select_max) {
-						unsigned char respbuf[64];
-						respbuf[0] = selected_cards.size();
-						for (size_t i = 0; i < selected_cards.size(); ++i)
-							respbuf[i + 1] = selected_cards[i]->select_seq;
-						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+						SetResponseSelectedCards();
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					} else if (sel >= select_min) {
 						select_ready = true;
@@ -585,11 +577,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					selected_cards.push_back(command_card);
 					if (CheckSelectSum()) {
-						unsigned char respbuf[64];
-						respbuf[0] = selected_cards.size();
-						for (size_t i = 0; i < selected_cards.size(); ++i)
-							respbuf[i + 1] = selected_cards[i]->select_seq;
-						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+						SetResponseSelectedCards();
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					} else {
 						mainGame->wCardSelect->setVisible(false);
@@ -642,11 +630,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
 					if(select_ready) {
-						unsigned char respbuf[64];
-						respbuf[0] = selected_cards.size();
-						for (size_t i = 0; i < selected_cards.size(); ++i)
-							respbuf[i + 1] = selected_cards[i]->select_seq;
-						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+						SetResponseSelectedCards();
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					}
 					break;
@@ -1228,19 +1212,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						max += selected_cards[i]->opParam;
 				}
 				if (min >= select_max) {
-					unsigned char respbuf[64];
-					respbuf[0] = selected_cards.size();
-					for (size_t i = 0; i < selected_cards.size(); ++i)
-						respbuf[i + 1] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					SetResponseSelectedCards();
 					DuelClient::SendResponse();
 				} else if (max >= select_min) {
 					if(selected_cards.size() == selectable_cards.size()) {
-						unsigned char respbuf[64];
-						respbuf[0] = selected_cards.size();
-						for (size_t i = 0; i < selected_cards.size(); ++i)
-							respbuf[i + 1] = selected_cards[i]->select_seq;
-						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+						SetResponseSelectedCards();
 						DuelClient::SendResponse();
 					} else {
 						select_ready = true;
@@ -1291,11 +1267,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				else break;
 				if (CheckSelectSum()) {
 					if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
-						unsigned char respbuf[64];
-						respbuf[0] = selected_cards.size();
-						for (size_t i = 0; i < selected_cards.size(); ++i)
-							respbuf[i + 1] = selected_cards[i]->select_seq;
-						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+						SetResponseSelectedCards();
 						DuelClient::SendResponse();
 					} else {
 						select_ready = true;
@@ -1365,20 +1337,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				if(mainGame->wQuery->isVisible()) {
-					unsigned char respbuf[64];
-					respbuf[0] = selected_cards.size();
-					for (size_t i = 0; i < selected_cards.size(); ++i)
-						respbuf[i + 1] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					SetResponseSelectedCards();
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
 				if(select_ready) {
-					unsigned char respbuf[64];
-					respbuf[0] = selected_cards.size();
-					for (size_t i = 0; i < selected_cards.size(); ++i)
-						respbuf[i + 1] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					SetResponseSelectedCards();
 					if(mainGame->wCardSelect->isVisible())
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					else
@@ -1398,11 +1362,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				if(mainGame->wQuery->isVisible()) {
-					unsigned char respbuf[64];
-					respbuf[0] = selected_cards.size();
-					for (size_t i = 0; i < selected_cards.size(); ++i)
-						respbuf[i + 1] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					SetResponseSelectedCards();
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
@@ -1410,11 +1370,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case MSG_SELECT_SUM: {
 				if(mainGame->wQuery->isVisible()) {
-					unsigned char respbuf[64];
-					respbuf[0] = selected_cards.size();
-					for (size_t i = 0; i < selected_cards.size(); ++i)
-						respbuf[i + 1] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					SetResponseSelectedCards();
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
@@ -1937,5 +1893,13 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 	panel = mainGame->wCmdMenu;
 	mainGame->wCmdMenu->setVisible(true);
 	mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - 20 , y - 20 - height, x + 80, y - 20));
+}
+
+void ClientField::SetResponseSelectedCards() const {
+	unsigned char respbuf[64];
+	respbuf[0] = selected_cards.size();
+	for (size_t i = 0; i < selected_cards.size(); ++i)
+		respbuf[i + 1] = selected_cards[i]->select_seq;
+	DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 }
 }
