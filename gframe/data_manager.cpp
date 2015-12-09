@@ -103,7 +103,7 @@ bool DataManager::LoadStrings(const char* file) {
 			wcscpy(pbuf, strBuffer);
 			_counterStrings[value] = pbuf;
 		} else if(!strcmp(strbuf, "setname")) {
-			sscanf(&linebuf[8], "%x %240[^\t^\n]", &value, strbuf);//using tab for comment
+			sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
 			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
@@ -191,11 +191,11 @@ const wchar_t* DataManager::GetCounterName(int code) {
 const wchar_t* DataManager::GetSetName(int code) {
 	auto csit = _setnameStrings.find(code);
 	if(csit == _setnameStrings.end())
-		return L"";
+		return NULL;
 	return csit->second;
 }
 unsigned int DataManager::GetSetCode(const wchar_t* setname) {
-	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); csit++)
+	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit)
 		if(wcscmp(csit->second, setname) == 0)
 			return csit->first;
 	return 0;
@@ -281,7 +281,7 @@ const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
 	wchar_t* p = scBuffer;
 	for(int i = 0; i < 4; ++i) {
 		const wchar_t* setname = GetSetName((setcode >> i * 16) & 0xffff);
-		if(setname != L"") {
+		if(setname) {
 			BufferIO::CopyWStrRef(setname, p, 16);
 			*p = L'|';
 			*++p = 0;
