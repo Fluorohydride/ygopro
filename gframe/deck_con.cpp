@@ -657,7 +657,10 @@ void DeckBuilder::FilterCards() {
 		myswprintf(result_string, L"%d", results.size());
 		return;
 	}
-	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0))
+	unsigned int set_code = 0;
+	if(pstr[0] == L'@')
+		set_code = dataManager.GetSetCode(&pstr[1]);
+	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
 		pstr = 0;
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
@@ -723,8 +726,23 @@ void DeckBuilder::FilterCards() {
 			if(pstr[0] == L'$') {
 				if(wcsstr(text.name, &pstr[1]) == 0)
 					continue;
-			}
-			else {
+			} else if(pstr[0] == L'@' && set_code) {
+				unsigned long long sc = data.setcode;
+				if(data.alias) {
+					auto aptr = dataManager._datas.find(data.alias);
+					if(aptr != dataManager._datas.end())
+						sc = aptr->second.setcode;
+				}
+				bool res = false;
+				int settype = set_code & 0xfff;
+				int setsubtype = set_code & 0xf000;
+				while(sc) {
+					if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
+						res = true;
+					sc = sc >> 16;
+				}
+				if(!res) continue;
+			} else {
 				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
 					continue;
 			}

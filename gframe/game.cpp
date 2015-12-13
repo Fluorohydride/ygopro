@@ -292,8 +292,10 @@ bool Game::Initialize() {
 	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
 	stDataInfo = env->addStaticText(L"", rect<s32>(15, 60, 296, 83), false, true, tabInfo, -1, false);
 	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
-	stText = env->addStaticText(L"", rect<s32>(15, 83, 287, 324), false, true, tabInfo, -1, false);
-	scrCardText = env->addScrollBar(false, rect<s32>(267, 83, 287, 324), tabInfo, SCROLL_CARDTEXT);
+	stSetName = env->addStaticText(L"", rect<s32>(15, 83, 296, 106), false, true, tabInfo, -1, false);
+	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
+	stText = env->addStaticText(L"", rect<s32>(15, 106, 287, 324), false, true, tabInfo, -1, false);
+	scrCardText = env->addScrollBar(false, rect<s32>(267, 106, 287, 324), tabInfo, SCROLL_CARDTEXT);
 	scrCardText->setLargeStep(1);
 	scrCardText->setSmallStep(1);
 	scrCardText->setVisible(false);
@@ -305,13 +307,19 @@ bool Game::Initialize() {
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	chkAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274));
-	chkAutoPos->setChecked(true);
+	chkAutoPos->setChecked(gameConf.chkAutoPos != 0);
 	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 50, 300, 75), tabSystem, -1, dataManager.GetSysString(1275));
+	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
 	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
+	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
+	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
 	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
+	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
-	chkIgnore2->setChecked(false);
+	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
+	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 260, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
+	chkHideSetname->setChecked(gameConf.chkHideSetname != 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -846,6 +854,14 @@ void Game::LoadConfig() {
 	gameConf.lastip[0] = 0;
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
+	//settings
+	gameConf.chkAutoPos = 1;
+	gameConf.chkRandomPos = 0;
+	gameConf.chkAutoChain = 0;
+	gameConf.chkWaitChain = 0;
+	gameConf.chkIgnore1 = 0;
+	gameConf.chkIgnore2 = 0;
+	gameConf.chkHideSetname = 0;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -878,6 +894,20 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
+		} else if(!strcmp(strbuf, "autopos")) {
+			gameConf.chkAutoPos = atoi(valbuf);
+		} else if(!strcmp(strbuf, "randompos")) {
+			gameConf.chkRandomPos = atoi(valbuf);
+		} else if(!strcmp(strbuf, "autochain")) {
+			gameConf.chkAutoChain = atoi(valbuf);
+		} else if(!strcmp(strbuf, "waitchain")) {
+			gameConf.chkWaitChain = atoi(valbuf);
+		} else if(!strcmp(strbuf, "ignore1")) {
+			gameConf.chkIgnore1 = atoi(valbuf);
+		} else if(!strcmp(strbuf, "ignore2")) {
+			gameConf.chkIgnore2 = atoi(valbuf);
+		} else if(!strcmp(strbuf, "hide_setname")) {
+			gameConf.chkHideSetname = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -920,6 +950,14 @@ void Game::SaveConfig() {
 	fprintf(fp, "lastip = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
+	//settings
+	fprintf(fp, "autopos = %d\n", ((mainGame->chkAutoPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "ignore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
+	fprintf(fp, "ignore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
@@ -933,6 +971,23 @@ void Game::ShowCardInfo(int code) {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
+	int offset = 0;
+	if(!mainGame->chkHideSetname->isChecked()) {
+		unsigned long long sc = cd.setcode;
+		if(cd.alias) {
+			auto aptr = dataManager._datas.find(cd.alias);
+			if(aptr != dataManager._datas.end())
+				sc = aptr->second.setcode;
+		}
+		if(sc) {
+			offset = 23;
+			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
+			stSetName->setText(formatBuffer);
+		} else
+			stSetName->setText(L"");
+	} else {
+		stSetName->setText(L"");
+	}
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
@@ -955,14 +1010,16 @@ void Game::ShowCardInfo(int code) {
 			wcscat(formatBuffer, scaleBuffer);
 		}
 		stDataInfo->setText(formatBuffer);
-		stText->setRelativePosition(rect<s32>(15, 83, 287, 324));
-		scrCardText->setRelativePosition(rect<s32>(267, 83, 287, 324));
+		stSetName->setRelativePosition(rect<s32>(15, 83, 296, 106));
+		stText->setRelativePosition(rect<s32>(15, 83 + offset, 287, 324));
+		scrCardText->setRelativePosition(rect<s32>(267, 83 + offset, 287, 324));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
-		stText->setRelativePosition(rect<s32>(15, 60, 287, 324));
-		scrCardText->setRelativePosition(rect<s32>(267, 60, 287, 324));
+		stSetName->setRelativePosition(rect<s32>(15, 60, 296, 83));
+		stText->setRelativePosition(rect<s32>(15, 60 + offset, 287, 324));
+		scrCardText->setRelativePosition(rect<s32>(267, 60 + offset, 287, 324));
 	}
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
