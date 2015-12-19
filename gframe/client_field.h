@@ -56,6 +56,7 @@ public:
 	int select_mode;
 	bool select_ready;
 	int announce_count;
+	int declarable_type;
 	int select_counter_count;
 	int select_counter_type;
 	std::vector<ClientCard*> selectable_cards;
@@ -101,6 +102,8 @@ public:
 	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);
 	bool check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count);
 	
+	void UpdateDeclarableCode();
+
 	irr::gui::IGUIElement* panel;
 	std::vector<int> ancard;
 	int hovered_controler;
@@ -123,5 +126,9 @@ public:
 };
 
 }
+
+//special cards
+#define CARD_MARINE_DOLPHIN	78734254
+#define CARD_TWINKLE_MOSS	13857930
 
 #endif //CLIENT_FIELD_H

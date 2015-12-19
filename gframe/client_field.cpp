@@ -1244,4 +1244,38 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 	       || (l2 > 0 && acc > l2 && check_sum(index, end, acc - l2, count + 1))
 	       || check_sum(index, end, acc, count);
 }
+template <class T>
+static bool is_declarable(T const& cd, int declarable_type) {
+	if(!(cd.type & declarable_type))
+		return false;
+	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
+		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+}
+void ClientField::UpdateDeclarableCode() {
+	const wchar_t* pname = mainGame->ebANCard->getText();
+	int trycode = BufferIO::GetVal(pname);
+	CardString cstr;
+	CardData cd;
+	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declarable_type)) {
+		mainGame->lstANCard->clear();
+		ancard.clear();
+		mainGame->lstANCard->addItem(cstr.name);
+		ancard.push_back(trycode);
+		return;
+	}
+	if(pname[0] == 0 || pname[1] == 0)
+		return;
+	mainGame->lstANCard->clear();
+	ancard.clear();
+	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
+		if(wcsstr(cit->second.name, pname) != 0) {
+			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+			//datas.alias can be double card names or alias
+			if(is_declarable(cp->second, declarable_type)) {
+				mainGame->lstANCard->addItem(cit->second.name);
+				ancard.push_back(cit->first);
+			}
+		}
+	}
+}
 }

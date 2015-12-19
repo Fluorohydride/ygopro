@@ -636,6 +636,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_ANNOUNCE_CARD: {
 			player = BufferIO::ReadInt8(pbuf);
+			pbuf += 4;
 			return ReadReplayResponse();
 		}
 		case MSG_ANNOUNCE_NUMBER: {
