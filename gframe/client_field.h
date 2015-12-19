@@ -50,6 +50,7 @@ public:
 	int selected_field;
 	int select_min;
 	int select_max;
+	int must_select_count;
 	int select_sumval;
 	int select_cancelable;
 	int select_mode;
@@ -96,9 +97,9 @@ public:
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
 	bool CheckSelectSum();
 	bool check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::iterator index, int min, int max);
-	bool check_sel_sum_s(std::set<ClientCard*>& left, int index, int acc);
-	void check_sel_sum_t(std::set<ClientCard*>& left, int acc);
-	bool check_sum(std::set<ClientCard*>& testlist, std::set<ClientCard*>::iterator index, int acc, int count);
+	bool check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc);
+	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);
+	bool check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count);
 	
 	irr::gui::IGUIElement* panel;
 	std::vector<int> ancard;

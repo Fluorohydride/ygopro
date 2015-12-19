@@ -727,6 +727,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbuf += 6;
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 11;
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += count * 11;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
