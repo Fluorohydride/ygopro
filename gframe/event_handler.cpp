@@ -1202,15 +1202,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case MSG_SELECT_SUM: {
-				if (!clicked_card)
+				if (!clicked_card || !clicked_card->is_selectable)
 					break;
 				if (clicked_card->is_selected) {
-					int i = 0;
-					while(selected_cards[i] != clicked_card) i++;
-					selected_cards.erase(selected_cards.begin() + i);
-				} else if (clicked_card->is_selectable)
+					auto it = std::find(selected_cards.begin(), selected_cards.end(), clicked_card);
+					selected_cards.erase(it);
+				} else
 					selected_cards.push_back(clicked_card);
-				else break;
 				if (CheckSelectSum()) {
 					if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 						SetResponseSelectedCards();
