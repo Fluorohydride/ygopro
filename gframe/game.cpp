@@ -1085,25 +1085,20 @@ const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
 }
 void Game::LoadSkin() {
-	if (gameConf.skin_index >= 0)
-	{
+	if (gameConf.skin_index >= 0) {
 		skinSystem = new CGUISkinSystem("skins", device);
 		core::array<core::stringw> skins = skinSystem->listSkins();
-		if ((size_t)gameConf.skin_index < skins.size())
-		{
+		if ((size_t)gameConf.skin_index < skins.size()) {
 			int index = skins.size() - gameConf.skin_index - 1; // reverse index
-			if (skinSystem->applySkin(skins[index].c_str()))
-			{
+			if (skinSystem->applySkin(skins[index].c_str())) {
 				// Convert and apply special color
 				stringw header_color = skinSystem->getProperty(L"CardInfoHeaderColor");
-				if (!header_color.empty())
-				{
+				if (!header_color.empty()) {
 					unsigned int color_value;
 					std::wstringstream ss;
 					ss << std::hex << header_color.c_str();
 					ss >> color_value;
-					if (!ss.fail())
-					{
+					if (!ss.fail()) {
 						stInfo->setOverrideColor(color_value);
 						stDataInfo->setOverrideColor(color_value);
 					}
@@ -1114,28 +1109,28 @@ void Game::LoadSkin() {
 }
 void Game::OnResize()
 {
-	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
-	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
-	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
-	wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750 + 50, 440));
-	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));
-	wSinglePlay->setRelativePosition(ResizeWin(220, 100, 800, 520));
-	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
-	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
-	wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
-	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	wOptions->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
-	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
-	wANNumber->setRelativePosition(ResizeWin(550, 200, 780, 295));
-	wANCard->setRelativePosition(ResizeWin(560, 170, 770, 370));
-	wANAttribute->setRelativePosition(ResizeWin(500, 200, 830, 285));
-	wANRace->setRelativePosition(ResizeWin(480, 200, 850, 385));
-	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
-	stHintMsg->setRelativePosition(ResizeWin(500, 60, 820, 90));
+	wMainMenu->setRelativePosition(ResizeWindow(370, 200, 650, 415));
+	wLanWindow->setRelativePosition(ResizeWindow(220, 100, 800, 520));
+	wCreateHost->setRelativePosition(ResizeWindow(320, 100, 700, 520));
+	wHostPrepare->setRelativePosition(ResizeWindow(270, 120, 750 + 50, 440));
+	wReplay->setRelativePosition(ResizeWindow(220, 100, 800, 520));
+	wSinglePlay->setRelativePosition(ResizeWindow(220, 100, 800, 520));
+	wHand->setRelativePosition(ResizeWindow(500, 450, 825, 605));
+	wFTSelect->setRelativePosition(ResizeWindow(550, 240, 780, 340));
+	wMessage->setRelativePosition(ResizeWindow(490, 200, 840, 340));
+	wACMessage->setRelativePosition(ResizeWindow(490, 240, 840, 300));
+	wQuery->setRelativePosition(ResizeWindow(490, 200, 840, 340));
+	wOptions->setRelativePosition(ResizeWindow(490, 200, 840, 340));
+	wPosSelect->setRelativePosition(ResizeWindow(340, 200, 935, 410));
+	wCardSelect->setRelativePosition(ResizeWindow(320, 100, 1000, 400));
+	wANNumber->setRelativePosition(ResizeWindow(550, 200, 780, 295));
+	wANCard->setRelativePosition(ResizeWindow(560, 170, 770, 370));
+	wANAttribute->setRelativePosition(ResizeWindow(500, 200, 830, 285));
+	wANRace->setRelativePosition(ResizeWindow(480, 200, 850, 385));
+	wReplaySave->setRelativePosition(ResizeWindow(510, 200, 820, 320));
+	stHintMsg->setRelativePosition(ResizeWindow(500, 60, 820, 90));
 
-	wChat->setRelativePosition(ResizeWin(305, 615, 1020, 640, true));
+	wChat->setRelativePosition(ResizeChat(305, 615, 1020, 640));
 	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 
 	wCardImg->setRelativePosition(Resize(1, 1, 199, 273));
@@ -1184,16 +1179,16 @@ void Game::OnResize()
 	btnEffectFilter->setRelativePosition(Resize(345, 28, 390, 69));
 	btnStartFilter->setRelativePosition(Resize(260, 96, 390, 118));
 
-	stBanlist->setRelativePosition(ResizeWin(10, 9, 100, 29));
-	stDeck->setRelativePosition(ResizeWin(10, 39, 100, 59));
-	stCategory->setRelativePosition(ResizeWin(10, 5, 70, 25));
-	stLimit->setRelativePosition(ResizeWin(205, 5, 280, 25));
-	stAttribute->setRelativePosition(ResizeWin(10, 28, 70, 48));
-	stType->setRelativePosition(ResizeWin(10, 51, 70, 71));
-	stAtk->setRelativePosition(ResizeWin(205, 28, 280, 48));
-	stDef->setRelativePosition(ResizeWin(205, 51, 280, 71));
-	stLevel->setRelativePosition(ResizeWin(10, 74, 80, 94));
-	stSearch->setRelativePosition(ResizeWin(205, 74, 280, 94));
+	stBanlist->setRelativePosition(ResizeWindow(10, 9, 100, 29));
+	stDeck->setRelativePosition(ResizeWindow(10, 39, 100, 59));
+	stCategory->setRelativePosition(ResizeWindow(10, 5, 70, 25));
+	stLimit->setRelativePosition(ResizeWindow(205, 5, 280, 25));
+	stAttribute->setRelativePosition(ResizeWindow(10, 28, 70, 48));
+	stType->setRelativePosition(ResizeWindow(10, 51, 70, 71));
+	stAtk->setRelativePosition(ResizeWindow(205, 28, 280, 48));
+	stDef->setRelativePosition(ResizeWindow(205, 51, 280, 71));
+	stLevel->setRelativePosition(ResizeWindow(10, 74, 80, 94));
+	stSearch->setRelativePosition(ResizeWindow(205, 74, 280, 94));
 
 	btnSideOK->setRelativePosition(Resize(510, 40, 820, 80));
 
@@ -1224,36 +1219,35 @@ recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy
 }
 position2di Game::Resize(s32 x, s32 y, bool reverse)
 {
-	if (reverse)
-	{
+	if (reverse) {
 		x = x * 1024 / window_size.Width;
 		y = y * 640 / window_size.Height;
-	}
-	else
-	{
+	} else {
 		x = x * window_size.Width / 1024;
 		y = y * window_size.Height / 640;
 	}
 	return position2di(x, y);
 }
-recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat)
+recti Game::ResizeWindow(s32 x, s32 y, s32 x2, s32 y2)
 {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
-	if (chat)
-	{
-		y = window_size.Height - sy;
-		x2 = window_size.Width;
-		y2 = y + sy;
-		return recti(x, y, x2, y2);
-	}
 	x = (x + sx / 2) * window_size.Width / 1024 - sx / 2;
 	y = (y + sy / 2) * window_size.Height / 640 - sy / 2;
 	x2 = sx + x;
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
 }
-recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2)
+recti Game::ResizeChat(s32 x, s32 y, s32 x2, s32 y2)
+{
+	s32 sx = x2 - x;
+	s32 sy = y2 - y;
+	y = window_size.Height - sy;
+	x2 = window_size.Width;
+	y2 = y + sy;
+	return recti(x, y, x2, y2);
+}
+recti Game::ResizeGameElememt(s32 x, s32 y, s32 x2, s32 y2)
 {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
