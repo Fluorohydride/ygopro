@@ -50,6 +50,7 @@ bool Game::Initialize() {
 	is_building = false;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
+	showingtext = 0;
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
@@ -976,15 +977,17 @@ void Game::ShowCardInfo(int code) {
 		}
 		stDataInfo->setText(formatBuffer);
 		stSetName->setRelativePosition(rect<s32>(15, 83, 296, 106));
-		stText->setRelativePosition(recti(15, 83, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-		scrCardText->setRelativePosition(recti(stInfo->getRelativePosition().getWidth() - 20, 83, stInfo->getRelativePosition().getWidth(), 324 * window_size.Height / 640));
+		s32 y = stSetName->getText()[0] == 0 ? 83 : 106;
+		stText->setRelativePosition(recti(15, y, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+		scrCardText->setRelativePosition(recti(stInfo->getRelativePosition().getWidth() - 20, y, stInfo->getRelativePosition().getWidth(), 324 * window_size.Height / 640));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
 		stSetName->setRelativePosition(rect<s32>(15, 60, 296 * window_size.Width / 1024, 83 * window_size.Height / 640));
-		stText->setRelativePosition(recti(15, 60, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-		scrCardText->setRelativePosition(recti(stInfo->getRelativePosition().getWidth() - 20, 60, stInfo->getRelativePosition().getWidth(), 324 * window_size.Height / 640));
+		s32 y = stSetName->getText()[0] == 0 ? 60 : 83;
+		stText->setRelativePosition(recti(15, y, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+		scrCardText->setRelativePosition(recti(stInfo->getRelativePosition().getWidth() - 20, y, stInfo->getRelativePosition().getWidth(), 324 * window_size.Height / 640));
 	}
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
@@ -1144,7 +1147,9 @@ void Game::OnResize()
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
 
-	InitStaticText(stText, stText->getRelativePosition().getWidth(), stText->getRelativePosition().getHeight(), textFont, showingtext);
+	if (showingtext != 0) {
+		InitStaticText(stText, stText->getRelativePosition().getWidth(), stText->getRelativePosition().getHeight(), textFont, showingtext);
+	}
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
