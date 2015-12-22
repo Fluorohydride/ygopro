@@ -1,5 +1,7 @@
 #include "CXMLRegistry.h"
 
+using namespace irr;
+
 CXMLRegistry::CXMLRegistry(io::IFileSystem *fsys) {
 	fileSystem = fsys;
 	fileSystem->grab();
@@ -96,15 +98,6 @@ core::array<const wchar_t*>* CXMLRegistry::listNodeChildren(const wchar_t *node,
 	return targetNode->listNodeChildren();
 }
 
-//BROKEN
-/*
-const irr::c8 *CXMLRegistry::getValueAsCharCStr(const wchar_t *index, const wchar_t *context) {
-	irr::core::stringc temp;
-	temp = getValueAsCStr(index,context);
-	return (const irr::c8 *)temp.c_str();
-
-}
-*/
 const wchar_t *CXMLRegistry::getValueAsCStr(const wchar_t *index, const wchar_t *context) {
 	CXMLNode *targetNode;
 	targetNode = resolveContext(context);
@@ -165,26 +158,6 @@ bool CXMLRegistry::writeFile(const irr::c8 *fname,const c8 *path) {
 	delete xml;
 	return true;
 }
-// check current folder, if there isnt anything in current, use default
-const c8 *CXMLRegistry::resolveConfigPath(const c8 *fname) {
-	core::string <c8> filename;
-	bool useCurrent = true;
-	filename = "config/current/";
-	filename += fname;
-	filename += ".xml";
-	if(!fileSystem->existFile(filename.c_str())) {
-		useCurrent = false;
-	}
-	return useCurrent?"config/current/":"config/defaults/";
-}
-
-bool CXMLRegistry::loadConfigFile(const c8 *fname) {	
-	return loadFile(fname, resolveConfigPath(fname));
-}
-bool CXMLRegistry::writeConfigFile(const c8 *fname) {
-	return writeFile(fname,"config/current/");
-}
-
 
 // This is tricky, we have to keep track of which nodes are 'open'
 bool CXMLRegistry::loadFile(const c8 *fname, const c8 *path) {
@@ -245,14 +218,6 @@ bool CXMLRegistry::loadFile(const c8 *fname, const c8 *path) {
 				if(currentParent->getParent() != NULL) 
 					currentParent = currentParent->getParent();
 				break;
-/*	
-			case io::EXN_COMMENT :				
-				newNode = new CXMLNode;
-				newNode->setType(CXMLNODETYPE_COMMENT);
-				//newNode->setValue(xml->getNodeType
-				currentNode->addChild(newNode);
-				break;
-*/
 		}		
 	}
 	//if(xml) xml->drop();

@@ -5,7 +5,6 @@
 #include <irrlicht.h>
 #endif
 #include "CImageGUISkin.h"
-//#include "SkinLoader.h"
 #include "../CXMLRegistry/CXMLRegistry.h"
 
 #ifndef _WIN32
@@ -43,8 +42,7 @@ public:
 	bool loadSkinList();
 	bool applySkin(const wchar_t *skinname);
 	// Gets property from current skin
-	core::stringw getProperty(core::stringw key);	
-	bool populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname);
+	core::stringw getProperty(core::stringw key);
 	
 };
 

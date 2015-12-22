@@ -44,21 +44,6 @@ bool CGUISkinSystem::loadSkinList() {
 		return false;
 }
 
-bool CGUISkinSystem::populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname) {
-	bool ret = false;
-	io::path oldpath = fs->getWorkingDirectory();
-	fs->changeWorkingDirectoryTo(skinsPath);
-	registry = new CXMLRegistry(fs);	
-	if(!registry->loadFile(SKINSYSTEM_SKINFILE,skinname.c_str())) {
-		return ret;
-	}
-	ret = registry->populateTreeView(control);
-	delete registry;
-	registry = NULL;
-	fs->changeWorkingDirectoryTo(oldpath);	
-	return ret;
-}
-
 void CGUISkinSystem::ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, const core::stringc& name, bool nullcolors) {
 	core::stringw context;
 	core::stringc ctmp,err = "";
@@ -100,42 +85,27 @@ void CGUISkinSystem::ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, cons
 // TO maintain compatability in case of upgrades
 // We dont touch the iterface to the skin itself.
 
-gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const c8 *skinname) {	
-	gui::CImageGUISkin* skin ;
-	gui::SImageGUISkinConfig skinConfig;
-	gui::EGUI_SKIN_TYPE fallbackType;
-	gui::IGUISkin *fallbackSkin;
-	
-	s32 i,x;
+gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const c8 *skinname) {
 	core::stringc tmp;
 	core::stringw wtmp;
 	core::stringc path = "./";
 	path += skinname;
 	if(!registry->loadFile(SKINSYSTEM_SKINFILE,path.c_str())) {
 		return NULL;
-	}	
+	}
 	// Easiest way to see if an xml is loading correctly
 	// is to make the registry write out the root node and see what comes out.
 	//registry->writeFile("Skin",".");
 	
-	// To switch on the fly, we have to set the skin to the fallback skin first	
-	tmp = registry->getValueAsCStr(L"skin",L"Skin/Properties/Fallback");
-	// Always default to metalic
-	fallbackType = gui::EGST_WINDOWS_METALLIC;
-	if(tmp.equals_ignore_case("EGST_WINDOWS_CLASSIC"))
-		fallbackType = gui::EGST_WINDOWS_CLASSIC;
-	else if(tmp.equals_ignore_case("EGST_BURNING_SKIN"))
-		fallbackType = gui::EGST_BURNING_SKIN;
+	gui::CImageGUISkin* skin = new gui::CImageGUISkin(device->getVideoDriver(), device->getGUIEnvironment()->getSkin());
+	gui::SImageGUISkinConfig skinConfig;
 
-	skin = new gui::CImageGUISkin(device->getVideoDriver(), device->getGUIEnvironment()->getSkin());
 	fs->changeWorkingDirectoryTo(path.c_str());
 	ParseGUIElementStyle(skinConfig.Button,"Button");
 	ParseGUIElementStyle(skinConfig.ButtonPressed, "Button/Pressed");
 	ParseGUIElementStyle(skinConfig.ButtonDisabled, "Button/ButtonDisabled");
     ParseGUIElementStyle(skinConfig.SunkenPane, "SunkenPane");
     ParseGUIElementStyle(skinConfig.Window, "Window");
-    ParseGUIElementStyle(skinConfig.ProgressBar, "ProgressBar",true);
-    ParseGUIElementStyle(skinConfig.ProgressBarFilled, "ProgressBar/Filled",true);
 	ParseGUIElementStyle(skinConfig.TabBody,"TabControl");
 	ParseGUIElementStyle(skinConfig.TabButton,"TabControl/TabButton");
 	ParseGUIElementStyle(skinConfig.TabButtonPressed,"TabControl/TabButtonPressed");
@@ -148,14 +118,6 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const c8 *skinname) {
 	ParseGUIElementStyle(skinConfig.ComboBoxDisabled,"ComboBox/ComboBoxDisabled");
 
 	skinConfig.CheckBoxColor = registry->getValueAsColor(L"Skin/Global/CheckBoxColor");
-	
-	// If there was no progress bar colors set, set them in the config to the defaults
-	// otherwise their 0,0,0,0. This is neccicary for the old klagui.	
-
-	if(skinConfig.ProgressBar.Color == NULL) 
-		skinConfig.ProgressBar.Color = video::SColor();	
-	if(skinConfig.ProgressBarFilled.Color == NULL) 
-		skinConfig.ProgressBarFilled.Color = video::SColor(255,255,0,0);
 
 	// Load in the Info
 	loadProperty((core::stringw)L"Name",skin);
@@ -177,9 +139,9 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const c8 *skinname) {
 	// This has the downside that it whipes out things like checkbox and window button colors
 	video::SColor newCol = video::SColor();
 	video::SColor oldCol = newCol;
-	x = registry->getValueAsInt(L"guialpha",L"Skin/Global/");
+	s32 x = registry->getValueAsInt(L"guialpha",L"Skin/Global/");
 	if(x && x != NULL) {		
-		i = gui::EGDC_COUNT;
+		s32 i = gui::EGDC_COUNT;
 		while(i--) {
 			oldCol = skin->getColor((gui::EGUI_DEFAULT_COLOR)i);		
 			

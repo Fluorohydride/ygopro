@@ -33,7 +33,7 @@ struct SImageGUIElementStyle
 
 struct SImageGUISkinConfig
 {
-    SImageGUIElementStyle SunkenPane, Window, Button, ButtonPressed, ButtonDisabled, ProgressBar, ProgressBarFilled, TabButton, TabButtonPressed, TabBody, MenuBar, MenuPane, MenuPressed, CheckBox, CheckBoxDisabled, ComboBox, ComboBoxDisabled;
+    SImageGUIElementStyle SunkenPane, Window, Button, ButtonPressed, ButtonDisabled, TabButton, TabButtonPressed, TabBody, MenuBar, MenuPane, MenuPressed, CheckBox, CheckBoxDisabled, ComboBox, ComboBoxDisabled;
 	video::SColor CheckBoxColor;
 };
 
@@ -91,12 +91,7 @@ public:
             video::SColor bgcolor, bool flat, bool fillBackGround,
             const core::rect<s32>& rect,
             const core::rect<s32>* clip=0);
-	/* Updates for irrlicht 1.7 by Mamnarock
-    virtual core::rect<s32> draw3DWindowBackground(IGUIElement* element,
-            bool drawTitleBar, video::SColor titleBarColor,
-            const core::rect<s32>& rect,
-            const core::rect<s32>* clip=0);
-  */
+
 	virtual core::rect<s32> draw3DWindowBackground(IGUIElement* element, 
          bool drawTitleBar, video::SColor titleBarColor, 
          const core::rect<s32>& rect, 
@@ -120,10 +115,6 @@ public:
     virtual void drawIcon(IGUIElement* element, EGUI_DEFAULT_ICON icon,
             const core::position2di position, u32 starttime=0, u32 currenttime=0, 
             bool loop=false, const core::rect<s32>* clip=0);
-	// Madoc - I had to add some things
-	
-	// Exposes config so we can get the progress bar colors
-	virtual SImageGUISkinConfig getConfig() { return Config; }
 
 	virtual void draw2DRectangle(IGUIElement* element, const video::SColor &color, 
 		const core::rect<s32>& pos, const core::rect<s32>* clip = 0);

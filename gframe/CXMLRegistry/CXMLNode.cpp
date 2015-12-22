@@ -1,5 +1,7 @@
 #include "CXMLNode.h"
 
+using namespace irr;
+
 CXMLNODETYPE CXMLNode::getType() { return type; }
 
 void CXMLNode::setType(CXMLNODETYPE newtype) { type = newtype; }
@@ -17,37 +19,6 @@ CXMLNode *CXMLNode::getParent() {
 void CXMLNode::setParent(CXMLNode *newparent) {
 	parent = newparent;
 }
-/*
-
-bool CXMLNode::getValueAsBool() {
-	if(!value.size()) return false;
-	if(value.equals_ignore_case((core::stringw)"true")) return true;
-	return false;
-}
-s32 CXMLNode::getValueAsInt() {
-	if(!value.size()) return 0;
-	return _wtoi(value.c_str());
-}
-
-const wchar_t* CXMLNode::getValueAsCStr() {
-	if(!value.size()) return false;
-	return value.c_str();
-}
-*/
-/*
-u16 CXMLNode::getChildCount() {
-	return children.getSize();
-}
-
-irr::core::list<CXMLNode*>::Iterator CXMLNode::getFirstChild() {
-	//if(children.empty()) return 0;
-	return children.begin();
-}
-irr::core::list<CXMLNode*>::Iterator CXMLNode::getLastChild() {
-	//if(children.empty()) return 0;
-	return  children.getLast();
-}
-*/
 const wchar_t* CXMLNode::getValue() {
 	return value.c_str();
 }
@@ -79,7 +50,6 @@ CXMLNode *CXMLNode::findChildByName(const wchar_t *name) {
 
 core::array<const wchar_t*> *CXMLNode::listChildrenByType(CXMLNODETYPE nodetype) {
 	core::array<const wchar_t*> *ret = new core::array<const wchar_t*>;
-	//core::stringw construct = L"";
 	core::list<CXMLNode*>::Iterator	it;
 	
 	for( it = children.begin(); it != children.end(); it++ ) {

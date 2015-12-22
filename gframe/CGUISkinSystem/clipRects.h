@@ -10,7 +10,7 @@ namespace irr
 //! It modifies dstRect and srcRect so the resulting dstRect is entirely inside the clipping rect.
 //! srcRect is scaled so the same part of the image is displayed.
 //! Returns false if dstRect is entirely outside clip, or true if at least some of it is inside.
-inline bool clipRects( core::rect<s32>& dstRect, core::rect<s32>& srcRect, const core::rect<s32>& clip )
+bool clipRects( core::rect<s32>& dstRect, core::rect<s32>& srcRect, const core::rect<s32>& clip )
 {
     // Clip left side
     if ( dstRect.UpperLeftCorner.X < clip.UpperLeftCorner.X )
