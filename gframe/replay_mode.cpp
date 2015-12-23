@@ -16,7 +16,6 @@ bool ReplayMode::is_paused = false;
 bool ReplayMode::is_swaping = false;
 bool ReplayMode::exit_pending = false;
 int ReplayMode::skip_turn = 0;
-wchar_t ReplayMode::event_string[256];
 
 bool ReplayMode::StartReplay(int skipturn) {
 	skip_turn = skipturn;

@@ -10,7 +10,6 @@ namespace ygo {
 long SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
-wchar_t SingleMode::event_string[256];
 
 bool SingleMode::StartPlay() {
 	Thread::NewThread(SinglePlayThread, 0);
