@@ -799,34 +799,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				const wchar_t* pname = mainGame->ebANCard->getText();
-				int trycode = BufferIO::GetVal(pname);
-				CardString cstr;
-				CardData cd;
-				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
-					&& (cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS 
-							|| !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
-					mainGame->lstANCard->clear();
-					ancard.clear();
-					mainGame->lstANCard->addItem(cstr.name);
-					ancard.push_back(trycode);
-					break;
-				}
-				if(pname[0] == 0 || pname[1] == 0)
-					break;
-				mainGame->lstANCard->clear();
-				ancard.clear();
-				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
-					if(wcsstr(cit->second.name, pname) != 0) {
-						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
-						//datas.alias can be double card names or alias
-						if(cp->second.code == CARD_MARINE_DOLPHIN || cp->second.code == CARD_TWINKLE_MOSS 
-								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
-							mainGame->lstANCard->addItem(cit->second.name);
-							ancard.push_back(cit->first);
-						}
-					}
-				}
+				UpdateDeclarableCode();
 				break;
 			}
 			}
@@ -835,34 +808,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				const wchar_t* pname = mainGame->ebANCard->getText();
-				int trycode = BufferIO::GetVal(pname);
-				CardString cstr;
-				CardData cd;
-				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
-					&& (cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS 
-							|| !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
-					mainGame->lstANCard->clear();
-					ancard.clear();
-					mainGame->lstANCard->addItem(cstr.name);
-					ancard.push_back(trycode);
-					break;
-				}
-				if(pname[0] == 0)
-					break;
-				mainGame->lstANCard->clear();
-				ancard.clear();
-				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
-					if(wcsstr(cit->second.name, pname) != 0) {
-						auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
-						//datas.alias can be double card names or alias
-						if(cp->second.code == CARD_MARINE_DOLPHIN || cp->second.code == CARD_TWINKLE_MOSS 
-								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
-							mainGame->lstANCard->addItem(cit->second.name);
-							ancard.push_back(cit->first);
-						}
-					}
-				}
+				UpdateDeclarableCode();
 				break;
 			}
 			case EDITBOX_CHAT: {
@@ -1256,15 +1202,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case MSG_SELECT_SUM: {
-				if (!clicked_card)
+				if (!clicked_card || !clicked_card->is_selectable)
 					break;
 				if (clicked_card->is_selected) {
-					int i = 0;
-					while(selected_cards[i] != clicked_card) i++;
-					selected_cards.erase(selected_cards.begin() + i);
-				} else if (clicked_card->is_selectable)
+					auto it = std::find(selected_cards.begin(), selected_cards.end(), clicked_card);
+					selected_cards.erase(it);
+				} else
 					selected_cards.push_back(clicked_card);
-				else break;
 				if (CheckSelectSum()) {
 					if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 						SetResponseSelectedCards();

@@ -17,7 +17,7 @@
 #include <unistd.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1337;
+const unsigned short PRO_VERSION = 0x1338;
 
 namespace ygo {
 

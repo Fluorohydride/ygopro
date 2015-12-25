@@ -16,7 +16,6 @@ bool ReplayMode::is_paused = false;
 bool ReplayMode::is_swaping = false;
 bool ReplayMode::exit_pending = false;
 int ReplayMode::skip_turn = 0;
-wchar_t ReplayMode::event_string[256];
 
 bool ReplayMode::StartReplay(int skipturn) {
 	skip_turn = skipturn;
@@ -308,6 +307,8 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			pbuf += 6;
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 11;
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += count * 11;
 			return ReadReplayResponse();
 		}
 		case MSG_SORT_CARD:
@@ -384,7 +385,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_NEW_PHASE: {
-			pbuf++;
+			pbuf += 2;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			ReplayRefresh();
 			break;
@@ -634,6 +635,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_ANNOUNCE_CARD: {
 			player = BufferIO::ReadInt8(pbuf);
+			pbuf += 4;
 			return ReadReplayResponse();
 		}
 		case MSG_ANNOUNCE_NUMBER: {

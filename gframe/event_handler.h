@@ -1,10 +1,6 @@
 #ifndef EVENT_HANDLER_H
 #define EVENT_HANDLER_H
 
-//special cards
-#define CARD_MARINE_DOLPHIN	78734254
-#define CARD_TWINKLE_MOSS 	13857930
-
 #include "config.h"
 #include "game.h"
 #include "client_card.h"
