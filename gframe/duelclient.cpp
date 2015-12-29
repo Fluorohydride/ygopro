@@ -1871,7 +1871,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->btnM1->setVisible(true);
 			mainGame->showcardcode = 6;
 			break;
-		case PHASE_BATTLE:
+		case PHASE_BATTLE_START:
 			mainGame->btnBP->setVisible(true);
 			mainGame->btnBP->setPressed(true);
 			mainGame->btnBP->setEnabled(false);

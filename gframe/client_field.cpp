@@ -1108,7 +1108,7 @@ bool ClientField::CheckSelectSum() {
 		selable.insert(selectsum_all[i]);
 	}
 	for(size_t i = 0; i < selected_cards.size(); ++i) {
-		if(i < must_select_count)
+		if((int)i < must_select_count)
 			selected_cards[i]->is_selectable = false;
 		else
 			selected_cards[i]->is_selectable = true;
