@@ -3062,7 +3062,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
 		int val = 0;
-		for(int p = 0; p < 2; ++p) {
+		for(int i = 0; i < 2; ++i) {
+			int p = mainGame->LocalPlayer(i);
 			mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);
 			myswprintf(mainGame->dInfo.strLP[p], L"%d", mainGame->dInfo.lp[p]);
 			for(int seq = 0; seq < 5; ++seq) {
