@@ -221,6 +221,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth()-25, mainGame->textFont, mainGame->showingtext, pos);
 				break;
 			}
+			case SCROLL_VOLUME: {
+				mainGame->gameConf.soundvolume = (double)mainGame->srcSoundVolume->getPos() / 100;
+				mainGame->gameConf.musicvolume = (double)mainGame->srcMusicVolume->getPos() / 100;
+				mainGame->engineSound->setSoundVolume(mainGame->gameConf.soundvolume);
+				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.musicvolume);
+				break;
+			}
 			break;
 			}
 		}
@@ -319,6 +326,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				}
 			}
+			}
+		}
+		case irr::gui::EGET_CHECKBOX_CHANGED: {
+			case CHECKBOX_ENABLE_MUSIC: {
+				if(!mainGame->chkEnableMusic->isChecked())
+					mainGame->engineMusic->stopAllSounds();
+				break;
 			}
 		}
 		default: break;

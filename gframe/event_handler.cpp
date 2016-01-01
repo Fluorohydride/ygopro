@@ -688,6 +688,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case CHECKBOX_ENABLE_MUSIC: {
+				if(!mainGame->chkEnableMusic->isChecked())
+					mainGame->engineMusic->stopAllSounds();
+				break;
+			}
 			}
 			break;
 		}
@@ -798,6 +803,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_CARDTEXT: {
 				u32 pos = mainGame->scrCardText->getPos();
 				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth()-25, mainGame->textFont, mainGame->showingtext, pos);
+				break;
+			}
+			case SCROLL_VOLUME: {
+				mainGame->gameConf.soundvolume = (double)mainGame->srcSoundVolume->getPos() / 100;
+				mainGame->gameConf.musicvolume = (double)mainGame->srcMusicVolume->getPos() / 100;
+				mainGame->engineSound->setSoundVolume(mainGame->gameConf.soundvolume);
+				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.musicvolume);
 				break;
 			}
 			break;
