@@ -20,7 +20,7 @@ public:
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
-	irr::video::ITexture* tCover;
+	irr::video::ITexture* tCover[2];
 	irr::video::ITexture* tUnknown;
 	irr::video::ITexture* tAct;
 	irr::video::ITexture* tAttack;
@@ -35,6 +35,8 @@ public:
 	irr::video::ITexture* tLim;
 	irr::video::ITexture* tHand[3];
 	irr::video::ITexture* tBackGround;
+	irr::video::ITexture* tBackGround_menu;
+	irr::video::ITexture* tBackGround_deck;
 	irr::video::ITexture* tField;
 };
 
