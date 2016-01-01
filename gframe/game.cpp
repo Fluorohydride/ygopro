@@ -874,6 +874,7 @@ void Game::LoadConfig() {
 	gameConf.chkIgnore2 = 0;
 	gameConf.chkHideSetname = 0;
 	gameConf.control_mode = 0;
+	gameConf.draw_field_spell = 1;
 
 	gameConf.enablesound = true;
 	gameConf.soundvolume = 1.0;
@@ -928,6 +929,8 @@ void Game::LoadConfig() {
 			gameConf.chkHideSetname = atoi(valbuf);
 		} else if(!strcmp(strbuf, "control_mode")) {
 			gameConf.control_mode = atoi(valbuf);
+		} else if(!strcmp(strbuf, "draw_field_spell")) {
+			gameConf.draw_field_spell = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enablesound = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "soundvolume")) {
@@ -988,6 +991,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "hide_setname = %d\n", gameConf.chkHideSetname);
 	fprintf(fp, "#control_mode = 0: Key A/S/R. control_mode = 1: MouseLeft/MouseRight/F9\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
+	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fprintf(fp, "enable_sound = %d\n", ((mainGame->chkEnableSound->isChecked()) ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", ((mainGame->chkEnableMusic->isChecked()) ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");

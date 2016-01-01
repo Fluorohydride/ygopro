@@ -62,8 +62,43 @@ void Game::DrawBackGround() {
 //	driver->setMaterial(matManager.mBackLine);
 //	driver->drawVertexPrimitiveList(matManager.vBackLine, 76, matManager.iBackLine, 58, irr::video::EVT_STANDARD, irr::scene::EPT_LINES);
 	//draw field
+	//draw field spell card
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
-	matManager.mTexture.setTexture(0, imageManager.tField);
+	int FieldCode1 = -1;
+	int FieldCode2 = -1;
+	bool drawField = false;
+	if(mainGame->gameConf.draw_field_spell
+		&& mainGame->dField.szone[0][5] && mainGame->dField.szone[0][5]->position & POS_FACEUP)
+		FieldCode1 = mainGame->dField.szone[0][5]->code;
+	if(mainGame->gameConf.draw_field_spell
+		&& mainGame->dField.szone[1][5] && mainGame->dField.szone[1][5]->position & POS_FACEUP)
+		FieldCode2 = mainGame->dField.szone[1][5]->code;
+	int FieldCode = (FieldCode1 > 0) ? FieldCode1 : FieldCode2;
+	if(FieldCode1 > 0 && FieldCode2 > 0 && FieldCode1 != FieldCode2) {
+		ITexture* texture = imageManager.GetTextureField(FieldCode1);
+		if(texture) {
+			drawField = true;
+			matManager.mTexture.setTexture(0, texture);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vFieldSpell1, 4, matManager.iRectangle, 2);
+		}
+		texture = imageManager.GetTextureField(FieldCode2);
+		if(texture) {
+			drawField = true;
+			matManager.mTexture.setTexture(0, texture);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vFieldSpell2, 4, matManager.iRectangle, 2);
+		}
+	} else if(FieldCode > 0) {
+		ITexture* texture = imageManager.GetTextureField(FieldCode);
+		if(texture) {
+			drawField = true;
+			matManager.mTexture.setTexture(0, texture);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vFieldSpell, 4, matManager.iRectangle, 2);
+		}
+	}
+	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent : imageManager.tField);
 	driver->setMaterial(matManager.mTexture);
 	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
 	driver->setMaterial(matManager.mBackLine);
