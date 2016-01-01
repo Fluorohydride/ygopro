@@ -12,7 +12,7 @@ bool DataManager::LoadDB(const char* file) {
 	if(sqlite3_open(file, &pDB) != SQLITE_OK)
 		return Error(pDB);
 	sqlite3_stmt* pStmt;
-	const char* sql = "select * from datas,texts where datas.id=texts.id";
+	const char* sql = "select * from datas";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
 	CardDataC cd;
@@ -39,7 +39,8 @@ bool DataManager::LoadDB(const char* file) {
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas.insert(std::make_pair(cd.code, cd));
-			len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), strBuffer);
+			/*
+            len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), strBuffer);
 			if(len) {
 				cs.name = new wchar_t[len + 1];
 				memcpy(cs.name, strBuffer, (len + 1)*sizeof(wchar_t));
@@ -60,6 +61,7 @@ bool DataManager::LoadDB(const char* file) {
 				} else cs.desc[i - 14] = 0;
 			}
 			_strings.insert(std::make_pair(cd.code, cs));
+            */
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
