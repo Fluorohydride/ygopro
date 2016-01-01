@@ -460,7 +460,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnEP->setVisible(false);
 		mainGame->btnShuffle->setVisible(false);
 		mainGame->wChat->setVisible(true);
-		mainGame->imgCard->setImage(imageManager.tCover);
+		mainGame->imgCard->setImage(imageManager.tCover[0]);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {

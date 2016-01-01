@@ -164,7 +164,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
 					break;
-				mainGame->imgCard->setImage(imageManager.tCover);
+				mainGame->imgCard->setImage(imageManager.tCover[0]);
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);
