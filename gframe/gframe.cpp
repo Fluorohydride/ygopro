@@ -48,15 +48,12 @@ int main(int argc, char* argv[]) {
 		
 		return 0;
 	}
+    /*
 	ygo::mainGame = &_game;
 	if(!ygo::mainGame->Initialize())
 		return 0;
 
 	for(int i = 1; i < argc; ++i) {
-		/*command line args:
-		 * -j: join host (host info from system.conf)
-		 * -d: deck edit
-		 * -r: replay */
 		if(argv[i][0] == '-' && argv[i][1] == 'e') {
 			ygo::dataManager.LoadDB(&argv[i][2]);
 		} else if(!strcmp(argv[i], "-j") || !strcmp(argv[i], "-d") || !strcmp(argv[i], "-r") || !strcmp(argv[i], "-s")) {
@@ -93,7 +90,8 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
 	WSACleanup();
 #else
-
+    
 #endif //_WIN32
+    */
 	return EXIT_SUCCESS;
 }
