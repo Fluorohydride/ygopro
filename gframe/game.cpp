@@ -814,6 +814,7 @@ void Game::LoadConfig() {
 	gameConf.chkIgnore1 = 0;
 	gameConf.chkIgnore2 = 0;
 	gameConf.chkHideSetname = 0;
+	gameConf.control_mode = 0;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -860,6 +861,8 @@ void Game::LoadConfig() {
 			gameConf.chkIgnore2 = atoi(valbuf);
 		} else if(!strcmp(strbuf, "hide_setname")) {
 			gameConf.chkHideSetname = atoi(valbuf);
+		} else if(!strcmp(strbuf, "control_mode")) {
+			gameConf.control_mode = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -910,6 +913,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "ignore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
 	fprintf(fp, "ignore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
 	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
+	fprintf(fp, "#control_mode = 0: Key A/S/R. control_mode = 1: MouseLeft/MouseRight/F9\n");
+	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
