@@ -595,8 +595,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				hovered_code = 0;
 			}
 			if(is_draging) {
-				dragx = x;
-				dragy = y;
+				dragx = event.MouseInput.X;
+				dragy = event.MouseInput.Y;
 			}
 			if(!is_draging && pre_code != hovered_code) {
 				if(hovered_code) {
