@@ -577,9 +577,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					selected_cards.push_back(command_card);
 					if (CheckSelectSum()) {
-						SetResponseSelectedCards();
-						mainGame->HideElement(mainGame->wCardSelect, true);
+						if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
+							SetResponseSelectedCards();
+							mainGame->HideElement(mainGame->wCardSelect, true);
+						} else {
+							select_ready = true;
+							mainGame->wCardSelect->setVisible(false);
+							mainGame->dField.ShowSelectCard(true);
+						}
 					} else {
+						select_ready = false;
 						mainGame->wCardSelect->setVisible(false);
 						mainGame->dField.ShowSelectCard();
 					}
@@ -628,7 +635,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->HideElement(mainGame->wCardSelect);
 					break;
 				}
-				if(mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
+				if(mainGame->dInfo.curMsg == MSG_SELECT_CARD || mainGame->dInfo.curMsg == MSG_SELECT_SUM) {
 					if(select_ready) {
 						SetResponseSelectedCards();
 						mainGame->HideElement(mainGame->wCardSelect, true);
