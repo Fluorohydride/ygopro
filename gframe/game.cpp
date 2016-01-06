@@ -9,9 +9,7 @@
 #include "netserver.h"
 #include "single_mode.h"
 
-#ifdef _WIN32
-#include <io.h>
-#else
+#ifndef _WIN32
 #include <sys/types.h>
 #include <dirent.h>
 #endif
@@ -58,39 +56,7 @@ bool Game::Initialize() {
 		return false;
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
-#ifdef _WIN32
-	char fpath[1000];
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
-	if(fh != INVALID_HANDLE_VALUE) {
-		do {
-			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				sprintf(fpath, "./expansions/%ls", fdataw.cFileName);
-				dataManager.LoadDB(fpath);
-			}
-		} while(FindNextFileW(fh, &fdataw));
-		FindClose(fh);
-	}
-#else
-        DIR * dir;
-        struct dirent * dirp;
-        const char *foldername = "./expansions/";
-        if((dir = opendir(foldername)) != NULL) {
-	        while((dirp = readdir(dir)) != NULL) {
-		        size_t len = strlen(dirp->d_name);
-		        if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
-			        continue;
-                        char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
-                        strncpy(filepath, foldername, strlen(foldername)+1);
-                        strncat(filepath, dirp->d_name, len);
-                        std::cout << "Found file " << filepath << std::endl;
-                        if (!dataManager.LoadDB(filepath))
-	                        std::cout << "Error loading file" << std::endl;
-                        free(filepath);
-	        }
-	        closedir(dir);
-        }
-#endif
+	RefreshExpansionDB();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
@@ -688,6 +654,41 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	}
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
+}
+void Game::RefreshExpansionDB() {
+#ifdef _WIN32
+	char fpath[1000];
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
+	if(fh != INVALID_HANDLE_VALUE) {
+		do {
+			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				sprintf(fpath, "./expansions/%ls", fdataw.cFileName);
+				dataManager.LoadDB(fpath);
+			}
+		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
+	}
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	const char *foldername = "./expansions/";
+	if((dir = opendir(foldername)) != NULL) {
+		while((dirp = readdir(dir)) != NULL) {
+			size_t len = strlen(dirp->d_name);
+			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
+				continue;
+			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
+			strncpy(filepath, foldername, strlen(foldername) + 1);
+			strncat(filepath, dirp->d_name, len);
+			std::cout << "Found file " << filepath << std::endl;
+			if(!dataManager.LoadDB(filepath))
+				std::cout << "Error loading file" << std::endl;
+			free(filepath);
+		}
+		closedir(dir);
+	}
+#endif
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
