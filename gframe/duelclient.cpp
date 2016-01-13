@@ -528,7 +528,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		char timebuf[40];
 		strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
 		size_t size = strlen(timebuf) + 1;
-		wchar_t* timetext = new wchar_t[size];
+		wchar_t timetext[80];
 		mbstowcs(timetext, timebuf, size);
 		mainGame->ebRSName->setText(timetext);
 		mainGame->PopupElement(mainGame->wReplaySave);
