@@ -917,8 +917,8 @@ namespace jaweson
                     cur_ptr++;
                     return obj;
                 }
-                int32_t warn_line;
-                int32_t warn_col;
+                int32_t warn_line = 0;
+                int32_t warn_col = 0;
                 while(true) {
                     uint32_t token_type = check_next_token();
                     if(token_type != TOKEN_STRING) {
@@ -976,8 +976,8 @@ namespace jaweson
                     cur_ptr++;
                     return obj;
                 }
-                int32_t warn_line;
-                int32_t warn_col;
+                int32_t warn_line = 0;
+                int32_t warn_col = 0;
                 while(true) {
                     JsonType* val = parse_value();
                     if(!val) {

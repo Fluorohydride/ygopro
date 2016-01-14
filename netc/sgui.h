@@ -464,7 +464,7 @@ namespace sgui
         virtual void RefreshVertices() {
             vertices.resize(4);
             indices.resize(6);
-            FillQuad(&vertices[0], &indices[0]);
+            FillQuad(vertices.data(), indices.data());
         }
         
         void FillQuad(vt2* v, int16_t* idx) {
@@ -503,7 +503,7 @@ namespace sgui
         virtual void RefreshVertices() {
             vertices.resize(20);
             indices.resize(60);
-            FillQuad9(&vertices[0], &indices[0]);
+            FillQuad9(vertices.data(), indices.data());
         }
         
         void FillQuad9(vt2* v, int16_t* idx) {

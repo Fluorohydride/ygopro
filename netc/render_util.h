@@ -232,6 +232,8 @@ namespace base
         virtual void PushVerticesAll() { ClearCommandVertices(); }
         
         void UploadVertices() {
+            if(vertex_buffer.empty())
+                return;
             glBindBuffer(GL_ARRAY_BUFFER, IRenderState<VTYPE>::vbo_id);
             if(vertex_buffer.size() > pre_vert_size) {
                 glBufferData(GL_ARRAY_BUFFER, sizeof(VTYPE) * vertex_buffer.size(), &vertex_buffer[0], GL_DYNAMIC_DRAW);
@@ -387,7 +389,7 @@ namespace base
         SyncVersion();
         auto new_idx = manager->BeginPrimitive(GetPrimitiveType(), GetTextureId());
         Update(std::get<0>(new_idx), std::get<1>(new_idx));
-        manager->PushVertices(&vertices[0], &indices[0], vertices.size(), indices.size());
+        manager->PushVertices(vertices.data(), indices.data(), vertices.size(), indices.size());
         ShowPushInfo();
     }
     
@@ -396,8 +398,8 @@ namespace base
         if(!CheckUpdateVersion())
             return;
         Update(vert_index, index_index);
-        manager->UpdateVertices(&vertices[0], vert_index, vertices.size());
-        manager->UpdateIndices(&indices[0], index_index, indices.size());
+        manager->UpdateVertices(vertices.data(), vert_index, vertices.size());
+        manager->UpdateIndices(indices.data(), index_index, indices.size());
         ShowUpdateInfo();
     }
     

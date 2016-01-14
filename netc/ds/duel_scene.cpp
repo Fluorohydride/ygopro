@@ -548,7 +548,7 @@ namespace ygopro
             vertices[i].color = color;
             vertices[i].hcolor = hl;
         }
-        vt2::GenQuadIndex(&indices[0], 1, vert_index);
+        vt2::GenQuadIndex(indices.data(), 1, vert_index);
     }
     
     void FloatingSprite::BuildSprite(recti rct, texf4 tex, rectf rct_prop) {

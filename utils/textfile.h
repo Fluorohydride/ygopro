@@ -22,7 +22,7 @@ public:
             file_size = txtfile.tellg();
             txtfile.seekg(0, txtfile.beg);
             datas.resize(file_size + 1);
-            txtfile.read(&datas[0], file_size);
+            txtfile.read(datas.data(), file_size);
             datas[file_size] = 0;
         } else {
             file_size = 0;
@@ -31,7 +31,7 @@ public:
     }
     
     inline char* Data() {
-        return &datas[0];
+        return datas.data();
     }
     
     inline size_t Length() { return file_size; }
