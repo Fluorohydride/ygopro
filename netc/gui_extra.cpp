@@ -759,9 +759,9 @@ namespace ygopro
             return std::make_tuple(1, 0, 0);
         int32_t pos = (int32_t)valstr.find(L'-');
         if(pos == std::wstring::npos)
-            return std::make_tuple(2, ParseInt(valstr.data(), (int32_t)valstr.length()), 0);
+            return std::make_tuple(2, ParseInt(&valstr[0], (int32_t)valstr.length()), 0);
         else
-            return std::make_tuple(3, ParseInt(valstr.data(), pos), ParseInt(&valstr[pos + 1], (int32_t)valstr.length() - pos - 1));
+            return std::make_tuple(3, ParseInt(&valstr[0], pos), ParseInt(&valstr[pos + 1], (int32_t)valstr.length() - pos - 1));
     }
     
     int32_t FilterDialog::ParseInt(const wchar_t* p, int32_t size) {

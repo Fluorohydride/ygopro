@@ -60,6 +60,29 @@ namespace ygopro
                 messages.PushCommand(dm);
                 break;
             }
+            case 6: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_TOSS_COIN;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint8_t>(2);
+                writer.Write<uint8_t>(1);
+                writer.Write<uint8_t>(0);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 7: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_TOSS_DICE;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint8_t>(3);
+                writer.Write<uint8_t>(4);
+                writer.Write<uint8_t>(6);
+                writer.Write<uint8_t>(2);
+                messages.PushCommand(dm);
+                break;
+            }
             case 9: {
                 log_panel->Show(0);
                 break;
@@ -1695,60 +1718,43 @@ namespace ygopro
             case MSG_DAMAGE_STEP_START: break;
             case MSG_DAMAGE_STEP_END: break;
             case MSG_MISSED_EFFECT: {
-//                BufferIO::ReadInt32(pbuf);
-//                unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
-//                myswprintf(textBuffer, dataManager.GetSysString(1622), dataManager.GetName(code));
-//                mainGame->lstLog->addItem(textBuffer);
-//                mainGame->logParam.push_back(code);
+                uint32_t code = reader.Read<uint32_t>();
+                CardData* ptr = DataMgr::Get()[code];
+                if(ptr) {
+                    std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_miss_effect"].to_string());
+                    str.replace(str.find(L"{name}"), 6, ptr->name);
+                    log_panel->AddLog(1, str);
+                    log_panel->Show(1);
+                }
                 break;
             }
             case MSG_BE_CHAIN_TARGET: break;
             case MSG_CREATE_RELATION: break;
             case MSG_RELEASE_RELATION: break;
             case MSG_TOSS_COIN: {
-//                /*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int count = BufferIO::ReadInt8(pbuf);
-//                wchar_t* pwbuf = textBuffer;
-//                BufferIO::CopyWStrRef(dataManager.GetSysString(1623), pwbuf, 256);
-//                for (int i = 0; i < count; ++i) {
-//                    int res = BufferIO::ReadInt8(pbuf);
-//                    *pwbuf++ = L'[';
-//                    BufferIO::CopyWStrRef(dataManager.GetSysString(res ? 60 : 61), pwbuf, 256);
-//                    *pwbuf++ = L']';
-//                }
-//                *pwbuf = 0;
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                mainGame->gMutex.Lock();
-//                mainGame->lstLog->addItem(textBuffer);
-//                mainGame->logParam.push_back(0);
-//                mainGame->stACMessage->setText(textBuffer);
-//                mainGame->PopupElement(mainGame->wACMessage, 20);
-//                mainGame->gMutex.Unlock();
-//                mainGame->WaitFrameSignal(40);
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                uint32_t count = reader.Read<uint8_t>();
+                std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_coin"].to_string());
+                for(uint32_t i = 0; i < count; ++i) {
+                    uint32_t res = reader.Read<uint8_t>();
+                    str.push_back(L' ');
+                    str.push_back(L'0' + res);
+                }
+                log_panel->AddLog(1, str);
+                log_panel->Show(1);
                 break;
             }
             case MSG_TOSS_DICE: {
-//                /*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int count = BufferIO::ReadInt8(pbuf);
-//                wchar_t* pwbuf = textBuffer;
-//                BufferIO::CopyWStrRef(dataManager.GetSysString(1624), pwbuf, 256);
-//                for (int i = 0; i < count; ++i) {
-//                    int res = BufferIO::ReadInt8(pbuf);
-//                    *pwbuf++ = L'[';
-//                    *pwbuf++ = L'0' + res;
-//                    *pwbuf++ = L']';
-//                }
-//                *pwbuf = 0;
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                mainGame->gMutex.Lock();
-//                mainGame->lstLog->addItem(textBuffer);
-//                mainGame->logParam.push_back(0);
-//                mainGame->stACMessage->setText(textBuffer);
-//                mainGame->PopupElement(mainGame->wACMessage, 20);
-//                mainGame->gMutex.Unlock();
-//                mainGame->WaitFrameSignal(40);
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                uint32_t count = reader.Read<uint8_t>();
+                std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_dice"].to_string());
+                for(uint32_t i = 0; i < count; ++i) {
+                    uint32_t res = reader.Read<uint8_t>();
+                    str.push_back(L' ');
+                    str.push_back(L'0' + res);
+                }
+                log_panel->AddLog(1, str);
+                log_panel->Show(1);
                 break;
             }
             case MSG_DECLEAR_RACE: {

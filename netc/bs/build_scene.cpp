@@ -116,14 +116,14 @@ namespace ygopro
         float ey = offsety[1] - card_size.y + th;
         float sy = offsety[2] - card_size.y + th;
         auto numblock = [&nw, &nh, &nbk](vt2* v, v2f pos, uint32_t cl1, uint32_t cl2, int32_t val) {
-            vt2::Fill(v, {pos.x, pos.y}, {nw, -nh}, nbk, cl1);
+            vt2::Fill(&v[0], {pos.x, pos.y}, {nw, -nh}, nbk, cl1);
             if(val >= 10) {
                 vt2::Fill(&v[4], {pos.x + nw * 0.1f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, ImageMgr::Get().GetCharTex(L'0' + (val % 100) / 10), cl2);
                 vt2::Fill(&v[8], {pos.x + nw * 0.5f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, ImageMgr::Get().GetCharTex(L'0' + val % 10), cl2);
             } else
                 vt2::Fill(&v[4], {pos.x + nw * 0.3f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, ImageMgr::Get().GetCharTex(L'0' + val), cl2);
         };
-        vt2::Fill(verts.data(), {lx, y0}, {rx - lx, y1 - y0}, msk, 0xc0ffffff);
+        vt2::Fill(&verts[0], {lx, y0}, {rx - lx, y1 - y0}, msk, 0xc0ffffff);
         vt2::Fill(&verts[4], {lx, y1}, {rx - lx, y2 - y1}, msk, 0xc0c0c0c0);
         vt2::Fill(&verts[8], {lx, y2}, {rx - lx, y3 - y2}, msk, 0xc0808080);
         vt2::Fill(&verts[12], {nx, my}, {nw, -th}, ImageMgr::Get().GetTexture("main_t"), 0xff80ffff);
