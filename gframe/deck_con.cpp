@@ -670,8 +670,7 @@ void DeckBuilder::FilterCards() {
 			continue;
 		switch(filter_type) {
 		case 1: {
-			int type2 = data.type & 0xe03ef1;
-			if(!(data.type & TYPE_MONSTER) || (filter_type2 == 0x21 && type2 != 0x21) || (data.type & filter_type2) != filter_type2)
+			if(!(data.type & TYPE_MONSTER) || (data.type & filter_type2) != filter_type2)
 				continue;
 			if(filter_race && data.race != filter_race)
 				continue;
