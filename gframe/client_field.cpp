@@ -421,9 +421,10 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	if(buttonok)
 		mainGame->btnSelectOK->setVisible(true);
 	else mainGame->btnSelectOK->setVisible(false);
+	mainGame->btnSelectCancel->setVisible(false);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
-void ClientField::ShowChainCard() {
+void ClientField::ShowChainCard(bool buttoncancel) {
 	int startpos;
 	size_t ct;
 	if(selectable_cards.size() <= 5) {
@@ -476,6 +477,11 @@ void ClientField::ShowChainCard() {
 	if(!chain_forced)
 		mainGame->btnSelectOK->setVisible(true);
 	else mainGame->btnSelectOK->setVisible(false);
+	if(buttoncancel) {
+		mainGame->btnSelectOK->setVisible(false);
+		mainGame->btnSelectCancel->setVisible(true);
+	} else
+		mainGame->btnSelectCancel->setVisible(false);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowLocationCard() {

@@ -315,6 +315,7 @@ bool Game::Initialize() {
 	}
 	scrCardList = env->addScrollBar(true, rect<s32>(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
 	btnSelectOK = env->addButton(rect<s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, dataManager.GetSysString(1211));
+	btnSelectCancel = env->addButton(rect<s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_CANCELL, dataManager.GetSysString(1212));
 	//card display
 	wCardDisplay = env->addWindow(rect<s32>(320, 100, 1000, 400), false, L"");
 	wCardDisplay->getCloseButton()->setVisible(false);

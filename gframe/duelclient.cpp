@@ -1248,6 +1248,50 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Unlock();
 		return false;
 	}
+	case MSG_SELECT_TRIGGER: {
+		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		int forced = BufferIO::ReadInt8(pbuf);
+		int code, c, l, s, ss, desc;
+		ClientCard* pcard;
+		mainGame->dField.chain_forced = (forced != 0);
+		mainGame->dField.activatable_cards.clear();
+		mainGame->dField.activatable_descs.clear();
+		for(int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			ss = BufferIO::ReadInt8(pbuf);
+			desc = BufferIO::ReadInt32(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s, ss);
+			mainGame->dField.activatable_cards.push_back(pcard);
+			mainGame->dField.activatable_descs.push_back(desc);
+			pcard->is_selected = false;
+			pcard->chain_code = code;
+			pcard->is_selectable = true;
+			pcard->cmdFlag |= COMMAND_ACTIVATE;
+		}
+		if(mainGame->chkAutoChain->isChecked() && forced) {
+			SetResponseI(0);
+			mainGame->dField.ClearChainSelect();
+			DuelClient::SendResponse();
+			return true;
+		}
+		mainGame->gMutex.Lock();
+		mainGame->dField.list_command = COMMAND_ACTIVATE;
+		mainGame->dField.selectable_cards = mainGame->dField.activatable_cards;
+		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end());
+		auto eit = std::unique(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end());
+		mainGame->dField.selectable_cards.erase(eit, mainGame->dField.selectable_cards.end());
+		if(forced)
+			mainGame->wCardSelect->setText(dataManager.GetSysString(206));
+		else
+			mainGame->wCardSelect->setText(dataManager.GetSysString(203));
+		mainGame->dField.ShowChainCard(forced ? false : true);
+		mainGame->gMutex.Unlock();
+		return false;
+	}
 	case MSG_SELECT_PLACE:
 	case MSG_SELECT_DISFIELD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
@@ -3223,6 +3267,10 @@ void DuelClient::SendResponse() {
 	}
 	case MSG_SELECT_COUNTER: {
 		mainGame->dField.ClearSelect();
+		break;
+	}
+	case MSG_SELECT_TRIGGER: {
+		mainGame->dField.ClearChainSelect();
 		break;
 	}
 	case MSG_SELECT_SUM: {

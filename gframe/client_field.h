@@ -87,7 +87,7 @@ public:
 	void ClearSelect();
 	void ClearChainSelect();
 	void ShowSelectCard(bool buttonok = false, bool chain = false);
-	void ShowChainCard();
+	void ShowChainCard(bool buttoncancel = false);
 	void ShowLocationCard();
 	void ReplaySwap();
 	void RefreshAllCards();

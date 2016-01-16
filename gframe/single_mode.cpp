@@ -220,6 +220,16 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			}
 			break;
 		}
+		case MSG_SELECT_TRIGGER: {
+			player = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += 1 + count * 12;
+			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
+				mainGame->singleSignal.Reset();
+				mainGame->singleSignal.Wait();
+			}
+			break;
+		}
 		case MSG_SELECT_PLACE:
 		case MSG_SELECT_DISFIELD: {
 			player = BufferIO::ReadInt8(pbuf);

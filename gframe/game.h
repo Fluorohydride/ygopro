@@ -290,6 +290,7 @@ public:
 	irr::gui::IGUIStaticText *stCardPos[5];
 	irr::gui::IGUIScrollBar *scrCardList;
 	irr::gui::IGUIButton* btnSelectOK;
+	irr::gui::IGUIButton* btnSelectCancel;
 	//card display
 	irr::gui::IGUIWindow* wCardDisplay;
 	irr::gui::CGUIImageButton* btnCardDisplay[5];
@@ -443,6 +444,7 @@ extern Game* mainGame;
 #define BUTTON_CARD_4				234
 #define SCROLL_CARD_SELECT			235
 #define BUTTON_CARD_SEL_OK			236
+#define BUTTON_CARD_SEL_CANCELL		237
 #define BUTTON_CMD_ACTIVATE			240
 #define BUTTON_CMD_SUMMON			241
 #define BUTTON_CMD_SPSUMMON			242
