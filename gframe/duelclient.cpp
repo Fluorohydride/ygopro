@@ -1287,7 +1287,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(forced)
 			mainGame->wCardSelect->setText(dataManager.GetSysString(206));
 		else
-			mainGame->wCardSelect->setText(dataManager.GetSysString(203));
+			mainGame->wCardSelect->setText(dataManager.GetSysString(566));
 		mainGame->dField.ShowChainCard(forced ? false : true);
 		mainGame->gMutex.Unlock();
 		return false;
