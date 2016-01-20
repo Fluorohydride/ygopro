@@ -15,12 +15,14 @@ public:
 	void RemoveTexture(int code);
 	irr::video::ITexture* GetTexture(int code);
 	irr::video::ITexture* GetTextureThumb(int code);
+	irr::video::ITexture* GetTextureField(int code);
 
 	std::unordered_map<int, irr::video::ITexture*> tMap;
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
+	std::unordered_map<int, irr::video::ITexture*> tFields;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
-	irr::video::ITexture* tCover;
+	irr::video::ITexture* tCover[2];
 	irr::video::ITexture* tUnknown;
 	irr::video::ITexture* tAct;
 	irr::video::ITexture* tAttack;
@@ -35,7 +37,10 @@ public:
 	irr::video::ITexture* tLim;
 	irr::video::ITexture* tHand[3];
 	irr::video::ITexture* tBackGround;
+	irr::video::ITexture* tBackGround_menu;
+	irr::video::ITexture* tBackGround_deck;
 	irr::video::ITexture* tField;
+	irr::video::ITexture* tFieldTransparent;
 };
 
 extern ImageManager imageManager;

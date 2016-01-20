@@ -688,6 +688,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case CHECKBOX_ENABLE_MUSIC: {
+				if(!mainGame->chkEnableMusic->isChecked())
+					mainGame->engineMusic->stopAllSounds();
+				break;
+			}
 			}
 			break;
 		}
@@ -724,7 +729,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(selectable_cards[i + pos]->code)
 						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
 					else
-						mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					if(sort_list.size()) {
 						if(sort_list[pos + i] > 0)
@@ -769,7 +774,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(display_cards[i + pos]->code)
 						mainGame->btnCardDisplay[i]->setImage(imageManager.GetTexture(display_cards[i + pos]->code));
 					else
-						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover);
+						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
@@ -798,6 +803,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_CARDTEXT: {
 				u32 pos = mainGame->scrCardText->getPos();
 				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth()-25, mainGame->textFont, mainGame->showingtext, pos);
+				break;
+			}
+			case SCROLL_VOLUME: {
+				mainGame->gameConf.soundvolume = (double)mainGame->srcSoundVolume->getPos() / 100;
+				mainGame->gameConf.musicvolume = (double)mainGame->srcMusicVolume->getPos() / 100;
+				mainGame->engineSound->setSoundVolume(mainGame->gameConf.soundvolume);
+				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.musicvolume);
 				break;
 			}
 			break;
@@ -850,7 +862,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mcard->code) {
 					mainGame->ShowCardInfo(mcard->code);
 				} else {
-					mainGame->imgCard->setImage(imageManager.tCover);
+					mainGame->imgCard->setImage(imageManager.tCover[0]);
 					mainGame->stName->setText(L"");
 					mainGame->stInfo->setText(L"");
 					mainGame->stDataInfo->setText(L"");
@@ -865,7 +877,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mcard->code) {
 					mainGame->ShowCardInfo(mcard->code);
 				} else {
-					mainGame->imgCard->setImage(imageManager.tCover);
+					mainGame->imgCard->setImage(imageManager.tCover[0]);
 					mainGame->stName->setText(L"");
 					mainGame->stInfo->setText(L"");
 					mainGame->stDataInfo->setText(L"");
@@ -1512,7 +1524,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						mainGame->stTip->setVisible(false);
-						mainGame->imgCard->setImage(imageManager.tCover);
+						mainGame->imgCard->setImage(imageManager.tCover[0]);
 						mainGame->stName->setText(L"");
 						mainGame->stInfo->setText(L"");
 						mainGame->stDataInfo->setText(L"");

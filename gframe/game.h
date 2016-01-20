@@ -33,6 +33,13 @@ struct Config {
 	int chkIgnore2;
 	int chkHideSetname;
 	int control_mode;
+	int draw_field_spell;
+
+	bool enablesound;
+	double soundvolume;
+	bool enablemusic;
+	double musicvolume;
+	int BGM_index;
 };
 
 struct DuelInfo {
@@ -84,6 +91,7 @@ public:
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
+	void RefreshBGMList();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
 	void DrawCards();
@@ -103,6 +111,9 @@ public:
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearTextures();
 	void CloseDuelWindow();
+	void PlaySoundEffect(char* sound);
+	void PlayMusic(char* song, bool loop);
+	void PlayBGM();
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
@@ -126,6 +137,7 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
+	std::vector<std::wstring> BGMList;
 
 	int hideChatTimer;
 	bool hideChat;
@@ -189,10 +201,13 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
-	irr::gui::IGUICheckBox* chkHideSetname;
+	irr::gui::IGUICheckBox* chkEnableSound;
+	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
+	irr::gui::IGUIScrollBar* srcSoundVolume;
+	irr::gui::IGUIScrollBar* srcMusicVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
@@ -380,6 +395,9 @@ public:
 	//surrender/leave
 	irr::gui::IGUIButton* btnLeaveGame;
 
+	//soundEngine
+	irrklang::ISoundEngine* engineSound;
+	irrklang::ISoundEngine* engineMusic;
 };
 
 extern Game* mainGame;
@@ -497,4 +515,7 @@ extern Game* mainGame;
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
+//#define CHECKBOX_ENABLE_SOUND		360
+#define CHECKBOX_ENABLE_MUSIC		361
+#define SCROLL_VOLUME				362
 #endif // GAME_H
