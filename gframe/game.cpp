@@ -856,9 +856,9 @@ void Game::LoadConfig() {
 			gameConf.chkAutoChain = atoi(valbuf);
 		} else if(!strcmp(strbuf, "waitchain")) {
 			gameConf.chkWaitChain = atoi(valbuf);
-		} else if(!strcmp(strbuf, "ignore1")) {
+		} else if(!strcmp(strbuf, "mute_opponent")) {
 			gameConf.chkIgnore1 = atoi(valbuf);
-		} else if(!strcmp(strbuf, "ignore2")) {
+		} else if(!strcmp(strbuf, "mute_spectators")) {
 			gameConf.chkIgnore2 = atoi(valbuf);
 		} else if(!strcmp(strbuf, "hide_setname")) {
 			gameConf.chkHideSetname = atoi(valbuf);
@@ -911,8 +911,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
 	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
 	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "ignore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "ignore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_opponent = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_spectators = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
 	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
 	fprintf(fp, "#control_mode = 0: Key A/S/R. control_mode = 1: MouseLeft/MouseRight/F9\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
