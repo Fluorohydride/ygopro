@@ -9,15 +9,13 @@
 #include "netserver.h"
 //#include "single_mode.h"
 
-#ifdef _WIN32
-#include <io.h>
-#else
+#ifndef _WIN32
 #include <sys/types.h>
 #include <dirent.h>
 #include <unistd.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1338;
+const unsigned short PRO_VERSION = 0x1339;
 
 namespace ygo {
 
@@ -106,39 +104,7 @@ bool Game::Initialize() {
 		return false;
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
-#ifdef _WIN32
-	char fpath[1000];
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
-	if(fh != INVALID_HANDLE_VALUE) {
-		do {
-			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				sprintf(fpath, "./expansions/%ls", fdataw.cFileName);
-				dataManager.LoadDB(fpath);
-			}
-		} while(FindNextFileW(fh, &fdataw));
-		FindClose(fh);
-	}
-#else
-        DIR * dir;
-        struct dirent * dirp;
-        const char *foldername = "./expansions/";
-        if((dir = opendir(foldername)) != NULL) {
-	        while((dirp = readdir(dir)) != NULL) {
-		        size_t len = strlen(dirp->d_name);
-		        if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
-			        continue;
-                        char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
-                        strncpy(filepath, foldername, strlen(foldername)+1);
-                        strncat(filepath, dirp->d_name, len);
-                        std::cout << "Found file " << filepath << std::endl;
-                        if (!dataManager.LoadDB(filepath))
-	                        std::cout << "Error loading file" << std::endl;
-                        free(filepath);
-	        }
-	        closedir(dir);
-        }
-#endif
+	RefreshExpansionDB();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
@@ -741,6 +707,41 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
+void Game::RefreshExpansionDB() {
+#ifdef _WIN32
+	char fpath[1000];
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
+	if(fh != INVALID_HANDLE_VALUE) {
+		do {
+			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				sprintf(fpath, "./expansions/%ls", fdataw.cFileName);
+				dataManager.LoadDB(fpath);
+			}
+		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
+	}
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	const char *foldername = "./expansions/";
+	if((dir = opendir(foldername)) != NULL) {
+		while((dirp = readdir(dir)) != NULL) {
+			size_t len = strlen(dirp->d_name);
+			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
+				continue;
+			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
+			strncpy(filepath, foldername, strlen(foldername) + 1);
+			strncat(filepath, dirp->d_name, len);
+			std::cout << "Found file " << filepath << std::endl;
+			if(!dataManager.LoadDB(filepath))
+				std::cout << "Error loading file" << std::endl;
+			free(filepath);
+		}
+		closedir(dir);
+	}
+#endif
+}
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 #ifdef _WIN32
@@ -866,6 +867,7 @@ void Game::LoadConfig() {
 	gameConf.chkIgnore1 = 0;
 	gameConf.chkIgnore2 = 0;
 	gameConf.chkHideSetname = 0;
+	gameConf.control_mode = 0;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -906,12 +908,14 @@ void Game::LoadConfig() {
 			gameConf.chkAutoChain = atoi(valbuf);
 		} else if(!strcmp(strbuf, "waitchain")) {
 			gameConf.chkWaitChain = atoi(valbuf);
-		} else if(!strcmp(strbuf, "ignore1")) {
+		} else if(!strcmp(strbuf, "mute_opponent")) {
 			gameConf.chkIgnore1 = atoi(valbuf);
-		} else if(!strcmp(strbuf, "ignore2")) {
+		} else if(!strcmp(strbuf, "mute_spectators")) {
 			gameConf.chkIgnore2 = atoi(valbuf);
 		} else if(!strcmp(strbuf, "hide_setname")) {
 			gameConf.chkHideSetname = atoi(valbuf);
+		} else if(!strcmp(strbuf, "control_mode")) {
+			gameConf.control_mode = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -959,9 +963,11 @@ void Game::SaveConfig() {
 	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
 	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
 	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "ignore1 = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "ignore2 = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_opponent = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_spectators = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
 	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
+	fprintf(fp, "#control_mode = 0: Key A/S/R. control_mode = 1: MouseLeft/MouseRight/F9\n");
+	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {

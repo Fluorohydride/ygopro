@@ -70,6 +70,8 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->gMutex.Lock();
+		if(!mainGame->wLanWindow->isVisible())
+			mainGame->ShowElement(mainGame->wLanWindow);
 		mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
 		mainGame->gMutex.Unlock();
 	}
@@ -138,6 +140,8 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->gMutex.Lock();
+				if(!mainGame->wLanWindow->isVisible())
+					mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
 				mainGame->gMutex.Unlock();
 			} else if(connect_state == 0x7) {
@@ -523,7 +527,14 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wPhase->setVisible(false);
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
-		mainGame->ebRSName->setText(L"");
+		time_t nowtime = time(NULL);
+		struct tm *localedtime = localtime(&nowtime);
+		char timebuf[40];
+		strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
+		size_t size = strlen(timebuf) + 1;
+		wchar_t timetext[80];
+		mbstowcs(timetext, timebuf, size);
+		mainGame->ebRSName->setText(timetext);
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.Unlock();
 		mainGame->replaySignal.Reset();
