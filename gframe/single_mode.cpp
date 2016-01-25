@@ -751,7 +751,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayReload() {
-	unsigned char queryBuffer[0x1000];
+	unsigned char queryBuffer[0x2000];
 	unsigned int flag = 0x7fdfff;
 	/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
