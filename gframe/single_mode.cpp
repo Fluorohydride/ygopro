@@ -711,7 +711,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 	return is_continuing;
 }
 void SingleMode::SinglePlayRefresh(int flag) {
-	unsigned char queryBuffer[0x1000];
+	unsigned char queryBuffer[0x2000];
 	/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);
@@ -726,27 +726,27 @@ void SingleMode::SinglePlayRefresh(int flag) {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_HAND, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshHand(int player, int flag) {
-	unsigned char queryBuffer[0x1000];
+	unsigned char queryBuffer[0x2000];
 	/*int len = */query_field_card(pduel, player, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_HAND, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshGrave(int player, int flag) {
-	unsigned char queryBuffer[0x1000];
+	unsigned char queryBuffer[0x2000];
 	/*int len = */query_field_card(pduel, player, LOCATION_GRAVE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_GRAVE, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshDeck(int player, int flag) {
-	unsigned char queryBuffer[0x1000];
+	unsigned char queryBuffer[0x2000];
 	/*int len = */query_field_card(pduel, player, LOCATION_DECK, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_DECK, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshExtra(int player, int flag) {
-	unsigned char queryBuffer[0x1000];
+	unsigned char queryBuffer[0x2000];
 	/*int len = */query_field_card(pduel, player, LOCATION_EXTRA, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_EXTRA, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
-	unsigned char queryBuffer[0x1000];
+	unsigned char queryBuffer[0x2000];
 	/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
 	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
 }

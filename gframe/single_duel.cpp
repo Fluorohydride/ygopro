@@ -1348,7 +1348,7 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 	event_add(etimer, &timeout);
 }
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
-	char query_buffer[0x1000];
+	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -1368,7 +1368,7 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
-	char query_buffer[0x1000];
+	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -1388,7 +1388,7 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
-	char query_buffer[0x1000];
+	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -1414,7 +1414,7 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
-	char query_buffer[0x1000];
+	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -1426,7 +1426,7 @@ void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(*pit);
 }
 void SingleDuel::RefreshExtra(int player, int flag, int use_cache) {
-	char query_buffer[0x1000];
+	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -1435,7 +1435,7 @@ void SingleDuel::RefreshExtra(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
 }
 void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag) {
-	char query_buffer[0x1000];
+	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_CARD);
 	BufferIO::WriteInt8(qbuf, player);
