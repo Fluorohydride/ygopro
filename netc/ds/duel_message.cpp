@@ -1622,55 +1622,23 @@ namespace ygopro
                 break;
             }
             case MSG_ATTACK: {
-//                int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int la = BufferIO::ReadInt8(pbuf);
-//                int sa = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                mainGame->dField.attacker = mainGame->dField.GetCard(ca, la, sa);
-//                int cd = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int ld = BufferIO::ReadInt8(pbuf);
-//                int sd = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                float sy;
-//                if (ld != 0) {
-//                    mainGame->dField.attack_target = mainGame->dField.GetCard(cd, ld, sd);
-//                    myswprintf(event_string, dataManager.GetSysString(1619), dataManager.GetName(mainGame->dField.attacker->code),
-//                               dataManager.GetName(mainGame->dField.attack_target->code));
-//                    float xa = mainGame->dField.attacker->curPos.X;
-//                    float ya = mainGame->dField.attacker->curPos.Y;
-//                    float xd = mainGame->dField.attack_target->curPos.X;
-//                    float yd = mainGame->dField.attack_target->curPos.Y;
-//                    sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-//                    mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
-//                    if (ca == 0)
-//                        mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
-//                    else
-//                        mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
-//                } else {
-//                    myswprintf(event_string, dataManager.GetSysString(1620), dataManager.GetName(mainGame->dField.attacker->code));
-//                    float xa = mainGame->dField.attacker->curPos.X;
-//                    float ya = mainGame->dField.attacker->curPos.Y;
-//                    float xd = 3.95f;
-//                    float yd = 3.5f;
-//                    if (ca == 0)
-//                        yd = -3.5f;
-//                    sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-//                    mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
-//                    if (ca == 0)
-//                        mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
-//                    else
-//                        mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
-//                }
-//                matManager.GenArrow(sy);
-//                mainGame->attack_sv = 0;
-//                mainGame->is_attacking = true;
-//                mainGame->WaitFrameSignal(40);
-//                mainGame->is_attacking = false;
+                CardPosInfo pattacker(LocalPosInfo(reader.Read<int32_t>()));
+                CardPosInfo ptarget(LocalPosInfo(reader.Read<int32_t>()));
+                auto catk = GetCard(pattacker);
+                auto ctarget = (ptarget.info == 0) ? nullptr : GetCard(ptarget);
+                if(catk == nullptr)
+                    break;
+                v3f startpos = catk->GetPositionInfo().first;
+                startpos.z = 0.1f;
                 break;
             }
             case MSG_BATTLE: {
+                CardPosInfo pattacker(LocalPosInfo(reader.Read<int32_t>()));
+                int32_t attacker_atk = reader.Read<int32_t>();
+                int32_t attacker_def = reader.Read<int32_t>();
+                CardPosInfo ptarget(LocalPosInfo(reader.Read<int32_t>()));
+                int32_t target_atk = reader.Read<int32_t>();
+                int32_t target_def = reader.Read<int32_t>();
 //                int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 //                int la = BufferIO::ReadInt8(pbuf);
 //                int sa = BufferIO::ReadInt8(pbuf);
@@ -1711,10 +1679,7 @@ namespace ygopro
 //                mainGame->gMutex.Unlock();
                 break;
             }
-            case MSG_ATTACK_NEGATED: {
-//                myswprintf(event_string, dataManager.GetSysString(1621), dataManager.GetName(mainGame->dField.attacker->code));
-                break;
-            }
+            case MSG_ATTACK_NEGATED: break;
             case MSG_DAMAGE_STEP_START: break;
             case MSG_DAMAGE_STEP_END: break;
             case MSG_MISSED_EFFECT: {
