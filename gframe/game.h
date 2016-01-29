@@ -24,6 +24,15 @@ struct Config {
 	wchar_t textfont[256];
 	wchar_t numfont[256];
 	wchar_t roompass[20];
+	//settings
+	int chkAutoPos;
+	int chkRandomPos;
+	int chkAutoChain;
+	int chkWaitChain;
+	int chkIgnore1;
+	int chkIgnore2;
+	int chkHideSetname;
+	int control_mode;
 };
 
 struct DuelInfo {
@@ -72,6 +81,7 @@ public:
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
 	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
+	void RefreshExpansionDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
@@ -97,6 +107,11 @@ public:
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
+
+	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
+		irr::gui::IGUIElement* focus = env->getFocus();
+		return focus && focus->hasType(type);
+	}
 
 	Mutex gMutex;
 	Mutex gBuffer;
@@ -168,12 +183,14 @@ public:
 	irr::gui::IGUIStaticText* stName;
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
+	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
 	irr::gui::IGUIScrollBar* scrCardText;
 	irr::gui::IGUICheckBox* chkAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
@@ -274,6 +291,12 @@ public:
 	irr::gui::IGUIStaticText *stCardPos[5];
 	irr::gui::IGUIScrollBar *scrCardList;
 	irr::gui::IGUIButton* btnSelectOK;
+	//card display
+	irr::gui::IGUIWindow* wCardDisplay;
+	irr::gui::CGUIImageButton* btnCardDisplay[5];
+	irr::gui::IGUIStaticText *stDisplayPos[5];
+	irr::gui::IGUIScrollBar *scrDisplayList;
+	irr::gui::IGUIButton* btnDisplayOK;
 	//announce number
 	irr::gui::IGUIWindow* wANNumber;
 	irr::gui::IGUIComboBox* cbANNumber;
@@ -453,6 +476,13 @@ extern unsigned char draw_count;
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define SCROLL_CARDTEXT				280
+#define BUTTON_DISPLAY_0			290
+#define BUTTON_DISPLAY_1			291
+#define BUTTON_DISPLAY_2			292
+#define BUTTON_DISPLAY_3			293
+#define BUTTON_DISPLAY_4			294
+#define SCROLL_CARD_DISPLAY			295
+#define BUTTON_CARD_DISP_OK			296
 #define BUTTON_CATEGORY_OK			300
 #define COMBOBOX_DBLFLIST			301
 #define COMBOBOX_DBDECKS			302

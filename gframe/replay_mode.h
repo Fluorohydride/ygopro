@@ -19,7 +19,7 @@ private:
 	static bool is_swaping;
 	static bool exit_pending;
 	static int skip_turn;
-	static wchar_t event_string[256];
+
 public:
 	static Replay cur_replay;
 	

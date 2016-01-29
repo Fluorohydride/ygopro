@@ -423,8 +423,11 @@ void Game::DrawMisc() {
 		adFont->draw(pcard->rscstring, recti(464, 246, 496, 266), 0xffffffff, true, false, 0);
 	}
 	if(dField.extra[0].size()) {
-		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(330, 562, 381, 552), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(330, 563, 383, 553), 0xffffff00, true, false, 0);
+		int offset = (dField.extra[0].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
+		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(320 + offset, 562, 371, 552), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(320 + offset, 563, 373, 553), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), recti(340, 562, 391, 552), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), recti(340, 563, 393, 553), 0xffffff00, true, false, 0);
 	}
 	if(dField.deck[0].size()) {
 		numFont->draw(dataManager.GetNumString(dField.deck[0].size()), recti(907, 562, 1021, 552), 0xff000000, true, false, 0);
@@ -439,8 +442,11 @@ void Game::DrawMisc() {
 		numFont->draw(dataManager.GetNumString(dField.remove[0].size()), recti(1015, 376, 959, 381), 0xffffff00, true, false, 0);
 	}
 	if(dField.extra[1].size()) {
-		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(818, 207, 908, 232), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(818, 208, 910, 233), 0xffffff00, true, false, 0);
+		int offset = (dField.extra[1].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
+		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(808 + offset, 207, 898, 232), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(808 + offset, 208, 900, 233), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), recti(828, 207, 918, 232), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), recti(828, 208, 920, 233), 0xffffff00, true, false, 0);
 	}
 	if(dField.deck[1].size()) {
 		numFont->draw(dataManager.GetNumString(dField.deck[1].size()), recti(465, 207, 481, 232), 0xff000000, true, false, 0);
@@ -489,6 +495,10 @@ void Game::DrawGUI() {
 							for(int i = 0; i < 5; ++i)
 								btnCardSelect[i]->setDrawImage(true);
 						}
+						if(fu.guiFading == wCardDisplay) {
+							for(int i = 0; i < 5; ++i)
+								btnCardDisplay[i]->setDrawImage(true);
+						}
 						env->setFocus(fu.guiFading);
 					} else
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
@@ -515,6 +525,10 @@ void Game::DrawGUI() {
 						if(fu.guiFading == wCardSelect) {
 							for(int i = 0; i < 5; ++i)
 								btnCardSelect[i]->setDrawImage(true);
+						}
+						if(fu.guiFading == wCardDisplay) {
+							for(int i = 0; i < 5; ++i)
+								btnCardDisplay[i]->setDrawImage(true);
 						}
 					} else
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
@@ -755,6 +769,10 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(false);
 	}
+	if(win == wCardDisplay) {
+		for(int i = 0; i < 5; ++i)
+			btnCardDisplay[i]->setDrawImage(false);
+	}
 	win->setRelativePosition(irr::core::recti(center.X, center.Y, 0, 0));
 	fadingList.push_back(fu);
 }
@@ -782,6 +800,10 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	if(win == wCardSelect) {
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(false);
+	}
+	if(win == wCardDisplay) {
+		for(int i = 0; i < 5; ++i)
+			btnCardDisplay[i]->setDrawImage(false);
 	}
 	fadingList.push_back(fu);
 }
@@ -898,10 +920,12 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangle(0x80000000, recti(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
 		if(ptr->second.type & TYPE_MONSTER) {
+			int form = 0x2605;
+			if(ptr->second.type & TYPE_XYZ) ++form;
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			textFont->draw(textBuffer, recti(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
-			myswprintf(textBuffer, L"%ls/%ls \x2605%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), ptr->second.level);
+			myswprintf(textBuffer, L"%ls/%ls %c%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
 			textFont->draw(textBuffer, recti(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
 			if(ptr->second.attack < 0 && ptr->second.defence < 0)
@@ -920,6 +944,8 @@ void Game::DrawDeckBd() {
 				wcscat(textBuffer, L" [OCG]");
 			else if((ptr->second.ot & 0x3) == 2)
 				wcscat(textBuffer, L" [TCG]");
+			else if((ptr->second.ot & 0x7) == 4)
+				wcscat(textBuffer, L" [Custom]");
 			textFont->draw(textBuffer, recti(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 		} else {
@@ -934,6 +960,8 @@ void Game::DrawDeckBd() {
 				wcscat(textBuffer, L"[OCG]");
 			else if((ptr->second.ot & 0x3) == 2)
 				wcscat(textBuffer, L"[TCG]");
+			else if((ptr->second.ot & 0x7) == 4)
+				wcscat(textBuffer, L"[Custom]");
 			textFont->draw(textBuffer, recti(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 		}

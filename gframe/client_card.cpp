@@ -18,8 +18,10 @@ ClientCard::ClientCard() {
 	is_highlighting = false;
 	is_disabled = false;
 	is_reversed = false;
+	is_conti = false;
 	cmdFlag = 0;
 	code = 0;
+	chain_code = 0;
 	type = 0;
 	alias = 0;
 	level = 0;

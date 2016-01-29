@@ -128,7 +128,7 @@ void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		else if(cd.type & 0x802040 && deck.extra.size() < 15) {
-			deck.extra.push_back(dataManager.GetCodePointer(code));
+			deck.extra.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
 		} else if(deck.main.size() < 60) {
 			deck.main.push_back(dataManager.GetCodePointer(code));
 		}
@@ -140,7 +140,7 @@ void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		if(deck.side.size() < 15)
-			deck.side.push_back(dataManager.GetCodePointer(code));
+			deck.side.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
 	}
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {

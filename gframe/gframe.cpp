@@ -64,9 +64,7 @@ int main(int argc, char* argv[]) {
 			event.EventType = irr::EET_GUI_EVENT;
 			event.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
 			if(!strcmp(argv[i], "-j")) {
-				event.GUIEvent.Caller = ygo::mainGame->btnLanMode;
-				ygo::mainGame->device->postEventFromUser(event);
-				//TODO: wait for wLanWindow show. if network connection faster than wLanWindow, wLanWindow will still show on duel scene.
+				ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 				event.GUIEvent.Caller = ygo::mainGame->btnJoinHost;
 				ygo::mainGame->device->postEventFromUser(event);
 			} else if(!strcmp(argv[i], "-d")) {
