@@ -32,11 +32,11 @@ unsigned int start_lp;
 unsigned char start_hand;
 unsigned char draw_count;
 
-void Game::MainServerLoop(int bDuel_mode) {
+void Game::MainServerLoop(int bDuel_mode, int lflist) {
 	deckManager.LoadLFList();
     dataManager.LoadDB("cards.cdb");
     aServerPort = NetServer::StartServer(aServerPort);
-    NetServer::Initduel(bDuel_mode);
+    NetServer::Initduel(bDuel_mode, lflist);
     printf("%u\n", aServerPort);
     fflush(stdout);
 	while(NetServer::net_evbase) {

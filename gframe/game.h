@@ -77,7 +77,7 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
-	void MainServerLoop(int bDuel_mode);
+	void MainServerLoop(int bDuel_mode, int lflist);
     /*
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);

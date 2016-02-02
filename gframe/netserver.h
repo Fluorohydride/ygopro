@@ -24,7 +24,7 @@ private:
 
 public:
 	static event_base* net_evbase;
-	static void Initduel(int duel_mode);
+	static void Initduel(int duel_mode, int lflist);
 	static unsigned short StartServer(unsigned short port);
 	static bool StartBroadcast();
 	static void StopServer();

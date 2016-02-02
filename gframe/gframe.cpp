@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 			ygo::draw_count=atoi(argv[10]);
 		}
 		ygo::mainGame = &_game;
-		ygo::mainGame->MainServerLoop(ygo::mode);
+		ygo::mainGame->MainServerLoop(ygo::mode, ygo::lflist);
 		
 		return 0;
 	}
