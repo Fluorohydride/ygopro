@@ -19,6 +19,7 @@ extern unsigned int start_lp;
 extern unsigned short time_limit;
 extern unsigned char start_hand;
 extern unsigned char draw_count;
+bool started_hand_tag = false;
 
 TagDuel::TagDuel() {
 	for(int i = 0; i < 4; ++i) {
@@ -151,11 +152,30 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 }
 void TagDuel::LeaveGame(DuelPlayer* dp) {
 	if(dp == host_player) {
-		EndDuel();
-		NetServer::StopServer();
-	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
+		int host_pos;
+		if(players[0] && dp->type != 0) {
+			host_pos = 0;
+			host_player = players[0];
+		} else if(players[1] && dp->type != 1) {
+			host_pos = 1;
+			host_player = players[1];
+		} else if(players[2] && dp->type != 2) {
+			host_pos = 2;
+			host_player = players[2];
+		} else if(players[3] && dp->type != 3) {
+			host_pos = 3;
+			host_player = players[3];
+		} else {
+			EndDuel();
+			NetServer::StopServer();
+		}
+		STOC_TypeChange sctc;
+		sctc.type = 0x10 | host_pos;
+		NetServer::SendPacketToPlayer(players[host_pos], STOC_TYPE_CHANGE, sctc);
+	}
+	if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 		observers.erase(dp);
-		if(!pduel) {
+		if(!started_hand_tag) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
 			for(int i = 0; i < 4; ++i)
@@ -166,7 +186,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 		}
 		NetServer::DisconnectPlayer(dp);
 	} else {
-		if(!pduel) {
+		if(!started_hand_tag) {
 			STOC_HS_PlayerChange scpc;
 			players[dp->type] = 0;
 			ready[dp->type] = false;
@@ -306,6 +326,7 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 		(*oit)->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(*oit);
 	}
+	started_hand_tag = true;
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
 	NetServer::ReSendToPlayer(players[2]);
 	hand_result[0] = 0;
