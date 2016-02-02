@@ -1,13 +1,13 @@
 #include "config.h"
 #include "game.h"
-#include "image_manager.h"
+//#include "image_manager.h"
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "replay.h"
-#include "materials.h"
-#include "duelclient.h"
+//#include "materials.h"
+//#include "duelclient.h"
 #include "netserver.h"
-#include "single_mode.h"
+//#include "single_mode.h"
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -47,7 +47,7 @@ void Game::MainServerLoop(int bDuel_mode) {
 #endif
     }
 }
-
+/*
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
@@ -544,6 +544,8 @@ bool Game::Initialize() {
 	hideChatTimer = 0;
 	return true;
 }
+*/
+/*
 void Game::MainLoop() {
 	wchar_t cap[256];
 	camera = smgr->addCameraSceneNode(0);
@@ -633,6 +635,8 @@ void Game::MainLoop() {
 	SaveConfig();
 //	device->drop();
 }
+*/
+/*
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
 	for(int i = 0; i < 16; ++i)
 		mProjection[i] = 0;
@@ -1099,6 +1103,7 @@ void Game::CloseDuelWindow() {
 	ClearTextures();
 	closeDoneSignal.Set();
 }
+*/
 int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;
 }

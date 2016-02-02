@@ -2,6 +2,7 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
+/*
 #include <vector>
 
 namespace ygo {
@@ -126,7 +127,7 @@ public:
 };
 
 }
-
+*/
 //special cards
 #define CARD_MARINE_DOLPHIN	78734254
 #define CARD_TWINKLE_MOSS	13857930

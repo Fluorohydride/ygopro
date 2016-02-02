@@ -45,11 +45,13 @@ inline int _wtoi(const wchar_t * s) {
 }
 #endif
 
+/*
 #include <irrlicht.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "CGUITTFont.h"
 #include "CGUIImageButton.h"
+*/
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,12 +64,14 @@ inline int _wtoi(const wchar_t * s) {
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/card.h"
 
+/*
 using namespace irr;
 using namespace core;
 using namespace scene;
 using namespace video;
 using namespace io;
 using namespace gui;
+*/
 
 extern const unsigned short PRO_VERSION;
 extern int enable_log;
