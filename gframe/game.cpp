@@ -29,6 +29,7 @@ bool enable_priority;
 bool no_check_deck;
 bool no_shuffle_deck;
 unsigned int start_lp;
+unsigned short time_limit;
 unsigned char start_hand;
 unsigned char draw_count;
 
