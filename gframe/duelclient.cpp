@@ -1220,7 +1220,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!forced && (mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain))) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
-			if(mainGame->chkWaitChain->isChecked()) {
+			if(mainGame->chkWaitChain->isChecked() && !mainGame->ignore_chain) {
 				mainGame->WaitFrameSignal(rnd.real() * 20 + 20);
 			}
 			DuelClient::SendResponse();
