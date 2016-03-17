@@ -1460,18 +1460,17 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				panelmode = true;
 		}
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
-		mainGame->dField.CheckSelectSum();
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls(%d)", dataManager.GetDesc(select_hint), mainGame->dField.select_sumval);
 		else myswprintf(textBuffer, L"%ls(%d)", dataManager.GetSysString(560), mainGame->dField.select_sumval);
 		select_hint = 0;
 		if (panelmode) {
 			mainGame->wCardSelect->setText(textBuffer);
-			mainGame->dField.ShowSelectCard();
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
+		mainGame->dField.ShowSelectSum(panelmode);
 		return false;
 	}
 	case MSG_SORT_CARD:
