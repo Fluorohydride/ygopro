@@ -1843,7 +1843,7 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 	} else mainGame->btnShowList->setVisible(false);
 	panel = mainGame->wCmdMenu;
 	mainGame->wCmdMenu->setVisible(true);
-	mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - 20, y, x + 80, y + height));
+	mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - 20 , y - 20 - height, x + 80, y - 20));
 }
 
 void ClientField::SetResponseSelectedCards() const {
