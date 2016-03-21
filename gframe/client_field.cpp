@@ -1105,8 +1105,12 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 		if(CheckSelectSum()) {
 			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 				SetResponseSelectedCards();
-				mainGame->HideElement(mainGame->wCardSelect, true);
-				return true;
+				if(mainGame->wCardSelect->isVisible())
+					mainGame->HideElement(mainGame->wCardSelect, true);
+				else {
+					DuelClient::SendResponse();
+					return true;
+				}
 			} else {
 				select_ready = true;
 				mainGame->wCardSelect->setVisible(false);
