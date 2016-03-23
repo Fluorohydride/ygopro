@@ -96,7 +96,7 @@ public:
 	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
 	void MoveCard(ClientCard* pcard, int frame);
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
-	void ShowSelectSum(bool panelmode);
+	bool ShowSelectSum(bool panelmode);
 	bool CheckSelectSum();
 	bool check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::iterator index, int min, int max);
 	bool check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc);

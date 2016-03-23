@@ -1470,8 +1470,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
-		mainGame->dField.ShowSelectSum(panelmode);
-		return false;
+		return mainGame->dField.ShowSelectSum(panelmode);
 	}
 	case MSG_SORT_CARD:
 	case MSG_SORT_CHAIN: {

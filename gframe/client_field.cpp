@@ -1100,12 +1100,17 @@ void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
 	pcard->is_fading = true;
 	pcard->aniFrame = frame;
 }
-void ClientField::ShowSelectSum(bool panelmode) {
+bool ClientField::ShowSelectSum(bool panelmode) {
 	if(panelmode) {
 		if(CheckSelectSum()) {
 			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 				SetResponseSelectedCards();
-				mainGame->HideElement(mainGame->wCardSelect, true);
+				if(mainGame->wCardSelect->isVisible())
+					mainGame->HideElement(mainGame->wCardSelect, true);
+				else {
+					DuelClient::SendResponse();
+					return true;
+				}
 			} else {
 				select_ready = true;
 				mainGame->wCardSelect->setVisible(false);
@@ -1121,6 +1126,7 @@ void ClientField::ShowSelectSum(bool panelmode) {
 			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 				SetResponseSelectedCards();
 				DuelClient::SendResponse();
+				return true;
 			} else {
 				select_ready = true;
 				wchar_t wbuf[256], *pwbuf = wbuf;
@@ -1133,6 +1139,7 @@ void ClientField::ShowSelectSum(bool panelmode) {
 		} else
 			select_ready = false;
 	}
+	return false;
 }
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
