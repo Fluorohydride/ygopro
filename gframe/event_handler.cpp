@@ -576,20 +576,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_SUM: {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					selected_cards.push_back(command_card);
-					if (CheckSelectSum()) {
-						if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
-							SetResponseSelectedCards();
-							mainGame->HideElement(mainGame->wCardSelect, true);
-						} else {
-							select_ready = true;
-							mainGame->wCardSelect->setVisible(false);
-							mainGame->dField.ShowSelectCard(true);
-						}
-					} else {
-						select_ready = false;
-						mainGame->wCardSelect->setVisible(false);
-						mainGame->dField.ShowSelectCard();
-					}
+					ShowSelectSum(true);
 					break;
 				}
 				case MSG_SORT_CHAIN:
@@ -1218,21 +1205,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					selected_cards.erase(it);
 				} else
 					selected_cards.push_back(clicked_card);
-				if (CheckSelectSum()) {
-					if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
-						SetResponseSelectedCards();
-						DuelClient::SendResponse();
-					} else {
-						select_ready = true;
-						wchar_t wbuf[256], *pwbuf = wbuf;
-						BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
-						*pwbuf++ = L'\n';
-						BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
-						mainGame->stQMessage->setText(wbuf);
-						mainGame->PopupElement(mainGame->wQuery);
-					}
-				} else
-					select_ready = false;
+				ShowSelectSum(false);
 				break;
 			}
 			}

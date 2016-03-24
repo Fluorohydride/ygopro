@@ -1220,7 +1220,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!forced && (mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain))) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
-			if(mainGame->chkWaitChain->isChecked()) {
+			if(mainGame->chkWaitChain->isChecked() && !mainGame->ignore_chain) {
 				mainGame->WaitFrameSignal(rnd.real() * 20 + 20);
 			}
 			DuelClient::SendResponse();
@@ -1460,19 +1460,17 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				panelmode = true;
 		}
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
-		mainGame->dField.CheckSelectSum();
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls(%d)", dataManager.GetDesc(select_hint), mainGame->dField.select_sumval);
 		else myswprintf(textBuffer, L"%ls(%d)", dataManager.GetSysString(560), mainGame->dField.select_sumval);
 		select_hint = 0;
 		if (panelmode) {
 			mainGame->wCardSelect->setText(textBuffer);
-			mainGame->dField.ShowSelectCard();
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
-		return false;
+		return mainGame->dField.ShowSelectSum(panelmode);
 	}
 	case MSG_SORT_CARD:
 	case MSG_SORT_CHAIN: {
