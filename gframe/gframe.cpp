@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 			ygo::start_lp=atoi(argv[8]);
 			ygo::start_hand=atoi(argv[9]);
 			ygo::draw_count=atoi(argv[10]);
-            ygo::time_limit=atoi(argv[11]);
+			ygo::time_limit=atoi(argv[11]);
 		}
 		ygo::mainGame = &_game;
 		ygo::mainGame->MainServerLoop(ygo::mode, ygo::lflist);
@@ -90,5 +90,6 @@ int main(int argc, char* argv[]) {
 #else
     
 #endif //_WIN32
+    */
 	return EXIT_SUCCESS;
 }

@@ -106,16 +106,14 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
     */
-    */
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
 	/*
     bool HasFocus(EGUI_ELEMENT_TYPE type) const {
-		irr::gui::IGUIElement* focus = env->getFocus();
+		//irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
 	}
-    */
     */
     
 	Mutex gMutex;
@@ -129,8 +127,7 @@ public:
 	Config gameConf;
 	DuelInfo dInfo;
 
-	/*
-    std::list<FadingUnit> fadingList;
+	/*std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
 
@@ -162,7 +159,6 @@ public:
 
 	bool is_building;
 	bool is_siding;
-    */
     */
 	/*
     ClientField dField;
