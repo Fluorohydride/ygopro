@@ -36,6 +36,25 @@ unsigned char draw_count;
 void Game::MainServerLoop(int bDuel_mode, int lflist) {
 	deckManager.LoadLFList();
     dataManager.LoadDB("cards.cdb");
+	
+	//load expansions
+	DIR * dir;
+	struct dirent * dirp;
+	const char *foldername = "./expansions/";
+	if((dir = opendir(foldername)) != NULL) {
+		while((dirp = readdir(dir)) != NULL) {
+			size_t len = strlen(dirp->d_name);
+			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
+				continue;
+			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
+			strncpy(filepath, foldername, strlen(foldername)+1);
+			strncat(filepath, dirp->d_name, len);
+			dataManager.LoadDB(filepath);
+			free(filepath);
+		}
+		closedir(dir);
+	}
+	
     aServerPort = NetServer::StartServer(aServerPort);
     NetServer::Initduel(bDuel_mode, lflist);
     printf("%u\n", aServerPort);

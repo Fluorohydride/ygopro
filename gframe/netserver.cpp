@@ -47,6 +47,7 @@ void NetServer::Initduel(int bDuel_mode, int lflist)
 
 		if(!hash)
 			pkt->info.lflist = deckManager._lfList[0].hash;
+		
         if(lflist == -1)
  			pkt->info.lflist = 0;
 		duel_mode->host_info = pkt->info;

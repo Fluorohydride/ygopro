@@ -88,8 +88,7 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
 	WSACleanup();
 #else
-
+    
 #endif //_WIN32
-	*/
 	return EXIT_SUCCESS;
 }

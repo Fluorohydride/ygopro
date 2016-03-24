@@ -45,7 +45,7 @@ typedef std::unordered_map<unsigned int, CardDataC>::iterator code_pointer;
 
 class ClientCard {
 public:
-/*
+    /*
 	irr::video::ITexture* curTexture;
 	irr::core::matrix4 mTransform;
 	irr::core::vector3df curPos;
@@ -113,7 +113,7 @@ public:
 	void ClearTarget();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
 	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
-*/
+    */
 };
 
 }

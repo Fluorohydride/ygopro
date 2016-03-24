@@ -1,45 +1,33 @@
-## ygopro
-A script engine for "yu-gi-oh!" and sample gui
+## ygopro(server)
+一个linux版的ygopro服务端，基于mycard代码修改。
 
-[中文说明](https://github.com/Fluorohydride/ygopro/wiki/%E4%B8%AD%E6%96%87%E8%AF%B4%E6%98%8E)
+现用于[YGOPRO 233服](http://mercury233.me/ygosrv233/)。
 
-###Keys:
-* ESC: Minimize the window.
-* A: Holding down this button will let the system stop at every timing.
-* S: Holding down this button will let the system skip every timing.
-* R: Fix the font error.
-* F1~F4: Show the cards in your grave, banished zone, extra deck, xyz materials.
-* F5~F8: Show the cards in your opponent's grave, banished zone, extra deck, xyz materials.
+###编译
+* 需要以下组件
+ * premake4
+ * freetype
+ * libevent
+ * sqlite3
+ * irrlicht1.8
+ * lua5.2
+ * libGL
+ * libGLU
+ * gcc
+* 可参考 https://github.com/mycard/mycard.github.io/tree/master/server 中的脚本
 
-###Color:
-* Background: 
-* White = your card, Grey = your opponent's card
-* Text: 
-* Black = default, Blue = the owner of the xyz material is different from its controller
-
-###Sequence:
-* Monster Zone: 1~5, starting from the left hand side.
-* Spell & Trap Zone: 1~5, starting from the left hand side.
-* Field Zone: 6
-* Pendulum Zone: 7~8, starting from the left hand side.
-* The others: 1~n, starting from the bottom.
-
-###Deck edit page:
-* All numeric textboxs: They support >, =, <, >=, <= signs.
-* Card name: Search card names and texts by default, $foo will only search foo in card names, and @foo will search cards of "foo" archetype(due to translation, card name contains "foo" does not mean that card is "foo" card).
-
-### Command-line options:
-* -j: Join the host in system.conf file.
-* -d: Enter the deck edit page.
-* -r: Enter the replay mode page.
-* -s: Enter the single mode page.
-* -efoo: Load foo as the extra database.
-
-### Directories:
-* pics: .jpg card images(177*254).
-* pics\thumbnail: .jpg thumbnail images(44*64).
-* script: .lua script files.
-* textures: Other image files.
-* deck: .ydk deck files.
-* replay: .yrp replay files.
-* expansions: *.cdb will be loaded as extra databases.
+###运行
+* 使用[ygopro-server-lite](https://github.com/mercury233/ygopro-server)运行
+* 手动运行的参数是
+ * ./ygopro 0 0 0 1 F F F 8000 5 1 180
+ * 端口（0为随机）
+ * 禁卡表编号
+ * 卡片允许
+ * 决斗模式
+ * 旧规则
+ * 不检查卡组
+ * 不洗切卡组
+ * 初始LP
+ * 初始手牌数
+ * 每回合抽卡
+ * 每回合时间
