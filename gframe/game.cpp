@@ -821,6 +821,7 @@ void Game::LoadConfig() {
 	gameConf.chkIgnore2 = 0;
 	gameConf.chkHideSetname = 0;
 	gameConf.control_mode = 0;
+	gameConf.draw_field_spell = 1;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -869,6 +870,8 @@ void Game::LoadConfig() {
 			gameConf.chkHideSetname = atoi(valbuf);
 		} else if(!strcmp(strbuf, "control_mode")) {
 			gameConf.control_mode = atoi(valbuf);
+		} else if(!strcmp(strbuf, "draw_field_spell")) {
+			gameConf.draw_field_spell = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -921,6 +924,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
 	fprintf(fp, "#control_mode = 0: Key A/S/R. control_mode = 1: MouseLeft/MouseRight/F9\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
+	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
