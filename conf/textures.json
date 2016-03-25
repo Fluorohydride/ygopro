@@ -56,7 +56,8 @@
     "main phase 1" : ["misc", 435, 0, 72, 128],
     "battle phase" : ["misc", 435, 0, 72, 128],
     "main phase2" : ["misc", 435, 0, 72, 128],
-    "end phase" : ["misc", 435, 0, 72, 128]
+    "end phase" : ["misc", 435, 0, 72, 128],
+    "attack arrow" : ["misc", 768, 0, 256, 20]
   },
   "points" : {
     "main_t" : ["misc", 500, 130, 500, 156, 440, 130, 440, 156],

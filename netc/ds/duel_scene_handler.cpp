@@ -101,6 +101,8 @@ namespace ygopro
         AddCard(97268402, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
         AddCard(97268402, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x10, 2, 0xa))->UpdatePosition(0);
+        AddCard(83764718, CardPosInfo(1, 0x4, 3, 0x1))->UpdatePosition(0);
+        AddCard(97268402, CardPosInfo(1, 0x4, 4, 0x1))->UpdatePosition(0);
         for(auto& pc : g_player[0].hand)
             pc->UpdatePosition(0);
     }
@@ -741,6 +743,18 @@ namespace ygopro
                     g_player[pid].field_blocks[s + 5]->SetTexcoord(s_tex);
             }
         }
+    }
+    
+    void DuelSceneHandler::ShowAttackSprite(v3f start, v3f end) {
+        v3f trans = (start + end) * 0.5f;
+        float tan = (end.y - start.y) / (end.x - start.x);
+        if(g_duel.attack_sprite == nullptr) {
+            g_duel.attack_sprite = duel_scene->AddFieldSprite().get();
+            g_duel.attack_sprite->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+            g_duel.attack_sprite->SetTexcoord(ImageMgr::Get().GetTexture("attack arrow"));
+        }
+        g_duel.attack_sprite->SetTranslation(trans);
+        g_duel.attack_sprite->SetRotation(glm::angleAxis(glm::atan(tan), glm::vec3(0.0f, 0.0f, 1.0f)));
     }
     
 }

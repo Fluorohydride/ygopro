@@ -18,45 +18,10 @@ namespace ygopro
         switch(param) {
             case 1: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_SUMMONING;
+                dm->msg_type = MSG_ATTACK;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint32_t>(84013237);
                 writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 2: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_SPSUMMONING;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint32_t>(84013237);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 3: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_FLIPSUMMONING;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint32_t>(84013237);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 4: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_SET;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint32_t>(84013237);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 3, 0).info);
-                messages.PushCommand(dm);
-                break;
-            }
-            case 5: {
-                auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_CHAIN_NEGATED;
-                BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint8_t>(1);
                 messages.PushCommand(dm);
                 break;
             }
@@ -1628,8 +1593,13 @@ namespace ygopro
                 auto ctarget = (ptarget.info == 0) ? nullptr : GetCard(ptarget);
                 if(catk == nullptr)
                     break;
+                auto& da = layoutCfg["direct attack"];
+                v3f dapos = {da[0].to_value<float>(), da[1].to_value<float>(), 0.0f};
+                if(ptarget.controler == 1)
+                    dapos.y = -dapos.y;
                 v3f startpos = catk->GetPositionInfo().first;
-                startpos.z = 0.1f;
+                v3f endpos = ctarget ? ctarget->GetPositionInfo().first : dapos;
+                ShowAttackSprite(startpos, endpos);
                 break;
             }
             case MSG_BATTLE: {
