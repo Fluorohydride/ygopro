@@ -368,7 +368,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		else if(chain)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
 		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
@@ -438,7 +438,7 @@ void ClientField::ShowChainCard() {
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
 		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
@@ -494,7 +494,7 @@ void ClientField::ShowLocationCard() {
 		if(display_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
 		else
-			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover);
+			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
 		mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
