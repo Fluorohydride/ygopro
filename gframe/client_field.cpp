@@ -373,7 +373,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-			if(chain && selectable_cards[i]->is_conti)
+			if(chain && selectable_cards[i]->is_conti && !selectable_cards[i]->code)
 				myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
 			else if(selectable_cards[i]->location == LOCATION_OVERLAY)
 				myswprintf(formatBuffer, L"%ls[%d](%d)", 

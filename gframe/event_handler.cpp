@@ -719,7 +719,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else
 							myswprintf(formatBuffer, L"");
 					} else {
-						if(selectable_cards[i + pos]->is_conti)
+						if(selectable_cards[i + pos]->is_conti && !selectable_cards[i + pos]->code)
 							myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
 						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY)
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
