@@ -104,8 +104,15 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		sprintf(file, "pics/field/%d.png", code);
 		irr::video::ITexture* img = driver->getTexture(file);
 		if(img == NULL) {
-			tFields[code] = NULL;
-			return NULL;
+			sprintf(file, "pics/field/%d.jpg", code);
+			irr::video::ITexture* img = driver->getTexture(file);
+			if(img == NULL) {
+				tFields[code] = NULL;
+				return NULL;
+			} else {
+				tFields[code] = img;
+				return img;
+			}
 		} else {
 			tFields[code] = img;
 			return img;
