@@ -638,7 +638,7 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
 	int pbuffer = 0;
 	u32 _width = 0, _height = 0;
-	for(int i = 0; text[i] != 0 && i < wcslen(text); ++i) {
+	for(size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
 		u32 w = font->getCharDimension(text[i]).Width;
 		if(text[i] == L'\n') {
 			dataManager.strBuffer[pbuffer++] = L'\n';
