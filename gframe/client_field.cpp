@@ -1296,7 +1296,7 @@ static bool is_declarable(T const& cd, int declarable_type) {
 	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
 		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
 }
-void ClientField::UpdateDeclarableCode() {
+void ClientField::UpdateDeclarableCode(bool enter) {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	CardString cstr;
@@ -1308,7 +1308,7 @@ void ClientField::UpdateDeclarableCode() {
 		ancard.push_back(trycode);
 		return;
 	}
-	if(pname[0] == 0 || pname[1] == 0)
+	if(pname[0] == 0 || (pname[1] == 0 && !enter))
 		return;
 	mainGame->lstANCard->clear();
 	ancard.clear();
