@@ -990,8 +990,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (pcard->location == LOCATION_DECK) {
 				pcard->SetCode(code);
 				mainGame->dField.deck_act = true;
-			}
-			else if (pcard->location == LOCATION_GRAVE)
+			} else if (pcard->location == LOCATION_GRAVE)
 				mainGame->dField.grave_act = true;
 			else if (pcard->location == LOCATION_REMOVED)
 				mainGame->dField.remove_act = true;
@@ -1063,8 +1062,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		if (BufferIO::ReadInt8(pbuf)) {
 			mainGame->btnShuffle->setVisible(true);
-		}
-		else {
+		} else {
 			mainGame->btnShuffle->setVisible(false);
 		}
 		return false;
@@ -1202,8 +1200,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->chain_code = code % 1000000000;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.remove_act = true;
-			}
-			else {
+			} else {
 				pcard->chain_code = code;
 				pcard->is_selectable = true;
 				pcard->cmdFlag |= COMMAND_ACTIVATE;

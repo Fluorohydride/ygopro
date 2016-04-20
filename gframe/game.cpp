@@ -878,12 +878,10 @@ void Game::LoadConfig() {
 			if (!strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
-			}
-			else if (!strcmp(strbuf, "gamename")) {
+			} else if (!strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
-			}
-			else if (!strcmp(strbuf, "lastdeck")) {
+			} else if (!strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 			}

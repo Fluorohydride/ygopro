@@ -738,8 +738,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else if(selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-					}
-					else {
+					} else {
 						if(selectable_cards[i + pos]->is_selected)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 						else if(selectable_cards[i + pos]->controler)
@@ -762,8 +761,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
 								dataManager.FormatLocation(display_cards[i + pos]->overlayTarget->location, display_cards[i + pos]->overlayTarget->sequence),
 								display_cards[i + pos]->overlayTarget->sequence + 1, display_cards[i + pos]->sequence + 1);
-					}
-					else
+					} else
 						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
 							display_cards[i + pos]->sequence + 1);
 					mainGame->stDisplayPos[i]->setText(formatBuffer);
@@ -773,8 +771,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(display_cards[i + pos]->overlayTarget->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
-					}
-					else {
+					} else {
 						if(display_cards[i + pos]->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);

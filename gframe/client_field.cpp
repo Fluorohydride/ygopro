@@ -389,8 +389,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 				if(selectable_cards[i]->overlayTarget->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-			}
-			else {
+			} else {
 				if(selectable_cards[i]->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
@@ -412,8 +411,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		}
 		mainGame->scrCardList->setPos(0);
 		mainGame->scrCardList->setVisible(false);
-	}
-	else {
+	} else {
 		mainGame->scrCardList->setVisible(true);
 		mainGame->scrCardList->setMin(0);
 		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
@@ -451,8 +449,7 @@ void ClientField::ShowChainCard() {
 			if(selectable_cards[i]->overlayTarget->controler)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-		}
-		else {
+		} else {
 			if(selectable_cards[i]->controler)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
@@ -467,8 +464,7 @@ void ClientField::ShowChainCard() {
 		}
 		mainGame->scrCardList->setPos(0);
 		mainGame->scrCardList->setVisible(false);
-	}
-	else {
+	} else {
 		mainGame->scrCardList->setVisible(true);
 		mainGame->scrCardList->setMin(0);
 		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
@@ -512,8 +508,7 @@ void ClientField::ShowLocationCard() {
 			if(display_cards[i]->overlayTarget->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
-		}
-		else {
+		} else {
 			if(display_cards[i]->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
@@ -528,8 +523,7 @@ void ClientField::ShowLocationCard() {
 		}
 		mainGame->scrDisplayList->setPos(0);
 		mainGame->scrDisplayList->setVisible(false);
-	}
-	else {
+	} else {
 		mainGame->scrDisplayList->setVisible(true);
 		mainGame->scrDisplayList->setMin(0);
 		mainGame->scrDisplayList->setMax((display_cards.size() - 5) * 10 + 9);
