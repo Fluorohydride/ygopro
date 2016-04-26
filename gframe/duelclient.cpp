@@ -460,7 +460,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnEP->setVisible(false);
 		mainGame->btnShuffle->setVisible(false);
 		mainGame->wChat->setVisible(true);
-		mainGame->imgCard->setImage(imageManager.tCover);
+		mainGame->imgCard->setImage(imageManager.tCover[0]);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {
@@ -990,8 +990,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (pcard->location == LOCATION_DECK) {
 				pcard->SetCode(code);
 				mainGame->dField.deck_act = true;
-			}
-			else if (pcard->location == LOCATION_GRAVE)
+			} else if (pcard->location == LOCATION_GRAVE)
 				mainGame->dField.grave_act = true;
 			else if (pcard->location == LOCATION_REMOVED)
 				mainGame->dField.remove_act = true;
@@ -1063,8 +1062,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		if (BufferIO::ReadInt8(pbuf)) {
 			mainGame->btnShuffle->setVisible(true);
-		}
-		else {
+		} else {
 			mainGame->btnShuffle->setVisible(false);
 		}
 		return false;
@@ -1202,8 +1200,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->chain_code = code % 1000000000;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.remove_act = true;
-			}
-			else {
+			} else {
 				pcard->chain_code = code;
 				pcard->is_selectable = true;
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
@@ -1835,7 +1832,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_NEW_TURN: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dInfo.turn++;
-		if(!mainGame->dInfo.isTag && mainGame->dInfo.turn == 5 && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
+		if(!mainGame->dInfo.isTag && mainGame->dInfo.turn == 3 && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351));
 			mainGame->btnLeaveGame->setVisible(true);
 		}

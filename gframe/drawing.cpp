@@ -62,8 +62,43 @@ void Game::DrawBackGround() {
 //	driver->setMaterial(matManager.mBackLine);
 //	driver->drawVertexPrimitiveList(matManager.vBackLine, 76, matManager.iBackLine, 58, irr::video::EVT_STANDARD, irr::scene::EPT_LINES);
 	//draw field
+	//draw field spell card
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
-	matManager.mTexture.setTexture(0, imageManager.tField);
+	int fieldcode1 = -1;
+	int fieldcode2 = -1;
+	bool drawField = false;
+	if(mainGame->gameConf.draw_field_spell
+		&& mainGame->dField.szone[0][5] && mainGame->dField.szone[0][5]->position & POS_FACEUP)
+		fieldcode1 = mainGame->dField.szone[0][5]->code;
+	if(mainGame->gameConf.draw_field_spell
+		&& mainGame->dField.szone[1][5] && mainGame->dField.szone[1][5]->position & POS_FACEUP)
+		fieldcode2 = mainGame->dField.szone[1][5]->code;
+	int fieldcode = (fieldcode1 > 0) ? fieldcode1 : fieldcode2;
+	if(fieldcode1 > 0 && fieldcode2 > 0 && fieldcode1 != fieldcode2) {
+		ITexture* texture = imageManager.GetTextureField(fieldcode1);
+		if(texture) {
+			drawField = true;
+			matManager.mTexture.setTexture(0, texture);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vFieldSpell1, 4, matManager.iRectangle, 2);
+		}
+		texture = imageManager.GetTextureField(fieldcode2);
+		if(texture) {
+			drawField = true;
+			matManager.mTexture.setTexture(0, texture);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vFieldSpell2, 4, matManager.iRectangle, 2);
+		}
+	} else if(fieldcode > 0) {
+		ITexture* texture = imageManager.GetTextureField(fieldcode);
+		if(texture) {
+			drawField = true;
+			matManager.mTexture.setTexture(0, texture);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vFieldSpell, 4, matManager.iRectangle, 2);
+		}
+	}
+	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent : imageManager.tField);
 	driver->setMaterial(matManager.mTexture);
 	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
 	driver->setMaterial(matManager.mBackLine);
@@ -201,7 +236,10 @@ void Game::DrawCard(ClientCard* pcard) {
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	driver->setMaterial(matManager.mCard);
 	driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
-	matManager.mCard.setTexture(0, imageManager.tCover);
+	if(pcard->controler == 0 || !imageManager.tCover[1])
+		matManager.mCard.setTexture(0, imageManager.tCover[0]);
+	else
+		matManager.mCard.setTexture(0, imageManager.tCover[1]);
 	driver->setMaterial(matManager.mCard);
 	driver->drawVertexPrimitiveList(matManager.vCardBack, 4, matManager.iRectangle, 2);
 	if(pcard->is_showequip) {

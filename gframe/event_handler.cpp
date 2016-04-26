@@ -711,7 +711,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(selectable_cards[i + pos]->code)
 						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
 					else
-						mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					if(sort_list.size()) {
 						if(sort_list[pos + i] > 0)
@@ -719,7 +719,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else
 							myswprintf(formatBuffer, L"");
 					} else {
-						if(selectable_cards[i + pos]->is_conti)
+						if(selectable_cards[i + pos]->is_conti && !selectable_cards[i + pos]->code)
 							myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
 						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY)
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
@@ -738,8 +738,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else if(selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-					}
-					else {
+					} else {
 						if(selectable_cards[i + pos]->is_selected)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 						else if(selectable_cards[i + pos]->controler)
@@ -756,14 +755,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(display_cards[i + pos]->code)
 						mainGame->btnCardDisplay[i]->setImage(imageManager.GetTexture(display_cards[i + pos]->code));
 					else
-						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover);
+						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
 								dataManager.FormatLocation(display_cards[i + pos]->overlayTarget->location, display_cards[i + pos]->overlayTarget->sequence),
 								display_cards[i + pos]->overlayTarget->sequence + 1, display_cards[i + pos]->sequence + 1);
-					}
-					else
+					} else
 						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
 							display_cards[i + pos]->sequence + 1);
 					mainGame->stDisplayPos[i]->setText(formatBuffer);
@@ -773,8 +771,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(display_cards[i + pos]->overlayTarget->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
-					}
-					else {
+					} else {
 						if(display_cards[i + pos]->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
@@ -793,7 +790,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode();
+				UpdateDeclarableCode(false);
 				break;
 			}
 			}
@@ -802,7 +799,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode();
+				UpdateDeclarableCode(true);
 				break;
 			}
 			case EDITBOX_CHAT: {
@@ -837,7 +834,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mcard->code) {
 					mainGame->ShowCardInfo(mcard->code);
 				} else {
-					mainGame->imgCard->setImage(imageManager.tCover);
+					mainGame->imgCard->setImage(imageManager.tCover[0]);
 					mainGame->stName->setText(L"");
 					mainGame->stInfo->setText(L"");
 					mainGame->stDataInfo->setText(L"");
@@ -852,7 +849,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mcard->code) {
 					mainGame->ShowCardInfo(mcard->code);
 				} else {
-					mainGame->imgCard->setImage(imageManager.tCover);
+					mainGame->imgCard->setImage(imageManager.tCover[0]);
 					mainGame->stName->setText(L"");
 					mainGame->stInfo->setText(L"");
 					mainGame->stDataInfo->setText(L"");
@@ -1414,7 +1411,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
-								myswprintf(formatBuffer, L"\n\x2605%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
+								int form = 0x2605;
+								if (mcard->rank) ++form;
+								myswprintf(formatBuffer, L"\n%c%d %ls/%ls", form, (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
 								str.append(formatBuffer);
 								if(mcard->location == LOCATION_HAND && (mcard->type & TYPE_PENDULUM)) {
 									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
@@ -1485,7 +1484,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						mainGame->stTip->setVisible(false);
-						mainGame->imgCard->setImage(imageManager.tCover);
+						mainGame->imgCard->setImage(imageManager.tCover[0]);
 						mainGame->stName->setText(L"");
 						mainGame->stInfo->setText(L"");
 						mainGame->stDataInfo->setText(L"");

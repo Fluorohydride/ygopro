@@ -33,6 +33,7 @@ struct Config {
 	int chkIgnore2;
 	int chkHideSetname;
 	int control_mode;
+	int draw_field_spell;
 };
 
 struct DuelInfo {

@@ -4,7 +4,7 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-wchar_t DataManager::strBuffer[2048];
+wchar_t DataManager::strBuffer[4096];
 DataManager dataManager;
 
 bool DataManager::LoadDB(const char* file) {
@@ -221,11 +221,10 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) {
 		else
 			return GetSysString(1009);
 	}
-	int filter = 1, i = 1000;
-	while(filter != location) {
-		filter <<= 1;
-		i++;
-	}
+	unsigned filter = 1;
+	int i = 1000;
+	for(; filter != 0x100 && filter != location; filter <<= 1)
+		++i;
 	if(filter == location)
 		return GetSysString(i);
 	else
@@ -233,7 +232,8 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) {
 }
 const wchar_t* DataManager::FormatAttribute(int attribute) {
 	wchar_t* p = attBuffer;
-	int filter = 1, i = 1010;
+	unsigned filter = 1;
+	int i = 1010;
 	for(; filter != 0x80; filter <<= 1, ++i) {
 		if(attribute & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
@@ -249,7 +249,8 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 }
 const wchar_t* DataManager::FormatRace(int race) {
 	wchar_t* p = racBuffer;
-	int filter = 1, i = 1020;
+	unsigned filter = 1;
+	int i = 1020;
 	for(; filter != 0x1000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
@@ -265,7 +266,8 @@ const wchar_t* DataManager::FormatRace(int race) {
 }
 const wchar_t* DataManager::FormatType(int type) {
 	wchar_t* p = tpBuffer;
-	int filter = 1, i = 1050;
+	unsigned filter = 1;
+	int i = 1050;
 	for(; filter != 0x2000000; filter <<= 1, ++i) {
 		if(type & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);

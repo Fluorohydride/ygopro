@@ -342,14 +342,14 @@ bool Game::Initialize() {
 	btnPSAU->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
 	btnPSAD->setImageScale(core::vector2df(0.5, 0.5));
-	btnPSAD->setImage(imageManager.tCover, rect<s32>(0, 0, 177, 254));
+	btnPSAD->setImage(imageManager.tCover[0], rect<s32>(0, 0, 177, 254));
 	btnPSDU = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(300, 45, 440, 185), wPosSelect, BUTTON_POS_DU);
 	btnPSDU->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSDU->setImageRotation(270);
 	btnPSDD = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(445, 45, 585, 185), wPosSelect, BUTTON_POS_DD);
 	btnPSDD->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSDD->setImageRotation(270);
-	btnPSDD->setImage(imageManager.tCover, rect<s32>(0, 0, 177, 254));
+	btnPSDD->setImage(imageManager.tCover[0], rect<s32>(0, 0, 177, 254));
 	//card select
 	wCardSelect = env->addWindow(rect<s32>(320, 100, 1000, 400), false, L"");
 	wCardSelect->getCloseButton()->setVisible(false);
@@ -600,7 +600,12 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
+			if(imageManager.tBackGround_deck)
+				driver->draw2DImage(imageManager.tBackGround_deck, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
 			DrawDeckBd();
+		} else {
+			if(imageManager.tBackGround_menu)
+				driver->draw2DImage(imageManager.tBackGround_menu, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
 		}
 		DrawGUI();
 		DrawSpec();
@@ -685,7 +690,7 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
 	int pbuffer = 0;
 	u32 _width = 0, _height = 0;
-	for(int i = 0; text[i] != 0 && i < 1023; ++i) {
+	for(size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
 		u32 w = font->getCharDimension(text[i]).Width;
 		if(text[i] == L'\n') {
 			dataManager.strBuffer[pbuffer++] = L'\n';
@@ -868,6 +873,7 @@ void Game::LoadConfig() {
 	gameConf.chkIgnore2 = 0;
 	gameConf.chkHideSetname = 0;
 	gameConf.control_mode = 0;
+	gameConf.draw_field_spell = 1;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -916,18 +922,18 @@ void Game::LoadConfig() {
 			gameConf.chkHideSetname = atoi(valbuf);
 		} else if(!strcmp(strbuf, "control_mode")) {
 			gameConf.control_mode = atoi(valbuf);
+		} else if(!strcmp(strbuf, "draw_field_spell")) {
+			gameConf.draw_field_spell = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
 			if (!strcmp(strbuf, "nickname")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
-			}
-			else if (!strcmp(strbuf, "gamename")) {
+			} else if (!strcmp(strbuf, "gamename")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
-			}
-			else if (!strcmp(strbuf, "lastdeck")) {
+			} else if (!strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 			}
@@ -968,6 +974,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
 	fprintf(fp, "#control_mode = 0: Key A/S/R. control_mode = 1: MouseLeft/MouseRight/F9\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
+	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
