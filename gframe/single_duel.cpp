@@ -906,11 +906,19 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SWAP: {
+			int c1 = pbuf[4];
+			int l1 = pbuf[5];
+			int s1 = pbuf[6];
+			int c2 = pbuf[12];
+			int l2 = pbuf[13];
+			int s2 = pbuf[14];
 			pbuf += 16;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
+			RefreshSingle(c1, l1, s1);
+			RefreshSingle(c2, l2, s2);
 			break;
 		}
 		case MSG_FIELD_DISABLED: {
