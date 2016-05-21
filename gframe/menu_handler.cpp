@@ -229,12 +229,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ebAttack->setText(L"");
 				mainGame->ebDefence->setText(L"");
 				mainGame->ebStar->setText(L"");
+				mainGame->ebScale->setText(L"");
 				mainGame->cbCardType2->setEnabled(false);
 				mainGame->cbAttribute->setEnabled(false);
 				mainGame->cbRace->setEnabled(false);
 				mainGame->ebAttack->setEnabled(false);
 				mainGame->ebDefence->setEnabled(false);
 				mainGame->ebStar->setEnabled(false);
+				mainGame->ebScale->setEnabled(false);
 				mainGame->deckBuilder.filter_effect = 0;
 				mainGame->deckBuilder.result_string[0] = L'0';
 				mainGame->deckBuilder.result_string[1] = 0;

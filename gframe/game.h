@@ -358,6 +358,7 @@ public:
 	irr::gui::IGUIComboBox* cbAttribute;
 	irr::gui::IGUIComboBox* cbLimit;
 	irr::gui::IGUIEditBox* ebStar;
+	irr::gui::IGUIEditBox* ebScale;
 	irr::gui::IGUIEditBox* ebAttack;
 	irr::gui::IGUIEditBox* ebDefence;
 	irr::gui::IGUIEditBox* ebCardName;

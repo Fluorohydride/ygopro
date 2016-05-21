@@ -9,6 +9,36 @@
 
 namespace ygo {
 
+static int parse_filter(const wchar_t* pstr, unsigned int* type) {
+	if(*pstr == L'=') {
+		*type = 1;
+		return BufferIO::GetVal(pstr + 1);
+	} else if(*pstr >= L'0' && *pstr <= L'9') {
+		*type = 1;
+		return BufferIO::GetVal(pstr);
+	} else if(*pstr == L'>') {
+		if(*(pstr + 1) == L'=') {
+			*type = 2;
+			return BufferIO::GetVal(pstr + 2);
+		} else {
+			*type = 3;
+			return BufferIO::GetVal(pstr + 1);
+		}
+	} else if(*pstr == L'<') {
+		if(*(pstr + 1) == L'=') {
+			*type = 4;
+			return BufferIO::GetVal(pstr + 2);
+		} else {
+			*type = 5;
+			return BufferIO::GetVal(pstr + 1);
+		}
+	} else if(*pstr == L'?') {
+		*type = 6;
+		return 0;
+	}
+	*type = 0;
+	return 0;
+}
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
@@ -95,91 +125,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
 				filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-				const wchar_t* pstr = mainGame->ebAttack->getText();
-				if(*pstr == 0) filter_atktype = 0;
-				else {
-					if(*pstr == L'=') {
-						filter_atktype = 1;
-						filter_atk = BufferIO::GetVal(pstr + 1);
-					} else if(*pstr >= L'0' && *pstr <= L'9') {
-						filter_atktype = 1;
-						filter_atk = BufferIO::GetVal(pstr);
-					} else if(*pstr == L'>') {
-						if(*(pstr + 1) == L'=') {
-							filter_atktype = 2;
-							filter_atk = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_atktype = 3;
-							filter_atk = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'<') {
-						if(*(pstr + 1) == L'=') {
-							filter_atktype = 4;
-							filter_atk = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_atktype = 5;
-							filter_atk = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'?') {
-						filter_atktype = 6;
-					} else filter_atktype = 0;
-				}
-				pstr = mainGame->ebDefence->getText();
-				if(*pstr == 0) filter_deftype = 0;
-				else {
-					if(*pstr == L'=') {
-						filter_deftype = 1;
-						filter_def = BufferIO::GetVal(pstr + 1);
-					} else if(*pstr >= L'0' && *pstr <= L'9') {
-						filter_deftype = 1;
-						filter_def = BufferIO::GetVal(pstr);
-					} else if(*pstr == L'>') {
-						if(*(pstr + 1) == L'=') {
-							filter_deftype = 2;
-							filter_def = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_deftype = 3;
-							filter_def = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'<') {
-						if(*(pstr + 1) == L'=') {
-							filter_deftype = 4;
-							filter_def = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_deftype = 5;
-							filter_def = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'?') {
-						filter_deftype = 6;
-					} else filter_deftype = 0;
-				}
-				pstr = mainGame->ebStar->getText();
-				if(*pstr == 0) filter_lvtype = 0;
-				else {
-					if(*pstr == L'=') {
-						filter_lvtype = 1;
-						filter_lv = BufferIO::GetVal(pstr + 1);
-					} else if(*pstr >= L'0' && *pstr <= L'9') {
-						filter_lvtype = 1;
-						filter_lv = BufferIO::GetVal(pstr);
-					} else if(*pstr == L'>') {
-						if(*(pstr + 1) == L'=') {
-							filter_lvtype = 2;
-							filter_lv = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_lvtype = 3;
-							filter_lv = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'<') {
-						if(*(pstr + 1) == L'=') {
-							filter_lvtype = 4;
-							filter_lv = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_lvtype = 5;
-							filter_lv = BufferIO::GetVal(pstr + 1);
-						}
-					} else filter_lvtype = 0;
-				}
+				filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
+				filter_def = parse_filter(mainGame->ebDefence->getText(), &filter_deftype);
+				filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
+				filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
 				FilterCards();
 				break;
 			}
@@ -257,6 +206,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->ebAttack->setEnabled(false);
 					mainGame->ebDefence->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
+					mainGame->ebScale->setEnabled(false);
 					break;
 				}
 				case 1: {
@@ -267,6 +217,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->ebAttack->setEnabled(true);
 					mainGame->ebDefence->setEnabled(true);
 					mainGame->ebStar->setEnabled(true);
+					mainGame->ebScale->setEnabled(true);
 					mainGame->cbCardType2->clear();
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1080), 0);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1054), TYPE_MONSTER + TYPE_NORMAL);
@@ -293,6 +244,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->ebAttack->setEnabled(false);
 					mainGame->ebDefence->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
+					mainGame->ebScale->setEnabled(false);
 					mainGame->cbCardType2->clear();
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1080), 0);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1054), TYPE_SPELL);
@@ -310,6 +262,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->ebAttack->setEnabled(false);
 					mainGame->ebDefence->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
+					mainGame->ebScale->setEnabled(false);
 					mainGame->cbCardType2->clear();
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1080), 0);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1054), TYPE_TRAP);
@@ -691,7 +644,13 @@ void DeckBuilder::FilterCards() {
 			if(filter_lvtype) {
 				if((filter_lvtype == 1 && data.level != filter_lv) || (filter_lvtype == 2 && data.level < filter_lv)
 				        || (filter_lvtype == 3 && data.level <= filter_lv) || (filter_lvtype == 4 && data.level > filter_lv)
-				        || (filter_lvtype == 5 && data.level >= filter_lv))
+				        || (filter_lvtype == 5 && data.level >= filter_lv) || filter_lvtype == 6)
+					continue;
+			}
+			if(filter_scltype) {
+				if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
+				        || (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
+				        || (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6)
 					continue;
 			}
 			break;
@@ -764,6 +723,7 @@ void DeckBuilder::FilterCards() {
 	mainGame->ebAttack->setText(L"");
 	mainGame->ebDefence->setText(L"");
 	mainGame->ebStar->setText(L"");
+	mainGame->ebScale->setText(L"");
 	filter_effect = 0;
 	for(int i = 0; i < 32; ++i)
 		mainGame->chkCategory[i]->setChecked(false);
