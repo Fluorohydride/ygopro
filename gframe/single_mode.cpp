@@ -47,7 +47,6 @@ int SingleMode::SinglePlayThread(void* param) {
 	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname, 20);
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.turn = 0;
-	mainGame->dInfo.strTurn[0] = 0;
 	if(!preload_script(pduel, fname2, slen)) {
 		end_duel(pduel);
 		return 0;

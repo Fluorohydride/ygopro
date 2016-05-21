@@ -54,7 +54,6 @@ struct DuelInfo {
 	wchar_t hostname_tag[20];
 	wchar_t clientname_tag[20];
 	wchar_t strLP[2][16];
-	wchar_t strTurn[8];
 	wchar_t* vic_string;
 	unsigned char player_type;
 	unsigned char time_player;

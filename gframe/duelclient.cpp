@@ -892,7 +892,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		extrac = BufferIO::ReadInt16(pbuf);
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
-		mainGame->dInfo.strTurn[0] = 0;
 		mainGame->dInfo.is_shuffling = false;
 		mainGame->gMutex.Unlock();
 		return true;
@@ -1843,7 +1842,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dInfo.tag_player[1] = !mainGame->dInfo.tag_player[1];
 		}
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-			myswprintf(mainGame->dInfo.strTurn, L"Turn:%d", mainGame->dInfo.turn);
 			mainGame->showcardcode = 10;
 			mainGame->showcarddif = 30;
 			mainGame->showcardp = 0;

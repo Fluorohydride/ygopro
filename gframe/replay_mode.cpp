@@ -84,7 +84,6 @@ int ReplayMode::ReplayThread(void* param) {
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	mainGame->dInfo.turn = 0;
-	mainGame->dInfo.strTurn[0] = 0;
 	if(!(opt & DUEL_TAG_MODE)) {
 		int main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
@@ -224,7 +223,6 @@ void ReplayMode::Restart(bool refresh) {
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	mainGame->dInfo.turn = 0;
-	mainGame->dInfo.strTurn[0] = 0;
 	if(!(opt & DUEL_TAG_MODE)) {
 		int main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
