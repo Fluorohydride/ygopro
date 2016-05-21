@@ -119,17 +119,21 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				filter_type = mainGame->cbCardType->getSelected();
 				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
 				filter_lm = mainGame->cbLimit->getSelected();
-				if(filter_type > 1) {
-					FilterCards();
-					break;
+				if(filter_type == 1) {
+					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
+					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
+					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
+					filter_def = parse_filter(mainGame->ebDefence->getText(), &filter_deftype);
+					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
+					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
 				}
-				filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
-				filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-				filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
-				filter_def = parse_filter(mainGame->ebDefence->getText(), &filter_deftype);
-				filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
-				filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
 				FilterCards();
+				if(!mainGame->gameConf.separate_clear_button)
+					ClearFilter();
+				break;
+			}
+			case BUTTON_CLEAR_FILTER: {
+				ClearFilter();
 				break;
 			}
 			case BUTTON_CATEGORY_OK: {
@@ -717,6 +721,8 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setPos(0);
 	}
 	std::sort(results.begin(), results.end(), ClientCard::deck_sort_lv);
+}
+void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);
 	mainGame->cbRace->setSelected(0);
 	mainGame->cbLimit->setSelected(0);

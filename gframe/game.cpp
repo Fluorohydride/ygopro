@@ -443,6 +443,10 @@ bool Game::Initialize() {
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(210, 96, 390, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
+	if(mainGame->gameConf.separate_clear_button) {
+		btnStartFilter->setRelativePosition(rect<s32>(210, 96, 335, 118));
+		btnClearFilter = env->addButton(rect<s32>(340, 96, 390, 118), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
+	}
 	wCategories = env->addWindow(rect<s32>(630, 60, 1000, 270), false, dataManager.strBuffer);
 	wCategories->getCloseButton()->setVisible(false);
 	wCategories->setDrawTitlebar(false);
@@ -824,6 +828,7 @@ void Game::LoadConfig() {
 	gameConf.chkHideSetname = 0;
 	gameConf.control_mode = 0;
 	gameConf.draw_field_spell = 1;
+	gameConf.separate_clear_button = 1;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -874,6 +879,8 @@ void Game::LoadConfig() {
 			gameConf.control_mode = atoi(valbuf);
 		} else if(!strcmp(strbuf, "draw_field_spell")) {
 			gameConf.draw_field_spell = atoi(valbuf);
+		} else if(!strcmp(strbuf, "separate_clear_button")) {
+			gameConf.separate_clear_button = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -925,6 +932,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "#control_mode = 0: Key A/S/R. control_mode = 1: MouseLeft/MouseRight/F9\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
+	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {

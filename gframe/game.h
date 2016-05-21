@@ -34,6 +34,7 @@ struct Config {
 	int chkHideSetname;
 	int control_mode;
 	int draw_field_spell;
+	int separate_clear_button;
 };
 
 struct DuelInfo {
@@ -364,6 +365,7 @@ public:
 	irr::gui::IGUIEditBox* ebCardName;
 	irr::gui::IGUIButton* btnEffectFilter;
 	irr::gui::IGUIButton* btnStartFilter;
+	irr::gui::IGUIButton* btnClearFilter;
 	irr::gui::IGUIWindow* wCategories;
 	irr::gui::IGUICheckBox* chkCategory[32];
 	irr::gui::IGUIButton* btnCategoryOK;
@@ -489,6 +491,7 @@ extern Game* mainGame;
 #define BUTTON_START_FILTER			312
 #define SCROLL_FILTER				314
 #define EDITBOX_KEYWORD				315
+#define BUTTON_CLEAR_FILTER			316
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
 #define BUTTON_REPLAY_STEP			322
