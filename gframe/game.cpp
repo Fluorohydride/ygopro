@@ -434,18 +434,19 @@ bool Game::Initialize() {
 	ebDefence = env->addEditBox(L"", rect<s32>(260, 49, 340, 69), true, wFilter);
 	ebDefence->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1324), rect<s32>(10, 74, 80, 94), false, false, wFilter);
-	ebStar = env->addEditBox(L"", rect<s32>(60, 72, 120, 92), true, wFilter);
+	ebStar = env->addEditBox(L"", rect<s32>(60, 72, 190, 92), true, wFilter);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebScale = env->addEditBox(L"", rect<s32>(130, 72, 190, 92), true, wFilter);
+	env->addStaticText(dataManager.GetSysString(1336), rect<s32>(10, 97, 80, 127), false, false, wFilter);
+	ebScale = env->addEditBox(L"", rect<s32>(60, 95, 190, 115), true, wFilter);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 74, 280, 94), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
-	btnStartFilter = env->addButton(rect<s32>(210, 96, 390, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
+	btnStartFilter = env->addButton(rect<s32>(205, 96, 390, 116), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
 	if(mainGame->gameConf.separate_clear_button) {
-		btnStartFilter->setRelativePosition(rect<s32>(210, 96, 335, 118));
-		btnClearFilter = env->addButton(rect<s32>(340, 96, 390, 118), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
+		btnStartFilter->setRelativePosition(rect<s32>(260, 96, 390, 116));
+		btnClearFilter = env->addButton(rect<s32>(205, 96, 255, 116), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
 	}
 	wCategories = env->addWindow(rect<s32>(630, 60, 1000, 270), false, dataManager.strBuffer);
 	wCategories->getCloseButton()->setVisible(false);
