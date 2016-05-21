@@ -178,6 +178,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnReplayStart->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
 				mainGame->btnReplayStep->setVisible(false);
+				mainGame->btnReplayUndo->setVisible(false);
 				mainGame->wPhase->setVisible(true);
 				mainGame->dField.panel = 0;
 				mainGame->dField.hovered_card = 0;

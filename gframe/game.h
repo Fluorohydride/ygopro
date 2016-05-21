@@ -379,6 +379,7 @@ public:
 	irr::gui::IGUIButton* btnReplayStart;
 	irr::gui::IGUIButton* btnReplayPause;
 	irr::gui::IGUIButton* btnReplayStep;
+	irr::gui::IGUIButton* btnReplayUndo;
 	irr::gui::IGUIButton* btnReplayExit;
 	irr::gui::IGUIButton* btnReplaySwap;
 	//surrender/leave
@@ -497,6 +498,7 @@ extern Game* mainGame;
 #define BUTTON_REPLAY_STEP			322
 #define BUTTON_REPLAY_EXIT			323
 #define BUTTON_REPLAY_SWAP			324
+#define BUTTON_REPLAY_UNDO			325
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
 #define LISTBOX_SINGLEPLAY_LIST		350

@@ -50,6 +50,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnReplayStart->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
 				mainGame->btnReplayStep->setVisible(false);
+				mainGame->btnReplayUndo->setVisible(false);
 				ReplayMode::Pause(false, false);
 				break;
 			}
@@ -59,6 +60,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnReplayStart->setVisible(true);
 				mainGame->btnReplayPause->setVisible(false);
 				mainGame->btnReplayStep->setVisible(true);
+				mainGame->btnReplayUndo->setVisible(true);
 				ReplayMode::Pause(true, false);
 				break;
 			}
@@ -78,6 +80,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(!mainGame->dInfo.isReplay)
 					break;
 				ReplayMode::SwapField();
+				break;
+			}
+			case BUTTON_REPLAY_UNDO: {
+				if(!mainGame->dInfo.isReplay)
+					break;
+				ReplayMode::Undo();
 				break;
 			}
 			case BUTTON_REPLAY_SAVE: {
