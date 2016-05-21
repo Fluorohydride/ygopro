@@ -13,6 +13,7 @@ public:
 	virtual bool OnEvent(const irr::SEvent& event);
 	void FilterCards();
 	void ClearFilter();
+	void ClearSearch();
 
 	long long filter_effect;
 	unsigned int filter_type;

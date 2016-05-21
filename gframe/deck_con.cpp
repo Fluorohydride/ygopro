@@ -133,7 +133,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CLEAR_FILTER: {
-				ClearFilter();
+				ClearSearch();
 				break;
 			}
 			case BUTTON_CATEGORY_OK: {
@@ -202,9 +202,17 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case COMBOBOX_MAINTYPE: {
+				mainGame->cbCardType2->setSelected(0);
+				mainGame->cbAttribute->setSelected(0);
+				mainGame->cbRace->setSelected(0);
+				mainGame->ebAttack->setText(L"");
+				mainGame->ebDefence->setText(L"");
+				mainGame->ebStar->setText(L"");
+				mainGame->ebScale->setText(L"");
 				switch(mainGame->cbCardType->getSelected()) {
 				case 0: {
 					mainGame->cbCardType2->setEnabled(false);
+					mainGame->cbCardType2->setSelected(0);
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
@@ -214,6 +222,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case 1: {
+					wchar_t normaltuner[32];
+					wchar_t normalpen[32];
 					wchar_t syntuner[32];
 					mainGame->cbCardType2->setEnabled(true);
 					mainGame->cbRace->setEnabled(true);
@@ -229,10 +239,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1056), TYPE_MONSTER + TYPE_FUSION);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1057), TYPE_MONSTER + TYPE_RITUAL);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1063), TYPE_MONSTER + TYPE_SYNCHRO);
-					myswprintf(syntuner, L"%ls|%ls", dataManager.GetSysString(1063), dataManager.GetSysString(1062));
-					mainGame->cbCardType2->addItem(syntuner, TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1073), TYPE_MONSTER + TYPE_XYZ);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1074), TYPE_MONSTER + TYPE_PENDULUM);
+					myswprintf(normaltuner, L"%ls|%ls", dataManager.GetSysString(1054), dataManager.GetSysString(1062));
+					mainGame->cbCardType2->addItem(normaltuner, TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
+					myswprintf(normalpen, L"%ls|%ls", dataManager.GetSysString(1054), dataManager.GetSysString(1074));
+					mainGame->cbCardType2->addItem(normalpen, TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
+					myswprintf(syntuner, L"%ls|%ls", dataManager.GetSysString(1063), dataManager.GetSysString(1062));
+					mainGame->cbCardType2->addItem(syntuner, TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1062), TYPE_MONSTER + TYPE_TUNER);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1061), TYPE_MONSTER + TYPE_DUAL);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1060), TYPE_MONSTER + TYPE_UNION);
@@ -721,6 +735,19 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setPos(0);
 	}
 	std::sort(results.begin(), results.end(), ClientCard::deck_sort_lv);
+}
+void DeckBuilder::ClearSearch() {
+	mainGame->cbCardType->setSelected(0);
+	mainGame->cbCardType2->setSelected(0);
+	mainGame->cbCardType2->setEnabled(false);
+	mainGame->cbRace->setEnabled(false);
+	mainGame->cbAttribute->setEnabled(false);
+	mainGame->ebAttack->setEnabled(false);
+	mainGame->ebDefence->setEnabled(false);
+	mainGame->ebStar->setEnabled(false);
+	mainGame->ebScale->setEnabled(false);
+	mainGame->ebCardName->setText(L"");
+	ClearFilter();
 }
 void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);
