@@ -847,7 +847,8 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 }
 void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 	element->getParent()->bringToFront(element);
-	dField.panel = element;
+	if(!mainGame->is_building)
+		dField.panel = element;
 	env->setFocus(element);
 	if(!hideframe)
 		ShowElement(element);

@@ -345,6 +345,7 @@ public:
 	irr::gui::IGUIButton* btnSortDeck;
 	irr::gui::IGUIButton* btnShuffleDeck;
 	irr::gui::IGUIButton* btnSaveDeck;
+	irr::gui::IGUIButton* btnDeleteDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
 	irr::gui::IGUIButton* btnDBExit;
 	irr::gui::IGUIButton* btnSideOK;
@@ -482,22 +483,23 @@ extern Game* mainGame;
 #define BUTTON_CLEAR_DECK			303
 #define BUTTON_SAVE_DECK			304
 #define BUTTON_SAVE_DECK_AS			305
-#define BUTTON_DBEXIT				306
-#define BUTTON_SORT_DECK			307
-#define BUTTON_SIDE_OK				308
-#define BUTTON_SHUFFLE_DECK			309
-#define COMBOBOX_MAINTYPE			310
-#define BUTTON_EFFECT_FILTER		311
-#define BUTTON_START_FILTER			312
+#define BUTTON_DELETE_DECK			306
+#define BUTTON_DBEXIT				307
+#define BUTTON_SORT_DECK			308
+#define BUTTON_SIDE_OK				309
+#define BUTTON_SHUFFLE_DECK			310
+#define COMBOBOX_MAINTYPE			311
+#define BUTTON_EFFECT_FILTER		312
+#define BUTTON_START_FILTER			313
 #define SCROLL_FILTER				314
 #define EDITBOX_KEYWORD				315
 #define BUTTON_CLEAR_FILTER			316
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
 #define BUTTON_REPLAY_STEP			322
-#define BUTTON_REPLAY_EXIT			323
-#define BUTTON_REPLAY_SWAP			324
-#define BUTTON_REPLAY_UNDO			325
+#define BUTTON_REPLAY_UNDO			323
+#define BUTTON_REPLAY_EXIT			324
+#define BUTTON_REPLAY_SWAP			325
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
 #define LISTBOX_SINGLEPLAY_LIST		350

@@ -43,6 +43,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
+		if(mainGame->wCategories->isVisible() && id != BUTTON_CATEGORY_OK)
+			break;
+		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO)
+			break;
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -90,6 +94,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
+				break;
+			}
+			case BUTTON_DELETE_DECK: {
+				if(mainGame->cbDBDecks->getSelected() == -1)
+					break;
+				mainGame->gMutex.Lock();
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1337));
+				mainGame->PopupElement(mainGame->wQuery);
+				mainGame->gMutex.Unlock();
 				break;
 			}
 			case BUTTON_DBEXIT: {
@@ -162,6 +175,26 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+				break;
+			}
+			case BUTTON_YES: {
+				mainGame->HideElement(mainGame->wQuery);
+				int sel = mainGame->cbDBDecks->getSelected();
+				if(deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
+					mainGame->cbDBDecks->removeItem(sel);
+					int count = mainGame->cbDBDecks->getItemCount();
+					if(sel >= count)
+						sel = count - 1;
+					mainGame->cbDBDecks->setSelected(sel);
+					if(sel != -1)
+						deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
+					mainGame->stACMessage->setText(dataManager.GetSysString(1338));
+					mainGame->PopupElement(mainGame->wACMessage, 20);
+				}
+				break;
+			}
+			case BUTTON_NO: {
+				mainGame->HideElement(mainGame->wQuery);
 				break;
 			}
 			}
@@ -299,7 +332,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
-			if(mainGame->wCategories->isVisible())
+			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;
@@ -435,7 +468,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			if(mainGame->wCategories->isVisible())
+			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;
