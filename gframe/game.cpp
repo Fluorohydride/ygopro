@@ -461,6 +461,12 @@ bool Game::Initialize() {
 	scrFilter->setLargeStep(10);
 	scrFilter->setSmallStep(1);
 	scrFilter->setVisible(false);
+	//sort type
+	wSort = env->addStaticText(L"", rect<s32>(930, 132, 1020, 156), true, false, 0, -1, true);
+	cbSortType = env->addComboBox(rect<s32>(10, 2, 85, 22), wSort, COMBOBOX_SORTTYPE);
+	for(int i = 1370; i <= 1373; i++)
+		cbSortType->addItem(dataManager.GetSysString(i));
+	wSort->setVisible(false);
 	//replay window
 	wReplay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1202));
 	wReplay->getCloseButton()->setVisible(false);
@@ -970,8 +976,8 @@ void Game::ShowCardInfo(int code) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
 		int form = 0x2605;
-		if(cd.type & TYPE_XYZ) ++form ;
-		myswprintf(formatBuffer, L"[%c%d] ",form,cd.level);
+		if(cd.type & TYPE_XYZ) ++form;
+		myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
 		wchar_t adBuffer[16];
 		if(cd.attack < 0 && cd.defence < 0)
 			myswprintf(adBuffer, L"?/?");
