@@ -14,6 +14,7 @@ public:
 	void FilterCards();
 	void ClearFilter();
 	void ClearSearch();
+	void SortList();
 
 	long long filter_effect;
 	unsigned int filter_type;

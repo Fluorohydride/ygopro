@@ -220,6 +220,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wDeckEdit->setVisible(true);
 				mainGame->wFilter->setVisible(true);
+				mainGame->wSort->setVisible(true);
 				mainGame->btnSideOK->setVisible(false);
 				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;
 				mainGame->cbDBLFList->setSelected(0);

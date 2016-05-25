@@ -110,6 +110,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->wDeckEdit->setVisible(false);
 				mainGame->wCategories->setVisible(false);
 				mainGame->wFilter->setVisible(false);
+				mainGame->wSort->setVisible(false);
 				mainGame->wCardImg->setVisible(false);
 				mainGame->wInfos->setVisible(false);
 				mainGame->PopupElement(mainGame->wMainMenu);
@@ -322,6 +323,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
+				break;
+			}
+			case COMBOBOX_SORTTYPE: {
+				SortList();
+				mainGame->env->setFocus(0);
+				break;
 			}
 			}
 		}
@@ -767,7 +774,7 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
 	}
-	std::sort(results.begin(), results.end(), ClientCard::deck_sort_lv);
+	SortList();
 }
 void DeckBuilder::ClearSearch() {
 	mainGame->cbCardType->setSelected(0);
@@ -793,6 +800,22 @@ void DeckBuilder::ClearFilter() {
 	filter_effect = 0;
 	for(int i = 0; i < 32; ++i)
 		mainGame->chkCategory[i]->setChecked(false);
+}
+void DeckBuilder::SortList() {
+	switch(mainGame->cbSortType->getSelected()) {
+	case 0:
+		std::sort(results.begin(), results.end(), ClientCard::deck_sort_lv);
+		break;
+	case 1:
+		std::sort(results.begin(), results.end(), ClientCard::deck_sort_atk);
+		break;
+	case 2:
+		std::sort(results.begin(), results.end(), ClientCard::deck_sort_def);
+		break;
+	case 3:
+		std::sort(results.begin(), results.end(), ClientCard::deck_sort_name);
+		break;
+	}
 }
 
 }

@@ -280,6 +280,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wPhase->setVisible(false);
 		mainGame->wDeckEdit->setVisible(false);
 		mainGame->wFilter->setVisible(false);
+		mainGame->wSort->setVisible(false);
 		mainGame->btnSideOK->setVisible(true);
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
