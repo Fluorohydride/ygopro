@@ -347,7 +347,6 @@ public:
 	irr::gui::IGUIButton* btnSaveDeck;
 	irr::gui::IGUIButton* btnDeleteDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
-	irr::gui::IGUIButton* btnDBExit;
 	irr::gui::IGUIButton* btnSideOK;
 	irr::gui::IGUIEditBox* ebDeckname;
 	//filter

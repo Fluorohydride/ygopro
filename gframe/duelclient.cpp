@@ -277,6 +277,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dField.Clear();
 		mainGame->is_building = true;
 		mainGame->is_siding = true;
+		mainGame->wChat->setVisible(false);
 		mainGame->wPhase->setVisible(false);
 		mainGame->wDeckEdit->setVisible(false);
 		mainGame->wFilter->setVisible(false);
