@@ -105,7 +105,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->gMutex.Unlock();
 				break;
 			}
-			case BUTTON_DBEXIT: {
+			case BUTTON_LEAVE_GAME: {
 				mainGame->is_building = false;
 				mainGame->wDeckEdit->setVisible(false);
 				mainGame->wCategories->setVisible(false);
@@ -113,6 +113,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->wSort->setVisible(false);
 				mainGame->wCardImg->setVisible(false);
 				mainGame->wInfos->setVisible(false);
+				mainGame->btnLeaveGame->setVisible(false);
 				mainGame->PopupElement(mainGame->wMainMenu);
 				mainGame->device->setEventReceiver(&mainGame->menuHandler);
 				mainGame->wACMessage->setVisible(false);
