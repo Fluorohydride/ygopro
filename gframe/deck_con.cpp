@@ -339,7 +339,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
-			mouse_pos = position2d<s32>(event.MouseInput.X, event.MouseInput.Y);
+			position2d<s32> mouse_pos = position2d<s32>(event.MouseInput.X, event.MouseInput.Y);
 			if(mainGame->cbDBLFList->getElementFromPoint(mouse_pos)
 				|| mainGame->cbDBDecks->getElementFromPoint(mouse_pos)
 				|| mainGame->cbCardType->getElementFromPoint(mouse_pos)

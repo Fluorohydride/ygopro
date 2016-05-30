@@ -34,7 +34,6 @@ public:
 	int hovered_pos;
 	int hovered_seq;
 	int click_pos;
-	position2d<s32> mouse_pos;
 	bool is_draging;
 	int dragx;
 	int dragy;
