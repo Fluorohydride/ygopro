@@ -138,7 +138,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
 					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
 					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
-					filter_def = parse_filter(mainGame->ebDefence->getText(), &filter_deftype);
+					filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
 					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
 					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
 				}
@@ -241,7 +241,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->cbAttribute->setSelected(0);
 				mainGame->cbRace->setSelected(0);
 				mainGame->ebAttack->setText(L"");
-				mainGame->ebDefence->setText(L"");
+				mainGame->ebDefense->setText(L"");
 				mainGame->ebStar->setText(L"");
 				mainGame->ebScale->setText(L"");
 				switch(mainGame->cbCardType->getSelected()) {
@@ -251,7 +251,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
-					mainGame->ebDefence->setEnabled(false);
+					mainGame->ebDefense->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
 					mainGame->ebScale->setEnabled(false);
 					break;
@@ -264,7 +264,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbRace->setEnabled(true);
 					mainGame->cbAttribute->setEnabled(true);
 					mainGame->ebAttack->setEnabled(true);
-					mainGame->ebDefence->setEnabled(true);
+					mainGame->ebDefense->setEnabled(true);
 					mainGame->ebStar->setEnabled(true);
 					mainGame->ebScale->setEnabled(true);
 					mainGame->cbCardType2->clear();
@@ -295,7 +295,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
-					mainGame->ebDefence->setEnabled(false);
+					mainGame->ebDefense->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
 					mainGame->ebScale->setEnabled(false);
 					mainGame->cbCardType2->clear();
@@ -313,7 +313,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
-					mainGame->ebDefence->setEnabled(false);
+					mainGame->ebDefense->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
 					mainGame->ebScale->setEnabled(false);
 					mainGame->cbCardType2->clear();
@@ -788,7 +788,7 @@ void DeckBuilder::ClearSearch() {
 	mainGame->cbRace->setEnabled(false);
 	mainGame->cbAttribute->setEnabled(false);
 	mainGame->ebAttack->setEnabled(false);
-	mainGame->ebDefence->setEnabled(false);
+	mainGame->ebDefense->setEnabled(false);
 	mainGame->ebStar->setEnabled(false);
 	mainGame->ebScale->setEnabled(false);
 	mainGame->ebCardName->setText(L"");
@@ -799,7 +799,7 @@ void DeckBuilder::ClearFilter() {
 	mainGame->cbRace->setSelected(0);
 	mainGame->cbLimit->setSelected(0);
 	mainGame->ebAttack->setText(L"");
-	mainGame->ebDefence->setText(L"");
+	mainGame->ebDefense->setText(L"");
 	mainGame->ebStar->setText(L"");
 	mainGame->ebScale->setText(L"");
 	filter_effect = 0;

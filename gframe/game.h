@@ -360,7 +360,7 @@ public:
 	irr::gui::IGUIEditBox* ebStar;
 	irr::gui::IGUIEditBox* ebScale;
 	irr::gui::IGUIEditBox* ebAttack;
-	irr::gui::IGUIEditBox* ebDefence;
+	irr::gui::IGUIEditBox* ebDefense;
 	irr::gui::IGUIEditBox* ebCardName;
 	irr::gui::IGUIButton* btnEffectFilter;
 	irr::gui::IGUIButton* btnStartFilter;
