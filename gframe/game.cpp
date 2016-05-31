@@ -986,14 +986,14 @@ void Game::ShowCardInfo(int code) {
 		if(cd.type & TYPE_XYZ) ++form;
 		myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
 		wchar_t adBuffer[16];
-		if(cd.attack < 0 && cd.defence < 0)
+		if(cd.attack < 0 && cd.defense < 0)
 			myswprintf(adBuffer, L"?/?");
 		else if(cd.attack < 0)
-			myswprintf(adBuffer, L"?/%d", cd.defence);
-		else if(cd.defence < 0)
+			myswprintf(adBuffer, L"?/%d", cd.defense);
+		else if(cd.defense < 0)
 			myswprintf(adBuffer, L"%d/?", cd.attack);
 		else
-			myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defence);
+			myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
 		wcscat(formatBuffer, adBuffer);
 		if(cd.type & TYPE_PENDULUM) {
 			wchar_t scaleBuffer[16];
