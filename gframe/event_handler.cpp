@@ -198,12 +198,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_POS_DU: {
-				DuelClient::SetResponseI(POS_FACEUP_DEFENCE);
+				DuelClient::SetResponseI(POS_FACEUP_DEFENSE);
 				mainGame->HideElement(mainGame->wPosSelect, true);
 				break;
 			}
 			case BUTTON_POS_DD: {
-				DuelClient::SetResponseI(POS_FACEDOWN_DEFENCE);
+				DuelClient::SetResponseI(POS_FACEDOWN_DEFENSE);
 				mainGame->HideElement(mainGame->wPosSelect, true);
 				break;
 			}

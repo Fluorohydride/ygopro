@@ -100,7 +100,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		} else
 			myswprintf(atkstring, L"%d", attack);
 	}
-	if(flag & QUERY_DEFENCE) {
+	if(flag & QUERY_DEFENSE) {
 		defense = BufferIO::ReadInt32(buf);
 		if(defense < 0) {
 			defstring[0] = '?';
@@ -110,7 +110,7 @@ void ClientCard::UpdateInfo(char* buf) {
 	}
 	if(flag & QUERY_BASE_ATTACK)
 		base_attack = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_BASE_DEFENCE)
+	if(flag & QUERY_BASE_DEFENSE)
 		base_defense = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_REASON)
 		reason = BufferIO::ReadInt32(buf);
