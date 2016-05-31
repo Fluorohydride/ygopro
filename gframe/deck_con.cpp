@@ -341,14 +341,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
 			position2d<s32> mouse_pos = position2d<s32>(event.MouseInput.X, event.MouseInput.Y);
-			if(mainGame->cbDBLFList->getElementFromPoint(mouse_pos)
-				|| mainGame->cbDBDecks->getElementFromPoint(mouse_pos)
-				|| mainGame->cbCardType->getElementFromPoint(mouse_pos)
-				|| mainGame->cbCardType2->getElementFromPoint(mouse_pos)
-				|| mainGame->cbLimit->getElementFromPoint(mouse_pos)
-				|| mainGame->cbAttribute->getElementFromPoint(mouse_pos)
-				|| mainGame->cbRace->getElementFromPoint(mouse_pos)
-				|| mainGame->cbSortType->getElementFromPoint(mouse_pos))
+			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+			if(root->getElementFromPoint(mouse_pos) != root)
 				break;
 			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
 				break;
