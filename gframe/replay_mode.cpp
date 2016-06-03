@@ -66,6 +66,8 @@ int ReplayMode::ReplayThread(void* param) {
 		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
 		mainGame->dInfo.isTag = true;
+		mainGame->dInfo.tag_player[0] = false;
+		mainGame->dInfo.tag_player[1] = false;
 	} else {
 		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
@@ -205,6 +207,8 @@ void ReplayMode::Restart(bool refresh) {
 		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
 		mainGame->dInfo.isTag = true;
+		mainGame->dInfo.tag_player[0] = false;
+		mainGame->dInfo.tag_player[1] = false;
 	} else {
 		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
