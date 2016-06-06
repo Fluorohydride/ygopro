@@ -175,7 +175,7 @@ bool Game::Initialize() {
 	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 199, 273), true, false, 0, -1, true);
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
 	wCardImg->setVisible(false);
-	imgCard = env->addImage(rect<s32>(9, 9, 187, 262), wCardImg);
+	imgCard = env->addImage(rect<s32>(10, 9, 187, 263), wCardImg);
 	imgCard->setUseAlphaChannel(true);
 	//phase
 	wPhase = env->addStaticText(L"", rect<s32>(480, 310, 855, 330));
