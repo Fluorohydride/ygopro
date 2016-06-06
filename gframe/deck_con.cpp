@@ -544,8 +544,70 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						deckManager.current_deck.extra.push_back(draging_pointer);
 					} else if(!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 60) {
 						deckManager.current_deck.main.push_back(draging_pointer);
+					} else if (deckManager.current_deck.side.size() < 15) {
+						deckManager.current_deck.side.push_back(draging_pointer);
 					}
 				}
+			}
+			break;
+		}
+		case irr::EMIE_MMOUSE_LEFT_UP: {
+			if (mainGame->is_siding)
+				break;
+			if (mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
+				break;
+			if (hovered_pos == 0 || hovered_seq == -1)
+				break;
+			if (is_draging)
+				break;
+			draging_pointer = dataManager.GetCodePointer(hovered_code);
+			unsigned int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
+			int limit = 3;
+			if (filterList->count(limitcode))
+				limit = (*filterList)[limitcode];
+			for (size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
+				if (deckManager.current_deck.main[i]->first == limitcode
+					|| deckManager.current_deck.main[i]->second.alias == limitcode)
+					limit--;
+			for (size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
+				if (deckManager.current_deck.extra[i]->first == limitcode
+					|| deckManager.current_deck.extra[i]->second.alias == limitcode)
+					limit--;
+			for (size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
+				if (deckManager.current_deck.side[i]->first == limitcode
+					|| deckManager.current_deck.side[i]->second.alias == limitcode)
+					limit--;
+			if (limit <= 0)
+				break;
+			if (hovered_pos == 1) {
+				if (deckManager.current_deck.main.size() < 60)
+					deckManager.current_deck.main.push_back(draging_pointer);
+				else if (deckManager.current_deck.side.size() < 15)
+					deckManager.current_deck.side.push_back(draging_pointer);
+			}
+			else if (hovered_pos == 2) {
+				if (deckManager.current_deck.extra.size() < 15)
+					deckManager.current_deck.extra.push_back(draging_pointer);
+				else if (deckManager.current_deck.side.size() < 15)
+					deckManager.current_deck.side.push_back(draging_pointer);
+			}
+			else if (hovered_pos == 3) {
+				if (deckManager.current_deck.side.size() < 15)
+					deckManager.current_deck.side.push_back(draging_pointer);
+				else {
+					if ((draging_pointer->second.type & 0x802040) && deckManager.current_deck.extra.size() < 15)
+						deckManager.current_deck.extra.push_back(draging_pointer);
+					else if (!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 60)
+						deckManager.current_deck.main.push_back(draging_pointer);
+				}
+			}
+			else {
+				if ((draging_pointer->second.type & 0x802040) && deckManager.current_deck.extra.size() < 15)
+					deckManager.current_deck.extra.push_back(draging_pointer);
+				else if (!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 60)
+					deckManager.current_deck.main.push_back(draging_pointer);
+				else if (deckManager.current_deck.side.size() < 15)
+					deckManager.current_deck.side.push_back(draging_pointer);
 			}
 			break;
 		}
