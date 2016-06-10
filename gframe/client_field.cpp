@@ -91,7 +91,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->controler = player;
 		pcard->location = 0x40;
 		pcard->sequence = i;
-		pcard->position = POS_FACEDOWN_DEFENCE;
+		pcard->position = POS_FACEDOWN_DEFENSE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 		pcard->mTransform.setTranslation(pcard->curPos);
 		pcard->mTransform.setRotationRadians(pcard->curRot);
@@ -878,7 +878,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			t->X = (matManager.vFields[16].Pos.X + matManager.vFields[17].Pos.X) / 2 + 1.1f * sequence;
 			t->Y = (matManager.vFields[16].Pos.Y + matManager.vFields[18].Pos.Y) / 2;
 			t->Z = 0.01f;
-			if (pcard->position & POS_DEFENCE) {
+			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
 				r->Z = -3.1415926f / 2.0f;
 				if (pcard->position & POS_FACEDOWN)
@@ -895,7 +895,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			t->X = (matManager.vFields[84].Pos.X + matManager.vFields[85].Pos.X) / 2 - 1.1f * sequence;
 			t->Y = (matManager.vFields[84].Pos.Y + matManager.vFields[86].Pos.Y) / 2;
 			t->Z = 0.01f;
-			if (pcard->position & POS_DEFENCE) {
+			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
 				r->Z = 3.1415926f / 2.0f;
 				if (pcard->position & POS_FACEDOWN)

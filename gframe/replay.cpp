@@ -257,5 +257,8 @@ char Replay::ReadInt8() {
 		return -1;
 	return *pdata++;
 }
+void Replay::Rewind() {
+	pdata = replay_data;
+}
 
 }

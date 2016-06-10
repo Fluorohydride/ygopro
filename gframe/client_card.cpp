@@ -1,5 +1,6 @@
 #include "client_card.h"
 #include "client_field.h"
+#include "data_manager.h"
 #include "game.h"
 
 namespace ygo {
@@ -30,9 +31,9 @@ ClientCard::ClientCard() {
 	race = 0;
 	attribute = 0;
 	attack = 0;
-	defence = 0;
+	defense = 0;
 	base_attack = 0;
-	base_defence = 0;
+	base_defense = 0;
 	lscale = 0;
 	rscale = 0;
 	cHint = 0;
@@ -99,18 +100,18 @@ void ClientCard::UpdateInfo(char* buf) {
 		} else
 			myswprintf(atkstring, L"%d", attack);
 	}
-	if(flag & QUERY_DEFENCE) {
-		defence = BufferIO::ReadInt32(buf);
-		if(defence < 0) {
+	if(flag & QUERY_DEFENSE) {
+		defense = BufferIO::ReadInt32(buf);
+		if(defense < 0) {
 			defstring[0] = '?';
 			defstring[1] = 0;
 		} else
-			myswprintf(defstring, L"%d", defence);
+			myswprintf(defstring, L"%d", defense);
 	}
 	if(flag & QUERY_BASE_ATTACK)
 		base_attack = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_BASE_DEFENCE)
-		base_defence = BufferIO::ReadInt32(buf);
+	if(flag & QUERY_BASE_DEFENSE)
+		base_defense = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_REASON)
 		reason = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_EQUIP_CARD) {
@@ -213,12 +214,62 @@ bool ClientCard::deck_sort_lv(code_pointer p1, code_pointer p2) {
 			return p1->second.level > p2->second.level;
 		if(p1->second.attack != p2->second.attack)
 			return p1->second.attack > p2->second.attack;
-		if(p1->second.defence != p2->second.defence)
-			return p1->second.defence > p2->second.defence;
-		else return p1->first < p2->first;
+		if(p1->second.defense != p2->second.defense)
+			return p1->second.defense > p2->second.defense;
+		return p1->first < p2->first;
 	}
 	if((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
 		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
+	return p1->first < p2->first;
+}
+bool ClientCard::deck_sort_atk(code_pointer p1, code_pointer p2) {
+	if((p1->second.type & 0x7) != (p2->second.type & 0x7))
+		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
+	if((p1->second.type & 0x7) == 1) {
+		if(p1->second.attack != p2->second.attack)
+			return p1->second.attack > p2->second.attack;
+		if(p1->second.defense != p2->second.defense)
+			return p1->second.defense > p2->second.defense;
+		if(p1->second.level != p2->second.level)
+			return p1->second.level > p2->second.level;
+		int type1 = (p1->second.type & 0x8020c0) ? (p1->second.type & 0x8020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x8020c0) ? (p2->second.type & 0x8020c1) : (p2->second.type & 0x31);
+		if(type1 != type2)
+			return type1 < type2;
+		return p1->first < p2->first;
+	}
+	if((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
+		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
+	return p1->first < p2->first;
+}
+bool ClientCard::deck_sort_def(code_pointer p1, code_pointer p2) {
+	if((p1->second.type & 0x7) != (p2->second.type & 0x7))
+		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
+	if((p1->second.type & 0x7) == 1) {
+		if(p1->second.defense != p2->second.defense)
+			return p1->second.defense > p2->second.defense;
+		if(p1->second.attack != p2->second.attack)
+			return p1->second.attack > p2->second.attack;
+		if(p1->second.level != p2->second.level)
+			return p1->second.level > p2->second.level;
+		int type1 = (p1->second.type & 0x8020c0) ? (p1->second.type & 0x8020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x8020c0) ? (p2->second.type & 0x8020c1) : (p2->second.type & 0x31);
+		if(type1 != type2)
+			return type1 < type2;
+		return p1->first < p2->first;
+	}
+	if((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
+		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
+	return p1->first < p2->first;
+}
+bool ClientCard::deck_sort_name(code_pointer p1, code_pointer p2) {
+	CardString cstr1;
+	CardString cstr2;
+	dataManager.GetString(p1->second.code, &cstr1);
+	dataManager.GetString(p2->second.code, &cstr2);
+	int res = wcscmp(cstr1.name, cstr2.name);
+	if(res != 0)
+		return res < 0;
 	return p1->first < p2->first;
 }
 }

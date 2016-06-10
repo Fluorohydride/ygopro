@@ -12,7 +12,10 @@ class DeckBuilder: public irr::IEventReceiver {
 public:
 	virtual bool OnEvent(const irr::SEvent& event);
 	void FilterCards();
-	
+	void ClearFilter();
+	void ClearSearch();
+	void SortList();
+
 	long long filter_effect;
 	unsigned int filter_type;
 	unsigned int filter_type2;
@@ -24,6 +27,8 @@ public:
 	int filter_def;
 	unsigned int filter_lvtype;
 	unsigned int filter_lv;
+	unsigned int filter_scltype;
+	unsigned int filter_scl;
 	int filter_lm;
 	int hovered_code;
 	int hovered_pos;
