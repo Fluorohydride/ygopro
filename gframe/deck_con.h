@@ -41,6 +41,8 @@ public:
 	size_t pre_extrac;
 	size_t pre_sidec;
 	code_pointer draging_pointer;
+	bool is_deleting;
+	bool is_clearing;
 	
 	std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
