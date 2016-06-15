@@ -902,6 +902,15 @@ void DeckBuilder::SortList() {
 		std::sort(results.begin(), results.end(), ClientCard::deck_sort_name);
 		break;
 	}
+	const wchar_t* pstr = mainGame->ebCardName->getText();
+	for (size_t i = 0, pos = 0; i < results.size(); ++i){
+		code_pointer ptr = results[i];
+		if (wcscmp(pstr, dataManager.GetName(ptr->first))==0) {
+			results.insert(results.begin() + pos, ptr);
+			results.erase(results.begin() + i + 1);
+			pos++;
+		}
+	}
 }
 
 }
