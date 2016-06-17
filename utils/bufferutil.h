@@ -39,7 +39,7 @@ public:
         std::string str;
         str.insert(str.end(), ptr, endptr);
         ptr = endptr;
-        return std::move(str);
+        return str;
     }
     
     inline void Read(void* buf, size_t sz) {

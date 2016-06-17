@@ -187,7 +187,7 @@ namespace sgui
         inline const AreaAttr& GetPosAttr() { return area_pos; }
         inline const AreaAttr& GetSizeAttr() { return area_size; }
         inline const v2f& GetAlignFactor() { return self_factor; }
-        inline RegionModifier BatchModifyPosSize() { return std::move(RegionModifier(this)); }
+        inline RegionModifier BatchModifyPosSize() { return RegionModifier(this); }
         
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto pre_pos = area_pos.absolute;
@@ -1485,7 +1485,7 @@ namespace sgui
         
         inline std::string GetClipboardString() {
             if(clipboard_getcb)
-                return std::move(clipboard_getcb());
+                return clipboard_getcb();
             return "";
         }
         
@@ -2613,10 +2613,10 @@ namespace sgui
             auto pre_act_size = area_size.absolute;
             area_pos.absolute = view_pos;
             area_size.absolute = view_size;
-            return std::move(ScrollBarModifier(bar, [this, pre_act_pos, pre_act_size]() {
+            return ScrollBarModifier(bar, [this, pre_act_pos, pre_act_size]() {
                 area_pos.absolute = pre_act_pos;
                 area_size.absolute = pre_act_size;
-            }));
+            });
         }
         
     protected:
@@ -3617,7 +3617,7 @@ namespace sgui
         }
         
         inline std::wstring GetSelectedText() {
-            return std::move(static_cast<UIText*>(this->ui_components[2])->GetText().substr(selection.x, selection.y - selection.x));
+            return static_cast<UIText*>(this->ui_components[2])->GetText().substr(selection.x, selection.y - selection.x);
         }
         
         inline void Clear() {

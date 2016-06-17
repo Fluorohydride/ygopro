@@ -20,8 +20,9 @@ namespace ygopro
                 auto dm = std::make_shared<DuelMessage>();
                 dm->msg_type = MSG_ATTACK;
                 BufferWriter writer(dm->msg_buffer);
-                writer.Write<uint32_t>(84013237);
+                //writer.Write<uint32_t>(84013237);
                 writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 3, 0).info);
                 messages.PushCommand(dm);
                 break;
             }
@@ -1589,26 +1590,47 @@ namespace ygopro
             case MSG_ATTACK: {
                 CardPosInfo pattacker(LocalPosInfo(reader.Read<int32_t>()));
                 CardPosInfo ptarget(LocalPosInfo(reader.Read<int32_t>()));
-                auto catk = GetCard(pattacker);
-                auto ctarget = (ptarget.info == 0) ? nullptr : GetCard(ptarget);
-                if(catk == nullptr)
-                    break;
                 auto& da = layoutCfg["direct attack"];
                 v3f dapos = {da[0].to_value<float>(), da[1].to_value<float>(), 0.0f};
                 if(ptarget.controler == 1)
                     dapos.y = -dapos.y;
-                v3f startpos = catk->GetPositionInfo().first;
-                v3f endpos = ctarget ? ctarget->GetPositionInfo().first : dapos;
-                ShowAttackSprite(startpos, endpos);
+                if(pattacker.controler > 1 || pattacker.sequence > 4 || ptarget.controler > 1 || (ptarget.location != 0 && ptarget.sequence > 4))
+                    break;
+                v3f startpos = g_player[pattacker.controler].field_blocks[pattacker.sequence]->translation;
+                v3f endpos = (ptarget.location != 0) ? g_player[ptarget.controler].field_blocks[ptarget.sequence]->translation : dapos;
+                startpos.z = 0.2f;
+                endpos.z = 0.2f;
+                glm::quat rot = glm::angleAxis(glm::atan(endpos.y - startpos.y, endpos.x - startpos.x) - 3.1415926f / 2.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                ClearAttackSprite();
+                auto atk_sprite = AddAttackSprite(startpos, rot);
+                auto action = std::make_shared<LerpAnimator<int64_t, FieldSprite>>(300, atk_sprite, [startpos, endpos](FieldSprite* fs, double t) ->bool {
+                    auto pos = startpos * (1 - t) + endpos * t;
+                    fs->SetTranslation(pos);
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(300));
+                auto animate = std::make_shared<ActionSequence<int64_t>>(action, std::make_shared<ActionWait<int64_t>>(300));
+                SceneMgr::Get().PushAction(std::make_shared<ActionRepeat<int64_t>>(animate), atk_sprite.get());
                 break;
             }
             case MSG_BATTLE: {
                 CardPosInfo pattacker(LocalPosInfo(reader.Read<int32_t>()));
                 int32_t attacker_atk = reader.Read<int32_t>();
                 int32_t attacker_def = reader.Read<int32_t>();
+                int8_t attacker_destroyed = reader.Read<int8_t>();
                 CardPosInfo ptarget(LocalPosInfo(reader.Read<int32_t>()));
                 int32_t target_atk = reader.Read<int32_t>();
                 int32_t target_def = reader.Read<int32_t>();
+                int8_t target_destroyed = reader.Read<int8_t>();
+                auto cattacker = GetCard(pattacker);
+                auto ctarget = GetCard(ptarget);
+                if(cattacker == nullptr)
+                    break;
+                auto& da = layoutCfg["direct attack"];
+                v3f dapos = {da[0].to_value<float>(), da[1].to_value<float>(), 0.0f};
+                if(ptarget.controler == 1)
+                    dapos.y = -dapos.y;
+                auto startpos = cattacker->GetPositionInfo().first;
+                auto endpos = ctarget ? ctarget->GetPositionInfo().first : dapos;
 //                int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 //                int la = BufferIO::ReadInt8(pbuf);
 //                int sa = BufferIO::ReadInt8(pbuf);
@@ -1667,6 +1689,7 @@ namespace ygopro
             case MSG_CREATE_RELATION: break;
             case MSG_RELEASE_RELATION: break;
             case MSG_TOSS_COIN: {
+                // todo: add effects
                 uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 uint32_t count = reader.Read<uint8_t>();
                 std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_coin"].to_string());
@@ -1680,6 +1703,7 @@ namespace ygopro
                 break;
             }
             case MSG_TOSS_DICE: {
+                // todo: add effects
                 uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 uint32_t count = reader.Read<uint8_t>();
                 std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_dice"].to_string());

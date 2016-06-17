@@ -103,7 +103,7 @@ namespace ygopro
         uint32_t disabled_field = 0;
         bool last_chain = false;
         std::vector<LocalChainInfo> chains;
-        FieldSprite* attack_sprite = nullptr;
+        std::vector<FieldSprite*> attack_sprite;
     };
     
     extern LocalDuelData g_duel;
@@ -136,7 +136,8 @@ namespace ygopro
         void SetLP(int32_t pid, int32_t lp);
         void AddChain(int32_t ct);
         void SetDisabledField(uint32_t fd_info);
-        void ShowAttackSprite(v3f start, v3f end);
+        std::shared_ptr<FieldSprite> AddAttackSprite(v3f trans, glm::quat rot);
+        void ClearAttackSprite();
         
         template<typename... ACTS>
         void PushMessageActions(ACTS... acts) {

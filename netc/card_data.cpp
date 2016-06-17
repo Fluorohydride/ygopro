@@ -149,10 +149,10 @@ namespace ygopro
         std::vector<uint32_t> result;
         auto iter = _aliases.find(code);
         if(iter == _aliases.end())
-            return std::move(result);
+            return result;
         else {
             result = iter->second;
-            return std::move(result);
+            return result;
         }
     }
 
@@ -165,7 +165,7 @@ namespace ygopro
         }
         if(result.size())
             std::sort(result.begin(), result.end(), CardData::card_sort);
-        return std::move(result);
+        return result;
     }
     
     std::wstring DataMgr::GetAttributeString(uint32_t attr) {

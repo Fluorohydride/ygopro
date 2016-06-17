@@ -160,7 +160,7 @@ public:
     }
     
     static std::string WSTRToLocalCharset(const std::wstring& wstr_name) {
-        return std::move(To<std::string>(wstr_name));
+        return To<std::string>(wstr_name);
     }
     
     static std::string LocalCharsetToUTF8(const std::string& local) {
@@ -168,7 +168,7 @@ public:
     }
     
     static std::wstring LocalCharsetToWSTR(const std::string& local) {
-        return std::move(To<std::wstring>(local));
+        return To<std::wstring>(local);
     }
     
 };

@@ -246,7 +246,7 @@ namespace ygopro
         extra_deck = e;
         side_deck = s;
         std::string deckstr(deck_string);
-        return std::move(deckstr);
+        return deckstr;
     }
     
     std::shared_ptr<DeckCardData> DeckData::InsertCard(CardLocation pos, uint32_t index, uint32_t code, bool checkc) {
@@ -503,7 +503,7 @@ namespace ygopro
         }
         if(result.size())
             std::sort(result.begin(), result.end(), CardData::card_sort);
-        return std::move(result);
+        return result;
     }
     
     void LimitRegulationMgr::LoadCurrentListToDeck(DeckData& deck, int32_t limit) {

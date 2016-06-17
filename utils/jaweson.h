@@ -111,7 +111,7 @@ namespace jaweson
                     }
                 }
             }
-            return std::move(result);
+            return result;
         }
         
         static inline uint8_t get_hex_value(uint8_t ch) {

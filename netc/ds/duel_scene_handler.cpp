@@ -745,16 +745,22 @@ namespace ygopro
         }
     }
     
-    void DuelSceneHandler::ShowAttackSprite(v3f start, v3f end) {
-        v3f trans = (start + end) * 0.5f;
-        float tan = (end.y - start.y) / (end.x - start.x);
-        if(g_duel.attack_sprite == nullptr) {
-            g_duel.attack_sprite = duel_scene->AddFieldSprite().get();
-            g_duel.attack_sprite->SetTexture(ImageMgr::Get().GetRawMiscTexture());
-            g_duel.attack_sprite->SetTexcoord(ImageMgr::Get().GetTexture("attack arrow"));
+    std::shared_ptr<FieldSprite> DuelSceneHandler::AddAttackSprite(v3f trans, glm::quat rot) {
+        auto ptr = duel_scene->AddFieldSprite();
+        ptr->SetSize(sgui::SGJsonUtil::ConvertVec2<float>(layoutCfg["attack icon size"]));
+        ptr->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+        ptr->SetTexcoord(ImageMgr::Get().GetTexture("attack"));
+        ptr->SetTranslation(trans);
+        ptr->SetRotation(rot);
+        g_duel.attack_sprite.push_back(ptr.get());
+        return ptr;
+    }
+    
+    void DuelSceneHandler::ClearAttackSprite() {
+        for(auto& fs : g_duel.attack_sprite) {
+            duel_scene->RemoveFieldSprite(fs);
+            SceneMgr::Get().RemoveAction(fs);
         }
-        g_duel.attack_sprite->SetTranslation(trans);
-        g_duel.attack_sprite->SetRotation(glm::angleAxis(glm::atan(tan), glm::vec3(0.0f, 0.0f, 1.0f)));
     }
     
 }

@@ -81,7 +81,7 @@ struct ToInner<std::wstring, std::string> {
         }
         std::string str;
         str.insert(str.begin(), buffer.begin(), buffer.end());
-        return std::move(str);
+        return str;
     }
 };
 
@@ -109,7 +109,7 @@ struct ToInner<std::string, std::wstring> {
         }
         std::wstring str;
         str.insert(str.begin(), buffer.begin(), buffer.end());
-        return std::move(str);
+        return str;
     }
 };
 
@@ -122,14 +122,14 @@ template<typename TOTYPE, typename T, typename... REST>
 std::string To(const char* format, T val, REST... r) {
     char buf[256];
     snprintf(buf, 256, format, val, std::forward<REST>(r)...);
-    return std::move(std::string(buf));
+    return std::string(buf);
 }
 
 template<typename TOTYPE, typename T, typename... REST>
 std::wstring To(const wchar_t* format, T val, REST... r) {
     wchar_t buf[256];
     swprintf(buf, 256, format, val, std::forward<REST>(r)...);
-    return std::move(std::wstring(buf));
+    return std::wstring(buf);
 }
 
 #endif

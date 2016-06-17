@@ -127,7 +127,7 @@ template<typename TIME_TYPE>
 class ActionRepeat : public Action<TIME_TYPE> {
     using repcb_type = std::function<bool(bool)>;
 public:
-    ActionRepeat(std::shared_ptr<Action<TIME_TYPE>> ac, repcb_type cb) : rep_action(ac), callback(cb) {}
+    ActionRepeat(std::shared_ptr<Action<TIME_TYPE>> ac, repcb_type cb = nullptr) : rep_action(ac), callback(cb) {}
     ActionRepeat(std::shared_ptr<Action<TIME_TYPE>> ac, int32_t count) : rep_action(ac) {
         int32_t cur_count = 0;
         callback = [cur_count, count](bool init) mutable ->bool {

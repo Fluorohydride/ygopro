@@ -311,7 +311,7 @@ namespace ygopro
     }
     
     std::string BuildScene::SaveDeckToString() {
-        return std::move(current_deck.SaveToString());
+        return current_deck.SaveToString();
     }
     
     void BuildScene::LoadDeck(DeckData& new_deck) {
