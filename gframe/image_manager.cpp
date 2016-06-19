@@ -109,8 +109,16 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		sprintf(file, "pics/field/%d.png", code);
+		sprintf(file, "expansions/pics/field/%d.png", code);
 		irr::video::ITexture* img = driver->getTexture(file);
+		if(img == NULL) {
+			sprintf(file, "expansions/pics/field/%d.jpg", code);
+			img = driver->getTexture(file);
+		}
+		if(img == NULL) {
+			sprintf(file, "pics/field/%d.png", code);
+			img = driver->getTexture(file);
+		}
 		if(img == NULL) {
 			sprintf(file, "pics/field/%d.jpg", code);
 			img = driver->getTexture(file);
