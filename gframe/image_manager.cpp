@@ -59,8 +59,12 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 	auto tit = tMap.find(code);
 	if(tit == tMap.end()) {
 		char file[256];
-		sprintf(file, "pics/%d.jpg", code);
+		sprintf(file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = driver->getTexture(file);
+		if(img == NULL) {
+			sprintf(file, "pics/%d.jpg", code);
+			img = driver->getTexture(file);
+		}
 		if(img == NULL) {
 			tMap[code] = NULL;
 			return GetTextureThumb(code);
@@ -80,8 +84,12 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		char file[256];
-		sprintf(file, "pics/thumbnail/%d.jpg", code);
+		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
 		irr::video::ITexture* img = driver->getTexture(file);
+		if(img == NULL) {
+			sprintf(file, "pics/thumbnail/%d.jpg", code);
+			img = driver->getTexture(file);
+		}
 		if(img == NULL) {
 			tThumb[code] = NULL;
 			return tUnknown;
@@ -101,8 +109,16 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		sprintf(file, "pics/field/%d.png", code);
+		sprintf(file, "expansions/pics/field/%d.png", code);
 		irr::video::ITexture* img = driver->getTexture(file);
+		if(img == NULL) {
+			sprintf(file, "expansions/pics/field/%d.jpg", code);
+			img = driver->getTexture(file);
+		}
+		if(img == NULL) {
+			sprintf(file, "pics/field/%d.png", code);
+			img = driver->getTexture(file);
+		}
 		if(img == NULL) {
 			sprintf(file, "pics/field/%d.jpg", code);
 			img = driver->getTexture(file);

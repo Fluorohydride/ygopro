@@ -51,9 +51,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
-				deckManager.current_deck.main.clear();
-				deckManager.current_deck.extra.clear();
-				deckManager.current_deck.side.clear();
+				mainGame->gMutex.Lock();
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1339));
+				mainGame->PopupElement(mainGame->wQuery);
+				mainGame->gMutex.Unlock();
+				is_clearing = true;
 				break;
 			}
 			case BUTTON_SORT_DECK: {
@@ -97,12 +99,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_DELETE_DECK: {
-				if(mainGame->cbDBDecks->getSelected() == -1)
+				int sel = mainGame->cbDBDecks->getSelected();
+				if(sel == -1)
 					break;
 				mainGame->gMutex.Lock();
-				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1337));
+				wchar_t textBuffer[256];
+				myswprintf(textBuffer, L"%ls\n%ls", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337));
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
+				is_deleting = true;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
@@ -181,22 +187,35 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_YES: {
 				mainGame->HideElement(mainGame->wQuery);
-				int sel = mainGame->cbDBDecks->getSelected();
-				if(deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
-					mainGame->cbDBDecks->removeItem(sel);
-					int count = mainGame->cbDBDecks->getItemCount();
-					if(sel >= count)
-						sel = count - 1;
-					mainGame->cbDBDecks->setSelected(sel);
-					if(sel != -1)
-						deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
-					mainGame->stACMessage->setText(dataManager.GetSysString(1338));
-					mainGame->PopupElement(mainGame->wACMessage, 20);
+				if(!mainGame->is_building || mainGame->is_siding)
+					break;
+				if(is_deleting) {
+					int sel = mainGame->cbDBDecks->getSelected();
+					if (deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
+						mainGame->cbDBDecks->removeItem(sel);
+						int count = mainGame->cbDBDecks->getItemCount();
+						if (sel >= count)
+							sel = count - 1;
+						mainGame->cbDBDecks->setSelected(sel);
+						if (sel != -1)
+							deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
+						mainGame->stACMessage->setText(dataManager.GetSysString(1338));
+						mainGame->PopupElement(mainGame->wACMessage, 20);
+					}
+					is_deleting = false;
+				}
+				if(is_clearing) {
+					deckManager.current_deck.main.clear();
+					deckManager.current_deck.extra.clear();
+					deckManager.current_deck.side.clear();
+					is_clearing = false;
 				}
 				break;
 			}
 			case BUTTON_NO: {
 				mainGame->HideElement(mainGame->wQuery);
+				is_deleting = false;
+				is_clearing = false;
 				break;
 			}
 			}
@@ -882,6 +901,15 @@ void DeckBuilder::SortList() {
 	case 3:
 		std::sort(results.begin(), results.end(), ClientCard::deck_sort_name);
 		break;
+	}
+	const wchar_t* pstr = mainGame->ebCardName->getText();
+	for (size_t i = 0, pos = 0; i < results.size(); ++i){
+		code_pointer ptr = results[i];
+		if (wcscmp(pstr, dataManager.GetName(ptr->first))==0) {
+			results.insert(results.begin() + pos, ptr);
+			results.erase(results.begin() + i + 1);
+			pos++;
+		}
 	}
 }
 
