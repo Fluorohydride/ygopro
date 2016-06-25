@@ -26,6 +26,39 @@ namespace ygopro
                 messages.PushCommand(dm);
                 break;
             }
+            case 2: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_CONFIRM_CARDS;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint8_t>(6);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x01, 0, 0).info);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x01, 1, 0).info);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x01, 2, 0).info);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x01, 3, 0).info);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x01, 4, 0).info);
+                writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x01, 5, 0).info);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 3: {
+                auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_BATTLE;
+                BufferWriter writer(dm->msg_buffer);
+                //writer.Write<uint32_t>(84013237);
+                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
+                writer.WriteRepeat(0, 9);
+                writer.Write<uint32_t>(CardPosInfo(1, 0x04, 3, 0).info);
+                writer.WriteRepeat(0, 9);
+                messages.PushCommand(dm);
+                break;
+            }
             case 6: {
                 auto dm = std::make_shared<DuelMessage>();
                 dm->msg_type = MSG_TOSS_COIN;
@@ -1631,44 +1664,21 @@ namespace ygopro
                     dapos.y = -dapos.y;
                 auto startpos = cattacker->GetPositionInfo().first;
                 auto endpos = ctarget ? ctarget->GetPositionInfo().first : dapos;
-//                int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int la = BufferIO::ReadInt8(pbuf);
-//                int sa = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                int aatk = BufferIO::ReadInt32(pbuf);
-//                int adef = BufferIO::ReadInt32(pbuf);
-//                /*int da = */BufferIO::ReadInt8(pbuf);
-//                int cd = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                int ld = BufferIO::ReadInt8(pbuf);
-//                int sd = BufferIO::ReadInt8(pbuf);
-//                BufferIO::ReadInt8(pbuf);
-//                int datk = BufferIO::ReadInt32(pbuf);
-//                int ddef = BufferIO::ReadInt32(pbuf);
-//                /*int dd = */BufferIO::ReadInt8(pbuf);
-//                if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-//                    return true;
-//                mainGame->gMutex.Lock();
-//                ClientCard* pcard = mainGame->dField.GetCard(ca, la, sa);
-//                if(aatk != pcard->attack) {
-//                    pcard->attack = aatk;
-//                    myswprintf(pcard->atkstring, L"%d", aatk);
-//                }
-//                if(adef != pcard->defence) {
-//                    pcard->defence = adef;
-//                    myswprintf(pcard->defstring, L"%d", adef);
-//                }
-//                if(ld) {
-//                    pcard = mainGame->dField.GetCard(cd, ld, sd);
-//                    if(datk != pcard->attack) {
-//                        pcard->attack = datk;
-//                        myswprintf(pcard->atkstring, L"%d", datk);
-//                    }
-//                    if(ddef != pcard->defence) {
-//                        pcard->defence = ddef;
-//                        myswprintf(pcard->defstring, L"%d", ddef);
-//                    }
-//                }
-//                mainGame->gMutex.Unlock();
+                if(endpos.z < startpos.z)
+                    endpos.z = startpos.z;
+                endpos = startpos * 0.2f + endpos * 0.8f;
+                auto action1 = std::make_shared<LerpAnimator<int64_t, FieldCard>>(100, cattacker, [startpos, endpos](FieldCard* pcard, double t) ->bool {
+                    auto pos = startpos * (1 - t) + endpos * t;
+                    pcard->SetTranslation(pos);
+                    return true;
+                }, std::make_shared<TGenLinear<int64_t>>(100));
+                auto action2 = std::make_shared<LerpAnimator<int64_t, FieldCard>>(500, cattacker, [startpos, endpos](FieldCard* pcard, double t) ->bool {
+                    auto pos = endpos * (1 - t) + startpos * t;
+                    pcard->SetTranslation(pos);
+                    return true;
+                }, std::make_shared<TGenMove<int64_t>>(500, 0.01));
+                auto animate = std::make_shared<ActionSequence<int64_t>>(action1, action2);
+                SceneMgr::Get().PushAction(animate);
                 break;
             }
             case MSG_ATTACK_NEGATED: break;

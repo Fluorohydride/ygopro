@@ -83,6 +83,14 @@ public:
         buffer_ptr->insert(buffer_ptr->end(), &str.front(), &str.back());
     }
     
+    inline void WriteRepeat(uint8_t val, size_t count) {
+        buffer_ptr->insert(buffer_ptr->end(), count, val);
+    }
+    
+    inline void WriteBuffer(uint8_t* ptr, size_t count) {
+        buffer_ptr->insert(buffer_ptr->end(), ptr, ptr + count);
+    }
+    
 protected:
     std::vector<uint8_t>* buffer_ptr = nullptr;
 };

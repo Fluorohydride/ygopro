@@ -90,6 +90,12 @@ namespace ygopro
         AddCard(84013237, CardPosInfo(0, 0x4, 1, 0x1))->UpdatePosition(0);
         for(int32_t i = 0; i < 3; ++i)
             AddCard(83764718, CardPosInfo(0, 0x2, 1, 0x1))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x1, 0, 0))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x1, 1, 0))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x1, 2, 0))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x1, 3, 0))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x1, 4, 0))->UpdatePosition(0);
+        AddCard(84013237, CardPosInfo(0, 0x1, 5, 0))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
         AddCard(84013237, CardPosInfo(0, 0x84, 1, 0))->UpdatePosition(0);
