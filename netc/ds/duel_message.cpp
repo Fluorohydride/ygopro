@@ -48,14 +48,25 @@ namespace ygopro
                 break;
             }
             case 3: {
+                for(uint32_t i = 0; i < 5; ++i) {
+                    auto dm = std::make_shared<DuelMessage>();
+                    dm->msg_type = MSG_BATTLE;
+                    BufferWriter writer(dm->msg_buffer);
+                    writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
+                    writer.WriteRepeat(0, 9);
+                    writer.Write<uint32_t>(CardPosInfo(1, 0x04, i, 0).info);
+                    writer.WriteRepeat(0, 9);
+                    messages.PushCommand(dm);
+                }
+                break;
+            }
+            case 4: {
                 auto dm = std::make_shared<DuelMessage>();
-                dm->msg_type = MSG_BATTLE;
+                dm->msg_type = MSG_DECLEAR_ATTRIB;
                 BufferWriter writer(dm->msg_buffer);
-                //writer.Write<uint32_t>(84013237);
-                writer.Write<uint32_t>(CardPosInfo(0, 0x04, 1, 0).info);
-                writer.WriteRepeat(0, 9);
-                writer.Write<uint32_t>(CardPosInfo(1, 0x04, 3, 0).info);
-                writer.WriteRepeat(0, 9);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint8_t>(3);
+                writer.Write<uint32_t>(0x3f);
                 messages.PushCommand(dm);
                 break;
             }
@@ -1646,16 +1657,19 @@ namespace ygopro
                 break;
             }
             case MSG_BATTLE: {
+                // todo: set atk/def for battling cards
                 CardPosInfo pattacker(LocalPosInfo(reader.Read<int32_t>()));
-                int32_t attacker_atk = reader.Read<int32_t>();
-                int32_t attacker_def = reader.Read<int32_t>();
-                int8_t attacker_destroyed = reader.Read<int8_t>();
+                // int32_t attacker_atk = reader.Read<int32_t>();
+                // int32_t attacker_def = reader.Read<int32_t>();
+                // int8_t attacker_destroyed = reader.Read<int8_t>();
+                reader.Skip(9);
                 CardPosInfo ptarget(LocalPosInfo(reader.Read<int32_t>()));
-                int32_t target_atk = reader.Read<int32_t>();
-                int32_t target_def = reader.Read<int32_t>();
-                int8_t target_destroyed = reader.Read<int8_t>();
+                // int32_t target_atk = reader.Read<int32_t>();
+                // int32_t target_def = reader.Read<int32_t>();
+                // int8_t target_destroyed = reader.Read<int8_t>();
+                reader.Skip(9);
                 auto cattacker = GetCard(pattacker);
-                auto ctarget = GetCard(ptarget);
+                // auto ctarget = GetCard(ptarget);
                 if(cattacker == nullptr)
                     break;
                 auto& da = layoutCfg["direct attack"];
@@ -1663,10 +1677,10 @@ namespace ygopro
                 if(ptarget.controler == 1)
                     dapos.y = -dapos.y;
                 auto startpos = cattacker->GetPositionInfo().first;
-                auto endpos = ctarget ? ctarget->GetPositionInfo().first : dapos;
+                auto endpos = (ptarget.location != 0) ? g_player[ptarget.controler].field_blocks[ptarget.sequence]->translation : dapos;
                 if(endpos.z < startpos.z)
                     endpos.z = startpos.z;
-                endpos = startpos * 0.2f + endpos * 0.8f;
+                endpos = startpos * 0.1f + endpos * 0.9f;
                 auto action1 = std::make_shared<LerpAnimator<int64_t, FieldCard>>(100, cattacker, [startpos, endpos](FieldCard* pcard, double t) ->bool {
                     auto pos = startpos * (1 - t) + endpos * t;
                     pcard->SetTranslation(pos);
@@ -1678,7 +1692,7 @@ namespace ygopro
                     return true;
                 }, std::make_shared<TGenMove<int64_t>>(500, 0.01));
                 auto animate = std::make_shared<ActionSequence<int64_t>>(action1, action2);
-                SceneMgr::Get().PushAction(animate);
+                PushMessageActions(animate);
                 break;
             }
             case MSG_ATTACK_NEGATED: break;
@@ -1700,7 +1714,8 @@ namespace ygopro
             case MSG_RELEASE_RELATION: break;
             case MSG_TOSS_COIN: {
                 // todo: add effects
-                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                // uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                reader.Skip(1);
                 uint32_t count = reader.Read<uint8_t>();
                 std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_coin"].to_string());
                 for(uint32_t i = 0; i < count; ++i) {
@@ -1714,7 +1729,8 @@ namespace ygopro
             }
             case MSG_TOSS_DICE: {
                 // todo: add effects
-                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                // uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
+                reader.Skip(1);
                 uint32_t count = reader.Read<uint8_t>();
                 std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_dice"].to_string());
                 for(uint32_t i = 0; i < count; ++i) {
@@ -1747,23 +1763,10 @@ namespace ygopro
                 break;
             }
             case MSG_DECLEAR_ATTRIB: {
-//                /*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
-//                int available = BufferIO::ReadInt32(pbuf);
-//                for(int i = 0, filter = 0x1; i < 7; ++i, filter <<= 1) {
-//                    mainGame->chkAttribute[i]->setChecked(false);
-//                    if(filter & available)
-//                        mainGame->chkAttribute[i]->setVisible(true);
-//                    else mainGame->chkAttribute[i]->setVisible(false);
-//                }
-//                if(select_hint)
-//                    myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-//                else myswprintf(textBuffer, dataManager.GetSysString(562));
-//                select_hint = 0;
-//                mainGame->gMutex.Lock();
-//                mainGame->wANAttribute->setText(textBuffer);
-//                mainGame->PopupElement(mainGame->wANAttribute);
-//                mainGame->gMutex.Unlock();
+                reader.Skip(1);
+                uint32_t count = reader.Read<uint8_t>();
+                uint32_t available = reader.Read<uint32_t>();
+                OperationPanel::DeclearAttribute(available, count);
                 break;
             }
             case MSG_DECLEAR_CARD: {

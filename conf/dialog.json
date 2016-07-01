@@ -402,6 +402,60 @@
     "item margin" : 20,
     "item size" : [200, 290]
   },
+  "declear race" : {
+  },
+  "declear attribute" : {
+    "type" : "window",
+    "close button" : false,
+    "allow resize" : false,
+    "position" : [0, 0, 500, 430, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "att earth" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["attribtue_earth", "0x000000ff"],
+        "position" : [10, 50, -20, 50, 0, 0, 1.0, 0, 0, 0]
+      },
+      "att water" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["attribtue_water", "0x000000ff"],
+        "position" : [10, 110, -20, 50, 0, 0, 1.0, 0, 0, 0]
+      },
+      "att fire" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["attribtue_fire", "0x000000ff"],
+        "position" : [10, 170, -20, 50, 0, 0, 1.0, 0, 0, 0]
+      },
+      "att wind" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["attribtue_wind", "0x000000ff"],
+        "position" : [10, 230, -20, 50, 0, 0, 1.0, 0, 0, 0]
+      },
+      "att light" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["attribtue_light", "0x000000ff"],
+        "position" : [10, 290, -20, 50, 0, 0, 1.0, 0, 0, 0]
+      },
+      "att dark" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["attribtue_dark", "0x000000ff"],
+        "position" : [10, 350, -20, 50, 0, 0, 1.0, 0, 0, 0]
+      },
+      "att divine" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["attribtue_divine", "0x000000ff"],
+        "position" : [10, 50, -20, 50, 0, 0, 1.0, 0, 0, 0]
+      }
+    },
+    "item color" : "0x00ffffff",
+    "selected color" : "0xffff00ff"
+  },
   "menus" : {
     "menu deck" : {
       "eui_deck_load" : 0,

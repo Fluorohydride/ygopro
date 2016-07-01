@@ -1128,4 +1128,48 @@ namespace ygopro
             ok_button->event_click += [wnd](sgui::SGWidget& sender)->bool { wnd->RemoveFromParent(); return true; };
     }
     
+    void OperationPanel::DeclearAttribute(int32_t available, int32_t count, std::function<void(uint32_t)> close_callback) {
+        static std::string att_names[] = {"att earth", "att water", "att fire", "att wind", "att light", "att dark", "att divine"};
+        uint32_t icolor = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["declear attribute"]["item color"]);
+        uint32_t scolor = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["declear attribute"]["selected color"]);
+        auto wnd = LoadDialogAs<sgui::SGWidgetContainer>("declear attribute");
+        if(!wnd)
+            return;
+        uint32_t* preturn_value = new uint32_t(0);
+        uint32_t* pcount = new uint32_t(0);
+        wnd->event_on_destroy += [preturn_value, pcount, close_callback](sgui::SGWidget& sender)->bool {
+            if(close_callback)
+                close_callback(*preturn_value);
+            delete preturn_value;
+            delete pcount;
+            return true;
+        };
+        for(int32_t i = 0; i < 7; ++i) {
+            auto att_button = wnd->FindWidgetAs<sgui::SGTextButton>(att_names[i]);
+            if(!att_button)
+                continue;
+            att_button->SetColor(icolor);
+            uint32_t att_value = 1 << i;
+            if((available & att_value) == 0) {
+                att_button->SetVisible(false);
+            } else {
+                att_button->event_click += [wnd, icolor, scolor, att_value, preturn_value, pcount, count](sgui::SGWidget& sender) {
+                    sgui::SGTextButton& btn = static_cast<sgui::SGTextButton&>(sender);
+                    if(btn.IsPushed()) {
+                        *preturn_value |= att_value;
+                        (*pcount)++;
+                        btn.SetColor(scolor);
+                        if(*pcount >= count) {
+                            wnd->RemoveFromParent();
+                        }
+                    } else {
+                        *preturn_value &= ~att_value;
+                        (*pcount)--;
+                        btn.SetColor(icolor);
+                    }
+                    return true;
+                };
+            }
+        }
+    }
 }

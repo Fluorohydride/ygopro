@@ -131,6 +131,7 @@ namespace ygopro
     class OperationPanel {
     public:
         static void Confirm(const std::vector<FieldCard*>& cards, std::function<void()> close_callback = nullptr);
+        static void DeclearAttribute(int32_t available, int32_t count, std::function<void(uint32_t)> close_callback = nullptr);
     };
 }
 
