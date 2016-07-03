@@ -55,7 +55,15 @@ int main(int argc, char* argv[]) {
 
 	for(int i = 1; i < argc; ++i) {
 		if(argv[i][0] == '-' && argv[i][1] == 'e') {
+#ifdef _WIN32
+			wchar_t fname[260];
+			MultiByteToWideChar(CP_ACP, 0, &argv[i][2], -1, fname, 260);
+			char fname2[260];
+			BufferIO::EncodeUTF8(fname, fname2);
+			ygo::dataManager.LoadDB(fname2);
+#else
 			ygo::dataManager.LoadDB(&argv[i][2]);
+#endif
 		} else if(!strcmp(argv[i], "-j") || !strcmp(argv[i], "-d") || !strcmp(argv[i], "-r") || !strcmp(argv[i], "-s")) {
 			exit_on_return = true;
 			irr::SEvent event;

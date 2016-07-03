@@ -31,7 +31,11 @@ int SingleMode::SinglePlayThread(void* param) {
 	wchar_t fname[256];
 	myswprintf(fname, L"./single/%ls", name);
 	char fname2[256];
+#ifdef _WIN32
+	size_t slen = WideCharToMultiByte(CP_ACP, 0, fname, -1, fname2, 256, NULL, NULL);
+#else
 	size_t slen = BufferIO::EncodeUTF8(fname, fname2);
+#endif
 	mtrandom rnd;
 	time_t seed = time(0);
 	rnd.reset(seed);
