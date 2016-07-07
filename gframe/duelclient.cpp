@@ -1273,7 +1273,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		unsigned char respbuf[64];
 		int pzone = 0;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
-			int filter;
+			unsigned int filter;
 			if (mainGame->dField.selectable_field & 0x1f) {
 				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
 				respbuf[1] = 0x4;
