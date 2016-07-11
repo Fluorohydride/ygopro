@@ -11,6 +11,8 @@ long SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 
+byte buffer[0x10000];
+
 bool SingleMode::StartPlay() {
 	Thread::NewThread(SinglePlayThread, 0);
 	return true;
@@ -35,6 +37,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mtrandom rnd;
 	time_t seed = time(0);
 	rnd.reset(seed);
+	set_script_reader((script_reader)ScriptReader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());
@@ -780,6 +783,29 @@ void SingleMode::SinglePlayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
+}
+byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
+	FILE *fp;
+#ifdef _WIN32
+	wchar_t fname[256];
+	BufferIO::DecodeUTF8(script_name, fname);
+	fp = _wfopen(fname, L"rb");
+#else
+	fp = fopen(script_name, "rb");
+#endif
+	if(!fp)
+		return 0;
+	fseek(fp, 0, SEEK_END);
+	unsigned int len = ftell(fp);
+	if(len > 0x10000) {
+		fclose(fp);
+		return 0;
+	}
+	fseek(fp, 0, SEEK_SET);
+	fread(buffer, len, 1, fp);
+	fclose(fp);
+	*slen = len;
+	return buffer;
 }
 int SingleMode::MessageHandler(long fduel, int type) {
 	if(!enable_log)
