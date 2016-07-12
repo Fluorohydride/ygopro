@@ -373,6 +373,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
+	set_script_reader(default_script_reader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)TagDuel::MessageHandler);
 	rnd.reset(seed);
