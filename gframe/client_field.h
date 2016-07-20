@@ -46,9 +46,9 @@ public:
 	size_t selected_option;
 	ClientCard* attacker;
 	ClientCard* attack_target;
-	int disabled_field;
-	int selectable_field;
-	int selected_field;
+	unsigned int disabled_field;
+	unsigned int selectable_field;
+	unsigned int selected_field;
 	int select_min;
 	int select_max;
 	int must_select_count;

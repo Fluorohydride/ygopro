@@ -90,6 +90,7 @@ bool Game::Initialize() {
 	lpcstring = 0;
 	always_chain = false;
 	ignore_chain = false;
+	chain_when_avail = false;
 	is_building = false;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));

@@ -1107,9 +1107,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case MSG_SELECT_DISFIELD: {
 				if (!(hovered_location & LOCATION_ONFIELD) || hovered_sequence == 5)
 					break;
-				int flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
-				if ((flag & selectable_field) > 0) {
-					if ((flag & selected_field) > 0) {
+				unsigned int flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
+				if (flag & selectable_field) {
+					if (flag & selected_field) {
 						selected_field &= ~flag;
 						select_min++;
 					} else {

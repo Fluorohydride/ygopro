@@ -29,6 +29,7 @@ public:
 	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0x781fff);
 	static void SinglePlayReload();
 
+	static byte* ScriptReader(const char* script_name, int* slen);
 	static int MessageHandler(long fduel, int type);
 };
 
