@@ -10,6 +10,7 @@
 namespace ygo {
 
 SingleDuel::SingleDuel(bool is_match) {
+	game_started = false;
 	match_mode = is_match;
 	match_kill = 0;
 	for(int i = 0; i < 2; ++i) {
@@ -145,7 +146,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 		NetServer::StopServer();
 	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 		observers.erase(dp);
-		if(!pduel) {
+		if(!game_started) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
 			if(players[0])
@@ -157,7 +158,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 		}
 		NetServer::DisconnectPlayer(dp);
 	} else {
-		if(!pduel && duel_count == 0) {
+		if(!game_started && duel_count == 0) {
 			STOC_HS_PlayerChange scpc;
 			players[dp->type] = 0;
 			ready[dp->type] = false;
@@ -170,7 +171,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 				NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 			NetServer::DisconnectPlayer(dp);
 		} else {
-			if(!pduel) {
+			if(!game_started) {
 				if(!ready[0])
 					NetServer::SendPacketToPlayer(players[0], STOC_DUEL_START);
 				if(!ready[1])
@@ -310,6 +311,7 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 		return;
 	NetServer::StopListen();
 	//NetServer::StopBroadcast();
+	game_started = true;
 	NetServer::SendPacketToPlayer(players[0], STOC_DUEL_START);
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit) {

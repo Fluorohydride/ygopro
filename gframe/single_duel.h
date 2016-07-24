@@ -52,6 +52,7 @@ protected:
 	Replay last_replay;
 	bool match_mode;
 	int match_kill;
+	bool game_started;
 	unsigned char duel_count;
 	unsigned char tp_player;
 	unsigned char match_result[3];
