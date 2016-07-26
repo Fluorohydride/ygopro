@@ -72,6 +72,7 @@ int ReplayMode::ReplayThread(void* param) {
 		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
 	}
+	set_script_reader(default_script_reader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());

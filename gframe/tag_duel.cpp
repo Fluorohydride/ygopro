@@ -10,6 +10,7 @@
 namespace ygo {
 
 TagDuel::TagDuel() {
+	game_started = false;
 	for(int i = 0; i < 4; ++i) {
 		players[i] = 0;
 		ready[i] = false;
@@ -119,7 +120,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 		NetServer::StopServer();
 	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 		observers.erase(dp);
-		if(!pduel) {
+		if(!game_started) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
 			for(int i = 0; i < 4; ++i)
@@ -130,7 +131,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 		}
 		NetServer::DisconnectPlayer(dp);
 	} else {
-		if(!pduel) {
+		if(!game_started) {
 			STOC_HS_PlayerChange scpc;
 			players[dp->type] = 0;
 			ready[dp->type] = false;
@@ -263,6 +264,7 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(!ready[0] || !ready[1] || !ready[2] || !ready[3])
 		return;
 	NetServer::StopListen();
+	game_started = true;
 	//NetServer::StopBroadcast();
 	for(int i = 0; i < 4; ++i)
 		NetServer::SendPacketToPlayer(players[i], STOC_DUEL_START);
@@ -373,6 +375,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
+	set_script_reader(default_script_reader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)TagDuel::MessageHandler);
 	rnd.reset(seed);
