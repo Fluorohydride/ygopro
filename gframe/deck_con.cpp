@@ -189,7 +189,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wQuery);
 				if(!mainGame->is_building || mainGame->is_siding)
 					break;
-				if(is_deleting) {
+				if(is_clearing) {
+					deckManager.current_deck.main.clear();
+					deckManager.current_deck.extra.clear();
+					deckManager.current_deck.side.clear();
+				}
+				else if(is_deleting) {
 					int sel = mainGame->cbDBDecks->getSelected();
 					if (deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 						mainGame->cbDBDecks->removeItem(sel);
@@ -202,14 +207,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->stACMessage->setText(dataManager.GetSysString(1338));
 						mainGame->PopupElement(mainGame->wACMessage, 20);
 					}
-					is_deleting = false;
 				}
-				if(is_clearing) {
-					deckManager.current_deck.main.clear();
-					deckManager.current_deck.extra.clear();
-					deckManager.current_deck.side.clear();
-					is_clearing = false;
-				}
+				is_clearing = false;
+				is_deleting = false;
 				break;
 			}
 			case BUTTON_NO: {
