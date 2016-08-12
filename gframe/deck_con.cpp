@@ -827,6 +827,10 @@ void DeckBuilder::FilterCards() {
 				continue;
 			if(filter_lm == 5 && data.ot != 2)
 				continue;
+			if(filter_lm == 6 && data.ot != 3)
+				continue;
+			if(filter_lm == 7 && data.ot != 4)
+				continue;
 		}
 		if(pstr) {
 			if(pstr[0] == L'$') {
