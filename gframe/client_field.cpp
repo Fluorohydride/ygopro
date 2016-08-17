@@ -62,6 +62,13 @@ void ClientField::Clear() {
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
 	chains.clear();
+	activatable_cards.clear();
+	summonable_cards.clear();
+	spsummonable_cards.clear();
+	msetable_cards.clear();
+	ssetable_cards.clear();
+	reposable_cards.clear();
+	attackable_cards.clear();
 	disabled_field = 0;
 	deck_act = false;
 	grave_act = false;
