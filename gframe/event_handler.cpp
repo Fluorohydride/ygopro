@@ -456,6 +456,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CMD_SHOWLIST: {
 				mainGame->wCmdMenu->setVisible(false);
 				selectable_cards.clear();
+				wchar_t formatBuffer[2048];
 				switch(command_location) {
 				case LOCATION_DECK: {
 					for(int32 i = (int32)deck[command_controler].size() - 1; i >= 0 ; --i)
@@ -612,6 +613,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SORT_CARD: {
 					int offset = mainGame->scrCardList->getPos() / 10;
 					int sel_seq = id - BUTTON_CARD_0 + offset;
+					wchar_t formatBuffer[2048];
 					if(sort_list[sel_seq]) {
 						select_min--;
 						int sel = sort_list[sel_seq];
@@ -742,6 +744,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					else
 						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+					wchar_t formatBuffer[2048];
 					if(sort_list.size()) {
 						if(sort_list[pos + i] > 0)
 							myswprintf(formatBuffer, L"%d", sort_list[pos + i]);
@@ -786,6 +789,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					else
 						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+					wchar_t formatBuffer[2048];
 					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
 								dataManager.FormatLocation(display_cards[i + pos]->overlayTarget->location, display_cards[i + pos]->overlayTarget->sequence),
@@ -919,6 +923,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(hovered_location & 0xe)
 				clicked_card = GetCard(hovered_controler, hovered_location, hovered_sequence);
 			else clicked_card = 0;
+			wchar_t formatBuffer[2048];
 			if(mainGame->dInfo.isReplay) {
 				if(mainGame->wCardSelect->isVisible())
 					break;
@@ -1222,6 +1227,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::SetResponseB(respbuf, selectable_cards.size());
 					DuelClient::SendResponse();
 				} else {
+					wchar_t formatBuffer[2048];
 					myswprintf(formatBuffer, dataManager.GetSysString(204), select_counter_count, dataManager.GetCounterName(select_counter_type));
 					mainGame->stHintMsg->setText(formatBuffer);
 				}
@@ -1378,22 +1384,40 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(x < 300)
 				break;
 			ClientCard* mcard = 0;
+			int mplayer = -1;
 			if(!panel || !panel->isVisible() || !panel->getRelativePosition().isPointInside(pos)) {
 				GetHoverField(x, y);
 				if(hovered_location & 0xe)
 					mcard = GetCard(hovered_controler, hovered_location, hovered_sequence);
-				else if(hovered_location == LOCATION_GRAVE && grave[hovered_controler].size())
-					mcard = *(grave[hovered_controler].rbegin());
-				else if(hovered_location == LOCATION_REMOVED && remove[hovered_controler].size()) {
-					mcard = *(remove[hovered_controler].rbegin());
-					if(mcard->position & POS_FACEDOWN)
-						mcard = 0;
-				} else if(hovered_location == LOCATION_DECK && deck[hovered_controler].size())
-					mcard = *(deck[hovered_controler].rbegin());
-				else mcard = 0;
+				else if(hovered_location == LOCATION_GRAVE) {
+					if(grave[hovered_controler].size())
+						mcard = grave[hovered_controler].back();
+				} else if(hovered_location == LOCATION_REMOVED) {
+					if(remove[hovered_controler].size()) {
+						mcard = remove[hovered_controler].back();
+						if(mcard->position & POS_FACEDOWN)
+							mcard = 0;
+					}
+				} else if(hovered_location == LOCATION_DECK) {
+					if(deck[hovered_controler].size())
+						mcard = deck[hovered_controler].back();
+				} else {
+					if(irr::core::recti(327, 8, 630, 51).isPointInside(pos))
+						mplayer = 0;
+					else if(irr::core::recti(689, 8, 991, 51).isPointInside(pos))
+						mplayer = 1;
+				}
 			}
 			if(hovered_location == LOCATION_HAND && (mainGame->dInfo.is_shuffling || mainGame->dInfo.curMsg == MSG_SHUFFLE_HAND))
 				mcard = 0;
+			if(mcard == 0 && mplayer < 0)
+				mainGame->stTip->setVisible(false);
+			else if(mcard == hovered_card && mplayer == hovered_player) {
+				if(mainGame->stTip->isVisible()) {
+					irr::core::recti tpos = mainGame->stTip->getRelativePosition();
+					mainGame->stTip->setRelativePosition(irr::core::position2di(x - tpos.getWidth() - 10, mcard ? y - tpos.getHeight() - 10 : y + 10));
+				}
+			}
 			if(mcard != hovered_card) {
 				if(hovered_card) {
 					if(hovered_card->location == LOCATION_HAND && !mainGame->dInfo.is_shuffling && mainGame->dInfo.curMsg != MSG_SHUFFLE_HAND) {
@@ -1425,22 +1449,20 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					if(mcard->equipTarget)
 						mcard->equipTarget->is_showequip = true;
-					if(mcard->equipped.size())
-						for(auto cit = mcard->equipped.begin(); cit != mcard->equipped.end(); ++cit)
-							(*cit)->is_showequip = true;
-					if(mcard->cardTarget.size())
-						for(auto cit = mcard->cardTarget.begin(); cit != mcard->cardTarget.end(); ++cit)
-							(*cit)->is_showtarget = true;
-					if(mcard->ownerTarget.size())
-						for(auto cit = mcard->ownerTarget.begin(); cit != mcard->ownerTarget.end(); ++cit)
-							(*cit)->is_showtarget = true;
+					for(auto cit = mcard->equipped.begin(); cit != mcard->equipped.end(); ++cit)
+						(*cit)->is_showequip = true;
+					for(auto cit = mcard->cardTarget.begin(); cit != mcard->cardTarget.end(); ++cit)
+						(*cit)->is_showtarget = true;
+					for(auto cit = mcard->ownerTarget.begin(); cit != mcard->ownerTarget.end(); ++cit)
+						(*cit)->is_showtarget = true;
 					if(mcard->code) {
 						mainGame->ShowCardInfo(mcard->code);
 						if(mcard->location & 0xe) {
 							std::wstring str;
+							wchar_t formatBuffer[2048];
+							myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
+							str.append(formatBuffer);
 							if(mcard->type & TYPE_MONSTER) {
-								myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
-								str.append(formatBuffer);
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)
 								        && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
@@ -1456,32 +1478,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
 									str.append(formatBuffer);
 								}
-								if(mcard->counters.size()) {
-									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
-										myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
-										str.append(formatBuffer);
-									}
-								}
-								if(mcard->cHint && mcard->chValue && (mcard->location & LOCATION_ONFIELD)) {
-									if(mcard->cHint == CHINT_TURN)
-										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->chValue);
-									else if(mcard->cHint == CHINT_CARD)
-										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(212), dataManager.GetName(mcard->chValue));
-									else if(mcard->cHint == CHINT_RACE)
-										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(213), dataManager.FormatRace(mcard->chValue));
-									else if(mcard->cHint == CHINT_ATTRIBUTE)
-										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(214), dataManager.FormatAttribute(mcard->chValue));
-									else if(mcard->cHint == CHINT_NUMBER)
-										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(215), mcard->chValue);
-									str.append(formatBuffer);
-								}
-								for(auto iter = mcard->desc_hints.begin(); iter != mcard->desc_hints.end(); ++iter) {
-									myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
-									str.append(formatBuffer);
-								}
 							} else {
-								myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
-								str.append(formatBuffer);
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
@@ -1490,33 +1487,31 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
 									str.append(formatBuffer);
 								}
-								if(mcard->counters.size()) {
-									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
-										myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
-										str.append(formatBuffer);
-									}
-								}
-								if(mcard->cHint && mcard->chValue && (mcard->location & LOCATION_ONFIELD)) {
-									if(mcard->cHint == CHINT_TURN)
-										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->chValue);
-									else if(mcard->cHint == CHINT_CARD)
-										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(212), dataManager.GetName(mcard->chValue));
-									else if(mcard->cHint == CHINT_RACE)
-										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(213), dataManager.FormatRace(mcard->chValue));
-									else if(mcard->cHint == CHINT_ATTRIBUTE)
-										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(214), dataManager.FormatAttribute(mcard->chValue));
-									else if(mcard->cHint == CHINT_NUMBER)
-										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(215), mcard->chValue);
-									str.append(formatBuffer);
-								}
-								for(auto iter = mcard->desc_hints.begin(); iter != mcard->desc_hints.end(); ++iter) {
-									myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
-									str.append(formatBuffer);
-								}
+							}
+							for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
+								myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
+								str.append(formatBuffer);
+							}
+							if(mcard->cHint && mcard->chValue && (mcard->location & LOCATION_ONFIELD)) {
+								if(mcard->cHint == CHINT_TURN)
+									myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->chValue);
+								else if(mcard->cHint == CHINT_CARD)
+									myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(212), dataManager.GetName(mcard->chValue));
+								else if(mcard->cHint == CHINT_RACE)
+									myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(213), dataManager.FormatRace(mcard->chValue));
+								else if(mcard->cHint == CHINT_ATTRIBUTE)
+									myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(214), dataManager.FormatAttribute(mcard->chValue));
+								else if(mcard->cHint == CHINT_NUMBER)
+									myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(215), mcard->chValue);
+								str.append(formatBuffer);
+							}
+							for(auto iter = mcard->desc_hints.begin(); iter != mcard->desc_hints.end(); ++iter) {
+								myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
+								str.append(formatBuffer);
 							}
 							mainGame->stTip->setVisible(true);
-							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str());
-							mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x, y));
+							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
+							mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
 							mainGame->stTip->setText(str.c_str());
 						}
 					} else {
@@ -1529,15 +1524,36 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->stText->setText(L"");
 						mainGame->scrCardText->setVisible(false);
 					}
-				} else {
-					mainGame->stTip->setVisible(false);
 				}
 				hovered_card = mcard;
-			} else {
-				if(mainGame->stTip->isVisible()) {
-					irr::core::recti tpos = mainGame->stTip->getRelativePosition();
-					mainGame->stTip->setRelativePosition(irr::core::position2di(x - tpos.getWidth() - 10, y - tpos.getHeight() - 10));
+			}
+			if(mplayer != hovered_player) {
+				if(mplayer >= 0) {
+					const wchar_t* player_name;
+					if(mplayer == 0) {
+						if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[0])
+							player_name = mainGame->dInfo.hostname;
+						else
+							player_name = mainGame->dInfo.hostname_tag;
+					} else {
+						if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[1])
+							player_name = mainGame->dInfo.clientname;
+						else
+							player_name = mainGame->dInfo.clientname_tag;
+					}
+					std::wstring str(player_name);
+					wchar_t formatBuffer[2048];
+					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
+					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {
+						myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
+						str.append(formatBuffer);
+					}
+					mainGame->stTip->setVisible(true);
+					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
+					mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y + 10, x - 10, y + 10 + dtip.Height));
+					mainGame->stTip->setText(str.c_str());
 				}
+				hovered_player = mplayer;
 			}
 			break;
 		}
@@ -1669,6 +1685,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 				}
 				if(display_cards.size()) {
+					wchar_t formatBuffer[2048];
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(loc_id), display_cards.size());
 					mainGame->wCardDisplay->setText(formatBuffer);
 					ShowLocationCard();
@@ -1844,7 +1861,7 @@ void ClientField::GetHoverField(int x, int y) {
 					hovered_sequence = 0;
 			}
 		}
-}
+	}
 }
 void ClientField::ShowMenu(int flag, int x, int y) {
 	if(!flag) {
