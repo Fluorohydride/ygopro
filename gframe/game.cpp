@@ -58,6 +58,7 @@ bool Game::Initialize() {
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
 	RefreshExpansionDB();
+	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
