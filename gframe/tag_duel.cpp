@@ -693,7 +693,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			if(pbuf[5] == LOCATION_HAND) {
+			if(pbuf[5] != LOCATION_DECK) {
 				pbuf += count * 7;
 				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 				NetServer::ReSendToPlayer(players[1]);
