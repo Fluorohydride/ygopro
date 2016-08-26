@@ -601,6 +601,11 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
+		case MSG_PLAYER_HINT: {
+			pbuf += 6;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
 		case MSG_TAG_SWAP: {
 			player = pbuf[0];
 			pbuf += pbuf[2] * 4 + pbuf[4] * 4 + 9;

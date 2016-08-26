@@ -58,6 +58,7 @@ bool Game::Initialize() {
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
 	RefreshExpansionDB();
+	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
@@ -437,6 +438,8 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1318));
 	cbLimit->addItem(dataManager.GetSysString(1240));
 	cbLimit->addItem(dataManager.GetSysString(1241));
+	cbLimit->addItem(dataManager.GetSysString(1242));
+	cbLimit->addItem(dataManager.GetSysString(1243));
 	env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
 	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, -1);
 	cbAttribute->setMaxSelectionRows(10);

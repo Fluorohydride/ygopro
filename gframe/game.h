@@ -496,7 +496,7 @@ extern Game* mainGame;
 #define BUTTON_SAVE_DECK			304
 #define BUTTON_SAVE_DECK_AS			305
 #define BUTTON_DELETE_DECK			306
-#define BUTTON_DBEXIT				307
+//#define BUTTON_DBEXIT				307
 #define BUTTON_SORT_DECK			308
 #define BUTTON_SIDE_OK				309
 #define BUTTON_SHUFFLE_DECK			310
