@@ -773,7 +773,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						if(selectable_cards[i + pos]->is_selected)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
-						else if(selectable_cards[i + pos]->controler)
+						else if((selectable_cards[i + pos]->controler)
+							|| ((selectable_cards[i + pos]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (selectable_cards[i + pos]->position & POS_FACEDOWN)))
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					}
@@ -805,7 +806,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					} else {
-						if(display_cards[i + pos]->controler)
+						if((display_cards[i + pos]->controler)
+							|| ((display_cards[i + pos]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (display_cards[i + pos]->position & POS_FACEDOWN)))
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					}

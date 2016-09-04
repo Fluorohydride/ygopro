@@ -398,7 +398,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			} else {
-				if(selectable_cards[i]->controler)
+				if((selectable_cards[i]->controler)
+					|| ((selectable_cards[i]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (selectable_cards[i]->position & POS_FACEDOWN)))
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			}
@@ -520,7 +521,8 @@ void ClientField::ShowLocationCard() {
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		} else {
-			if(display_cards[i]->controler)
+			if((display_cards[i]->controler)
+				|| ((display_cards[i]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (display_cards[i]->position & POS_FACEDOWN)))
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		}
