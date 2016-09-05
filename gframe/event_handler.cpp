@@ -738,6 +738,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_CARD_SELECT: {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
+					// draw selectable_cards[i + pos] in btnCardSelect[i]
 					mainGame->stCardPos[i]->enableOverrideColor(false);
 					if(selectable_cards[i + pos]->code)
 						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
@@ -765,18 +766,29 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
 						if(selectable_cards[i + pos]->owner != selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
+						// BackgroundColor: controller of the xyz monster
 						if(selectable_cards[i + pos]->is_selected)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 						else if(selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-						else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+						else 
+							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+					} else if(selectable_cards[i + pos]->location == LOCATION_EXTRA || selectable_cards[i + pos]->location == LOCATION_REMOVED) {
+						if(selectable_cards[i + pos]->position & POS_FACEDOWN)
+							mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
+						if(selectable_cards[i + pos]->is_selected)
+							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
+						else if(selectable_cards[i + pos]->controler)
+							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+						else 
+							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					} else {
 						if(selectable_cards[i + pos]->is_selected)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
-						else if((selectable_cards[i + pos]->controler)
-							|| ((selectable_cards[i + pos]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (selectable_cards[i + pos]->position & POS_FACEDOWN)))
+						else if(selectable_cards[i + pos]->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-						else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+						else 
+							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
 				break;
@@ -784,6 +796,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_CARD_DISPLAY: {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
+					// draw display_cards[i + pos] in btnCardDisplay[i]
 					mainGame->stDisplayPos[i]->enableOverrideColor(false);
 					if(display_cards[i + pos]->code)
 						mainGame->btnCardDisplay[i]->setImage(imageManager.GetTexture(display_cards[i + pos]->code));
@@ -802,14 +815,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
 						if(display_cards[i + pos]->owner != display_cards[i + pos]->overlayTarget->controler)
 							mainGame->stDisplayPos[i]->setOverrideColor(0xff0000ff);
+						// BackgroundColor: controller of the xyz monster
 						if(display_cards[i + pos]->overlayTarget->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
-					} else {
-						if((display_cards[i + pos]->controler)
-							|| ((display_cards[i + pos]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (display_cards[i + pos]->position & POS_FACEDOWN)))
+						else 
+							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+					} else if(display_cards[i + pos]->location == LOCATION_EXTRA || display_cards[i + pos]->location == LOCATION_REMOVED) {
+						if(display_cards[i + pos]->position & POS_FACEDOWN)
+							mainGame->stDisplayPos[i]->setOverrideColor(0xff0000ff);
+						if(display_cards[i + pos]->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-						else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+						else 
+							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+					} else {
+						if(display_cards[i + pos]->controler)
+							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
+						else 
+							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
 				break;
