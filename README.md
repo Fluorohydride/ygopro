@@ -1,20 +1,14 @@
 ## ygopro(server)
-一个linux版的ygopro服务端，基于mycard代码修改。
-
-现用于[YGOPRO 233服](http://mercury233.me/ygosrv233/)。
+一个linux版的ygopro服务端。
 
 ###编译
 * 需要以下组件
  * premake4
- * freetype
  * libevent
  * sqlite3
- * irrlicht1.8
  * lua5.2
- * libGL
- * libGLU
  * gcc
-* 可参考 https://github.com/mycard/mycard.github.io/tree/master/server 中的脚本
+* 可参考 https://github.com/mercury233/ygopro-server/wiki 中的脚本
 
 ###运行
 * 使用[ygopro-server-lite](https://github.com/mercury233/ygopro-server)运行

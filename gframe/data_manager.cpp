@@ -72,8 +72,6 @@ bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
 	if(!fp)
 		return false;
-	for(int i = 0; i < 2048; ++i)
-		_sysStrings[i] = 0;
 	char linebuf[256];
 	char strbuf[256];
 	int value;

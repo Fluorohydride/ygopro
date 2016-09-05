@@ -748,7 +748,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			if(pbuf[5] == LOCATION_HAND) {
+			if(pbuf[5] != LOCATION_DECK) {
 				pbuf += count * 7;
 				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 				NetServer::ReSendToPlayer(players[1]);
@@ -1377,6 +1377,16 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		}
 		case MSG_CARD_HINT: {
 			pbuf += 9;
+			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			break;
+		}
+		case MSG_PLAYER_HINT: {
+			pbuf += 6;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			NetServer::ReSendToPlayer(players[2]);

@@ -66,6 +66,7 @@ public:
 	std::vector<ClientCard*> selectsum_all;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
+	std::map<int, int> player_desc_hints[2];
 	bool grave_act;
 	bool remove_act;
 	bool deck_act;
@@ -115,11 +116,11 @@ public:
 	int command_location;
 	size_t command_sequence;
 	ClientCard* hovered_card;
+	int hovered_player;
 	ClientCard* clicked_card;
 	ClientCard* command_card;
 	ClientCard* highlighting_card;
 	int list_command;
-	wchar_t formatBuffer[2048];
 
 	virtual bool OnEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);

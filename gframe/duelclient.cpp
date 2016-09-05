@@ -2977,6 +2977,20 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		return true;
 	}
+	case MSG_PLAYER_HINT: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int chtype = BufferIO::ReadInt8(pbuf);
+		int value = BufferIO::ReadInt32(pbuf);
+		auto& player_desc_hints = mainGame->dField.player_desc_hints[player];
+		if(chtype == PHINT_DESC_ADD) {
+			player_desc_hints[value]++;
+		} else if(chtype == PHINT_DESC_REMOVE) {
+			player_desc_hints[value]--;
+			if(player_desc_hints[value] == 0)
+				player_desc_hints.erase(value);
+		}
+		return true;
+	}
 	case MSG_MATCH_KILL: {
 		match_kill = BufferIO::ReadInt32(pbuf);
 		return true;

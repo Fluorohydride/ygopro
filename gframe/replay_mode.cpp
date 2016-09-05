@@ -765,6 +765,11 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
+		case MSG_PLAYER_HINT: {
+			pbuf += 6;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
 		case MSG_MATCH_KILL: {
 			pbuf += 4;
 			break;

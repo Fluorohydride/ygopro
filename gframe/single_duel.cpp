@@ -1340,6 +1340,14 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 				NetServer::ReSendToPlayer(*oit);
 			break;
 		}
+		case MSG_PLAYER_HINT: {
+			pbuf += 6;
+			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::ReSendToPlayer(players[1]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			break;
+		}
 		case MSG_MATCH_KILL: {
 			int code = BufferIO::ReadInt32(pbuf);
 			if(match_mode) {
