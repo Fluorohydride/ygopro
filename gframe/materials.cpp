@@ -356,6 +356,11 @@ Materials::Materials() {
 	vFields[133] = S3DVertex(vector3df(0.2f, -1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
 	vFields[134] = S3DVertex(vector3df(1.0f, -2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
 	vFields[135] = S3DVertex(vector3df(0.2f, -2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
+	//conti_act
+	vFields[136] = S3DVertex(vector3df(-0.8f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
+	vFields[137] = S3DVertex(vector3df(0.0f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
+	vFields[138] = S3DVertex(vector3df(-0.8f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
+	vFields[139] = S3DVertex(vector3df(0.0f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
 
 
 	for(int i = 0; i < 40; ++i)

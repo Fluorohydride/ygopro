@@ -329,14 +329,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						for(size_t i = 0; i < remove[command_controler].size(); ++i)
 							if(remove[command_controler][i]->cmdFlag & COMMAND_ACTIVATE)
 								selectable_cards.push_back(remove[command_controler][i]);
-						selectable_cards.reserve(selectable_cards.size() + conti_cards.size());
-						selectable_cards.insert(selectable_cards.end(), conti_cards.begin(), conti_cards.end());
 						break;
 					}
 					case LOCATION_EXTRA: {
 						for(size_t i = 0; i < extra[command_controler].size(); ++i)
 							if(extra[command_controler][i]->cmdFlag & COMMAND_ACTIVATE)
 								selectable_cards.push_back(extra[command_controler][i]);
+						break;
+					}
+					case POSITION_HINT: {
+						selectable_cards.insert(selectable_cards.end(), conti_cards.begin(), conti_cards.end());
 						break;
 					}
 					}
@@ -1106,14 +1108,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_REMOVED: {
 					int command_flag = 0;
-					if(remove[hovered_controler].size() == 0 && conti_cards.size() == 0)
+					if(remove[hovered_controler].size() == 0)
 						break;
 					for(size_t i = 0; i < remove[hovered_controler].size(); ++i)
 						command_flag |= remove[hovered_controler][i]->cmdFlag;
-					if(conti_cards.size())
-						command_flag |= COMMAND_ACTIVATE;
-					if(remove[hovered_controler].size())
-						command_flag |= COMMAND_LIST;
+					command_flag |= COMMAND_LIST;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;
@@ -1125,6 +1124,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					for(size_t i = 0; i < extra[hovered_controler].size(); ++i)
 						command_flag |= extra[hovered_controler][i]->cmdFlag;
 					command_flag |= COMMAND_LIST;
+					list_command = 1;
+					ShowMenu(command_flag, x, y);
+					break;
+				}
+				case POSITION_HINT: {
+					int command_flag = 0;
+					if(conti_cards.size() == 0)
+						break;
+					if(conti_cards.size())
+						command_flag |= COMMAND_ACTIVATE;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;
@@ -1829,6 +1838,9 @@ void ClientField::GetHoverField(int x, int y) {
 			if(boardy >= matManager.vFields[82].Pos.Y && boardy <= matManager.vFields[80].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_REMOVED;
+			} else if(boardy >= matManager.vFields[136].Pos.Y && boardy <= matManager.vFields[138].Pos.Y) {
+				hovered_controler = 0;
+				hovered_location = POSITION_HINT;
 			}
 		} else if(boardx >= matManager.vFields[0].Pos.X && boardx <= matManager.vFields[1].Pos.X) {
 			if(boardy >= matManager.vFields[0].Pos.Y && boardy <= matManager.vFields[2].Pos.Y) {

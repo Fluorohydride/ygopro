@@ -1211,7 +1211,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->is_conti = true;
 				pcard->chain_code = code % 1000000000;
 				mainGame->dField.conti_cards.push_back(pcard);
-				mainGame->dField.remove_act = true;
+				mainGame->dField.conti_act = true;
 			} else {
 				pcard->chain_code = code;
 				pcard->is_selectable = true;

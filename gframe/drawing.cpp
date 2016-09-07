@@ -321,6 +321,12 @@ void Game::DrawMisc() {
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
+	if(dField.conti_act) {
+		im.setTranslation(vector3df(matManager.vFields[136].Pos.X - (matManager.vFields[136].Pos.X - matManager.vFields[137].Pos.X)/2,
+			matManager.vFields[136].Pos.Y - (matManager.vFields[136].Pos.Y - matManager.vFields[138].Pos.Y)/2, 0.03f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
 	if(dField.chains.size() > 1) {
 		for(size_t i = 0; i < dField.chains.size(); ++i) {
 			if(dField.chains[i].solved)

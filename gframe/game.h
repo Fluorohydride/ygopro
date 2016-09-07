@@ -412,6 +412,8 @@ extern Game* mainGame;
 #define COMMAND_ATTACK		0x0040
 #define COMMAND_LIST		0x0080
 
+#define POSITION_HINT		0x8000
+
 #define BUTTON_LAN_MODE				100
 #define BUTTON_SINGLE_MODE			101
 #define BUTTON_REPLAY_MODE			102

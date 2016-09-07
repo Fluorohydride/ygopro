@@ -71,6 +71,7 @@ public:
 	bool deck_act;
 	bool extra_act;
 	bool pzone_act[2];
+	bool conti_act;
 	bool chain_forced;
 	ChainInfo current_chain;
 	bool last_chain;

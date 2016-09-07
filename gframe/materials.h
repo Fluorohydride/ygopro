@@ -20,7 +20,7 @@ public:
 	S3DVertex vFieldSpell1[4];
 	S3DVertex vFieldSpell2[4];
 	S3DVertex vBackLine[76];
-	S3DVertex vFields[136];
+	S3DVertex vFields[140];
 	S3DVertex vArrow[40];
 	SColor c2d[4];
 	u16 iRectangle[6];

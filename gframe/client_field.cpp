@@ -20,6 +20,7 @@ ClientField::ClientField() {
 	extra_act = false;
 	pzone_act[0] = false;
 	pzone_act[1] = false;
+	conti_act = false;
 	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
@@ -76,6 +77,7 @@ void ClientField::Clear() {
 	extra_act = false;
 	pzone_act[0] = false;
 	pzone_act[1] = false;
+	conti_act = false;
 	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
@@ -335,6 +337,7 @@ void ClientField::ClearCommandFlag() {
 	remove_act = false;
 	pzone_act[0] = false;
 	pzone_act[1] = false;
+	conti_act = false;
 }
 void ClientField::ClearSelect() {
 	std::vector<ClientCard*>::iterator cit;
@@ -356,6 +359,7 @@ void ClientField::ClearChainSelect() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
+	conti_act = false;
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
