@@ -193,8 +193,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					deckManager.current_deck.main.clear();
 					deckManager.current_deck.extra.clear();
 					deckManager.current_deck.side.clear();
-				}
-				else if(is_deleting) {
+				} else if(is_deleting) {
 					int sel = mainGame->cbDBDecks->getSelected();
 					if (deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 						mainGame->cbDBDecks->removeItem(sel);
@@ -603,14 +602,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					deckManager.current_deck.main.push_back(draging_pointer);
 				else if (deckManager.current_deck.side.size() < 15)
 					deckManager.current_deck.side.push_back(draging_pointer);
-			}
-			else if (hovered_pos == 2) {
+			} else if (hovered_pos == 2) {
 				if (deckManager.current_deck.extra.size() < 15)
 					deckManager.current_deck.extra.push_back(draging_pointer);
 				else if (deckManager.current_deck.side.size() < 15)
 					deckManager.current_deck.side.push_back(draging_pointer);
-			}
-			else if (hovered_pos == 3) {
+			} else if (hovered_pos == 3) {
 				if (deckManager.current_deck.side.size() < 15)
 					deckManager.current_deck.side.push_back(draging_pointer);
 				else {
@@ -619,8 +616,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					else if (!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 60)
 						deckManager.current_deck.main.push_back(draging_pointer);
 				}
-			}
-			else {
+			} else {
 				if ((draging_pointer->second.type & 0x802040) && deckManager.current_deck.extra.size() < 15)
 					deckManager.current_deck.extra.push_back(draging_pointer);
 				else if (!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 60)

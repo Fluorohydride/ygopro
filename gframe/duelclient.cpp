@@ -1860,8 +1860,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->btnChainAlways->setVisible(true);
 				mainGame->btnChainWhenAvail->setVisible(true);
 				mainGame->dField.UpdateChainButtons();
-			}
-			else {
+			} else {
 				mainGame->btnChainIgnore->setVisible(false);
 				mainGame->btnChainAlways->setVisible(false);
 				mainGame->btnChainWhenAvail->setVisible(false);
