@@ -1035,6 +1035,24 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
+				case LOCATION_REMOVED: {
+					if (remove[hovered_controler].size() == 0)
+						break;
+					for (int32 i = (int32)remove[hovered_controler].size() - 1; i >= 0; --i)
+						selectable_cards.push_back(remove[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				case LOCATION_EXTRA: {
+					if (extra[hovered_controler].size() == 0)
+						break;
+					for (int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0; --i)
+						selectable_cards.push_back(extra[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
 				}
 				if(selectable_cards.size())
 					ShowSelectCard(true);
