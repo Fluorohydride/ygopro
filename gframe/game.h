@@ -325,6 +325,8 @@ public:
 	irr::gui::IGUIButton* btnRepos;
 	irr::gui::IGUIButton* btnAttack;
 	irr::gui::IGUIButton* btnShowList;
+	irr::gui::IGUIButton* btnOperation;
+	irr::gui::IGUIButton* btnReset;
 	irr::gui::IGUIButton* btnShuffle;
 	//chat window
 	irr::gui::IGUIWindow* wChat;
@@ -411,6 +413,8 @@ extern Game* mainGame;
 #define COMMAND_REPOS		0x0020
 #define COMMAND_ATTACK		0x0040
 #define COMMAND_LIST		0x0080
+#define COMMAND_OPERATION	0x0100
+#define COMMAND_RESET		0x0200
 
 #define POSITION_HINT		0x8000
 

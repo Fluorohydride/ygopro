@@ -312,6 +312,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 				} else {
 					selectable_cards.clear();
+					bool conti_exist = false;
 					switch(command_location) {
 					case LOCATION_DECK: {
 						for(size_t i = 0; i < deck[command_controler].size(); ++i)
@@ -339,11 +340,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					case POSITION_HINT: {
 						selectable_cards.insert(selectable_cards.end(), conti_cards.begin(), conti_cards.end());
+						conti_exist = true;
 						break;
 					}
 					}
-					mainGame->wCardSelect->setText(dataManager.GetSysString(566));
-					list_command = COMMAND_ACTIVATE;
+					if(!conti_exist) {
+						mainGame->wCardSelect->setText(dataManager.GetSysString(566));
+						list_command = COMMAND_ACTIVATE;
+					} else {
+						mainGame->wCardSelect->setText(dataManager.GetSysString(568));
+						list_command = COMMAND_OPERATION;
+					}
 					ShowSelectCard(true, true);
 				}
 				break;
@@ -546,7 +553,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->HideElement(mainGame->wCardSelect, true);
 						break;
 					}
-					if(list_command == COMMAND_ACTIVATE) {
+					if(list_command == COMMAND_ACTIVATE || list_command == COMMAND_OPERATION) {
 						int index = -1;
 						command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 						select_options.clear();
@@ -1133,7 +1140,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(conti_cards.size() == 0)
 						break;
 					if(conti_cards.size())
-						command_flag |= COMMAND_ACTIVATE;
+						command_flag |= COMMAND_OPERATION;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;
@@ -1955,6 +1962,16 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		mainGame->btnShowList->setRelativePosition(position2di(1, height));
 		height += 21;
 	} else mainGame->btnShowList->setVisible(false);
+	if(flag & COMMAND_OPERATION) {
+		mainGame->btnOperation->setVisible(true);
+		mainGame->btnOperation->setRelativePosition(position2di(1, height));
+		height += 21;
+	} else mainGame->btnOperation->setVisible(false);
+	if(flag & COMMAND_RESET) {
+		mainGame->btnReset->setVisible(true);
+		mainGame->btnReset->setRelativePosition(position2di(1, height));
+		height += 21;
+	} else mainGame->btnReset->setVisible(false);
 	panel = mainGame->wCmdMenu;
 	mainGame->wCmdMenu->setVisible(true);
 	mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - 20 , y - 20 - height, x + 80, y - 20));

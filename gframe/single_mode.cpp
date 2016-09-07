@@ -215,7 +215,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += 10 + count * 12;
+			pbuf += 10 + count * 13;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();
