@@ -1217,8 +1217,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			} else {
 				pcard->chain_code = code;
 				pcard->is_selectable = true;
-				if(flag == 0x2)
+				if(flag == 0x2) {
 					pcard->cmdFlag |= COMMAND_RESET;
+					mainGame->dField.reset_descs.insert(desc);
+				}
 				else
 					pcard->cmdFlag |= COMMAND_ACTIVATE;
 				if(l == LOCATION_GRAVE)
