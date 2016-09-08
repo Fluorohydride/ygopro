@@ -400,11 +400,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnHostPrepKick[1]->setVisible(false);
 			}
 			mainGame->chkHostPrepReady[0]->setEnabled(false);
-			mainGame->chkHostPrepReady[0]->setChecked(false);
 			mainGame->chkHostPrepReady[1]->setEnabled(false);
-			mainGame->chkHostPrepReady[1]->setChecked(false);
 			if(selftype < 2) {
 				mainGame->chkHostPrepReady[selftype]->setEnabled(true);
+				mainGame->chkHostPrepReady[selftype]->setChecked(false);
 				mainGame->btnHostPrepDuelist->setEnabled(false);
 				mainGame->btnHostPrepOB->setEnabled(true);
 			} else {
@@ -1198,7 +1197,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.activatable_descs.clear();
 		mainGame->dField.conti_cards.clear();
 		for (int i = 0; i < count; ++i) {
-			int flag = BufferIO::ReadInt8(pbuf);;
+			int flag = BufferIO::ReadInt8(pbuf);
 			code = BufferIO::ReadInt32(pbuf);
 			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 			l = BufferIO::ReadInt8(pbuf);
