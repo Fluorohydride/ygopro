@@ -159,7 +159,7 @@ void Game::DrawBackGround() {
 		}
 	}
 	//current sel
-	if (dField.hovered_location != 0 && dField.hovered_location != 2) {
+	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT) {
 		int index = 0;
 		if (dField.hovered_controler == 0) {
 			if (dField.hovered_location == LOCATION_DECK) index = 0;
