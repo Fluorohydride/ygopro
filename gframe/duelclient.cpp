@@ -1196,6 +1196,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
 		mainGame->dField.conti_cards.clear();
+		mainGame->dField.reset_descs.clear();
 		for (int i = 0; i < count; ++i) {
 			int flag = BufferIO::ReadInt8(pbuf);
 			code = BufferIO::ReadInt32(pbuf);
