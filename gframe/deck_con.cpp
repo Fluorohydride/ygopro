@@ -746,7 +746,7 @@ void DeckBuilder::FilterCards() {
 	results.clear();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
 	int trycode = BufferIO::GetVal(pstr);
-	if(dataManager.GetData(trycode, 0)) {
+	if (dataManager.GetData(trycode, 0)) {
 		auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
 		results.push_back(ptr);
 		mainGame->scrFilter->setVisible(false);
@@ -754,113 +754,149 @@ void DeckBuilder::FilterCards() {
 		myswprintf(result_string, L"%d", results.size());
 		return;
 	}
-	unsigned int set_code = 0;
-	if(pstr[0] == L'@')
-		set_code = dataManager.GetSetCode(&pstr[1]);
-	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
-		pstr = 0;
+	std::wstring str = std::wstring(pstr);
+	std::vector<std::wstring> query_elements;
+	std::vector<std::vector<std::wstring>::iterator> query_elements_track;
+	size_t element_start = 0;
+	while (1) {
+		size_t element_end = str.find_first_of(L' ', element_start);
+		if (element_end == std::wstring::npos) {
+			break;
+		}
+		query_elements.push_back(str.substr(element_start, element_end - element_start));
+		element_start = element_end + 1;
+	}
+	query_elements.push_back(str.substr(element_start));
+	std::unordered_map<std::wstring, unsigned int> set_code_map;
+	for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); elements_iterator++) {
+		const wchar_t* element_pointer = elements_iterator->c_str();
+		if (element_pointer[0] == L'@')
+			set_code_map[*elements_iterator] = dataManager.GetSetCode(&element_pointer[1]);
+		if (element_pointer[0] == 0 || (element_pointer[0] == L'$' && element_pointer[1] == 0) || (element_pointer[0] == L'@' && element_pointer[1] == 0))
+			query_elements_track.push_back(elements_iterator);
+	}
+	for (auto elements_track_iterator = query_elements_track.begin(); elements_track_iterator != query_elements_track.end(); elements_track_iterator++) {
+		query_elements.erase(*elements_track_iterator);
+	}
 	auto strpointer = dataManager._strings.begin();
-	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
+	for (code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
 		const CardDataC& data = ptr->second;
 		const CardString& text = strpointer->second;
-		if(data.type & TYPE_TOKEN)
+		if (data.type & TYPE_TOKEN)
 			continue;
-		switch(filter_type) {
+		switch (filter_type) {
 		case 1: {
-			if(!(data.type & TYPE_MONSTER) || (data.type & filter_type2) != filter_type2)
+			if (!(data.type & TYPE_MONSTER) || (data.type & filter_type2) != filter_type2)
 				continue;
-			if(filter_race && data.race != filter_race)
+			if (filter_race && data.race != filter_race)
 				continue;
-			if(filter_attrib && data.attribute != filter_attrib)
+			if (filter_attrib && data.attribute != filter_attrib)
 				continue;
-			if(filter_atktype) {
-				if((filter_atktype == 1 && data.attack != filter_atk) || (filter_atktype == 2 && data.attack < filter_atk)
-				        || (filter_atktype == 3 && data.attack <= filter_atk) || (filter_atktype == 4 && (data.attack > filter_atk || data.attack < 0))
-				        || (filter_atktype == 5 && (data.attack >= filter_atk || data.attack < 0)) || (filter_atktype == 6 && data.attack != -2))
+			if (filter_atktype) {
+				if ((filter_atktype == 1 && data.attack != filter_atk) || (filter_atktype == 2 && data.attack < filter_atk)
+					|| (filter_atktype == 3 && data.attack <= filter_atk) || (filter_atktype == 4 && (data.attack > filter_atk || data.attack < 0))
+					|| (filter_atktype == 5 && (data.attack >= filter_atk || data.attack < 0)) || (filter_atktype == 6 && data.attack != -2))
 					continue;
 			}
-			if(filter_deftype) {
-				if((filter_deftype == 1 && data.defense != filter_def) || (filter_deftype == 2 && data.defense < filter_def)
-				        || (filter_deftype == 3 && data.defense <= filter_def) || (filter_deftype == 4 && (data.defense > filter_def || data.defense < 0))
-				        || (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2))
+			if (filter_deftype) {
+				if ((filter_deftype == 1 && data.defense != filter_def) || (filter_deftype == 2 && data.defense < filter_def)
+					|| (filter_deftype == 3 && data.defense <= filter_def) || (filter_deftype == 4 && (data.defense > filter_def || data.defense < 0))
+					|| (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2))
 					continue;
 			}
-			if(filter_lvtype) {
-				if((filter_lvtype == 1 && data.level != filter_lv) || (filter_lvtype == 2 && data.level < filter_lv)
-				        || (filter_lvtype == 3 && data.level <= filter_lv) || (filter_lvtype == 4 && data.level > filter_lv)
-				        || (filter_lvtype == 5 && data.level >= filter_lv) || filter_lvtype == 6)
+			if (filter_lvtype) {
+				if ((filter_lvtype == 1 && data.level != filter_lv) || (filter_lvtype == 2 && data.level < filter_lv)
+					|| (filter_lvtype == 3 && data.level <= filter_lv) || (filter_lvtype == 4 && data.level > filter_lv)
+					|| (filter_lvtype == 5 && data.level >= filter_lv) || filter_lvtype == 6)
 					continue;
 			}
-			if(filter_scltype) {
-				if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
-				        || (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
-				        || (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6)
+			if (filter_scltype) {
+				if ((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
+					|| (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
+					|| (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6)
 					continue;
 			}
 			break;
 		}
 		case 2: {
-			if(!(data.type & TYPE_SPELL))
+			if (!(data.type & TYPE_SPELL))
 				continue;
-			if(filter_type2 && data.type != filter_type2)
+			if (filter_type2 && data.type != filter_type2)
 				continue;
 			break;
 		}
 		case 3: {
-			if(!(data.type & TYPE_TRAP))
+			if (!(data.type & TYPE_TRAP))
 				continue;
-			if(filter_type2 && data.type != filter_type2)
+			if (filter_type2 && data.type != filter_type2)
 				continue;
 			break;
 		}
 		}
-		if(filter_effect && !(data.category & filter_effect))
+		if (filter_effect && !(data.category & filter_effect))
 			continue;
-		if(filter_lm) {
-			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1))
+		if (filter_lm) {
+			if (filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1))
 				continue;
-			if(filter_lm == 4 && data.ot != 1)
+			if (filter_lm == 4 && data.ot != 1)
 				continue;
-			if(filter_lm == 5 && data.ot != 2)
+			if (filter_lm == 5 && data.ot != 2)
 				continue;
 			if(filter_lm == 6 && data.ot != 3)
 				continue;
 			if(filter_lm == 7 && data.ot != 4)
 				continue;
 		}
-		if(pstr) {
-			if(pstr[0] == L'$') {
-				if(wcsstr(text.name, &pstr[1]) == 0)
-					continue;
-			} else if(pstr[0] == L'@' && set_code) {
+		bool is_target = true;
+		for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); elements_iterator++) {
+			const wchar_t* element_pointer = elements_iterator->c_str();
+			if (element_pointer[0] == L'$') {
+				if (wcsstr(text.name, &element_pointer[1]) == 0) {
+					is_target = false;
+					break;
+				}
+			}
+			else if (element_pointer[0] == L'@' && set_code_map[*elements_iterator]) {
 				unsigned long long sc = data.setcode;
-				if(data.alias) {
+				if (data.alias) {
 					auto aptr = dataManager._datas.find(data.alias);
-					if(aptr != dataManager._datas.end())
+					if (aptr != dataManager._datas.end())
 						sc = aptr->second.setcode;
 				}
 				bool res = false;
-				int settype = set_code & 0xfff;
-				int setsubtype = set_code & 0xf000;
-				while(sc) {
+				int settype = set_code_map[*elements_iterator] & 0xfff;
+				int setsubtype = set_code_map[*elements_iterator] & 0xf000;
+				while (sc) {
 					if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
 						res = true;
 					sc = sc >> 16;
 				}
-				if(!res) continue;
-			} else {
-				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
-					continue;
+				if (!res) {
+					is_target = false;
+					break;
+				}
+			}
+			else {
+				if (wcsstr(text.name, elements_iterator->c_str()) == 0 && wcsstr(text.text, elements_iterator->c_str()) == 0) {
+					is_target = false;
+					break;
+				}
 			}
 		}
-		results.push_back(ptr);
+		if (is_target) {
+			results.push_back(ptr);
+		}
+		else {
+			continue;
+		}
 	}
 	myswprintf(result_string, L"%d", results.size());
-	if(results.size() > 7) {
+	if (results.size() > 7) {
 		mainGame->scrFilter->setVisible(true);
 		mainGame->scrFilter->setMax(results.size() - 7);
 		mainGame->scrFilter->setPos(0);
-	} else {
+	}
+	else {
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
 	}
