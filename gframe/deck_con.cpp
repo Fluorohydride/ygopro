@@ -39,6 +39,25 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 	*type = 0;
 	return 0;
 }
+
+static bool check_set_code(const CardDataC& data, int set_code) {
+	unsigned long long sc = data.setcode;
+	if (data.alias) {
+		auto aptr = dataManager._datas.find(data.alias);
+		if (aptr != dataManager._datas.end())
+			sc = aptr->second.setcode;
+	}
+	bool res = false;
+	int settype = set_code & 0xfff;
+	int setsubtype = set_code & 0xf000;
+	while (sc) {
+		if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
+			res = true;
+		sc = sc >> 16;
+	}
+	return res;
+}
+
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
@@ -833,24 +852,13 @@ void DeckBuilder::FilterCards() {
 				if(wcsstr(text.name, &pstr[1]) == 0)
 					continue;
 			} else if(pstr[0] == L'@' && set_code) {
-				unsigned long long sc = data.setcode;
-				if(data.alias) {
-					auto aptr = dataManager._datas.find(data.alias);
-					if(aptr != dataManager._datas.end())
-						sc = aptr->second.setcode;
-				}
-				bool res = false;
-				int settype = set_code & 0xfff;
-				int setsubtype = set_code & 0xf000;
-				while(sc) {
-					if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
-						res = true;
-					sc = sc >> 16;
-				}
-				if(!res) continue;
+				if(!check_set_code(data, set_code)) continue;
 			} else {
-				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
-					continue;
+				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0) {
+					set_code = dataManager.GetSetCode(&pstr[0]);
+					if(!set_code || !check_set_code(data, set_code))
+						continue;
+				}
 			}
 		}
 		results.push_back(ptr);
