@@ -1630,7 +1630,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(formatBuffer) + irr::core::dimension2d<unsigned int>(10, 10);
 					mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
 				}
-			} else {
+				mainGame->stTip->setVisible(should_show_tip);
+				break;
+			}
 			hovered_location = 0;
 			ClientCard* mcard = 0;
 			int mplayer = -1;
@@ -1804,11 +1806,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				hovered_player = mplayer;
 			}
-			}
-			if(should_show_tip)
-				mainGame->stTip->setVisible(true);
-			else
-				mainGame->stTip->setVisible(false);
+			mainGame->stTip->setVisible(should_show_tip);
 			break;
 		}
 		case irr::EMIE_MOUSE_WHEEL: {
