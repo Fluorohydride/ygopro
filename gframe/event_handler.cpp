@@ -430,10 +430,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					select_options.clear();
 					for (size_t i = 0; i < activatable_cards.size(); ++i) {
 						if (activatable_cards[i] == clicked_card) {
-							if(reset_descs.find(activatable_descs[i]) != reset_descs.end())
+							if(conti_descs.find(activatable_descs[i]) != conti_descs.end())
+								continue;
+							if(reset_descs.find(activatable_descs[i]) != reset_descs.end()) {
 								if(id == BUTTON_CMD_ACTIVATE) continue;
-							else
+							} else {
 								if(id == BUTTON_CMD_RESET) continue;
+							}
 							select_options.push_back(activatable_descs[i]);
 							if (index == -1) index = i;
 						}
@@ -705,6 +708,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						select_options.clear();
 						for (size_t i = 0; i < activatable_cards.size(); ++i) {
 							if (activatable_cards[i] == command_card) {
+								if(conti_descs.find(activatable_descs[i]) != conti_descs.end()) {
+									if(list_command == COMMAND_ACTIVATE) continue;
+								} else {
+									if(list_command == COMMAND_OPERATION) continue;
+								}
 								select_options.push_back(activatable_descs[i]);
 								if (index == -1) index = i;
 							}

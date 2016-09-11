@@ -39,6 +39,7 @@ public:
 	std::vector<ClientCard*> conti_cards;
 	std::vector<int> activatable_descs;
 	std::set<int> reset_descs;
+	std::set<int> conti_descs;
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
 	int extra_p_count[2];

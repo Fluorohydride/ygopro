@@ -1205,6 +1205,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.activatable_descs.clear();
 		mainGame->dField.conti_cards.clear();
 		mainGame->dField.reset_descs.clear();
+		mainGame->dField.conti_descs.clear();
 		for (int i = 0; i < count; ++i) {
 			int flag = BufferIO::ReadInt8(pbuf);
 			code = BufferIO::ReadInt32(pbuf);
@@ -1222,6 +1223,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
+				mainGame->dField.conti_descs.insert(desc);
 				conti_exist = true;
 			} else {
 				pcard->chain_code = code;
