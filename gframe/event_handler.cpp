@@ -1468,6 +1468,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_RMOUSE_LEFT_UP: {
 			if(mainGame->dInfo.isReplay)
 				break;
+			s32 x = event.MouseInput.X;
+			s32 y = event.MouseInput.Y;
+			irr::core::position2di pos(x, y);
+			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+			if(root->getElementFromPoint(pos) == mainGame->btnCancelOrFinish)
+				mainGame->chkHideHintButton->setChecked(true);
 			if(mainGame->gameConf.control_mode == 1 && event.MouseInput.X > 300) {
 				mainGame->ignore_chain = event.MouseInput.isRightPressed();
 				mainGame->always_chain = false;
@@ -1611,8 +1617,18 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			s32 x = event.MouseInput.X;
 			s32 y = event.MouseInput.Y;
-			hovered_location = 0;
 			irr::core::position2di pos(x, y);
+			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+			if(root->getElementFromPoint(pos) == mainGame->btnCancelOrFinish) {
+				mainGame->stTip->setVisible(true);
+				wchar_t formatBuffer[2048];
+				myswprintf(formatBuffer, dataManager.GetSysString(1700), mainGame->btnCancelOrFinish->getText());
+				irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(formatBuffer) + irr::core::dimension2d<unsigned int>(10, 10);
+				mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
+				mainGame->stTip->setText(formatBuffer);
+			} else
+				mainGame->stTip->setVisible(false);
+			hovered_location = 0;
 			if(x < 300)
 				break;
 			ClientCard* mcard = 0;
