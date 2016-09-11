@@ -1615,22 +1615,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_MOUSE_MOVED: {
 			if(!mainGame->dInfo.isStarted)
 				break;
+			bool should_show_tip = false;
 			s32 x = event.MouseInput.X;
 			s32 y = event.MouseInput.Y;
 			irr::core::position2di pos(x, y);
-			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-			if(root->getElementFromPoint(pos) == mainGame->btnCancelOrFinish) {
-				mainGame->stTip->setVisible(true);
-				wchar_t formatBuffer[2048];
-				myswprintf(formatBuffer, dataManager.GetSysString(1700), mainGame->btnCancelOrFinish->getText());
-				irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(formatBuffer) + irr::core::dimension2d<unsigned int>(10, 10);
-				mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
-				mainGame->stTip->setText(formatBuffer);
-			} else
-				mainGame->stTip->setVisible(false);
+			wchar_t formatBuffer[2048];
+			if(x < 300) {
+				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+				irr::gui::IGUIElement* elem = root->getElementFromPoint(pos);
+				if(elem == mainGame->btnCancelOrFinish) {
+					should_show_tip = true;
+					myswprintf(formatBuffer, dataManager.GetSysString(1700), mainGame->btnCancelOrFinish->getText());
+					mainGame->stTip->setText(formatBuffer);
+					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(formatBuffer) + irr::core::dimension2d<unsigned int>(10, 10);
+					mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
+				}
+			} else {
 			hovered_location = 0;
-			if(x < 300)
-				break;
 			ClientCard* mcard = 0;
 			int mplayer = -1;
 			if(!panel || !panel->isVisible() || !panel->getRelativePosition().isPointInside(pos)) {
@@ -1656,12 +1657,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mplayer = 1;
 				}
 			}
+
 			if(hovered_location == LOCATION_HAND && (mainGame->dInfo.is_shuffling || mainGame->dInfo.curMsg == MSG_SHUFFLE_HAND))
 				mcard = 0;
 			if(mcard == 0 && mplayer < 0)
-				mainGame->stTip->setVisible(false);
+				should_show_tip = false;
 			else if(mcard == hovered_card && mplayer == hovered_player) {
 				if(mainGame->stTip->isVisible()) {
+					should_show_tip = true;
 					irr::core::recti tpos = mainGame->stTip->getRelativePosition();
 					mainGame->stTip->setRelativePosition(irr::core::position2di(x - tpos.getWidth() - 10, mcard ? y - tpos.getHeight() - 10 : y + 10));
 				}
@@ -1707,7 +1710,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->ShowCardInfo(mcard->code);
 						if(mcard->location & 0xe) {
 							std::wstring str;
-							wchar_t formatBuffer[2048];
 							myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 							str.append(formatBuffer);
 							if(mcard->type & TYPE_MONSTER) {
@@ -1757,13 +1759,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
 								str.append(formatBuffer);
 							}
-							mainGame->stTip->setVisible(true);
+							should_show_tip = true;
 							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
 							mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
 							mainGame->stTip->setText(str.c_str());
 						}
 					} else {
-						mainGame->stTip->setVisible(false);
+						should_show_tip = false;
 						mainGame->imgCard->setImage(imageManager.tCover[0]);
 						mainGame->stName->setText(L"");
 						mainGame->stInfo->setText(L"");
@@ -1790,19 +1792,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							player_name = mainGame->dInfo.clientname_tag;
 					}
 					std::wstring str(player_name);
-					wchar_t formatBuffer[2048];
 					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
 					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {
 						myswprintf(formatBuffer, L"\n*%ls", dataManager.GetDesc(iter->first));
 						str.append(formatBuffer);
 					}
-					mainGame->stTip->setVisible(true);
+					should_show_tip = true;
 					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
 					mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y + 10, x - 10, y + 10 + dtip.Height));
 					mainGame->stTip->setText(str.c_str());
 				}
 				hovered_player = mplayer;
 			}
+			}
+			if(should_show_tip)
+				mainGame->stTip->setVisible(true);
+			else
+				mainGame->stTip->setVisible(false);
 			break;
 		}
 		case irr::EMIE_MOUSE_WHEEL: {
