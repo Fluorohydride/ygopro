@@ -2176,7 +2176,7 @@ void ClientField::UpdateChainButtons() {
 	}
 }
 void ClientField::ShowCancelOrFinishButton(int buttonOp) {
-	if (!mainGame->chkHideChainButton->isChecked() && !mainGame->dInfo.isReplay) {
+	if (!mainGame->chkHideHintButton->isChecked() && !mainGame->dInfo.isReplay) {
 		switch (buttonOp) {
 		case 1:
 			mainGame->btnCancelOrFinish->setText(dataManager.GetSysString(1295));

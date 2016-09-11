@@ -377,7 +377,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
-			position2d<s32> mouse_pos = position2d<s32>(event.MouseInput.X, event.MouseInput.Y);
+			irr::core::position2di mouse_pos(event.MouseInput.X, event.MouseInput.Y);
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) != root)
 				break;
@@ -648,7 +648,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_MOUSE_MOVED: {
 			int x = event.MouseInput.X;
 			int y = event.MouseInput.Y;
-			position2d<s32> mouse_pos = position2d<s32>(x, y);
+			irr::core::position2di mouse_pos(x, y);
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) != root)
 				break;

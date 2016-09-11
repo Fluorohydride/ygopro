@@ -32,7 +32,7 @@ struct Config {
 	int chkIgnore1;
 	int chkIgnore2;
 	int chkHideSetname;
-	int chkHideChainButton;
+	int chkHideHintButton;
 	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
@@ -193,7 +193,7 @@ public:
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkHideSetname;
-	irr::gui::IGUICheckBox* chkHideChainButton;
+	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
