@@ -148,6 +148,137 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				UpdateChainButtons();
 				break;
 			}
+			case BUTTON_CANCEL_OR_FINISH: {
+				switch (mainGame->dInfo.curMsg) {
+				case MSG_WAITING: {
+					if (mainGame->wCardSelect->isVisible()) {
+						mainGame->HideElement(mainGame->wCardSelect);
+						ShowCancelOrFinishButton(0);
+					}
+					break;
+				}
+				case MSG_SELECT_BATTLECMD: {
+					if (mainGame->wCardSelect->isVisible()) {
+						mainGame->HideElement(mainGame->wCardSelect);
+						ShowCancelOrFinishButton(0);
+					}
+					if (mainGame->wOptions->isVisible()) {
+						mainGame->HideElement(mainGame->wOptions);
+						ShowCancelOrFinishButton(0);
+					}
+					break;
+				}
+				case MSG_SELECT_IDLECMD: {
+					if (mainGame->wCardSelect->isVisible()) {
+						mainGame->HideElement(mainGame->wCardSelect);
+						ShowCancelOrFinishButton(0);
+					}
+					if (mainGame->wOptions->isVisible()) {
+						mainGame->HideElement(mainGame->wOptions);
+						ShowCancelOrFinishButton(0);
+					}
+					break;
+				}
+				case MSG_SELECT_YESNO:
+				case MSG_SELECT_EFFECTYN: {
+					if (highlighting_card)
+						highlighting_card->is_highlighting = false;
+					highlighting_card = 0;
+					DuelClient::SetResponseI(0);
+					mainGame->HideElement(mainGame->wQuery, true);
+					break;
+				}
+				case MSG_SELECT_CARD: {
+					if (selected_cards.size() == 0) {
+						if (select_cancelable) {
+							DuelClient::SetResponseI(-1);
+							ShowCancelOrFinishButton(0);
+							if (mainGame->wCardSelect->isVisible())
+								mainGame->HideElement(mainGame->wCardSelect, true);
+							else
+								DuelClient::SendResponse();
+						}
+						break;
+					}
+					if (mainGame->wQuery->isVisible()) {
+						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
+						mainGame->HideElement(mainGame->wQuery, true);
+						break;
+					}
+					if (select_ready) {
+						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
+						if (mainGame->wCardSelect->isVisible())
+							mainGame->HideElement(mainGame->wCardSelect, true);
+						else
+							DuelClient::SendResponse();
+					}
+					break;
+				}
+				case MSG_SELECT_TRIBUTE: {
+					if (selected_cards.size() == 0) {
+						if (select_cancelable) {
+							DuelClient::SetResponseI(-1);
+							if (mainGame->wCardSelect->isVisible())
+								mainGame->HideElement(mainGame->wCardSelect, true);
+							else
+								DuelClient::SendResponse();
+						}
+						break;
+					}
+					if (mainGame->wQuery->isVisible()) {
+						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
+						mainGame->HideElement(mainGame->wQuery, true);
+						break;
+					}
+					break;
+				}
+				case MSG_SELECT_SUM: {
+					if (mainGame->wQuery->isVisible()) {
+						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
+						mainGame->HideElement(mainGame->wQuery, true);
+						break;
+					}
+					break;
+				}
+				case MSG_SELECT_CHAIN: {
+					if (chain_forced)
+						break;
+					if (mainGame->wCardSelect->isVisible()) {
+						mainGame->HideElement(mainGame->wCardSelect);
+						ShowCancelOrFinishButton(0);
+						break;
+					}
+					if (mainGame->wQuery->isVisible()) {
+						DuelClient::SetResponseI(-1);
+						ShowCancelOrFinishButton(0);
+						mainGame->HideElement(mainGame->wQuery, true);
+					}
+					else {
+						mainGame->PopupElement(mainGame->wQuery);
+						ShowCancelOrFinishButton(0);
+					}
+					if (mainGame->wOptions->isVisible()) {
+						DuelClient::SetResponseI(-1);
+						ShowCancelOrFinishButton(0);
+						mainGame->HideElement(mainGame->wOptions);
+					}
+					break;
+				}
+				case MSG_SORT_CHAIN:
+				case MSG_SORT_CARD: {
+					if (mainGame->wCardSelect->isVisible()) {
+						DuelClient::SetResponseI(-1);
+						mainGame->HideElement(mainGame->wCardSelect, true);
+					}
+					break;
+				}
+				}
+				break;
+			}
 			case BUTTON_MSG_OK: {
 				mainGame->HideElement(mainGame->wMessage);
 				mainGame->actionSignal.Set();
@@ -164,11 +295,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
-				case MSG_SELECT_CHAIN:
 				case MSG_SELECT_CARD:
 				case MSG_SELECT_TRIBUTE:
 				case MSG_SELECT_SUM: {
 					mainGame->HideElement(mainGame->wQuery);
+					break;
+				}
+				case MSG_SELECT_CHAIN: {
+					mainGame->HideElement(mainGame->wQuery);
+					if (!chain_forced) {
+						ShowCancelOrFinishButton(1);
+					}
 					break;
 				}
 				default: {
@@ -192,12 +329,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_CHAIN: {
 					DuelClient::SetResponseI(-1);
 					mainGame->HideElement(mainGame->wQuery, true);
+					ShowCancelOrFinishButton(0);
 					break;
 				}
 				case MSG_SELECT_CARD:
 				case MSG_SELECT_TRIBUTE:
 				case MSG_SELECT_SUM: {
 					SetResponseSelectedCards();
+					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
@@ -285,6 +424,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CMD_ACTIVATE:
 			case BUTTON_CMD_RESET: {
 				mainGame->wCmdMenu->setVisible(false);
+				ShowCancelOrFinishButton(0);
 				if(!list_command) {
 					int index = -1;
 					select_options.clear();
@@ -412,6 +552,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					list_command = COMMAND_SPSUMMON;
 					mainGame->wCardSelect->setText(dataManager.GetSysString(509));
 					ShowSelectCard();
+					ShowCancelOrFinishButton(1);
 				}
 				break;
 			}
@@ -607,13 +748,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					int sel = selected_cards.size();
 					if (sel >= select_max) {
 						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					} else if (sel >= select_min) {
 						select_ready = true;
 						mainGame->btnSelectOK->setVisible(true);
+						ShowCancelOrFinishButton(2);
 					} else {
 						select_ready = false;
 						mainGame->btnSelectOK->setVisible(false);
+						if (select_cancelable && sel == 0)
+							ShowCancelOrFinishButton(1);
+						else
+							ShowCancelOrFinishButton(0);
 					}
 					break;
 				}
@@ -670,6 +817,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->dInfo.curMsg == MSG_SELECT_CARD || mainGame->dInfo.curMsg == MSG_SELECT_SUM) {
 					if(select_ready) {
 						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					}
 					break;
@@ -1253,13 +1401,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if (min >= select_max) {
 					SetResponseSelectedCards();
+					ShowCancelOrFinishButton(0);
 					DuelClient::SendResponse();
 				} else if (max >= select_min) {
 					if(selected_cards.size() == selectable_cards.size()) {
 						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
 						DuelClient::SendResponse();
 					} else {
 						select_ready = true;
+						ShowCancelOrFinishButton(2);
 						if(mainGame->dInfo.curMsg == MSG_SELECT_TRIBUTE) {
 							wchar_t wbuf[256], *pwbuf = wbuf;
 							BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
@@ -1271,6 +1422,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 				} else {
 					select_ready = false;
+					if (select_cancelable && min == 0)
+						ShowCancelOrFinishButton(1);
+					else
+						ShowCancelOrFinishButton(0);
 				}
 				break;
 			}
@@ -1326,24 +1481,29 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case MSG_WAITING: {
 				if(mainGame->wCardSelect->isVisible()) {
 					mainGame->HideElement(mainGame->wCardSelect);
+					ShowCancelOrFinishButton(0);
 				}
 				break;
 			}
 			case MSG_SELECT_BATTLECMD: {
 				if(mainGame->wCardSelect->isVisible()) {
 					mainGame->HideElement(mainGame->wCardSelect);
+					ShowCancelOrFinishButton(0);
 				}
 				if(mainGame->wOptions->isVisible()) {
 					mainGame->HideElement(mainGame->wOptions);
+					ShowCancelOrFinishButton(0);
 				}
 				break;
 			}
 			case MSG_SELECT_IDLECMD: {
 				if(mainGame->wCardSelect->isVisible()) {
 					mainGame->HideElement(mainGame->wCardSelect);
+					ShowCancelOrFinishButton(0);
 				}
 				if(mainGame->wOptions->isVisible()) {
 					mainGame->HideElement(mainGame->wOptions);
+					ShowCancelOrFinishButton(0);
 				}
 				break;
 			}
@@ -1360,6 +1520,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(selected_cards.size() == 0) {
 					if(select_cancelable) {
 						DuelClient::SetResponseI(-1);
+						ShowCancelOrFinishButton(0);
 						if(mainGame->wCardSelect->isVisible())
 							mainGame->HideElement(mainGame->wCardSelect, true);
 						else
@@ -1369,11 +1530,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(mainGame->wQuery->isVisible()) {
 					SetResponseSelectedCards();
+					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
 				if(select_ready) {
 					SetResponseSelectedCards();
+					ShowCancelOrFinishButton(0);
 					if(mainGame->wCardSelect->isVisible())
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					else
@@ -1394,6 +1557,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(mainGame->wQuery->isVisible()) {
 					SetResponseSelectedCards();
+					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
@@ -1402,6 +1566,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case MSG_SELECT_SUM: {
 				if(mainGame->wQuery->isVisible()) {
 					SetResponseSelectedCards();
+					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
@@ -1412,16 +1577,20 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				if(mainGame->wCardSelect->isVisible()) {
 					mainGame->HideElement(mainGame->wCardSelect);
+					ShowCancelOrFinishButton(0);
 					break;
 				}
 				if(mainGame->wQuery->isVisible()) {
 					DuelClient::SetResponseI(-1);
+					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wQuery, true);
 				} else {
 					mainGame->PopupElement(mainGame->wQuery);
+					ShowCancelOrFinishButton(0);
 				}
 				if(mainGame->wOptions->isVisible()) {
 					DuelClient::SetResponseI(-1);
+					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wOptions);
 				}
 				break;
@@ -2004,6 +2173,26 @@ void ClientField::UpdateChainButtons() {
 		mainGame->btnChainIgnore->setPressed(mainGame->ignore_chain);
 		mainGame->btnChainAlways->setPressed(mainGame->always_chain);
 		mainGame->btnChainWhenAvail->setPressed(mainGame->chain_when_avail);
+	}
+}
+void ClientField::ShowCancelOrFinishButton(int buttonOp) {
+	if (!mainGame->chkHideChainButton->isChecked() && !mainGame->dInfo.isReplay) {
+		switch (buttonOp) {
+		case 1:
+			mainGame->btnCancelOrFinish->setText(dataManager.GetSysString(1295));
+			mainGame->btnCancelOrFinish->setVisible(true);
+			break;
+		case 2:
+			mainGame->btnCancelOrFinish->setText(dataManager.GetSysString(1296));
+			mainGame->btnCancelOrFinish->setVisible(true);
+			break;
+		case 0:
+		default:
+			mainGame->btnCancelOrFinish->setVisible(false);
+			break;
+		}
+	} else {
+		mainGame->btnCancelOrFinish->setVisible(false);
 	}
 }
 void ClientField::SetResponseSelectedCards() const {

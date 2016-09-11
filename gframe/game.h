@@ -395,7 +395,8 @@ public:
 	irr::gui::IGUIButton* btnChainIgnore;
 	irr::gui::IGUIButton* btnChainAlways;
 	irr::gui::IGUIButton* btnChainWhenAvail;
-
+	//cancel or finish
+	irr::gui::IGUIButton* btnCancelOrFinish;
 };
 
 extern Game* mainGame;
@@ -486,6 +487,7 @@ extern Game* mainGame;
 #define BUTTON_CHAIN_IGNORE			264
 #define BUTTON_CHAIN_ALWAYS			265
 #define BUTTON_CHAIN_WHENAVAIL		266
+#define BUTTON_CANCEL_OR_FINISH		267
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define SCROLL_CARDTEXT				280

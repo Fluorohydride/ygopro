@@ -541,6 +541,9 @@ bool Game::Initialize() {
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
+	//cancel or finish
+	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
+	btnCancelOrFinish->setVisible(false);
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
@@ -1122,6 +1125,7 @@ void Game::CloseDuelWindow() {
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
+	btnCancelOrFinish->setVisible(false);
 	wChat->setVisible(false);
 	lstLog->clear();
 	logParam.clear();

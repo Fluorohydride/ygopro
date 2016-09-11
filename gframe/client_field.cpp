@@ -1131,6 +1131,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 		if(CheckSelectSum()) {
 			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 				SetResponseSelectedCards();
+				ShowCancelOrFinishButton(0);
 				if(mainGame->wCardSelect->isVisible())
 					mainGame->HideElement(mainGame->wCardSelect, true);
 				else {
@@ -1151,6 +1152,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 		if(CheckSelectSum()) {
 			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 				SetResponseSelectedCards();
+				ShowCancelOrFinishButton(0);
 				DuelClient::SendResponse();
 				return true;
 			} else {
@@ -1164,6 +1166,11 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 			}
 		} else
 			select_ready = false;
+	}
+	if (select_ready) {
+		ShowCancelOrFinishButton(1);
+	} else {
+		ShowCancelOrFinishButton(0);
 	}
 	return false;
 }
