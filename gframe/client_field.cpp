@@ -20,6 +20,7 @@ ClientField::ClientField() {
 	extra_act = false;
 	pzone_act[0] = false;
 	pzone_act[1] = false;
+	conti_act = false;
 	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
@@ -76,6 +77,7 @@ void ClientField::Clear() {
 	extra_act = false;
 	pzone_act[0] = false;
 	pzone_act[1] = false;
+	conti_act = false;
 	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
@@ -335,6 +337,7 @@ void ClientField::ClearCommandFlag() {
 	remove_act = false;
 	pzone_act[0] = false;
 	pzone_act[1] = false;
+	conti_act = false;
 }
 void ClientField::ClearSelect() {
 	std::vector<ClientCard*>::iterator cit;
@@ -356,6 +359,7 @@ void ClientField::ClearChainSelect() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
+	conti_act = false;
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
@@ -397,11 +401,18 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 				if(selectable_cards[i]->overlayTarget->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-			} else {
-				if((selectable_cards[i]->controler)
-					|| ((selectable_cards[i]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (selectable_cards[i]->position & POS_FACEDOWN)))
+			} else if(selectable_cards[i]->location == LOCATION_EXTRA || selectable_cards[i]->location == LOCATION_REMOVED) {
+				if(selectable_cards[i]->position & POS_FACEDOWN)
+					mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
+				if(selectable_cards[i]->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+				else
+					mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+			} else {
+				if(selectable_cards[i]->controler)
+					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+				else
+					mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 			}
 		} else {
 			if(sort_list[i]) {
@@ -519,12 +530,20 @@ void ClientField::ShowLocationCard() {
 				mainGame->stDisplayPos[i]->setOverrideColor(0xff0000ff);
 			if(display_cards[i]->overlayTarget->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+			else 
+				mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+		} else if(display_cards[i]->location == LOCATION_EXTRA || display_cards[i]->location == LOCATION_REMOVED) {
+			if(display_cards[i]->position & POS_FACEDOWN)
+				mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
+			if(display_cards[i]->controler)
+				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+			else 
+				mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		} else {
-			if((display_cards[i]->controler)
-				|| ((display_cards[i]->location & (LOCATION_EXTRA + LOCATION_REMOVED)) && (display_cards[i]->position & POS_FACEDOWN)))
+			if(display_cards[i]->controler)
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-			else mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
+			else 
+				mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stDisplayPos[i]->setVisible(true);
 		mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
@@ -1112,6 +1131,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 		if(CheckSelectSum()) {
 			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 				SetResponseSelectedCards();
+				ShowCancelOrFinishButton(0);
 				if(mainGame->wCardSelect->isVisible())
 					mainGame->HideElement(mainGame->wCardSelect, true);
 				else {
@@ -1132,6 +1152,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 		if(CheckSelectSum()) {
 			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 				SetResponseSelectedCards();
+				ShowCancelOrFinishButton(0);
 				DuelClient::SendResponse();
 				return true;
 			} else {
@@ -1145,6 +1166,11 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 			}
 		} else
 			select_ready = false;
+	}
+	if (select_ready) {
+		ShowCancelOrFinishButton(1);
+	} else {
+		ShowCancelOrFinishButton(0);
 	}
 	return false;
 }

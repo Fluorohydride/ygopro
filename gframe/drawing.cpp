@@ -159,7 +159,7 @@ void Game::DrawBackGround() {
 		}
 	}
 	//current sel
-	if (dField.hovered_location != 0 && dField.hovered_location != 2) {
+	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT) {
 		int index = 0;
 		if (dField.hovered_controler == 0) {
 			if (dField.hovered_location == LOCATION_DECK) index = 0;
@@ -318,6 +318,12 @@ void Game::DrawMisc() {
 	if(dField.pzone_act[1]) {
 		im.setTranslation(vector3df(matManager.vFields[128].Pos.X - (matManager.vFields[128].Pos.X - matManager.vFields[129].Pos.X)/2,
 			matManager.vFields[128].Pos.Y - (matManager.vFields[128].Pos.Y - matManager.vFields[130].Pos.Y)/2, 0.03f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
+	if(dField.conti_act) {
+		im.setTranslation(vector3df(matManager.vFields[136].Pos.X - (matManager.vFields[136].Pos.X - matManager.vFields[137].Pos.X)/2,
+			matManager.vFields[136].Pos.Y - (matManager.vFields[136].Pos.Y - matManager.vFields[138].Pos.Y)/2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
