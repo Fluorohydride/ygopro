@@ -66,8 +66,21 @@ bool Game::Initialize() {
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	textFont = guiFont;
 	smgr = device->getSceneManager();
-	device->setWindowCaption(L"[---]");
+	device->setWindowCaption(L"YGOPro");
 	device->setResizable(false);
+#ifdef _WIN32
+	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
+	HICON hSmallIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
+	HWND hWnd;
+	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
+	if(gameConf.use_d3d)
+		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
+	else
+		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
+	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
+	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
+#endif
 	//main menu
 	wchar_t strbuf[256];
 	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
@@ -632,7 +645,7 @@ void Game::MainLoop() {
 			usleep(20000);
 #endif
 		if(cur_time >= 1000) {
-			myswprintf(cap, L"FPS: %d", fps);
+			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
 			fps = 0;
 			cur_time -= 1000;
