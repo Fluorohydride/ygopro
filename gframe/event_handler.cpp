@@ -388,15 +388,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::SetResponseI(selected_option);
 				} else if (mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
 					int index = 0;
-					while(activatable_cards[index] != command_card || activatable_descs[index] != select_options[selected_option]) index++;
+					while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
 					DuelClient::SetResponseI((index << 16) + 5);
 				} else if (mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
 					int index = 0;
-					while(activatable_cards[index] != command_card || activatable_descs[index] != select_options[selected_option]) index++;
+					while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
 					DuelClient::SetResponseI(index << 16);
 				} else {
 					int index = 0;
-					while(activatable_cards[index] != command_card || activatable_descs[index] != select_options[selected_option]) index++;
+					while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
 					DuelClient::SetResponseI(index);
 				}
 				mainGame->HideElement(mainGame->wOptions, true);
@@ -430,14 +430,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					select_options.clear();
 					for (size_t i = 0; i < activatable_cards.size(); ++i) {
 						if (activatable_cards[i] == clicked_card) {
-							if(conti_descs.find(activatable_descs[i]) != conti_descs.end())
+							if(activatable_descs[i].second == EDESC_OPERATION)
 								continue;
-							if(reset_descs.find(activatable_descs[i]) != reset_descs.end()) {
+							if(activatable_descs[i].second == EDESC_RESET) {
 								if(id == BUTTON_CMD_ACTIVATE) continue;
 							} else {
 								if(id == BUTTON_CMD_RESET) continue;
 							}
-							select_options.push_back(activatable_descs[i]);
+							select_options.push_back(activatable_descs[i].first);
 							if (index == -1) index = i;
 						}
 					}
@@ -708,12 +708,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						select_options.clear();
 						for (size_t i = 0; i < activatable_cards.size(); ++i) {
 							if (activatable_cards[i] == command_card) {
-								if(conti_descs.find(activatable_descs[i]) != conti_descs.end()) {
+								if(activatable_descs[i].second == EDESC_OPERATION) {
 									if(list_command == COMMAND_ACTIVATE) continue;
 								} else {
 									if(list_command == COMMAND_OPERATION) continue;
 								}
-								select_options.push_back(activatable_descs[i]);
+								select_options.push_back(activatable_descs[i].first);
 								if (index == -1) index = i;
 							}
 						}
