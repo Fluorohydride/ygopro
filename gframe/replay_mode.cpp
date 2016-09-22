@@ -474,6 +474,8 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_REVERSE_DECK: {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			ReplayRefreshDeck(0);
+			ReplayRefreshDeck(1);
 			break;
 		}
 		case MSG_DECK_TOP: {
