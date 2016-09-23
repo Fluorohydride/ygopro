@@ -61,10 +61,11 @@ public:
         return ptr >= end;
     }
     
+    inline uint8_t* DataPtr() { return ptr; }
+    
 private:
     uint8_t* ptr;
     uint8_t* end;
-
 };
 
 class BufferWriter {

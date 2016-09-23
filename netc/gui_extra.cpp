@@ -1129,7 +1129,7 @@ namespace ygopro
     }
     
     void OperationPanel::DeclearAttribute(int32_t available, int32_t count, std::function<void(uint32_t)> close_callback) {
-        static std::string att_names[] = {"att earth", "att water", "att fire", "att wind", "att light", "att dark", "att divine"};
+        static std::string att_names[] = {"earth", "water", "fire", "wind", "light", "dark", "divine"};
         uint32_t icolor = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["declear attribute"]["item color"]);
         uint32_t scolor = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["declear attribute"]["selected color"]);
         auto wnd = LoadDialogAs<sgui::SGWidgetContainer>("declear attribute");
@@ -1164,6 +1164,58 @@ namespace ygopro
                         }
                     } else {
                         *preturn_value &= ~att_value;
+                        (*pcount)--;
+                        btn.SetColor(icolor);
+                    }
+                    return true;
+                };
+            }
+        }
+    }
+    
+    void OperationPanel::DeclearRace(int32_t available, int32_t count, std::function<void(uint32_t)> close_callback) {
+        static std::string rac_names[] = {
+            "warrior", "spellcaster", "fairy", "fiend",
+            "zombie", "machine", "aqua", "pyro",
+            "rock", "windbeast", "plant", "insect",
+            "thunder", "dragon", "beast", "beastwarrior",
+            "dinosaur", "fish", "seaserpent", "reptile",
+            "psychic", "divine", "creatorgod", "phantomdragon"
+        };
+        uint32_t icolor = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["declear race"]["item color"]);
+        uint32_t scolor = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["declear race"]["selected color"]);
+        auto wnd = LoadDialogAs<sgui::SGWidgetContainer>("declear race");
+        if(!wnd)
+            return;
+        uint32_t* preturn_value = new uint32_t(0);
+        uint32_t* pcount = new uint32_t(0);
+        wnd->event_on_destroy += [preturn_value, pcount, close_callback](sgui::SGWidget& sender)->bool {
+            if(close_callback)
+                close_callback(*preturn_value);
+            delete preturn_value;
+            delete pcount;
+            return true;
+        };
+        for(int32_t i = 0; i < 28; ++i) {
+            auto rac_button = wnd->FindWidgetAs<sgui::SGTextButton>(rac_names[i]);
+            if(!rac_button)
+                continue;
+            rac_button->SetColor(icolor);
+            uint32_t rac_value = 1 << i;
+            if((available & rac_value) == 0) {
+                rac_button->SetVisible(false);
+            } else {
+                rac_button->event_click += [wnd, icolor, scolor, rac_value, preturn_value, pcount, count](sgui::SGWidget& sender) {
+                    sgui::SGTextButton& btn = static_cast<sgui::SGTextButton&>(sender);
+                    if(btn.IsPushed()) {
+                        *preturn_value |= rac_value;
+                        (*pcount)++;
+                        btn.SetColor(scolor);
+                        if(*pcount >= count) {
+                            wnd->RemoveFromParent();
+                        }
+                    } else {
+                        *preturn_value &= ~rac_value;
                         (*pcount)--;
                         btn.SetColor(icolor);
                     }

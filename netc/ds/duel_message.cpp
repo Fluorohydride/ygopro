@@ -62,6 +62,16 @@ namespace ygopro
             }
             case 4: {
                 auto dm = std::make_shared<DuelMessage>();
+                dm->msg_type = MSG_DECLEAR_RACE;
+                BufferWriter writer(dm->msg_buffer);
+                writer.Write<uint8_t>(0);
+                writer.Write<uint8_t>(3);
+                writer.Write<uint32_t>(0xffffffff);
+                messages.PushCommand(dm);
+                break;
+            }
+            case 5: {
+                auto dm = std::make_shared<DuelMessage>();
                 dm->msg_type = MSG_DECLEAR_ATTRIB;
                 BufferWriter writer(dm->msg_buffer);
                 writer.Write<uint8_t>(0);
@@ -1743,23 +1753,12 @@ namespace ygopro
                 break;
             }
             case MSG_DECLEAR_RACE: {
-//                /*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-//                mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
-//                int available = BufferIO::ReadInt32(pbuf);
-//                for(int i = 0, filter = 0x1; i < 24; ++i, filter <<= 1) {
-//                    mainGame->chkRace[i]->setChecked(false);
-//                    if(filter & available)
-//                        mainGame->chkRace[i]->setVisible(true);
-//                    else mainGame->chkRace[i]->setVisible(false);
-//                }
-//                if(select_hint)
-//                    myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-//                else myswprintf(textBuffer, dataManager.GetSysString(563));
-//                select_hint = 0;
-//                mainGame->gMutex.Lock();
-//                mainGame->wANRace->setText(textBuffer);
-//                mainGame->PopupElement(mainGame->wANRace);
-//                mainGame->gMutex.Unlock();
+                auto begin = reader.DataPtr();
+                reader.Skip(1);
+                uint32_t count = reader.Read<uint8_t>();
+                uint32_t available = reader.Read<uint32_t>();
+                auto end = reader.DataPtr();
+                OperationPanel::DeclearRace(available, count);
                 break;
             }
             case MSG_DECLEAR_ATTRIB: {

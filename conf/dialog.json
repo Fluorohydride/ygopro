@@ -403,53 +403,205 @@
     "item size" : [200, 290]
   },
   "declear race" : {
+    "type" : "window",
+    "close button" : false,
+    "allow resize" : false,
+    "position" : [0, 0, 852, 410, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "warrior" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_warrior", "0x000000ff"],
+        "position" : [11, 50, -13, 50, 0, 0, 0.25, 0, 0, 0]
+      },
+      "spellcaster" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_spellcaster", "0x000000ff"],
+        "position" : [8, 50, -13, 50, 0.25, 0, 0.25, 0, 0, 0]
+      },
+      "fairy" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_fairy", "0x000000ff"],
+        "position" : [5, 50, -13, 50, 0.5, 0, 0.25, 0, 0, 0]
+      },
+      "fiend" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_fiend", "0x000000ff"],
+        "position" : [2, 50, -20, 50, 0.75, 0, 0.25, 0, 0, 0]
+      },
+      "zombie" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_zombie", "0x000000ff"],
+        "position" : [11, 110, -13, 50, 0, 0, 0.25, 0, 0, 0]
+      },
+      "machine" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_machine", "0x000000ff"],
+        "position" : [8, 110, -13, 50, 0.25, 0, 0.25, 0, 0, 0]
+      },
+      "aqua" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_aqua", "0x000000ff"],
+        "position" : [5, 110, -13, 50, 0.5, 0, 0.25, 0, 0, 0]
+      },
+      "pyro" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_pyro", "0x000000ff"],
+        "position" : [2, 110, -20, 50, 0.75, 0, 0.25, 0, 0, 0]
+      },
+      "rock" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_rock", "0x000000ff"],
+        "position" : [11, 170, -13, 50, 0, 0, 0.25, 0, 0, 0]
+      },
+      "windbeast" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_windbeast", "0x000000ff"],
+        "position" : [8, 170, -13, 50, 0.25, 0, 0.25, 0, 0, 0]
+      },
+      "plant" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_plant", "0x000000ff"],
+        "position" : [5, 170, -13, 50, 0.5, 0, 0.25, 0, 0, 0]
+      },
+      "insect" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_insect", "0x000000ff"],
+        "position" : [2, 170, -20, 50, 0.75, 0, 0.25, 0, 0, 0]
+      },
+      "thunder" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_thunder", "0x000000ff"],
+        "position" : [11, 230, -13, 50, 0, 0, 0.25, 0, 0, 0]
+      },
+      "dragon" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_dragon", "0x000000ff"],
+        "position" : [8, 230, -13, 50, 0.25, 0, 0.25, 0, 0, 0]
+      },
+      "beast" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_beast", "0x000000ff"],
+        "position" : [5, 230, -13, 50, 0.5, 0, 0.25, 0, 0, 0]
+      },
+      "beastwarrior" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_beastwarrior", "0x000000ff"],
+        "position" : [2, 230, -20, 50, 0.75, 0, 0.25, 0, 0, 0]
+      },
+      "dinosaur" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_dinosaur", "0x000000ff"],
+        "position" : [11, 290, -13, 50, 0, 0, 0.25, 0, 0, 0]
+      },
+      "fish" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_fish", "0x000000ff"],
+        "position" : [8, 290, -13, 50, 0.25, 0, 0.25, 0, 0, 0]
+      },
+      "seaserpent" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_seaserpent", "0x000000ff"],
+        "position" : [5, 290, -13, 50, 0.5, 0, 0.25, 0, 0, 0]
+      },
+      "reptile" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_reptile", "0x000000ff"],
+        "position" : [2, 290, -20, 50, 0.75, 0, 0.25, 0, 0, 0]
+      },
+      "psychic" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_psychic", "0x000000ff"],
+        "position" : [11, 350, -13, 50, 0, 0, 0.25, 0, 0, 0]
+      },
+      "divine" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_divine", "0x000000ff"],
+        "position" : [8, 350, -13, 50, 0.25, 0, 0.25, 0, 0, 0]
+      },
+      "creatorgod" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_creatorgod", "0x000000ff"],
+        "position" : [5, 350, -13, 50, 0.5, 0, 0.25, 0, 0, 0]
+      },
+      "phantomdragon" : {
+        "type" : "text button",
+        "push button" : true,
+        "text" : ["race_phantomdragon", "0x000000ff"],
+        "position" : [2, 350, -20, 50, 0.75, 0, 0.25, 0, 0, 0]
+      }
+    },
+    "item color" : "0x00ffffff",
+    "selected color" : "0xffff00ff"
   },
   "declear attribute" : {
     "type" : "window",
     "close button" : false,
     "allow resize" : false,
-    "position" : [0, 0, 500, 430, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "position" : [0, 0, 500, 410, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
     "children" : {
-      "att earth" : {
+      "earth" : {
         "type" : "text button",
         "push button" : true,
-        "text" : ["attribtue_earth", "0x000000ff"],
+        "text" : ["attribute_earth", "0x000000ff"],
         "position" : [10, 50, -20, 50, 0, 0, 1.0, 0, 0, 0]
       },
-      "att water" : {
+      "water" : {
         "type" : "text button",
         "push button" : true,
-        "text" : ["attribtue_water", "0x000000ff"],
+        "text" : ["attribute_water", "0x000000ff"],
         "position" : [10, 110, -20, 50, 0, 0, 1.0, 0, 0, 0]
       },
-      "att fire" : {
+      "fire" : {
         "type" : "text button",
         "push button" : true,
-        "text" : ["attribtue_fire", "0x000000ff"],
+        "text" : ["attribute_fire", "0x000000ff"],
         "position" : [10, 170, -20, 50, 0, 0, 1.0, 0, 0, 0]
       },
-      "att wind" : {
+      "wind" : {
         "type" : "text button",
         "push button" : true,
-        "text" : ["attribtue_wind", "0x000000ff"],
+        "text" : ["attribute_wind", "0x000000ff"],
         "position" : [10, 230, -20, 50, 0, 0, 1.0, 0, 0, 0]
       },
-      "att light" : {
+      "light" : {
         "type" : "text button",
         "push button" : true,
-        "text" : ["attribtue_light", "0x000000ff"],
+        "text" : ["attribute_light", "0x000000ff"],
         "position" : [10, 290, -20, 50, 0, 0, 1.0, 0, 0, 0]
       },
-      "att dark" : {
+      "dark" : {
         "type" : "text button",
         "push button" : true,
-        "text" : ["attribtue_dark", "0x000000ff"],
+        "text" : ["attribute_dark", "0x000000ff"],
         "position" : [10, 350, -20, 50, 0, 0, 1.0, 0, 0, 0]
       },
-      "att divine" : {
+      "divine" : {
         "type" : "text button",
         "push button" : true,
-        "text" : ["attribtue_divine", "0x000000ff"],
+        "text" : ["attribute_divine", "0x000000ff"],
         "position" : [10, 50, -20, 50, 0, 0, 1.0, 0, 0, 0]
       }
     },
@@ -534,13 +686,13 @@
     },
     "attribute list" : {
       "eui_filter_na" : ["0x000000ff", 0],
-      "attribtue_earth" : ["0x000000ff", 1],
-      "attribtue_water" : ["0x000000ff", 2],
-      "attribtue_fire" : ["0x000000ff", 4],
-      "attribtue_wind" : ["0x000000ff", 8],
-      "attribtue_light" : ["0x000000ff", 16],
-      "attribtue_dark" : ["0x000000ff", 32],
-      "attribtue_divine" : ["0x000000ff", 64]
+      "attribute_earth" : ["0x000000ff", 1],
+      "attribute_water" : ["0x000000ff", 2],
+      "attribute_fire" : ["0x000000ff", 4],
+      "attribute_wind" : ["0x000000ff", 8],
+      "attribute_light" : ["0x000000ff", 16],
+      "attribute_dark" : ["0x000000ff", 32],
+      "attribute_divine" : ["0x000000ff", 64]
     },
     "race list" : {
       "eui_filter_na" : ["0x000000ff", 0],

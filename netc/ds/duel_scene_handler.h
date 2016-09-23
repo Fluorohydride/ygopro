@@ -184,6 +184,7 @@ namespace ygopro
         std::shared_ptr<LogPanel> log_panel;
         bool message_lock = false;
         CommandListMT<DuelMessage> messages;
+        std::vector<uint8_t> last_operation_message;
     };
     
 }
