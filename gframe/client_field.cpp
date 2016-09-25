@@ -1,3 +1,4 @@
+#include <stack>
 #include "client_field.h"
 #include "client_card.h"
 #include "duelclient.h"
@@ -1329,7 +1330,148 @@ static bool is_declarable(T const& cd, int declarable_type) {
 	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
 		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
 }
-void ClientField::UpdateDeclarableCode(bool enter) {
+template <class T>
+static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
+	std::stack<int> stack;
+	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
+		switch(*it) {
+		case OPCODE_ADD: {
+			if (stack.size() >= 2) {
+				int rhs = stack.top();
+				stack.pop();
+				int lhs = stack.top();
+				stack.pop();
+				stack.push(lhs + rhs);
+			}
+			break;
+		}
+		case OPCODE_SUB: {
+			if (stack.size() >= 2) {
+				int rhs = stack.top();
+				stack.pop();
+				int lhs = stack.top();
+				stack.pop();
+				stack.push(lhs - rhs);
+			}
+			break;
+		}
+		case OPCODE_MUL: {
+			if (stack.size() >= 2) {
+				int rhs = stack.top();
+				stack.pop();
+				int lhs = stack.top();
+				stack.pop();
+				stack.push(lhs * rhs);
+			}
+			break;
+		}
+		case OPCODE_DIV: {
+			if (stack.size() >= 2) {
+				int rhs = stack.top();
+				stack.pop();
+				int lhs = stack.top();
+				stack.pop();
+				stack.push(lhs / rhs);
+			}
+			break;
+		}
+		case OPCODE_AND: {
+			if (stack.size() >= 2) {
+				int rhs = stack.top();
+				stack.pop();
+				int lhs = stack.top();
+				stack.pop();
+				stack.push(lhs && rhs);
+			}
+			break;
+		}
+		case OPCODE_OR: {
+			if (stack.size() >= 2) {
+				int rhs = stack.top();
+				stack.pop();
+				int lhs = stack.top();
+				stack.pop();
+				stack.push(lhs || rhs);
+			}
+			break;
+		}
+		case OPCODE_NEG: {
+			if (stack.size() >= 1) {
+				int val = stack.top();
+				stack.pop();
+				stack.push(-val);
+			}
+			break;
+		}
+		case OPCODE_NOT: {
+			if (stack.size() >= 1) {
+				int val = stack.top();
+				stack.pop();
+				stack.push(!val);
+			}
+			break;
+		}
+		case OPCODE_ISCODE: {
+			if (stack.size() >= 1) {
+				int code = stack.top();
+				stack.pop();
+				stack.push(cd.code == code);
+			}
+			break;
+		}
+		case OPCODE_ISSETCARD: {
+			if (stack.size() >= 1) {
+				int set_code = stack.top();
+				stack.pop();
+				unsigned long long sc = cd.setcode;
+				bool res = false;
+				int settype = set_code & 0xfff;
+				int setsubtype = set_code & 0xf000;
+				while (sc) {
+					if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
+						res = true;
+					sc = sc >> 16;
+				}
+				stack.push(res);
+			}
+			break;
+		}
+		case OPCODE_ISTYPE: {
+			if (stack.size() >= 1) {
+				int val = stack.top();
+				stack.pop();
+				stack.push(cd.type & val);
+			}
+			break;
+		}
+		case OPCODE_ISRACE: {
+			if (stack.size() >= 1) {
+				int race = stack.top();
+				stack.pop();
+				stack.push(cd.race & race);
+			}
+			break;
+		}
+		case OPCODE_ISATTRIBUTE: {
+			if (stack.size() >= 1) {
+				int attribute = stack.top();
+				stack.pop();
+				stack.push(cd.attribute & attribute);
+			}
+			break;
+		}
+		default: {
+			stack.push(*it);
+			break;
+		}
+		}
+	}
+	if(stack.size() != 1 || stack.top() == 0)
+		return false;
+	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
+		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
+}
+void ClientField::UpdateDeclarableCodeType(bool enter) {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	CardString cstr;
@@ -1341,7 +1483,7 @@ void ClientField::UpdateDeclarableCode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if(pname[0] == 0 || (pname[1] == 0 && !enter))
+	if((pname[0] == 0 || pname[1] == 0) && !enter)
 		return;
 	mainGame->lstANCard->clear();
 	ancard.clear();
@@ -1355,5 +1497,38 @@ void ClientField::UpdateDeclarableCode(bool enter) {
 			}
 		}
 	}
+}
+void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
+	const wchar_t* pname = mainGame->ebANCard->getText();
+	int trycode = BufferIO::GetVal(pname);
+	CardString cstr;
+	CardData cd;
+	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
+		mainGame->lstANCard->clear();
+		ancard.clear();
+		mainGame->lstANCard->addItem(cstr.name);
+		ancard.push_back(trycode);
+		return;
+	}
+	if((pname[0] == 0 || pname[1] == 0) && !enter)
+		return;
+	mainGame->lstANCard->clear();
+	ancard.clear();
+	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
+		if(wcsstr(cit->second.name, pname) != 0) {
+			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
+			//datas.alias can be double card names or alias
+			if(is_declarable(cp->second, opcode)) {
+				mainGame->lstANCard->addItem(cit->second.name);
+				ancard.push_back(cit->first);
+			}
+		}
+	}
+}
+void ClientField::UpdateDeclarableCode(bool enter) {
+	if(opcode.size() == 0)
+		UpdateDeclarableCodeType(enter);
+	else
+		UpdateDeclarableCodeOpcode(enter);
 }
 }
