@@ -3312,6 +3312,9 @@ void DuelClient::SendResponse() {
 		break;
 	}
 	case MSG_SELECT_SUM: {
+		for(int i = 0; i < mainGame->dField.must_select_count; ++i) {
+			mainGame->dField.selected_cards[i]->is_selected = false;
+		}
 		for(size_t i = 0; i < mainGame->dField.selectsum_all.size(); ++i) {
 			mainGame->dField.selectsum_all[i]->is_selectable = false;
 			mainGame->dField.selectsum_all[i]->is_selected = false;
