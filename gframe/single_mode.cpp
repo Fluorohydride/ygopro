@@ -317,6 +317,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_REVERSE_DECK: {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			SinglePlayRefreshDeck(0);
+			SinglePlayRefreshDeck(1);
 			break;
 		}
 		case MSG_DECK_TOP: {
@@ -586,7 +588,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			}
 			break;
 		}
-		case MSG_ANNOUNCE_NUMBER: {
+		case MSG_ANNOUNCE_NUMBER:
+		case MSG_ANNOUNCE_CARD_FILTER: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += 4 * count;
