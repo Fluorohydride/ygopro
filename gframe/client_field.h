@@ -77,6 +77,7 @@ public:
 	ChainInfo current_chain;
 	bool last_chain;
 	bool deck_reversed;
+	bool conti_selecting;
 	
 	ClientField();
 	void Clear();

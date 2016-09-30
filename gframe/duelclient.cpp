@@ -1217,13 +1217,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
 			pcard->is_selected = false;
 			if(flag == EDESC_OPERATION) {
-				pcard->is_conti = true;
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
 				conti_exist = true;
 			} else {
-				pcard->chain_code = code;
 				pcard->is_selectable = true;
 				if(flag == EDESC_RESET)
 					pcard->cmdFlag |= COMMAND_RESET;

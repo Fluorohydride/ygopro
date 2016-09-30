@@ -460,7 +460,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 				} else {
 					selectable_cards.clear();
-					bool conti_exist = false;
+					conti_selecting = false;
 					switch(command_location) {
 					case LOCATION_DECK: {
 						for(size_t i = 0; i < deck[command_controler].size(); ++i)
@@ -488,11 +488,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					case POSITION_HINT: {
 						selectable_cards.insert(selectable_cards.end(), conti_cards.begin(), conti_cards.end());
-						conti_exist = true;
+						conti_selecting = true;
 						break;
 					}
 					}
-					if(!conti_exist) {
+					if(!conti_selecting) {
 						mainGame->wCardSelect->setText(dataManager.GetSysString(566));
 						list_command = COMMAND_ACTIVATE;
 					} else {
@@ -910,11 +910,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				for(int i = 0; i < 5; ++i) {
 					// draw selectable_cards[i + pos] in btnCardSelect[i]
 					mainGame->stCardPos[i]->enableOverrideColor(false);
+					// image
 					if(selectable_cards[i + pos]->code)
 						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
+					else if(conti_selecting)
+						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->chain_code));
 					else
 						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+					// text
 					wchar_t formatBuffer[2048];
 					if(sort_list.size()) {
 						if(sort_list[pos + i] > 0)
@@ -922,7 +926,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else
 							myswprintf(formatBuffer, L"");
 					} else {
-						if(selectable_cards[i + pos]->is_conti && !selectable_cards[i + pos]->code)
+						if(conti_selecting)
 							myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
 						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY)
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
@@ -933,17 +937,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								selectable_cards[i + pos]->sequence + 1);
 					}
 					mainGame->stCardPos[i]->setText(formatBuffer);
+					// color
+					if(conti_selecting)
+						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
 						if(selectable_cards[i + pos]->owner != selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
-						// BackgroundColor: controller of the xyz monster
 						if(selectable_cards[i + pos]->is_selected)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 						else if(selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 						else 
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-					} else if(selectable_cards[i + pos]->location == LOCATION_EXTRA || selectable_cards[i + pos]->location == LOCATION_REMOVED) {
+					} else if(selectable_cards[i + pos]->location == LOCATION_DECK || selectable_cards[i + pos]->location == LOCATION_EXTRA || selectable_cards[i + pos]->location == LOCATION_REMOVED) {
 						if(selectable_cards[i + pos]->position & POS_FACEDOWN)
 							mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
 						if(selectable_cards[i + pos]->is_selected)

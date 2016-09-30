@@ -844,6 +844,7 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	if(win == wCardSelect) {
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(false);
+		dField.conti_selecting = false;
 	}
 	if(win == wCardDisplay) {
 		for(int i = 0; i < 5; ++i)

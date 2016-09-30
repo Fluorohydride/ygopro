@@ -16,7 +16,7 @@ A script engine for "yu-gi-oh!" and sample gui
 * White = your card, Grey = your opponent's card  
 
 ####Text: 
-Cards in extra deck or removed: 
+Cards in deck, extra deck and banished zone: 
 * Black = face-up, Blue = face-down
 
 Xyz materials:
