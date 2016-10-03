@@ -940,7 +940,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					// color
 					if(conti_selecting)
 						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-					if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
+					else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
 						if(selectable_cards[i + pos]->owner != selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
 						if(selectable_cards[i + pos]->is_selected)
