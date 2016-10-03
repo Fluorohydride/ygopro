@@ -91,6 +91,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->controler = player;
 		pcard->location = 0x1;
 		pcard->sequence = i;
+		pcard->position = POS_FACEDOWN_DEFENSE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 		pcard->mTransform.setTranslation(pcard->curPos);
 		pcard->mTransform.setRotationRadians(pcard->curRot);
