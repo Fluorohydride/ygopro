@@ -1737,8 +1737,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
 								int form = 0x2605;
+								if (mcard->rank && mcard->level){
+								myswprintf(formatBuffer, L"\n%c%d/%c%d %ls/%ls", form, mcard->level, form+1, mcard->rank, dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
+								}else{
 								if (mcard->rank) ++form;
 								myswprintf(formatBuffer, L"\n%c%d %ls/%ls", form, (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
+								}
 								str.append(formatBuffer);
 								if(mcard->location == LOCATION_HAND && (mcard->type & TYPE_PENDULUM)) {
 									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);

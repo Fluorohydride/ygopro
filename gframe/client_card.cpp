@@ -40,6 +40,7 @@ ClientCard::ClientCard() {
 	atkstring[0] = 0;
 	defstring[0] = 0;
 	lvstring[0] = 0;
+	rkstring[0] = 0;
 	rscstring[0] = 0;
 	lscstring[0] = 0;
 	overlayTarget = 0;
@@ -82,9 +83,9 @@ void ClientCard::UpdateInfo(char* buf) {
 	}
 	if(flag & QUERY_RANK) {
 		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && rank != (unsigned int)pdata) {
+		if(rank != (unsigned int)pdata) {
 			rank = pdata;
-			myswprintf(lvstring, L"R%d", rank);
+			myswprintf(rkstring, L"R%d", rank);
 		}
 	}
 	if(flag & QUERY_ATTRIBUTE)

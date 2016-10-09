@@ -412,6 +412,7 @@ void Game::DrawMisc() {
 		pcard = dField.mzone[0][i];
 		if(pcard && pcard->code != 0) {
 			int m = 493 + i * 85;
+			int m2 = 473 + i * 80;
 			adFont->draw(L"/", recti(m - 4, 416, m + 4, 436), 0xff000000, true, false, 0);
 			adFont->draw(L"/", recti(m - 3, 417, m + 5, 437), 0xffffffff, true, false, 0);
 			int w = adFont->getDimension(pcard->atkstring).Width;
@@ -422,15 +423,28 @@ void Game::DrawMisc() {
 			adFont->draw(pcard->defstring, recti(m + 4, 416, m + 4 + w, 436), 0xff000000, false, false, 0);
 			adFont->draw(pcard->defstring, recti(m + 5, 417, m + 5 + w, 437),
 			             pcard->defense > pcard->base_defense ? 0xffffff00 : pcard->defense < pcard->base_defense ? 0xffff2090 : 0xffffffff , false, false, 0);
-			adFont->draw(pcard->lvstring, recti(473 + i * 80, 356, 475 + i * 80, 366), 0xff000000, false, false, 0);
-			adFont->draw(pcard->lvstring, recti(474 + i * 80, 357, 476 + i * 80, 367),
-			             (pcard->type & TYPE_XYZ) ? 0xffff80ff : (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+			if (pcard->level!=0 && pcard->rank!=0) {
+				adFont->draw(L"/", recti(m2 - 4, 356, m2 + 4, 366), 0xff000000, true, false, 0);
+				adFont->draw(L"/", recti(m2 - 3, 357, m2 + 5, 367), 0xffffffff, true, false, 0);
+				int w2 = adFont->getDimension(pcard->lvstring).Width;
+				adFont->draw(pcard->lvstring, recti(m2 - 5 - w2, 356, m - 5, 366), 0xff000000, false, false, 0);
+				adFont->draw(pcard->lvstring, recti(m2 - 4 - w2, 357, m - 5, 367), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(m2 + 4, 356, m2 + 4 + w2, 366), 0xff000000, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(m2 + 5, 357, m2 + 5 + w2, 367), 0xffff80ff, false, false, 0);
+			}else if (pcard->rank != 0) {
+				adFont->draw(pcard->rkstring, recti(473 + i * 80, 356, 475 + i * 80, 366), 0xff000000, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(474 + i * 80, 357, 476 + i * 80, 367),0xffff80ff, false, false, 0);
+			}else if (pcard->level != 0) {
+				adFont->draw(pcard->lvstring, recti(473 + i * 80, 356, 475 + i * 80, 366), 0xff000000, false, false, 0);
+				adFont->draw(pcard->lvstring, recti(474 + i * 80, 357, 476 + i * 80, 367),(pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+			}
 		}
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = dField.mzone[1][i];
 		if(pcard && (pcard->position & POS_FACEUP)) {
 			int m = 803 - i * 68;
+			int m2 = 779 - i * 71;
 			adFont->draw(L"/", recti(m - 4, 235, m + 4, 255), 0xff000000, true, false, 0);
 			adFont->draw(L"/", recti(m - 3, 236, m + 5, 256), 0xffffffff, true, false, 0);
 			int w = adFont->getDimension(pcard->atkstring).Width;
@@ -441,9 +455,21 @@ void Game::DrawMisc() {
 			adFont->draw(pcard->defstring, recti(m + 4, 235, m + 4 + w, 255), 0xff000000, false, false, 0);
 			adFont->draw(pcard->defstring, recti(m + 5, 236, m + 5 + w, 256),
 			             pcard->defense > pcard->base_defense ? 0xffffff00 : pcard->defense < pcard->base_defense ? 0xffff2090 : 0xffffffff , false, false, 0);
-			adFont->draw(pcard->lvstring, recti(779 - i * 71, 272, 800 - i * 71, 292), 0xff000000, false, false, 0);
-			adFont->draw(pcard->lvstring, recti(780 - i * 71, 273, 800 - i * 71, 293),
-			             (pcard->type & TYPE_XYZ) ? 0xffff80ff : (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+			if (pcard->level!=0 && pcard->rank!=0) {
+				adFont->draw(L"/", recti(m2 - 4, 272, m2 + 4, 292), 0xff000000, true, false, 0);
+				adFont->draw(L"/", recti(m2 - 3, 273, m2 + 5, 293), 0xffffffff, true, false, 0);
+				int w2 = adFont->getDimension(pcard->lvstring).Width;
+				adFont->draw(pcard->lvstring, recti(m2 - 5 - w2, 272, m - 5, 292), 0xff000000, false, false, 0);
+				adFont->draw(pcard->lvstring, recti(m2 - 4 - w2, 273, m - 5, 293), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(m2 + 4, 272, m2 + 4 + w2, 292), 0xff000000, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(m2 + 5, 273, m2 + 5 + w2, 293), 0xffff80ff, false, false, 0);
+			}else if (pcard->rank != 0) {
+				adFont->draw(pcard->rkstring, recti(473 + i * 80, 272, 475 + i * 80, 292), 0xff000000, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(474 + i * 80, 273, 476 + i * 80, 293),0xffff80ff, false, false, 0);
+			}else if (pcard->level != 0) {
+				adFont->draw(pcard->lvstring, recti(473 + i * 80, 272, 475 + i * 80, 292), 0xff000000, false, false, 0);
+				adFont->draw(pcard->lvstring, recti(474 + i * 80, 273, 476 + i * 80, 293),(pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+			}
 		}
 	}
 	pcard = dField.szone[0][6];
