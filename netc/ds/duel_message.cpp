@@ -1724,40 +1724,46 @@ namespace ygopro
             case MSG_RELEASE_RELATION: break;
             case MSG_TOSS_COIN: {
                 // todo: add effects
-                // uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
-                reader.Skip(1);
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 uint32_t count = reader.Read<uint8_t>();
                 std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_coin"].to_string());
+                std::wstring strfront = To<std::wstring>(stringCfg["eui_logmsg_coin_front"].to_string());
+                std::wstring strback = To<std::wstring>(stringCfg["eui_logmsg_coin_back"].to_string());
+                str.replace(str.find(L"{name}"), 6, g_player[playerid].name);
+                std::wstring result;
                 for(uint32_t i = 0; i < count; ++i) {
                     uint32_t res = reader.Read<uint8_t>();
-                    str.push_back(L' ');
-                    str.push_back(L'0' + res);
+                    if(i > 0)
+                        result.push_back(L',');
+                    result += res ? strfront : strback;
                 }
+                str.replace(str.find(L"{result}"), 8, result);
                 log_panel->AddLog(1, str);
                 log_panel->Show(1);
                 break;
             }
             case MSG_TOSS_DICE: {
                 // todo: add effects
-                // uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
-                reader.Skip(1);
+                uint32_t playerid = LocalPlayer(reader.Read<uint8_t>());
                 uint32_t count = reader.Read<uint8_t>();
                 std::wstring str = To<std::wstring>(stringCfg["eui_logmsg_dice"].to_string());
+                str.replace(str.find(L"{name}"), 6, g_player[playerid].name);
+                std::wstring result;
                 for(uint32_t i = 0; i < count; ++i) {
                     uint32_t res = reader.Read<uint8_t>();
-                    str.push_back(L' ');
+                    if(i > 0)
+                        result.push_back(L',');
                     str.push_back(L'0' + res);
                 }
+                str.replace(str.find(L"{result}"), 8, result);
                 log_panel->AddLog(1, str);
                 log_panel->Show(1);
                 break;
             }
             case MSG_DECLEAR_RACE: {
-                auto begin = reader.DataPtr();
                 reader.Skip(1);
                 uint32_t count = reader.Read<uint8_t>();
                 uint32_t available = reader.Read<uint32_t>();
-                auto end = reader.DataPtr();
                 OperationPanel::DeclearRace(available, count);
                 break;
             }

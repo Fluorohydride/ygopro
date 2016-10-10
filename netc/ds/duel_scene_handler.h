@@ -59,7 +59,7 @@ namespace ygopro
         int32_t extra_faceup_count = 0;
         std::array<v2i, 4> lp_verts_rel;
         std::array<v2f, 4> lp_verts_prop;
-        std::string name;
+        std::wstring name;
     };
     
     enum class FloatingNumberType {

@@ -171,19 +171,19 @@ namespace ygopro
     std::wstring DataMgr::GetAttributeString(uint32_t attr) {
         std::string attname;
         if(attr & 0x1)
-            attname.append(stringCfg["attribtue_earth"].to_string()).append("|");
+            attname.append(stringCfg["attribute_earth"].to_string()).append("|");
         if(attr & 0x2)
-            attname.append(stringCfg["attribtue_water"].to_string()).append("|");
+            attname.append(stringCfg["attribute_water"].to_string()).append("|");
         if(attr & 0x4)
-            attname.append(stringCfg["attribtue_fire"].to_string()).append("|");
+            attname.append(stringCfg["attribute_fire"].to_string()).append("|");
         if(attr & 0x8)
-            attname.append(stringCfg["attribtue_wind"].to_string()).append("|");
+            attname.append(stringCfg["attribute_wind"].to_string()).append("|");
         if(attr & 0x10)
-            attname.append(stringCfg["attribtue_light"].to_string()).append("|");
+            attname.append(stringCfg["attribute_light"].to_string()).append("|");
         if(attr & 0x20)
-            attname.append(stringCfg["attribtue_dark"].to_string()).append("|");
+            attname.append(stringCfg["attribute_dark"].to_string()).append("|");
         if(attr & 0x40)
-            attname.append(stringCfg["attribtue_divine"].to_string()).append("|");
+            attname.append(stringCfg["attribute_divine"].to_string()).append("|");
         if(attname.length() > 0)
             attname.resize(attname.length() - 1);
         return To<std::wstring>(attname);

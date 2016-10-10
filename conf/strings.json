@@ -1,6 +1,6 @@
 {
   "unknown" : "？？？",
-  "pendulum_delimiter" : "[----]",
+  "pendulum_delimiter" : "【怪兽效果】",
   "eui_button_ok" : "确定",
   "eui_button_cancel" : "取消",
   "eui_button_yes" : "是",
@@ -66,8 +66,8 @@
   "eui_msg_screen_err" : "无法创建文件夹 {path}.",
   "eui_msg_screen_save" : "卡组已保存至:\n{path}",
   "eui_msg_setcode" : "从属系列:",
-  "eui_logmsg_coin" : "{name}投掷了硬币，结果是{result}",
-  "eui_logmsg_dice" : "{name}投掷了骰子，结果是{result}",
+  "eui_logmsg_coin" : "{name}投掷了硬币，结果是【{result}】",
+  "eui_logmsg_dice" : "{name}投掷了骰子，结果是【{result}】",
   "eui_logmsg_coin_front" : "正面",
   "eui_logmsg_coin_back" : "反面",
   "eui_logmsg_select_option" : "{name}选择了{result}",

@@ -923,8 +923,11 @@ namespace ygopro
                 pen_text->SetPosition({info_margin + scale_width, info_text_height + info_margin});
                 pen_text->GetTextUI()->SetLinespacing(2);
                 pen_text->GetTextUI()->SetMaxWidth(scroll_area->GetViewSize().x - slider_width - scale_width * 2);
-                if(pd > 0)
-                    pen_text->GetTextUI()->SetText(data->texts.substr(0, pd - 1), 0xff000000);
+                if(pd > 0) {
+                    // todo: remove scale text from description
+                    auto st = data->texts.find(L"→");
+                    pen_text->GetTextUI()->SetText(data->texts.substr(data->texts.find(L"→") + 1, pd - st - 1), 0xff000000);
+                }
                 ph = pen_text->GetAbsoluteSize().y;
             }
             if(ph < min_pen_height)
@@ -1046,7 +1049,7 @@ namespace ygopro
     void LogPanel::AddLog(int32_t msg_type, const std::wstring& msg, bool newlog) {
         if(msg_type >= 3)
             return;
-        if(log_list[msg_type]) {
+        if(!window.expired() && log_list[msg_type]) {
             log_list[msg_type]->AddItem(L"", default_item_color);
             auto count = log_list[msg_type]->GetItemCount();
             auto ui = log_list[msg_type]->GetItemUI(count - 1);
