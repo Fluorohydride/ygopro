@@ -1217,13 +1217,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
 			pcard->is_selected = false;
 			if(flag == EDESC_OPERATION) {
-				pcard->is_conti = true;
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
 				conti_exist = true;
 			} else {
-				pcard->chain_code = code;
 				pcard->is_selectable = true;
 				if(flag == EDESC_RESET)
 					pcard->cmdFlag |= COMMAND_RESET;
@@ -1426,7 +1424,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_SELECT_COUNTER: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_counter_type = BufferIO::ReadInt16(pbuf);
-		mainGame->dField.select_counter_count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_counter_count = BufferIO::ReadInt16(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.selectable_cards.clear();
 		int c, l, s, t/*, code*/;
@@ -1436,7 +1434,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 			l = BufferIO::ReadInt8(pbuf);
 			s = BufferIO::ReadInt8(pbuf);
-			t = BufferIO::ReadInt8(pbuf);
+			t = BufferIO::ReadInt16(pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			mainGame->dField.selectable_cards.push_back(pcard);
 			pcard->opParam = (t << 16) | t;
@@ -2222,7 +2220,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_FIELD_DISABLED: {
-		int disabled = BufferIO::ReadInt32(pbuf);
+		unsigned int disabled = BufferIO::ReadInt32(pbuf);
 		if (!mainGame->dInfo.isFirst)
 			disabled = (disabled >> 16) | (disabled << 16);
 		mainGame->dField.disabled_field = disabled;

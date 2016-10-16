@@ -15,7 +15,7 @@
 #include <unistd.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x133B;
+const unsigned short PRO_VERSION = 0x133C;
 
 namespace ygo {
 
@@ -94,6 +94,8 @@ bool Game::Initialize() {
 	is_building = false;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
+	for(int i = 0; i < 2048; ++i)
+ 		dataManager._sysStrings[i] = 0;
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
