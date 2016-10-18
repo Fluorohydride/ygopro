@@ -835,6 +835,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				} else {
 					mainGame->HideElement(mainGame->wCardSelect);
+					if(mainGame->dInfo.curMsg == MSG_SELECT_CHAIN && !chain_forced)
+						ShowCancelOrFinishButton(1);
 					break;
 				}
 				break;
