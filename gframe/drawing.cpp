@@ -464,11 +464,11 @@ void Game::DrawMisc() {
 				adFont->draw(pcard->rkstring, recti(m2 + 4, 272, m2 + 4 + w2, 292), 0xff000000, false, false, 0);
 				adFont->draw(pcard->rkstring, recti(m2 + 5, 273, m2 + 5 + w2, 293), 0xffff80ff, false, false, 0);
 			}else if (pcard->rank != 0) {
-				adFont->draw(pcard->rkstring, recti(473 + i * 80, 272, 475 + i * 80, 292), 0xff000000, false, false, 0);
-				adFont->draw(pcard->rkstring, recti(474 + i * 80, 273, 476 + i * 80, 293),0xffff80ff, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(779 - i * 71, 272, 800 - i * 71, 292), 0xff000000, false, false, 0);
+				adFont->draw(pcard->rkstring, recti(780 - i * 71, 273, 800 - i * 71, 293),0xffff80ff, false, false, 0);
 			}else if (pcard->level != 0) {
-				adFont->draw(pcard->lvstring, recti(473 + i * 80, 272, 475 + i * 80, 292), 0xff000000, false, false, 0);
-				adFont->draw(pcard->lvstring, recti(474 + i * 80, 273, 476 + i * 80, 293),(pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+				adFont->draw(pcard->lvstring, recti(779 - i * 71, 272, 800 - i * 71, 292), 0xff000000, false, false, 0);
+				adFont->draw(pcard->lvstring, recti(780 - i * 71, 273, 800 - i * 71, 293),(pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
 			}
 		}
 	}
