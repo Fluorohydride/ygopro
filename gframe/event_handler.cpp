@@ -1482,6 +1482,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_RMOUSE_LEFT_UP: {
 			if(mainGame->dInfo.isReplay)
 				break;
+			if(event.MouseInput.isLeftPressed())
+				break;
 			s32 x = event.MouseInput.X;
 			s32 y = event.MouseInput.Y;
 			irr::core::position2di pos(x, y);
