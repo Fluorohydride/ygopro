@@ -15,6 +15,7 @@ public:
 	bool LoadStrings(const char* file);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
+	bool GetDataC(int code, CardDataC* pData);
 	code_pointer GetCodePointer(int code);
 	bool GetString(int code, CardString* pStr);
 	const wchar_t* GetName(int code);
