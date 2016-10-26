@@ -1015,6 +1015,7 @@ void Game::ShowCardInfo(int code) {
 		if(sc) {
 			offset = 23;
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
+			showingsetname = dataManager.FormatFullSetName(sc);
 			stSetName->setText(formatBuffer);
 		} else
 			stSetName->setText(L"");

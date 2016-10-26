@@ -650,8 +650,21 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			int y = event.MouseInput.Y;
 			irr::core::position2di mouse_pos(x, y);
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-			if(root->getElementFromPoint(mouse_pos) != root)
+			irr::gui::IGUIElement* elem = root->getElementFromPoint(mouse_pos);
+			if(elem != root) {
+				if(elem == mainGame->stSetName) {
+					wchar_t formatBuffer[2048];
+					myswprintf(formatBuffer, L"%ls", mainGame->showingsetname);
+					mainGame->stTip->setText(formatBuffer);
+					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(formatBuffer) + irr::core::dimension2d<unsigned int>(10, 10);
+					mainGame->stTip->setRelativePosition(recti(x + 10, y + 10, x + 10 + dtip.Width, y + 10 + dtip.Height));
+					mainGame->stTip->setVisible(true);
+				} else {
+					mainGame->stTip->setVisible(false);
+				}
 				break;
+			}
+			mainGame->stTip->setVisible(false);
 			int pre_code = hovered_code;
 			if(x >= 314 && x <= 794 && y >= 164 && y <= 435) {
 				int lx = 10, px, py = (y - 164) / 68;
