@@ -74,7 +74,6 @@ bool Game::Initialize() {
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
 	HICON hSmallIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
-	HWND hWnd;
 	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
 	if(gameConf.use_d3d)
 		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
