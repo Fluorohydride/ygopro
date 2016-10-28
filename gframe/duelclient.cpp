@@ -641,6 +641,15 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->stHostPrepDuelist[pkt->pos]->setText(name);
 		mainGame->gMutex.Unlock();
+#ifdef _WIN32
+		FLASHWINFO fi;
+		fi.cbSize = sizeof(FLASHWINFO);
+		fi.hwnd = mainGame->hWnd;
+		fi.dwFlags = FLASHW_TRAY | FLASHW_TIMERNOFG;
+		fi.uCount = 0;
+		fi.dwTimeout = 0;
+		FlashWindowEx(&fi);
+#endif
 		break;
 	}
 	case STOC_HS_PLAYER_CHANGE: {
