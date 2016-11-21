@@ -87,6 +87,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ShowElement(mainGame->wCreateHost);
 				break;
 			}
+			case BUTTON_RULE_CARDS: {
+				if(mainGame->wRules->isVisible()){
+					mainGame->HideElement(mainGame->wRules);
+				}else {
+					mainGame->PopupElement(mainGame->wRules);
+				}
+				break;
+			}
+			case BUTTON_RULE_OK: {				
+				mainGame->HideElement(mainGame->wRules);
+				break;
+			}
 			case BUTTON_HOST_CONFIRM: {
 				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
 				if(!NetServer::StartServer(mainGame->gameConf.serverport))
@@ -95,6 +107,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					NetServer::StopServer();
 					break;
 				}
+				mainGame->HideElement(mainGame->wRules);
 				mainGame->btnHostConfirm->setEnabled(false);
 				mainGame->btnHostCancel->setEnabled(false);
 				break;
@@ -103,6 +116,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->HideElement(mainGame->wRules);
 				mainGame->HideElement(mainGame->wCreateHost);
 				mainGame->ShowElement(mainGame->wLanWindow);
 				break;
@@ -140,6 +154,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
+				mainGame->HideElement(mainGame->wHostPrepare2);
 				mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->wChat->setVisible(false);
 				if(exit_on_return)
@@ -332,6 +347,134 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				} else {
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 					mainGame->cbDeckSelect->setEnabled(true);
+				}
+				break;
+			}
+			case CHECK_SEALED_DUEL: {
+				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					for (int i = 1; i < 14; ++i)
+						if (i != 3)
+						mainGame->chkRules[i]->setEnabled(false);
+				}
+				else {
+					for (int i = 1; i < 14; ++i)
+						if (i != 3)
+						mainGame->chkRules[i]->setEnabled(true);
+				}
+				break;
+			}
+			case CHECK_BOOSTER_DUEL: {
+				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					for (int i = 0; i < 14; ++i)
+						if(i != 1 && i != 3)
+						mainGame->chkRules[i]->setEnabled(false);
+				}
+				else {
+					for (int i = 0; i < 14; ++i)
+						if (i != 1 && i != 3)
+						mainGame->chkRules[i]->setEnabled(true);
+				}
+				break;
+			}
+			case CHECK_ACTION_DUEL: {
+				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					mainGame->chkRules[0]->setEnabled(false);
+					mainGame->chkRules[1]->setEnabled(false);
+					for (int i = 9; i < 12; ++i)
+							mainGame->chkRules[i]->setEnabled(false);
+				}
+				else {
+					mainGame->chkRules[0]->setEnabled(true);
+					mainGame->chkRules[1]->setEnabled(true);
+					for (int i = 9; i < 12; ++i)
+							mainGame->chkRules[i]->setEnabled(true);
+					for (int i = 0; i < 14; ++i) {
+						if (mainGame->chkRules[i]->isChecked() && i != 3)
+							for (int i = 0; i < 2; ++i)
+								mainGame->chkRules[i]->setEnabled(false);
+					}
+				}
+				break;
+			}
+			case CHECK_CONCENTRATION_DUEL:
+			case CHECK_BOSS_DUEL:
+			case CHECK_BATTLE_CITY:
+			case CHECK_DUELIST_KINGDOM:
+			case CHECK_ROSE_DUEL:
+			case CHECK_COMMAND_DUEL:
+			case CHECK_DECK_MASTER_DUEL: {
+				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					for (int i = 0; i < 2; ++i)
+						mainGame->chkRules[i]->setEnabled(false);
+				}
+				else {
+					for (int i = 0; i < 2; ++i)
+						mainGame->chkRules[i]->setEnabled(true);
+					for (int i = 0; i < 16; ++i) {
+						if (mainGame->chkRules[i]->isChecked() && i != 3)
+							for (int i = 0; i < 2; ++i)
+								mainGame->chkRules[i]->setEnabled(false);
+					}
+				}
+				break;
+			}
+			case CHECK_TURBO_DUEL_1: {
+				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					for (int i = 0; i < 3; ++i)
+						mainGame->chkRules[i]->setEnabled(false);
+					mainGame->chkRules[10]->setEnabled(false);
+					mainGame->chkRules[11]->setEnabled(false);
+				}
+				else {
+					for (int i = 0; i < 3; ++i)
+						mainGame->chkRules[i]->setEnabled(true);
+					mainGame->chkRules[10]->setEnabled(true);
+					mainGame->chkRules[11]->setEnabled(true);
+					for (int i = 0; i < 16; ++i) {
+						if (mainGame->chkRules[i]->isChecked() && i != 3)
+							for (int i = 0; i < 2; ++i)
+								mainGame->chkRules[i]->setEnabled(false);
+					}
+				}
+				break;
+			}
+			case CHECK_TURBO_DUEL_2: {
+				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					for (int i = 0; i < 3; ++i)
+						mainGame->chkRules[i]->setEnabled(false);
+					mainGame->chkRules[9]->setEnabled(false);
+					mainGame->chkRules[11]->setEnabled(false);
+				}
+				else {
+					for (int i = 0; i < 3; ++i)
+						mainGame->chkRules[i]->setEnabled(true);
+					mainGame->chkRules[9]->setEnabled(true);
+					mainGame->chkRules[11]->setEnabled(true);
+					for (int i = 0; i < 16; ++i) {
+						if (mainGame->chkRules[i]->isChecked() && i != 3)
+							for (int i = 0; i < 2; ++i)
+								mainGame->chkRules[i]->setEnabled(false);
+					}
+				}
+				break;
+			}
+			case CHECK_TURBO_DUEL_3: {
+				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					for (int i = 0; i < 3; ++i)
+						mainGame->chkRules[i]->setEnabled(false);
+					mainGame->chkRules[9]->setEnabled(false);
+					mainGame->chkRules[10]->setEnabled(false);
+				}
+				else {
+					for (int i = 0; i < 3; ++i)
+						mainGame->chkRules[i]->setEnabled(true);
+					mainGame->chkRules[9]->setEnabled(true);
+					mainGame->chkRules[10]->setEnabled(true);
+					for (int i = 0; i < 16; ++i) {
+						if (mainGame->chkRules[i]->isChecked() && i != 3)
+							for (int i = 0; i < 2; ++i)
+								mainGame->chkRules[i]->setEnabled(false);
+					}
 				}
 				break;
 			}

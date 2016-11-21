@@ -14,7 +14,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x133C;
+const unsigned short PRO_VERSION = 0x133A;
 
 namespace ygo {
 
@@ -140,6 +140,16 @@ bool Game::Initialize() {
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
 	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1236));
+	btnRuleCards = env->addButton(rect<s32>(260, 330, 370, 350), wCreateHost, BUTTON_RULE_CARDS, dataManager.GetSysString(1625));
+	wRules = env->addWindow(rect<s32>(630, 100, 1000, 310), false, dataManager.strBuffer);
+	wRules->getCloseButton()->setVisible(false);
+	wRules->setDrawTitlebar(false);
+	wRules->setDraggable(true);
+	wRules->setVisible(false);
+	btnRulesOK = env->addButton(rect<s32>(135, 175, 235, 200), wRules, BUTTON_RULE_OK, dataManager.GetSysString(1211));
+	for(int i = 0; i < 14; ++i)
+		chkRules[i] = env->addCheckBox(false, recti(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, 353+i, dataManager.GetSysString(1132 + i));
+	chkDrawDestiny = env->addCheckBox(false, rect<s32>(180, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1626));
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
@@ -163,6 +173,10 @@ bool Game::Initialize() {
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
 	//host(single)
+	wHostPrepare2 = env->addWindow(rect<s32>(750, 120, 950, 440), false, dataManager.GetSysString(1625));
+	wHostPrepare2->getCloseButton()->setVisible(false);
+	wHostPrepare2->setVisible(false);
+	stHostPrepRule2 = env->addStaticText(L"", rect<s32>(10, 30, 460, 230), false, true, wHostPrepare2);
 	wHostPrepare = env->addWindow(rect<s32>(270, 120, 750, 440), false, dataManager.GetSysString(1250));
 	wHostPrepare->getCloseButton()->setVisible(false);
 	wHostPrepare->setVisible(false);

@@ -228,12 +228,19 @@ public:
 	irr::gui::IGUIEditBox* ebServerName;
 	irr::gui::IGUIEditBox* ebServerPass;
 	irr::gui::IGUICheckBox* chkEnablePriority;
+	irr::gui::IGUIButton* btnRuleCards;
+	irr::gui::IGUIWindow* wRules;
+	irr::gui::IGUICheckBox* chkRules[14];
+	irr::gui::IGUIButton* btnRulesOK;
+	irr::gui::IGUICheckBox* chkDrawDestiny;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
 	irr::gui::IGUIButton* btnHostCancel;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
+	irr::gui::IGUIWindow* wHostPrepare2;
+	irr::gui::IGUIStaticText* stHostCardRule;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
 	irr::gui::IGUIButton* btnHostPrepOB;
 	irr::gui::IGUIStaticText* stHostPrepDuelist[4];
@@ -241,6 +248,7 @@ public:
 	irr::gui::IGUIButton* btnHostPrepKick[4];
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIStaticText* stHostPrepRule;
+	irr::gui::IGUIStaticText* stHostPrepRule2;
 	irr::gui::IGUIStaticText* stHostPrepOB;
 	irr::gui::IGUIButton* btnHostPrepStart;
 	irr::gui::IGUIButton* btnHostPrepCancel;
@@ -432,6 +440,8 @@ extern Game* mainGame;
 #define BUTTON_HOST_CONFIRM			114
 #define BUTTON_HOST_CANCEL			115
 #define BUTTON_LAN_REFRESH			116
+#define BUTTON_RULE_CARDS			117
+#define BUTTON_RULE_OK				118
 #define BUTTON_HP_DUELIST			120
 #define BUTTON_HP_OBSERVER			121
 #define BUTTON_HP_START				122
@@ -526,5 +536,19 @@ extern Game* mainGame;
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
+#define CHECK_SEALED_DUEL			353
+#define CHECK_BOOSTER_DUEL			354
+#define CHECK_ACTION_DUEL			355
+#define CHECK_SPEED_DUEL			356
+#define CHECK_CONCENTRATION_DUEL	357
+#define CHECK_BOSS_DUEL				358
+#define CHECK_BATTLE_CITY			359
+#define CHECK_DUELIST_KINGDOM		360
+#define CHECK_ROSE_DUEL				361
+#define CHECK_TURBO_DUEL_1			362
+#define CHECK_TURBO_DUEL_2			363
+#define CHECK_TURBO_DUEL_3			364
+#define CHECK_COMMAND_DUEL			365
+#define CHECK_DECK_MASTER_DUEL		366
 #define COMBOBOX_SORTTYPE			370
 #endif // GAME_H

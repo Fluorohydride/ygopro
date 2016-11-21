@@ -120,6 +120,26 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
 			cscg.info.enable_priority = mainGame->chkEnablePriority->isChecked();
+			cscg.info.destiny_draw = mainGame->chkDrawDestiny->isChecked();
+			cscg.info.sealed = mainGame->chkRules[0]->isChecked();
+			cscg.info.booster = mainGame->chkRules[1]->isChecked();
+			cscg.info.action = mainGame->chkRules[2]->isChecked();
+			cscg.info.speed = mainGame->chkRules[3]->isChecked();
+			cscg.info.concentration = mainGame->chkRules[4]->isChecked();
+			cscg.info.boss = mainGame->chkRules[5]->isChecked();
+			cscg.info.city = mainGame->chkRules[6]->isChecked();
+			cscg.info.kingdom = mainGame->chkRules[7]->isChecked();
+			cscg.info.rose = mainGame->chkRules[8]->isChecked();
+			cscg.info.turbo1 = mainGame->chkRules[9]->isChecked();
+			cscg.info.turbo2 = mainGame->chkRules[10]->isChecked();
+			cscg.info.turbo3 = mainGame->chkRules[11]->isChecked();
+			cscg.info.command = mainGame->chkRules[12]->isChecked();
+			cscg.info.master = mainGame->chkRules[13]->isChecked();
+			cscg.info.rule_count = 0;
+			for (int i = 0; i < 14; ++i) {
+				if (mainGame->chkRules[i]->isChecked())
+					++cscg.info.rule_count;
+			}
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
@@ -151,6 +171,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->gMutex.Lock();
 					mainGame->HideElement(mainGame->wHostPrepare);
+					mainGame->HideElement(mainGame->wHostPrepare2);
 					mainGame->ShowElement(mainGame->wLanWindow);
 					mainGame->wChat->setVisible(false);
 					if(events & BEV_EVENT_EOF)
@@ -311,6 +332,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_JOIN_GAME: {
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
 		std::wstring str;
+		std::wstring str2;
 		wchar_t msgbuf[256];
 		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist));
 		str.append(msgbuf);
@@ -333,6 +355,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1236));
 			str.append(msgbuf);
 		}
+		if(pkt->info.destiny_draw) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1626));
+			str.append(msgbuf);
+		}
 		if(pkt->info.no_check_deck) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1229));
 			str.append(msgbuf);
@@ -340,6 +366,62 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(pkt->info.no_shuffle_deck) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1230));
 			str.append(msgbuf);
+		}
+		if(pkt->info.sealed) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1132));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.booster) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1133));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.action) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1134));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.speed) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1135));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.concentration) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1136));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.boss) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1137));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.city) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1138));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.kingdom) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1139));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.rose) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1140));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.turbo1) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1141));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.turbo2) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1142));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.turbo3) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1143));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.command) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1144));
+			str2.append(msgbuf);
+		}
+		if(pkt->info.master) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1145));
+			str2.append(msgbuf);
 		}
 		mainGame->gMutex.Lock();
 		if(pkt->info.mode == 2) {
@@ -372,6 +454,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->stHostPrepDuelist[3]->setText(L"");
 		mainGame->stHostPrepOB->setText(L"");
 		mainGame->SetStaticText(mainGame->stHostPrepRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
+		mainGame->SetStaticText(mainGame->stHostPrepRule2, 180, mainGame->guiFont, (wchar_t*)str2.c_str());
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		mainGame->cbDeckSelect->setEnabled(true);
 		if(mainGame->wCreateHost->isVisible())
@@ -379,6 +462,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
+		if(pkt->info.rule_count > 0)
+			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
 		connect_state |= 0x4;
@@ -440,6 +525,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_DUEL_START: {
 		mainGame->HideElement(mainGame->wHostPrepare);
+		mainGame->HideElement(mainGame->wHostPrepare2);
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
@@ -3422,7 +3508,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
-			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck && ! pHP->host.enable_priority)
+			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck && ! pHP->host.enable_priority && !pHP->host.destiny_draw && pHP->host.rule_count==0 )
 				hoststr.append(dataManager.GetSysString(1280));
 			else hoststr.append(dataManager.GetSysString(1281));
 			hoststr.append(L"]");

@@ -385,6 +385,8 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	int opt = 0;
 	if(host_info.enable_priority)
 		opt |= DUEL_OBSOLETE_RULING;
+	if(host_info.destiny_draw)
+		opt |= DUEL_DESTINY_DRAW;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
 	opt |= DUEL_TAG_MODE;
@@ -394,10 +396,68 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
 	//
-	last_replay.WriteInt32(pdeck[0].main.size(), false);
+	last_replay.WriteInt32(pdeck[0].main.size() + host_info.rule_count, false);
 	for(int32 i = (int32)pdeck[0].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
+	}
+	if(host_info.destiny_draw) {
+		new_card(pduel, 511004000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511004000, false);
+	}
+	if(host_info.sealed) {
+		new_card(pduel, 511005092, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511005092, false);
+	}
+	if(host_info.booster) {
+		new_card(pduel, 511005093, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511005093, false);
+	}
+	if(host_info.action) {
+		new_card(pduel, 95000043, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(95000043, false);
+	}
+	if(host_info.speed) {
+		new_card(pduel, 511004001, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511004001, false);
+	}
+	if(host_info.concentration) {
+		//needed mode
+	}
+	if(host_info.boss) {
+		new_card(pduel, 95000000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(95000000, false);
+	}
+	if(host_info.city) {
+		new_card(pduel, 511004014, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511004014, false);
+	}
+	if(host_info.kingdom) {
+		new_card(pduel, 511002621, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511002621, false);
+	}
+	if(host_info.rose) {
+		//needed mode
+	}
+	if(host_info.turbo1) {
+		new_card(pduel, 511002094, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511002094, false);
+	}
+	if(host_info.turbo2) {
+		new_card(pduel, 110000000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(110000000, false);
+	}
+	if(host_info.turbo3) {
+		new_card(pduel, 511001727, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(511001727, false);
+	}
+	if(host_info.command) {
+		new_card(pduel, 95200000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(95200000, false);
+	}
+	if(host_info.master) {
+		new_card(pduel, 51100567, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(51100567, false);
 	}
 	last_replay.WriteInt32(pdeck[0].extra.size(), false);
 	for(int32 i = (int32)pdeck[0].extra.size() - 1; i >= 0; --i) {
@@ -416,10 +476,17 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
 	}
 	//
-	last_replay.WriteInt32(pdeck[3].main.size(), false);
+	if(host_info.master)
+		last_replay.WriteInt32(pdeck[3].main.size() + 1, false);
+	else
+		last_replay.WriteInt32(pdeck[3].main.size(), false);
 	for(int32 i = (int32)pdeck[3].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[3].main[i]->first, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[3].main[i]->first, false);
+	}
+	if(host_info.master) {
+		new_card(pduel, 51100567, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(51100567, false);
 	}
 	last_replay.WriteInt32(pdeck[3].extra.size(), false);
 	for(int32 i = (int32)pdeck[3].extra.size() - 1; i >= 0; --i) {
