@@ -1365,8 +1365,6 @@ void Game::OnResize()
 	wRules->setRelativePosition(mainGame->ResizeWin(630, 100, 1000, 310));
 	wReplay->setRelativePosition(mainGame->ResizeWin(220, 100, 800, 520));
 	wSinglePlay->setRelativePosition(mainGame->ResizeWin(220, 100, 800, 520));
-	wChat->setRelativePosition(mainGame->ResizeWin(305, 615, 1020, 640, true));
-	ebChatInput->setRelativePosition(recti(3, 2, mainGame->window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
@@ -1394,6 +1392,9 @@ void Game::OnResize()
 	lstLog->setRelativePosition(mainGame->Resize(10, 10, 290, 290));
 	btnClearLog->setRelativePosition(mainGame->Resize(160, 300, 260, 325));
 	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
+
+	wChat->setRelativePosition(mainGame->ResizeWin(wInfos->getRelativePosition().LowerRightCorner.X + 6, 615, 1020, 640, true));
+	ebChatInput->setRelativePosition(recti(3, 2, mainGame->window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));

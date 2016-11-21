@@ -527,6 +527,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								selectable_cards.push_back(grave[command_controler][i]);
 						break;
 					}
+					case LOCATION_REMOVED: {
+						for (size_t i = 0; i < remove[command_controler].size(); ++i)
+							if (remove[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
+								selectable_cards.push_back(remove[command_controler][i]);
+						break;
+					}
 					case LOCATION_EXTRA: {
 						for(size_t i = 0; i < extra[command_controler].size(); ++i)
 							if(extra[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
@@ -607,6 +613,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_MZONE: {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
 					for(int32 i = 0; i < (int32)pcard->overlayed.size(); ++i)
+						selectable_cards.push_back(pcard->overlayed[i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				case LOCATION_SZONE: {
+					ClientCard* pcard = szone[command_controler][command_sequence];
+					for (int32 i = 0; i < (int32)pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);
