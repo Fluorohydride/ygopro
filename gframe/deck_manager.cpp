@@ -66,6 +66,15 @@ wchar_t* DeckManager::GetLFListName(int lfhash) {
 	}
 	return (wchar_t*)dataManager.unknown_string;
 }
+int DeckManager::TypeCount(std::vector<code_pointer> cards, int type) {
+	int count = 0;
+	for (size_t i = 0; i < cards.size(); ++i) {
+		code_pointer cit = cards[i];
+		if (cit->second.type & type)
+			count++;
+	}
+	return count;
+}
 int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
 	std::unordered_map<int, int> ccount;
 	std::unordered_map<int, int>* list = 0;

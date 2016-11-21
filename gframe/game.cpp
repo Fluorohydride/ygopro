@@ -453,11 +453,11 @@ bool Game::Initialize() {
 	cbCardType->addItem(dataManager.GetSysString(1312));
 	cbCardType->addItem(dataManager.GetSysString(1313));
 	cbCardType->addItem(dataManager.GetSysString(1314));
-	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, -1);
+	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, COMBOBOX_OTHER_FILT);
 	cbCardType2->setMaxSelectionRows(10);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
 	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
-	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, -1);
+	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, COMBOBOX_OTHER_FILT);
 	cbLimit->setMaxSelectionRows(10);
 	cbLimit->addItem(dataManager.GetSysString(1310));
 	cbLimit->addItem(dataManager.GetSysString(1316));
@@ -468,13 +468,13 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1242));
 	cbLimit->addItem(dataManager.GetSysString(1243));
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
-	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, -1);
+	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, COMBOBOX_OTHER_FILT);
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
 		cbAttribute->addItem(dataManager.FormatAttribute(filter), filter);
 	stRace = env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
-	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 190, 60 + 75 / 6), wFilter, -1);
+	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 190, 60 + 75 / 6), wFilter, COMBOBOX_OTHER_FILT);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x1000000; filter <<= 1)
@@ -713,26 +713,40 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 	scrCardText->setPos(0);
 }
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
-	int pbuffer = 0;
-	u32 _width = 0, _height = 0;
-	for(size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
-		u32 w = font->getCharDimension(text[i]).Width;
-		if(text[i] == L'\n') {
-			dataManager.strBuffer[pbuffer++] = L'\n';
-			_width = 0;
-			_height++;
-			if(_height == pos)
-				pbuffer = 0;
-			continue;
-		} else if(_width > 0 && _width + w > cWidth) {
+	int pbuffer = 0, lsnz = 0;
+	u32 _width = 0, _height = 0, s = font->getCharDimension(L' ').Width;
+	for (size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
+		if (text[i] == L' ') {
+			lsnz = i;
+			if (_width + s > cWidth) {
+				dataManager.strBuffer[pbuffer++] = L'\n';
+				_width = 0;
+				_height++;
+				if(_height == pos)
+					pbuffer = 0;
+			}
+			else {
+				dataManager.strBuffer[pbuffer++] = L' ';
+				_width += s;
+			}
+		}
+		else if(text[i] == L'\n') {
 			dataManager.strBuffer[pbuffer++] = L'\n';
 			_width = 0;
 			_height++;
 			if(_height == pos)
 				pbuffer = 0;
 		}
-		_width += w;
-		dataManager.strBuffer[pbuffer++] = text[i];
+		else {
+			if((_width += font->getCharDimension(text[i]).Width) > cWidth) {
+				dataManager.strBuffer[lsnz] = L'\n';
+				_width = 0;
+				for(int j = lsnz + 1; j < i; j++) {
+					_width += font->getCharDimension(text[j]).Width;
+				}
+			}
+			dataManager.strBuffer[pbuffer++] = text[i];
+		}
 	}
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
@@ -1075,7 +1089,7 @@ void Game::ShowCardInfo(int code) {
 	}
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
-	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
+	InitStaticText(stText, tsize.getWidth() - 30, tsize.getHeight(), textFont, showingtext);
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {

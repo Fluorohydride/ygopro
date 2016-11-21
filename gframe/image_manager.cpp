@@ -76,7 +76,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 	if(tit->second)
 		return tit->second;
 	else
-		return GetTextureThumb(code);
+		return tUnknown;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
@@ -101,7 +101,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(tit->second)
 		return tit->second;
 	else
-		return tUnknown;
+		return GetTexture(code);
 }
 irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	if(code == 0)

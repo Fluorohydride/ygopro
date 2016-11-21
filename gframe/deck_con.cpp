@@ -263,6 +263,31 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::gui::EGET_EDITBOX_CHANGED: {
+			switch (id) {
+			case EDITBOX_KEYWORD: {
+				stringw filter = mainGame->ebCardName->getText();
+				if (filter.size() > 2) {
+					filter_type = mainGame->cbCardType->getSelected();
+					filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
+					filter_lm = mainGame->cbLimit->getSelected();
+					if (filter_type == 1) {
+						filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
+						filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
+						filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
+						filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
+						filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
+						filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
+					}
+					FilterCards();
+					if (!mainGame->gameConf.separate_clear_button)
+						ClearFilter();
+				}
+				break;
+			}
+			}
+			break;
+		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
@@ -361,7 +386,38 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
+				filter_type = mainGame->cbCardType->getSelected();
+				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
+				filter_lm = mainGame->cbLimit->getSelected();
+				if (filter_type == 1) {
+					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
+					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
+					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
+					filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
+					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
+					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
+				}
+				FilterCards();
+				if (!mainGame->gameConf.separate_clear_button)
+					ClearFilter();
 				break;
+			}
+			case COMBOBOX_OTHER_FILT: {
+				filter_type = mainGame->cbCardType->getSelected();
+				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
+				filter_lm = mainGame->cbLimit->getSelected();
+				if(filter_type == 1) {
+					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
+					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
+					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
+					filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
+					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
+					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
+				}
+				FilterCards();
+				if(!mainGame->gameConf.separate_clear_button)
+					ClearFilter();
+				break; 
 			}
 			case COMBOBOX_SORTTYPE: {
 				SortList();
@@ -772,9 +828,7 @@ void DeckBuilder::FilterCards() {
 		return;
 	}
 	unsigned int set_code = 0;
-	if(pstr[0] == L'@')
-		set_code = dataManager.GetSetCode(&pstr[1]);
-	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
+	if(pstr[0] == 0)
 		pstr = 0;
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
@@ -846,17 +900,10 @@ void DeckBuilder::FilterCards() {
 				continue;
 		}
 		if(pstr) {
-			if(pstr[0] == L'$') {
-				if(wcsstr(text.name, &pstr[1]) == 0)
+			if(!(CardNameCompare(text.name, pstr)) && !(CardNameCompare(text.text, pstr))) {
+				set_code = dataManager.GetSetCode(&pstr[0]);
+				if (!set_code || !check_set_code(data, set_code))
 					continue;
-			} else if(pstr[0] == L'@' && set_code) {
-				if(!check_set_code(data, set_code)) continue;
-			} else {
-				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0) {
-					set_code = dataManager.GetSetCode(&pstr[0]);
-					if(!set_code || !check_set_code(data, set_code))
-						continue;
-				}
 			}
 		}
 		results.push_back(ptr);
@@ -871,6 +918,33 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setPos(0);
 	}
 	SortList();
+}
+bool DeckBuilder::CardNameCompare(const wchar_t *sa, const wchar_t *sb)
+{
+	int i = 0;
+	int j = 0;
+	wchar_t ca;
+	wchar_t cb;
+
+	if (!sa || !sb)
+		return false;
+	while (sa[i])
+	{
+		ca = towupper(sa[i]);
+		cb = towupper(sb[j]);
+		if (ca == '-') ca = ' ';
+		if (cb == '-') cb = ' ';
+		if (ca == cb)
+		{
+			j++;
+			if (!sb[j])
+				return true;
+		}
+		else
+			j = 0;
+		i++;
+	}
+	return false;
 }
 void DeckBuilder::ClearSearch() {
 	mainGame->cbCardType->setSelected(0);

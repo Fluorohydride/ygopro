@@ -1783,7 +1783,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							}
 							should_show_tip = true;
 							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
-							mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
+							mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y - 10 - dtip.Height, mousepos.X - 10, mousepos.Y - 10));
 							mainGame->stTip->setText(str.c_str());
 						}
 					} else {
@@ -1821,7 +1821,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					should_show_tip = true;
 					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
-					mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y + 10, x - 10, y + 10 + dtip.Height));
+					mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y + 10, mousepos.X - 10, mousepos.Y + 10 + dtip.Height));
 					mainGame->stTip->setText(str.c_str());
 				}
 				hovered_player = mplayer;

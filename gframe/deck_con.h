@@ -16,6 +16,8 @@ public:
 	void ClearSearch();
 	void SortList();
 
+	static bool CardNameCompare(const wchar_t *sa, const wchar_t *sb);
+
 	long long filter_effect;
 	unsigned int filter_type;
 	unsigned int filter_type2;

@@ -38,6 +38,7 @@ public:
 	void LoadLFList();
 	wchar_t* GetLFListName(int lfhash);
 	int CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);
+	int TypeCount(std::vector<code_pointer> cards, int type);
 	void LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadDeck(const wchar_t* file);
