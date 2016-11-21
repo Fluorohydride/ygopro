@@ -34,7 +34,6 @@ struct Config {
 	int chkIgnore2;
 	int chkHideSetname;
 	int chkHideHintButton;
-	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
 
@@ -444,8 +443,6 @@ public:
 	irr::gui::IGUIButton* btnChainIgnore;
 	irr::gui::IGUIButton* btnChainAlways;
 	irr::gui::IGUIButton* btnChainWhenAvail;
-	//cancel or finish
-	irr::gui::IGUIButton* btnCancelOrFinish;
 };
 
 extern Game* mainGame;
