@@ -8,6 +8,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include <sstream>
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -33,6 +34,19 @@ bool Game::Initialize() {
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
+
+	// Apply skin
+	if (gameConf.skin_index >= 0)
+	{
+		skinSystem = new CGUISkinSystem("skin", device);
+		core::array<core::stringw> skins = skinSystem->listSkins();
+		if ((size_t)gameConf.skin_index < skins.size())
+		{
+			int index = skins.size() - gameConf.skin_index - 1; // reverse index
+			skinSystem->applySkin(skins[index].c_str());
+		}
+	}
+
 	linePattern = 0x0f0f;
 	waitFrame = 0;
 	signalFrame = 0;
@@ -967,7 +981,7 @@ void Game::LoadConfig() {
 	gameConf.chkHideSetname = 0;
 	gameConf.chkHideHintButton = 0;
 	gameConf.control_mode = 0;
-
+	gameConf.skin_index = -1;
 	gameConf.enablesound = true;
 	gameConf.volume = 1.0;
 	gameConf.enablemusic = true;
@@ -1031,6 +1045,8 @@ void Game::LoadConfig() {
 			gameConf.separate_clear_button = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_sound")) {
  			gameConf.enablesound = atoi(valbuf) > 0;
+		} else if (!strcmp(strbuf, "skin_index")) {
+			gameConf.skin_index = atoi(valbuf);
  		} else if(!strcmp(strbuf, "volume")) {
  			gameConf.volume = atof(valbuf) / 100;
  		} else if(!strcmp(strbuf, "enable_music")) {
@@ -1090,6 +1106,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
+	fprintf(fp, "skin_index = %d\n", gameConf.skin_index);
 	fprintf(fp, "enable_sound = %d\n", ((mainGame->chkEnableSound->isChecked()) ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", ((mainGame->chkEnableMusic->isChecked()) ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");

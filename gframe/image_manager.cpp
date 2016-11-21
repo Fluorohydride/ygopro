@@ -23,8 +23,8 @@ bool ImageManager::Initial() {
 	tHand[1] = driver->getTexture("textures/f2.jpg");
 	tHand[2] = driver->getTexture("textures/f3.jpg");
 	tBackGround = driver->getTexture("textures/bg.jpg");
-	tBackGround_menu = driver->getTexture("textures/bg_menu.jpg");
-	tBackGround_deck = driver->getTexture("textures/bg_deck.jpg");
+	tBackGround_menu = driver->getTexture("textures/bg.jpg");
+	tBackGround_deck = driver->getTexture("textures/bg2.jpg");
 	tField = driver->getTexture("textures/field2.png");
 	tFieldTransparent = driver->getTexture("textures/field-transparent2.png");
 	return true;
