@@ -248,6 +248,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 			}
+			case SCROLL_VOLUME: {
+				mainGame->gameConf.volume = (double)mainGame->srcVolume->getPos() / 100;
+				mainGame->engineSound->setSoundVolume(mainGame->gameConf.volume);
+				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.volume);
+				break;
+			}
 		}
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
@@ -424,6 +430,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->env->setFocus(0);
 				break;
 			}
+			}
+		}
+		case irr::gui::EGET_CHECKBOX_CHANGED: {
+			case CHECKBOX_ENABLE_MUSIC: {
+				if (!mainGame->chkEnableMusic->isChecked())
+					mainGame->engineMusic->stopAllSounds();
+				break;
 			}
 		}
 		default: break;

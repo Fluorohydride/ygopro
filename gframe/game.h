@@ -36,6 +36,11 @@ struct Config {
 	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
+
+	bool enablesound;
+	double volume;
+	bool enablemusic;
+	int BGM_index;
 };
 
 struct DuelInfo {
@@ -86,6 +91,7 @@ public:
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
+	void RefreshBGMList();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
 	void DrawCards();
@@ -105,6 +111,9 @@ public:
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearTextures();
 	void CloseDuelWindow();
+	void PlaySoundEffect(char* sound);
+	void PlayMusic(char* song, bool loop);
+	void PlayBGM();
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
@@ -135,6 +144,7 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
+	std::vector<std::wstring> BGMList;
 
 	int hideChatTimer;
 	bool hideChat;
@@ -196,6 +206,7 @@ public:
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
+	irr::gui::IGUIStaticText* stVolume;
 	irr::gui::IGUIScrollBar* scrCardText;
 	irr::gui::IGUICheckBox* chkAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
@@ -203,9 +214,12 @@ public:
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
+	irr::gui::IGUICheckBox* chkEnableSound;
+	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
+	irr::gui::IGUIScrollBar* srcVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
@@ -419,6 +433,9 @@ public:
 	irr::gui::IGUIButton* btnReplaySwap;
 	//surrender/leave
 	irr::gui::IGUIButton* btnLeaveGame;
+	//soundEngine
+	irrklang::ISoundEngine* engineSound;
+	irrklang::ISoundEngine* engineMusic;
 	//chain control
 	irr::gui::IGUIButton* btnChainIgnore;
 	irr::gui::IGUIButton* btnChainAlways;
@@ -571,5 +588,7 @@ extern Game* mainGame;
 #define CHECK_TURBO_DUEL_3			364
 #define CHECK_COMMAND_DUEL			365
 #define CHECK_DECK_MASTER_DUEL		366
+#define CHECKBOX_ENABLE_MUSIC		361
+#define SCROLL_VOLUME				362
 #define COMBOBOX_SORTTYPE			370
 #endif // GAME_H
