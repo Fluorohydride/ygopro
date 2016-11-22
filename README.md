@@ -1,3 +1,4 @@
+This will be the new mainline for ygopro projects.
 ## ygopro
 A script engine for "yu-gi-oh!" and sample gui
 
