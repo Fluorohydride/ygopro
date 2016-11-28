@@ -841,7 +841,15 @@ void DeckBuilder::FilterCards() {
 		return;
 	}
 	unsigned int set_code = 0;
+<<<<<<< HEAD
 	if(pstr[0] == 0)
+=======
+	if(pstr[0] == L'@')
+		set_code = dataManager.GetSetCode(&pstr[1]);
+	else
+		set_code = dataManager.GetSetCode(&pstr[0]);
+	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
+>>>>>>> refs/remotes/Fluorohydride/master
 		pstr = 0;
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
@@ -917,6 +925,15 @@ void DeckBuilder::FilterCards() {
 				set_code = dataManager.GetSetCode(&pstr[0]);
 				if (!set_code || !check_set_code(data, set_code))
 					continue;
+<<<<<<< HEAD
+=======
+			} else if(pstr[0] == L'@' && set_code) {
+				if(!check_set_code(data, set_code)) continue;
+			} else {
+				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0
+					&& (!set_code || !check_set_code(data, set_code)))
+					continue;
+>>>>>>> refs/remotes/Fluorohydride/master
 			}
 		}
 		results.push_back(ptr);

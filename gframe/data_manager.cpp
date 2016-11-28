@@ -193,9 +193,12 @@ const wchar_t* DataManager::GetSetName(int code) {
 	return csit->second;
 }
 unsigned int DataManager::GetSetCode(const wchar_t* setname) {
-	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit)
-		if(wcscmp(csit->second, setname) == 0)
+	wchar_t strbuff[256];
+	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
+		swscanf(csit->second, L"%[^|]", strbuff);//setname|extra info
+		if(wcscmp(strbuff, setname) == 0)
 			return csit->first;
+	}
 	return 0;
 }
 const wchar_t* DataManager::GetNumString(int num, bool bracket) {

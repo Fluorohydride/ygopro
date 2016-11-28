@@ -35,6 +35,7 @@ public:
 	irr::video::ITexture* tEquip;
 	irr::video::ITexture* tTarget;
 	irr::video::ITexture* tLim;
+	irr::video::ITexture* tOT;
 	irr::video::ITexture* tHand[3];
 	irr::video::ITexture* tBackGround;
 	irr::video::ITexture* tBackGround_menu;
