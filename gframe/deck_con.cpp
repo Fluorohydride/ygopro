@@ -945,8 +945,6 @@ bool DeckBuilder::CardNameCompare(const wchar_t *sa, const wchar_t *sb)
 	{
 		ca = towupper(sa[i]);
 		cb = towupper(sb[j]);
-		if (ca == '-') ca = ' ';
-		if (cb == '-') cb = ' ';
 		if (ca == cb)
 		{
 			j++;

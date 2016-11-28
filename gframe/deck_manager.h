@@ -37,11 +37,12 @@ public:
 
 	void LoadLFList();
 	wchar_t* GetLFListName(int lfhash);
-	int CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);
+	int CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg,bool doubled);
 	int TypeCount(std::vector<code_pointer> cards, int type);
-	void LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
+	void LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2=0, int sidec2=0, bool doubled = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadDeck(const wchar_t* file);
+	bool LoadDeckDouble(const wchar_t* file, const wchar_t* file2);
 	bool SaveDeck(Deck& deck, const wchar_t* name);
 	bool DeleteDeck(Deck& deck, const wchar_t* name);
 };

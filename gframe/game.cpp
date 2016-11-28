@@ -30,7 +30,7 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_DIRECT3D9;
 	else
 		params.DriverType = irr::video::EDT_OPENGL;
-	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
+		params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
@@ -214,6 +214,8 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 235, 110, 255), false, false, wHostPrepare);
 	cbDeckSelect = env->addComboBox(rect<s32>(120, 230, 270, 255), wHostPrepare);
 	cbDeckSelect->setMaxSelectionRows(10);
+	cbDeckSelect2 = env->addComboBox(rect<s32>(280, 230, 430, 255), wHostPrepare);
+	cbDeckSelect2->setMaxSelectionRows(10);
 	btnHostPrepStart = env->addButton(rect<s32>(230, 280, 340, 305), wHostPrepare, BUTTON_HP_START, dataManager.GetSysString(1215));
 	btnHostPrepCancel = env->addButton(rect<s32>(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1212));
 	//img

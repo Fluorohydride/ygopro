@@ -132,12 +132,12 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.rose = mainGame->chkRules[8]->isChecked();
 			cscg.info.turbo1 = mainGame->chkRules[9]->isChecked();
 			cscg.info.turbo2 = mainGame->chkRules[10]->isChecked();
-			cscg.info.turbo3 = mainGame->chkRules[11]->isChecked();
+			cscg.info.doubled = mainGame->chkRules[11]->isChecked();
 			cscg.info.command = mainGame->chkRules[12]->isChecked();
 			cscg.info.master = mainGame->chkRules[13]->isChecked();
 			cscg.info.rule_count = 0;
 			for (int i = 0; i < 14; ++i) {
-				if (mainGame->chkRules[i]->isChecked())
+				if (mainGame->chkRules[i]->isChecked() && i!=11)
 					++cscg.info.rule_count;
 			}
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
@@ -245,6 +245,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->env->addMessageBox(L"", msgbuf);
 			}
 			mainGame->cbDeckSelect->setEnabled(true);
+			mainGame->cbDeckSelect2->setEnabled(true);
 			mainGame->gMutex.Unlock();
 			break;
 		}
@@ -410,7 +411,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1142));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.turbo3) {
+		if(pkt->info.doubled) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1143));
 			str2.append(msgbuf);
 		}
@@ -455,7 +456,15 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->SetStaticText(mainGame->stHostPrepRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
 		mainGame->SetStaticText(mainGame->stHostPrepRule2, 180, mainGame->guiFont, (wchar_t*)str2.c_str());
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
+		mainGame->RefreshDeck(mainGame->cbDeckSelect2);
 		mainGame->cbDeckSelect->setEnabled(true);
+		if (pkt->info.doubled) {
+			mainGame->cbDeckSelect2->setVisible(true);
+			mainGame->cbDeckSelect2->setEnabled(true);
+		}else{
+			mainGame->cbDeckSelect2->setVisible(false);
+			mainGame->cbDeckSelect2->setEnabled(false);
+		}
 		if(mainGame->wCreateHost->isVisible())
 			mainGame->HideElement(mainGame->wCreateHost);
 		else if (mainGame->wLanWindow->isVisible())
@@ -1835,6 +1844,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SWAP_GRAVE_DECK: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int m = 0;
+		int e = mainGame->dField.extra[player].size();
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
 			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
@@ -1842,10 +1853,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
 				if ((*cit)->type & 0x802040) {
 					(*cit)->location = LOCATION_EXTRA;
+					(*cit)->position = POS_FACEDOWN;
+					(*cit)->sequence = e;
 					mainGame->dField.extra[player].push_back(*cit);
 					cit = mainGame->dField.deck[player].erase(cit);
+					e++;
 				} else {
 					(*cit)->location = LOCATION_DECK;
+					(*cit)->sequence = m;
+					m++;
 					++cit;
 				}
 			}
@@ -1860,10 +1876,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				ClientCard* pcard = *cit;
 				if (pcard->type & 0x802040) {
 					pcard->location = LOCATION_EXTRA;
+					pcard->position = POS_FACEDOWN;
+					pcard->sequence = e;
 					mainGame->dField.extra[player].push_back(pcard);
 					cit = mainGame->dField.deck[player].erase(cit);
+					e++;
 				} else {
 					pcard->location = LOCATION_DECK;
+					pcard->sequence = m;
+					m++;
 					++cit;
 				}
 				mainGame->dField.MoveCard(pcard, 10);

@@ -273,6 +273,7 @@ public:
 	irr::gui::IGUICheckBox* chkHostPrepReady[4];
 	irr::gui::IGUIButton* btnHostPrepKick[4];
 	irr::gui::IGUIComboBox* cbDeckSelect;
+	irr::gui::IGUIComboBox* cbDeckSelect2;
 	irr::gui::IGUIStaticText* stHostPrepRule;
 	irr::gui::IGUIStaticText* stHostPrepRule2;
 	irr::gui::IGUIStaticText* stHostPrepOB;
@@ -586,7 +587,7 @@ extern Game* mainGame;
 #define CHECK_ROSE_DUEL				361
 #define CHECK_TURBO_DUEL_1			362
 #define CHECK_TURBO_DUEL_2			363
-#define CHECK_TURBO_DUEL_3			364
+#define CHECK_DOUBLE_DECK			364
 #define CHECK_COMMAND_DUEL			365
 #define CHECK_DECK_MASTER_DUEL		366
 #define CHECKBOX_ENABLE_MUSIC		361

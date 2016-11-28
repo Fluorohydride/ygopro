@@ -28,7 +28,7 @@ struct HostInfo {
 	bool rose;
 	bool turbo1;
 	bool turbo2;
-	bool turbo3;
+	bool doubled;
 	bool command;
 	bool master;
 	unsigned int rule_count;

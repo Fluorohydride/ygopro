@@ -224,7 +224,7 @@ void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(is_ready) {
 		bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
 		bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
-		int res = host_info.no_check_deck ? false : deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
+		int res = host_info.no_check_deck ? false : deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg, host_info.doubled);
 		if(res) {
 			STOC_HS_PlayerChange scpc;
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
@@ -256,7 +256,7 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
 	char* deckbuf = (char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
-	deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
+	deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec, 0, 0, host_info.doubled);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
@@ -385,8 +385,6 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	int opt = 0;
 	if(host_info.enable_priority)
 		opt |= DUEL_OBSOLETE_RULING;
-	if(host_info.destiny_draw)
-		opt |= DUEL_DESTINY_DRAW;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
 	opt |= DUEL_TAG_MODE;
@@ -447,11 +445,11 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(host_info.turbo2) {
 		new_card(pduel, 110000000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(110000000, false);
-	}
-	if(host_info.turbo3) {
+	}/*
+	if(host_info.doubled) {
 		new_card(pduel, 511001727, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(511001727, false);
-	}
+	}*/
 	if(host_info.command) {
 		new_card(pduel, 95200000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(95200000, false);
