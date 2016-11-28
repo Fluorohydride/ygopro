@@ -957,18 +957,6 @@ void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, i
 				break;
 		}
 	}
-<<<<<<< HEAD
-=======
-	if(mainGame->cbLimit->getSelected() >= 4) {
-		switch(cp->second.ot) {
-		case 1:
-			driver->draw2DImage(imageManager.tOT, recti(pos.X + 7, pos.Y + 50, pos.X + 37, pos.Y + 65), recti(0, 0, 128, 64), 0, 0, true);
-			break;
-		case 2:
-			driver->draw2DImage(imageManager.tOT, recti(pos.X + 7, pos.Y + 50, pos.X + 37, pos.Y + 65), recti(0, 64, 128, 128), 0, 0, true);
-			break;
-		}
->>>>>>> refs/remotes/Fluorohydride/master
 	}
 }
 void Game::DrawDeckBd() {
