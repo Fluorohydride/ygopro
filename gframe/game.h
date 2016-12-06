@@ -114,6 +114,9 @@ public:
 		return focus && focus->hasType(type);
 	}
 
+	void SetWindowsIcon();
+	void FlashWindow();
+
 	Mutex gMutex;
 	Mutex gBuffer;
 	Signal frameSignal;

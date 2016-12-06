@@ -71,17 +71,13 @@ bool Game::Initialize() {
 	device->setWindowCaption(L"YGOPro");
 	device->setResizable(false);
 #ifdef _WIN32
-	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
-	HICON hSmallIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
-	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
 	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
 	if(gameConf.use_d3d)
 		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
 	else
 		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
-	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
-	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 #endif
+	SetWindowsIcon();
 	//main menu
 	wchar_t strbuf[256];
 	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
@@ -1154,6 +1150,26 @@ int Game::LocalPlayer(int player) {
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
+}
+void Game::SetWindowsIcon() {
+#ifdef _WIN32
+	HINSTANCE hInstance = (HINSTANCE)GetModuleHandleW(NULL);
+	HICON hSmallIcon = (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+	HICON hBigIcon = (HICON)LoadImageW(hInstance, MAKEINTRESOURCEW(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
+	SendMessageW(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
+	SendMessageW(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
+#endif
+}
+void Game::FlashWindow() {
+#ifdef _WIN32
+	FLASHWINFO fi;
+	fi.cbSize = sizeof(FLASHWINFO);
+	fi.hwnd = hWnd;
+	fi.dwFlags = FLASHW_TRAY | FLASHW_TIMERNOFG;
+	fi.uCount = 0;
+	fi.dwTimeout = 0;
+	FlashWindowEx(&fi);
+#endif
 }
 
 }
