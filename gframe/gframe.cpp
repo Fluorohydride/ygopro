@@ -3,7 +3,7 @@
 #include "data_manager.h"
 #include <event2/thread.h>
 
-int enable_log = 0;
+int enable_log = 1;
 bool exit_on_return = false;
 bool runasserver = true;
 
@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
 		ygo::aServerPort=atoi(argv[1]);
 		ygo::lflist=atoi(argv[2]);
 		ygo::start_hand=0;
+		ygo::replay_mode=0;
 		if (argc>2) {
 			ygo::rule=atoi(argv[3]);
 			ygo::mode=atoi(argv[4]);
@@ -42,6 +43,8 @@ int main(int argc, char* argv[]) {
 			ygo::start_hand=atoi(argv[9]);
 			ygo::draw_count=atoi(argv[10]);
 			ygo::time_limit=atoi(argv[11]);
+			if (argc>12)
+				ygo::replay_mode=atoi(argv[12]);
 		}
 		ygo::mainGame = &_game;
 		ygo::mainGame->MainServerLoop(ygo::mode, ygo::lflist);

@@ -116,10 +116,10 @@ public:
 		//irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
 	}
-
-	void SetWindowsIcon();
+	
+ 	void SetWindowsIcon();
 	void FlashWindow();
-	*/
+   */
 
 	Mutex gMutex;
 	Mutex gBuffer;
@@ -423,6 +423,7 @@ extern bool no_check_deck;
 extern bool no_shuffle_deck;
 extern unsigned int start_lp;
 extern unsigned short time_limit;
+extern unsigned short replay_mode;
 extern unsigned char start_hand;
 extern unsigned char draw_count;
 

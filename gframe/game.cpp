@@ -9,6 +9,11 @@
 #include "netserver.h"
 //#include "single_mode.h"
 
+#ifdef _WIN32
+#define strcasecmp _stricmp
+#include "dirent.h"
+#endif // _WIN32
+
 #ifndef _WIN32
 #include <sys/types.h>
 #include <dirent.h>
@@ -30,6 +35,7 @@ bool no_check_deck;
 bool no_shuffle_deck;
 unsigned int start_lp;
 unsigned short time_limit;
+unsigned short replay_mode;
 unsigned char start_hand;
 unsigned char draw_count;
 
@@ -1204,6 +1210,7 @@ int Game::LocalPlayer(int player) {
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
 }
+/*
 void Game::SetWindowsIcon() {
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandleW(NULL);
@@ -1224,5 +1231,6 @@ void Game::FlashWindow() {
 	FlashWindowEx(&fi);
 #endif
 }
+*/
 
 }

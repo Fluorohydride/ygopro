@@ -22,6 +22,7 @@ struct HostInfo {
 	unsigned char start_hand;
 	unsigned char draw_count;
 	unsigned short time_limit;
+	unsigned short replay_mode;
 };
 struct HostPacket {
 	unsigned short identifier;

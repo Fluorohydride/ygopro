@@ -1,7 +1,17 @@
 /expansions
+/specials
 /obj
 /bin
 /build
+/event
+/lua
+/sqlite3
 /replay
 /deck
+/.vscode
+/gframe/ygopro.ico
+/gframe/ygopro.rc
+/gframe/ygopro.aps
+/gframe/dirent.h
 ygopro
+premake5.exe

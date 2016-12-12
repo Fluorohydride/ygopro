@@ -12,13 +12,16 @@ project "ygopro"
             "single_duel.cpp", "single_duel.h",
             "tag_duel.cpp", "tag_duel.h",
             "**.cc", "**.c"}
-    excludes "lzma/**"
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", "sqlite3", "lua" , "event"}
+
+    configuration "windows"
+        files "ygopro.rc"
+        includedirs { "../event/include", "../sqlite3" }
+        links { "ws2_32" }
 
     configuration "not vs*"
         buildoptions { "-std=gnu++0x", "-fno-rtti" }
     configuration "not windows"
         includedirs { "/usr/include/lua", "/usr/include/lua5.2", "/usr/include/lua/5.2" }
-        excludes { "COSOperator.*" }
         links { "event_pthreads", "dl", "pthread" }

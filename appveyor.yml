@@ -1,0 +1,39 @@
+version: '{build}'
+install:
+  - git submodule update --init --recursive
+
+  # environment and system dependency
+  - appveyor DownloadFile https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-windows.zip
+  - 7z x premake-5.0.0-alpha10-windows.zip
+  
+  - appveyor DownloadFile https://github.com/libevent/libevent/releases/download/release-2.0.22-stable/libevent-2.0.22-stable.tar.gz
+  - tar xf libevent-2.0.22-stable.tar.gz
+  - move libevent-2.0.22-stable event
+  - xcopy /E event\WIN32-Code event\include
+  
+  - appveyor DownloadFile https://www.lua.org/ftp/lua-5.2.4.tar.gz
+  - tar xf lua-5.2.4.tar.gz
+  - move lua-5.2.4\src lua
+  
+  - appveyor DownloadFile https://www.sqlite.org/2016/sqlite-amalgamation-3150200.zip
+  - 7z x sqlite-amalgamation-3150200.zip
+  - move sqlite-amalgamation-3150200 sqlite3
+  
+  - appveyor DownloadFile https://github.com/tronkko/dirent/raw/master/include/dirent.h
+  - move dirent.h gframe\
+
+  # let premake happy
+  - xcopy /E premake\* .
+  
+  # premake
+  - premake5 vs2015
+  
+configuration: Release
+build: 
+    project: build/ygo.sln
+    parallel: true
+after_build:
+  - ps: move bin\release\ygopro.exe .
+artifacts:
+  - path: ygopro.exe
+    name: ygopro(server)

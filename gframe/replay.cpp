@@ -8,6 +8,7 @@
 namespace ygo {
 
 extern unsigned short aServerPort;
+extern unsigned short replay_mode;
 
 Replay::Replay() {
 	is_recording = false;
@@ -42,115 +43,135 @@ std::wstring SA2W(std::string& strA)
 
 
 void Replay::BeginRecord() {
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
-if(is_recording)
-		CloseHandle(recording_fp);
-    std::stringstream ss;
-    ss<<ygo::aServerPort;
-    std::string ssss;
-    ssss=ss.str();
+		if(is_recording)
+			CloseHandle(recording_fp);
+		std::stringstream ss;
+		ss<<ygo::aServerPort;
+		std::string ssss;
+		ssss=ss.str();
 
-    std::wstring comPrefix = L"./replay/";
+		std::wstring comPrefix = L"./replay/";
 
-    std::wstring comID =comPrefix+ SA2W(ssss)+L"Replay.yrp" ;
+		std::wstring comID =comPrefix+ SA2W(ssss)+L"Replay.yrp" ;
 
-	recording_fp = CreateFileW(comID.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
-	if(recording_fp == INVALID_HANDLE_VALUE)
-		return;
+		recording_fp = CreateFileW(comID.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+		if(recording_fp == INVALID_HANDLE_VALUE)
+			return;
 #else
-	if(is_recording)
-		fclose(fp);
-	char path[20];
-	sprintf(path, "./replay/%u.yrp", ygo::aServerPort);
-	fp = fopen(path, "wb");
-	if(!fp)
-		return;
+		if(is_recording)
+			fclose(fp);
+		time_t nowtime = time(NULL);
+		struct tm *localedtime = localtime(&nowtime);
+		char tmppath[40];
+		strftime(tmppath, 40, "./replay/%Y-%m-%d %H-%M-%S %%u.yrp", localedtime);
+		char path[40];
+		sprintf(path, tmppath, ygo::aServerPort);
+		fp = fopen(path, "wb");
+		if(!fp)
+			return;
 #endif
+	}
 	pdata = replay_data;
 	is_recording = true;
 }
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &header, sizeof(header), &size, NULL);
+		DWORD size;
+		WriteFile(recording_fp, &header, sizeof(header), &size, NULL);
 #else
-	fwrite(&header, sizeof(header), 1, fp);
-	fflush(fp);
+		fwrite(&header, sizeof(header), 1, fp);
+		fflush(fp);
 #endif
+	}
 }
 void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	if(!is_recording)
 		return;
 	memcpy(pdata, data, length);
 	pdata += length;
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, data, length, &size, NULL);
+		DWORD size;
+		WriteFile(recording_fp, data, length, &size, NULL);
 #else
-	fwrite(data, length, 1, fp);
-	if(flush)
-		fflush(fp);
+		fwrite(data, length, 1, fp);
+		if(flush)
+			fflush(fp);
 #endif
+	}
 }
 void Replay::WriteInt32(int data, bool flush) {
 	if(!is_recording)
 		return;
 	*((int*)(pdata)) = data;
 	pdata += 4;
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
+		DWORD size;
+		WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
 #else
-	fwrite(&data, sizeof(int), 1, fp);
-	if(flush)
-		fflush(fp);
+		fwrite(&data, sizeof(int), 1, fp);
+		if(flush)
+			fflush(fp);
 #endif
+	}
 }
 void Replay::WriteInt16(short data, bool flush) {
 	if(!is_recording)
 		return;
 	*((short*)(pdata)) = data;
 	pdata += 2;
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
+		DWORD size;
+		WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
 #else
-	fwrite(&data, sizeof(short), 1, fp);
-	if(flush)
-		fflush(fp);
+		fwrite(&data, sizeof(short), 1, fp);
+		if(flush)
+			fflush(fp);
 #endif
+	}
 }
 void Replay::WriteInt8(char data, bool flush) {
 	if(!is_recording)
 		return;
 	*pdata = data;
 	pdata++;
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
+		DWORD size;
+		WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
 #else
-	fwrite(&data, sizeof(char), 1, fp);
-	if(flush)
-		fflush(fp);
+		fwrite(&data, sizeof(char), 1, fp);
+		if(flush)
+			fflush(fp);
 #endif
+	}
 }
 void Replay::Flush() {
 	if(!is_recording)
 		return;
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
 #else
-	fflush(fp);
+		fflush(fp);
 #endif
+	}
 }
 void Replay::EndRecord() {
 	if(!is_recording)
 		return;
+	if (ygo::replay_mode>0) {
 #ifdef _WIN32
-	CloseHandle(recording_fp);
+		CloseHandle(recording_fp);
 #else
-	fclose(fp);
+		fclose(fp);
 #endif
+	}
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
