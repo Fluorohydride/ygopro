@@ -1,0 +1,27 @@
+1 ICON "ygopro.ico"
+
+1 VERSIONINFO
+FILEVERSION 1, 0, 33, 12
+PRODUCTVERSION 1, 0, 33, 12
+FILEOS 0x4
+FILETYPE 0x1
+
+BEGIN
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "080404b0"
+BEGIN
+VALUE "FileDescription", "YGOPRO Server Mode ver.233"
+VALUE "InternalName", "YGOPRO Server Mode"
+VALUE "LegalCopyright", "Copyright (C) 2016 Fluorohydride"
+VALUE "OriginalFilename", "ygopro.exe"
+VALUE "ProductName", "YGOPRO Server Mode"
+VALUE "FileVersion", "1.033.C.233"
+VALUE "ProductVersion", "1.033.C.233"
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x804, 1200
+END
+END
