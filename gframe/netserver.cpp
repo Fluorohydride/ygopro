@@ -16,8 +16,8 @@ unsigned short NetServer::last_sent = 0;
 
 void NetServer::Initduel(int bDuel_mode, int lflist)
 {
-        CTOS_CreateGame* pkt = new CTOS_CreateGame;
-        pkt->info.mode=MODE_SINGLE;
+		CTOS_CreateGame* pkt = new CTOS_CreateGame;
+		pkt->info.mode=MODE_SINGLE;
 		
 		if(bDuel_mode == MODE_SINGLE) {
 			duel_mode = new SingleDuel(false);
@@ -79,9 +79,9 @@ unsigned short NetServer::StartServer(unsigned short port) {
 		return false;
 	}
 	evutil_socket_t fd=evconnlistener_get_fd(listener);
-    socklen_t addrlen=sizeof(struct sockaddr);
-    struct sockaddr_in addr;
-    getsockname(fd,(struct sockaddr*)&addr,&addrlen);
+	socklen_t addrlen=sizeof(struct sockaddr);
+	struct sockaddr_in addr;
+	getsockname(fd,(struct sockaddr*)&addr,&addrlen);
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
 	Thread::NewThread(ServerThread, net_evbase);
 	return ntohs(addr.sin_port);

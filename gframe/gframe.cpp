@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 #endif //_WIN32
 	ygo::Game _game;
 	if (runasserver){
-	    ygo::aServerPort=7911;
+		ygo::aServerPort=7911;
 		ygo::aServerPort=atoi(argv[1]);
 		ygo::lflist=atoi(argv[2]);
 		ygo::start_hand=0;
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 		
 		return 0;
 	}
-    /*
+	/*
 	ygo::mainGame = &_game;
 	if(!ygo::mainGame->Initialize())
 		return 0;
@@ -99,8 +99,8 @@ int main(int argc, char* argv[]) {
 #ifdef _WIN32
 	WSACleanup();
 #else
-    
+	
 #endif //_WIN32
-    */
+	*/
 	return EXIT_SUCCESS;
 }

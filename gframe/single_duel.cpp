@@ -90,16 +90,16 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			host_info.replay_mode=0;
 
 			if (ygo::start_hand !=0 ){
-		        host_info.start_hand=ygo::start_hand;
-		        host_info.start_lp=ygo::start_lp;
-		        host_info.draw_count=ygo::draw_count;
-		        host_info.mode=ygo::mode;
-		        host_info.no_check_deck=ygo::no_check_deck;
-		        host_info.no_shuffle_deck=ygo::no_shuffle_deck;
-		        host_info.enable_priority=ygo::enable_priority;
-		        host_info.rule=ygo::rule;
-		        host_info.time_limit=ygo::time_limit;
-		        host_info.replay_mode=ygo::replay_mode;
+				host_info.start_hand=ygo::start_hand;
+				host_info.start_lp=ygo::start_lp;
+				host_info.draw_count=ygo::draw_count;
+				host_info.mode=ygo::mode;
+				host_info.no_check_deck=ygo::no_check_deck;
+				host_info.no_shuffle_deck=ygo::no_shuffle_deck;
+				host_info.enable_priority=ygo::enable_priority;
+				host_info.rule=ygo::rule;
+				host_info.time_limit=ygo::time_limit;
+				host_info.replay_mode=ygo::replay_mode;
 			}
 		}else
 		{

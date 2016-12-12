@@ -80,7 +80,7 @@ public:
 	bool Initialize();
 	//void MainLoop();
 	void MainServerLoop(int bDuel_mode, int lflist);
-    /*
+	/*
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
 	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
@@ -107,12 +107,12 @@ public:
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearTextures();
 	void CloseDuelWindow();
-    */
+	*/
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 
 	/*
-    bool HasFocus(EGUI_ELEMENT_TYPE type) const {
+	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		//irr::gui::IGUIElement* focus = env->getFocus();
 		return focus && focus->hasType(type);
 	}
@@ -165,9 +165,9 @@ public:
 
 	bool is_building;
 	bool is_siding;
-    */
+	*/
 	/*
-    ClientField dField;
+	ClientField dField;
 	DeckBuilder deckBuilder;
 	MenuHandler menuHandler;
 	irr::IrrlichtDevice* device;
@@ -410,7 +410,7 @@ public:
 	irr::gui::IGUIButton* btnChainWhenAvail;
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
-    */
+	*/
 };
 
 extern Game* mainGame;

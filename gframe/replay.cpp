@@ -24,20 +24,19 @@ Replay::~Replay() {
 
 std::wstring SA2W(std::string& strA)
 {
-    setlocale(LC_ALL, "chs");
+	setlocale(LC_ALL, "chs");
 
-    const char* _Source = strA.c_str();
-    size_t _Dsize = strA.size() + 1;
-    wchar_t *_Dest = new wchar_t[_Dsize];
-    wmemset(_Dest, 0, _Dsize);
-    mbstowcs(_Dest,_Source,_Dsize);
-    std::wstring result = _Dest;
-    delete []_Dest;
+	const char* _Source = strA.c_str();
+	size_t _Dsize = strA.size() + 1;
+	wchar_t *_Dest = new wchar_t[_Dsize];
+	wmemset(_Dest, 0, _Dsize);
+	mbstowcs(_Dest,_Source,_Dsize);
+	std::wstring result = _Dest;
+	delete []_Dest;
 
-    setlocale(LC_ALL, "C");
+	setlocale(LC_ALL, "C");
 
-    return result;
-
+	return result;
 }
 
 

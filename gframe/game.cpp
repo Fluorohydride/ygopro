@@ -41,7 +41,7 @@ unsigned char draw_count;
 
 void Game::MainServerLoop(int bDuel_mode, int lflist) {
 	deckManager.LoadLFList();
-    dataManager.LoadDB("cards.cdb");
+	dataManager.LoadDB("cards.cdb");
 	
 	//load expansions
 	DIR * dir;
@@ -61,17 +61,17 @@ void Game::MainServerLoop(int bDuel_mode, int lflist) {
 		closedir(dir);
 	}
 	
-    aServerPort = NetServer::StartServer(aServerPort);
-    NetServer::Initduel(bDuel_mode, lflist);
-    printf("%u\n", aServerPort);
-    fflush(stdout);
+	aServerPort = NetServer::StartServer(aServerPort);
+	NetServer::Initduel(bDuel_mode, lflist);
+	printf("%u\n", aServerPort);
+	fflush(stdout);
 	while(NetServer::net_evbase) {
 #ifdef WIN32
-        Sleep(200);
+		Sleep(200);
 #else
-	usleep(200000);
+		usleep(200000);
 #endif
-    }
+	}
 }
 /*
 bool Game::Initialize() {
