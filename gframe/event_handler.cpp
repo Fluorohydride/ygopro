@@ -835,6 +835,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				} else {
 					mainGame->HideElement(mainGame->wCardSelect);
+					if(mainGame->dInfo.curMsg == MSG_SELECT_CHAIN && !chain_forced)
+						ShowCancelOrFinishButton(1);
 					break;
 				}
 				break;
@@ -1481,6 +1483,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::EMIE_RMOUSE_LEFT_UP: {
 			if(mainGame->dInfo.isReplay)
+				break;
+			if(event.MouseInput.isLeftPressed())
 				break;
 			s32 x = event.MouseInput.X;
 			s32 y = event.MouseInput.Y;
