@@ -156,18 +156,12 @@ void ClientCard::UpdateInfo(char* buf) {
 	if(flag & QUERY_IS_PUBLIC)
 		is_public = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LSCALE) {
-		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && lscale != (unsigned int)pdata) {
-			lscale = pdata;
-			myswprintf(lscstring, L"%d", lscale);
-		}
+		lscale = BufferIO::ReadInt32(buf);
+		myswprintf(lscstring, L"%d", lscale);
 	}
 	if(flag & QUERY_RSCALE) {
-		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && rscale != (unsigned int)pdata) {
-			rscale = pdata;
-			myswprintf(rscstring, L"%d", rscale);
-		}
+		rscale = BufferIO::ReadInt32(buf);
+		myswprintf(rscstring, L"%d", rscale);
 	}
 }
 void ClientCard::ClearTarget() {
