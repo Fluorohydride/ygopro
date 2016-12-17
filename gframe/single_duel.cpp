@@ -423,10 +423,6 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
 	last_replay.WriteInt32(pdeck[0].main.size() + host_info.rule_count, false);
-	for(int32 i = (int32)pdeck[0].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
-	}
 	if(host_info.destiny_draw) {
 		new_card(pduel, 511004000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(511004000, false);
@@ -479,29 +475,26 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(95200000, false);
 	}
 	if(host_info.master) {
-		new_card(pduel, 51100567, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(51100567, false);
+		new_card(pduel, 300, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(300, false);
 	}
 	if(host_info.action) {
 		new_card(pduel, 95000043, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(95000043, false);
+	}
+	for(int32 i = (int32)pdeck[0].main.size() - 1; i >= 0; --i) {
+		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
 	}
 	last_replay.WriteInt32(pdeck[0].extra.size(), false);
 	for(int32 i = (int32)pdeck[0].extra.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].extra[i]->first, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[0].extra[i]->first, false);
 	}
-	if(host_info.master)
-		last_replay.WriteInt32(pdeck[1].main.size() + 1, false);
-	else
-		last_replay.WriteInt32(pdeck[1].main.size(), false);
+	last_replay.WriteInt32(pdeck[1].main.size(), false);
 	for(int32 i = (int32)pdeck[1].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[1].main[i]->first, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[1].main[i]->first, false);
-	}
-	if(host_info.master) {
-		new_card(pduel, 51100567, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(51100567, false);
 	}
 	last_replay.WriteInt32(pdeck[1].extra.size(), false);
 	for(int32 i = (int32)pdeck[1].extra.size() - 1; i >= 0; --i) {
@@ -509,6 +502,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
 	}
 	last_replay.Flush();
+	mainGame->dInfo.startlp = host_info.start_lp;
 	char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
