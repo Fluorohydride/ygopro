@@ -1207,28 +1207,31 @@ bool ClientField::CheckSelectSum() {
 		}
 		return ret;
 	} else {
-		int op1, op2, mm = -1, ms, m, max = 0, sumc = 0, sums;
+		int mm = -1, mx = -1, max = 0, sumc = 0;
 		bool ret = false;
 		for (size_t i = 0; i < selected_cards.size(); ++i) {
-			op1 = selected_cards[i]->opParam & 0xffff;
-			op2 = selected_cards[i]->opParam >> 16;
-			m = (op2 > 0 && op1 > op2) ? op2 : op1;
-			max += op2 > op1 ? op2 : op1;
-			if (mm == -1 || m < mm)
-				mm = m;
-			sumc += m;
+			int op1 = selected_cards[i]->opParam & 0xffff;
+			int op2 = selected_cards[i]->opParam >> 16;
+			int opmin = (op2 > 0 && op1 > op2) ? op2 : op1;
+			int opmax = op2 > op1 ? op2 : op1;
+			if (mm == -1 || opmin < mm)
+				mm = opmin;
+			if (mx == -1 || opmax < mx)
+				mx = opmax;
+			sumc += opmin;
+			max += opmax;
 		}
 		if (select_sumval <= sumc)
 			return true;
-		if (select_sumval <= max)
+		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
 		for(sit = selable.begin(); sit != selable.end(); ++sit) {
-			op1 = (*sit)->opParam & 0xffff;
-			op2 = (*sit)->opParam >> 16;
-			m = op1;
-			sums = sumc;
+			int op1 = (*sit)->opParam & 0xffff;
+			int op2 = (*sit)->opParam >> 16;
+			int m = op1;
+			int sums = sumc;
 			sums += m;
-			ms = mm;
+			int ms = mm;
 			if (ms == -1 || m < ms)
 				ms = m;
 			if (sums >= select_sumval) {
