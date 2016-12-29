@@ -3275,7 +3275,7 @@ void DuelClient::SetResponseI(int respI) {
 	*((int*)response_buf) = respI;
 	response_len = 4;
 }
-void DuelClient::SetResponseB(unsigned char * respB, unsigned char len) {
+void DuelClient::SetResponseB(void* respB, unsigned char len) {
 	memcpy(response_buf, respB, len);
 	response_len = len;
 }

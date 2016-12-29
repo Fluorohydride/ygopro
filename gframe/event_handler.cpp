@@ -1453,7 +1453,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					clicked_card->is_selectable = false;
 				select_counter_count--;
 				if (select_counter_count == 0) {
-					unsigned char respbuf[64];
+					unsigned short int respbuf[32];
 					for(size_t i = 0; i < selectable_cards.size(); ++i)
 						respbuf[i] = (selectable_cards[i]->opParam >> 16) - (selectable_cards[i]->opParam & 0xffff);
 					mainGame->stHintMsg->setVisible(false);
