@@ -66,6 +66,44 @@ bool DataManager::LoadDB(const char* file) {
 	sqlite3_close(pDB);
 	return true;
 }
+void DataManager::LoadExpansionDB() {
+#ifdef _WIN32
+	char fpath[1000];
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
+	if(fh != INVALID_HANDLE_VALUE) {
+		do {
+			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				char fname[780];
+				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
+				sprintf(fpath, "./expansions/%s", fname);
+				LoadDB(fpath);
+			}
+		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
+	}
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	const char *foldername = "./expansions/";
+	if((dir = opendir(foldername)) != NULL) {
+		while((dirp = readdir(dir)) != NULL) {
+			size_t len = strlen(dirp->d_name);
+			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
+				continue;
+			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
+			strncpy(filepath, foldername, strlen(foldername) + 1);
+			strncat(filepath, dirp->d_name, len);
+			std::cout << "Found file " << filepath << std::endl;
+			if(!LoadDB(filepath))
+				std::cout << "Error loading file" << std::endl;
+			free(filepath);
+		}
+		closedir(dir);
+	}
+#endif
+}
+
 bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
 	if(!fp)
