@@ -9,7 +9,7 @@ DataManager dataManager;
 
 bool DataManager::LoadDB(const char* file) {
 	sqlite3* pDB;
-	if(sqlite3_open(file, &pDB) != SQLITE_OK)
+	if(sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
