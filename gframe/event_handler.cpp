@@ -1458,7 +1458,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						respbuf[i] = (selectable_cards[i]->opParam >> 16) - (selectable_cards[i]->opParam & 0xffff);
 					mainGame->stHintMsg->setVisible(false);
 					ClearSelect();
-					DuelClient::SetResponseB(respbuf, selectable_cards.size());
+					DuelClient::SetResponseB(respbuf, selectable_cards.size() * 2);
 					DuelClient::SendResponse();
 				} else {
 					wchar_t formatBuffer[2048];
