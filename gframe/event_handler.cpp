@@ -386,18 +386,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_OPTION_OK: {
 				if (mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
 					DuelClient::SetResponseI(selected_option);
-				} else if (mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
-					int index = 0;
-					while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
-					DuelClient::SetResponseI((index << 16) + 5);
-				} else if (mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
-					int index = 0;
-					while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
-					DuelClient::SetResponseI(index << 16);
 				} else {
 					int index = 0;
 					while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
-					DuelClient::SetResponseI(index);
+					if (mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
+						DuelClient::SetResponseI((index << 16) + 5);
+					} else if (mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
+						DuelClient::SetResponseI(index << 16);
+					} else {
+						DuelClient::SetResponseI(index);
+					}
 				}
 				mainGame->HideElement(mainGame->wOptions, true);
 				break;
@@ -487,7 +485,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					case POSITION_HINT: {
-						selectable_cards.insert(selectable_cards.end(), conti_cards.begin(), conti_cards.end());
+						selectable_cards = conti_cards;
+						std::sort(selectable_cards.begin(), selectable_cards.end());
+						auto eit = std::unique(selectable_cards.begin(), selectable_cards.end());
+						selectable_cards.erase(eit, selectable_cards.end());
 						conti_selecting = true;
 						break;
 					}
@@ -1326,8 +1327,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					int command_flag = 0;
 					if(conti_cards.size() == 0)
 						break;
-					if(conti_cards.size())
-						command_flag |= COMMAND_OPERATION;
+					command_flag |= COMMAND_OPERATION;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;
