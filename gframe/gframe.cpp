@@ -14,7 +14,7 @@ void GetParameter(char* param, const char* arg) {
 	MultiByteToWideChar(CP_ACP, 0, arg, -1, arg1, 260);
 	BufferIO::EncodeUTF8(arg1, param);
 #else
-	strcpy(param, arg1);
+	strcpy(param, arg);
 #endif
 }
 void GetParameterW(wchar_t* param, const char* arg) {
