@@ -16,7 +16,7 @@ struct Config {
 	unsigned short antialias;
 	unsigned short serverport;
 	unsigned char textfontsize;
-	wchar_t lastip[20];
+	wchar_t lasthost[100];
 	wchar_t lastport[10];
 	wchar_t nickname[20];
 	wchar_t gamename[20];
@@ -218,7 +218,7 @@ public:
 	irr::gui::IGUIEditBox* ebNickName;
 	irr::gui::IGUIListBox* lstHostList;
 	irr::gui::IGUIButton* btnLanRefresh;
-	irr::gui::IGUIEditBox* ebJoinIP;
+	irr::gui::IGUIEditBox* ebJoinHost;
 	irr::gui::IGUIEditBox* ebJoinPort;
 	irr::gui::IGUIEditBox* ebJoinPass;
 	irr::gui::IGUIButton* btnJoinHost;
