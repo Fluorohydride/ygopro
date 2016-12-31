@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
 			++i;
 			wchar_t param[128];
 			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebJoinIP->setText(param);
+			ygo::mainGame->ebJoinHost->setText(param);
 			continue;
 		} else if(!strcmp(argv[i], "-p")) { // host Port
 			++i;
