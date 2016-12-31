@@ -31,38 +31,36 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
-			#if WINVER >= 0x0600
-				struct addrinfo hints, *servinfo;
-				memset(&hints, 0, sizeof(struct addrinfo));
-				hints.ai_family = AF_INET;			/* Allow IPv4 or IPv6 */
-				hints.ai_socktype = SOCK_STREAM;	/* Datagram socket */
-				hints.ai_flags = AI_PASSIVE;		/* For wildcard IP address */
-				hints.ai_protocol = 0;				/* Any protocol */
-				hints.ai_canonname = NULL;
-				hints.ai_addr = NULL;
-				hints.ai_next = NULL;
-				int status;
-				char hostname[100];
 				char ip[20];
-				const wchar_t* pstr = mainGame->ebJoinIP->getText();
-				BufferIO::CopyWStr(pstr, hostname, 100);
-				if ((status = getaddrinfo(hostname, NULL, &hints, &servinfo)) == -1) {
-					fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-					//error handling
-					BufferIO::CopyWStr(pstr, ip, 16);
-				} else
-					inet_ntop(AF_INET, &(((struct sockaddr_in *)servinfo->ai_addr)->sin_addr), ip, 20);
-				freeaddrinfo(servinfo);
-			#else
-				char hostname[100];
-				char ip[20];
-				const wchar_t* pstr = mainGame->ebJoinIP->getText();
-				BufferIO::CopyWStr(pstr, hostname, 100);
+				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, ip, 16);
-			#endif
 				unsigned int remote_addr = htonl(inet_addr(ip));
+				if(remote_addr == -1) {
+					char hostname[100];
+					char port[6];
+					BufferIO::CopyWStr(pstr, hostname, 100);
+					BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), port, 6);
+					struct evutil_addrinfo hints;
+					struct evutil_addrinfo *answer = NULL;
+					memset(&hints, 0, sizeof(hints));
+					hints.ai_family = AF_INET;
+					hints.ai_socktype = SOCK_STREAM;
+					hints.ai_protocol = IPPROTO_TCP;
+					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
+					int status=evutil_getaddrinfo(hostname, port, &hints, &answer);
+					if(status != 0) {
+						mainGame->gMutex.Lock();
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
+						mainGame->gMutex.Unlock();
+						break;
+					} else {
+						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
+						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
+						remote_addr = htonl(inet_addr(ip));
+					}
+				}
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
-				BufferIO::CopyWStr(pstr, mainGame->gameConf.lastip, 20);
+				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
 				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
@@ -74,6 +72,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_JOIN_CANCEL: {
 				mainGame->HideElement(mainGame->wLanWindow);
 				mainGame->ShowElement(mainGame->wMainMenu);
+				if(exit_on_return)
+					mainGame->device->closeDevice();
 				break;
 			}
 			case BUTTON_LAN_REFRESH: {
@@ -160,10 +160,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
-				if(mainGame->lstReplayList->getSelected() == -1)
-					break;
-				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
-					break;
+				if(open_file) {
+					ReplayMode::cur_replay.OpenReplay(open_file_name);
+					open_file = false;
+				} else {
+					if(mainGame->lstReplayList->getSelected() == -1)
+						break;
+					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
+						break;
+				}
 				mainGame->imgCard->setImage(imageManager.tCover[0]);
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
@@ -198,7 +203,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
-				if(mainGame->lstSinglePlayList->getSelected() == -1)
+				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
 					break;
 				mainGame->singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
@@ -211,8 +216,32 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
-				if(mainGame->cbDBDecks->getSelected() != -1)
+				if(open_file && deckManager.LoadDeck(open_file_name)) {
+#ifdef WIN32
+					wchar_t *dash = wcsrchr(open_file_name, L'\\');
+#else
+					wchar_t *dash = wcsrchr(open_file_name, L'/');
+#endif
+					wchar_t *dot = wcsrchr(open_file_name, L'.');
+					if(dash && dot) {
+						wchar_t deck_name[256];
+						wcsncpy(deck_name, dash + 1, dot - dash - 1);
+						deck_name[dot - dash - 1] = L'\0';
+						mainGame->ebDeckname->setText(deck_name);
+						mainGame->cbDBDecks->setSelected(-1);
+					} else {
+						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
+							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
+								mainGame->cbDBDecks->setSelected(i);
+								break;
+							}
+						}
+					}
+					open_file = false;
+				} else if(mainGame->cbDBDecks->getSelected() != -1) {
 					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+					mainGame->ebDeckname->setText(L"");
+				}
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->is_building = true;
 				mainGame->is_siding = false;
@@ -266,7 +295,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int port = DuelClient::hosts[sel].port;
 				wchar_t buf[20];
 				myswprintf(buf, L"%d.%d.%d.%d", addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
-				mainGame->ebJoinIP->setText(buf);
+				mainGame->ebJoinHost->setText(buf);
 				myswprintf(buf, L"%d", port);
 				mainGame->ebJoinPort->setText(buf);
 				break;

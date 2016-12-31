@@ -168,21 +168,28 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
+FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
+#ifdef WIN32
+	FILE* fp = _wfopen(file, (wchar_t*)mode);
+#else
+	char file2[256];
+	BufferIO::EncodeUTF8(file, file2);
+	FILE* fp = fopen(file2, mode);
+#endif
+	return fp;
+}
 bool DeckManager::LoadDeck(const wchar_t* file) {
 	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
-	wchar_t deck[64];
-	myswprintf(deck, L"./deck/%ls.ydk", file);
-	int cardlist[128];
-	bool is_side = false;
-#ifdef WIN32
-	FILE* fp = _wfopen(deck, L"r");
-#else
-	char deckfn[256];
-	BufferIO::EncodeUTF8(deck, deckfn);
-	FILE* fp = fopen(deckfn, "r");
-#endif
+	wchar_t localfile[64];
+	myswprintf(localfile, L"./deck/%ls.ydk", file);
+	FILE* fp = OpenDeckFile(localfile, "r");
+	if(!fp) {
+		fp = OpenDeckFile(file, "r");
+	}
 	if(!fp)
 		return false;
+	int cardlist[128];
+	bool is_side = false;
 	char linebuf[256];
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
@@ -211,13 +218,7 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	wchar_t file[64];
 	myswprintf(file, L"./deck/%ls.ydk", name);
-#ifdef WIN32
-	FILE* fp = _wfopen(file, L"w");
-#else
-	char filefn[256];
-	BufferIO::EncodeUTF8(file, filefn);
-	FILE* fp = fopen(filefn, "w");
-#endif
+	FILE* fp = OpenDeckFile(file, "w");
 	if(!fp)
 		return false;
 	fprintf(fp, "#created by ...\n#main\n");

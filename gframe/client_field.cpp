@@ -1183,11 +1183,10 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 }
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
-	std::set<ClientCard*>::iterator sit;
-	for(size_t i = 0; i < selectsum_all.size(); ++i) {
-		selectsum_all[i]->is_selectable = false;
-		selectsum_all[i]->is_selected = false;
-		selable.insert(selectsum_all[i]);
+	for(auto sit = selectsum_all.begin(); sit != selectsum_all.end(); ++sit) {
+		(*sit)->is_selectable = false;
+		(*sit)->is_selected = false;
+		selable.insert(*sit);
 	}
 	for(size_t i = 0; i < selected_cards.size(); ++i) {
 		if((int)i < must_select_count)
@@ -1201,34 +1200,37 @@ bool ClientField::CheckSelectSum() {
 	if (select_mode == 0) {
 		bool ret = check_sel_sum_s(selable, 0, select_sumval);
 		selectable_cards.clear();
-		for(sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
+		for(auto sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
 			(*sit)->is_selectable = true;
 			selectable_cards.push_back(*sit);
 		}
 		return ret;
 	} else {
-		int op1, op2, mm = -1, ms, m, max = 0, sumc = 0, sums;
+		int mm = -1, mx = -1, max = 0, sumc = 0;
 		bool ret = false;
-		for (size_t i = 0; i < selected_cards.size(); ++i) {
-			op1 = selected_cards[i]->opParam & 0xffff;
-			op2 = selected_cards[i]->opParam >> 16;
-			m = (op2 > 0 && op1 > op2) ? op2 : op1;
-			max += op2 > op1 ? op2 : op1;
-			if (mm == -1 || m < mm)
-				mm = m;
-			sumc += m;
+		for (auto sit = selected_cards.begin(); sit != selected_cards.end(); ++sit) {
+			int op1 = (*sit)->opParam & 0xffff;
+			int op2 = (*sit)->opParam >> 16;
+			int opmin = (op2 > 0 && op1 > op2) ? op2 : op1;
+			int opmax = op2 > op1 ? op2 : op1;
+			if (mm == -1 || opmin < mm)
+				mm = opmin;
+			if (mx == -1 || opmax < mx)
+				mx = opmax;
+			sumc += opmin;
+			max += opmax;
 		}
 		if (select_sumval <= sumc)
 			return true;
-		if (select_sumval <= max)
+		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
-		for(sit = selable.begin(); sit != selable.end(); ++sit) {
-			op1 = (*sit)->opParam & 0xffff;
-			op2 = (*sit)->opParam >> 16;
-			m = op1;
-			sums = sumc;
+		for(auto sit = selable.begin(); sit != selable.end(); ++sit) {
+			int op1 = (*sit)->opParam & 0xffff;
+			int op2 = (*sit)->opParam >> 16;
+			int m = op1;
+			int sums = sumc;
 			sums += m;
-			ms = mm;
+			int ms = mm;
 			if (ms == -1 || m < ms)
 				ms = m;
 			if (sums >= select_sumval) {
@@ -1259,14 +1261,14 @@ bool ClientField::CheckSelectSum() {
 			}
 		}
 		selectable_cards.clear();
-		for(sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
+		for(auto sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
 			(*sit)->is_selectable = true;
 			selectable_cards.push_back(*sit);
 		}
 		return ret;
 	}
 }
-bool ClientField::check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::iterator index, int min, int max) {
+bool ClientField::check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max) {
 	if (index == left.end())
 		return false;
 	int op1 = (*index)->opParam & 0xffff;
