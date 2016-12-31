@@ -17,7 +17,6 @@ void GetParameter(char* param, const char* arg) {
 	strcpy(param, arg1);
 #endif
 }
-
 void GetParameterW(wchar_t* param, const char* arg) {
 #ifdef _WIN32
 	MultiByteToWideChar(CP_ACP, 0, arg, -1, param, 260);
@@ -25,7 +24,6 @@ void GetParameterW(wchar_t* param, const char* arg) {
 	BufferIO::DecodeUTF8(arg, param);
 #endif
 }
-
 void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;
 	event.EventType = irr::EET_GUI_EVENT;
@@ -50,31 +48,41 @@ int main(int argc, char* argv[]) {
 		return 0;
 
 	for(int i = 1; i < argc; ++i) {
+		if(argv[i][0] == '-' && argv[i][1] == 'e') {
+			char param[128];
+			GetParameter(param, &argv[i][2]);
+			ygo::dataManager.LoadDB(param);
+		}
 		if(!strcmp(argv[i], "-e")) { // extra database
 			++i;
 			char param[128];
 			GetParameter(param, &argv[i][0]);
 			ygo::dataManager.LoadDB(param);
+			continue;
 		} else if(!strcmp(argv[i], "-n")) { // nickName
 			++i;
 			wchar_t param[128];
 			GetParameterW(param, &argv[i][0]);
 			ygo::mainGame->ebNickName->setText(param);
+			continue;
 		} else if(!strcmp(argv[i], "-h")) { // Host address
 			++i;
 			wchar_t param[128];
 			GetParameterW(param, &argv[i][0]);
 			ygo::mainGame->ebJoinIP->setText(param);
+			continue;
 		} else if(!strcmp(argv[i], "-p")) { // host Port
 			++i;
 			wchar_t param[128];
 			GetParameterW(param, &argv[i][0]);
 			ygo::mainGame->ebJoinPort->setText(param);
+			continue;
 		} else if(!strcmp(argv[i], "-w")) { // host passWord
 			++i;
 			wchar_t param[128];
 			GetParameterW(param, &argv[i][0]);
 			ygo::mainGame->ebJoinPass->setText(param);
+			continue;
 		} else if(!strcmp(argv[i], "-x")) { // eXit on return
 			exit_on_return = true;
 		} else if(!strcmp(argv[i], "-j")) { // Join host
@@ -107,7 +115,6 @@ int main(int argc, char* argv[]) {
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
 		}
-
 	}
 	ygo::mainGame->MainLoop();
 #ifdef _WIN32
