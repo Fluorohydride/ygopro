@@ -32,7 +32,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_JOIN_HOST: {
 				char ip[20];
-				const wchar_t* pstr = mainGame->ebJoinIP->getText();
+				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, ip, 16);
 				unsigned int remote_addr = htonl(inet_addr(ip));
 				if(remote_addr == -1) {
@@ -60,7 +60,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 				}
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
-				BufferIO::CopyWStr(pstr, mainGame->gameConf.lastip, 20);
+				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
 				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
@@ -264,7 +264,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int port = DuelClient::hosts[sel].port;
 				wchar_t buf[20];
 				myswprintf(buf, L"%d.%d.%d.%d", addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
-				mainGame->ebJoinIP->setText(buf);
+				mainGame->ebJoinHost->setText(buf);
 				myswprintf(buf, L"%d", port);
 				mainGame->ebJoinPort->setText(buf);
 				break;
