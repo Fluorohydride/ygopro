@@ -8,27 +8,21 @@ bool exit_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
 
-const char* GetParameter(const char* arg) {
+void GetParameter(char* param, const char* arg) {
 #ifdef _WIN32
 	wchar_t arg1[260];
 	MultiByteToWideChar(CP_ACP, 0, arg, -1, arg1, 260);
-	char arg2[260];
-	BufferIO::EncodeUTF8(arg1, arg2);
-	return arg2;
+	BufferIO::EncodeUTF8(arg1, param);
 #else
-	return arg;
+	strcpy(param, arg1);
 #endif
 }
 
-const wchar_t* GetParameterW(const char* arg) {
+void GetParameterW(wchar_t* param, const char* arg) {
 #ifdef _WIN32
-	wchar_t arg1[260];
-	MultiByteToWideChar(CP_ACP, 0, arg, -1, arg1, 260);
-	return arg1;
+	MultiByteToWideChar(CP_ACP, 0, arg, -1, param, 260);
 #else
-	wchar_t arg2[260];
-	BufferIO::DecodeUTF8(arg, arg2);
-	return arg2;
+	BufferIO::DecodeUTF8(arg, param);
 #endif
 }
 
@@ -58,41 +52,62 @@ int main(int argc, char* argv[]) {
 	for(int i = 1; i < argc; ++i) {
 		if(!strcmp(argv[i], "-e")) { // extra database
 			++i;
-			ygo::dataManager.LoadDB(GetParameter(&argv[i][0]));
+			char param[128];
+			GetParameter(param, &argv[i][0]);
+			ygo::dataManager.LoadDB(param);
 		} else if(!strcmp(argv[i], "-n")) { // nickName
 			++i;
-			ygo::mainGame->ebNickName->setText(GetParameterW(&argv[i][0]));
+			wchar_t param[128];
+			GetParameterW(param, &argv[i][0]);
+			ygo::mainGame->ebNickName->setText(param);
 		} else if(!strcmp(argv[i], "-h")) { // Host address
 			++i;
-			ygo::mainGame->ebJoinIP->setText(GetParameterW(&argv[i][0]));
+			wchar_t param[128];
+			GetParameterW(param, &argv[i][0]);
+			ygo::mainGame->ebJoinIP->setText(param);
 		} else if(!strcmp(argv[i], "-p")) { // host Port
 			++i;
-			ygo::mainGame->ebJoinPort->setText(GetParameterW(&argv[i][0]));
+			wchar_t param[128];
+			GetParameterW(param, &argv[i][0]);
+			ygo::mainGame->ebJoinPort->setText(param);
 		} else if(!strcmp(argv[i], "-w")) { // host passWord
 			++i;
-			ygo::mainGame->ebJoinPass->setText(GetParameterW(&argv[i][0]));
+			wchar_t param[128];
+			GetParameterW(param, &argv[i][0]);
+			ygo::mainGame->ebJoinPass->setText(param);
 		} else if(!strcmp(argv[i], "-x")) { // eXit on return
 			exit_on_return = true;
 		} else if(!strcmp(argv[i], "-j")) { // Join host
 			ClickButton(ygo::mainGame->btnLanMode);
 			ClickButton(ygo::mainGame->btnJoinHost);
 			break;
-		} else if(!strcmp(argv[i], "-o")) { // Open file
-			open_file = true;
-			++i;
-			wcscpy(open_file_name, GetParameterW(&argv[i][0]));
 		} else if(!strcmp(argv[i], "-d")) { // Deck
+			if(i < argc) {
+				open_file = true;
+				GetParameterW(open_file_name, &argv[i + 1][0]);
+			}
 			ClickButton(ygo::mainGame->btnDeckEdit);
 			break;
 		} else if(!strcmp(argv[i], "-r")) { // Replay
+			if(i < argc) {
+				open_file = true;
+				GetParameterW(open_file_name, &argv[i + 1][0]);
+			}
 			ClickButton(ygo::mainGame->btnReplayMode);
-			ClickButton(ygo::mainGame->btnLoadReplay);
+			if(open_file)
+				ClickButton(ygo::mainGame->btnLoadReplay);
 			break;
 		} else if(!strcmp(argv[i], "-s")) { // Single
+			if(i < argc) {
+				open_file = true;
+				GetParameterW(open_file_name, &argv[i + 1][0]);
+			}
 			ClickButton(ygo::mainGame->btnServerMode);
-			ClickButton(ygo::mainGame->btnLoadSinglePlay);
+			if(open_file)
+				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
 		}
+
 	}
 	ygo::mainGame->MainLoop();
 #ifdef _WIN32
