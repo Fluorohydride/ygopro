@@ -139,15 +139,24 @@ void Replay::SaveReplay(const wchar_t* name) {
 	fclose(fp);
 }
 bool Replay::OpenReplay(const wchar_t* name) {
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
 #ifdef WIN32
-	fp = _wfopen(fname, L"rb");
+	fp = _wfopen(name, L"rb");
 #else
-	char fname2[256];
-	BufferIO::EncodeUTF8(fname, fname2);
-	fp = fopen(fname2, "rb");
+	char name2[256];
+	BufferIO::EncodeUTF8(name, name2);
+	fp = fopen(name2, "rb");
 #endif
+	if(!fp) {
+		wchar_t fname[256];
+		myswprintf(fname, L"./replay/%ls", name);
+#ifdef WIN32
+		fp = _wfopen(fname, L"rb");
+#else
+		char fname2[256];
+		BufferIO::EncodeUTF8(fname, fname2);
+		fp = fopen(fname2, "rb");
+#endif
+	}
 	if(!fp)
 		return false;
 	fseek(fp, 0, SEEK_END);

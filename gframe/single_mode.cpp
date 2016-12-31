@@ -29,11 +29,17 @@ void SingleMode::SetResponse(unsigned char* resp) {
 	set_responseb(pduel, resp);
 }
 int SingleMode::SinglePlayThread(void* param) {
-	const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
-	wchar_t fname[256];
-	myswprintf(fname, L"./single/%ls", name);
 	char fname2[256];
-	size_t slen = BufferIO::EncodeUTF8(fname, fname2);
+	size_t slen;
+	if(open_file) {
+		slen = BufferIO::EncodeUTF8(open_file_name, fname2);
+		open_file = false;
+	} else {
+		const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
+		wchar_t fname[256];
+		myswprintf(fname, L"./single/%ls", name);
+		slen = BufferIO::EncodeUTF8(fname, fname2);
+	}
 	mtrandom rnd;
 	time_t seed = time(0);
 	rnd.reset(seed);
@@ -103,6 +109,8 @@ int SingleMode::SinglePlayThread(void* param) {
 		mainGame->ShowElement(mainGame->wSinglePlay);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.Unlock();
+		if(exit_on_return)
+			mainGame->device->closeDevice();
 	}
 	return 0;
 }
