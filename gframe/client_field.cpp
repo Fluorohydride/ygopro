@@ -1148,7 +1148,12 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 			} else {
 				select_ready = true;
 				mainGame->wCardSelect->setVisible(false);
-				mainGame->dField.ShowSelectCard(true);
+				wchar_t wbuf[256], *pwbuf = wbuf;
+				BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
+				*pwbuf++ = L'\n';
+				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
+				mainGame->stQMessage->setText(wbuf);
+				mainGame->PopupElement(mainGame->wQuery);
 			}
 		} else {
 			select_ready = false;
