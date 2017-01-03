@@ -205,6 +205,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 				break;
 			}
+			case BUTTON_MSG_OK: {
+				mainGame->HideElement(mainGame->wMessage);
+				mainGame->actionSignal.Set();
+				break;
+			}
 			case BUTTON_YES: {
 				mainGame->HideElement(mainGame->wQuery);
 				if(!mainGame->is_building || mainGame->is_siding)
