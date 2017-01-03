@@ -1500,8 +1500,13 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declarable_type)) {
-				mainGame->lstANCard->addItem(cit->second.name);
-				ancard.push_back(cit->first);
+				if(wcscmp(pname, cit->second.name) == 0) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+					ancard.insert(ancard.begin(), cit->first);
+				} else {
+					mainGame->lstANCard->addItem(cit->second.name);
+					ancard.push_back(cit->first);
+				}
 			}
 		}
 	}
@@ -1527,8 +1532,13 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, opcode)) {
-				mainGame->lstANCard->addItem(cit->second.name);
-				ancard.push_back(cit->first);
+				if(wcscmp(pname, cit->second.name) == 0) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+					ancard.insert(ancard.begin(), cit->first);
+				} else {
+					mainGame->lstANCard->addItem(cit->second.name);
+					ancard.push_back(cit->first);
+				}
 			}
 		}
 	}
