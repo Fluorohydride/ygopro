@@ -5,6 +5,7 @@
 
 int enable_log = 0;
 bool exit_on_return = false;
+bool keep_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
 
@@ -85,11 +86,16 @@ int main(int argc, char* argv[]) {
 			continue;
 		} else if(!strcmp(argv[i], "-x")) { // eXit on return
 			exit_on_return = true;
+		} else if(!strcmp(argv[i], "-k")) { // Keep on return
+			exit_on_return = false;
+			keep_on_return = true;
 		} else if(!strcmp(argv[i], "-j")) { // Join host
+			exit_on_return = !keep_on_return;
 			ClickButton(ygo::mainGame->btnLanMode);
 			ClickButton(ygo::mainGame->btnJoinHost);
 			break;
 		} else if(!strcmp(argv[i], "-d")) { // Deck
+			exit_on_return = !keep_on_return;
 			if(i < argc) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i + 1][0]);
@@ -97,6 +103,7 @@ int main(int argc, char* argv[]) {
 			ClickButton(ygo::mainGame->btnDeckEdit);
 			break;
 		} else if(!strcmp(argv[i], "-r")) { // Replay
+			exit_on_return = !keep_on_return;
 			if(i < argc) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i + 1][0]);
@@ -106,6 +113,7 @@ int main(int argc, char* argv[]) {
 				ClickButton(ygo::mainGame->btnLoadReplay);
 			break;
 		} else if(!strcmp(argv[i], "-s")) { // Single
+			exit_on_return = !keep_on_return;
 			if(i < argc) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i + 1][0]);
