@@ -522,6 +522,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->is_building = false;
+		mainGame->wDeckEdit->setVisible(false);
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
@@ -1458,7 +1460,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selectsum_all.clear();
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.selectsum_cards.clear();
-		bool panelmode = false;
+		mainGame->dField.select_panalmode = false;
 		for (int i = 0; i < mainGame->dField.must_select_count; ++i) {
 			unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
 			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
@@ -1484,20 +1486,20 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->select_seq = i;
 			mainGame->dField.selectsum_all.push_back(pcard);
 			if ((l & 0xe) == 0)
-				panelmode = true;
+				mainGame->dField.select_panalmode = true;
 		}
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls(%d)", dataManager.GetDesc(select_hint), mainGame->dField.select_sumval);
 		else myswprintf(textBuffer, L"%ls(%d)", dataManager.GetSysString(560), mainGame->dField.select_sumval);
 		select_hint = 0;
-		if (panelmode) {
+		if(mainGame->dField.select_panalmode) {
 			mainGame->wCardSelect->setText(textBuffer);
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
-		return mainGame->dField.ShowSelectSum(panelmode);
+		return mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
 	}
 	case MSG_SORT_CARD:
 	case MSG_SORT_CHAIN: {

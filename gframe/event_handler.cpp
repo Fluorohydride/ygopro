@@ -299,6 +299,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_TRIBUTE:
 				case MSG_SELECT_SUM: {
 					mainGame->HideElement(mainGame->wQuery);
+					if(select_panalmode)
+						mainGame->dField.ShowSelectCard(true);
 					break;
 				}
 				case MSG_SELECT_CHAIN: {
@@ -888,6 +890,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstLog->getSelected();
 				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
 					mainGame->ShowCardInfo(mainGame->logParam[sel]);
+				}
+				break;
+			}
+			case LISTBOX_ANCARD: {
+				int sel = mainGame->lstANCard->getSelected();
+				if(sel != -1) {
+					mainGame->ShowCardInfo(ancard[sel]);
 				}
 				break;
 			}

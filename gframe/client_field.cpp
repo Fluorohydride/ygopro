@@ -1148,7 +1148,12 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 			} else {
 				select_ready = true;
 				mainGame->wCardSelect->setVisible(false);
-				mainGame->dField.ShowSelectCard(true);
+				wchar_t wbuf[256], *pwbuf = wbuf;
+				BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
+				*pwbuf++ = L'\n';
+				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
+				mainGame->stQMessage->setText(wbuf);
+				mainGame->PopupElement(mainGame->wQuery);
 			}
 		} else {
 			select_ready = false;
@@ -1500,8 +1505,13 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declarable_type)) {
-				mainGame->lstANCard->addItem(cit->second.name);
-				ancard.push_back(cit->first);
+				if(wcscmp(pname, cit->second.name) == 0) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+					ancard.insert(ancard.begin(), cit->first);
+				} else {
+					mainGame->lstANCard->addItem(cit->second.name);
+					ancard.push_back(cit->first);
+				}
 			}
 		}
 	}
@@ -1527,8 +1537,13 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, opcode)) {
-				mainGame->lstANCard->addItem(cit->second.name);
-				ancard.push_back(cit->first);
+				if(wcscmp(pname, cit->second.name) == 0) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+					ancard.insert(ancard.begin(), cit->first);
+				} else {
+					mainGame->lstANCard->addItem(cit->second.name);
+					ancard.push_back(cit->first);
+				}
 			}
 		}
 	}
