@@ -299,6 +299,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_TRIBUTE:
 				case MSG_SELECT_SUM: {
 					mainGame->HideElement(mainGame->wQuery);
+					if(select_panalmode)
+						mainGame->dField.ShowSelectCard(true);
 					break;
 				}
 				case MSG_SELECT_CHAIN: {

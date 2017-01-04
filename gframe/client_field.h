@@ -54,6 +54,7 @@ public:
 	int select_sumval;
 	int select_cancelable;
 	int select_mode;
+	bool select_panalmode;
 	bool select_ready;
 	int announce_count;
 	int declarable_type;
