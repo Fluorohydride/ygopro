@@ -41,6 +41,7 @@ public:
 	int TypeCount(std::vector<code_pointer> cards, int type);
 	void LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2=0, int sidec2=0, bool doubled = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
+	FILE* OpenDeckFile(const wchar_t * file, const char * mode);
 	bool LoadDeck(const wchar_t* file);
 	bool LoadDeckDouble(const wchar_t* file, const wchar_t* file2);
 	bool SaveDeck(Deck& deck, const wchar_t* name);

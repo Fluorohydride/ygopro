@@ -616,6 +616,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->is_building = false;
+		mainGame->wDeckEdit->setVisible(false);
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
@@ -1042,7 +1044,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			desc =  BufferIO::ReadInt32(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			mainGame->dField.activatable_cards.push_back(pcard);
-			mainGame->dField.activatable_descs.push_back(std::make_pair(desc,0));
+			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, 0));
 			pcard->cmdFlag |= COMMAND_ACTIVATE;
 			if (pcard->location == LOCATION_GRAVE)
 				mainGame->dField.grave_act = true;
@@ -1548,7 +1550,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selectsum_all.clear();
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.selectsum_cards.clear();
-		bool panelmode = false;
+		mainGame->dField.select_panalmode = false;
 		for (int i = 0; i < mainGame->dField.must_select_count; ++i) {
 			unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
 			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
@@ -1574,20 +1576,20 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->select_seq = i;
 			mainGame->dField.selectsum_all.push_back(pcard);
 			if ((l & 0xe) == 0)
-				panelmode = true;
+				mainGame->dField.select_panalmode = true;
 		}
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls(%d)", dataManager.GetDesc(select_hint), mainGame->dField.select_sumval);
 		else myswprintf(textBuffer, L"%ls(%d)", dataManager.GetSysString(560), mainGame->dField.select_sumval);
 		select_hint = 0;
-		if (panelmode) {
+		if(mainGame->dField.select_panalmode) {
 			mainGame->wCardSelect->setText(textBuffer);
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
-		return mainGame->dField.ShowSelectSum(panelmode);
+		return mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
 	}
 	case MSG_SORT_CARD:
 	case MSG_SORT_CHAIN: {
@@ -1849,24 +1851,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SWAP_GRAVE_DECK: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		int m = 0;
-		int e = mainGame->dField.extra[player].size();
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
 			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
 				(*cit)->location = LOCATION_GRAVE;
+			int m = 0;
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
 				if ((*cit)->type & 0x802040) {
-					(*cit)->location = LOCATION_EXTRA;
 					(*cit)->position = POS_FACEDOWN;
-					(*cit)->sequence = e;
-					mainGame->dField.extra[player].push_back(*cit);
+					mainGame->dField.AddCard(*cit, player, LOCATION_EXTRA, 0);
 					cit = mainGame->dField.deck[player].erase(cit);
-					e++;
 				} else {
 					(*cit)->location = LOCATION_DECK;
-					(*cit)->sequence = m;
-					m++;
+					(*cit)->sequence = m++;
 					++cit;
 				}
 			}
@@ -1877,19 +1874,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				(*cit)->location = LOCATION_GRAVE;
 				mainGame->dField.MoveCard(*cit, 10);
 			}
+			int m = 0;
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
 				ClientCard* pcard = *cit;
 				if (pcard->type & 0x802040) {
-					pcard->location = LOCATION_EXTRA;
 					pcard->position = POS_FACEDOWN;
-					pcard->sequence = e;
-					mainGame->dField.extra[player].push_back(pcard);
+					mainGame->dField.AddCard(pcard, player, LOCATION_EXTRA, 0);
 					cit = mainGame->dField.deck[player].erase(cit);
-					e++;
 				} else {
 					pcard->location = LOCATION_DECK;
-					pcard->sequence = m;
-					m++;
+					pcard->sequence = m++;
 					++cit;
 				}
 				mainGame->dField.MoveCard(pcard, 10);
@@ -3396,7 +3390,7 @@ void DuelClient::SetResponseI(int respI) {
 	*((int*)response_buf) = respI;
 	response_len = 4;
 }
-void DuelClient::SetResponseB(unsigned char * respB, unsigned char len) {
+void DuelClient::SetResponseB(void* respB, unsigned char len) {
 	memcpy(response_buf, respB, len);
 	response_len = len;
 }

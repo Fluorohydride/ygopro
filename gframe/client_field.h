@@ -54,6 +54,7 @@ public:
 	int select_sumval;
 	int select_cancelable;
 	int select_mode;
+	bool select_panalmode;
 	bool select_ready;
 	int announce_count;
 	int declarable_type;
@@ -102,7 +103,7 @@ public:
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
 	bool ShowSelectSum(bool panelmode);
 	bool CheckSelectSum();
-	bool check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::iterator index, int min, int max);
+	bool check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max);
 	bool check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc);
 	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);
 	bool check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count);

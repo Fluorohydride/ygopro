@@ -88,7 +88,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
-				if(deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()))) {
+				int sel = mainGame->cbDBDecks->getSelected();
+				if(sel>-1 && deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -202,6 +203,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+				break;
+			}
+			case BUTTON_MSG_OK: {
+				mainGame->HideElement(mainGame->wMessage);
+				mainGame->actionSignal.Set();
 				break;
 			}
 			case BUTTON_YES: {
