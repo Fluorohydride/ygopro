@@ -904,7 +904,7 @@ void Game::LoadConfig() {
 			gameConf.serverport = atoi(valbuf);
 		} else if(!strcmp(strbuf, "lasthost")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.lasthost, 20);
+			BufferIO::CopyWStr(wstr, gameConf.lasthost, 100);
 		} else if(!strcmp(strbuf, "lastport")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lastport, 20);
