@@ -1764,13 +1764,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
 			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
 				(*cit)->location = LOCATION_GRAVE;
+			int m = 0;
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
 				if ((*cit)->type & 0x802040) {
-					(*cit)->location = LOCATION_EXTRA;
-					mainGame->dField.extra[player].push_back(*cit);
+					(*cit)->position = POS_FACEDOWN;
+					mainGame->dField.AddCard(*cit, player, LOCATION_EXTRA, 0);
 					cit = mainGame->dField.deck[player].erase(cit);
 				} else {
 					(*cit)->location = LOCATION_DECK;
+					(*cit)->sequence = m++;
 					++cit;
 				}
 			}
@@ -1781,14 +1783,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				(*cit)->location = LOCATION_GRAVE;
 				mainGame->dField.MoveCard(*cit, 10);
 			}
+			int m = 0;
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
 				ClientCard* pcard = *cit;
 				if (pcard->type & 0x802040) {
-					pcard->location = LOCATION_EXTRA;
-					mainGame->dField.extra[player].push_back(pcard);
+					pcard->position = POS_FACEDOWN;
+					mainGame->dField.AddCard(pcard, player, LOCATION_EXTRA, 0);
 					cit = mainGame->dField.deck[player].erase(cit);
 				} else {
 					pcard->location = LOCATION_DECK;
+					pcard->sequence = m++;
 					++cit;
 				}
 				mainGame->dField.MoveCard(pcard, 10);

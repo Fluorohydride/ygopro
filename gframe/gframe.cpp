@@ -84,6 +84,7 @@ int main(int argc, char* argv[]) {
 	if(!ygo::mainGame->Initialize())
 		return 0;
 
+	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
 		if(argv[i][0] == '-' && argv[i][1] == 'e') {
 			char param[128];
@@ -120,8 +121,6 @@ int main(int argc, char* argv[]) {
 			GetParameterW(param, &argv[i][0]);
 			ygo::mainGame->ebJoinPass->setText(param);
 			continue;
-		} else if(!strcmp(argv[i], "-x")) { // eXit on return
-			exit_on_return = true;
 		} else if(!strcmp(argv[i], "-k")) { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
