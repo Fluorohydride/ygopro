@@ -1760,6 +1760,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SWAP_GRAVE_DECK: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int m = 0;
+		int e = mainGame->dField.extra[player].size();
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
 			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
@@ -1767,10 +1769,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
 				if ((*cit)->type & 0x802040) {
 					(*cit)->location = LOCATION_EXTRA;
+					(*cit)->position = POS_FACEDOWN;
+					(*cit)->sequence = e;
 					mainGame->dField.extra[player].push_back(*cit);
 					cit = mainGame->dField.deck[player].erase(cit);
+					e++;
 				} else {
 					(*cit)->location = LOCATION_DECK;
+					(*cit)->sequence = m;
+					m++;
 					++cit;
 				}
 			}
@@ -1785,10 +1792,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				ClientCard* pcard = *cit;
 				if (pcard->type & 0x802040) {
 					pcard->location = LOCATION_EXTRA;
+					pcard->position = POS_FACEDOWN;
+					pcard->sequence = e;
 					mainGame->dField.extra[player].push_back(pcard);
 					cit = mainGame->dField.deck[player].erase(cit);
+					e++;
 				} else {
 					pcard->location = LOCATION_DECK;
+					pcard->sequence = m;
+					m++;
 					++cit;
 				}
 				mainGame->dField.MoveCard(pcard, 10);
