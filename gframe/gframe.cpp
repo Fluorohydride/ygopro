@@ -34,6 +34,13 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
+	wchar_t exepath[MAX_PATH];
+	GetModuleFileName(NULL, exepath, MAX_PATH);
+	wchar_t* p = wcsrchr(exepath, '\\');
+	*p = '\0';
+	SetCurrentDirectory(exepath);
+#endif //_WIN32
+#ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	wVersionRequested = MAKEWORD(2, 2);
