@@ -1289,6 +1289,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selected_field = 0;
 		unsigned char respbuf[64];
 		int pzone = 0;
+		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE)
+			mainGame->stHintMsg->setText(dataManager.GetSysString(569));
+		else
+			mainGame->stHintMsg->setText(dataManager.GetSysString(570));
+		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
 			unsigned int filter;
 			if (mainGame->dField.selectable_field & 0x1f) {
