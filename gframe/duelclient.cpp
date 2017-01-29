@@ -2573,6 +2573,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			mainGame->gMutex.Lock();
 			if(pc1->equipTarget) {
+				pc1->is_showequip = false;
 				pc1->equipTarget->is_showequip = false;
 				pc1->equipTarget->equipped.erase(pc1);
 			}
