@@ -131,6 +131,7 @@ public:
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
 	void UpdateChainButtons();
+	void ShowCancelOrFinishButton(int buttonOp);
 	void SetResponseSelectedCards() const;
 };
 

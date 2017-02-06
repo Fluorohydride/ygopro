@@ -286,9 +286,9 @@ bool Game::Initialize() {
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
-	chkEnableSound = env->addCheckBox(gameConf.enablesound, rect<s32>(20, 230, 280, 255), tabSystem, -1, dataManager.GetSysString(1295));
+	chkEnableSound = env->addCheckBox(gameConf.enablesound, rect<s32>(20, 230, 280, 255), tabSystem, -1, dataManager.GetSysString(2046));
 	chkEnableSound->setChecked(gameConf.enablesound);
-	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, rect<s32>(20, 260, 280, 285), tabSystem, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(1296));
+	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, rect<s32>(20, 260, 280, 285), tabSystem, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2047));
 	chkEnableMusic->setChecked(gameConf.enablemusic);
 	stVolume = env->addStaticText(L"Volume", rect<s32>(20, 290, 80, 310), false, true, tabSystem, -1, false);
 	srcVolume = env->addScrollBar(true, rect<s32>(85, 295, 280, 310), tabSystem, SCROLL_VOLUME);
@@ -591,6 +591,9 @@ bool Game::Initialize() {
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
+	//cancel or finish
+	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
+	btnCancelOrFinish->setVisible(false);
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
@@ -983,7 +986,6 @@ void Game::LoadConfig() {
 	gameConf.enablesound = true;
 	gameConf.volume = 1.0;
 	gameConf.enablemusic = true;
-	gameConf.BGM_index = -1;
 	fseek(fp, 0, SEEK_END);
 	gameConf.draw_field_spell = 1;
 	gameConf.separate_clear_button = 1;
@@ -1047,8 +1049,6 @@ void Game::LoadConfig() {
  			gameConf.volume = atof(valbuf) / 100;
  		} else if(!strcmp(strbuf, "enable_music")) {
  			gameConf.enablemusic = atoi(valbuf) > 0;
- 		} else if(!strcmp(strbuf, "BGM_index")) {
- 			gameConf.BGM_index = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1107,8 +1107,6 @@ void Game::SaveConfig() {
 	int vol = gameConf.volume * 100;
 	if (vol < 0) vol = 0; else if (vol > 100) vol = 100;
 	fprintf(fp, "volume = %d\n", vol);
-	fprintf(fp, "#playing the music corresponding to the sequence(start from 0) under folder /BGM\n#-1 means playing one of them randomly\n");
-	fprintf(fp, "BGM_index = %d\n", gameConf.BGM_index);
 	fclose(fp);
 }
 void Game::PlaySoundEffect(char* sound) {
@@ -1134,7 +1132,7 @@ void Game::PlayBGM() {
 			is_playing = false;
 		if(!is_playing) {
 			int count = BGMList.size();
-			int bgm = (gameConf.BGM_index >= 0) ? gameConf.BGM_index : rand() % count;
+			int bgm = rand() % count;
 			auto name = BGMList[bgm].c_str();
 			wchar_t fname[256];
 			myswprintf(fname, L"./sound/BGM/%ls", name);
@@ -1300,6 +1298,7 @@ void Game::CloseDuelWindow() {
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
+	btnCancelOrFinish->setVisible(false);
 	wChat->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
@@ -1418,6 +1417,7 @@ void Game::OnResize()
 	btnChainAlways->setRelativePosition(Resize(205, 140, 295, 175));
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
+	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2)
 {

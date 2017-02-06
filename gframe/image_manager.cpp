@@ -62,6 +62,10 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 		sprintf(file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = driver->getTexture(file);
 		if(img == NULL) {
+			sprintf(file, "pics/%d.png", code);
+			img = driver->getTexture(file);
+		}
+		if (img == NULL) {
 			sprintf(file, "pics/%d.jpg", code);
 			img = driver->getTexture(file);
 		}

@@ -40,7 +40,6 @@ struct Config {
 	bool enablesound;
 	double volume;
 	bool enablemusic;
-	int BGM_index;
 	int skin_index;
 };
 
@@ -445,6 +444,9 @@ public:
 	irr::gui::IGUIButton* btnChainIgnore;
 	irr::gui::IGUIButton* btnChainAlways;
 	irr::gui::IGUIButton* btnChainWhenAvail;
+
+	//cancel or finish
+	irr::gui::IGUIButton* btnCancelOrFinish;
 };
 
 extern Game* mainGame;
