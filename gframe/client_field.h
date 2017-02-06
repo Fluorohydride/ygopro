@@ -62,6 +62,7 @@ public:
 	int select_counter_type;
 	std::vector<ClientCard*> selectable_cards;
 	std::vector<ClientCard*> selected_cards;
+	std::vector<ClientCard*> unselected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
 	std::vector<int> opcode;
