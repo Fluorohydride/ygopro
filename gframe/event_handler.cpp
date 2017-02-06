@@ -223,6 +223,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					else
 						DuelClient::SendResponse();
+					break;
 				}
 				case MSG_SELECT_TRIBUTE: {
 					if (selected_cards.size() == 0) {
