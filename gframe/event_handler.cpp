@@ -869,7 +869,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case CHECK_RACE: {
 				int rac = 0, filter = 0x1, count = 0;
-				for(int i = 0; i < 24; ++i, filter <<= 1) {
+				for(int i = 0; i < 25; ++i, filter <<= 1) {
 					if(mainGame->chkRace[i]->isChecked()) {
 						rac |= filter;
 						count++;
@@ -959,7 +959,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 						else if(selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-						else 
+						else
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					} else if(selectable_cards[i + pos]->location == LOCATION_DECK || selectable_cards[i + pos]->location == LOCATION_EXTRA || selectable_cards[i + pos]->location == LOCATION_REMOVED) {
 						if(selectable_cards[i + pos]->position & POS_FACEDOWN)
@@ -968,14 +968,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 						else if(selectable_cards[i + pos]->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-						else 
+						else
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					} else {
 						if(selectable_cards[i + pos]->is_selected)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
 						else if(selectable_cards[i + pos]->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-						else 
+						else
 							mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
@@ -1006,19 +1006,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						// BackgroundColor: controller of the xyz monster
 						if(display_cards[i + pos]->overlayTarget->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-						else 
+						else
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					} else if(display_cards[i + pos]->location == LOCATION_EXTRA || display_cards[i + pos]->location == LOCATION_REMOVED) {
 						if(display_cards[i + pos]->position & POS_FACEDOWN)
 							mainGame->stDisplayPos[i]->setOverrideColor(0xff0000ff);
 						if(display_cards[i + pos]->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-						else 
+						else
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					} else {
 						if(display_cards[i + pos]->controler)
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffd0d0d0);
-						else 
+						else
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
@@ -1859,7 +1859,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->chain_when_avail = false;
 				UpdateChainButtons();
 			}
-			break; 
+			break;
 		}
 		default:
 			break;
