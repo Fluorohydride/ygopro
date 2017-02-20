@@ -521,7 +521,7 @@ bool Game::Initialize() {
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
-	if(mainGame->gameConf.separate_clear_button) {
+	if(gameConf.separate_clear_button) {
 		btnStartFilter->setRelativePosition(rect<s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 		btnClearFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 255, 100 + 125 / 6), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
 	}
@@ -650,13 +650,13 @@ void Game::MainLoop() {
 			driver->draw2DImage(imageManager.tBackGround, Resize(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
 		gMutex.Lock();
 		if(dInfo.isStarted) {
-			if (mainGame->showcardcode == 1 || mainGame->showcardcode == 3)
+			if (showcardcode == 1 || showcardcode == 3)
 				PlayMusic("./sound/duelwin.mp3", true);
-			else if (mainGame->showcardcode == 2)
+			else if (showcardcode == 2)
 				PlayMusic("./sound/duellose.mp3", true);
-			else if (mainGame->dInfo.lp[0] > 0 && mainGame->dInfo.lp[LocalPlayer(0)] <= mainGame->dInfo.lp[LocalPlayer(1)] / 2)
+			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] <= dInfo.lp[LocalPlayer(1)] / 2)
 				PlayMusic("./sound/song-disadvantage.mp3", true);
-			else if (mainGame->dInfo.lp[0] > 0 && mainGame->dInfo.lp[LocalPlayer(0)] >= mainGame->dInfo.lp[LocalPlayer(1)] * 2)
+			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] >= dInfo.lp[LocalPlayer(1)] * 2)
 				PlayMusic("./sound/song-advantage.mp3", true);
 			else
 				PlayBGM();
@@ -717,7 +717,7 @@ void Game::MainLoop() {
 		}
 	}
 	DuelClient::StopClient(true);
-	if(mainGame->dInfo.isSingleMode)
+	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
 #ifdef _WIN32
 	Sleep(500);
@@ -1090,19 +1090,19 @@ void Game::SaveConfig() {
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
 	//settings
-	fprintf(fp, "autopos = %d\n", ((mainGame->chkAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_opponent = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_spectators = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "autopos = %d\n", ((chkAutoPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "randompos = %d\n", ((chkRandomPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "autochain = %d\n", ((chkAutoChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "waitchain = %d\n", ((chkWaitChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_opponent = %d\n", ((chkIgnore1->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_spectators = %d\n", ((chkIgnore2->isChecked()) ? 1 : 0));
 	fprintf(fp, "hide_setname = %d\n", (gameConf.chkHideSetname));
-	fprintf(fp, "hide_hint_button = %d\n", ((mainGame->chkHideHintButton->isChecked()) ? 1 : 0));
+	fprintf(fp, "hide_hint_button = %d\n", ((chkHideHintButton->isChecked()) ? 1 : 0));
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
 	fprintf(fp, "skin_index = %d\n", gameConf.skin_index);
-	fprintf(fp, "enable_sound = %d\n", ((mainGame->chkEnableSound->isChecked()) ? 1 : 0));
-	fprintf(fp, "enable_music = %d\n", ((mainGame->chkEnableMusic->isChecked()) ? 1 : 0));
+	fprintf(fp, "enable_sound = %d\n", ((chkEnableSound->isChecked()) ? 1 : 0));
+	fprintf(fp, "enable_music = %d\n", ((chkEnableMusic->isChecked()) ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
 	int vol = gameConf.volume * 100;
 	if (vol < 0) vol = 0; else if (vol > 100) vol = 100;
@@ -1110,13 +1110,13 @@ void Game::SaveConfig() {
 	fclose(fp);
 }
 void Game::PlaySoundEffect(char* sound) {
-	if(mainGame->chkEnableSound->isChecked()) {
+	if(chkEnableSound->isChecked()) {
 		engineSound->play2D(sound);
 		engineSound->setSoundVolume(gameConf.volume);
 	}
 }
 void Game::PlayMusic(char* song, bool loop) {
-	if(mainGame->chkEnableMusic->isChecked()) {
+	if(chkEnableMusic->isChecked()) {
 		if(!engineMusic->isCurrentlyPlaying(song)) {
 			engineMusic->stopAllSounds();
 			engineMusic->play2D(song, loop);
@@ -1125,7 +1125,7 @@ void Game::PlayMusic(char* song, bool loop) {
 	}
 }
 void Game::PlayBGM() {
-	if(mainGame->chkEnableMusic->isChecked()) {
+	if(chkEnableMusic->isChecked()) {
 		static bool is_playing = false;
 		static char strBuffer[1024];
 		if(is_playing && !engineMusic->isCurrentlyPlaying(strBuffer))
@@ -1196,15 +1196,15 @@ void Game::ShowCardInfo(int code) {
 			wcscat(formatBuffer, scaleBuffer);
 		}
 		stDataInfo->setText(formatBuffer);
-		stSetName->setRelativePosition(rect<s32>(15, 83, 316 * mainGame->window_size.Width / 1024 - 30, 116));
-		stText->setRelativePosition(rect<s32>(15, 83 + offset, 296 * mainGame->window_size.Width / 1024 - 30, 324 * mainGame->window_size.Height / 640));
+		stSetName->setRelativePosition(rect<s32>(15, 83, 316 * window_size.Width / 1024 - 30, 116));
+		stText->setRelativePosition(rect<s32>(15, 83 + offset, 296 * window_size.Width / 1024 - 30, 324 * window_size.Height / 640));
 		scrCardText->setRelativePosition(Resize(267, 83 + offset, 287, 324));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
-		stSetName->setRelativePosition(rect<s32>(15, 60, 316 * mainGame->window_size.Height / 640, 83));
-		stText->setRelativePosition(rect<s32>(15, 60 + offset, 287 * mainGame->window_size.Width / 1024 - 30, 324 * mainGame->window_size.Height / 640));
+		stSetName->setRelativePosition(rect<s32>(15, 60, 316 * window_size.Height / 640, 83));
+		stText->setRelativePosition(rect<s32>(15, 60 + offset, 287 * window_size.Width / 1024 - 30, 324 * window_size.Height / 640));
 		scrCardText->setRelativePosition(Resize(267, 60 + offset, 287, 324));
 	}
 	showingtext = dataManager.GetText(code);
@@ -1226,26 +1226,26 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L": ");
 		break;
 	case 1: //from client
-		mainGame->PlaySoundEffect("./sound/chatmessage.wav");
+		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.clientname);
 		chatMsg[0].append(L": ");
 		break;
 	case 2: //host tag
-		mainGame->PlaySoundEffect("./sound/chatmessage.wav");
+		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.hostname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 3: //client tag
-		mainGame->PlaySoundEffect("./sound/chatmessage.wav");
+		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.clientname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 7: //local name
-		chatMsg[0].append(mainGame->ebNickName->getText());
+		chatMsg[0].append(ebNickName->getText());
 		chatMsg[0].append(L": ");
 		break;
 	case 8: //system custom message, no prefix.
-		mainGame->PlaySoundEffect("./sound/chatmessage.wav");
+		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(L"[System]: ");
 		break;
 	case 9: //error message
@@ -1259,12 +1259,12 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
-	mainGame->imgCard->setImage(0);
-	mainGame->btnPSAU->setImage();
-	mainGame->btnPSDU->setImage();
+	imgCard->setImage(0);
+	btnPSAU->setImage();
+	btnPSDU->setImage();
 	for(int i=0; i<=4; ++i) {
-		mainGame->btnCardSelect[i]->setImage();
-		mainGame->btnCardDisplay[i]->setImage();
+		btnCardSelect[i]->setImage();
+		btnCardDisplay[i]->setImage();
 	}
 	imageManager.ClearTexture();
 }
@@ -1315,57 +1315,57 @@ const wchar_t* Game::LocalName(int local_player) {
 }
 void Game::OnResize()
 {
-	wMainMenu->setRelativePosition(mainGame->ResizeWin(370, 200, 650, 415));
-	wDeckEdit->setRelativePosition(mainGame->Resize(309, 8, 605, 130));
-	cbDBLFList->setRelativePosition(mainGame->Resize(80, 5, 220, 30));
-	cbDBDecks->setRelativePosition(mainGame->Resize(80, 35, 220, 60));
-	btnClearDeck->setRelativePosition(mainGame->Resize(115, 99, 165, 120));
-	btnSortDeck->setRelativePosition(mainGame->Resize(60, 99, 110, 120));
-	btnShuffleDeck->setRelativePosition(mainGame->Resize(5, 99, 55, 120));
-	btnSaveDeck->setRelativePosition(mainGame->Resize(225, 35, 290, 60));
-	btnSaveDeckAs->setRelativePosition(mainGame->Resize(225, 65, 290, 90));
-	ebDeckname->setRelativePosition(mainGame->Resize(80, 65, 220, 90));
+	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
+	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
+	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
+	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
+	btnClearDeck->setRelativePosition(Resize(115, 99, 165, 120));
+	btnSortDeck->setRelativePosition(Resize(60, 99, 110, 120));
+	btnShuffleDeck->setRelativePosition(Resize(5, 99, 55, 120));
+	btnSaveDeck->setRelativePosition(Resize(225, 35, 290, 60));
+	btnSaveDeckAs->setRelativePosition(Resize(225, 65, 290, 90));
+	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
 
-	wSort->setRelativePosition(mainGame->Resize(930, 132, 1020, 156));
-	cbSortType->setRelativePosition(mainGame->Resize(10, 2, 85, 22));
-	wFilter->setRelativePosition(mainGame->Resize(610, 8, 1020, 130));
-	scrFilter->setRelativePosition(mainGame->Resize(999, 161, 1019, 629));
-	cbCardType->setRelativePosition(mainGame->Resize(60, 3, 120, 23));
-	cbCardType2->setRelativePosition(mainGame->Resize(130, 3, 190, 23));
-	cbRace->setRelativePosition(mainGame->Resize(60, 49, 190, 69));
-	cbAttribute->setRelativePosition(mainGame->Resize(60, 26, 190, 46));
-	cbLimit->setRelativePosition(mainGame->Resize(260, 3, 390, 23));
-	ebStar->setRelativePosition(mainGame->Resize(60, 72, 100, 92));
-	ebScale->setRelativePosition(mainGame->Resize(150, 72, 190, 92));
-	ebAttack->setRelativePosition(mainGame->Resize(260, 26, 340, 46));
-	ebDefense->setRelativePosition(mainGame->Resize(260, 49, 340, 69));
-	ebCardName->setRelativePosition(mainGame->Resize(260, 72, 390, 92));
-	btnEffectFilter->setRelativePosition(mainGame->Resize(345, 28, 390, 69));
-	btnStartFilter->setRelativePosition(mainGame->Resize(260, 96, 390, 118));
-	btnClearFilter->setRelativePosition(mainGame->Resize(205, 96, 255, 118));
+	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
+	cbSortType->setRelativePosition(Resize(10, 2, 85, 22));
+	wFilter->setRelativePosition(Resize(610, 8, 1020, 130));
+	scrFilter->setRelativePosition(Resize(999, 161, 1019, 629));
+	cbCardType->setRelativePosition(Resize(60, 3, 120, 23));
+	cbCardType2->setRelativePosition(Resize(130, 3, 190, 23));
+	cbRace->setRelativePosition(Resize(60, 49, 190, 69));
+	cbAttribute->setRelativePosition(Resize(60, 26, 190, 46));
+	cbLimit->setRelativePosition(Resize(260, 3, 390, 23));
+	ebStar->setRelativePosition(Resize(60, 72, 100, 92));
+	ebScale->setRelativePosition(Resize(150, 72, 190, 92));
+	ebAttack->setRelativePosition(Resize(260, 26, 340, 46));
+	ebDefense->setRelativePosition(Resize(260, 49, 340, 69));
+	ebCardName->setRelativePosition(Resize(260, 72, 390, 92));
+	btnEffectFilter->setRelativePosition(Resize(345, 28, 390, 69));
+	btnStartFilter->setRelativePosition(Resize(260, 96, 390, 118));
+	btnClearFilter->setRelativePosition(Resize(205, 96, 255, 118));
 
-	wCategories->setRelativePosition(mainGame->ResizeWin(450, 60, 1000, 270));
-	stBanlist->setRelativePosition(mainGame->ResizeWin(10, 9, 100, 29));
-	stDeck->setRelativePosition(mainGame->ResizeWin(10, 39, 100, 59));
-	stCategory->setRelativePosition(mainGame->ResizeWin(10, 5, 70, 25));
-	stLimit->setRelativePosition(mainGame->ResizeWin(205, 5, 280, 25));
-	stAttribute->setRelativePosition(mainGame->ResizeWin(10, 28, 70, 48));
-	stRace->setRelativePosition(mainGame->ResizeWin(10, 51, 70, 71));
-	stAttack->setRelativePosition(mainGame->ResizeWin(205, 28, 280, 48));
-	stDefense->setRelativePosition(mainGame->ResizeWin(205, 51, 280, 71));
-	stStar->setRelativePosition(mainGame->ResizeWin(10, 74, 80, 94));
-	stSearch->setRelativePosition(mainGame->ResizeWin(205, 74, 280, 94));
-	stScale->setRelativePosition(mainGame->ResizeWin(101, 74, 150, 94));
-	btnSideOK->setRelativePosition(mainGame->Resize(510, 40, 820, 80));
-	btnDeleteDeck->setRelativePosition(mainGame->Resize(225, 95, 290, 120));
+	wCategories->setRelativePosition(ResizeWin(450, 60, 1000, 270));
+	stBanlist->setRelativePosition(ResizeWin(10, 9, 100, 29));
+	stDeck->setRelativePosition(ResizeWin(10, 39, 100, 59));
+	stCategory->setRelativePosition(ResizeWin(10, 5, 70, 25));
+	stLimit->setRelativePosition(ResizeWin(205, 5, 280, 25));
+	stAttribute->setRelativePosition(ResizeWin(10, 28, 70, 48));
+	stRace->setRelativePosition(ResizeWin(10, 51, 70, 71));
+	stAttack->setRelativePosition(ResizeWin(205, 28, 280, 48));
+	stDefense->setRelativePosition(ResizeWin(205, 51, 280, 71));
+	stStar->setRelativePosition(ResizeWin(10, 74, 80, 94));
+	stSearch->setRelativePosition(ResizeWin(205, 74, 280, 94));
+	stScale->setRelativePosition(ResizeWin(101, 74, 150, 94));
+	btnSideOK->setRelativePosition(Resize(510, 40, 820, 80));
+	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
 
-	wLanWindow->setRelativePosition(mainGame->ResizeWin(220, 100, 800, 520));
-	wCreateHost->setRelativePosition(mainGame->ResizeWin(320, 100, 700, 520));
-	wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440));
-	wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440));
-	wRules->setRelativePosition(mainGame->ResizeWin(630, 100, 1000, 310));
-	wReplay->setRelativePosition(mainGame->ResizeWin(220, 100, 800, 520));
-	wSinglePlay->setRelativePosition(mainGame->ResizeWin(220, 100, 800, 520));
+	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
+	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
+	wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 440));
+	wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 440));
+	wRules->setRelativePosition(ResizeWin(630, 100, 1000, 310));
+	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));
+	wSinglePlay->setRelativePosition(ResizeWin(220, 100, 800, 520));
 
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
@@ -1382,20 +1382,20 @@ void Game::OnResize()
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
 	stHintMsg->setRelativePosition(ResizeWin(500, 60, 820, 90));
 
-	wCardImg->setRelativePosition(mainGame->Resize(1, 1, 199, 273));
-	imgCard->setRelativePosition(mainGame->Resize(10, 9, 187, 263));
-	wInfos->setRelativePosition(mainGame->Resize(1, 275, 301, 639));
-	stName->setRelativePosition(recti(10, 10, 287 * mainGame->window_size.Width / 1024, 32));
-	stInfo->setRelativePosition(recti(15, 37, 296 * mainGame->window_size.Width / 1024, 60));
-	stDataInfo->setRelativePosition(recti(15, 60, 296 * mainGame->window_size.Width / 1024, 83));
-	stText->setRelativePosition(recti(15, 83, 296 * mainGame->window_size.Width / 1024 - 30, 324 * mainGame->window_size.Height / 640));
-	scrCardText->setRelativePosition(Resize(267, 106, 287, 324));
-	lstLog->setRelativePosition(mainGame->Resize(10, 10, 290, 290));
-	btnClearLog->setRelativePosition(mainGame->Resize(160, 300, 260, 325));
+	wCardImg->setRelativePosition(Resize(1, 1, 199, 273));
+	imgCard->setRelativePosition(Resize(10, 9, 187, 263));
+	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
+	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
+	stInfo->setRelativePosition(recti(15, 37, 296 * window_size.Width / 1024, 60));
+	stDataInfo->setRelativePosition(recti(15, 60, 296 * window_size.Width / 1024, 83));
+	stText->setRelativePosition(recti(15, stText->getRelativePosition().UpperLeftCorner.Y, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+	scrCardText->setRelativePosition(recti(267 * window_size.Width / 1024, scrCardText->getRelativePosition().UpperLeftCorner.Y, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
+	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
 	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
 
-	wChat->setRelativePosition(mainGame->ResizeWin(wInfos->getRelativePosition().LowerRightCorner.X + 6, 615, 1020, 640, true));
-	ebChatInput->setRelativePosition(recti(3, 2, mainGame->window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
+	wChat->setRelativePosition(ResizeWin(wInfos->getRelativePosition().LowerRightCorner.X + 6, 615, 1020, 640, true));
+	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
