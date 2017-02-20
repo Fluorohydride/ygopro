@@ -1469,6 +1469,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selected_field = 0;
 		unsigned char respbuf[64];
 		int pzone = 0;
+		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE)
+			mainGame->stHintMsg->setText(dataManager.GetSysString(569));
+		else
+			mainGame->stHintMsg->setText(dataManager.GetSysString(570));
+		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
 			unsigned int filter;
 			if (mainGame->dField.selectable_field & 0x1f) {
@@ -2755,10 +2760,17 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			if(pc1->equipTarget)
+				pc1->equipTarget->equipped.erase(pc1);
 			pc1->equipTarget = pc2;
 			pc2->equipped.insert(pc1);
 		} else {
 			mainGame->gMutex.Lock();
+			if(pc1->equipTarget) {
+				pc1->is_showequip = false;
+				pc1->equipTarget->is_showequip = false;
+				pc1->equipTarget->equipped.erase(pc1);
+			}
 			pc1->equipTarget = pc2;
 			pc2->equipped.insert(pc1);
 			if (mainGame->dField.hovered_card == pc1)
@@ -3094,7 +3106,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
 		int available = BufferIO::ReadInt32(pbuf);
-		for(int i = 0, filter = 0x1; i < 24; ++i, filter <<= 1) {
+		for(int i = 0, filter = 0x1; i < 25; ++i, filter <<= 1) {
 			mainGame->chkRace[i]->setChecked(false);
 			if(filter & available)
 				mainGame->chkRace[i]->setVisible(true);
@@ -3409,7 +3421,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				ClientCard* ccard = mainGame->dField.hand[p][seq];
 				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 			}
-			
+
 			val = BufferIO::ReadInt8(pbuf);
 			for(int seq = 0; seq < val; ++seq) {
 				ClientCard* ccard = new ClientCard;
