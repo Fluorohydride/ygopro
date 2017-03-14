@@ -15,7 +15,7 @@ struct HostInfo {
 	unsigned int lflist;
 	unsigned char rule;
 	unsigned char mode;
-	bool enable_priority;
+	unsigned char duel_rule;
 	bool no_check_deck;
 	bool no_shuffle_deck;
 	unsigned int start_lp;
