@@ -307,13 +307,13 @@ void Game::DrawMisc() {
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.pzone_act[0]) {
-		im.setTranslation(vector3df((matManager.vFieldSzone[0][6][0].Pos.X + matManager.vFieldSzone[0][6][0].Pos.X) / 2,
+		im.setTranslation(vector3df((matManager.vFieldSzone[0][6][0].Pos.X + matManager.vFieldSzone[0][6][1].Pos.X) / 2,
 			(matManager.vFieldSzone[0][6][0].Pos.Y + matManager.vFieldSzone[0][6][2].Pos.Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.pzone_act[1]) {
-		im.setTranslation(vector3df((matManager.vFieldSzone[0][7][0].Pos.X + matManager.vFieldSzone[0][7][0].Pos.X) / 2,
+		im.setTranslation(vector3df((matManager.vFieldSzone[0][7][0].Pos.X + matManager.vFieldSzone[0][7][1].Pos.X) / 2,
 			(matManager.vFieldSzone[0][7][0].Pos.Y + matManager.vFieldSzone[0][7][2].Pos.Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
