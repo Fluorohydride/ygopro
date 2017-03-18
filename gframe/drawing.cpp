@@ -108,22 +108,22 @@ void Game::DrawBackGround() {
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 5; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(&matManager.vFields[16 + i * 4], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldMzone[0][i], !(dField.selected_field & filter), 2, cv);
 		}
 		filter = 0x100;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(&matManager.vFields[36 + i * 4], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldSzone[0][i], !(dField.selected_field & filter), 2, cv);
 		}
 		filter = 0x10000;
 		for (int i = 0; i < 5; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(&matManager.vFields[84 + i * 4], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldMzone[1][i], !(dField.selected_field & filter), 2, cv);
 		}
 		filter = 0x1000000;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(&matManager.vFields[104 + i * 4], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldSzone[1][i], !(dField.selected_field & filter), 2, cv);
 		}
 	}
 	//disabled field
@@ -132,50 +132,47 @@ void Game::DrawBackGround() {
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 5; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
-				driver->draw3DLine(matManager.vFields[16 + i * 4].Pos, matManager.vFields[16 + i * 4 + 3].Pos, 0xffffffff);
-				driver->draw3DLine(matManager.vFields[16 + i * 4 + 1].Pos, matManager.vFields[16 + i * 4 + 2].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldMzone[0][i][0].Pos, matManager.vFieldMzone[0][i][3].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldMzone[0][i][1].Pos, matManager.vFieldMzone[0][i][2].Pos, 0xffffffff);
 			}
 		}
 		filter = 0x100;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
-				driver->draw3DLine(matManager.vFields[36 + i * 4].Pos, matManager.vFields[36 + i * 4 + 3].Pos, 0xffffffff);
-				driver->draw3DLine(matManager.vFields[36 + i * 4 + 1].Pos, matManager.vFields[36 + i * 4 + 2].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldSzone[0][i][0].Pos, matManager.vFieldSzone[0][i][3].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldSzone[0][i][1].Pos, matManager.vFieldSzone[0][i][2].Pos, 0xffffffff);
 			}
 		}
 		filter = 0x10000;
 		for (int i = 0; i < 5; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
-				driver->draw3DLine(matManager.vFields[84 + i * 4].Pos, matManager.vFields[84 + i * 4 + 3].Pos, 0xffffffff);
-				driver->draw3DLine(matManager.vFields[84 + i * 4 + 1].Pos, matManager.vFields[84 + i * 4 + 2].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldMzone[1][i][0].Pos, matManager.vFieldMzone[1][i][3].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldMzone[1][i][1].Pos, matManager.vFieldMzone[1][i][2].Pos, 0xffffffff);
 			}
 		}
 		filter = 0x1000000;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
-				driver->draw3DLine(matManager.vFields[104 + i * 4].Pos, matManager.vFields[104 + i * 4 + 3].Pos, 0xffffffff);
-				driver->draw3DLine(matManager.vFields[104 + i * 4 + 1].Pos, matManager.vFields[104 + i * 4 + 2].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldSzone[1][i][0].Pos, matManager.vFieldSzone[1][i][3].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFieldSzone[1][i][1].Pos, matManager.vFieldSzone[1][i][2].Pos, 0xffffffff);
 			}
 		}
 	}
 	//current sel
 	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT) {
-		int index = 0;
-		if (dField.hovered_controler == 0) {
-			if (dField.hovered_location == LOCATION_DECK) index = 0;
-			else if (dField.hovered_location == LOCATION_MZONE) index = 16 + dField.hovered_sequence * 4;
-			else if (dField.hovered_location == LOCATION_SZONE) index = 36 + dField.hovered_sequence * 4;
-			else if (dField.hovered_location == LOCATION_GRAVE) index = 4;
-			else if (dField.hovered_location == LOCATION_REMOVED) index = 12;
-			else if (dField.hovered_location == LOCATION_EXTRA) index = 8;
-		} else {
-			if (dField.hovered_location == LOCATION_DECK) index = 68;
-			else if (dField.hovered_location == LOCATION_MZONE) index = 84 + dField.hovered_sequence * 4;
-			else if (dField.hovered_location == LOCATION_SZONE) index = 104 + dField.hovered_sequence * 4;
-			else if (dField.hovered_location == LOCATION_GRAVE) index = 72;
-			else if (dField.hovered_location == LOCATION_REMOVED) index = 80;
-			else if (dField.hovered_location == LOCATION_EXTRA) index = 76;
-		}
+		S3DVertex *vertex = 0;
+		if (dField.hovered_location == LOCATION_DECK)
+			vertex = matManager.vFieldDeck[dField.hovered_controler];
+		else if (dField.hovered_location == LOCATION_MZONE)
+			vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
+		else if (dField.hovered_location == LOCATION_SZONE)
+			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence];
+		else if (dField.hovered_location == LOCATION_GRAVE)
+			vertex = matManager.vFieldGrave[dField.hovered_controler];
+		else if (dField.hovered_location == LOCATION_REMOVED)
+			vertex = matManager.vFieldRemove[dField.hovered_controler];
+		else if (dField.hovered_location == LOCATION_EXTRA)
+			vertex = matManager.vFieldExtra[dField.hovered_controler];
 		selFieldAlpha += selFieldDAlpha;
 		if (selFieldAlpha <= 5) {
 			selFieldAlpha = 5;
@@ -188,7 +185,7 @@ void Game::DrawBackGround() {
 		matManager.mSelField.AmbientColor = 0xffffffff;
 		matManager.mSelField.DiffuseColor = selFieldAlpha << 24;
 		driver->setMaterial(matManager.mSelField);
-		driver->drawVertexPrimitiveList(&matManager.vFields[index], 4, matManager.iRectangle, 2);
+		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
 	}
 }
 void Game::DrawCards() {
@@ -286,44 +283,44 @@ void Game::DrawMisc() {
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
 	if(dField.deck_act) {
-		im.setTranslation(vector3df(matManager.vFields[0].Pos.X - (matManager.vFields[0].Pos.X - matManager.vFields[1].Pos.X)/2,
-			matManager.vFields[0].Pos.Y - (matManager.vFields[0].Pos.Y - matManager.vFields[3].Pos.Y)/2, dField.deck[0].size() * 0.01f + 0.02f));
+		im.setTranslation(vector3df((matManager.vFieldDeck[0][0].Pos.X + matManager.vFieldDeck[0][1].Pos.X) / 2,
+			(matManager.vFieldDeck[0][0].Pos.Y + matManager.vFieldDeck[0][2].Pos.Y) / 2, dField.deck[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.grave_act) {
-		im.setTranslation(vector3df(matManager.vFields[4].Pos.X - (matManager.vFields[4].Pos.X - matManager.vFields[5].Pos.X)/2,
-			matManager.vFields[4].Pos.Y - (matManager.vFields[4].Pos.Y - matManager.vFields[6].Pos.Y)/2, dField.grave[0].size() * 0.01f + 0.02f));
+		im.setTranslation(vector3df((matManager.vFieldGrave[0][0].Pos.X + matManager.vFieldGrave[0][1].Pos.X) / 2,
+			(matManager.vFieldGrave[0][0].Pos.Y + matManager.vFieldGrave[0][2].Pos.Y) / 2, dField.grave[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.remove_act) {
-		im.setTranslation(vector3df(matManager.vFields[12].Pos.X - (matManager.vFields[12].Pos.X - matManager.vFields[13].Pos.X)/2,
-			matManager.vFields[12].Pos.Y - (matManager.vFields[12].Pos.Y - matManager.vFields[14].Pos.Y)/2, dField.remove[0].size() * 0.01f + 0.02f));
+		im.setTranslation(vector3df((matManager.vFieldRemove[0][0].Pos.X + matManager.vFieldRemove[0][1].Pos.X) / 2,
+			(matManager.vFieldRemove[0][0].Pos.Y + matManager.vFieldRemove[0][2].Pos.Y) / 2, dField.remove[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.extra_act) {
-		im.setTranslation(vector3df(matManager.vFields[8].Pos.X - (matManager.vFields[8].Pos.X - matManager.vFields[9].Pos.X)/2,
-			matManager.vFields[8].Pos.Y - (matManager.vFields[8].Pos.Y - matManager.vFields[10].Pos.Y)/2, dField.extra[0].size() * 0.01f + 0.02f));
+		im.setTranslation(vector3df((matManager.vFieldExtra[0][0].Pos.X + matManager.vFieldExtra[0][1].Pos.X) / 2,
+			(matManager.vFieldExtra[0][0].Pos.Y + matManager.vFieldExtra[0][2].Pos.Y) / 2, dField.extra[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.pzone_act[0]) {
-		im.setTranslation(vector3df(matManager.vFields[60].Pos.X - (matManager.vFields[60].Pos.X - matManager.vFields[61].Pos.X)/2,
-			matManager.vFields[60].Pos.Y - (matManager.vFields[60].Pos.Y - matManager.vFields[62].Pos.Y)/2, 0.03f));
+		im.setTranslation(vector3df((matManager.vFieldSzone[0][6][0].Pos.X + matManager.vFieldSzone[0][6][0].Pos.X) / 2,
+			(matManager.vFieldSzone[0][6][0].Pos.Y + matManager.vFieldSzone[0][6][2].Pos.Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.pzone_act[1]) {
-		im.setTranslation(vector3df(matManager.vFields[128].Pos.X - (matManager.vFields[128].Pos.X - matManager.vFields[129].Pos.X)/2,
-			matManager.vFields[128].Pos.Y - (matManager.vFields[128].Pos.Y - matManager.vFields[130].Pos.Y)/2, 0.03f));
+		im.setTranslation(vector3df((matManager.vFieldSzone[0][7][0].Pos.X + matManager.vFieldSzone[0][7][0].Pos.X) / 2,
+			(matManager.vFieldSzone[0][7][0].Pos.Y + matManager.vFieldSzone[0][7][2].Pos.Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.conti_act) {
-		im.setTranslation(vector3df(matManager.vFields[136].Pos.X - (matManager.vFields[136].Pos.X - matManager.vFields[137].Pos.X)/2,
-			matManager.vFields[136].Pos.Y - (matManager.vFields[136].Pos.Y - matManager.vFields[138].Pos.Y)/2, 0.03f));
+		im.setTranslation(vector3df((matManager.vFieldContiAct[0].X + matManager.vFieldContiAct[1].X) / 2,
+			(matManager.vFieldContiAct[0].Y + matManager.vFieldContiAct[2].Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
