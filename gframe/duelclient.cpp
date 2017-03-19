@@ -1296,40 +1296,42 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
 			unsigned int filter;
-			if (mainGame->dField.selectable_field & 0x1f) {
-				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
-				respbuf[1] = 0x4;
-				filter = mainGame->dField.selectable_field & 0x1f;
+			if (mainGame->dField.selectable_field & 0x7f) {
+				respbuf[0] = mainGame->LocalPlayer(0);
+				respbuf[1] = LOCATION_MZONE;
+				filter = mainGame->dField.selectable_field & 0x7f;
 			} else if (mainGame->dField.selectable_field & 0x1f00) {
-				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
-				respbuf[1] = 0x8;
+				respbuf[0] = mainGame->LocalPlayer(0);
+				respbuf[1] = LOCATION_SZONE;
 				filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
 			} else if (mainGame->dField.selectable_field & 0xc000) {
-				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
-				respbuf[1] = 0x8;
+				respbuf[0] = mainGame->LocalPlayer(0);
+				respbuf[1] = LOCATION_SZONE;
 				filter = (mainGame->dField.selectable_field >> 14) & 0x3;
 				pzone = 1;
-			} else if (mainGame->dField.selectable_field & 0x1f0000) {
-				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
-				respbuf[1] = 0x4;
-				filter = (mainGame->dField.selectable_field >> 16) & 0x1f;
+			} else if (mainGame->dField.selectable_field & 0x7f0000) {
+				respbuf[0] = mainGame->LocalPlayer(1);
+				respbuf[1] = LOCATION_MZONE;
+				filter = (mainGame->dField.selectable_field >> 16) & 0x7f;
 			} else if (mainGame->dField.selectable_field & 0x1f000000) {
-				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
-				respbuf[1] = 0x8;
+				respbuf[0] = mainGame->LocalPlayer(1);
+				respbuf[1] = LOCATION_SZONE;
 				filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
 			} else {
-				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
-				respbuf[1] = 0x8;
+				respbuf[0] = mainGame->LocalPlayer(1);
+				respbuf[1] = LOCATION_SZONE;
 				filter = (mainGame->dField.selectable_field >> 30) & 0x3;
 				pzone = 1;
 			}
 			if(!pzone) {
 				if(mainGame->chkRandomPos->isChecked()) {
-					respbuf[2] = rnd.real() * 5;
-					while(!(filter & (1 << respbuf[2])))
-						respbuf[2] = rnd.real() * 5;
+					do {
+						respbuf[2] = rnd.real() * 7;
+					} while(!(filter & (1 << respbuf[2])));
 				} else {
-					if (filter & 0x4) respbuf[2] = 2;
+					if (filter & 0x40) respbuf[2] = 6;
+					else if (filter & 0x20) respbuf[2] = 5;
+					else if (filter & 0x4) respbuf[2] = 2;
 					else if (filter & 0x2) respbuf[2] = 1;
 					else if (filter & 0x8) respbuf[2] = 3;
 					else if (filter & 0x1) respbuf[2] = 0;

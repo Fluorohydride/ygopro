@@ -91,6 +91,7 @@ public:
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
+	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
 	void DrawSpec();
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);

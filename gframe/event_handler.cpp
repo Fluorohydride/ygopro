@@ -1346,7 +1346,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case MSG_SELECT_PLACE:
 			case MSG_SELECT_DISFIELD: {
-				if (!(hovered_location & LOCATION_ONFIELD) || hovered_sequence == 5)
+				if (!(hovered_location & LOCATION_ONFIELD))
 					break;
 				unsigned int flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
 				if (flag & selectable_field) {
@@ -1360,10 +1360,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							unsigned char respbuf[80];
 							int filter = 1;
 							int p = 0;
-							for (int i = 0; i < 5; ++i, filter <<= 1) {
+							for (int i = 0; i < 7; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(0);
-									respbuf[p + 1] = 0x4;
+									respbuf[p + 1] = LOCATION_MZONE;
 									respbuf[p + 2] = i;
 									p += 3;
 								}
@@ -1372,16 +1372,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							for (int i = 0; i < 8; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(0);
-									respbuf[p + 1] = 0x8;
+									respbuf[p + 1] = LOCATION_SZONE;
 									respbuf[p + 2] = i;
 									p += 3;
 								}
 							}
 							filter = 0x10000;
-							for (int i = 0; i < 5; ++i, filter <<= 1) {
+							for (int i = 0; i < 7; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(1);
-									respbuf[p + 1] = 0x4;
+									respbuf[p + 1] = LOCATION_MZONE;
 									respbuf[p + 2] = i;
 									p += 3;
 								}
@@ -1390,7 +1390,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							for (int i = 0; i < 8; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(1);
-									respbuf[p + 1] = 0x8;
+									respbuf[p + 1] = LOCATION_SZONE;
 									respbuf[p + 2] = i;
 									p += 3;
 								}
@@ -1916,49 +1916,49 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				switch(event.KeyInput.Key) {
 					case irr::KEY_F1:
 						loc_id = 1004;
-						for(int32 i = (int32)grave[0].size() - 1; i >= 0 ; --i)
-							display_cards.push_back(grave[0][i]);
+						for(auto it = grave[0].rbegin(); it != grave[0].rend(); ++it)
+							display_cards.push_back(*it);
 						break;
 					case irr::KEY_F2:
 						loc_id = 1005;
-						for(int32 i = (int32)remove[0].size() - 1; i >= 0 ; --i)
-							display_cards.push_back(remove[0][i]);
+						for(auto it = remove[0].rbegin(); it != remove[0].rend(); ++it)
+							display_cards.push_back(*it);
 						break;
 					case irr::KEY_F3:
 						loc_id = 1006;
-						for(int32 i = (int32)extra[0].size() - 1; i >= 0 ; --i)
-							display_cards.push_back(extra[0][i]);
+						for(auto it = extra[0].rbegin(); it != extra[0].rend(); ++it)
+							display_cards.push_back(*it);
 						break;
 					case irr::KEY_F4:
 						loc_id = 1007;
-						for(int32 i = 0; i <= 4 ; ++i) {
-							if(mzone[0][i] && mzone[0][i]->overlayed.size()) {
-								for(int32 j = 0; j <= (int32)mzone[0][i]->overlayed.size() - 1 ; ++j)
-									display_cards.push_back(mzone[0][i]->overlayed[j]);
+						for(auto it = mzone[0].begin(); it != mzone[0].end(); ++it) {
+							if(*it) {
+								for(auto oit = (*it)->overlayed.begin(); oit != (*it)->overlayed.end(); ++oit)
+									display_cards.push_back(*oit);
 							}
 						}
 						break;
 					case irr::KEY_F5:
 						loc_id = 1004;
-						for(int32 i = (int32)grave[1].size() - 1; i >= 0 ; --i)
-							display_cards.push_back(grave[1][i]);
+						for(auto it = grave[1].rbegin(); it != grave[1].rend(); ++it)
+							display_cards.push_back(*it);
 						break;
 					case irr::KEY_F6:
 						loc_id = 1005;
-						for(int32 i = (int32)remove[1].size() - 1; i >= 0 ; --i)
-							display_cards.push_back(remove[1][i]);
+						for(auto it = remove[1].rbegin(); it != remove[1].rend(); ++it)
+							display_cards.push_back(*it);
 						break;
 					case irr::KEY_F7:
 						loc_id = 1006;
-						for(int32 i = (int32)extra[1].size() - 1; i >= 0 ; --i)
-							display_cards.push_back(extra[1][i]);
+						for(auto it = extra[1].rbegin(); it != extra[1].rend(); ++it)
+							display_cards.push_back(*it);
 						break;
 					case irr::KEY_F8:
 						loc_id = 1007;
-						for(int32 i = 0; i <= 4 ; ++i) {
-							if(mzone[1][i] && mzone[1][i]->overlayed.size()) {
-								for(int32 j = 0; j <= (int32)mzone[1][i]->overlayed.size() - 1 ; ++j)
-									display_cards.push_back(mzone[1][i]->overlayed[j]);
+						for(auto it = mzone[1].begin(); it != mzone[1].end(); ++it) {
+							if(*it) {
+								for(auto oit = (*it)->overlayed.begin(); oit != (*it)->overlayed.end(); ++oit)
+									display_cards.push_back(*oit);
 							}
 						}
 						break;
@@ -2128,6 +2128,28 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_MZONE;
 				hovered_sequence = sequence;
+			} else if(boardy >= matManager.vFieldMzone[0][5][0].Pos.Y && boardy <= matManager.vFieldMzone[0][5][2].Pos.Y) {
+				if(sequence == 1) {
+					if(usable_exmzone != 6) {
+						hovered_controler = 0;
+						hovered_location = LOCATION_MZONE;
+						hovered_sequence = 5;
+					} else {
+						hovered_controler = 1;
+						hovered_location = LOCATION_MZONE;
+						hovered_sequence = 6;
+					}
+				} else if(sequence == 3) {
+					if(usable_exmzone != 5) {
+						hovered_controler = 0;
+						hovered_location = LOCATION_MZONE;
+						hovered_sequence = 6;
+					} else {
+						hovered_controler = 1;
+						hovered_location = LOCATION_MZONE;
+						hovered_sequence = 5;
+					}
+				}
 			} else if(boardy >= matManager.vFieldMzone[1][0][2].Pos.Y && boardy <= matManager.vFieldMzone[1][0][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_MZONE;
