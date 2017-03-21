@@ -77,6 +77,7 @@ public:
 	s32 base_defense;
 	u32 lscale;
 	u32 rscale;
+	u32 link;
 	u32 reason;
 	u32 select_seq;
 	u8 owner;

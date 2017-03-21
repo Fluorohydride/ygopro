@@ -319,6 +319,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1063), TYPE_MONSTER + TYPE_SYNCHRO);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1073), TYPE_MONSTER + TYPE_XYZ);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1074), TYPE_MONSTER + TYPE_PENDULUM);
+					mainGame->cbCardType2->addItem(dataManager.GetSysString(1076), TYPE_MONSTER + TYPE_LINK);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1075), TYPE_MONSTER + TYPE_SPSUMMON);
 					myswprintf(normaltuner, L"%ls|%ls", dataManager.GetSysString(1054), dataManager.GetSysString(1062));
 					mainGame->cbCardType2->addItem(normaltuner, TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
@@ -373,6 +374,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case COMBOBOX_SORTTYPE: {
 				SortList();
 				mainGame->env->setFocus(0);
+				break;
+			}
+			case COMBOBOX_SECONDTYPE: {
+				if (mainGame->cbCardType->getSelected() == 1) {
+					if (mainGame->cbCardType2->getSelected() == 8) {
+						mainGame->ebDefense->setEnabled(false);
+						mainGame->ebDefense->setText(L"");
+					}
+					else {
+						mainGame->ebDefense->setEnabled(true);
+
+					}
+				}
 				break;
 			}
 			}
@@ -810,7 +824,8 @@ void DeckBuilder::FilterCards() {
 			if(filter_deftype) {
 				if((filter_deftype == 1 && data.defense != filter_def) || (filter_deftype == 2 && data.defense < filter_def)
 				        || (filter_deftype == 3 && data.defense <= filter_def) || (filter_deftype == 4 && (data.defense > filter_def || data.defense < 0))
-				        || (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2))
+				        || (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2)
+						|| (data.type & TYPE_LINK))
 					continue;
 			}
 			if(filter_lvtype) {
