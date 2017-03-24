@@ -31,7 +31,6 @@ ClientField::ClientField() {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
 	}
-	usable_exmzone = 0;
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
@@ -66,7 +65,6 @@ void ClientField::Clear() {
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
-	usable_exmzone = 0;
 	chains.clear();
 	activatable_cards.clear();
 	summonable_cards.clear();
@@ -183,8 +181,6 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	case LOCATION_MZONE: {
 		mzone[controler][sequence] = pcard;
-		if (!usable_exmzone && sequence >= 5)
-			usable_exmzone = sequence;
 		break;
 	}
 	case LOCATION_SZONE: {

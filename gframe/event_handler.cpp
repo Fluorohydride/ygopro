@@ -2130,7 +2130,7 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_sequence = sequence;
 			} else if(boardy >= matManager.vFieldMzone[0][5][0].Pos.Y && boardy <= matManager.vFieldMzone[0][5][2].Pos.Y) {
 				if(sequence == 1) {
-					if(usable_exmzone != 6) {
+					if(!mzone[1][6]) {
 						hovered_controler = 0;
 						hovered_location = LOCATION_MZONE;
 						hovered_sequence = 5;
@@ -2140,7 +2140,7 @@ void ClientField::GetHoverField(int x, int y) {
 						hovered_sequence = 6;
 					}
 				} else if(sequence == 3) {
-					if(usable_exmzone != 5) {
+					if(!mzone[1][5]) {
 						hovered_controler = 0;
 						hovered_location = LOCATION_MZONE;
 						hovered_sequence = 6;
