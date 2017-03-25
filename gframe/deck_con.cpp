@@ -381,10 +381,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					if (mainGame->cbCardType2->getSelected() == 8) {
 						mainGame->ebDefense->setEnabled(false);
 						mainGame->ebDefense->setText(L"");
-					}
-					else {
+					} else {
 						mainGame->ebDefense->setEnabled(true);
-
 					}
 				}
 				break;
@@ -825,7 +823,7 @@ void DeckBuilder::FilterCards() {
 				if((filter_deftype == 1 && data.defense != filter_def) || (filter_deftype == 2 && data.defense < filter_def)
 				        || (filter_deftype == 3 && data.defense <= filter_def) || (filter_deftype == 4 && (data.defense > filter_def || data.defense < 0))
 				        || (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2)
-						|| (data.type & TYPE_LINK))
+				        || (data.type & TYPE_LINK))
 					continue;
 			}
 			if(filter_lvtype) {

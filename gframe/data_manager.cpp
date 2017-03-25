@@ -31,6 +31,11 @@ bool DataManager::LoadDB(const char* file) {
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
+			if(cd.type & TYPE_LINK) {
+				cd.link_marker = cd.defense;
+				cd.defense = 0;
+			} else
+				cd.link_marker = 0;
 			unsigned int level = sqlite3_column_int(pStmt, 7);
 			cd.level = level & 0xff;
 			cd.lscale = (level >> 24) & 0xff;

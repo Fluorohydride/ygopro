@@ -1025,15 +1025,9 @@ void Game::ShowCardInfo(int code) {
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
-		int form = 0x2605;
-		if(cd.type & TYPE_XYZ) ++form;
-		if(cd.type & TYPE_LINK) {
-			if(cd.attack < 0)
-				myswprintf(formatBuffer, L"?/Link %d", cd.level);
-			else
-				myswprintf(formatBuffer, L"%d/Link %d", cd.attack, cd.level);
-		}
-		else {
+		if(!(cd.type & TYPE_LINK)) {
+			int form = 0x2605;
+			if(cd.type & TYPE_XYZ) ++form;
 			myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
 			wchar_t adBuffer[16];
 			if(cd.attack < 0 && cd.defense < 0)
@@ -1044,6 +1038,14 @@ void Game::ShowCardInfo(int code) {
 				myswprintf(adBuffer, L"%d/?", cd.attack);
 			else
 				myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
+			wcscat(formatBuffer, adBuffer);
+		} else {
+			myswprintf(formatBuffer, L"[LINK-%d] ", cd.level);
+			wchar_t adBuffer[16];
+			if(cd.attack < 0)
+				myswprintf(adBuffer, L"?/-");
+			else
+				myswprintf(adBuffer, L"%d/-", cd.attack);
 			wcscat(formatBuffer, adBuffer);
 		}
 		if(cd.type & TYPE_PENDULUM) {

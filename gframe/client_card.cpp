@@ -27,6 +27,7 @@ ClientCard::ClientCard() {
 	alias = 0;
 	level = 0;
 	rank = 0;
+	link = 0;
 	race = 0;
 	attribute = 0;
 	attack = 0;
@@ -35,7 +36,7 @@ ClientCard::ClientCard() {
 	base_defense = 0;
 	lscale = 0;
 	rscale = 0;
-	link = 0;
+	link_marker = 0;
 	cHint = 0;
 	chValue = 0;
 	atkstring[0] = 0;
@@ -88,13 +89,6 @@ void ClientCard::UpdateInfo(char* buf) {
 			myswprintf(lvstring, L"R%d", rank);
 		}
 	}
-	if(flag & QUERY_LINK) {
-		pdata = BufferIO::ReadInt32(buf);
-		if (link != (unsigned int)pdata) {
-			link = pdata;
-			myswprintf(lvstring, L"L%d", link);
-		}
-	}
 	if(flag & QUERY_ATTRIBUTE)
 		attribute = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_RACE)
@@ -109,7 +103,10 @@ void ClientCard::UpdateInfo(char* buf) {
 	}
 	if(flag & QUERY_DEFENSE) {
 		defense = BufferIO::ReadInt32(buf);
-		if(defense < 0) {
+		if(type & TYPE_LINK) {
+			defstring[0] = '-';
+			defstring[1] = 0;
+		} else if(defense < 0) {
 			defstring[0] = '?';
 			defstring[1] = 0;
 		} else
@@ -169,6 +166,16 @@ void ClientCard::UpdateInfo(char* buf) {
 	if(flag & QUERY_RSCALE) {
 		rscale = BufferIO::ReadInt32(buf);
 		myswprintf(rscstring, L"%d", rscale);
+	}
+	if(flag & QUERY_LINK) {
+		pdata = BufferIO::ReadInt32(buf);
+		if (link != (unsigned int)pdata) {
+			link = pdata;
+		}
+		pdata = BufferIO::ReadInt32(buf);
+		if (link_marker != (unsigned int)pdata) {
+			link_marker = pdata;
+		}
 	}
 }
 void ClientCard::ClearTarget() {
