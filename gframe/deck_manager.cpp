@@ -127,7 +127,7 @@ void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 			continue;
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		else if(cd.type & 0x4802040 && deck.extra.size() < 15) {
+		else if(cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && deck.extra.size() < 15) {
 			deck.extra.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
 		} else if(deck.main.size() < 60) {
 			deck.main.push_back(dataManager.GetCodePointer(code));
