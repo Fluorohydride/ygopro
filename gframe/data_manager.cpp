@@ -296,6 +296,27 @@ const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
 		return unknown_string;
 	return scBuffer;
 }
+const wchar_t* DataManager::FormatFullSetName(unsigned long long setcode) {
+	wchar_t* p = scBuffer;
+	for(int i = 0; i < 4; ++i) {
+		unsigned long long code = (setcode >> i * 16) & 0xffff;
+		for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit)
+		{
+			unsigned long long settype = csit->first & 0xfff;
+			unsigned long long setsubtype = csit->first & 0xf000;
+			if((code & 0xfff) == settype && (code & 0xf000 & setsubtype) == setsubtype) {
+				BufferIO::CopyWStrRef(csit->second, p, 16);
+				*p = L'\n';
+				*++p = 0;
+			}
+		}
+	}
+	if (p != scBuffer)
+		*(p - 1) = 0;
+	else
+		return unknown_string;
+	return scBuffer;
+}
 int DataManager::CardReader(int code, void* pData) {
 	if(!dataManager.GetData(code, (CardData*)pData))
 		memset(pData, 0, sizeof(CardData));

@@ -142,6 +142,7 @@ public:
 	int signalFrame;
 	int actionParam;
 	const wchar_t* showingtext;
+	const wchar_t* showingsetname;
 	int showcard;
 	int showcardcode;
 	int showcarddif;

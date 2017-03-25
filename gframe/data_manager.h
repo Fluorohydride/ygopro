@@ -31,6 +31,7 @@ public:
 	const wchar_t* FormatRace(int race);
 	const wchar_t* FormatType(int type);
 	const wchar_t* FormatSetName(unsigned long long setcode);
+	const wchar_t* FormatFullSetName(unsigned long long setcode);
 
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
