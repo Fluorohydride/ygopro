@@ -35,6 +35,7 @@ ClientCard::ClientCard() {
 	base_defense = 0;
 	lscale = 0;
 	rscale = 0;
+	link = 0;
 	cHint = 0;
 	chValue = 0;
 	atkstring[0] = 0;
@@ -85,6 +86,13 @@ void ClientCard::UpdateInfo(char* buf) {
 		if(pdata && rank != (unsigned int)pdata) {
 			rank = pdata;
 			myswprintf(lvstring, L"R%d", rank);
+		}
+	}
+	if(flag & QUERY_LINK) {
+		pdata = BufferIO::ReadInt32(buf);
+		if (link != (unsigned int)pdata) {
+			link = pdata;
+			myswprintf(lvstring, L"L%d", link);
 		}
 	}
 	if(flag & QUERY_ATTRIBUTE)
@@ -197,8 +205,8 @@ bool ClientCard::deck_sort_lv(code_pointer p1, code_pointer p2) {
 	if((p1->second.type & 0x7) != (p2->second.type & 0x7))
 		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
 	if((p1->second.type & 0x7) == 1) {
-		int type1 = (p1->second.type & 0x8020c0) ? (p1->second.type & 0x8020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x8020c0) ? (p2->second.type & 0x8020c1) : (p2->second.type & 0x31);
+		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
 		if(type1 != type2)
 			return type1 < type2;
 		if(p1->second.level != p2->second.level)
@@ -223,8 +231,8 @@ bool ClientCard::deck_sort_atk(code_pointer p1, code_pointer p2) {
 			return p1->second.defense > p2->second.defense;
 		if(p1->second.level != p2->second.level)
 			return p1->second.level > p2->second.level;
-		int type1 = (p1->second.type & 0x8020c0) ? (p1->second.type & 0x8020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x8020c0) ? (p2->second.type & 0x8020c1) : (p2->second.type & 0x31);
+		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
 		if(type1 != type2)
 			return type1 < type2;
 		return p1->first < p2->first;
@@ -243,8 +251,8 @@ bool ClientCard::deck_sort_def(code_pointer p1, code_pointer p2) {
 			return p1->second.attack > p2->second.attack;
 		if(p1->second.level != p2->second.level)
 			return p1->second.level > p2->second.level;
-		int type1 = (p1->second.type & 0x8020c0) ? (p1->second.type & 0x8020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x8020c0) ? (p2->second.type & 0x8020c1) : (p2->second.type & 0x31);
+		int type1 = (p1->second.type & 0x48020c0) ? (p1->second.type & 0x48020c1) : (p1->second.type & 0x31);
+		int type2 = (p2->second.type & 0x48020c0) ? (p2->second.type & 0x48020c1) : (p2->second.type & 0x31);
 		if(type1 != type2)
 			return type1 < type2;
 		return p1->first < p2->first;
