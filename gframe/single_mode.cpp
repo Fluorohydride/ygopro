@@ -57,8 +57,13 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.turn = 0;
 	if(!preload_script(pduel, fname2, slen)) {
-		end_duel(pduel);
-		return 0;
+		wchar_t fname[256];
+		myswprintf(fname, L"./single/%ls", open_file_name);
+		slen = BufferIO::EncodeUTF8(fname, fname2);
+		if(!preload_script(pduel, fname2, slen)) {
+			end_duel(pduel);
+			return 0;
+		}
 	}
 	mainGame->gMutex.Lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
