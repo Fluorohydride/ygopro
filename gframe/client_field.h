@@ -41,7 +41,7 @@ public:
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
 	int extra_p_count[2];
-	
+
 	size_t selected_option;
 	ClientCard* attacker;
 	ClientCard* attack_target;

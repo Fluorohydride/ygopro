@@ -15,7 +15,6 @@ struct HostInfo {
 	unsigned int lflist;
 	unsigned char rule;
 	unsigned char mode;
-	bool enable_priority;
 	bool destiny_draw;
 	bool sealed;
 	bool booster;
@@ -32,6 +31,7 @@ struct HostInfo {
 	bool command;
 	bool master;
 	unsigned int rule_count;
+	unsigned char duel_rule;
 	bool no_check_deck;
 	bool no_shuffle_deck;
 	unsigned int start_lp;

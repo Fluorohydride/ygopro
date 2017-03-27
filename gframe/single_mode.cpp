@@ -650,7 +650,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			for(int p = 0; p < 2; ++p) {
 				mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);
 				myswprintf(mainGame->dInfo.strLP[p], L"%d", mainGame->dInfo.lp[p]);
-				for(int seq = 0; seq < 5; ++seq) {
+				for(int seq = 0; seq < 7; ++seq) {
 					val = BufferIO::ReadInt8(pbuf);
 					if(val) {
 						ClientCard* ccard = new ClientCard;
@@ -784,7 +784,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 }
 void SingleMode::SinglePlayReload() {
 	unsigned char queryBuffer[0x2000];
-	unsigned int flag = 0x7fdfff;
+	unsigned int flag = 0xffdfff;
 	/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);

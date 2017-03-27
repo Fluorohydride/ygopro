@@ -98,6 +98,7 @@ public:
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
+	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
 	void DrawSpec();
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
@@ -253,12 +254,12 @@ public:
 	irr::gui::IGUIEditBox* ebDrawCount;
 	irr::gui::IGUIEditBox* ebServerName;
 	irr::gui::IGUIEditBox* ebServerPass;
-	irr::gui::IGUICheckBox* chkEnablePriority;
 	irr::gui::IGUIButton* btnRuleCards;
 	irr::gui::IGUIWindow* wRules;
 	irr::gui::IGUICheckBox* chkRules[14];
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUICheckBox* chkDrawDestiny;
+	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
@@ -562,11 +563,12 @@ extern Game* mainGame;
 #define BUTTON_SIDE_OK				309
 #define BUTTON_SHUFFLE_DECK			310
 #define COMBOBOX_MAINTYPE			311
-#define BUTTON_EFFECT_FILTER		312
-#define BUTTON_START_FILTER			313
-#define SCROLL_FILTER				314
-#define EDITBOX_KEYWORD				315
-#define BUTTON_CLEAR_FILTER			316
+#define COMBOBOX_SECONDTYPE			312
+#define BUTTON_EFFECT_FILTER		313
+#define BUTTON_START_FILTER			314
+#define SCROLL_FILTER				315
+#define EDITBOX_KEYWORD				316
+#define BUTTON_CLEAR_FILTER			317
 #define COMBOBOX_OTHER_FILT			319
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321

@@ -153,7 +153,6 @@ bool Game::Initialize() {
 	ebTimeLimit = env->addEditBox(strbuf, rect<s32>(140, 115, 220, 140), true, wCreateHost);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
-	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1236));
 	btnRuleCards = env->addButton(rect<s32>(260, 330, 370, 350), wCreateHost, BUTTON_RULE_CARDS, dataManager.GetSysString(1625));
 	wRules = env->addWindow(rect<s32>(630, 100, 1000, 310), false, dataManager.strBuffer);
 	wRules->getCloseButton()->setVisible(false);
@@ -164,6 +163,13 @@ bool Game::Initialize() {
 	for(int i = 0; i < 14; ++i)
 		chkRules[i] = env->addCheckBox(false, recti(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, 353+i, dataManager.GetSysString(1132 + i));
 	chkDrawDestiny = env->addCheckBox(false, rect<s32>(180, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1626));
+	env->addStaticText(dataManager.GetSysString(1236), rect<s32>(20, 180, 220, 200), false, false, wCreateHost);
+	cbDuelRule = env->addComboBox(rect<s32>(140, 175, 300, 200), wCreateHost);
+	cbDuelRule->addItem(dataManager.GetSysString(1260));
+	cbDuelRule->addItem(dataManager.GetSysString(1261));
+	cbDuelRule->addItem(dataManager.GetSysString(1262));
+	cbDuelRule->addItem(dataManager.GetSysString(1263));
+	cbDuelRule->setSelected(2);
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
@@ -478,7 +484,7 @@ bool Game::Initialize() {
 	cbCardType->addItem(dataManager.GetSysString(1312));
 	cbCardType->addItem(dataManager.GetSysString(1313));
 	cbCardType->addItem(dataManager.GetSysString(1314));
-	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, COMBOBOX_OTHER_FILT);
+	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(10);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
 	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
@@ -1177,19 +1183,27 @@ void Game::ShowCardInfo(int code) {
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
-		int form = 0x2605;
-		if(cd.type & TYPE_XYZ) ++form;
-		myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
-		wchar_t adBuffer[16];
-		if(cd.attack < 0 && cd.defense < 0)
-			myswprintf(adBuffer, L"?/?");
-		else if(cd.attack < 0)
-			myswprintf(adBuffer, L"?/%d", cd.defense);
-		else if(cd.defense < 0)
-			myswprintf(adBuffer, L"%d/?", cd.attack);
-		else
-			myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
-		wcscat(formatBuffer, adBuffer);
+		if(cd.type & TYPE_LINK){
+			if (cd.attack < 0)
+				myswprintf(formatBuffer, L"?/Link %d", cd.level);
+			else
+				myswprintf(formatBuffer, L"%d/Link %d", cd.attack, cd.level);
+		}
+		else {
+			int form = 0x2605;
+			if(cd.type & TYPE_XYZ) ++form;
+			myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
+			wchar_t adBuffer[16];
+			if (cd.attack < 0 && cd.defense < 0)
+				myswprintf(adBuffer, L"?/?");
+			else if (cd.attack < 0)
+				myswprintf(adBuffer, L"?/%d", cd.defense);
+			else if (cd.defense < 0)
+				myswprintf(adBuffer, L"%d/?", cd.attack);
+			else
+				myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
+			wcscat(formatBuffer, adBuffer);
+		}
 		if(cd.type & TYPE_PENDULUM) {
 			wchar_t scaleBuffer[16];
 			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
