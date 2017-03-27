@@ -163,8 +163,13 @@ void Game::DrawBackGround() {
 		S3DVertex *vertex = 0;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler];
-		else if (dField.hovered_location == LOCATION_MZONE)
+		else if (dField.hovered_location == LOCATION_MZONE) {
 			vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
+			ClientCard* pcard = mainGame->dField.mzone[dField.hovered_controler][dField.hovered_sequence];
+			if(pcard && pcard->type & TYPE_LINK) {
+				DrawLinkedZones(pcard);
+			}
+		}
 		else if (dField.hovered_location == LOCATION_SZONE)
 			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence];
 		else if (dField.hovered_location == LOCATION_GRAVE)
@@ -186,6 +191,36 @@ void Game::DrawBackGround() {
 		matManager.mSelField.DiffuseColor = selFieldAlpha << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
+	}
+}
+void Game::DrawLinkedZones(ClientCard* pcard) {
+	int mark = pcard->link_marker;
+	matManager.mSelField.AmbientColor = 0xff0261a2;
+	driver->setMaterial(matManager.mSelField);
+	if (dField.hovered_sequence<5) {
+		if (mark & 0x10 && dField.hovered_sequence>0)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
+		if (mark & 0x40 && dField.hovered_sequence<4)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
+		if ((mark & 0x100 && dField.hovered_sequence == 2) || (mark & 0x200 && dField.hovered_sequence == 1) || (mark & 0x400 && dField.hovered_sequence == 0))
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
+		if ((mark & 0x100 && dField.hovered_sequence == 4) || (mark & 0x200 && dField.hovered_sequence == 3) || (mark & 0x400 && dField.hovered_sequence == 2))
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
+	}
+	else {
+		int swap = (dField.hovered_sequence == 5) ? 0 : 2;
+		if (mark & 0x1)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][0 + swap], 4, matManager.iRectangle, 2);
+		if (mark & 0x2)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][1 + swap], 4, matManager.iRectangle, 2);
+		if (mark & 0x4)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][2 + swap], 4, matManager.iRectangle, 2);
+		if (mark & 0x100)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][4 - swap], 4, matManager.iRectangle, 2);
+		if (mark & 0x200)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][3 - swap], 4, matManager.iRectangle, 2);
+		if (mark & 0x400)
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][2 - swap], 4, matManager.iRectangle, 2);
 	}
 }
 void Game::DrawCards() {
