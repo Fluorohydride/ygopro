@@ -195,7 +195,7 @@ void Game::DrawBackGround() {
 }
 void Game::DrawLinkedZones(ClientCard* pcard) {
 	int mark = pcard->link_marker;
-	matManager.mSelField.AmbientColor = 0xffffd700;
+	matManager.mSelField.AmbientColor = 0xff0261a2;
 	driver->setMaterial(matManager.mSelField);
 	if (dField.hovered_sequence<5) {
 		if (mark & 0x10 && dField.hovered_sequence>0)
