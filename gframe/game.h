@@ -599,4 +599,6 @@ extern Game* mainGame;
 #define CHECKBOX_ENABLE_MUSIC		361
 #define SCROLL_VOLUME				362
 #define COMBOBOX_SORTTYPE			370
+
+#define DEFAULT_DUEL_RULE			3
 #endif // GAME_H
