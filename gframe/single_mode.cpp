@@ -11,7 +11,7 @@ long SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 
-byte buffer[0x10000];
+static byte buffer[0x20000];
 
 bool SingleMode::StartPlay() {
 	Thread::NewThread(SinglePlayThread, 0);
@@ -813,7 +813,7 @@ byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
 		return 0;
 	fseek(fp, 0, SEEK_END);
 	unsigned int len = ftell(fp);
-	if(len > 0x10000) {
+	if(len > sizeof(buffer)) {
 		fclose(fp);
 		return 0;
 	}
