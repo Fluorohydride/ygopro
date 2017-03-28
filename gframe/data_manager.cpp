@@ -301,6 +301,42 @@ const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
 		return unknown_string;
 	return scBuffer;
 }
+const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
+	wchar_t* p = lmBuffer;
+	if(link_marker & LINK_MARKER_TOP_LEFT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2196;
+	}
+	if(link_marker & LINK_MARKER_TOP) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2191;
+	}
+	if(link_marker & LINK_MARKER_TOP_RIGHT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2197;
+	}
+	if(link_marker & LINK_MARKER_LEFT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2190;
+	}
+	if(link_marker & LINK_MARKER_RIGHT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2192;
+	}
+	if(link_marker & LINK_MARKER_BOTTOM_LEFT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2199;
+	}
+	if(link_marker & LINK_MARKER_BOTTOM) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2193;
+	}
+	if(link_marker & LINK_MARKER_BOTTOM_RIGHT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2198;
+	}
+	return lmBuffer;
+}
 int DataManager::CardReader(int code, void* pData) {
 	if(!dataManager.GetData(code, (CardData*)pData))
 		memset(pData, 0, sizeof(CardData));

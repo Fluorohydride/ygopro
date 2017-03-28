@@ -1043,10 +1043,11 @@ void Game::ShowCardInfo(int code) {
 			myswprintf(formatBuffer, L"[LINK-%d] ", cd.level);
 			wchar_t adBuffer[16];
 			if(cd.attack < 0)
-				myswprintf(adBuffer, L"?/-");
+				myswprintf(adBuffer, L"?/-   ");
 			else
-				myswprintf(adBuffer, L"%d/-", cd.attack);
+				myswprintf(adBuffer, L"%d/-   ", cd.attack);
 			wcscat(formatBuffer, adBuffer);
+			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
 		}
 		if(cd.type & TYPE_PENDULUM) {
 			wchar_t scaleBuffer[16];
