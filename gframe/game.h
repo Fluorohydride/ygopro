@@ -537,4 +537,6 @@ extern Game* mainGame;
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define COMBOBOX_SORTTYPE			370
+
+#define DEFAULT_DUEL_RULE			3
 #endif // GAME_H

@@ -329,7 +329,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(msgbuf);
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
 		str.append(msgbuf);
-		if(pkt->info.duel_rule != 2) {
+		if(pkt->info.duel_rule != DEFAULT_DUEL_RULE) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + pkt->info.duel_rule));
 			str.append(msgbuf);
 		}
@@ -3443,7 +3443,8 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
-			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck && pHP->host.duel_rule == 2)
+			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
+			        && pHP->host.duel_rule == DEFAULT_DUEL_RULE)
 				hoststr.append(dataManager.GetSysString(1280));
 			else hoststr.append(dataManager.GetSysString(1281));
 			hoststr.append(L"]");

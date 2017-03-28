@@ -975,12 +975,12 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangle(0x80000000, recti(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
 		if(ptr->second.type & TYPE_MONSTER) {
+			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
+			textFont->draw(textBuffer, recti(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
+			textFont->draw(textBuffer, recti(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
 			if(!(ptr->second.type & TYPE_LINK)) {
 				int form = 0x2605;
 				if(ptr->second.type & TYPE_XYZ) ++form;
-				myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
-				textFont->draw(textBuffer, recti(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
-				textFont->draw(textBuffer, recti(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
 				myswprintf(textBuffer, L"%ls/%ls %c%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
 				textFont->draw(textBuffer, recti(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
 				textFont->draw(textBuffer, recti(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
@@ -991,26 +991,18 @@ void Game::DrawDeckBd() {
 				else if(ptr->second.defense < 0)
 					myswprintf(textBuffer, L"%d/?", ptr->second.attack);
 				else myswprintf(textBuffer, L"%d/%d", ptr->second.attack, ptr->second.defense);
-				if(ptr->second.type & TYPE_PENDULUM) {
-					wchar_t scaleBuffer[16];
-					myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
-					wcscat(textBuffer, scaleBuffer);
-				}
 			} else {
-				myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
-				textFont->draw(textBuffer, recti(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
-				textFont->draw(textBuffer, recti(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
 				myswprintf(textBuffer, L"%ls/%ls LINK-%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), ptr->second.level);
 				textFont->draw(textBuffer, recti(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
 				textFont->draw(textBuffer, recti(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
 				if(ptr->second.attack < 0)
 					myswprintf(textBuffer, L"?/-");
 				else myswprintf(textBuffer, L"%d/-", ptr->second.attack);
-				if(ptr->second.type & TYPE_PENDULUM) {
-					wchar_t scaleBuffer[16];
-					myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
-					wcscat(textBuffer, scaleBuffer);
-				}
+			}
+			if(ptr->second.type & TYPE_PENDULUM) {
+				wchar_t scaleBuffer[16];
+				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
+				wcscat(textBuffer, scaleBuffer);
 			}
 			if((ptr->second.ot & 0x3) == 1)
 				wcscat(textBuffer, L" [OCG]");

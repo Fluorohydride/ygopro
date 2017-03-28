@@ -1757,10 +1757,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								} else {
 									myswprintf(formatBuffer, L"\nLINK-%d", mcard->link);
 									str.append(formatBuffer);
-									if(mcard->link_marker & LINK_MARKER_TOP) {
-										myswprintf(formatBuffer, L" %ls", dataManager.GetSysString(1361));
-										str.append(formatBuffer);
-									}
 								}
 								myswprintf(formatBuffer, L" %ls/%ls", dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
 								str.append(formatBuffer);

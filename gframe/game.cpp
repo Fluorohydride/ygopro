@@ -140,7 +140,7 @@ bool Game::Initialize() {
 	cbDuelRule->addItem(dataManager.GetSysString(1261));
 	cbDuelRule->addItem(dataManager.GetSysString(1262));
 	cbDuelRule->addItem(dataManager.GetSysString(1263));
-	cbDuelRule->setSelected(2);
+	cbDuelRule->setSelected(DEFAULT_DUEL_RULE);
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
