@@ -130,7 +130,7 @@ void Game::DrawBackGround() {
 	{
 		/*float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};*/
 		unsigned int filter = 0x1;
-		for (int i = 0; i < 5; ++i, filter <<= 1) {
+		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
 				driver->draw3DLine(matManager.vFieldMzone[0][i][0].Pos, matManager.vFieldMzone[0][i][3].Pos, 0xffffffff);
 				driver->draw3DLine(matManager.vFieldMzone[0][i][1].Pos, matManager.vFieldMzone[0][i][2].Pos, 0xffffffff);
@@ -144,7 +144,7 @@ void Game::DrawBackGround() {
 			}
 		}
 		filter = 0x10000;
-		for (int i = 0; i < 5; ++i, filter <<= 1) {
+		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
 				driver->draw3DLine(matManager.vFieldMzone[1][i][0].Pos, matManager.vFieldMzone[1][i][3].Pos, 0xffffffff);
 				driver->draw3DLine(matManager.vFieldMzone[1][i][1].Pos, matManager.vFieldMzone[1][i][2].Pos, 0xffffffff);
