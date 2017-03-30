@@ -42,6 +42,7 @@ ClientCard::ClientCard() {
 	atkstring[0] = 0;
 	defstring[0] = 0;
 	lvstring[0] = 0;
+	linkstring[0] = 0;
 	rscstring[0] = 0;
 	lscstring[0] = 0;
 	overlayTarget = 0;
@@ -172,6 +173,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		if (link != (unsigned int)pdata) {
 			link = pdata;
 		}
+		myswprintf(linkstring, L"L\x2012%d", link);
 		pdata = BufferIO::ReadInt32(buf);
 		if (link_marker != (unsigned int)pdata) {
 			link_marker = pdata;
