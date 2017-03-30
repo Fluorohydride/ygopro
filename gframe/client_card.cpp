@@ -42,6 +42,7 @@ ClientCard::ClientCard() {
 	atkstring[0] = 0;
 	defstring[0] = 0;
 	lvstring[0] = 0;
+	linkstring[0] = 0;
 	rkstring[0] = 0;
 	rscstring[0] = 0;
 	lscstring[0] = 0;
@@ -172,7 +173,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		pdata = BufferIO::ReadInt32(buf);
 		if (link != (unsigned int)pdata) {
 			link = pdata;
-			myswprintf(lvstring, L"L%d", link);
+			myswprintf(linkstring, L"L%d", link);
 		}
 		pdata = BufferIO::ReadInt32(buf);
 		if (link_marker != (unsigned int)pdata) {

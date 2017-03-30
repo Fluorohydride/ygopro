@@ -462,10 +462,10 @@ void Game::DrawMisc() {
 	}
 	pcard = dField.mzone[1][5];
 	if(pcard && (pcard->position & POS_FACEUP))
-		DrawStatus(pcard, 743, 338, 712, 291);
+		DrawStatus(pcard, 739, 291, 710, 338);
 	pcard = dField.mzone[1][6];
 	if(pcard && (pcard->position & POS_FACEUP))
-		DrawStatus(pcard, 589, 338, 563, 291);
+		DrawStatus(pcard, 593, 291, 555, 338);
 	pcard = dField.szone[0][6];
 	if(pcard) {
 		adFont->draw(pcard->lscstring, mainGame->Resize(426, 394, 438, 414), 0xff000000, true, false, 0);
@@ -559,8 +559,8 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 		adFont->draw(pcard->lvstring, mainGame->Resize(x2 + 1, y2, x2 + 3, y2 + 21), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
 	}
 	else if (pcard->link != 0) {
-		adFont->draw(pcard->lvstring, mainGame->Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->lvstring, mainGame->Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xff99ffff, false, false, 0);
+		adFont->draw(pcard->linkstring, mainGame->Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->linkstring, mainGame->Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xff99ffff, false, false, 0);
 	}
 }
 void Game::DrawGUI() {

@@ -237,7 +237,7 @@ bool Game::Initialize() {
 	btnDP->setEnabled(false);
 	btnDP->setPressed(true);
 	btnDP->setVisible(false);
-	btnSP = env->addButton(rect<s32>(65, 0, 115, 20), wPhase, -1, L"\xff33\xff30");
+	btnSP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"\xff33\xff30");
 	btnSP->setEnabled(false);
 	btnSP->setPressed(true);
 	btnSP->setVisible(false);
@@ -245,11 +245,11 @@ bool Game::Initialize() {
 	btnM1->setEnabled(false);
 	btnM1->setPressed(true);
 	btnM1->setVisible(false);
-	btnBP = env->addButton(rect<s32>(195, 0, 245, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
+	btnBP = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
 	btnBP->setVisible(false);
-	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
+	btnM2 = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
 	btnM2->setVisible(false);
-	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
+	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
 	btnShuffle = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1307));
 	btnShuffle->setVisible(false);
@@ -1423,11 +1423,11 @@ void Game::OnResize()
 
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
 	btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-	btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-	btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-	btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-	btnM2->setRelativePosition(Resize(260, 0, 310, 20));
-	btnEP->setRelativePosition(Resize(325, 0, 375, 20));
+	btnSP->setRelativePosition(Resize(0, 0, 50, 20));
+	btnM1->setRelativePosition(Resize(160, 0, 210, 20));
+	btnBP->setRelativePosition(Resize(160, 0, 210, 20));
+	btnM2->setRelativePosition(Resize(160, 0, 210, 20));
+	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
 	btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	btnChainAlways->setRelativePosition(Resize(205, 140, 295, 175));
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
