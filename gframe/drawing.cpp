@@ -528,7 +528,8 @@ void Game::DrawMisc() {
 void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 	if(pcard->type & TYPE_LINK) {
 		adFont->draw(pcard->atkstring, mainGame->Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
-		adFont->draw(pcard->atkstring, mainGame->Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 0xffffffff, true, false, 0);
+		adFont->draw(pcard->atkstring, mainGame->Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 
+			pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, true, false, 0);
 	}else{
 		adFont->draw(L"/", mainGame->Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
 		adFont->draw(L"/", mainGame->Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 0xffffffff, true, false, 0);
