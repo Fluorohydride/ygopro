@@ -423,10 +423,10 @@ void Game::DrawMisc() {
 	}
 	pcard = dField.mzone[1][5];
 	if(pcard && (pcard->position & POS_FACEUP))
-		DrawStatus(pcard, 743, 338, 712, 291);
+		DrawStatus(pcard, 739, 291, 710, 338);
 	pcard = dField.mzone[1][6];
 	if(pcard && (pcard->position & POS_FACEUP))
-		DrawStatus(pcard, 589, 338, 563, 291);
+		DrawStatus(pcard, 593, 291, 555, 338);
 	pcard = dField.szone[0][6];
 	if(pcard) {
 		adFont->draw(pcard->lscstring, recti(426, 394, 438, 414), 0xff000000, true, false, 0);
@@ -493,15 +493,19 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 	adFont->draw(pcard->atkstring, recti(x1 - 5 - w, y1, x1 - 5, y1 + 20), 0xff000000, false, false, 0);
 	adFont->draw(pcard->atkstring, recti(x1 - 4 - w, y1 + 1, x1 - 4, y1 + 21),
 		pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, false, false, 0);
-	if(!(pcard->type & TYPE_LINK)) {
+	if(pcard->type & TYPE_LINK) {
+		w = adFont->getDimension(pcard->linkstring).Width;
+		adFont->draw(pcard->linkstring, recti(x1 + 4, y1, x1 + 4 + w, y1 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->linkstring, recti(x1 + 5, y1 + 1, x1 + 5 + w, y1 + 21), 0xff99ffff, false, false, 0);
+	} else {
 		w = adFont->getDimension(pcard->defstring).Width;
 		adFont->draw(pcard->defstring, recti(x1 + 4, y1, x1 + 4 + w, y1 + 20), 0xff000000, false, false, 0);
 		adFont->draw(pcard->defstring, recti(x1 + 5, y1 + 1, x1 + 5 + w, y1 + 21),
 			pcard->defense > pcard->base_defense ? 0xffffff00 : pcard->defense < pcard->base_defense ? 0xffff2090 : 0xffffffff, false, false, 0);
+		adFont->draw(pcard->lvstring, recti(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->lvstring, recti(x2 + 1, y2, x2 + 3, y2 + 21),
+			(pcard->type & TYPE_XYZ) ? 0xffff80ff : (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
 	}
-	adFont->draw(pcard->lvstring, recti(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-	adFont->draw(pcard->lvstring, recti(x2 + 1, y2, x2 + 3, y2 + 21),
-	             (pcard->type & TYPE_XYZ) ? 0xffff80ff : (pcard->type & TYPE_TUNER) ? 0xffffff00 : (pcard->type & TYPE_LINK) ? 0xff99ffff : 0xffffffff, false, false, 0);
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {
