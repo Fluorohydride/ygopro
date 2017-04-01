@@ -15,6 +15,9 @@ ClientField::ClientField() {
 	hovered_card = 0;
 	clicked_card = 0;
 	highlighting_card = 0;
+	hovered_controler = 0;
+	hovered_location = 0;
+	hovered_sequence = 0;
 	deck_act = false;
 	grave_act = false;
 	remove_act = false;
@@ -25,10 +28,8 @@ ClientField::ClientField() {
 	deck_reversed = false;
 	conti_selecting = false;
 	for(int p = 0; p < 2; ++p) {
-		for(int i = 0; i < 5; ++i)
-			mzone[p].push_back(0);
-		for(int i = 0; i < 8; ++i)
-			szone[p].push_back(0);
+		mzone[p].resize(7, 0);
+		szone[p].resize(8, 0);
 	}
 }
 void ClientField::Clear() {
@@ -716,15 +717,9 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	t->Z = 0;
 	switch((location & 0x7f)) {
 	case LOCATION_DECK: {
-		if (controler == 0) {
-			t->X = (matManager.vFields[0].Pos.X + matManager.vFields[1].Pos.X) / 2;
-			t->Y = (matManager.vFields[0].Pos.Y + matManager.vFields[2].Pos.Y) / 2;
-			t->Z = deck[controler].size() * 0.01f + 0.03f;
-		} else {
-			t->X = (matManager.vFields[68].Pos.X + matManager.vFields[69].Pos.X) / 2;
-			t->Y = (matManager.vFields[68].Pos.Y + matManager.vFields[70].Pos.Y) / 2;
-			t->Z = deck[controler].size() * 0.01f + 0.03f;
-		}
+		t->X = (matManager.vFieldDeck[controler][0].Pos.X + matManager.vFieldDeck[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldDeck[controler][0].Pos.Y + matManager.vFieldDeck[controler][2].Pos.Y) / 2;
+		t->Z = deck[controler].size() * 0.01f + 0.03f;
 		break;
 	}
 	case LOCATION_HAND: {
@@ -740,91 +735,33 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 		break;
 	}
 	case LOCATION_MZONE: {
-		if (controler == 0) {
-			t->X = (matManager.vFields[16].Pos.X + matManager.vFields[17].Pos.X) / 2 + 1.1f * sequence;
-			t->Y = (matManager.vFields[16].Pos.Y + matManager.vFields[18].Pos.Y) / 2;
-			t->Z = 0.03f;
-		} else {
-			t->X = (matManager.vFields[84].Pos.X + matManager.vFields[85].Pos.X) / 2 - 1.1f * sequence;
-			t->Y = (matManager.vFields[84].Pos.Y + matManager.vFields[86].Pos.Y) / 2;
-			t->Z = 0.03f;
-		}
+		t->X = (matManager.vFieldMzone[controler][sequence][0].Pos.X + matManager.vFieldMzone[controler][sequence][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldMzone[controler][sequence][0].Pos.Y + matManager.vFieldMzone[controler][sequence][2].Pos.Y) / 2;
+		t->Z = 0.03f;
 		break;
 	}
 	case LOCATION_SZONE: {
-		if (controler == 0) {
-			if (sequence <= 4) {
-				t->X = (matManager.vFields[36].Pos.X + matManager.vFields[37].Pos.X) / 2 + 1.1f * sequence;
-				t->Y = (matManager.vFields[36].Pos.Y + matManager.vFields[38].Pos.Y) / 2;
-				t->Z = 0.03f;
-			} else if (sequence == 5) {
-				t->X = (matManager.vFields[56].Pos.X + matManager.vFields[57].Pos.X) / 2;
-				t->Y = (matManager.vFields[56].Pos.Y + matManager.vFields[58].Pos.Y) / 2;
-				t->Z = 0.03f;
-			} else if (sequence == 6) {
-				t->X = (matManager.vFields[60].Pos.X + matManager.vFields[61].Pos.X) / 2;
-				t->Y = (matManager.vFields[60].Pos.Y + matManager.vFields[62].Pos.Y) / 2;
-				t->Z = 0.03f;
-			} else {
-				t->X = (matManager.vFields[64].Pos.X + matManager.vFields[65].Pos.X) / 2;
-				t->Y = (matManager.vFields[64].Pos.Y + matManager.vFields[66].Pos.Y) / 2;
-				t->Z = 0.03f;
-			}
-		} else {
-			if (sequence <= 4) {
-				t->X = (matManager.vFields[104].Pos.X + matManager.vFields[105].Pos.X) / 2 - 1.1f * sequence;
-				t->Y = (matManager.vFields[104].Pos.Y + matManager.vFields[106].Pos.Y) / 2;
-				t->Z = 0.03f;
-			} else if (sequence == 5) {
-				t->X = (matManager.vFields[124].Pos.X + matManager.vFields[125].Pos.X) / 2;
-				t->Y = (matManager.vFields[124].Pos.Y + matManager.vFields[126].Pos.Y) / 2;
-				t->Z = 0.03f;
-			} else if (sequence == 6) {
-				t->X = (matManager.vFields[128].Pos.X + matManager.vFields[129].Pos.X) / 2;
-				t->Y = (matManager.vFields[128].Pos.Y + matManager.vFields[130].Pos.Y) / 2;
-				t->Z = 0.03f;
-			} else {
-				t->X = (matManager.vFields[132].Pos.X + matManager.vFields[133].Pos.X) / 2;
-				t->Y = (matManager.vFields[132].Pos.Y + matManager.vFields[134].Pos.Y) / 2;
-				t->Z = 0.03f;
-			}
-		}
+		t->X = (matManager.vFieldSzone[controler][sequence][0].Pos.X + matManager.vFieldSzone[controler][sequence][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldSzone[controler][sequence][0].Pos.Y + matManager.vFieldSzone[controler][sequence][2].Pos.Y) / 2;
+		t->Z = 0.03f;
 		break;
 	}
 	case LOCATION_GRAVE: {
-		if (controler == 0) {
-			t->X = (matManager.vFields[4].Pos.X + matManager.vFields[5].Pos.X) / 2;
-			t->Y = (matManager.vFields[4].Pos.Y + matManager.vFields[6].Pos.Y) / 2;
-			t->Z = grave[controler].size() * 0.01f + 0.03f;
-		} else {
-			t->X = (matManager.vFields[72].Pos.X + matManager.vFields[73].Pos.X) / 2;
-			t->Y = (matManager.vFields[72].Pos.Y + matManager.vFields[74].Pos.Y) / 2;
-			t->Z = grave[controler].size() * 0.01f + 0.03f;
-		}
+		t->X = (matManager.vFieldGrave[controler][0].Pos.X + matManager.vFieldGrave[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldGrave[controler][0].Pos.Y + matManager.vFieldGrave[controler][2].Pos.Y) / 2;
+		t->Z = grave[controler].size() * 0.01f + 0.03f;
 		break;
 	}
 	case LOCATION_REMOVED: {
-		if (controler == 0) {
-			t->X = (matManager.vFields[12].Pos.X + matManager.vFields[13].Pos.X) / 2;
-			t->Y = (matManager.vFields[12].Pos.Y + matManager.vFields[14].Pos.Y) / 2;
-			t->Z = remove[controler].size() * 0.01f + 0.03f;
-		} else {
-			t->X = (matManager.vFields[80].Pos.X + matManager.vFields[81].Pos.X) / 2;
-			t->Y = (matManager.vFields[80].Pos.Y + matManager.vFields[82].Pos.Y) / 2;
-			t->Z = remove[controler].size() * 0.01f + 0.03f;
-		}
+		t->X = (matManager.vFieldRemove[controler][0].Pos.X + matManager.vFieldRemove[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldRemove[controler][0].Pos.Y + matManager.vFieldRemove[controler][2].Pos.Y) / 2;
+		t->Z = remove[controler].size() * 0.01f + 0.03f;
 		break;
 	}
 	case LOCATION_EXTRA: {
-		if (controler == 0) {
-			t->X = (matManager.vFields[8].Pos.X + matManager.vFields[9].Pos.X) / 2;
-			t->Y = (matManager.vFields[8].Pos.Y + matManager.vFields[10].Pos.Y) / 2;
-			t->Z = extra[controler].size() * 0.01f + 0.03f;
-		} else {
-			t->X = (matManager.vFields[76].Pos.X + matManager.vFields[77].Pos.X) / 2;
-			t->Y = (matManager.vFields[76].Pos.Y + matManager.vFields[78].Pos.Y) / 2;
-			t->Z = extra[controler].size() * 0.01f + 0.03f;
-		}
+		t->X = (matManager.vFieldExtra[controler][0].Pos.X + matManager.vFieldExtra[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldExtra[controler][0].Pos.Y + matManager.vFieldExtra[controler][2].Pos.Y) / 2;
+		t->Z = extra[controler].size() * 0.01f + 0.03f;
 		break;
 	}
 	}
@@ -835,10 +772,10 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	int location = pcard->location;
 	switch (location) {
 	case LOCATION_DECK: {
+		t->X = (matManager.vFieldDeck[controler][0].Pos.X + matManager.vFieldDeck[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldDeck[controler][0].Pos.Y + matManager.vFieldDeck[controler][2].Pos.Y) / 2;
+		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
-			t->X = (matManager.vFields[0].Pos.X + matManager.vFields[1].Pos.X) / 2;
-			t->Y = (matManager.vFields[0].Pos.Y + matManager.vFields[2].Pos.Y) / 2;
-			t->Z = 0.01f + 0.01f * sequence;
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
 				r->Y = 3.1415926f;
@@ -849,9 +786,6 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			}
 		} else {
-			t->X = (matManager.vFields[68].Pos.X + matManager.vFields[69].Pos.X) / 2;
-			t->Y = (matManager.vFields[68].Pos.Y + matManager.vFields[70].Pos.Y) / 2;
-			t->Z = 0.01f + 0.01f * sequence;
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
 				r->Y = 3.1415926f;
@@ -913,10 +847,10 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_MZONE: {
+		t->X = (matManager.vFieldMzone[controler][sequence][0].Pos.X + matManager.vFieldMzone[controler][sequence][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldMzone[controler][sequence][0].Pos.Y + matManager.vFieldMzone[controler][sequence][2].Pos.Y) / 2;
+		t->Z = 0.01f;
 		if (controler == 0) {
-			t->X = (matManager.vFields[16].Pos.X + matManager.vFields[17].Pos.X) / 2 + 1.1f * sequence;
-			t->Y = (matManager.vFields[16].Pos.Y + matManager.vFields[18].Pos.Y) / 2;
-			t->Z = 0.01f;
 			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
 				r->Z = -3.1415926f / 2.0f;
@@ -931,9 +865,6 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				else r->Y = 0.0f;
 			}
 		} else {
-			t->X = (matManager.vFields[84].Pos.X + matManager.vFields[85].Pos.X) / 2 - 1.1f * sequence;
-			t->Y = (matManager.vFields[84].Pos.Y + matManager.vFields[86].Pos.Y) / 2;
-			t->Z = 0.01f;
 			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
 				r->Z = 3.1415926f / 2.0f;
@@ -951,47 +882,16 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_SZONE: {
+		t->X = (matManager.vFieldSzone[controler][sequence][0].Pos.X + matManager.vFieldSzone[controler][sequence][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldSzone[controler][sequence][0].Pos.Y + matManager.vFieldSzone[controler][sequence][2].Pos.Y) / 2;
+		t->Z = 0.01f;
 		if (controler == 0) {
-			if (sequence <= 4) {
-				t->X = (matManager.vFields[36].Pos.X + matManager.vFields[37].Pos.X) / 2 + 1.1f * sequence;
-				t->Y = (matManager.vFields[36].Pos.Y + matManager.vFields[38].Pos.Y) / 2;
-				t->Z = 0.01f;
-			} else if (sequence == 5) {
-				t->X = (matManager.vFields[56].Pos.X + matManager.vFields[57].Pos.X) / 2;
-				t->Y = (matManager.vFields[56].Pos.Y + matManager.vFields[58].Pos.Y) / 2;
-				t->Z = 0.01f;
-			} else if (sequence == 6) {
-				t->X = (matManager.vFields[60].Pos.X + matManager.vFields[61].Pos.X) / 2;
-				t->Y = (matManager.vFields[60].Pos.Y + matManager.vFields[62].Pos.Y) / 2;
-				t->Z = 0.01f;
-			} else {
-				t->X = (matManager.vFields[64].Pos.X + matManager.vFields[65].Pos.X) / 2;
-				t->Y = (matManager.vFields[64].Pos.Y + matManager.vFields[66].Pos.Y) / 2;
-				t->Z = 0.01f;
-			}
 			r->X = 0.0f;
 			r->Z = 0.0f;
 			if (pcard->position & POS_FACEDOWN)
 				r->Y = 3.1415926f;
 			else r->Y = 0.0f;
 		} else {
-			if (sequence <= 4) {
-				t->X = (matManager.vFields[104].Pos.X + matManager.vFields[105].Pos.X) / 2 - 1.1f * sequence;
-				t->Y = (matManager.vFields[104].Pos.Y + matManager.vFields[106].Pos.Y) / 2;
-				t->Z = 0.01f;
-			} else if (sequence == 5) {
-				t->X = (matManager.vFields[124].Pos.X + matManager.vFields[125].Pos.X) / 2;
-				t->Y = (matManager.vFields[124].Pos.Y + matManager.vFields[126].Pos.Y) / 2;
-				t->Z = 0.01f;
-			} else if (sequence == 6) {
-				t->X = (matManager.vFields[128].Pos.X + matManager.vFields[129].Pos.X) / 2;
-				t->Y = (matManager.vFields[128].Pos.Y + matManager.vFields[130].Pos.Y) / 2;
-				t->Z = 0.01f;
-			} else {
-				t->X = (matManager.vFields[132].Pos.X + matManager.vFields[133].Pos.X) / 2;
-				t->Y = (matManager.vFields[132].Pos.Y + matManager.vFields[134].Pos.Y) / 2;
-				t->Z = 0.01f;
-			}
 			r->X = 0.0f;
 			r->Z = 3.1415926f;
 			if (pcard->position & POS_FACEDOWN)
@@ -1001,17 +901,14 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_GRAVE: {
+		t->X = (matManager.vFieldGrave[controler][0].Pos.X + matManager.vFieldGrave[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldGrave[controler][0].Pos.Y + matManager.vFieldGrave[controler][2].Pos.Y) / 2;
+		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
-			t->X = (matManager.vFields[4].Pos.X + matManager.vFields[5].Pos.X) / 2;
-			t->Y = (matManager.vFields[4].Pos.Y + matManager.vFields[6].Pos.Y) / 2;
-			t->Z = 0.01f + 0.01f * sequence;
 			r->X = 0.0f;
 			r->Y = 0.0f;
 			r->Z = 0.0f;
 		} else {
-			t->X = (matManager.vFields[72].Pos.X + matManager.vFields[73].Pos.X) / 2;
-			t->Y = (matManager.vFields[72].Pos.Y + matManager.vFields[74].Pos.Y) / 2;
-			t->Z = 0.01f + 0.01f * sequence;
 			r->X = 0.0f;
 			r->Y = 0.0f;
 			r->Z = 3.1415926f;
@@ -1019,10 +916,10 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_REMOVED: {
+		t->X = (matManager.vFieldRemove[controler][0].Pos.X + matManager.vFieldRemove[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldRemove[controler][0].Pos.Y + matManager.vFieldRemove[controler][2].Pos.Y) / 2;
+		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
-			t->X = (matManager.vFields[12].Pos.X + matManager.vFields[13].Pos.X) / 2;
-			t->Y = (matManager.vFields[12].Pos.Y + matManager.vFields[14].Pos.Y) / 2;
-			t->Z = 0.01f + 0.01f * sequence;
 			if(pcard->position & POS_FACEUP) {
 				r->X = 0.0f;
 				r->Y = 0.0f;
@@ -1033,9 +930,6 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			}
 		} else {
-			t->X = (matManager.vFields[80].Pos.X + matManager.vFields[81].Pos.X) / 2;
-			t->Y = (matManager.vFields[80].Pos.Y + matManager.vFields[82].Pos.Y) / 2;
-			t->Z = 0.01f + 0.01f * sequence;
 			if(pcard->position & POS_FACEUP) {
 				r->X = 0.0f;
 				r->Y = 0.0f;
@@ -1049,19 +943,16 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_EXTRA: {
+		t->X = (matManager.vFieldExtra[controler][0].Pos.X + matManager.vFieldExtra[controler][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldExtra[controler][0].Pos.Y + matManager.vFieldExtra[controler][2].Pos.Y) / 2;
+		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
-			t->X = (matManager.vFields[8].Pos.X + matManager.vFields[9].Pos.X) / 2;
-			t->Y = (matManager.vFields[8].Pos.Y + matManager.vFields[10].Pos.Y) / 2;
-			t->Z = 0.01f + 0.01f * sequence;
 			r->X = 0.0f;
 			if(pcard->position & POS_FACEUP)
 				r->Y = 0.0f;
 			else r->Y = 3.1415926f;
 			r->Z = 0.0f;
 		} else {
-			t->X = (matManager.vFields[76].Pos.X + matManager.vFields[77].Pos.X) / 2;
-			t->Y = (matManager.vFields[76].Pos.Y + matManager.vFields[78].Pos.Y) / 2;
-			t->Z = 0.01f * sequence;
 			r->X = 0.0f;
 			if(pcard->position & POS_FACEUP)
 				r->Y = 0.0f;
@@ -1076,15 +967,15 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		}
 		int oseq = pcard->overlayTarget->sequence;
 		if (pcard->overlayTarget->controler == 0) {
-			t->X = (matManager.vFields[16].Pos.X + matManager.vFields[17].Pos.X) / 2 + 1.1f * oseq - 0.12f + 0.06f * sequence;
-			t->Y = (matManager.vFields[16].Pos.Y + matManager.vFields[18].Pos.Y) / 2 + 0.05f;
+			t->X = (matManager.vFieldMzone[0][oseq][0].Pos.X + matManager.vFieldMzone[0][oseq][1].Pos.X) / 2 - 0.12f + 0.06f * sequence;
+			t->Y = (matManager.vFieldMzone[0][oseq][0].Pos.Y + matManager.vFieldMzone[0][oseq][2].Pos.Y) / 2 + 0.05f;
 			t->Z = 0.005f + pcard->sequence * 0.0001f;
 			r->X = 0.0f;
 			r->Y = 0.0f;
 			r->Z = 0.0f;
 		} else {
-			t->X = (matManager.vFields[84].Pos.X + matManager.vFields[85].Pos.X) / 2 - 1.1f * oseq + 0.12f - 0.06f * sequence;
-			t->Y = (matManager.vFields[84].Pos.Y + matManager.vFields[86].Pos.Y) / 2 - 0.05f;
+			t->X = (matManager.vFieldMzone[1][oseq][0].Pos.X + matManager.vFieldMzone[1][oseq][1].Pos.X) / 2 + 0.12f - 0.06f * sequence;
+			t->Y = (matManager.vFieldMzone[1][oseq][0].Pos.Y + matManager.vFieldMzone[1][oseq][2].Pos.Y) / 2 - 0.05f;
 			t->Z = 0.005f + pcard->sequence * 0.0001f;
 			r->X = 0.0f;
 			r->Y = 0.0f;

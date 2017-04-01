@@ -31,6 +31,11 @@ bool DataManager::LoadDB(const char* file) {
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defense = sqlite3_column_int(pStmt, 6);
+			if(cd.type & TYPE_LINK) {
+				cd.link_marker = cd.defense;
+				cd.defense = 0;
+			} else
+				cd.link_marker = 0;
 			unsigned int level = sqlite3_column_int(pStmt, 7);
 			cd.level = level & 0xff;
 			cd.lscale = (level >> 24) & 0xff;
@@ -269,7 +274,7 @@ const wchar_t* DataManager::FormatType(int type) {
 	wchar_t* p = tpBuffer;
 	unsigned filter = 1;
 	int i = 1050;
-	for(; filter != 0x4000000; filter <<= 1, ++i) {
+	for(; filter != 0x8000000; filter <<= 1, ++i) {
 		if(type & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
@@ -297,6 +302,42 @@ const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
 	else
 		return unknown_string;
 	return scBuffer;
+}
+const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
+	wchar_t* p = lmBuffer;
+	if(link_marker & LINK_MARKER_TOP_LEFT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2196;
+	}
+	if(link_marker & LINK_MARKER_TOP) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2191;
+	}
+	if(link_marker & LINK_MARKER_TOP_RIGHT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2197;
+	}
+	if(link_marker & LINK_MARKER_LEFT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2190;
+	}
+	if(link_marker & LINK_MARKER_RIGHT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2192;
+	}
+	if(link_marker & LINK_MARKER_BOTTOM_LEFT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2199;
+	}
+	if(link_marker & LINK_MARKER_BOTTOM) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2193;
+	}
+	if(link_marker & LINK_MARKER_BOTTOM_RIGHT) {
+		BufferIO::CopyWStrRef(L"[ ]", p, 4);
+		*(p - 2) = 0x2198;
+	}
+	return lmBuffer;
 }
 int DataManager::CardReader(int code, void* pData) {
 	if(!dataManager.GetData(code, (CardData*)pData))

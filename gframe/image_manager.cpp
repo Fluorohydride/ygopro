@@ -26,8 +26,8 @@ bool ImageManager::Initial() {
 	tBackGround = driver->getTexture("textures/bg.jpg");
 	tBackGround_menu = driver->getTexture("textures/bg_menu.jpg");
 	tBackGround_deck = driver->getTexture("textures/bg_deck.jpg");
-	tField = driver->getTexture("textures/field2.png");
-	tFieldTransparent = driver->getTexture("textures/field-transparent2.png");
+	tField = driver->getTexture("textures/field3.png");
+	tFieldTransparent = driver->getTexture("textures/field-transparent3.png");
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {

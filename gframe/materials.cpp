@@ -4,55 +4,28 @@ namespace ygo {
 
 Materials matManager;
 
+inline void SetS3DVertex(S3DVertex* v, f32 x1, f32 y1, f32 x2, f32 y2, f32 z, f32 nz, f32 tu1, f32 tv1, f32 tu2, f32 tv2) {
+	v[0] = S3DVertex(x1, y1, z, 0, 0, nz, SColor(255, 255, 255, 255), tu1, tv1);
+	v[1] = S3DVertex(x2, y1, z, 0, 0, nz, SColor(255, 255, 255, 255), tu2, tv1);
+	v[2] = S3DVertex(x1, y2, z, 0, 0, nz, SColor(255, 255, 255, 255), tu1, tv2);
+	v[3] = S3DVertex(x2, y2, z, 0, 0, nz, SColor(255, 255, 255, 255), tu2, tv2);
+}
+
 Materials::Materials() {
-	vCardFront[0] = S3DVertex(vector3df(-0.35f, -0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vCardFront[1] = S3DVertex(vector3df(0.35f, -0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vCardFront[2] = S3DVertex(vector3df(-0.35f, 0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vCardFront[3] = S3DVertex(vector3df(0.35f, 0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vCardOutline[0] = S3DVertex(vector3df(-0.375f, -0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vCardOutline[1] = S3DVertex(vector3df(0.37f, -0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vCardOutline[2] = S3DVertex(vector3df(-0.375f, 0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vCardOutline[3] = S3DVertex(vector3df(0.37f, 0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vCardOutliner[0] = S3DVertex(vector3df(0.37f, -0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vCardOutliner[1] = S3DVertex(vector3df(-0.375f, -0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vCardOutliner[2] = S3DVertex(vector3df(0.37f, 0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vCardOutliner[3] = S3DVertex(vector3df(-0.375f, 0.54f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vCardBack[0] = S3DVertex(vector3df(0.35f, -0.5f, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vCardBack[1] = S3DVertex(vector3df(-0.35f, -0.5f, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vCardBack[2] = S3DVertex(vector3df(0.35f, 0.5f, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vCardBack[3] = S3DVertex(vector3df(-0.35f, 0.5f, 0), vector3df(0, 0, -1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vSymbol[0] = S3DVertex(vector3df(-0.35f, -0.35f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vSymbol[1] = S3DVertex(vector3df(0.35f, -0.35f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vSymbol[2] = S3DVertex(vector3df(-0.35f, 0.35f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vSymbol[3] = S3DVertex(vector3df(0.35f, 0.35f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vNegate[0] = S3DVertex(vector3df(-0.25f, -0.28f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vNegate[1] = S3DVertex(vector3df(0.25f, -0.28f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vNegate[2] = S3DVertex(vector3df(-0.25f, 0.22f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vNegate[3] = S3DVertex(vector3df(0.25f, 0.22f, 0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vChainNum[0] = S3DVertex(vector3df(-0.35f, -0.35f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vChainNum[1] = S3DVertex(vector3df(0.35f, -0.35f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0.19375f, 0));
-	vChainNum[2] = S3DVertex(vector3df(-0.35f, 0.35f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0.2421875f));
-	vChainNum[3] = S3DVertex(vector3df(0.35f, 0.35f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0.19375f, 0.2421875f));
-	vActivate[0] = S3DVertex(vector3df(-0.5f, -0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vActivate[1] = S3DVertex(vector3df(0.5f, -0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vActivate[2] = S3DVertex(vector3df(-0.5f, 0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vActivate[3] = S3DVertex(vector3df(0.5f, 0.5f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vField[0] = S3DVertex(vector3df(-1.0f, -4.0f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vField[1] = S3DVertex(vector3df(9.0f, -4.0f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vField[2] = S3DVertex(vector3df(-1.0f, 4.0f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vField[3] = S3DVertex(vector3df(9.0f, 4.0f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vFieldSpell[0] = S3DVertex(vector3df(1.2f, -3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFieldSpell[1] = S3DVertex(vector3df(6.7f, -3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
-	vFieldSpell[2] = S3DVertex(vector3df(1.2f, 3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
-	vFieldSpell[3] = S3DVertex(vector3df(6.7f, 3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
-	vFieldSpell1[0] = S3DVertex(vector3df(1.2f, 0.8f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0.2f));
-	vFieldSpell1[1] = S3DVertex(vector3df(6.7f, 0.8f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0.2f));
-	vFieldSpell1[2] = S3DVertex(vector3df(1.2f, 3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0.63636f));
-	vFieldSpell1[3] = S3DVertex(vector3df(6.7f, 3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0.63636f));
-	vFieldSpell2[0] = S3DVertex(vector3df(1.2f, -3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0.63636f));
-	vFieldSpell2[1] = S3DVertex(vector3df(6.7f, -3.2f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0.63636f));
-	vFieldSpell2[2] = S3DVertex(vector3df(1.2f, -0.8f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0.2f));
-	vFieldSpell2[3] = S3DVertex(vector3df(6.7f, -0.8f, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0.2f));
+	SetS3DVertex(vCardFront, -0.35f, -0.5f, 0.35f, 0.5f, 0, 1, 0, 0, 1, 1);
+	SetS3DVertex(vCardOutline, -0.375f, -0.54f, 0.37f, 0.54f, 0, 1, 0, 0, 1, 1);
+	SetS3DVertex(vCardOutliner, 0.37f, -0.54f, -0.375f, 0.54f, 0, 1, 0, 0, 1, 1);
+	SetS3DVertex(vCardBack, 0.35f, -0.5f, -0.35f, 0.5f, 0, -1, 0, 0, 1, 1);
+	SetS3DVertex(vSymbol, -0.35f, -0.35f, 0.35f, 0.35f, 0.01f, 1, 0, 0, 1, 1);
+	SetS3DVertex(vNegate, -0.25f, -0.28f, 0.25f, 0.22f, 0.01f, 1, 0, 0, 1, 1);
+	SetS3DVertex(vChainNum, -0.35f, -0.35f, 0.35f, 0.35f, 0, 1, 0, 0, 0.19375f, 0.2421875f);
+	SetS3DVertex(vActivate, -0.5f, -0.5f, 0.5f, 0.5f, 0, 1, 0, 0, 1, 1);
+	SetS3DVertex(vField, -1.0f, -4.0f, 9.0f, 4.0f, 0, 1, 0, 0, 1, 1);
+	SetS3DVertex(vFieldSpell, 1.2f, -3.2f, 6.7f, 3.2f, 0, 1, 0, 0, 1, 1);
+	SetS3DVertex(vFieldSpell1, 1.2f, 0.8f, 6.7f, 3.2f, 0, 1, 0, 0.2f, 1, 0.63636f);
+	SetS3DVertex(vFieldSpell2, 1.2f, -3.2f, 6.7f, -0.8f, 0, 1, 0, 0.63636f, 1, 0.2f);
+
+	/*
 	//background grids
 	for (int i = 0; i < 6; ++i) {
 		vBackLine[i * 6 + 0] = S3DVertex(vector3df(1.2f + i * 1.1f, 0.5f, -0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
@@ -200,6 +173,7 @@ Materials::Materials() {
 	iBackLine[113] = 75;
 	iBackLine[114] = 74;
 	iBackLine[115] = 75;
+	*/
 
 	iRectangle[0] = 0;
 	iRectangle[1] = 1;
@@ -208,159 +182,45 @@ Materials::Materials() {
 	iRectangle[4] = 1;
 	iRectangle[5] = 3;
 
-	//deck0
-	vFields[0] = S3DVertex(vector3df(6.9f, 2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[1] = S3DVertex(vector3df(7.7f, 2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[2] = S3DVertex(vector3df(6.9f, 3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[3] = S3DVertex(vector3df(7.7f, 3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//grave0
-	vFields[4] = S3DVertex(vector3df(6.9f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[5] = S3DVertex(vector3df(7.7f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[6] = S3DVertex(vector3df(6.9f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[7] = S3DVertex(vector3df(7.7f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//extra0
-	vFields[8] = S3DVertex(vector3df(0.2f, 2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[9] = S3DVertex(vector3df(1.0f, 2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[10] = S3DVertex(vector3df(0.2f, 3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[11] = S3DVertex(vector3df(1.0f, 3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//remove0
-	vFields[12] = S3DVertex(vector3df(7.9f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[13] = S3DVertex(vector3df(8.7f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[14] = S3DVertex(vector3df(7.9f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[15] = S3DVertex(vector3df(8.7f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//mzone0
-	vFields[16] = S3DVertex(vector3df(1.2f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[17] = S3DVertex(vector3df(2.3f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[18] = S3DVertex(vector3df(1.2f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[19] = S3DVertex(vector3df(2.3f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[20] = S3DVertex(vector3df(2.3f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[21] = S3DVertex(vector3df(3.4f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[22] = S3DVertex(vector3df(2.3f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[23] = S3DVertex(vector3df(3.4f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[24] = S3DVertex(vector3df(3.4f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[25] = S3DVertex(vector3df(4.5f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[26] = S3DVertex(vector3df(3.4f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[27] = S3DVertex(vector3df(4.5f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[28] = S3DVertex(vector3df(4.5f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[29] = S3DVertex(vector3df(5.6f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[30] = S3DVertex(vector3df(4.5f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[31] = S3DVertex(vector3df(5.6f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[32] = S3DVertex(vector3df(5.6f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[33] = S3DVertex(vector3df(6.7f, 0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[34] = S3DVertex(vector3df(5.6f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[35] = S3DVertex(vector3df(6.7f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//szone0
-	vFields[36] = S3DVertex(vector3df(1.2f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[37] = S3DVertex(vector3df(2.3f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[38] = S3DVertex(vector3df(1.2f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[39] = S3DVertex(vector3df(2.3f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[40] = S3DVertex(vector3df(2.3f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[41] = S3DVertex(vector3df(3.4f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[42] = S3DVertex(vector3df(2.3f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[43] = S3DVertex(vector3df(3.4f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[44] = S3DVertex(vector3df(3.4f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[45] = S3DVertex(vector3df(4.5f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[46] = S3DVertex(vector3df(3.4f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[47] = S3DVertex(vector3df(4.5f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[48] = S3DVertex(vector3df(4.5f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[49] = S3DVertex(vector3df(5.6f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[50] = S3DVertex(vector3df(4.5f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[51] = S3DVertex(vector3df(5.6f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[52] = S3DVertex(vector3df(5.6f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[53] = S3DVertex(vector3df(6.7f, 2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[54] = S3DVertex(vector3df(5.6f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[55] = S3DVertex(vector3df(6.7f, 3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[56] = S3DVertex(vector3df(0.2f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));//field
-	vFields[57] = S3DVertex(vector3df(1.0f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[58] = S3DVertex(vector3df(0.2f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[59] = S3DVertex(vector3df(1.0f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[60] = S3DVertex(vector3df(0.2f, 1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));//LScale
-	vFields[61] = S3DVertex(vector3df(1.0f, 1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[62] = S3DVertex(vector3df(0.2f, 2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[63] = S3DVertex(vector3df(1.0f, 2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[64] = S3DVertex(vector3df(6.9f, 1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));//RScale
-	vFields[65] = S3DVertex(vector3df(7.7f, 1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[66] = S3DVertex(vector3df(6.9f, 2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[67] = S3DVertex(vector3df(7.7f, 2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//deck1
-	vFields[68] = S3DVertex(vector3df(1.0f, -2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[69] = S3DVertex(vector3df(0.2f, -2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[70] = S3DVertex(vector3df(1.0f, -3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[71] = S3DVertex(vector3df(0.2f, -3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//grave1
-	vFields[72] = S3DVertex(vector3df(1.0f, -0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[73] = S3DVertex(vector3df(0.2f, -0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[74] = S3DVertex(vector3df(1.0f, -1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[75] = S3DVertex(vector3df(0.2f, -1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//extra1
-	vFields[76] = S3DVertex(vector3df(7.7f, -2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[77] = S3DVertex(vector3df(6.9f, -2.7f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[78] = S3DVertex(vector3df(7.7f, -3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[79] = S3DVertex(vector3df(6.9f, -3.9f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//remove1
-	vFields[80] = S3DVertex(vector3df(0.0f, -0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[81] = S3DVertex(vector3df(-0.8f, -0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[82] = S3DVertex(vector3df(0.0f, -1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[83] = S3DVertex(vector3df(-0.8f, -1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//mzone1
-	vFields[84] = S3DVertex(vector3df(6.7f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[85] = S3DVertex(vector3df(5.6f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[86] = S3DVertex(vector3df(6.7f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[87] = S3DVertex(vector3df(5.6f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[88] = S3DVertex(vector3df(5.6f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[89] = S3DVertex(vector3df(4.5f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[90] = S3DVertex(vector3df(5.6f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[91] = S3DVertex(vector3df(4.5f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[92] = S3DVertex(vector3df(4.5f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[93] = S3DVertex(vector3df(3.4f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[94] = S3DVertex(vector3df(4.5f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[95] = S3DVertex(vector3df(3.4f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[96] = S3DVertex(vector3df(3.4f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[97] = S3DVertex(vector3df(2.3f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[98] = S3DVertex(vector3df(3.4f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[99] = S3DVertex(vector3df(2.3f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[100] = S3DVertex(vector3df(2.3f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[101] = S3DVertex(vector3df(1.2f, -0.8f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[102] = S3DVertex(vector3df(2.3f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[103] = S3DVertex(vector3df(1.2f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	//szone1
-	vFields[104] = S3DVertex(vector3df(6.7f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[105] = S3DVertex(vector3df(5.6f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[106] = S3DVertex(vector3df(6.7f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[107] = S3DVertex(vector3df(5.6f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[108] = S3DVertex(vector3df(5.6f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[109] = S3DVertex(vector3df(4.5f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[110] = S3DVertex(vector3df(5.6f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[111] = S3DVertex(vector3df(4.5f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[112] = S3DVertex(vector3df(4.5f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[113] = S3DVertex(vector3df(3.4f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[114] = S3DVertex(vector3df(4.5f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[115] = S3DVertex(vector3df(3.4f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[116] = S3DVertex(vector3df(3.4f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[117] = S3DVertex(vector3df(2.3f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[118] = S3DVertex(vector3df(3.4f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[119] = S3DVertex(vector3df(2.3f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[120] = S3DVertex(vector3df(2.3f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[121] = S3DVertex(vector3df(1.2f, -2.0f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[122] = S3DVertex(vector3df(2.3f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[123] = S3DVertex(vector3df(1.2f, -3.2f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[124] = S3DVertex(vector3df(7.7f, -0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));//field
-	vFields[125] = S3DVertex(vector3df(6.9f, -0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[126] = S3DVertex(vector3df(7.7f, -1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[127] = S3DVertex(vector3df(6.9f, -1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[128] = S3DVertex(vector3df(7.7f, -1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));//lscale
-	vFields[129] = S3DVertex(vector3df(6.9f, -1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[130] = S3DVertex(vector3df(7.7f, -2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[131] = S3DVertex(vector3df(6.9f, -2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[132] = S3DVertex(vector3df(1.0f, -1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));//rscale
-	vFields[133] = S3DVertex(vector3df(0.2f, -1.4f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[134] = S3DVertex(vector3df(1.0f, -2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[135] = S3DVertex(vector3df(0.2f, -2.6f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
+	SetS3DVertex(vFieldDeck[0], 6.9f, 2.7f, 7.7f, 3.9f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldGrave[0], 6.9f, 0.1f, 7.7f, 1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldExtra[0], 0.2f, 2.7f, 1.0f, 3.9f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldRemove[0], 7.9f, 0.1f, 8.7f, 1.3f, 0, 1, 0, 0, 0, 0);
+	for(int i = 0; i < 5; ++i)
+		SetS3DVertex(vFieldMzone[0][i], 1.2f + i * 1.1f, 0.8f, 2.3f + i * 1.1f, 2.0f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldMzone[0][5], 2.3f, -0.6f, 3.4f, 0.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldMzone[0][6], 4.5f, -0.6f, 5.6f, 0.6f, 0, 1, 0, 0, 0, 0);
+	for(int i = 0; i < 5; ++i)
+		SetS3DVertex(vFieldSzone[0][i], 1.2f + i * 1.1f, 2.0f, 2.3f + i * 1.1f, 3.2f, 0, 1, 0, 0, 0, 0);
+	//field
+	SetS3DVertex(vFieldSzone[0][5], 0.2f, 0.1f, 1.0f, 1.3f, 0, 1, 0, 0, 0, 0);
+	//LScale
+	SetS3DVertex(vFieldSzone[0][6], 0.2f, 1.4f, 1.0f, 2.6f, 0, 1, 0, 0, 0, 0);
+	//RScale
+	SetS3DVertex(vFieldSzone[0][7], 6.9f, 1.4f, 7.7f, 2.6f, 0, 1, 0, 0, 0, 0);
+
+	SetS3DVertex(vFieldDeck[1], 1.0f, -2.7f, 0.2f, -3.9f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldGrave[1], 1.0f, -0.1f, 0.2f, -1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldExtra[1], 7.7f, -2.7f, 6.9f, -3.9f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldRemove[1], 0.0f, -0.1f, -0.8f, -1.3f, 0, 1, 0, 0, 0, 0);
+	for(int i = 0; i < 5; ++i)
+		SetS3DVertex(vFieldMzone[1][i], 6.7f - i * 1.1f, -0.8f, 5.6f - i * 1.1f, -2.0f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldMzone[1][5], 5.6f, 0.6f, 4.5f, -0.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldMzone[1][6], 3.4f, 0.6f, 2.3f, -0.6f, 0, 1, 0, 0, 0, 0);
+	for(int i = 0; i < 5; ++i)
+		SetS3DVertex(vFieldSzone[1][i], 6.7f - i * 1.1f, -2.0f, 5.6f - i * 1.1f, -3.2f, 0, 1, 0, 0, 0, 0);
+	//field
+	SetS3DVertex(vFieldSzone[1][5], 7.7f, -0.1f, 6.9f, -1.3f, 0, 1, 0, 0, 0, 0);
+	//LScale
+	SetS3DVertex(vFieldSzone[1][6], 7.7f, -1.4f, 6.9f, -2.6f, 0, 1, 0, 0, 0, 0);
+	//RScale
+	SetS3DVertex(vFieldSzone[1][7], 1.0f, -1.4f, 0.2f, -2.6f, 0, 1, 0, 0, 0, 0);
+
 	//conti_act
-	vFields[136] = S3DVertex(vector3df(-0.8f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[137] = S3DVertex(vector3df(0.0f, 0.1f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[138] = S3DVertex(vector3df(-0.8f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
-	vFields[139] = S3DVertex(vector3df(0.0f, 1.3f, 0.0f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
+	vFieldContiAct[0] = vector3df(-0.8f, 0.1f, 0.0f);
+	vFieldContiAct[1] = vector3df(0.0f, 0.1f, 0.0f);
+	vFieldContiAct[2] = vector3df(-0.8f, 1.3f, 0.0f);
+	vFieldContiAct[3] = vector3df(0.0f, 1.3f, 0.0f);
 
 
 	for(int i = 0; i < 40; ++i)

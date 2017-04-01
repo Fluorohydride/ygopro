@@ -20,6 +20,7 @@ struct CardData {
 	int defense;
 	unsigned int lscale;
 	unsigned int rscale;
+	unsigned int link_marker;
 };
 struct CardDataC {
 	unsigned int code;
@@ -33,6 +34,7 @@ struct CardDataC {
 	int defense;
 	unsigned int lscale;
 	unsigned int rscale;
+	unsigned int link_marker;
 	unsigned int ot;
 	unsigned int category;
 };
@@ -70,6 +72,7 @@ public:
 	u32 type;
 	u32 level;
 	u32 rank;
+	u32 link;
 	u32 attribute;
 	u32 race;
 	s32 attack;
@@ -78,6 +81,7 @@ public:
 	s32 base_defense;
 	u32 lscale;
 	u32 rscale;
+	u32 link_marker;
 	u32 reason;
 	u32 select_seq;
 	u8 owner;
@@ -103,6 +107,7 @@ public:
 	wchar_t atkstring[16];
 	wchar_t defstring[16];
 	wchar_t lvstring[16];
+	wchar_t linkstring[16];
 	wchar_t lscstring[16];
 	wchar_t rscstring[16];
 

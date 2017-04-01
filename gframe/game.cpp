@@ -188,7 +188,13 @@ bool Game::Initialize() {
 	ebTimeLimit = env->addEditBox(strbuf, rect<s32>(140, 115, 220, 140), true, wCreateHost);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
-	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1236));
+	env->addStaticText(dataManager.GetSysString(1236), rect<s32>(20, 180, 220, 200), false, false, wCreateHost);
+	cbDuelRule = env->addComboBox(rect<s32>(140, 175, 300, 200), wCreateHost);
+	cbDuelRule->addItem(dataManager.GetSysString(1260));
+	cbDuelRule->addItem(dataManager.GetSysString(1261));
+	cbDuelRule->addItem(dataManager.GetSysString(1262));
+	cbDuelRule->addItem(dataManager.GetSysString(1263));
+	cbDuelRule->setSelected(DEFAULT_DUEL_RULE);
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
@@ -488,7 +494,7 @@ bool Game::Initialize() {
 	cbCardType->addItem(dataManager.GetSysString(1312));
 	cbCardType->addItem(dataManager.GetSysString(1313));
 	cbCardType->addItem(dataManager.GetSysString(1314));
-	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, -1);
+	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(10);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
 	env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
@@ -1077,19 +1083,30 @@ void Game::ShowCardInfo(int code) {
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
-		int form = 0x2605;
-		if(cd.type & TYPE_XYZ) ++form;
-		myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
-		wchar_t adBuffer[16];
-		if(cd.attack < 0 && cd.defense < 0)
-			myswprintf(adBuffer, L"?/?");
-		else if(cd.attack < 0)
-			myswprintf(adBuffer, L"?/%d", cd.defense);
-		else if(cd.defense < 0)
-			myswprintf(adBuffer, L"%d/?", cd.attack);
-		else
-			myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
-		wcscat(formatBuffer, adBuffer);
+		if(!(cd.type & TYPE_LINK)) {
+			int form = 0x2605;
+			if(cd.type & TYPE_XYZ) ++form;
+			myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
+			wchar_t adBuffer[16];
+			if(cd.attack < 0 && cd.defense < 0)
+				myswprintf(adBuffer, L"?/?");
+			else if(cd.attack < 0)
+				myswprintf(adBuffer, L"?/%d", cd.defense);
+			else if(cd.defense < 0)
+				myswprintf(adBuffer, L"%d/?", cd.attack);
+			else
+				myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
+			wcscat(formatBuffer, adBuffer);
+		} else {
+			myswprintf(formatBuffer, L"[LINK-%d] ", cd.level);
+			wchar_t adBuffer[16];
+			if(cd.attack < 0)
+				myswprintf(adBuffer, L"?/-   ");
+			else
+				myswprintf(adBuffer, L"%d/-   ", cd.attack);
+			wcscat(formatBuffer, adBuffer);
+			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
+		}
 		if(cd.type & TYPE_PENDULUM) {
 			wchar_t scaleBuffer[16];
 			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);

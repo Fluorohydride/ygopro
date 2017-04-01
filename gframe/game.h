@@ -93,6 +93,7 @@ public:
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
+	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
 	void DrawSpec();
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
@@ -240,7 +241,7 @@ public:
 	irr::gui::IGUIEditBox* ebDrawCount;
 	irr::gui::IGUIEditBox* ebServerName;
 	irr::gui::IGUIEditBox* ebServerPass;
-	irr::gui::IGUICheckBox* chkEnablePriority;
+	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
@@ -536,11 +537,12 @@ extern unsigned char draw_count;
 #define BUTTON_SIDE_OK				309
 #define BUTTON_SHUFFLE_DECK			310
 #define COMBOBOX_MAINTYPE			311
-#define BUTTON_EFFECT_FILTER		312
-#define BUTTON_START_FILTER			313
-#define SCROLL_FILTER				314
-#define EDITBOX_KEYWORD				315
-#define BUTTON_CLEAR_FILTER			316
+#define COMBOBOX_SECONDTYPE			312
+#define BUTTON_EFFECT_FILTER		313
+#define BUTTON_START_FILTER			314
+#define SCROLL_FILTER				315
+#define EDITBOX_KEYWORD				316
+#define BUTTON_CLEAR_FILTER			317
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
 #define BUTTON_REPLAY_STEP			322
@@ -553,4 +555,6 @@ extern unsigned char draw_count;
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define COMBOBOX_SORTTYPE			370
+
+#define DEFAULT_DUEL_RULE			3
 #endif // GAME_H
