@@ -419,7 +419,7 @@ extern unsigned short aServerPort;
 extern unsigned int lflist;
 extern unsigned char rule;
 extern unsigned char mode;
-extern bool enable_priority;
+extern unsigned char duel_rule;
 extern bool no_check_deck;
 extern bool no_shuffle_deck;
 extern unsigned int start_lp;

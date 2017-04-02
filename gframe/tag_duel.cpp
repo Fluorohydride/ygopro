@@ -12,7 +12,7 @@ namespace ygo {
 extern unsigned int lflist;
 extern unsigned char rule;
 extern unsigned char mode;
-extern bool enable_priority;
+extern bool duel_rule;
 extern bool no_check_deck;
 extern bool no_shuffle_deck;
 extern unsigned int start_lp;
@@ -65,7 +65,7 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			host_info.mode=3;
 			host_info.no_check_deck=false;
 			host_info.no_shuffle_deck=false;
-			host_info.enable_priority=false;
+			host_info.duel_rule=3;
 			host_info.rule=0;
 			host_info.time_limit=180;
 			host_info.replay_mode=0;
@@ -77,7 +77,7 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 				host_info.mode=ygo::mode;
 				host_info.no_check_deck=ygo::no_check_deck;
 				host_info.no_shuffle_deck=ygo::no_shuffle_deck;
-				host_info.enable_priority=ygo::enable_priority;
+				host_info.duel_rule=ygo::duel_rule;
 				host_info.rule=ygo::rule;
 				host_info.time_limit=ygo::time_limit;
 				host_info.replay_mode=ygo::replay_mode;

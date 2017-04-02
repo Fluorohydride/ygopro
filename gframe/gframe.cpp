@@ -63,9 +63,9 @@ int main(int argc, char* argv[]) {
 			ygo::rule=atoi(argv[3]);
 			ygo::mode=atoi(argv[4]);
 			if (argv[5][0]=='T')
-				ygo::enable_priority=true;
+				ygo::duel_rule=2;
 			else
-				ygo::enable_priority=false;
+				ygo::duel_rule=3;
 			if (argv[6][0]=='T')
 				ygo::no_check_deck=true;
 			else
