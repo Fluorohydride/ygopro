@@ -66,6 +66,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO)
 			break;
+		if(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK)
+			break;
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -240,6 +242,31 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wQuery);
 				is_deleting = false;
 				is_clearing = false;
+				break;
+			}
+			case BUTTON_MARKS_FILTER: {
+				mainGame->PopupElement(mainGame->wLinkMarks);
+				break;
+			}
+			case BUTTON_MARKERS_OK: {
+				filter_marks = 0;
+				if (mainGame->btnMark[0]->isPressed())
+					filter_marks |= 0100;
+				if (mainGame->btnMark[1]->isPressed())
+					filter_marks |= 0200;
+				if (mainGame->btnMark[2]->isPressed())
+					filter_marks |= 0400;
+				if (mainGame->btnMark[3]->isPressed())
+					filter_marks |= 0010;
+				if (mainGame->btnMark[4]->isPressed())
+					filter_marks |= 0040;
+				if (mainGame->btnMark[5]->isPressed())
+					filter_marks |= 0001;
+				if (mainGame->btnMark[6]->isPressed())
+					filter_marks |= 0002;
+				if (mainGame->btnMark[7]->isPressed())
+					filter_marks |= 0004;
+				mainGame->HideElement(mainGame->wLinkMarks);
 				break;
 			}
 			}
@@ -860,6 +887,8 @@ void DeckBuilder::FilterCards() {
 		}
 		if(filter_effect && !(data.category & filter_effect))
 			continue;
+		if(filter_marks && (data.link_marker & filter_marks)!= filter_marks)
+			continue;
 		if(filter_lm) {
 			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1))
 				continue;
@@ -921,6 +950,9 @@ void DeckBuilder::ClearFilter() {
 	filter_effect = 0;
 	for(int i = 0; i < 32; ++i)
 		mainGame->chkCategory[i]->setChecked(false);
+	filter_marks = 0;
+	for(int i = 0; i < 8; i++)
+		mainGame->btnMark[i]->setPressed(false);
 }
 void DeckBuilder::SortList() {
 	auto left = results.begin();

@@ -29,6 +29,7 @@ public:
 	unsigned int filter_lv;
 	unsigned int filter_scltype;
 	unsigned int filter_scl;
+	unsigned int filter_marks;
 	int filter_lm;
 	int hovered_code;
 	int hovered_pos;
