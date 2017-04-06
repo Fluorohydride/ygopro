@@ -517,10 +517,10 @@ bool Game::Initialize() {
 	ebDefense = env->addEditBox(L"", rect<s32>(260, 40 + 75 / 6, 340, 60 + 75 / 6), true, wFilter);
 	ebDefense->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stStar = env->addStaticText(dataManager.GetSysString(1324), rect<s32>(10, 62 + 100 / 6, 80, 82 + 100 / 6), false, false, wFilter);
-	ebStar = env->addEditBox(L"", rect<s32>(60, 60 + 100 / 6, 190, 80 + 100 / 6), true, wFilter);
+	ebStar = env->addEditBox(L"", rect<s32>(60, 60 + 100 / 6, 100, 80 + 100 / 6), true, wFilter);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stScale = env->addStaticText(dataManager.GetSysString(1336), rect<s32>(10, 82 + 125 / 6, 80, 102 + 125 / 6), false, false, wFilter);
-	ebScale = env->addEditBox(L"", rect<s32>(60, 80 + 125 / 6, 190, 100 + 125 / 6), true, wFilter);
+	stScale = env->addStaticText(dataManager.GetSysString(1336), rect<s32>(101, 62 + 100 / 6, 150, 82 + 100 / 6), false, false, wFilter);
+	ebScale = env->addEditBox(L"", rect<s32>(150, 60 + 100 / 6, 190, 80 + 100 / 6), true, wFilter);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 60 + 100 / 6, 390, 80 + 100 / 6), true, wFilter, EDITBOX_KEYWORD);
@@ -539,6 +539,23 @@ bool Game::Initialize() {
 	btnCategoryOK = env->addButton(rect<s32>(200, 175, 300, 200), wCategories, BUTTON_CATEGORY_OK, dataManager.GetSysString(1211));
 	for(int i = 0; i < 32; ++i)
 		chkCategory[i] = env->addCheckBox(false, recti(10 + (i % 4) * 130, 10 + (i / 4) * 20, 140 + (i % 4) * 130, 30 + (i / 4) * 20), wCategories, -1, dataManager.GetSysString(1100 + i));
+	btnMarksFilter = env->addButton(rect<s32>(60, 80 + 125 / 6, 190, 100 + 125 / 6), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
+	wLinkMarks = env->addWindow(rect<s32>(700, 30, 820, 150), false, dataManager.strBuffer);
+	wLinkMarks->getCloseButton()->setVisible(false);
+	wLinkMarks->setDrawTitlebar(false);
+	wLinkMarks->setDraggable(false);
+	wLinkMarks->setVisible(false);
+	btnMarksOK = env->addButton(recti(45, 45, 75, 75), wLinkMarks, BUTTON_MARKERS_OK, dataManager.GetSysString(1211));
+	btnMark[0] = env->addButton(recti(10, 10, 40, 40), wLinkMarks, -1, L"\x2196");
+	btnMark[1] = env->addButton(recti(45, 10, 75, 40), wLinkMarks, -1, L"\x2191");
+	btnMark[2] = env->addButton(recti(80, 10, 110, 40), wLinkMarks, -1, L"\x2197");
+	btnMark[3] = env->addButton(recti(10, 45, 40, 75), wLinkMarks, -1, L"\x2190");
+	btnMark[4] = env->addButton(recti(80, 45, 110, 75), wLinkMarks, -1, L"\x2192");
+	btnMark[5] = env->addButton(recti(10, 80, 40, 110), wLinkMarks, -1, L"\x2199");
+	btnMark[6] = env->addButton(recti(45, 80, 75, 110), wLinkMarks, -1, L"\x2193");
+	btnMark[7] = env->addButton(recti(80, 80, 110, 110), wLinkMarks, -1, L"\x2198");
+	for(int i=0;i<8;i++)
+		btnMark[i]->setIsPushButton(true);
 	//replay window
 	wReplay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1202));
 	wReplay->getCloseButton()->setVisible(false);
@@ -812,6 +829,18 @@ void Game::LoadExpansionDB() {
 				dataManager.LoadDB(fpath);
 			}
 		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
+	}
+	fh = FindFirstFileW(L"./expansions/live2017/*.cdb", &fdataw);
+	if (fh != INVALID_HANDLE_VALUE) {
+		do {
+			if (!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				char fname[780];
+				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
+				sprintf(fpath, "./expansions/live2017/%s", fname);
+				dataManager.LoadDB(fpath);
+			}
+		} while (FindNextFileW(fh, &fdataw));
 		FindClose(fh);
 	}
 #else
@@ -1350,16 +1379,18 @@ void Game::OnResize()
 	cbRace->setRelativePosition(Resize(60, 49, 190, 69));
 	cbAttribute->setRelativePosition(Resize(60, 26, 190, 46));
 	cbLimit->setRelativePosition(Resize(260, 3, 390, 23));
-	ebStar->setRelativePosition(Resize(60, 72, 100, 92));
-	ebScale->setRelativePosition(Resize(150, 72, 190, 92));
+	ebStar->setRelativePosition(Resize(60, 60 + 100 / 6, 100, 80 + 100 / 6));
+	ebScale->setRelativePosition(Resize(150, 60 + 100 / 6, 190, 80 + 100 / 6));
 	ebAttack->setRelativePosition(Resize(260, 26, 340, 46));
 	ebDefense->setRelativePosition(Resize(260, 49, 340, 69));
 	ebCardName->setRelativePosition(Resize(260, 72, 390, 92));
 	btnEffectFilter->setRelativePosition(Resize(345, 28, 390, 69));
 	btnStartFilter->setRelativePosition(Resize(260, 96, 390, 118));
 	btnClearFilter->setRelativePosition(Resize(205, 96, 255, 118));
+	btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 190, 100 + 125 / 6));
 
 	wCategories->setRelativePosition(ResizeWin(450, 60, 1000, 270));
+	wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
 	stBanlist->setRelativePosition(ResizeWin(10, 9, 100, 29));
 	stDeck->setRelativePosition(ResizeWin(10, 39, 100, 59));
 	stCategory->setRelativePosition(ResizeWin(10, 5, 70, 25));
@@ -1368,9 +1399,9 @@ void Game::OnResize()
 	stRace->setRelativePosition(ResizeWin(10, 51, 70, 71));
 	stAttack->setRelativePosition(ResizeWin(205, 28, 280, 48));
 	stDefense->setRelativePosition(ResizeWin(205, 51, 280, 71));
-	stStar->setRelativePosition(ResizeWin(10, 74, 80, 94));
+	stStar->setRelativePosition(ResizeWin(10, 62 + 100 / 6, 80, 82 + 100 / 6));
 	stSearch->setRelativePosition(ResizeWin(205, 74, 280, 94));
-	stScale->setRelativePosition(ResizeWin(101, 74, 150, 94));
+	stScale->setRelativePosition(ResizeWin(101, 62 + 100 / 6, 150, 82 + 100 / 6));
 	btnSideOK->setRelativePosition(Resize(510, 40, 820, 80));
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
 
