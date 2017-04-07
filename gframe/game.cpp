@@ -1104,13 +1104,32 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L"[System]: ");
 		break;
 	case 9: //error message
-		chatMsg[0].append(L"[Script error:] ");
+		chatMsg[0].append(L"[Script Error]: ");
 		break;
 	default: //from watcher or unknown
 		if(player < 11 || player > 19)
 			chatMsg[0].append(L"[---]: ");
 	}
 	chatMsg[0].append(msg);
+}
+void Game::AddDebugMsg(char* msg)
+{
+	if (enable_log & 0x1) {
+		wchar_t wbuf[1024];
+		BufferIO::DecodeUTF8(msg, wbuf);
+		mainGame->AddChatMsg(wbuf, 9);
+	}
+	if (enable_log & 0x2) {
+		FILE* fp = fopen("error.log", "at");
+		if (!fp)
+			return;
+		time_t nowtime = time(NULL);
+		struct tm *localedtime = localtime(&nowtime);
+		char timebuf[40];
+		strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
+		fprintf(fp, "[%s][Script Error]: %s\n", timebuf, msg);
+		fclose(fp);
+	}
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
