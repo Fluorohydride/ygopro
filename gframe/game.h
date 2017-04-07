@@ -112,6 +112,7 @@ public:
 	void SaveConfig();
 	void ShowCardInfo(int code);
 	void AddChatMsg(wchar_t* msg, int player);
+	void AddDebugMsg(char* msgbuf);
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PlaySoundEffect(char* sound);
