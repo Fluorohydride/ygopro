@@ -1286,11 +1286,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
+		unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
 		mainGame->dField.selected_field = 0;
 		unsigned char respbuf[64];
 		int pzone = 0;
-		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE)
-			mainGame->stHintMsg->setText(dataManager.GetSysString(569));
+		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
+			myswprintf(textBuffer, dataManager.GetSysString(569), dataManager.GetName(code));
+			mainGame->stHintMsg->setText(textBuffer);
+		}
 		else
 			mainGame->stHintMsg->setText(dataManager.GetSysString(570));
 		mainGame->stHintMsg->setVisible(true);

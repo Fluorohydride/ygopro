@@ -233,7 +233,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_PLACE:
 		case MSG_SELECT_DISFIELD: {
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 5;
+			pbuf += 9;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();

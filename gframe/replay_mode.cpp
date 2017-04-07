@@ -404,7 +404,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_PLACE:
 		case MSG_SELECT_DISFIELD: {
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 5;
+			pbuf += 9;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_POSITION: {

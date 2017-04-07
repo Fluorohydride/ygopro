@@ -701,7 +701,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_SELECT_PLACE:
 		case MSG_SELECT_DISFIELD: {
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 5;
+			pbuf += 9;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
