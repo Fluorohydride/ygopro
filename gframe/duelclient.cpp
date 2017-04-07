@@ -1294,6 +1294,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				myswprintf(textBuffer, dataManager.GetSysString(569), dataManager.GetName(select_hint));
 			} else
 				myswprintf(textBuffer, dataManager.GetSysString(560));
+			select_hint = 0;
 			mainGame->stHintMsg->setText(textBuffer);
 		} else
 			mainGame->stHintMsg->setText(dataManager.GetSysString(570));
