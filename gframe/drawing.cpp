@@ -311,7 +311,7 @@ void Game::DrawMisc() {
 		if(dField.szone[0][6] && dField.szone[0][6]->lscale)
 			seq = 6;
 		im.setTranslation(vector3df((matManager.vFieldSzone[0][seq][0].Pos.X + matManager.vFieldSzone[0][seq][1].Pos.X) / 2,
-			(matManager.vFieldSzone[0][6][0].Pos.Y + matManager.vFieldSzone[0][seq][2].Pos.Y) / 2, 0.03f));
+			(matManager.vFieldSzone[0][seq][0].Pos.Y + matManager.vFieldSzone[0][seq][2].Pos.Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
