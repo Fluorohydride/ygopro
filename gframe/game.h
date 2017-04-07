@@ -421,6 +421,10 @@ public:
 	irr::gui::IGUIWindow* wCategories;
 	irr::gui::IGUICheckBox* chkCategory[32];
 	irr::gui::IGUIButton* btnCategoryOK;
+	irr::gui::IGUIButton* btnMarksFilter;
+	irr::gui::IGUIWindow* wLinkMarks;
+	irr::gui::IGUIButton* btnMark[8];
+	irr::gui::IGUIButton* btnMarksOK;
 	//sort type
 	irr::gui::IGUIStaticText* wSort;
 	irr::gui::IGUIComboBox* cbSortType;
@@ -599,6 +603,9 @@ extern Game* mainGame;
 #define CHECKBOX_ENABLE_MUSIC		361
 #define SCROLL_VOLUME				362
 #define COMBOBOX_SORTTYPE			370
+
+#define BUTTON_MARKS_FILTER			380
+#define BUTTON_MARKERS_OK			381
 
 #define DEFAULT_DUEL_RULE			3
 #endif // GAME_H
