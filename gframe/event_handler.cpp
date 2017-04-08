@@ -1750,9 +1750,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
 								if(!(mcard->type & TYPE_LINK)) {
-									int form = 0x2605;
-									if (mcard->rank) ++form;
-									myswprintf(formatBuffer, L"\n%c%d", form, (mcard->level ? mcard->level : mcard->rank));
+									wchar_t* form = L"\u2605";
+									if (mcard->rank) form = L"\u2606";
+									myswprintf(formatBuffer, L"\n%ls%d", form, (mcard->level ? mcard->level : mcard->rank));
 									str.append(formatBuffer);
 								} else {
 									myswprintf(formatBuffer, L"\nLINK-%d", mcard->link);

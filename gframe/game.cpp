@@ -1026,9 +1026,9 @@ void Game::ShowCardInfo(int code) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
 		if(!(cd.type & TYPE_LINK)) {
-			int form = 0x2605;
-			if(cd.type & TYPE_XYZ) ++form;
-			myswprintf(formatBuffer, L"[%c%d] ", form, cd.level);
+			wchar_t* form = L"\u2605";
+			if(cd.type & TYPE_XYZ) form = L"\u2606";
+			myswprintf(formatBuffer, L"[%ls%d] ", form, cd.level);
 			wchar_t adBuffer[16];
 			if(cd.attack < 0 && cd.defense < 0)
 				myswprintf(adBuffer, L"?/?");
