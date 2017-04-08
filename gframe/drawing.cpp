@@ -1095,8 +1095,8 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangle(0x80000000, mainGame->Resize(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
 		if(ptr->second.type & TYPE_MONSTER) {
-			int form = 0x2605;
-			if(ptr->second.type & TYPE_XYZ) ++form;
+			wchar_t* form = L"\u2605";
+			if (ptr->second.type & TYPE_XYZ) form = L"\u2606";
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			textFont->draw(textBuffer, mainGame->Resize(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, mainGame->Resize(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
@@ -1110,7 +1110,7 @@ void Game::DrawDeckBd() {
 					myswprintf(textBuffer, L"%d/Link %d", ptr->second.attack, ptr->second.level);
 			}
 			else {
-				myswprintf(textBuffer, L"%ls/%ls %c%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
+				myswprintf(textBuffer, L"%ls/%ls %ls%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
 				textFont->draw(textBuffer, mainGame->Resize(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
 				textFont->draw(textBuffer, mainGame->Resize(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
 				if (ptr->second.attack < 0 && ptr->second.defense < 0)

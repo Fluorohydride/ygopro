@@ -1822,9 +1822,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}else{
 									myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 									str.append(formatBuffer);
-									int form = 0x2605;
-									if (mcard->rank) ++form;
-									myswprintf(formatBuffer, L"\n%c%d %ls/%ls", form, (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
+									wchar_t* form = L"\u2605";
+									if (mcard->rank) form = L"\u2606";
+									myswprintf(formatBuffer, L"\n%ls%d %ls/%ls", form, (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
 									str.append(formatBuffer);
 								}
 								if(mcard->location == LOCATION_HAND && (mcard->type & TYPE_PENDULUM)) {
