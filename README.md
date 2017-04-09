@@ -5,7 +5,7 @@
 
 现用于[萌卡](https://mycard.moe/)和[YGOPRO 233服](http://mercury233.me/ygosrv233/)。
 
-###Linux下编译
+### Linux下编译
 * 需要以下组件或工具
  * gcc
  * premake4
@@ -14,7 +14,7 @@
  * sqlite3
 * 可参考 https://github.com/mercury233/ygopro-server/wiki 中的脚本
 
-###Windows下编译
+### Windows下编译
 * 需要以下组件或工具
  * Visual Studio
  * premake5
@@ -24,7 +24,7 @@
  * dirent for windows
 * 可参考本项目 [appveyor.yml](https://github.com/mycard/ygopro/blob/server/appveyor.yml) 中的脚本
 
-###运行
+### 运行
 * 使用[ygopro-server](https://github.com/mycard/ygopro-server)运行
 * 手动运行的参数是
  * ./ygopro 0 0 0 1 F F F 8000 5 1 180 0

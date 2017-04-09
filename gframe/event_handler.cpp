@@ -1750,9 +1750,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
 								if(!(mcard->type & TYPE_LINK)) {
-									int form = 0x2605;
-									if (mcard->rank) ++form;
-									myswprintf(formatBuffer, L"\n%c%d", form, (mcard->level ? mcard->level : mcard->rank));
+									wchar_t* form = L"\u2605";
+									if (mcard->rank) form = L"\u2606";
+									myswprintf(formatBuffer, L"\n%ls%d", form, (mcard->level ? mcard->level : mcard->rank));
 									str.append(formatBuffer);
 								} else {
 									myswprintf(formatBuffer, L"\nLINK-%d", mcard->link);
@@ -1769,7 +1769,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
-								if(mcard->location == LOCATION_SZONE && (mcard->sequence == 6 || mcard->sequence == 7)) {
+								if(mcard->location == LOCATION_SZONE && mcard->lscale) {
 									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
 									str.append(formatBuffer);
 								}

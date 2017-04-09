@@ -1013,7 +1013,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.remove_act = true;
 			else if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
-			else if (pcard->location == LOCATION_SZONE && pcard->sequence == 6)
+			else if (pcard->location == LOCATION_SZONE && (pcard->sequence == 0 || pcard->sequence == 6) && pcard->lscale)
 				mainGame->dField.pzone_act[pcard->controler] = true;
 		}
 		mainGame->dField.reposable_cards.clear();
@@ -1289,9 +1289,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selected_field = 0;
 		unsigned char respbuf[64];
 		int pzone = 0;
-		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE)
-			mainGame->stHintMsg->setText(dataManager.GetSysString(569));
-		else
+		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
+			if (select_hint) {
+				myswprintf(textBuffer, dataManager.GetSysString(569), dataManager.GetName(select_hint));
+			} else
+				myswprintf(textBuffer, dataManager.GetSysString(560));
+			select_hint = 0;
+			mainGame->stHintMsg->setText(textBuffer);
+		} else
 			mainGame->stHintMsg->setText(dataManager.GetSysString(570));
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
