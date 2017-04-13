@@ -3109,6 +3109,24 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->WaitFrameSignal(40);
 		return true;
 	}
+	case MSG_ROCK_PAPER_SCISSORS: {
+		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		mainGame->gMutex.Lock();
+		mainGame->PopupElement(mainGame->wHand);
+		mainGame->gMutex.Unlock();
+		return false;
+	}
+	case MSG_HAND_RES: {
+		int res1 = BufferIO::ReadInt8(pbuf);
+		int res2 = BufferIO::ReadInt8(pbuf);
+		mainGame->stHintMsg->setVisible(false);
+		mainGame->showcardcode = (res1 - 1) + ((res2 - 1) << 16);
+		mainGame->showcarddif = 50;
+		mainGame->showcardp = 0;
+		mainGame->showcard = 100;
+		mainGame->WaitFrameSignal(60);
+		return false;
+	}
 	case MSG_ANNOUNCE_RACE: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
