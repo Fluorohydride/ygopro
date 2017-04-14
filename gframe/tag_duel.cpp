@@ -1390,7 +1390,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			return 1;
 		}
 		case MSG_HAND_RES: {
-			pbuf += 2;
+			pbuf += 1;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			NetServer::ReSendToPlayer(players[2]);

@@ -3117,10 +3117,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return false;
 	}
 	case MSG_HAND_RES: {
-		int res1 = BufferIO::ReadInt8(pbuf);
-		int res2 = BufferIO::ReadInt8(pbuf);
+		int res = BufferIO::ReadInt8(pbuf);
 		mainGame->stHintMsg->setVisible(false);
-		mainGame->showcardcode = (res1 - 1) + ((res2 - 1) << 16);
+		mainGame->showcardcode = ((res & 0x3) - 1) + ((((res >> 2) & 0x3) - 1) << 16);
 		mainGame->showcarddif = 50;
 		mainGame->showcardp = 0;
 		mainGame->showcard = 100;
