@@ -447,6 +447,8 @@ public:
 	//soundEngine
 	irrklang::ISoundEngine* engineSound;
 	irrklang::ISoundEngine* engineMusic;
+	//swap
+	irr::gui::IGUIButton* btnSpectatorSwap;
 	//chain control
 	irr::gui::IGUIButton* btnChainIgnore;
 	irr::gui::IGUIButton* btnChainAlways;

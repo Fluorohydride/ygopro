@@ -82,9 +82,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_REPLAY_SWAP: {
-				if(!mainGame->dInfo.isReplay)
-					break;
-				ReplayMode::SwapField();
+				if(mainGame->dInfo.isReplay)
+					ReplayMode::SwapField();
+				else if (mainGame->dInfo.player_type != 7)
+					mainGame->dField.ReplaySwap();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {
