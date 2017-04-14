@@ -357,7 +357,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->env->setFocus(mainGame->wHostPrepare);
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					bool check = false;
-					if (!mainGame->cbDeckSelect->isVisible())
+					if (!mainGame->cbDeckSelect2->isVisible())
 						check = (mainGame->cbDeckSelect->getSelected() == -1 || !deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())));
 					else
 						check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !deckManager.LoadDeckDouble(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()), mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected())));
