@@ -3111,6 +3111,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_ROCK_PAPER_SCISSORS: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		mainGame->gMutex.Lock();
 		mainGame->PopupElement(mainGame->wHand);
 		mainGame->gMutex.Unlock();
@@ -3118,6 +3120,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_HAND_RES: {
 		int res = BufferIO::ReadInt8(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		mainGame->stHintMsg->setVisible(false);
 		mainGame->showcardcode = ((res & 0x3) - 1) + ((((res >> 2) & 0x3) - 1) << 16);
 		mainGame->showcarddif = 50;
