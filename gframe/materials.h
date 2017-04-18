@@ -21,11 +21,11 @@ public:
 	S3DVertex vFieldSpell2[4];
 	//S3DVertex vBackLine[76];
 	S3DVertex vFieldDeck[2][4];
-	S3DVertex vFieldGrave[2][4];
+	S3DVertex vFieldGrave[2][2][4];
 	S3DVertex vFieldExtra[2][4];
-	S3DVertex vFieldRemove[2][4];
+	S3DVertex vFieldRemove[2][2][4];
 	S3DVertex vFieldMzone[2][7][4];
-	S3DVertex vFieldSzone[2][8][4];
+	S3DVertex vFieldSzone[2][8][2][4];
 	irr::core::vector3df vFieldContiAct[4];
 	S3DVertex vArrow[40];
 	SColor c2d[4];
