@@ -3290,6 +3290,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
 			mainGame->dField.last_chain = true;
 		}
+		mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
 		mainGame->gMutex.Unlock();
 		break;
 	}

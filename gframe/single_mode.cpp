@@ -694,6 +694,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			BufferIO::ReadInt8(pbuf); //chain count, always 0
 			SinglePlayReload();
 			mainGame->dField.RefreshAllCards();
+			mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
 			mainGame->gMutex.Unlock();
 			break;
 		}
