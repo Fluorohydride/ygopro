@@ -381,6 +381,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->ShowElement(mainGame->wHostPrepare);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
+		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
 		connect_state |= 0x4;
 		break;
 	}
