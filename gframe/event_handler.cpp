@@ -1494,6 +1494,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				selected_cards.push_back(clicked_card);
 				if (selected_cards.size() > 0) {
+					ShowCancelOrFinishButton(0);
 					SetResponseSelectedCards();
 					DuelClient::SendResponse();
 				}
