@@ -381,6 +381,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->ShowElement(mainGame->wHostPrepare);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
+		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
 		connect_state |= 0x4;
 		break;
 	}
@@ -3290,6 +3291,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
 			mainGame->dField.last_chain = true;
 		}
+		mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
 		mainGame->gMutex.Unlock();
 		break;
 	}

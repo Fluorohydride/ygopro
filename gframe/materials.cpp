@@ -183,38 +183,58 @@ Materials::Materials() {
 	iRectangle[5] = 3;
 
 	SetS3DVertex(vFieldDeck[0], 6.9f, 2.7f, 7.7f, 3.9f, 0, 1, 0, 0, 0, 0);
-	SetS3DVertex(vFieldGrave[0], 6.9f, 0.1f, 7.7f, 1.3f, 0, 1, 0, 0, 0, 0);
+	//grave
+	SetS3DVertex(vFieldGrave[0][0], 6.9f, 0.1f, 7.7f, 1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldGrave[0][1], 6.9f, 1.4f, 7.7f, 2.6f, 0, 1, 0, 0, 0, 0);
+	//extra
 	SetS3DVertex(vFieldExtra[0], 0.2f, 2.7f, 1.0f, 3.9f, 0, 1, 0, 0, 0, 0);
-	SetS3DVertex(vFieldRemove[0], 7.9f, 0.1f, 8.7f, 1.3f, 0, 1, 0, 0, 0, 0);
+	//remove
+	SetS3DVertex(vFieldRemove[0][0], 7.9f, 0.1f, 8.7f, 1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldRemove[0][1], 6.9f, 0.1f, 7.7f, 1.3f, 0, 1, 0, 0, 0, 0);
 	for(int i = 0; i < 5; ++i)
 		SetS3DVertex(vFieldMzone[0][i], 1.2f + i * 1.1f, 0.8f, 2.3f + i * 1.1f, 2.0f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldMzone[0][5], 2.3f, -0.6f, 3.4f, 0.6f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldMzone[0][6], 4.5f, -0.6f, 5.6f, 0.6f, 0, 1, 0, 0, 0, 0);
-	for(int i = 0; i < 5; ++i)
-		SetS3DVertex(vFieldSzone[0][i], 1.2f + i * 1.1f, 2.0f, 2.3f + i * 1.1f, 3.2f, 0, 1, 0, 0, 0, 0);
+	for (int i = 0; i < 5; ++i) {
+		SetS3DVertex(vFieldSzone[0][i][0], 1.2f + i * 1.1f, 2.0f, 2.3f + i * 1.1f, 3.2f, 0, 1, 0, 0, 0, 0);
+		SetS3DVertex(vFieldSzone[0][i][1], 1.2f + i * 1.1f, 2.0f, 2.3f + i * 1.1f, 3.2f, 0, 1, 0, 0, 0, 0);
+	}
 	//field
-	SetS3DVertex(vFieldSzone[0][5], 0.2f, 0.1f, 1.0f, 1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[0][5][0], 0.2f, 0.1f, 1.0f, 1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[0][5][1], 0.2f, 1.4f, 1.0f, 2.6f, 0, 1, 0, 0, 0, 0);
 	//LScale
-	SetS3DVertex(vFieldSzone[0][6], 0.2f, 1.4f, 1.0f, 2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[0][6][0], 0.2f, 1.4f, 1.0f, 2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[0][6][1], 0.2f, 0.1f, 1.0f, 1.3f, 0, 1, 0, 0, 0, 0);
 	//RScale
-	SetS3DVertex(vFieldSzone[0][7], 6.9f, 1.4f, 7.7f, 2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[0][7][0], 6.9f, 1.4f, 7.7f, 2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[0][7][1], 7.9f, 0.1f, 8.7f, 1.3f, 0, 1, 0, 0, 0, 0);
 
 	SetS3DVertex(vFieldDeck[1], 1.0f, -2.7f, 0.2f, -3.9f, 0, 1, 0, 0, 0, 0);
-	SetS3DVertex(vFieldGrave[1], 1.0f, -0.1f, 0.2f, -1.3f, 0, 1, 0, 0, 0, 0);
+	//grave
+	SetS3DVertex(vFieldGrave[1][0], 1.0f, -0.1f, 0.2f, -1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldGrave[1][1], 1.0f, -1.4f, 0.2f, -2.6f, 0, 1, 0, 0, 0, 0);
+	//extra
 	SetS3DVertex(vFieldExtra[1], 7.7f, -2.7f, 6.9f, -3.9f, 0, 1, 0, 0, 0, 0);
-	SetS3DVertex(vFieldRemove[1], 0.0f, -0.1f, -0.8f, -1.3f, 0, 1, 0, 0, 0, 0);
+	//remove
+	SetS3DVertex(vFieldRemove[1][0], 0.0f, -0.1f, -0.8f, -1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldRemove[1][1], 1.0f, -0.1f, 0.2f, -1.3f, 0, 1, 0, 0, 0, 0);
 	for(int i = 0; i < 5; ++i)
 		SetS3DVertex(vFieldMzone[1][i], 6.7f - i * 1.1f, -0.8f, 5.6f - i * 1.1f, -2.0f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldMzone[1][5], 5.6f, 0.6f, 4.5f, -0.6f, 0, 1, 0, 0, 0, 0);
 	SetS3DVertex(vFieldMzone[1][6], 3.4f, 0.6f, 2.3f, -0.6f, 0, 1, 0, 0, 0, 0);
-	for(int i = 0; i < 5; ++i)
-		SetS3DVertex(vFieldSzone[1][i], 6.7f - i * 1.1f, -2.0f, 5.6f - i * 1.1f, -3.2f, 0, 1, 0, 0, 0, 0);
+	for (int i = 0; i < 5; ++i) {
+		SetS3DVertex(vFieldSzone[1][i][0], 6.7f - i * 1.1f, -2.0f, 5.6f - i * 1.1f, -3.2f, 0, 1, 0, 0, 0, 0);
+		SetS3DVertex(vFieldSzone[1][i][1], 6.7f - i * 1.1f, -2.0f, 5.6f - i * 1.1f, -3.2f, 0, 1, 0, 0, 0, 0);
+	}
 	//field
-	SetS3DVertex(vFieldSzone[1][5], 7.7f, -0.1f, 6.9f, -1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[1][5][0], 7.7f, -0.1f, 6.9f, -1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[1][5][1], 7.7f, -1.4f, 6.9f, -2.6f, 0, 1, 0, 0, 0, 0);
 	//LScale
-	SetS3DVertex(vFieldSzone[1][6], 7.7f, -1.4f, 6.9f, -2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[1][6][0], 7.7f, -1.4f, 6.9f, -2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[1][6][1], 7.7f, -0.1f, 6.9f, -1.3f, 0, 1, 0, 0, 0, 0);
 	//RScale
-	SetS3DVertex(vFieldSzone[1][7], 1.0f, -1.4f, 0.2f, -2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[1][7][0], 1.0f, -1.4f, 0.2f, -2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vFieldSzone[1][7][1], 0.0f, -0.1f, -0.8f, -1.3f, 0, 1, 0, 0, 0, 0);
 
 	//conti_act
 	vFieldContiAct[0] = vector3df(-0.8f, 0.1f, 0.0f);
