@@ -3,4 +3,4 @@
 	url = https://github.com/edo9300/ygopro-core.git
 [submodule "script"]
 	path = script
-	url = git@github.com:Fluorohydride/ygopro-scripts.git
+	url = https://github.com/edo9300/ygopro-scripts.git
