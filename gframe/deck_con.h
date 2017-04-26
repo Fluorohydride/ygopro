@@ -12,10 +12,13 @@ class DeckBuilder: public irr::IEventReceiver {
 public:
 	virtual bool OnEvent(const irr::SEvent& event);
 	void FilterCards();
+	void StartFilter();
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
 
+	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
+	
 	long long filter_effect;
 	unsigned int filter_type;
 	unsigned int filter_type2;
