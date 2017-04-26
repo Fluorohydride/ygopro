@@ -987,10 +987,12 @@ void DeckBuilder::SortList() {
 	}
 }
 static inline wchar_t NormalizeChar(wchar_t c) {
+	/*
 	// Convert all symbols and punctuations to space.
 	if (c != 0 && c < 128 && !isalnum(c)) {
 		return ' ';
 	}
+	*/
 	// Convert latin chararacters to uppercase to ignore case.
 	if (c < 128 && isalpha(c)) {
 		return toupper(c);
