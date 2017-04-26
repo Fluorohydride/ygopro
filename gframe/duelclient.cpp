@@ -119,29 +119,31 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.destiny_draw = mainGame->chkDrawDestiny->isChecked();
-			cscg.info.sealed = mainGame->chkRules[0]->isChecked();
-			cscg.info.booster = mainGame->chkRules[1]->isChecked();
-			cscg.info.action = mainGame->chkRules[2]->isChecked();
-			cscg.info.speed = mainGame->chkRules[3]->isChecked();
-			cscg.info.concentration = mainGame->chkRules[4]->isChecked();
-			cscg.info.boss = mainGame->chkRules[5]->isChecked();
-			cscg.info.city = mainGame->chkRules[6]->isChecked();
-			cscg.info.kingdom = mainGame->chkRules[7]->isChecked();
-			cscg.info.rose = mainGame->chkRules[8]->isChecked();
-			cscg.info.turbo1 = mainGame->chkRules[9]->isChecked();
-			cscg.info.turbo2 = mainGame->chkRules[10]->isChecked();
-			cscg.info.doubled = mainGame->chkRules[11]->isChecked();
-			cscg.info.command = mainGame->chkRules[12]->isChecked();
-			cscg.info.master = mainGame->chkRules[13]->isChecked();
-			cscg.info.rule_count = 0;
-			for (int i = 0; i < 14; ++i) {
-				if (mainGame->chkRules[i]->isChecked() && i!=11)
-					++cscg.info.rule_count;
-			}
 			cscg.info.duel_rule = mainGame->cbDuelRule->getSelected();
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
+			cscg.info.destiny_draw = mainGame->chkDrawDestiny->isChecked() ? 2 : 0;
+			cscg.info.sealed = mainGame->chkRules[0]->isChecked() ? 2 : 0;
+			cscg.info.booster = mainGame->chkRules[1]->isChecked() ? 2 : 0;
+			cscg.info.action = mainGame->chkRules[2]->isChecked() ? 2 : 0;
+			cscg.info.speed = mainGame->chkRules[3]->isChecked() ? 2 : 0;
+			cscg.info.concentration = mainGame->chkRules[4]->isChecked() ? 2 : 0;
+			cscg.info.boss = mainGame->chkRules[5]->isChecked() ? 2 : 0;
+			cscg.info.city = mainGame->chkRules[6]->isChecked() ? 2 : 0;
+			cscg.info.kingdom = mainGame->chkRules[7]->isChecked() ? 2 : 0;
+			cscg.info.rose = mainGame->chkRules[8]->isChecked() ? 2 : 0;
+			cscg.info.turbo1 = mainGame->chkRules[9]->isChecked() ? 2 : 0;
+			cscg.info.turbo2 = mainGame->chkRules[10]->isChecked() ? 2 : 0;
+			cscg.info.doubled = mainGame->chkRules[11]->isChecked() ? 2 : 0;
+			cscg.info.command = mainGame->chkRules[12]->isChecked() ? 2 : 0;
+			cscg.info.master = mainGame->chkRules[13]->isChecked() ? 2 : 0;
+			cscg.info.rule_count = 0;
+			for (int i = 0; i < 14; ++i) {
+				if (mainGame->chkRules[i]->isChecked() && i != 11) {
+					cscg.info.rule_count = 2;
+					break;
+				}
+			}
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
 			CTOS_JoinGame csjg;
@@ -356,7 +358,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + pkt->info.duel_rule));
 			str.append(msgbuf);
 		}
-		if(pkt->info.destiny_draw) {
+		if(pkt->info.destiny_draw==2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1626));
 			str.append(msgbuf);
 		}
@@ -368,59 +370,59 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1230));
 			str.append(msgbuf);
 		}
-		if(pkt->info.sealed) {
+		if(pkt->info.sealed == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1132));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.booster) {
+		if(pkt->info.booster == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1133));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.action) {
+		if(pkt->info.action == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1134));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.speed) {
+		if(pkt->info.speed == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1135));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.concentration) {
+		if(pkt->info.concentration == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1136));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.boss) {
+		if(pkt->info.boss == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1137));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.city) {
+		if(pkt->info.city == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1138));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.kingdom) {
+		if(pkt->info.kingdom == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1139));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.rose) {
+		if(pkt->info.rose == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1140));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.turbo1) {
+		if(pkt->info.turbo1 == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1141));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.turbo2) {
+		if(pkt->info.turbo2 == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1142));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.doubled) {
+		if(pkt->info.doubled == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1143));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.command) {
+		if(pkt->info.command == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1144));
 			str2.append(msgbuf);
 		}
-		if(pkt->info.master) {
+		if(pkt->info.master == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1145));
 			str2.append(msgbuf);
 		}
@@ -459,7 +461,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		mainGame->RefreshDeck(mainGame->cbDeckSelect2);
 		mainGame->cbDeckSelect->setEnabled(true);
-		if (pkt->info.doubled) {
+		if (pkt->info.doubled == 2) {
 			mainGame->cbDeckSelect2->setVisible(true);
 			mainGame->cbDeckSelect2->setEnabled(true);
 		}else{
@@ -471,7 +473,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
-		if(pkt->info.rule_count > 0)
+		if(pkt->info.rule_count == 2)
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
