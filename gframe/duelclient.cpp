@@ -1480,10 +1480,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				myswprintf(textBuffer, dataManager.GetSysString(569), dataManager.GetName(select_hint));
 			} else
 				myswprintf(textBuffer, dataManager.GetSysString(560));
-			select_hint = 0;
-			mainGame->stHintMsg->setText(textBuffer);
-		} else
-			mainGame->stHintMsg->setText(dataManager.GetSysString(570));
+		} else {
+			if (select_hint) {
+				myswprintf(textBuffer, dataManager.GetDesc(select_hint));
+			} else
+				myswprintf(textBuffer, dataManager.GetSysString(570));
+		}
+		select_hint = 0;
+		mainGame->stHintMsg->setText(textBuffer);
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
 			unsigned int filter;
