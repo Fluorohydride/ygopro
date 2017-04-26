@@ -632,6 +632,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_RELOAD_FIELD: {
 			mainGame->gMutex.Lock();
 			mainGame->dField.Clear();
+			mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
 			int val = 0;
 			for(int p = 0; p < 2; ++p) {
 				mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);

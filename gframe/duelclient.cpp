@@ -381,6 +381,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->ShowElement(mainGame->wHostPrepare);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
+		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
 		connect_state |= 0x4;
 		break;
 	}
@@ -3175,6 +3176,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_RELOAD_FIELD: {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
+		mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
 		int val = 0;
 		for(int i = 0; i < 2; ++i) {
 			int p = mainGame->LocalPlayer(i);

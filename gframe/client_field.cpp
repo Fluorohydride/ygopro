@@ -715,6 +715,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	t->X = 0;
 	t->Y = 0;
 	t->Z = 0;
+	int rule = (mainGame->dInfo.duel_rule >= 3) ? 1 : 0;
 	switch((location & 0x7f)) {
 	case LOCATION_DECK: {
 		t->X = (matManager.vFieldDeck[controler][0].Pos.X + matManager.vFieldDeck[controler][1].Pos.X) / 2;
@@ -741,20 +742,20 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 		break;
 	}
 	case LOCATION_SZONE: {
-		t->X = (matManager.vFieldSzone[controler][sequence][0].Pos.X + matManager.vFieldSzone[controler][sequence][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldSzone[controler][sequence][0].Pos.Y + matManager.vFieldSzone[controler][sequence][2].Pos.Y) / 2;
+		t->X = (matManager.vFieldSzone[controler][sequence][rule][0].Pos.X + matManager.vFieldSzone[controler][sequence][rule][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldSzone[controler][sequence][rule][0].Pos.Y + matManager.vFieldSzone[controler][sequence][rule][2].Pos.Y) / 2;
 		t->Z = 0.03f;
 		break;
 	}
 	case LOCATION_GRAVE: {
-		t->X = (matManager.vFieldGrave[controler][0].Pos.X + matManager.vFieldGrave[controler][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldGrave[controler][0].Pos.Y + matManager.vFieldGrave[controler][2].Pos.Y) / 2;
+		t->X = (matManager.vFieldGrave[controler][rule][0].Pos.X + matManager.vFieldGrave[controler][rule][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldGrave[controler][rule][0].Pos.Y + matManager.vFieldGrave[controler][rule][2].Pos.Y) / 2;
 		t->Z = grave[controler].size() * 0.01f + 0.03f;
 		break;
 	}
 	case LOCATION_REMOVED: {
-		t->X = (matManager.vFieldRemove[controler][0].Pos.X + matManager.vFieldRemove[controler][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldRemove[controler][0].Pos.Y + matManager.vFieldRemove[controler][2].Pos.Y) / 2;
+		t->X = (matManager.vFieldRemove[controler][rule][0].Pos.X + matManager.vFieldRemove[controler][rule][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldRemove[controler][rule][0].Pos.Y + matManager.vFieldRemove[controler][rule][2].Pos.Y) / 2;
 		t->Z = remove[controler].size() * 0.01f + 0.03f;
 		break;
 	}
@@ -770,6 +771,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	int controler = pcard->controler;
 	int sequence = pcard->sequence;
 	int location = pcard->location;
+	int rule = (mainGame->dInfo.duel_rule >= 3) ? 1 : 0;
 	switch (location) {
 	case LOCATION_DECK: {
 		t->X = (matManager.vFieldDeck[controler][0].Pos.X + matManager.vFieldDeck[controler][1].Pos.X) / 2;
@@ -882,8 +884,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_SZONE: {
-		t->X = (matManager.vFieldSzone[controler][sequence][0].Pos.X + matManager.vFieldSzone[controler][sequence][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldSzone[controler][sequence][0].Pos.Y + matManager.vFieldSzone[controler][sequence][2].Pos.Y) / 2;
+		t->X = (matManager.vFieldSzone[controler][sequence][rule][0].Pos.X + matManager.vFieldSzone[controler][sequence][rule][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldSzone[controler][sequence][rule][0].Pos.Y + matManager.vFieldSzone[controler][sequence][rule][2].Pos.Y) / 2;
 		t->Z = 0.01f;
 		if (controler == 0) {
 			r->X = 0.0f;
@@ -901,8 +903,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_GRAVE: {
-		t->X = (matManager.vFieldGrave[controler][0].Pos.X + matManager.vFieldGrave[controler][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldGrave[controler][0].Pos.Y + matManager.vFieldGrave[controler][2].Pos.Y) / 2;
+		t->X = (matManager.vFieldGrave[controler][rule][0].Pos.X + matManager.vFieldGrave[controler][rule][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldGrave[controler][rule][0].Pos.Y + matManager.vFieldGrave[controler][rule][2].Pos.Y) / 2;
 		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
 			r->X = 0.0f;
@@ -916,8 +918,8 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		break;
 	}
 	case LOCATION_REMOVED: {
-		t->X = (matManager.vFieldRemove[controler][0].Pos.X + matManager.vFieldRemove[controler][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldRemove[controler][0].Pos.Y + matManager.vFieldRemove[controler][2].Pos.Y) / 2;
+		t->X = (matManager.vFieldRemove[controler][rule][0].Pos.X + matManager.vFieldRemove[controler][rule][1].Pos.X) / 2;
+		t->Y = (matManager.vFieldRemove[controler][rule][0].Pos.Y + matManager.vFieldRemove[controler][rule][2].Pos.Y) / 2;
 		t->Z = 0.01f + 0.01f * sequence;
 		if (controler == 0) {
 			if(pcard->position & POS_FACEUP) {
