@@ -36,6 +36,7 @@ struct Config {
 	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
+	int auto_search_limit;
 };
 
 struct DuelInfo {

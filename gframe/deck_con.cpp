@@ -281,9 +281,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_EDITBOX_CHANGED: {
-			switch (id) {
+			switch(id) {
 			case EDITBOX_KEYWORD: {
-				StartFilter();
+				if(mainGame->gameConf.auto_search_limit >= 0 && (wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
+					StartFilter();
 				break;
 			}
 			}
