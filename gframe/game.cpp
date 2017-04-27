@@ -1151,7 +1151,7 @@ void Game::PlayMusic(char* song, bool loop) {
 	}
 }
 void Game::PlayBGM() {
-	if(chkEnableMusic->isChecked()) {
+	if(chkEnableMusic->isChecked() && BGMList.size() > 0) {
 		static bool is_playing = false;
 		static char strBuffer[1024];
 		if(is_playing && !engineMusic->isCurrentlyPlaying(strBuffer))
