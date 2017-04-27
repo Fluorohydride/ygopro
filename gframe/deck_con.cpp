@@ -1019,6 +1019,8 @@ void DeckBuilder::ClearSearch() {
 	mainGame->ebScale->setEnabled(false);
 	mainGame->ebCardName->setText(L"");
 	ClearFilter();
+	results.clear();
+	myswprintf(result_string, L"%d", 0);
 }
 void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);
