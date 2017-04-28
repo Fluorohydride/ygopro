@@ -1014,7 +1014,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.remove_act = true;
 			else if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
-			else if (pcard->location == LOCATION_SZONE && (pcard->sequence == 0 || pcard->sequence == 6) && pcard->lscale)
+			else if (pcard->location == LOCATION_SZONE && (pcard->sequence == 0 || pcard->sequence == 6) && (pcard->type & TYPE_PENDULUM))
 				mainGame->dField.pzone_act[pcard->controler] = true;
 		}
 		mainGame->dField.reposable_cards.clear();
