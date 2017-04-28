@@ -1289,6 +1289,22 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 				NetServer::ReSendToPlayer(*oit);
 			break;
 		}
+		case MSG_ROCK_PAPER_SCISSORS: {
+			player = BufferIO::ReadInt8(pbuf);
+			WaitforResponse(player);
+			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			return 1;
+		}
+		case MSG_HAND_RES: {
+			pbuf += 1;
+			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
+			for (auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			break;
+		}
 		case MSG_ANNOUNCE_RACE: {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;

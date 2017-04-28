@@ -574,6 +574,19 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
+		case MSG_ROCK_PAPER_SCISSORS: {
+			player = BufferIO::ReadInt8(pbuf);
+			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
+				mainGame->singleSignal.Reset();
+				mainGame->singleSignal.Wait();
+			}
+			break;
+		}
+		case MSG_HAND_RES: {
+			pbuf += 1;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
 		case MSG_ANNOUNCE_RACE: {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;
