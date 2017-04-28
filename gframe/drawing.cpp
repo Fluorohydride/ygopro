@@ -492,6 +492,26 @@ void Game::DrawMisc() {
 		adFont->draw(pcard->rscstring, recti(463, 245, 495, 265), 0xff000000, true, false, 0);
 		adFont->draw(pcard->rscstring, recti(464, 246, 496, 266), 0xffffffff, true, false, 0);
 	}
+	pcard = dField.szone[0][0];
+	if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+		adFont->draw(pcard->lscstring, recti(506, 430, 518, 450), 0xff000000, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(507, 431, 519, 451), 0xffffffff, true, false, 0);
+	}
+	pcard = dField.szone[0][4];
+	if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+		adFont->draw(pcard->rscstring, recti(808, 430, 820, 450), 0xff000000, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(809, 431, 821, 451), 0xffffffff, true, false, 0);
+	}
+	pcard = dField.szone[1][0];
+	if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+		adFont->draw(pcard->lscstring, recti(773, 222, 785, 242), 0xff000000, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(774, 223, 786, 243), 0xffffffff, true, false, 0);
+	}
+	pcard = dField.szone[1][4];
+	if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+		adFont->draw(pcard->rscstring, recti(550, 222, 562, 242), 0xff000000, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(551, 223, 563, 243), 0xffffffff, true, false, 0);
+	}
 	if(dField.extra[0].size()) {
 		int offset = (dField.extra[0].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
 		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(320 + offset, 562, 371, 552), 0xff000000, true, false, 0);
