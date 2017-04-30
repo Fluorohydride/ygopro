@@ -36,6 +36,7 @@ struct Config {
 	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
+	int auto_search_limit;
 };
 
 struct DuelInfo {
@@ -91,6 +92,7 @@ public:
 	void RefreshSingleplay();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
+	void DrawLinkedZones(ClientCard* pcard);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
@@ -389,6 +391,10 @@ public:
 	irr::gui::IGUIWindow* wCategories;
 	irr::gui::IGUICheckBox* chkCategory[32];
 	irr::gui::IGUIButton* btnCategoryOK;
+	irr::gui::IGUIButton* btnMarksFilter;
+	irr::gui::IGUIWindow* wLinkMarks;
+	irr::gui::IGUIButton* btnMark[8];
+	irr::gui::IGUIButton* btnMarksOK;
 	//sort type
 	irr::gui::IGUIStaticText* wSort;
 	irr::gui::IGUIComboBox* cbSortType;
@@ -557,6 +563,9 @@ extern unsigned char draw_count;
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define COMBOBOX_SORTTYPE			370
+
+#define BUTTON_MARKS_FILTER			380
+#define BUTTON_MARKERS_OK			381
 
 #define DEFAULT_DUEL_RULE			3
 #endif // GAME_H

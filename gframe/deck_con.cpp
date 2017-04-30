@@ -66,6 +66,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO)
 			break;
+		if(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK)
+			break;
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -157,18 +159,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_START_FILTER: {
-				filter_type = mainGame->cbCardType->getSelected();
-				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-				filter_lm = mainGame->cbLimit->getSelected();
-				if(filter_type == 1) {
-					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
-					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
-					filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
-					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
-					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
-				}
-				FilterCards();
+				StartFilter();
 				if(!mainGame->gameConf.separate_clear_button)
 					ClearFilter();
 				break;
@@ -242,6 +233,31 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				is_clearing = false;
 				break;
 			}
+			case BUTTON_MARKS_FILTER: {
+				mainGame->PopupElement(mainGame->wLinkMarks);
+				break;
+			}
+			case BUTTON_MARKERS_OK: {
+				filter_marks = 0;
+				if (mainGame->btnMark[0]->isPressed())
+					filter_marks |= 0100;
+				if (mainGame->btnMark[1]->isPressed())
+					filter_marks |= 0200;
+				if (mainGame->btnMark[2]->isPressed())
+					filter_marks |= 0400;
+				if (mainGame->btnMark[3]->isPressed())
+					filter_marks |= 0010;
+				if (mainGame->btnMark[4]->isPressed())
+					filter_marks |= 0040;
+				if (mainGame->btnMark[5]->isPressed())
+					filter_marks |= 0001;
+				if (mainGame->btnMark[6]->isPressed())
+					filter_marks |= 0002;
+				if (mainGame->btnMark[7]->isPressed())
+					filter_marks |= 0004;
+				mainGame->HideElement(mainGame->wLinkMarks);
+				break;
+			}
 			}
 			break;
 		}
@@ -258,12 +274,17 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_KEYWORD: {
-				irr::SEvent me;
-				me.EventType = irr::EET_GUI_EVENT;
-				me.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
-				me.GUIEvent.Caller = mainGame->btnStartFilter;
-				me.GUIEvent.Element = mainGame->btnStartFilter;
-				mainGame->device->postEventFromUser(me);
+				StartFilter();
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_CHANGED: {
+			switch(id) {
+			case EDITBOX_KEYWORD: {
+				if(mainGame->gameConf.auto_search_limit >= 0 && (wcslen(mainGame->ebCardName->getText()) >= mainGame->gameConf.auto_search_limit))
+					StartFilter();
 				break;
 			}
 			}
@@ -783,6 +804,20 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	}
 	return false;
 }
+void DeckBuilder::StartFilter() {
+	filter_type = mainGame->cbCardType->getSelected();
+	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
+	filter_lm = mainGame->cbLimit->getSelected();
+	if(filter_type == 1) {
+		filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
+		filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
+		filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
+		filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
+		filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
+		filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
+	}
+	FilterCards();
+}
 void DeckBuilder::FilterCards() {
 	results.clear();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
@@ -860,6 +895,8 @@ void DeckBuilder::FilterCards() {
 		}
 		if(filter_effect && !(data.category & filter_effect))
 			continue;
+		if(filter_marks && (data.link_marker & filter_marks)!= filter_marks)
+			continue;
 		if(filter_lm) {
 			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1))
 				continue;
@@ -874,12 +911,12 @@ void DeckBuilder::FilterCards() {
 		}
 		if(pstr) {
 			if(pstr[0] == L'$') {
-				if(wcsstr(text.name, &pstr[1]) == 0)
+				if(!CardNameContains(text.name, &pstr[1]))
 					continue;
 			} else if(pstr[0] == L'@' && set_code) {
 				if(!check_set_code(data, set_code)) continue;
 			} else {
-				if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0
+				if(!CardNameContains(text.name, pstr) && wcsstr(text.text, pstr) == 0
 					&& (!set_code || !check_set_code(data, set_code)))
 					continue;
 			}
@@ -909,6 +946,8 @@ void DeckBuilder::ClearSearch() {
 	mainGame->ebScale->setEnabled(false);
 	mainGame->ebCardName->setText(L"");
 	ClearFilter();
+	results.clear();
+	myswprintf(result_string, L"%d", 0);
 }
 void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);
@@ -921,6 +960,9 @@ void DeckBuilder::ClearFilter() {
 	filter_effect = 0;
 	for(int i = 0; i < 32; ++i)
 		mainGame->chkCategory[i]->setChecked(false);
+	filter_marks = 0;
+	for(int i = 0; i < 8; i++)
+		mainGame->btnMark[i]->setPressed(false);
 }
 void DeckBuilder::SortList() {
 	auto left = results.begin();
@@ -946,5 +988,46 @@ void DeckBuilder::SortList() {
 		break;
 	}
 }
-
+static inline wchar_t NormalizeChar(wchar_t c) {
+	/*
+	// Convert all symbols and punctuations to space.
+	if (c != 0 && c < 128 && !isalnum(c)) {
+		return ' ';
+	}
+	*/
+	// Convert latin chararacters to uppercase to ignore case.
+	if (c < 128 && isalpha(c)) {
+		return toupper(c);
+	}
+	// Remove some accentued characters that are not supported by the editbox.
+	if (c >= 232 && c <= 235) {
+		return 'E';
+	}
+	if (c >= 238 && c <= 239) {
+		return 'I';
+	}
+	return c;
+}
+bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needle)
+{
+	if (!needle[0]) {
+		return true;
+	}
+	int i = 0;
+	int j = 0;
+	while (haystack[i]) {
+		wchar_t ca = NormalizeChar(haystack[i]);
+		wchar_t cb = NormalizeChar(needle[j]);
+		if (ca == cb) {
+			j++;
+			if (!needle[j]) {
+				return true;
+			}
+		} else {
+			j = 0;
+		}
+		i++;
+	}
+	return false;
+}
 }

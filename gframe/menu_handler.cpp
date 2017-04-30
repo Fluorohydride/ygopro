@@ -271,6 +271,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ebStar->setEnabled(false);
 				mainGame->ebScale->setEnabled(false);
 				mainGame->deckBuilder.filter_effect = 0;
+				mainGame->deckBuilder.filter_marks = 0;
 				mainGame->deckBuilder.result_string[0] = L'0';
 				mainGame->deckBuilder.result_string[1] = 0;
 				mainGame->deckBuilder.results.clear();
@@ -280,6 +281,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 				for(int i = 0; i < 32; ++i)
 					mainGame->chkCategory[i]->setChecked(false);
+				for(int i = 0; i < 8; i++)
+					mainGame->btnMark[i]->setPressed(false);
 				break;
 			}
 			}
