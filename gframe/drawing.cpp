@@ -169,7 +169,7 @@ void Game::DrawBackGround() {
 		else if (dField.hovered_location == LOCATION_MZONE) {
 			vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
 			ClientCard* pcard = mainGame->dField.mzone[dField.hovered_controler][dField.hovered_sequence];
-			if(pcard && pcard->type & TYPE_LINK) {
+			if(dInfo.duel_rule >= 3 && pcard && pcard->type & TYPE_LINK) {
 				DrawLinkedZones(pcard);
 			}
 		}
