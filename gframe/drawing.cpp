@@ -205,10 +205,12 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
 		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence<4)
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
-		if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0))
-			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
-		if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2))
-			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
+		if (dInfo.duel_rule >= 3) {
+			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0))
+				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
+			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2))
+				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
+		}
 	}
 	else {
 		int swap = (dField.hovered_sequence == 5) ? 0 : 2;
@@ -476,25 +478,48 @@ void Game::DrawMisc() {
 	pcard = dField.mzone[1][6];
 	if(pcard && (pcard->position & POS_FACEUP))
 		DrawStatus(pcard, 593, 291, 555, 338);
-	pcard = dField.szone[0][6];
-	if(pcard) {
-		adFont->draw(pcard->lscstring, mainGame->Resize(426, 394, 438, 414), 0xff000000, true, false, 0);
-		adFont->draw(pcard->lscstring, mainGame->Resize(427, 395, 439, 415), 0xffffffff, true, false, 0);
-	}
-	pcard = dField.szone[0][7];
-	if(pcard) {
-		adFont->draw(pcard->rscstring, mainGame->Resize(880, 394, 912, 414), 0xff000000, true, false, 0);
-		adFont->draw(pcard->rscstring, mainGame->Resize(881, 395, 913, 415), 0xffffffff, true, false, 0);
-	}
-	pcard = dField.szone[1][6];
-	if(pcard) {
-		adFont->draw(pcard->lscstring, mainGame->Resize(839, 245, 871, 265), 0xff000000, true, false, 0);
-		adFont->draw(pcard->lscstring, mainGame->Resize(840, 246, 872, 266), 0xffffffff, true, false, 0);
-	}
-	pcard = dField.szone[1][7];
-	if(pcard) {
-		adFont->draw(pcard->rscstring, mainGame->Resize(463, 245, 495, 265), 0xff000000, true, false, 0);
-		adFont->draw(pcard->rscstring, mainGame->Resize(464, 246, 496, 266), 0xffffffff, true, false, 0);
+	if(dInfo.duel_rule < 3) {
+		pcard = dField.szone[0][6];
+		if(pcard) {
+			adFont->draw(pcard->lscstring, recti(426, 394, 438, 414), 0xff000000, true, false, 0);
+			adFont->draw(pcard->lscstring, recti(427, 395, 439, 415), 0xffffffff, true, false, 0);
+		}
+		pcard = dField.szone[0][7];
+		if(pcard) {
+			adFont->draw(pcard->rscstring, recti(880, 394, 912, 414), 0xff000000, true, false, 0);
+			adFont->draw(pcard->rscstring, recti(881, 395, 913, 415), 0xffffffff, true, false, 0);
+		}
+		pcard = dField.szone[1][6];
+		if(pcard) {
+			adFont->draw(pcard->lscstring, recti(839, 245, 871, 265), 0xff000000, true, false, 0);
+			adFont->draw(pcard->lscstring, recti(840, 246, 872, 266), 0xffffffff, true, false, 0);
+		}
+		pcard = dField.szone[1][7];
+		if(pcard) {
+			adFont->draw(pcard->rscstring, recti(463, 245, 495, 265), 0xff000000, true, false, 0);
+			adFont->draw(pcard->rscstring, recti(464, 246, 496, 266), 0xffffffff, true, false, 0);
+		}
+	} else {
+		pcard = dField.szone[0][0];
+		if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+			adFont->draw(pcard->lscstring, recti(454, 430, 466, 450), 0xff000000, true, false, 0);
+			adFont->draw(pcard->lscstring, recti(455, 431, 467, 451), 0xffffffff, true, false, 0);
+		}
+		pcard = dField.szone[0][4];
+		if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+			adFont->draw(pcard->rscstring, recti(850, 430, 882, 450), 0xff000000, true, false, 0);
+			adFont->draw(pcard->rscstring, recti(851, 431, 883, 451), 0xffffffff, true, false, 0);
+		}
+		pcard = dField.szone[1][0];
+		if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+			adFont->draw(pcard->lscstring, recti(806, 222, 838, 242), 0xff000000, true, false, 0);
+			adFont->draw(pcard->lscstring, recti(807, 223, 839, 243), 0xffffffff, true, false, 0);
+		}
+		pcard = dField.szone[1][4];
+		if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
+			adFont->draw(pcard->rscstring, recti(498, 222, 530, 242), 0xff000000, true, false, 0);
+			adFont->draw(pcard->rscstring, recti(499, 223, 531, 243), 0xffffffff, true, false, 0);
+		}
 	}
 	if(dField.extra[0].size()) {
 		int offset = (dField.extra[0].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
