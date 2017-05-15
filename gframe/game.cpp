@@ -76,6 +76,12 @@ bool Game::Initialize() {
 		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
 	else
 		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
+	if(hWnd) {
+		LONG style = GetWindowLong(hWnd, GWL_STYLE);
+		style |= WS_MINIMIZEBOX;
+		SetWindowLong(hWnd, GWL_STYLE, style);
+		SendMessage(hWnd, WM_NCPAINT, 1, 0);
+	}
 #endif
 	SetWindowsIcon();
 	//main menu
