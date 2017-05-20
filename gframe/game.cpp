@@ -278,19 +278,21 @@ bool Game::Initialize() {
 	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272));
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
-	chkAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274));
-	chkAutoPos->setChecked(gameConf.chkAutoPos != 0);
-	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 50, 300, 75), tabSystem, -1, dataManager.GetSysString(1275));
+	chkMAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274));
+	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
+	chkSTAutoPos = env->addCheckBox(false, rect<s32>(20, 50, 280, 75), tabSystem, -1, dataManager.GetSysString(1278));
+	chkSTAutoPos->setChecked(gameConf.chkSTAutoPos != 0);
+	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 80, 300, 105), tabSystem, -1, dataManager.GetSysString(1275));
 	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
-	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
+	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1276));
 	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
-	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
+	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 140, 280, 165), tabSystem, -1, dataManager.GetSysString(1277));
 	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
 	chkHideHintButton = env->addCheckBox(false, rect<s32>(20, 140, 280, 165), tabSystem, -1, dataManager.GetSysString(1355));
 	chkHideHintButton->setChecked(gameConf.chkHideHintButton != 0);
-	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
+	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1290));
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
-	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
+	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 230, 280, 255), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
 	chkEnableSound = env->addCheckBox(gameConf.enablesound, rect<s32>(20, 230, 280, 255), tabSystem, -1, dataManager.GetSysString(2046));
 	chkEnableSound->setChecked(gameConf.enablesound);
@@ -1000,7 +1002,8 @@ void Game::LoadConfig() {
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
 	//settings
-	gameConf.chkAutoPos = 1;
+	gameConf.chkMAutoPos = 0;
+	gameConf.chkSTAutoPos = 1;
 	gameConf.chkRandomPos = 0;
 	gameConf.chkAutoChain = 0;
 	gameConf.chkWaitChain = 0;
@@ -1047,8 +1050,10 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "roompass")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
-		} else if(!strcmp(strbuf, "autopos")) {
-			gameConf.chkAutoPos = atoi(valbuf);
+		} else if(!strcmp(strbuf, "automonsterpos")) {
+			gameConf.chkMAutoPos = atoi(valbuf);
+		} else if(!strcmp(strbuf, "autospellpos")) {
+			gameConf.chkSTAutoPos = atoi(valbuf);
 		} else if(!strcmp(strbuf, "randompos")) {
 			gameConf.chkRandomPos = atoi(valbuf);
 		} else if(!strcmp(strbuf, "autochain")) {
@@ -1116,14 +1121,15 @@ void Game::SaveConfig() {
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
 	//settings
-	fprintf(fp, "autopos = %d\n", ((chkAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "randompos = %d\n", ((chkRandomPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autochain = %d\n", ((chkAutoChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "waitchain = %d\n", ((chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_opponent = %d\n", ((chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_spectators = %d\n", ((chkIgnore2->isChecked()) ? 1 : 0));
-	fprintf(fp, "hide_setname = %d\n", (gameConf.chkHideSetname));
-	fprintf(fp, "hide_hint_button = %d\n", ((chkHideHintButton->isChecked()) ? 1 : 0));
+	fprintf(fp, "automonsterpos = %d\n", ((mainGame->chkMAutoPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "autospellpos = %d\n", ((mainGame->chkSTAutoPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
+	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_opponent = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
+	fprintf(fp, "mute_spectators = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
+	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
+	fprintf(fp, "hide_hint_button = %d\n", ((mainGame->chkHideHintButton->isChecked()) ? 1 : 0));
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
 	fprintf(fp, "skin_index = %d\n", gameConf.skin_index);

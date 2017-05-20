@@ -122,6 +122,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->wInfos->setVisible(false);
 					mainGame->wPhase->setVisible(false);
 					mainGame->btnLeaveGame->setVisible(false);
+					mainGame->btnSpectatorSwap->setVisible(false);
+					mainGame->wChat->setVisible(false);
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);

@@ -309,6 +309,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnSideOK->setVisible(true);
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
+		mainGame->btnSpectatorSwap->setVisible(false);
 		mainGame->btnChainIgnore->setVisible(false);
 		mainGame->btnChainAlways->setVisible(false);
 		mainGame->btnChainWhenAvail->setVisible(false);
@@ -1489,7 +1490,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		select_hint = 0;
 		mainGame->stHintMsg->setText(textBuffer);
 		mainGame->stHintMsg->setVisible(true);
-		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
+		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && (
+			(mainGame->chkMAutoPos->isChecked() && mainGame->dField.selectable_field & 0x7f007f) ||
+			(mainGame->chkSTAutoPos->isChecked() && !(mainGame->dField.selectable_field & 0x7f007f)))) {
 			unsigned int filter;
 			if (mainGame->dField.selectable_field & 0x7f) {
 				respbuf[0] = mainGame->LocalPlayer(0);
