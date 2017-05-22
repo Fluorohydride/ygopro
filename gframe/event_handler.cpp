@@ -82,9 +82,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_REPLAY_SWAP: {
-				if(!mainGame->dInfo.isReplay)
-					break;
-				ReplayMode::SwapField();
+				if(mainGame->dInfo.isReplay)
+					ReplayMode::SwapField();
+				else if (mainGame->dInfo.player_type == 7)
+					mainGame->dField.ReplaySwap();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {
@@ -121,6 +122,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->wInfos->setVisible(false);
 					mainGame->wPhase->setVisible(false);
 					mainGame->btnLeaveGame->setVisible(false);
+					mainGame->btnSpectatorSwap->setVisible(false);
+					mainGame->wChat->setVisible(false);
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
