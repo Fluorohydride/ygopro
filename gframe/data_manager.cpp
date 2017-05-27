@@ -133,6 +133,14 @@ bool DataManager::GetData(int code, CardData* pData) {
 		*pData = *((CardData*)&cdit->second);
 	return true;
 }
+bool DataManager::GetDataC(int code, CardDataC* pData) {
+	auto cdit = _datas.find(code);
+	if(cdit == _datas.end())
+		return false;
+	if(pData)
+		*pData = *(&cdit->second);
+	return true;
+}
 code_pointer DataManager::GetCodePointer(int code) {
 	return _datas.find(code);
 }

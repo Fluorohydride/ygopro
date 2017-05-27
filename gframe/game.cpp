@@ -1032,10 +1032,10 @@ void Game::SaveConfig() {
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
-	CardData cd;
+	CardDataC cd;
 	wchar_t formatBuffer[256];
-	if(!dataManager.GetData(code, &cd))
-		memset(&cd, 0, sizeof(CardData));
+	if(!dataManager.GetDataC(code, &cd))
+		memset(&cd, 0, sizeof(CardDataC));
 	imgCard->setImage(imageManager.GetTexture(code));
 	imgCard->setScaleImage(true);
 	if(cd.alias != 0 && (cd.alias - code < 10 || code - cd.alias < 10))
@@ -1061,6 +1061,12 @@ void Game::ShowCardInfo(int code) {
 	}
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
+		if ((cd.ot & 0x3) == 1)
+			wcscat(formatBuffer, L" [OCG]");
+		else if ((cd.ot & 0x3) == 2)
+			wcscat(formatBuffer, L" [TCG]");
+		else if ((cd.ot & 0x7) == 4)
+			wcscat(formatBuffer, L" [Custom]");
 		stInfo->setText(formatBuffer);
 		if(!(cd.type & TYPE_LINK)) {
 			wchar_t* form = L"\u2605";
@@ -1097,6 +1103,12 @@ void Game::ShowCardInfo(int code) {
 		scrCardText->setRelativePosition(rect<s32>(267, 83 + offset, 287, 324));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
+		if ((cd.ot & 0x3) == 1)
+			wcscat(formatBuffer, L" [OCG]");
+		else if ((cd.ot & 0x3) == 2)
+			wcscat(formatBuffer, L" [TCG]");
+		else if ((cd.ot & 0x7) == 4)
+			wcscat(formatBuffer, L" [Custom]");
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
 		stSetName->setRelativePosition(rect<s32>(15, 60, 296, 83));
