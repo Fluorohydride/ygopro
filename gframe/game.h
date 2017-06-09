@@ -553,5 +553,5 @@ extern Game* mainGame;
 #define BUTTON_MARKS_FILTER			380
 #define BUTTON_MARKERS_OK			381
 
-#define DEFAULT_DUEL_RULE			3
+#define DEFAULT_DUEL_RULE			4
 #endif // GAME_H

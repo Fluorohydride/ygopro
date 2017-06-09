@@ -67,7 +67,7 @@ void Game::DrawBackGround() {
 	int fieldcode1 = -1;
 	int fieldcode2 = -1;
 	bool drawField = false;
-	int rule = (dInfo.duel_rule >= 3) ? 1 : 0;
+	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
 	if(mainGame->gameConf.draw_field_spell
 		&& mainGame->dField.szone[0][5] && mainGame->dField.szone[0][5]->position & POS_FACEUP)
 		fieldcode1 = mainGame->dField.szone[0][5]->code;
@@ -160,9 +160,9 @@ void Game::DrawBackGround() {
 		}
 	}
 	//current sel
-	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT 
-		&& !(dInfo.duel_rule < 3 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
-		&& !(dInfo.duel_rule >= 3 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
+	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
+		&& !(dInfo.duel_rule < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
+		&& !(dInfo.duel_rule >= 4 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
 		S3DVertex *vertex = 0;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler];
@@ -172,8 +172,7 @@ void Game::DrawBackGround() {
 			if(pcard && pcard->type & TYPE_LINK) {
 				DrawLinkedZones(pcard);
 			}
-		}
-		else if (dField.hovered_location == LOCATION_SZONE)
+		} else if (dField.hovered_location == LOCATION_SZONE)
 			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence][rule];
 		else if (dField.hovered_location == LOCATION_GRAVE)
 			vertex = matManager.vFieldGrave[dField.hovered_controler][rule];
@@ -200,19 +199,18 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	int mark = pcard->link_marker;
 	matManager.mSelField.AmbientColor = 0xff0261a2;
 	driver->setMaterial(matManager.mSelField);
-	if (dField.hovered_sequence<5) {
-		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence>0)
+	if (dField.hovered_sequence < 5) {
+		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > 0)
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
-		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence<4)
+		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence < 4)
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
-		if (dInfo.duel_rule >= 3) {
+		if (dInfo.duel_rule >= 4) {
 			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0))
 				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
 			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2))
 				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
 		}
-	}
-	else {
+	} else {
 		int swap = (dField.hovered_sequence == 5) ? 0 : 2;
 		if (mark & LINK_MARKER_BOTTOM_LEFT)
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][0 + swap], 4, matManager.iRectangle, 2);
@@ -317,7 +315,7 @@ void Game::DrawCard(ClientCard* pcard) {
 }
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
-	int rule = (dInfo.duel_rule >= 3) ? 1 : 0;
+	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot.Z += 0.02f;
 	im.setRotationRadians(act_rot);
@@ -348,18 +346,14 @@ void Game::DrawMisc() {
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.pzone_act[0]) {
-		int seq = 0;
-		if(dField.szone[0][6] && dField.szone[0][6]->lscale)
-			seq = 6;
+		int seq = dInfo.duel_rule >= 4 ? 0 : 6;
 		im.setTranslation(vector3df((matManager.vFieldSzone[0][seq][rule][0].Pos.X + matManager.vFieldSzone[0][seq][rule][1].Pos.X) / 2,
 			(matManager.vFieldSzone[0][seq][rule][0].Pos.Y + matManager.vFieldSzone[0][seq][rule][2].Pos.Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.pzone_act[1]) {
-		int seq = 0;
-		if(dField.szone[1][6] && dField.szone[1][6]->lscale)
-			seq = 6;
+		int seq = dInfo.duel_rule >= 4 ? 0 : 6;
 		im.setTranslation(vector3df((matManager.vFieldSzone[1][seq][rule][0].Pos.X + matManager.vFieldSzone[1][seq][rule][1].Pos.X) / 2,
 			(matManager.vFieldSzone[1][seq][rule][0].Pos.Y + matManager.vFieldSzone[1][seq][rule][2].Pos.Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
@@ -474,7 +468,7 @@ void Game::DrawMisc() {
 	pcard = dField.mzone[1][6];
 	if(pcard && (pcard->position & POS_FACEUP))
 		DrawStatus(pcard, 593, 291, 555, 338);
-	if(dInfo.duel_rule < 3) {
+	if(dInfo.duel_rule < 4) {
 		pcard = dField.szone[0][6];
 		if(pcard) {
 			adFont->draw(pcard->lscstring, recti(426, 394, 438, 414), 0xff000000, true, false, 0);
