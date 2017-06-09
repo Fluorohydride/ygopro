@@ -119,7 +119,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.duel_rule = mainGame->cbDuelRule->getSelected();
+			cscg.info.duel_rule = mainGame->cbDuelRule->getSelected() + 1;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.destiny_draw = mainGame->chkDrawDestiny->isChecked() ? 2 : 0;
@@ -356,7 +356,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
 		str.append(msgbuf);
 		if(pkt->info.duel_rule != DEFAULT_DUEL_RULE) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + pkt->info.duel_rule));
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + pkt->info.duel_rule - 1));
 			str.append(msgbuf);
 		}
 		if(pkt->info.destiny_draw==2) {
@@ -1122,8 +1122,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.remove_act = true;
 			else if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
-			else if (pcard->location == LOCATION_SZONE && (pcard->sequence == 0 || pcard->sequence == 6) && (pcard->type & TYPE_PENDULUM))
-				mainGame->dField.pzone_act[pcard->controler] = true;
+			else {
+				int seq = mainGame->dInfo.duel_rule >= 4 ? 0 : 6;
+				if (pcard->location == LOCATION_SZONE && pcard->sequence == seq && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget)
+					mainGame->dField.pzone_act[pcard->controler] = true;
+			}
 		}
 		mainGame->dField.reposable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -3139,10 +3142,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		mainGame->stHintMsg->setVisible(false);
+		int res1 = (res & 0x3) - 1;
+		int res2 = ((res >> 2) & 0x3) - 1;
 		if(mainGame->dInfo.isFirst)
-			mainGame->showcardcode = ((res & 0x3) - 1) + ((((res >> 2) & 0x3) - 1) << 16);
+			mainGame->showcardcode = res1 + (res2 << 16);
 		else
-			mainGame->showcardcode = (((res >> 2) & 0x3) - 1) + (((res & 0x3) - 1) << 16);
+			mainGame->showcardcode = res2 + (res1 << 16);
 		mainGame->showcarddif = 50;
 		mainGame->showcardp = 0;
 		mainGame->showcard = 100;
