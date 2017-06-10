@@ -241,13 +241,13 @@ bool Game::Initialize() {
 	btnSP->setEnabled(false);
 	btnSP->setPressed(true);
 	btnSP->setVisible(false);
-	btnM1 = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, -1, L"\xff2d\xff11");
+	btnM1 = env->addButton(rect<s32>(130, 0, 180, 20), wPhase, -1, L"\xff2d\xff11");
 	btnM1->setEnabled(false);
 	btnM1->setPressed(true);
 	btnM1->setVisible(false);
 	btnBP = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
 	btnBP->setVisible(false);
-	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
+	btnM2 = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
 	btnM2->setVisible(false);
 	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
@@ -1471,17 +1471,10 @@ void Game::OnResize()
 
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
 	btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-	if (dInfo.duel_rule >= 4) {
-		btnSP->setRelativePosition(Resize(0, 0, 50, 20));
-		btnM1->setRelativePosition(Resize(160, 0, 210, 20));
-		btnBP->setRelativePosition(Resize(160, 0, 210, 20));
-		btnM2->setRelativePosition(Resize(160, 0, 210, 20));
-	} else {
-		btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-		btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-		btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-		btnM2->setRelativePosition(Resize(260, 0, 310, 20));
-	}
+	btnSP->setRelativePosition(Resize(0, 0, 50, 20));
+	btnM1->setRelativePosition(Resize(160, 0, 210, 20));
+	btnBP->setRelativePosition(Resize(160, 0, 210, 20));
+	btnM2->setRelativePosition(Resize(160, 0, 210, 20));
 	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
 	btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	btnSpectatorSwap->setRelativePosition(Resize(205, 100, 295, 135));
