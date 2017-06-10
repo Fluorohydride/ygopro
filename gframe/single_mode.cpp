@@ -651,6 +651,17 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			mainGame->gMutex.Lock();
 			mainGame->dField.Clear();
 			mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
+			if (mainGame->dInfo.duel_rule >= 3) {
+				mainGame->btnSP->setRelativePosition(rect<s32>(160, 0, 210, 20));
+				mainGame->btnM1->setRelativePosition(rect<s32>(160, 0, 210, 20));
+				mainGame->btnBP->setRelativePosition(rect<s32>(160, 0, 210, 20));
+				mainGame->btnM2->setRelativePosition(rect<s32>(160, 0, 210, 20));
+			} else {
+				mainGame->btnSP->setRelativePosition(rect<s32>(65, 0, 115, 20));
+				mainGame->btnM1->setRelativePosition(rect<s32>(130, 0, 180, 20));
+				mainGame->btnBP->setRelativePosition(rect<s32>(195, 0, 245, 20));
+				mainGame->btnM2->setRelativePosition(rect<s32>(260, 0, 310, 20));
+			}
 			int val = 0;
 			for(int p = 0; p < 2; ++p) {
 				mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);
