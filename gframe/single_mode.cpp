@@ -665,6 +665,18 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			mainGame->gMutex.Lock();
 			mainGame->dField.Clear();
 			mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
+			// reset master rule 4 phase button position
+			if (mainGame->dInfo.duel_rule >= 4) {
+				mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
+				mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+				mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+				mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+			} else {
+				mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+				mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
+				mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
+				mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+			}
 			int val = 0;
 			for(int p = 0; p < 2; ++p) {
 				mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);
