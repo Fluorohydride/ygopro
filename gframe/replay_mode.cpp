@@ -90,7 +90,7 @@ int ReplayMode::ReplayThread(void* param) {
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	mainGame->dInfo.turn = 0;
 	// reset master rule 4 phase button position
-	if (mainGame->dInfo.duel_rule >= 3) {
+	if (mainGame->dInfo.duel_rule >= 4) {
 		mainGame->btnSP->setRelativePosition(rect<s32>(160, 0, 210, 20));
 		mainGame->btnM1->setRelativePosition(rect<s32>(160, 0, 210, 20));
 		mainGame->btnBP->setRelativePosition(rect<s32>(160, 0, 210, 20));
