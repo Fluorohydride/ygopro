@@ -470,6 +470,18 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wChat->setVisible(true);
 		mainGame->imgCard->setImage(imageManager.tCover[0]);
 		mainGame->device->setEventReceiver(&mainGame->dField);
+		// reset master rule 4 phase button position
+		if (mainGame->dInfo.duel_rule >= 3) {
+			mainGame->btnSP->setRelativePosition(rect<s32>(160, 0, 210, 20));
+			mainGame->btnM1->setRelativePosition(rect<s32>(160, 0, 210, 20));
+			mainGame->btnBP->setRelativePosition(rect<s32>(160, 0, 210, 20));
+			mainGame->btnM2->setRelativePosition(rect<s32>(160, 0, 210, 20));
+		} else {
+			mainGame->btnSP->setRelativePosition(rect<s32>(65, 0, 115, 20));
+			mainGame->btnM1->setRelativePosition(rect<s32>(130, 0, 180, 20));
+			mainGame->btnBP->setRelativePosition(rect<s32>(195, 0, 245, 20));
+			mainGame->btnM2->setRelativePosition(rect<s32>(260, 0, 310, 20));
+		}
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {
 				mainGame->dInfo.player_type = 7;
