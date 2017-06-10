@@ -470,7 +470,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wChat->setVisible(true);
 		mainGame->imgCard->setImage(imageManager.tCover[0]);
 		mainGame->device->setEventReceiver(&mainGame->dField);
-		if (mainGame->dInfo.duel_rule >= 3) {
+		if (mainGame->dInfo.duel_rule >= 3) { 
 			mainGame->btnSP->setRelativePosition(rect<s32>(160, 0, 210, 20));
 			mainGame->btnM1->setRelativePosition(rect<s32>(160, 0, 210, 20));
 			mainGame->btnBP->setRelativePosition(rect<s32>(160, 0, 210, 20));
