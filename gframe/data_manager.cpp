@@ -290,7 +290,7 @@ const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
 	for(int i = 0; i < 4; ++i) {
 		const wchar_t* setname = GetSetName((setcode >> i * 16) & 0xffff);
 		if(setname) {
-			BufferIO::CopyWStrRef(setname, p, 16);
+			BufferIO::CopyWStrRef(setname, p, 32);
 			*p = L'|';
 			*++p = 0;
 		}
