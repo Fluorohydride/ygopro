@@ -652,7 +652,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			mainGame->dField.Clear();
 			mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
 			// reset master rule 4 phase button position
-			if (mainGame->dInfo.duel_rule >= 3) {
+			if (mainGame->dInfo.duel_rule >= 4) {
 				mainGame->btnSP->setRelativePosition(rect<s32>(160, 0, 210, 20));
 				mainGame->btnM1->setRelativePosition(rect<s32>(160, 0, 210, 20));
 				mainGame->btnBP->setRelativePosition(rect<s32>(160, 0, 210, 20));
