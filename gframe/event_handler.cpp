@@ -711,6 +711,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						while(spsummonable_cards[index] != command_card) index++;
 						DuelClient::SetResponseI((index << 16) + 1);
 						mainGame->HideElement(mainGame->wCardSelect, true);
+						ShowCancelOrFinishButton(0);
 						break;
 					}
 					if(list_command == COMMAND_ACTIVATE || list_command == COMMAND_OPERATION) {
