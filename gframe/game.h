@@ -351,9 +351,7 @@ public:
 	irr::gui::IGUICheckBox* chkIgnore2;
 	//phase button
 	irr::gui::IGUIStaticText* wPhase;
-	irr::gui::IGUIButton* btnDP;
-	irr::gui::IGUIButton* btnSP;
-	irr::gui::IGUIButton* btnM1;
+	irr::gui::IGUIButton* btnPhaseStatus;
 	irr::gui::IGUIButton* btnBP;
 	irr::gui::IGUIButton* btnM2;
 	irr::gui::IGUIButton* btnEP;
@@ -509,6 +507,7 @@ extern Game* mainGame;
 #define BUTTON_CHAIN_ALWAYS			265
 #define BUTTON_CHAIN_WHENAVAIL		266
 #define BUTTON_CANCEL_OR_FINISH		267
+#define BUTTON_PHASE				268
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define SCROLL_CARDTEXT				280
