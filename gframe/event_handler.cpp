@@ -130,8 +130,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->ShowElement(mainGame->wLanWindow);
 				} else {
 					DuelClient::SendPacketToServer(CTOS_SURRENDER);
-					if(panel)
-						mainGame->HideElement(panel);
 				}
 				break;
 			}
