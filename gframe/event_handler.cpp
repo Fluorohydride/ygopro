@@ -130,8 +130,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->ShowElement(mainGame->wLanWindow);
 				} else {
 					DuelClient::SendPacketToServer(CTOS_SURRENDER);
-					if(panel)
-						mainGame->HideElement(panel);
 				}
 				break;
 			}
@@ -734,6 +732,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						while(spsummonable_cards[index] != command_card) index++;
 						DuelClient::SetResponseI((index << 16) + 1);
 						mainGame->HideElement(mainGame->wCardSelect, true);
+						ShowCancelOrFinishButton(0);
 						break;
 					}
 					if(list_command == COMMAND_ACTIVATE || list_command == COMMAND_OPERATION) {
