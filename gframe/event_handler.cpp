@@ -700,7 +700,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_IDLECMD:
 				case MSG_SELECT_BATTLECMD:
-				case MSG_SELECT_CHAIN: {
+				case MSG_SELECT_CHAIN:
+				case MSG_SELECT_TRIGGER: {
 					if(list_command == COMMAND_LIST)
 						break;
 					if(list_command == COMMAND_SPSUMMON) {
@@ -848,6 +849,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(mainGame->dInfo.curMsg == MSG_SELECT_CHAIN && !chain_forced)
 						ShowCancelOrFinishButton(1);
 					break;
+				}
+				break;
+			}
+			case BUTTON_CARD_SEL_CANCELL: {
+				if(mainGame->dInfo.curMsg == MSG_SELECT_TRIGGER) {
+					DuelClient::SetResponseI(-1);
+					mainGame->HideElement(mainGame->wCardSelect, true);
+					DuelClient::SendResponse();
 				}
 				break;
 			}
@@ -1633,6 +1642,22 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wOptions);
 				}
+				break;
+			}
+			case MSG_SELECT_TRIGGER: {
+				if(chain_forced)
+					break;
+				if(mainGame->wOptions->isVisible()) {
+					DuelClient::SetResponseI(-1);
+					mainGame->HideElement(mainGame->wOptions);
+					mainGame->dField.ShowChainCard(!chain_forced);
+					break;
+				}
+				DuelClient::SetResponseI(-1);
+				if(mainGame->wCardSelect->isVisible())
+					mainGame->HideElement(mainGame->wCardSelect, true);
+				else
+					DuelClient::SendResponse();
 				break;
 			}
 			case MSG_SORT_CHAIN:

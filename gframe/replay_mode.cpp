@@ -403,6 +403,12 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			pbuf += 10 + count * 13;
 			return ReadReplayResponse();
 		}
+		case MSG_SELECT_TRIGGER: {
+			player = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += 1 + count * 12;
+			return ReadReplayResponse();
+		}
 		case MSG_SELECT_PLACE:
 		case MSG_SELECT_DISFIELD: {
 			player = BufferIO::ReadInt8(pbuf);
