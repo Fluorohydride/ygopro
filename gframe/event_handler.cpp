@@ -29,7 +29,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HAND2:
 			case BUTTON_HAND3: {
 				mainGame->wHand->setVisible(false);
-				if(mainGame->dInfo.curMsg == MSG_ROCK_PAPER_SCISSORS){
+				if(mainGame->dInfo.curMsg == MSG_ROCK_PAPER_SCISSORS) {
 					DuelClient::SetResponseI(id - BUTTON_HAND1 + 1);
 					DuelClient::SendResponse();
 				} else {
@@ -204,7 +204,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							else
 								DuelClient::SendResponse();
 						}
-						break;
 					}
 					if (mainGame->wQuery->isVisible()) {
 						SetResponseSelectedCards();
@@ -1640,7 +1639,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else
 							DuelClient::SendResponse();
 					}
-					break;
 				}
 				if(mainGame->wQuery->isVisible()) {
 					SetResponseSelectedCards();
