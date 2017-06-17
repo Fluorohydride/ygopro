@@ -1160,7 +1160,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int c, l, s, ss;
 		unsigned int code;
 		bool panelmode = false;
-		mainGame->dField.select_ready = false;
+		bool select_ready = mainGame->dField.select_min == 0;
+		mainGame->dField.select_ready = select_ready;
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
 			code = (unsigned int)BufferIO::ReadInt32(pbuf);
@@ -1190,7 +1191,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (panelmode) {
 			mainGame->gMutex.Lock();
 			mainGame->wCardSelect->setText(textBuffer);
-			mainGame->dField.ShowSelectCard();
+			mainGame->dField.ShowSelectCard(select_ready);
 			mainGame->gMutex.Unlock();
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
@@ -1198,6 +1199,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		if (mainGame->dField.select_cancelable) {
 			mainGame->dField.ShowCancelOrFinishButton(1);
+		} else if (select_ready) {
+			mainGame->dField.ShowCancelOrFinishButton(2);
 		} else {
 			mainGame->dField.ShowCancelOrFinishButton(0);
 		}
