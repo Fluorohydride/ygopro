@@ -89,28 +89,20 @@ bool DataManager::LoadStrings(const char* file) {
 		sscanf(linebuf, "!%s", strbuf);
 		if(!strcmp(strbuf, "system")) {
 			sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
-			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
-			wchar_t* pbuf = new wchar_t[len + 1];
-			wcscpy(pbuf, strBuffer);
-			_sysStrings[value] = pbuf;
+			BufferIO::DecodeUTF8(strbuf, strBuffer);
+			_sysStrings[value] = strBuffer;
 		} else if(!strcmp(strbuf, "victory")) {
 			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
-			wchar_t* pbuf = new wchar_t[len + 1];
-			wcscpy(pbuf, strBuffer);
-			_victoryStrings[value] = pbuf;
+			BufferIO::DecodeUTF8(strbuf, strBuffer);
+			_victoryStrings[value] = strBuffer;
 		} else if(!strcmp(strbuf, "counter")) {
 			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
-			wchar_t* pbuf = new wchar_t[len + 1];
-			wcscpy(pbuf, strBuffer);
-			_counterStrings[value] = pbuf;
+			BufferIO::DecodeUTF8(strbuf, strBuffer);
+			_counterStrings[value] = strBuffer;
 		} else if(!strcmp(strbuf, "setname")) {
 			sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
-			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
-			wchar_t* pbuf = new wchar_t[len + 1];
-			wcscpy(pbuf, strBuffer);
-			_setnameStrings[value] = pbuf;
+			BufferIO::DecodeUTF8(strbuf, strBuffer);
+			_setnameStrings[value] = strBuffer;
 		}
 	}
 	fclose(fp);
@@ -175,33 +167,35 @@ const wchar_t* DataManager::GetDesc(int strCode) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) {
-	if(code < 0 || code >= 2048 || _sysStrings[code] == 0)
+	if(code < 0 || code >= 2048)
 		return unknown_string;
-	return _sysStrings[code];
+	auto csit = _sysStrings.find(code);
+	if(csit == _sysStrings.end())
+		return unknown_string;
+	return csit->second.c_str();
 }
 const wchar_t* DataManager::GetVictoryString(int code) {
 	auto csit = _victoryStrings.find(code);
 	if(csit == _victoryStrings.end())
 		return unknown_string;
-	return csit->second;
+	return csit->second.c_str();
 }
 const wchar_t* DataManager::GetCounterName(int code) {
 	auto csit = _counterStrings.find(code);
 	if(csit == _counterStrings.end())
 		return unknown_string;
-	return csit->second;
+	return csit->second.c_str();
 }
 const wchar_t* DataManager::GetSetName(int code) {
 	auto csit = _setnameStrings.find(code);
 	if(csit == _setnameStrings.end())
 		return NULL;
-	return csit->second;
+	return csit->second.c_str();
 }
 unsigned int DataManager::GetSetCode(const wchar_t* setname) {
-	wchar_t strbuff[256];
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
-		swscanf(csit->second, L"%[^|]", strbuff);//setname|extra info
-		if(wcscmp(strbuff, setname) == 0)
+		auto xpos = csit->second.find_first_of(L'|');//setname|extra info
+		if(csit->second.compare(0, xpos, setname) == 0)
 			return csit->first;
 	}
 	return 0;
