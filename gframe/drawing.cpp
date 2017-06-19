@@ -50,9 +50,9 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 void Game::DrawBackGround() {
 	static int selFieldAlpha = 255;
 	static int selFieldDAlpha = -10;
-	matrix4 im = irr::core::IdentityMatrix;
-	im.setTranslation(vector3df(0, 0, -0.01f));
-	driver->setTransform(irr::video::ETS_WORLD, im);
+//	matrix4 im = irr::core::IdentityMatrix;
+//	im.setTranslation(vector3df(0, 0, -0.01f));
+//	driver->setTransform(irr::video::ETS_WORLD, im);
 	//dark shade
 //	matManager.mSelField.AmbientColor = 0xff000000;
 //	matManager.mSelField.DiffuseColor = 0xa0000000;
@@ -268,23 +268,32 @@ void Game::DrawCard(ClientCard* pcard) {
 	matManager.mCard.AmbientColor = 0xffffffff;
 	matManager.mCard.DiffuseColor = (pcard->curAlpha << 24) | 0xffffff;
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
-	auto cosy = std::cos(pcard->curRot.Y);
-	if(cosy > -0.99f) {
+	auto m22 = pcard->mTransform(2, 2);
+	if(m22 > -0.99 || pcard->is_moving) {
 		matManager.mCard.setTexture(0, imageManager.GetTexture(pcard->code));
 		driver->setMaterial(matManager.mCard);
 		driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
 	}
-	if(cosy < 0.99f) {
+	if(m22 < 0.99 || pcard->is_moving) {
 		matManager.mCard.setTexture(0, imageManager.tCover[pcard->controler]);
 		driver->setMaterial(matManager.mCard);
 		driver->drawVertexPrimitiveList(matManager.vCardBack, 4, matManager.iRectangle, 2);
 	}
+	if(pcard->is_moving)
+		return;
+	irr::core::matrix4 im;
+	im.setTranslation(pcard->curPos);
+	driver->setTransform(irr::video::ETS_WORLD, im);
 	if(pcard->is_showequip) {
 		matManager.mTexture.setTexture(0, imageManager.tEquip);
 		driver->setMaterial(matManager.mTexture);
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	} else if(pcard->is_showtarget) {
 		matManager.mTexture.setTexture(0, imageManager.tTarget);
+		driver->setMaterial(matManager.mTexture);
+		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
+	} else if(pcard->is_showchaintarget) {
+		matManager.mTexture.setTexture(0, imageManager.tChainTarget);
 		driver->setMaterial(matManager.mTexture);
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	} else if(pcard->is_disabled && (pcard->location & LOCATION_ONFIELD) && (pcard->position & POS_FACEUP)) {

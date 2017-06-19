@@ -62,6 +62,7 @@ public:
 	bool is_selected;
 	bool is_showequip;
 	bool is_showtarget;
+	bool is_showchaintarget;
 	bool is_highlighting;
 	bool is_reversed;
 	u32 code;
