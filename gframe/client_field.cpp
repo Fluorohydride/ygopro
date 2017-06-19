@@ -65,6 +65,8 @@ void ClientField::Clear() {
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
+	player_desc_hints[0].clear();
+	player_desc_hints[1].clear();
 	chains.clear();
 	activatable_cards.clear();
 	summonable_cards.clear();
