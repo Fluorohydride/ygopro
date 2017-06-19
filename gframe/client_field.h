@@ -8,7 +8,7 @@ namespace ygo {
 
 class ClientCard;
 
-struct ChainInfo{
+struct ChainInfo {
 	irr::core::vector3df chain_pos;
 	ClientCard* chain_card;
 	int code;

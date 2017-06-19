@@ -4,7 +4,7 @@
 #pragma once
 
 #define _IRR_STATIC_LIB_
-#define _IRR_COMPILE_WITH_DX9_DEV_PACK
+#define IRR_COMPILE_WITH_DX9_DEV_PACK
 #ifdef _WIN32
 
 #include <WinSock2.h>

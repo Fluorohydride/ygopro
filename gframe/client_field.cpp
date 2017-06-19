@@ -93,9 +93,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = 0x1;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-		pcard->mTransform.setTranslation(pcard->curPos);
-		pcard->mTransform.setRotationRadians(pcard->curRot);
+		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 	}
 	for(int i = 0; i < extrac; ++i) {
 		pcard = new ClientCard;
@@ -105,9 +103,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = 0x40;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-		pcard->mTransform.setTranslation(pcard->curPos);
-		pcard->mTransform.setRotationRadians(pcard->curRot);
+		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 	}
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
@@ -582,63 +578,47 @@ void ClientField::ReplaySwap() {
 	for(int p = 0; p < 2; ++p) {
 		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = hand[p].begin(); cit != hand[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = mzone[p].begin(); cit != mzone[p].end(); ++cit) {
 			if(*cit) {
 				(*cit)->controler = 1 - (*cit)->controler;
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = szone[p].begin(); cit != szone[p].end(); ++cit) {
 			if(*cit) {
 				(*cit)->controler = 1 - (*cit)->controler;
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = grave[p].begin(); cit != grave[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = remove[p].begin(); cit != remove[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = extra[p].begin(); cit != extra[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 	}
 	for(auto cit = overlay_cards.begin(); cit != overlay_cards.end(); ++cit) {
 		(*cit)->controler = 1 - (*cit)->controler;
-		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-		(*cit)->mTransform.setTranslation((*cit)->curPos);
-		(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 		(*cit)->is_moving = false;
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
@@ -656,56 +636,40 @@ void ClientField::ReplaySwap() {
 void ClientField::RefreshAllCards() {
 	for(int p = 0; p < 2; ++p) {
 		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = hand[p].begin(); cit != hand[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = mzone[p].begin(); cit != mzone[p].end(); ++cit) {
 			if(*cit) {
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = szone[p].begin(); cit != szone[p].end(); ++cit) {
 			if(*cit) {
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = grave[p].begin(); cit != grave[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = remove[p].begin(); cit != remove[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = extra[p].begin(); cit != extra[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 	}
 	for(auto cit = overlay_cards.begin(); cit != overlay_cards.end(); ++cit) {
-		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-		(*cit)->mTransform.setTranslation((*cit)->curPos);
-		(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 		(*cit)->is_moving = false;
 	}
 }

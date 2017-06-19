@@ -2008,9 +2008,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->gMutex.Lock();
 				mainGame->dField.AddCard(pcard, cc, cl, cs);
 				mainGame->gMutex.Unlock();
-				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-				pcard->mTransform.setTranslation(pcard->curPos);
-				pcard->mTransform.setRotationRadians(pcard->curRot);
+				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 				pcard->curAlpha = 5;
 				mainGame->dField.FadeCard(pcard, 255, 20);
 				mainGame->WaitFrameSignal(20);
@@ -2368,12 +2366,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
 		mainGame->dField.current_chain.solved = false;
 		int chc = 0;
-		for(size_t i = 0; i < mainGame->dField.chains.size(); ++i) {
+		for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
 			if (cl == 0x10 || cl == 0x20) {
-				if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
+				if (chit->controler == cc && chit->location == cl)
 					chc++;
 			} else {
-				if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
+				if (chit->controler == cc && chit->location == cl && chit->sequence == cs)
 					chc++;
 			}
 		}
@@ -3318,12 +3316,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
 			mainGame->dField.current_chain.solved = false;
 			int chc = 0;
-			for(size_t i = 0; i < mainGame->dField.chains.size(); ++i) {
+			for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
 				if (cl == 0x10 || cl == 0x20) {
-					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
+					if (chit->controler == cc && chit->location == cl)
 						chc++;
 				} else {
-					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
+					if (chit->controler == cc && chit->location == cl && chit->sequence == cs)
 						chc++;
 				}
 			}

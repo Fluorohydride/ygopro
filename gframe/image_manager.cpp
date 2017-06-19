@@ -7,6 +7,8 @@ ImageManager imageManager;
 bool ImageManager::Initial() {
 	tCover[0] = driver->getTexture("textures/cover.jpg");
 	tCover[1] = driver->getTexture("textures/cover2.jpg");
+	if(!tCover[1])
+		tCover[1] = tCover[0];
 	tUnknown = driver->getTexture("textures/unknown.jpg");
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
