@@ -89,6 +89,18 @@ int ReplayMode::ReplayThread(void* param) {
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	mainGame->dInfo.turn = 0;
+	// reset master rule 4 phase button position
+	if (mainGame->dInfo.duel_rule >= 4) {
+		mainGame->btnSP->setRelativePosition(rect<s32>(160, 0, 210, 20));
+		mainGame->btnM1->setRelativePosition(rect<s32>(160, 0, 210, 20));
+		mainGame->btnBP->setRelativePosition(rect<s32>(160, 0, 210, 20));
+		mainGame->btnM2->setRelativePosition(rect<s32>(160, 0, 210, 20));
+	} else {
+		mainGame->btnSP->setRelativePosition(rect<s32>(65, 0, 115, 20));
+		mainGame->btnM1->setRelativePosition(rect<s32>(130, 0, 180, 20));
+		mainGame->btnBP->setRelativePosition(rect<s32>(195, 0, 245, 20));
+		mainGame->btnM2->setRelativePosition(rect<s32>(260, 0, 310, 20));
+	}
 	if(!(opt & DUEL_TAG_MODE)) {
 		int main = cur_replay.ReadInt32();
 		for(int i = 0; i < main; ++i)
