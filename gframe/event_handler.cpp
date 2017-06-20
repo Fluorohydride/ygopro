@@ -665,6 +665,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ShowSelectCard(true);
 				break;
 			}
+			case BUTTON_PHASE: {
+				mainGame->btnPhaseStatus->setPressed(true);
+				break;
+			}
 			case BUTTON_BP: {
 				if(mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
 					DuelClient::SetResponseI(6);

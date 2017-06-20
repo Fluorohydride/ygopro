@@ -290,6 +290,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnChainAlways->setVisible(false);
 		mainGame->btnChainWhenAvail->setVisible(false);
 		mainGame->btnCancelOrFinish->setVisible(false);
+		mainGame->btnShuffle->setVisible(false);
 		mainGame->deckBuilder.result_string[0] = L'0';
 		mainGame->deckBuilder.result_string[1] = 0;
 		mainGame->deckBuilder.results.clear();
@@ -460,9 +461,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wInfos->setVisible(true);
 		mainGame->wPhase->setVisible(true);
 		mainGame->btnSideOK->setVisible(false);
-		mainGame->btnDP->setVisible(false);
-		mainGame->btnSP->setVisible(false);
-		mainGame->btnM1->setVisible(false);
+		mainGame->btnPhaseStatus->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
@@ -550,6 +549,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnChainAlways->setVisible(false);
 		mainGame->btnChainWhenAvail->setVisible(false);
 		mainGame->btnCancelOrFinish->setVisible(false);
+		mainGame->btnShuffle->setVisible(false);
 		time_t nowtime = time(NULL);
 		struct tm *localedtime = localtime(&nowtime);
 		char timebuf[40];
@@ -1941,9 +1941,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_NEW_PHASE: {
 		unsigned short phase = BufferIO::ReadInt16(pbuf);
-		mainGame->btnDP->setVisible(false);
-		mainGame->btnSP->setVisible(false);
-		mainGame->btnM1->setVisible(false);
+		mainGame->btnPhaseStatus->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
@@ -1952,36 +1950,32 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcardp = 0;
 		switch (phase) {
 		case PHASE_DRAW:
-			mainGame->btnDP->setVisible(true);
+			mainGame->btnPhaseStatus->setText(L"\xff24\xff30");
 			mainGame->showcardcode = 4;
 			break;
 		case PHASE_STANDBY:
-			mainGame->btnSP->setVisible(true);
+			mainGame->btnPhaseStatus->setText(L"\xff33\xff30");
 			mainGame->showcardcode = 5;
 			break;
 		case PHASE_MAIN1:
-			mainGame->btnM1->setVisible(true);
+			mainGame->btnPhaseStatus->setText(L"\xff2d\xff11");
 			mainGame->showcardcode = 6;
 			break;
 		case PHASE_BATTLE_START:
-			mainGame->btnBP->setVisible(true);
-			mainGame->btnBP->setPressed(true);
-			mainGame->btnBP->setEnabled(false);
+			mainGame->btnPhaseStatus->setText(L"\xff22\xff30");
 			mainGame->showcardcode = 7;
 			break;
 		case PHASE_MAIN2:
-			mainGame->btnM2->setVisible(true);
-			mainGame->btnM2->setPressed(true);
-			mainGame->btnM2->setEnabled(false);
+			mainGame->btnPhaseStatus->setText(L"\xff2d\xff12");
 			mainGame->showcardcode = 8;
 			break;
 		case PHASE_END:
-			mainGame->btnEP->setVisible(true);
-			mainGame->btnEP->setPressed(true);
-			mainGame->btnEP->setEnabled(false);
+			mainGame->btnPhaseStatus->setText(L"\xff25\xff30");
 			mainGame->showcardcode = 9;
 			break;
 		}
+		mainGame->btnPhaseStatus->setPressed(true);
+		mainGame->btnPhaseStatus->setVisible(true);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			mainGame->showcard = 101;
 			mainGame->WaitFrameSignal(40);
