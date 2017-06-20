@@ -63,9 +63,9 @@ int main(int argc, char* argv[]) {
 			ygo::rule=atoi(argv[3]);
 			ygo::mode=atoi(argv[4]);
 			if (argv[5][0]=='T')
-				ygo::duel_rule=2;
+				ygo::duel_rule=DEFAULT_DUEL_RULE-1;
 			else
-				ygo::duel_rule=3;
+				ygo::duel_rule=DEFAULT_DUEL_RULE;
 			if (argv[6][0]=='T')
 				ygo::no_check_deck=true;
 			else
