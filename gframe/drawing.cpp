@@ -24,6 +24,7 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 		glEnd();
 		glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
 		glDisable(GL_LINE_STIPPLE);
+		glEnable(GL_TEXTURE_2D);
 	} else {
 		driver->setMaterial(matManager.mOutLine);
 		if(strip) {
@@ -49,9 +50,9 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 void Game::DrawBackGround() {
 	static int selFieldAlpha = 255;
 	static int selFieldDAlpha = -10;
-	matrix4 im = irr::core::IdentityMatrix;
-	im.setTranslation(vector3df(0, 0, -0.01f));
-	driver->setTransform(irr::video::ETS_WORLD, im);
+//	matrix4 im = irr::core::IdentityMatrix;
+//	im.setTranslation(vector3df(0, 0, -0.01f));
+//	driver->setTransform(irr::video::ETS_WORLD, im);
 	//dark shade
 //	matManager.mSelField.AmbientColor = 0xff000000;
 //	matManager.mSelField.DiffuseColor = 0xa0000000;
@@ -64,39 +65,39 @@ void Game::DrawBackGround() {
 	//draw field
 	//draw field spell card
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
-	int fieldcode1 = -1;
-	int fieldcode2 = -1;
 	bool drawField = false;
 	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
-	if(mainGame->gameConf.draw_field_spell
-		&& mainGame->dField.szone[0][5] && mainGame->dField.szone[0][5]->position & POS_FACEUP)
-		fieldcode1 = mainGame->dField.szone[0][5]->code;
-	if(mainGame->gameConf.draw_field_spell
-		&& mainGame->dField.szone[1][5] && mainGame->dField.szone[1][5]->position & POS_FACEUP)
-		fieldcode2 = mainGame->dField.szone[1][5]->code;
-	int fieldcode = (fieldcode1 > 0) ? fieldcode1 : fieldcode2;
-	if(fieldcode1 > 0 && fieldcode2 > 0 && fieldcode1 != fieldcode2) {
-		ITexture* texture = imageManager.GetTextureField(fieldcode1);
-		if(texture) {
-			drawField = true;
-			matManager.mTexture.setTexture(0, texture);
-			driver->setMaterial(matManager.mTexture);
-			driver->drawVertexPrimitiveList(matManager.vFieldSpell1, 4, matManager.iRectangle, 2);
-		}
-		texture = imageManager.GetTextureField(fieldcode2);
-		if(texture) {
-			drawField = true;
-			matManager.mTexture.setTexture(0, texture);
-			driver->setMaterial(matManager.mTexture);
-			driver->drawVertexPrimitiveList(matManager.vFieldSpell2, 4, matManager.iRectangle, 2);
-		}
-	} else if(fieldcode > 0) {
-		ITexture* texture = imageManager.GetTextureField(fieldcode);
-		if(texture) {
-			drawField = true;
-			matManager.mTexture.setTexture(0, texture);
-			driver->setMaterial(matManager.mTexture);
-			driver->drawVertexPrimitiveList(matManager.vFieldSpell, 4, matManager.iRectangle, 2);
+	if(mainGame->gameConf.draw_field_spell) {
+		int fieldcode1 = -1;
+		int fieldcode2 = -1;
+		if(mainGame->dField.szone[0][5] && mainGame->dField.szone[0][5]->position & POS_FACEUP)
+			fieldcode1 = mainGame->dField.szone[0][5]->code;
+		if(mainGame->dField.szone[1][5] && mainGame->dField.szone[1][5]->position & POS_FACEUP)
+			fieldcode2 = mainGame->dField.szone[1][5]->code;
+		int fieldcode = (fieldcode1 > 0) ? fieldcode1 : fieldcode2;
+		if(fieldcode1 > 0 && fieldcode2 > 0 && fieldcode1 != fieldcode2) {
+			ITexture* texture = imageManager.GetTextureField(fieldcode1);
+			if(texture) {
+				drawField = true;
+				matManager.mTexture.setTexture(0, texture);
+				driver->setMaterial(matManager.mTexture);
+				driver->drawVertexPrimitiveList(matManager.vFieldSpell1, 4, matManager.iRectangle, 2);
+			}
+			texture = imageManager.GetTextureField(fieldcode2);
+			if(texture) {
+				drawField = true;
+				matManager.mTexture.setTexture(0, texture);
+				driver->setMaterial(matManager.mTexture);
+				driver->drawVertexPrimitiveList(matManager.vFieldSpell2, 4, matManager.iRectangle, 2);
+			}
+		} else if(fieldcode > 0) {
+			ITexture* texture = imageManager.GetTextureField(fieldcode);
+			if(texture) {
+				drawField = true;
+				matManager.mTexture.setTexture(0, texture);
+				driver->setMaterial(matManager.mTexture);
+				driver->drawVertexPrimitiveList(matManager.vFieldSpell, 4, matManager.iRectangle, 2);
+			}
 		}
 	}
 	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent[rule] : imageManager.tField[rule]);
@@ -249,7 +250,6 @@ void Game::DrawCards() {
 		DrawCard(*cit);
 }
 void Game::DrawCard(ClientCard* pcard) {
-	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	if(pcard->aniFrame) {
 		if(pcard->is_moving) {
 			pcard->curPos += pcard->dPos;
@@ -267,29 +267,20 @@ void Game::DrawCard(ClientCard* pcard) {
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
 	matManager.mCard.DiffuseColor = (pcard->curAlpha << 24) | 0xffffff;
-	matManager.mCard.setTexture(0, imageManager.GetTexture(pcard->code));
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
-	driver->setMaterial(matManager.mCard);
-	driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
-	if(pcard->controler == 0 || !imageManager.tCover[1])
-		matManager.mCard.setTexture(0, imageManager.tCover[0]);
-	else
-		matManager.mCard.setTexture(0, imageManager.tCover[1]);
-	driver->setMaterial(matManager.mCard);
-	driver->drawVertexPrimitiveList(matManager.vCardBack, 4, matManager.iRectangle, 2);
-	if(pcard->is_showequip) {
-		matManager.mTexture.setTexture(0, imageManager.tEquip);
-		driver->setMaterial(matManager.mTexture);
-		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
-	} else if(pcard->is_showtarget) {
-		matManager.mTexture.setTexture(0, imageManager.tTarget);
-		driver->setMaterial(matManager.mTexture);
-		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
-	} else if(pcard->is_disabled && (pcard->location & LOCATION_ONFIELD) && (pcard->position & POS_FACEUP)) {
-		matManager.mTexture.setTexture(0, imageManager.tNegated);
-		driver->setMaterial(matManager.mTexture);
-		driver->drawVertexPrimitiveList(matManager.vNegate, 4, matManager.iRectangle, 2);
+	auto m22 = pcard->mTransform(2, 2);
+	if(m22 > -0.99 || pcard->is_moving) {
+		matManager.mCard.setTexture(0, imageManager.GetTexture(pcard->code));
+		driver->setMaterial(matManager.mCard);
+		driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
 	}
+	if(m22 < 0.99 || pcard->is_moving) {
+		matManager.mCard.setTexture(0, imageManager.tCover[pcard->controler]);
+		driver->setMaterial(matManager.mCard);
+		driver->drawVertexPrimitiveList(matManager.vCardBack, 4, matManager.iRectangle, 2);
+	}
+	if(pcard->is_moving)
+		return;
 	if(pcard->is_selectable && (pcard->location & 0xe)) {
 		float cv[4] = {1.0f, 1.0f, 0.0f, 1.0f};
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
@@ -303,6 +294,26 @@ void Game::DrawCard(ClientCard* pcard) {
 			DrawSelectionLine(matManager.vCardOutline, true, 2, cv);
 		else
 			DrawSelectionLine(matManager.vCardOutliner, true, 2, cv);
+	}
+	irr::core::matrix4 im;
+	im.setTranslation(pcard->curPos);
+	driver->setTransform(irr::video::ETS_WORLD, im);
+	if(pcard->is_showequip) {
+		matManager.mTexture.setTexture(0, imageManager.tEquip);
+		driver->setMaterial(matManager.mTexture);
+		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
+	} else if(pcard->is_showtarget) {
+		matManager.mTexture.setTexture(0, imageManager.tTarget);
+		driver->setMaterial(matManager.mTexture);
+		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
+	} else if(pcard->is_showchaintarget) {
+		matManager.mTexture.setTexture(0, imageManager.tChainTarget);
+		driver->setMaterial(matManager.mTexture);
+		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
+	} else if(pcard->is_disabled && (pcard->location & LOCATION_ONFIELD) && (pcard->position & POS_FACEUP)) {
+		matManager.mTexture.setTexture(0, imageManager.tNegated);
+		driver->setMaterial(matManager.mTexture);
+		driver->drawVertexPrimitiveList(matManager.vNegate, 4, matManager.iRectangle, 2);
 	}
 	if(pcard->cmdFlag & COMMAND_ATTACK) {
 		matManager.mTexture.setTexture(0, imageManager.tAttack);
@@ -872,7 +883,7 @@ void Game::DrawSpec() {
 		matk.setRotationRadians(atk_r);
 		driver->setTransform(irr::video::ETS_WORLD, matk);
 		driver->setMaterial(matManager.mATK);
-		driver->drawVertexPrimitiveList(&matManager.vArrow[attack_sv], 40, matManager.iArrow, 10, EVT_STANDARD, EPT_TRIANGLE_STRIP);
+		driver->drawVertexPrimitiveList(&matManager.vArrow[attack_sv], 12, matManager.iArrow, 10, EVT_STANDARD, EPT_TRIANGLE_STRIP);
 		attack_sv += 4;
 		if (attack_sv > 28)
 			attack_sv = 0;

@@ -47,7 +47,6 @@ typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer
 
 class ClientCard {
 public:
-	irr::video::ITexture* curTexture;
 	irr::core::matrix4 mTransform;
 	irr::core::vector3df curPos;
 	irr::core::vector3df curRot;
@@ -63,6 +62,7 @@ public:
 	bool is_selected;
 	bool is_showequip;
 	bool is_showtarget;
+	bool is_showchaintarget;
 	bool is_highlighting;
 	bool is_reversed;
 	u32 code;

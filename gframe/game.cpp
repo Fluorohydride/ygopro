@@ -60,8 +60,6 @@ bool Game::Initialize() {
 	is_building = false;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
-	for(int i = 0; i < 2048; ++i)
- 		dataManager._sysStrings[i] = 0;
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
@@ -784,8 +782,12 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
 	int pbuffer = 0, lsnz = 0;
 	u32 _width = 0, _height = 0, s = font->getCharDimension(L' ').Width;
+	wchar_t prev = 0;
 	for (size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
-		if (text[i] == L' ') {
+		wchar_t c = text[i];
+		u32 w = font->getCharDimension(c).Width + font->getKerningWidth(c, prev);
+		prev = c;
+		if (c == L' ') {
 			lsnz = i;
 			if (_width + s > cWidth) {
 				dataManager.strBuffer[pbuffer++] = L'\n';
@@ -799,7 +801,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 				_width += s;
 			}
 		}
-		else if(text[i] == L'\n') {
+		else if(c == L'\n') {
 			dataManager.strBuffer[pbuffer++] = L'\n';
 			_width = 0;
 			_height++;
@@ -807,14 +809,14 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 				pbuffer = 0;
 		}
 		else {
-			if((_width += font->getCharDimension(text[i]).Width) > cWidth) {
+			if((_width += w) > cWidth) {
 				dataManager.strBuffer[lsnz] = L'\n';
 				_width = 0;
 				for(int j = lsnz + 1; j < i; j++) {
 					_width += font->getCharDimension(text[j]).Width;
 				}
 			}
-			dataManager.strBuffer[pbuffer++] = text[i];
+			dataManager.strBuffer[pbuffer++] = c;
 		}
 	}
 	dataManager.strBuffer[pbuffer] = 0;
@@ -1360,6 +1362,7 @@ void Game::CloseDuelWindow() {
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
 	btnCancelOrFinish->setVisible(false);
+	btnShuffle->setVisible(false);
 	wChat->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
