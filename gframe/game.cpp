@@ -101,8 +101,6 @@ bool Game::Initialize() {
 	is_building = false;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
-	for(int i = 0; i < 2048; ++i)
- 		dataManager._sysStrings[i] = 0;
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
@@ -201,7 +199,7 @@ bool Game::Initialize() {
 	cbDuelRule->addItem(dataManager.GetSysString(1261));
 	cbDuelRule->addItem(dataManager.GetSysString(1262));
 	cbDuelRule->addItem(dataManager.GetSysString(1263));
-	cbDuelRule->setSelected(DEFAULT_DUEL_RULE);
+	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
@@ -259,26 +257,16 @@ bool Game::Initialize() {
 	//phase
 	wPhase = env->addStaticText(L"", rect<s32>(480, 310, 855, 330));
 	wPhase->setVisible(false);
-	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"\xff24\xff30");
-	btnDP->setEnabled(false);
-	btnDP->setPressed(true);
-	btnDP->setVisible(false);
-	btnSP = env->addButton(rect<s32>(65, 0, 115, 20), wPhase, -1, L"\xff33\xff30");
-	btnSP->setEnabled(false);
-	btnSP->setPressed(true);
-	btnSP->setVisible(false);
-	btnM1 = env->addButton(rect<s32>(130, 0, 180, 20), wPhase, -1, L"\xff2d\xff11");
-	btnM1->setEnabled(false);
-	btnM1->setPressed(true);
-	btnM1->setVisible(false);
-	btnBP = env->addButton(rect<s32>(195, 0, 245, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
+	btnPhaseStatus = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, BUTTON_PHASE, L"");
+	btnPhaseStatus->setIsPushButton(true);
+	btnPhaseStatus->setPressed(true);
+	btnPhaseStatus->setVisible(false);
+	btnBP = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
 	btnBP->setVisible(false);
-	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
+	btnM2 = env->addButton(rect<s32>(160, 0, 210, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
 	btnM2->setVisible(false);
-	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
+	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
-	btnShuffle = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1307));
-	btnShuffle->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
 	wInfos->setVisible(false);
@@ -639,6 +627,9 @@ bool Game::Initialize() {
 	//cancel or finish
 	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
 	btnCancelOrFinish->setVisible(false);
+	//shuffle
+	btnShuffle = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1297));
+	btnShuffle->setVisible(false);
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
@@ -784,12 +775,16 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
 	int pbuffer = 0;
 	u32 _width = 0, _height = 0;
+	wchar_t prev = 0;
 	for(size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
-		u32 w = font->getCharDimension(text[i]).Width;
+		wchar_t c = text[i];
+		u32 w = font->getCharDimension(c).Width + font->getKerningWidth(c, prev);
+		prev = c;
 		if(text[i] == L'\n') {
 			dataManager.strBuffer[pbuffer++] = L'\n';
 			_width = 0;
 			_height++;
+			prev = 0;
 			if(_height == pos)
 				pbuffer = 0;
 			continue;
@@ -797,11 +792,12 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 			dataManager.strBuffer[pbuffer++] = L'\n';
 			_width = 0;
 			_height++;
+			prev = 0;
 			if(_height == pos)
 				pbuffer = 0;
 		}
 		_width += w;
-		dataManager.strBuffer[pbuffer++] = text[i];
+		dataManager.strBuffer[pbuffer++] = c;
 	}
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
@@ -1270,6 +1266,7 @@ void Game::CloseDuelWindow() {
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
 	btnCancelOrFinish->setVisible(false);
+	btnShuffle->setVisible(false);
 	wChat->setVisible(false);
 	lstLog->clear();
 	logParam.clear();

@@ -16,6 +16,7 @@ ClientCard::ClientCard() {
 	is_selected = false;
 	is_showequip = false;
 	is_showtarget = false;
+	is_showchaintarget = false;
 	is_highlighting = false;
 	is_disabled = false;
 	is_reversed = false;

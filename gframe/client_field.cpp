@@ -65,6 +65,8 @@ void ClientField::Clear() {
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
+	player_desc_hints[0].clear();
+	player_desc_hints[1].clear();
 	chains.clear();
 	activatable_cards.clear();
 	summonable_cards.clear();
@@ -93,9 +95,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = 0x1;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-		pcard->mTransform.setTranslation(pcard->curPos);
-		pcard->mTransform.setRotationRadians(pcard->curRot);
+		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 	}
 	for(int i = 0; i < extrac; ++i) {
 		pcard = new ClientCard;
@@ -105,9 +105,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = 0x40;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-		pcard->mTransform.setTranslation(pcard->curPos);
-		pcard->mTransform.setRotationRadians(pcard->curRot);
+		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 	}
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
@@ -446,9 +444,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
 		mainGame->scrCardList->setPos(0);
 	}
-	if(buttonok)
-		mainGame->btnSelectOK->setVisible(true);
-	else mainGame->btnSelectOK->setVisible(false);
+	mainGame->btnSelectOK->setVisible(buttonok);
 	mainGame->PopupElement(mainGame->wCardSelect);
 }
 void ClientField::ShowChainCard() {
@@ -584,63 +580,47 @@ void ClientField::ReplaySwap() {
 	for(int p = 0; p < 2; ++p) {
 		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = hand[p].begin(); cit != hand[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = mzone[p].begin(); cit != mzone[p].end(); ++cit) {
 			if(*cit) {
 				(*cit)->controler = 1 - (*cit)->controler;
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = szone[p].begin(); cit != szone[p].end(); ++cit) {
 			if(*cit) {
 				(*cit)->controler = 1 - (*cit)->controler;
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = grave[p].begin(); cit != grave[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = remove[p].begin(); cit != remove[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = extra[p].begin(); cit != extra[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 	}
 	for(auto cit = overlay_cards.begin(); cit != overlay_cards.end(); ++cit) {
 		(*cit)->controler = 1 - (*cit)->controler;
-		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-		(*cit)->mTransform.setTranslation((*cit)->curPos);
-		(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 		(*cit)->is_moving = false;
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
@@ -658,56 +638,40 @@ void ClientField::ReplaySwap() {
 void ClientField::RefreshAllCards() {
 	for(int p = 0; p < 2; ++p) {
 		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = hand[p].begin(); cit != hand[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = mzone[p].begin(); cit != mzone[p].end(); ++cit) {
 			if(*cit) {
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = szone[p].begin(); cit != szone[p].end(); ++cit) {
 			if(*cit) {
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-				(*cit)->mTransform.setTranslation((*cit)->curPos);
-				(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 				(*cit)->is_moving = false;
 			}
 		}
 		for(auto cit = grave[p].begin(); cit != grave[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = remove[p].begin(); cit != remove[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 		for(auto cit = extra[p].begin(); cit != extra[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-			(*cit)->mTransform.setTranslation((*cit)->curPos);
-			(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 			(*cit)->is_moving = false;
 		}
 	}
 	for(auto cit = overlay_cards.begin(); cit != overlay_cards.end(); ++cit) {
-		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot);
-		(*cit)->mTransform.setTranslation((*cit)->curPos);
-		(*cit)->mTransform.setRotationRadians((*cit)->curRot);
+		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
 		(*cit)->is_moving = false;
 	}
 }
@@ -715,7 +679,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	t->X = 0;
 	t->Y = 0;
 	t->Z = 0;
-	int rule = (mainGame->dInfo.duel_rule >= 3) ? 1 : 0;
+	int rule = (mainGame->dInfo.duel_rule >= 4) ? 1 : 0;
 	switch((location & 0x7f)) {
 	case LOCATION_DECK: {
 		t->X = (matManager.vFieldDeck[controler][0].Pos.X + matManager.vFieldDeck[controler][1].Pos.X) / 2;
@@ -771,7 +735,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	int controler = pcard->controler;
 	int sequence = pcard->sequence;
 	int location = pcard->location;
-	int rule = (mainGame->dInfo.duel_rule >= 3) ? 1 : 0;
+	int rule = (mainGame->dInfo.duel_rule >= 4) ? 1 : 0;
 	switch (location) {
 	case LOCATION_DECK: {
 		t->X = (matManager.vFieldDeck[controler][0].Pos.X + matManager.vFieldDeck[controler][1].Pos.X) / 2;

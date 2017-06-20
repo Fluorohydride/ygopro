@@ -81,7 +81,7 @@ int ReplayMode::ReplayThread(void* param) {
 	int draw_count = cur_replay.ReadInt32();
 	int opt = cur_replay.ReadInt32();
 	int duel_rule = opt >> 16;
-	mainGame->dInfo.duel_rule = duel_rule - 1;
+	mainGame->dInfo.duel_rule = duel_rule;
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;

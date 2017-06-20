@@ -7,6 +7,8 @@ ImageManager imageManager;
 bool ImageManager::Initial() {
 	tCover[0] = driver->getTexture("textures/cover.jpg");
 	tCover[1] = driver->getTexture("textures/cover2.jpg");
+	if(!tCover[1])
+		tCover[1] = tCover[0];
 	tUnknown = driver->getTexture("textures/unknown.jpg");
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
@@ -18,6 +20,7 @@ bool ImageManager::Initial() {
 	tMask = driver->getTexture("textures/mask.png");
 	tEquip = driver->getTexture("textures/equip.png");
 	tTarget = driver->getTexture("textures/target.png");
+	tChainTarget = driver->getTexture("textures/chaintarget.png");
 	tLim = driver->getTexture("textures/lim.png");
 	tOT = driver->getTexture("textures/ot.png");
 	tHand[0] = driver->getTexture("textures/f1.jpg");

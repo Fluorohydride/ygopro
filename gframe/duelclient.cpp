@@ -119,7 +119,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.duel_rule = mainGame->cbDuelRule->getSelected();
+			cscg.info.duel_rule = mainGame->cbDuelRule->getSelected() + 1;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
@@ -290,6 +290,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnChainAlways->setVisible(false);
 		mainGame->btnChainWhenAvail->setVisible(false);
 		mainGame->btnCancelOrFinish->setVisible(false);
+		mainGame->btnShuffle->setVisible(false);
 		mainGame->deckBuilder.result_string[0] = L'0';
 		mainGame->deckBuilder.result_string[1] = 0;
 		mainGame->deckBuilder.results.clear();
@@ -331,7 +332,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
 		str.append(msgbuf);
 		if(pkt->info.duel_rule != DEFAULT_DUEL_RULE) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + pkt->info.duel_rule));
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + pkt->info.duel_rule - 1));
 			str.append(msgbuf);
 		}
 		if(pkt->info.no_check_deck) {
@@ -460,9 +461,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wInfos->setVisible(true);
 		mainGame->wPhase->setVisible(true);
 		mainGame->btnSideOK->setVisible(false);
-		mainGame->btnDP->setVisible(false);
-		mainGame->btnSP->setVisible(false);
-		mainGame->btnM1->setVisible(false);
+		mainGame->btnPhaseStatus->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
@@ -550,6 +549,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnChainAlways->setVisible(false);
 		mainGame->btnChainWhenAvail->setVisible(false);
 		mainGame->btnCancelOrFinish->setVisible(false);
+		mainGame->btnShuffle->setVisible(false);
 		time_t nowtime = time(NULL);
 		struct tm *localedtime = localtime(&nowtime);
 		char timebuf[40];
@@ -1019,8 +1019,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.remove_act = true;
 			else if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
-			else if (pcard->location == LOCATION_SZONE && (pcard->sequence == 0 || pcard->sequence == 6) && (pcard->type & TYPE_PENDULUM))
-				mainGame->dField.pzone_act[pcard->controler] = true;
+			else {
+				int seq = mainGame->dInfo.duel_rule >= 4 ? 0 : 6;
+				if (pcard->location == LOCATION_SZONE && pcard->sequence == seq && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget)
+					mainGame->dField.pzone_act[pcard->controler] = true;
+			}
 		}
 		mainGame->dField.reposable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -1157,7 +1160,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int c, l, s, ss;
 		unsigned int code;
 		bool panelmode = false;
-		mainGame->dField.select_ready = false;
+		bool select_ready = mainGame->dField.select_min == 0;
+		mainGame->dField.select_ready = select_ready;
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
 			code = (unsigned int)BufferIO::ReadInt32(pbuf);
@@ -1187,7 +1191,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (panelmode) {
 			mainGame->gMutex.Lock();
 			mainGame->wCardSelect->setText(textBuffer);
-			mainGame->dField.ShowSelectCard();
+			mainGame->dField.ShowSelectCard(select_ready);
 			mainGame->gMutex.Unlock();
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
@@ -1195,6 +1199,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		if (mainGame->dField.select_cancelable) {
 			mainGame->dField.ShowCancelOrFinishButton(1);
+		} else if (select_ready) {
+			mainGame->dField.ShowCancelOrFinishButton(2);
 		} else {
 			mainGame->dField.ShowCancelOrFinishButton(0);
 		}
@@ -1900,7 +1906,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_NEW_TURN: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dInfo.turn++;
-		if(!mainGame->dInfo.isTag && mainGame->dInfo.turn == 3 && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
+		if(!mainGame->dInfo.isTag && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351));
 			mainGame->btnLeaveGame->setVisible(true);
 		}
@@ -1935,9 +1941,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_NEW_PHASE: {
 		unsigned short phase = BufferIO::ReadInt16(pbuf);
-		mainGame->btnDP->setVisible(false);
-		mainGame->btnSP->setVisible(false);
-		mainGame->btnM1->setVisible(false);
+		mainGame->btnPhaseStatus->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
@@ -1946,36 +1950,32 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcardp = 0;
 		switch (phase) {
 		case PHASE_DRAW:
-			mainGame->btnDP->setVisible(true);
+			mainGame->btnPhaseStatus->setText(L"\xff24\xff30");
 			mainGame->showcardcode = 4;
 			break;
 		case PHASE_STANDBY:
-			mainGame->btnSP->setVisible(true);
+			mainGame->btnPhaseStatus->setText(L"\xff33\xff30");
 			mainGame->showcardcode = 5;
 			break;
 		case PHASE_MAIN1:
-			mainGame->btnM1->setVisible(true);
+			mainGame->btnPhaseStatus->setText(L"\xff2d\xff11");
 			mainGame->showcardcode = 6;
 			break;
 		case PHASE_BATTLE_START:
-			mainGame->btnBP->setVisible(true);
-			mainGame->btnBP->setPressed(true);
-			mainGame->btnBP->setEnabled(false);
+			mainGame->btnPhaseStatus->setText(L"\xff22\xff30");
 			mainGame->showcardcode = 7;
 			break;
 		case PHASE_MAIN2:
-			mainGame->btnM2->setVisible(true);
-			mainGame->btnM2->setPressed(true);
-			mainGame->btnM2->setEnabled(false);
+			mainGame->btnPhaseStatus->setText(L"\xff2d\xff12");
 			mainGame->showcardcode = 8;
 			break;
 		case PHASE_END:
-			mainGame->btnEP->setVisible(true);
-			mainGame->btnEP->setPressed(true);
-			mainGame->btnEP->setEnabled(false);
+			mainGame->btnPhaseStatus->setText(L"\xff25\xff30");
 			mainGame->showcardcode = 9;
 			break;
 		}
+		mainGame->btnPhaseStatus->setPressed(true);
+		mainGame->btnPhaseStatus->setVisible(true);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			mainGame->showcard = 101;
 			mainGame->WaitFrameSignal(40);
@@ -2002,9 +2002,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->gMutex.Lock();
 				mainGame->dField.AddCard(pcard, cc, cl, cs);
 				mainGame->gMutex.Unlock();
-				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-				pcard->mTransform.setTranslation(pcard->curPos);
-				pcard->mTransform.setRotationRadians(pcard->curRot);
+				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 				pcard->curAlpha = 5;
 				mainGame->dField.FadeCard(pcard, 255, 20);
 				mainGame->WaitFrameSignal(20);
@@ -2045,8 +2043,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 						pcard->equipTarget = 0;
 					}
 				}
+				pcard->is_hovered = false;
 				pcard->is_showequip = false;
 				pcard->is_showtarget = false;
+				pcard->is_showchaintarget = false;
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					mainGame->dField.RemoveCard(pc, pl, ps);
 					pcard->position = cp;
@@ -2097,6 +2097,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->counters.clear();
 				pcard->ClearTarget();
 				pcard->is_showtarget = false;
+				pcard->is_showchaintarget = false;
 				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					mainGame->dField.RemoveCard(pc, pl, ps);
@@ -2361,13 +2362,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.current_chain.sequence = cs;
 		mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
 		mainGame->dField.current_chain.solved = false;
+		mainGame->dField.current_chain.target.clear();
 		int chc = 0;
-		for(size_t i = 0; i < mainGame->dField.chains.size(); ++i) {
+		for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
 			if (cl == 0x10 || cl == 0x20) {
-				if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
+				if (chit->controler == cc && chit->location == cl)
 					chc++;
 			} else {
-				if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
+				if (chit->controler == cc && chit->location == cl && chit->sequence == cs)
 					chc++;
 			}
 		}
@@ -2460,14 +2462,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pbuf += count * 4;
 			return true;
 		}
-		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
 			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 			int l = BufferIO::ReadInt8(pbuf);
 			int s = BufferIO::ReadInt8(pbuf);
 			/*int ss = */BufferIO::ReadInt8(pbuf);
-			pcard = mainGame->dField.GetCard(c, l, s);
+			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
 			pcard->is_highlighting = true;
+			mainGame->dField.current_chain.target.insert(pcard);
 			if(pcard->location & LOCATION_ONFIELD) {
 				for (int j = 0; j < 3; ++j) {
 					mainGame->dField.FadeCard(pcard, 5, 5);
@@ -2937,10 +2939,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		mainGame->stHintMsg->setVisible(false);
+		int res1 = (res & 0x3) - 1;
+		int res2 = ((res >> 2) & 0x3) - 1;
 		if(mainGame->dInfo.isFirst)
-			mainGame->showcardcode = ((res & 0x3) - 1) + ((((res >> 2) & 0x3) - 1) << 16);
+			mainGame->showcardcode = res1 + (res2 << 16);
 		else
-			mainGame->showcardcode = (((res >> 2) & 0x3) - 1) + (((res & 0x3) - 1) << 16);
+			mainGame->showcardcode = res2 + (res1 << 16);
 		mainGame->showcarddif = 50;
 		mainGame->showcardp = 0;
 		mainGame->showcard = 100;
@@ -3310,12 +3314,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
 			mainGame->dField.current_chain.solved = false;
 			int chc = 0;
-			for(size_t i = 0; i < mainGame->dField.chains.size(); ++i) {
+			for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
 				if (cl == 0x10 || cl == 0x20) {
-					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
+					if (chit->controler == cc && chit->location == cl)
 						chc++;
 				} else {
-					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
+					if (chit->controler == cc && chit->location == cl && chit->sequence == cs)
 						chc++;
 				}
 			}

@@ -34,6 +34,7 @@ public:
 	irr::video::ITexture* tMask;
 	irr::video::ITexture* tEquip;
 	irr::video::ITexture* tTarget;
+	irr::video::ITexture* tChainTarget;
 	irr::video::ITexture* tLim;
 	irr::video::ITexture* tOT;
 	irr::video::ITexture* tHand[3];
