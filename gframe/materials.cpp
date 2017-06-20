@@ -237,10 +237,10 @@ Materials::Materials() {
 	SetS3DVertex(vFieldSzone[1][7][1], 0.0f, -0.1f, -0.8f, -1.3f, 0, 1, 0, 0, 0, 0);
 
 	//conti_act
-	vFieldContiAct[0] = vector3df(-0.8f, 0.1f, 0.0f);
-	vFieldContiAct[1] = vector3df(0.0f, 0.1f, 0.0f);
-	vFieldContiAct[2] = vector3df(-0.8f, 1.3f, 0.0f);
-	vFieldContiAct[3] = vector3df(0.0f, 1.3f, 0.0f);
+	vFieldContiAct[0] = vector3df(3.5f, -0.6f, 0.0f);
+	vFieldContiAct[1] = vector3df(4.4f, -0.6f, 0.0f);
+	vFieldContiAct[2] = vector3df(3.5f, 0.6f, 0.0f);
+	vFieldContiAct[3] = vector3df(4.4f, 0.6f, 0.0f);
 
 
 	for(int i = 0; i < 40; ++i)
