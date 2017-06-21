@@ -16,6 +16,7 @@ public:
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
+	void UpdateHovered(int x, int y);
 
 	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
 	

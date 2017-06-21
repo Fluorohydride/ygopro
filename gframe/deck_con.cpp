@@ -688,83 +688,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case irr::EMIE_MOUSE_MOVED: {
-			int x = event.MouseInput.X;
-			int y = event.MouseInput.Y;
-			irr::core::position2di mouse_pos(x, y);
-			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-			if(root->getElementFromPoint(mouse_pos) != root)
-				break;
-			int pre_code = hovered_code;
-			if(x >= 314 && x <= 794 && y >= 164 && y <= 435) {
-				int lx = 10, px, py = (y - 164) / 68;
-				hovered_pos = 1;
-				if(deckManager.current_deck.main.size() > 40)
-					lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
-				if(x >= 750)
-					px = lx - 1;
-				else px = (x - 314) * (lx - 1) / 436;
-				if(py*lx + px >= (int)deckManager.current_deck.main.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_seq = py * lx + px;
-					hovered_code = deckManager.current_deck.main[hovered_seq]->first;
-				}
-			} else if(x >= 314 && x <= 794 && y >= 466 && y <= 530) {
-				int lx = deckManager.current_deck.extra.size();
-				hovered_pos = 2;
-				if(lx < 10)
-					lx = 10;
-				if(x >= 750)
-					hovered_seq = lx - 1;
-				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= (int)deckManager.current_deck.extra.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
-				}
-			} else if (x >= 314 && x <= 794 && y >= 564 && y <= 628) {
-				int lx = deckManager.current_deck.side.size();
-				hovered_pos = 3;
-				if(lx < 10)
-					lx = 10;
-				if(x >= 750)
-					hovered_seq = lx - 1;
-				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= (int)deckManager.current_deck.side.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_code = deckManager.current_deck.side[hovered_seq]->first;
-				}
-			} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
-				hovered_pos = 4;
-				hovered_seq = (y - 165) / 66;
-				if(mainGame->scrFilter->getPos() + hovered_seq >= (int)results.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_code = results[mainGame->scrFilter->getPos() + hovered_seq]->first;
-				}
-			} else {
-				hovered_pos = 0;
-				hovered_code = 0;
-			}
-			if(is_draging) {
-				dragx = x;
-				dragy = y;
-			}
-			if(!is_draging && pre_code != hovered_code) {
-				if(hovered_code) {
-					mainGame->ShowCardInfo(hovered_code);
-				}
-				if(pre_code)
-					imageManager.RemoveTexture(pre_code);
-			}
-			break;
-		}
 		case irr::EMIE_MOUSE_WHEEL: {
 			if(!mainGame->scrFilter->isVisible())
 				break;
@@ -775,13 +698,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(mainGame->scrFilter->getPos() > 0)
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() - 1);
 			}
-			SEvent e = event;
-			e.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-			mainGame->device->postEventFromUser(e);
 			break;
 		}
 		default: break;
 		}
+		UpdateHovered(event.MouseInput.X, event.MouseInput.Y);
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
@@ -988,6 +909,7 @@ void DeckBuilder::SortList() {
 		break;
 	}
 }
+
 static inline wchar_t NormalizeChar(wchar_t c) {
 	/*
 	// Convert all symbols and punctuations to space.
@@ -1008,6 +930,7 @@ static inline wchar_t NormalizeChar(wchar_t c) {
 	}
 	return c;
 }
+
 bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needle)
 {
 	if (!needle[0]) {
@@ -1030,4 +953,80 @@ bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needl
 	}
 	return false;
 }
+
+void DeckBuilder::UpdateHovered(int x, int y) {
+	irr::core::position2di mouse_pos(x, y);
+	irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+	if(root->getElementFromPoint(mouse_pos) != root)
+		return;
+	int pre_code = hovered_code;
+	if(x >= 314 && x <= 794 && y >= 164 && y <= 435) {
+		int lx = 10, px, py = (y - 164) / 68;
+		hovered_pos = 1;
+		if(deckManager.current_deck.main.size() > 40)
+			lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
+		if(x >= 750)
+			px = lx - 1;
+		else px = (x - 314) * (lx - 1) / 436;
+		if(py*lx + px >= (int)deckManager.current_deck.main.size()) {
+			hovered_seq = -1;
+			hovered_code = 0;
+		} else {
+			hovered_seq = py * lx + px;
+			hovered_code = deckManager.current_deck.main[hovered_seq]->first;
+		}
+	} else if(x >= 314 && x <= 794 && y >= 466 && y <= 530) {
+		int lx = deckManager.current_deck.extra.size();
+		hovered_pos = 2;
+		if(lx < 10)
+			lx = 10;
+		if(x >= 750)
+			hovered_seq = lx - 1;
+		else hovered_seq = (x - 314) * (lx - 1) / 436;
+		if(hovered_seq >= (int)deckManager.current_deck.extra.size()) {
+			hovered_seq = -1;
+			hovered_code = 0;
+		} else {
+			hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
+		}
+	} else if (x >= 314 && x <= 794 && y >= 564 && y <= 628) {
+		int lx = deckManager.current_deck.side.size();
+		hovered_pos = 3;
+		if(lx < 10)
+			lx = 10;
+		if(x >= 750)
+			hovered_seq = lx - 1;
+		else hovered_seq = (x - 314) * (lx - 1) / 436;
+		if(hovered_seq >= (int)deckManager.current_deck.side.size()) {
+			hovered_seq = -1;
+			hovered_code = 0;
+		} else {
+			hovered_code = deckManager.current_deck.side[hovered_seq]->first;
+		}
+	} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
+		hovered_pos = 4;
+		hovered_seq = (y - 165) / 66;
+		if(mainGame->scrFilter->getPos() + hovered_seq >= (int)results.size()) {
+			hovered_seq = -1;
+			hovered_code = 0;
+		} else {
+			hovered_code = results[mainGame->scrFilter->getPos() + hovered_seq]->first;
+		}
+	} else {
+		hovered_pos = 0;
+		hovered_code = 0;
+	}
+	if(is_draging) {
+		dragx = x;
+		dragy = y;
+	}
+	if(!is_draging && pre_code != hovered_code) {
+		if(hovered_code) {
+			mainGame->ShowCardInfo(hovered_code);
+		}
+		if(pre_code)
+			imageManager.RemoveTexture(pre_code);
+	}
+}
+
 }
