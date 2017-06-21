@@ -297,6 +297,7 @@ const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
 }
 const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
 	wchar_t* p = lmBuffer;
+	*p = 0;
 	if(link_marker & LINK_MARKER_TOP_LEFT)
 		BufferIO::CopyWStrRef(L"[\u2196]", p, 4);
 	if(link_marker & LINK_MARKER_TOP)
