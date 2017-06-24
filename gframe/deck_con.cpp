@@ -58,6 +58,45 @@ static bool check_set_code(const CardDataC& data, int set_code) {
 	return res;
 }
 
+void DeckBuilder::Initialize() {
+	mainGame->is_building = true;
+	mainGame->is_siding = false;
+	mainGame->wInfos->setVisible(true);
+	mainGame->wCardImg->setVisible(true);
+	mainGame->wDeckEdit->setVisible(true);
+	mainGame->wFilter->setVisible(true);
+	mainGame->wSort->setVisible(true);
+	mainGame->btnLeaveGame->setVisible(true);
+	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1306));
+	mainGame->btnSideOK->setVisible(false);
+	filterList = deckManager._lfList[0].content;
+	mainGame->cbDBLFList->setSelected(0);
+	ClearSearch();
+	is_draging = false;
+	prevID = 0;
+	is_modified = false;
+	mainGame->device->setEventReceiver(&mainGame->deckBuilder);
+}
+void DeckBuilder::Terminate() {
+	mainGame->is_building = false;
+	mainGame->wDeckEdit->setVisible(false);
+	mainGame->wCategories->setVisible(false);
+	mainGame->wFilter->setVisible(false);
+	mainGame->wSort->setVisible(false);
+	mainGame->wCardImg->setVisible(false);
+	mainGame->wInfos->setVisible(false);
+	mainGame->btnLeaveGame->setVisible(false);
+	mainGame->PopupElement(mainGame->wMainMenu);
+	mainGame->device->setEventReceiver(&mainGame->menuHandler);
+	mainGame->wACMessage->setVisible(false);
+	imageManager.ClearTexture();
+	mainGame->scrFilter->setVisible(false);
+	int sel = mainGame->cbDBDecks->getSelected();
+	if(sel >= 0)
+		BufferIO::CopyWStr(mainGame->cbDBDecks->getItem(sel), mainGame->gameConf.lastdeck, 64);
+	if(exit_on_return)
+		mainGame->device->closeDevice();
+}
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
@@ -76,7 +115,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1339));
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
-				is_clearing = true;
+				prevID = id;
 				break;
 			}
 			case BUTTON_SORT_DECK: {
@@ -91,9 +130,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SAVE_DECK: {
 				int sel = mainGame->cbDBDecks->getSelected();
-				if(sel>-1 && deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
+				if(sel >= 0 && deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
+					is_modified = false;
 				}
 				break;
 			}
@@ -117,6 +157,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(deckManager.SaveDeck(deckManager.current_deck, dname)) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
+					is_modified = false;
 				}
 				break;
 			}
@@ -130,28 +171,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
-				is_deleting = true;
+				prevID = id;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
-				mainGame->is_building = false;
-				mainGame->wDeckEdit->setVisible(false);
-				mainGame->wCategories->setVisible(false);
-				mainGame->wFilter->setVisible(false);
-				mainGame->wSort->setVisible(false);
-				mainGame->wCardImg->setVisible(false);
-				mainGame->wInfos->setVisible(false);
-				mainGame->btnLeaveGame->setVisible(false);
-				mainGame->PopupElement(mainGame->wMainMenu);
-				mainGame->device->setEventReceiver(&mainGame->menuHandler);
-				mainGame->wACMessage->setVisible(false);
-				imageManager.ClearTexture();
-				mainGame->scrFilter->setVisible(false);
-				if(mainGame->cbDBDecks->getSelected() != -1) {
-					BufferIO::CopyWStr(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()), mainGame->gameConf.lastdeck, 64);
+				if(is_modified && mainGame->gameConf.prompt_to_discard_deck_changes) {
+					mainGame->gMutex.Lock();
+					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
+					mainGame->PopupElement(mainGame->wQuery);
+					mainGame->gMutex.Unlock();
+					prevID = id;
+					break;
 				}
-				if(exit_on_return)
-					mainGame->device->closeDevice();
+				Terminate();
 				break;
 			}
 			case BUTTON_EFFECT_FILTER: {
@@ -205,11 +237,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wQuery);
 				if(!mainGame->is_building || mainGame->is_siding)
 					break;
-				if(is_clearing) {
+				if(prevID == BUTTON_CLEAR_DECK) {
 					deckManager.current_deck.main.clear();
 					deckManager.current_deck.extra.clear();
 					deckManager.current_deck.side.clear();
-				} else if(is_deleting) {
+				} else if(prevID == BUTTON_DELETE_DECK) {
 					int sel = mainGame->cbDBDecks->getSelected();
 					if (deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 						mainGame->cbDBDecks->removeItem(sel);
@@ -221,16 +253,17 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
 						mainGame->stACMessage->setText(dataManager.GetSysString(1338));
 						mainGame->PopupElement(mainGame->wACMessage, 20);
+						is_modified = false;
 					}
+				} else if(prevID == BUTTON_LEAVE_GAME) {
+					Terminate();
 				}
-				is_clearing = false;
-				is_deleting = false;
+				prevID = 0;
 				break;
 			}
 			case BUTTON_NO: {
 				mainGame->HideElement(mainGame->wQuery);
-				is_deleting = false;
-				is_clearing = false;
+				prevID = 0;
 				break;
 			}
 			case BUTTON_MARKS_FILTER: {
@@ -298,6 +331,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case COMBOBOX_DBDECKS: {
 				deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+				is_modified = false;
 				break;
 			}
 			case COMBOBOX_MAINTYPE: {
@@ -417,7 +451,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
-			irr::core::position2di mouse_pos(event.MouseInput.X, event.MouseInput.Y);
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) != root)
 				break;
@@ -431,100 +464,38 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			draging_pointer = dataManager.GetCodePointer(hovered_code);
 			if(draging_pointer == dataManager._datas.end())
 				break;
-			unsigned int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
 			if(hovered_pos == 4) {
-				int limit = 3;
-				if(filterList->count(limitcode))
-					limit = (*filterList)[limitcode];
-				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-					if(deckManager.current_deck.main[i]->first == limitcode
-					        || deckManager.current_deck.main[i]->second.alias == limitcode)
-						limit--;
-				for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-					if(deckManager.current_deck.extra[i]->first == limitcode
-					        || deckManager.current_deck.extra[i]->second.alias == limitcode)
-						limit--;
-				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-					if(deckManager.current_deck.side[i]->first == limitcode
-					        || deckManager.current_deck.side[i]->second.alias == limitcode)
-						limit--;
-				if(limit <= 0)
+				if(!check_limit(draging_pointer))
 					break;
 			}
 			if(hovered_pos == 1)
-				deckManager.current_deck.main.erase(deckManager.current_deck.main.begin() + hovered_seq);
+				pop_main(hovered_seq);
 			else if(hovered_pos == 2)
-				deckManager.current_deck.extra.erase(deckManager.current_deck.extra.begin() + hovered_seq);
+				pop_extra(hovered_seq);
 			else if(hovered_pos == 3)
-				deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
+				pop_side(hovered_seq);
 			is_draging = true;
 			break;
 		}
 		case irr::EMIE_LMOUSE_LEFT_UP: {
 			if(!is_draging)
 				break;
-			if(!mainGame->is_siding) {
-				if((hovered_pos == 1 && (draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
-					|| (hovered_pos == 2 && !(draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))))
-					hovered_pos = 0;
-				if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 60) {
-					if(hovered_seq == -1)
-						deckManager.current_deck.main.push_back(draging_pointer);
-					else if(hovered_seq < (int)deckManager.current_deck.main.size() && hovered_pos)
-						deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
-					else deckManager.current_deck.main.push_back(draging_pointer);
-					is_draging = false;
-				} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 15) {
-					if(hovered_seq == -1)
-						deckManager.current_deck.extra.push_back(draging_pointer);
-					else if(hovered_seq < (int)deckManager.current_deck.extra.size() && hovered_pos)
-						deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
-					else deckManager.current_deck.extra.push_back(draging_pointer);
-					is_draging = false;
-				} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 15) {
-					if(hovered_seq == -1)
-						deckManager.current_deck.side.push_back(draging_pointer);
-					else if(hovered_seq < (int)deckManager.current_deck.side.size() && hovered_pos)
-						deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
-					else deckManager.current_deck.side.push_back(draging_pointer);
-					is_draging = false;
-				} else if (hovered_pos == 4)
-					is_draging = false;
-			} else {
-				if((hovered_pos == 1 && (draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
-					|| (hovered_pos == 2 && !(draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
-					|| hovered_pos == 4)
-					hovered_pos = 0;
-				if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 65) {
-					if(hovered_seq == -1)
-						deckManager.current_deck.main.push_back(draging_pointer);
-					else if(hovered_seq < (int)deckManager.current_deck.main.size() && hovered_pos)
-						deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
-					else deckManager.current_deck.main.push_back(draging_pointer);
-					is_draging = false;
-				} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 20) {
-					if(hovered_seq == -1)
-						deckManager.current_deck.extra.push_back(draging_pointer);
-					else if(hovered_seq < (int)deckManager.current_deck.extra.size() && hovered_pos)
-						deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
-					else deckManager.current_deck.extra.push_back(draging_pointer);
-					is_draging = false;
-				} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 20) {
-					if(hovered_seq == -1)
-						deckManager.current_deck.side.push_back(draging_pointer);
-					else if(hovered_seq < (int)deckManager.current_deck.side.size() && hovered_pos)
-						deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
-					else deckManager.current_deck.side.push_back(draging_pointer);
-					is_draging = false;
-				}
-			}
-			if(is_draging) {
+			bool pushed = false;
+			if(hovered_pos == 1)
+				pushed = push_main(draging_pointer, hovered_seq);
+			else if(hovered_pos == 2)
+				pushed = push_extra(draging_pointer, hovered_seq);
+			else if(hovered_pos == 3)
+				pushed = push_side(draging_pointer, hovered_seq);
+			else if(hovered_pos == 4 && !mainGame->is_siding)
+				pushed = true;
+			if(!pushed) {
 				if(click_pos == 1)
-					deckManager.current_deck.main.push_back(draging_pointer);
+					push_main(draging_pointer);
 				else if(click_pos == 2)
-					deckManager.current_deck.extra.push_back(draging_pointer);
+					push_extra(draging_pointer);
 				else if(click_pos == 3)
-					deckManager.current_deck.side.push_back(draging_pointer);
+					push_side(draging_pointer);
 			}
 			is_draging = false;
 			break;
@@ -535,99 +506,53 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				if(hovered_pos == 0 || hovered_seq == -1)
 					break;
-				draging_pointer = dataManager.GetCodePointer(hovered_code);
-				if(draging_pointer == dataManager._datas.end())
+				auto pointer = dataManager.GetCodePointer(hovered_code);
+				if(pointer == dataManager._datas.end())
 					break;
 				if(hovered_pos == 1) {
-					if(deckManager.current_deck.side.size() < 20) {
-						deckManager.current_deck.main.erase(deckManager.current_deck.main.begin() + hovered_seq);
-						deckManager.current_deck.side.push_back(draging_pointer);
-					}
+					if(push_side(pointer))
+						pop_main(hovered_seq);
 				} else if(hovered_pos == 2) {
-					if(deckManager.current_deck.side.size() < 20) {
-						deckManager.current_deck.extra.erase(deckManager.current_deck.extra.begin() + hovered_seq);
-						deckManager.current_deck.side.push_back(draging_pointer);
-					}
+					if(push_side(pointer))
+						pop_extra(hovered_seq);
 				} else {
-					if((draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.extra.size() < 20) {
-						deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
-						deckManager.current_deck.extra.push_back(draging_pointer);
-					}
-					if(!(draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.main.size() < 64) {
-						deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
-						deckManager.current_deck.main.push_back(draging_pointer);
-					}
+					if(push_extra(pointer) || push_main(pointer))
+						pop_side(hovered_seq);
 				}
 				break;
 			}
 			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
 				break;
-			if(hovered_pos == 0 || hovered_seq == -1)
-				break;
 			if(!is_draging) {
-				draging_pointer = dataManager.GetCodePointer(hovered_code);
-				if(draging_pointer == dataManager._datas.end())
+				if(hovered_pos == 0 || hovered_seq == -1)
 					break;
-			}
-			if(hovered_pos == 1) {
-				if(!is_draging)
-					deckManager.current_deck.main.erase(deckManager.current_deck.main.begin() + hovered_seq);
-				else if(deckManager.current_deck.side.size() < 15) {
-					deckManager.current_deck.side.push_back(draging_pointer);
-					is_draging = false;
-				}
-			} else if(hovered_pos == 2) {
-				if(!is_draging)
-					deckManager.current_deck.extra.erase(deckManager.current_deck.extra.begin() + hovered_seq);
-				else if(deckManager.current_deck.side.size() < 15) {
-					deckManager.current_deck.side.push_back(draging_pointer);
-					is_draging = false;
-				}
-			} else if(hovered_pos == 3) {
-				if(!is_draging)
-					deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
-				else {
-					if((draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.extra.size() < 15) {
-						deckManager.current_deck.extra.push_back(draging_pointer);
-						is_draging = false;
-					} else if(!(draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.main.size() < 60) {
-						deckManager.current_deck.main.push_back(draging_pointer);
-						is_draging = false;
-					}
+				if(hovered_pos == 1) {
+					pop_main(hovered_seq);
+				} else if(hovered_pos == 2) {
+					pop_extra(hovered_seq);
+				} else if(hovered_pos == 3) {
+					pop_side(hovered_seq);
+				} else {
+					auto pointer = dataManager.GetCodePointer(hovered_code);
+					if(pointer == dataManager._datas.end())
+						break;
+					if(!check_limit(pointer))
+						break;
+					if(!push_extra(pointer) && !push_main(pointer))
+						push_side(pointer);
 				}
 			} else {
-				if(is_draging) {
-					if(deckManager.current_deck.side.size() < 15) {
-						deckManager.current_deck.side.push_back(draging_pointer);
-						is_draging = false;
-					}
+				if(click_pos == 1) {
+					push_side(draging_pointer);
+				} else if(click_pos == 2) {
+					push_side(draging_pointer);
+				} else if(click_pos == 3) {
+					if(!push_extra(draging_pointer))
+						push_main(draging_pointer);
 				} else {
-					unsigned int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
-					int limit = 3;
-					if(filterList->count(limitcode))
-						limit = (*filterList)[limitcode];
-					for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-						if(deckManager.current_deck.main[i]->first == limitcode
-						        || deckManager.current_deck.main[i]->second.alias == limitcode)
-							limit--;
-					for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-						if(deckManager.current_deck.extra[i]->first == limitcode
-						        || deckManager.current_deck.extra[i]->second.alias == limitcode)
-							limit--;
-					for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-						if(deckManager.current_deck.side[i]->first == limitcode
-						        || deckManager.current_deck.side[i]->second.alias == limitcode)
-							limit--;
-					if(limit <= 0)
-						break;
-					if((draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.extra.size() < 15) {
-						deckManager.current_deck.extra.push_back(draging_pointer);
-					} else if(!(draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.main.size() < 60) {
-						deckManager.current_deck.main.push_back(draging_pointer);
-					} else if (deckManager.current_deck.side.size() < 15) {
-						deckManager.current_deck.side.push_back(draging_pointer);
-					}
+					push_side(draging_pointer);
 				}
+				is_draging = false;
 			}
 			break;
 		}
@@ -640,129 +565,27 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			if (is_draging)
 				break;
-			draging_pointer = dataManager.GetCodePointer(hovered_code);
-			unsigned int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
-			int limit = 3;
-			if (filterList->count(limitcode))
-				limit = (*filterList)[limitcode];
-			for (size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-				if (deckManager.current_deck.main[i]->first == limitcode
-					|| deckManager.current_deck.main[i]->second.alias == limitcode)
-					limit--;
-			for (size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-				if (deckManager.current_deck.extra[i]->first == limitcode
-					|| deckManager.current_deck.extra[i]->second.alias == limitcode)
-					limit--;
-			for (size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-				if (deckManager.current_deck.side[i]->first == limitcode
-					|| deckManager.current_deck.side[i]->second.alias == limitcode)
-					limit--;
-			if (limit <= 0)
+			auto pointer = dataManager.GetCodePointer(hovered_code);
+			if(!check_limit(pointer))
 				break;
 			if (hovered_pos == 1) {
-				if (deckManager.current_deck.main.size() < 60)
-					deckManager.current_deck.main.push_back(draging_pointer);
-				else if (deckManager.current_deck.side.size() < 15)
-					deckManager.current_deck.side.push_back(draging_pointer);
+				if(!push_main(pointer))
+					push_side(pointer);
 			} else if (hovered_pos == 2) {
-				if (deckManager.current_deck.extra.size() < 15)
-					deckManager.current_deck.extra.push_back(draging_pointer);
-				else if (deckManager.current_deck.side.size() < 15)
-					deckManager.current_deck.side.push_back(draging_pointer);
+				if(!push_extra(pointer))
+					push_side(pointer);
 			} else if (hovered_pos == 3) {
-				if (deckManager.current_deck.side.size() < 15)
-					deckManager.current_deck.side.push_back(draging_pointer);
-				else {
-					if ((draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.extra.size() < 15)
-						deckManager.current_deck.extra.push_back(draging_pointer);
-					else if (!(draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.main.size() < 60)
-						deckManager.current_deck.main.push_back(draging_pointer);
-				}
+				if(!push_side(pointer) && !push_extra(pointer))
+					push_main(pointer);
 			} else {
-				if ((draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.extra.size() < 15)
-					deckManager.current_deck.extra.push_back(draging_pointer);
-				else if (!(draging_pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) && deckManager.current_deck.main.size() < 60)
-					deckManager.current_deck.main.push_back(draging_pointer);
-				else if (deckManager.current_deck.side.size() < 15)
-					deckManager.current_deck.side.push_back(draging_pointer);
+				if(!push_extra(pointer) && !push_main(pointer))
+					push_side(pointer);
 			}
 			break;
 		}
 		case irr::EMIE_MOUSE_MOVED: {
-			int x = event.MouseInput.X;
-			int y = event.MouseInput.Y;
-			irr::core::position2di mouse_pos(x, y);
-			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-			if(root->getElementFromPoint(mouse_pos) != root)
-				break;
-			int pre_code = hovered_code;
-			if(x >= 314 && x <= 794 && y >= 164 && y <= 435) {
-				int lx = 10, px, py = (y - 164) / 68;
-				hovered_pos = 1;
-				if(deckManager.current_deck.main.size() > 40)
-					lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
-				if(x >= 750)
-					px = lx - 1;
-				else px = (x - 314) * (lx - 1) / 436;
-				if(py*lx + px >= (int)deckManager.current_deck.main.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_seq = py * lx + px;
-					hovered_code = deckManager.current_deck.main[hovered_seq]->first;
-				}
-			} else if(x >= 314 && x <= 794 && y >= 466 && y <= 530) {
-				int lx = deckManager.current_deck.extra.size();
-				hovered_pos = 2;
-				if(lx < 10)
-					lx = 10;
-				if(x >= 750)
-					hovered_seq = lx - 1;
-				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= (int)deckManager.current_deck.extra.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
-				}
-			} else if (x >= 314 && x <= 794 && y >= 564 && y <= 628) {
-				int lx = deckManager.current_deck.side.size();
-				hovered_pos = 3;
-				if(lx < 10)
-					lx = 10;
-				if(x >= 750)
-					hovered_seq = lx - 1;
-				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= (int)deckManager.current_deck.side.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_code = deckManager.current_deck.side[hovered_seq]->first;
-				}
-			} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
-				hovered_pos = 4;
-				hovered_seq = (y - 165) / 66;
-				if(mainGame->scrFilter->getPos() + hovered_seq >= (int)results.size()) {
-					hovered_seq = -1;
-					hovered_code = 0;
-				} else {
-					hovered_code = results[mainGame->scrFilter->getPos() + hovered_seq]->first;
-				}
-			} else {
-				hovered_pos = 0;
-				hovered_code = 0;
-			}
-			if(is_draging) {
-				dragx = x;
-				dragy = y;
-			}
-			if(!is_draging && pre_code != hovered_code) {
-				if(hovered_code) {
-					mainGame->ShowCardInfo(hovered_code);
-				}
-				if(pre_code)
-					imageManager.RemoveTexture(pre_code);
-			}
+			mouse_pos.set(event.MouseInput.X, event.MouseInput.Y);
+			GetHoveredCard();
 			break;
 		}
 		case irr::EMIE_MOUSE_WHEEL: {
@@ -775,9 +598,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(mainGame->scrFilter->getPos() > 0)
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() - 1);
 			}
-			SEvent e = event;
-			e.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-			mainGame->device->postEventFromUser(e);
+			GetHoveredCard();
 			break;
 		}
 		default: break;
@@ -803,6 +624,85 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	default: break;
 	}
 	return false;
+}
+void DeckBuilder::GetHoveredCard() {
+	irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+	if(root->getElementFromPoint(mouse_pos) != root)
+		return;
+	int x = mouse_pos.X;
+	int y = mouse_pos.Y;
+	int pre_code = hovered_code;
+	hovered_pos = 0;
+	hovered_code = 0;
+	if(x >= 314 && x <= 794) {
+		if(y >= 164 && y <= 435) {
+			int lx = 10, px, py = (y - 164) / 68;
+			hovered_pos = 1;
+			if(deckManager.current_deck.main.size() > 40)
+				lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
+			if(x >= 750)
+				px = lx - 1;
+			else
+				px = (x - 314) * (lx - 1) / 436;
+			hovered_seq = py * lx + px;
+			if(hovered_seq >= (int)deckManager.current_deck.main.size()) {
+				hovered_seq = -1;
+				hovered_code = 0;
+			} else {
+				hovered_code = deckManager.current_deck.main[hovered_seq]->first;
+			}
+		} else if(y >= 466 && y <= 530) {
+			int lx = deckManager.current_deck.extra.size();
+			hovered_pos = 2;
+			if(lx < 10)
+				lx = 10;
+			if(x >= 750)
+				hovered_seq = lx - 1;
+			else
+				hovered_seq = (x - 314) * (lx - 1) / 436;
+			if(hovered_seq >= (int)deckManager.current_deck.extra.size()) {
+				hovered_seq = -1;
+				hovered_code = 0;
+			} else {
+				hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
+			}
+		} else if (y >= 564 && y <= 628) {
+			int lx = deckManager.current_deck.side.size();
+			hovered_pos = 3;
+			if(lx < 10)
+				lx = 10;
+			if(x >= 750)
+				hovered_seq = lx - 1;
+			else
+				hovered_seq = (x - 314) * (lx - 1) / 436;
+			if(hovered_seq >= (int)deckManager.current_deck.side.size()) {
+				hovered_seq = -1;
+				hovered_code = 0;
+			} else {
+				hovered_code = deckManager.current_deck.side[hovered_seq]->first;
+			}
+		}
+	} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
+		hovered_pos = 4;
+		hovered_seq = (y - 165) / 66;
+		int pos = mainGame->scrFilter->getPos() + hovered_seq;
+		if(pos >= (int)results.size()) {
+			hovered_seq = -1;
+			hovered_code = 0;
+		} else {
+			hovered_code = results[pos]->first;
+		}
+	}
+	if(is_draging) {
+		dragx = x;
+		dragy = y;
+	}
+	if(!is_draging && pre_code != hovered_code) {
+		if(hovered_code)
+			mainGame->ShowCardInfo(hovered_code);
+		if(pre_code)
+			imageManager.RemoveTexture(pre_code);
+	}
 }
 void DeckBuilder::StartFilter() {
 	filter_type = mainGame->cbCardType->getSelected();
@@ -1029,5 +929,86 @@ bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needl
 		i++;
 	}
 	return false;
+}
+bool DeckBuilder::push_main(code_pointer pointer, int seq) {
+	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))
+		return false;
+	auto& container = deckManager.current_deck.main;
+	int maxc = mainGame->is_siding ? 64 : 60;
+	if((int)container.size() >= maxc)
+		return false;
+	if(seq >= 0 && seq < (int)container.size())
+		container.insert(container.begin() + seq, pointer);
+	else
+		container.push_back(pointer);
+	is_modified = true;
+	GetHoveredCard();
+	return true;
+}
+bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
+	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
+		return false;
+	auto& container = deckManager.current_deck.extra;
+	int maxc = mainGame->is_siding ? 20 : 15;
+	if((int)container.size() >= maxc)
+		return false;
+	if(seq >= 0 && seq < (int)container.size())
+		container.insert(container.begin() + seq, pointer);
+	else
+		container.push_back(pointer);
+	is_modified = true;
+	GetHoveredCard();
+	return true;
+}
+bool DeckBuilder::push_side(code_pointer pointer, int seq) {
+	auto& container = deckManager.current_deck.side;
+	int maxc = mainGame->is_siding ? 20 : 15;
+	if((int)container.size() >= maxc)
+		return false;
+	if(seq >= 0 && seq < (int)container.size())
+		container.insert(container.begin() + seq, pointer);
+	else
+		container.push_back(pointer);
+	is_modified = true;
+	GetHoveredCard();
+	return true;
+}
+void DeckBuilder::pop_main(int seq) {
+	auto& container = deckManager.current_deck.main;
+	container.erase(container.begin() + seq);
+	is_modified = true;
+	GetHoveredCard();
+}
+void DeckBuilder::pop_extra(int seq) {
+	auto& container = deckManager.current_deck.extra;
+	container.erase(container.begin() + seq);
+	is_modified = true;
+	GetHoveredCard();
+}
+void DeckBuilder::pop_side(int seq) {
+	auto& container = deckManager.current_deck.side;
+	container.erase(container.begin() + seq);
+	is_modified = true;
+	GetHoveredCard();
+}
+bool DeckBuilder::check_limit(code_pointer pointer) {
+	unsigned int limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
+	int limit = 3;
+	auto flit = filterList->find(limitcode);
+	if(flit != filterList->end())
+		limit = flit->second;
+	for(auto it = deckManager.current_deck.main.begin(); it != deckManager.current_deck.main.end(); ++it) {
+		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+			limit--;
+	}
+	for(auto it = deckManager.current_deck.extra.begin(); it != deckManager.current_deck.extra.end(); ++it) {
+		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+			limit--;
+	}
+	for(auto it = deckManager.current_deck.side.begin(); it != deckManager.current_deck.side.end(); ++it) {
+		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
+			limit--;
+	}
+	return limit > 0;
 }
 }

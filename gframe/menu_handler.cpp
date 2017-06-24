@@ -244,46 +244,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					mainGame->ebDeckname->setText(L"");
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
-				mainGame->is_building = true;
-				mainGame->is_siding = false;
-				mainGame->wInfos->setVisible(true);
-				mainGame->wCardImg->setVisible(true);
-				mainGame->wDeckEdit->setVisible(true);
-				mainGame->wFilter->setVisible(true);
-				mainGame->wSort->setVisible(true);
-				mainGame->btnLeaveGame->setVisible(true);
-				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1306));
-				mainGame->btnSideOK->setVisible(false);
-				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;
-				mainGame->cbDBLFList->setSelected(0);
-				mainGame->cbCardType->setSelected(0);
-				mainGame->cbCardType2->setSelected(0);
-				mainGame->cbAttribute->setSelected(0);
-				mainGame->cbRace->setSelected(0);
-				mainGame->ebAttack->setText(L"");
-				mainGame->ebDefense->setText(L"");
-				mainGame->ebStar->setText(L"");
-				mainGame->ebScale->setText(L"");
-				mainGame->cbCardType2->setEnabled(false);
-				mainGame->cbAttribute->setEnabled(false);
-				mainGame->cbRace->setEnabled(false);
-				mainGame->ebAttack->setEnabled(false);
-				mainGame->ebDefense->setEnabled(false);
-				mainGame->ebStar->setEnabled(false);
-				mainGame->ebScale->setEnabled(false);
-				mainGame->deckBuilder.filter_effect = 0;
-				mainGame->deckBuilder.filter_marks = 0;
-				mainGame->deckBuilder.result_string[0] = L'0';
-				mainGame->deckBuilder.result_string[1] = 0;
-				mainGame->deckBuilder.results.clear();
-				mainGame->deckBuilder.is_draging = false;
-				mainGame->deckBuilder.is_deleting = false;
-				mainGame->deckBuilder.is_clearing = false;
-				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
-				for(int i = 0; i < 32; ++i)
-					mainGame->chkCategory[i]->setChecked(false);
-				for(int i = 0; i < 8; i++)
-					mainGame->btnMark[i]->setPressed(false);
+				mainGame->deckBuilder.Initialize();
 				break;
 			}
 			}

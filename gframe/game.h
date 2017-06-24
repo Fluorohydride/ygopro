@@ -38,6 +38,7 @@ struct Config {
 	int draw_field_spell;
 	int separate_clear_button;
 	int auto_search_limit;
+	int prompt_to_discard_deck_changes;
 };
 
 struct DuelInfo {
