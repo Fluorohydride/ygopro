@@ -57,7 +57,8 @@ public:
 	size_t pre_extrac;
 	size_t pre_sidec;
 	code_pointer draging_pointer;
-	s32 prevID;
+	int prev_deck;
+	s32 prev_operation;
 	bool is_modified;
 
 	std::unordered_map<int, int>* filterList;

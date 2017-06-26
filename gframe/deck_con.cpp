@@ -73,7 +73,8 @@ void DeckBuilder::Initialize() {
 	mainGame->cbDBLFList->setSelected(0);
 	ClearSearch();
 	is_draging = false;
-	prevID = 0;
+	prev_deck = mainGame->cbDBDecks->getSelected();
+	prev_operation = 0;
 	is_modified = false;
 	mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 }
@@ -115,7 +116,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1339));
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
-				prevID = id;
+				prev_operation = id;
 				break;
 			}
 			case BUTTON_SORT_DECK: {
@@ -171,7 +172,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
-				prevID = id;
+				prev_operation = id;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
@@ -180,7 +181,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
 					mainGame->gMutex.Unlock();
-					prevID = id;
+					prev_operation = id;
 					break;
 				}
 				Terminate();
@@ -237,33 +238,42 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wQuery);
 				if(!mainGame->is_building || mainGame->is_siding)
 					break;
-				if(prevID == BUTTON_CLEAR_DECK) {
+				if(prev_operation == BUTTON_CLEAR_DECK) {
 					deckManager.current_deck.main.clear();
 					deckManager.current_deck.extra.clear();
 					deckManager.current_deck.side.clear();
-				} else if(prevID == BUTTON_DELETE_DECK) {
+				} else if(prev_operation == BUTTON_DELETE_DECK) {
 					int sel = mainGame->cbDBDecks->getSelected();
-					if (deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
+					if(deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 						mainGame->cbDBDecks->removeItem(sel);
 						int count = mainGame->cbDBDecks->getItemCount();
-						if (sel >= count)
+						if(sel >= count)
 							sel = count - 1;
 						mainGame->cbDBDecks->setSelected(sel);
-						if (sel != -1)
+						if(sel != -1)
 							deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
 						mainGame->stACMessage->setText(dataManager.GetSysString(1338));
 						mainGame->PopupElement(mainGame->wACMessage, 20);
+						prev_deck = sel;
 						is_modified = false;
 					}
-				} else if(prevID == BUTTON_LEAVE_GAME) {
+				} else if(prev_operation == BUTTON_LEAVE_GAME) {
 					Terminate();
+				} else if(prev_operation == COMBOBOX_DBDECKS) {
+					int sel = mainGame->cbDBDecks->getSelected();
+					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
+					prev_deck = sel;
+					is_modified = false;
 				}
-				prevID = 0;
+				prev_operation = 0;
 				break;
 			}
 			case BUTTON_NO: {
 				mainGame->HideElement(mainGame->wQuery);
-				prevID = 0;
+				if (prev_operation == COMBOBOX_DBDECKS) {
+					mainGame->cbDBDecks->setSelected(prev_deck);
+				}
+				prev_operation = 0;
 				break;
 			}
 			case BUTTON_MARKS_FILTER: {
@@ -330,7 +340,17 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
-				deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+				if(is_modified && mainGame->gameConf.prompt_to_discard_deck_changes) {
+					mainGame->gMutex.Lock();
+					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
+					mainGame->PopupElement(mainGame->wQuery);
+					mainGame->gMutex.Unlock();
+					prev_operation = id;
+					break;
+				}
+				int sel = mainGame->cbDBDecks->getSelected();
+				deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
+				prev_deck = sel;
 				is_modified = false;
 				break;
 			}
