@@ -99,6 +99,8 @@ void DeckBuilder::Terminate() {
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
+	if(mainGame->dField.OnCommonEvent(event))
+		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
@@ -305,14 +307,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
-			switch(id) {
-			case SCROLL_CARDTEXT: {
-				u32 pos = mainGame->scrCardText->getPos();
-				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth()-25, mainGame->textFont, mainGame->showingtext, pos);
-				break;
-			}
 			break;
-			}
 		}
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
@@ -626,19 +621,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
-		switch(event.KeyInput.Key) {
-		case irr::KEY_KEY_R: {
-			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
-				mainGame->textFont->setTransparency(true);
-			break;
-		}
-		case irr::KEY_ESCAPE: {
-			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
-				mainGame->device->minimizeWindow();
-			break;
-		}
-		default: break;
-		}
 		break;
 	}
 	default: break;

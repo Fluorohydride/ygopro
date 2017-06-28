@@ -271,6 +271,9 @@ bool Game::Initialize() {
 	posY += 30;
 	chkIgnoreDeckChanges = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1357));
 	chkIgnoreDeckChanges->setChecked(gameConf.chkIgnoreDeckChanges != 0);
+	posY += 30;
+	chkAutoSearch = env->addCheckBox(false, rect<s32>(posX, posY, posX + 225, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
+	chkAutoSearch->setChecked(gameConf.auto_search_limit >= 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
