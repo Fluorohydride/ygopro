@@ -176,7 +176,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
-				if(is_modified && mainGame->gameConf.prompt_to_discard_deck_changes) {
+				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
 					mainGame->gMutex.Lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
@@ -340,7 +340,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
-				if(is_modified && mainGame->gameConf.prompt_to_discard_deck_changes) {
+				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
 					mainGame->gMutex.Lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);

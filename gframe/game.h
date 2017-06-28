@@ -38,7 +38,7 @@ struct Config {
 	int draw_field_spell;
 	int separate_clear_button;
 	int auto_search_limit;
-	int prompt_to_discard_deck_changes;
+	int chkIgnoreDeckChanges;
 };
 
 struct DuelInfo {
@@ -211,6 +211,8 @@ public:
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
+	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
+	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
