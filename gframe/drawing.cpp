@@ -198,33 +198,80 @@ void Game::DrawBackGround() {
 }
 void Game::DrawLinkedZones(ClientCard* pcard) {
 	int mark = pcard->link_marker;
-	matManager.mSelField.AmbientColor = 0xff0261a2;
-	driver->setMaterial(matManager.mSelField);
+	ClientCard* pcard2;
 	if (dField.hovered_sequence < 5) {
-		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > 0)
+		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > 0) {
+			pcard2 = mainGame->dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
+			CheckMutual(pcard2, LINK_MARKER_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
-		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence < 4)
+		}
+		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence < 4) {
+			pcard2 = mainGame->dField.mzone[dField.hovered_controler][dField.hovered_sequence + 1];
+			CheckMutual(pcard2, LINK_MARKER_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
+		}
 		if (dInfo.duel_rule >= 4) {
-			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0))
+			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0)) {
+				int mark = (dField.hovered_sequence == 2) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 1) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
+				pcard2 = mainGame->dField.mzone[dField.hovered_controler][5];
+				if (!pcard2) {
+					pcard2 = mainGame->dField.mzone[1 - dField.hovered_controler][6];
+					mark = (dField.hovered_sequence == 2) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 1) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
+				}
+				CheckMutual(pcard2, mark);
 				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
-			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2))
+			}
+			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2)) {
+				int mark = (dField.hovered_sequence == 4) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 3) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
+				pcard2 = mainGame->dField.mzone[dField.hovered_controler][6];
+				if (!pcard2) {
+					pcard2 = mainGame->dField.mzone[1 - dField.hovered_controler][5];
+					mark = (dField.hovered_sequence == 4) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 3) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
+				}
+				CheckMutual(pcard2, mark);
 				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
+			}
 		}
 	} else {
 		int swap = (dField.hovered_sequence == 5) ? 0 : 2;
-		if (mark & LINK_MARKER_BOTTOM_LEFT)
+		if (mark & LINK_MARKER_BOTTOM_LEFT) {
+			pcard2 = mainGame->dField.mzone[dField.hovered_controler][0 + swap];
+			CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][0 + swap], 4, matManager.iRectangle, 2);
-		if (mark & LINK_MARKER_BOTTOM)
+		}
+		if (mark & LINK_MARKER_BOTTOM) {
+			pcard2 = mainGame->dField.mzone[dField.hovered_controler][1 + swap];
+			CheckMutual(pcard2, LINK_MARKER_TOP);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][1 + swap], 4, matManager.iRectangle, 2);
-		if (mark & LINK_MARKER_BOTTOM_RIGHT)
+		}
+		if (mark & LINK_MARKER_BOTTOM_RIGHT) {
+			pcard2 = mainGame->dField.mzone[dField.hovered_controler][2 + swap];
+			CheckMutual(pcard2, LINK_MARKER_TOP_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][2 + swap], 4, matManager.iRectangle, 2);
-		if (mark & LINK_MARKER_TOP_LEFT)
+		}
+		if (mark & LINK_MARKER_TOP_LEFT) {
+			pcard2 = mainGame->dField.mzone[1 - dField.hovered_controler][4 - swap];
+			CheckMutual(pcard2, LINK_MARKER_TOP_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][4 - swap], 4, matManager.iRectangle, 2);
-		if (mark & LINK_MARKER_TOP)
+		}
+		if (mark & LINK_MARKER_TOP) {
+			pcard2 = mainGame->dField.mzone[1 - dField.hovered_controler][3 - swap];
+			CheckMutual(pcard2, LINK_MARKER_TOP);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][3 - swap], 4, matManager.iRectangle, 2);
-		if (mark & LINK_MARKER_TOP_RIGHT)
+		}
+		if (mark & LINK_MARKER_TOP_RIGHT) {
+			pcard2 = mainGame->dField.mzone[1 - dField.hovered_controler][2 - swap];
+			CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][2 - swap], 4, matManager.iRectangle, 2);
+		}
+	}
+}
+void Game::CheckMutual(ClientCard* pcard, int mark) {
+	matManager.mSelField.AmbientColor = 0xff0261a2;
+	driver->setMaterial(matManager.mSelField);
+	if (pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
+		matManager.mSelField.AmbientColor = 0xff009900;
+		driver->setMaterial(matManager.mSelField);
 	}
 }
 void Game::DrawCards() {
