@@ -1158,6 +1158,8 @@ void Game::PlayBGM() {
 			is_playing = false;
 		if(!is_playing) {
 			int count = BGMList.size();
+			if(count <= 0)
+				return;
 			int bgm = (gameConf.BGM_index >= 0) ? gameConf.BGM_index : rand() % count;
 			auto name = BGMList[bgm].c_str();
 			wchar_t fname[256];
@@ -1184,7 +1186,7 @@ void Game::ShowCardInfo(int code) {
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
 	int offset = 0;
-	if(!gameConf.chkHideSetname) {
+	if(!mainGame->chkHideSetname->isChecked()) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
 			auto aptr = dataManager._datas.find(cd.alias);

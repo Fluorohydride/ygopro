@@ -459,13 +459,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			}
 		}
-		case irr::gui::EGET_CHECKBOX_CHANGED: {
-			case CHECKBOX_ENABLE_MUSIC: {
-				if(!mainGame->chkEnableMusic->isChecked())
-					mainGame->engineMusic->stopAllSounds();
-				break;
-			}
-		}
 		default: break;
 		}
 		break;

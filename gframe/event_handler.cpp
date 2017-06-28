@@ -888,11 +888,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			case CHECKBOX_ENABLE_MUSIC: {
-				if(!mainGame->chkEnableMusic->isChecked())
-					mainGame->engineMusic->stopAllSounds();
-				break;
-			}
 			}
 			break;
 		}
@@ -1970,6 +1965,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			switch(id) {
 			case CHECKBOX_AUTO_SEARCH: {
 				mainGame->gameConf.auto_search_limit = mainGame->chkAutoSearch->isChecked() ? 0 : -1;
+				return true;
+				break;
+			}
+			case CHECKBOX_ENABLE_MUSIC: {
+				if(!mainGame->chkEnableMusic->isChecked())
+					mainGame->engineMusic->stopAllSounds();
 				return true;
 				break;
 			}
