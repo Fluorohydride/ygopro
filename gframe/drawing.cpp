@@ -211,7 +211,9 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
 		}
 		if (dInfo.duel_rule >= 4) {
-			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0)) {
+			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2)
+				|| (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1)
+				|| (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 0)) {
 				int mark = (dField.hovered_sequence == 2) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 1) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
 				pcard2 = mainGame->dField.mzone[dField.hovered_controler][5];
 				if (!pcard2) {
@@ -221,7 +223,9 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 				CheckMutual(pcard2, mark);
 				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
 			}
-			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4) || (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3) || (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2)) {
+			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4)
+				|| (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3)
+				|| (mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence == 2)) {
 				int mark = (dField.hovered_sequence == 4) ? LINK_MARKER_BOTTOM_RIGHT : (dField.hovered_sequence == 3) ? LINK_MARKER_BOTTOM : LINK_MARKER_BOTTOM_LEFT;
 				pcard2 = mainGame->dField.mzone[dField.hovered_controler][6];
 				if (!pcard2) {
