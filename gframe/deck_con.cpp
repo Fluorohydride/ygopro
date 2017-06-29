@@ -915,6 +915,9 @@ bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needl
 	if (!needle[0]) {
 		return true;
 	}
+	if (!haystack) {
+		return false;
+	}
 	int i = 0;
 	int j = 0;
 	while (haystack[i]) {
