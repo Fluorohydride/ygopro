@@ -36,7 +36,6 @@ struct Config {
 	int chkHideSetname;
 	int chkHideHintButton;
 	int draw_field_spell;
-	int separate_clear_button;
 
 	bool enablesound;
 	double volume;
