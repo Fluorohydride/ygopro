@@ -113,11 +113,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
-				mainGame->gMutex.Lock();
-				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1339));
-				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.Unlock();
-				prev_operation = id;
+				deckManager.current_deck.main.clear();
+				deckManager.current_deck.extra.clear();
+				deckManager.current_deck.side.clear();
 				break;
 			}
 			case BUTTON_SORT_DECK: {
@@ -238,11 +236,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wQuery);
 				if(!mainGame->is_building || mainGame->is_siding)
 					break;
-				if(prev_operation == BUTTON_CLEAR_DECK) {
-					deckManager.current_deck.main.clear();
-					deckManager.current_deck.extra.clear();
-					deckManager.current_deck.side.clear();
-				} else if(prev_operation == BUTTON_DELETE_DECK) {
+				if(prev_operation == BUTTON_DELETE_DECK) {
 					int sel = mainGame->cbDBDecks->getSelected();
 					if(deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 						mainGame->cbDBDecks->removeItem(sel);
