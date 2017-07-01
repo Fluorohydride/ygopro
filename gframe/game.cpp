@@ -638,10 +638,9 @@ void Game::MainLoop() {
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
-		if(imageManager.tBackGround)
-			driver->draw2DImage(imageManager.tBackGround, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
 		gMutex.Lock();
 		if(dInfo.isStarted) {
+			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
 			DrawMisc();
@@ -649,12 +648,10 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
-			if(imageManager.tBackGround_deck)
-				driver->draw2DImage(imageManager.tBackGround_deck, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
+			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
-			if(imageManager.tBackGround_menu)
-				driver->draw2DImage(imageManager.tBackGround_menu, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
+			DrawBackImage(imageManager.tBackGround_menu);
 		}
 		DrawGUI();
 		DrawSpec();
