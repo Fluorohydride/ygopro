@@ -2012,10 +2012,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				break;
 			}
 			case SCROLL_VOLUME: {
-				mainGame->gameConf.soundvolume = (double)mainGame->srcSoundVolume->getPos() / 100;
-				mainGame->gameConf.musicvolume = (double)mainGame->srcMusicVolume->getPos() / 100;
-				mainGame->engineSound->setSoundVolume(mainGame->gameConf.soundvolume);
-				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.musicvolume);
+				mainGame->gameConf.sound_volume = (double)mainGame->scrSoundVolume->getPos() / 100;
+				mainGame->gameConf.music_volume = (double)mainGame->scrMusicVolume->getPos() / 100;
+				mainGame->engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
+				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.music_volume);
 				break;
 			}
 			}

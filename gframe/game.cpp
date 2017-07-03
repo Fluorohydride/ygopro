@@ -272,26 +272,29 @@ bool Game::Initialize() {
 	chkIgnoreDeckChanges = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1357));
 	chkIgnoreDeckChanges->setChecked(gameConf.chkIgnoreDeckChanges != 0);
 	posY += 30;
-	chkAutoSearch = env->addCheckBox(false, rect<s32>(posX, posY, posX + 225, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
+	chkAutoSearch = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
 	chkAutoSearch->setChecked(gameConf.auto_search_limit >= 0);
 	posY += 30;
-	chkEnableSound = env->addCheckBox(gameConf.enablesound, rect<s32>(posX, posY, posX + 120, posY + 25), tabSystem, -1, dataManager.GetSysString(1380));
-	chkEnableSound->setChecked(gameConf.enablesound);
-	srcSoundVolume = env->addScrollBar(true, rect<s32>(posX + 126, posY + 4, posX + 260, posY + 21), tabSystem, SCROLL_VOLUME);
-	srcSoundVolume->setMax(100);
-	srcSoundVolume->setMin(0);
-	srcSoundVolume->setPos(gameConf.soundvolume * 100);
-	srcSoundVolume->setLargeStep(1);
-	srcSoundVolume->setSmallStep(1);
+	chkEnableSound = env->addCheckBox(gameConf.enable_sound, rect<s32>(posX, posY, posX + 120, posY + 25), tabSystem, -1, dataManager.GetSysString(1380));
+	chkEnableSound->setChecked(gameConf.enable_sound);
+	scrSoundVolume = env->addScrollBar(true, rect<s32>(posX + 126, posY + 4, posX + 260, posY + 21), tabSystem, SCROLL_VOLUME);
+	scrSoundVolume->setMax(100);
+	scrSoundVolume->setMin(0);
+	scrSoundVolume->setPos(gameConf.sound_volume * 100);
+	scrSoundVolume->setLargeStep(1);
+	scrSoundVolume->setSmallStep(1);
 	posY += 30;
-	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, rect<s32>(posX, posY, posX + 120, posY + 25), tabSystem, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(1381));
-	chkEnableMusic->setChecked(gameConf.enablemusic);
-	srcMusicVolume = env->addScrollBar(true, rect<s32>(posX + 126, posY + 4, posX + 260, posY + 21), tabSystem, SCROLL_VOLUME);
-	srcMusicVolume->setMax(100);
-	srcMusicVolume->setMin(0);
-	srcMusicVolume->setPos(gameConf.musicvolume * 100);
-	srcMusicVolume->setLargeStep(1);
-	srcMusicVolume->setSmallStep(1);
+	chkEnableMusic = env->addCheckBox(gameConf.enable_music, rect<s32>(posX, posY, posX + 120, posY + 25), tabSystem, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(1381));
+	chkEnableMusic->setChecked(gameConf.enable_music);
+	scrMusicVolume = env->addScrollBar(true, rect<s32>(posX + 126, posY + 4, posX + 260, posY + 21), tabSystem, SCROLL_VOLUME);
+	scrMusicVolume->setMax(100);
+	scrMusicVolume->setMin(0);
+	scrMusicVolume->setPos(gameConf.music_volume * 100);
+	scrMusicVolume->setLargeStep(1);
+	scrMusicVolume->setSmallStep(1);
+	posY += 30;
+	chkMusicMode = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1382));
+	chkMusicMode->setChecked(gameConf.music_mode != 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -992,11 +995,11 @@ void Game::LoadConfig() {
 	gameConf.separate_clear_button = 1;
 	gameConf.auto_search_limit = -1;
 	gameConf.chkIgnoreDeckChanges = 0;
-	gameConf.enablesound = true;
-	gameConf.soundvolume = 0.5;
-	gameConf.enablemusic = true;
-	gameConf.musicvolume = 0.5;
-	gameConf.BGM_index = -1;
+	gameConf.enable_sound = true;
+	gameConf.sound_volume = 0.5;
+	gameConf.enable_music = true;
+	gameConf.music_volume = 0.5;
+	gameConf.music_mode = 1;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -1058,13 +1061,15 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "ignore_deck_changes")) {
 			gameConf.chkIgnoreDeckChanges = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_sound")) {
-			gameConf.enablesound = atoi(valbuf) > 0;
-		} else if(!strcmp(strbuf, "soundvolume")) {
-			gameConf.soundvolume = atof(valbuf) / 100;
+			gameConf.enable_sound = atoi(valbuf) > 0;
+		} else if(!strcmp(strbuf, "sound_volume")) {
+			gameConf.sound_volume = atof(valbuf) / 100;
 		} else if(!strcmp(strbuf, "enable_music")) {
-			gameConf.enablemusic = atoi(valbuf) > 0;
-		} else if(!strcmp(strbuf, "musicvolume")) {
-			gameConf.musicvolume = atof(valbuf) / 100;
+			gameConf.enable_music = atoi(valbuf) > 0;
+		} else if(!strcmp(strbuf, "music_volume")) {
+			gameConf.music_volume = atof(valbuf) / 100;
+		} else if(!strcmp(strbuf, "music_mode")) {
+			gameConf.music_mode = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1125,20 +1130,19 @@ void Game::SaveConfig() {
 	fprintf(fp, "enable_sound = %d\n", ((mainGame->chkEnableSound->isChecked()) ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", ((mainGame->chkEnableMusic->isChecked()) ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
-	int vol = gameConf.soundvolume * 100;
+	int vol = gameConf.sound_volume * 100;
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
-	fprintf(fp, "soundvolume = %d\n", vol);
-	vol = gameConf.musicvolume * 100;
+	fprintf(fp, "sound_volume = %d\n", vol);
+	vol = gameConf.music_volume * 100;
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
-	fprintf(fp, "musicvolume = %d\n", vol);
-	fprintf(fp, "#playing the music corresponding to the sequence(start from 0) under folder /BGM\n#-1 means playing one of them randomly\n");
-	fprintf(fp, "BGM_index = %d\n", gameConf.BGM_index);
+	fprintf(fp, "music_volume = %d\n", vol);
+	fprintf(fp, "music_mode = %d\n", ((mainGame->chkMusicMode->isChecked()) ? 1 : 0));
 	fclose(fp);
 }
 void Game::PlaySoundEffect(char* sound) {
 	if(mainGame->chkEnableSound->isChecked()) {
 		engineSound->play2D(sound);
-		engineSound->setSoundVolume(gameConf.soundvolume);
+		engineSound->setSoundVolume(gameConf.sound_volume);
 	}
 }
 void Game::PlayMusic(char* song, bool loop) {
@@ -1146,7 +1150,7 @@ void Game::PlayMusic(char* song, bool loop) {
 		if(!engineMusic->isCurrentlyPlaying(song)) {
 			engineMusic->stopAllSounds();
 			engineMusic->play2D(song, loop);
-			engineMusic->setSoundVolume(gameConf.musicvolume);
+			engineMusic->setSoundVolume(gameConf.music_volume);
 		}
 	}
 }
@@ -1160,7 +1164,7 @@ void Game::PlayBGM() {
 			int count = BGMList.size();
 			if(count <= 0)
 				return;
-			int bgm = (gameConf.BGM_index >= 0) ? gameConf.BGM_index : rand() % count;
+			int bgm = (gameConf.music_mode >= 0) ? 0 : rand() % count;
 			auto name = BGMList[bgm].c_str();
 			wchar_t fname[256];
 			myswprintf(fname, L"./sound/BGM/%ls", name);
@@ -1169,7 +1173,7 @@ void Game::PlayBGM() {
 		if(!engineMusic->isCurrentlyPlaying(strBuffer)) {
 			engineMusic->stopAllSounds();
 			engineMusic->play2D(strBuffer, true);
-			engineMusic->setSoundVolume(gameConf.musicvolume);
+			engineMusic->setSoundVolume(gameConf.music_volume);
 			is_playing = true;
 		}
 	}
