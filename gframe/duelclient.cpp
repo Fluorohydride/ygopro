@@ -2426,6 +2426,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_CHAIN_END: {
+		for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
+			for(auto tgit = chit->target.begin(); tgit != chit->target.end(); ++tgit)
+				(*tgit)->is_showchaintarget = false;
+			chit->chain_card->is_showchaintarget = false;
+		}
 		mainGame->dField.chains.clear();
 		return true;
 	}

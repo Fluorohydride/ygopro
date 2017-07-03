@@ -72,11 +72,15 @@ void DeckBuilder::Initialize() {
 	filterList = deckManager._lfList[0].content;
 	mainGame->cbDBLFList->setSelected(0);
 	ClearSearch();
+	mouse_pos.set(0, 0);
+	hovered_code = 0;
+	hovered_pos = 0;
+	hovered_seq = -1;
 	is_draging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
 	is_modified = false;
-	mainGame->device->setEventReceiver(&mainGame->deckBuilder);
+	mainGame->device->setEventReceiver(this);
 }
 void DeckBuilder::Terminate() {
 	mainGame->is_building = false;
@@ -914,6 +918,9 @@ bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needl
 {
 	if (!needle[0]) {
 		return true;
+	}
+	if (!haystack) {
+		return false;
 	}
 	int i = 0;
 	int j = 0;

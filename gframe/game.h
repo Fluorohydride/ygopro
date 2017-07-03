@@ -106,6 +106,7 @@ public:
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
 	void DrawSpec();
+	void DrawBackImage(irr::video::ITexture* texture);
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
