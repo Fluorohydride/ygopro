@@ -249,8 +249,6 @@ bool Game::Initialize() {
 	btnM2->setVisible(false);
 	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
-	btnShuffle = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1307));
-	btnShuffle->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
 	wInfos->setVisible(false);
@@ -615,7 +613,7 @@ bool Game::Initialize() {
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
 	//shuffle
-	btnShuffle = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1297));
+	btnShuffle = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1307));
 	btnShuffle->setVisible(false);
 	//cancel or finish
 	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
