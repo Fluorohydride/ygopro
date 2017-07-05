@@ -78,7 +78,6 @@ void DeckBuilder::Initialize() {
 	hovered_seq = -1;
 	is_lastcard = 0;
 	is_draging = false;
-	is_starting_dragging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
 	mainGame->device->setEventReceiver(this);
@@ -517,11 +516,18 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(!check_limit(draging_pointer))
 					break;
 			}
-			is_starting_dragging = true;
+			is_draging = true;
+			if(hovered_pos == 1)
+				pop_main(hovered_seq);
+			else if(hovered_pos == 2)
+				pop_extra(hovered_seq);
+			else if(hovered_pos == 3)
+				pop_side(hovered_seq);
+			mouse_pos.set(event.MouseInput.X, event.MouseInput.Y);
+			GetHoveredCard();
 			break;
 		}
 		case irr::EMIE_LMOUSE_LEFT_UP: {
-			is_starting_dragging = false;
 			if(!is_draging)
 				break;
 			bool pushed = false;
@@ -628,16 +634,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_MOVED: {
-			if(is_starting_dragging) {
-				is_draging = true;
-				if(hovered_pos == 1)
-					pop_main(hovered_seq);
-				else if(hovered_pos == 2)
-					pop_extra(hovered_seq);
-				else if(hovered_pos == 3)
-					pop_side(hovered_seq);
-				is_starting_dragging = false;
-			}
 			mouse_pos.set(event.MouseInput.X, event.MouseInput.Y);
 			GetHoveredCard();
 			break;
