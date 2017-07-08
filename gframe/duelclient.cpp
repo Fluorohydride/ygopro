@@ -1611,6 +1611,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_CONFIRM_CARDS: {
+		mainGame->PlaySoundEffect("./sound/reveal.wav");
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
 		int code, c, l, s;
@@ -1999,7 +2000,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int cs = BufferIO::ReadInt8(pbuf);
 		int cp = BufferIO::ReadInt8(pbuf);
 		int reason = BufferIO::ReadInt32(pbuf);
-		if(reason & REASON_DESTROY && pl != cl)
+		if(cl & LOCATION_REMOVED)
+			mainGame->PlaySoundEffect("./sound/banished.wav");
+		else if(reason & REASON_DESTROY && pl != cl)
 			mainGame->PlaySoundEffect("./sound/destroyed.wav");
 		if (pl == 0) {
 			ClientCard* pcard = new ClientCard();
@@ -2450,6 +2453,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_RANDOM_SELECTED: {
+		mainGame->PlaySoundEffect("./sound/target.wav");
 		/*int player = */BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
@@ -2474,6 +2478,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_BECOME_TARGET: {
+		mainGame->PlaySoundEffect("./sound/target.wav");
 		int count = BufferIO::ReadInt8(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			pbuf += count * 4;
@@ -2796,7 +2801,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_ATTACK: {
-		mainGame->PlaySoundEffect("./sound/attack.wav");
 		int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int la = BufferIO::ReadInt8(pbuf);
 		int sa = BufferIO::ReadInt8(pbuf);
@@ -2806,6 +2810,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int ld = BufferIO::ReadInt8(pbuf);
 		int sd = BufferIO::ReadInt8(pbuf);
 		BufferIO::ReadInt8(pbuf);
+		if(ld != 0)
+			mainGame->PlaySoundEffect("./sound/attack.wav");
+		else
+			mainGame->PlaySoundEffect("./sound/directattack.wav");
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		float sy;
