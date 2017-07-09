@@ -44,6 +44,7 @@ bool Game::Initialize() {
 	ignore_chain = false;
 	chain_when_avail = false;
 	is_building = false;
+	bgm_scene = -1;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
@@ -665,15 +666,15 @@ void Game::MainLoop() {
 		gMutex.Lock();
 		if(dInfo.isStarted) {
 			if(mainGame->showcardcode == 1 || mainGame->showcardcode == 3)
-				PlayMusic("./sound/duelwin.mp3", true);
+				PlayBGM(BGM_WIN);
 			else if(mainGame->showcardcode == 2)
-				PlayMusic("./sound/duellose.mp3", true);
+				PlayBGM(BGM_LOSE);
 			else if(mainGame->dInfo.lp[0] > 0 && mainGame->dInfo.lp[LocalPlayer(0)] <= mainGame->dInfo.lp[LocalPlayer(1)] / 2)
-				PlayMusic("./sound/song-disadvantage.mp3", true);
+				PlayBGM(BGM_DISADVANTAGE);
 			else if(mainGame->dInfo.lp[0] > 0 && mainGame->dInfo.lp[LocalPlayer(0)] >= mainGame->dInfo.lp[LocalPlayer(1)] * 2)
-				PlayMusic("./sound/song-advantage.mp3", true);
+				PlayBGM(BGM_ADVANTAGE);
 			else
-				PlayBGM();
+				PlayBGM(BGM_DUEL);
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
@@ -682,11 +683,11 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
-			PlayMusic("./sound/deck.mp3", true);
+			PlayBGM(BGM_DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
-			PlayMusic("./sound/menu.mp3", true);
+			PlayBGM(BGM_MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
 		DrawGUI();
@@ -932,14 +933,28 @@ void Game::RefreshSingleplay() {
 #endif
 }
 void Game::RefreshBGMList() {
+	RefershBGMDir(L"", BGM_DUEL);
+	RefershBGMDir(L"duel/", BGM_DUEL);
+	RefershBGMDir(L"menu/", BGM_MENU);
+	RefershBGMDir(L"deck/", BGM_DECK);
+	RefershBGMDir(L"advantage/", BGM_ADVANTAGE);
+	RefershBGMDir(L"disadvantage/", BGM_DISADVANTAGE);
+	RefershBGMDir(L"win/", BGM_WIN);
+	RefershBGMDir(L"lose/", BGM_LOSE);
+}
+void Game::RefershBGMDir(std::wstring path, int scene) {
 #ifdef _WIN32
 	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./sound/BGM/*.mp3", &fdataw);
+	std::wstring search = L"./sound/BGM/" + path + L"*.mp3";
+	HANDLE fh = FindFirstFileW(search.c_str(), &fdataw);
 	if(fh == INVALID_HANDLE_VALUE)
 		return;
 	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			BGMList.push_back(fdataw.cFileName);
+		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+			std::wstring filename = path + (std::wstring)fdataw.cFileName;
+			BGMList[BGM_ALL].push_back(filename);
+			BGMList[scene].push_back(filename);
+		}
 	} while(FindNextFileW(fh, &fdataw));
 	FindClose(fh);
 #else
@@ -953,7 +968,7 @@ void Game::RefreshBGMList() {
 			continue;
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		BGMList.push_back(fdataw.cFileName);
+		BGMList[BGM_ALL].push_back(wname);
 	}
 	closedir(dir);
 #endif
@@ -1262,36 +1277,31 @@ void Game::PlaySoundEffect(int sound) {
 	engineSound->setSoundVolume(gameConf.sound_volume);
 }
 void Game::PlayMusic(char* song, bool loop) {
-	if(mainGame->chkEnableMusic->isChecked()) {
-		if(!engineMusic->isCurrentlyPlaying(song)) {
-			engineMusic->stopAllSounds();
-			engineMusic->play2D(song, loop);
-			engineMusic->setSoundVolume(gameConf.music_volume);
-		}
+	if(!mainGame->chkEnableMusic->isChecked())
+		return;
+	if(!engineMusic->isCurrentlyPlaying(song)) {
+		engineMusic->stopAllSounds();
+		soundBGM = engineMusic->play2D(song, loop, false, true);
+		engineMusic->setSoundVolume(gameConf.music_volume);
 	}
 }
-void Game::PlayBGM() {
-	if(mainGame->chkEnableMusic->isChecked()) {
-		static bool is_playing = false;
-		static char strBuffer[1024];
-		if(is_playing && !engineMusic->isCurrentlyPlaying(strBuffer))
-			is_playing = false;
-		if(!is_playing) {
-			int count = BGMList.size();
-			if(count <= 0)
-				return;
-			int bgm = (gameConf.music_mode >= 0) ? 0 : rand() % count;
-			auto name = BGMList[bgm].c_str();
-			wchar_t fname[256];
-			myswprintf(fname, L"./sound/BGM/%ls", name);
-			BufferIO::EncodeUTF8(fname, strBuffer);
-		}
-		if(!engineMusic->isCurrentlyPlaying(strBuffer)) {
-			engineMusic->stopAllSounds();
-			engineMusic->play2D(strBuffer, true);
-			engineMusic->setSoundVolume(gameConf.music_volume);
-			is_playing = true;
-		}
+void Game::PlayBGM(int scene) {
+	if(!mainGame->chkEnableMusic->isChecked())
+		return;
+	if(!mainGame->chkMusicMode->isChecked())
+		scene = BGM_ALL;
+	char BGMName[1024];
+	if(scene != bgm_scene || (soundBGM && soundBGM->isFinished())) {
+		int count = BGMList[scene].size();
+		if(count <= 0)
+			return;
+		bgm_scene = scene;
+		int bgm = rand() % count;
+		auto name = BGMList[scene][bgm].c_str();
+		wchar_t fname[1024];
+		myswprintf(fname, L"./sound/BGM/%ls", name);
+		BufferIO::EncodeUTF8(fname, BGMName);
+		PlayMusic(BGMName, false);
 	}
 }
 void Game::ShowCardInfo(int code) {
