@@ -17,6 +17,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		s32 id = caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
+			if(id < 110)
+				mainGame->PlaySoundEffect(SOUND_MENU);
+			else
+				mainGame->PlaySoundEffect(SOUND_BUTTON);
 			switch(id) {
 			case BUTTON_MODE_EXIT: {
 				mainGame->device->closeDevice();
