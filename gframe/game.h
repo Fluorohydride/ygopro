@@ -38,6 +38,7 @@ struct Config {
 	int draw_field_spell;
 	int separate_clear_button;
 	int auto_search_limit;
+	int chkIgnoreDeckChanges;
 };
 
 struct DuelInfo {
@@ -94,12 +95,14 @@ public:
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
+	void CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
 	void DrawSpec();
+	void DrawBackImage(irr::video::ITexture* texture);
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
@@ -214,6 +217,8 @@ public:
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
+	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
+	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
@@ -565,6 +570,7 @@ extern unsigned char draw_count;
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
+#define CHECKBOX_AUTO_SEARCH		360
 #define COMBOBOX_SORTTYPE			370
 
 #define BUTTON_MARKS_FILTER			380

@@ -269,6 +269,7 @@ bool Game::Initialize() {
 	btnEP->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
+	wInfos->setTabExtraWidth(16);
 	wInfos->setVisible(false);
 	//info
 	irr::gui::IGUITab* tabInfo = wInfos->addTab(dataManager.GetSysString(1270));
@@ -290,26 +291,44 @@ bool Game::Initialize() {
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(18);
 	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272));
+	//helper
+	irr::gui::IGUITab* tabHelper = wInfos->addTab(dataManager.GetSysString(1298));
+	int posX = 20;
+	int posY = 20;
+	chkMAutoPos = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1274));
+	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
+	posY += 30;
+	chkSTAutoPos = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1278));
+	chkSTAutoPos->setChecked(gameConf.chkSTAutoPos != 0);
+	posY += 30;
+	chkRandomPos = env->addCheckBox(false, rect<s32>(posX + 20, posY, posX + 20 + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1275));
+	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
+	posY += 30;
+	chkAutoChain = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1276));
+	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
+	posY += 30;
+	chkWaitChain = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1277));
+	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
-	chkMAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274));
-	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
-	chkSTAutoPos = env->addCheckBox(false, rect<s32>(20, 50, 280, 75), tabSystem, -1, dataManager.GetSysString(1278));
-	chkSTAutoPos->setChecked(gameConf.chkSTAutoPos != 0);
-	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 80, 300, 105), tabSystem, -1, dataManager.GetSysString(1275));
-	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
-	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1276));
-	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
-	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 140, 280, 165), tabSystem, -1, dataManager.GetSysString(1277));
-	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
-	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1290));
+	posY = 20;
+	chkIgnore1 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1290));
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
-	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 230, 280, 255), tabSystem, -1, dataManager.GetSysString(1291));
+	posY += 30;
+	chkIgnore2 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
-	chkHideSetname = env->addCheckBox(false, rect<s32>(20, 260, 280, 285), tabSystem, -1, dataManager.GetSysString(1354));
+	posY += 30;
+	chkHideSetname = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1354));
 	chkHideSetname->setChecked(gameConf.chkHideSetname != 0);
-	chkHideHintButton = env->addCheckBox(false, rect<s32>(20, 290, 280, 315), tabSystem, -1, dataManager.GetSysString(1355));
+	posY += 30;
+	chkHideHintButton = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1355));
 	chkHideHintButton->setChecked(gameConf.chkHideHintButton != 0);
+	posY += 30;
+	chkIgnoreDeckChanges = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1357));
+	chkIgnoreDeckChanges->setChecked(gameConf.chkIgnoreDeckChanges != 0);
+	posY += 30;
+	chkAutoSearch = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
+	chkAutoSearch->setChecked(gameConf.auto_search_limit >= 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -624,12 +643,12 @@ bool Game::Initialize() {
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
-	//cancel or finish
-	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
-	btnCancelOrFinish->setVisible(false);
 	//shuffle
 	btnShuffle = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1297));
 	btnShuffle->setVisible(false);
+	//cancel or finish
+	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
+	btnCancelOrFinish->setVisible(false);
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
@@ -676,10 +695,9 @@ void Game::MainLoop() {
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
-		if(imageManager.tBackGround)
-			driver->draw2DImage(imageManager.tBackGround, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
 		gMutex.Lock();
 		if(dInfo.isStarted) {
+			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
 			DrawMisc();
@@ -687,12 +705,10 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
-			if(imageManager.tBackGround_deck)
-				driver->draw2DImage(imageManager.tBackGround_deck, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
+			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
-			if(imageManager.tBackGround_menu)
-				driver->draw2DImage(imageManager.tBackGround_menu, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
+			DrawBackImage(imageManager.tBackGround_menu);
 		}
 		DrawGUI();
 		DrawSpec();
@@ -970,6 +986,7 @@ void Game::LoadConfig() {
 	gameConf.draw_field_spell = 1;
 	gameConf.separate_clear_button = 1;
 	gameConf.auto_search_limit = -1;
+	gameConf.chkIgnoreDeckChanges = 0;
 	fseek(fp, 0, SEEK_END);
 	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -1028,6 +1045,8 @@ void Game::LoadConfig() {
 			gameConf.separate_clear_button = atoi(valbuf);
 		} else if(!strcmp(strbuf, "auto_search_limit")) {
 			gameConf.auto_search_limit = atoi(valbuf);
+		} else if(!strcmp(strbuf, "ignore_deck_changes")) {
+			gameConf.chkIgnoreDeckChanges = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1084,6 +1103,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
 	fprintf(fp, "#auto_search_limit >= 0: Start search automatically when the user enters N chars\n");
 	fprintf(fp, "auto_search_limit = %d\n", gameConf.auto_search_limit);
+	fprintf(fp, "ignore_deck_changes = %d\n", ((mainGame->chkIgnoreDeckChanges->isChecked()) ? 1 : 0));
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {

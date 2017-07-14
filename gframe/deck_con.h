@@ -11,6 +11,9 @@ namespace ygo {
 class DeckBuilder: public irr::IEventReceiver {
 public:
 	virtual bool OnEvent(const irr::SEvent& event);
+	void Initialize();
+	void Terminate();
+	void GetHoveredCard();
 	void FilterCards();
 	void StartFilter();
 	void ClearFilter();
@@ -18,7 +21,15 @@ public:
 	void SortList();
 
 	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
-	
+
+	bool push_main(code_pointer pointer, int seq = -1);
+	bool push_extra(code_pointer pointer, int seq = -1);
+	bool push_side(code_pointer pointer, int seq = -1);
+	void pop_main(int seq);
+	void pop_extra(int seq);
+	void pop_side(int seq);
+	bool check_limit(code_pointer pointer);
+
 	long long filter_effect;
 	unsigned int filter_type;
 	unsigned int filter_type2;
@@ -34,20 +45,24 @@ public:
 	unsigned int filter_scl;
 	unsigned int filter_marks;
 	int filter_lm;
+	position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;
 	int hovered_seq;
+	int is_lastcard;
 	int click_pos;
 	bool is_draging;
+	bool is_starting_dragging;
 	int dragx;
 	int dragy;
 	size_t pre_mainc;
 	size_t pre_extrac;
 	size_t pre_sidec;
 	code_pointer draging_pointer;
-	bool is_deleting;
-	bool is_clearing;
-	
+	int prev_deck;
+	s32 prev_operation;
+	bool is_modified;
+
 	std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
