@@ -34,11 +34,13 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 
 int main(int argc, char* argv[]) {
 #ifdef _WIN32
+#ifndef _DEBUG
 	wchar_t exepath[MAX_PATH];
 	GetModuleFileNameW(NULL, exepath, MAX_PATH);
 	wchar_t* p = wcsrchr(exepath, '\\');
 	*p = '\0';
 	SetCurrentDirectoryW(exepath);
+#endif //_DEBUG
 #endif //_WIN32
 #ifdef _WIN32
 	WORD wVersionRequested;
