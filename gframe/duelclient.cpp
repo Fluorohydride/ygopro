@@ -2321,7 +2321,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*int cs = */BufferIO::ReadInt8(pbuf);
 		/*int cp = */BufferIO::ReadInt8(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-			mainGame->PlaySoundEffect(SOUND_SPECIAL_SUMMON);
+			CardData cd;
+			if(dataManager.GetData(code, &cd) && (cd.type & TYPE_TOKEN))
+				mainGame->PlaySoundEffect(SOUND_TOKEN);
+			else
+				mainGame->PlaySoundEffect(SOUND_SPECIAL_SUMMON);
 			myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
 			mainGame->showcardcode = code;
 			mainGame->showcarddif = 1;

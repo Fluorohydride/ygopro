@@ -1191,6 +1191,10 @@ void Game::PlaySoundEffect(int sound) {
 		engineSound->play2D("./sound/banished.wav");
 		break;
 	}
+	case SOUND_TOKEN: {
+		engineSound->play2D("./sound/token.wav");
+		break;
+	}
 	case SOUND_ATTACK: {
 		engineSound->play2D("./sound/attack.wav");
 		break;
