@@ -169,6 +169,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->closeDoneSignal.Wait();
 					mainGame->gMutex.Lock();
 					mainGame->dInfo.isStarted = false;
+					mainGame->dInfo.isFinished = false;
 					mainGame->is_building = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->ShowElement(mainGame->wLanWindow);
@@ -449,6 +450,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isStarted = true;
+		mainGame->dInfo.isFinished = false;
 		mainGame->dInfo.lp[0] = 0;
 		mainGame->dInfo.lp[1] = 0;
 		mainGame->dInfo.strLP[0][0] = 0;
@@ -529,6 +531,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->dInfo.isFinished = true;
 		mainGame->is_building = false;
 		mainGame->wDeckEdit->setVisible(false);
 		mainGame->btnCreateHost->setEnabled(true);
@@ -744,6 +747,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->dInfo.isFinished = false;
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
@@ -853,6 +857,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		break;
 	}
 	case MSG_WIN: {
+		mainGame->dInfo.isFinished = true;
 		int player = BufferIO::ReadInt8(pbuf);
 		int type = BufferIO::ReadInt8(pbuf);
 		mainGame->showcarddif = 110;
