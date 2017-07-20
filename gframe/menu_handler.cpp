@@ -159,9 +159,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_START: {
-				if(!mainGame->chkHostPrepReady[0]->isChecked()
-				        || !mainGame->chkHostPrepReady[1]->isChecked())
-					break;
 				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
