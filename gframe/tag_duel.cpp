@@ -240,7 +240,7 @@ void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	STOC_HS_PlayerChange scpc;
 	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
 	for(int i = 0; i < 4; ++i)
-		if(players[i] && players[i] != dp)
+		if(players[i])
 			NetServer::SendPacketToPlayer(players[i], STOC_HS_PLAYER_CHANGE, scpc);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);

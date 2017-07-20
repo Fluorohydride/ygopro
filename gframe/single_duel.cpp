@@ -269,6 +269,7 @@ void SingleDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	ready[dp->type] = is_ready;
 	STOC_HS_PlayerChange scpc;
 	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
+	NetServer::SendPacketToPlayer(players[dp->type], STOC_HS_PLAYER_CHANGE, scpc);
 	if(players[1 - dp->type])
 		NetServer::SendPacketToPlayer(players[1 - dp->type], STOC_HS_PLAYER_CHANGE, scpc);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
