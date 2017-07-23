@@ -415,6 +415,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnHostPrepDuelist->setEnabled(false);
 				mainGame->btnHostPrepOB->setEnabled(true);
 				mainGame->btnHostPrepReady->setVisible(true);
+				mainGame->btnHostPrepNotReady->setVisible(false);
 			} else {
 				mainGame->btnHostPrepDuelist->setEnabled(true);
 				mainGame->btnHostPrepOB->setEnabled(false);
@@ -447,6 +448,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->chkHostPrepReady[selftype]->setEnabled(true);
 				mainGame->btnHostPrepOB->setEnabled(true);
 				mainGame->btnHostPrepReady->setVisible(true);
+				mainGame->btnHostPrepNotReady->setVisible(false);
 			} else {
 				mainGame->btnHostPrepOB->setEnabled(false);
 				mainGame->btnHostPrepReady->setVisible(false);
