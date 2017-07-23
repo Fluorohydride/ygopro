@@ -825,11 +825,11 @@ void Game::DrawSpec() {
 		}
 		case 7: {
 			core::position2d<s32> corner[4];
-			float y = sin(showcarddif * 3.1415926f / 180.0f) * 254;
-			corner[0] = core::position2d<s32>(574 - (254 - y) * 0.3f, 404 - y);
-			corner[1] = core::position2d<s32>(751 + (254 - y) * 0.3f, 404 - y);
-			corner[2] = core::position2d<s32>(574, 404);
-			corner[3] = core::position2d<s32>(751, 404);
+			float y = sin(showcarddif * 3.1415926f / 180.0f) * 254 * window_size.Height / 640;
+			corner[0] = core::position2d<s32>(574 * window_size.Width / 1024 - (254 * window_size.Height / 640 - y) * 0.3f, 404 * window_size.Height / 640 - y);
+			corner[1] = core::position2d<s32>(751 * window_size.Width / 1024 + (254 * window_size.Height / 640 - y) * 0.3f, 404 * window_size.Height / 640 - y);
+			corner[2] = core::position2d<s32>(574 * window_size.Width / 1024, 404 * window_size.Height / 640);
+			corner[3] = core::position2d<s32>(751 * window_size.Width / 1024, 404 * window_size.Height / 640);
 			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode), rect<s32>(0, 0, 177, 254), corner);
 			showcardp++;
 			showcarddif += 9;
