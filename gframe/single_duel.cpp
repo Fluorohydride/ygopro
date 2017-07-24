@@ -202,7 +202,9 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 		} else {
 			EndDuel();
 			NetServer::StopServer();
+			return;
 		}
+		ready[host_pos] = false;
 		STOC_TypeChange sctc;
 		sctc.type = 0x10 | host_pos;
 		NetServer::SendPacketToPlayer(players[host_pos], STOC_TYPE_CHANGE, sctc);
