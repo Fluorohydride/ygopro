@@ -830,15 +830,10 @@ byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
 #endif
 	if(!fp)
 		return 0;
-	fseek(fp, 0, SEEK_END);
-	unsigned int len = ftell(fp);
-	if(len > sizeof(buffer)) {
-		fclose(fp);
-		return 0;
-	}
-	fseek(fp, 0, SEEK_SET);
-	fread(buffer, len, 1, fp);
+	int len = fread(buffer, 1, sizeof(buffer), fp);
 	fclose(fp);
+	if(len >= sizeof(buffer))
+		return 0;
 	*slen = len;
 	return buffer;
 }
