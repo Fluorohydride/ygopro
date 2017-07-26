@@ -49,8 +49,10 @@ public:
 	int hovered_code;
 	int hovered_pos;
 	int hovered_seq;
+	int is_lastcard;
 	int click_pos;
 	bool is_draging;
+	bool is_starting_dragging;
 	int dragx;
 	int dragy;
 	size_t pre_mainc;

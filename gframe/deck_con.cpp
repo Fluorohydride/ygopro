@@ -76,7 +76,9 @@ void DeckBuilder::Initialize() {
 	hovered_code = 0;
 	hovered_pos = 0;
 	hovered_seq = -1;
+	is_lastcard = 0;
 	is_draging = false;
+	is_starting_dragging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
 	is_modified = false;
@@ -487,25 +489,20 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(!check_limit(draging_pointer))
 					break;
 			}
-			if(hovered_pos == 1)
-				pop_main(hovered_seq);
-			else if(hovered_pos == 2)
-				pop_extra(hovered_seq);
-			else if(hovered_pos == 3)
-				pop_side(hovered_seq);
-			is_draging = true;
+			is_starting_dragging = true;
 			break;
 		}
 		case irr::EMIE_LMOUSE_LEFT_UP: {
+			is_starting_dragging = false;
 			if(!is_draging)
 				break;
 			bool pushed = false;
 			if(hovered_pos == 1)
 				pushed = push_main(draging_pointer, hovered_seq);
 			else if(hovered_pos == 2)
-				pushed = push_extra(draging_pointer, hovered_seq);
+				pushed = push_extra(draging_pointer, hovered_seq + is_lastcard);
 			else if(hovered_pos == 3)
-				pushed = push_side(draging_pointer, hovered_seq);
+				pushed = push_side(draging_pointer, hovered_seq + is_lastcard);
 			else if(hovered_pos == 4 && !mainGame->is_siding)
 				pushed = true;
 			if(!pushed) {
@@ -603,6 +600,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_MOVED: {
+			if(is_starting_dragging) {
+				is_draging = true;
+				if(hovered_pos == 1)
+					pop_main(hovered_seq);
+				else if(hovered_pos == 2)
+					pop_extra(hovered_seq);
+				else if(hovered_pos == 3)
+					pop_side(hovered_seq);
+				is_starting_dragging = false;
+			}
 			mouse_pos.set(event.MouseInput.X, event.MouseInput.Y);
 			GetHoveredCard();
 			break;
@@ -640,6 +647,7 @@ void DeckBuilder::GetHoveredCard() {
 	int pre_code = hovered_code;
 	hovered_pos = 0;
 	hovered_code = 0;
+	is_lastcard = 0;
 	if(x >= 314 && x <= 794) {
 		if(y >= 164 && y <= 435) {
 			int lx = 10, px, py = (y - 164) / 68;
@@ -671,6 +679,8 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_code = 0;
 			} else {
 				hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
+				if(x >= 772)
+					is_lastcard = 1;
 			}
 		} else if (y >= 564 && y <= 628) {
 			int lx = deckManager.current_deck.side.size();
@@ -686,6 +696,8 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_code = 0;
 			} else {
 				hovered_code = deckManager.current_deck.side[hovered_seq]->first;
+				if(x >= 772)
+					is_lastcard = 1;
 			}
 		}
 	} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
@@ -779,7 +791,8 @@ void DeckBuilder::FilterCards() {
 			if(filter_scltype) {
 				if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
 				        || (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
-				        || (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6)
+				        || (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6
+				        || !(data.type & TYPE_PENDULUM))
 					continue;
 			}
 			break;

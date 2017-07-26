@@ -267,6 +267,8 @@ public:
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIStaticText* stHostPrepRule;
 	irr::gui::IGUIStaticText* stHostPrepOB;
+	irr::gui::IGUIButton* btnHostPrepReady;
+	irr::gui::IGUIButton* btnHostPrepNotReady;
 	irr::gui::IGUIButton* btnHostPrepStart;
 	irr::gui::IGUIButton* btnHostPrepCancel;
 	//replay
@@ -480,6 +482,8 @@ extern unsigned char draw_count;
 #define BUTTON_HP_CANCEL			123
 #define BUTTON_HP_KICK				124
 #define CHECKBOX_HP_READY			125
+#define BUTTON_HP_READY				126
+#define BUTTON_HP_NOTREADY			127
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
