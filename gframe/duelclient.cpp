@@ -2060,7 +2060,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int cp = BufferIO::ReadInt8(pbuf);
 		int reason = BufferIO::ReadInt32(pbuf);
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
-			if(cl & LOCATION_REMOVED)
+			if(cl & LOCATION_REMOVED && pl != cl)
 				mainGame->PlaySoundEffect(SOUND_BANISHED);
 			else if(reason & REASON_DESTROY && pl != cl)
 				mainGame->PlaySoundEffect(SOUND_DESTROYED);
