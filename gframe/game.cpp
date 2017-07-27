@@ -1015,7 +1015,6 @@ void Game::LoadConfig() {
 	gameConf.enablesound = true;
 	gameConf.volume = 1.0;
 	gameConf.enablemusic = true;
-	fseek(fp, 0, SEEK_END);
 	gameConf.draw_field_spell = 1;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
