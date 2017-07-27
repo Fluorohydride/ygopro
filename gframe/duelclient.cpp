@@ -140,8 +140,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.rule_count = 0;
 			for (int i = 0; i < 14; ++i) {
 				if (mainGame->chkRules[i]->isChecked() && i != 11) {
-					cscg.info.rule_count = 2;
-					break;
+					cscg.info.rule_count++;
 				}
 			}
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
@@ -337,6 +336,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
 		std::wstring str;
 		std::wstring str2;
+		bool host2 = false;
 		wchar_t msgbuf[256];
 		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist));
 		str.append(msgbuf);
@@ -362,6 +362,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(pkt->info.destiny_draw==2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1626));
 			str.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.no_check_deck) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1229));
@@ -374,58 +375,72 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(pkt->info.sealed == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1132));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.booster == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1133));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.action == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1134));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.speed == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1135));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.concentration == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1136));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.boss == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1137));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.city == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1138));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.kingdom == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1139));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.rose == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1140));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.turbo1 == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1141));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.turbo2 == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1142));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.doubled == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1143));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.command == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1144));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		if(pkt->info.master == 2) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1145));
 			str2.append(msgbuf);
+			host2 = true;
 		}
 		mainGame->gMutex.Lock();
 		if(pkt->info.mode == 2) {
@@ -476,7 +491,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
-		if(pkt->info.rule_count == 2)
+		if(host2)
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
@@ -3738,6 +3753,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
 		if(!is_closing && pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION && remotes.find(ipaddr) == remotes.end() ) {
+			wchar_t msgbuf[256];
 			mainGame->gMutex.Lock();
 			remotes.insert(ipaddr);
 			pHP->ipaddr = ipaddr;
@@ -3749,6 +3765,9 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(dataManager.GetSysString(pHP->host.rule + 1240));
 			hoststr.append(L"][");
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
+			hoststr.append(L"][");
+			myswprintf(msgbuf, L"MR %d", (pHP->host.duel_rule == 0) ? 3 : pHP->host.duel_rule);
+			hoststr.append(msgbuf);
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck 
