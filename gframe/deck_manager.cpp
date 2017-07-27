@@ -260,12 +260,7 @@ bool DeckManager::LoadDeckDouble(const wchar_t* file, const wchar_t* file2) {
 	if(!fp || !fp2)
 		return false;
 	char linebuf[256];
-	fseek(fp, 0, SEEK_END);
-	int fsize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	fgets(linebuf, 256, fp);
-	while(ftell(fp) < fsize && ct < 128) {
-		fgets(linebuf, 256, fp);
+	while(fgets(linebuf, 256, fp) && ct < 128) {
 		if(linebuf[0] == '!') {
 			is_side = true;
 			continue;
@@ -282,12 +277,7 @@ bool DeckManager::LoadDeckDouble(const wchar_t* file, const wchar_t* file2) {
 	}
 	fclose(fp);
 	is_side = false;
-	fseek(fp2, 0, SEEK_END);
-	int fsize2 = ftell(fp2);
-	fseek(fp2, 0, SEEK_SET);
-	fgets(linebuf, 256, fp2);
-	while(ftell(fp2) < fsize2 && ct < 128) {
-		fgets(linebuf, 256, fp2);
+	while(fgets(linebuf, 256, fp2) && ct < 128) {
 		if(linebuf[0] == '!') {
 			is_side = true;
 			continue;
