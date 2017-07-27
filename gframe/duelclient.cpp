@@ -1272,9 +1272,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_highlighting = true;
 			mainGame->dField.highlighting_card = pcard;
 		}
-		wchar_t ynbuf[256];
-		myswprintf(ynbuf, dataManager.GetSysString(200), dataManager.FormatLocation(l, s), dataManager.GetName(code));
-		myswprintf(textBuffer, L"%ls\n%ls", event_string, ynbuf);
+		int desc = BufferIO::ReadInt32(pbuf);
+		if(desc == 0) {
+			wchar_t ynbuf[256];
+			myswprintf(ynbuf, dataManager.GetSysString(200), dataManager.FormatLocation(l, s), dataManager.GetName(code));
+			myswprintf(textBuffer, L"%ls\n%ls", event_string, ynbuf);
+		} else if(desc < 2048) {
+			myswprintf(textBuffer, dataManager.GetSysString(desc), dataManager.GetName(code));
+		} else {
+			myswprintf(textBuffer, dataManager.GetDesc(desc), dataManager.GetName(code));
+		}
 		mainGame->gMutex.Lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
 		mainGame->PopupElement(mainGame->wQuery);
