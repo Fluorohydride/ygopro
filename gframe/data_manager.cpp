@@ -78,12 +78,7 @@ bool DataManager::LoadStrings(const char* file) {
 	char linebuf[256];
 	char strbuf[256];
 	int value;
-	fseek(fp, 0, SEEK_END);
-	int fsize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	fgets(linebuf, 256, fp);
-	while(ftell(fp) < fsize) {
-		fgets(linebuf, 256, fp);
+	while(fgets(linebuf, 256, fp)) {
 		if(linebuf[0] != '!')
 			continue;
 		sscanf(linebuf, "!%s", strbuf);

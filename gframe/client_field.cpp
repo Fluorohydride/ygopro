@@ -76,6 +76,13 @@ void ClientField::Clear() {
 	reposable_cards.clear();
 	attackable_cards.clear();
 	disabled_field = 0;
+	panel = 0;
+	hovered_card = 0;
+	clicked_card = 0;
+	highlighting_card = 0;
+	hovered_controler = 0;
+	hovered_location = 0;
+	hovered_sequence = 0;
 	deck_act = false;
 	grave_act = false;
 	remove_act = false;
