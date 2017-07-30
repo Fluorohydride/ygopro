@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include <queue>
+#include <future>
 
 namespace ygo {
 
@@ -86,6 +88,15 @@ public:
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
 	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
+
+	std::future<void> BeginInvoke(std::packaged_task<void()>&&);
+
+	template <typename T>
+	std::future<void> BeginInvoke(T&& t) { return BeginInvoke(std::packaged_task<void()>(t)); }
+
+	template <typename T>
+	void Invoke(T&& t) { BeginInvoke(std::forward<T>(t)).get(); }
+
 	void LoadExpansionDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
@@ -128,6 +139,7 @@ public:
 
 	Mutex gMutex;
 	Mutex gBuffer;
+	Mutex delayedOperationMutex;
 	Signal frameSignal;
 	Signal actionSignal;
 	Signal replaySignal;
@@ -139,6 +151,7 @@ public:
 
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
+	std::queue<std::packaged_task<void()>> delayedOperations;
 	std::wstring chatMsg[8];
 
 	int hideChatTimer;
