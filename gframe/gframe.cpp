@@ -2,7 +2,6 @@
 #include "game.h"
 #include "data_manager.h"
 #include <event2/thread.h>
-#include <locale.h>
 
 int enable_log = 0;
 bool exit_on_return = false;
@@ -35,7 +34,7 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 
 int main(int argc, char* argv[]) {
 #ifndef _WIN32
-        setlocale(LC_CTYPE, "UTF-8");
+	setlocale(LC_CTYPE, "UTF-8");
 #endif
 #ifdef _WIN32
 #ifndef _DEBUG
