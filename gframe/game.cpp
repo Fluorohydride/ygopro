@@ -642,6 +642,13 @@ void Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.Lock();
+		delayedOperationMutex.Lock();
+		while (!delayedOperations.empty())
+		{
+			delayedOperations.front()();
+			delayedOperations.pop();
+		}
+		delayedOperationMutex.Unlock();
 		if(dInfo.isStarted) {
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
@@ -762,6 +769,17 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
+
+std::future<void> Game::BeginInvoke(std::packaged_task<void()>&& op) {
+        std::future<void> f = op.get_future();
+
+	delayedOperationMutex.Lock();
+	delayedOperations.push(std::move(op));
+	delayedOperationMutex.Unlock();
+
+        return f;
+}
+
 void Game::LoadExpansionDB() {
 #ifdef _WIN32
 	char fpath[1000];
