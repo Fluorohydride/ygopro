@@ -153,7 +153,7 @@ void SGUITTGlyph::preload(u32 char_index, FT_Face face, video::IVideoDriver* dri
 	}
 
 	glyph_page = parent->getLastGlyphPageIndex();
-	u32 texture_side_length = page->texture->getOriginalSize().Width;
+	u32 texture_side_length = page->texture_size.Width;
 	core::vector2di page_position(
 	    (page->used_slots % (texture_side_length / font_size)) * font_size,
 	    (page->used_slots / (texture_side_length / font_size)) * font_size
@@ -443,9 +443,8 @@ CGUITTGlyphPage* CGUITTFont::createGlyphPage(const u8& pixel_mode) {
 	if (page_texture_size.Width > max_texture_size.Width || page_texture_size.Height > max_texture_size.Height)
 		page_texture_size = max_texture_size;
 
-	if (!page->createPageTexture(pixel_mode, page_texture_size))
-		// TODO: add error message?
-		return 0;
+        page->texture_size = page_texture_size;
+        page->pixel_mode = pixel_mode;
 
 	if (page) {
 		// Determine the number of glyph slots on the page and add it to the list of pages.
