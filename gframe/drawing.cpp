@@ -67,6 +67,7 @@ void Game::DrawBackGround() {
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
 	bool drawField = false;
 	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
+	bool ExtraLink = false;
 	if(mainGame->gameConf.draw_field_spell) {
 		int fieldcode1 = -1;
 		int fieldcode2 = -1;
@@ -160,19 +161,33 @@ void Game::DrawBackGround() {
 			}
 		}
 	}
+	//Extra Link status
+	std::vector<ClientCard*> mz[2] = { mainGame->dField.mzone[0],mainGame->dField.mzone[1] };
+	for(int i = 0; i < 2; i++)
+		if(!(mz[1][5] || mz[1][6]) &&
+			((mz[0][5] && !mz[0][6] && mz[0][5]->type & TYPE_LINK && mz[0][5]->link_marker & LINK_MARKER_BOTTOM + (0x7e * i)) ||
+			(mz[0][6] && !mz[0][5] && mz[0][6]->type & TYPE_LINK && mz[0][6]->link_marker & LINK_MARKER_BOTTOM + (0x7e * i))) &&
+			mz[i][1] && mz[i][1]->type & TYPE_LINK && mz[i][1]->link_marker & LINK_MARKER_TOP + LINK_MARKER_RIGHT &&
+			mz[i][2] && mz[i][2]->type & TYPE_LINK && mz[i][2]->link_marker & LINK_MARKER_LEFT + LINK_MARKER_RIGHT &&
+			mz[i][3] && mz[i][3]->type & TYPE_LINK && mz[i][3]->link_marker & LINK_MARKER_TOP + LINK_MARKER_LEFT) {
+			ExtraLink = true;
+			matManager.mSelField.AmbientColor = 0xffffff00;
+			matManager.mSelField.DiffuseColor = 140 << 24;
+			driver->setMaterial(matManager.mSelField);
+			driver->drawVertexPrimitiveList(matManager.vFieldMzone[0][(mz[0][5]) ? 6 : 5], 4, matManager.iRectangle, 2);
+			break;
+		}
 	//current sel
 	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
 		&& !(dInfo.duel_rule < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
 		&& !(dInfo.duel_rule >= 4 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
 		S3DVertex *vertex = 0;
+		ClientCard* pcard = 0;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler];
 		else if (dField.hovered_location == LOCATION_MZONE) {
 			vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
-			ClientCard* pcard = mainGame->dField.mzone[dField.hovered_controler][dField.hovered_sequence];
-			if(pcard && pcard->type & TYPE_LINK) {
-				DrawLinkedZones(pcard);
-			}
+			pcard = mainGame->dField.mzone[dField.hovered_controler][dField.hovered_sequence];
 		} else if (dField.hovered_location == LOCATION_SZONE)
 			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence][rule];
 		else if (dField.hovered_location == LOCATION_GRAVE)
@@ -194,9 +209,12 @@ void Game::DrawBackGround() {
 		matManager.mSelField.DiffuseColor = selFieldAlpha << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
+		if (pcard && pcard->type & TYPE_LINK) {
+			DrawLinkedZones(pcard, ExtraLink);
+		}
 	}
 }
-void Game::DrawLinkedZones(ClientCard* pcard) {
+void Game::DrawLinkedZones(ClientCard* pcard, bool ExtraLink) {
 	int mark = pcard->link_marker;
 	ClientCard* pcard2;
 	if (dField.hovered_sequence < 5) {
@@ -221,7 +239,8 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 					mark = (dField.hovered_sequence == 2) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 1) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
 				}
 				CheckMutual(pcard2, mark);
-				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
+				if(pcard2 || !ExtraLink)
+					driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][5], 4, matManager.iRectangle, 2);
 			}
 			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 4)
 				|| (mark & LINK_MARKER_TOP && dField.hovered_sequence == 3)
@@ -233,7 +252,8 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 					mark = (dField.hovered_sequence == 4) ? LINK_MARKER_TOP_LEFT : (dField.hovered_sequence == 3) ? LINK_MARKER_TOP : LINK_MARKER_TOP_RIGHT;
 				}
 				CheckMutual(pcard2, mark);
-				driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
+				if(pcard2 || !ExtraLink)
+					driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][6], 4, matManager.iRectangle, 2);
 			}
 		}
 	} else {
