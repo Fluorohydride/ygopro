@@ -905,6 +905,8 @@ void Game::LoadConfig() {
 	char strbuf[32];
 	char valbuf[256];
 	wchar_t wstr[256];
+	gameConf.use_d3d = 0;
+	gameConf.use_image_scale = 1;
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
 	gameConf.textfontsize = 12;
@@ -937,6 +939,8 @@ void Game::LoadConfig() {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = atoi(valbuf) > 0;
+		} else if(!strcmp(strbuf, "use_image_scale")) {
+			gameConf.use_image_scale = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "textfont")) {
@@ -1009,6 +1013,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[256];
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
+	fprintf(fp, "use_image_scale = %d\n", gameConf.use_image_scale ? 1 : 0);
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
 	fprintf(fp, "errorlog = %d\n", enable_log);
 	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
