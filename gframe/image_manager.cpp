@@ -175,7 +175,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 			return GetTextureThumb(code);
 		} else {
 			tMap[code] = img;
-			return img;
+			return (img == NULL) ? tUnknown : img;
 		}
 	}
 	if(tit->second)
@@ -219,18 +219,18 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	if(tit == tFields.end()) {
 		char file[256];
 		sprintf(file, "expansions/pics/field/%d.png", code);
-		irr::video::ITexture* img = driver->getTexture(file);
+		irr::video::ITexture* img = GetTextureFromFile(file, 512, 512);
 		if(img == NULL) {
 			sprintf(file, "expansions/pics/field/%d.jpg", code);
-			img = driver->getTexture(file);
+			img = GetTextureFromFile(file, 512, 512);
 		}
 		if(img == NULL) {
 			sprintf(file, "pics/field/%d.png", code);
-			img = driver->getTexture(file);
+			img = GetTextureFromFile(file, 512, 512);
 		}
 		if(img == NULL) {
 			sprintf(file, "pics/field/%d.jpg", code);
-			img = driver->getTexture(file);
+			img = GetTextureFromFile(file, 512, 512);
 			if(img == NULL) {
 				tFields[code] = NULL;
 				return NULL;
