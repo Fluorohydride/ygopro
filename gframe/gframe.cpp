@@ -33,6 +33,9 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 }
 
 int main(int argc, char* argv[]) {
+#ifndef _WIN32
+	setlocale(LC_CTYPE, "UTF-8");
+#endif
 #ifdef _WIN32
 #ifndef _DEBUG
 	wchar_t exepath[MAX_PATH];
