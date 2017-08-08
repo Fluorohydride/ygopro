@@ -89,6 +89,7 @@ public:
 #ifdef YGOPRO_SERVER_MODE
 	void MainServerLoop(int mode, int lflist);
 	void LoadExpansionDB();
+	void AddDebugMsg(char* msgbuf);
 #else
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);

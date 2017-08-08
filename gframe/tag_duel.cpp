@@ -1810,7 +1810,7 @@ int TagDuel::MessageHandler(long fduel, int type) {
 		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, (byte*)msgbuf);
-	fprintf(stderr, "%s\n", msgbuf);
+	mainGame->AddDebugMsg(msgbuf);
 	return 0;
 }
 void TagDuel::TagTimer(evutil_socket_t fd, short events, void* arg) {

@@ -1206,8 +1206,12 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	}
 	chatMsg[0].append(msg);
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::AddDebugMsg(char* msg)
 {
+#ifdef YGOPRO_SERVER_MODE
+	fprintf(stderr, "%s\n", msg);
+#else
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
@@ -1224,7 +1228,9 @@ void Game::AddDebugMsg(char* msg)
 		fprintf(fp, "[%s][Script Error]: %s\n", timebuf, msg);
 		fclose(fp);
 	}
+#endif //YGOPRO_SERVER_MODE
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	mainGame->imgCard->setImage(0);

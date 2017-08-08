@@ -31,7 +31,7 @@ void NetServer::InitDuel(int mode, int lflist)
 
 	pkt->info.mode = mode;
 
-	if(lflist == -1)
+	if(lflist < 0)
 		pkt->info.lflist = 0;
 	else if(lflist >= deckManager._lfList.size())
 		pkt->info.lflist = deckManager._lfList[0].hash;
@@ -66,13 +66,17 @@ bool NetServer::StartServer(unsigned short port) {
 		net_evbase = 0;
 		return false;
 	}
-	evutil_socket_t fd=evconnlistener_get_fd(listener);
-	socklen_t addrlen=sizeof(struct sockaddr);
-	struct sockaddr_in addr;
-	getsockname(fd,(struct sockaddr*)&addr,&addrlen);
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
 	Thread::NewThread(ServerThread, net_evbase);
+#ifdef YGOPRO_SERVER_MODE
+	evutil_socket_t fd = evconnlistener_get_fd(listener);
+	socklen_t addrlen = sizeof(sockaddr);
+	sockaddr_in addr;
+	getsockname(fd, (sockaddr*)&addr, &addrlen);
 	return ntohs(addr.sin_port);
+#else
+	return true;
+#endif //YGOPRO_SERVER_MODE
 }
 bool NetServer::StartBroadcast() {
 	if(!net_evbase)
