@@ -1,23 +1,24 @@
 #include "config.h"
 #include "game.h"
-//#include "image_manager.h"
+#ifdef YGOPRO_SERVER_MODE
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "replay.h"
-//#include "materials.h"
-//#include "duelclient.h"
 #include "netserver.h"
-//#include "single_mode.h"
-
-#ifdef _WIN32
-#define strcasecmp _stricmp
-#include "dirent.h"
-#endif // _WIN32
+#else
+#include "image_manager.h"
+#include "data_manager.h"
+#include "deck_manager.h"
+#include "replay.h"
+#include "materials.h"
+#include "duelclient.h"
+#include "netserver.h"
+#include "single_mode.h"
+#endif //YGOPRO_SERVER_MODE
 
 #ifndef _WIN32
 #include <sys/types.h>
 #include <dirent.h>
-#include <unistd.h>
 #endif
 
 const unsigned short PRO_VERSION = 0x233C;
@@ -42,23 +43,7 @@ unsigned char draw_count;
 void Game::MainServerLoop(int bDuel_mode, int lflist) {
 	deckManager.LoadLFList();
 	
-	//load expansions
-	DIR * dir;
-	struct dirent * dirp;
-	const char *foldername = "./expansions/";
-	if((dir = opendir(foldername)) != NULL) {
-		while((dirp = readdir(dir)) != NULL) {
-			size_t len = strlen(dirp->d_name);
-			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
-				continue;
-			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
-			strncpy(filepath, foldername, strlen(foldername)+1);
-			strncat(filepath, dirp->d_name, len);
-			dataManager.LoadDB(filepath);
-			free(filepath);
-		}
-		closedir(dir);
-	}
+	LoadExpansionDB()
 	
 	dataManager.LoadDB("cards.cdb");
 	
@@ -74,7 +59,7 @@ void Game::MainServerLoop(int bDuel_mode, int lflist) {
 #endif
 	}
 }
-/*
+#ifndef YGOPRO_SERVER_MODE
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
@@ -673,8 +658,8 @@ bool Game::Initialize() {
 	hideChatTimer = 0;
 	return true;
 }
-*/
-/*
+
+
 void Game::MainLoop() {
 	wchar_t cap[256];
 	camera = smgr->addCameraSceneNode(0);
@@ -764,8 +749,6 @@ void Game::MainLoop() {
 	SaveConfig();
 //	device->drop();
 }
-*/
-/*
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
 	for(int i = 0; i < 16; ++i)
 		mProjection[i] = 0;
@@ -821,6 +804,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::LoadExpansionDB() {
 #ifdef _WIN32
 	char fpath[1000];
@@ -858,6 +842,7 @@ void Game::LoadExpansionDB() {
 	}
 #endif
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 #ifdef _WIN32
@@ -1294,14 +1279,12 @@ void Game::CloseDuelWindow() {
 	ClearTextures();
 	closeDoneSignal.Set();
 }
-*/
 int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
 }
-/*
 void Game::SetWindowsIcon() {
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandleW(NULL);
@@ -1322,6 +1305,6 @@ void Game::FlashWindow() {
 	FlashWindowEx(&fi);
 #endif
 }
-*/
+#endif //YGOPRO_SERVER_MODE
 
 }
