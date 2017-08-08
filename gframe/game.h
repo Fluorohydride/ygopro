@@ -438,7 +438,7 @@ public:
 extern Game* mainGame;
 #ifdef YGOPRO_SERVER_MODE
 extern unsigned short aServerPort;
-unsigned short replay_mode;
+extern unsigned short replay_mode;
 extern unsigned int lflist;
 extern unsigned char rule;
 extern unsigned char mode;
@@ -447,7 +447,7 @@ extern bool no_check_deck;
 extern bool no_shuffle_deck;
 extern unsigned int start_lp;
 extern unsigned short time_limit;
-xextern unsigned char start_hand;
+extern unsigned char start_hand;
 extern unsigned char draw_count;
 #endif //YGOPRO_SERVER_MODE
 
