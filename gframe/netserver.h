@@ -74,7 +74,7 @@ public:
 	}
 	static void ReSendToPlayer(DuelPlayer* dp) {
 		if(dp)
-			bufferevent_write(dp->bev, nest_server_write, last_sent);
+			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 };
 
