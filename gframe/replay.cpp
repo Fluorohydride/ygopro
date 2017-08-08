@@ -29,7 +29,7 @@ void Replay::BeginRecord() {
 	time_t nowtime = time(NULL);
 	struct tm *localedtime = localtime(&nowtime);
 	wchar_t tmppath[80];
-	wcsftime(tmppath, 80, "./replay/%Y-%m-%d %H-%M-%S %%u.yrp", localedtime);
+	wcsftime(tmppath, 80, L"./replay/%Y-%m-%d %H-%M-%S %%u.yrp", localedtime);
 	wchar_t path[80];
 	myswprintf(path, tmppath, ygo::aServerPort);
 	recording_fp = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
