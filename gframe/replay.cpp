@@ -21,7 +21,7 @@ Replay::~Replay() {
 }
 void Replay::BeginRecord() {
 #ifdef YGOPRO_SERVER_MODE
-	if(ygo::replay_mode == 0) return;
+	if(ygo::replay_mode > 0) {
 #endif //YGOPRO_SERVER_MODE
 #ifdef _WIN32
 	if(is_recording)
@@ -48,6 +48,9 @@ void Replay::BeginRecord() {
 	if(!fp)
 		return;
 #endif
+#ifdef YGOPRO_SERVER_MODE
+	}
+#endif //YGOPRO_SERVER_MODE
 	pdata = replay_data;
 	is_recording = true;
 }
@@ -147,13 +150,16 @@ void Replay::EndRecord() {
 	if(!is_recording)
 		return;
 #ifdef YGOPRO_SERVER_MODE
-	if(ygo::replay_mode == 0) return;
+	if(ygo::replay_mode > 0) {
 #endif //YGOPRO_SERVER_MODE
 #ifdef _WIN32
 	CloseHandle(recording_fp);
 #else
 	fclose(fp);
 #endif
+#ifdef YGOPRO_SERVER_MODE
+	}
+#endif //YGOPRO_SERVER_MODE
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
