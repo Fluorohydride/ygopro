@@ -43,7 +43,7 @@ unsigned char draw_count;
 void Game::MainServerLoop(int bDuel_mode, int lflist) {
 	deckManager.LoadLFList();
 	
-	LoadExpansionDB()
+	LoadExpansionDB();
 	
 	dataManager.LoadDB("cards.cdb");
 	
