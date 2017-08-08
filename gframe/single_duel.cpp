@@ -9,18 +9,7 @@
 
 namespace ygo {
 
-extern unsigned int lflist;
-extern unsigned char rule;
-extern unsigned char mode;
-extern unsigned char duel_rule;
-extern bool no_check_deck;
-extern bool no_shuffle_deck;
-extern unsigned int start_lp;
-extern unsigned short time_limit;
 extern unsigned short replay_mode;
-extern unsigned char start_hand;
-extern unsigned char draw_count;
-bool runasserver = true;
 
 SingleDuel::SingleDuel(bool is_match) {
 	game_started = false;
@@ -46,15 +35,19 @@ void SingleDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			if((*pit) != dp)
 				NetServer::ReSendToPlayer(*pit);
+#ifdef YGOPRO_SERVER_MODE
 		/*for(auto pit = recorders.begin(); pit != recorders.end(); ++pit)
 			if((*pit) != dp)
 				NetServer::ReSendToPlayer(*pit);*/
+#endif //YGOPRO_SERVER_MODE
 	} else {
 		NetServer::SendBufferToPlayer(players[1 - dp->type], STOC_CHAT, &scc, 4 + msglen * 2);
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::ReSendToPlayer(*pit);
+#ifdef YGOPRO_SERVER_MODE
 		/*for(auto pit = recorders.begin(); pit != recorders.end(); ++pit)
 			NetServer::ReSendToPlayer(*pit);*/
+#endif //YGOPRO_SERVER_MODE
 	}
 }
 void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
@@ -76,31 +69,9 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			NetServer::DisconnectPlayer(dp);
 			return;
 		}
-		
-		if (runasserver){
-			host_info.start_hand=5;
-			host_info.start_lp=8000;
-			host_info.draw_count=1;
-			host_info.mode=1;
-			host_info.no_check_deck=false;
-			host_info.no_shuffle_deck=false;
-			host_info.duel_rule=DEFAULT_DUEL_RULE;
-			host_info.rule=0;
-			host_info.time_limit=180;
+#ifdef YGOPRO_SERVER_MODE
 
-			if (ygo::start_hand !=0 ){
-				host_info.start_hand=ygo::start_hand;
-				host_info.start_lp=ygo::start_lp;
-				host_info.draw_count=ygo::draw_count;
-				host_info.mode=ygo::mode;
-				host_info.no_check_deck=ygo::no_check_deck;
-				host_info.no_shuffle_deck=ygo::no_shuffle_deck;
-				host_info.duel_rule=ygo::duel_rule;
-				host_info.rule=ygo::rule;
-				host_info.time_limit=ygo::time_limit;
-			}
-		}else
-		{
+#else
 		wchar_t jpass[20];
 		BufferIO::CopyWStr(pkt->pass, jpass, 20);
 		if(wcscmp(jpass, pass)) {
@@ -110,7 +81,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 			return;
 		}
-		}
+#endif //YGOPRO_SERVER_MODE
 	}
 	dp->game = this;
 	if(!players[0] && !players[1] && observers.size() == 0)

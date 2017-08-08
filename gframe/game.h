@@ -6,6 +6,8 @@
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#else
+#include "netserver.h"
 #endif //YGOPRO_SERVER_MODE
 #include <unordered_map>
 #include <vector>
@@ -87,7 +89,7 @@ class Game {
 public:
 	bool Initialize();
 #ifdef YGOPRO_SERVER_MODE
-	void MainServerLoop(int mode, int lflist);
+	void MainServerLoop();
 	void LoadExpansionDB();
 	void AddDebugMsg(char* msgbuf);
 #else
@@ -439,16 +441,7 @@ extern Game* mainGame;
 #ifdef YGOPRO_SERVER_MODE
 extern unsigned short aServerPort;
 extern unsigned short replay_mode;
-extern unsigned int lflist;
-extern unsigned char rule;
-extern unsigned char mode;
-extern unsigned char duel_rule;
-extern bool no_check_deck;
-extern bool no_shuffle_deck;
-extern unsigned int start_lp;
-extern unsigned short time_limit;
-extern unsigned char start_hand;
-extern unsigned char draw_count;
+extern HostInfo game_info;
 #endif //YGOPRO_SERVER_MODE
 
 }

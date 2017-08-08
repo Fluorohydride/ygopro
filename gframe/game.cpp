@@ -30,24 +30,15 @@ Game* mainGame;
 #ifdef YGOPRO_SERVER_MODE
 unsigned short aServerPort;
 unsigned short replay_mode;
-unsigned int lflist;
-unsigned char rule;
-unsigned char mode;
-unsigned char duel_rule;
-bool no_check_deck;
-bool no_shuffle_deck;
-unsigned int start_lp;
-unsigned short time_limit;
-unsigned char start_hand;
-unsigned char draw_count;
+HostInfo game_info;
 
-void Game::MainServerLoop(int mode, int lflist) {
+void Game::MainServerLoop() {
 	deckManager.LoadLFList();
 	LoadExpansionDB();
 	dataManager.LoadDB("cards.cdb");
 	
 	aServerPort = NetServer::StartServer(aServerPort);
-	NetServer::InitDuel(mode, lflist);
+	NetServer::InitDuel();
 	printf("%u\n", aServerPort);
 	fflush(stdout);
 	

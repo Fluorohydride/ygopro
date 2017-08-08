@@ -27,7 +27,7 @@ private:
 public:
 #ifdef YGOPRO_SERVER_MODE
 	static event_base* net_evbase;
-	static void InitDuel(int mode, int lflist);
+	static void InitDuel();
 	static unsigned short StartServer(unsigned short port);
 #else
 	static bool StartServer(unsigned short port);
@@ -74,7 +74,7 @@ public:
 	}
 	static void ReSendToPlayer(DuelPlayer* dp) {
 		if(dp)
-			bufferevent_write(dp->bev, net_server_write, last_sent);
+			bufferevent_write(dp->bev, nest_server_write, last_sent);
 	}
 };
 

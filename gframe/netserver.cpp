@@ -14,29 +14,40 @@ char NetServer::net_server_write[0x2000];
 unsigned short NetServer::last_sent = 0;
 
 #ifdef YGOPRO_SERVER_MODE
-void NetServer::InitDuel(int mode, int lflist)
+extern unsigned short replay_mode;
+extern HostInfo game_info;
+
+void NetServer::InitDuel()
 {
-	if(mode == MODE_SINGLE) {
+	if(game_info.mode == MODE_SINGLE) {
 		duel_mode = new SingleDuel(false);
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
-	} else if(mode == MODE_MATCH) {
+	} else if(game_info.mode == MODE_MATCH) {
 		duel_mode = new SingleDuel(true);
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
-	} else if(mode == MODE_TAG) {
+	} else if(game_info.mode == MODE_TAG) {
 		duel_mode = new TagDuel();
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, TagDuel::TagTimer, duel_mode);
 	}
 
 	CTOS_CreateGame* pkt = new CTOS_CreateGame;
+	
+	pkt->info.mode = game_info.mode;
+	pkt->info.start_hand = game_info.start_hand;
+	pkt->info.start_lp = game_info.start_lp;
+	pkt->info.draw_count = game_info.draw_count;
+	pkt->info.no_check_deck = game_info.no_check_deck;
+	pkt->info.no_shuffle_deck = game_info.no_shuffle_deck;
+	pkt->info.duel_rule = game_info.duel_rule;
+	pkt->info.rule = game_info.rule;
+	pkt->info.time_limit = game_info.time_limit;
 
-	pkt->info.mode = mode;
-
-	if(lflist < 0)
+	if(game_info.lflist < 0)
 		pkt->info.lflist = 0;
-	else if(lflist >= deckManager._lfList.size())
+	else if(game_info.lflist >= deckManager._lfList.size())
 		pkt->info.lflist = deckManager._lfList[0].hash;
 	else
-		pkt->info.lflist = deckManager._lfList[lflist].hash;
+		pkt->info.lflist = deckManager._lfList[game_info.lflist].hash;
 	
 	duel_mode->host_info = pkt->info;
 	

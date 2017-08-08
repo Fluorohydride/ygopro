@@ -46,7 +46,9 @@ protected:
 	DuelPlayer* pplayer[4];
 	DuelPlayer* cur_player[2];
 	std::set<DuelPlayer*> observers;
+#ifdef YGOPRO_SERVER_MODE
 	std::set<DuelPlayer*> recorders;
+#endif //YGOPRO_SERVER_MODE
 	bool ready[4];
 	Deck pdeck[4];
 	unsigned char hand_result[2];
