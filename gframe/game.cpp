@@ -4,7 +4,6 @@
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "replay.h"
-#include "netserver.h"
 #else
 #include "image_manager.h"
 #include "data_manager.h"

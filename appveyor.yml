@@ -20,9 +20,6 @@ install:
   - 7z x sqlite-amalgamation-3150200.zip
   - move sqlite-amalgamation-3150200 sqlite3
   
-  - appveyor DownloadFile https://github.com/tronkko/dirent/raw/master/include/dirent.h
-  - move dirent.h gframe\
-
   # let premake happy
   - xcopy /E premake\* .
   
