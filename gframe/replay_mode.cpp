@@ -185,6 +185,7 @@ int ReplayMode::ReplayThread(void* param) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->ShowElement(mainGame->wReplay);
+		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.Unlock();
 		if(exit_on_return)
@@ -195,9 +196,6 @@ int ReplayMode::ReplayThread(void* param) {
 void ReplayMode::Restart(bool refresh) {
 	end_duel(pduel);
 	mainGame->dInfo.isStarted = false;
-	mainGame->dField.panel = 0;
-	mainGame->dField.hovered_card = 0;
-	mainGame->dField.clicked_card = 0;
 	mainGame->dField.Clear();
 	//mainGame->device->setEventReceiver(&mainGame->dField);
 	cur_replay.Rewind();

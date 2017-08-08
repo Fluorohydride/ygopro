@@ -115,6 +115,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::StopClient();
 					mainGame->dInfo.isStarted = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
+					mainGame->stTip->setVisible(false);
 					mainGame->wCardImg->setVisible(false);
 					mainGame->wInfos->setVisible(false);
 					mainGame->wPhase->setVisible(false);

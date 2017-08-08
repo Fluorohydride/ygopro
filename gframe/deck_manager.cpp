@@ -13,12 +13,7 @@ void DeckManager::LoadLFList() {
 	char linebuf[256];
 	wchar_t strBuffer[256];
 	if(fp) {
-		fseek(fp, 0, SEEK_END);
-		int fsize = ftell(fp);
-		fseek(fp, 0, SEEK_SET);
-		fgets(linebuf, 256, fp);
-		while(ftell(fp) < fsize) {
-			fgets(linebuf, 256, fp);
+		while(fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')
 				continue;
 			int p = 0, sa = 0, code, count;
@@ -191,12 +186,7 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	int cardlist[128];
 	bool is_side = false;
 	char linebuf[256];
-	fseek(fp, 0, SEEK_END);
-	int fsize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	fgets(linebuf, 256, fp);
-	while(ftell(fp) < fsize && ct < 128) {
-		fgets(linebuf, 256, fp);
+	while(fgets(linebuf, 256, fp) && ct < 128) {
 		if(linebuf[0] == '!') {
 			is_side = true;
 			continue;

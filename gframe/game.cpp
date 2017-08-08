@@ -990,11 +990,7 @@ void Game::LoadConfig() {
 	gameConf.separate_clear_button = 1;
 	gameConf.auto_search_limit = -1;
 	gameConf.chkIgnoreDeckChanges = 0;
-	fseek(fp, 0, SEEK_END);
-	int fsize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-	while(ftell(fp) < fsize) {
-		fgets(linebuf, 256, fp);
+	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
