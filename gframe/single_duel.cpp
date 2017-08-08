@@ -84,7 +84,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			host_info.mode=1;
 			host_info.no_check_deck=false;
 			host_info.no_shuffle_deck=false;
-			host_info.duel_rule=3;
+			host_info.duel_rule=DEFAULT_DUEL_RULE;
 			host_info.rule=0;
 			host_info.time_limit=180;
 			host_info.replay_mode=0;

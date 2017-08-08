@@ -59,32 +59,32 @@ int main(int argc, char* argv[]) {
 	ygo::Game _game;
 #ifdef YGOPRO_SERVER_MODE
 	enable_log = 1;
-	ygo::aServerPort=7911;
-	ygo::aServerPort=atoi(argv[1]);
-	ygo::lflist=atoi(argv[2]);
-	ygo::start_hand=0;
-	if (argc>2) {
-		ygo::rule=atoi(argv[3]);
-		ygo::mode=atoi(argv[4]);
-		if (ygo::mode > 2)
+	ygo::aServerPort = 7911;
+	ygo::aServerPort = atoi(argv[1]);
+	ygo::lflist = atoi(argv[2]);
+	ygo::start_hand = 0;
+	if(argc > 2) {
+		ygo::rule = atoi(argv[3]);
+		ygo::mode = atoi(argv[4]);
+		if(ygo::mode > 2)
 			ygo::mode = 0;
-		if (argv[5][0]=='T')
-			ygo::duel_rule=DEFAULT_DUEL_RULE-1;
+		if(argv[5][0] == 'T')
+			ygo::duel_rule = DEFAULT_DUEL_RULE-1;
 		else
-			ygo::duel_rule=DEFAULT_DUEL_RULE;
-		if (argv[6][0]=='T')
-			ygo::no_check_deck=true;
+			ygo::duel_rule = DEFAULT_DUEL_RULE;
+		if(argv[6][0] == 'T')
+			ygo::no_check_deck = true;
 		else
-			ygo::no_check_deck=false;
-		if (argv[7][0]=='T')
-			ygo::no_shuffle_deck=true;
+			ygo::no_check_deck = false;
+		if(argv[7][0] == 'T')
+			ygo::no_shuffle_deck = true;
 		else
-			ygo::no_shuffle_deck=false;
-		ygo::start_lp=atoi(argv[8]);
-		ygo::start_hand=atoi(argv[9]);
-		ygo::draw_count=atoi(argv[10]);
-		ygo::time_limit=atoi(argv[11]);
-		ygo::replay_mode=atoi(argv[12]);
+			ygo::no_shuffle_deck = false;
+		ygo::start_lp = atoi(argv[8]);
+		ygo::start_hand = atoi(argv[9]);
+		ygo::draw_count = atoi(argv[10]);
+		ygo::time_limit = atoi(argv[11]);
+		ygo::replay_mode = atoi(argv[12]);
 	}
 	ygo::mainGame = &_game;
 	ygo::mainGame->MainServerLoop(ygo::mode, ygo::lflist);
