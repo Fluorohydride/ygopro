@@ -27,6 +27,7 @@ namespace ygo {
 
 Game* mainGame;
 
+#ifdef YGOPRO_SERVER_MODE
 unsigned short aServerPort;
 unsigned int lflist;
 unsigned char rule;
@@ -40,17 +41,16 @@ unsigned short replay_mode;
 unsigned char start_hand;
 unsigned char draw_count;
 
-void Game::MainServerLoop(int bDuel_mode, int lflist) {
+void Game::MainServerLoop(int mode, int lflist) {
 	deckManager.LoadLFList();
-	
 	LoadExpansionDB();
-	
 	dataManager.LoadDB("cards.cdb");
 	
 	aServerPort = NetServer::StartServer(aServerPort);
-	NetServer::Initduel(bDuel_mode, lflist);
+	NetServer::InitDuel(mode, lflist);
 	printf("%u\n", aServerPort);
 	fflush(stdout);
+	
 	while(NetServer::net_evbase) {
 #ifdef WIN32
 		Sleep(200);
@@ -59,7 +59,7 @@ void Game::MainServerLoop(int bDuel_mode, int lflist) {
 #endif
 	}
 }
-#ifndef YGOPRO_SERVER_MODE
+#else
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();

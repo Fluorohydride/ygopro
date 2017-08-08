@@ -87,7 +87,7 @@ class Game {
 public:
 	bool Initialize();
 #ifdef YGOPRO_SERVER_MODE
-	void MainServerLoop(int bDuel_mode, int lflist);
+	void MainServerLoop(int mode, int lflist);
 	void LoadExpansionDB();
 #else
 	void MainLoop();

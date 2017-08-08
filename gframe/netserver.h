@@ -14,7 +14,9 @@ class NetServer {
 private:
 	static std::unordered_map<bufferevent*, DuelPlayer> users;
 	static unsigned short server_port;
-
+#ifndef YGOPRO_SERVER_MODE
+	static event_base* net_evbase;
+#endif //YGOPRO_SERVER_MODE
 	static event* broadcast_ev;
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
@@ -23,9 +25,13 @@ private:
 	static unsigned short last_sent;
 
 public:
+#ifdef YGOPRO_SERVER_MODE
 	static event_base* net_evbase;
-	static void Initduel(int duel_mode, int lflist);
+	static void InitDuel(int mode, int lflist);
 	static unsigned short StartServer(unsigned short port);
+#else
+	static bool StartServer(unsigned short port);
+#endif //YGOPRO_SERVER_MODE
 	static bool StartBroadcast();
 	static void StopServer();
 	static void StopBroadcast();
