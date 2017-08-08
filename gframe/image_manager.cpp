@@ -173,10 +173,9 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 		if(img == NULL && !mainGame->gameConf.use_image_scale) {
 			tMap[code] = NULL;
 			return GetTextureThumb(code);
-		} else {
-			tMap[code] = img;
-			return (img == NULL) ? tUnknown : img;
 		}
+		tMap[code] = img;
+		return (img == NULL) ? tUnknown : img;
 	}
 	if(tit->second)
 		return tit->second;
@@ -189,23 +188,22 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		char file[256];
-		char exfile[256];
-		if(mainGame->gameConf.use_image_scale)
-			sprintf(file, "pics/%d.jpg", code);
-		else
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
-		sprintf(exfile, "expansions/%s", file);
-		irr::video::ITexture* img = GetTextureFromFile(exfile, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
+		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
+		irr::video::ITexture* img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 		if(img == NULL) {
+			sprintf(file, "pics/thumbnail/%d.jpg", code);
 			img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 		}
-		if(img == NULL) {
-			tThumb[code] = NULL;
-			return tUnknown;
-		} else {
-			tThumb[code] = img;
-			return img;
+		if(img == NULL && mainGame->gameConf.use_image_scale) {
+			sprintf(file, "expansions/pics/%d.jpg", code);
+			img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
+			if(img == NULL) {
+				sprintf(file, "pics/%d.jpg", code);
+				img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
+			}
 		}
+		tThumb[code] = img;
+		return (img == NULL) ? tUnknown : img;
 	}
 	if(tit->second)
 		return tit->second;
