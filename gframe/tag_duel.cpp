@@ -68,7 +68,6 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			host_info.duel_rule=DEFAULT_DUEL_RULE;
 			host_info.rule=0;
 			host_info.time_limit=180;
-			host_info.replay_mode=0;
 
 			if (ygo::start_hand !=0 ){
 				host_info.start_hand=ygo::start_hand;
@@ -80,7 +79,6 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 				host_info.duel_rule=ygo::duel_rule;
 				host_info.rule=ygo::rule;
 				host_info.time_limit=ygo::time_limit;
-				host_info.replay_mode=ygo::replay_mode;
 			}
 		}else
 		{
@@ -1623,7 +1621,7 @@ void TagDuel::EndDuel() {
 	NetServer::ReSendToPlayer(players[1]);
 	NetServer::ReSendToPlayer(players[2]);
 	NetServer::ReSendToPlayer(players[3]);
-	if (host_info.replay_mode == 0) {
+	if (ygo::replay_mode == 0) {
 		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 			NetServer::ReSendToPlayer(*oit);
 		for(auto oit = recorders.begin(); oit != recorders.end(); ++oit)
