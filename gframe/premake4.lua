@@ -2,6 +2,8 @@ include "lzma"
 
 project "ygopro"
     kind "ConsoleApp"
+	
+	defines { "YGOPRO_SERVER_MODE" }
 
     files { "gframe.cpp", "config.h",
             "game.cpp", "game.h",
