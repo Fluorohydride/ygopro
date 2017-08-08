@@ -812,8 +812,29 @@ void CGUITTFont::setInvisibleCharacters(const core::ustring& s) {
 }
 
 video::IImage* CGUITTFont::createTextureFromChar(const uchar32_t& ch) {
-	
-	return 0;
+	u32 n = getGlyphIndexByChar(ch);
+	const SGUITTGlyph& glyph = Glyphs[n - 1];
+	CGUITTGlyphPage* page = Glyph_Pages[glyph.glyph_page];
+
+	if (page->dirty)
+		page->updateTexture();
+
+	video::ITexture* tex = page->texture;
+
+	// Acquire a read-only lock of the corresponding page texture.
+	void* ptr = tex->lock(video::ETLM_READ_ONLY);
+
+	video::ECOLOR_FORMAT format = tex->getColorFormat();
+	core::dimension2du tex_size = tex->getOriginalSize();
+	video::IImage* pageholder = Driver->createImageFromData(format, tex_size, ptr, true, false);
+
+	// Copy the image data out of the page texture.
+	core::dimension2du glyph_size(glyph.source_rect.getSize());
+	video::IImage* image = Driver->createImage(format, glyph_size);
+	pageholder->copyTo(image, core::position2di(0, 0), glyph.source_rect);
+
+	tex->unlock();
+	return image;
 }
 
 video::ITexture* CGUITTFont::getPageTextureByIndex(const u32& page_index) const {

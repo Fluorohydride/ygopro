@@ -2,7 +2,6 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
-/*
 #include <vector>
 #include <set>
 
