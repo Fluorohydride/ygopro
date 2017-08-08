@@ -4,9 +4,7 @@
 #include <event2/thread.h>
 
 int enable_log = 0;
-#ifdef YGOPRO_SERVER_MODE
-enable_log = 1;
-#else
+#ifndef YGOPRO_SERVER_MODE
 bool exit_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
@@ -60,6 +58,7 @@ int main(int argc, char* argv[]) {
 #endif //_WIN32
 	ygo::Game _game;
 #ifdef YGOPRO_SERVER_MODE
+	enable_log = 1;
 	ygo::aServerPort=7911;
 	ygo::aServerPort=atoi(argv[1]);
 	ygo::lflist=atoi(argv[2]);
