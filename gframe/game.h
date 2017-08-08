@@ -13,6 +13,7 @@
 
 namespace ygo {
 
+#ifndef YGOPRO_SERVER_MODE
 struct Config {
 	bool use_d3d;
 	unsigned short antialias;
@@ -67,7 +68,7 @@ struct DuelInfo {
 	unsigned short time_limit;
 	unsigned short time_left[2];
 };
-#ifndef YGOPRO_SERVER_MODE
+
 struct FadingUnit {
 	bool signalAction;
 	bool isFadein;
@@ -80,6 +81,7 @@ struct FadingUnit {
 	irr::core::vector2di fadingDiff;
 };
 #endif //YGOPRO_SERVER_MODE
+
 class Game {
 
 public:
@@ -140,9 +142,7 @@ public:
 	Signal singleSignal;
 	Signal closeSignal;
 	Signal closeDoneSignal;
-#endif //YGOPRO_SERVER_MODE
 	Config gameConf;
-#ifndef YGOPRO_SERVER_MODE
 	DuelInfo dInfo;
 
 	std::list<FadingUnit> fadingList;

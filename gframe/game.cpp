@@ -658,8 +658,6 @@ bool Game::Initialize() {
 	hideChatTimer = 0;
 	return true;
 }
-
-
 void Game::MainLoop() {
 	wchar_t cap[256];
 	camera = smgr->addCameraSceneNode(0);
