@@ -8,18 +8,6 @@ solution "ygo"
     configuration "windows"
         defines { "WIN32", "_WIN32" }
 
-    configuration "bsd"
-        defines { "LUA_USE_POSIX" }
-        includedirs { "/usr/local/include" }
-        libdirs { "/usr/local/lib" }
-
-    configuration "macosx"
-        defines { "LUA_USE_MACOSX" }
-        includedirs { "/usr/local/include/*" }
-        libdirs { "/usr/local/lib", "/usr/X11/lib" }
-        buildoptions { "-stdlib=libc++" }
-        links {"OpenGL.framework","Cocoa.framework","IOKit.framework"}
-
     configuration "linux"
         defines { "LUA_USE_LINUX" }
 

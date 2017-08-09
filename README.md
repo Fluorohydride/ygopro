@@ -1,18 +1,19 @@
 ## YGOPro(Server)
 [![Build status](https://ci.appveyor.com/api/projects/status/qgkqi6o0wq7qn922/branch/server?svg=true)](https://ci.appveyor.com/project/zh99998/ygopro/branch/server)
+[![Build Status](https://travis-ci.org/moecube/ygopro.svg?branch=server)](https://travis-ci.org/moecube/ygopro)
 
 一个YGOPro的服务端版本，运行后自动建立主机，并开启端口供YGOPro客户端连接。
 
-现用于[萌卡](https://mycard.moe/)和[YGOPRO 233服](http://mercury233.me/ygosrv233/)。
+现用于[萌卡](https://mycard.moe/)和[YGOPro 233服](http://mercury233.me/ygosrv233/)。
 
 ### Linux下编译
 * 需要以下组件或工具
  * gcc
- * premake4
+ * premake5
  * libevent
  * lua5.2
  * sqlite3
-* 可参考 https://github.com/mercury233/ygopro-server/wiki 中的脚本
+* 可参考本项目 [.travis.yml](https://github.com/mycard/ygopro/blob/server/.travis.yml) 中的脚本
 
 ### Windows下编译
 * 需要以下组件或工具
@@ -21,7 +22,6 @@
  * libevent
  * lua5.2
  * sqlite3
- * dirent for windows
 * 可参考本项目 [appveyor.yml](https://github.com/mycard/ygopro/blob/server/appveyor.yml) 中的脚本
 
 ### 运行
