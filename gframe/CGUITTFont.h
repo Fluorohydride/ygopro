@@ -143,6 +143,13 @@ public:
 	void updateTexture() {
 		if (!dirty) return;
 
+                if (!texture)
+                {
+			if (!createPageTexture(pixel_mode, texture_size))
+				// TODO: add error message?
+				return;
+                }
+
 		void* ptr = texture->lock();
 		video::ECOLOR_FORMAT format = texture->getColorFormat();
 		core::dimension2du size = texture->getOriginalSize();
@@ -175,6 +182,9 @@ public:
 
 	core::array<core::vector2di> render_positions;
 	core::array<core::recti> render_source_rects;
+
+	core::dimension2du texture_size;
+	u8 pixel_mode;
 
 private:
 	core::array<const SGUITTGlyph*> glyph_to_be_paged;

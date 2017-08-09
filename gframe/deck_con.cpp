@@ -96,7 +96,7 @@ void DeckBuilder::Terminate() {
 	mainGame->PopupElement(mainGame->wMainMenu);
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
-	imageManager.ClearTexture();
+	mainGame->ClearTextures();
 	mainGame->scrFilter->setVisible(false);
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)
@@ -224,6 +224,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1410));
 					break;
 				}
+
+                                // clear imgCard
+                                mainGame->imgCard->setImage(imageManager.tCover[0]);
+
+                                // send result to server
 				char deckbuf[1024];
 				char* pdeck = deckbuf;
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
