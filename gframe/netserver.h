@@ -76,6 +76,14 @@ public:
 		if(dp)
 			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
+#ifdef YGOPRO_SERVER_MODE
+	static void ReSendToPlayers(DuelPlayer* dp1, DuelPlayer* dp2) {
+		if(dp1)
+			bufferevent_write(dp1->bev, net_server_write, last_sent);
+		if(dp2)
+			bufferevent_write(dp2->bev, net_server_write, last_sent);
+	}
+#endif //YGOPRO_SERVER_MODE
 };
 
 }
