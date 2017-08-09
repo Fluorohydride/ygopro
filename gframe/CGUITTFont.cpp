@@ -230,7 +230,7 @@ CGUITTFont* CGUITTFont::create(IrrlichtDevice *device, const io::path& filename,
 //! Constructor.
 CGUITTFont::CGUITTFont(IGUIEnvironment *env)
 	: use_monochrome(false), use_transparency(true), use_hinting(true), use_auto_hinting(true),
-	  batch_load_size(1), Device(0), Environment(env), Driver(0), GlobalKerningWidth(0), GlobalKerningHeight(0) {
+	  batch_load_size(1), Device(0), Environment(env), Driver(0), GlobalKerningWidth(0), GlobalKerningHeight(0), supposed_line_height(0) {
 #ifdef _DEBUG
 	setDebugName("CGUITTFont");
 #endif
@@ -344,6 +344,24 @@ bool CGUITTFont::load(const io::path& filename, const u32 size, const bool antia
 	batch_load_size = 127;
 	getGlyphIndexByChar((uchar32_t)0);
 	batch_load_size = old_size;
+
+	// Calculate the supposed line height of this font (of this size) --
+	// Not using FT_SizeMetric::ascender or height, but actually by testing some of the glyphs,
+	// to see what should give a reasonable not cluttered line height.
+	// The ascender or height info may as well just be arbitrary ones.
+
+	// Get the maximum font height.  Unfortunately, we have to do this hack as
+	// Irrlicht will draw things wrong.  In FreeType, the font size is the
+	// maximum size for a single glyph, but that glyph may hang "under" the
+	// draw line, increasing the total font height to beyond the set size.
+	// Irrlicht does not understand this concept when drawing fonts.  Also, I
+	// add +1 to give it a 1 pixel blank border.  This makes things like
+	// tooltips look nicer.
+	s32 test1 = getHeightFromCharacter((uchar32_t)'g') + 1;
+	s32 test2 = getHeightFromCharacter((uchar32_t)'j') + 1;
+	s32 test3 = getHeightFromCharacter((uchar32_t)0x55B5) + 1;
+
+	supposed_line_height = core::max_(test1, core::max_(test2, test3));
 
 	return true;
 }
@@ -521,7 +539,7 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 
 			if (lineBreak) {
 				previousChar = 0;
-				offset.Y += font_metrics.ascender / 64;
+				offset.Y += supposed_line_height; //font_metrics.ascender / 64;
 				offset.X = position.UpperLeftCorner.X;
 
 				if (hcenter)
@@ -576,20 +594,8 @@ core::dimension2d<u32> CGUITTFont::getDimension(const wchar_t* text) const {
 }
 
 core::dimension2d<u32> CGUITTFont::getDimension(const core::ustring& text) const {
-	// Get the maximum font height.  Unfortunately, we have to do this hack as
-	// Irrlicht will draw things wrong.  In FreeType, the font size is the
-	// maximum size for a single glyph, but that glyph may hang "under" the
-	// draw line, increasing the total font height to beyond the set size.
-	// Irrlicht does not understand this concept when drawing fonts.  Also, I
-	// add +1 to give it a 1 pixel blank border.  This makes things like
-	// tooltips look nicer.
-	s32 test1 = getHeightFromCharacter((uchar32_t)'g') + 1;
-	s32 test2 = getHeightFromCharacter((uchar32_t)'j') + 1;
-	s32 test3 = getHeightFromCharacter((uchar32_t)'_') + 1;
-	s32 max_font_height = core::max_(test1, core::max_(test2, test3));
-
-	core::dimension2d<u32> text_dimension(0, max_font_height);
-	core::dimension2d<u32> line(0, max_font_height);
+	core::dimension2d<u32> text_dimension(0, supposed_line_height);
+	core::dimension2d<u32> line(0, supposed_line_height);
 
 	uchar32_t previousChar = 0;
 	core::ustring::const_iterator iter = text.begin();
@@ -618,7 +624,7 @@ core::dimension2d<u32> CGUITTFont::getDimension(const core::ustring& text) const
 			if (text_dimension.Width < line.Width)
 				text_dimension.Width = line.Width;
 			line.Width = 0;
-			line.Height = max_font_height;
+			line.Height = supposed_line_height;
 			continue;
 		}
 		line.Width += getWidthFromCharacter(p);
@@ -937,7 +943,7 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 
 		if (line_break) {
 			previous_char = 0;
-			offset.Y -= tt_face->size->metrics.ascender / 64;
+			offset.Y -= supposed_line_height; //tt_face->size->metrics.ascender / 64;
 			offset.X = start_point.X;
 			if (center)
 				offset.X += (text_size.Width - getDimensionUntilEndOfLine(text + 1).Width) >> 1;

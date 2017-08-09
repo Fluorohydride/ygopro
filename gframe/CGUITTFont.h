@@ -377,6 +377,7 @@ private:
 
 	s32 GlobalKerningWidth;
 	s32 GlobalKerningHeight;
+	s32 supposed_line_height;
 	core::ustring Invisible;
 };
 
