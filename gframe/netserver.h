@@ -16,7 +16,7 @@ private:
 	static unsigned short server_port;
 #ifndef YGOPRO_SERVER_MODE
 	static event_base* net_evbase;
-#endif //YGOPRO_SERVER_MODE
+#endif
 	static event* broadcast_ev;
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;

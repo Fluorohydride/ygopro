@@ -442,7 +442,7 @@ extern Game* mainGame;
 extern unsigned short aServerPort;
 extern unsigned short replay_mode;
 extern HostInfo game_info;
-#endif //YGOPRO_SERVER_MODE
+#endif
 
 }
 

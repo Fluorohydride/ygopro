@@ -49,7 +49,7 @@ void Game::MainServerLoop() {
 #endif
 	}
 }
-#else
+#else //YGOPRO_SERVER_MODE
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();

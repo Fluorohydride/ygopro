@@ -16,7 +16,7 @@ bool DataManager::LoadDB(const char* file) {
 	const char* sql = "select * from datas";
 #else
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
-#endif //YGOPRO_SERVER_MODE
+#endif
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
 	CardDataC cd;

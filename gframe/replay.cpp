@@ -6,9 +6,10 @@
 
 namespace ygo {
 
+#ifdef YGOPRO_SERVER_MODE
 extern unsigned short aServerPort;
 extern unsigned short replay_mode;
-
+#endif
 Replay::Replay() {
 	is_recording = false;
 	is_replaying = false;
@@ -22,10 +23,11 @@ Replay::~Replay() {
 void Replay::BeginRecord() {
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode > 0) {
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 	if(is_recording)
 		CloseHandle(recording_fp);
+#ifdef YGOPRO_SERVER_MODE
 	time_t nowtime = time(NULL);
 	struct tm *localedtime = localtime(&nowtime);
 	wchar_t tmppath[80];
@@ -33,11 +35,15 @@ void Replay::BeginRecord() {
 	wchar_t path[80];
 	myswprintf(path, tmppath, ygo::aServerPort);
 	recording_fp = CreateFileW(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+#else
+	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+#endif //YGOPRO_SERVER_MODE
 	if(recording_fp == INVALID_HANDLE_VALUE)
 		return;
 #else
 	if(is_recording)
 		fclose(fp);
+#ifdef YGOPRO_SERVER_MODE
 	time_t nowtime = time(NULL);
 	struct tm *localedtime = localtime(&nowtime);
 	char tmppath[40];
@@ -45,6 +51,9 @@ void Replay::BeginRecord() {
 	char path[40];
 	sprintf(path, tmppath, ygo::aServerPort);
 	fp = fopen(path, "wb");
+#else
+	fp = fopen("./replay/_LastReplay.yrp", "wb");
+#endif //YGOPRO_SERVER_MODE
 	if(!fp)
 		return;
 #endif
@@ -58,7 +67,7 @@ void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode == 0) return;
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &header, sizeof(header), &size, NULL);
@@ -74,7 +83,7 @@ void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	pdata += length;
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode == 0) return;
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, data, length, &size, NULL);
@@ -91,7 +100,7 @@ void Replay::WriteInt32(int data, bool flush) {
 	pdata += 4;
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode == 0) return;
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
@@ -108,7 +117,7 @@ void Replay::WriteInt16(short data, bool flush) {
 	pdata += 2;
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode == 0) return;
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
@@ -125,7 +134,7 @@ void Replay::WriteInt8(char data, bool flush) {
 	pdata++;
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode == 0) return;
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
@@ -140,7 +149,7 @@ void Replay::Flush() {
 		return;
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode == 0) return;
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 #else
 	fflush(fp);
@@ -151,7 +160,7 @@ void Replay::EndRecord() {
 		return;
 #ifdef YGOPRO_SERVER_MODE
 	if(ygo::replay_mode > 0) {
-#endif //YGOPRO_SERVER_MODE
+#endif
 #ifdef _WIN32
 	CloseHandle(recording_fp);
 #else
@@ -159,7 +168,7 @@ void Replay::EndRecord() {
 #endif
 #ifdef YGOPRO_SERVER_MODE
 	}
-#endif //YGOPRO_SERVER_MODE
+#endif
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;

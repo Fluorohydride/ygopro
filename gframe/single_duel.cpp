@@ -110,7 +110,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		sctc.type = NETPLAYER_TYPE_OBSERVER;
 	}
 	else
-#endif //YGOPRO_SERVER_MODE
+#endif
 	if(!players[0] || !players[1]) {
 		STOC_HS_PlayerEnter scpe;
 		BufferIO::CopyWStr(dp->name, scpe.name, 20);

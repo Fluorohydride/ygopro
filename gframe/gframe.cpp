@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 	ygo::mainGame = &_game;
 	ygo::mainGame->MainServerLoop();
 	return 0;
-#else
+#else //YGOPRO_SERVER_MODE
 	ygo::mainGame = &_game;
 	if(!ygo::mainGame->Initialize())
 		return 0;
