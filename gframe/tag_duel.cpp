@@ -175,10 +175,12 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 			NetServer::StopServer();
 			return;
 		}
-		ready[host_pos] = false;
-		STOC_TypeChange sctc;
-		sctc.type = 0x10 | host_pos;
-		NetServer::SendPacketToPlayer(players[host_pos], STOC_TYPE_CHANGE, sctc);
+		if(!game_started) {
+			ready[host_pos] = false;
+			STOC_TypeChange sctc;
+			sctc.type = 0x10 | host_pos;
+			NetServer::SendPacketToPlayer(players[host_pos], STOC_TYPE_CHANGE, sctc);
+		}
 	}
 	if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 #else
