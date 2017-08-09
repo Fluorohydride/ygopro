@@ -16,5 +16,5 @@ before_install:
 script:
 - ./premake5 gmake
 - cd build
-#- sed -i 's/-llua/-llua5.2/g' ygopro.make
-- make config=release -j2
+- sed -i 's/-llua/-llua5.2/g' ygopro.make
+- make config=release
