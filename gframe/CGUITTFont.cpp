@@ -443,8 +443,8 @@ CGUITTGlyphPage* CGUITTFont::createGlyphPage(const u8& pixel_mode) {
 	if (page_texture_size.Width > max_texture_size.Width || page_texture_size.Height > max_texture_size.Height)
 		page_texture_size = max_texture_size;
 
-        page->texture_size = page_texture_size;
-        page->pixel_mode = pixel_mode;
+	page->texture_size = page_texture_size;
+	page->pixel_mode = pixel_mode;
 
 	if (page) {
 		// Determine the number of glyph slots on the page and add it to the list of pages.

@@ -224,11 +224,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1410));
 					break;
 				}
-
-                                // clear imgCard
-                                mainGame->imgCard->setImage(imageManager.tCover[0]);
-
-                                // send result to server
+				mainGame->imgCard->setImage(imageManager.tCover[0]);
 				char deckbuf[1024];
 				char* pdeck = deckbuf;
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());

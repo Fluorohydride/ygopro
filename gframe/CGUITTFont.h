@@ -143,12 +143,11 @@ public:
 	void updateTexture() {
 		if (!dirty) return;
 
-                if (!texture)
-                {
+		if (!texture) {
 			if (!createPageTexture(pixel_mode, texture_size))
 				// TODO: add error message?
 				return;
-                }
+		}
 
 		void* ptr = texture->lock();
 		video::ECOLOR_FORMAT format = texture->getColorFormat();
