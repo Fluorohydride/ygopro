@@ -822,9 +822,13 @@ void Game::LoadExpansionDB() {
 			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
 			strncpy(filepath, foldername, strlen(foldername) + 1);
 			strncat(filepath, dirp->d_name, len);
+#ifdef YGOPRO_SERVER_MODE
+			dataManager.LoadDB(filepath);
+#else
 			std::cout << "Found file " << filepath << std::endl;
 			if(!dataManager.LoadDB(filepath))
 				std::cout << "Error loading file" << std::endl;
+#endif
 			free(filepath);
 		}
 		closedir(dir);
