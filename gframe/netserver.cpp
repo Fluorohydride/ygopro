@@ -42,7 +42,7 @@ void NetServer::InitDuel()
 	pkt->info.rule = game_info.rule;
 	pkt->info.time_limit = game_info.time_limit;
 
-	if(game_info.lflist < 0)
+	if(game_info.lflist == 999)
 		pkt->info.lflist = 0;
 	else if(game_info.lflist >= deckManager._lfList.size())
 		pkt->info.lflist = deckManager._lfList[0].hash;

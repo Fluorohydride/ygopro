@@ -73,11 +73,15 @@ int main(int argc, char* argv[]) {
 	ygo::game_info.time_limit = 180;
 	if(argc > 1) {
 		ygo::aServerPort = atoi(argv[1]);
-		ygo::game_info.lflist = atoi(argv[2]);
+		int lflist = atoi(argv[2]);
+		if(lflist < 0)
+			lflist = 999;
+		ygo::game_info.lflist = lflist;
 		ygo::game_info.rule = atoi(argv[3]);
-		ygo::game_info.mode = atoi(argv[4]);
-		if(ygo::game_info.mode > 2)
-			ygo::game_info.mode = 0;
+		int mode = atoi(argv[4]);
+		if(mode > 2)
+			mode = 0;
+		ygo::game_info.mode = mode;
 		if(argv[5][0] == 'T')
 			ygo::game_info.duel_rule = DEFAULT_DUEL_RULE - 1;
 		else
