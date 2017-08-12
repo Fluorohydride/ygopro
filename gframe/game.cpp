@@ -782,19 +782,14 @@ void Game::LoadExpansionDB() {
 #else
 	DIR * dir;
 	struct dirent * dirp;
-	const char *foldername = "./expansions/";
-	if((dir = opendir(foldername)) != NULL) {
+	if((dir = opendir("./expansions/")) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
 			size_t len = strlen(dirp->d_name);
 			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
 				continue;
-			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
-			strncpy(filepath, foldername, strlen(foldername) + 1);
-			strncat(filepath, dirp->d_name, len);
-			std::cout << "Found file " << filepath << std::endl;
-			if(!dataManager.LoadDB(filepath))
-				std::cout << "Error loading file" << std::endl;
-			free(filepath);
+			char filepath[1000];
+			sprintf(filepath, "./expansions/%s", dirp->d_name);
+			dataManager.LoadDB(filepath);
 		}
 		closedir(dir);
 	}
