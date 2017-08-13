@@ -469,6 +469,11 @@ extern Game* mainGame;
 
 }
 
+#define CARD_IMG_WIDTH		177
+#define CARD_IMG_HEIGHT		254
+#define CARD_THUMB_WIDTH	44
+#define CARD_THUMB_HEIGHT	64
+
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2
 

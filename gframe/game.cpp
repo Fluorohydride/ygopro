@@ -226,10 +226,10 @@ bool Game::Initialize() {
 	btnHostPrepStart = env->addButton(rect<s32>(230, 280, 340, 305), wHostPrepare, BUTTON_HP_START, dataManager.GetSysString(1215));
 	btnHostPrepCancel = env->addButton(rect<s32>(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1210));
 	//img
-	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 199, 273), true, false, 0, -1, true);
+	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, 0, -1, true);
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
 	wCardImg->setVisible(false);
-	imgCard = env->addImage(rect<s32>(10, 9, 187, 263), wCardImg);
+	imgCard = env->addImage(rect<s32>(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
 	imgCard->setImage(imageManager.tCover[0]);
 	imgCard->setUseAlphaChannel(true);
 	//phase
@@ -361,14 +361,14 @@ bool Game::Initialize() {
 	btnPSAU->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
 	btnPSAD->setImageScale(core::vector2df(0.5, 0.5));
-	btnPSAD->setImage(imageManager.tCover[0], rect<s32>(0, 0, 177, 254));
+	btnPSAD->setImage(imageManager.tCover[0], rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT));
 	btnPSDU = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(300, 45, 440, 185), wPosSelect, BUTTON_POS_DU);
 	btnPSDU->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSDU->setImageRotation(270);
 	btnPSDD = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(445, 45, 585, 185), wPosSelect, BUTTON_POS_DD);
 	btnPSDD->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSDD->setImageRotation(270);
-	btnPSDD->setImage(imageManager.tCover[0], rect<s32>(0, 0, 177, 254));
+	btnPSDD->setImage(imageManager.tCover[0], rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT));
 	//card select
 	wCardSelect = env->addWindow(rect<s32>(320, 100, 1000, 400), false, L"");
 	wCardSelect->getCloseButton()->setVisible(false);
@@ -1170,7 +1170,7 @@ void Game::ShowCardInfo(int code) {
 	wchar_t formatBuffer[256];
 	if(!dataManager.GetData(code, &cd))
 		memset(&cd, 0, sizeof(CardData));
-	imgCard->setImage(imageManager.GetTexture(code));
+	imgCard->setImage(imageManager.GetTexture(code, true));
 	imgCard->setScaleImage(true);
 	if(cd.alias != 0 && (cd.alias - code < 10 || code - cd.alias < 10))
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
@@ -1433,8 +1433,8 @@ void Game::OnResize()
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
 	stHintMsg->setRelativePosition(ResizeWin(500, 60, 820, 90));
 
-	wCardImg->setRelativePosition(Resize(1, 1, 199, 273));
-	imgCard->setRelativePosition(Resize(10, 9, 187, 263));
+	wCardImg->setRelativePosition(Resize(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18));
+	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	stInfo->setRelativePosition(recti(15, 37, 296 * window_size.Width / 1024, 60));
@@ -1498,6 +1498,8 @@ void Game::OnResize()
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
+
+	imageManager.ClearTexture();
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2)
 {
