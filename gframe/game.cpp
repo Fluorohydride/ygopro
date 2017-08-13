@@ -1458,20 +1458,41 @@ void Game::OnResize()
 	btnReplayExit->setRelativePosition(Resize(5, 105, 85, 125));
 
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-	if (dInfo.duel_rule >= 4) {
-		btnSP->setRelativePosition(Resize(0, 0, 50, 20));
-		btnM1->setRelativePosition(Resize(160, 0, 210, 20));
-		btnBP->setRelativePosition(Resize(160, 0, 210, 20));
-		btnM2->setRelativePosition(Resize(160, 0, 210, 20));
+	if(dInfo.speed) {
+		if(dInfo.duel_rule >= 4) {
+			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
+			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
+			btnDP->setRelativePosition(Resize(0, 40, 50, 60));
+			btnSP->setRelativePosition(Resize(0, 40, 50, 60));
+			btnM1->setRelativePosition(Resize(160, 20, 210, 40));
+			btnBP->setRelativePosition(Resize(160, 20, 210, 40));
+			btnM2->setRelativePosition(Resize(160, 20, 210, 40));
+			btnEP->setRelativePosition(Resize(310, 0, 360, 20));
+		} else {
+			btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
+			btnDP->setRelativePosition(Resize(65, 0, 115, 20));
+			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+			btnEP->setRelativePosition(Resize(260, 0, 310, 20));
+		}
 	} else {
-		btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-		btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-		btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-		btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
+		if(dInfo.duel_rule >= 4) {
+			btnSP->setRelativePosition(Resize(0, 0, 50, 20));
+			btnM1->setRelativePosition(Resize(160, 0, 210, 20));
+			btnBP->setRelativePosition(Resize(160, 0, 210, 20));
+			btnM2->setRelativePosition(Resize(160, 0, 210, 20));
+		} else {
+			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+		}
+		btnEP->setRelativePosition(Resize(320, 0, 370, 20));
+		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	}
-	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
-	btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	btnSpectatorSwap->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainAlways->setRelativePosition(Resize(205, 140, 295, 175));
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));

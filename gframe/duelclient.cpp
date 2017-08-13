@@ -139,7 +139,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.master = mainGame->chkRules[13]->isChecked() ? 2 : 0;
 			cscg.info.rule_count = 0;
 			for (int i = 0; i < 14; ++i) {
-				if (mainGame->chkRules[i]->isChecked() && i != 11) {
+				if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 11) {
 					cscg.info.rule_count++;
 				}
 			}
@@ -497,6 +497,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
 		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
+		mainGame->dInfo.speed = (pkt->info.speed == 2) ? 1 : 0;
 		watching = 0;
 		connect_state |= 0x4;
 		break;
@@ -605,16 +606,41 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wChat->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		// reset master rule 4 phase button position
-		if (mainGame->dInfo.duel_rule >= 4) {
-			mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-			mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-			mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-			mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+		mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 310, 855, 330));
+		if(mainGame->dInfo.speed) {
+			if(mainGame->dInfo.duel_rule >= 4) {
+				mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 290, 855, 350));
+				mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+				mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+				mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+				mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+				mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+				mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+				mainGame->btnEP->setRelativePosition(mainGame->Resize(310, 0, 360, 20));
+			} else {
+				mainGame->btnShuffle->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+				mainGame->btnDP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+				mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+				mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
+				mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
+				mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+				mainGame->btnEP->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+			}
 		} else {
-			mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
-			mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
-			mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
-			mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+			mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
+			if(mainGame->dInfo.duel_rule >= 4) {
+				mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
+				mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+				mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+				mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+			} else {
+				mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+				mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
+				mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
+				mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+			}
+			mainGame->btnEP->setRelativePosition(mainGame->Resize(320, 0, 370, 20));
+			mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
 		}
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {
@@ -1187,7 +1213,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
 			else {
-				int seq = mainGame->dInfo.duel_rule >= 4 ? 0 : 6;
+				int seq = mainGame->dInfo.duel_rule >= 4 ? (mainGame->dInfo.speed) ? 1 : 0 : 6;
 				if (pcard->location == LOCATION_SZONE && pcard->sequence == seq && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget)
 					mainGame->dField.pzone_act[pcard->controler] = true;
 			}
@@ -3500,7 +3526,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_RELOAD_FIELD: {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
-		mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
+		int rule = BufferIO::ReadInt8(pbuf);
+		mainGame->dInfo.duel_rule = rule & 0xf;
+		mainGame->dInfo.speed = (rule >> 4) ? 1 : 0;
 		int val = 0;
 		for(int i = 0; i < 2; ++i) {
 			int p = mainGame->LocalPlayer(i);

@@ -32,10 +32,14 @@ bool ImageManager::Initial() {
 	tBackGround_deck = driver->getTexture("textures/bg_deck.jpg");
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
-	tField[0] = driver->getTexture("textures/field2.png");
-	tFieldTransparent[0] = driver->getTexture("textures/field-transparent2.png");
-	tField[1] = driver->getTexture("textures/field3.png");
-	tFieldTransparent[1] = driver->getTexture("textures/field-transparent3.png");
+	tField[0][0] = driver->getTexture("textures/field2.png");
+	tFieldTransparent[0][0] = driver->getTexture("textures/field-transparent2.png");
+	tField[0][1] = driver->getTexture("textures/field3.png");
+	tFieldTransparent[0][1] = driver->getTexture("textures/field-transparent3.png");
+	tField[1][0] = driver->getTexture("textures/fieldSP2.png");
+	tFieldTransparent[1][0] = driver->getTexture("textures/field-transparentSP2.png");
+	tField[1][1] = driver->getTexture("textures/fieldSP3.png");
+	tFieldTransparent[1][1] = driver->getTexture("textures/field-transparentSP3.png");
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {

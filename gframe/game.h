@@ -55,6 +55,7 @@ struct DuelInfo {
 	int lp[2];
 	int startlp;
 	int duel_rule;
+	int speed = false;
 	int turn;
 	short curMsg;
 	wchar_t hostname[20];
