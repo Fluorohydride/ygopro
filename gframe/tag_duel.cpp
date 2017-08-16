@@ -385,6 +385,8 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	int opt = (int)host_info.duel_rule << 16;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
+	if(host_info.speed)
+		opt |= SPEED_DUEL;
 	opt |= DUEL_TAG_MODE;
 	last_replay.WriteInt32(host_info.start_lp, false);
 	last_replay.WriteInt32(host_info.start_hand, false);
@@ -413,10 +415,10 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		new_card(pduel, 95000043, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(95000043, false);
 	}
-	if(host_info.speed) {
+	/*if(host_info.speed) {
 		new_card(pduel, 511004001, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(511004001, false);
-	}
+	}*/
 	if(host_info.concentration) {
 		new_card(pduel, 511004322, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(511004322, false);
@@ -502,6 +504,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(pdeck[2].extra[i]->first, false);
 	}
 	last_replay.Flush();
+	mainGame->dInfo.startlp = host_info.start_lp;
 	char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);

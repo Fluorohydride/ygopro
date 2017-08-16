@@ -416,6 +416,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	int opt = (int)host_info.duel_rule << 16;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
+	if(host_info.speed)
+		opt |= SPEED_DUEL;
 	last_replay.WriteInt32(host_info.start_lp, false);
 	last_replay.WriteInt32(host_info.start_hand, false);
 	last_replay.WriteInt32(host_info.draw_count, false);
@@ -434,10 +436,10 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		new_card(pduel, 511005093, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(511005093, false);
 	}
-	if(host_info.speed) {
+	/*if(host_info.speed) {
 		new_card(pduel, 511004001, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(511004001, false);
-	}
+	}*/
 	if(host_info.concentration) {
 		new_card(pduel, 511004322, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(511004322, false);

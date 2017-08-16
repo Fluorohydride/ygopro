@@ -82,6 +82,7 @@ int ReplayMode::ReplayThread(void* param) {
 	int opt = cur_replay.ReadInt32();
 	int duel_rule = opt >> 16;
 	mainGame->dInfo.duel_rule = duel_rule;
+	mainGame->dInfo.speed = (opt & SPEED_DUEL) ? 1 : 0;
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;
@@ -90,16 +91,41 @@ int ReplayMode::ReplayThread(void* param) {
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	mainGame->dInfo.turn = 0;
 	// reset master rule 4 phase button position
-	if (mainGame->dInfo.duel_rule >= 4) {
-		mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-		mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-		mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-		mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+	mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 310, 855, 330));
+	if(mainGame->dInfo.speed) {
+		if(mainGame->dInfo.duel_rule >= 4) {
+			mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 290, 855, 350));
+			mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+			mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+			mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+			mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+			mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+			mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+			mainGame->btnEP->setRelativePosition(mainGame->Resize(310, 0, 360, 20));
+		} else {
+			mainGame->btnShuffle->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+			mainGame->btnDP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+			mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+			mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
+			mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
+			mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+			mainGame->btnEP->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+		}
 	} else {
-		mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
-		mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
-		mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
-		mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+		mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
+		if(mainGame->dInfo.duel_rule >= 4) {
+			mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
+			mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+			mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+			mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+		} else {
+			mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+			mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
+			mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
+			mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+		}
+		mainGame->btnEP->setRelativePosition(mainGame->Resize(320, 0, 370, 20));
+		mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
 	}
 	if(!(opt & DUEL_TAG_MODE)) {
 		int main = cur_replay.ReadInt32();

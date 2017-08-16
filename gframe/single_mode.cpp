@@ -662,18 +662,45 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_RELOAD_FIELD: {
 			mainGame->gMutex.Lock();
 			mainGame->dField.Clear();
-			mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
+			int rule = BufferIO::ReadInt8(pbuf);
+			mainGame->dInfo.duel_rule = rule & 0xf;
+			mainGame->dInfo.speed = (rule >> 4) ? 1 : 0;
 			// reset master rule 4 phase button position
-			if (mainGame->dInfo.duel_rule >= 4) {
-				mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-				mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-				mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-				mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+			mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 310, 855, 330));
+			if(mainGame->dInfo.speed) {
+				if(mainGame->dInfo.duel_rule >= 4) {
+					mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 290, 855, 350));
+					mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+					mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+					mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
+					mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+					mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+					mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
+					mainGame->btnEP->setRelativePosition(mainGame->Resize(310, 0, 360, 20));
+				} else {
+					mainGame->btnShuffle->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+					mainGame->btnDP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+					mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+					mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
+					mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
+					mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+					mainGame->btnEP->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+				}
 			} else {
-				mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
-				mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
-				mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
-				mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+				mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
+				if(mainGame->dInfo.duel_rule >= 4) {
+					mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
+					mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+					mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+					mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
+				} else {
+					mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
+					mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
+					mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
+					mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
+				}
+				mainGame->btnEP->setRelativePosition(mainGame->Resize(320, 0, 370, 20));
+				mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
 			}
 			int val = 0;
 			for(int p = 0; p < 2; ++p) {
