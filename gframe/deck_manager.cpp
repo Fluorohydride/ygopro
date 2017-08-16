@@ -82,7 +82,9 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 	if(!list)
 		return 0;
 	int dc = 0;
-	if(deck.main.size() < 40 || (!doubled && (deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15)) 
+	if(mainGame->dInfo.speed && (deck.main.size() != 20 || deck.extra.size() > 5))
+		return 1;
+	else if(!mainGame->dInfo.speed && deck.main.size() < 40 || (!doubled && (deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15))
 		|| (doubled && (deck.main.size() != 100 || deck.extra.size() > 30 || deck.side.size() > 30)))
 		return 1;
 	for(size_t i = 0; i < deck.main.size(); ++i) {
