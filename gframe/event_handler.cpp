@@ -10,6 +10,7 @@
 #include "single_mode.h"
 #include "materials.h"
 #include "../ocgcore/field.h"
+#include "utils.h"
 
 namespace ygo {
 
@@ -2014,6 +2015,22 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_HOVERED: {
+			// Set cursor to an I-Beam if hovering over an edit box
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			{
+				utils.changeCursor(ECI_IBEAM);
+			}
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_LEFT: {
+			// Set cursor to normal if left an edit box
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			{
+				utils.changeCursor(ECI_NORMAL);
+			}
+			break;
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_CLEAR_LOG: {
@@ -2088,6 +2105,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::KEY_ESCAPE: {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
+			return true;
+			break;
+		}
+		case irr::KEY_F12: {
+			if (!event.KeyInput.PressedDown)
+				utils.takeScreenshot(mainGame->device);
 			return true;
 			break;
 		}

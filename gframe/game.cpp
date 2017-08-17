@@ -9,6 +9,7 @@
 #include "netserver.h"
 #include "single_mode.h"
 #include <sstream>
+#include "utils.h"
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -645,6 +646,9 @@ bool Game::Initialize() {
 	engineMusic = irrklang::createIrrKlangDevice();
 	hideChat = false;
 	hideChatTimer = 0;
+
+	utils.initUtils();
+
 	return true;
 }
 void Game::MainLoop() {

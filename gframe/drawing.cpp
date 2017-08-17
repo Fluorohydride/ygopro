@@ -1278,7 +1278,8 @@ void Game::DrawDeckBd() {
 	recti extrapos = mainGame->Resize(310, 440, 797, 460);
 	stringw extraDeckTypeCount = stringw(dataManager.GetSysString(1056)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_FUSION)) + " " +
 		stringw(dataManager.GetSysString(1073)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_XYZ)) + " " +
-		stringw(dataManager.GetSysString(1063)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_SYNCHRO));
+		stringw(dataManager.GetSysString(1063)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_SYNCHRO)) + " " +
+		stringw(dataManager.GetSysString(1076)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_LINK));
 	irr::core::dimension2d<u32> extraDeckTypeSize = textFont->getDimension(extraDeckTypeCount);
 	textFont->draw(extraDeckTypeCount, recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
 		extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y), 0xff000000, false, true);

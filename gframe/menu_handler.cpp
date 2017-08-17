@@ -7,6 +7,7 @@
 #include "single_mode.h"
 #include "image_manager.h"
 #include "game.h"
+#include "utils.h"
 
 namespace ygo {
 
@@ -513,6 +514,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_ESCAPE: {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
+			break;
+		}
+		case irr::KEY_F12: {
+			if (!event.KeyInput.PressedDown)
+				utils.takeScreenshot(mainGame->device);
+			return true;
 			break;
 		}
 		default: break;
