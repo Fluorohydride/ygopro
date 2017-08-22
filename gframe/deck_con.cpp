@@ -186,18 +186,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_START_FILTER: {
-				filter_type = mainGame->cbCardType->getSelected();
-				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-				filter_lm = mainGame->cbLimit->getSelected();
-				if(filter_type == 1) {
-					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
-					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
-					filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
-					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
-					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
-				}
-				FilterCards();
+				StartFilter();
 				break;
 			}
 			case BUTTON_CLEAR_FILTER: {
@@ -297,6 +286,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnMark[7]->isPressed())
 					filter_marks |= 0004;
 				mainGame->HideElement(mainGame->wLinkMarks);
+				StartFilter();
 				break;
 			}
 			}
@@ -321,18 +311,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case EDITBOX_KEYWORD: {
 				stringw filter = mainGame->ebCardName->getText();
 				if (filter.size() > 2) {
-					filter_type = mainGame->cbCardType->getSelected();
-					filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-					filter_lm = mainGame->cbLimit->getSelected();
-					if (filter_type == 1) {
-						filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
-						filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-						filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
-						filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
-						filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
-						filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
-					}
-					FilterCards();
+					StartFilter();
 				}
 				break;
 			}
@@ -441,18 +420,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
-				filter_type = mainGame->cbCardType->getSelected();
-				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-				filter_lm = mainGame->cbLimit->getSelected();
-				if (filter_type == 1) {
-					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
-					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
-					filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
-					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
-					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
-				}
-				FilterCards();
+				StartFilter();
 				break;
 			}
 			case COMBOBOX_SECONDTYPE:
@@ -465,18 +433,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->ebDefense->setEnabled(true);
 					}
 				}
-				filter_type = mainGame->cbCardType->getSelected();
-				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-				filter_lm = mainGame->cbLimit->getSelected();
-				if(filter_type == 1) {
-					filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
-					filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-					filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
-					filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
-					filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
-					filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
-				}
-				FilterCards();
+				StartFilter();
 				break; 
 			}
 			case COMBOBOX_SORTTYPE: {
@@ -485,13 +442,33 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			}
+			break;
 		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
-			case CHECKBOX_ENABLE_MUSIC: {
-				if (!mainGame->chkEnableMusic->isChecked())
-					mainGame->engineMusic->stopAllSounds();
-				break;
+			switch (id) {
+				case CHECKBOX_SHOW_ANIME: {
+					int prevLimit = mainGame->cbLimit->getSelected();
+					mainGame->cbLimit->clear();
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1310));
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1316));
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1317));
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1318));
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1240));
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1241));
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1242));
+					if(mainGame->chkAnime->isChecked()) {
+						mainGame->cbLimit->addItem(dataManager.GetSysString(1243));
+						mainGame->cbLimit->addItem(L"Illegal");
+						mainGame->cbLimit->addItem(L"VG");
+						mainGame->cbLimit->addItem(L"Custom");
+					}
+					if (prevLimit < 8)
+						mainGame->cbLimit->setSelected(prevLimit);
+					StartFilter();
+					break;
+				}
 			}
+			break;
 		}
 		default: break;
 		}
@@ -748,6 +725,20 @@ void DeckBuilder::GetHoveredCard() {
 			imageManager.RemoveTexture(pre_code);
 	}
 }
+void DeckBuilder::StartFilter() {
+	filter_type = mainGame->cbCardType->getSelected();
+	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
+	filter_lm = mainGame->cbLimit->getSelected();
+	if(filter_type == 1) {
+		filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
+		filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
+		filter_atk = parse_filter(mainGame->ebAttack->getText(), &filter_atktype);
+		filter_def = parse_filter(mainGame->ebDefense->getText(), &filter_deftype);
+		filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
+		filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
+	}
+	FilterCards();
+}
 void DeckBuilder::FilterCards() {
 	results.clear();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
@@ -767,7 +758,7 @@ void DeckBuilder::FilterCards() {
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
 		const CardDataC& data = ptr->second;
 		const CardString& text = strpointer->second;
-		if(data.type & TYPE_TOKEN)
+		if(data.type & TYPE_TOKEN || (data.ot > 3 && !mainGame->chkAnime->isChecked()))
 			continue;
 		switch(filter_type) {
 		case 1: {
@@ -800,7 +791,7 @@ void DeckBuilder::FilterCards() {
 				if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
 				        || (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
 				        || (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6
-				        || !(data.type & TYPE_PENDULUM))
+						|| !(data.type & TYPE_PENDULUM))
 					continue;
 			}
 			break;
@@ -834,6 +825,12 @@ void DeckBuilder::FilterCards() {
 			if(filter_lm == 6 && data.ot != 3)
 				continue;
 			if(filter_lm == 7 && data.ot != 4)
+				continue;
+			if(filter_lm == 8 && data.ot != 8)
+				continue;
+			if(filter_lm == 9 && data.ot != 16)
+				continue;
+			if(filter_lm == 10 && data.ot != 32)
 				continue;
 		}
 		if(pstr) {

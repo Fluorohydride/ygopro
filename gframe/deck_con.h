@@ -15,6 +15,7 @@ public:
 	void Terminate();
 	void GetHoveredCard();
 	void FilterCards();
+	void StartFilter();
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();

@@ -931,11 +931,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			case CHECKBOX_ENABLE_MUSIC: {
-				if(!mainGame->chkEnableMusic->isChecked())
-					mainGame->engineMusic->stopAllSounds();
-				break;
-			}
 			}
 			break;
 		}
@@ -2080,6 +2075,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->gameConf.volume = (double)mainGame->srcVolume->getPos() / 100;
 				mainGame->engineSound->setSoundVolume(mainGame->gameConf.volume);
 				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.volume);
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_CHECKBOX_CHANGED: {
+			switch (id) {
+			case CHECKBOX_ENABLE_MUSIC: {
+				if (!mainGame->chkEnableMusic->isChecked())
+					mainGame->engineMusic->stopAllSounds();
 				break;
 			}
 			}

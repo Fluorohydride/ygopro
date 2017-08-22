@@ -482,17 +482,19 @@ bool Game::Initialize() {
 	//filters
 	wFilter = env->addStaticText(L"", rect<s32>(610, 5, 1020, 130), true, false, 0, -1, true);
 	wFilter->setVisible(false);
-	stCategory = env->addStaticText(dataManager.GetSysString(1311), rect<s32>(10, 25 / 6 + 2, 70, 22 + 25 / 6), false, false, wFilter);
-	cbCardType = env->addComboBox(rect<s32>(60, 25 / 6, 120, 20 + 25 / 6), wFilter, COMBOBOX_MAINTYPE);
+	stCategory = env->addStaticText(dataManager.GetSysString(1311), rect<s32>(10, 5, 70, 25), false, false, wFilter);
+	cbCardType = env->addComboBox(rect<s32>(60, 3, 120, 23), wFilter, COMBOBOX_MAINTYPE);
 	cbCardType->addItem(dataManager.GetSysString(1310));
 	cbCardType->addItem(dataManager.GetSysString(1312));
 	cbCardType->addItem(dataManager.GetSysString(1313));
 	cbCardType->addItem(dataManager.GetSysString(1314));
-	cbCardType2 = env->addComboBox(rect<s32>(125, 25 / 6, 200, 20 + 25 / 6), wFilter, COMBOBOX_SECONDTYPE);
-	cbCardType2->setMaxSelectionRows(10);
+	cbCardType2 = env->addComboBox(rect<s32>(130, 3, 190, 23), wFilter, COMBOBOX_SECONDTYPE);
+	cbCardType2->setMaxSelectionRows(20);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
-	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
-	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, COMBOBOX_OTHER_FILT);
+	chkAnime = env->addCheckBox(false, recti(10, 96, 150, 118), wFilter, CHECKBOX_SHOW_ANIME, dataManager.GetSysString(1999));
+	chkAnime->setChecked(gameConf.chkAnime != 0);
+	stLimit = env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 5, 280, 25), false, false, wFilter);
+	cbLimit = env->addComboBox(rect<s32>(260, 3, 390, 23), wFilter, COMBOBOX_OTHER_FILT);
 	cbLimit->setMaxSelectionRows(10);
 	cbLimit->addItem(dataManager.GetSysString(1310));
 	cbLimit->addItem(dataManager.GetSysString(1316));
@@ -501,37 +503,42 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1240));
 	cbLimit->addItem(dataManager.GetSysString(1241));
 	cbLimit->addItem(dataManager.GetSysString(1242));
-	cbLimit->addItem(dataManager.GetSysString(1243));
-	stAttribute = env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
-	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, COMBOBOX_OTHER_FILT);
+	if(chkAnime->isChecked()) {
+		cbLimit->addItem(dataManager.GetSysString(1243));
+		cbLimit->addItem(L"Illegal");
+		cbLimit->addItem(L"VG");
+		cbLimit->addItem(L"Custom");
+	}
+	stAttribute = env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 28, 70, 48), false, false, wFilter);
+	cbAttribute = env->addComboBox(rect<s32>(60, 26, 190, 46), wFilter, COMBOBOX_OTHER_FILT);
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
 		cbAttribute->addItem(dataManager.FormatAttribute(filter), filter);
-	stRace = env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
-	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 190, 60 + 75 / 6), wFilter, COMBOBOX_OTHER_FILT);
+	stRace = env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 51, 70, 71), false, false, wFilter);
+	cbRace = env->addComboBox(rect<s32>(60, 49, 190, 69), wFilter, COMBOBOX_OTHER_FILT);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x2000000; filter <<= 1)
 		cbRace->addItem(dataManager.FormatRace(filter), filter);
-	stAttack = env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 22 + 50 / 6, 280, 42 + 50 / 6), false, false, wFilter);
-	ebAttack = env->addEditBox(L"", rect<s32>(260, 20 + 50 / 6, 340, 40 + 50 / 6), true, wFilter);
+	stAttack = env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 28, 280, 48), false, false, wFilter);
+	ebAttack = env->addEditBox(L"", rect<s32>(260, 26, 340, 46), true, wFilter);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stDefense = env->addStaticText(dataManager.GetSysString(1323), rect<s32>(205, 42 + 75 / 6, 280, 62 + 75 / 6), false, false, wFilter);
-	ebDefense = env->addEditBox(L"", rect<s32>(260, 40 + 75 / 6, 340, 60 + 75 / 6), true, wFilter);
+	stDefense = env->addStaticText(dataManager.GetSysString(1323), rect<s32>(205, 51, 280, 71), false, false, wFilter);
+	ebDefense = env->addEditBox(L"", rect<s32>(260, 49, 340, 69), true, wFilter);
 	ebDefense->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stStar = env->addStaticText(dataManager.GetSysString(1324), rect<s32>(10, 62 + 100 / 6, 80, 82 + 100 / 6), false, false, wFilter);
-	ebStar = env->addEditBox(L"", rect<s32>(60, 60 + 100 / 6, 100, 80 + 100 / 6), true, wFilter);
+	stStar = env->addStaticText(dataManager.GetSysString(1324), rect<s32>(10, 74, 80, 94), false, false, wFilter);
+	ebStar = env->addEditBox(L"", rect<s32>(60, 72, 100, 92), true, wFilter);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stScale = env->addStaticText(dataManager.GetSysString(1336), rect<s32>(101, 62 + 100 / 6, 150, 82 + 100 / 6), false, false, wFilter);
-	ebScale = env->addEditBox(L"", rect<s32>(150, 60 + 100 / 6, 190, 80 + 100 / 6), true, wFilter);
+	stScale = env->addStaticText(dataManager.GetSysString(1336), rect<s32>(110, 74, 150, 94), false, false, wFilter);
+	ebScale = env->addEditBox(L"", rect<s32>(150, 72, 190, 92), true, wFilter);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 62 + 100 / 6, 280, 82 + 100 / 6), false, false, wFilter);
-	ebCardName = env->addEditBox(L"", rect<s32>(260, 60 + 100 / 6, 390, 80 + 100 / 6), true, wFilter, EDITBOX_KEYWORD);
+	stSearch = env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 74, 280, 94), false, false, wFilter);
+	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
-	btnStartFilter = env->addButton(rect<s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
-	btnClearFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 255, 100 + 125 / 6), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
+	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
+	btnStartFilter = env->addButton(rect<s32>(260, 96, 390, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
+	btnClearFilter = env->addButton(rect<s32>(205, 96, 255, 118), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
 	wCategories = env->addWindow(rect<s32>(450, 60, 1000, 270), false, dataManager.strBuffer);
 	wCategories->getCloseButton()->setVisible(false);
 	wCategories->setDrawTitlebar(false);
@@ -540,7 +547,7 @@ bool Game::Initialize() {
 	btnCategoryOK = env->addButton(rect<s32>(200, 175, 300, 200), wCategories, BUTTON_CATEGORY_OK, dataManager.GetSysString(1211));
 	for(int i = 0; i < 32; ++i)
 		chkCategory[i] = env->addCheckBox(false, recti(10 + (i % 4) * 130, 10 + (i / 4) * 20, 140 + (i % 4) * 130, 30 + (i / 4) * 20), wCategories, -1, dataManager.GetSysString(1100 + i));
-	btnMarksFilter = env->addButton(rect<s32>(60, 80 + 125 / 6, 190, 100 + 125 / 6), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
+	btnMarksFilter = env->addButton(rect<s32>(155, 96, 240, 118), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
 	wLinkMarks = env->addWindow(rect<s32>(700, 30, 820, 150), false, dataManager.strBuffer);
 	wLinkMarks->getCloseButton()->setVisible(false);
 	wLinkMarks->setDrawTitlebar(false);
@@ -1017,6 +1024,7 @@ void Game::LoadConfig() {
 	gameConf.volume = 1.0;
 	gameConf.enablemusic = true;
 	gameConf.draw_field_spell = 1;
+	gameConf.chkAnime = 0;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1065,6 +1073,8 @@ void Game::LoadConfig() {
 			gameConf.chkHideHintButton = atoi(valbuf);
 		} else if(!strcmp(strbuf, "draw_field_spell")) {
 			gameConf.draw_field_spell = atoi(valbuf);
+		} else if(!strcmp(strbuf, "show_anime")) {
+			gameConf.chkAnime = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_sound")) {
  			gameConf.enablesound = atoi(valbuf) > 0;
 		} else if (!strcmp(strbuf, "skin_index")) {
@@ -1124,6 +1134,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "hide_setname = %d\n", ((gameConf.chkHideSetname) ? 1 : 0));
 	fprintf(fp, "hide_hint_button = %d\n", ((chkHideHintButton->isChecked()) ? 1 : 0));
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
+	fprintf(fp, "show_anime = %d\n", ((chkAnime->isChecked()) ? 1 : 0));
 	fprintf(fp, "skin_index = %d\n", gameConf.skin_index);
 	fprintf(fp, "enable_sound = %d\n", ((chkEnableSound->isChecked()) ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", ((chkEnableMusic->isChecked()) ? 1 : 0));
@@ -1390,15 +1401,16 @@ void Game::OnResize()
 	cbRace->setRelativePosition(Resize(60, 49, 190, 69));
 	cbAttribute->setRelativePosition(Resize(60, 26, 190, 46));
 	cbLimit->setRelativePosition(Resize(260, 3, 390, 23));
-	ebStar->setRelativePosition(Resize(60, 60 + 100 / 6, 100, 80 + 100 / 6));
-	ebScale->setRelativePosition(Resize(150, 60 + 100 / 6, 190, 80 + 100 / 6));
+	ebStar->setRelativePosition(Resize(60, 72, 100, 92));
+	ebScale->setRelativePosition(Resize(150, 72, 190, 92));
 	ebAttack->setRelativePosition(Resize(260, 26, 340, 46));
 	ebDefense->setRelativePosition(Resize(260, 49, 340, 69));
 	ebCardName->setRelativePosition(Resize(260, 72, 390, 92));
 	btnEffectFilter->setRelativePosition(Resize(345, 28, 390, 69));
-	btnStartFilter->setRelativePosition(Resize(260, 96, 390, 118));
-	btnClearFilter->setRelativePosition(Resize(205, 96, 255, 118));
-	btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 190, 100 + 125 / 6));
+	btnStartFilter->setRelativePosition(Resize(327, 96, 390, 118));
+	btnClearFilter->setRelativePosition(Resize(260, 96, 322, 118));
+	btnMarksFilter->setRelativePosition(Resize(155, 96, 240, 118));
+	chkAnime->setRelativePosition(Resize(10, 96, 150, 118));
 
 	wCategories->setRelativePosition(ResizeWin(450, 60, 1000, 270));
 	wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
@@ -1410,9 +1422,9 @@ void Game::OnResize()
 	stRace->setRelativePosition(ResizeWin(10, 51, 70, 71));
 	stAttack->setRelativePosition(ResizeWin(205, 28, 280, 48));
 	stDefense->setRelativePosition(ResizeWin(205, 51, 280, 71));
-	stStar->setRelativePosition(ResizeWin(10, 62 + 100 / 6, 80, 82 + 100 / 6));
+	stStar->setRelativePosition(ResizeWin(10, 74, 80, 94));
 	stSearch->setRelativePosition(ResizeWin(205, 74, 280, 94));
-	stScale->setRelativePosition(ResizeWin(101, 62 + 100 / 6, 150, 82 + 100 / 6));
+	stScale->setRelativePosition(ResizeWin(110, 74, 150, 94));
 	btnSideOK->setRelativePosition(Resize(510, 40, 820, 80));
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
 
