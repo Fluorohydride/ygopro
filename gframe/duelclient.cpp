@@ -3528,6 +3528,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
 		if(!is_closing && pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION && remotes.find(ipaddr) == remotes.end() ) {
+			wchar_t msgbuf[256];
 			mainGame->gMutex.Lock();
 			remotes.insert(ipaddr);
 			pHP->ipaddr = ipaddr;
@@ -3539,6 +3540,9 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(dataManager.GetSysString(pHP->host.rule + 1240));
 			hoststr.append(L"][");
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
+			hoststr.append(L"][");
+			myswprintf(msgbuf, L"MR %d", (pHP->host.duel_rule == 0) ? 3 : pHP->host.duel_rule);
+			hoststr.append(msgbuf);
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
