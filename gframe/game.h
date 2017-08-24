@@ -37,6 +37,7 @@ struct Config {
 	int chkHideHintButton;
 	int draw_field_spell;
 
+	int chkAnime;
 	bool enablesound;
 	double volume;
 	bool enablemusic;
@@ -433,6 +434,7 @@ public:
 	irr::gui::IGUIWindow* wLinkMarks;
 	irr::gui::IGUIButton* btnMark[8];
 	irr::gui::IGUIButton* btnMarksOK;
+	irr::gui::IGUICheckBox* chkAnime;
 	//sort type
 	irr::gui::IGUIStaticText* wSort;
 	irr::gui::IGUIComboBox* cbSortType;
@@ -619,6 +621,7 @@ extern Game* mainGame;
 #define CHECK_DECK_MASTER_DUEL		366
 #define CHECKBOX_ENABLE_MUSIC		361
 #define SCROLL_VOLUME				362
+#define CHECKBOX_SHOW_ANIME			363
 #define COMBOBOX_SORTTYPE			370
 
 #define BUTTON_MARKS_FILTER			380
