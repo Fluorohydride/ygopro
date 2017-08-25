@@ -32,6 +32,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		s32 id = caller->getID();
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_HOVERED: {
+			// Set cursor to an I-Beam if hovering over an edit box
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			{
+				utils.changeCursor(ECI_IBEAM);
+			}
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_LEFT: {
+			// Set cursor to normal if left an edit box
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			{
+				utils.changeCursor(ECI_NORMAL);
+			}
+			break;
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_MODE_EXIT: {
