@@ -60,17 +60,24 @@ int ReplayMode::ReplayThread(void* param) {
 	mtrandom rnd;
 	int seed = rh.seed;
 	rnd.reset(seed);
+	unsigned short buffer[20];
 	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.hostname, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.hostname_tag, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.clientname_tag, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.clientname, 20);
 		mainGame->dInfo.isTag = true;
 		mainGame->dInfo.tag_player[0] = false;
 		mainGame->dInfo.tag_player[1] = false;
 	} else {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.hostname, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.clientname, 20);
 	}
 	set_script_reader(default_script_reader);
 	set_card_reader((card_reader)DataManager::CardReader);
@@ -204,17 +211,24 @@ void ReplayMode::Restart(bool refresh) {
 	mtrandom rnd;
 	int seed = rh.seed;
 	rnd.reset(seed);
+	unsigned short buffer[20];
 	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.hostname, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.hostname_tag, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.clientname_tag, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.clientname, 20);
 		mainGame->dInfo.isTag = true;
 		mainGame->dInfo.tag_player[0] = false;
 		mainGame->dInfo.tag_player[1] = false;
 	} else {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.hostname, 20);
+		cur_replay.ReadData(buffer, 40);
+		BufferIO::CopyWStr(buffer, mainGame->dInfo.clientname, 20);
 	}
 	//set_card_reader((card_reader)DataManager::CardReader);
 	//set_message_handler((message_handler)MessageHandler);
