@@ -202,6 +202,13 @@ bool Replay::ReadNextResponse(unsigned char resp[64]) {
 	pdata += len;
 	return true;
 }
+void Replay::ReadName(wchar_t* data) {
+	if(!is_replaying)
+		return;
+	unsigned short buffer[20];
+	ReadData(buffer, 40);
+	BufferIO::CopyWStr(buffer, data, 20);
+}
 void Replay::ReadData(void* data, unsigned int length) {
 	if(!is_replaying)
 		return;
