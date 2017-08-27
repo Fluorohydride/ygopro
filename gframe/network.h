@@ -25,13 +25,12 @@ struct HostInfo {
 	int destiny_draw;
 	int sealed;
 	int booster;
-	int action;
 	int speed;
 	int concentration;
 	int boss;
 	int city;
 	int kingdom;
-	int rose;
+	int dimension;
 	int turbo1;
 	int turbo2;
 	int doubled;

@@ -161,7 +161,6 @@ bool Game::Initialize() {
 	btnRulesOK = env->addButton(rect<s32>(135, 175, 235, 200), wRules, BUTTON_RULE_OK, dataManager.GetSysString(1211));
 	for(int i = 0; i < 14; ++i)
 		chkRules[i] = env->addCheckBox(false, recti(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, 353+i, dataManager.GetSysString(1132 + i));
-	chkDrawDestiny = env->addCheckBox(false, rect<s32>(180, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1626));
 	env->addStaticText(dataManager.GetSysString(1236), rect<s32>(20, 180, 220, 200), false, false, wCreateHost);
 	cbDuelRule = env->addComboBox(rect<s32>(140, 175, 300, 200), wCreateHost);
 	cbDuelRule->addItem(dataManager.GetSysString(1260));

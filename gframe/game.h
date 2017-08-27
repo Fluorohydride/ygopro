@@ -266,7 +266,6 @@ public:
 	irr::gui::IGUIWindow* wRules;
 	irr::gui::IGUICheckBox* chkRules[14];
 	irr::gui::IGUIButton* btnRulesOK;
-	irr::gui::IGUICheckBox* chkDrawDestiny;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
@@ -607,16 +606,16 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECK_SEALED_DUEL			353
 #define CHECK_BOOSTER_DUEL			354
-#define CHECK_ACTION_DUEL			355
+#define CHECK_DESTINY_DRAW			355
 #define CHECK_SPEED_DUEL			356
 #define CHECK_CONCENTRATION_DUEL	357
 #define CHECK_BOSS_DUEL				358
 #define CHECK_BATTLE_CITY			359
 #define CHECK_DUELIST_KINGDOM		360
-#define CHECK_ROSE_DUEL				361
-#define CHECK_TURBO_DUEL_1			362
+#define CHECK_DIMENSION_DUEL		361
+#define CHECK_DOUBLE_DECK			362
 #define CHECK_TURBO_DUEL_2			363
-#define CHECK_DOUBLE_DECK			364
+#define CHECK_TURBO_DUEL_1			364
 #define CHECK_COMMAND_DUEL			365
 #define CHECK_DECK_MASTER_DUEL		366
 #define CHECKBOX_ENABLE_MUSIC		361
