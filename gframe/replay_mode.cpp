@@ -61,16 +61,16 @@ int ReplayMode::ReplayThread(void* param) {
 	int seed = rh.seed;
 	rnd.reset(seed);
 	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 		mainGame->dInfo.isTag = true;
 		mainGame->dInfo.tag_player[0] = false;
 		mainGame->dInfo.tag_player[1] = false;
 	} else {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 	}
 	set_script_reader(default_script_reader);
 	set_card_reader((card_reader)DataManager::CardReader);
@@ -209,16 +209,16 @@ void ReplayMode::Restart(bool refresh) {
 	int seed = rh.seed;
 	rnd.reset(seed);
 	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 		mainGame->dInfo.isTag = true;
 		mainGame->dInfo.tag_player[0] = false;
 		mainGame->dInfo.tag_player[1] = false;
 	} else {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 	}
 	//set_card_reader((card_reader)DataManager::CardReader);
 	//set_message_handler((message_handler)MessageHandler);
