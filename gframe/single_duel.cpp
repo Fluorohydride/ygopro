@@ -492,7 +492,6 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
 	}
 	last_replay.Flush();
-	mainGame->dInfo.startlp = host_info.start_lp;
 	char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
