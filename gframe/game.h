@@ -18,6 +18,7 @@ namespace ygo {
 #ifndef YGOPRO_SERVER_MODE
 struct Config {
 	bool use_d3d;
+	bool use_image_scale;
 	unsigned short antialias;
 	unsigned short serverport;
 	unsigned char textfontsize;
@@ -446,6 +447,11 @@ extern HostInfo game_info;
 
 }
 
+#define CARD_IMG_WIDTH		177
+#define CARD_IMG_HEIGHT		254
+#define CARD_THUMB_WIDTH	44
+#define CARD_THUMB_HEIGHT	64
+
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2
 
@@ -562,6 +568,8 @@ extern HostInfo game_info;
 #define SCROLL_FILTER				315
 #define EDITBOX_KEYWORD				316
 #define BUTTON_CLEAR_FILTER			317
+#define COMBOBOX_ATTRIBUTE			318
+#define COMBOBOX_RACE				319
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
 #define BUTTON_REPLAY_STEP			322
@@ -575,6 +583,7 @@ extern HostInfo game_info;
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_AUTO_SEARCH		360
 #define COMBOBOX_SORTTYPE			370
+#define COMBOBOX_LIMIT				371
 
 #define BUTTON_MARKS_FILTER			380
 #define BUTTON_MARKERS_OK			381
