@@ -61,16 +61,16 @@ int ReplayMode::ReplayThread(void* param) {
 	int seed = rh.seed;
 	rnd.reset(seed);
 	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 		mainGame->dInfo.isTag = true;
 		mainGame->dInfo.tag_player[0] = false;
 		mainGame->dInfo.tag_player[1] = false;
 	} else {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 	}
 	set_script_reader(default_script_reader);
 	set_card_reader((card_reader)DataManager::CardReader);
@@ -185,6 +185,7 @@ int ReplayMode::ReplayThread(void* param) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->ShowElement(mainGame->wReplay);
+		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.Unlock();
 		if(exit_on_return)
@@ -195,9 +196,6 @@ int ReplayMode::ReplayThread(void* param) {
 void ReplayMode::Restart(bool refresh) {
 	end_duel(pduel);
 	mainGame->dInfo.isStarted = false;
-	mainGame->dField.panel = 0;
-	mainGame->dField.hovered_card = 0;
-	mainGame->dField.clicked_card = 0;
 	mainGame->dField.Clear();
 	//mainGame->device->setEventReceiver(&mainGame->dField);
 	cur_replay.Rewind();
@@ -207,16 +205,16 @@ void ReplayMode::Restart(bool refresh) {
 	int seed = rh.seed;
 	rnd.reset(seed);
 	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 		mainGame->dInfo.isTag = true;
 		mainGame->dInfo.tag_player[0] = false;
 		mainGame->dInfo.tag_player[1] = false;
 	} else {
-		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
 	}
 	//set_card_reader((card_reader)DataManager::CardReader);
 	//set_message_handler((message_handler)MessageHandler);

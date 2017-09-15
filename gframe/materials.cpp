@@ -250,7 +250,7 @@ Materials::Materials() {
 	mCard.DiffuseColor = 0xff000000;
 	mCard.ColorMaterial = irr::video::ECM_NONE;
 	mCard.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
-//	mCard.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
+	mCard.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
 	mTexture.AmbientColor = 0xffffffff;
 	mTexture.DiffuseColor = 0xff000000;
 	mTexture.ColorMaterial = irr::video::ECM_NONE;
@@ -260,13 +260,13 @@ Materials::Materials() {
 	mBackLine.DiffuseColor = 0xc0000000;
 	mBackLine.AntiAliasing = EAAM_FULL_BASIC;
 	mBackLine.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
-//	mBackLine.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
+	mBackLine.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
 	mBackLine.Thickness = 2;
 	mSelField.ColorMaterial = irr::video::ECM_NONE;
 	mSelField.AmbientColor = 0xffffffff;
 	mSelField.DiffuseColor = 0xff000000;
 	mSelField.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
-//	mSelField.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
+	mSelField.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
 	mOutLine.ColorMaterial = irr::video::ECM_AMBIENT;
 	mOutLine.DiffuseColor = 0xff000000;
 	mOutLine.Thickness = 2;
@@ -276,7 +276,7 @@ Materials::Materials() {
 	mATK.DiffuseColor = 0x80000000;
 	mATK.setFlag(EMF_BACK_FACE_CULLING, FALSE);
 	mATK.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
-//	mATK.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
+	mATK.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
 }
 void Materials::GenArrow(float y) {
 	float ay = 1.0f;

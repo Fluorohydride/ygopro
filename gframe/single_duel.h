@@ -49,7 +49,10 @@ protected:
 	unsigned char hand_result[2];
 	unsigned char last_response;
 	std::set<DuelPlayer*> observers;
-	std::set<DuelPlayer*> recorders;
+#ifdef YGOPRO_SERVER_MODE
+	DuelPlayer* cache_recorder;
+	DuelPlayer* replay_recorder;
+#endif
 	Replay last_replay;
 	bool match_mode;
 	int match_kill;

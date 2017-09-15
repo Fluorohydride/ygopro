@@ -3,28 +3,15 @@ solution "ygo"
     language "C++"
     objdir "obj"
 
-    configurations { "Debug", "Release" }
+    configurations { "Release", "Debug" }
 
     configuration "windows"
         defines { "WIN32", "_WIN32" }
-
-    configuration "bsd"
-        defines { "LUA_USE_POSIX" }
-        includedirs { "/usr/local/include" }
-        libdirs { "/usr/local/lib" }
-
-    configuration "macosx"
-        defines { "LUA_USE_MACOSX" }
-        includedirs { "/usr/local/include/*" }
-        libdirs { "/usr/local/lib", "/usr/X11/lib" }
-        buildoptions { "-stdlib=libc++" }
-        links {"OpenGL.framework","Cocoa.framework","IOKit.framework"}
 
     configuration "linux"
         defines { "LUA_USE_LINUX" }
 
     configuration "Release"
-        flags { "OptimizeSpeed" }
         targetdir "bin/release"
 
     configuration "Debug"
@@ -33,6 +20,7 @@ solution "ygo"
         targetdir "bin/debug"
 
     configuration { "Release", "vs*" }
+        optimize "Speed"
         flags { "StaticRuntime", "LinkTimeOptimization" }
         disablewarnings { "4244", "4267", "4838", "4577", "4819", "4018", "4996", "4477" }
 

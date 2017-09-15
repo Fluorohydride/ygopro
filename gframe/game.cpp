@@ -1,23 +1,23 @@
 #include "config.h"
 #include "game.h"
-//#include "image_manager.h"
+#ifdef YGOPRO_SERVER_MODE
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "replay.h"
-//#include "materials.h"
-//#include "duelclient.h"
+#else
+#include "image_manager.h"
+#include "data_manager.h"
+#include "deck_manager.h"
+#include "replay.h"
+#include "materials.h"
+#include "duelclient.h"
 #include "netserver.h"
-//#include "single_mode.h"
-
-#ifdef _WIN32
-#define strcasecmp _stricmp
-#include "dirent.h"
-#endif // _WIN32
+#include "single_mode.h"
+#endif //YGOPRO_SERVER_MODE
 
 #ifndef _WIN32
 #include <sys/types.h>
 #include <dirent.h>
-#include <unistd.h>
 #endif
 
 const unsigned short PRO_VERSION = 0x133F;
@@ -26,46 +26,21 @@ namespace ygo {
 
 Game* mainGame;
 
+#ifdef YGOPRO_SERVER_MODE
 unsigned short aServerPort;
-unsigned int lflist;
-unsigned char rule;
-unsigned char mode;
-unsigned char duel_rule;
-bool no_check_deck;
-bool no_shuffle_deck;
-unsigned int start_lp;
-unsigned short time_limit;
 unsigned short replay_mode;
-unsigned char start_hand;
-unsigned char draw_count;
+HostInfo game_info;
 
-void Game::MainServerLoop(int bDuel_mode, int lflist) {
+void Game::MainServerLoop() {
 	deckManager.LoadLFList();
-	
-	//load expansions
-	DIR * dir;
-	struct dirent * dirp;
-	const char *foldername = "./expansions/";
-	if((dir = opendir(foldername)) != NULL) {
-		while((dirp = readdir(dir)) != NULL) {
-			size_t len = strlen(dirp->d_name);
-			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
-				continue;
-			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
-			strncpy(filepath, foldername, strlen(foldername)+1);
-			strncat(filepath, dirp->d_name, len);
-			dataManager.LoadDB(filepath);
-			free(filepath);
-		}
-		closedir(dir);
-	}
-	
+	LoadExpansionDB();
 	dataManager.LoadDB("cards.cdb");
 	
 	aServerPort = NetServer::StartServer(aServerPort);
-	NetServer::Initduel(bDuel_mode, lflist);
+	NetServer::InitDuel();
 	printf("%u\n", aServerPort);
 	fflush(stdout);
+	
 	while(NetServer::net_evbase) {
 #ifdef WIN32
 		Sleep(200);
@@ -74,7 +49,7 @@ void Game::MainServerLoop(int bDuel_mode, int lflist) {
 #endif
 	}
 }
-/*
+#else //YGOPRO_SERVER_MODE
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
@@ -252,10 +227,11 @@ bool Game::Initialize() {
 	btnHostPrepStart = env->addButton(rect<s32>(230, 280, 340, 305), wHostPrepare, BUTTON_HP_START, dataManager.GetSysString(1215));
 	btnHostPrepCancel = env->addButton(rect<s32>(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1210));
 	//img
-	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 199, 273), true, false, 0, -1, true);
+	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, 0, -1, true);
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
 	wCardImg->setVisible(false);
-	imgCard = env->addImage(rect<s32>(10, 9, 187, 263), wCardImg);
+	imgCard = env->addImage(rect<s32>(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
+	imgCard->setImage(imageManager.tCover[0]);
 	imgCard->setUseAlphaChannel(true);
 	//phase
 	wPhase = env->addStaticText(L"", rect<s32>(480, 310, 855, 330));
@@ -388,14 +364,14 @@ bool Game::Initialize() {
 	btnPSAU->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
 	btnPSAD->setImageScale(core::vector2df(0.5, 0.5));
-	btnPSAD->setImage(imageManager.tCover[0], rect<s32>(0, 0, 177, 254));
+	btnPSAD->setImage(imageManager.tCover[0], rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT));
 	btnPSDU = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(300, 45, 440, 185), wPosSelect, BUTTON_POS_DU);
 	btnPSDU->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSDU->setImageRotation(270);
 	btnPSDD = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(445, 45, 585, 185), wPosSelect, BUTTON_POS_DD);
 	btnPSDD->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSDD->setImageRotation(270);
-	btnPSDD->setImage(imageManager.tCover[0], rect<s32>(0, 0, 177, 254));
+	btnPSDD->setImage(imageManager.tCover[0], rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT));
 	//card select
 	wCardSelect = env->addWindow(rect<s32>(320, 100, 1000, 400), false, L"");
 	wCardSelect->getCloseButton()->setVisible(false);
@@ -517,7 +493,7 @@ bool Game::Initialize() {
 	cbCardType2->setMaxSelectionRows(10);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
 	env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 2 + 25 / 6, 280, 22 + 25 / 6), false, false, wFilter);
-	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, -1);
+	cbLimit = env->addComboBox(rect<s32>(260, 25 / 6, 390, 20 + 25 / 6), wFilter, COMBOBOX_LIMIT);
 	cbLimit->setMaxSelectionRows(10);
 	cbLimit->addItem(dataManager.GetSysString(1310));
 	cbLimit->addItem(dataManager.GetSysString(1316));
@@ -528,13 +504,13 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1242));
 	cbLimit->addItem(dataManager.GetSysString(1243));
 	env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 22 + 50 / 6, 70, 42 + 50 / 6), false, false, wFilter);
-	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, -1);
+	cbAttribute = env->addComboBox(rect<s32>(60, 20 + 50 / 6, 190, 40 + 50 / 6), wFilter, COMBOBOX_ATTRIBUTE);
 	cbAttribute->setMaxSelectionRows(10);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
 		cbAttribute->addItem(dataManager.FormatAttribute(filter), filter);
 	env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 42 + 75 / 6, 70, 62 + 75 / 6), false, false, wFilter);
-	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 190, 60 + 75 / 6), wFilter, -1);
+	cbRace = env->addComboBox(rect<s32>(60, 40 + 75 / 6, 190, 60 + 75 / 6), wFilter, COMBOBOX_RACE);
 	cbRace->setMaxSelectionRows(10);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x2000000; filter <<= 1)
@@ -673,8 +649,6 @@ bool Game::Initialize() {
 	hideChatTimer = 0;
 	return true;
 }
-*/
-/*
 void Game::MainLoop() {
 	wchar_t cap[256];
 	camera = smgr->addCameraSceneNode(0);
@@ -764,8 +738,6 @@ void Game::MainLoop() {
 	SaveConfig();
 //	device->drop();
 }
-*/
-/*
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
 	for(int i = 0; i < 16; ++i)
 		mProjection[i] = 0;
@@ -821,6 +793,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::LoadExpansionDB() {
 #ifdef _WIN32
 	char fpath[1000];
@@ -840,24 +813,20 @@ void Game::LoadExpansionDB() {
 #else
 	DIR * dir;
 	struct dirent * dirp;
-	const char *foldername = "./expansions/";
-	if((dir = opendir(foldername)) != NULL) {
+	if((dir = opendir("./expansions/")) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
 			size_t len = strlen(dirp->d_name);
 			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
 				continue;
-			char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
-			strncpy(filepath, foldername, strlen(foldername) + 1);
-			strncat(filepath, dirp->d_name, len);
-			std::cout << "Found file " << filepath << std::endl;
-			if(!dataManager.LoadDB(filepath))
-				std::cout << "Error loading file" << std::endl;
-			free(filepath);
+			char filepath[1000];
+			sprintf(filepath, "./expansions/%s", dirp->d_name);
+			dataManager.LoadDB(filepath);
 		}
 		closedir(dir);
 	}
 #endif
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 #ifdef _WIN32
@@ -964,6 +933,8 @@ void Game::LoadConfig() {
 	char strbuf[32];
 	char valbuf[256];
 	wchar_t wstr[256];
+	gameConf.use_d3d = 0;
+	gameConf.use_image_scale = 1;
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
 	gameConf.textfontsize = 12;
@@ -996,6 +967,8 @@ void Game::LoadConfig() {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = atoi(valbuf) > 0;
+		} else if(!strcmp(strbuf, "use_image_scale")) {
+			gameConf.use_image_scale = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "textfont")) {
@@ -1068,6 +1041,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[256];
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
+	fprintf(fp, "use_image_scale = %d\n", gameConf.use_image_scale ? 1 : 0);
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
 	fprintf(fp, "errorlog = %d\n", enable_log);
 	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
@@ -1223,8 +1197,12 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	}
 	chatMsg[0].append(msg);
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::AddDebugMsg(char* msg)
 {
+#ifdef YGOPRO_SERVER_MODE
+	fprintf(stderr, "%s\n", msg);
+#else
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
@@ -1241,10 +1219,12 @@ void Game::AddDebugMsg(char* msg)
 		fprintf(fp, "[%s][Script Error]: %s\n", timebuf, msg);
 		fclose(fp);
 	}
+#endif //YGOPRO_SERVER_MODE
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
-	mainGame->imgCard->setImage(0);
+	mainGame->imgCard->setImage(imageManager.tCover[0]);
 	mainGame->btnPSAU->setImage();
 	mainGame->btnPSDU->setImage();
 	for(int i=0; i<=4; ++i) {
@@ -1294,14 +1274,12 @@ void Game::CloseDuelWindow() {
 	ClearTextures();
 	closeDoneSignal.Set();
 }
-*/
 int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
 }
-/*
 void Game::SetWindowsIcon() {
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandleW(NULL);
@@ -1322,6 +1300,6 @@ void Game::FlashWindow() {
 	FlashWindowEx(&fi);
 #endif
 }
-*/
+#endif //YGOPRO_SERVER_MODE
 
 }

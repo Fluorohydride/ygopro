@@ -15,10 +15,8 @@ solution "ygo"
 
     configuration "macosx"
         defines { "LUA_USE_MACOSX" }
-        includedirs { "/usr/local/include/*" }
-        libdirs { "/usr/local/lib", "/usr/X11/lib" }
-        buildoptions { "-stdlib=libc++" }
-        links {"OpenGL.framework","Cocoa.framework","IOKit.framework"}
+        includedirs { "/opt/local/include" }
+        libdirs { "/opt/local/lib" }
 
     configuration "linux"
         defines { "LUA_USE_LINUX" }
@@ -47,7 +45,7 @@ solution "ygo"
         defines { "_ITERATOR_DEBUG_LEVEL=0" }
 
     configuration "Release"
-        --flags { "OptimizeSpeed" }
+        flags { "OptimizeSpeed" }
         targetdir "bin/release"
 
     include "ocgcore"

@@ -78,9 +78,6 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->stText->setText(L"");
 	mainGame->scrCardText->setVisible(false);
 	mainGame->wPhase->setVisible(true);
-	mainGame->dField.panel = 0;
-	mainGame->dField.hovered_card = 0;
-	mainGame->dField.clicked_card = 0;
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isStarted = true;
@@ -112,6 +109,7 @@ int SingleMode::SinglePlayThread(void* param) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->ShowElement(mainGame->wSinglePlay);
+		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.Unlock();
 		if(exit_on_return)

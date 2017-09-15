@@ -2,6 +2,8 @@ include "lzma"
 
 project "ygopro"
     kind "ConsoleApp"
+	
+    defines { "YGOPRO_SERVER_MODE" }
 
     files { "gframe.cpp", "config.h",
             "game.cpp", "game.h",
@@ -10,8 +12,7 @@ project "ygopro"
             "replay.cpp", "replay.h",
             "netserver.cpp", "netserver.h",
             "single_duel.cpp", "single_duel.h",
-            "tag_duel.cpp", "tag_duel.h",
-            "**.cc", "**.c"}
+            "tag_duel.cpp", "tag_duel.h" }
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", "sqlite3", "lua" , "event"}
 
