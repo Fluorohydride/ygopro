@@ -3,6 +3,11 @@
 #include "data_manager.h"
 #include <event2/thread.h>
 
+#if __APPLE__
+#import <CoreFoundation/CoreFoundation.h>
+#endif
+
+
 int enable_log = 0;
 bool exit_on_return = false;
 bool open_file = false;
@@ -36,6 +41,17 @@ int main(int argc, char* argv[]) {
 #ifndef _WIN32
 	setlocale(LC_CTYPE, "UTF-8");
 #endif
+
+#if __APPLE__
+	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
+	CFRelease(bundle_url);
+	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
+	CFRelease(bundle_base_url);
+	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
+	CFRelease(path);
+#endif
+
 #ifdef _WIN32
 #ifndef _DEBUG
 	wchar_t exepath[MAX_PATH];
