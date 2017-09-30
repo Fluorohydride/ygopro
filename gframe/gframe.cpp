@@ -2,11 +2,9 @@
 #include "game.h"
 #include "data_manager.h"
 #include <event2/thread.h>
-
-#if __APPLE__
+#ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
 #endif
-
 
 int enable_log = 0;
 bool exit_on_return = false;
@@ -41,8 +39,7 @@ int main(int argc, char* argv[]) {
 #ifndef _WIN32
 	setlocale(LC_CTYPE, "UTF-8");
 #endif
-
-#if __APPLE__
+#ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
 	CFRelease(bundle_url);
@@ -50,8 +47,7 @@ int main(int argc, char* argv[]) {
 	CFRelease(bundle_base_url);
 	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
 	CFRelease(path);
-#endif
-
+#endif //__APPLE__
 #ifdef _WIN32
 #ifndef _DEBUG
 	wchar_t exepath[MAX_PATH];
