@@ -640,6 +640,13 @@ bool Game::Initialize() {
 	}
 	engineSound = irrklang::createIrrKlangDevice();
 	engineMusic = irrklang::createIrrKlangDevice();
+	if(!engineSound || !engineMusic) {
+		chkEnableSound->setChecked(false);
+		chkEnableSound->setEnabled(false);
+		chkEnableMusic->setChecked(false);
+		chkEnableMusic->setEnabled(false);
+		chkMusicMode->setEnabled(false);
+	}
 	hideChat = false;
 	hideChatTimer = 0;
 	return true;
@@ -743,7 +750,8 @@ void Game::MainLoop() {
 	usleep(500000);
 #endif
 	SaveConfig();
-	engineMusic->drop();
+	if(engineMusic)
+		engineMusic->drop();
 //	device->drop();
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
