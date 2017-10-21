@@ -80,6 +80,7 @@ void DeckBuilder::Initialize() {
 	is_draging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
+	shiftpress = false;
 	mainGame->device->setEventReceiver(this);
 }
 void DeckBuilder::Terminate() {
@@ -295,12 +296,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_KEYWORD: {
-				irr::SEvent me;
-				me.EventType = irr::EET_GUI_EVENT;
-				me.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
-				me.GUIEvent.Caller = mainGame->btnStartFilter;
-				me.GUIEvent.Element = mainGame->btnStartFilter;
-				mainGame->device->postEventFromUser(me);
+				StartFilter();
 				break;
 			}
 			}
@@ -564,10 +560,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					auto pointer = dataManager.GetCodePointer(hovered_code);
 					if(pointer == dataManager._datas.end())
 						break;
-					if(!check_limit(pointer))
-						break;
-					if(!push_extra(pointer) && !push_main(pointer))
+					if(shiftpress)
 						push_side(pointer);
+					else {
+						if (!check_limit(pointer))
+							break;
+						if (!push_extra(pointer) && !push_main(pointer))
+							push_side(pointer);
+					}
 				}
 			} else {
 				if(click_pos == 1) {
@@ -634,6 +634,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
+		switch (event.KeyInput.Key) {
+		case irr::KEY_SHIFT:
+		case irr::KEY_LSHIFT:
+		case irr::KEY_RSHIFT: {
+			shiftpress = event.KeyInput.PressedDown;
+			return true;
+			break;
+		}
+		}
 		break;
 	}
 	default: break;

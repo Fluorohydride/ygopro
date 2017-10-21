@@ -72,7 +72,7 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
-extern const unsigned short PRO_VERSION;
+extern unsigned short PRO_VERSION;
 extern int enable_log;
 extern bool exit_on_return;
 extern bool open_file;
