@@ -2135,7 +2135,7 @@ void ClientField::GetHoverField(int x, int y) {
 		ofRect = recti(531+ 46, 135, 800- 46, 191);
 	}
 	irr::core::position2di pos(x, y);
-	int rule = (mainGame->dInfo.duel_rule >= 4) ? 1 : 0;
+	int rule = (mainGame->dInfo.duel_rule == 3) ? 0 : 1;
 	int speed = (mainGame->dInfo.speed) ? 1 : 0;
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();

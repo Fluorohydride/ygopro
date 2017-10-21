@@ -37,10 +37,14 @@ bool ImageManager::Initial() {
 	tFieldTransparent[0][0] = driver->getTexture("textures/field-transparent2.png");
 	tField[0][1] = driver->getTexture("textures/field3.png");
 	tFieldTransparent[0][1] = driver->getTexture("textures/field-transparent3.png");
+	tField[0][2] = driver->getTexture("textures/field.png");
+	tFieldTransparent[0][2] = driver->getTexture("textures/field-transparent.png");
 	tField[1][0] = driver->getTexture("textures/fieldSP2.png");
 	tFieldTransparent[1][0] = driver->getTexture("textures/field-transparentSP2.png");
 	tField[1][1] = driver->getTexture("textures/fieldSP3.png");
 	tFieldTransparent[1][1] = driver->getTexture("textures/field-transparentSP3.png");
+	tField[1][2] = driver->getTexture("textures/fieldSP.png");
+	tFieldTransparent[1][2] = driver->getTexture("textures/field-transparentSP.png");
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {

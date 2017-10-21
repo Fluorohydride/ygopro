@@ -66,7 +66,7 @@ void Game::DrawBackGround() {
 	//draw field spell card
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
 	bool drawField = false;
-	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
+	int rule = (dInfo.duel_rule == 3) ? 0 : 1;
 	int speed = (dInfo.speed) ? 1 : 0;
 	if(mainGame->gameConf.draw_field_spell) {
 		int fieldcode1 = -1;
@@ -101,7 +101,7 @@ void Game::DrawBackGround() {
 			}
 		}
 	}
-	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent[speed][rule] : imageManager.tField[speed][rule]);
+	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent[speed][(dInfo.duel_rule < 3) ? 2 : rule] : imageManager.tField[speed][(dInfo.duel_rule < 3) ? 2 : rule]);
 	driver->setMaterial(matManager.mTexture);
 	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
 	driver->setMaterial(matManager.mBackLine);
@@ -378,7 +378,7 @@ void Game::DrawCard(ClientCard* pcard) {
 }
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
-	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
+	int rule = (dInfo.duel_rule == 3) ? 0 : 1;
 	int speed = (dInfo.speed) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot.Z += 0.02f;
