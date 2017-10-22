@@ -984,11 +984,11 @@ void Game::RefreshBGMList() {
 		return;
 	while((dirp = readdir(dir)) != NULL) {
 		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name len - 4, ".mp3") != 0)
+		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".mp3") != 0)
 			continue;
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		BGMList.push_back(fdataw.cFileName);
+		BGMList.push_back(wname);
 	}
 	closedir(dir);
 #endif
