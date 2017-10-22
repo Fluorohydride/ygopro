@@ -164,7 +164,7 @@ void Game::DrawBackGround() {
 	//current sel
 	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
 		&& !(dInfo.duel_rule < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
-		&& !(dInfo.duel_rule >= 4 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
+		&& !(dInfo.duel_rule != 3 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
 		S3DVertex *vertex = 0;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler][speed];
