@@ -167,7 +167,6 @@ bool Game::Initialize() {
 	cbDuelRule->addItem(dataManager.GetSysString(1261));
 	cbDuelRule->addItem(dataManager.GetSysString(1262));
 	cbDuelRule->addItem(dataManager.GetSysString(1263));
-	//cbDuelRule->addItem(dataManager.GetSysString(1264));
 	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
 	btnCustomRule = env->addButton(rect<s32>(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, dataManager.GetSysString(1626));
 	wCustomRules = env->addWindow(rect<s32>(700, 100, 910, 280), false, dataManager.strBuffer);
@@ -176,7 +175,7 @@ bool Game::Initialize() {
 	wCustomRules->setDraggable(true);
 	wCustomRules->setVisible(false);
 	for(int i = 0; i < 5; ++i)
-		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + i * 20, 200, 30 + i * 20), wCustomRules, 353+i, dataManager.GetSysString(1265 + i));
+		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + i * 20, 200, 30 + i * 20), wCustomRules, 353 + i, dataManager.GetSysString(1265 + i));
 	btnCustomRulesOK = env->addButton(rect<s32>(55, 130, 155, 155), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211));
 	duel_param = 0;
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));

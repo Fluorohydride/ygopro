@@ -127,7 +127,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.duel_rule = ((mainGame->cbDuelRule->getSelected() + 1) << 16) | mainGame->duel_param;
+			cscg.info.duel_rule = mainGame->duel_param;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.sealed = mainGame->chkRules[0]->isChecked() ? 2 : 0;
@@ -377,7 +377,32 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(msgbuf);
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
 		str.append(msgbuf);
-		uint32 rule = pkt->info.duel_rule >> 16;
+		uint32 rule = 5;
+		mainGame->dInfo.duel_rule = 2;
+		if(pkt->info.duel_rule == MASTER_RULE_1) {
+			rule = 1;
+			mainGame->dInfo.duel_rule = 1;
+		}
+		else if(pkt->info.duel_rule == MASTER_RULE_2) {
+			rule = 2;
+			mainGame->dInfo.duel_rule = 2;
+		}
+		else if(pkt->info.duel_rule == MASTER_RULE_3) {
+			rule = 3;
+			mainGame->dInfo.duel_rule = 3;
+		}
+		else if(pkt->info.duel_rule == MASTER_RULE_4) {
+			rule = 4;
+			mainGame->dInfo.duel_rule = 4;
+		}
+		else if((pkt->info.duel_rule) & DUEL_EMZONE) {
+			rule = 5;
+			mainGame->dInfo.duel_rule = 4;
+		}
+		else if((pkt->info.duel_rule) & DUEL_PZONE) {
+			rule = 5;
+			mainGame->dInfo.duel_rule = 3;
+		}
 		if(rule == 5) {
 			uint32 flag = pkt->info.duel_rule & 0xffff, filter = 0x100;
 			for (int i = 0; i < 5; ++i, filter <<= 1)
@@ -521,11 +546,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
-		mainGame->dInfo.duel_rule = 4;
-		if(((pkt->info.duel_rule & 0xffff) & DUEL_NO_PZONE) && ((pkt->info.duel_rule & 0xffff) & DUEL_NO_EMZONE))
-			mainGame->dInfo.duel_rule = 2;
-		else if((pkt->info.duel_rule & 0xffff) & DUEL_NO_EMZONE)
-			mainGame->dInfo.duel_rule = 3;
 		mainGame->dInfo.speed = (pkt->info.speed == 2) ? 1 : 0;
 		watching = 0;
 		connect_state |= 0x4;
