@@ -80,8 +80,11 @@ int ReplayMode::ReplayThread(void* param) {
 	int start_hand = cur_replay.ReadInt32();
 	int draw_count = cur_replay.ReadInt32();
 	int opt = cur_replay.ReadInt32();
-	int duel_rule = opt >> 16;
-	mainGame->dInfo.duel_rule = duel_rule;
+	mainGame->dInfo.duel_rule = 4;
+	if (((opt & 0xffff) & DUEL_NO_PZONE) && ((opt & 0xffff) & DUEL_NO_EMZONE))
+		mainGame->dInfo.duel_rule = 2;
+	else if ((opt & 0xffff) & DUEL_NO_EMZONE)
+		mainGame->dInfo.duel_rule = 3;
 	mainGame->dInfo.speed = (opt & SPEED_DUEL) ? 1 : 0;
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);

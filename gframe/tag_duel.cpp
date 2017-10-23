@@ -382,7 +382,29 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	pduel = create_duel(rnd.rand());
 	set_player_info(pduel, 0, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
-	int opt = (int)host_info.duel_rule << 16;
+	int opt = host_info.duel_rule;
+	switch (opt) {
+	case 0x1F00: {
+		opt |= (1 << 16);
+		break;
+	}
+	case 0x1E00: {
+		opt |= (2 << 16);
+		break;
+	}
+	case 0x1000: {
+		opt |= (3 << 16);
+		break;
+	}
+	case 0: {
+		opt |= (4 << 16);
+		break;
+	}
+	default: {
+		opt |= (5 << 16);
+		break;
+	}
+	}
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
 	if(host_info.speed)
