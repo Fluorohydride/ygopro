@@ -128,6 +128,7 @@ bool Game::Initialize() {
 	cbRule->addItem(dataManager.GetSysString(1241));
 	cbRule->addItem(dataManager.GetSysString(1242));
 	cbRule->addItem(dataManager.GetSysString(1243));
+	cbRule->setSelected(gameConf.defaultOT - 1);
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
