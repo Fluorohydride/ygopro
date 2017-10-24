@@ -234,7 +234,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				break;
 			}
 			case DECKERROR_UNKNOWNCARD: {
-				myswprintf(msgbuf, dataManager.GetSysString(1415), dataManager.GetName(code));
+				myswprintf(msgbuf, dataManager.GetSysString(1415), dataManager.GetName(code), code);
 				break;
 			}
 			case DECKERROR_CARDCOUNT: {
