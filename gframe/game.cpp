@@ -178,7 +178,7 @@ bool Game::Initialize() {
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
 	//host(single)
-	wHostPrepare2 = env->addWindow(rect<s32>(750, 120, 950, 260), false, dataManager.GetSysString(1625));
+	wHostPrepare2 = env->addWindow(rect<s32>(750, 120, 950, 260), false, dataManager.GetSysString(1264));
 	wHostPrepare2->getCloseButton()->setVisible(false);
 	wHostPrepare2->setVisible(false);
 	stHostPrepRule2 = env->addStaticText(L"", rect<s32>(10, 30, 460, 350), false, true, wHostPrepare2);
