@@ -139,12 +139,22 @@ bool Game::Initialize() {
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
 	env->addStaticText(dataManager.GetSysString(1236), rect<s32>(20, 180, 220, 200), false, false, wCreateHost);
-	cbDuelRule = env->addComboBox(rect<s32>(140, 175, 300, 200), wCreateHost);
+	cbDuelRule = env->addComboBox(rect<s32>(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
 	cbDuelRule->addItem(dataManager.GetSysString(1260));
 	cbDuelRule->addItem(dataManager.GetSysString(1261));
 	cbDuelRule->addItem(dataManager.GetSysString(1262));
 	cbDuelRule->addItem(dataManager.GetSysString(1263));
 	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
+	btnCustomRule = env->addButton(rect<s32>(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, dataManager.GetSysString(1626));
+	wCustomRules = env->addWindow(rect<s32>(700, 100, 910, 280), false, dataManager.strBuffer);
+	wCustomRules->getCloseButton()->setVisible(false);
+	wCustomRules->setDrawTitlebar(false);
+	wCustomRules->setDraggable(true);
+	wCustomRules->setVisible(false);
+	for(int i = 0; i < 5; ++i)
+		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + i * 20, 200, 30 + i * 20), wCustomRules, 353 + i, dataManager.GetSysString(1265 + i));
+	btnCustomRulesOK = env->addButton(rect<s32>(55, 130, 155, 155), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211));
+	duel_param = 0;
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
@@ -168,6 +178,10 @@ bool Game::Initialize() {
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
 	//host(single)
+	wHostPrepare2 = env->addWindow(rect<s32>(750, 120, 950, 260), false, dataManager.GetSysString(1625));
+	wHostPrepare2->getCloseButton()->setVisible(false);
+	wHostPrepare2->setVisible(false);
+	stHostPrepRule2 = env->addStaticText(L"", rect<s32>(10, 30, 460, 350), false, true, wHostPrepare2);
 	wHostPrepare = env->addWindow(rect<s32>(270, 120, 750, 440), false, dataManager.GetSysString(1250));
 	wHostPrepare->getCloseButton()->setVisible(false);
 	wHostPrepare->setVisible(false);
