@@ -8,6 +8,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include "../ocgcore/duel.h"
 #include <sstream>
 #include "utils.h"
 
@@ -1394,6 +1395,44 @@ int Game::LocalPlayer(int player) {
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
+}
+int Game::GetMasterRule(uint32 param, int* truerule) {
+	switch(param) {
+	case MASTER_RULE_1: {
+		if (truerule)
+			*truerule = 1;
+		return 1;
+		break;
+	}
+	case MASTER_RULE_2: {
+		if (truerule)
+			*truerule = 2;
+		return 2;
+		break;
+	}
+	case MASTER_RULE_3: {
+		if (truerule)
+			*truerule = 3;
+		return 3;
+		break;
+	}
+	case MASTER_RULE_4: {
+		if (truerule)
+			*truerule = 4;
+		return 4;
+		break;
+	}
+	default: {
+		if (truerule)
+			*truerule = 5;
+		if(param & DUEL_EMZONE)
+			return 4;
+		else if (param & DUEL_PZONE)
+			return 3;
+		else
+			return 2;
+	}
+	}
 }
 void Game::OnResize()
 {

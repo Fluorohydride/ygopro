@@ -126,6 +126,7 @@ public:
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
+	int GetMasterRule(uint32 param, int* truerule = 0);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();

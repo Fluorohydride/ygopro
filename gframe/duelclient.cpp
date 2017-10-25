@@ -127,23 +127,25 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
+			cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param);
 			cscg.info.duel_flag = mainGame->duel_param;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
-			cscg.info.sealed = mainGame->chkRules[0]->isChecked() ? 2 : 0;
-			cscg.info.booster = mainGame->chkRules[1]->isChecked() ? 2 : 0;
-			cscg.info.destiny_draw = mainGame->chkRules[2]->isChecked() ? 2 : 0;
-			cscg.info.speed = mainGame->chkRules[3]->isChecked() ? 2 : 0;
-			cscg.info.concentration = mainGame->chkRules[4]->isChecked() ? 2 : 0;
-			cscg.info.boss = mainGame->chkRules[5]->isChecked() ? 2 : 0;
-			cscg.info.city = mainGame->chkRules[6]->isChecked() ? 2 : 0;
-			cscg.info.kingdom = mainGame->chkRules[7]->isChecked() ? 2 : 0;
-			cscg.info.dimension = mainGame->chkRules[8]->isChecked() ? 2 : 0;
-			cscg.info.doubled = mainGame->chkRules[9]->isChecked() ? 2 : 0;
-			cscg.info.turbo2 = mainGame->chkRules[10]->isChecked() ? 2 : 0;
-			cscg.info.turbo1 = mainGame->chkRules[11]->isChecked() ? 2 : 0;
-			cscg.info.command = mainGame->chkRules[12]->isChecked() ? 2 : 0;
-			cscg.info.master = mainGame->chkRules[13]->isChecked() ? 2 : 0;
+			cscg.info.check = 2;
+			cscg.info.sealed = mainGame->chkRules[0]->isChecked();
+			cscg.info.booster = mainGame->chkRules[1]->isChecked();
+			cscg.info.destiny_draw = mainGame->chkRules[2]->isChecked();
+			cscg.info.speed = mainGame->chkRules[3]->isChecked();
+			cscg.info.concentration = mainGame->chkRules[4]->isChecked();
+			cscg.info.boss = mainGame->chkRules[5]->isChecked();
+			cscg.info.city = mainGame->chkRules[6]->isChecked();
+			cscg.info.kingdom = mainGame->chkRules[7]->isChecked();
+			cscg.info.dimension = mainGame->chkRules[8]->isChecked();
+			cscg.info.doubled = mainGame->chkRules[9]->isChecked();
+			cscg.info.turbo2 = mainGame->chkRules[10]->isChecked();
+			cscg.info.turbo1 = mainGame->chkRules[11]->isChecked();
+			cscg.info.command = mainGame->chkRules[12]->isChecked();
+			cscg.info.master = mainGame->chkRules[13]->isChecked();
 			cscg.info.rule_count = 0;
 			for (int i = 0; i < 14; ++i) {
 				if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 11) {
@@ -377,43 +379,100 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(msgbuf);
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
 		str.append(msgbuf);
-		uint32 rule = 5;
-		mainGame->dInfo.duel_rule = 2;
-		if(pkt->info.duel_flag == MASTER_RULE_1) {
-			rule = 1;
-			mainGame->dInfo.duel_rule = 1;
+		int rule;
+		if (pkt->info.check == 2) {
+			mainGame->dInfo.duel_rule = mainGame->GetMasterRule(pkt->info.duel_flag, &rule);
+		} else {
+			rule = pkt->info.duel_rule;
+			if (rule == 0) {
+				mainGame->dInfo.duel_rule = 3;
+				rule = 3;
+			} else
+				mainGame->dInfo.duel_rule = rule;
 		}
-		else if(pkt->info.duel_flag == MASTER_RULE_2) {
-			rule = 2;
-			mainGame->dInfo.duel_rule = 2;
-		}
-		else if(pkt->info.duel_flag == MASTER_RULE_3) {
-			rule = 3;
-			mainGame->dInfo.duel_rule = 3;
-		}
-		else if(pkt->info.duel_flag == MASTER_RULE_4) {
-			rule = 4;
-			mainGame->dInfo.duel_rule = 4;
-		}
-		else if((pkt->info.duel_flag) & DUEL_EMZONE) {
-			rule = 5;
-			mainGame->dInfo.duel_rule = 4;
-		}
-		else if((pkt->info.duel_flag) & DUEL_PZONE) {
-			rule = 5;
-			mainGame->dInfo.duel_rule = 3;
-		}
-		if(rule == 5) {
-			uint32 flag = pkt->info.duel_flag & 0xffff, filter = 0x100;
+		if (rule == 5) {
+			uint32 filter = 0x100;
 			for (int i = 0; i < 5; ++i, filter <<= 1)
-				if (flag & filter) {
+				if (pkt->info.duel_flag & filter) {
 					myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1265 + i));
 					str2.append(msgbuf);
 					host2 = true;
 				}
-		} else if(rule != DEFAULT_DUEL_RULE) {
+		} else if (rule != DEFAULT_DUEL_RULE) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + rule - 1));
 			str.append(msgbuf);
+		}
+		if(pkt->info.check == 2) {
+			if (pkt->info.destiny_draw) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1134));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.sealed) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1132));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.booster) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1133));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.speed) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1135));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.concentration) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1136));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.boss) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1137));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.city) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1138));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.kingdom) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1139));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.dimension) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1140));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.doubled) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1141));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.turbo2) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1142));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.turbo1) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1143));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.command) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1144));
+				str2.append(msgbuf);
+				host2 = true;
+			}
+			if (pkt->info.master) {
+				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1145));
+				str2.append(msgbuf);
+				host2 = true;
+			}
 		}
 		if(pkt->info.no_check_deck) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1229));
@@ -422,76 +481,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(pkt->info.no_shuffle_deck) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1230));
 			str.append(msgbuf);
-		}
-		if(pkt->info.destiny_draw==2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1134));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.sealed == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1132));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.booster == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1133));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.speed == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1135));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.concentration == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1136));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.boss == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1137));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.city == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1138));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.kingdom == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1139));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.dimension == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1140));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.doubled == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1141));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.turbo2 == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1142));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.turbo1 == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1143));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.command == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1144));
-			str2.append(msgbuf);
-			host2 = true;
-		}
-		if(pkt->info.master == 2) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1145));
-			str2.append(msgbuf);
-			host2 = true;
 		}
 		mainGame->gMutex.Lock();
 		if(pkt->info.mode == 2) {
@@ -530,10 +519,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		mainGame->RefreshDeck(mainGame->cbDeckSelect2);
 		mainGame->cbDeckSelect->setEnabled(true);
-		if (pkt->info.doubled == 2) {
+		if (pkt->info.check == 2 && pkt->info.doubled) {
 			mainGame->cbDeckSelect2->setVisible(true);
 			mainGame->cbDeckSelect2->setEnabled(true);
-		}else{
+		} else {
 			mainGame->cbDeckSelect2->setVisible(false);
 			mainGame->cbDeckSelect2->setEnabled(false);
 		}
@@ -546,7 +535,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
-		mainGame->dInfo.speed = (pkt->info.speed == 2) ? 1 : 0;
+		mainGame->dInfo.speed = (pkt->info.check == 2 && pkt->info.speed) ? 1 : 0;
 		watching = 0;
 		connect_state |= 0x4;
 		break;
@@ -3880,16 +3869,12 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			myswprintf(msgbuf, L"%X.0%X.%X", pHP->version >> 12, (pHP->version >> 4) & 0xff, pHP->version & 0xf);
 			hoststr.append(msgbuf);
 			hoststr.append(L"][");
-			int rule = 5;
-			if (pHP->host.duel_flag == MASTER_RULE_1)
-				rule = 1;
-			else if (pHP->host.duel_flag == MASTER_RULE_2)
-				rule = 2;
-			else if (pHP->host.duel_flag == MASTER_RULE_3)
-				rule = 3;
-			else if (pHP->host.duel_flag == MASTER_RULE_4)
-				rule = 4;
-			if (rule == 5)
+			int rule;
+			if(pHP->host.check == 2) {
+				mainGame->GetMasterRule(pHP->host.duel_flag, &rule);
+			} else
+				rule = pHP->host.duel_rule;
+			if(rule == 5)
 				myswprintf(msgbuf, L"Custom MR");
 			else
 				myswprintf(msgbuf, L"MR %d", (rule == 0) ? 3 : rule);
