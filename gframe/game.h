@@ -120,6 +120,7 @@ public:
 	void AddDebugMsg(char* msgbuf);
 	void ClearTextures();
 	void CloseDuelWindow();
+	bool PlayChant(unsigned int code);
 	void PlaySoundEffect(char* sound);
 	void PlayMusic(char* song, bool loop);
 	void PlayBGM();

@@ -716,10 +716,12 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
+			engineSound->stopAllSounds();
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 			PlayMusic("./sound/deck.mp3", true);
 		} else {
+			engineSound->stopAllSounds();
 			DrawBackImage(imageManager.tBackGround_menu);
 			PlayMusic("./sound/menu.mp3", true);
 		}
@@ -776,6 +778,7 @@ void Game::MainLoop() {
 	usleep(500000);
 #endif
 	SaveConfig();
+	engineSound->drop();
 	engineMusic->drop();
 //	device->drop();
 }
@@ -1160,6 +1163,18 @@ void Game::SaveConfig() {
 	if (vol < 0) vol = 0; else if (vol > 100) vol = 100;
 	fprintf(fp, "volume = %d\n", vol);
 	fclose(fp);
+}
+bool Game::PlayChant(unsigned int code) {
+	char sound[1000];
+	sprintf(sound, "./sound/chants/%d.wav", code);
+	FILE *file = fopen(sound, "r");
+	if(file) {
+		fclose(file);
+		if (!engineSound->isCurrentlyPlaying(sound))
+			PlaySoundEffect(sound);
+		return true;
+	}
+	return false;
 }
 void Game::PlaySoundEffect(char* sound) {
 	if(chkEnableSound->isChecked()) {
