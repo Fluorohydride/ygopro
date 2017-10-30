@@ -161,40 +161,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CUSTOM_RULE_OK: {
-				uint32 flag = 0, filter = 0x100;
-				for(int i = 0; i < 5; ++i, filter <<= 1)
-					if(mainGame->chkCustomRules[i]->isChecked()) {
-						flag |= filter;
-					}
-				mainGame->cbDuelRule->clear();
-				mainGame->cbDuelRule->addItem(dataManager.GetSysString(1260));
-				mainGame->cbDuelRule->addItem(dataManager.GetSysString(1261));
-				mainGame->cbDuelRule->addItem(dataManager.GetSysString(1262));
-				mainGame->cbDuelRule->addItem(dataManager.GetSysString(1263));
-				switch (flag) {
-				case MASTER_RULE_1: {
-					mainGame->cbDuelRule->setSelected(0);
-					break;
-				}
-				case MASTER_RULE_2: {
-					mainGame->cbDuelRule->setSelected(1);
-					break;
-				}
-				case MASTER_RULE_3: {
-					mainGame->cbDuelRule->setSelected(2);
-					break;
-				}
-				case MASTER_RULE_4: {
-					mainGame->cbDuelRule->setSelected(3);
-					break;
-				}
-				default: {
-					mainGame->cbDuelRule->addItem(dataManager.GetSysString(1264));
-					mainGame->cbDuelRule->setSelected(4);
-					break;
-				}
-				}
-				mainGame->duel_param = flag;
+				mainGame->UpdateDuelParam();
 				mainGame->HideElement(mainGame->wCustomRules);
 				break;
 			}
