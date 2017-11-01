@@ -154,7 +154,7 @@ bool Game::Initialize() {
 	for(int i = 0; i < 5; ++i)
 		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + i * 20, 200, 30 + i * 20), wCustomRules, 353 + i, dataManager.GetSysString(1265 + i));
 	btnCustomRulesOK = env->addButton(rect<s32>(55, 130, 155, 155), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211));
-	duel_param = 0;
+	duel_param = MASTER_RULE_4;
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
@@ -1255,6 +1255,42 @@ int Game::LocalPlayer(int player) {
 }
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
+}
+void Game::UpdateDuelParam() {
+	uint32 flag = 0, filter = 0x100;
+	for (int i = 0; i < 5; ++i, filter <<= 1)
+		if (chkCustomRules[i]->isChecked()) {
+			flag |= filter;
+		}
+	cbDuelRule->clear();
+	cbDuelRule->addItem(dataManager.GetSysString(1260));
+	cbDuelRule->addItem(dataManager.GetSysString(1261));
+	cbDuelRule->addItem(dataManager.GetSysString(1262));
+	cbDuelRule->addItem(dataManager.GetSysString(1263));
+	switch (flag) {
+	case MASTER_RULE_1: {
+		cbDuelRule->setSelected(0);
+		break;
+	}
+	case MASTER_RULE_2: {
+		cbDuelRule->setSelected(1);
+		break;
+	}
+	case MASTER_RULE_3: {
+		cbDuelRule->setSelected(2);
+		break;
+	}
+	case MASTER_RULE_4: {
+		cbDuelRule->setSelected(3);
+		break;
+	}
+	default: {
+		cbDuelRule->addItem(dataManager.GetSysString(1264));
+		cbDuelRule->setSelected(4);
+		break;
+	}
+	}
+	duel_param = flag;
 }
 void Game::SetWindowsIcon() {
 #ifdef _WIN32

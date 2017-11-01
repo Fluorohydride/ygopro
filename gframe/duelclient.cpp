@@ -364,9 +364,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->dInfo.duel_rule = 3;
 		}
 		if(rule == 5) {
-			uint32 flag = pkt->info.duel_flag, filter = 0x100;
+			uint32 filter = 0x100;
 			for (int i = 0; i < 5; ++i, filter <<= 1)
-				if (flag & filter) {
+				if (pkt->info.duel_flag & filter) {
 					myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1265 + i));
 					str2.append(msgbuf);
 				}
