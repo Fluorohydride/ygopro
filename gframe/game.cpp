@@ -794,12 +794,13 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
 void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text) {
-	SetStaticText(pControl, cWidth, font, text);
+	const auto& tsize = scrCardText->getRelativePosition();
+	SetStaticText(pControl, cWidth - tsize.getWidth(), font, text);
 	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
 		scrCardText->setVisible(false);
 		return;
 	}
-	SetStaticText(pControl, cWidth-25, font, text);
+	SetStaticText(pControl, cWidth - tsize.getWidth(), font, text);
 	u32 fontheight = font->getDimension(L"A").Height + font->getKerningHeight();
 	u32 step = (font->getDimension(dataManager.strBuffer).Height - cHeight) / fontheight + 1;
 	scrCardText->setVisible(true);
@@ -810,7 +811,7 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
 	int pbuffer = 0, lsnz = 0;
 	u32 _width = 0, _height = 0, s = font->getCharDimension(L' ').Width;
-	wchar_t prev = 0;
+	wchar_t prev = 0, temp[4096] = L"";
 	for (size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
 		wchar_t c = text[i];
 		u32 w = font->getCharDimension(c).Width + font->getKerningWidth(c, prev);
@@ -818,34 +819,38 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 		if (c == L' ') {
 			lsnz = i;
 			if (_width + s > cWidth) {
-				dataManager.strBuffer[pbuffer++] = L'\n';
+				temp[pbuffer++] = L'\n';
 				_width = 0;
-				_height++;
-				if(_height == pos)
-					pbuffer = 0;
 			}
 			else {
-				dataManager.strBuffer[pbuffer++] = L' ';
+				temp[pbuffer++] = L' ';
 				_width += s;
 			}
-		}
-		else if(c == L'\n') {
-			dataManager.strBuffer[pbuffer++] = L'\n';
+		} else if(c == L'\n') {
+			temp[pbuffer++] = L'\n';
 			_width = 0;
-			_height++;
-			if(_height == pos)
-				pbuffer = 0;
-		}
-		else {
+		} else {
 			if((_width += w) > cWidth) {
-				dataManager.strBuffer[lsnz] = L'\n';
+				temp[lsnz] = L'\n';
 				_width = 0;
 				for(int j = lsnz + 1; j < i; j++) {
 					_width += font->getCharDimension(text[j]).Width;
 				}
 			}
-			dataManager.strBuffer[pbuffer++] = c;
+			temp[pbuffer++] = c;
 		}
+	}
+	pbuffer = 0;
+	for (size_t i = 0; temp[i] != 0 && i < wcslen(temp); ++i) {
+		wchar_t c = temp[i];
+		if (c == L'\n') {
+			dataManager.strBuffer[pbuffer++] = L'\n';
+			_height++;
+			if(_height == pos)
+				pbuffer = 0;
+			continue;
+		}
+		dataManager.strBuffer[pbuffer++] = c;
 	}
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
@@ -1273,7 +1278,7 @@ void Game::ShowCardInfo(int code) {
 		}
 		stDataInfo->setText(formatBuffer);
 		stSetName->setRelativePosition(rect<s32>(15, 83, 316 * window_size.Width / 1024 - 30, 116));
-		stText->setRelativePosition(rect<s32>(15, 83 + offset, 296 * window_size.Width / 1024 - 30, 324 * window_size.Height / 640));
+		stText->setRelativePosition(rect<s32>(15, 83 + offset, 287 * window_size.Width / 1024 - 30, 324 * window_size.Height / 640));
 		scrCardText->setRelativePosition(Resize(267, 83 + offset, 287, 324));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
@@ -1285,7 +1290,7 @@ void Game::ShowCardInfo(int code) {
 	}
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
-	InitStaticText(stText, tsize.getWidth() - 30, tsize.getHeight(), textFont, showingtext);
+	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
