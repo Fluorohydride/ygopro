@@ -14,26 +14,28 @@
 namespace ygo {
 
 bool ClientField::OnEvent(const irr::SEvent& event) {
+	if(OnCommonEvent(event))
+		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
-			case BUTTON_CLEAR_LOG: {
-				mainGame->lstLog->clear();
-				mainGame->logParam.clear();
-				break;
-			}
 			case BUTTON_HAND1:
 			case BUTTON_HAND2:
 			case BUTTON_HAND3: {
 				mainGame->wHand->setVisible(false);
-				mainGame->stHintMsg->setText(L"");
-				mainGame->stHintMsg->setVisible(true);
-				CTOS_HandResult cshr;
-				cshr.res = id - BUTTON_HAND1 + 1;
-				DuelClient::SendPacketToServer(CTOS_HAND_RESULT, cshr);
+				if(mainGame->dInfo.curMsg == MSG_ROCK_PAPER_SCISSORS) {
+					DuelClient::SetResponseI(id - BUTTON_HAND1 + 1);
+					DuelClient::SendResponse();
+				} else {
+					mainGame->stHintMsg->setText(L"");
+					mainGame->stHintMsg->setVisible(true);
+					CTOS_HandResult cshr;
+					cshr.res = id - BUTTON_HAND1 + 1;
+					DuelClient::SendPacketToServer(CTOS_HAND_RESULT, cshr);
+				}
 				break;
 			}
 			case BUTTON_FIRST:
@@ -77,9 +79,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_REPLAY_SWAP: {
-				if(!mainGame->dInfo.isReplay)
-					break;
-				ReplayMode::SwapField();
+				if(mainGame->dInfo.isReplay)
+					ReplayMode::SwapField();
+				else if (mainGame->dInfo.player_type == 7)
+					mainGame->dField.ReplaySwap();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {
@@ -112,18 +115,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::StopClient();
 					mainGame->dInfo.isStarted = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
+					mainGame->stTip->setVisible(false);
 					mainGame->wCardImg->setVisible(false);
 					mainGame->wInfos->setVisible(false);
 					mainGame->wPhase->setVisible(false);
 					mainGame->btnLeaveGame->setVisible(false);
+					mainGame->btnSpectatorSwap->setVisible(false);
+					mainGame->wChat->setVisible(false);
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->ShowElement(mainGame->wLanWindow);
 				} else {
 					DuelClient::SendPacketToServer(CTOS_SURRENDER);
-					if(panel)
-						mainGame->HideElement(panel);
 				}
 				break;
 			}
@@ -198,7 +202,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							else
 								DuelClient::SendResponse();
 						}
-						break;
 					}
 					if (mainGame->wQuery->isVisible()) {
 						SetResponseSelectedCards();
@@ -668,6 +671,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ShowSelectCard(true);
 				break;
 			}
+			case BUTTON_PHASE: {
+				mainGame->btnPhaseStatus->setPressed(true);
+				break;
+			}
 			case BUTTON_BP: {
 				if(mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
 					DuelClient::SetResponseI(6);
@@ -711,6 +718,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						while(spsummonable_cards[index] != command_card) index++;
 						DuelClient::SetResponseI((index << 16) + 1);
 						mainGame->HideElement(mainGame->wCardSelect, true);
+						ShowCancelOrFinishButton(0);
 						break;
 					}
 					if(list_command == COMMAND_ACTIVATE || list_command == COMMAND_OPERATION) {
@@ -916,29 +924,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_LISTBOX_CHANGED: {
 			switch(id) {
-			case LISTBOX_LOG: {
-				int sel = mainGame->lstLog->getSelected();
-				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
-					mainGame->ShowCardInfo(mainGame->logParam[sel]);
-				}
-				break;
-			}
 			case LISTBOX_ANCARD: {
 				int sel = mainGame->lstANCard->getSelected();
 				if(sel != -1) {
 					mainGame->ShowCardInfo(ancard[sel]);
-				}
-				break;
-			}
-			}
-			break;
-		}
-		case irr::gui::EGET_LISTBOX_SELECTED_AGAIN: {
-			switch(id) {
-			case LISTBOX_LOG: {
-				int sel = mainGame->lstLog->getSelected();
-				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
-					mainGame->wInfos->setActiveTab(0);
 				}
 				break;
 			}
@@ -1052,11 +1041,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 					}
 				}
-				break;
-			}
-			case SCROLL_CARDTEXT: {
-				u32 pos = mainGame->scrCardText->getPos();
-				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth()-25, mainGame->textFont, mainGame->showingtext, pos);
 				break;
 			}
 			break;
@@ -1606,7 +1590,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else
 							DuelClient::SendResponse();
 					}
-					break;
 				}
 				if(mainGame->wQuery->isVisible()) {
 					SetResponseSelectedCards();
@@ -1733,7 +1716,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mplayer = 1;
 				}
 			}
-
 			if(hovered_location == LOCATION_HAND && (mainGame->dInfo.is_shuffling || mainGame->dInfo.curMsg == MSG_SHUFFLE_HAND))
 				mcard = 0;
 			if(mcard == 0 && mplayer < 0)
@@ -1753,17 +1735,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(hovered_controler == 0)
 							mainGame->hideChat = false;
 					}
-					if(hovered_card->equipTarget)
-						hovered_card->equipTarget->is_showequip = false;
-					if(hovered_card->equipped.size())
-						for(auto cit = hovered_card->equipped.begin(); cit != hovered_card->equipped.end(); ++cit)
-							(*cit)->is_showequip = false;
-					if(hovered_card->cardTarget.size())
-						for(auto cit = hovered_card->cardTarget.begin(); cit != hovered_card->cardTarget.end(); ++cit)
-							(*cit)->is_showtarget = false;
-					if(hovered_card->ownerTarget.size())
-						for(auto cit = hovered_card->ownerTarget.begin(); cit != hovered_card->ownerTarget.end(); ++cit)
-							(*cit)->is_showtarget = false;
+					SetShowMark(hovered_card, false);
 				}
 				if(mcard) {
 					if(mcard != clicked_card)
@@ -1774,14 +1746,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(hovered_controler == 0)
 							mainGame->hideChat = true;
 					}
-					if(mcard->equipTarget)
-						mcard->equipTarget->is_showequip = true;
-					for(auto cit = mcard->equipped.begin(); cit != mcard->equipped.end(); ++cit)
-						(*cit)->is_showequip = true;
-					for(auto cit = mcard->cardTarget.begin(); cit != mcard->cardTarget.end(); ++cit)
-						(*cit)->is_showtarget = true;
-					for(auto cit = mcard->ownerTarget.begin(); cit != mcard->ownerTarget.end(); ++cit)
-						(*cit)->is_showtarget = true;
+					SetShowMark(mcard, true);
 					if(mcard->code) {
 						mainGame->ShowCardInfo(mcard->code);
 						if(mcard->location & 0xe) {
@@ -1797,9 +1762,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
 								if(!(mcard->type & TYPE_LINK)) {
-									int form = 0x2605;
-									if (mcard->rank) ++form;
-									myswprintf(formatBuffer, L"\n%c%d", form, (mcard->level ? mcard->level : mcard->rank));
+									wchar_t* form = L"\u2605";
+									if (mcard->rank) form = L"\u2606";
+									myswprintf(formatBuffer, L"\n%ls%d", form, (mcard->level ? mcard->level : mcard->rank));
 									str.append(formatBuffer);
 								} else {
 									myswprintf(formatBuffer, L"\nLINK-%d", mcard->link);
@@ -1949,12 +1914,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case irr::KEY_KEY_R: {
-			if(mainGame->gameConf.control_mode == 0
-				&& !event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
-				mainGame->textFont->setTransparency(true);
-			break;
-		}
 		case irr::KEY_F1:
 		case irr::KEY_F2:
 		case irr::KEY_F3:
@@ -2026,15 +1985,101 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		default: break;
+		}
+		break;
+	}
+	default: break;
+	}
+	return false;
+}
+bool ClientField::OnCommonEvent(const irr::SEvent& event) {
+	switch(event.EventType) {
+	case irr::EET_GUI_EVENT: {
+		s32 id = event.GUIEvent.Caller->getID();
+		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_BUTTON_CLICKED: {
+			switch(id) {
+			case BUTTON_CLEAR_LOG: {
+				mainGame->lstLog->clear();
+				mainGame->logParam.clear();
+				return true;
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_CHECKBOX_CHANGED: {
+			switch(id) {
+			case CHECKBOX_AUTO_SEARCH: {
+				mainGame->gameConf.auto_search_limit = mainGame->chkAutoSearch->isChecked() ? 0 : -1;
+				return true;
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_LISTBOX_CHANGED: {
+			switch(id) {
+			case LISTBOX_LOG: {
+				int sel = mainGame->lstLog->getSelected();
+				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+					mainGame->ShowCardInfo(mainGame->logParam[sel]);
+				}
+				return true;
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_LISTBOX_SELECTED_AGAIN: {
+			switch(id) {
+			case LISTBOX_LOG: {
+				int sel = mainGame->lstLog->getSelected();
+				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+					mainGame->wInfos->setActiveTab(0);
+				}
+				return true;
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
+			switch(id) {
+			case SCROLL_CARDTEXT: {
+				u32 pos = mainGame->scrCardText->getPos();
+				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - 25, mainGame->textFont, mainGame->showingtext, pos);
+				return true;
+				break;
+			}
+			}
+			break;
+		}
+		default: break;
+		}
+		break;
+	}
+	case irr::EET_KEY_INPUT_EVENT: {
+		switch(event.KeyInput.Key) {
+		case irr::KEY_KEY_R: {
+			if(mainGame->gameConf.control_mode == 0
+				&& !event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
+				mainGame->textFont->setTransparency(true);
+			return true;
+			break;
+		}
 		case irr::KEY_F9: {
 			if(mainGame->gameConf.control_mode == 1
 				&& !event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
+			return true;
 			break;
 		}
 		case irr::KEY_ESCAPE: {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
+			return true;
 			break;
 		}
 		default: break;
@@ -2049,6 +2094,7 @@ void ClientField::GetHoverField(int x, int y) {
 	irr::core::recti sfRect(430, 504, 875, 600);
 	irr::core::recti ofRect(531, 135, 800, 191);
 	irr::core::position2di pos(x, y);
+	int rule = (mainGame->dInfo.duel_rule >= 4) ? 1 : 0;
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
 		int cardSize = 66;
@@ -2115,49 +2161,62 @@ void ClientField::GetHoverField(int x, int y) {
 			if(boardy >= matManager.vFieldExtra[0][0].Pos.Y && boardy <= matManager.vFieldExtra[0][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_EXTRA;
-			} else if(boardy >= matManager.vFieldSzone[0][5][0].Pos.Y && boardy <= matManager.vFieldSzone[0][5][2].Pos.Y) {//field
+			} else if(boardy >= matManager.vFieldSzone[0][5][rule][0].Pos.Y && boardy <= matManager.vFieldSzone[0][5][rule][2].Pos.Y) {//field
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 5;
-			} else if(boardy >= matManager.vFieldSzone[0][6][0].Pos.Y && boardy <= matManager.vFieldSzone[0][6][2].Pos.Y) {
+			} else if(boardy >= matManager.vFieldSzone[0][6][rule][0].Pos.Y && boardy <= matManager.vFieldSzone[0][6][rule][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 6;
-			} else if(boardy >= matManager.vFieldSzone[1][7][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][0].Pos.Y) {
+			} else if(rule == 1 && boardy >= matManager.vFieldRemove[1][rule][2].Pos.Y && boardy <= matManager.vFieldRemove[1][rule][0].Pos.Y) {
+				hovered_controler = 1;
+				hovered_location = LOCATION_REMOVED;
+			} else if(rule == 0 && boardy >= matManager.vFieldSzone[1][7][rule][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][rule][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
-			} else if(boardy >= matManager.vFieldGrave[1][2].Pos.Y && boardy <= matManager.vFieldGrave[1][0].Pos.Y) {
+			} else if(boardy >= matManager.vFieldGrave[1][rule][2].Pos.Y && boardy <= matManager.vFieldGrave[1][rule][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_GRAVE;
 			} else if(boardy >= matManager.vFieldDeck[1][2].Pos.Y && boardy <= matManager.vFieldDeck[1][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_DECK;
 			}
-		} else if(boardx >= matManager.vFieldRemove[1][1].Pos.X && boardx <= matManager.vFieldRemove[1][0].Pos.X) {
-			if(boardy >= matManager.vFieldRemove[1][2].Pos.Y && boardy <= matManager.vFieldRemove[1][0].Pos.Y) {
+		} else if (boardx >= matManager.vFieldContiAct[0].X && boardx <= matManager.vFieldContiAct[1].X
+				&& boardy >= matManager.vFieldContiAct[0].Y && boardy <= matManager.vFieldContiAct[2].Y) {
+			hovered_controler = 0;
+			hovered_location = POSITION_HINT;
+		} else if(rule == 0 && boardx >= matManager.vFieldRemove[1][rule][1].Pos.X && boardx <= matManager.vFieldRemove[1][rule][0].Pos.X) {
+			if(boardy >= matManager.vFieldRemove[1][rule][2].Pos.Y && boardy <= matManager.vFieldRemove[1][rule][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_REMOVED;
-			} else if(boardy >= matManager.vFieldContiAct[0].Y && boardy <= matManager.vFieldContiAct[2].Y) {
-				hovered_controler = 0;
-				hovered_location = POSITION_HINT;
+			}
+		} else if(rule == 1 && boardx >= matManager.vFieldSzone[1][7][rule][1].Pos.X && boardx <= matManager.vFieldSzone[1][7][rule][2].Pos.X) {
+			if(boardy >= matManager.vFieldSzone[1][7][rule][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][rule][0].Pos.Y) {
+				hovered_controler = 1;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 7;
 			}
 		} else if(boardx >= matManager.vFieldDeck[0][0].Pos.X && boardx <= matManager.vFieldDeck[0][1].Pos.X) {
 			if(boardy >= matManager.vFieldDeck[0][0].Pos.Y && boardy <= matManager.vFieldDeck[0][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_DECK;
-			} else if(boardy >= matManager.vFieldGrave[0][0].Pos.Y && boardy <= matManager.vFieldGrave[0][2].Pos.Y) {
+			} else if(boardy >= matManager.vFieldGrave[0][rule][0].Pos.Y && boardy <= matManager.vFieldGrave[0][rule][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_GRAVE;
-			} else if(boardy >= matManager.vFieldSzone[1][6][2].Pos.Y && boardy <= matManager.vFieldSzone[1][6][0].Pos.Y) {
+			} else if(boardy >= matManager.vFieldSzone[1][6][rule][2].Pos.Y && boardy <= matManager.vFieldSzone[1][6][rule][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 6;
-			} else if(boardy >= matManager.vFieldSzone[0][7][0].Pos.Y && boardy <= matManager.vFieldSzone[0][7][2].Pos.Y) {
+			} else if(rule == 0 && boardy >= matManager.vFieldSzone[0][7][rule][0].Pos.Y && boardy <= matManager.vFieldSzone[0][7][rule][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
-			} else if(boardy >= matManager.vFieldSzone[1][5][2].Pos.Y && boardy <= matManager.vFieldSzone[1][5][0].Pos.Y) {
+			} else if(rule == 1 && boardy >= matManager.vFieldRemove[0][rule][0].Pos.Y && boardy <= matManager.vFieldRemove[0][rule][2].Pos.Y) {
+				hovered_controler = 0;
+				hovered_location = LOCATION_REMOVED;
+			} else if(boardy >= matManager.vFieldSzone[1][5][rule][2].Pos.Y && boardy <= matManager.vFieldSzone[1][5][rule][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 5;
@@ -2165,8 +2224,14 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_EXTRA;
 			}
-		} else if(boardx >= matManager.vFieldRemove[0][0].Pos.X && boardx <= matManager.vFieldRemove[0][1].Pos.X) {
-			if(boardy >= matManager.vFieldRemove[0][0].Pos.Y && boardy <= matManager.vFieldRemove[0][2].Pos.Y) {
+		} else if(rule == 0 && boardx >= matManager.vFieldSzone[0][7][rule][0].Pos.X && boardx <= matManager.vFieldSzone[0][7][rule][1].Pos.X) {
+			if(boardy >= matManager.vFieldSzone[0][7][rule][0].Pos.Y && boardy <= matManager.vFieldSzone[0][7][rule][2].Pos.Y) {
+				hovered_controler = 0;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 7;
+			}
+		} else if(rule == 0 && boardx >= matManager.vFieldRemove[0][rule][0].Pos.X && boardx <= matManager.vFieldRemove[0][rule][1].Pos.X) {
+			if(boardy >= matManager.vFieldRemove[0][rule][0].Pos.Y && boardy <= matManager.vFieldRemove[0][rule][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_REMOVED;
 			}
@@ -2174,7 +2239,7 @@ void ClientField::GetHoverField(int x, int y) {
 			int sequence = (boardx - matManager.vFieldMzone[0][0][0].Pos.X) / (matManager.vFieldMzone[0][0][1].Pos.X - matManager.vFieldMzone[0][0][0].Pos.X);
 			if(sequence > 4)
 				sequence = 4;
-			if(boardy > matManager.vFieldSzone[0][0][0].Pos.Y && boardy <= matManager.vFieldSzone[0][0][2].Pos.Y) {
+			if(boardy > matManager.vFieldSzone[0][0][rule][0].Pos.Y && boardy <= matManager.vFieldSzone[0][0][rule][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = sequence;
@@ -2208,7 +2273,7 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_MZONE;
 				hovered_sequence = 4 - sequence;
-			} else if(boardy >= matManager.vFieldSzone[1][0][2].Pos.Y && boardy < matManager.vFieldSzone[1][0][0].Pos.Y) {
+			} else if(boardy >= matManager.vFieldSzone[1][0][rule][2].Pos.Y && boardy < matManager.vFieldSzone[1][0][rule][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 4 - sequence;
@@ -2311,6 +2376,24 @@ void ClientField::ShowCancelOrFinishButton(int buttonOp) {
 		}
 	} else {
 		mainGame->btnCancelOrFinish->setVisible(false);
+	}
+}
+void ClientField::SetShowMark(ClientCard* pcard, bool enable) {
+	if(pcard->equipTarget)
+		pcard->equipTarget->is_showequip = enable;
+	for(auto cit = pcard->equipped.begin(); cit != pcard->equipped.end(); ++cit)
+		(*cit)->is_showequip = enable;
+	for(auto cit = pcard->cardTarget.begin(); cit != pcard->cardTarget.end(); ++cit)
+		(*cit)->is_showtarget = enable;
+	for(auto cit = pcard->ownerTarget.begin(); cit != pcard->ownerTarget.end(); ++cit)
+		(*cit)->is_showtarget = enable;
+	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
+		if(pcard == chit->chain_card) {
+			for(auto tgit = chit->target.begin(); tgit != chit->target.end(); ++tgit)
+				(*tgit)->is_showchaintarget = enable;
+		}
+		if(chit->target.find(pcard) != chit->target.end())
+			chit->chain_card->is_showchaintarget = enable;
 	}
 }
 void ClientField::SetResponseSelectedCards() const {

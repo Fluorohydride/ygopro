@@ -13,6 +13,7 @@ namespace ygo {
 
 struct Config {
 	bool use_d3d;
+	bool use_image_scale;
 	unsigned short antialias;
 	unsigned short serverport;
 	unsigned char textfontsize;
@@ -25,7 +26,8 @@ struct Config {
 	wchar_t numfont[256];
 	wchar_t roompass[20];
 	//settings
-	int chkAutoPos;
+	int chkMAutoPos;
+	int chkSTAutoPos;
 	int chkRandomPos;
 	int chkAutoChain;
 	int chkWaitChain;
@@ -36,6 +38,8 @@ struct Config {
 	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
+	int auto_search_limit;
+	int chkIgnoreDeckChanges;
 };
 
 struct DuelInfo {
@@ -48,6 +52,7 @@ struct DuelInfo {
 	bool is_shuffling;
 	bool tag_player[2];
 	int lp[2];
+	int duel_rule;
 	int turn;
 	short curMsg;
 	wchar_t hostname[20];
@@ -88,12 +93,15 @@ public:
 	void RefreshSingleplay();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
+	void DrawLinkedZones(ClientCard* pcard);
+	void CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
 	void DrawSpec();
+	void DrawBackImage(irr::video::ITexture* texture);
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
@@ -198,12 +206,15 @@ public:
 	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
 	irr::gui::IGUIScrollBar* scrCardText;
-	irr::gui::IGUICheckBox* chkAutoPos;
+	irr::gui::IGUICheckBox* chkMAutoPos;
+	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
+	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
+	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
@@ -252,6 +263,8 @@ public:
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIStaticText* stHostPrepRule;
 	irr::gui::IGUIStaticText* stHostPrepOB;
+	irr::gui::IGUIButton* btnHostPrepReady;
+	irr::gui::IGUIButton* btnHostPrepNotReady;
 	irr::gui::IGUIButton* btnHostPrepStart;
 	irr::gui::IGUIButton* btnHostPrepCancel;
 	//replay
@@ -346,9 +359,7 @@ public:
 	irr::gui::IGUICheckBox* chkIgnore2;
 	//phase button
 	irr::gui::IGUIStaticText* wPhase;
-	irr::gui::IGUIButton* btnDP;
-	irr::gui::IGUIButton* btnSP;
-	irr::gui::IGUIButton* btnM1;
+	irr::gui::IGUIButton* btnPhaseStatus;
 	irr::gui::IGUIButton* btnBP;
 	irr::gui::IGUIButton* btnM2;
 	irr::gui::IGUIButton* btnEP;
@@ -383,6 +394,10 @@ public:
 	irr::gui::IGUIWindow* wCategories;
 	irr::gui::IGUICheckBox* chkCategory[32];
 	irr::gui::IGUIButton* btnCategoryOK;
+	irr::gui::IGUIButton* btnMarksFilter;
+	irr::gui::IGUIWindow* wLinkMarks;
+	irr::gui::IGUIButton* btnMark[8];
+	irr::gui::IGUIButton* btnMarksOK;
 	//sort type
 	irr::gui::IGUIStaticText* wSort;
 	irr::gui::IGUIComboBox* cbSortType;
@@ -401,6 +416,8 @@ public:
 	irr::gui::IGUIButton* btnReplaySwap;
 	//surrender/leave
 	irr::gui::IGUIButton* btnLeaveGame;
+	//swap
+	irr::gui::IGUIButton* btnSpectatorSwap;
 	//chain control
 	irr::gui::IGUIButton* btnChainIgnore;
 	irr::gui::IGUIButton* btnChainAlways;
@@ -412,6 +429,11 @@ public:
 extern Game* mainGame;
 
 }
+
+#define CARD_IMG_WIDTH		177
+#define CARD_IMG_HEIGHT		254
+#define CARD_THUMB_WIDTH	44
+#define CARD_THUMB_HEIGHT	64
 
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2
@@ -448,6 +470,8 @@ extern Game* mainGame;
 #define BUTTON_HP_CANCEL			123
 #define BUTTON_HP_KICK				124
 #define CHECKBOX_HP_READY			125
+#define BUTTON_HP_READY				126
+#define BUTTON_HP_NOTREADY			127
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
@@ -498,6 +522,7 @@ extern Game* mainGame;
 #define BUTTON_CHAIN_ALWAYS			265
 #define BUTTON_CHAIN_WHENAVAIL		266
 #define BUTTON_CANCEL_OR_FINISH		267
+#define BUTTON_PHASE				268
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define SCROLL_CARDTEXT				280
@@ -526,6 +551,8 @@ extern Game* mainGame;
 #define SCROLL_FILTER				315
 #define EDITBOX_KEYWORD				316
 #define BUTTON_CLEAR_FILTER			317
+#define COMBOBOX_ATTRIBUTE			318
+#define COMBOBOX_RACE				319
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
 #define BUTTON_REPLAY_STEP			322
@@ -537,7 +564,12 @@ extern Game* mainGame;
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
+#define CHECKBOX_AUTO_SEARCH		360
 #define COMBOBOX_SORTTYPE			370
+#define COMBOBOX_LIMIT				371
 
-#define DEFAULT_DUEL_RULE			3
+#define BUTTON_MARKS_FILTER			380
+#define BUTTON_MARKERS_OK			381
+
+#define DEFAULT_DUEL_RULE			4
 #endif // GAME_H

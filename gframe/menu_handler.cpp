@@ -10,6 +10,21 @@
 
 namespace ygo {
 
+void UpdateDeck() {
+	BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
+		mainGame->gameConf.lastdeck, 64);
+	char deckbuf[1024];
+	char* pdeck = deckbuf;
+	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
+	BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
+	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
+		BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
+	for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
+		BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
+	for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
+		BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
+	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+}
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
@@ -108,6 +123,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_DUELIST: {
+				mainGame->cbDeckSelect->setEnabled(true);
 				DuelClient::SendPacketToServer(CTOS_HS_TODUELIST);
 				break;
 			}
@@ -127,10 +143,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				DuelClient::SendPacketToServer(CTOS_HS_KICK, csk);
 				break;
 			}
-			case BUTTON_HP_START: {
-				if(!mainGame->chkHostPrepReady[0]->isChecked()
-				        || !mainGame->chkHostPrepReady[1]->isChecked())
+			case BUTTON_HP_READY: {
+				if(mainGame->cbDeckSelect->getSelected() == -1 ||
+					!deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))) {
 					break;
+				}
+				UpdateDeck();
+				DuelClient::SendPacketToServer(CTOS_HS_READY);
+				mainGame->cbDeckSelect->setEnabled(false);
+				break;
+			}
+			case BUTTON_HP_NOTREADY: {
+				DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
+				mainGame->cbDeckSelect->setEnabled(true);
+				break;
+			}
+			case BUTTON_HP_START: {
 				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
@@ -185,9 +213,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnReplayStep->setVisible(false);
 				mainGame->btnReplayUndo->setVisible(false);
 				mainGame->wPhase->setVisible(true);
-				mainGame->dField.panel = 0;
-				mainGame->dField.hovered_card = 0;
-				mainGame->dField.clicked_card = 0;
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
@@ -243,43 +268,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					mainGame->ebDeckname->setText(L"");
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
-				mainGame->is_building = true;
-				mainGame->is_siding = false;
-				mainGame->wInfos->setVisible(true);
-				mainGame->wCardImg->setVisible(true);
-				mainGame->wDeckEdit->setVisible(true);
-				mainGame->wFilter->setVisible(true);
-				mainGame->wSort->setVisible(true);
-				mainGame->btnLeaveGame->setVisible(true);
-				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1306));
-				mainGame->btnSideOK->setVisible(false);
-				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;
-				mainGame->cbDBLFList->setSelected(0);
-				mainGame->cbCardType->setSelected(0);
-				mainGame->cbCardType2->setSelected(0);
-				mainGame->cbAttribute->setSelected(0);
-				mainGame->cbRace->setSelected(0);
-				mainGame->ebAttack->setText(L"");
-				mainGame->ebDefense->setText(L"");
-				mainGame->ebStar->setText(L"");
-				mainGame->ebScale->setText(L"");
-				mainGame->cbCardType2->setEnabled(false);
-				mainGame->cbAttribute->setEnabled(false);
-				mainGame->cbRace->setEnabled(false);
-				mainGame->ebAttack->setEnabled(false);
-				mainGame->ebDefense->setEnabled(false);
-				mainGame->ebStar->setEnabled(false);
-				mainGame->ebScale->setEnabled(false);
-				mainGame->deckBuilder.filter_effect = 0;
-				mainGame->deckBuilder.result_string[0] = L'0';
-				mainGame->deckBuilder.result_string[1] = 0;
-				mainGame->deckBuilder.results.clear();
-				mainGame->deckBuilder.is_draging = false;
-				mainGame->deckBuilder.is_deleting = false;
-				mainGame->deckBuilder.is_clearing = false;
-				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
-				for(int i = 0; i < 32; ++i)
-					mainGame->chkCategory[i]->setChecked(false);
+				mainGame->deckBuilder.Initialize();
 				break;
 			}
 			}
@@ -313,11 +302,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
 				repinfo.append(infobuf);
 				wchar_t namebuf[4][20];
-				BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[0], namebuf[0], 20);
-				BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[40], namebuf[1], 20);
+				ReplayMode::cur_replay.ReadName(namebuf[0]);
+				ReplayMode::cur_replay.ReadName(namebuf[1]);
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
-					BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[80], namebuf[2], 20);
-					BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[120], namebuf[3], 20);
+					ReplayMode::cur_replay.ReadName(namebuf[2]);
+					ReplayMode::cur_replay.ReadName(namebuf[3]);
 				}
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
 					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
@@ -343,19 +332,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
 						break;
 					}
-					BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
-					                   mainGame->gameConf.lastdeck, 64);
-					char deckbuf[1024];
-					char* pdeck = deckbuf;
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
-					for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-						BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
-					for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-						BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
-					for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-						BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
-					DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+					UpdateDeck();
 					DuelClient::SendPacketToServer(CTOS_HS_READY);
 					mainGame->cbDeckSelect->setEnabled(false);
 				} else {
