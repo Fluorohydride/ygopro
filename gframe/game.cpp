@@ -32,7 +32,13 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_DIRECT3D9;
 	else
 		params.DriverType = irr::video::EDT_OPENGL;
-		params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
+	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
+	if(gameConf.fullscreen) {
+		IrrlichtDevice *nulldevice = createDevice(video::EDT_NULL);
+		params.WindowSize = nulldevice->getVideoModeList()->getDesktopResolution();
+		nulldevice->drop();
+		params.Fullscreen = true;
+	}
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
@@ -1022,6 +1028,7 @@ void Game::LoadConfig() {
 	char valbuf[256];
 	wchar_t wstr[256];
 	gameConf.antialias = 0;
+	gameConf.fullscreen = false;
 	gameConf.serverport = 7911;
 	gameConf.textfontsize = 12;
 	gameConf.nickname[0] = 0;
@@ -1054,6 +1061,8 @@ void Game::LoadConfig() {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "use_d3d")) {
 			gameConf.use_d3d = atoi(valbuf) > 0;
+		} else if(!strcmp(strbuf, "fullscreen")) {
+			gameConf.fullscreen = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "textfont")) {
@@ -1130,6 +1139,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[256];
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
+	fprintf(fp, "fullscreen = %d\n", gameConf.fullscreen ? 1 : 0);
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
 	fprintf(fp, "errorlog = %d\n", enable_log);
 	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);

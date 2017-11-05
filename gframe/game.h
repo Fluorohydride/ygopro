@@ -14,6 +14,7 @@ namespace ygo {
 
 struct Config {
 	bool use_d3d;
+	bool fullscreen;
 	unsigned short antialias;
 	unsigned short serverport;
 	unsigned char textfontsize;
