@@ -807,7 +807,7 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 		return;
 	}
 	const auto& tsize = scrCardText->getRelativePosition();
-	SetStaticText(pControl, cWidth - tsize.getWidth(), font, text);
+	SetStaticText(pControl, cWidth - tsize.getWidth() - 10, font, text);
 	u32 fontheight = font->getDimension(L"A").Height + font->getKerningHeight();
 	u32 step = (font->getDimension(dataManager.strBuffer).Height - cHeight) / fontheight + 1;
 	scrCardText->setVisible(true);

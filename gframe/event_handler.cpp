@@ -2068,7 +2068,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			case SCROLL_CARDTEXT: {
 				u32 pos = mainGame->scrCardText->getPos();
 				const auto& tsize = mainGame->scrCardText->getRelativePosition();
-				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - tsize.getWidth(), mainGame->textFont, mainGame->showingtext, pos);
+				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - tsize.getWidth() - 10, mainGame->textFont, mainGame->showingtext, pos);
 				return true;
 				break;
 			}
