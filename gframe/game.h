@@ -188,6 +188,7 @@ public:
 	bool is_building;
 	bool is_siding;
 	uint32 duel_param;
+	int texty;
 
 	irr::core::dimension2d<irr::u32> window_size;
 
