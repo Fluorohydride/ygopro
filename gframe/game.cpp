@@ -801,7 +801,7 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
 void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text) {
-	SetStaticText(pControl, cWidth-10, font, text);
+	SetStaticText(pControl, cWidth - 10, font, text);
 	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
 		scrCardText->setVisible(false);
 		return;
@@ -851,11 +851,11 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	for (size_t i = 0; temp[i] != 0 && i < wcslen(temp); ++i) {
 		wchar_t c = temp[i];
 		if (c == L'\n') {
-			dataManager.strBuffer[pbuffer++] = L'\n';
 			_height++;
-			if(_height == pos)
+			if(_height == pos) {
 				pbuffer = 0;
-			continue;
+				continue;
+			}
 		}
 		dataManager.strBuffer[pbuffer++] = c;
 	}
@@ -1290,17 +1290,15 @@ void Game::ShowCardInfo(int code) {
 		stDataInfo->setText(formatBuffer);
 		stSetName->setRelativePosition(rect<s32>(15, 83, 316 * window_size.Width / 1024 - 30, 116));
 		texty = 83 + offset;
-		stText->setRelativePosition(rect<s32>(15, texty * window_size.Height / 640, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-		scrCardText->setRelativePosition(Resize(267, texty, 287, 324));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
 		stSetName->setRelativePosition(rect<s32>(15, 60, 316 * window_size.Height / 640, 83));
 		texty = 60 + offset;
-		stText->setRelativePosition(rect<s32>(15, texty * window_size.Height / 640, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-		scrCardText->setRelativePosition(Resize(267, texty, 287, 324));
 	}
+	stText->setRelativePosition(rect<s32>(15, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+	scrCardText->setRelativePosition(rect<s32>(267 * window_size.Width / 1024, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
 	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
@@ -1582,8 +1580,8 @@ void Game::OnResize()
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	stInfo->setRelativePosition(recti(15, 37, 296 * window_size.Width / 1024, 60));
 	stDataInfo->setRelativePosition(recti(15, 60, 296 * window_size.Width / 1024, 83));
-	stText->setRelativePosition(recti(15, texty * window_size.Height / 640, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-	scrCardText->setRelativePosition(Resize(267, texty, 287, 324));
+	stText->setRelativePosition(recti(15, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+	scrCardText->setRelativePosition(rect<s32>(267 * window_size.Width / 1024, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	const auto& tsize = stText->getRelativePosition();
 	if(texty)

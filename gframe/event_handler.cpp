@@ -1113,6 +1113,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->stDataInfo->setText(L"");
 					mainGame->stSetName->setText(L"");
 					mainGame->stText->setText(L"");
+					mainGame->texty = 0;
 					mainGame->scrCardText->setVisible(false);
 				}
 			}
@@ -1128,6 +1129,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->stDataInfo->setText(L"");
 					mainGame->stSetName->setText(L"");
 					mainGame->stText->setText(L"");
+					mainGame->texty = 0;
 					mainGame->scrCardText->setVisible(false);
 				}
 			}
@@ -1832,6 +1834,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->stDataInfo->setText(L"");
 						mainGame->stSetName->setText(L"");
 						mainGame->stText->setText(L"");
+						mainGame->texty = 0;
 						mainGame->scrCardText->setVisible(false);
 					}
 				}
