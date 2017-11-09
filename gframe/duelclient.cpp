@@ -643,7 +643,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		wchar_t msg[256];
 		BufferIO::CopyWStr(pkt->msg, msg, 256);
-		msg[(len - 3) / 2] = 0;
 		mainGame->gMutex.Lock();
 		mainGame->AddChatMsg(msg, player);
 		mainGame->gMutex.Unlock();
