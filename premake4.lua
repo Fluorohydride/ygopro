@@ -22,6 +22,8 @@ solution "ygo"
 
     configuration "linux"
         defines { "LUA_USE_LINUX" }
+		includedirs { "irrKlang/include" }
+		libdirs { "irrKlang/lib" }
 
     configuration "vs*"
         flags "EnableSSE2"

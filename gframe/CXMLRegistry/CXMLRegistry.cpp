@@ -1,5 +1,11 @@
 #include "CXMLRegistry.h"
 
+#ifndef _WIN32
+inline int _wtoi(const wchar_t * str){
+	return (int)wcstol(str, 0, 10);
+}
+#endif
+
 CXMLRegistry::CXMLRegistry(io::IFileSystem *fsys) {
 	fileSystem = fsys;
 	fileSystem->grab();

@@ -2,14 +2,9 @@
 
 #ifndef __C_XMLREGISTRY_H_INCLUDED__
 #define __C_XMLREGISTRY_H_INCLUDED__
-#ifdef _WIN32
+
 #include <irrlicht.h>
-#else
-//	Setup for compile with stripped down IRRlicht on FreeBSD (stripped by Madoc)
-#include <irrString.h>
-#include <irrArray.h>
-#include <irrTypes.h>
-#endif
+
 using namespace irr;
 #include "CXMLNode.h"
 //File->
