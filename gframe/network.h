@@ -24,6 +24,7 @@ struct HostInfo {
 	unsigned short time_limit;
 	unsigned char check;
 	unsigned int duel_flag;
+	int forbiddentypes;
 	bool destiny_draw;
 	bool sealed;
 	bool booster;
