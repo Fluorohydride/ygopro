@@ -1170,7 +1170,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_BATTLECMD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		int code, desc, count, con, loc, seq/*, diratt*/;
+		int code, count, con, loc, seq/*, diratt*/;
 		u64 desc;
 		ClientCard* pcard;
 		mainGame->dField.activatable_cards.clear();
