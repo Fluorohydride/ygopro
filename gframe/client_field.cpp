@@ -343,6 +343,7 @@ void ClientField::ClearCommandFlag() {
 		(*cit)->cmdFlag = 0;
 	for(cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
+	conti_cards.clear();
 	deck_act = false;
 	extra_act = false;
 	grave_act = false;
