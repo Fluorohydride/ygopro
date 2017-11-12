@@ -106,12 +106,14 @@ int ReplayMode::ReplayThread(void* param) {
 		opt |= MASTER_RULE_1;
 	} else if (!(opt & 0xff80))
 		opt |= MASTER_RULE_3;
-	mainGame->dInfo.duel_rule = 2;
-	if(opt & DUEL_EMZONE)
-		mainGame->dInfo.duel_rule = 4;
+	mainGame->dInfo.duel_field = 2;
+	if ((opt & DUEL_PZONE) && (opt & DUEL_SEPARATE_PZONE) && (opt & DUEL_EMZONE))
+		mainGame->dInfo.duel_field = 5;
+	else if (opt & DUEL_EMZONE)
+		mainGame->dInfo.duel_field = 4;
 	else if(opt & DUEL_PZONE)
-		mainGame->dInfo.duel_rule = 3;
-	mainGame->dInfo.speed = (opt & SPEED_DUEL) ? 1 : 0;
+		mainGame->dInfo.duel_field = 3;
+	mainGame->dInfo.extraval = (opt & SPEED_DUEL) ? 1 : 0;
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;
@@ -122,8 +124,8 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.turn = 0;
 	// reset master rule 4 phase button position
 	mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 310, 855, 330));
-	if(mainGame->dInfo.speed) {
-		if(mainGame->dInfo.duel_rule >= 4) {
+	if(mainGame->dInfo.extraval) {
+		if(mainGame->dInfo.duel_field >= 4) {
 			mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 290, 855, 350));
 			mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
 			mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
@@ -143,7 +145,7 @@ int ReplayMode::ReplayThread(void* param) {
 		}
 	} else {
 		mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-		if(mainGame->dInfo.duel_rule >= 4) {
+		if(mainGame->dInfo.duel_field >= 4) {
 			mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
 			mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
 			mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));

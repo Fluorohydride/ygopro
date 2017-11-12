@@ -2134,13 +2134,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 void ClientField::GetHoverField(int x, int y) {
 	irr::core::recti sfRect(430, 504, 875, 600);
 	irr::core::recti ofRect(531, 135, 800, 191);
-	if(mainGame->dInfo.speed) {
+	if(mainGame->dInfo.extraval & 0x1) {
 		sfRect = recti(509, 504, 796, 600);
 		ofRect = recti(531+ 46, 135, 800- 46, 191);
 	}
 	irr::core::position2di pos(x, y);
-	int rule = (mainGame->dInfo.duel_rule == 3) ? 0 : 1;
-	int speed = (mainGame->dInfo.speed) ? 1 : 0;
+	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
+	int speed = (mainGame->dInfo.extraval & 0x1) ? 1 : 0;
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
 		int cardSize = 66;
@@ -2207,38 +2207,38 @@ void ClientField::GetHoverField(int x, int y) {
 			if(boardy >= matManager.vFieldExtra[0][speed][0].Pos.Y && boardy <= matManager.vFieldExtra[0][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_EXTRA;
-			} else if(boardy >= matManager.vFieldSzone[0][5][rule][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][5][rule][speed][2].Pos.Y) {//field
+			} else if(boardy >= matManager.vFieldSzone[0][5][field][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][5][field][speed][2].Pos.Y) {//field
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 5;
-			} else if(boardy >= matManager.vFieldSzone[0][6][rule][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][6][rule][speed][2].Pos.Y) {
+			} else if(boardy >= matManager.vFieldSzone[0][6][field][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][6][field][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 6;
-			} else if(rule == 1 && boardy >= matManager.vFieldRemove[1][rule][speed][2].Pos.Y && boardy <= matManager.vFieldRemove[1][rule][speed][0].Pos.Y) {
+			} else if(field == 1 && boardy >= matManager.vFieldRemove[1][field][speed][2].Pos.Y && boardy <= matManager.vFieldRemove[1][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_REMOVED;
-			} else if(rule == 0 && boardy >= matManager.vFieldSzone[1][7][rule][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][rule][speed][0].Pos.Y) {
+			} else if(field == 0 && boardy >= matManager.vFieldSzone[1][7][field][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
-			} else if(boardy >= matManager.vFieldGrave[1][rule][speed][2].Pos.Y && boardy <= matManager.vFieldGrave[1][rule][speed][0].Pos.Y) {
+			} else if(boardy >= matManager.vFieldGrave[1][field][speed][2].Pos.Y && boardy <= matManager.vFieldGrave[1][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_GRAVE;
 			} else if(boardy >= matManager.vFieldDeck[1][speed][2].Pos.Y && boardy <= matManager.vFieldDeck[1][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_DECK;
 			}
-		} else if(rule == 0 && boardx >= matManager.vFieldRemove[1][rule][speed][1].Pos.X && boardx <= matManager.vFieldRemove[1][rule][speed][0].Pos.X) {
-			if(boardy >= matManager.vFieldRemove[1][rule][speed][2].Pos.Y && boardy <= matManager.vFieldRemove[1][rule][speed][0].Pos.Y) {
+		} else if(field == 0 && boardx >= matManager.vFieldRemove[1][field][speed][1].Pos.X && boardx <= matManager.vFieldRemove[1][field][speed][0].Pos.X) {
+			if(boardy >= matManager.vFieldRemove[1][field][speed][2].Pos.Y && boardy <= matManager.vFieldRemove[1][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_REMOVED;
 			} else if(boardy >= matManager.vFieldContiAct[speed][0].Y && boardy <= matManager.vFieldContiAct[speed][2].Y) {
 				hovered_controler = 0;
 				hovered_location = POSITION_HINT;
 			}
-		} else if(rule == 1 && boardx >= matManager.vFieldSzone[1][7][rule][speed][1].Pos.X && boardx <= matManager.vFieldSzone[1][7][rule][speed][2].Pos.X) {
-			if(boardy >= matManager.vFieldSzone[1][7][rule][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][rule][speed][0].Pos.Y) {
+		} else if(field == 1 && boardx >= matManager.vFieldSzone[1][7][field][speed][1].Pos.X && boardx <= matManager.vFieldSzone[1][7][field][speed][2].Pos.X) {
+			if(boardy >= matManager.vFieldSzone[1][7][field][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
@@ -2250,21 +2250,21 @@ void ClientField::GetHoverField(int x, int y) {
 			if(boardy >= matManager.vFieldDeck[0][speed][0].Pos.Y && boardy <= matManager.vFieldDeck[0][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_DECK;
-			} else if(boardy >= matManager.vFieldGrave[0][rule][speed][0].Pos.Y && boardy <= matManager.vFieldGrave[0][rule][speed][2].Pos.Y) {
+			} else if(boardy >= matManager.vFieldGrave[0][field][speed][0].Pos.Y && boardy <= matManager.vFieldGrave[0][field][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_GRAVE;
-			} else if(boardy >= matManager.vFieldSzone[1][6][rule][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][6][rule][speed][0].Pos.Y) {
+			} else if(boardy >= matManager.vFieldSzone[1][6][field][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][6][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 6;
-			} else if(rule == 0 && boardy >= matManager.vFieldSzone[0][7][rule][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][7][rule][speed][2].Pos.Y) {
+			} else if(field == 0 && boardy >= matManager.vFieldSzone[0][7][field][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][7][field][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
-			} else if(rule == 1 && boardy >= matManager.vFieldRemove[0][rule][speed][0].Pos.Y && boardy <= matManager.vFieldRemove[0][rule][speed][2].Pos.Y) {
+			} else if(field == 1 && boardy >= matManager.vFieldRemove[0][field][speed][0].Pos.Y && boardy <= matManager.vFieldRemove[0][field][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_REMOVED;
-			} else if(boardy >= matManager.vFieldSzone[1][5][rule][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][5][rule][speed][0].Pos.Y) {
+			} else if(boardy >= matManager.vFieldSzone[1][5][field][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][5][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 5;
@@ -2272,14 +2272,14 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_EXTRA;
 			}
-		} else if(rule == 1 && boardx >= matManager.vFieldSzone[0][7][rule][speed][0].Pos.X && boardx <= matManager.vFieldSzone[0][7][rule][speed][1].Pos.X) {
-			if(boardy >= matManager.vFieldSzone[0][7][rule][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][7][rule][speed][2].Pos.Y) {
+		} else if(field == 1 && boardx >= matManager.vFieldSzone[0][7][field][speed][0].Pos.X && boardx <= matManager.vFieldSzone[0][7][field][speed][1].Pos.X) {
+			if(boardy >= matManager.vFieldSzone[0][7][field][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][7][field][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 7;
 			}
-		} else if(rule == 0 && boardx >= matManager.vFieldRemove[0][rule][speed][0].Pos.X && boardx <= matManager.vFieldRemove[0][rule][speed][1].Pos.X) {
-			if(boardy >= matManager.vFieldRemove[0][rule][speed][0].Pos.Y && boardy <= matManager.vFieldRemove[0][rule][speed][2].Pos.Y) {
+		} else if(field == 0 && boardx >= matManager.vFieldRemove[0][field][speed][0].Pos.X && boardx <= matManager.vFieldRemove[0][field][speed][1].Pos.X) {
+			if(boardy >= matManager.vFieldRemove[0][field][speed][0].Pos.Y && boardy <= matManager.vFieldRemove[0][field][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_REMOVED;
 			}
@@ -2287,9 +2287,9 @@ void ClientField::GetHoverField(int x, int y) {
 			int sequence = (boardx - matManager.vFieldMzone[0][0][0].Pos.X) / (matManager.vFieldMzone[0][0][1].Pos.X - matManager.vFieldMzone[0][0][0].Pos.X);
 			if(sequence > 4)
 				sequence = 4;
-			if(mainGame->dInfo.speed && (sequence == 0 || sequence== 4))
+			if((mainGame->dInfo.extraval & 0x1) && (sequence == 0 || sequence== 4))
 				hovered_location = 0;
-			else if(boardy > matManager.vFieldSzone[0][0][rule][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][0][rule][speed][2].Pos.Y) {
+			else if(boardy > matManager.vFieldSzone[0][0][field][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][0][field][speed][2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = sequence;
@@ -2323,7 +2323,7 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_MZONE;
 				hovered_sequence = 4 - sequence;
-			} else if(boardy >= matManager.vFieldSzone[1][0][rule][speed][2].Pos.Y && boardy < matManager.vFieldSzone[1][0][rule][speed][0].Pos.Y) {
+			} else if(boardy >= matManager.vFieldSzone[1][0][field][speed][2].Pos.Y && boardy < matManager.vFieldSzone[1][0][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 4 - sequence;

@@ -177,14 +177,34 @@ bool Game::Initialize() {
 	cbDuelRule->addItem(dataManager.GetSysString(1263));
 	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
 	btnCustomRule = env->addButton(rect<s32>(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, dataManager.GetSysString(1626));
-	wCustomRules = env->addWindow(rect<s32>(700, 100, 910, 280), false, dataManager.strBuffer);
+	wCustomRules = env->addWindow(rect<s32>(700, 100, 910, 410), false, dataManager.strBuffer);
 	wCustomRules->getCloseButton()->setVisible(false);
 	wCustomRules->setDrawTitlebar(false);
 	wCustomRules->setDraggable(true);
 	wCustomRules->setVisible(false);
-	for(int i = 0; i < 5; ++i)
-		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + i * 20, 200, 30 + i * 20), wCustomRules, 353 + i, dataManager.GetSysString(1265 + i));
-	btnCustomRulesOK = env->addButton(rect<s32>(55, 130, 155, 155), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211));
+	int spacing = 0;
+	env->addStaticText(dataManager.GetSysString(1629), rect<s32>(10, 10 + spacing * 20, 200, 30 + spacing * 20), false, false, wCustomRules);
+	spacing++;
+	for(int i = 0; i < 6; ++i, ++spacing)
+		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, dataManager.GetSysString(1631 + i));
+	env->addStaticText(dataManager.GetSysString(1628), rect<s32>(10, 10 + spacing * 20, 200, 30 + spacing * 20), false, false, wCustomRules);
+	myswprintf(strbuf, dataManager.GetSysString(1627), dataManager.GetSysString(1056));
+	spacing++;
+	chkTypeLimit[0] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
+	myswprintf(strbuf, dataManager.GetSysString(1627), dataManager.GetSysString(1063));
+	spacing++;
+	chkTypeLimit[1] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
+	myswprintf(strbuf, dataManager.GetSysString(1627), dataManager.GetSysString(1073));
+	spacing++;
+	chkTypeLimit[2] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
+	myswprintf(strbuf, dataManager.GetSysString(1627), dataManager.GetSysString(1074));
+	spacing++;
+	chkTypeLimit[3] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
+	myswprintf(strbuf, dataManager.GetSysString(1627), dataManager.GetSysString(1076));
+	spacing++;
+	chkTypeLimit[4] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 353 + spacing, strbuf);
+	btnCustomRulesOK = env->addButton(rect<s32>(55, 270, 155, 295), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211));
+	forbiddentypes = MASTER_RULE_4_FORB;
 	duel_param = MASTER_RULE_4;
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
@@ -1429,9 +1449,15 @@ const wchar_t* Game::LocalName(int local_player) {
 }
 void Game::UpdateDuelParam() {
 	uint32 flag = 0, filter = 0x100;
-	for (int i = 0; i < 5; ++i, filter <<= 1)
+	for (int i = 0; i < 6; ++i, filter <<= 1)
 		if (chkCustomRules[i]->isChecked()) {
 			flag |= filter;
+		}
+	uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+	uint32 flag2 = 0;
+	for (int i = 0; i < 5; ++i)
+		if (chkTypeLimit[i]->isChecked()) {
+			flag2 |= limits[i];
 		}
 	cbDuelRule->clear();
 	cbDuelRule->addItem(dataManager.GetSysString(1260));
@@ -1441,58 +1467,65 @@ void Game::UpdateDuelParam() {
 	switch (flag) {
 	case MASTER_RULE_1: {
 		cbDuelRule->setSelected(0);
-		break;
+		if (flag2 == MASTER_RULE_1_FORB)
+			break;
 	}
 	case MASTER_RULE_2: {
 		cbDuelRule->setSelected(1);
-		break;
+		if (flag2 == MASTER_RULE_2_FORB)
+			break;
 	}
 	case MASTER_RULE_3: {
 		cbDuelRule->setSelected(2);
-		break;
+		if (flag2 == MASTER_RULE_3_FORB)
+			break;
 	}
 	case MASTER_RULE_4: {
 		cbDuelRule->setSelected(3);
-		break;
+		if (flag2 == MASTER_RULE_4_FORB)
+			break;
 	}
 	default: {
-		cbDuelRule->addItem(dataManager.GetSysString(1264));
+		cbDuelRule->addItem(dataManager.GetSysString(1630));
 		cbDuelRule->setSelected(4);
 		break;
 	}
 	}
 	duel_param = flag;
+	forbiddentypes = flag2;
 }
-int Game::GetMasterRule(uint32 param, int* truerule) {
+int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	switch(param) {
 	case MASTER_RULE_1: {
 		if (truerule)
 			*truerule = 1;
-		return 1;
-		break;
+		if (forbiddentypes == MASTER_RULE_1_FORB)
+			return 1;
 	}
 	case MASTER_RULE_2: {
 		if (truerule)
 			*truerule = 2;
-		return 2;
-		break;
+		if (forbiddentypes == MASTER_RULE_2_FORB)
+			return 1;
 	}
 	case MASTER_RULE_3: {
 		if (truerule)
 			*truerule = 3;
-		return 3;
-		break;
+		if (forbiddentypes == MASTER_RULE_3_FORB)
+			return 1;
 	}
 	case MASTER_RULE_4: {
 		if (truerule)
 			*truerule = 4;
-		return 4;
-		break;
+		if (forbiddentypes == MASTER_RULE_4_FORB)
+			return 1;
 	}
 	default: {
 		if (truerule)
 			*truerule = 5;
-		if(param & DUEL_EMZONE)
+		if ((param & DUEL_PZONE) && (param & DUEL_SEPARATE_PZONE) && (param & DUEL_EMZONE))
+			return 5;
+		else if(param & DUEL_EMZONE)
 			return 4;
 		else if (param & DUEL_PZONE)
 			return 3;
@@ -1555,7 +1588,7 @@ void Game::OnResize()
 	wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 440));
 	wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 440));
 	wRules->setRelativePosition(ResizeWin(630, 100, 1000, 310));
-	wCustomRules->setRelativePosition(ResizeWin(700, 100, 910, 280));
+	wCustomRules->setRelativePosition(ResizeWin(700, 100, 910, 410));
 	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wSinglePlay->setRelativePosition(ResizeWin(220, 100, 800, 520));
 
@@ -1602,8 +1635,8 @@ void Game::OnResize()
 	btnReplayExit->setRelativePosition(Resize(5, 105, 85, 125));
 
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	if(dInfo.speed) {
-		if(dInfo.duel_rule >= 4) {
+	if(dInfo.extraval & 0x1) {
+		if(dInfo.duel_field >= 4) {
 			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
 			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
 			btnDP->setRelativePosition(Resize(0, 40, 50, 60));
@@ -1623,7 +1656,7 @@ void Game::OnResize()
 		}
 	} else {
 		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-		if(dInfo.duel_rule >= 4) {
+		if(dInfo.duel_field >= 4) {
 			btnSP->setRelativePosition(Resize(0, 0, 50, 20));
 			btnM1->setRelativePosition(Resize(160, 0, 210, 20));
 			btnBP->setRelativePosition(Resize(160, 0, 210, 20));

@@ -70,7 +70,7 @@ int DeckManager::TypeCount(std::vector<code_pointer> cards, int type) {
 	}
 	return count;
 }
-int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled) {
+int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes) {
 	std::unordered_map<int, int> ccount;
 	std::unordered_map<int, int>* list = 0;
 	for(size_t i = 0; i < _lfList.size(); ++i) {
@@ -82,9 +82,11 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 	if(!list)
 		return 0;
 	int dc = 0;
-	if(mainGame->dInfo.speed && (deck.main.size() != 20 || deck.extra.size() > 5))
+	if ((mainGame->dInfo.extraval & 0x1) && (deck.main.size() != 20 || deck.extra.size() > 5))
 		return 1;
-	else if(!mainGame->dInfo.speed && deck.main.size() < 40 || (!doubled && (deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15))
+	if (TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
+		return 1;
+	if (!(mainGame->dInfo.extraval & 0x1) && deck.main.size() < 40 || (!doubled && (deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15))
 		|| (doubled && (deck.main.size() != 100 || deck.extra.size() > 30 || deck.side.size() > 30)))
 		return 1;
 	for(size_t i = 0; i < deck.main.size(); ++i) {

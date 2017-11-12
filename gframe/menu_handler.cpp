@@ -136,27 +136,37 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				switch (mainGame->cbDuelRule->getSelected()) {
 				case 0: {
 					mainGame->duel_param = MASTER_RULE_1;
+					mainGame->forbiddentypes = MASTER_RULE_1_FORB;
 					break;
 				}
 				case 1: {
 					mainGame->duel_param = MASTER_RULE_2;
+					mainGame->forbiddentypes = MASTER_RULE_2_FORB;
 					break;
 				}
 				case 2: {
 					mainGame->duel_param = MASTER_RULE_3;
+					mainGame->forbiddentypes = MASTER_RULE_3_FORB;
 					break;
 				}
 				case 3: {
 					mainGame->duel_param = MASTER_RULE_4;
+					mainGame->forbiddentypes = MASTER_RULE_4_FORB;
 					break;
 				}
 				}
 				uint32 filter = 0x100;
-				for (int i = 0; i < 5; ++i, filter <<= 1)
+				for (int i = 0; i < 6; ++i, filter <<= 1)
 					if (mainGame->duel_param & filter)
 						mainGame->chkCustomRules[i]->setChecked(true);
 					else
 						mainGame->chkCustomRules[i]->setChecked(false);
+				uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+				for (int i = 0; i < 5; ++i, filter <<= 1)
+					if (mainGame->forbiddentypes & limits[i])
+						mainGame->chkTypeLimit[i]->setChecked(true);
+					else
+						mainGame->chkTypeLimit[i]->setChecked(false);
 				mainGame->PopupElement(mainGame->wCustomRules);
 				break;
 			}
@@ -557,7 +567,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				}
 				uint32 filter = 0x100;
-				for (int i = 0; i < 5; ++i, filter <<= 1)
+				for (int i = 0; i < 6; ++i, filter <<= 1)
 					if (mainGame->duel_param & filter)
 						mainGame->chkCustomRules[i]->setChecked(true);
 					else

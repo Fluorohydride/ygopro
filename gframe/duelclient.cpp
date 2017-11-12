@@ -127,11 +127,12 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param);
+			cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param, mainGame->forbiddentypes);
 			cscg.info.duel_flag = mainGame->duel_param;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.check = 2;
+			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.sealed = mainGame->chkRules[0]->isChecked();
 			cscg.info.booster = mainGame->chkRules[1]->isChecked();
 			cscg.info.destiny_draw = mainGame->chkRules[2]->isChecked();
@@ -381,20 +382,20 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(msgbuf);
 		int rule;
 		if (pkt->info.check == 2) {
-			mainGame->dInfo.duel_rule = mainGame->GetMasterRule(pkt->info.duel_flag, &rule);
+			mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt->info.duel_flag, pkt->info.forbiddentypes, &rule);
 		} else {
 			rule = pkt->info.duel_rule;
 			if (rule == 0) {
-				mainGame->dInfo.duel_rule = 3;
+				mainGame->dInfo.duel_field = 3;
 				rule = 3;
 			} else
-				mainGame->dInfo.duel_rule = rule;
+				mainGame->dInfo.duel_field = rule;
 		}
 		if (rule == 5) {
 			uint32 filter = 0x100;
-			for (int i = 0; i < 5; ++i, filter <<= 1)
+			for (int i = 0; i < 6; ++i, filter <<= 1)
 				if (pkt->info.duel_flag & filter) {
-					myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1265 + i));
+					myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1631 + i));
 					str2.append(msgbuf);
 					host2 = true;
 				}
@@ -536,7 +537,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
-		mainGame->dInfo.speed = (pkt->info.check == 2 && pkt->info.speed) ? 1 : 0;
+		mainGame->dInfo.extraval = (pkt->info.check == 2 && pkt->info.speed) ? 1 : 0;
 		watching = 0;
 		connect_state |= 0x4;
 		break;
@@ -645,8 +646,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		// reset master rule 4 phase button position
 		mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 310, 855, 330));
-		if(mainGame->dInfo.speed) {
-			if(mainGame->dInfo.duel_rule >= 4) {
+		if(mainGame->dInfo.extraval & 0x1) {
+			if(mainGame->dInfo.duel_field >= 4) {
 				mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 290, 855, 350));
 				mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
 				mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
@@ -666,7 +667,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			}
 		} else {
 			mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-			if(mainGame->dInfo.duel_rule >= 4) {
+			if(mainGame->dInfo.duel_field >= 4) {
 				mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
 				mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
 				mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
@@ -3586,9 +3587,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_RELOAD_FIELD: {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
-		int rule = BufferIO::ReadInt8(pbuf);
-		mainGame->dInfo.duel_rule = rule & 0xf;
-		mainGame->dInfo.speed = (rule >> 4) ? 1 : 0;
+		int field = BufferIO::ReadInt8(pbuf);
+		mainGame->dInfo.duel_field = field & 0xf;
+		mainGame->dInfo.extraval = field >> 4;
 		int val = 0;
 		for(int i = 0; i < 2; ++i) {
 			int p = mainGame->LocalPlayer(i);
@@ -3877,7 +3878,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(L"][");
 			int rule;
 			if(pHP->host.check == 2) {
-				mainGame->GetMasterRule(pHP->host.duel_flag, &rule);
+				mainGame->GetMasterRule(pHP->host.duel_flag, pHP->host.forbiddentypes, &rule);
 			} else
 				rule = pHP->host.duel_rule;
 			if(rule == 5)

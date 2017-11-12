@@ -56,9 +56,9 @@ struct DuelInfo {
 	bool tag_player[2];
 	int lp[2];
 	int startlp;
-	int duel_rule;
-	int speed = false;
+	int duel_field;
 	int lua64;
+	int extraval;
 	int turn;
 	short curMsg;
 	wchar_t hostname[20];
@@ -130,7 +130,7 @@ public:
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 	void UpdateDuelParam();
-	int GetMasterRule(uint32 param, int* truerule = 0);
+	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
@@ -189,6 +189,7 @@ public:
 
 	bool is_building;
 	bool is_siding;
+	int forbiddentypes;
 	uint32 duel_param;
 	int texty;
 
@@ -275,7 +276,8 @@ public:
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
-	irr::gui::IGUICheckBox* chkCustomRules[5];
+	irr::gui::IGUICheckBox* chkCustomRules[6];
+	irr::gui::IGUICheckBox* chkTypeLimit[5];
 	irr::gui::IGUIWindow* wCustomRules;
 	irr::gui::IGUIButton* btnCustomRulesOK;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
