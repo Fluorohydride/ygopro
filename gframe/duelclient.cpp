@@ -977,25 +977,37 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_BATTLECMD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		int /*code, */desc, count, con, loc, seq/*, diratt*/;
+		int code, desc, count, con, loc, seq/*, diratt*/;
 		ClientCard* pcard;
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
 		count = BufferIO::ReadInt8(pbuf);
 		for (int i = 0; i < count; ++i) {
-			/*code = */BufferIO::ReadInt32(pbuf);
+			code = BufferIO::ReadInt32(pbuf);
 			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 			loc =  BufferIO::ReadInt8(pbuf);
 			seq =  BufferIO::ReadInt8(pbuf);
 			desc =  BufferIO::ReadInt32(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
+			int flag = 0;
+			if(code & 0x80000000) {
+				flag = EDESC_OPERATION;
+				code &= 0x7fffffff;
+			}
 			mainGame->dField.activatable_cards.push_back(pcard);
-			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, 0));
-			pcard->cmdFlag |= COMMAND_ACTIVATE;
-			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
-			else if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
+			if(flag == EDESC_OPERATION) {
+				pcard->chain_code = code;
+				mainGame->dField.conti_cards.push_back(pcard);
+				mainGame->dField.conti_act = true;
+				pcard->cmdFlag |= COMMAND_OPERATION;
+			} else {
+				pcard->cmdFlag |= COMMAND_ACTIVATE;
+				if (pcard->location == LOCATION_GRAVE)
+					mainGame->dField.grave_act = true;
+				else if (pcard->location == LOCATION_REMOVED)
+					mainGame->dField.remove_act = true;
+			}
 		}
 		mainGame->dField.attackable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -1106,13 +1118,25 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			seq = BufferIO::ReadInt8(pbuf);
 			desc = BufferIO::ReadInt32(pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
+			int flag = 0;
+			if(code & 0x80000000) {
+				flag = EDESC_OPERATION;
+				code &= 0x7fffffff;
+			}
 			mainGame->dField.activatable_cards.push_back(pcard);
-			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, 0));
-			pcard->cmdFlag |= COMMAND_ACTIVATE;
-			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
-			else if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
+			if(flag == EDESC_OPERATION) {
+				pcard->chain_code = code;
+				mainGame->dField.conti_cards.push_back(pcard);
+				mainGame->dField.conti_act = true;
+				pcard->cmdFlag |= COMMAND_OPERATION;
+			} else {
+				pcard->cmdFlag |= COMMAND_ACTIVATE;
+				if (pcard->location == LOCATION_GRAVE)
+					mainGame->dField.grave_act = true;
+				else if (pcard->location == LOCATION_REMOVED)
+					mainGame->dField.remove_act = true;
+			}
 		}
 		if(BufferIO::ReadInt8(pbuf)) {
 			mainGame->btnBP->setVisible(true);
