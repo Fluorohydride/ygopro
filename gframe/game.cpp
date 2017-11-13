@@ -186,7 +186,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1629), rect<s32>(10, 10 + spacing * 20, 200, 30 + spacing * 20), false, false, wCustomRules);
 	spacing++;
 	for(int i = 0; i < 6; ++i, ++spacing)
-		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, dataManager.GetSysString(1631 + i));
+		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 390 + i, dataManager.GetSysString(1631 + i));
 	env->addStaticText(dataManager.GetSysString(1628), rect<s32>(10, 10 + spacing * 20, 200, 30 + spacing * 20), false, false, wCustomRules);
 	myswprintf(strbuf, dataManager.GetSysString(1627), dataManager.GetSysString(1056));
 	spacing++;
@@ -229,13 +229,13 @@ bool Game::Initialize() {
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
 	//host(single)
+	wHostPrepare = env->addWindow(rect<s32>(270, 120, 750, 440), false, dataManager.GetSysString(1250));
+	wHostPrepare->getCloseButton()->setVisible(false);
+	wHostPrepare->setVisible(false);
 	wHostPrepare2 = env->addWindow(rect<s32>(750, 120, 950, 440), false, dataManager.GetSysString(1625));
 	wHostPrepare2->getCloseButton()->setVisible(false);
 	wHostPrepare2->setVisible(false);
 	stHostPrepRule2 = env->addStaticText(L"", rect<s32>(10, 30, 460, 350), false, true, wHostPrepare2);
-	wHostPrepare = env->addWindow(rect<s32>(270, 120, 750, 440), false, dataManager.GetSysString(1250));
-	wHostPrepare->getCloseButton()->setVisible(false);
-	wHostPrepare->setVisible(false);
 	btnHostPrepDuelist = env->addButton(rect<s32>(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, dataManager.GetSysString(1251));
 	for(int i = 0; i < 2; ++i) {
 		stHostPrepDuelist[i] = env->addStaticText(L"", rect<s32>(40, 65 + i * 25, 240, 85 + i * 25), true, false, wHostPrepare);
@@ -652,6 +652,8 @@ bool Game::Initialize() {
 	//swap
 	btnSpectatorSwap = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnSpectatorSwap->setVisible(false);
+	btnHandSwap = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_HAND_SWAP, dataManager.GetSysString(1346));
+	btnHandSwap->setVisible(false);
 	//chain buttons
 	btnChainIgnore = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_CHAIN_IGNORE, dataManager.GetSysString(1292));
 	btnChainAlways = env->addButton(rect<s32>(205, 140, 295, 175), 0, BUTTON_CHAIN_ALWAYS, dataManager.GetSysString(1293));
@@ -1428,6 +1430,7 @@ void Game::CloseDuelWindow() {
 	btnSideOK->setVisible(false);
 	btnLeaveGame->setVisible(false);
 	btnSpectatorSwap->setVisible(false);
+	btnHandSwap->setVisible(false);
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
@@ -1587,6 +1590,7 @@ void Game::OnResize()
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
 	wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 440));
 	wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 440));
+	wHostPrepare3->setRelativePosition(ResizeWin(70, 120, 270, 440));
 	wRules->setRelativePosition(ResizeWin(630, 100, 1000, 310));
 	wCustomRules->setRelativePosition(ResizeWin(700, 100, 910, 410));
 	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));
@@ -1671,6 +1675,7 @@ void Game::OnResize()
 		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	}
 	btnSpectatorSwap->setRelativePosition(Resize(205, 100, 295, 135));
+	btnHandSwap->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainAlways->setRelativePosition(Resize(205, 140, 295, 175));
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));

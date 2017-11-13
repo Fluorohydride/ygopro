@@ -32,9 +32,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		s32 id = caller->getID();
-		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && (id <CHECK_SEALED_DUEL || id>CHECK_DECK_MASTER_DUEL)))
+		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && (id < CHECK_SEALED_DUEL || id > CHECK_DECK_MASTER_DUEL)))
 			break;
-		if(mainGame->wCustomRules->isVisible() && id != BUTTON_CUSTOM_RULE_OK)
+		if(mainGame->wCustomRules->isVisible() && id != BUTTON_CUSTOM_RULE_OK && (id < CHECKBOX_OBSOLETE || id > CHECKBOX_EMZONE))
 			break;
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
@@ -156,17 +156,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				}
 				uint32 filter = 0x100;
-				for (int i = 0; i < 6; ++i, filter <<= 1)
-					if (mainGame->duel_param & filter)
-						mainGame->chkCustomRules[i]->setChecked(true);
-					else
-						mainGame->chkCustomRules[i]->setChecked(false);
+				for (int i = 0; i < 6; ++i, filter <<= 1) {
+						mainGame->chkCustomRules[i]->setChecked(mainGame->duel_param & filter);
+					if(i == 3)
+						mainGame->chkCustomRules[4]->setEnabled(mainGame->duel_param & filter);
+				}
 				uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 				for (int i = 0; i < 5; ++i, filter <<= 1)
-					if (mainGame->forbiddentypes & limits[i])
-						mainGame->chkTypeLimit[i]->setChecked(true);
-					else
-						mainGame->chkTypeLimit[i]->setChecked(false);
+						mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 				mainGame->PopupElement(mainGame->wCustomRules);
 				break;
 			}
@@ -511,6 +508,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case CHECKBOX_PZONE: {
+				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked())
+					mainGame->chkCustomRules[4]->setEnabled(true);
+				else {
+					mainGame->chkCustomRules[4]->setChecked(false);
+					mainGame->chkCustomRules[4]->setEnabled(false);
+				}
+			}
 			}
 			break;
 		}
@@ -570,12 +575,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
-				uint32 filter = 0x100;
-				for (int i = 0; i < 6; ++i, filter <<= 1)
-					if (mainGame->duel_param & filter)
-						mainGame->chkCustomRules[i]->setChecked(true);
-					else
-						mainGame->chkCustomRules[i]->setChecked(false);
 			}
 			}
 		}

@@ -642,5 +642,12 @@ extern Game* mainGame;
 #define BUTTON_MARKS_FILTER			380
 #define BUTTON_MARKERS_OK			381
 
+#define CHECKBOX_OBSOLETE			390
+#define CHECKBOX_DRAW				391
+#define CHECKBOX_FIELD				392
+#define CHECKBOX_PZONE				393
+#define CHECKBOX_SEPARATE_PZONE		394
+#define CHECKBOX_EMZONE				395
+
 #define DEFAULT_DUEL_RULE			4
 #endif // GAME_H
