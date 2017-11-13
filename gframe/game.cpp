@@ -1506,19 +1506,19 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 		if (truerule)
 			*truerule = 2;
 		if (forbiddentypes == MASTER_RULE_2_FORB)
-			return 1;
+			return 2;
 	}
 	case MASTER_RULE_3: {
 		if (truerule)
 			*truerule = 3;
 		if (forbiddentypes == MASTER_RULE_3_FORB)
-			return 1;
+			return 3;
 	}
 	case MASTER_RULE_4: {
 		if (truerule)
 			*truerule = 4;
 		if (forbiddentypes == MASTER_RULE_4_FORB)
-			return 1;
+			return 4;
 	}
 	default: {
 		if (truerule)

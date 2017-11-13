@@ -548,21 +548,25 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				case 0:{
 					mainGame->cbDuelRule->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_1;
+					mainGame->forbiddentypes = MASTER_RULE_1_FORB;
 					break;
 				}
 				case 1: {
 					mainGame->cbDuelRule->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_2;
+					mainGame->forbiddentypes = MASTER_RULE_2_FORB;
 					break;
 				}
 				case 2: {
 					mainGame->cbDuelRule->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_3;
+					mainGame->forbiddentypes = MASTER_RULE_3_FORB;
 					break;
 				}
 				case 3: {
 					mainGame->cbDuelRule->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_4;
+					mainGame->forbiddentypes = MASTER_RULE_4_FORB;
 					break;
 				}
 				}

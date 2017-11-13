@@ -75,11 +75,11 @@ void Game::DrawBackGround() {
 			break;
 		}
 		case 3: {
-			tfield = 1;
+			tfield = 0;
 			break;
 		}
 		case 4: {
-			tfield = 0;
+			tfield = 1;
 			break;
 		}
 	}
