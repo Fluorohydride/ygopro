@@ -374,6 +374,9 @@ public:
 	irr::gui::IGUIButton* btnDeleteDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
 	irr::gui::IGUIButton* btnSideOK;
+	irr::gui::IGUIButton* btnSideShuffle;
+	irr::gui::IGUIButton* btnSideSort;
+	irr::gui::IGUIButton* btnSideReload;
 	irr::gui::IGUIEditBox* ebDeckname;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
@@ -540,7 +543,7 @@ extern Game* mainGame;
 #define BUTTON_SAVE_DECK			304
 #define BUTTON_SAVE_DECK_AS			305
 #define BUTTON_DELETE_DECK			306
-//#define BUTTON_DBEXIT				307
+#define BUTTON_SIDE_RELOAD			307
 #define BUTTON_SORT_DECK			308
 #define BUTTON_SIDE_OK				309
 #define BUTTON_SHUFFLE_DECK			310
