@@ -3311,7 +3311,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 							ClientCard* xcard = new ClientCard;
 							ccard->overlayed.push_back(xcard);
 							mainGame->dField.overlay_cards.insert(xcard);
-							mainGame->gMutex.Unlock();
 							xcard->overlayTarget = ccard;
 							xcard->location = 0x80;
 							xcard->sequence = ccard->overlayed.size() - 1;
@@ -3465,7 +3464,7 @@ void DuelClient::SendResponse() {
 	}
 	}
 	if(mainGame->dInfo.isSingleMode) {
-		SingleMode::SetResponse(response_buf);
+		SingleMode::SetResponse(response_buf, response_len);
 		mainGame->singleSignal.Set();
 	} else {
 		mainGame->dInfo.time_player = 2;
