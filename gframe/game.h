@@ -69,9 +69,9 @@ struct DuelInfo {
 };
 
 struct BotInfo {
-	wchar_t internalname[32];
+	wchar_t internalname[256];
 	wchar_t name[32];
-	wchar_t desc[32];
+	wchar_t desc[256];
 	int flag;
 };
 
