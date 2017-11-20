@@ -68,6 +68,13 @@ struct DuelInfo {
 	unsigned short time_left[2];
 };
 
+struct BotInfo {
+	wchar_t internalname[32];
+	wchar_t name[32];
+	wchar_t desc[32];
+	int flag;
+};
+
 struct FadingUnit {
 	bool signalAction;
 	bool isFadein;
@@ -92,6 +99,7 @@ public:
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
+	void RefreshBot();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
@@ -142,6 +150,7 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
+	std::vector<BotInfo> botInfo;
 
 	int hideChatTimer;
 	bool hideChat;
@@ -574,7 +583,8 @@ extern Game* mainGame;
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
 #define BUTTON_BOT_START			340
-#define CHECKBOX_BOT_OLD_RULE		341
+#define LISTBOX_BOT_LIST			341
+#define CHECKBOX_BOT_OLD_RULE		342
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352

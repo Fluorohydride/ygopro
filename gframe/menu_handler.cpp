@@ -192,6 +192,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->ShowElement(mainGame->wSinglePlay);
 				mainGame->RefreshSingleplay();
+				mainGame->RefreshBot();
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
@@ -235,6 +236,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_BOT_START: {
+				int sel = mainGame->lstBotList->getSelected();
+				if(sel == -1)
+					break;
 				bot_mode = true;
 				if(!NetServer::StartServer(mainGame->gameConf.serverport))
 					break;
@@ -249,7 +253,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				si.cb = sizeof(si);
 				ZeroMemory(&pi, sizeof(pi));
 				LPTSTR cmd = new TCHAR[MAX_PATH];
-				myswprintf(cmd, L"Bot.exe %s", L"1");
+				myswprintf(cmd, L"Bot.exe %d \"%s\"", (mainGame->chkBotHand->isChecked() ? 1 : 0), mainGame->botInfo[sel].internalname);
 				if(!CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 				{
 					NetServer::StopServer();
@@ -259,7 +263,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnStartBot->setEnabled(false);
 				mainGame->btnBotCancel->setEnabled(false);
 				break;
-
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
 				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
@@ -351,6 +354,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
 				break;
 			}
+			case LISTBOX_BOT_LIST: {
+				int sel = mainGame->lstBotList->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->SetStaticText(mainGame->stBotInfo, 200, mainGame->guiFont, mainGame->botInfo[sel].desc);
+				break;
+			}
 			}
 			break;
 		}
@@ -373,6 +383,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 					mainGame->cbDeckSelect->setEnabled(true);
 				}
+				break;
+			}
+			case CHECKBOX_BOT_OLD_RULE: {
+				mainGame->RefreshBot();
 				break;
 			}
 			}
