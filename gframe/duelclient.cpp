@@ -284,6 +284,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wSort->setVisible(false);
 		mainGame->stTip->setVisible(false);
 		mainGame->btnSideOK->setVisible(true);
+		mainGame->btnSideShuffle->setVisible(true);
+		mainGame->btnSideSort->setVisible(true);
+		mainGame->btnSideReload->setVisible(true);
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->btnSpectatorSwap->setVisible(false);
@@ -485,6 +488,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wInfos->setVisible(true);
 		mainGame->wPhase->setVisible(true);
 		mainGame->btnSideOK->setVisible(false);
+		mainGame->btnSideShuffle->setVisible(false);
+		mainGame->btnSideSort->setVisible(false);
+		mainGame->btnSideReload->setVisible(false);
 		mainGame->btnPhaseStatus->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
