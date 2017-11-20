@@ -222,16 +222,23 @@ void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(dp->type > 3 || ready[dp->type] == is_ready)
 		return;
 	if(is_ready) {
-		bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
-		bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
-		int res = host_info.no_check_deck ? false : deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
-		if(res) {
+		unsigned int deckerror = 0;
+		if(!host_info.no_check_deck) {
+			if(deck_error[dp->type]) {
+				deckerror = (DECKERROR_UNKNOWNCARD << 28) + deck_error[dp->type];
+			} else {
+				bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
+				bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
+				deckerror = deckManager.CheckDeck(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
+			}
+		}
+		if(deckerror) {
 			STOC_HS_PlayerChange scpc;
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_DECKERROR;
-			scem.code = res;
+			scem.code = deckerror;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 			return;
 		}
@@ -256,7 +263,7 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
 	char* deckbuf = (char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
-	deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
+	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)

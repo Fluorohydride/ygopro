@@ -216,13 +216,52 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		case ERRMSG_DECKERROR: {
 			mainGame->gMutex.Lock();
-			if(pkt->code == 1)
-				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
-			else {
-				wchar_t msgbuf[256];
-				myswprintf(msgbuf, dataManager.GetSysString(1407), dataManager.GetName(pkt->code));
-				mainGame->env->addMessageBox(L"", msgbuf);
+			unsigned int code = pkt->code & 0xFFFFFFF;
+			int flag = pkt->code >> 28;
+			wchar_t msgbuf[256];
+			switch(flag)
+			{
+			case DECKERROR_LFLIST: {
+				myswprintf(msgbuf, dataManager.GetSysString(1407), dataManager.GetName(code));
+				break;
 			}
+			case DECKERROR_OCGONLY: {
+				myswprintf(msgbuf, dataManager.GetSysString(1413), dataManager.GetName(code));
+				break;
+			}
+			case DECKERROR_TCGONLY: {
+				myswprintf(msgbuf, dataManager.GetSysString(1414), dataManager.GetName(code));
+				break;
+			}
+			case DECKERROR_UNKNOWNCARD: {
+				myswprintf(msgbuf, dataManager.GetSysString(1415), dataManager.GetName(code), code);
+				break;
+			}
+			case DECKERROR_CARDCOUNT: {
+				myswprintf(msgbuf, dataManager.GetSysString(1416), dataManager.GetName(code));
+				break;
+			}
+			case DECKERROR_MAINCOUNT: {
+				myswprintf(msgbuf, dataManager.GetSysString(1417), code);
+				break;
+			}
+			case DECKERROR_EXTRACOUNT: {
+				if(code>0)
+					myswprintf(msgbuf, dataManager.GetSysString(1418), code);
+				else
+					myswprintf(msgbuf, dataManager.GetSysString(1420));
+				break;
+			}
+			case DECKERROR_SIDECOUNT: {
+				myswprintf(msgbuf, dataManager.GetSysString(1419), code);
+				break;
+			}
+			default: {
+				myswprintf(msgbuf, dataManager.GetSysString(1406));
+				break;
+			}
+			}
+			mainGame->env->addMessageBox(L"", msgbuf);
 			mainGame->cbDeckSelect->setEnabled(true);
 			mainGame->gMutex.Unlock();
 			break;
