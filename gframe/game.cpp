@@ -555,16 +555,16 @@ bool Game::Initialize() {
 	wSinglePlay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1201));
 	wSinglePlay->getCloseButton()->setVisible(false);
 	wSinglePlay->setVisible(false);
-	irr::gui::IGUITabControl* wSingle = env->addTabControl(rect<s32>(10, 30, 570, 410), wSinglePlay, true);
+	irr::gui::IGUITabControl* wSingle = env->addTabControl(rect<s32>(0, 20, 579, 419), wSinglePlay, true);
 	irr::gui::IGUITab* tabAI = wSingle->addTab(L"人机模式");
-	env->addButton(rect<s32>(440, 285, 550, 310), tabAI, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
-	env->addButton(rect<s32>(440, 315, 550, 340), tabAI, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
-	tabAI->setVisible(false);
+	env->addListBox(rect<s32>(10, 10, 350, 350), tabAI, LISTBOX_SINGLEPLAY_LIST, true);
+	env->addButton(rect<s32>(459, 301, 569, 326), tabAI, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
+	env->addButton(rect<s32>(459, 331, 569, 356), tabAI, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 	irr::gui::IGUITab* tabSingle = wSingle->addTab(L"残局模式");
-	lstSinglePlayList = env->addListBox(rect<s32>(10, 10, 350, 340), tabSingle, LISTBOX_SINGLEPLAY_LIST, true);
+	lstSinglePlayList = env->addListBox(rect<s32>(10, 10, 350, 350), tabSingle, LISTBOX_SINGLEPLAY_LIST, true);
 	lstSinglePlayList->setItemHeight(18);
-	btnLoadSinglePlay = env->addButton(rect<s32>(440, 285, 550, 310), tabSingle, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
-	btnSinglePlayCancel = env->addButton(rect<s32>(440, 315, 550, 340), tabSingle, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
+	btnLoadSinglePlay = env->addButton(rect<s32>(459, 301, 569, 326), tabSingle, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
+	btnSinglePlayCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabSingle, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 	env->addStaticText(dataManager.GetSysString(1352), rect<s32>(360, 10, 550, 30), false, true, tabSingle);
 	stSinglePlayInfo = env->addStaticText(L"", rect<s32>(360, 40, 550, 280), false, true, tabSingle);
 	//replay save
