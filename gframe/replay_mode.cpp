@@ -854,14 +854,13 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			char namebuf[128];
-			wchar_t wname[128];
 			int len = BufferIO::ReadInt16(pbuf);
-			char* begin = pbuf;
 			pbuf += len + 1;
-			memcpy(namebuf, begin, len + 1);
-			BufferIO::DecodeUTF8(namebuf, wname);
-			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname, 20);
+			break;
+		}
+		case MSG_SHOW_HINT: {
+			int len = BufferIO::ReadInt16(pbuf);
+			pbuf += len + 1;
 			break;
 		}
 		}
