@@ -560,6 +560,13 @@ bool Game::Initialize() {
 	env->addListBox(rect<s32>(10, 10, 350, 350), tabAI, LISTBOX_SINGLEPLAY_LIST, true);
 	env->addButton(rect<s32>(459, 301, 569, 326), tabAI, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
 	env->addButton(rect<s32>(459, 331, 569, 356), tabAI, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
+	env->addStaticText(dataManager.GetSysString(1352), rect<s32>(360, 10, 550, 30), false, true, tabAI);
+	env->addStaticText(L"一个可怕的AI\n非常可怕", rect<s32>(360, 40, 550, 160), false, true, tabAI);
+	env->addCheckBox(false, rect<s32>(360, 170, 560, 190), tabAI, -1, L"使用旧规则（大师规则3）");
+	env->addCheckBox(false, rect<s32>(360, 200, 560, 220), tabAI, -1, L"锁定出剪刀");
+	env->addCheckBox(false, rect<s32>(360, 230, 560, 250), tabAI, -1, dataManager.GetSysString(1229));
+	env->addCheckBox(false, rect<s32>(360, 260, 560, 280), tabAI, -1, dataManager.GetSysString(1230));
+
 	irr::gui::IGUITab* tabSingle = wSingle->addTab(L"残局模式");
 	lstSinglePlayList = env->addListBox(rect<s32>(10, 10, 350, 350), tabSingle, LISTBOX_SINGLEPLAY_LIST, true);
 	lstSinglePlayList->setItemHeight(18);
