@@ -46,6 +46,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
+				bot_mode = false;
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, ip, 16);
@@ -103,6 +104,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
+				bot_mode = false;
 				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
 				if(!NetServer::StartServer(mainGame->gameConf.serverport))
 					break;
@@ -167,8 +169,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->btnStartBot->setEnabled(true);
+				mainGame->btnBotCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
-				mainGame->ShowElement(mainGame->wLanWindow);
+				if(bot_mode)
+					mainGame->ShowElement(mainGame->wSinglePlay);
+				else
+					mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->wChat->setVisible(false);
 				if(exit_on_return)
 					mainGame->device->closeDevice();
@@ -226,6 +233,33 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
+			}
+			case BUTTON_BOT_START: {
+				bot_mode = true;
+				if(!NetServer::StartServer(mainGame->gameConf.serverport))
+					break;
+				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
+					NetServer::StopServer();
+					break;
+				}
+#ifdef _WIN32
+				STARTUPINFO si;
+				PROCESS_INFORMATION pi;
+				ZeroMemory(&si, sizeof(si));
+				si.cb = sizeof(si);
+				ZeroMemory(&pi, sizeof(pi));
+				LPTSTR cmd = new TCHAR[MAX_PATH];
+				myswprintf(cmd, L"Bot.exe %s", L"1");
+				if(!CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+				{
+					NetServer::StopServer();
+					break;
+				}
+#endif
+				mainGame->btnStartBot->setEnabled(false);
+				mainGame->btnBotCancel->setEnabled(false);
+				break;
+
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
 				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)

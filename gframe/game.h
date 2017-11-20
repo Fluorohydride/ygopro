@@ -277,6 +277,14 @@ public:
 	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
 	irr::gui::IGUIWindow* wSinglePlay;
+	irr::gui::IGUIListBox* lstBotList;
+	irr::gui::IGUIStaticText* stBotInfo;
+	irr::gui::IGUIButton* btnStartBot;
+	irr::gui::IGUIButton* btnBotCancel;
+	irr::gui::IGUICheckBox* chkBotOldRule;
+	irr::gui::IGUICheckBox* chkBotHand;
+	irr::gui::IGUICheckBox* chkBotNoCheckDeck;
+	irr::gui::IGUICheckBox* chkBotNoShuffleDeck;
 	irr::gui::IGUIListBox* lstSinglePlayList;
 	irr::gui::IGUIStaticText* stSinglePlayInfo;
 	irr::gui::IGUIButton* btnLoadSinglePlay;
@@ -565,6 +573,8 @@ extern Game* mainGame;
 #define BUTTON_REPLAY_SWAP			325
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
+#define BUTTON_BOT_START			340
+#define CHECKBOX_BOT_OLD_RULE		341
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
