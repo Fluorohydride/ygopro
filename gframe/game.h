@@ -40,6 +40,7 @@ struct Config {
 	int separate_clear_button;
 	int auto_search_limit;
 	int chkIgnoreDeckChanges;
+	int defaultOT;
 };
 
 struct DuelInfo {
@@ -374,6 +375,9 @@ public:
 	irr::gui::IGUIButton* btnDeleteDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
 	irr::gui::IGUIButton* btnSideOK;
+	irr::gui::IGUIButton* btnSideShuffle;
+	irr::gui::IGUIButton* btnSideSort;
+	irr::gui::IGUIButton* btnSideReload;
 	irr::gui::IGUIEditBox* ebDeckname;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
@@ -540,7 +544,7 @@ extern Game* mainGame;
 #define BUTTON_SAVE_DECK			304
 #define BUTTON_SAVE_DECK_AS			305
 #define BUTTON_DELETE_DECK			306
-//#define BUTTON_DBEXIT				307
+#define BUTTON_SIDE_RELOAD			307
 #define BUTTON_SORT_DECK			308
 #define BUTTON_SIDE_OK				309
 #define BUTTON_SHUFFLE_DECK			310
@@ -551,6 +555,8 @@ extern Game* mainGame;
 #define SCROLL_FILTER				315
 #define EDITBOX_KEYWORD				316
 #define BUTTON_CLEAR_FILTER			317
+#define COMBOBOX_ATTRIBUTE			318
+#define COMBOBOX_RACE				319
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
 #define BUTTON_REPLAY_STEP			322
@@ -564,6 +570,7 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_AUTO_SEARCH		360
 #define COMBOBOX_SORTTYPE			370
+#define COMBOBOX_LIMIT				371
 
 #define BUTTON_MARKS_FILTER			380
 #define BUTTON_MARKERS_OK			381
