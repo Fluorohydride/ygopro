@@ -40,6 +40,7 @@ struct Config {
 	int separate_clear_button;
 	int auto_search_limit;
 	int chkIgnoreDeckChanges;
+	int defaultOT;
 };
 
 struct DuelInfo {
