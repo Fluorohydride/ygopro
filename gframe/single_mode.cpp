@@ -10,6 +10,7 @@ namespace ygo {
 long SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
+Replay SingleMode::last_replay;
 
 static byte buffer[0x20000];
 
@@ -23,23 +24,18 @@ void SingleMode::StopPlay(bool is_exiting) {
 	mainGame->actionSignal.Set();
 	mainGame->singleSignal.Set();
 }
-void SingleMode::SetResponse(unsigned char* resp) {
+void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
+	last_replay.WriteInt8(len);
+	last_replay.WriteData(resp, len);
 	set_responseb(pduel, resp);
 }
 int SingleMode::SinglePlayThread(void* param) {
-	char fname2[256];
-	size_t slen;
-	if(open_file) {
-		slen = BufferIO::EncodeUTF8(open_file_name, fname2);
-		open_file = false;
-	} else {
-		const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
-		wchar_t fname[256];
-		myswprintf(fname, L"./single/%ls", name);
-		slen = BufferIO::EncodeUTF8(fname, fname2);
-	}
+	const int start_lp = 8000;
+	const int start_hand = 5;
+	const int draw_count = 1;
+	const int opt = 0;
 	mtrandom rnd;
 	time_t seed = time(0);
 	rnd.reset(seed);
@@ -47,24 +43,44 @@ int SingleMode::SinglePlayThread(void* param) {
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());
-	set_player_info(pduel, 0, 8000, 5, 1);
-	set_player_info(pduel, 1, 8000, 5, 1);
-	mainGame->dInfo.lp[0] = 8000;
-	mainGame->dInfo.lp[1] = 8000;
+	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
+	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
+	mainGame->dInfo.lp[0] = start_lp;
+	mainGame->dInfo.lp[1] = start_lp;
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname, 20);
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.turn = 0;
-	if(!preload_script(pduel, fname2, slen)) {
-		wchar_t fname[256];
-		myswprintf(fname, L"./single/%ls", open_file_name);
-		slen = BufferIO::EncodeUTF8(fname, fname2);
-		if(!preload_script(pduel, fname2, slen)) {
-			end_duel(pduel);
-			return 0;
+	char filename[256];
+	size_t slen = 0;
+	if(open_file) {
+		open_file = false;
+		slen = BufferIO::EncodeUTF8(open_file_name, filename);
+		if(!preload_script(pduel, filename, slen)) {
+			wchar_t fname[256];
+			myswprintf(fname, L"./single/%ls", open_file_name);
+			slen = BufferIO::EncodeUTF8(fname, filename);
+			if(!preload_script(pduel, filename, slen))
+				slen = 0;
 		}
+	} else {
+		const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
+		wchar_t fname[256];
+		myswprintf(fname, L"./single/%ls", name);
+		slen = BufferIO::EncodeUTF8(fname, filename);
+		if(!preload_script(pduel, filename, slen))
+			slen = 0;
 	}
+	if(slen == 0) {
+		end_duel(pduel);
+		return 0;
+	}
+	ReplayHeader rh;
+	rh.id = 0x31707279;
+	rh.version = PRO_VERSION;
+	rh.flag = REPLAY_SINGLE_MODE;
+	rh.seed = seed;
 	mainGame->gMutex.Lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
 	mainGame->wCardImg->setVisible(true);
@@ -85,11 +101,24 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dInfo.isSingleMode = true;
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.Unlock();
-	start_duel(pduel, 0);
 	char engineBuffer[0x1000];
 	is_closing = false;
 	is_continuing = true;
-	int len = 0;
+	int len = get_message(pduel, (byte*)engineBuffer);
+	if (len > 0)
+		is_continuing = SinglePlayAnalyze(engineBuffer, len);
+	last_replay.BeginRecord();
+	last_replay.WriteHeader(rh);
+	last_replay.WriteData(mainGame->dInfo.hostname, 40, false);
+	last_replay.WriteData(mainGame->dInfo.clientname, 40, false);
+	last_replay.WriteInt32(start_lp, false);
+	last_replay.WriteInt32(start_hand, false);
+	last_replay.WriteInt32(draw_count, false);
+	last_replay.WriteInt32(opt, false);
+	last_replay.WriteInt16(slen, false);
+	last_replay.WriteData(filename, slen, false);
+	last_replay.Flush();
+	start_duel(pduel, opt);
 	while (is_continuing) {
 		int result = process(pduel);
 		len = result & 0xffff;
@@ -99,6 +128,21 @@ int SingleMode::SinglePlayThread(void* param) {
 			is_continuing = SinglePlayAnalyze(engineBuffer, len);
 		}
 	}
+	last_replay.EndRecord();
+	time_t nowtime = time(NULL);
+	struct tm *localedtime = localtime(&nowtime);
+	char timebuf[40];
+	strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
+	size_t size = strlen(timebuf) + 1;
+	wchar_t timetext[80];
+	mbstowcs(timetext, timebuf, size);
+	mainGame->ebRSName->setText(timetext);
+	mainGame->PopupElement(mainGame->wReplaySave);
+	mainGame->gMutex.Unlock();
+	mainGame->replaySignal.Reset();
+	mainGame->replaySignal.Wait();
+	if(mainGame->actionParam)
+		last_replay.SaveReplay(mainGame->ebRSName->getText());
 	end_duel(pduel);
 	if(!is_closing) {
 		mainGame->gMutex.Lock();

@@ -226,7 +226,7 @@ short Replay::ReadInt16() {
 	if(!is_replaying)
 		return -1;
 	short ret = *((short*)pdata);
-	pdata += 4;
+	pdata += 2;
 	return ret;
 }
 char Replay::ReadInt8() {

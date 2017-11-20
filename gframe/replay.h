@@ -9,6 +9,7 @@ namespace ygo {
 #define REPLAY_COMPRESSED	0x1
 #define REPLAY_TAG			0x2
 #define REPLAY_DECODED		0x4
+#define REPLAY_SINGLE_MODE	0x8
 
 struct ReplayHeader {
 	unsigned int id;
