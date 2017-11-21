@@ -925,10 +925,10 @@ void Game::RefreshBot() {
 			if(linebuf[0] == '!') {
 				BotInfo newinfo;
 				sscanf(linebuf, "!%240[^\n]", strbuf);
-				BufferIO::DecodeUTF8(strbuf, newinfo.internalname);
+				BufferIO::DecodeUTF8(strbuf, newinfo.name);
 				fgets(linebuf, 256, fp);
 				sscanf(linebuf, "%240[^\n]", strbuf);
-				BufferIO::DecodeUTF8(strbuf, newinfo.name);
+				BufferIO::DecodeUTF8(strbuf, newinfo.command);
 				fgets(linebuf, 256, fp);
 				sscanf(linebuf, "%240[^\n]", strbuf);
 				BufferIO::DecodeUTF8(strbuf, newinfo.desc);

@@ -253,7 +253,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				si.cb = sizeof(si);
 				ZeroMemory(&pi, sizeof(pi));
 				LPTSTR cmd = new TCHAR[MAX_PATH];
-				myswprintf(cmd, L"Bot.exe \"%s\" %d %d", mainGame->botInfo[sel].internalname, (mainGame->chkBotHand->isChecked() ? 1 : 0), mainGame->gameConf.serverport);
+				int flag = 0;
+				flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
+				myswprintf(cmd, L"Bot.exe \"%ls\" %d %d", mainGame->botInfo[sel].command, flag, mainGame->gameConf.serverport);
 				if(!CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 				{
 					NetServer::StopServer();
