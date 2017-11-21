@@ -530,250 +530,51 @@ void Game::DrawMisc() {
 	lpcFont->draw(dataManager.GetNumString(dInfo.turn), mainGame->Resize(635, 5, 685, 40), 0x80000000, true, false, 0);
 	lpcFont->draw(dataManager.GetNumString(dInfo.turn), mainGame->Resize(635, 5, 687, 40), 0x8000ffff, true, false, 0);
 	ClientCard* pcard;
-	for(int i = 0; i < 5; ++i) {
-		pcard = dField.mzone[0][i];
-		if(pcard && pcard->code != 0)
-			DrawStatus(pcard, 493 + i * 85, 416, 473 + i * 80, 356);
-	}
-	pcard = dField.mzone[0][5];
-	if(pcard && pcard->code != 0)
-		DrawStatus(pcard, 589, 338, 563, 291);
-	pcard = dField.mzone[0][6];
-	if(pcard && pcard->code != 0)
-		DrawStatus(pcard, 743, 338, 712, 291);
-	for(int i = 0; i < 5; ++i) {
-		pcard = dField.mzone[1][i];
-		if(pcard && (pcard->position & POS_FACEUP))
-			DrawStatus(pcard, 803 - i * 68, 235, 779 - i * 71, 272);
-	}
-	pcard = dField.mzone[1][5];
-	if(pcard && (pcard->position & POS_FACEUP))
-		DrawStatus(pcard, 739, 291, 710, 338);
-	pcard = dField.mzone[1][6];
-	if(pcard && (pcard->position & POS_FACEUP))
-		DrawStatus(pcard, 593, 291, 555, 338);
-	if(dInfo.duel_field != 4) {
-		if(dInfo.extraval & 0x1) {
-			pcard = dField.szone[0][6];
-			if(pcard) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(510, 394, 522, 414), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(511, 395, 523, 415), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[0][7];
-			if(pcard) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(795, 394, 827, 414), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(796, 395, 828, 415), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][6];
-			if(pcard) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(772, 245, 804, 265), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(773, 246, 805, 266), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][7];
-			if(pcard) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(530, 245, 562, 265), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(531, 246, 563, 266), 0xffffffff, true, false, 0);
-			}
+	int seq = (dInfo.duel_field != 4) ? 6 : (dInfo.extraval & 0x1) ? 1 : 0;
+	int increase = (dInfo.duel_field != 4) ? 1 : (dInfo.extraval & 0x1) ? 2 : 4;
+	wchar_t textBuffer[64];
+	for (int p = 0, seq2 = seq; p < 2; ++p, seq2 = seq) {
+		for (int i = 0; i < 7; ++i) {
+			pcard = dField.mzone[p][i];
+			if (pcard && pcard->code != 0 && (p == 0 || (pcard->position & POS_FACEUP)))
+				DrawStatus(pcard);
 		}
-		else {
-			pcard = dField.szone[0][6];
-			if(pcard) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(426, 394, 438, 414), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(427, 395, 439, 415), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[0][7];
-			if(pcard) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(880, 394, 912, 414), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(881, 395, 913, 415), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][6];
-			if(pcard) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(839, 245, 871, 265), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(840, 246, 872, 266), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][7];
-			if(pcard) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(463, 245, 495, 265), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(464, 246, 496, 266), 0xffffffff, true, false, 0);
-			}
+		for (int i = 0; i < 2; i++, seq2 += increase) {
+			pcard = dField.szone[p][seq2];
+			if (pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget)
+				DrawPendScale(pcard);
 		}
-	} else {
-		if(dInfo.extraval & 0x1) {
-			pcard = dField.szone[0][1];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(454+88, 430, 466+88, 450), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(455+88, 431, 467+88, 451), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[0][3];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(850-88, 430, 882-88, 450), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(851-88, 431, 883-88, 451), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][1];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(806-69, 222, 838- 69, 242), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(807- 69, 223, 839- 69, 243), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][3];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(498+ 67, 222, 530+ 67, 242), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(499+ 67, 223, 531+ 67, 243), 0xffffffff, true, false, 0);
-			}
+		if (dField.extra[p].size()) {
+			if (dField.extra_p_count[p] > 0)
+				myswprintf(textBuffer, L"%ls%ls", dataManager.GetNumString(dField.extra[p].size()), dataManager.GetNumString(dField.extra_p_count[p], true));
+			else
+				myswprintf(textBuffer, L"%ls", dataManager.GetNumString(dField.extra[p].size()));
+			DrawStackIndicator(textBuffer, matManager.vFieldExtra[p][speed], (p == 1));
 		}
-		else {
-			pcard = dField.szone[0][0];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(454, 430, 466, 450), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(455, 431, 467, 451), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[0][4];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(850, 430, 882, 450), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(851, 431, 883, 451), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][0];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->lscstring, mainGame->Resize(806, 222, 838, 242), 0xff000000, true, false, 0);
-				adFont->draw(pcard->lscstring, mainGame->Resize(807, 223, 839, 243), 0xffffffff, true, false, 0);
-			}
-			pcard = dField.szone[1][4];
-			if(pcard && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget) {
-				adFont->draw(pcard->rscstring, mainGame->Resize(498, 222, 530, 242), 0xff000000, true, false, 0);
-				adFont->draw(pcard->rscstring, mainGame->Resize(499, 223, 531, 243), 0xffffffff, true, false, 0);
-			}
-		}
-	}
-	if(dInfo.extraval & 0x1) {
-		if(dField.extra[0].size()) {
-			int offset = (dField.extra[0].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
-			numFont->draw(dataManager.GetNumString(dField.extra[0].size()), mainGame->Resize(415 + offset, 562, 466, 552), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra[0].size()), mainGame->Resize(415 + offset, 563, 468, 553), 0xffffff00, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), mainGame->Resize(435, 562, 486, 552), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), mainGame->Resize(435, 563, 488, 553), 0xffffff00, true, false, 0);
-		}
-		if(dField.deck[0].size()) {
-			numFont->draw(dataManager.GetNumString(dField.deck[0].size()), mainGame->Resize(808, 562, 922, 552), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.deck[0].size()), mainGame->Resize(809, 563, 924, 553), 0xffffff00, true, false, 0);
-		}
-		if (field == 0) {
-			if (dField.grave[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(757, 375, 904, 380), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(757, 376, 906, 381), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(932, 375, 874, 380), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(932, 376, 876, 381), 0xffffff00, true, false, 0);
-			}
-		} else {
-			if (dField.grave[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(778, 456, 910, 461), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(778, 457, 912, 462), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(757, 375, 904, 380), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(757, 376, 906, 381), 0xffffff00, true, false, 0);
-			}
-		}
-		if(dField.extra[1].size()) {
-			int offset = (dField.extra[1].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
-			numFont->draw(dataManager.GetNumString(dField.extra[1].size()), mainGame->Resize(746 + offset, 207, 836, 232), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra[1].size()), mainGame->Resize(746 + offset, 208, 838, 233), 0xffffff00, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), mainGame->Resize(766, 207, 856, 232), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), mainGame->Resize(766, 208, 858, 233), 0xffffff00, true, false, 0);
-		}
-		if(dField.deck[1].size()) {
-			numFont->draw(dataManager.GetNumString(dField.deck[1].size()), mainGame->Resize(528, 207, 544, 232), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.deck[1].size()), mainGame->Resize(528, 208, 546, 233), 0xffffff00, true, false, 0);
-		}
-		if (field == 0) {
-			if (dField.grave[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(492, 310, 534, 281), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(492, 311, 536, 282), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(374, 310, 517, 340), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(374, 311, 519, 341), 0xffffff00, true, false, 0);
-			}
-		} else {
-			if (dField.grave[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(523, 249, 530, 299), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(523, 250, 532, 300), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(492, 310, 534, 281), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(492, 311, 536, 282), 0xffffff00, true, false, 0);
-			}
-		}
-	}
-	else {
-		if(dField.extra[0].size()) {
-			int offset = (dField.extra[0].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
-			numFont->draw(dataManager.GetNumString(dField.extra[0].size()), mainGame->Resize(320 + offset, 562, 371, 552), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra[0].size()), mainGame->Resize(320 + offset, 563, 373, 553), 0xffffff00, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), mainGame->Resize(340, 562, 391, 552), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[0], true), mainGame->Resize(340, 563, 393, 553), 0xffffff00, true, false, 0);
-		}
-		if(dField.deck[0].size()) {
-			numFont->draw(dataManager.GetNumString(dField.deck[0].size()), mainGame->Resize(907, 562, 1021, 552), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.deck[0].size()), mainGame->Resize(908, 563, 1023, 553), 0xffffff00, true, false, 0);
-		}
-		if (field == 0) {
-			if (dField.grave[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(837, 375, 984, 380), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(837, 376, 986, 381), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(1015, 375, 957, 380), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(1015, 376, 959, 381), 0xffffff00, true, false, 0);
-			}
-		} else {
-			if (dField.grave[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(870, 456, 1002, 461), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[0].size()), mainGame->Resize(870, 457, 1004, 462), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[0].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(837, 375, 984, 380), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[0].size()), mainGame->Resize(837, 376, 986, 381), 0xffffff00, true, false, 0);
-			}
-		}
-		if(dField.extra[1].size()) {
-			int offset = (dField.extra[1].size() >= 10) ? 0 : mainGame->textFont->getDimension(dataManager.GetNumString(1)).Width;
-			numFont->draw(dataManager.GetNumString(dField.extra[1].size()), mainGame->Resize(808 + offset, 207, 898, 232), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra[1].size()), mainGame->Resize(808 + offset, 208, 900, 233), 0xffffff00, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), mainGame->Resize(828, 207, 918, 232), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.extra_p_count[1], true), mainGame->Resize(828, 208, 920, 233), 0xffffff00, true, false, 0);
-		}
-		if(dField.deck[1].size()) {
-			numFont->draw(dataManager.GetNumString(dField.deck[1].size()), mainGame->Resize(465, 207, 481, 232), 0xff000000, true, false, 0);
-			numFont->draw(dataManager.GetNumString(dField.deck[1].size()), mainGame->Resize(465, 208, 483, 233), 0xffffff00, true, false, 0);
-		}
-		if (field == 0) {
-			if (dField.grave[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(420, 310, 462, 281), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(420, 311, 464, 282), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(300, 310, 443, 340), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(300, 311, 445, 341), 0xffffff00, true, false, 0);
-			}
-		} else {
-			if (dField.grave[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(455, 249, 462, 299), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.grave[1].size()), mainGame->Resize(455, 250, 464, 300), 0xffffff00, true, false, 0);
-			}
-			if (dField.remove[1].size()) {
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(420, 310, 462, 281), 0xff000000, true, false, 0);
-				numFont->draw(dataManager.GetNumString(dField.remove[1].size()), mainGame->Resize(420, 311, 464, 282), 0xffffff00, true, false, 0);
-			}
-		}
+		if (dField.deck[p].size())
+			DrawStackIndicator(dataManager.GetNumString(dField.deck[p].size()), matManager.vFieldDeck[p][speed], (p == 1));
+		if (dField.grave[p].size())
+			DrawStackIndicator(dataManager.GetNumString(dField.grave[p].size()), matManager.vFieldGrave[p][field][speed], (p == 1));
+		if (dField.remove[p].size())
+			DrawStackIndicator(dataManager.GetNumString(dField.remove[p].size()), matManager.vFieldRemove[p][field][speed], (p == 1));
 	}
 }
-void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
+/*Draws the stats of a card based on its relative position
+*/
+void Game::DrawStatus(ClientCard* pcard) {
+	int x1, y1, x2, y2;
+	if (pcard->controler == 0) {
+		ConvertCoords(pcard->curPos.X, (0.39f + pcard->curPos.Y), &x1, &y1);
+		ConvertCoords((pcard->curPos.X - 0.48f), (pcard->curPos.Y - 0.66f), &x2, &y2);
+	} else {
+		ConvertCoords(pcard->curPos.X, (pcard->curPos.Y - 0.66f), &x1, &y1);
+		ConvertCoords((pcard->curPos.X - 0.48f), (0.39f + pcard->curPos.Y), &x2, &y2);
+	}
 	if(pcard->type & TYPE_LINK) {
 		adFont->draw(pcard->atkstring, mainGame->Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
 		adFont->draw(pcard->atkstring, mainGame->Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 
 			pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, true, false, 0);
-	}else{
+	} else {
 		adFont->draw(L"/", mainGame->Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
 		adFont->draw(L"/", mainGame->Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 0xffffffff, true, false, 0);
 		int w = adFont->getDimension(pcard->atkstring).Width;
@@ -806,6 +607,48 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 		adFont->draw(pcard->linkstring, mainGame->Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
 		adFont->draw(pcard->linkstring, mainGame->Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xff99ffff, false, false, 0);
 	}
+}
+/*Draws the pendulum scale value of a card in the pendulum zone based on its relative position
+*/
+void Game::DrawPendScale(ClientCard* pcard) {
+	int x, y, swap = (pcard->sequence > 1 && pcard->sequence != 6) ? 1 : 0;
+	float x0, y0, reverse = (pcard->controler == 0) ? 1.0f : -1.0f;
+	wchar_t* strscale=L"";
+	if (swap) {
+		x0 = pcard->curPos.X - 0.35f * reverse;
+		strscale = pcard->rscstring;
+	} else {
+		x0 = pcard->curPos.X + 0.35f * reverse;
+		strscale = pcard->lscstring;
+	}
+	if (pcard->controler == 0) {
+		swap = 1 - swap;
+		y0 = pcard->curPos.Y - 0.56f;
+	} else
+		y0 = pcard->curPos.Y + 0.29f;
+	ConvertCoords(x0, y0, &x, &y);
+	adFont->draw(strscale, mainGame->Resize(x - (12 * swap), y, x + (12 * (1 - swap)), y - 800), 0xff000000, true, false, 0);
+	adFont->draw(strscale, mainGame->Resize(x + 1 - (12 * swap), y, x + 1 + (12 * (1 - swap)), y - 800), 0xffffffff, true, false, 0);
+}
+/*Draws the text in the middle of the bottom side of the zone
+*/
+void Game::DrawStackIndicator(const wchar_t* text, S3DVertex* v, bool opponent) {
+	int x, y, width = mainGame->textFont->getDimension(text).Width / 2, height = mainGame->textFont->getDimension(text).Height / 2;
+	float x0 = (v[0].Pos.X + v[1].Pos.X) / 2;
+	float y0 = (opponent) ? v[0].Pos.Y : v[2].Pos.Y;
+	ConvertCoords(x0, y0, &x, &y);
+	numFont->draw(text, mainGame->Resize(x - width, y - height + 2, x + width, y + height), 0xff000000, true, false, 0);
+	numFont->draw(text, mainGame->Resize(x - width, y - height + 3, x + width, y + height + 1), 0xffffff00, true, false, 0);
+}
+/*Converts the coordinates from the 3d plane to the 2d plane (the window)
+*/
+void Game::ConvertCoords(float x, float y, int* x1, int* y1) {
+	double angle = atan((y - 8.0) / -7.8);
+	double screeny = tan(0.798056 - angle);			//0.798056 = arctan(8.0/7.8), to avoid calculating it every time
+	double vlen = sqrt(1.0 + screeny * screeny);
+	double screenx = (x - 4.2) / (7.8 / vlen / cos(angle));
+	*x1 = (screenx + 0.90) * 1024.0 / 1.35;
+	*y1 = (screeny + 0.42) * 640.0 / 0.84;
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {

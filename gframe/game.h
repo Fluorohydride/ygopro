@@ -105,7 +105,10 @@ public:
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();
-	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
+	void DrawStatus(ClientCard* pcard);
+	void DrawPendScale(ClientCard* pcard);
+	void DrawStackIndicator(const wchar_t* text, S3DVertex* v, bool opponent);
+	void ConvertCoords(float x, float y, int* x1, int* y1);
 	void DrawGUI();
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture);
