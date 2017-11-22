@@ -60,7 +60,6 @@ public:
 	code_pointer draging_pointer;
 	int prev_deck;
 	s32 prev_operation;
-	bool shiftpress;
 
 	std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;

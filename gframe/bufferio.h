@@ -117,7 +117,9 @@ public:
 			ret = ret * 10 + (*pstr - L'0');
 			pstr++;
 		}
-		return ret;
+		if(*pstr == 0)
+			return ret;
+		return 0;
 	}
 };
 

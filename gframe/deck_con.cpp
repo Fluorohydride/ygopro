@@ -80,7 +80,6 @@ void DeckBuilder::Initialize() {
 	is_draging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
-	shiftpress = false;
 	mainGame->device->setEventReceiver(this);
 }
 void DeckBuilder::Terminate() {
@@ -560,7 +559,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					auto pointer = dataManager.GetCodePointer(hovered_code);
 					if(pointer == dataManager._datas.end())
 						break;
-					if(shiftpress)
+					if(event.MouseInput.Shift)
 						push_side(pointer);
 					else {
 						if (!check_limit(pointer))
@@ -630,18 +629,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		default: break;
-		}
-		break;
-	}
-	case irr::EET_KEY_INPUT_EVENT: {
-		switch (event.KeyInput.Key) {
-		case irr::KEY_SHIFT:
-		case irr::KEY_LSHIFT:
-		case irr::KEY_RSHIFT: {
-			shiftpress = event.KeyInput.PressedDown;
-			return true;
-			break;
-		}
 		}
 		break;
 	}
