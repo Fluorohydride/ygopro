@@ -158,6 +158,7 @@ bool Game::Initialize() {
 	cbRule->addItem(dataManager.GetSysString(1241));
 	cbRule->addItem(dataManager.GetSysString(1242));
 	cbRule->addItem(dataManager.GetSysString(1243));
+	cbRule->setSelected(gameConf.defaultOT - 1);
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
@@ -468,6 +469,12 @@ bool Game::Initialize() {
 	btnClearDeck = env->addButton(rect<s32>(115, 99, 165, 120), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304));
 	btnSideOK = env->addButton(rect<s32>(510, 40, 820, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334));
 	btnSideOK->setVisible(false);
+	btnSideShuffle = env->addButton(rect<s32>(310, 100, 370, 130), 0, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307));
+	btnSideShuffle->setVisible(false);
+	btnSideSort = env->addButton(rect<s32>(375, 100, 435, 130), 0, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
+	btnSideSort->setVisible(false);
+	btnSideReload = env->addButton(rect<s32>(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, dataManager.GetSysString(1309));
+	btnSideReload->setVisible(false);
 	//
 	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(10);
@@ -961,6 +968,7 @@ void Game::LoadConfig() {
 	gameConf.separate_clear_button = 1;
 	gameConf.auto_search_limit = -1;
 	gameConf.chkIgnoreDeckChanges = 0;
+	gameConf.defaultOT = 1;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1019,6 +1027,8 @@ void Game::LoadConfig() {
 			gameConf.auto_search_limit = atoi(valbuf);
 		} else if(!strcmp(strbuf, "ignore_deck_changes")) {
 			gameConf.chkIgnoreDeckChanges = atoi(valbuf);
+		} else if(!strcmp(strbuf, "default_ot")) {
+			gameConf.defaultOT = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1077,6 +1087,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "#auto_search_limit >= 0: Start search automatically when the user enters N chars\n");
 	fprintf(fp, "auto_search_limit = %d\n", gameConf.auto_search_limit);
 	fprintf(fp, "ignore_deck_changes = %d\n", ((mainGame->chkIgnoreDeckChanges->isChecked()) ? 1 : 0));
+	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {

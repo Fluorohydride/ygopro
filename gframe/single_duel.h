@@ -46,6 +46,7 @@ protected:
 	DuelPlayer* pplayer[2];
 	bool ready[2];
 	Deck pdeck[2];
+	int deck_error[2];
 	unsigned char hand_result[2];
 	unsigned char last_response;
 	std::set<DuelPlayer*> observers;
