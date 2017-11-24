@@ -652,8 +652,6 @@ bool Game::Initialize() {
 	//swap
 	btnSpectatorSwap = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnSpectatorSwap->setVisible(false);
-	btnHandSwap = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_HAND_SWAP, dataManager.GetSysString(1346));
-	btnHandSwap->setVisible(false);
 	//chain buttons
 	btnChainIgnore = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_CHAIN_IGNORE, dataManager.GetSysString(1292));
 	btnChainAlways = env->addButton(rect<s32>(205, 140, 295, 175), 0, BUTTON_CHAIN_ALWAYS, dataManager.GetSysString(1293));
@@ -1430,7 +1428,6 @@ void Game::CloseDuelWindow() {
 	btnSideOK->setVisible(false);
 	btnLeaveGame->setVisible(false);
 	btnSpectatorSwap->setVisible(false);
-	btnHandSwap->setVisible(false);
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
@@ -1674,7 +1671,6 @@ void Game::OnResize()
 		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	}
 	btnSpectatorSwap->setRelativePosition(Resize(205, 100, 295, 135));
-	btnHandSwap->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainAlways->setRelativePosition(Resize(205, 140, 295, 175));
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
