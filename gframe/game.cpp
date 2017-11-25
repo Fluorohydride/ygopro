@@ -844,7 +844,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 		u32 w = font->getCharDimension(c).Width + font->getKerningWidth(c, prev);
 		prev = c;
 		if (c == L' ') {
-			lsnz = i;
+			lsnz = pbuffer;
 			if (_width + s > cWidth) {
 				temp[pbuffer++] = L'\n';
 				_width = 0;
@@ -858,15 +858,19 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 			_width = 0;
 		} else {
 			if((_width += w) > cWidth) {
-				temp[lsnz] = L'\n';
-				_width = 0;
-				for(int j = lsnz + 1; j < i; j++) {
-					_width += font->getCharDimension(text[j]).Width;
-				}
-				if (_width > cWidth) {
-					temp[lsnz] = L' ';
-					temp[pbuffer++] = L'\n';
+				if(lsnz) {
+					wchar_t old = temp[lsnz];
+					temp[lsnz] = L'\n';
 					_width = 0;
+					for (int j = lsnz + 1; j < i; j++) {
+						_width += font->getCharDimension(text[j]).Width;
+					}
+					if(_width > cWidth)
+						temp[lsnz] = old;
+				}
+				if(_width > cWidth) {
+					temp[pbuffer++] = L'\n';
+					_width = w;
 				}
 			}
 			temp[pbuffer++] = c;
@@ -1254,10 +1258,12 @@ void Game::PlayBGM() {
 		}
 	}
 }
-void Game::ShowCardInfo(int code) {
+void Game::ShowCardInfo(int code, bool resize) {
+	if (showingcard == code && !resize)
+		return;
+	showingcard = code;
 	CardData cd;
 	wchar_t formatBuffer[256];
-	showingcard = code;
 	if(!dataManager.GetData(code, &cd))
 		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code, true));
@@ -1266,7 +1272,7 @@ void Game::ShowCardInfo(int code) {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
-	int offset = 37;
+	stSetName->setText(L"");
 	if(!gameConf.chkHideSetname) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
@@ -1277,10 +1283,7 @@ void Game::ShowCardInfo(int code) {
 		if(sc) {
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
 			SetStaticText(stSetName, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
-		} else
-			stSetName->setText(L"");
-	} else {
-		stSetName->setText(L"");
+		}
 	}
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
@@ -1318,7 +1321,8 @@ void Game::ShowCardInfo(int code) {
 		SetStaticText(stInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
 		stDataInfo->setText(L"");
 	}
-	stInfo->setRelativePosition(rect<s32>(15, offset, 296 * window_size.Width / 1024, offset + textFont->getDimension(stInfo->getText()).Height));
+	int offset = 37;
+	stInfo->setRelativePosition(rect<s32>(15, offset, (296 * window_size.Width / 1024), offset + textFont->getDimension(stInfo->getText()).Height));
 	offset += textFont->getDimension(stInfo->getText()).Height;
 	if(wcscmp(stDataInfo->getText(), L"")) {
 		stDataInfo->setRelativePosition(rect<s32>(15, offset, 296 * window_size.Width / 1024, offset + textFont->getDimension(stDataInfo->getText()).Height));
@@ -1625,7 +1629,7 @@ void Game::OnResize()
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	const auto& tsize = stText->getRelativePosition();
 	if(showingcard)
-		ShowCardInfo(showingcard);
+		ShowCardInfo(showingcard, true);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
 	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
 
