@@ -66,7 +66,7 @@ bool Game::Initialize() {
 	ignore_chain = false;
 	chain_when_avail = false;
 	is_building = false;
-	texty = 0;
+	showingcard = 0;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
@@ -863,6 +863,11 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 				for(int j = lsnz + 1; j < i; j++) {
 					_width += font->getCharDimension(text[j]).Width;
 				}
+				if (_width > cWidth) {
+					temp[lsnz] = L' ';
+					temp[pbuffer++] = L'\n';
+					_width = 0;
+				}
 			}
 			temp[pbuffer++] = c;
 		}
@@ -1252,6 +1257,7 @@ void Game::PlayBGM() {
 void Game::ShowCardInfo(int code) {
 	CardData cd;
 	wchar_t formatBuffer[256];
+	showingcard = code;
 	if(!dataManager.GetData(code, &cd))
 		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code, true));
@@ -1260,7 +1266,7 @@ void Game::ShowCardInfo(int code) {
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
-	int offset = 0;
+	int offset = 37;
 	if(!gameConf.chkHideSetname) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
@@ -1269,9 +1275,8 @@ void Game::ShowCardInfo(int code) {
 				sc = aptr->second.setcode;
 		}
 		if(sc) {
-			offset = 23;
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
-			stSetName->setText(formatBuffer);
+			SetStaticText(stSetName, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
 		} else
 			stSetName->setText(L"");
 	} else {
@@ -1279,7 +1284,7 @@ void Game::ShowCardInfo(int code) {
 	}
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
-		stInfo->setText(formatBuffer);
+		SetStaticText(stInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
 		if(cd.type & TYPE_LINK){
 			if (cd.attack < 0)
 				myswprintf(formatBuffer, L"?/Link %d	", cd.level);
@@ -1307,18 +1312,24 @@ void Game::ShowCardInfo(int code) {
 			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
 			wcscat(formatBuffer, scaleBuffer);
 		}
-		stDataInfo->setText(formatBuffer);
-		stSetName->setRelativePosition(rect<s32>(15, 83, 316 * window_size.Width / 1024 - 30, 116));
-		texty = 83 + offset;
+		SetStaticText(stDataInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
-		stInfo->setText(formatBuffer);
+		SetStaticText(stInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
 		stDataInfo->setText(L"");
-		stSetName->setRelativePosition(rect<s32>(15, 60, 316 * window_size.Height / 640, 83));
-		texty = 60 + offset;
 	}
-	stText->setRelativePosition(rect<s32>(15, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-	scrCardText->setRelativePosition(rect<s32>(267 * window_size.Width / 1024, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+	stInfo->setRelativePosition(rect<s32>(15, offset, 296 * window_size.Width / 1024, offset + textFont->getDimension(stInfo->getText()).Height));
+	offset += textFont->getDimension(stInfo->getText()).Height;
+	if(wcscmp(stDataInfo->getText(), L"")) {
+		stDataInfo->setRelativePosition(rect<s32>(15, offset, 296 * window_size.Width / 1024, offset + textFont->getDimension(stDataInfo->getText()).Height));
+		offset += textFont->getDimension(stDataInfo->getText()).Height;
+	}
+	if(wcscmp(stSetName->getText(), L"")) {
+		stSetName->setRelativePosition(rect<s32>(15, offset, 296 * window_size.Width / 1024, offset + textFont->getDimension(stSetName->getText()).Height));
+		offset += textFont->getDimension(stSetName->getText()).Height;
+	}
+	stText->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+	scrCardText->setRelativePosition(rect<s32>(267 * window_size.Width / 1024, offset, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
 	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
@@ -1611,14 +1622,10 @@ void Game::OnResize()
 	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
-	stInfo->setRelativePosition(recti(15, 37, 296 * window_size.Width / 1024, 60));
-	stDataInfo->setRelativePosition(recti(15, 60, 296 * window_size.Width / 1024, 83));
-	stText->setRelativePosition(recti(15, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-	scrCardText->setRelativePosition(rect<s32>(267 * window_size.Width / 1024, texty, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	const auto& tsize = stText->getRelativePosition();
-	if(texty)
-		InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
+	if(showingcard)
+		ShowCardInfo(showingcard);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
 	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
 

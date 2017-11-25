@@ -194,7 +194,7 @@ public:
 	bool is_siding;
 	int forbiddentypes;
 	uint32 duel_param;
-	int texty;
+	uint32 showingcard;
 
 	irr::core::dimension2d<irr::u32> window_size;
 
