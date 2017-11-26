@@ -556,17 +556,19 @@ bool Game::Initialize() {
 	wSinglePlay->getCloseButton()->setVisible(false);
 	wSinglePlay->setVisible(false);
 	irr::gui::IGUITabControl* wSingle = env->addTabControl(rect<s32>(0, 20, 579, 419), wSinglePlay, true);
-	irr::gui::IGUITab* tabBot = wSingle->addTab(dataManager.GetSysString(1380));
-	lstBotList = env->addListBox(rect<s32>(10, 10, 350, 350), tabBot, LISTBOX_BOT_LIST, true);
-	lstBotList->setItemHeight(18);
-	btnStartBot = env->addButton(rect<s32>(459, 301, 569, 326), tabBot, BUTTON_BOT_START, dataManager.GetSysString(1211));
-	btnBotCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabBot, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
-	env->addStaticText(dataManager.GetSysString(1382), rect<s32>(360, 10, 550, 30), false, true, tabBot);
-	stBotInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 160), false, true, tabBot);
-	chkBotOldRule = env->addCheckBox(false, rect<s32>(360, 170, 560, 190), tabBot, CHECKBOX_BOT_OLD_RULE, dataManager.GetSysString(1383));
-	chkBotHand = env->addCheckBox(false, rect<s32>(360, 200, 560, 220), tabBot, -1, dataManager.GetSysString(1384));
-	chkBotNoCheckDeck = env->addCheckBox(false, rect<s32>(360, 230, 560, 250), tabBot, -1, dataManager.GetSysString(1229));
-	chkBotNoShuffleDeck = env->addCheckBox(false, rect<s32>(360, 260, 560, 280), tabBot, -1, dataManager.GetSysString(1230));
+	if(gameConf.enable_bot_mode) {
+		irr::gui::IGUITab* tabBot = wSingle->addTab(dataManager.GetSysString(1380));
+		lstBotList = env->addListBox(rect<s32>(10, 10, 350, 350), tabBot, LISTBOX_BOT_LIST, true);
+		lstBotList->setItemHeight(18);
+		btnStartBot = env->addButton(rect<s32>(459, 301, 569, 326), tabBot, BUTTON_BOT_START, dataManager.GetSysString(1211));
+		btnBotCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabBot, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
+		env->addStaticText(dataManager.GetSysString(1382), rect<s32>(360, 10, 550, 30), false, true, tabBot);
+		stBotInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 160), false, true, tabBot);
+		chkBotOldRule = env->addCheckBox(false, rect<s32>(360, 170, 560, 190), tabBot, CHECKBOX_BOT_OLD_RULE, dataManager.GetSysString(1383));
+		chkBotHand = env->addCheckBox(false, rect<s32>(360, 200, 560, 220), tabBot, -1, dataManager.GetSysString(1384));
+		chkBotNoCheckDeck = env->addCheckBox(false, rect<s32>(360, 230, 560, 250), tabBot, -1, dataManager.GetSysString(1229));
+		chkBotNoShuffleDeck = env->addCheckBox(false, rect<s32>(360, 260, 560, 280), tabBot, -1, dataManager.GetSysString(1230));
+	}
 	irr::gui::IGUITab* tabSingle = wSingle->addTab(dataManager.GetSysString(1381));
 	lstSinglePlayList = env->addListBox(rect<s32>(10, 10, 350, 350), tabSingle, LISTBOX_SINGLEPLAY_LIST, true);
 	lstSinglePlayList->setItemHeight(18);
@@ -914,6 +916,8 @@ void Game::RefreshSingleplay() {
 #endif
 }
 void Game::RefreshBot() {
+	if(!gameConf.enable_bot_mode)
+		return;
 	botInfo.clear();
 	FILE* fp = fopen("bot.conf", "r");
 	char linebuf[256];
@@ -988,6 +992,7 @@ void Game::LoadConfig() {
 	gameConf.auto_search_limit = -1;
 	gameConf.chkIgnoreDeckChanges = 0;
 	gameConf.defaultOT = 1;
+	gameConf.enable_bot_mode = 0;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1048,6 +1053,10 @@ void Game::LoadConfig() {
 			gameConf.chkIgnoreDeckChanges = atoi(valbuf);
 		} else if(!strcmp(strbuf, "default_ot")) {
 			gameConf.defaultOT = atoi(valbuf);
+		} else if(!strcmp(strbuf, "enable_bot_mode")) {
+#ifdef _WIN32
+			gameConf.enable_bot_mode = atoi(valbuf);
+#endif
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1107,6 +1116,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "auto_search_limit = %d\n", gameConf.auto_search_limit);
 	fprintf(fp, "ignore_deck_changes = %d\n", ((mainGame->chkIgnoreDeckChanges->isChecked()) ? 1 : 0));
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
+	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {

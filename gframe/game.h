@@ -41,6 +41,7 @@ struct Config {
 	int auto_search_limit;
 	int chkIgnoreDeckChanges;
 	int defaultOT;
+	int enable_bot_mode;
 };
 
 struct DuelInfo {
