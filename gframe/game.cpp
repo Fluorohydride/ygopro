@@ -933,9 +933,10 @@ void Game::RefreshBot() {
 				sscanf(linebuf, "%240[^\n]", strbuf);
 				BufferIO::DecodeUTF8(strbuf, newinfo.desc);
 				fgets(linebuf, 256, fp);
-				sscanf(linebuf, "%d", &newinfo.flag);
-				if((chkBotOldRule->isChecked() && (newinfo.flag & 0x1))
-					|| (!chkBotOldRule->isChecked() && (newinfo.flag & 0x2)))
+				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
+				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
+				if((chkBotOldRule->isChecked() && newinfo.support_master_rule_3)
+					|| (!chkBotOldRule->isChecked() && newinfo.support_new_master_rule))
 					botInfo.push_back(newinfo);
 				continue;
 			}
@@ -948,7 +949,7 @@ void Game::RefreshBot() {
 		lstBotList->addItem(botInfo[i].name);
 	}
 	if(botInfo.size() == 0)
-		stBotInfo->setText(dataManager.GetSysString(1385));
+		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
 }
 void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");

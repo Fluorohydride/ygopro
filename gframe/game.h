@@ -69,10 +69,11 @@ struct DuelInfo {
 };
 
 struct BotInfo {
-	wchar_t name[32];
+	wchar_t name[256];
 	wchar_t command[256];
 	wchar_t desc[256];
-	int flag;
+	bool support_master_rule_3;
+	bool support_new_master_rule;
 };
 
 struct FadingUnit {
