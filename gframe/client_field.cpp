@@ -710,14 +710,8 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	t->Z = 0;
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
 	int speed = (mainGame->dInfo.extraval & 0x1) ? 1 : 0;
-	switch((location & 0x7f)) {
-	case LOCATION_DECK: {
-		t->X = (matManager.vFieldDeck[controler][speed][0].Pos.X + matManager.vFieldDeck[controler][speed][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldDeck[controler][speed][0].Pos.Y + matManager.vFieldDeck[controler][speed][2].Pos.Y) / 2;
-		t->Z = deck[controler].size() * 0.01f + 0.03f;
-		break;
-	}
-	case LOCATION_HAND: {
+	S3DVertex loc[4];
+	if ((location & 0x7f) == LOCATION_HAND) {
 		if (controler == 0) {
 			t->X = 2.95f;
 			t->Y = 3.15f;
@@ -727,38 +721,50 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 			t->Y = -3.15f;
 			t->Z = 0.03f;
 		}
+		return;
+	}
+	bool chk = false;
+	switch((location & 0x7f)) {
+	case LOCATION_DECK: {
+		std::copy(matManager.vFieldDeck[controler][speed], matManager.vFieldDeck[controler][speed] + 4, loc);
+		t->Z = deck[controler].size() * 0.01f + 0.03f;
+		chk = true;
 		break;
 	}
 	case LOCATION_MZONE: {
-		t->X = (matManager.vFieldMzone[controler][sequence][0].Pos.X + matManager.vFieldMzone[controler][sequence][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldMzone[controler][sequence][0].Pos.Y + matManager.vFieldMzone[controler][sequence][2].Pos.Y) / 2;
+		std::copy(matManager.vFieldMzone[controler][sequence], matManager.vFieldMzone[controler][sequence] + 4, loc);
 		t->Z = 0.03f;
+		chk = true;
 		break;
 	}
 	case LOCATION_SZONE: {
-		t->X = (matManager.vFieldSzone[controler][sequence][field][speed][0].Pos.X + matManager.vFieldSzone[controler][sequence][field][speed][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldSzone[controler][sequence][field][speed][0].Pos.Y + matManager.vFieldSzone[controler][sequence][field][speed][2].Pos.Y) / 2;
+		std::copy(matManager.vFieldSzone[controler][sequence][field][speed], matManager.vFieldSzone[controler][sequence][field][speed] + 4, loc);
 		t->Z = 0.03f;
+		chk = true;
 		break;
 	}
 	case LOCATION_GRAVE: {
-		t->X = (matManager.vFieldGrave[controler][field][speed][0].Pos.X + matManager.vFieldGrave[controler][field][speed][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldGrave[controler][field][speed][0].Pos.Y + matManager.vFieldGrave[controler][field][speed][2].Pos.Y) / 2;
+		std::copy(matManager.vFieldGrave[controler][field][speed], matManager.vFieldGrave[controler][field][speed] + 4, loc);
 		t->Z = grave[controler].size() * 0.01f + 0.03f;
+		chk = true;
 		break;
 	}
 	case LOCATION_REMOVED: {
-		t->X = (matManager.vFieldRemove[controler][field][speed][0].Pos.X + matManager.vFieldRemove[controler][field][speed][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldRemove[controler][field][speed][0].Pos.Y + matManager.vFieldRemove[controler][field][speed][2].Pos.Y) / 2;
+		std::copy(matManager.vFieldRemove[controler][field][speed], matManager.vFieldRemove[controler][field][speed] + 4, loc);
 		t->Z = remove[controler].size() * 0.01f + 0.03f;
+		chk = true;
 		break;
 	}
 	case LOCATION_EXTRA: {
-		t->X = (matManager.vFieldExtra[controler][speed][0].Pos.X + matManager.vFieldExtra[controler][speed][1].Pos.X) / 2;
-		t->Y = (matManager.vFieldExtra[controler][speed][0].Pos.Y + matManager.vFieldExtra[controler][speed][2].Pos.Y) / 2;
+		std::copy(matManager.vFieldExtra[controler][speed], matManager.vFieldExtra[controler][speed] + 4, loc);
 		t->Z = extra[controler].size() * 0.01f + 0.03f;
+		chk = true;
 		break;
 	}
+	}
+	if(chk) {
+		t->X = (loc[0].Pos.X + loc[1].Pos.X) / 2;
+		t->Y = (loc[0].Pos.Y + loc[2].Pos.Y) / 2;
 	}
 }
 void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
