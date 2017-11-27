@@ -120,7 +120,7 @@ public:
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
-	void ShowCardInfo(int code);
+	void ShowCardInfo(int code, bool resize = false);
 	void AddChatMsg(wchar_t* msg, int player);
 	void AddDebugMsg(char* msgbuf);
 	void ClearTextures();

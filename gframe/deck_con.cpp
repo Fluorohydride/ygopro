@@ -98,6 +98,13 @@ void DeckBuilder::Terminate() {
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
 	mainGame->ClearTextures();
+	mainGame->stName->setText(L"");
+	mainGame->stInfo->setText(L"");
+	mainGame->stDataInfo->setText(L"");
+	mainGame->stSetName->setText(L"");
+	mainGame->stText->setText(L"");
+	mainGame->showingcard = 0;
+	mainGame->scrCardText->setVisible(false);
 	mainGame->scrFilter->setVisible(false);
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)
@@ -212,6 +219,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				mainGame->imgCard->setImage(imageManager.tCover[0]);
+				mainGame->stName->setText(L"");
+				mainGame->stInfo->setText(L"");
+				mainGame->stDataInfo->setText(L"");
+				mainGame->stSetName->setText(L"");
+				mainGame->stText->setText(L"");
+				mainGame->showingcard = 0;
+				mainGame->scrCardText->setVisible(false);
 				char deckbuf[1024];
 				char* pdeck = deckbuf;
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());

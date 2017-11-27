@@ -1412,6 +1412,7 @@ void Game::AddDebugMsg(char* msg)
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	imgCard->setImage(imageManager.tCover[0]);
+	scrCardText->setVisible(false);
 	imgCard->setScaleImage(true);
 	btnPSAU->setImage();
 	btnPSDU->setImage();
@@ -1460,6 +1461,13 @@ void Game::CloseDuelWindow() {
 	lstHostList->clear();
 	DuelClient::hosts.clear();
 	ClearTextures();
+	stName->setText(L"");
+	stInfo->setText(L"");
+	stDataInfo->setText(L"");
+	stSetName->setText(L"");
+	stText->setText(L"");
+	showingcard = 0;
+	scrCardText->setVisible(false);
 	closeDoneSignal.Set();
 }
 int Game::LocalPlayer(int player) {
