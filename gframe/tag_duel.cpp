@@ -352,7 +352,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_TAG;
+	rh.flag = REPLAY_TAG + REPLAY_LUA64;
 	time_t seed = time(0);
 	rh.seed = seed;
 	last_replay.BeginRecord();

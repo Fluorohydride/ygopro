@@ -393,7 +393,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = 0;
+	rh.flag = REPLAY_LUA64;
 	time_t seed = time(0);
 	rh.seed = seed;
 	last_replay.BeginRecord();

@@ -81,7 +81,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE;
+	rh.flag = REPLAY_SINGLE_MODE + REPLAY_LUA64;
 	rh.seed = seed;
 	mainGame->gMutex.Lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
