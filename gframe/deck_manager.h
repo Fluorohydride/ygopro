@@ -37,9 +37,9 @@ public:
 
 	void LoadLFList();
 	wchar_t* GetLFListName(int lfhash);
-	int CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes = 0);
+	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes = 0);
 	int TypeCount(std::vector<code_pointer> cards, int type);
-	void LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0, bool doubled = false);
+	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0, bool doubled = false);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	FILE* OpenDeckFile(const wchar_t * file, const char * mode);
 	bool LoadDeck(const wchar_t* file);
