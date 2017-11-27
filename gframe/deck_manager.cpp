@@ -83,6 +83,8 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	if(!list)
 		return 0;
 	int dc = 0;
+	if(TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
+		return (DECKERROR_FORBTYPE << 28);
 	bool speed = mainGame->dInfo.extraval & 0x1;
 	if(doubled){
 		if(speed){

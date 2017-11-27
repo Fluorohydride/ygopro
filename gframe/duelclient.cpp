@@ -293,6 +293,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				myswprintf(msgbuf, dataManager.GetSysString(1419), code);
 				break;
 			}
+			case DECKERROR_FORBTYPE: {
+				myswprintf(msgbuf, dataManager.GetSysString(1421));
+				break;
+			}
 			default: {
 				myswprintf(msgbuf, dataManager.GetSysString(1406));
 				break;
