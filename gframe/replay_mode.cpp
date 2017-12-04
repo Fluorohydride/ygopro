@@ -60,39 +60,106 @@ bool ReplayMode::ReadReplayResponse() {
 int ReplayMode::ReplayThread(void* param) {
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
-	mtrandom rnd;
-	int seed = rh.seed;
-	rnd.reset(seed);
-	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadName(mainGame->dInfo.hostname);
-		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
-		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
-		cur_replay.ReadName(mainGame->dInfo.clientname);
-		mainGame->dInfo.isTag = true;
-		mainGame->dInfo.tag_player[0] = false;
-		mainGame->dInfo.tag_player[1] = false;
-	} else {
-		cur_replay.ReadName(mainGame->dInfo.hostname);
-		cur_replay.ReadName(mainGame->dInfo.clientname);
-		mainGame->dInfo.isTag = false;
-	}
-	if(rh.flag & REPLAY_SINGLE_MODE) {
+	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
+	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
+	mainGame->dInfo.lua64 = !!(rh.flag & REPLAY_LUA64);
+	mainGame->dInfo.tag_player[0] = false;
+	mainGame->dInfo.tag_player[1] = false;
+	if(mainGame->dInfo.isSingleMode) {
 		set_script_reader((script_reader)SingleMode::ScriptReader);
 		set_card_reader((card_reader)DataManager::CardReader);
 		set_message_handler((message_handler)MessageHandler);
-		mainGame->dInfo.isSingleMode = true;
 	} else {
 		set_script_reader(default_script_reader);
 		set_card_reader((card_reader)DataManager::CardReader);
 		set_message_handler((message_handler)MessageHandler);
-		mainGame->dInfo.isSingleMode = false;
 	}
-	mainGame->dInfo.lua64 = (rh.flag & REPLAY_LUA64) ? 1 : 0;
+	if(!StartDuel()) {
+		EndDuel();
+		return 0;
+	}
+	mainGame->dInfo.isStarted = true;
+	mainGame->dInfo.isReplay = true;
+	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
+	char engineBuffer[0x1000];
+	is_continuing = true;
+	skip_step = 0;
+	if(mainGame->dInfo.isSingleMode) {
+		int len = get_message(pduel, (byte*)engineBuffer);
+		if (len > 0)
+			is_continuing = ReplayAnalyze(engineBuffer, len);
+	} else {
+		ReplayRefreshDeck(0);
+		ReplayRefreshDeck(1);
+		ReplayRefreshExtra(0);
+		ReplayRefreshExtra(1);
+	}
+	exit_pending = false;
+	current_step = 0;
+	if(mainGame->dInfo.isReplaySkiping)
+		mainGame->gMutex.Lock();
+	while (is_continuing && !exit_pending) {
+		int result = process(pduel);
+		int len = result & 0xffff;
+		/*int flag = result >> 16;*/
+		if (len > 0) {
+			get_message(pduel, (byte*)engineBuffer);
+			is_continuing = ReplayAnalyze(engineBuffer, len);
+			if(is_restarting) {
+				is_restarting = false;
+				int step = current_step - 1;
+				if(step < 0)
+					step = 0;
+				if(mainGame->dInfo.isSingleMode) {
+					is_continuing = true;
+					skip_step = 0;
+					int len = get_message(pduel, (byte*)engineBuffer);
+					if (len > 0) {
+						mainGame->gMutex.Unlock();
+						is_continuing = ReplayAnalyze(engineBuffer, len);
+						mainGame->gMutex.Lock();
+					}
+				}
+				if(step == 0) {
+					Pause(true, false);
+					mainGame->dInfo.isStarted = true;
+					mainGame->dInfo.isReplaySkiping = false;
+					mainGame->dField.RefreshAllCards();
+					mainGame->gMutex.Unlock();
+				}
+				skip_step = step;
+				current_step = 0;
+			}
+		}
+	}
+	if(mainGame->dInfo.isReplaySkiping) {
+		mainGame->dInfo.isReplaySkiping = false;
+		mainGame->dField.RefreshAllCards();
+		mainGame->gMutex.Unlock();
+	}
+	EndDuel();
+	return 0;
+}
+bool ReplayMode::StartDuel() {
+	const ReplayHeader& rh = cur_replay.pheader;
+	mtrandom rnd;
+	int seed = rh.seed;
+	rnd.reset(seed);
+	if(mainGame->dInfo.isTag) {
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
+	} else {
+		cur_replay.ReadName(mainGame->dInfo.hostname);
+		cur_replay.ReadName(mainGame->dInfo.clientname);
+	}
 	pduel = create_duel(rnd.rand());
 	int start_lp = cur_replay.ReadInt32();
 	int start_hand = cur_replay.ReadInt32();
 	int draw_count = cur_replay.ReadInt32();
 	int opt = cur_replay.ReadInt32();
+	int duel_rule = opt >> 16;
 	int rule = opt >> 16; //backwards compatibility with master rule replays
 	if(rule)
 		switch (rule) {
@@ -126,11 +193,7 @@ int ReplayMode::ReplayThread(void* param) {
 		mainGame->dInfo.duel_field = 4;
 	else if(opt & DUEL_PZONE)
 		mainGame->dInfo.duel_field = 3;
-	mainGame->dInfo.extraval = (opt & SPEED_DUEL) ? 1 : 0;
-	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
-	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
-	mainGame->dInfo.lp[0] = start_lp;
-	mainGame->dInfo.lp[1] = start_lp;
+	mainGame->dInfo.extraval = !!(opt & SPEED_DUEL);
 	// reset master rule 4 phase button position
 	mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 310, 855, 330));
 	if(mainGame->dInfo.extraval) {
@@ -168,155 +231,6 @@ int ReplayMode::ReplayThread(void* param) {
 		mainGame->btnEP->setRelativePosition(mainGame->Resize(320, 0, 370, 20));
 		mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
 	}
-	if(!mainGame->dInfo.isSingleMode) {
-		if(!(opt & DUEL_TAG_MODE)) {
-			int main = cur_replay.ReadInt32();
-			for(int i = 0; i < main; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-			int extra = cur_replay.ReadInt32();
-			for(int i = 0; i < extra; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-			mainGame->dField.Initial(0, main, extra);
-			main = cur_replay.ReadInt32();
-			for(int i = 0; i < main; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-			extra = cur_replay.ReadInt32();
-			for(int i = 0; i < extra; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-			mainGame->dField.Initial(1, main, extra);
-		} else {
-			int main = cur_replay.ReadInt32();
-			for(int i = 0; i < main; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-			int extra = cur_replay.ReadInt32();
-			for(int i = 0; i < extra; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-			mainGame->dField.Initial(0, main, extra);
-			main = cur_replay.ReadInt32();
-			for(int i = 0; i < main; ++i)
-				new_tag_card(pduel, cur_replay.ReadInt32(), 0, LOCATION_DECK);
-			extra = cur_replay.ReadInt32();
-			for(int i = 0; i < extra; ++i)
-				new_tag_card(pduel, cur_replay.ReadInt32(), 0, LOCATION_EXTRA);
-			main = cur_replay.ReadInt32();
-			for(int i = 0; i < main; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-			extra = cur_replay.ReadInt32();
-			for(int i = 0; i < extra; ++i)
-				new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-			mainGame->dField.Initial(1, main, extra);
-			main = cur_replay.ReadInt32();
-			for(int i = 0; i < main; ++i)
-				new_tag_card(pduel, cur_replay.ReadInt32(), 1, LOCATION_DECK);
-			extra = cur_replay.ReadInt32();
-			for(int i = 0; i < extra; ++i)
-				new_tag_card(pduel, cur_replay.ReadInt32(), 1, LOCATION_EXTRA);
-		}
-	} else {
-		char filename[256];
-		size_t slen = cur_replay.ReadInt16();
-		cur_replay.ReadData(filename, slen);
-		filename[slen] = 0;
-		if(!preload_script(pduel, filename, slen)) {
-			end_duel(pduel);
-			return 0;
-		}
-	}
-	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
-	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
-	mainGame->dInfo.turn = 0;
-	start_duel(pduel, opt);
-	mainGame->dInfo.isStarted = true;
-	mainGame->dInfo.isReplay = true;
-	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
-	char engineBuffer[0x1000];
-	is_continuing = true;
-	if(mainGame->dInfo.isSingleMode) {
-		int len = get_message(pduel, (byte*)engineBuffer);
-		if (len > 0)
-			is_continuing = ReplayAnalyze(engineBuffer, len);
-	} else {
-		ReplayRefreshDeck(0);
-		ReplayRefreshDeck(1);
-		ReplayRefreshExtra(0);
-		ReplayRefreshExtra(1);
-	}
-	exit_pending = false;
-	current_step = 0;
-	skip_step = 0;
-	if(mainGame->dInfo.isReplaySkiping)
-		mainGame->gMutex.Lock();
-	while (is_continuing && !exit_pending) {
-		int result = process(pduel);
-		int len = result & 0xffff;
-		/*int flag = result >> 16;*/
-		if (len > 0) {
-			get_message(pduel, (byte*)engineBuffer);
-			is_continuing = ReplayAnalyze(engineBuffer, len);
-		}
-	}
-	if(mainGame->dInfo.isReplaySkiping) {
-		mainGame->dInfo.isReplaySkiping = false;
-		mainGame->dField.RefreshAllCards();
-		mainGame->gMutex.Unlock();
-	}
-	end_duel(pduel);
-	if(!is_closing) {
-		mainGame->actionSignal.Reset();
-		mainGame->gMutex.Lock();
-		mainGame->stMessage->setText(dataManager.GetSysString(1501));
-		if(mainGame->wCardSelect->isVisible())
-			mainGame->HideElement(mainGame->wCardSelect);
-		mainGame->PopupElement(mainGame->wMessage);
-		mainGame->gMutex.Unlock();
-		mainGame->actionSignal.Wait();
-		mainGame->gMutex.Lock();
-		mainGame->dInfo.isStarted = false;
-		mainGame->dInfo.isReplay = false;
-		mainGame->gMutex.Unlock();
-		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.Set();
-		mainGame->closeDoneSignal.Wait();
-		mainGame->gMutex.Lock();
-		mainGame->ShowElement(mainGame->wReplay);
-		mainGame->stTip->setVisible(false);
-		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->gMutex.Unlock();
-		if(exit_on_return)
-			mainGame->device->closeDevice();
-	}
-	return 0;
-}
-void ReplayMode::Restart(bool refresh) {
-	end_duel(pduel);
-	mainGame->dInfo.isStarted = false;
-	mainGame->dField.Clear();
-	//mainGame->device->setEventReceiver(&mainGame->dField);
-	cur_replay.Rewind();
-	const ReplayHeader& rh = cur_replay.pheader;
-	//mainGame->dInfo.isFirst = true;
-	mtrandom rnd;
-	int seed = rh.seed;
-	rnd.reset(seed);
-	if(rh.flag & REPLAY_TAG) {
-		cur_replay.ReadName(mainGame->dInfo.hostname);
-		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
-		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
-		cur_replay.ReadName(mainGame->dInfo.clientname);
-		mainGame->dInfo.isTag = true;
-		mainGame->dInfo.tag_player[0] = false;
-		mainGame->dInfo.tag_player[1] = false;
-	} else {
-		cur_replay.ReadName(mainGame->dInfo.hostname);
-		cur_replay.ReadName(mainGame->dInfo.clientname);
-	}
-	//set_card_reader((card_reader)DataManager::CardReader);
-	//set_message_handler((message_handler)MessageHandler);
-	pduel = create_duel(rnd.rand());
-	int start_lp = cur_replay.ReadInt32();
-	int start_hand = cur_replay.ReadInt32();
-	int draw_count = cur_replay.ReadInt32();
-	int opt = cur_replay.ReadInt32();
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;
@@ -375,11 +289,51 @@ void ReplayMode::Restart(bool refresh) {
 		cur_replay.ReadData(filename, slen);
 		filename[slen] = 0;
 		if(!preload_script(pduel, filename, slen)) {
-			end_duel(pduel);
-			return;
+			return false;
 		}
 	}
 	start_duel(pduel, opt);
+	return true;
+}
+void ReplayMode::EndDuel() {
+	end_duel(pduel);
+	if(!is_closing) {
+		mainGame->actionSignal.Reset();
+		mainGame->gMutex.Lock();
+		mainGame->stMessage->setText(dataManager.GetSysString(1501));
+		if(mainGame->wCardSelect->isVisible())
+			mainGame->HideElement(mainGame->wCardSelect);
+		mainGame->PopupElement(mainGame->wMessage);
+		mainGame->gMutex.Unlock();
+		mainGame->actionSignal.Wait();
+		mainGame->gMutex.Lock();
+		mainGame->dInfo.isStarted = false;
+		mainGame->dInfo.isReplay = false;
+		mainGame->gMutex.Unlock();
+		mainGame->closeDoneSignal.Reset();
+		mainGame->closeSignal.Set();
+		mainGame->closeDoneSignal.Wait();
+		mainGame->gMutex.Lock();
+		mainGame->ShowElement(mainGame->wReplay);
+		mainGame->stTip->setVisible(false);
+		mainGame->device->setEventReceiver(&mainGame->menuHandler);
+		mainGame->gMutex.Unlock();
+		if(exit_on_return)
+			mainGame->device->closeDevice();
+	}
+}
+void ReplayMode::Restart(bool refresh) {
+	end_duel(pduel);
+	mainGame->dInfo.isStarted = false;
+	mainGame->dField.Clear();
+	//mainGame->device->setEventReceiver(&mainGame->dField);
+	cur_replay.Rewind();
+	//mainGame->dInfo.isFirst = true;
+	mainGame->dInfo.tag_player[0] = false;
+	mainGame->dInfo.tag_player[1] = false;
+	if(!StartDuel()) {
+		EndDuel();
+	}
 	if(refresh) {
 		mainGame->dField.RefreshAllCards();
 		mainGame->dInfo.isStarted = true;
@@ -389,17 +343,12 @@ void ReplayMode::Restart(bool refresh) {
 	is_restarting = true;
 }
 void ReplayMode::Undo() {
+	if(skip_step > 0 || current_step == 0)
+		return;
+	mainGame->dInfo.isReplaySkiping = true;
 	Restart(false);
-	skip_step = current_step - 1;
-	if(skip_step < 0)
-		skip_step = 0;
-	current_step = 0;
-	if(skip_step) {
-		mainGame->dInfo.isReplaySkiping = true;
-		mainGame->gMutex.Lock();
-		Pause(false, false);
-	} else
-		mainGame->dInfo.isReplaySkiping = false;
+	mainGame->gMutex.Lock();
+	Pause(false, false);
 }
 bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 	char* pbuf = msg;
@@ -409,7 +358,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		if(is_closing)
 			return false;
 		if(is_restarting) {
-			is_restarting = false;
+			//is_restarting = false;
 			return true;
 		}
 		if(is_swaping) {
@@ -959,6 +908,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		}
 		}
 		if(pauseable) {
+			current_step++;
 			if(skip_step) {
 				skip_step--;
 				if(skip_step == 0) {
@@ -975,7 +925,6 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 				mainGame->actionSignal.Wait();
 				is_paused = false;
 			}
-			current_step++;
 		}
 	}
 	return true;
@@ -995,7 +944,7 @@ void ReplayMode::ReplayRefresh(int flag) {
 	/*len = */query_field_card(pduel, 1, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_HAND, (char*)queryBuffer);
 }
-void  ReplayMode::ReplayRefreshHand(int player, int flag) {
+void ReplayMode::ReplayRefreshHand(int player, int flag) {
 	unsigned char queryBuffer[0x2000];
 	/*int len = */query_field_card(pduel, player, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_HAND, (char*)queryBuffer);

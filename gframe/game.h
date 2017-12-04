@@ -52,12 +52,12 @@ struct DuelInfo {
 	bool isFirst;
 	bool isTag;
 	bool isSingleMode;
+	bool lua64;
 	bool is_shuffling;
 	bool tag_player[2];
 	int lp[2];
 	int startlp;
 	int duel_field;
-	int lua64;
 	int extraval;
 	int turn;
 	short curMsg;
