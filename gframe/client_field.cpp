@@ -633,10 +633,9 @@ void ClientField::ReplaySwap() {
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
-	for(int i = 0; i < 16; ++i)
-		std::swap(mainGame->dInfo.strLP[0][i], mainGame->dInfo.strLP[1][i]);
-	for(int i = 0; i < 20; ++i)
-		std::swap(mainGame->dInfo.hostname[i], mainGame->dInfo.clientname[i]);
+	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
+	std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
+	std::swap(mainGame->dInfo.hostname_tag, mainGame->dInfo.clientname_tag);
 	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
 		chit->controler = 1 - chit->controler;
 		GetChainLocation(chit->controler, chit->location, chit->sequence, &chit->chain_pos);
