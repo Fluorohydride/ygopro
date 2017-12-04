@@ -49,6 +49,9 @@ inline int _wtoi(const wchar_t * s) {
 
 #include <irrlicht.h>
 #include <irrKlang.h>
+#ifdef IRRKLANG_STATIC
+#include "../ikpmp3/ikpMP3.h"
+#endif
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "CGUITTFont.h"

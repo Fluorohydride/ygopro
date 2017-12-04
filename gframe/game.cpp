@@ -654,6 +654,12 @@ bool Game::Initialize() {
 		chkEnableMusic->setEnabled(false);
 		chkMusicMode->setEnabled(false);
 	}
+#ifdef IRRKLANG_STATIC
+	else {
+		irrklang::ikpMP3Init(engineSound);
+		irrklang::ikpMP3Init(engineMusic);
+	}
+#endif
 	hideChat = false;
 	hideChatTimer = 0;
 	return true;
