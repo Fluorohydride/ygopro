@@ -400,13 +400,13 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.flag = REPLAY_LUA64;
 	time_t seed = time(0);
 	rh.seed = seed;
-	last_replay.BeginRecord();
+	last_replay.BeginRecord(false);
 	last_replay.WriteHeader(rh);
 	rnd.reset(seed);
 	last_replay.WriteData(players[0]->name, 40, false);
 	last_replay.WriteData(players[1]->name, 40, false);
 	//records the replay with the new system
-	new_replay.BeginRecord2();
+	new_replay.BeginRecord();
 	rh.id = 0x58707279;
 	new_replay.WriteHeader(rh);
 	new_replay.WriteData(players[0]->name, 40, false);

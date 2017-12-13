@@ -28,7 +28,6 @@ mtrandom DuelClient::rnd;
 
 std::vector<BufferIO::ReplayPacket> DuelClient::replay_stream;
 Replay DuelClient::last_replay;
-bool DuelClient::old_replay = true;
 
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
@@ -797,8 +796,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			ReplayHeader pheader;
 			memcpy(&pheader, prep, sizeof(ReplayHeader));
 			replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_MODE, prep, len - 1));
-			if(old_replay && mainGame->saveReplay) {
-				last_replay.BeginRecord();
+			if(mainGame->saveReplay) {
+				last_replay.BeginRecord(false);
 				last_replay.WriteHeader(pheader);
 				last_replay.pheader.id = 0x58707279;
 				last_replay.WriteData(mainGame->dInfo.hostname, 40, false);
@@ -807,7 +806,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					last_replay.WriteData(mainGame->dInfo.hostname_tag, 40, false);
 					last_replay.WriteData(mainGame->dInfo.clientname_tag, 40, false);
 				}
-				last_replay.WriteInt32(mainGame->dInfo.duel_field | mainGame->dInfo.extraval);
+				last_replay.WriteInt32(mainGame->dInfo.duel_field | mainGame->dInfo.extraval >> 8);
 				last_replay.WriteStream(replay_stream);
 				last_replay.EndRecord();
 			}
@@ -957,12 +956,37 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_NEW_REPLAY: {
-		char* prep = pdata;
-		memcpy(&last_replay.pheader, prep, sizeof(ReplayHeader));
-		prep += sizeof(ReplayHeader);
-		memcpy(last_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
-		last_replay.comp_size = len - sizeof(ReplayHeader) - 1;
-		old_replay = false;
+		mainGame->gMutex.Lock();
+		mainGame->wPhase->setVisible(false);
+		if(mainGame->dInfo.player_type < 7)
+			mainGame->btnLeaveGame->setVisible(false);
+		mainGame->btnChainIgnore->setVisible(false);
+		mainGame->btnChainAlways->setVisible(false);
+		mainGame->btnChainWhenAvail->setVisible(false);
+		mainGame->btnCancelOrFinish->setVisible(false);
+		time_t nowtime = time(NULL);
+		struct tm *localedtime = localtime(&nowtime);
+		char timebuf[40];
+		strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
+		size_t size = strlen(timebuf) + 1;
+		wchar_t timetext[80];
+		mbstowcs(timetext, timebuf, size);
+		mainGame->ebRSName->setText(timetext);
+		mainGame->PopupElement(mainGame->wReplaySave);
+		mainGame->gMutex.Unlock();
+		mainGame->replaySignal.Reset();
+		mainGame->replaySignal.Wait();
+		if(mainGame->saveReplay || !is_host) {
+			char* prep = pdata;
+			Replay new_replay;
+			memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
+			prep += sizeof(ReplayHeader);
+			memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
+			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
+			if(mainGame->saveReplay)
+				new_replay.SaveReplay(mainGame->ebRSName->getText());
+			else new_replay.SaveReplay(L"_LastReplay");
+		}
 		break;
 	}
 	}

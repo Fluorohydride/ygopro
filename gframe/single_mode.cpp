@@ -108,10 +108,10 @@ int SingleMode::SinglePlayThread(void* param) {
 	char engineBuffer[0x1000];
 	is_closing = false;
 	is_continuing = true;
-	last_replay.BeginRecord();
+	last_replay.BeginRecord(false);
 	last_replay.WriteHeader(rh);
 	//records the replay with the new system
-	new_replay.BeginRecord2();
+	new_replay.BeginRecord();
 	rh.id = 0x58707279;
 	new_replay.WriteHeader(rh);
 	replay_stream.clear();

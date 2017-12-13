@@ -26,8 +26,7 @@ class Replay {
 public:
 	Replay();
 	~Replay();
-	void BeginRecord();
-	void BeginRecord2();
+	void BeginRecord(bool write = true);
 	void WriteStream(std::vector<BufferIO::ReplayPacket> stream);
 	void WritePacket(BufferIO::ReplayPacket p);
 	void WriteHeader(ReplayHeader& header);
@@ -61,6 +60,7 @@ public:
 	size_t replay_size;
 	size_t comp_size;
 	bool is_recording;
+	bool is_writing;
 	bool is_replaying;
 };
 

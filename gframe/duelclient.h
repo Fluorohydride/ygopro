@@ -48,7 +48,6 @@ public:
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
 	static std::vector<BufferIO::ReplayPacket> replay_stream;
 	static Replay last_replay;
-	static bool old_replay;
 	static int ClientAnalyze(char* msg, unsigned int len);
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned char len);

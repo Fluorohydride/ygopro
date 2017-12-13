@@ -357,7 +357,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.flag = REPLAY_TAG + REPLAY_LUA64;
 	time_t seed = time(0);
 	rh.seed = seed;
-	last_replay.BeginRecord();
+	last_replay.BeginRecord(false);
 	last_replay.WriteHeader(rh);
 	rnd.reset(seed);
 	last_replay.WriteData(players[0]->name, 40, false);
@@ -365,7 +365,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteData(players[2]->name, 40, false);
 	last_replay.WriteData(players[3]->name, 40, false);
 	//records the replay with the new system
-	new_replay.BeginRecord2();
+	new_replay.BeginRecord();
 	rh.id = 0x58707279;
 	new_replay.WriteHeader(rh);
 	new_replay.WriteData(players[0]->name, 40, false);
