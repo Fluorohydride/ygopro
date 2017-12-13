@@ -33,6 +33,33 @@ void Replay::BeginRecord() {
 	pdata = replay_data;
 	is_recording = true;
 }
+void Replay::BeginRecord2() {
+#ifdef _WIN32
+	if(is_recording)
+		CloseHandle(recording_fp);
+	recording_fp = CreateFileW(L"./replay/_LastReplay2.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+	if(recording_fp == INVALID_HANDLE_VALUE)
+		return;
+#else
+	if(is_recording)
+		fclose(fp);
+	fp = fopen("./replay/_LastReplay2.yrp", "wb");
+	if(!fp)
+		return;
+#endif
+	pdata = replay_data;
+	is_recording = true;
+}
+void Replay::WritePacket(BufferIO::ReplayPacket p) {
+	WriteInt8(p.message, false);
+	WriteInt32(p.length, false);
+	WriteData((char*)p.data, p.length);
+}
+void Replay::WriteStream(std::vector<BufferIO::ReplayPacket> stream) {
+	if(stream.size())
+		for(auto it = stream.begin(); it != stream.end(); it++)
+			WritePacket((*it));
+}
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
 #ifdef _WIN32
@@ -118,7 +145,7 @@ void Replay::EndRecord() {
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
-	comp_size = 0x1000;
+	comp_size = 0x20000;
 	LzmaCompress(comp_data, &comp_size, replay_data, pdata - replay_data, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	is_recording = false;
 }
@@ -161,7 +188,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		return false;
 	fread(&pheader, sizeof(pheader), 1, fp);
 	if(pheader.flag & REPLAY_COMPRESSED) {
-		comp_size = fread(comp_data, 1, 0x1000, fp);
+		comp_size = fread(comp_data, 1, 0x20000, fp);
 		fclose(fp);
 		replay_size = pheader.datasize;
 		if(LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
@@ -190,7 +217,15 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	ReplayHeader rheader;
 	fread(&rheader, sizeof(ReplayHeader), 1, rfp);
 	fclose(rfp);
-	return rheader.id == 0x31707279 && rheader.version >= 0x12d0;
+	return (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
+}
+bool Replay::ReadNextPacket(BufferIO::ReplayPacket* packet) {
+	if (pdata - replay_data >= (int)replay_size)
+		return false;
+	packet->message = *pdata++;
+	packet->length = ReadInt32();
+	ReadData((char*)&packet->data, packet->length);
+	return true;
 }
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
 	if(pdata - replay_data >= (int)replay_size)

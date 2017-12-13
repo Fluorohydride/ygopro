@@ -121,6 +121,27 @@ public:
 			return ret;
 		return 0;
 	}
+	struct ReplayPacket {
+		int message;
+		int length;
+		unsigned char data[0x2000];
+		ReplayPacket() {}
+		ReplayPacket(char * buf, int len) {
+			message = ReadInt8(buf);
+			length = len;
+			memcpy(data, buf, length);
+		}
+		ReplayPacket(int msg, char * buf, int len) {
+			message = msg;
+			length = len;
+			memcpy(data, buf, length);
+		}
+		void Set(int msg, char * buf, int len) {
+			message = msg;
+			length = len;
+			memcpy(data, buf, length);
+		}
+	};
 };
 
 #endif //BUFFERIO_H

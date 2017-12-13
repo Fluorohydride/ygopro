@@ -16,8 +16,9 @@ private:
 	static bool is_closing;
 	static bool is_pausing;
 	static bool is_paused;
-	static bool is_swaping;
+	static bool is_swapping;
 	static bool is_restarting;
+	static bool undo;
 	static bool exit_pending;
 	static int skip_turn;
 	static int current_step;
@@ -25,6 +26,7 @@ private:
 
 public:
 	static Replay cur_replay;
+	static std::vector<BufferIO::ReplayPacket> ReplayMode::current_stream;
 	
 public:
 	static bool StartReplay(int skipturn);
@@ -37,17 +39,7 @@ public:
 	static void EndDuel();
 	static void Restart(bool refresh);
 	static void Undo();
-	static bool ReplayAnalyze(char* msg, unsigned int len);
-	
-	static void ReplayRefresh(int flag = 0xf81fff);
-	static void ReplayRefreshHand(int player, int flag = 0x781fff);
-	static void ReplayRefreshGrave(int player, int flag = 0x181fff);
-	static void ReplayRefreshDeck(int player, int flag = 0x181fff);
-	static void ReplayRefreshExtra(int player, int flag = 0x181fff);
-	static void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
-	static void ReplayReload();
-
-	static int MessageHandler(long fduel, int type);
+	static bool ReplayAnalyze(BufferIO::ReplayPacket p);
 };
 
 }

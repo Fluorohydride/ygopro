@@ -27,6 +27,9 @@ public:
 	Replay();
 	~Replay();
 	void BeginRecord();
+	void BeginRecord2();
+	void WriteStream(std::vector<BufferIO::ReplayPacket> stream);
+	void WritePacket(BufferIO::ReplayPacket p);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
 	void WriteInt32(int data, bool flush = true);
@@ -37,6 +40,7 @@ public:
 	void SaveReplay(const wchar_t* name);
 	bool OpenReplay(const wchar_t* name);
 	static bool CheckReplay(const wchar_t* name);
+	bool ReadNextPacket(BufferIO::ReplayPacket* packet);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
 	void ReadHeader(ReplayHeader& header);

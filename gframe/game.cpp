@@ -1228,7 +1228,7 @@ bool Game::PlayChant(unsigned int code) {
 	return false;
 }
 void Game::PlaySoundEffect(char* sound) {
-	if(chkEnableSound->isChecked()) {
+	if(chkEnableSound->isChecked() && (!dInfo.isReplay || !dInfo.isReplaySkiping)) {
 		engineSound->play2D(sound);
 		engineSound->setSoundVolume(gameConf.volume);
 	}
@@ -1563,8 +1563,46 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	}
 	}
 }
-void Game::OnResize()
-{
+void Game::SetPhaseButtons() {
+	// reset master rule 4 phase button position
+	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
+	if (dInfo.extraval & 0x1) {
+		if (dInfo.duel_field >= 4) {
+			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
+			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
+			btnDP->setRelativePosition(Resize(0, 40, 50, 60));
+			btnSP->setRelativePosition(Resize(0, 40, 50, 60));
+			btnM1->setRelativePosition(Resize(160, 20, 210, 40));
+			btnBP->setRelativePosition(Resize(160, 20, 210, 40));
+			btnM2->setRelativePosition(Resize(160, 20, 210, 40));
+			btnEP->setRelativePosition(Resize(310, 0, 360, 20));
+		} else {
+			btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
+			btnDP->setRelativePosition(Resize(65, 0, 115, 20));
+			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+			btnEP->setRelativePosition(Resize(260, 0, 310, 20));
+		}
+	} else {
+		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
+		if (dInfo.duel_field >= 4) {
+			btnSP->setRelativePosition(Resize(0, 0, 50, 20));
+			btnM1->setRelativePosition(Resize(160, 0, 210, 20));
+			btnBP->setRelativePosition(Resize(160, 0, 210, 20));
+			btnM2->setRelativePosition(Resize(160, 0, 210, 20));
+		} else {
+			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+		}
+		btnEP->setRelativePosition(Resize(320, 0, 370, 20));
+		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
+	}
+}
+void Game::OnResize() {
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
@@ -1662,42 +1700,7 @@ void Game::OnResize()
 	btnReplaySwap->setRelativePosition(Resize(5, 30, 85, 50));
 	btnReplayExit->setRelativePosition(Resize(5, 105, 85, 125));
 
-	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	if(dInfo.extraval & 0x1) {
-		if(dInfo.duel_field >= 4) {
-			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
-			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
-			btnDP->setRelativePosition(Resize(0, 40, 50, 60));
-			btnSP->setRelativePosition(Resize(0, 40, 50, 60));
-			btnM1->setRelativePosition(Resize(160, 20, 210, 40));
-			btnBP->setRelativePosition(Resize(160, 20, 210, 40));
-			btnM2->setRelativePosition(Resize(160, 20, 210, 40));
-			btnEP->setRelativePosition(Resize(310, 0, 360, 20));
-		} else {
-			btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
-			btnDP->setRelativePosition(Resize(65, 0, 115, 20));
-			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
-			btnEP->setRelativePosition(Resize(260, 0, 310, 20));
-		}
-	} else {
-		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-		if(dInfo.duel_field >= 4) {
-			btnSP->setRelativePosition(Resize(0, 0, 50, 20));
-			btnM1->setRelativePosition(Resize(160, 0, 210, 20));
-			btnBP->setRelativePosition(Resize(160, 0, 210, 20));
-			btnM2->setRelativePosition(Resize(160, 0, 210, 20));
-		} else {
-			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
-		}
-		btnEP->setRelativePosition(Resize(320, 0, 370, 20));
-		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
-	}
+	SetPhaseButtons();
 	btnSpectatorSwap->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainAlways->setRelativePosition(Resize(205, 140, 295, 175));
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
