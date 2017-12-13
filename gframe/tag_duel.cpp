@@ -1572,6 +1572,14 @@ void TagDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 void TagDuel::EndDuel() {
 	if(!pduel)
 		return;
+	last_replay.EndRecord();
+	char replaybuf[0x2000], *pbuf = replaybuf;
+	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
+	pbuf += sizeof(ReplayHeader);
+	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
+
+	replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
+
 	//in case of remaining packets, e.g. MSG_WIN
 	new_replay.WriteStream(replay_stream);
 	new_replay.EndRecord();
@@ -1587,11 +1595,6 @@ void TagDuel::EndDuel() {
 		NetServer::ReSendToPlayer(*oit);
 
 
-	last_replay.EndRecord();
-	char replaybuf[0x2000], *pbuf = replaybuf;
-	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
-	pbuf += sizeof(ReplayHeader);
-	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
 	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
 	NetServer::ReSendToPlayer(players[1]);
 	NetServer::ReSendToPlayer(players[2]);

@@ -145,6 +145,13 @@ int SingleMode::SinglePlayThread(void* param) {
 		}
 	}
 	last_replay.EndRecord();
+	char replaybuf[0x2000], *pbuf = replaybuf;
+	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
+	pbuf += sizeof(ReplayHeader);
+	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
+
+	new_replay.WritePacket(BufferIO::ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
+
 	new_replay.EndRecord();
 	time_t nowtime = time(NULL);
 	struct tm *localedtime = localtime(&nowtime);

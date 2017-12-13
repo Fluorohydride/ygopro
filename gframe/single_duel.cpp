@@ -1495,7 +1495,7 @@ void SingleDuel::EndDuel() {
 	pbuf += sizeof(ReplayHeader);
 	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
 
-	replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_SYSTEM, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
+	replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
 
 	//in case of remaining packets, e.g. MSG_WIN
 	new_replay.WriteStream(replay_stream);

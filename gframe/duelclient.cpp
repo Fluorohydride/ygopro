@@ -796,7 +796,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			char* prep = pdata;
 			ReplayHeader pheader;
 			memcpy(&pheader, prep, sizeof(ReplayHeader));
-			replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_SYSTEM, prep, len - 1));
+			replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_MODE, prep, len - 1));
 			if(old_replay && mainGame->saveReplay) {
 				last_replay.BeginRecord();
 				last_replay.WriteHeader(pheader);
