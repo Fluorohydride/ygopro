@@ -129,7 +129,7 @@ void Replay::Flush() {
 	fflush(fp);
 #endif
 }
-void Replay::EndRecord() {
+void Replay::EndRecord(size_t size) {
 	if(!is_recording)
 		return;
 	if(is_writing)
@@ -141,7 +141,7 @@ void Replay::EndRecord() {
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
-	comp_size = 0x20000;
+	comp_size = size;
 	LzmaCompress(comp_data, &comp_size, replay_data, pdata - replay_data, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	is_recording = false;
 }

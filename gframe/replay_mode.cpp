@@ -246,7 +246,7 @@ bool ReplayMode::ReplayAnalyze(BufferIO::ReplayPacket p) {
 			break;
 		}
 		case OLD_REPLAY_MODE:
-			break;
+			return true;
 		}
 		DuelClient::ClientAnalyze((char*)p.data, p.length);
 		if(pauseable) {

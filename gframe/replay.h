@@ -35,7 +35,7 @@ public:
 	void WriteInt16(short data, bool flush = true);
 	void WriteInt8(char data, bool flush = true);
 	void Flush();
-	void EndRecord();
+	void EndRecord(size_t size = 0x20000);
 	void SaveReplay(const wchar_t* name);
 	bool OpenReplay(const wchar_t* name);
 	static bool CheckReplay(const wchar_t* name);

@@ -1489,7 +1489,7 @@ void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 void SingleDuel::EndDuel() {
 	if(!pduel)
 		return;
-	last_replay.EndRecord();
+	last_replay.EndRecord(0x1000);
 	char replaybuf[0x2000], *pbuf = replaybuf;
 	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
 	pbuf += sizeof(ReplayHeader);
