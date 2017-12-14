@@ -278,7 +278,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					else {
 						mainGame->PopupElement(mainGame->wQuery);
-						soundManager.PlaySoundEffect(SOUND_QUESTION);
 						ShowCancelOrFinishButton(0);
 					}
 					if (mainGame->wOptions->isVisible()) {
@@ -1452,7 +1451,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
 							mainGame->stQMessage->setText(wbuf);
 							mainGame->PopupElement(mainGame->wQuery);
-							soundManager.PlaySoundEffect(SOUND_QUESTION);
 						}
 					}
 				} else {
@@ -1628,7 +1626,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->HideElement(mainGame->wQuery, true);
 				} else {
 					mainGame->PopupElement(mainGame->wQuery);
-					soundManager.PlaySoundEffect(SOUND_QUESTION);
 					ShowCancelOrFinishButton(0);
 				}
 				if(mainGame->wOptions->isVisible()) {

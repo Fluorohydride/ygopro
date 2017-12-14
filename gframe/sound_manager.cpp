@@ -195,6 +195,25 @@ void SoundManager::PlaySoundEffect(int sound) {
 	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 #endif
 }
+void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
+	if(element == mainGame->wMessage) {
+		PlaySoundEffect(SOUND_INFO);
+	} else if(element == mainGame->wQuery) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wOptions) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wANAttribute) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wANCard) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wANNumber) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wANRace) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wReplaySave) {
+		PlaySoundEffect(SOUND_QUESTION);
+	}
+}
 void SoundManager::PlayMusic(char* song, bool loop) {
 #ifdef YGOPRO_USE_IRRKLANG
 	if(!mainGame->chkEnableMusic->isChecked())

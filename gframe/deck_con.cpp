@@ -128,7 +128,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->gMutex.Lock();
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1339));
 				mainGame->PopupElement(mainGame->wQuery);
-				soundManager.PlaySoundEffect(SOUND_QUESTION);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
 				break;
@@ -185,7 +184,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337));
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
-				soundManager.PlaySoundEffect(SOUND_QUESTION);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
 				break;
@@ -195,7 +193,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->gMutex.Lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					soundManager.PlaySoundEffect(SOUND_QUESTION);
 					mainGame->gMutex.Unlock();
 					prev_operation = id;
 					break;
@@ -359,7 +356,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->gMutex.Lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					soundManager.PlaySoundEffect(SOUND_QUESTION);
 					mainGame->gMutex.Unlock();
 					prev_operation = id;
 					break;

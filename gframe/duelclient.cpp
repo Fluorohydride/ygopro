@@ -590,7 +590,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnCancelOrFinish->setVisible(false);
 		mainGame->stMessage->setText(dataManager.GetSysString(1500));
 		mainGame->PopupElement(mainGame->wMessage);
-		soundManager.PlaySoundEffect(SOUND_INFO);
 		mainGame->gMutex.Unlock();
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
@@ -633,7 +632,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mbstowcs(timetext, timebuf, size);
 		mainGame->ebRSName->setText(timetext);
 		mainGame->PopupElement(mainGame->wReplaySave);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		mainGame->replaySignal.Reset();
 		mainGame->replaySignal.Wait();
@@ -820,7 +818,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->stMessage->setText(L"Error occurs.");
 		mainGame->PopupElement(mainGame->wMessage);
-		soundManager.PlaySoundEffect(SOUND_INFO);
 		mainGame->gMutex.Unlock();
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
@@ -857,7 +854,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->gMutex.Lock();
 			mainGame->stMessage->setText(dataManager.GetDesc(data));
 			mainGame->PopupElement(mainGame->wMessage);
-			soundManager.PlaySoundEffect(SOUND_INFO);
 			mainGame->gMutex.Unlock();
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
@@ -1241,7 +1237,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
 		mainGame->PopupElement(mainGame->wQuery);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}
@@ -1252,7 +1247,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(desc));
 		mainGame->PopupElement(mainGame->wQuery);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}
@@ -1276,7 +1270,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		select_hint = 0;
 		mainGame->wOptions->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wOptions);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}
@@ -1421,7 +1414,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					myswprintf(textBuffer, L"%ls\n%ls", event_string, dataManager.GetSysString(203));
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
-				soundManager.PlaySoundEffect(SOUND_QUESTION);
 			}
 		}
 		mainGame->gMutex.Unlock();
@@ -3143,7 +3135,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->wANRace->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANRace);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}
@@ -3164,7 +3155,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->wANAttribute->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANAttribute);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}
@@ -3181,7 +3171,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->wANCard->setText(textBuffer);
 		mainGame->dField.UpdateDeclarableCode(true);
 		mainGame->PopupElement(mainGame->wANCard);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}
@@ -3202,7 +3191,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		select_hint = 0;
 		mainGame->wANNumber->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANNumber);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}
@@ -3222,7 +3210,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->wANCard->setText(textBuffer);
 		mainGame->dField.UpdateDeclarableCode(true);
 		mainGame->PopupElement(mainGame->wANCard);
-		soundManager.PlaySoundEffect(SOUND_QUESTION);
 		mainGame->gMutex.Unlock();
 		return false;
 	}

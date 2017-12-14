@@ -27,6 +27,7 @@ public:
 	bool Init();
 	void RefreshBGMList();
 	void PlaySoundEffect(int sound);
+	void PlayDialogSound(irr::gui::IGUIElement * element);
 	void PlayMusic(char* song, bool loop);
 	void PlayBGM(int scene);
 	void StopBGM();
