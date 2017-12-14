@@ -4,6 +4,7 @@
 #include "duelclient.h"
 #include "data_manager.h"
 #include "image_manager.h"
+#include "sound_manager.h"
 #include "game.h"
 #include "materials.h"
 #include "../ocgcore/field.h"
@@ -1018,7 +1019,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
 				mainGame->stQMessage->setText(wbuf);
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->PlaySoundEffect(SOUND_QUESTION);
+				soundManager.PlaySoundEffect(SOUND_QUESTION);
 			}
 		} else {
 			select_ready = false;
@@ -1040,7 +1041,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
 				mainGame->stQMessage->setText(wbuf);
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->PlaySoundEffect(SOUND_QUESTION);
+				soundManager.PlaySoundEffect(SOUND_QUESTION);
 			}
 		} else
 			select_ready = false;
