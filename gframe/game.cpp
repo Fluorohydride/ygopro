@@ -640,9 +640,14 @@ bool Game::Initialize() {
 	if(!soundManager.Init()) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
+		chkEnableSound->setVisible(false);
 		chkEnableMusic->setChecked(false);
 		chkEnableMusic->setEnabled(false);
+		chkEnableMusic->setVisible(false);
+		scrSoundVolume->setVisible(false);
+		scrMusicVolume->setVisible(false);
 		chkMusicMode->setEnabled(false);
+		chkMusicMode->setVisible(false);
 	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);

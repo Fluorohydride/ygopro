@@ -3,7 +3,12 @@
 
 #include "config.h"
 #include "game.h"
-#include <vector>
+#ifdef YGOPRO_USE_IRRKLANG
+#include <irrKlang.h>
+#ifdef IRRKLANG_STATIC
+#include "../ikpmp3/ikpMP3.h"
+#endif
+#endif
 
 namespace ygo {
 
@@ -11,9 +16,11 @@ class SoundManager {
 private:
 	std::vector<std::wstring> BGMList[8];
 	int bgm_scene;
+#ifdef YGOPRO_USE_IRRKLANG
 	irrklang::ISoundEngine* engineSound;
 	irrklang::ISoundEngine* engineMusic;
 	irrklang::ISound* soundBGM;
+#endif
 	void RefershBGMDir(std::wstring path, int scene);
 
 public:

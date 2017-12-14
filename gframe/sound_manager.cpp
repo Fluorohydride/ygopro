@@ -1,13 +1,11 @@
 #include "sound_manager.h"
-#ifdef IRRKLANG_STATIC
-#include "../ikpmp3/ikpMP3.h"
-#endif
 
 namespace ygo {
 
 SoundManager soundManager;
 
 bool SoundManager::Init() {
+#ifdef YGOPRO_USE_IRRKLANG
 	bgm_scene = -1;
 	RefreshBGMList();
 	engineSound = irrklang::createIrrKlangDevice();
@@ -21,6 +19,9 @@ bool SoundManager::Init() {
 #endif
 		return true;
 	}
+#endif // YGOPRO_USE_IRRKLANG
+	// TODO: Implement other sound engines
+	return false;
 }
 void SoundManager::RefreshBGMList() {
 	RefershBGMDir(L"", BGM_DUEL);
@@ -64,6 +65,7 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 #endif
 }
 void SoundManager::PlaySoundEffect(int sound) {
+#ifdef YGOPRO_USE_IRRKLANG
 	if(!mainGame->chkEnableSound->isChecked())
 		return;
 	switch(sound) {
@@ -191,8 +193,10 @@ void SoundManager::PlaySoundEffect(int sound) {
 		break;
 	}
 	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
+#endif
 }
 void SoundManager::PlayMusic(char* song, bool loop) {
+#ifdef YGOPRO_USE_IRRKLANG
 	if(!mainGame->chkEnableMusic->isChecked())
 		return;
 	if(!engineMusic->isCurrentlyPlaying(song)) {
@@ -200,8 +204,10 @@ void SoundManager::PlayMusic(char* song, bool loop) {
 		soundBGM = engineMusic->play2D(song, loop, false, true);
 		engineMusic->setSoundVolume(mainGame->gameConf.music_volume);
 	}
+#endif
 }
 void SoundManager::PlayBGM(int scene) {
+#ifdef YGOPRO_USE_IRRKLANG
 	if(!mainGame->chkEnableMusic->isChecked())
 		return;
 	if(!mainGame->chkMusicMode->isChecked())
@@ -219,14 +225,21 @@ void SoundManager::PlayBGM(int scene) {
 		BufferIO::EncodeUTF8(fname, BGMName);
 		PlayMusic(BGMName, false);
 	}
+#endif
 }
 void SoundManager::StopBGM() {
+#ifdef YGOPRO_USE_IRRKLANG
 	engineMusic->stopAllSounds();
+#endif
 }
 void SoundManager::SetSoundVolume(double volume) {
+#ifdef YGOPRO_USE_IRRKLANG
 	engineSound->setSoundVolume(volume);
+#endif
 }
 void SoundManager::SetMusicVolume(double volume) {
+#ifdef YGOPRO_USE_IRRKLANG
 	engineMusic->setSoundVolume(volume);
+#endif
 }
 }
