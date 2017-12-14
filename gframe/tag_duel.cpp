@@ -1476,8 +1476,10 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 	int pid = (player == 0) ? 0 : 2;
 	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
 	NetServer::ReSendToPlayer(players[pid + 1]);
-	for (int i = 0; i < 5; ++i) {
+	int qlen = 0;
+	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
+		qlen += clen;
 		if (clen == 4)
 			continue;
 		if (qbuf[11] & POS_FACEDOWN)
@@ -1500,8 +1502,10 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 	int pid = (player == 0) ? 0 : 2;
 	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
 	NetServer::ReSendToPlayer(players[pid + 1]);
-	for (int i = 0; i < 8; ++i) {
+	int qlen = 0;
+	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
+		qlen += clen;
 		if (clen == 4)
 			continue;
 		if (qbuf[11] & POS_FACEDOWN)
@@ -1522,9 +1526,9 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
 	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
-	int qlen = 0, slen;
+	int qlen = 0;
 	while(qlen < len) {
-		slen = BufferIO::ReadInt32(qbuf);
+		int slen = BufferIO::ReadInt32(qbuf);
 		int qflag = *(int*)qbuf;
 		int pos = slen - 8;
 		if(qflag & QUERY_LSCALE)
