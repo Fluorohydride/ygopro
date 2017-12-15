@@ -62,7 +62,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					hints.ai_socktype = SOCK_STREAM;
 					hints.ai_protocol = IPPROTO_TCP;
 					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-					int status=evutil_getaddrinfo(hostname, port, &hints, &answer);
+					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 					if(status != 0) {
 						mainGame->gMutex.Lock();
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));

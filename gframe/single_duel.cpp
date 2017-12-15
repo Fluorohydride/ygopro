@@ -78,12 +78,14 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 	if(!players[0] || !players[1]) {
 		STOC_HS_PlayerEnter scpe;
 		BufferIO::CopyWStr(dp->name, scpe.name, 20);
-		if(players[0]) {
+		if(!players[0])
+			scpe.pos = 0;
+		else
 			scpe.pos = 1;
+		if(players[0]) {
 			NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_ENTER, scpe);
 		}
 		if(players[1]) {
-			scpe.pos = 0;
 			NetServer::SendPacketToPlayer(players[1], STOC_HS_PLAYER_ENTER, scpe);
 		}
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
