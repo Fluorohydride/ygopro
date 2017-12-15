@@ -14,7 +14,6 @@ bool SoundManager::Init() {
 		return false;
 	} else {
 #ifdef IRRKLANG_STATIC
-		irrklang::ikpMP3Init(engineSound);
 		irrklang::ikpMP3Init(engineMusic);
 #endif
 		return true;
