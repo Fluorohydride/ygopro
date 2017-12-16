@@ -66,7 +66,7 @@ void Game::DrawBackGround() {
 	//draw field spell card
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
 	bool drawField = false;
-	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
+	int rule = (dInfo.duel_rule == 3) ? 0 : 1;
 	if(mainGame->gameConf.draw_field_spell) {
 		int fieldcode1 = -1;
 		int fieldcode2 = -1;
@@ -100,7 +100,7 @@ void Game::DrawBackGround() {
 			}
 		}
 	}
-	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent[rule] : imageManager.tField[rule]);
+	matManager.mTexture.setTexture(0, drawField ? imageManager.tFieldTransparent[(dInfo.duel_rule < 3) ? 2 : rule] : imageManager.tField[(dInfo.duel_rule < 3) ? 2 : rule]);
 	driver->setMaterial(matManager.mTexture);
 	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
 	driver->setMaterial(matManager.mBackLine);
@@ -163,7 +163,7 @@ void Game::DrawBackGround() {
 	//current sel
 	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
 		&& !(dInfo.duel_rule < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
-		&& !(dInfo.duel_rule >= 4 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
+		&& !(dInfo.duel_rule != 3 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
 		S3DVertex *vertex = 0;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler];
@@ -377,7 +377,7 @@ void Game::DrawCard(ClientCard* pcard) {
 }
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
-	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
+	int rule = (dInfo.duel_rule == 3) ? 0 : 1;
 	irr::core::matrix4 im, ic, it;
 	act_rot.Z += 0.02f;
 	im.setRotationRadians(act_rot);

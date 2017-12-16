@@ -119,6 +119,7 @@ public:
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
+	void UpdateDuelParam();
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
@@ -172,6 +173,7 @@ public:
 
 	bool is_building;
 	bool is_siding;
+	uint32 duel_param;
 
 	ClientField dField;
 	DeckBuilder deckBuilder;
@@ -250,12 +252,17 @@ public:
 	irr::gui::IGUIEditBox* ebServerName;
 	irr::gui::IGUIEditBox* ebServerPass;
 	irr::gui::IGUIComboBox* cbDuelRule;
+	irr::gui::IGUIButton* btnCustomRule;
+	irr::gui::IGUICheckBox* chkCustomRules[5];
+	irr::gui::IGUIWindow* wCustomRules;
+	irr::gui::IGUIButton* btnCustomRulesOK;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
 	irr::gui::IGUIButton* btnHostCancel;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
+	irr::gui::IGUIWindow* wHostPrepare2;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
 	irr::gui::IGUIButton* btnHostPrepOB;
 	irr::gui::IGUIStaticText* stHostPrepDuelist[4];
@@ -468,6 +475,9 @@ extern Game* mainGame;
 #define BUTTON_HOST_CONFIRM			114
 #define BUTTON_HOST_CANCEL			115
 #define BUTTON_LAN_REFRESH			116
+#define BUTTON_CUSTOM_RULE			117
+#define COMBOBOX_DUEL_RULE			118
+#define BUTTON_CUSTOM_RULE_OK		119
 #define BUTTON_HP_DUELIST			120
 #define BUTTON_HP_OBSERVER			121
 #define BUTTON_HP_START				122

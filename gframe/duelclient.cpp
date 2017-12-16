@@ -119,7 +119,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.duel_rule = mainGame->cbDuelRule->getSelected() + 1;
+			cscg.info.duel_flag = mainGame->duel_param;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
@@ -151,6 +151,8 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->gMutex.Lock();
 					mainGame->HideElement(mainGame->wHostPrepare);
+					if(mainGame->wHostPrepare2->isVisible())
+						mainGame->HideElement(mainGame->wHostPrepare2);
 					mainGame->ShowElement(mainGame->wLanWindow);
 					mainGame->wChat->setVisible(false);
 					if(events & BEV_EVENT_EOF)
@@ -358,6 +360,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_JOIN_GAME: {
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
 		std::wstring str;
+		std::wstring str2;
 		wchar_t msgbuf[256];
 		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist));
 		str.append(msgbuf);
@@ -376,8 +379,42 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(msgbuf);
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
 		str.append(msgbuf);
-		if(pkt->info.duel_rule != DEFAULT_DUEL_RULE) {
-			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + pkt->info.duel_rule - 1));
+		uint32 rule = 5;
+		mainGame->dInfo.duel_rule = 2;
+		if(pkt->info.duel_flag == MASTER_RULE_1) {
+			rule = 1;
+			mainGame->dInfo.duel_rule = 1;
+		}
+		else if(pkt->info.duel_flag == MASTER_RULE_2) {
+			rule = 2;
+			mainGame->dInfo.duel_rule = 2;
+		}
+		else if(pkt->info.duel_flag == MASTER_RULE_3) {
+			rule = 3;
+			mainGame->dInfo.duel_rule = 3;
+		}
+		else if(pkt->info.duel_flag == MASTER_RULE_4) {
+			rule = 4;
+			mainGame->dInfo.duel_rule = 4;
+		}
+		else if((pkt->info.duel_flag) & DUEL_EMZONE) {
+			rule = 5;
+			mainGame->dInfo.duel_rule = 4;
+		}
+		else if((pkt->info.duel_flag) & DUEL_PZONE) {
+			rule = 5;
+			mainGame->dInfo.duel_rule = 3;
+		}
+		if(rule == 5) {
+			uint32 filter = 0x100;
+			for (int i = 0; i < 5; ++i, filter <<= 1)
+				if (pkt->info.duel_flag & filter) {
+					myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1265 + i));
+					str2.append(msgbuf);
+				}
+			mainGame->ShowElement(mainGame->wHostPrepare2);
+		} else if(rule != DEFAULT_DUEL_RULE) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + rule - 1));
 			str.append(msgbuf);
 		}
 		if(pkt->info.no_check_deck) {
@@ -430,7 +467,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->ShowElement(mainGame->wHostPrepare);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
-		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
 		watching = 0;
 		connect_state |= 0x4;
 		break;
@@ -510,6 +546,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_DUEL_START: {
 		mainGame->HideElement(mainGame->wHostPrepare);
+		if(mainGame->wHostPrepare2->isVisible())
+			mainGame->HideElement(mainGame->wHostPrepare2);
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
@@ -3611,9 +3649,18 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(L"][");
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
 			hoststr.append(L"][");
+			int rule = 5;
+			if (pHP->host.duel_flag == MASTER_RULE_1)
+				rule = 1;
+			else if (pHP->host.duel_flag == MASTER_RULE_2)
+				rule = 2;
+			else if (pHP->host.duel_flag == MASTER_RULE_3)
+				rule = 3;
+			else if (pHP->host.duel_flag == MASTER_RULE_4)
+				rule = 4;
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
-			        && pHP->host.duel_rule == DEFAULT_DUEL_RULE)
+			        && rule == DEFAULT_DUEL_RULE)
 				hoststr.append(dataManager.GetSysString(1280));
 			else hoststr.append(dataManager.GetSysString(1281));
 			hoststr.append(L"]");
