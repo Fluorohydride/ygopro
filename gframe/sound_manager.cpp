@@ -1,4 +1,7 @@
 #include "sound_manager.h"
+#ifndef _WIN32
+#include <dirent.h>
+#endif
 
 namespace ygo {
 
