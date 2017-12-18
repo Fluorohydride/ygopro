@@ -256,7 +256,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int flag = 0;
 				flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
 				myswprintf(cmd, L"Bot.exe \"%ls\" %d %d", mainGame->botInfo[sel].command, flag, mainGame->gameConf.serverport);
-				if(!CreateProcessW(NULL, (LPWSTR)cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+				if(!CreateProcessW(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
 				{
 					NetServer::StopServer();
 					break;
@@ -274,8 +274,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					sprintf(arg3, "%d", mainGame->gameConf.serverport);
 					execl("./bot", "bot", arg1, arg2, arg3, NULL);
 					exit(0);
-				}
-				else {
+				} else {
 					if(!NetServer::StartServer(mainGame->gameConf.serverport))
 						break;
 					if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
