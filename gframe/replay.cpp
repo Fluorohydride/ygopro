@@ -23,7 +23,7 @@ void Replay::BeginRecord(bool write) {
 		CloseHandle(recording_fp);
 	is_writing = write;
 	if(is_writing) {
-		recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+		recording_fp = CreateFileW(L"./replay/_LastReplay.yrpX", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
 		if(recording_fp == INVALID_HANDLE_VALUE)
 			return;
 	}
@@ -32,7 +32,7 @@ void Replay::BeginRecord(bool write) {
 		fclose(fp);
 	is_writing = write;
 	if(is_writing) {
-		fp = fopen("./replay/_LastReplay.yrp", "wb");
+		fp = fopen("./replay/_LastReplay.yrpX", "wb");
 		if(!fp)
 			return;
 	}
@@ -148,7 +148,7 @@ void Replay::EndRecord(size_t size) {
 }
 void Replay::SaveReplay(const wchar_t* name) {
 	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls.yrp", name);
+	myswprintf(fname, L"./replay/%ls.yrpX", name);
 #ifdef WIN32
 	fp = _wfopen(fname, L"wb");
 #else

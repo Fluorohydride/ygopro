@@ -408,6 +408,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	//records the replay with the new system
 	new_replay.BeginRecord();
 	rh.id = 0x58707279;
+	rh.flag |= REPLAY_NEWREPLAY;
 	new_replay.WriteHeader(rh);
 	new_replay.WriteData(players[0]->name, 40, false);
 	new_replay.WriteData(players[1]->name, 40);

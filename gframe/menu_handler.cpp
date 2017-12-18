@@ -395,6 +395,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
+				if(ReplayMode::cur_replay.pheader.id == 0x31707279) {
+					mainGame->chkYrp->setChecked(false);
+					mainGame->chkYrp->setEnabled(false);
+				} else
+					mainGame->chkYrp->setEnabled(true);
 				break;
 			}
 			}
