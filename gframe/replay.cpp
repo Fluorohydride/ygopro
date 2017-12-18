@@ -1,6 +1,7 @@
 #include "replay.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/card.h"
+#include "../ocgcore/field.h"
 #include <algorithm>
 #include "lzma/LzmaLib.h"
 
@@ -267,6 +268,33 @@ char Replay::ReadInt8() {
 }
 void Replay::Rewind() {
 	pdata = replay_data;
+}
+
+bool Replay::LoadYrp() {
+	if (pheader.flag & REPLAY_NEWREPLAY) {
+		pdata += (4 + ((pheader.flag & REPLAY_TAG) ? 160 : 80));
+		BufferIO::ReplayPacket p;
+		while (ReadNextPacket(&p))
+			if (p.message == OLD_REPLAY_MODE) {
+				char* prep = (char*)p.data;
+				memcpy(&pheader, prep, sizeof(ReplayHeader));
+				prep += sizeof(ReplayHeader);
+				if(pheader.flag & REPLAY_COMPRESSED) {
+					comp_size = (size_t)(p.length - sizeof(ReplayHeader));
+					replay_size = pheader.datasize;
+					if (LzmaUncompress(replay_data, &replay_size, (unsigned char*)prep, &comp_size, pheader.props, 5) != SZ_OK)
+						return false;
+				} else {
+					comp_size = fread(replay_data, 1, 0x20000, fp);
+					fclose(fp);
+					replay_size = comp_size;
+				}
+				pdata = replay_data;
+				is_replaying = true;
+				return true;
+			}
+	}
+	return !(pheader.flag & REPLAY_NEWREPLAY);
 }
 
 }

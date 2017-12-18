@@ -48,6 +48,7 @@ struct Config {
 struct DuelInfo {
 	bool isStarted;
 	bool isReplay;
+	bool isOldReplay;
 	bool isReplaySkiping;
 	bool isFirst;
 	bool isTag;
@@ -310,6 +311,7 @@ public:
 	irr::gui::IGUIWindow* wReplay;
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIStaticText* stReplayInfo;
+	irr::gui::IGUICheckBox* chkYrp;
 	irr::gui::IGUIButton* btnLoadReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
 	irr::gui::IGUIEditBox* ebRepStartTurn;

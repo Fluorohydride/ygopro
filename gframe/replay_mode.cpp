@@ -9,6 +9,7 @@
 namespace ygo {
 
 long ReplayMode::pduel = 0;
+bool ReplayMode::yrp = false;
 Replay ReplayMode::cur_replay;
 std::vector<BufferIO::ReplayPacket> ReplayMode::current_stream;
 bool ReplayMode::is_continuing = true;
@@ -25,8 +26,12 @@ int ReplayMode::skip_step = 0;
 bool ReplayMode::StartReplay(int skipturn) {
 	skip_turn = skipturn;
 	if(skip_turn < 0)
-		skip_turn = 0;
-	Thread::NewThread(ReplayThread, 0);
+		skip_turn = 0; 
+	yrp = cur_replay.pheader.id == 0x31707279;
+	if(yrp)
+		Thread::NewThread(OldReplayThread, 0);
+	else
+		Thread::NewThread(ReplayThread, 0);
 	return true;
 }
 void ReplayMode::StopReplay(bool is_exiting) {
@@ -50,13 +55,6 @@ void ReplayMode::Pause(bool is_pause, bool is_step) {
 			is_pausing = false;
 		mainGame->actionSignal.Set();
 	}
-}
-bool ReplayMode::ReadReplayResponse() {
-	unsigned char resp[64];
-	bool result = cur_replay.ReadNextResponse(resp);
-	if(result)
-		set_responseb(pduel, resp);
-	return result;
 }
 int ReplayMode::ReplayThread(void* param) {
 	const ReplayHeader& rh = cur_replay.pheader;
@@ -123,6 +121,8 @@ int ReplayMode::ReplayThread(void* param) {
 	return 0;
 }
 void ReplayMode::EndDuel() {
+	if(yrp)
+		end_duel(pduel);
 	if(!is_closing) {
 		mainGame->actionSignal.Reset();
 		mainGame->gMutex.Lock();
@@ -135,6 +135,7 @@ void ReplayMode::EndDuel() {
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isReplay = false;
+		mainGame->dInfo.isOldReplay = false;
 		mainGame->gMutex.Unlock();
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
@@ -149,10 +150,17 @@ void ReplayMode::EndDuel() {
 	}
 }
 void ReplayMode::Restart(bool refresh) {
+	if(yrp) {
+		end_duel(pduel);
+		cur_replay.Rewind();
+	}
 	mainGame->dInfo.isStarted = false;
 	mainGame->dField.Clear();
 	mainGame->dInfo.tag_player[0] = false;
 	mainGame->dInfo.tag_player[1] = false;
+	if (yrp && !StartDuel()) {
+		EndDuel();
+	}
 	if(refresh) {
 		mainGame->dField.RefreshAllCards();
 		mainGame->dInfo.isStarted = true;

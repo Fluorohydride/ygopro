@@ -11,6 +11,7 @@ namespace ygo {
 #define REPLAY_DECODED		0x4
 #define REPLAY_SINGLE_MODE	0x8
 #define REPLAY_LUA64		0x10
+#define REPLAY_NEWREPLAY	0x20
 
 struct ReplayHeader {
 	unsigned int id;
@@ -42,12 +43,12 @@ public:
 	bool ReadNextPacket(BufferIO::ReplayPacket* packet);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
-	void ReadHeader(ReplayHeader& header);
 	void ReadData(void* data, unsigned int length);
 	int ReadInt32();
 	short ReadInt16();
 	char ReadInt8();
 	void Rewind();
+	bool LoadYrp();
 
 	FILE* fp;
 	ReplayHeader pheader;

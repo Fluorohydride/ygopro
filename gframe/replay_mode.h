@@ -12,6 +12,7 @@ namespace ygo {
 class ReplayMode {
 private:
 	static long pduel;
+	static bool yrp;
 	static bool is_continuing;
 	static bool is_closing;
 	static bool is_pausing;
@@ -35,11 +36,23 @@ public:
 	static void Pause(bool is_pause, bool is_step);
 	static bool ReadReplayResponse();
 	static int ReplayThread(void* param);
+	static int OldReplayThread(void* param);
 	static bool StartDuel();
 	static void EndDuel();
 	static void Restart(bool refresh);
 	static void Undo();
 	static bool ReplayAnalyze(BufferIO::ReplayPacket p);
+	static bool ReplayAnalyze(char* msg, unsigned int len);
+
+	static void ReplayRefresh(int flag = 0xf81fff);
+	static void ReplayRefreshHand(int player, int flag = 0x781fff);
+	static void ReplayRefreshGrave(int player, int flag = 0x181fff);
+	static void ReplayRefreshDeck(int player, int flag = 0x181fff);
+	static void ReplayRefreshExtra(int player, int flag = 0x181fff);
+	static void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
+	static void ReplayReload();
+
+	static int MessageHandler(long fduel, int type);
 };
 
 }

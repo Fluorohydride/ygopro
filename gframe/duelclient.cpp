@@ -28,6 +28,7 @@ mtrandom DuelClient::rnd;
 
 std::vector<BufferIO::ReplayPacket> DuelClient::replay_stream;
 Replay DuelClient::last_replay;
+bool DuelClient::old_replay = true;
 
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
@@ -735,6 +736,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Unlock();
 		match_kill = 0;
 		replay_stream.clear();
+		old_replay = true;
 		break;
 	}
 	case STOC_DUEL_END: {
@@ -771,6 +773,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_REPLAY: {
+		if (!old_replay) break;
 		mainGame->gMutex.Lock();
 		mainGame->wPhase->setVisible(false);
 		if(mainGame->dInfo.player_type < 7)
@@ -956,6 +959,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_NEW_REPLAY: {
+		old_replay = false;
 		mainGame->gMutex.Lock();
 		mainGame->wPhase->setVisible(false);
 		if(mainGame->dInfo.player_type < 7)
@@ -994,7 +998,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	char* pbuf = msg;
 	wchar_t textBuffer[256];
-	if(!mainGame->dInfo.isReplay) {
+	if(!mainGame->dInfo.isReplay || mainGame->dInfo.isOldReplay) {
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		if(mainGame->dInfo.curMsg != MSG_WAITING) {
 			BufferIO::ReplayPacket p;
