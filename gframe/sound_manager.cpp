@@ -55,8 +55,10 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 #else
 	DIR * dir;
 	struct dirent * dirp;
-	std::wstring searchpath = L"./sound/BGM/" + path;
-	if((dir = opendir(searchpath.c_str())) == NULL)
+	std::wstring wsearchpath = L"./sound/BGM/" + path;
+	char searchpath[256];
+	BufferIO::EncodeUTF8(wsearchpath.c_str(), searchpath);
+	if((dir = opendir(searchpath)) == NULL)
 		return;
 	while((dirp = readdir(dir)) != NULL) {
 		size_t len = strlen(dirp->d_name);
@@ -64,8 +66,9 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 			continue;
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		BGMList[BGM_ALL].push_back(wname);
-		BGMList[scene].push_back(wname);
+		std::wstring filename = path + (std::wstring)wname;
+		BGMList[BGM_ALL].push_back(filename);
+		BGMList[scene].push_back(filename);
 	}
 	closedir(dir);
 #endif
