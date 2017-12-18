@@ -54,7 +54,7 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	// not fully implemented
 	DIR * dir;
 	struct dirent * dirp;
-	if((dir = opendir("./sound/BGM/*.ogg")) == NULL)
+	if((dir = opendir("./sound/BGM/")) == NULL)
 		return;
 	while((dirp = readdir(dir)) != NULL) {
 		size_t len = strlen(dirp->d_name);

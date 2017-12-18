@@ -31,3 +31,13 @@ project "ygopro"
         includedirs { "/usr/include/lua", "/usr/include/lua5.2", "/usr/include/lua/5.2", "/usr/include/irrlicht", "/usr/include/freetype2" }
         excludes { "COSOperator.*" }
         links { "event_pthreads", "GL", "dl", "pthread" }
+    configuration "linux"
+        removelinks { "lua" }
+        links { "lua5.2" }
+        if USE_IRRKLANG then
+            defines { "YGOPRO_USE_IRRKLANG" }
+            links { "IrrKlang" }
+            linkoptions{ "-Wl,-rpath=./irrklang/bin/linux-gcc-64/" }
+            libdirs { "../irrklang/bin/linux-gcc-64" }
+            includedirs { "../irrklang/include" }
+        end
