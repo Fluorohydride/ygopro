@@ -10,6 +10,8 @@
 #endif
 #endif
 
+#define wcsicmp _wcsicmp
+
 namespace ygo {
 
 class SoundManager {

@@ -38,31 +38,34 @@ void SoundManager::RefreshBGMList() {
 void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 #ifdef _WIN32
 	WIN32_FIND_DATAW fdataw;
-	std::wstring search = L"./sound/BGM/" + path + L"*.mp3";
+	std::wstring search = L"./sound/BGM/" + path + L"*.*";
 	HANDLE fh = FindFirstFileW(search.c_str(), &fdataw);
 	if(fh == INVALID_HANDLE_VALUE)
 		return;
 	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			std::wstring filename = path + (std::wstring)fdataw.cFileName;
-			BGMList[BGM_ALL].push_back(filename);
-			BGMList[scene].push_back(filename);
-		}
+		size_t len = wcslen(fdataw.cFileName);
+		if((fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || len < 5
+			|| !(wcsicmp(fdataw.cFileName + len - 4, L".mp3") == 0 || wcsicmp(fdataw.cFileName + len - 4, L".ogg") == 0))
+			continue;
+		std::wstring filename = path + (std::wstring)fdataw.cFileName;
+		BGMList[BGM_ALL].push_back(filename);
+		BGMList[scene].push_back(filename);
 	} while(FindNextFileW(fh, &fdataw));
 	FindClose(fh);
 #else
-	// not fully implemented
 	DIR * dir;
 	struct dirent * dirp;
-	if((dir = opendir("./sound/BGM/")) == NULL)
+	std::wstring searchpath = L"./sound/BGM/" + path;
+	if((dir = opendir(searchpath.c_str())) == NULL)
 		return;
 	while((dirp = readdir(dir)) != NULL) {
 		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".ogg") != 0)
+		if(len < 5 || !(strcasecmp(dirp->d_name + len - 4, ".mp3") == 0 || strcasecmp(dirp->d_name + len - 4, ".ogg")))
 			continue;
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
 		BGMList[BGM_ALL].push_back(wname);
+		BGMList[scene].push_back(wname);
 	}
 	closedir(dir);
 #endif
