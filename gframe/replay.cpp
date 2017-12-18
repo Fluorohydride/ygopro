@@ -7,6 +7,22 @@
 
 namespace ygo {
 
+ReplayPacket::ReplayPacket(char * buf, int len) {
+	message = BufferIO::ReadInt8(buf);
+	length = len;
+	memcpy(data, buf, length);
+}
+ReplayPacket::ReplayPacket(int msg, char * buf, int len) {
+	message = msg;
+	length = len;
+	memcpy(data, buf, length);
+}
+void ReplayPacket::Set(int msg, char * buf, int len) {
+	message = msg;
+	length = len;
+	memcpy(data, buf, length);
+}
+
 Replay::Replay() {
 	is_recording = false;
 	is_replaying = false;
@@ -40,12 +56,12 @@ void Replay::BeginRecord(bool write) {
 	pdata = replay_data;
 	is_recording = true;
 }
-void Replay::WritePacket(BufferIO::ReplayPacket p) {
+void Replay::WritePacket(ReplayPacket p) {
 	WriteInt8(p.message, false);
 	WriteInt32(p.length, false);
 	WriteData((char*)p.data, p.length);
 }
-void Replay::WriteStream(std::vector<BufferIO::ReplayPacket> stream) {
+void Replay::WriteStream(std::vector<ReplayPacket> stream) {
 	if(stream.size())
 		for(auto it = stream.begin(); it != stream.end(); it++)
 			WritePacket((*it));
@@ -216,7 +232,7 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	fclose(rfp);
 	return (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
 }
-bool Replay::ReadNextPacket(BufferIO::ReplayPacket* packet) {
+bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	if (pdata - replay_data >= (int)replay_size)
 		return false;
 	packet->message = *pdata++;
@@ -273,7 +289,7 @@ void Replay::Rewind() {
 bool Replay::LoadYrp() {
 	if (pheader.flag & REPLAY_NEWREPLAY) {
 		pdata += (4 + ((pheader.flag & REPLAY_TAG) ? 160 : 80));
-		BufferIO::ReplayPacket p;
+		ReplayPacket p;
 		while (ReadNextPacket(&p))
 			if (p.message == OLD_REPLAY_MODE) {
 				char* prep = (char*)p.data;

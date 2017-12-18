@@ -12,7 +12,7 @@ bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
 Replay SingleMode::new_replay;
-std::vector<BufferIO::ReplayPacket> SingleMode::replay_stream;
+std::vector<ReplayPacket> SingleMode::replay_stream;
 
 static byte buffer[0x20000];
 
@@ -151,7 +151,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	pbuf += sizeof(ReplayHeader);
 	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
 
-	new_replay.WritePacket(BufferIO::ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
+	new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
 
 	new_replay.EndRecord();
 	time_t nowtime = time(NULL);
@@ -196,7 +196,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		if(is_closing || !is_continuing)
 			return false;
 		offset = pbuf;
-		BufferIO::ReplayPacket p;
+		ReplayPacket p;
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		p.message = mainGame->dInfo.curMsg;
 		p.length = len - 1;
@@ -881,13 +881,13 @@ void SingleMode::SinglePlayRefresh(int player, int location, int flag) {
 	unsigned char queryBuffer[0x2000];
 	char queryBuffer2[0x2000];
 	char* qbuf = queryBuffer2;
-	BufferIO::ReplayPacket p;
+	ReplayPacket p;
 	int len = query_field_card(pduel, player, location, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, location);
 	memcpy(qbuf, (char*)queryBuffer, len);
-	replay_stream.push_back(BufferIO::ReplayPacket(MSG_UPDATE_DATA, queryBuffer2, len + 2));
+	replay_stream.push_back(ReplayPacket(MSG_UPDATE_DATA, queryBuffer2, len + 2));
 }
 void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
 	unsigned char queryBuffer[0x2000];
@@ -899,7 +899,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 	BufferIO::WriteInt8(qbuf, location);
 	BufferIO::WriteInt8(qbuf, sequence);
 	memcpy(qbuf, (char*)queryBuffer, len);
-	BufferIO::ReplayPacket p(MSG_UPDATE_CARD, queryBuffer2, len + 3);
+	ReplayPacket p(MSG_UPDATE_CARD, queryBuffer2, len + 3);
 	replay_stream.push_back(p);
 }
 void SingleMode::SinglePlayRefresh(int flag) {

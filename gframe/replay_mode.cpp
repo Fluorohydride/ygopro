@@ -11,7 +11,7 @@ namespace ygo {
 long ReplayMode::pduel = 0;
 bool ReplayMode::yrp = false;
 Replay ReplayMode::cur_replay;
-std::vector<BufferIO::ReplayPacket> ReplayMode::current_stream;
+std::vector<ReplayPacket> ReplayMode::current_stream;
 bool ReplayMode::is_continuing = true;
 bool ReplayMode::is_closing = false;
 bool ReplayMode::is_pausing = false;
@@ -78,7 +78,7 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.duel_field = opt & 0xff;
 	mainGame->dInfo.extraval = (opt >> 8);
 	mainGame->SetPhaseButtons();
-	BufferIO::ReplayPacket p;
+	ReplayPacket p;
 	current_stream.clear();
 	while (cur_replay.ReadNextPacket(&p)) {
 		current_stream.push_back(p);
@@ -177,7 +177,7 @@ void ReplayMode::Undo() {
 	mainGame->gMutex.Lock();
 	Pause(false, false);
 }
-bool ReplayMode::ReplayAnalyze(BufferIO::ReplayPacket p) {
+bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 	is_restarting = false;
 	while(true) {
 		if(is_closing)

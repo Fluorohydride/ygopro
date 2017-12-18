@@ -29,7 +29,7 @@ public:
 protected:
 	static Replay last_replay;
 	static Replay new_replay;
-	static std::vector<BufferIO::ReplayPacket> replay_stream;
+	static std::vector<ReplayPacket> replay_stream;
 };
 
 }

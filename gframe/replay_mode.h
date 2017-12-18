@@ -27,7 +27,7 @@ private:
 
 public:
 	static Replay cur_replay;
-	static std::vector<BufferIO::ReplayPacket> ReplayMode::current_stream;
+	static std::vector<ReplayPacket> ReplayMode::current_stream;
 	
 public:
 	static bool StartReplay(int skipturn);
@@ -41,7 +41,7 @@ public:
 	static void EndDuel();
 	static void Restart(bool refresh);
 	static void Undo();
-	static bool ReplayAnalyze(BufferIO::ReplayPacket p);
+	static bool ReplayAnalyze(ReplayPacket p);
 	static bool ReplayAnalyze(char* msg, unsigned int len);
 
 	static void ReplayRefresh(int flag = 0xf81fff);

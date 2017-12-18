@@ -26,7 +26,7 @@ u64 DuelClient::select_hint = 0;
 wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;
 
-std::vector<BufferIO::ReplayPacket> DuelClient::replay_stream;
+std::vector<ReplayPacket> DuelClient::replay_stream;
 Replay DuelClient::last_replay;
 bool DuelClient::old_replay = true;
 
@@ -798,7 +798,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			char* prep = pdata;
 			ReplayHeader pheader;
 			memcpy(&pheader, prep, sizeof(ReplayHeader));
-			replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_MODE, prep, len - 1));
+			replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, prep, len - 1));
 			if(mainGame->saveReplay) {
 				last_replay.BeginRecord(false);
 				last_replay.WriteHeader(pheader);
@@ -1001,7 +1001,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	if(!mainGame->dInfo.isReplay || mainGame->dInfo.isOldReplay) {
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		if(mainGame->dInfo.curMsg != MSG_WAITING) {
-			BufferIO::ReplayPacket p;
+			ReplayPacket p;
 			p.message = mainGame->dInfo.curMsg;
 			p.length = len - 1;
 			memcpy(p.data, pbuf, p.length);

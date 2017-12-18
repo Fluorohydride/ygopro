@@ -23,13 +23,24 @@ struct ReplayHeader {
 	unsigned char props[8];
 };
 
+class ReplayPacket {
+public:
+	int message;
+	int length;
+	unsigned char data[0x2000];
+	ReplayPacket() {}
+	ReplayPacket(char * buf, int len);
+	ReplayPacket(int msg, char * buf, int len);
+	void Set(int msg, char * buf, int len);
+};
+
 class Replay {
 public:
 	Replay();
 	~Replay();
 	void BeginRecord(bool write = true);
-	void WriteStream(std::vector<BufferIO::ReplayPacket> stream);
-	void WritePacket(BufferIO::ReplayPacket p);
+	void WriteStream(std::vector<ReplayPacket> stream);
+	void WritePacket(ReplayPacket p);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
 	void WriteInt32(int data, bool flush = true);
@@ -40,7 +51,7 @@ public:
 	void SaveReplay(const wchar_t* name);
 	bool OpenReplay(const wchar_t* name);
 	static bool CheckReplay(const wchar_t* name);
-	bool ReadNextPacket(BufferIO::ReplayPacket* packet);
+	bool ReadNextPacket(ReplayPacket* packet);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
 	void ReadData(void* data, unsigned int length);

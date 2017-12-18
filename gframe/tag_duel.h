@@ -42,7 +42,7 @@ public:
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 
 	void PseudoRefreshDeck(int player, int flag = 0x181fff);
-	static std::vector<BufferIO::ReplayPacket> replay_stream;
+	static std::vector<ReplayPacket> replay_stream;
 	
 protected:
 	DuelPlayer* players[4];

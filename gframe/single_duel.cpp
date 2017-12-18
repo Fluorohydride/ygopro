@@ -9,7 +9,7 @@
 
 namespace ygo {
 
-std::vector<BufferIO::ReplayPacket> SingleDuel::replay_stream;
+std::vector<ReplayPacket> SingleDuel::replay_stream;
 
 SingleDuel::SingleDuel(bool is_match) {
 	game_started = false;
@@ -187,7 +187,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			BufferIO::ReplayPacket p((char*)wbuf, 3);
+			ReplayPacket p((char*)wbuf, 3);
 			replay_stream.push_back(p);
 			EndDuel();
 			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
@@ -530,7 +530,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::SendBufferToPlayer(*oit, STOC_GAME_MSG, startbuf, 18);
 	startbuf[1] = 0;
-	BufferIO::ReplayPacket p((char*)startbuf, 17);
+	ReplayPacket p((char*)startbuf, 17);
 	replay_stream.push_back(p);
 	PseudoRefreshDeck(0);
 	PseudoRefreshDeck(1);
@@ -611,7 +611,7 @@ void SingleDuel::Surrender(DuelPlayer* dp) {
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
-	BufferIO::ReplayPacket p((char*)wbuf, 3);
+	ReplayPacket p((char*)wbuf, 3);
 	replay_stream.push_back(p);
 	if(players[player] == pplayer[player]) {
 		match_result[duel_count++] = 1 - player;
@@ -630,7 +630,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 	while (pbuf - msgbuffer < (int)len) {
 		replay_stream.clear();
 		bool record = true;
-		BufferIO::ReplayPacket p;
+		ReplayPacket p;
 		offset = pbuf;
 		unsigned char engType = BufferIO::ReadUInt8(pbuf);
 		p.message = engType;
@@ -1496,7 +1496,7 @@ void SingleDuel::EndDuel() {
 	pbuf += sizeof(ReplayHeader);
 	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
 
-	replay_stream.push_back(BufferIO::ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
+	replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
 
 	//in case of remaining packets, e.g. MSG_WIN
 	new_replay.WriteStream(replay_stream);
@@ -1551,7 +1551,7 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_MZONE);
 	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	BufferIO::ReplayPacket p((char*)query_buffer, len + 2);
+	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 	int qlen = 0;
 	while (qlen < len) {
@@ -1575,7 +1575,7 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_SZONE);
 	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	BufferIO::ReplayPacket p((char*)query_buffer, len + 2);
+	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 	int qlen = 0;
 	while (qlen < len) {
@@ -1616,7 +1616,7 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer, len + 3);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
-	BufferIO::ReplayPacket p((char*)query_buffer, len + 2);
+	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 }
 void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
@@ -1630,7 +1630,7 @@ void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
-	BufferIO::ReplayPacket p((char*)query_buffer, len + 2);
+	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 }
 void SingleDuel::RefreshExtra(int player, int flag, int use_cache) {
@@ -1641,7 +1641,7 @@ void SingleDuel::RefreshExtra(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_EXTRA);
 	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	BufferIO::ReplayPacket p((char*)query_buffer, len + 2);
+	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 }
 void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag) {
@@ -1653,7 +1653,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	BufferIO::WriteInt8(qbuf, sequence);
 	int len = query_card(pduel, player, location, sequence, flag, (unsigned char*)qbuf, 0);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 4);
-	BufferIO::ReplayPacket p((char*)query_buffer, len + 3);
+	ReplayPacket p((char*)query_buffer, len + 3);
 	replay_stream.push_back(p);
 	if(location == LOCATION_REMOVED && (qbuf[15] & POS_FACEDOWN))
 		return;
@@ -1670,7 +1670,7 @@ void SingleDuel::PseudoRefreshDeck(int player, int flag) {
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_DECK);
 	int len = query_field_card(pduel, player, LOCATION_DECK, flag, (unsigned char*)qbuf, 0);
-	BufferIO::ReplayPacket p((char*)query_buffer, len + 2);
+	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 }
 int SingleDuel::MessageHandler(long fduel, int type) {
@@ -1694,7 +1694,7 @@ void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
 		NetServer::ReSendToPlayer(sd->players[1]);
 		for(auto oit = sd->observers.begin(); oit != sd->observers.end(); ++oit)
 			NetServer::ReSendToPlayer(*oit);
-		BufferIO::ReplayPacket p((char*)wbuf, 3);
+		ReplayPacket p((char*)wbuf, 3);
 		sd->replay_stream.push_back(p);
 		if(sd->players[player] == sd->pplayer[player]) {
 			sd->match_result[sd->duel_count++] = 1 - player;
