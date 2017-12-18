@@ -85,6 +85,7 @@ int ReplayMode::ReplayThread(void* param) {
 	}
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isReplay = true;
+	mainGame->dInfo.turn = 0;
 	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
 	is_continuing = true;
 	skip_step = 0;
@@ -252,6 +253,18 @@ bool ReplayMode::ReplayAnalyze(BufferIO::ReplayPacket p) {
 				}
 			}
 			break;
+		}
+		case MSG_AI_NAME: {
+			char* pbuf =(char*) p.data;
+			char namebuf[128];
+			wchar_t wname[128];
+			int len = BufferIO::ReadInt16(pbuf);
+			char* begin = pbuf;
+			pbuf += len + 1;
+			memcpy(namebuf, begin, len + 1);
+			BufferIO::DecodeUTF8(namebuf, wname);
+			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname, 20);
+			return true;
 		}
 		case OLD_REPLAY_MODE:
 			return true;

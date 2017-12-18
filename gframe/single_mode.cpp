@@ -113,6 +113,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	//records the replay with the new system
 	new_replay.BeginRecord();
 	rh.id = 0x58707279;
+	rh.flag |= REPLAY_NEWREPLAY;
 	new_replay.WriteHeader(rh);
 	replay_stream.clear();
 	unsigned short buffer[20];
@@ -848,7 +849,6 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			memcpy(namebuf, begin, len + 1);
 			BufferIO::DecodeUTF8(namebuf, wname);
 			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname, 20);
-			record = false;
 			break;
 		}
 		case MSG_SHOW_HINT: {
