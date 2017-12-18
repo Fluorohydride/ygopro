@@ -240,13 +240,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				bot_mode = true;
+#ifdef _WIN32
 				if(!NetServer::StartServer(mainGame->gameConf.serverport))
 					break;
 				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
 					NetServer::StopServer();
 					break;
 				}
-#ifdef _WIN32
 				STARTUPINFO si;
 				PROCESS_INFORMATION pi;
 				ZeroMemory(&si, sizeof(si));
@@ -260,6 +260,28 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				{
 					NetServer::StopServer();
 					break;
+				}
+#else
+				if(fork() == 0) {
+					usleep(100000);
+					char arg1[512];
+					BufferIO::EncodeUTF8(mainGame->botInfo[sel].command, arg1);
+					int flag = 0;
+					flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
+					char arg2[8];
+					sprintf(arg2, "%d", flag);
+					char arg3[5];
+					sprintf(arg3, "%d", mainGame->gameConf.serverport);
+					execl("./bot", "bot", arg1, arg2, arg3, NULL);
+					exit(0);
+				}
+				else {
+					if(!NetServer::StartServer(mainGame->gameConf.serverport))
+						break;
+					if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
+						NetServer::StopServer();
+						break;
+					}
 				}
 #endif
 				mainGame->btnStartBot->setEnabled(false);
