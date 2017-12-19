@@ -1,10 +1,27 @@
 #include "replay.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/card.h"
+#include "../ocgcore/field.h"
 #include <algorithm>
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
+
+ReplayPacket::ReplayPacket(char * buf, int len) {
+	message = BufferIO::ReadInt8(buf);
+	length = len;
+	memcpy(data, buf, length);
+}
+ReplayPacket::ReplayPacket(int msg, char * buf, int len) {
+	message = msg;
+	length = len;
+	memcpy(data, buf, length);
+}
+void ReplayPacket::Set(int msg, char * buf, int len) {
+	message = msg;
+	length = len;
+	memcpy(data, buf, length);
+}
 
 Replay::Replay() {
 	is_recording = false;
@@ -16,25 +33,42 @@ Replay::~Replay() {
 	delete[] replay_data;
 	delete[] comp_data;
 }
-void Replay::BeginRecord() {
+void Replay::BeginRecord(bool write) {
 #ifdef _WIN32
-	if(is_recording)
+	if(is_recording && is_writing)
 		CloseHandle(recording_fp);
-	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
-	if(recording_fp == INVALID_HANDLE_VALUE)
-		return;
+	is_writing = write;
+	if(is_writing) {
+		recording_fp = CreateFileW(L"./replay/_LastReplay.yrpX", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+		if(recording_fp == INVALID_HANDLE_VALUE)
+			return;
+	}
 #else
-	if(is_recording)
+	if(is_recording && is_writing)
 		fclose(fp);
-	fp = fopen("./replay/_LastReplay.yrp", "wb");
-	if(!fp)
-		return;
+	is_writing = write;
+	if(is_writing) {
+		fp = fopen("./replay/_LastReplay.yrpX", "wb");
+		if(!fp)
+			return;
+	}
 #endif
 	pdata = replay_data;
 	is_recording = true;
 }
+void Replay::WritePacket(ReplayPacket p) {
+	WriteInt8(p.message, false);
+	WriteInt32(p.length, false);
+	WriteData((char*)p.data, p.length);
+}
+void Replay::WriteStream(std::vector<ReplayPacket> stream) {
+	if(stream.size())
+		for(auto it = stream.begin(); it != stream.end(); it++)
+			WritePacket((*it));
+}
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
+	if(!is_writing) return;
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &header, sizeof(header), &size, NULL);
@@ -48,6 +82,7 @@ void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 		return;
 	memcpy(pdata, data, length);
 	pdata += length;
+	if(!is_writing) return;
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, data, length, &size, NULL);
@@ -62,6 +97,7 @@ void Replay::WriteInt32(int data, bool flush) {
 		return;
 	*((int*)(pdata)) = data;
 	pdata += 4;
+	if(!is_writing) return;
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
@@ -76,6 +112,7 @@ void Replay::WriteInt16(short data, bool flush) {
 		return;
 	*((short*)(pdata)) = data;
 	pdata += 2;
+	if(!is_writing) return;
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
@@ -90,6 +127,7 @@ void Replay::WriteInt8(char data, bool flush) {
 		return;
 	*pdata = data;
 	pdata++;
+	if(!is_writing) return;
 #ifdef _WIN32
 	DWORD size;
 	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
@@ -102,14 +140,16 @@ void Replay::WriteInt8(char data, bool flush) {
 void Replay::Flush() {
 	if(!is_recording)
 		return;
+	if(!is_writing) return;
 #ifdef _WIN32
 #else
 	fflush(fp);
 #endif
 }
-void Replay::EndRecord() {
+void Replay::EndRecord(size_t size) {
 	if(!is_recording)
 		return;
+	if(is_writing)
 #ifdef _WIN32
 	CloseHandle(recording_fp);
 #else
@@ -118,13 +158,13 @@ void Replay::EndRecord() {
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
-	comp_size = 0x1000;
+	comp_size = size;
 	LzmaCompress(comp_data, &comp_size, replay_data, pdata - replay_data, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	is_recording = false;
 }
 void Replay::SaveReplay(const wchar_t* name) {
 	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls.yrp", name);
+	myswprintf(fname, L"./replay/%ls.yrpX", name);
 #ifdef WIN32
 	fp = _wfopen(fname, L"wb");
 #else
@@ -161,7 +201,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		return false;
 	fread(&pheader, sizeof(pheader), 1, fp);
 	if(pheader.flag & REPLAY_COMPRESSED) {
-		comp_size = fread(comp_data, 1, 0x1000, fp);
+		comp_size = fread(comp_data, 1, 0x20000, fp);
 		fclose(fp);
 		replay_size = pheader.datasize;
 		if(LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
@@ -190,7 +230,23 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	ReplayHeader rheader;
 	fread(&rheader, sizeof(ReplayHeader), 1, rfp);
 	fclose(rfp);
-	return rheader.id == 0x31707279 && rheader.version >= 0x12d0;
+	return (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
+}
+bool Replay::ReadNextPacket(ReplayPacket* packet) {
+	if (pdata - replay_data >= (int)replay_size)
+		return false;
+	packet->message = *pdata++;
+	packet->length = ReadInt32();
+	ReadData((char*)&packet->data, packet->length);
+	return true;
+}
+bool Replay::ReadStream(std::vector<ReplayPacket>* stream) {
+	stream->clear();
+	ReplayPacket p;
+	while (ReadNextPacket(&p)) {
+		stream->push_back(p);
+	}
+	return !!stream->size();
 }
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
 	if(pdata - replay_data >= (int)replay_size)
@@ -236,6 +292,33 @@ char Replay::ReadInt8() {
 }
 void Replay::Rewind() {
 	pdata = replay_data;
+}
+
+bool Replay::LoadYrp() {
+	if (pheader.flag & REPLAY_NEWREPLAY) {
+		pdata += (4 + ((pheader.flag & REPLAY_TAG) ? 160 : 80));
+		ReplayPacket p;
+		while (ReadNextPacket(&p))
+			if (p.message == OLD_REPLAY_MODE) {
+				char* prep = (char*)p.data;
+				memcpy(&pheader, prep, sizeof(ReplayHeader));
+				prep += sizeof(ReplayHeader);
+				if(pheader.flag & REPLAY_COMPRESSED) {
+					comp_size = (size_t)(p.length - sizeof(ReplayHeader));
+					replay_size = pheader.datasize;
+					if (LzmaUncompress(replay_data, &replay_size, (unsigned char*)prep, &comp_size, pheader.props, 5) != SZ_OK)
+						return false;
+				} else {
+					comp_size = fread(replay_data, 1, 0x20000, fp);
+					fclose(fp);
+					replay_size = comp_size;
+				}
+				pdata = replay_data;
+				is_replaying = true;
+				return true;
+			}
+	}
+	return !(pheader.flag & REPLAY_NEWREPLAY);
 }
 
 }

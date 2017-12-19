@@ -48,6 +48,7 @@ struct Config {
 struct DuelInfo {
 	bool isStarted;
 	bool isReplay;
+	bool isOldReplay;
 	bool isReplaySkiping;
 	bool isFirst;
 	bool isTag;
@@ -134,6 +135,7 @@ public:
 	const wchar_t* LocalName(int local_player);
 	void UpdateDuelParam();
 	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);
+	void SetPhaseButtons();
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
@@ -170,7 +172,7 @@ public:
 	unsigned short linePattern;
 	int waitFrame;
 	int signalFrame;
-	int actionParam;
+	int saveReplay;
 	const wchar_t* showingtext;
 	int showcard;
 	int showcardcode;
@@ -309,6 +311,7 @@ public:
 	irr::gui::IGUIWindow* wReplay;
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIStaticText* stReplayInfo;
+	irr::gui::IGUICheckBox* chkYrp;
 	irr::gui::IGUIButton* btnLoadReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
 	irr::gui::IGUIEditBox* ebRepStartTurn;

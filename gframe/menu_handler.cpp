@@ -274,6 +274,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
 						break;
 				}
+				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.LoadYrp())
+					break;
 				mainGame->imgCard->setImage(imageManager.tCover[0]);
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
@@ -393,6 +395,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
+				if(ReplayMode::cur_replay.pheader.id == 0x31707279) {
+					mainGame->chkYrp->setChecked(false);
+					mainGame->chkYrp->setEnabled(false);
+				} else
+					mainGame->chkYrp->setEnabled(true);
 				break;
 			}
 			}

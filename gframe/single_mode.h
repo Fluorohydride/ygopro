@@ -18,11 +18,8 @@ public:
 	static int SinglePlayThread(void* param);
 	static bool SinglePlayAnalyze(char* msg, unsigned int len);
 	
+	static void SinglePlayRefresh(int player, int location, int flag = 0xf81fff);
 	static void SinglePlayRefresh(int flag = 0xf81fff);
-	static void SinglePlayRefreshHand(int player, int flag = 0x781fff);
-	static void SinglePlayRefreshGrave(int player, int flag = 0x181fff);
-	static void SinglePlayRefreshDeck(int player, int flag = 0x181fff);
-	static void SinglePlayRefreshExtra(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	static void SinglePlayReload();
 
@@ -31,6 +28,8 @@ public:
 
 protected:
 	static Replay last_replay;
+	static Replay new_replay;
+	static std::vector<ReplayPacket> replay_stream;
 };
 
 }
