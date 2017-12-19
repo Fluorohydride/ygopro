@@ -775,6 +775,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			int rule = BufferIO::ReadInt8(pbuf);
 			mainGame->dInfo.duel_field = rule & 0xf;
 			mainGame->dInfo.extraval = rule >> 4;
+			mainGame->SetPhaseButtons();
 			int val = 0;
 			for(int p = 0; p < 2; ++p) {
 				mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);
@@ -903,29 +904,14 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 	replay_stream.push_back(p);
 }
 void SingleMode::SinglePlayRefresh(int flag) {
-	SinglePlayRefresh(0, LOCATION_MZONE, flag);
-	SinglePlayRefresh(1, LOCATION_MZONE, flag);
-	SinglePlayRefresh(0, LOCATION_SZONE, flag);
-	SinglePlayRefresh(1, LOCATION_SZONE, flag);
-	SinglePlayRefresh(0, LOCATION_HAND, flag);
-	SinglePlayRefresh(1, LOCATION_HAND, flag);
+	for(int p = 0; p < 2; p++)
+		for(int loc = LOCATION_HAND; loc != LOCATION_GRAVE; loc *= 2)
+			SinglePlayRefresh(p, loc, flag);
 }
 void SingleMode::SinglePlayReload() {
-	unsigned int flag = 0xffdfff;
-	SinglePlayRefresh(0, LOCATION_MZONE, flag);
-	SinglePlayRefresh(1, LOCATION_MZONE, flag);
-	SinglePlayRefresh(0, LOCATION_SZONE, flag);
-	SinglePlayRefresh(1, LOCATION_SZONE, flag);
-	SinglePlayRefresh(0, LOCATION_HAND, flag);
-	SinglePlayRefresh(1, LOCATION_HAND, flag);
-	SinglePlayRefresh(0, LOCATION_DECK, flag);
-	SinglePlayRefresh(1, LOCATION_DECK, flag);
-	SinglePlayRefresh(0, LOCATION_EXTRA, flag);
-	SinglePlayRefresh(1, LOCATION_EXTRA, flag);
-	SinglePlayRefresh(0, LOCATION_GRAVE, flag);
-	SinglePlayRefresh(1, LOCATION_GRAVE, flag);
-	SinglePlayRefresh(0, LOCATION_REMOVED, flag);
-	SinglePlayRefresh(1, LOCATION_REMOVED, flag);
+	for(int p = 0; p < 2; p++)
+		for(int loc = LOCATION_DECK; loc != LOCATION_OVERLAY; loc *= 2)
+			SinglePlayRefresh(p, loc, 0xffdfff);
 }
 byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
 	FILE *fp;

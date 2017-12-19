@@ -49,10 +49,10 @@ namespace ygo {
 				is_continuing = ReplayAnalyze(engineBuffer, len);
 		}
 		else {
-			ReplayRefreshDeck(0);
-			ReplayRefreshDeck(1);
-			ReplayRefreshExtra(0);
-			ReplayRefreshExtra(1);
+			ReplayRefresh(0, LOCATION_DECK, 0x181fff);
+			ReplayRefresh(1, LOCATION_DECK, 0x181fff);
+			ReplayRefresh(0, LOCATION_EXTRA, 0x181fff);
+			ReplayRefresh(1, LOCATION_EXTRA, 0x181fff);
 		}
 		exit_pending = false;
 		current_step = 0;
@@ -155,47 +155,8 @@ namespace ygo {
 			mainGame->dInfo.duel_field = 4;
 		else if (opt & DUEL_PZONE)
 			mainGame->dInfo.duel_field = 3;
-		mainGame->dInfo.extraval = !!(opt & SPEED_DUEL);
-		// reset master rule 4 phase button position
-		mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 310, 855, 330));
-		if (mainGame->dInfo.extraval) {
-			if (mainGame->dInfo.duel_field >= 4) {
-				mainGame->wPhase->setRelativePosition(mainGame->Resize(480, 290, 855, 350));
-				mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
-				mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
-				mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 40, 50, 60));
-				mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
-				mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
-				mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 20, 210, 40));
-				mainGame->btnEP->setRelativePosition(mainGame->Resize(310, 0, 360, 20));
-			}
-			else {
-				mainGame->btnShuffle->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
-				mainGame->btnDP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
-				mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
-				mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
-				mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
-				mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
-				mainGame->btnEP->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
-			}
-		}
-		else {
-			mainGame->btnDP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-			if (mainGame->dInfo.duel_field >= 4) {
-				mainGame->btnSP->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-				mainGame->btnM1->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-				mainGame->btnBP->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-				mainGame->btnM2->setRelativePosition(mainGame->Resize(160, 0, 210, 20));
-			}
-			else {
-				mainGame->btnSP->setRelativePosition(mainGame->Resize(65, 0, 115, 20));
-				mainGame->btnM1->setRelativePosition(mainGame->Resize(130, 0, 180, 20));
-				mainGame->btnBP->setRelativePosition(mainGame->Resize(195, 0, 245, 20));
-				mainGame->btnM2->setRelativePosition(mainGame->Resize(260, 0, 310, 20));
-			}
-			mainGame->btnEP->setRelativePosition(mainGame->Resize(320, 0, 370, 20));
-			mainGame->btnShuffle->setRelativePosition(mainGame->Resize(0, 0, 50, 20));
-		}
+		mainGame->dInfo.extraval = (opt & SPEED_DUEL);
+		mainGame->SetPhaseButtons();
 		set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 		set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 		mainGame->dInfo.lp[0] = start_lp;
@@ -436,7 +397,7 @@ namespace ygo {
 			case MSG_SHUFFLE_DECK: {
 				player = BufferIO::ReadInt8(pbuf);
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
-				ReplayRefreshDeck(player);
+				ReplayRefresh(player, LOCATION_DECK, 0x181fff);
 				break;
 			}
 			case MSG_SHUFFLE_HAND: {
@@ -461,13 +422,13 @@ namespace ygo {
 			case MSG_SWAP_GRAVE_DECK: {
 				player = BufferIO::ReadInt8(pbuf);
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
-				ReplayRefreshGrave(player);
+				ReplayRefresh(player, LOCATION_GRAVE, 0x181fff);
 				break;
 			}
 			case MSG_REVERSE_DECK: {
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
-				ReplayRefreshDeck(0);
-				ReplayRefreshDeck(1);
+				ReplayRefresh(0, LOCATION_DECK, 0x181fff);
+				ReplayRefresh(1, LOCATION_DECK, 0x181fff);
 				break;
 			}
 			case MSG_DECK_TOP: {
@@ -782,8 +743,8 @@ namespace ygo {
 				player = pbuf[0];
 				pbuf += pbuf[2] * 4 + pbuf[4] * 4 + 9;
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
-				ReplayRefreshDeck(player);
-				ReplayRefreshExtra(player);
+				ReplayRefresh(player, LOCATION_DECK, 0x181fff);
+				ReplayRefresh(player, LOCATION_EXTRA, 0x181fff);
 				break;
 			}
 			case MSG_RELOAD_FIELD: {
@@ -841,40 +802,15 @@ namespace ygo {
 		}
 		return true;
 	}
+	void ReplayMode::ReplayRefresh(int player, int location, int flag) {
+		unsigned char queryBuffer[0x2000];
+		/*int len = */query_field_card(pduel, player, location, flag, queryBuffer, 0);
+		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer);
+	}
 	void ReplayMode::ReplayRefresh(int flag) {
-		unsigned char queryBuffer[0x4000];
-		/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_MZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_SZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_SZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_SZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_SZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_HAND, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_HAND, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_HAND, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_HAND, (char*)queryBuffer);
-	}
-	void ReplayMode::ReplayRefreshHand(int player, int flag) {
-		unsigned char queryBuffer[0x2000];
-		/*int len = */query_field_card(pduel, player, LOCATION_HAND, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_HAND, (char*)queryBuffer);
-	}
-	void ReplayMode::ReplayRefreshGrave(int player, int flag) {
-		unsigned char queryBuffer[0x2000];
-		/*int len = */query_field_card(pduel, player, LOCATION_GRAVE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_GRAVE, (char*)queryBuffer);
-	}
-	void ReplayMode::ReplayRefreshDeck(int player, int flag) {
-		unsigned char queryBuffer[0x2000];
-		/*int len = */query_field_card(pduel, player, LOCATION_DECK, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_DECK, (char*)queryBuffer);
-	}
-	void ReplayMode::ReplayRefreshExtra(int player, int flag) {
-		unsigned char queryBuffer[0x2000];
-		/*int len = */query_field_card(pduel, player, LOCATION_EXTRA, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_EXTRA, (char*)queryBuffer);
+		for(int p = 0; p < 2; p++)
+			for(int loc = LOCATION_HAND; loc != LOCATION_GRAVE; loc *= 2)
+				ReplayRefresh(p, loc, flag);
 	}
 	void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
 		unsigned char queryBuffer[0x4000];
@@ -882,36 +818,9 @@ namespace ygo {
 		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
 	}
 	void ReplayMode::ReplayReload() {
-		unsigned char queryBuffer[0x4000];
-		unsigned int flag = 0xffdfff;
-		/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_MZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_SZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_SZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_SZONE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_SZONE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_HAND, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_HAND, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_HAND, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_HAND, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_DECK, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_DECK, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_DECK, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_DECK, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_EXTRA, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_EXTRA, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_EXTRA, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_EXTRA, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_GRAVE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_GRAVE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_GRAVE, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_GRAVE, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 0, LOCATION_REMOVED, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
-		/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
+		for(int p = 0; p < 2; p++)
+			for(int loc = LOCATION_DECK; loc != LOCATION_OVERLAY; loc *= 2)
+				ReplayRefresh(p, loc, 0xffdfff);
 	}
 	int ReplayMode::MessageHandler(long fduel, int type) {
 		if (!enable_log)
