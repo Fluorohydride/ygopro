@@ -1519,7 +1519,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			s = BufferIO::ReadInt8(pbuf);
 			ss = BufferIO::ReadInt8(pbuf);
 			if ((l & LOCATION_OVERLAY) > 0)
-				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
+				pcard = mainGame->dField.GetCard(c, l & (~LOCATION_OVERLAY), s)->overlayed[ss];
 			else if (l == 0) {
 				pcard = new ClientCard();
 				mainGame->dField.limbo_temp.push_back(pcard);
@@ -1580,7 +1580,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			s = BufferIO::ReadInt8(pbuf);
 			ss = BufferIO::ReadInt8(pbuf);
 			if ((l & LOCATION_OVERLAY) > 0)
-				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
+				pcard = mainGame->dField.GetCard(c, l & (~LOCATION_OVERLAY), s)->overlayed[ss];
 			else if (l == 0) {
 				pcard = new ClientCard();
 				mainGame->dField.limbo_temp.push_back(pcard);
@@ -1604,7 +1604,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			s = BufferIO::ReadInt8(pbuf);
 			ss = BufferIO::ReadInt8(pbuf);
 			if ((l & LOCATION_OVERLAY) > 0)
-				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
+				pcard = mainGame->dField.GetCard(c, l & (~LOCATION_OVERLAY), s)->overlayed[ss];
 			else if (l == 0) {
 				pcard = new ClientCard();
 				mainGame->dField.limbo_temp.push_back(pcard);
@@ -1818,7 +1818,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
 		unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
 		int positions = BufferIO::ReadInt8(pbuf);
-		if (positions == 0x1 || positions == 0x2 || positions == 0x4 || positions == 0x8) {
+		if (positions == POS_FACEUP_ATTACK || positions == POS_FACEDOWN_ATTACK || positions == POS_FACEUP_DEFENSE || positions == POS_FACEDOWN_DEFENSE) {
 			SetResponseI(positions);
 			return true;
 		}
@@ -1830,24 +1830,24 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(count == 4) startpos = 10;
 		else if(count == 3) startpos = 82;
 		else startpos = 155;
-		if(positions & 0x1) {
+		if(positions & POS_FACEUP_ATTACK) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
 			mainGame->btnPSAU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAU->setVisible(false);
-		if(positions & 0x2) {
+		if(positions & POS_FACEDOWN_ATTACK) {
 			mainGame->btnPSAD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAD->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAD->setVisible(false);
-		if(positions & 0x4) {
+		if(positions & POS_FACEUP_DEFENSE) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
 			mainGame->btnPSDU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSDU->setVisible(false);
-		if(positions & 0x8) {
+		if(positions & POS_FACEDOWN_DEFENSE) {
 			mainGame->btnPSDD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDD->setVisible(true);
 			startpos += 145;
@@ -2121,10 +2121,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(code);
 			mainGame->gMutex.Unlock();
-			if (l & 0x41 || l == 0) {
+			if (l & (LOCATION_EXTRA | LOCATION_DECK) || l == 0) {
 				if(count == 1 && l != 0) {
 					float shift = -0.15f;
-					if (c == 0 && l == 0x40) shift = 0.15f;
+					if (c == 0 && l == LOCATION_EXTRA) shift = 0.15f;
 					pcard->dPos = irr::core::vector3df(shift, 0, 0);
 					if((l == LOCATION_DECK) && mainGame->dField.deck_reversed)
 						pcard->dRot = irr::core::vector3df(0, 0, 0);
@@ -2552,9 +2552,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.RemoveCard(pc, pl, ps);
 			delete pcard;
 		} else {
-			if (!(pl & 0x80) && !(cl & 0x80)) {
+			if (!(pl & LOCATION_OVERLAY) && !(cl & LOCATION_OVERLAY)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
-				if (pcard->code != code && (code != 0 || cl == 0x40))
+				if (pcard->code != code && (code != 0 || cl == LOCATION_EXTRA))
 					pcard->SetCode(code);
 				pcard->cHint = 0;
 				pcard->chValue = 0;
@@ -2582,7 +2582,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->position = cp;
 					mainGame->dField.AddCard(pcard, cc, cl, cs);
 					mainGame->gMutex.Unlock();
-					if (pl == cl && pc == cc && (cl & 0x71)) {
+					if (pl == cl && pc == cc && (cl & (LOCATION_DECK | LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_EXTRA))) {
 						pcard->dPos = irr::core::vector3df(-0.3f, 0, 0);
 						pcard->dRot = irr::core::vector3df(0, 0, 0);
 						if (pc == 1) pcard->dPos.X = 0.3f;
@@ -2592,14 +2592,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 						mainGame->dField.MoveCard(pcard, 5);
 						mainGame->WaitFrameSignal(5);
 					} else {
-						if (cl == 0x4 && pcard->overlayed.size() > 0) {
+						if (cl == LOCATION_MZONE && pcard->overlayed.size() > 0) {
 							mainGame->gMutex.Lock();
 							for (size_t i = 0; i < pcard->overlayed.size(); ++i)
 								mainGame->dField.MoveCard(pcard->overlayed[i], 10);
 							mainGame->gMutex.Unlock();
 							mainGame->WaitFrameSignal(10);
 						}
-						if (cl == 0x2) {
+						if (cl == LOCATION_HAND) {
 							mainGame->gMutex.Lock();
 							for (size_t i = 0; i < mainGame->dField.hand[cc].size(); ++i)
 								mainGame->dField.MoveCard(mainGame->dField.hand[cc][i], 10);
@@ -2607,7 +2607,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 						} else {
 							mainGame->gMutex.Lock();
 							mainGame->dField.MoveCard(pcard, 10);
-							if (pl == 0x2)
+							if (pl == LOCATION_HAND)
 								for (size_t i = 0; i < mainGame->dField.hand[pc].size(); ++i)
 									mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
 							mainGame->gMutex.Unlock();
@@ -2615,7 +2615,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 						mainGame->WaitFrameSignal(5);
 					}
 				}
-			} else if (!(pl & 0x80)) {
+			} else if (!(pl & LOCATION_OVERLAY)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
 				if (code != 0 && pcard->code != code)
 					pcard->SetCode(code);
@@ -2623,13 +2623,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->ClearTarget();
 				pcard->is_showtarget = false;
 				pcard->is_showchaintarget = false;
-				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
+				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & (~LOCATION_OVERLAY), cs);
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					mainGame->dField.RemoveCard(pc, pl, ps);
 					olcard->overlayed.push_back(pcard);
 					mainGame->dField.overlay_cards.insert(pcard);
 					pcard->overlayTarget = olcard;
-					pcard->location = 0x80;
+					pcard->location = LOCATION_OVERLAY;
 					pcard->sequence = olcard->overlayed.size() - 1;
 				} else {
 					mainGame->gMutex.Lock();
@@ -2638,20 +2638,20 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					mainGame->dField.overlay_cards.insert(pcard);
 					mainGame->gMutex.Unlock();
 					pcard->overlayTarget = olcard;
-					pcard->location = 0x80;
+					pcard->location = LOCATION_OVERLAY;
 					pcard->sequence = olcard->overlayed.size() - 1;
-					if (olcard->location & 0x0c) {
+					if (olcard->location & LOCATION_ONFIELD) {
 						mainGame->gMutex.Lock();
 						mainGame->dField.MoveCard(pcard, 10);
-						if (pl == 0x2)
+						if (pl == LOCATION_HAND)
 							for (size_t i = 0; i < mainGame->dField.hand[pc].size(); ++i)
 								mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
 						mainGame->gMutex.Unlock();
 						mainGame->WaitFrameSignal(5);
 					}
 				}
-			} else if (!(cl & 0x80)) {
-				ClientCard* olcard = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
+			} else if (!(cl & LOCATION_OVERLAY)) {
+				ClientCard* olcard = mainGame->dField.GetCard(pc, pl & (~LOCATION_OVERLAY), ps);
 				ClientCard* pcard = olcard->overlayed[pp];
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
@@ -2680,14 +2680,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					mainGame->WaitFrameSignal(5);
 				}
 			} else {
-				ClientCard* olcard1 = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
+				ClientCard* olcard1 = mainGame->dField.GetCard(pc, pl & (~LOCATION_OVERLAY), ps);
 				ClientCard* pcard = olcard1->overlayed[pp];
-				ClientCard* olcard2 = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
+				ClientCard* olcard2 = mainGame->dField.GetCard(cc, cl & (~LOCATION_OVERLAY), cs);
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
 					olcard2->overlayed.push_back(pcard);
 					pcard->sequence = olcard2->overlayed.size() - 1;
-					pcard->location = 0x80;
+					pcard->location = LOCATION_OVERLAY;
 					pcard->overlayTarget = olcard2;
 					for (size_t i = 0; i < olcard1->overlayed.size(); ++i) {
 						olcard1->overlayed[i]->sequence = i;
@@ -2697,7 +2697,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
 					olcard2->overlayed.push_back(pcard);
 					pcard->sequence = olcard2->overlayed.size() - 1;
-					pcard->location = 0x80;
+					pcard->location = LOCATION_OVERLAY;
 					pcard->overlayTarget = olcard2;
 					for (size_t i = 0; i < olcard1->overlayed.size(); ++i) {
 						olcard1->overlayed[i]->sequence = i;
@@ -2898,7 +2898,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.current_chain.target.clear();
 		int chc = 0;
 		for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
-			if (cl == 0x10 || cl == 0x20) {
+			if (cl == LOCATION_GRAVE || cl == LOCATION_REMOVED) {
 				if (chit->controler == cc && chit->location == cl)
 					chc++;
 			} else {
@@ -2983,8 +2983,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			int l = BufferIO::ReadInt8(pbuf);
 			int s = BufferIO::ReadInt8(pbuf);
 			int ss = BufferIO::ReadInt8(pbuf);
-			if ((l & 0x80) > 0)
-				pcards[i] = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
+			if ((l & LOCATION_OVERLAY) > 0)
+				pcards[i] = mainGame->dField.GetCard(c, l & (~LOCATION_OVERLAY), s)->overlayed[ss];
 			else
 				pcards[i] = mainGame->dField.GetCard(c, l, s);
 			pcards[i]->is_highlighting = true;
@@ -3789,7 +3789,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 							ccard->overlayed.push_back(xcard);
 							mainGame->dField.overlay_cards.insert(xcard);
 							xcard->overlayTarget = ccard;
-							xcard->location = 0x80;
+							xcard->location = LOCATION_OVERLAY;
 							xcard->sequence = ccard->overlayed.size() - 1;
 							mainGame->dField.GetCardLocation(xcard, &xcard->curPos, &xcard->curRot, true);
 						}
@@ -3866,7 +3866,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.current_chain.solved = false;
 			int chc = 0;
 			for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {
-				if (cl == 0x10 || cl == 0x20) {
+				if (cl == LOCATION_GRAVE || cl == LOCATION_REMOVED) {
 					if (chit->controler == cc && chit->location == cl)
 						chc++;
 				} else {

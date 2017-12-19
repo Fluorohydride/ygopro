@@ -102,7 +102,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		deck[player].push_back(pcard);
 		pcard->owner = player;
 		pcard->controler = player;
-		pcard->location = 0x1;
+		pcard->location = LOCATION_DECK;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
@@ -112,7 +112,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		extra[player].push_back(pcard);
 		pcard->owner = player;
 		pcard->controler = player;
-		pcard->location = 0x40;
+		pcard->location = LOCATION_EXTRA;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
@@ -120,8 +120,8 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
-	bool is_xyz = (location & 0x80) != 0;
-	location &= 0x7f;
+	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
+	location &= (~LOCATION_OVERLAY);
 	switch(location) {
 	case LOCATION_DECK:
 		lst = &deck[controler];
@@ -710,7 +710,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
 	int speed = (mainGame->dInfo.extraval & 0x1) ? 1 : 0;
 	S3DVertex loc[4];
-	if ((location & 0x7f) == LOCATION_HAND) {
+	if ((location & (~LOCATION_OVERLAY)) == LOCATION_HAND) {
 		if (controler == 0) {
 			t->X = 2.95f;
 			t->Y = 3.15f;
@@ -723,7 +723,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 		return;
 	}
 	bool chk = false;
-	switch((location & 0x7f)) {
+	switch((location & (~LOCATION_OVERLAY))) {
 	case LOCATION_DECK: {
 		std::copy(matManager.vFieldDeck[controler][speed], matManager.vFieldDeck[controler][speed] + 4, loc);
 		t->Z = deck[controler].size() * 0.01f + 0.03f;
