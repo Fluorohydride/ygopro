@@ -61,7 +61,7 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
-	mainGame->dInfo.lua64 = true;
+	mainGame->dInfo.lua64 = !!(rh.flag & REPLAY_LUA64);
 	mainGame->dInfo.tag_player[0] = false;
 	mainGame->dInfo.tag_player[1] = false;
 	if (mainGame->dInfo.isTag) {
@@ -78,10 +78,9 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.duel_field = opt & 0xff;
 	mainGame->dInfo.extraval = (opt >> 8);
 	mainGame->SetPhaseButtons();
-	ReplayPacket p;
-	current_stream.clear();
-	while (cur_replay.ReadNextPacket(&p)) {
-		current_stream.push_back(p);
+	if(!cur_replay.ReadStream(&current_stream)) {
+		EndDuel();
+		return 0;
 	}
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isReplay = true;
@@ -156,6 +155,7 @@ void ReplayMode::Restart(bool refresh) {
 		cur_replay.Rewind();
 	}
 	mainGame->dInfo.isStarted = false;
+	mainGame->dInfo.turn = 0;
 	mainGame->dField.Clear();
 	mainGame->dInfo.tag_player[0] = false;
 	mainGame->dInfo.tag_player[1] = false;

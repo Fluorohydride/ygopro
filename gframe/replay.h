@@ -52,6 +52,7 @@ public:
 	bool OpenReplay(const wchar_t* name);
 	static bool CheckReplay(const wchar_t* name);
 	bool ReadNextPacket(ReplayPacket* packet);
+	bool ReadStream(std::vector<ReplayPacket>* stream);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
 	void ReadData(void* data, unsigned int length);

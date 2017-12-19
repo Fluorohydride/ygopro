@@ -240,6 +240,14 @@ bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	ReadData((char*)&packet->data, packet->length);
 	return true;
 }
+bool Replay::ReadStream(std::vector<ReplayPacket>* stream) {
+	stream->clear();
+	ReplayPacket p;
+	while (ReadNextPacket(&p)) {
+		stream->push_back(p);
+	}
+	return !!stream->size();
+}
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
 	if(pdata - replay_data >= (int)replay_size)
 		return false;
