@@ -1726,6 +1726,44 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		return true;
 	}
+	case MSG_CONFIRM_EXTRATOP: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int count = BufferIO::ReadInt8(pbuf);
+		int code;
+		ClientCard* pcard;
+		mainGame->dField.selectable_cards.clear();
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			pbuf += 3;
+			pcard = *(mainGame->dField.extra[player].rbegin() + i + mainGame->dField.extra_p_count[player]);
+			if (code != 0)
+				pcard->SetCode(code);
+		}
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
+		myswprintf(textBuffer, dataManager.GetSysString(207), count);
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
+		for (int i = 0; i < count; ++i) {
+			pcard = *(mainGame->dField.extra[player].rbegin() + i + mainGame->dField.extra_p_count[player]);
+			mainGame->gMutex.Lock();
+			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(pcard->code));
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(pcard->code);
+			mainGame->gMutex.Unlock();
+			if (player == 0)
+				pcard->dPos = irr::core::vector3df(0, -0.20f, 0);
+			else
+				pcard->dPos = irr::core::vector3df(0.15f, 0, 0);
+			pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+			pcard->is_moving = true;
+			pcard->aniFrame = 5;
+			mainGame->WaitFrameSignal(45);
+			mainGame->dField.MoveCard(pcard, 5);
+			mainGame->WaitFrameSignal(5);
+		}
+		return true;
+	}
 	case MSG_CONFIRM_CARDS: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
@@ -1902,6 +1940,33 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			}
 			mainGame->WaitFrameSignal(5);
 		}
+		return true;
+	}
+	case MSG_SHUFFLE_EXTRA: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		/*int count = */BufferIO::ReadInt8(pbuf);
+		if((mainGame->dField.extra[player].size() - mainGame->dField.extra_p_count[player]) < 2)
+			return true;
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			for (int i = 0; i < 5; ++i) {
+				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
+					if(!((*cit)->position & POS_FACEUP)) {
+						(*cit)->dPos = irr::core::vector3df(rand() * 0.4f / RAND_MAX - 0.2f, 0, 0);
+						(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+						(*cit)->is_moving = true;
+						(*cit)->aniFrame = 3;
+					}
+				}
+				mainGame->WaitFrameSignal(3);
+				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit)
+					if(!((*cit)->position & POS_FACEUP))
+						mainGame->dField.MoveCard(*cit, 3);
+				mainGame->WaitFrameSignal(3);
+			}
+		}
+		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit)
+			if(!((*cit)->position & POS_FACEUP))
+				(*cit)->SetCode(BufferIO::ReadInt32(pbuf));
 		return true;
 	}
 	case MSG_REFRESH_DECK: {
