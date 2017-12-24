@@ -1707,9 +1707,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->dPos = irr::core::vector3df(0, -0.20f, 0);
 			else
 				pcard->dPos = irr::core::vector3df(0.15f, 0, 0);
-			if(!mainGame->dField.deck_reversed)
-				pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-			else pcard->dRot = irr::core::vector3df(0, 0, 0);
+			pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
 			pcard->is_moving = true;
 			pcard->aniFrame = 5;
 			mainGame->WaitFrameSignal(45);
@@ -1897,7 +1895,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_EXTRA: {
-		mainGame->PlaySoundEffect("./sound/shuffle.wav");
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		/*int count = */BufferIO::ReadInt8(pbuf);
 		if((mainGame->dField.extra[player].size() - mainGame->dField.extra_p_count[player]) < 2)
