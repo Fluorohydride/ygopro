@@ -431,6 +431,13 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
+		case MSG_CONFIRM_EXTRATOP: {
+			player = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += count * 7;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
@@ -445,6 +452,13 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_HAND: {
+			/*int oplayer = */BufferIO::ReadInt8(pbuf);
+			int count = BufferIO::ReadInt8(pbuf);
+			pbuf += count * 4;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
+		case MSG_SHUFFLE_EXTRA: {
 			/*int oplayer = */BufferIO::ReadInt8(pbuf);
 			int count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 4;

@@ -203,8 +203,21 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		break;
 	}
 	case LOCATION_EXTRA: {
-		extra[controler].push_back(pcard);
-		pcard->sequence = extra[controler].size() - 1;
+		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
+			extra[controler].push_back(pcard);
+			pcard->sequence = extra[controler].size() - 1;
+		} else {
+			extra[controler].push_back(0);
+			int p = extra[controler].size() - extra_p_count[controler] - 1;
+			for(int i = extra[controler].size() - 1; i > p; --i) {
+				extra[controler][i] = extra[controler][i - 1];
+				extra[controler][i]->sequence++;
+				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
+				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
+			}
+			extra[controler][p] = pcard;
+			pcard->sequence = p;
+		}
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
 		break;
