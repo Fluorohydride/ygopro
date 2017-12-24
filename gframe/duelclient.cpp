@@ -1800,6 +1800,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
+		soundManager.PlaySoundEffect(SOUND_REVEAL);
 		myswprintf(textBuffer, dataManager.GetSysString(207), count);
 		mainGame->lstLog->addItem(textBuffer);
 		mainGame->logParam.push_back(0);
@@ -2007,10 +2008,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SHUFFLE_EXTRA: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		/*int count = */BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
 		if((mainGame->dField.extra[player].size() - mainGame->dField.extra_p_count[player]) < 2)
 			return true;
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			if(count > 1)
+				soundManager.PlaySoundEffect(SOUND_SHUFFLE);
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 					if(!((*cit)->position & POS_FACEUP)) {
