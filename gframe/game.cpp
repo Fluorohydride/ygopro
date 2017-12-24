@@ -1054,9 +1054,7 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "default_ot")) {
 			gameConf.defaultOT = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_bot_mode")) {
-#ifdef _WIN32
 			gameConf.enable_bot_mode = atoi(valbuf);
-#endif
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
