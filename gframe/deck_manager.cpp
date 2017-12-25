@@ -1,5 +1,6 @@
 #include "deck_manager.h"
 #include "data_manager.h"
+#include "network.h"
 #include "game.h"
 #include <algorithm>
 
@@ -61,7 +62,7 @@ wchar_t* DeckManager::GetLFListName(int lfhash) {
 	}
 	return (wchar_t*)dataManager.unknown_string;
 }
-int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
+int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
 	std::unordered_map<int, int> ccount;
 	std::unordered_map<int, int>* list = 0;
 	for(size_t i = 0; i < _lfList.size(); ++i) {
@@ -73,53 +74,73 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 	if(!list)
 		return 0;
 	int dc = 0;
-	if(deck.main.size() < 40 || deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15)
-		return 1;
+	if(deck.main.size() < 40 || deck.main.size() > 60)
+		return (DECKERROR_MAINCOUNT << 28) + deck.main.size();
+	if(deck.extra.size() > 15)
+		return (DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
+	if(deck.side.size() > 15)
+		return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
+
 	for(size_t i = 0; i < deck.main.size(); ++i) {
 		code_pointer cit = deck.main[i];
-		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
-			return cit->first;
+		if(!allow_ocg && (cit->second.ot == 0x1))
+			return (DECKERROR_OCGONLY << 28) + cit->first;
+		if(!allow_tcg && (cit->second.ot == 0x2))
+			return (DECKERROR_TCGONLY << 28) + cit->first;
 		if(cit->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN | TYPE_LINK))
-			return 1;
+			return (DECKERROR_EXTRACOUNT << 28);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
+		if(dc > 3)
+			return (DECKERROR_CARDCOUNT << 28) + cit->first;
 		auto it = list->find(code);
-		if(dc > 3 || (it != list->end() && dc > it->second))
-			return cit->first;
+		if(it != list->end() && dc > it->second)
+			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
 	for(size_t i = 0; i < deck.extra.size(); ++i) {
 		code_pointer cit = deck.extra[i];
-		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
-			return cit->first;
+		if(!allow_ocg && (cit->second.ot == 0x1))
+			return (DECKERROR_OCGONLY << 28) + cit->first;
+		if(!allow_tcg && (cit->second.ot == 0x2))
+			return (DECKERROR_TCGONLY << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
+		if(dc > 3)
+			return (DECKERROR_CARDCOUNT << 28) + cit->first;
 		auto it = list->find(code);
-		if(dc > 3 || (it != list->end() && dc > it->second))
-			return cit->first;
+		if(it != list->end() && dc > it->second)
+			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
 	for(size_t i = 0; i < deck.side.size(); ++i) {
 		code_pointer cit = deck.side[i];
-		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
-			return cit->first;
+		if(!allow_ocg && (cit->second.ot == 0x1))
+			return (DECKERROR_OCGONLY << 28) + cit->first;
+		if(!allow_tcg && (cit->second.ot == 0x2))
+			return (DECKERROR_TCGONLY << 28) + cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
+		if(dc > 3)
+			return (DECKERROR_CARDCOUNT << 28) + cit->first;
 		auto it = list->find(code);
-		if(dc > 3 || (it != list->end() && dc > it->second))
-			return cit->first;
+		if(it != list->end() && dc > it->second)
+			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
 	return 0;
 }
-void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
+int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck.clear();
 	int code;
+	int errorcode = 0;
 	CardData cd;
 	for(int i = 0; i < mainc; ++i) {
 		code = dbuf[i];
-		if(!dataManager.GetData(code, &cd))
+		if(!dataManager.GetData(code, &cd)) {
+			errorcode = code;
 			continue;
+		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		else if(cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && deck.extra.size() < 15) {
@@ -130,13 +151,16 @@ void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 	}
 	for(int i = 0; i < sidec; ++i) {
 		code = dbuf[mainc + i];
-		if(!dataManager.GetData(code, &cd))
+		if(!dataManager.GetData(code, &cd)) {
+			errorcode = code;
 			continue;
+		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		if(deck.side.size() < 15)
 			deck.side.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
 	}
+	return errorcode;
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::unordered_map<int, int> pcount;

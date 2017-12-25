@@ -1,4 +1,4 @@
-include "lzma"
+include "lzma/."
 
 project "ygopro"
     kind "WindowedApp"

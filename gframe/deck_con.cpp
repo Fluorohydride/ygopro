@@ -69,6 +69,9 @@ void DeckBuilder::Initialize() {
 	mainGame->btnLeaveGame->setVisible(true);
 	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1306));
 	mainGame->btnSideOK->setVisible(false);
+	mainGame->btnSideShuffle->setVisible(false);
+	mainGame->btnSideSort->setVisible(false);
+	mainGame->btnSideReload->setVisible(false);
 	filterList = deckManager._lfList[0].content;
 	mainGame->cbDBLFList->setSelected(0);
 	ClearSearch();
@@ -237,6 +240,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+				break;
+			}
+			case BUTTON_SIDE_RELOAD: {
+				deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
 				break;
 			}
 			case BUTTON_MSG_OK: {

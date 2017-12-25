@@ -10,6 +10,7 @@ int enable_log = 0;
 bool exit_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
+bool bot_mode = false;
 
 void GetParameter(char* param, const char* arg) {
 #ifdef _WIN32
@@ -151,7 +152,7 @@ int main(int argc, char* argv[]) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i + 1][0]);
 			}
-			ClickButton(ygo::mainGame->btnServerMode);
+			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;

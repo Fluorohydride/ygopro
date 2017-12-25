@@ -203,8 +203,21 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		break;
 	}
 	case LOCATION_EXTRA: {
-		extra[controler].push_back(pcard);
-		pcard->sequence = extra[controler].size() - 1;
+		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
+			extra[controler].push_back(pcard);
+			pcard->sequence = extra[controler].size() - 1;
+		} else {
+			extra[controler].push_back(0);
+			int p = extra[controler].size() - extra_p_count[controler] - 1;
+			for(int i = extra[controler].size() - 1; i > p; --i) {
+				extra[controler][i] = extra[controler][i - 1];
+				extra[controler][i]->sequence++;
+				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
+				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
+			}
+			extra[controler][p] = pcard;
+			pcard->sequence = p;
+		}
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
 		break;
@@ -340,6 +353,7 @@ void ClientField::ClearCommandFlag() {
 		(*cit)->cmdFlag = 0;
 	for(cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
+	conti_cards.clear();
 	deck_act = false;
 	extra_act = false;
 	grave_act = false;
@@ -632,10 +646,9 @@ void ClientField::ReplaySwap() {
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
-	for(int i = 0; i < 16; ++i)
-		std::swap(mainGame->dInfo.strLP[0][i], mainGame->dInfo.strLP[1][i]);
-	for(int i = 0; i < 20; ++i)
-		std::swap(mainGame->dInfo.hostname[i], mainGame->dInfo.clientname[i]);
+	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
+	std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
+	std::swap(mainGame->dInfo.hostname_tag, mainGame->dInfo.clientname_tag);
 	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
 		chit->controler = 1 - chit->controler;
 		GetChainLocation(chit->controler, chit->location, chit->sequence, &chit->chain_pos);

@@ -40,6 +40,8 @@ struct Config {
 	int separate_clear_button;
 	int auto_search_limit;
 	int chkIgnoreDeckChanges;
+	int defaultOT;
+	int enable_bot_mode;
 };
 
 struct DuelInfo {
@@ -67,6 +69,14 @@ struct DuelInfo {
 	unsigned short time_left[2];
 };
 
+struct BotInfo {
+	wchar_t name[256];
+	wchar_t command[256];
+	wchar_t desc[256];
+	bool support_master_rule_3;
+	bool support_new_master_rule;
+};
+
 struct FadingUnit {
 	bool signalAction;
 	bool isFadein;
@@ -91,6 +101,7 @@ public:
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
+	void RefreshBot();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
@@ -141,6 +152,7 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
+	std::vector<BotInfo> botInfo;
 
 	int hideChatTimer;
 	bool hideChat;
@@ -221,7 +233,7 @@ public:
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
-	irr::gui::IGUIButton* btnServerMode;
+	irr::gui::IGUIButton* btnSingleMode;
 	irr::gui::IGUIButton* btnReplayMode;
 	irr::gui::IGUIButton* btnTestMode;
 	irr::gui::IGUIButton* btnDeckEdit;
@@ -276,6 +288,14 @@ public:
 	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
 	irr::gui::IGUIWindow* wSinglePlay;
+	irr::gui::IGUIListBox* lstBotList;
+	irr::gui::IGUIStaticText* stBotInfo;
+	irr::gui::IGUIButton* btnStartBot;
+	irr::gui::IGUIButton* btnBotCancel;
+	irr::gui::IGUICheckBox* chkBotOldRule;
+	irr::gui::IGUICheckBox* chkBotHand;
+	irr::gui::IGUICheckBox* chkBotNoCheckDeck;
+	irr::gui::IGUICheckBox* chkBotNoShuffleDeck;
 	irr::gui::IGUIListBox* lstSinglePlayList;
 	irr::gui::IGUIStaticText* stSinglePlayInfo;
 	irr::gui::IGUIButton* btnLoadSinglePlay;
@@ -374,6 +394,9 @@ public:
 	irr::gui::IGUIButton* btnDeleteDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
 	irr::gui::IGUIButton* btnSideOK;
+	irr::gui::IGUIButton* btnSideShuffle;
+	irr::gui::IGUIButton* btnSideSort;
+	irr::gui::IGUIButton* btnSideReload;
 	irr::gui::IGUIEditBox* ebDeckname;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
@@ -540,7 +563,7 @@ extern Game* mainGame;
 #define BUTTON_SAVE_DECK			304
 #define BUTTON_SAVE_DECK_AS			305
 #define BUTTON_DELETE_DECK			306
-//#define BUTTON_DBEXIT				307
+#define BUTTON_SIDE_RELOAD			307
 #define BUTTON_SORT_DECK			308
 #define BUTTON_SIDE_OK				309
 #define BUTTON_SHUFFLE_DECK			310
@@ -561,6 +584,9 @@ extern Game* mainGame;
 #define BUTTON_REPLAY_SWAP			325
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
+#define BUTTON_BOT_START			340
+#define LISTBOX_BOT_LIST			341
+#define CHECKBOX_BOT_OLD_RULE		342
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
