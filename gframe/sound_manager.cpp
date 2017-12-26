@@ -2,6 +2,11 @@
 #ifndef _WIN32
 #include <dirent.h>
 #endif
+#ifdef IRRKLANG_STATIC
+#include "../ikpmp3/ikpMP3.h"
+#endif
+
+#define wcsicmp _wcsicmp
 
 namespace ygo {
 
