@@ -880,53 +880,38 @@ void DeckBuilder::FilterCards() {
 	}
 	SortList();
 }
-bool DeckBuilder::CardNameCompare(const wchar_t *sa, const wchar_t *sb)
-{
-	int i = 0;
-	int j = 0;
-	int k;
-	wchar_t ca;
-	wchar_t cb;
-	wchar_t wc = L'*';
-	wchar_t pwc;
-	bool wcr = false;
-
-	if (!sa || !sb)
+bool DeckBuilder::CardNameCompare(const wchar_t *sa, const wchar_t *sb) {
+	if(!sa || !sb || (wcslen(sb) > wcslen(sa)))
 		return false;
-	while (sa[i])
-	{
+	int i = 0, j = 0, k;
+	wchar_t ca, cb, pwc, wc = L'*';
+	bool wcr = false;
+	while(sa[i]) {
 		ca = towupper(sa[i]);
 		cb = towupper(sb[j]);
-		if (ca == cb)
-		{
+		if(ca == cb) {
 			j++;
-			if (!sb[j])
+			if(!sb[j])
 				return true;
-		}
-		else if (cb == wc)
-		{
-			while (sb[j] == wc)
-			{
+		} else if(cb == wc) {
+			while(sb[j] == wc) {
 				j++;
-				if (!sb[j])
+				if(!sb[j])
 					return true;
 			}
 			k = j;
 			pwc = towupper(sb[j]);
 			wcr = true;
-			while (towupper(sa[i]) != pwc) {
+			while(towupper(sa[i]) != pwc) {
 				i++;
-				if (!sa[i])
+				if(!sa[i])
 					return false;
 			}
 			i--;
-		}
-		else if (wcr && ca == pwc)
-		{
+		} else if(wcr && ca == pwc) {
 			j = k;
 			i--;
-		}
-		else
+		} else
 			j = 0;
 		i++;
 	}
