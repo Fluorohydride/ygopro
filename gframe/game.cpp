@@ -793,15 +793,38 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 void Game::LoadExpansionDB() {
 #ifdef _WIN32
 	char fpath[1000];
+	wchar_t wfpath[1000];
 	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
+	WIN32_FIND_DATAW ffdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*", &fdataw);
 	if(fh != INVALID_HANDLE_VALUE) {
 		do {
-			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				char fname[780];
-				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
-				sprintf(fpath, "./expansions/%s", fname);
-				dataManager.LoadDB(fpath);
+			if(wcscmp(L".",fdataw.cFileName) != 0 && wcscmp(L"..",fdataw.cFileName) != 0) {
+				if(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					myswprintf(wfpath, L"expansions/%s/*.cdb", fdataw.cFileName);
+					HANDLE ffh = FindFirstFileW(wfpath, &ffdataw);
+					if(ffh != INVALID_HANDLE_VALUE) {
+						do {
+							if(!(ffdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+								char fpathname[780];
+								char fname[780];
+								BufferIO::EncodeUTF8(fdataw.cFileName, fpathname);
+								BufferIO::EncodeUTF8(ffdataw.cFileName, fname);
+								sprintf(fpath, "./expansions/%s/%s", fpathname, fname);
+								dataManager.LoadDB(fpath);
+							}
+						} while(FindNextFileW(ffh, &ffdataw));
+						FindClose(ffh);
+					}
+				} else {
+					wchar_t *dot = wcsrchr(fdataw.cFileName, L'.');
+					if(wcscmp(L".cdb", dot) == 0) {
+						char fname[780];
+						BufferIO::EncodeUTF8(fdataw.cFileName, fname);
+						sprintf(fpath, "./expansions/%s", fname);
+						dataManager.LoadDB(fpath);
+					}
+				}
 			}
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
