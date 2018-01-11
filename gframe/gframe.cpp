@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i + 1][0]);
 			}
-			ClickButton(ygo::mainGame->btnServerMode);
+			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
