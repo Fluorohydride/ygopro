@@ -2039,7 +2039,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			float shift = -0.15f;
 			if (player == 1) shift = 0.15f;
 			pcard->dPos = irr::core::vector3df(shift, 0, 0);
-			pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+			if(!mainGame->dField.deck_reversed)
+				pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+			else pcard->dRot = irr::core::vector3df(0, 0, 0);
 			pcard->is_moving = true;
 			pcard->aniFrame = 5;
 			mainGame->WaitFrameSignal(45);
@@ -2077,9 +2079,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->dPos = irr::core::vector3df(0, -0.20f, 0);
 			else
 				pcard->dPos = irr::core::vector3df(0.15f, 0, 0);
-			if(!mainGame->dField.deck_reversed)
-				pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-			else pcard->dRot = irr::core::vector3df(0, 0, 0);
+			pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
 			pcard->is_moving = true;
 			pcard->aniFrame = 5;
 			mainGame->WaitFrameSignal(45);
