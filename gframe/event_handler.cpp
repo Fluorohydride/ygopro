@@ -1066,6 +1066,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				UpdateDeclarableCode(false);
 				break;
 			}
+			case EDITBOX_REPLAY_NAME: {
+				mainGame->ValidateName(mainGame->ebRSName);
+				break;
+			}
 			}
 			break;
 		}

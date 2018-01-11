@@ -331,6 +331,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case EDITBOX_DECK_NAME: {
+				mainGame->ValidateName(mainGame->ebDeckname);
+				break;
+			}
 			}
 			break;
 		}
