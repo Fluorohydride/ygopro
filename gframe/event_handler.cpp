@@ -2198,10 +2198,10 @@ void ClientField::GetHoverField(int x, int y) {
 	} else {
 		double screenx = x / 1024.0 * 1.35 - 0.90;
 		double screeny = y / 640.0 * 0.84 - 0.42;
-		double angle = 0.798056 - atan(screeny);	//0.798056 = arctan(8.0/7.8)
+		double angle = mainGame->board.atan - atan(screeny);
 		double vlen = sqrt(1.0 + screeny * screeny);
-		double boardx = 4.2 + 7.8 * screenx / vlen / cos(angle);
-		double boardy = 8.0 - 7.8 * tan(angle);
+		double boardx = mainGame->board.x + mainGame->board.z * screenx / vlen / cos(angle);
+		double boardy = mainGame->board.y - mainGame->board.z * tan(angle);
 		hovered_location = 0;
 		if(boardx >= matManager.vFieldExtra[0][speed][0].Pos.X && boardx <= matManager.vFieldExtra[0][speed][1].Pos.X) {
 			if(boardy >= matManager.vFieldExtra[0][speed][0].Pos.Y && boardy <= matManager.vFieldExtra[0][speed][2].Pos.Y) {

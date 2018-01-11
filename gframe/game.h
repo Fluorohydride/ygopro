@@ -86,6 +86,10 @@ struct FadingUnit {
 	irr::core::vector2di fadingDiff;
 };
 
+struct Fieldmatrix {
+	float x, y, z, atan;
+};
+
 class Game {
 
 public:
@@ -119,6 +123,7 @@ public:
 	void WaitFrameSignal(int frame);
 	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag = false);
 	void DrawDeckBd();
+	bool LoadGui(irr::SIrrlichtCreationParameters params, bool reload = false);
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
@@ -148,6 +153,7 @@ public:
 	position2di Resize(s32 x, s32 y, bool reverse = false);
 	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
+	void ValidateName(irr::gui::IGUIEditBox* box);
 
 	Mutex gMutex;
 	Mutex gBuffer;
@@ -486,11 +492,17 @@ public:
 
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
+
+	Fieldmatrix board;
 };
 
 extern Game* mainGame;
 
 }
+
+#define FIELD_X			4.2f	
+#define FIELD_Y			8.0f
+#define FIELD_Z			7.8f
 
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
@@ -599,6 +611,7 @@ extern Game* mainGame;
 #define BUTTON_DISPLAY_4			294
 #define SCROLL_CARD_DISPLAY			295
 #define BUTTON_CARD_DISP_OK			296
+#define EDITBOX_DECK_NAME			297
 #define BUTTON_CATEGORY_OK			300
 #define COMBOBOX_DBLFLIST			301
 #define COMBOBOX_DBDECKS			302
@@ -624,6 +637,7 @@ extern Game* mainGame;
 #define BUTTON_REPLAY_UNDO			323
 #define BUTTON_REPLAY_EXIT			324
 #define BUTTON_REPLAY_SWAP			325
+#define EDITBOX_REPLAY_NAME			326
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
 #define LISTBOX_SINGLEPLAY_LIST		350

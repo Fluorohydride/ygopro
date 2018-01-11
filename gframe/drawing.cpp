@@ -643,10 +643,10 @@ void Game::DrawStackIndicator(const wchar_t* text, S3DVertex* v, bool opponent) 
 /*Converts the coordinates from the 3d plane to the 2d plane (the window)
 */
 void Game::ConvertCoords(float x, float y, int* x1, int* y1) {
-	double angle = atan((y - 8.0) / -7.8);
-	double screeny = tan(0.798056 - angle);			//0.798056 = arctan(8.0/7.8), to avoid calculating it every time
+	double angle = atan((y - mainGame->board.y) / -mainGame->board.z);
+	double screeny = tan(mainGame->board.atan - angle);
 	double vlen = sqrt(1.0 + screeny * screeny);
-	double screenx = (x - 4.2) / (7.8 / vlen / cos(angle));
+	double screenx = (x - mainGame->board.x) / (mainGame->board.z / vlen / cos(angle));
 	*x1 = (screenx + 0.90) * 1024.0 / 1.35;
 	*y1 = (screeny + 0.42) * 640.0 / 0.84;
 }
@@ -798,7 +798,7 @@ void Game::DrawSpec() {
 		}
 		case 7: {
 			core::position2d<s32> corner[4];
-			float y = sin(showcarddif * 3.1415926f / 180.0f) * CARD_IMG_HEIGHT * window_size.Height / 640;
+			float y = sin(showcarddif * PI / 180.0f) * CARD_IMG_HEIGHT * window_size.Height / 640;
 			corner[0] = core::position2d<s32>(574 * window_size.Width / 1024 - (CARD_IMG_HEIGHT * window_size.Height / 640 - y) * 0.3f, 404 * window_size.Height / 640 - y);
 			corner[1] = core::position2d<s32>(751 * window_size.Width / 1024 + (CARD_IMG_HEIGHT * window_size.Height / 640 - y) * 0.3f, 404 * window_size.Height / 640 - y);
 			corner[2] = core::position2d<s32>(574 * window_size.Width / 1024, 404 * window_size.Height / 640);

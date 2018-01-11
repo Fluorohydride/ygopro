@@ -2244,7 +2244,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
 					if((*cit)->code) {
 						(*cit)->dPos = irr::core::vector3df(0, 0, 0);
-						(*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
+						(*cit)->dRot = irr::core::vector3df(1.322f / 5, PI / 5, 0);
 						(*cit)->is_moving = true;
 						(*cit)->is_hovered = false;
 						(*cit)->aniFrame = 5;

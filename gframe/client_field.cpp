@@ -780,7 +780,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		if (controler == 0) {
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
-				r->Y = 3.1415926f;
+				r->Y = PI;
 				r->Z = 0.0f;
 			} else {
 				r->X = 0.0f;
@@ -790,12 +790,12 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		} else {
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
-				r->Y = 3.1415926f;
-				r->Z = 3.1415926f;
+				r->Y = PI;
+				r->Z = PI;
 			} else {
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = 3.1415926f;
+				r->Z = PI;
 			}
 		}
 		break;
@@ -819,12 +819,12 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.5f + 0.001f * sequence;
 			}
 			if(pcard->code) {
-				r->X = -0.798056f;
+				r->X = -mainGame->board.atan;
 				r->Y = 0.0f;
 				r->Z = 0.0f;
 			} else {
-				r->X = 0.798056f;
-				r->Y = 3.1415926f;
+				r->X = mainGame->board.atan;
+				r->Y = PI;
 				r->Z = 0;
 			}
 		} else {
@@ -843,11 +843,11 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.5f - 0.001f * sequence;
 			}
 			if (pcard->code == 0) {
-				r->X = 0.798056f;
-				r->Y = 3.1415926f;
+				r->X = mainGame->board.atan;
+				r->Y = PI;
 				r->Z = 0;
 			} else {
-				r->X = -0.798056f;
+				r->X = -mainGame->board.atan;
 				r->Y = 0;
 				r->Z = 0;
 			}
@@ -861,29 +861,29 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		if (controler == 0) {
 			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
-				r->Z = -3.1415926f / 2.0f;
+				r->Z = -HALF_PI;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = 3.1415926f + 0.001f;
+					r->Y = PI + 0.001f;
 				else r->Y = 0.0f;
 			} else {
 				r->X = 0.0f;
 				r->Z = 0.0f;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = 3.1415926f;
+					r->Y = PI;
 				else r->Y = 0.0f;
 			}
 		} else {
 			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
-				r->Z = 3.1415926f / 2.0f;
+				r->Z = HALF_PI;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = 3.1415926f + 0.001f;
+					r->Y = PI + 0.001f;
 				else r->Y = 0.0f;
 			} else {
 				r->X = 0.0f;
-				r->Z = 3.1415926f;
+				r->Z = PI;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = 3.1415926f;
+					r->Y = PI;
 				else r->Y = 0.0f;
 			}
 		}
@@ -897,13 +897,13 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			r->X = 0.0f;
 			r->Z = 0.0f;
 			if (pcard->position & POS_FACEDOWN)
-				r->Y = 3.1415926f;
+				r->Y = PI;
 			else r->Y = 0.0f;
 		} else {
 			r->X = 0.0f;
-			r->Z = 3.1415926f;
+			r->Z = PI;
 			if (pcard->position & POS_FACEDOWN)
-				r->Y = 3.1415926f;
+				r->Y = PI;
 			else r->Y = 0.0f;
 		}
 		break;
@@ -919,7 +919,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		} else {
 			r->X = 0.0f;
 			r->Y = 0.0f;
-			r->Z = 3.1415926f;
+			r->Z = PI;
 		}
 		break;
 	}
@@ -934,18 +934,18 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			} else {
 				r->X = 0.0f;
-				r->Y = 3.1415926f;
+				r->Y = PI;
 				r->Z = 0.0f;
 			}
 		} else {
 			if(pcard->position & POS_FACEUP) {
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = 3.1415926f;
+				r->Z = PI;
 			} else {
 				r->X = 0.0f;
-				r->Y = 3.1415926f;
-				r->Z = 3.1415926f;
+				r->Y = PI;
+				r->Z = PI;
 			}
 		}
 		break;
@@ -958,14 +958,14 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			r->X = 0.0f;
 			if(pcard->position & POS_FACEUP)
 				r->Y = 0.0f;
-			else r->Y = 3.1415926f;
+			else r->Y = PI;
 			r->Z = 0.0f;
 		} else {
 			r->X = 0.0f;
 			if(pcard->position & POS_FACEUP)
 				r->Y = 0.0f;
-			else r->Y = 3.1415926f;
-			r->Z = 3.1415926f;
+			else r->Y = PI;
+			r->Z = PI;
 		}
 		break;
 	}
@@ -989,7 +989,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.005f + pcard->sequence * 0.0001f;
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = 3.1415926f;
+				r->Z = PI;
 			}
 		} else {
 			if (pcard->overlayTarget->controler == 0) {
@@ -1006,7 +1006,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.005f + pcard->sequence * 0.0001f;
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = 3.1415926f;
+				r->Z = PI;
 			}
 		}
 		break;
@@ -1023,27 +1023,27 @@ void ClientField::MoveCard(ClientCard * pcard, int frame) {
 	GetCardLocation(pcard, &trans, &rot);
 	pcard->dPos = (trans - pcard->curPos) / frame;
 	float diff = rot.X - pcard->curRot.X;
-	while (diff < 0) diff += 3.1415926f * 2;
-	while (diff > 3.1415926f * 2)
-		diff -= 3.1415926f * 2;
-	if (diff < 3.1415926f)
+	while (diff < 0) diff += PI * 2;
+	while (diff > PI * 2)
+		diff -= PI * 2;
+	if (diff < PI)
 		pcard->dRot.X = diff / frame;
 	else
-		pcard->dRot.X = -(3.1415926f * 2 - diff) / frame;
+		pcard->dRot.X = -(PI * 2 - diff) / frame;
 	diff = rot.Y - pcard->curRot.Y;
-	while (diff < 0) diff += 3.1415926f * 2;
-	while (diff > 3.1415926f * 2) diff -= 3.1415926f * 2;
-	if (diff < 3.1415926f)
+	while (diff < 0) diff += PI * 2;
+	while (diff > PI * 2) diff -= PI * 2;
+	if (diff < PI)
 		pcard->dRot.Y = diff / frame;
 	else
-		pcard->dRot.Y = -(3.1415926f * 2 - diff) / frame;
+		pcard->dRot.Y = -(PI * 2 - diff) / frame;
 	diff = rot.Z - pcard->curRot.Z;
-	while (diff < 0) diff += 3.1415926f * 2;
-	while (diff > 3.1415926f * 2) diff -= 3.1415926f * 2;
-	if (diff < 3.1415926f)
+	while (diff < 0) diff += PI * 2;
+	while (diff > PI * 2) diff -= PI * 2;
+	if (diff < PI)
 		pcard->dRot.Z = diff / frame;
 	else
-		pcard->dRot.Z = -(3.1415926f * 2 - diff) / frame;
+		pcard->dRot.Z = -(PI * 2 - diff) / frame;
 	pcard->is_moving = true;
 	pcard->aniFrame = frame;
 }
