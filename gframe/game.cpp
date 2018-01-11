@@ -1773,6 +1773,18 @@ recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2)
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
 }
+void Game::ValidateName(irr::gui::IGUIEditBox* box) {
+	stringw text = box->getText();
+	wchar_t filtered[256];
+	int j = 0;
+	for (int i = 0; text[i]; i++)
+		if (!(text[i] == L'<' || text[i] == L'>' || text[i] == L':' || text[i] == L'"' || text[i] == L'/' || text[i] == L'\\' || text[i] == L'|' || text[i] == L'?' || text[i] == L'*' || text[i] == L'<')) {
+			filtered[j] = text[i];
+			j++;
+		}
+	filtered[j] = 0;
+	box->setText(filtered);
+}
 
 }
 
