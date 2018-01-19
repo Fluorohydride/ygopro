@@ -617,7 +617,7 @@ bool Game::Initialize() {
 	btnReplayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, dataManager.GetSysString(1347));
 	env->addStaticText(dataManager.GetSysString(1349), rect<s32>(360, 30, 570, 50), false, true, wReplay);
 	stReplayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 350), false, true, wReplay);
-	chkYrp = env->addCheckBox(false, recti(360, 250, 560, 270), wReplay, -1, dataManager.GetSysString(2000));
+	chkYrp = env->addCheckBox(false, recti(360, 250, 560, 270), wReplay, -1, dataManager.GetSysString(1356));
 	env->addStaticText(dataManager.GetSysString(1353), rect<s32>(360, 275, 570, 295), false, true, wReplay);
 	ebRepStartTurn = env->addEditBox(L"", rect<s32>(360, 300, 460, 320), true, wReplay, -1);
 	ebRepStartTurn->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
