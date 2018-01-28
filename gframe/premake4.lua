@@ -22,3 +22,4 @@ project "ygopro"
         includedirs { "/usr/include/lua", "/usr/include/lua5.3", "/usr/include/lua/5.3", "/usr/include/irrlicht", "/usr/include/freetype2" }
         excludes { "COSOperator.*" }
         links { "event_pthreads", "GL", "dl", "pthread" }
+		linkoptions { "-Wl,-rpath '-Wl,\$\$ORIGIN'" }
