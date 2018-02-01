@@ -257,6 +257,25 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		case ERRMSG_DECKERROR: {
 			mainGame->gMutex.Lock();
+			int mainmin = 40, mainmax = 60, extramax = 15, sidemax = 15;
+			if (mainGame->cbDeckSelect2->isVisible()) {
+				if (mainGame->dInfo.extraval & 0x1) {
+					mainmin = 40;
+					mainmax = 60;
+					extramax = 10;
+					sidemax = 0;
+				} else {
+					mainmin = 100;
+					mainmax = 100;
+					extramax = 30;
+					sidemax = 30;
+				}
+			} else if (mainGame->dInfo.extraval & 0x1) {
+				mainmin = 20;
+				mainmax = 30;
+				extramax = 10;
+				sidemax = 0;
+			}
 			unsigned int code = pkt->code & 0xFFFFFFF;
 			int flag = pkt->code >> 28;
 			wchar_t msgbuf[256];
@@ -283,18 +302,18 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				break;
 			}
 			case DECKERROR_MAINCOUNT: {
-				myswprintf(msgbuf, dataManager.GetSysString(1417), code);
+				myswprintf(msgbuf, dataManager.GetSysString(1417), mainmin, mainmax, code);
 				break;
 			}
 			case DECKERROR_EXTRACOUNT: {
 				if(code>0)
-					myswprintf(msgbuf, dataManager.GetSysString(1418), code);
+					myswprintf(msgbuf, dataManager.GetSysString(1418), extramax, code);
 				else
 					myswprintf(msgbuf, dataManager.GetSysString(1420));
 				break;
 			}
 			case DECKERROR_SIDECOUNT: {
-				myswprintf(msgbuf, dataManager.GetSysString(1419), code);
+				myswprintf(msgbuf, dataManager.GetSysString(1419), sidemax, code);
 				break;
 			}
 			case DECKERROR_FORBTYPE: {
