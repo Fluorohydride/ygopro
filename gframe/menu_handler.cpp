@@ -226,11 +226,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				UpdateDeck();
 				DuelClient::SendPacketToServer(CTOS_HS_READY);
 				mainGame->cbDeckSelect->setEnabled(false);
+				mainGame->cbDeckSelect2->setEnabled(false);
+				if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+					mainGame->btnHostPrepDuelist->setEnabled(false);
 				break;
 			}
 			case BUTTON_HP_NOTREADY: {
 				DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 				mainGame->cbDeckSelect->setEnabled(true);
+				mainGame->cbDeckSelect2->setEnabled(true);
+				if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+					mainGame->btnHostPrepDuelist->setEnabled(true);
 				break;
 			}
 			case BUTTON_HP_START: {
@@ -425,10 +431,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					DuelClient::SendPacketToServer(CTOS_HS_READY);
 					mainGame->cbDeckSelect->setEnabled(false);
 					mainGame->cbDeckSelect2->setEnabled(false);
+					if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+						mainGame->btnHostPrepDuelist->setEnabled(false);
 				} else {
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 					mainGame->cbDeckSelect->setEnabled(true);
 					mainGame->cbDeckSelect2->setEnabled(true);
+					if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+						mainGame->btnHostPrepDuelist->setEnabled(true);
 				}
 				break;
 			}

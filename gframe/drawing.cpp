@@ -512,11 +512,17 @@ void Game::DrawMisc() {
 
 	recti p1size = mainGame->Resize(335, 31, 629, 50);
 	recti p2size = mainGame->Resize(986, 31, 986, 50);
-	if(!dInfo.isTag || !dInfo.tag_player[0])
+	if (dInfo.isRelay)
+		textFont->draw(dInfo.hostname_relay[dInfo.relay_player[0]], p1size, 0xffffffff, false, false, 0);
+	else if(!dInfo.isTag || !dInfo.tag_player[0])
 		textFont->draw(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
 	else
 		textFont->draw(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
-	if(!dInfo.isTag || !dInfo.tag_player[1]) {
+	if (dInfo.isRelay) {
+		auto cld = textFont->getDimension(dInfo.clientname_relay[dInfo.relay_player[1]]);
+		p2size.UpperLeftCorner.X -= cld.Width;
+		textFont->draw(dInfo.clientname_relay[dInfo.relay_player[1]], p2size, 0xffffffff, false, false, 0);
+	} else if(!dInfo.isTag || !dInfo.tag_player[1]) {
 		auto cld = textFont->getDimension(dInfo.clientname);
 		p2size.UpperLeftCorner.X -= cld.Width;
 		textFont->draw(dInfo.clientname, p2size, 0xffffffff, false, false, 0);

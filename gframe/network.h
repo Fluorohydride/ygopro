@@ -241,4 +241,5 @@ public:
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1
 #define MODE_TAG		0x2
+#define MODE_RELAY		0x3
 #endif //NETWORK_H

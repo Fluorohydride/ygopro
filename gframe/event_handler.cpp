@@ -1848,12 +1848,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mplayer >= 0) {
 					const wchar_t* player_name;
 					if(mplayer == 0) {
-						if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[0])
+						if(mainGame->dInfo.isRelay)
+							player_name = mainGame->dInfo.hostname_relay[mainGame->dInfo.relay_player[0]];
+						else if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[0])
 							player_name = mainGame->dInfo.hostname;
 						else
 							player_name = mainGame->dInfo.hostname_tag;
 					} else {
-						if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[1])
+						if (mainGame->dInfo.isRelay)
+							player_name = mainGame->dInfo.clientname_relay[mainGame->dInfo.relay_player[1]];
+						else if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[1])
 							player_name = mainGame->dInfo.clientname;
 						else
 							player_name = mainGame->dInfo.clientname_tag;

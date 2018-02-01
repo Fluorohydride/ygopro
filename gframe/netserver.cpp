@@ -1,6 +1,7 @@
 #include "netserver.h"
 #include "single_duel.h"
 #include "tag_duel.h"
+#include "relay_duel.h"
 
 namespace ygo {
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
@@ -232,10 +233,13 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		} else if(pkt->info.mode == MODE_TAG) {
 			duel_mode = new TagDuel();
 			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, TagDuel::TagTimer, duel_mode);
+		} else if(pkt->info.mode == MODE_RELAY) {
+			duel_mode = new RelayDuel();
+			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, RelayDuel::RelayTimer, duel_mode);
 		}
 		if(pkt->info.rule > 3)
 			pkt->info.rule = 0;
-		if(pkt->info.mode > 2)
+		if(pkt->info.mode > 3)
 			pkt->info.mode = 0;
 		unsigned int hash = 1;
 		for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit) {

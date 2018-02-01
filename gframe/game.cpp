@@ -155,6 +155,7 @@ bool Game::Initialize() {
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
 	cbMatchMode->addItem(dataManager.GetSysString(1245));
 	cbMatchMode->addItem(dataManager.GetSysString(1246));
+	cbMatchMode->addItem(dataManager.GetSysString(1247));
 	env->addStaticText(dataManager.GetSysString(1237), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
 	myswprintf(strbuf, L"%d", 180);
 	ebTimeLimit = env->addEditBox(strbuf, rect<s32>(140, 115, 220, 140), true, wCreateHost);
@@ -237,23 +238,17 @@ bool Game::Initialize() {
 	wHostPrepare2->setVisible(false);
 	stHostPrepRule2 = env->addStaticText(L"", rect<s32>(10, 30, 460, 350), false, true, wHostPrepare2);
 	btnHostPrepDuelist = env->addButton(rect<s32>(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, dataManager.GetSysString(1251));
-	for(int i = 0; i < 2; ++i) {
+	for(int i = 0; i < 6; ++i) {
 		stHostPrepDuelist[i] = env->addStaticText(L"", rect<s32>(40, 65 + i * 25, 240, 85 + i * 25), true, false, wHostPrepare);
 		btnHostPrepKick[i] = env->addButton(rect<s32>(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_HP_KICK, L"X");
 		chkHostPrepReady[i] = env->addCheckBox(false, rect<s32>(250, 65 + i * 25, 270, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
-		chkHostPrepReady[i]->setEnabled(false);
-	}
-	for(int i = 2; i < 4; ++i) {
-		stHostPrepDuelist[i] = env->addStaticText(L"", rect<s32>(40, 75 + i * 25, 240, 95 + i * 25), true, false, wHostPrepare);
-		btnHostPrepKick[i] = env->addButton(rect<s32>(10, 75 + i * 25, 30, 95 + i * 25), wHostPrepare, BUTTON_HP_KICK, L"X");
-		chkHostPrepReady[i] = env->addCheckBox(false, rect<s32>(250, 75 + i * 25, 270, 95 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
 		chkHostPrepReady[i]->setEnabled(false);
 	}
 	btnHostPrepOB = env->addButton(rect<s32>(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252));
 	myswprintf(dataManager.strBuffer, L"%ls%d", dataManager.GetSysString(1253), 0);
 	stHostPrepOB = env->addStaticText(dataManager.strBuffer, rect<s32>(10, 210, 270, 230), false, false, wHostPrepare);
 	stHostPrepRule = env->addStaticText(L"", rect<s32>(280, 30, 460, 230), false, true, wHostPrepare);
-	env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 235, 110, 255), false, false, wHostPrepare);
+	stDeckSelect = env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 235, 110, 255), false, false, wHostPrepare);
 	cbDeckSelect = env->addComboBox(rect<s32>(120, 230, 270, 255), wHostPrepare);
 	cbDeckSelect->setMaxSelectionRows(10);
 	cbDeckSelect2 = env->addComboBox(rect<s32>(280, 230, 430, 255), wHostPrepare);
@@ -1362,22 +1357,22 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	chatType[0] = player;
 	switch(player) {
 	case 0: //from host
-		chatMsg[0].append(dInfo.hostname);
+		chatMsg[0].append((dInfo.isRelay) ? dInfo.hostname_relay[0] : dInfo.hostname);
 		chatMsg[0].append(L": ");
 		break;
 	case 1: //from client
 		PlaySoundEffect("./sound/chatmessage.wav");
-		chatMsg[0].append(dInfo.clientname);
+		chatMsg[0].append((dInfo.isRelay) ? dInfo.clientname_relay[0] : dInfo.clientname);
 		chatMsg[0].append(L": ");
 		break;
 	case 2: //host tag
 		PlaySoundEffect("./sound/chatmessage.wav");
-		chatMsg[0].append(dInfo.hostname_tag);
+		chatMsg[0].append((dInfo.isRelay) ? dInfo.hostname_relay[1] : dInfo.hostname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 3: //client tag
 		PlaySoundEffect("./sound/chatmessage.wav");
-		chatMsg[0].append(dInfo.clientname_tag);
+		chatMsg[0].append((dInfo.isRelay) ? dInfo.clientname_relay[1] : dInfo.clientname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 7: //local name
@@ -1662,8 +1657,13 @@ void Game::OnResize() {
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
-	wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 440));
-	wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 440));
+	if (dInfo.isRelay) {
+		wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 500));
+		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 500));
+	} else {
+		wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 440));
+		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 440));
+	}
 	wRules->setRelativePosition(ResizeWin(630, 100, 1000, 310));
 	wCustomRules->setRelativePosition(ResizeWin(700, 100, 910, 410));
 	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));

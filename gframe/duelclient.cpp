@@ -328,6 +328,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->env->addMessageBox(L"", msgbuf);
 			mainGame->cbDeckSelect->setEnabled(true);
 			mainGame->cbDeckSelect2->setEnabled(true);
+			if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+				mainGame->btnHostPrepDuelist->setEnabled(true);
 			mainGame->gMutex.Unlock();
 			break;
 		}
@@ -554,20 +556,69 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			str.append(msgbuf);
 		}
 		mainGame->gMutex.Lock();
-		if(pkt->info.mode == 2) {
-			mainGame->dInfo.isTag = true;
-			mainGame->chkHostPrepReady[2]->setVisible(true);
-			mainGame->chkHostPrepReady[3]->setVisible(true);
-			mainGame->stHostPrepDuelist[2]->setVisible(true);
-			mainGame->stHostPrepDuelist[3]->setVisible(true);
-		} else {
+		int x = (pkt->info.mode == 3) ? 60 : 0;
+		mainGame->btnHostPrepOB->setRelativePosition(rect<s32>(10, 180 + x, 110, 205 + x));
+		mainGame->stHostPrepOB->setRelativePosition(rect<s32>(10, 210 + x, 270, 230 + x));
+		mainGame->stHostPrepRule->setRelativePosition(rect<s32>(280, 30, 460, 230 + x));
+		mainGame->stDeckSelect->setRelativePosition(rect<s32>(10, 235 + x, 110, 255 + x));
+		mainGame->cbDeckSelect->setRelativePosition(rect<s32>(120, 230 + x, 270, 255 + x));
+		mainGame->cbDeckSelect2->setRelativePosition(rect<s32>(280, 230 + x, 430, 255 + x));
+		mainGame->btnHostPrepReady->setRelativePosition(rect<s32>(170, 180 + x, 270, 205 + x));
+		mainGame->btnHostPrepNotReady->setRelativePosition(rect<s32>(170, 180 + x, 270, 205 + x));
+		mainGame->btnHostPrepStart->setRelativePosition(rect<s32>(230, 280 + x, 340, 305 + x));
+		mainGame->btnHostPrepCancel->setRelativePosition(rect<s32>(350, 280 + x, 460, 305 + x));
+		mainGame->wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440 + x));
+		mainGame->wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
+		switch (pkt->info.mode) {
+		case 0:
+		case 1: {
 			mainGame->dInfo.isTag = false;
-			mainGame->chkHostPrepReady[2]->setVisible(false);
-			mainGame->chkHostPrepReady[3]->setVisible(false);
-			mainGame->stHostPrepDuelist[2]->setVisible(false);
-			mainGame->stHostPrepDuelist[3]->setVisible(false);
+			mainGame->dInfo.isRelay = false;
+			for (int i = 2; i < 6; i++) {
+				mainGame->chkHostPrepReady[i]->setVisible(false);
+				mainGame->stHostPrepDuelist[i]->setVisible(false);
+			}
+			break; 
 		}
-		for(int i = 0; i < 4; ++i)
+		case 2:{
+			mainGame->dInfo.isTag = true;
+			mainGame->dInfo.isRelay = false;
+			for (int i = 2; i < 4; ++i) {
+				mainGame->stHostPrepDuelist[i]->setRelativePosition(rect<s32>(40, 75 + i * 25, 240, 95 + i * 25));
+				mainGame->btnHostPrepKick[i]->setRelativePosition(rect<s32>(10, 75 + i * 25, 30, 95 + i * 25));
+				mainGame->chkHostPrepReady[i]->setRelativePosition(rect<s32>(250, 75 + i * 25, 270, 95 + i * 25));
+			}
+			for (int i = 2; i < 4; i++) {
+				mainGame->chkHostPrepReady[i]->setVisible(true);
+				mainGame->stHostPrepDuelist[i]->setVisible(true);
+			}
+			for (int i = 4; i < 6; i++) {
+				mainGame->chkHostPrepReady[i]->setVisible(false);
+				mainGame->stHostPrepDuelist[i]->setVisible(false);
+			}
+			break;
+		}
+		case 3: {
+			mainGame->dInfo.isTag = false;
+			mainGame->dInfo.isRelay = true;
+			for (int i = 0; i < 3; ++i) {
+				mainGame->stHostPrepDuelist[i]->setRelativePosition(rect<s32>(40, 65 + i * 25, 240, 85 + i * 25));
+				mainGame->btnHostPrepKick[i]->setRelativePosition(rect<s32>(10, 65 + i * 25, 30, 85 + i * 25));
+				mainGame->chkHostPrepReady[i]->setRelativePosition(rect<s32>(250, 65 + i * 25, 270, 85 + i * 25));
+			}
+			for (int i = 3; i < 6; ++i) {
+				mainGame->stHostPrepDuelist[i]->setRelativePosition(rect<s32>(40, 75 + i * 25, 240, 95 + i * 25));
+				mainGame->btnHostPrepKick[i]->setRelativePosition(rect<s32>(10, 75 + i * 25, 30, 95 + i * 25));
+				mainGame->chkHostPrepReady[i]->setRelativePosition(rect<s32>(250, 75 + i * 25, 270, 95 + i * 25));
+			}
+			for (int i = 2; i < 6; i++) {
+				mainGame->chkHostPrepReady[i]->setVisible(true);
+				mainGame->stHostPrepDuelist[i]->setVisible(true);
+			}
+			break;
+		}
+		}
+		for(int i = 0; i < 6; ++i)
 			mainGame->chkHostPrepReady[i]->setChecked(false);
 		mainGame->btnHostPrepReady->setVisible(true);
 		mainGame->btnHostPrepNotReady->setVisible(false);
@@ -584,6 +635,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->stHostPrepDuelist[1]->setText(L"");
 		mainGame->stHostPrepDuelist[2]->setText(L"");
 		mainGame->stHostPrepDuelist[3]->setText(L"");
+		mainGame->stHostPrepDuelist[4]->setText(L"");
+		mainGame->stHostPrepDuelist[5]->setText(L"");
 		mainGame->stHostPrepOB->setText(L"");
 		mainGame->SetStaticText(mainGame->stHostPrepRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
 		mainGame->SetStaticText(mainGame->stHostPrepRule2, 180, mainGame->guiFont, (wchar_t*)str2.c_str());
@@ -613,11 +666,13 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_TYPE_CHANGE: {
 		STOC_TypeChange* pkt = (STOC_TypeChange*)pdata;
-		if(!mainGame->dInfo.isTag) {
+		if(!mainGame->dInfo.isTag && !mainGame->dInfo.isRelay) {
 			selftype = pkt->type & 0xf;
 			is_host = ((pkt->type >> 4) & 0xf) != 0;
 			mainGame->btnHostPrepKick[2]->setVisible(false);
 			mainGame->btnHostPrepKick[3]->setVisible(false);
+			mainGame->btnHostPrepKick[4]->setVisible(false);
+			mainGame->btnHostPrepKick[5]->setVisible(false);
 			if(is_host) {
 				mainGame->btnHostPrepStart->setVisible(true);
 				mainGame->btnHostPrepKick[0]->setVisible(true);
@@ -647,7 +702,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			} else {
 				mainGame->btnHostPrepStart->setEnabled(false);
 			}
-		} else {
+		} else if (mainGame->dInfo.isTag) {
+			mainGame->btnHostPrepKick[4]->setVisible(false);
+			mainGame->btnHostPrepKick[5]->setVisible(false);
 			if(selftype < 4) {
 				mainGame->chkHostPrepReady[selftype]->setEnabled(false);
 				mainGame->chkHostPrepReady[selftype]->setChecked(false);
@@ -680,6 +737,42 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			} else {
 				mainGame->btnHostPrepStart->setEnabled(false);
 			}
+		} else {
+			if (selftype < 6) {
+				mainGame->chkHostPrepReady[selftype]->setEnabled(false);
+				mainGame->chkHostPrepReady[selftype]->setChecked(false);
+			}
+			selftype = pkt->type & 0xf;
+			is_host = ((pkt->type >> 4) & 0xf) != 0;
+			mainGame->btnHostPrepDuelist->setEnabled(true);
+			if (is_host) {
+				mainGame->btnHostPrepStart->setVisible(true);
+				for (int i = 0; i < 6; ++i)
+					mainGame->btnHostPrepKick[i]->setVisible(true);
+			}
+			else {
+				mainGame->btnHostPrepStart->setVisible(false);
+				for (int i = 0; i < 6; ++i)
+					mainGame->btnHostPrepKick[i]->setVisible(false);
+			}
+			if (selftype < 6) {
+				mainGame->chkHostPrepReady[selftype]->setEnabled(true);
+				mainGame->btnHostPrepOB->setEnabled(true);
+				mainGame->btnHostPrepReady->setVisible(true);
+				mainGame->btnHostPrepNotReady->setVisible(false);
+			}
+			else {
+				mainGame->btnHostPrepOB->setEnabled(false);
+				mainGame->btnHostPrepReady->setVisible(false);
+				mainGame->btnHostPrepNotReady->setVisible(false);
+			}
+			if ((mainGame->chkHostPrepReady[0]->isChecked() || mainGame->chkHostPrepReady[1]->isChecked() || mainGame->chkHostPrepReady[2]->isChecked()) &&
+				(mainGame->chkHostPrepReady[3]->isChecked() || mainGame->chkHostPrepReady[4]->isChecked() || mainGame->chkHostPrepReady[5]->isChecked())) {
+				mainGame->btnHostPrepStart->setEnabled(true);
+			}
+			else {
+				mainGame->btnHostPrepStart->setEnabled(false);
+			}
 		}
 		mainGame->dInfo.player_type = selftype;
 		break;
@@ -699,6 +792,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.time_left[0] = 0;
 		mainGame->dInfo.time_left[1] = 0;
 		mainGame->dInfo.time_player = 2;
+		mainGame->dInfo.relay_player[0] = 0;
+		mainGame->dInfo.relay_player[1] = 0;
 		mainGame->is_building = false;
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
@@ -717,7 +812,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wChat->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		mainGame->SetPhaseButtons();
-		if(!mainGame->dInfo.isTag) {
+		if(!mainGame->dInfo.isTag && !mainGame->dInfo.isRelay) {
 			if(selftype > 1) {
 				mainGame->dInfo.player_type = 7;
 				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350));
@@ -731,7 +826,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[1]->getText(), mainGame->dInfo.hostname, 20);
 				BufferIO::CopyWStr(mainGame->stHostPrepDuelist[0]->getText(), mainGame->dInfo.clientname, 20);
 			}
-		} else {
+		} else if(mainGame->dInfo.isTag) {
 			if(selftype > 3) {
 				mainGame->dInfo.player_type = 7;
 				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350));
@@ -751,6 +846,32 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			}
 			mainGame->dInfo.tag_player[0] = false;
 			mainGame->dInfo.tag_player[1] = false;
+		} else {
+			if(selftype > 5) {
+				mainGame->dInfo.player_type = 7;
+				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350));
+				mainGame->btnLeaveGame->setVisible(true);
+				mainGame->btnSpectatorSwap->setVisible(true);
+			}
+			if(selftype > 2 && selftype < 6) {
+				for (int i = 2; i >= 0; i--) {
+					if (mainGame->chkHostPrepReady[i + 3]->isChecked())
+						mainGame->dInfo.relay_player[0] = i;
+					if (mainGame->chkHostPrepReady[i]->isChecked())
+						mainGame->dInfo.relay_player[1] = i;
+					BufferIO::CopyWStr(mainGame->stHostPrepDuelist[i + 3]->getText(), mainGame->dInfo.hostname_relay[0], 20);
+					BufferIO::CopyWStr(mainGame->stHostPrepDuelist[i]->getText(), mainGame->dInfo.clientname_relay[1], 20);
+				}
+			} else {
+				for (int i = 2; i >= 0; i--) {
+					if(mainGame->chkHostPrepReady[i]->isChecked())
+						mainGame->dInfo.relay_player[0] = i;
+					if(mainGame->chkHostPrepReady[i + 3]->isChecked())
+						mainGame->dInfo.relay_player[1] = i;
+					BufferIO::CopyWStr(mainGame->stHostPrepDuelist[i]->getText(), mainGame->dInfo.hostname_relay[0], 20);
+					BufferIO::CopyWStr(mainGame->stHostPrepDuelist[i + 3]->getText(), mainGame->dInfo.clientname_relay[1], 20);
+				}
+			}
 		}
 		mainGame->gMutex.Unlock();
 		match_kill = 0;
@@ -890,11 +1011,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_HS_PLAYER_ENTER: {
 		mainGame->PlaySoundEffect("./sound/playerenter.wav");
 		STOC_HS_PlayerEnter* pkt = (STOC_HS_PlayerEnter*)pdata;
-		if(pkt->pos > 3)
+		if(pkt->pos > 5)
 			break;
 		wchar_t name[20];
 		BufferIO::CopyWStr(pkt->name, name, 20);
-		if(mainGame->dInfo.isTag) {
+		if (mainGame->dInfo.isRelay) {
+			if (pkt->pos < 3)
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.hostname_relay[pkt->pos], 20);
+			else
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.clientname_relay[pkt->pos - 3], 20);
+		} else if(mainGame->dInfo.isTag) {
 			if(pkt->pos == 0)
 				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.hostname, 20);
 			else if(pkt->pos == 1)
@@ -918,7 +1044,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		STOC_HS_PlayerChange* pkt = (STOC_HS_PlayerChange*)pdata;
 		unsigned char pos = (pkt->status >> 4) & 0xf;
 		unsigned char state = pkt->status & 0xf;
-		if(pos > 3)
+		if(pos > 5)
 			break;
 		mainGame->gMutex.Lock();
 		if(state < 8) {
@@ -927,14 +1053,21 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->stHostPrepDuelist[state]->setText(prename);
 			mainGame->stHostPrepDuelist[pos]->setText(L"");
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
-			if(pos == 0)
-				BufferIO::CopyWStr(prename, mainGame->dInfo.hostname, 20);
-			else if(pos == 1)
-				BufferIO::CopyWStr(prename, mainGame->dInfo.hostname_tag, 20);
-			else if(pos == 2)
-				BufferIO::CopyWStr(prename, mainGame->dInfo.clientname, 20);
-			else if(pos == 3)
-				BufferIO::CopyWStr(prename, mainGame->dInfo.clientname_tag, 20);
+			if (mainGame->dInfo.isRelay) {
+				if (pos < 3)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname_relay[pos], 20);
+				else
+					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname_relay[pos - 3], 20);
+			} else {
+				if (pos == 0)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname, 20);
+				else if (pos == 1)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname_tag, 20);
+				else if (pos == 2)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname, 20);
+				else if (pos == 3)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname_tag, 20);
+			}
 		} else if(state == PLAYERCHANGE_READY) {
 			mainGame->chkHostPrepReady[pos]->setChecked(true);
 			if(pos == selftype) {
@@ -958,8 +1091,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
 			mainGame->stHostPrepOB->setText(watchbuf);
 		}
-		if(mainGame->chkHostPrepReady[0]->isChecked() && mainGame->chkHostPrepReady[1]->isChecked()
-			&& (!mainGame->dInfo.isTag || (mainGame->chkHostPrepReady[2]->isChecked() && mainGame->chkHostPrepReady[3]->isChecked()))) {
+		if((mainGame->chkHostPrepReady[0]->isChecked() && mainGame->chkHostPrepReady[1]->isChecked()
+			&& (!mainGame->dInfo.isTag || (mainGame->chkHostPrepReady[2]->isChecked() && mainGame->chkHostPrepReady[3]->isChecked()))) || 
+			(mainGame->dInfo.isRelay && ((mainGame->chkHostPrepReady[0]->isChecked() || mainGame->chkHostPrepReady[1]->isChecked() || mainGame->chkHostPrepReady[2]->isChecked()) &&
+			(mainGame->chkHostPrepReady[3]->isChecked() || mainGame->chkHostPrepReady[4]->isChecked() || mainGame->chkHostPrepReady[5]->isChecked())))){
 			mainGame->btnHostPrepStart->setEnabled(true);
 		} else {
 			mainGame->btnHostPrepStart->setEnabled(false);
@@ -1181,7 +1316,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(match_kill)
 				myswprintf(vic_buf, dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
 			else if(type < 0x10)
-				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.clientname, dataManager.GetVictoryString(type));
+				myswprintf(vic_buf, L"[%ls] %ls", (mainGame->dInfo.isRelay) ? mainGame->dInfo.clientname_relay[mainGame->dInfo.relay_player[1]] : mainGame->dInfo.clientname, dataManager.GetVictoryString(type));
 			else
 				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
 			mainGame->dInfo.vic_string = vic_buf;
@@ -1190,7 +1325,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(match_kill)
 				myswprintf(vic_buf, dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
 			else if(type < 0x10)
-				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.hostname, dataManager.GetVictoryString(type));
+				myswprintf(vic_buf, L"[%ls] %ls", (mainGame->dInfo.isRelay) ? mainGame->dInfo.hostname_relay[mainGame->dInfo.relay_player[0]] : mainGame->dInfo.hostname, dataManager.GetVictoryString(type));
 			else
 				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
 			mainGame->dInfo.vic_string = vic_buf;
@@ -1223,7 +1358,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		if(playertype & 0xf0)
 			mainGame->dInfo.player_type = 7;
-		if(mainGame->dInfo.isTag) {
+		if(mainGame->dInfo.isTag && !mainGame->dInfo.isRelay) {
 			if(mainGame->dInfo.isFirst)
 				mainGame->dInfo.tag_player[1] = true;
 			else
@@ -2456,7 +2591,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->btnCancelOrFinish->setVisible(false);
 			}
 		}
-		if(mainGame->dInfo.isTag && mainGame->dInfo.turn != 1) {
+		if(!mainGame->dInfo.isRelay && mainGame->dInfo.isTag && mainGame->dInfo.turn != 1) {
 			if(player == 0)
 				mainGame->dInfo.tag_player[0] = !mainGame->dInfo.tag_player[0];
 			else
@@ -3667,7 +3802,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_TAG_SWAP: {
-		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int player = BufferIO::ReadInt8(pbuf);
+		int newp = 0;
+		if (mainGame->dInfo.isRelay) {
+			newp = player >> 4;
+			player = mainGame->LocalPlayer(player & 0xf);
+		} else
+			player = mainGame->LocalPlayer(player);
 		size_t mcount = (size_t)BufferIO::ReadInt8(pbuf);
 		size_t ecount = (size_t)BufferIO::ReadInt8(pbuf);
 		size_t pcount = (size_t)BufferIO::ReadInt8(pbuf);
@@ -3777,6 +3918,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			}
 			mainGame->WaitFrameSignal(5);
 		}
+		if(mainGame->dInfo.isRelay)
+			mainGame->dInfo.relay_player[player] = newp;
 		break;
 	}
 	case MSG_RELOAD_FIELD: {
