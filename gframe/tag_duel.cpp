@@ -579,17 +579,17 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 	while (pbuf - msgbuffer < (int)len) {
 		replay_stream.clear();
 		bool record = true;
-		ReplayPacket p;
+		ReplayPacket pk;
 		offset = pbuf;
 		unsigned char engType = BufferIO::ReadUInt8(pbuf);
-		p.message = engType;
-		p.length = len - 1;
-		memcpy(p.data, pbuf, p.length);
+		pk.message = engType;
+		pk.length = len - 1;
+		memcpy(pk.data, pbuf, pk.length);
 		switch (engType) {
 		case MSG_RETRY: {
 			WaitforResponse(last_response);
 			NetServer::SendBufferToPlayer(cur_player[last_response], STOC_GAME_MSG, offset, pbuf - offset);
-			replay_stream.push_back(p);
+			replay_stream.push_back(pk);
 			return 1;
 		}
 		case MSG_HINT: {
@@ -630,7 +630,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			replay_stream.push_back(p);
+			replay_stream.push_back(pk);
 			EndDuel();
 			return 2;
 		}
@@ -1547,9 +1547,9 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		}
 		//setting the length again in case of multiple messages in a row,
 		//when the packet will be written in the replay, the extra data registered previously will be discarded
-		p.length = (pbuf - offset) - 1;
+		pk.length = (pbuf - offset) - 1;
 		if (record)
-			replay_stream.insert(replay_stream.begin(), p);
+			replay_stream.insert(replay_stream.begin(), pk);
 		new_replay.WriteStream(replay_stream);
 	}
 	return 0;
