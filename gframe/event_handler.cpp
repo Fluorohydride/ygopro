@@ -1087,8 +1087,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					unsigned short msgbuf[256];
 					if(mainGame->dInfo.isStarted) {
 						if(mainGame->dInfo.player_type < 7) {
-							if(mainGame->dInfo.isTag && (mainGame->dInfo.player_type % 2))
-								mainGame->AddChatMsg((wchar_t*)input, 2);
+							if (mainGame->dInfo.isRelay)
+								mainGame->AddChatMsg((wchar_t*)input, (mainGame->dInfo.player_type % 3) * 2);
+							else if(mainGame->dInfo.isTag)
+								mainGame->AddChatMsg((wchar_t*)input, (mainGame->dInfo.player_type % 2) * 2);
 							else
 								mainGame->AddChatMsg((wchar_t*)input, 0);
 						} else
@@ -1847,21 +1849,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(mplayer != hovered_player) {
 				if(mplayer >= 0) {
 					const wchar_t* player_name;
-					if(mplayer == 0) {
-						if(mainGame->dInfo.isRelay)
-							player_name = mainGame->dInfo.hostname_relay[mainGame->dInfo.relay_player[0]];
-						else if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[0])
-							player_name = mainGame->dInfo.hostname;
-						else
-							player_name = mainGame->dInfo.hostname_tag;
-					} else {
-						if (mainGame->dInfo.isRelay)
-							player_name = mainGame->dInfo.clientname_relay[mainGame->dInfo.relay_player[1]];
-						else if(!mainGame->dInfo.isTag || !mainGame->dInfo.tag_player[1])
-							player_name = mainGame->dInfo.clientname;
-						else
-							player_name = mainGame->dInfo.clientname_tag;
-					}
+					if (mplayer == 0)
+						player_name = mainGame->dInfo.hostname[mainGame->dInfo.current_player[mplayer]];
+					else
+						player_name = mainGame->dInfo.clientname[mainGame->dInfo.current_player[mplayer]];
 					std::wstring str(player_name);
 					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
 					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {

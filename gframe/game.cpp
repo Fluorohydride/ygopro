@@ -1356,23 +1356,34 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	chatTiming[0] = 1200;
 	chatType[0] = player;
 	switch(player) {
-	case 0: //from host
-		chatMsg[0].append((dInfo.isRelay) ? dInfo.hostname_relay[0] : dInfo.hostname);
+	case 0: //host 1
+		PlaySoundEffect("./sound/chatmessage.wav");
+		chatMsg[0].append(dInfo.hostname[0]);
 		chatMsg[0].append(L": ");
 		break;
-	case 1: //from client
+	case 1: //client 1
 		PlaySoundEffect("./sound/chatmessage.wav");
-		chatMsg[0].append((dInfo.isRelay) ? dInfo.clientname_relay[0] : dInfo.clientname);
+		chatMsg[0].append(dInfo.clientname[0]);
 		chatMsg[0].append(L": ");
 		break;
-	case 2: //host tag
+	case 2: //host 2
 		PlaySoundEffect("./sound/chatmessage.wav");
-		chatMsg[0].append((dInfo.isRelay) ? dInfo.hostname_relay[1] : dInfo.hostname_tag);
+		chatMsg[0].append(dInfo.hostname[1]);
 		chatMsg[0].append(L": ");
 		break;
-	case 3: //client tag
+	case 3: //client 2
 		PlaySoundEffect("./sound/chatmessage.wav");
-		chatMsg[0].append((dInfo.isRelay) ? dInfo.clientname_relay[1] : dInfo.clientname_tag);
+		chatMsg[0].append(dInfo.clientname[1]);
+		chatMsg[0].append(L": ");
+		break;
+	case 4: //host 3
+		PlaySoundEffect("./sound/chatmessage.wav");
+		chatMsg[0].append(dInfo.hostname[2]);
+		chatMsg[0].append(L": ");
+		break;
+	case 5: //client 3
+		PlaySoundEffect("./sound/chatmessage.wav");
+		chatMsg[0].append(dInfo.clientname[2]);
 		chatMsg[0].append(L": ");
 		break;
 	case 7: //local name
@@ -1476,7 +1487,7 @@ int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
 const wchar_t* Game::LocalName(int local_player) {
-	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
+	return local_player == 0 ? dInfo.hostname[0] : dInfo.clientname[0];
 }
 void Game::UpdateDuelParam() {
 	uint32 flag = 0, filter = 0x100;

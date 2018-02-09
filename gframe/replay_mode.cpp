@@ -62,17 +62,17 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 	mainGame->dInfo.lua64 = !!(rh.flag & REPLAY_LUA64);
-	mainGame->dInfo.tag_player[0] = false;
-	mainGame->dInfo.tag_player[1] = false;
+	mainGame->dInfo.current_player[0] = 0;
+	mainGame->dInfo.current_player[1] = 0;
 	if (mainGame->dInfo.isTag) {
-		cur_replay.ReadName(mainGame->dInfo.hostname);
-		cur_replay.ReadName(mainGame->dInfo.hostname_tag);
-		cur_replay.ReadName(mainGame->dInfo.clientname_tag);
-		cur_replay.ReadName(mainGame->dInfo.clientname);
+		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
+		cur_replay.ReadName(mainGame->dInfo.hostname[1]);
+		cur_replay.ReadName(mainGame->dInfo.clientname[1]);
+		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
 	}
 	else {
-		cur_replay.ReadName(mainGame->dInfo.hostname);
-		cur_replay.ReadName(mainGame->dInfo.clientname);
+		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
+		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
 	}
 	int opt = cur_replay.ReadInt32();
 	mainGame->dInfo.duel_field = opt & 0xff;
@@ -157,8 +157,8 @@ void ReplayMode::Restart(bool refresh) {
 	mainGame->dInfo.isStarted = false;
 	mainGame->dInfo.turn = 0;
 	mainGame->dField.Clear();
-	mainGame->dInfo.tag_player[0] = false;
-	mainGame->dInfo.tag_player[1] = false;
+	mainGame->dInfo.current_player[0] = 0;
+	mainGame->dInfo.current_player[1] = 0;
 	if (yrp && !StartDuel()) {
 		EndDuel();
 	}
@@ -263,7 +263,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			pbuf += len + 1;
 			memcpy(namebuf, begin, len + 1);
 			BufferIO::DecodeUTF8(namebuf, wname);
-			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname, 20);
+			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname[0], 20);
 			return true;
 		}
 		case OLD_REPLAY_MODE:

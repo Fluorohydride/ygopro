@@ -53,8 +53,8 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dInfo.startlp = start_lp;
 	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
-	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname, 20);
-	mainGame->dInfo.clientname[0] = 0;
+	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname[0], 20);
+	mainGame->dInfo.clientname[0][0] = 0;
 	mainGame->dInfo.turn = 0;
 	char filename[256];
 	size_t slen = 0;
@@ -117,10 +117,10 @@ int SingleMode::SinglePlayThread(void* param) {
 	new_replay.WriteHeader(rh);
 	replay_stream.clear();
 	unsigned short buffer[20];
-	BufferIO::CopyWStr(mainGame->dInfo.hostname, buffer, 20);
+	BufferIO::CopyWStr(mainGame->dInfo.hostname[0], buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
 	new_replay.WriteData(buffer, 40, false);
-	BufferIO::CopyWStr(mainGame->dInfo.clientname, buffer, 20);
+	BufferIO::CopyWStr(mainGame->dInfo.clientname[0], buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
 	new_replay.WriteData(buffer, 40, false);
 	last_replay.WriteInt32(start_lp, false);
@@ -849,7 +849,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			pbuf += len + 1;
 			memcpy(namebuf, begin, len + 1);
 			BufferIO::DecodeUTF8(namebuf, wname);
-			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname, 20);
+			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname[0], 20);
 			break;
 		}
 		case MSG_SHOW_HINT: {

@@ -512,25 +512,10 @@ void Game::DrawMisc() {
 
 	recti p1size = mainGame->Resize(335, 31, 629, 50);
 	recti p2size = mainGame->Resize(986, 31, 986, 50);
-	if (dInfo.isRelay)
-		textFont->draw(dInfo.hostname_relay[dInfo.relay_player[0]], p1size, 0xffffffff, false, false, 0);
-	else if(!dInfo.isTag || !dInfo.tag_player[0])
-		textFont->draw(dInfo.hostname, p1size, 0xffffffff, false, false, 0);
-	else
-		textFont->draw(dInfo.hostname_tag, p1size, 0xffffffff, false, false, 0);
-	if (dInfo.isRelay) {
-		auto cld = textFont->getDimension(dInfo.clientname_relay[dInfo.relay_player[1]]);
-		p2size.UpperLeftCorner.X -= cld.Width;
-		textFont->draw(dInfo.clientname_relay[dInfo.relay_player[1]], p2size, 0xffffffff, false, false, 0);
-	} else if(!dInfo.isTag || !dInfo.tag_player[1]) {
-		auto cld = textFont->getDimension(dInfo.clientname);
-		p2size.UpperLeftCorner.X -= cld.Width;
-		textFont->draw(dInfo.clientname, p2size, 0xffffffff, false, false, 0);
-	} else {
-		auto cld = textFont->getDimension(dInfo.clientname_tag);
-		p2size.UpperLeftCorner.X -= cld.Width;
-		textFont->draw(dInfo.clientname_tag, p2size, 0xffffffff, false, false, 0);
-	}
+	textFont->draw(dInfo.hostname[dInfo.current_player[0]], p1size, 0xffffffff, false, false, 0);
+	auto cld = textFont->getDimension(dInfo.clientname[dInfo.current_player[1]]);
+	p2size.UpperLeftCorner.X -= cld.Width;
+	textFont->draw(dInfo.clientname[dInfo.current_player[1]], p2size, 0xffffffff, false, false, 0);
 	driver->draw2DRectangle(mainGame->Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(mainGame->Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	lpcFont->draw(dataManager.GetNumString(dInfo.turn), mainGame->Resize(635, 5, 685, 40), 0x80000000, true, false, 0);

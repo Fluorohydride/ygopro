@@ -20,8 +20,8 @@ namespace ygo {
 		mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
 		mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 		mainGame->dInfo.lua64 = true;
-		mainGame->dInfo.tag_player[0] = false;
-		mainGame->dInfo.tag_player[1] = false;
+		mainGame->dInfo.current_player[0] = 0;
+		mainGame->dInfo.current_player[1] = 0;
 		if (mainGame->dInfo.isSingleMode) {
 			set_script_reader((script_reader)SingleMode::ScriptReader);
 			set_card_reader((card_reader)DataManager::CardReader);
@@ -106,14 +106,14 @@ namespace ygo {
 		int seed = rh.seed;
 		rnd.reset(seed);
 		if (mainGame->dInfo.isTag) {
-			cur_replay.ReadName(mainGame->dInfo.hostname);
-			cur_replay.ReadName(mainGame->dInfo.hostname_tag);
-			cur_replay.ReadName(mainGame->dInfo.clientname_tag);
-			cur_replay.ReadName(mainGame->dInfo.clientname);
+			cur_replay.ReadName(mainGame->dInfo.hostname[0]);
+			cur_replay.ReadName(mainGame->dInfo.hostname[1]);
+			cur_replay.ReadName(mainGame->dInfo.clientname[1]);
+			cur_replay.ReadName(mainGame->dInfo.clientname[0]);
 		}
 		else {
-			cur_replay.ReadName(mainGame->dInfo.hostname);
-			cur_replay.ReadName(mainGame->dInfo.clientname);
+			cur_replay.ReadName(mainGame->dInfo.hostname[0]);
+			cur_replay.ReadName(mainGame->dInfo.clientname[0]);
 		}
 		pduel = create_duel(rnd.rand());
 		int start_lp = cur_replay.ReadInt32();
