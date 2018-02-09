@@ -487,7 +487,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				else {
 					for (int i = 0; i < 2; ++i)
 						mainGame->chkRules[i]->setEnabled(true);
-					for (int i = 0; i < 16; ++i) {
+					for (int i = 0; i < 14; ++i) {
 						if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 9)
 							for (int i = 0; i < 2; ++i)
 								mainGame->chkRules[i]->setEnabled(false);
@@ -505,7 +505,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					for (int i = 0; i < 3; ++i)
 						mainGame->chkRules[i]->setEnabled(true);
 					mainGame->chkRules[10]->setEnabled(true);
-					for (int i = 0; i < 16; ++i) {
+					for (int i = 0; i < 14; ++i) {
 						if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 9)
 							for (int i = 0; i < 1; ++i)
 								mainGame->chkRules[i]->setEnabled(false);
@@ -523,7 +523,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					for (int i = 0; i < 3; ++i)
 						mainGame->chkRules[i]->setEnabled(true);
 					mainGame->chkRules[11]->setEnabled(true);
-					for (int i = 0; i < 16; ++i) {
+					for (int i = 0; i < 14; ++i) {
 						if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 9)
 							for (int i = 0; i < 1; ++i)
 								mainGame->chkRules[i]->setEnabled(false);
