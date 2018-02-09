@@ -986,9 +986,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					player = 10;
 			} else if(mainGame->dInfo.isRelay) {
 				if (mainGame->dInfo.isStarted && !mainGame->dInfo.isFirst)
-					player ^= 2;
+					player += (player > 2) ? -3 : 3;
 				player = (player > 1) ? (player % 3) * 2 + 1 : (player % 3) * 2;
-				if (player > 3)
+				if (player > 5)
 					player = 10;
 			} else {
 				if(mainGame->dInfo.isStarted)
