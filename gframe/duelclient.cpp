@@ -988,7 +988,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			} else if(mainGame->dInfo.isRelay) {
 				if (mainGame->dInfo.isStarted && !mainGame->dInfo.isFirst)
 					player += (player > 2) ? -3 : 3;
-				player = (player > 1) ? (player % 3) * 2 + 1 : (player % 3) * 2;
+				player = (player > 2) ? (player % 3) * 2 + 1 : (player % 3) * 2;
 				if (player > 5)
 					player = 10;
 			} else {
@@ -1055,24 +1055,29 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Lock();
 		if(state < 8) {
 			mainGame->PlaySoundEffect("./sound/playerenter.wav");
-			wchar_t* prename = (wchar_t*)mainGame->stHostPrepDuelist[pos]->getText();
+			wchar_t prename[20];
+			BufferIO::CopyWStr(mainGame->stHostPrepDuelist[pos]->getText(), prename, 20);
 			mainGame->stHostPrepDuelist[state]->setText(prename);
 			mainGame->stHostPrepDuelist[pos]->setText(L"");
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
 			if (mainGame->dInfo.isRelay) {
 				if (pos < 3)
-					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname[pos], 20);
+					BufferIO::CopyWStr(L"", mainGame->dInfo.hostname[pos], 20);
 				else
-					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname[pos - 3], 20);
+					BufferIO::CopyWStr(L"", mainGame->dInfo.clientname[pos - 3], 20);
+				if (state < 3)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname[state], 20);
+				else
+					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname[state - 3], 20);
 			} else {
-				if (pos == 0)
-					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname[0], 20);
-				else if (pos == 1)
-					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname[1], 20);
-				else if (pos == 2)
-					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname[0], 20);
-				else if (pos == 3)
-					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname[1], 20);
+				if (pos < 2)
+					BufferIO::CopyWStr(L"", mainGame->dInfo.hostname[pos], 20);
+				else if (pos < 4)
+					BufferIO::CopyWStr(L"", mainGame->dInfo.clientname[pos - 2], 20);
+				if (state < 2)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.hostname[state], 20);
+				else if (state < 4)
+					BufferIO::CopyWStr(prename, mainGame->dInfo.clientname[state - 2], 20);
 			}
 		} else if(state == PLAYERCHANGE_READY) {
 			mainGame->chkHostPrepReady[pos]->setChecked(true);
