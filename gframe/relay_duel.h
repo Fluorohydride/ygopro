@@ -56,6 +56,7 @@ protected:
 	};
 	duelist players[6];
 	unsigned char startp[2];
+	unsigned char endp[2];
 	DuelPlayer* cur_player[2];
 	std::set<DuelPlayer*> observers;
 	unsigned char hand_result[2];

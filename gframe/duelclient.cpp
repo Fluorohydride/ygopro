@@ -416,6 +416,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->deckBuilder.pre_extrac = deckManager.current_deck.extra.size();
 		mainGame->deckBuilder.pre_sidec = deckManager.current_deck.side.size();
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
+		mainGame->dInfo.isFirst = mainGame->dInfo.player_type == 0;
 		mainGame->gMutex.Unlock();
 		break;
 	}
@@ -3807,13 +3808,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_TAG_SWAP: {
-		int player = BufferIO::ReadInt8(pbuf);
-		int newp = 0;
-		if (mainGame->dInfo.isRelay) {
-			newp = player >> 4;
-			player = mainGame->LocalPlayer(player & 0xf);
-		} else
-			player = mainGame->LocalPlayer(player);
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		size_t mcount = (size_t)BufferIO::ReadInt8(pbuf);
 		size_t ecount = (size_t)BufferIO::ReadInt8(pbuf);
 		size_t pcount = (size_t)BufferIO::ReadInt8(pbuf);
@@ -3924,7 +3919,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->WaitFrameSignal(5);
 		}
 		if(mainGame->dInfo.isRelay)
-			mainGame->dInfo.current_player[player] = newp;
+			mainGame->dInfo.current_player[player]++;
 		break;
 	}
 	case MSG_RELOAD_FIELD: {

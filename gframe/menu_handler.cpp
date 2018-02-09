@@ -387,15 +387,21 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				tm* st = localtime(&curtime);
 				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
 				repinfo.append(infobuf);
-				wchar_t namebuf[4][20];
+				wchar_t namebuf[6][20];
 				ReplayMode::cur_replay.ReadName(namebuf[0]);
 				ReplayMode::cur_replay.ReadName(namebuf[1]);
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
+				if(ReplayMode::cur_replay.pheader.flag & (REPLAY_TAG + REPLAY_RELAY)) {
 					ReplayMode::cur_replay.ReadName(namebuf[2]);
 					ReplayMode::cur_replay.ReadName(namebuf[3]);
 				}
+				if(ReplayMode::cur_replay.pheader.flag & REPLAY_RELAY) {
+					ReplayMode::cur_replay.ReadName(namebuf[4]);
+					ReplayMode::cur_replay.ReadName(namebuf[5]);
+				}
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
 					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
+				else if (ReplayMode::cur_replay.pheader.flag & REPLAY_RELAY)
+					myswprintf(infobuf, L"%ls\n%ls\n%ls\n===VS===\n%ls\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3], namebuf[4], namebuf[5]);
 				else
 					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
 				repinfo.append(infobuf);

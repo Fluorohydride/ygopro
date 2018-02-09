@@ -60,17 +60,24 @@ int ReplayMode::ReplayThread(void* param) {
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
+	mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 	mainGame->dInfo.lua64 = !!(rh.flag & REPLAY_LUA64);
 	mainGame->dInfo.current_player[0] = 0;
 	mainGame->dInfo.current_player[1] = 0;
-	if (mainGame->dInfo.isTag) {
+	if (mainGame->dInfo.isRelay) {
+		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
+		cur_replay.ReadName(mainGame->dInfo.hostname[1]);
+		cur_replay.ReadName(mainGame->dInfo.hostname[2]);
+		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
+		cur_replay.ReadName(mainGame->dInfo.clientname[1]);
+		cur_replay.ReadName(mainGame->dInfo.clientname[2]);
+	} else if (mainGame->dInfo.isTag) {
 		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
 		cur_replay.ReadName(mainGame->dInfo.hostname[1]);
 		cur_replay.ReadName(mainGame->dInfo.clientname[1]);
 		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
-	}
-	else {
+	} else {
 		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
 		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
 	}

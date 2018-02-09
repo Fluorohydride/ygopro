@@ -296,7 +296,7 @@ void Replay::Rewind() {
 
 bool Replay::LoadYrp() {
 	if (pheader.flag & REPLAY_NEWREPLAY) {
-		pdata += (4 + ((pheader.flag & REPLAY_TAG) ? 160 : 80));
+		pdata += (4 + ((pheader.flag & REPLAY_RELAY) ? 240 : (pheader.flag & REPLAY_TAG) ? 160 : 80));
 		ReplayPacket p;
 		while (ReadNextPacket(&p))
 			if (p.message == OLD_REPLAY_MODE) {

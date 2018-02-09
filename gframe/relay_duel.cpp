@@ -16,7 +16,9 @@ RelayDuel::RelayDuel() {
 	for (int i = 0; i < 6; i++)
 		players[i] = duelist();
 	startp[0] = 0;
+	endp[0] = 3;
 	startp[1] = 3;
+	endp[1] = 6;
 }
 RelayDuel::~RelayDuel() {
 }
@@ -269,6 +271,46 @@ void RelayDuel::StartDuel(DuelPlayer* dp) {
 	if(!((players[0].ready || players[1].ready || players[2].ready) &&
 		(players[3].ready || players[4].ready || players[5].ready)))
 		return;
+	for (int i = 0; i < 3; i++)
+		if (!players[i].player) {
+			endp[0]--;
+			for (int j = i + 1; j < 3; j++)
+				if (players[j].player) {
+					STOC_HS_PlayerChange scpc;
+					scpc.status = (j << 4) | i;
+					for (int k = 0; k < 6; k++)
+						if (players[k].player)
+							NetServer::SendPacketToPlayer(players[k].player, STOC_HS_PLAYER_CHANGE, scpc);
+					for (auto pit = observers.begin(); pit != observers.end(); ++pit)
+						NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
+					STOC_TypeChange sctc;
+					sctc.type = (players[j].player == host_player ? 0x10 : 0) | i;
+					NetServer::SendPacketToPlayer(players[j].player, STOC_TYPE_CHANGE, sctc);
+					players[i] = players[j];
+					players[j] = duelist();
+					players[i].player->type = i;
+				}
+		}
+	for (int i = 3; i < 6; i++)
+		if (!players[i].player) {
+			endp[1]--;
+			for (int j = i + 1; j < 6; j++)
+				if (players[j].player) {
+					STOC_HS_PlayerChange scpc;
+					scpc.status = (j << 4) | i;
+					for (int k = 0; k < 6; k++)
+						if (players[k].player)
+							NetServer::SendPacketToPlayer(players[k].player, STOC_HS_PLAYER_CHANGE, scpc);
+					for (auto pit = observers.begin(); pit != observers.end(); ++pit)
+						NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
+					STOC_TypeChange sctc;
+					sctc.type = (players[j].player == host_player ? 0x10 : 0) | i;
+					NetServer::SendPacketToPlayer(players[j].player, STOC_TYPE_CHANGE, sctc);
+					players[i] = players[j];
+					players[j] = duelist();
+					players[i].player->type = i;
+				}
+		}
 	NetServer::StopListen();
 	game_started = true;
 	//NetServer::StopBroadcast();
@@ -279,12 +321,6 @@ void RelayDuel::StartDuel(DuelPlayer* dp) {
 		(*oit)->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(*oit);
 	}
-	for (startp[0] = 0; startp[0] < 3; startp[0]++)
-		if (players[startp[0]].player)
-			break;
-	for (startp[1] = 3; startp[1] < 5; startp[1]++)
-		if (players[startp[1]].player)
-			break;
 	NetServer::SendPacketToPlayer(players[startp[0]].player, STOC_SELECT_HAND);
 	NetServer::ReSendToPlayer(players[startp[1]].player);
 	hand_result[0] = 0;
@@ -346,10 +382,6 @@ void RelayDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 			if(players[i].player)
 				players[i].player->type = i;
 		swapped = true;
-		int starttmp0 = startp[1] - 3;
-		int starttmp1 = startp[0] + 3;
-		startp[0] = starttmp0;
-		startp[1] = starttmp1;
 	}
 	turn_count = 0;
 	cur_player[0] = players[startp[0]].player;
@@ -358,7 +390,7 @@ void RelayDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = REPLAY_TAG + REPLAY_LUA64;
+	rh.flag = REPLAY_RELAY + REPLAY_LUA64;
 	time_t seed = time(0);
 	rh.seed = seed;
 	last_replay.BeginRecord(false);
@@ -369,10 +401,15 @@ void RelayDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.id = 0x58707279;
 	rh.flag |= REPLAY_NEWREPLAY;
 	new_replay.WriteHeader(rh);
+	unsigned short tmp[20];
+	BufferIO::CopyWStr(L"", tmp, 20);
 	for (int i = 0; i < 6; i++)
-		if (players[i].player->name) {
+		if (players[i].player) {
 			last_replay.WriteData(players[i].player->name, 40, false);
 			new_replay.WriteData(players[i].player->name, 40, false);
+		} else {
+			last_replay.WriteData(tmp, 40, false);
+			new_replay.WriteData(tmp, 40, false);
 		}
 	replay_stream.clear();
 	if(!host_info.no_shuffle_deck) {
@@ -1494,22 +1531,12 @@ int RelayDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_TAG_SWAP: {
-			pbufw = pbuf;
 			player = BufferIO::ReadInt8(pbuf);
-			int newp = 0;
-			for (int i = startp[player]; i < (player == 0) ? 3 : 6; i++)
-				if (players[i].player == cur_player[player]) {
-					for (newp = i + 1; newp < (player == 0) ? 3 : 6; newp++)
-						if (players[newp].player)
-							break;
-					break;
-				}
-			BufferIO::WriteInt8(pbufw, player + (newp << 4));
 			/*int mcount = */BufferIO::ReadInt8(pbuf);
 			int ecount = BufferIO::ReadInt8(pbuf);
 			/*int pcount = */BufferIO::ReadInt8(pbuf);
 			int hcount = BufferIO::ReadInt8(pbuf);
-			pbufw += 4;
+			pbufw = pbuf + 4;
 			pbuf += hcount * 4 + ecount * 4 + 4;
 			for (int p = player * 3, i = 0; i < 3; i++, p++)
 				if (players[p].player)
@@ -1531,16 +1558,15 @@ int RelayDuel::Analyze(char* msgbuffer, unsigned int len) {
 					NetServer::SendBufferToPlayer(players[p].player, STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			for (int i = startp[player]; i < (player == 0) ? 3 : 6; i++)
+			for (int i = startp[player]; i < endp[player]; i++)
 				if (players[i].player == cur_player[player]) {
-					for (int j = i + 1; j < (player == 0) ? 3 : 6; j++)
+					for (int j = i + 1; j < endp[player]; j++)
 						if (players[j].player) {
 							cur_player[player] = players[j].player;
 							break;
 						}
 					break;
 				}
-			cur_player[player] = players[newp].player;
 			PseudoRefreshDeck(player);
 			RefreshExtra(player);
 			RefreshMzone(0, 0x81fff, 0);
@@ -1655,7 +1681,7 @@ void RelayDuel::RefreshMzone(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(players[pid].player, STOC_GAME_MSG, query_buffer, len + 3);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
-	for (int i = pid + 1; i < player * 3 + 3; i++)
+	for (int i = pid + 1; i < endp[player]; i++)
 		if(players[i].player)
 			NetServer::ReSendToPlayer(players[i].player);
 	int qlen = 0;
@@ -1670,7 +1696,7 @@ void RelayDuel::RefreshMzone(int player, int flag, int use_cache) {
 	}
 	pid = startp[1 - player];
 	NetServer::SendBufferToPlayer(players[pid].player, STOC_GAME_MSG, query_buffer, len + 3);
-	for (int i = pid + 1; i < (1 - player) * 3 + 3; i++)
+	for (int i = pid + 1; i < endp[1 - player]; i++)
 		if (players[i].player)
 			NetServer::ReSendToPlayer(players[i].player);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
@@ -1687,7 +1713,7 @@ void RelayDuel::RefreshSzone(int player, int flag, int use_cache) {
 	NetServer::SendBufferToPlayer(players[pid].player, STOC_GAME_MSG, query_buffer, len + 3);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
-	for (int i = pid + 1; i < player * 3 + 3; i++)
+	for (int i = pid + 1; i < endp[player]; i++)
 		if(players[i].player)
 			NetServer::ReSendToPlayer(players[i].player);
 	int qlen = 0;
@@ -1702,7 +1728,7 @@ void RelayDuel::RefreshSzone(int player, int flag, int use_cache) {
 	}
 	pid = startp[1 - player];
 	NetServer::SendBufferToPlayer(players[pid].player, STOC_GAME_MSG, query_buffer, len + 3);
-	for (int i = pid + 1; i < (1 - player) * 3 + 3; i++)
+	for (int i = pid + 1; i < endp[1 - player]; i++)
 		if (players[i].player)
 			NetServer::ReSendToPlayer(players[i].player);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
@@ -1778,12 +1804,11 @@ void RelayDuel::RefreshSingle(int player, int location, int sequence, int flag) 
 	if(location & LOCATION_ONFIELD) {
 		int pid = startp[player];
 		NetServer::SendBufferToPlayer(players[pid].player, STOC_GAME_MSG, query_buffer, len + 4);
-		for (int i = pid + 1; i < player * 3 + 3; i++)
+		for (int i = pid + 1; i < endp[player]; i++)
 			if (players[i].player)
 				NetServer::ReSendToPlayer(players[i].player);
 		if(qbuf[15] & POS_FACEUP) {
-			pid = startp[1 - player];
-			for (int i = pid; i < (1 - player) * 3 + 3; i++)
+			for (int i = startp[1 - player]; i < endp[1 - player]; i++)
 				if (players[i].player)
 					NetServer::ReSendToPlayer(players[i].player);
 			for(auto pit = observers.begin(); pit != observers.end(); ++pit)
@@ -1792,7 +1817,7 @@ void RelayDuel::RefreshSingle(int player, int location, int sequence, int flag) 
 	} else {
 		int pid = startp[player];
 		NetServer::SendBufferToPlayer(players[pid].player, STOC_GAME_MSG, query_buffer, len + 4);
-		for (int i = pid + 1; i < player * 3 + 3; i++)
+		for (int i = pid + 1; i < endp[player]; i++)
 			if (players[i].player)
 				NetServer::ReSendToPlayer(players[i].player);
 		if(location == LOCATION_REMOVED && (qbuf[15] & POS_FACEDOWN))
