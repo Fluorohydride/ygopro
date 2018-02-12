@@ -1096,7 +1096,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
-				pcard->cmdFlag |= COMMAND_OPERATION;
 			} else {
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
 				if (pcard->location == LOCATION_GRAVE)
@@ -1226,7 +1225,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
-				pcard->cmdFlag |= COMMAND_OPERATION;
 			} else {
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
 				if (pcard->location == LOCATION_GRAVE)
