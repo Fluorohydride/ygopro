@@ -38,7 +38,6 @@ void RelayDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			scem.msg = ERRMSG_JOINERROR;
 			scem.code = 0;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
-			NetServer::DisconnectPlayer(dp);
 			return;
 		}
 		CTOS_JoinGame* pkt = (CTOS_JoinGame*)pdata;
@@ -47,7 +46,6 @@ void RelayDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			scem.msg = ERRMSG_VERERROR;
 			scem.code = PRO_VERSION;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
-			NetServer::DisconnectPlayer(dp);
 			return;
 		}
 		wchar_t jpass[20];
