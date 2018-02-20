@@ -216,8 +216,8 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 #else
 	char oldfilefn[256];
 	char newfilefn[256];
-	BufferIO::EncodeUTF8(oldname, oldfilefn);
-	BufferIO::EncodeUTF8(newname, newfilefn);
+	BufferIO::EncodeUTF8(oldfname, oldfilefn);
+	BufferIO::EncodeUTF8(newfname, newfilefn);
 	int result = rename(oldfilefn, newfilefn);
 	return result == 0;
 #endif
