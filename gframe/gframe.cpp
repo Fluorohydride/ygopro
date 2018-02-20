@@ -159,13 +159,13 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(argc == 2) {
 			char* pstrext = argv[1] + strlen(argv[1]) - 4;
-			if(!strnicmp(pstrext, ".ydk", 4)) {
+			if(!mystrncasecmp(pstrext, ".ydk", 4)) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i][0]);
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 			}
-			if(!strnicmp(pstrext, ".yrp", 4)) {
+			if(!mystrncasecmp(pstrext, ".yrp", 4)) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i][0]);
 				exit_on_return = !keep_on_return;
