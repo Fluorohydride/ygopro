@@ -78,6 +78,7 @@ int main(int argc, char* argv[]) {
 			char param[128];
 			GetParameter(param, &argv[i][2]);
 			ygo::dataManager.LoadDB(param);
+			continue;
 		}
 		if(!strcmp(argv[i], "-e")) { // extra database
 			++i;
@@ -156,6 +157,21 @@ int main(int argc, char* argv[]) {
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
+		} else if(argc == 2) {
+			char* pstrext = argv[1] + strlen(argv[1]) - 4;
+			if(!strnicmp(pstrext, ".ydk", 4)) {
+				open_file = true;
+				GetParameterW(open_file_name, &argv[i][0]);
+				exit_on_return = !keep_on_return;
+				ClickButton(ygo::mainGame->btnDeckEdit);
+			}
+			if(!strnicmp(pstrext, ".yrp", 4)) {
+				open_file = true;
+				GetParameterW(open_file_name, &argv[i][0]);
+				exit_on_return = !keep_on_return;
+				ClickButton(ygo::mainGame->btnReplayMode);
+				ClickButton(ygo::mainGame->btnLoadReplay);
+			}
 		}
 	}
 	ygo::mainGame->MainLoop();
