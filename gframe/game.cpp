@@ -44,6 +44,8 @@ bool Game::Initialize() {
 	ignore_chain = false;
 	chain_when_avail = false;
 	is_building = false;
+	menuHandler.prev_operation = 0;
+	menuHandler.prev_sel = -1;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();

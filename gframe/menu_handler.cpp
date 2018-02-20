@@ -250,6 +250,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
+				prev_sel = sel;
 				break;
 			}
 			case BUTTON_RENAME_REPLAY: {
@@ -262,6 +263,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wReplaySave);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
+				prev_sel = sel;
 				break;
 			}
 			case BUTTON_CANCEL_REPLAY: {
@@ -368,45 +370,43 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_YES: {
 				mainGame->HideElement(mainGame->wQuery);
 				if(prev_operation == BUTTON_DELETE_REPLAY) {
-					int sel = mainGame->lstReplayList->getSelected();
-					if(sel == -1)
-						break;
-					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(sel))) {
+					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(prev_sel))) {
 						mainGame->stReplayInfo->setText(L"");
-						mainGame->lstReplayList->removeItem(sel);
+						mainGame->lstReplayList->removeItem(prev_sel);
 					}
 				}
 				prev_operation = 0;
+				prev_sel = -1;
 				break;
 			}
 			case BUTTON_NO: {
 				mainGame->HideElement(mainGame->wQuery);
 				prev_operation = 0;
+				prev_sel = -1;
 				break;
 			}
 			case BUTTON_REPLAY_SAVE: {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
-					int sel = mainGame->lstReplayList->getSelected();
-					if(sel == -1)
-						break;
 					wchar_t newname[256];
 					BufferIO::CopyWStr(mainGame->ebRSName->getText(), newname, 256);
 					if(wcsnicmp(newname + wcslen(newname) - 4, L".yrp", 4)) {
 						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
 					}
-					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(sel), newname)) {
-						mainGame->lstReplayList->setItem(sel, newname, -1);
+					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
+						mainGame->lstReplayList->setItem(prev_sel, newname, -1);
 					} else {
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365));
 					}
 				}
 				prev_operation = 0;
+				prev_sel = -1;
 				break;
 			}
 			case BUTTON_REPLAY_CANCEL: {
 				mainGame->HideElement(mainGame->wReplaySave);
 				prev_operation = 0;
+				prev_sel = -1;
 				break;
 			}
 			}
