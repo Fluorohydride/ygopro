@@ -284,6 +284,8 @@ public:
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIStaticText* stReplayInfo;
 	irr::gui::IGUIButton* btnLoadReplay;
+	irr::gui::IGUIButton* btnDeleteReplay;
+	irr::gui::IGUIButton* btnRenameReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
 	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
@@ -498,6 +500,8 @@ extern Game* mainGame;
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
+#define BUTTON_DELETE_REPLAY		133
+#define BUTTON_RENAME_REPLAY		134
 #define EDITBOX_CHAT				140
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
