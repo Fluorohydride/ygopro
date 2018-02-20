@@ -6,8 +6,6 @@
 #include "../ikpmp3/ikpMP3.h"
 #endif
 
-#define wcsicmp _wcsicmp
-
 namespace ygo {
 
 SoundManager soundManager;
@@ -50,7 +48,7 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	do {
 		size_t len = wcslen(fdataw.cFileName);
 		if((fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || len < 5
-			|| !(wcsicmp(fdataw.cFileName + len - 4, L".mp3") == 0 || wcsicmp(fdataw.cFileName + len - 4, L".ogg") == 0))
+			|| !(_wcsicmp(fdataw.cFileName + len - 4, L".mp3") == 0 || _wcsicmp(fdataw.cFileName + len - 4, L".ogg") == 0))
 			continue;
 		std::wstring filename = path + (std::wstring)fdataw.cFileName;
 		BGMList[BGM_ALL].push_back(filename);
