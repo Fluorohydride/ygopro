@@ -645,6 +645,7 @@ void ClientField::ReplaySwap() {
 		(*cit)->is_moving = false;
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
+	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
 	std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
