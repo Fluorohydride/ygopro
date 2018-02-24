@@ -30,6 +30,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		s32 id = caller->getID();
+		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) {
+			mainGame->wQuery->getParent()->bringToFront(mainGame->wQuery);
+			break;
+		}
+		if(mainGame->wReplaySave->isVisible() && id != BUTTON_REPLAY_SAVE && id != BUTTON_REPLAY_CANCEL) {
+			mainGame->wReplaySave->getParent()->bringToFront(mainGame->wReplaySave);
+			break;
+		}
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -185,6 +193,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->ShowElement(mainGame->wReplay);
 				mainGame->ebRepStartTurn->setText(L"1");
+				mainGame->stReplayInfo->setText(L"");
 				mainGame->RefreshReplay();
 				break;
 			}
@@ -228,6 +237,33 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(start_turn == 1)
 					start_turn = 0;
 				ReplayMode::StartReplay(start_turn);
+				break;
+			}
+			case BUTTON_DELETE_REPLAY: {
+				int sel = mainGame->lstReplayList->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->gMutex.Lock();
+				wchar_t textBuffer[256];
+				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363));
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
+				mainGame->PopupElement(mainGame->wQuery);
+				mainGame->gMutex.Unlock();
+				prev_operation = id;
+				prev_sel = sel;
+				break;
+			}
+			case BUTTON_RENAME_REPLAY: {
+				int sel = mainGame->lstReplayList->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->gMutex.Lock();
+				mainGame->wReplaySave->setText(dataManager.GetSysString(1364));
+				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
+				mainGame->PopupElement(mainGame->wReplaySave);
+				mainGame->gMutex.Unlock();
+				prev_operation = id;
+				prev_sel = sel;
 				break;
 			}
 			case BUTTON_CANCEL_REPLAY: {
@@ -329,6 +365,48 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->deckBuilder.Initialize();
+				break;
+			}
+			case BUTTON_YES: {
+				mainGame->HideElement(mainGame->wQuery);
+				if(prev_operation == BUTTON_DELETE_REPLAY) {
+					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(prev_sel))) {
+						mainGame->stReplayInfo->setText(L"");
+						mainGame->lstReplayList->removeItem(prev_sel);
+					}
+				}
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
+			case BUTTON_NO: {
+				mainGame->HideElement(mainGame->wQuery);
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
+			case BUTTON_REPLAY_SAVE: {
+				mainGame->HideElement(mainGame->wReplaySave);
+				if(prev_operation == BUTTON_RENAME_REPLAY) {
+					wchar_t newname[256];
+					BufferIO::CopyWStr(mainGame->ebRSName->getText(), newname, 256);
+					if(mywcsncasecmp(newname + wcslen(newname) - 4, L".yrp", 4)) {
+						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
+					}
+					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
+						mainGame->lstReplayList->setItem(prev_sel, newname, -1);
+					} else {
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365));
+					}
+				}
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
+			case BUTTON_REPLAY_CANCEL: {
+				mainGame->HideElement(mainGame->wReplaySave);
+				prev_operation = 0;
+				prev_sel = -1;
 				break;
 			}
 			}

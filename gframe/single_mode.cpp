@@ -139,6 +139,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	wchar_t timetext[80];
 	mbstowcs(timetext, timebuf, size);
 	mainGame->ebRSName->setText(timetext);
+	mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
 	mainGame->PopupElement(mainGame->wReplaySave);
 	mainGame->gMutex.Unlock();
 	mainGame->replaySignal.Reset();

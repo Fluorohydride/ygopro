@@ -673,6 +673,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		wchar_t timetext[80];
 		mbstowcs(timetext, timebuf, size);
 		mainGame->ebRSName->setText(timetext);
+		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.Unlock();
 		mainGame->replaySignal.Reset();

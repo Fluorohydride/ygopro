@@ -84,6 +84,7 @@ void DeckBuilder::Initialize() {
 	is_starting_dragging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
+	prev_sel = -1;
 	is_modified = false;
 	mainGame->device->setEventReceiver(this);
 }
@@ -184,6 +185,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
+				prev_sel = sel;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
@@ -260,7 +262,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					deckManager.current_deck.extra.clear();
 					deckManager.current_deck.side.clear();
 				} else if(prev_operation == BUTTON_DELETE_DECK) {
-					int sel = mainGame->cbDBDecks->getSelected();
+					int sel = prev_sel;
 					if(deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 						mainGame->cbDBDecks->removeItem(sel);
 						int count = mainGame->cbDBDecks->getItemCount();
@@ -274,6 +276,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						prev_deck = sel;
 						is_modified = false;
 					}
+					prev_sel = -1;
 				} else if(prev_operation == BUTTON_LEAVE_GAME) {
 					Terminate();
 				} else if(prev_operation == COMBOBOX_DBDECKS) {
