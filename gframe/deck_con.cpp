@@ -848,12 +848,12 @@ void DeckBuilder::FilterCards() {
 		}
 		if(pstr) {
 			if(pstr[0] == L'$') {
-				if(!CardNameContains(text.name, &pstr[1]))
+				if(!CardNameContains(text.name.c_str(), &pstr[1]))
 					continue;
 			} else if(pstr[0] == L'@' && set_code) {
 				if(!check_set_code(data, set_code)) continue;
 			} else {
-				if(!CardNameContains(text.name, pstr) && wcsstr(text.text, pstr) == 0
+				if(!CardNameContains(text.name.c_str(), pstr) && text.text.find(pstr) == std::wstring::npos
 					&& (!set_code || !check_set_code(data, set_code)))
 					continue;
 			}

@@ -39,9 +39,9 @@ struct CardDataC {
 	unsigned int category;
 };
 struct CardString {
-	wchar_t* name;
-	wchar_t* text;
-	wchar_t* desc[16];
+	std::wstring name;
+	std::wstring text;
+	std::wstring desc[16];
 };
 typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
 
