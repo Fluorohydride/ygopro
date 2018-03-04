@@ -860,13 +860,13 @@ void DeckBuilder::FilterCards() {
 		}
 		if(pstr) {
 			if(pstr[0] == L'$') {
-				if(!CardNameCompare(text.name, &pstr[1]))
+				if(!CardNameCompare(text.name.c_str(), &pstr[1]))
 					continue;
 			} else if(pstr[0] == L'@' && set_code) {
 				if(!check_set_code(data, set_code))
 					continue;
 			} else {
-				if(!CardNameCompare(text.name, pstr) && !(CardNameCompare(text.text, pstr))
+				if(!CardNameCompare(text.name.c_str(), pstr) && !(CardNameCompare(text.text.c_str(), pstr))
 					&& (!set_code || !check_set_code(data, set_code)))
 					continue;
 			}
