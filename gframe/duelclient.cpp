@@ -1393,14 +1393,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
-		if (!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
-			mainGame->gMutex.Unlock();
 		if(mainGame->dInfo.isReplaySwapped) {
-		std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
+			std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
 			mainGame->dInfo.isReplaySwapped = false;
 			mainGame->dField.ReplaySwap();
 		}
-		mainGame->gMutex.Unlock();
+		if (!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
+			mainGame->gMutex.Unlock();
 		return true;
 	}
 	case MSG_UPDATE_DATA: {
