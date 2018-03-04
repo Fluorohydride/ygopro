@@ -54,6 +54,8 @@ public:
 	static bool CheckReplay(const wchar_t* name);
 	bool ReadNextPacket(ReplayPacket* packet);
 	bool ReadStream(std::vector<ReplayPacket>* stream);
+	static bool DeleteReplay(const wchar_t* name);
+	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
 	void ReadData(void* data, unsigned int length);
