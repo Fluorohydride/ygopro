@@ -562,6 +562,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.time_left[0] = 0;
 		mainGame->dInfo.time_left[1] = 0;
 		mainGame->dInfo.time_player = 2;
+		mainGame->dInfo.isReplaySwapped = false;
 		mainGame->is_building = false;
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
@@ -672,6 +673,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		wchar_t timetext[80];
 		mbstowcs(timetext, timebuf, size);
 		mainGame->ebRSName->setText(timetext);
+		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.Unlock();
 		mainGame->replaySignal.Reset();
@@ -1050,6 +1052,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
+		if(mainGame->dInfo.isReplaySwapped) {
+			std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
+			std::swap(mainGame->dInfo.hostname_tag, mainGame->dInfo.clientname_tag);
+			mainGame->dInfo.isReplaySwapped = false;
+			mainGame->dField.ReplaySwap();
+		}
 		mainGame->gMutex.Unlock();
 		return true;
 	}

@@ -84,6 +84,7 @@ void DeckBuilder::Initialize() {
 	is_starting_dragging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
+	prev_sel = -1;
 	is_modified = false;
 	mainGame->device->setEventReceiver(this);
 }
@@ -184,6 +185,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
+				prev_sel = sel;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
@@ -260,7 +262,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					deckManager.current_deck.extra.clear();
 					deckManager.current_deck.side.clear();
 				} else if(prev_operation == BUTTON_DELETE_DECK) {
-					int sel = mainGame->cbDBDecks->getSelected();
+					int sel = prev_sel;
 					if(deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
 						mainGame->cbDBDecks->removeItem(sel);
 						int count = mainGame->cbDBDecks->getItemCount();
@@ -274,6 +276,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						prev_deck = sel;
 						is_modified = false;
 					}
+					prev_sel = -1;
 				} else if(prev_operation == BUTTON_LEAVE_GAME) {
 					Terminate();
 				} else if(prev_operation == COMBOBOX_DBDECKS) {
@@ -845,12 +848,12 @@ void DeckBuilder::FilterCards() {
 		}
 		if(pstr) {
 			if(pstr[0] == L'$') {
-				if(!CardNameContains(text.name, &pstr[1]))
+				if(!CardNameContains(text.name.c_str(), &pstr[1]))
 					continue;
 			} else if(pstr[0] == L'@' && set_code) {
 				if(!check_set_code(data, set_code)) continue;
 			} else {
-				if(!CardNameContains(text.name, pstr) && wcsstr(text.text, pstr) == 0
+				if(!CardNameContains(text.name.c_str(), pstr) && text.text.find(pstr) == std::wstring::npos
 					&& (!set_code || !check_set_code(data, set_code)))
 					continue;
 			}
