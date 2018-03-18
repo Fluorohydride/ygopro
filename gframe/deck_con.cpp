@@ -220,6 +220,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				for(int i = 0; i < 32; ++i, filter <<= 1)
 					if(mainGame->chkCategory[i]->isChecked())
 						filter_effect |= filter;
+				if(filter_effect > 0)
+					mainGame->btnEffectFilter->setPressed(true);
+				else
+					mainGame->btnEffectFilter->setPressed(false);
 				mainGame->HideElement(mainGame->wCategories);
 				InstantSearch();
 				break;
@@ -319,6 +323,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnMark[7]->isPressed())
 					filter_marks |= 0004;
 				mainGame->HideElement(mainGame->wLinkMarks);
+				if(filter_marks > 0)
+					mainGame->btnMarksFilter->setPressed(true);
+				else
+					mainGame->btnMarksFilter->setPressed(false);
 				InstantSearch();
 				break;
 			}
@@ -904,6 +912,8 @@ void DeckBuilder::ClearFilter() {
 	filter_marks = 0;
 	for(int i = 0; i < 8; i++)
 		mainGame->btnMark[i]->setPressed(false);
+	mainGame->btnEffectFilter->setPressed(false);
+	mainGame->btnMarksFilter->setPressed(false);
 }
 void DeckBuilder::SortList() {
 	auto left = results.begin();
