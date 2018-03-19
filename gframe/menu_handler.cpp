@@ -39,6 +39,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_HOVERED: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(ECI_IBEAM);
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_LEFT: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(ECI_NORMAL);
+			break;
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_MODE_EXIT: {
