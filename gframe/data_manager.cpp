@@ -17,8 +17,7 @@ bool DataManager::LoadDB(const char* file) {
 		return Error(pDB);
 	CardDataC cd;
 	CardString cs;
-	for(int i = 0; i < 16; ++i) cs.desc[i] = 0;
-	int step = 0, len = 0;
+	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
 		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
@@ -44,27 +43,21 @@ bool DataManager::LoadDB(const char* file) {
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas.insert(std::make_pair(cd.code, cd));
-			len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), strBuffer);
-			if(len) {
-				cs.name = new wchar_t[len + 1];
-				memcpy(cs.name, strBuffer, (len + 1)*sizeof(wchar_t));
-			} else cs.name = 0;
-			len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 13), strBuffer);
-			if(len) {
-				cs.text = new wchar_t[len + 1];
-				memcpy(cs.text, strBuffer, (len + 1)*sizeof(wchar_t));
-			} else {
-				cs.text = new wchar_t[1];
-				cs.text[0] = 0;
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
+				BufferIO::DecodeUTF8(text, strBuffer);
+				cs.name = strBuffer;
 			}
-			for(int i = 14; i < 30; ++i) {
-				len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, i), strBuffer);
-				if(len) {
-					cs.desc[i - 14] = new wchar_t[len + 1];
-					memcpy(cs.desc[i - 14], strBuffer, (len + 1)*sizeof(wchar_t));
-				} else cs.desc[i - 14] = 0;
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
+				BufferIO::DecodeUTF8(text, strBuffer);
+				cs.text = strBuffer;
 			}
-			_strings.insert(std::make_pair(cd.code, cs));
+			for(int i = 0; i < 16; ++i) {
+				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
+					BufferIO::DecodeUTF8(text, strBuffer);
+					cs.desc[i] = strBuffer;
+				}
+			}
+			_strings.emplace(cd.code, cs);
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
@@ -126,8 +119,8 @@ code_pointer DataManager::GetCodePointer(int code) {
 bool DataManager::GetString(int code, CardString* pStr) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end()) {
-		pStr->name = (wchar_t*)unknown_string;
-		pStr->text = (wchar_t*)unknown_string;
+		pStr->name = unknown_string;
+		pStr->text = unknown_string;
 		return false;
 	}
 	*pStr = csit->second;
@@ -137,16 +130,16 @@ const wchar_t* DataManager::GetName(int code) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
-	if(csit->second.name)
-		return csit->second.name;
+	if(!csit->second.name.empty())
+		return csit->second.name.c_str();
 	return unknown_string;
 }
 const wchar_t* DataManager::GetText(int code) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
-	if(csit->second.text)
-		return csit->second.text;
+	if(!csit->second.text.empty())
+		return csit->second.text.c_str();
 	return unknown_string;
 }
 const wchar_t* DataManager::GetDesc(int strCode) {
@@ -157,8 +150,8 @@ const wchar_t* DataManager::GetDesc(int strCode) {
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
 		return unknown_string;
-	if(csit->second.desc[offset])
-		return csit->second.desc[offset];
+	if(!csit->second.desc[offset].empty())
+		return csit->second.desc[offset].c_str();
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) {
