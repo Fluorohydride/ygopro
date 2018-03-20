@@ -42,6 +42,9 @@ struct Config {
 	int chkIgnoreDeckChanges;
 	int defaultOT;
 	int enable_bot_mode;
+	bool window_maximized;
+	int window_width;
+	int window_height;
 };
 
 struct DuelInfo {
