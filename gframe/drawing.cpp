@@ -642,8 +642,8 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 	adFont->draw(L"/", Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
 	adFont->draw(L"/", Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 0xffffffff, true, false, 0);
 	int w = adFont->getDimension(pcard->atkstring).Width;
-	adFont->draw(pcard->atkstring, Resize(x1 - 5 - w, y1, x1 - 5, y1 + 20), 0xff000000, false, false, 0);
-	adFont->draw(pcard->atkstring, Resize(x1 - 4 - w, y1 + 1, x1 - 4, y1 + 21),
+	adFont->draw(pcard->atkstring, recti((x1 - 5) * xScale - w, (y1) * yScale, (x1 - 5) * xScale, (y1 + 20) * yScale), 0xff000000, false, false, 0);
+	adFont->draw(pcard->atkstring, recti((x1 - 4) * xScale - w, (y1 + 1) * yScale, (x1 - 4) * xScale, (y1 + 21) * yScale),
 		pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, false, false, 0);
 	if(pcard->type & TYPE_LINK) {
 		w = adFont->getDimension(pcard->linkstring).Width;
