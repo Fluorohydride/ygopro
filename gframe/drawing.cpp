@@ -375,6 +375,13 @@ void Game::DrawCard(ClientCard* pcard) {
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	}
 }
+void Game::DrawShadowText(CGUITTFont * font, const core::stringw & text, const core::rect<s32>& position, const core::rect<s32>& padding,
+						  video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
+	core::rect<s32> shadowposition = recti(position.UpperLeftCorner.X - padding.UpperLeftCorner.X, position.UpperLeftCorner.Y - padding.UpperLeftCorner.Y, 
+										   position.LowerRightCorner.X - padding.LowerRightCorner.X, position.LowerRightCorner.Y - padding.LowerRightCorner.Y);
+	font->draw(text, shadowposition, shadowcolor, hcenter, vcenter, clip);
+	font->draw(text, position, color, hcenter, vcenter, clip);
+}
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
 	int rule = (dInfo.duel_rule >= 4) ? 1 : 0;
@@ -487,10 +494,12 @@ void Game::DrawMisc() {
 		driver->draw2DRectangle(Resize(795 - dInfo.time_left[1] * 100 / dInfo.time_limit, 34, 795, 44), 0xa0e0e0e0, 0xa0e0e0e0, 0xa0c0c0c0, 0xa0c0c0c0);
 		driver->draw2DRectangleOutline(Resize(695, 34, 795, 44), 0xffffffff);
 	}
-	numFont->draw(dInfo.strLP[0], Resize(330, 11, 629, 30), 0xff000000, true, false, 0);
-	numFont->draw(dInfo.strLP[0], Resize(330, 12, 631, 30), 0xffffff00, true, false, 0);
-	numFont->draw(dInfo.strLP[1], Resize(691, 11, 990, 30), 0xff000000, true, false, 0);
-	numFont->draw(dInfo.strLP[1], Resize(691, 12, 992, 30), 0xffffff00, true, false, 0);
+	//numFont->draw(dInfo.strLP[0], Resize(330, 11, 629, 30), 0xff000000, true, false, 0);
+	//numFont->draw(dInfo.strLP[0], Resize(330, 12, 631, 30), 0xffffff00, true, false, 0);
+	//numFont->draw(dInfo.strLP[1], Resize(691, 11, 990, 30), 0xff000000, true, false, 0);
+	//numFont->draw(dInfo.strLP[1], Resize(691, 12, 992, 30), 0xffffff00, true, false, 0);
+	DrawShadowText(numFont, dInfo.strLP[0], Resize(330, 12, 631, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, false, 0);
+	DrawShadowText(numFont, dInfo.strLP[1], Resize(691, 12, 992, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, false, 0);
 
 	recti p1size = Resize(335, 31, 629, 50);
 	recti p2size = Resize(986, 31, 986, 50);
@@ -642,9 +651,11 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 	adFont->draw(L"/", Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
 	adFont->draw(L"/", Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 0xffffffff, true, false, 0);
 	int w = adFont->getDimension(pcard->atkstring).Width;
-	adFont->draw(pcard->atkstring, recti((x1 - 5) * xScale - w, (y1) * yScale, (x1 - 5) * xScale, (y1 + 20) * yScale), 0xff000000, false, false, 0);
-	adFont->draw(pcard->atkstring, recti((x1 - 4) * xScale - w, (y1 + 1) * yScale, (x1 - 4) * xScale, (y1 + 21) * yScale),
-		pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, false, false, 0);
+	//adFont->draw(pcard->atkstring, Resize(x1 - 5 - w, y1, x1 - 5, y1 + 20), 0xff000000, false, false, 0);
+	//adFont->draw(pcard->atkstring, Resize(x1 - 4 - w, y1 + 1, x1 - 4, y1 + 21),
+	//	pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, false, false, 0);
+	DrawShadowText(adFont, pcard->atkstring, Resize(x1 - 4, y1 + 1, x1 - 4, y1 + 21, -w, 0, 0, 0), Resize(1, 1, 1, 1),
+		pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, 0xff000000, false, false, 0);
 	if(pcard->type & TYPE_LINK) {
 		w = adFont->getDimension(pcard->linkstring).Width;
 		adFont->draw(pcard->linkstring, Resize(x1 + 4, y1, x1 + 4 + w, y1 + 20), 0xff000000, false, false, 0);
