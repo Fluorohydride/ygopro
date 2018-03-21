@@ -45,6 +45,7 @@ struct Config {
 	bool window_maximized;
 	int window_width;
 	int window_height;
+	bool resize_popup_menu;
 };
 
 struct DuelInfo {

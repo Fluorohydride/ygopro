@@ -1014,6 +1014,7 @@ void Game::LoadConfig() {
 	gameConf.window_maximized = false;
 	gameConf.window_width = 1024;
 	gameConf.window_height = 640;
+	gameConf.resize_popup_menu = true;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1082,6 +1083,8 @@ void Game::LoadConfig() {
 			gameConf.window_width = atoi(valbuf);
 		} else if(!strcmp(strbuf, "window_height")) {
 			gameConf.window_height = atoi(valbuf);
+		} else if(!strcmp(strbuf, "resize_popup_menu")) {
+			gameConf.resize_popup_menu = atoi(valbuf) > 0;
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1436,6 +1439,23 @@ void Game::OnResize() {
 	wANRace->setRelativePosition(ResizeWin(480, 200, 850, 410));
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
 	stHintMsg->setRelativePosition(ResizeWin(500, 60, 820, 90));
+
+	if(gameConf.resize_popup_menu) {
+		int width = 100 * mainGame->xScale;
+		int height = (mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14;
+		wCmdMenu->setRelativePosition(recti(1, 1, width + 1, 1));
+		btnActivate->setRelativePosition(recti(1, 1, width, height));
+		btnSummon->setRelativePosition(recti(1, 1, width, height));
+		btnSPSummon->setRelativePosition(recti(1, 1, width, height));
+		btnMSet->setRelativePosition(recti(1, 1, width, height));
+		btnSSet->setRelativePosition(recti(1, 1, width, height));
+		btnRepos->setRelativePosition(recti(1, 1, width, height));
+		btnAttack->setRelativePosition(recti(1, 1, width, height));
+		btnActivate->setRelativePosition(recti(1, 1, width, height));
+		btnShowList->setRelativePosition(recti(1, 1, width, height));
+		btnOperation->setRelativePosition(recti(1, 1, width, height));
+		btnReset->setRelativePosition(recti(1, 1, width, height));
+	}
 
 	wCardImg->setRelativePosition(Resize(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18));
 	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
