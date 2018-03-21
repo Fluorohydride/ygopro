@@ -1392,8 +1392,9 @@ void Game::OnResize() {
 	ebDefense->setRelativePosition(Resize(260, 49, 340, 69));
 	ebCardName->setRelativePosition(Resize(260, 72, 390, 92));
 	btnEffectFilter->setRelativePosition(Resize(345, 28, 390, 69));
-	btnStartFilter->setRelativePosition(Resize(327, 96, 390, 118));
-	btnClearFilter->setRelativePosition(Resize(260, 96, 322, 118));
+	btnStartFilter->setRelativePosition(Resize(260, 80 + 125 / 6, 390, 100 + 125 / 6));
+	if(btnClearFilter)
+		btnClearFilter->setRelativePosition(Resize(205, 80 + 125 / 6, 255, 100 + 125 / 6));
 	btnMarksFilter->setRelativePosition(Resize(60, 80 + 125 / 6, 190, 100 + 125 / 6));
 
 	wCategories->setRelativePosition(ResizeWin(450, 60, 1000, 270));
