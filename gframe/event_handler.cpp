@@ -2006,7 +2006,7 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		return;
 	}
 	int height = 1;
-	int offset = (mainGame->gameConf.resize_popup_menu && mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14;
+	int offset = mainGame->gameConf.resize_popup_menu ? ((mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14) : 21;
 	if(flag & COMMAND_ACTIVATE) {
 		mainGame->btnActivate->setVisible(true);
 		mainGame->btnActivate->setRelativePosition(position2di(1, height));
