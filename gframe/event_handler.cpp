@@ -1729,6 +1729,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_HOVERED: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_LEFT: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(ECI_NORMAL);
+			break;
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_CLEAR_LOG: {
@@ -1786,6 +1796,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
 			case SCROLL_CARDTEXT: {
+				if(!mainGame->scrCardText->isVisible()) {
+					return true;
+					break;
+				}
 				u32 pos = mainGame->scrCardText->getPos();
 				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - 25, mainGame->textFont, mainGame->showingtext, pos);
 				return true;

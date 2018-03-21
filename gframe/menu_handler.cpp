@@ -40,6 +40,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_HOVERED: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_LEFT: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(ECI_NORMAL);
+			break;
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			if(id < 110)
 				soundManager.PlaySoundEffect(SOUND_MENU);
