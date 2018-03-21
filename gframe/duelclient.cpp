@@ -194,6 +194,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->btnStartBot->setEnabled(true);
 					mainGame->btnBotCancel->setEnabled(true);
+					mainGame->stTip->setVisible(false);
 					mainGame->gMutex.Unlock();
 					mainGame->closeDoneSignal.Reset();
 					mainGame->closeSignal.Set();
