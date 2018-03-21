@@ -754,6 +754,8 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 	SetStaticText(pControl, cWidth, font, text);
 	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
 		scrCardText->setVisible(false);
+		if(env->hasFocus(scrCardText))
+			env->removeFocus(scrCardText);
 		return;
 	}
 	SetStaticText(pControl, cWidth-25, font, text);

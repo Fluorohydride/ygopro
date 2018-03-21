@@ -637,6 +637,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_MOUSE_WHEEL: {
 			if(!mainGame->scrFilter->isVisible())
 				break;
+			if(mainGame->env->hasFocus(mainGame->scrFilter))
+				break;
+			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+			if(root->getElementFromPoint(mouse_pos) != root)
+				break;
 			if(event.MouseInput.Wheel < 0) {
 				if(mainGame->scrFilter->getPos() < mainGame->scrFilter->getMax())
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() + 1);
