@@ -1014,7 +1014,7 @@ void Game::LoadConfig() {
 	gameConf.window_maximized = false;
 	gameConf.window_width = 1024;
 	gameConf.window_height = 640;
-	gameConf.resize_popup_menu = true;
+	gameConf.resize_popup_menu = false;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1148,6 +1148,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	fprintf(fp, "window_height = %d\n", gameConf.window_height);
+	fprintf(fp, "resize_popup_menu = %d\n", gameConf.resize_popup_menu ? 1 : 0);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
