@@ -127,7 +127,7 @@ public:
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
-	void ShowCardInfo(int code);
+	void ShowCardInfo(int code, bool resize = false);
 	void AddChatMsg(wchar_t* msg, int player);
 	void AddDebugMsg(char* msgbuf);
 	void ClearTextures();
@@ -177,6 +177,7 @@ public:
 	int waitFrame;
 	int signalFrame;
 	int actionParam;
+	int showingcode;
 	const wchar_t* showingtext;
 	int showcard;
 	int showcardcode;

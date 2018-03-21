@@ -225,6 +225,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						break;
 				}
 				mainGame->imgCard->setImage(imageManager.tCover[0]);
+				mainGame->showingcode = 0;
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);
