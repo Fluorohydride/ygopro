@@ -736,7 +736,7 @@ void Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.Lock();
-		if(dInfo.isStarted) {
+		if(dInfo.isStarted || dInfo.isReplaySkiping) {
 			if (showcardcode == 1 || showcardcode == 3)
 				PlayMusic("./sound/duelwin.mp3", true);
 			else if (showcardcode == 2)
@@ -836,6 +836,8 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 	SetStaticText(pControl, cWidth - 10, font, text);
 	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
 		scrCardText->setVisible(false);
+		if(env->hasFocus(scrCardText))
+			env->removeFocus(scrCardText);
 		return;
 	}
 	const auto& tsize = scrCardText->getRelativePosition();

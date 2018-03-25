@@ -47,7 +47,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
 			// Set cursor to an I-Beam if hovering over an edit box
-			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
 			{
 				utils.changeCursor(ECI_IBEAM);
 			}
@@ -55,7 +55,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
 			// Set cursor to normal if left an edit box
-			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
 			{
 				utils.changeCursor(ECI_NORMAL);
 			}

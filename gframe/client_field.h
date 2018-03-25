@@ -138,6 +138,7 @@ public:
 	void ShowCancelOrFinishButton(int buttonOp);
 	void SetShowMark(ClientCard* pcard, bool enable);
 	void SetResponseSelectedCards() const;
+	void CancelOrFinish();
 };
 
 }

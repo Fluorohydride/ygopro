@@ -203,6 +203,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
+					mainGame->stTip->setVisible(false);
 					mainGame->gMutex.Unlock();
 					mainGame->closeDoneSignal.Reset();
 					mainGame->closeSignal.Set();
