@@ -32,8 +32,6 @@ project "ygopro"
         excludes { "COSOperator.*" }
         links { "event_pthreads", "GL", "dl", "pthread" }
     configuration "linux"
-        removelinks { "lua" }
-        links { "lua5.2" }
         if USE_IRRKLANG then
             defines { "YGOPRO_USE_IRRKLANG" }
             links { "IrrKlang" }
