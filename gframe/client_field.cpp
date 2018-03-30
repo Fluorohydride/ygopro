@@ -203,8 +203,21 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		break;
 	}
 	case LOCATION_EXTRA: {
-		extra[controler].push_back(pcard);
-		pcard->sequence = extra[controler].size() - 1;
+		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
+			extra[controler].push_back(pcard);
+			pcard->sequence = extra[controler].size() - 1;
+		} else {
+			extra[controler].push_back(0);
+			int p = extra[controler].size() - extra_p_count[controler] - 1;
+			for(int i = extra[controler].size() - 1; i > p; --i) {
+				extra[controler][i] = extra[controler][i - 1];
+				extra[controler][i]->sequence++;
+				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
+				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
+			}
+			extra[controler][p] = pcard;
+			pcard->sequence = p;
+		}
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
 		break;
@@ -340,6 +353,7 @@ void ClientField::ClearCommandFlag() {
 		(*cit)->cmdFlag = 0;
 	for(cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
+	conti_cards.clear();
 	deck_act = false;
 	extra_act = false;
 	grave_act = false;
@@ -635,11 +649,11 @@ void ClientField::ReplaySwap() {
 		(*cit)->is_moving = false;
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
+	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
-	for(int i = 0; i < 16; ++i)
-		std::swap(mainGame->dInfo.strLP[0][i], mainGame->dInfo.strLP[1][i]);
-	for(int i = 0; i < 20; ++i)
-		std::swap(mainGame->dInfo.hostname[i], mainGame->dInfo.clientname[i]);
+	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
+	std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
+	std::swap(mainGame->dInfo.hostname_tag, mainGame->dInfo.clientname_tag);
 	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
 		chit->controler = 1 - chit->controler;
 		GetChainLocation(chit->controler, chit->location, chit->sequence, &chit->chain_pos);
@@ -1360,7 +1374,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declarable_type)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(cstr.name);
+		mainGame->lstANCard->addItem(cstr.name.c_str());
 		ancard.push_back(trycode);
 		return;
 	}
@@ -1369,15 +1383,15 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
-		if(wcsstr(cit->second.name, pname) != 0) {
+		if(cit->second.name.find(pname) != std::wstring::npos) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declarable_type)) {
-				if(wcscmp(pname, cit->second.name) == 0) { //exact match
-					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+				if(pname == cit->second.name) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
 					ancard.insert(ancard.begin(), cit->first);
 				} else {
-					mainGame->lstANCard->addItem(cit->second.name);
+					mainGame->lstANCard->addItem(cit->second.name.c_str());
 					ancard.push_back(cit->first);
 				}
 			}
@@ -1392,7 +1406,7 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(cstr.name);
+		mainGame->lstANCard->addItem(cstr.name.c_str());
 		ancard.push_back(trycode);
 		return;
 	}
@@ -1401,15 +1415,15 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
-		if(wcsstr(cit->second.name, pname) != 0) {
+		if(cit->second.name.find(pname) != std::wstring::npos) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, opcode)) {
-				if(wcscmp(pname, cit->second.name) == 0) { //exact match
-					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+				if(pname == cit->second.name) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
 					ancard.insert(ancard.begin(), cit->first);
 				} else {
-					mainGame->lstANCard->addItem(cit->second.name);
+					mainGame->lstANCard->addItem(cit->second.name.c_str());
 					ancard.push_back(cit->first);
 				}
 			}

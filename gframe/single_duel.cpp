@@ -27,17 +27,10 @@ void SingleDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	scc.player = dp->type;
 	unsigned short* msg = (unsigned short*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
-	if(dp->type > 1) {
-		NetServer::SendBufferToPlayer(players[0], STOC_CHAT, &scc, 4 + msglen * 2);
-		NetServer::ReSendToPlayer(players[1]);
-		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-			if((*pit) != dp)
-				NetServer::ReSendToPlayer(*pit);
-	} else {
-		NetServer::SendBufferToPlayer(players[1 - dp->type], STOC_CHAT, &scc, 4 + msglen * 2);
-		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-			NetServer::ReSendToPlayer(*pit);
-	}
+	NetServer::SendBufferToPlayer(players[0], STOC_CHAT, &scc, 4 + msglen * 2);
+	NetServer::ReSendToPlayer(players[1]);
+	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+		NetServer::ReSendToPlayer(*pit);
 }
 void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 	if(!is_creater) {
@@ -78,12 +71,14 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 	if(!players[0] || !players[1]) {
 		STOC_HS_PlayerEnter scpe;
 		BufferIO::CopyWStr(dp->name, scpe.name, 20);
-		if(players[0]) {
+		if(!players[0])
+			scpe.pos = 0;
+		else
 			scpe.pos = 1;
+		if(players[0]) {
 			NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_ENTER, scpe);
 		}
 		if(players[1]) {
-			scpe.pos = 0;
 			NetServer::SendPacketToPlayer(players[1], STOC_HS_PLAYER_ENTER, scpe);
 		}
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
@@ -252,16 +247,23 @@ void SingleDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(ready[dp->type] == is_ready)
 		return;
 	if(is_ready) {
-		bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
-		bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
-		int res = host_info.no_check_deck ? false : deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
-		if(res) {
+		unsigned int deckerror = 0;
+		if(!host_info.no_check_deck) {
+			if(deck_error[dp->type]) {
+				deckerror = (DECKERROR_UNKNOWNCARD << 28) + deck_error[dp->type];
+			} else {
+				bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
+				bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
+				deckerror = deckManager.CheckDeck(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
+			}
+		}
+		if(deckerror) {
 			STOC_HS_PlayerChange scpc;
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_DECKERROR;
-			scem.code = res;
+			scem.code = deckerror;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 			return;
 		}
@@ -287,7 +289,7 @@ void SingleDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
 	if(duel_count == 0) {
-		deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
+		deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
 	} else {
 		if(deckManager.LoadSide(pdeck[dp->type], (int*)deckbuf, mainc, sidec)) {
 			ready[dp->type] = true;
@@ -782,6 +784,16 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 				NetServer::ReSendToPlayer(*oit);
 			break;
 		}
+		case MSG_CONFIRM_EXTRATOP: {
+			player = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt8(pbuf);
+			pbuf += count * 7;
+			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::ReSendToPlayer(players[1]);
+			for (auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			break;
+		}
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
@@ -815,6 +827,18 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			RefreshHand(player, 0x781fff, 0);
+			break;
+		}
+		case MSG_SHUFFLE_EXTRA: {
+			player = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt8(pbuf);
+			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
+			for (int i = 0; i < count; ++i)
+				BufferIO::WriteInt32(pbuf, 0);
+			NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
+			for (auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			RefreshExtra(player);
 			break;
 		}
 		case MSG_REFRESH_DECK: {
@@ -1416,8 +1440,10 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_MZONE);
 	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	for (int i = 0; i < 5; ++i) {
+	int qlen = 0;
+	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
+		qlen += clen;
 		if (clen == 4)
 			continue;
 		if (qbuf[11] & POS_FACEDOWN)
@@ -1436,8 +1462,10 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_SZONE);
 	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	for (int i = 0; i < 8; ++i) {
+	int qlen = 0;
+	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
+		qlen += clen;
 		if (clen == 4)
 			continue;
 		if (qbuf[11] & POS_FACEDOWN)
@@ -1456,9 +1484,9 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
 	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	int qlen = 0, slen;
+	int qlen = 0;
 	while(qlen < len) {
-		slen = BufferIO::ReadInt32(qbuf);
+		int slen = BufferIO::ReadInt32(qbuf);
 		int qflag = *(int*)qbuf;
 		int pos = slen - 8;
 		if(qflag & QUERY_LSCALE)

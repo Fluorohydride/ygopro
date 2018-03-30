@@ -9,6 +9,7 @@ namespace ygo {
 #define REPLAY_COMPRESSED	0x1
 #define REPLAY_TAG			0x2
 #define REPLAY_DECODED		0x4
+#define REPLAY_SINGLE_MODE	0x8
 
 struct ReplayHeader {
 	unsigned int id;
@@ -35,6 +36,8 @@ public:
 	void SaveReplay(const wchar_t* name);
 	bool OpenReplay(const wchar_t* name);
 	static bool CheckReplay(const wchar_t* name);
+	static bool DeleteReplay(const wchar_t* name);
+	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
 	void ReadHeader(ReplayHeader& header);

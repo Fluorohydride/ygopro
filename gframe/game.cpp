@@ -14,7 +14,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1340;
+const unsigned short PRO_VERSION = 0x1342;
 
 namespace ygo {
 
@@ -44,6 +44,8 @@ bool Game::Initialize() {
 	ignore_chain = false;
 	chain_when_avail = false;
 	is_building = false;
+	menuHandler.prev_operation = 0;
+	menuHandler.prev_sel = -1;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
@@ -88,7 +90,7 @@ bool Game::Initialize() {
 	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, strbuf);
 	wMainMenu->getCloseButton()->setVisible(false);
 	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
-	btnServerMode = env->addButton(rect<s32>(10, 65, 270, 95), wMainMenu, BUTTON_SINGLE_MODE, dataManager.GetSysString(1201));
+	btnSingleMode = env->addButton(rect<s32>(10, 65, 270, 95), wMainMenu, BUTTON_SINGLE_MODE, dataManager.GetSysString(1201));
 	btnReplayMode = env->addButton(rect<s32>(10, 100, 270, 130), wMainMenu, BUTTON_REPLAY_MODE, dataManager.GetSysString(1202));
 //	btnTestMode = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_TEST_MODE, dataManager.GetSysString(1203));
 	btnDeckEdit = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204));
@@ -128,6 +130,7 @@ bool Game::Initialize() {
 	cbRule->addItem(dataManager.GetSysString(1241));
 	cbRule->addItem(dataManager.GetSysString(1242));
 	cbRule->addItem(dataManager.GetSysString(1243));
+	cbRule->setSelected(gameConf.defaultOT - 1);
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
@@ -438,6 +441,12 @@ bool Game::Initialize() {
 	btnClearDeck = env->addButton(rect<s32>(115, 99, 165, 120), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304));
 	btnSideOK = env->addButton(rect<s32>(510, 40, 820, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334));
 	btnSideOK->setVisible(false);
+	btnSideShuffle = env->addButton(rect<s32>(310, 100, 370, 130), 0, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307));
+	btnSideShuffle->setVisible(false);
+	btnSideSort = env->addButton(rect<s32>(375, 100, 435, 130), 0, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
+	btnSideSort->setVisible(false);
+	btnSideReload = env->addButton(rect<s32>(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, dataManager.GetSysString(1309));
+	btnSideReload->setVisible(false);
 	//
 	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(10);
@@ -502,7 +511,7 @@ bool Game::Initialize() {
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
-	if(mainGame->gameConf.separate_clear_button) {
+	if(gameConf.separate_clear_button) {
 		btnStartFilter->setRelativePosition(rect<s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 		btnClearFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 255, 100 + 125 / 6), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
 	}
@@ -537,8 +546,10 @@ bool Game::Initialize() {
 	wReplay->setVisible(false);
 	lstReplayList = env->addListBox(rect<s32>(10, 30, 350, 400), wReplay, LISTBOX_REPLAY_LIST, true);
 	lstReplayList->setItemHeight(18);
-	btnLoadReplay = env->addButton(rect<s32>(460, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348));
-	btnReplayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, dataManager.GetSysString(1347));
+	btnLoadReplay = env->addButton(rect<s32>(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348));
+	btnDeleteReplay = env->addButton(rect<s32>(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, dataManager.GetSysString(1361));
+	btnRenameReplay = env->addButton(rect<s32>(360, 385, 460, 410), wReplay, BUTTON_RENAME_REPLAY, dataManager.GetSysString(1362));
+	btnReplayCancel = env->addButton(rect<s32>(470, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, dataManager.GetSysString(1347));
 	env->addStaticText(dataManager.GetSysString(1349), rect<s32>(360, 30, 570, 50), false, true, wReplay);
 	stReplayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 350), false, true, wReplay);
 	env->addStaticText(dataManager.GetSysString(1353), rect<s32>(360, 275, 570, 295), false, true, wReplay);
@@ -548,12 +559,32 @@ bool Game::Initialize() {
 	wSinglePlay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1201));
 	wSinglePlay->getCloseButton()->setVisible(false);
 	wSinglePlay->setVisible(false);
-	lstSinglePlayList = env->addListBox(rect<s32>(10, 30, 350, 400), wSinglePlay, LISTBOX_SINGLEPLAY_LIST, true);
+	irr::gui::IGUITabControl* wSingle = env->addTabControl(rect<s32>(0, 20, 579, 419), wSinglePlay, true);
+	if(gameConf.enable_bot_mode) {
+		irr::gui::IGUITab* tabBot = wSingle->addTab(dataManager.GetSysString(1380));
+		lstBotList = env->addListBox(rect<s32>(10, 10, 350, 350), tabBot, LISTBOX_BOT_LIST, true);
+		lstBotList->setItemHeight(18);
+		btnStartBot = env->addButton(rect<s32>(459, 301, 569, 326), tabBot, BUTTON_BOT_START, dataManager.GetSysString(1211));
+		btnBotCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabBot, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
+		env->addStaticText(dataManager.GetSysString(1382), rect<s32>(360, 10, 550, 30), false, true, tabBot);
+		stBotInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 160), false, true, tabBot);
+		chkBotOldRule = env->addCheckBox(false, rect<s32>(360, 170, 560, 190), tabBot, CHECKBOX_BOT_OLD_RULE, dataManager.GetSysString(1383));
+		chkBotHand = env->addCheckBox(false, rect<s32>(360, 200, 560, 220), tabBot, -1, dataManager.GetSysString(1384));
+		chkBotNoCheckDeck = env->addCheckBox(false, rect<s32>(360, 230, 560, 250), tabBot, -1, dataManager.GetSysString(1229));
+		chkBotNoShuffleDeck = env->addCheckBox(false, rect<s32>(360, 260, 560, 280), tabBot, -1, dataManager.GetSysString(1230));
+	} else { // avoid null pointer
+		btnStartBot = env->addButton(rect<s32>(0, 0, 0, 0), wSinglePlay);
+		btnBotCancel = env->addButton(rect<s32>(0, 0, 0, 0), wSinglePlay);
+		btnStartBot->setVisible(false);
+		btnBotCancel->setVisible(false);
+	}
+	irr::gui::IGUITab* tabSingle = wSingle->addTab(dataManager.GetSysString(1381));
+	lstSinglePlayList = env->addListBox(rect<s32>(10, 10, 350, 350), tabSingle, LISTBOX_SINGLEPLAY_LIST, true);
 	lstSinglePlayList->setItemHeight(18);
-	btnLoadSinglePlay = env->addButton(rect<s32>(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
-	btnSinglePlayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
-	env->addStaticText(dataManager.GetSysString(1352), rect<s32>(360, 30, 570, 50), false, true, wSinglePlay);
-	stSinglePlayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 350), false, true, wSinglePlay);
+	btnLoadSinglePlay = env->addButton(rect<s32>(459, 301, 569, 326), tabSingle, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
+	btnSinglePlayCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabSingle, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
+	env->addStaticText(dataManager.GetSysString(1352), rect<s32>(360, 10, 550, 30), false, true, tabSingle);
+	stSinglePlayInfo = env->addStaticText(L"", rect<s32>(360, 40, 550, 280), false, true, tabSingle);
 	//replay save
 	wReplaySave = env->addWindow(rect<s32>(510, 200, 820, 320), false, dataManager.GetSysString(1340));
 	wReplaySave->getCloseButton()->setVisible(false);
@@ -643,7 +674,7 @@ void Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.Lock();
-		if(dInfo.isStarted) {
+		if(dInfo.isStarted || dInfo.isReplaySkiping) {
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
@@ -698,7 +729,7 @@ void Game::MainLoop() {
 		}
 	}
 	DuelClient::StopClient(true);
-	if(mainGame->dInfo.isSingleMode)
+	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
 #ifdef _WIN32
 	Sleep(500);
@@ -723,6 +754,8 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 	SetStaticText(pControl, cWidth, font, text);
 	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
 		scrCardText->setVisible(false);
+		if(env->hasFocus(scrCardText))
+			env->removeFocus(scrCardText);
 		return;
 	}
 	SetStaticText(pControl, cWidth-25, font, text);
@@ -893,6 +926,46 @@ void Game::RefreshSingleplay() {
 	closedir(dir);
 #endif
 }
+void Game::RefreshBot() {
+	if(!gameConf.enable_bot_mode)
+		return;
+	botInfo.clear();
+	FILE* fp = fopen("bot.conf", "r");
+	char linebuf[256];
+	char strbuf[256];
+	if(fp) {
+		while(fgets(linebuf, 256, fp)) {
+			if(linebuf[0] == '#')
+				continue;
+			if(linebuf[0] == '!') {
+				BotInfo newinfo;
+				sscanf(linebuf, "!%240[^\n]", strbuf);
+				BufferIO::DecodeUTF8(strbuf, newinfo.name);
+				fgets(linebuf, 256, fp);
+				sscanf(linebuf, "%240[^\n]", strbuf);
+				BufferIO::DecodeUTF8(strbuf, newinfo.command);
+				fgets(linebuf, 256, fp);
+				sscanf(linebuf, "%240[^\n]", strbuf);
+				BufferIO::DecodeUTF8(strbuf, newinfo.desc);
+				fgets(linebuf, 256, fp);
+				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
+				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
+				if((chkBotOldRule->isChecked() && newinfo.support_master_rule_3)
+					|| (!chkBotOldRule->isChecked() && newinfo.support_new_master_rule))
+					botInfo.push_back(newinfo);
+				continue;
+			}
+		}
+		fclose(fp);
+	}
+	lstBotList->clear();
+	stBotInfo->setText(L"");
+	for(unsigned int i = 0; i < botInfo.size(); ++i) {
+		lstBotList->addItem(botInfo[i].name);
+	}
+	if(botInfo.size() == 0)
+		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
+}
 void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
 	if(!fp)
@@ -929,6 +1002,8 @@ void Game::LoadConfig() {
 	gameConf.separate_clear_button = 1;
 	gameConf.auto_search_limit = -1;
 	gameConf.chkIgnoreDeckChanges = 0;
+	gameConf.defaultOT = 1;
+	gameConf.enable_bot_mode = 0;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -987,6 +1062,10 @@ void Game::LoadConfig() {
 			gameConf.auto_search_limit = atoi(valbuf);
 		} else if(!strcmp(strbuf, "ignore_deck_changes")) {
 			gameConf.chkIgnoreDeckChanges = atoi(valbuf);
+		} else if(!strcmp(strbuf, "default_ot")) {
+			gameConf.defaultOT = atoi(valbuf);
+		} else if(!strcmp(strbuf, "enable_bot_mode")) {
+			gameConf.enable_bot_mode = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1029,22 +1108,24 @@ void Game::SaveConfig() {
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
 	//settings
-	fprintf(fp, "automonsterpos = %d\n", ((mainGame->chkMAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autospellpos = %d\n", ((mainGame->chkSTAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_opponent = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_spectators = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
-	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
-	fprintf(fp, "hide_hint_button = %d\n", ((mainGame->chkHideHintButton->isChecked()) ? 1 : 0));
+	fprintf(fp, "automonsterpos = %d\n", (chkMAutoPos->isChecked() ? 1 : 0));
+	fprintf(fp, "autospellpos = %d\n", (chkSTAutoPos->isChecked() ? 1 : 0));
+	fprintf(fp, "randompos = %d\n", (chkRandomPos->isChecked() ? 1 : 0));
+	fprintf(fp, "autochain = %d\n", (chkAutoChain->isChecked() ? 1 : 0));
+	fprintf(fp, "waitchain = %d\n", (chkWaitChain->isChecked() ? 1 : 0));
+	fprintf(fp, "mute_opponent = %d\n", (chkIgnore1->isChecked() ? 1 : 0));
+	fprintf(fp, "mute_spectators = %d\n", (chkIgnore2->isChecked() ? 1 : 0));
+	fprintf(fp, "hide_setname = %d\n", (chkHideSetname->isChecked() ? 1 : 0));
+	fprintf(fp, "hide_hint_button = %d\n", (chkHideHintButton->isChecked() ? 1 : 0));
 	fprintf(fp, "#control_mode = 0: Key A/S/D/R Chain Buttons. control_mode = 1: MouseLeft/MouseRight/NULL/F9 Without Chain Buttons\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
 	fprintf(fp, "#auto_search_limit >= 0: Start search automatically when the user enters N chars\n");
 	fprintf(fp, "auto_search_limit = %d\n", gameConf.auto_search_limit);
-	fprintf(fp, "ignore_deck_changes = %d\n", ((mainGame->chkIgnoreDeckChanges->isChecked()) ? 1 : 0));
+	fprintf(fp, "ignore_deck_changes = %d\n", (chkIgnoreDeckChanges->isChecked() ? 1 : 0));
+	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
+	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
@@ -1059,7 +1140,7 @@ void Game::ShowCardInfo(int code) {
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
 	int offset = 0;
-	if(!mainGame->chkHideSetname->isChecked()) {
+	if(!chkHideSetname->isChecked()) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
 			auto aptr = dataManager._datas.find(cd.alias);
@@ -1150,7 +1231,7 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L": ");
 		break;
 	case 7: //local name
-		chatMsg[0].append(mainGame->ebNickName->getText());
+		chatMsg[0].append(ebNickName->getText());
 		chatMsg[0].append(L": ");
 		break;
 	case 8: //system custom message, no prefix.
@@ -1170,7 +1251,7 @@ void Game::AddDebugMsg(char* msg)
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
-		mainGame->AddChatMsg(wbuf, 9);
+		AddChatMsg(wbuf, 9);
 	}
 	if (enable_log & 0x2) {
 		FILE* fp = fopen("error.log", "at");
@@ -1186,12 +1267,12 @@ void Game::AddDebugMsg(char* msg)
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
-	mainGame->imgCard->setImage(imageManager.tCover[0]);
-	mainGame->btnPSAU->setImage();
-	mainGame->btnPSDU->setImage();
+	imgCard->setImage(imageManager.tCover[0]);
+	btnPSAU->setImage();
+	btnPSDU->setImage();
 	for(int i=0; i<=4; ++i) {
-		mainGame->btnCardSelect[i]->setImage();
-		mainGame->btnCardDisplay[i]->setImage();
+		btnCardSelect[i]->setImage();
+		btnCardDisplay[i]->setImage();
 	}
 	imageManager.ClearTexture();
 }
@@ -1261,6 +1342,12 @@ void Game::FlashWindow() {
 	fi.dwTimeout = 0;
 	FlashWindowEx(&fi);
 #endif
+}
+void Game::SetCursor(ECURSOR_ICON icon) {
+	ICursorControl* cursor = mainGame->device->getCursorControl();
+	if(cursor->getActiveIcon() != icon) {
+		cursor->setActiveIcon(icon);
+	}
 }
 
 }

@@ -33,6 +33,8 @@ public:
 	static void Pause(bool is_pause, bool is_step);
 	static bool ReadReplayResponse();
 	static int ReplayThread(void* param);
+	static bool StartDuel();
+	static void EndDuel();
 	static void Restart(bool refresh);
 	static void Undo();
 	static bool ReplayAnalyze(char* msg, unsigned int len);
@@ -43,6 +45,7 @@ public:
 	static void ReplayRefreshDeck(int player, int flag = 0x181fff);
 	static void ReplayRefreshExtra(int player, int flag = 0x181fff);
 	static void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
+	static void ReplayReload();
 
 	static int MessageHandler(long fduel, int type);
 };

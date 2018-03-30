@@ -30,7 +30,25 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		s32 id = caller->getID();
+		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) {
+			mainGame->wQuery->getParent()->bringToFront(mainGame->wQuery);
+			break;
+		}
+		if(mainGame->wReplaySave->isVisible() && id != BUTTON_REPLAY_SAVE && id != BUTTON_REPLAY_CANCEL) {
+			mainGame->wReplaySave->getParent()->bringToFront(mainGame->wReplaySave);
+			break;
+		}
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_HOVERED: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_LEFT: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(ECI_NORMAL);
+			break;
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_MODE_EXIT: {
@@ -46,6 +64,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
+				bot_mode = false;
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, ip, 16);
@@ -62,7 +81,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					hints.ai_socktype = SOCK_STREAM;
 					hints.ai_protocol = IPPROTO_TCP;
 					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-					int status=evutil_getaddrinfo(hostname, port, &hints, &answer);
+					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 					if(status != 0) {
 						mainGame->gMutex.Lock();
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
@@ -103,6 +122,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
+				bot_mode = false;
 				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
 				if(!NetServer::StartServer(mainGame->gameConf.serverport))
 					break;
@@ -167,8 +187,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->btnStartBot->setEnabled(true);
+				mainGame->btnBotCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
-				mainGame->ShowElement(mainGame->wLanWindow);
+				if(bot_mode)
+					mainGame->ShowElement(mainGame->wSinglePlay);
+				else
+					mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->wChat->setVisible(false);
 				if(exit_on_return)
 					mainGame->device->closeDevice();
@@ -178,6 +203,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->ShowElement(mainGame->wReplay);
 				mainGame->ebRepStartTurn->setText(L"1");
+				mainGame->stReplayInfo->setText(L"");
 				mainGame->RefreshReplay();
 				break;
 			}
@@ -185,6 +211,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->ShowElement(mainGame->wSinglePlay);
 				mainGame->RefreshSingleplay();
+				mainGame->RefreshBot();
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
@@ -222,9 +249,88 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				ReplayMode::StartReplay(start_turn);
 				break;
 			}
+			case BUTTON_DELETE_REPLAY: {
+				int sel = mainGame->lstReplayList->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->gMutex.Lock();
+				wchar_t textBuffer[256];
+				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363));
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
+				mainGame->PopupElement(mainGame->wQuery);
+				mainGame->gMutex.Unlock();
+				prev_operation = id;
+				prev_sel = sel;
+				break;
+			}
+			case BUTTON_RENAME_REPLAY: {
+				int sel = mainGame->lstReplayList->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->gMutex.Lock();
+				mainGame->wReplaySave->setText(dataManager.GetSysString(1364));
+				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
+				mainGame->PopupElement(mainGame->wReplaySave);
+				mainGame->gMutex.Unlock();
+				prev_operation = id;
+				prev_sel = sel;
+				break;
+			}
 			case BUTTON_CANCEL_REPLAY: {
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->ShowElement(mainGame->wMainMenu);
+				break;
+			}
+			case BUTTON_BOT_START: {
+				int sel = mainGame->lstBotList->getSelected();
+				if(sel == -1)
+					break;
+				bot_mode = true;
+#ifdef _WIN32
+				if(!NetServer::StartServer(mainGame->gameConf.serverport))
+					break;
+				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
+					NetServer::StopServer();
+					break;
+				}
+				STARTUPINFO si;
+				PROCESS_INFORMATION pi;
+				ZeroMemory(&si, sizeof(si));
+				si.cb = sizeof(si);
+				ZeroMemory(&pi, sizeof(pi));
+				wchar_t cmd[MAX_PATH];
+				int flag = 0;
+				flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
+				myswprintf(cmd, L"Bot.exe \"%ls\" %d %d", mainGame->botInfo[sel].command, flag, mainGame->gameConf.serverport);
+				if(!CreateProcessW(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi))
+				{
+					NetServer::StopServer();
+					break;
+				}
+#else
+				if(fork() == 0) {
+					usleep(100000);
+					char arg1[512];
+					BufferIO::EncodeUTF8(mainGame->botInfo[sel].command, arg1);
+					int flag = 0;
+					flag += (mainGame->chkBotHand->isChecked() ? 0x1 : 0);
+					char arg2[8];
+					sprintf(arg2, "%d", flag);
+					char arg3[8];
+					sprintf(arg3, "%d", mainGame->gameConf.serverport);
+					execl("./bot", "bot", arg1, arg2, arg3, NULL);
+					exit(0);
+				} else {
+					if(!NetServer::StartServer(mainGame->gameConf.serverport))
+						break;
+					if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
+						NetServer::StopServer();
+						break;
+					}
+				}
+#endif
+				mainGame->btnStartBot->setEnabled(false);
+				mainGame->btnBotCancel->setEnabled(false);
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
@@ -269,6 +375,48 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->deckBuilder.Initialize();
+				break;
+			}
+			case BUTTON_YES: {
+				mainGame->HideElement(mainGame->wQuery);
+				if(prev_operation == BUTTON_DELETE_REPLAY) {
+					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(prev_sel))) {
+						mainGame->stReplayInfo->setText(L"");
+						mainGame->lstReplayList->removeItem(prev_sel);
+					}
+				}
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
+			case BUTTON_NO: {
+				mainGame->HideElement(mainGame->wQuery);
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
+			case BUTTON_REPLAY_SAVE: {
+				mainGame->HideElement(mainGame->wReplaySave);
+				if(prev_operation == BUTTON_RENAME_REPLAY) {
+					wchar_t newname[256];
+					BufferIO::CopyWStr(mainGame->ebRSName->getText(), newname, 256);
+					if(mywcsncasecmp(newname + wcslen(newname) - 4, L".yrp", 4)) {
+						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
+					}
+					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
+						mainGame->lstReplayList->setItem(prev_sel, newname, -1);
+					} else {
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365));
+					}
+				}
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
+			case BUTTON_REPLAY_CANCEL: {
+				mainGame->HideElement(mainGame->wReplaySave);
+				prev_operation = 0;
+				prev_sel = -1;
 				break;
 			}
 			}
@@ -317,6 +465,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
 				break;
 			}
+			case LISTBOX_BOT_LIST: {
+				int sel = mainGame->lstBotList->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->SetStaticText(mainGame->stBotInfo, 200, mainGame->guiFont, mainGame->botInfo[sel].desc);
+				break;
+			}
 			}
 			break;
 		}
@@ -339,6 +494,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 					mainGame->cbDeckSelect->setEnabled(true);
 				}
+				break;
+			}
+			case CHECKBOX_BOT_OLD_RULE: {
+				mainGame->RefreshBot();
 				break;
 			}
 			}
