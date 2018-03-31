@@ -97,6 +97,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isStarted = true;
+	mainGame->dInfo.isFinished = false;
 	mainGame->dInfo.isSingleMode = true;
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.Unlock();
@@ -150,6 +151,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	if(!is_closing) {
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->dInfo.isFinished = true;
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->gMutex.Unlock();
 		mainGame->closeDoneSignal.Reset();
