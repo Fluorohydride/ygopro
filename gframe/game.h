@@ -139,6 +139,7 @@ public:
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 	void UpdateDuelParam();
+	void UpdateExtraRules();
 	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);
 	void SetPhaseButtons();
 
@@ -201,6 +202,7 @@ public:
 	bool is_building;
 	bool is_siding;
 	int forbiddentypes;
+	unsigned short extra_rules;
 	uint32 duel_param;
 	uint32 showingcard;
 
@@ -283,7 +285,7 @@ public:
 	irr::gui::IGUIEditBox* ebServerPass;
 	irr::gui::IGUIButton* btnRuleCards;
 	irr::gui::IGUIWindow* wRules;
-	irr::gui::IGUICheckBox* chkRules[14];
+	irr::gui::IGUICheckBox* chkRules[13];
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
@@ -648,23 +650,10 @@ extern Game* mainGame;
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
-#define CHECK_SEALED_DUEL			353
-#define CHECK_BOOSTER_DUEL			354
-#define CHECK_DESTINY_DRAW			355
-#define CHECK_SPEED_DUEL			356
-#define CHECK_CONCENTRATION_DUEL	357
-#define CHECK_BOSS_DUEL				358
-#define CHECK_BATTLE_CITY			359
-#define CHECK_DUELIST_KINGDOM		360
-#define CHECK_DIMENSION_DUEL		361
-#define CHECK_DOUBLE_DECK			362
-#define CHECK_TURBO_DUEL_2			363
-#define CHECK_TURBO_DUEL_1			364
-#define CHECK_COMMAND_DUEL			365
-#define CHECK_DECK_MASTER_DUEL		366
-#define CHECKBOX_ENABLE_MUSIC		361
-#define SCROLL_VOLUME				362
-#define CHECKBOX_SHOW_ANIME			363
+#define CHECKBOX_EXTRA_RULE			353
+#define CHECKBOX_ENABLE_MUSIC		366
+#define SCROLL_VOLUME				367
+#define CHECKBOX_SHOW_ANIME			368
 #define COMBOBOX_SORTTYPE			370
 
 #define BUTTON_MARKS_FILTER			380

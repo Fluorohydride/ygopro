@@ -25,21 +25,7 @@ struct HostInfo {
 	unsigned char check;
 	unsigned int duel_flag;
 	int forbiddentypes;
-	bool destiny_draw;
-	bool sealed;
-	bool booster;
-	bool speed;
-	bool concentration;
-	bool boss;
-	bool city;
-	bool kingdom;
-	bool dimension;
-	bool turbo1;
-	bool turbo2;
-	bool doubled;
-	bool command;
-	bool master;
-	int rule_count;
+	unsigned short extra_rules;
 };
 struct HostPacket {
 	unsigned short identifier;
@@ -242,4 +228,18 @@ public:
 #define MODE_MATCH		0x1
 #define MODE_TAG		0x2
 #define MODE_RELAY		0x3
+
+#define SEALED_DUEL			0x1
+#define BOOSTER_DUEL		0x2
+#define DESTINY_DRAW		0x4
+#define DUEL_SPEED			0x8
+#define CONCENTRATION_DUEL	0x10
+#define BOSS_DUEL			0x20
+#define BATTLE_CITY			0x40
+#define DUELIST_KINGDOM		0x80
+#define DIMENSTION_DUEL		0x100
+#define TURBO_DUEL			0x200
+#define DOUBLE_DECK			0x400
+#define COMMAND_DUEL		0x800
+#define DECK_MASTER			0x1000
 #endif //NETWORK_H

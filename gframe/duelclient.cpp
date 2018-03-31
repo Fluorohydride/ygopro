@@ -137,26 +137,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.check = 2;
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
-			cscg.info.sealed = mainGame->chkRules[0]->isChecked();
-			cscg.info.booster = mainGame->chkRules[1]->isChecked();
-			cscg.info.destiny_draw = mainGame->chkRules[2]->isChecked();
-			cscg.info.speed = mainGame->chkRules[3]->isChecked();
-			cscg.info.concentration = mainGame->chkRules[4]->isChecked();
-			cscg.info.boss = mainGame->chkRules[5]->isChecked();
-			cscg.info.city = mainGame->chkRules[6]->isChecked();
-			cscg.info.kingdom = mainGame->chkRules[7]->isChecked();
-			cscg.info.dimension = mainGame->chkRules[8]->isChecked();
-			cscg.info.doubled = mainGame->chkRules[9]->isChecked();
-			cscg.info.turbo2 = mainGame->chkRules[10]->isChecked();
-			cscg.info.turbo1 = mainGame->chkRules[11]->isChecked();
-			cscg.info.command = mainGame->chkRules[12]->isChecked();
-			cscg.info.master = mainGame->chkRules[13]->isChecked();
-			cscg.info.rule_count = 0;
-			for (int i = 0; i < 14; ++i) {
-				if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 11) {
-					cscg.info.rule_count++;
-				}
-			}
+			cscg.info.extra_rules = mainGame->extra_rules;
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
 			CTOS_JoinGame csjg;
@@ -432,9 +413,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_JOIN_GAME: {
 		temp_ver = 0;
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
-		std::wstring str;
-		std::wstring str2;
-		bool host2 = false;
+		std::wstring str, str2;
 		wchar_t msgbuf[256];
 		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist));
 		str.append(msgbuf);
@@ -470,84 +449,20 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				if (pkt->info.duel_flag & filter) {
 					myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1631 + i));
 					str2.append(msgbuf);
-					host2 = true;
 				}
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1630));
+			str.append(msgbuf);
 		} else if (rule != DEFAULT_DUEL_RULE) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1260 + rule - 1));
 			str.append(msgbuf);
 		}
 		mainGame->dInfo.lua64 = pkt->info.check == 2;
 		if(pkt->info.check == 2) {
-			if (pkt->info.destiny_draw) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1134));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.sealed) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1132));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.booster) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1133));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.speed) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1135));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.concentration) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1136));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.boss) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1137));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.city) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1138));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.kingdom) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1139));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.dimension) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1140));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.doubled) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1141));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.turbo2) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1142));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.turbo1) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1143));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.command) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1144));
-				str2.append(msgbuf);
-				host2 = true;
-			}
-			if (pkt->info.master) {
-				myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1145));
-				str2.append(msgbuf);
-				host2 = true;
-			}
+			for(int flag = SEALED_DUEL, i = 0; flag < DECK_MASTER + 1; flag = flag << 1, i++)
+				if(pkt->info.extra_rules & flag) {
+					myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1132 + i));
+					str2.append(msgbuf);
+				}
 		}
 		if(pkt->info.no_check_deck) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1229));
@@ -645,7 +560,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		mainGame->RefreshDeck(mainGame->cbDeckSelect2);
 		mainGame->cbDeckSelect->setEnabled(true);
-		if (pkt->info.check == 2 && pkt->info.doubled) {
+		if (pkt->info.check == 2 && pkt->info.extra_rules & DOUBLE_DECK) {
 			mainGame->cbDeckSelect2->setVisible(true);
 			mainGame->cbDeckSelect2->setEnabled(true);
 		} else {
@@ -657,11 +572,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
-		if(host2)
+		if(str2.size())
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
-		mainGame->dInfo.extraval = (pkt->info.check == 2 && pkt->info.speed) ? 1 : 0;
+		mainGame->dInfo.extraval = (pkt->info.check == 2 && pkt->info.extra_rules & DUEL_SPEED) ? 1 : 0;
 		if(mainGame->dInfo.isRelay)
 			mainGame->dInfo.isFirst = mainGame->dInfo.player_type < 3;
 		else if (mainGame->dInfo.isTag)
@@ -4241,8 +4156,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck 
-					&& rule == DEFAULT_DUEL_RULE && !pHP->host.destiny_draw
-					&& pHP->host.rule_count==0)
+					&& rule == DEFAULT_DUEL_RULE && pHP->host.extra_rules==0)
 				hoststr.append(dataManager.GetSysString(1280));
 			else hoststr.append(dataManager.GetSysString(1281));
 			hoststr.append(L"]");

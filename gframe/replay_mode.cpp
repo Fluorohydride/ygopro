@@ -83,7 +83,7 @@ int ReplayMode::ReplayThread(void* param) {
 	}
 	int opt = cur_replay.ReadInt32();
 	mainGame->dInfo.duel_field = opt & 0xff;
-	mainGame->dInfo.extraval = (opt >> 8);
+	mainGame->dInfo.extraval = ((opt >> 8) & SPEED_DUEL) ? 1 : 0;
 	mainGame->SetPhaseButtons();
 	if(!cur_replay.ReadStream(&current_stream)) {
 		EndDuel();

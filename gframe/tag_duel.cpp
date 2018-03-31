@@ -229,7 +229,7 @@ void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 			} else {
 				bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
 				bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
-				deckerror = deckManager.CheckDeck(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg, host_info.doubled, host_info.forbiddentypes);
+				deckerror = deckManager.CheckDeck(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg, host_info.extra_rules & DOUBLE_DECK, host_info.forbiddentypes);
 			}
 		}
 		if(deckerror) {
@@ -263,7 +263,7 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
 	char* deckbuf = (char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
-	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec, 0, 0, host_info.doubled);
+	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec, 0, 0, host_info.extra_rules & DOUBLE_DECK);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
@@ -402,7 +402,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	int opt = host_info.duel_flag;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
-	if(host_info.speed)
+	if(host_info.extra_rules & DUEL_SPEED)
 		opt |= SPEED_DUEL;
 	opt |= DUEL_TAG_MODE;
 	new_replay.WriteInt32((mainGame->GetMasterRule(opt, 0)) | (opt & SPEED_DUEL) << 8);
@@ -412,60 +412,39 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
 	//
-	last_replay.WriteInt32(pdeck[0].main.size() + host_info.rule_count, false);
+	std::vector<unsigned int> extracards;
+	if(host_info.extra_rules & SEALED_DUEL)
+		extracards.push_back(511005092);
+	if(host_info.extra_rules & BOOSTER_DUEL)
+		extracards.push_back(511005093);
+	if(host_info.extra_rules & CONCENTRATION_DUEL)
+		extracards.push_back(511004322);
+	if(host_info.extra_rules & BOSS_DUEL)
+		extracards.push_back(95000000);
+	if(host_info.extra_rules & BATTLE_CITY)
+		extracards.push_back(511004014);
+	if(host_info.extra_rules & DUELIST_KINGDOM)
+		extracards.push_back(511002621);
+	if(host_info.extra_rules & DIMENSTION_DUEL)
+		extracards.push_back(511600002);
+	if(host_info.extra_rules & TURBO_DUEL)
+		extracards.push_back(302);
+	if(host_info.extra_rules & COMMAND_DUEL)
+		extracards.push_back(95200000);
+	if(host_info.extra_rules & DECK_MASTER)
+		extracards.push_back(300);
+	if(host_info.extra_rules & DESTINY_DRAW)
+		extracards.push_back(511004000);
+	last_replay.WriteInt32(pdeck[0].main.size(), false);
 	for(int32 i = (int32)pdeck[0].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
 	}
-	if(host_info.sealed) {
-		new_card(pduel, 511005092, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511005092, false);
+	last_replay.WriteInt32(pdeck[0].extra.size() + extracards.size(), false);
+	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
+		new_card(pduel, extracards[i], 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+		last_replay.WriteInt32(extracards[i], false);
 	}
-	if(host_info.booster) {
-		new_card(pduel, 511005093, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511005093, false);
-	}
-	if(host_info.concentration) {
-		new_card(pduel, 511004322, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511004322, false);
-	}
-	if(host_info.boss) {
-		new_card(pduel, 95000000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(95000000, false);
-	}
-	if(host_info.city) {
-		new_card(pduel, 511004014, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511004014, false);
-	}
-	if(host_info.kingdom) {
-		new_card(pduel, 511002621, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511002621, false);
-	}
-	if(host_info.dimension) {
-		new_card(pduel, 511600002, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511600002, false);
-	}
-	if(host_info.turbo1) {
-		new_card(pduel, 511002094, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511002094, false);
-	}
-	if(host_info.turbo2) {
-		new_card(pduel, 110000000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(110000000, false);
-	}
-	if(host_info.command) {
-		new_card(pduel, 95200000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(95200000, false);
-	}
-	if(host_info.master) {
-		new_card(pduel, 300, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(300, false);
-	}
-	if(host_info.destiny_draw) {
-		new_card(pduel, 511004000, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(511004000, false);
-	}
-	last_replay.WriteInt32(pdeck[0].extra.size(), false);
 	for(int32 i = (int32)pdeck[0].extra.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].extra[i]->first, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[0].extra[i]->first, false);
@@ -482,17 +461,10 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
 	}
 	//
-	if(host_info.master)
-		last_replay.WriteInt32(pdeck[3].main.size() + 1, false);
-	else
-		last_replay.WriteInt32(pdeck[3].main.size(), false);
+	last_replay.WriteInt32(pdeck[3].main.size(), false);
 	for(int32 i = (int32)pdeck[3].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[3].main[i]->first, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[3].main[i]->first, false);
-	}
-	if(host_info.master) {
-		new_card(pduel, 51100567, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(51100567, false);
 	}
 	last_replay.WriteInt32(pdeck[3].extra.size(), false);
 	for(int32 i = (int32)pdeck[3].extra.size() - 1; i >= 0; --i) {

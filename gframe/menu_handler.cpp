@@ -32,7 +32,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		s32 id = caller->getID();
-		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && (id < CHECK_SEALED_DUEL || id > CHECK_DECK_MASTER_DUEL)))
+		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && id != CHECKBOX_EXTRA_RULE))
 			break;
 		if(mainGame->wCustomRules->isVisible() && id != BUTTON_CUSTOM_RULE_OK && (id < CHECKBOX_OBSOLETE || id > CHECKBOX_EMZONE))
 			break;
@@ -526,91 +526,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			case CHECK_SEALED_DUEL: {
-				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
-					for (int i = 1; i < 14; ++i)
-						if (i != 2 && i != 3 && i != 9)
-						mainGame->chkRules[i]->setEnabled(false);
-				}
-				else {
-					for (int i = 1; i < 14; ++i)
-						if (i != 2 && i != 3 && i != 9)
-						mainGame->chkRules[i]->setEnabled(true);
-				}
-				break;
-			}
-			case CHECK_BOOSTER_DUEL: {
-				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
-					for (int i = 0; i < 14; ++i)
-						if(i != 1 && i != 2 && i != 3 && i != 9)
-						mainGame->chkRules[i]->setEnabled(false);
-				}
-				else {
-					for (int i = 0; i < 14; ++i)
-						if (i != 1 && i != 2 && i != 3 && i != 9)
-						mainGame->chkRules[i]->setEnabled(true);
-				}
-				break;
-			}
-			case CHECK_CONCENTRATION_DUEL:
-			case CHECK_BOSS_DUEL:
-			case CHECK_BATTLE_CITY:
-			case CHECK_DUELIST_KINGDOM:
-			case CHECK_COMMAND_DUEL:
-			case CHECK_DECK_MASTER_DUEL: {
-				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
-					for (int i = 0; i < 2; ++i)
-						mainGame->chkRules[i]->setEnabled(false);
-				}
-				else {
-					for (int i = 0; i < 2; ++i)
-						mainGame->chkRules[i]->setEnabled(true);
-					for (int i = 0; i < 14; ++i) {
-						if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 9)
-							for (int i = 0; i < 2; ++i)
-								mainGame->chkRules[i]->setEnabled(false);
-					}
-				}
-				break;
-			}
-			case CHECK_TURBO_DUEL_1: {
-				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
-					for (int i = 0; i < 3; ++i)
-						mainGame->chkRules[i]->setEnabled(false);
-					mainGame->chkRules[10]->setEnabled(false);
-				}
-				else {
-					for (int i = 0; i < 3; ++i)
-						mainGame->chkRules[i]->setEnabled(true);
-					mainGame->chkRules[10]->setEnabled(true);
-					for (int i = 0; i < 14; ++i) {
-						if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 9)
-							for (int i = 0; i < 1; ++i)
-								mainGame->chkRules[i]->setEnabled(false);
-					}
-				}
-				break;
-			}
-			case CHECK_TURBO_DUEL_2: {
-				if (static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
-					for (int i = 0; i < 3; ++i)
-						mainGame->chkRules[i]->setEnabled(false);
-					mainGame->chkRules[11]->setEnabled(false);
-				}
-				else {
-					for (int i = 0; i < 3; ++i)
-						mainGame->chkRules[i]->setEnabled(true);
-					mainGame->chkRules[11]->setEnabled(true);
-					for (int i = 0; i < 14; ++i) {
-						if (mainGame->chkRules[i]->isChecked() && i != 3 && i != 9)
-							for (int i = 0; i < 1; ++i)
-								mainGame->chkRules[i]->setEnabled(false);
-					}
-				}
+			case CHECKBOX_EXTRA_RULE: {
+				mainGame->UpdateExtraRules();
 				break;
 			}
 			case CHECKBOX_PZONE: {
-				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked())
+				if(mainGame->chkCustomRules[3]->isChecked())
 					mainGame->chkCustomRules[4]->setEnabled(true);
 				else {
 					mainGame->chkCustomRules[4]->setChecked(false);
