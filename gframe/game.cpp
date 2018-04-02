@@ -1525,6 +1525,10 @@ void Game::OnResize() {
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
 	stHintMsg->setRelativePosition(ResizeWin(500, 60, 820, 90));
 
+	//sound / music volume bar
+	scrSoundVolume->setRelativePosition(recti(20 + 126, 200 + 4, 20 + (300 * xScale) - 40, 200 + 21));
+	scrMusicVolume->setRelativePosition(recti(20 + 126, 230 + 4, 20 + (300 * xScale) - 40, 230 + 21));
+
 	if(gameConf.resize_popup_menu) {
 		int width = 100 * mainGame->xScale;
 		int height = (mainGame->yScale >= 0.666) ? 21 * mainGame->yScale : 14;
