@@ -1466,8 +1466,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (mainGame->dField.select_cancelable) {
 			if (count2 == 0)
 				mainGame->dField.ShowCancelOrFinishButton(1);
-			else
+			else {
+				mainGame->dField.select_ready = true;
 				mainGame->dField.ShowCancelOrFinishButton(2);
+			}
 		}
 		else
 			mainGame->dField.ShowCancelOrFinishButton(0);
