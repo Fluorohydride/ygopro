@@ -471,6 +471,9 @@ void Game::DrawMisc() {
 			driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
 		}
 	}
+	//finish button
+	if(btnCancelOrFinish->isVisible() && dField.select_ready)
+		DrawSelectionLine(btnCancelOrFinish, 2, 0xffffff00);
 	//lp bar
 	if((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) {
 		driver->draw2DRectangle(0xa0000000, recti(327, 8, 630, 51));
