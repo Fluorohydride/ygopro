@@ -34,7 +34,8 @@ bool Game::Initialize() {
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
-	linePattern = 0x0f0f;
+	linePatternD3D = 0;
+	linePatternGL = 0x0f0f;
 	waitFrame = 0;
 	signalFrame = 0;
 	showcard = 0;
@@ -711,10 +712,8 @@ void Game::MainLoop() {
 			yScale = window_size.Height / 640.0;
 			OnResize();
 		}
-		if(gameConf.use_d3d)
-			linePattern = (linePattern + 1) % 30;
-		else
-			linePattern = (linePattern << 1) | (linePattern >> 15);
+		linePatternD3D = (linePatternD3D + 1) % 30;
+		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
