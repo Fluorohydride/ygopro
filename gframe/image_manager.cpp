@@ -99,7 +99,7 @@ void ImageManager::RefreshImageDir(std::wstring path, int image_type) {
 	do {
 		size_t len = wcslen(fdataw.cFileName);
 		if((fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || len < 5
-			|| !(wcsicmp(fdataw.cFileName + len - 4, L".jpg") == 0 || wcsicmp(fdataw.cFileName + len - 4, L".png") == 0))
+			|| !(_wcsicmp(fdataw.cFileName + len - 4, L".jpg") == 0 || _wcsicmp(fdataw.cFileName + len - 4, L".png") == 0))
 			continue;
 		std::wstring filename = path + (std::wstring)fdataw.cFileName;
 		ImageList[image_type].push_back(filename);
