@@ -583,6 +583,5 @@ extern Game* mainGame;
 #define TEXTURE_ATTACK				5
 #define TEXTURE_ACTIVATE			6
 
-
 #define DEFAULT_DUEL_RULE			4
 #endif // GAME_H
