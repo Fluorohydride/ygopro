@@ -44,6 +44,8 @@ public:
 	irr::video::ITexture* tBackGround_deck;
 	irr::video::ITexture* tField[2];
 	irr::video::ITexture* tFieldTransparent[2];
+	irr::video::ITexture* tRScale[14];
+	irr::video::ITexture* tLScale[14];
 };
 
 extern ImageManager imageManager;

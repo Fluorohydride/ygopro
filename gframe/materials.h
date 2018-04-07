@@ -11,6 +11,7 @@ public:
 	S3DVertex vCardOutline[4];
 	S3DVertex vCardOutliner[4];
 	S3DVertex vCardBack[4];
+	S3DVertex vPScale[4];
 	S3DVertex vSymbol[4];
 	S3DVertex vNegate[4];
 	S3DVertex vChainNum[4];

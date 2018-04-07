@@ -38,6 +38,15 @@ bool ImageManager::Initial() {
 	tFieldTransparent[0] = driver->getTexture("textures/field-transparent2.png");
 	tField[1] = driver->getTexture("textures/field3.png");
 	tFieldTransparent[1] = driver->getTexture("textures/field-transparent3.png");
+	char buff[100];
+	for (int i = 0; i < 14; i++) {
+		snprintf(buff, 100, "textures/pscale/rscale_%d.png", i);
+		tRScale[i] = driver->getTexture(buff);
+	}
+	for (int i = 0; i < 14; i++) {
+		snprintf(buff, 100, "textures/pscale/lscale_%d.png", i);
+		tLScale[i] = driver->getTexture(buff);
+	}
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {

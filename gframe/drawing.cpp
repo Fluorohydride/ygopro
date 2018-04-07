@@ -395,6 +395,22 @@ void Game::DrawCard(ClientCard* pcard) {
 		driver->setTransform(irr::video::ETS_WORLD, atk);
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	}
+	if(mainGame->chkEnablePScale->isChecked() && (pcard->type & TYPE_PENDULUM) && ((pcard->location & LOCATION_SZONE) && (pcard->sequence == 0 || pcard->sequence == 6))) {
+		int scale = pcard->lscale;
+		if(scale >= 0 && scale <= 13 && imageManager.tLScale[scale]) {
+			matManager.mTexture.setTexture(0, imageManager.tLScale[scale]);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vPScale, 4, matManager.iRectangle, 2);
+		}
+	}
+	if(mainGame->chkEnablePScale->isChecked() && (pcard->type & TYPE_PENDULUM) && ((pcard->location & LOCATION_SZONE) && (pcard->sequence == 4 || pcard->sequence == 7))) {
+		int scale2 = pcard->rscale;
+		if(scale2 >= 0 && scale2 <= 13 && imageManager.tRScale[scale2]) {
+			matManager.mTexture.setTexture(0, imageManager.tRScale[scale2]);
+			driver->setMaterial(matManager.mTexture);
+			driver->drawVertexPrimitiveList(matManager.vPScale, 4, matManager.iRectangle, 2);
+		}
+	}
 }
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);

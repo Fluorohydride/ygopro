@@ -47,6 +47,7 @@ struct Config {
 	double sound_volume;
 	double music_volume;
 	int music_mode;
+	int chkEnablePScale;
 };
 
 struct DuelInfo {
@@ -245,6 +246,7 @@ public:
 	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUICheckBox* chkMusicMode;
+	irr::gui::IGUICheckBox* chkEnablePScale;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
