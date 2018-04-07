@@ -44,6 +44,7 @@ public:
 	bool LoadDeck(const wchar_t* file);
 	bool SaveDeck(Deck& deck, const wchar_t* name);
 	bool DeleteDeck(Deck& deck, const wchar_t* name);
+	static bool RenameDeck(const wchar_t* oldname, const wchar_t* newname);
 };
 
 extern DeckManager deckManager;
