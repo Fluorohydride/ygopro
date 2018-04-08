@@ -788,16 +788,14 @@ void DeckBuilder::FilterCards() {
 	size_t element_start = 0;
 	while (1) {
 		size_t element_end = str.find_first_of(L' ', element_start);
-		if (element_end == std::wstring::npos) {
+		if (element_end == std::wstring::npos)
 			break;
-		}
 		size_t length = element_end - element_start;
 		if(length > 0) {
 			query_elements.push_back(str.substr(element_start, length));
 			element_start = element_end + 1;
-		} else {
+		} else
 			element_start++;
-		}
 	}
 	query_elements.push_back(str.substr(element_start));
 	std::unordered_map<std::wstring, unsigned int> set_code_map;
