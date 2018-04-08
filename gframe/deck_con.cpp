@@ -782,13 +782,37 @@ void DeckBuilder::FilterCards() {
 		myswprintf(result_string, L"%d", results.size());
 		return;
 	}
-	unsigned int set_code = 0;
-	if(pstr[0] == L'@')
-		set_code = dataManager.GetSetCode(&pstr[1]);
-	else
-		set_code = dataManager.GetSetCode(&pstr[0]);
-	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
-		pstr = 0;
+	std::wstring str = std::wstring(pstr);
+	std::vector<std::wstring> query_elements;
+	std::vector<std::vector<std::wstring>::iterator> query_elements_track;
+	size_t element_start = 0;
+	while (1) {
+		size_t element_end = str.find_first_of(L' ', element_start);
+		if (element_end == std::wstring::npos) {
+			break;
+		}
+		size_t length = element_end - element_start;
+		if(length > 0) {
+			query_elements.push_back(str.substr(element_start, length));
+			element_start = element_end + 1;
+		} else {
+			element_start++;
+		}
+	}
+	query_elements.push_back(str.substr(element_start));
+	std::unordered_map<std::wstring, unsigned int> set_code_map;
+	for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); elements_iterator++) {
+		const wchar_t* element_pointer = elements_iterator->c_str();
+		if (element_pointer[0] == L'@')
+			set_code_map[*elements_iterator] = dataManager.GetSetCode(&element_pointer[1]);
+		else
+			set_code_map[*elements_iterator] = dataManager.GetSetCode(&element_pointer[0]);			
+		if (element_pointer[0] == 0 || (element_pointer[0] == L'$' && element_pointer[1] == 0) || (element_pointer[0] == L'@' && element_pointer[1] == 0))
+			query_elements_track.push_back(elements_iterator);
+	}
+	for (auto elements_track_iterator = query_elements_track.begin(); elements_track_iterator != query_elements_track.end(); elements_track_iterator++) {
+		query_elements.erase(*elements_track_iterator);
+	}
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
 		const CardDataC& data = ptr->second;
@@ -862,19 +886,32 @@ void DeckBuilder::FilterCards() {
 			if(filter_lm == 7 && data.ot != 4)
 				continue;
 		}
-		if(pstr) {
-			if(pstr[0] == L'$') {
-				if(!CardNameContains(text.name.c_str(), &pstr[1]))
-					continue;
-			} else if(pstr[0] == L'@' && set_code) {
-				if(!check_set_code(data, set_code)) continue;
+		bool is_target = true;
+		for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); elements_iterator++) {
+			const wchar_t* element_pointer = elements_iterator->c_str();
+			if (element_pointer[0] == L'$') {
+				if(!CardNameContains(text.name.c_str(), &element_pointer[1])){
+					is_target = false;
+					break;
+				}
+			}
+			else if (element_pointer[0] == L'@' && set_code_map[*elements_iterator]) {
+				if(!check_set_code(data, set_code_map[*elements_iterator])) {
+					is_target = false;
+					break;
+				}
 			} else {
-				if(!CardNameContains(text.name.c_str(), pstr) && text.text.find(pstr) == std::wstring::npos
-					&& (!set_code || !check_set_code(data, set_code)))
-					continue;
+				if (!CardNameContains(text.name.c_str(), elements_iterator->c_str()) && text.text.find(elements_iterator->c_str()) == std::wstring::npos
+					&& (!set_code_map[*elements_iterator] || !check_set_code(data, set_code_map[*elements_iterator]))) {
+					is_target = false;
+					break;
+				}
 			}
 		}
-		results.push_back(ptr);
+		if (is_target)
+			results.push_back(ptr);
+		else
+			continue;
 	}
 	myswprintf(result_string, L"%d", results.size());
 	if(results.size() > 7) {
