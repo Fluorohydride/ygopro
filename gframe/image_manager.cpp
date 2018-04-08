@@ -60,7 +60,7 @@ bool ImageManager::Initial() {
 	if(!tBackGround_deck)
 		tBackGround_deck = GetRandomImage(TEXTURE_DUEL);
 	if(!tBackGround_deck)
-		tBackGround_deck = tBackGround;	
+		tBackGround_deck = tBackGround;
 	tField[0] = driver->getTexture("textures/field2.png");
 	tFieldTransparent[0] = driver->getTexture("textures/field-transparent2.png");
 	tField[1] = driver->getTexture("textures/field3.png");
