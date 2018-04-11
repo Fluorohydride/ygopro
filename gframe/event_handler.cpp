@@ -6,6 +6,7 @@
 #include "duelclient.h"
 #include "data_manager.h"
 #include "image_manager.h"
+#include "sound_manager.h"
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
@@ -40,6 +41,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_FIRST:
 			case BUTTON_SECOND: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->HideElement(mainGame->wFTSelect);
 				CTOS_TPResult cstr;
 				cstr.res = BUTTON_SECOND - id;
@@ -49,6 +51,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_START: {
 				if(!mainGame->dInfo.isReplay)
 					break;
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->btnReplayStart->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
 				mainGame->btnReplayStep->setVisible(false);
@@ -59,6 +62,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_PAUSE: {
 				if(!mainGame->dInfo.isReplay)
 					break;
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->btnReplayStart->setVisible(true);
 				mainGame->btnReplayPause->setVisible(false);
 				mainGame->btnReplayStep->setVisible(true);
@@ -69,16 +73,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_STEP: {
 				if(!mainGame->dInfo.isReplay)
 					break;
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				ReplayMode::Pause(false, true);
 				break;
 			}
 			case BUTTON_REPLAY_EXIT: {
 				if(!mainGame->dInfo.isReplay)
 					break;
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				ReplayMode::StopReplay();
 				break;
 			}
 			case BUTTON_REPLAY_SWAP: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				if(mainGame->dInfo.isReplay)
 					ReplayMode::SwapField();
 				else if (mainGame->dInfo.player_type == 7)
@@ -88,24 +95,28 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_UNDO: {
 				if(!mainGame->dInfo.isReplay)
 					break;
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				ReplayMode::Undo();
 				break;
 			}
 			case BUTTON_REPLAY_SAVE: {
 				if(mainGame->ebRSName->getText()[0] == 0)
 					break;
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->actionParam = 1;
 				mainGame->HideElement(mainGame->wReplaySave);
 				mainGame->replaySignal.Set();
 				break;
 			}
 			case BUTTON_REPLAY_CANCEL: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->actionParam = 0;
 				mainGame->HideElement(mainGame->wReplaySave);
 				mainGame->replaySignal.Set();
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				if(mainGame->dInfo.isSingleMode) {
 					mainGame->singleSignal.SetNoWait(true);
 					SingleMode::StopPlay(false);
@@ -114,6 +125,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->dInfo.player_type == 7) {
 					DuelClient::StopClient();
 					mainGame->dInfo.isStarted = false;
+					mainGame->dInfo.isFinished = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->stTip->setVisible(false);
 					mainGame->wCardImg->setVisible(false);
@@ -137,6 +149,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CHAIN_IGNORE: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->ignore_chain = mainGame->btnChainIgnore->isPressed();
 				mainGame->always_chain = false;
 				mainGame->chain_when_avail = false;
@@ -144,6 +157,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CHAIN_ALWAYS: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->always_chain = mainGame->btnChainAlways->isPressed();
 				mainGame->ignore_chain = false;
 				mainGame->chain_when_avail = false;
@@ -151,6 +165,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CHAIN_WHENAVAIL: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->chain_when_avail = mainGame->btnChainWhenAvail->isPressed();
 				mainGame->always_chain = false;
 				mainGame->ignore_chain = false;
@@ -158,15 +173,18 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CANCEL_OR_FINISH: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				CancelOrFinish();
 				break;
 			}
 			case BUTTON_MSG_OK: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->HideElement(mainGame->wMessage);
 				mainGame->actionSignal.Set();
 				break;
 			}
 			case BUTTON_YES: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
@@ -200,6 +218,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_NO: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
@@ -252,6 +271,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_OPTION_PREV: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				selected_option--;
 				mainGame->btnOptionn->setVisible(true);
 				if(selected_option == 0)
@@ -260,6 +280,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_OPTION_NEXT: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				selected_option++;
 				mainGame->btnOptionp->setVisible(true);
 				if(selected_option == select_options.size() - 1)
@@ -268,6 +289,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_OPTION_OK: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				if (mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
 					DuelClient::SetResponseI(selected_option);
 				} else {
@@ -285,11 +307,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_ANNUMBER_OK: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				DuelClient::SetResponseI(mainGame->cbANNumber->getSelected());
 				mainGame->HideElement(mainGame->wANNumber, true);
 				break;
 			}
 			case BUTTON_ANCARD_OK: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				int sel = mainGame->lstANCard->getSelected();
 				if(sel == -1)
 					break;
@@ -662,6 +686,24 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					break;
 				}
+				case MSG_SELECT_UNSELECT_CARD: {
+					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
+					if (command_card->is_selected) {
+						command_card->is_selected = false;
+						if(command_card->controler)
+							mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffd0d0d0);
+						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffffff);
+					} else {
+						command_card->is_selected = true;
+						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffff00);
+					}
+					selected_cards.push_back(command_card);
+					if (selected_cards.size() > 0) {
+						SetResponseSelectedCards();
+						ShowCancelOrFinishButton(0);
+						mainGame->HideElement(mainGame->wCardSelect, true);}
+					break;
+				}
 				case MSG_SELECT_SUM: {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					selected_cards.push_back(command_card);
@@ -723,6 +765,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->HideElement(mainGame->wCardSelect);
 					mainGame->actionSignal.Set();
 					break;
+				} else if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD){
+					DuelClient::SetResponseI(-1);
+					ShowCancelOrFinishButton(0);
+					mainGame->HideElement(mainGame->wCardSelect, true);
 				} else {
 					mainGame->HideElement(mainGame->wCardSelect);
 					if(mainGame->dInfo.curMsg == MSG_SELECT_CHAIN && !chain_forced)
@@ -916,16 +962,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				const wchar_t* input = mainGame->ebChatInput->getText();
 				if(input[0]) {
 					unsigned short msgbuf[256];
-					if(mainGame->dInfo.isStarted) {
-						if(mainGame->dInfo.player_type < 7) {
-							if(mainGame->dInfo.isTag && (mainGame->dInfo.player_type % 2))
-								mainGame->AddChatMsg((wchar_t*)input, 2);
-							else
-								mainGame->AddChatMsg((wchar_t*)input, 0);
-						} else
-							mainGame->AddChatMsg((wchar_t*)input, 10);
-					} else
-						mainGame->AddChatMsg((wchar_t*)input, 7);
 					int len = BufferIO::CopyWStr(input, msgbuf, 256);
 					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
 					mainGame->ebChatInput->setText(L"");
@@ -1317,6 +1353,22 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case MSG_SELECT_UNSELECT_CARD: {
+				if (!(hovered_location & 0xe) || !clicked_card || !clicked_card->is_selectable)
+					break;
+				if (clicked_card->is_selected) {
+					clicked_card->is_selected = false;
+				} else {
+					clicked_card->is_selected = true;
+				}
+				selected_cards.push_back(clicked_card);
+				if (selected_cards.size() > 0) {
+					ShowCancelOrFinishButton(0);
+					SetResponseSelectedCards();
+					DuelClient::SendResponse();
+				}
+				break;
+			}
 			case MSG_SELECT_COUNTER: {
 				if (!clicked_card || !clicked_card->is_selectable)
 					break;
@@ -1705,9 +1757,20 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_HOVERED: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_LEFT: {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+				mainGame->SetCursor(ECI_NORMAL);
+			break;
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_CLEAR_LOG: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->lstLog->clear();
 				mainGame->logParam.clear();
 				return true;
@@ -1720,6 +1783,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			switch(id) {
 			case CHECKBOX_AUTO_SEARCH: {
 				mainGame->gameConf.auto_search_limit = mainGame->chkAutoSearch->isChecked() ? 0 : -1;
+				return true;
+				break;
+			}
+			case CHECKBOX_ENABLE_MUSIC: {
+				if(!mainGame->chkEnableMusic->isChecked())
+					soundManager.StopBGM();
 				return true;
 				break;
 			}
@@ -1755,8 +1824,20 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
 			case SCROLL_CARDTEXT: {
+				if(!mainGame->scrCardText->isVisible()) {
+					return true;
+					break;
+				}
 				u32 pos = mainGame->scrCardText->getPos();
 				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - 25, mainGame->textFont, mainGame->showingtext, pos);
+				return true;
+				break;
+			}
+			case SCROLL_VOLUME: {
+				mainGame->gameConf.sound_volume = (double)mainGame->scrSoundVolume->getPos() / 100;
+				mainGame->gameConf.music_volume = (double)mainGame->scrMusicVolume->getPos() / 100;
+				soundManager.SetSoundVolume(mainGame->gameConf.sound_volume);
+				soundManager.SetMusicVolume(mainGame->gameConf.music_volume);
 				return true;
 				break;
 			}
@@ -2177,6 +2258,17 @@ void ClientField::CancelOrFinish() {
 		}
 		break;
 	}
+	case MSG_SELECT_UNSELECT_CARD: {
+        if (select_cancelable) {
+            DuelClient::SetResponseI(-1);
+            ShowCancelOrFinishButton(0);
+            if (mainGame->wCardSelect->isVisible())
+                mainGame->HideElement(mainGame->wCardSelect, true);
+            else
+                DuelClient::SendResponse();
+        }
+        break;
+    }
 	case MSG_SELECT_TRIBUTE: {
 		if(selected_cards.size() == 0) {
 			if(select_cancelable) {

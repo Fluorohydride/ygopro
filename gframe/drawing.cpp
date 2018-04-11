@@ -2,6 +2,7 @@
 #include "materials.h"
 #include "image_manager.h"
 #include "deck_manager.h"
+#include "sound_manager.h"
 #include "duelclient.h"
 #include "../ocgcore/field.h"
 
@@ -11,7 +12,7 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 	if(!gameConf.use_d3d) {
 		float origin[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 		glLineWidth(width);
-		glLineStipple(1, linePattern);
+		glLineStipple(1, linePatternGL);
 		if(strip)
 			glEnable(GL_LINE_STIPPLE);
 		glDisable(GL_TEXTURE_2D);
@@ -28,16 +29,16 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 	} else {
 		driver->setMaterial(matManager.mOutLine);
 		if(strip) {
-			if(linePattern < 15) {
-				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePattern + 1) / 15.0);
-				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePattern + 1) / 15.0);
-				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePattern + 1) / 15.0);
-				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePattern + 1) / 15.0);
+			if(linePatternD3D < 15) {
+				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D + 1) / 15.0);
+				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D + 1) / 15.0);
+				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D + 1) / 15.0);
+				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D + 1) / 15.0);
 			} else {
-				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePattern - 14) / 15.0, vec[1].Pos);
-				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePattern - 14) / 15.0, vec[3].Pos);
-				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePattern - 14) / 15.0, vec[2].Pos);
-				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePattern - 14) / 15.0, vec[0].Pos);
+				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D - 14) / 15.0, vec[1].Pos);
+				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D - 14) / 15.0, vec[3].Pos);
+				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D - 14) / 15.0, vec[2].Pos);
+				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D - 14) / 15.0, vec[0].Pos);
 			}
 		} else {
 			driver->draw3DLine(vec[0].Pos, vec[1].Pos);
@@ -45,6 +46,26 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 			driver->draw3DLine(vec[3].Pos, vec[2].Pos);
 			driver->draw3DLine(vec[2].Pos, vec[0].Pos);
 		}
+	}
+}
+void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color) {
+	recti pos = element->getAbsolutePosition();
+	float x1 = pos.UpperLeftCorner.X;
+	float x2 = pos.LowerRightCorner.X;
+	float y1 = pos.UpperLeftCorner.Y;
+	float y2 = pos.LowerRightCorner.Y;
+	float w = pos.getWidth();
+	float h = pos.getHeight();
+	if(linePatternD3D < 15) {
+		driver->draw2DRectangle(color, recti(x1 - 1 - width, y1 - 1 - width, x1 + (w * (linePatternD3D + 1) / 15.0) + 1 + width, y1 - 1));
+		driver->draw2DRectangle(color, recti(x2 - (w * (linePatternD3D + 1) / 15.0) - 1 - width, y2 + 1, x2 + 1 + width, y2 + 1 + width));
+		driver->draw2DRectangle(color, recti(x1 - 1 - width, y1 - 1 - width, x1 - 1, y2 - (h * (linePatternD3D + 1) / 15.0) + 1 + width));
+		driver->draw2DRectangle(color, recti(x2 + 1, y1 + (h * (linePatternD3D + 1) / 15.0) - 1 - width, x2 + 1 + width, y2 + 1 + width));
+	} else {
+		driver->draw2DRectangle(color, recti(x1 - 1 - width + (w * (linePatternD3D - 14) / 15.0), y1 - 1 - width, x2 + 1 + width, y1 - 1));
+		driver->draw2DRectangle(color, recti(x1 - 1 - width, y2 + 1, x2 - (w * (linePatternD3D - 14) / 15.0) + 1 + width, y2 + 1 + width));
+		driver->draw2DRectangle(color, recti(x1 - 1 - width, y2 - (h * (linePatternD3D - 14) / 15.0) - 1 - width, x1 - 1, y2 + 1 + width));
+		driver->draw2DRectangle(color, recti(x2 + 1, y1 - 1 - width, x2 + 1 + width, y1 + (h * (linePatternD3D - 14) / 15.0) + 1 + width));
 	}
 }
 void Game::DrawBackGround() {
@@ -450,6 +471,9 @@ void Game::DrawMisc() {
 			driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
 		}
 	}
+	//finish button
+	if(btnCancelOrFinish->isVisible() && dField.select_ready)
+		DrawSelectionLine(btnCancelOrFinish, 2, 0xffffff00);
 	//lp bar
 	if((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) {
 		driver->draw2DRectangle(0xa0000000, recti(327, 8, 630, 51));
@@ -1008,6 +1032,7 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	fadingList.push_back(fu);
 }
 void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
+	soundManager.PlayDialogSound(element);
 	element->getParent()->bringToFront(element);
 	if(!mainGame->is_building)
 		dField.panel = element;

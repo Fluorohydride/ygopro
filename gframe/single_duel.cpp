@@ -34,25 +34,14 @@ void SingleDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	scc.player = dp->type;
 	unsigned short* msg = (unsigned short*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
-	if(dp->type > 1) {
-		NetServer::SendBufferToPlayer(players[0], STOC_CHAT, &scc, 4 + msglen * 2);
-		NetServer::ReSendToPlayer(players[1]);
-		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-			if((*pit) != dp)
-				NetServer::ReSendToPlayer(*pit);
+	NetServer::SendBufferToPlayer(players[0], STOC_CHAT, &scc, 4 + msglen * 2);
+	NetServer::ReSendToPlayer(players[1]);
+	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
-		if(cache_recorder)
-			NetServer::ReSendToPlayer(cache_recorder);
+	if(cache_recorder)
+		NetServer::ReSendToPlayer(cache_recorder);
 #endif
-	} else {
-		NetServer::SendBufferToPlayer(players[1 - dp->type], STOC_CHAT, &scc, 4 + msglen * 2);
-		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-			NetServer::ReSendToPlayer(*pit);
-#ifdef YGOPRO_SERVER_MODE
-		if(cache_recorder)
-			NetServer::ReSendToPlayer(cache_recorder);
-#endif
-	}
 }
 void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 #ifdef YGOPRO_SERVER_MODE
@@ -842,6 +831,34 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbuf += 3;
 			count = BufferIO::ReadInt8(pbuf);
 			int c/*, l, s, ss, code*/;
+			for (int i = 0; i < count; ++i) {
+				pbufw = pbuf;
+				/*code = */BufferIO::ReadInt32(pbuf);
+				c = BufferIO::ReadInt8(pbuf);
+				/*l = */BufferIO::ReadInt8(pbuf);
+				/*s = */BufferIO::ReadInt8(pbuf);
+				/*ss = */BufferIO::ReadInt8(pbuf);
+				if (c != player) BufferIO::WriteInt32(pbufw, 0);
+			}
+			WaitforResponse(player);
+			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			return 1;
+		}
+		case MSG_SELECT_UNSELECT_CARD: {
+			player = BufferIO::ReadInt8(pbuf);
+			pbuf += 4;
+			count = BufferIO::ReadInt8(pbuf);
+			int c/*, l, s, ss, code*/;
+			for (int i = 0; i < count; ++i) {
+				pbufw = pbuf;
+				/*code = */BufferIO::ReadInt32(pbuf);
+				c = BufferIO::ReadInt8(pbuf);
+				/*l = */BufferIO::ReadInt8(pbuf);
+				/*s = */BufferIO::ReadInt8(pbuf);
+				/*ss = */BufferIO::ReadInt8(pbuf);
+				if (c != player) BufferIO::WriteInt32(pbufw, 0);
+			}
+			count = BufferIO::ReadInt8(pbuf);
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
 				/*code = */BufferIO::ReadInt32(pbuf);

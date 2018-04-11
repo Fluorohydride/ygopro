@@ -24,5 +24,5 @@ project "ygopro"
     configuration "not vs*"
         buildoptions { "-std=gnu++0x", "-fno-rtti" }
     configuration "not windows"
-        includedirs { "/usr/include/lua", "/usr/include/lua5.2", "/usr/include/lua/5.2" }
+        includedirs { "/usr/include/lua", "/usr/include/lua5.3", "/usr/include/lua/5.3" }
         links { "event_pthreads", "dl", "pthread" }

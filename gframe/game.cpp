@@ -8,6 +8,7 @@
 #include "image_manager.h"
 #include "data_manager.h"
 #include "deck_manager.h"
+#include "sound_manager.h"
 #include "replay.h"
 #include "materials.h"
 #include "duelclient.h"
@@ -20,7 +21,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1342;
+const unsigned short PRO_VERSION = 0x1343;
 
 namespace ygo {
 
@@ -63,7 +64,8 @@ bool Game::Initialize() {
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
-	linePattern = 0x0f0f;
+	linePatternD3D = 0;
+	linePatternGL = 0x0f0f;
 	waitFrame = 0;
 	signalFrame = 0;
 	showcard = 0;
@@ -311,6 +313,27 @@ bool Game::Initialize() {
 	posY += 30;
 	chkAutoSearch = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
 	chkAutoSearch->setChecked(gameConf.auto_search_limit >= 0);
+	posY += 30;
+	chkEnableSound = env->addCheckBox(gameConf.enable_sound, rect<s32>(posX, posY, posX + 120, posY + 25), tabSystem, -1, dataManager.GetSysString(1279));
+	chkEnableSound->setChecked(gameConf.enable_sound);
+	scrSoundVolume = env->addScrollBar(true, rect<s32>(posX + 126, posY + 4, posX + 260, posY + 21), tabSystem, SCROLL_VOLUME);
+	scrSoundVolume->setMax(100);
+	scrSoundVolume->setMin(0);
+	scrSoundVolume->setPos(gameConf.sound_volume * 100);
+	scrSoundVolume->setLargeStep(1);
+	scrSoundVolume->setSmallStep(1);
+	posY += 30;
+	chkEnableMusic = env->addCheckBox(gameConf.enable_music, rect<s32>(posX, posY, posX + 120, posY + 25), tabSystem, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(1280));
+	chkEnableMusic->setChecked(gameConf.enable_music);
+	scrMusicVolume = env->addScrollBar(true, rect<s32>(posX + 126, posY + 4, posX + 260, posY + 21), tabSystem, SCROLL_VOLUME);
+	scrMusicVolume->setMax(100);
+	scrMusicVolume->setMin(0);
+	scrMusicVolume->setPos(gameConf.music_volume * 100);
+	scrMusicVolume->setLargeStep(1);
+	scrMusicVolume->setSmallStep(1);
+	posY += 30;
+	chkMusicMode = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1281));
+	chkMusicMode->setChecked(gameConf.music_mode != 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -541,7 +564,7 @@ bool Game::Initialize() {
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 20 + 50 / 6, 390, 60 + 75 / 6), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 390, 100 + 125 / 6), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
-	if(mainGame->gameConf.separate_clear_button) {
+	if(gameConf.separate_clear_button) {
 		btnStartFilter->setRelativePosition(rect<s32>(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 		btnClearFilter = env->addButton(rect<s32>(205, 80 + 125 / 6, 255, 100 + 125 / 6), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
 	}
@@ -669,6 +692,18 @@ bool Game::Initialize() {
 	stTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
 	LoadConfig();
+	if(!soundManager.Init()) {
+		chkEnableSound->setChecked(false);
+		chkEnableSound->setEnabled(false);
+		chkEnableSound->setVisible(false);
+		chkEnableMusic->setChecked(false);
+		chkEnableMusic->setEnabled(false);
+		chkEnableMusic->setVisible(false);
+		scrSoundVolume->setVisible(false);
+		scrMusicVolume->setVisible(false);
+		chkMusicMode->setEnabled(false);
+		chkMusicMode->setVisible(false);
+	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
 	for (u32 i = 0; i < EGDC_COUNT; ++i) {
@@ -696,15 +731,23 @@ void Game::MainLoop() {
 	int fps = 0;
 	int cur_time = 0;
 	while(device->run()) {
-		if(gameConf.use_d3d)
-			linePattern = (linePattern + 1) % 30;
-		else
-			linePattern = (linePattern << 1) | (linePattern >> 15);
+		linePatternD3D = (linePatternD3D + 1) % 30;
+		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.Lock();
-		if(dInfo.isStarted) {
+		if(dInfo.isStarted || dInfo.isReplaySkiping) {
+			if(dInfo.isFinished && showcardcode == 1)
+				soundManager.PlayBGM(BGM_WIN);
+			else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
+				soundManager.PlayBGM(BGM_LOSE);
+			else if(dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
+				soundManager.PlayBGM(BGM_DISADVANTAGE);
+			else if(dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
+				soundManager.PlayBGM(BGM_ADVANTAGE);
+			else
+				soundManager.PlayBGM(BGM_DUEL);
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
@@ -713,9 +756,11 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
+			soundManager.PlayBGM(BGM_DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
+			soundManager.PlayBGM(BGM_MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
 		DrawGUI();
@@ -759,7 +804,7 @@ void Game::MainLoop() {
 		}
 	}
 	DuelClient::StopClient(true);
-	if(mainGame->dInfo.isSingleMode)
+	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
 #ifdef _WIN32
 	Sleep(500);
@@ -784,6 +829,8 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 	SetStaticText(pControl, cWidth, font, text);
 	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
 		scrCardText->setVisible(false);
+		if(env->hasFocus(scrCardText))
+			env->removeFocus(scrCardText);
 		return;
 	}
 	SetStaticText(pControl, cWidth-25, font, text);
@@ -1034,6 +1081,11 @@ void Game::LoadConfig() {
 	gameConf.chkIgnoreDeckChanges = 0;
 	gameConf.defaultOT = 1;
 	gameConf.enable_bot_mode = 0;
+	gameConf.enable_sound = true;
+	gameConf.sound_volume = 0.5;
+	gameConf.enable_music = true;
+	gameConf.music_volume = 0.5;
+	gameConf.music_mode = 1;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1096,6 +1148,16 @@ void Game::LoadConfig() {
 			gameConf.defaultOT = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_bot_mode")) {
 			gameConf.enable_bot_mode = atoi(valbuf);
+		} else if(!strcmp(strbuf, "enable_sound")) {
+			gameConf.enable_sound = atoi(valbuf) > 0;
+		} else if(!strcmp(strbuf, "sound_volume")) {
+			gameConf.sound_volume = atof(valbuf) / 100;
+		} else if(!strcmp(strbuf, "enable_music")) {
+			gameConf.enable_music = atoi(valbuf) > 0;
+		} else if(!strcmp(strbuf, "music_volume")) {
+			gameConf.music_volume = atof(valbuf) / 100;
+		} else if(!strcmp(strbuf, "music_mode")) {
+			gameConf.music_mode = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1138,24 +1200,34 @@ void Game::SaveConfig() {
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
 	//settings
-	fprintf(fp, "automonsterpos = %d\n", ((mainGame->chkMAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autospellpos = %d\n", ((mainGame->chkSTAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "randompos = %d\n", ((mainGame->chkRandomPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autochain = %d\n", ((mainGame->chkAutoChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "waitchain = %d\n", ((mainGame->chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_opponent = %d\n", ((mainGame->chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_spectators = %d\n", ((mainGame->chkIgnore2->isChecked()) ? 1 : 0));
-	fprintf(fp, "hide_setname = %d\n", ((mainGame->chkHideSetname->isChecked()) ? 1 : 0));
-	fprintf(fp, "hide_hint_button = %d\n", ((mainGame->chkHideHintButton->isChecked()) ? 1 : 0));
+	fprintf(fp, "automonsterpos = %d\n", (chkMAutoPos->isChecked() ? 1 : 0));
+	fprintf(fp, "autospellpos = %d\n", (chkSTAutoPos->isChecked() ? 1 : 0));
+	fprintf(fp, "randompos = %d\n", (chkRandomPos->isChecked() ? 1 : 0));
+	fprintf(fp, "autochain = %d\n", (chkAutoChain->isChecked() ? 1 : 0));
+	fprintf(fp, "waitchain = %d\n", (chkWaitChain->isChecked() ? 1 : 0));
+	fprintf(fp, "mute_opponent = %d\n", (chkIgnore1->isChecked() ? 1 : 0));
+	fprintf(fp, "mute_spectators = %d\n", (chkIgnore2->isChecked() ? 1 : 0));
+	fprintf(fp, "hide_setname = %d\n", (chkHideSetname->isChecked() ? 1 : 0));
+	fprintf(fp, "hide_hint_button = %d\n", (chkHideHintButton->isChecked() ? 1 : 0));
 	fprintf(fp, "#control_mode = 0: Key A/S/D/R Chain Buttons. control_mode = 1: MouseLeft/MouseRight/NULL/F9 Without Chain Buttons\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
 	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
 	fprintf(fp, "#auto_search_limit >= 0: Start search automatically when the user enters N chars\n");
 	fprintf(fp, "auto_search_limit = %d\n", gameConf.auto_search_limit);
-	fprintf(fp, "ignore_deck_changes = %d\n", ((mainGame->chkIgnoreDeckChanges->isChecked()) ? 1 : 0));
+	fprintf(fp, "ignore_deck_changes = %d\n", (chkIgnoreDeckChanges->isChecked() ? 1 : 0));
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
+	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
+	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
+	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
+	int vol = gameConf.sound_volume * 100;
+	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
+	fprintf(fp, "sound_volume = %d\n", vol);
+	vol = gameConf.music_volume * 100;
+	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
+	fprintf(fp, "music_volume = %d\n", vol);
+	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
@@ -1170,7 +1242,7 @@ void Game::ShowCardInfo(int code) {
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
 	int offset = 0;
-	if(!mainGame->chkHideSetname->isChecked()) {
+	if(!chkHideSetname->isChecked()) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
 			auto aptr = dataManager._datas.find(cd.alias);
@@ -1249,22 +1321,26 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L": ");
 		break;
 	case 1: //from client
+		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(dInfo.clientname);
 		chatMsg[0].append(L": ");
 		break;
 	case 2: //host tag
+		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(dInfo.hostname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 3: //client tag
+		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(dInfo.clientname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 7: //local name
-		chatMsg[0].append(mainGame->ebNickName->getText());
+		chatMsg[0].append(ebNickName->getText());
 		chatMsg[0].append(L": ");
 		break;
 	case 8: //system custom message, no prefix.
+		soundManager.PlaySoundEffect(SOUND_CHAT);
 		chatMsg[0].append(L"[System]: ");
 		break;
 	case 9: //error message
@@ -1285,7 +1361,7 @@ void Game::AddDebugMsg(char* msg)
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
-		mainGame->AddChatMsg(wbuf, 9);
+		AddChatMsg(wbuf, 9);
 	}
 	if (enable_log & 0x2) {
 		FILE* fp = fopen("error.log", "at");
@@ -1303,12 +1379,12 @@ void Game::AddDebugMsg(char* msg)
 #ifndef YGOPRO_SERVER_MODE
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
-	mainGame->imgCard->setImage(imageManager.tCover[0]);
-	mainGame->btnPSAU->setImage();
-	mainGame->btnPSDU->setImage();
+	imgCard->setImage(imageManager.tCover[0]);
+	btnPSAU->setImage();
+	btnPSDU->setImage();
 	for(int i=0; i<=4; ++i) {
-		mainGame->btnCardSelect[i]->setImage();
-		mainGame->btnCardDisplay[i]->setImage();
+		btnCardSelect[i]->setImage();
+		btnCardDisplay[i]->setImage();
 	}
 	imageManager.ClearTexture();
 }
@@ -1378,6 +1454,12 @@ void Game::FlashWindow() {
 	fi.dwTimeout = 0;
 	FlashWindowEx(&fi);
 #endif
+}
+void Game::SetCursor(ECURSOR_ICON icon) {
+	ICursorControl* cursor = mainGame->device->getCursorControl();
+	if(cursor->getActiveIcon() != icon) {
+		cursor->setActiveIcon(icon);
+	}
 }
 #endif //YGOPRO_SERVER_MODE
 
