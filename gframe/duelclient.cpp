@@ -1397,7 +1397,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_UNSELECT_CARD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		bool buttonok = BufferIO::ReadInt8(pbuf);
+		bool buttonok = !!BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
