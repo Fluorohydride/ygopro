@@ -9,12 +9,11 @@ addons:
     packages:
     - libevent-dev
     - libsqlite3-dev
-    - liblua5.2-dev
 before_install:
 - git submodule update --init --recursive
 - wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha10/premake-5.0.0-alpha10-linux.tar.gz | tar zfx -
+- wget -O - https://www.lua.org/ftp/lua-5.3.4.tar.gz | tar zfx -; cd lua-5.3.4; sudo make linux install; cd ..
 script:
 - ./premake5 gmake
 - cd build
-- sed -i 's/-llua/-llua5.2/g' ygopro.make
 - make config=release
