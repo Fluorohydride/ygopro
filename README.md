@@ -11,7 +11,7 @@
  * gcc
  * premake5
  * libevent
- * lua5.2
+ * lua5.3
  * sqlite3
 * 可参考本项目 [.travis.yml](https://github.com/mycard/ygopro/blob/server/.travis.yml) 中的脚本
 
@@ -20,7 +20,7 @@
  * Visual Studio
  * premake5
  * libevent
- * lua5.2
+ * lua5.3
  * sqlite3
 * 可参考本项目 [appveyor.yml](https://github.com/mycard/ygopro/blob/server/appveyor.yml) 中的脚本
 
