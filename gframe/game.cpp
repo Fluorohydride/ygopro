@@ -9,6 +9,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include <sstream>
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -34,6 +35,15 @@ bool Game::Initialize() {
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
+	// Apply skin
+	if(gameConf.skin_index >= 0) {
+		skinSystem = new CGUISkinSystem("skin", device);
+		core::array<core::stringw> skins = skinSystem->listSkins();
+		if((size_t)gameConf.skin_index < skins.size()) {
+			int index = skins.size() - gameConf.skin_index - 1; // reverse index
+			skinSystem->applySkin(skins[index].c_str());
+		}
+	}
 	linePatternD3D = 0;
 	linePatternGL = 0x0f0f;
 	waitFrame = 0;
@@ -1054,6 +1064,7 @@ void Game::LoadConfig() {
 	gameConf.enable_music = true;
 	gameConf.music_volume = 0.5;
 	gameConf.music_mode = 1;
+	gameConf.skin_index = -1;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1126,6 +1137,8 @@ void Game::LoadConfig() {
 			gameConf.music_volume = atof(valbuf) / 100;
 		} else if(!strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = atoi(valbuf);
+		} else if (!strcmp(strbuf, "skin_index")) {
+			gameConf.skin_index = atoi(valbuf);
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1196,6 +1209,7 @@ void Game::SaveConfig() {
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	fprintf(fp, "music_volume = %d\n", vol);
 	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
+	fprintf(fp, "skin_index = %d\n", gameConf.skin_index);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
