@@ -37,7 +37,9 @@ bool Game::Initialize() {
 		return false;
 	// Apply skin
 	if(gameConf.skin_index >= 0) {
-		skinSystem = new CGUISkinSystem("skin", device);
+		wchar_t skin_dir[16];
+		myswprintf(skin_dir, L"skin");
+		skinSystem = new CGUISkinSystem(skin_dir, device);
 		core::array<core::stringw> skins = skinSystem->listSkins();
 		if((size_t)gameConf.skin_index < skins.size()) {
 			int index = skins.size() - gameConf.skin_index - 1; // reverse index
