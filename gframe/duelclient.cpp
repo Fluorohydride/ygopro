@@ -1397,8 +1397,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_UNSELECT_CARD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		bool finishable = BufferIO::ReadInt8(pbuf);
-		bool cancelable = BufferIO::ReadInt8(pbuf);
+		bool finishable = BufferIO::ReadInt8(pbuf) != 0;
+		bool cancelable = BufferIO::ReadInt8(pbuf) != 0;
 		mainGame->dField.select_cancelable = finishable || cancelable;
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
@@ -1458,7 +1458,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (panelmode) {
 			mainGame->gMutex.Lock();
 			mainGame->wCardSelect->setText(textBuffer);
-			mainGame->dField.ShowSelectCard(mainGame->dField.select_cancelable);
+			mainGame->dField.ShowSelectCard(mainGame->dField.select_cancelable != 0);
 			mainGame->gMutex.Unlock();
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
