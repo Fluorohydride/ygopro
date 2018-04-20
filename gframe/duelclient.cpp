@@ -479,7 +479,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if(mainGame->wSinglePlay->isVisible())
 			mainGame->HideElement(mainGame->wSinglePlay);
 		mainGame->ShowElement(mainGame->wHostPrepare);
-		mainGame->wChat->setVisible(true);
+		if(!mainGame->chkIgnore1->isChecked())
+			mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
 		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
 		watching = 0;
@@ -588,7 +589,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
 		mainGame->btnShuffle->setVisible(false);
-		mainGame->wChat->setVisible(true);
+		if(!mainGame->chkIgnore1->isChecked())
+			mainGame->wChat->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {
