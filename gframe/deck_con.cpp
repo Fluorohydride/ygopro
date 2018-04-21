@@ -369,7 +369,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				int sel = mainGame->cbDBDecks->getSelected();
-				deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
+				if(sel >= 0)
+					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
 				prev_deck = sel;
 				is_modified = false;
 				break;

@@ -920,12 +920,13 @@ void Game::DrawSpec() {
 	    showChat = false;
 	    hideChatTimer--;
 	}
-	int maxChatLines = dInfo.isStarted ? 5 : 8;
-	for(int i = 0; i < maxChatLines; ++i) {
+	for(int i = 0; i < 8; ++i) {
 		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
 		                                   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
 		if(chatTiming[i]) {
 			chatTiming[i]--;
+			if(mainGame->dInfo.isStarted && i >= 5)
+				continue;
 			if(!showChat && i > 2)
 				continue;
 			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
