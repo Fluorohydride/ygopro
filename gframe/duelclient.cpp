@@ -337,7 +337,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				event_base_loopbreak(client_base);
 				temp_ver = pkt->code;
 				try_needed = true;
-			}	
+			}
 			break;
 		}
 		}
@@ -973,8 +973,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Lock();
 		if(state < 8) {
 			mainGame->PlaySoundEffect("./sound/playerenter.wav");
-			wchar_t prename[20];
-			BufferIO::CopyWStr(mainGame->stHostPrepDuelist[pos]->getText(), prename, 20);
+			wchar_t* prename = (wchar_t*)mainGame->stHostPrepDuelist[pos]->getText();
 			mainGame->stHostPrepDuelist[state]->setText(prename);
 			mainGame->stHostPrepDuelist[pos]->setText(L"");
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
@@ -1586,7 +1585,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_CARD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) != 0;
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
@@ -1647,8 +1646,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_UNSELECT_CARD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		bool buttonok = BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf);
+		bool finishable = BufferIO::ReadInt8(pbuf) != 0;
+		bool cancelable = BufferIO::ReadInt8(pbuf) != 0;
+		mainGame->dField.select_cancelable = finishable || cancelable;
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
 		int count1 = BufferIO::ReadInt8(pbuf);
@@ -1715,17 +1715,20 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (panelmode) {
 			mainGame->gMutex.Lock();
 			mainGame->wCardSelect->setText(textBuffer);
-			mainGame->dField.ShowSelectCard(buttonok);
+			mainGame->dField.ShowSelectCard(mainGame->dField.select_cancelable);
 			mainGame->gMutex.Unlock();
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
 		if (mainGame->dField.select_cancelable) {
-			if (count2 == 0)
-				mainGame->dField.ShowCancelOrFinishButton(1);
-			else
+			if(finishable) {
+				mainGame->dField.select_ready = true;
 				mainGame->dField.ShowCancelOrFinishButton(2);
+			}
+			else {
+				mainGame->dField.ShowCancelOrFinishButton(1);
+			}
 		}
 		else
 			mainGame->dField.ShowCancelOrFinishButton(0);
@@ -1945,7 +1948,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_TRIBUTE: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) ? true : false;
+		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) != 0;
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
@@ -2358,12 +2361,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_EXTRA: {
-		mainGame->PlaySoundEffect("./sound/shuffle.wav");
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		/*int count = */BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
 		if((mainGame->dField.extra[player].size() - mainGame->dField.extra_p_count[player]) < 2)
 			return true;
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			if(count > 1)
+				mainGame->PlaySoundEffect("./sound/shuffle.wav");
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 					if(!((*cit)->position & POS_FACEUP)) {

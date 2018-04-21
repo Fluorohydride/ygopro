@@ -1100,9 +1100,8 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 			select_ready = false;
 	}
 	if (select_ready) {
-		ShowCancelOrFinishButton(1);
-	}
-	else {
+		ShowCancelOrFinishButton(2);
+	} else {
 		ShowCancelOrFinishButton(0);
 	}
 	return false;

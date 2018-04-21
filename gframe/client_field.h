@@ -55,8 +55,8 @@ public:
 	int select_max;
 	int must_select_count;
 	int select_sumval;
-	int select_cancelable;
 	int select_mode;
+	bool select_cancelable;
 	bool select_panalmode;
 	bool select_ready;
 	int announce_count;

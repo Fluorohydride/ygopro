@@ -346,7 +346,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case COMBOBOX_DBDECKS: {
 				int sel = mainGame->cbDBDecks->getSelected();
-				deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
+				if(sel >= 0)
+					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
 				prev_deck = sel;
 				break;
 			}

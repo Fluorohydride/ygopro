@@ -11,8 +11,44 @@ DeckManager deckManager;
 void DeckManager::LoadLFList() {
 	LFList* cur = NULL;
 	FILE* fp = fopen("lflist.conf", "r");
+	FILE* fp_custom = fopen("expansions/lflist.conf", "r");
 	char linebuf[256];
 	wchar_t strBuffer[256];
+	if(fp_custom) {
+		while(fgets(linebuf, 256, fp_custom)) {
+			if(linebuf[0] == '#')
+				continue;
+			int p = 0, sa = 0, code, count;
+			if(linebuf[0] == '!') {
+				sa = BufferIO::DecodeUTF8((const char*)(&linebuf[1]), strBuffer);
+				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' ) sa--;
+				LFList newlist;
+				_lfList.push_back(newlist);
+				cur = &_lfList[_lfList.size() - 1];
+				memcpy(cur->listName, (const void*)strBuffer, 40);
+				cur->listName[sa] = 0;
+				cur->content = new std::unordered_map<int, int>;
+				cur->hash = 0x7dfcee6a;
+				continue;
+			}
+			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
+			if(linebuf[p] == 0)
+				continue;
+			linebuf[p++] = 0;
+			sa = p;
+			code = atoi(linebuf);
+			if(code == 0)
+				continue;
+			while(linebuf[p] == ' ' || linebuf[p] == '\t') p++;
+			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
+			linebuf[p] = 0;
+			count = atoi(&linebuf[sa]);
+			if(cur == NULL) continue;
+			(*cur->content)[code] = count;
+			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
+		}
+		fclose(fp_custom);
+	}
 	if(fp) {
 		while(fgets(linebuf, 256, fp)) {
 			if(linebuf[0] == '#')

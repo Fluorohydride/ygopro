@@ -42,7 +42,6 @@ bool Game::Initialize() {
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
-
 	// Apply skin
 	if (gameConf.skin_index >= 0)
 	{
@@ -54,8 +53,8 @@ bool Game::Initialize() {
 			skinSystem->applySkin(skins[index].c_str());
 		}
 	}
-
-	linePattern = 0x0f0f;
+	linePatternD3D = 0;
+	linePatternGL = 0x0f0f;
 	waitFrame = 0;
 	signalFrame = 0;
 	showcard = 0;
@@ -729,10 +728,8 @@ void Game::MainLoop() {
 			window_size = size;
 			OnResize();
 		}
-		if(gameConf.use_d3d)
-			linePattern = (linePattern + 1) % 30;
-		else
-			linePattern = (linePattern << 1) | (linePattern >> 15);
+		linePatternD3D = (linePatternD3D + 1) % 30;
+		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
@@ -1409,6 +1406,11 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 			chatMsg[0].append(L"[---]: ");
 	}
 	chatMsg[0].append(msg);
+}
+void Game::ClearChatMsg() {
+	for(int i = 7; i >= 0; --i) {
+		chatTiming[i] = 0;
+	}
 }
 void Game::AddDebugMsg(char* msg)
 {

@@ -104,6 +104,7 @@ public:
 	void RefreshSingleplay();
 	void RefreshBGMList();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
+	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
 	void CheckMutual(ClientCard* pcard, int mark);
@@ -128,6 +129,7 @@ public:
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
 	void AddChatMsg(wchar_t* msg, int player);
+	void ClearChatMsg();
 	void AddDebugMsg(char* msgbuf);
 	void ClearTextures();
 	void CloseDuelWindow();
@@ -176,7 +178,8 @@ public:
 	bool hideChat;
 	int chatTiming[8];
 	int chatType[8];
-	unsigned short linePattern;
+	unsigned short linePatternD3D;
+	unsigned short linePatternGL;
 	int waitFrame;
 	int signalFrame;
 	int saveReplay;
@@ -240,6 +243,9 @@ public:
 	irr::gui::IGUIStaticText* stText;
 	irr::gui::IGUIStaticText* stVolume;
 	irr::gui::IGUIScrollBar* scrCardText;
+	irr::gui::IGUIListBox* lstLog;
+	irr::gui::IGUIButton* btnClearLog;
+	irr::gui::IGUIButton* btnSaveLog;
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
@@ -249,9 +255,6 @@ public:
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
-	irr::gui::IGUIListBox* lstLog;
-	irr::gui::IGUIButton* btnClearLog;
-	irr::gui::IGUIButton* btnSaveLog;
 	irr::gui::IGUIScrollBar* srcVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;

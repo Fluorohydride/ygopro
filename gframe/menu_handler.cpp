@@ -28,6 +28,8 @@ void UpdateDeck() {
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 }
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
+	if(mainGame->dField.OnCommonEvent(event))
+		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
