@@ -142,10 +142,10 @@ const wchar_t* DataManager::GetText(int code) {
 		return csit->second.text.c_str();
 	return unknown_string;
 }
-const wchar_t* DataManager::GetDesc(int strCode) {
+const wchar_t* DataManager::GetDesc(u64 strCode) {
 	if(strCode < 10000)
 		return GetSysString(strCode);
-	int code = strCode >> 4;
+	u64 code = strCode >> 4;
 	int offset = strCode & 0xf;
 	auto csit = _strings.find(code);
 	if(csit == _strings.end())
