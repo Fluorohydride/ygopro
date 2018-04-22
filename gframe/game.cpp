@@ -36,7 +36,7 @@ bool Game::Initialize() {
 	if(!device)
 		return false;
 	// Apply skin
-	if(gameConf.skin_index) {
+	if(gameConf.skin_index && gameConf.use_d3d) {
 		wchar_t skin_dir[16];
 		myswprintf(skin_dir, L"skin");
 		skinSystem = new CGUISkinSystem(skin_dir, device);
