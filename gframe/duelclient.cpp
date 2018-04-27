@@ -479,7 +479,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if(mainGame->wSinglePlay->isVisible())
 			mainGame->HideElement(mainGame->wSinglePlay);
 		mainGame->ShowElement(mainGame->wHostPrepare);
-		mainGame->wChat->setVisible(true);
+		if(!mainGame->chkIgnore1->isChecked())
+			mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
 		mainGame->dInfo.duel_rule = pkt->info.duel_rule;
 		watching = 0;
@@ -588,7 +589,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
 		mainGame->btnShuffle->setVisible(false);
-		mainGame->wChat->setVisible(true);
+		if(!mainGame->chkIgnore1->isChecked())
+			mainGame->wChat->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(!mainGame->dInfo.isTag) {
 			if(selftype > 1) {
@@ -1340,7 +1342,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_CARD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) != 0;
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
@@ -1397,8 +1399,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_UNSELECT_CARD: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		bool buttonok = BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf);
+		bool finishable = BufferIO::ReadInt8(pbuf) != 0;
+		bool cancelable = BufferIO::ReadInt8(pbuf) != 0;
+		mainGame->dField.select_cancelable = finishable || cancelable;
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
 		int count1 = BufferIO::ReadInt8(pbuf);
@@ -1457,18 +1460,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (panelmode) {
 			mainGame->gMutex.Lock();
 			mainGame->wCardSelect->setText(textBuffer);
-			mainGame->dField.ShowSelectCard(buttonok);
+			mainGame->dField.ShowSelectCard(mainGame->dField.select_cancelable);
 			mainGame->gMutex.Unlock();
 		} else {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
 		if (mainGame->dField.select_cancelable) {
-			if (count2 == 0)
-				mainGame->dField.ShowCancelOrFinishButton(1);
-			else {
+			if(finishable) {
 				mainGame->dField.select_ready = true;
 				mainGame->dField.ShowCancelOrFinishButton(2);
+			}
+			else {
+				mainGame->dField.ShowCancelOrFinishButton(1);
 			}
 		}
 		else
@@ -1688,7 +1692,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_TRIBUTE: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) ? true : false;
+		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) != 0;
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
