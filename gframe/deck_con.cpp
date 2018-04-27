@@ -788,7 +788,7 @@ void DeckBuilder::FilterCards() {
 	size_t element_start = 0;
 	while (1) {
 		size_t element_end = str.find_first_of(L' ', element_start);
-		if (element_end == std::wstring::npos)
+		if(element_end == std::wstring::npos)
 			break;
 		size_t length = element_end - element_start;
 		if(length > 0) {
@@ -801,16 +801,15 @@ void DeckBuilder::FilterCards() {
 	std::unordered_map<std::wstring, unsigned int> set_code_map;
 	for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); elements_iterator++) {
 		const wchar_t* element_pointer = elements_iterator->c_str();
-		if (element_pointer[0] == L'@')
+		if(element_pointer[0] == L'@')
 			set_code_map[*elements_iterator] = dataManager.GetSetCode(&element_pointer[1]);
 		else
 			set_code_map[*elements_iterator] = dataManager.GetSetCode(&element_pointer[0]);			
 		if (element_pointer[0] == 0 || (element_pointer[0] == L'$' && element_pointer[1] == 0) || (element_pointer[0] == L'@' && element_pointer[1] == 0))
 			query_elements_track.push_back(elements_iterator);
 	}
-	for (auto elements_track_iterator = query_elements_track.begin(); elements_track_iterator != query_elements_track.end(); elements_track_iterator++) {
+	for (auto elements_track_iterator = query_elements_track.begin(); elements_track_iterator != query_elements_track.end(); elements_track_iterator++)
 		query_elements.erase(*elements_track_iterator);
-	}
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
 		const CardDataC& data = ptr->second;
