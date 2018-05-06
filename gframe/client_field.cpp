@@ -203,8 +203,21 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		break;
 	}
 	case LOCATION_EXTRA: {
-		extra[controler].push_back(pcard);
-		pcard->sequence = extra[controler].size() - 1;
+		if(extra_p_count[controler] == 0 || (pcard->position & POS_FACEUP)) {
+			extra[controler].push_back(pcard);
+			pcard->sequence = extra[controler].size() - 1;
+		} else {
+			extra[controler].push_back(0);
+			int p = extra[controler].size() - extra_p_count[controler] - 1;
+			for(int i = extra[controler].size() - 1; i > p; --i) {
+				extra[controler][i] = extra[controler][i - 1];
+				extra[controler][i]->sequence++;
+				extra[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
+				extra[controler][i]->mTransform.setTranslation(extra[controler][i]->curPos);
+			}
+			extra[controler][p] = pcard;
+			pcard->sequence = p;
+		}
 		if (pcard->position & POS_FACEUP)
 			extra_p_count[controler]++;
 		break;
@@ -407,26 +420,30 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 					selectable_cards[i]->sequence + 1);
 			mainGame->stCardPos[i]->setText(formatBuffer);
 			// color
-			if(conti_selecting)
-				mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-			else if(selectable_cards[i]->location == LOCATION_OVERLAY) {
-				if(selectable_cards[i]->owner != selectable_cards[i]->overlayTarget->controler)
-					mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
-				if(selectable_cards[i]->overlayTarget->controler)
-					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-			} else if(selectable_cards[i]->location == LOCATION_DECK || selectable_cards[i]->location == LOCATION_EXTRA || selectable_cards[i]->location == LOCATION_REMOVED) {
-				if(selectable_cards[i]->position & POS_FACEDOWN)
-					mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
-				if(selectable_cards[i]->controler)
-					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-				else
+			if (selectable_cards[i]->is_selected)
+				mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
+			else {
+				if(conti_selecting)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
-			} else {
-				if(selectable_cards[i]->controler)
-					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
-				else
-					mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+				else if(selectable_cards[i]->location == LOCATION_OVERLAY) {
+					if(selectable_cards[i]->owner != selectable_cards[i]->overlayTarget->controler)
+						mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
+					if(selectable_cards[i]->overlayTarget->controler)
+						mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+					else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+				} else if(selectable_cards[i]->location == LOCATION_DECK || selectable_cards[i]->location == LOCATION_EXTRA || selectable_cards[i]->location == LOCATION_REMOVED) {
+					if(selectable_cards[i]->position & POS_FACEDOWN)
+						mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
+					if(selectable_cards[i]->controler)
+						mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+					else
+						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+				} else {
+					if(selectable_cards[i]->controler)
+						mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+					else
+						mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+				}
 			}
 		} else {
 			if(sort_list[i]) {
@@ -632,6 +649,7 @@ void ClientField::ReplaySwap() {
 		(*cit)->is_moving = false;
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
+	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
 	std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
@@ -1044,7 +1062,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 			select_ready = false;
 	}
 	if (select_ready) {
-		ShowCancelOrFinishButton(1);
+		ShowCancelOrFinishButton(2);
 	} else {
 		ShowCancelOrFinishButton(0);
 	}
@@ -1356,7 +1374,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declarable_type)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(cstr.name);
+		mainGame->lstANCard->addItem(cstr.name.c_str());
 		ancard.push_back(trycode);
 		return;
 	}
@@ -1365,15 +1383,15 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
-		if(wcsstr(cit->second.name, pname) != 0) {
+		if(cit->second.name.find(pname) != std::wstring::npos) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, declarable_type)) {
-				if(wcscmp(pname, cit->second.name) == 0) { //exact match
-					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+				if(pname == cit->second.name) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
 					ancard.insert(ancard.begin(), cit->first);
 				} else {
-					mainGame->lstANCard->addItem(cit->second.name);
+					mainGame->lstANCard->addItem(cit->second.name.c_str());
 					ancard.push_back(cit->first);
 				}
 			}
@@ -1388,7 +1406,7 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(cstr.name);
+		mainGame->lstANCard->addItem(cstr.name.c_str());
 		ancard.push_back(trycode);
 		return;
 	}
@@ -1397,15 +1415,15 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
-		if(wcsstr(cit->second.name, pname) != 0) {
+		if(cit->second.name.find(pname) != std::wstring::npos) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(is_declarable(cp->second, opcode)) {
-				if(wcscmp(pname, cit->second.name) == 0) { //exact match
-					mainGame->lstANCard->insertItem(0, cit->second.name, -1);
+				if(pname == cit->second.name) { //exact match
+					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
 					ancard.insert(ancard.begin(), cit->first);
 				} else {
-					mainGame->lstANCard->addItem(cit->second.name);
+					mainGame->lstANCard->addItem(cit->second.name.c_str());
 					ancard.push_back(cit->first);
 				}
 			}

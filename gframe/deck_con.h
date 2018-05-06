@@ -62,6 +62,7 @@ public:
 	code_pointer draging_pointer;
 	int prev_deck;
 	s32 prev_operation;
+	int prev_sel;
 	bool is_modified;
 
 	std::unordered_map<int, int>* filterList;

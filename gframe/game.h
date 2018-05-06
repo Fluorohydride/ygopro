@@ -41,10 +41,17 @@ struct Config {
 	int auto_search_limit;
 	int chkIgnoreDeckChanges;
 	int defaultOT;
+	int enable_bot_mode;
+	bool enable_sound;
+	bool enable_music;
+	double sound_volume;
+	double music_volume;
+	int music_mode;
 };
 
 struct DuelInfo {
 	bool isStarted;
+	bool isFinished;
 	bool isReplay;
 	bool isReplaySkiping;
 	bool isFirst;
@@ -66,6 +73,15 @@ struct DuelInfo {
 	unsigned char time_player;
 	unsigned short time_limit;
 	unsigned short time_left[2];
+	bool isReplaySwapped;
+};
+
+struct BotInfo {
+	wchar_t name[256];
+	wchar_t command[256];
+	wchar_t desc[256];
+	bool support_master_rule_3;
+	bool support_new_master_rule;
 };
 
 struct FadingUnit {
@@ -92,7 +108,9 @@ public:
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
+	void RefreshBot();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
+	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
 	void CheckMutual(ClientCard* pcard, int mark);
@@ -113,7 +131,10 @@ public:
 	void SaveConfig();
 	void ShowCardInfo(int code);
 	void AddChatMsg(wchar_t* msg, int player);
+	void ClearChatMsg();
 	void AddDebugMsg(char* msgbuf);
+	bool MakeDirectory(const std::string folder);
+	void initUtils();
 	void ClearTextures();
 	void CloseDuelWindow();
 
@@ -127,6 +148,7 @@ public:
 
 	void SetWindowsIcon();
 	void FlashWindow();
+	void SetCursor(ECURSOR_ICON icon);
 
 	Mutex gMutex;
 	Mutex gBuffer;
@@ -142,12 +164,14 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
+	std::vector<BotInfo> botInfo;
 
 	int hideChatTimer;
 	bool hideChat;
 	int chatTiming[8];
 	int chatType[8];
-	unsigned short linePattern;
+	unsigned short linePatternD3D;
+	unsigned short linePatternGL;
 	int waitFrame;
 	int signalFrame;
 	int actionParam;
@@ -207,6 +231,9 @@ public:
 	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
 	irr::gui::IGUIScrollBar* scrCardText;
+	irr::gui::IGUIListBox* lstLog;
+	irr::gui::IGUIButton* btnClearLog;
+	irr::gui::IGUIButton* btnSaveLog;
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
@@ -216,13 +243,15 @@ public:
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
 	irr::gui::IGUICheckBox* chkAutoSearch;
-	irr::gui::IGUIListBox* lstLog;
-	irr::gui::IGUIButton* btnClearLog;
-	irr::gui::IGUIButton* btnSaveLog;
+	irr::gui::IGUICheckBox* chkEnableSound;
+	irr::gui::IGUICheckBox* chkEnableMusic;
+	irr::gui::IGUIScrollBar* scrSoundVolume;
+	irr::gui::IGUIScrollBar* scrMusicVolume;
+	irr::gui::IGUICheckBox* chkMusicMode;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
-	irr::gui::IGUIButton* btnServerMode;
+	irr::gui::IGUIButton* btnSingleMode;
 	irr::gui::IGUIButton* btnReplayMode;
 	irr::gui::IGUIButton* btnTestMode;
 	irr::gui::IGUIButton* btnDeckEdit;
@@ -273,10 +302,20 @@ public:
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIStaticText* stReplayInfo;
 	irr::gui::IGUIButton* btnLoadReplay;
+	irr::gui::IGUIButton* btnDeleteReplay;
+	irr::gui::IGUIButton* btnRenameReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
 	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
 	irr::gui::IGUIWindow* wSinglePlay;
+	irr::gui::IGUIListBox* lstBotList;
+	irr::gui::IGUIStaticText* stBotInfo;
+	irr::gui::IGUIButton* btnStartBot;
+	irr::gui::IGUIButton* btnBotCancel;
+	irr::gui::IGUICheckBox* chkBotOldRule;
+	irr::gui::IGUICheckBox* chkBotHand;
+	irr::gui::IGUICheckBox* chkBotNoCheckDeck;
+	irr::gui::IGUICheckBox* chkBotNoShuffleDeck;
 	irr::gui::IGUIListBox* lstSinglePlayList;
 	irr::gui::IGUIStaticText* stSinglePlayInfo;
 	irr::gui::IGUIButton* btnLoadSinglePlay;
@@ -479,6 +518,8 @@ extern Game* mainGame;
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
+#define BUTTON_DELETE_REPLAY		133
+#define BUTTON_RENAME_REPLAY		134
 #define EDITBOX_CHAT				140
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
@@ -565,10 +606,18 @@ extern Game* mainGame;
 #define BUTTON_REPLAY_SWAP			325
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
+#define BUTTON_BOT_START			340
+#define LISTBOX_BOT_LIST			341
+#define CHECKBOX_BOT_OLD_RULE		342
 #define LISTBOX_SINGLEPLAY_LIST		350
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_AUTO_SEARCH		360
+#define CHECKBOX_ENABLE_SOUND		361
+#define CHECKBOX_ENABLE_MUSIC		362
+#define SCROLL_VOLUME				363
+#define CHECKBOX_DISABLE_CHAT		364
+
 #define COMBOBOX_SORTTYPE			370
 #define COMBOBOX_LIMIT				371
 
