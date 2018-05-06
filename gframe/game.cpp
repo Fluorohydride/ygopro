@@ -1382,6 +1382,14 @@ void Game::initUtils() {
 	//original files
 	MakeDirectory("script");
 	MakeDirectory("textures");
+	//subdirs in textures
+	MakeDirectory("textures/act");
+	MakeDirectory("textures/attack");
+	MakeDirectory("textures/bg");
+	MakeDirectory("textures/bg_deck");
+	MakeDirectory("textures/bg_menu");
+	MakeDirectory("textures/cover");
+	MakeDirectory("textures/cover2");
 	//sound
 	MakeDirectory("sound");
 	MakeDirectory("sound/BGM");
