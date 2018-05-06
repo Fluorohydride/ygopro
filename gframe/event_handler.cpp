@@ -1889,6 +1889,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			return true;
 			break;
 		}
+		case irr::KEY_KEY_X:
+		case irr::KEY_F12: {
+			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
+				mainGame->takeScreenshot();
+			return true;
+			break;
+		}
 		default: break;
 		}
 		break;

@@ -1422,6 +1422,17 @@ void Game::FlashWindow() {
 	FlashWindowEx(&fi);
 #endif
 }
+void Game::takeScreenshot() {
+	irr::video::IImage* const image = driver->createScreenShot();
+	if(image) {
+		irr::c8 filename[64];
+		snprintf(filename, 64, "screenshots/ygopro_%u.png", device->getTimer()->getRealTime());
+		if (!driver->writeImageToFile(image, filename))
+			device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
+		image->drop();
+	} else
+		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
+}
 void Game::SetCursor(ECURSOR_ICON icon) {
 	ICursorControl* cursor = mainGame->device->getCursorControl();
 	if(cursor->getActiveIcon() != icon) {
