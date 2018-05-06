@@ -1414,7 +1414,7 @@ void Game::initUtils() {
 	MakeDirectory("replay");
 #ifdef YGOPRO_SERVER_MODE
 	//special scripts
-	MakeDirectory("specials");	
+	MakeDirectory("specials");
 #else
 	//cards from extra pack
 	MakeDirectory("expansions");
