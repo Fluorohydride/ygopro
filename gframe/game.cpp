@@ -13,7 +13,12 @@
 
 #ifndef _WIN32
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
+#include <unistd.h>
+#else
+#include <direct.h>
+#include <io.h>
 #endif
 
 const unsigned short PRO_VERSION = 0x1343;
@@ -24,6 +29,7 @@ Game* mainGame;
 
 bool Game::Initialize() {
 	srand(time(0));
+	initUtils();
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
@@ -284,7 +290,7 @@ bool Game::Initialize() {
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	posY = 20;
-	chkIgnore1 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1290));
+	chkIgnore1 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_DISABLE_CHAT, dataManager.GetSysString(1290));
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
 	posY += 30;
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1291));
@@ -1342,6 +1348,11 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	}
 	chatMsg[0].append(msg);
 }
+void Game::ClearChatMsg() {
+	for(int i = 7; i >= 0; --i) {
+		chatTiming[i] = 0;
+	}
+}
 void Game::AddDebugMsg(char* msg)
 {
 	if (enable_log & 0x1) {
@@ -1360,6 +1371,52 @@ void Game::AddDebugMsg(char* msg)
 		fprintf(fp, "[%s][Script Error]: %s\n", timebuf, msg);
 		fclose(fp);
 	}
+}
+bool Game::MakeDirectory(const std::string folder) {
+    std::string folder_builder;
+    std::string sub;
+    sub.reserve(folder.size());
+    for(auto it = folder.begin(); it != folder.end(); ++it) {
+        const char c = *it;
+        sub.push_back(c);
+        if(c == '/' || it == folder.end() - 1) {
+            folder_builder.append(sub);
+            if(access(folder_builder.c_str(), 0) != 0)
+#ifdef _WIN32
+                if(mkdir(folder_builder.c_str()) != 0)
+#else
+                if(mkdir(folder_builder.c_str(), 0777) != 0)
+#endif
+                    return false;
+            sub.clear();
+        }
+    }
+    return true;
+}
+void Game::initUtils() {
+	//user files
+	MakeDirectory("replay");
+	//cards from extra pack
+	MakeDirectory("expansions");
+	//files in ygopro-starter-pack
+	MakeDirectory("deck");
+	MakeDirectory("single");
+	//original files
+	MakeDirectory("script");
+	MakeDirectory("textures");
+	//sound
+	MakeDirectory("sound");
+	MakeDirectory("sound/BGM");
+	MakeDirectory("sound/BGM/advantage");
+	MakeDirectory("sound/BGM/deck");
+	MakeDirectory("sound/BGM/disadvantage");
+	MakeDirectory("sound/BGM/duel");
+	MakeDirectory("sound/BGM/lose");
+	MakeDirectory("sound/BGM/menu");
+	MakeDirectory("sound/BGM/win");
+	//pics
+	MakeDirectory("pics");
+	MakeDirectory("pics/field");
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
