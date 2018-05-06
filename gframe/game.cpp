@@ -1403,6 +1403,7 @@ void Game::initUtils() {
 	MakeDirectory("single");
 	//original files
 	MakeDirectory("script");
+	MakeDirectory("skin");
 	MakeDirectory("textures");
 	//sound
 	MakeDirectory("sound");
