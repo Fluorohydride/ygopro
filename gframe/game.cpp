@@ -1389,6 +1389,8 @@ void Game::initUtils() {
 	//original files
 	MakeDirectory("script");
 	MakeDirectory("textures");
+	//subdirs in textures
+	MakeDirectory("textures/pscale");
 	//sound
 	MakeDirectory("sound");
 	MakeDirectory("sound/BGM");
