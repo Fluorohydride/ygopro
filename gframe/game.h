@@ -110,6 +110,8 @@ public:
 	void MainServerLoop();
 	void LoadExpansionDB();
 	void AddDebugMsg(char* msgbuf);
+	void AddDebugMsg(char* msgbuf);
+	bool MakeDirectory(const std::string folder);
 #else
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
@@ -144,6 +146,8 @@ public:
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearChatMsg();
 	void AddDebugMsg(char* msgbuf);
+	bool MakeDirectory(const std::string folder);
+	void initUtils();
 	void ClearTextures();
 	void CloseDuelWindow();
 
