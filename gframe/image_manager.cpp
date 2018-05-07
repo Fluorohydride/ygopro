@@ -174,8 +174,11 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	int width = CARD_IMG_WIDTH;
 	int height = CARD_IMG_HEIGHT;
 	if(fit) {
-		width = width * mainGame->xScale;
-		height = height * mainGame->yScale;
+		float mul = mainGame->xScale;
+		if(mainGame->xScale > mainGame->yScale)
+			mul = mainGame->yScale;
+		width = width * mul;
+		height = height * mul;
 	}
 	auto tit = tMap[fit ? 1 : 0].find(code);
 	if(tit == tMap[fit ? 1 : 0].end()) {

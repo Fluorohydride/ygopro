@@ -1550,8 +1550,8 @@ void Game::OnResize() {
 		btnReset->setRelativePosition(recti(1, 1, width, height));
 	}
 
-	wCardImg->setRelativePosition(Resize(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18));
-	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
+	wCardImg->setRelativePosition(ResizeCard(1, 1, 20, 18));
+	imgCard->setRelativePosition(ResizeCard(10, 9, 0, 0));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
 	stName->setRelativePosition(recti(10, 10, 287 * xScale, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
@@ -1633,6 +1633,56 @@ recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2) {
 	y = y * yScale;
 	x2 = sx + x;
 	y2 = sy + y;
+	return recti(x, y, x2, y2);
+}
+recti Game::ResizeCard(s32 x, s32 y, s32 x2, s32 y2) {
+	float mul = xScale;
+	if(xScale > yScale)
+		mul = yScale;
+	s32 sx = CARD_IMG_WIDTH * mul + x2 * xScale;
+	s32 sy = CARD_IMG_HEIGHT * mul + y2 * yScale;
+	x = x * xScale;
+	y = y * yScale;
+	x2 = sx + x;
+	y2 = sy + y;
+	return recti(x, y, x2, y2);
+}
+recti Game::ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2) {
+	return ResizeCardMid(x, y, x2, y2, (x + x2) * 0.5, (y + y2) * 0.5);
+}
+position2di Game::ResizeCardHint(s32 x, s32 y) {
+	return ResizeCardMid(x, y, x + CARD_IMG_WIDTH * 0.5, y + CARD_IMG_HEIGHT * 0.5);
+}
+recti Game::ResizeCardMid(s32 x, s32 y, s32 x2, s32 y2, s32 midx, s32 midy) {
+	float mul = xScale;
+	if(xScale > yScale)
+		mul = yScale;
+	s32 cx = midx * xScale;
+	s32 cy = midy * yScale;
+	x = cx + (x - midx) * mul;
+	y = cy + (y - midy) * mul;
+	x2 = cx + (x2 - midx) * mul;
+	y2 = cy + (y2 - midy) * mul;
+	return recti(x, y, x2, y2);
+}
+position2di Game::ResizeCardMid(s32 x, s32 y, s32 midx, s32 midy) {
+	float mul = xScale;
+	if(xScale > yScale)
+		mul = yScale;
+	s32 cx = midx * xScale;
+	s32 cy = midy * yScale;
+	x = cx + (x - midx) * mul;
+	y = cy + (y - midy) * mul;
+	return position2di(x, y);
+}
+recti Game::ResizeFit(s32 x, s32 y, s32 x2, s32 y2) {
+	float mul = xScale;
+	if(xScale > yScale)
+		mul = yScale;
+	x = x * mul;
+	y = y * mul;
+	x2 = x2 * mul;
+	y2 = y2 * mul;
 	return recti(x, y, x2, y2);
 }
 void Game::SetWindowsIcon() {
