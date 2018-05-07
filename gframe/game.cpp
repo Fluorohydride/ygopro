@@ -1308,7 +1308,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	showingcode = code;
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
-	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
+	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), guiFont, showingtext);
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
@@ -1501,18 +1501,18 @@ void Game::OnResize() {
 	irr::gui::CGUITTFont* old_numFont = numFont;
 	irr::gui::CGUITTFont* old_adFont = adFont;
 	irr::gui::CGUITTFont* old_lpcFont = lpcFont;
-	irr::gui::CGUITTFont* old_guiFont = guiFont;
+	//irr::gui::CGUITTFont* old_guiFont = guiFont;
 	irr::gui::CGUITTFont* old_textFont = textFont;
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, (yScale > 0.5 ? 16 * yScale : 8));
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, (yScale > 0.75 ? 12 * yScale : 9));
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48 * yScale);
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
-	env->getSkin()->setFont(guiFont);
+	//guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
+	//env->getSkin()->setFont(guiFont);
 	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
 	old_numFont->drop();
 	old_adFont->drop();
 	old_lpcFont->drop();
-	old_guiFont->drop();
+	//old_guiFont->drop();
 	old_textFont->drop();
 
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));

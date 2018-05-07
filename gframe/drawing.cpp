@@ -898,7 +898,7 @@ void Game::DrawSpec() {
 				DrawShadowText(lpcFont, lstr, ResizeElem(650 - pos.Width / 2, 290, 950, 370), Resize(-1, -1, 0, 0), 0xffffffff);
 				if(dInfo.vic_string && (showcardcode == 1 || showcardcode == 2)) {
 					driver->draw2DRectangle(0xa0000000, ResizeElem(540, 320, 800, 340));
-					DrawShadowText(textFont, dInfo.vic_string, ResizeElem(500, 320, 840, 340), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true, 0);
+					DrawShadowText(guiFont, dInfo.vic_string, ResizeElem(500, 320, 840, 340), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true, 0);
 				}
 			} else if(showcardp < showcarddif + 10) {
 				int alpha = ((showcarddif + 10 - showcardp) * 25) << 24;
@@ -937,7 +937,7 @@ void Game::DrawSpec() {
 				continue;
 			if(!showChat && i > 2)
 				continue;
-			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
+			int w = guiFont->getDimension(chatMsg[i].c_str()).Width;
 
 			recti rectloc(mainGame->wChat->getRelativePosition().UpperLeftCorner.X, mainGame->window_size.Height - 45, mainGame->wChat->getRelativePosition().UpperLeftCorner.X + 2 + w, mainGame->window_size.Height - 25);
 			rectloc -= position2di(0, i * 20);
@@ -946,8 +946,8 @@ void Game::DrawSpec() {
 			recti shadowloc = msgloc + position2di(1, 1);
 
 			driver->draw2DRectangle(rectloc, 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
-			textFont->draw(chatMsg[i].c_str(), msgloc, 0xff000000, false, false);
-			textFont->draw(chatMsg[i].c_str(), shadowloc, chatColor[chatType[i]], false, false);
+			guiFont->draw(chatMsg[i].c_str(), msgloc, 0xff000000, false, false);
+			guiFont->draw(chatMsg[i].c_str(), shadowloc, chatColor[chatType[i]], false, false);
 		}
 	}
 }
