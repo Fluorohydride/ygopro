@@ -495,7 +495,7 @@ bool Game::Initialize() {
 	//filters
 	wFilter = env->addStaticText(L"", rect<s32>(610, 5, 1020, 130), true, false, 0, -1, true);
 	wFilter->setVisible(false);
-	stCategory = env->addStaticText(dataManager.GetSysString(1311), rect<s32>(10, 25 / 6 + 2, 70, 22 + 25 / 6), false, false, wFilter);
+	stCategory = env->addStaticText(dataManager.GetSysString(1311), rect<s32>(10, 2 + 25 / 6, 70, 22 + 25 / 6), false, false, wFilter);
 	cbCardType = env->addComboBox(rect<s32>(60, 25 / 6, 120, 20 + 25 / 6), wFilter, COMBOBOX_MAINTYPE);
 	cbCardType->addItem(dataManager.GetSysString(1310));
 	cbCardType->addItem(dataManager.GetSysString(1312));
@@ -1511,7 +1511,7 @@ void Game::OnResize() {
 	//env->getSkin()->setFont(guiFont);
 
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
-	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
+	wDeckEdit->setRelativePosition(Resize(309, 5, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
 	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
 	btnClearDeck->setRelativePosition(Resize(115, 99, 165, 120));
@@ -1523,19 +1523,19 @@ void Game::OnResize() {
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
 	cbSortType->setRelativePosition(Resize(10, 2, 85, 22));
-	wFilter->setRelativePosition(Resize(610, 8, 1020, 130));
+	wFilter->setRelativePosition(Resize(610, 5, 1020, 130));
 	scrFilter->setRelativePosition(Resize(999, 161, 1019, 629));
-	cbCardType->setRelativePosition(Resize(60, 3, 120, 23));
-	cbCardType2->setRelativePosition(Resize(130, 3, 190, 23));
-	cbRace->setRelativePosition(Resize(60, 49, 190, 69));
-	cbAttribute->setRelativePosition(Resize(60, 26, 190, 46));
-	cbLimit->setRelativePosition(Resize(260, 3, 390, 23));
-	ebStar->setRelativePosition(Resize(60, 72, 100, 92));
-	ebScale->setRelativePosition(Resize(150, 72, 190, 92));
-	ebAttack->setRelativePosition(Resize(260, 26, 340, 46));
-	ebDefense->setRelativePosition(Resize(260, 49, 340, 69));
-	ebCardName->setRelativePosition(Resize(260, 72, 390, 92));
-	btnEffectFilter->setRelativePosition(Resize(345, 28, 390, 69));
+	cbCardType->setRelativePosition(Resize(60, 25 / 6, 120, 20 + 25 / 6));
+	cbCardType2->setRelativePosition(Resize(130, 25 / 6, 190, 20 + 25 / 6));
+	cbRace->setRelativePosition(Resize(60, 40 + 75 / 6, 190, 60 + 75 / 6));
+	cbAttribute->setRelativePosition(Resize(60, 20 + 50 / 6, 190, 40 + 50 / 6));
+	cbLimit->setRelativePosition(Resize(260, 25 / 6, 390, 20 + 25 / 6));
+	ebStar->setRelativePosition(Resize(60, 60 + 100 / 6, 100, 80 + 100 / 6));
+	ebScale->setRelativePosition(Resize(150, 60 + 100 / 6, 190, 80 + 100 / 6));
+	ebAttack->setRelativePosition(Resize(260, 20 + 50 / 6, 340, 40 + 50 / 6));
+	ebDefense->setRelativePosition(Resize(260, 40 + 75 / 6, 340, 60 + 75 / 6));
+	ebCardName->setRelativePosition(Resize(260, 60 + 100 / 6, 390, 80 + 100 / 6));
+	btnEffectFilter->setRelativePosition(Resize(345, 20 + 50 / 6, 390, 60 + 75 / 6));
 	btnStartFilter->setRelativePosition(Resize(260, 80 + 125 / 6, 390, 100 + 125 / 6));
 	if(btnClearFilter)
 		btnClearFilter->setRelativePosition(Resize(205, 80 + 125 / 6, 255, 100 + 125 / 6));
@@ -1545,15 +1545,15 @@ void Game::OnResize() {
 	wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
 	stBanlist->setRelativePosition(ResizeWin(10, 9, 100, 29));
 	stDeck->setRelativePosition(ResizeWin(10, 39, 100, 59));
-	stCategory->setRelativePosition(ResizeWin(10, 5, 70, 25));
-	stLimit->setRelativePosition(ResizeWin(205, 5, 280, 25));
-	stAttribute->setRelativePosition(ResizeWin(10, 28, 70, 48));
-	stRace->setRelativePosition(ResizeWin(10, 51, 70, 71));
-	stAttack->setRelativePosition(ResizeWin(205, 28, 280, 48));
-	stDefense->setRelativePosition(ResizeWin(205, 51, 280, 71));
-	stStar->setRelativePosition(ResizeWin(10, 74, 80, 94));
-	stSearch->setRelativePosition(ResizeWin(205, 74, 280, 94));
-	stScale->setRelativePosition(ResizeWin(110, 74, 150, 94));
+	stCategory->setRelativePosition(ResizeWin(10, 2 + 25 / 6, 70, 22 + 25 / 6));
+	stLimit->setRelativePosition(ResizeWin(205, 2 + 25 / 6, 280, 22 + 25 / 6));
+	stAttribute->setRelativePosition(ResizeWin(10, 22 + 50 / 6, 70, 42 + 50 / 6));
+	stRace->setRelativePosition(ResizeWin(10, 42 + 75 / 6, 70, 62 + 75 / 6));
+	stAttack->setRelativePosition(ResizeWin(205, 22 + 50 / 6, 280, 42 + 50 / 6));
+	stDefense->setRelativePosition(ResizeWin(205, 42 + 75 / 6, 280, 62 + 75 / 6));
+	stStar->setRelativePosition(ResizeWin(10, 62 + 100 / 6, 70, 82 + 100 / 6));
+	stSearch->setRelativePosition(ResizeWin(205, 62 + 100 / 6, 280, 82 + 100 / 6));
+	stScale->setRelativePosition(ResizeWin(100, 62 + 100 / 6, 160, 82 + 100 / 6));
 	btnSideOK->setRelativePosition(Resize(510, 40, 820, 80));
 	btnSideShuffle->setRelativePosition(Resize(310, 100, 370, 130));
 	btnSideSort->setRelativePosition(Resize(375, 100, 435, 130));
