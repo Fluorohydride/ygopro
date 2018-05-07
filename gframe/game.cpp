@@ -74,7 +74,7 @@ bool Game::Initialize() {
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
-	textFont = guiFont;
+	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"YGOPro");
 	device->setResizable(true);
@@ -1253,7 +1253,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 				sc = aptr->second.setcode;
 		}
 		if(sc) {
-			offset = 23;
+			offset = 23 * yScale;
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
 			stSetName->setText(formatBuffer);
 		} else
@@ -1294,15 +1294,15 @@ void Game::ShowCardInfo(int code, bool resize) {
 			wcscat(formatBuffer, scaleBuffer);
 		}
 		stDataInfo->setText(formatBuffer);
-		stSetName->setRelativePosition(rect<s32>(15, 83, 296 * xScale, 106));
-		stText->setRelativePosition(rect<s32>(15, 83 + offset, 287 * xScale, 324 * yScale));
+		stSetName->setRelativePosition(rect<s32>(15, 83 * yScale, 296 * xScale, 83 * yScale + offset));
+		stText->setRelativePosition(rect<s32>(15, 83 * yScale + offset, 287 * xScale, 324 * yScale));
 		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, 83 + offset, 287 * xScale, 324 * yScale));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
-		stSetName->setRelativePosition(rect<s32>(15, 60, 296 * xScale, 83));
-		stText->setRelativePosition(rect<s32>(15, 60 + offset, 287 * xScale, 324 * yScale));
+		stSetName->setRelativePosition(rect<s32>(15, 60 * yScale, 296 * xScale, 60 * yScale + offset));
+		stText->setRelativePosition(rect<s32>(15, 60 * yScale + offset, 287 * xScale, 324 * yScale));
 		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, 60 + offset, 287 * xScale, 324 * yScale));
 	}
 	showingcode = code;
@@ -1501,14 +1501,19 @@ void Game::OnResize() {
 	irr::gui::CGUITTFont* old_numFont = numFont;
 	irr::gui::CGUITTFont* old_adFont = adFont;
 	irr::gui::CGUITTFont* old_lpcFont = lpcFont;
+	irr::gui::CGUITTFont* old_guiFont = guiFont;
+	irr::gui::CGUITTFont* old_textFont = textFont;
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, (yScale > 0.5 ? 16 * yScale : 8));
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, (yScale > 0.75 ? 12 * yScale : 9));
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48 * yScale);
+	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
+	env->getSkin()->setFont(guiFont);
+	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
 	old_numFont->drop();
 	old_adFont->drop();
 	old_lpcFont->drop();
-	//guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
-	//env->getSkin()->setFont(guiFont);
+	old_guiFont->drop();
+	old_textFont->drop();
 
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
 	wDeckEdit->setRelativePosition(Resize(309, 5, 605, 130));
@@ -1543,17 +1548,17 @@ void Game::OnResize() {
 
 	wCategories->setRelativePosition(ResizeWin(450, 60, 1000, 270));
 	wLinkMarks->setRelativePosition(ResizeWin(700, 30, 820, 150));
-	stBanlist->setRelativePosition(ResizeWin(10, 9, 100, 29));
-	stDeck->setRelativePosition(ResizeWin(10, 39, 100, 59));
-	stCategory->setRelativePosition(ResizeWin(10, 2 + 25 / 6, 70, 22 + 25 / 6));
-	stLimit->setRelativePosition(ResizeWin(205, 2 + 25 / 6, 280, 22 + 25 / 6));
-	stAttribute->setRelativePosition(ResizeWin(10, 22 + 50 / 6, 70, 42 + 50 / 6));
-	stRace->setRelativePosition(ResizeWin(10, 42 + 75 / 6, 70, 62 + 75 / 6));
-	stAttack->setRelativePosition(ResizeWin(205, 22 + 50 / 6, 280, 42 + 50 / 6));
-	stDefense->setRelativePosition(ResizeWin(205, 42 + 75 / 6, 280, 62 + 75 / 6));
-	stStar->setRelativePosition(ResizeWin(10, 62 + 100 / 6, 70, 82 + 100 / 6));
-	stSearch->setRelativePosition(ResizeWin(205, 62 + 100 / 6, 280, 82 + 100 / 6));
-	stScale->setRelativePosition(ResizeWin(100, 62 + 100 / 6, 160, 82 + 100 / 6));
+	stBanlist->setRelativePosition(Resize(10, 9, 100, 29));
+	stDeck->setRelativePosition(Resize(10, 39, 100, 59));
+	stCategory->setRelativePosition(Resize(10, 2 + 25 / 6, 70, 22 + 25 / 6));
+	stLimit->setRelativePosition(Resize(205, 2 + 25 / 6, 280, 22 + 25 / 6));
+	stAttribute->setRelativePosition(Resize(10, 22 + 50 / 6, 70, 42 + 50 / 6));
+	stRace->setRelativePosition(Resize(10, 42 + 75 / 6, 70, 62 + 75 / 6));
+	stAttack->setRelativePosition(Resize(205, 22 + 50 / 6, 280, 42 + 50 / 6));
+	stDefense->setRelativePosition(Resize(205, 42 + 75 / 6, 280, 62 + 75 / 6));
+	stStar->setRelativePosition(Resize(10, 62 + 100 / 6, 70, 82 + 100 / 6));
+	stSearch->setRelativePosition(Resize(205, 62 + 100 / 6, 280, 82 + 100 / 6));
+	stScale->setRelativePosition(Resize(100, 62 + 100 / 6, 160, 82 + 100 / 6));
 	btnSideOK->setRelativePosition(Resize(510, 40, 820, 80));
 	btnSideShuffle->setRelativePosition(Resize(310, 100, 370, 130));
 	btnSideSort->setRelativePosition(Resize(375, 100, 435, 130));
@@ -1605,7 +1610,9 @@ void Game::OnResize() {
 	wCardImg->setRelativePosition(ResizeCard(1, 1, 20, 18));
 	imgCard->setRelativePosition(ResizeCard(10, 9, 0, 0));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
-	stName->setRelativePosition(recti(10, 10, 287 * xScale, 32));
+	stName->setRelativePosition(recti(10, 10, 300 * xScale - 13, 10 + 22 * yScale));
+	stInfo->setRelativePosition(recti(15, 37 * yScale, 300 * xScale - 13, 60 * yScale));
+	stDataInfo->setRelativePosition(recti(15, 60 * yScale, 300 * xScale - 13, 83 * yScale));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	//const auto& tsize = stText->getRelativePosition();
 	if(showingcode)
