@@ -1253,7 +1253,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 				sc = aptr->second.setcode;
 		}
 		if(sc) {
-			offset = 23 * yScale;
+			offset = 23;// *yScale;
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
 			stSetName->setText(formatBuffer);
 		} else
@@ -1294,15 +1294,19 @@ void Game::ShowCardInfo(int code, bool resize) {
 			wcscat(formatBuffer, scaleBuffer);
 		}
 		stDataInfo->setText(formatBuffer);
-		stSetName->setRelativePosition(rect<s32>(15, 83 * yScale, 296 * xScale, 83 * yScale + offset));
-		stText->setRelativePosition(rect<s32>(15, 83 * yScale + offset, 287 * xScale, 324 * yScale));
+		//stSetName->setRelativePosition(rect<s32>(15, 83 * yScale, 296 * xScale, 83 * yScale + offset));
+		//stText->setRelativePosition(rect<s32>(15, 83 * yScale + offset, 287 * xScale, 324 * yScale));
+		stSetName->setRelativePosition(rect<s32>(15, 83, 296 * xScale, 83 + offset));
+		stText->setRelativePosition(rect<s32>(15, 83 + offset, 287 * xScale, 324 * yScale));
 		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, 83 + offset, 287 * xScale, 324 * yScale));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
-		stSetName->setRelativePosition(rect<s32>(15, 60 * yScale, 296 * xScale, 60 * yScale + offset));
-		stText->setRelativePosition(rect<s32>(15, 60 * yScale + offset, 287 * xScale, 324 * yScale));
+		//stSetName->setRelativePosition(rect<s32>(15, 60 * yScale, 296 * xScale, 60 * yScale + offset));
+		//stText->setRelativePosition(rect<s32>(15, 60 * yScale + offset, 287 * xScale, 324 * yScale));
+		stSetName->setRelativePosition(rect<s32>(15, 60, 296 * xScale, 60 + offset));
+		stText->setRelativePosition(rect<s32>(15, 60 + offset, 287 * xScale, 324 * yScale));
 		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, 60 + offset, 287 * xScale, 324 * yScale));
 	}
 	showingcode = code;
@@ -1508,7 +1512,7 @@ void Game::OnResize() {
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48 * yScale);
 	//guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
 	//env->getSkin()->setFont(guiFont);
-	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize * yScale);
+	textFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, (yScale > 0.642 ? gameConf.textfontsize * yScale : 9));
 	old_numFont->drop();
 	old_adFont->drop();
 	old_lpcFont->drop();
@@ -1610,9 +1614,10 @@ void Game::OnResize() {
 	wCardImg->setRelativePosition(ResizeCard(1, 1, 20, 18));
 	imgCard->setRelativePosition(ResizeCard(10, 9, 0, 0));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
-	stName->setRelativePosition(recti(10, 10, 300 * xScale - 13, 10 + 22 * yScale));
-	stInfo->setRelativePosition(recti(15, 37 * yScale, 300 * xScale - 13, 60 * yScale));
-	stDataInfo->setRelativePosition(recti(15, 60 * yScale, 300 * xScale - 13, 83 * yScale));
+	stName->setRelativePosition(recti(10, 10, 300 * xScale - 13, 10 + 22));
+	//stName->setRelativePosition(recti(10, 10, 300 * xScale - 13, 10 + 22 * yScale));
+	//stInfo->setRelativePosition(recti(15, 37 * yScale, 300 * xScale - 13, 60 * yScale));
+	//stDataInfo->setRelativePosition(recti(15, 60 * yScale, 300 * xScale - 13, 83 * yScale));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	//const auto& tsize = stText->getRelativePosition();
 	if(showingcode)
