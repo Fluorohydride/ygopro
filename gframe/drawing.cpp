@@ -781,7 +781,7 @@ void Game::DrawSpec() {
 		}
 		case 2: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
-			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 150, 761, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, CARD_IMG_HEIGHT), 0, 0, true);
+			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 150, 751, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, CARD_IMG_HEIGHT), 0, 0, true);
 			showcarddif += 15;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;
