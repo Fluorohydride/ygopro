@@ -874,14 +874,21 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_SET_CARD: {
+			int loc = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			RefreshMzone(0, 0x181fff, 0);
-			RefreshMzone(1, 0x181fff, 0);
+			if(loc == LOCATION_MZONE) {
+				RefreshMzone(0, 0x181fff, 0);
+				RefreshMzone(1, 0x181fff, 0);
+			}
+			else {
+				RefreshSzone(0, 0x181fff, 0);
+				RefreshSzone(1, 0x181fff, 0);
+			}
 			break;
 		}
 		case MSG_NEW_TURN: {

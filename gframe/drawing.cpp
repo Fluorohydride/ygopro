@@ -660,8 +660,7 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {
-		std::map<irr::gui::CGUIImageButton*, int>::iterator mit;
-		for(mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
+		for(auto mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
 			mit->first->setImage(imageManager.GetTexture(mit->second));
 		imageLoading.clear();
 	}
