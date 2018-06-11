@@ -444,6 +444,7 @@ namespace ygo {
 				break;
 			}
 			case MSG_SHUFFLE_SET_CARD: {
+				pbuf++;
 				count = BufferIO::ReadInt8(pbuf);
 				pbuf += count * 8;
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
