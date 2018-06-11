@@ -213,8 +213,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SIDE_OK: {
-				if(deckManager.current_deck.main.size() != pre_mainc || deckManager.current_deck.extra.size() != pre_extrac
-				        || deckManager.current_deck.side.size() != pre_sidec) {
+				if(deckManager.current_deck.main.size() != deckManager.pre_deck.main.size() || deckManager.current_deck.extra.size() != deckManager.pre_deck.extra.size()
+				        || deckManager.current_deck.side.size() != deckManager.pre_deck.side.size()) {
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1410));
 					break;
 				}
@@ -240,7 +240,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SIDE_RELOAD: {
-				deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+				deckManager.current_deck = deckManager.pre_deck;
 				break;
 			}
 			case BUTTON_MSG_OK: {
@@ -982,8 +982,7 @@ bool DeckBuilder::push_main(code_pointer pointer, int seq) {
 	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.main;
-	int maxc = mainGame->is_siding ? 64 : 60;
-	if((int)container.size() >= maxc)
+	if(!mainGame->is_siding)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);
@@ -996,8 +995,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
 		return false;
 	auto& container = deckManager.current_deck.extra;
-	int maxc = mainGame->is_siding ? 20 : 15;
-	if((int)container.size() >= maxc)
+	if(!mainGame->is_siding)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);
@@ -1008,8 +1006,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 }
 bool DeckBuilder::push_side(code_pointer pointer, int seq) {
 	auto& container = deckManager.current_deck.side;
-	int maxc = mainGame->is_siding ? 20 : 15;
-	if((int)container.size() >= maxc)
+	if(!mainGame->is_siding)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);

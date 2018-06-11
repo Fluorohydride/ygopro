@@ -1056,7 +1056,7 @@ void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, i
 		limitloc = recti(pos.X, pos.Y, pos.X + 20 * window_size.Width / 1024, pos.Y + 20 * window_size.Height / 640);
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height));
-	if(lflist->count(lcode)) {
+	if(!mainGame->is_siding && lflist->count(lcode)) {
 		switch((*lflist)[lcode]) {
 		case 0:
 			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), 0, 0, true);

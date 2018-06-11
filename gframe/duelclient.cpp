@@ -394,9 +394,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->deckBuilder.results.clear();
 		mainGame->deckBuilder.hovered_code = 0;
 		mainGame->deckBuilder.is_draging = false;
-		mainGame->deckBuilder.pre_mainc = deckManager.current_deck.main.size();
-		mainGame->deckBuilder.pre_extrac = deckManager.current_deck.extra.size();
-		mainGame->deckBuilder.pre_sidec = deckManager.current_deck.side.size();
+		deckManager.pre_deck = deckManager.current_deck;
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type == 0;
 		mainGame->gMutex.Unlock();

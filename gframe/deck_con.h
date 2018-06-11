@@ -54,9 +54,6 @@ public:
 	bool is_draging;
 	int dragx;
 	int dragy;
-	size_t pre_mainc;
-	size_t pre_extrac;
-	size_t pre_sidec;
 	code_pointer draging_pointer;
 	int prev_deck;
 	s32 prev_operation;

@@ -33,6 +33,7 @@ struct Deck {
 class DeckManager {
 public:
 	Deck current_deck;
+	Deck pre_deck;
 	std::vector<LFList> _lfList;
 
 	void LoadLFList();
