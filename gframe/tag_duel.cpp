@@ -1892,13 +1892,13 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	BufferIO::WriteInt16(pbuf, 0);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, startbuf, 18);
 
-	int newturn_count = 1;
-	if(turn_player == 1)
-		newturn_count = 2;
+	int newturn_count = turn_count % 4;
+	if(newturn_count == 0)
+		newturn_count = 4;
 	for(int i = 0; i < newturn_count; i++) {
 		char turnbuf[2], *pbuf_t = turnbuf;
 		BufferIO::WriteInt8(pbuf_t, MSG_NEW_TURN);
-		BufferIO::WriteInt8(pbuf_t, i);
+		BufferIO::WriteInt8(pbuf_t, i % 2);
 		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, turnbuf, 2);		
 	}	
 
