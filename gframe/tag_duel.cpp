@@ -1878,7 +1878,7 @@ void TagDuel::WaitforResponse(int playerid) {
 void TagDuel::RequestField(DuelPlayer* dp) {
 	if(dp->type > 3)
 		return;
-	int player = (dp->type > 1) ? 2 : 0;
+	int player = (dp->type > 1) ? 1 : 0;
 	NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 
 	char startbuf[32], *pbuf = startbuf;
