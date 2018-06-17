@@ -1836,18 +1836,18 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	char* qbuf = query_buffer;
 	int length = query_field_info(pduel, (unsigned char*)qbuf);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, query_buffer, length);
-	RefreshMzone(1 - player, 0xffffff, 0, dp);
-	RefreshMzone(player, 0xffffff, 0, dp);
-	RefreshSzone(1 - player, 0xffffff, 0, dp);
-	RefreshSzone(player, 0xffffff, 0, dp);
-	RefreshHand(1 - player, 0xffffff, 0, dp);
-	RefreshHand(player, 0xffffff, 0, dp);
-	RefreshGrave(1 - player, 0xffffff, 0, dp);
-	RefreshGrave(player, 0xffffff, 0, dp);
-	RefreshExtra(1 - player, 0xffffff, 0, dp);
-	RefreshExtra(player, 0xffffff, 0, dp);
-	RefreshRemoved(1 - player, 0xffffff, 0, dp);
-	RefreshRemoved(player, 0xffffff, 0, dp);
+	RefreshMzone(1 - player, 0xffdfff, 0, dp);
+	RefreshMzone(player, 0xffdfff, 0, dp);
+	RefreshSzone(1 - player, 0xffdfff, 0, dp);
+	RefreshSzone(player, 0xffdfff, 0, dp);
+	RefreshHand(1 - player, 0xffdfff, 0, dp);
+	RefreshHand(player, 0xffdfff, 0, dp);
+	RefreshGrave(1 - player, 0xffdfff, 0, dp);
+	RefreshGrave(player, 0xffdfff, 0, dp);
+	RefreshExtra(1 - player, 0xffdfff, 0, dp);
+	RefreshExtra(player, 0xffdfff, 0, dp);
+	RefreshRemoved(1 - player, 0xffdfff, 0, dp);
+	RefreshRemoved(player, 0xffdfff, 0, dp);
 	NetServer::SendPacketToPlayer(dp, STOC_FIELD_FINISH);
 }
 #endif //YGOPRO_SERVER_MODE
