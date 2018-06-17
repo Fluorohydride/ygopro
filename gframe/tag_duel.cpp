@@ -591,6 +591,10 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		NetServer::SendBufferToPlayer(cache_recorder, STOC_GAME_MSG, startbuf, 18);
 	if(replay_recorder)
 		NetServer::SendBufferToPlayer(replay_recorder, STOC_GAME_MSG, startbuf, 18);
+	lp[0] = host_info.start_lp;
+	lp[1] = host_info.start_lp;
+	turn_player = 0;
+	phase = 1;
 #endif
 	RefreshExtra(0);
 	RefreshExtra(1);
@@ -1028,7 +1032,11 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_NEW_TURN: {
+#ifdef YGOPRO_SERVER_MODE
+			turn_player = BufferIO::ReadInt8(pbuf);
+#else
 			pbuf++;
+#endif
 			time_limit[0] = host_info.time_limit;
 			time_limit[1] = host_info.time_limit;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
@@ -1057,7 +1065,11 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_NEW_PHASE: {
+#ifdef YGOPRO_SERVER_MODE
+			phase = BufferIO::ReadInt16(pbuf);
+#else
 			pbuf += 2;
+#endif
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			NetServer::ReSendToPlayer(players[2]);
@@ -1426,7 +1438,15 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_DAMAGE: {
+#ifdef YGOPRO_SERVER_MODE
+			int player = BufferIO::ReadInt8(pbuf);
+			int val = BufferIO::ReadInt32(pbuf);
+			lp[player] -= val;
+			if(lp[player] < 0)
+				lp[player] = 0;
+#else
 			pbuf += 5;
+#endif
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			NetServer::ReSendToPlayer(players[2]);
@@ -1439,7 +1459,13 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_RECOVER: {
+#ifdef YGOPRO_SERVER_MODE
+			int player = BufferIO::ReadInt8(pbuf);
+			int val = BufferIO::ReadInt32(pbuf);
+			lp[player] += val;
+#else
 			pbuf += 5;
+#endif
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			NetServer::ReSendToPlayer(players[2]);
@@ -1465,7 +1491,13 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_LPUPDATE: {
+#ifdef YGOPRO_SERVER_MODE
+			int player = BufferIO::ReadInt8(pbuf);
+			int val = BufferIO::ReadInt32(pbuf);
+			lp[player] = val;
+#else
 			pbuf += 5;
+#endif
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			NetServer::ReSendToPlayer(players[2]);
@@ -1517,7 +1549,15 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_PAY_LPCOST: {
+#ifdef YGOPRO_SERVER_MODE
+			int player = BufferIO::ReadInt8(pbuf);
+			int val = BufferIO::ReadInt32(pbuf);
+			lp[player] -= val;
+			if(lp[player] < 0)
+				lp[player] = 0;
+#else
 			pbuf += 5;
+#endif
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			NetServer::ReSendToPlayer(players[2]);
@@ -1834,6 +1874,58 @@ void TagDuel::WaitforResponse(int playerid) {
 	} else
 		cur_player[playerid]->state = CTOS_RESPONSE;
 }
+#ifdef YGOPRO_SERVER_MODE
+void TagDuel::RequestField(DuelPlayer* dp) {
+	if(dp->type > 3)
+		return;
+	int player = (dp->type > 1) ? 2 : 0;
+	NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
+
+	char startbuf[32], *pbuf = startbuf;
+	BufferIO::WriteInt8(pbuf, MSG_START);
+	BufferIO::WriteInt8(pbuf, player);
+	BufferIO::WriteInt32(pbuf, lp[0]);
+	BufferIO::WriteInt32(pbuf, lp[1]);
+	BufferIO::WriteInt16(pbuf, 0);
+	BufferIO::WriteInt16(pbuf, 0);
+	BufferIO::WriteInt16(pbuf, 0);
+	BufferIO::WriteInt16(pbuf, 0);
+	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, startbuf, 18);
+
+	int newturn_count = 1;
+	if(turn_player == 1)
+		newturn_count = 2;
+	for(int i = 0; i < newturn_count; i++) {
+		char turnbuf[2], *pbuf_t = turnbuf;
+		BufferIO::WriteInt8(pbuf_t, MSG_NEW_TURN);
+		BufferIO::WriteInt8(pbuf_t, i);
+		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, turnbuf, 2);		
+	}	
+
+	char phasebuf[4], *pbuf_p = phasebuf;
+	BufferIO::WriteInt8(pbuf_p, MSG_NEW_PHASE);
+	BufferIO::WriteInt16(pbuf_p, phase);
+	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, phasebuf, 3);
+
+	char query_buffer[256];
+	char* qbuf = query_buffer;
+	int length = query_field_info(pduel, (unsigned char*)qbuf);
+	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, query_buffer, length);
+	RefreshMzone(1 - player, 0xffffff, 0, dp);
+	RefreshMzone(player, 0xffffff, 0, dp);
+	RefreshSzone(1 - player, 0xffffff, 0, dp);
+	RefreshSzone(player, 0xffffff, 0, dp);
+	RefreshHand(1 - player, 0xffffff, 0, dp);
+	RefreshHand(player, 0xffffff, 0, dp);
+	RefreshGrave(1 - player, 0xffffff, 0, dp);
+	RefreshGrave(player, 0xffffff, 0, dp);
+	RefreshExtra(1 - player, 0xffffff, 0, dp);
+	RefreshExtra(player, 0xffffff, 0, dp);
+	RefreshRemoved(1 - player, 0xffffff, 0, dp);
+	RefreshRemoved(player, 0xffffff, 0, dp);
+	NetServer::SendPacketToPlayer(dp, STOC_FIELD_FINISH);
+}
+#endif //YGOPRO_SERVER_MODE
 void TagDuel::TimeConfirm(DuelPlayer* dp) {
 	if(host_info.time_limit == 0)
 		return;
@@ -1844,7 +1936,12 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 	timeval timeout = {1, 0};
 	event_add(etimer, &timeout);
 }
-void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
+#ifdef YGOPRO_SERVER_MODE
+void TagDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
+#else
+void TagDuel::RefreshMzone(int player, int flag, int use_cache)
+#endif //YGOPRO_SERVER_MODE
+{
 	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
@@ -1852,10 +1949,17 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_MZONE);
 	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, (unsigned char*)qbuf, use_cache);
 	int pid = (player == 0) ? 0 : 2;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
-	NetServer::ReSendToPlayer(players[pid + 1]);
 #ifdef YGOPRO_SERVER_MODE
-	NetServer::ReSendToPlayer(replay_recorder);
+if(!dp || dp == players[pid])
+#endif
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp || dp == players[pid + 1])
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
+#else
+	NetServer::ReSendToPlayer(players[pid + 1]);
 #endif
 	int qlen = 0;
 	while(qlen < len) {
@@ -1868,15 +1972,30 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[pid])
+#endif
 	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp || dp == players[pid + 1])
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+if(!dp)
+#else
 	NetServer::ReSendToPlayer(players[pid + 1]);
+#endif
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
-	NetServer::ReSendToPlayer(cache_recorder);
+	if(!dp)
+		NetServer::ReSendToPlayer(cache_recorder);
 #endif
 }
-void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
+#ifdef YGOPRO_SERVER_MODE
+void TagDuel::RefreshSzone(int player, int flag, int use_cache, DuelPlayer* dp)
+#else
+void TagDuel::RefreshSzone(int player, int flag, int use_cache)
+#endif //YGOPRO_SERVER_MODE
+{
 	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
@@ -1884,10 +2003,17 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_SZONE);
 	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, (unsigned char*)qbuf, use_cache);
 	int pid = (player == 0) ? 0 : 2;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
-	NetServer::ReSendToPlayer(players[pid + 1]);
 #ifdef YGOPRO_SERVER_MODE
-	NetServer::ReSendToPlayer(replay_recorder);
+if(!dp || dp == players[pid])
+#endif
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp || dp == players[pid + 1])
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
+#else
+	NetServer::ReSendToPlayer(players[pid + 1]);
 #endif
 	int qlen = 0;
 	while(qlen < len) {
@@ -1900,24 +2026,43 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[pid])
+#endif
 	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp || dp == players[pid + 1])
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+if(!dp)
+#else
 	NetServer::ReSendToPlayer(players[pid + 1]);
+#endif
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
-	NetServer::ReSendToPlayer(cache_recorder);
+	if(!dp)
+		NetServer::ReSendToPlayer(cache_recorder);
 #endif
 }
-void TagDuel::RefreshHand(int player, int flag, int use_cache) {
+#ifdef YGOPRO_SERVER_MODE
+void TagDuel::RefreshHand(int player, int flag, int use_cache, DuelPlayer* dp)
+#else
+void TagDuel::RefreshHand(int player, int flag, int use_cache)
+#endif //YGOPRO_SERVER_MODE
+{
 	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
 	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == cur_player[player])
+#endif
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
 #ifdef YGOPRO_SERVER_MODE
-	NetServer::ReSendToPlayer(replay_recorder);
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
 #endif
 	int qlen = 0;
 	while(qlen < len) {
@@ -1934,40 +2079,128 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 		qlen += slen;
 	}
 	for(int i = 0; i < 4; ++i)
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[i])
+#endif
 		if(players[i] != cur_player[player])
 			NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, query_buffer, len + 3);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp)
+#endif
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
-	NetServer::ReSendToPlayer(cache_recorder);
+	if(!dp)
+		NetServer::ReSendToPlayer(cache_recorder);
 #endif
 }
-void TagDuel::RefreshGrave(int player, int flag, int use_cache) {
+#ifdef YGOPRO_SERVER_MODE
+void TagDuel::RefreshGrave(int player, int flag, int use_cache, DuelPlayer* dp)
+#else
+void TagDuel::RefreshGrave(int player, int flag, int use_cache)
+#endif //YGOPRO_SERVER_MODE
+{
 	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_GRAVE);
 	int len = query_field_card(pduel, player, LOCATION_GRAVE, flag, (unsigned char*)qbuf, use_cache);
+#ifdef YGOPRO_SERVER_MODE
+	for(int i = 0; i < 4; ++i)
+		if(!dp || dp == players[i])
+			NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, query_buffer, len + 3);
+if(!dp)
+#else
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, query_buffer, len + 3);
 	NetServer::ReSendToPlayer(players[1]);
 	NetServer::ReSendToPlayer(players[2]);
 	NetServer::ReSendToPlayer(players[3]);
+#endif
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 #ifdef YGOPRO_SERVER_MODE
+	if(!dp)
 		NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
 #endif
 }
-void TagDuel::RefreshExtra(int player, int flag, int use_cache) {
+#ifdef YGOPRO_SERVER_MODE
+void TagDuel::RefreshExtra(int player, int flag, int use_cache, DuelPlayer* dp)
+#else
+void TagDuel::RefreshExtra(int player, int flag, int use_cache)
+#endif //YGOPRO_SERVER_MODE
+{
 	char query_buffer[0x2000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_EXTRA);
 	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, (unsigned char*)qbuf, use_cache);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == cur_player[player])
+#endif
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
+#ifdef YGOPRO_SERVER_MODE
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
+	int qlen = 0;
+	while(qlen < len) {
+		int clen = BufferIO::ReadInt32(qbuf);
+		qlen += clen;
+		if (clen == 4)
+			continue;
+		if (qbuf[11] & POS_FACEDOWN)
+			memset(qbuf, 0, clen - 4);
+		qbuf += clen - 4;
+	}
+	for(int i = 0; i < 4; ++i)
+		if(!dp || dp == players[i])
+			if(players[i] != cur_player[player])
+				NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, query_buffer, len + 3);
+	if(!dp)
+		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+			NetServer::ReSendToPlayer(*pit);
+	if(!dp)
+		NetServer::ReSendToPlayer(cache_recorder);
+#endif
 }
+#ifdef YGOPRO_SERVER_MODE
+void TagDuel::RefreshRemoved(int player, int flag, int use_cache, DuelPlayer* dp) {
+	char query_buffer[0x2000];
+	char* qbuf = query_buffer;
+	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
+	BufferIO::WriteInt8(qbuf, player);
+	BufferIO::WriteInt8(qbuf, LOCATION_REMOVED);
+	int len = query_field_card(pduel, player, LOCATION_REMOVED, flag, (unsigned char*)qbuf, use_cache);
+	int pid = (player == 0) ? 0 : 2;
+	if(!dp || dp == players[pid])
+		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+	if(!dp || dp == players[pid + 1])
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+	if(!dp)
+		NetServer::ReSendToPlayer(replay_recorder);
+	int qlen = 0;
+	while(qlen < len) {
+		int clen = BufferIO::ReadInt32(qbuf);
+		qlen += clen;
+		if (clen == 4)
+			continue;
+		if (qbuf[11] & POS_FACEDOWN)
+			memset(qbuf, 0, clen - 4);
+		qbuf += clen - 4;
+	}
+	pid = 2 - pid;
+	if(!dp || dp == players[pid])
+		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+	if(!dp || dp == players[pid + 1])
+		NetServer::SendBufferToPlayer(players[pid + 1], STOC_GAME_MSG, query_buffer, len + 3);
+	if(!dp)
+		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+			NetServer::ReSendToPlayer(*pit);
+	if(!dp)
+		NetServer::ReSendToPlayer(cache_recorder);
+}
+#endif
 void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	char query_buffer[0x2000];
 	char* qbuf = query_buffer;

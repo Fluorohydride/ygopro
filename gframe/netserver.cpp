@@ -226,7 +226,11 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	char* pdata = data;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
+#ifdef YGOPRO_SERVER_MODE
+	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (pktType != CTOS_REQUEST_FIELD) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
+#else
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
+#endif
 		return;
 	switch(pktType) {
 	case CTOS_RESPONSE: {
@@ -356,6 +360,14 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode->StartDuel(dp);
 		break;
 	}
+#ifdef YGOPRO_SERVER_MODE
+	case CTOS_REQUEST_FIELD: {
+		if(!dp->game || !duel_mode->pduel)
+			break;
+		duel_mode->RequestField(dp);
+		break;
+	}
+#endif
 	}
 }
 
