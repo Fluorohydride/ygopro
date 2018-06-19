@@ -1915,8 +1915,8 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	RefreshMzone(player, 0xffdfff, 0, dp);
 	RefreshSzone(1 - player, 0xffdfff, 0, dp);
 	RefreshSzone(player, 0xffdfff, 0, dp);
-	RefreshHand(1 - player, 0xffdfff, 0, dp);
-	RefreshHand(player, 0xffdfff, 0, dp);
+	RefreshHand(1 - player, 0x7fdfff, 0, dp);
+	RefreshHand(player, 0x7fdfff, 0, dp);
 	RefreshGrave(1 - player, 0xffdfff, 0, dp);
 	RefreshGrave(player, 0xffdfff, 0, dp);
 	RefreshExtra(1 - player, 0xffdfff, 0, dp);
