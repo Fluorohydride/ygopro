@@ -1122,6 +1122,7 @@ void Game::LoadConfig() {
 			gameConf.defaultOT = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_bot_mode")) {
 			gameConf.enable_bot_mode = atoi(valbuf);
+#ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "sound_volume")) {
@@ -1132,6 +1133,7 @@ void Game::LoadConfig() {
 			gameConf.music_volume = atof(valbuf) / 100;
 		} else if(!strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = atoi(valbuf);
+#endif
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1192,6 +1194,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "ignore_deck_changes = %d\n", (chkIgnoreDeckChanges->isChecked() ? 1 : 0));
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
+#ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
@@ -1202,6 +1205,7 @@ void Game::SaveConfig() {
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	fprintf(fp, "music_volume = %d\n", vol);
 	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
+#endif
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
@@ -1383,6 +1387,7 @@ void Game::initUtils() {
 	MakeDirectory("script");
 	MakeDirectory("textures");
 	//sound
+#ifdef YGOPRO_USE_IRRKLANG
 	MakeDirectory("sound");
 	MakeDirectory("sound/BGM");
 	MakeDirectory("sound/BGM/advantage");
@@ -1392,6 +1397,7 @@ void Game::initUtils() {
 	MakeDirectory("sound/BGM/lose");
 	MakeDirectory("sound/BGM/menu");
 	MakeDirectory("sound/BGM/win");
+#endif
 	//pics
 	MakeDirectory("pics");
 	MakeDirectory("pics/field");
