@@ -149,7 +149,63 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			CTOS_JoinGame csjg;
 			csjg.version = PRO_VERSION;
 			csjg.gameid = 0;
-			BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
+			if(srvpro_mode) {
+				wchar_t pass[20];
+				wchar_t temp_pass[20];
+				if(mainGame->cbSrvProRule->getSelected() == 0)
+					myswprintf(pass, L"OO");
+				else if(mainGame->cbSrvProRule->getSelected() == 1)
+					myswprintf(pass, L"TO");
+				else if(mainGame->cbSrvProRule->getSelected() == 2)
+					myswprintf(pass, L"OT");
+				else
+					myswprintf(pass, L"NU");
+				if(mainGame->cbSrvProDuelRule->getSelected() == 1) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,PR", temp_pass);
+				}
+				if(mainGame->cbSrvProMatchMode->getSelected() == 0) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,S", temp_pass);
+				}
+				else if(mainGame->cbSrvProMatchMode->getSelected() == 1) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,M", temp_pass);
+				} else {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,T", temp_pass);
+				}
+				if(mainGame->chkSrvProNoCheckDeck->isChecked()) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,NC", temp_pass);
+				}
+				if(mainGame->chkSrvProNoShuffleDeck->isChecked()) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,NS", temp_pass);
+				}
+				if(mainGame->ebSrvProTimeLimit->getText()) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,TM%d", temp_pass, mainGame->ebSrvProTimeLimit->getText());
+				}
+				if(mainGame->ebSrvProStartLP->getText()) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,ST%d", temp_pass, mainGame->ebSrvProStartLP->getText());
+				}
+				if(mainGame->ebSrvProStartHand->getText()) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,LP%d", temp_pass, mainGame->ebSrvProStartHand->getText());
+				}
+				if(mainGame->ebSrvProDrawCount->getText()) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d,DR%d", temp_pass, mainGame->ebSrvProDrawCount->getText());
+				}
+				if(mainGame->ebSrvProRoomName->getText()) {
+					myswprintf(temp_pass, pass);
+					myswprintf(pass, L"%d#%d", temp_pass, mainGame->ebSrvProRoomName->getText());
+				}
+				BufferIO::CopyWStr(pass, csjg.pass, 20);
+			} else
+				BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		bufferevent_enable(bev, EV_READ);
