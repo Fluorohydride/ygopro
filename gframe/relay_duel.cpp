@@ -465,7 +465,7 @@ void RelayDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		extracards.push_back(511004000);
 	last_replay.WriteInt32(players[startp[0]].pdeck.main.size(), false);
 	for(int32 i = (int32)players[startp[0]].pdeck.main.size() - 1; i >= 0; --i) {
-		new_card(pduel, players[startp[0]].pdeck.main[i]->first, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+		new_card(pduel, players[startp[0]].pdeck.main[i]->first, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(players[startp[0]].pdeck.main[i]->first, false);
 	}
 	last_replay.WriteInt32(players[startp[0]].pdeck.extra.size() + extracards.size(), false);
