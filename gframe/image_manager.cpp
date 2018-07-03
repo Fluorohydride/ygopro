@@ -6,9 +6,9 @@ namespace ygo {
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
-	tCover[0] = 0;
-	tCover[1] = 0;
-	tUnknown = 0;
+	tCover[0] = NULL;
+	tCover[1] = NULL;
+	tUnknown = NULL;
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
 	tChain = driver->getTexture("textures/chain.png");
@@ -25,9 +25,9 @@ bool ImageManager::Initial() {
 	tHand[0] = driver->getTexture("textures/f1.jpg");
 	tHand[1] = driver->getTexture("textures/f2.jpg");
 	tHand[2] = driver->getTexture("textures/f3.jpg");
-	tBackGround = 0;
-	tBackGround_menu = 0;
-	tBackGround_deck = 0;
+	tBackGround = NULL;
+	tBackGround_menu = NULL;
+	tBackGround_deck = NULL;
 	tField[0] = driver->getTexture("textures/field2.png");
 	tFieldTransparent[0] = driver->getTexture("textures/field-transparent2.png");
 	tField[1] = driver->getTexture("textures/field3.png");
