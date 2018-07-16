@@ -1923,8 +1923,18 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	RefreshExtra(player, 0xffdfff, 0, dp);
 	RefreshRemoved(1 - player, 0xffdfff, 0, dp);
 	RefreshRemoved(player, 0xffdfff, 0, dp);
+	/*
 	if(dp == cur_player[last_response])
 		WaitforResponse(last_response);
+	*/
+	STOC_TimeLimit sctl;
+	sctl.player = 1 - last_response;
+	sctl.left_time = time_limit[1 - last_response];
+	NetServer::SendPacketToPlayer(dp, STOC_TIME_LIMIT, sctl);
+	sctl.player = last_response;
+	sctl.left_time = time_limit[last_response] - time_elapsed;
+	NetServer::SendPacketToPlayer(dp, STOC_TIME_LIMIT, sctl);
+
 	NetServer::SendPacketToPlayer(dp, STOC_FIELD_FINISH);
 }
 #endif //YGOPRO_SERVER_MODE
