@@ -746,6 +746,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 								xcard->overlayTarget = ccard;
 								xcard->location = 0x80;
 								xcard->sequence = ccard->overlayed.size() - 1;
+								xcard->owner = p;
+								xcard->controler = p;
 							}
 						}
 					}
