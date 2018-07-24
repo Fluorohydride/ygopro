@@ -1648,7 +1648,7 @@ void SingleDuel::PseudoRefreshDeck(int player, int flag) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_DECK);
-	int len = query_field_card(pduel, player, LOCATION_DECK, flag, (unsigned char*)qbuf, 0);
+	int len = query_field_card(pduel, player, LOCATION_DECK, flag, (unsigned char*)qbuf, 0, 1);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 }
