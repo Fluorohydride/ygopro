@@ -889,7 +889,6 @@ void Game::DrawSpec() {
 				break;
 			}
 			auto pos = lpcFont->getDimension(lstr);
-			//int offset = pos.Width / 2;
 			if(showcardp < 10) {
 				int alpha = (showcardp * 25) << 24;
 				DrawShadowText(lpcFont, lstr, ResizeElem(650 - pos.Width / 2 - (9 - showcardp) * 40, 290, 950, 370), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
