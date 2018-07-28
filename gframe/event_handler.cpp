@@ -1776,6 +1776,26 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			case BUTTON_WINDOW_RESIZE_S: {
+				mainGame->SetWindowsScale(0.8);
+				return true;
+				break;
+			}
+			case BUTTON_WINDOW_RESIZE_M: {
+				mainGame->SetWindowsScale(1);
+				return true;
+				break;
+			}
+			case BUTTON_WINDOW_RESIZE_L: {
+				mainGame->SetWindowsScale(1.25);
+				return true;
+				break;
+			}
+			case BUTTON_WINDOW_RESIZE_XL: {
+				mainGame->SetWindowsScale(1.5);
+				return true;
+				break;
+			}
 			}
 			break;
 		}

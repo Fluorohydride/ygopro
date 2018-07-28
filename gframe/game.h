@@ -166,6 +166,7 @@ public:
 	recti ResizeFit(s32 x, s32 y, s32 x2, s32 y2);
 
 	void SetWindowsIcon();
+	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
 
@@ -272,6 +273,10 @@ public:
 	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUICheckBox* chkMusicMode;
+	irr::gui::IGUIButton* btnWinResizeS;
+	irr::gui::IGUIButton* btnWinResizeM;
+	irr::gui::IGUIButton* btnWinResizeL;
+	irr::gui::IGUIButton* btnWinResizeXL;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
@@ -652,6 +657,10 @@ extern Game* mainGame;
 #define CHECKBOX_ENABLE_MUSIC		362
 #define SCROLL_VOLUME				363
 #define CHECKBOX_DISABLE_CHAT		364
+#define BUTTON_WINDOW_RESIZE_S		365
+#define BUTTON_WINDOW_RESIZE_M		366
+#define BUTTON_WINDOW_RESIZE_L		367
+#define BUTTON_WINDOW_RESIZE_XL		368
 
 #define COMBOBOX_SORTTYPE			370
 #define COMBOBOX_LIMIT				371
