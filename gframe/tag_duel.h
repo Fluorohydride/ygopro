@@ -35,6 +35,7 @@ public:
 	void RefreshSzone(int player, int flag = 0x681fff, int use_cache = 1);
 	void RefreshHand(int player, int flag = 0x781fff, int use_cache = 1);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
+	void RefreshDeck(int player, int flag = 0x1, int use_cache = 1);
 	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 
@@ -53,6 +54,7 @@ protected:
 	unsigned char last_response;
 	Replay last_replay;
 	bool game_started;
+	bool replay_debug;
 	unsigned char turn_count;
 	unsigned short time_limit[2];
 	unsigned short time_elapsed;

@@ -19,6 +19,7 @@ private:
 	static bool is_swaping;
 	static bool is_restarting;
 	static bool exit_pending;
+	static bool is_debug;
 	static int skip_turn;
 	static int current_step;
 	static int skip_step;

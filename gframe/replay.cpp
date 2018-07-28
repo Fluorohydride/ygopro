@@ -10,7 +10,7 @@ Replay::Replay() {
 	is_recording = false;
 	is_replaying = false;
 	replay_data = new unsigned char[0x20000];
-	comp_data = new unsigned char[0x2000];
+	comp_data = new unsigned char[0x20000];
 }
 Replay::~Replay() {
 	delete[] replay_data;
@@ -120,7 +120,7 @@ void Replay::EndRecord() {
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
-	comp_size = 0x1000;
+	comp_size = 0x20000;
 	LzmaCompress(comp_data, &comp_size, replay_data, pdata - replay_data, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	is_recording = false;
 }
@@ -168,7 +168,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 		return false;
 	}
 	if(pheader.flag & REPLAY_COMPRESSED) {
-		comp_size = fread(comp_data, 1, 0x1000, fp);
+		comp_size = fread(comp_data, 1, 0x20000, fp);
 		fclose(fp);
 		replay_size = pheader.datasize;
 		if(LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
@@ -197,7 +197,10 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	ReplayHeader rheader;
 	size_t count = fread(&rheader, sizeof(ReplayHeader), 1, rfp);
 	fclose(rfp);
-	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0;
+	if(count < 1)
+		return false;
+	return rheader.id == REPLAY_RPY1 && rheader.version >= 0x12d0
+		|| rheader.id == REPLAY_RPYX;//&&rheader.version >= 0x1336
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
@@ -245,6 +248,15 @@ void Replay::ReadName(wchar_t* data) {
 	unsigned short buffer[20];
 	ReadData(buffer, 40);
 	BufferIO::CopyWStr(buffer, data, 20);
+}
+int Replay::ReadNextBuffer(unsigned char buff[0x2000]) {
+	if(pdata - replay_data >= (int)replay_size)
+		return 0;
+	int len = ReadInt16();
+	if(len < 0 || len > 0x2000)
+		return 0;
+	ReadData(buff, len);
+	return len;
 }
 void Replay::ReadData(void* data, unsigned int length) {
 	if(!is_replaying)

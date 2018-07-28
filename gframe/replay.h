@@ -11,6 +11,9 @@ namespace ygo {
 #define REPLAY_DECODED		0x4
 #define REPLAY_SINGLE_MODE	0x8
 
+#define REPLAY_RPY1			0x31707279
+#define REPLAY_RPYX			0x3170727a
+
 struct ReplayHeader {
 	unsigned int id;
 	unsigned int version;
@@ -40,6 +43,7 @@ public:
 	static bool RenameReplay(const wchar_t* oldname, const wchar_t* newname);
 	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadName(wchar_t* data);
+	int ReadNextBuffer(unsigned char buff[0x2000]);
 	void ReadHeader(ReplayHeader& header);
 	void ReadData(void* data, unsigned int length);
 	int ReadInt32();

@@ -19,8 +19,11 @@ public:
 	static bool SinglePlayAnalyze(char* msg, unsigned int len);
 	
 	static void SinglePlayRefresh(int flag = 0xf81fff);
+	static void SinglePlayRefreckMzone(int player, int flag = 0xf81fff);
+	static void SinglePlayRefreckSzone(int player, int flag = 0xf81fff);
 	static void SinglePlayRefreshHand(int player, int flag = 0x781fff);
 	static void SinglePlayRefreshGrave(int player, int flag = 0x181fff);
+	static void SinglePlayRefreshRemoved(int player, int flag = 0x81fff);
 	static void SinglePlayRefreshDeck(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshExtra(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
@@ -30,6 +33,7 @@ public:
 
 protected:
 	static Replay last_replay;
+	static bool replay_debug;
 };
 
 }
