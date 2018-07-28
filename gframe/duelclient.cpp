@@ -1518,7 +1518,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->cmdFlag |= COMMAND_RESET;
 				else
 					pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if(l == LOCATION_GRAVE)
+				if(pcard->location == LOCATION_DECK) {
+					pcard->SetCode(code);
+					mainGame->dField.deck_act = true;
+				} else if(l == LOCATION_GRAVE)
 					mainGame->dField.grave_act = true;
 				else if(l == LOCATION_REMOVED)
 					mainGame->dField.remove_act = true;
