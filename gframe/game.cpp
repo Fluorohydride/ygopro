@@ -735,7 +735,7 @@ void Game::MainLoop() {
 			soundManager.PlayBGM(BGM_DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
-		} else if(!dInfo.isReplaySkiping) {
+		} else {
 			soundManager.PlayBGM(BGM_MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
