@@ -867,7 +867,7 @@ void DeckBuilder::FilterCards() {
 					&& (!set_code || !check_set_code(data, set_code)))
 					continue;
 				if (tryresult && data.code != trycode
-					&& !(data.alias == trycode && (data.alias - data.code < CARD_ARTWORK_VERSION_OFFSET || data.code - data.alias < CARD_ARTWORK_VERSION_OFFSET)))
+					&& !(data.alias == trycode && (data.alias - data.code < CARD_ARTWORK_VERSIONS_OFFSET || data.code - data.alias < CARD_ARTWORK_VERSIONS_OFFSET)))
 					continue;
 			}
 		}

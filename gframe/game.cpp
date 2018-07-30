@@ -1215,7 +1215,7 @@ void Game::ShowCardInfo(int code) {
 		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code));
 	imgCard->setScaleImage(true);
-	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSION_OFFSET || code - cd.alias < CARD_ARTWORK_VERSION_OFFSET))
+	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
