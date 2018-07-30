@@ -774,15 +774,6 @@ void DeckBuilder::StartFilter() {
 void DeckBuilder::FilterCards() {
 	results.clear();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
-	int trycode = BufferIO::GetVal(pstr);
-	if(dataManager.GetData(trycode, 0)) {
-		auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
-		results.push_back(ptr);
-		mainGame->scrFilter->setVisible(false);
-		mainGame->scrFilter->setPos(0);
-		myswprintf(result_string, L"%d", results.size());
-		return;
-	}
 	unsigned int set_code = 0;
 	if(pstr[0] == L'@')
 		set_code = dataManager.GetSetCode(&pstr[1]);
@@ -870,8 +861,13 @@ void DeckBuilder::FilterCards() {
 			} else if(pstr[0] == L'@' && set_code) {
 				if(!check_set_code(data, set_code)) continue;
 			} else {
-				if(!CardNameContains(text.name.c_str(), pstr) && text.text.find(pstr) == std::wstring::npos
+				int trycode = BufferIO::GetVal(pstr);
+				bool tryresult = dataManager.GetData(trycode, 0);
+				if(!tryresult && !CardNameContains(text.name.c_str(), pstr) && text.text.find(pstr) == std::wstring::npos
 					&& (!set_code || !check_set_code(data, set_code)))
+					continue;
+				if (tryresult && data.code != trycode
+					&& !(data.alias == trycode && (data.alias - data.code < CARD_ARTWORK_VERSIONS_OFFSET || data.code - data.alias < CARD_ARTWORK_VERSIONS_OFFSET)))
 					continue;
 			}
 		}
