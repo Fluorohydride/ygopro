@@ -143,6 +143,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->ShowElement(mainGame->wSinglePlay);
 					else
 						mainGame->ShowElement(mainGame->wLanWindow);
+					if(exit_on_return)
+						mainGame->device->closeDevice();
 				} else {
 					DuelClient::SendPacketToServer(CTOS_SURRENDER);
 				}
@@ -464,6 +466,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					list_command = COMMAND_SPSUMMON;
 					mainGame->wCardSelect->setText(dataManager.GetSysString(509));
 					ShowSelectCard();
+					select_ready = false;
 					ShowCancelOrFinishButton(1);
 				}
 				break;
@@ -954,18 +957,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case EDITBOX_ANCARD: {
 				UpdateDeclarableCode(true);
-				break;
-			}
-			case EDITBOX_CHAT: {
-				if(mainGame->dInfo.isReplay)
-					break;
-				const wchar_t* input = mainGame->ebChatInput->getText();
-				if(input[0]) {
-					unsigned short msgbuf[256];
-					int len = BufferIO::CopyWStr(input, msgbuf, 256);
-					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
-					mainGame->ebChatInput->setText(L"");
-				}
 				break;
 			}
 			}
@@ -1545,7 +1536,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(formatBuffer);
 								}
 							}
-							for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
+							for(auto ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
 								myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
 								str.append(formatBuffer);
 							}
@@ -1758,13 +1749,17 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX) {
 				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
+				return true;
+			}
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX) {
 				mainGame->SetCursor(ECI_NORMAL);
+				return true;
+			}
 			break;
 		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
@@ -1789,6 +1784,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			case CHECKBOX_ENABLE_MUSIC: {
 				if(!mainGame->chkEnableMusic->isChecked())
 					soundManager.StopBGM();
+				return true;
+				break;
+			}
+			case CHECKBOX_DISABLE_CHAT: {
+				bool show = mainGame->is_building ? false : !mainGame->chkIgnore1->isChecked();
+				mainGame->wChat->setVisible(show);
+				if(!show)
+					mainGame->ClearChatMsg();
 				return true;
 				break;
 			}
@@ -1839,6 +1842,24 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				soundManager.SetSoundVolume(mainGame->gameConf.sound_volume);
 				soundManager.SetMusicVolume(mainGame->gameConf.music_volume);
 				return true;
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_ENTER: {
+			switch(id) {
+			case EDITBOX_CHAT: {
+				if(mainGame->dInfo.isReplay)
+					break;
+				const wchar_t* input = mainGame->ebChatInput->getText();
+				if(input[0]) {
+					unsigned short msgbuf[256];
+					int len = BufferIO::CopyWStr(input, msgbuf, 256);
+					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
+					mainGame->ebChatInput->setText(L"");
+					return true;
+				}
 				break;
 			}
 			}

@@ -106,6 +106,7 @@ int ReplayMode::ReplayThread(void* param) {
 			get_message(pduel, (byte*)engineBuffer);
 			is_continuing = ReplayAnalyze(engineBuffer, len);
 			if(is_restarting) {
+				mainGame->gMutex.Lock();
 				is_restarting = false;
 				int step = current_step - 1;
 				if(step < 0)
@@ -280,7 +281,6 @@ void ReplayMode::Undo() {
 		return;
 	mainGame->dInfo.isReplaySkiping = true;
 	Restart(false);
-	mainGame->gMutex.Lock();
 	Pause(false, false);
 }
 bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
@@ -497,6 +497,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_SET_CARD: {
+			pbuf++;
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);

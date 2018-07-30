@@ -12,10 +12,15 @@
 
 #ifndef _WIN32
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <dirent.h>
+#include <unistd.h>
+#else
+#include <direct.h>
+#include <io.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1342;
+const unsigned short PRO_VERSION = 0x1344;
 
 namespace ygo {
 
@@ -23,6 +28,7 @@ Game* mainGame;
 
 bool Game::Initialize() {
 	srand(time(0));
+	initUtils();
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
@@ -266,7 +272,7 @@ bool Game::Initialize() {
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	posY = 20;
-	chkIgnore1 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1290));
+	chkIgnore1 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_DISABLE_CHAT, dataManager.GetSysString(1290));
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
 	posY += 30;
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1291));
@@ -707,7 +713,7 @@ void Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.Lock();
-		if(dInfo.isStarted || dInfo.isReplaySkiping) {
+		if(dInfo.isStarted) {
 			if(dInfo.isFinished && showcardcode == 1)
 				soundManager.PlayBGM(BGM_WIN);
 			else if(dInfo.isFinished && (showcardcode == 2 || showcardcode == 3))
@@ -1116,6 +1122,7 @@ void Game::LoadConfig() {
 			gameConf.defaultOT = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_bot_mode")) {
 			gameConf.enable_bot_mode = atoi(valbuf);
+#ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "sound_volume")) {
@@ -1126,6 +1133,7 @@ void Game::LoadConfig() {
 			gameConf.music_volume = atof(valbuf) / 100;
 		} else if(!strcmp(strbuf, "music_mode")) {
 			gameConf.music_mode = atoi(valbuf);
+#endif
 		} else {
 			// options allowing multiple words
 			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
@@ -1186,6 +1194,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "ignore_deck_changes = %d\n", (chkIgnoreDeckChanges->isChecked() ? 1 : 0));
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
+#ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
 	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
@@ -1196,6 +1205,7 @@ void Game::SaveConfig() {
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	fprintf(fp, "music_volume = %d\n", vol);
 	fprintf(fp, "music_mode = %d\n", (chkMusicMode->isChecked() ? 1 : 0));
+#endif
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
@@ -1320,6 +1330,11 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	}
 	chatMsg[0].append(msg);
 }
+void Game::ClearChatMsg() {
+	for(int i = 7; i >= 0; --i) {
+		chatTiming[i] = 0;
+	}
+}
 void Game::AddDebugMsg(char* msg)
 {
 	if (enable_log & 0x1) {
@@ -1338,6 +1353,54 @@ void Game::AddDebugMsg(char* msg)
 		fprintf(fp, "[%s][Script Error]: %s\n", timebuf, msg);
 		fclose(fp);
 	}
+}
+bool Game::MakeDirectory(const std::string folder) {
+    std::string folder_builder;
+    std::string sub;
+    sub.reserve(folder.size());
+    for(auto it = folder.begin(); it != folder.end(); ++it) {
+        const char c = *it;
+        sub.push_back(c);
+        if(c == '/' || it == folder.end() - 1) {
+            folder_builder.append(sub);
+            if(access(folder_builder.c_str(), 0) != 0)
+#ifdef _WIN32
+                if(mkdir(folder_builder.c_str()) != 0)
+#else
+                if(mkdir(folder_builder.c_str(), 0777) != 0)
+#endif
+                    return false;
+            sub.clear();
+        }
+    }
+    return true;
+}
+void Game::initUtils() {
+	//user files
+	MakeDirectory("replay");
+	//cards from extra pack
+	MakeDirectory("expansions");
+	//files in ygopro-starter-pack
+	MakeDirectory("deck");
+	MakeDirectory("single");
+	//original files
+	MakeDirectory("script");
+	MakeDirectory("textures");
+	//sound
+#ifdef YGOPRO_USE_IRRKLANG
+	MakeDirectory("sound");
+	MakeDirectory("sound/BGM");
+	MakeDirectory("sound/BGM/advantage");
+	MakeDirectory("sound/BGM/deck");
+	MakeDirectory("sound/BGM/disadvantage");
+	MakeDirectory("sound/BGM/duel");
+	MakeDirectory("sound/BGM/lose");
+	MakeDirectory("sound/BGM/menu");
+	MakeDirectory("sound/BGM/win");
+#endif
+	//pics
+	MakeDirectory("pics");
+	MakeDirectory("pics/field");
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
@@ -1376,6 +1439,9 @@ void Game::CloseDuelWindow() {
 	wReplaySave->setVisible(false);
 	stHintMsg->setVisible(false);
 	btnSideOK->setVisible(false);
+	btnSideShuffle->setVisible(false);
+	btnSideSort->setVisible(false);
+	btnSideReload->setVisible(false);
 	btnLeaveGame->setVisible(false);
 	btnSpectatorSwap->setVisible(false);
 	btnChainIgnore->setVisible(false);

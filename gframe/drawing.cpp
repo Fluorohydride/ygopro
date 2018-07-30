@@ -681,8 +681,7 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {
-		std::map<irr::gui::CGUIImageButton*, int>::iterator mit;
-		for(mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
+		for(auto mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
 			mit->first->setImage(imageManager.GetTexture(mit->second));
 		imageLoading.clear();
 	}
@@ -781,7 +780,7 @@ void Game::DrawSpec() {
 		}
 		case 2: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
-			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 150, 761, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, CARD_IMG_HEIGHT), 0, 0, true);
+			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 150, 751, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, CARD_IMG_HEIGHT), 0, 0, true);
 			showcarddif += 15;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;
@@ -944,12 +943,13 @@ void Game::DrawSpec() {
 	    showChat = false;
 	    hideChatTimer--;
 	}
-	int maxChatLines = mainGame->dInfo.isStarted ? 5 : 8;
-	for(int i = 0; i < maxChatLines; ++i) {
+	for(int i = 0; i < 8; ++i) {
 		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
 		                                   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
 		if(chatTiming[i]) {
 			chatTiming[i]--;
+			if(mainGame->dInfo.isStarted && i >= 5)
+				continue;
 			if(!showChat && i > 2)
 				continue;
 			int w = textFont->getDimension(chatMsg[i].c_str()).Width;

@@ -415,6 +415,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_SET_CARD: {
+			pbuf++;
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
@@ -745,6 +746,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 								xcard->overlayTarget = ccard;
 								xcard->location = 0x80;
 								xcard->sequence = ccard->overlayed.size() - 1;
+								xcard->owner = p;
+								xcard->controler = p;
 							}
 						}
 					}
