@@ -866,7 +866,8 @@ void DeckBuilder::FilterCards() {
 				if(!tryresult && !CardNameContains(text.name.c_str(), pstr) && text.text.find(pstr) == std::wstring::npos
 					&& (!set_code || !check_set_code(data, set_code)))
 					continue;
-				if (tryresult && data.code != trycode && data.alias != trycode)
+				if (tryresult && data.code != trycode
+					&& !(data.alias == trycode && (data.alias - data.code < CARD_ARTWORK_VERSION_OFFSET || data.code - data.alias < CARD_ARTWORK_VERSION_OFFSET)))
 					continue;
 			}
 		}
