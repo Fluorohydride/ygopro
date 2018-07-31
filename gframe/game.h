@@ -669,4 +669,6 @@ extern Game* mainGame;
 #define BUTTON_MARKERS_OK			381
 
 #define DEFAULT_DUEL_RULE			4
+
+#define CARD_ARTWORK_VERSIONS_OFFSET	10
 #endif // GAME_H
