@@ -27,7 +27,6 @@ public:
 	static void SinglePlayReload();
 
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
-	static byte* ScriptReader(const char* script_name, int* slen);
 	static int MessageHandler(long fduel, int type);
 
 protected:
