@@ -1300,9 +1300,14 @@ void Game::ShowCardInfo(int code, bool resize) {
 			wcscat(formatBuffer, scaleBuffer);
 		}
 		stDataInfo->setText(formatBuffer);
-		stSetName->setRelativePosition(rect<s32>(15, 83, 296 * xScale, 83 + offset));
-		stText->setRelativePosition(rect<s32>(15, 83 + offset, 287 * xScale, 324 * yScale));
-		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, 83 + offset, 287 * xScale, 324 * yScale));
+		int offset_arrows = 0;
+		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(formatBuffer);
+		if(dtxt.Width > (300 * xScale - 13) - 15)
+			offset_arrows = 15;
+		stDataInfo->setRelativePosition(rect<s32>(15, 60, 300 * xScale - 13, (83 + offset_arrows)));
+		stSetName->setRelativePosition(rect<s32>(15, (83 + offset_arrows), 296 * xScale, (83 + offset_arrows) + offset));
+		stText->setRelativePosition(rect<s32>(15, (83 + offset_arrows) + offset, 287 * xScale, 324 * yScale));
+		scrCardText->setRelativePosition(rect<s32>(287 * xScale - 20, (83 + offset_arrows) + offset, 287 * xScale, 324 * yScale));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
