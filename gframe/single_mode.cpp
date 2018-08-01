@@ -12,6 +12,8 @@ bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
 
+static byte buffer[0x20000];
+
 bool SingleMode::StartPlay() {
 	Thread::NewThread(SinglePlayThread, 0);
 	return true;
@@ -58,11 +60,7 @@ int SingleMode::SinglePlayThread(void* param) {
 		if(!preload_script(pduel, filename, slen)) {
 			wchar_t fname[256];
 			myswprintf(fname, L"./single/%ls", open_file_name);
-#ifdef _WIN32
-			slen = WideCharToMultiByte(CP_ACP, 0, fname, -1, filename, 256, 0, 0);
-#else
 			slen = BufferIO::EncodeUTF8(fname, filename);
-#endif // _WIN32
 			if(!preload_script(pduel, filename, slen))
 				slen = 0;
 		}
@@ -70,11 +68,7 @@ int SingleMode::SinglePlayThread(void* param) {
 		const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
 		wchar_t fname[256];
 		myswprintf(fname, L"./single/%ls", name);
-#ifdef _WIN32
-		slen = WideCharToMultiByte(CP_ACP, 0, fname, -1, filename, 256, 0, 0);
-#else
 		slen = BufferIO::EncodeUTF8(fname, filename);
-#endif // _WIN32
 		if(!preload_script(pduel, filename, slen))
 			slen = 0;
 	}
@@ -906,11 +900,28 @@ void SingleMode::SinglePlayReload() {
 byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
 	char sname[256] = "./expansions";
 	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-	if(buffer)
+	if(ScriptReader(sname, slen))
 		return buffer;
 	else
-		return default_script_reader(script_name, slen);
+		return ScriptReader(script_name, slen);
+}
+byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
+	FILE *fp;
+#ifdef _WIN32
+	wchar_t fname[256];
+	BufferIO::DecodeUTF8(script_name, fname);
+	fp = _wfopen(fname, L"rb");
+#else
+	fp = fopen(script_name, "rb");
+#endif
+	if(!fp)
+		return 0;
+	int len = fread(buffer, 1, sizeof(buffer), fp);
+	fclose(fp);
+	if(len >= sizeof(buffer))
+		return 0;
+	*slen = len;
+	return buffer;
 }
 int SingleMode::MessageHandler(long fduel, int type) {
 	if(!enable_log)
