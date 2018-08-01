@@ -623,9 +623,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 			(wchar_t*)dataManager.GetDesc(select_options[0]));
 		mainGame->stOptions->setVisible(true);
 		mainGame->btnOptionp->setVisible(false);
-		if(count > 1)
-			mainGame->btnOptionn->setVisible(true);
-		else mainGame->btnOptionn->setVisible(false);
+		mainGame->btnOptionn->setVisible(count > 1);
 		mainGame->btnOptionOK->setVisible(true);
 		for(int i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(false);
