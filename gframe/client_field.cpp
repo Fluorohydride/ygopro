@@ -612,9 +612,12 @@ void ClientField::ShowSelectOption(int select_hint) {
 		mainGame->btnOptionOK->setVisible(false);
 		for(int i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(i < count);
-		recti loc = mainGame->wOptions->getRelativePosition();
-		loc.LowerRightCorner.Y = loc.UpperLeftCorner.Y + 30 + 40 * count;
-		mainGame->wOptions->setRelativePosition(loc);
+		recti pos = mainGame->wOptions->getRelativePosition();
+		int newheight = 30 + 40 * count;
+		int oldheight = pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y;
+		pos.UpperLeftCorner.Y = pos.UpperLeftCorner.Y + (oldheight - newheight) / 2;
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
+		mainGame->wOptions->setRelativePosition(pos);
 	} else {
 		mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->guiFont,
 			(wchar_t*)dataManager.GetDesc(select_options[0]));
@@ -626,9 +629,9 @@ void ClientField::ShowSelectOption(int select_hint) {
 		mainGame->btnOptionOK->setVisible(true);
 		for(int i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(false);
-		recti loc = mainGame->wOptions->getRelativePosition();
-		loc.LowerRightCorner.Y = loc.UpperLeftCorner.Y + 140;
-		mainGame->wOptions->setRelativePosition(loc);
+		recti pos = mainGame->wOptions->getRelativePosition();
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 140;
+		mainGame->wOptions->setRelativePosition(pos);
 	}
 	if(select_hint)
 		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
