@@ -374,6 +374,7 @@ void ClientField::ClearChainSelect() {
 		(*cit)->is_selected = false;
 	}
 	conti_cards.clear();
+	deck_act = false;
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
