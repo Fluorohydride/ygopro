@@ -4,11 +4,11 @@
 #include "image_manager.h"
 #include "sound_manager.h"
 #include "single_mode.h"
-#include "../ocgcore/field.h"
-#include "../ocgcore/duel.h"
+#include "../ocgcore/common.h"
 #include "game.h"
 #include "replay.h"
 #include "replay_mode.h"
+#include <algorithm>
 
 namespace ygo {
 
