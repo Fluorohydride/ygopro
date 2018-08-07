@@ -1665,6 +1665,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::KEY_KEY_Z: {
+			if(!mainGame->dInfo.isReplay && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+				mainGame->dInfo.isReplaySkiping = event.KeyInput.PressedDown;
+				if(mainGame->dInfo.isStarted && !mainGame->dInfo.isReplaySkiping) {
+					mainGame->gMutex.Lock();
+					mainGame->dField.RefreshAllCards();
+					mainGame->gMutex.Unlock();
+				}
+			}
+			break;
+		}
 		case irr::KEY_F1:
 		case irr::KEY_F2:
 		case irr::KEY_F3:
