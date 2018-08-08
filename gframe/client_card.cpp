@@ -71,8 +71,12 @@ void ClientCard::UpdateInfo(char* buf) {
 			code = pdata;
 	}
 	if(flag & QUERY_POSITION) {
-		pdata = BufferIO::ReadInt32(buf);
-		position = (pdata >> 24) & 0xff;
+		pdata = (BufferIO::ReadInt32(buf) >> 24) & 0xff;
+		if((location & (LOCATION_EXTRA | LOCATION_REMOVED)) && (u8)pdata != position) {
+			position = pdata;
+			mainGame->dField.MoveCard(this, 1);
+		} else
+			position = pdata;
 	}
 	if(flag & QUERY_ALIAS)
 		alias = BufferIO::ReadInt32(buf);
