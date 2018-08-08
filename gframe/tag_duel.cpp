@@ -2,9 +2,7 @@
 #include "netserver.h"
 #include "game.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/card.h"
-#include "../ocgcore/duel.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
