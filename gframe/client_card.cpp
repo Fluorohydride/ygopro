@@ -38,6 +38,7 @@ ClientCard::ClientCard() {
 	lscale = 0;
 	rscale = 0;
 	link_marker = 0;
+	position = 0;
 	cHint = 0;
 	chValue = 0;
 	atkstring[0] = 0;
