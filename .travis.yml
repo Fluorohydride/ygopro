@@ -12,7 +12,7 @@ addons:
 before_install:
 - git submodule update --init --recursive
 - wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha12/premake-5.0.0-alpha12-linux.tar.gz | tar zfx -
-- wget -O - https://www.lua.org/ftp/lua-5.3.4.tar.gz | tar zfx -; cd lua-5.3.4; sudo make linux install; cd ..
+- wget -O - https://www.lua.org/ftp/lua-5.3.5.tar.gz | tar zfx -; cd lua-5.3.5; sudo make linux install; cd ..
 script:
 - ./premake5 gmake
 - cd build
