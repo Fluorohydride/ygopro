@@ -1846,8 +1846,18 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	RefreshExtra(player, 0xffdfff, 0, dp);
 	RefreshRemoved(1 - player, 0xffdfff, 0, dp);
 	RefreshRemoved(player, 0xffdfff, 0, dp);
+	/*
 	if(dp == players[last_response])
 		WaitforResponse(last_response);
+	*/
+	STOC_TimeLimit sctl;
+	sctl.player = 1 - last_response;
+	sctl.left_time = time_limit[1 - last_response];
+	NetServer::SendPacketToPlayer(dp, STOC_TIME_LIMIT, sctl);
+	sctl.player = last_response;
+	sctl.left_time = time_limit[last_response] - time_elapsed;
+	NetServer::SendPacketToPlayer(dp, STOC_TIME_LIMIT, sctl);
+
 	NetServer::SendPacketToPlayer(dp, STOC_FIELD_FINISH);
 }
 #endif //YGOPRO_SERVER_MODE
@@ -2039,8 +2049,10 @@ void SingleDuel::RefreshExtra(int player, int flag, int use_cache)
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_EXTRA);
 	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, (unsigned char*)qbuf, use_cache);
-	if(!dp || dp == players[player])
-		NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
+#ifdef YGOPRO_SERVER_MODE
+if(!dp || dp == players[player])
+#endif
+	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
 #ifdef YGOPRO_SERVER_MODE
 	if(!dp)
 		NetServer::ReSendToPlayer(replay_recorder);
@@ -2115,9 +2127,20 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	}
 }
 byte* SingleDuel::ScriptReaderEx(const char* script_name, int* slen) {
+#ifdef YGOPRO_SERVER_MODE
+	char sname[256] = "./specials";
+	strcat(sname, script_name + 8);//default script name: ./script/c%d.lua
+	byte* buffer = default_script_reader(sname, slen);
+	if(!buffer) {
+		char sname[256] = "./expansions";
+		strcat(sname, script_name + 1);
+		buffer = default_script_reader(sname, slen);
+	}
+#else
 	char sname[256] = "./expansions";
 	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
 	byte* buffer = default_script_reader(sname, slen);
+#endif
 	if(buffer)
 		return buffer;
 	else
