@@ -49,7 +49,8 @@ public:
 	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
 #endif
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
-	
+
+	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static int MessageHandler(long fduel, int type);
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 	

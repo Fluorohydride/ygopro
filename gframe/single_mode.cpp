@@ -1,8 +1,7 @@
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
-#include "../ocgcore/duel.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
@@ -39,7 +38,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mtrandom rnd;
 	time_t seed = time(0);
 	rnd.reset(seed);
-	set_script_reader((script_reader)ScriptReader);
+	set_script_reader((script_reader)ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());
@@ -724,70 +723,25 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_RELOAD_FIELD: {
-			mainGame->gMutex.Lock();
-			mainGame->dField.Clear();
-			mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
-			int val = 0;
+			pbuf++;
 			for(int p = 0; p < 2; ++p) {
-				mainGame->dInfo.lp[p] = BufferIO::ReadInt32(pbuf);
-				myswprintf(mainGame->dInfo.strLP[p], L"%d", mainGame->dInfo.lp[p]);
+				pbuf += 4;
 				for(int seq = 0; seq < 7; ++seq) {
-					val = BufferIO::ReadInt8(pbuf);
-					if(val) {
-						ClientCard* ccard = new ClientCard;
-						mainGame->dField.AddCard(ccard, p, LOCATION_MZONE, seq);
-						ccard->position = BufferIO::ReadInt8(pbuf);
-						val = BufferIO::ReadInt8(pbuf);
-						if(val) {
-							for(int xyz = 0; xyz < val; ++xyz) {
-								ClientCard* xcard = new ClientCard;
-								ccard->overlayed.push_back(xcard);
-								mainGame->dField.overlay_cards.insert(xcard);
-								xcard->overlayTarget = ccard;
-								xcard->location = 0x80;
-								xcard->sequence = ccard->overlayed.size() - 1;
-							}
-						}
-					}
+					int val = BufferIO::ReadInt8(pbuf);
+					if(val)
+						pbuf += 2;
 				}
 				for(int seq = 0; seq < 8; ++seq) {
-					val = BufferIO::ReadInt8(pbuf);
-					if(val) {
-						ClientCard* ccard = new ClientCard;
-						mainGame->dField.AddCard(ccard, p, LOCATION_SZONE, seq);
-						ccard->position = BufferIO::ReadInt8(pbuf);
-					}
+					int val = BufferIO::ReadInt8(pbuf);
+					if(val)
+						pbuf++;
 				}
-				val = BufferIO::ReadInt8(pbuf);
-				for(int seq = 0; seq < val; ++seq) {
-					ClientCard* ccard = new ClientCard;
-					mainGame->dField.AddCard(ccard, p, LOCATION_DECK, seq);
-				}
-				val = BufferIO::ReadInt8(pbuf);
-				for(int seq = 0; seq < val; ++seq) {
-					ClientCard* ccard = new ClientCard;
-					mainGame->dField.AddCard(ccard, p, LOCATION_HAND, seq);
-				}
-				val = BufferIO::ReadInt8(pbuf);
-				for(int seq = 0; seq < val; ++seq) {
-					ClientCard* ccard = new ClientCard;
-					mainGame->dField.AddCard(ccard, p, LOCATION_GRAVE, seq);
-				}
-				val = BufferIO::ReadInt8(pbuf);
-				for(int seq = 0; seq < val; ++seq) {
-					ClientCard* ccard = new ClientCard;
-					mainGame->dField.AddCard(ccard, p, LOCATION_REMOVED, seq);
-				}
-				val = BufferIO::ReadInt8(pbuf);
-				for(int seq = 0; seq < val; ++seq) {
-					ClientCard* ccard = new ClientCard;
-					mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
-				}
-				val = BufferIO::ReadInt8(pbuf);
-				mainGame->dField.extra_p_count[p] = val;
+				pbuf += 6;
 			}
-			BufferIO::ReadInt8(pbuf); //chain count, always 0
+			pbuf++;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayReload();
+			mainGame->gMutex.Lock();
 			mainGame->dField.RefreshAllCards();
 			mainGame->gMutex.Unlock();
 			break;
@@ -894,6 +848,14 @@ void SingleMode::SinglePlayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
+}
+byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
+	char sname[256] = "./expansions";
+	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
+	if(ScriptReader(sname, slen))
+		return buffer;
+	else
+		return ScriptReader(script_name, slen);
 }
 byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
 	FILE *fp;

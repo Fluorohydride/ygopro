@@ -6,7 +6,7 @@
 #include "image_manager.h"
 #include "game.h"
 #include "materials.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 
 namespace ygo {
 
@@ -374,6 +374,7 @@ void ClientField::ClearChainSelect() {
 		(*cit)->is_selected = false;
 	}
 	conti_cards.clear();
+	deck_act = false;
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
@@ -588,6 +589,55 @@ void ClientField::ShowLocationCard() {
 	}
 	mainGame->btnDisplayOK->setVisible(true);
 	mainGame->PopupElement(mainGame->wCardDisplay);
+}
+void ClientField::ShowSelectOption(int select_hint) {
+	selected_option = 0;
+	wchar_t textBuffer[256];
+	int count = select_options.size();
+	bool quickmode = (count <= 5);
+	mainGame->gMutex.Lock();
+	for(int i = 0; (i < count) && quickmode; i++) {
+		const wchar_t* option = dataManager.GetDesc(select_options[i]);
+		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(option);
+		if(dtxt.Width > 310) {
+			quickmode = false;
+			break;
+		}
+		mainGame->btnOption[i]->setText(option);
+	}
+	if(quickmode) {
+		mainGame->stOptions->setVisible(false);
+		mainGame->btnOptionp->setVisible(false);
+		mainGame->btnOptionn->setVisible(false);
+		mainGame->btnOptionOK->setVisible(false);
+		for(int i = 0; i < 5; i++)
+			mainGame->btnOption[i]->setVisible(i < count);
+		recti pos = mainGame->wOptions->getRelativePosition();
+		int newheight = 30 + 40 * count;
+		int oldheight = pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y;
+		pos.UpperLeftCorner.Y = pos.UpperLeftCorner.Y + (oldheight - newheight) / 2;
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
+		mainGame->wOptions->setRelativePosition(pos);
+	} else {
+		mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->guiFont,
+			(wchar_t*)dataManager.GetDesc(select_options[0]));
+		mainGame->stOptions->setVisible(true);
+		mainGame->btnOptionp->setVisible(false);
+		mainGame->btnOptionn->setVisible(count > 1);
+		mainGame->btnOptionOK->setVisible(true);
+		for(int i = 0; i < 5; i++)
+			mainGame->btnOption[i]->setVisible(false);
+		recti pos = mainGame->wOptions->getRelativePosition();
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 140;
+		mainGame->wOptions->setRelativePosition(pos);
+	}
+	if(select_hint)
+		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+	else
+		myswprintf(textBuffer, dataManager.GetSysString(555));
+	mainGame->wOptions->setText(textBuffer);
+	mainGame->PopupElement(mainGame->wOptions);
+	mainGame->gMutex.Unlock();
 }
 void ClientField::ReplaySwap() {
 	std::swap(deck[0], deck[1]);
