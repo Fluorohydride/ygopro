@@ -44,5 +44,5 @@ artifacts:
 cache:
   - premake-5.0.0-alpha10-windows.zip
   - libevent-2.0.22-stable.tar.gz
-  - lua-5.3.4.tar.gz
+  - lua-5.3.5.tar.gz
   - sqlite-amalgamation-3200000.zip
