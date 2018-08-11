@@ -13,7 +13,52 @@ char NetServer::net_server_read[0x2000];
 char NetServer::net_server_write[0x2000];
 unsigned short NetServer::last_sent = 0;
 
+#ifdef YGOPRO_SERVER_MODE
+extern unsigned short replay_mode;
+extern HostInfo game_info;
+
+void NetServer::InitDuel()
+{
+	if(game_info.mode == MODE_SINGLE) {
+		duel_mode = new SingleDuel(false);
+		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
+	} else if(game_info.mode == MODE_MATCH) {
+		duel_mode = new SingleDuel(true);
+		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
+	} else if(game_info.mode == MODE_TAG) {
+		duel_mode = new TagDuel();
+		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, TagDuel::TagTimer, duel_mode);
+	}
+
+	CTOS_CreateGame* pkt = new CTOS_CreateGame;
+	
+	pkt->info.mode = game_info.mode;
+	pkt->info.start_hand = game_info.start_hand;
+	pkt->info.start_lp = game_info.start_lp;
+	pkt->info.draw_count = game_info.draw_count;
+	pkt->info.no_check_deck = game_info.no_check_deck;
+	pkt->info.no_shuffle_deck = game_info.no_shuffle_deck;
+	pkt->info.duel_rule = game_info.duel_rule;
+	pkt->info.rule = game_info.rule;
+	pkt->info.time_limit = game_info.time_limit;
+
+	if(game_info.lflist == 999)
+		pkt->info.lflist = 0;
+	else if(game_info.lflist >= deckManager._lfList.size())
+		pkt->info.lflist = deckManager._lfList[0].hash;
+	else
+		pkt->info.lflist = deckManager._lfList[game_info.lflist].hash;
+	
+	duel_mode->host_info = pkt->info;
+	
+	BufferIO::CopyWStr(pkt->name, duel_mode->name, 20);
+	BufferIO::CopyWStr(pkt->pass, duel_mode->pass, 20);
+}
+
+unsigned short NetServer::StartServer(unsigned short port) {
+#else
 bool NetServer::StartServer(unsigned short port) {
+#endif //YGOPRO_SERVER_MODE
 	if(net_evbase)
 		return false;
 	net_evbase = event_base_new();
@@ -34,7 +79,15 @@ bool NetServer::StartServer(unsigned short port) {
 	}
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
 	Thread::NewThread(ServerThread, net_evbase);
+#ifdef YGOPRO_SERVER_MODE
+	evutil_socket_t fd = evconnlistener_get_fd(listener);
+	socklen_t addrlen = sizeof(sockaddr);
+	sockaddr_in addr;
+	getsockname(fd, (sockaddr*)&addr, &addrlen);
+	return ntohs(addr.sin_port);
+#else
 	return true;
+#endif //YGOPRO_SERVER_MODE
 }
 bool NetServer::StartBroadcast() {
 	if(!net_evbase)
@@ -173,7 +226,11 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	char* pdata = data;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
+#ifdef YGOPRO_SERVER_MODE
+	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (pktType != CTOS_REQUEST_FIELD) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
+#else
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
+#endif
 		return;
 	switch(pktType) {
 	case CTOS_RESPONSE: {
@@ -303,6 +360,14 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode->StartDuel(dp);
 		break;
 	}
+#ifdef YGOPRO_SERVER_MODE
+	case CTOS_REQUEST_FIELD: {
+		if(!dp->game || !duel_mode->pduel)
+			break;
+		duel_mode->RequestField(dp);
+		break;
+	}
+#endif
 	}
 }
 

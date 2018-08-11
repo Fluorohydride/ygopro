@@ -53,11 +53,13 @@ inline int _wtoi(const wchar_t * s) {
 }
 #endif
 
+#ifndef YGOPRO_SERVER_MODE
 #include <irrlicht.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "CGUITTFont.h"
 #include "CGUIImageButton.h"
+#endif //YGOPRO_SERVER_MODE
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -68,14 +70,16 @@ inline int _wtoi(const wchar_t * s) {
 #include "mysignal.h"
 #include "mythread.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/card.h"
+#include "../ocgcore/common.h"
 
+#ifndef YGOPRO_SERVER_MODE
 using namespace irr;
 using namespace core;
 using namespace scene;
 using namespace video;
 using namespace io;
 using namespace gui;
+#endif //YGOPRO_SERVER_MODE
 
 extern const unsigned short PRO_VERSION;
 extern int enable_log;

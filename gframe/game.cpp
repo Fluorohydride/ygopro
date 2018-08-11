@@ -1,5 +1,10 @@
 #include "config.h"
 #include "game.h"
+#ifdef YGOPRO_SERVER_MODE
+#include "data_manager.h"
+#include "deck_manager.h"
+#include "replay.h"
+#else
 #include "image_manager.h"
 #include "data_manager.h"
 #include "deck_manager.h"
@@ -9,6 +14,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#endif //YGOPRO_SERVER_MODE
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -26,6 +32,31 @@ namespace ygo {
 
 Game* mainGame;
 
+#ifdef YGOPRO_SERVER_MODE
+unsigned short aServerPort;
+unsigned short replay_mode;
+HostInfo game_info;
+
+void Game::MainServerLoop() {
+	initUtils();
+	deckManager.LoadLFList();
+	LoadExpansionDB();
+	dataManager.LoadDB("cards.cdb");
+	
+	aServerPort = NetServer::StartServer(aServerPort);
+	NetServer::InitDuel();
+	printf("%u\n", aServerPort);
+	fflush(stdout);
+	
+	while(NetServer::net_evbase) {
+#ifdef WIN32
+		Sleep(200);
+#else
+		usleep(200000);
+#endif
+	}
+}
+#else //YGOPRO_SERVER_MODE
 bool Game::Initialize() {
 	srand(time(0));
 	initUtils();
@@ -847,6 +878,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::LoadExpansionDB() {
 #ifdef _WIN32
 	char fpath[1000];
@@ -879,6 +911,7 @@ void Game::LoadExpansionDB() {
 	}
 #endif
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 #ifdef _WIN32
@@ -1335,8 +1368,12 @@ void Game::ClearChatMsg() {
 		chatTiming[i] = 0;
 	}
 }
+#endif //YGOPRO_SERVER_MODE
 void Game::AddDebugMsg(char* msg)
 {
+#ifdef YGOPRO_SERVER_MODE
+	fprintf(stderr, "%s\n", msg);
+#else
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
@@ -1353,6 +1390,7 @@ void Game::AddDebugMsg(char* msg)
 		fprintf(fp, "[%s][Script Error]: %s\n", timebuf, msg);
 		fclose(fp);
 	}
+#endif //YGOPRO_SERVER_MODE
 }
 bool Game::MakeDirectory(const std::string folder) {
     std::string folder_builder;
@@ -1380,6 +1418,10 @@ void Game::initUtils() {
 	MakeDirectory("replay");
 	//cards from extra pack
 	MakeDirectory("expansions");
+#ifdef YGOPRO_SERVER_MODE
+	//special scripts
+	MakeDirectory("specials");
+#else
 	//files in ygopro-starter-pack
 	MakeDirectory("deck");
 	MakeDirectory("single");
@@ -1401,7 +1443,9 @@ void Game::initUtils() {
 	//pics
 	MakeDirectory("pics");
 	MakeDirectory("pics/field");
+#endif //YGOPRO_SERVER_MODE
 }
+#ifndef YGOPRO_SERVER_MODE
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	imgCard->setImage(imageManager.tCover[0]);
@@ -1489,5 +1533,6 @@ void Game::SetCursor(ECURSOR_ICON icon) {
 		cursor->setActiveIcon(icon);
 	}
 }
+#endif //YGOPRO_SERVER_MODE
 
 }

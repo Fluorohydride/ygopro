@@ -10,7 +10,8 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
+#include <algorithm>
 
 namespace ygo {
 

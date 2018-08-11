@@ -2,15 +2,20 @@
 #define GAME_H
 
 #include "config.h"
+#ifndef YGOPRO_SERVER_MODE
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#else
+#include "netserver.h"
+#endif //YGOPRO_SERVER_MODE
 #include <unordered_map>
 #include <vector>
 #include <list>
 
 namespace ygo {
 
+#ifndef YGOPRO_SERVER_MODE
 struct Config {
 	bool use_d3d;
 	bool use_image_scale;
@@ -95,11 +100,19 @@ struct FadingUnit {
 	irr::core::vector2di fadingLR;
 	irr::core::vector2di fadingDiff;
 };
+#endif //YGOPRO_SERVER_MODE
 
 class Game {
 
 public:
 	bool Initialize();
+#ifdef YGOPRO_SERVER_MODE
+	void MainServerLoop();
+	void LoadExpansionDB();
+	void AddDebugMsg(char* msgbuf);
+	bool MakeDirectory(const std::string folder);
+	void initUtils();
+#else
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
@@ -467,9 +480,15 @@ public:
 	irr::gui::IGUIButton* btnChainWhenAvail;
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
+#endif //YGOPRO_SERVER_MODE
 };
 
 extern Game* mainGame;
+#ifdef YGOPRO_SERVER_MODE
+extern unsigned short aServerPort;
+extern unsigned short replay_mode;
+extern HostInfo game_info;
+#endif
 
 }
 
