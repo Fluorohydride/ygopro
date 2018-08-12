@@ -866,6 +866,14 @@ void SingleMode::SinglePlayReload() {
 		for(int loc = LOCATION_DECK; loc != LOCATION_OVERLAY; loc *= 2)
 			SinglePlayRefresh(p, loc, 0xffdfff);
 }
+byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
+	char sname[256] = "./expansions";
+	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
+	if(ScriptReader(sname, slen))
+		return buffer;
+	else
+		return ScriptReader(script_name, slen);
+}
 byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
 	FILE *fp;
 #ifdef _WIN32
@@ -883,15 +891,6 @@ byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
 		return 0;
 	*slen = len;
 	return buffer;
-}
-byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-	if(buffer)
-		return buffer;
-	else
-		return default_script_reader(script_name, slen);
 }
 int SingleMode::MessageHandler(long fduel, int type) {
 	if(!enable_log)
