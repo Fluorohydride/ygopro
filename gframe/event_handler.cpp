@@ -9,8 +9,9 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 #include "utils.h"
+#include <algorithm>
 
 namespace ygo {
 
@@ -127,6 +128,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->ShowElement(mainGame->wLanWindow);
+					if(exit_on_return)
+						mainGame->device->closeDevice();
 				} else {
 					DuelClient::SendPacketToServer(CTOS_SURRENDER);
 				}
@@ -263,21 +266,33 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
+			case BUTTON_OPTION_0: {
+				selected_option = 0;
+				SetResponseSelectedOption();
+				break;
+			}
+			case BUTTON_OPTION_1: {
+				selected_option = 1;
+				SetResponseSelectedOption();
+				break;
+			}
+			case BUTTON_OPTION_2: {
+				selected_option = 2;
+				SetResponseSelectedOption();
+				break;
+			}
+			case BUTTON_OPTION_3: {
+				selected_option = 3;
+				SetResponseSelectedOption();
+				break;
+			}
+			case BUTTON_OPTION_4: {
+				selected_option = 4;
+				SetResponseSelectedOption();
+				break;
+			}
 			case BUTTON_OPTION_OK: {
-				if (mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
-					DuelClient::SetResponseI(selected_option);
-				} else {
-					int index = 0;
-					while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
-					if (mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
-						DuelClient::SetResponseI((index << 16) + 5);
-					} else if (mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
-						DuelClient::SetResponseI(index << 16);
-					} else {
-						DuelClient::SetResponseI(index);
-					}
-				}
-				mainGame->HideElement(mainGame->wOptions, true);
+				SetResponseSelectedOption();
 				break;
 			}
 			case BUTTON_ANNUMBER_OK: {
@@ -329,12 +344,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 						DuelClient::SendResponse();
 					} else {
-						mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[0]));
-						selected_option = 0;
 						command_card = clicked_card;
-						mainGame->btnOptionp->setVisible(false);
-						mainGame->btnOptionn->setVisible(true);
-						mainGame->ShowElement(mainGame->wOptions);
+						ShowSelectOption();
 					}
 				} else {
 					selectable_cards.clear();
@@ -626,10 +637,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						} else {
 							mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[0]));
 							selected_option = 0;
-							mainGame->btnOptionp->setVisible(false);
-							mainGame->btnOptionn->setVisible(true);
 							mainGame->wCardSelect->setVisible(false);
-							mainGame->ShowElement(mainGame->wOptions);
+							ShowSelectOption();
 						}
 						break;
 					}
@@ -2193,6 +2202,22 @@ void ClientField::SetResponseSelectedCards() const {
 	for (size_t i = 0; i < selected_cards.size(); ++i)
 		respbuf[i + 1] = selected_cards[i]->select_seq;
 	DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+}
+void ClientField::SetResponseSelectedOption() const {
+	if(mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
+		DuelClient::SetResponseI(selected_option);
+	} else {
+		int index = 0;
+		while(activatable_cards[index] != command_card || activatable_descs[index].first != select_options[selected_option]) index++;
+		if(mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD) {
+			DuelClient::SetResponseI((index << 16) + 5);
+		} else if(mainGame->dInfo.curMsg == MSG_SELECT_BATTLECMD) {
+			DuelClient::SetResponseI(index << 16);
+		} else {
+			DuelClient::SetResponseI(index);
+		}
+	}
+	mainGame->HideElement(mainGame->wOptions, true);
 }
 void ClientField::CancelOrFinish() {
 	switch (mainGame->dInfo.curMsg) {

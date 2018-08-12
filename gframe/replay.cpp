@@ -1,7 +1,6 @@
 #include "replay.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/card.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 #include <algorithm>
 #include "lzma/LzmaLib.h"
 

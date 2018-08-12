@@ -2,8 +2,7 @@
 #include "duelclient.h"
 #include "game.h"
 #include "single_mode.h"
-#include "../ocgcore/duel.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
@@ -102,6 +101,7 @@ int ReplayMode::ReplayThread(void* param) {
 	for(auto it = current_stream.begin(); is_continuing && !exit_pending && it != current_stream.end();) {
 		is_continuing = ReplayAnalyze((*it));
 		if(is_restarting) {
+			mainGame->gMutex.Lock();
 			it = current_stream.begin();
 			is_restarting = false;
 			int step = current_step - 1;
@@ -181,7 +181,6 @@ void ReplayMode::Undo() {
 		return;
 	mainGame->dInfo.isReplaySkiping = true;
 	Restart(false);
-	mainGame->gMutex.Lock();
 	Pause(false, false);
 }
 bool ReplayMode::ReplayAnalyze(ReplayPacket p) {

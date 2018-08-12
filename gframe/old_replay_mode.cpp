@@ -2,8 +2,7 @@
 #include "duelclient.h"
 #include "game.h"
 #include "single_mode.h"
-#include "../ocgcore/duel.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
@@ -24,12 +23,12 @@ namespace ygo {
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
 		if (mainGame->dInfo.isSingleMode) {
-			set_script_reader((script_reader)SingleMode::ScriptReader);
+			set_script_reader((script_reader)SingleMode::ScriptReaderEx);
 			set_card_reader((card_reader)DataManager::CardReader);
 			set_message_handler((message_handler)MessageHandler);
 		}
 		else {
-			set_script_reader(default_script_reader);
+			set_script_reader((script_reader)ScriptReaderEx);
 			set_card_reader((card_reader)DataManager::CardReader);
 			set_message_handler((message_handler)MessageHandler);
 		}
@@ -829,6 +828,15 @@ namespace ygo {
 		for(int p = 0; p < 2; p++)
 			for(int loc = LOCATION_DECK; loc != LOCATION_OVERLAY; loc *= 2)
 				ReplayRefresh(p, loc, 0xffdfff);
+	}
+	byte* ReplayMode::ScriptReaderEx(const char* script_name, int* slen) {
+		char sname[256] = "./expansions";
+		strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
+		byte* buffer = default_script_reader(sname, slen);
+		if(buffer)
+			return buffer;
+		else
+			return default_script_reader(script_name, slen);
 	}
 	int ReplayMode::MessageHandler(long fduel, int type) {
 		if (!enable_log)

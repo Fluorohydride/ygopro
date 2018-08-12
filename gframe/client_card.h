@@ -4,6 +4,7 @@
 #include "config.h"
 #include <vector>
 #include <set>
+#include <map>
 #include <unordered_map>
 
 namespace ygo {
