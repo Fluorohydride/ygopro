@@ -4,7 +4,7 @@
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "duelclient.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 
 namespace ygo {
 
@@ -697,8 +697,7 @@ void Game::DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2) {
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {
-		std::map<irr::gui::CGUIImageButton*, int>::iterator mit;
-		for(mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
+		for(auto mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
 			mit->first->setImage(imageManager.GetTexture(mit->second));
 		imageLoading.clear();
 	}
@@ -797,7 +796,7 @@ void Game::DrawSpec() {
 		}
 		case 2: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
-			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 150, 761, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, CARD_IMG_HEIGHT), 0, 0, true);
+			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 150, 751, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, CARD_IMG_HEIGHT), 0, 0, true);
 			showcarddif += 15;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;

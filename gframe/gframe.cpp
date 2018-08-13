@@ -134,7 +134,7 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(!strcmp(argv[i], "-j")) { // Join host
 			exit_on_return = !keep_on_return;
-			ClickButton(ygo::mainGame->btnLanMode);
+			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 			ClickButton(ygo::mainGame->btnJoinHost);
 			break;
 		} else if(!strcmp(argv[i], "-r")) { // Replay

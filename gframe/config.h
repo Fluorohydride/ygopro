@@ -68,7 +68,7 @@ inline int _wtoi(const wchar_t * s) {
 #include "mysignal.h"
 #include "mythread.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/card.h"
+#include "../ocgcore/common.h"
 
 using namespace irr;
 using namespace core;
