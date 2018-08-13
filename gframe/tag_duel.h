@@ -62,7 +62,6 @@ protected:
 #ifdef YGOPRO_SERVER_MODE
 	DuelPlayer* cache_recorder;
 	DuelPlayer* replay_recorder;
-	int lp[2];
 	int turn_player;
 	int phase;
 #endif
