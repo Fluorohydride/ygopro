@@ -2,9 +2,7 @@
 #include "netserver.h"
 #include "game.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/card.h"
-#include "../ocgcore/duel.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 
 namespace ygo {
@@ -408,7 +406,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
-	set_script_reader(default_script_reader);
+	set_script_reader((script_reader)ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)SingleDuel::MessageHandler);
 	rnd.reset(seed);
@@ -874,14 +872,21 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_SET_CARD: {
+			int loc = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			RefreshMzone(0, 0x181fff, 0);
-			RefreshMzone(1, 0x181fff, 0);
+			if(loc == LOCATION_MZONE) {
+				RefreshMzone(0, 0x181fff, 0);
+				RefreshMzone(1, 0x181fff, 0);
+			}
+			else {
+				RefreshSzone(0, 0x181fff, 0);
+				RefreshSzone(1, 0x181fff, 0);
+			}
 			break;
 		}
 		case MSG_NEW_TURN: {
@@ -1539,6 +1544,15 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::ReSendToPlayer(*pit);
 	}
+}
+byte* SingleDuel::ScriptReaderEx(const char* script_name, int* slen) {
+	char sname[256] = "./expansions";
+	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
+	byte* buffer = default_script_reader(sname, slen);
+	if(buffer)
+		return buffer;
+	else
+		return default_script_reader(script_name, slen);
 }
 int SingleDuel::MessageHandler(long fduel, int type) {
 	if(!enable_log)
