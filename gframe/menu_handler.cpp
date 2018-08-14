@@ -183,10 +183,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
+				unsigned int host_port = _wtoi(mainGame->ebHostPort->getText());
 				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
-				if(!NetServer::StartServer(mainGame->gameConf.serverport))
+				BufferIO::CopyWStr(mainGame->ebHostPort->getText(), mainGame->gameConf.serverport, 20);
+				if(!NetServer::StartServer(host_port))
 					break;
-				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
+				if(!DuelClient::StartClient(0x7f000001, host_port)) {
 					NetServer::StopServer();
 					break;
 				}
@@ -567,6 +569,32 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_CHANGED: {
+			switch(id) {
+			case EDITBOX_PORT_BOX: {
+				stringw text = caller->getText();
+				wchar_t filtered[20];
+				int j = 0;
+				bool changed = false;
+				for(int i = 0; text[i]; i++) {
+					if(text[i] >= L'0' && text[i]<= L'9') {
+						filtered[j] = text[i];
+						j++;
+						changed = true;
+					}
+				}
+				filtered[j] = 0;
+				if(BufferIO::GetVal(filtered) > 65535) {
+					wcscpy(filtered, L"65535");
+					changed = true;
+				}
+				if(changed)
+					caller->setText(filtered);
+				break;
+				}
 			}
 			break;
 		}

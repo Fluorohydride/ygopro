@@ -129,7 +129,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1221), rect<s32>(10, 360, 220, 380), false, false, wLanWindow);
 	ebJoinHost = env->addEditBox(gameConf.lasthost, rect<s32>(110, 355, 350, 380), true, wLanWindow);
 	ebJoinHost->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebJoinPort = env->addEditBox(gameConf.lastport, rect<s32>(360, 355, 420, 380), true, wLanWindow);
+	ebJoinPort = env->addEditBox(gameConf.lastport, rect<s32>(360, 355, 420, 380), true, wLanWindow, EDITBOX_PORT_BOX);
 	ebJoinPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1222), rect<s32>(10, 390, 220, 410), false, false, wLanWindow);
 	ebJoinPass = env->addEditBox(gameConf.roompass, rect<s32>(110, 385, 420, 410), true, wLanWindow);
@@ -162,7 +162,7 @@ bool Game::Initialize() {
 	ebTimeLimit = env->addEditBox(strbuf, rect<s32>(140, 115, 220, 140), true, wCreateHost);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
-	btnRuleCards = env->addButton(rect<s32>(260, 330, 370, 350), wCreateHost, BUTTON_RULE_CARDS, dataManager.GetSysString(1625));
+	btnRuleCards = env->addButton(rect<s32>(260, 325, 370, 350), wCreateHost, BUTTON_RULE_CARDS, dataManager.GetSysString(1625));
 	wRules = env->addWindow(rect<s32>(630, 100, 1000, 310), false, dataManager.strBuffer);
 	wRules->getCloseButton()->setVisible(false);
 	wRules->setDrawTitlebar(false);
@@ -223,14 +223,17 @@ bool Game::Initialize() {
 	myswprintf(strbuf, L"%d", 1);
 	ebDrawCount = env->addEditBox(strbuf, rect<s32>(140, 295, 220, 320), true, wCreateHost);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(dataManager.GetSysString(1234), rect<s32>(10, 360, 220, 380), false, false, wCreateHost);
-	ebServerName = env->addEditBox(gameConf.gamename, rect<s32>(110, 355, 250, 380), true, wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1234), rect<s32>(10, 330, 220, 350), false, false, wCreateHost);
+	ebServerName = env->addEditBox(gameConf.gamename, rect<s32>(110, 325, 250, 350), true, wCreateHost);
 	ebServerName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(dataManager.GetSysString(1235), rect<s32>(10, 390, 220, 410), false, false, wCreateHost);
-	ebServerPass = env->addEditBox(L"", rect<s32>(110, 385, 250, 410), true, wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1235), rect<s32>(10, 360, 220, 380), false, false, wCreateHost);
+	ebServerPass = env->addEditBox(L"", rect<s32>(110, 355, 250, 380), true, wCreateHost);
 	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
+	env->addStaticText(L"Host Port:", rect<s32>(10, 390, 220, 410), false, false, wCreateHost);
+	ebHostPort = env->addEditBox(gameConf.serverport, rect<s32>(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
+	ebHostPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//host(single)
 	wHostPrepare = env->addWindow(rect<s32>(270, 120, 750, 440), false, dataManager.GetSysString(1250));
 	wHostPrepare->getCloseButton()->setVisible(false);
@@ -1073,7 +1076,7 @@ void Game::LoadConfig() {
 	wchar_t wstr[256];
 	gameConf.antialias = 0;
 	gameConf.fullscreen = false;
-	gameConf.serverport = 7911;
+	BufferIO::CopyWStr(L"7911", gameConf.serverport, 20);
 	gameConf.textfontsize = 12;
 	gameConf.nickname[0] = 0;
 	gameConf.gamename[0] = 0;
@@ -1119,7 +1122,8 @@ void Game::LoadConfig() {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
 		} else if(!strcmp(strbuf, "serverport")) {
-			gameConf.serverport = atoi(valbuf);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.serverport, 20);
 		} else if(!strcmp(strbuf, "lasthost")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lasthost, 100);
@@ -1197,7 +1201,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "textfont = %s %d\n", linebuf, gameConf.textfontsize);
 	BufferIO::EncodeUTF8(gameConf.numfont, linebuf);
 	fprintf(fp, "numfont = %s\n", linebuf);
-	fprintf(fp, "serverport = %d\n", gameConf.serverport);
+	BufferIO::EncodeUTF8(gameConf.serverport, linebuf);
+	fprintf(fp, "serverport = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.lasthost, linebuf);
 	fprintf(fp, "lasthost = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
@@ -1733,7 +1738,8 @@ void Game::OnResize() {
 	wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	wOptions->setRelativePosition(ResizeWin(490, 200, 840, 340));
+	auto pos = wOptions->getRelativePosition();
+	wOptions->setRelativePosition(ResizeWin(490, 200, 490 + (pos.LowerRightCorner.X - pos.UpperLeftCorner.X), 200 + (pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y)));
 	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
 	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
 	wANNumber->setRelativePosition(ResizeWin(550, 200, 780, 295));
@@ -1748,7 +1754,6 @@ void Game::OnResize() {
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
-	const auto& tsize = stText->getRelativePosition();
 	if(showingcard)
 		ShowCardInfo(showingcard, true);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));

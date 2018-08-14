@@ -16,7 +16,7 @@ struct Config {
 	bool use_d3d;
 	bool fullscreen;
 	unsigned short antialias;
-	unsigned short serverport;
+	wchar_t serverport[20];
 	unsigned char textfontsize;
 	wchar_t lasthost[100];
 	wchar_t lastport[10];
@@ -300,6 +300,7 @@ public:
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
 	irr::gui::IGUIButton* btnHostCancel;
+	irr::gui::IGUIEditBox* ebHostPort;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
 	irr::gui::IGUIWindow* wHostPrepare2;
@@ -566,6 +567,7 @@ extern Game* mainGame;
 #define BUTTON_DELETE_REPLAY		133
 #define BUTTON_RENAME_REPLAY		134
 #define EDITBOX_CHAT				140
+#define EDITBOX_PORT_BOX			141
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202
