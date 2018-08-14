@@ -602,7 +602,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 			break;
 		}
 	}
-	for(int i = 0; (i < count) && (i < count) && quickmode; i++) {
+	for(int i = 0; (i < count) && (i < 5) && quickmode; i++) {
 		const wchar_t* option = dataManager.GetDesc(select_options[i]);
 		mainGame->btnOption[i]->setText(option);
 	}
