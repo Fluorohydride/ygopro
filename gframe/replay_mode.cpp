@@ -64,11 +64,11 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.tag_player[0] = false;
 	mainGame->dInfo.tag_player[1] = false;
 	if(mainGame->dInfo.isSingleMode) {
-		set_script_reader((script_reader)SingleMode::ScriptReader);
+		set_script_reader((script_reader)SingleMode::ScriptReaderEx);
 		set_card_reader((card_reader)DataManager::CardReader);
 		set_message_handler((message_handler)MessageHandler);
 	} else {
-		set_script_reader(default_script_reader);
+		set_script_reader((script_reader)ScriptReaderEx);
 		set_card_reader((card_reader)DataManager::CardReader);
 		set_message_handler((message_handler)MessageHandler);
 	}
@@ -934,6 +934,15 @@ void ReplayMode::ReplayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
+}
+byte* ReplayMode::ScriptReaderEx(const char* script_name, int* slen) {
+	char sname[256] = "./expansions";
+	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
+	byte* buffer = default_script_reader(sname, slen);
+	if(buffer)
+		return buffer;
+	else
+		return default_script_reader(script_name, slen);
 }
 int ReplayMode::MessageHandler(long fduel, int type) {
 	if(!enable_log)

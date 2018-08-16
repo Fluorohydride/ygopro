@@ -406,7 +406,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
-	set_script_reader(default_script_reader);
+	set_script_reader((script_reader)ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)SingleDuel::MessageHandler);
 	rnd.reset(seed);
@@ -1544,6 +1544,15 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::ReSendToPlayer(*pit);
 	}
+}
+byte* SingleDuel::ScriptReaderEx(const char* script_name, int* slen) {
+	char sname[256] = "./expansions";
+	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
+	byte* buffer = default_script_reader(sname, slen);
+	if(buffer)
+		return buffer;
+	else
+		return default_script_reader(script_name, slen);
 }
 int SingleDuel::MessageHandler(long fduel, int type) {
 	if(!enable_log)
