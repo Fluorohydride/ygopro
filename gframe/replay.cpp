@@ -61,9 +61,8 @@ void Replay::WritePacket(ReplayPacket p) {
 	WriteData((char*)p.data, p.length);
 }
 void Replay::WriteStream(std::vector<ReplayPacket> stream) {
-	if(stream.size())
-		for(auto it = stream.begin(); it != stream.end(); it++)
-			WritePacket((*it));
+	for(auto packet : stream)
+		WritePacket(packet);
 }
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;

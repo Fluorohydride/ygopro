@@ -42,6 +42,10 @@ bool Game::Initialize() {
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
+#ifdef _DEBUG
+	auto logger = device->getLogger();
+	logger->setLogLevel(ELL_ERROR);
+#endif
 	// Apply skin
 	if (gameConf.skin_index >= 0)
 	{
@@ -723,7 +727,7 @@ void Game::MainLoop() {
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.90f, 0.45f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-
+	
 	mProjection.buildCameraLookAtMatrixLH(vector3df(board.x, board.y, board.z), vector3df(board.x, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
@@ -734,7 +738,7 @@ void Game::MainLoop() {
 	int cur_time = 0;
 	while(device->run()) {
 		dimension2du size = driver->getScreenSize();
-		if (window_size != size) {
+		if(window_size != size) {
 			window_size = size;
 			OnResize();
 		}
@@ -841,7 +845,7 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
 void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text) {
-	SetStaticText(pControl, cWidth - 10, font, text);
+	SetStaticText(pControl, cWidth, font, text);
 	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
 		scrCardText->setVisible(false);
 		if(env->hasFocus(scrCardText))
@@ -849,7 +853,7 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 		return;
 	}
 	const auto& tsize = scrCardText->getRelativePosition();
-	SetStaticText(pControl, cWidth - tsize.getWidth() - 10, font, text);
+	SetStaticText(pControl, cWidth - tsize.getWidth(), font, text);
 	u32 fontheight = font->getDimension(L"A").Height + font->getKerningHeight();
 	u32 step = (font->getDimension(dataManager.strBuffer).Height - cHeight) / fontheight + 1;
 	scrCardText->setVisible(true);
@@ -857,60 +861,116 @@ void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cH
 	scrCardText->setMax(step);
 	scrCardText->setPos(0);
 }
+//took from irrlicht
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
-	int pbuffer = 0, lsnz = 0;
-	u32 _width = 0, _height = 0, s = font->getCharDimension(L' ').Width;
-	wchar_t prev = 0, temp[4096] = L"";
-	for (size_t i = 0; text[i] != 0 && i < wcslen(text); ++i) {
-		wchar_t c = text[i];
-		u32 w = font->getCharDimension(c).Width + font->getKerningWidth(c, prev);
-		prev = c;
-		if (c == L' ') {
-			lsnz = pbuffer;
-			if (_width + s > cWidth) {
-				temp[pbuffer++] = L'\n';
-				_width = 0;
+	core::array< core::stringw > BrokenText;
+	core::stringw Text = text;
+	core::stringw line;
+	core::stringw word;
+	core::stringw whitespace;
+	s32 size = Text.size();
+	s32 length = 0;
+	s32 elWidth = cWidth;
+	wchar_t c;
+	for(s32 i = 0; i < size; ++i) {
+		c = Text[i];
+		bool lineBreak = false;
+
+		if(c == L'\r') // Mac or Windows breaks
+		{
+			lineBreak = true;
+			if(Text[i + 1] == L'\n') // Windows breaks
+			{
+				Text.erase(i + 1);
+				--size;
 			}
-			else {
-				temp[pbuffer++] = L' ';
-				_width += s;
-			}
-		} else if(c == L'\n') {
-			temp[pbuffer++] = L'\n';
-			_width = 0;
-		} else {
-			if((_width += w) > cWidth) {
-				if(lsnz) {
-					wchar_t old = temp[lsnz];
-					temp[lsnz] = L'\n';
-					_width = 0;
-					for (int j = lsnz + 1; j < i; j++) {
-						_width += font->getCharDimension(text[j]).Width;
+			c = ' ';
+		} else if(c == L'\n') // Unix breaks
+		{
+			lineBreak = true;
+			c = ' ';
+		}
+
+		bool isWhitespace = (c == L' ' || c == 0);
+		if(!isWhitespace) {
+			// part of a word
+			word += c;
+		}
+
+		if(isWhitespace || i == (size - 1)) {
+			if(word.size()) {
+				// here comes the next whitespace, look if
+				// we must break the last word to the next line.
+				const s32 whitelgth = font->getDimension(whitespace.c_str()).Width;
+				s32 wordlgth = font->getDimension(word.c_str()).Width;
+				if(wordlgth > elWidth) {
+					core::stringw second;
+					s32 secondLength;
+					while(wordlgth > elWidth) {
+						int j = 0;
+						for(; j < word.size() - 1; j++) {
+							if(font->getDimension(line + whitespace + word.subString(0, j + 1)).Width > elWidth)
+								break;
+						}
+						if(j == 0) {
+							dataManager.strBuffer[0] = 0;
+							pControl->setText(L"");
+							return;
+						}
+						core::stringw first = word.subString(0, j);
+						second = word.subString(j, word.size() - j);
+						BrokenText.push_back(line + whitespace + first);
+						secondLength = font->getDimension(second.c_str()).Width;
+						word = second;
+						wordlgth = secondLength;
+						whitespace = L"";
+						line = L"";
 					}
-					if(_width > cWidth)
-						temp[lsnz] = old;
+					line = second;
+					length = secondLength;
+				} else if(length && (length + wordlgth + whitelgth > elWidth)) {
+					// break to next line
+					BrokenText.push_back(line);
+					length = wordlgth;
+					line = word;
+				} else {
+					// add word to line
+					line += whitespace;
+					line += word;
+					length += whitelgth + wordlgth;
 				}
-				if(_width > cWidth) {
-					temp[pbuffer++] = L'\n';
-					_width = w;
-				}
+
+				word = L"";
+				whitespace = L"";
 			}
-			temp[pbuffer++] = c;
+
+			if(isWhitespace) {
+				whitespace += c;
+			}
+
+			// compute line break
+			if(lineBreak) {
+				line += whitespace;
+				line += word;
+				BrokenText.push_back(line);
+				line = L"";
+				word = L"";
+				whitespace = L"";
+				length = 0;
+			}
 		}
 	}
-	pbuffer = 0;
-	for (size_t i = 0; temp[i] != 0 && i < wcslen(temp); ++i) {
-		wchar_t c = temp[i];
-		if (c == L'\n') {
-			_height++;
-			if(_height == pos) {
-				pbuffer = 0;
-				continue;
-			}
-		}
-		dataManager.strBuffer[pbuffer++] = c;
+	line += whitespace;
+	line += word;
+	BrokenText.push_back(line);
+	int pbuffer = 0;
+	for(size_t i = pos; i < BrokenText.size(); i++) {
+		for(size_t j = 0; j < BrokenText[i].size(); j++)
+			dataManager.strBuffer[pbuffer++] = BrokenText[i][j];
+		dataManager.strBuffer[pbuffer++] = L'\n';
 	}
-	dataManager.strBuffer[pbuffer] = 0;
+	if(pbuffer)
+		dataManager.strBuffer[pbuffer - 1] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
 void Game::LoadExpansionDB() {
@@ -1292,7 +1352,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	imgCard->setScaleImage(true);
-	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET  || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET ))
+	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);

@@ -1071,22 +1071,26 @@ void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, i
 }
 void Game::DrawDeckBd() {
 	wchar_t textBuffer[64];
+	stringw buffer;
 	//main deck
 	driver->draw2DRectangle(Resize(310, 137, 797, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
 	textFont->draw(dataManager.GetSysString(1330), Resize(314, 136, 409, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1330), Resize(315, 137, 410, 157), 0xffffffff, false, true);
-	numFont->draw(dataManager.numStrings[deckManager.current_deck.main.size()], Resize(379, 137, 439, 157), 0xff000000, false, true);
-	numFont->draw(dataManager.numStrings[deckManager.current_deck.main.size()], Resize(380, 138, 440, 158), 0xffffffff, false, true);
+	buffer = stringw(deckManager.current_deck.main.size());
+	if(mainGame->is_siding)
+		buffer += stringw(L" (") + stringw(deckManager.pre_deck.main.size()) + stringw(L")");
+	numFont->draw(buffer, Resize(379, 137, 439, 157), 0xff000000, false, true);
+	numFont->draw(buffer, Resize(380, 138, 440, 158), 0xffffffff, false, true);
 	driver->draw2DRectangle(Resize(310, 160, 797, 436), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	recti mainpos = Resize(310, 137, 797, 157);
-	stringw mainDeckTypeCount = stringw(dataManager.GetSysString(1312)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.main, TYPE_MONSTER)) + " " +
+	buffer = stringw(dataManager.GetSysString(1312)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.main, TYPE_MONSTER)) + " " +
 		stringw(dataManager.GetSysString(1313)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.main, TYPE_SPELL)) + " " +
 		stringw(dataManager.GetSysString(1314)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.main, TYPE_TRAP));
-	irr::core::dimension2d<u32> mainDeckTypeSize = textFont->getDimension(mainDeckTypeCount);
-	textFont->draw(mainDeckTypeCount, recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 5, mainpos.UpperLeftCorner.Y,
+	irr::core::dimension2d<u32> mainDeckTypeSize = textFont->getDimension(buffer);
+	textFont->draw(buffer, recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 5, mainpos.UpperLeftCorner.Y,
 		mainpos.LowerRightCorner.X, mainpos.LowerRightCorner.Y), 0xff000000, false, true);
-	textFont->draw(mainDeckTypeCount, recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 4, mainpos.UpperLeftCorner.Y + 1,
+	textFont->draw(buffer, recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 4, mainpos.UpperLeftCorner.Y + 1,
 		mainpos.LowerRightCorner.X + 1, mainpos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
 	driver->draw2DRectangleOutline(Resize(309, 159, 797, 436));
 	int lx;
@@ -1108,17 +1112,20 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 439, 797, 460));
 	textFont->draw(dataManager.GetSysString(1331), Resize(314, 439, 409, 459), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1331), Resize(315, 440, 410, 460), 0xffffffff, false, true);
-	numFont->draw(dataManager.numStrings[deckManager.current_deck.extra.size()], Resize(379, 440, 439, 460), 0xff000000, false, true);
-	numFont->draw(dataManager.numStrings[deckManager.current_deck.extra.size()], Resize(380, 441, 440, 461), 0xffffffff, false, true);
+	buffer = stringw(deckManager.current_deck.extra.size());
+	if(mainGame->is_siding)
+		buffer += stringw(L" (") + stringw(deckManager.pre_deck.extra.size()) + stringw(L")");
+	numFont->draw(buffer, Resize(379, 440, 439, 460), 0xff000000, false, true);
+	numFont->draw(buffer, Resize(380, 441, 440, 461), 0xffffffff, false, true);
 	recti extrapos = Resize(310, 440, 797, 460);
-	stringw extraDeckTypeCount = stringw(dataManager.GetSysString(1056)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_FUSION)) + " " +
+	buffer = stringw(dataManager.GetSysString(1056)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_FUSION)) + " " +
 		stringw(dataManager.GetSysString(1073)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_XYZ)) + " " +
 		stringw(dataManager.GetSysString(1063)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_SYNCHRO)) + " " +
 		stringw(dataManager.GetSysString(1076)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_LINK));
-	irr::core::dimension2d<u32> extraDeckTypeSize = textFont->getDimension(extraDeckTypeCount);
-	textFont->draw(extraDeckTypeCount, recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
+	irr::core::dimension2d<u32> extraDeckTypeSize = textFont->getDimension(buffer);
+	textFont->draw(buffer, recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
 		extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y), 0xff000000, false, true);
-	textFont->draw(extraDeckTypeCount, recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 4, extrapos.UpperLeftCorner.Y + 1,
+	textFont->draw(buffer, recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 4, extrapos.UpperLeftCorner.Y + 1,
 		extrapos.LowerRightCorner.X + 1, extrapos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
 	driver->draw2DRectangle(Resize(310, 463, 797, 533), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(309, 462, 797, 533));
@@ -1135,16 +1142,19 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 536, 797, 557));
 	textFont->draw(dataManager.GetSysString(1332), Resize(314, 536, 409, 556), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1332), Resize(315, 537, 410, 557), 0xffffffff, false, true);
-	numFont->draw(dataManager.numStrings[deckManager.current_deck.side.size()], Resize(379, 537, 439, 557), 0xff000000, false, true);
-	numFont->draw(dataManager.numStrings[deckManager.current_deck.side.size()], Resize(379, 537, 439, 557), 0xffffffff, false, true);
+	buffer = stringw(deckManager.current_deck.side.size());
+	if(mainGame->is_siding)
+		buffer += stringw(L" (") + stringw(deckManager.pre_deck.side.size()) + stringw(L")");
+	numFont->draw(buffer, Resize(379, 537, 439, 557), 0xff000000, false, true);
+	numFont->draw(buffer, Resize(379, 537, 439, 557), 0xffffffff, false, true);
 	recti sidepos = Resize(310, 537, 797, 557);
-	stringw sideDeckTypeCount = stringw(dataManager.GetSysString(1312)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.side, TYPE_MONSTER)) + " " +
+	buffer = stringw(dataManager.GetSysString(1312)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.side, TYPE_MONSTER)) + " " +
 		stringw(dataManager.GetSysString(1313)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.side, TYPE_SPELL)) + " " +
 		stringw(dataManager.GetSysString(1314)) + " " + stringw(deckManager.TypeCount(deckManager.current_deck.side, TYPE_TRAP));
-	irr::core::dimension2d<u32> sideDeckTypeSize = textFont->getDimension(sideDeckTypeCount);
-	textFont->draw(sideDeckTypeCount, recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 5, sidepos.UpperLeftCorner.Y,
+	irr::core::dimension2d<u32> sideDeckTypeSize = textFont->getDimension(buffer);
+	textFont->draw(buffer, recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 5, sidepos.UpperLeftCorner.Y,
 		sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y), 0xff000000, false, true);
-	textFont->draw(sideDeckTypeCount, recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 4, sidepos.UpperLeftCorner.Y + 1,
+	textFont->draw(buffer, recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 4, sidepos.UpperLeftCorner.Y + 1,
 		sidepos.LowerRightCorner.X + 1, sidepos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
 	driver->draw2DRectangle(Resize(310, 560, 797, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));

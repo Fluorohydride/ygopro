@@ -18,8 +18,8 @@ private:
 	static event* broadcast_ev;
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
-	static char net_server_read[0x2000];
-	static char net_server_write[0x2000];
+	static char net_server_read[0x20000];
+	static char net_server_write[0x20000];
 	static unsigned short last_sent;
 
 public:

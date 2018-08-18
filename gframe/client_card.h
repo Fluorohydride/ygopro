@@ -44,6 +44,13 @@ struct CardString {
 	std::wstring text;
 	std::wstring desc[16];
 };
+struct loc_info {
+	u8 controler;
+	u8 location;
+	u32 sequence;
+	u32 position;
+};
+
 typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
 
 class ClientCard {
@@ -87,7 +94,7 @@ public:
 	u8 owner;
 	u8 controler;
 	u8 location;
-	u8 sequence;
+	u32 sequence;
 	u8 position;
 	u8 is_disabled;
 	u8 is_public;
@@ -116,6 +123,7 @@ public:
 	void SetCode(int code);
 	void UpdateInfo(char* buf);
 	void ClearTarget();
+	static loc_info read_location_info(char*& p);
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
 	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
 	static bool deck_sort_atk(code_pointer l1, code_pointer l2);

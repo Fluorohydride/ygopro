@@ -91,18 +91,15 @@ void DeckManager::LoadLFList() {
 	_lfList.push_back(nolimit);
 }
 wchar_t* DeckManager::GetLFListName(int lfhash) {
-	for(size_t i = 0; i < _lfList.size(); ++i) {
-		if(_lfList[i].hash == (unsigned int)lfhash) {
-			return _lfList[i].listName;
-		}
-	}
+	auto it = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](LFList list){return list.hash == (unsigned int)lfhash; });
+	if(it != _lfList.end())
+		return (*it).listName;
 	return (wchar_t*)dataManager.unknown_string;
 }
 int DeckManager::TypeCount(std::vector<code_pointer> cards, int type) {
 	int count = 0;
-	for (size_t i = 0; i < cards.size(); ++i) {
-		code_pointer cit = cards[i];
-		if (cit->second.type & type)
+	for(auto card : cards) {
+		if(card->second.type & type)
 			count++;
 	}
 	return count;
@@ -168,7 +165,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		dc = ccount[code];
 		if(dc > 3)
 			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(code);
+		auto it = list->find(cit->first);
+		if (it == list->end())
+			it = list->find(code);
 		if(it != list->end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
@@ -183,7 +182,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		dc = ccount[code];
 		if(dc > 3)
 			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(code);
+		auto it = list->find(cit->first);
+		if(it == list->end())
+			it = list->find(code);
 		if(it != list->end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
@@ -198,7 +199,9 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		dc = ccount[code];
 		if(dc > 3)
 			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(code);
+		auto it = list->find(cit->first);
+		if(it == list->end())
+			it = list->find(code);
 		if(it != list->end() && dc > it->second)
 			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
@@ -261,27 +264,26 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc
 	return errorcode;
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
-	std::unordered_map<int, int> pcount;
-	std::unordered_map<int, int> ncount;
-	for(size_t i = 0; i < deck.main.size(); ++i)
-		pcount[deck.main[i]->first]++;
-	for(size_t i = 0; i < deck.extra.size(); ++i)
-		pcount[deck.extra[i]->first]++;
-	for(size_t i = 0; i < deck.side.size(); ++i)
-		pcount[deck.side[i]->first]++;
+	std::map<int, int> pcount;
+	std::map<int, int> ncount;
+	for(auto card: deck.main)
+		pcount[card->first]++;
+	for(auto card : deck.extra)
+		pcount[card->first]++;
+	for(auto card : deck.side)
+		pcount[card->first]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec,0,0,true);
 	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
 		return false;
-	for(size_t i = 0; i < ndeck.main.size(); ++i)
-		ncount[ndeck.main[i]->first]++;
-	for(size_t i = 0; i < ndeck.extra.size(); ++i)
-		ncount[ndeck.extra[i]->first]++;
-	for(size_t i = 0; i < ndeck.side.size(); ++i)
-		ncount[ndeck.side[i]->first]++;
-	for(auto cdit = ncount.begin(); cdit != ncount.end(); ++cdit)
-		if(cdit->second != pcount[cdit->first])
-			return false;
+	for(auto card : ndeck.main)
+		ncount[card->first]++;
+	for(auto card : ndeck.extra)
+		ncount[card->first]++;
+	for(auto card : ndeck.side)
+		ncount[card->first]++;
+	if(!std::equal(pcount.begin(), pcount.end(), ncount.begin()))
+		return false;
 	deck = ndeck;
 	return true;
 }
@@ -391,14 +393,14 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	if(!fp)
 		return false;
 	fprintf(fp, "#created by ...\n#main\n");
-	for(size_t i = 0; i < deck.main.size(); ++i)
-		fprintf(fp, "%d\n", deck.main[i]->first);
+	for(auto card : deck.main)
+		fprintf(fp, "%d\n", card->first);
 	fprintf(fp, "#extra\n");
-	for(size_t i = 0; i < deck.extra.size(); ++i)
-		fprintf(fp, "%d\n", deck.extra[i]->first);
+	for(auto card : deck.extra)
+		fprintf(fp, "%d\n", card->first);
 	fprintf(fp, "!side\n");
-	for(size_t i = 0; i < deck.side.size(); ++i)
-		fprintf(fp, "%d\n", deck.side[i]->first);
+	for(auto card : deck.side)
+		fprintf(fp, "%d\n", card->first);
 	fclose(fp);
 	return true;
 }

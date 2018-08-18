@@ -58,7 +58,6 @@ public:
 	int select_sumval;
 	int select_mode;
 	bool select_cancelable;
-	bool select_panalmode;
 	bool select_ready;
 	int announce_count;
 	int declarable_type;
@@ -66,6 +65,7 @@ public:
 	int select_counter_type;
 	std::vector<ClientCard*> selectable_cards;
 	std::vector<ClientCard*> selected_cards;
+	std::vector<ClientCard*> must_select_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
 	std::vector<int> opcode;
@@ -106,7 +106,7 @@ public:
 	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
 	void MoveCard(ClientCard* pcard, int frame);
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
-	bool ShowSelectSum(bool panelmode);
+	bool ShowSelectSum();
 	bool CheckSelectSum();
 	bool check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max);
 	bool check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc);

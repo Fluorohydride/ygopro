@@ -64,6 +64,11 @@ inline int _wtoi(const wchar_t * s) {
 #include <stdlib.h>
 #include <memory.h>
 #include <time.h>
+#include <set>
+#include <map>
+#include <unordered_set>
+#include <unordered_map>
+#include <algorithm>
 #include "bufferio.h"
 #include "mymutex.h"
 #include "mysignal.h"

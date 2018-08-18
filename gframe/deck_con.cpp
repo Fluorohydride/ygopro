@@ -6,6 +6,7 @@
 #include "game.h"
 #include "duelclient.h"
 #include <algorithm>
+#include <unordered_map>
 
 namespace ygo {
 
@@ -844,7 +845,11 @@ void DeckBuilder::FilterCards() {
 		if(filter_marks && (data.link_marker & filter_marks)!= filter_marks)
 			continue;
 		if(filter_lm) {
-			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1))
+			unsigned int limitcode = ptr->first;
+			auto flit = filterList->find(limitcode);
+			if (flit == filterList->end())
+				limitcode = ptr->second.alias ? ptr->second.alias : ptr->first;
+			if(filter_lm <= 3 && (!filterList->count(limitcode) || (*filterList)[limitcode] != filter_lm - 1))
 				continue;
 			if(filter_lm == 4 && data.ot != 1)
 				continue;
@@ -1032,22 +1037,32 @@ void DeckBuilder::pop_side(int seq) {
 }
 bool DeckBuilder::check_limit(code_pointer pointer) {
 	unsigned int limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
+	int found = 0;
+	std::unordered_set<int> limit_codes;
+	auto f=[&](int code, int alias){
+		if(filterList->find(code) != filterList->end())
+			limit_codes.insert(code);
+		else
+			limit_codes.insert(alias);
+	};
+	auto f2 = [&](std::vector<code_pointer> list) {
+		for(auto it : list) {
+			if(it->first == limitcode || it->second.alias == limitcode) {
+				f(it->first, it->second.alias);
+				found++;
+			}
+		}
+	};
+	f(pointer->first, limitcode);
+	f2(deckManager.current_deck.main);
+	f2(deckManager.current_deck.extra);
+	f2(deckManager.current_deck.side);
 	int limit = 3;
-	auto flit = filterList->find(limitcode);
-	if(flit != filterList->end())
-		limit = flit->second;
-	for(auto it = deckManager.current_deck.main.begin(); it != deckManager.current_deck.main.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
-			limit--;
+	for(int code : limit_codes) {
+		auto flit = filterList->find(code);
+		if(flit != filterList->end())
+			limit = std::min(limit,flit->second);
 	}
-	for(auto it = deckManager.current_deck.extra.begin(); it != deckManager.current_deck.extra.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
-			limit--;
-	}
-	for(auto it = deckManager.current_deck.side.begin(); it != deckManager.current_deck.side.end(); ++it) {
-		if((*it)->first == limitcode || (*it)->second.alias == limitcode)
-			limit--;
-	}
-	return limit > 0;
+	return limit > found;
 }
 }

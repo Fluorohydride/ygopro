@@ -9,6 +9,7 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
+#include <bitset>
 #include "../ocgcore/common.h"
 #include "utils.h"
 #include <algorithm>
@@ -84,7 +85,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->dInfo.isReplay)
 					ReplayMode::SwapField();
 				else if (mainGame->dInfo.player_type == 7)
-					mainGame->dField.ReplaySwap();
+					ReplaySwap();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {
@@ -177,11 +178,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case MSG_SELECT_CARD:
-				case MSG_SELECT_TRIBUTE:
-				case MSG_SELECT_SUM: {
+				case MSG_SELECT_TRIBUTE: {
 					mainGame->HideElement(mainGame->wQuery);
-					if(select_panalmode)
-						mainGame->dField.ShowSelectCard(true);
 					break;
 				}
 				case MSG_SELECT_CHAIN: {
@@ -216,8 +214,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case MSG_SELECT_CARD:
-				case MSG_SELECT_TRIBUTE:
-				case MSG_SELECT_SUM: {
+				case MSG_SELECT_TRIBUTE: {
 					SetResponseSelectedCards();
 					ShowCancelOrFinishButton(0);
 					mainGame->HideElement(mainGame->wQuery, true);
@@ -633,9 +630,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 					if (command_card->is_selected) {
 						command_card->is_selected = false;
-						int i = 0;
-						while(selected_cards[i] != command_card) i++;
-						selected_cards.erase(selected_cards.begin() + i);
+						auto it = std::find(selected_cards.begin(), selected_cards.end(), command_card);
+						selected_cards.erase(it);
 						if(command_card->controler)
 							mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffd0d0d0);
 						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(0xffffffff);
@@ -683,8 +679,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case MSG_SELECT_SUM: {
 					command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
-					selected_cards.push_back(command_card);
-					ShowSelectSum(true);
+					if (std::find(must_select_cards.begin(), must_select_cards.end(), command_card) != must_select_cards.end())
+						break;
+					if (command_card->is_selected) {
+						command_card->is_selected = false;
+						auto it = std::find(selected_cards.begin(), selected_cards.end(), command_card);
+						selected_cards.erase(it);
+					} else
+						selected_cards.push_back(command_card);
+					ShowSelectSum();
 					break;
 				}
 				case MSG_SORT_CHAIN:
@@ -1293,9 +1296,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				if (clicked_card->is_selected) {
 					clicked_card->is_selected = false;
-					int i = 0;
-					while(selected_cards[i] != clicked_card) i++;
-					selected_cards.erase(selected_cards.begin() + i);
+					auto it = std::find(selected_cards.begin(), selected_cards.end(), clicked_card);
+					selected_cards.erase(it);
 				} else {
 					clicked_card->is_selected = true;
 					selected_cards.push_back(clicked_card);
@@ -1376,14 +1378,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case MSG_SELECT_SUM: {
-				if (!clicked_card || !clicked_card->is_selectable)
+				if (!clicked_card || !clicked_card->is_selectable || (std::find(must_select_cards.begin(), must_select_cards.end(), clicked_card) != must_select_cards.end()))
 					break;
 				if (clicked_card->is_selected) {
+					clicked_card->is_selected = false;
 					auto it = std::find(selected_cards.begin(), selected_cards.end(), clicked_card);
 					selected_cards.erase(it);
 				} else
 					selected_cards.push_back(clicked_card);
-				ShowSelectSum(false);
+				ShowSelectSum();
 				break;
 			}
 			}
@@ -1793,7 +1796,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				}
 				u32 pos = mainGame->scrCardText->getPos();
 				const auto& tsize = mainGame->scrCardText->getRelativePosition();
-				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - tsize.getWidth() - 10, mainGame->textFont, mainGame->showingtext, pos);
+				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - tsize.getWidth(), mainGame->textFont, mainGame->showingtext, pos);
 				return true;
 				break;
 			}
@@ -2191,11 +2194,19 @@ void ClientField::SetShowMark(ClientCard* pcard, bool enable) {
 	}
 }
 void ClientField::SetResponseSelectedCards() const {
-	unsigned char respbuf[64];
-	respbuf[0] = selected_cards.size();
-	for (size_t i = 0; i < selected_cards.size(); ++i)
-		respbuf[i + 1] = selected_cards[i]->select_seq;
-	DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+	if (mainGame->dInfo.lua64) {
+		std::bitset<64 * 8> bitvalue;
+		bitvalue.reset();
+		for(auto c : selected_cards)
+			bitvalue[c->select_seq + 1] = 1;
+		DuelClient::SetResponseB(&bitvalue, sizeof(bitvalue));
+	} else {
+		unsigned char respbuf[64];
+		respbuf[0] = selected_cards.size();
+		for (size_t i = 0; i < selected_cards.size(); ++i)
+			respbuf[i + 1] = selected_cards[i]->select_seq;
+		DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+	}
 }
 void ClientField::SetResponseSelectedOption() const {
 	if(mainGame->dInfo.curMsg == MSG_SELECT_OPTION) {
@@ -2253,8 +2264,7 @@ void ClientField::CancelOrFinish() {
 		mainGame->HideElement(mainGame->wQuery, true);
 		break;
 	}
-	case MSG_SELECT_CARD:
-	case MSG_SELECT_UNSELECT_CARD: {
+	case MSG_SELECT_CARD: {
 		if (selected_cards.size() == 0) {
 			if (select_cancelable) {
 				DuelClient::SetResponseI(-1);
@@ -2281,6 +2291,17 @@ void ClientField::CancelOrFinish() {
 		}
 		break;
 	}
+	case MSG_SELECT_UNSELECT_CARD: {
+		if(select_cancelable) {
+			DuelClient::SetResponseI(-1);
+			ShowCancelOrFinishButton(0);
+			if(mainGame->wCardSelect->isVisible())
+				mainGame->HideElement(mainGame->wCardSelect, true);
+			else
+				DuelClient::SendResponse();
+		}
+		break;
+	}
 	case MSG_SELECT_TRIBUTE: {
 		if (selected_cards.size() == 0) {
 			if (select_cancelable) {
@@ -2301,10 +2322,12 @@ void ClientField::CancelOrFinish() {
 		break;
 	}
 	case MSG_SELECT_SUM: {
-		if (mainGame->wQuery->isVisible()) {
+		if(select_ready) {
 			SetResponseSelectedCards();
 			ShowCancelOrFinishButton(0);
-			mainGame->HideElement(mainGame->wQuery, true);
+			if (mainGame->wCardSelect->isVisible())
+				mainGame->HideElement(mainGame->wCardSelect, true);
+			DuelClient::SendResponse();
 			break;
 		}
 		break;

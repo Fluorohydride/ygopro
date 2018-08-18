@@ -28,7 +28,7 @@ class ReplayPacket {
 public:
 	int message;
 	int length;
-	unsigned char data[0x2000];
+	unsigned char data[0x20000];
 	ReplayPacket() {}
 	ReplayPacket(char * buf, int len);
 	ReplayPacket(int msg, char * buf, int len);

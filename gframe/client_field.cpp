@@ -607,7 +607,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 			break;
 		}
 	}
-	for(int i = 0; (i < count) && quickmode; i++) {
+	for(int i = 0; (i < count) && (i < 5) && quickmode; i++) {
 		const wchar_t* option = dataManager.GetDesc(select_options[i]);
 		mainGame->btnOption[i]->setText(option);
 	}
@@ -1107,52 +1107,30 @@ void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
 	pcard->is_fading = true;
 	pcard->aniFrame = frame;
 }
-bool ClientField::ShowSelectSum(bool panelmode) {
-	if(panelmode) {
-		if(CheckSelectSum()) {
-			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
-				SetResponseSelectedCards();
-				ShowCancelOrFinishButton(0);
-				if(mainGame->wCardSelect->isVisible())
-					mainGame->HideElement(mainGame->wCardSelect, true);
-				else {
-					DuelClient::SendResponse();
-					return true;
-				}
-			} else {
-				select_ready = true;
-				mainGame->wCardSelect->setVisible(false);
-				wchar_t wbuf[256], *pwbuf = wbuf;
-				BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
-				*pwbuf++ = L'\n';
-				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
-				mainGame->stQMessage->setText(wbuf);
-				mainGame->PopupElement(mainGame->wQuery);
-			}
+bool ClientField::ShowSelectSum() {
+	if(CheckSelectSum()) {
+		if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
+			SetResponseSelectedCards();
+			ShowCancelOrFinishButton(0);
+			DuelClient::SendResponse();
+			return true;
 		} else {
-			select_ready = false;
-			mainGame->wCardSelect->setVisible(false);
-			mainGame->dField.ShowSelectCard();
+			select_ready = true;
 		}
-	} else {
-		if(CheckSelectSum()) {
-			if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
-				SetResponseSelectedCards();
-				ShowCancelOrFinishButton(0);
-				DuelClient::SendResponse();
-				return true;
-			} else {
-				select_ready = true;
-				wchar_t wbuf[256], *pwbuf = wbuf;
-				BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
-				*pwbuf++ = L'\n';
-				BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
-				mainGame->stQMessage->setText(wbuf);
-				mainGame->PopupElement(mainGame->wQuery);
-			}
-		} else
-			select_ready = false;
+	} else
+		select_ready = false;
+	bool panelmode = false;
+	for (auto card : selectable_cards) {
+		if (card->location & (LOCATION_DECK+LOCATION_EXTRA+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_OVERLAY)) {
+			panelmode = true;
+			break;
+		}
 	}
+	mainGame->wCardSelect->setVisible(false);
+	if(panelmode) {
+		mainGame->dField.ShowSelectCard(select_ready);
+	}
+	mainGame->stHintMsg->setVisible(!panelmode);
 	if (select_ready) {
 		ShowCancelOrFinishButton(2);
 	} else {
@@ -1162,26 +1140,44 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 }
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
-	for(auto sit = selectsum_all.begin(); sit != selectsum_all.end(); ++sit) {
-		(*sit)->is_selectable = false;
-		(*sit)->is_selected = false;
-		selable.insert(*sit);
+	for(auto card : selectsum_all) {
+		card->is_selectable = false;
+		card->is_selected = false;
+		selable.insert(card);
 	}
-	for(size_t i = 0; i < selected_cards.size(); ++i) {
-		if((int)i < must_select_count)
-			selected_cards[i]->is_selectable = false;
-		else
-			selected_cards[i]->is_selectable = true;
-		selected_cards[i]->is_selected = true;
-		selable.erase(selected_cards[i]);
+	for(auto card : must_select_cards) {
+		card->is_selectable = true;
+		card->is_selected = true;
+		selable.erase(card);
 	}
+	for(auto card : selected_cards) {
+		card->is_selectable = true;
+		card->is_selected = true;
+		selable.erase(card);
+	}
+	selected_cards.insert(selected_cards.end(), must_select_cards.begin(), must_select_cards.end());
 	selectsum_cards.clear();
 	if (select_mode == 0) {
 		bool ret = check_sel_sum_s(selable, 0, select_sumval);
 		selectable_cards.clear();
-		for(auto sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
-			(*sit)->is_selectable = true;
-			selectable_cards.push_back(*sit);
+		std::sort(mainGame->dField.must_select_cards.begin(), mainGame->dField.must_select_cards.end(), ClientCard::client_card_sort);
+		for(auto card : must_select_cards) {
+			card->is_selectable = true;
+			selectable_cards.push_back(card);
+			auto it = std::find(selected_cards.begin(), selected_cards.end(), card);
+			if (it != selected_cards.end())
+				selected_cards.erase(it);
+		}
+		std::sort(mainGame->dField.selected_cards.begin(), mainGame->dField.selected_cards.end(), ClientCard::client_card_sort);
+		for(auto card : selected_cards) {
+			card->is_selectable = true;
+			selectable_cards.push_back(card);
+		}
+		std::vector<ClientCard*> tmp(selectsum_cards.begin(), selectsum_cards.end());
+		std::sort(tmp.begin(), tmp.end(), ClientCard::client_card_sort);
+		for(auto card : tmp) {
+			card->is_selectable = true;
+			selectable_cards.push_back(card);
 		}
 		return ret;
 	} else {
@@ -1199,8 +1195,14 @@ bool ClientField::CheckSelectSum() {
 			sumc += opmin;
 			max += opmax;
 		}
-		if (select_sumval <= sumc)
+		if (select_sumval <= sumc) {
+			for (auto card : must_select_cards) {
+				auto it = std::find(selected_cards.begin(), selected_cards.end(), card);
+				if (it != selected_cards.end())
+					selected_cards.erase(it);
+			}
 			return true;
+		}
 		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
 		for(auto sit = selable.begin(); sit != selable.end(); ++sit) {
@@ -1240,9 +1242,24 @@ bool ClientField::CheckSelectSum() {
 			}
 		}
 		selectable_cards.clear();
-		for(auto sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
-			(*sit)->is_selectable = true;
-			selectable_cards.push_back(*sit);
+		std::sort(must_select_cards.begin(), must_select_cards.end(), ClientCard::client_card_sort);
+		for(auto card : must_select_cards) {
+			card->is_selectable = true;
+			selectable_cards.push_back(card);
+			auto it = std::find(selected_cards.begin(), selected_cards.end(), card);
+			if (it != selected_cards.end())
+				selected_cards.erase(it);
+		}
+		std::sort(selected_cards.begin(), selected_cards.end(), ClientCard::client_card_sort);
+		for(auto card : selected_cards) {
+			card->is_selectable = true;
+			selectable_cards.push_back(card);
+		}
+		std::vector<ClientCard*> tmp(selectsum_cards.begin(), selectsum_cards.end());
+		std::sort(tmp.begin(), tmp.end(), ClientCard::client_card_sort);
+		for(auto card : tmp) {
+			card->is_selectable = true;
+			selectable_cards.push_back(card);
 		}
 		return ret;
 	}

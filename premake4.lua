@@ -10,7 +10,7 @@ solution "ygo"
 	defines { "LUA_COMPAT_5_2" }
 
     configuration "windows"
-        defines { "WIN32", "_WIN32" }
+        defines { "WIN32", "_WIN32", "NOMINMAX" }
 
     configuration "bsd"
         defines { "LUA_USE_POSIX" }
@@ -24,8 +24,6 @@ solution "ygo"
 
     configuration "linux"
         defines { "LUA_USE_LINUX" }
-		includedirs { "irrKlang/include" }
-		libdirs { "irrKlang/lib" }
 
     configuration "vs*"
         flags "EnableSSE2"

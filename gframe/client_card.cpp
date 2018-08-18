@@ -129,22 +129,16 @@ void ClientCard::UpdateInfo(char* buf) {
 	if(flag & QUERY_REASON)
 		reason = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_EQUIP_CARD) {
-		int c = BufferIO::ReadInt8(buf);
-		int l = BufferIO::ReadInt8(buf);
-		int s = BufferIO::ReadInt8(buf);
-		BufferIO::ReadInt8(buf);
-		ClientCard* ecard = mainGame->dField.GetCard(c, l, s);
+		loc_info info = read_location_info(buf);
+		ClientCard* ecard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
 		equipTarget = ecard;
 		ecard->equipped.insert(this);
 	}
 	if(flag & QUERY_TARGET_CARD) {
 		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
-			int c = BufferIO::ReadInt8(buf);
-			int l = BufferIO::ReadInt8(buf);
-			int s = BufferIO::ReadInt8(buf);
-			BufferIO::ReadInt8(buf);
-			ClientCard* tcard = mainGame->dField.GetCard(c, l, s);
+			loc_info info = read_location_info(buf);
+			ClientCard* tcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
 			cardTarget.insert(tcard);
 			tcard->ownerTarget.insert(this);
 		}
@@ -200,6 +194,19 @@ void ClientCard::ClearTarget() {
 	}
 	cardTarget.clear();
 	ownerTarget.clear();
+}
+loc_info ClientCard::read_location_info(char*& p) {
+	loc_info info;
+	info.controler = BufferIO::ReadInt8(p);
+	info.location = BufferIO::ReadInt8(p);
+	if (mainGame->dInfo.lua64) {
+		info.sequence = BufferIO::ReadInt32(p);
+		info.position = BufferIO::ReadInt32(p);
+	} else {
+		info.sequence = BufferIO::ReadInt8(p);
+		info.position = BufferIO::ReadInt8(p);
+	}
+	return info;
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 	int32 cp1 = c1->overlayTarget ? c1->overlayTarget->controler : c1->controler;

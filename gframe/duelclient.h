@@ -74,6 +74,8 @@ public:
 		memcpy(p, buffer, len);
 		bufferevent_write(client_bev, duel_client_write, len + 3);
 	}
+
+	static void ReplayPrompt(bool need_header = false);
 	
 protected:
 	static bool is_refreshing;
