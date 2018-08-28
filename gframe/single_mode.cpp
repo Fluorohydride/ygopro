@@ -51,6 +51,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname, 20);
 	mainGame->dInfo.clientname[0] = 0;
 	mainGame->dInfo.turn = 0;
+	mainGame->dInfo.announce_cache.clear();
 	char filename[256];
 	size_t slen = 0;
 	if(open_file) {
