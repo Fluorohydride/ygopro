@@ -1435,7 +1435,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 	if(try_cache && mainGame->dInfo.announce_cache.size()) {
 		for(int i = 0; i < mainGame->dInfo.announce_cache.size(); ++i) {
 			unsigned int cache_code = mainGame->dInfo.announce_cache[i];
-			if(dataManager.GetString(cache_code, &cstr) && dataManager.GetData(cache_code, &cd) && is_declarable(cd, opcode)) {
+			if(dataManager.GetString(cache_code, &cstr) && dataManager.GetData(cache_code, &cd) && is_declarable(cd, declarable_type)) {
 				mainGame->lstANCard->addItem(cstr.name.c_str());
 				ancard.push_back(cache_code);
 			}
