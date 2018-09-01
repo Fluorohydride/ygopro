@@ -1876,7 +1876,7 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, phasebuf, 3);
 
 	char query_buffer[256];
-	int length = query_field_info(pduel, query_buffer);
+	int length = query_field_info(pduel, (unsigned char*)query_buffer);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, query_buffer, length);
 	RefreshMzone(1 - player, 0xffdfff, 0, dp);
 	RefreshMzone(player, 0xffdfff, 0, dp);
