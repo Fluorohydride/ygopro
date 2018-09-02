@@ -583,7 +583,7 @@ namespace ygo {
 			case MSG_RANDOM_SELECTED: {
 				player = BufferIO::ReadInt8(pbuf);
 				count = BufferIO::ReadInt8(pbuf);
-				pbuf += count * 4;
+				pbuf += count * 10;
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
 				pauseable = false;
 				break;

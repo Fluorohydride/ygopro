@@ -1226,7 +1226,7 @@ int RelayDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_RANDOM_SELECTED: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 4;
+			pbuf += count * 10;
 			NetServer::SendBufferToPlayer(players[startp[0]].player, STOC_GAME_MSG, offset, pbuf - offset);
 			for (int i = startp[0] + 1; i < 6; i++)
 				if (players[i].player)

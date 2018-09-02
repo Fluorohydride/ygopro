@@ -2943,19 +2943,17 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*int player = */BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-			pbuf += count * 4;
+			pbuf += count * 10;
 			return true;
 		}
 		ClientCard* pcards[10];
 		for (int i = 0; i < count; ++i) {
-			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l = BufferIO::ReadUInt8(pbuf);
-			int s = BufferIO::ReadInt8(pbuf);
-			int ss = BufferIO::ReadInt8(pbuf);
-			if ((l & LOCATION_OVERLAY) > 0)
-				pcards[i] = mainGame->dField.GetCard(c, l & (~LOCATION_OVERLAY) & 0xff, s)->overlayed[ss];
+			loc_info info = ClientCard::read_location_info(pbuf);
+			info.controler = mainGame->LocalPlayer(info.controler);
+			if ((info.location & LOCATION_OVERLAY) > 0)
+				pcards[i] = mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
 			else
-				pcards[i] = mainGame->dField.GetCard(c, l, s);
+				pcards[i] = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
 			pcards[i]->is_highlighting = true;
 		}
 		mainGame->WaitFrameSignal(30);
@@ -2966,7 +2964,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_BECOME_TARGET: {
 		int count = BufferIO::ReadInt8(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
-			pbuf += count * 4;
+			pbuf += count * 10;
 			return true;
 		}
 		for (int i = 0; i < count; ++i) {
