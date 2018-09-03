@@ -1017,6 +1017,7 @@ void Game::RefreshReplay() {
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
+	mainGame->stSinglePlayInfo->setText(L"");
 #ifdef _WIN32
 	WIN32_FIND_DATAW fdataw;
 	HANDLE fh = FindFirstFileW(L"./single/*.lua", &fdataw);
