@@ -1859,10 +1859,10 @@ std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 	std::wstring str((std::istreambuf_iterator<char>(infile)),
 		std::istreambuf_iterator<char>());
 	std::wstring res = L"";
-	size_t start = str.find(L"#header");
+	size_t start = str.find(L"--[[message");
 	if(start != std::wstring::npos) {
-		size_t end = str.rfind(L"#endheader");
-		res = str.substr(start + 7, end - (start + 7));
+		size_t end = str.find(L"]]", start);
+		res = str.substr(start + 11, end - (start + 11));
 		int len = 0;
 		for(wchar_t c : res) {
 			if(iswalnum(c))
@@ -1876,17 +1876,6 @@ std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 			res = res.substr(len);
 	}
 	return res;
-}
-std::string Game::ReadPuzzleBuffer(const char* script_name) {
-	std::ifstream infile(script_name);
-	std::string str((std::istreambuf_iterator<char>(infile)),
-		std::istreambuf_iterator<char>());
-	size_t start = str.rfind("#endheader");
-	if(start != std::string::npos) {
-		std::string res = str.substr(start + 10);
-		return res;
-	}
-	return str;
 }
 
 

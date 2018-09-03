@@ -221,8 +221,7 @@ namespace ygo {
 			char filename[256];
 			size_t slen = cur_replay.ReadInt16();
 			cur_replay.ReadData(filename, slen);
-			std::string scriptbuff = mainGame->ReadPuzzleBuffer(filename);
-			if(!preload_script(pduel, filename, slen, scriptbuff.length(), (char *)scriptbuff.c_str()))
+			if(!preload_script(pduel, filename, slen))
 				return false;
 		}
 		start_duel(pduel, opt);

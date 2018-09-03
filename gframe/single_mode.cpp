@@ -57,17 +57,14 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dInfo.turn = 0;
 	char filename[256];
 	size_t slen = 0;
-	std::string scriptbuff;
 	if(open_file) {
 		open_file = false;
 		slen = BufferIO::EncodeUTF8(open_file_name, filename);
-		scriptbuff = mainGame->ReadPuzzleBuffer(filename);
-		if(!preload_script(pduel, filename, slen, scriptbuff.length(), (char *)scriptbuff.c_str())) {
+		if(!preload_script(pduel, filename, slen)) {
 			wchar_t fname[256];
 			myswprintf(fname, L"./single/%ls", open_file_name);
 			slen = BufferIO::EncodeUTF8(fname, filename);
-			scriptbuff = mainGame->ReadPuzzleBuffer(filename);
-			if(!preload_script(pduel, filename, slen, scriptbuff.length(), (char *)scriptbuff.c_str()))
+			if(!preload_script(pduel, filename, slen))
 				slen = 0;
 		}
 	} else {
@@ -75,8 +72,7 @@ int SingleMode::SinglePlayThread(void* param) {
 		wchar_t fname[256];
 		myswprintf(fname, L"./single/%ls", name);
 		slen = BufferIO::EncodeUTF8(fname, filename);
-		scriptbuff = mainGame->ReadPuzzleBuffer(filename);
-		if(!preload_script(pduel, filename, slen, scriptbuff.length(), (char *)scriptbuff.c_str()))
+		if(!preload_script(pduel, filename, slen))
 			slen = 0;
 	}
 	if(slen == 0) {
