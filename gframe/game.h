@@ -157,6 +157,7 @@ public:
 	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
 	void ValidateName(irr::gui::IGUIEditBox* box);
+	std::wstring ReadPuzzleMessage(const char* script_name);
 
 	Mutex gMutex;
 	Mutex gBuffer;

@@ -496,6 +496,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					mainGame->chkYrp->setEnabled(true);
 				break;
 			}
+			case LISTBOX_SINGLEPLAY_LIST: {
+				int sel = mainGame->lstSinglePlayList->getSelected();
+				if(sel == -1)
+					break;
+				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
+				wchar_t fname[256];
+				char filename[256];
+				myswprintf(fname, L"./single/%ls", name);
+				BufferIO::EncodeUTF8(fname, filename);
+				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(filename).c_str());
+				break;
+			}
 			}
 			break;
 		}
