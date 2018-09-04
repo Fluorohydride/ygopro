@@ -9,6 +9,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include <fstream>
 
 #ifndef _WIN32
 #include <sys/types.h>
