@@ -16,19 +16,23 @@ Replay::~Replay() {
 	delete[] replay_data;
 	delete[] comp_data;
 }
-void Replay::BeginRecord() {
+void Replay::BeginRecord(const wchar_t* name) {
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
+	wchar_t fname[256];
+	myswprintf(fname, L"./replay/%ls.yrp", name);
 #ifdef _WIN32
 	if(is_recording)
 		CloseHandle(recording_fp);
-	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+	recording_fp = CreateFileW(fname, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
 	if(recording_fp == INVALID_HANDLE_VALUE)
 		return;
 #else
 	if(is_recording)
 		fclose(fp);
-	fp = fopen("./replay/_LastReplay.yrp", "wb");
+	char fname2[256];
+	BufferIO::EncodeUTF8(fname, fname2);
+	fp = fopen(fname2, "wb");
 	if(!fp)
 		return;
 #endif

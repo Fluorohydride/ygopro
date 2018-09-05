@@ -27,6 +27,7 @@ int DuelClient::select_hint = 0;
 int DuelClient::select_unselect_hint = 0;
 wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;
+Replay DuelClient::last_replay;
 
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
@@ -235,6 +236,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
+		last_replay.WriteInt16(len - 1);
+		last_replay.WriteData(pdata, len - 1);
 		ClientAnalyze(pdata, len - 1);
 		break;
 	}
@@ -629,11 +632,50 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->dInfo.tag_player[1] = false;
 		}
 		mainGame->gMutex.Unlock();
+		mainGame->replay_received = false;
+		ReplayHeader rh;
+		rh.id = REPLAY_RPYX;
+		rh.version = PRO_VERSION;
+		rh.flag = 0;
+		if(mainGame->dInfo.isTag)
+			rh.flag |= REPLAY_TAG;
+		time_t seed = time(0);
+		rh.seed = seed;
+		last_replay.BeginRecord(L"_LastClientReplay");
+		last_replay.WriteHeader(rh);
+		if(!mainGame->dInfo.isTag) {
+			last_replay.WriteData(mainGame->dInfo.hostname, 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname, 40, false);
+		} else {
+			last_replay.WriteData(mainGame->dInfo.hostname, 40, false);
+			last_replay.WriteData(mainGame->dInfo.hostname_tag, 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname, 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname_tag, 40, false);
+		}
 		match_kill = 0;
 		break;
 	}
 	case STOC_DUEL_END: {
 		mainGame->gMutex.Lock();
+		last_replay.EndRecord();
+		if(!mainGame->replay_received) {
+			time_t nowtime = time(NULL);
+			struct tm *localedtime = localtime(&nowtime);
+			char timebuf[40];
+			strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
+			size_t size = strlen(timebuf) + 1;
+			wchar_t timetext[80];
+			mbstowcs(timetext, timebuf, size);
+			mainGame->ebRSName->setText(timetext);
+			mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
+			mainGame->PopupElement(mainGame->wReplaySave);
+			mainGame->gMutex.Unlock();
+			mainGame->replaySignal.Reset();
+			mainGame->replaySignal.Wait();
+			if(mainGame->actionParam)
+				last_replay.SaveReplay(mainGame->ebRSName->getText());
+			mainGame->gMutex.Lock();
+		}
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->btnSpectatorSwap->setVisible(false);
@@ -672,6 +714,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_REPLAY: {
+		mainGame->replay_received = true;
 		mainGame->gMutex.Lock();
 		mainGame->wPhase->setVisible(false);
 		if(mainGame->dInfo.player_type < 7)

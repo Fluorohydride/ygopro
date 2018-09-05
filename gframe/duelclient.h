@@ -10,6 +10,7 @@
 #include <event2/buffer.h>
 #include <event2/thread.h>
 #include "network.h"
+#include "replay.h"
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "../ocgcore/mtrandom.h"
@@ -33,6 +34,7 @@ private:
 	static int select_unselect_hint;
 	static wchar_t event_string[256];
 	static mtrandom rnd;
+	static Replay last_replay;
 public:
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);

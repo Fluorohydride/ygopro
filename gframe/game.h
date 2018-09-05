@@ -201,6 +201,7 @@ public:
 
 	bool is_building;
 	bool is_siding;
+	bool replay_received;
 
 	ClientField dField;
 	DeckBuilder deckBuilder;

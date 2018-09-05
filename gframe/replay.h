@@ -28,7 +28,7 @@ class Replay {
 public:
 	Replay();
 	~Replay();
-	void BeginRecord();
+	void BeginRecord(const wchar_t* name = L"_LastReplay");
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
 	void WriteInt32(int data, bool flush = true);
