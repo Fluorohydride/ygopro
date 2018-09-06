@@ -1428,12 +1428,12 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		int index = 0;
 		for(auto it = ancard.begin(); it != ancard.end();) {
 			int trycode = *it;
-			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && !is_declarable(cd, declarable_type)) {
-				it = ancard.erase(it);
-				mainGame->lstANCard->removeItem(index);
-			} else {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declarable_type)) {
 				++it;
 				++index;
+			} else {
+				it = ancard.erase(it);
+				mainGame->lstANCard->removeItem(index);
 			}
 		}
 		if(!ancard.empty())
@@ -1473,12 +1473,12 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		int index = 0;
 		for(auto it = ancard.begin(); it != ancard.end();) {
 			int trycode = *it;
-			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && !is_declarable(cd, opcode)) {
-				it = ancard.erase(it);
-				mainGame->lstANCard->removeItem(index);
-			} else {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
 				++it;
 				++index;
+			} else {
+				it = ancard.erase(it);
+				mainGame->lstANCard->removeItem(index);
 			}
 		}
 		if(!ancard.empty())
