@@ -1424,8 +1424,21 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter && ancard.size() < 50) {
+		int index = 0;
+		for(auto it = ancard.begin(); it != ancard.end();) {
+			int trycode = *it;
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && !is_declarable(cd, declarable_type)) {
+				it = ancard.erase(it);
+				mainGame->lstANCard->removeItem(index);
+			} else {
+				++it;
+				++index;
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
@@ -1456,8 +1469,21 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter && ancard.size() < 50) {
+		int index = 0;
+		for(auto it = ancard.begin(); it != ancard.end();) {
+			int trycode = *it;
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && !is_declarable(cd, opcode)) {
+				it = ancard.erase(it);
+				mainGame->lstANCard->removeItem(index);
+			} else {
+				++it;
+				++index;
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
