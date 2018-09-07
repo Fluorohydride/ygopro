@@ -85,10 +85,10 @@ bool Game::Initialize() {
 	else
 		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
 	if(hWnd) {
-		LONG style = GetWindowLong(hWnd, GWL_STYLE);
+		LONG style = GetWindowLongW(hWnd, GWL_STYLE);
 		style |= WS_MINIMIZEBOX;
-		SetWindowLong(hWnd, GWL_STYLE, style);
-		SendMessage(hWnd, WM_NCPAINT, 1, 0);
+		SetWindowLongW(hWnd, GWL_STYLE, style);
+		SendMessageW(hWnd, WM_NCPAINT, 1, 0);
 	}
 #endif
 	SetWindowsIcon();
