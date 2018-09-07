@@ -33,7 +33,7 @@ public:
 
 protected:
 	static Replay last_replay;
-	static bool replay_debug;
+	static Replay last_debug_replay;
 };
 
 }

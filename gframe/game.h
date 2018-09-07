@@ -51,7 +51,6 @@ struct Config {
 	double sound_volume;
 	double music_volume;
 	int music_mode;
-	int new_replay;
 };
 
 struct DuelInfo {

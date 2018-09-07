@@ -52,10 +52,10 @@ protected:
 	unsigned char last_response;
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
+	Replay last_debug_replay;
 	bool match_mode;
 	int match_kill;
 	bool game_started;
-	bool replay_debug;
 	unsigned char duel_count;
 	unsigned char tp_player;
 	unsigned char match_result[3];
