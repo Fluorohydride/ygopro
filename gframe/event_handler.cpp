@@ -1319,14 +1319,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						select_ready = true;
 						ShowCancelOrFinishButton(2);
-						if(mainGame->dInfo.curMsg == MSG_SELECT_TRIBUTE) {
-							wchar_t wbuf[256], *pwbuf = wbuf;
-							BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
-							*pwbuf++ = L'\n';
-							BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
-							mainGame->stQMessage->setText(wbuf);
-							mainGame->PopupElement(mainGame->wQuery);
-						}
 					}
 				} else {
 					select_ready = false;
@@ -2297,6 +2289,14 @@ void ClientField::CancelOrFinish() {
 			ShowCancelOrFinishButton(0);
 			mainGame->HideElement(mainGame->wQuery, true);
 			break;
+		}
+		if(select_ready) {
+			SetResponseSelectedCards();
+			ShowCancelOrFinishButton(0);
+			if(mainGame->wCardSelect->isVisible())
+				mainGame->HideElement(mainGame->wCardSelect, true);
+			else
+				DuelClient::SendResponse();
 		}
 		break;
 	}
