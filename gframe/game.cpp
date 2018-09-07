@@ -10,6 +10,7 @@
 #include "single_mode.h"
 #include "../ocgcore/duel.h"
 #include <sstream>
+#include <fstream>
 #include "utils.h"
 
 #ifndef _WIN32
