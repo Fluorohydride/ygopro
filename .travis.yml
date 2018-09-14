@@ -6,9 +6,13 @@ addons:
   ssh_known_hosts:
   - github.com
   apt:
+    sources:
+      - ubuntu-toolchain-r-test
     packages:
-    - libevent-dev
-    - libsqlite3-dev
+      - gcc-6
+      - g++-6
+      - libevent-dev
+      - libsqlite3-dev
 before_install:
 - git submodule update --init --recursive
 - wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha12/premake-5.0.0-alpha12-linux.tar.gz | tar zfx -
