@@ -15,6 +15,8 @@ addons:
       - libsqlite3-dev
 before_install:
 - git submodule update --init --recursive
+- ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
+- ln -s /usr/bin/g++-6 /usr/local/bin/g++
 - wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha12/premake-5.0.0-alpha12-linux.tar.gz | tar zfx -
 - wget -O - https://www.lua.org/ftp/lua-5.3.5.tar.gz | tar zfx -; cd lua-5.3.5; sudo make linux install; cd ..
 script:
