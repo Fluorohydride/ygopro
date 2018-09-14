@@ -22,7 +22,7 @@ project "ygopro"
         links { "ws2_32" }
 
     configuration "not vs*"
-        buildoptions { "-std=gnu++0x", "-fno-rtti" }
+        buildoptions { "-std=c++14", "-fno-rtti" }
     configuration "not windows"
         includedirs { "/usr/include/lua", "/usr/include/lua5.3", "/usr/include/lua/5.3" }
         links { "event_pthreads", "dl", "pthread" }
