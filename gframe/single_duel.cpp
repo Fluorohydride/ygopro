@@ -1424,6 +1424,9 @@ void SingleDuel::WaitforResponse(int playerid) {
 		NetServer::SendPacketToPlayer(players[0], STOC_TIME_LIMIT, sctl);
 		NetServer::SendPacketToPlayer(players[1], STOC_TIME_LIMIT, sctl);
 		players[playerid]->state = CTOS_TIME_CONFIRM;
+		time_elapsed = 0;
+		timeval timeout = { 1, 0 };
+		event_add(etimer, &timeout);
 	} else
 		players[playerid]->state = CTOS_RESPONSE;
 }
@@ -1432,6 +1435,7 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 		return;
 	if(dp->type != last_response)
 		return;
+	event_del(etimer);
 	players[last_response]->state = CTOS_RESPONSE;
 	time_elapsed = 0;
 	timeval timeout = {1, 0};
