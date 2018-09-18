@@ -156,6 +156,9 @@ bool ReplayMode::StartDuel() {
 		cur_replay.ReadName(mainGame->dInfo.clientname);
 	}
 	pduel = create_duel(rnd.rand());
+#ifdef YGOPRO_SERVER_MODE
+	preload_script(pduel, "./script/special.lua", 0);
+#endif
 	int start_lp = cur_replay.ReadInt32();
 	int start_hand = cur_replay.ReadInt32();
 	int draw_count = cur_replay.ReadInt32();
