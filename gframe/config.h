@@ -12,11 +12,9 @@
 #include <ws2tcpip.h>
 
 #ifdef _MSC_VER
-#define myswprintf _swprintf
 #define mywcsncasecmp _wcsnicmp
 #define mystrncasecmp _strnicmp
 #else
-#define myswprintf swprintf
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
 #endif
@@ -44,7 +42,6 @@
 #define SOCKET_ERRNO() (errno)
 
 #include <wchar.h>
-#define myswprintf(buf, fmt, ...) swprintf(buf, 4096, fmt, ##__VA_ARGS__)
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
 inline int _wtoi(const wchar_t * s) {
@@ -52,6 +49,11 @@ inline int _wtoi(const wchar_t * s) {
 	return (int)wcstol(s, &endptr, 10);
 }
 #endif
+
+template<size_t N, typename... TR>
+inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
+	return swprintf(buf, N, fmt, args...);
+}
 
 #ifndef YGOPRO_SERVER_MODE
 #include <irrlicht.h>
