@@ -1878,7 +1878,7 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	BufferIO::WriteInt16(pbuf_p, phase);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, phasebuf, 3);
 
-	char query_buffer[256];
+	char query_buffer[1024];
 	int length = query_field_info(pduel, (unsigned char*)query_buffer);
 	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, query_buffer, length);
 	RefreshMzone(1 - player, 0xffdfff, 0, dp);
@@ -1924,7 +1924,11 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
 void TagDuel::RefreshMzone(int player, int flag, int use_cache)
 #endif //YGOPRO_SERVER_MODE
 {
+#ifdef YGOPRO_SERVER_MODE
+	char query_buffer[0x40000];
+#else
 	char query_buffer[0x4000];
+#endif
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -1978,7 +1982,11 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache, DuelPlayer* dp)
 void TagDuel::RefreshSzone(int player, int flag, int use_cache)
 #endif //YGOPRO_SERVER_MODE
 {
+#ifdef YGOPRO_SERVER_MODE
+	char query_buffer[0x40000];
+#else
 	char query_buffer[0x4000];
+#endif
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -2032,7 +2040,11 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache, DuelPlayer* dp)
 void TagDuel::RefreshHand(int player, int flag, int use_cache)
 #endif //YGOPRO_SERVER_MODE
 {
+#ifdef YGOPRO_SERVER_MODE
+	char query_buffer[0x40000];
+#else
 	char query_buffer[0x4000];
+#endif
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -2082,7 +2094,11 @@ void TagDuel::RefreshGrave(int player, int flag, int use_cache, DuelPlayer* dp)
 void TagDuel::RefreshGrave(int player, int flag, int use_cache)
 #endif //YGOPRO_SERVER_MODE
 {
+#ifdef YGOPRO_SERVER_MODE
+	char query_buffer[0x40000];
+#else
 	char query_buffer[0x4000];
+#endif
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -2112,7 +2128,11 @@ void TagDuel::RefreshExtra(int player, int flag, int use_cache, DuelPlayer* dp)
 void TagDuel::RefreshExtra(int player, int flag, int use_cache)
 #endif //YGOPRO_SERVER_MODE
 {
+#ifdef YGOPRO_SERVER_MODE
+	char query_buffer[0x40000];
+#else
 	char query_buffer[0x4000];
+#endif
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
@@ -2148,7 +2168,7 @@ if(!dp || dp == cur_player[player])
 }
 #ifdef YGOPRO_SERVER_MODE
 void TagDuel::RefreshRemoved(int player, int flag, int use_cache, DuelPlayer* dp) {
-	char query_buffer[0x4000];
+	char query_buffer[0x40000];
 	char* qbuf = query_buffer;
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
