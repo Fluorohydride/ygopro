@@ -63,23 +63,23 @@ int main(int argc, char* argv[]) {
 	wchar_t* command = GetCommandLineW();
 	char buffer[2048];
 	BufferIO::EncodeUTF8(command, buffer);
-	char* ptr = buffer;
+	char* p = buffer;
 	argc = 0;
 	int j = 0;
 	bool in_QM = false, in_TEXT = false, in_SPACE = true;
-	while(*ptr) {
+	while(*p) {
 		if(in_QM) {
-			if(*ptr == '\"')
+			if(*p == '\"')
 				in_QM = false;
 			else
 				++j;
 		} else {
-			switch(*ptr) {
+			switch(*p) {
 			case '\"': {
 				in_QM = true;
 				in_TEXT = true;
 				if(in_SPACE) {
-					argv[argc] = ptr + 1;
+					argv[argc] = p + 1;
 					j = 0;
 				}
 				in_SPACE = FALSE;
@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
 			default: {
 				in_TEXT = TRUE;
 				if(in_SPACE) {
-					argv[argc] = ptr;
+					argv[argc] = p;
 					j = 1;
 				} else
 					++j;
@@ -109,7 +109,7 @@ int main(int argc, char* argv[]) {
 			}
 			}
 		}
-		++ptr;
+		++p;
 	}
 	argv[argc][j] = '\0';
 	++argc;
