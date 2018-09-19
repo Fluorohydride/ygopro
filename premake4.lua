@@ -23,7 +23,7 @@ solution "ygo"
 
     configuration "vs*"
         flags "EnableSSE2"
-        buildoptions { "-wd4996" }
+        buildoptions { "-wd4996", "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     configuration "not vs*"
