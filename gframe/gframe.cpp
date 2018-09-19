@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 					argv[argc] = ptr + 1;
 					j = 0;
 				}
-				in_SPACE = FALSE;
+				in_SPACE = false;
 				break;
 			}
 			case ' ':
@@ -93,18 +93,18 @@ int main(int argc, char* argv[]) {
 					argv[argc][j] = '\0';
 					++argc;
 				}
-				in_TEXT = FALSE;
-				in_SPACE = TRUE;
+				in_TEXT = false;
+				in_SPACE = true;
 				break;
 			}
 			default: {
-				in_TEXT = TRUE;
+				in_TEXT = true;
 				if(in_SPACE) {
 					argv[argc] = ptr;
 					j = 1;
 				} else
 					++j;
-				in_SPACE = FALSE;
+				in_SPACE = false;
 				break;
 			}
 			}
