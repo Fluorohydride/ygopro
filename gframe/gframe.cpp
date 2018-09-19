@@ -111,8 +111,10 @@ int main(int argc, char* argv[]) {
 		}
 		++ptr;
 	}
-	argv[argc][j] = '\0';
-	++argc;
+	if(in_TEXT) {
+		argv[argc][j] = '\0';
+		++argc;
+	}
 	argv[argc] = NULL;
 #endif // _WIN32
 
