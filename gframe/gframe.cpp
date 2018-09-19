@@ -12,22 +12,6 @@ bool open_file = false;
 wchar_t open_file_name[256] = L"";
 bool bot_mode = false;
 
-void GetParameter(char* param, const char* arg) {
-#ifdef _WIN32
-	wchar_t arg1[260];
-	MultiByteToWideChar(CP_ACP, 0, arg, -1, arg1, 260);
-	BufferIO::EncodeUTF8(arg1, param);
-#else
-	strcpy(param, arg);
-#endif
-}
-void GetParameterW(wchar_t* param, const char* arg) {
-#ifdef _WIN32
-	MultiByteToWideChar(CP_ACP, 0, arg, -1, param, 260);
-#else
-	BufferIO::DecodeUTF8(arg, param);
-#endif
-}
 void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;
 	event.EventType = irr::EET_GUI_EVENT;
@@ -72,57 +56,60 @@ int main(int argc, char* argv[]) {
 	if(!ygo::mainGame->Initialize())
 		return 0;
 
+	wchar_t** wargv;
+#ifdef _WIN32
+	int wargc;
+	LPWSTR commandLine = GetCommandLineW();
+	wargv = CommandLineToArgvW(commandLine, &wargc);
+#else
+	for(int i = 1; i < argc; ++i) {
+		BufferIO::DecodeUTF8(argv[i], wargv[i]);
+	}
+#endif //_WIN32
+
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
-		if(argv[i][0] == '-' && argv[i][1] == 'e') {
+		if(argv[i][0] == '-' && argv[i][1] == 'e' && argv[i][2] != '\0') {
 			char param[128];
-			GetParameter(param, &argv[i][2]);
+			BufferIO::EncodeUTF8(&wargv[i][2], param);
 			ygo::dataManager.LoadDB(param);
 			continue;
 		}
 		if(!strcmp(argv[i], "-e")) { // extra database
 			++i;
 			char param[128];
-			GetParameter(param, &argv[i][0]);
+			BufferIO::EncodeUTF8(wargv[i], param);
 			ygo::dataManager.LoadDB(param);
 			continue;
 		} else if(!strcmp(argv[i], "-n")) { // nickName
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebNickName->setText(param);
+			ygo::mainGame->ebNickName->setText(wargv[i]);
 			continue;
 		} else if(!strcmp(argv[i], "-h")) { // Host address
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebJoinHost->setText(param);
+			ygo::mainGame->ebJoinHost->setText(wargv[i]);
 			continue;
 		} else if(!strcmp(argv[i], "-p")) { // host Port
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebJoinPort->setText(param);
+			ygo::mainGame->ebJoinPort->setText(wargv[i]);
 			continue;
 		} else if(!strcmp(argv[i], "-w")) { // host passWord
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebJoinPass->setText(param);
+			ygo::mainGame->ebJoinPass->setText(wargv[i]);
 			continue;
 		} else if(!strcmp(argv[i], "-k")) { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
 		} else if(!strcmp(argv[i], "-d")) { // Deck
-			if(i + 2 < argc) { // select deck
-				++i;
-				GetParameterW(ygo::mainGame->gameConf.lastdeck, &argv[i][0]);
+			++i;
+			if(i + 1 < argc) { // select deck
+				wcscpy(ygo::mainGame->gameConf.lastdeck, wargv[i]);
 				continue;
 			} else { // open deck
 				exit_on_return = !keep_on_return;
 				if(i < argc) {
 					open_file = true;
-					GetParameterW(open_file_name, &argv[i + 1][0]);
+					wcscpy(open_file_name, wargv[i]);
 				}
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
@@ -139,9 +126,10 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(!strcmp(argv[i], "-r")) { // Replay
 			exit_on_return = !keep_on_return;
+			++i;
 			if(i < argc) {
 				open_file = true;
-				GetParameterW(open_file_name, &argv[i + 1][0]);
+				wcscpy(open_file_name, wargv[i]);
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
 			if(open_file)
@@ -149,9 +137,10 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(!strcmp(argv[i], "-s")) { // Single
 			exit_on_return = !keep_on_return;
+			++i;
 			if(i < argc) {
 				open_file = true;
-				GetParameterW(open_file_name, &argv[i + 1][0]);
+				wcscpy(open_file_name, wargv[i]);
 			}
 			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
@@ -161,14 +150,14 @@ int main(int argc, char* argv[]) {
 			char* pstrext = argv[1] + strlen(argv[1]) - 4;
 			if(!mystrncasecmp(pstrext, ".ydk", 4)) {
 				open_file = true;
-				GetParameterW(open_file_name, &argv[1][0]);
+				wcscpy(open_file_name, wargv[i]);
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
 			if(!mystrncasecmp(pstrext, ".yrp", 4)) {
 				open_file = true;
-				GetParameterW(open_file_name, &argv[1][0]);
+				wcscpy(open_file_name, wargv[i]);
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnReplayMode);
 				ClickButton(ygo::mainGame->btnLoadReplay);
