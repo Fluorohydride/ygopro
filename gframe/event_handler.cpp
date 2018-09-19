@@ -338,6 +338,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				DuelClient::SetResponseI(ancard[sel]);
+				mainGame->dInfo.announce_cache.insert(mainGame->dInfo.announce_cache.begin(), ancard[sel]);
 				mainGame->HideElement(mainGame->wANCard, true);
 				break;
 			}

@@ -74,6 +74,7 @@ struct DuelInfo {
 	unsigned short time_limit;
 	unsigned short time_left[2];
 	bool isReplaySwapped;
+	std::vector<unsigned int> announce_cache;
 };
 
 struct BotInfo {

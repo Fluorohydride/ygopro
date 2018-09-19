@@ -1424,10 +1424,25 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	bool try_cache = false;
+	if(pname[0] == 0 || pname[1] == 0) {
+		if(!enter)
+			return;
+		try_cache = true;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
+	if(try_cache && mainGame->dInfo.announce_cache.size()) {
+		for(int i = 0; i < mainGame->dInfo.announce_cache.size(); ++i) {
+			unsigned int cache_code = mainGame->dInfo.announce_cache[i];
+			if(dataManager.GetString(cache_code, &cstr) && dataManager.GetData(cache_code, &cd) && is_declarable(cd, declarable_type)) {
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				ancard.push_back(cache_code);
+			}
+		}
+		if(ancard.size())
+			return;
+	}
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 		if(cit->second.name.find(pname) != std::wstring::npos) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
@@ -1456,10 +1471,25 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	bool try_cache = false;
+	if(pname[0] == 0 || pname[1] == 0) {
+		if(!enter)
+			return;
+		try_cache = true;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
+	if(try_cache && mainGame->dInfo.announce_cache.size()) {
+		for(int i = 0; i < mainGame->dInfo.announce_cache.size(); ++i) {
+			unsigned int cache_code = mainGame->dInfo.announce_cache[i];
+			if(dataManager.GetString(cache_code, &cstr) && dataManager.GetData(cache_code, &cd) && is_declarable(cd, opcode)) {
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				ancard.push_back(cache_code);
+			}
+		}
+		if(ancard.size())
+			return;
+	}
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 		if(cit->second.name.find(pname) != std::wstring::npos) {
 			auto cp = dataManager.GetCodePointer(cit->first);	//verified by _strings
