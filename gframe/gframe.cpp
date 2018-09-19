@@ -120,37 +120,46 @@ int main(int argc, char* argv[]) {
 
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
-		if(argv[i][0] == '-' && argv[i][1] == 'e') {
+		if(argv[i][0] == '-' && argv[i][1] == 'e' && argv[i][2]) {
 			ygo::dataManager.LoadDB(&argv[i][2]);
 			continue;
 		}
 		if(!strcmp(argv[i], "-e")) { // extra database
 			++i;
-			ygo::dataManager.LoadDB(&argv[i][0]);
+			if(i < argc)
+				ygo::dataManager.LoadDB(&argv[i][0]);
 			continue;
 		} else if(!strcmp(argv[i], "-n")) { // nickName
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebNickName->setText(param);
+			if(i < argc) {
+				wchar_t param[128];
+				GetParameterW(param, &argv[i][0]);
+				ygo::mainGame->ebNickName->setText(param);
+			}
 			continue;
 		} else if(!strcmp(argv[i], "-h")) { // Host address
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebJoinHost->setText(param);
+			if(i < argc) {
+				wchar_t param[128];
+				GetParameterW(param, &argv[i][0]);
+				ygo::mainGame->ebJoinHost->setText(param);
+			}
 			continue;
 		} else if(!strcmp(argv[i], "-p")) { // host Port
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebJoinPort->setText(param);
+			if(i < argc) {
+				wchar_t param[128];
+				GetParameterW(param, &argv[i][0]);
+				ygo::mainGame->ebJoinPort->setText(param);
+			}
 			continue;
 		} else if(!strcmp(argv[i], "-w")) { // host passWord
 			++i;
-			wchar_t param[128];
-			GetParameterW(param, &argv[i][0]);
-			ygo::mainGame->ebJoinPass->setText(param);
+			if(i < argc) {
+				wchar_t param[128];
+				GetParameterW(param, &argv[i][0]);
+				ygo::mainGame->ebJoinPass->setText(param);
+			}
 			continue;
 		} else if(!strcmp(argv[i], "-k")) { // Keep on return
 			exit_on_return = false;
@@ -162,7 +171,7 @@ int main(int argc, char* argv[]) {
 				continue;
 			} else { // open deck
 				exit_on_return = !keep_on_return;
-				if(i < argc) {
+				if(i + 1 < argc) {
 					open_file = true;
 					GetParameterW(open_file_name, &argv[i + 1][0]);
 				}
@@ -181,7 +190,7 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(!strcmp(argv[i], "-r")) { // Replay
 			exit_on_return = !keep_on_return;
-			if(i < argc) {
+			if(i + 1 < argc) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i + 1][0]);
 			}
@@ -191,7 +200,7 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(!strcmp(argv[i], "-s")) { // Single
 			exit_on_return = !keep_on_return;
-			if(i < argc) {
+			if(i + 1 < argc) {
 				open_file = true;
 				GetParameterW(open_file_name, &argv[i + 1][0]);
 			}
