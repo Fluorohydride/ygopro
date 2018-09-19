@@ -165,6 +165,9 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
+#ifdef _WIN32
+	LocalFree(wargv);
+#endif
 	ygo::mainGame->MainLoop();
 #ifdef _WIN32
 	WSACleanup();
