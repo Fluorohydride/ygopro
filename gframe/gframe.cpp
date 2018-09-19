@@ -37,15 +37,6 @@ int main(int argc, char* argv[]) {
 	CFRelease(path);
 #endif //__APPLE__
 #ifdef _WIN32
-#ifndef _DEBUG
-	wchar_t exepath[MAX_PATH];
-	GetModuleFileNameW(NULL, exepath, MAX_PATH);
-	wchar_t* p = wcsrchr(exepath, '\\');
-	*p = '\0';
-	SetCurrentDirectoryW(exepath);
-#endif //_DEBUG
-#endif //_WIN32
-#ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
 	wVersionRequested = MAKEWORD(2, 2);
