@@ -35,11 +35,15 @@ int main(int argc, char* argv[]) {
 #endif //__APPLE__
 #ifdef _WIN32
 #ifndef _DEBUG
-	wchar_t exepath[MAX_PATH];
-	GetModuleFileNameW(NULL, exepath, MAX_PATH);
-	wchar_t* p = wcsrchr(exepath, '\\');
-	*p = '\0';
-	SetCurrentDirectoryW(exepath);
+	char* pstrext;
+	if(argc == 2 && (pstrext = strrchr(argv[1], '.'))
+		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
+		wchar_t exepath[MAX_PATH];
+		GetModuleFileNameW(NULL, exepath, MAX_PATH);
+		wchar_t* p = wcsrchr(exepath, '\\');
+		*p = '\0';
+		SetCurrentDirectoryW(exepath);
+	}
 #endif //_DEBUG
 #endif //_WIN32
 #ifdef _WIN32
