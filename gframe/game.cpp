@@ -107,23 +107,77 @@ bool Game::Initialize() {
 	wLanWindow = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1200));
 	wLanWindow->getCloseButton()->setVisible(false);
 	wLanWindow->setVisible(false);
-	env->addStaticText(dataManager.GetSysString(1220), rect<s32>(10, 30, 220, 50), false, false, wLanWindow);
-	ebNickName = env->addEditBox(gameConf.nickname, rect<s32>(110, 25, 450, 50), true, wLanWindow);
+	irr::gui::IGUITabControl* wLan = env->addTabControl(rect<s32>(0, 20, 579, 419), wLanWindow, true);
+	if(gameConf.enable_srvpro) {
+		irr::gui::IGUITab* tabSrvpro = wLan->addTab(dataManager.GetSysString(1238));
+		env->addStaticText(dataManager.GetSysString(1249), rect<s32>(10, 10, 220, 30), false, false, tabSrvpro);
+		cbSrvProServer = env->addComboBox(rect<s32>(110, 5, 450, 30), tabSrvpro);
+		cbSrvProServer->setMaxSelectionRows(5);
+		env->addStaticText(dataManager.GetSysString(1225), rect<s32>(10, 40, 220, 60), false, false, tabSrvpro);
+		cbSrvProRule = env->addComboBox(rect<s32>(110, 35, 450, 60), tabSrvpro);
+		cbSrvProRule->addItem(dataManager.GetSysString(1240));
+		cbSrvProRule->addItem(dataManager.GetSysString(1241));
+		cbSrvProRule->addItem(dataManager.GetSysString(1242));
+		cbSrvProRule->addItem(dataManager.GetSysString(1243));
+		cbSrvProRule->setSelected(gameConf.defaultOT - 1);
+		env->addStaticText(dataManager.GetSysString(1236), rect<s32>(10, 70, 220, 90), false, false, tabSrvpro);
+		cbSrvProDuelRule = env->addComboBox(rect<s32>(110, 65, 450, 90), tabSrvpro);
+		cbSrvProDuelRule->addItem(dataManager.GetSysString(1263));
+		cbSrvProDuelRule->addItem(dataManager.GetSysString(1262));
+		env->addStaticText(dataManager.GetSysString(1227), rect<s32>(10, 100, 220, 120), false, false, tabSrvpro);
+		cbSrvProMatchMode = env->addComboBox(rect<s32>(110, 95, 450, 120), tabSrvpro);
+		cbSrvProMatchMode->addItem(dataManager.GetSysString(1244));
+		cbSrvProMatchMode->addItem(dataManager.GetSysString(1245));
+		cbSrvProMatchMode->addItem(dataManager.GetSysString(1246));
+		chkSrvProNoCheckDeck = env->addCheckBox(false, rect<s32>(10, 130, 220, 150), tabSrvpro, -1, dataManager.GetSysString(1229));
+		chkSrvProNoShuffleDeck = env->addCheckBox(false, rect<s32>(10, 160, 220, 180), tabSrvpro, -1, dataManager.GetSysString(1230));
+		env->addStaticText(dataManager.GetSysString(1237), rect<s32>(10, 190, 220, 210), false, false, tabSrvpro);
+		ebSrvProTimeLimit = env->addEditBox(L"", rect<s32>(110, 185, 450, 210), true, tabSrvpro);
+		ebSrvProTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+		env->addStaticText(dataManager.GetSysString(1231), rect<s32>(10, 220, 220, 240), false, false, tabSrvpro);
+		ebSrvProStartLP = env->addEditBox(L"", rect<s32>(110, 215, 450, 240), true, tabSrvpro);
+		ebSrvProStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+		env->addStaticText(dataManager.GetSysString(1232), rect<s32>(10, 250, 220, 270), false, false, tabSrvpro);
+		ebSrvProStartHand = env->addEditBox(L"", rect<s32>(110, 245, 450, 270), true, tabSrvpro);
+		ebSrvProStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+		env->addStaticText(dataManager.GetSysString(1233), rect<s32>(10, 280, 220, 300), false, false, tabSrvpro);
+		ebSrvProDrawCount = env->addEditBox(L"", rect<s32>(110, 275, 450, 300), true, tabSrvpro);
+		ebSrvProDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+		env->addStaticText(dataManager.GetSysString(1235), rect<s32>(10, 310, 220, 330), false, false, tabSrvpro);
+		ebSrvProRoomName = env->addEditBox(L"", rect<s32>(110, 305, 450, 330), true, tabSrvpro);
+		ebSrvProRoomName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+		btnJoinHost = env->addButton(rect<s32>(460, 305, 570, 330), tabSrvpro, BUTTON_JOIN_SRVPRO, dataManager.GetSysString(1223));
+		btnJoinCancel = env->addButton(rect<s32>(460, 335, 570, 360), tabSrvpro, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
+	} else { // avoid null pointer
+		cbSrvProServer = env->addComboBox(rect<s32>(0, 0, 0, 0), wLanWindow);
+		cbSrvProRule = env->addComboBox(rect<s32>(0, 0, 0, 0), wLanWindow);
+		cbSrvProDuelRule = env->addComboBox(rect<s32>(0, 0, 0, 0), wLanWindow);
+		cbSrvProMatchMode = env->addComboBox(rect<s32>(0, 0, 0, 0), wLanWindow);
+		chkSrvProNoCheckDeck = env->addCheckBox(false, rect<s32>(0, 0, 0, 0), wLanWindow, -1, dataManager.GetSysString(1229));
+		chkSrvProNoShuffleDeck = env->addCheckBox(false, rect<s32>(0, 0, 0, 0), wLanWindow, -1, dataManager.GetSysString(1230));
+		ebSrvProTimeLimit = env->addEditBox(L"", rect<s32>(0, 0, 0, 0), true, wLanWindow);
+		ebSrvProStartLP = env->addEditBox(L"", rect<s32>(0, 0, 0, 0), true, wLanWindow);
+		ebSrvProStartHand = env->addEditBox(L"", rect<s32>(0, 0, 0, 0), true, wLanWindow);
+		ebSrvProDrawCount = env->addEditBox(L"", rect<s32>(0, 0, 0, 0), true, wLanWindow);
+		ebSrvProRoomName = env->addEditBox(L"", rect<s32>(0, 0, 0, 0), true, wLanWindow);
+	}
+	irr::gui::IGUITab* tabLanMode = wLan->addTab(dataManager.GetSysString(1239));
+	env->addStaticText(dataManager.GetSysString(1220), rect<s32>(10, 10, 220, 30), false, false, tabLanMode);
+	ebNickName = env->addEditBox(gameConf.nickname, rect<s32>(110, 5, 450, 30), true, tabLanMode);
 	ebNickName->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	lstHostList = env->addListBox(rect<s32>(10, 60, 570, 320), wLanWindow, LISTBOX_LAN_HOST, true);
+	lstHostList = env->addListBox(rect<s32>(10, 40, 570, 270), tabLanMode, LISTBOX_LAN_HOST, true);
 	lstHostList->setItemHeight(18);
-	btnLanRefresh = env->addButton(rect<s32>(240, 325, 340, 350), wLanWindow, BUTTON_LAN_REFRESH, dataManager.GetSysString(1217));
-	env->addStaticText(dataManager.GetSysString(1221), rect<s32>(10, 360, 220, 380), false, false, wLanWindow);
-	ebJoinHost = env->addEditBox(gameConf.lasthost, rect<s32>(110, 355, 350, 380), true, wLanWindow);
+	btnLanRefresh = env->addButton(rect<s32>(240, 275, 340, 300), tabLanMode, BUTTON_LAN_REFRESH, dataManager.GetSysString(1217));
+	env->addStaticText(dataManager.GetSysString(1221), rect<s32>(10, 310, 220, 330), false, false, tabLanMode);
+	ebJoinHost = env->addEditBox(gameConf.lasthost, rect<s32>(110, 305, 350, 330), true, tabLanMode);
 	ebJoinHost->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebJoinPort = env->addEditBox(gameConf.lastport, rect<s32>(360, 355, 420, 380), true, wLanWindow);
+	ebJoinPort = env->addEditBox(gameConf.lastport, rect<s32>(360, 305, 420, 330), true, tabLanMode);
 	ebJoinPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(dataManager.GetSysString(1222), rect<s32>(10, 390, 220, 410), false, false, wLanWindow);
-	ebJoinPass = env->addEditBox(gameConf.roompass, rect<s32>(110, 385, 420, 410), true, wLanWindow);
-	ebJoinPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnJoinHost = env->addButton(rect<s32>(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, dataManager.GetSysString(1223));
-	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
-	btnCreateHost = env->addButton(rect<s32>(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224));
+	env->addStaticText(dataManager.GetSysString(1222), rect<s32>(10, 340, 220, 360), false, false, tabLanMode);
+	ebJoinPass = env->addEditBox(gameConf.roompass, rect<s32>(110, 335, 420, 360), true, tabLanMode);
+	btnJoinHost = env->addButton(rect<s32>(460, 305, 570, 330), tabLanMode, BUTTON_JOIN_HOST, dataManager.GetSysString(1223));
+	btnJoinCancel = env->addButton(rect<s32>(460, 335, 570, 360), tabLanMode, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
+	btnCreateHost = env->addButton(rect<s32>(460, 5, 570, 30), tabLanMode, BUTTON_CREATE_HOST, dataManager.GetSysString(1224));
 	//create host
 	wCreateHost = env->addWindow(rect<s32>(320, 100, 700, 520), false, dataManager.GetSysString(1224));
 	wCreateHost->getCloseButton()->setVisible(false);
@@ -1020,6 +1074,38 @@ void Game::RefreshBot() {
 	if(botInfo.size() == 0)
 		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
 }
+void Game::RefreshSrvPro() {
+	if(!gameConf.enable_srvpro)
+		return;
+	srvproInfo.clear();
+	FILE* fp = fopen("srvpro.conf", "r");
+	char linebuf[256];
+	char strbuf[256];
+	if(fp) {
+		while(fgets(linebuf, 256, fp)) {
+			if(linebuf[0] == '#')
+				continue;
+			if(linebuf[0] == '!') {
+				SrvProInfo newinfo;
+				sscanf(linebuf, "!%240[^\n]", strbuf);
+				BufferIO::DecodeUTF8(strbuf, newinfo.name);
+				fgets(linebuf, 256, fp);
+				sscanf(linebuf, "%240[^\n]", strbuf);
+				BufferIO::DecodeUTF8(strbuf, newinfo.host);
+				fgets(linebuf, 256, fp);
+				sscanf(linebuf, "%240[^\n]", strbuf);
+				BufferIO::DecodeUTF8(strbuf, newinfo.port);
+				srvproInfo.push_back(newinfo);
+				continue;
+			}
+		}
+		fclose(fp);
+	}
+	cbSrvProServer->clear();
+	for(unsigned int i = 0; i < srvproInfo.size(); ++i) {
+		cbSrvProServer->addItem(srvproInfo[i].name);
+	}
+}
 void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
 	if(!fp)
@@ -1058,6 +1144,7 @@ void Game::LoadConfig() {
 	gameConf.chkIgnoreDeckChanges = 0;
 	gameConf.defaultOT = 1;
 	gameConf.enable_bot_mode = 0;
+	gameConf.enable_srvpro = 0;
 	gameConf.enable_sound = true;
 	gameConf.sound_volume = 0.5;
 	gameConf.enable_music = true;
@@ -1125,6 +1212,8 @@ void Game::LoadConfig() {
 			gameConf.defaultOT = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_bot_mode")) {
 			gameConf.enable_bot_mode = atoi(valbuf);
+		} else if(!strcmp(strbuf, "enable_srvpro")) {
+			gameConf.enable_srvpro = atoi(valbuf);
 #ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = atoi(valbuf) > 0;
@@ -1197,6 +1286,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "ignore_deck_changes = %d\n", (chkIgnoreDeckChanges->isChecked() ? 1 : 0));
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
+	fprintf(fp, "enable_srvpro = %d\n", gameConf.enable_srvpro);
 #ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));

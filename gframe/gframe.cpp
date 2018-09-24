@@ -11,6 +11,7 @@ bool exit_on_return = false;
 bool open_file = false;
 wchar_t open_file_name[256] = L"";
 bool bot_mode = false;
+bool srvpro_mode = false;
 
 void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;

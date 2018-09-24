@@ -85,5 +85,6 @@ extern bool exit_on_return;
 extern bool open_file;
 extern wchar_t open_file_name[256];
 extern bool bot_mode;
+extern bool srvpro_mode;
 
 #endif

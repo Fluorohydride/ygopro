@@ -42,6 +42,7 @@ struct Config {
 	int chkIgnoreDeckChanges;
 	int defaultOT;
 	int enable_bot_mode;
+	int enable_srvpro;
 	bool enable_sound;
 	bool enable_music;
 	double sound_volume;
@@ -84,6 +85,12 @@ struct BotInfo {
 	bool support_new_master_rule;
 };
 
+struct SrvProInfo {
+	wchar_t name[256];
+	wchar_t host[256];
+	wchar_t port[256];
+};
+
 struct FadingUnit {
 	bool signalAction;
 	bool isFadein;
@@ -109,6 +116,7 @@ public:
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
+	void RefreshSrvPro();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
@@ -165,6 +173,7 @@ public:
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
 	std::vector<BotInfo> botInfo;
+	std::vector<SrvProInfo> srvproInfo;
 
 	int hideChatTimer;
 	bool hideChat;
@@ -258,6 +267,17 @@ public:
 	irr::gui::IGUIButton* btnModeExit;
 	//lan
 	irr::gui::IGUIWindow* wLanWindow;
+	irr::gui::IGUIComboBox* cbSrvProServer;
+	irr::gui::IGUIComboBox* cbSrvProRule;
+	irr::gui::IGUIComboBox* cbSrvProDuelRule;
+	irr::gui::IGUIComboBox* cbSrvProMatchMode;
+	irr::gui::IGUICheckBox* chkSrvProNoCheckDeck;
+	irr::gui::IGUICheckBox* chkSrvProNoShuffleDeck;
+	irr::gui::IGUIEditBox* ebSrvProTimeLimit;
+	irr::gui::IGUIEditBox* ebSrvProStartLP;
+	irr::gui::IGUIEditBox* ebSrvProStartHand;
+	irr::gui::IGUIEditBox* ebSrvProDrawCount;
+	irr::gui::IGUIEditBox* ebSrvProRoomName;
 	irr::gui::IGUIEditBox* ebNickName;
 	irr::gui::IGUIListBox* lstHostList;
 	irr::gui::IGUIButton* btnLanRefresh;
@@ -508,6 +528,7 @@ extern Game* mainGame;
 #define BUTTON_HOST_CONFIRM			114
 #define BUTTON_HOST_CANCEL			115
 #define BUTTON_LAN_REFRESH			116
+#define BUTTON_JOIN_SRVPRO			117
 #define BUTTON_HP_DUELIST			120
 #define BUTTON_HP_OBSERVER			121
 #define BUTTON_HP_START				122
