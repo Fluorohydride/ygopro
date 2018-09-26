@@ -1382,7 +1382,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
 		}
 		else {
-			wchar_t* form = L"\u2605";
+			const wchar_t* form = L"\u2605";
 			if(cd.type & TYPE_XYZ) form = L"\u2606";
 			myswprintf(formatBuffer, L"[%ls%d] ", form, cd.level);
 			wchar_t adBuffer[16];

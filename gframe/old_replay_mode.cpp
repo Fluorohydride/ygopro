@@ -222,7 +222,7 @@ namespace ygo {
 			size_t slen = cur_replay.ReadInt16();
 			cur_replay.ReadData(filename, slen);
 			filename[slen] = 0;
-			if(!preload_script(pduel, filename, slen))
+			if(!preload_script(pduel, filename, 0))
 				return false;
 		}
 		start_duel(pduel, opt);

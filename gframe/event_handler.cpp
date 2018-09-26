@@ -1437,6 +1437,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(mcard->position & POS_FACEDOWN)
 							mcard = 0;
 					}
+				} else if(hovered_location == LOCATION_EXTRA) {
+					if(extra[hovered_controler].size()) {
+						mcard = extra[hovered_controler].back();
+						if(mcard->position & POS_FACEDOWN)
+							mcard = 0;
+					}
 				} else if(hovered_location == LOCATION_DECK) {
 					if(deck[hovered_controler].size())
 						mcard = deck[hovered_controler].back();
@@ -1498,7 +1504,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}else{
 									myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 									str.append(formatBuffer);
-									wchar_t* form = L"\u2605";
+									const wchar_t* form = L"\u2605";
 									if (mcard->rank) form = L"\u2606";
 									if (mcard->rank && mcard->level)
 										myswprintf(formatBuffer, L"\n\u2606%d/\u2605%d %ls/%ls", mcard->level, mcard->rank, dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));

@@ -1181,7 +1181,7 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangle(0x80000000, Resize(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
 		if(ptr->second.type & TYPE_MONSTER) {
-			wchar_t* form = L"\u2605";
+			const wchar_t* form = L"\u2605";
 			if (ptr->second.type & TYPE_XYZ) form = L"\u2606";
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			textFont->draw(textBuffer, Resize(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
