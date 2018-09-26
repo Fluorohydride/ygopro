@@ -2297,6 +2297,7 @@ void ClientField::CancelOrFinish() {
 	case MSG_SELECT_TRIBUTE: {
 		if (selected_cards.size() == 0) {
 			if (select_cancelable) {
+				ShowCancelOrFinishButton(0);
 				DuelClient::SetResponseI(-1);
 				if (mainGame->wCardSelect->isVisible())
 					mainGame->HideElement(mainGame->wCardSelect, true);
