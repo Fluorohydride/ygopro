@@ -1411,12 +1411,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			if(event.MouseInput.isLeftPressed())
 				break;
-			s32 x = event.MouseInput.X;
-			s32 y = event.MouseInput.Y;
-			irr::core::position2di pos(x, y);
-			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-			if(root->getElementFromPoint(pos) == mainGame->btnCancelOrFinish)
-				mainGame->chkHideHintButton->setChecked(true);
 			if(mainGame->gameConf.control_mode == 1 && event.MouseInput.X > 300) {
 				mainGame->ignore_chain = event.MouseInput.isRightPressed();
 				mainGame->always_chain = false;
@@ -1432,27 +1426,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_MOUSE_MOVED: {
 			if(!mainGame->dInfo.isStarted)
 				break;
-			bool should_show_tip = false;
 			s32 x = event.MouseInput.X;
 			s32 y = event.MouseInput.Y;
-			irr::core::position2di pos(x, y);
-			wchar_t formatBuffer[2048];
 			if(x < 300) {
-				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-				irr::gui::IGUIElement* elem = root->getElementFromPoint(pos);
-				if(elem == mainGame->btnCancelOrFinish) {
-					should_show_tip = true;
-					myswprintf(formatBuffer, dataManager.GetSysString(1700), mainGame->btnCancelOrFinish->getText());
-					mainGame->stTip->setText(formatBuffer);
-					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(formatBuffer) + irr::core::dimension2d<unsigned int>(10, 10);
-					mainGame->stTip->setRelativePosition(recti(x - 10 - dtip.Width, y - 10 - dtip.Height, x - 10, y - 10));
-				}
-				mainGame->stTip->setVisible(should_show_tip);
 				break;
 			}
+			irr::core::position2di pos(x, y);
+			wchar_t formatBuffer[2048];
 			hovered_location = 0;
 			ClientCard* mcard = 0;
 			int mplayer = -1;
+			bool should_show_tip = false;
 			if(!panel || !panel->isVisible() || !panel->getRelativePosition().isPointInside(pos)) {
 				GetHoverField(x, y);
 				if(hovered_location & 0xe)
@@ -2184,7 +2168,7 @@ void ClientField::UpdateChainButtons() {
 	}
 }
 void ClientField::ShowCancelOrFinishButton(int buttonOp) {
-	if (!mainGame->chkHideHintButton->isChecked() && !mainGame->dInfo.isReplay) {
+	if (!mainGame->dInfo.isReplay) {
 		switch (buttonOp) {
 		case 1:
 			mainGame->btnCancelOrFinish->setText(dataManager.GetSysString(1295));
