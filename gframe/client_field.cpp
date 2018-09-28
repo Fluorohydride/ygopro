@@ -1424,8 +1424,23 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+		std::vector<int> cache;
+		cache.swap(ancard);
+		int sel = mainGame->lstANCard->getSelected();
+		int selcode = (sel == -1) ? 0 : cache[sel];
+		mainGame->lstANCard->clear();
+		for(const auto& trycode : cache) {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declarable_type)) {
+				ancard.push_back(trycode);
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				if(trycode == selcode)
+					mainGame->lstANCard->setSelected(cstr.name.c_str());
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
@@ -1456,8 +1471,23 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+		std::vector<int> cache;
+		cache.swap(ancard);
+		int sel = mainGame->lstANCard->getSelected();
+		int selcode = (sel == -1) ? 0 : cache[sel];
+		mainGame->lstANCard->clear();
+		for(const auto& trycode : cache) {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
+				ancard.push_back(trycode);
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				if(trycode == selcode)
+					mainGame->lstANCard->setSelected(cstr.name.c_str());
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
