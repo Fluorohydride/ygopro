@@ -399,7 +399,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		else if(conti_selecting)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
+			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler]);
 		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
@@ -483,7 +483,7 @@ void ClientField::ShowChainCard() {
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
+			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler]);
 		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
@@ -538,7 +538,7 @@ void ClientField::ShowLocationCard() {
 		if(display_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
 		else
-			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
+			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[display_cards[i]->controler]);
 		mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
@@ -1424,8 +1424,23 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+		std::vector<int> cache;
+		cache.swap(ancard);
+		int sel = mainGame->lstANCard->getSelected();
+		int selcode = (sel == -1) ? 0 : cache[sel];
+		mainGame->lstANCard->clear();
+		for(const auto& trycode : cache) {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declarable_type)) {
+				ancard.push_back(trycode);
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				if(trycode == selcode)
+					mainGame->lstANCard->setSelected(cstr.name.c_str());
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
@@ -1456,8 +1471,23 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+		std::vector<int> cache;
+		cache.swap(ancard);
+		int sel = mainGame->lstANCard->getSelected();
+		int selcode = (sel == -1) ? 0 : cache[sel];
+		mainGame->lstANCard->clear();
+		for(const auto& trycode : cache) {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
+				ancard.push_back(trycode);
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				if(trycode == selcode)
+					mainGame->lstANCard->setSelected(cstr.name.c_str());
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
