@@ -768,7 +768,7 @@ void DeckBuilder::FilterCards() {
 	results.clear();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
 	int trycode = BufferIO::GetVal(pstr);
-	if(dataManager.GetData(trycode, 0)) {
+	if(trycode && dataManager.GetData(trycode, 0)) {
 		auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
 		results.push_back(ptr);
 		mainGame->scrFilter->setVisible(false);
@@ -892,42 +892,26 @@ void DeckBuilder::FilterCards() {
 	}
 	SortList();
 }
-bool DeckBuilder::CardNameCompare(const wchar_t *sa, const wchar_t *sb) {
-	if(!sa || !sb || (wcslen(sb) > wcslen(sa)))
+bool DeckBuilder::CardNameCompare(std::wstring sa, std::wstring sb) {
+	if(sa.empty() || sb.empty() || (sb.size() > sa.size()))
 		return false;
-	int i = 0, j = 0, k;
-	wchar_t ca, cb, pwc, wc = L'*';
-	bool wcr = false;
-	while(sa[i]) {
-		ca = towupper(sa[i]);
-		cb = towupper(sb[j]);
-		if(ca == cb) {
-			j++;
-			if(!sb[j])
-				return true;
-		} else if(cb == wc) {
-			while(sb[j] == wc) {
-				j++;
-				if(!sb[j])
-					return true;
-			}
-			k = j;
-			pwc = towupper(sb[j]);
-			wcr = true;
-			while(towupper(sa[i]) != pwc) {
-				i++;
-				if(!sa[i])
-					return false;
-			}
-			i--;
-		} else if(wcr && ca == pwc) {
-			j = k;
-			i--;
-		} else
-			j = 0;
-		i++;
+	std::transform(sa.begin(), sa.end(), sa.begin(), ::tolower);
+	std::transform(sb.begin(), sb.end(), sb.begin(), ::tolower);
+	std::vector<std::wstring> tokens;
+	std::size_t pos;
+	while((pos = sb.find(L'*')) != std::wstring::npos) {
+		tokens.push_back(sb.substr(0, pos));
+		sb = sb.substr(pos + 1);
 	}
-	return false;
+	if(sb.size())
+		tokens.push_back(sb);
+	for(auto token : tokens) {
+		std::size_t pos;
+		if((pos = sa.find(token)) == std::wstring::npos)
+			return false;
+		sa = sa.substr(pos + 1);
+	}
+	return true;
 }
 void DeckBuilder::ClearSearch() {
 	mainGame->cbCardType->setSelected(0);

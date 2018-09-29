@@ -20,7 +20,7 @@ public:
 	void ClearSearch();
 	void SortList();
 
-	static bool CardNameCompare(const wchar_t *sa, const wchar_t *sb);
+	static bool CardNameCompare(std::wstring sa, std::wstring sb);
 
 	bool push_main(code_pointer pointer, int seq = -1);
 	bool push_extra(code_pointer pointer, int seq = -1);
