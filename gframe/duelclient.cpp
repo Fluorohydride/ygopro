@@ -2846,6 +2846,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					mainGame->dField.FadeCard(pcard, 255, 5);
 					mainGame->WaitFrameSignal(5);
 				}
+			} else if(pcard->location & 0x30) {
+				float shift = -0.15f;
+				if(c == 1) shift = 0.15f;
+				pcard->dPos = irr::core::vector3df(shift, 0, 0);
+				pcard->dRot = irr::core::vector3df(0, 0, 0);
+				pcard->is_moving = true;
+				pcard->aniFrame = 5;
+				mainGame->WaitFrameSignal(30);
+				mainGame->dField.MoveCard(pcard, 5);
 			} else
 				mainGame->WaitFrameSignal(30);
 			myswprintf(textBuffer, dataManager.GetSysString(1610), dataManager.GetName(pcard->code), dataManager.FormatLocation(l, s), s + 1);
