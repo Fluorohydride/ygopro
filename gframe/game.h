@@ -341,6 +341,11 @@ public:
 	irr::gui::IGUIStaticText* stQMessage;
 	irr::gui::IGUIButton* btnYes;
 	irr::gui::IGUIButton* btnNo;
+	//surrender yes/no
+	irr::gui::IGUIWindow* wSurrender;
+	irr::gui::IGUIStaticText* stSurrenderMessage;
+	irr::gui::IGUIButton* btnSurrenderYes;
+	irr::gui::IGUIButton* btnSurrenderNo;
 	//options
 	irr::gui::IGUIWindow* wOptions;
 	irr::gui::IGUIStaticText* stOptions;
@@ -586,6 +591,8 @@ extern Game* mainGame;
 #define BUTTON_DISPLAY_4			294
 #define SCROLL_CARD_DISPLAY			295
 #define BUTTON_CARD_DISP_OK			296
+#define BUTTON_SURRENDER_YES		297
+#define BUTTON_SURRENDER_NO			298
 #define BUTTON_CATEGORY_OK			300
 #define COMBOBOX_DBLFLIST			301
 #define COMBOBOX_DBDECKS			302
