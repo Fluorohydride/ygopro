@@ -1370,6 +1370,16 @@ void Game::ShowCardInfo(int code, bool resize) {
 	const auto& tsize = stText->getRelativePosition();
 	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
 }
+void Game::ShowCardNoInfo(int player) {
+	imgCard->setImage(imageManager.tCover[player]);
+	stName->setText(L"");
+	stInfo->setText(L"");
+	stDataInfo->setText(L"");
+	stSetName->setText(L"");
+	stText->setText(L"");
+	showingcard = 0;
+	scrCardText->setVisible(false);
+}
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];

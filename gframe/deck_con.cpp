@@ -61,6 +61,7 @@ static bool check_set_code(const CardDataC& data, int set_code) {
 void DeckBuilder::Initialize() {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
+	mainGame->ShowCardNoInfo();
 	mainGame->wInfos->setVisible(true);
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wDeckEdit->setVisible(true);
@@ -87,6 +88,7 @@ void DeckBuilder::Initialize() {
 }
 void DeckBuilder::Terminate() {
 	mainGame->is_building = false;
+	mainGame->ShowCardNoInfo();
 	mainGame->wDeckEdit->setVisible(false);
 	mainGame->wCategories->setVisible(false);
 	mainGame->wFilter->setVisible(false);
@@ -218,14 +220,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1410));
 					break;
 				}
-				mainGame->imgCard->setImage(imageManager.tCover[0]);
-				mainGame->stName->setText(L"");
-				mainGame->stInfo->setText(L"");
-				mainGame->stDataInfo->setText(L"");
-				mainGame->stSetName->setText(L"");
-				mainGame->stText->setText(L"");
-				mainGame->showingcard = 0;
-				mainGame->scrCardText->setVisible(false);
+				mainGame->ShowCardNoInfo();
 				char deckbuf[1024];
 				char* pdeck = deckbuf;
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
