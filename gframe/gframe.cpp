@@ -2,6 +2,7 @@
 #include "game.h"
 #include "data_manager.h"
 #include <event2/thread.h>
+#include <memory>
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
 #endif
@@ -62,10 +63,12 @@ int main(int argc, char* argv[]) {
 
 #ifdef _WIN32
 	int wargc;
-	wchar_t** wargv = CommandLineToArgvW(GetCommandLineW(), &wargc);
+	std::unique_ptr<wchar_t*[], void(*)(wchar_t**)> wargv(CommandLineToArgvW(GetCommandLineW(), &wargc), [](wchar_t** wargv) {
+		LocalFree(wargv);
+	});
 #else
 	int wargc = argc;
-	wchar_t (*wargv)[256] = new wchar_t[wargc][256];
+	auto wargv = std::make_unique<wchar_t[][256]>(wargc);
 	for(int i = 0; i < argc; ++i) {
 		BufferIO::DecodeUTF8(argv[i], wargv[i]);
 	}
@@ -175,11 +178,6 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	}
-#ifdef _WIN32
-	LocalFree(wargv);
-#else
-	delete[] wargv;
-#endif
 	ygo::mainGame->MainLoop();
 #ifdef _WIN32
 	WSACleanup();
