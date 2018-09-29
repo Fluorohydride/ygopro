@@ -232,7 +232,7 @@ bool Game::Initialize() {
 	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
-	env->addStaticText(L"Host Port:", rect<s32>(10, 390, 220, 410), false, false, wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1238), rect<s32>(10, 390, 220, 410), false, false, wCreateHost);
 	ebHostPort = env->addEditBox(gameConf.serverport, rect<s32>(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
 	ebHostPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//host(single)
