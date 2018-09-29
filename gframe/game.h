@@ -173,7 +173,7 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
-	std::vector<std::wstring> BGMList;
+	std::vector<std::string> BGMList;
 
 	int hideChatTimer;
 	bool hideChat;

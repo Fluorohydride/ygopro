@@ -974,71 +974,58 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 		dataManager.strBuffer[pbuffer - 1] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
-void Game::LoadExpansionDB() {
 #ifdef _WIN32
-	char fpath[1000];
+std::vector<std::string> FindfolderFiles(const std::wstring& path, const std::wstring& extension) {
+	std::vector<std::string> res;
 	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
+	HANDLE fh = FindFirstFileW((path + L"*" + extension).c_str(), &fdataw);
 	if(fh != INVALID_HANDLE_VALUE) {
 		do {
 			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				char fname[780];
+				char fname[1000];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
-				sprintf(fpath, "./expansions/%s", fname);
-				dataManager.LoadDB(fpath);
+				res.push_back(fname);
 			}
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
 	}
 #else
+void FindfolderFiles(const std::string& path, const std::string& extension) {
+	std::vector<std::string> res;
 	DIR * dir;
 	struct dirent * dirp;
-	if((dir = opendir("./expansions/")) != NULL) {
+	if((dir = opendir(path.c:str())) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
 			size_t len = strlen(dirp->d_name);
-			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
+			if(len < 5 || strcasecmp(dirp->d_name + len - 4, extension.c_str()) != 0)
 				continue;
-			char filepath[1000];
-			sprintf(filepath, "./expansions/%s", dirp->d_name);
-			dataManager.LoadDB(filepath);
+			res.push_back(dirp->d_name);
 		}
 		closedir(dir);
 	}
 #endif
+	return res;
+}
+
+#ifdef _WIN32
+#define WSTRINGPATH(x) L##x
+#else
+#define WSTRINGPATH(x) x
+#endif
+
+void Game::LoadExpansionDB() {
+	auto files = FindfolderFiles(WSTRINGPATH("./expansions/"), WSTRINGPATH(".cdb"));
+	for (auto& file : files)
+		dataManager.LoadDB(("./expansions/" + file).c_str());
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./deck/*.ydk", &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			wchar_t* pf = fdataw.cFileName;
-			while(*pf) pf++;
-			while(*pf != L'.') pf--;
-			*pf = 0;
-			cbDeck->addItem(fdataw.cFileName);
-		}
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./deck/")) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".ydk") != 0)
-			continue;
-		dirp->d_name[len - 4] = 0;
+	auto files = FindfolderFiles(WSTRINGPATH("./deck/"), WSTRINGPATH(".ydk"));
+	for(auto& file : files) {
 		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
+		BufferIO::DecodeUTF8(file.substr(0, file.size() - 4).c_str(), wname);
 		cbDeck->addItem(wname);
 	}
-	closedir(dir);
-#endif
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
 			cbDeck->setSelected(i);
@@ -1048,89 +1035,27 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 }
 void Game::RefreshReplay() {
 	lstReplayList->clear();
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./replay/*.yrp", &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && Replay::CheckReplay(fdataw.cFileName)) {
-			lstReplayList->addItem(fdataw.cFileName);
-		}
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./replay/")) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".yrp") != 0)
-			continue;
+	auto files = FindfolderFiles(WSTRINGPATH("./replay/"), WSTRINGPATH(".yrp"));
+	for(auto& file : files) {
 		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		if(Replay::CheckReplay(wname))
-			lstReplayList->addItem(wname);
+		BufferIO::DecodeUTF8(file.c_str(), wname);
+		lstReplayList->addItem(wname);
 	}
-	closedir(dir);
-#endif
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
-	mainGame->stSinglePlayInfo->setText(L"");
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./single/*.lua", &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			lstSinglePlayList->addItem(fdataw.cFileName);
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./single/")) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".lua") != 0)
-			continue;
+	auto files = FindfolderFiles(WSTRINGPATH("./single/"), WSTRINGPATH(".lua"));
+	for(auto& file : files) {
 		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
+		BufferIO::DecodeUTF8(file.c_str(), wname);
 		lstSinglePlayList->addItem(wname);
 	}
-	closedir(dir);
-#endif
 }
 void Game::RefreshBGMList() {
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./sound/BGM/*.mp3", &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			BGMList.push_back(fdataw.cFileName);
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./sound/BGM/*.mp3")) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".mp3") != 0)
-			continue;
-		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		BGMList.push_back(wname);
+	auto files = FindfolderFiles(WSTRINGPATH("./sound/BGM/"), WSTRINGPATH(".mp3"));
+	for(auto& file : files) {
+		BGMList.push_back(file);
 	}
-	closedir(dir);
-#endif
 }
 void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");
@@ -1325,20 +1250,17 @@ void Game::PlayMusic(char* song, bool loop) {
 void Game::PlayBGM() {
 	if(chkEnableMusic->isChecked() && BGMList.size() > 0) {
 		static bool is_playing = false;
-		static char strBuffer[1024];
-		if(is_playing && !engineMusic->isCurrentlyPlaying(strBuffer))
+		static std::string strBuffer;
+		if(is_playing && !engineMusic->isCurrentlyPlaying(strBuffer.c_str()))
 			is_playing = false;
 		if(!is_playing) {
 			int count = BGMList.size();
 			int bgm = rand() % count;
-			auto name = BGMList[bgm].c_str();
-			wchar_t fname[256];
-			myswprintf(fname, L"./sound/BGM/%ls", name);
-			BufferIO::EncodeUTF8(fname, strBuffer);
+			strBuffer = "./sound/BGM/" + BGMList[bgm];
 		}
-		if(!engineMusic->isCurrentlyPlaying(strBuffer)) {
+		if(!engineMusic->isCurrentlyPlaying(strBuffer.c_str())) {
 			engineMusic->stopAllSounds();
-			engineMusic->play2D(strBuffer, true);
+			engineMusic->play2D(strBuffer.c_str(), true);
 			engineMusic->setSoundVolume(gameConf.volume);
 			is_playing = true;
 		}
@@ -1486,8 +1408,7 @@ void Game::ClearChatMsg() {
 		chatTiming[i] = 0;
 	}
 }
-void Game::AddDebugMsg(char* msg)
-{
+void Game::AddDebugMsg(char* msg) {
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
