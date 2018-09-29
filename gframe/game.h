@@ -37,6 +37,7 @@ struct Config {
 	int chkHideSetname;
 	int chkHideHintButton;
 	int draw_field_spell;
+	int quick_animation;
 
 	int chkAnime;
 	bool enablesound;
@@ -128,6 +129,7 @@ public:
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
+	void ShowCardNoInfo(int player = 0);
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearChatMsg();
 	void AddDebugMsg(char* msgbuf);
@@ -252,6 +254,7 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkEnableSound;
@@ -668,6 +671,7 @@ extern Game* mainGame;
 #define CHECKBOX_ENABLE_MUSIC		366
 #define SCROLL_VOLUME				367
 #define CHECKBOX_SHOW_ANIME			368
+#define CHECKBOX_QUICK_ANIMATION	369
 #define COMBOBOX_SORTTYPE			370
 
 #define BUTTON_MARKS_FILTER			380

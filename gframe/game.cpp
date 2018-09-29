@@ -236,7 +236,7 @@ bool Game::Initialize() {
 	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
-	env->addStaticText(L"Host Port:", rect<s32>(10, 390, 220, 410), false, false, wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1238), rect<s32>(10, 390, 220, 410), false, false, wCreateHost);
 	ebHostPort = env->addEditBox(gameConf.serverport, rect<s32>(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
 	ebHostPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//host(single)
@@ -349,6 +349,8 @@ bool Game::Initialize() {
 	srcVolume->setPos(gameConf.volume * 100);
 	srcVolume->setLargeStep(1);
 	srcVolume->setSmallStep(1);
+	chkQuickAnimation = env->addCheckBox(false, rect<s32>(20, 315, 280, 340), tabSystem, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
+	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -1092,6 +1094,7 @@ void Game::LoadConfig() {
 	gameConf.volume = 1.0;
 	gameConf.enablemusic = true;
 	gameConf.draw_field_spell = 1;
+	gameConf.quick_animation = 0;
 	gameConf.chkAnime = 0;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
@@ -1146,6 +1149,8 @@ void Game::LoadConfig() {
 			gameConf.chkHideHintButton = atoi(valbuf);
 		} else if(!strcmp(strbuf, "draw_field_spell")) {
 			gameConf.draw_field_spell = atoi(valbuf);
+		} else if(!strcmp(strbuf, "quick_animation")) {
+			gameConf.quick_animation = atoi(valbuf);
 		} else if(!strcmp(strbuf, "show_anime")) {
 			gameConf.chkAnime = atoi(valbuf);
 		} else if(!strcmp(strbuf, "enable_sound")) {
@@ -1210,6 +1215,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "hide_setname = %d\n", ((gameConf.chkHideSetname) ? 1 : 0));
 	fprintf(fp, "hide_hint_button = %d\n", ((chkHideHintButton->isChecked()) ? 1 : 0));
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
+	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "show_anime = %d\n", ((chkAnime->isChecked()) ? 1 : 0));
 	fprintf(fp, "skin_index = %d\n", gameConf.skin_index);
 	fprintf(fp, "enable_sound = %d\n", ((chkEnableSound->isChecked()) ? 1 : 0));
@@ -1345,6 +1351,16 @@ void Game::ShowCardInfo(int code, bool resize) {
 	showingtext = dataManager.GetText(code);
 	const auto& tsize = stText->getRelativePosition();
 	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
+}
+void Game::ShowCardNoInfo(int player) {
+	imgCard->setImage(imageManager.tCover[player]);
+	stName->setText(L"");
+	stInfo->setText(L"");
+	stDataInfo->setText(L"");
+	stSetName->setText(L"");
+	stText->setText(L"");
+	showingcard = 0;
+	scrCardText->setVisible(false);
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
