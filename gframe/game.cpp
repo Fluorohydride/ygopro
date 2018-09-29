@@ -1333,6 +1333,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 }
 void Game::ShowCardNoInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
+	showingcode = 0;
 	stName->setText(L"");
 	stInfo->setText(L"");
 	stDataInfo->setText(L"");
