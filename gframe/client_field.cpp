@@ -34,31 +34,18 @@ ClientField::ClientField() {
 }
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
-		for(auto cit = deck[i].begin(); cit != deck[i].end(); ++cit)
-			delete *cit;
-		deck[i].clear();
-		for(auto cit = hand[i].begin(); cit != hand[i].end(); ++cit)
-			delete *cit;
-		hand[i].clear();
-		for(auto cit = mzone[i].begin(); cit != mzone[i].end(); ++cit) {
-			if(*cit)
-				delete *cit;
-			*cit = 0;
+		for(auto zone : { &mzone[i] ,&szone[i] }) {
+			for(auto& pcard : *zone) {
+				if(pcard)
+					delete pcard;
+				pcard = 0;
+			}
 		}
-		for(auto cit = szone[i].begin(); cit != szone[i].end(); ++cit) {
-			if(*cit)
-				delete *cit;
-			*cit = 0;
+		for(auto zone : { &deck[i], &hand[i], &grave[i], &remove[i], &extra[i] }) {
+			for(auto& pcard : *zone)
+				delete pcard;
+			zone->clear();
 		}
-		for(auto cit = grave[i].begin(); cit != grave[i].end(); ++cit)
-			delete *cit;
-		grave[i].clear();
-		for(auto cit = remove[i].begin(); cit != remove[i].end(); ++cit)
-			delete *cit;
-		remove[i].clear();
-		for(auto cit = extra[i].begin(); cit != extra[i].end(); ++cit)
-			delete *cit;
-		extra[i].clear();
 	}
 	for(auto cit = limbo_temp.begin(); cit != limbo_temp.end(); ++cit)
 			delete *cit;
@@ -118,33 +105,35 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 	}
 }
-ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
-	std::vector<ClientCard*>* lst = 0;
-	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
-	location &= (~LOCATION_OVERLAY);
+std::vector<ClientCard*>* ClientField::GetList(int location, int controler) {
 	switch(location) {
 	case LOCATION_DECK:
-		lst = &deck[controler];
+		return &deck[controler];
 		break;
 	case LOCATION_HAND:
-		lst = &hand[controler];
+		return &hand[controler];
 		break;
 	case LOCATION_MZONE:
-		lst = &mzone[controler];
+		return &mzone[controler];
 		break;
 	case LOCATION_SZONE:
-		lst = &szone[controler];
+		return &szone[controler];
 		break;
 	case LOCATION_GRAVE:
-		lst = &grave[controler];
+		return &grave[controler];
 		break;
 	case LOCATION_REMOVED:
-		lst = &remove[controler];
+		return &remove[controler];
 		break;
 	case LOCATION_EXTRA:
-		lst = &extra[controler];
+		return &extra[controler];
 		break;
 	}
+	return nullptr;
+}
+ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
+	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
+	auto lst = GetList(location & (~LOCATION_OVERLAY), controler);
 	if(!lst)
 		return 0;
 	if(is_xyz) {
@@ -305,30 +294,7 @@ void ClientField::UpdateCard(int controler, int location, int sequence, char* da
 		pcard->UpdateInfo(data + 4);
 }
 void ClientField::UpdateFieldCard(int controler, int location, char* data) {
-	std::vector<ClientCard*>* lst = 0;
-	switch(location) {
-	case LOCATION_DECK:
-		lst = &deck[controler];
-		break;
-	case LOCATION_HAND:
-		lst = &hand[controler];
-		break;
-	case LOCATION_MZONE:
-		lst = &mzone[controler];
-		break;
-	case LOCATION_SZONE:
-		lst = &szone[controler];
-		break;
-	case LOCATION_GRAVE:
-		lst = &grave[controler];
-		break;
-	case LOCATION_REMOVED:
-		lst = &remove[controler];
-		break;
-	case LOCATION_EXTRA:
-		lst = &extra[controler];
-		break;
-	}
+	auto lst = GetList(location, controler);
 	if(!lst)
 		return;
 	int len;
@@ -340,20 +306,13 @@ void ClientField::UpdateFieldCard(int controler, int location, char* data) {
 	}
 }
 void ClientField::ClearCommandFlag() {
-	for(auto cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit)
-		(*cit)->cmdFlag = 0;
-	for(auto cit = summonable_cards.begin(); cit != summonable_cards.end(); ++cit)
-		(*cit)->cmdFlag = 0;
-	for(auto cit = spsummonable_cards.begin(); cit != spsummonable_cards.end(); ++cit)
-		(*cit)->cmdFlag = 0;
-	for(auto cit = msetable_cards.begin(); cit != msetable_cards.end(); ++cit)
-		(*cit)->cmdFlag = 0;
-	for(auto cit = ssetable_cards.begin(); cit != ssetable_cards.end(); ++cit)
-		(*cit)->cmdFlag = 0;
-	for(auto cit = reposable_cards.begin(); cit != reposable_cards.end(); ++cit)
-		(*cit)->cmdFlag = 0;
-	for(auto cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
-		(*cit)->cmdFlag = 0;
+	for(auto& pcard : activatable_cards)  pcard->cmdFlag = 0;
+	for(auto& pcard : summonable_cards)   pcard->cmdFlag = 0;
+	for(auto& pcard : spsummonable_cards) pcard->cmdFlag = 0;
+	for(auto& pcard : msetable_cards)     pcard->cmdFlag = 0;
+	for(auto& pcard : ssetable_cards)     pcard->cmdFlag = 0;
+	for(auto& pcard : reposable_cards)    pcard->cmdFlag = 0;
+	for(auto& pcard : attackable_cards)   pcard->cmdFlag = 0;
 	conti_cards.clear();
 	deck_act = false;
 	extra_act = false;
@@ -364,17 +323,17 @@ void ClientField::ClearCommandFlag() {
 	conti_act = false;
 }
 void ClientField::ClearSelect() {
-	for(auto cit = selectable_cards.begin(); cit != selectable_cards.end(); ++cit) {
-		(*cit)->is_selectable = false;
-		(*cit)->is_selected = false;
+	for(auto& pcard : selectable_cards) {
+		pcard->is_selectable = false;
+		pcard->is_selected = false;
 	}
 }
 void ClientField::ClearChainSelect() {
-	for(auto cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
-		(*cit)->cmdFlag = 0;
-		(*cit)->chain_code = 0;
-		(*cit)->is_selectable = false;
-		(*cit)->is_selected = false;
+	for(auto& pcard : activatable_cards) {
+		pcard->cmdFlag = 0;
+		pcard->chain_code = 0;
+		pcard->is_selectable = false;
+		pcard->is_selected = false;
 	}
 	conti_cards.clear();
 	deck_act = false;
@@ -660,101 +619,61 @@ void ClientField::ReplaySwap() {
 	std::swap(remove[0], remove[1]);
 	std::swap(extra[0], extra[1]);
 	std::swap(extra_p_count[0], extra_p_count[1]);
+	auto resetloc = [&](std::vector<ClientCard*> zone) {
+		for(auto& pcard : zone) {
+			if(pcard) {
+				pcard->controler = 1 - pcard->controler;
+				GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+				pcard->is_moving = false;
+			}
+		}
+	};
 	for(int p = 0; p < 2; ++p) {
-		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
-			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = hand[p].begin(); cit != hand[p].end(); ++cit) {
-			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = mzone[p].begin(); cit != mzone[p].end(); ++cit) {
-			if(*cit) {
-				(*cit)->controler = 1 - (*cit)->controler;
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-				(*cit)->is_moving = false;
-			}
-		}
-		for(auto cit = szone[p].begin(); cit != szone[p].end(); ++cit) {
-			if(*cit) {
-				(*cit)->controler = 1 - (*cit)->controler;
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-				(*cit)->is_moving = false;
-			}
-		}
-		for(auto cit = grave[p].begin(); cit != grave[p].end(); ++cit) {
-			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = remove[p].begin(); cit != remove[p].end(); ++cit) {
-			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = extra[p].begin(); cit != extra[p].end(); ++cit) {
-			(*cit)->controler = 1 - (*cit)->controler;
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
+		resetloc(deck[p]);
+		resetloc(hand[p]);
+		resetloc(mzone[p]);
+		resetloc(szone[p]);
+		resetloc(grave[p]);
+		resetloc(remove[p]);
+		resetloc(extra[p]);
 	}
-	for(auto cit = overlay_cards.begin(); cit != overlay_cards.end(); ++cit) {
-		(*cit)->controler = 1 - (*cit)->controler;
-		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-		(*cit)->is_moving = false;
+	for(auto& pcard : overlay_cards) {
+		pcard->controler = 1 - pcard->controler;
+		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		pcard->is_moving = false;
 	}
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
 	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
 	std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
-	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
-		chit->controler = 1 - chit->controler;
-		GetChainLocation(chit->controler, chit->location, chit->sequence, &chit->chain_pos);
+	for(auto& chit : chains) {
+		chit.controler = 1 - chit.controler;
+		GetChainLocation(chit.controler, chit.location, chit.sequence, &chit.chain_pos);
 	}
 	disabled_field = (disabled_field >> 16) | (disabled_field << 16);
 }
 void ClientField::RefreshAllCards() {
+	auto refreshloc = [&](std::vector<ClientCard*> zone) {
+		for(auto& pcard : zone) {
+			if(pcard) {
+				GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+				pcard->is_moving = false;
+			}
+		}
+	};
 	for(int p = 0; p < 2; ++p) {
-		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = hand[p].begin(); cit != hand[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = mzone[p].begin(); cit != mzone[p].end(); ++cit) {
-			if(*cit) {
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-				(*cit)->is_moving = false;
-			}
-		}
-		for(auto cit = szone[p].begin(); cit != szone[p].end(); ++cit) {
-			if(*cit) {
-				GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-				(*cit)->is_moving = false;
-			}
-		}
-		for(auto cit = grave[p].begin(); cit != grave[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = remove[p].begin(); cit != remove[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
-		for(auto cit = extra[p].begin(); cit != extra[p].end(); ++cit) {
-			GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-			(*cit)->is_moving = false;
-		}
+		refreshloc(deck[p]);
+		refreshloc(hand[p]);
+		refreshloc(mzone[p]);
+		refreshloc(szone[p]);
+		refreshloc(grave[p]);
+		refreshloc(remove[p]);
+		refreshloc(extra[p]);
 	}
-	for(auto cit = overlay_cards.begin(); cit != overlay_cards.end(); ++cit) {
-		GetCardLocation(*cit, &(*cit)->curPos, &(*cit)->curRot, true);
-		(*cit)->is_moving = false;
+	for(auto& pcard : overlay_cards) {
+		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		pcard->is_moving = false;
 	}
 }
 void ClientField::GetChainLocation(int controler, int location, int sequence, irr::core::vector3df* t) {
@@ -1119,7 +1038,7 @@ bool ClientField::ShowSelectSum() {
 	} else
 		select_ready = false;
 	bool panelmode = false;
-	for (auto card : selectable_cards) {
+	for (auto& card : selectable_cards) {
 		if (card->location & (LOCATION_DECK+LOCATION_EXTRA+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_OVERLAY)) {
 			panelmode = true;
 			break;
@@ -1139,17 +1058,17 @@ bool ClientField::ShowSelectSum() {
 }
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
-	for(auto card : selectsum_all) {
+	for(auto& card : selectsum_all) {
 		card->is_selectable = false;
 		card->is_selected = false;
 		selable.insert(card);
 	}
-	for(auto card : must_select_cards) {
+	for(auto& card : must_select_cards) {
 		card->is_selectable = true;
 		card->is_selected = true;
 		selable.erase(card);
 	}
-	for(auto card : selected_cards) {
+	for(auto& card : selected_cards) {
 		card->is_selectable = true;
 		card->is_selected = true;
 		selable.erase(card);
@@ -1160,7 +1079,7 @@ bool ClientField::CheckSelectSum() {
 		bool ret = check_sel_sum_s(selable, 0, select_sumval);
 		selectable_cards.clear();
 		std::sort(mainGame->dField.must_select_cards.begin(), mainGame->dField.must_select_cards.end(), ClientCard::client_card_sort);
-		for(auto card : must_select_cards) {
+		for(auto& card : must_select_cards) {
 			card->is_selectable = true;
 			selectable_cards.push_back(card);
 			auto it = std::find(selected_cards.begin(), selected_cards.end(), card);
@@ -1168,13 +1087,13 @@ bool ClientField::CheckSelectSum() {
 				selected_cards.erase(it);
 		}
 		std::sort(mainGame->dField.selected_cards.begin(), mainGame->dField.selected_cards.end(), ClientCard::client_card_sort);
-		for(auto card : selected_cards) {
+		for(auto& card : selected_cards) {
 			card->is_selectable = true;
 			selectable_cards.push_back(card);
 		}
 		std::vector<ClientCard*> tmp(selectsum_cards.begin(), selectsum_cards.end());
 		std::sort(tmp.begin(), tmp.end(), ClientCard::client_card_sort);
-		for(auto card : tmp) {
+		for(auto& card : tmp) {
 			card->is_selectable = true;
 			selectable_cards.push_back(card);
 		}
@@ -1195,7 +1114,7 @@ bool ClientField::CheckSelectSum() {
 			max += opmax;
 		}
 		if (select_sumval <= sumc) {
-			for (auto card : must_select_cards) {
+			for (auto& card : must_select_cards) {
 				auto it = std::find(selected_cards.begin(), selected_cards.end(), card);
 				if (it != selected_cards.end())
 					selected_cards.erase(it);
@@ -1242,7 +1161,7 @@ bool ClientField::CheckSelectSum() {
 		}
 		selectable_cards.clear();
 		std::sort(must_select_cards.begin(), must_select_cards.end(), ClientCard::client_card_sort);
-		for(auto card : must_select_cards) {
+		for(auto& card : must_select_cards) {
 			card->is_selectable = true;
 			selectable_cards.push_back(card);
 			auto it = std::find(selected_cards.begin(), selected_cards.end(), card);
@@ -1250,13 +1169,13 @@ bool ClientField::CheckSelectSum() {
 				selected_cards.erase(it);
 		}
 		std::sort(selected_cards.begin(), selected_cards.end(), ClientCard::client_card_sort);
-		for(auto card : selected_cards) {
+		for(auto& card : selected_cards) {
 			card->is_selectable = true;
 			selectable_cards.push_back(card);
 		}
 		std::vector<ClientCard*> tmp(selectsum_cards.begin(), selectsum_cards.end());
 		std::sort(tmp.begin(), tmp.end(), ClientCard::client_card_sort);
-		for(auto card : tmp) {
+		for(auto& card : tmp) {
 			card->is_selectable = true;
 			selectable_cards.push_back(card);
 		}

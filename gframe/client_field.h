@@ -87,6 +87,7 @@ public:
 	ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
+	std::vector<ClientCard*>* GetList(int location, int controler);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
