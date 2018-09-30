@@ -1331,7 +1331,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	const auto& tsize = stText->getRelativePosition();
 	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), guiFont, showingtext);
 }
-void Game::ShowCardNoInfo(int player) {
+void Game::ClearCardInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
 	showingcode = 0;
 	stName->setText(L"");
