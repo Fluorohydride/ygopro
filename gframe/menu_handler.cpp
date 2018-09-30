@@ -222,7 +222,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
 						break;
 				}
-				mainGame->ShowCardNoInfo();
+				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);

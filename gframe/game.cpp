@@ -1294,7 +1294,7 @@ void Game::ShowCardInfo(int code) {
 	const auto& tsize = stText->getRelativePosition();
 	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
 }
-void Game::ShowCardNoInfo(int player) {
+void Game::ClearCardInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
 	stName->setText(L"");
 	stInfo->setText(L"");
