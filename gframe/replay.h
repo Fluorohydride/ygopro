@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include <time.h>
+#include <vector>
 
 namespace ygo {
 
