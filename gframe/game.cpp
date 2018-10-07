@@ -992,11 +992,11 @@ std::vector<std::string> FindfolderFiles(const std::wstring& path, const std::ws
 		FindClose(fh);
 	}
 #else
-void FindfolderFiles(const std::string& path, const std::string& extension) {
+std::vector<std::string> FindfolderFiles(const std::string& path, const std::string& extension) {
 	std::vector<std::string> res;
 	DIR * dir;
 	struct dirent * dirp;
-	if((dir = opendir(path.c:str())) != NULL) {
+	if((dir = opendir(path.c_str())) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
 			size_t len = strlen(dirp->d_name);
 			if(len < 5 || strcasecmp(dirp->d_name + len - 4, extension.c_str()) != 0)
@@ -1005,9 +1005,9 @@ void FindfolderFiles(const std::string& path, const std::string& extension) {
 		}
 		closedir(dir);
 	}
-#endif
 	return res;
 }
+#endif
 
 #ifdef _WIN32
 #define WSTRINGPATH(x) L##x
