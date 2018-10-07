@@ -991,6 +991,8 @@ std::vector<std::string> FindfolderFiles(const std::wstring& path, const std::ws
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
 	}
+	return res;
+}
 #else
 std::vector<std::string> FindfolderFiles(const std::string& path, const std::string& extension) {
 	std::vector<std::string> res;
