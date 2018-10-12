@@ -317,25 +317,25 @@ void Game::CheckMutual(ClientCard* pcard, int mark) {
 }
 void Game::DrawCards() {
 	for(int p = 0; p < 2; ++p) {
-		for(auto it = dField.mzone[p].begin(); it != dField.mzone[p].end(); ++it)
-			if(*it)
-				DrawCard(*it);
-		for(auto it = dField.szone[p].begin(); it != dField.szone[p].end(); ++it)
-			if(*it)
-				DrawCard(*it);
-		for(auto it = dField.deck[p].begin(); it != dField.deck[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.hand[p].begin(); it != dField.hand[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.grave[p].begin(); it != dField.grave[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.remove[p].begin(); it != dField.remove[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.extra[p].begin(); it != dField.extra[p].end(); ++it)
-			DrawCard(*it);
+		for(auto& pcard : dField.mzone[p])
+			if(pcard)
+				DrawCard(pcard);
+		for(auto& pcard : dField.szone[p])
+			if(pcard)
+				DrawCard(pcard);
+		for(auto& pcard : dField.deck[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.hand[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.grave[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.remove[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.extra[p])
+			DrawCard(pcard);
 	}
-	for(auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit)
-		DrawCard(*cit);
+	for(auto& pcard : dField.overlay_cards)
+		DrawCard(pcard);
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame) {
@@ -1212,14 +1212,7 @@ void Game::DrawDeckBd() {
 				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
 				wcscat(textBuffer, scaleBuffer);
 			}
-			if((ptr->second.ot & 0x3) == 1)
-				wcscat(textBuffer, L" [OCG]");
-			else if((ptr->second.ot & 0x3) == 2)
-				wcscat(textBuffer, L" [TCG]");
-			else if((ptr->second.ot & 0x7) == 4)
-				wcscat(textBuffer, L" [Anime]");
-			textFont->draw(textBuffer, Resize(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
-			textFont->draw(textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
+			wcscat(textBuffer, L" ");
 		} else {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			textFont->draw(textBuffer, Resize(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
@@ -1228,21 +1221,21 @@ void Game::DrawDeckBd() {
 			textFont->draw(ptype, Resize(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
 			textFont->draw(ptype, Resize(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
 			textBuffer[0] = 0;
-			if((ptr->second.ot & 0x3f) == 1)
-				wcscat(textBuffer, L" [OCG]");
-			else if((ptr->second.ot & 0x3f) == 2)
-				wcscat(textBuffer, L" [TCG]");
-			else if((ptr->second.ot & 0x3f) == 4)
-				wcscat(textBuffer, L" [Anime]");
-			else if((ptr->second.ot & 0x3f) == 8)
-				wcscat(textBuffer, L" [Illegal]");
-			else if((ptr->second.ot & 0x3f) == 16)
-				wcscat(textBuffer, L" [VG]");
-			else if((ptr->second.ot & 0x3f) == 32)
-				wcscat(textBuffer, L" [Custom]");
-			textFont->draw(textBuffer, Resize(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
-			textFont->draw(textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 		}
+		if((ptr->second.ot & 0x3f) == 1)
+			wcscat(textBuffer, L"[OCG]");
+		else if((ptr->second.ot & 0x3f) == 2)
+			wcscat(textBuffer, L"[TCG]");
+		else if((ptr->second.ot & 0x3f) == 4)
+			wcscat(textBuffer, L"[Anime]");
+		else if((ptr->second.ot & 0x3f) == 8)
+			wcscat(textBuffer, L"[Illegal]");
+		else if((ptr->second.ot & 0x3f) == 16)
+			wcscat(textBuffer, L"[VG]");
+		else if((ptr->second.ot & 0x3f) == 32)
+			wcscat(textBuffer, L"[Custom]");
+		textFont->draw(textBuffer, Resize(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
+		textFont->draw(textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 	}
 	if(deckBuilder.is_draging) {
 		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - 22, deckBuilder.dragy - 32), deckBuilder.filterList, true);
