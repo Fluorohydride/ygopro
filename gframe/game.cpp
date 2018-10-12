@@ -1335,7 +1335,12 @@ void Game::ShowCardInfo(int code, bool resize) {
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		SetStaticText(stInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
-		stDataInfo->setText(L"");
+		if(cd.type & TYPE_LINK) {
+			myswprintf(formatBuffer, L"Link %d	", cd.level);
+			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
+			SetStaticText(stDataInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
+		} else
+			stDataInfo->setText(L"");
 	}
 	int offset = 37;
 	stInfo->setRelativePosition(rect<s32>(15, offset, (296 * window_size.Width / 1024), offset + textFont->getDimension(stInfo->getText()).Height));
