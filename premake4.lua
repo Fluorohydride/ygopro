@@ -2,7 +2,7 @@ solution "ygo"
     location "build"
     language "C++"
     objdir "obj"
-    startproject "ygopro"
+    --startproject "ygopro"
 
     configurations { "Debug", "Release" }
 
