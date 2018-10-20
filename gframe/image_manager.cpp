@@ -8,6 +8,10 @@ ImageManager imageManager;
 bool ImageManager::Initial() {
 	tCover[0] = NULL;
 	tCover[1] = NULL;
+	tCover[2] = GetTextureFromFile("textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	tCover[3] = GetTextureFromFile("textures/cover2.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	if(!tCover[3])
+		tCover[3] = tCover[2];
 	tUnknown = NULL;
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
