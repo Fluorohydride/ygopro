@@ -1717,13 +1717,11 @@ recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
 }
-recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2) {
-	s32 sx = x2 - x;
-	s32 sy = y2 - y;
-	x = (x + sx / 2 - 100) * xScale - sx / 2 + 100;
+recti Game::ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width) {
+	x = x * xScale - width / 2;
 	y = y * yScale;
-	x2 = sx + x;
-	y2 = sy + y;
+	x2 = x2 * xScale;
+	y2 = y2 * yScale;
 	return recti(x, y, x2, y2);
 }
 recti Game::ResizeCard(s32 x, s32 y, s32 x2, s32 y2) {
