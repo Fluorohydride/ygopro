@@ -2240,12 +2240,12 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	}
 	if(str.length() > 0) {
 		parent->addChild(mainGame->stCardListTip);
-		irr::core::rect<s32> epos = element->getRelativePosition();
-		s32 x = (epos.UpperLeftCorner.X + epos.LowerRightCorner.X) / 2;
-		s32 y = epos.LowerRightCorner.Y;
-		irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
-		mainGame->stCardListTip->setRelativePosition(recti(x - dtip.Width / 2, y - 10, x + dtip.Width / 2, y - 10 + dtip.Height));
-		mainGame->stCardListTip->setText(str.c_str());
+		irr::core::rect<s32> ePos = element->getRelativePosition();
+		s32 x = (ePos.UpperLeftCorner.X + ePos.LowerRightCorner.X) / 2;
+		s32 y = ePos.LowerRightCorner.Y;
+		mainGame->SetStaticText(mainGame->stCardListTip, 160, mainGame->guiFont, str.c_str());
+		irr::core::dimension2d<unsigned int> dTip = mainGame->guiFont->getDimension(mainGame->stCardListTip->getText()) + irr::core::dimension2d<unsigned int>(10, 10);
+		mainGame->stCardListTip->setRelativePosition(recti(x - dTip.Width / 2, y - 10, x + dTip.Width / 2, y - 10 + dTip.Height));
 		mainGame->stCardListTip->setVisible(true);
 	}
 }
