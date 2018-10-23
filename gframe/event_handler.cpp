@@ -2243,9 +2243,14 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 		irr::core::rect<s32> ePos = element->getRelativePosition();
 		s32 x = (ePos.UpperLeftCorner.X + ePos.LowerRightCorner.X) / 2;
 		s32 y = ePos.LowerRightCorner.Y;
-		mainGame->SetStaticText(mainGame->stCardListTip, 160, mainGame->guiFont, str.c_str());
+		mainGame->SetStaticText(mainGame->stCardListTip, 320, mainGame->guiFont, str.c_str());
 		irr::core::dimension2d<unsigned int> dTip = mainGame->guiFont->getDimension(mainGame->stCardListTip->getText()) + irr::core::dimension2d<unsigned int>(10, 10);
-		mainGame->stCardListTip->setRelativePosition(recti(x - dTip.Width / 2, y - 10, x + dTip.Width / 2, y - 10 + dTip.Height));
+		s32 w = dTip.Width / 2;
+		if(x - w < 10)
+			x = w + 10;
+		if(x + w > 670)
+			x = 670 - w;
+		mainGame->stCardListTip->setRelativePosition(recti(x - w, y - 10, x + w, y - 10 + dTip.Height));
 		mainGame->stCardListTip->setVisible(true);
 	}
 }
