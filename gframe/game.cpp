@@ -675,7 +675,7 @@ bool Game::Initialize() {
 	stTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stTip->setVisible(false);
 	//tip for cards in select / display list
-	stCardListTip = env->addStaticText(L"", rect<s32>(0, 0, 150, 150), false, true, wCardSelect, -1, true);
+	stCardListTip = env->addStaticText(L"", rect<s32>(0, 0, 150, 150), false, true, wCardSelect, TEXT_CARD_LIST_TIP, true);
 	stCardListTip->setBackgroundColor(0xc0ffffff);
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
