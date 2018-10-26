@@ -7,8 +7,8 @@
 
 class BufferIO {
 public:
-	inline static unsigned long long ReadInt64(char*& p) {
-		unsigned long long ret = *(unsigned long long*)p;
+	inline static long long ReadInt64(char*& p) {
+		long long ret = *(long long*)p;
 		p += 8;
 		return ret;
 	}
@@ -32,16 +32,20 @@ public:
 		p++;
 		return ret;
 	}
+	inline static void WriteInt64(char*& p, long long val) {
+		std::memcpy(p, &val, sizeof(val));
+		p += 8;
+	}
 	inline static void WriteInt32(char*& p, int val) {
-		(*(int*)p) = val;
+		std::memcpy(p, &val, sizeof(val));
 		p += 4;
 	}
 	inline static void WriteInt16(char*& p, short val) {
-		(*(short*)p) = val;
+		std::memcpy(p, &val, sizeof(val));
 		p += 2;
 	}
 	inline static void WriteInt8(char*& p, char val) {
-		*p = val;
+		std::memcpy(p, &val, sizeof(val));
 		p++;
 	}
 	template<typename T1, typename T2>
