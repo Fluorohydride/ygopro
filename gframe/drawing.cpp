@@ -207,13 +207,13 @@ void Game::DrawBackGround() {
 		else if (dField.hovered_location == LOCATION_MZONE) {
 			vertex = matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence];
 			ClientCard* pcard = dField.mzone[dField.hovered_controler][dField.hovered_sequence];
-			if(pcard && pcard->type & TYPE_LINK) {
+			if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP)) {
 				DrawLinkedZones(pcard);
 			}
 		} else if(dField.hovered_location == LOCATION_SZONE) {
 			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence][field][speed];
 			ClientCard* pcard = dField.szone[dField.hovered_controler][dField.hovered_sequence];
-			if(pcard && pcard->type & TYPE_LINK) {
+			if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP)) {
 				DrawLinkedZones(pcard);
 			}
 		}
