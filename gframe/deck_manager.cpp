@@ -158,7 +158,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 			return (DECKERROR_OCGONLY << 28) + cit->first;
 		if(!allow_tcg && (cit->second.ot == 0x2))
 			return (DECKERROR_TCGONLY << 28) + cit->first;
-		if(cit->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN | TYPE_LINK))
+		if((cit->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN)) || (cit->second.type & TYPE_LINK && cit->second.type & TYPE_MONSTER))
 			return (DECKERROR_EXTRACOUNT << 28);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
@@ -223,7 +223,7 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		else if(cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && deck.extra.size() < 15*d) {
+		else if((cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd.type & TYPE_LINK && cd.type & TYPE_MONSTER)) && deck.extra.size() < 15*d) {
 			deck.extra.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
 		} else if(deck.main.size() < 60*d) {
 			deck.main.push_back(dataManager.GetCodePointer(code));

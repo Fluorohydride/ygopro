@@ -419,6 +419,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1057), TYPE_SPELL + TYPE_RITUAL);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1068), TYPE_SPELL + TYPE_EQUIP);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1069), TYPE_SPELL + TYPE_FIELD);
+					mainGame->cbCardType2->addItem(dataManager.GetSysString(1076), TYPE_SPELL + TYPE_LINK);
 					break;
 				}
 				case 3: {
@@ -963,7 +964,7 @@ void DeckBuilder::SortList() {
 	}
 }
 bool DeckBuilder::push_main(code_pointer pointer, int seq) {
-	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK))
+	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->second.type != (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.main;
 	if(!mainGame->is_siding && (int)container.size() >= 60)
@@ -976,7 +977,7 @@ bool DeckBuilder::push_main(code_pointer pointer, int seq) {
 	return true;
 }
 bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
-	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)))
+	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) || pointer->second.type == (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.extra;
 	if(!mainGame->is_siding && (int)container.size() >= 15)

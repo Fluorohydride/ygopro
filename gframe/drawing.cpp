@@ -210,8 +210,13 @@ void Game::DrawBackGround() {
 			if(pcard && pcard->type & TYPE_LINK) {
 				DrawLinkedZones(pcard);
 			}
-		} else if (dField.hovered_location == LOCATION_SZONE)
+		} else if(dField.hovered_location == LOCATION_SZONE) {
 			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence][field][speed];
+			ClientCard* pcard = dField.szone[dField.hovered_controler][dField.hovered_sequence];
+			if(pcard && pcard->type & TYPE_LINK) {
+				DrawLinkedZones(pcard);
+			}
+		}
 		else if (dField.hovered_location == LOCATION_GRAVE)
 			vertex = matManager.vFieldGrave[dField.hovered_controler][field][speed];
 		else if (dField.hovered_location == LOCATION_REMOVED)
@@ -236,6 +241,38 @@ void Game::DrawBackGround() {
 void Game::DrawLinkedZones(ClientCard* pcard) {
 	int mark = pcard->link_marker;
 	ClientCard* pcard2;
+	if(dField.hovered_location == LOCATION_SZONE) {
+		int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
+		int speed = (dInfo.extraval & 0x1) ? 1 : 0;
+		if(dField.hovered_sequence > 4)
+			return;
+		if(mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence > (0 + (dInfo.extraval & 0x1))) {
+			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
+			CheckMutual(pcard2, LINK_MARKER_BOTTOM_RIGHT);
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
+		}
+		if(mark & LINK_MARKER_TOP) {
+			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence];
+			CheckMutual(pcard2, LINK_MARKER_BOTTOM);
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence], 4, matManager.iRectangle, 2);
+		}
+		if(mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence < (4 - (dInfo.extraval & 0x1))) {
+			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence + 1];
+			CheckMutual(pcard2, LINK_MARKER_BOTTOM_LEFT);
+			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
+		}
+		if(mark & LINK_MARKER_LEFT && dField.hovered_sequence >(0 + (dInfo.extraval & 0x1))) {
+			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
+			CheckMutual(pcard2, LINK_MARKER_RIGHT);
+			driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence - 1][field][speed], 4, matManager.iRectangle, 2);
+		}
+		if(mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - (dInfo.extraval & 0x1))) {
+			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
+			CheckMutual(pcard2, LINK_MARKER_LEFT);
+			driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence + 1][field][speed], 4, matManager.iRectangle, 2);
+		}
+		return;
+	}
 	if (dField.hovered_sequence < 5) {
 		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > (0 + (dInfo.extraval & 0x1))) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
@@ -317,25 +354,25 @@ void Game::CheckMutual(ClientCard* pcard, int mark) {
 }
 void Game::DrawCards() {
 	for(int p = 0; p < 2; ++p) {
-		for(auto it = dField.mzone[p].begin(); it != dField.mzone[p].end(); ++it)
-			if(*it)
-				DrawCard(*it);
-		for(auto it = dField.szone[p].begin(); it != dField.szone[p].end(); ++it)
-			if(*it)
-				DrawCard(*it);
-		for(auto it = dField.deck[p].begin(); it != dField.deck[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.hand[p].begin(); it != dField.hand[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.grave[p].begin(); it != dField.grave[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.remove[p].begin(); it != dField.remove[p].end(); ++it)
-			DrawCard(*it);
-		for(auto it = dField.extra[p].begin(); it != dField.extra[p].end(); ++it)
-			DrawCard(*it);
+		for(auto& pcard : dField.mzone[p])
+			if(pcard)
+				DrawCard(pcard);
+		for(auto& pcard : dField.szone[p])
+			if(pcard)
+				DrawCard(pcard);
+		for(auto& pcard : dField.deck[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.hand[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.grave[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.remove[p])
+			DrawCard(pcard);
+		for(auto& pcard : dField.extra[p])
+			DrawCard(pcard);
 	}
-	for(auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit)
-		DrawCard(*cit);
+	for(auto& pcard : dField.overlay_cards)
+		DrawCard(pcard);
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame) {
@@ -1212,14 +1249,7 @@ void Game::DrawDeckBd() {
 				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
 				wcscat(textBuffer, scaleBuffer);
 			}
-			if((ptr->second.ot & 0x3) == 1)
-				wcscat(textBuffer, L" [OCG]");
-			else if((ptr->second.ot & 0x3) == 2)
-				wcscat(textBuffer, L" [TCG]");
-			else if((ptr->second.ot & 0x7) == 4)
-				wcscat(textBuffer, L" [Anime]");
-			textFont->draw(textBuffer, Resize(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
-			textFont->draw(textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
+			wcscat(textBuffer, L" ");
 		} else {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			textFont->draw(textBuffer, Resize(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
@@ -1228,21 +1258,21 @@ void Game::DrawDeckBd() {
 			textFont->draw(ptype, Resize(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
 			textFont->draw(ptype, Resize(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
 			textBuffer[0] = 0;
-			if((ptr->second.ot & 0x3f) == 1)
-				wcscat(textBuffer, L" [OCG]");
-			else if((ptr->second.ot & 0x3f) == 2)
-				wcscat(textBuffer, L" [TCG]");
-			else if((ptr->second.ot & 0x3f) == 4)
-				wcscat(textBuffer, L" [Anime]");
-			else if((ptr->second.ot & 0x3f) == 8)
-				wcscat(textBuffer, L" [Illegal]");
-			else if((ptr->second.ot & 0x3f) == 16)
-				wcscat(textBuffer, L" [VG]");
-			else if((ptr->second.ot & 0x3f) == 32)
-				wcscat(textBuffer, L" [Custom]");
-			textFont->draw(textBuffer, Resize(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
-			textFont->draw(textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 		}
+		if((ptr->second.ot & 0x3f) == 1)
+			wcscat(textBuffer, L"[OCG]");
+		else if((ptr->second.ot & 0x3f) == 2)
+			wcscat(textBuffer, L"[TCG]");
+		else if((ptr->second.ot & 0x3f) == 4)
+			wcscat(textBuffer, L"[Anime]");
+		else if((ptr->second.ot & 0x3f) == 8)
+			wcscat(textBuffer, L"[Illegal]");
+		else if((ptr->second.ot & 0x3f) == 16)
+			wcscat(textBuffer, L"[VG]");
+		else if((ptr->second.ot & 0x3f) == 32)
+			wcscat(textBuffer, L"[Custom]");
+		textFont->draw(textBuffer, Resize(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
+		textFont->draw(textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
 	}
 	if(deckBuilder.is_draging) {
 		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - 22, deckBuilder.dragy - 32), deckBuilder.filterList, true);
