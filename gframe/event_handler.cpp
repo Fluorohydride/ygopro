@@ -54,6 +54,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->btnReplayStart->setVisible(false);
+				mainGame->btnReplaySwap->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
 				mainGame->btnReplayStep->setVisible(false);
 				mainGame->btnReplayUndo->setVisible(false);
@@ -65,6 +66,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				mainGame->btnReplayStart->setVisible(true);
+				mainGame->btnReplaySwap->setVisible(true);
 				mainGame->btnReplayPause->setVisible(false);
 				mainGame->btnReplayStep->setVisible(true);
 				mainGame->btnReplayUndo->setVisible(true);
