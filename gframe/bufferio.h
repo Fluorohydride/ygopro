@@ -1,5 +1,6 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
+#include <cstring>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4244)
