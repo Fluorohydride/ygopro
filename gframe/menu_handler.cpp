@@ -228,7 +228,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->wReplay->setVisible(true);
 				mainGame->wReplayControl->setVisible(true);
 				mainGame->btnReplayStart->setVisible(false);
-				mainGame->btnReplaySwap->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
 				mainGame->btnReplayStep->setVisible(false);
 				mainGame->btnReplayUndo->setVisible(false);
