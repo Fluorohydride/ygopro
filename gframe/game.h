@@ -262,12 +262,18 @@ public:
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
+	irr::gui::IGUIWindow* tabHelper;
+	irr::gui::IGUIElement* elmTabHelperLast;
+	irr::gui::IGUIScrollBar* scrTabHelper;
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
+	irr::gui::IGUIWindow* tabSystem;
+	irr::gui::IGUIElement* elmTabSystemLast;
+	irr::gui::IGUIScrollBar* scrTabSystem;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
@@ -659,9 +665,11 @@ extern Game* mainGame;
 #define BUTTON_BOT_START			340
 #define LISTBOX_BOT_LIST			341
 #define CHECKBOX_BOT_OLD_RULE		342
-#define LISTBOX_SINGLEPLAY_LIST		350
-#define BUTTON_LOAD_SINGLEPLAY		351
-#define BUTTON_CANCEL_SINGLEPLAY	352
+#define LISTBOX_SINGLEPLAY_LIST		343
+#define BUTTON_LOAD_SINGLEPLAY		344
+#define BUTTON_CANCEL_SINGLEPLAY	345
+#define SCROLL_TAB_HELPER			350
+#define SCROLL_TAB_SYSTEM			351
 #define CHECKBOX_AUTO_SEARCH		360
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
