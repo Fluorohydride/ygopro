@@ -1796,6 +1796,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_MULTI_KEYWORDS: {
 				mainGame->gameConf.search_multiple_keywords = mainGame->chkMultiKeywords->isChecked() ? 1 : 0;
+				if(mainGame->is_building && !mainGame->is_siding)
+					mainGame->deckBuilder.InstantSearch();
 				return true;
 				break;
 			}
