@@ -780,8 +780,8 @@ void DeckBuilder::FilterCards() {
 	std::vector<std::wstring> query_elements;
 	std::vector<std::vector<std::wstring>::iterator> query_elements_track;
 	size_t element_start = 0;
-	while(1) {
-		size_t element_end = str.find_first_of(L' ', element_start);
+	while(mainGame->gameConf.search_multiple_keywords) {
+		size_t element_end = str.find_first_of(mainGame->gameConf.search_multiple_keywords == 1 ? L' ' : L'+', element_start);
 		if(element_end == std::wstring::npos)
 			break;
 		size_t length = element_end - element_start;
