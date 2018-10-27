@@ -1,18 +1,33 @@
 #include "image_manager.h"
 #include "game.h"
+#ifndef _WIN32
+#include <dirent.h>
+#endif
 
 namespace ygo {
 
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
-	tCover[0] = driver->getTexture("textures/cover.jpg");
-	tCover[1] = driver->getTexture("textures/cover2.jpg");
+	RefreshRandomImageList();
+
+	tCover[0] = GetRandomImage(TEXTURE_COVER_S);
+	if(!tCover[0])
+		tCover[0] = driver->getTexture("textures/cover.jpg");
+	tCover[1] = GetRandomImage(TEXTURE_COVER_O);
+	if(!tCover[1])
+		tCover[1] = driver->getTexture("textures/cover2.jpg");
+	if(!tCover[1])
+		tCover[1] = GetRandomImage(TEXTURE_COVER_S);
 	if(!tCover[1])
 		tCover[1] = tCover[0];
 	tUnknown = driver->getTexture("textures/unknown.jpg");
-	tAct = driver->getTexture("textures/act.png");
-	tAttack = driver->getTexture("textures/attack.png");
+	tAct = GetRandomImage(TEXTURE_ACTIVATE);
+	tAttack = GetRandomImage(TEXTURE_ATTACK);
+	if(!tAct)
+		tAct = driver->getTexture("textures/act.png");
+	if(!tAttack)
+		tAttack = driver->getTexture("textures/attack.png");
 	tChain = driver->getTexture("textures/chain.png");
 	tNegated = driver->getTexture("textures/negated.png");
 	tNumber = driver->getTexture("textures/number.png");
@@ -27,11 +42,23 @@ bool ImageManager::Initial() {
 	tHand[0] = driver->getTexture("textures/f1.jpg");
 	tHand[1] = driver->getTexture("textures/f2.jpg");
 	tHand[2] = driver->getTexture("textures/f3.jpg");
-	tBackGround = driver->getTexture("textures/bg.jpg");
-	tBackGround_menu = driver->getTexture("textures/bg_menu.jpg");
+	tBackGround = GetRandomImage(TEXTURE_DUEL);
+	if(!tBackGround)
+		tBackGround = driver->getTexture("textures/bg.jpg");
+	if(!tBackGround)
+		tBackGround = driver->getTexture("textures/bg_duel.jpg");
+	tBackGround_menu = GetRandomImage(TEXTURE_MENU);
+	if(!tBackGround_menu)
+		tBackGround_menu = driver->getTexture("textures/bg_menu.jpg");
+	if(!tBackGround_menu)
+		tBackGround_menu = GetRandomImage(TEXTURE_DUEL);
 	if(!tBackGround_menu)
 		tBackGround_menu = tBackGround;
-	tBackGround_deck = driver->getTexture("textures/bg_deck.jpg");
+	tBackGround_deck = GetRandomImage(TEXTURE_DECK);
+	if(!tBackGround_deck)
+		tBackGround_deck = driver->getTexture("textures/bg_deck.jpg");
+	if(!tBackGround_deck)
+		tBackGround_deck = GetRandomImage(TEXTURE_DUEL);
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
 	tField[0] = driver->getTexture("textures/field2.png");
@@ -39,6 +66,64 @@ bool ImageManager::Initial() {
 	tField[1] = driver->getTexture("textures/field3.png");
 	tFieldTransparent[1] = driver->getTexture("textures/field-transparent3.png");
 	return true;
+}
+irr::video::ITexture* ImageManager::GetRandomImage(int image_type) {
+	int count = ImageList[image_type].size();
+	if(count <= 0)
+		return 0;
+	char ImageName[1024];
+	wchar_t fname[1024];
+	int image_id = rand() % count;
+	auto name = ImageList[image_type][image_id].c_str();
+	myswprintf(fname, L"./textures/%ls", name);
+	BufferIO::EncodeUTF8(fname, ImageName);
+	return driver->getTexture(ImageName);
+}
+void ImageManager::RefreshRandomImageList() {
+	RefreshImageDir(L"bg/", TEXTURE_DUEL);
+	RefreshImageDir(L"bg_duel/", TEXTURE_DUEL);
+	RefreshImageDir(L"bg_deck/", TEXTURE_DECK);
+	RefreshImageDir(L"bg_menu/", TEXTURE_MENU);
+	RefreshImageDir(L"cover/", TEXTURE_COVER_S);
+	RefreshImageDir(L"cover2/", TEXTURE_COVER_O);
+	RefreshImageDir(L"attack/", TEXTURE_ATTACK);
+	RefreshImageDir(L"act/", TEXTURE_ACTIVATE);
+}
+void ImageManager::RefreshImageDir(std::wstring path, int image_type) {
+#ifdef _WIN32
+	WIN32_FIND_DATAW fdataw;
+	std::wstring search = L"./textures/" + path + L"*.*";
+	HANDLE fh = FindFirstFileW(search.c_str(), &fdataw);
+	if(fh == INVALID_HANDLE_VALUE)
+		return;
+	do {
+		size_t len = wcslen(fdataw.cFileName);
+		if((fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || len < 5
+			|| !(_wcsicmp(fdataw.cFileName + len - 4, L".jpg") == 0 || _wcsicmp(fdataw.cFileName + len - 4, L".png") == 0))
+			continue;
+		std::wstring filename = path + (std::wstring)fdataw.cFileName;
+		ImageList[image_type].push_back(filename);
+	} while(FindNextFileW(fh, &fdataw));
+	FindClose(fh);
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	std::wstring wsearchpath = L"./textures/" + path;
+	char searchpath[256];
+	BufferIO::EncodeUTF8(wsearchpath.c_str(), searchpath);
+	if((dir = opendir(searchpath)) == NULL)
+		return;
+	while((dirp = readdir(dir)) != NULL) {
+		size_t len = strlen(dirp->d_name);
+		if(len < 5 || !(strcasecmp(dirp->d_name + len - 4, ".jpg") == 0 || strcasecmp(dirp->d_name + len - 4, ".png")))
+			continue;
+		wchar_t wname[256];
+		BufferIO::DecodeUTF8(dirp->d_name, wname);
+		std::wstring filename = path + (std::wstring)wname;
+		ImageList[image_type].push_back(filename);
+	}
+	closedir(dir);
+#endif
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	device = dev;
