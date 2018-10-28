@@ -335,6 +335,9 @@ void CGUICustomText::breakText() {
 			scrText->setMin(0);
 			scrText->setMax((getTextHeight() - RelativeRect.getHeight()));
 			scrText->setPos(0);
+			int step = getActiveFont()->getDimension(L"A").Height + getActiveFont()->getKerningHeight();
+			scrText->setSmallStep(step);
+			scrText->setLargeStep(step);
 		}
 	}
 }
