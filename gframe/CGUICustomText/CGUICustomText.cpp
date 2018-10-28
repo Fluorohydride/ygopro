@@ -48,7 +48,6 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 		scrText = environment->addScrollBar(false, irr::core::rect<s32>(width2, 0, width, RelativeRect.getHeight()), this, -1);
 		scrText->setSmallStep(1);
 		scrText->setLargeStep(1);
-		//scrText->setVisible(false);
 	}
 }
 
@@ -347,8 +346,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 	if(scrollbar_spacing && !scrText)
 		return;
 
-	core::array< core::stringw >* text = scrollbar_spacing ? &BrokenText : &BrokenText;
-	text->clear();
+	BrokenText.clear();
 
 	IGUISkin* skin = Environment->getSkin();
 	IGUIFont* font = getActiveFont();
@@ -422,7 +420,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 						{
 							core::stringw first  = word.subString(0, where);
 							core::stringw second = word.subString(where, word.size() - where);
-							text->push_back(line + first + L"-");
+							BrokenText.push_back(line + first + L"-");
 							const s32 secondLength = font->getDimension(second.c_str()).Width;
 
 							length = secondLength;
@@ -433,7 +431,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 							// No soft hyphen found, so there's nothing more we can do
 							// break to next line
 							if (length)
-								text->push_back(line);
+								BrokenText.push_back(line);
 							length = wordlgth;
 							line = word;
 						}
@@ -441,7 +439,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 					else if (length && (length + wordlgth + whitelgth > elWidth))
 					{
 						// break to next line
-						text->push_back(line);
+						BrokenText.push_back(line);
 						length = wordlgth;
 						line = word;
 					}
@@ -467,7 +465,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 				{
 					line += whitespace;
 					line += word;
-					text->push_back(line);
+					BrokenText.push_back(line);
 					line = L"";
 					word = L"";
 					whitespace = L"";
@@ -478,7 +476,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 
 		line += whitespace;
 		line += word;
-		text->push_back(line);
+		BrokenText.push_back(line);
 	}
 	else
 	{
@@ -516,7 +514,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 					if (length && (length + wordlgth + whitelgth > elWidth))
 					{
 						// break to next line
-						text->push_back(line);
+						BrokenText.push_back(line);
 						length = wordlgth;
 						line = word;
 					}
@@ -540,7 +538,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 				{
 					line = whitespace + line;
 					line = word + line;
-					text->push_back(line);
+					BrokenText.push_back(line);
 					line = L"";
 					word = L"";
 					whitespace = L"";
@@ -556,7 +554,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 
 		line = whitespace + line;
 		line = word + line;
-		text->push_back(line);
+		BrokenText.push_back(line);
 	}
 }
 
