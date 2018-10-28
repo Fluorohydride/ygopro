@@ -6,7 +6,6 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "image_manager.h"
-#include "../ocgcore/duel.h"
 #include "game.h"
 #include "utils.h"
 
