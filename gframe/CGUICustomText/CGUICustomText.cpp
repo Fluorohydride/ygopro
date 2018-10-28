@@ -131,7 +131,7 @@ void CGUICustomText::draw()
 
 				core::rect<s32> r = frameRect;
 				s32 height = font->getDimension(L"A").Height + font->getKerningHeight();
-				s32 totalHeight = height * (BrokenText.size() - offset);
+				s32 totalHeight = height * BrokenText.size();
 				if (VAlign == EGUIA_CENTER)
 				{
 					r.UpperLeftCorner.Y = r.getCenter().Y - (totalHeight / 2);
@@ -141,7 +141,9 @@ void CGUICustomText::draw()
 					r.UpperLeftCorner.Y = r.LowerRightCorner.Y - totalHeight;
 				}
 
-				for (u32 i= offset; i<BrokenText.size(); ++i)
+				r.UpperLeftCorner.Y -= offset;
+
+				for (u32 i= 0; i<BrokenText.size(); ++i)
 				{
 					if (HAlign == EGUIA_LOWERRIGHT)
 					{
@@ -331,7 +333,7 @@ void CGUICustomText::breakText() {
 			scrText->setVisible(true);
 			breakText(true);
 			scrText->setMin(0);
-			scrText->setMax(1 + (getTextHeight() - RelativeRect.getHeight()) / (getActiveFont()->getDimension(L"A").Height + getActiveFont()->getKerningHeight()));
+			scrText->setMax((getTextHeight() - RelativeRect.getHeight()));
 			scrText->setPos(0);
 		}
 	}
