@@ -252,7 +252,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionn->setVisible(true);
 				if(selected_option == 0)
 					mainGame->btnOptionp->setVisible(false);
-				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[selected_option]));
+				mainGame->stOptions->setText((wchar_t*)dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
 			case BUTTON_OPTION_NEXT: {
@@ -260,7 +260,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionp->setVisible(true);
 				if(selected_option == select_options.size() - 1)
 					mainGame->btnOptionn->setVisible(false);
-				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[selected_option]));
+				mainGame->stOptions->setText((wchar_t*)dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
 			case BUTTON_OPTION_0:
@@ -617,7 +617,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							}
 							mainGame->HideElement(mainGame->wCardSelect, true);
 						} else {
-							mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[0]));
+							mainGame->stOptions->setText((wchar_t*)dataManager.GetDesc(select_options[0]));
 							selected_option = 0;
 							mainGame->wCardSelect->setVisible(false);
 							ShowSelectOption();
@@ -1548,14 +1548,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						should_show_tip = false;
-						mainGame->imgCard->setImage(imageManager.tCover[0]);
-						mainGame->stName->setText(L"");
-						mainGame->stInfo->setText(L"");
-						mainGame->stDataInfo->setText(L"");
-						mainGame->stSetName->setText(L"");
-						mainGame->stText->setText(L"");
-						mainGame->showingcard = 0;
-						mainGame->scrCardText->setVisible(false);
+						mainGame->ShowCardNoInfo(0);
 					}
 				}
 				hovered_card = mcard;
@@ -1781,17 +1774,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
-			case SCROLL_CARDTEXT: {
-				if(!mainGame->scrCardText->isVisible()) {
-					return true;
-					break;
-				}
-				u32 pos = mainGame->scrCardText->getPos();
-				const auto& tsize = mainGame->scrCardText->getRelativePosition();
-				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth() - tsize.getWidth(), mainGame->textFont, mainGame->showingtext, pos);
-				return true;
-				break;
-			}
 			case SCROLL_VOLUME: {
 				mainGame->gameConf.volume = (double)mainGame->srcVolume->getPos() / 100;
 				mainGame->engineSound->setSoundVolume(mainGame->gameConf.volume);

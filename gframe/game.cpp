@@ -309,11 +309,8 @@ bool Game::Initialize() {
 	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
 	stSetName = env->addStaticText(L"", rect<s32>(15, 83, 296, 106), false, true, tabInfo, -1, false);
 	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
-	stText = env->addStaticText(L"", rect<s32>(15, 106, 287, 324), false, true, tabInfo, -1, false);
-	scrCardText = env->addScrollBar(false, rect<s32>(267, 106, 287, 324), tabInfo, SCROLL_CARDTEXT);
-	scrCardText->setLargeStep(1);
-	scrCardText->setSmallStep(1);
-	scrCardText->setVisible(false);
+	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 106, 287, 324), true, 0, 0.07);
+	stText->setWordWrap(true);
 	//log
 	irr::gui::IGUITab* tabLog =  wInfos->addTab(dataManager.GetSysString(1271));
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
@@ -846,135 +843,6 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[11] = 1.0f;
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
-void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text) {
-	SetStaticText(pControl, cWidth, font, text);
-	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
-		scrCardText->setVisible(false);
-		if(env->hasFocus(scrCardText))
-			env->removeFocus(scrCardText);
-		return;
-	}
-	const auto& tsize = scrCardText->getRelativePosition();
-	SetStaticText(pControl, cWidth - tsize.getWidth(), font, text);
-	u32 fontheight = font->getDimension(L"A").Height + font->getKerningHeight();
-	u32 step = (font->getDimension(dataManager.strBuffer).Height - cHeight) / fontheight + 1;
-	scrCardText->setVisible(true);
-	scrCardText->setMin(0);
-	scrCardText->setMax(step);
-	scrCardText->setPos(0);
-}
-//took from irrlicht
-void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
-	core::array< core::stringw > BrokenText;
-	core::stringw Text = text;
-	core::stringw line;
-	core::stringw word;
-	core::stringw whitespace;
-	s32 size = Text.size();
-	s32 length = 0;
-	s32 elWidth = cWidth;
-	wchar_t c;
-	for(s32 i = 0; i < size; ++i) {
-		c = Text[i];
-		bool lineBreak = false;
-
-		if(c == L'\r') // Mac or Windows breaks
-		{
-			lineBreak = true;
-			if(Text[i + 1] == L'\n') // Windows breaks
-			{
-				Text.erase(i + 1);
-				--size;
-			}
-			c = ' ';
-		} else if(c == L'\n') // Unix breaks
-		{
-			lineBreak = true;
-			c = ' ';
-		}
-
-		bool isWhitespace = (c == L' ' || c == 0);
-		if(!isWhitespace) {
-			// part of a word
-			word += c;
-		}
-
-		if(isWhitespace || i == (size - 1)) {
-			if(word.size()) {
-				// here comes the next whitespace, look if
-				// we must break the last word to the next line.
-				const s32 whitelgth = font->getDimension(whitespace.c_str()).Width;
-				s32 wordlgth = font->getDimension(word.c_str()).Width;
-				if(wordlgth > elWidth) {
-					core::stringw second;
-					s32 secondLength;
-					while(wordlgth > elWidth) {
-						int j = 0;
-						for(; j < word.size() - 1; j++) {
-							if(font->getDimension(line + whitespace + word.subString(0, j + 1)).Width > elWidth)
-								break;
-						}
-						if(j == 0) {
-							dataManager.strBuffer[0] = 0;
-							pControl->setText(L"");
-							return;
-						}
-						core::stringw first = word.subString(0, j);
-						second = word.subString(j, word.size() - j);
-						BrokenText.push_back(line + whitespace + first);
-						secondLength = font->getDimension(second.c_str()).Width;
-						word = second;
-						wordlgth = secondLength;
-						whitespace = L"";
-						line = L"";
-					}
-					line = second;
-					length = secondLength;
-				} else if(length && (length + wordlgth + whitelgth > elWidth)) {
-					// break to next line
-					BrokenText.push_back(line);
-					length = wordlgth;
-					line = word;
-				} else {
-					// add word to line
-					line += whitespace;
-					line += word;
-					length += whitelgth + wordlgth;
-				}
-
-				word = L"";
-				whitespace = L"";
-			}
-
-			if(isWhitespace) {
-				whitespace += c;
-			}
-
-			// compute line break
-			if(lineBreak) {
-				line += whitespace;
-				line += word;
-				BrokenText.push_back(line);
-				line = L"";
-				word = L"";
-				whitespace = L"";
-				length = 0;
-			}
-		}
-	}
-	line += whitespace;
-	line += word;
-	BrokenText.push_back(line);
-	int pbuffer = 0;
-	for(size_t i = pos; i < BrokenText.size(); i++) {
-		for(size_t j = 0; j < BrokenText[i].size(); j++)
-			dataManager.strBuffer[pbuffer++] = BrokenText[i][j];
-		dataManager.strBuffer[pbuffer++] = L'\n';
-	}
-	if(pbuffer)
-		dataManager.strBuffer[pbuffer - 1] = 0;
-	pControl->setText(dataManager.strBuffer);
-}
 #ifdef _WIN32
 std::vector<std::string> FindfolderFiles(const std::wstring& path, const std::wstring& extension) {
 	std::vector<std::string> res;
@@ -1297,12 +1165,12 @@ void Game::ShowCardInfo(int code, bool resize) {
 		}
 		if(sc) {
 			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329), dataManager.FormatSetName(sc));
-			SetStaticText(stSetName, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
+			stSetName->setText(formatBuffer);
 		}
 	}
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
-		SetStaticText(stInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
+		stInfo->setText(formatBuffer);
 		if(cd.type & TYPE_LINK){
 			if (cd.attack < 0)
 				myswprintf(formatBuffer, L"?/Link %d	", cd.level);
@@ -1330,14 +1198,14 @@ void Game::ShowCardInfo(int code, bool resize) {
 			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
 			wcscat(formatBuffer, scaleBuffer);
 		}
-		SetStaticText(stDataInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
+		stDataInfo->setText(formatBuffer);
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
-		SetStaticText(stInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
+		stInfo->setText(formatBuffer);
 		if(cd.type & TYPE_LINK) {
 			myswprintf(formatBuffer, L"Link %d	", cd.level);
 			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker));
-			SetStaticText(stDataInfo, (296 * window_size.Width / 1024) - 15, textFont, formatBuffer, 0);
+			stDataInfo->setText(formatBuffer);
 		} else
 			stDataInfo->setText(L"");
 	}
@@ -1353,10 +1221,8 @@ void Game::ShowCardInfo(int code, bool resize) {
 		offset += textFont->getDimension(stSetName->getText()).Height;
 	}
 	stText->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-	scrCardText->setRelativePosition(rect<s32>(267 * window_size.Width / 1024, offset, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
 	showingtext = dataManager.GetText(code);
-	const auto& tsize = stText->getRelativePosition();
-	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
+	stText->setText(showingtext);
 }
 void Game::ShowCardNoInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
@@ -1366,7 +1232,6 @@ void Game::ShowCardNoInfo(int player) {
 	stSetName->setText(L"");
 	stText->setText(L"");
 	showingcard = 0;
-	scrCardText->setVisible(false);
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
@@ -1451,7 +1316,6 @@ void Game::AddDebugMsg(char* msg) {
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	imgCard->setImage(imageManager.tCover[0]);
-	scrCardText->setVisible(false);
 	imgCard->setScaleImage(true);
 	btnPSAU->setImage();
 	btnPSDU->setImage();
@@ -1509,7 +1373,6 @@ void Game::CloseDuelWindow() {
 	stSetName->setText(L"");
 	stText->setText(L"");
 	showingcard = 0;
-	scrCardText->setVisible(false);
 	closeDoneSignal.Set();
 }
 int Game::LocalPlayer(int player) {

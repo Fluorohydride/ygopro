@@ -9,6 +9,7 @@
 #include <vector>
 #include <list>
 #include "CGUISkinSystem/CGUISkinSystem.h"
+#include "CGUICustomText/CGUICustomText.h"
 
 namespace ygo {
 
@@ -97,8 +98,6 @@ public:
 	bool Initialize();
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
-	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
-	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
 	void LoadExpansionDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
@@ -243,9 +242,8 @@ public:
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
-	irr::gui::IGUIStaticText* stText;
+	irr::gui::CGUICustomText* stText;
 	irr::gui::IGUIStaticText* stVolume;
-	irr::gui::IGUIScrollBar* scrCardText;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
@@ -627,7 +625,7 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_OR_FINISH		267
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
-#define SCROLL_CARDTEXT				280
+//#define SCROLL_CARDTEXT				280
 #define BUTTON_DISPLAY_0			290
 #define BUTTON_DISPLAY_1			291
 #define BUTTON_DISPLAY_2			292
