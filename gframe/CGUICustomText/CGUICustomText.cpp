@@ -14,7 +14,7 @@ namespace gui
 
 //! constructor
 CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment* environment, IGUIElement* parent,
-			s32 id, const core::rect<s32>& rectangle, bool scrollbar, int scroll_width, float scroll_ratio, bool background)
+			s32 id, const core::rect<s32>& rectangle, bool background)
 : IGUIStaticText(environment, parent, id, rectangle),
 	HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_UPPERLEFT),
 	Border(border), OverrideColorEnabled(false), OverrideBGColorEnabled(false), WordWrap(false), Background(background),
@@ -31,29 +31,11 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 	{
 		BGColor = environment->getSkin()->getColor(gui::EGDC_3D_FACE);
 	}
-
-	if(scrollbar) {
-		core::rect<s32> frameRect(AbsoluteRect);
-		core::rect<s32> r = frameRect;
-		ScrollWidth = scroll_width;
-		ScrollRatio = scroll_ratio;
-		int width = RelativeRect.getWidth();
-		int width2 = 0;
-		if(ScrollWidth)
-			width2 = ScrollWidth;
-		else if(ScrollRatio)
-			width2 = width - round(width*ScrollRatio);
-		else
-			width2 = width - round(width*0.1);
-		scrText = environment->addScrollBar(false, irr::core::rect<s32>(width2, 0, width, RelativeRect.getHeight()), this, -1);
-		scrText->setSmallStep(1);
-		scrText->setLargeStep(1);
-	}
 }
 
 CGUICustomText* CGUICustomText::addCustomText(const wchar_t* text, bool border, IGUIEnvironment* environment,
-	IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool scrollbar, int scroll_width, float scroll_ratio, bool background) {
-	CGUICustomText* button = new CGUICustomText(text, border, environment, parent, id, rectangle, scrollbar, scroll_width, scroll_ratio, background);
+	IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool background) {
+	CGUICustomText* button = new CGUICustomText(text, border, environment, parent, id, rectangle, background);
 	button->drop();
 	return button;
 }
@@ -127,7 +109,7 @@ void CGUICustomText::draw()
 				if (font != LastBreakFont)
 					breakText();
 
-				int offset = scrText ? scrText->getPos() : 0;
+				int offset = (scrText && scrText->isVisible()) ? scrText->getPos() : 0;
 
 				core::rect<s32> r = frameRect;
 				s32 height = font->getDimension(L"A").Height + font->getKerningHeight();
@@ -677,8 +659,32 @@ void CGUICustomText::deserializeAttributes(io::IAttributes* in, io::SAttributeRe
 	// OverrideFont = in->getAttributeAsFont("OverrideFont");
 }
 
+void CGUICustomText::enableScrollBar(int scroll_width, float scroll_ratio) {
+	if(scrText)
+		return;
+	core::rect<s32> frameRect(AbsoluteRect);
+	core::rect<s32> r = frameRect;
+	ScrollWidth = scroll_width;
+	ScrollRatio = scroll_ratio;
+	int width = RelativeRect.getWidth();
+	int width2 = 0;
+	if(ScrollWidth)
+		width2 = ScrollWidth;
+	else if(ScrollRatio)
+		width2 = width - round(width*ScrollRatio);
+	else
+		width2 = width - round(width*0.1);
+	scrText = Environment->addScrollBar(false, irr::core::rect<s32>(width2, 0, width, RelativeRect.getHeight()), this, -1);
+	scrText->setSmallStep(1);
+	scrText->setLargeStep(1);
+}
+
 irr::gui::IGUIScrollBar * CGUICustomText::getScrollBar() {
 	return scrText;
+}
+
+bool CGUICustomText::hasScrollBar() {
+	return !!scrText;
 }
 
 

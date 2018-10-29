@@ -309,7 +309,8 @@ bool Game::Initialize() {
 	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
 	stSetName = env->addStaticText(L"", rect<s32>(15, 83, 296, 106), false, true, tabInfo, -1, false);
 	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
-	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 106, 287, 324), true, 0, 0.07);
+	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 106, 287, 324));
+	stText->enableScrollBar(0, 0.07);
 	stText->setWordWrap(true);
 	//log
 	irr::gui::IGUITab* tabLog =  wInfos->addTab(dataManager.GetSysString(1271));

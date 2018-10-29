@@ -18,10 +18,10 @@ namespace gui
 
 		//! constructor
 		CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment* environment, IGUIElement* parent, s32 id,
-			const core::rect<s32>& rectangle, bool scrollbar = false, int scroll_width = 0, float scroll_ratio = 0, bool background = false);
+			const core::rect<s32>& rectangle, bool background = false);
 
 		static CGUICustomText* addCustomText(const wchar_t* text, bool border, IGUIEnvironment* environment, IGUIElement* parent, s32 id,
-			const core::rect<s32>& rectangle, bool scrollbar = false, int scroll_width = 0, float scroll_ratio = 0, bool background = false);
+			const core::rect<s32>& rectangle, bool background = false);
 
 		//! destructor
 		virtual ~CGUICustomText();
@@ -114,7 +114,11 @@ namespace gui
 		//! Reads attributes of the element
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
 
+		virtual void enableScrollBar(int scroll_width = 0, float scroll_ratio = 0);
+
 		virtual irr::gui::IGUIScrollBar* getScrollBar();
+
+		virtual bool hasScrollBar();
 
 	private:
 
@@ -149,4 +153,4 @@ namespace gui
 #endif // _IRR_COMPILE_WITH_GUI_
 
 #endif
-
+		// scrollbar related variables
