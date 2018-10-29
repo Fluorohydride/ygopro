@@ -20,7 +20,7 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 	Border(border), OverrideColorEnabled(false), OverrideBGColorEnabled(false), WordWrap(false), Background(background),
 	RestrainTextInside(true), RightToLeft(false),
 	OverrideColor(video::SColor(101,255,255,255)), BGColor(video::SColor(101,210,210,210)),
-	OverrideFont(0), LastBreakFont(0), scrText(0)
+	OverrideFont(0), LastBreakFont(0), scrText(0), scrolling(NO_SCROLLING), maxFrame(0), curFrame(0), animationStep(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CGUICustomText");
@@ -87,6 +87,9 @@ void CGUICustomText::draw()
 
 		if (font)
 		{
+			bool autoscrolling = scrolling != NO_SCROLLING && !!animationStep;
+			if(frameTimer)
+				frameTimer--;
 			if (!WordWrap)
 			{
 				if (VAlign == EGUIA_LOWERRIGHT)
@@ -99,10 +102,33 @@ void CGUICustomText::draw()
 					frameRect.UpperLeftCorner.X = frameRect.LowerRightCorner.X -
 						font->getDimension(Text.c_str()).Width;
 				}
+				if(!frameTimer) {
+					curFrame += (increasingFrame) ? 1 : -1;
+					if(curFrame > maxFrame || curFrame < 0) {
+						if(scrolling == LEFT_TO_RIGHT) {
+							curFrame = 0;
+							frameTimer = animationWaitEnd;
+						} else if(scrolling == RIGHT_TO_LEFT) {
+							curFrame = maxFrame;
+							frameTimer = animationWaitEnd;
+						} else if(scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == RIGHT_TO_LEFT_BOUNCING) {
+							increasingFrame = !increasingFrame;
+							if(increasingFrame) {
+								curFrame++;
+								frameTimer = animationWaitEnd;
+							} else {
+								curFrame--;
+								frameTimer = animationWaitStart;
+							}
+						}
+					}
+				}
+
+				frameRect.UpperLeftCorner.X -= round((float)curFrame * animationStep);
 
 				font->draw(Text.c_str(), frameRect,
 					OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
-					HAlign == EGUIA_CENTER, VAlign == EGUIA_CENTER, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
+					HAlign == EGUIA_CENTER && !autoscrolling, VAlign == EGUIA_CENTER, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
 			}
 			else
 			{
@@ -545,12 +571,37 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 	}
 }
 
+void CGUICustomText::updateScrollingStuff() {
+	if(Text.empty())
+		return;
+	frameTimer = animationWaitStart;
+	increasingFrame = (scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM || scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM_BOUNCING);
+	core::rect<s32> frameRect(AbsoluteRect);
+	if(Border) {
+		int size = Environment->getSkin()->getSize(EGDS_TEXT_DISTANCE_X);
+		frameRect.UpperLeftCorner.X += size;
+		frameRect.LowerRightCorner.X -= size;
+	}
+	animationStep = 0;
+	if(forcedSteps) {
+		const int offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
+		if(offset > 0) {
+			animationStep = forcedSteps;
+			maxFrame = ceil((float)offset / (float)animationStep);
+		}
+	} else {
+		const int offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
+		animationStep = (offset <= 0) ? 0 : (float)offset / (float)maxFrame;
+	}
+	curFrame = increasingFrame ? 0 : maxFrame;
+}
 
 //! Sets the new caption of this element.
 void CGUICustomText::setText(const wchar_t* text)
 {
 	IGUIElement::setText(text);
 	breakText();
+	updateScrollingStuff();
 }
 
 
@@ -569,6 +620,7 @@ void CGUICustomText::updateAbsolutePosition()
 		scrText->setRelativePosition(irr::core::rect<s32>(width2, 0, width, RelativeRect.getHeight()));
 	}
 	breakText();
+	updateScrollingStuff();
 }
 
 
@@ -685,6 +737,15 @@ irr::gui::IGUIScrollBar * CGUICustomText::getScrollBar() {
 
 bool CGUICustomText::hasScrollBar() {
 	return !!scrText;
+}
+
+void CGUICustomText::setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames, int steps, int waitstart, int waitend) {
+	scrolling = type;
+	maxFrame = frames;
+	animationWaitStart = waitstart;
+	animationWaitEnd = waitend;
+	forcedSteps = steps;
+	updateScrollingStuff();
 }
 
 

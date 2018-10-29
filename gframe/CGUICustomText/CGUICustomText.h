@@ -16,6 +16,28 @@ namespace gui
 	{
 	public:
 
+		enum CTEXT_SCROLLING_TYPE {
+
+			NO_SCROLLING = 0,
+
+			LEFT_TO_RIGHT,
+
+			RIGHT_TO_LEFT,
+
+			TOP_TO_BOTTOM,
+
+			BOTTOM_TO_TOP,
+
+			LEFT_TO_RIGHT_BOUNCING,
+
+			RIGHT_TO_LEFT_BOUNCING,
+
+			TOP_TO_BOTTOM_BOUNCING,
+
+			BOTTOM_TO_TOP_BOUNCING
+
+		};
+
 		//! constructor
 		CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment* environment, IGUIElement* parent, s32 id,
 			const core::rect<s32>& rectangle, bool background = false);
@@ -120,6 +142,8 @@ namespace gui
 
 		virtual bool hasScrollBar();
 
+		virtual void setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames, int steps = 0, int waitstart = 0, int waitend = 0);
+
 	private:
 
 		//! Breaks the single text line.
@@ -141,10 +165,23 @@ namespace gui
 
 		core::array< core::stringw > BrokenText;
 
+		// scrollbar related variables
 		irr::gui::IGUIScrollBar* scrText;
-
 		int ScrollWidth;
 		float ScrollRatio;
+
+		 // auto scrolling related functions and variables
+		CTEXT_SCROLLING_TYPE scrolling;
+		int maxFrame;
+		int curFrame;
+		int frameTimer;
+		int forcedSteps;
+		float animationStep;
+		int animationWaitStart;
+		int animationWaitEnd;
+		bool increasingFrame;
+
+		void updateScrollingStuff();
 	};
 
 } // end namespace gui
