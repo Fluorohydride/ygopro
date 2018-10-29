@@ -1545,8 +1545,41 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 			NetServer::ReSendToPlayer(*pit);
 	}
 }
-byte* SingleDuel::ScriptReaderEx(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
+byte* SingleDuel::::ScriptReaderEx(const char* script_name, int* slen) {
+	ScriptReaderExDirectry("./expansions", script_name, slen)
+#ifdef _WIN32
+	char fpath[1000];
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*", &fdataw);
+	if(fh != INVALID_HANDLE_VALUE) {
+		do {
+			if((fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				char fname[780];
+				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
+				sprintf(fpath, "./expansions/%s", fname);
+				return ScriptReaderExDirectry(fpath, script_name, slen)
+			}
+		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
+	}
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	if((dir = opendir("./expansions/")) != NULL) {
+		while((dirp = readdir(dir)) != NULL) {
+			if (f->d_type != DT_DIR)
+				continue;
+			char filepath[1000];
+			sprintf(filepath, "./expansions/%s/", dirp->d_name);
+			return ScriptReaderExDirectry(filepath, script_name, slen)
+		}
+		closedir(dir);
+	}
+#endif
+	return default_script_reader(script_name, slen);
+}
+byte* SingleDuel::ScriptReaderExDirectry(const char* path, const char* script_name, int* slen) {
+	char sname[256] = path;
 	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
 	byte* buffer = default_script_reader(sname, slen);
 	if(buffer)
