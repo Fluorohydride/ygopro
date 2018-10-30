@@ -1675,7 +1675,9 @@ byte* TagDuel::::ScriptReaderEx(const char* script_name, int* slen) {
 				char fname[780];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				sprintf(fpath, "./expansions/%s", fname);
-				return ScriptReaderExDirectry(fpath, script_name, slen)
+				byte* buffer = ScriptReaderExDirectry(fpath, script_name, slen)
+				if(buffer)
+					return buffer;
 			}
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
@@ -1689,7 +1691,9 @@ byte* TagDuel::::ScriptReaderEx(const char* script_name, int* slen) {
 				continue;
 			char filepath[1000];
 			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			return ScriptReaderExDirectry(filepath, script_name, slen)
+			byte* buffer = ScriptReaderExDirectry(filepath, script_name, slen)
+			if(buffer)
+				return buffer;
 		}
 		closedir(dir);
 	}
@@ -1699,11 +1703,7 @@ byte* TagDuel::::ScriptReaderEx(const char* script_name, int* slen) {
 byte* TagDuel::ScriptReaderExDirectry(const char* path, const char* script_name, int* slen) {
 	char sname[256] = path;
 	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-	if(buffer)
-		return buffer;
-	else
-		return default_script_reader(script_name, slen);
+	return default_script_reader(sname, slen);
 }
 int TagDuel::MessageHandler(long fduel, int type) {
 	if(!enable_log)
