@@ -144,6 +144,10 @@ namespace gui
 
 		virtual void setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames, float steps_ratio = 0.0f, int steps = 0, int waitstart = 0, int waitend = 0);
 
+		virtual bool hasVerticalAutoscrolling() const;
+
+		virtual bool hasHorizontalAutoscrolling() const;
+
 	private:
 
 		//! Breaks the single text line.
@@ -183,7 +187,7 @@ namespace gui
 		bool increasingFrame;
 		bool waitingEndFrame;
 
-		void updateScrollingStuff();
+		void updateAutoScrollingStuff();
 	};
 
 } // end namespace gui
@@ -192,4 +196,4 @@ namespace gui
 #endif // _IRR_COMPILE_WITH_GUI_
 
 #endif
-		// scrollbar related variables
+

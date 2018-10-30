@@ -90,6 +90,31 @@ void CGUICustomText::draw()
 			bool autoscrolling = scrolling != NO_SCROLLING && !!animationStep;
 			if(frameTimer)
 				frameTimer--;
+			else {
+				curFrame += (increasingFrame) ? 1 : -1;
+				if(curFrame > maxFrame || curFrame < 0) {
+					if(scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM) {
+						waitingEndFrame = !waitingEndFrame;
+						if(!waitingEndFrame)
+							curFrame = 0;
+						frameTimer = animationWaitEnd;
+					} else if(scrolling == RIGHT_TO_LEFT || scrolling == BOTTOM_TO_TOP) {
+						waitingEndFrame = !waitingEndFrame;
+						if(!waitingEndFrame)
+							curFrame = maxFrame;
+						frameTimer = animationWaitEnd;
+					} else if(scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == RIGHT_TO_LEFT_BOUNCING || scrolling == TOP_TO_BOTTOM_BOUNCING || scrolling == BOTTOM_TO_TOP_BOUNCING) {
+						increasingFrame = !increasingFrame;
+						if(increasingFrame) {
+							curFrame++;
+							frameTimer = animationWaitEnd;
+						} else {
+							curFrame--;
+							frameTimer = animationWaitStart;
+						}
+					}
+				}
+			}
 			if (!WordWrap)
 			{
 				if (VAlign == EGUIA_LOWERRIGHT)
@@ -102,37 +127,15 @@ void CGUICustomText::draw()
 					frameRect.UpperLeftCorner.X = frameRect.LowerRightCorner.X -
 						font->getDimension(Text.c_str()).Width;
 				}
-				if(!frameTimer) {
-					curFrame += (increasingFrame) ? 1 : -1;
-					if(curFrame > maxFrame || curFrame < 0) {
-						if(scrolling == LEFT_TO_RIGHT) {
-							waitingEndFrame = !waitingEndFrame;
-							if(!waitingEndFrame)
-								curFrame = 0;
-							frameTimer = animationWaitEnd;
-						} else if(scrolling == RIGHT_TO_LEFT) {
-							waitingEndFrame = !waitingEndFrame;
-							if(!waitingEndFrame)
-								curFrame = maxFrame;
-							frameTimer = animationWaitEnd;
-						} else if(scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == RIGHT_TO_LEFT_BOUNCING) {
-							increasingFrame = !increasingFrame;
-							if(increasingFrame) {
-								curFrame++;
-								frameTimer = animationWaitEnd;
-							} else {
-								curFrame--;
-								frameTimer = animationWaitStart;
-							}
-						}
-					}
-				}
 
-				frameRect.UpperLeftCorner.X -= round((float)curFrame * animationStep);
+				if(hasHorizontalAutoscrolling())
+					frameRect.UpperLeftCorner.X -= round((float)curFrame * animationStep);
+				if(hasVerticalAutoscrolling())
+					frameRect.UpperLeftCorner.Y -= round((float)curFrame * animationStep);
 
 				font->draw(Text.c_str(), frameRect,
 					OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
-					HAlign == EGUIA_CENTER && !autoscrolling, VAlign == EGUIA_CENTER, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
+					HAlign == EGUIA_CENTER && !autoscrolling && hasHorizontalAutoscrolling(), VAlign == EGUIA_CENTER && !autoscrolling && hasVerticalAutoscrolling(), (RestrainTextInside ? &AbsoluteClippingRect : NULL));
 			}
 			else
 			{
@@ -154,6 +157,11 @@ void CGUICustomText::draw()
 				}
 
 				r.UpperLeftCorner.Y -= offset;
+
+				if(hasHorizontalAutoscrolling())
+					r.UpperLeftCorner.X -= round((float)curFrame * animationStep);
+				if(hasVerticalAutoscrolling())
+					r.UpperLeftCorner.Y -= round((float)curFrame * animationStep);
 
 				for (u32 i= 0; i<BrokenText.size(); ++i)
 				{
@@ -312,6 +320,7 @@ void CGUICustomText::setWordWrap(bool enable)
 {
 	WordWrap = enable;
 	breakText();
+	updateAutoScrollingStuff();
 }
 
 
@@ -575,7 +584,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 	}
 }
 
-void CGUICustomText::updateScrollingStuff() {
+void CGUICustomText::updateAutoScrollingStuff() {
 	if(Text.empty())
 		return;
 	waitingEndFrame = false;
@@ -588,7 +597,11 @@ void CGUICustomText::updateScrollingStuff() {
 		frameRect.LowerRightCorner.X -= size;
 	}
 	animationStep = 0;
-	const int offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
+	int offset = 0;
+	if(hasHorizontalAutoscrolling())
+		offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
+	if(hasVerticalAutoscrolling())
+		offset = getTextHeight() - frameRect.getHeight();
 	if(forcedSteps) {
 		if(offset > 0) {
 			animationStep = forcedSteps;
@@ -609,7 +622,7 @@ void CGUICustomText::setText(const wchar_t* text)
 {
 	IGUIElement::setText(text);
 	breakText();
-	updateScrollingStuff();
+	updateAutoScrollingStuff();
 }
 
 
@@ -628,7 +641,7 @@ void CGUICustomText::updateAbsolutePosition()
 		scrText->setRelativePosition(irr::core::rect<s32>(width2, 0, width, RelativeRect.getHeight()));
 	}
 	breakText();
-	updateScrollingStuff();
+	updateAutoScrollingStuff();
 }
 
 
@@ -754,7 +767,15 @@ void CGUICustomText::setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames,
 	animationWaitEnd = waitend;
 	forcedStepsRatio = steps_ratio;
 	forcedSteps = steps;
-	updateScrollingStuff();
+	updateAutoScrollingStuff();
+}
+
+bool CGUICustomText::hasVerticalAutoscrolling() const {
+	return scrolling == TOP_TO_BOTTOM || scrolling == BOTTOM_TO_TOP || scrolling == TOP_TO_BOTTOM_BOUNCING || scrolling == BOTTOM_TO_TOP_BOUNCING;
+}
+
+bool CGUICustomText::hasHorizontalAutoscrolling() const {
+	return scrolling == LEFT_TO_RIGHT || scrolling == RIGHT_TO_LEFT || scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == RIGHT_TO_LEFT_BOUNCING;
 }
 
 
