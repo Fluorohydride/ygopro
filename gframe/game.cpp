@@ -849,15 +849,19 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 std::vector<std::string> FindfolderFiles(const std::wstring& path, const std::wstring& extension) {
 	std::vector<std::string> res;
 	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW((path + L"*" + extension).c_str(), &fdataw);
+	HANDLE fh = FindFirstFile((path + L"*.*").c_str(), &fdataw);
 	if(fh != INVALID_HANDLE_VALUE) {
 		do {
 			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				std::wstring name(fdataw.cFileName);
+				size_t dotpos = name.find_last_of(L".");
+				if(name.size() < 5 || dotpos == std::wstring::npos || name.substr(dotpos).find(extension) == std::wstring::npos)
+					continue;
 				char fname[1000];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				res.push_back(fname);
 			}
-		} while(FindNextFileW(fh, &fdataw));
+		} while(FindNextFile(fh, &fdataw));
 		FindClose(fh);
 	}
 	return res;
@@ -869,8 +873,9 @@ std::vector<std::string> FindfolderFiles(const std::string& path, const std::str
 	struct dirent * dirp;
 	if((dir = opendir(path.c_str())) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
-			size_t len = strlen(dirp->d_name);
-			if(len < 5 || strcasecmp(dirp->d_name + len - 4, extension.c_str()) != 0)
+			std::string name(dirp->d_name);
+			size_t dotpos = name.find_last_of(".");
+			if(name.size() < 5 || dotpos == std::string::npos || name.substr(dotpos).find(extension) == std::string::npos)
 				continue;
 			res.push_back(dirp->d_name);
 		}
