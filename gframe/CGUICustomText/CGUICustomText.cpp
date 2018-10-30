@@ -106,10 +106,14 @@ void CGUICustomText::draw()
 					curFrame += (increasingFrame) ? 1 : -1;
 					if(curFrame > maxFrame || curFrame < 0) {
 						if(scrolling == LEFT_TO_RIGHT) {
-							curFrame = 0;
+							waitingEndFrame = !waitingEndFrame;
+							if(!waitingEndFrame)
+								curFrame = 0;
 							frameTimer = animationWaitEnd;
 						} else if(scrolling == RIGHT_TO_LEFT) {
-							curFrame = maxFrame;
+							waitingEndFrame = !waitingEndFrame;
+							if(!waitingEndFrame)
+								curFrame = maxFrame;
 							frameTimer = animationWaitEnd;
 						} else if(scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == RIGHT_TO_LEFT_BOUNCING) {
 							increasingFrame = !increasingFrame;
@@ -574,6 +578,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 void CGUICustomText::updateScrollingStuff() {
 	if(Text.empty())
 		return;
+	waitingEndFrame = false;
 	frameTimer = animationWaitStart;
 	increasingFrame = (scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM || scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM_BOUNCING);
 	core::rect<s32> frameRect(AbsoluteRect);
@@ -583,14 +588,17 @@ void CGUICustomText::updateScrollingStuff() {
 		frameRect.LowerRightCorner.X -= size;
 	}
 	animationStep = 0;
+	const int offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
 	if(forcedSteps) {
-		const int offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
 		if(offset > 0) {
 			animationStep = forcedSteps;
 			maxFrame = ceil((float)offset / (float)animationStep);
 		}
+	} else if(forcedStepsRatio) {
+		float steps = (float)offset / forcedStepsRatio;
+		maxFrame = ceil(steps);
+		animationStep = (offset <= 0) ? 0 : (float)offset / (float)maxFrame;
 	} else {
-		const int offset = getActiveFont()->getDimension(Text.c_str()).Width - frameRect.getWidth();
 		animationStep = (offset <= 0) ? 0 : (float)offset / (float)maxFrame;
 	}
 	curFrame = increasingFrame ? 0 : maxFrame;
@@ -739,11 +747,12 @@ bool CGUICustomText::hasScrollBar() {
 	return !!scrText;
 }
 
-void CGUICustomText::setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames, int steps, int waitstart, int waitend) {
+void CGUICustomText::setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames, float steps_ratio, int steps, int waitstart, int waitend) {
 	scrolling = type;
 	maxFrame = frames;
 	animationWaitStart = waitstart;
 	animationWaitEnd = waitend;
+	forcedStepsRatio = steps_ratio;
 	forcedSteps = steps;
 	updateScrollingStuff();
 }

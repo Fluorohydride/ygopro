@@ -303,7 +303,7 @@ bool Game::Initialize() {
 	irr::gui::IGUITab* tabInfo = wInfos->addTab(dataManager.GetSysString(1270));
 	stName = irr::gui::CGUICustomText::addCustomText(L"", true, env, tabInfo, -1, rect<s32>(10, 10, 287, 32));
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stName->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, ((textFont->getDimension(L"A").Width)/5.0f), 120, 300);
+	stName->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
 	stInfo = env->addStaticText(L"", rect<s32>(15, 37, 296, 60), false, true, tabInfo, -1, false);
 	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
 	stDataInfo = env->addStaticText(L"", rect<s32>(15, 60, 296, 83), false, true, tabInfo, -1, false);

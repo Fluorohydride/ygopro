@@ -142,7 +142,7 @@ namespace gui
 
 		virtual bool hasScrollBar();
 
-		virtual void setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames, int steps = 0, int waitstart = 0, int waitend = 0);
+		virtual void setTextAutoScrolling(CTEXT_SCROLLING_TYPE type, int frames, float steps_ratio = 0.0f, int steps = 0, int waitstart = 0, int waitend = 0);
 
 	private:
 
@@ -176,10 +176,12 @@ namespace gui
 		int curFrame;
 		int frameTimer;
 		int forcedSteps;
+		float forcedStepsRatio;
 		float animationStep;
 		int animationWaitStart;
 		int animationWaitEnd;
 		bool increasingFrame;
+		bool waitingEndFrame;
 
 		void updateScrollingStuff();
 	};
