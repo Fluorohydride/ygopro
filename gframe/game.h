@@ -185,7 +185,6 @@ public:
 	int waitFrame;
 	int signalFrame;
 	int saveReplay;
-	const wchar_t* showingtext;
 	int showcard;
 	int showcardcode;
 	int showcarddif;
@@ -238,7 +237,7 @@ public:
 	irr::gui::IGUIStaticText* stTip;
 	//infos
 	irr::gui::IGUITabControl* wInfos;
-	irr::gui::IGUIStaticText* stName;
+	irr::gui::CGUICustomText* stName;
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;

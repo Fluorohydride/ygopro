@@ -1223,8 +1223,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		offset += textFont->getDimension(stSetName->getText()).Height;
 	}
 	stText->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
-	showingtext = dataManager.GetText(code);
-	stText->setText(showingtext);
+	stText->setText(dataManager.GetText(code));
 }
 void Game::ShowCardNoInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
