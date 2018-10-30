@@ -1076,7 +1076,7 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag) {
+void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag, recti* cliprect) {
 	int code = cp->first;
 	int lcode = cp->first;
 	if(!lflist->count(lcode))
@@ -1091,17 +1091,17 @@ void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, i
 		dragloc = recti(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH * window_size.Width / 1024, pos.Y + CARD_THUMB_HEIGHT * window_size.Height / 640);
 		limitloc = recti(pos.X, pos.Y, pos.X + 20 * window_size.Width / 1024, pos.Y + 20 * window_size.Height / 640);
 	}
-	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height));
+	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
 	if(!mainGame->is_siding && lflist->count(lcode)) {
 		switch((*lflist)[lcode]) {
 		case 0:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), 0, 0, true);
+			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
 			break;
 		case 1:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), 0, 0, true);
+			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), cliprect, 0, true);
 			break;
 		case 2:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), 0, 0, true);
+			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), cliprect, 0, true);
 			break;
 		}
 	}
@@ -1212,21 +1212,24 @@ void Game::DrawDeckBd() {
 	numFont->draw(deckBuilder.result_string, Resize(875, 137, 935, 157), 0xffffffff, false, true);
 	driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
-	for(size_t i = 0; i < 7 && i + scrFilter->getPos() < deckBuilder.results.size(); ++i) {
-		code_pointer ptr = deckBuilder.results[i + scrFilter->getPos()];
+	int card_position = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
+	const int height_offset = (scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
+	const recti rect = Resize(805, 160, 1020, 630);
+	for(size_t i = 0; i < 8 && (i + card_position) < deckBuilder.results.size(); ++i) {
+		code_pointer ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangle(0x80000000, Resize(806, 164 + i * 66, 1019, 230 + i * 66));
-		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
+			driver->draw2DRectangle(0x80000000, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
+		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect);
 		if(ptr->second.type & TYPE_MONSTER) {
 			const wchar_t* form = L"\u2605";
 			if (ptr->second.type & TYPE_XYZ) form = L"\u2606";
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
-			textFont->draw(textBuffer, Resize(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
-			textFont->draw(textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
+			textFont->draw(textBuffer, Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
+			textFont->draw(textBuffer, Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
 			if (ptr->second.type & TYPE_LINK) {
-				myswprintf(textBuffer, L"%ls/%ls", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race));
-				textFont->draw(textBuffer, Resize(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
-				textFont->draw(textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
+				myswprintf(textBuffer, L"%ls/%ls", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), &rect);
+				textFont->draw(textBuffer, Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
+				textFont->draw(textBuffer, Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
 				if (ptr->second.attack < 0)
 					myswprintf(textBuffer, L"?/Link %d", ptr->second.level);
 				else
@@ -1234,8 +1237,8 @@ void Game::DrawDeckBd() {
 			}
 			else {
 				myswprintf(textBuffer, L"%ls/%ls %ls%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
-				textFont->draw(textBuffer, Resize(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
-				textFont->draw(textBuffer, Resize(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
+				textFont->draw(textBuffer, Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
+				textFont->draw(textBuffer, Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
 				if (ptr->second.attack < 0 && ptr->second.defense < 0)
 					myswprintf(textBuffer, L"?/?");
 				else if (ptr->second.attack < 0)
@@ -1252,11 +1255,11 @@ void Game::DrawDeckBd() {
 			wcscat(textBuffer, L" ");
 		} else {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
-			textFont->draw(textBuffer, Resize(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
-			textFont->draw(textBuffer, Resize(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
+			textFont->draw(textBuffer, Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
+			textFont->draw(textBuffer, Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
 			const wchar_t* ptype = dataManager.FormatType(ptr->second.type);
-			textFont->draw(ptype, Resize(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
-			textFont->draw(ptype, Resize(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
+			textFont->draw(ptype, Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
+			textFont->draw(ptype, Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
 			textBuffer[0] = 0;
 		}
 		if((ptr->second.ot & 0x3f) == 1)
@@ -1271,8 +1274,8 @@ void Game::DrawDeckBd() {
 			wcscat(textBuffer, L"[VG]");
 		else if((ptr->second.ot & 0x3f) == 32)
 			wcscat(textBuffer, L"[Custom]");
-		textFont->draw(textBuffer, Resize(859, 208 + i * 66, 955, 229 + i * 66), 0xff000000, false, false);
-		textFont->draw(textBuffer, Resize(860, 209 + i * 66, 955, 229 + i * 66), 0xffffffff, false, false);
+		textFont->draw(textBuffer, Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
+		textFont->draw(textBuffer, Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
 	}
 	if(deckBuilder.is_draging) {
 		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - 22, deckBuilder.dragy - 32), deckBuilder.filterList, true);

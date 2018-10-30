@@ -524,8 +524,8 @@ bool Game::Initialize() {
 	btnSideReload->setVisible(false);
 	//
 	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), 0, SCROLL_FILTER);
-	scrFilter->setLargeStep(10);
-	scrFilter->setSmallStep(1);
+	scrFilter->setLargeStep(100);
+	scrFilter->setSmallStep(10);
 	scrFilter->setVisible(false);
 	//sort type
 	wSort = env->addStaticText(L"", rect<s32>(930, 132, 1020, 156), true, false, 0, -1, true);

@@ -639,10 +639,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			if(event.MouseInput.Wheel < 0) {
 				if(mainGame->scrFilter->getPos() < mainGame->scrFilter->getMax())
-					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() + 1);
+					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() + DECK_SEARCH_SCROLL_STEP);
 			} else {
 				if(mainGame->scrFilter->getPos() > 0)
-					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() - 1);
+					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() - DECK_SEARCH_SCROLL_STEP);
 			}
 			GetHoveredCard();
 			break;
@@ -719,9 +719,10 @@ void DeckBuilder::GetHoveredCard() {
 			}
 		}
 	} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
+		const int offset = (mainGame->scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
 		hovered_pos = 4;
-		hovered_seq = (y - 165) / 66;
-		int pos = mainGame->scrFilter->getPos() + hovered_seq;
+		hovered_seq = (y - 165 - offset) / 66;
+		int pos = floor(mainGame->scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP) + hovered_seq;
 		if(pos >= (int)results.size()) {
 			hovered_seq = -1;
 			hovered_code = 0;
@@ -874,7 +875,7 @@ void DeckBuilder::FilterCards() {
 	myswprintf(result_string, L"%d", results.size());
 	if(results.size() > 7) {
 		mainGame->scrFilter->setVisible(true);
-		mainGame->scrFilter->setMax(results.size() - 7);
+		mainGame->scrFilter->setMax((results.size() - 7) * DECK_SEARCH_SCROLL_STEP);
 		mainGame->scrFilter->setPos(0);
 	} else {
 		mainGame->scrFilter->setVisible(false);
