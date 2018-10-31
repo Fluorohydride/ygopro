@@ -1656,7 +1656,7 @@ void Game::OnResize() {
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
 
-	imageManager.ClearTexture();
+	imageManager.ClearTexture(true);
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2)
 {
