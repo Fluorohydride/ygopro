@@ -55,35 +55,29 @@ void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	device = dev;
 	driver = dev->getVideoDriver();
 }
-void ImageManager::ClearTexture() {
-	for(auto tit = tMap[0].begin(); tit != tMap[0].end(); ++tit) {
-		if(tit->second)
-			driver->removeTexture(tit->second);
+void ImageManager::ClearTexture(bool resize) {
+	auto f = [&](std::unordered_map<int, irr::video::ITexture*> &map) {
+		for(auto tit = map.begin(); tit != map.end(); ++tit) {
+			if(tit->second)
+				driver->removeTexture(tit->second);
+		}
+		map.clear();
+	};
+	if(!resize) {
+		f(tMap[0]);
 	}
-	for(auto tit = tMap[1].begin(); tit != tMap[1].end(); ++tit) {
-		if(tit->second)
-			driver->removeTexture(tit->second);
-	}
-	for(auto tit = tThumb.begin(); tit != tThumb.end(); ++tit) {
-		if(tit->second)
-			driver->removeTexture(tit->second);
-	}
-	tMap[0].clear();
-	tMap[1].clear();
-	tThumb.clear();
+	f(tMap[1]);
+	f(tThumb);
+	f(tFields);
 }
 void ImageManager::RemoveTexture(int code) {
-	auto tit = tMap[0].find(code);
-	if(tit != tMap[0].end()) {
-		if(tit->second)
-			driver->removeTexture(tit->second);
-		tMap[0].erase(tit);
-	}
-	tit = tMap[1].find(code);
-	if(tit != tMap[1].end()) {
-		if(tit->second)
-			driver->removeTexture(tit->second);
-		tMap[1].erase(tit);
+	for(auto map : { &tMap[0], &tMap[1] }) {
+		auto tit = map->find(code);
+		if(tit != map->end()) {
+			if(tit->second)
+				driver->removeTexture(tit->second);
+			map->erase(tit);
+		}
 	}
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
@@ -175,112 +169,66 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s3
 	srcimg->drop();
 	return texture;
 }
+irr::video::ITexture* ImageManager::LoadCardTexture(int code, int width, int height) {
+	char file[256];
+	auto f = [&](const char* path) {
+		sprintf(file, path, code);
+		return GetTextureFromFile(file, width, height);
+	};
+	irr::video::ITexture* img = nullptr;
+	if(!(img = f("expansions/pics/%d.png")))
+		if(!(img = f("expansions/pics/%d.jpg")))
+			if(!(img = f("pics/%d.png")))
+				img = f("pics/%d.jpg");
+	return img;
+}
 irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	if(code == 0)
 		return tUnknown;
-	int width = CARD_IMG_WIDTH;
-	int height = CARD_IMG_HEIGHT;
-	if(fit) {
-		width = width * mainGame->window_size.Width / 1024;
-		height = height * mainGame->window_size.Height / 640;
+	auto& map = tMap[fit ? 1 : 0];
+	auto tit = map.find(code);
+	if(tit == map.end()) {
+		int width = CARD_IMG_WIDTH;
+		int height = CARD_IMG_HEIGHT;
+		if(fit) {
+			width = width * mainGame->window_size.Width / 1024;
+			height = height * mainGame->window_size.Height / 640;
+		}
+		map[code] = LoadCardTexture(code, width, height);
+		return (!map[code]) ? tUnknown : map[code];
 	}
-	auto tit = tMap[fit ? 1 : 0].find(code);
-	if(tit == tMap[fit ? 1 : 0].end()) {
-		char file[256];
-		sprintf(file, "expansions/pics/%d.png", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
-		if(img == NULL) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		if(img == NULL) {
-			sprintf(file, "pics/%d.png", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		if(img == NULL) {
-			sprintf(file, "pics/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		tMap[fit ? 1 : 0][code] = img;
-		return (img == NULL) ? tUnknown : img;
-	}
-	if(tit->second)
-		return tit->second;
-	else
-		return tUnknown;
+	return (tit->second) ? tit->second : tUnknown;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
 		return tUnknown;
 	auto tit = tThumb.find(code);
-	int width = CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024;
-	int height = CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640;
 	if(tit == tThumb.end()) {
-		char file[256];
-		sprintf(file, "expansions/pics/%d.png", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
-		if(img == NULL) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		if(img == NULL) {
-			sprintf(file, "pics/%d.png", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		if(img == NULL) {
-			sprintf(file, "pics/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		if(img == NULL) {
-			sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		if(img == NULL) {
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-		}
-		tThumb[code] = img;
-		return (img == NULL) ? tUnknown : img;
+		int width = CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024;
+		int height = CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640;
+		tThumb[code] = LoadCardTexture(code, width, height);
+		return (!tThumb[code]) ? tUnknown : tThumb[code];
 	}
-	if(tit->second)
-		return tit->second;
-	else
-		return tUnknown;
+	return (tit->second) ? tit->second : tUnknown;
 }
 irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	if(code == 0)
-		return NULL;
+		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/field/%d.png", code);
-		irr::video::ITexture* img = driver->getTexture(file);
-		if(img == NULL) {
-			sprintf(file, "expansions/pics/field/%d.jpg", code);
-			img = driver->getTexture(file);
-		}
-		if(img == NULL) {
-			sprintf(file, "pics/field/%d.png", code);
-			img = driver->getTexture(file);
-		}
-		if(img == NULL) {
-			sprintf(file, "pics/field/%d.jpg", code);
-			img = driver->getTexture(file);
-			if(img == NULL) {
-				tFields[code] = NULL;
-				return NULL;
-			} else {
-				tFields[code] = img;
-				return img;
-			}
-		} else {
-			tFields[code] = img;
-			return img;
-		}
+		auto f = [&](const char* path) {
+			sprintf(file, path, code);
+			return driver->getTexture(file);
+		};
+		irr::video::ITexture* img = nullptr;
+		if(!(img = f("expansions/pics/field/%d.png")))
+			if(!(img = f("expansions/pics/field/%d.jpg")))
+				if(!(img = f("pics/field/%d.png")))
+					img = f("pics/field/%d.jpg");
+		tFields[code] = img;
+		return img;
 	}
-	if(tit->second)
-		return tit->second;
-	else
-		return NULL;
+	return (tit->second) ? tit->second : nullptr;
 }
 }

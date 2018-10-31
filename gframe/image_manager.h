@@ -11,7 +11,7 @@ class ImageManager {
 public:
 	bool Initial();
 	void SetDevice(irr::IrrlichtDevice* dev);
-	void ClearTexture();
+	void ClearTexture(bool resize = false);
 	void RemoveTexture(int code);
 	irr::video::ITexture* GetTextureFromFile(char* file, s32 width, s32 height);
 	irr::video::ITexture* GetTexture(int code, bool fit = false);
@@ -43,6 +43,8 @@ public:
 	irr::video::ITexture* tBackGround_deck;
 	irr::video::ITexture* tField[2][4];
 	irr::video::ITexture* tFieldTransparent[2][4];
+	private:
+	irr::video::ITexture* LoadCardTexture(int code, int width, int height);
 };
 
 extern ImageManager imageManager;
