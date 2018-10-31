@@ -845,60 +845,43 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[11] = 1.0f;
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
-#ifdef _WIN32
-std::vector<std::string> FindfolderFiles(const std::wstring& path, const std::wstring& extension) {
+std::vector<std::string> Game::FindfolderFiles(const std::string& path, const std::string& extension, int subdirectorylayers) {
+	auto filesystem = device->getFileSystem();
+	auto cwd = filesystem->getWorkingDirectory();
+	filesystem->changeWorkingDirectoryTo(path.c_str());
+	auto list = filesystem->createFileList();
 	std::vector<std::string> res;
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFile((path + L"*.*").c_str(), &fdataw);
-	if(fh != INVALID_HANDLE_VALUE) {
-		do {
-			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				std::wstring name(fdataw.cFileName);
-				size_t dotpos = name.find_last_of(L".");
-				if(name.size() < 5 || dotpos == std::wstring::npos || name.substr(dotpos).find(extension) == std::wstring::npos)
+	for(int i = 0; i < list->getFileCount(); i++) {
+		if(list->isDirectory(i)) {
+			if(subdirectorylayers) {
+				std::string newpath(list->getFileName(i).c_str());
+				if(newpath == ".." || newpath == ".")
 					continue;
-				char fname[1000];
-				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
-				res.push_back(fname);
+				std::vector<std::string> res2 = FindfolderFiles("./" + newpath, extension, subdirectorylayers-1);
+				for(auto&file : res2) {
+					file = newpath + "/" + file;
+				}
+				res.insert(res.end(), res2.begin(), res2.end());
 			}
-		} while(FindNextFile(fh, &fdataw));
-		FindClose(fh);
-	}
-	return res;
-}
-#else
-std::vector<std::string> FindfolderFiles(const std::string& path, const std::string& extension) {
-	std::vector<std::string> res;
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir(path.c_str())) != NULL) {
-		while((dirp = readdir(dir)) != NULL) {
-			std::string name(dirp->d_name);
-			size_t dotpos = name.find_last_of(".");
-			if(name.size() < 5 || dotpos == std::string::npos || name.substr(dotpos).find(extension) == std::string::npos)
-				continue;
-			res.push_back(dirp->d_name);
+			continue;
 		}
-		closedir(dir);
+		std::string name(list->getFileName(i).c_str());
+		size_t dotpos = name.find_last_of(".");
+		if(name.size() < 5 || dotpos == std::wstring::npos || name.substr(dotpos).find(extension) == std::wstring::npos)
+			continue;
+		res.push_back(name.c_str());
 	}
+	filesystem->changeWorkingDirectoryTo(cwd);
 	return res;
 }
-#endif
-
-#ifdef _WIN32
-#define WSTRINGPATH(x) L##x
-#else
-#define WSTRINGPATH(x) x
-#endif
-
 void Game::LoadExpansionDB() {
-	auto files = FindfolderFiles(WSTRINGPATH("./expansions/"), WSTRINGPATH(".cdb"));
+	auto files = FindfolderFiles("./expansions/", ".cdb", 3);
 	for (auto& file : files)
 		dataManager.LoadDB(("./expansions/" + file).c_str());
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	auto files = FindfolderFiles(WSTRINGPATH("./deck/"), WSTRINGPATH(".ydk"));
+	auto files = FindfolderFiles("./deck/", ".ydk");
 	for(auto& file : files) {
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(file.substr(0, file.size() - 4).c_str(), wname);
@@ -913,7 +896,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 }
 void Game::RefreshReplay() {
 	lstReplayList->clear();
-	auto files = FindfolderFiles(WSTRINGPATH("./replay/"), WSTRINGPATH(".yrp"));
+	auto files = FindfolderFiles("./replay/", ".yrp");
 	for(auto& file : files) {
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(file.c_str(), wname);
@@ -922,7 +905,7 @@ void Game::RefreshReplay() {
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
-	auto files = FindfolderFiles(WSTRINGPATH("./single/"), WSTRINGPATH(".lua"));
+	auto files = FindfolderFiles("./single/", ".lua");
 	for(auto& file : files) {
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(file.c_str(), wname);
@@ -930,7 +913,7 @@ void Game::RefreshSingleplay() {
 	}
 }
 void Game::RefreshBGMList() {
-	auto files = FindfolderFiles(WSTRINGPATH("./sound/BGM/"), WSTRINGPATH(".mp3"));
+	auto files = FindfolderFiles("./sound/BGM/", ".mp3");
 	for(auto& file : files) {
 		BGMList.push_back(file);
 	}

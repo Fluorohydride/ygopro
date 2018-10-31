@@ -98,6 +98,7 @@ public:
 	bool Initialize();
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
+	std::vector<std::string> FindfolderFiles(const std::string& path, const std::string& extension, int subdirectorylayers = 0);
 	void LoadExpansionDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
