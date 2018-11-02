@@ -861,7 +861,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	pControl->setText(dataManager.strBuffer);
 }
 void Game::LoadExpansionDB() {
-	LoadExpansionDBDirectry("./expansions")
+	LoadExpansionDBDirectry("./expansions");
 #ifdef _WIN32
 	char fpath[1000];
 	WIN32_FIND_DATAW fdataw;
@@ -872,7 +872,7 @@ void Game::LoadExpansionDB() {
 				char fname[780];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				sprintf(fpath, "./expansions/%s", fname);
-				LoadExpansionDBDirectry(fpath)
+				LoadExpansionDBDirectry(fpath);
 			}
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
@@ -882,11 +882,11 @@ void Game::LoadExpansionDB() {
 	struct dirent * dirp;
 	if((dir = opendir("./expansions/")) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
-			if (f->d_type != DT_DIR)
+			if (dirp->d_type != DT_DIR)
 				continue;
 			char filepath[1000];
 			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			LoadExpansionDBDirectry(filepath)
+			LoadExpansionDBDirectry(filepath);
 		}
 		closedir(dir);
 	}
@@ -929,7 +929,7 @@ void Game::LoadExpansionDBDirectry(const char* path) {
 #endif
 }
 void Game::LoadExpansionStrings() {
-	LoadExpansionStringsDirectry("./expansions")
+	LoadExpansionStringsDirectry("./expansions");
 #ifdef _WIN32
 	char fpath[1000];
 	WIN32_FIND_DATAW fdataw;
@@ -940,7 +940,7 @@ void Game::LoadExpansionStrings() {
 				char fname[780];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				sprintf(fpath, "./expansions/%s", fname);
-				LoadExpansionStringsDirectry(fpath)
+				LoadExpansionStringsDirectry(fpath);
 			}
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
@@ -950,11 +950,11 @@ void Game::LoadExpansionStrings() {
 	struct dirent * dirp;
 	if((dir = opendir("./expansions/")) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
-			if (f->d_type != DT_DIR)
+			if (dirp->d_type != DT_DIR)
 				continue;
 			char filepath[1000];
 			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			LoadExpansionStringsDirectry(filepath)
+			LoadExpansionStringsDirectry(filepath);
 		}
 		closedir(dir);
 	}

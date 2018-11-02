@@ -1663,8 +1663,8 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	}
 }
 
-byte* TagDuel::::ScriptReaderEx(const char* script_name, int* slen) {
-	ScriptReaderExDirectry("./expansions", script_name, slen)
+byte* TagDuel::ScriptReaderEx(const char* script_name, int* slen) {
+	ScriptReaderExDirectry("./expansions", script_name, slen);
 #ifdef _WIN32
 	char fpath[1000];
 	WIN32_FIND_DATAW fdataw;
@@ -1675,7 +1675,7 @@ byte* TagDuel::::ScriptReaderEx(const char* script_name, int* slen) {
 				char fname[780];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				sprintf(fpath, "./expansions/%s", fname);
-				byte* buffer = ScriptReaderExDirectry(fpath, script_name, slen)
+				byte* buffer = ScriptReaderExDirectry(fpath, script_name, slen);
 				if(buffer)
 					return buffer;
 			}
@@ -1687,11 +1687,11 @@ byte* TagDuel::::ScriptReaderEx(const char* script_name, int* slen) {
 	struct dirent * dirp;
 	if((dir = opendir("./expansions/")) != NULL) {
 		while((dirp = readdir(dir)) != NULL) {
-			if (f->d_type != DT_DIR)
+			if (dirp->d_type != DT_DIR)
 				continue;
 			char filepath[1000];
 			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			byte* buffer = ScriptReaderExDirectry(filepath, script_name, slen)
+			byte* buffer = ScriptReaderExDirectry(filepath, script_name, slen);
 			if(buffer)
 				return buffer;
 		}
@@ -1701,7 +1701,8 @@ byte* TagDuel::::ScriptReaderEx(const char* script_name, int* slen) {
 	return default_script_reader(script_name, slen);
 }
 byte* TagDuel::ScriptReaderExDirectry(const char* path, const char* script_name, int* slen) {
-	char sname[256] = path;
+	char sname[256];
+	strcpy(sname, path);
 	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
 	return default_script_reader(sname, slen);
 }
