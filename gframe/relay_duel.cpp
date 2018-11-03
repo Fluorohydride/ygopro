@@ -418,9 +418,9 @@ void RelayDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
-	set_script_reader((script_reader)ScriptReaderEx);
+	set_script_reader((script_reader)Game::ScriptReader);
 	set_card_reader((card_reader)DataManager::CardReader);
-	set_message_handler((message_handler)RelayDuel::MessageHandler);
+	set_message_handler((message_handler)Game::MessageHandler);
 	rnd.reset(seed);
 	pduel = create_duel(rnd.rand());
 	set_player_info(pduel, 0, host_info.start_lp, host_info.start_hand, host_info.draw_count);
@@ -1824,23 +1824,6 @@ void RelayDuel::PseudoRefreshDeck(int player, int flag) {
 	int len = query_field_card(pduel, player, LOCATION_DECK, flag, (unsigned char*)qbuf, 0, 1);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
-}
-byte* RelayDuel::ScriptReaderEx(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-	if(buffer)
-		return buffer;
-	else
-		return default_script_reader(script_name, slen);
-}
-int RelayDuel::MessageHandler(long fduel, int type) {
-	if(!enable_log)
-		return 0;
-	char msgbuf[1024];
-	get_log_message(fduel, (byte*)msgbuf);
-	mainGame->AddDebugMsg(msgbuf);
-	return 0;
 }
 void RelayDuel::RelayTimer(evutil_socket_t fd, short events, void* arg) {
 	RelayDuel* sd = static_cast<RelayDuel*>(arg);

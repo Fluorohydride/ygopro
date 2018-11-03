@@ -22,16 +22,9 @@ namespace ygo {
 		mainGame->dInfo.lua64 = true;
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
-		if (mainGame->dInfo.isSingleMode) {
-			set_script_reader((script_reader)SingleMode::ScriptReaderEx);
-			set_card_reader((card_reader)DataManager::CardReader);
-			set_message_handler((message_handler)MessageHandler);
-		}
-		else {
-			set_script_reader((script_reader)ScriptReaderEx);
-			set_card_reader((card_reader)DataManager::CardReader);
-			set_message_handler((message_handler)MessageHandler);
-		}
+		set_script_reader((script_reader)Game::ScriptReader);
+		set_card_reader((card_reader)DataManager::CardReader);
+		set_message_handler((message_handler)Game::MessageHandler);
 		if (!StartDuel()) {
 			EndDuel();
 			return 0;
@@ -828,23 +821,6 @@ namespace ygo {
 		for(int p = 0; p < 2; p++)
 			for(int loc = LOCATION_DECK; loc != LOCATION_OVERLAY; loc *= 2)
 				ReplayRefresh(p, loc, 0xffdfff);
-	}
-	byte* ReplayMode::ScriptReaderEx(const char* script_name, int* slen) {
-		char sname[256] = "./expansions";
-		strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-		byte* buffer = default_script_reader(sname, slen);
-		if(buffer)
-			return buffer;
-		else
-			return default_script_reader(script_name, slen);
-	}
-	int ReplayMode::MessageHandler(long fduel, int type) {
-		if (!enable_log)
-			return 0;
-		char msgbuf[1024];
-		get_log_message(fduel, (byte*)msgbuf);
-		mainGame->AddDebugMsg(msgbuf);
-		return 0;
 	}
 
 }

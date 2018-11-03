@@ -1735,6 +1735,23 @@ std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 	}
 	return res;
 }
+byte* Game::ScriptReader(const char* script_name, int* slen) {
+	char sname[256] = "./expansions";
+	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
+	byte* buffer = default_script_reader(sname, slen);
+	if(buffer)
+		return buffer;
+	else
+		return default_script_reader(script_name, slen);
+}
+int Game::MessageHandler(long fduel, int type) {
+	if(!enable_log)
+		return 0;
+	char msgbuf[1024];
+	get_log_message(fduel, (byte*)msgbuf);
+	mainGame->AddDebugMsg(msgbuf);
+	return 0;
+}
 
 
 }

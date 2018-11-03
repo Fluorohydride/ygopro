@@ -125,7 +125,6 @@ public:
 	void WaitFrameSignal(int frame);
 	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag = false, recti* cliprect = nullptr);
 	void DrawDeckBd();
-	bool LoadGui(irr::SIrrlichtCreationParameters params, bool reload = false);
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
@@ -160,6 +159,8 @@ public:
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
 	void ValidateName(irr::gui::IGUIEditBox* box);
 	std::wstring ReadPuzzleMessage(const char* script_name);
+	static byte* ScriptReader(const char* script_name, int* slen);
+	static int MessageHandler(long fduel, int type);
 
 	Mutex gMutex;
 	Mutex gBuffer;
