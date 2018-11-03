@@ -135,6 +135,7 @@ public:
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearChatMsg();
 	void AddDebugMsg(char* msgbuf);
+	void ErrorLog(char* msgbuf);
 	bool MakeDirectory(const std::string folder);
 	void initUtils();
 	void ClearTextures();
