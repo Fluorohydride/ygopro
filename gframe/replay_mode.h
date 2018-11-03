@@ -25,7 +25,7 @@ private:
 
 public:
 	static Replay cur_replay;
-	
+
 public:
 	static bool StartReplay(int skipturn);
 	static void StopReplay(bool is_exiting = false);
@@ -38,7 +38,7 @@ public:
 	static void Restart(bool refresh);
 	static void Undo();
 	static bool ReplayAnalyze(char* msg, unsigned int len);
-	
+
 	static void ReplayRefresh(int flag = 0xf81fff);
 	static void ReplayRefreshHand(int player, int flag = 0x781fff);
 	static void ReplayRefreshGrave(int player, int flag = 0x181fff);
@@ -48,6 +48,7 @@ public:
 	static void ReplayReload();
 
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
+	static byte* ScriptReaderExDirectry(const char* path, const char* script_name, int* slen);
 	static int MessageHandler(long fduel, int type);
 };
 

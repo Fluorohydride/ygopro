@@ -846,12 +846,46 @@ void SingleMode::SinglePlayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
 }
 byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
+	ScriptReaderExDirectry("./expansions", script_name, slen);
+#ifdef _WIN32
+	char fpath[1000];
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*", &fdataw);
+	if(fh != INVALID_HANDLE_VALUE) {
+		do {
+			if(wcscmp(L".",fdataw.cFileName) != 0 && wcscmp(L"..",fdataw.cFileName) != 0 && fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				char fname[780];
+				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
+				sprintf(fpath, "./expansions/%s", fname);
+				byte* buffer = ScriptReaderExDirectry(fpath, script_name, slen);
+				if(buffer)
+					return buffer;
+			}
+		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
+	}
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	if((dir = opendir("./expansions/")) != NULL) {
+		while((dirp = readdir(dir)) != NULL) {
+			if (strcmp(".", dirp->d_name) == 0 || strcmp("..", dirp->d_name) == 0 || dirp->d_type != DT_DIR)
+				continue;
+			char filepath[1000];
+			sprintf(filepath, "./expansions/%s/", dirp->d_name);
+			byte* buffer = ScriptReaderExDirectry(filepath, script_name, slen);
+			if(buffer)
+				return buffer;
+		}
+		closedir(dir);
+	}
+#endif
+	return ScriptReader(script_name, slen);
+}
+byte* SingleMode::ScriptReaderExDirectry(const char* path, const char* script_name, int* slen) {
+	char sname[256] = path;
 	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	if(ScriptReader(sname, slen))
-		return buffer;
-	else
-		return ScriptReader(script_name, slen);
+	return ScriptReader(sname, slen)
 }
 byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
 	FILE *fp;
