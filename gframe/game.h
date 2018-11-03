@@ -132,10 +132,10 @@ public:
 	void SaveConfig();
 	void ShowCardInfo(int code);
 	void ClearCardInfo(int player = 0);
-	void AddChatMsg(wchar_t* msg, int player);
+	void AddChatMsg(const wchar_t* msg, int player);
 	void ClearChatMsg();
-	void AddDebugMsg(char* msgbuf);
-	void ErrorLog(char* msgbuf);
+	void AddDebugMsg(const char* msgbuf);
+	void ErrorLog(const char* msgbuf);
 	bool MakeDirectory(const std::string folder);
 	void initUtils();
 	void ClearTextures();

@@ -1320,7 +1320,7 @@ void Game::ClearCardInfo(int player) {
 	stText->setText(L"");
 	scrCardText->setVisible(false);
 }
-void Game::AddChatMsg(wchar_t* msg, int player) {
+void Game::AddChatMsg(const wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
@@ -1371,8 +1371,7 @@ void Game::ClearChatMsg() {
 		chatTiming[i] = 0;
 	}
 }
-void Game::AddDebugMsg(char* msg)
-{
+void Game::AddDebugMsg(const char* msg) {
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msg, wbuf);
@@ -1384,7 +1383,7 @@ void Game::AddDebugMsg(char* msg)
 		ErrorLog(msgbuf);
 	}
 }
-void Game::ErrorLog(char* msg) {
+void Game::ErrorLog(const char* msg) {
 	FILE* fp = fopen("error.log", "at");
 	if(!fp)
 		return;
