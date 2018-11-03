@@ -158,16 +158,59 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s3
 		return driver->getTexture(file);
 	}
 }
+irr::video::ITexture* ImageManager::GetTextureExpansions(char* file, s32 width, s32 height) {
+	irr::video::ITexture* img = GetTextureExpansionsDirectry("./expansions", file, width, height);
+	if(img != NULL)
+		return img;
+#ifdef _WIN32
+	char fpath[1000];
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*", &fdataw);
+	if(fh != INVALID_HANDLE_VALUE) {
+		do {
+			if(wcscmp(L".",fdataw.cFileName) != 0 && wcscmp(L"..",fdataw.cFileName) != 0 && fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+				char fname[780];
+				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
+				sprintf(fpath, "./expansions/%s", fname);
+				img = GetTextureExpansionsDirectry(fpath, file, width, height);
+				if(img != NULL)
+					return img;
+			}
+		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
+	}
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	if((dir = opendir("./expansions/")) != NULL) {
+		while((dirp = readdir(dir)) != NULL) {
+			if (strcmp(".", dirp->d_name) == 0 || strcmp("..", dirp->d_name) == 0 || dirp->d_type != DT_DIR)
+				continue;
+			char filepath[1000];
+			sprintf(filepath, "./expansions/%s/", dirp->d_name);
+			img = GetTextureExpansionsDirectry(filepath, file, width, height);
+			if(img != NULL)
+				return img;
+		}
+		closedir(dir);
+	}
+#endif
+	return img;
+}
+irr::video::ITexture* ImageManager::GetTextureExpansionsDirectry(const char* path, char* file, s32 width, s32 height) {
+	char fpath[1000];
+	sprintf(fpath, "%s/%s", path, file);
+	return GetTextureFromFile(fpath, width, height);
+}
 irr::video::ITexture* ImageManager::GetTexture(int code) {
 	if(code == 0)
 		return tUnknown;
 	auto tit = tMap.find(code);
 	if(tit == tMap.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+		sprintf(file, "pics/%d.jpg", code);
+		irr::video::ITexture* img = GetTextureExpansions(file, CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 		if(img == NULL) {
-			sprintf(file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 		}
 		if(img == NULL && !mainGame->gameConf.use_image_scale) {
@@ -188,17 +231,15 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
+		sprintf(file, "pics/thumbnail/%d.jpg", code);
+		irr::video::ITexture* img = GetTextureExpansions(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 		if(img == NULL) {
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
 			img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 		}
 		if(img == NULL && mainGame->gameConf.use_image_scale) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
-			img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
+			sprintf(file, "pics/%d.jpg", code);
+			img = GetTextureExpansions(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 			if(img == NULL) {
-				sprintf(file, "pics/%d.jpg", code);
 				img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 			}
 		}
@@ -216,11 +257,11 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/field/%d.png", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, 512, 512);
+		sprintf(file, "pics/field/%d.png", code);
+		irr::video::ITexture* img = GetTextureExpansions(file, 512, 512);
 		if(img == NULL) {
-			sprintf(file, "expansions/pics/field/%d.jpg", code);
-			img = GetTextureFromFile(file, 512, 512);
+			sprintf(file, "pics/field/%d.jpg", code);
+			img = GetTextureExpansions(file, 512, 512);
 		}
 		if(img == NULL) {
 			sprintf(file, "pics/field/%d.png", code);
