@@ -145,11 +145,10 @@ public:
 	void SaveConfig();
 	void ShowCardInfo(int code);
 	void ClearCardInfo(int player = 0);
-	void AddChatMsg(wchar_t* msg, int player);
+	void AddChatMsg(const wchar_t* msg, int player);
 	void ClearChatMsg();
-	void AddDebugMsg(char* msgbuf);
-	bool MakeDirectory(const std::string folder);
-	void initUtils();
+	void AddDebugMsg(const char* msgbuf);
+	void ErrorLog(const char* msgbuf);
 	void ClearTextures();
 	void CloseDuelWindow();
 
@@ -572,6 +571,7 @@ extern HostInfo game_info;
 #define BUTTON_CARD_4				234
 #define SCROLL_CARD_SELECT			235
 #define BUTTON_CARD_SEL_OK			236
+#define TEXT_CARD_LIST_TIP			237
 #define BUTTON_CMD_ACTIVATE			240
 #define BUTTON_CMD_SUMMON			241
 #define BUTTON_CMD_SPSUMMON			242

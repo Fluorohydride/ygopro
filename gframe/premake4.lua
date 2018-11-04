@@ -6,7 +6,7 @@ project "ygopro"
     defines { "YGOPRO_SERVER_MODE" }
 
     files { "gframe.cpp", "config.h",
-            "game.cpp", "game.h",
+            "game.cpp", "game.h", "myfilesystem.h",
             "deck_manager.cpp", "deck_manager.h",
             "data_manager.cpp", "data_manager.h",
             "replay.cpp", "replay.h",

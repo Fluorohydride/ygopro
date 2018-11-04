@@ -24,6 +24,8 @@ void Replay::BeginRecord() {
 #ifdef YGOPRO_SERVER_MODE
 	if(replay_mode > 0) {
 #endif
+	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
+		return;
 #ifdef _WIN32
 	if(is_recording)
 		CloseHandle(recording_fp);
@@ -177,6 +179,8 @@ void Replay::EndRecord() {
 	is_recording = false;
 }
 void Replay::SaveReplay(const wchar_t* name) {
+	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
+		return;
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
 #ifdef WIN32
