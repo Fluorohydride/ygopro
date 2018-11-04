@@ -133,9 +133,11 @@ public:
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code);
+	void ClearCardInfo(int player = 0);
 	void AddChatMsg(wchar_t* msg, int player);
 	void ClearChatMsg();
 	void AddDebugMsg(char* msgbuf);
+	void ErrorLog(char* msgbuf);
 	bool MakeDirectory(const std::string folder);
 	void initUtils();
 	void ClearTextures();
@@ -228,6 +230,7 @@ public:
 	//hint text
 	irr::gui::IGUIStaticText* stHintMsg;
 	irr::gui::IGUIStaticText* stTip;
+	irr::gui::IGUIStaticText* stCardListTip;
 	//infos
 	irr::gui::IGUITabControl* wInfos;
 	irr::gui::IGUIStaticText* stName;
@@ -555,6 +558,7 @@ extern Game* mainGame;
 #define BUTTON_CARD_4				234
 #define SCROLL_CARD_SELECT			235
 #define BUTTON_CARD_SEL_OK			236
+#define TEXT_CARD_LIST_TIP			237
 #define BUTTON_CMD_ACTIVATE			240
 #define BUTTON_CMD_SUMMON			241
 #define BUTTON_CMD_SPSUMMON			242

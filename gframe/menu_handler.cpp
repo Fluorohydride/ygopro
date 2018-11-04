@@ -222,16 +222,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
 						break;
 				}
-				mainGame->imgCard->setImage(imageManager.tCover[0]);
+				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);
-				mainGame->stName->setText(L"");
-				mainGame->stInfo->setText(L"");
-				mainGame->stDataInfo->setText(L"");
-				mainGame->stSetName->setText(L"");
-				mainGame->stText->setText(L"");
-				mainGame->scrCardText->setVisible(false);
 				mainGame->wReplayControl->setVisible(true);
 				mainGame->btnReplayStart->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);

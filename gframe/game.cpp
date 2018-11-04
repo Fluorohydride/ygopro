@@ -21,7 +21,7 @@
 #include <io.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1345;
+const unsigned short PRO_VERSION = 0x1346;
 
 namespace ygo {
 
@@ -39,8 +39,10 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
 	device = irr::createDeviceEx(params);
-	if(!device)
+	if(!device) {
+		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
+	}
 	// Apply skin
 	if(gameConf.skin_index && gameConf.use_d3d) {
 		wchar_t skin_dir[16];
@@ -56,7 +58,6 @@ bool Game::Initialize() {
 				index = skins.size() - gameConf.skin_index; // reverse index
 			if(index >= 0)
 				skinSystem->applySkin(skins[index].c_str());
-		}
 	}
 	linePatternD3D = 0;
 	linePatternGL = 0x0f0f;
@@ -79,13 +80,19 @@ bool Game::Initialize() {
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	imageManager.SetDevice(device);
-	if(!imageManager.Initial())
+	if(!imageManager.Initial()) {
+		ErrorLog("Failed to load textures!");
 		return false;
+	}
 	LoadExpansionDB();
-	if(!dataManager.LoadDB("cards.cdb"))
+	if(!dataManager.LoadDB("cards.cdb")) {
+		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
-	if(!dataManager.LoadStrings("strings.conf"))
+	}
+	if(!dataManager.LoadStrings("strings.conf")) {
+		ErrorLog("Failed to load strings!");
 		return false;
+	}
 	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
@@ -93,6 +100,10 @@ bool Game::Initialize() {
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	textFont = guiFont;
+	if(!numFont || !textFont) {
+		ErrorLog("Failed to load font(s)!");
+		return false;
+	}
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"YGOPro");
 	device->setResizable(false);
@@ -690,6 +701,11 @@ bool Game::Initialize() {
 	stTip->setBackgroundColor(0xc0ffffff);
 	stTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stTip->setVisible(false);
+	//tip for cards in select / display list
+	stCardListTip = env->addStaticText(L"", rect<s32>(0, 0, 150, 150), false, true, wCardSelect, TEXT_CARD_LIST_TIP, true);
+	stCardListTip->setBackgroundColor(0xc0ffffff);
+	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
 	LoadConfig();
 	if(!soundManager.Init()) {
@@ -1316,6 +1332,15 @@ void Game::ShowCardInfo(int code) {
 	const auto& tsize = stText->getRelativePosition();
 	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
 }
+void Game::ClearCardInfo(int player) {
+	imgCard->setImage(imageManager.tCover[player]);
+	stName->setText(L"");
+	stInfo->setText(L"");
+	stDataInfo->setText(L"");
+	stSetName->setText(L"");
+	stText->setText(L"");
+	scrCardText->setVisible(false);
+}
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
@@ -1375,16 +1400,21 @@ void Game::AddDebugMsg(char* msg)
 		AddChatMsg(wbuf, 9);
 	}
 	if (enable_log & 0x2) {
-		FILE* fp = fopen("error.log", "at");
-		if (!fp)
-			return;
-		time_t nowtime = time(NULL);
-		struct tm *localedtime = localtime(&nowtime);
-		char timebuf[40];
-		strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
-		fprintf(fp, "[%s][Script Error]: %s\n", timebuf, msg);
-		fclose(fp);
+		char msgbuf[1040];
+		sprintf(msgbuf, "[Script Error]: %s", msg);
+		ErrorLog(msgbuf);
 	}
+}
+void Game::ErrorLog(char* msg) {
+	FILE* fp = fopen("error.log", "at");
+	if(!fp)
+		return;
+	time_t nowtime = time(NULL);
+	struct tm *localedtime = localtime(&nowtime);
+	char timebuf[40];
+	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
+	fprintf(fp, "[%s]%s\n", timebuf, msg);
+	fclose(fp);
 }
 bool Game::MakeDirectory(const std::string folder) {
     std::string folder_builder;
