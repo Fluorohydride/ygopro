@@ -110,7 +110,7 @@ public:
 #ifdef YGOPRO_SERVER_MODE
 	void MainServerLoop();
 	void LoadExpansionDB();
-	void AddDebugMsg(char* msgbuf);
+	void AddDebugMsg(const char* msgbuf);
 	bool MakeDirectory(const std::string folder);
 	void initUtils();
 #else
