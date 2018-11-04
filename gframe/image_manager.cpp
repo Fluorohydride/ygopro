@@ -142,62 +142,48 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest)
 		}
 }
 irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s32 height) {
+#ifdef _WIN32
+	wchar_t name[1024];
+	BufferIO::DecodeUTF8(file, name);
+#else
+	char* name = file;
+#endif // _WIN32
+
 	if(mainGame->gameConf.use_image_scale) {
 		irr::video::ITexture* texture;
-		irr::video::IImage* srcimg = driver->createImageFromFile(file);
+		irr::video::IImage* srcimg = driver->createImageFromFile(name);
 		if(srcimg == NULL)
 			return NULL;
 		if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
-			texture = driver->addTexture(file, srcimg);
+			texture = driver->addTexture(name, srcimg);
 		} else {
 			video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(width, height));
 			imageScaleNNAA(srcimg, destimg);
-			texture = driver->addTexture(file, destimg);
+			texture = driver->addTexture(name, destimg);
 			destimg->drop();
 		}
 		srcimg->drop();
 		return texture;
 	} else {
-		return driver->getTexture(file);
+		return driver->getTexture(name);
 	}
 }
 irr::video::ITexture* ImageManager::GetTextureExpansions(char* file, s32 width, s32 height) {
 	irr::video::ITexture* img = GetTextureExpansionsDirectry("./expansions", file, width, height);
 	if(img != NULL)
 		return img;
-#ifdef _WIN32
-	char fpath[1000];
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./expansions/*", &fdataw);
-	if(fh != INVALID_HANDLE_VALUE) {
-		do {
-			if(wcscmp(L".",fdataw.cFileName) != 0 && wcscmp(L"..",fdataw.cFileName) != 0 && fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				char fname[780];
-				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
-				sprintf(fpath, "./expansions/%s", fname);
-				img = GetTextureExpansionsDirectry(fpath, file, width, height);
-				if(img != NULL)
-					return img;
-			}
-		} while(FindNextFileW(fh, &fdataw));
-		FindClose(fh);
-	}
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./expansions/")) != NULL) {
-		while((dirp = readdir(dir)) != NULL) {
-			if (strcmp(".", dirp->d_name) == 0 || strcmp("..", dirp->d_name) == 0 || dirp->d_type != DT_DIR)
-				continue;
-			char filepath[1000];
-			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			img = GetTextureExpansionsDirectry(filepath, file, width, height);
-			if(img != NULL)
-				return img;
+	bool find = false;
+	FileSystem::TraversalDir("./expansions", [this, file, width, height, &img, &find](const char* name, bool isdir) {
+		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..")) {
+			char subdir[1024];
+			sprintf(subdir, "./expansions/%s", name);
+			img = GetTextureExpansionsDirectry(subdir, file, width, height);
+			if(img)
+				find = true;
 		}
-		closedir(dir);
-	}
-#endif
+	});
+	if(find)
+		return img;
 	return img;
 }
 irr::video::ITexture* ImageManager::GetTextureExpansionsDirectry(const char* path, char* file, s32 width, s32 height) {

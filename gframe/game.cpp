@@ -882,9 +882,9 @@ void Game::LoadExpansionStrings() {
 	dataManager.LoadStrings("./expansions/strings.conf");
 	FileSystem::TraversalDir("./expansions", [](const char* name, bool isdir) {
 		if(isdir && strcmp(name, ".") && strcmp(name, "..")) {
-			char subdir[1024];
-			sprintf(subdir, "./expansions/%s/strings.conf", name);
-			dataManager.LoadStrings(subdir);
+			char fpath[1024];
+			sprintf(fpath, "./expansions/%s/strings.conf", name);
+			dataManager.LoadStrings(fpath);
 		}
 	});
 }

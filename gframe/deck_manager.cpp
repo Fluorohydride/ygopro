@@ -13,7 +13,13 @@ DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
 	LFList* cur = NULL;
+#ifdef _WIN32
+	wchar_t fname[1024];
+	BufferIO::DecodeUTF8(path, fname);
+	FILE* fp = _wfopen(fname, L"r");
+#else
 	FILE* fp = fopen(path, "r");
+#endif // _WIN32
 	char linebuf[256];
 	wchar_t strBuffer[256];
 	if(fp) {
@@ -52,42 +58,15 @@ void DeckManager::LoadLFListSingle(const char* path) {
 		fclose(fp);
 	}
 }
-void DeckManager::LoadLFListDirectry(const char* path) {
-	char fpath[1000];
-	sprintf(fpath, "%s/lflist.conf", path);
-	LoadLFListSingle(fpath);
-}
 void DeckManager::LoadLFList() {
 	LoadLFListSingle("expansions/lflist.conf");
-#ifdef _WIN32
-	char fpath[1000];
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./expansions/*", &fdataw);
-	if(fh != INVALID_HANDLE_VALUE) {
-		do {
-			if(wcscmp(L".",fdataw.cFileName) != 0 && wcscmp(L"..",fdataw.cFileName) != 0 && fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-				char fname[780];
-				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
-				sprintf(fpath, "./expansions/%s", fname);
-				LoadLFListDirectry(fpath);
-			}
-		} while(FindNextFileW(fh, &fdataw));
-		FindClose(fh);
-	}
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./expansions/")) != NULL) {
-		while((dirp = readdir(dir)) != NULL) {
-			if (strcmp(".", dirp->d_name) == 0 || strcmp("..", dirp->d_name) == 0 || dirp->d_type != DT_DIR)
-				continue;
-			char filepath[1000];
-			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			LoadLFListDirectry(filepath);
+	FileSystem::TraversalDir("./expansions", [this](const char* name, bool isdir) {
+		if(isdir && strcmp(name, ".") && strcmp(name, "..")) {
+			char fpath[1024];
+			sprintf(fpath, "./expansions/%s/lflist.conf", name);
+			LoadLFListSingle(fpath);
 		}
-		closedir(dir);
-	}
-#endif
+	});
 	LoadLFListSingle("lflist.conf");
 	LFList nolimit;
 	myswprintf(nolimit.listName, L"N/A");
