@@ -49,6 +49,11 @@ void DeckManager::LoadLFListSingle(const char* path) {
 		fclose(fp);
 	}
 }
+void DeckManager::LoadLFListDirectry(const char* path) {
+	char fpath[1000];
+	sprintf(fpath, "%s/lflist.conf", path);
+	LoadLFListSingle(fpath);
+}
 void DeckManager::LoadLFList() {
 	LoadLFListSingle("expansions/lflist.conf");
 #ifdef _WIN32
@@ -61,7 +66,7 @@ void DeckManager::LoadLFList() {
 				char fname[780];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				sprintf(fpath, "./expansions/%s", fname);
-				LoadLFListSingle(fpath);
+				LoadLFListDirectry(fpath);
 			}
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
@@ -75,7 +80,7 @@ void DeckManager::LoadLFList() {
 				continue;
 			char filepath[1000];
 			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			LoadLFListSingle(filepath);
+			LoadLFListDirectry(filepath);
 		}
 		closedir(dir);
 	}
