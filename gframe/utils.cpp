@@ -3,18 +3,55 @@
 
 namespace ygo {
 	Utils utils;
-
+#ifdef _WIN32
+	bool Utils::Makedirectory(const std::wstring& path) {
+		return CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
+	}
+	bool Utils::Makedirectory(const std::string& path) {
+		return Makedirectory((const wchar_t*)su::stou16(std::string(path)).c_str());
+	}
+#else
+	bool Utils::Makedirectory(const std::wstring& path) {
+		return Makedirectory(su::u16tos(std::u16string((const char16_t*)&path[0])));
+	}
+	bool Utils::Makedirectory(const std::string& path) {
+		return !mkdir(&path[0], 0777) || errno == EEXIST;
+	}
+#endif
+	bool Utils::Movefile(const std::string& source, const std::string& destination) {
+		std::ifstream  src(source, std::ios::binary);
+		if(!src.is_open())
+			return false;
+		std::ofstream  dst(destination, std::ios::binary);
+		if(!dst.is_open())
+			return false;
+		dst << src.rdbuf();
+		src.close();
+		remove(source.c_str());
+		return true;
+	}
+	bool Utils::Movefile(const std::wstring& source, const std::wstring& destination) {
+#ifdef _WIN32
+		std::ifstream  src(source, std::ios::binary);
+		if(!src.is_open())
+			return false;
+		std::ofstream  dst(destination, std::ios::binary);
+		if(!dst.is_open())
+			return false;
+		dst << src.rdbuf();
+		src.close();
+		return true;
+#else
+		return Movefile(su::u16tos(std::u16string((const char16_t*)&source[0])), su::u16tos(std::u16string((const char16_t*)&destination[0])));
+#endif
+	}
 	void Utils::initUtils() {
 		//create directories if missing
-#ifdef WIN32
-		CreateDirectoryW(L"deck", NULL);
-		CreateDirectoryW(L"pics", NULL);
-		CreateDirectoryW(L"pics/field", NULL);
-		CreateDirectoryW(L"replay", NULL);
-		CreateDirectoryW(L"screenshots", NULL);
-#else
-
-#endif
+		Makedirectory("deck");
+		Makedirectory("pics");
+		Makedirectory("pics/field");
+		Makedirectory("replay");
+		Makedirectory("screenshots");
 	}
 
 	void Utils::takeScreenshot(irr::IrrlichtDevice* device)

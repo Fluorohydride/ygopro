@@ -77,6 +77,8 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "mythread.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
+#include "string_utils.hpp"
+#include "utils.h"
 
 using namespace irr;
 using namespace core;
