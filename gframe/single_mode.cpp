@@ -145,7 +145,7 @@ int SingleMode::SinglePlayThread(void* param) {
 		mainGame->actionParam = 1;
 		wchar_t msgbuf[256];
 		myswprintf(msgbuf, dataManager.GetSysString(1367), timetext);
-		mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, msgbuf);
+		mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, msgbuf);
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->gMutex.Unlock();
 		mainGame->WaitFrameSignal(30);
