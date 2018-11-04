@@ -136,8 +136,6 @@ public:
 	void ClearChatMsg();
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);
-	bool MakeDirectory(const std::string folder);
-	void initUtils();
 	void ClearTextures();
 	void CloseDuelWindow();
 

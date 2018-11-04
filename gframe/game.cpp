@@ -12,12 +12,7 @@
 
 #ifndef _WIN32
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <dirent.h>
-#include <unistd.h>
-#else
-#include <direct.h>
-#include <io.h>
 #endif
 
 const unsigned short PRO_VERSION = 0x1346;
@@ -28,7 +23,6 @@ Game* mainGame;
 
 bool Game::Initialize() {
 	srand(time(0));
-	initUtils();
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
@@ -1393,54 +1387,6 @@ void Game::ErrorLog(const char* msg) {
 	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
 	fprintf(fp, "[%s]%s\n", timebuf, msg);
 	fclose(fp);
-}
-bool Game::MakeDirectory(const std::string folder) {
-    std::string folder_builder;
-    std::string sub;
-    sub.reserve(folder.size());
-    for(auto it = folder.begin(); it != folder.end(); ++it) {
-        const char c = *it;
-        sub.push_back(c);
-        if(c == '/' || it == folder.end() - 1) {
-            folder_builder.append(sub);
-            if(access(folder_builder.c_str(), 0) != 0)
-#ifdef _WIN32
-                if(mkdir(folder_builder.c_str()) != 0)
-#else
-                if(mkdir(folder_builder.c_str(), 0777) != 0)
-#endif
-                    return false;
-            sub.clear();
-        }
-    }
-    return true;
-}
-void Game::initUtils() {
-	//user files
-	MakeDirectory("replay");
-	//cards from extra pack
-	MakeDirectory("expansions");
-	//files in ygopro-starter-pack
-	MakeDirectory("deck");
-	MakeDirectory("single");
-	//original files
-	MakeDirectory("script");
-	MakeDirectory("textures");
-	//sound
-#ifdef YGOPRO_USE_IRRKLANG
-	MakeDirectory("sound");
-	MakeDirectory("sound/BGM");
-	MakeDirectory("sound/BGM/advantage");
-	MakeDirectory("sound/BGM/deck");
-	MakeDirectory("sound/BGM/disadvantage");
-	MakeDirectory("sound/BGM/duel");
-	MakeDirectory("sound/BGM/lose");
-	MakeDirectory("sound/BGM/menu");
-	MakeDirectory("sound/BGM/win");
-#endif
-	//pics
-	MakeDirectory("pics");
-	MakeDirectory("pics/field");
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
