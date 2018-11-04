@@ -846,7 +846,9 @@ void SingleMode::SinglePlayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
 }
 byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
-	ScriptReaderExDirectry("./expansions", script_name, slen);
+	byte* buffer = ScriptReaderExDirectry("./expansions", script_name, slen);
+	if(buffer)
+		return buffer;
 #ifdef _WIN32
 	char fpath[1000];
 	WIN32_FIND_DATAW fdataw;
@@ -857,7 +859,7 @@ byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
 				char fname[780];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				sprintf(fpath, "./expansions/%s", fname);
-				byte* buffer = ScriptReaderExDirectry(fpath, script_name, slen);
+				buffer = ScriptReaderExDirectry(fpath, script_name, slen);
 				if(buffer)
 					return buffer;
 			}
@@ -873,7 +875,7 @@ byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
 				continue;
 			char filepath[1000];
 			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			byte* buffer = ScriptReaderExDirectry(filepath, script_name, slen);
+			buffer = ScriptReaderExDirectry(filepath, script_name, slen);
 			if(buffer)
 				return buffer;
 		}
