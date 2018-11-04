@@ -3,6 +3,9 @@
 #include "network.h"
 #include "game.h"
 #include <algorithm>
+#ifndef _WIN32
+#include <dirent.h>
+#endif
 
 namespace ygo {
 
