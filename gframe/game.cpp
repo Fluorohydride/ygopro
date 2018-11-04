@@ -28,7 +28,6 @@ unsigned short replay_mode;
 HostInfo game_info;
 
 void Game::MainServerLoop() {
-	initUtils();
 	deckManager.LoadLFList();
 	LoadExpansionDB();
 	dataManager.LoadDB("cards.cdb");
