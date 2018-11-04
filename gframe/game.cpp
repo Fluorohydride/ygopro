@@ -10,11 +10,6 @@
 #include "netserver.h"
 #include "single_mode.h"
 
-#ifndef _WIN32
-#include <sys/types.h>
-#include <dirent.h>
-#endif
-
 const unsigned short PRO_VERSION = 0x1346;
 
 namespace ygo {
@@ -865,70 +860,25 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	pControl->setText(dataManager.strBuffer);
 }
 void Game::LoadExpansionDB() {
-#ifdef _WIN32
-	char fpath[1000];
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
-	if(fh != INVALID_HANDLE_VALUE) {
-		do {
-			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-				char fname[780];
-				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
-				sprintf(fpath, "./expansions/%s", fname);
-				dataManager.LoadDB(fpath);
-			}
-		} while(FindNextFileW(fh, &fdataw));
-		FindClose(fh);
-	}
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./expansions/")) != NULL) {
-		while((dirp = readdir(dir)) != NULL) {
-			size_t len = strlen(dirp->d_name);
-			if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
-				continue;
-			char filepath[1000];
-			sprintf(filepath, "./expansions/%s", dirp->d_name);
-			dataManager.LoadDB(filepath);
+	FileSystem::TraversalDir("./expansions", [](const char* name, bool isdir) {
+		if(!isdir && !mystrncasecmp(strrchr(name, '.'), ".cdb", 4)) {
+			char fpath[1024];
+			sprintf(fpath, "./expansions/%s", name);
+			dataManager.LoadDB(fpath);
 		}
-		closedir(dir);
-	}
-#endif
+	});
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./deck/*.ydk", &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			wchar_t* pf = fdataw.cFileName;
-			while(*pf) pf++;
-			while(*pf != L'.') pf--;
-			*pf = 0;
-			cbDeck->addItem(fdataw.cFileName);
+	FileSystem::TraversalDir(L"./deck", [cbDeck](const wchar_t* name, bool isdir) {
+		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
+			size_t len = wcslen(name);
+			wchar_t deckname[256];
+			wcsncpy(deckname, name, len - 4);
+			deckname[len - 4] = 0;
+			cbDeck->addItem(deckname);
 		}
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./deck/")) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".ydk") != 0)
-			continue;
-		dirp->d_name[len - 4] = 0;
-		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		cbDeck->addItem(wname);
-	}
-	closedir(dir);
-#endif
+	});
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
 			cbDeck->setSelected(i);
@@ -938,61 +888,17 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 }
 void Game::RefreshReplay() {
 	lstReplayList->clear();
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./replay/*.yrp", &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && Replay::CheckReplay(fdataw.cFileName)) {
-			lstReplayList->addItem(fdataw.cFileName);
-		}
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./replay/")) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".yrp") != 0)
-			continue;
-		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		if(Replay::CheckReplay(wname))
-			lstReplayList->addItem(wname);
-	}
-	closedir(dir);
-#endif
+	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
+		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
+			lstReplayList->addItem(name);
+	});
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW(L"./single/*.lua", &fdataw);
-	if(fh == INVALID_HANDLE_VALUE)
-		return;
-	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-			lstSinglePlayList->addItem(fdataw.cFileName);
-	} while(FindNextFileW(fh, &fdataw));
-	FindClose(fh);
-#else
-	DIR * dir;
-	struct dirent * dirp;
-	if((dir = opendir("./single/")) == NULL)
-		return;
-	while((dirp = readdir(dir)) != NULL) {
-		size_t len = strlen(dirp->d_name);
-		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".lua") != 0)
-			continue;
-		wchar_t wname[256];
-		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		lstSinglePlayList->addItem(wname);
-	}
-	closedir(dir);
-#endif
+	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
+		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
+			lstSinglePlayList->addItem(name);
+	});
 }
 void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
