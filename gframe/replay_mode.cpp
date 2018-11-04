@@ -949,7 +949,7 @@ byte* ReplayMode::ScriptReaderEx(const char* script_name, int* slen) {
 				char fname[780];
 				BufferIO::EncodeUTF8(fdataw.cFileName, fname);
 				sprintf(fpath, "./expansions/%s", fname);
-				byte* buffer = ScriptReaderExDirectry(fpath, script_name, slen);
+				buffer = ScriptReaderExDirectry(fpath, script_name, slen);
 				if(buffer)
 					return buffer;
 			}
@@ -965,7 +965,7 @@ byte* ReplayMode::ScriptReaderEx(const char* script_name, int* slen) {
 				continue;
 			char filepath[1000];
 			sprintf(filepath, "./expansions/%s/", dirp->d_name);
-			byte* buffer = ScriptReaderExDirectry(filepath, script_name, slen);
+			buffer = ScriptReaderExDirectry(filepath, script_name, slen);
 			if(buffer)
 				return buffer;
 		}
