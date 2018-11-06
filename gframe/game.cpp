@@ -10,7 +10,6 @@
 #include "single_mode.h"
 #include <sstream>
 #include <fstream>
-#include "utils.h"
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -44,6 +43,7 @@ bool Game::Initialize() {
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
+	filesystem = device->getFileSystem();
 #ifdef _DEBUG
 	auto logger = device->getLogger();
 	logger->setLogLevel(ELL_ERROR);
@@ -625,7 +625,9 @@ bool Game::Initialize() {
 	wReplay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1202));
 	wReplay->getCloseButton()->setVisible(false);
 	wReplay->setVisible(false);
-	lstReplayList = env->addListBox(rect<s32>(10, 30, 350, 400), wReplay, LISTBOX_REPLAY_LIST, true);
+	lstReplayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wReplay, LISTBOX_REPLAY_LIST, rect<s32>(10, 30, 350, 400), filesystem, true, true, false);
+	lstReplayList->setWorkingPath("./replay");
+	lstReplayList->addFilteredExtensions(std::vector<io::path>{"yrp", "yrpx"});
 	lstReplayList->setItemHeight(18);
 	btnLoadReplay = env->addButton(rect<s32>(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348));
 	btnDeleteReplay = env->addButton(rect<s32>(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, dataManager.GetSysString(1361));
@@ -641,8 +643,10 @@ bool Game::Initialize() {
 	wSinglePlay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1201));
 	wSinglePlay->getCloseButton()->setVisible(false);
 	wSinglePlay->setVisible(false);
-	lstSinglePlayList = env->addListBox(rect<s32>(10, 30, 350, 400), wSinglePlay, LISTBOX_SINGLEPLAY_LIST, true);
+	lstSinglePlayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wSinglePlay, LISTBOX_SINGLEPLAY_LIST, rect<s32>(10, 30, 350, 400), filesystem, true, true, false);
 	lstSinglePlayList->setItemHeight(18);
+	lstSinglePlayList->setWorkingPath("./single");
+	lstSinglePlayList->addFilteredExtensions(std::vector<io::path>{"lua"});
 	btnLoadSinglePlay = env->addButton(rect<s32>(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
 	btnSinglePlayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 	env->addStaticText(dataManager.GetSysString(1352), rect<s32>(360, 30, 570, 50), false, true, wSinglePlay);
@@ -848,7 +852,6 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
 std::vector<std::string> Game::FindfolderFiles(const std::string& path, const std::string& extension, int subdirectorylayers) {
-	auto filesystem = device->getFileSystem();
 	auto cwd = filesystem->getWorkingDirectory();
 	filesystem->changeWorkingDirectoryTo(path.c_str());
 	auto list = filesystem->createFileList();
@@ -877,7 +880,7 @@ std::vector<std::string> Game::FindfolderFiles(const std::string& path, const st
 	return res;
 }
 void Game::LoadExpansionDB() {
-	auto files = FindfolderFiles("./expansions/", ".cdb", 3);
+	auto files = FindfolderFiles("./expansions/", ".cdb");
 	for (auto& file : files)
 		dataManager.LoadDB(("./expansions/" + file).c_str());
 }
@@ -897,22 +900,10 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	}
 }
 void Game::RefreshReplay() {
-	lstReplayList->clear();
-	auto files = FindfolderFiles("./replay/", ".yrp");
-	for(auto& file : files) {
-		wchar_t wname[256];
-		BufferIO::DecodeUTF8(file.c_str(), wname);
-		lstReplayList->addItem(wname);
-	}
+	lstReplayList->resetPath();
 }
 void Game::RefreshSingleplay() {
-	lstSinglePlayList->clear();
-	auto files = FindfolderFiles("./single/", ".lua");
-	for(auto& file : files) {
-		wchar_t wname[256];
-		BufferIO::DecodeUTF8(file.c_str(), wname);
-		lstSinglePlayList->addItem(wname);
-	}
+	lstSinglePlayList->resetPath();
 }
 void Game::RefreshBGMList() {
 	auto files = FindfolderFiles("./sound/BGM/", ".mp3");

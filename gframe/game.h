@@ -10,6 +10,7 @@
 #include <list>
 #include "CGUISkinSystem/CGUISkinSystem.h"
 #include "CGUICustomText/CGUICustomText.h"
+#include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
 
 namespace ygo {
 
@@ -223,6 +224,7 @@ public:
 	irr::video::IVideoDriver* driver;
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
+	io::IFileSystem* filesystem;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;
@@ -325,7 +327,7 @@ public:
 	irr::gui::IGUIButton* btnHostPrepCancel;
 	//replay
 	irr::gui::IGUIWindow* wReplay;
-	irr::gui::IGUIListBox* lstReplayList;
+	irr::gui::CGUIFileSelectListBox* lstReplayList;
 	irr::gui::IGUIStaticText* stReplayInfo;
 	irr::gui::IGUICheckBox* chkYrp;
 	irr::gui::IGUIButton* btnLoadReplay;
@@ -335,7 +337,7 @@ public:
 	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
 	irr::gui::IGUIWindow* wSinglePlay;
-	irr::gui::IGUIListBox* lstSinglePlayList;
+	irr::gui::CGUIFileSelectListBox* lstSinglePlayList;
 	irr::gui::IGUIStaticText* stSinglePlayInfo;
 	irr::gui::IGUIButton* btnLoadSinglePlay;
 	irr::gui::IGUIButton* btnSinglePlayCancel;

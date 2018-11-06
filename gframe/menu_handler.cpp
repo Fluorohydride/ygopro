@@ -289,7 +289,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				} else {
 					if(mainGame->lstReplayList->getSelected() == -1)
 						break;
-					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
+					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true)))
 						break;
 				}
 				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.LoadYrp())
@@ -451,9 +451,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				int sel = mainGame->lstReplayList->getSelected();
-				if(sel == -1)
+				if(sel == -1 || sel == 0)
 					break;
-				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel)))
+				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)))
 					break;
 				wchar_t infobuf[256];
 				std::wstring repinfo;
@@ -490,14 +490,94 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
 				int sel = mainGame->lstSinglePlayList->getSelected();
-				if(sel == -1)
+				if(sel == -1 || sel == 0)
 					break;
-				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
-				wchar_t fname[256];
+				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true);
 				char filename[256];
-				myswprintf(fname, L"./single/%ls", name);
-				BufferIO::EncodeUTF8(fname, filename);
+				BufferIO::EncodeUTF8(name, filename);
 				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(filename).c_str());
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_LISTBOX_SELECTED_AGAIN: {
+			switch(id) {
+			case LISTBOX_LAN_HOST: {
+				char ip[20];
+				const wchar_t* pstr = mainGame->ebJoinHost->getText();
+				BufferIO::CopyWStr(pstr, ip, 16);
+				unsigned int remote_addr = htonl(inet_addr(ip));
+				if(remote_addr == -1) {
+					char hostname[100];
+					char port[6];
+					BufferIO::CopyWStr(pstr, hostname, 100);
+					BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), port, 6);
+					struct evutil_addrinfo hints;
+					struct evutil_addrinfo *answer = NULL;
+					memset(&hints, 0, sizeof(hints));
+					hints.ai_family = AF_INET;
+					hints.ai_socktype = SOCK_STREAM;
+					hints.ai_protocol = IPPROTO_TCP;
+					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
+					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
+					if(status != 0) {
+						mainGame->gMutex.Lock();
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
+						mainGame->gMutex.Unlock();
+						break;
+					} else {
+						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
+						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
+						remote_addr = htonl(inet_addr(ip));
+					}
+				}
+				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
+				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
+				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
+				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
+					mainGame->btnCreateHost->setEnabled(false);
+					mainGame->btnJoinHost->setEnabled(false);
+					mainGame->btnJoinCancel->setEnabled(false);
+				}
+				break;
+			}
+			case LISTBOX_REPLAY_LIST: {
+				if(open_file) {
+					ReplayMode::cur_replay.OpenReplay(open_file_name);
+					open_file = false;
+				} else {
+					if(mainGame->lstReplayList->getSelected() == -1 || mainGame->lstReplayList->getSelected() == 0)
+						break;
+					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true)))
+						break;
+				}
+				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.LoadYrp())
+					break;
+				mainGame->ShowCardNoInfo();
+				mainGame->wCardImg->setVisible(true);
+				mainGame->wInfos->setVisible(true);
+				mainGame->wReplay->setVisible(true);
+				mainGame->wReplayControl->setVisible(true);
+				mainGame->btnReplayStart->setVisible(false);
+				mainGame->btnReplayPause->setVisible(true);
+				mainGame->btnReplayStep->setVisible(false);
+				mainGame->btnReplayUndo->setVisible(false);
+				mainGame->wPhase->setVisible(true);
+				mainGame->dField.Clear();
+				mainGame->HideElement(mainGame->wReplay);
+				mainGame->device->setEventReceiver(&mainGame->dField);
+				unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
+				if(start_turn == 1)
+					start_turn = 0;
+				ReplayMode::StartReplay(start_turn);
+				break;
+			}
+			case LISTBOX_SINGLEPLAY_LIST: {
+				if(!open_file && (mainGame->lstSinglePlayList->getSelected() == -1 || mainGame->lstSinglePlayList->getSelected() == 0))
+					break;
+				mainGame->singleSignal.SetNoWait(false);
+				SingleMode::StartPlay();
 				break;
 			}
 			}
