@@ -31,7 +31,7 @@ solution "ygo"
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     configuration "not vs*"
-        buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
+        buildoptions { "-fno-strict-aliasing", "-Wno-format-security" }
     configuration {"not vs*", "windows"}
         buildoptions { "-static-libgcc" }
 
@@ -52,12 +52,12 @@ solution "ygo"
         flags { "OptimizeSpeed" }
         targetdir "bin/release"
 
+    include "lua"
     include "ocgcore"
     include "gframe"
     if os.is("windows") then
     include "event"
     include "freetype"
     include "irrlicht"
-    include "lua"
     include "sqlite3"
     end
