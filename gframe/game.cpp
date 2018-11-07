@@ -8,6 +8,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include "utils.h"
 #include <sstream>
 #include <fstream>
 
