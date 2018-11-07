@@ -125,6 +125,8 @@ void ClientCard::UpdateInfo(char* buf) {
 		base_defense = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_REASON)
 		reason = BufferIO::ReadInt32(buf);
+	if(flag & QUERY_REASON_CARD)
+		BufferIO::ReadInt32(buf);
 	if(flag & QUERY_EQUIP_CARD) {
 		int c = BufferIO::ReadInt8(buf);
 		int l = BufferIO::ReadInt8(buf);
