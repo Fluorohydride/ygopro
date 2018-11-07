@@ -19,7 +19,7 @@ project "ygopro"
     configuration "not vs*"
         buildoptions { "-std=c++14", "-fno-rtti", "-fpermissive" }
     configuration "not windows"
-        includedirs { "/usr/include/lua", "/usr/include/lua5.3", "/usr/include/lua/5.3", "/usr/include/irrlicht", "/usr/include/freetype2", "../irrKlang/include" }
+        includedirs { "/usr/include/irrlicht", "/usr/include/freetype2", "../irrKlang/include" }
         excludes { "COSOperator.*" }
         libdirs { "../irrKlang/lib" }
         links { "event_pthreads", "GL", "dl", "pthread", "lua5.3" }
