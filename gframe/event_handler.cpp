@@ -993,7 +993,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->stCardListTip->setVisible(false);
 			}
 			if(id == TEXT_CARD_LIST_TIP) {
-				mainGame->stCardListTip->setVisible(true);
+				mainGame->stCardListTip->setVisible(false);
 			}
 			break;
 		}
@@ -1570,14 +1570,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						should_show_tip = false;
-						mainGame->imgCard->setImage(imageManager.tCover[0]);
-						mainGame->stName->setText(L"");
-						mainGame->stInfo->setText(L"");
-						mainGame->stDataInfo->setText(L"");
-						mainGame->stSetName->setText(L"");
-						mainGame->stText->setText(L"");
-						mainGame->showingcard = 0;
-						mainGame->scrCardText->setVisible(false);
+						mainGame->ClearCardInfo(0);
 					}
 				}
 				hovered_card = mcard;
