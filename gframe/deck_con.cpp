@@ -101,7 +101,7 @@ void DeckBuilder::Terminate() {
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
 	mainGame->ClearTextures();
-	mainGame->ShowCardNoInfo(0);
+	mainGame->ClearCardInfo(0);
 	mainGame->scrFilter->setVisible(false);
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)

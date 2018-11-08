@@ -996,7 +996,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->stCardListTip->setVisible(false);
 			}
 			if(id == TEXT_CARD_LIST_TIP) {
-				mainGame->stCardListTip->setVisible(true);
+				mainGame->stCardListTip->setVisible(false);
 			}
 			break;
 		}
@@ -1573,7 +1573,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						should_show_tip = false;
-						mainGame->ShowCardNoInfo(0);
+						mainGame->ClearCardInfo(0);
 					}
 				}
 				hovered_card = mcard;
@@ -2217,7 +2217,7 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 		irr::core::rect<s32> ePos = element->getRelativePosition();
 		s32 x = (ePos.UpperLeftCorner.X + ePos.LowerRightCorner.X) / 2;
 		s32 y = ePos.LowerRightCorner.Y;
-		mainGame->SetStaticText(mainGame->stCardListTip, 320, mainGame->guiFont, str.c_str());
+		mainGame->stCardListTip->setText(str.c_str());
 		irr::core::dimension2d<unsigned int> dTip = mainGame->guiFont->getDimension(mainGame->stCardListTip->getText()) + irr::core::dimension2d<unsigned int>(10, 10);
 		s32 w = dTip.Width / 2;
 		if(x - w < 10)
