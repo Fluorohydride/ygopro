@@ -896,7 +896,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 }
 void Game::LoadExpansionDB() {
 	FileSystem::TraversalDir("./expansions", [](const char* name, bool isdir) {
-		if(!isdir && !mystrncasecmp(strrchr(name, '.'), ".cdb", 4)) {
+		if(!isdir && strrchr(name, '.') && !mystrncasecmp(strrchr(name, '.'), ".cdb", 4)) {
 			char fpath[1024];
 			sprintf(fpath, "./expansions/%s", name);
 			dataManager.LoadDB(fpath);
@@ -906,7 +906,7 @@ void Game::LoadExpansionDB() {
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	FileSystem::TraversalDir(L"./deck", [cbDeck](const wchar_t* name, bool isdir) {
-		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
 			size_t len = wcslen(name);
 			wchar_t deckname[256];
 			wcsncpy(deckname, name, len - 4);
@@ -924,14 +924,14 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
 			lstReplayList->addItem(name);
 	});
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
 	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
 			lstSinglePlayList->addItem(name);
 	});
 }
