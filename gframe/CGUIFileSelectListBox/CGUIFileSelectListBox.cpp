@@ -691,7 +691,7 @@ bool CGUIFileSelectListBox::getSerializationLabels(EGUI_LISTBOX_COLOR colorType,
 void CGUIFileSelectListBox::LoadFolderContents() {
 	Items.clear();
 	if(curList)
-		delete[] curList;
+		curList->drop();
 	auto cwd = filesystem->getWorkingDirectory();
 	filesystem->changeWorkingDirectoryTo(curAbsPath);
 	curList = filesystem->createFileList();
