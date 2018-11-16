@@ -939,7 +939,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case EDITBOX_REPLAY_NAME: {
-				mainGame->ValidateName(mainGame->ebRSName);
+				mainGame->ValidateName(event.GUIEvent.Caller);
 				break;
 			}
 			}
