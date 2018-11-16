@@ -1,5 +1,6 @@
 #include "data_manager.h"
 #include <stdio.h>
+#include <fstream>
 
 namespace ygo {
 
@@ -67,35 +68,30 @@ bool DataManager::LoadDB(const char* file) {
 	return true;
 }
 bool DataManager::LoadStrings(const char* file) {
-	FILE* fp = fopen(file, "r");
-	if(!fp)
+	std::ifstream string_file(file, std::ifstream::in);
+	if(!string_file.is_open())
 		return false;
-	char linebuf[256];
-	char strbuf[256];
-	int value;
-	while(fgets(linebuf, 256, fp)) {
-		if(linebuf[0] != '!')
+	std::string str;
+	while(std::getline(string_file, str)) {
+		if(str.empty() || str.at(0) != '!') {
 			continue;
-		sscanf(linebuf, "!%s", strbuf);
-		if(!strcmp(strbuf, "system")) {
-			sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_sysStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "victory")) {
-			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_victoryStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "counter")) {
-			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_counterStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "setname")) {
-			sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_setnameStrings[value] = strBuffer;
 		}
+		auto pos = str.find(' ');
+		auto type = str.substr(1, pos - 1);
+		str = str.substr(pos + 1);
+		pos = str.find(' ');
+		auto value = str.substr(0, pos);
+		str = str.substr(pos + 1);
+		if(type == "system")
+			_sysStrings[std::stoi(value)] = BufferIO::DecodeUTF8s(str);
+		else if(type == "victory")
+			_victoryStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+		else if(type == "counter")
+			_counterStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+		else if(type == "setname")
+			_setnameStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
 	}
-	fclose(fp);
+	string_file.close();
 	for(int i = 0; i < 255; ++i)
 		myswprintf(numStrings[i], L"%d", i);
 	return true;
