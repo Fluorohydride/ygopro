@@ -74,7 +74,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
-	filterList = deckManager._lfList[0].content;
+	filterList = &deckManager._lfList[0].content;
 	mainGame->cbDBLFList->setSelected(0);
 	ClearSearch();
 	mouse_pos.set(0, 0);
@@ -105,7 +105,7 @@ void DeckBuilder::Terminate() {
 	mainGame->scrFilter->setVisible(false);
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)
-		BufferIO::CopyWStr(mainGame->cbDBDecks->getItem(sel), mainGame->gameConf.lastdeck, 64);
+		mainGame->gameConf.lastdeck = mainGame->cbDBDecks->getItem(sel);
 	if(exit_on_return)
 		mainGame->device->closeDevice();
 }
@@ -322,7 +322,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case EDITBOX_DECK_NAME: {
-				mainGame->ValidateName(mainGame->ebDeckname);
+				mainGame->ValidateName(event.GUIEvent.Caller);
 				break;
 			}
 			}
@@ -331,7 +331,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
-				filterList = deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
+				filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
