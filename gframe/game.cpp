@@ -99,10 +99,10 @@ bool Game::Initialize() {
 	PopulateResourcesDirectories();
 	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
-	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
-	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
-	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
+	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), 16);
+	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), 12);
+	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), 48);
+	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont.c_str(), gameConf.textfontsize);
 	textFont = guiFont;
 	if(!numFont || !textFont) {
 		ErrorLog("Failed to load font(s)!");
@@ -140,18 +140,18 @@ bool Game::Initialize() {
 	wLanWindow->getCloseButton()->setVisible(false);
 	wLanWindow->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1220), rect<s32>(10, 30, 220, 50), false, false, wLanWindow);
-	ebNickName = env->addEditBox(gameConf.nickname, rect<s32>(110, 25, 450, 50), true, wLanWindow);
+	ebNickName = env->addEditBox(gameConf.nickname.c_str(), rect<s32>(110, 25, 450, 50), true, wLanWindow);
 	ebNickName->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	lstHostList = env->addListBox(rect<s32>(10, 60, 570, 320), wLanWindow, LISTBOX_LAN_HOST, true);
 	lstHostList->setItemHeight(18);
 	btnLanRefresh = env->addButton(rect<s32>(240, 325, 340, 350), wLanWindow, BUTTON_LAN_REFRESH, dataManager.GetSysString(1217));
 	env->addStaticText(dataManager.GetSysString(1221), rect<s32>(10, 360, 220, 380), false, false, wLanWindow);
-	ebJoinHost = env->addEditBox(gameConf.lasthost, rect<s32>(110, 355, 350, 380), true, wLanWindow);
+	ebJoinHost = env->addEditBox(gameConf.lasthost.c_str(), rect<s32>(110, 355, 350, 380), true, wLanWindow);
 	ebJoinHost->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebJoinPort = env->addEditBox(gameConf.lastport, rect<s32>(360, 355, 420, 380), true, wLanWindow, EDITBOX_PORT_BOX);
+	ebJoinPort = env->addEditBox(gameConf.lastport.c_str(), rect<s32>(360, 355, 420, 380), true, wLanWindow, EDITBOX_PORT_BOX);
 	ebJoinPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1222), rect<s32>(10, 390, 220, 410), false, false, wLanWindow);
-	ebJoinPass = env->addEditBox(gameConf.roompass, rect<s32>(110, 385, 420, 410), true, wLanWindow);
+	ebJoinPass = env->addEditBox(gameConf.roompass.c_str(), rect<s32>(110, 385, 420, 410), true, wLanWindow);
 	ebJoinPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnJoinHost = env->addButton(rect<s32>(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, dataManager.GetSysString(1223));
 	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
@@ -163,7 +163,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 30, 220, 50), false, false, wCreateHost);
 	cbLFlist = env->addComboBox(rect<s32>(140, 25, 300, 50), wCreateHost);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbLFlist->addItem(deckManager._lfList[i].listName, deckManager._lfList[i].hash);
+		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
 	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
 	cbRule->addItem(dataManager.GetSysString(1240));
@@ -243,7 +243,7 @@ bool Game::Initialize() {
 	ebDrawCount = env->addEditBox(strbuf, rect<s32>(140, 295, 220, 320), true, wCreateHost);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1234), rect<s32>(10, 330, 220, 350), false, false, wCreateHost);
-	ebServerName = env->addEditBox(gameConf.gamename, rect<s32>(110, 325, 250, 350), true, wCreateHost);
+	ebServerName = env->addEditBox(gameConf.gamename.c_str(), rect<s32>(110, 325, 250, 350), true, wCreateHost);
 	ebServerName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1235), rect<s32>(10, 360, 220, 380), false, false, wCreateHost);
 	ebServerPass = env->addEditBox(L"", rect<s32>(110, 355, 250, 380), true, wCreateHost);
@@ -251,7 +251,7 @@ bool Game::Initialize() {
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
 	env->addStaticText(dataManager.GetSysString(1238), rect<s32>(10, 390, 220, 410), false, false, wCreateHost);
-	ebHostPort = env->addEditBox(gameConf.serverport, rect<s32>(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
+	ebHostPort = env->addEditBox(gameConf.serverport.c_str(), rect<s32>(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
 	ebHostPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//host(single)
 	wHostPrepare = env->addWindow(rect<s32>(270, 120, 750, 440), false, dataManager.GetSysString(1250));
@@ -520,7 +520,7 @@ bool Game::Initialize() {
 	cbDBDecks = env->addComboBox(rect<s32>(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbDBLFList->addItem(deckManager._lfList[i].listName);
+		cbDBLFList->addItem(deckManager._lfList[i].listName.c_str());
 	btnSaveDeck = env->addButton(rect<s32>(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302));
 	ebDeckname = env->addEditBox(L"", rect<s32>(80, 65, 220, 90), true, wDeckEdit, EDITBOX_DECK_NAME);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -898,7 +898,7 @@ std::vector<std::string> Game::FindfolderFiles(const std::string& path, const st
 	return res;
 }
 void Game::LoadExpansionDB() {
-	auto files = FindfolderFiles("./expansions/", ".cdb");
+	auto files = FindfolderFiles("./expansions/", ".cdb", 1);
 	for (auto& file : files)
 		dataManager.LoadDB(("./expansions/" + file).c_str());
 }
@@ -910,7 +910,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 		cbDeck->addItem(BufferIO::DecodeUTF8s(file.substr(0, file.size() - 4)).c_str());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
-		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
+		if(gameConf.lastdeck == cbDeck->getItem(i)) {
 			cbDeck->setSelected(i);
 			break;
 		}
@@ -929,25 +929,18 @@ void Game::RefreshBGMList() {
 	}
 }
 void Game::LoadConfig() {
-	FILE* fp = fopen("system.conf", "r");
-	if(!fp)
-		return;
-	char linebuf[256];
-	char strbuf[32];
-	char valbuf[256];
-	wchar_t wstr[256];
 	gameConf.antialias = 0;
 	gameConf.fullscreen = false;
-	BufferIO::CopyWStr(L"7911", gameConf.serverport, 20);
+	gameConf.serverport = L"7911";
 	gameConf.textfontsize = 12;
-	gameConf.nickname[0] = 0;
-	gameConf.gamename[0] = 0;
-	gameConf.lastdeck[0] = 0;
-	gameConf.numfont[0] = 0;
-	gameConf.textfont[0] = 0;
-	gameConf.lasthost[0] = 0;
-	gameConf.lastport[0] = 0;
-	gameConf.roompass[0] = 0;
+	gameConf.nickname = L"";
+	gameConf.gamename = L"";
+	gameConf.lastdeck = L"";
+	gameConf.numfont = L"";
+	gameConf.textfont = L"";
+	gameConf.lasthost = L"";
+	gameConf.lastport = L"";
+	gameConf.roompass = L"";
 	//settings
 	gameConf.chkMAutoPos = 0;
 	gameConf.chkSTAutoPos = 1;
@@ -965,135 +958,126 @@ void Game::LoadConfig() {
 	gameConf.draw_field_spell = 1;
 	gameConf.quick_animation = 0;
 	gameConf.chkAnime = 0;
-	while(fgets(linebuf, 256, fp)) {
-		sscanf(linebuf, "%s = %s", strbuf, valbuf);
-		if(!strcmp(strbuf, "antialias")) {
-			gameConf.antialias = atoi(valbuf);
-		} else if(!strcmp(strbuf, "use_d3d")) {
-			gameConf.use_d3d = atoi(valbuf) > 0;
-		} else if(!strcmp(strbuf, "fullscreen")) {
-			gameConf.fullscreen = atoi(valbuf) > 0;
-		} else if(!strcmp(strbuf, "errorlog")) {
-			enable_log = atoi(valbuf);
-		} else if(!strcmp(strbuf, "textfont")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			int textfontsize;
-			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
-			gameConf.textfontsize = textfontsize;
-			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
-		} else if(!strcmp(strbuf, "numfont")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
-		} else if(!strcmp(strbuf, "serverport")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.serverport, 20);
-		} else if(!strcmp(strbuf, "lasthost")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.lasthost, 100);
-		} else if(!strcmp(strbuf, "lastport")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.lastport, 20);
-		} else if(!strcmp(strbuf, "roompass")) {
-			BufferIO::DecodeUTF8(valbuf, wstr);
-			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
-		} else if(!strcmp(strbuf, "game_version")) {
-			PRO_VERSION = atoi(valbuf);
-		} else if(!strcmp(strbuf, "automonsterpos")) {
-			gameConf.chkMAutoPos = atoi(valbuf);
-		} else if(!strcmp(strbuf, "autospellpos")) {
-			gameConf.chkSTAutoPos = atoi(valbuf);
-		} else if(!strcmp(strbuf, "randompos")) {
-			gameConf.chkRandomPos = atoi(valbuf);
-		} else if(!strcmp(strbuf, "autochain")) {
-			gameConf.chkAutoChain = atoi(valbuf);
-		} else if(!strcmp(strbuf, "waitchain")) {
-			gameConf.chkWaitChain = atoi(valbuf);
-		} else if(!strcmp(strbuf, "mute_opponent")) {
-			gameConf.chkIgnore1 = atoi(valbuf);
-		} else if(!strcmp(strbuf, "mute_spectators")) {
-			gameConf.chkIgnore2 = atoi(valbuf);
-		} else if(!strcmp(strbuf, "hide_setname")) {
-			gameConf.chkHideSetname = atoi(valbuf);
-		} else if(!strcmp(strbuf, "hide_hint_button")) {
-			gameConf.chkHideHintButton = atoi(valbuf);
-		} else if(!strcmp(strbuf, "draw_field_spell")) {
-			gameConf.draw_field_spell = atoi(valbuf);
-		} else if(!strcmp(strbuf, "quick_animation")) {
-			gameConf.quick_animation = atoi(valbuf);
-		} else if(!strcmp(strbuf, "show_anime")) {
-			gameConf.chkAnime = atoi(valbuf);
-		} else if(!strcmp(strbuf, "enable_sound")) {
- 			gameConf.enablesound = atoi(valbuf) > 0;
-		} else if (!strcmp(strbuf, "skin_index")) {
-			gameConf.skin_index = atoi(valbuf);
- 		} else if(!strcmp(strbuf, "volume")) {
- 			gameConf.volume = atof(valbuf) / 100;
- 		} else if(!strcmp(strbuf, "enable_music")) {
- 			gameConf.enablemusic = atoi(valbuf) > 0;
-		} else {
-			// options allowing multiple words
-			sscanf(linebuf, "%s = %240[^\n]", strbuf, valbuf);
-			if (!strcmp(strbuf, "nickname")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
-			} else if (!strcmp(strbuf, "gamename")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
-			} else if (!strcmp(strbuf, "lastdeck")) {
-				BufferIO::DecodeUTF8(valbuf, wstr);
-				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
-			}
+	std::wifstream conf_file("system.conf", std::wifstream::in);
+	if(!conf_file.is_open())
+		return;
+	std::wstring str;
+	while(std::getline(conf_file, str)) {
+		if(str.empty() || str.at(0) == L'#') {
+			continue;
 		}
+		auto pos = str.find_first_of(L"=");
+		if(pos == std::wstring::npos)
+			continue;
+		auto type = str.substr(0, pos - 1);
+		str = str.substr(pos + 2);
+		if(type == L"antialias")
+			gameConf.antialias = std::stoi(str);
+		else if(type == L"use_d3d")
+			gameConf.use_d3d = std::stoi(str);
+		else if(type == L"fullscreen")
+			gameConf.fullscreen = std::stoi(str);
+		else if(type == L"errorlog")
+			enable_log = std::stoi(str);
+		else if(type == L"nickname")
+			gameConf.nickname = str;
+		else if(type == L"gamename")
+			gameConf.gamename = str;
+		else if(type == L"lastdeck")
+			gameConf.lastdeck = str;
+		else if(type == L"textfont") {
+			pos = str.find(L' ');
+			if(pos == std::wstring::npos) {
+				gameConf.textfont = str;
+				continue;
+			}
+			gameConf.textfont = str.substr(0, pos);
+			gameConf.textfontsize = std::stoi(str.substr(pos));
+		} else if(type == L"numfont")
+			gameConf.numfont = str;
+		else if(type == L"serverport")
+			gameConf.serverport = str;
+		else if(type == L"lasthost")
+			gameConf.lasthost = str;
+		else if(type == L"lastport")
+			gameConf.lastport = str;
+		else if(type == L"roompass")
+			gameConf.roompass = str;
+		else if(type == L"game_version")
+			PRO_VERSION = std::stoi(str);
+		else if(type == L"automonsterpos")
+			gameConf.chkMAutoPos = std::stoi(str);
+		else if(type == L"autospellpos")
+			gameConf.chkSTAutoPos = std::stoi(str);
+		else if(type == L"randompos")
+			gameConf.chkRandomPos = std::stoi(str);
+		else if(type == L"autochain")
+			gameConf.chkAutoChain = std::stoi(str);
+		else if(type == L"waitchain")
+			gameConf.chkWaitChain = std::stoi(str);
+		else if(type == L"mute_opponent")
+			gameConf.chkIgnore1 = std::stoi(str);
+		else if(type == L"mute_spectators")
+			gameConf.chkIgnore1 = std::stoi(str);
+		else if(type == L"hide_setname")
+			gameConf.chkHideSetname = std::stoi(str);
+		else if(type == L"hide_hint_button")
+			gameConf.chkHideHintButton = std::stoi(str);
+		else if(type == L"draw_field_spell")
+			gameConf.draw_field_spell = std::stoi(str);
+		else if(type == L"quick_animation")
+			gameConf.quick_animation = std::stoi(str);
+		else if(type == L"show_anime")
+			gameConf.chkAnime = std::stoi(str);
+		else if(type == L"enable_sound")
+			gameConf.enablesound = !!std::stoi(str);
+		else if(type == L"skin_index")
+			gameConf.skin_index = std::stoi(str);
+		else if(type == L"volume")
+			gameConf.volume = std::stof(str)/100.0f;
+		else if(type == L"enable_music")
+			gameConf.enablemusic = !!std::stoi(str);
 	}
-	fclose(fp);
+	conf_file.close();
 }
 void Game::SaveConfig() {
-	FILE* fp = fopen("system.conf", "w");
-	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
-	char linebuf[256];
-	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
-	fprintf(fp, "fullscreen = %d\n", gameConf.fullscreen ? 1 : 0);
-	fprintf(fp, "antialias = %d\n", gameConf.antialias);
-	fprintf(fp, "errorlog = %d\n", enable_log);
-	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
-	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
-	fprintf(fp, "nickname = %s\n", linebuf);
-	BufferIO::EncodeUTF8(gameConf.gamename, linebuf);
-	fprintf(fp, "gamename = %s\n", linebuf);
-	BufferIO::EncodeUTF8(gameConf.lastdeck, linebuf);
-	fprintf(fp, "lastdeck = %s\n", linebuf);
-	BufferIO::EncodeUTF8(gameConf.textfont, linebuf);
-	fprintf(fp, "textfont = %s %d\n", linebuf, gameConf.textfontsize);
-	BufferIO::EncodeUTF8(gameConf.numfont, linebuf);
-	fprintf(fp, "numfont = %s\n", linebuf);
-	BufferIO::EncodeUTF8(gameConf.serverport, linebuf);
-	fprintf(fp, "serverport = %s\n", linebuf);
-	BufferIO::EncodeUTF8(gameConf.lasthost, linebuf);
-	fprintf(fp, "lasthost = %s\n", linebuf);
-	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
-	fprintf(fp, "lastport = %s\n", linebuf);
-	fprintf(fp, "game_version = %d\n", PRO_VERSION);
-	//settings
-	fprintf(fp, "automonsterpos = %d\n", ((chkMAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autospellpos = %d\n", ((chkSTAutoPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "randompos = %d\n", ((chkRandomPos->isChecked()) ? 1 : 0));
-	fprintf(fp, "autochain = %d\n", ((chkAutoChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "waitchain = %d\n", ((chkWaitChain->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_opponent = %d\n", ((chkIgnore1->isChecked()) ? 1 : 0));
-	fprintf(fp, "mute_spectators = %d\n", ((chkIgnore2->isChecked()) ? 1 : 0));
-	fprintf(fp, "hide_setname = %d\n", ((gameConf.chkHideSetname) ? 1 : 0));
-	fprintf(fp, "hide_hint_button = %d\n", ((chkHideHintButton->isChecked()) ? 1 : 0));
-	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
-	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
-	fprintf(fp, "show_anime = %d\n", ((chkAnime->isChecked()) ? 1 : 0));
-	fprintf(fp, "skin_index = %d\n", gameConf.skin_index);
-	fprintf(fp, "enable_sound = %d\n", ((chkEnableSound->isChecked()) ? 1 : 0));
-	fprintf(fp, "enable_music = %d\n", ((chkEnableMusic->isChecked()) ? 1 : 0));
-	fprintf(fp, "#Volume of sound and music, between 0 and 100\n");
+	std::wofstream conf_file("system.conf", std::wifstream::out);
+	if(!conf_file.is_open())
+		return;
+	conf_file << L"#config file\n#nickname & gamename should be less than 20 characters\n";
+	conf_file << L"use_d3d = "			<< std::to_wstring(gameConf.use_d3d ? 1 : 0) << L"\n";
+	conf_file << L"fullscreen = "		<< std::to_wstring(gameConf.fullscreen ? 1 : 0) << L"\n";
+	conf_file << L"antialias = "		<< std::to_wstring(gameConf.antialias) << L"\n";
+	conf_file << L"errorlog = "			<< std::to_wstring(enable_log) << L"\n";
+	conf_file << L"nickname = "			<< ebNickName->getText() << L"\n";
+	conf_file << L"gamename = "			<< gameConf.gamename << L"\n";
+	conf_file << L"lastdeck = "			<< gameConf.lastdeck << L"\n";
+	conf_file << L"textfont = "			<< gameConf.textfont << L" " << std::to_wstring(gameConf.textfontsize) << L"\n";
+	conf_file << L"numfont = "			<< gameConf.numfont << L"\n";
+	conf_file << L"serverport = "		<< gameConf.serverport << L"\n";
+	conf_file << L"lasthost = "			<< gameConf.lasthost << L"\n";
+	conf_file << L"lastport = "			<< gameConf.lastport << L"\n";
+	conf_file << L"game_version = "		<< std::to_wstring(PRO_VERSION) << L"\n";
+	conf_file << L"automonsterpos = "	<< std::to_wstring(chkMAutoPos->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"autospellpos = "		<< std::to_wstring(chkSTAutoPos->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"randompos = "		<< std::to_wstring(chkRandomPos->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"autochain = "		<< std::to_wstring(chkAutoChain->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"waitchain = "		<< std::to_wstring(chkWaitChain->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"mute_opponent = "	<< std::to_wstring(chkIgnore1->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"mute_spectators = "	<< std::to_wstring(chkIgnore2->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"hide_setname = "		<< std::to_wstring(gameConf.chkHideSetname ? 1 : 0) << L"\n";
+	conf_file << L"hide_hint_button = " << std::to_wstring(chkHideHintButton->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"draw_field_spell = " << std::to_wstring(gameConf.draw_field_spell) << L"\n";
+	conf_file << L"quick_animation = "	<< std::to_wstring(gameConf.quick_animation) << L"\n";
+	conf_file << L"show_anime = "		<< std::to_wstring(chkAnime->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"skin_index = "		<< std::to_wstring(gameConf.skin_index) << L"\n";
+	conf_file << L"enable_sound = "		<< std::to_wstring(chkEnableSound->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"enable_music = "		<< std::to_wstring(chkEnableMusic->isChecked() ? 1 : 0) << L"\n";
+	conf_file << L"#Volume of sound and music, between 0 and 100\n";
 	int vol = gameConf.volume * 100;
-	if (vol < 0) vol = 0; else if (vol > 100) vol = 100;
-	fprintf(fp, "volume = %d\n", vol);
-	fclose(fp);
+	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
+	conf_file << L"volume = "			<< std::to_wstring(vol) << L"\n";
+	conf_file.close();
 }
 bool Game::PlayChant(unsigned int code) {
 	char sound[1000];

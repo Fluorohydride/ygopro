@@ -11,6 +11,7 @@
 #include "CGUISkinSystem/CGUISkinSystem.h"
 #include "CGUICustomText/CGUICustomText.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include "utils.h"
 
 namespace ygo {
 
@@ -18,16 +19,16 @@ struct Config {
 	bool use_d3d;
 	bool fullscreen;
 	unsigned short antialias;
-	wchar_t serverport[20];
+	std::wstring serverport;
 	unsigned char textfontsize;
-	wchar_t lasthost[100];
-	wchar_t lastport[10];
-	wchar_t nickname[20];
-	wchar_t gamename[20];
-	wchar_t lastdeck[64];
-	wchar_t textfont[256];
-	wchar_t numfont[256];
-	wchar_t roompass[20];
+	std::wstring lasthost;
+	std::wstring lastport;
+	std::wstring nickname;
+	std::wstring gamename;
+	std::wstring lastdeck;
+	std::wstring textfont;
+	std::wstring numfont;
+	std::wstring roompass;
 	//settings
 	int chkMAutoPos;
 	int chkSTAutoPos;
@@ -130,7 +131,7 @@ public:
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
-	void AddChatMsg(const wchar_t* msg, int player);
+	void AddChatMsg(const std::wstring& msg, int player);
 	void ClearChatMsg();
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);

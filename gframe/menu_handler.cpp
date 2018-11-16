@@ -12,8 +12,7 @@
 namespace ygo {
 
 void UpdateDeck() {
-	BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
-		mainGame->gameConf.lastdeck, 64);
+	mainGame->gameConf.lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
 	char deckbuf[1024];
 	char* pdeck = deckbuf;
 	BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
@@ -105,9 +104,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						remote_addr = htonl(inet_addr(ip));
 					}
 				}
-				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
-				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
-				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
+				unsigned int remote_port = std::stoi(mainGame->ebJoinPort->getText());
+				mainGame->gameConf.lasthost = pstr;
+				mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
@@ -182,9 +181,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				unsigned int host_port = _wtoi(mainGame->ebHostPort->getText());
-				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
-				BufferIO::CopyWStr(mainGame->ebHostPort->getText(), mainGame->gameConf.serverport, 20);
+				unsigned int host_port = std::stoi(mainGame->ebHostPort->getText());
+				mainGame->gameConf.gamename = mainGame->ebServerName->getText();
+				mainGame->gameConf.serverport = mainGame->ebHostPort->getText();
 				if(!NetServer::StartServer(host_port))
 					break;
 				if(!DuelClient::StartClient(0x7f000001, host_port)) {
@@ -532,9 +531,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						remote_addr = htonl(inet_addr(ip));
 					}
 				}
-				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
-				BufferIO::CopyWStr(pstr, mainGame->gameConf.lasthost, 100);
-				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
+				unsigned int remote_port = std::stoi(mainGame->ebJoinPort->getText());
+				mainGame->gameConf.lasthost = pstr;
+				mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
