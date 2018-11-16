@@ -958,125 +958,125 @@ void Game::LoadConfig() {
 	gameConf.draw_field_spell = 1;
 	gameConf.quick_animation = 0;
 	gameConf.chkAnime = 0;
-	std::wifstream conf_file("system.conf", std::wifstream::in);
+	std::ifstream conf_file("system.conf", std::ifstream::in);
 	if(!conf_file.is_open())
 		return;
-	std::wstring str;
+	std::string str;
 	while(std::getline(conf_file, str)) {
-		if(str.empty() || str.at(0) == L'#') {
+		if(str.empty() || str.at(0) == '#') {
 			continue;
 		}
-		auto pos = str.find_first_of(L"=");
+		auto pos = str.find_first_of("=");
 		if(pos == std::wstring::npos)
 			continue;
 		auto type = str.substr(0, pos - 1);
 		str = str.substr(pos + 2);
-		if(type == L"antialias")
+		if(type == "antialias")
 			gameConf.antialias = std::stoi(str);
-		else if(type == L"use_d3d")
+		else if(type == "use_d3d")
 			gameConf.use_d3d = std::stoi(str);
-		else if(type == L"fullscreen")
+		else if(type == "fullscreen")
 			gameConf.fullscreen = std::stoi(str);
-		else if(type == L"errorlog")
+		else if(type == "errorlog")
 			enable_log = std::stoi(str);
-		else if(type == L"nickname")
-			gameConf.nickname = str;
-		else if(type == L"gamename")
-			gameConf.gamename = str;
-		else if(type == L"lastdeck")
-			gameConf.lastdeck = str;
-		else if(type == L"textfont") {
+		else if(type == "nickname")
+			gameConf.nickname = BufferIO::DecodeUTF8s(str);
+		else if(type == "gamename")
+			gameConf.gamename = BufferIO::DecodeUTF8s(str);
+		else if(type == "lastdeck")
+			gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
+		else if(type == "textfont") {
 			pos = str.find(L' ');
 			if(pos == std::wstring::npos) {
-				gameConf.textfont = str;
+				gameConf.textfont = BufferIO::DecodeUTF8s(str);
 				continue;
 			}
-			gameConf.textfont = str.substr(0, pos);
+			gameConf.textfont = BufferIO::DecodeUTF8s(str.substr(0, pos));
 			gameConf.textfontsize = std::stoi(str.substr(pos));
-		} else if(type == L"numfont")
-			gameConf.numfont = str;
-		else if(type == L"serverport")
-			gameConf.serverport = str;
-		else if(type == L"lasthost")
-			gameConf.lasthost = str;
-		else if(type == L"lastport")
-			gameConf.lastport = str;
-		else if(type == L"roompass")
-			gameConf.roompass = str;
-		else if(type == L"game_version")
+		} else if(type == "numfont")
+			gameConf.numfont = BufferIO::DecodeUTF8s(str);
+		else if(type == "serverport")
+			gameConf.serverport = BufferIO::DecodeUTF8s(str);
+		else if(type == "lasthost")
+			gameConf.lasthost = BufferIO::DecodeUTF8s(str);
+		else if(type == "lastport")
+			gameConf.lastport = BufferIO::DecodeUTF8s(str);
+		else if(type == "roompass")
+			gameConf.roompass = BufferIO::DecodeUTF8s(str);
+		else if(type == "game_version")
 			PRO_VERSION = std::stoi(str);
-		else if(type == L"automonsterpos")
+		else if(type == "automonsterpos")
 			gameConf.chkMAutoPos = std::stoi(str);
-		else if(type == L"autospellpos")
+		else if(type == "autospellpos")
 			gameConf.chkSTAutoPos = std::stoi(str);
-		else if(type == L"randompos")
+		else if(type == "randompos")
 			gameConf.chkRandomPos = std::stoi(str);
-		else if(type == L"autochain")
+		else if(type == "autochain")
 			gameConf.chkAutoChain = std::stoi(str);
-		else if(type == L"waitchain")
+		else if(type == "waitchain")
 			gameConf.chkWaitChain = std::stoi(str);
-		else if(type == L"mute_opponent")
+		else if(type == "mute_opponent")
 			gameConf.chkIgnore1 = std::stoi(str);
-		else if(type == L"mute_spectators")
+		else if(type == "mute_spectators")
 			gameConf.chkIgnore1 = std::stoi(str);
-		else if(type == L"hide_setname")
+		else if(type == "hide_setname")
 			gameConf.chkHideSetname = std::stoi(str);
-		else if(type == L"hide_hint_button")
+		else if(type == "hide_hint_button")
 			gameConf.chkHideHintButton = std::stoi(str);
-		else if(type == L"draw_field_spell")
+		else if(type == "draw_field_spell")
 			gameConf.draw_field_spell = std::stoi(str);
-		else if(type == L"quick_animation")
+		else if(type == "quick_animation")
 			gameConf.quick_animation = std::stoi(str);
-		else if(type == L"show_anime")
+		else if(type == "show_anime")
 			gameConf.chkAnime = std::stoi(str);
-		else if(type == L"enable_sound")
+		else if(type == "enable_sound")
 			gameConf.enablesound = !!std::stoi(str);
-		else if(type == L"skin_index")
+		else if(type == "skin_index")
 			gameConf.skin_index = std::stoi(str);
-		else if(type == L"volume")
+		else if(type == "volume")
 			gameConf.volume = std::stof(str)/100.0f;
-		else if(type == L"enable_music")
+		else if(type == "enable_music")
 			gameConf.enablemusic = !!std::stoi(str);
 	}
 	conf_file.close();
 }
 void Game::SaveConfig() {
-	std::wofstream conf_file("system.conf", std::wifstream::out);
+	std::ofstream conf_file("system.conf", std::ofstream::out);
 	if(!conf_file.is_open())
 		return;
-	conf_file << L"#config file\n#nickname & gamename should be less than 20 characters\n";
-	conf_file << L"use_d3d = "			<< std::to_wstring(gameConf.use_d3d ? 1 : 0) << L"\n";
-	conf_file << L"fullscreen = "		<< std::to_wstring(gameConf.fullscreen ? 1 : 0) << L"\n";
-	conf_file << L"antialias = "		<< std::to_wstring(gameConf.antialias) << L"\n";
-	conf_file << L"errorlog = "			<< std::to_wstring(enable_log) << L"\n";
-	conf_file << L"nickname = "			<< ebNickName->getText() << L"\n";
-	conf_file << L"gamename = "			<< gameConf.gamename << L"\n";
-	conf_file << L"lastdeck = "			<< gameConf.lastdeck << L"\n";
-	conf_file << L"textfont = "			<< gameConf.textfont << L" " << std::to_wstring(gameConf.textfontsize) << L"\n";
-	conf_file << L"numfont = "			<< gameConf.numfont << L"\n";
-	conf_file << L"serverport = "		<< gameConf.serverport << L"\n";
-	conf_file << L"lasthost = "			<< gameConf.lasthost << L"\n";
-	conf_file << L"lastport = "			<< gameConf.lastport << L"\n";
-	conf_file << L"game_version = "		<< std::to_wstring(PRO_VERSION) << L"\n";
-	conf_file << L"automonsterpos = "	<< std::to_wstring(chkMAutoPos->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"autospellpos = "		<< std::to_wstring(chkSTAutoPos->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"randompos = "		<< std::to_wstring(chkRandomPos->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"autochain = "		<< std::to_wstring(chkAutoChain->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"waitchain = "		<< std::to_wstring(chkWaitChain->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"mute_opponent = "	<< std::to_wstring(chkIgnore1->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"mute_spectators = "	<< std::to_wstring(chkIgnore2->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"hide_setname = "		<< std::to_wstring(gameConf.chkHideSetname ? 1 : 0) << L"\n";
-	conf_file << L"hide_hint_button = " << std::to_wstring(chkHideHintButton->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"draw_field_spell = " << std::to_wstring(gameConf.draw_field_spell) << L"\n";
-	conf_file << L"quick_animation = "	<< std::to_wstring(gameConf.quick_animation) << L"\n";
-	conf_file << L"show_anime = "		<< std::to_wstring(chkAnime->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"skin_index = "		<< std::to_wstring(gameConf.skin_index) << L"\n";
-	conf_file << L"enable_sound = "		<< std::to_wstring(chkEnableSound->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"enable_music = "		<< std::to_wstring(chkEnableMusic->isChecked() ? 1 : 0) << L"\n";
-	conf_file << L"#Volume of sound and music, between 0 and 100\n";
+	conf_file << "#config file\n#nickname & gamename should be less than 20 characters\n";
+	conf_file << "use_d3d = "			<< std::to_string(gameConf.use_d3d ? 1 : 0) << "\n";
+	conf_file << "fullscreen = "		<< std::to_string(gameConf.fullscreen ? 1 : 0) << "\n";
+	conf_file << "antialias = "			<< std::to_string(gameConf.antialias) << "\n";
+	conf_file << "errorlog = "			<< std::to_string(enable_log) << "\n";
+	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
+	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
+	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
+	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
+	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
+	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";
+	conf_file << "lasthost = "			<< BufferIO::EncodeUTF8s(gameConf.lasthost) << "\n";
+	conf_file << "lastport = "			<< BufferIO::EncodeUTF8s(gameConf.lastport) << "\n";
+	conf_file << "game_version = "		<< std::to_string(PRO_VERSION) << "\n";
+	conf_file << "automonsterpos = "	<< std::to_string(chkMAutoPos->isChecked() ? 1 : 0) << "\n";
+	conf_file << "autospellpos = "		<< std::to_string(chkSTAutoPos->isChecked() ? 1 : 0) << "\n";
+	conf_file << "randompos = "			<< std::to_string(chkRandomPos->isChecked() ? 1 : 0) << "\n";
+	conf_file << "autochain = "			<< std::to_string(chkAutoChain->isChecked() ? 1 : 0) << "\n";
+	conf_file << "waitchain = "			<< std::to_string(chkWaitChain->isChecked() ? 1 : 0) << "\n";
+	conf_file << "mute_opponent = "		<< std::to_string(chkIgnore1->isChecked() ? 1 : 0) << "\n";
+	conf_file << "mute_spectators = "	<< std::to_string(chkIgnore2->isChecked() ? 1 : 0) << "\n";
+	conf_file << "hide_setname = "		<< std::to_string(gameConf.chkHideSetname ? 1 : 0) << "\n";
+	conf_file << "hide_hint_button = "	<< std::to_string(chkHideHintButton->isChecked() ? 1 : 0) << "\n";
+	conf_file << "draw_field_spell = "	<< std::to_string(gameConf.draw_field_spell) << "\n";
+	conf_file << "quick_animation = "	<< std::to_string(gameConf.quick_animation) << "\n";
+	conf_file << "show_anime = "		<< std::to_string(chkAnime->isChecked() ? 1 : 0) << "\n";
+	conf_file << "skin_index = "		<< std::to_string(gameConf.skin_index) << "\n";
+	conf_file << "enable_sound = "		<< std::to_string(chkEnableSound->isChecked() ? 1 : 0) << "\n";
+	conf_file << "enable_music = "		<< std::to_string(chkEnableMusic->isChecked() ? 1 : 0) << "\n";
+	conf_file << "#Volume of sound and music, between 0 and 100\n";
 	int vol = gameConf.volume * 100;
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
-	conf_file << L"volume = "			<< std::to_wstring(vol) << L"\n";
+	conf_file << "volume = "			<< std::to_string(vol) << "\n";
 	conf_file.close();
 }
 bool Game::PlayChant(unsigned int code) {
