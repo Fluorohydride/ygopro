@@ -160,77 +160,50 @@ void Replay::EndRecord(size_t size) {
 	LzmaCompress(comp_data, &comp_size, replay_data, pdata - replay_data, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	is_recording = false;
 }
-void Replay::SaveReplay(const wchar_t* name) {
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls.yrpX", name);
-#ifdef WIN32
-	fp = _wfopen(fname, L"wb");
-#else
-	char fname2[256];
-	BufferIO::EncodeUTF8(fname, fname2);
-	fp = fopen(fname2, "wb");
-#endif
-	if(!fp)
+void Replay::SaveReplay(const std::wstring& name) {
+	std::ofstream replay_file(L"./replay/" + name + L".yrpX", std::ofstream::binary);
+	if(!replay_file.is_open())
 		return;
-	fwrite(&pheader, sizeof(pheader), 1, fp);
-	fwrite(comp_data, comp_size, 1, fp);
-	fclose(fp);
+	replay_file.write((char*)&pheader, sizeof(pheader));
+	replay_file.write((char*)comp_data, comp_size);
+	replay_file.close();
 }
-bool Replay::OpenReplay(const wchar_t* name) {
-#ifdef WIN32
-	fp = _wfopen(name, L"rb");
-#else
-	char name2[256];
-	BufferIO::EncodeUTF8(name, name2);
-	fp = fopen(name2, "rb");
-#endif
-	if(!fp) {
-		wchar_t fname[256];
-		myswprintf(fname, L"./replay/%ls", name);
-#ifdef WIN32
-		fp = _wfopen(fname, L"rb");
-#else
-		char fname2[256];
-		BufferIO::EncodeUTF8(fname, fname2);
-		fp = fopen(fname2, "rb");
-#endif
+bool Replay::OpenReplay(const std::wstring& name) {
+	std::ifstream replay_file(name, std::ifstream::binary);
+	if(!replay_file.is_open()) {
+		replay_file.open(L"./replay/" + name, std::ifstream::binary);
+		if(!replay_file.is_open())
+			return false;
 	}
-	if(!fp)
-		return false;
-	if(fread(&pheader, sizeof(pheader), 1, fp) < 1) {
-		fclose(fp);
+	if(replay_file.read((char*)&pheader, sizeof(pheader)).gcount() < 1) {
+		replay_file.close();
 		return false;
 	}
 	if(pheader.flag & REPLAY_COMPRESSED) {
-		comp_size = fread(comp_data, 1, 0x20000, fp);
-		fclose(fp);
+		comp_size = replay_file.read((char*)comp_data, 0x20000).gcount();
+		replay_file.close();
 		replay_size = pheader.datasize;
 		if(LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
 			return false;
 	} else {
-		comp_size = fread(replay_data, 1, 0x20000, fp);
-		fclose(fp);
+		comp_size = replay_file.read((char*)replay_data, 0x20000).gcount();
+		replay_file.close();
 		replay_size = comp_size;
 	}
 	pdata = replay_data;
 	is_replaying = true;
 	return true;
 }
-bool Replay::CheckReplay(const wchar_t* name) {
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
-#ifdef WIN32
-	FILE* rfp = _wfopen(fname, L"rb");
-#else
-	char fname2[256];
-	BufferIO::EncodeUTF8(fname, fname2);
-	FILE* rfp = fopen(fname2, "rb");
-#endif
-	if(!rfp)
-		return false;
+bool Replay::CheckReplay(const std::wstring& name) {
+	std::ifstream replay_file(name, std::ifstream::binary);
+	if(!replay_file.is_open()) {
+		replay_file.open(L"./replay/" + name, std::ifstream::binary);
+		if(!replay_file.is_open())
+			return false;
+	}
 	ReplayHeader rheader;
-	size_t count = fread(&rheader, sizeof(ReplayHeader), 1, rfp);
-	fclose(rfp);
+	auto count = replay_file.read((char*)&rheader, sizeof(pheader)).gcount();
+	replay_file.close();
 	return count == 1 && (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
 }
 bool Replay::ReadNextPacket(ReplayPacket* packet) {
@@ -316,8 +289,7 @@ bool Replay::LoadYrp() {
 					if (LzmaUncompress(replay_data, &replay_size, (unsigned char*)prep, &comp_size, pheader.props, 5) != SZ_OK)
 						return false;
 				} else {
-					comp_size = fread(replay_data, 1, 0x20000, fp);
-					fclose(fp);
+					replay_data = comp_data;
 					replay_size = comp_size;
 				}
 				pdata = replay_data;

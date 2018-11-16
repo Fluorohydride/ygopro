@@ -50,9 +50,9 @@ public:
 	void WriteInt8(char data, bool flush = true);
 	void Flush();
 	void EndRecord(size_t size = 0x20000);
-	void SaveReplay(const wchar_t* name);
-	bool OpenReplay(const wchar_t* name);
-	static bool CheckReplay(const wchar_t* name);
+	void SaveReplay(const std::wstring& name);
+	bool OpenReplay(const std::wstring& name);
+	static bool CheckReplay(const std::wstring& name);
 	bool ReadNextPacket(ReplayPacket* packet);
 	bool ReadStream(std::vector<ReplayPacket>* stream);
 	static bool DeleteReplay(const std::wstring& name);
