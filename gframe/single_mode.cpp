@@ -56,27 +56,23 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dInfo.clientname[0][0] = 0;
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
-	char filename[256];
-	size_t slen = 0;
+	bool loaded = true;
+	std::string script_name = "";
 	if(open_file) {
 		open_file = false;
-		slen = BufferIO::EncodeUTF8(open_file_name, filename);
-		if(!preload_script(pduel, filename, 0)) {
-			wchar_t fname[256];
-			myswprintf(fname, L"./single/%ls", open_file_name);
-			slen = BufferIO::EncodeUTF8(fname, filename);
-			if(!preload_script(pduel, filename, 0))
-				slen = 0;
+		script_name = BufferIO::EncodeUTF8s(open_file_name);
+		if(!preload_script(pduel, (char*)script_name.c_str(), 0)) {
+			script_name = BufferIO::EncodeUTF8s(std::wstring(L"./single/") + open_file_name);
+			if(!preload_script(pduel, (char*)script_name.c_str(), 0))
+				loaded = false;
 		}
 	} else {
-		const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
-		wchar_t fname[256];
-		myswprintf(fname, L"./single/%ls", name);
-		slen = BufferIO::EncodeUTF8(fname, filename);
-		if(!preload_script(pduel, filename, 0))
-			slen = 0;
+		const std::wstring name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
+		script_name = BufferIO::EncodeUTF8s(std::wstring(L"./single/") + name);
+		if(!preload_script(pduel, (char*)script_name.c_str(), 0))
+			loaded = false;
 	}
-	if(slen == 0) {
+	if(!loaded) {
 		end_duel(pduel);
 		return 0;
 	}
@@ -121,8 +117,8 @@ int SingleMode::SinglePlayThread(void* param) {
 	last_replay.WriteInt32(start_hand, false);
 	last_replay.WriteInt32(draw_count, false);
 	last_replay.WriteInt32(opt, false);
-	last_replay.WriteInt16(slen, false);
-	last_replay.WriteData(filename, slen, false);
+	last_replay.WriteInt16(script_name.size(), false);
+	last_replay.WriteData(script_name.c_str(), script_name.size(), false);
 	last_replay.Flush();
 	new_replay.WriteInt32((mainGame->GetMasterRule(opt, 0)) | (opt & SPEED_DUEL) << 8);
 	int len = get_message(pduel, (byte*)engineBuffer);
