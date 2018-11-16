@@ -1,6 +1,7 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
 #include <cstring>
+#include <string>
 
 #ifdef _MSC_VER
 #pragma warning(disable: 4244)
@@ -139,6 +140,64 @@ public:
 		}
 		*wp = 0;
 		return wp - wstr;
+	}
+	static std::string EncodeUTF8s(const std::wstring& source) {
+		std::string res;
+		for(size_t i = 0; i < source.size(); i++) {
+			auto c = source[i];
+			if(c < 0x80) {
+				res += ((char)c);
+			} else if(c < 0x800) {
+				res += ((char)(((c >> 6) & 0x1f) | 0xc0));
+				res += ((char)((c & 0x3f) | 0x80));
+			} else if(c < 0x10000 && (c < 0xd800 || c > 0xdfff)) {
+				res += ((char)(((c >> 12) & 0xf) | 0xe0));
+				res += ((char)(((c >> 6) & 0x3f) | 0x80));
+				res += ((char)(((c) & 0x3f) | 0x80));
+			} else {
+#ifdef _WIN32
+				unsigned unicode = 0;
+				unicode |= (c & 0x3ff) << 10;
+				c = source[++i];
+				unicode |= c & 0x3ff;
+				unicode += 0x10000;
+				res += ((char)(((unicode >> 18) & 0x7) | 0xf0));
+				res += ((char)(((unicode >> 12) & 0x3f) | 0x80));
+				res += ((char)(((unicode >> 6) & 0x3f) | 0x80));
+				res += ((char)(((unicode) & 0x3f) | 0x80));
+#else
+				res += ((char*)(((c >> 18) & 0x7) | 0xf0));
+				res += ((char*)(((c >> 12) & 0x3f) | 0x80));
+				res += ((char*)(((c >> 6) & 0x3f) | 0x80));
+				res += ((char*)(((c) & 0x3f) | 0x80));
+#endif
+			}
+		}
+		return res;
+	}
+	// UTF-8 to UTF-16/UTF-32
+	static std::wstring DecodeUTF8s(const std::string& source) {
+		std::wstring res = L"";
+		for(size_t i = 0; i < source.size(); i++) {
+			auto c = source[i];
+			if((c & 0x80) == 0) {
+				res += ((wchar_t)c);
+			} else if((c & 0xe0) == 0xc0) {
+				res += ((wchar_t)((((unsigned)c & 0x1f) << 6) | ((unsigned)source[++i] & 0x3f)));
+			} else if((c & 0xf0) == 0xe0) {
+				res += ((wchar_t)((((unsigned)c & 0xf) << 12) | (((unsigned)source[++i] & 0x3f) << 6) | ((unsigned)source[++i] & 0x3f)));
+			} else if((c & 0xf8) == 0xf0) {
+#ifdef _WIN32
+				unsigned unicode = (((unsigned)c & 0x7) << 18) | (((unsigned)source[++i] & 0x3f) << 12) | (((unsigned)source[++i] & 0x3f) << 6) | ((unsigned)source[++i] & 0x3f);
+				unicode -= 0x10000;
+				res += ((wchar_t)((unicode >> 10) | 0xd800));
+				res += ((wchar_t)((unicode & 0x3ff) | 0xdc00));
+#else
+				res += ((wchar_t)((((unsigned)c & 0x7) << 18) | (((unsigned)source[++i] & 0x3f) << 12) | (((unsigned)source[++i] & 0x3f) << 6) | ((unsigned)source[++i] & 0x3f)));
+#endif // _WIN32
+			}
+		}
+		return res;
 	}
 	static int GetVal(const wchar_t* pstr) {
 		int ret = 0;
