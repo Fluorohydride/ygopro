@@ -33,6 +33,12 @@ namespace ygo {
 	bool Utils::Movefile(const std::wstring& source, const std::wstring& destination) {
 		return Movefile(BufferIO::EncodeUTF8s(source), BufferIO::EncodeUTF8s(destination));
 	}
+	bool Utils::Deletefile(const std::string & source) {
+		return remove(source.c_str()) == 0;
+	}
+	bool Utils::Deletefile(const std::wstring & source) {
+		return Deletefile(BufferIO::EncodeUTF8s(source));
+	}
 	void Utils::initUtils() {
 		//create directories if missing
 		Makedirectory("deck");
@@ -63,8 +69,8 @@ namespace ygo {
 		}
 	}
 
-	void Utils::changeCursor(ECURSOR_ICON icon) {
-		gui::ICursorControl* cursor = mainGame->device->getCursorControl();
+	void Utils::changeCursor(irr::gui::ECURSOR_ICON icon) {
+		irr::gui::ICursorControl* cursor = mainGame->device->getCursorControl();
 		if (cursor->getActiveIcon() != icon) {
 			cursor->setActiveIcon(icon);
 		}

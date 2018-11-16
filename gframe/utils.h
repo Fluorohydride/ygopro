@@ -14,9 +14,11 @@ namespace ygo {
 		static bool Makedirectory(const std::string& path);
 		static bool Movefile(const std::string& source, const std::string& destination);
 		static bool Movefile(const std::wstring& source, const std::wstring& destination);
+		static bool Deletefile(const std::string& source);
+		static bool Deletefile(const std::wstring& source);
 		void initUtils();
 		void takeScreenshot(irr::IrrlichtDevice* device);
-		void changeCursor(ECURSOR_ICON icon);
+		void changeCursor(irr::gui::ECURSOR_ICON icon);
 	};
 	extern Utils utils;
 }
