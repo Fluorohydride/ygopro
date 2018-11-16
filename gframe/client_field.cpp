@@ -566,10 +566,8 @@ void ClientField::ShowSelectOption(int select_hint) {
 			break;
 		}
 	}
-	for(int i = 0; (i < count) && (i < 5) && quickmode; i++) {
-		const wchar_t* option = dataManager.GetDesc(select_options[i]);
-		mainGame->btnOption[i]->setText(option);
-	}
+	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
+		mainGame->btnOption[i]->setText(dataManager.GetDesc(select_options[i]));
 	recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + 375;
@@ -591,7 +589,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
 		mainGame->wOptions->setRelativePosition(pos);
 	} else {
-		mainGame->stOptions->setText((wchar_t*)dataManager.GetDesc(select_options[0]));
+		mainGame->stOptions->setText(dataManager.GetDesc(select_options[0]));
 		mainGame->stOptions->setVisible(true);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(count > 1);
