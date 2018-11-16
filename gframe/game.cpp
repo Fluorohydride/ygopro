@@ -1657,42 +1657,34 @@ void Game::OnResize() {
 
 	imageManager.ClearTexture(true);
 }
-recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2)
-{
+recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
 	x = x * window_size.Width / 1024;
 	y = y * window_size.Height / 640;
 	x2 = x2 * window_size.Width / 1024;
 	y2 = y2 * window_size.Height / 640;
 	return recti(x, y, x2, y2);
 }
-recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2)
-{
+recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2) {
 	x = x * window_size.Width / 1024 + dx;
 	y = y * window_size.Height / 640 + dy;
 	x2 = x2 * window_size.Width / 1024 + dx2;
 	y2 = y2 * window_size.Height / 640 + dy2;
 	return recti(x, y, x2, y2);
 }
-position2di Game::Resize(s32 x, s32 y, bool reverse)
-{
-	if (reverse)
-	{
+vector2d<s32> Game::Resize(s32 x, s32 y, bool reverse) {
+	if(reverse) {
 		x = x * 1024 / window_size.Width;
 		y = y * 640 / window_size.Height;
-	}
-	else
-	{
+	} else {
 		x = x * window_size.Width / 1024;
 		y = y * window_size.Height / 640;
 	}
-	return position2di(x, y);
+	return vector2d<s32>(x, y);
 }
-recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat)
-{
+recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
-	if (chat)
-	{
+	if(chat) {
 		y = window_size.Height - sy;
 		x2 = window_size.Width;
 		y2 = y + sy;
@@ -1704,8 +1696,7 @@ recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat)
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
 }
-recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2)
-{
+recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2) {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
 	x = (x + sx / 2 - 100) * window_size.Width / 1024 - sx / 2 + 100;

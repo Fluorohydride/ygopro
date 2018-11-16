@@ -156,7 +156,7 @@ public:
 	void OnResize();
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
-	position2di Resize(s32 x, s32 y, bool reverse = false);
+	vector2d<s32> Resize(s32 x, s32 y, bool reverse = false);
 	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
 	void ValidateName(irr::gui::IGUIEditBox* box);
