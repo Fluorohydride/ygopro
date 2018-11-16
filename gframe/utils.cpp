@@ -8,11 +8,11 @@ namespace ygo {
 		return CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
 	}
 	bool Utils::Makedirectory(const std::string& path) {
-		return Makedirectory((const wchar_t*)su::stou16(std::string(path)).c_str());
+		return Makedirectory(BufferIO::DecodeUTF8s(path));
 	}
 #else
 	bool Utils::Makedirectory(const std::wstring& path) {
-		return Makedirectory(su::u16tos(std::u16string((const char16_t*)&path[0])));
+		return Makedirectory(BufferIO::EncodeUTF8s(path));
 	}
 	bool Utils::Makedirectory(const std::string& path) {
 		return !mkdir(&path[0], 0777) || errno == EEXIST;
@@ -31,19 +31,7 @@ namespace ygo {
 		return true;
 	}
 	bool Utils::Movefile(const std::wstring& source, const std::wstring& destination) {
-#ifdef _WIN32
-		std::ifstream  src(source, std::ios::binary);
-		if(!src.is_open())
-			return false;
-		std::ofstream  dst(destination, std::ios::binary);
-		if(!dst.is_open())
-			return false;
-		dst << src.rdbuf();
-		src.close();
-		return true;
-#else
-		return Movefile(su::u16tos(std::u16string((const char16_t*)&source[0])), su::u16tos(std::u16string((const char16_t*)&destination[0])));
-#endif
+		return Movefile(BufferIO::EncodeUTF8s(source), BufferIO::EncodeUTF8s(destination));
 	}
 	void Utils::initUtils() {
 		//create directories if missing
