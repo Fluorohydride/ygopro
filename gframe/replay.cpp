@@ -249,35 +249,11 @@ bool Replay::ReadStream(std::vector<ReplayPacket>* stream) {
 	}
 	return !!stream->size();
 }
-bool Replay::DeleteReplay(const wchar_t* name) {
-	wchar_t fname[256];
-	myswprintf(fname, L"./replay/%ls", name);
-#ifdef WIN32
-	BOOL result = DeleteFileW(fname);
-	return !!result;
-#else
-	char filefn[256];
-	BufferIO::EncodeUTF8(fname, filefn);
-	int result = unlink(filefn);
-	return result == 0;
-#endif
+bool Replay::DeleteReplay(const std::wstring& name) {
+	return Utils::Deletefile(L"./replay/" + name + L".ydk");
 }
-bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
-	wchar_t oldfname[256];
-	wchar_t newfname[256];
-	myswprintf(oldfname, L"./replay/%ls", oldname);
-	myswprintf(newfname, L"./replay/%ls", newname);
-#ifdef WIN32
-	BOOL result = MoveFileW(oldfname, newfname);
-	return !!result;
-#else
-	char oldfilefn[256];
-	char newfilefn[256];
-	BufferIO::EncodeUTF8(oldfname, oldfilefn);
-	BufferIO::EncodeUTF8(newfname, newfilefn);
-	int result = rename(oldfilefn, newfilefn);
-	return result == 0;
-#endif
+bool Replay::RenameReplay(const std::wstring& oldname, const std::wstring& newname) {
+	return Utils::Movefile(L"./replay/" + oldname, L"./replay/" + newname);
 }
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
 	if(pdata - replay_data >= (int)replay_size)

@@ -47,7 +47,7 @@ public:
 	bool LoadDeck(const wchar_t* file);
 	bool LoadDeckDouble(const wchar_t* file, const wchar_t* file2);
 	bool SaveDeck(Deck& deck, const wchar_t* name);
-	bool DeleteDeck(Deck& deck, const wchar_t* name);
+	bool DeleteDeck(Deck& deck, const std::wstring& name);
 };
 
 extern DeckManager deckManager;

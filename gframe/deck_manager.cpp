@@ -372,17 +372,7 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	fclose(fp);
 	return true;
 }
-bool DeckManager::DeleteDeck(Deck& deck, const wchar_t* name) {
-	wchar_t file[64];
-	myswprintf(file, L"./deck/%ls.ydk", name);
-#ifdef WIN32
-	BOOL result = DeleteFileW(file);
-	return !!result;
-#else
-	char filefn[256];
-	BufferIO::EncodeUTF8(file, filefn);
-	int result = unlink(filefn);
-	return result == 0;
-#endif
+bool DeckManager::DeleteDeck(Deck& deck, const std::wstring& name) {
+	return Utils::Deletefile(L"./deck/" + name + L".ydk");
 }
 }
