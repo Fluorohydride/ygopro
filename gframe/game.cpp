@@ -283,7 +283,10 @@ bool Game::Initialize() {
 	posY += 30;
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
-	elmTabHelperLast = chkQuickAnimation;
+	posY += 30;
+	chkAutoSaveReplay = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1366));
+	chkAutoSaveReplay->setChecked(gameConf.auto_save_replay != 0);
+	elmTabHelperLast = chkAutoSaveReplay;
 	//system
 	irr::gui::IGUITab* _tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	_tabSystem->setRelativePosition(recti(16, 49, 299, 362));
@@ -1014,6 +1017,7 @@ void Game::LoadConfig() {
 	gameConf.defaultOT = 1;
 	gameConf.enable_bot_mode = 0;
 	gameConf.quick_animation = 0;
+	gameConf.auto_save_replay = 0;
 	gameConf.enable_sound = true;
 	gameConf.sound_volume = 0.5;
 	gameConf.enable_music = true;
@@ -1087,6 +1091,8 @@ void Game::LoadConfig() {
 			gameConf.enable_bot_mode = atoi(valbuf);
 		} else if(!strcmp(strbuf, "quick_animation")) {
 			gameConf.quick_animation = atoi(valbuf);
+		} else if(!strcmp(strbuf, "auto_save_replay")) {
+			gameConf.auto_save_replay = atoi(valbuf);
 		} else if(!strcmp(strbuf, "window_maximized")) {
 			gameConf.window_maximized = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "window_width")) {
@@ -1168,6 +1174,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
+	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	fprintf(fp, "window_height = %d\n", gameConf.window_height);
@@ -1348,7 +1355,7 @@ void Game::ErrorLog(const char* msg) {
 	if(!fp)
 		return;
 	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
+	tm* localedtime = localtime(&nowtime);
 	char timebuf[40];
 	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
 	fprintf(fp, "[%s]%s\n", timebuf, msg);

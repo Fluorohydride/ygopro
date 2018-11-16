@@ -43,6 +43,7 @@ struct Config {
 	int defaultOT;
 	int enable_bot_mode;
 	int quick_animation;
+	int auto_save_replay;
 	bool enable_sound;
 	bool enable_music;
 	double sound_volume;
@@ -270,6 +271,7 @@ public:
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
+	irr::gui::IGUICheckBox* chkAutoSaveReplay;
 	irr::gui::IGUIWindow* tabSystem;
 	irr::gui::IGUIElement* elmTabSystemLast;
 	irr::gui::IGUIScrollBar* scrTabSystem;
