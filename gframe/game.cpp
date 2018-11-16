@@ -97,6 +97,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
+	PopulateResourcesDirectories();
 	dataManager.LoadStrings("./expansions/strings.conf");
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
@@ -1741,13 +1742,20 @@ std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 	return res;
 }
 byte* Game::ScriptReader(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-	if(buffer)
-		return buffer;
-	else
-		return default_script_reader(script_name, slen);
+	static std::string buffer;
+	IReadFile* file = nullptr;
+	for(auto& path : mainGame->resource_dirs) {
+		file = mainGame->filesystem->createAndOpenFile((path + script_name).c_str());
+		if(file)
+			break;
+	}
+	if(!file && !(file = mainGame->filesystem->createAndOpenFile(script_name)))
+		return 0;
+	const auto size = file->getSize();
+	buffer.reserve(size);
+	*slen = file->read(&buffer[0], size);
+	file->drop();
+	return (byte*)&buffer[0];
 }
 int Game::MessageHandler(long fduel, int type) {
 	if(!enable_log)
@@ -1756,6 +1764,14 @@ int Game::MessageHandler(long fduel, int type) {
 	get_log_message(fduel, (byte*)msgbuf);
 	mainGame->AddDebugMsg(msgbuf);
 	return 0;
+}
+void Game::PopulateResourcesDirectories() {
+#define LF(x) resource_dirs.push_back(filesystem->getAbsolutePath(x).c_str());
+	LF("./expansions/script/");
+	LF("./expansions/pics/");
+	LF("./pics/");
+	LF("./script/");
+#undef LF
 }
 
 

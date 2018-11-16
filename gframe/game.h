@@ -226,6 +226,8 @@ public:
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
 	io::IFileSystem* filesystem;
+	void PopulateResourcesDirectories();
+	std::vector<std::string> resource_dirs;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;

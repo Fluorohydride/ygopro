@@ -153,7 +153,7 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 			dest->setPixel(dx, dy, pxl);
 		}
 }
-irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s32 height) {
+irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 width, s32 height) {
 	irr::video::ITexture* texture;
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);
 	if(srcimg == NULL)
@@ -170,17 +170,14 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s3
 	return texture;
 }
 irr::video::ITexture* ImageManager::LoadCardTexture(int code, int width, int height) {
-	char file[256];
-	auto f = [&](const char* path) {
-		sprintf(file, path, code);
-		return GetTextureFromFile(file, width, height);
-	};
 	irr::video::ITexture* img = nullptr;
-	if(!(img = f("expansions/pics/%d.png")))
-		if(!(img = f("expansions/pics/%d.jpg")))
-			if(!(img = f("pics/%d.png")))
-				img = f("pics/%d.jpg");
-	return img;
+	for(auto& path : mainGame->resource_dirs) {
+		for(auto& extension : { ".png", ".jpg" }) {
+			if(img = GetTextureFromFile((path + std::to_string(code) + extension).c_str(), width, height))
+				return img;
+		}
+	}
+	return nullptr;
 }
 irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	if(code == 0)
@@ -216,16 +213,13 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
-		char file[256];
-		auto f = [&](const char* path) {
-			sprintf(file, path, code);
-			return driver->getTexture(file);
-		};
 		irr::video::ITexture* img = nullptr;
-		if(!(img = f("expansions/pics/field/%d.png")))
-			if(!(img = f("expansions/pics/field/%d.jpg")))
-				if(!(img = f("pics/field/%d.png")))
-					img = f("pics/field/%d.jpg");
+		for(auto& path : mainGame->resource_dirs) {
+			for(auto& extension : { ".png", ".jpg" }) {
+				if(img = driver->getTexture((path + "field/" + std::to_string(code) + extension).c_str()))
+					return img;
+			}
+		}
 		tFields[code] = img;
 		return img;
 	}
