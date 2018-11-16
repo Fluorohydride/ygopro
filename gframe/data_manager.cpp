@@ -49,17 +49,14 @@ bool DataManager::LoadDB(const char* file) {
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas.insert(std::make_pair(cd.code, cd));
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
-				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.name = strBuffer;
+				cs.name = BufferIO::DecodeUTF8s(text);
 			}
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 13)) {
-				BufferIO::DecodeUTF8(text, strBuffer);
-				cs.text = strBuffer;
+				cs.text = BufferIO::DecodeUTF8s(text);
 			}
 			for(int i = 0; i < 16; ++i) {
 				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 14)) {
-					BufferIO::DecodeUTF8(text, strBuffer);
-					cs.desc[i] = strBuffer;
+					cs.desc[i] = BufferIO::DecodeUTF8s(text);
 				}
 			}
 			_strings.emplace(cd.code, cs);

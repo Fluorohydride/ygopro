@@ -907,8 +907,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	auto files = FindfolderFiles("./deck/", ".ydk");
 	for(auto& file : files) {
 		wchar_t wname[256];
-		BufferIO::DecodeUTF8(file.substr(0, file.size() - 4).c_str(), wname);
-		cbDeck->addItem(wname);
+		cbDeck->addItem(BufferIO::DecodeUTF8s(file.substr(0, file.size() - 4)).c_str());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
@@ -1233,7 +1232,7 @@ void Game::ClearCardInfo(int player) {
 	stText->setText(L"");
 	showingcard = 0;
 }
-void Game::AddChatMsg(const wchar_t* msg, int player) {
+void Game::AddChatMsg(const std::wstring& msg, int player) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
@@ -1298,8 +1297,7 @@ void Game::ClearChatMsg() {
 void Game::AddDebugMsg(const char* msg) {
 	if (enable_log & 0x1) {
 		wchar_t wbuf[1024];
-		BufferIO::DecodeUTF8(msg, wbuf);
-		AddChatMsg(wbuf, 9);
+		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9);
 	}
 	if (enable_log & 0x2) {
 		char msgbuf[1040];
@@ -1713,27 +1711,27 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	obj->setText(text.c_str());
 }
 std::wstring Game::ReadPuzzleMessage(const char* script_name) {
-	std::ifstream infile(script_name);
-	std::wstring str((std::istreambuf_iterator<char>(infile)),
-		std::istreambuf_iterator<char>());
-	std::wstring res = L"";
-	size_t start = str.find(L"--[[message");
-	if(start != std::wstring::npos) {
-		size_t end = str.find(L"]]", start);
-		res = str.substr(start + 11, end - (start + 11));
-		int len = 0;
-		for(wchar_t c : res) {
-			if(iswalnum(c))
-				break;
-			len++;
-			if(c == L'\n') {
-				break;
-			}
+	std::ifstream infile(script_name, std::ifstream::in);
+	std::string str;
+	std::string res = "";
+	size_t start = std::string::npos;
+	while(std::getline(infile, str)) {
+		if(str.empty())
+			continue;
+		if(start == std::string::npos) {
+			start = str.find("--[[message");
+			if(start == std::string::npos)
+				continue;
+			str = str.substr(start + 11);
 		}
-		if(len)
-			res = res.substr(len);
+		size_t end = str.find("]]");
+		res += str;
+		if(end != std::string::npos) {
+			res = res.substr(0, res.size() - (str.size() - end));
+			break;
+		}
 	}
-	return res;
+	return BufferIO::DecodeUTF8s(res);
 }
 byte* Game::ScriptReader(const char* script_name, int* slen) {
 	static std::string buffer;
