@@ -181,7 +181,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.Lock();
-				mainGame->wRenameDeck->setText(dataManager.GetSysString(1367));
+				mainGame->wRenameDeck->setText(dataManager.GetSysString(1376));
 				mainGame->ebREName->setText(mainGame->cbDBDecks->getItem(sel));
 				mainGame->PopupElement(mainGame->wRenameDeck);
 				mainGame->gMutex.Unlock();
@@ -200,7 +200,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					if(DeckManager::RenameDeck(mainGame->cbDBDecks->getItem(prev_sel), newname)) {
 						mainGame->RefreshDeck(mainGame->cbDBDecks);
 						mainGame->cbDBDecks->setSelected(prev_sel);
-						mainGame->stACMessage->setText(dataManager.GetSysString(1366));
+						mainGame->stACMessage->setText(dataManager.GetSysString(1375));
 					        mainGame->PopupElement(mainGame->wACMessage, 20);
 					} else {
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365));
