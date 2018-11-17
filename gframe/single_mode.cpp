@@ -128,18 +128,25 @@ int SingleMode::SinglePlayThread(void* param) {
 	}
 	last_replay.EndRecord();
 	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
-	char timebuf[40];
-	strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
-	size_t size = strlen(timebuf) + 1;
-	wchar_t timetext[80];
-	mbstowcs(timetext, timebuf, size);
+	tm* localedtime = localtime(&nowtime);
+	wchar_t timetext[40];
+	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
 	mainGame->ebRSName->setText(timetext);
-	mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
-	mainGame->PopupElement(mainGame->wReplaySave);
-	mainGame->gMutex.Unlock();
-	mainGame->replaySignal.Reset();
-	mainGame->replaySignal.Wait();
+	if(!mainGame->chkAutoSaveReplay->isChecked()) {
+		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
+		mainGame->PopupElement(mainGame->wReplaySave);
+		mainGame->gMutex.Unlock();
+		mainGame->replaySignal.Reset();
+		mainGame->replaySignal.Wait();
+	} else {
+		mainGame->actionParam = 1;
+		wchar_t msgbuf[256];
+		myswprintf(msgbuf, dataManager.GetSysString(1367), timetext);
+		mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, msgbuf);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(30);
+	}
 	if(mainGame->actionParam)
 		last_replay.SaveReplay(mainGame->ebRSName->getText());
 	end_duel(pduel);

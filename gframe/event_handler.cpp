@@ -424,6 +424,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->wCardSelect->setText(dataManager.GetSysString(568));
 						list_command = COMMAND_OPERATION;
 					}
+					std::sort(selectable_cards.begin(), selectable_cards.end(), ClientCard::client_card_sort);
 					ShowSelectCard(true, true);
 				}
 				break;
@@ -580,6 +581,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				}
 				list_command = COMMAND_LIST;
+				std::sort(selectable_cards.begin(), selectable_cards.end(), ClientCard::client_card_sort);
 				ShowSelectCard(true);
 				break;
 			}
@@ -2232,6 +2234,8 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	if(pcard->code) {
 		str.append(dataManager.GetName(pcard->code));
 	}
+	if(pcard->status & STATUS_PROC_COMPLETE)
+		str.append(L"\n").append(dataManager.GetSysString(224));
 	for(size_t i = 0; i < chains.size(); ++i) {
 		wchar_t formatBuffer[2048];
 		auto chit = chains[i];
