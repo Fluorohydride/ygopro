@@ -256,7 +256,7 @@ void RelayDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
 	char* deckbuf = (char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
-	players[dp->type].deck_error = deckManager.LoadDeck(players[dp->type].pdeck, (int*)deckbuf, mainc, sidec, 0, 0, host_info.extra_rules & DOUBLE_DECK);
+	players[dp->type].deck_error = deckManager.LoadDeck(players[dp->type].pdeck, (int*)deckbuf, mainc, sidec);
 }
 void RelayDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)

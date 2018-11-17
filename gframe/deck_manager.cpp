@@ -174,68 +174,47 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	return 0;
 }
-int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2, bool doubled) {
-	std::vector<int> vect;
-	vect.insert(vect.begin(), dbuf, dbuf + mainc + sidec + mainc2 + sidec2);
-	return LoadDeck(deck, vect, mainc, sidec, mainc2, sidec2, doubled);
+int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2) {
+	std::vector<int> mainvect;
+	std::vector<int> sidevect;
+	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc);
+	dbuf += mainc;
+	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec);
+	dbuf += sidec;
+	mainvect.insert(mainvect.end(), dbuf, dbuf);
+	dbuf += mainc2;
+	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec2);
+	return LoadDeck(deck, mainvect, sidevect);
 }
-int DeckManager::LoadDeck(Deck& deck, std::vector<int> dbuf, int mainc, int sidec, int mainc2, int sidec2, bool doubled) {
+int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist) {
 	deck.clear();
-	int code;
-	int d = 1;
-	if(doubled)
-		d = 2;
 	int errorcode = 0;
 	CardData cd;
-	for(int i = 0; i < mainc; ++i) {
-		code = dbuf[i];
+	for(auto code : mainlist) {
+		if(cd.type & TYPE_TOKEN)
+			continue;
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
 		}
-		if(cd.type & TYPE_TOKEN)
-			continue;
-		else if((cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd.type & TYPE_LINK && cd.type & TYPE_MONSTER)) && deck.extra.size() < 15 * d) {
-			deck.extra.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
-		} else if(deck.main.size() < 60 * d) {
+		else if((cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd.type & TYPE_LINK && cd.type & TYPE_MONSTER))) {
+			deck.extra.push_back(dataManager.GetCodePointer(code));
+		} else {
 			deck.main.push_back(dataManager.GetCodePointer(code));
 		}
 	}
-	for(int i = 0; i < sidec; ++i) {
-		code = dbuf[mainc + i];
+	for(auto code : sidelist) {
+		if(cd.type & TYPE_TOKEN)
+			continue;
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
 		}
-		if(cd.type & TYPE_TOKEN)
-			continue;
-		if(deck.side.size() < 15 * d)
-			deck.side.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
-	}
-	for(int i = 0; i < mainc2; ++i) {
-		code = dbuf[mainc + sidec + i];
-		if(!dataManager.GetData(code, &cd))
-			continue;
-		if(cd.type & TYPE_TOKEN)
-			continue;
-		else if(cd.type & 0x802040 && deck.extra.size() < 30) {
-			deck.extra.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
-		} else if(deck.main.size() < 120) {
-			deck.main.push_back(dataManager.GetCodePointer(code));
-		}
-	}
-	for(int i = 0; i < sidec2; ++i) {
-		code = dbuf[mainc + sidec + mainc2 + i];
-		if(!dataManager.GetData(code, &cd))
-			continue;
-		if(cd.type & TYPE_TOKEN)
-			continue;
-		if(deck.side.size() < 30)
-			deck.side.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
+		deck.side.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
 	}
 	return errorcode;
 }
-std::vector<int> LoadCardList(const std::wstring& name, int* retmainc = nullptr, int* retsidec = nullptr, std::vector<int>* cardlist = nullptr) {
+std::vector<int> LoadCardList(const std::wstring& name, std::vector<int>* mainlist = nullptr, std::vector<int>* sidelist = nullptr, int* retmainc = nullptr, int* retsidec = nullptr) {
 	std::vector<int> res;
 	std::ifstream deck(name, std::ifstream::in);
 	if(!deck.is_open())
@@ -256,18 +235,21 @@ std::vector<int> LoadCardList(const std::wstring& name, int* retmainc = nullptr,
 		if(!str.empty()) {
 			int code = std::stoi(str);
 			res.push_back(code);
-			if(cardlist)
-				cardlist->push_back(code);
 			if(is_side) {
+				if(sidelist)
+					sidelist->push_back(code);
 				sidec++;
-				if(retsidec)
-					*retsidec++;
+			} else {
+				if(mainlist)
+					mainlist->push_back(code);
 			}
 		}
 	}
-	if(retmainc)
-		(*retmainc) = res.size() - sidec;
 	deck.close();
+	if(retmainc)
+		*retmainc = res.size() - sidec;
+	if(retsidec)
+		*retsidec = sidec;
 	return res;
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
@@ -280,7 +262,7 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	for(auto& card : deck.side)
 		pcount[card->first]++;
 	Deck ndeck;
-	LoadDeck(ndeck, dbuf, mainc, sidec,0,0,true);
+	LoadDeck(ndeck, dbuf, mainc, sidec);
 	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
 		return false;
 	for(auto& card : ndeck.main)
@@ -295,20 +277,18 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	return true;
 }
 bool DeckManager::LoadDeck(const std::wstring& file) {
-	int mainc = 0;
-	int sidec = 0;
-	std::vector<int> cardlist = LoadCardList(L"./deck/" + file + L".ydk", &mainc, &sidec);
-	LoadDeck(current_deck, cardlist, mainc, sidec);
+	std::vector<int> mainlist;
+	std::vector<int> sidelist;
+	std::vector<int> cardlist = LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist);
+	LoadDeck(current_deck, mainlist, sidelist);
 	return true;
 }
 bool DeckManager::LoadDeckDouble(const std::wstring& file, const std::wstring& file2) {
-	int mainc1 = 0;
-	int sidec1 = 0;
-	std::vector<int> cardlist = LoadCardList(L"./deck/" + file + L".ydk", &mainc1, &sidec1);
-	int mainc2 = 0;
-	int sidec2 = 0;
-	LoadCardList(L"./deck/" + file2 + L".ydk", &mainc1, &sidec1, &cardlist);
-	LoadDeck(current_deck, cardlist, mainc1, sidec1, mainc2, sidec2);
+	std::vector<int> mainlist;
+	std::vector<int> sidelist;
+	LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist);
+	LoadCardList(L"./deck/" + file2 + L".ydk", &mainlist, &sidelist);
+	LoadDeck(current_deck, mainlist, sidelist);
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const std::wstring& name) {

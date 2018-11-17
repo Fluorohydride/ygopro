@@ -41,8 +41,8 @@ public:
 	const wchar_t* GetLFListName(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes = 0);
 	int TypeCount(std::vector<code_pointer> cards, int type);
-	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0, bool doubled = false);
-	int LoadDeck(Deck& deck, std::vector<int> dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0, bool doubled = false);
+	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0);
+	int LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadDeck(const std::wstring& file);
 	bool LoadDeckDouble(const std::wstring& file, const std::wstring& file2);
