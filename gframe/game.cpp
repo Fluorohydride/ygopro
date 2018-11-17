@@ -570,6 +570,7 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1316));
 	cbLimit->addItem(dataManager.GetSysString(1317));
 	cbLimit->addItem(dataManager.GetSysString(1318));
+	cbLimit->addItem(dataManager.GetSysString(1320));
 	cbLimit->addItem(dataManager.GetSysString(1240));
 	cbLimit->addItem(dataManager.GetSysString(1241));
 	cbLimit->addItem(dataManager.GetSysString(1242));

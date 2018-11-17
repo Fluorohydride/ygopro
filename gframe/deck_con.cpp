@@ -74,7 +74,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
-	filterList = &deckManager._lfList[0].content;
+	filterList = &deckManager._lfList[0];
 	mainGame->cbDBLFList->setSelected(0);
 	ClearSearch();
 	mouse_pos.set(0, 0);
@@ -331,7 +331,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
-				filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
+				filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
+				StartFilter();
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
@@ -465,6 +466,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1316));
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1317));
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1318));
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1320));
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1240));
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1241));
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1242));
@@ -744,7 +746,7 @@ void DeckBuilder::GetHoveredCard() {
 void DeckBuilder::StartFilter() {
 	filter_type = mainGame->cbCardType->getSelected();
 	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-	filter_lm = mainGame->cbLimit->getSelected();
+	filter_lm = static_cast<search_filters>(mainGame->cbLimit->getSelected());
 	if(filter_type == 1) {
 		filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
 		filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
@@ -837,24 +839,31 @@ void DeckBuilder::FilterCards() {
 			continue;
 		if(filter_lm) {
 			unsigned int limitcode = ptr->first;
-			auto flit = filterList->find(limitcode);
-			if (flit == filterList->end())
+			auto flit = filterList->content.find(limitcode);
+			if (flit == filterList->content.end())
 				limitcode = ptr->second.alias ? ptr->second.alias : ptr->first;
-			if(filter_lm <= 3 && (!filterList->count(limitcode) || (*filterList)[limitcode] != filter_lm - 1))
+			if(filter_lm <= FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
 				continue;
-			if(filter_lm == 4 && data.ot != 1)
+			if(filter_lm == FILTER_UNLIMITED) {
+				if(filterList->whitelist) {
+					if(!filterList->content.count(limitcode) || filterList->content[limitcode] < 3)
+						continue;
+				} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
+						continue;
+			}
+			if(filter_lm == FILTER_OCG && data.ot != 0x1)
 				continue;
-			if(filter_lm == 5 && data.ot != 2)
+			if(filter_lm == FILTER_TCG && data.ot != 0x2)
 				continue;
-			if(filter_lm == 6 && data.ot != 3)
+			if(filter_lm == FILTER_TCG_OCG && data.ot != 0x3)
 				continue;
-			if(filter_lm == 7 && data.ot != 4)
+			if(filter_lm == FILTER_ANIME && data.ot != 0x4)
 				continue;
-			if(filter_lm == 8 && data.ot != 8)
+			if(filter_lm == FILTER_ILLEGAL && data.ot != 0x8)
 				continue;
-			if(filter_lm == 9 && data.ot != 16)
+			if(filter_lm == FILTER_VIDEOGAME && data.ot != 0x10)
 				continue;
-			if(filter_lm == 10 && data.ot != 32)
+			if(filter_lm == FILTER_CUSTOM && data.ot != 0x20)
 				continue;
 		}
 		if(pstr) {
@@ -1015,7 +1024,7 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 	int found = 0;
 	std::unordered_set<int> limit_codes;
 	auto f=[&](int code, int alias){
-		if(filterList->find(code) != filterList->end())
+		if(filterList->content.find(code) != filterList->content.end())
 			limit_codes.insert(code);
 		else
 			limit_codes.insert(alias);
@@ -1034,10 +1043,12 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 	f2(deckManager.current_deck.side);
 	int limit = 3;
 	for(int code : limit_codes) {
-		auto flit = filterList->find(code);
-		if(flit != filterList->end())
+		auto flit = filterList->content.find(code);
+		if(flit != filterList->content.end())
 			limit = std::min(limit,flit->second);
 	}
+	if(limit_codes.empty() && filterList->whitelist)
+		limit = 0;
 	return limit > found;
 }
 }

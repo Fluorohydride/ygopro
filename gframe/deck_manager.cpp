@@ -27,7 +27,12 @@ void DeckManager::LoadLFListSingle(const char* path) {
 			lflist.listName = BufferIO::DecodeUTF8s(str.substr(1));
 			lflist.content.clear();
 			lflist.hash = 0x7dfcee6a;
+			lflist.whitelist = false;
 			continue;
+		}
+		const std::string key("$whitelist");
+		if(str.substr(0, key.size()) == key) {
+			lflist.whitelist = true;
 		}
 		if(!lflist.hash)
 			continue;
@@ -55,6 +60,7 @@ void DeckManager::LoadLFList() {
 	nolimit.listName = L"N/A";
 	nolimit.hash = 0;
 	nolimit.content.clear();
+	nolimit.whitelist = false;
 	_lfList.push_back(nolimit);
 }
 const wchar_t* DeckManager::GetLFListName(int lfhash) {
@@ -73,15 +79,16 @@ int DeckManager::TypeCount(std::vector<code_pointer> cards, int type) {
 }
 int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes) {
 	std::unordered_map<int, int> ccount;
-	std::unordered_map<int, int>* list = 0;
-	for(size_t i = 0; i < _lfList.size(); ++i) {
-		if(_lfList[i].hash == (unsigned int)lfhash) {
-			list = &_lfList[i].content;
+	LFList* curlist = nullptr;
+	for(auto& list : _lfList) {
+		if(list.hash == (unsigned int)lfhash) {
+			curlist = &list;
 			break;
 		}
 	}
-	if(!list)
+	if(!curlist)
 		return 0;
+	auto list = &curlist->content;
 	int dc = 0;
 	if(TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
 		return (DECKERROR_FORBTYPE << 28);
@@ -135,7 +142,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		auto it = list->find(cit->first);
 		if (it == list->end())
 			it = list->find(code);
-		if(it != list->end() && dc > it->second)
+		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
 			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
 	for(size_t i = 0; i < deck.extra.size(); ++i) {
@@ -152,7 +159,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		auto it = list->find(cit->first);
 		if(it == list->end())
 			it = list->find(code);
-		if(it != list->end() && dc > it->second)
+		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
 			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
 	for(size_t i = 0; i < deck.side.size(); ++i) {
@@ -169,7 +176,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		auto it = list->find(cit->first);
 		if(it == list->end())
 			it = list->find(code);
-		if(it != list->end() && dc > it->second)
+		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
 			return (DECKERROR_LFLIST << 28) + cit->first;
 	}
 	return 0;
@@ -191,12 +198,12 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 	int errorcode = 0;
 	CardData cd;
 	for(auto code : mainlist) {
-		if(cd.type & TYPE_TOKEN)
-			continue;
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
 		}
+		if(cd.type & TYPE_TOKEN)
+			continue;
 		else if((cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd.type & TYPE_LINK && cd.type & TYPE_MONSTER))) {
 			deck.extra.push_back(dataManager.GetCodePointer(code));
 		} else {
@@ -204,12 +211,12 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 		}
 	}
 	for(auto code : sidelist) {
-		if(cd.type & TYPE_TOKEN)
-			continue;
 		if(!dataManager.GetData(code, &cd)) {
 			errorcode = code;
 			continue;
 		}
+		if(cd.type & TYPE_TOKEN)
+			continue;
 		deck.side.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
 	}
 	return errorcode;

@@ -2,6 +2,7 @@
 #define DECK_CON_H
 
 #include "config.h"
+#include "deck_manager.h"
 #include <unordered_map>
 #include <vector>
 #include "client_card.h"
@@ -10,6 +11,20 @@ namespace ygo {
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
+	enum search_filters {
+		FILTER_NONE,
+		FILTER_BANNED,
+		FILTER_LIMITED,
+		FILTER_SEMI_LIMITED,
+		FILTER_UNLIMITED,
+		FILTER_OCG,
+		FILTER_TCG,
+		FILTER_TCG_OCG,
+		FILTER_ANIME,
+		FILTER_ILLEGAL,
+		FILTER_VIDEOGAME,
+		FILTER_CUSTOM
+	};
 	virtual bool OnEvent(const irr::SEvent& event);
 	void Initialize();
 	void Terminate();
@@ -44,7 +59,7 @@ public:
 	unsigned int filter_scltype;
 	unsigned int filter_scl;
 	unsigned int filter_marks;
-	int filter_lm;
+	search_filters filter_lm;
 	position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;
@@ -58,7 +73,7 @@ public:
 	int prev_deck;
 	s32 prev_operation;
 
-	std::unordered_map<int, int>* filterList;
+	LFList* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
 };

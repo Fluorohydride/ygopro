@@ -1076,10 +1076,10 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag, recti* cliprect) {
+void Game::DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag, recti* cliprect) {
 	int code = cp->first;
 	int lcode = cp->first;
-	if(!lflist->count(lcode))
+	if(!lflist->content.count(lcode))
 		lcode = cp->second.alias ? cp->second.alias : cp->first;
 	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
 	if (img == NULL)
@@ -1092,8 +1092,8 @@ void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, i
 		limitloc = recti(pos.X, pos.Y, pos.X + 20 * window_size.Width / 1024, pos.Y + 20 * window_size.Height / 640);
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
-	if(!mainGame->is_siding && lflist->count(lcode)) {
-		switch((*lflist)[lcode]) {
+	if(!mainGame->is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {
+		switch(lflist->content[lcode]) {
 		case 0:
 			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
 			break;
@@ -1262,23 +1262,23 @@ void Game::DrawDeckBd() {
 			textFont->draw(ptype, Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
 			textBuffer[0] = 0;
 		}
-		if((ptr->second.ot & 0x3f) == 1)
+		if((ptr->second.ot & 0x1) == ptr->second.ot)
 			wcscat(textBuffer, L"[OCG]");
-		else if((ptr->second.ot & 0x3f) == 2)
+		else if((ptr->second.ot & 0x2) == ptr->second.ot)
 			wcscat(textBuffer, L"[TCG]");
-		else if((ptr->second.ot & 0x3f) == 4)
+		else if((ptr->second.ot & 0x4) == ptr->second.ot)
 			wcscat(textBuffer, L"[Anime]");
-		else if((ptr->second.ot & 0x3f) == 8)
+		else if((ptr->second.ot & 0x8) == ptr->second.ot)
 			wcscat(textBuffer, L"[Illegal]");
-		else if((ptr->second.ot & 0x3f) == 16)
+		else if((ptr->second.ot & 0x10) == ptr->second.ot)
 			wcscat(textBuffer, L"[VG]");
-		else if((ptr->second.ot & 0x3f) == 32)
+		else if((ptr->second.ot & 0x20) == ptr->second.ot)
 			wcscat(textBuffer, L"[Custom]");
 		textFont->draw(textBuffer, Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
 		textFont->draw(textBuffer, Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
 	}
 	if(deckBuilder.is_draging) {
-		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - 22, deckBuilder.dragy - 32), deckBuilder.filterList, true);
+		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - (CARD_THUMB_WIDTH / 2), deckBuilder.dragy - (CARD_THUMB_HEIGHT / 2)), deckBuilder.filterList, true);
 	}
 }
 }
