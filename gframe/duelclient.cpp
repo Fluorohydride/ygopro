@@ -1304,6 +1304,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			wchar_t ynbuf[256];
 			myswprintf(ynbuf, dataManager.GetSysString(200), dataManager.FormatLocation(l, s), dataManager.GetName(code));
 			myswprintf(textBuffer, L"%ls\n%ls", event_string, ynbuf);
+		} else if(desc == 221) {
+			wchar_t ynbuf[256];
+			myswprintf(ynbuf, dataManager.GetSysString(221), dataManager.FormatLocation(l, s), dataManager.GetName(code));
+			myswprintf(textBuffer, L"%ls\n%ls\n%ls", event_string, ynbuf, dataManager.GetSysString(223));
 		} else if(desc < 2048) {
 			myswprintf(textBuffer, dataManager.GetSysString(desc), dataManager.GetName(code));
 		} else {
@@ -1558,6 +1562,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(!forced) {
 				if(count == 0)
 					myswprintf(textBuffer, L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202));
+				else if(select_trigger)
+					myswprintf(textBuffer, L"%ls\n%ls\n%ls", event_string, dataManager.GetSysString(222), dataManager.GetSysString(223));
 				else
 					myswprintf(textBuffer, L"%ls\n%ls", event_string, dataManager.GetSysString(203));
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
