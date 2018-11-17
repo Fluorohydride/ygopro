@@ -40,6 +40,7 @@ struct Config {
 	int separate_clear_button;
 	int auto_search_limit;
 	int search_multiple_keywords;
+	int search_regex;
 	int chkIgnoreDeckChanges;
 	int defaultOT;
 	int enable_bot_mode;
@@ -143,6 +144,8 @@ public:
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
+	bool CheckRegEx(const wchar_t* text, const wchar_t* exp, bool exact = false);
+	bool CheckRegEx(std::wstring text, const wchar_t* exp, bool exact = false);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
@@ -250,6 +253,7 @@ public:
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
 	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUICheckBox* chkMultiKeywords;
+	irr::gui::IGUICheckBox* chkRegex;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -628,6 +632,7 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_AUTO_SEARCH		360
 #define CHECKBOX_MULTI_KEYWORDS		372
+#define CHECKBOX_REGEX				373
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
 #define SCROLL_VOLUME				363

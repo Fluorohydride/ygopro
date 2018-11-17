@@ -902,6 +902,7 @@ void DeckBuilder::FilterCards() {
 				int trycode = BufferIO::GetVal(elements_iterator->c_str());
 				bool tryresult = dataManager.GetData(trycode, 0);
 				if(!tryresult && !CardNameContains(text.name.c_str(), elements_iterator->c_str()) && text.text.find(elements_iterator->c_str()) == std::wstring::npos
+					&& !mainGame->CheckRegEx(text.text, elements_iterator->c_str())
 					&& (!set_code_map[*elements_iterator] || !check_set_code(data, set_code_map[*elements_iterator]))) {
 					is_target = false;
 					break;
@@ -969,7 +970,7 @@ void DeckBuilder::SortList() {
 	auto left = results.begin();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(wcscmp(pstr, dataManager.GetName((*it)->first)) == 0) {
+		if(wcscmp(pstr, dataManager.GetName((*it)->first)) == 0 || mainGame->CheckRegEx(dataManager.GetName((*it)->first), pstr, true)) {
 			std::iter_swap(left, it);
 			++left;
 		}
@@ -1017,6 +1018,8 @@ bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needl
 	if (!haystack) {
 		return false;
 	}
+	if(mainGame->CheckRegEx(haystack, needle))
+		return true;
 	int i = 0;
 	int j = 0;
 	while (haystack[i]) {
