@@ -11,6 +11,7 @@
 #include "CGUISkinSystem/CGUISkinSystem.h"
 #include "CGUICustomText/CGUICustomText.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include "deck_manager.h"
 
 namespace ygo {
 
@@ -124,7 +125,7 @@ public:
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag = false, recti* cliprect = nullptr);
+	void DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag = false, recti* cliprect = nullptr);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
