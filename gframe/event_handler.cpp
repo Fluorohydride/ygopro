@@ -2234,6 +2234,8 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	if(pcard->code) {
 		str.append(dataManager.GetName(pcard->code));
 	}
+	if(pcard->status & STATUS_PROC_COMPLETE)
+		str.append(L"\n").append(dataManager.GetSysString(218));
 	for(size_t i = 0; i < chains.size(); ++i) {
 		wchar_t formatBuffer[2048];
 		auto chit = chains[i];

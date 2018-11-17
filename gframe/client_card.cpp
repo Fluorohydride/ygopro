@@ -18,7 +18,7 @@ ClientCard::ClientCard() {
 	is_showtarget = false;
 	is_showchaintarget = false;
 	is_highlighting = false;
-	is_disabled = false;
+	status = 0;
 	is_reversed = false;
 	cmdFlag = 0;
 	code = 0;
@@ -164,10 +164,8 @@ void ClientCard::UpdateInfo(char* buf) {
 	}
 	if(flag & QUERY_OWNER)
 		owner = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_IS_DISABLED)
-		is_disabled = BufferIO::ReadInt32(buf);
-	if(flag & QUERY_IS_PUBLIC)
-		is_public = BufferIO::ReadInt32(buf);
+	if(flag & QUERY_STATUS)
+		status = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LSCALE) {
 		lscale = BufferIO::ReadInt32(buf);
 		myswprintf(lscstring, L"%d", lscale);
