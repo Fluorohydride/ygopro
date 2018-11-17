@@ -871,10 +871,11 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
 std::vector<std::string> Game::FindfolderFiles(const std::string& path, const std::string& extension, int subdirectorylayers) {
-	auto cwd = filesystem->getWorkingDirectory();
-	filesystem->changeWorkingDirectoryTo(path.c_str());
-	auto list = filesystem->createFileList();
 	std::vector<std::string> res;
+	auto cwd = filesystem->getWorkingDirectory();
+	if(!filesystem->changeWorkingDirectoryTo(path.c_str()))
+		return res;
+	auto list = filesystem->createFileList();
 	for(int i = 0; i < list->getFileCount(); i++) {
 		if(list->isDirectory(i)) {
 			if(subdirectorylayers) {

@@ -693,7 +693,8 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 	if(curList)
 		curList->drop();
 	auto cwd = filesystem->getWorkingDirectory();
-	filesystem->changeWorkingDirectoryTo(curAbsPath);
+	if(!filesystem->changeWorkingDirectoryTo(curAbsPath))
+		return;
 	curList = filesystem->createFileList();
 	for(int i = 0; i < curList->getFileCount(); i++) {
 		ListItem item;
