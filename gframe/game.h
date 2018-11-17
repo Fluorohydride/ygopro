@@ -39,9 +39,12 @@ struct Config {
 	int draw_field_spell;
 	int separate_clear_button;
 	int auto_search_limit;
+	int search_multiple_keywords;
 	int chkIgnoreDeckChanges;
 	int defaultOT;
 	int enable_bot_mode;
+	int quick_animation;
+	int auto_save_replay;
 	bool enable_sound;
 	bool enable_music;
 	double sound_volume;
@@ -130,8 +133,11 @@ public:
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code);
-	void AddChatMsg(wchar_t* msg, int player);
-	void AddDebugMsg(char* msgbuf);
+	void ClearCardInfo(int player = 0);
+	void AddChatMsg(const wchar_t* msg, int player);
+	void ClearChatMsg();
+	void AddDebugMsg(const char* msgbuf);
+	void ErrorLog(const char* msgbuf);
 	void ClearTextures();
 	void CloseDuelWindow();
 
@@ -220,6 +226,7 @@ public:
 	//hint text
 	irr::gui::IGUIStaticText* stHintMsg;
 	irr::gui::IGUIStaticText* stTip;
+	irr::gui::IGUIStaticText* stCardListTip;
 	//infos
 	irr::gui::IGUITabControl* wInfos;
 	irr::gui::IGUIStaticText* stName;
@@ -236,10 +243,13 @@ public:
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
+	irr::gui::IGUICheckBox* chkQuickAnimation;
+	irr::gui::IGUICheckBox* chkAutoSaveReplay;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
 	irr::gui::IGUICheckBox* chkAutoSearch;
+	irr::gui::IGUICheckBox* chkMultiKeywords;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -342,6 +352,7 @@ public:
 	irr::gui::IGUIButton* btnOptionp;
 	irr::gui::IGUIButton* btnOptionn;
 	irr::gui::IGUIButton* btnOptionOK;
+	irr::gui::IGUIButton* btnOption[5];
 	//pos selection
 	irr::gui::IGUIWindow* wPosSelect;
 	irr::gui::CGUIImageButton* btnPSAU;
@@ -539,6 +550,11 @@ extern Game* mainGame;
 #define BUTTON_OPTION_PREV			220
 #define BUTTON_OPTION_NEXT			221
 #define BUTTON_OPTION_OK			222
+#define BUTTON_OPTION_0				223
+#define BUTTON_OPTION_1				224
+#define BUTTON_OPTION_2				225
+#define BUTTON_OPTION_3				226
+#define BUTTON_OPTION_4				227
 #define BUTTON_CARD_0				230
 #define BUTTON_CARD_1				231
 #define BUTTON_CARD_2				232
@@ -546,6 +562,7 @@ extern Game* mainGame;
 #define BUTTON_CARD_4				234
 #define SCROLL_CARD_SELECT			235
 #define BUTTON_CARD_SEL_OK			236
+#define TEXT_CARD_LIST_TIP			237
 #define BUTTON_CMD_ACTIVATE			240
 #define BUTTON_CMD_SUMMON			241
 #define BUTTON_CMD_SPSUMMON			242
@@ -616,9 +633,12 @@ extern Game* mainGame;
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_AUTO_SEARCH		360
+#define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
 #define SCROLL_VOLUME				363
+#define CHECKBOX_DISABLE_CHAT		364
+#define CHECKBOX_QUICK_ANIMATION	369
 
 #define COMBOBOX_SORTTYPE			370
 #define COMBOBOX_LIMIT				371
@@ -631,4 +651,6 @@ extern Game* mainGame;
 #define BUTTON_RENAME_DECK_CANCEL	388
 
 #define DEFAULT_DUEL_RULE			4
+
+#define CARD_ARTWORK_VERSIONS_OFFSET	10
 #endif // GAME_H

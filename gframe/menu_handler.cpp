@@ -27,6 +27,8 @@ void UpdateDeck() {
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 }
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
+	if(mainGame->dField.OnCommonEvent(event))
+		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
@@ -40,16 +42,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		switch(event.GUIEvent.EventType) {
-		case irr::gui::EGET_ELEMENT_HOVERED: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
-				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
-			break;
-		}
-		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
-				mainGame->SetCursor(ECI_NORMAL);
-			break;
-		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			if(id < 110)
 				soundManager.PlaySoundEffect(SOUND_MENU);
@@ -230,16 +222,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
 						break;
 				}
-				mainGame->imgCard->setImage(imageManager.tCover[0]);
+				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);
-				mainGame->stName->setText(L"");
-				mainGame->stInfo->setText(L"");
-				mainGame->stDataInfo->setText(L"");
-				mainGame->stSetName->setText(L"");
-				mainGame->stText->setText(L"");
-				mainGame->scrCardText->setVisible(false);
 				mainGame->wReplayControl->setVisible(true);
 				mainGame->btnReplayStart->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
@@ -453,7 +439,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				std::wstring repinfo;
 				time_t curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);
-				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
+				wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
 				repinfo.append(infobuf);
 				wchar_t namebuf[4][20];
 				ReplayMode::cur_replay.ReadName(namebuf[0]);
@@ -468,7 +454,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
-				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
+				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, repinfo.c_str());
 				break;
 			}
 			case LISTBOX_BOT_LIST: {
@@ -507,49 +493,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			}
-			break;
-		}
-		case irr::gui::EGET_EDITBOX_ENTER: {
-			switch(id) {
-			case EDITBOX_CHAT: {
-				if(mainGame->dInfo.isReplay)
-					break;
-				const wchar_t* input = mainGame->ebChatInput->getText();
-				if(input[0]) {
-					unsigned short msgbuf[256];
-					if(mainGame->dInfo.isStarted) {
-						if(mainGame->dInfo.player_type < 7) {
-							if(mainGame->dInfo.isTag && (mainGame->dInfo.player_type % 2))
-								mainGame->AddChatMsg((wchar_t*)input, 2);
-							else
-								mainGame->AddChatMsg((wchar_t*)input, 0);
-						} else
-							mainGame->AddChatMsg((wchar_t*)input, 10);
-					} else
-						mainGame->AddChatMsg((wchar_t*)input, 7);
-					int len = BufferIO::CopyWStr(input, msgbuf, 256);
-					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
-					mainGame->ebChatInput->setText(L"");
-				}
-				break;
-			}
-			}
-			break;
-		}
-		default: break;
-		}
-		break;
-	}
-	case irr::EET_KEY_INPUT_EVENT: {
-		switch(event.KeyInput.Key) {
-		case irr::KEY_KEY_R: {
-			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
-				mainGame->textFont->setTransparency(true);
-			break;
-		}
-		case irr::KEY_ESCAPE: {
-			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
-				mainGame->device->minimizeWindow();
 			break;
 		}
 		default: break;

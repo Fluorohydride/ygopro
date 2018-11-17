@@ -6,7 +6,7 @@
 #include "image_manager.h"
 #include "game.h"
 #include "materials.h"
-#include "../ocgcore/field.h"
+#include "../ocgcore/common.h"
 
 namespace ygo {
 
@@ -303,7 +303,6 @@ void ClientField::UpdateCard(int controler, int location, int sequence, char* da
 }
 void ClientField::UpdateFieldCard(int controler, int location, char* data) {
 	std::vector<ClientCard*>* lst = 0;
-	std::vector<ClientCard*>::iterator cit;
 	switch(location) {
 	case LOCATION_DECK:
 		lst = &deck[controler];
@@ -330,7 +329,7 @@ void ClientField::UpdateFieldCard(int controler, int location, char* data) {
 	if(!lst)
 		return;
 	int len;
-	for(cit = lst->begin(); cit != lst->end(); ++cit) {
+	for(auto cit = lst->begin(); cit != lst->end(); ++cit) {
 		len = BufferIO::ReadInt32(data);
 		if(len > 8)
 			(*cit)->UpdateInfo(data);
@@ -338,20 +337,19 @@ void ClientField::UpdateFieldCard(int controler, int location, char* data) {
 	}
 }
 void ClientField::ClearCommandFlag() {
-	std::vector<ClientCard*>::iterator cit;
-	for(cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit)
+	for(auto cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
-	for(cit = summonable_cards.begin(); cit != summonable_cards.end(); ++cit)
+	for(auto cit = summonable_cards.begin(); cit != summonable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
-	for(cit = spsummonable_cards.begin(); cit != spsummonable_cards.end(); ++cit)
+	for(auto cit = spsummonable_cards.begin(); cit != spsummonable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
-	for(cit = msetable_cards.begin(); cit != msetable_cards.end(); ++cit)
+	for(auto cit = msetable_cards.begin(); cit != msetable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
-	for(cit = ssetable_cards.begin(); cit != ssetable_cards.end(); ++cit)
+	for(auto cit = ssetable_cards.begin(); cit != ssetable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
-	for(cit = reposable_cards.begin(); cit != reposable_cards.end(); ++cit)
+	for(auto cit = reposable_cards.begin(); cit != reposable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
-	for(cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
+	for(auto cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
 	conti_cards.clear();
 	deck_act = false;
@@ -363,21 +361,20 @@ void ClientField::ClearCommandFlag() {
 	conti_act = false;
 }
 void ClientField::ClearSelect() {
-	std::vector<ClientCard*>::iterator cit;
-	for(cit = selectable_cards.begin(); cit != selectable_cards.end(); ++cit) {
+	for(auto cit = selectable_cards.begin(); cit != selectable_cards.end(); ++cit) {
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
 	}
 }
 void ClientField::ClearChainSelect() {
-	std::vector<ClientCard*>::iterator cit;
-	for(cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
+	for(auto cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
 		(*cit)->cmdFlag = 0;
 		(*cit)->chain_code = 0;
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
 	}
 	conti_cards.clear();
+	deck_act = false;
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
@@ -402,7 +399,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		else if(conti_selecting)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
+			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler]);
 		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
@@ -486,7 +483,7 @@ void ClientField::ShowChainCard() {
 		if(selectable_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 		else
-			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
+			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler]);
 		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
@@ -541,7 +538,7 @@ void ClientField::ShowLocationCard() {
 		if(display_cards[i]->code)
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
 		else
-			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
+			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[display_cards[i]->controler]);
 		mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
@@ -592,6 +589,55 @@ void ClientField::ShowLocationCard() {
 	}
 	mainGame->btnDisplayOK->setVisible(true);
 	mainGame->PopupElement(mainGame->wCardDisplay);
+}
+void ClientField::ShowSelectOption(int select_hint) {
+	selected_option = 0;
+	wchar_t textBuffer[256];
+	int count = select_options.size();
+	bool quickmode = (count <= 5);
+	mainGame->gMutex.Lock();
+	for(int i = 0; (i < count) && quickmode; i++) {
+		const wchar_t* option = dataManager.GetDesc(select_options[i]);
+		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(option);
+		if(dtxt.Width > 310) {
+			quickmode = false;
+			break;
+		}
+		mainGame->btnOption[i]->setText(option);
+	}
+	if(quickmode) {
+		mainGame->stOptions->setVisible(false);
+		mainGame->btnOptionp->setVisible(false);
+		mainGame->btnOptionn->setVisible(false);
+		mainGame->btnOptionOK->setVisible(false);
+		for(int i = 0; i < 5; i++)
+			mainGame->btnOption[i]->setVisible(i < count);
+		recti pos = mainGame->wOptions->getRelativePosition();
+		int newheight = 30 + 40 * count;
+		int oldheight = pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y;
+		pos.UpperLeftCorner.Y = pos.UpperLeftCorner.Y + (oldheight - newheight) / 2;
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
+		mainGame->wOptions->setRelativePosition(pos);
+	} else {
+		mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->guiFont,
+			(wchar_t*)dataManager.GetDesc(select_options[0]));
+		mainGame->stOptions->setVisible(true);
+		mainGame->btnOptionp->setVisible(false);
+		mainGame->btnOptionn->setVisible(count > 1);
+		mainGame->btnOptionOK->setVisible(true);
+		for(int i = 0; i < 5; i++)
+			mainGame->btnOption[i]->setVisible(false);
+		recti pos = mainGame->wOptions->getRelativePosition();
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 140;
+		mainGame->wOptions->setRelativePosition(pos);
+	}
+	if(select_hint)
+		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+	else
+		myswprintf(textBuffer, dataManager.GetSysString(555));
+	mainGame->wOptions->setText(textBuffer);
+	mainGame->PopupElement(mainGame->wOptions);
+	mainGame->gMutex.Unlock();
 }
 void ClientField::ReplaySwap() {
 	std::swap(deck[0], deck[1]);
@@ -1062,7 +1108,7 @@ bool ClientField::ShowSelectSum(bool panelmode) {
 			select_ready = false;
 	}
 	if (select_ready) {
-		ShowCancelOrFinishButton(1);
+		ShowCancelOrFinishButton(2);
 	} else {
 		ShowCancelOrFinishButton(0);
 	}
@@ -1378,8 +1424,23 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+		std::vector<int> cache;
+		cache.swap(ancard);
+		int sel = mainGame->lstANCard->getSelected();
+		int selcode = (sel == -1) ? 0 : cache[sel];
+		mainGame->lstANCard->clear();
+		for(const auto& trycode : cache) {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declarable_type)) {
+				ancard.push_back(trycode);
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				if(trycode == selcode)
+					mainGame->lstANCard->setSelected(cstr.name.c_str());
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
@@ -1410,8 +1471,23 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter)
-		return;
+	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+		std::vector<int> cache;
+		cache.swap(ancard);
+		int sel = mainGame->lstANCard->getSelected();
+		int selcode = (sel == -1) ? 0 : cache[sel];
+		mainGame->lstANCard->clear();
+		for(const auto& trycode : cache) {
+			if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
+				ancard.push_back(trycode);
+				mainGame->lstANCard->addItem(cstr.name.c_str());
+				if(trycode == selcode)
+					mainGame->lstANCard->setSelected(cstr.name.c_str());
+			}
+		}
+		if(!ancard.empty())
+			return;
+	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {

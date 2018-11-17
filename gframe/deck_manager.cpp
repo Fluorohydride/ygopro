@@ -8,9 +8,9 @@ namespace ygo {
 
 DeckManager deckManager;
 
-void DeckManager::LoadLFList() {
+void DeckManager::LoadLFListSingle(const char* path) {
 	LFList* cur = NULL;
-	FILE* fp = fopen("lflist.conf", "r");
+	FILE* fp = fopen(path, "r");
 	char linebuf[256];
 	wchar_t strBuffer[256];
 	if(fp) {
@@ -24,7 +24,7 @@ void DeckManager::LoadLFList() {
 				LFList newlist;
 				_lfList.push_back(newlist);
 				cur = &_lfList[_lfList.size() - 1];
-				memcpy(cur->listName, (const void*)strBuffer, 40);
+				memcpy(cur->listName, (const void*)strBuffer, 20 * sizeof(wchar_t));
 				cur->listName[sa] = 0;
 				cur->content = new std::unordered_map<int, int>;
 				cur->hash = 0x7dfcee6a;
@@ -48,6 +48,10 @@ void DeckManager::LoadLFList() {
 		}
 		fclose(fp);
 	}
+}
+void DeckManager::LoadLFList() {
+	LoadLFListSingle("expansions/lflist.conf");
+	LoadLFListSingle("lflist.conf");
 	LFList nolimit;
 	myswprintf(nolimit.listName, L"N/A");
 	nolimit.hash = 0;
@@ -247,6 +251,8 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
+	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
+		return false;
 	wchar_t file[64];
 	myswprintf(file, L"./deck/%ls.ydk", name);
 	FILE* fp = OpenDeckFile(file, "w");

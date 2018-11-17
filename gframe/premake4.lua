@@ -26,9 +26,9 @@ project "ygopro"
     configuration {"windows", "not vs*"}
         includedirs { "/mingw/include/irrlicht", "/mingw/include/freetype2" }
     configuration "not vs*"
-        buildoptions { "-std=gnu++0x", "-fno-rtti" }
+        buildoptions { "-std=c++14", "-fno-rtti" }
     configuration "not windows"
-        includedirs { "/usr/include/lua", "/usr/include/lua5.3", "/usr/include/lua/5.3", "/usr/include/irrlicht", "/usr/include/freetype2" }
+        includedirs { "/usr/include/irrlicht", "/usr/include/freetype2" }
         excludes { "COSOperator.*" }
         links { "event_pthreads", "GL", "dl", "pthread" }
     configuration "linux"
