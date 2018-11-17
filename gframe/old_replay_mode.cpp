@@ -119,34 +119,6 @@ namespace ygo {
 		int start_hand = cur_replay.ReadInt32();
 		int draw_count = cur_replay.ReadInt32();
 		int opt = cur_replay.ReadInt32();
-		int duel_rule = opt >> 16;
-		int rule = opt >> 16; //backwards compatibility with master rule replays
-		if (rule)
-			switch (rule) {
-			case 1: {
-				opt |= MASTER_RULE_1;
-				break;
-			}
-			case 2: {
-				opt |= MASTER_RULE_2;
-				break;
-			}
-			case 3: {
-				opt |= MASTER_RULE_3;
-				break;
-			}
-			case 4: {
-				opt |= MASTER_RULE_4;
-				break;
-			}
-			}
-		//pre mr4 replay compatibility
-		if (opt & DUEL_OBSOLETE_RULING) {
-			opt &= ~DUEL_OBSOLETE_RULING;
-			opt |= MASTER_RULE_1;
-		}
-		else if (!(opt & 0xff80))
-			opt |= MASTER_RULE_3;
 		mainGame->dInfo.duel_field = 2;
 		if ((opt & DUEL_PZONE) && (opt & DUEL_SEPARATE_PZONE) && (opt & DUEL_EMZONE))
 			mainGame->dInfo.duel_field = 5;
