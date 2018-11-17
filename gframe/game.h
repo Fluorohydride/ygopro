@@ -11,7 +11,6 @@
 #include "CGUISkinSystem/CGUISkinSystem.h"
 #include "CGUICustomText/CGUICustomText.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
-#include "utils.h"
 
 namespace ygo {
 
@@ -133,8 +132,8 @@ public:
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player);
 	void ClearChatMsg();
-	void AddDebugMsg(const char* msgbuf);
-	void ErrorLog(const char* msgbuf);
+	void AddDebugMsg(const std::string& msg);
+	void ErrorLog(const std::string& msg);
 	void ClearTextures();
 	void CloseDuelWindow();
 	bool PlayChant(unsigned int code);

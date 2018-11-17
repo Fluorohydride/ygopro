@@ -182,7 +182,7 @@ bool Game::Initialize() {
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
 	btnRuleCards = env->addButton(rect<s32>(260, 325, 370, 350), wCreateHost, BUTTON_RULE_CARDS, dataManager.GetSysString(1625));
-	wRules = env->addWindow(rect<s32>(630, 100, 1000, 310), false, dataManager.strBuffer);
+	wRules = env->addWindow(rect<s32>(630, 100, 1000, 310), false, L"");
 	wRules->getCloseButton()->setVisible(false);
 	wRules->setDrawTitlebar(false);
 	wRules->setDraggable(true);
@@ -199,7 +199,7 @@ bool Game::Initialize() {
 	cbDuelRule->addItem(dataManager.GetSysString(1263));
 	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
 	btnCustomRule = env->addButton(rect<s32>(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, dataManager.GetSysString(1626));
-	wCustomRules = env->addWindow(rect<s32>(700, 100, 910, 410), false, dataManager.strBuffer);
+	wCustomRules = env->addWindow(rect<s32>(700, 100, 910, 410), false, L"");
 	wCustomRules->getCloseButton()->setVisible(false);
 	wCustomRules->setDrawTitlebar(false);
 	wCustomRules->setDraggable(true);
@@ -609,7 +609,7 @@ bool Game::Initialize() {
 	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(260, 96, 390, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
 	btnClearFilter = env->addButton(rect<s32>(205, 96, 255, 118), wFilter, BUTTON_CLEAR_FILTER, dataManager.GetSysString(1304));
-	wCategories = env->addWindow(rect<s32>(450, 60, 1000, 270), false, dataManager.strBuffer);
+	wCategories = env->addWindow(rect<s32>(450, 60, 1000, 270), false, L"");
 	wCategories->getCloseButton()->setVisible(false);
 	wCategories->setDrawTitlebar(false);
 	wCategories->setDraggable(false);
@@ -618,7 +618,7 @@ bool Game::Initialize() {
 	for(int i = 0; i < 32; ++i)
 		chkCategory[i] = env->addCheckBox(false, recti(10 + (i % 4) * 130, 10 + (i / 4) * 20, 140 + (i % 4) * 130, 30 + (i / 4) * 20), wCategories, -1, dataManager.GetSysString(1100 + i));
 	btnMarksFilter = env->addButton(rect<s32>(155, 96, 240, 118), wFilter, BUTTON_MARKS_FILTER, dataManager.GetSysString(1374));
-	wLinkMarks = env->addWindow(rect<s32>(700, 30, 820, 150), false, dataManager.strBuffer);
+	wLinkMarks = env->addWindow(rect<s32>(700, 30, 820, 150), false, L"");
 	wLinkMarks->getCloseButton()->setVisible(false);
 	wLinkMarks->setDrawTitlebar(false);
 	wLinkMarks->setDraggable(false);
@@ -1278,18 +1278,15 @@ void Game::ClearChatMsg() {
 		chatTiming[i] = 0;
 	}
 }
-void Game::AddDebugMsg(const char* msg) {
+void Game::AddDebugMsg(const std::string& msg) {
 	if (enable_log & 0x1) {
-		wchar_t wbuf[1024];
 		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9);
 	}
 	if (enable_log & 0x2) {
-		char msgbuf[1040];
-		sprintf(msgbuf, "[Script Error]: %s", msg);
-		ErrorLog(msgbuf);
+		ErrorLog("[Script Error]: " + msg);
 	}
 }
-void Game::ErrorLog(const char* msg) {
+void Game::ErrorLog(const std::string& msg) {
 	FILE* fp = fopen("error.log", "at");
 	if(!fp)
 		return;
