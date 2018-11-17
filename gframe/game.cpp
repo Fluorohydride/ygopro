@@ -273,6 +273,9 @@ bool Game::Initialize() {
 	posY += 30;
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
+	posY += 30;
+	chkAutoSaveReplay = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1366));
+	chkAutoSaveReplay->setChecked(gameConf.auto_save_replay != 0);
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	posY = 20;
@@ -871,7 +874,7 @@ void Game::LoadExpansionDB() {
 }
 void Game::LoadExpansionDBDirectry(const char* path) {
 	FileSystem::TraversalDir(path, [path](const char* name, bool isdir) {
-		if(!isdir && !mystrncasecmp(strrchr(name, '.'), ".cdb", 4)) {
+		if(!isdir && strrchr(name, '.') && !mystrncasecmp(strrchr(name, '.'), ".cdb", 4)) {
 			char fpath[1024];
 			sprintf(fpath, "%s/%s", path, name);
 			dataManager.LoadDB(fpath);
@@ -891,7 +894,7 @@ void Game::LoadExpansionStrings() {
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	FileSystem::TraversalDir(L"./deck", [cbDeck](const wchar_t* name, bool isdir) {
-		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
 			size_t len = wcslen(name);
 			wchar_t deckname[256];
 			wcsncpy(deckname, name, len - 4);
@@ -909,14 +912,14 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 void Game::RefreshReplay() {
 	lstReplayList->clear();
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
 			lstReplayList->addItem(name);
 	});
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
 	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
-		if(!isdir && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
 			lstSinglePlayList->addItem(name);
 	});
 }
@@ -999,6 +1002,7 @@ void Game::LoadConfig() {
 	gameConf.defaultOT = 1;
 	gameConf.enable_bot_mode = 0;
 	gameConf.quick_animation = 0;
+	gameConf.auto_save_replay = 0;
 	gameConf.enable_sound = true;
 	gameConf.sound_volume = 0.5;
 	gameConf.enable_music = true;
@@ -1068,6 +1072,8 @@ void Game::LoadConfig() {
 			gameConf.enable_bot_mode = atoi(valbuf);
 		} else if(!strcmp(strbuf, "quick_animation")) {
 			gameConf.quick_animation = atoi(valbuf);
+		} else if(!strcmp(strbuf, "auto_save_replay")) {
+			gameConf.auto_save_replay = atoi(valbuf);
 #ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = atoi(valbuf) > 0;
@@ -1141,6 +1147,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
+	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 #ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
@@ -1308,7 +1315,7 @@ void Game::ErrorLog(const char* msg) {
 	if(!fp)
 		return;
 	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
+	tm* localedtime = localtime(&nowtime);
 	char timebuf[40];
 	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
 	fprintf(fp, "[%s]%s\n", timebuf, msg);

@@ -125,6 +125,8 @@ void ClientCard::UpdateInfo(char* buf) {
 		base_defense = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_REASON)
 		reason = BufferIO::ReadInt32(buf);
+	if(flag & QUERY_REASON_CARD)
+		buf += 4;
 	if(flag & QUERY_EQUIP_CARD) {
 		int c = BufferIO::ReadInt8(buf);
 		int l = BufferIO::ReadInt8(buf);
@@ -210,8 +212,14 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 			return c1->overlayTarget->sequence < c2->overlayTarget->sequence;
 		else return c1->sequence < c2->sequence;
 	else {
-		if(c1->location & 0x71)
+		if(c1->location & (LOCATION_DECK | LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_EXTRA)) {
+			for(size_t i = 0; i < mainGame->dField.chains.size(); ++i) {
+				auto chit = mainGame->dField.chains[i];
+				if(c1 == chit.chain_card || chit.target.find(c1) != chit.target.end())
+					return true;
+			}
 			return c1->sequence > c2->sequence;
+		}
 		else
 			return c1->sequence < c2->sequence;
 	}
