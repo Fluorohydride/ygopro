@@ -7,7 +7,6 @@
 #include "single_mode.h"
 #include "image_manager.h"
 #include "game.h"
-#include "utils.h"
 
 namespace ygo {
 
@@ -49,7 +48,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			// Set cursor to an I-Beam if hovering over an edit box
 			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
 			{
-				utils.changeCursor(ECI_IBEAM);
+				Utils::changeCursor(ECI_IBEAM);
 			}
 			break;
 		}
@@ -57,7 +56,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			// Set cursor to normal if left an edit box
 			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
 			{
-				utils.changeCursor(ECI_NORMAL);
+				Utils::changeCursor(ECI_NORMAL);
 			}
 			break;
 		}
@@ -729,7 +728,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_F12: {
 			if (!event.KeyInput.PressedDown)
-				utils.takeScreenshot(mainGame->device);
+				Utils::takeScreenshot(mainGame->device);
 			return true;
 			break;
 		}

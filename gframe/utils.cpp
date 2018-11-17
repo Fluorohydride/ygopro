@@ -27,7 +27,7 @@ namespace ygo {
 			return false;
 		dst << src.rdbuf();
 		src.close();
-		remove(source.c_str());
+		Deletefile(source);
 		return true;
 	}
 	bool Utils::Movefile(const std::wstring& source, const std::wstring& destination) {
@@ -39,7 +39,7 @@ namespace ygo {
 	bool Utils::Deletefile(const std::wstring & source) {
 		return Deletefile(BufferIO::EncodeUTF8s(source));
 	}
-	void Utils::initUtils() {
+	void Utils::CreateResourceFolders() {
 		//create directories if missing
 		Makedirectory("deck");
 		Makedirectory("pics");

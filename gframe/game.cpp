@@ -742,7 +742,7 @@ bool Game::Initialize() {
 	hideChat = false;
 	hideChatTimer = 0;
 
-	utils.initUtils();
+	Utils::CreateResourceFolders();
 
 	return true;
 }
