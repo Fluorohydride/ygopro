@@ -12,6 +12,7 @@ struct LFList {
 	unsigned int hash;
 	std::wstring listName;
 	std::unordered_map<int, int> content;
+	bool whitelist;
 };
 struct Deck {
 	std::vector<code_pointer> main;

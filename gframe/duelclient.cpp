@@ -544,9 +544,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->deckBuilder.filterList = 0;
 		for(auto lit = deckManager._lfList.begin(); lit != deckManager._lfList.end(); ++lit)
 			if(lit->hash == pkt->info.lflist)
-				mainGame->deckBuilder.filterList = &lit->content;
+				mainGame->deckBuilder.filterList = &(*lit);
 		if(mainGame->deckBuilder.filterList == 0)
-			mainGame->deckBuilder.filterList = &deckManager._lfList[0].content;
+			mainGame->deckBuilder.filterList = &deckManager._lfList[0];
 		mainGame->stHostPrepDuelist[0]->setText(L"");
 		mainGame->stHostPrepDuelist[1]->setText(L"");
 		mainGame->stHostPrepDuelist[2]->setText(L"");
