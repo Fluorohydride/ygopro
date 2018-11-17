@@ -681,18 +681,26 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnCancelOrFinish->setVisible(false);
 		mainGame->btnShuffle->setVisible(false);
 		time_t nowtime = time(NULL);
-		struct tm *localedtime = localtime(&nowtime);
-		char timebuf[40];
-		strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
-		size_t size = strlen(timebuf) + 1;
-		wchar_t timetext[80];
-		mbstowcs(timetext, timebuf, size);
+		tm* localedtime = localtime(&nowtime);
+		wchar_t timetext[40];
+		wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
 		mainGame->ebRSName->setText(timetext);
-		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
-		mainGame->PopupElement(mainGame->wReplaySave);
-		mainGame->gMutex.Unlock();
-		mainGame->replaySignal.Reset();
-		mainGame->replaySignal.Wait();
+		if(!mainGame->chkAutoSaveReplay->isChecked()) {
+			mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
+			mainGame->PopupElement(mainGame->wReplaySave);
+			mainGame->gMutex.Unlock();
+			mainGame->replaySignal.Reset();
+			mainGame->replaySignal.Wait();
+		}
+		else {
+			mainGame->actionParam = 1;
+			wchar_t msgbuf[256];
+			myswprintf(msgbuf, dataManager.GetSysString(1367), timetext);
+			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, msgbuf);
+			mainGame->PopupElement(mainGame->wACMessage, 20);
+			mainGame->gMutex.Unlock();
+			mainGame->WaitFrameSignal(30);
+		}
 		if(mainGame->actionParam || !is_host) {
 			char* prep = pdata;
 			Replay new_replay;
@@ -1296,6 +1304,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			wchar_t ynbuf[256];
 			myswprintf(ynbuf, dataManager.GetSysString(200), dataManager.FormatLocation(l, s), dataManager.GetName(code));
 			myswprintf(textBuffer, L"%ls\n%ls", event_string, ynbuf);
+		} else if(desc == 221) {
+			wchar_t ynbuf[256];
+			myswprintf(ynbuf, dataManager.GetSysString(221), dataManager.FormatLocation(l, s), dataManager.GetName(code));
+			myswprintf(textBuffer, L"%ls\n%ls\n%ls", event_string, ynbuf, dataManager.GetSysString(223));
 		} else if(desc < 2048) {
 			myswprintf(textBuffer, dataManager.GetSysString(desc), dataManager.GetName(code));
 		} else {
@@ -1550,6 +1562,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(!forced) {
 				if(count == 0)
 					myswprintf(textBuffer, L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202));
+				else if(select_trigger)
+					myswprintf(textBuffer, L"%ls\n%ls\n%ls", event_string, dataManager.GetSysString(222), dataManager.GetSysString(223));
 				else
 					myswprintf(textBuffer, L"%ls\n%ls", event_string, dataManager.GetSysString(203));
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
@@ -2714,7 +2728,17 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcarddif = 0;
 		mainGame->showcard = 1;
 		pcard->is_highlighting = true;
-		mainGame->WaitFrameSignal(30);
+		if(pcard->location & 0x30) {
+			float shift = -0.15f;
+			if(cc == 1) shift = 0.15f;
+			pcard->dPos = irr::core::vector3df(shift, 0, 0);
+			pcard->dRot = irr::core::vector3df(0, 0, 0);
+			pcard->is_moving = true;
+			pcard->aniFrame = 5;
+			mainGame->WaitFrameSignal(30);
+			mainGame->dField.MoveCard(pcard, 5);
+		} else
+			mainGame->WaitFrameSignal(30);
 		pcard->is_highlighting = false;
 		mainGame->dField.current_chain.chain_card = pcard;
 		mainGame->dField.current_chain.code = code;
@@ -2846,6 +2870,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					mainGame->dField.FadeCard(pcard, 255, 5);
 					mainGame->WaitFrameSignal(5);
 				}
+			} else if(pcard->location & 0x30) {
+				float shift = -0.15f;
+				if(c == 1) shift = 0.15f;
+				pcard->dPos = irr::core::vector3df(shift, 0, 0);
+				pcard->dRot = irr::core::vector3df(0, 0, 0);
+				pcard->is_moving = true;
+				pcard->aniFrame = 5;
+				mainGame->WaitFrameSignal(30);
+				mainGame->dField.MoveCard(pcard, 5);
 			} else
 				mainGame->WaitFrameSignal(30);
 			myswprintf(textBuffer, dataManager.GetSysString(1610), dataManager.GetName(pcard->code), dataManager.FormatLocation(l, s), s + 1);
