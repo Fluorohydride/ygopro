@@ -1229,49 +1229,42 @@ void Game::AddChatMsg(const std::wstring& msg, int player) {
 	case 0: //host 1
 		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.hostname[0]);
-		chatMsg[0].append(L": ");
 		break;
 	case 1: //client 1
 		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.clientname[0]);
-		chatMsg[0].append(L": ");
 		break;
 	case 2: //host 2
 		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.hostname[1]);
-		chatMsg[0].append(L": ");
 		break;
 	case 3: //client 2
 		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.clientname[1]);
-		chatMsg[0].append(L": ");
 		break;
 	case 4: //host 3
 		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.hostname[2]);
-		chatMsg[0].append(L": ");
 		break;
 	case 5: //client 3
 		PlaySoundEffect("./sound/chatmessage.wav");
 		chatMsg[0].append(dInfo.clientname[2]);
-		chatMsg[0].append(L": ");
 		break;
 	case 7: //local name
 		chatMsg[0].append(ebNickName->getText());
-		chatMsg[0].append(L": ");
 		break;
 	case 8: //system custom message, no prefix.
 		PlaySoundEffect("./sound/chatmessage.wav");
-		chatMsg[0].append(L"[System]: ");
+		chatMsg[0].append(L"[System]");
 		break;
 	case 9: //error message
-		chatMsg[0].append(L"[Script Error]: ");
+		chatMsg[0].append(L"[Script Error]");
 		break;
 	default: //from watcher or unknown
 		if(player < 11 || player > 19)
-			chatMsg[0].append(L"[---]: ");
+			chatMsg[0].append(L"[---]");
 	}
-	chatMsg[0].append(msg);
+	chatMsg[0].append(L": ").append(msg);
 }
 void Game::ClearChatMsg() {
 	for(int i = 7; i >= 0; --i) {
