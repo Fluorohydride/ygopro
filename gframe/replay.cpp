@@ -64,76 +64,49 @@ void Replay::WriteStream(std::vector<ReplayPacket> stream) {
 	for(auto packet : stream)
 		WritePacket(packet);
 }
-void Replay::WriteHeader(ReplayHeader& header) {
-	pheader = header;
+void Replay::Write(const void* data, size_t size, bool flush){
 	if(!is_writing) return;
 #ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &header, sizeof(header), &size, NULL);
+	DWORD sizea;
+	WriteFile(recording_fp, data, size, &sizea, NULL);
 #else
-	fwrite(&header, sizeof(header), 1, fp);
-	fflush(fp);
+	fwrite(data, size, 1, fp);
+	if(flush)
+		fflush(fp);
 #endif
+
+}
+void Replay::WriteHeader(ReplayHeader& header) {
+	pheader = header;
+	Write(&header, sizeof(header), true);
 }
 void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	if(!is_recording)
 		return;
 	memcpy(pdata, data, length);
 	pdata += length;
-	if(!is_writing) return;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, data, length, &size, NULL);
-#else
-	fwrite(data, length, 1, fp);
-	if(flush)
-		fflush(fp);
-#endif
+	Write(data, length, flush);
 }
 void Replay::WriteInt32(int data, bool flush) {
 	if(!is_recording)
 		return;
 	*((int*)(pdata)) = data;
 	pdata += 4;
-	if(!is_writing) return;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
-#else
-	fwrite(&data, sizeof(int), 1, fp);
-	if(flush)
-		fflush(fp);
-#endif
+	Write(&data, sizeof(int), flush);
 }
 void Replay::WriteInt16(short data, bool flush) {
 	if(!is_recording)
 		return;
 	*((short*)(pdata)) = data;
 	pdata += 2;
-	if(!is_writing) return;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
-#else
-	fwrite(&data, sizeof(short), 1, fp);
-	if(flush)
-		fflush(fp);
-#endif
+	Write(&data, sizeof(short), flush);
 }
 void Replay::WriteInt8(char data, bool flush) {
 	if(!is_recording)
 		return;
 	*pdata = data;
 	pdata++;
-	if(!is_writing) return;
-#ifdef _WIN32
-	DWORD size;
-	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
-#else
-	fwrite(&data, sizeof(char), 1, fp);
-	if(flush)
-		fflush(fp);
-#endif
+	Write(&data, sizeof(char), flush);
 }
 void Replay::Flush() {
 	if(!is_recording)

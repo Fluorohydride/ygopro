@@ -43,6 +43,7 @@ public:
 	void BeginRecord(bool write = true);
 	void WriteStream(std::vector<ReplayPacket> stream);
 	void WritePacket(ReplayPacket p);
+	void Write(const void* data, size_t size, bool flush);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
 	void WriteInt32(int data, bool flush = true);
