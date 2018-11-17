@@ -178,24 +178,29 @@ public:
 	// UTF-8 to UTF-16/UTF-32
 	static std::wstring DecodeUTF8s(const std::string& source) {
 		std::wstring res = L"";
-		for(size_t i = 0; i < source.size(); i++) {
+		for(size_t i = 0; i < source.size();) {
 			auto c = source[i];
 			if((c & 0x80) == 0) {
 				res += ((wchar_t)c);
+				i++;
 			} else if((c & 0xe0) == 0xc0) {
-				res += ((wchar_t)((((unsigned)c & 0x1f) << 6) | ((unsigned)source[++i] & 0x3f)));
+				res += ((wchar_t)((((unsigned)c & 0x1f) << 6) | ((unsigned)source[i + 1] & 0x3f)));
+				i += 2;
 			} else if((c & 0xf0) == 0xe0) {
-				res += ((wchar_t)((((unsigned)c & 0xf) << 12) | (((unsigned)source[++i] & 0x3f) << 6) | ((unsigned)source[++i] & 0x3f)));
+				res += ((wchar_t)((((unsigned)c & 0xf) << 12) | (((unsigned)source[i + 1] & 0x3f) << 6) | ((unsigned)source[i + 2] & 0x3f)));
+				i += 3;
 			} else if((c & 0xf8) == 0xf0) {
 #ifdef _WIN32
-				unsigned unicode = (((unsigned)c & 0x7) << 18) | (((unsigned)source[++i] & 0x3f) << 12) | (((unsigned)source[++i] & 0x3f) << 6) | ((unsigned)source[++i] & 0x3f);
+				unsigned unicode = (((unsigned)c & 0x7) << 18) | (((unsigned)source[i + 1] & 0x3f) << 12) | (((unsigned)source[i + 2] & 0x3f) << 6) | ((unsigned)source[i + 3] & 0x3f);
 				unicode -= 0x10000;
 				res += ((wchar_t)((unicode >> 10) | 0xd800));
 				res += ((wchar_t)((unicode & 0x3ff) | 0xdc00));
 #else
-				res += ((wchar_t)((((unsigned)c & 0x7) << 18) | (((unsigned)source[++i] & 0x3f) << 12) | (((unsigned)source[++i] & 0x3f) << 6) | ((unsigned)source[++i] & 0x3f)));
+				res += ((wchar_t)((((unsigned)c & 0x7) << 18) | (((unsigned)source[i + 1] & 0x3f) << 12) | (((unsigned)source[i + 2] & 0x3f) << 6) | ((unsigned)source[i + 3] & 0x3f)));
 #endif // _WIN32
-			}
+				i += 4;
+			} else
+				i++;
 		}
 		return res;
 	}
