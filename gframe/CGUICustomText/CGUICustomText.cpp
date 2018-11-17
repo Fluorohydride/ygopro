@@ -434,7 +434,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 					// here comes the next whitespace, look if
 					// we must break the last word to the next line.
 					const s32 whitelgth = font->getDimension(whitespace.c_str()).Width;
-					const s32 wordlgth = font->getDimension(word.c_str()).Width;
+					s32 wordlgth = font->getDimension(word.c_str()).Width;
 
 					if (wordlgth > elWidth)
 					{
@@ -455,11 +455,26 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 						else
 						{
 							// No soft hyphen found, so there's nothing more we can do
-							// break to next line
-							if (length)
-								BrokenText.push_back(line);
-							length = wordlgth;
-							line = word;
+							// break line in pieces
+							core::stringw second;
+							s32 secondLength;
+							while(wordlgth > elWidth) {
+								int j = 0;
+								for(; j < word.size() - 1; j++) {
+									if(font->getDimension((line + whitespace + word.subString(0, j + 1)).c_str()).Width > elWidth)
+										break;
+								}
+								core::stringw first = word.subString(0, j);
+								second = word.subString(j, word.size() - j);
+								BrokenText.push_back(line + whitespace + first);
+								secondLength = font->getDimension(second.c_str()).Width;
+								word = second;
+								wordlgth = secondLength;
+								whitespace = L"";
+								line = L"";
+							}
+							line = second;
+							length = secondLength;
 						}
 					}
 					else if (length && (length + wordlgth + whitelgth > elWidth))
