@@ -321,13 +321,13 @@ bool Game::Initialize() {
 	stName = irr::gui::CGUICustomText::addCustomText(L"", true, env, tabInfo, -1, rect<s32>(10, 10, 287, 32));
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	((CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
-	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 37, 296, 60));
+	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 37, 287, 60));
 	stInfo->setWordWrap(true);
 	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
-	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 60, 296, 83));
+	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 60, 287, 83));
 	stDataInfo->setWordWrap(true);
 	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
-	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 83, 296, 106));
+	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 83, 287, 106));
 	stSetName->setWordWrap(true);
 	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, rect<s32>(15, 106, 287, 324));
@@ -1206,15 +1206,15 @@ void Game::ShowCardInfo(int code, bool resize) {
 			stDataInfo->setText(L"");
 	}
 	int offset = 37;
-	stInfo->setRelativePosition(rect<s32>(15, offset, (296 * window_size.Width / 1024), offset + textFont->getDimension(stInfo->getText()).Height));
-	offset += textFont->getDimension(stInfo->getText()).Height;
+	stInfo->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, offset + stInfo->getTextHeight()));
+	offset += stInfo->getTextHeight();
 	if(wcscmp(stDataInfo->getText(), L"")) {
-		stDataInfo->setRelativePosition(rect<s32>(15, offset, 296 * window_size.Width / 1024, offset + textFont->getDimension(stDataInfo->getText()).Height));
-		offset += textFont->getDimension(stDataInfo->getText()).Height;
+		stDataInfo->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, offset + stDataInfo->getTextHeight()));
+		offset += stDataInfo->getTextHeight();
 	}
 	if(wcscmp(stSetName->getText(), L"")) {
-		stSetName->setRelativePosition(rect<s32>(15, offset, 296 * window_size.Width / 1024, offset + textFont->getDimension(stSetName->getText()).Height));
-		offset += textFont->getDimension(stSetName->getText()).Height;
+		stSetName->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, offset + stSetName->getTextHeight()));
+		offset += stSetName->getTextHeight();
 	}
 	stText->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
 	stText->setText(dataManager.GetText(code));
