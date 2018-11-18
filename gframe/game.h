@@ -144,7 +144,7 @@ public:
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
-	bool CheckRegEx(const std::wstring& text, const std::wstring& exp, bool exact);
+	bool CheckRegEx(const std::wstring& text, const std::wstring& exp, bool exact = false);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
