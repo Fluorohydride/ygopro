@@ -409,11 +409,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					std::wstring newname(mainGame->ebRSName->getText());
-					auto extension = newname.substr(newname.size() - 4);
-					if(extension != L".yrp") {
-						newname += L".yrp";
-					}
-					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
+					newname = newname.substr(0, newname.find_last_of(L"."));
+					std::wstring oldname(mainGame->lstReplayList->getListItem(prev_sel));
+					auto oldextension = oldname.substr(oldname.find_last_of(L"."));
+					newname += oldextension;
+					if(Replay::RenameReplay(oldname, newname)) {
 						mainGame->lstReplayList->setItem(prev_sel, newname.c_str(), -1);
 					} else {
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365).c_str());

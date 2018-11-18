@@ -156,7 +156,7 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(wargc == 2 && wcslen(wargv[1]) >= 4) {
 			std::wstring name(wargv[i]);
-			auto extension = name.substr(name.size() - 4);
+			auto extension = name.substr(name.find_last_of(L"."));
 			if(extension == L".ydk") {
 				open_file = true;
 				open_file_name = name;
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-			if(extension == L".yrp") {
+			if(extension == L".yrp" || extension == L".yrpX") {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;
