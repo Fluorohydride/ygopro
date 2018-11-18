@@ -183,11 +183,12 @@ namespace ygo {
 			}
 		}
 		else {
-			char filename[256];
+			std::string filename;
 			size_t slen = cur_replay.ReadInt16();
-			cur_replay.ReadData(filename, slen);
+			filename.resize(slen);
+			cur_replay.ReadData(&filename[0], slen);
 			filename[slen] = 0;
-			if(!preload_script(pduel, filename, 0))
+			if(!preload_script(pduel, (char*)filename.c_str(), 0))
 				return false;
 		}
 		start_duel(pduel, opt);
