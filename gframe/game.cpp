@@ -1298,7 +1298,7 @@ void Game::ErrorLog(const std::string& msg) {
 	struct tm *localedtime = localtime(&nowtime);
 	char timebuf[40];
 	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
-	fprintf(fp, "[%s]%s\n", timebuf, msg);
+	fprintf(fp, "[%s]%s\n", timebuf, msg.c_str());
 	fclose(fp);
 }
 void Game::ClearTextures() {
@@ -1700,7 +1700,8 @@ std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 	std::string str;
 	std::string res = "";
 	size_t start = std::string::npos;
-	while(std::getline(infile, str)) {
+	bool stop = false;
+	while(std::getline(infile, str) && !stop) {
 		if(str.empty())
 			continue;
 		if(start == std::string::npos) {
@@ -1710,11 +1711,15 @@ std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 			str = str.substr(start + 11);
 		}
 		size_t end = str.find("]]");
-		res += str;
 		if(end != std::string::npos) {
-			res = res.substr(0, res.size() - (str.size() - end));
-			break;
+			str = str.substr(0, end);
+			stop = true;
 		}
+		if(str.empty())
+			continue;
+		if(!res.empty())
+			res += "\n";
+		res += str;
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
