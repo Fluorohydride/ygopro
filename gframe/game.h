@@ -246,11 +246,11 @@ public:
 	irr::gui::IGUIStaticText* stCardListTip;
 	//infos
 	irr::gui::IGUITabControl* wInfos;
-	irr::gui::CGUICustomText* stName;
+	irr::gui::IGUIStaticText* stName;
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
-	irr::gui::CGUICustomText* stText;
+	irr::gui::IGUIStaticText* stText;
 	irr::gui::IGUIStaticText* stVolume;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
