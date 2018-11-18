@@ -62,13 +62,13 @@ int SingleMode::SinglePlayThread(void* param) {
 		open_file = false;
 		script_name = BufferIO::EncodeUTF8s(open_file_name);
 		if(!preload_script(pduel, (char*)script_name.c_str(), 0)) {
-			script_name = BufferIO::EncodeUTF8s(std::wstring(L"./single/") + open_file_name);
+			script_name = BufferIO::EncodeUTF8s(L"./single/" + open_file_name);
 			if(!preload_script(pduel, (char*)script_name.c_str(), 0))
 				loaded = false;
 		}
 	} else {
 		const std::wstring name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
-		script_name = BufferIO::EncodeUTF8s(std::wstring(L"./single/") + name);
+		script_name = BufferIO::EncodeUTF8s(L"./single/" + name);
 		if(!preload_script(pduel, (char*)script_name.c_str(), 0))
 			loaded = false;
 	}
