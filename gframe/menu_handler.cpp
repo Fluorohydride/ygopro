@@ -359,11 +359,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(open_file && deckManager.LoadDeck(open_file_name)) {
 #ifdef WIN32
-					wchar_t *dash = wcsrchr(open_file_name, L'\\');
+					wchar_t *dash = wcsrchr((wchar_t*)open_file_name.c_str(), L'\\');
 #else
-					wchar_t *dash = wcsrchr(open_file_name, L'/');
+					wchar_t *dash = wcsrchr((wchar_t*)open_file_name.c_str(), L'/');
 #endif
-					wchar_t *dot = wcsrchr(open_file_name, L'.');
+					wchar_t *dot = wcsrchr((wchar_t*)open_file_name.c_str(), L'.');
 					if(dash && dot) {
 						wchar_t deck_name[256];
 						wcsncpy(deck_name, dash + 1, dot - dash - 1);
@@ -372,7 +372,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBDecks->setSelected(-1);
 					} else {
 						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-							if(!wcscmp(mainGame->cbDBDecks->getItem(i), open_file_name)) {
+							if(mainGame->cbDBDecks->getItem(i) == open_file_name) {
 								mainGame->cbDBDecks->setSelected(i);
 								break;
 							}

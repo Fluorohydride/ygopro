@@ -90,6 +90,6 @@ extern unsigned short PRO_VERSION;
 extern int enable_log;
 extern bool exit_on_return;
 extern bool open_file;
-extern wchar_t open_file_name[256];
+extern std::wstring open_file_name;
 
 #endif

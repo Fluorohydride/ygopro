@@ -221,11 +221,11 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 	}
 	return errorcode;
 }
-std::vector<int> LoadCardList(const std::wstring& name, std::vector<int>* mainlist = nullptr, std::vector<int>* sidelist = nullptr, int* retmainc = nullptr, int* retsidec = nullptr) {
-	std::vector<int> res;
+bool LoadCardList(const std::wstring& name, std::vector<int>* mainlist = nullptr, std::vector<int>* sidelist = nullptr, int* retmainc = nullptr, int* retsidec = nullptr) {
 	std::ifstream deck(name, std::ifstream::in);
 	if(!deck.is_open())
-		return res;
+		return false;
+	std::vector<int> res;
 	std::string str;
 	bool is_side = false;
 	int sidec = 0;
@@ -257,7 +257,7 @@ std::vector<int> LoadCardList(const std::wstring& name, std::vector<int>* mainli
 		*retmainc = res.size() - sidec;
 	if(retsidec)
 		*retsidec = sidec;
-	return res;
+	return true;
 }
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::map<int, int> pcount;
@@ -286,7 +286,10 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 bool DeckManager::LoadDeck(const std::wstring& file) {
 	std::vector<int> mainlist;
 	std::vector<int> sidelist;
-	std::vector<int> cardlist = LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist);
+	if(!LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist)) {
+		if(!LoadCardList(file, &mainlist, &sidelist))
+			return false;
+	}
 	LoadDeck(current_deck, mainlist, sidelist);
 	return true;
 }

@@ -10,7 +10,7 @@
 int enable_log = 0;
 bool exit_on_return = false;
 bool open_file = false;
-wchar_t open_file_name[256] = L"";
+std::wstring open_file_name = L"";
 
 void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
 				exit_on_return = !keep_on_return;
 				if(i < wargc) {
 					open_file = true;
-					wcscpy(open_file_name, wargv[i]);
+					open_file_name = wargv[i];
 				}
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]) {
 			++i;
 			if(i < wargc) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				open_file_name = wargv[i];
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
 			if(open_file)
@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
 			++i;
 			if(i < wargc) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				open_file_name = wargv[i];
 			}
 			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
@@ -158,14 +158,14 @@ int main(int argc, char* argv[]) {
 			wchar_t* pstrext = wargv[1] + wcslen(wargv[1]) - 4;
 			if(!mywcsncasecmp(pstrext, L".ydk", 4)) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				open_file_name = wargv[i];
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
 			if(!mywcsncasecmp(pstrext, L".yrp", 4)) {
 				open_file = true;
-				wcscpy(open_file_name, wargv[i]);
+				open_file_name = wargv[i];
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnReplayMode);
 				ClickButton(ygo::mainGame->btnLoadReplay);
