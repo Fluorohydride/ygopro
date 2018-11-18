@@ -87,7 +87,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wInfos->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);
-	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210));
+	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210).c_str());
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
@@ -152,7 +152,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	wchar_t timetext[80];
 	mbstowcs(timetext, timebuf, size);
 	mainGame->ebRSName->setText(timetext);
-	mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
+	mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
 	mainGame->PopupElement(mainGame->wReplaySave);
 	mainGame->gMutex.Unlock();
 	mainGame->replaySignal.Reset();

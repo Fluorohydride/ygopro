@@ -5,7 +5,6 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-wchar_t DataManager::strBuffer[4096];
 DataManager dataManager;
 
 bool DataManager::LoadDB(const char* file) {
@@ -92,12 +91,12 @@ bool DataManager::LoadStrings(const char* file) {
 			_setnameStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
 	}
 	string_file.close();
-	for(int i = 0; i < 255; ++i)
-		myswprintf(numStrings[i], L"%d", i);
+	/*for(int i = 0; i < 255; ++i)
+		myswprintf(numStrings[i], L"%d", i);*/
 	return true;
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
+	auto error = sqlite3_errmsg(pDB);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);
@@ -124,61 +123,55 @@ bool DataManager::GetString(int code, CardString* pStr) {
 	*pStr = csit->second;
 	return true;
 }
-const wchar_t* DataManager::GetName(int code) {
+std::wstring DataManager::GetName(int code) {
 	auto csit = _strings.find(code);
-	if(csit == _strings.end())
+	if(csit == _strings.end() || csit->second.name.empty())
 		return unknown_string;
-	if(!csit->second.name.empty())
-		return csit->second.name.c_str();
-	return unknown_string;
+	return csit->second.name;
 }
-const wchar_t* DataManager::GetText(int code) {
+std::wstring DataManager::GetText(int code) {
 	auto csit = _strings.find(code);
-	if(csit == _strings.end())
+	if(csit == _strings.end() || csit->second.text.empty())
 		return unknown_string;
-	if(!csit->second.text.empty())
-		return csit->second.text.c_str();
-	return unknown_string;
+	return csit->second.text;
 }
-const wchar_t* DataManager::GetDesc(u64 strCode) {
+std::wstring DataManager::GetDesc(u64 strCode) {
 	if(strCode < 10000)
 		return GetSysString(strCode);
 	u64 code = strCode >> 4;
 	int offset = strCode & 0xf;
 	auto csit = _strings.find(code);
-	if(csit == _strings.end())
+	if(csit == _strings.end() || csit->second.desc[offset].empty())
 		return unknown_string;
-	if(!csit->second.desc[offset].empty())
-		return csit->second.desc[offset].c_str();
-	return unknown_string;
+	return csit->second.desc[offset];
 }
-const wchar_t* DataManager::GetSysString(int code) {
+std::wstring DataManager::GetSysString(int code) {
 	if(code < 0 || code >= 2048)
 		return unknown_string;
 	auto csit = _sysStrings.find(code);
-	if(csit == _sysStrings.end())
+	if(csit == _sysStrings.end() || csit->second.empty())
 		return unknown_string;
-	return csit->second.c_str();
+	return csit->second;
 }
-const wchar_t* DataManager::GetVictoryString(int code) {
+std::wstring DataManager::GetVictoryString(int code) {
 	auto csit = _victoryStrings.find(code);
-	if(csit == _victoryStrings.end())
+	if(csit == _victoryStrings.end() || csit->second.empty())
 		return unknown_string;
-	return csit->second.c_str();
+	return csit->second;
 }
-const wchar_t* DataManager::GetCounterName(int code) {
+std::wstring DataManager::GetCounterName(int code) {
 	auto csit = _counterStrings.find(code);
-	if(csit == _counterStrings.end())
+	if(csit == _counterStrings.end() || csit->second.empty())
 		return unknown_string;
-	return csit->second.c_str();
+	return csit->second;
 }
-const wchar_t* DataManager::GetSetName(int code) {
+std::wstring DataManager::GetSetName(int code) {
 	auto csit = _setnameStrings.find(code);
-	if(csit == _setnameStrings.end())
-		return NULL;
-	return csit->second.c_str();
+	if(csit == _setnameStrings.end() || csit->second.empty())
+		return L"";
+	return csit->second;
 }
-unsigned int DataManager::GetSetCode(const wchar_t* setname) {
+unsigned int DataManager::GetSetCode(const std::wstring& setname) {
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
 		auto xpos = csit->second.find_first_of(L'|');//setname|extra info
 		if(csit->second.compare(0, xpos, setname) == 0)
@@ -186,17 +179,12 @@ unsigned int DataManager::GetSetCode(const wchar_t* setname) {
 	}
 	return 0;
 }
-const wchar_t* DataManager::GetNumString(int num, bool bracket) {
+std::wstring DataManager::GetNumString(int num, bool bracket) {
 	if(!bracket)
-		return numStrings[num];
-	wchar_t* p = numBuffer;
-	*p++ = L'(';
-	BufferIO::CopyWStrRef(numStrings[num], p, 4);
-	*p = L')';
-	*++p = 0;
-	return numBuffer;
+		return std::to_wstring(num);
+	return L"(" + std::to_wstring(num) + L")";
 }
-const wchar_t* DataManager::FormatLocation(int location, int sequence) {
+std::wstring DataManager::FormatLocation(int location, int sequence) {
 	if(location == 0x8) {
 		if(sequence < 5)
 			return GetSysString(1003);
@@ -214,93 +202,81 @@ const wchar_t* DataManager::FormatLocation(int location, int sequence) {
 	else
 		return unknown_string;
 }
-const wchar_t* DataManager::FormatAttribute(int attribute) {
-	wchar_t* p = attBuffer;
+std::wstring DataManager::FormatAttribute(int attribute) {
+	std::wstring res;
 	unsigned filter = 1;
 	int i = 1010;
 	for(; filter != 0x80; filter <<= 1, ++i) {
 		if(attribute & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+			if(!res.empty())
+				res += L"|";
+			res += GetSysString(i);
 		}
 	}
-	if(p != attBuffer)
-		*(p - 1) = 0;
-	else
+	if(res.empty())
 		return unknown_string;
-	return attBuffer;
+	return res;
 }
-const wchar_t* DataManager::FormatRace(int race) {
-	wchar_t* p = racBuffer;
+std::wstring DataManager::FormatRace(int race) {
+	std::wstring res;
 	unsigned filter = 1;
 	int i = 1020;
 	for(; filter != 0x2000000; filter <<= 1, ++i) {
 		if(race & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+			if(!res.empty())
+				res += L"|";
+			res += GetSysString(i);
 		}
 	}
-	if(p != racBuffer)
-		*(p - 1) = 0;
-	else
+	if(res.empty())
 		return unknown_string;
-	return racBuffer;
+	return res;
 }
-const wchar_t* DataManager::FormatType(int type) {
-	wchar_t* p = tpBuffer;
+std::wstring DataManager::FormatType(int type) {
+	std::wstring res;
 	unsigned filter = 1;
 	int i = 1050;
 	for(; filter != 0x8000000; filter <<= 1, ++i) {
 		if(type & filter) {
-			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
-			*p = L'|';
-			*++p = 0;
+			if(!res.empty())
+				res += L"|";
+			res += GetSysString(i);
 		}
 	}
-	if(p != tpBuffer)
-		*(p - 1) = 0;
-	else
+	if(res.empty())
 		return unknown_string;
-	return tpBuffer;
+	return res;
 }
-const wchar_t* DataManager::FormatSetName(unsigned long long setcode) {
-	wchar_t* p = scBuffer;
+std::wstring DataManager::FormatSetName(unsigned long long setcode) {
+	std::wstring res;
 	for(int i = 0; i < 4; ++i) {
-		const wchar_t* setname = GetSetName((setcode >> i * 16) & 0xffff);
-		if(setname) {
-			BufferIO::CopyWStrRef(setname, p, 32);
-			*p = L'|';
-			*++p = 0;
-		}
+		if(!res.empty())
+			res += L"|";
+		res += GetSetName((setcode >> i * 16) & 0xffff);
 	}
-	if(p != scBuffer)
-		*(p - 1) = 0;
-	else
+	if(res.empty())
 		return unknown_string;
-	return scBuffer;
+	return res;
 }
-const wchar_t* DataManager::FormatLinkMarker(int link_marker) {
-	wchar_t* p = lmBuffer;
-	*p = 0;
+std::wstring DataManager::FormatLinkMarker(int link_marker) {
+	std::wstring res;
 	if(link_marker & LINK_MARKER_TOP_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2196]", p, 4);
+		res+=L"[\u2196]";
 	if(link_marker & LINK_MARKER_TOP)
-		BufferIO::CopyWStrRef(L"[\u2191]", p, 4);
+		res += L"[\u2191]";
 	if(link_marker & LINK_MARKER_TOP_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2197]", p, 4);
+		res += L"[\u2197]";
 	if(link_marker & LINK_MARKER_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2190]", p, 4);
+		res += L"[\u2190]";
 	if(link_marker & LINK_MARKER_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2192]", p, 4);
+		res += L"[\u2192]";
 	if(link_marker & LINK_MARKER_BOTTOM_LEFT)
-		BufferIO::CopyWStrRef(L"[\u2199]", p, 4);
+		res += L"[\u2199]";
 	if(link_marker & LINK_MARKER_BOTTOM)
-		BufferIO::CopyWStrRef(L"[\u2193]", p, 4);
+		res += L"[\u2193]";
 	if(link_marker & LINK_MARKER_BOTTOM_RIGHT)
-		BufferIO::CopyWStrRef(L"[\u2198]", p, 4);
-	return lmBuffer;
+		res += L"[\u2198]";
+	return res;
 }
 int DataManager::CardReader(int code, void* pData) {
 	if(!dataManager.GetData(code, (CardData*)pData))

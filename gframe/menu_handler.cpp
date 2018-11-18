@@ -94,7 +94,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 					if(status != 0) {
 						mainGame->gMutex.Lock();
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
 						mainGame->gMutex.Unlock();
 						break;
 					} else {
@@ -317,7 +317,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				mainGame->gMutex.Lock();
 				wchar_t textBuffer[256];
-				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363));
+				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363).c_str());
 				mainGame->stQMessage->setText((wchar_t*)textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
@@ -330,7 +330,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.Lock();
-				mainGame->wReplaySave->setText(dataManager.GetSysString(1364));
+				mainGame->wReplaySave->setText(dataManager.GetSysString(1364).c_str());
 				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
 				mainGame->PopupElement(mainGame->wReplaySave);
 				mainGame->gMutex.Unlock();
@@ -416,7 +416,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
 						mainGame->lstReplayList->setItem(prev_sel, newname, -1);
 					} else {
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365));
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365).c_str());
 					}
 				}
 				prev_operation = 0;
@@ -519,7 +519,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 					if(status != 0) {
 						mainGame->gMutex.Lock();
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412));
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
 						mainGame->gMutex.Unlock();
 						break;
 					} else {

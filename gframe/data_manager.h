@@ -17,21 +17,21 @@ public:
 	bool GetData(int code, CardData* pData);
 	code_pointer GetCodePointer(int code);
 	bool GetString(int code, CardString* pStr);
-	const wchar_t* GetName(int code);
-	const wchar_t* GetText(int code);
-	const wchar_t* GetDesc(u64 strCode);
-	const wchar_t* GetSysString(int code);
-	const wchar_t* GetVictoryString(int code);
-	const wchar_t* GetCounterName(int code);
-	const wchar_t* GetSetName(int code);
-	unsigned int GetSetCode(const wchar_t* setname);
-	const wchar_t* GetNumString(int num, bool bracket = false);
-	const wchar_t* FormatLocation(int location, int sequence);
-	const wchar_t* FormatAttribute(int attribute);
-	const wchar_t* FormatRace(int race);
-	const wchar_t* FormatType(int type);
-	const wchar_t* FormatSetName(unsigned long long setcode);
-	const wchar_t* FormatLinkMarker(int link_marker);
+	std::wstring GetName(int code);
+	std::wstring GetText(int code);
+	std::wstring GetDesc(u64 strCode);
+	std::wstring GetSysString(int code);
+	std::wstring GetVictoryString(int code);
+	std::wstring GetCounterName(int code);
+	std::wstring GetSetName(int code);
+	unsigned int GetSetCode(const std::wstring& setname);
+	std::wstring GetNumString(int num, bool bracket = false);
+	std::wstring FormatLocation(int location, int sequence);
+	std::wstring FormatAttribute(int attribute);
+	std::wstring FormatRace(int race);
+	std::wstring FormatType(int type);
+	std::wstring FormatSetName(unsigned long long setcode);
+	std::wstring FormatLinkMarker(int link_marker);
 
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
@@ -40,15 +40,6 @@ public:
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
 
-	wchar_t numStrings[256][4];
-	wchar_t numBuffer[6];
-	wchar_t attBuffer[128];
-	wchar_t racBuffer[128];
-	wchar_t tpBuffer[128];
-	wchar_t scBuffer[128];
-	wchar_t lmBuffer[32];
-
-	static wchar_t strBuffer[4096];
 	static const wchar_t* unknown_string;
 	static int CardReader(int, void*);
 
