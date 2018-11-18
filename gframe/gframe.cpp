@@ -155,17 +155,18 @@ int main(int argc, char* argv[]) {
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
 		} else if(wargc == 2 && wcslen(wargv[1]) >= 4) {
-			wchar_t* pstrext = wargv[1] + wcslen(wargv[1]) - 4;
-			if(!mywcsncasecmp(pstrext, L".ydk", 4)) {
+			std::wstring name(wargv[i]);
+			auto extension = name.substr(name.size() - 4);
+			if(extension == L".ydk") {
 				open_file = true;
-				open_file_name = wargv[i];
+				open_file_name = name;
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-			if(!mywcsncasecmp(pstrext, L".yrp", 4)) {
+			if(extension == L".yrp") {
 				open_file = true;
-				open_file_name = wargv[i];
+				open_file_name = name;
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnReplayMode);
 				ClickButton(ygo::mainGame->btnLoadReplay);

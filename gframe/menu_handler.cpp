@@ -408,13 +408,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_SAVE: {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
-					wchar_t newname[256];
-					BufferIO::CopyWStr(mainGame->ebRSName->getText(), newname, 256);
-					if(mywcsncasecmp(newname + wcslen(newname) - 4, L".yrp", 4)) {
-						myswprintf(newname, L"%ls.yrp", mainGame->ebRSName->getText());
+					std::wstring newname(mainGame->ebRSName->getText());
+					auto extension = newname.substr(newname.size() - 4);
+					if(extension != L".yrp") {
+						newname += L".yrp";
 					}
 					if(Replay::RenameReplay(mainGame->lstReplayList->getListItem(prev_sel), newname)) {
-						mainGame->lstReplayList->setItem(prev_sel, newname, -1);
+						mainGame->lstReplayList->setItem(prev_sel, newname.c_str(), -1);
 					} else {
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365).c_str());
 					}
