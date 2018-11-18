@@ -44,10 +44,12 @@ struct Config {
 	int draw_field_spell;
 	int separate_clear_button;
 	int auto_search_limit;
+	int search_multiple_keywords;
 	int chkIgnoreDeckChanges;
 	int defaultOT;
 	int enable_bot_mode;
 	int quick_animation;
+	int auto_save_replay;
 	bool enable_sound;
 	bool enable_music;
 	double sound_volume;
@@ -255,10 +257,12 @@ public:
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
+	irr::gui::IGUICheckBox* chkAutoSaveReplay;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
 	irr::gui::IGUICheckBox* chkAutoSearch;
+	irr::gui::IGUICheckBox* chkMultiKeywords;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -642,6 +646,7 @@ extern HostInfo game_info;
 #define BUTTON_LOAD_SINGLEPLAY		351
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_AUTO_SEARCH		360
+#define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
 #define SCROLL_VOLUME				363

@@ -279,7 +279,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionn->setVisible(true);
 				if(selected_option == 0)
 					mainGame->btnOptionp->setVisible(false);
-				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[selected_option]));
+				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
 			case BUTTON_OPTION_NEXT: {
@@ -288,7 +288,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionp->setVisible(true);
 				if(selected_option == select_options.size() - 1)
 					mainGame->btnOptionn->setVisible(false);
-				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[selected_option]));
+				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
 			case BUTTON_OPTION_0: {
@@ -424,6 +424,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->wCardSelect->setText(dataManager.GetSysString(568));
 						list_command = COMMAND_OPERATION;
 					}
+					std::sort(selectable_cards.begin(), selectable_cards.end(), ClientCard::client_card_sort);
 					ShowSelectCard(true, true);
 				}
 				break;
@@ -580,6 +581,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				}
 				list_command = COMMAND_LIST;
+				std::sort(selectable_cards.begin(), selectable_cards.end(), ClientCard::client_card_sort);
 				ShowSelectCard(true);
 				break;
 			}
@@ -1795,6 +1797,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			switch(id) {
 			case CHECKBOX_AUTO_SEARCH: {
 				mainGame->gameConf.auto_search_limit = mainGame->chkAutoSearch->isChecked() ? 0 : -1;
+				if(mainGame->is_building && !mainGame->is_siding)
+					mainGame->deckBuilder.InstantSearch();
+				return true;
+				break;
+			}
+			case CHECKBOX_MULTI_KEYWORDS: {
+				mainGame->gameConf.search_multiple_keywords = mainGame->chkMultiKeywords->isChecked() ? 1 : 0;
+				if(mainGame->is_building && !mainGame->is_siding)
+					mainGame->deckBuilder.InstantSearch();
 				return true;
 				break;
 			}
@@ -2232,6 +2243,8 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	if(pcard->code) {
 		str.append(dataManager.GetName(pcard->code));
 	}
+	if(pcard->status & STATUS_PROC_COMPLETE)
+		str.append(L"\n").append(dataManager.GetSysString(224));
 	for(size_t i = 0; i < chains.size(); ++i) {
 		wchar_t formatBuffer[2048];
 		auto chit = chains[i];

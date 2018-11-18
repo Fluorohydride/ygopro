@@ -303,6 +303,9 @@ bool Game::Initialize() {
 	posY += 30;
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
+	posY += 30;
+	chkAutoSaveReplay = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1366));
+	chkAutoSaveReplay->setChecked(gameConf.auto_save_replay != 0);
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
 	posY = 20;
@@ -323,6 +326,9 @@ bool Game::Initialize() {
 	posY += 30;
 	chkAutoSearch = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_AUTO_SEARCH, dataManager.GetSysString(1358));
 	chkAutoSearch->setChecked(gameConf.auto_search_limit >= 0);
+	posY += 30;
+	chkMultiKeywords = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_MULTI_KEYWORDS, dataManager.GetSysString(1378));
+	chkMultiKeywords->setChecked(gameConf.search_multiple_keywords > 0);
 	posY += 30;
 	chkEnableSound = env->addCheckBox(gameConf.enable_sound, rect<s32>(posX, posY, posX + 120, posY + 25), tabSystem, -1, dataManager.GetSysString(1279));
 	chkEnableSound->setChecked(gameConf.enable_sound);
@@ -1007,10 +1013,12 @@ void Game::LoadConfig() {
 	gameConf.draw_field_spell = 1;
 	gameConf.separate_clear_button = 1;
 	gameConf.auto_search_limit = -1;
+	gameConf.search_multiple_keywords = 1;
 	gameConf.chkIgnoreDeckChanges = 0;
 	gameConf.defaultOT = 1;
 	gameConf.enable_bot_mode = 0;
 	gameConf.quick_animation = 0;
+	gameConf.auto_save_replay = 0;
 	gameConf.enable_sound = true;
 	gameConf.sound_volume = 0.5;
 	gameConf.enable_music = true;
@@ -1072,6 +1080,8 @@ void Game::LoadConfig() {
 			gameConf.separate_clear_button = atoi(valbuf);
 		} else if(!strcmp(strbuf, "auto_search_limit")) {
 			gameConf.auto_search_limit = atoi(valbuf);
+		} else if(!strcmp(strbuf, "search_multiple_keywords")) {
+			gameConf.search_multiple_keywords = atoi(valbuf);
 		} else if(!strcmp(strbuf, "ignore_deck_changes")) {
 			gameConf.chkIgnoreDeckChanges = atoi(valbuf);
 		} else if(!strcmp(strbuf, "default_ot")) {
@@ -1080,6 +1090,8 @@ void Game::LoadConfig() {
 			gameConf.enable_bot_mode = atoi(valbuf);
 		} else if(!strcmp(strbuf, "quick_animation")) {
 			gameConf.quick_animation = atoi(valbuf);
+		} else if(!strcmp(strbuf, "auto_save_replay")) {
+			gameConf.auto_save_replay = atoi(valbuf);
 #ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = atoi(valbuf) > 0;
@@ -1149,10 +1161,13 @@ void Game::SaveConfig() {
 	fprintf(fp, "separate_clear_button = %d\n", gameConf.separate_clear_button);
 	fprintf(fp, "#auto_search_limit >= 0: Start search automatically when the user enters N chars\n");
 	fprintf(fp, "auto_search_limit = %d\n", gameConf.auto_search_limit);
+	fprintf(fp, "#search_multiple_keywords = 0: Disable. 1: Search mutiple keywords with separator \" \". 2: with separator \"+\"\n");
+	fprintf(fp, "search_multiple_keywords = %d\n", gameConf.search_multiple_keywords);
 	fprintf(fp, "ignore_deck_changes = %d\n", (chkIgnoreDeckChanges->isChecked() ? 1 : 0));
 	fprintf(fp, "default_ot = %d\n", gameConf.defaultOT);
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
+	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 #ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
@@ -1326,7 +1341,7 @@ void Game::ErrorLog(const char* msg) {
 	if(!fp)
 		return;
 	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
+	tm* localedtime = localtime(&nowtime);
 	char timebuf[40];
 	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
 	fprintf(fp, "[%s]%s\n", timebuf, msg);
