@@ -1398,21 +1398,7 @@ void Game::FlashWindow() {
 	FlashWindowEx(&fi);
 #endif
 }
-bool Game::CheckRegEx(const wchar_t* text, const wchar_t* exp, bool exact) {
-	if(!gameConf.search_regex)
-		return false;
-	bool result;
-	try {
-		if(exact)
-			result = std::regex_match(text, std::wregex(exp));
-		else
-			result = std::regex_search(text, std::wregex(exp));
-	} catch(...) {
-		result = false;
-	}
-	return result;
-}
-bool Game::CheckRegEx(std::wstring text, const wchar_t* exp, bool exact) {
+bool Game::CheckRegEx(const std::wstring& text, const std::wstring& exp, bool exact) {
 	if(!gameConf.search_regex)
 		return false;
 	bool result;
