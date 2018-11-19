@@ -1,4 +1,5 @@
 #include "data_manager.h"
+#include "game.h"
 #include <stdio.h>
 #include <fstream>
 
@@ -171,13 +172,14 @@ std::wstring DataManager::GetSetName(int code) {
 		return L"";
 	return csit->second;
 }
-unsigned int DataManager::GetSetCode(const std::wstring& setname) {
+std::vector<unsigned int> DataManager::GetSetCode(std::wstring setname) {
+	std::vector<unsigned int> res;
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
 		auto xpos = csit->second.find_first_of(L'|');//setname|extra info
-		if(csit->second.compare(0, xpos, setname) == 0)
-			return csit->first;
+		if(Game::CompareStrings(csit->second.substr(0, xpos), setname))
+			res.push_back(csit->first);
 	}
-	return 0;
+	return res;
 }
 std::wstring DataManager::GetNumString(int num, bool bracket) {
 	if(!bracket)
@@ -250,9 +252,10 @@ std::wstring DataManager::FormatType(int type) {
 std::wstring DataManager::FormatSetName(unsigned long long setcode) {
 	std::wstring res;
 	for(int i = 0; i < 4; ++i) {
-		if(!res.empty())
+		auto name = GetSetName((setcode >> i * 16) & 0xffff);
+		if(!res.empty() && !name.empty())
 			res += L"|";
-		res += GetSetName((setcode >> i * 16) & 0xffff);
+		res += name;
 	}
 	if(res.empty())
 		return unknown_string;

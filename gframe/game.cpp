@@ -1695,6 +1695,27 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 	obj->setText(text.c_str());
 }
+bool Game::CompareStrings(std::wstring sa, std::wstring sb) {
+	if(sa.empty() || sb.empty() || (sb.size() > sa.size()))
+		return false;
+	std::transform(sa.begin(), sa.end(), sa.begin(), ::tolower);
+	std::transform(sb.begin(), sb.end(), sb.begin(), ::tolower);
+	std::vector<std::wstring> tokens;
+	std::size_t pos;
+	while((pos = sb.find(L'*')) != std::wstring::npos) {
+		if(pos != 0)
+			tokens.push_back(sb.substr(0, pos));
+		sb = sb.substr(pos + 1);
+	}
+	if(sb.size())
+		tokens.push_back(sb);
+	for(auto token : tokens) {
+		if((pos = sa.find(token)) == std::wstring::npos)
+			return false;
+		sa = sa.substr(pos + 1);
+	}
+	return true;
+}
 std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 	std::ifstream infile(script_name, std::ifstream::in);
 	std::string str;

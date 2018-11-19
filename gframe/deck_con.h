@@ -30,12 +30,11 @@ public:
 	void Terminate();
 	void GetHoveredCard();
 	void FilterCards();
+	bool CheckCard(const CardDataC& data, const CardString& text, const wchar_t* pstr, std::vector<unsigned int>& setcode);
 	void StartFilter();
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
-
-	static bool CardNameCompare(std::wstring sa, std::wstring sb);
 
 	bool push_main(code_pointer pointer, int seq = -1);
 	bool push_extra(code_pointer pointer, int seq = -1);
@@ -74,6 +73,7 @@ public:
 	s32 prev_operation;
 
 	LFList* filterList;
+	std::map<std::wstring, std::vector<code_pointer>> searched_terms;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
 };

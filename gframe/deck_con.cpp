@@ -41,22 +41,24 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 	return 0;
 }
 
-static bool check_set_code(const CardDataC& data, int set_code) {
-	unsigned long long sc = data.setcode;
+static bool check_set_code(const CardDataC& data, std::vector<unsigned int>& setcodes) {
+	unsigned long long card_setcode = data.setcode;
 	if (data.alias) {
 		auto aptr = dataManager._datas.find(data.alias);
 		if (aptr != dataManager._datas.end())
-			sc = aptr->second.setcode;
+			card_setcode = aptr->second.setcode;
 	}
-	bool res = false;
-	int settype = set_code & 0xfff;
-	int setsubtype = set_code & 0xf000;
-	while (sc) {
-		if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
-			res = true;
-		sc = sc >> 16;
+	for(auto& set_code : setcodes) {
+		auto sc = card_setcode;
+		int settype = set_code & 0xfff;
+		int setsubtype = set_code & 0xf000;
+		while(sc) {
+			if((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
+				return true;
+			sc = sc >> 16;
+		}
 	}
-	return res;
+	return false;
 }
 
 void DeckBuilder::Initialize() {
@@ -759,128 +761,66 @@ void DeckBuilder::StartFilter() {
 }
 void DeckBuilder::FilterCards() {
 	results.clear();
-	const wchar_t* pstr = mainGame->ebCardName->getText();
-	int trycode = BufferIO::GetVal(pstr);
-	if(trycode && dataManager.GetData(trycode, 0)) {
-		auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
-		results.push_back(ptr);
-		mainGame->scrFilter->setVisible(false);
-		mainGame->scrFilter->setPos(0);
-		myswprintf(result_string, L"%d", results.size());
-		return;
+	std::wstring searchterm(mainGame->ebCardName->getText());
+	std::vector<std::wstring> searchterms;
+	std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::tolower);
+	if(searchterm.empty())
+		searchterms.push_back(searchterm);
+	else {
+		std::size_t pos;
+		while((pos = searchterm.find(L'+')) != std::wstring::npos) {
+			searchterms.push_back(searchterm.substr(0, pos));
+			searchterm = searchterm.substr(pos + 1);
+		}
+		if(searchterm.size())
+			searchterms.push_back(searchterm);
 	}
-	unsigned int set_code = 0;
-	if (pstr[0] == L'@')
-		set_code = dataManager.GetSetCode(&pstr[1]);
-	else
-		set_code = dataManager.GetSetCode(&pstr[0]);
-	if (pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
-		pstr = 0;
-	auto strpointer = dataManager._strings.begin();
-	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
-		const CardDataC& data = ptr->second;
-		const CardString& text = strpointer->second;
-		if(data.type & TYPE_TOKEN || (data.ot > 3 && !mainGame->chkAnime->isChecked()))
-			continue;
-		switch(filter_type) {
-		case 1: {
-			if(!(data.type & TYPE_MONSTER) || (data.type & filter_type2) != filter_type2)
-				continue;
-			if(filter_race && data.race != filter_race)
-				continue;
-			if(filter_attrib && data.attribute != filter_attrib)
-				continue;
-			if(filter_atktype) {
-				if((filter_atktype == 1 && data.attack != filter_atk) || (filter_atktype == 2 && data.attack < filter_atk)
-				        || (filter_atktype == 3 && data.attack <= filter_atk) || (filter_atktype == 4 && (data.attack > filter_atk || data.attack < 0))
-				        || (filter_atktype == 5 && (data.attack >= filter_atk || data.attack < 0)) || (filter_atktype == 6 && data.attack != -2))
-					continue;
-			}
-			if(filter_deftype) {
-				if((filter_deftype == 1 && data.defense != filter_def) || (filter_deftype == 2 && data.defense < filter_def)
-				        || (filter_deftype == 3 && data.defense <= filter_def) || (filter_deftype == 4 && (data.defense > filter_def || data.defense < 0))
-				        || (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2)
-				        || (data.type & TYPE_LINK))
-					continue;
-			}
-			if(filter_lvtype) {
-				if((filter_lvtype == 1 && data.level != filter_lv) || (filter_lvtype == 2 && data.level < filter_lv)
-				        || (filter_lvtype == 3 && data.level <= filter_lv) || (filter_lvtype == 4 && data.level > filter_lv)
-				        || (filter_lvtype == 5 && data.level >= filter_lv) || filter_lvtype == 6)
-					continue;
-			}
-			if(filter_scltype) {
-				if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
-				        || (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
-				        || (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6
-						|| !(data.type & TYPE_PENDULUM))
-					continue;
-			}
-			break;
-		}
-		case 2: {
-			if(!(data.type & TYPE_SPELL))
-				continue;
-			if(filter_type2 && data.type != filter_type2)
-				continue;
-			break;
-		}
-		case 3: {
-			if(!(data.type & TYPE_TRAP))
-				continue;
-			if(filter_type2 && data.type != filter_type2)
-				continue;
-			break;
-		}
-		}
-		if(filter_effect && !(data.category & filter_effect))
-			continue;
-		if(filter_marks && (data.link_marker & filter_marks)!= filter_marks)
-			continue;
-		if(filter_lm) {
-			unsigned int limitcode = ptr->first;
-			auto flit = filterList->content.find(limitcode);
-			if (flit == filterList->content.end())
-				limitcode = ptr->second.alias ? ptr->second.alias : ptr->first;
-			if(filter_lm <= FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
-				continue;
-			if(filter_lm == FILTER_UNLIMITED) {
-				if(filterList->whitelist) {
-					if(!filterList->content.count(limitcode) || filterList->content[limitcode] < 3)
-						continue;
-				} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
-						continue;
-			}
-			if(filter_lm == FILTER_OCG && data.ot != 0x1)
-				continue;
-			if(filter_lm == FILTER_TCG && data.ot != 0x2)
-				continue;
-			if(filter_lm == FILTER_TCG_OCG && data.ot != 0x3)
-				continue;
-			if(filter_lm == FILTER_ANIME && data.ot != 0x4)
-				continue;
-			if(filter_lm == FILTER_ILLEGAL && data.ot != 0x8)
-				continue;
-			if(filter_lm == FILTER_VIDEOGAME && data.ot != 0x10)
-				continue;
-			if(filter_lm == FILTER_CUSTOM && data.ot != 0x20)
-				continue;
-		}
-		if(pstr) {
-			if(pstr[0] == L'$') {
-				if(!CardNameCompare(text.name.c_str(), &pstr[1]))
-					continue;
-			} else if(pstr[0] == L'@' && set_code) {
-				if(!check_set_code(data, set_code))
-					continue;
-			} else {
-				if(!CardNameCompare(text.name.c_str(), pstr) && !(CardNameCompare(text.text.c_str(), pstr))
-					&& (!set_code || !check_set_code(data, set_code)))
-					continue;
-			}
-		}
-		results.push_back(ptr);
+	//removes no longer existing search terms from the cache
+	for(auto it = searched_terms.cbegin(); it != searched_terms.cend();) {
+		if(std::find(searchterms.begin(), searchterms.end(), (*it).first) == searchterms.end())
+			it = searched_terms.erase(it);
+		else
+			++it;
 	}
+	//removes search terms already cached
+	for(auto it = searchterms.cbegin(); it != searchterms.cend();) {
+		if(searched_terms.count((*it)))
+			it = searchterms.erase(it);
+		else
+			it++;
+	}
+	for(auto term : searchterms) {
+		const wchar_t* pstr = term.c_str();
+		std::vector<code_pointer> result;
+		searched_terms[term] = result;
+		int trycode = BufferIO::GetVal(pstr);
+		if(trycode && dataManager.GetData(trycode, 0)) {
+			auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
+			result.push_back(ptr);
+			searched_terms[term] = result;
+			continue;
+		}
+		std::vector<unsigned int> set_code;
+		if(pstr[0] == L'@')
+			set_code = dataManager.GetSetCode(&pstr[1]);
+		else
+			set_code = dataManager.GetSetCode(&pstr[0]);
+		if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
+			pstr = 0;
+		auto strpointer = dataManager._strings.begin();
+		for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
+			if(CheckCard(ptr->second, strpointer->second, pstr, set_code))
+				result.push_back(ptr);
+		}
+		if(result.size())
+			searched_terms[term] = result;
+	}
+	for(auto& res : searched_terms) {
+		results.insert(results.end(), res.second.begin(), res.second.end());
+	}
+	SortList();
+	auto ip = std::unique(results.begin(), results.end());
+	results.resize(std::distance(results.begin(), ip));
 	myswprintf(result_string, L"%d", results.size());
 	if(results.size() > 7) {
 		mainGame->scrFilter->setVisible(true);
@@ -890,26 +830,106 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
 	}
-	SortList();
 }
-bool DeckBuilder::CardNameCompare(std::wstring sa, std::wstring sb) {
-	if(sa.empty() || sb.empty() || (sb.size() > sa.size()))
+bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const wchar_t* pstr, std::vector<unsigned int>& set_code) {
+	if(data.type & TYPE_TOKEN || (data.ot > 3 && !mainGame->chkAnime->isChecked()))
 		return false;
-	std::transform(sa.begin(), sa.end(), sa.begin(), ::tolower);
-	std::transform(sb.begin(), sb.end(), sb.begin(), ::tolower);
-	std::vector<std::wstring> tokens;
-	std::size_t pos;
-	while((pos = sb.find(L'*')) != std::wstring::npos) {
-		if(pos != 0)
-			tokens.push_back(sb.substr(0, pos));
-		sb = sb.substr(pos + 1);
-	}
-	if(sb.size())
-		tokens.push_back(sb);
-	for(auto token : tokens) {
-		if((pos = sa.find(token)) == std::wstring::npos)
+	switch(filter_type) {
+	case 1: {
+		if(!(data.type & TYPE_MONSTER) || (data.type & filter_type2) != filter_type2)
 			return false;
-		sa = sa.substr(pos + 1);
+		if(filter_race && data.race != filter_race)
+			return false;
+		if(filter_attrib && data.attribute != filter_attrib)
+			return false;
+		if(filter_atktype) {
+			if((filter_atktype == 1 && data.attack != filter_atk) || (filter_atktype == 2 && data.attack < filter_atk)
+				|| (filter_atktype == 3 && data.attack <= filter_atk) || (filter_atktype == 4 && (data.attack > filter_atk || data.attack < 0))
+				|| (filter_atktype == 5 && (data.attack >= filter_atk || data.attack < 0)) || (filter_atktype == 6 && data.attack != -2))
+				return false;
+		}
+		if(filter_deftype) {
+			if((filter_deftype == 1 && data.defense != filter_def) || (filter_deftype == 2 && data.defense < filter_def)
+				|| (filter_deftype == 3 && data.defense <= filter_def) || (filter_deftype == 4 && (data.defense > filter_def || data.defense < 0))
+				|| (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2)
+				|| (data.type & TYPE_LINK))
+				return false;
+		}
+		if(filter_lvtype) {
+			if((filter_lvtype == 1 && data.level != filter_lv) || (filter_lvtype == 2 && data.level < filter_lv)
+				|| (filter_lvtype == 3 && data.level <= filter_lv) || (filter_lvtype == 4 && data.level > filter_lv)
+				|| (filter_lvtype == 5 && data.level >= filter_lv) || filter_lvtype == 6)
+				return false;
+		}
+		if(filter_scltype) {
+			if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
+				|| (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
+				|| (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6
+				|| !(data.type & TYPE_PENDULUM))
+				return false;
+		}
+		break;
+	}
+	case 2: {
+		if(!(data.type & TYPE_SPELL))
+			return false;
+		if(filter_type2 && data.type != filter_type2)
+			return false;
+		break;
+	}
+	case 3: {
+		if(!(data.type & TYPE_TRAP))
+			return false;
+		if(filter_type2 && data.type != filter_type2)
+			return false;
+		break;
+	}
+	}
+	if(filter_effect && !(data.category & filter_effect))
+		return false;
+	if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
+		return false;
+	if(filter_lm) {
+		unsigned int limitcode = data.code;
+		auto flit = filterList->content.find(limitcode);
+		if(flit == filterList->content.end())
+			limitcode = data.alias ? data.alias : data.code;
+		if(filter_lm <= FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
+			return false;
+		if(filter_lm == FILTER_UNLIMITED) {
+			if(filterList->whitelist) {
+				if(!filterList->content.count(limitcode) || filterList->content[limitcode] < 3)
+					return false;
+			} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
+				return false;
+		}
+		if(filter_lm == FILTER_OCG && data.ot != 0x1)
+			return false;
+		if(filter_lm == FILTER_TCG && data.ot != 0x2)
+			return false;
+		if(filter_lm == FILTER_TCG_OCG && data.ot != 0x3)
+			return false;
+		if(filter_lm == FILTER_ANIME && data.ot != 0x4)
+			return false;
+		if(filter_lm == FILTER_ILLEGAL && data.ot != 0x8)
+			return false;
+		if(filter_lm == FILTER_VIDEOGAME && data.ot != 0x10)
+			return false;
+		if(filter_lm == FILTER_CUSTOM && data.ot != 0x20)
+			return false;
+	}
+	if(pstr) {
+		if(pstr[0] == L'$') {
+			if(!Game::CompareStrings(text.name.c_str(), &pstr[1]))
+				return false;
+		} else if(pstr[0] == L'@' && set_code.size()) {
+			if(!check_set_code(data, set_code))
+				return false;
+		} else {
+			if(!Game::CompareStrings(text.name.c_str(), pstr) && !(Game::CompareStrings(text.text.c_str(), pstr))
+				&& (!set_code.size() || !check_set_code(data, set_code)))
+				return false;
+		}
 	}
 	return true;
 }
