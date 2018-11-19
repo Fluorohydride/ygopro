@@ -900,13 +900,13 @@ bool DeckBuilder::CardNameCompare(std::wstring sa, std::wstring sb) {
 	std::vector<std::wstring> tokens;
 	std::size_t pos;
 	while((pos = sb.find(L'*')) != std::wstring::npos) {
-		tokens.push_back(sb.substr(0, pos));
+		if(pos != 0)
+			tokens.push_back(sb.substr(0, pos));
 		sb = sb.substr(pos + 1);
 	}
 	if(sb.size())
 		tokens.push_back(sb);
 	for(auto token : tokens) {
-		std::size_t pos;
 		if((pos = sa.find(token)) == std::wstring::npos)
 			return false;
 		sa = sa.substr(pos + 1);
