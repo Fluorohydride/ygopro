@@ -29,6 +29,7 @@ public:
 	void Initialize();
 	void Terminate();
 	void GetHoveredCard();
+	bool CheckFilterTypes();
 	void FilterCards();
 	bool CheckCard(const CardDataC& data, const CardString& text, const wchar_t* pstr, std::vector<unsigned int>& setcode);
 	void StartFilter();
@@ -58,6 +59,20 @@ public:
 	unsigned int filter_scltype;
 	unsigned int filter_scl;
 	unsigned int filter_marks;
+	long long prev_filter_effect;
+	unsigned int prev_filter_type;
+	unsigned int prev_filter_type2;
+	unsigned int prev_filter_attrib;
+	unsigned int prev_filter_race;
+	unsigned int prev_filter_atktype;
+	int prev_filter_atk;
+	unsigned int prev_filter_deftype;
+	int prev_filter_def;
+	unsigned int prev_filter_lvtype;
+	unsigned int prev_filter_lv;
+	unsigned int prev_filter_scltype;
+	unsigned int prev_filter_scl;
+	unsigned int prev_filter_marks;
 	search_filters filter_lm;
 	position2di mouse_pos;
 	int hovered_code;

@@ -745,6 +745,29 @@ void DeckBuilder::GetHoveredCard() {
 			imageManager.RemoveTexture(pre_code);
 	}
 }
+bool DeckBuilder::CheckFilterTypes() {
+	bool res = false;
+#define LF(x) if(x != prev_##x) {\
+	res = true;\
+	}\
+	prev_##x = x;
+	LF(filter_effect)
+		LF(filter_type)
+		LF(filter_type2)
+		LF(filter_attrib)
+		LF(filter_race)
+		LF(filter_atktype)
+		LF(filter_atk)
+		LF(filter_deftype)
+		LF(filter_def)
+		LF(filter_lvtype)
+		LF(filter_lv)
+		LF(filter_scltype)
+		LF(filter_scl)
+		LF(filter_marks)
+#undef LF
+		return res;
+}
 void DeckBuilder::StartFilter() {
 	filter_type = mainGame->cbCardType->getSelected();
 	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
@@ -763,7 +786,7 @@ void DeckBuilder::FilterCards() {
 	results.clear();
 	std::wstring searchterm(mainGame->ebCardName->getText());
 	std::vector<std::wstring> searchterms;
-	std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::tolower);
+	std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::toupper);
 	if(searchterm.empty())
 		searchterms.push_back(searchterm);
 	else {
@@ -775,6 +798,8 @@ void DeckBuilder::FilterCards() {
 		if(searchterm.size())
 			searchterms.push_back(searchterm);
 	}
+	if(CheckFilterTypes())
+		searched_terms.clear();
 	//removes no longer existing search terms from the cache
 	for(auto it = searched_terms.cbegin(); it != searched_terms.cend();) {
 		if(std::find(searchterms.begin(), searchterms.end(), (*it).first) == searchterms.end())
@@ -920,13 +945,15 @@ bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const
 	}
 	if(pstr) {
 		if(pstr[0] == L'$') {
-			if(!Game::CompareStrings(text.name.c_str(), &pstr[1]))
+			auto tokens = Game::tokenize(&pstr[1], L"*");
+			if(!Game::CompareStrings(text.name, tokens, true))
 				return false;
 		} else if(pstr[0] == L'@' && set_code.size()) {
 			if(!check_set_code(data, set_code))
 				return false;
 		} else {
-			if(!Game::CompareStrings(text.name.c_str(), pstr) && !(Game::CompareStrings(text.text.c_str(), pstr))
+			auto tokens = Game::tokenize(pstr, L"*");
+			if(!Game::CompareStrings(text.name, tokens, true) && !(Game::CompareStrings(text.text, tokens, true))
 				&& (!set_code.size() || !check_set_code(data, set_code)))
 				return false;
 		}
