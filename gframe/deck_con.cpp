@@ -902,7 +902,7 @@ void DeckBuilder::FilterCards() {
 				int trycode = BufferIO::GetVal(elements_iterator->c_str());
 				bool tryresult = dataManager.GetData(trycode, 0);
 				if(!tryresult && !CardNameContains(text.name.c_str(), elements_iterator->c_str()) && text.text.find(elements_iterator->c_str()) == std::wstring::npos
-					&& !mainGame->CheckRegEx(text.text, elements_iterator->c_str())
+					&& !mainGame->CheckRegEx(text.text, *elements_iterator)
 					&& (!set_code_map[*elements_iterator] || !check_set_code(data, set_code_map[*elements_iterator]))) {
 					is_target = false;
 					break;
