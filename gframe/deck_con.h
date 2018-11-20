@@ -29,9 +29,9 @@ public:
 	void Initialize();
 	void Terminate();
 	void GetHoveredCard();
-	bool CheckFilterTypes();
+	bool FiltersChanged();
 	void FilterCards();
-	bool CheckCard(const CardDataC& data, const CardString& text, const wchar_t* pstr, std::vector<unsigned int>& setcode);
+	bool CheckCard(const CardDataC& data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& setcode);
 	void StartFilter();
 	void ClearFilter();
 	void ClearSearch();

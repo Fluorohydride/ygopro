@@ -172,12 +172,12 @@ std::wstring DataManager::GetSetName(int code) {
 		return L"";
 	return csit->second;
 }
-std::vector<unsigned int> DataManager::GetSetCode(std::wstring setname) {
+std::vector<unsigned int> DataManager::GetSetCode(std::vector<std::wstring>& setname) {
 	std::vector<unsigned int> res;
-	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
-		auto xpos = csit->second.find_first_of(L'|');//setname|extra info
-		if(Game::CompareStrings(csit->second.substr(0, xpos), setname, true))
-			res.push_back(csit->first);
+	for(auto& string : _setnameStrings) {
+		auto xpos = string.second.find_first_of(L'|');//setname|extra info
+		if(Game::CompareStrings(string.second.substr(0, xpos), setname, true))
+			res.push_back(string.first);
 	}
 	return res;
 }

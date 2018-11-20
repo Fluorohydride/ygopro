@@ -42,6 +42,8 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 }
 
 static bool check_set_code(const CardDataC& data, std::vector<unsigned int>& setcodes) {
+	if(setcodes.empty())
+		return false;
 	unsigned long long card_setcode = data.setcode;
 	if (data.alias) {
 		auto aptr = dataManager._datas.find(data.alias);
@@ -317,7 +319,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch (id) {
 			case EDITBOX_KEYWORD: {
-				stringw filter = mainGame->ebCardName->getText();
+				std::wstring filter = mainGame->ebCardName->getText();
 				if (filter.size() > 2) {
 					StartFilter();
 				}
@@ -745,7 +747,7 @@ void DeckBuilder::GetHoveredCard() {
 			imageManager.RemoveTexture(pre_code);
 	}
 }
-bool DeckBuilder::CheckFilterTypes() {
+bool DeckBuilder::FiltersChanged() {
 	bool res = false;
 #define LF(x) if(x != prev_##x) {\
 	res = true;\
@@ -789,16 +791,9 @@ void DeckBuilder::FilterCards() {
 	std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::toupper);
 	if(searchterm.empty())
 		searchterms.push_back(searchterm);
-	else {
-		std::size_t pos;
-		while((pos = searchterm.find(L'+')) != std::wstring::npos) {
-			searchterms.push_back(searchterm.substr(0, pos));
-			searchterm = searchterm.substr(pos + 1);
-		}
-		if(searchterm.size())
-			searchterms.push_back(searchterm);
-	}
-	if(CheckFilterTypes())
+	else
+		searchterms = Game::tokenize(searchterm, L"+");
+	if(FiltersChanged())
 		searched_terms.clear();
 	//removes no longer existing search terms from the cache
 	for(auto it = searched_terms.cbegin(); it != searched_terms.cend();) {
@@ -815,10 +810,9 @@ void DeckBuilder::FilterCards() {
 			it++;
 	}
 	for(auto term : searchterms) {
-		const wchar_t* pstr = term.c_str();
 		std::vector<code_pointer> result;
 		searched_terms[term] = result;
-		int trycode = BufferIO::GetVal(pstr);
+		int trycode = BufferIO::GetVal(term.c_str());
 		if(trycode && dataManager.GetData(trycode, 0)) {
 			auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
 			result.push_back(ptr);
@@ -826,15 +820,22 @@ void DeckBuilder::FilterCards() {
 			continue;
 		}
 		std::vector<unsigned int> set_code;
-		if(pstr[0] == L'@')
-			set_code = dataManager.GetSetCode(&pstr[1]);
-		else
-			set_code = dataManager.GetSetCode(&pstr[0]);
-		if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
-			pstr = 0;
+		std::vector<std::wstring> tokens;
+		if(!term.empty()) {
+			if(term[0] == L'@' || term[0] == L'$') {
+				if(term.size() > 1)
+					tokens = Game::tokenize(&term[1], L"*");
+			} else {
+				tokens = Game::tokenize(term, L"*");
+			}
+		}
+		if(tokens.empty())
+			tokens.push_back(L"");
+		set_code = dataManager.GetSetCode(tokens);
 		auto strpointer = dataManager._strings.begin();
+		wchar_t checkterm = term.empty() ? term[0] : 0;
 		for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
-			if(CheckCard(ptr->second, strpointer->second, pstr, set_code))
+			if(CheckCard(ptr->second, strpointer->second, checkterm, tokens, set_code))
 				result.push_back(ptr);
 		}
 		if(result.size())
@@ -856,7 +857,7 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setPos(0);
 	}
 }
-bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const wchar_t* pstr, std::vector<unsigned int>& set_code) {
+bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
 	if(data.type & TYPE_TOKEN || (data.ot > 3 && !mainGame->chkAnime->isChecked()))
 		return false;
 	switch(filter_type) {
@@ -943,16 +944,12 @@ bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const
 		if(filter_lm == FILTER_CUSTOM && data.ot != 0x20)
 			return false;
 	}
-	if(pstr) {
-		if(pstr[0] == L'$') {
-			auto tokens = Game::tokenize(&pstr[1], L"*");
-			if(!Game::CompareStrings(text.name, tokens, true))
-				return false;
-		} else if(pstr[0] == L'@' && set_code.size()) {
-			if(!check_set_code(data, set_code))
-				return false;
+	if(tokens.size()) {
+		if(checkchar == L'$') {
+			return Game::CompareStrings(text.name, tokens, true);
+		} else if(checkchar == L'@') {
+			return check_set_code(data, set_code);
 		} else {
-			auto tokens = Game::tokenize(pstr, L"*");
 			if(!Game::CompareStrings(text.name, tokens, true) && !(Game::CompareStrings(text.text, tokens, true))
 				&& (!set_code.size() || !check_set_code(data, set_code)))
 				return false;
@@ -971,6 +968,7 @@ void DeckBuilder::ClearSearch() {
 	mainGame->ebStar->setEnabled(false);
 	mainGame->ebScale->setEnabled(false);
 	mainGame->ebCardName->setText(L"");
+	searched_terms.clear();
 	ClearFilter();
 	results.clear();
 	myswprintf(result_string, L"%d", 0);

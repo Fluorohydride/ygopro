@@ -24,7 +24,7 @@ public:
 	std::wstring GetVictoryString(int code);
 	std::wstring GetCounterName(int code);
 	std::wstring GetSetName(int code);
-	std::vector<unsigned int> GetSetCode(std::wstring setname);
+	std::vector<unsigned int> GetSetCode(std::vector<std::wstring>& setname);
 	std::wstring GetNumString(int num, bool bracket = false);
 	std::wstring FormatLocation(int location, int sequence);
 	std::wstring FormatAttribute(int attribute);
