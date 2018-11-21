@@ -5,10 +5,7 @@
 #include <functional>
 #include "bufferio.h"
 
-#ifdef _WIN32
-#include <direct.h>
-#include <sys/stat.h>
-#else
+#ifndef _WIN32
 #include <dirent.h>
 #include <sys/stat.h>
 #endif
