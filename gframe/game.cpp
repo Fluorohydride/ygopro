@@ -905,6 +905,7 @@ std::vector<std::string> Game::FindfolderFiles(const std::string& path, const st
 			continue;
 		res.push_back(name.c_str());
 	}
+	list->drop();
 	filesystem->changeWorkingDirectoryTo(cwd);
 	return res;
 }
