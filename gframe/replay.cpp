@@ -132,7 +132,7 @@ void Replay::EndRecord(size_t size) {
 	is_recording = false;
 }
 void Replay::SaveReplay(const std::wstring& name) {
-	std::ofstream replay_file(L"./replay/" + name + L".yrpX", std::ofstream::binary);
+	std::ofstream replay_file("./replay/" + BufferIO::EncodeUTF8s(name) + ".yrpX", std::ofstream::binary);
 	if(!replay_file.is_open())
 		return;
 	replay_file.write((char*)&pheader, sizeof(pheader));
@@ -140,9 +140,9 @@ void Replay::SaveReplay(const std::wstring& name) {
 	replay_file.close();
 }
 bool Replay::OpenReplay(const std::wstring& name) {
-	std::ifstream replay_file(name, std::ifstream::binary);
+	std::ifstream replay_file(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(L"./replay/" + name, std::ifstream::binary);
+		replay_file.open("./replay/" + BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 		if(!replay_file.is_open())
 			return false;
 	}
@@ -166,9 +166,9 @@ bool Replay::OpenReplay(const std::wstring& name) {
 	return true;
 }
 bool Replay::CheckReplay(const std::wstring& name) {
-	std::ifstream replay_file(name, std::ifstream::binary);
+	std::ifstream replay_file(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(L"./replay/" + name, std::ifstream::binary);
+		replay_file.open("./replay/" + BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 		if(!replay_file.is_open())
 			return false;
 	}
