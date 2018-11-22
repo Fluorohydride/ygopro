@@ -11,19 +11,19 @@ namespace ygo {
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
-	enum search_filters {
-		FILTER_NONE,
-		FILTER_BANNED,
-		FILTER_LIMITED,
-		FILTER_SEMI_LIMITED,
-		FILTER_UNLIMITED,
-		FILTER_OCG,
-		FILTER_TCG,
-		FILTER_TCG_OCG,
-		FILTER_ANIME,
-		FILTER_ILLEGAL,
-		FILTER_VIDEOGAME,
-		FILTER_CUSTOM
+	enum limitation_search_filters {
+		LIMITATION_FILTER_NONE,
+		LIMITATION_FILTER_BANNED,
+		LIMITATION_FILTER_LIMITED,
+		LIMITATION_FILTER_SEMI_LIMITED,
+		LIMITATION_FILTER_UNLIMITED,
+		LIMITATION_FILTER_OCG,
+		LIMITATION_FILTER_TCG,
+		LIMITATION_FILTER_TCG_OCG,
+		LIMITATION_FILTER_ANIME,
+		LIMITATION_FILTER_ILLEGAL,
+		LIMITATION_FILTER_VIDEOGAME,
+		LIMITATION_FILTER_CUSTOM
 	};
 	virtual bool OnEvent(const irr::SEvent& event);
 	void Initialize();
@@ -73,7 +73,7 @@ public:
 	unsigned int prev_filter_scltype;
 	unsigned int prev_filter_scl;
 	unsigned int prev_filter_marks;
-	search_filters filter_lm;
+	limitation_search_filters filter_lm;
 	position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;

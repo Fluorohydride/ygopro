@@ -773,7 +773,7 @@ bool DeckBuilder::FiltersChanged() {
 void DeckBuilder::StartFilter() {
 	filter_type = mainGame->cbCardType->getSelected();
 	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-	filter_lm = static_cast<search_filters>(mainGame->cbLimit->getSelected());
+	filter_lm = static_cast<limitation_search_filters>(mainGame->cbLimit->getSelected());
 	if(filter_type == 1) {
 		filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
 		filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
@@ -920,28 +920,28 @@ bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const
 		auto flit = filterList->content.find(limitcode);
 		if(flit == filterList->content.end())
 			limitcode = data.alias ? data.alias : data.code;
-		if(filter_lm <= FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
+		if(filter_lm <= LIMITATION_FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
 			return false;
-		if(filter_lm == FILTER_UNLIMITED) {
+		if(filter_lm == LIMITATION_FILTER_UNLIMITED) {
 			if(filterList->whitelist) {
 				if(!filterList->content.count(limitcode) || filterList->content[limitcode] < 3)
 					return false;
 			} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
 				return false;
 		}
-		if(filter_lm == FILTER_OCG && data.ot != 0x1)
+		if(filter_lm == LIMITATION_FILTER_OCG && data.ot != 0x1)
 			return false;
-		if(filter_lm == FILTER_TCG && data.ot != 0x2)
+		if(filter_lm == LIMITATION_FILTER_TCG && data.ot != 0x2)
 			return false;
-		if(filter_lm == FILTER_TCG_OCG && data.ot != 0x3)
+		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data.ot != 0x3)
 			return false;
-		if(filter_lm == FILTER_ANIME && data.ot != 0x4)
+		if(filter_lm == LIMITATION_FILTER_ANIME && data.ot != 0x4)
 			return false;
-		if(filter_lm == FILTER_ILLEGAL && data.ot != 0x8)
+		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data.ot != 0x8)
 			return false;
-		if(filter_lm == FILTER_VIDEOGAME && data.ot != 0x10)
+		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data.ot != 0x10)
 			return false;
-		if(filter_lm == FILTER_CUSTOM && data.ot != 0x20)
+		if(filter_lm == LIMITATION_FILTER_CUSTOM && data.ot != 0x20)
 			return false;
 	}
 	if(tokens.size()) {
@@ -1074,8 +1074,8 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 		else
 			limit_codes.insert(alias);
 	};
-	auto f2 = [&](std::vector<code_pointer> list) {
-		for(auto it : list) {
+	auto f2 = [&](std::vector<code_pointer>& list) {
+		for(auto& it : list) {
 			if(it->first == limitcode || it->second.alias == limitcode) {
 				f(it->first, it->second.alias);
 				found++;
