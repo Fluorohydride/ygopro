@@ -1,8 +1,7 @@
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
-#include "../ocgcore/common.h"
-#include "../ocgcore/mtrandom.h"
+#include <mtrandom.h>
 
 namespace ygo {
 

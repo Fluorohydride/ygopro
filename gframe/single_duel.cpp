@@ -1,9 +1,7 @@
 #include "single_duel.h"
 #include "netserver.h"
 #include "game.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
-#include "../ocgcore/mtrandom.h"
+#include <mtrandom.h>
 
 namespace ygo {
 

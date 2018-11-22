@@ -5,7 +5,7 @@
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "replay.h"
-#include "../ocgcore/mtrandom.h"
+#include <mtrandom.h>
 
 namespace ygo {
 

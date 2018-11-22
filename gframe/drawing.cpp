@@ -3,7 +3,6 @@
 #include "image_manager.h"
 #include "deck_manager.h"
 #include "duelclient.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 

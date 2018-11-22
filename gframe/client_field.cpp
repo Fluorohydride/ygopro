@@ -6,7 +6,6 @@
 #include "image_manager.h"
 #include "game.h"
 #include "materials.h"
-#include "../ocgcore/common.h"
 
 namespace ygo {
 

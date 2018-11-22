@@ -75,8 +75,8 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "mymutex.h"
 #include "mysignal.h"
 #include "mythread.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
+#include <ocgapi.h>
+#include <common.h>
 #include "utils.h"
 
 using namespace irr;

@@ -12,7 +12,7 @@
 #include "network.h"
 #include "data_manager.h"
 #include "deck_manager.h"
-#include "../ocgcore/mtrandom.h"
+#include <mtrandom.h>
 #include "replay.h"
 
 namespace ygo {

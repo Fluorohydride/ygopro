@@ -3,7 +3,6 @@
 #include "materials.h"
 #include "image_manager.h"
 #include "single_mode.h"
-#include "../ocgcore/common.h"
 #include "game.h"
 #include "replay.h"
 #include "replay_mode.h"

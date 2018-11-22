@@ -10,7 +10,6 @@
 #include "single_mode.h"
 #include "materials.h"
 #include <bitset>
-#include "../ocgcore/common.h"
 #include <algorithm>
 
 namespace ygo {
