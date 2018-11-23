@@ -236,10 +236,7 @@ bool LoadCardList(const std::wstring& name, std::vector<int>* mainlist = nullptr
 			is_side = true;
 			continue;
 		}
-		auto pos = str.find_first_not_of("0123456789");
-		if(pos != std::string::npos)
-			str.erase(0, pos);
-		if(!str.empty()) {
+		if(str.find_first_of("0123456789") != std::string::npos) {
 			int code = std::stoi(str);
 			res.push_back(code);
 			if(is_side) {
