@@ -833,7 +833,7 @@ void DeckBuilder::FilterCards() {
 			tokens.push_back(L"");
 		set_code = dataManager.GetSetCode(tokens);
 		auto strpointer = dataManager._strings.begin();
-		wchar_t checkterm = term.empty() ? term[0] : 0;
+		wchar_t checkterm = term.size() ? term[0] : 0;
 		for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
 			if(CheckCard(ptr->second, strpointer->second, checkterm, tokens, set_code))
 				result.push_back(ptr);
