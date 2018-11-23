@@ -975,10 +975,13 @@ void Game::LoadConfig() {
 		return;
 	std::string str;
 	while(std::getline(conf_file, str)) {
+		auto pos = str.find_first_of("\n\r");
+		if(str.size() && pos != std::string::npos)
+			str = str.erase(0, pos);
 		if(str.empty() || str.at(0) == '#') {
 			continue;
 		}
-		auto pos = str.find_first_of("=");
+		pos = str.find_first_of("=");
 		if(pos == std::wstring::npos)
 			continue;
 		auto type = str.substr(0, pos - 1);

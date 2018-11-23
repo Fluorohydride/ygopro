@@ -73,10 +73,13 @@ bool DataManager::LoadStrings(const char* file) {
 		return false;
 	std::string str;
 	while(std::getline(string_file, str)) {
+		auto pos = str.find_first_of("\n\r");
+		if(str.size() && pos != std::string::npos)
+			str = str.erase(0, pos);
 		if(str.empty() || str.at(0) != '!') {
 			continue;
 		}
-		auto pos = str.find(' ');
+		 pos = str.find(' ');
 		auto type = str.substr(1, pos - 1);
 		str = str.substr(pos + 1);
 		pos = str.find(' ');
