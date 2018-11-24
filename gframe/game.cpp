@@ -1748,6 +1748,9 @@ std::wstring Game::ReadPuzzleMessage(const char* script_name) {
 	size_t start = std::string::npos;
 	bool stop = false;
 	while(std::getline(infile, str) && !stop) {
+		auto pos = str.find_first_of("\n\r");
+		if(str.size() && pos != std::string::npos)
+			str = str.erase(0, pos);
 		bool was_empty = str.empty();
 		if(start == std::string::npos) {
 			start = str.find("--[[message");
