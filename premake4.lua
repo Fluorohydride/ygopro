@@ -51,8 +51,8 @@ solution "ygo"
 
     include "ocgcore"
     include "gframe"
-	include "fmt"
     if os.is("windows") then
+	include "fmt"
     include "event"
     include "freetype"
     include "irrlicht"
