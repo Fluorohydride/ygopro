@@ -11,7 +11,7 @@
 #include "single_mode.h"
 #include <regex>
 
-const unsigned short PRO_VERSION = 0x1346;
+const unsigned short PRO_VERSION = 0x1347;
 
 namespace ygo {
 
