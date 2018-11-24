@@ -842,8 +842,8 @@ void DeckBuilder::FilterCards() {
 			element_start++;
 		}
 		if(element_start < str.size()) {
-			element.setcode = dataManager.GetSetCode(element.keyword.c_str());
 			element.keyword = str.substr(element_start);
+			element.setcode = dataManager.GetSetCode(element.keyword.c_str());
 			query_elements.push_back(element);
 		}
 	}
