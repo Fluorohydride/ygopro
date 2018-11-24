@@ -95,8 +95,6 @@ bool DataManager::LoadStrings(const char* file) {
 			_setnameStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
 	}
 	string_file.close();
-	/*for(int i = 0; i < 255; ++i)
-		myswprintf(numStrings[i], L"%d", i);*/
 	return true;
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
@@ -186,8 +184,8 @@ std::vector<unsigned int> DataManager::GetSetCode(std::vector<std::wstring>& set
 }
 std::wstring DataManager::GetNumString(int num, bool bracket) {
 	if(!bracket)
-		return std::to_wstring(num);
-	return L"(" + std::to_wstring(num) + L")";
+		return fmt::to_wstring(num);
+	return fmt::format(L"({})", num);
 }
 std::wstring DataManager::FormatLocation(int location, int sequence) {
 	if(location == 0x8) {

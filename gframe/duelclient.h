@@ -31,7 +31,7 @@ private:
 	static char duel_client_write[0x2000];
 	static bool is_closing;
 	static u64 select_hint;
-	static wchar_t event_string[256];
+	static std::wstring event_string;
 	static mtrandom rnd;
 public:
 	static unsigned int temp_ip;

@@ -77,6 +77,8 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "mythread.h"
 #include <ocgapi.h>
 #include <common.h>
+#include <fmt\format.h>
+#include <fmt\printf.h>
 #include "utils.h"
 
 using namespace irr;

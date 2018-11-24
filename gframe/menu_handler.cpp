@@ -316,9 +316,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.Lock();
-				wchar_t textBuffer[256];
-				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363).c_str());
-				mainGame->stQMessage->setText((wchar_t*)textBuffer);
+				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363)).c_str());
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
@@ -440,11 +438,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				int addr = DuelClient::hosts[sel].ipaddr;
 				int port = DuelClient::hosts[sel].port;
-				wchar_t buf[20];
-				myswprintf(buf, L"%d.%d.%d.%d", addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
-				mainGame->ebJoinHost->setText(buf);
-				myswprintf(buf, L"%d", port);
-				mainGame->ebJoinPort->setText(buf);
+				mainGame->ebJoinHost->setText(fmt::format(L"{}.{}.{}.{}", addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff).c_str());
+				mainGame->ebJoinPort->setText(fmt::to_wstring(port).c_str());
 				break;
 			}
 			case LISTBOX_REPLAY_LIST: {
@@ -453,12 +448,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)))
 					break;
-				wchar_t infobuf[256];
 				std::wstring repinfo;
 				time_t curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);
-				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
-				repinfo.append(infobuf);
+				repinfo.append(fmt::format(L"{}/{}/{} {:02}:{:02}:{:02}\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec).c_str());
 				wchar_t namebuf[6][20];
 				ReplayMode::cur_replay.ReadName(namebuf[0]);
 				ReplayMode::cur_replay.ReadName(namebuf[1]);
@@ -471,12 +464,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					ReplayMode::cur_replay.ReadName(namebuf[5]);
 				}
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
+					repinfo.append(fmt::format(L"{}\n{}\n===VS===\n{}\n{}\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]));
 				else if (ReplayMode::cur_replay.pheader.flag & REPLAY_RELAY)
-					myswprintf(infobuf, L"%ls\n%ls\n%ls\n===VS===\n%ls\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3], namebuf[4], namebuf[5]);
+					repinfo.append(fmt::format(L"{}\n{}\n{}\n===VS===\n{}\n{}\n{}\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3], namebuf[4], namebuf[5]));
 				else
-					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
-				repinfo.append(infobuf);
+					repinfo.append(fmt::format(L"{}\n===VS===\n{}\n", namebuf[0], namebuf[1]));
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->stReplayInfo->setText((wchar_t*)repinfo.c_str());
 				if(ReplayMode::cur_replay.pheader.id == 0x31707279) {

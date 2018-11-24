@@ -39,7 +39,7 @@ public:
 
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
-	const wchar_t* GetLFListName(int lfhash);
+	std::wstring GetLFListName(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes = 0);
 	int TypeCount(std::vector<code_pointer> cards, int type);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0);
