@@ -174,7 +174,7 @@ irr::video::ITexture* ImageManager::GetTextureExpansions(char* file, s32 width, 
 		return img;
 	bool find = false;
 	FileSystem::TraversalDir("./expansions", [this, file, width, height, &img, &find](const char* name, bool isdir) {
-		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..")) {
+		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
 			char subdir[1024];
 			sprintf(subdir, "./expansions/%s", name);
 			img = GetTextureExpansionsDirectry(subdir, file, width, height);

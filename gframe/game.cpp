@@ -865,7 +865,7 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 void Game::LoadExpansionDB() {
 	LoadExpansionDBDirectry("./expansions");
 	FileSystem::TraversalDir("./expansions", [this](const char* name, bool isdir) {
-		if(isdir && strcmp(name, ".") && strcmp(name, "..")) {
+		if(isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
 			char subdir[1024];
 			sprintf(subdir, "./expansions/%s", name);
 			LoadExpansionDBDirectry(subdir);
@@ -884,7 +884,7 @@ void Game::LoadExpansionDBDirectry(const char* path) {
 void Game::LoadExpansionStrings() {
 	dataManager.LoadStrings("./expansions/strings.conf");
 	FileSystem::TraversalDir("./expansions", [](const char* name, bool isdir) {
-		if(isdir && strcmp(name, ".") && strcmp(name, "..")) {
+		if(isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
 			char fpath[1024];
 			sprintf(fpath, "./expansions/%s/strings.conf", name);
 			dataManager.LoadStrings(fpath);

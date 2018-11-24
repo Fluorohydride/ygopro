@@ -944,7 +944,7 @@ byte* ReplayMode::ScriptReaderEx(const char* script_name, int* slen) {
 		return buffer;
 	bool find = false;
 	FileSystem::TraversalDir("./expansions", [script_name, slen, &buffer, &find](const char* name, bool isdir) {
-		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..")) {
+		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
 			char subdir[1024];
 			sprintf(subdir, "./expansions/%s", name);
 			buffer = ScriptReaderExDirectry(subdir, script_name, slen);

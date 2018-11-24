@@ -61,7 +61,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 void DeckManager::LoadLFList() {
 	LoadLFListSingle("expansions/lflist.conf");
 	FileSystem::TraversalDir("./expansions", [this](const char* name, bool isdir) {
-		if(isdir && strcmp(name, ".") && strcmp(name, "..")) {
+		if(isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
 			char fpath[1024];
 			sprintf(fpath, "./expansions/%s/lflist.conf", name);
 			LoadLFListSingle(fpath);
