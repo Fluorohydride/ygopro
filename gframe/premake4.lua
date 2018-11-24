@@ -5,11 +5,11 @@ project "ygopro"
 
     files { "**.cpp", "**.cc", "**.c", "**.h" }
     excludes "lzma/**"
-    includedirs { "../ocgcore", "../irrKlang/include" }
-    links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3" , "event", "IrrKlang"}
+    includedirs { "../ocgcore", "../irrKlang/include", "../fmt/include" }
+    links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3" , "event", "IrrKlang", "fmt" }
 
     configuration "windows"
-        files "ygopro.rc"
+        files "../ygopro.rc"
         excludes "CGUIButton.cpp"
         includedirs { "../irrlicht/include", "../freetype/include", "../event/include", "../sqlite3" }
         libdirs { "../irrKlang/lib/Win32-visualStudio" }

@@ -366,19 +366,17 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		mainGame->btnCardSelect[i]->setVisible(true);
 		if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
 			// text
-			wchar_t formatBuffer[2048];
+			std::wstring text = L"";
 			if(conti_selecting)
-				myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
-			else if(selectable_cards[i]->location == LOCATION_OVERLAY)
-				myswprintf(formatBuffer, L"%ls[%d](%d)", 
-					dataManager.FormatLocation(selectable_cards[i]->overlayTarget->location, selectable_cards[i]->overlayTarget->sequence).c_str(),
+				text = DataManager::unknown_string;
+			else if(selectable_cards[i]->location == LOCATION_OVERLAY) {
+				text = fmt::format(L"{}[{}]({})", dataManager.FormatLocation(selectable_cards[i]->overlayTarget->location, selectable_cards[i]->overlayTarget->sequence),
 					selectable_cards[i]->overlayTarget->sequence + 1, selectable_cards[i]->sequence + 1);
-			else if (selectable_cards[i]->location == 0)
-				myswprintf(formatBuffer, L"");
-			else
-				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence).c_str(),
+			} else if(selectable_cards[i]->location) {
+				text = fmt::format(L"{}[{}]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
 					selectable_cards[i]->sequence + 1);
-			mainGame->stCardPos[i]->setText(formatBuffer);
+			}
+			mainGame->stCardPos[i]->setText(text.c_str());
 			// color
 			if (selectable_cards[i]->is_selected)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
@@ -407,9 +405,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			}
 		} else {
 			if(sort_list[i]) {
-				wchar_t formatBuffer[2048];
-				myswprintf(formatBuffer, L"%d", sort_list[i]);
-				mainGame->stCardPos[i]->setText(formatBuffer);
+				mainGame->stCardPos[i]->setText(fmt::to_wstring(sort_list[i]).c_str());
 			} else mainGame->stCardPos[i]->setText(L"");
 			mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
@@ -450,10 +446,8 @@ void ClientField::ShowChainCard() {
 		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
-		wchar_t formatBuffer[2048];
-		myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence).c_str(),
-			selectable_cards[i]->sequence + 1);
-		mainGame->stCardPos[i]->setText(formatBuffer);
+		mainGame->stCardPos[i]->setText(fmt::format(L"{}[{}]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+			selectable_cards[i]->sequence + 1).c_str());
 		if(selectable_cards[i]->location == LOCATION_OVERLAY) {
 			if(selectable_cards[i]->owner != selectable_cards[i]->overlayTarget->controler)
 				mainGame->stCardPos[i]->setOverrideColor(0xff0000ff);
@@ -505,15 +499,15 @@ void ClientField::ShowLocationCard() {
 		mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
-		wchar_t formatBuffer[2048];
-		if(display_cards[i]->location == LOCATION_OVERLAY)
-			myswprintf(formatBuffer, L"%ls[%d](%d)", 
-				dataManager.FormatLocation(display_cards[i]->overlayTarget->location, display_cards[i]->overlayTarget->sequence).c_str(),
+		std::wstring text;
+		if(display_cards[i]->location == LOCATION_OVERLAY) {
+			text = fmt::format(L"{}[{}]({})", dataManager.FormatLocation(display_cards[i]->overlayTarget->location, display_cards[i]->overlayTarget->sequence),
 				display_cards[i]->overlayTarget->sequence + 1, display_cards[i]->sequence + 1);
-		else
-			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(display_cards[i]->location, display_cards[i]->sequence).c_str(),
+		} else if(display_cards[i]->location) {
+			text = fmt::format(L"{}[{}]", dataManager.FormatLocation(display_cards[i]->location, display_cards[i]->sequence),
 				display_cards[i]->sequence + 1);
-		mainGame->stDisplayPos[i]->setText(formatBuffer);
+		}
+		mainGame->stDisplayPos[i]->setText(text.c_str());
 		if(display_cards[i]->location == LOCATION_OVERLAY) {
 			if(display_cards[i]->owner != display_cards[i]->overlayTarget->controler)
 				mainGame->stDisplayPos[i]->setOverrideColor(0xff0000ff);
@@ -598,11 +592,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 140;
 		mainGame->wOptions->setRelativePosition(pos);
 	}
-	if(select_hint)
-		myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint).c_str());
-	else
-		myswprintf(textBuffer, dataManager.GetSysString(555).c_str());
-	mainGame->wOptions->setText(textBuffer);
+	mainGame->wOptions->setText(dataManager.GetDesc(select_hint ? select_hint : 555).c_str());
 	mainGame->PopupElement(mainGame->wOptions);
 	mainGame->gMutex.Unlock();
 }

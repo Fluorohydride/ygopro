@@ -579,7 +579,6 @@ void Game::DrawMisc() {
 	ClientCard* pcard;
 	int seq = (dInfo.duel_field != 4) ? 6 : (dInfo.extraval & 0x1) ? 1 : 0;
 	int increase = (dInfo.duel_field != 4) ? 1 : (dInfo.extraval & 0x1) ? 2 : 4;
-	wchar_t textBuffer[64];
 	for (int p = 0, seq2 = seq; p < 2; ++p, seq2 = seq) {
 		for (int i = 0; i < 7; ++i) {
 			pcard = dField.mzone[p][i];
@@ -592,11 +591,7 @@ void Game::DrawMisc() {
 				DrawPendScale(pcard);
 		}
 		if (dField.extra[p].size()) {
-			if (dField.extra_p_count[p] > 0)
-				myswprintf(textBuffer, L"%ls%ls", dataManager.GetNumString(dField.extra[p].size()).c_str(), dataManager.GetNumString(dField.extra_p_count[p], true).c_str());
-			else
-				myswprintf(textBuffer, L"%ls", dataManager.GetNumString(dField.extra[p].size()).c_str());
-			DrawStackIndicator(textBuffer, matManager.vFieldExtra[p][speed], (p == 1));
+			DrawStackIndicator(dataManager.GetNumString(dField.extra[p].size()) + ((dField.extra_p_count[p] > 0) ? dataManager.GetNumString(dField.extra_p_count[p], true) : L""), matManager.vFieldExtra[p][speed], (p == 1));
 		}
 		if (dField.deck[p].size())
 			DrawStackIndicator(dataManager.GetNumString(dField.deck[p].size()).c_str(), matManager.vFieldDeck[p][speed], (p == 1));
@@ -618,41 +613,41 @@ void Game::DrawStatus(ClientCard* pcard) {
 		ConvertCoords((pcard->curPos.X - 0.48f), (0.39f + pcard->curPos.Y), &x2, &y2);
 	}
 	if(pcard->type & TYPE_LINK) {
-		adFont->draw(pcard->atkstring, Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
-		adFont->draw(pcard->atkstring, Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 
+		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
+		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21),
 			pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, true, false, 0);
 	} else {
 		adFont->draw(L"/", Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
 		adFont->draw(L"/", Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 0xffffffff, true, false, 0);
 		int w = adFont->getDimension(pcard->atkstring).Width;
-		adFont->draw(pcard->atkstring, Resize(x1 - 5, y1, x1 - 5, y1 + 20, -w, 0, 0, 0), 0xff000000, false, false, 0);
-		adFont->draw(pcard->atkstring, Resize(x1 - 4, y1 + 1, x1 - 4, y1 + 21, -w, 0, 0, 0),
+		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 5, y1, x1 - 5, y1 + 20, -w, 0, 0, 0), 0xff000000, false, false, 0);
+		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 4, y1 + 1, x1 - 4, y1 + 21, -w, 0, 0, 0),
 			pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, false, false, 0);
 		w = adFont->getDimension(pcard->defstring).Width;
-		adFont->draw(pcard->defstring, Resize(x1 + 4, y1, x1 + 4 + w, y1 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->defstring, Resize(x1 + 5, y1 + 1, x1 + 5 + w, y1 + 21),
+		adFont->draw(pcard->defstring.c_str(), Resize(x1 + 4, y1, x1 + 4 + w, y1 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->defstring.c_str(), Resize(x1 + 5, y1 + 1, x1 + 5 + w, y1 + 21),
 			pcard->defense > pcard->base_defense ? 0xffffff00 : pcard->defense < pcard->base_defense ? 0xffff2090 : 0xffffffff, false, false, 0);
 	}
 	if (pcard->level != 0 && pcard->rank != 0) {
 		adFont->draw(L"/", Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, true, false, 0);
 		adFont->draw(L"/", Resize(x2 + 1, y2 + 1, x2 + 3, y2 + 21), 0xffffffff, true, false, 0);
 		int w2 = adFont->getDimension(pcard->lvstring).Width;
-		adFont->draw(pcard->lvstring, Resize(x2 - 5, y2, x2 - 5, y2 + 20, -w2, 0, 0, 0), 0xff000000, false, false, 0);
-		adFont->draw(pcard->lvstring, Resize(x2 - 4, y2 +1 , x2 - 4, y2 + 21, -w2, 0, 0, 0), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
-		adFont->draw(pcard->rkstring, Resize(x2 + 4, y2, x2 + 4 + w2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->rkstring, Resize(x2 + 5, y2 + 1, x2 + 5 + w2, y2 + 21), 0xffff80ff, false, false, 0);
+		adFont->draw(pcard->lvstring.c_str(), Resize(x2 - 5, y2, x2 - 5, y2 + 20, -w2, 0, 0, 0), 0xff000000, false, false, 0);
+		adFont->draw(pcard->lvstring.c_str(), Resize(x2 - 4, y2 +1 , x2 - 4, y2 + 21, -w2, 0, 0, 0), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+		adFont->draw(pcard->rkstring.c_str(), Resize(x2 + 4, y2, x2 + 4 + w2, y2 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->rkstring.c_str(), Resize(x2 + 5, y2 + 1, x2 + 5 + w2, y2 + 21), 0xffff80ff, false, false, 0);
 	}
 	else if (pcard->rank != 0) {
-		adFont->draw(pcard->rkstring, Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->rkstring, Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xffff80ff, false, false, 0);
+		adFont->draw(pcard->rkstring.c_str(), Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->rkstring.c_str(), Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xffff80ff, false, false, 0);
 	}
 	else if (pcard->level != 0) {
-		adFont->draw(pcard->lvstring, Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->lvstring, Resize(x2 + 1, y2, x2 + 3, y2 + 21), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+		adFont->draw(pcard->lvstring.c_str(), Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->lvstring.c_str(), Resize(x2 + 1, y2, x2 + 3, y2 + 21), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
 	}
 	else if (pcard->link != 0) {
-		adFont->draw(pcard->linkstring, Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->linkstring, Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xff99ffff, false, false, 0);
+		adFont->draw(pcard->linkstring.c_str(), Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
+		adFont->draw(pcard->linkstring.c_str(), Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xff99ffff, false, false, 0);
 	}
 }
 /*Draws the pendulum scale value of a card in the pendulum zone based on its relative position
@@ -660,13 +655,13 @@ void Game::DrawStatus(ClientCard* pcard) {
 void Game::DrawPendScale(ClientCard* pcard) {
 	int x, y, swap = (pcard->sequence > 1 && pcard->sequence != 6) ? 1 : 0;
 	float x0, y0, reverse = (pcard->controler == 0) ? 1.0f : -1.0f;
-	wchar_t* strscale=L"";
+	std::wstring scale;
 	if (swap) {
 		x0 = pcard->curPos.X - 0.35f * reverse;
-		strscale = pcard->rscstring;
+		scale = pcard->rscstring;
 	} else {
 		x0 = pcard->curPos.X + 0.35f * reverse;
-		strscale = pcard->lscstring;
+		scale = pcard->lscstring;
 	}
 	if (pcard->controler == 0) {
 		swap = 1 - swap;
@@ -674,8 +669,8 @@ void Game::DrawPendScale(ClientCard* pcard) {
 	} else
 		y0 = pcard->curPos.Y + 0.29f;
 	ConvertCoords(x0, y0, &x, &y);
-	adFont->draw(strscale, Resize(x - (12 * swap), y, x + (12 * (1 - swap)), y - 800), 0xff000000, true, false, 0);
-	adFont->draw(strscale, Resize(x + 1 - (12 * swap), y, x + 1 + (12 * (1 - swap)), y - 800), 0xffffffff, true, false, 0);
+	adFont->draw(scale.c_str(), Resize(x - (12 * swap), y, x + (12 * (1 - swap)), y - 800), 0xff000000, true, false, 0);
+	adFont->draw(scale.c_str(), Resize(x + 1 - (12 * swap), y, x + 1 + (12 * (1 - swap)), y - 800), 0xffffffff, true, false, 0);
 }
 /*Draws the text in the middle of the bottom side of the zone
 */
@@ -1106,23 +1101,24 @@ void Game::DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag
 	}
 }
 void Game::DrawDeckBd() {
-	wchar_t textBuffer[64];
 	std::wstring buffer;
 	//main deck
 	driver->draw2DRectangle(Resize(310, 137, 797, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(314, 136, 409, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(315, 137, 410, 157), 0xffffffff, false, true);
-	buffer = std::to_wstring(deckManager.current_deck.main.size());
-	if(mainGame->is_siding)
-		buffer += L" (" + std::to_wstring(deckManager.pre_deck.main.size()) + L")";
+	if(mainGame->is_siding) {
+		buffer = fmt::format(L"{} ({})", deckManager.current_deck.main.size(),  deckManager.pre_deck.main.size());
+	} else {
+		buffer = fmt::to_wstring(deckManager.current_deck.main.size());
+	}
 	numFont->draw(buffer.c_str(), Resize(379, 137, 439, 157), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(380, 138, 440, 158), 0xffffffff, false, true);
 	driver->draw2DRectangle(Resize(310, 160, 797, 436), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	recti mainpos = Resize(310, 137, 797, 157);
-	buffer = dataManager.GetSysString(1312) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.main, TYPE_MONSTER)) + L" " +
-		dataManager.GetSysString(1313) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.main, TYPE_SPELL)) + L" " +
-		dataManager.GetSysString(1314) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.main, TYPE_TRAP));
+	buffer = fmt::format(L"{} {} {} {} {} {}", dataManager.GetSysString(1312), deckManager.TypeCount(deckManager.current_deck.main, TYPE_MONSTER),
+		dataManager.GetSysString(1313), deckManager.TypeCount(deckManager.current_deck.main, TYPE_SPELL),
+		dataManager.GetSysString(1314), deckManager.TypeCount(deckManager.current_deck.main, TYPE_TRAP));
 	irr::core::dimension2d<u32> mainDeckTypeSize = textFont->getDimension(buffer);
 	textFont->draw(buffer.c_str(), recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 5, mainpos.UpperLeftCorner.Y,
 		mainpos.LowerRightCorner.X, mainpos.LowerRightCorner.Y), 0xff000000, false, true);
@@ -1148,16 +1144,18 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 439, 797, 460));
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(314, 439, 409, 459), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(315, 440, 410, 460), 0xffffffff, false, true);
-	buffer = std::to_wstring(deckManager.current_deck.extra.size());
-	if(mainGame->is_siding)
-		buffer += L" (" + std::to_wstring(deckManager.pre_deck.extra.size()) + L")";
+	if(mainGame->is_siding) {
+		buffer = fmt::format(L"{} ({})", deckManager.current_deck.extra.size(), deckManager.pre_deck.extra.size());
+	} else {
+		buffer = fmt::to_wstring(deckManager.current_deck.extra.size());
+	}
 	numFont->draw(buffer.c_str(), Resize(379, 440, 439, 460), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(380, 441, 440, 461), 0xffffffff, false, true);
 	recti extrapos = Resize(310, 440, 797, 460);
-	buffer = dataManager.GetSysString(1056) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_FUSION)) + L" " +
-		dataManager.GetSysString(1073) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_XYZ)) + L" " +
-		dataManager.GetSysString(1063) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_SYNCHRO)) + L" " +
-		dataManager.GetSysString(1076) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.extra, TYPE_LINK));
+	buffer = fmt::format(L"{} {} {} {} {} {} {} {}", dataManager.GetSysString(1056), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_FUSION),
+		dataManager.GetSysString(1073), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_XYZ),
+		dataManager.GetSysString(1063), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_SYNCHRO),
+		dataManager.GetSysString(1076), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_LINK));
 	irr::core::dimension2d<u32> extraDeckTypeSize = textFont->getDimension(buffer);
 	textFont->draw(buffer.c_str(), recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
 		extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y), 0xff000000, false, true);
@@ -1178,15 +1176,17 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 536, 797, 557));
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(314, 536, 409, 556), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(315, 537, 410, 557), 0xffffffff, false, true);
-	buffer = std::to_wstring(deckManager.current_deck.side.size());
-	if(mainGame->is_siding)
-		buffer += L" (" + std::to_wstring(deckManager.pre_deck.side.size()) + L")";
+	if(mainGame->is_siding) {
+		buffer = fmt::format(L"{} ({})", deckManager.current_deck.side.size(), deckManager.pre_deck.side.size());
+	} else {
+		buffer = fmt::to_wstring(deckManager.current_deck.side.size());
+	}
 	numFont->draw(buffer.c_str(), Resize(379, 537, 439, 557), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(379, 537, 439, 557), 0xffffffff, false, true);
 	recti sidepos = Resize(310, 537, 797, 557);
-	buffer = dataManager.GetSysString(1312) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.side, TYPE_MONSTER)) + L" " +
-		dataManager.GetSysString(1313) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.side, TYPE_SPELL)) + L" " +
-		dataManager.GetSysString(1314) + L" " + std::to_wstring(deckManager.TypeCount(deckManager.current_deck.side, TYPE_TRAP));
+	buffer = fmt::format(L"{} {} {} {} {} {}", dataManager.GetSysString(1312), deckManager.TypeCount(deckManager.current_deck.side, TYPE_MONSTER),
+		dataManager.GetSysString(1313), deckManager.TypeCount(deckManager.current_deck.side, TYPE_SPELL),
+		dataManager.GetSysString(1314), deckManager.TypeCount(deckManager.current_deck.side, TYPE_TRAP));
 	irr::core::dimension2d<u32> sideDeckTypeSize = textFont->getDimension(buffer);
 	textFont->draw(buffer.c_str(), recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 5, sidepos.UpperLeftCorner.Y,
 		sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y), 0xff000000, false, true);
@@ -1207,8 +1207,8 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(804, 136, 915, 157));
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(809, 136, 914, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(810, 137, 915, 157), 0xffffffff, false, true);
-	numFont->draw(deckBuilder.result_string, Resize(874, 136, 934, 156), 0xff000000, false, true);
-	numFont->draw(deckBuilder.result_string, Resize(875, 137, 935, 157), 0xffffffff, false, true);
+	numFont->draw(deckBuilder.result_string.c_str(), Resize(874, 136, 934, 156), 0xff000000, false, true);
+	numFont->draw(deckBuilder.result_string.c_str(), Resize(875, 137, 935, 157), 0xffffffff, false, true);
 	driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	int card_position = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
@@ -1220,61 +1220,59 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangle(0x80000000, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
 		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect);
 		if(ptr->second.type & TYPE_MONSTER) {
-			const wchar_t* form = L"\u2605";
-			if (ptr->second.type & TYPE_XYZ) form = L"\u2606";
-			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first).c_str());
-			textFont->draw(textBuffer, Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
-			textFont->draw(textBuffer, Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
+			buffer = dataManager.GetName(ptr->first);
+			textFont->draw(buffer.c_str(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
+			textFont->draw(buffer.c_str(), Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
 			if (ptr->second.type & TYPE_LINK) {
-				myswprintf(textBuffer, L"%ls/%ls", dataManager.FormatAttribute(ptr->second.attribute).c_str(), dataManager.FormatRace(ptr->second.race).c_str());
-				textFont->draw(textBuffer, Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
-				textFont->draw(textBuffer, Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-				if (ptr->second.attack < 0)
-					myswprintf(textBuffer, L"?/Link %d", ptr->second.level);
+				buffer = fmt::format(L"{}/{}", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race));
+				textFont->draw(buffer.c_str(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
+				textFont->draw(buffer.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
+				if(ptr->second.attack < 0)
+					buffer = L"?/Link " + fmt::format(L"{}	", ptr->second.level);
 				else
-					myswprintf(textBuffer, L"%d/Link %d", ptr->second.attack, ptr->second.level);
-			}
-			else {
-				myswprintf(textBuffer, L"%ls/%ls %ls%d", dataManager.FormatAttribute(ptr->second.attribute).c_str(), dataManager.FormatRace(ptr->second.race).c_str(), form, ptr->second.level);
-				textFont->draw(textBuffer, Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
-				textFont->draw(textBuffer, Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-				if (ptr->second.attack < 0 && ptr->second.defense < 0)
-					myswprintf(textBuffer, L"?/?");
-				else if (ptr->second.attack < 0)
-					myswprintf(textBuffer, L"?/%d", ptr->second.defense);
-				else if (ptr->second.defense < 0)
-					myswprintf(textBuffer, L"%d/?", ptr->second.attack);
-				else myswprintf(textBuffer, L"%d/%d", ptr->second.attack, ptr->second.defense);
+					buffer = fmt::format(L"{}/Link {}	", ptr->second.attack, ptr->second.level);
+			} else {
+				const wchar_t* form = L"\u2605";
+				if(ptr->second.type & TYPE_XYZ) form = L"\u2606";
+				buffer = fmt::format(L"{}/{} {}{}", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
+				textFont->draw(buffer.c_str(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
+				textFont->draw(buffer.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
+				if(ptr->second.attack < 0 && ptr->second.defense < 0)
+					buffer = L"?/?";
+				else if(ptr->second.attack < 0)
+					buffer = fmt::format(L"?/{}", ptr->second.defense);
+				else if(ptr->second.defense < 0)
+					buffer = fmt::format(L"{}/?", ptr->second.attack);
+				else
+					buffer = fmt::format(L"{}/{}", ptr->second.attack, ptr->second.defense);
 			}
 			if(ptr->second.type & TYPE_PENDULUM) {
-				wchar_t scaleBuffer[16];
-				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
-				wcscat(textBuffer, scaleBuffer);
+				buffer.append(fmt::format(L" {}/{}", ptr->second.lscale, ptr->second.rscale));
 			}
-			wcscat(textBuffer, L" ");
+			buffer.append(L" ");
 		} else {
-			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first).c_str());
-			textFont->draw(textBuffer, Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
-			textFont->draw(textBuffer, Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
-			const std::wstring ptype = dataManager.FormatType(ptr->second.type);
-			textFont->draw(ptype.c_str(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
-			textFont->draw(ptype.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-			textBuffer[0] = 0;
+			buffer = dataManager.GetName(ptr->first);
+			textFont->draw(buffer.c_str(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
+			textFont->draw(buffer.c_str(), Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
+			buffer = dataManager.FormatType(ptr->second.type);
+			textFont->draw(buffer.c_str(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
+			textFont->draw(buffer.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
+			buffer = L"";
 		}
 		if((ptr->second.ot & 0x1) == ptr->second.ot)
-			wcscat(textBuffer, L"[OCG]");
+			buffer.append(L"[OCG]");
 		else if((ptr->second.ot & 0x2) == ptr->second.ot)
-			wcscat(textBuffer, L"[TCG]");
+			buffer.append(L"[TCG]");
 		else if((ptr->second.ot & 0x4) == ptr->second.ot)
-			wcscat(textBuffer, L"[Anime]");
+			buffer.append(L"[Anime]");
 		else if((ptr->second.ot & 0x8) == ptr->second.ot)
-			wcscat(textBuffer, L"[Illegal]");
+			buffer.append(L"[Illegal]");
 		else if((ptr->second.ot & 0x10) == ptr->second.ot)
-			wcscat(textBuffer, L"[VG]");
+			buffer.append(L"[VG]");
 		else if((ptr->second.ot & 0x20) == ptr->second.ot)
-			wcscat(textBuffer, L"[Custom]");
-		textFont->draw(textBuffer, Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
-		textFont->draw(textBuffer, Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
+			buffer.append(L"[Custom]");
+		textFont->draw(buffer.c_str(), Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
+		textFont->draw(buffer.c_str(), Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
 	}
 	if(deckBuilder.is_draging) {
 		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - (CARD_THUMB_WIDTH / 2), deckBuilder.dragy - (CARD_THUMB_HEIGHT / 2)), deckBuilder.filterList, true);

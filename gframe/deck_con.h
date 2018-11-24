@@ -90,7 +90,7 @@ public:
 	LFList* filterList;
 	std::map<std::wstring, std::vector<code_pointer>> searched_terms;
 	std::vector<code_pointer> results;
-	wchar_t result_string[8];
+	std::wstring result_string;
 };
 
 }

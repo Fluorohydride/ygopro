@@ -41,13 +41,13 @@ ClientCard::ClientCard() {
 	position = 0;
 	cHint = 0;
 	chValue = 0;
-	atkstring[0] = 0;
-	defstring[0] = 0;
-	lvstring[0] = 0;
-	linkstring[0] = 0;
-	rkstring[0] = 0;
-	rscstring[0] = 0;
-	lscstring[0] = 0;
+	atkstring = L"";
+	defstring = L"";
+	lvstring = L"";
+	linkstring = L"";
+	rkstring = L"";
+	rscstring = L"";
+	lscstring = L"";
 	overlayTarget = 0;
 	equipTarget = 0;
 }
@@ -89,14 +89,14 @@ void ClientCard::UpdateInfo(char* buf) {
 		pdata = BufferIO::ReadInt32(buf);
 		if(level != (unsigned int)pdata) {
 			level = pdata;
-			myswprintf(lvstring, L"L%d", level);
+			lvstring = fmt::format(L"L{}",level);
 		}
 	}
 	if(flag & QUERY_RANK) {
 		pdata = BufferIO::ReadInt32(buf);
 		if(rank != (unsigned int)pdata) {
 			rank = pdata;
-			myswprintf(rkstring, L"R%d", rank);
+			rkstring = fmt::format(L"R{}", level);
 		}
 	}
 	if(flag & QUERY_ATTRIBUTE)
@@ -106,21 +106,18 @@ void ClientCard::UpdateInfo(char* buf) {
 	if(flag & QUERY_ATTACK) {
 		attack = BufferIO::ReadInt32(buf);
 		if(attack < 0) {
-			atkstring[0] = '?';
-			atkstring[1] = 0;
+			atkstring = L"?";
 		} else
-			myswprintf(atkstring, L"%d", attack);
+			atkstring = fmt::to_wstring(attack);
 	}
 	if(flag & QUERY_DEFENSE) {
 		defense = BufferIO::ReadInt32(buf);
 		if(type & TYPE_LINK) {
-			defstring[0] = '-';
-			defstring[1] = 0;
+			defstring = L"-";
 		} else if(defense < 0) {
-			defstring[0] = '?';
-			defstring[1] = 0;
+			defstring = L"?";
 		} else
-			myswprintf(defstring, L"%d", defense);
+			defstring = fmt::to_wstring(defense);
 	}
 	if(flag & QUERY_BASE_ATTACK)
 		base_attack = BufferIO::ReadInt32(buf);
@@ -165,17 +162,17 @@ void ClientCard::UpdateInfo(char* buf) {
 		is_public = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LSCALE) {
 		lscale = BufferIO::ReadInt32(buf);
-		myswprintf(lscstring, L"%d", lscale);
+		lscstring = fmt::to_wstring(lscale);
 	}
 	if(flag & QUERY_RSCALE) {
 		rscale = BufferIO::ReadInt32(buf);
-		myswprintf(rscstring, L"%d", rscale);
+		rscstring = fmt::to_wstring(rscale);
 	}
 	if(flag & QUERY_LINK) {
 		pdata = BufferIO::ReadInt32(buf);
 		if (link != (unsigned int)pdata) {
 			link = pdata;
-			myswprintf(linkstring, L"L%d", link);
+			linkstring = fmt::format(L"L{}", link);
 		}
 		pdata = BufferIO::ReadInt32(buf);
 		if (link_marker != (unsigned int)pdata) {

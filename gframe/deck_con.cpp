@@ -180,9 +180,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.Lock();
-				wchar_t textBuffer[256];
-				myswprintf(textBuffer, L"%ls\n%ls", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337).c_str());
-				mainGame->stQMessage->setText((wchar_t*)textBuffer);
+				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337)).c_str());
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
@@ -367,9 +365,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case 1: {
-					wchar_t normaltuner[32];
-					wchar_t normalpen[32];
-					wchar_t syntuner[32];
 					mainGame->cbCardType2->setEnabled(true);
 					mainGame->cbRace->setEnabled(true);
 					mainGame->cbAttribute->setEnabled(true);
@@ -388,12 +383,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1074).c_str(), TYPE_MONSTER + TYPE_PENDULUM);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1076).c_str(), TYPE_MONSTER + TYPE_LINK);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1075).c_str(), TYPE_MONSTER + TYPE_SPSUMMON);
-					myswprintf(normaltuner, L"%ls|%ls", dataManager.GetSysString(1054).c_str(), dataManager.GetSysString(1062).c_str());
-					mainGame->cbCardType2->addItem(normaltuner, TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
-					myswprintf(normalpen, L"%ls|%ls", dataManager.GetSysString(1054).c_str(), dataManager.GetSysString(1074).c_str());
-					mainGame->cbCardType2->addItem(normalpen, TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
-					myswprintf(syntuner, L"%ls|%ls", dataManager.GetSysString(1063).c_str(), dataManager.GetSysString(1062).c_str());
-					mainGame->cbCardType2->addItem(syntuner, TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
+					mainGame->cbCardType2->addItem((dataManager.GetSysString(1054) + L"|" + dataManager.GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
+					mainGame->cbCardType2->addItem((dataManager.GetSysString(1054) + L"|" + dataManager.GetSysString(1074)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
+					mainGame->cbCardType2->addItem((dataManager.GetSysString(1063) + L"|" + dataManager.GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1062).c_str(), TYPE_MONSTER + TYPE_TUNER);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1061).c_str(), TYPE_MONSTER + TYPE_DUAL);
 					mainGame->cbCardType2->addItem(dataManager.GetSysString(1060).c_str(), TYPE_MONSTER + TYPE_UNION);
@@ -847,7 +839,7 @@ void DeckBuilder::FilterCards() {
 	SortList();
 	auto ip = std::unique(results.begin(), results.end());
 	results.resize(std::distance(results.begin(), ip));
-	myswprintf(result_string, L"%d", results.size());
+	result_string = fmt::to_wstring(results.size());
 	if(results.size() > 7) {
 		mainGame->scrFilter->setVisible(true);
 		mainGame->scrFilter->setMax((results.size() - 7) * DECK_SEARCH_SCROLL_STEP);
@@ -971,7 +963,7 @@ void DeckBuilder::ClearSearch() {
 	searched_terms.clear();
 	ClearFilter();
 	results.clear();
-	myswprintf(result_string, L"%d", 0);
+	result_string = L"0";
 }
 void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);

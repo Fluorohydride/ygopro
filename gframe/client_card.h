@@ -111,13 +111,13 @@ public:
 	std::set<ClientCard*> ownerTarget;
 	std::map<int, int> counters;
 	std::map<int, int> desc_hints;
-	wchar_t atkstring[16];
-	wchar_t defstring[16];
-	wchar_t lvstring[16];
-	wchar_t rkstring[16];
-	wchar_t linkstring[16];
-	wchar_t lscstring[16];
-	wchar_t rscstring[16];
+	std::wstring atkstring;
+	std::wstring defstring;
+	std::wstring lvstring;
+	std::wstring rkstring;
+	std::wstring linkstring;
+	std::wstring lscstring;
+	std::wstring rscstring;
 
 	ClientCard();
 	void SetCode(int code);

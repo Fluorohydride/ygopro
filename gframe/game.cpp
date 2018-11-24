@@ -125,9 +125,7 @@ bool Game::Initialize() {
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 #endif
 	//main menu
-	wchar_t strbuf[256];
-	myswprintf(strbuf, L"EDOPro Version:%X.0%X.%X", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
-	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, strbuf);
+	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200).c_str());
 	btnSingleMode = env->addButton(rect<s32>(10, 65, 270, 95), wMainMenu, BUTTON_SINGLE_MODE, dataManager.GetSysString(1201).c_str());
@@ -177,8 +175,7 @@ bool Game::Initialize() {
 	cbMatchMode->addItem(dataManager.GetSysString(1246).c_str());
 	cbMatchMode->addItem(dataManager.GetSysString(1247).c_str());
 	env->addStaticText(dataManager.GetSysString(1237).c_str(), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
-	myswprintf(strbuf, L"%d", 180);
-	ebTimeLimit = env->addEditBox(strbuf, rect<s32>(140, 115, 220, 140), true, wCreateHost);
+	ebTimeLimit = env->addEditBox(L"180", rect<s32>(140, 115, 220, 140), true, wCreateHost);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1228).c_str(), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
 	btnRuleCards = env->addButton(rect<s32>(260, 325, 370, 350), wCreateHost, BUTTON_RULE_CARDS, dataManager.GetSysString(1625).c_str());
@@ -210,37 +207,29 @@ bool Game::Initialize() {
 	for(int i = 0; i < 6; ++i, ++spacing)
 		chkCustomRules[i] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 390 + i, dataManager.GetSysString(1631 + i).c_str());
 	env->addStaticText(dataManager.GetSysString(1628).c_str(), rect<s32>(10, 10 + spacing * 20, 200, 30 + spacing * 20), false, false, wCustomRules);
-	myswprintf(strbuf, dataManager.GetSysString(1627).c_str(), dataManager.GetSysString(1056).c_str());
 	spacing++;
-	chkTypeLimit[0] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
-	myswprintf(strbuf, dataManager.GetSysString(1627).c_str(), dataManager.GetSysString(1063).c_str());
+	chkTypeLimit[0] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1056)).c_str());
 	spacing++;
-	chkTypeLimit[1] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
-	myswprintf(strbuf, dataManager.GetSysString(1627).c_str(), dataManager.GetSysString(1073).c_str());
+	chkTypeLimit[1] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1063)).c_str());
 	spacing++;
-	chkTypeLimit[2] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
-	myswprintf(strbuf, dataManager.GetSysString(1627).c_str(), dataManager.GetSysString(1074).c_str());
+	chkTypeLimit[2] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1073)).c_str());
 	spacing++;
-	chkTypeLimit[3] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, strbuf);
-	myswprintf(strbuf, dataManager.GetSysString(1627).c_str(), dataManager.GetSysString(1076).c_str());
+	chkTypeLimit[3] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1074)).c_str());
 	spacing++;
-	chkTypeLimit[4] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 353 + spacing, strbuf);
+	chkTypeLimit[4] = env->addCheckBox(false, recti(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 353 + spacing, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1076)).c_str());
 	btnCustomRulesOK = env->addButton(rect<s32>(55, 270, 155, 295), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211).c_str());
 	forbiddentypes = MASTER_RULE_4_FORB;
 	duel_param = MASTER_RULE_4;
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229).c_str());
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230).c_str());
 	env->addStaticText(dataManager.GetSysString(1231).c_str(), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
-	myswprintf(strbuf, L"%d", 8000);
-	ebStartLP = env->addEditBox(strbuf, rect<s32>(140, 235, 220, 260), true, wCreateHost);
+	ebStartLP = env->addEditBox(L"8000", rect<s32>(140, 235, 220, 260), true, wCreateHost);
 	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1232).c_str(), rect<s32>(20, 270, 320, 290), false, false, wCreateHost);
-	myswprintf(strbuf, L"%d", 5);
-	ebStartHand = env->addEditBox(strbuf, rect<s32>(140, 265, 220, 290), true, wCreateHost);
+	ebStartHand = env->addEditBox(L"5", rect<s32>(140, 265, 220, 290), true, wCreateHost);
 	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1233).c_str(), rect<s32>(20, 300, 320, 320), false, false, wCreateHost);
-	myswprintf(strbuf, L"%d", 1);
-	ebDrawCount = env->addEditBox(strbuf, rect<s32>(140, 295, 220, 320), true, wCreateHost);
+	ebDrawCount = env->addEditBox(L"1", rect<s32>(140, 295, 220, 320), true, wCreateHost);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1234).c_str(), rect<s32>(10, 330, 220, 350), false, false, wCreateHost);
 	ebServerName = env->addEditBox(gameConf.gamename.c_str(), rect<s32>(110, 325, 250, 350), true, wCreateHost);
@@ -841,8 +830,7 @@ void Game::MainLoop() {
 			usleep(20000);
 #endif
 		if(cur_time >= 1000) {
-			myswprintf(cap, L"EDOPro FPS: %d", fps);
-			device->setWindowCaption(cap);
+			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
 			fps = 0;
 			cur_time -= 1000;
 			timer->setTime(0);
@@ -918,7 +906,6 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	auto files = FindfolderFiles("./deck/", ".ydk");
 	for(auto& file : files) {
-		wchar_t wname[256];
 		cbDeck->addItem(BufferIO::DecodeUTF8s(file.substr(0, file.size() - 4)).c_str());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
@@ -1095,13 +1082,10 @@ void Game::SaveConfig() {
 	conf_file.close();
 }
 bool Game::PlayChant(unsigned int code) {
-	char sound[1000];
-	sprintf(sound, "./sound/chants/%d.wav", code);
-	FILE *file = fopen(sound, "r");
-	if(file) {
-		fclose(file);
-		if (!engineSound->isCurrentlyPlaying(sound))
-			PlaySoundEffect(sound);
+	std::string sound(fmt::format("./sound/chants/{}.wav", code));
+	if(filesystem->existFile(sound.c_str())) {
+		if (!engineSound->isCurrentlyPlaying(sound.c_str()))
+			PlaySoundEffect((char*)sound.c_str());
 		return true;
 	}
 	return false;
@@ -1145,15 +1129,14 @@ void Game::ShowCardInfo(int code, bool resize) {
 		return;
 	showingcard = code;
 	CardData cd;
-	wchar_t formatBuffer[256];
 	if(!dataManager.GetData(code, &cd))
 		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code, true));
 	imgCard->setScaleImage(true);
-	if(cd.alias != 0 && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
-		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias).c_str(), cd.alias);
-	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code).c_str(), code);
-	stName->setText(formatBuffer);
+	int tmp_code = code;
+	if(cd.alias && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
+		tmp_code = cd.alias;
+	stName->setText(fmt::format(L"{}[{:08}]", dataManager.GetName(tmp_code), tmp_code).c_str());
 	stSetName->setText(L"");
 	if(!gameConf.chkHideSetname) {
 		unsigned long long sc = cd.setcode;
@@ -1163,48 +1146,37 @@ void Game::ShowCardInfo(int code, bool resize) {
 				sc = aptr->second.setcode;
 		}
 		if(sc) {
-			myswprintf(formatBuffer, L"%ls%ls", dataManager.GetSysString(1329).c_str(), dataManager.FormatSetName(sc).c_str());
-			stSetName->setText(formatBuffer);
+			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(sc)).c_str());
 		}
 	}
+	std::wstring text = L"";
 	if(cd.type & TYPE_MONSTER) {
-		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type).c_str(), dataManager.FormatRace(cd.race).c_str(), dataManager.FormatAttribute(cd.attribute).c_str());
-		stInfo->setText(formatBuffer);
+		stInfo->setText(fmt::format(L"[{}] {}/{}", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute)).c_str());
 		if(cd.type & TYPE_LINK){
-			if (cd.attack < 0)
-				myswprintf(formatBuffer, L"?/Link %d	", cd.level);
+			if(cd.attack < 0)
+				text.append(L"?/Link ").append(fmt::format(L"{}	", cd.level));
 			else
-				myswprintf(formatBuffer, L"%d/Link %d	", cd.attack, cd.level);
-			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker).c_str());
-		}
-		else {
-			const wchar_t* form = L"\u2605";
-			if(cd.type & TYPE_XYZ) form = L"\u2606";
-			myswprintf(formatBuffer, L"[%ls%d] ", form, cd.level);
-			wchar_t adBuffer[16];
+				text.append(fmt::format(L"{}/Link {}	", cd.attack, cd.level));
+			text.append(dataManager.FormatLinkMarker(cd.link_marker));
+		} else {
+			text.append(fmt::format(L"[{}{}] ", (cd.type & TYPE_XYZ) ? L"\u2606" : L"\u2605", cd.level));
 			if (cd.attack < 0 && cd.defense < 0)
-				myswprintf(adBuffer, L"?/?");
+				text.append(L"?/?");
 			else if (cd.attack < 0)
-				myswprintf(adBuffer, L"?/%d", cd.defense);
+				text.append(fmt::format(L"?/{}", cd.defense));
 			else if (cd.defense < 0)
-				myswprintf(adBuffer, L"%d/?", cd.attack);
+				text.append(fmt::format(L"{}/?", cd.attack));
 			else
-				myswprintf(adBuffer, L"%d/%d", cd.attack, cd.defense);
-			wcscat(formatBuffer, adBuffer);
+				text.append(fmt::format(L"{}/{}", cd.attack, cd.defense));
 		}
 		if(cd.type & TYPE_PENDULUM) {
-			wchar_t scaleBuffer[16];
-			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
-			wcscat(formatBuffer, scaleBuffer);
+			text.append(fmt::format(L"   {}/{}", cd.lscale, cd.rscale));
 		}
-		stDataInfo->setText(formatBuffer);
+		stDataInfo->setText(text.c_str());
 	} else {
-		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type).c_str());
-		stInfo->setText(formatBuffer);
+		stInfo->setText(fmt::format(L"[{}]", dataManager.FormatType(cd.type)).c_str());
 		if(cd.type & TYPE_LINK) {
-			myswprintf(formatBuffer, L"Link %d	", cd.level);
-			wcscat(formatBuffer, dataManager.FormatLinkMarker(cd.link_marker).c_str());
-			stDataInfo->setText(formatBuffer);
+			stDataInfo->setText(fmt::format(L"Link {}", cd.level, dataManager.FormatLinkMarker(cd.link_marker)).c_str());
 		} else
 			stDataInfo->setText(L"");
 	}
