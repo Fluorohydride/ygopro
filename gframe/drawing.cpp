@@ -694,9 +694,14 @@ void Game::ConvertCoords(float x, float y, int* x1, int* y1) {
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {
-		for(auto mit = imageLoading.begin(); mit != imageLoading.end(); ++mit)
-			mit->first->setImage(imageManager.GetTexture(mit->second));
-		imageLoading.clear();
+		for(auto mit = imageLoading.begin(); mit != imageLoading.end();) {
+			int check = 0;
+			mit->first->setImage(imageManager.GetTexture(mit->second, false, false, &check));
+			if(check != 2)
+				mit = imageLoading.erase(mit);
+			else
+				++mit;
+		}
 	}
 	imageManager.RefreshCachedTextures();
 	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
