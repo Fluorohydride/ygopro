@@ -74,6 +74,7 @@ bool Game::Initialize() {
 	chain_when_avail = false;
 	is_building = false;
 	showingcard = 0;
+	cardimagetextureloading = false;
 	menuHandler.prev_operation = 0;
 	menuHandler.prev_sel = -1;
 	memset(&dInfo, 0, sizeof(DuelInfo));
@@ -764,6 +765,7 @@ void Game::MainLoop() {
 		dimension2du size = driver->getScreenSize();
 		if(window_size != size) {
 			window_size = size;
+			cardimagetextureloading = false;
 			OnResize();
 		}
 		linePatternD3D = (linePatternD3D + 1) % 30;
@@ -802,6 +804,9 @@ void Game::MainLoop() {
 		}
 		DrawGUI();
 		DrawSpec();
+		if(cardimagetextureloading) {
+			ShowCardInfo(showingcard, false);
+		}
 		gMutex.Unlock();
 		if(signalFrame > 0) {
 			signalFrame--;
@@ -1125,13 +1130,20 @@ void Game::PlayBGM() {
 	}
 }
 void Game::ShowCardInfo(int code, bool resize) {
-	if (showingcard == code && !resize)
+	if (showingcard == code && !resize && !cardimagetextureloading)
 		return;
 	showingcard = code;
+	int shouldrefresh = -1;
+	auto img = imageManager.GetTexture(code, false, true, &shouldrefresh);
+	cardimagetextureloading = false;
+	if(shouldrefresh == 2) {
+		cardimagetextureloading = true;
+		return;
+	}
 	CardData cd;
 	if(!dataManager.GetData(code, &cd))
 		memset(&cd, 0, sizeof(CardData));
-	imgCard->setImage(imageManager.GetTexture(code, true));
+	imgCard->setImage(img);
 	imgCard->setScaleImage(true);
 	int tmp_code = code;
 	if(cd.alias && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
@@ -1201,6 +1213,7 @@ void Game::ClearCardInfo(int player) {
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
 	stText->setText(L"");
+	cardimagetextureloading = false;
 	showingcard = 0;
 }
 void Game::AddChatMsg(const std::wstring& msg, int player) {
@@ -1336,6 +1349,7 @@ void Game::CloseDuelWindow() {
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
 	stText->setText(L"");
+	cardimagetextureloading = false;
 	showingcard = 0;
 	closeDoneSignal.Set();
 }
@@ -1590,6 +1604,8 @@ void Game::OnResize() {
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
+	imageManager.ClearTexture(true);
+
 	if(showingcard)
 		ShowCardInfo(showingcard, true);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
@@ -1613,8 +1629,6 @@ void Game::OnResize() {
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
-
-	imageManager.ClearTexture(true);
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
 	x = x * window_size.Width / 1024;

@@ -4,6 +4,8 @@
 #include "config.h"
 #include "data_manager.h"
 #include <unordered_map>
+#include <atomic>
+#include <future>
 
 namespace ygo {
 
@@ -13,9 +15,11 @@ public:
 	void SetDevice(irr::IrrlichtDevice* dev);
 	void ClearTexture(bool resize = false);
 	void RemoveTexture(int code);
-	irr::video::ITexture* GetTextureFromFile(const char* file, s32 width, s32 height);
-	irr::video::ITexture* GetTexture(int code, bool fit = false);
-	irr::video::ITexture* GetTextureThumb(int code);
+	void RefreshCachedTextures();
+	void ClearCachedTextures(bool resize);
+	irr::video::IImage* GetTextureFromFile(const char* file, s32 width, s32 height, std::atomic_uint& source_width, std::atomic_uint& source_height);
+	irr::video::ITexture* GetTexture(int code, bool wait = false, bool fit = false, int* chk = nullptr);
+	irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(int code);
 
 	std::unordered_map<int, irr::video::ITexture*> tMap[2];
@@ -44,7 +48,11 @@ public:
 	irr::video::ITexture* tField[2][4];
 	irr::video::ITexture* tFieldTransparent[2][4];
 	private:
-	irr::video::ITexture* LoadCardTexture(int code, int width, int height);
+	std::pair<IImage*, const char*> LoadCardTexture(int code, int width, int height, std::atomic_uint& source_width, std::atomic_uint& source_height);
+	std::map<int,std::future<std::pair<IImage*, const char*>>> loading_pics[3];
+	std::mutex pic_load;
+	std::atomic_uint cur_pic_res_width[3];
+	std::atomic_uint cur_pic_res_height[3];
 };
 
 extern ImageManager imageManager;

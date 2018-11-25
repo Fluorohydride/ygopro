@@ -698,6 +698,7 @@ void Game::DrawGUI() {
 			mit->first->setImage(imageManager.GetTexture(mit->second));
 		imageLoading.clear();
 	}
+	imageManager.RefreshCachedTextures();
 	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
 		auto fthis = fit++;
 		FadingUnit& fu = *fthis;
@@ -1214,7 +1215,7 @@ void Game::DrawDeckBd() {
 	int card_position = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
 	const int height_offset = (scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
 	recti rect = Resize(805, 160, 1020, 630);
-	for(size_t i = 0; i < 8 && (i + card_position) < deckBuilder.results.size(); ++i) {
+	for(size_t i = 0; i < 9 && (i + card_position) < deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
