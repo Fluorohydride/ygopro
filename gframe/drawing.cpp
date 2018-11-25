@@ -546,13 +546,13 @@ void Game::DrawMisc() {
 		lpccolor -= 0x19000000;
 		lpframe--;
 	}
-	if(lpcstring) {
+	if(lpcstring.size()) {
 		if(lpplayer == 0) {
-			lpcFont->draw(lpcstring, Resize(400, 470, 920, 520), lpccolor | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring, Resize(400, 472, 922, 520), lpccolor, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 470, 920, 520), lpccolor | 0x00ffffff, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 472, 922, 520), lpccolor, true, false, 0);
 		} else {
-			lpcFont->draw(lpcstring, Resize(400, 160, 920, 210), lpccolor | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring, Resize(400, 162, 922, 210), lpccolor, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 160, 920, 210), lpccolor | 0x00ffffff, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 162, 922, 210), lpccolor, true, false, 0);
 		}
 	}
 	if(!dInfo.isReplay && dInfo.player_type < 7 && dInfo.time_limit) {

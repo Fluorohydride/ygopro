@@ -68,7 +68,7 @@ bool Game::Initialize() {
 	showcard = 0;
 	is_attacking = false;
 	lpframe = 0;
-	lpcstring = 0;
+	lpcstring = L"";
 	always_chain = false;
 	ignore_chain = false;
 	chain_when_avail = false;
