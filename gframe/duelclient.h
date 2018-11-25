@@ -30,6 +30,7 @@ private:
 	static char duel_client_write[0x2000];
 	static bool is_closing;
 	static int select_hint;
+	static int select_unselect_hint;
 	static wchar_t event_string[256];
 	static mtrandom rnd;
 public:
