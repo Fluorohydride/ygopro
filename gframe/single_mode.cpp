@@ -49,10 +49,10 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dInfo.lp[0] = start_lp;
 	mainGame->dInfo.lp[1] = start_lp;
 	mainGame->dInfo.startlp = start_lp;
-	myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
-	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
-	BufferIO::CopyWStr(mainGame->ebNickName->getText(), mainGame->dInfo.hostname[0], 20);
-	mainGame->dInfo.clientname[0][0] = 0;
+	mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
+	mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
+	mainGame->dInfo.hostname[0] = mainGame->ebNickName->getText();
+	mainGame->dInfo.clientname[0] = L"";
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
 	bool loaded = true;
@@ -106,10 +106,10 @@ int SingleMode::SinglePlayThread(void* param) {
 	new_replay.WriteHeader(rh);
 	replay_stream.clear();
 	unsigned short buffer[20];
-	BufferIO::CopyWStr(mainGame->dInfo.hostname[0], buffer, 20);
+	BufferIO::CopyWStr(mainGame->dInfo.hostname[0].c_str(), buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
 	new_replay.WriteData(buffer, 40, false);
-	BufferIO::CopyWStr(mainGame->dInfo.clientname[0], buffer, 20);
+	BufferIO::CopyWStr(mainGame->dInfo.clientname[0].c_str(), buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
 	new_replay.WriteData(buffer, 40, false);
 	last_replay.WriteInt32(start_lp, false);
@@ -791,14 +791,13 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			char namebuf[128];
-			wchar_t wname[128];
 			int len = BufferIO::ReadInt16(pbuf);
 			char* begin = pbuf;
 			pbuf += len + 1;
+			char* namebuf = new char[len];
 			memcpy(namebuf, begin, len + 1);
-			BufferIO::DecodeUTF8(namebuf, wname);
-			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname[0], 20);
+			mainGame->dInfo.clientname[0] = BufferIO::DecodeUTF8s(namebuf);
+			delete[] namebuf;
 			break;
 		}
 		case MSG_SHOW_HINT: {

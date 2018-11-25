@@ -97,21 +97,21 @@ namespace ygo {
 		mtrandom rnd;
 		int seed = rh.seed;
 		rnd.reset(seed);
-		if (mainGame->dInfo.isRelay) {
-			cur_replay.ReadName(mainGame->dInfo.hostname[0]);
-			cur_replay.ReadName(mainGame->dInfo.hostname[1]);
-			cur_replay.ReadName(mainGame->dInfo.hostname[2]);
-			cur_replay.ReadName(mainGame->dInfo.clientname[0]);
-			cur_replay.ReadName(mainGame->dInfo.clientname[1]);
-			cur_replay.ReadName(mainGame->dInfo.clientname[2]);
-		} else if (mainGame->dInfo.isTag) {
-			cur_replay.ReadName(mainGame->dInfo.hostname[0]);
-			cur_replay.ReadName(mainGame->dInfo.hostname[1]);
-			cur_replay.ReadName(mainGame->dInfo.clientname[1]);
-			cur_replay.ReadName(mainGame->dInfo.clientname[0]);
+		if(mainGame->dInfo.isRelay) {
+			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
+			cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
+			cur_replay.ReadName(&mainGame->dInfo.hostname[2][0]);
+			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
+			cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
+			cur_replay.ReadName(&mainGame->dInfo.clientname[2][0]);
+		} else if(mainGame->dInfo.isTag) {
+			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
+			cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
+			cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
+			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
 		} else {
-			cur_replay.ReadName(mainGame->dInfo.hostname[0]);
-			cur_replay.ReadName(mainGame->dInfo.clientname[0]);
+			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
+			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
 		}
 		pduel = create_duel(rnd.rand());
 		int start_lp = cur_replay.ReadInt32();
@@ -132,8 +132,8 @@ namespace ygo {
 		mainGame->dInfo.lp[0] = start_lp;
 		mainGame->dInfo.lp[1] = start_lp;
 		mainGame->dInfo.startlp = start_lp;
-		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
-		myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
+		mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
+		mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
 		mainGame->dInfo.turn = 0;
 		if (!mainGame->dInfo.isSingleMode) {
 			if (!(opt & DUEL_TAG_MODE)) {

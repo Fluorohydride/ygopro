@@ -542,7 +542,7 @@ void Game::DrawMisc() {
 	else driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * dInfo.lp[1] / dInfo.startlp, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
 	if(lpframe) {
 		dInfo.lp[lpplayer] -= lpd;
-		myswprintf(dInfo.strLP[lpplayer], L"%d", dInfo.lp[lpplayer]);
+		dInfo.strLP[lpplayer] = fmt::to_wstring(dInfo.lp[lpplayer]);
 		lpccolor -= 0x19000000;
 		lpframe--;
 	}
@@ -561,17 +561,17 @@ void Game::DrawMisc() {
 		driver->draw2DRectangle(Resize(795 - dInfo.time_left[1] * 100 / dInfo.time_limit, 34, 795, 44), 0xa0e0e0e0, 0xa0e0e0e0, 0xa0c0c0c0, 0xa0c0c0c0);
 		driver->draw2DRectangleOutline(Resize(695, 34, 795, 44), 0xffffffff);
 	}
-	numFont->draw(dInfo.strLP[0], Resize(330, 11, 629, 30), 0xff000000, true, false, 0);
-	numFont->draw(dInfo.strLP[0], Resize(330, 12, 631, 30), 0xffffff00, true, false, 0);
-	numFont->draw(dInfo.strLP[1], Resize(691, 11, 990, 30), 0xff000000, true, false, 0);
-	numFont->draw(dInfo.strLP[1], Resize(691, 12, 992, 30), 0xffffff00, true, false, 0);
+	numFont->draw(dInfo.strLP[0].c_str(), Resize(330, 11, 629, 30), 0xff000000, true, false, 0);
+	numFont->draw(dInfo.strLP[0].c_str(), Resize(330, 12, 631, 30), 0xffffff00, true, false, 0);
+	numFont->draw(dInfo.strLP[1].c_str(), Resize(691, 11, 990, 30), 0xff000000, true, false, 0);
+	numFont->draw(dInfo.strLP[1].c_str(), Resize(691, 12, 992, 30), 0xffffff00, true, false, 0);
 
 	recti p1size = Resize(335, 31, 629, 50);
 	recti p2size = Resize(986, 31, 986, 50);
-	textFont->draw(dInfo.hostname[dInfo.current_player[0]], p1size, 0xffffffff, false, false, 0);
+	textFont->draw(dInfo.hostname[dInfo.current_player[0]].c_str(), p1size, 0xffffffff, false, false, 0);
 	auto cld = textFont->getDimension(dInfo.clientname[dInfo.current_player[1]]);
 	p2size.UpperLeftCorner.X -= cld.Width;
-	textFont->draw(dInfo.clientname[dInfo.current_player[1]], p2size, 0xffffffff, false, false, 0);
+	textFont->draw(dInfo.clientname[dInfo.current_player[1]].c_str(), p2size, 0xffffffff, false, false, 0);
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	lpcFont->draw(dataManager.GetNumString(dInfo.turn).c_str(), Resize(635, 5, 685, 40), 0x80000000, true, false, 0);
@@ -928,15 +928,15 @@ void Game::DrawSpec() {
 				recti loc = ResizeElem(650 - pos.Width / 2, 290, 950, 370);
 				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2, 291, 950, 370), 0xff000000);
 				lpcFont->draw(lstr, loc, 0xffffffff);
-				if(dInfo.vic_string && (showcardcode == 1 || showcardcode == 2)) {
+				if(dInfo.vic_string.size() && (showcardcode == 1 || showcardcode == 2)) {
 					s32 vicx = (260 + pos.Width) / 2 - 260;
 					recti vicloc = recti(loc.UpperLeftCorner.X + vicx, loc.UpperLeftCorner.Y + 50, loc.UpperLeftCorner.X + vicx + 260, loc.UpperLeftCorner.Y + 70);
 					vicloc += position2di(2, 2);
 					driver->draw2DRectangle(0xa0000000, vicloc);
-					guiFont->draw(dInfo.vic_string, vicloc, 0xff000000, true, true);
+					guiFont->draw(dInfo.vic_string.c_str(), vicloc, 0xff000000, true, true);
 					vicloc.UpperLeftCorner.X -= 2;
 					vicloc.UpperLeftCorner.Y -= 1;
-					guiFont->draw(dInfo.vic_string, vicloc, 0xffffffff, true, true);
+					guiFont->draw(dInfo.vic_string.c_str(), vicloc, 0xffffffff, true, true);
 				}
 			} else if(showcardp < showcarddif + 10) {
 				int alpha = ((showcarddif + 10 - showcardp) * 25) << 24;

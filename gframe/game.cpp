@@ -77,7 +77,11 @@ bool Game::Initialize() {
 	cardimagetextureloading = false;
 	menuHandler.prev_operation = 0;
 	menuHandler.prev_sel = -1;
-	memset(&dInfo, 0, sizeof(DuelInfo));
+	dInfo = {};
+	for(int i = 0; i < 3; i++) {
+		dInfo.clientname[i].reserve(20);
+		dInfo.hostname[i].reserve(20);
+	}
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
@@ -1356,7 +1360,7 @@ void Game::CloseDuelWindow() {
 int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
-const wchar_t* Game::LocalName(int local_player) {
+std::wstring Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname[0] : dInfo.clientname[0];
 }
 void Game::UpdateDuelParam() {

@@ -67,10 +67,10 @@ struct DuelInfo {
 	int extraval;
 	int turn;
 	short curMsg;
-	wchar_t clientname[3][20];
-	wchar_t hostname[3][20];
-	wchar_t strLP[2][16];
-	wchar_t* vic_string;
+	std::wstring clientname[3];
+	std::wstring hostname[3];
+	std::wstring strLP[2];
+	std::wstring vic_string;
 	unsigned char player_type;
 	unsigned char time_player;
 	unsigned short time_limit;
@@ -143,7 +143,7 @@ public:
 	void PlayBGM();
 
 	int LocalPlayer(int player);
-	const wchar_t* LocalName(int local_player);
+	std::wstring LocalName(int local_player);
 	void UpdateDuelParam();
 	void UpdateExtraRules();
 	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);

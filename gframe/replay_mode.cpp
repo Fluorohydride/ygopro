@@ -63,20 +63,20 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.current_player[0] = 0;
 	mainGame->dInfo.current_player[1] = 0;
 	if (mainGame->dInfo.isRelay) {
-		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
-		cur_replay.ReadName(mainGame->dInfo.hostname[1]);
-		cur_replay.ReadName(mainGame->dInfo.hostname[2]);
-		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
-		cur_replay.ReadName(mainGame->dInfo.clientname[1]);
-		cur_replay.ReadName(mainGame->dInfo.clientname[2]);
+		cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
+		cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
+		cur_replay.ReadName(&mainGame->dInfo.hostname[2][0]);
+		cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
+		cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
+		cur_replay.ReadName(&mainGame->dInfo.clientname[2][0]);
 	} else if (mainGame->dInfo.isTag) {
-		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
-		cur_replay.ReadName(mainGame->dInfo.hostname[1]);
-		cur_replay.ReadName(mainGame->dInfo.clientname[1]);
-		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
+		cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
+		cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
+		cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
+		cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
 	} else {
-		cur_replay.ReadName(mainGame->dInfo.hostname[0]);
-		cur_replay.ReadName(mainGame->dInfo.clientname[0]);
+		cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
+		cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
 	}
 	int opt = cur_replay.ReadInt32();
 	mainGame->dInfo.duel_field = opt & 0xff;
@@ -260,14 +260,13 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 		}
 		case MSG_AI_NAME: {
 			char* pbuf =(char*) p.data;
-			char namebuf[128];
-			wchar_t wname[128];
 			int len = BufferIO::ReadInt16(pbuf);
 			char* begin = pbuf;
 			pbuf += len + 1;
+			char* namebuf = new char[len];
 			memcpy(namebuf, begin, len + 1);
-			BufferIO::DecodeUTF8(namebuf, wname);
-			BufferIO::CopyWStr(wname, mainGame->dInfo.clientname[0], 20);
+			mainGame->dInfo.clientname[0] = BufferIO::DecodeUTF8s(namebuf);
+			delete[] namebuf;
 			return true;
 		}
 		case OLD_REPLAY_MODE:
