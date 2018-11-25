@@ -299,7 +299,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if (mainGame->btnMark[7]->isPressed())
 					filter_marks |= 0004;
 				mainGame->HideElement(mainGame->wLinkMarks);
-				StartFilter();
+				StartFilter(true);
 				break;
 			}
 			}
@@ -334,7 +334,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
 				filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
-				StartFilter();
+				StartFilter(true);
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
@@ -429,7 +429,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
-				StartFilter();
+				StartFilter(true);
 				break;
 			}
 			case COMBOBOX_SECONDTYPE:
@@ -442,7 +442,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->ebDefense->setEnabled(true);
 					}
 				}
-				StartFilter();
+				StartFilter(true);
 				break; 
 			}
 			case COMBOBOX_SORTTYPE: {
@@ -474,7 +474,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 					if (prevLimit < 8)
 						mainGame->cbLimit->setSelected(prevLimit);
-					StartFilter();
+					StartFilter(true);
 					break;
 				}
 			}
@@ -516,8 +516,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_LMOUSE_LEFT_UP: {
-			if(!is_draging)
+			if(!is_draging) {
+				mouse_pos.set(event.MouseInput.X, event.MouseInput.Y);
+				GetHoveredCard();
 				break;
+			}
 			bool pushed = false;
 			if(hovered_pos == 1)
 				pushed = push_main(draging_pointer, hovered_seq);
@@ -759,10 +762,11 @@ bool DeckBuilder::FiltersChanged() {
 		LF(filter_scltype)
 		LF(filter_scl)
 		LF(filter_marks)
+		LF(filter_lm)
 #undef LF
 		return res;
 }
-void DeckBuilder::StartFilter() {
+void DeckBuilder::StartFilter(bool force_refresh) {
 	filter_type = mainGame->cbCardType->getSelected();
 	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
 	filter_lm = static_cast<limitation_search_filters>(mainGame->cbLimit->getSelected());
@@ -774,9 +778,9 @@ void DeckBuilder::StartFilter() {
 		filter_lv = parse_filter(mainGame->ebStar->getText(), &filter_lvtype);
 		filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
 	}
-	FilterCards();
+	FilterCards(force_refresh);
 }
-void DeckBuilder::FilterCards() {
+void DeckBuilder::FilterCards(bool force_refresh) {
 	results.clear();
 	std::wstring searchterm(mainGame->ebCardName->getText());
 	std::vector<std::wstring> searchterms;
@@ -785,7 +789,7 @@ void DeckBuilder::FilterCards() {
 		searchterms.push_back(searchterm);
 	else
 		searchterms = Game::tokenize(searchterm, L"+");
-	if(FiltersChanged())
+	if(FiltersChanged() || force_refresh)
 		searched_terms.clear();
 	//removes no longer existing search terms from the cache
 	for(auto it = searched_terms.cbegin(); it != searched_terms.cend();) {

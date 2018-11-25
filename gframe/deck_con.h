@@ -30,9 +30,9 @@ public:
 	void Terminate();
 	void GetHoveredCard();
 	bool FiltersChanged();
-	void FilterCards();
+	void FilterCards(bool force_refresh = false);
 	bool CheckCard(const CardDataC& data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& setcode);
-	void StartFilter();
+	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
@@ -59,6 +59,7 @@ public:
 	unsigned int filter_scltype;
 	unsigned int filter_scl;
 	unsigned int filter_marks;
+	limitation_search_filters filter_lm;
 	long long prev_filter_effect;
 	unsigned int prev_filter_type;
 	unsigned int prev_filter_type2;
@@ -73,7 +74,7 @@ public:
 	unsigned int prev_filter_scltype;
 	unsigned int prev_filter_scl;
 	unsigned int prev_filter_marks;
-	limitation_search_filters filter_lm;
+	limitation_search_filters prev_filter_lm;
 	position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;
