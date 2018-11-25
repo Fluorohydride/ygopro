@@ -1148,15 +1148,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcardp = 0;
 		mainGame->dInfo.vic_string = 0;
 		mainGame->showcardcode = player + 1;
+		std::wstring formatted_string = L"";
 		if(player < 2) {
 			if(match_kill)
-				mainGame->dInfo.vic_string = &fmt::sprintf(dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill))[0];
-			else if(type < 0x10)
-				mainGame->dInfo.vic_string = &fmt::format(L"[{}] {}", mainGame->dInfo.clientname[mainGame->dInfo.current_player[mainGame->LocalPlayer(player)]],
-					dataManager.GetVictoryString(type))[0];
-			else
-				mainGame->dInfo.vic_string = &dataManager.GetVictoryString(type)[0];
+				formatted_string = fmt::sprintf(dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
+			else if(type < 0x10) {
+				auto curplayer = mainGame->dInfo.current_player[mainGame->LocalPlayer(player)];
+				formatted_string = fmt::format(L"[{}] {}", (mainGame->LocalPlayer(player) == 0) ? mainGame->dInfo.clientname[curplayer] : mainGame->dInfo.hostname[curplayer],
+					dataManager.GetVictoryString(type));
+			} else
+				formatted_string = dataManager.GetVictoryString(type);
 		}
+		mainGame->dInfo.vic_string = (wchar_t*)formatted_string.c_str();
 		mainGame->showcard = 101;
 		mainGame->WaitFrameSignal(120);
 		mainGame->dInfo.vic_string = 0;
