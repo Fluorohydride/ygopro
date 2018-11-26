@@ -132,7 +132,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		int l = BufferIO::ReadInt8(buf);
 		int s = BufferIO::ReadInt8(buf);
 		BufferIO::ReadInt8(buf);
-		ClientCard* ecard = mainGame->dField.GetCard(c, l, s);
+		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
 		equipTarget = ecard;
 		ecard->equipped.insert(this);
 	}
@@ -143,7 +143,7 @@ void ClientCard::UpdateInfo(char* buf) {
 			int l = BufferIO::ReadInt8(buf);
 			int s = BufferIO::ReadInt8(buf);
 			BufferIO::ReadInt8(buf);
-			ClientCard* tcard = mainGame->dField.GetCard(c, l, s);
+			ClientCard* tcard = mainGame->dField.GetCard(mainGame->LocalPlayer(c), l, s);
 			cardTarget.insert(tcard);
 			tcard->ownerTarget.insert(this);
 		}
