@@ -876,46 +876,16 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[11] = 1.0f;
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
-std::vector<std::string> Game::FindfolderFiles(const std::string& path, const std::string& extension, int subdirectorylayers) {
-	std::vector<std::string> res;
-	auto cwd = filesystem->getWorkingDirectory();
-	if(!filesystem->changeWorkingDirectoryTo(path.c_str()))
-		return res;
-	auto list = filesystem->createFileList();
-	for(int i = 0; i < list->getFileCount(); i++) {
-		if(list->isDirectory(i)) {
-			if(subdirectorylayers) {
-				std::string newpath(list->getFileName(i).c_str());
-				if(newpath == ".." || newpath == ".")
-					continue;
-				std::vector<std::string> res2 = FindfolderFiles("./" + newpath, extension, subdirectorylayers-1);
-				for(auto&file : res2) {
-					file = newpath + "/" + file;
-				}
-				res.insert(res.end(), res2.begin(), res2.end());
-			}
-			continue;
-		}
-		std::string name(list->getFileName(i).c_str());
-		size_t dotpos = name.find_last_of(".");
-		if(name.size() < 5 || dotpos == std::wstring::npos || name.substr(dotpos).find(extension) == std::wstring::npos)
-			continue;
-		res.push_back(name.c_str());
-	}
-	list->drop();
-	filesystem->changeWorkingDirectoryTo(cwd);
-	return res;
-}
 void Game::LoadExpansionDB() {
-	auto files = FindfolderFiles("./expansions/", ".cdb", 1);
+	auto files = Utils::FindfolderFiles(L"./expansions/", L".cdb", 2);
 	for (auto& file : files)
-		dataManager.LoadDB(("./expansions/" + file).c_str());
+		dataManager.LoadDB(BufferIO::EncodeUTF8s(L"./expansions/" + file).c_str());
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	auto files = FindfolderFiles("./deck/", ".ydk");
+	auto files = Utils::FindfolderFiles(L"./deck/", L".ydk");
 	for(auto& file : files) {
-		cbDeck->addItem(BufferIO::DecodeUTF8s(file.substr(0, file.size() - 4)).c_str());
+		cbDeck->addItem(file.substr(0, file.size() - 4).c_str());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(gameConf.lastdeck == cbDeck->getItem(i)) {
@@ -931,9 +901,9 @@ void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
 }
 void Game::RefreshBGMList() {
-	auto files = FindfolderFiles("./sound/BGM/", ".mp3");
+	auto files = Utils::FindfolderFiles(L"./sound/BGM/", L".mp3");
 	for(auto& file : files) {
-		BGMList.push_back(file);
+		BGMList.push_back(BufferIO::EncodeUTF8s(file));
 	}
 }
 void Game::LoadConfig() {
@@ -1731,8 +1701,12 @@ bool Game::CompareStrings(std::wstring input, const std::wstring & second_term, 
 		std::transform(tokens[0].begin(), tokens[0].end(), tokens[0].begin(), ::toupper);
 	return CompareStrings(input, tokens);
 }
-std::wstring Game::ReadPuzzleMessage(const char* script_name) {
+std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
+#ifdef _WIN32
 	std::ifstream infile(script_name, std::ifstream::in);
+#else
+	std::ifstream infile(BufferIO::EncodeUTF8s(script_name), std::ifstream::in);
+#endif
 	std::string str;
 	std::string res = "";
 	size_t start = std::string::npos;

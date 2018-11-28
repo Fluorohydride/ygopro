@@ -483,7 +483,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1 || sel == 0)
 					break;
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true);
-				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(BufferIO::EncodeUTF8s(name).c_str()).c_str());
+				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(name).c_str());
 				break;
 			}
 			}

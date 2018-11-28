@@ -223,7 +223,11 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 	return errorcode;
 }
 bool LoadCardList(const std::wstring& name, std::vector<int>* mainlist = nullptr, std::vector<int>* sidelist = nullptr, int* retmainc = nullptr, int* retsidec = nullptr) {
+#ifdef _WIN32
+	std::ifstream deck(name, std::ifstream::in);
+#else
 	std::ifstream deck(BufferIO::EncodeUTF8s(name), std::ifstream::in);
+#endif
 	if(!deck.is_open())
 		return false;
 	std::vector<int> res;
@@ -303,7 +307,11 @@ bool DeckManager::LoadDeckDouble(const std::wstring& file, const std::wstring& f
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const std::wstring& name) {
+#ifdef _WIN32
+	std::ofstream deckfile(L"./deck/" + name + L".ydk", std::ofstream::out);
+#else
 	std::ofstream deckfile("./deck/" + BufferIO::EncodeUTF8s(name) + ".ydk", std::ofstream::out);
+#endif
 	if(!deckfile.is_open())
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";

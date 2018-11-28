@@ -132,7 +132,11 @@ void Replay::EndRecord(size_t size) {
 	is_recording = false;
 }
 void Replay::SaveReplay(const std::wstring& name) {
+#ifdef _WIN32
+	std::ofstream replay_file(L"./replay/" + name + L".yrpX", std::ofstream::binary);
+#else
 	std::ofstream replay_file("./replay/" + BufferIO::EncodeUTF8s(name) + ".yrpX", std::ofstream::binary);
+#endif
 	if(!replay_file.is_open())
 		return;
 	replay_file.write((char*)&pheader, sizeof(pheader));
@@ -140,9 +144,15 @@ void Replay::SaveReplay(const std::wstring& name) {
 	replay_file.close();
 }
 bool Replay::OpenReplay(const std::wstring& name) {
+#ifdef _WIN32
+	std::ifstream replay_file(name, std::ifstream::binary);
+	if(!replay_file.is_open()) {
+		replay_file.open(L"./replay/" + name, std::ifstream::binary);
+#else
 	std::ifstream replay_file(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 	if(!replay_file.is_open()) {
 		replay_file.open("./replay/" + BufferIO::EncodeUTF8s(name), std::ifstream::binary);
+#endif
 		if(!replay_file.is_open())
 			return false;
 	}
@@ -166,9 +176,15 @@ bool Replay::OpenReplay(const std::wstring& name) {
 	return true;
 }
 bool Replay::CheckReplay(const std::wstring& name) {
+#ifdef _WIN32
+	std::ifstream replay_file(name, std::ifstream::binary);
+	if(!replay_file.is_open()) {
+		replay_file.open(L"./replay/" + name, std::ifstream::binary);
+#else
 	std::ifstream replay_file(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 	if(!replay_file.is_open()) {
 		replay_file.open("./replay/" + BufferIO::EncodeUTF8s(name), std::ifstream::binary);
+#endif
 		if(!replay_file.is_open())
 			return false;
 	}
