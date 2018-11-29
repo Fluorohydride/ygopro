@@ -19,7 +19,7 @@ namespace ygo {
 		static void CreateResourceFolders();
 		static void takeScreenshot(irr::IrrlichtDevice* device);
 		static void changeCursor(irr::gui::ECURSOR_ICON icon);
-		static std::vector<std::wstring> FindfolderFiles(const std::wstring& path, const std::wstring& extension, int subdirectorylayers = 0);
+		static std::vector<std::wstring> FindfolderFiles(const std::wstring& path, std::vector<std::wstring> extensions, int subdirectorylayers = 0);
 	};
 }
 

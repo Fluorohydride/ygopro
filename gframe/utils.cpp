@@ -92,11 +92,8 @@ namespace ygo {
 			cursor->setActiveIcon(icon);
 		}
 	}
-	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, const std::wstring & extension, int subdirectorylayers) {
+	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, std::vector<std::wstring> extensions, int subdirectorylayers) {
 		std::vector<std::wstring> res;
-		/*auto cwd = filesystem->getWorkingDirectory();
-		if(!filesystem->changeWorkingDirectoryTo(BufferIO::EncodeUTF8s(path).c_str()))
-			return res;*/
 #ifdef _WIN32
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW((path + L"*.*").c_str(), &fdataw);
@@ -105,9 +102,10 @@ namespace ygo {
 				std::wstring name = fdataw.cFileName;
 				if(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 					if(subdirectorylayers) {
-						if(name == L".." || name == L".")
+						if(name == L".." || name == L".") {
 							continue;
-						std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extension, subdirectorylayers - 1);
+						}
+						std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extensions, subdirectorylayers - 1);
 						for(auto&file : res2) {
 							file = name + L"/" + file;
 						}
@@ -117,7 +115,9 @@ namespace ygo {
 				}
 				if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 					size_t dotpos = name.find_last_of(L".");
-					if(dotpos == std::wstring::npos || name.substr(dotpos).find(extension) == std::wstring::npos)
+					if(dotpos == std::wstring::npos)
+						continue;
+					if(extensions.size() && std::find(extensions.begin(), extensions.end(), name.substr(dotpos)) == extensions.end())
 						continue;
 					res.push_back(name.c_str());
 				}
@@ -145,7 +145,9 @@ namespace ygo {
 					continue;
 				}
 				size_t dotpos = name.find_last_of(L".");
-				if(dotpos == std::wstring::npos || name.substr(dotpos).find(extension) == std::wstring::npos)
+				if(dotpos == std::wstring::npos)
+					continue;
+				if(std::find(extensions.begin(), extensions.end(), name.substr(dotpos)) == extensions.end())
 					continue;
 				res.push_back(name.c_str());
 			}

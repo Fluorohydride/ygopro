@@ -43,7 +43,7 @@ namespace gui
 
 		virtual const wchar_t* getListItem(u32 id) const;
 
-		virtual const wchar_t* getListItem(u32 id, bool relativepath, bool fullpath = false) const;
+		virtual const wchar_t* getListItem(u32 id, bool relativepath) const;
 
 		//! adds an list item, returns id of item
 		virtual u32 addItem(const wchar_t* text);
@@ -142,9 +142,9 @@ namespace gui
 
 		void resetPath();
 
-		void setWorkingPath(const io::path& newDirectory);
+		void setWorkingPath(const std::wstring& newDirectory);
 
-		void addFilteredExtensions(std::vector<io::path> extensions);
+		void addFilteredExtensions(std::vector<std::wstring> extensions);
 
 
 	private:
@@ -154,7 +154,6 @@ namespace gui
 			ListItem() : icon(-1)
 			{}
 
-			core::stringw fulltext;
 			core::stringw reltext;
 			core::stringw text;
 			s32 icon;
@@ -180,16 +179,15 @@ namespace gui
 		bool getSerializationLabels(EGUI_LISTBOX_COLOR colorType, core::stringc & useColorLabel, core::stringc & colorLabel) const;
 
 		void LoadFolderContents();
+		io::IFileList* CreateFilelist(const std::wstring & path);
 
-		core::stringc NormalizePath(core::stringc path);
+		std::wstring NormalizePath(const std::wstring& path);
 
-		io::path basePath;
-		io::path absPath;
-		io::path curRelPath;
-		io::path curAbsPath;
+		core::stringw basePath;
+		core::stringw curRelPath;
 		io::IFileList* curList;
 		io::IFileSystem* filesystem;
-		std::vector<io::path> filtered_extensions;
+		std::vector<std::wstring> filtered_extensions;
 
 		core::array< ListItem > Items;
 		s32 Selected;
