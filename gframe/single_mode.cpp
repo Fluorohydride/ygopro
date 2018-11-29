@@ -794,10 +794,10 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			int len = BufferIO::ReadInt16(pbuf);
 			char* begin = pbuf;
 			pbuf += len + 1;
-			char* namebuf = new char[len];
-			memcpy(namebuf, begin, len + 1);
+			std::string namebuf;
+			namebuf.resize(len);
+			memcpy(&namebuf[0], begin, len + 1);
 			mainGame->dInfo.clientname[0] = BufferIO::DecodeUTF8s(namebuf);
-			delete[] namebuf;
 			break;
 		}
 		case MSG_SHOW_HINT: {
