@@ -10,7 +10,7 @@
 #include "netserver.h"
 #include "single_mode.h"
 
-const unsigned short PRO_VERSION = 0x1347;
+const unsigned short PRO_VERSION = 0x1348;
 
 namespace ygo {
 
