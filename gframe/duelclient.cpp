@@ -24,6 +24,7 @@ char DuelClient::duel_client_read[0x2000];
 char DuelClient::duel_client_write[0x2000];
 bool DuelClient::is_closing = false;
 int DuelClient::select_hint = 0;
+int DuelClient::select_unselect_hint = 0;
 wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;
 
@@ -1452,7 +1453,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
 		if(select_hint)
-			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_hint),
+			select_unselect_hint = select_hint;
+		if(select_unselect_hint)
+			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_unselect_hint),
 			           mainGame->dField.select_min, mainGame->dField.select_max);
 		else myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetSysString(560), mainGame->dField.select_min, mainGame->dField.select_max);
 		select_hint = 0;
