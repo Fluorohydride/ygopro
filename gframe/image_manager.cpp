@@ -167,6 +167,10 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 		sprintf(file, "expansions/pics/%d.jpg", code);
 		irr::video::ITexture* img = GetTextureFromFile(file, CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 		if(img == NULL) {
+			sprintf(file, mainGame->GetLocaleDir("pics/%d.jpg"), code);
+			img = GetTextureFromFile(file, CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+		}
+		if(img == NULL) {
 			sprintf(file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 		}
@@ -192,6 +196,10 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		irr::video::ITexture* img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 		if(img == NULL) {
 			sprintf(file, "pics/thumbnail/%d.jpg", code);
+			img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
+		}
+		if(img == NULL) {
+			sprintf(file, mainGame->GetLocaleDir("pics/thumbnail/%d.jpg"), code);
 			img = GetTextureFromFile(file, CARD_THUMB_WIDTH, CARD_THUMB_HEIGHT);
 		}
 		if(img == NULL && mainGame->gameConf.use_image_scale) {
@@ -220,6 +228,14 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		irr::video::ITexture* img = GetTextureFromFile(file, 512, 512);
 		if(img == NULL) {
 			sprintf(file, "expansions/pics/field/%d.jpg", code);
+			img = GetTextureFromFile(file, 512, 512);
+		}
+		if(img == NULL) {
+			sprintf(file, mainGame->GetLocaleDir("pics/field/%d.png"), code);
+			img = GetTextureFromFile(file, 512, 512);
+		}
+		if(img == NULL) {
+			sprintf(file, mainGame->GetLocaleDir("pics/field/%d.jpg"), code);
 			img = GetTextureFromFile(file, 512, 512);
 		}
 		if(img == NULL) {

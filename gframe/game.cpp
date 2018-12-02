@@ -57,10 +57,12 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadExpansionDB();
+	if(dataManager.LoadDB(GetLocaleDir("cards.cdb"))) {} else
 	if(!dataManager.LoadDB("cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
 	}
+	if(dataManager.LoadStrings(GetLocaleDir("strings.conf"))) {} else
 	if(!dataManager.LoadStrings("strings.conf")) {
 		ErrorLog("Failed to load strings!");
 		return false;
@@ -320,6 +322,9 @@ bool Game::Initialize() {
 	posY += 30;
 	chkMusicMode = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1281));
 	chkMusicMode->setChecked(gameConf.music_mode != 0);
+	env->addStaticText(dataManager.GetSysString(1288), rect<s32>(posX + 23, posY + 3, posX + 160, posY + 28), false, false, tabSystem);
+	cbLocale = env->addComboBox(rect<s32>(posX + 150, posY + 4, posX + 250, posY + 21), tabSystem, COMBOBOX_LOCALE);
+	RefreshLocales();
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -906,11 +911,27 @@ void Game::RefreshSingleplay() {
 			lstSinglePlayList->addItem(name);
 	});
 }
+void Game::RefreshLocales() {
+	cbLocale->clear();
+	cbLocale->addItem(L"default");
+	FileSystem::TraversalDir(L"./locales", [this](const wchar_t* name, bool isdir) {
+		if(isdir && wcscmp(name, L".") && wcscmp(name, L".."))
+			cbLocale->addItem(name);
+	});
+	for(size_t i = 0; i < cbLocale->getItemCount(); ++i) {
+		if(!wcscmp(cbLocale->getItem(i), gameConf.locale)) {
+			cbLocale->setSelected(i);
+			break;
+		}
+	}
+}
 void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
 		return;
 	botInfo.clear();
-	FILE* fp = fopen("bot.conf", "r");
+	FILE* fp = fopen(GetLocaleDir("bot.conf"), "r");
+	if(!fp)
+		fp = fopen("bot.conf", "r");
 	char linebuf[256];
 	char strbuf[256];
 	if(fp) {
@@ -1084,10 +1105,40 @@ void Game::LoadConfig() {
 			} else if (!strcmp(strbuf, "lastdeck")) {
 				BufferIO::DecodeUTF8(valbuf, wstr);
 				BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
+			} else if (!strcmp(strbuf, "locale")) {
+				BufferIO::DecodeUTF8(valbuf, wstr);
+				BufferIO::CopyWStr(wstr, gameConf.locale, 64);
 			}
 		}
 	}
 	fclose(fp);
+#ifdef _WIN32
+	if(!gameConf.locale) {
+		unsigned int lcid = ((unsigned int)GetSystemDefaultLangID()) & 0xff;
+		switch(lcid) {
+			case 0x04: {
+				myswprintf(mainGame->gameConf.locale, L"%ls", L"zh-CN");
+				break;
+			}
+			case 0x09: {
+				myswprintf(mainGame->gameConf.locale, L"%ls", L"en-US");
+				break;
+			}
+			case 0x0a: {
+				myswprintf(mainGame->gameConf.locale, L"%ls", L"es-ES");
+				break;
+			}
+			case 0x11: {
+				myswprintf(mainGame->gameConf.locale, L"%ls", L"ja-JP");
+				break;
+			}
+			case 0x12: {
+				myswprintf(mainGame->gameConf.locale, L"%ls", L"ko-KR");
+				break;
+			}
+		}
+	}
+#endif
 }
 void Game::SaveConfig() {
 	FILE* fp = fopen("system.conf", "w");
@@ -1136,6 +1187,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
+	BufferIO::EncodeUTF8(gameConf.locale, linebuf);
+	fprintf(fp, "locale = %s\n", linebuf);
 #ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
@@ -1389,6 +1442,16 @@ void Game::FlashWindow() {
 	fi.dwTimeout = 0;
 	FlashWindowEx(&fi);
 #endif
+}
+const char* Game::GetLocaleDir(const char* dir) {
+	if(!gameConf.locale || !wcscmp(gameConf.locale, L"default"))
+		return dir;
+	wchar_t locale_buf[256];
+	wchar_t orig_dir[64];
+	BufferIO::DecodeUTF8(dir, orig_dir);
+	myswprintf(locale_buf, L"locales/%ls/%ls", gameConf.locale, orig_dir);
+	BufferIO::EncodeUTF8(locale_buf, locale_buf_utf8);
+	return locale_buf_utf8;
 }
 void Game::SetCursor(ECURSOR_ICON icon) {
 	ICursorControl* cursor = mainGame->device->getCursorControl();
