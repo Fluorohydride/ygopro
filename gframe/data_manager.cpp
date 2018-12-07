@@ -6,6 +6,7 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[4096];
 byte DataManager::scriptBuffer[0x20000];
+IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
 bool DataManager::LoadDB(const wchar_t* wfile) {
@@ -334,21 +335,16 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 		return ScriptReader(script_name, slen);
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
-	FILE *fp;
-#ifdef _WIN32
 	wchar_t fname[256];
 	BufferIO::DecodeUTF8(script_name, fname);
-	fp = _wfopen(fname, L"rb");
-#else
-	fp = fopen(script_name, "rb");
-#endif
-	if(!fp)
+	IReadFile* reader = FileSystem->createAndOpenFile(fname);
+	if(reader == NULL)
 		return 0;
-	int len = fread(scriptBuffer, 1, sizeof(scriptBuffer), fp);
-	fclose(fp);
-	if(len >= sizeof(scriptBuffer))
+	size_t size = reader->getSize();
+	if(size > sizeof(scriptBuffer))
 		return 0;
-	*slen = len;
+	reader->read(scriptBuffer, size);
+	*slen = size;
 	return scriptBuffer;
 }
 
