@@ -56,6 +56,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
+	dataManager.FileSystem = device->getFileSystem();
 	LoadExpansionDB();
 	if(!dataManager.LoadDB("cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");

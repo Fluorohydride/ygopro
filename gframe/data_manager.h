@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "sqlite3.h"
+#include "spmemvfs.h"
 #include "client_card.h"
 #include <unordered_map>
 
@@ -13,7 +14,7 @@ public:
 	DataManager(): _datas(8192), _strings(8192) {}
 	bool LoadDB(const char* file);
 	bool LoadStrings(const char* file);
-	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
+	bool Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
 	code_pointer GetCodePointer(int code);
 	bool GetString(int code, CardString* pStr);
@@ -54,7 +55,7 @@ public:
 	static int CardReader(int, void*);
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
-
+	IFileSystem* FileSystem;
 };
 
 extern DataManager dataManager;

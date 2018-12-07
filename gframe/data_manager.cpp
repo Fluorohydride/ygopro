@@ -9,20 +9,33 @@ byte DataManager::scriptBuffer[0x20000];
 DataManager dataManager;
 
 bool DataManager::LoadDB(const char* file) {
-	sqlite3* pDB;
-	if(sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
-		return Error(pDB);
+	wchar_t wfile[256];
+	BufferIO::DecodeUTF8(file, wfile);
+	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+	if(reader == NULL)
+		return false;
+	spmemvfs_db_t db;
+	spmembuffer_t * mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
+	spmemvfs_env_init();
+	mem->total = mem->used = reader->getSize();
+	mem->data = (char*)malloc(mem->total + 1);
+	reader->read(mem->data, mem->total);
+	reader->drop();
+	(mem->data)[mem->total] = '\0';
+	if(spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
+		return Error(&db);
+	sqlite3* pDB = db.handle;
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
-		return Error(pDB);
+		return Error(&db);
 	CardDataC cd;
 	CardString cs;
 	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
 		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
-			return Error(pDB, pStmt);
+			return Error(&db, pStmt);
 		else if(step == SQLITE_ROW) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
@@ -62,7 +75,8 @@ bool DataManager::LoadDB(const char* file) {
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
-	sqlite3_close(pDB);
+	spmemvfs_close_db(&db);
+	spmemvfs_env_fini();
 	return true;
 }
 bool DataManager::LoadStrings(const char* file) {
@@ -99,11 +113,12 @@ bool DataManager::LoadStrings(const char* file) {
 		myswprintf(numStrings[i], L"%d", i);
 	return true;
 }
-bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
+bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
+	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
-	sqlite3_close(pDB);
+	spmemvfs_close_db(pDB);
+	spmemvfs_env_fini();
 	return false;
 }
 bool DataManager::GetData(int code, CardData* pData) {
