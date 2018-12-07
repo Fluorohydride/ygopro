@@ -5,7 +5,7 @@ namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[4096];
-static byte scriptBuffer[0x20000];
+byte DataManager::scriptBuffer[0x20000];
 DataManager dataManager;
 
 bool DataManager::LoadDB(const char* file) {
