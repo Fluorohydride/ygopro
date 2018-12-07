@@ -51,6 +51,8 @@ public:
 	static wchar_t strBuffer[4096];
 	static const wchar_t* unknown_string;
 	static int CardReader(int, void*);
+	static byte* ScriptReaderEx(const char* script_name, int* slen);
+	static byte* ScriptReader(const char* script_name, int* slen);
 
 };
 
