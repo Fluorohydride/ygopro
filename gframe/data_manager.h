@@ -12,7 +12,7 @@ namespace ygo {
 class DataManager {
 public:
 	DataManager(): _datas(8192), _strings(8192) {}
-	bool LoadDB(const char* file);
+	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
 	bool Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);

@@ -57,8 +57,8 @@ bool Game::Initialize() {
 		return false;
 	}
 	dataManager.FileSystem = device->getFileSystem();
-	LoadExpansionDB();
-	if(!dataManager.LoadDB("cards.cdb")) {
+	LoadExpansions();
+	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
 	}
@@ -866,12 +866,24 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
-void Game::LoadExpansionDB() {
-	FileSystem::TraversalDir("./expansions", [](const char* name, bool isdir) {
-		if(!isdir && strrchr(name, '.') && !mystrncasecmp(strrchr(name, '.'), ".cdb", 4)) {
-			char fpath[1024];
-			sprintf(fpath, "./expansions/%s", name);
+void Game::LoadExpansions() {
+	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
+			wchar_t fpath[1024];
+			myswprintf(fpath, L"./expansions/%s", name);
 			dataManager.LoadDB(fpath);
+		}
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4)) {
+			wchar_t fpath[1024];
+			myswprintf(fpath, L"./expansions/%s", name);
+			dataManager.FileSystem->addFileArchive(fpath);
+
+			size_t len = wcslen(name);
+			wchar_t expansname[256];
+			wcsncpy(expansname, name, len - 4);
+			expansname[len - 4] = 0;
+			wcscat(expansname, L".cdb");
+			dataManager.LoadDB(expansname);
 		}
 	});
 }

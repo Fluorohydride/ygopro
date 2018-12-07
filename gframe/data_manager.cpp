@@ -8,9 +8,7 @@ wchar_t DataManager::strBuffer[4096];
 byte DataManager::scriptBuffer[0x20000];
 DataManager dataManager;
 
-bool DataManager::LoadDB(const char* file) {
-	wchar_t wfile[256];
-	BufferIO::DecodeUTF8(file, wfile);
+bool DataManager::LoadDB(const wchar_t* wfile) {
 	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
 	if(reader == NULL)
 		return false;
@@ -22,6 +20,8 @@ bool DataManager::LoadDB(const char* file) {
 	reader->read(mem->data, mem->total);
 	reader->drop();
 	(mem->data)[mem->total] = '\0';
+	char file[256];
+	BufferIO::EncodeUTF8(wfile, file);
 	if(spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
 		return Error(&db);
 	sqlite3* pDB = db.handle;
