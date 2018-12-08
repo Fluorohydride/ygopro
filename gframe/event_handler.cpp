@@ -832,7 +832,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							text = fmt::format(L"{}[{}]({})", dataManager.FormatLocation(selectable_cards[i + pos]->overlayTarget->location, selectable_cards[i + pos]->overlayTarget->sequence),
 								selectable_cards[i + pos]->overlayTarget->sequence + 1, selectable_cards[i + pos]->sequence + 1);
 						} else if(selectable_cards[i]->location != 0) {
-							text = fmt::format(L"{}[{}]", dataManager.FormatLocation(selectable_cards[i + pos]->overlayTarget->location, selectable_cards[i + pos]->overlayTarget->sequence),
+							text = fmt::format(L"{}[{}]", dataManager.FormatLocation(selectable_cards[i + pos]->location, selectable_cards[i + pos]->sequence),
 								selectable_cards[i + pos]->sequence + 1);
 						}
 					}
