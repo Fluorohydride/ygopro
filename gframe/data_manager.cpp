@@ -344,12 +344,12 @@ int DataManager::CardReader(int code, void* pData) {
 	return 0;
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
-	char exname[256] = "./expansions";
+	char exname[256] = "expansions";
 	strcat(exname, script_name + 1);//default script name: ./script/c%d.lua
 	if(ScriptReader(exname, slen))
 		return scriptBuffer;
 	else
-		return ScriptReader(script_name, slen);
+		return ScriptReader(script_name + 2, slen);
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 	wchar_t fname[256];

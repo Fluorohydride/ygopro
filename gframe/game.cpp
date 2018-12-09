@@ -876,7 +876,7 @@ void Game::LoadExpansions() {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4)) {
 			wchar_t fpath[1024];
 			myswprintf(fpath, L"./expansions/%s", name);
-			dataManager.FileSystem->addFileArchive(fpath);
+			dataManager.FileSystem->addFileArchive(fpath, true, false);
 		}
 	});
 	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
