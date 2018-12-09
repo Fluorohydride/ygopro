@@ -5,6 +5,7 @@ namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[4096];
+byte DataManager::scriptBuffer[0x20000];
 DataManager dataManager;
 
 bool DataManager::LoadDB(const char* file) {
@@ -308,6 +309,32 @@ int DataManager::CardReader(int code, void* pData) {
 	if(!dataManager.GetData(code, (CardData*)pData))
 		memset(pData, 0, sizeof(CardData));
 	return 0;
+}
+byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+	char exname[256] = "./expansions";
+	strcat(exname, script_name + 1);//default script name: ./script/c%d.lua
+	if(ScriptReader(exname, slen))
+		return scriptBuffer;
+	else
+		return ScriptReader(script_name, slen);
+}
+byte* DataManager::ScriptReader(const char* script_name, int* slen) {
+	FILE *fp;
+#ifdef _WIN32
+	wchar_t fname[256];
+	BufferIO::DecodeUTF8(script_name, fname);
+	fp = _wfopen(fname, L"rb");
+#else
+	fp = fopen(script_name, "rb");
+#endif
+	if(!fp)
+		return 0;
+	int len = fread(scriptBuffer, 1, sizeof(scriptBuffer), fp);
+	fclose(fp);
+	if(len >= sizeof(scriptBuffer))
+		return 0;
+	*slen = len;
+	return scriptBuffer;
 }
 
 }
