@@ -105,6 +105,7 @@ bool DataManager::LoadStrings(IReadFile* reader) {
 			linebuf[0] = '\0';
 		}
 	}
+	reader->drop();
 	return true;
 }
 void DataManager::ReadStringConfLine(const char* linebuf) {
