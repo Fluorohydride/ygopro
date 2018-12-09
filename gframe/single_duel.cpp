@@ -527,7 +527,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
-	set_script_reader((script_reader)ScriptReaderEx);
+	set_script_reader((script_reader)DataManager::ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)SingleDuel::MessageHandler);
 	rnd.reset(seed);
@@ -2116,26 +2116,6 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 		NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
 #endif
 	}
-}
-byte* SingleDuel::ScriptReaderEx(const char* script_name, int* slen) {
-#ifdef YGOPRO_SERVER_MODE
-	char sname[256] = "./specials";
-	strcat(sname, script_name + 8);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-	if(!buffer) {
-		char sname[256] = "./expansions";
-		strcat(sname, script_name + 1);
-		buffer = default_script_reader(sname, slen);
-	}
-#else
-	char sname[256] = "./expansions";
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-#endif
-	if(buffer)
-		return buffer;
-	else
-		return default_script_reader(script_name, slen);
 }
 int SingleDuel::MessageHandler(long fduel, int type) {
 	if(!enable_log)
