@@ -877,15 +877,16 @@ void Game::LoadExpansions() {
 			wchar_t fpath[1024];
 			myswprintf(fpath, L"./expansions/%s", name);
 			dataManager.FileSystem->addFileArchive(fpath);
-
-			size_t len = wcslen(name);
-			wchar_t expansname[256];
-			wcsncpy(expansname, name, len - 4);
-			expansname[len - 4] = 0;
-			wcscat(expansname, L".cdb");
-			dataManager.LoadDB(expansname);
 		}
 	});
+	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
+		const IFileList* archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
+		for(u32 j = 0; j < archive->getFileCount(); ++j) {
+			const wchar_t* fname = archive->getFullFileName(j).c_str();
+			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
+				dataManager.LoadDB(fname);
+		}
+	}
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
