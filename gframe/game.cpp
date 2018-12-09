@@ -885,6 +885,10 @@ void Game::LoadExpansions() {
 			const wchar_t* fname = archive->getFullFileName(j).c_str();
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
 				dataManager.LoadDB(fname);
+			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
+				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
+				dataManager.LoadStrings(reader);
+			}
 		}
 	}
 }

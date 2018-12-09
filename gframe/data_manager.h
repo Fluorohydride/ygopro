@@ -14,6 +14,8 @@ public:
 	DataManager(): _datas(8192), _strings(8192) {}
 	bool LoadDB(const wchar_t* wfile);
 	bool LoadStrings(const char* file);
+	bool LoadStrings(IReadFile* reader);
+	void ReadStringConfLine(const char* linebuf);
 	bool Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
 	code_pointer GetCodePointer(int code);

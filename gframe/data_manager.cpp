@@ -85,34 +85,51 @@ bool DataManager::LoadStrings(const char* file) {
 	if(!fp)
 		return false;
 	char linebuf[256];
-	char strbuf[256];
-	int value;
 	while(fgets(linebuf, 256, fp)) {
-		if(linebuf[0] != '!')
-			continue;
-		sscanf(linebuf, "!%s", strbuf);
-		if(!strcmp(strbuf, "system")) {
-			sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_sysStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "victory")) {
-			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_victoryStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "counter")) {
-			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_counterStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "setname")) {
-			sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_setnameStrings[value] = strBuffer;
-		}
+		ReadStringConfLine(linebuf);
 	}
 	fclose(fp);
 	for(int i = 0; i < 255; ++i)
 		myswprintf(numStrings[i], L"%d", i);
 	return true;
+}
+bool DataManager::LoadStrings(IReadFile* reader) {
+	char ch[2] = " ";
+	char linebuf[256] = "";
+	while(reader->read(&ch[0], 1)) {
+		if(ch[0] == '\0')
+			break;
+		strcat(linebuf, ch);
+		if(ch[0] == '\n') {
+			ReadStringConfLine(linebuf);
+			linebuf[0] = '\0';
+		}
+	}
+	return true;
+}
+void DataManager::ReadStringConfLine(const char* linebuf) {
+	if(linebuf[0] != '!')
+		return;
+	char strbuf[256];
+	int value;
+	sscanf(linebuf, "!%s", strbuf);
+	if(!strcmp(strbuf, "system")) {
+		sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_sysStrings[value] = strBuffer;
+	} else if(!strcmp(strbuf, "victory")) {
+		sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_victoryStrings[value] = strBuffer;
+	} else if(!strcmp(strbuf, "counter")) {
+		sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_counterStrings[value] = strBuffer;
+	} else if(!strcmp(strbuf, "setname")) {
+		sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_setnameStrings[value] = strBuffer;
+	}
 }
 bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
 	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
