@@ -45,6 +45,7 @@ struct Config {
 	int enable_bot_mode;
 	int quick_animation;
 	int auto_save_replay;
+	int prefer_expansion_script;
 	bool enable_sound;
 	bool enable_music;
 	double sound_volume;
@@ -250,6 +251,7 @@ public:
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
 	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUICheckBox* chkMultiKeywords;
+	irr::gui::IGUICheckBox* chkPreferExpansionScript;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -628,6 +630,7 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_AUTO_SEARCH		360
 #define CHECKBOX_MULTI_KEYWORDS		372
+#define CHECKBOX_PREFER_EXPANSION	373
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
 #define SCROLL_VOLUME				363
