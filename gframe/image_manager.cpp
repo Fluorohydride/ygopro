@@ -1,8 +1,5 @@
 #include "image_manager.h"
 #include "game.h"
-#ifndef _WIN32
-#include <dirent.h>
-#endif
 
 namespace ygo {
 
