@@ -66,15 +66,9 @@ int ReplayMode::ReplayThread(void* param) {
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 	mainGame->dInfo.tag_player[0] = false;
 	mainGame->dInfo.tag_player[1] = false;
-	if(mainGame->dInfo.isSingleMode) {
-		set_script_reader((script_reader)SingleMode::ScriptReaderEx);
-		set_card_reader((card_reader)DataManager::CardReader);
-		set_message_handler((message_handler)MessageHandler);
-	} else {
-		set_script_reader((script_reader)ScriptReaderEx);
-		set_card_reader((card_reader)DataManager::CardReader);
-		set_message_handler((message_handler)MessageHandler);
-	}
+	set_script_reader((script_reader)DataManager::ScriptReaderEx);
+	set_card_reader((card_reader)DataManager::CardReader);
+	set_message_handler((message_handler)MessageHandler);
 	if(!StartDuel()) {
 		EndDuel();
 		return 0;
@@ -937,30 +931,6 @@ void ReplayMode::ReplayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
-}
-byte* ReplayMode::ScriptReaderEx(const char* script_name, int* slen) {
-	byte* buffer = ScriptReaderExDirectry("./expansions", script_name, slen);
-	if(buffer)
-		return buffer;
-	bool find = false;
-	FileSystem::TraversalDir("./expansions", [script_name, slen, &buffer, &find](const char* name, bool isdir) {
-		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
-			char subdir[1024];
-			sprintf(subdir, "./expansions/%s", name);
-			buffer = ScriptReaderExDirectry(subdir, script_name, slen);
-			if(buffer)
-				find = true;
-		}
-	});
-	if(find)
-		return buffer;
-	return default_script_reader(script_name, slen);
-}
-byte* ReplayMode::ScriptReaderExDirectry(const char* path, const char* script_name, int* slen) {
-	char sname[256];
-	strcpy(sname, path);
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	return default_script_reader(sname, slen);
 }
 int ReplayMode::MessageHandler(long fduel, int type) {
 	if(!enable_log)

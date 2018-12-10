@@ -5,6 +5,7 @@ namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[4096];
+byte DataManager::scriptBuffer[0x20000];
 DataManager dataManager;
 
 bool DataManager::LoadDB(const char* file) {
@@ -314,6 +315,47 @@ int DataManager::CardReader(int code, void* pData) {
 	if(!dataManager.GetData(code, (CardData*)pData))
 		memset(pData, 0, sizeof(CardData));
 	return 0;
+}
+byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+	byte* buffer = ScriptReaderExDirectry("./expansions", script_name, slen);
+	if(buffer)
+		return buffer;
+	bool find = false;
+	FileSystem::TraversalDir("./expansions", [script_name, slen, &buffer, &find](const char* name, bool isdir) {
+		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
+			char subdir[1024];
+			sprintf(subdir, "./expansions/%s", name);
+			buffer = ScriptReaderExDirectry(subdir, script_name, slen);
+			if(buffer)
+				find = true;
+		}
+	});
+	if(find)
+		return buffer;
+	return ScriptReader(script_name, slen);
+}
+byte* DataManager::ScriptReaderExDirectry(const char* path, const char* script_name, int* slen) {
+	char sname[256];
+	sprintf(sname, "%s%s", path, script_name + 1); //default script name: ./script/c%d.lua
+	return ScriptReader(sname, slen);
+}
+byte* DataManager::ScriptReader(const char* script_name, int* slen) {
+	FILE *fp;
+#ifdef _WIN32
+	wchar_t fname[256];
+	BufferIO::DecodeUTF8(script_name, fname);
+	fp = _wfopen(fname, L"rb");
+#else
+	fp = fopen(script_name, "rb");
+#endif
+	if(!fp)
+		return 0;
+	int len = fread(scriptBuffer, 1, sizeof(scriptBuffer), fp);
+	fclose(fp);
+	if(len >= sizeof(scriptBuffer))
+		return 0;
+	*slen = len;
+	return scriptBuffer;
 }
 
 }

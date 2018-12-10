@@ -129,7 +129,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
 				mainGame->gMutex.Lock();
-				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1339));
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, dataManager.GetSysString(1339));
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
@@ -185,7 +185,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->gMutex.Lock();
 				wchar_t textBuffer[256];
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337));
-				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
@@ -195,7 +195,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_LEAVE_GAME: {
 				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
 					mainGame->gMutex.Lock();
-					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
+					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
 					mainGame->gMutex.Unlock();
 					prev_operation = id;
@@ -362,7 +362,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case COMBOBOX_DBDECKS: {
 				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
 					mainGame->gMutex.Lock();
-					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetSysString(1356));
+					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
 					mainGame->gMutex.Unlock();
 					prev_operation = id;
@@ -676,14 +676,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 void DeckBuilder::GetHoveredCard() {
+	int pre_code = hovered_code;
+	hovered_pos = 0;
+	hovered_code = 0;
 	irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 	if(root->getElementFromPoint(mouse_pos) != root)
 		return;
 	int x = mouse_pos.X;
 	int y = mouse_pos.Y;
-	int pre_code = hovered_code;
-	hovered_pos = 0;
-	hovered_code = 0;
 	is_lastcard = 0;
 	if(x >= 314 && x <= 794) {
 		if(y >= 164 && y <= 435) {
@@ -775,14 +775,78 @@ void DeckBuilder::StartFilter() {
 }
 void DeckBuilder::FilterCards() {
 	results.clear();
+	struct element_t {
+		std::wstring keyword;
+		int setcode;
+		enum class type_t {
+			all,
+			name,
+			setcode
+		} type;
+		bool exclude;
+		element_t(): setcode(0), type(type_t::all), exclude(false) {}
+	};
 	const wchar_t* pstr = mainGame->ebCardName->getText();
-	unsigned int set_code = 0;
-	if(pstr[0] == L'@')
-		set_code = dataManager.GetSetCode(&pstr[1]);
-	else
-		set_code = dataManager.GetSetCode(&pstr[0]);
-	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0) || (pstr[0] == L'@' && pstr[1] == 0))
-		pstr = 0;
+	std::wstring str = std::wstring(pstr);
+	std::vector<element_t> query_elements;
+	if(mainGame->gameConf.search_multiple_keywords) {
+		const wchar_t separator = mainGame->gameConf.search_multiple_keywords == 1 ? L' ' : L'+';
+		const wchar_t minussign = L'-';
+		const wchar_t quotation = L'\"';
+		size_t element_start = 0;
+		for(;;) {
+			element_start = str.find_first_not_of(separator, element_start);
+			if(element_start == std::wstring::npos)
+				break;
+			element_t element;
+			if(str[element_start] == minussign) {
+				element.exclude = true;
+				element_start++;
+			}
+			if(element_start >= str.size())
+				break;
+			if(str[element_start] == L'$') {
+				element.type = element_t::type_t::name;
+				element_start++;
+			} else if(str[element_start] == L'@') {
+				element.type = element_t::type_t::setcode;
+				element_start++;
+			}
+			if(element_start >= str.size())
+				break;
+			wchar_t delimiter = separator;
+			if(str[element_start] == quotation) {
+				delimiter = quotation;
+				element_start++;
+			}
+			size_t element_end = str.find_first_of(delimiter, element_start);
+			if(element_end != std::wstring::npos) {
+				size_t length = element_end - element_start;
+				element.keyword = str.substr(element_start, length);
+			} else
+				element.keyword = str.substr(element_start);
+			element.setcode = dataManager.GetSetCode(element.keyword.c_str());
+			query_elements.push_back(element);
+			if(element_end == std::wstring::npos)
+				break;
+			element_start = element_end + 1;
+		}
+	} else {
+		element_t element;
+		size_t element_start = 0;
+		if(str[element_start] == L'$') {
+			element.type = element_t::type_t::name;
+			element_start++;
+		} else if(str[element_start] == L'@') {
+			element.type = element_t::type_t::setcode;
+			element_start++;
+		}
+		if(element_start < str.size()) {
+			element.keyword = str.substr(element_start);
+			element.setcode = dataManager.GetSetCode(element.keyword.c_str());
+			query_elements.push_back(element);
+		}
+	}
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
 		const CardDataC& data = ptr->second;
@@ -856,24 +920,35 @@ void DeckBuilder::FilterCards() {
 			if(filter_lm == 7 && data.ot != 4)
 				continue;
 		}
-		if(pstr) {
-			if(pstr[0] == L'$') {
-				if(!CardNameContains(text.name.c_str(), &pstr[1]))
-					continue;
-			} else if(pstr[0] == L'@' && set_code) {
-				if(!check_set_code(data, set_code)) continue;
+		bool is_target = true;
+		for (auto elements_iterator = query_elements.begin(); elements_iterator != query_elements.end(); ++elements_iterator) {
+			bool match = false;
+			if (elements_iterator->type == element_t::type_t::name) {
+				match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str());
+			} else if (elements_iterator->type == element_t::type_t::setcode) {
+				match = elements_iterator->setcode && check_set_code(data, elements_iterator->setcode);
 			} else {
-				int trycode = BufferIO::GetVal(pstr);
+				int trycode = BufferIO::GetVal(elements_iterator->keyword.c_str());
 				bool tryresult = dataManager.GetData(trycode, 0);
-				if(!tryresult && !CardNameContains(text.name.c_str(), pstr) && text.text.find(pstr) == std::wstring::npos
-					&& (!set_code || !check_set_code(data, set_code)))
-					continue;
-				if (tryresult && data.code != trycode
-					&& !(data.alias == trycode && (data.alias - data.code < CARD_ARTWORK_VERSIONS_OFFSET || data.code - data.alias < CARD_ARTWORK_VERSIONS_OFFSET)))
-					continue;
+				if(!tryresult) {
+					match = CardNameContains(text.name.c_str(), elements_iterator->keyword.c_str())
+						|| text.text.find(elements_iterator->keyword) != std::wstring::npos
+						|| (elements_iterator->setcode && check_set_code(data, elements_iterator->setcode));
+				} else {
+					match = data.code == trycode || data.alias == trycode;
+				}
+			}
+			if(elements_iterator->exclude)
+				match = !match;
+			if(!match) {
+				is_target = false;
+				break;
 			}
 		}
-		results.push_back(ptr);
+		if(is_target)
+			results.push_back(ptr);
+		else
+			continue;
 	}
 	myswprintf(result_string, L"%d", results.size());
 	if(results.size() > 7) {

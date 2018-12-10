@@ -49,8 +49,12 @@ public:
 	wchar_t lmBuffer[32];
 
 	static wchar_t strBuffer[4096];
+	static byte scriptBuffer[0x20000];
 	static const wchar_t* unknown_string;
 	static int CardReader(int, void*);
+	static byte* ScriptReaderEx(const char* script_name, int* slen);
+	static byte* ScriptReaderExDirectry(const char* path, const char* script_name, int* slen);
+	static byte* ScriptReader(const char* script_name, int* slen);
 
 };
 
