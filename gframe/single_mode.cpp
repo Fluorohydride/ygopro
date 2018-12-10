@@ -3,9 +3,6 @@
 #include "game.h"
 #include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
-#ifndef _WIN32
-#include <dirent.h>
-#endif
 
 namespace ygo {
 
