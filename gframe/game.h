@@ -33,8 +33,8 @@ struct Config {
 	int chkWaitChain;
 	int chkIgnore1;
 	int chkIgnore2;
-	int chkHideSetname;
-	int chkHideHintButton;
+	int hide_setname;
+	int hide_hint_button;
 	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
@@ -245,8 +245,6 @@ public:
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkAutoSaveReplay;
-	irr::gui::IGUICheckBox* chkHideSetname;
-	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
 	irr::gui::IGUICheckBox* chkAutoSearch;
 	irr::gui::IGUICheckBox* chkMultiKeywords;
