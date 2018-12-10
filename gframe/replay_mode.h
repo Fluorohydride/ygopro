@@ -47,7 +47,6 @@ public:
 	static void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	static void ReplayReload();
 
-	static byte* ScriptReaderEx(const char* script_name, int* slen);
 	static int MessageHandler(long fduel, int type);
 };
 

@@ -17,6 +17,8 @@ Replay::~Replay() {
 	delete[] comp_data;
 }
 void Replay::BeginRecord() {
+	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
+		return;
 #ifdef _WIN32
 	if(is_recording)
 		CloseHandle(recording_fp);
@@ -123,6 +125,8 @@ void Replay::EndRecord() {
 	is_recording = false;
 }
 void Replay::SaveReplay(const wchar_t* name) {
+	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
+		return;
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
 #ifdef WIN32
@@ -159,7 +163,10 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	}
 	if(!fp)
 		return false;
-	fread(&pheader, sizeof(pheader), 1, fp);
+	if(fread(&pheader, sizeof(pheader), 1, fp) < 1) {
+		fclose(fp);
+		return false;
+	}
 	if(pheader.flag & REPLAY_COMPRESSED) {
 		comp_size = fread(comp_data, 1, 0x1000, fp);
 		fclose(fp);
@@ -188,9 +195,9 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	if(!rfp)
 		return false;
 	ReplayHeader rheader;
-	fread(&rheader, sizeof(ReplayHeader), 1, rfp);
+	size_t count = fread(&rheader, sizeof(ReplayHeader), 1, rfp);
 	fclose(rfp);
-	return rheader.id == 0x31707279 && rheader.version >= 0x12d0;
+	return count == 1 && rheader.id == 0x31707279 && rheader.version >= 0x12d0;
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
