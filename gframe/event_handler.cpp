@@ -1835,6 +1835,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			case CHECKBOX_PREFER_EXPANSION: {
+				mainGame->gameConf.prefer_expansion_script = mainGame->chkPreferExpansionScript->isChecked() ? 1 : 0;
+				return true;
+				break;
+			}
 			}
 			break;
 		}
@@ -2208,7 +2213,7 @@ void ClientField::UpdateChainButtons() {
 	}
 }
 void ClientField::ShowCancelOrFinishButton(int buttonOp) {
-	if (!mainGame->chkHideHintButton->isChecked() && !mainGame->dInfo.isReplay) {
+	if (!mainGame->gameConf.hide_hint_button && !mainGame->dInfo.isReplay) {
 		switch (buttonOp) {
 		case 1:
 			mainGame->btnCancelOrFinish->setText(dataManager.GetSysString(1295));
