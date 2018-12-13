@@ -306,12 +306,6 @@ bool Game::Initialize() {
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1291));
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
 	posY += 30;
-	chkHideSetname = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1354));
-	chkHideSetname->setChecked(gameConf.chkHideSetname != 0);
-	posY += 30;
-	chkHideHintButton = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1355));
-	chkHideHintButton->setChecked(gameConf.chkHideHintButton != 0);
-	posY += 30;
 	chkIgnoreDeckChanges = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1357));
 	chkIgnoreDeckChanges->setChecked(gameConf.chkIgnoreDeckChanges != 0);
 	posY += 30;
@@ -320,6 +314,9 @@ bool Game::Initialize() {
 	posY += 30;
 	chkMultiKeywords = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_MULTI_KEYWORDS, dataManager.GetSysString(1378));
 	chkMultiKeywords->setChecked(gameConf.search_multiple_keywords > 0);
+	posY += 30;
+	chkPreferExpansionScript = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, CHECKBOX_PREFER_EXPANSION, dataManager.GetSysString(1379));
+	chkPreferExpansionScript->setChecked(gameConf.prefer_expansion_script != 0);
 	posY += 30;
 	env->addStaticText(dataManager.GetSysString(1282), rect<s32>(posX + 23, posY + 3, posX + 120, posY + 28), false, false, tabSystem);
 	btnWinResizeS = env->addButton(rect<s32>(posX + 115, posY, posX + 145, posY + 25), tabSystem, BUTTON_WINDOW_RESIZE_S, dataManager.GetSysString(1283));
@@ -654,7 +651,7 @@ bool Game::Initialize() {
 	btnLoadSinglePlay = env->addButton(rect<s32>(459, 301, 569, 326), tabSingle, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211));
 	btnSinglePlayCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabSingle, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 	env->addStaticText(dataManager.GetSysString(1352), rect<s32>(360, 10, 550, 30), false, true, tabSingle);
-	stSinglePlayInfo = env->addStaticText(L"", rect<s32>(360, 40, 550, 280), false, true, tabSingle);
+	stSinglePlayInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 280), false, true, tabSingle);
 	//replay save
 	wReplaySave = env->addWindow(rect<s32>(510, 200, 820, 320), false, dataManager.GetSysString(1340));
 	wReplaySave->getCloseButton()->setVisible(false);
@@ -936,6 +933,7 @@ void Game::RefreshReplay() {
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
+	stSinglePlayInfo->setText(L"");
 	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
 			lstSinglePlayList->addItem(name);
@@ -1010,8 +1008,8 @@ void Game::LoadConfig() {
 	gameConf.chkWaitChain = 0;
 	gameConf.chkIgnore1 = 0;
 	gameConf.chkIgnore2 = 0;
-	gameConf.chkHideSetname = 0;
-	gameConf.chkHideHintButton = 0;
+	gameConf.hide_setname = 0;
+	gameConf.hide_hint_button = 0;
 	gameConf.control_mode = 0;
 	gameConf.draw_field_spell = 1;
 	gameConf.separate_clear_button = 1;
@@ -1022,6 +1020,7 @@ void Game::LoadConfig() {
 	gameConf.enable_bot_mode = 0;
 	gameConf.quick_animation = 0;
 	gameConf.auto_save_replay = 0;
+	gameConf.prefer_expansion_script = 0;
 	gameConf.enable_sound = true;
 	gameConf.sound_volume = 0.5;
 	gameConf.enable_music = true;
@@ -1076,9 +1075,9 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "mute_spectators")) {
 			gameConf.chkIgnore2 = atoi(valbuf);
 		} else if(!strcmp(strbuf, "hide_setname")) {
-			gameConf.chkHideSetname = atoi(valbuf);
+			gameConf.hide_setname = atoi(valbuf);
 		} else if(!strcmp(strbuf, "hide_hint_button")) {
-			gameConf.chkHideHintButton = atoi(valbuf);
+			gameConf.hide_hint_button = atoi(valbuf);
 		} else if(!strcmp(strbuf, "control_mode")) {
 			gameConf.control_mode = atoi(valbuf);
 		} else if(!strcmp(strbuf, "draw_field_spell")) {
@@ -1099,6 +1098,8 @@ void Game::LoadConfig() {
 			gameConf.quick_animation = atoi(valbuf);
 		} else if(!strcmp(strbuf, "auto_save_replay")) {
 			gameConf.auto_save_replay = atoi(valbuf);
+		} else if(!strcmp(strbuf, "prefer_expansion_script")) {
+			gameConf.prefer_expansion_script = atoi(valbuf);
 		} else if(!strcmp(strbuf, "window_maximized")) {
 			gameConf.window_maximized = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "window_width")) {
@@ -1168,8 +1169,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "waitchain = %d\n", (chkWaitChain->isChecked() ? 1 : 0));
 	fprintf(fp, "mute_opponent = %d\n", (chkIgnore1->isChecked() ? 1 : 0));
 	fprintf(fp, "mute_spectators = %d\n", (chkIgnore2->isChecked() ? 1 : 0));
-	fprintf(fp, "hide_setname = %d\n", (chkHideSetname->isChecked() ? 1 : 0));
-	fprintf(fp, "hide_hint_button = %d\n", (chkHideHintButton->isChecked() ? 1 : 0));
+	fprintf(fp, "hide_setname = %d\n", gameConf.hide_setname);
+	fprintf(fp, "hide_hint_button = %d\n", gameConf.hide_hint_button);
 	fprintf(fp, "#control_mode = 0: Key A/S/D/R Chain Buttons. control_mode = 1: MouseLeft/MouseRight/NULL/F9 Without Chain Buttons\n");
 	fprintf(fp, "control_mode = %d\n", gameConf.control_mode);
 	fprintf(fp, "draw_field_spell = %d\n", gameConf.draw_field_spell);
@@ -1183,6 +1184,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "enable_bot_mode = %d\n", gameConf.enable_bot_mode);
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
+	fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
 	fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	fprintf(fp, "window_width = %d\n", gameConf.window_width);
 	fprintf(fp, "window_height = %d\n", gameConf.window_height);
@@ -1215,7 +1217,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
 	int offset = 0;
-	if(!chkHideSetname->isChecked()) {
+	if(!gameConf.hide_setname) {
 		unsigned long long sc = cd.setcode;
 		if(cd.alias) {
 			auto aptr = dataManager._datas.find(cd.alias);

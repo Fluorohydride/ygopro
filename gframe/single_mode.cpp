@@ -11,8 +11,6 @@ bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
 
-static byte buffer[0x20000];
-
 bool SingleMode::StartPlay() {
 	Thread::NewThread(SinglePlayThread, 0);
 	return true;
@@ -38,7 +36,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mtrandom rnd;
 	time_t seed = time(0);
 	rnd.reset(seed);
-	set_script_reader((script_reader)ScriptReaderEx);
+	set_script_reader((script_reader)DataManager::ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());
@@ -851,32 +849,6 @@ void SingleMode::SinglePlayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
-}
-byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	if(ScriptReader(sname, slen))
-		return buffer;
-	else
-		return ScriptReader(script_name, slen);
-}
-byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
-	FILE *fp;
-#ifdef _WIN32
-	wchar_t fname[256];
-	BufferIO::DecodeUTF8(script_name, fname);
-	fp = _wfopen(fname, L"rb");
-#else
-	fp = fopen(script_name, "rb");
-#endif
-	if(!fp)
-		return 0;
-	int len = fread(buffer, 1, sizeof(buffer), fp);
-	fclose(fp);
-	if(len >= sizeof(buffer))
-		return 0;
-	*slen = len;
-	return buffer;
 }
 int SingleMode::MessageHandler(long fduel, int type) {
 	if(!enable_log)
