@@ -882,7 +882,7 @@ void Game::LoadExpansions() {
 #ifdef _WIN32
 			const wchar_t* fname = archive->getFullFileName(j).c_str();
 #else
-			const wchar_t fname[1024];
+			wchar_t fname[1024];
 			const char* uname = archive->getFullFileName(j).c_str();
 			BufferIO::DecodeUTF8(uname, fname);
 #endif
