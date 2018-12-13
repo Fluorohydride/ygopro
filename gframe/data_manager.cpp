@@ -1,4 +1,5 @@
 #include "data_manager.h"
+#include "game.h"
 #include <stdio.h>
 
 namespace ygo {
@@ -317,18 +318,35 @@ int DataManager::CardReader(int code, void* pData) {
 	return 0;
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+	// default script name: ./script/c%d.lua
 #ifdef YGOPRO_SERVER_MODE
-	char spname[256] = "./specials";
-	strcat(spname, script_name + 8);//default script name: ./script/c%d.lua
-	if(ScriptReader(spname, slen))
+	char first[256];
+	char second[256];
+	char third[256];
+	sprintf(first, "specials/%s", script_name + 9);
+	sprintf(second, "expansions/%s", script_name + 2);
+	sprintf(third, "%s", script_name + 2);
+	if(ScriptReader(first, slen))
 		return scriptBuffer;
-#endif
-	char exname[256] = "./expansions";
-	strcat(exname, script_name + 1);//default script name: ./script/c%d.lua
-	if(ScriptReader(exname, slen))
+	else if(ScriptReader(second, slen))
 		return scriptBuffer;
 	else
-		return ScriptReader(script_name, slen);
+		return ScriptReader(third, slen);
+#else
+	char first[256];
+	char second[256];
+	if(mainGame->gameConf.prefer_expansion_script) {
+		sprintf(first, "expansions/%s", script_name + 2);
+		sprintf(second, "%s", script_name + 2);
+	} else {
+		sprintf(first, "%s", script_name + 2);
+		sprintf(second, "expansions/%s", script_name + 2);
+	}
+	if(ScriptReader(first, slen))
+		return scriptBuffer;
+	else
+		return ScriptReader(second, slen);
+#endif
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 	FILE *fp;
