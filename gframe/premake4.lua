@@ -22,6 +22,6 @@ project "ygopro"
         links { "ws2_32" }
 
     configuration "not vs*"
-        buildoptions { "-std=c++14", "-fno-rtti" }
+        buildoptions { "-std=c++1y", "-fno-rtti" }
     configuration "not windows"
         links { "event_pthreads", "dl", "pthread" }
