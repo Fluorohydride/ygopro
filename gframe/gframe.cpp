@@ -19,7 +19,9 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 	event.GUIEvent.Caller = btn;
 	ygo::mainGame->device->postEventFromUser(event);
 }
-
+#if _WIN32 && !_DEBUG
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") 
+#endif
 int main(int argc, char* argv[]) {
 #ifndef _WIN32
 	setlocale(LC_CTYPE, "UTF-8");

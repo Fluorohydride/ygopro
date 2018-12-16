@@ -9,6 +9,7 @@ project "ygopro"
     links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3" , "event", "IrrKlang", "fmt" }
 
     configuration "windows"
+		kind "ConsoleApp"
         files "../ygopro.rc"
         excludes "CGUIButton.cpp"
         includedirs { "../irrlicht/include", "../freetype/include", "../event/include", "../sqlite3" }
