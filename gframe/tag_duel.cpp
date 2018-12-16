@@ -1665,7 +1665,7 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
-	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache, FALSE);
+	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_POSITION, (unsigned char*)qbuf, use_cache, FALSE);
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
@@ -1673,12 +1673,11 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 	while(qlen < len) {
 		int slen = BufferIO::ReadInt32(qbuf);
 		int qflag = *(int*)qbuf;
-		int pos = slen - 8;
-		if(qflag & QUERY_LSCALE)
-			pos -= 4;
-		if(qflag & QUERY_RSCALE)
-			pos -= 4;
-		if(!qbuf[pos])
+		int offset = 8;
+		if(!(qflag & QUERY_CODE))
+			offset -= 4;
+		unsigned position = ((*(int*)(qbuf + offset)) >> 24) & 0xff;
+		if(!(position & POS_FACEUP))
 			memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 		qlen += slen;

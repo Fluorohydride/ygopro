@@ -12,8 +12,6 @@ Replay SingleMode::last_replay;
 Replay SingleMode::new_replay;
 std::vector<ReplayPacket> SingleMode::replay_stream;
 
-static byte buffer[0x20000];
-
 bool SingleMode::StartPlay() {
 	Thread::NewThread(SinglePlayThread, 0);
 	return true;
@@ -144,11 +142,9 @@ int SingleMode::SinglePlayThread(void* param) {
 
 	new_replay.EndRecord();
 	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
-	char timebuf[40];
-	strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
-	size_t size = strlen(timebuf) + 1;
-	wchar_t timetext[80];
+	tm* localedtime = localtime(&nowtime);
+	wchar_t timetext[40];
+	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
 	mbstowcs(timetext, timebuf, size);
 	mainGame->ebRSName->setText(timetext);
 	mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());

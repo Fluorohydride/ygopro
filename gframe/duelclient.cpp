@@ -1439,6 +1439,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(desc == 0) {
 			text = fmt::sprintf(L"%ls\n%ls", event_string,
 				fmt::sprintf(dataManager.GetSysString(200), dataManager.FormatLocation(info.location, info.sequence), dataManager.GetName(code)));
+		} else if(desc == 221) {
+			text = fmt::format(L"{}\n{}\n{}", event_string,
+				fmt::sprintf(dataManager.GetSysString(221), dataManager.FormatLocation(info.location, info.sequence), dataManager.GetName(code)),
+				dataManager.GetSysString(223));
 		} else if(desc < 2048) {
 			text = fmt::sprintf(dataManager.GetSysString(desc), dataManager.GetName(code));
 		} else {
@@ -1689,6 +1693,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(!forced) {
 				if(count == 0)
 					mainGame->stQMessage->setText(fmt::sprintf(L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202)).c_str());
+				else if(select_trigger)
+					mainGame->stQMessage->setText(fmt::sprintf(L"%ls\n%ls\n%ls", event_string, dataManager.GetSysString(222), dataManager.GetSysString(223)).c_str());
 				else
 					mainGame->stQMessage->setText(fmt::sprintf(L"%ls\n%ls", event_string, dataManager.GetSysString(203)).c_str());				
 				mainGame->PopupElement(mainGame->wQuery);
