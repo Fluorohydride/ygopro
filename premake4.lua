@@ -1,12 +1,10 @@
-solution "ygo"
+workspace "ygo"
     location "build"
     language "C++"
     objdir "obj"
-	if os.is("windows") then
-		startproject "ygopro"
-	end
+	startproject "ygopro"
 
-    configurations { "Debug", "Release" }
+    configurations { "Debug", "DebugDLL" , "Release", "ReleaseDLL" }
 	defines { "LUA_COMPAT_5_2" }
 
     configuration "windows"
@@ -26,33 +24,35 @@ solution "ygo"
         defines { "LUA_USE_LINUX" }
 
     configuration "vs*"
-        flags "EnableSSE2"
-        buildoptions { "-wd4996", "/utf-8" }
+        vectorextensions "SSE2"
+        buildoptions { "-wd4996" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     configuration "not vs*"
-        buildoptions { "-fno-strict-aliasing", "-Wno-format-security" }
+        buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
     configuration {"not vs*", "windows"}
         buildoptions { "-static-libgcc" }
 
-    configuration "Debug"
-        flags "Symbols"
+    configuration "Debug*"
+        symbols "On"
         defines "_DEBUG"
         targetdir "bin/debug"
-
-    configuration { "Release", "not vs*" }
-        flags "Symbols"
+		
+	configuration { "Release", "not vs*" }
+        symbols "On"
         defines "NDEBUG"
         buildoptions "-march=native"
 
-    configuration "Release"
-        flags { "OptimizeSpeed" }
+    configuration "Release*"
+        optimize "Speed"
         targetdir "bin/release"
+	configuration "*DLL"
+		defines {"YGOPRO_BUILD_DLL"}
 
     include "ocgcore"
     include "gframe"
 	include "fmt"
-    if os.is("windows") then
+    if os.ishost("windows") then
     include "event"
     include "freetype"
     include "irrlicht"
