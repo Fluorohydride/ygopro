@@ -728,7 +728,9 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 			auto pos = name.find('.');
 			if(pos == std::wstring::npos)
 				continue;
-			if(std::find(filtered_extensions.begin(), filtered_extensions.end(), name.substr(pos+1, name.size())) == filtered_extensions.end())
+			auto extension = name.substr(pos + 1);
+			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+			if(std::find(filtered_extensions.begin(), filtered_extensions.end(), extension) == filtered_extensions.end())
 				continue;
 		}
 		item.reltext = NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name.c_str()).c_str();
