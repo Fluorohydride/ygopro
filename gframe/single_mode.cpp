@@ -145,7 +145,6 @@ int SingleMode::SinglePlayThread(void* param) {
 	tm* localedtime = localtime(&nowtime);
 	wchar_t timetext[40];
 	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
-	mbstowcs(timetext, timebuf, size);
 	mainGame->ebRSName->setText(timetext);
 	mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
 	mainGame->PopupElement(mainGame->wReplaySave);

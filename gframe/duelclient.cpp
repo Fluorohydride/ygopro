@@ -3961,20 +3961,20 @@ void DuelClient::ReplayPrompt(bool need_header) {
 		last_replay.WriteHeader(pheader);
 		last_replay.pheader.id = 0x58707279;
 		if(last_replay.pheader.flag & REPLAY_TAG) {
-			last_replay.WriteData(mainGame->dInfo.hostname[0], 40, false);
-			last_replay.WriteData(mainGame->dInfo.hostname[1], 40, false);
-			last_replay.WriteData(mainGame->dInfo.clientname[0], 40, false);
-			last_replay.WriteData(mainGame->dInfo.clientname[1], 40, false);
+			last_replay.WriteData(mainGame->dInfo.hostname[0].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.hostname[1].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname[0].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname[1].c_str(), 40, false);
 		} else if(last_replay.pheader.flag & REPLAY_RELAY) {
-			last_replay.WriteData(mainGame->dInfo.hostname[0], 40, false);
-			last_replay.WriteData(mainGame->dInfo.hostname[1], 40, false);
-			last_replay.WriteData(mainGame->dInfo.hostname[2], 40, false);
-			last_replay.WriteData(mainGame->dInfo.clientname[0], 40, false);
-			last_replay.WriteData(mainGame->dInfo.clientname[1], 40, false);
-			last_replay.WriteData(mainGame->dInfo.clientname[2], 40, false);
+			last_replay.WriteData(mainGame->dInfo.hostname[0].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.hostname[1].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.hostname[2].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname[0].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname[1].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname[2].c_str(), 40, false);
 		} else {
-			last_replay.WriteData(mainGame->dInfo.hostname[0], 40, false);
-			last_replay.WriteData(mainGame->dInfo.clientname[0], 40, false);
+			last_replay.WriteData(mainGame->dInfo.hostname[0].c_str(), 40, false);
+			last_replay.WriteData(mainGame->dInfo.clientname[0].c_str(), 40, false);
 		}
 		last_replay.WriteInt32(mainGame->dInfo.duel_field | mainGame->dInfo.extraval >> 8);
 		last_replay.WriteStream(replay_stream);
