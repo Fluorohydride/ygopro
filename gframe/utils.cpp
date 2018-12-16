@@ -117,7 +117,9 @@ namespace ygo {
 					size_t dotpos = name.find_last_of(L".");
 					if(dotpos == std::wstring::npos)
 						continue;
-					if(extensions.size() && std::find(extensions.begin(), extensions.end(), name.substr(dotpos)) == extensions.end())
+					auto extension = name.substr(dotpos + 1);
+					std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+					if(extensions.size() && std::find(extensions.begin(), extensions.end(), extension) == extensions.end())
 						continue;
 					res.push_back(name.c_str());
 				}
@@ -147,7 +149,9 @@ namespace ygo {
 				size_t dotpos = name.find_last_of(L".");
 				if(dotpos == std::wstring::npos)
 					continue;
-				if(std::find(extensions.begin(), extensions.end(), name.substr(dotpos)) == extensions.end())
+				auto extension = name.substr(dotpos);
+				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+				if(std::find(extensions.begin(), extensions.end(), extension) == extensions.end())
 					continue;
 				res.push_back(name.c_str());
 			}

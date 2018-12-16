@@ -643,7 +643,7 @@ bool Game::Initialize() {
 	wReplay->setVisible(false);
 	lstReplayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wReplay, LISTBOX_REPLAY_LIST, rect<s32>(10, 30, 350, 400), filesystem, true, true, false);
 	lstReplayList->setWorkingPath(L"./replay");
-	lstReplayList->addFilteredExtensions(coreloaded ? std::vector<std::wstring>{L"yrp", L"yrpX"} : std::vector<std::wstring>{ L"yrpX" });
+	lstReplayList->addFilteredExtensions(coreloaded ? std::vector<std::wstring>{L"yrp", L"yrpx"} : std::vector<std::wstring>{ L"yrpx" });
 	lstReplayList->setItemHeight(18);
 	btnLoadReplay = env->addButton(rect<s32>(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348).c_str());
 	btnDeleteReplay = env->addButton(rect<s32>(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, dataManager.GetSysString(1361).c_str());
@@ -877,13 +877,13 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
 void Game::LoadExpansionDB() {
-	auto files = Utils::FindfolderFiles(L"./expansions/", std::vector<std::wstring>{L".cdb"}, 2);
+	auto files = Utils::FindfolderFiles(L"./expansions/", std::vector<std::wstring>{L"cdb"}, 2);
 	for (auto& file : files)
 		dataManager.LoadDB(BufferIO::EncodeUTF8s(L"./expansions/" + file).c_str());
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	auto files = Utils::FindfolderFiles(L"./deck/", std::vector<std::wstring>{L".ydk"});
+	auto files = Utils::FindfolderFiles(L"./deck/", std::vector<std::wstring>{L"ydk"});
 	for(auto& file : files) {
 		cbDeck->addItem(file.substr(0, file.size() - 4).c_str());
 	}
@@ -901,7 +901,7 @@ void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
 }
 void Game::RefreshBGMList() {
-	auto files = Utils::FindfolderFiles(L"./sound/BGM/", std::vector<std::wstring>{L".mp3"});
+	auto files = Utils::FindfolderFiles(L"./sound/BGM/", std::vector<std::wstring>{L"mp3"});
 	for(auto& file : files) {
 		BGMList.push_back(BufferIO::EncodeUTF8s(file));
 	}
