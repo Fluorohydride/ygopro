@@ -290,9 +290,7 @@ bool ClientCard::deck_sort_def(code_pointer p1, code_pointer p2) {
 	return p1->first < p2->first;
 }
 bool ClientCard::deck_sort_name(code_pointer p1, code_pointer p2) {
-	const wchar_t* name1 = dataManager.GetName(p1->first).c_str();
-	const wchar_t* name2 = dataManager.GetName(p2->first).c_str();
-	int res = wcscmp(name1, name2);
+	int res = dataManager.GetName(p1->first).compare(dataManager.GetName(p2->first));
 	if(res != 0)
 		return res < 0;
 	return p1->first < p2->first;
