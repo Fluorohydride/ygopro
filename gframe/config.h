@@ -75,7 +75,11 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "mymutex.h"
 #include "mysignal.h"
 #include "mythread.h"
+#ifndef YGOPRO_BUILD_DLL
 #include <ocgapi.h>
+#else
+#include "dllinterface.h"
+#endif
 #include <common.h>
 #include <fmt\format.h>
 #include <fmt\printf.h>

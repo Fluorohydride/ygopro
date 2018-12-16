@@ -1,13 +1,14 @@
 include "lzma/."
-
 project "ygopro"
+	filter "*DLL"
+		targetname "ygoprodll"
+	filter {}
     kind "WindowedApp"
-
     files { "**.cpp", "**.cc", "**.c", "**.h" }
     excludes "lzma/**"
     includedirs { "../ocgcore", "../irrKlang/include", "../fmt/include" }
-    links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3" , "event", "IrrKlang", "fmt" }
-
+	
+	links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3" , "event", "IrrKlang", "fmt" }
     configuration "windows"
 		kind "ConsoleApp"
         files "../ygopro.rc"

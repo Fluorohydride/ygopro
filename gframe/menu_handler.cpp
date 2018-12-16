@@ -33,6 +33,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		s32 id = caller->getID();
 		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && id != CHECKBOX_EXTRA_RULE))
 			break;
+		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK)
+			break;
 		if(mainGame->wCustomRules->isVisible() && id != BUTTON_CUSTOM_RULE_OK && (id < CHECKBOX_OBSOLETE || id > CHECKBOX_EMZONE))
 			break;
 		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) {
@@ -67,7 +69,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_MODE: {
-				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wMainMenu);
@@ -194,7 +196,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CANCEL: {
-				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				if(mainGame->wRules->isVisible())
@@ -254,7 +256,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HP_CANCEL: {
 				DuelClient::StopClient();
-				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
@@ -382,6 +384,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->deckBuilder.Initialize();
 				break;
 			}
+			case BUTTON_MSG_OK: {
+				mainGame->HideElement(mainGame->wMessage);
+				break;
+			}
 			case BUTTON_YES: {
 				mainGame->HideElement(mainGame->wQuery);
 				if(prev_operation == BUTTON_DELETE_REPLAY) {
@@ -472,7 +478,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					mainGame->chkYrp->setChecked(false);
 					mainGame->chkYrp->setEnabled(false);
 				} else
-					mainGame->chkYrp->setEnabled(true);
+					mainGame->chkYrp->setEnabled(mainGame->coreloaded);
 				break;
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {

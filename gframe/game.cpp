@@ -46,9 +46,14 @@ bool Game::Initialize() {
 		return false;
 	}
 	filesystem = device->getFileSystem();
+	coreloaded = true;
+#ifdef YGOPRO_BUILD_DLL
+	if(!(ocgcore = LoadOCGcore("./ocgcore")) && !(ocgcore = LoadOCGcore("./expansions/ocgcore")))
+		coreloaded = false;
+#endif
 #ifdef _DEBUG
 	auto logger = device->getLogger();
-	logger->setLogLevel(ELL_ERROR);
+	logger->setLogLevel(ELL_DEBUG);
 #endif
 	// Apply skin
 	if (gameConf.skin_index >= 0)
@@ -138,6 +143,7 @@ bool Game::Initialize() {
 //	btnTestMode = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_TEST_MODE, dataManager.GetSysString(1203).c_str());
 	btnDeckEdit = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204).c_str());
 	btnModeExit = env->addButton(rect<s32>(10, 170, 270, 200), wMainMenu, BUTTON_MODE_EXIT, dataManager.GetSysString(1210).c_str());
+	btnSingleMode->setEnabled(coreloaded);
 	//lan mode
 	wLanWindow = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1200).c_str());
 	wLanWindow->getCloseButton()->setVisible(false);
@@ -159,6 +165,7 @@ bool Game::Initialize() {
 	btnJoinHost = env->addButton(rect<s32>(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, dataManager.GetSysString(1223).c_str());
 	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212).c_str());
 	btnCreateHost = env->addButton(rect<s32>(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224).c_str());
+	btnCreateHost->setEnabled(coreloaded);
 	//create host
 	wCreateHost = env->addWindow(rect<s32>(320, 100, 700, 520), false, dataManager.GetSysString(1224).c_str());
 	wCreateHost->getCloseButton()->setVisible(false);
@@ -730,6 +737,12 @@ bool Game::Initialize() {
 	LoadConfig();
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
+#ifdef YGOPRO_BUILD_DLL
+	if(!coreloaded) {
+		stMessage->setText(L"Couldn't load the duel api, youll be limited to replay watching and online mode");
+		PopupElement(mainGame->wMessage);
+	}
+#endif
 	for (u32 i = 0; i < EGDC_COUNT; ++i) {
 		SColor col = env->getSkin()->getColor((EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);

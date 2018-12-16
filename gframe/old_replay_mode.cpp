@@ -187,7 +187,7 @@ namespace ygo {
 			filename.resize(slen);
 			cur_replay.ReadData(&filename[0], slen);
 			filename[slen] = 0;
-			if(!preload_script(pduel, (char*)filename.c_str(), 0))
+			if(!preload_script(pduel, (char*)filename.c_str(), 0, 0, nullptr))
 				return false;
 		}
 		start_duel(pduel, opt);
@@ -776,7 +776,7 @@ namespace ygo {
 	}
 	void ReplayMode::ReplayRefresh(int player, int location, int flag) {
 		unsigned char queryBuffer[0x20000];
-		/*int len = */query_field_card(pduel, player, location, flag, queryBuffer, 0);
+		/*int len = */query_field_card(pduel, player, location, flag, queryBuffer, 0, FALSE);
 		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer);
 	}
 	void ReplayMode::ReplayRefresh(int flag) {
@@ -786,7 +786,7 @@ namespace ygo {
 	}
 	void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
 		unsigned char queryBuffer[0x20000];
-		/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
+		/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer, 0, FALSE);
 		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
 	}
 	void ReplayMode::ReplayReload() {

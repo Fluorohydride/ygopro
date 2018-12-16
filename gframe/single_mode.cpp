@@ -60,15 +60,15 @@ int SingleMode::SinglePlayThread(void* param) {
 	if(open_file) {
 		open_file = false;
 		script_name = BufferIO::EncodeUTF8s(open_file_name);
-		if(!preload_script(pduel, (char*)script_name.c_str(), 0)) {
+		if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr)) {
 			script_name = BufferIO::EncodeUTF8s(L"./single/" + open_file_name);
-			if(!preload_script(pduel, (char*)script_name.c_str(), 0))
+			if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr))
 				loaded = false;
 		}
 	} else {
 		const std::wstring name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
 		script_name = BufferIO::EncodeUTF8s(L"./single/" + name);
-		if(!preload_script(pduel, (char*)script_name.c_str(), 0))
+		if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr))
 			loaded = false;
 	}
 	if(!loaded) {
@@ -831,7 +831,7 @@ void SingleMode::SinglePlayRefresh(int player, int location, int flag) {
 	char queryBuffer2[0x20000];
 	char* qbuf = queryBuffer2;
 	ReplayPacket p;
-	int len = query_field_card(pduel, player, location, flag, queryBuffer, 0);
+	int len = query_field_card(pduel, player, location, flag, queryBuffer, 0, FALSE);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, location);
@@ -842,7 +842,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 	unsigned char queryBuffer[0x2000];
 	char queryBuffer2[0x2000];
 	char* qbuf = queryBuffer2;
-	int len = query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
+	int len = query_card(pduel, player, location, sequence, flag, queryBuffer, 0, FALSE);
 	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, location);

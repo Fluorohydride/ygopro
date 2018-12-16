@@ -177,7 +177,10 @@ public:
 	Signal closeDoneSignal;
 	Config gameConf;
 	DuelInfo dInfo;
-
+#ifdef YGOPRO_BUILD_DLL
+	void* ocgcore;
+#endif
+	bool coreloaded;
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];

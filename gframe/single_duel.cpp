@@ -1520,7 +1520,7 @@ void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_MZONE);
-	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, (unsigned char*)qbuf, use_cache);
+	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, (unsigned char*)qbuf, use_cache, FALSE);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
@@ -1544,7 +1544,7 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_SZONE);
-	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, (unsigned char*)qbuf, use_cache);
+	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, (unsigned char*)qbuf, use_cache, FALSE);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
@@ -1568,7 +1568,7 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
-	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache);
+	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache, FALSE);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
 	int qlen = 0;
 	while(qlen < len) {
@@ -1596,7 +1596,7 @@ void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_GRAVE);
-	int len = query_field_card(pduel, player, LOCATION_GRAVE, flag, (unsigned char*)qbuf, use_cache);
+	int len = query_field_card(pduel, player, LOCATION_GRAVE, flag, (unsigned char*)qbuf, use_cache, FALSE);
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, query_buffer, len + 3);
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
@@ -1610,7 +1610,7 @@ void SingleDuel::RefreshExtra(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_EXTRA);
-	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, (unsigned char*)qbuf, use_cache);
+	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, (unsigned char*)qbuf, use_cache, FALSE);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
@@ -1622,7 +1622,7 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, location);
 	BufferIO::WriteInt8(qbuf, sequence);
-	int len = query_card(pduel, player, location, sequence, flag, (unsigned char*)qbuf, 0);
+	int len = query_card(pduel, player, location, sequence, flag, (unsigned char*)qbuf, 0, FALSE);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 4);
 	ReplayPacket p((char*)query_buffer, len + 3);
 	replay_stream.push_back(p);
@@ -1640,7 +1640,7 @@ void SingleDuel::PseudoRefreshDeck(int player, int flag) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_DECK);
-	int len = query_field_card(pduel, player, LOCATION_DECK, flag, (unsigned char*)qbuf, 0, 1);
+	int len = query_field_card(pduel, player, LOCATION_DECK, flag, (unsigned char*)qbuf, 0, TRUE);
 	ReplayPacket p((char*)query_buffer, len + 2);
 	replay_stream.push_back(p);
 }

@@ -77,7 +77,7 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		return;
 	if(!is_closing) {
 		temp_ver = 0;
-		mainGame->btnCreateHost->setEnabled(true);
+		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->gMutex.Lock();
@@ -155,7 +155,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		if(!is_closing) {
 			if(connect_state == 0x1) {
 				temp_ver = 0;
-				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->gMutex.Lock();
@@ -165,7 +165,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				mainGame->gMutex.Unlock();
 			} else if(connect_state == 0x7) {
 				if(!mainGame->dInfo.isStarted && !mainGame->is_building) {
-					mainGame->btnCreateHost->setEnabled(true);
+					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->gMutex.Lock();
@@ -181,7 +181,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					ReplayPrompt(false);
 					mainGame->gMutex.Lock();
 					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1502).c_str());
-					mainGame->btnCreateHost->setEnabled(true);
+					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->stTip->setVisible(false);
@@ -223,7 +223,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		switch(pkt->msg) {
 		case ERRMSG_JOINERROR: {
 			temp_ver = 0;
-			mainGame->btnCreateHost->setEnabled(true);
+			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 			mainGame->btnJoinHost->setEnabled(true);
 			mainGame->btnJoinCancel->setEnabled(true);
 			mainGame->gMutex.Lock();
@@ -324,7 +324,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		case ERRMSG_VERERROR: {
 			if (temp_ver) {
 				temp_ver = 0;
-				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->gMutex.Lock();
@@ -806,7 +806,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.isStarted = false;
 		mainGame->is_building = false;
 		mainGame->wDeckEdit->setVisible(false);
-		mainGame->btnCreateHost->setEnabled(true);
+		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->stTip->setVisible(false);
@@ -1033,7 +1033,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ReplayPrompt(true);
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
-		mainGame->btnCreateHost->setEnabled(true);
+		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->stTip->setVisible(false);
