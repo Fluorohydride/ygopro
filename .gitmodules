@@ -1,6 +1,7 @@
 [submodule "ocgcore"]
 	path = ocgcore
 	url = https://github.com/edo9300/ygopro-core.git
+	branch= Test
 [submodule "script"]
 	path = script
 	url = https://github.com/edo9300/ygopro-scripts.git
