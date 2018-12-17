@@ -1123,10 +1123,8 @@ void Game::ShowCardInfo(int code, bool resize) {
 	int shouldrefresh = -1;
 	auto img = imageManager.GetTexture(code, false, true, &shouldrefresh);
 	cardimagetextureloading = false;
-	if(shouldrefresh == 2) {
+	if(shouldrefresh == 2)
 		cardimagetextureloading = true;
-		return;
-	}
 	CardData cd;
 	if(!dataManager.GetData(code, &cd))
 		memset(&cd, 0, sizeof(CardData));
