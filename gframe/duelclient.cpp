@@ -3191,7 +3191,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			return true;
 		pc->is_highlighting = true;
 		mainGame->gMutex.Lock();
-		mainGame->stACMessage->setText(fmt::sprintf(dataManager.GetSysString(1617), dataManager.GetName(pc->code), dataManager.GetCounterName(type)).c_str());
+		mainGame->stACMessage->setText(fmt::sprintf(dataManager.GetSysString(1617), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type)).c_str());
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->gMutex.Unlock();
 		mainGame->WaitFrameSignal(40);
@@ -3213,7 +3213,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			return true;
 		pc->is_highlighting = true;
 		mainGame->gMutex.Lock();
-		mainGame->stACMessage->setText(fmt::sprintf(dataManager.GetSysString(1618), dataManager.GetName(pc->code), dataManager.GetCounterName(type)).c_str());
+		mainGame->stACMessage->setText(fmt::sprintf(dataManager.GetSysString(1618), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type)).c_str());
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->gMutex.Unlock();
 		mainGame->WaitFrameSignal(40);
@@ -3906,7 +3906,6 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
 		if(!is_closing && pHP->identifier == NETWORK_SERVER_ID && remotes.find(ipaddr) == remotes.end() ) {
-			wchar_t msgbuf[256];
 			mainGame->gMutex.Lock();
 			remotes.insert(ipaddr);
 			pHP->ipaddr = ipaddr;
@@ -3920,7 +3919,6 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
 			hoststr.append(L"][");
 			hoststr.append(fmt::format(L"{:X}.0{:X}.{:X}", pHP->version >> 12, (pHP->version >> 4) & 0xff, pHP->version & 0xf));
-			hoststr.append(msgbuf);
 			hoststr.append(L"][");
 			int rule;
 			if(pHP->host.check == 2) {
@@ -3931,7 +3929,6 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 				hoststr.append(L"Custom MR");
 			else
 				hoststr.append(fmt::format(L"MR {}", (rule == 0) ? 3 : rule));
-			hoststr.append(msgbuf);
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
 			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck 
