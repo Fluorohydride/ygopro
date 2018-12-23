@@ -1,6 +1,6 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
-#include <cstring>
+
 #include <string>
 
 #ifdef _MSC_VER

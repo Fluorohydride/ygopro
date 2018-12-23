@@ -1,8 +1,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#pragma once
-
 #define _IRR_STATIC_LIB_
 #define IRR_COMPILE_WITH_DX9_DEV_PACK
 #ifdef _WIN32
@@ -41,7 +39,7 @@
 #define SOCKADDR sockaddr
 #define SOCKET_ERRNO() (errno)
 
-#include <wchar.h>
+#include <cwchar>
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
 inline int _wtoi(const wchar_t * s) {
