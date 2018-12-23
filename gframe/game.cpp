@@ -1773,9 +1773,9 @@ int Game::MessageHandler(long fduel, int type) {
 void Game::PopulateResourcesDirectories() {
 #define LF(x) resource_dirs.push_back(filesystem->getAbsolutePath(x).c_str());
 	LF("./expansions/script/");
+	LF("./script/");
 	LF("./expansions/pics/");
 	LF("./pics/");
-	LF("./script/");
 #undef LF
 }
 

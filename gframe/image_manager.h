@@ -48,8 +48,8 @@ public:
 	irr::video::ITexture* tField[2][4];
 	irr::video::ITexture* tFieldTransparent[2][4];
 	private:
-	std::pair<IImage*, const char*> LoadCardTexture(int code, int width, int height, std::atomic_uint& source_width, std::atomic_uint& source_height);
-	std::map<int,std::future<std::pair<IImage*, const char*>>> loading_pics[3];
+	std::pair<IImage*, std::string> LoadCardTexture(int code, int width, int height, std::atomic_uint& source_width, std::atomic_uint& source_height);
+	std::map<int,std::future<std::pair<IImage*, std::string>>> loading_pics[3];
 	std::mutex pic_load;
 	std::atomic_uint cur_pic_res_width[3];
 	std::atomic_uint cur_pic_res_height[3];

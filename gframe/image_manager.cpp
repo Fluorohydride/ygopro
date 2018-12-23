@@ -99,7 +99,7 @@ void ImageManager::RefreshCachedTextures() {
 		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			auto pair = it->second.get();
 			if(pair.first) {
-				tMap[0][it->first] = driver->addTexture(pair.second, pair.first);
+				tMap[0][it->first] = driver->addTexture(pair.second.c_str(), pair.first);
 				pair.first->drop();
 			} else
 				tMap[0][it->first] = nullptr;
@@ -112,7 +112,7 @@ void ImageManager::RefreshCachedTextures() {
 		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			auto pair = it->second.get();
 			if(pair.first) {
-				tMap[1][it->first] = driver->addTexture(pair.second, pair.first);
+				tMap[1][it->first] = driver->addTexture(pair.second.c_str(), pair.first);
 				pair.first->drop();
 			} else
 				tMap[1][it->first] = nullptr;
@@ -125,7 +125,7 @@ void ImageManager::RefreshCachedTextures() {
 		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			auto pair = it->second.get();
 			if(pair.first) {
-				tThumb[it->first] = driver->addTexture(pair.second, pair.first);
+				tThumb[it->first] = driver->addTexture(pair.second.c_str(), pair.first);
 				pair.first->drop();
 			} else
 				tThumb[it->first] = nullptr;
@@ -259,7 +259,7 @@ irr::video::IImage* ImageManager::GetTextureFromFile(const char* file, s32 width
 		return destimg;
 	}
 }
-std::pair<IImage*, const char*> ImageManager::LoadCardTexture(int code, int width, int height, std::atomic_uint& source_width, std::atomic_uint& source_height) {
+std::pair<IImage*, std::string> ImageManager::LoadCardTexture(int code, int width, int height, std::atomic_uint& source_width, std::atomic_uint& source_height) {
 	irr::video::IImage* img = nullptr;
 	for(auto& path : mainGame->resource_dirs) {
 		for(auto& extension : { ".png", ".jpg" }) {
@@ -269,7 +269,7 @@ std::pair<IImage*, const char*> ImageManager::LoadCardTexture(int code, int widt
 			if(img = GetTextureFromFile(file.c_str(), width, height, std::ref(source_width), std::ref(source_height))) {
 				if(width != source_width || height != source_height)
 					return std::make_pair(nullptr, "fail");
-				return std::make_pair(img, file.c_str());
+				return std::make_pair(img, file);
 			}
 		}
 	}
