@@ -1221,7 +1221,9 @@ void Game::DrawDeckBd() {
 	int card_position = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
 	const int height_offset = (scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
 	recti rect = Resize(805, 160, 1020, 630);
-	for(size_t i = 0; i < 9 && (i + card_position) < deckBuilder.results.size(); ++i) {
+	//loads the thumb of one card before and one after to make the scroll smoother
+	int i = (card_position > 0) ? -1 : 0;
+	for(; i < 9 && (i + card_position) < (int)deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);

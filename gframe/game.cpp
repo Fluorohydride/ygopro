@@ -841,7 +841,7 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(1))
+		if(closeSignal.Wait(0))
 			CloseDuelWindow();
 		fps++;
 		cur_time = timer->getTime();
@@ -1589,7 +1589,7 @@ void Game::OnResize() {
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
-	imageManager.ClearTexture(true);
+	imageManager.ClearTexture();
 
 	if(showingcard)
 		ShowCardInfo(showingcard, true);
