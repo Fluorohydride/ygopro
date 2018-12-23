@@ -13,7 +13,7 @@ Replay SingleMode::new_replay;
 std::vector<ReplayPacket> SingleMode::replay_stream;
 
 bool SingleMode::StartPlay() {
-	Thread::NewThread(SinglePlayThread, 0);
+	std::thread(SinglePlayThread).detach();
 	return true;
 }
 void SingleMode::StopPlay(bool is_exiting) {
@@ -29,7 +29,7 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	last_replay.WriteData(resp, len);
 	set_responseb(pduel, resp);
 }
-int SingleMode::SinglePlayThread(void* param) {
+int SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
@@ -78,7 +78,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	rh.version = PRO_VERSION;
 	rh.flag = REPLAY_SINGLE_MODE + REPLAY_LUA64;
 	rh.seed = seed;
-	mainGame->gMutex.Lock();
+	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
 	mainGame->ClearCardInfo();
 	mainGame->wCardImg->setVisible(true);
@@ -91,7 +91,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isSingleMode = true;
 	mainGame->device->setEventReceiver(&mainGame->dField);
-	mainGame->gMutex.Unlock();
+	mainGame->gMutex.unlock();
 	char engineBuffer[0x20000];
 	is_closing = false;
 	is_continuing = true;
@@ -145,28 +145,29 @@ int SingleMode::SinglePlayThread(void* param) {
 	tm* localedtime = localtime(&nowtime);
 	wchar_t timetext[40];
 	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
+	mainGame->gMutex.lock();
 	mainGame->ebRSName->setText(timetext);
 	mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
 	mainGame->PopupElement(mainGame->wReplaySave);
-	mainGame->gMutex.Unlock();
+	mainGame->gMutex.unlock();
 	mainGame->replaySignal.Reset();
 	mainGame->replaySignal.Wait();
 	if(mainGame->saveReplay)
 		new_replay.SaveReplay(mainGame->ebRSName->getText());
 	end_duel(pduel);
 	if(!is_closing) {
-		mainGame->gMutex.Lock();
+		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
-		mainGame->gMutex.Unlock();
+		mainGame->gMutex.unlock();
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
-		mainGame->gMutex.Lock();
+		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wSinglePlay);
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->gMutex.Unlock();
+		mainGame->gMutex.unlock();
 		if(exit_on_return)
 			mainGame->device->closeDevice();
 	}
@@ -188,10 +189,10 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		memcpy(p.data, pbuf, p.length);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
-			mainGame->gMutex.Lock();
+			mainGame->gMutex.lock();
 			mainGame->stMessage->setText(L"Error occurs.");
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.Unlock();
+			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
 			return false;
@@ -780,9 +781,9 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			pbuf++;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayReload();
-			mainGame->gMutex.Lock();
+			mainGame->gMutex.lock();
 			mainGame->dField.RefreshAllCards();
-			mainGame->gMutex.Unlock();
+			mainGame->gMutex.unlock();
 			break;
 		}
 		case MSG_AI_NAME: {
@@ -803,10 +804,10 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			pbuf += len + 1;
 			memcpy(msgbuf, begin, len + 1);
 			BufferIO::DecodeUTF8(msgbuf, msg);
-			mainGame->gMutex.Lock();
+			mainGame->gMutex.lock();
 			mainGame->stMessage->setText(msg);
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.Unlock();
+			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
 			break;

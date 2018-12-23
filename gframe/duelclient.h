@@ -44,7 +44,7 @@ public:
 	static void StopClient(bool is_exiting = false);
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
-	static int ClientThread(void* param);
+	static int ClientThread();
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
 	static std::vector<ReplayPacket> replay_stream;
 	static Replay last_replay;
@@ -85,7 +85,7 @@ protected:
 public:
 	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();
-	static int RefreshThread(void* arg);
+	static int RefreshThread(event_base* broadev);
 	static void BroadcastReply(evutil_socket_t fd, short events, void* arg);
 };
 

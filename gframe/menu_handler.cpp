@@ -95,9 +95,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
 					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 					if(status != 0) {
-						mainGame->gMutex.Lock();
+						mainGame->gMutex.lock();
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
-						mainGame->gMutex.Unlock();
+						mainGame->gMutex.unlock();
 						break;
 					} else {
 						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
@@ -317,10 +317,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstReplayList->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363)).c_str());
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				prev_sel = sel;
 				break;
@@ -329,11 +329,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstReplayList->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->wReplaySave->setText(dataManager.GetSysString(1364).c_str());
 				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
 				mainGame->PopupElement(mainGame->wReplaySave);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				prev_sel = sel;
 				break;
@@ -513,9 +513,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
 					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 					if(status != 0) {
-						mainGame->gMutex.Lock();
+						mainGame->gMutex.lock();
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
-						mainGame->gMutex.Unlock();
+						mainGame->gMutex.unlock();
 						break;
 					} else {
 						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);

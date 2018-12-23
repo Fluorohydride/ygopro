@@ -167,8 +167,7 @@ public:
 	static byte* ScriptReader(const char* script_name, int* slen);
 	static int MessageHandler(long fduel, int type);
 
-	Mutex gMutex;
-	Mutex gBuffer;
+	std::mutex gMutex;
 	Signal frameSignal;
 	Signal actionSignal;
 	Signal replaySignal;

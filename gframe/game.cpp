@@ -790,7 +790,7 @@ void Game::MainLoop() {
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
-		gMutex.Lock();
+		gMutex.lock();
 		if(dInfo.isStarted) {
 			if (showcardcode == 1 || showcardcode == 3)
 				PlayMusic("./sound/duelwin.mp3", true);
@@ -824,7 +824,7 @@ void Game::MainLoop() {
 		if(cardimagetextureloading) {
 			ShowCardInfo(showingcard, false);
 		}
-		gMutex.Unlock();
+		gMutex.unlock();
 		if(signalFrame > 0) {
 			signalFrame--;
 			if(!signalFrame)
@@ -841,7 +841,7 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(0))
+		if(closeSignal.Wait(1))
 			CloseDuelWindow();
 		fps++;
 		cur_time = timer->getTime();

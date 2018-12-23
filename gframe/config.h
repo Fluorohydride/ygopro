@@ -72,9 +72,9 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <unordered_map>
 #include <algorithm>
 #include "bufferio.h"
-#include "mymutex.h"
+#include <mutex>
 #include "mysignal.h"
-#include "mythread.h"
+#include <thread>
 #ifndef YGOPRO_BUILD_DLL
 #include <ocgapi.h>
 #else

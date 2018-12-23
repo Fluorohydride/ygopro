@@ -12,7 +12,7 @@ namespace ygo {
 			set_responseb(pduel, resp);
 		return result;
 	}
-	int ReplayMode::OldReplayThread(void* param) {
+	int ReplayMode::OldReplayThread() {
 		const ReplayHeader& rh = cur_replay.pheader;
 		mainGame->dInfo.isFirst = true;
 		mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
@@ -49,7 +49,7 @@ namespace ygo {
 		exit_pending = false;
 		current_step = 0;
 		if (mainGame->dInfo.isReplaySkiping)
-			mainGame->gMutex.Lock();
+			mainGame->gMutex.lock();
 		while (is_continuing && !exit_pending) {
 			int result = process(pduel);
 			int len = result & 0xffff;
@@ -67,9 +67,9 @@ namespace ygo {
 						skip_step = 0;
 						int len = get_message(pduel, (byte*)engineBuffer);
 						if (len > 0) {
-							mainGame->gMutex.Unlock();
+							mainGame->gMutex.unlock();
 							is_continuing = ReplayAnalyze(engineBuffer, len);
-							mainGame->gMutex.Lock();
+							mainGame->gMutex.lock();
 						}
 					}
 					if (step == 0) {
@@ -77,7 +77,7 @@ namespace ygo {
 						mainGame->dInfo.isStarted = true;
 						mainGame->dInfo.isReplaySkiping = false;
 						mainGame->dField.RefreshAllCards();
-						mainGame->gMutex.Unlock();
+						mainGame->gMutex.unlock();
 					}
 					skip_step = step;
 					current_step = 0;
@@ -87,7 +87,7 @@ namespace ygo {
 		if (mainGame->dInfo.isReplaySkiping) {
 			mainGame->dInfo.isReplaySkiping = false;
 			mainGame->dField.RefreshAllCards();
-			mainGame->gMutex.Unlock();
+			mainGame->gMutex.unlock();
 		}
 		EndDuel();
 		return 0;
@@ -205,9 +205,9 @@ namespace ygo {
 				return true;
 			}
 			if (is_swapping) {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->dField.ReplaySwap();
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				is_swapping = false;
 			}
 			char* offset = pbuf;
@@ -218,12 +218,12 @@ namespace ygo {
 				if (mainGame->dInfo.isReplaySkiping) {
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 				}
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stMessage->setText(L"Error occurs.");
 				mainGame->PopupElement(mainGame->wMessage);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				mainGame->actionSignal.Reset();
 				mainGame->actionSignal.Wait();
 				return false;
@@ -237,7 +237,7 @@ namespace ygo {
 				if (mainGame->dInfo.isReplaySkiping) {
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 				}
 				pbuf += 2;
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
@@ -425,7 +425,7 @@ namespace ygo {
 					if (skip_turn == 0) {
 						mainGame->dInfo.isReplaySkiping = false;
 						mainGame->dField.RefreshAllCards();
-						mainGame->gMutex.Unlock();
+						mainGame->gMutex.unlock();
 					}
 				}
 				player = BufferIO::ReadInt8(pbuf);
@@ -761,7 +761,7 @@ namespace ygo {
 						mainGame->dInfo.isStarted = true;
 						mainGame->dInfo.isReplaySkiping = false;
 						mainGame->dField.RefreshAllCards();
-						mainGame->gMutex.Unlock();
+						mainGame->gMutex.unlock();
 					}
 				}
 				if (is_pausing) {

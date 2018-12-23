@@ -552,7 +552,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 	wchar_t textBuffer[256];
 	int count = select_options.size();
 	bool quickmode = true;// (count <= 5);
-	mainGame->gMutex.Lock();
+	mainGame->gMutex.lock();
 	for(auto option : select_options) {
 		if(mainGame->guiFont->getDimension(dataManager.GetDesc(option)).Width > 310) {
 			quickmode = false;
@@ -594,7 +594,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 	}
 	mainGame->wOptions->setText(dataManager.GetDesc(select_hint ? select_hint : 555).c_str());
 	mainGame->PopupElement(mainGame->wOptions);
-	mainGame->gMutex.Unlock();
+	mainGame->gMutex.unlock();
 }
 void ClientField::ReplaySwap() {
 	std::swap(deck[0], deck[1]);
