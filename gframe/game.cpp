@@ -867,12 +867,12 @@ void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
 			wchar_t fpath[1024];
-			myswprintf(fpath, L"./expansions/%s", name);
+			myswprintf(fpath, L"./expansions/%ls", name);
 			dataManager.LoadDB(fpath);
 		}
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4)) {
 			wchar_t fpath[1024];
-			myswprintf(fpath, L"./expansions/%s", name);
+			myswprintf(fpath, L"./expansions/%ls", name);
 			dataManager.FileSystem->addFileArchive(fpath, true, false);
 		}
 	});
