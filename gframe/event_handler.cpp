@@ -2184,11 +2184,19 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 }
 void ClientField::SetResponseSelectedCards() const {
 	if (mainGame->dInfo.lua64) {
-		std::bitset<64 * 8> bitvalue;
-		bitvalue.reset();
-		for(auto c : selected_cards)
-			bitvalue[c->select_seq + 1] = 1;
-		DuelClient::SetResponseB(&bitvalue, sizeof(bitvalue));
+		if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD) {
+			unsigned int respbuf[16];
+			respbuf[0] = selected_cards.size();
+			for(size_t i = 0; i < selected_cards.size(); ++i)
+				respbuf[i + 1] = selected_cards[i]->select_seq;
+			DuelClient::SetResponseB((char*)respbuf, (selected_cards.size()*4) + 1);
+		} else {
+			std::bitset<64 * 8> bitvalue;
+			bitvalue.reset();
+			for(auto c : selected_cards)
+				bitvalue[c->select_seq + 1] = 1;
+			DuelClient::SetResponseB(&bitvalue, sizeof(bitvalue));
+		}
 	} else {
 		unsigned char respbuf[64];
 		respbuf[0] = selected_cards.size();
