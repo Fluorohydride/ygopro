@@ -1705,7 +1705,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_PLACE:
 	case MSG_SELECT_DISFIELD: {
-		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int selecting_player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		unsigned int flag = BufferIO::ReadInt32(pbuf);
 		if(selecting_player == 1) {
