@@ -2189,13 +2189,35 @@ void ClientField::SetResponseSelectedCards() const {
 			respbuf[0] = selected_cards.size();
 			for(size_t i = 0; i < selected_cards.size(); ++i)
 				respbuf[i + 1] = selected_cards[i]->select_seq;
-			DuelClient::SetResponseB((char*)respbuf, (selected_cards.size()*4) + 1);
+			DuelClient::SetResponseB((char*)respbuf, (selected_cards.size()*4) + 4);
 		} else {
-			std::bitset<64 * 8> bitvalue;
-			bitvalue.reset();
-			for(auto c : selected_cards)
-				bitvalue[c->select_seq + 1] = 1;
-			DuelClient::SetResponseB(&bitvalue, sizeof(bitvalue));
+			uint32 maxseq = 0;
+			uint32 size = selected_cards.size();
+			for(auto c : selected_cards) {
+				maxseq = std::max(maxseq, c->select_seq);
+			}
+			if(size < 14) {
+				unsigned int respbuf[16];
+				respbuf[0] = 0;
+				respbuf[1] = size;
+				for(size_t i = 0; i < size; ++i)
+					respbuf[i + 2] = selected_cards[i]->select_seq;
+				DuelClient::SetResponseB((char*)respbuf, (size * 4) + 8);
+			} else if(maxseq <= ((unsigned short)65535) && size < 30) {
+				unsigned short respbuf[32];
+				*(int*)&respbuf[0] = 1;
+				respbuf[2] = size;
+				for(size_t i = 0; i < size; ++i)
+					respbuf[i + 3] = selected_cards[i]->select_seq;
+				DuelClient::SetResponseB((char*)respbuf, (size * 2) + 6);
+			} else if(maxseq < (511 - (sizeof(int) * 8))) {
+				std::bitset<64 * 8> bitvalue;
+				bitvalue.reset();
+				*(int*)&bitvalue = 2;
+				for(auto c : selected_cards)
+					bitvalue[c->select_seq + 1 + (sizeof(int) * 8)] = 1;
+				DuelClient::SetResponseB(&bitvalue, sizeof(bitvalue));
+			}
 		}
 	} else {
 		unsigned char respbuf[64];
@@ -2263,13 +2285,13 @@ void ClientField::CancelOrFinish() {
 	}
 	case MSG_SELECT_CARD: {
 		if (selected_cards.size() == 0) {
-			if (select_cancelable) {
+			if(select_cancelable) {
 				DuelClient::SetResponseI(-1);
-			ShowCancelOrFinishButton(0);
-			if (mainGame->wCardSelect->isVisible())
-				mainGame->HideElement(mainGame->wCardSelect, true);
-			else
-				DuelClient::SendResponse();
+				ShowCancelOrFinishButton(0);
+				if(mainGame->wCardSelect->isVisible())
+					mainGame->HideElement(mainGame->wCardSelect, true);
+				else
+					DuelClient::SendResponse();
 			}
 		}
 		if (mainGame->wQuery->isVisible()) {
