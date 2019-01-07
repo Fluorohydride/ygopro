@@ -123,8 +123,7 @@ public:
 			return;
 		struct stat fileStat;
 		std::vector<file_unit> file_list;
-		while ((dirp = readdir(dir)) != nullptr)
-		{
+		while((dirp = readdir(dir)) != nullptr) {
 			file_unit funit;
 			char fname[1024];
 			strcpy(fname, path);
