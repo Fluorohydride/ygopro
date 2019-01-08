@@ -3,8 +3,8 @@ project "lua"
 
 	files { "**.cc", "**.cpp", "**.c", "**.h" }
 	excludes { "lua.c", "luac.c" }
-    
-	configuration "vs*"
+
+	filter "action:vs*"
 		buildoptions { "/TP" }
-	configuration "not vs*"
+	filter "action:not vs*"
 		buildoptions { "-x c++" }
