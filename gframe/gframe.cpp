@@ -19,11 +19,16 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 	event.GUIEvent.Caller = btn;
 	ygo::mainGame->device->postEventFromUser(event);
 }
-#if _WIN32 && !_DEBUG
-#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") 
-#endif
+#ifdef _WIN32
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup") 
+int wmain(int wargc, wchar_t* wargv[]) {
+#else
 int main(int argc, char* argv[]) {
-#ifndef _WIN32
+	int wargc = argc;
+	auto wargv = argv;
+	for(int i = 0; i < argc; ++i) {
+		BufferIO::DecodeUTF8(argv[i], wargv[i]);
+	}
 	setlocale(LC_CTYPE, "UTF-8");
 #endif
 #ifdef __APPLE__
@@ -35,19 +40,20 @@ int main(int argc, char* argv[]) {
 	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
 	CFRelease(path);
 #endif //__APPLE__
-#ifdef _WIN32
-#ifndef _DEBUG
-	char* pstrext;
-	if(argc == 2 && (pstrext = strrchr(argv[1], '.'))
-		&& (!mystrncasecmp(pstrext, ".ydk", 4) || !mystrncasecmp(pstrext, ".yrp", 4))) {
-		wchar_t exepath[MAX_PATH];
-		GetModuleFileNameW(NULL, exepath, MAX_PATH);
-		wchar_t* p = wcsrchr(exepath, '\\');
-		*p = '\0';
-		SetCurrentDirectoryW(exepath);
+#if	_WIN32 && !_DEBUG
+	if(wargc == 2) {
+		std::wstring name(wargv[1]);
+		auto extension = name.substr(name.find_last_of(L"."));
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+		if(extension == L".ydk" || extension == L".yrp" || extension == L".yrpx") {
+			wchar_t exepath[MAX_PATH];
+			GetModuleFileNameW(NULL, exepath, MAX_PATH);
+			wchar_t* p = wcsrchr(exepath, '\\');
+			*p = '\0';
+			SetCurrentDirectoryW(exepath);
+		}
 	}
-#endif //_DEBUG
-#endif //_WIN32
+#endif //_WIN32 && !_DEBUG
 #ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -60,57 +66,27 @@ int main(int argc, char* argv[]) {
 	ygo::Game _game;
 	ygo::mainGame = &_game;
 	if(!ygo::mainGame->Initialize())
-		return 0;
-
-#ifdef _WIN32
-	int wargc;
-	std::unique_ptr<wchar_t*[], void(*)(wchar_t**)> wargv(CommandLineToArgvW(GetCommandLineW(), &wargc), [](wchar_t** wargv) {
-		LocalFree(wargv);
-	});
-#else
-	int wargc = argc;
-	auto wargv = std::make_unique<wchar_t[][256]>(wargc);
-	for(int i = 0; i < argc; ++i) {
-		BufferIO::DecodeUTF8(argv[i], wargv[i]);
-	}
-#endif //_WIN32
-
+		return EXIT_FAILURE;
 	bool keep_on_return = false;
 	for(int i = 1; i < wargc; ++i) {
-		if(wargv[i][0] == L'-' && wargv[i][1] == L'e' && wargv[i][2] != L'\0') {
-			ygo::dataManager.LoadDB(BufferIO::EncodeUTF8s(&wargv[i][2]).c_str());
-			continue;
-		}
-		if(!wcscmp(wargv[i], L"-e")) { // extra database
-			++i;
-			if(i < wargc) {
-				ygo::dataManager.LoadDB(BufferIO::EncodeUTF8s(wargv[i]).c_str());
-			}
-			continue;
-		} else if(!wcscmp(wargv[i], L"-n")) { // nickName
-			++i;
-			if(i < wargc)
-				ygo::mainGame->ebNickName->setText(wargv[i]);
-			continue;
-		} else if(!wcscmp(wargv[i], L"-h")) { // Host address
-			++i;
-			if(i < wargc)
-				ygo::mainGame->ebJoinHost->setText(wargv[i]);
-			continue;
-		} else if(!wcscmp(wargv[i], L"-p")) { // host Port
-			++i;
-			if(i < wargc)
-				ygo::mainGame->ebJoinPort->setText(wargv[i]);
-			continue;
-		} else if(!wcscmp(wargv[i], L"-w")) { // host passWord
-			++i;
-			if(i < wargc)
-				ygo::mainGame->ebJoinPass->setText(wargv[i]);
-			continue;
-		} else if(!wcscmp(wargv[i], L"-k")) { // Keep on return
+		std::wstring parameter(wargv[i]);
+#define PARAM_CHECK(x) if(parameter == x)
+#define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < wargc) {y;} continue;}
+		// Extra database
+		RUN_IF(L"-e", ygo::dataManager.LoadDB(BufferIO::EncodeUTF8s(wargv[i]).c_str()))
+		// Nickname
+		else RUN_IF(L"-n", ygo::mainGame->ebNickName->setText(wargv[i]))
+		// Host address
+		else RUN_IF(L"-h", ygo::mainGame->ebJoinHost->setText(wargv[i]))
+		// Host Port
+		else RUN_IF(L"-p", ygo::mainGame->ebJoinPort->setText(wargv[i]))
+		// Host password
+		else RUN_IF(L"-w", ygo::mainGame->ebJoinPass->setText(wargv[i]))
+#undef RUN_IF
+		else PARAM_CHECK(L"-k") { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
-		} else if(!wcscmp(wargv[i], L"-d")) { // Deck
+		} else PARAM_CHECK(L"-d") { // Deck
 			++i;
 			if(i + 1 < wargc) { // select deck
 				ygo::mainGame->gameConf.lastdeck = wargv[i];
@@ -124,17 +100,17 @@ int main(int argc, char* argv[]) {
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-		} else if(!wcscmp(wargv[i], L"-c")) { // Create host
+		} else PARAM_CHECK(L"-c") { // Create host
 			exit_on_return = !keep_on_return;
 			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 			ClickButton(ygo::mainGame->btnHostConfirm);
 			break;
-		} else if(!wcscmp(wargv[i], L"-j")) { // Join host
+		} else PARAM_CHECK(L"-j") { // Join host
 			exit_on_return = !keep_on_return;
 			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 			ClickButton(ygo::mainGame->btnJoinHost);
 			break;
-		} else if(!wcscmp(wargv[i], L"-r")) { // Replay
+		} else PARAM_CHECK(L"-r") { // Replay
 			exit_on_return = !keep_on_return;
 			++i;
 			if(i < wargc) {
@@ -145,7 +121,7 @@ int main(int argc, char* argv[]) {
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadReplay);
 			break;
-		} else if(!wcscmp(wargv[i], L"-s")) { // Single
+		} else PARAM_CHECK(L"-s") { // Single
 			exit_on_return = !keep_on_return;
 			++i;
 			if(i < wargc) {
@@ -159,6 +135,7 @@ int main(int argc, char* argv[]) {
 		} else if(wargc == 2 && wcslen(wargv[1]) >= 4) {
 			std::wstring name(wargv[i]);
 			auto extension = name.substr(name.find_last_of(L"."));
+			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 			if(extension == L".ydk") {
 				open_file = true;
 				open_file_name = name;
@@ -166,7 +143,7 @@ int main(int argc, char* argv[]) {
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-			if(extension == L".yrp" || extension == L".yrpX") {
+			if(extension == L".yrp" || extension == L".yrpx") {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;
@@ -175,12 +152,11 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 		}
+#undef PARAM_CHECK
 	}
 	ygo::mainGame->MainLoop();
 #ifdef _WIN32
 	WSACleanup();
-#else
-
 #endif //_WIN32
 	return EXIT_SUCCESS;
 }
