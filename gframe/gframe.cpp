@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
 	CFRelease(path);
 #endif //__APPLE__
-#if	_WIN32 && !_DEBUG
+#if defined(_WIN32) && !defined(_DEBUG)
 	if(wargc == 2) {
 		std::wstring name(wargv[1]);
 		auto extension = name.substr(name.find_last_of(L"."));
