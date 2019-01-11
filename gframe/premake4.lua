@@ -3,7 +3,6 @@ project "ygopro"
 	configuration "*DLL"
 		targetname "ygoprodll"
 	configuration {}
-
 	kind "WindowedApp"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
@@ -29,5 +28,5 @@ project "ygopro"
 		includedirs { "/usr/include/irrlicht", "/usr/include/freetype2" }
 		excludes "COSOperator.*"
 		libdirs "../irrKlang/lib"
-		links { "event_pthreads", "GL", "dl", "pthread", "lua5.3" }
-		linkoptions { "-Wl,-rpath '-Wl,\$\$ORIGIN'" }
+		links { "event_pthreads", "GL", "dl", "pthread", "lua5.3++" }
+		linkoptions { "-Wl,-rpath '-Wl,$$ORIGIN'" }
