@@ -968,7 +968,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(mainGame->dInfo.curMsg != MSG_SELECT_SUM || (mainGame->stCardListTip->isVisible() && mainGame->wCardSelect->isVisible())) {
+			if(mainGame->stCardListTip->isVisible()) {
 				if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
 					int pos = mainGame->scrCardList->getPos() / 10;
 					ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
