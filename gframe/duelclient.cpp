@@ -418,7 +418,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(L"==========\n");
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1231), pkt->info.start_lp));
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1232), pkt->info.start_hand));
-		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1231), pkt->info.draw_count));
+		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1233), pkt->info.draw_count));
 		int rule;
 		if (pkt->info.check == 2) {
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt->info.duel_flag, pkt->info.forbiddentypes, &rule);
