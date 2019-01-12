@@ -32,8 +32,8 @@ private:
 	static bool is_closing;
 	static u64 select_hint;
 	static std::wstring event_string;
-	static std::mt19937 rnd;
 public:
+	static std::mt19937 rnd;
 	static unsigned int temp_ip;
 	static unsigned short temp_port;
 	static unsigned short temp_ver;

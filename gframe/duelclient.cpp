@@ -63,7 +63,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		return false;
 	}
 	connect_state = 0x1;
-	rnd = std::mt19937(time(0));
+	rnd.seed(time(0));
 	if(!create_game) {
 		timeval timeout = {5, 0};
 		event* resp_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
@@ -1729,51 +1729,57 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && (
 			(mainGame->chkMAutoPos->isChecked() && mainGame->dField.selectable_field & 0x7f007f) ||
 			(mainGame->chkSTAutoPos->isChecked() && !(mainGame->dField.selectable_field & 0x7f007f)))) {
-			unsigned int filter;
-			if (mainGame->dField.selectable_field & 0x7f) {
-				respbuf[0] = mainGame->LocalPlayer(0);
-				respbuf[1] = LOCATION_MZONE;
-				filter = mainGame->dField.selectable_field & 0x7f;
-			} else if (mainGame->dField.selectable_field & 0x1f00) {
-				respbuf[0] = mainGame->LocalPlayer(0);
-				respbuf[1] = LOCATION_SZONE;
-				filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
-			} else if (mainGame->dField.selectable_field & 0xc000) {
-				respbuf[0] = mainGame->LocalPlayer(0);
-				respbuf[1] = LOCATION_SZONE;
-				filter = (mainGame->dField.selectable_field >> 14) & 0x3;
-				pzone = 1;
-			} else if (mainGame->dField.selectable_field & 0x7f0000) {
-				respbuf[0] = mainGame->LocalPlayer(1);
-				respbuf[1] = LOCATION_MZONE;
-				filter = (mainGame->dField.selectable_field >> 16) & 0x7f;
-			} else if (mainGame->dField.selectable_field & 0x1f000000) {
-				respbuf[0] = mainGame->LocalPlayer(1);
-				respbuf[1] = LOCATION_SZONE;
-				filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
-			} else {
-				respbuf[0] = mainGame->LocalPlayer(1);
-				respbuf[1] = LOCATION_SZONE;
-				filter = (mainGame->dField.selectable_field >> 30) & 0x3;
-				pzone = 1;
-			}
-			if(!pzone) {
-				if(mainGame->chkRandomPos->isChecked()) {
-					do {
-						respbuf[2] = (std::uniform_int_distribution<>(0, 31))(rnd);
-					} while(!(filter & (1 << respbuf[2])));
-				} else {
-					if (filter & 0x40) respbuf[2] = 6;
-					else if (filter & 0x20) respbuf[2] = 5;
-					else if (filter & 0x4) respbuf[2] = 2;
-					else if (filter & 0x2) respbuf[2] = 1;
-					else if (filter & 0x8) respbuf[2] = 3;
-					else if (filter & 0x1) respbuf[2] = 0;
-					else if (filter & 0x10) respbuf[2] = 4;
+			if(mainGame->chkRandomPos->isChecked()) {
+				std::vector<char> positions;
+				for(char i = 0; i < 32; i++) {
+					if(mainGame->dField.selectable_field & (1 << i))
+						positions.push_back(i);
 				}
+				char res = positions[(std::uniform_int_distribution<>(0, positions.size() - 1))(rnd)];
+				respbuf[0] = mainGame->LocalPlayer((res < 16) ? 0 : 1);
+				respbuf[1] = ((1 << res) & 0x7f007f) ? LOCATION_MZONE : LOCATION_SZONE;
+				respbuf[2] = res - (16 * respbuf[0]) - (2 * (respbuf[1] - LOCATION_MZONE));
 			} else {
-				if (filter & 0x1) respbuf[2] = 6;
-				else if (filter & 0x2) respbuf[2] = 7;
+				unsigned int filter;
+				if(mainGame->dField.selectable_field & 0x7f) {
+					respbuf[0] = mainGame->LocalPlayer(0);
+					respbuf[1] = LOCATION_MZONE;
+					filter = mainGame->dField.selectable_field & 0x7f;
+				} else if(mainGame->dField.selectable_field & 0x1f00) {
+					respbuf[0] = mainGame->LocalPlayer(0);
+					respbuf[1] = LOCATION_SZONE;
+					filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
+				} else if(mainGame->dField.selectable_field & 0xc000) {
+					respbuf[0] = mainGame->LocalPlayer(0);
+					respbuf[1] = LOCATION_SZONE;
+					filter = (mainGame->dField.selectable_field >> 14) & 0x3;
+					pzone = 1;
+				} else if(mainGame->dField.selectable_field & 0x7f0000) {
+					respbuf[0] = mainGame->LocalPlayer(1);
+					respbuf[1] = LOCATION_MZONE;
+					filter = (mainGame->dField.selectable_field >> 16) & 0x7f;
+				} else if(mainGame->dField.selectable_field & 0x1f000000) {
+					respbuf[0] = mainGame->LocalPlayer(1);
+					respbuf[1] = LOCATION_SZONE;
+					filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
+				} else {
+					respbuf[0] = mainGame->LocalPlayer(1);
+					respbuf[1] = LOCATION_SZONE;
+					filter = (mainGame->dField.selectable_field >> 30) & 0x3;
+					pzone = 1;
+				}
+				if(!pzone) {
+					if(filter & 0x40) respbuf[2] = 6;
+					else if(filter & 0x20) respbuf[2] = 5;
+					else if(filter & 0x4) respbuf[2] = 2;
+					else if(filter & 0x2) respbuf[2] = 1;
+					else if(filter & 0x8) respbuf[2] = 3;
+					else if(filter & 0x1) respbuf[2] = 0;
+					else if(filter & 0x10) respbuf[2] = 4;
+				} else {
+					if(filter & 0x1) respbuf[2] = 6;
+					else if(filter & 0x2) respbuf[2] = 7;
+				}
 			}
 			mainGame->dField.selectable_field = 0;
 			SetResponseB(respbuf, 3);

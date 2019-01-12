@@ -35,11 +35,11 @@ int SingleMode::SinglePlayThread() {
 	const int draw_count = 1;
 	const int opt = 0;
 	time_t seed = time(0);
-	std::mt19937 rnd(seed);
+	DuelClient::rnd.seed(seed);
 	set_script_reader((script_reader)Game::ScriptReader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)Game::MessageHandler);
-	pduel = create_duel(rnd());
+	pduel = create_duel(DuelClient::rnd());
 	mainGame->dInfo.lua64 = true;
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
