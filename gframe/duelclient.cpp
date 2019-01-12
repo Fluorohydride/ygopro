@@ -1760,7 +1760,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(!pzone) {
 				if(mainGame->chkRandomPos->isChecked()) {
 					do {
-						respbuf[2] = (std::uniform_int_distribution<>(0, 6))(rnd);
+						respbuf[2] = (std::uniform_int_distribution<>(0, 31))(rnd);
 					} while(!(filter & (1 << respbuf[2])));
 				} else {
 					if (filter & 0x40) respbuf[2] = 6;
