@@ -1,7 +1,7 @@
 #include "single_duel.h"
 #include "netserver.h"
 #include "game.h"
-#include <mtrandom.h>
+#include <random>
 
 namespace ygo {
 
@@ -368,7 +368,6 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(dp->state != CTOS_TP_RESULT)
 		return;
 	bool swapped = false;
-	mtrandom rnd;
 	pplayer[0] = players[0];
 	pplayer[1] = players[1];
 	if((tp && dp->type == 1) || (!tp && dp->type == 0)) {
@@ -391,7 +390,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.seed = seed;
 	last_replay.BeginRecord(false);
 	last_replay.WriteHeader(rh);
-	rnd.reset(seed);
+	std::mt19937 rnd(seed);
 	last_replay.WriteData(players[0]->name, 40, false);
 	last_replay.WriteData(players[1]->name, 40, false);
 	//records the replay with the new system
@@ -402,23 +401,16 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	new_replay.WriteData(players[0]->name, 40, false);
 	new_replay.WriteData(players[1]->name, 40);
 	replay_stream.clear();
-	if(!host_info.no_shuffle_deck) {
-		for(size_t i = pdeck[0].main.size() - 1; i > 0; --i) {
-			int swap = rnd.real() * (i + 1);
-			std::swap(pdeck[0].main[i], pdeck[0].main[swap]);
-		}
-		for(size_t i = pdeck[1].main.size() - 1; i > 0; --i) {
-			int swap = rnd.real() * (i + 1);
-			std::swap(pdeck[1].main[i], pdeck[1].main[swap]);
-		}
-	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
 	set_script_reader((script_reader)Game::ScriptReader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)Game::MessageHandler);
-	rnd.reset(seed);
-	pduel = create_duel(rnd.rand());
+	pduel = create_duel(rnd());
+	if(!host_info.no_shuffle_deck) {
+		std::shuffle(pdeck[0].main.begin(), pdeck[0].main.end(), rnd);
+		std::shuffle(pdeck[1].main.begin(), pdeck[1].main.end(), rnd);
+	}
 	set_player_info(pduel, 0, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	int opt = host_info.duel_flag;

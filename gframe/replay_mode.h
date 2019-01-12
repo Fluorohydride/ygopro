@@ -5,7 +5,7 @@
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "replay.h"
-#include <mtrandom.h>
+#include <random>
 
 namespace ygo {
 

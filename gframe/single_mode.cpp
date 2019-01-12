@@ -1,7 +1,7 @@
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
-#include <mtrandom.h>
+#include <random>
 
 namespace ygo {
 
@@ -34,13 +34,12 @@ int SingleMode::SinglePlayThread() {
 	const int start_hand = 5;
 	const int draw_count = 1;
 	const int opt = 0;
-	mtrandom rnd;
 	time_t seed = time(0);
-	rnd.reset(seed);
+	std::mt19937 rnd(seed);
 	set_script_reader((script_reader)Game::ScriptReader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)Game::MessageHandler);
-	pduel = create_duel(rnd.rand());
+	pduel = create_duel(rnd());
 	mainGame->dInfo.lua64 = true;
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);

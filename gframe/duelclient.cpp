@@ -23,7 +23,7 @@ char DuelClient::duel_client_write[0x2000];
 bool DuelClient::is_closing = false;
 u64 DuelClient::select_hint = 0;
 std::wstring DuelClient::event_string;
-mtrandom DuelClient::rnd;
+std::mt19937 DuelClient::rnd;
 
 std::vector<ReplayPacket> DuelClient::replay_stream;
 Replay DuelClient::last_replay;
@@ -63,7 +63,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		return false;
 	}
 	connect_state = 0x1;
-	rnd.reset(time(0));
+	rnd = std::mt19937(time(0));
 	if(!create_game) {
 		timeval timeout = {5, 0};
 		event* resp_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
@@ -1665,7 +1665,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
 			if(mainGame->chkWaitChain->isChecked() && !mainGame->ignore_chain) {
-				mainGame->WaitFrameSignal(rnd.real() * 20 + 20);
+				mainGame->WaitFrameSignal(rnd() * 20 + 20);
 			}
 			DuelClient::SendResponse();
 			return true;
@@ -1760,7 +1760,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(!pzone) {
 				if(mainGame->chkRandomPos->isChecked()) {
 					do {
-						respbuf[2] = rnd.real() * 7;
+						respbuf[2] = (std::uniform_int_distribution<>(0, 6))(rnd);
 					} while(!(filter & (1 << respbuf[2])));
 				} else {
 					if (filter & 0x40) respbuf[2] = 6;

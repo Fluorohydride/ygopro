@@ -12,7 +12,7 @@
 #include "network.h"
 #include "data_manager.h"
 #include "deck_manager.h"
-#include <mtrandom.h>
+#include <random>
 #include "replay.h"
 
 namespace ygo {
@@ -32,7 +32,7 @@ private:
 	static bool is_closing;
 	static u64 select_hint;
 	static std::wstring event_string;
-	static mtrandom rnd;
+	static std::mt19937 rnd;
 public:
 	static unsigned int temp_ip;
 	static unsigned short temp_port;

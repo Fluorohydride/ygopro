@@ -2,7 +2,7 @@
 #include "duelclient.h"
 #include "game.h"
 #include "single_mode.h"
-#include <mtrandom.h>
+#include <random>
 
 namespace ygo {
 	bool ReplayMode::ReadReplayResponse() {
@@ -94,9 +94,7 @@ namespace ygo {
 	}
 	bool ReplayMode::StartDuel() {
 		const ReplayHeader& rh = cur_replay.pheader;
-		mtrandom rnd;
 		int seed = rh.seed;
-		rnd.reset(seed);
 		if(mainGame->dInfo.isRelay) {
 			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
 			cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
@@ -113,7 +111,8 @@ namespace ygo {
 			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
 			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
 		}
-		pduel = create_duel(rnd.rand());
+		std::mt19937 rnd(seed);
+		pduel = create_duel(rnd());
 		int start_lp = cur_replay.ReadInt32();
 		int start_hand = cur_replay.ReadInt32();
 		int draw_count = cur_replay.ReadInt32();
