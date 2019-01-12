@@ -968,17 +968,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
-				int pos = mainGame->scrCardList->getPos() / 10;
-				ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
-				SetShowMark(mcard, false);
-				mainGame->stCardListTip->setVisible(false);
-			}
-			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
-				int pos = mainGame->scrDisplayList->getPos() / 10;
-				ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
-				SetShowMark(mcard, false);
-				mainGame->stCardListTip->setVisible(false);
+			if(mainGame->dInfo.curMsg != MSG_SELECT_SUM || (mainGame->stCardListTip->isVisible() && mainGame->wCardSelect->isVisible())) {
+				if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
+					int pos = mainGame->scrCardList->getPos() / 10;
+					ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
+					SetShowMark(mcard, false);
+					mainGame->stCardListTip->setVisible(false);
+				}
+				if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
+					int pos = mainGame->scrDisplayList->getPos() / 10;
+					ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
+					SetShowMark(mcard, false);
+					mainGame->stCardListTip->setVisible(false);
+				}
 			}
 			if(id == TEXT_CARD_LIST_TIP) {
 				mainGame->stCardListTip->setVisible(false);

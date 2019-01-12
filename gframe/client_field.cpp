@@ -1030,6 +1030,7 @@ bool ClientField::ShowSelectSum() {
 		}
 	}
 	mainGame->wCardSelect->setVisible(false);
+	mainGame->stCardListTip->setVisible(false);
 	if(panelmode) {
 		mainGame->dField.ShowSelectCard(select_ready);
 	}
@@ -1060,6 +1061,10 @@ bool ClientField::CheckSelectSum() {
 	}
 	selected_cards.insert(selected_cards.end(), must_select_cards.begin(), must_select_cards.end());
 	selectsum_cards.clear();
+	for(auto& card : selectable_cards) {
+		SetShowMark(card, false);
+	}
+	mainGame->stCardListTip->setVisible(false);
 	if (select_mode == 0) {
 		bool ret = check_sel_sum_s(selable, 0, select_sumval);
 		selectable_cards.clear();
