@@ -1746,20 +1746,38 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-byte* Game::ScriptReader(const char* script_name, int* slen) {
-	static std::string buffer;
+std::string Game::LoadScript(const std::string& name, int& slen) {
+	std::string buffer;
+	slen = 0;
 	IReadFile* file = nullptr;
 	for(auto& path : mainGame->resource_dirs) {
-		file = mainGame->filesystem->createAndOpenFile((path + script_name).c_str());
+		file = mainGame->filesystem->createAndOpenFile((path + name).c_str());
 		if(file)
 			break;
 	}
-	if(!file && !(file = mainGame->filesystem->createAndOpenFile(script_name)))
-		return 0;
+	if(!file && !(file = mainGame->filesystem->createAndOpenFile(name.c_str())))
+		return buffer;
 	const auto size = file->getSize();
 	buffer.reserve(size);
-	*slen = file->read(&buffer[0], size);
+	slen = file->read(&buffer[0], size);
 	file->drop();
+	return buffer;
+}
+unsigned long Game::SetupDuel(uint32 seed) {
+	set_script_reader((script_reader)ScriptReader);
+	set_card_reader((card_reader)DataManager::CardReader);
+	set_message_handler((message_handler)MessageHandler);
+	unsigned long pduel = create_duel(seed);
+	int len = 0;
+	std::string buf = LoadScript("constant.lua", len);
+	preload_script(pduel, (char*)"constant.lua", 0, len, &buf[0]);
+	buf = LoadScript("utility.lua", len);
+	preload_script(pduel, (char*)"utility.lua", 0, len, &buf[0]);
+	return pduel;
+}
+byte* Game::ScriptReader(const char* script_name, int* slen) {
+	static std::string buffer;
+	buffer = mainGame->LoadScript(script_name, *slen);
 	return (byte*)&buffer[0];
 }
 int Game::MessageHandler(long fduel, int type) {

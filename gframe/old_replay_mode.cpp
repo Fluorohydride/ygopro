@@ -21,9 +21,6 @@ namespace ygo {
 		mainGame->dInfo.lua64 = true;
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
-		set_script_reader((script_reader)Game::ScriptReader);
-		set_card_reader((card_reader)DataManager::CardReader);
-		set_message_handler((message_handler)Game::MessageHandler);
 		if (!StartDuel()) {
 			EndDuel();
 			return 0;
@@ -112,7 +109,7 @@ namespace ygo {
 			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
 		}
 		std::mt19937 rnd(seed);
-		pduel = create_duel(rnd());
+		pduel = mainGame->SetupDuel(rnd());
 		int start_lp = cur_replay.ReadInt32();
 		int start_hand = cur_replay.ReadInt32();
 		int draw_count = cur_replay.ReadInt32();

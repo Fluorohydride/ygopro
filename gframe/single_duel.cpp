@@ -403,10 +403,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	replay_stream.clear();
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
-	set_script_reader((script_reader)Game::ScriptReader);
-	set_card_reader((card_reader)DataManager::CardReader);
-	set_message_handler((message_handler)Game::MessageHandler);
-	pduel = create_duel(rnd());
+	pduel = mainGame->SetupDuel(rnd());
 	if(!host_info.no_shuffle_deck) {
 		std::shuffle(pdeck[0].main.begin(), pdeck[0].main.end(), rnd);
 		std::shuffle(pdeck[1].main.begin(), pdeck[1].main.end(), rnd);
