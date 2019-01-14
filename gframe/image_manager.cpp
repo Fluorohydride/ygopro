@@ -6,7 +6,7 @@ namespace ygo {
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
-	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::system_clock::now();
+	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	tCover[0] = driver->getTexture("textures/cover.jpg");
 	tCover[1] = driver->getTexture("textures/cover2.jpg");
 	if(!tCover[1])
@@ -131,7 +131,7 @@ void ImageManager::ClearFutureObjects(loading_map* map) {
 	delete map;
 }
 void ImageManager::ClearCachedTextures() {
-	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::system_clock::now();
+	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	if(loading_pics[0]->size()) {
 		std::thread(&ImageManager::ClearFutureObjects, this, loading_pics[0]).detach();
 		loading_pics[0] = new loading_map();

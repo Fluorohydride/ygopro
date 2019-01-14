@@ -138,7 +138,7 @@ namespace ygo {
 					if(subdirectorylayers) {
 						if(name == L".." || name == L".")
 							continue;
-						std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extension, subdirectorylayers - 1);
+						std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extensions, subdirectorylayers - 1);
 						for(auto&file : res2) {
 							file = name + L"/" + file;
 						}

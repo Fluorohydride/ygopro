@@ -79,8 +79,8 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "dllinterface.h"
 #endif
 #include <common.h>
-#include <fmt\format.h>
-#include <fmt\printf.h>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 #include "utils.h"
 
 using namespace irr;

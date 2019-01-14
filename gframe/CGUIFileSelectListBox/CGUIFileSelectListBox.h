@@ -7,6 +7,7 @@
 
 #include <irrlicht.h>
 #include <vector>
+#include <string>
 #include "IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 

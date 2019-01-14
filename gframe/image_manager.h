@@ -13,7 +13,7 @@ class ImageManager {
 private:
 	typedef std::pair<IImage*, std::string> image_path;
 	typedef std::map<int, std::future<image_path>> loading_map;
-	typedef std::chrono::time_point<std::chrono::system_clock> chrono_time;
+	typedef unsigned long long chrono_time;
 public:
 	ImageManager() {
 		loading_pics[0] = new loading_map();

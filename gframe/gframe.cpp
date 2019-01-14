@@ -25,7 +25,7 @@ int wmain(int wargc, wchar_t* wargv[]) {
 #else
 int main(int argc, char* argv[]) {
 	int wargc = argc;
-	auto wargv = argv;
+	auto wargv = std::make_unique<wchar_t[][256]>(wargc);
 	for(int i = 0; i < argc; ++i) {
 		BufferIO::DecodeUTF8(argv[i], wargv[i]);
 	}

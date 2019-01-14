@@ -3,7 +3,9 @@
 
 #include "config.h"
 #include <fstream>
+#include <vector>
 #ifndef _WIN32
+#include <dirent.h>
 #include <sys/stat.h>
 #endif
 
