@@ -956,7 +956,7 @@ void Game::LoadConfig() {
 	while(std::getline(conf_file, str)) {
 		auto pos = str.find_first_of("\n\r");
 		if(str.size() && pos != std::string::npos)
-			str = str.erase(0, pos);
+			str = str.substr(0, pos);
 		if(str.empty() || str.at(0) == '#') {
 			continue;
 		}
