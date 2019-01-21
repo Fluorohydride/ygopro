@@ -1077,12 +1077,12 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag, recti* cliprect) {
+void Game::DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag, recti* cliprect, bool load_image) {
 	int code = cp->first;
 	int lcode = cp->first;
 	if(!lflist->content.count(lcode))
 		lcode = cp->second.alias ? cp->second.alias : cp->first;
-	irr::video::ITexture* img = imageManager.GetTextureThumb(code);
+	irr::video::ITexture* img = load_image ? imageManager.GetTextureThumb(code) : imageManager.tUnknown;
 	if (img == NULL)
 		return; //NULL->getSize() will cause a crash
 	dimension2d<u32> size = img->getOriginalSize();
@@ -1218,7 +1218,10 @@ void Game::DrawDeckBd() {
 	numFont->draw(deckBuilder.result_string.c_str(), Resize(875, 137, 935, 157), 0xffffffff, false, true);
 	driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
-	int card_position = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
+	int prev_pos = deckBuilder.scroll_pos;
+	deckBuilder.scroll_pos = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
+	bool draw_thumb = std::abs(prev_pos - deckBuilder.scroll_pos) < 10;
+	int card_position = deckBuilder.scroll_pos;
 	const int height_offset = (scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
 	recti rect = Resize(805, 160, 1020, 630);
 	//loads the thumb of one card before and one after to make the scroll smoother
@@ -1227,7 +1230,7 @@ void Game::DrawDeckBd() {
 		code_pointer ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
-		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect);
+		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect, draw_thumb);
 		if(ptr->second.type & TYPE_MONSTER) {
 			buffer = dataManager.GetName(ptr->first);
 			textFont->draw(buffer.c_str(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);

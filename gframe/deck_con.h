@@ -82,6 +82,7 @@ public:
 	int is_lastcard;
 	int click_pos;
 	bool is_draging;
+	int scroll_pos;
 	int dragx;
 	int dragy;
 	code_pointer draging_pointer;

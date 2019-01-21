@@ -89,6 +89,7 @@ void DeckBuilder::Initialize() {
 	is_draging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
+	scroll_pos = 0;
 	mainGame->device->setEventReceiver(this);
 }
 void DeckBuilder::Terminate() {
@@ -453,6 +454,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
+			switch(id) {
+				case SCROLL_FILTER: {
+					GetHoveredCard();
+					break;
+				}
+			}
+			break;
+		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch (id) {
 				case CHECKBOX_SHOW_ANIME: {
@@ -782,11 +792,12 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	results.clear();
 	std::wstring searchterm(mainGame->ebCardName->getText());
 	std::vector<std::wstring> searchterms;
-	std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::toupper);
 	if(searchterm.empty())
 		searchterms.push_back(searchterm);
-	else
+	else {
+		std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::toupper);
 		searchterms = Game::tokenize(searchterm, L"+");
+	}
 	if(FiltersChanged() || force_refresh)
 		searched_terms.clear();
 	//removes no longer existing search terms from the cache
@@ -809,8 +820,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		int trycode = BufferIO::GetVal(term.c_str());
 		if(trycode && dataManager.GetData(trycode, 0)) {
 			auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
-			result.push_back(ptr);
-			searched_terms[term] = result;
+			searched_terms[term].push_back(ptr);
 			continue;
 		}
 		std::vector<unsigned int> set_code;
@@ -843,10 +853,12 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	results.resize(std::distance(results.begin(), ip));
 	result_string = fmt::to_wstring(results.size());
 	if(results.size() > 7) {
+		scroll_pos = 0;
 		mainGame->scrFilter->setVisible(true);
 		mainGame->scrFilter->setMax((results.size() - 7) * DECK_SEARCH_SCROLL_STEP);
 		mainGame->scrFilter->setPos(0);
 	} else {
+		scroll_pos = 0;
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
 	}
