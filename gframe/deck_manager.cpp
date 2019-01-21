@@ -19,7 +19,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	while(std::getline(infile, str)) {
 		auto pos = str.find_first_of("\n\r");
 		if(str.size() && pos != std::string::npos)
-			str = str.erase(0, pos);
+			str = str.substr(0, pos);
 		if(str.empty() || str[0] == '#')
 			continue;
 		if(str[0] == '!') {
@@ -182,14 +182,14 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	return 0;
 }
-int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2) {
+int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2, int len) {
 	std::vector<int> mainvect;
 	std::vector<int> sidevect;
 	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc);
 	dbuf += mainc;
 	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec);
 	dbuf += sidec;
-	mainvect.insert(mainvect.end(), dbuf, dbuf);
+	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc2);
 	dbuf += mainc2;
 	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec2);
 	return LoadDeck(deck, mainvect, sidevect);
@@ -237,7 +237,7 @@ bool LoadCardList(const std::wstring& name, std::vector<int>* mainlist = nullptr
 	while(std::getline(deck, str)) {
 		auto pos = str.find_first_of("\n\r");
 		if(str.size() && pos != std::string::npos)
-			str = str.erase(0, pos);
+			str = str.substr(0, pos);
 		if(str.empty() || str[0] == '#')
 			continue;
 		if(str[0] == '!') {
@@ -288,22 +288,28 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
-bool DeckManager::LoadDeck(const std::wstring& file) {
+bool DeckManager::LoadDeck(const std::wstring& file, Deck* deck) {
 	std::vector<int> mainlist;
 	std::vector<int> sidelist;
 	if(!LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist)) {
 		if(!LoadCardList(file, &mainlist, &sidelist))
 			return false;
 	}
-	LoadDeck(current_deck, mainlist, sidelist);
+	if(deck)
+		LoadDeck(*deck, mainlist, sidelist);
+	else
+		LoadDeck(current_deck, mainlist, sidelist);
 	return true;
 }
-bool DeckManager::LoadDeckDouble(const std::wstring& file, const std::wstring& file2) {
+bool DeckManager::LoadDeckDouble(const std::wstring& file, const std::wstring& file2, Deck* deck) {
 	std::vector<int> mainlist;
 	std::vector<int> sidelist;
 	LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist);
 	LoadCardList(L"./deck/" + file2 + L".ydk", &mainlist, &sidelist);
-	LoadDeck(current_deck, mainlist, sidelist);
+	if(deck)
+		LoadDeck(*deck, mainlist, sidelist);
+	else
+		LoadDeck(current_deck, mainlist, sidelist);
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const std::wstring& name) {

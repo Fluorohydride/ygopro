@@ -739,7 +739,7 @@ bool Game::Initialize() {
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
-		stMessage->setText(L"Couldn't load the duel api, youll be limited to replay watching and online mode");
+		stMessage->setText(L"Couldn't load the duel api, you'll be limited to replay watching and online mode");
 		PopupElement(mainGame->wMessage);
 	}
 #endif
@@ -876,6 +876,10 @@ void Game::MainLoop() {
 	SaveConfig();
 	engineSound->drop();
 	engineMusic->drop();
+#ifdef YGOPRO_BUILD_DLL
+	if(ocgcore)
+		UnloadCore(ocgcore);
+#endif //YGOPRO_BUILD_DLL
 //	device->drop();
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
@@ -1725,7 +1729,7 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	while(std::getline(infile, str) && !stop) {
 		auto pos = str.find_first_of("\n\r");
 		if(str.size() && pos != std::string::npos)
-			str = str.erase(0, pos);
+			str = str.substr(0, pos);
 		bool was_empty = str.empty();
 		if(start == std::string::npos) {
 			start = str.find("--[[message");
@@ -1789,12 +1793,17 @@ int Game::MessageHandler(long fduel, int type) {
 	return 0;
 }
 void Game::PopulateResourcesDirectories() {
-#define LF(x) resource_dirs.push_back(filesystem->getAbsolutePath(x).c_str());
-	LF("./expansions/script/");
-	LF("./script/");
-	LF("./expansions/pics/");
-	LF("./pics/");
-#undef LF
+	auto f = [&](std::string path) {
+		std::string abspath = filesystem->getAbsolutePath(path.c_str()).c_str();
+		if(abspath[abspath.size() - 1] != '/')
+			abspath += "/";
+		resource_dirs.push_back(abspath);
+
+	};
+	f("./expansions/script/");
+	f("./script/");
+	f("./expansions/pics/");
+	f("./pics/");
 }
 
 

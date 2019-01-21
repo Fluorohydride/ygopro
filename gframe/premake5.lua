@@ -28,5 +28,5 @@ project "ygopro"
 		includedirs { "/usr/include/irrlicht", "/usr/include/freetype2" }
 		excludes "COSOperator.*"
 		libdirs "../irrKlang/lib"
-		links { "event_pthreads", "GL", "dl", "pthread", "lua5.3++" }
+		links { "event_pthreads", "GL", "dl", "pthread", "lua5.3-c++" }
 		linkoptions { "-Wl,-rpath '-Wl,$$ORIGIN'" }

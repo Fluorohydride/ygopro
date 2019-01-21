@@ -129,10 +129,11 @@ namespace ygo {
 #else
 		DIR * dir;
 		struct dirent * dirp = nullptr;
-		if((dir = opendir(".")) != nullptr) {
+		std::string _path = BufferIO::EncodeUTF8s(path);
+		if((dir = opendir(_path.c_str())) != nullptr) {
 			struct stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
-				stat(dirp->d_name, &fileStat);
+				stat((_path + dirp->d_name).c_str(), &fileStat);
 				std::wstring name = BufferIO::DecodeUTF8s(dirp->d_name);
 				if(S_ISDIR(fileStat.st_mode)) {
 					if(subdirectorylayers) {
@@ -149,7 +150,7 @@ namespace ygo {
 				size_t dotpos = name.find_last_of(L".");
 				if(dotpos == std::wstring::npos)
 					continue;
-				auto extension = name.substr(dotpos);
+				auto extension = name.substr(dotpos + 1);
 				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 				if(std::find(extensions.begin(), extensions.end(), extension) == extensions.end())
 					continue;
