@@ -182,7 +182,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	}
 	return 0;
 }
-int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2, int len) {
+int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2) {
 	std::vector<int> mainvect;
 	std::vector<int> sidevect;
 	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc);

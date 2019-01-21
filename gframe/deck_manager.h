@@ -45,8 +45,8 @@ public:
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0);
 	int LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
-	bool LoadDeck(const std::wstring& file);
-	bool LoadDeckDouble(const std::wstring& file, const std::wstring& file2);
+	bool LoadDeck(const std::wstring& file, Deck* deck = nullptr);
+	bool LoadDeckDouble(const std::wstring& file, const std::wstring& file2, Deck* deck = nullptr);
 	bool SaveDeck(Deck& deck, const std::wstring& name);
 	bool DeleteDeck(Deck& deck, const std::wstring& name);
 };
