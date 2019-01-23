@@ -11,8 +11,6 @@ bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
 
-static byte buffer[0x20000];
-
 bool SingleMode::StartPlay() {
 	Thread::NewThread(SinglePlayThread, 0);
 	return true;
@@ -38,7 +36,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mtrandom rnd;
 	time_t seed = time(0);
 	rnd.reset(seed);
-	set_script_reader((script_reader)ScriptReaderEx);
+	set_script_reader((script_reader)DataManager::ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());
@@ -128,18 +126,25 @@ int SingleMode::SinglePlayThread(void* param) {
 	}
 	last_replay.EndRecord();
 	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
-	char timebuf[40];
-	strftime(timebuf, 40, "%Y-%m-%d %H-%M-%S", localedtime);
-	size_t size = strlen(timebuf) + 1;
-	wchar_t timetext[80];
-	mbstowcs(timetext, timebuf, size);
+	tm* localedtime = localtime(&nowtime);
+	wchar_t timetext[40];
+	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
 	mainGame->ebRSName->setText(timetext);
-	mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
-	mainGame->PopupElement(mainGame->wReplaySave);
-	mainGame->gMutex.Unlock();
-	mainGame->replaySignal.Reset();
-	mainGame->replaySignal.Wait();
+	if(!mainGame->chkAutoSaveReplay->isChecked()) {
+		mainGame->wReplaySave->setText(dataManager.GetSysString(1340));
+		mainGame->PopupElement(mainGame->wReplaySave);
+		mainGame->gMutex.Unlock();
+		mainGame->replaySignal.Reset();
+		mainGame->replaySignal.Wait();
+	} else {
+		mainGame->actionParam = 1;
+		wchar_t msgbuf[256];
+		myswprintf(msgbuf, dataManager.GetSysString(1367), timetext);
+		mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->guiFont, msgbuf);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(30);
+	}
 	if(mainGame->actionParam)
 		last_replay.SaveReplay(mainGame->ebRSName->getText());
 	end_duel(pduel);
@@ -844,32 +849,6 @@ void SingleMode::SinglePlayReload() {
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
-}
-byte* SingleMode::ScriptReaderEx(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	if(ScriptReader(sname, slen))
-		return buffer;
-	else
-		return ScriptReader(script_name, slen);
-}
-byte* SingleMode::ScriptReader(const char* script_name, int* slen) {
-	FILE *fp;
-#ifdef _WIN32
-	wchar_t fname[256];
-	BufferIO::DecodeUTF8(script_name, fname);
-	fp = _wfopen(fname, L"rb");
-#else
-	fp = fopen(script_name, "rb");
-#endif
-	if(!fp)
-		return 0;
-	int len = fread(buffer, 1, sizeof(buffer), fp);
-	fclose(fp);
-	if(len >= sizeof(buffer))
-		return 0;
-	*slen = len;
-	return buffer;
 }
 int SingleMode::MessageHandler(long fduel, int type) {
 	if(!enable_log)

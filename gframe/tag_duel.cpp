@@ -381,7 +381,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	time_limit[0] = host_info.time_limit;
 	time_limit[1] = host_info.time_limit;
-	set_script_reader((script_reader)ScriptReaderEx);
+	set_script_reader((script_reader)DataManager::ScriptReaderEx);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)TagDuel::MessageHandler);
 	rnd.reset(seed);
@@ -1583,18 +1583,17 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
-	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache);
+	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_POSITION, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
 	int qlen = 0;
 	while(qlen < len) {
 		int slen = BufferIO::ReadInt32(qbuf);
 		int qflag = *(int*)qbuf;
-		int pos = slen - 8;
-		if(qflag & QUERY_LSCALE)
-			pos -= 4;
-		if(qflag & QUERY_RSCALE)
-			pos -= 4;
-		if(!qbuf[pos])
+		int offset = 8;
+		if(!(qflag & QUERY_CODE))
+			offset -= 4;
+		unsigned position = ((*(int*)(qbuf + offset)) >> 24) & 0xff;
+		if(!(position & POS_FACEUP))
 			memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 		qlen += slen;
@@ -1661,15 +1660,6 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 				NetServer::ReSendToPlayer(*pit);
 		}
 	}
-}
-byte* TagDuel::ScriptReaderEx(const char* script_name, int* slen) {
-	char sname[256] = "./expansions";
-	strcat(sname, script_name + 1);//default script name: ./script/c%d.lua
-	byte* buffer = default_script_reader(sname, slen);
-	if(buffer)
-		return buffer;
-	else
-		return default_script_reader(script_name, slen);
 }
 int TagDuel::MessageHandler(long fduel, int type) {
 	if(!enable_log)

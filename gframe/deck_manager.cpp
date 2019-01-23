@@ -234,6 +234,8 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
+	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
+		return false;
 	wchar_t file[64];
 	myswprintf(file, L"./deck/%ls.ydk", name);
 	FILE* fp = OpenDeckFile(file, "w");
