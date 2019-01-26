@@ -1,3 +1,7 @@
+newoption {
+	trigger		= "no-direct3d",
+	description	= "Disable directx options in irrlicht if the DirectX SDK isn't installed"
+}
 workspace "ygo"
 	location "build"
 	language "C++"
@@ -9,6 +13,9 @@ workspace "ygo"
 
 	filter "system:windows"
 		defines { "WIN32", "_WIN32", "NOMINMAX", "NO_IRR_COMPILE_WITH_DIRECT3D_8_" }
+	
+	filter "options:no-direct3d"
+		defines "NO_IRR_COMPILE_WITH_DIRECT3D_9_"
 
 	filter "system:bsd"
 		defines "LUA_USE_POSIX"
