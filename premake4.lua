@@ -4,10 +4,10 @@ solution "ygo"
 	objdir "obj"
 
 	configurations { "Debug", "DebugDLL" , "Release", "ReleaseDLL" }
-	defines "LUA_COMPAT_5_2"
+	defines { "LUA_COMPAT_5_2" }
 
 	configuration "windows"
-		defines { "WIN32", "_WIN32", "NOMINMAX" }
+		defines { "WIN32", "_WIN32", "NOMINMAX", "NO_IRR_COMPILE_WITH_DIRECT3D_8_" }
 
 	configuration "bsd"
 		defines "LUA_USE_POSIX"

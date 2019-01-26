@@ -5,10 +5,10 @@ workspace "ygo"
 	startproject "ygopro"
 
 	configurations { "Debug", "DebugDLL" , "Release", "ReleaseDLL" }
-	defines "LUA_COMPAT_5_2"
+	defines { "LUA_COMPAT_5_2" }
 
 	filter "system:windows"
-		defines { "WIN32", "_WIN32", "NOMINMAX" }
+		defines { "WIN32", "_WIN32", "NOMINMAX", "NO_IRR_COMPILE_WITH_DIRECT3D_8_" }
 
 	filter "system:bsd"
 		defines "LUA_USE_POSIX"
@@ -54,7 +54,7 @@ workspace "ygo"
 	include "ocgcore"
 	include "gframe"
 	include "fmt"
-	if os.ishost("windows") then
+	if os.istarget("windows") then
 		include "event"
 		include "freetype"
 		include "irrlicht"
