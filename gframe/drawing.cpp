@@ -1232,7 +1232,7 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	int prev_pos = deckBuilder.scroll_pos;
 	deckBuilder.scroll_pos = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
-	bool draw_thumb = std::abs(prev_pos - deckBuilder.scroll_pos) < 10;
+	bool draw_thumb = std::abs(prev_pos - deckBuilder.scroll_pos) < (10.0f * 1000.0f / 60.0f) * delta_time;
 	int card_position = deckBuilder.scroll_pos;
 	const int height_offset = (scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
 	recti rect = Resize(805, 160, 1020, 630);
