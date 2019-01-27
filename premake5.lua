@@ -10,6 +10,9 @@ workspace "ygo"
 
 	configurations { "Debug", "DebugDLL" , "Release", "ReleaseDLL" }
 
+	filter "system:windows"
+		defines { "WIN32", "_WIN32", "NOMINMAX" }
+
 	filter "system:bsd"
 		includedirs "/usr/local/include"
 		libdirs "/usr/local/lib"
