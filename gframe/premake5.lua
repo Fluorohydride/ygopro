@@ -21,6 +21,9 @@ project "ygopro"
 		filter "options:no-direct3d"
 			defines "NO_IRR_COMPILE_WITH_DIRECT3D_9_"
 
+		filter "options:not no-direct3d"
+			defines "IRR_COMPILE_WITH_DX9_DEV_PACK"
+
 	filter { "action:not vs*", "system:windows" }
 		includedirs { "/mingw/include/irrlicht", "/mingw/include/freetype2" }
 		libdirs "../irrKlang/lib/Win32-gcc"
