@@ -48,7 +48,7 @@ bool Game::Initialize() {
 	filesystem = device->getFileSystem();
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
-	if(!(ocgcore = LoadOCGcore("./ocgcore")) && !(ocgcore = LoadOCGcore("./expansions/ocgcore")))
+	if(!(ocgcore = LoadOCGcore("./")) && !(ocgcore = LoadOCGcore("./expansions/")))
 		coreloaded = false;
 #endif
 	auto logger = device->getLogger();

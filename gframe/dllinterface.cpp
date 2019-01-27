@@ -1,6 +1,5 @@
 #ifdef YGOPRO_BUILD_DLL
 #include "dllinterface.h"
-#include <cstdio>
 #include <string>
 #ifndef _WIN32
 #include <dlfcn.h>
@@ -29,88 +28,89 @@ void(*set_responseb)(ptr pduel, byte* buf) = nullptr;
 int32(*preload_script)(ptr pduel, char* script, int32 len, int32 scriptlen, char* scriptbuff) = nullptr;
 
 #ifdef _WIN32
-void* LoadOCGcore(const std::string& path) {
-	void* newcore = LoadLibrary(BufferIO::DecodeUTF8s(path + ".dll").c_str());
-	if(!newcore)
-		return nullptr;
-#define LF(x) x = (decltype(x))GetProcAddress((HMODULE)newcore, #x);\
-		if(!x) return nullptr;
+void* OpenLibrary(const std::string& path) {
+	return LoadLibrary(BufferIO::DecodeUTF8s(path + "ocgcore.dll").c_str());
+}
+void CloseLibrary(void *handle) {
+	FreeLibrary((HMODULE)handle);
+}
+
+#define LF(x,core) x = (decltype(x))GetProcAddress((HMODULE)core, #x);\
+		if(!x){ CloseLibrary(core); return nullptr; }
+
 #else
-void* LoadOCGcore(const std::string& path) {
+
+void* OpenLibrary(const std::string& path) {
 #ifdef __APPLE__
-	std::string ext(".dylib");
+	return dlopen((path + "libocgcore.dylib").c_str(), RTLD_LAZY);
 #else
-	std::string ext(".so");
-#endif //__APPLE__
-	void* newcore = dlopen((path + ext).c_str(), RTLD_LAZY);
+	return dlopen((path + "libocgcore.so").c_str(), RTLD_LAZY);
+#endif
+}
+
+void CloseLibrary(void *handle) {
+	dlclose(handle);
+}
+
+#define LF(x,core) x = (decltype(x))dlsym(core, #x);\
+		if(!x){ CloseLibrary(core); return nullptr; }
+
+#endif
+
+void* LoadOCGcore(const std::string& path) {
+	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
-#define LF(x) x = (decltype(x))dlsym(newcore, #x);\
-		if(!x) return nullptr;
-#endif //_WIN32
-	LF(set_script_reader);
-	LF(set_card_reader);
-	LF(set_message_handler);
-	LF(create_duel);
-	LF(start_duel);
-	LF(end_duel);
-	LF(set_player_info);
-	LF(get_log_message);
-	LF(get_message);
-	LF(process);
-	LF(new_card);
-	LF(new_tag_card);
-	LF(new_relay_card);
-	LF(query_card);
-	LF(query_field_count);
-	LF(query_field_card);
-	LF(query_field_info);
-	LF(set_responsei);
-	LF(set_responseb);
-	LF(preload_script);
-#undef LF
+	LF(set_script_reader, newcore);
+	LF(set_card_reader, newcore);
+	LF(set_message_handler, newcore);
+	LF(create_duel, newcore);
+	LF(start_duel, newcore);
+	LF(end_duel, newcore);
+	LF(set_player_info, newcore);
+	LF(get_log_message, newcore);
+	LF(get_message, newcore);
+	LF(process, newcore);
+	LF(new_card, newcore);
+	LF(new_tag_card, newcore);
+	LF(new_relay_card, newcore);
+	LF(query_card, newcore);
+	LF(query_field_count, newcore);
+	LF(query_field_card, newcore);
+	LF(query_field_info, newcore);
+	LF(set_responsei, newcore);
+	LF(set_responseb, newcore);
+	LF(preload_script, newcore);
 	return newcore;
 }
 bool ReloadCore(void *handle) {
 	if(!handle)
 		return false;
-#ifdef _WIN32
-#define LF(x) x = (decltype(x))GetProcAddress((HMODULE)handle, #x);\
-		if(!x) return false;
-#else
-#define LF(x) x = (decltype(x))dlsym(handle, #x);\
-		if(!x) return false;
-#endif //_WIN32
-	LF(set_script_reader);
-	LF(set_card_reader);
-	LF(set_message_handler);
-	LF(create_duel);
-	LF(start_duel);
-	LF(end_duel);
-	LF(set_player_info);
-	LF(get_log_message);
-	LF(get_message);
-	LF(process);
-	LF(new_card);
-	LF(new_tag_card);
-	LF(new_relay_card);
-	LF(query_card);
-	LF(query_field_count);
-	LF(query_field_card);
-	LF(query_field_info);
-	LF(set_responsei);
-	LF(set_responseb);
-	LF(preload_script);
-#undef LF
+	LF(set_script_reader, handle);
+	LF(set_card_reader, handle);
+	LF(set_message_handler, handle);
+	LF(create_duel, handle);
+	LF(start_duel, handle);
+	LF(end_duel, handle);
+	LF(set_player_info, handle);
+	LF(get_log_message, handle);
+	LF(get_message, handle);
+	LF(process, handle);
+	LF(new_card, handle);
+	LF(new_tag_card, handle);
+	LF(new_relay_card, handle);
+	LF(query_card, handle);
+	LF(query_field_count, handle);
+	LF(query_field_card, handle);
+	LF(query_field_info, handle);
+	LF(set_responsei, handle);
+	LF(set_responseb, handle);
+	LF(preload_script, handle);
 	return true;
 }
 
 void UnloadCore(void *handle) {
-#ifdef _WIN32
-	FreeLibrary((HMODULE)handle);
-#else
-	dlclose(handle);
-#endif
+	CloseLibrary(handle);
 	set_script_reader = nullptr;
 	set_card_reader = nullptr;
 	set_message_handler = nullptr;
@@ -134,50 +134,31 @@ void UnloadCore(void *handle) {
 }
 
 void* ChangeOCGcore(const std::string& path, void *handle) {
-#ifdef _WIN32
-	void* newcore = LoadLibrary(BufferIO::DecodeUTF8s(path + ".dll").c_str());
+	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
-#define LF(x) x = (decltype(x))GetProcAddress((HMODULE)newcore, #x);\
-		if(!x) return nullptr;
-#else
-#ifdef __APPLE__
-	std::string ext(".dylib");
-#else
-	std::string ext(".so");
-#endif //__APPLE__
-	void* newcore = dlopen((path + ext).c_str(), RTLD_LAZY);
-	if(!newcore)
-		return nullptr;
-#define LF(x) x = (decltype(x))dlsym(newcore, #x);\
-		if(!x) return nullptr;
-#endif //_WIN32
-	LF(set_script_reader);
-	LF(set_card_reader);
-	LF(set_message_handler);
-	LF(create_duel);
-	LF(start_duel);
-	LF(end_duel);
-	LF(set_player_info);
-	LF(get_log_message);
-	LF(get_message);
-	LF(process);
-	LF(new_card);
-	LF(new_tag_card);
-	LF(new_relay_card);
-	LF(query_card);
-	LF(query_field_count);
-	LF(query_field_card);
-	LF(query_field_info);
-	LF(set_responsei);
-	LF(set_responseb);
-	LF(preload_script);
-#undef LF
-#ifdef _WIN32
-	FreeLibrary((HMODULE)handle);
-#else
-	dlclose(handle);
-#endif
+	LF(set_script_reader, newcore);
+	LF(set_card_reader, newcore);
+	LF(set_message_handler, newcore);
+	LF(create_duel, newcore);
+	LF(start_duel, newcore);
+	LF(end_duel, newcore);
+	LF(set_player_info, newcore);
+	LF(get_log_message, newcore);
+	LF(get_message, newcore);
+	LF(process, newcore);
+	LF(new_card, newcore);
+	LF(new_tag_card, newcore);
+	LF(new_relay_card, newcore);
+	LF(query_card, newcore);
+	LF(query_field_count, newcore);
+	LF(query_field_card, newcore);
+	LF(query_field_info, newcore);
+	LF(set_responsei, newcore);
+	LF(set_responseb, newcore);
+	LF(preload_script, newcore);
+	CloseLibrary(handle);
 	return newcore;
 }
+#undef LF
 #endif //YGOPRO_BUILD_DLL
