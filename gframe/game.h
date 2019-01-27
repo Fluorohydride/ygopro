@@ -138,8 +138,8 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
 	bool PlayChant(unsigned int code);
-	void PlaySoundEffect(char* sound);
-	void PlayMusic(char* song, bool loop);
+	void PlaySoundEffect(const std::string& sound);
+	void PlayMusic(const std::string& song, bool loop);
 	void PlayBGM();
 
 	int LocalPlayer(int player);

@@ -1096,22 +1096,22 @@ bool Game::PlayChant(unsigned int code) {
 	std::string sound(fmt::format("./sound/chants/{}.wav", code));
 	if(filesystem->existFile(sound.c_str())) {
 		if (!engineSound->isCurrentlyPlaying(sound.c_str()))
-			PlaySoundEffect((char*)sound.c_str());
+			PlaySoundEffect(sound);
 		return true;
 	}
 	return false;
 }
-void Game::PlaySoundEffect(char* sound) {
+void Game::PlaySoundEffect(const std::string& sound) {
 	if(chkEnableSound->isChecked() && (!dInfo.isReplay || !dInfo.isReplaySkiping)) {
-		engineSound->play2D(sound);
+		engineSound->play2D(sound.c_str());
 		engineSound->setSoundVolume(gameConf.volume);
 	}
 }
-void Game::PlayMusic(char* song, bool loop) {
+void Game::PlayMusic(const std::string& song, bool loop) {
 	if(chkEnableMusic->isChecked()) {
-		if(!engineMusic->isCurrentlyPlaying(song)) {
+		if(!engineMusic->isCurrentlyPlaying(song.c_str())) {
 			engineMusic->stopAllSounds();
-			engineMusic->play2D(song, loop);
+			engineMusic->play2D(song.c_str(), loop);
 			engineMusic->setSoundVolume(gameConf.volume);
 		}
 	}
@@ -1284,15 +1284,15 @@ void Game::AddDebugMsg(const std::string& msg) {
 	}
 }
 void Game::ErrorLog(const std::string& msg) {
-	FILE* fp = fopen("error.log", "at");
-	if(!fp)
+	std::ofstream log("error.log", std::ofstream::app);
+	if(!log.is_open())
 		return;
 	time_t nowtime = time(NULL);
-	struct tm *localedtime = localtime(&nowtime);
+	tm *localedtime = localtime(&nowtime);
 	char timebuf[40];
 	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
-	fprintf(fp, "[%s]%s\n", timebuf, msg.c_str());
-	fclose(fp);
+	log << "[" << timebuf << "]" << msg << std::endl;
+	log.close();
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
