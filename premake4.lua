@@ -8,26 +8,17 @@ solution "ygo"
 	objdir "obj"
 
 	configurations { "Debug", "DebugDLL" , "Release", "ReleaseDLL" }
-	defines { "LUA_COMPAT_5_2" }
 
 	configuration "windows"
-		defines { "WIN32", "_WIN32", "NOMINMAX", "NO_IRR_COMPILE_WITH_DIRECT3D_8_" }
-		
-	configuration "no-direct3d"
-		defines "NO_IRR_COMPILE_WITH_DIRECT3D_9_"
+		defines { "WIN32", "_WIN32", "NOMINMAX" }
 
 	configuration "bsd"
-		defines "LUA_USE_POSIX"
 		includedirs "/usr/local/include"
 		libdirs "/usr/local/lib"
 
 	configuration "macosx"
-		defines "LUA_USE_MACOSX"
 		includedirs "/opt/local/include"
 		libdirs "/opt/local/lib"
-
-	configuration "linux"
-		defines "LUA_USE_LINUX"
 
 	configuration "vs*"
 		flags "EnableSSE2"
@@ -36,6 +27,7 @@ solution "ygo"
 
 	configuration "not vs*"
 		buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
+
 	configuration {"not vs*", "windows"}
 		buildoptions "-static-libgcc"
 
@@ -52,8 +44,6 @@ solution "ygo"
 	configuration "Release*"
 		flags "OptimizeSpeed"
 		targetdir "bin/release"
-	configuration "*DLL"
-		defines "YGOPRO_BUILD_DLL"
 
 	include "ocgcore"
 	include "gframe"
