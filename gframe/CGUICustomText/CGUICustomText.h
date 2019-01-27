@@ -177,8 +177,8 @@ namespace gui
 		 // auto scrolling related functions and variables
 		CTEXT_SCROLLING_TYPE scrolling;
 		int maxFrame;
-		int curFrame;
-		int frameTimer;
+		float curFrame;
+		float frameTimer;
 		int forcedSteps;
 		float forcedStepsRatio;
 		float animationStep;
@@ -186,6 +186,8 @@ namespace gui
 		int animationWaitEnd;
 		bool increasingFrame;
 		bool waitingEndFrame;
+
+		u32 prev_time;
 
 		void updateAutoScrollingStuff();
 	};

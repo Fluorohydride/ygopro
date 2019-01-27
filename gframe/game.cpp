@@ -51,10 +51,8 @@ bool Game::Initialize() {
 	if(!(ocgcore = LoadOCGcore("./ocgcore")) && !(ocgcore = LoadOCGcore("./expansions/ocgcore")))
 		coreloaded = false;
 #endif
-#ifdef _DEBUG
 	auto logger = device->getLogger();
-	logger->setLogLevel(ELL_DEBUG);
-#endif
+	logger->setLogLevel(ELL_WARNING);
 	// Apply skin
 	if (gameConf.skin_index >= 0)
 	{
@@ -68,7 +66,7 @@ bool Game::Initialize() {
 	}
 	linePatternD3D = 0;
 	linePatternGL = 0x0f0f;
-	waitFrame = 0;
+	waitFrame = 0.0f;
 	signalFrame = 0;
 	showcard = 0;
 	is_attacking = false;
@@ -758,6 +756,7 @@ bool Game::Initialize() {
 	engineMusic = irrklang::createIrrKlangDevice();
 	hideChat = false;
 	hideChatTimer = 0;
+	delta_time = 0;
 
 	Utils::CreateResourceFolders();
 
@@ -775,19 +774,27 @@ void Game::MainLoop() {
 	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
 	irr::ITimer* timer = device->getTimer();
-	timer->setTime(0);
-	int fps = 0;
-	int cur_time = 0;
+	uint32 cur_time = 0;
+	uint32 prev_time = timer->getTime();
+	float frame_counter = 0.0f;
 	while(device->run()) {
+		timer->tick();
+		auto now = timer->getTime();
+		delta_time = now - prev_time;
+		prev_time = now;
+		cur_time += delta_time;
 		dimension2du size = driver->getScreenSize();
 		if(window_size != size) {
 			window_size = size;
 			cardimagetextureloading = false;
 			OnResize();
 		}
-		linePatternD3D = (linePatternD3D + 1) % 30;
-		linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
-		atkframe += 0.1f;
+		frame_counter += (float)delta_time * 60.0f/1000.0f;
+		for(; frame_counter>=1; frame_counter--) {
+			linePatternD3D = (linePatternD3D + 1) % 30;
+			linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
+		}
+		atkframe += 0.1f * (float)delta_time * 60.0f / 1000.0f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.lock();
@@ -826,34 +833,26 @@ void Game::MainLoop() {
 		}
 		gMutex.unlock();
 		if(signalFrame > 0) {
-			signalFrame--;
+			uint32 movetime = std::min((int)delta_time, signalFrame);
+			signalFrame -= movetime;
 			if(!signalFrame)
 				frameSignal.Set();
 		}
-		if(waitFrame >= 0) {
-			waitFrame++;
-			if(waitFrame % 90 == 0) {
+		if(waitFrame >= 0.0f) {
+			waitFrame += (float)delta_time * 60.0f / 1000.0f;;
+			if((int)std::round(waitFrame) % 90 == 0) {
 				stHintMsg->setText(dataManager.GetSysString(1390).c_str());
-			} else if(waitFrame % 90 == 30) {
+			} else if((int)std::round(waitFrame) % 90 == 30) {
 				stHintMsg->setText(dataManager.GetSysString(1391).c_str());
-			} else if(waitFrame % 90 == 60) {
+			} else if((int)std::round(waitFrame) % 90 == 60) {
 				stHintMsg->setText(dataManager.GetSysString(1392).c_str());
 			}
 		}
 		driver->endScene();
 		if(closeSignal.Wait(0))
 			CloseDuelWindow();
-		fps++;
-		cur_time = timer->getTime();
-		if(cur_time < fps * 17 - 20)
-#ifdef _WIN32
-			Sleep(20);
-#else
-			usleep(20000);
-#endif
-		if(cur_time >= 1000) {
-			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
-			fps = 0;
+		device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", driver->getFPS()).c_str());
+		while(cur_time >= 1000) {
 			cur_time -= 1000;
 			timer->setTime(0);
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
@@ -863,6 +862,14 @@ void Game::MainLoop() {
 		if (DuelClient::try_needed) {
 			DuelClient::try_needed = false;
 			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, false);
+		}
+		if(gameConf.max_fps) {
+			timer->tick();
+			int ndelta_time = timer->getTime() - prev_time;
+			int sleep_time = (1000 / gameConf.max_fps) - ndelta_time;
+			if(sleep_time > 0) {
+				device->sleep(sleep_time);
+			}
 		}
 	}
 	DuelClient::StopClient(true);
@@ -925,6 +932,8 @@ void Game::RefreshBGMList() {
 }
 void Game::LoadConfig() {
 	gameConf.antialias = 0;
+	gameConf.use_d3d = false;
+	gameConf.max_fps = 60;
 	gameConf.fullscreen = false;
 	gameConf.serverport = L"7911";
 	gameConf.textfontsize = 12;
@@ -973,7 +982,11 @@ void Game::LoadConfig() {
 			gameConf.antialias = std::stoi(str);
 		else if(type == "use_d3d")
 			gameConf.use_d3d = std::stoi(str);
-		else if(type == "fullscreen")
+		else if(type == "max_fps") {
+			auto val = std::stoi(str);
+			if(val >= 0)
+				gameConf.max_fps = val;
+		} else if(type == "fullscreen")
 			gameConf.fullscreen = std::stoi(str);
 		else if(type == "errorlog")
 			enable_log = std::stoi(str);
@@ -1044,6 +1057,8 @@ void Game::SaveConfig() {
 		return;
 	conf_file << "#config file\n#nickname & gamename should be less than 20 characters\n";
 	conf_file << "use_d3d = "			<< std::to_string(gameConf.use_d3d ? 1 : 0) << "\n";
+	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
+	conf_file << "max_fps = "			<< std::to_string(gameConf.max_fps) << "\n";
 	conf_file << "fullscreen = "		<< std::to_string(gameConf.fullscreen ? 1 : 0) << "\n";
 	conf_file << "antialias = "			<< std::to_string(gameConf.antialias) << "\n";
 	conf_file << "errorlog = "			<< std::to_string(enable_log) << "\n";
@@ -1212,7 +1227,7 @@ void Game::AddChatMsg(const std::wstring& msg, int player) {
 		chatType[i] = chatType[i - 1];
 	}
 	chatMsg[0].clear();
-	chatTiming[0] = 1200;
+	chatTiming[0] = 1200.0f;
 	chatType[0] = player;
 	switch(player) {
 	case 0: //host 1

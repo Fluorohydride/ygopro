@@ -976,39 +976,41 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	}
 }
 void ClientField::MoveCard(ClientCard * pcard, int frame) {
+	float milliseconds = (float)frame * 1000.0f / 60.0f;
 	irr::core::vector3df trans = pcard->curPos;
 	irr::core::vector3df rot = pcard->curRot;
 	GetCardLocation(pcard, &trans, &rot);
-	pcard->dPos = (trans - pcard->curPos) / frame;
+	pcard->dPos = (trans - pcard->curPos) / milliseconds;
 	float diff = rot.X - pcard->curRot.X;
 	while (diff < 0) diff += PI * 2;
 	while (diff > PI * 2)
 		diff -= PI * 2;
 	if (diff < PI)
-		pcard->dRot.X = diff / frame;
+		pcard->dRot.X = diff / milliseconds;
 	else
-		pcard->dRot.X = -(PI * 2 - diff) / frame;
+		pcard->dRot.X = -(PI * 2 - diff) / milliseconds;
 	diff = rot.Y - pcard->curRot.Y;
 	while (diff < 0) diff += PI * 2;
 	while (diff > PI * 2) diff -= PI * 2;
 	if (diff < PI)
-		pcard->dRot.Y = diff / frame;
+		pcard->dRot.Y = diff / milliseconds;
 	else
-		pcard->dRot.Y = -(PI * 2 - diff) / frame;
+		pcard->dRot.Y = -(PI * 2 - diff) / milliseconds;
 	diff = rot.Z - pcard->curRot.Z;
 	while (diff < 0) diff += PI * 2;
 	while (diff > PI * 2) diff -= PI * 2;
 	if (diff < PI)
-		pcard->dRot.Z = diff / frame;
+		pcard->dRot.Z = diff / milliseconds;
 	else
-		pcard->dRot.Z = -(PI * 2 - diff) / frame;
+		pcard->dRot.Z = -(PI * 2 - diff) / milliseconds;
 	pcard->is_moving = true;
-	pcard->aniFrame = frame;
+	pcard->aniFrame = milliseconds;
 }
 void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
-	pcard->dAlpha = (alpha - pcard->curAlpha) / frame;
+	float milliseconds = (float)frame * 1000.0f / 60.0f;
+	pcard->dAlpha = (alpha - pcard->curAlpha) / milliseconds;
 	pcard->is_fading = true;
-	pcard->aniFrame = frame;
+	pcard->aniFrame = milliseconds;
 }
 bool ClientField::ShowSelectSum() {
 	if(CheckSelectSum()) {

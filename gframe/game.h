@@ -17,6 +17,7 @@ namespace ygo {
 
 struct Config {
 	bool use_d3d;
+	int max_fps;
 	bool fullscreen;
 	unsigned short antialias;
 	std::wstring serverport;
@@ -81,13 +82,13 @@ struct DuelInfo {
 struct FadingUnit {
 	bool signalAction;
 	bool isFadein;
-	int fadingFrame;
+	float fadingFrame;
 	int autoFadeoutFrame;
 	irr::gui::IGUIElement* guiFading;
 	irr::core::recti fadingSize;
 	irr::core::vector2di fadingUL;
 	irr::core::vector2di fadingLR;
-	irr::core::vector2di fadingDiff;
+	irr::core::vector2di fadingDest;
 };
 
 struct Fieldmatrix {
@@ -187,26 +188,27 @@ public:
 	std::wstring chatMsg[8];
 	std::vector<std::string> BGMList;
 
+	uint32 delta_time;
 	int hideChatTimer;
 	bool hideChat;
-	int chatTiming[8];
+	float chatTiming[8];
 	int chatType[8];
 	unsigned short linePatternD3D;
 	unsigned short linePatternGL;
-	int waitFrame;
+	float waitFrame;
 	int signalFrame;
 	int saveReplay;
 	int showcard;
 	int showcardcode;
-	int showcarddif;
-	int showcardp;
-	int is_attacking;
-	int attack_sv;
+	float showcarddif;
+	float showcardp;
+	bool is_attacking;
+	float attack_sv;
 	irr::core::vector3df atk_r;
 	irr::core::vector3df atk_t;
 	float atkdy;
 	int lpframe;
-	int lpd;
+	float lpd;
 	int lpplayer;
 	int lpccolor;
 	std::wstring lpcstring;

@@ -6,6 +6,8 @@
 #include "IGUIFont.h"
 #include "IVideoDriver.h"
 #include "rect.h"
+#include "os.h"
+#include <algorithm>
 
 namespace irr
 {
@@ -20,7 +22,7 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 	Border(border), OverrideColorEnabled(false), OverrideBGColorEnabled(false), WordWrap(false), Background(background),
 	RestrainTextInside(true), RightToLeft(false),
 	OverrideColor(video::SColor(101,255,255,255)), BGColor(video::SColor(101,210,210,210)),
-	OverrideFont(0), LastBreakFont(0), scrText(0), scrolling(NO_SCROLLING), maxFrame(0), curFrame(0), animationStep(0)
+	OverrideFont(0), LastBreakFont(0), scrText(0), prev_time(0), scrolling(NO_SCROLLING), maxFrame(0), curFrame(0), animationStep(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CGUICustomText");
@@ -79,7 +81,9 @@ void CGUICustomText::draw()
 		skin->draw3DSunkenPane(this, 0, true, false, frameRect, &AbsoluteClippingRect);
 		frameRect.UpperLeftCorner.X += skin->getSize(EGDS_TEXT_DISTANCE_X);
 	}
-
+	auto now = os::Timer::getTime();
+	auto delta_time = now - prev_time;
+	prev_time = now;
 	// draw the text
 	if (Text.size())
 	{
@@ -89,9 +93,9 @@ void CGUICustomText::draw()
 		{
 			bool autoscrolling = scrolling != NO_SCROLLING && !!animationStep;
 			if(frameTimer)
-				frameTimer--;
+				frameTimer -= std::min((float)delta_time * 60.0f / 1000.0f, frameTimer);
 			else {
-				curFrame += (increasingFrame) ? 1 : -1;
+				curFrame += (increasingFrame) ? (float)delta_time * 60.0f / 1000.0f : -(float)delta_time * 60.0f / 1000.0f;
 				if(curFrame > maxFrame || curFrame < 0) {
 					if(scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM) {
 						waitingEndFrame = !waitingEndFrame;
@@ -106,10 +110,10 @@ void CGUICustomText::draw()
 					} else if(scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == RIGHT_TO_LEFT_BOUNCING || scrolling == TOP_TO_BOTTOM_BOUNCING || scrolling == BOTTOM_TO_TOP_BOUNCING) {
 						increasingFrame = !increasingFrame;
 						if(increasingFrame) {
-							curFrame++;
+							curFrame += (float)delta_time * 60.0f / 1000.0f;
 							frameTimer = animationWaitEnd;
 						} else {
-							curFrame--;
+							curFrame -= (float)delta_time * 60.0f / 1000.0f;
 							frameTimer = animationWaitStart;
 						}
 					}
@@ -604,7 +608,7 @@ void CGUICustomText::updateAutoScrollingStuff() {
 		return;
 	waitingEndFrame = false;
 	frameTimer = animationWaitStart;
-	increasingFrame = (scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM || scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM_BOUNCING);
+	increasingFrame = (scrolling == LEFT_TO_RIGHT || scrolling == TOP_TO_BOTTOM || scrolling == LEFT_TO_RIGHT_BOUNCING || scrolling == TOP_TO_BOTTOM_BOUNCING);
 	core::rect<s32> frameRect(AbsoluteRect);
 	if(Border) {
 		int size = Environment->getSkin()->getSize(EGDS_TEXT_DISTANCE_X);

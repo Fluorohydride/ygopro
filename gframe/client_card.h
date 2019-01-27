@@ -28,7 +28,7 @@ struct CardDataC {
 	unsigned int alias;
 	unsigned long long setcode;
 	unsigned int type;
-	unsigned int level;
+	int level;
 	unsigned int attribute;
 	unsigned int race;
 	int attack;
@@ -60,9 +60,9 @@ public:
 	irr::core::vector3df curRot;
 	irr::core::vector3df dPos;
 	irr::core::vector3df dRot;
-	u32 curAlpha;
-	u32 dAlpha;
-	u32 aniFrame;
+	f32 curAlpha;
+	f32 dAlpha;
+	s32 aniFrame;
 	bool is_moving;
 	bool is_fading;
 	bool is_hovered;

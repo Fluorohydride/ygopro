@@ -67,8 +67,8 @@ void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::vid
 	}
 }
 void Game::DrawBackGround() {
-	static int selFieldAlpha = 255;
-	static int selFieldDAlpha = -10;
+	static float selFieldAlpha = 255;
+	static float selFieldDAlpha = -10;
 //	matrix4 im = irr::core::IdentityMatrix;
 //	im.setTranslation(vector3df(0, 0, -0.01f));
 //	driver->setTransform(irr::video::ETS_WORLD, im);
@@ -222,7 +222,7 @@ void Game::DrawBackGround() {
 			vertex = matManager.vFieldRemove[dField.hovered_controler][field][speed];
 		else if (dField.hovered_location == LOCATION_EXTRA)
 			vertex = matManager.vFieldExtra[dField.hovered_controler][speed];
-		selFieldAlpha += selFieldDAlpha;
+		selFieldAlpha += selFieldDAlpha * (float)mainGame->delta_time * 60.0f / 1000.0f;
 		if (selFieldAlpha <= 5) {
 			selFieldAlpha = 5;
 			selFieldDAlpha = 10;
@@ -232,7 +232,7 @@ void Game::DrawBackGround() {
 			selFieldDAlpha = -10;
 		}
 		matManager.mSelField.AmbientColor = 0xffffffff;
-		matManager.mSelField.DiffuseColor = selFieldAlpha << 24;
+		matManager.mSelField.DiffuseColor = (int)std::round(selFieldAlpha) << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
 	}
@@ -374,23 +374,25 @@ void Game::DrawCards() {
 		DrawCard(pcard);
 }
 void Game::DrawCard(ClientCard* pcard) {
-	if(pcard->aniFrame) {
+	if(pcard->aniFrame > 0) {
+		uint32 movetime = std::min((s32)mainGame->delta_time, pcard->aniFrame);
 		if(pcard->is_moving) {
-			pcard->curPos += pcard->dPos;
-			pcard->curRot += pcard->dRot;
+			pcard->curPos += (pcard->dPos * movetime);
+			pcard->curRot += (pcard->dRot * movetime);
 			pcard->mTransform.setTranslation(pcard->curPos);
 			pcard->mTransform.setRotationRadians(pcard->curRot);
 		}
 		if(pcard->is_fading)
-			pcard->curAlpha += pcard->dAlpha;
-		pcard->aniFrame--;
-		if(pcard->aniFrame == 0) {
+			pcard->curAlpha += pcard->dAlpha * movetime;
+		pcard->aniFrame -= movetime;
+		if(pcard->aniFrame <= 0) {
+			pcard->aniFrame = 0;
 			pcard->is_moving = false;
 			pcard->is_fading = false;
 		}
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
-	matManager.mCard.DiffuseColor = (pcard->curAlpha << 24) | 0xffffff;
+	matManager.mCard.DiffuseColor = ((int)std::round(pcard->curAlpha) << 24) | 0xffffff;
 	driver->setTransform(irr::video::ETS_WORLD, pcard->mTransform);
 	auto m22 = pcard->mTransform(2, 2);
 	if(m22 > -0.99 || pcard->is_moving) {
@@ -454,7 +456,7 @@ void Game::DrawMisc() {
 	int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 	int speed = (dInfo.extraval & 0x1) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
-	act_rot.Z += 0.02f;
+	act_rot.Z += (1.2f / 1000.0f) * mainGame->delta_time;
 	im.setRotationRadians(act_rot);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
@@ -542,10 +544,11 @@ void Game::DrawMisc() {
 		driver->draw2DImage(imageManager.tLPBar, Resize(696, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
 	else driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * dInfo.lp[1] / dInfo.startlp, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
 	if(lpframe) {
-		dInfo.lp[lpplayer] -= lpd;
+		int32 movetime = std::min(lpframe, (int32)delta_time);
+		dInfo.lp[lpplayer] -= std::round(lpd * movetime);
 		dInfo.strLP[lpplayer] = fmt::to_wstring(dInfo.lp[lpplayer]);
 		lpccolor -= 0x19000000;
-		lpframe--;
+		lpframe -= movetime;
 	}
 	if(lpcstring.size()) {
 		if(lpplayer == 0) {
@@ -706,20 +709,22 @@ void Game::DrawGUI() {
 	}
 	imageManager.RefreshCachedTextures();
 	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
-		auto fthis = fit++;
+		auto fthis = fit;
 		FadingUnit& fu = *fthis;
-		if(fu.fadingFrame) {
+		if(fu.fadingFrame != 0.0f) {
+			fit++;
+			float movetime = std::min(fu.fadingFrame, (float)mainGame->delta_time);
 			fu.guiFading->setVisible(true);
 			if(fu.isFadein) {
-				if(fu.fadingFrame > 5) {
-					fu.fadingUL.X -= fu.fadingDiff.X;
-					fu.fadingLR.X += fu.fadingDiff.X;
-					fu.fadingFrame--;
+				if(fu.fadingFrame > (int)(5.0f * 1000.0f / 60.0f)) {
+					fu.fadingUL.X -= fu.fadingDest.X * movetime;
+					fu.fadingLR.X += fu.fadingDest.X * movetime;
+					fu.fadingFrame -= movetime;
 					fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				} else {
-					fu.fadingUL.Y -= fu.fadingDiff.Y;
-					fu.fadingLR.Y += fu.fadingDiff.Y;
-					fu.fadingFrame--;
+					fu.fadingUL.Y -= fu.fadingDest.Y * movetime;
+					fu.fadingLR.Y += fu.fadingDest.Y * movetime;
+					fu.fadingFrame -= movetime;
 					if(!fu.fadingFrame) {
 						fu.guiFading->setRelativePosition(fu.fadingSize);
 						if(fu.guiFading == wPosSelect) {
@@ -741,15 +746,17 @@ void Game::DrawGUI() {
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				}
 			} else {
-				if(fu.fadingFrame > 5) {
-					fu.fadingUL.Y += fu.fadingDiff.Y;
-					fu.fadingLR.Y -= fu.fadingDiff.Y;
-					fu.fadingFrame--;
+				if(fu.fadingFrame > (5.0f * 1000.0f / 60.0f)) {
+					fu.fadingUL.Y += fu.fadingDest.Y * movetime;
+					fu.fadingLR.Y -= fu.fadingDest.Y * movetime;
+					fu.fadingFrame -= movetime;
+					if(!fu.fadingFrame)
+						fu.fadingFrame += 0.0001f;
 					fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				} else {
-					fu.fadingUL.X += fu.fadingDiff.X;
-					fu.fadingLR.X -= fu.fadingDiff.X;
-					fu.fadingFrame--;
+					fu.fadingUL.X += fu.fadingDest.X * movetime;
+					fu.fadingLR.X -= fu.fadingDest.X * movetime;
+					fu.fadingFrame -= movetime;
 					if(!fu.fadingFrame) {
 						fu.guiFading->setVisible(false);
 						fu.guiFading->setRelativePosition(fu.fadingSize);
@@ -776,11 +783,13 @@ void Game::DrawGUI() {
 				}
 			}
 		} else if(fu.autoFadeoutFrame) {
-			fu.autoFadeoutFrame--;
+			fit++;
+			uint32 movetime = std::min((int32)mainGame->delta_time, fu.autoFadeoutFrame);
+			fu.autoFadeoutFrame -= movetime;
 			if(!fu.autoFadeoutFrame)
 				HideElement(fu.guiFading);
 		} else
-			fadingList.erase(fthis);
+			fit = fadingList.erase(fthis);
 	}
 	env->drawAll();
 }
@@ -791,8 +800,8 @@ void Game::DrawSpec() {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tMask, ResizeElem(574, 150, 574 + (showcarddif > CARD_IMG_WIDTH ? CARD_IMG_WIDTH : showcarddif), 404),
 			                    recti(CARD_IMG_HEIGHT - showcarddif, 0, CARD_IMG_HEIGHT - (showcarddif > CARD_IMG_WIDTH ? showcarddif - CARD_IMG_WIDTH : 0), CARD_IMG_HEIGHT), 0, 0, true);
-			showcarddif += 15;
-			if(showcarddif >= CARD_IMG_HEIGHT) {
+			showcarddif += (900.0f / 1000.0f) * (float)mainGame->delta_time;
+			if(std::round(showcarddif) >= CARD_IMG_HEIGHT) {
 				showcard = 2;
 				showcarddif = 0;
 			}
@@ -801,7 +810,7 @@ void Game::DrawSpec() {
 		case 2: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tMask, ResizeElem(574 + showcarddif, 150, 751, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
-			showcarddif += 15;
+			showcarddif += (900.0f / 1000.0f) * (float)mainGame->delta_time;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;
 			}
@@ -811,37 +820,40 @@ void Game::DrawSpec() {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tNegated, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), recti(0, 0, 128, 128), 0, 0, true);
 			if(showcarddif < 64)
-				showcarddif += 4;
+				showcarddif += (240.0f / 1000.0f) * (float)mainGame->delta_time;
 			break;
 		}
 		case 4: {
-			matManager.c2d[0] = (showcarddif << 24) | 0xffffff;
-			matManager.c2d[1] = (showcarddif << 24) | 0xffffff;
-			matManager.c2d[2] = (showcarddif << 24) | 0xffffff;
-			matManager.c2d[3] = (showcarddif << 24) | 0xffffff;
+			matManager.c2d[0] = ((int)std::round(showcarddif) << 24) | 0xffffff;
+			matManager.c2d[1] = ((int)std::round(showcarddif) << 24) | 0xffffff;
+			matManager.c2d[2] = ((int)std::round(showcarddif) << 24) | 0xffffff;
+			matManager.c2d[3] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), ResizeElem(574, 154, 751, 404),
 			                    recti(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 255)
-				showcarddif += 17;
+				showcarddif += (1020.0f / 1000.0f) * (float)mainGame->delta_time;
 			break;
 		}
 		case 5: {
-			matManager.c2d[0] = (showcarddif << 25) | 0xffffff;
-			matManager.c2d[1] = (showcarddif << 25) | 0xffffff;
-			matManager.c2d[2] = (showcarddif << 25) | 0xffffff;
-			matManager.c2d[3] = (showcarddif << 25) | 0xffffff;
+			matManager.c2d[0] = ((int)std::round(showcarddif) << 25) | 0xffffff;
+			matManager.c2d[1] = ((int)std::round(showcarddif) << 25) | 0xffffff;
+			matManager.c2d[2] = ((int)std::round(showcarddif) << 25) | 0xffffff;
+			matManager.c2d[3] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), ResizeElem(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif),
 			                    recti(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
-			if(showcarddif < 127)
-				showcarddif += 9;
+			if(showcarddif < 127) {
+				showcarddif += (540.0f / 1000.0f) * (float)mainGame->delta_time;
+				if(showcarddif > 127.0f)
+					showcarddif = 127;
+			}
 			break;
 		}
 		case 6: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tNumber, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
-			                    recti((showcardp % 5) * 64, (showcardp / 5) * 64, (showcardp % 5 + 1) * 64, (showcardp / 5 + 1) * 64), 0, 0, true);
+			                    recti(((int)std::round(showcardp) % 5) * 64, ((int)std::round(showcardp) / 5) * 64, ((int)std::round(showcardp) % 5 + 1) * 64, ((int)std::round(showcardp) / 5 + 1) * 64), 0, 0, true);
 			if(showcarddif < 64)
-				showcarddif += 4;
+				showcarddif += (240.0f / 1000.0f) * (float)mainGame->delta_time;
 			break;
 		}
 		case 7: {
@@ -852,8 +864,8 @@ void Game::DrawSpec() {
 			corner[2] = core::position2d<s32>(574 * window_size.Width / 1024, 404 * window_size.Height / 640);
 			corner[3] = core::position2d<s32>(751 * window_size.Width / 1024, 404 * window_size.Height / 640);
 			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode), rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
-			showcardp++;
-			showcarddif += 9;
+			showcardp += (float)delta_time * 60.0f / 1000.0f;
+			showcarddif += (540.0f / 1000.0f) * (float)mainGame->delta_time;
 			if(showcarddif >= 90)
 				showcarddif = 90;
 			if(showcardp == 60) {
@@ -867,9 +879,9 @@ void Game::DrawSpec() {
 				driver->draw2DImage(imageManager.tHand[(showcardcode >> 16) & 0x3], Resize(615, showcarddif));
 				driver->draw2DImage(imageManager.tHand[showcardcode & 0x3], Resize(615, 540 - showcarddif));
 				float dy = -0.333333f * showcardp + 10;
-				showcardp++;
+				showcardp += (float)delta_time * 60.0f / 1000.0f;
 				if(showcardp < 30)
-					showcarddif += (int)dy;
+					showcarddif += (dy * 60.f / 1000.0f) * (float)mainGame->delta_time;
 			} else
 				showcard = 0;
 			break;
@@ -922,9 +934,9 @@ void Game::DrawSpec() {
 			}
 			auto pos = lpcFont->getDimension(lstr);
 			if(showcardp < 10) {
-				int alpha = (showcardp * 25) << 24;
-				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 - (9 - showcardp) * 40, 291, 950, 370), alpha);
-				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 - (9 - showcardp) * 40, 290, 950, 370), alpha | 0xffffff);
+				int alpha = ((int)std::round(showcardp) * 25) << 24;
+				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 - (9 - std::round(showcardp)) * 40, 291, 950, 370), alpha);
+				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 - (9 - std::round(showcardp)) * 40, 290, 950, 370), alpha | 0xffffff);
 			} else if(showcardp < showcarddif) {
 				recti loc = ResizeElem(650 - pos.Width / 2, 290, 950, 370);
 				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2, 291, 950, 370), 0xff000000);
@@ -940,11 +952,11 @@ void Game::DrawSpec() {
 					guiFont->draw(dInfo.vic_string.c_str(), vicloc, 0xffffffff, true, true);
 				}
 			} else if(showcardp < showcarddif + 10) {
-				int alpha = ((showcarddif + 10 - showcardp) * 25) << 24;
-				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 + (showcardp - showcarddif) * 40, 291, 950, 370), alpha);
-				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 + (showcardp - showcarddif) * 40, 290, 950, 370), alpha | 0xffffff);
+				int alpha = (int)std::round((((showcarddif + 10.0f - showcardp) * 25.0f) / 1000.0f) * (float)mainGame->delta_time) << 24;
+				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 291, 950, 370), alpha);
+				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 290, 950, 370), alpha | 0xffffff);
 			}
-			showcardp++;
+			showcardp += (float)delta_time * 60.0f / 1000.0f;
 			break;
 		}
 		}
@@ -955,10 +967,10 @@ void Game::DrawSpec() {
 		matk.setRotationRadians(atk_r);
 		driver->setTransform(irr::video::ETS_WORLD, matk);
 		driver->setMaterial(matManager.mATK);
-		driver->drawVertexPrimitiveList(&matManager.vArrow[attack_sv], 12, matManager.iArrow, 10, EVT_STANDARD, EPT_TRIANGLE_STRIP);
-		attack_sv += 4;
+		driver->drawVertexPrimitiveList(&matManager.vArrow[(int)std::round(attack_sv)], 12, matManager.iArrow, 10, EVT_STANDARD, EPT_TRIANGLE_STRIP);
+		attack_sv += (240 / 1000.0f) * mainGame->delta_time;
 		if (attack_sv > 28)
-			attack_sv = 0;
+			attack_sv = 0.0f;
 	}
 	bool showChat = true;
 	if(hideChat) {
@@ -971,8 +983,8 @@ void Game::DrawSpec() {
 	for(int i = 0; i < 8; ++i) {
 		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
 		                                   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
-		if(chatTiming[i]) {
-			chatTiming[i]--;
+		if(chatTiming[i] > 0.0f) {
+			chatTiming[i] -= (float)delta_time * 60.0f / 1000.0f;
 			if(mainGame->dInfo.isStarted && i >= 5)
 				continue;
 			if(!showChat && i > 2)
@@ -1003,16 +1015,16 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 		if(win == fit->guiFading && win != wOptions) // the size of wOptions is always setted by ClientField::ShowSelectOption before showing it
 			fu.fadingSize = fit->fadingSize;
 	irr::core::position2di center = fu.fadingSize.getCenter();
-	fu.fadingDiff.X = fu.fadingSize.getWidth() / 10;
-	fu.fadingDiff.Y = (fu.fadingSize.getHeight() - 4) / 10;
+	fu.fadingFrame = 10.0f * 1000.0f / 60.0f;
+	fu.fadingDest.X = fu.fadingSize.getWidth() / fu.fadingFrame;
+	fu.fadingDest.Y = (fu.fadingSize.getHeight() - 4) / fu.fadingFrame;
 	fu.fadingUL = center;
 	fu.fadingLR = center;
 	fu.fadingUL.Y -= 2;
 	fu.fadingLR.Y += 2;
 	fu.guiFading = win;
 	fu.isFadein = true;
-	fu.fadingFrame = 10;
-	fu.autoFadeoutFrame = autoframe;
+	fu.autoFadeoutFrame = autoframe * 1000 / 60;
 	fu.signalAction = 0;
 	if(win == wPosSelect) {
 		btnPSAU->setDrawImage(false);
@@ -1037,13 +1049,13 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
 		if(win == fit->guiFading)
 			fu.fadingSize = fit->fadingSize;
-	fu.fadingDiff.X = fu.fadingSize.getWidth() / 10;
-	fu.fadingDiff.Y = (fu.fadingSize.getHeight() - 4) / 10;
+	fu.fadingFrame = 10.0f * 1000.0f / 60.0f;
+	fu.fadingDest.X = fu.fadingSize.getWidth() / fu.fadingFrame;
+	fu.fadingDest.Y = (fu.fadingSize.getHeight() - 4) / fu.fadingFrame;
 	fu.fadingUL = fu.fadingSize.UpperLeftCorner;
 	fu.fadingLR = fu.fadingSize.LowerRightCorner;
 	fu.guiFading = win;
 	fu.isFadein = false;
-	fu.fadingFrame = 10;
 	fu.autoFadeoutFrame = 0;
 	fu.signalAction = set_action;
 	if(win == wPosSelect) {
@@ -1074,7 +1086,7 @@ void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 }
 void Game::WaitFrameSignal(int frame) {
 	frameSignal.Reset();
-	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 : frame;
+	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 * 1000 / 60 : frame * 1000 / 60;
 	frameSignal.Wait();
 }
 void Game::DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag, recti* cliprect, bool load_image) {
