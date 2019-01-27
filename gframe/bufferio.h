@@ -167,10 +167,10 @@ public:
 				res += ((char)(((unicode >> 6) & 0x3f) | 0x80));
 				res += ((char)(((unicode) & 0x3f) | 0x80));
 #else
-				res += ((char*)(((c >> 18) & 0x7) | 0xf0));
-				res += ((char*)(((c >> 12) & 0x3f) | 0x80));
-				res += ((char*)(((c >> 6) & 0x3f) | 0x80));
-				res += ((char*)(((c) & 0x3f) | 0x80));
+				res += ((char)(((c >> 18) & 0x7) | 0xf0));
+				res += ((char)(((c >> 12) & 0x3f) | 0x80));
+				res += ((char)(((c >> 6) & 0x3f) | 0x80));
+				res += ((char)(((c) & 0x3f) | 0x80));
 #endif
 			}
 		}
