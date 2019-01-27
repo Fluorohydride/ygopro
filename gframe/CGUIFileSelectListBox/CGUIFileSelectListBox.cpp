@@ -700,10 +700,10 @@ io::IFileList* CGUIFileSelectListBox::CreateFilelist(const std::wstring & path) 
 #else
 	DIR * dir;
 	struct dirent * dirp = nullptr;
-	if((dir = opendir(".")) != nullptr) {
+	if((dir = opendir(BufferIO::EncodeUTF8s(path).c_str())) != nullptr) {
 		struct stat fileStat;
 		while((dirp = readdir(dir)) != nullptr) {
-			stat(dirp->d_name, &fileStat);
+			stat((BufferIO::EncodeUTF8s(path + L"/") + dirp->d_name).c_str(), &fileStat);
 			res->addItem(dirp->d_name, 0, fileStat.st_size, S_ISDIR(fileStat.st_mode), 0);
 		}
 		closedir(dir);
