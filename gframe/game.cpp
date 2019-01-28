@@ -65,7 +65,6 @@ bool Game::Initialize() {
 		}
 	}
 	linePatternD3D = 0;
-	linePatternGL = 0x0f0f;
 	waitFrame = 0.0f;
 	signalFrame = 0;
 	showcard = 0;
@@ -775,7 +774,6 @@ void Game::MainLoop() {
 	float atkframe = 0.1f;
 	irr::ITimer* timer = device->getTimer();
 	uint32 cur_time = 0;
-	uint32 prev_time = timer->getTime();
 	uint32 prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
 	int fps = 0;
@@ -794,7 +792,6 @@ void Game::MainLoop() {
 		frame_counter += (float)delta_time * 60.0f/1000.0f;
 		for(; frame_counter>=1; frame_counter--) {
 			linePatternD3D = (linePatternD3D + 1) % 30;
-			linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		}
 		atkframe += 0.1f * (float)delta_time * 60.0f / 1000.0f;
 		atkdy = (float)sin(atkframe);
