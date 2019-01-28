@@ -720,6 +720,8 @@ void Game::DrawGUI() {
 					fu.fadingUL.X -= fu.fadingDest.X * movetime;
 					fu.fadingLR.X += fu.fadingDest.X * movetime;
 					fu.fadingFrame -= movetime;
+					if(!fu.fadingFrame)
+						fu.fadingFrame += 0.0001f;
 					fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				} else {
 					fu.fadingUL.Y -= fu.fadingDest.Y * movetime;

@@ -776,10 +776,12 @@ void Game::MainLoop() {
 	irr::ITimer* timer = device->getTimer();
 	uint32 cur_time = 0;
 	uint32 prev_time = timer->getTime();
+	uint32 prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
+	int fps = 0;
 	while(device->run()) {
-		timer->tick();
-		auto now = timer->getTime();
+		fps++;
+		auto now = timer->getRealTime();
 		delta_time = now - prev_time;
 		prev_time = now;
 		cur_time += delta_time;
@@ -849,12 +851,14 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(0))
+		if(!closeSignal.try_lock())
 			CloseDuelWindow();
-		device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", driver->getFPS()).c_str());
+		else
+			closeSignal.unlock();
 		while(cur_time >= 1000) {
+			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
+			fps = 0;
 			cur_time -= 1000;
-			timer->setTime(0);
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
@@ -864,8 +868,7 @@ void Game::MainLoop() {
 			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, false);
 		}
 		if(gameConf.max_fps) {
-			timer->tick();
-			int ndelta_time = timer->getTime() - prev_time;
+			int ndelta_time = timer->getRealTime() - prev_time;
 			int sleep_time = (1000 / gameConf.max_fps) - ndelta_time;
 			if(sleep_time > 0) {
 				device->sleep(sleep_time);

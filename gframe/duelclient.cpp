@@ -187,8 +187,9 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->stTip->setVisible(false);
 					mainGame->gMutex.unlock();
 					mainGame->closeDoneSignal.Reset();
-					mainGame->closeSignal.Set();
+					mainGame->closeSignal.lock();
 					mainGame->closeDoneSignal.Wait();
+					mainGame->closeSignal.unlock();
 					mainGame->gMutex.lock();
 					mainGame->dInfo.isStarted = false;
 					mainGame->is_building = false;
@@ -800,7 +801,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
 		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.Set();
+		mainGame->closeSignal.lock();
+		mainGame->closeDoneSignal.Wait();
+		mainGame->closeSignal.unlock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
@@ -1028,7 +1031,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
 		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.Set();
+		mainGame->closeSignal.lock();
+		mainGame->closeDoneSignal.Wait();
+		mainGame->closeSignal.unlock();
 		mainGame->closeDoneSignal.Wait();
 		ReplayPrompt(true);
 		mainGame->gMutex.lock();

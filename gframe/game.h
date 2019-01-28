@@ -175,7 +175,7 @@ public:
 	Signal actionSignal;
 	Signal replaySignal;
 	Signal singleSignal;
-	Signal closeSignal;
+	std::mutex closeSignal;
 	Signal closeDoneSignal;
 	Config gameConf;
 	DuelInfo dInfo;
@@ -586,6 +586,10 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_REPLAY		132
 #define BUTTON_DELETE_REPLAY		133
 #define BUTTON_RENAME_REPLAY		134
+#ifdef BUILD_WITH_AI
+#define BUTTON_AI_START				135
+#define BUTTON_AI_CANCEL			136
+#endif //BUILD_WITH_AI
 #define EDITBOX_CHAT				140
 #define EDITBOX_PORT_BOX			141
 #define BUTTON_MSG_OK				200

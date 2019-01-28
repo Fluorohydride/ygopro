@@ -157,7 +157,9 @@ int SingleMode::SinglePlayThread() {
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->gMutex.unlock();
 		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.Set();
+		mainGame->closeSignal.lock();
+		mainGame->closeDoneSignal.Wait();
+		mainGame->closeSignal.unlock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wSinglePlay);
