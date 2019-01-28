@@ -160,7 +160,6 @@ int SingleMode::SinglePlayThread() {
 		mainGame->closeSignal.lock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
-		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wSinglePlay);
 		mainGame->stTip->setVisible(false);

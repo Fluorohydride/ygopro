@@ -146,7 +146,6 @@ void ReplayMode::EndDuel() {
 		mainGame->closeSignal.lock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
-		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wReplay);
 		mainGame->stTip->setVisible(false);

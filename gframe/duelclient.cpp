@@ -804,7 +804,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeSignal.lock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
-		mainGame->closeDoneSignal.Wait();
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->is_building = false;
@@ -1034,7 +1033,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->closeSignal.lock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
-		mainGame->closeDoneSignal.Wait();
 		ReplayPrompt(true);
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
