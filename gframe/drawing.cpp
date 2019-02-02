@@ -203,7 +203,7 @@ void Game::DrawBackGround() {
 			vertex = matManager.vFieldRemove[dField.hovered_controler][field][speed];
 		else if (dField.hovered_location == LOCATION_EXTRA)
 			vertex = matManager.vFieldExtra[dField.hovered_controler][speed];
-		selFieldAlpha += selFieldDAlpha * (float)mainGame->delta_time * 60.0f / 1000.0f;
+		selFieldAlpha += selFieldDAlpha * (float)delta_time * 60.0f / 1000.0f;
 		if (selFieldAlpha <= 5) {
 			selFieldAlpha = 5;
 			selFieldDAlpha = 10;
@@ -356,7 +356,7 @@ void Game::DrawCards() {
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame > 0) {
-		uint32 movetime = std::min((s32)mainGame->delta_time, pcard->aniFrame);
+		uint32 movetime = std::min((s32)delta_time, pcard->aniFrame);
 		if(pcard->is_moving) {
 			pcard->curPos += (pcard->dPos * movetime);
 			pcard->curRot += (pcard->dRot * movetime);
@@ -437,7 +437,7 @@ void Game::DrawMisc() {
 	int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 	int speed = (dInfo.extraval & 0x1) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
-	act_rot.Z += (1.2f / 1000.0f) * mainGame->delta_time;
+	act_rot.Z += (1.2f / 1000.0f) * delta_time;
 	im.setRotationRadians(act_rot);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
@@ -694,7 +694,7 @@ void Game::DrawGUI() {
 		FadingUnit& fu = *fthis;
 		if(fu.fadingFrame != 0.0f) {
 			fit++;
-			float movetime = std::min(fu.fadingFrame, (float)mainGame->delta_time);
+			float movetime = std::min(fu.fadingFrame, (float)delta_time);
 			fu.guiFading->setVisible(true);
 			if(fu.isFadein) {
 				if(fu.fadingFrame > (int)(5.0f * 1000.0f / 60.0f)) {
@@ -767,7 +767,7 @@ void Game::DrawGUI() {
 			}
 		} else if(fu.autoFadeoutFrame) {
 			fit++;
-			uint32 movetime = std::min((int32)mainGame->delta_time, fu.autoFadeoutFrame);
+			uint32 movetime = std::min((int32)delta_time, fu.autoFadeoutFrame);
 			fu.autoFadeoutFrame -= movetime;
 			if(!fu.autoFadeoutFrame)
 				HideElement(fu.guiFading);
@@ -783,7 +783,7 @@ void Game::DrawSpec() {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tMask, ResizeElem(574, 150, 574 + (showcarddif > CARD_IMG_WIDTH ? CARD_IMG_WIDTH : showcarddif), 404),
 			                    recti(CARD_IMG_HEIGHT - showcarddif, 0, CARD_IMG_HEIGHT - (showcarddif > CARD_IMG_WIDTH ? showcarddif - CARD_IMG_WIDTH : 0), CARD_IMG_HEIGHT), 0, 0, true);
-			showcarddif += (900.0f / 1000.0f) * (float)mainGame->delta_time;
+			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(std::round(showcarddif) >= CARD_IMG_HEIGHT) {
 				showcard = 2;
 				showcarddif = 0;
@@ -793,7 +793,7 @@ void Game::DrawSpec() {
 		case 2: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tMask, ResizeElem(574 + showcarddif, 150, 751, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
-			showcarddif += (900.0f / 1000.0f) * (float)mainGame->delta_time;
+			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;
 			}
@@ -803,7 +803,7 @@ void Game::DrawSpec() {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tNegated, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), recti(0, 0, 128, 128), 0, 0, true);
 			if(showcarddif < 64)
-				showcarddif += (240.0f / 1000.0f) * (float)mainGame->delta_time;
+				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
 		}
 		case 4: {
@@ -814,7 +814,7 @@ void Game::DrawSpec() {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), ResizeElem(574, 154, 751, 404),
 			                    recti(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 255)
-				showcarddif += (1020.0f / 1000.0f) * (float)mainGame->delta_time;
+				showcarddif += (1020.0f / 1000.0f) * (float)delta_time;
 			break;
 		}
 		case 5: {
@@ -825,7 +825,7 @@ void Game::DrawSpec() {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), ResizeElem(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif),
 			                    recti(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 127) {
-				showcarddif += (540.0f / 1000.0f) * (float)mainGame->delta_time;
+				showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 				if(showcarddif > 127.0f)
 					showcarddif = 127;
 			}
@@ -836,7 +836,7 @@ void Game::DrawSpec() {
 			driver->draw2DImage(imageManager.tNumber, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
 			                    recti(((int)std::round(showcardp) % 5) * 64, ((int)std::round(showcardp) / 5) * 64, ((int)std::round(showcardp) % 5 + 1) * 64, ((int)std::round(showcardp) / 5 + 1) * 64), 0, 0, true);
 			if(showcarddif < 64)
-				showcarddif += (240.0f / 1000.0f) * (float)mainGame->delta_time;
+				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
 		}
 		case 7: {
@@ -848,7 +848,7 @@ void Game::DrawSpec() {
 			corner[3] = core::position2d<s32>(751 * window_size.Width / 1024, 404 * window_size.Height / 640);
 			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode), rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
 			showcardp += (float)delta_time * 60.0f / 1000.0f;
-			showcarddif += (540.0f / 1000.0f) * (float)mainGame->delta_time;
+			showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= 90)
 				showcarddif = 90;
 			if(showcardp == 60) {
@@ -864,7 +864,7 @@ void Game::DrawSpec() {
 				float dy = -0.333333f * showcardp + 10;
 				showcardp += (float)delta_time * 60.0f / 1000.0f;
 				if(showcardp < 30)
-					showcarddif += (dy * 60.f / 1000.0f) * (float)mainGame->delta_time;
+					showcarddif += (dy * 60.f / 1000.0f) * (float)delta_time;
 			} else
 				showcard = 0;
 			break;
@@ -935,7 +935,7 @@ void Game::DrawSpec() {
 					guiFont->draw(dInfo.vic_string.c_str(), vicloc, 0xffffffff, true, true);
 				}
 			} else if(showcardp < showcarddif + 10) {
-				int alpha = (int)std::round((((showcarddif + 10.0f - showcardp) * 25.0f) / 1000.0f) * (float)mainGame->delta_time) << 24;
+				int alpha = (int)std::round((((showcarddif + 10.0f - showcardp) * 25.0f) / 1000.0f) * (float)delta_time) << 24;
 				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 291, 950, 370), alpha);
 				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 290, 950, 370), alpha | 0xffffff);
 			}
@@ -951,7 +951,7 @@ void Game::DrawSpec() {
 		driver->setTransform(irr::video::ETS_WORLD, matk);
 		driver->setMaterial(matManager.mATK);
 		driver->drawVertexPrimitiveList(&matManager.vArrow[(int)std::round(attack_sv)], 12, matManager.iArrow, 10, EVT_STANDARD, EPT_TRIANGLE_STRIP);
-		attack_sv += (240 / 1000.0f) * mainGame->delta_time;
+		attack_sv += (240 / 1000.0f) * delta_time;
 		if (attack_sv > 28)
 			attack_sv = 0.0f;
 	}
@@ -968,7 +968,7 @@ void Game::DrawSpec() {
 		                                   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
 		if(chatTiming[i] > 0.0f) {
 			chatTiming[i] -= (float)delta_time * 60.0f / 1000.0f;
-			if(mainGame->dInfo.isStarted && i >= 5)
+			if(dInfo.isStarted && i >= 5)
 				continue;
 			if(!showChat && i > 2)
 				continue;
@@ -1088,7 +1088,7 @@ void Game::DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag
 		limitloc = recti(pos.X, pos.Y, pos.X + 20 * window_size.Width / 1024, pos.Y + 20 * window_size.Height / 640);
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
-	if(!mainGame->is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {
+	if(!is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {
 		switch(lflist->content[lcode]) {
 		case 0:
 			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
@@ -1109,7 +1109,7 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(314, 136, 409, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(315, 137, 410, 157), 0xffffffff, false, true);
-	if(mainGame->is_siding) {
+	if(is_siding) {
 		buffer = fmt::format(L"{} ({})", deckManager.current_deck.main.size(),  deckManager.pre_deck.main.size());
 	} else {
 		buffer = fmt::to_wstring(deckManager.current_deck.main.size());
@@ -1146,7 +1146,7 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 439, 797, 460));
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(314, 439, 409, 459), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(315, 440, 410, 460), 0xffffffff, false, true);
-	if(mainGame->is_siding) {
+	if(is_siding) {
 		buffer = fmt::format(L"{} ({})", deckManager.current_deck.extra.size(), deckManager.pre_deck.extra.size());
 	} else {
 		buffer = fmt::to_wstring(deckManager.current_deck.extra.size());
@@ -1178,7 +1178,7 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 536, 797, 557));
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(314, 536, 409, 556), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(315, 537, 410, 557), 0xffffffff, false, true);
-	if(mainGame->is_siding) {
+	if(is_siding) {
 		buffer = fmt::format(L"{} ({})", deckManager.current_deck.side.size(), deckManager.pre_deck.side.size());
 	} else {
 		buffer = fmt::to_wstring(deckManager.current_deck.side.size());

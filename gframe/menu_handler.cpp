@@ -676,27 +676,28 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch (id) {
 			case COMBOBOX_DUEL_RULE: {
-				switch (mainGame->cbDuelRule->getSelected()) {
+				auto& combobox = mainGame->cbDuelRule;
+				switch (combobox->getSelected()) {
 				case 0:{
-					mainGame->cbDuelRule->removeItem(4);
+					combobox->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_1;
 					mainGame->forbiddentypes = MASTER_RULE_1_FORB;
 					break;
 				}
 				case 1: {
-					mainGame->cbDuelRule->removeItem(4);
+					combobox->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_2;
 					mainGame->forbiddentypes = MASTER_RULE_2_FORB;
 					break;
 				}
 				case 2: {
-					mainGame->cbDuelRule->removeItem(4);
+					combobox->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_3;
 					mainGame->forbiddentypes = MASTER_RULE_3_FORB;
 					break;
 				}
 				case 3: {
-					mainGame->cbDuelRule->removeItem(4);
+					combobox->removeItem(4);
 					mainGame->duel_param = MASTER_RULE_4;
 					mainGame->forbiddentypes = MASTER_RULE_4_FORB;
 					break;

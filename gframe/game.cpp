@@ -196,7 +196,7 @@ bool Game::Initialize() {
 	btnRulesOK = env->addButton(rect<s32>(135, 175, 235, 200), wRules, BUTTON_RULE_OK, dataManager.GetSysString(1211).c_str());
 	for(int i = 0; i < 13; ++i)
 		chkRules[i] = env->addCheckBox(false, recti(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, CHECKBOX_EXTRA_RULE, dataManager.GetSysString(1132 + i).c_str());
-	mainGame->extra_rules = 0;
+	extra_rules = 0;
 	env->addStaticText(dataManager.GetSysString(1236).c_str(), rect<s32>(20, 180, 220, 200), false, false, wCreateHost);
 	cbDuelRule = env->addComboBox(rect<s32>(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
 	cbDuelRule->addItem(dataManager.GetSysString(1260).c_str());
@@ -424,7 +424,7 @@ bool Game::Initialize() {
 	scrOption = env->addScrollBar(false, rect<s32>(350, 30, 365, 220), wOptions, SCROLL_OPTION_SELECT);
 	scrOption->setLargeStep(1);
 	scrOption->setSmallStep(1);
-	mainGame->scrOption->setMin(0);
+	scrOption->setMin(0);
 	//pos select
 	wPosSelect = env->addWindow(rect<s32>(340, 200, 935, 410), false, dataManager.GetSysString(561).c_str());
 	wPosSelect->getCloseButton()->setVisible(false);
@@ -737,7 +737,7 @@ bool Game::Initialize() {
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
 		stMessage->setText(L"Couldn't load the duel api, you'll be limited to replay watching and online mode");
-		PopupElement(mainGame->wMessage);
+		PopupElement(wMessage);
 	}
 #endif
 	for (u32 i = 0; i < EGDC_COUNT; ++i) {
@@ -762,7 +762,6 @@ bool Game::Initialize() {
 	return true;
 }
 void Game::MainLoop() {
-	wchar_t cap[256];
 	camera = smgr->addCameraSceneNode(0);
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.90f, 0.45f, -0.42f, 0.42f, 1.0f, 100.0f);
@@ -901,13 +900,13 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
 void Game::LoadExpansionDB() {
-	auto files = Utils::FindfolderFiles(L"./expansions/", std::vector<std::wstring>{L"cdb"}, 2);
+	auto files = Utils::FindfolderFiles(L"./expansions/", {L"cdb"}, 2);
 	for (auto& file : files)
 		dataManager.LoadDB(BufferIO::EncodeUTF8s(L"./expansions/" + file).c_str());
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	auto files = Utils::FindfolderFiles(L"./deck/", std::vector<std::wstring>{L"ydk"});
+	auto files = Utils::FindfolderFiles(L"./deck/", {L"ydk"});
 	for(auto& file : files) {
 		cbDeck->addItem(file.substr(0, file.size() - 4).c_str());
 	}
@@ -925,7 +924,7 @@ void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
 }
 void Game::RefreshBGMList() {
-	auto files = Utils::FindfolderFiles(L"./sound/BGM/", std::vector<std::wstring>{L"mp3"});
+	auto files = Utils::FindfolderFiles(L"./sound/BGM/", {L"mp3"});
 	for(auto& file : files) {
 		BGMList.push_back(BufferIO::EncodeUTF8s(file));
 	}
@@ -1769,12 +1768,12 @@ std::string Game::LoadScript(const std::string& name, int& slen) {
 	std::string buffer;
 	slen = 0;
 	IReadFile* file = nullptr;
-	for(auto& path : mainGame->resource_dirs) {
-		file = mainGame->filesystem->createAndOpenFile((path + name).c_str());
+	for(auto& path : resource_dirs) {
+		file = filesystem->createAndOpenFile((path + name).c_str());
 		if(file)
 			break;
 	}
-	if(!file && !(file = mainGame->filesystem->createAndOpenFile(name.c_str())))
+	if(!file && !(file = filesystem->createAndOpenFile(name.c_str())))
 		return buffer;
 	const auto size = file->getSize();
 	buffer.reserve(size);
@@ -1810,8 +1809,7 @@ int Game::MessageHandler(long fduel, int type) {
 void Game::PopulateResourcesDirectories() {
 	auto f = [&](std::string path) {
 		std::string abspath = filesystem->getAbsolutePath(path.c_str()).c_str();
-		if(abspath[abspath.size() - 1] != '/')
-			abspath += "/";
+		abspath += "/";
 		resource_dirs.push_back(abspath);
 
 	};
