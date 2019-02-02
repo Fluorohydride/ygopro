@@ -165,10 +165,11 @@ public:
 	static bool CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input = false, bool transform_token = false);
 	static bool CompareStrings(std::wstring input, const std::wstring& second_term, bool transform_input = false, bool transform_term = false);
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
-	unsigned long SetupDuel(uint32 seed);
+	void* SetupDuel(uint32 seed);
 	std::string LoadScript(const std::string& script_name, int& slen);
+	std::string PreLoadScript(void* pduel, const std::string& script_name);
 	static byte* ScriptReader(const char* script_name, int* slen);
-	static int MessageHandler(long fduel, int type);
+	static int MessageHandler(void* fduel, int type);
 
 	std::mutex gMutex;
 	Signal frameSignal;

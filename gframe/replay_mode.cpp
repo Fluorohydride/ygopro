@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-long ReplayMode::pduel = 0;
+void* ReplayMode::pduel = 0;
 bool ReplayMode::yrp = false;
 Replay ReplayMode::cur_replay;
 std::vector<ReplayPacket> ReplayMode::current_stream;

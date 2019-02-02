@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-long SingleMode::pduel = 0;
+void* SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;

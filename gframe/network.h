@@ -144,7 +144,7 @@ public:
 	event* etimer;
 	DuelPlayer* host_player;
 	HostInfo host_info;
-	unsigned long pduel;
+	void* pduel;
 	wchar_t name[20];
 	wchar_t pass[20];
 };

@@ -7,7 +7,7 @@ namespace ygo {
 
 class SingleMode {
 private:
-	static long pduel;
+	static void* pduel;
 	static bool is_closing;
 	static bool is_continuing;
 

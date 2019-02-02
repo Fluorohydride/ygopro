@@ -1781,16 +1781,19 @@ std::string Game::LoadScript(const std::string& name, int& slen) {
 	file->drop();
 	return buffer;
 }
-unsigned long Game::SetupDuel(uint32 seed) {
+std::string Game::PreLoadScript(void* pduel, const std::string& script_name) {
+	int len = 0;
+	std::string buf = LoadScript(script_name, len);
+	preload_script(pduel, (char*)script_name.c_str(), 0, len, &buf[0]);
+	return buf;
+}
+void* Game::SetupDuel(uint32 seed) {
 	set_script_reader((script_reader)ScriptReader);
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)MessageHandler);
-	unsigned long pduel = create_duel(seed);
-	int len = 0;
-	std::string buf = LoadScript("constant.lua", len);
-	preload_script(pduel, (char*)"constant.lua", 0, len, &buf[0]);
-	buf = LoadScript("utility.lua", len);
-	preload_script(pduel, (char*)"utility.lua", 0, len, &buf[0]);
+	void* pduel = create_duel(seed);
+	PreLoadScript(pduel, "constant.lua");
+	PreLoadScript(pduel, "utility.lua");
 	return pduel;
 }
 byte* Game::ScriptReader(const char* script_name, int* slen) {
@@ -1798,7 +1801,7 @@ byte* Game::ScriptReader(const char* script_name, int* slen) {
 	buffer = mainGame->LoadScript(script_name, *slen);
 	return (byte*)&buffer[0];
 }
-int Game::MessageHandler(long fduel, int type) {
+int Game::MessageHandler(void* fduel, int type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
