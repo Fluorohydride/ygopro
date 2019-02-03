@@ -36,7 +36,7 @@ solution "ygo"
 		defines "_DEBUG"
 		targetdir "bin/debug"
 
-	configuration { "Release", "not vs*" }
+	configuration { "Release*", "not vs*" }
 		flags "Symbols"
 		defines "NDEBUG"
 		buildoptions "-march=native"
