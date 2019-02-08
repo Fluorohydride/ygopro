@@ -162,7 +162,7 @@ public:
 	position2di ResizeReverse(s32 x, s32 y);
 	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2);
-	recti ResizeCard(s32 x, s32 y, s32 x2, s32 y2);
+	recti ResizeCardImgWin(s32 x, s32 y, s32 mx, s32 my);
 	recti ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2);
 	position2di ResizeCardHint(s32 x, s32 y);
 	recti ResizeCardMid(s32 x, s32 y, s32 x2, s32 y2, s32 midx, s32 midy);
