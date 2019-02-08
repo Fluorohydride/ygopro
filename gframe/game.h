@@ -161,7 +161,7 @@ public:
 	position2di Resize(s32 x, s32 y);
 	position2di ResizeReverse(s32 x, s32 y);
 	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
-	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
+	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeCard(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2);
 	position2di ResizeCardHint(s32 x, s32 y);

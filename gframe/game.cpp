@@ -1612,7 +1612,7 @@ void Game::OnResize() {
 	btnM2->setRelativePosition(Resize(160, 0, 210, 20));
 	btnEP->setRelativePosition(Resize(320, 0, 370, 20));
 
-	wChat->setRelativePosition(ResizeWin(wInfos->getRelativePosition().LowerRightCorner.X + 6, 615, 1020, 640, true));
+	wChat->setRelativePosition(recti(wInfos->getRelativePosition().LowerRightCorner.X + 6, window_size.Height - 25, window_size.Width, window_size.Height));
 	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
@@ -1655,15 +1655,9 @@ position2di Game::ResizeReverse(s32 x, s32 y) {
 	y = y / yScale;
 	return position2di(x, y);
 }
-recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
+recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2) {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
-	if(chat) {
-		y = window_size.Height - sy;
-		x2 = window_size.Width;
-		y2 = y + sy;
-		return recti(x, y, x2, y2);
-	}
 	x = (x + sx / 2) * xScale - sx / 2;
 	y = (y + sy / 2) * yScale - sy / 2;
 	x2 = sx + x;
