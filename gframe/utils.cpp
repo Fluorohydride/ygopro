@@ -51,10 +51,18 @@ namespace ygo {
 #endif
 	}
 	bool Utils::Deletefile(const std::string & source) {
+#ifdef _WIN32
+		return Deletefile(BufferIO::DecodeUTF8s(source));
+#else
 		return remove(source.c_str()) == 0;
+#endif
 	}
 	bool Utils::Deletefile(const std::wstring & source) {
+#ifdef _WIN32
+		return DeleteFile(source.c_str());
+#else
 		return Deletefile(BufferIO::EncodeUTF8s(source));
+#endif
 	}
 	void Utils::CreateResourceFolders() {
 		//create directories if missing
