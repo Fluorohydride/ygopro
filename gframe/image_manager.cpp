@@ -1,9 +1,14 @@
 #include "image_manager.h"
 #include "game.h"
+#include <curl/curl.h>
 
 namespace ygo {
 
 ImageManager imageManager;
+
+void ImageManager::AddDownloadResource(PicSource src) {
+	pic_urls.push_back(src);
+}
 
 bool ImageManager::Initial() {
 	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -130,6 +135,107 @@ void ImageManager::ClearFutureObjects(loading_map* map) {
 	}
 	delete map;
 }
+size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
+	std::ofstream *out = static_cast<std::ofstream *>(userdata);
+	size_t nbytes = size * nmemb;
+	out->write(ptr, nbytes);
+	return nbytes;
+}
+bool IsValidImage(const std::string& file, std::string& extension) {
+	extension.clear();
+	std::ifstream pic(file, std::ifstream::binary);
+	char pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a }; //png header
+	char jpgheader[] = { 0xff, 0xd8, 0xff }; //jpg header
+	char header[8];
+	pic.read(header, 8);
+	if(!memcmp(pngheader, header, sizeof(pngheader))) {
+		extension = ".png";
+	} else if(!memcmp(jpgheader, header, sizeof(jpgheader))) {
+		extension = ".jpg";
+	} else
+		return false;
+	return true;
+}
+void ImageManager::DownloadPic(int code) {
+	auto id = std::to_string(code);
+	std::string dest_folder = "./pics/" + id;
+	auto name = "./pics/temp/" + id;
+	std::string ext;
+	pic_download.lock();
+	if(downloading_pics.find(code) == downloading_pics.end()) {
+		downloading_pics[code].first = false;
+		pic_download.unlock();
+		for(auto& src : pic_urls) {
+			if(src.type == "field")
+				continue;
+			CURL *curl = NULL;
+			std::ofstream fp(name, std::ofstream::binary);
+			CURLcode res;
+			curl = curl_easy_init();
+			if(curl) {
+				curl_easy_setopt(curl, CURLOPT_URL, fmt::sprintf(src.url, code).c_str());
+				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fp);
+				res = curl_easy_perform(curl);
+				curl_easy_cleanup(curl);
+				fp.close();
+				if(res == CURLE_OK && IsValidImage(name, ext)) {
+					Utils::Movefile(name, dest_folder + ext);
+					break;
+				} else {
+					Utils::Deletefile(name);
+				}
+			}
+		}
+	} else {
+		pic_download.unlock();
+		return;
+	}
+	pic_download.lock();
+	downloading_pics[code].first = true;
+	downloading_pics[code].second = dest_folder + ext;
+	pic_download.unlock();
+}
+void ImageManager::DownloadField(int code) {
+	auto id = std::to_string(code);
+	std::string dest_folder = "./pics/field/" + id;
+	auto name = "./pics/temp/" + id + "_f";
+	std::string ext;
+	field_download.lock();
+	if(downloading_fields.find(code) == downloading_fields.end()) {
+		downloading_fields[code].first = false;
+		field_download.unlock();
+		for(auto& src : pic_urls) {
+			if(src.type == "pic")
+				continue;
+			CURL *curl = NULL;
+			std::ofstream fp(name, std::ofstream::binary);
+			CURLcode res;
+			curl = curl_easy_init();
+			if(curl) {
+				curl_easy_setopt(curl, CURLOPT_URL, fmt::sprintf(src.url, code).c_str());
+				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fp);
+				res = curl_easy_perform(curl);
+				curl_easy_cleanup(curl);
+				fp.close();
+				if(res == CURLE_OK && IsValidImage(name, ext)) {
+					Utils::Movefile(name, dest_folder + ext);
+					break;
+				} else {
+					Utils::Deletefile(name);
+				}
+			}
+		}
+	} else {
+		field_download.unlock();
+		return;
+	}
+	field_download.lock();
+	downloading_fields[code].first = true;
+	downloading_fields[code].second = dest_folder + ext;
+	field_download.unlock();
+}
 void ImageManager::ClearCachedTextures() {
 	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	if(loading_pics[0]->size()) {
@@ -243,7 +349,17 @@ irr::video::IImage* ImageManager::GetTextureFromFile(const char* file, s32 width
 }
 ImageManager::image_path ImageManager::LoadCardTexture(int code, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* img = nullptr;
-	for(auto& path : mainGame->resource_dirs) {
+	pic_download.lock();
+	bool should_download = downloading_pics.find(code) == downloading_pics.end();
+	pic_download.unlock();
+	if(!should_download) {
+		while(!downloading_pics[code].first) {
+			if(timestamp_id != source_timestamp_id.load()) {
+				return std::make_pair(nullptr, "fail");
+			}
+		}
+	}
+	for(auto& path : mainGame->pic_dirs) {
 		for(auto& extension : { ".png", ".jpg" }) {
 			if(timestamp_id != source_timestamp_id.load())
 				return std::make_pair(nullptr, "fail");
@@ -255,6 +371,22 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, int width, int 
 				}
 				return std::make_pair(img, file);
 			}
+		}
+	}
+	if(should_download) {
+		std::async(std::launch::async, &ImageManager::DownloadPic, this, code);
+		while(!downloading_pics[code].first) {
+			if(timestamp_id != source_timestamp_id.load()) {
+				return std::make_pair(nullptr, "fail");
+			}
+		}
+		auto file = downloading_pics[code].second;
+		if(img = GetTextureFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id))) {
+			if(timestamp_id != source_timestamp_id.load()) {
+				img->drop();
+				return std::make_pair(nullptr, "fail");
+			}
+			return std::make_pair(img, file);
 		}
 	}
 	return std::make_pair(img, "");
@@ -342,14 +474,26 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
+		field_download.lock();
+		bool should_download = downloading_fields.find(code) == downloading_fields.end();
+		field_download.unlock();
 		irr::video::ITexture* img = nullptr;
-		for(auto& path : mainGame->resource_dirs) {
-			for(auto& extension : { ".png", ".jpg" }) {
-				if(img = driver->getTexture((path + "field/" + std::to_string(code) + extension).c_str()))
-					return img;
+		if(!should_download) {
+			if(downloading_fields[code].first) {
+				img = driver->getTexture(downloading_fields[code].second.c_str());
+			}
+		} else {
+			for(auto& path : mainGame->field_dirs) {
+				for(auto& extension : { ".png", ".jpg" }) {
+					if(img = driver->getTexture((path + std::to_string(code) + extension).c_str()))
+						return img;
+				}
 			}
 		}
-		tFields[code] = img;
+		if(should_download)
+			std::async(std::launch::async, &ImageManager::DownloadField, this, code);
+		else
+			tFields[code] = img;
 		return img;
 	}
 	return (tit->second) ? tit->second : nullptr;

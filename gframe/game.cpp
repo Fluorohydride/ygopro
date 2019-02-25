@@ -8,8 +8,10 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include "repo_manager.h"
 #include <sstream>
 #include <fstream>
+#include <nlohmann/json.hpp>
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -94,6 +96,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
+	LoadPicUrls();
 	LoadExpansionDB();
 	if(!dataManager.LoadDB("cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
@@ -759,6 +762,8 @@ bool Game::Initialize() {
 
 	Utils::CreateResourceFolders();
 
+	LoadGithubRepositories();
+
 	return true;
 }
 void Game::MainLoop() {
@@ -862,6 +867,22 @@ void Game::MainLoop() {
 		if (DuelClient::try_needed) {
 			DuelClient::try_needed = false;
 			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, false);
+		}
+		auto repos = repoManager.GetReadyRepos();
+		if(!repos.empty()) {
+			for(auto& repo : repos) {
+				if(repo.error.size()) {
+					ErrorLog("The repo " + repo.url + " couldn't be cloned");
+					ErrorLog("Error: " + repo.error);
+					continue;
+				}
+				script_dirs.insert(script_dirs.begin(), repo.script_path);
+				pic_dirs.insert(pic_dirs.begin(), repo.pics_path);
+				auto files = Utils::FindfolderFiles(BufferIO::DecodeUTF8s(repo.data_path), { L"cdb" }, 0);
+				for(auto& file : files)
+					dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file));
+				dataManager.LoadStrings(repo.data_path + "/strings.conf");
+			}
 		}
 		if(gameConf.max_fps) {
 			int ndelta_time = timer->getRealTime() - prev_time;
@@ -1090,6 +1111,71 @@ void Game::SaveConfig() {
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	conf_file << "volume = "			<< std::to_string(vol) << "\n";
 	conf_file.close();
+}
+void Game::LoadPicUrls() {
+	try {
+		std::ifstream f("pic_urls.json");
+		if(f.is_open()) {
+			nlohmann::json j;
+			f >> j;
+			f.close();
+			if(j.size()) {
+				for(auto& obj : j["urls"].get<std::vector<nlohmann::json>>()) {
+					if(obj["url"].get<std::string>() == "default") {
+						if(obj["type"].get<std::string>() == "pic") {
+#ifdef DEFAULT_PIC_URL
+							imageManager.AddDownloadResource({ DEFAULT_PIC_URL, "pic" });
+#endif
+						} else {
+#ifdef DEFAULT_FIELD_URL
+							imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, "field" });
+#endif
+						}
+					} else {
+						imageManager.AddDownloadResource({ obj["url"].get<std::string>(),obj["type"].get<std::string>() });
+					}
+				}
+			}
+		}
+	}
+	catch(std::exception& e) {
+		ErrorLog(std::string("Exception ocurred: ") + e.what());
+	}
+}
+void Game::LoadGithubRepositories() {
+	try {
+		std::ifstream f("git_repo.json");
+		if(f.is_open()) {
+			nlohmann::json j;
+			f >> j;
+			f.close();
+			if(j.size()) {
+				for(auto& obj : j["repos"].get<std::vector<nlohmann::json>>()) {
+					RepoManager::GitRepo tmp_repo;
+					tmp_repo.url = obj["url"].get<std::string>();
+					if(obj["should_update"].is_boolean())
+						tmp_repo.should_update = obj["should_update"].get<bool>();
+					if(tmp_repo.url == "default") {
+						tmp_repo.url = "https://github.com/Ygoproco/Live2017Links/";
+						tmp_repo.repo_path = "./expansions/Live2017Links";
+					} else if(tmp_repo.url == "default_anime") {
+						tmp_repo.url = "https://github.com/Ygoproco/LiveanimeLinks/";
+						tmp_repo.repo_path = "./expansions/LiveanimeLinks";
+					} else {
+						tmp_repo.repo_path = obj["repo_path"].get<std::string>();
+						tmp_repo.data_path = obj["data_path"].get<std::string>();
+						tmp_repo.script_path = obj["script_path"].get<std::string>();
+						tmp_repo.pics_path = obj["pics_path"].get<std::string>();
+					}
+					tmp_repo.Sanitize();
+					repoManager.AddRepo(tmp_repo);
+				}
+			}
+		}
+	}
+	catch(std::exception& e) {
+		ErrorLog(std::string("Exception ocurred: ") + e.what());
+	}
 }
 bool Game::PlayChant(unsigned int code) {
 	std::string sound(fmt::format("./sound/chants/{}.wav", code));
@@ -1768,7 +1854,7 @@ std::string Game::LoadScript(const std::string& name, int& slen) {
 	std::string buffer;
 	slen = 0;
 	IReadFile* file = nullptr;
-	for(auto& path : resource_dirs) {
+	for(auto& path : script_dirs) {
 		file = filesystem->createAndOpenFile((path + name).c_str());
 		if(file)
 			break;
@@ -1810,16 +1896,12 @@ int Game::MessageHandler(void* fduel, int type) {
 	return 0;
 }
 void Game::PopulateResourcesDirectories() {
-	auto f = [&](std::string path) {
-		std::string abspath = filesystem->getAbsolutePath(path.c_str()).c_str();
-		abspath += "/";
-		resource_dirs.push_back(abspath);
-
-	};
-	f("./expansions/script/");
-	f("./script/");
-	f("./expansions/pics/");
-	f("./pics/");
+	script_dirs.push_back("./expansions/script/");
+	script_dirs.push_back("./script/");
+	pic_dirs.push_back("./expansions/pics/");
+	pic_dirs.push_back("./pics/");
+	field_dirs.push_back("./expansions/pics/field/");
+	field_dirs.push_back("./pics/field/");
 }
 
 

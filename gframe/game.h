@@ -129,6 +129,8 @@ public:
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
+	void LoadPicUrls();
+	void LoadGithubRepositories();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player);
@@ -237,7 +239,9 @@ public:
 	irr::scene::ICameraSceneNode* camera;
 	io::IFileSystem* filesystem;
 	void PopulateResourcesDirectories();
-	std::vector<std::string> resource_dirs;
+	std::vector<std::string> field_dirs;
+	std::vector<std::string> pic_dirs;
+	std::vector<std::string> script_dirs;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;

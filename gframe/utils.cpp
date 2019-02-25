@@ -83,6 +83,8 @@ namespace ygo {
 		Makedirectory(TEXT("deck"));
 		Makedirectory(TEXT("pics"));
 		Makedirectory(TEXT("pics/field"));
+		Deletedirectory(TEXT("pics/temp"));
+		Makedirectory(TEXT("pics/temp"));
 		Makedirectory(TEXT("replay"));
 		Makedirectory(TEXT("screenshots"));
 	}

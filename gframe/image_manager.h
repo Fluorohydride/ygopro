@@ -9,11 +9,17 @@
 
 namespace ygo {
 
+struct PicSource {
+	std::string url;
+	std::string type;
+};
+
 class ImageManager {
 private:
-	typedef std::pair<IImage*, std::string> image_path;
-	typedef std::map<int, std::future<image_path>> loading_map;
-	typedef unsigned long long chrono_time;
+	using image_path = std::pair<IImage*, std::string>;
+	using loading_map = std::map<int, std::future<image_path>>;
+	using chrono_time = unsigned long long;
+	using downloading_map = std::map<int/*code*/, std::pair<bool /*status: value not found: not yet downloaded, false: downloading, true: downloaded*/, std::string>>;
 public:
 	ImageManager() {
 		loading_pics[0] = new loading_map();
@@ -25,6 +31,7 @@ public:
 		delete loading_pics[1];
 		delete loading_pics[2];
 	}
+	void AddDownloadResource(PicSource src);
 	bool Initial();
 	void SetDevice(irr::IrrlichtDevice* dev);
 	void ClearTexture();
@@ -63,11 +70,17 @@ public:
 	irr::video::ITexture* tField[2][4];
 	irr::video::ITexture* tFieldTransparent[2][4];
 private:
-	void ClearFutureObjects(loading_map * map);
+	void ClearFutureObjects(loading_map* map);
+	void DownloadPic(int code);
+	void DownloadField(int code);
 	image_path LoadCardTexture(int code, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	loading_map* loading_pics[3];
-	std::mutex pic_load;
+	downloading_map downloading_pics;
+	downloading_map downloading_fields;
+	std::mutex pic_download;
+	std::mutex field_download;
 	std::atomic<chrono_time> timestamp_id[3];
+	std::vector<PicSource> pic_urls;
 };
 
 extern ImageManager imageManager;
