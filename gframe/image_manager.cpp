@@ -173,7 +173,7 @@ void ImageManager::DownloadPic(int code) {
 			CURLcode res;
 			curl = curl_easy_init();
 			if(curl) {
-				curl_easy_setopt(curl, CURLOPT_URL, fmt::sprintf(src.url, code).c_str());
+				curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fp);
 				res = curl_easy_perform(curl);
@@ -213,7 +213,7 @@ void ImageManager::DownloadField(int code) {
 			CURLcode res;
 			curl = curl_easy_init();
 			if(curl) {
-				curl_easy_setopt(curl, CURLOPT_URL, fmt::sprintf(src.url, code).c_str());
+				curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fp);
 				res = curl_easy_perform(curl);
