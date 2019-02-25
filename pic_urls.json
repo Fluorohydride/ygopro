@@ -1,0 +1,24 @@
+{
+	"urls": [
+	{
+		"url" : "default",
+		"type" : "pic"
+	},
+	{
+		"url" : "default",
+		"type" : "field"
+	},
+	{
+        "url" : "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/{}.png",
+        "type" : "pic"
+    },
+    {
+        "url" : "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/{}.jpg",
+        "type" : "pic"
+    },
+    {
+        "url" : "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/field/{}.png",
+        "type" : "field"
+    }
+	]
+}
