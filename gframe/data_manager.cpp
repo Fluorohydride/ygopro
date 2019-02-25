@@ -8,9 +8,9 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 DataManager dataManager;
 
-bool DataManager::LoadDB(const char* file) {
+bool DataManager::LoadDB(const std::string& file) {
 	sqlite3* pDB;
-	if(sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
+	if(sqlite3_open_v2(file.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
@@ -66,7 +66,7 @@ bool DataManager::LoadDB(const char* file) {
 	sqlite3_close(pDB);
 	return true;
 }
-bool DataManager::LoadStrings(const char* file) {
+bool DataManager::LoadStrings(const std::string& file) {
 	std::ifstream string_file(file, std::ifstream::in);
 	if(!string_file.is_open())
 		return false;
@@ -78,7 +78,7 @@ bool DataManager::LoadStrings(const char* file) {
 		if(str.empty() || str.at(0) != '!') {
 			continue;
 		}
-		 pos = str.find(' ');
+		pos = str.find(' ');
 		auto type = str.substr(1, pos - 1);
 		str = str.substr(pos + 1);
 		pos = str.find(' ');

@@ -11,8 +11,8 @@ namespace ygo {
 class DataManager {
 public:
 	DataManager(): _datas(8192), _strings(8192) {}
-	bool LoadDB(const char* file);
-	bool LoadStrings(const char* file);
+	bool LoadDB(const std::string& file);
+	bool LoadStrings(const std::string& file);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
 	code_pointer GetCodePointer(int code);

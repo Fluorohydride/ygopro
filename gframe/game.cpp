@@ -902,7 +902,7 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 void Game::LoadExpansionDB() {
 	auto files = Utils::FindfolderFiles(L"./expansions/", {L"cdb"}, 2);
 	for (auto& file : files)
-		dataManager.LoadDB(BufferIO::EncodeUTF8s(L"./expansions/" + file).c_str());
+		dataManager.LoadDB(BufferIO::EncodeUTF8s(L"./expansions/" + file));
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
