@@ -15,6 +15,10 @@
 #define mystrncasecmp strncasecmp
 #endif
 
+#ifndef TEXT
+#define TEXT(x) x
+#endif
+
 #define socklen_t int
 
 #else //_WIN32

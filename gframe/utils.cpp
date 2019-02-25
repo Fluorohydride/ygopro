@@ -64,13 +64,27 @@ namespace ygo {
 		return Deletefile(BufferIO::EncodeUTF8s(source));
 #endif
 	}
+	bool Utils::Deletedirectory(const std::string & source) {
+#ifdef _WIN32
+		return Deletedirectory(BufferIO::DecodeUTF8s(source));
+#else
+		return rmdir(source.c_str()) == 0;
+#endif
+	}
+	bool Utils::Deletedirectory(const std::wstring & source) {
+#ifdef _WIN32
+		return RemoveDirectory(source.c_str());
+#else
+		return Deletedirectory(BufferIO::EncodeUTF8s(source));
+#endif
+	}
 	void Utils::CreateResourceFolders() {
 		//create directories if missing
-		Makedirectory("deck");
-		Makedirectory("pics");
-		Makedirectory("pics/field");
-		Makedirectory("replay");
-		Makedirectory("screenshots");
+		Makedirectory(TEXT("deck"));
+		Makedirectory(TEXT("pics"));
+		Makedirectory(TEXT("pics/field"));
+		Makedirectory(TEXT("replay"));
+		Makedirectory(TEXT("screenshots"));
 	}
 
 	void Utils::takeScreenshot(irr::IrrlichtDevice* device)
