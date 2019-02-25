@@ -144,10 +144,10 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 bool IsValidImage(const std::string& file, std::string& extension) {
 	extension.clear();
 	std::ifstream pic(file, std::ifstream::binary);
-	char pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a }; //png header
-	char jpgheader[] = { 0xff, 0xd8, 0xff }; //jpg header
-	char header[8];
-	pic.read(header, 8);
+	unsigned char pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a }; //png header
+	unsigned char jpgheader[] = { 0xff, 0xd8, 0xff }; //jpg header
+	unsigned char header[8];
+	pic.read((char*)header, 8);
 	if(!memcmp(pngheader, header, sizeof(pngheader))) {
 		extension = ".png";
 	} else if(!memcmp(jpgheader, header, sizeof(jpgheader))) {

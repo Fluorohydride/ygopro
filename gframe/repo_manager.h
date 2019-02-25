@@ -4,7 +4,7 @@
 #include <atomic>
 #include <map>
 #include <future>
-#include <unordered_set>
+#include <vector>
 extern "C" {
 #include <git2.h>
 }

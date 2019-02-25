@@ -1,6 +1,8 @@
 #include "utils.h"
 #include "game.h"
-
+#ifndef TEXT
+#define TEXT(x) x
+#endif
 namespace ygo {
 	Utils utils;
 #ifdef _WIN32
