@@ -293,6 +293,8 @@ void RepoManager::GitRepo::Sanitize() {
 		pics_path = repo_path + "/" + pics_path + "/";
 	else
 		pics_path = repo_path + "/pics/";
+	if(has_core)
+		core_path = repo_path + "/" + core_path + "/";
 }
 
 }

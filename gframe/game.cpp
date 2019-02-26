@@ -739,7 +739,7 @@ bool Game::Initialize() {
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
-		stMessage->setText(L"Couldn't load the duel api, you'll be limited to replay watching and online mode");
+		stMessage->setText(L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.");
 		PopupElement(wMessage);
 	}
 #endif
@@ -882,7 +882,21 @@ void Game::MainLoop() {
 				for(auto& file : files)
 					dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file));
 				dataManager.LoadStrings(repo.data_path + "/strings.conf");
+				if(repo.has_core) {
+					cores_to_load.insert(cores_to_load.begin(), repo.core_path);
+				}
 			}
+		}
+		if(!dInfo.isStarted && cores_to_load.size() && repoManager.GetUpdatingRepos() == 0) {
+			for(auto& path : cores_to_load) {
+				void* ncore = nullptr;
+				if((ncore = ChangeOCGcore(path, ocgcore))) {
+					ocgcore = ncore;
+					coreloaded = true;
+					break;
+				}
+			}
+			cores_to_load.clear();
 		}
 		if(gameConf.max_fps) {
 			int ndelta_time = timer->getRealTime() - prev_time;
@@ -1158,6 +1172,9 @@ void Game::LoadGithubRepositories() {
 					if(tmp_repo.url == "default") {
 						tmp_repo.url = "https://github.com/Ygoproco/Live2017Links/";
 						tmp_repo.repo_path = "./expansions/Live2017Links";
+#ifdef YGOPRO_BUILD_DLL
+						tmp_repo.has_core = true;
+#endif
 					} else if(tmp_repo.url == "default_anime") {
 						tmp_repo.url = "https://github.com/Ygoproco/LiveanimeLinks/";
 						tmp_repo.repo_path = "./expansions/LiveanimeLinks";
@@ -1166,6 +1183,12 @@ void Game::LoadGithubRepositories() {
 						tmp_repo.data_path = obj["data_path"].get<std::string>();
 						tmp_repo.script_path = obj["script_path"].get<std::string>();
 						tmp_repo.pics_path = obj["pics_path"].get<std::string>();
+#ifdef YGOPRO_BUILD_DLL
+						if(obj["core_path"].is_string()) {
+							tmp_repo.has_core = true;
+							tmp_repo.core_path = obj["core_path"].get<std::string>();
+						}
+#endif
 					}
 					tmp_repo.Sanitize();
 					repoManager.AddRepo(tmp_repo);

@@ -21,7 +21,9 @@ public:
 		std::string data_path = "";
 		std::string script_path = "script";
 		std::string pics_path = "pics";
+		std::string core_path = "";
 		bool should_update = true;
+		bool has_core = false;
 		bool ready = false;
 		std::string error = "";
 		void Sanitize();
@@ -36,6 +38,10 @@ public:
 	}
 
 	std::vector<GitRepo> GetReadyRepos();
+
+	size_t GetUpdatingRepos() {
+		return working_repos.size();
+	};
 
 	void AddRepo(GitRepo repo);
 

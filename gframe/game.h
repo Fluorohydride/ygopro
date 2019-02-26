@@ -242,6 +242,7 @@ public:
 	std::vector<std::string> field_dirs;
 	std::vector<std::string> pic_dirs;
 	std::vector<std::string> script_dirs;
+	std::vector<std::string> cores_to_load;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;
