@@ -904,7 +904,7 @@ void Game::MainLoop() {
 			}
 			cores_to_load.clear();
 		}
-#endif YGOPRO_BUILD_DLL
+#endif //YGOPRO_BUILD_DLL
 		if(gameConf.max_fps) {
 			int ndelta_time = timer->getRealTime() - prev_time;
 			int sleep_time = (1000 / gameConf.max_fps) - ndelta_time;
