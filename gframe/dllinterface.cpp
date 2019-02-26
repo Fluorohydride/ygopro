@@ -29,6 +29,7 @@ int32(*preload_script)(ptr pduel, char* script, int32 len, int32 scriptlen, char
 
 #define CREATE_CLONE(x) auto x##_copy = x;
 #define STORE_CLONE(x) x##_copy = x;
+#define CLEAR_CLONE(x) x##_copy = nullptr;
 
 CREATE_CLONE(set_script_reader)
 CREATE_CLONE(set_card_reader)
@@ -105,6 +106,27 @@ void RestoreFromCopies() {
 
 #undef RESTORE_CLONE
 
+void ClearCopies() {
+	CLEAR_CLONE(set_script_reader);
+	CLEAR_CLONE(set_card_reader);
+	CLEAR_CLONE(set_message_handler);
+	CLEAR_CLONE(create_duel);
+	CLEAR_CLONE(start_duel);
+	CLEAR_CLONE(end_duel);
+	CLEAR_CLONE(set_player_info);
+	CLEAR_CLONE(get_log_message);
+	CLEAR_CLONE(process);
+	CLEAR_CLONE(new_card);
+	CLEAR_CLONE(new_tag_card);
+	CLEAR_CLONE(new_relay_card);
+	CLEAR_CLONE(query_field_count);
+	CLEAR_CLONE(query_field_card);
+	CLEAR_CLONE(query_field_info);
+	CLEAR_CLONE(set_responsei);
+	CLEAR_CLONE(set_responseb);
+	CLEAR_CLONE(preload_script);
+}
+
 #define LOAD_FUNCTION(x,core) x = (decltype(x))GetFunction(core, #x);\
 		if(!x){ UnloadCore(core); return nullptr; }
 
@@ -132,6 +154,7 @@ void* LoadOCGcore(const std::string& path) {
 	LOAD_FUNCTION(set_responsei, newcore);
 	LOAD_FUNCTION(set_responseb, newcore);
 	LOAD_FUNCTION(preload_script, newcore);
+	ClearCopies();
 	return newcore;
 }
 #undef LOAD_FUNCTION
@@ -167,6 +190,7 @@ bool ReloadCore(void *handle) {
 	LOAD_WITH_COPY_CHECK(set_responsei, handle);
 	LOAD_WITH_COPY_CHECK(set_responseb, handle);
 	LOAD_WITH_COPY_CHECK(preload_script, handle);
+	ClearCopies();
 	return true;
 }
 
@@ -228,9 +252,12 @@ void* ChangeOCGcore(const std::string& path, void *handle) {
 	CHANGE_WITH_COPY_CHECK(set_responsei, newcore);
 	CHANGE_WITH_COPY_CHECK(set_responseb, newcore);
 	CHANGE_WITH_COPY_CHECK(preload_script, newcore);
+	ClearCopies();
 	if(handle)
 		CloseLibrary(handle);
 	return newcore;
 }
 #undef CHANGE_WITH_COPY_CHECK
+#undef STORE_CLONE
+#undef CLEAR_CLONE
 #endif //YGOPRO_BUILD_DLL
