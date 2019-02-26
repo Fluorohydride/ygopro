@@ -27,6 +27,31 @@ void(*set_responsei)(ptr pduel, int32 value) = nullptr;
 void(*set_responseb)(ptr pduel, byte* buf) = nullptr;
 int32(*preload_script)(ptr pduel, char* script, int32 len, int32 scriptlen, char* scriptbuff) = nullptr;
 
+#define CREATE_CLONE(x) auto x##_copy = x;
+#define STORE_CLONE(x) x##_copy = x;
+
+CREATE_CLONE(set_script_reader)
+CREATE_CLONE(set_card_reader)
+CREATE_CLONE(set_message_handler)
+CREATE_CLONE(create_duel)
+CREATE_CLONE(start_duel)
+CREATE_CLONE(end_duel)
+CREATE_CLONE(set_player_info)
+CREATE_CLONE(get_log_message)
+CREATE_CLONE(get_message)
+CREATE_CLONE(process)
+CREATE_CLONE(new_card)
+CREATE_CLONE(new_tag_card)
+CREATE_CLONE(new_relay_card)
+CREATE_CLONE(query_card)
+CREATE_CLONE(query_field_count)
+CREATE_CLONE(query_field_card)
+CREATE_CLONE(query_field_info)
+CREATE_CLONE(set_responsei)
+CREATE_CLONE(set_responseb)
+CREATE_CLONE(preload_script)
+#undef CREATE_CLONE
+
 #ifdef _WIN32
 void* OpenLibrary(const std::string& path) {
 	return LoadLibrary(BufferIO::DecodeUTF8s(path + "ocgcore.dll").c_str());
@@ -35,8 +60,7 @@ void CloseLibrary(void *handle) {
 	FreeLibrary((HMODULE)handle);
 }
 
-#define LF(x,core) x = (decltype(x))GetProcAddress((HMODULE)core, #x);\
-		if(!x){ CloseLibrary(core); return nullptr; }
+#define GetFunction(core, x) GetProcAddress((HMODULE)core, x)
 
 #else
 
@@ -52,62 +76,101 @@ void CloseLibrary(void *handle) {
 	dlclose(handle);
 }
 
-#define LF(x,core) x = (decltype(x))dlsym(core, #x);\
-		if(!x){ CloseLibrary(core); return nullptr; }
+#define GetFunction(core, x) dlsym(core, x)
 
 #endif
+
+#define RESTORE_CLONE(x) if(x##_copy) { x = x##_copy; x##_copy = nullptr; }
+
+void RestoreFromCopies() {
+	RESTORE_CLONE(set_script_reader)
+	RESTORE_CLONE(set_card_reader)
+	RESTORE_CLONE(set_message_handler)
+	RESTORE_CLONE(create_duel)
+	RESTORE_CLONE(start_duel)
+	RESTORE_CLONE(end_duel)
+	RESTORE_CLONE(set_player_info)
+	RESTORE_CLONE(get_log_message)
+	RESTORE_CLONE(process)
+	RESTORE_CLONE(new_card)
+	RESTORE_CLONE(new_tag_card)
+	RESTORE_CLONE(new_relay_card)
+	RESTORE_CLONE(query_field_count)
+	RESTORE_CLONE(query_field_card)
+	RESTORE_CLONE(query_field_info)
+	RESTORE_CLONE(set_responsei)
+	RESTORE_CLONE(set_responseb)
+	RESTORE_CLONE(preload_script)
+}
+
+#undef RESTORE_CLONE
+
+#define LOAD_FUNCTION(x,core) x = (decltype(x))GetFunction(core, #x);\
+		if(!x){ UnloadCore(core); return nullptr; }
 
 void* LoadOCGcore(const std::string& path) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
-	LF(set_script_reader, newcore);
-	LF(set_card_reader, newcore);
-	LF(set_message_handler, newcore);
-	LF(create_duel, newcore);
-	LF(start_duel, newcore);
-	LF(end_duel, newcore);
-	LF(set_player_info, newcore);
-	LF(get_log_message, newcore);
-	LF(get_message, newcore);
-	LF(process, newcore);
-	LF(new_card, newcore);
-	LF(new_tag_card, newcore);
-	LF(new_relay_card, newcore);
-	LF(query_card, newcore);
-	LF(query_field_count, newcore);
-	LF(query_field_card, newcore);
-	LF(query_field_info, newcore);
-	LF(set_responsei, newcore);
-	LF(set_responseb, newcore);
-	LF(preload_script, newcore);
+	LOAD_FUNCTION(set_script_reader, newcore);
+	LOAD_FUNCTION(set_card_reader, newcore);
+	LOAD_FUNCTION(set_message_handler, newcore);
+	LOAD_FUNCTION(create_duel, newcore);
+	LOAD_FUNCTION(start_duel, newcore);
+	LOAD_FUNCTION(end_duel, newcore);
+	LOAD_FUNCTION(set_player_info, newcore);
+	LOAD_FUNCTION(get_log_message, newcore);
+	LOAD_FUNCTION(get_message, newcore);
+	LOAD_FUNCTION(process, newcore);
+	LOAD_FUNCTION(new_card, newcore);
+	LOAD_FUNCTION(new_tag_card, newcore);
+	LOAD_FUNCTION(new_relay_card, newcore);
+	LOAD_FUNCTION(query_card, newcore);
+	LOAD_FUNCTION(query_field_count, newcore);
+	LOAD_FUNCTION(query_field_card, newcore);
+	LOAD_FUNCTION(query_field_info, newcore);
+	LOAD_FUNCTION(set_responsei, newcore);
+	LOAD_FUNCTION(set_responseb, newcore);
+	LOAD_FUNCTION(preload_script, newcore);
 	return newcore;
 }
+#undef LOAD_FUNCTION
+
+#define LOAD_WITH_COPY_CHECK(x,core) STORE_CLONE(x)\
+		x = (decltype(x))GetFunction(core, #x);\
+		if(!x) {\
+			UnloadCore(core);\
+			RestoreFromCopies();\
+			return false;\
+		}
+
 bool ReloadCore(void *handle) {
 	if(!handle)
 		return false;
-	LF(set_script_reader, handle);
-	LF(set_card_reader, handle);
-	LF(set_message_handler, handle);
-	LF(create_duel, handle);
-	LF(start_duel, handle);
-	LF(end_duel, handle);
-	LF(set_player_info, handle);
-	LF(get_log_message, handle);
-	LF(get_message, handle);
-	LF(process, handle);
-	LF(new_card, handle);
-	LF(new_tag_card, handle);
-	LF(new_relay_card, handle);
-	LF(query_card, handle);
-	LF(query_field_count, handle);
-	LF(query_field_card, handle);
-	LF(query_field_info, handle);
-	LF(set_responsei, handle);
-	LF(set_responseb, handle);
-	LF(preload_script, handle);
+	LOAD_WITH_COPY_CHECK(set_script_reader, handle);
+	LOAD_WITH_COPY_CHECK(set_card_reader, handle);
+	LOAD_WITH_COPY_CHECK(set_message_handler, handle);
+	LOAD_WITH_COPY_CHECK(create_duel, handle);
+	LOAD_WITH_COPY_CHECK(start_duel, handle);
+	LOAD_WITH_COPY_CHECK(end_duel, handle);
+	LOAD_WITH_COPY_CHECK(set_player_info, handle);
+	LOAD_WITH_COPY_CHECK(get_log_message, handle);
+	LOAD_WITH_COPY_CHECK(get_message, handle);
+	LOAD_WITH_COPY_CHECK(process, handle);
+	LOAD_WITH_COPY_CHECK(new_card, handle);
+	LOAD_WITH_COPY_CHECK(new_tag_card, handle);
+	LOAD_WITH_COPY_CHECK(new_relay_card, handle);
+	LOAD_WITH_COPY_CHECK(query_card, handle);
+	LOAD_WITH_COPY_CHECK(query_field_count, handle);
+	LOAD_WITH_COPY_CHECK(query_field_card, handle);
+	LOAD_WITH_COPY_CHECK(query_field_info, handle);
+	LOAD_WITH_COPY_CHECK(set_responsei, handle);
+	LOAD_WITH_COPY_CHECK(set_responseb, handle);
+	LOAD_WITH_COPY_CHECK(preload_script, handle);
 	return true;
 }
+
+#undef LOAD_WITH_COPY_CHECK
 
 void UnloadCore(void *handle) {
 	CloseLibrary(handle);
@@ -133,32 +196,41 @@ void UnloadCore(void *handle) {
 	preload_script = nullptr;
 }
 
+#define CHANGE_WITH_COPY_CHECK(x,core) STORE_CLONE(x)\
+		x = (decltype(x))GetFunction(core, #x);\
+		if(!x) {\
+			CloseLibrary(core);\
+			RestoreFromCopies();\
+			return nullptr;\
+		}
+
 void* ChangeOCGcore(const std::string& path, void *handle) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
-	LF(set_script_reader, newcore);
-	LF(set_card_reader, newcore);
-	LF(set_message_handler, newcore);
-	LF(create_duel, newcore);
-	LF(start_duel, newcore);
-	LF(end_duel, newcore);
-	LF(set_player_info, newcore);
-	LF(get_log_message, newcore);
-	LF(get_message, newcore);
-	LF(process, newcore);
-	LF(new_card, newcore);
-	LF(new_tag_card, newcore);
-	LF(new_relay_card, newcore);
-	LF(query_card, newcore);
-	LF(query_field_count, newcore);
-	LF(query_field_card, newcore);
-	LF(query_field_info, newcore);
-	LF(set_responsei, newcore);
-	LF(set_responseb, newcore);
-	LF(preload_script, newcore);
-	CloseLibrary(handle);
+	CHANGE_WITH_COPY_CHECK(set_script_reader, newcore);
+	CHANGE_WITH_COPY_CHECK(set_card_reader, newcore);
+	CHANGE_WITH_COPY_CHECK(set_message_handler, newcore);
+	CHANGE_WITH_COPY_CHECK(create_duel, newcore);
+	CHANGE_WITH_COPY_CHECK(start_duel, newcore);
+	CHANGE_WITH_COPY_CHECK(end_duel, newcore);
+	CHANGE_WITH_COPY_CHECK(set_player_info, newcore);
+	CHANGE_WITH_COPY_CHECK(get_log_message, newcore);
+	CHANGE_WITH_COPY_CHECK(get_message, newcore);
+	CHANGE_WITH_COPY_CHECK(process, newcore);
+	CHANGE_WITH_COPY_CHECK(new_card, newcore);
+	CHANGE_WITH_COPY_CHECK(new_tag_card, newcore);
+	CHANGE_WITH_COPY_CHECK(new_relay_card, newcore);
+	CHANGE_WITH_COPY_CHECK(query_card, newcore);
+	CHANGE_WITH_COPY_CHECK(query_field_count, newcore);
+	CHANGE_WITH_COPY_CHECK(query_field_card, newcore);
+	CHANGE_WITH_COPY_CHECK(query_field_info, newcore);
+	CHANGE_WITH_COPY_CHECK(set_responsei, newcore);
+	CHANGE_WITH_COPY_CHECK(set_responseb, newcore);
+	CHANGE_WITH_COPY_CHECK(preload_script, newcore);
+	if(handle)
+		CloseLibrary(handle);
 	return newcore;
 }
-#undef LF
+#undef CHANGE_WITH_COPY_CHECK
 #endif //YGOPRO_BUILD_DLL
