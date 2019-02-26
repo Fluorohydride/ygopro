@@ -670,7 +670,7 @@ bool Game::Initialize() {
 	lstSinglePlayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wSinglePlay, LISTBOX_SINGLEPLAY_LIST, rect<s32>(10, 30, 350, 400), filesystem, true, true, false);
 	lstSinglePlayList->setItemHeight(18);
 	lstSinglePlayList->setWorkingPath(L"./single");
-	lstSinglePlayList->addFilteredExtensions(std::vector<std::wstring>{L"lua"});
+	lstSinglePlayList->addFilteredExtensions({L"lua"});
 	btnLoadSinglePlay = env->addButton(rect<s32>(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211).c_str());
 	btnSinglePlayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210).c_str());
 	env->addStaticText(dataManager.GetSysString(1352).c_str(), rect<s32>(360, 30, 570, 50), false, true, wSinglePlay);
@@ -887,17 +887,24 @@ void Game::MainLoop() {
 				}
 			}
 		}
+#ifdef YGOPRO_BUILD_DLL
 		if(!dInfo.isStarted && cores_to_load.size() && repoManager.GetUpdatingRepos() == 0) {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
 				if((ncore = ChangeOCGcore(path, ocgcore))) {
 					ocgcore = ncore;
-					coreloaded = true;
+					if(!coreloaded) {
+						coreloaded = true;
+						btnSingleMode->setEnabled(true);
+						btnCreateHost->setEnabled(true);
+						lstReplayList->addFilteredExtensions({L"yrp", L"yrpx"});
+					}
 					break;
 				}
 			}
 			cores_to_load.clear();
 		}
+#endif YGOPRO_BUILD_DLL
 		if(gameConf.max_fps) {
 			int ndelta_time = timer->getRealTime() - prev_time;
 			int sleep_time = (1000 / gameConf.max_fps) - ndelta_time;
