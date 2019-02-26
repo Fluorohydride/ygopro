@@ -163,7 +163,7 @@ void ImageManager::DownloadPic(int code) {
 	std::string ext;
 	pic_download.lock();
 	if(downloading_pics.find(code) == downloading_pics.end()) {
-		downloading_pics[code].first = false;
+		downloading_pics[code].first = 0;
 		pic_download.unlock();
 		for(auto& src : pic_urls) {
 			if(src.type == "field")
@@ -192,8 +192,11 @@ void ImageManager::DownloadPic(int code) {
 		return;
 	}
 	pic_download.lock();
-	downloading_pics[code].first = true;
-	downloading_pics[code].second = dest_folder + ext;
+	if(ext.size()) {
+		downloading_pics[code].first = 2;
+		downloading_pics[code].second = dest_folder + ext;
+	} else
+		downloading_pics[code].first = 1;
 	pic_download.unlock();
 }
 void ImageManager::DownloadField(int code) {
@@ -203,7 +206,7 @@ void ImageManager::DownloadField(int code) {
 	std::string ext;
 	field_download.lock();
 	if(downloading_fields.find(code) == downloading_fields.end()) {
-		downloading_fields[code].first = false;
+		downloading_fields[code].first = 0;
 		field_download.unlock();
 		for(auto& src : pic_urls) {
 			if(src.type == "pic")
@@ -232,8 +235,11 @@ void ImageManager::DownloadField(int code) {
 		return;
 	}
 	field_download.lock();
-	downloading_fields[code].first = true;
-	downloading_fields[code].second = dest_folder + ext;
+	if(ext.size()) {
+		downloading_fields[code].first = 2;
+		downloading_fields[code].second = dest_folder + ext;
+	} else
+		downloading_fields[code].first = 1;
 	field_download.unlock();
 }
 void ImageManager::ClearCachedTextures() {
@@ -353,7 +359,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, int width, int 
 	bool should_download = downloading_pics.find(code) == downloading_pics.end();
 	pic_download.unlock();
 	if(!should_download) {
-		while(!downloading_pics[code].first) {
+		while(downloading_pics[code].first <= 1) {
 			if(timestamp_id != source_timestamp_id.load()) {
 				return std::make_pair(nullptr, "fail");
 			}
@@ -375,7 +381,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, int width, int 
 	}
 	if(should_download) {
 		std::async(std::launch::async, &ImageManager::DownloadPic, this, code);
-		while(!downloading_pics[code].first) {
+		while(downloading_pics[code].first <= 1) {
 			if(timestamp_id != source_timestamp_id.load()) {
 				return std::make_pair(nullptr, "fail");
 			}
@@ -479,18 +485,19 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		field_download.unlock();
 		irr::video::ITexture* img = nullptr;
 		if(!should_download) {
-			if(downloading_fields[code].first) {
+			if(downloading_fields[code].first == 2) {
 				img = driver->getTexture(downloading_fields[code].second.c_str());
-			}
+			} else
+				return nullptr;
 		} else {
 			for(auto& path : mainGame->field_dirs) {
 				for(auto& extension : { ".png", ".jpg" }) {
 					if(img = driver->getTexture((path + std::to_string(code) + extension).c_str()))
-						return img;
+						break;
 				}
 			}
 		}
-		if(should_download)
+		if(should_download && !img)
 			std::async(std::launch::async, &ImageManager::DownloadField, this, code);
 		else
 			tFields[code] = img;
