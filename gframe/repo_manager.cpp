@@ -16,7 +16,7 @@ int fetchead_foreach_cb(const char *ref_name, const char *remote_url, const git_
 		int curr = 0;
 		int total;
 	};
-	payload_struct* _payload = (payload_struct*)payload;
+	payload_struct* _payload = static_cast<payload_struct*>(payload);
 	git_repository* repo = _payload->repo;
 	_payload->curr++;
 	int fetch_percent = (((100 * _payload->curr) / _payload->total) / 2) + 50;
@@ -141,7 +141,7 @@ int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid
 
 	fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress *stats, void *payload)->int {
 		int fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 50;
-		RepoPayload* repo_status = (RepoPayload*)payload;
+		RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 		repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
 		return 0;
 	};
@@ -175,7 +175,7 @@ int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid
 	}, &count);
 
 	git_repository_fetchhead_foreach(repo, [](const char *ref_name, const char *remote_url, const git_oid *oid, unsigned int is_merge, void *payload)->int {
-		git_oid* id = (git_oid*)payload;
+		git_oid* id = static_cast<git_oid*>(payload);
 		*id = *oid;
 		return 1;
 	}, id);
@@ -265,7 +265,7 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 		git_clone_options opts = GIT_CLONE_OPTIONS_INIT;
 		opts.checkout_opts.progress_cb = [](const char *path, size_t cur, size_t tot, void *payload) {
 			int fetch_percent = (((100 * cur) / tot) / 2) + 50;
-			RepoPayload* repo_status = (RepoPayload*)payload;
+			RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 			repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
 		};
 		RepoPayload payload;
@@ -274,7 +274,7 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 		opts.checkout_opts.progress_payload = &payload;
 		opts.fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress *stats, void *payload) {
 			int fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 2;
-			RepoPayload* repo_status = (RepoPayload*)payload;
+			RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 			repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
 			return 0;
 		};
