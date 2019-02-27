@@ -164,21 +164,14 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	out->write(ptr, nbytes);
 	return nbytes;
 }
-bool IsValidImage(const std::string& file, std::string& extension) {
-	extension.clear();
-	std::ifstream pic(file, std::ifstream::binary);
-	unsigned char pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a }; //png header
-	unsigned char jpgheader[] = { 0xff, 0xd8, 0xff }; //jpg header
-	unsigned char header[8];
-	pic.read((char*)header, 8);
+const char* GetExtension(char* header) {
+	std::string extension;
 	int res = CheckImageHeader((char*)header);
-	if(res == 1) {
-		extension = ".png";
-	} else if(res == 2) {
-		extension = ".jpg";
-	} else
-		return false;
-	return true;
+	if(res == 1)
+		return ".png";
+	else if(res == 2)
+		return ".jpg";
+	return "";
 }
 void ImageManager::DownloadPic(int code) {
 	auto id = std::to_string(code);
@@ -209,7 +202,8 @@ void ImageManager::DownloadPic(int code) {
 				res = curl_easy_perform(curl);
 				curl_easy_cleanup(curl);
 				fp.close();
-				if(res == CURLE_OK && IsValidImage(name, ext)) {
+				if(res == CURLE_OK) {
+					ext = GetExtension(payload.header);
 					Utils::Movefile(name, dest_folder + ext);
 					break;
 				} else {
@@ -258,7 +252,8 @@ void ImageManager::DownloadField(int code) {
 				res = curl_easy_perform(curl);
 				curl_easy_cleanup(curl);
 				fp.close();
-				if(res == CURLE_OK && IsValidImage(name, ext)) {
+				if(res == CURLE_OK) {
+					ext = GetExtension(payload.header);
 					Utils::Movefile(name, dest_folder + ext);
 					break;
 				} else {
