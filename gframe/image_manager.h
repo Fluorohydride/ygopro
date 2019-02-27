@@ -19,7 +19,7 @@ private:
 	using image_path = std::pair<IImage*, std::string>;
 	using loading_map = std::map<int, std::future<image_path>>;
 	using chrono_time = unsigned long long;
-	using downloading_map = std::map<int/*code*/, std::pair<int /*status: value not found: not yet downloaded, 0: downloading, 1: corrently downloaded, 2: not correctly downloaded*/, std::string>>;
+	using downloading_map = std::map<int/*code*/, std::pair<int /*status: value not found: not yet downloaded, 0: downloading, 1: not correctly downloaded, 2: correctly downloaded*/, std::string>>;
 public:
 	ImageManager() {
 		loading_pics[0] = new loading_map();

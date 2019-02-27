@@ -5,6 +5,7 @@
 #include <map>
 #include <future>
 #include <vector>
+#include <mutex>
 extern "C" {
 #include <git2.h>
 }
@@ -26,7 +27,13 @@ public:
 		bool has_core = false;
 		bool ready = false;
 		std::string error = "";
+		std::vector<std::string> commit_history;
 		void Sanitize();
+	};
+	struct RepoPayload {
+		RepoManager* repo_manager = nullptr;
+		git_repository* repo = nullptr;
+		std::string path;
 	};
 
 
@@ -39,23 +46,32 @@ public:
 
 	std::vector<GitRepo> GetReadyRepos();
 
+	std::map<std::string, int> GetRepoStatus();
+
 	size_t GetUpdatingRepos() {
 		return working_repos.size();
 	};
 
 	void AddRepo(GitRepo repo);
 
+	void UpdateStatus(std::string repo, int percentage);
+
 private:
 
 	std::vector<GitRepo> available_repos;
 
-	std::string CloneorUpdateThreaded(GitRepo repo);
+	std::vector<std::string> CloneorUpdateThreaded(GitRepo repo);
+
+	int jsgitpull(git_repository * repo, std::string repo_path, git_oid* id);
 
 	bool CloneorUpdate(GitRepo repo);
 
 	void UpdateReadyRepos();
+	
+	std::map<std::string, std::future<std::vector<std::string>>> working_repos;
 
-	std::map<std::string, std::future<std::string>> working_repos;
+	std::map<std::string, int> repos_status;
+	std::mutex repos_status_mutex;
 };
 
 extern RepoManager repoManager;
