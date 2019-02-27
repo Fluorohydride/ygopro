@@ -135,8 +135,31 @@ void ImageManager::ClearFutureObjects(loading_map* map) {
 	}
 	delete map;
 }
+int CheckImageHeader(char* header) {
+	unsigned char pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a }; //png header
+	unsigned char jpgheader[] = { 0xff, 0xd8, 0xff }; //jpg header
+	if(!memcmp(pngheader, header, sizeof(pngheader))) {
+		return 1;
+	} else if(!memcmp(jpgheader, header, sizeof(jpgheader))) {
+		return 2;
+	} else
+		return 0;
+}
 size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
-	std::ofstream *out = static_cast<std::ofstream *>(userdata);
+	struct payload {
+		std::ofstream* stream;
+		char header[8];
+		int header_written;
+	};
+	auto data = static_cast<payload*>(userdata);
+	if(data->header_written < 8) {
+		auto increase = std::min(nmemb * size, (size_t)(8 - data->header_written));
+		memcpy(&data->header[data->header_written], ptr, increase);
+		data->header_written += increase;
+		if(data->header_written == 8 && !CheckImageHeader(data->header))
+			return -1;
+	}
+	std::ofstream *out = data->stream;
 	size_t nbytes = size * nmemb;
 	out->write(ptr, nbytes);
 	return nbytes;
@@ -148,9 +171,10 @@ bool IsValidImage(const std::string& file, std::string& extension) {
 	unsigned char jpgheader[] = { 0xff, 0xd8, 0xff }; //jpg header
 	unsigned char header[8];
 	pic.read((char*)header, 8);
-	if(!memcmp(pngheader, header, sizeof(pngheader))) {
+	int res = CheckImageHeader((char*)header);
+	if(res == 1) {
 		extension = ".png";
-	} else if(!memcmp(jpgheader, header, sizeof(jpgheader))) {
+	} else if(res == 2) {
 		extension = ".jpg";
 	} else
 		return false;
@@ -169,13 +193,19 @@ void ImageManager::DownloadPic(int code) {
 			if(src.type == "field")
 				continue;
 			CURL *curl = NULL;
+			struct {
+				std::ofstream* stream;
+				char header[8] = { 0 };
+				int header_written = 0;
+			} payload;
 			std::ofstream fp(name, std::ofstream::binary);
+			payload.stream = &fp;
 			CURLcode res;
 			curl = curl_easy_init();
 			if(curl) {
 				curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fp);
+				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
 				res = curl_easy_perform(curl);
 				curl_easy_cleanup(curl);
 				fp.close();
@@ -212,7 +242,13 @@ void ImageManager::DownloadField(int code) {
 			if(src.type == "pic")
 				continue;
 			CURL *curl = NULL;
+			struct {
+				std::ofstream* stream;
+				char header[8] = { 0 };
+				int header_written = 0;
+			} payload;
 			std::ofstream fp(name, std::ofstream::binary);
+			payload.stream = &fp;
 			CURLcode res;
 			curl = curl_easy_init();
 			if(curl) {
