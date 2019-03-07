@@ -7,6 +7,7 @@
 #include "menu_handler.h"
 #include <unordered_map>
 #include <vector>
+#include <deque>
 #include <list>
 
 namespace ygo {
@@ -166,7 +167,7 @@ public:
 	DuelInfo dInfo;
 
 	std::list<FadingUnit> fadingList;
-	std::vector<int> logParam;
+	std::deque<int> logParam;
 	std::wstring chatMsg[8];
 	std::vector<BotInfo> botInfo;
 
