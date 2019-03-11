@@ -140,7 +140,7 @@ int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid
 	fetch_opts.callbacks.credentials = cred_acquire_cb;*/
 
 	fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress *stats, void *payload)->int {
-		int fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 50;
+		int fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 2;
 		RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 		repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
 		return 0;
@@ -256,9 +256,13 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 				Utils::Deletefile(_repo.repo_path + "/" + file);
 			}
 			git_commit* commit = getLastCommit(repo);
-			git_reset(repo, (git_object*)commit, GIT_RESET_HARD, nullptr);
-			git_commit_free(commit);
+			if(commit) {
+				git_reset(repo, (git_object*)commit, GIT_RESET_HARD, nullptr);
+				git_commit_free(commit);
+			}
 			res = jsgitpull(repo, _repo.repo_path, &id);
+		} else {
+			UpdateStatus(_repo.repo_path, 100);
 		}
 	} else {
 		repo = nullptr;
@@ -284,6 +288,7 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 	if(res < 0) {
 		const git_error *e = giterr_last();
 		errstring = std::to_string(res) + "/" + std::to_string(res) + e->message;
+		return { errstring };
 	}
 	auto commits = GetCommitsInfo(repo, id);
 	git_repository_free(repo);
