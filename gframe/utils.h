@@ -18,6 +18,8 @@ namespace ygo {
 		static bool Movefile(const std::wstring& source, const std::wstring& destination);
 		static bool Deletefile(const std::string& source);
 		static bool Deletefile(const std::wstring& source);
+		static bool ClearDirectory(const std::string& path);
+		static bool ClearDirectory(const std::wstring& path);
 		static bool Deletedirectory(const std::string& source);
 		static bool Deletedirectory(const std::wstring& source);
 		static void CreateResourceFolders();

@@ -66,15 +66,67 @@ namespace ygo {
 		return Deletefile(BufferIO::EncodeUTF8s(source));
 #endif
 	}
+	bool Utils::ClearDirectory(const std::string & path) {
+#ifdef _WIN32
+		return ClearDirectory(BufferIO::DecodeUTF8s(path));
+#else
+		DIR * dir;
+		struct dirent * dirp = nullptr;
+		if((dir = opendir(path.c_str())) != nullptr) {
+			struct stat fileStat;
+			while((dirp = readdir(dir)) != nullptr) {
+				stat((path + dirp->d_name).c_str(), &fileStat);
+				std::string name = dirp->d_name;
+				if(S_ISDIR(fileStat.st_mode)) {
+					if(name == ".." || name == ".") {
+						continue;
+					}
+					Deletedirectory(path + name + "/");
+					continue;
+				} else {
+					Deletefile(path + name);
+				}
+			}
+			closedir(dir);
+		}
+		return true;
+#endif
+	}
+	bool Utils::ClearDirectory(const std::wstring & path) {
+#ifdef _WIN32
+		WIN32_FIND_DATAW fdataw;
+		HANDLE fh = FindFirstFileW((path + L"*.*").c_str(), &fdataw);
+		if(fh != INVALID_HANDLE_VALUE) {
+			do {
+				std::wstring name = fdataw.cFileName;
+				if(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					if(name == L".." || name == L".") {
+						continue;
+					}
+					Deletedirectory(path + name + L"/");
+					continue;
+				} else {
+					Deletefile(path + name);
+				}
+			} while(FindNextFileW(fh, &fdataw));
+			FindClose(fh);
+		}
+		return true;
+#else
+		return ClearDirectory(BufferIO::EncodeUTF8s(path));
+#endif
+	}
 	bool Utils::Deletedirectory(const std::string & source) {
 #ifdef _WIN32
 		return Deletedirectory(BufferIO::DecodeUTF8s(source));
 #else
+		ClearDirectory(source);
 		return rmdir(source.c_str()) == 0;
 #endif
 	}
 	bool Utils::Deletedirectory(const std::wstring & source) {
 #ifdef _WIN32
+		ClearDirectory(source);
 		return RemoveDirectory(source.c_str());
 #else
 		return Deletedirectory(BufferIO::EncodeUTF8s(source));
@@ -85,8 +137,7 @@ namespace ygo {
 		Makedirectory(TEXT("deck"));
 		Makedirectory(TEXT("pics"));
 		Makedirectory(TEXT("pics/field"));
-		Deletedirectory(TEXT("pics/temp"));
-		Makedirectory(TEXT("pics/temp"));
+		ClearDirectory(TEXT("pics/temp/"));
 		Makedirectory(TEXT("replay"));
 		Makedirectory(TEXT("screenshots"));
 	}
