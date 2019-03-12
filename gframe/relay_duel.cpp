@@ -1585,21 +1585,22 @@ void RelayDuel::EndDuel() {
 	if(!pduel)
 		return;
 	last_replay.EndRecord(0x1000);
-	char replaybuf[0x2000], *pbuf = replaybuf;
-	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
-	pbuf += sizeof(ReplayHeader);
-	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
+	std::vector<unsigned char> oldreplay;
+	oldreplay.insert(oldreplay.end(),(unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
+	oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
 
-	replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
+	replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), sizeof(ReplayHeader) + last_replay.comp_size));
 
 	//in case of remaining packets, e.g. MSG_WIN
 	new_replay.WriteStream(replay_stream);
 	new_replay.EndRecord();
-	char nreplaybuf[0x2000], *npbuf = nreplaybuf;
-	memcpy(npbuf, &new_replay.pheader, sizeof(ReplayHeader));
-	npbuf += sizeof(ReplayHeader);
-	memcpy(npbuf, new_replay.comp_data, new_replay.comp_size);
-	NetServer::SendBufferToPlayer(players[startp[0]].player, STOC_NEW_REPLAY, nreplaybuf, sizeof(ReplayHeader) + new_replay.comp_size);
+
+	std::vector<unsigned char> newreplay;
+	newreplay.insert(newreplay.end(), (unsigned char*)&new_replay.pheader, ((unsigned char*)&new_replay.pheader) + sizeof(ReplayHeader));
+	newreplay.insert(newreplay.end(), new_replay.comp_data.begin(), new_replay.comp_data.end());
+
+
+	NetServer::SendBufferToPlayer(players[startp[0]].player, STOC_NEW_REPLAY, newreplay.data(), newreplay.size());
 	for (int i = startp[0] + 1; i < 6; i++)
 		if (players[i].player)
 			NetServer::ReSendToPlayer(players[i].player);
@@ -1607,7 +1608,7 @@ void RelayDuel::EndDuel() {
 		NetServer::ReSendToPlayer(*oit);
 
 
-	NetServer::SendBufferToPlayer(players[startp[0]].player, STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
+	NetServer::SendBufferToPlayer(players[startp[0]].player, STOC_REPLAY, oldreplay.data(), oldreplay.size());
 	for (int i = startp[0] + 1; i < 6; i++)
 		if (players[i].player)
 			NetServer::ReSendToPlayer(players[i].player);

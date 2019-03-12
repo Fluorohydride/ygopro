@@ -23,12 +23,9 @@ void ReplayPacket::Set(int msg, char * buf, int len) {
 Replay::Replay() {
 	is_recording = false;
 	is_replaying = false;
-	replay_data = new unsigned char[0x20000];
-	comp_data = new unsigned char[0x2000];
+	can_read = false;
 }
 Replay::~Replay() {
-	delete[] replay_data;
-	delete[] comp_data;
 }
 void Replay::BeginRecord(bool write) {
 #ifdef _WIN32
@@ -50,7 +47,6 @@ void Replay::BeginRecord(bool write) {
 			return;
 	}
 #endif
-	pdata = replay_data;
 	is_recording = true;
 }
 void Replay::WritePacket(ReplayPacket p) {
@@ -81,30 +77,17 @@ void Replay::WriteHeader(ReplayHeader& header) {
 void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	if(!is_recording)
 		return;
-	memcpy(pdata, data, length);
-	pdata += length;
+	replay_data.insert(replay_data.end(), (unsigned char*)data, ((unsigned char*)data) + length);
 	Write(data, length, flush);
 }
 void Replay::WriteInt32(int data, bool flush) {
-	if(!is_recording)
-		return;
-	*((int*)(pdata)) = data;
-	pdata += 4;
-	Write(&data, sizeof(int), flush);
+	WriteData((void*)&data, sizeof(data), flush);
 }
 void Replay::WriteInt16(short data, bool flush) {
-	if(!is_recording)
-		return;
-	*((short*)(pdata)) = data;
-	pdata += 2;
-	Write(&data, sizeof(short), flush);
+	WriteData((void*)&data, sizeof(data), flush);
 }
 void Replay::WriteInt8(char data, bool flush) {
-	if(!is_recording)
-		return;
-	*pdata = data;
-	pdata++;
-	Write(&data, sizeof(char), flush);
+	WriteData((void*)&data, sizeof(data), flush);
 }
 void Replay::Flush() {
 	if(!is_recording)
@@ -124,11 +107,13 @@ void Replay::EndRecord(size_t size) {
 #else
 	fclose(fp);
 #endif
-	pheader.datasize = pdata - replay_data;
+	pheader.datasize = replay_data.size();
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
 	comp_size = size;
-	LzmaCompress(comp_data, &comp_size, replay_data, pdata - replay_data, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
+	comp_data.resize(replay_data.size() * 2);
+	LzmaCompress(&comp_data[0], &comp_size, &replay_data[0], replay_data.size(), pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
+	comp_data.resize(comp_size);
 	is_recording = false;
 }
 void Replay::SaveReplay(const std::wstring& name) {
@@ -140,7 +125,7 @@ void Replay::SaveReplay(const std::wstring& name) {
 	if(!replay_file.is_open())
 		return;
 	replay_file.write((char*)&pheader, sizeof(pheader));
-	replay_file.write((char*)comp_data, comp_size);
+	replay_file.write((char*)&comp_data[0], comp_size);
 	replay_file.close();
 }
 bool Replay::OpenReplay(const std::wstring& name) {
@@ -156,23 +141,25 @@ bool Replay::OpenReplay(const std::wstring& name) {
 		if(!replay_file.is_open())
 			return false;
 	}
-	if(replay_file.read((char*)&pheader, sizeof(pheader)).gcount() < 1) {
-		replay_file.close();
-		return false;
-	}
+	std::vector<uint8_t> contents((std::istreambuf_iterator<char>(replay_file)), std::istreambuf_iterator<char>());
+	memcpy(&pheader, contents.data(), sizeof(pheader));
+	contents.erase(contents.begin(), contents.begin() + sizeof(pheader));
+	comp_size = contents.size();
 	if(pheader.flag & REPLAY_COMPRESSED) {
-		comp_size = replay_file.read((char*)comp_data, 0x20000).gcount();
+		replay_data.resize(0x200000);
 		replay_file.close();
 		replay_size = pheader.datasize;
-		if(LzmaUncompress(replay_data, &replay_size, comp_data, &comp_size, pheader.props, 5) != SZ_OK)
+		if(LzmaUncompress(&replay_data[0], &replay_size, &contents[0], &comp_size, pheader.props, 5) != SZ_OK)
 			return false;
+		replay_data.resize(replay_size);
 	} else {
-		comp_size = replay_file.read((char*)replay_data, 0x20000).gcount();
+		replay_data = contents;
 		replay_file.close();
 		replay_size = comp_size;
 	}
-	pdata = replay_data;
+	data_iterator = replay_data.begin();
 	is_replaying = true;
+	can_read = true;
 	return true;
 }
 bool Replay::CheckReplay(const std::wstring& name) {
@@ -194,9 +181,9 @@ bool Replay::CheckReplay(const std::wstring& name) {
 	return count == 1 && (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
 }
 bool Replay::ReadNextPacket(ReplayPacket* packet) {
-	if (pdata - replay_data >= (int)replay_size)
+	if (!can_read)
 		return false;
-	packet->message = *pdata++;
+	packet->message = (unsigned char)ReadInt8();
 	packet->length = ReadInt32();
 	ReadData((char*)&packet->data, packet->length);
 	return true;
@@ -216,54 +203,57 @@ bool Replay::RenameReplay(const std::wstring& oldname, const std::wstring& newna
 	return Utils::Movefile(L"./replay/" + oldname, L"./replay/" + newname);
 }
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
-	if(pdata - replay_data >= (int)replay_size)
+	if(!can_read)
 		return false;
-	int len = *pdata++;
-	if(len > 64)
+	int len = ReadInt8();
+	if(len > 64 || len < 1)
 		return false;
-	memcpy(resp, pdata, len);
-	pdata += len;
+	ReadData(resp, len);
 	return true;
 }
-void Replay::ReadName(wchar_t* data) {
-	if(!is_replaying)
-		return;
+bool Replay::ReadName(wchar_t* data) {
+	if(!is_replaying || !can_read)
+		return false;
 	unsigned short buffer[20];
 	ReadData(buffer, 40);
 	BufferIO::CopyWStr(buffer, data, 20);
+	return true;
 }
-void Replay::ReadData(void* data, unsigned int length) {
-	if(!is_replaying)
-		return;
-	memcpy(data, pdata, length);
-	pdata += length;
+bool Replay::ReadData(void* data, unsigned int length) {
+	if(!is_replaying || !can_read)
+		return false;
+	auto loc = std::distance(replay_data.begin(), data_iterator);
+	if((replay_data.size() - loc) < length) {
+		can_read = false;
+		return false;
+	}
+	memcpy(data, &replay_data[loc], length);
+	data_iterator += length;
+	return true;
+}
+template<typename  T>
+T Replay::Read() {
+	T ret = 0;
+	if(!ReadData(&ret, sizeof(T)))
+		return -1;
+	return ret;
 }
 int Replay::ReadInt32() {
-	if(!is_replaying)
-		return -1;
-	int ret = *((int*)pdata);
-	pdata += 4;
-	return ret;
+	return Read<int>();
 }
 short Replay::ReadInt16() {
-	if(!is_replaying)
-		return -1;
-	short ret = *((short*)pdata);
-	pdata += 2;
-	return ret;
+	return Read<short>();
 }
 char Replay::ReadInt8() {
-	if(!is_replaying)
-		return -1;
-	return *pdata++;
+	return Read<char>();
 }
 void Replay::Rewind() {
-	pdata = replay_data;
+	data_iterator = replay_data.begin();
 }
 
 bool Replay::LoadYrp() {
 	if (pheader.flag & REPLAY_NEWREPLAY) {
-		pdata += (4 + ((pheader.flag & REPLAY_RELAY) ? 240 : (pheader.flag & REPLAY_TAG) ? 160 : 80));
+		data_iterator += (4 + ((pheader.flag & REPLAY_RELAY) ? 240 : (pheader.flag & REPLAY_TAG) ? 160 : 80));
 		ReplayPacket p;
 		while (ReadNextPacket(&p))
 			if (p.message == OLD_REPLAY_MODE) {
@@ -273,13 +263,14 @@ bool Replay::LoadYrp() {
 				if(pheader.flag & REPLAY_COMPRESSED) {
 					comp_size = (size_t)(p.length - sizeof(ReplayHeader));
 					replay_size = pheader.datasize;
-					if (LzmaUncompress(replay_data, &replay_size, (unsigned char*)prep, &comp_size, pheader.props, 5) != SZ_OK)
+					if (LzmaUncompress(&replay_data[0], &replay_size, (unsigned char*)prep, &comp_size, pheader.props, 5) != SZ_OK)
 						return false;
 				} else {
-					replay_data = comp_data;
+					replay_data.insert(replay_data.begin(), prep, prep + (size_t)(p.length - sizeof(ReplayHeader)));
 					replay_size = comp_size;
 				}
-				pdata = replay_data;
+				replay_data.shrink_to_fit();
+				data_iterator = replay_data.begin();
 				is_replaying = true;
 				return true;
 			}

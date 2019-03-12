@@ -984,7 +984,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		last_replay;
 		memcpy(&last_replay.pheader, prep, sizeof(ReplayHeader));
 		prep += sizeof(ReplayHeader);
-		memcpy(last_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
+		memcpy(last_replay.comp_data.data(), prep, len - sizeof(ReplayHeader) - 1);
 		last_replay.comp_size = len - sizeof(ReplayHeader) - 1;
 		break;
 	}

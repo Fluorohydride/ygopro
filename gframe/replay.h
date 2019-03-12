@@ -2,7 +2,7 @@
 #define REPLAY_H
 
 #include "config.h"
-#include <time.h>
+#include <ctime>
 #include <vector>
 
 namespace ygo {
@@ -59,8 +59,10 @@ public:
 	static bool DeleteReplay(const std::wstring& name);
 	static bool RenameReplay(const std::wstring& oldname, const std::wstring& newname);
 	bool ReadNextResponse(unsigned char resp[64]);
-	void ReadName(wchar_t* data);
-	void ReadData(void* data, unsigned int length);
+	bool ReadName(wchar_t* data);
+	bool ReadData(void* data, unsigned int length);
+	template <typename  T>
+	T Read();
 	int ReadInt32();
 	short ReadInt16();
 	char ReadInt8();
@@ -72,14 +74,15 @@ public:
 #ifdef _WIN32
 	HANDLE recording_fp;
 #endif
-	unsigned char* replay_data;
-	unsigned char* comp_data;
-	unsigned char* pdata;
+	std::vector<uint8_t> replay_data;
+	std::vector<uint8_t> comp_data;
+	std::vector<uint8_t>::iterator data_iterator;
 	size_t replay_size;
 	size_t comp_size;
 	bool is_recording;
 	bool is_writing;
 	bool is_replaying;
+	bool can_read;
 };
 
 }

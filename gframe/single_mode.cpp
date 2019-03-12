@@ -129,12 +129,10 @@ int SingleMode::SinglePlayThread() {
 		}
 	}
 	last_replay.EndRecord(0x1000);
-	char replaybuf[0x2000], *pbuf = replaybuf;
-	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
-	pbuf += sizeof(ReplayHeader);
-	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
-
-	new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size));
+	std::vector<unsigned char> oldreplay;
+	oldreplay.insert(oldreplay.end(), (unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
+	oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
+	new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), oldreplay.size()));
 
 	new_replay.EndRecord();
 	time_t nowtime = time(NULL);
