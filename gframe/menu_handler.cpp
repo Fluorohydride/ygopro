@@ -295,6 +295,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.LoadYrp())
 					break;
 				mainGame->ClearCardInfo();
+				mainGame->mTopMenu->setVisible(false);
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);
@@ -546,6 +547,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.LoadYrp())
 					break;
 				mainGame->ClearCardInfo();
+				mainGame->mTopMenu->setVisible(false);
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);

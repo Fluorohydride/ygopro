@@ -18,6 +18,7 @@ public:
 	class GitRepo {
 	public:
 		std::string url = "";
+		std::string repo_name = "";
 		std::string repo_path = "";
 		std::string data_path = "";
 		std::string script_path = "script";
@@ -28,7 +29,7 @@ public:
 		bool ready = false;
 		std::string error = "";
 		std::vector<std::string> commit_history;
-		void Sanitize();
+		bool Sanitize();
 	};
 	struct RepoPayload {
 		RepoManager* repo_manager = nullptr;
@@ -52,7 +53,7 @@ public:
 		return working_repos.size();
 	};
 
-	void AddRepo(GitRepo repo);
+	bool AddRepo(GitRepo repo);
 
 	void UpdateStatus(std::string repo, int percentage);
 

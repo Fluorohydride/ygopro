@@ -77,6 +77,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->gMutex.lock();
 	mainGame->HideElement(mainGame->wSinglePlay);
 	mainGame->ClearCardInfo();
+	mainGame->mTopMenu->setVisible(false);
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wInfos->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);

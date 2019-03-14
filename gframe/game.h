@@ -11,7 +11,11 @@
 #include "CGUISkinSystem/CGUISkinSystem.h"
 #include "CGUICustomText/CGUICustomText.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include "CGUICustomContextMenu/CGUICustomContextMenu.h"
+#include "CGUICustomContextMenu/CGUICustomMenu.h"
+#include "CProgressBar/CProgressBar.h"
 #include "deck_manager.h"
+#include "repo_manager.h"
 
 namespace ygo {
 
@@ -130,6 +134,7 @@ public:
 	void LoadConfig();
 	void SaveConfig();
 	void LoadPicUrls();
+	void AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo);
 	void LoadGithubRepositories();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
@@ -190,6 +195,11 @@ public:
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
 	std::vector<std::string> BGMList;
+	struct RepoGui {
+		std::string path;
+		IProgressBar* progress;
+	};
+	std::map<std::string, std::pair<IProgressBar*, IProgressBar*>> repoInfoGui;
 
 	uint32 delta_time;
 	int hideChatTimer;
@@ -269,6 +279,8 @@ public:
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
+	irr::gui::IGUITab* tabRepositories;
+	irr::gui::IGUIContextMenu* mTabRepositories;
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
@@ -282,6 +294,8 @@ public:
 	irr::gui::IGUIScrollBar* srcVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
+	irr::gui::IGUIContextMenu* mTopMenu;
+	irr::gui::IGUIContextMenu* mRepositoriesInfo;
 	irr::gui::IGUIButton* btnLanMode;
 	irr::gui::IGUIButton* btnSingleMode;
 	irr::gui::IGUIButton* btnReplayMode;

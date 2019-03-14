@@ -8,7 +8,6 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
-#include "repo_manager.h"
 #include <sstream>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -134,6 +133,8 @@ bool Game::Initialize() {
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 #endif
+	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
+	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(L"Repositories Status", 1, true, true));
 	//main menu
 	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
@@ -369,6 +370,10 @@ bool Game::Initialize() {
 	srcVolume->setSmallStep(1);
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(20, 315, 280, 340), tabSystem, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
+	//log
+	tabRepositories = wInfos->addTab(L"Repositories Status");
+	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, rect<s32>(1, 275, 301, 639));
+	mTabRepositories->grab();
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -905,6 +910,10 @@ void Game::MainLoop() {
 			cores_to_load.clear();
 		}
 #endif //YGOPRO_BUILD_DLL
+		for(auto& repo : repoManager.GetRepoStatus()) {
+			repoInfoGui[repo.first].first->setProgress(repo.second);
+			repoInfoGui[repo.first].second->setProgress(repo.second);
+		}
 		if(gameConf.max_fps) {
 			int ndelta_time = timer->getRealTime() - prev_time;
 			int sleep_time = (1000 / gameConf.max_fps) - ndelta_time;
@@ -1163,6 +1172,34 @@ void Game::LoadPicUrls() {
 		ErrorLog(std::string("Exception ocurred: ") + e.what());
 	}
 }
+void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
+	std::wstring name = BufferIO::DecodeUTF8s(repo.repo_name);
+	auto a = env->addWindow(rect<s32>(0, 0, 470, 55), false, L"", mRepositoriesInfo);
+	a->getCloseButton()->setVisible(false);
+	a->setDraggable(false);
+	a->setDrawTitlebar(false);
+	a->setDrawBackground(false);
+	env->addStaticText(name.c_str(), rect<s32>(5, 5, 170 + 295, 20 + 5), false, false, a);
+	IProgressBar * pb = new IProgressBar(env, rect<s32>(5, 20 + 15, 170 + 295, 20 + 30), -1, a);
+	pb->addBorder(1);
+	pb->drop();
+	((CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
+	repoInfoGui[repo.repo_path].first = pb;
+
+	auto b = env->addWindow(rect<s32>(0, 0, 300, 55), false, L"", tabRepositories);
+	b->getCloseButton()->setVisible(false);
+	b->setDraggable(false);
+	b->setDrawTitlebar(false);
+	b->setDrawBackground(false);
+	env->addStaticText(name.c_str(), rect<s32>(5, 5, 300, 20 + 5), false, false, b);
+	pb = new IProgressBar(env, rect<s32>(5, 20 + 15, 300 - 5, 20 + 30), -1, b);
+	pb->addBorder(1);
+	pb->drop();
+	((CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
+	repoInfoGui[repo.repo_path].second = pb;
+}
+#define JSON_SET_IF_VALID(field, jsontype, cpptype)if(obj[#field].is_##jsontype())\
+													tmp_repo.field = obj[#field].get<cpptype>();
 void Game::LoadGithubRepositories() {
 	try {
 		std::ifstream f("git_repo.json");
@@ -1173,9 +1210,8 @@ void Game::LoadGithubRepositories() {
 			if(j.size()) {
 				for(auto& obj : j["repos"].get<std::vector<nlohmann::json>>()) {
 					RepoManager::GitRepo tmp_repo;
-					tmp_repo.url = obj["url"].get<std::string>();
-					if(obj["should_update"].is_boolean())
-						tmp_repo.should_update = obj["should_update"].get<bool>();
+					JSON_SET_IF_VALID(url, string, std::string);
+					JSON_SET_IF_VALID(should_update, boolean, bool);
 					if(tmp_repo.url == "default") {
 						tmp_repo.url = "https://github.com/Ygoproco/Live2017Links/";
 						tmp_repo.repo_path = "./expansions/Live2017Links";
@@ -1186,19 +1222,22 @@ void Game::LoadGithubRepositories() {
 						tmp_repo.url = "https://github.com/Ygoproco/LiveanimeLinks/";
 						tmp_repo.repo_path = "./expansions/LiveanimeLinks";
 					} else {
-						tmp_repo.repo_path = obj["repo_path"].get<std::string>();
-						tmp_repo.data_path = obj["data_path"].get<std::string>();
-						tmp_repo.script_path = obj["script_path"].get<std::string>();
-						tmp_repo.pics_path = obj["pics_path"].get<std::string>();
+						JSON_SET_IF_VALID(repo_path, string, std::string);
+						JSON_SET_IF_VALID(repo_name, string, std::string);
+						JSON_SET_IF_VALID(data_path, string, std::string);
+						JSON_SET_IF_VALID(script_path, string, std::string);
+						JSON_SET_IF_VALID(pics_path, string, std::string);
 #ifdef YGOPRO_BUILD_DLL
-						if(obj["core_path"].is_string()) {
+						JSON_SET_IF_VALID(core_path, string, std::string);
+						if(tmp_repo.core_path.size()) {
 							tmp_repo.has_core = true;
-							tmp_repo.core_path = obj["core_path"].get<std::string>();
 						}
 #endif
 					}
-					tmp_repo.Sanitize();
-					repoManager.AddRepo(tmp_repo);
+					if(tmp_repo.Sanitize()) {
+						repoManager.AddRepo(tmp_repo);
+						AddGithubRepositoryStatusWindow(tmp_repo);
+					}
 				}
 			}
 		}
@@ -1207,6 +1246,7 @@ void Game::LoadGithubRepositories() {
 		ErrorLog(std::string("Exception ocurred: ") + e.what());
 	}
 }
+#undef JSON_SET_IF_VALID
 bool Game::PlayChant(unsigned int code) {
 	std::string sound(fmt::format("./sound/chants/{}.wav", code));
 	if(filesystem->existFile(sound.c_str())) {
@@ -1426,6 +1466,7 @@ void Game::CloseDuelWindow() {
 		if(wit->isFadein)
 			wit->autoFadeoutFrame = 1;
 	}
+	mTopMenu->setVisible(true);
 	wACMessage->setVisible(false);
 	wANAttribute->setVisible(false);
 	wANCard->setVisible(false);
@@ -1721,6 +1762,9 @@ void Game::OnResize() {
 	wCardImg->setRelativePosition(Resize(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18));
 	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
+	for(auto& window : repoInfoGui) {
+		window.second.second->setRelativePosition(recti(5, 20 + 15, ((300 - 8) * window_size.Width) / 1024 , 20 + 30));
+	}
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	imageManager.ClearTexture();

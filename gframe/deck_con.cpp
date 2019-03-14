@@ -67,6 +67,7 @@ void DeckBuilder::Initialize() {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
 	mainGame->ClearCardInfo();
+	mainGame->mTopMenu->setVisible(false);
 	mainGame->wInfos->setVisible(true);
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wDeckEdit->setVisible(true);
@@ -95,6 +96,7 @@ void DeckBuilder::Initialize() {
 void DeckBuilder::Terminate() {
 	mainGame->is_building = false;
 	mainGame->ClearCardInfo();
+	mainGame->mTopMenu->setVisible(true);
 	mainGame->wDeckEdit->setVisible(false);
 	mainGame->wCategories->setVisible(false);
 	mainGame->wFilter->setVisible(false);

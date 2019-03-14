@@ -218,14 +218,29 @@ std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
 	std::vector<std::string> res;
 	static git_oid tmp = { 0 };
 	git_revwalk* rewalk;
-	git_revwalk_new(&rewalk, repo);
+	if(git_revwalk_new(&rewalk, repo) < 0) {
+		const git_error *e = giterr_last();
+		return { e->message };
+	}
 	git_revwalk_sorting(rewalk, GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
-	git_revwalk_push_head(rewalk);
-	git_revwalk_hide_glob(rewalk, "tags/*");
+	if(git_revwalk_push_head(rewalk) < 0) {
+		const git_error *e = giterr_last();
+		return { e->message };
+	}
+	if(git_revwalk_hide_glob(rewalk, "tags/*") < 0) {
+		const git_error *e = giterr_last();
+		return { e->message };
+	}
 	git_object *obj;
-	git_revparse_single(&obj, repo, "HEAD~10");
-	git_revwalk_hide(rewalk, git_object_id(obj));
-	git_object_free(obj);
+	if(git_revparse_single(&obj, repo, "HEAD~10") < 0){
+		const git_error *e = giterr_last();
+		return { e->message };
+	}
+	if(git_revwalk_hide(rewalk, git_object_id(obj)) < 0) {
+		git_object_free(obj);
+		const git_error *e = giterr_last();
+		return { e->message };
+	}
 	git_oid oid;
 	while(git_revwalk_next(&oid, rewalk) == 0) {
 		git_commit *c;
@@ -237,6 +252,7 @@ std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
 		git_commit_free(c);
 		res.push_back(message + "\n" + author);
 	}
+	res.insert(res.begin(), "");
 	return res;
 }
 std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
@@ -266,6 +282,7 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 		}
 	} else {
 		repo = nullptr;
+		Utils::Deletedirectory(_repo.repo_path + "/");
 		git_clone_options opts = GIT_CLONE_OPTIONS_INIT;
 		opts.checkout_opts.progress_cb = [](const char *path, size_t cur, size_t tot, void *payload) {
 			int fetch_percent = (((100 * cur) / tot) / 2) + 50;
@@ -287,12 +304,10 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 	}
 	if(res < 0) {
 		const git_error *e = giterr_last();
-		errstring = std::to_string(res) + "/" + std::to_string(res) + e->message;
-		return { errstring };
+		return { e->message };
 	}
 	auto commits = GetCommitsInfo(repo, id);
 	git_repository_free(repo);
-	commits.insert(commits.begin(), errstring);
 	return commits;
 }
 
@@ -339,9 +354,12 @@ std::map<std::string, int> RepoManager::GetRepoStatus() {
 	return repos_status;
 }
 
-void RepoManager::AddRepo(GitRepo repo) {
-	if(CloneorUpdate(repo))
-		available_repos.push_back(repo);	
+bool RepoManager::AddRepo(GitRepo repo) {
+	if(CloneorUpdate(repo)) {
+		available_repos.push_back(repo);
+		return true;
+	}
+	return false;
 }
 
 void RepoManager::UpdateStatus(std::string repo, int percentage) {
@@ -350,7 +368,9 @@ void RepoManager::UpdateStatus(std::string repo, int percentage) {
 	repos_status_mutex.unlock();
 }
 
-void RepoManager::GitRepo::Sanitize() {
+bool RepoManager::GitRepo::Sanitize() {
+	if(url.empty())
+		return false;
 	data_path = repo_path + "/" + data_path + "/";
 	if(script_path.size())
 		script_path = repo_path + "/" + script_path + "/";
@@ -362,6 +382,13 @@ void RepoManager::GitRepo::Sanitize() {
 		pics_path = repo_path + "/pics/";
 	if(has_core)
 		core_path = repo_path + "/" + core_path + "/";
+	if(repo_name.empty()) {
+		size_t found = repo_path.find_last_of("/");
+		repo_name = repo_path.substr(found + 1);
+		if(repo_name.empty())
+			repo_name = repo_path;
+	}
+	return true;
 }
 
 }

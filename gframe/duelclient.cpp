@@ -701,6 +701,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.current_player[1] = 0;
 		mainGame->dInfo.isReplaySwapped = false;
 		mainGame->is_building = false;
+		mainGame->mTopMenu->setVisible(false);
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
 		mainGame->wPhase->setVisible(true);
