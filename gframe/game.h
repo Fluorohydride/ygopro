@@ -168,8 +168,8 @@ public:
 	static bool CompareStrings(std::wstring input, const std::wstring& second_term, bool transform_input = false, bool transform_term = false);
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
 	void* SetupDuel(uint32 seed);
-	std::string LoadScript(const std::string& script_name, int& slen);
-	std::string PreLoadScript(void* pduel, const std::string& script_name);
+	std::vector<unsigned char> LoadScript(const std::string& script_name, int& slen);
+	std::vector<unsigned char> PreLoadScript(void* pduel, const std::string& script_name);
 	static byte* ScriptReader(const char* script_name, int* slen);
 	static int MessageHandler(void* fduel, int type);
 

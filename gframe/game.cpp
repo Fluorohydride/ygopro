@@ -1880,8 +1880,8 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-std::string Game::LoadScript(const std::string& name, int& slen) {
-	std::string buffer;
+std::vector<unsigned char> Game::LoadScript(const std::string& name, int& slen) {
+	std::vector<unsigned char> buffer;
 	slen = 0;
 	IReadFile* file = nullptr;
 	for(auto& path : script_dirs) {
@@ -1897,10 +1897,10 @@ std::string Game::LoadScript(const std::string& name, int& slen) {
 	file->drop();
 	return buffer;
 }
-std::string Game::PreLoadScript(void* pduel, const std::string& script_name) {
+std::vector<unsigned char> Game::PreLoadScript(void* pduel, const std::string& script_name) {
 	int len = 0;
-	std::string buf = LoadScript(script_name, len);
-	preload_script(pduel, (char*)script_name.c_str(), 0, len, &buf[0]);
+	auto buf = LoadScript(script_name, len);
+	preload_script(pduel, (char*)script_name.c_str(), 0, len, (char*)&buf[0]);
 	return buf;
 }
 void* Game::SetupDuel(uint32 seed) {
@@ -1913,9 +1913,9 @@ void* Game::SetupDuel(uint32 seed) {
 	return pduel;
 }
 byte* Game::ScriptReader(const char* script_name, int* slen) {
-	static std::string buffer;
+	static std::vector<unsigned char> buffer;
 	buffer = mainGame->LoadScript(script_name, *slen);
-	return (byte*)&buffer[0];
+	return &buffer[0];
 }
 int Game::MessageHandler(void* fduel, int type) {
 	if(!enable_log)
