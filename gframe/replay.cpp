@@ -157,7 +157,7 @@ bool Replay::OpenReplay(const std::wstring& name) {
 		replay_file.close();
 		replay_size = comp_size;
 	}
-	data_iterator = replay_data.begin();
+	data_position = 0;
 	is_replaying = true;
 	can_read = true;
 	return true;
@@ -222,13 +222,12 @@ bool Replay::ReadName(wchar_t* data) {
 bool Replay::ReadData(void* data, unsigned int length) {
 	if(!is_replaying || !can_read)
 		return false;
-	auto loc = std::distance(replay_data.begin(), data_iterator);
-	if((replay_data.size() - loc) < length) {
+	if((replay_data.size() - data_position) < length) {
 		can_read = false;
 		return false;
 	}
-	memcpy(data, &replay_data[loc], length);
-	data_iterator += length;
+	memcpy(data, &replay_data[data_position], length);
+	data_position += length;
 	return true;
 }
 template<typename  T>
@@ -248,12 +247,12 @@ char Replay::ReadInt8() {
 	return Read<char>();
 }
 void Replay::Rewind() {
-	data_iterator = replay_data.begin();
+	data_position = 0;
 }
 
 bool Replay::LoadYrp() {
 	if (pheader.flag & REPLAY_NEWREPLAY) {
-		data_iterator += (4 + ((pheader.flag & REPLAY_RELAY) ? 240 : (pheader.flag & REPLAY_TAG) ? 160 : 80));
+		data_position += (4 + ((pheader.flag & REPLAY_RELAY) ? 240 : (pheader.flag & REPLAY_TAG) ? 160 : 80));
 		ReplayPacket p;
 		while (ReadNextPacket(&p))
 			if (p.message == OLD_REPLAY_MODE) {
@@ -270,7 +269,7 @@ bool Replay::LoadYrp() {
 					replay_size = comp_size;
 				}
 				replay_data.shrink_to_fit();
-				data_iterator = replay_data.begin();
+				data_position = 0;
 				is_replaying = true;
 				return true;
 			}
