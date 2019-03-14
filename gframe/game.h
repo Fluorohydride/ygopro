@@ -25,6 +25,7 @@ struct Config {
 	wchar_t textfont[256];
 	wchar_t numfont[256];
 	wchar_t roompass[20];
+	wchar_t locale[64];
 	//settings
 	int chkMAutoPos;
 	int chkSTAutoPos;
@@ -113,6 +114,7 @@ public:
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
+	void RefreshLocales();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
@@ -144,6 +146,7 @@ public:
 
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
+	const char* GetLocaleDir(const char* dir);
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
@@ -201,6 +204,8 @@ public:
 	bool is_building;
 	bool is_siding;
 
+	char locale_buf_utf8[256];
+
 	ClientField dField;
 	DeckBuilder deckBuilder;
 	MenuHandler menuHandler;
@@ -255,6 +260,7 @@ public:
 	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUICheckBox* chkMusicMode;
+	irr::gui::IGUIComboBox* cbLocale;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
@@ -637,6 +643,7 @@ extern Game* mainGame;
 
 #define COMBOBOX_SORTTYPE			370
 #define COMBOBOX_LIMIT				371
+#define COMBOBOX_LOCALE				372
 
 #define BUTTON_MARKS_FILTER			380
 #define BUTTON_MARKERS_OK			381
