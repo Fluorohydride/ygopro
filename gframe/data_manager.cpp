@@ -15,7 +15,7 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	if(reader == NULL)
 		return false;
 	spmemvfs_db_t db;
-	spmembuffer_t * mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
+	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
 	spmemvfs_env_init();
 	mem->total = mem->used = reader->getSize();
 	mem->data = (char*)malloc(mem->total + 1);
