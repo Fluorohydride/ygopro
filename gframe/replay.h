@@ -27,13 +27,18 @@ struct ReplayHeader {
 
 class ReplayPacket {
 public:
-	int message;
-	int length;
-	unsigned char data[0x20000];
 	ReplayPacket() {}
 	ReplayPacket(char * buf, int len);
 	ReplayPacket(int msg, char * buf, int len);
 	void Set(int msg, char * buf, int len);
+	int message;
+	std::vector<unsigned char> data;
+};
+
+struct ReplayResponse {
+public:
+	int length;
+	char message[64];
 };
 
 class Replay {
@@ -43,12 +48,14 @@ public:
 	void BeginRecord(bool write = true);
 	void WriteStream(std::vector<ReplayPacket> stream);
 	void WritePacket(ReplayPacket p);
+	template <typename  T>
+	void Write(const void* data, bool flush);
 	void Write(const void* data, size_t size, bool flush);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
-	void WriteInt32(int data, bool flush = true);
-	void WriteInt16(short data, bool flush = true);
-	void WriteInt8(char data, bool flush = true);
+	void WriteInt32(int32_t data, bool flush = true);
+	void WriteInt16(int16_t data, bool flush = true);
+	void WriteInt8(int8_t data, bool flush = true);
 	void Flush();
 	void EndRecord(size_t size = 0x20000);
 	void SaveReplay(const std::wstring& name);
@@ -63,26 +70,31 @@ public:
 	bool ReadData(void* data, unsigned int length);
 	template <typename  T>
 	T Read();
-	int ReadInt32();
-	short ReadInt16();
-	char ReadInt8();
+	int32_t ReadInt32();
+	int16_t ReadInt16();
+	int8_t ReadInt8();
 	void Rewind();
 	bool LoadYrp();
-
-	FILE* fp;
+	bool ParseResponses();
 	ReplayHeader pheader;
-#ifdef _WIN32
-	HANDLE recording_fp;
-#endif
 	std::vector<uint8_t> replay_data;
 	std::vector<uint8_t> comp_data;
-	std::vector<uint8_t>::iterator data_iterator;
+	size_t data_position;
 	size_t replay_size;
 	size_t comp_size;
+private:
+	bool ReadNextResponse(ReplayResponse* res);
+#ifdef _WIN32
+	HANDLE fp;
+#else
+	FILE* fp;
+#endif
 	bool is_recording;
 	bool is_writing;
 	bool is_replaying;
 	bool can_read;
+	std::vector<ReplayResponse> responses;
+	std::vector<ReplayResponse>::iterator responses_iterator;
 };
 
 }

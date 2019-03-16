@@ -186,6 +186,7 @@ namespace ygo {
 			if(!preload_script(pduel, (char*)filename.c_str(), 0, 0, nullptr))
 				return false;
 		}
+		cur_replay.ParseResponses();
 		start_duel(pduel, opt);
 		return true;
 	}

@@ -985,6 +985,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		last_replay;
 		memcpy(&last_replay.pheader, prep, sizeof(ReplayHeader));
 		prep += sizeof(ReplayHeader);
+		last_replay.comp_data.resize(len - sizeof(ReplayHeader) - 1);
 		memcpy(last_replay.comp_data.data(), prep, len - sizeof(ReplayHeader) - 1);
 		last_replay.comp_size = len - sizeof(ReplayHeader) - 1;
 		break;
@@ -996,10 +997,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	if(!mainGame->dInfo.isReplay || mainGame->dInfo.isOldReplay) {
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		if(mainGame->dInfo.curMsg != MSG_WAITING) {
-			ReplayPacket p;
-			p.message = mainGame->dInfo.curMsg;
-			p.length = len - 1;
-			memcpy(p.data, pbuf, p.length);
+			ReplayPacket p(mainGame->dInfo.curMsg, pbuf, len - 1);
 			replay_stream.push_back(p);
 		}
 	}
