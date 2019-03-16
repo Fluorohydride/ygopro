@@ -10,46 +10,44 @@
 
 class BufferIO {
 public:
-	inline static long long ReadInt64(char*& p) {
-		long long ret = *(long long*)p;
-		p += 8;
+	template<typename T>
+	inline static T Read(char*& p) {
+		T ret;
+		memcpy((void*)&ret, p, sizeof(T));
+		p += sizeof(T);
 		return ret;
 	}
-	inline static int ReadInt32(char*& p) {
-		int ret = *(int*)p;
-		p += 4;
-		return ret;
+	inline static int64_t ReadInt64(char*& p) {
+		return Read<int64_t>(p);
 	}
-	inline static short ReadInt16(char*& p) {
-		short ret = *(short*)p;
-		p += 2;
-		return ret;
+	inline static int32_t ReadInt32(char*& p) {
+		return Read<int32_t>(p);
 	}
-	inline static char ReadInt8(char*& p) {
-		char ret = *(char*)p;
-		p++;
-		return ret;
+	inline static int16_t ReadInt16(char*& p) {
+		return Read<int16_t>(p);
 	}
-	inline static unsigned char ReadUInt8(char*& p) {
-		unsigned char ret = *(unsigned char*)p;
-		p++;
-		return ret;
+	inline static int8_t ReadInt8(char*& p) {
+		return Read<int8_t>(p);
+	}
+	inline static uint8_t ReadUInt8(char*& p) {
+		return Read<uint8_t>(p);
+	}
+	template<typename T>
+	inline static void Write(char*& p, T value) {
+		std::memcpy(p, &value, sizeof(T));
+		p += sizeof(T);
 	}
 	inline static void WriteInt64(char*& p, long long val) {
-		std::memcpy(p, &val, sizeof(val));
-		p += 8;
+		Write<int64_t>(p, val);
 	}
 	inline static void WriteInt32(char*& p, int val) {
-		std::memcpy(p, &val, sizeof(val));
-		p += 4;
+		Write<int32_t>(p, val);
 	}
 	inline static void WriteInt16(char*& p, short val) {
-		std::memcpy(p, &val, sizeof(val));
-		p += 2;
+		Write<int16_t>(p, val);
 	}
 	inline static void WriteInt8(char*& p, char val) {
-		std::memcpy(p, &val, sizeof(val));
-		p++;
+		Write<int8_t>(p, val);
 	}
 	template<typename T1, typename T2>
 	inline static int CopyWStr(T1* src, T2* pstr, int bufsize) {
