@@ -29,13 +29,16 @@ namespace ygo {
 		mainGame->dInfo.isReplay = true;
 		mainGame->dInfo.isOldReplay = true;
 		mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
-		char engineBuffer[0x20000];
+		std::vector<uint8> duelBuffer;
 		is_continuing = true;
 		skip_step = 0;
 		if (mainGame->dInfo.isSingleMode) {
-			int len = get_message(pduel, (byte*)engineBuffer);
-			if (len > 0)
-				is_continuing = ReplayAnalyze(engineBuffer, len);
+			int len = get_message(pduel, nullptr);
+			if(len > 0) {
+				duelBuffer.resize(len);
+				get_message(pduel, duelBuffer.data());
+				is_continuing = ReplayAnalyze((char*)duelBuffer.data(), len);
+			}
 		}
 		else {
 			ReplayRefresh(0, LOCATION_DECK, 0x181fff);
@@ -48,12 +51,12 @@ namespace ygo {
 		if (mainGame->dInfo.isReplaySkiping)
 			mainGame->gMutex.lock();
 		while (is_continuing && !exit_pending) {
-			int result = process(pduel);
-			int len = result & 0xffff;
-			/*int flag = result >> 16;*/
+			/*int flag = */process(pduel);
+			int len = get_message(pduel, nullptr);
 			if (len > 0) {
-				get_message(pduel, (byte*)engineBuffer);
-				is_continuing = ReplayAnalyze(engineBuffer, len);
+				duelBuffer.resize(len);
+				get_message(pduel, duelBuffer.data());
+				is_continuing = ReplayAnalyze((char*)duelBuffer.data(), len);
 				if (is_restarting) {
 					is_restarting = false;
 					int step = current_step - 1;
@@ -62,10 +65,12 @@ namespace ygo {
 					if (mainGame->dInfo.isSingleMode) {
 						is_continuing = true;
 						skip_step = 0;
-						int len = get_message(pduel, (byte*)engineBuffer);
+						len = get_message(pduel, nullptr);
 						if (len > 0) {
+							duelBuffer.resize(len);
+							get_message(pduel, duelBuffer.data());
 							mainGame->gMutex.unlock();
-							is_continuing = ReplayAnalyze(engineBuffer, len);
+							is_continuing = ReplayAnalyze((char*)duelBuffer.data(), len);
 							mainGame->gMutex.lock();
 						}
 					}
@@ -176,8 +181,7 @@ namespace ygo {
 				for (int i = 0; i < extra; ++i)
 					new_tag_card(pduel, cur_replay.ReadInt32(), 1, LOCATION_EXTRA);
 			}
-		}
-		else {
+		} else {
 			std::string filename;
 			size_t slen = cur_replay.ReadInt16();
 			filename.resize(slen);
@@ -772,9 +776,11 @@ namespace ygo {
 		return true;
 	}
 	void ReplayMode::ReplayRefresh(int player, int location, int flag) {
-		unsigned char queryBuffer[0x20000];
-		/*int len = */query_field_card(pduel, player, location, flag, queryBuffer, 0, FALSE);
-		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer);
+		std::vector<uint8_t> buffer;
+		int len = query_field_card(pduel, player, location, flag, nullptr, 0, FALSE);
+		buffer.resize(buffer.size() + len);
+		get_cached_query(pduel, &buffer[3]);
+		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)buffer.data());
 	}
 	void ReplayMode::ReplayRefresh(int flag) {
 		for(int p = 0; p < 2; p++)
@@ -782,9 +788,11 @@ namespace ygo {
 				ReplayRefresh(p, loc, flag);
 	}
 	void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
-		unsigned char queryBuffer[0x20000];
-		/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer, 0, FALSE);
-		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
+		std::vector<uint8_t> buffer;
+		int len = query_card(pduel, player, location, sequence, flag, nullptr, 0, FALSE);
+		buffer.resize(buffer.size() + len);
+		get_cached_query(pduel, &buffer[3]);
+		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)buffer.data());
 	}
 	void ReplayMode::ReplayReload() {
 		for(int p = 0; p < 2; p++)

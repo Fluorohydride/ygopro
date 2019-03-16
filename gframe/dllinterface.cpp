@@ -5,6 +5,8 @@
 #include <dlfcn.h>
 #endif
 
+int(*get_api_version)(int* min) = nullptr;
+
 void(*set_script_reader)(script_reader f) = nullptr;
 void(*set_card_reader)(card_reader f) = nullptr;
 void(*set_message_handler)(message_handler f) = nullptr;
@@ -19,6 +21,7 @@ int32(*process)(ptr pduel) = nullptr;
 void(*new_card)(ptr pduel, uint32 code, uint8 owner, uint8 playerid, uint8 location, uint8 sequence, uint8 position) = nullptr;
 void(*new_tag_card)(ptr pduel, uint32 code, uint8 owner, uint8 location) = nullptr;
 void(*new_relay_card)(ptr pduel, uint32 code, uint8 owner, uint8 location, uint8 playernum) = nullptr;
+int32(*get_cached_query)(ptr pduel, byte* buf) = nullptr;
 int32(*query_card)(ptr pduel, uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache, int32 ignore_cache) = nullptr;
 int32(*query_field_count)(ptr pduel, uint8 playerid, uint8 location) = nullptr;
 int32(*query_field_card)(ptr pduel, uint8 playerid, uint8 location, int32 query_flag, byte* buf, int32 use_cache, int32 ignore_cache) = nullptr;
@@ -31,6 +34,7 @@ int32(*preload_script)(ptr pduel, char* script, int32 len, int32 scriptlen, char
 #define STORE_CLONE(x) x##_copy = x;
 #define CLEAR_CLONE(x) x##_copy = nullptr;
 
+CREATE_CLONE(get_api_version)
 CREATE_CLONE(set_script_reader)
 CREATE_CLONE(set_card_reader)
 CREATE_CLONE(set_message_handler)
@@ -44,6 +48,7 @@ CREATE_CLONE(process)
 CREATE_CLONE(new_card)
 CREATE_CLONE(new_tag_card)
 CREATE_CLONE(new_relay_card)
+CREATE_CLONE(get_cached_query)
 CREATE_CLONE(query_card)
 CREATE_CLONE(query_field_count)
 CREATE_CLONE(query_field_card)
@@ -84,29 +89,32 @@ void CloseLibrary(void *handle) {
 #define RESTORE_CLONE(x) if(x##_copy) { x = x##_copy; x##_copy = nullptr; }
 
 void RestoreFromCopies() {
-	RESTORE_CLONE(set_script_reader)
-	RESTORE_CLONE(set_card_reader)
-	RESTORE_CLONE(set_message_handler)
-	RESTORE_CLONE(create_duel)
-	RESTORE_CLONE(start_duel)
-	RESTORE_CLONE(end_duel)
-	RESTORE_CLONE(set_player_info)
-	RESTORE_CLONE(get_log_message)
-	RESTORE_CLONE(process)
-	RESTORE_CLONE(new_card)
-	RESTORE_CLONE(new_tag_card)
-	RESTORE_CLONE(new_relay_card)
-	RESTORE_CLONE(query_field_count)
-	RESTORE_CLONE(query_field_card)
-	RESTORE_CLONE(query_field_info)
-	RESTORE_CLONE(set_responsei)
-	RESTORE_CLONE(set_responseb)
-	RESTORE_CLONE(preload_script)
+	RESTORE_CLONE(get_api_version);
+	RESTORE_CLONE(set_script_reader);
+	RESTORE_CLONE(set_card_reader);
+	RESTORE_CLONE(set_message_handler);
+	RESTORE_CLONE(create_duel);
+	RESTORE_CLONE(start_duel);
+	RESTORE_CLONE(end_duel);
+	RESTORE_CLONE(set_player_info);
+	RESTORE_CLONE(get_log_message);
+	RESTORE_CLONE(process);
+	RESTORE_CLONE(new_card);
+	RESTORE_CLONE(new_tag_card);
+	RESTORE_CLONE(new_relay_card);
+	RESTORE_CLONE(get_cached_query);
+	RESTORE_CLONE(query_field_count);
+	RESTORE_CLONE(query_field_card);
+	RESTORE_CLONE(query_field_info);
+	RESTORE_CLONE(set_responsei);
+	RESTORE_CLONE(set_responseb);
+	RESTORE_CLONE(preload_script);
 }
 
 #undef RESTORE_CLONE
 
 void ClearCopies() {
+	CLEAR_CLONE(get_api_version);
 	CLEAR_CLONE(set_script_reader);
 	CLEAR_CLONE(set_card_reader);
 	CLEAR_CLONE(set_message_handler);
@@ -119,6 +127,7 @@ void ClearCopies() {
 	CLEAR_CLONE(new_card);
 	CLEAR_CLONE(new_tag_card);
 	CLEAR_CLONE(new_relay_card);
+	CLEAR_CLONE(get_cached_query);
 	CLEAR_CLONE(query_field_count);
 	CLEAR_CLONE(query_field_card);
 	CLEAR_CLONE(query_field_info);
@@ -127,42 +136,48 @@ void ClearCopies() {
 	CLEAR_CLONE(preload_script);
 }
 
-#define LOAD_FUNCTION(x,core) x = (decltype(x))GetFunction(core, #x);\
-		if(!x){ UnloadCore(core); return nullptr; }
+#define LOAD_FUNCTION(x) x = (decltype(x))GetFunction(newcore, #x);\
+		if(!x){ UnloadCore(newcore); return nullptr; }
 
 void* LoadOCGcore(const std::string& path) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
-	LOAD_FUNCTION(set_script_reader, newcore);
-	LOAD_FUNCTION(set_card_reader, newcore);
-	LOAD_FUNCTION(set_message_handler, newcore);
-	LOAD_FUNCTION(create_duel, newcore);
-	LOAD_FUNCTION(start_duel, newcore);
-	LOAD_FUNCTION(end_duel, newcore);
-	LOAD_FUNCTION(set_player_info, newcore);
-	LOAD_FUNCTION(get_log_message, newcore);
-	LOAD_FUNCTION(get_message, newcore);
-	LOAD_FUNCTION(process, newcore);
-	LOAD_FUNCTION(new_card, newcore);
-	LOAD_FUNCTION(new_tag_card, newcore);
-	LOAD_FUNCTION(new_relay_card, newcore);
-	LOAD_FUNCTION(query_card, newcore);
-	LOAD_FUNCTION(query_field_count, newcore);
-	LOAD_FUNCTION(query_field_card, newcore);
-	LOAD_FUNCTION(query_field_info, newcore);
-	LOAD_FUNCTION(set_responsei, newcore);
-	LOAD_FUNCTION(set_responseb, newcore);
-	LOAD_FUNCTION(preload_script, newcore);
+	LOAD_FUNCTION(get_api_version);
+	if(get_api_version(nullptr) != 1) {
+		UnloadCore(newcore);
+		return nullptr;
+	}
+	LOAD_FUNCTION(set_script_reader);
+	LOAD_FUNCTION(set_card_reader);
+	LOAD_FUNCTION(set_message_handler);
+	LOAD_FUNCTION(create_duel);
+	LOAD_FUNCTION(start_duel);
+	LOAD_FUNCTION(end_duel);
+	LOAD_FUNCTION(set_player_info);
+	LOAD_FUNCTION(get_log_message);
+	LOAD_FUNCTION(get_message);
+	LOAD_FUNCTION(process);
+	LOAD_FUNCTION(new_card);
+	LOAD_FUNCTION(new_tag_card);
+	LOAD_FUNCTION(get_cached_query);
+	LOAD_FUNCTION(new_relay_card);
+	LOAD_FUNCTION(query_card);
+	LOAD_FUNCTION(query_field_count);
+	LOAD_FUNCTION(query_field_card);
+	LOAD_FUNCTION(query_field_info);
+	LOAD_FUNCTION(set_responsei);
+	LOAD_FUNCTION(set_responseb);
+	LOAD_FUNCTION(preload_script);
 	ClearCopies();
 	return newcore;
 }
 #undef LOAD_FUNCTION
 
-#define LOAD_WITH_COPY_CHECK(x,core) STORE_CLONE(x)\
-		x = (decltype(x))GetFunction(core, #x);\
+#define LOAD_WITH_COPY_CHECK(x) STORE_CLONE(x)\
+		x = (decltype(x))GetFunction(handle, #x);\
 		if(!x) {\
-			UnloadCore(core);\
+			UnloadCore(handle);\
 			RestoreFromCopies();\
 			return false;\
 		}
@@ -170,26 +185,28 @@ void* LoadOCGcore(const std::string& path) {
 bool ReloadCore(void *handle) {
 	if(!handle)
 		return false;
-	LOAD_WITH_COPY_CHECK(set_script_reader, handle);
-	LOAD_WITH_COPY_CHECK(set_card_reader, handle);
-	LOAD_WITH_COPY_CHECK(set_message_handler, handle);
-	LOAD_WITH_COPY_CHECK(create_duel, handle);
-	LOAD_WITH_COPY_CHECK(start_duel, handle);
-	LOAD_WITH_COPY_CHECK(end_duel, handle);
-	LOAD_WITH_COPY_CHECK(set_player_info, handle);
-	LOAD_WITH_COPY_CHECK(get_log_message, handle);
-	LOAD_WITH_COPY_CHECK(get_message, handle);
-	LOAD_WITH_COPY_CHECK(process, handle);
-	LOAD_WITH_COPY_CHECK(new_card, handle);
-	LOAD_WITH_COPY_CHECK(new_tag_card, handle);
-	LOAD_WITH_COPY_CHECK(new_relay_card, handle);
-	LOAD_WITH_COPY_CHECK(query_card, handle);
-	LOAD_WITH_COPY_CHECK(query_field_count, handle);
-	LOAD_WITH_COPY_CHECK(query_field_card, handle);
-	LOAD_WITH_COPY_CHECK(query_field_info, handle);
-	LOAD_WITH_COPY_CHECK(set_responsei, handle);
-	LOAD_WITH_COPY_CHECK(set_responseb, handle);
-	LOAD_WITH_COPY_CHECK(preload_script, handle);
+	LOAD_WITH_COPY_CHECK(get_api_version);
+	LOAD_WITH_COPY_CHECK(set_script_reader);
+	LOAD_WITH_COPY_CHECK(set_card_reader);
+	LOAD_WITH_COPY_CHECK(set_message_handler);
+	LOAD_WITH_COPY_CHECK(create_duel);
+	LOAD_WITH_COPY_CHECK(start_duel);
+	LOAD_WITH_COPY_CHECK(end_duel);
+	LOAD_WITH_COPY_CHECK(set_player_info);
+	LOAD_WITH_COPY_CHECK(get_log_message);
+	LOAD_WITH_COPY_CHECK(get_message);
+	LOAD_WITH_COPY_CHECK(process);
+	LOAD_WITH_COPY_CHECK(new_card);
+	LOAD_WITH_COPY_CHECK(new_tag_card);
+	LOAD_WITH_COPY_CHECK(new_relay_card);
+	LOAD_WITH_COPY_CHECK(get_cached_query);
+	LOAD_WITH_COPY_CHECK(query_card);
+	LOAD_WITH_COPY_CHECK(query_field_count);
+	LOAD_WITH_COPY_CHECK(query_field_card);
+	LOAD_WITH_COPY_CHECK(query_field_info);
+	LOAD_WITH_COPY_CHECK(set_responsei);
+	LOAD_WITH_COPY_CHECK(set_responseb);
+	LOAD_WITH_COPY_CHECK(preload_script);
 	ClearCopies();
 	return true;
 }
@@ -198,6 +215,7 @@ bool ReloadCore(void *handle) {
 
 void UnloadCore(void *handle) {
 	CloseLibrary(handle);
+	get_api_version = nullptr;
 	set_script_reader = nullptr;
 	set_card_reader = nullptr;
 	set_message_handler = nullptr;
@@ -211,6 +229,7 @@ void UnloadCore(void *handle) {
 	new_card = nullptr;
 	new_tag_card = nullptr;
 	new_relay_card = nullptr;
+	get_cached_query = nullptr;
 	query_card = nullptr;
 	query_field_count = nullptr;
 	query_field_card = nullptr;
@@ -220,10 +239,10 @@ void UnloadCore(void *handle) {
 	preload_script = nullptr;
 }
 
-#define CHANGE_WITH_COPY_CHECK(x,core) STORE_CLONE(x)\
-		x = (decltype(x))GetFunction(core, #x);\
+#define CHANGE_WITH_COPY_CHECK(x) STORE_CLONE(x)\
+		x = (decltype(x))GetFunction(newcore, #x);\
 		if(!x) {\
-			CloseLibrary(core);\
+			CloseLibrary(newcore);\
 			RestoreFromCopies();\
 			return nullptr;\
 		}
@@ -232,26 +251,33 @@ void* ChangeOCGcore(const std::string& path, void *handle) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
-	CHANGE_WITH_COPY_CHECK(set_script_reader, newcore);
-	CHANGE_WITH_COPY_CHECK(set_card_reader, newcore);
-	CHANGE_WITH_COPY_CHECK(set_message_handler, newcore);
-	CHANGE_WITH_COPY_CHECK(create_duel, newcore);
-	CHANGE_WITH_COPY_CHECK(start_duel, newcore);
-	CHANGE_WITH_COPY_CHECK(end_duel, newcore);
-	CHANGE_WITH_COPY_CHECK(set_player_info, newcore);
-	CHANGE_WITH_COPY_CHECK(get_log_message, newcore);
-	CHANGE_WITH_COPY_CHECK(get_message, newcore);
-	CHANGE_WITH_COPY_CHECK(process, newcore);
-	CHANGE_WITH_COPY_CHECK(new_card, newcore);
-	CHANGE_WITH_COPY_CHECK(new_tag_card, newcore);
-	CHANGE_WITH_COPY_CHECK(new_relay_card, newcore);
-	CHANGE_WITH_COPY_CHECK(query_card, newcore);
-	CHANGE_WITH_COPY_CHECK(query_field_count, newcore);
-	CHANGE_WITH_COPY_CHECK(query_field_card, newcore);
-	CHANGE_WITH_COPY_CHECK(query_field_info, newcore);
-	CHANGE_WITH_COPY_CHECK(set_responsei, newcore);
-	CHANGE_WITH_COPY_CHECK(set_responseb, newcore);
-	CHANGE_WITH_COPY_CHECK(preload_script, newcore);
+	CHANGE_WITH_COPY_CHECK(get_api_version);
+	if(get_api_version(nullptr) != 1) {
+		CloseLibrary(newcore);
+		RestoreFromCopies();
+		return nullptr;
+	}
+	CHANGE_WITH_COPY_CHECK(set_script_reader);
+	CHANGE_WITH_COPY_CHECK(set_card_reader);
+	CHANGE_WITH_COPY_CHECK(set_message_handler);
+	CHANGE_WITH_COPY_CHECK(create_duel);
+	CHANGE_WITH_COPY_CHECK(start_duel);
+	CHANGE_WITH_COPY_CHECK(end_duel);
+	CHANGE_WITH_COPY_CHECK(set_player_info);
+	CHANGE_WITH_COPY_CHECK(get_log_message);
+	CHANGE_WITH_COPY_CHECK(get_message);
+	CHANGE_WITH_COPY_CHECK(process);
+	CHANGE_WITH_COPY_CHECK(new_card);
+	CHANGE_WITH_COPY_CHECK(new_tag_card);
+	CHANGE_WITH_COPY_CHECK(new_relay_card);
+	CHANGE_WITH_COPY_CHECK(get_cached_query);
+	CHANGE_WITH_COPY_CHECK(query_card);
+	CHANGE_WITH_COPY_CHECK(query_field_count);
+	CHANGE_WITH_COPY_CHECK(query_field_card);
+	CHANGE_WITH_COPY_CHECK(query_field_info);
+	CHANGE_WITH_COPY_CHECK(set_responsei);
+	CHANGE_WITH_COPY_CHECK(set_responseb);
+	CHANGE_WITH_COPY_CHECK(preload_script);
 	ClearCopies();
 	if(handle)
 		CloseLibrary(handle);

@@ -218,7 +218,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.unlock();
 			}
-			DuelClient::ClientAnalyze((char*)p.data, p.length);
+			DuelClient::ClientAnalyze((char*)p.data.data(), p.data.size());
 			return false;
 		}
 		case MSG_START:
@@ -260,7 +260,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			break;
 		}
 		case MSG_AI_NAME: {
-			char* pbuf =(char*) p.data;
+			char* pbuf = (char*)p.data.data();
 			int len = BufferIO::ReadInt16(pbuf);
 			char* begin = pbuf;
 			pbuf += len + 1;
@@ -273,7 +273,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 		case OLD_REPLAY_MODE:
 			return true;
 		}
-		DuelClient::ClientAnalyze((char*)p.data, p.length);
+		DuelClient::ClientAnalyze((char*)p.data.data(), p.data.size());
 		if(pauseable) {
 			current_step++;
 			if(skip_step) {

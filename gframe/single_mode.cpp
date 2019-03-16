@@ -89,7 +89,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.isSingleMode = true;
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
-	char engineBuffer[0x20000];
+	std::vector<uint8> duelBuffer;
 	is_closing = false;
 	is_continuing = true;
 	last_replay.BeginRecord(false);
@@ -115,18 +115,21 @@ int SingleMode::SinglePlayThread() {
 	last_replay.WriteData(script_name.c_str(), script_name.size(), false);
 	last_replay.Flush();
 	new_replay.WriteInt32((mainGame->GetMasterRule(opt, 0)) | (opt & SPEED_DUEL) << 8);
-	int len = get_message(pduel, (byte*)engineBuffer);
+	int len = get_message(pduel, nullptr);
 	if (len > 0){
-		is_continuing = SinglePlayAnalyze(engineBuffer, len);
+		duelBuffer.resize(len);
+		get_message(pduel, duelBuffer.data());
+		is_continuing = SinglePlayAnalyze((char*)duelBuffer.data(), len);
 	}
 	start_duel(pduel, opt);
 	while (is_continuing) {
-		int result = process(pduel);
-		len = result & 0xffff;
+		/*int flag = */process(pduel);
+		len = get_message(pduel, nullptr);
 		/* int flag = result >> 16; */
 		if (len > 0) {
-			get_message(pduel, (byte*)engineBuffer);
-			is_continuing = SinglePlayAnalyze(engineBuffer, len);
+			duelBuffer.resize(len);
+			get_message(pduel, duelBuffer.data());
+			is_continuing = SinglePlayAnalyze((char*)duelBuffer.data(), len);
 		}
 	}
 	last_replay.EndRecord(0x1000);
@@ -178,11 +181,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		if(is_closing || !is_continuing)
 			return false;
 		offset = pbuf;
-		ReplayPacket p;
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
-		p.message = mainGame->dInfo.curMsg;
-		p.length = len - 1;
-		memcpy(p.data, pbuf, p.length);
+		ReplayPacket p(mainGame->dInfo.curMsg, pbuf, len - 1);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
 			mainGame->gMutex.lock();
@@ -811,7 +811,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		//setting the length again in case of multiple messages in a row,
 		//when the packet will be written in the replay, the extra data registered previously will be discarded
-		p.length = (pbuf - offset) - 1;
+		p.data.resize((pbuf - offset) - 1);
 		if (record)
 			replay_stream.insert(replay_stream.begin(), p);
 		new_replay.WriteStream(replay_stream);
@@ -819,28 +819,25 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 	return is_continuing;
 }
 void SingleMode::SinglePlayRefresh(int player, int location, int flag) {
-	unsigned char queryBuffer[0x20000];
-	char queryBuffer2[0x20000];
-	char* qbuf = queryBuffer2;
-	ReplayPacket p;
-	int len = query_field_card(pduel, player, location, flag, queryBuffer, TRUE, FALSE);
-	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)queryBuffer);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, location);
-	memcpy(qbuf, (char*)queryBuffer, len);
-	replay_stream.push_back(ReplayPacket(MSG_UPDATE_DATA, queryBuffer2, len + 2));
+	std::vector<uint8_t> buffer;
+	int len = query_field_card(pduel, player, location, flag, nullptr, FALSE, TRUE);
+	buffer.resize(len);
+	get_cached_query(pduel, buffer.data());
+	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)buffer.data());
+	buffer.insert(buffer.begin(), location);
+	buffer.insert(buffer.begin(), player);
+	replay_stream.push_back(ReplayPacket(MSG_UPDATE_DATA, (char*)buffer.data(), buffer.size()));
 }
 void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
-	unsigned char queryBuffer[0x2000];
-	char queryBuffer2[0x2000];
-	char* qbuf = queryBuffer2;
-	int len = query_card(pduel, player, location, sequence, flag, queryBuffer, TRUE, FALSE);
-	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, location);
-	BufferIO::WriteInt8(qbuf, sequence);
-	memcpy(qbuf, (char*)queryBuffer, len);
-	ReplayPacket p(MSG_UPDATE_CARD, queryBuffer2, len + 3);
+	std::vector<uint8_t> buffer;
+	int len = query_card(pduel, player, location, sequence, flag, nullptr, FALSE, TRUE);
+	buffer.resize(len);
+	get_cached_query(pduel, buffer.data());
+	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)buffer.data());
+	buffer.insert(buffer.begin(), sequence);
+	buffer.insert(buffer.begin(), location);
+	buffer.insert(buffer.begin(), player);
+	ReplayPacket p(MSG_UPDATE_CARD, (char*)buffer.data(), buffer.size());
 	replay_stream.push_back(p);
 }
 void SingleMode::SinglePlayRefresh(int flag) {

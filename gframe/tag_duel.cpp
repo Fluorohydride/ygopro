@@ -492,18 +492,18 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	Process();
 }
 void TagDuel::Process() {
-	char engineBuffer[0x20000];
+	std::vector<uint8> duelBuffer;
 	unsigned int engFlag = 0, engLen = 0;
 	int stop = 0;
-	while (!stop) {
-		if (engFlag == 2)
+	while(!stop) {
+		if(engFlag == 2)
 			break;
-		int result = process(pduel);
-		engLen = result & 0xffff;
-		engFlag = result >> 16;
-		if (engLen > 0) {
-			get_message(pduel, (byte*)&engineBuffer);
-			stop = Analyze(engineBuffer, engLen);
+		engFlag = process(pduel);
+		engLen = get_message(pduel, nullptr);
+		if(engLen > 0) {
+			duelBuffer.resize(engLen);
+			get_message(pduel, duelBuffer.data());
+			stop = Analyze((char*)duelBuffer.data(), engLen);
 		}
 	}
 	if(stop == 2)
@@ -527,12 +527,9 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 	while (pbuf - msgbuffer < (int)len) {
 		replay_stream.clear();
 		bool record = true;
-		ReplayPacket pk;
 		offset = pbuf;
 		unsigned char engType = BufferIO::ReadUInt8(pbuf);
-		pk.message = engType;
-		pk.length = len - 1;
-		memcpy(pk.data, pbuf, pk.length);
+		ReplayPacket pk(engType, pbuf, len - 1);
 		switch (engType) {
 		case MSG_RETRY: {
 			WaitforResponse(last_response);
@@ -1498,7 +1495,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		}
 		//setting the length again in case of multiple messages in a row,
 		//when the packet will be written in the replay, the extra data registered previously will be discarded
-		pk.length = (pbuf - offset) - 1;
+		pk.data.resize((pbuf - offset) - 1);
 		if (record)
 			replay_stream.insert(replay_stream.begin(), pk);
 		new_replay.WriteStream(replay_stream);
@@ -1585,19 +1582,27 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 	timeval timeout = {1, 0};
 	event_add(etimer, &timeout);
 }
+template<typename T>
+void insert_value(std::vector<uint8_t>& vec, T val) {
+	const auto vec_size = vec.size();
+	const auto val_size = sizeof(T);
+	vec.resize(vec_size + val_size);
+	std::memcpy(&vec[vec_size], &val, val_size);
+}
 void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
-	char query_buffer[0x20000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, LOCATION_MZONE);
-	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, (unsigned char*)qbuf, use_cache, FALSE);
+	std::vector<uint8_t> buffer;
+	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	insert_value<uint8_t>(buffer, player);
+	insert_value<uint8_t>(buffer, LOCATION_MZONE);
+	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, nullptr, use_cache, FALSE);
+	buffer.resize(buffer.size() + len);
+	get_cached_query(pduel, &buffer[3]);
 	int pid = (player == 0) ? 0 : 2;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
-	ReplayPacket p((char*)query_buffer, len + 2);
-	replay_stream.push_back(p);
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, buffer.data(), buffer.size());
 	NetServer::ReSendToPlayer(players[pid + 1]);
+	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
 	int qlen = 0;
+	char* qbuf = (char*)&buffer[3];
 	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
 		qlen += clen;
@@ -1608,24 +1613,25 @@ void TagDuel::RefreshMzone(int player, int flag, int use_cache) {
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, buffer.data(), buffer.size());
 	NetServer::ReSendToPlayer(players[pid + 1]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
-	char query_buffer[0x20000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, LOCATION_SZONE);
-	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, (unsigned char*)qbuf, use_cache, FALSE);
+	std::vector<uint8_t> buffer;
+	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	insert_value<uint8_t>(buffer, player);
+	insert_value<uint8_t>(buffer, LOCATION_SZONE);
+	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, nullptr, use_cache, FALSE);
+	buffer.resize(buffer.size() + len);
+	get_cached_query(pduel, &buffer[3]);
 	int pid = (player == 0) ? 0 : 2;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
-	ReplayPacket p((char*)query_buffer, len + 2);
-	replay_stream.push_back(p);
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, buffer.data(), buffer.size());
 	NetServer::ReSendToPlayer(players[pid + 1]);
+	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
 	int qlen = 0;
+	char* qbuf = (char*)&buffer[3];
 	while(qlen < len) {
 		int clen = BufferIO::ReadInt32(qbuf);
 		qlen += clen;
@@ -1636,22 +1642,23 @@ void TagDuel::RefreshSzone(int player, int flag, int use_cache) {
 		qbuf += clen - 4;
 	}
 	pid = 2 - pid;
-	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 3);
+	NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, buffer.data(), buffer.size());
 	NetServer::ReSendToPlayer(players[pid + 1]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshHand(int player, int flag, int use_cache) {
-	char query_buffer[0x20000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
-	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_POSITION, (unsigned char*)qbuf, use_cache, FALSE);
-	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
-	ReplayPacket p((char*)query_buffer, len + 2);
-	replay_stream.push_back(p);
+	std::vector<uint8_t> buffer;
+	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	insert_value<uint8_t>(buffer, player);
+	insert_value<uint8_t>(buffer, LOCATION_HAND);
+	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_POSITION, nullptr, use_cache, FALSE);
+	buffer.resize(buffer.size() + len);
+	get_cached_query(pduel, &buffer[3]);
+	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, buffer.data(), buffer.size());
+	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
 	int qlen = 0;
+	char* qbuf = (char*)&buffer[3];
 	while(qlen < len) {
 		int slen = BufferIO::ReadInt32(qbuf);
 		int qflag = *(int*)qbuf;
@@ -1666,61 +1673,63 @@ void TagDuel::RefreshHand(int player, int flag, int use_cache) {
 	}
 	for(int i = 0; i < 4; ++i)
 		if(players[i] != cur_player[player])
-			NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, query_buffer, len + 3);
+			NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, buffer.data(), buffer.size());
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
 }
 void TagDuel::RefreshGrave(int player, int flag, int use_cache) {
-	char query_buffer[0x20000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, LOCATION_GRAVE);
-	int len = query_field_card(pduel, player, LOCATION_GRAVE, flag, (unsigned char*)qbuf, use_cache, FALSE);
-	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, query_buffer, len + 3);
+	std::vector<uint8_t> buffer;
+	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	insert_value<uint8_t>(buffer, player);
+	insert_value<uint8_t>(buffer, LOCATION_GRAVE);
+	int len = query_field_card(pduel, player, LOCATION_GRAVE, flag, nullptr, use_cache, FALSE);
+	buffer.resize(buffer.size() + len);
+	get_cached_query(pduel, &buffer[3]);
+	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, buffer.data(), buffer.size());
 	NetServer::ReSendToPlayer(players[1]);
 	NetServer::ReSendToPlayer(players[2]);
 	NetServer::ReSendToPlayer(players[3]);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::ReSendToPlayer(*pit);
-	ReplayPacket p((char*)query_buffer, len + 2);
-	replay_stream.push_back(p);
+	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
 }
 void TagDuel::RefreshExtra(int player, int flag, int use_cache) {
-	char query_buffer[0x20000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, LOCATION_EXTRA);
-	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, (unsigned char*)qbuf, use_cache, FALSE);
-	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 3);
-	ReplayPacket p((char*)query_buffer, len + 2);
-	replay_stream.push_back(p);
+	std::vector<uint8_t> buffer;
+	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	insert_value<uint8_t>(buffer, player);
+	insert_value<uint8_t>(buffer, LOCATION_EXTRA);
+	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, nullptr, use_cache, FALSE);
+	buffer.resize(buffer.size() + len);
+	get_cached_query(pduel, &buffer[3]);
+	NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, buffer.data(), buffer.size());
+	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
 }
 void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
-	char query_buffer[0x20000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_CARD);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, location);
-	BufferIO::WriteInt8(qbuf, sequence);
-	int len = query_card(pduel, player, location, sequence, flag, (unsigned char*)qbuf, 0, FALSE);
-	ReplayPacket p((char*)query_buffer, len + 3);
-	replay_stream.push_back(p);
+	std::vector<uint8_t> buffer;
+	insert_value<uint8_t>(buffer, MSG_UPDATE_CARD);
+	insert_value<uint8_t>(buffer, player);
+	insert_value<uint8_t>(buffer, location);
+	insert_value<uint8_t>(buffer, sequence);
+	int len = query_card(pduel, player, location, sequence, flag, nullptr, 0, FALSE);
+	buffer.resize(buffer.size() + len);
+	get_cached_query(pduel, &buffer[4]);
+	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, buffer.data(), buffer.size());
+	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
+	char* qbuf = (char*)&buffer[4];
 	if(location & LOCATION_ONFIELD) {
 		int pid = (player == 0) ? 0 : 2;
-		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
+		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, buffer.data(), buffer.size() - 1);
 		NetServer::ReSendToPlayer(players[pid + 1]);
 		if(qbuf[15] & POS_FACEUP) {
 			pid = 2 - pid;
-			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
+			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, buffer.data(), buffer.size() - 1);
 			NetServer::ReSendToPlayer(players[pid + 1]);
 			for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 				NetServer::ReSendToPlayer(*pit);
 		}
 	} else {
 		int pid = (player == 0) ? 0 : 2;
-		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
+		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, buffer.data(), buffer.size() - 1);
 		NetServer::ReSendToPlayer(players[pid + 1]);
 		if(location == LOCATION_REMOVED && (qbuf[15] & POS_FACEDOWN))
 			return;
@@ -1734,14 +1743,14 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	}
 }
 void TagDuel::PseudoRefreshDeck(int player, int flag) {
-	char query_buffer[0x20000];
-	char* qbuf = query_buffer;
-	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
-	BufferIO::WriteInt8(qbuf, player);
-	BufferIO::WriteInt8(qbuf, LOCATION_DECK);
-	int len = query_field_card(pduel, player, LOCATION_DECK, flag, (unsigned char*)qbuf, 0, TRUE);
-	ReplayPacket p((char*)query_buffer, len + 2);
-	replay_stream.push_back(p);
+	std::vector<uint8_t> buffer;
+	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	insert_value<uint8_t>(buffer, player);
+	insert_value<uint8_t>(buffer, LOCATION_DECK);
+	int len = query_field_card(pduel, player, LOCATION_DECK, flag, nullptr, 0, TRUE);
+	buffer.resize(buffer.size() + len);
+	get_cached_query(pduel, &buffer[3]);
+	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
 }
 void TagDuel::TagTimer(evutil_socket_t fd, short events, void* arg) {
 	TagDuel* sd = static_cast<TagDuel*>(arg);
