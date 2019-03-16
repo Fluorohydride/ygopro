@@ -1936,15 +1936,15 @@ std::vector<unsigned char> Game::LoadScript(const std::string& name, int& slen) 
 	if(!file && !(file = filesystem->createAndOpenFile(name.c_str())))
 		return buffer;
 	const auto size = file->getSize();
-	buffer.reserve(size);
-	slen = file->read(&buffer[0], size);
+	buffer.resize(size);
+	slen = file->read(buffer.data(), size);
 	file->drop();
 	return buffer;
 }
 std::vector<unsigned char> Game::PreLoadScript(void* pduel, const std::string& script_name) {
 	int len = 0;
 	auto buf = LoadScript(script_name, len);
-	preload_script(pduel, (char*)script_name.c_str(), 0, len, (char*)&buf[0]);
+	preload_script(pduel, (char*)script_name.c_str(), 0, len, (char*)buf.data());
 	return buf;
 }
 void* Game::SetupDuel(uint32 seed) {
@@ -1959,7 +1959,7 @@ void* Game::SetupDuel(uint32 seed) {
 byte* Game::ScriptReader(const char* script_name, int* slen) {
 	static std::vector<unsigned char> buffer;
 	buffer = mainGame->LoadScript(script_name, *slen);
-	return &buffer[0];
+	return buffer.data();
 }
 int Game::MessageHandler(void* fduel, int type) {
 	if(!enable_log)
