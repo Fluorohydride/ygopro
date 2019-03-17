@@ -1642,18 +1642,11 @@ void RelayDuel::TimeConfirm(DuelPlayer* dp) {
 	timeval timeout = {1, 0};
 	event_add(etimer, &timeout);
 }
-template<typename T>
-void insert_value(std::vector<uint8_t>& vec, T val) {
-	const auto vec_size = vec.size();
-	const auto val_size = sizeof(T);
-	vec.resize(vec_size + val_size);
-	std::memcpy(&vec[vec_size], &val, val_size);
-}
 void RelayDuel::RefreshMzone(int player, int flag, int use_cache) {
 	std::vector<uint8_t> buffer;
-	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
-	insert_value<uint8_t>(buffer, player);
-	insert_value<uint8_t>(buffer, LOCATION_MZONE);
+	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	BufferIO::insert_value<uint8_t>(buffer, player);
+	BufferIO::insert_value<uint8_t>(buffer, LOCATION_MZONE);
 	int len = query_field_card(pduel, player, LOCATION_MZONE, flag, nullptr, use_cache, FALSE);
 	buffer.resize(buffer.size() + len);
 	get_cached_query(pduel, &buffer[3]);
@@ -1684,9 +1677,9 @@ void RelayDuel::RefreshMzone(int player, int flag, int use_cache) {
 }
 void RelayDuel::RefreshSzone(int player, int flag, int use_cache) {
 	std::vector<uint8_t> buffer;
-	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
-	insert_value<uint8_t>(buffer, player);
-	insert_value<uint8_t>(buffer, LOCATION_SZONE);
+	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	BufferIO::insert_value<uint8_t>(buffer, player);
+	BufferIO::insert_value<uint8_t>(buffer, LOCATION_SZONE);
 	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, nullptr, use_cache, FALSE);
 	buffer.resize(buffer.size() + len);
 	get_cached_query(pduel, &buffer[3]);
@@ -1717,9 +1710,9 @@ void RelayDuel::RefreshSzone(int player, int flag, int use_cache) {
 }
 void RelayDuel::RefreshHand(int player, int flag, int use_cache) {
 	std::vector<uint8_t> buffer;
-	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
-	insert_value<uint8_t>(buffer, player);
-	insert_value<uint8_t>(buffer, LOCATION_HAND);
+	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	BufferIO::insert_value<uint8_t>(buffer, player);
+	BufferIO::insert_value<uint8_t>(buffer, LOCATION_HAND);
 	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_POSITION, nullptr, use_cache, FALSE);
 	buffer.resize(buffer.size() + len);
 	get_cached_query(pduel, &buffer[3]);
@@ -1747,9 +1740,9 @@ void RelayDuel::RefreshHand(int player, int flag, int use_cache) {
 }
 void RelayDuel::RefreshGrave(int player, int flag, int use_cache) {
 	std::vector<uint8_t> buffer;
-	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
-	insert_value<uint8_t>(buffer, player);
-	insert_value<uint8_t>(buffer, LOCATION_GRAVE);
+	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	BufferIO::insert_value<uint8_t>(buffer, player);
+	BufferIO::insert_value<uint8_t>(buffer, LOCATION_GRAVE);
 	int len = query_field_card(pduel, player, LOCATION_GRAVE, flag, nullptr, use_cache, FALSE);
 	buffer.resize(buffer.size() + len);
 	get_cached_query(pduel, &buffer[3]);
@@ -1763,9 +1756,9 @@ void RelayDuel::RefreshGrave(int player, int flag, int use_cache) {
 }
 void RelayDuel::RefreshExtra(int player, int flag, int use_cache) {
 	std::vector<uint8_t> buffer;
-	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
-	insert_value<uint8_t>(buffer, player);
-	insert_value<uint8_t>(buffer, LOCATION_EXTRA);
+	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	BufferIO::insert_value<uint8_t>(buffer, player);
+	BufferIO::insert_value<uint8_t>(buffer, LOCATION_EXTRA);
 	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, nullptr, use_cache, FALSE);
 	buffer.resize(buffer.size() + len);
 	get_cached_query(pduel, &buffer[3]);
@@ -1774,10 +1767,10 @@ void RelayDuel::RefreshExtra(int player, int flag, int use_cache) {
 }
 void RelayDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	std::vector<uint8_t> buffer;
-	insert_value<uint8_t>(buffer, MSG_UPDATE_CARD);
-	insert_value<uint8_t>(buffer, player);
-	insert_value<uint8_t>(buffer, location);
-	insert_value<uint8_t>(buffer, sequence);
+	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_CARD);
+	BufferIO::insert_value<uint8_t>(buffer, player);
+	BufferIO::insert_value<uint8_t>(buffer, location);
+	BufferIO::insert_value<uint8_t>(buffer, sequence);
 	int len = query_card(pduel, player, location, sequence, flag, nullptr, 0, FALSE);
 	buffer.resize(buffer.size() + len);
 	get_cached_query(pduel, &buffer[4]);
@@ -1815,9 +1808,9 @@ void RelayDuel::RefreshSingle(int player, int location, int sequence, int flag) 
 }
 void RelayDuel::PseudoRefreshDeck(int player, int flag) {
 	std::vector<uint8_t> buffer;
-	insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
-	insert_value<uint8_t>(buffer, player);
-	insert_value<uint8_t>(buffer, LOCATION_DECK);
+	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
+	BufferIO::insert_value<uint8_t>(buffer, player);
+	BufferIO::insert_value<uint8_t>(buffer, LOCATION_DECK);
 	int len = query_field_card(pduel, player, LOCATION_DECK, flag, nullptr, 0, TRUE);
 	buffer.resize(buffer.size() + len);
 	get_cached_query(pduel, &buffer[3]);

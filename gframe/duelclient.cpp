@@ -15,10 +15,10 @@ std::vector<unsigned char> DuelClient::response_buf;
 unsigned int DuelClient::watching = 0;
 unsigned char DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
-event_base* DuelClient::client_base = 0;
-bufferevent* DuelClient::client_bev = 0;
-char DuelClient::duel_client_read[0x2000];
-char DuelClient::duel_client_write[0x2000];
+event_base* DuelClient::client_base = nullptr;
+bufferevent* DuelClient::client_bev = nullptr;
+std::vector<uint8_t> DuelClient::duel_client_read;
+std::vector<uint8_t> DuelClient::duel_client_write;
 bool DuelClient::is_closing = false;
 u64 DuelClient::select_hint = 0;
 std::wstring DuelClient::event_string;
@@ -106,10 +106,11 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 		evbuffer_copyout(input, &packet_len, 2);
 		if(len < (size_t)packet_len + 2)
 			return;
-		evbuffer_remove(input, duel_client_read, packet_len + 2);
+		duel_client_read.resize(packet_len + 2);
+		evbuffer_remove(input, duel_client_read.data(), packet_len + 2);
 		if(packet_len)
-			HandleSTOCPacketLan(&duel_client_read[2], packet_len);
-		len -= packet_len + 2;
+			HandleSTOCPacketLan((char*)&duel_client_read[2], packet_len);
+		len = evbuffer_get_length(input);
 	}
 }
 void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {

@@ -10,6 +10,19 @@
 
 class BufferIO {
 public:
+	static void insert_data(std::vector<uint8_t>& vec, void* val, size_t len) {
+		const auto vec_size = vec.size();
+		const auto val_size = len;
+		vec.resize(vec_size + val_size);
+		std::memcpy(&vec[vec_size], val, val_size);
+	}
+	template<typename T>
+	static void insert_value(std::vector<uint8_t>& vec, T val) {
+		const auto vec_size = vec.size();
+		const auto val_size = sizeof(T);
+		vec.resize(vec_size + val_size);
+		std::memcpy(&vec[vec_size], &val, val_size);
+	}
 	template<typename T>
 	inline static T Read(char*& p) {
 		T ret;

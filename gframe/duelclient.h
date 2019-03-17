@@ -26,8 +26,8 @@ private:
 	static bool is_host;
 	static event_base* client_base;
 	static bufferevent* client_bev;
-	static char duel_client_read[0x2000];
-	static char duel_client_write[0x2000];
+	static std::vector<uint8_t> duel_client_read;
+	static std::vector<uint8_t> duel_client_write;
 	static bool is_closing;
 	static u64 select_hint;
 	static std::wstring event_string;
@@ -53,25 +53,25 @@ public:
 	static void SetResponseB(void* respB, unsigned int len);
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
-		char* p = duel_client_write;
-		BufferIO::WriteInt16(p, 1);
-		BufferIO::WriteInt8(p, proto);
-		bufferevent_write(client_bev, duel_client_write, 3);
+		duel_client_write.clear();
+		BufferIO::insert_value<int16_t>(duel_client_write, 1);
+		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, ST& st) {
-		char* p = duel_client_write;
-		BufferIO::WriteInt16(p, 1 + sizeof(ST));
-		BufferIO::WriteInt8(p, proto);
-		memcpy(p, &st, sizeof(ST));
-		bufferevent_write(client_bev, duel_client_write, sizeof(ST) + 3);
+		duel_client_write.clear();
+		BufferIO::insert_value<int16_t>(duel_client_write, 1 + sizeof(ST));
+		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		BufferIO::insert_value<ST>(duel_client_write, st);
+		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
-		char* p = duel_client_write;
-		BufferIO::WriteInt16(p, 1 + len);
-		BufferIO::WriteInt8(p, proto);
-		memcpy(p, buffer, len);
-		bufferevent_write(client_bev, duel_client_write, len + 3);
+		duel_client_write.clear();
+		BufferIO::insert_value<int16_t>(duel_client_write, 1 + len);
+		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		BufferIO::insert_data(duel_client_write, buffer, len);
+		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 
 	static void ReplayPrompt(bool need_header = false);
