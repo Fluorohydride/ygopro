@@ -37,7 +37,7 @@ extern int32(*query_field_count)(ptr pduel, uint8 playerid, uint8 location);
 extern int32(*query_field_card)(ptr pduel, uint8 playerid, uint8 location, int32 query_flag, byte* buf, int32 use_cache, int32 ignore_cache);
 extern int32(*query_field_info)(ptr pduel, byte* buf);
 extern void(*set_responsei)(ptr pduel, int32 value);
-extern void(*set_responseb)(ptr pduel, byte* buf);
+extern void(*set_responseb)(ptr pduel, byte* buf, size_t len);
 extern int32(*preload_script)(ptr pduel, char* script, int32 len, int32 scriptlen, char* scriptbuff);
 
 byte* default_script_reader(const char* script_name, int* len);

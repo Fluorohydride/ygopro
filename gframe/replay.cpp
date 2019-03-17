@@ -205,10 +205,10 @@ bool Replay::DeleteReplay(const std::wstring& name) {
 bool Replay::RenameReplay(const std::wstring& oldname, const std::wstring& newname) {
 	return Utils::Movefile(L"./replay/" + oldname, L"./replay/" + newname);
 }
-bool Replay::ReadNextResponse(unsigned char resp[64]) {
+bool Replay::GetNextResponse(ReplayResponse* res) {
 	if(responses_iterator == responses.end())
 		return false;
-	memcpy(resp, responses_iterator->message, 64);
+	*res = *responses_iterator;
 	responses_iterator++;
 	return true;
 }
@@ -216,9 +216,10 @@ bool Replay::ReadNextResponse(ReplayResponse* res) {
 	if(!can_read | !res)
 		return false;
 	res->length = ReadInt8();
-	if(res->length > 64 || res->length < 1)
+	if(res->length < 1)
 		return false;
-	if(!ReadData(res->message, res->length))
+	res->response.resize(res->length);
+	if(!ReadData(res->response.data(), res->length))
 		return false;
 	return true;
 }

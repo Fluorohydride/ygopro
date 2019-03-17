@@ -1434,7 +1434,7 @@ void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 	memcpy(resb, pdata, len);
 	last_replay.WriteInt8(len);
 	last_replay.WriteData(resb, len);
-	set_responseb(pduel, resb);
+	set_responseb(pduel, resb, len);
 	players[dp->type]->state = 0xff;
 	if(host_info.time_limit) {
 		if(time_limit[dp->type] >= time_elapsed)

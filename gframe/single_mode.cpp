@@ -27,7 +27,7 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 		return;
 	last_replay.WriteInt8(len);
 	last_replay.WriteData(resp, len);
-	set_responseb(pduel, resp);
+	set_responseb(pduel, resp, len);
 }
 int SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;

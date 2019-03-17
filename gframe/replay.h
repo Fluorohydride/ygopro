@@ -38,7 +38,7 @@ public:
 struct ReplayResponse {
 public:
 	int length;
-	char message[64];
+	std::vector<uint8_t> response;
 };
 
 class Replay {
@@ -65,7 +65,7 @@ public:
 	bool ReadStream(std::vector<ReplayPacket>* stream);
 	static bool DeleteReplay(const std::wstring& name);
 	static bool RenameReplay(const std::wstring& oldname, const std::wstring& newname);
-	bool ReadNextResponse(unsigned char resp[64]);
+	bool GetNextResponse(ReplayResponse* res);
 	bool ReadName(wchar_t* data);
 	bool ReadData(void* data, unsigned int length);
 	template <typename  T>

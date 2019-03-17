@@ -6,10 +6,10 @@
 
 namespace ygo {
 	bool ReplayMode::ReadReplayResponse() {
-		unsigned char resp[64];
-		bool result = cur_replay.ReadNextResponse(resp);
+		ReplayResponse res;
+		bool result = cur_replay.GetNextResponse(&res);
 		if (result)
-			set_responseb(pduel, resp);
+			set_responseb(pduel, res.response.data(), res.length);
 		return result;
 	}
 	int ReplayMode::OldReplayThread() {

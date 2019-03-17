@@ -11,8 +11,7 @@
 namespace ygo {
 
 unsigned DuelClient::connect_state = 0;
-unsigned char DuelClient::response_buf[64];
-unsigned char DuelClient::response_len = 0;
+std::vector<unsigned char> DuelClient::response_buf;
 unsigned int DuelClient::watching = 0;
 unsigned char DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
@@ -3780,12 +3779,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	return true;
 }
 void DuelClient::SetResponseI(int respI) {
-	*((int*)response_buf) = respI;
-	response_len = 4;
+	response_buf.resize(sizeof(int));
+	memcpy(response_buf.data(), &respI, sizeof(int));
 }
-void DuelClient::SetResponseB(void* respB, unsigned char len) {
-	memcpy(response_buf, respB, len);
-	response_len = len;
+void DuelClient::SetResponseB(void* respB, unsigned int len) {
+	response_buf.resize(len);
+	memcpy(response_buf.data(), respB, len);
 }
 void DuelClient::SendResponse() {
 	switch(mainGame->dInfo.curMsg) {
@@ -3841,11 +3840,11 @@ void DuelClient::SendResponse() {
 	}
 	replay_stream.pop_back();
 	if(mainGame->dInfo.isSingleMode) {
-		SingleMode::SetResponse(response_buf, response_len);
+		SingleMode::SetResponse(response_buf.data(), response_buf.size());
 		mainGame->singleSignal.Set();
 	} else if (!mainGame->dInfo.isReplay) {
 		mainGame->dInfo.time_player = 2;
-		SendBufferToServer(CTOS_RESPONSE, response_buf, response_len);
+		SendBufferToServer(CTOS_RESPONSE, response_buf.data(), response_buf.size());
 	}
 }
 void DuelClient::BeginRefreshHost() {

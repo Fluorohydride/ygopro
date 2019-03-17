@@ -27,7 +27,7 @@ int32(*query_field_count)(ptr pduel, uint8 playerid, uint8 location) = nullptr;
 int32(*query_field_card)(ptr pduel, uint8 playerid, uint8 location, int32 query_flag, byte* buf, int32 use_cache, int32 ignore_cache) = nullptr;
 int32(*query_field_info)(ptr pduel, byte* buf) = nullptr;
 void(*set_responsei)(ptr pduel, int32 value) = nullptr;
-void(*set_responseb)(ptr pduel, byte* buf) = nullptr;
+void(*set_responseb)(ptr pduel, byte* buf, size_t len) = nullptr;
 int32(*preload_script)(ptr pduel, char* script, int32 len, int32 scriptlen, char* scriptbuff) = nullptr;
 
 #define CREATE_CLONE(x) auto x##_copy = x;
@@ -144,7 +144,8 @@ void* LoadOCGcore(const std::string& path) {
 	if(!newcore)
 		return nullptr;
 	LOAD_FUNCTION(get_api_version);
-	if(get_api_version(nullptr) != 1) {
+	int min;
+	if(get_api_version(&min) != 1 && min < 1) {
 		UnloadCore(newcore);
 		return nullptr;
 	}
@@ -252,7 +253,8 @@ void* ChangeOCGcore(const std::string& path, void *handle) {
 	if(!newcore)
 		return nullptr;
 	CHANGE_WITH_COPY_CHECK(get_api_version);
-	if(get_api_version(nullptr) != 1) {
+	int min;
+	if(get_api_version(&min) != 1 && min < 1) {
 		CloseLibrary(newcore);
 		RestoreFromCopies();
 		return nullptr;
