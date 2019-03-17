@@ -9,6 +9,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include <sstream>
 
 const unsigned short PRO_VERSION = 0x1348;
 
@@ -30,6 +31,22 @@ bool Game::Initialize() {
 	if(!device) {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
+	}
+	// Apply skin
+	if(gameConf.skin_index && gameConf.use_d3d) {
+		wchar_t skin_dir[16];
+		myswprintf(skin_dir, L"skin");
+		skinSystem = new CGUISkinSystem(skin_dir, device);
+		core::array<core::stringw> skins = skinSystem->listSkins();
+		size_t count = skins.size();
+		if(count > 0) {
+			int index = -1;
+			if(gameConf.skin_index < 0)
+				index = rand() % count;
+			else if((size_t)gameConf.skin_index <= skins.size())
+				index = skins.size() - gameConf.skin_index; // reverse index
+			if(index >= 0)
+				skinSystem->applySkin(skins[index].c_str());
 	}
 	linePatternD3D = 0;
 	linePatternGL = 0x0f0f;
@@ -991,6 +1008,7 @@ void Game::LoadConfig() {
 	gameConf.enable_music = true;
 	gameConf.music_volume = 0.5;
 	gameConf.music_mode = 1;
+	gameConf.skin_index = -1;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1061,6 +1079,8 @@ void Game::LoadConfig() {
 			gameConf.auto_save_replay = atoi(valbuf);
 		} else if(!strcmp(strbuf, "prefer_expansion_script")) {
 			gameConf.prefer_expansion_script = atoi(valbuf);
+ 		} else if (!strcmp(strbuf, "skin_index")) {
+			gameConf.skin_index = atoi(valbuf);
 #ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = atoi(valbuf) > 0;
@@ -1138,6 +1158,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
+  fprintf(fp, "skin_index = %d\n", gameConf.skin_index);
 #ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
