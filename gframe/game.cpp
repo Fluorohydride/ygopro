@@ -317,6 +317,9 @@ bool Game::Initialize() {
 	posY += 30;
 	chkMusicMode = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1281));
 	chkMusicMode->setChecked(gameConf.music_mode != 0);
+	posY += 30;
+	chkEnablePScale = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabSystem, -1, dataManager.GetSysString(1287));
+	chkEnablePScale->setChecked(gameConf.chkEnablePScale != 0);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -991,6 +994,7 @@ void Game::LoadConfig() {
 	gameConf.enable_music = true;
 	gameConf.music_volume = 0.5;
 	gameConf.music_mode = 1;
+	gameConf.chkEnablePScale = 1;
 	while(fgets(linebuf, 256, fp)) {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
@@ -1061,6 +1065,8 @@ void Game::LoadConfig() {
 			gameConf.auto_save_replay = atoi(valbuf);
 		} else if(!strcmp(strbuf, "prefer_expansion_script")) {
 			gameConf.prefer_expansion_script = atoi(valbuf);
+ 		} else if(!strcmp(strbuf, "enable_pendulum_scale")) {
+			gameConf.chkEnablePScale = atoi(valbuf);
 #ifdef YGOPRO_USE_IRRKLANG
 		} else if(!strcmp(strbuf, "enable_sound")) {
 			gameConf.enable_sound = atoi(valbuf) > 0;
@@ -1138,6 +1144,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
 	fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
+	fprintf(fp, "enable_pendulum_scale = %d\n", ((mainGame->chkEnablePScale->isChecked()) ? 1 : 0));
 #ifdef YGOPRO_USE_IRRKLANG
 	fprintf(fp, "enable_sound = %d\n", (chkEnableSound->isChecked() ? 1 : 0));
 	fprintf(fp, "enable_music = %d\n", (chkEnableMusic->isChecked() ? 1 : 0));
