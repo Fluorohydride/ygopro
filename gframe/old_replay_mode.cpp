@@ -778,8 +778,8 @@ namespace ygo {
 	void ReplayMode::ReplayRefresh(int player, int location, int flag) {
 		std::vector<uint8_t> buffer;
 		int len = query_field_card(pduel, player, location, flag, nullptr, 0, FALSE);
-		buffer.resize(buffer.size() + len);
-		get_cached_query(pduel, &buffer[3]);
+		buffer.resize(len);
+		get_cached_query(pduel, buffer.data());
 		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)buffer.data());
 	}
 	void ReplayMode::ReplayRefresh(int flag) {
@@ -790,8 +790,8 @@ namespace ygo {
 	void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
 		std::vector<uint8_t> buffer;
 		int len = query_card(pduel, player, location, sequence, flag, nullptr, 0, FALSE);
-		buffer.resize(buffer.size() + len);
-		get_cached_query(pduel, &buffer[3]);
+		buffer.resize(len);
+		get_cached_query(pduel, buffer.data());
 		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)buffer.data());
 	}
 	void ReplayMode::ReplayReload() {

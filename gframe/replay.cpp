@@ -77,7 +77,9 @@ void Replay::Write(const void * data, bool flush) {
 void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	if(!is_recording)
 		return;
-	replay_data.insert(replay_data.end(), (unsigned char*)data, ((unsigned char*)data) + length);
+	const auto vec_size = replay_data.size();
+	replay_data.resize(vec_size + length);
+	std::memcpy(&replay_data[vec_size], data, length);
 	Write(data, length, flush);
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
@@ -107,12 +109,12 @@ void Replay::EndRecord(size_t size) {
 #else
 	fclose(fp);
 #endif
-	pheader.datasize = replay_data.size();
+	pheader.datasize = replay_data.size() - sizeof(ReplayHeader);
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
 	comp_size = size;
 	comp_data.resize(replay_data.size() * 2);
-	LzmaCompress(comp_data.data(), &comp_size, replay_data.data(), replay_data.size(), pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
+	LzmaCompress(comp_data.data(), &comp_size, replay_data.data() + sizeof(ReplayHeader), replay_data.size() - sizeof(ReplayHeader), pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	comp_data.resize(comp_size);
 	is_recording = false;
 }
