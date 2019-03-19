@@ -2,6 +2,7 @@
 #define BUFFERIO_H
 
 #include <string>
+#include <vector>
 #include <cstring>
 
 #ifdef _MSC_VER
