@@ -45,7 +45,7 @@ public:
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
-	static std::vector<ReplayPacket> replay_stream;
+	static ReplayStream replay_stream;
 	static Replay last_replay;
 	static bool old_replay;
 	static int ClientAnalyze(char* msg, unsigned int len);

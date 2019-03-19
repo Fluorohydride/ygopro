@@ -24,7 +24,7 @@ u64 DuelClient::select_hint = 0;
 std::wstring DuelClient::event_string;
 std::mt19937 DuelClient::rnd;
 
-std::vector<ReplayPacket> DuelClient::replay_stream;
+ReplayStream DuelClient::replay_stream;
 Replay DuelClient::last_replay;
 bool DuelClient::old_replay = true;
 

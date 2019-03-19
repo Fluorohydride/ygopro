@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-std::vector<ReplayPacket> TagDuel::replay_stream;
+ReplayStream TagDuel::replay_stream;
 
 TagDuel::TagDuel() {
 	game_started = false;

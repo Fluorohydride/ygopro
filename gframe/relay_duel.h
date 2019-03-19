@@ -41,7 +41,7 @@ public:
 	static void RelayTimer(evutil_socket_t fd, short events, void* arg);
 
 	void PseudoRefreshDeck(int player, int flag = 0x181fff);
-	static std::vector<ReplayPacket> replay_stream;
+	static ReplayStream replay_stream;
 	
 protected:
 	class duelist {

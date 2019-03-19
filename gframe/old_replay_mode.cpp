@@ -7,13 +7,17 @@
 namespace ygo {
 	bool ReplayMode::ReadReplayResponse() {
 		ReplayResponse res;
-		bool result = cur_replay.GetNextResponse(&res);
+		bool result = cur_replay.yrp->GetNextResponse(&res);
 		if (result)
 			set_responseb(pduel, res.response.data(), res.length);
 		return result;
 	}
 	int ReplayMode::OldReplayThread() {
-		const ReplayHeader& rh = cur_replay.pheader;
+		if(!cur_replay.yrp || !mainGame->dInfo.isReplay) {
+			EndDuel();
+			return 0;
+		}
+		const ReplayHeader& rh = cur_replay.yrp->pheader;
 		mainGame->dInfo.isFirst = true;
 		mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
 		mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
@@ -26,7 +30,6 @@ namespace ygo {
 			return 0;
 		}
 		mainGame->dInfo.isStarted = true;
-		mainGame->dInfo.isReplay = true;
 		mainGame->dInfo.isOldReplay = true;
 		mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
 		std::vector<uint8> duelBuffer;
@@ -95,30 +98,31 @@ namespace ygo {
 		return 0;
 	}
 	bool ReplayMode::StartDuel() {
-		const ReplayHeader& rh = cur_replay.pheader;
+		const ReplayHeader& rh = cur_replay.yrp->pheader;
 		int seed = rh.seed;
+		auto names = ReplayMode::cur_replay.yrp->GetPlayerNames();
 		if(mainGame->dInfo.isRelay) {
-			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
-			cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
-			cur_replay.ReadName(&mainGame->dInfo.hostname[2][0]);
-			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
-			cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
-			cur_replay.ReadName(&mainGame->dInfo.clientname[2][0]);
+			mainGame->dInfo.hostname[0] = names[0];
+			mainGame->dInfo.hostname[1] = names[1];
+			mainGame->dInfo.hostname[2] = names[2];
+			mainGame->dInfo.clientname[0] = names[3];
+			mainGame->dInfo.clientname[1] = names[4];
+			mainGame->dInfo.clientname[2] = names[5];
 		} else if(mainGame->dInfo.isTag) {
-			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
-			cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
-			cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
-			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
+			mainGame->dInfo.hostname[0] = names[0];
+			mainGame->dInfo.hostname[1] = names[1];
+			mainGame->dInfo.clientname[1] = names[2];
+			mainGame->dInfo.clientname[0] = names[3];
 		} else {
-			cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
-			cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
+			mainGame->dInfo.hostname[0] = names[0];
+			mainGame->dInfo.clientname[0] = names[1];
 		}
 		std::mt19937 rnd(seed);
 		pduel = mainGame->SetupDuel(rnd());
-		int start_lp = cur_replay.ReadInt32();
-		int start_hand = cur_replay.ReadInt32();
-		int draw_count = cur_replay.ReadInt32();
-		int opt = cur_replay.ReadInt32();
+		int start_lp = cur_replay.yrp->params.start_lp;
+		int start_hand = cur_replay.yrp->params.start_hand;
+		int draw_count = cur_replay.yrp->params.draw_count;
+		int opt = cur_replay.yrp->params.duel_flags;
 		mainGame->dInfo.duel_field = 2;
 		if ((opt & DUEL_PZONE) && (opt & DUEL_SEPARATE_PZONE) && (opt & DUEL_EMZONE))
 			mainGame->dInfo.duel_field = 5;
@@ -136,61 +140,62 @@ namespace ygo {
 		mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 		mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
 		mainGame->dInfo.turn = 0;
+		auto decks = cur_replay.yrp->GetPlayerDecks();
 		if (!mainGame->dInfo.isSingleMode) {
-			if (!(opt & DUEL_TAG_MODE)) {
-				int main = cur_replay.ReadInt32();
-				for (int i = 0; i < main; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				int extra = cur_replay.ReadInt32();
-				for (int i = 0; i < extra; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, main, extra);
-				main = cur_replay.ReadInt32();
-				for (int i = 0; i < main; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				extra = cur_replay.ReadInt32();
-				for (int i = 0; i < extra; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, main, extra);
-			}
-			else {
-				int main = cur_replay.ReadInt32();
-				for (int i = 0; i < main; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				int extra = cur_replay.ReadInt32();
-				for (int i = 0; i < extra; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, main, extra);
-				main = cur_replay.ReadInt32();
-				for (int i = 0; i < main; ++i)
-					new_tag_card(pduel, cur_replay.ReadInt32(), 0, LOCATION_DECK);
-				extra = cur_replay.ReadInt32();
-				for (int i = 0; i < extra; ++i)
-					new_tag_card(pduel, cur_replay.ReadInt32(), 0, LOCATION_EXTRA);
-				main = cur_replay.ReadInt32();
-				for (int i = 0; i < main; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				extra = cur_replay.ReadInt32();
-				for (int i = 0; i < extra; ++i)
-					new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, main, extra);
-				main = cur_replay.ReadInt32();
-				for (int i = 0; i < main; ++i)
-					new_tag_card(pduel, cur_replay.ReadInt32(), 1, LOCATION_DECK);
-				extra = cur_replay.ReadInt32();
-				for (int i = 0; i < extra; ++i)
-					new_tag_card(pduel, cur_replay.ReadInt32(), 1, LOCATION_EXTRA);
+			if (opt & DUEL_RELAY_MODE) {
+				for(auto card : decks[0].first)
+					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+				for(auto card : decks[0].second)
+					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+				mainGame->dField.Initial(0, decks[0].first.size(), decks[0].second.size());
+				for(auto card : decks[1].first)
+					new_tag_card(pduel, card, 0, LOCATION_DECK);
+				for(auto card : decks[1].second)
+					new_tag_card(pduel, card, 0, LOCATION_EXTRA);
+				for(auto card : decks[2].first)
+					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+				for(auto card : decks[2].second)
+					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+				mainGame->dField.Initial(1, decks[2].first.size(), decks[2].second.size());
+				for(auto card : decks[3].first)
+					new_tag_card(pduel, card, 1, LOCATION_DECK);
+				for(auto card : decks[3].second)
+					new_tag_card(pduel, card, 1, LOCATION_EXTRA);
+			} else if (opt & DUEL_TAG_MODE) {
+				for(auto card : decks[0].first)
+					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+				for(auto card : decks[0].second)
+					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+				mainGame->dField.Initial(0, decks[0].first.size(), decks[0].second.size());
+				for(auto card : decks[1].first)
+					new_tag_card(pduel, card, 0, LOCATION_DECK);
+				for(auto card : decks[1].second)
+					new_tag_card(pduel, card, 0, LOCATION_EXTRA);
+				for(auto card : decks[2].first)
+					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+				for(auto card : decks[2].second)
+					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+				mainGame->dField.Initial(1, decks[2].first.size(), decks[2].second.size());
+				for(auto card : decks[3].first)
+					new_tag_card(pduel, card, 1, LOCATION_DECK);
+				for(auto card : decks[3].second)
+					new_tag_card(pduel, card, 1, LOCATION_EXTRA);
+			} else {
+				for(auto card : decks[0].first)
+					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+				for(auto card : decks[0].second)
+					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+				mainGame->dField.Initial(0, decks[0].first.size(), decks[0].second.size());
+				for(auto card : decks[1].first)
+					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
+				for(auto card : decks[1].second)
+					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
+				mainGame->dField.Initial(1, decks[1].first.size(), decks[1].second.size());
 			}
 		} else {
-			std::string filename;
-			size_t slen = cur_replay.ReadInt16();
-			filename.resize(slen);
-			cur_replay.ReadData(&filename[0], slen);
-			filename[slen] = 0;
-			if(!preload_script(pduel, (char*)filename.c_str(), 0, 0, nullptr))
+			if(!preload_script(pduel, (char*)cur_replay.yrp->scriptname.c_str(), 0, 0, nullptr))
 				return false;
 		}
-		cur_replay.ParseResponses();
 		start_duel(pduel, opt);
 		return true;
 	}

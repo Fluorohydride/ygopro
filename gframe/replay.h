@@ -35,6 +35,9 @@ public:
 	std::vector<unsigned char> data;
 };
 
+using ReplayDeck = std::vector<std::pair<std::vector<int>, std::vector<int>>>;
+using ReplayStream = std::vector<ReplayPacket>;
+
 struct ReplayResponse {
 public:
 	int length;
@@ -46,7 +49,7 @@ public:
 	Replay();
 	~Replay();
 	void BeginRecord(bool write = true);
-	void WriteStream(std::vector<ReplayPacket> stream);
+	void WriteStream(ReplayStream stream);
 	void WritePacket(ReplayPacket p);
 	template <typename  T>
 	void Write(const void* data, bool flush);
@@ -60,40 +63,58 @@ public:
 	void EndRecord(size_t size = 0x20000);
 	void SaveReplay(const std::wstring& name);
 	bool OpenReplay(const std::wstring& name);
+	bool OpenReplayFromBuffer(std::vector<uint8_t> contents);
 	static bool CheckReplay(const std::wstring& name);
-	bool ReadNextPacket(ReplayPacket* packet);
-	bool ReadStream(std::vector<ReplayPacket>* stream);
 	static bool DeleteReplay(const std::wstring& name);
 	static bool RenameReplay(const std::wstring& oldname, const std::wstring& newname);
 	bool GetNextResponse(ReplayResponse* res);
-	bool ReadName(wchar_t* data);
+	std::vector<std::wstring> GetPlayerNames();
+	ReplayDeck GetPlayerDecks();
+	ReplayStream packets_stream;
+	void Rewind();
+	std::unique_ptr<Replay> yrp;
+	ReplayHeader pheader;
+	std::vector<uint8_t> replay_data;
+	std::vector<uint8_t> comp_data;
+	size_t replay_size;
+	size_t comp_size;
+	struct duel_parameters {
+		int start_lp;
+		int start_hand;
+		int draw_count;
+		int duel_flags;
+	};
+	duel_parameters params;
+	std::string scriptname;
+private:
+	void Reset();
 	bool ReadData(void* data, unsigned int length);
 	template <typename  T>
 	T Read();
 	int32_t ReadInt32();
 	int16_t ReadInt16();
 	int8_t ReadInt8();
-	void Rewind();
-	bool LoadYrp();
-	bool ParseResponses();
-	ReplayHeader pheader;
-	std::vector<uint8_t> replay_data;
-	std::vector<uint8_t> comp_data;
-	size_t data_position;
-	size_t replay_size;
-	size_t comp_size;
-private:
 	bool ReadNextResponse(ReplayResponse* res);
+	bool ReadName(wchar_t* data);
+	bool ReadNextPacket(ReplayPacket* packet);
 #ifdef _WIN32
 	HANDLE fp;
 #else
 	FILE* fp;
 #endif
+	size_t data_position;
+	void ParseNames();
+	void ParseParams();
+	void ParseDecks();
+	void ParseStream();
+	bool ParseResponses();
 	bool is_recording;
 	bool is_writing;
 	bool is_replaying;
 	bool can_read;
 	std::vector<ReplayResponse> responses;
+	std::vector<std::wstring> players;
+	ReplayDeck decks;
 	std::vector<ReplayResponse>::iterator responses_iterator;
 };
 

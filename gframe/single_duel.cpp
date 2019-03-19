@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-std::vector<ReplayPacket> SingleDuel::replay_stream;
+ReplayStream SingleDuel::replay_stream;
 
 SingleDuel::SingleDuel(bool is_match) {
 	game_started = false;

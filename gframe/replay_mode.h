@@ -27,10 +27,10 @@ private:
 
 public:
 	static Replay cur_replay;
-	static std::vector<ReplayPacket> ReplayMode::current_stream;
+	static ReplayStream ReplayMode::current_stream;
 	
 public:
-	static bool StartReplay(int skipturn);
+	static bool StartReplay(int skipturn, bool is_yrp);
 	static void StopReplay(bool is_exiting = false);
 	static void SwapField();
 	static void Pause(bool is_pause, bool is_step);

@@ -292,7 +292,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true)))
 						break;
 				}
-				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.LoadYrp())
+				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)
 					break;
 				mainGame->ClearCardInfo();
 				mainGame->mTopMenu->setVisible(false);
@@ -311,7 +311,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
 				if(start_turn == 1)
 					start_turn = 0;
-				ReplayMode::StartReplay(start_turn);
+				ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
 				break;
 			}
 			case BUTTON_DELETE_REPLAY: {
@@ -456,26 +456,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				time_t curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);
 				repinfo.append(fmt::format(L"{}/{}/{} {:02}:{:02}:{:02}\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec).c_str());
-				wchar_t namebuf[6][20];
-				ReplayMode::cur_replay.ReadName(namebuf[0]);
-				ReplayMode::cur_replay.ReadName(namebuf[1]);
-				if(ReplayMode::cur_replay.pheader.flag & (REPLAY_TAG + REPLAY_RELAY)) {
-					ReplayMode::cur_replay.ReadName(namebuf[2]);
-					ReplayMode::cur_replay.ReadName(namebuf[3]);
-				}
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_RELAY) {
-					ReplayMode::cur_replay.ReadName(namebuf[4]);
-					ReplayMode::cur_replay.ReadName(namebuf[5]);
-				}
+				auto names = ReplayMode::cur_replay.GetPlayerNames();
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					repinfo.append(fmt::format(L"{}\n{}\n===VS===\n{}\n{}\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]));
+					repinfo.append(fmt::format(L"{}\n{}\n===VS===\n{}\n{}\n", names[0], names[1], names[2], names[3]));
 				else if (ReplayMode::cur_replay.pheader.flag & REPLAY_RELAY)
-					repinfo.append(fmt::format(L"{}\n{}\n{}\n===VS===\n{}\n{}\n{}\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3], namebuf[4], namebuf[5]));
+					repinfo.append(fmt::format(L"{}\n{}\n{}\n===VS===\n{}\n{}\n{}\n", names[0], names[1], names[2], names[3], names[4], names[5]));
 				else
-					repinfo.append(fmt::format(L"{}\n===VS===\n{}\n", namebuf[0], namebuf[1]));
+					repinfo.append(fmt::format(L"{}\n===VS===\n{}\n", names[0], names[1]));
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->stReplayInfo->setText((wchar_t*)repinfo.c_str());
-				if(ReplayMode::cur_replay.pheader.id == 0x31707279) {
+				if(ReplayMode::cur_replay.pheader.id == 0x31707279 || !ReplayMode::cur_replay.yrp) {
 					mainGame->chkYrp->setChecked(false);
 					mainGame->chkYrp->setEnabled(false);
 				} else
@@ -544,7 +534,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true)))
 						break;
 				}
-				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.LoadYrp())
+				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)
 					break;
 				mainGame->ClearCardInfo();
 				mainGame->mTopMenu->setVisible(false);
@@ -563,7 +553,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
 				if(start_turn == 1)
 					start_turn = 0;
-				ReplayMode::StartReplay(start_turn);
+				ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
 				break;
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {

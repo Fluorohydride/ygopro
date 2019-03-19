@@ -8,7 +8,7 @@ namespace ygo {
 void* ReplayMode::pduel = 0;
 bool ReplayMode::yrp = false;
 Replay ReplayMode::cur_replay;
-std::vector<ReplayPacket> ReplayMode::current_stream;
+ReplayStream ReplayMode::current_stream;
 bool ReplayMode::is_continuing = true;
 bool ReplayMode::is_closing = false;
 bool ReplayMode::is_pausing = false;
@@ -20,12 +20,13 @@ int ReplayMode::skip_turn = 0;
 int ReplayMode::current_step = 0;
 int ReplayMode::skip_step = 0;
 
-bool ReplayMode::StartReplay(int skipturn) {
+bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
+	if(mainGame->dInfo.isReplay)
+		return false;
 	skip_turn = skipturn;
 	if(skip_turn < 0)
 		skip_turn = 0; 
-	yrp = cur_replay.pheader.id == 0x31707279;
-	if(yrp)
+	if(is_yrp)
 		std::thread(OldReplayThread).detach();
 	else
 		std::thread(ReplayThread).detach();
@@ -54,6 +55,7 @@ void ReplayMode::Pause(bool is_pause, bool is_step) {
 	}
 }
 int ReplayMode::ReplayThread() {
+	mainGame->dInfo.isReplay = true;
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
@@ -62,32 +64,33 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.lua64 = !!(rh.flag & REPLAY_LUA64);
 	mainGame->dInfo.current_player[0] = 0;
 	mainGame->dInfo.current_player[1] = 0;
+	auto names = ReplayMode::cur_replay.GetPlayerNames();
 	if (mainGame->dInfo.isRelay) {
-		cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
-		cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
-		cur_replay.ReadName(&mainGame->dInfo.hostname[2][0]);
-		cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
-		cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
-		cur_replay.ReadName(&mainGame->dInfo.clientname[2][0]);
+		mainGame->dInfo.hostname[0] = names[0];
+		mainGame->dInfo.hostname[1] = names[1];
+		mainGame->dInfo.hostname[2] = names[2];
+		mainGame->dInfo.clientname[0] = names[3];
+		mainGame->dInfo.clientname[1] = names[4];
+		mainGame->dInfo.clientname[2] = names[5];
 	} else if (mainGame->dInfo.isTag) {
-		cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
-		cur_replay.ReadName(&mainGame->dInfo.hostname[1][0]);
-		cur_replay.ReadName(&mainGame->dInfo.clientname[1][0]);
-		cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
+		mainGame->dInfo.hostname[0] = names[0];
+		mainGame->dInfo.hostname[1] = names[1];
+		mainGame->dInfo.clientname[1] = names[2];
+		mainGame->dInfo.clientname[0] = names[3];
 	} else {
-		cur_replay.ReadName(&mainGame->dInfo.hostname[0][0]);
-		cur_replay.ReadName(&mainGame->dInfo.clientname[0][0]);
+		mainGame->dInfo.hostname[0] = names[0];
+		mainGame->dInfo.clientname[0] = names[1];
 	}
-	int opt = cur_replay.ReadInt32();
+	int opt = cur_replay.params.duel_flags;
 	mainGame->dInfo.duel_field = opt & 0xff;
 	mainGame->dInfo.extraval = ((opt >> 8) & SPEED_DUEL) ? 1 : 0;
 	mainGame->SetPhaseButtons();
-	if(!cur_replay.ReadStream(&current_stream)) {
+	current_stream = cur_replay.packets_stream;
+	if(!current_stream.size()) {
 		EndDuel();
 		return 0;
 	}
 	mainGame->dInfo.isStarted = true;
-	mainGame->dInfo.isReplay = true;
 	mainGame->dInfo.turn = 0;
 	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
 	is_continuing = true;

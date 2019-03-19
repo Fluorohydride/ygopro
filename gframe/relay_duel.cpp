@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-std::vector<ReplayPacket> RelayDuel::replay_stream;
+ReplayStream RelayDuel::replay_stream;
 
 RelayDuel::RelayDuel() {
 	game_started = false;

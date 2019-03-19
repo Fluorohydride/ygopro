@@ -17,6 +17,7 @@ void ReplayPacket::Set(int msg, char* buf, int len) {
 }
 
 Replay::Replay() {
+	yrp = nullptr;
 	is_recording = false;
 	is_replaying = false;
 	can_read = false;
@@ -24,6 +25,7 @@ Replay::Replay() {
 Replay::~Replay() {
 }
 void Replay::BeginRecord(bool write) {
+	Reset();
 #ifdef _WIN32
 	if(is_recording && is_writing)
 		CloseHandle(fp);
@@ -50,7 +52,7 @@ void Replay::WritePacket(ReplayPacket p) {
 	WriteInt32(p.data.size(), false);
 	WriteData((char*)p.data.data(), p.data.size());
 }
-void Replay::WriteStream(std::vector<ReplayPacket> stream) {
+void Replay::WriteStream(ReplayStream stream) {
 	for(auto packet : stream)
 		WritePacket(packet);
 }
@@ -130,6 +132,37 @@ void Replay::SaveReplay(const std::wstring& name) {
 	replay_file.write((char*)comp_data.data(), comp_size);
 	replay_file.close();
 }
+bool Replay::OpenReplayFromBuffer(std::vector<uint8_t> contents) {
+	Reset();
+	memcpy(&pheader, contents.data(), sizeof(pheader));
+	if(pheader.id != 0x31707279 && pheader.id != 0x58707279) {
+		Reset();
+		return false;
+	}
+	contents.erase(contents.begin(), contents.begin() + sizeof(pheader));
+	comp_size = contents.size();
+	if(pheader.flag & REPLAY_COMPRESSED) {
+		replay_size = pheader.datasize;
+		replay_data.resize(replay_size);
+		if(LzmaUncompress(replay_data.data(), &replay_size, contents.data(), &comp_size, pheader.props, 5) != SZ_OK)
+			return false;
+	} else {
+		replay_data = contents;
+		replay_size = comp_size;
+	}
+	data_position = 0;
+	is_replaying = true;
+	can_read = true;
+	ParseNames();
+	ParseParams();
+	if(pheader.id == 0x31707279) {
+		ParseDecks();
+		ParseResponses();
+	} else {
+		ParseStream();
+	}
+	return true;
+}
 bool Replay::OpenReplay(const std::wstring& name) {
 #ifdef _WIN32
 	std::ifstream replay_file(name, std::ifstream::binary);
@@ -144,25 +177,8 @@ bool Replay::OpenReplay(const std::wstring& name) {
 			return false;
 	}
 	std::vector<uint8_t> contents((std::istreambuf_iterator<char>(replay_file)), std::istreambuf_iterator<char>());
-	memcpy(&pheader, contents.data(), sizeof(pheader));
-	contents.erase(contents.begin(), contents.begin() + sizeof(pheader));
-	comp_size = contents.size();
-	if(pheader.flag & REPLAY_COMPRESSED) {
-		replay_data.resize(0x200000);
-		replay_file.close();
-		replay_size = pheader.datasize;
-		if(LzmaUncompress(replay_data.data(), &replay_size, contents.data(), &comp_size, pheader.props, 5) != SZ_OK)
-			return false;
-		replay_data.resize(replay_size);
-	} else {
-		replay_data = contents;
-		replay_file.close();
-		replay_size = comp_size;
-	}
-	data_position = 0;
-	is_replaying = true;
-	can_read = true;
-	return true;
+	replay_file.close();
+	return OpenReplayFromBuffer(contents);
 }
 bool Replay::CheckReplay(const std::wstring& name) {
 #ifdef _WIN32
@@ -182,25 +198,6 @@ bool Replay::CheckReplay(const std::wstring& name) {
 	replay_file.close();
 	return count == 1 && (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
 }
-bool Replay::ReadNextPacket(ReplayPacket* packet) {
-	if (!can_read)
-		return false;
-	unsigned char message = (unsigned char)ReadInt8();
-	if(!can_read)
-		return false;
-	packet->message = message;
-	packet->data.resize(ReadInt32());
-	ReadData((char*)packet->data.data(), packet->data.size());
-	return true;
-}
-bool Replay::ReadStream(std::vector<ReplayPacket>* stream) {
-	stream->clear();
-	ReplayPacket p;
-	while (ReadNextPacket(&p)) {
-		stream->push_back(p);
-	}
-	return !stream->empty();
-}
 bool Replay::DeleteReplay(const std::wstring& name) {
 	return Utils::Deletefile(L"./replay/" + name + L".ydk");
 }
@@ -214,6 +211,12 @@ bool Replay::GetNextResponse(ReplayResponse* res) {
 	responses_iterator++;
 	return true;
 }
+std::vector<std::wstring> Replay::GetPlayerNames() {
+	return players;
+}
+ReplayDeck Replay::GetPlayerDecks() {
+	return decks;
+}
 bool Replay::ReadNextResponse(ReplayResponse* res) {
 	if(!can_read | !res)
 		return false;
@@ -225,6 +228,86 @@ bool Replay::ReadNextResponse(ReplayResponse* res) {
 		return false;
 	return true;
 }
+void Replay::ParseNames() {
+	players.clear();
+	int iterations = (pheader.flag & REPLAY_RELAY) ? 6 : (pheader.flag & REPLAY_TAG) ? 4 : 2;
+	for(int i = 0; i < iterations; i++) {
+		wchar_t namebuf[20];
+		ReadName(namebuf);
+		players.push_back(namebuf);
+	}
+}
+void Replay::ParseParams() {
+	params = { 0 };
+	if(pheader.id == 0x31707279) {
+		params.start_lp = ReadInt32();
+		params.start_hand = ReadInt32();
+		params.draw_count = ReadInt32();
+	}
+	params.duel_flags = ReadInt32();
+	if(pheader.flag & REPLAY_SINGLE_MODE && pheader.id == 0x31707279) {
+		size_t slen = ReadInt16();
+		scriptname.resize(slen);
+		ReadData(&scriptname[0], slen);
+		scriptname[slen] = 0;
+	}
+}
+void Replay::ParseDecks() {
+	decks.clear();
+	if(pheader.id != 0x31707279 || pheader.flag & REPLAY_SINGLE_MODE)
+		return;
+	int iterations = (pheader.flag & REPLAY_RELAY) ? 6 : (pheader.flag & REPLAY_TAG) ? 4 : 2;
+	for(int i = 0; i < iterations; i++) {
+		std::vector<int> main_deck;
+		int main = ReadInt32();
+		for(int i = 0; i < main; ++i)
+			main_deck.push_back(ReadInt32());
+		std::vector<int> extra_deck;
+		int extra = ReadInt32();
+		for(int i = 0; i < extra; ++i)
+			extra_deck.push_back(ReadInt32());
+		decks.push_back(std::make_pair(main_deck, extra_deck));
+	}
+}
+bool Replay::ReadNextPacket(ReplayPacket* packet) {
+	if(!can_read)
+		return false;
+	unsigned char message = (unsigned char)ReadInt8();
+	if(!can_read)
+		return false;
+	packet->message = message;
+	int len = ReadInt32();
+	if(!can_read || len == -1)
+		return false;
+	packet->data.resize(len);
+	ReadData((char*)packet->data.data(), packet->data.size());
+	return true;
+}
+void Replay::ParseStream() {
+	packets_stream.clear();
+	if(pheader.id != 0x58707279)
+		return;
+	ReplayPacket p;
+	while(ReadNextPacket(&p)) {
+		if(p.message == MSG_AI_NAME) {
+			char* pbuf = (char*)p.data.data();
+			int len = BufferIO::ReadInt16(pbuf);
+			char* begin = pbuf;
+			pbuf += len + 1;
+			std::string namebuf;
+			namebuf.resize(len);
+			memcpy(&namebuf[0], begin, len + 1);
+			players[1] = BufferIO::DecodeUTF8s(namebuf);
+			continue;
+		}
+		if(p.message == OLD_REPLAY_MODE && !yrp) {
+			yrp = std::make_unique<Replay>();
+			yrp->OpenReplayFromBuffer(p.data);
+			continue;
+		}
+		packets_stream.push_back(p);
+	}
+}
 bool Replay::ReadName(wchar_t* data) {
 	if(!is_replaying || !can_read)
 		return false;
@@ -233,6 +316,18 @@ bool Replay::ReadName(wchar_t* data) {
 		return false;
 	BufferIO::CopyWStr(buffer, data, 20);
 	return true;
+}
+void Replay::Reset() {
+	yrp = nullptr;
+	scriptname.clear();
+	responses.clear();
+	players.clear();
+	decks.clear();
+	params = { 0 };
+	packets_stream.clear();
+	data_position = 0;
+	replay_data.clear();
+	comp_data.clear();
 }
 bool Replay::ReadData(void* data, unsigned int length) {
 	if(!is_replaying || !can_read)
@@ -265,35 +360,10 @@ void Replay::Rewind() {
 	data_position = 0;
 	responses_iterator = responses.begin();
 }
-
-bool Replay::LoadYrp() {
-	if (pheader.flag & REPLAY_NEWREPLAY) {
-		data_position += (4 + ((pheader.flag & REPLAY_RELAY) ? 240 : (pheader.flag & REPLAY_TAG) ? 160 : 80));
-		ReplayPacket p;
-		while (ReadNextPacket(&p))
-			if (p.message == OLD_REPLAY_MODE) {
-				char* prep = (char*)p.data.data();
-				memcpy(&pheader, prep, sizeof(ReplayHeader));
-				prep += sizeof(ReplayHeader);
-				if(pheader.flag & REPLAY_COMPRESSED) {
-					comp_size = (size_t)(p.data.size() - sizeof(ReplayHeader));
-					replay_size = pheader.datasize;
-					if (LzmaUncompress(replay_data.data(), &replay_size, (unsigned char*)prep, &comp_size, pheader.props, 5) != SZ_OK)
-						return false;
-				} else {
-					replay_data.insert(replay_data.begin(), prep, prep + (size_t)(p.data.size() - sizeof(ReplayHeader)));
-					replay_size = comp_size;
-				}
-				replay_data.shrink_to_fit();
-				data_position = 0;
-				is_replaying = true;
-				return true;
-			}
-	}
-	return !(pheader.flag & REPLAY_NEWREPLAY);
-}
 bool Replay::ParseResponses() {
 	responses.clear();
+	if(pheader.id != 0x31707279)
+		return false;
 	ReplayResponse r;
 	while(ReadNextResponse(&r)) {
 		responses.push_back(r);

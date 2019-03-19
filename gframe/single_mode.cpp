@@ -10,9 +10,11 @@ bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
 Replay SingleMode::new_replay;
-std::vector<ReplayPacket> SingleMode::replay_stream;
+ReplayStream SingleMode::replay_stream;
 
 bool SingleMode::StartPlay() {
+	if(mainGame->dInfo.isSingleMode)
+		return false;
 	std::thread(SinglePlayThread).detach();
 	return true;
 }
@@ -30,6 +32,7 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	set_responseb(pduel, resp, len);
 }
 int SingleMode::SinglePlayThread() {
+	mainGame->dInfo.isSingleMode = true;
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
@@ -86,7 +89,6 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isStarted = true;
-	mainGame->dInfo.isSingleMode = true;
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
 	std::vector<uint8> duelBuffer;
