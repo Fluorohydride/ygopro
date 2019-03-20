@@ -137,6 +137,7 @@ namespace ygo {
 		Makedirectory(TEXT("deck"));
 		Makedirectory(TEXT("pics"));
 		Makedirectory(TEXT("pics/field"));
+		Makedirectory(TEXT("pics/temp/"));
 		ClearDirectory(TEXT("pics/temp/"));
 		Makedirectory(TEXT("replay"));
 		Makedirectory(TEXT("screenshots"));

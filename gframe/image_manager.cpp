@@ -192,22 +192,24 @@ void ImageManager::DownloadPic(int code) {
 				int header_written = 0;
 			} payload;
 			std::ofstream fp(name, std::ofstream::binary);
-			payload.stream = &fp;
-			CURLcode res;
-			curl = curl_easy_init();
-			if(curl) {
-				curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
-				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
-				res = curl_easy_perform(curl);
-				curl_easy_cleanup(curl);
-				fp.close();
-				if(res == CURLE_OK) {
-					ext = GetExtension(payload.header);
-					Utils::Movefile(name, dest_folder + ext);
-					break;
-				} else {
-					Utils::Deletefile(name);
+			if(fp.is_open()) {
+				payload.stream = &fp;
+				CURLcode res;
+				curl = curl_easy_init();
+				if(curl) {
+					curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
+					curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
+					curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
+					res = curl_easy_perform(curl);
+					curl_easy_cleanup(curl);
+					fp.close();
+					if(res == CURLE_OK) {
+						ext = GetExtension(payload.header);
+						Utils::Movefile(name, dest_folder + ext);
+						break;
+					} else {
+						Utils::Deletefile(name);
+					}
 				}
 			}
 		}
