@@ -408,6 +408,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 					return std::make_pair(nullptr, "fail");
 				}
 				if(width != _width || height != _height) {
+					img->drop();
 					width = _width;
 					height = _height;
 					goto __repeat;
