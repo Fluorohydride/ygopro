@@ -1767,7 +1767,7 @@ void Game::OnResize() {
 	}
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
-	imageManager.ClearTexture();
+	imageManager.ClearTexture(true);
 
 	if(showingcard)
 		ShowCardInfo(showingcard, true);

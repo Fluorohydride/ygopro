@@ -34,12 +34,12 @@ public:
 	void AddDownloadResource(PicSource src);
 	bool Initial();
 	void SetDevice(irr::IrrlichtDevice* dev);
-	void ClearTexture();
+	void ClearTexture(bool resize = false);
 	void RemoveTexture(int code);
 	void RefreshCachedTextures();
-	void ClearCachedTextures();
+	void ClearCachedTextures(bool resize);
 	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
-	irr::video::IImage* GetTextureFromFile(const char* file, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
+	irr::video::IImage* GetTextureFromFile(const char* file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::ITexture* GetTexture(int code, bool wait = false, bool fit = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(int code);
@@ -73,13 +73,14 @@ private:
 	void ClearFutureObjects(loading_map* map);
 	void DownloadPic(int code);
 	void DownloadField(int code);
-	image_path LoadCardTexture(int code, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
+	image_path LoadCardTexture(int code, std::atomic<s32>& width, std::atomic<s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	loading_map* loading_pics[3];
 	downloading_map downloading_pics;
 	downloading_map downloading_fields;
+	std::pair<std::atomic<s32>, std::atomic<s32>> sizes[3];
 	std::mutex pic_download;
 	std::mutex field_download;
-	std::atomic<chrono_time> timestamp_id[3];
+	std::atomic<chrono_time> timestamp_id;
 	std::vector<PicSource> pic_urls;
 };
 

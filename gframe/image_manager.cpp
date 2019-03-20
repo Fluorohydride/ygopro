@@ -11,7 +11,7 @@ void ImageManager::AddDownloadResource(PicSource src) {
 }
 
 bool ImageManager::Initial() {
-	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	tCover[0] = driver->getTexture("textures/cover.jpg");
 	tCover[1] = driver->getTexture("textures/cover2.jpg");
 	if(!tCover[1])
@@ -55,13 +55,19 @@ bool ImageManager::Initial() {
 	tFieldTransparent[1][2] = driver->getTexture("textures/field-transparentSP.png");
 	tField[1][3] = driver->getTexture("textures/fieldSP4.png");
 	tFieldTransparent[1][3] = driver->getTexture("textures/field-transparentSP4.png");
+	sizes[0].first = CARD_IMG_WIDTH;
+	sizes[0].second = CARD_IMG_HEIGHT;
+	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_size.Width / 1024;
+	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_size.Height / 640;
+	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024;
+	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640;
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	device = dev;
 	driver = dev->getVideoDriver();
 }
-void ImageManager::ClearTexture() {
+void ImageManager::ClearTexture(bool resize) {
 	auto f = [&](std::unordered_map<int, irr::video::ITexture*> &map) {
 		for(auto tit = map.begin(); tit != map.end(); ++tit) {
 			if(tit->second)
@@ -69,7 +75,15 @@ void ImageManager::ClearTexture() {
 		}
 		map.clear();
 	};
-	ClearCachedTextures();
+	if(resize) {
+		sizes[1].first = CARD_IMG_WIDTH * mainGame->window_size.Width / 1024;
+		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_size.Height / 640;
+		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024;
+		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640;
+	}
+	if(!resize) {
+		ClearCachedTextures(resize);
+	}
 	f(tMap[0]);
 	f(tMap[1]);
 	f(tThumb);
@@ -85,47 +99,36 @@ void ImageManager::RemoveTexture(int code) {
 		}
 	}
 }
+#define LOAD_LOOP(src, dest, index)for(auto it = src->begin(); it != src->end();) {\
+		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {\
+			auto pair = it->second.get();\
+			if(pair.first) {\
+				if(pair.first->getDimension().Width != sizes[index].first || pair.first->getDimension().Height != sizes[index].second) {\
+					readd.push_back(it->first);\
+					dest[it->first] = nullptr;\
+					it = src->erase(it);\
+					continue;\
+				}\
+				dest[it->first] = driver->addTexture(pair.second.c_str(), pair.first);\
+				pair.first->drop();\
+			} else if(pair.second != "wait for download")\
+				dest[it->first] = nullptr;\
+			it = src->erase(it);\
+			continue;\
+		}\
+		it++;\
+	}\
+	for(auto& code : readd) {\
+		(*src)[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));\
+	}\
+	readd.clear();
 void ImageManager::RefreshCachedTextures() {
-	for(auto it = loading_pics[0]->begin(); it != loading_pics[0]->end();) {
-		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
-			auto pair = it->second.get();
-			if(pair.first) {
-				tMap[0][it->first] = driver->addTexture(pair.second.c_str(), pair.first);
-				pair.first->drop();
-			} else
-				tMap[0][it->first] = nullptr;
-			it = loading_pics[0]->erase(it);
-			continue;
-		}
-		it++;
-	}
-	for(auto it = loading_pics[1]->begin(); it != loading_pics[1]->end();) {
-		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
-			auto pair = it->second.get();
-			if(pair.first) {
-				tMap[1][it->first] = driver->addTexture(pair.second.c_str(), pair.first);
-				pair.first->drop();
-			} else
-				tMap[1][it->first] = nullptr;
-			it = loading_pics[1]->erase(it);
-			continue;
-		}
-		it++;
-	}
-	for(auto it = loading_pics[2]->begin(); it != loading_pics[2]->end();) {
-		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
-			auto pair = it->second.get();
-			if(pair.first) {
-				tThumb[it->first] = driver->addTexture(pair.second.c_str(), pair.first);
-				pair.first->drop();
-			} else
-				tThumb[it->first] = nullptr;
-			it = loading_pics[2]->erase(it);
-			continue;
-		}
-		it++;
-	}
+	std::vector<int> readd;
+	LOAD_LOOP(loading_pics[0], tMap[0], 0)
+	LOAD_LOOP(loading_pics[1], tMap[1], 1)
+	LOAD_LOOP(loading_pics[2], tThumb, 2)
 }
+#undef LOAD_LOOP
 void ImageManager::ClearFutureObjects(loading_map* map) {
 	for(auto it = map->begin(); it != map->end();) {
 		auto pair = it->second.get();
@@ -275,21 +278,17 @@ void ImageManager::DownloadField(int code) {
 		downloading_fields[code].first = 1;
 	field_download.unlock();
 }
-void ImageManager::ClearCachedTextures() {
-	timestamp_id[0] = timestamp_id[1] = timestamp_id[2] = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	if(loading_pics[0]->size()) {
-		std::thread(&ImageManager::ClearFutureObjects, this, loading_pics[0]).detach();
-		loading_pics[0] = new loading_map();
-	}
-	if(loading_pics[1]->size()) {
-		std::thread(&ImageManager::ClearFutureObjects, this, loading_pics[1]).detach();
-		loading_pics[1] = new loading_map();
-	}
-	if(loading_pics[2]->size()) {
-		std::thread(&ImageManager::ClearFutureObjects, this, loading_pics[2]).detach();
-		loading_pics[2] = new loading_map();
-	}
+#define CHANGE_LIST(list)if(list->size()) {\
+							std::thread(&ImageManager::ClearFutureObjects, this, list).detach();\
+							list = new loading_map();\
+						}
+void ImageManager::ClearCachedTextures(bool resize) {
+	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	CHANGE_LIST(loading_pics[0])
+	CHANGE_LIST(loading_pics[1])
+	CHANGE_LIST(loading_pics[2])
 }
+#undef CHANGE_LIST
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
 bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
@@ -370,10 +369,13 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 		}
 	return true;
 }
-irr::video::IImage* ImageManager::GetTextureFromFile(const char* file, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+irr::video::IImage* ImageManager::GetTextureFromFile(const char* file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);
-	if(srcimg == NULL || timestamp_id != source_timestamp_id.load())
+	if(srcimg == NULL || timestamp_id != source_timestamp_id.load()) {
+		if(srcimg)
+			srcimg->drop();
 		return NULL;
+	}
 	if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
 		return srcimg;
 	} else {
@@ -386,49 +388,42 @@ irr::video::IImage* ImageManager::GetTextureFromFile(const char* file, s32 width
 		return destimg;
 	}
 }
-ImageManager::image_path ImageManager::LoadCardTexture(int code, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32>& _width, std::atomic<s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* img = nullptr;
-	pic_download.lock();
-	bool should_download = downloading_pics.find(code) == downloading_pics.end();
-	pic_download.unlock();
-	if(!should_download) {
-		while(downloading_pics[code].first <= 1) {
-			if(timestamp_id != source_timestamp_id.load()) {
-				return std::make_pair(nullptr, "fail");
-			}
-		}
-	}
+	int width = _width;
+	int height = _height;
 	for(auto& path : mainGame->pic_dirs) {
 		for(auto& extension : { ".png", ".jpg" }) {
 			if(timestamp_id != source_timestamp_id.load())
 				return std::make_pair(nullptr, "fail");
 			auto file = path + std::to_string(code) + extension;
+			if(width != _width || height != _height) {
+				width = _width;
+				height = _height;
+			}
+			__repeat:
 			if(img = GetTextureFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id))) {
 				if(timestamp_id != source_timestamp_id.load()) {
 					img->drop();
 					return std::make_pair(nullptr, "fail");
 				}
+				if(width != _width || height != _height) {
+					width = _width;
+					height = _height;
+					goto __repeat;
+				}
 				return std::make_pair(img, file);
 			}
+			if(timestamp_id != source_timestamp_id.load())
+				return std::make_pair(nullptr, "fail");
 		}
 	}
-	if(should_download) {
-		std::async(std::launch::async, &ImageManager::DownloadPic, this, code);
-		while(downloading_pics[code].first <= 1) {
-			if(timestamp_id != source_timestamp_id.load()) {
-				return std::make_pair(nullptr, "fail");
-			}
-		}
-		auto file = downloading_pics[code].second;
-		if(img = GetTextureFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id))) {
-			if(timestamp_id != source_timestamp_id.load()) {
-				img->drop();
-				return std::make_pair(nullptr, "fail");
-			}
-			return std::make_pair(img, file);
-		}
+	pic_download.lock();
+	if(downloading_pics.find(code) == downloading_pics.end()) {
+		std::thread(&ImageManager::DownloadPic, this, code).detach();
 	}
-	return std::make_pair(img, "");
+	pic_download.unlock();
+	return std::make_pair(img, "wait for download");
 }
 irr::video::ITexture* ImageManager::GetTexture(int code, bool wait, bool fit, int* chk) {
 	if(chk)
@@ -439,6 +434,16 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool wait, bool fit, in
 	auto& map = tMap[index];
 	auto tit = map.find(code);
 	if(tit == map.end()) {
+		pic_download.lock();
+		if(downloading_pics.find(code) != downloading_pics.end()) {
+			if(downloading_pics[code].first == 0 || downloading_pics[code].first == 1) {
+				pic_download.unlock();
+				if(!downloading_pics[code].first && chk)
+					*chk = 2;
+				return tUnknown;
+			}
+		}
+		pic_download.unlock();
 		auto a = loading_pics[index]->find(code);
 		if(chk)
 			*chk = 2;
@@ -450,7 +455,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool wait, bool fit, in
 				height = height * mainGame->window_size.Height / 640;
 			}
 			if(wait) {
-				auto tmp_img = LoadCardTexture(code, width, height, timestamp_id[index].load(), timestamp_id[index]);
+				auto tmp_img = LoadCardTexture(code, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
 				if(tmp_img.first) {
 					map[code] = driver->addTexture(tmp_img.second.c_str(), tmp_img.first);
 					tmp_img.first->drop();
@@ -463,7 +468,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool wait, bool fit, in
 				}
 				return (map[code]) ? map[code] : tUnknown;
 			} else {
-				(*loading_pics[index])[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, width, height, timestamp_id[index].load(), std::ref(timestamp_id[index]));
+				(*loading_pics[index])[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
 			}
 		}
 		return tUnknown;
@@ -479,14 +484,22 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code, bool wait, int* ch
 		return tUnknown;
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
+		pic_download.lock();
+		if(downloading_pics.find(code) != downloading_pics.end()) {
+			if(downloading_pics[code].first == 0 || downloading_pics[code].first == 1) {
+				pic_download.unlock();
+				if(!downloading_pics[code].first && chk)
+					*chk = 2;
+				return tUnknown;
+			}
+		}
+		pic_download.unlock();
 		auto a = loading_pics[2]->find(code);
 		if(chk)
 			*chk = 2;
 		if(a == loading_pics[2]->end()) {
-			int width = CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024;
-			int height = CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640;
 			if(wait) {
-				auto tmp_img = LoadCardTexture(code, width, height, timestamp_id[2].load(), timestamp_id[2]);
+				auto tmp_img = LoadCardTexture(code, std::ref(sizes[2].first), std::ref(sizes[2].second), timestamp_id.load(), std::ref(timestamp_id));
 				if(tmp_img.first) {
 					tThumb[code] = driver->addTexture(tmp_img.second.c_str(), tmp_img.first);
 					tmp_img.first->drop();
@@ -499,7 +512,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code, bool wait, int* ch
 				}
 				return (tThumb[code]) ? tThumb[code] : tUnknown;
 			} else {
-				(*loading_pics[2])[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, width, height, timestamp_id[2].load(), std::ref(timestamp_id[2]));
+				(*loading_pics[2])[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, std::ref(sizes[2].first), std::ref(sizes[2].second), timestamp_id.load(), std::ref(timestamp_id));
 			}
 		}
 		return tUnknown;
