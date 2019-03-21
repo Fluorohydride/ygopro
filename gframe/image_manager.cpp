@@ -253,7 +253,7 @@ void ImageManager::DownloadField(int code) {
 			if(curl) {
 				curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &fp);
+				curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
 				res = curl_easy_perform(curl);
 				curl_easy_cleanup(curl);
 				fp.close();
@@ -545,7 +545,7 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 			}
 		}
 		if(should_download && !img)
-			std::async(std::launch::async, &ImageManager::DownloadField, this, code);
+			std::thread(&ImageManager::DownloadField, this, code).detach();
 		else
 			tFields[code] = img;
 		return img;
