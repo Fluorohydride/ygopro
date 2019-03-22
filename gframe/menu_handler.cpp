@@ -394,7 +394,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(prev_operation == BUTTON_DELETE_REPLAY) {
 					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(prev_sel))) {
 						mainGame->stReplayInfo->setText(L"");
-						mainGame->lstReplayList->removeItem(prev_sel);
+						mainGame->lstReplayList->refreshList();
 					}
 				}
 				prev_operation = 0;
@@ -416,7 +416,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					auto oldextension = oldname.substr(oldname.find_last_of(L"."));
 					newname += oldextension;
 					if(Replay::RenameReplay(oldname, newname)) {
-						mainGame->lstReplayList->setItem(prev_sel, newname.c_str(), -1);
+						mainGame->lstReplayList->refreshList();
 					} else {
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365).c_str());
 					}
@@ -448,7 +448,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				int sel = mainGame->lstReplayList->getSelected();
-				if(sel == -1 || sel == 0)
+				mainGame->stReplayInfo->setText(L"");
+				if(sel == -1)
 					break;
 				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)))
 					break;
@@ -474,7 +475,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
 				int sel = mainGame->lstSinglePlayList->getSelected();
-				if(sel == -1 || sel == 0)
+				mainGame->stSinglePlayInfo->setText(L"");
+				if(sel == -1)
 					break;
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true);
 				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(name).c_str());
@@ -529,7 +531,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
 				} else {
-					if(mainGame->lstReplayList->getSelected() == -1 || mainGame->lstReplayList->getSelected() == 0)
+					if(mainGame->lstReplayList->getSelected() == -1)
 						break;
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true)))
 						break;
@@ -557,7 +559,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
-				if(!open_file && (mainGame->lstSinglePlayList->getSelected() == -1 || mainGame->lstSinglePlayList->getSelected() == 0))
+				if(!open_file && (mainGame->lstSinglePlayList->getSelected() == -1))
 					break;
 				mainGame->singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();

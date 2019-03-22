@@ -30,7 +30,7 @@ CGUIFileSelectListBox::CGUIFileSelectListBox(IGUIEnvironment* environment, IGUIE
 	TotalItemHeight(0), ItemsIconWidth(0), Font(0), IconBank(0),
 	ScrollBar(0), selectTime(0), LastKeyTime(0), Selecting(false), DrawBack(drawBack),
 	MoveOverSelect(moveOverSelect), AutoScroll(true), HighlightWhenNotFocused(true),
-	filesystem(filesystem), curList(0), basePath(0), curRelPath(0)
+	filesystem(filesystem), basePath(0), curRelPath(0), IsRoot(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CGUIFileSelectListBox");
@@ -91,6 +91,7 @@ const wchar_t* CGUIFileSelectListBox::getListItem(u32 id) const {
 }
 const wchar_t* CGUIFileSelectListBox::getListItem(u32 id, bool relativepath) const
 {
+	id += IsRoot;
 	if (id>=Items.size())
 		return 0;
 
@@ -104,6 +105,7 @@ const wchar_t* CGUIFileSelectListBox::getListItem(u32 id, bool relativepath) con
 //! Returns the icon of an item
 s32 CGUIFileSelectListBox::getIcon(u32 id) const
 {
+	id += IsRoot;
 	if (id>=Items.size())
 		return -1;
 
@@ -194,7 +196,7 @@ void CGUIFileSelectListBox::recalculateItemHeight()
 //! returns id of selected item. returns -1 if no item is selected.
 s32 CGUIFileSelectListBox::getSelected() const
 {
-	return Selected;
+	return std::max(Selected - IsRoot, -1);
 }
 
 
@@ -292,8 +294,9 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event)
 			else
 			if (!event.KeyInput.PressedDown && ( event.KeyInput.Key == KEY_RETURN || event.KeyInput.Key == KEY_SPACE ) )
 			{
-				if(curList->isDirectory(Selected + 1)) {
-					curRelPath = NormalizePath(std::wstring(curRelPath.c_str()) + BufferIO::DecodeUTF8s(curList->getFileName(Selected + 1).c_str())).c_str();
+				if(Items[Selected].isDirectory) {
+					prevRelPath = curRelPath;
+					curRelPath = Items[Selected].reltext;
 					Selected = 0;
 					if(ScrollBar)
 						ScrollBar->setPos(0);
@@ -468,12 +471,13 @@ void CGUIFileSelectListBox::selectNew(s32 ypos, bool onlyHover)
 
 	recalculateScrollPos();
 
-	bool selagain = (Selected == oldSelected && now < selectTime + 500);
+	bool selagain = (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
+	prevRelPath = curRelPath;
 	selectTime = now;
-	if(selagain && curList->isDirectory(Selected + 1)) {
+	if(selagain && Items[Selected].isDirectory) {
 		selectTime = now;
-		curRelPath = NormalizePath(std::wstring(curRelPath.c_str()) + BufferIO::DecodeUTF8s(curList->getFileName(Selected + 1).c_str())).c_str();
-		Selected = 0;
+		curRelPath = Items[Selected].reltext;
+		Selected = -1;
 		if(ScrollBar)
 			ScrollBar->setPos(0);
 		LoadFolderContents();
@@ -685,15 +689,13 @@ bool CGUIFileSelectListBox::getSerializationLabels(EGUI_LISTBOX_COLOR colorType,
 	}
 	return true;
 }
-io::IFileList* CGUIFileSelectListBox::CreateFilelist(const std::wstring & path) {
-	auto res = filesystem->createEmptyFileList(BufferIO::EncodeUTF8s(curRelPath.c_str()).c_str(), false, false);
+void CGUIFileSelectListBox::CreateFilelist(const std::wstring & path, const std::function<void(std::wstring, bool)>& cb) {
 #ifdef _WIN32
 	WIN32_FIND_DATAW fdataw;
 	HANDLE fh = FindFirstFileW((path + L"*.*").c_str(), &fdataw);
 	if(fh != INVALID_HANDLE_VALUE) {
 		do {
-			std::wstring name = fdataw.cFileName;
-			res->addItem(BufferIO::EncodeUTF8s(name).c_str(), 0, fdataw.nFileSizeHigh, fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY, 0);
+			cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
 	}
@@ -703,44 +705,47 @@ io::IFileList* CGUIFileSelectListBox::CreateFilelist(const std::wstring & path) 
 	if((dir = opendir(BufferIO::EncodeUTF8s(path).c_str())) != nullptr) {
 		struct stat fileStat;
 		while((dirp = readdir(dir)) != nullptr) {
-			stat((BufferIO::EncodeUTF8s(path + L"/") + dirp->d_name).c_str(), &fileStat);
-			res->addItem(dirp->d_name, 0, fileStat.st_size, S_ISDIR(fileStat.st_mode), 0);
+			cb(BufferIO::DecodeUTF8s(dirp->d_name), S_ISDIR(fileStat.st_mode));
 		}
 		closedir(dir);
 	}
 #endif
-	res->sort();
-	return res;
 }
 void CGUIFileSelectListBox::LoadFolderContents() {
 	Items.clear();
-	if(curList)
-		curList->drop();
-	if(curRelPath.lastChar() != L'/')
-		curRelPath += L"/";
-	curList = CreateFilelist(curRelPath.c_str());
-	for(int i = 0; i < curList->getFileCount(); i++) {
-		ListItem item;
-		std::wstring name = BufferIO::DecodeUTF8s(curList->getFileName(i).c_str());
+	IsRoot = 0;
+	(curRelPath = NormalizePath(curRelPath.c_str()).c_str()).append(L"/");
+	bool is_root = BaseIsRoot && curRelPath == basePath;
+	CreateFilelist(curRelPath.c_str(), [&](std::wstring name, bool is_directory) {
 		if(name == L".")
-			continue;
-		if(!curList->isDirectory(i) && filtered_extensions.size()) {
+			return;
+		if(name == L"..") {
+			IsRoot = 1;
+			if(is_root) {
+				IsRoot = 0;
+				return;
+			}
+		}
+		if(!is_directory && filtered_extensions.size()) {
 			auto pos = name.find('.');
 			if(pos == std::wstring::npos)
-				continue;
+				return;
 			auto extension = name.substr(pos + 1);
 			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 			if(std::find(filtered_extensions.begin(), filtered_extensions.end(), extension) == filtered_extensions.end())
-				continue;
+				return;
 		}
+		ListItem item;
 		item.reltext = NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name.c_str()).c_str();
-		if(curList->isDirectory(i)) {
+		if(is_directory) {
+			item.reltext += L"/";
 			name = L"[" + name + L"]";
 		}
 		item.text = name.c_str();
 		item.icon = -1;
+		item.isDirectory = is_directory;
 		Items.push_back(item);
-	}
+	});
 	recalculateItemHeight();
 }
 
@@ -949,14 +954,21 @@ void CGUIFileSelectListBox::setDrawBackground(bool draw)
     DrawBack = draw;
 }
 
-void CGUIFileSelectListBox::resetPath() {
-	curRelPath = basePath;
+void CGUIFileSelectListBox::refreshList() {
 	LoadFolderContents();
 }
 
-void CGUIFileSelectListBox::setWorkingPath(const std::wstring& newDirectory) {
-	basePath = newDirectory.c_str();
+void CGUIFileSelectListBox::resetPath() {
 	curRelPath = basePath;
+	prevRelPath = curRelPath;
+	LoadFolderContents();
+}
+
+void CGUIFileSelectListBox::setWorkingPath(const std::wstring& newDirectory, bool setAsRoot) {
+	BaseIsRoot = setAsRoot;
+	basePath = (NormalizePath(newDirectory) + L"/").c_str();
+	curRelPath = basePath;
+	prevRelPath = curRelPath;
 	LoadFolderContents();
 }
 
@@ -966,7 +978,7 @@ void CGUIFileSelectListBox::addFilteredExtensions(std::vector<std::wstring> exte
 
 std::wstring CGUIFileSelectListBox::NormalizePath(const std::wstring& path) {
 	std::wstring normalpath = path;
-	core::array<std::wstring> paths;
+	std::vector<std::wstring> paths;
 	auto delimiter = normalpath.find(L'/');
 	while(delimiter != std::wstring::npos) {
 		paths.push_back(normalpath.substr(0, delimiter));
@@ -978,16 +990,26 @@ std::wstring CGUIFileSelectListBox::NormalizePath(const std::wstring& path) {
 	normalpath.clear();
 	if(paths.empty())
 		return path;
-	for(u32 i = paths[0] == L"." ? 1 : 0; i < paths.size(); ++i) {
-		if(paths[i] == L".." && i>1 && paths[i - 1] != L"..") {
-			paths.erase(i--);
-			paths.erase(i--);
+	for(auto it = paths.begin(); it != paths.end();) {
+		if((*it).empty()) {
+			it = paths.erase(it);
+			continue;
 		}
+		if((*it) == L"." && it != paths.begin()) {
+			it = paths.erase(it);
+			continue;
+		}
+		if((*it) != L".." && (it + 1) != paths.end() && (*(it + 1)) == L"..") {
+			it = paths.erase(paths.erase(it));
+			continue;
+		}
+		it++;
 	}
-	for(u32 i = 0; i < paths.size(); ++i) {
-		normalpath += paths[i] + L"/";
+	for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
+		normalpath += *it + L"/";
 	}
-	return normalpath.substr(0, normalpath.size() - 1);
+	normalpath += paths.back();
+	return normalpath;
 }
 
 

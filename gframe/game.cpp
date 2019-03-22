@@ -652,7 +652,7 @@ bool Game::Initialize() {
 	wReplay->getCloseButton()->setVisible(false);
 	wReplay->setVisible(false);
 	lstReplayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wReplay, LISTBOX_REPLAY_LIST, rect<s32>(10, 30, 350, 400), filesystem, true, true, false);
-	lstReplayList->setWorkingPath(L"./replay");
+	lstReplayList->setWorkingPath(L"./replay", true);
 	lstReplayList->addFilteredExtensions(coreloaded ? std::vector<std::wstring>{L"yrp", L"yrpx"} : std::vector<std::wstring>{ L"yrpx" });
 	lstReplayList->setItemHeight(18);
 	btnLoadReplay = env->addButton(rect<s32>(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348).c_str());
@@ -672,7 +672,7 @@ bool Game::Initialize() {
 	wSinglePlay->setVisible(false);
 	lstSinglePlayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wSinglePlay, LISTBOX_SINGLEPLAY_LIST, rect<s32>(10, 30, 350, 400), filesystem, true, true, false);
 	lstSinglePlayList->setItemHeight(18);
-	lstSinglePlayList->setWorkingPath(L"./single");
+	lstSinglePlayList->setWorkingPath(L"./single", true);
 	lstSinglePlayList->addFilteredExtensions({L"lua"});
 	btnLoadSinglePlay = env->addButton(rect<s32>(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211).c_str());
 	btnSinglePlayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210).c_str());

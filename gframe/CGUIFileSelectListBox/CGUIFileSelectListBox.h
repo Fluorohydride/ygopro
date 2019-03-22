@@ -8,6 +8,7 @@
 #include <irrlicht.h>
 #include <vector>
 #include <string>
+#include <functional>
 #include "IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
@@ -136,14 +137,16 @@ namespace gui
 		virtual void swapItems(u32 index1, u32 index2);
 
 		//! set global itemHeight
-		virtual void setItemHeight( s32 height );
+		virtual void setItemHeight(s32 height);
 
         //! Sets whether to draw the background
-        virtual void setDrawBackground(bool draw);
+		virtual void setDrawBackground(bool draw);
+
+		void refreshList();
 
 		void resetPath();
 
-		void setWorkingPath(const std::wstring& newDirectory);
+		void setWorkingPath(const std::wstring& newDirectory, bool setAsRoot = false);
 
 		void addFilteredExtensions(std::vector<std::wstring> extensions);
 
@@ -156,6 +159,7 @@ namespace gui
 			{}
 
 			core::stringw reltext;
+			bool isDirectory;
 			core::stringw text;
 			s32 icon;
 
@@ -180,13 +184,13 @@ namespace gui
 		bool getSerializationLabels(EGUI_LISTBOX_COLOR colorType, core::stringc & useColorLabel, core::stringc & colorLabel) const;
 
 		void LoadFolderContents();
-		io::IFileList* CreateFilelist(const std::wstring & path);
+		void CreateFilelist(const std::wstring & path, const std::function<void(std::wstring, bool)>& cb);
 
 		std::wstring NormalizePath(const std::wstring& path);
 
 		core::stringw basePath;
+		core::stringw prevRelPath;
 		core::stringw curRelPath;
-		io::IFileList* curList;
 		io::IFileSystem* filesystem;
 		std::vector<std::wstring> filtered_extensions;
 
@@ -203,6 +207,8 @@ namespace gui
 		u32 LastKeyTime;
 		core::stringw KeyBuffer;
 		bool Selecting;
+		int IsRoot;
+		bool BaseIsRoot;
 		bool DrawBack;
 		bool MoveOverSelect;
 		bool AutoScroll;
