@@ -466,7 +466,7 @@ void CGUIFileSelectListBox::selectNew(s32 ypos, bool onlyHover)
 	s32 oldSelected = Selected;
 
 	Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
-	if (Selected<0 && !Items.empty())
+	if(Selected < 0 && !Items.empty())
 		Selected = 0;
 
 	recalculateScrollPos();
@@ -999,7 +999,7 @@ std::wstring CGUIFileSelectListBox::NormalizePath(const std::wstring& path) {
 			it = paths.erase(it);
 			continue;
 		}
-		if((*it) != L".." && (it + 1) != paths.end() && (*(it + 1)) == L"..") {
+		if((*it) != L".." && it != paths.begin() && (it + 1) != paths.end() && (*(it + 1)) == L"..") {
 			it = paths.erase(paths.erase(it));
 			continue;
 		}
