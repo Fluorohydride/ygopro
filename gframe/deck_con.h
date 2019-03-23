@@ -44,37 +44,25 @@ public:
 	void pop_extra(int seq);
 	void pop_side(int seq);
 	bool check_limit(code_pointer pointer);
+#define DECLARE_WITH_CACHE(type, name) type name;\
+										type prev_##name;
+	DECLARE_WITH_CACHE(long long, filter_effect)
+	DECLARE_WITH_CACHE(unsigned int, filter_type)
+	DECLARE_WITH_CACHE(unsigned int, filter_type2)
+	DECLARE_WITH_CACHE(unsigned int, filter_attrib)
+	DECLARE_WITH_CACHE(unsigned int, filter_race)
+	DECLARE_WITH_CACHE(unsigned int, filter_atktype)
+	DECLARE_WITH_CACHE(int, filter_atk)
+	DECLARE_WITH_CACHE(unsigned int, filter_deftype)
+	DECLARE_WITH_CACHE(int, filter_def)
+	DECLARE_WITH_CACHE(unsigned int, filter_lvtype)
+	DECLARE_WITH_CACHE(unsigned int, filter_lv)
+	DECLARE_WITH_CACHE(unsigned int, filter_scltype)
+	DECLARE_WITH_CACHE(unsigned int, filter_scl)
+	DECLARE_WITH_CACHE(unsigned int, filter_marks)
+	DECLARE_WITH_CACHE(limitation_search_filters, filter_lm)
+#undef DECLARE_WITH_CACHE
 
-	long long filter_effect;
-	unsigned int filter_type;
-	unsigned int filter_type2;
-	unsigned int filter_attrib;
-	unsigned int filter_race;
-	unsigned int filter_atktype;
-	int filter_atk;
-	unsigned int filter_deftype;
-	int filter_def;
-	unsigned int filter_lvtype;
-	unsigned int filter_lv;
-	unsigned int filter_scltype;
-	unsigned int filter_scl;
-	unsigned int filter_marks;
-	limitation_search_filters filter_lm;
-	long long prev_filter_effect;
-	unsigned int prev_filter_type;
-	unsigned int prev_filter_type2;
-	unsigned int prev_filter_attrib;
-	unsigned int prev_filter_race;
-	unsigned int prev_filter_atktype;
-	int prev_filter_atk;
-	unsigned int prev_filter_deftype;
-	int prev_filter_def;
-	unsigned int prev_filter_lvtype;
-	unsigned int prev_filter_lv;
-	unsigned int prev_filter_scltype;
-	unsigned int prev_filter_scl;
-	unsigned int prev_filter_marks;
-	limitation_search_filters prev_filter_lm;
 	position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;

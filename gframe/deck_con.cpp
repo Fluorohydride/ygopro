@@ -752,30 +752,30 @@ void DeckBuilder::GetHoveredCard() {
 			mainGame->ShowCardInfo(hovered_code);
 	}
 }
-bool DeckBuilder::FiltersChanged() {
-	bool res = false;
-#define LF(x) if(x != prev_##x) {\
+#define CHECK_AND_SET(x) if(x != prev_##x) {\
 	res = true;\
 	}\
 	prev_##x = x;
-	LF(filter_effect)
-		LF(filter_type)
-		LF(filter_type2)
-		LF(filter_attrib)
-		LF(filter_race)
-		LF(filter_atktype)
-		LF(filter_atk)
-		LF(filter_deftype)
-		LF(filter_def)
-		LF(filter_lvtype)
-		LF(filter_lv)
-		LF(filter_scltype)
-		LF(filter_scl)
-		LF(filter_marks)
-		LF(filter_lm)
-#undef LF
-		return res;
+bool DeckBuilder::FiltersChanged() {
+	bool res = false;
+	CHECK_AND_SET(filter_effect);
+	CHECK_AND_SET(filter_type);
+	CHECK_AND_SET(filter_type2);
+	CHECK_AND_SET(filter_attrib);
+	CHECK_AND_SET(filter_race);
+	CHECK_AND_SET(filter_atktype);
+	CHECK_AND_SET(filter_atk);
+	CHECK_AND_SET(filter_deftype);
+	CHECK_AND_SET(filter_def);
+	CHECK_AND_SET(filter_lvtype);
+	CHECK_AND_SET(filter_lv);
+	CHECK_AND_SET(filter_scltype);
+	CHECK_AND_SET(filter_scl);
+	CHECK_AND_SET(filter_marks);
+	CHECK_AND_SET(filter_lm);
+	return res;
 }
+#undef CHECK_AND_SET
 void DeckBuilder::StartFilter(bool force_refresh) {
 	filter_type = mainGame->cbCardType->getSelected();
 	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
@@ -798,7 +798,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		searchterms.push_back(searchterm);
 	else {
 		std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::toupper);
-		searchterms = Game::tokenize(searchterm, L"+");
+		searchterms = Game::TokenizeString(searchterm, L"+");
 	}
 	if(FiltersChanged() || force_refresh)
 		searched_terms.clear();
@@ -830,9 +830,9 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		if(!term.empty()) {
 			if(term[0] == L'@' || term[0] == L'$') {
 				if(term.size() > 1)
-					tokens = Game::tokenize(&term[1], L"*");
+					tokens = Game::TokenizeString(&term[1], L"*");
 			} else {
-				tokens = Game::tokenize(term, L"*");
+				tokens = Game::TokenizeString(term, L"*");
 			}
 		}
 		if(tokens.empty())
@@ -998,9 +998,8 @@ void DeckBuilder::ClearFilter() {
 }
 void DeckBuilder::SortList() {
 	auto left = results.begin();
-	const wchar_t* pstr = mainGame->ebCardName->getText();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(wcscmp(pstr, dataManager.GetName((*it)->first).c_str()) == 0) {
+		if(searched_terms.find(Game::StringtoUpper(dataManager.GetName((*it)->first))) != searched_terms.end()) {
 			std::iter_swap(left, it);
 			++left;
 		}
