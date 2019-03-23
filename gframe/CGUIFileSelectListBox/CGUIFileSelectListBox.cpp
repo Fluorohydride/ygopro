@@ -689,34 +689,12 @@ bool CGUIFileSelectListBox::getSerializationLabels(EGUI_LISTBOX_COLOR colorType,
 	}
 	return true;
 }
-void CGUIFileSelectListBox::CreateFilelist(const std::wstring & path, const std::function<void(std::wstring, bool)>& cb) {
-#ifdef _WIN32
-	WIN32_FIND_DATAW fdataw;
-	HANDLE fh = FindFirstFileW((path + L"*.*").c_str(), &fdataw);
-	if(fh != INVALID_HANDLE_VALUE) {
-		do {
-			cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
-		} while(FindNextFileW(fh, &fdataw));
-		FindClose(fh);
-	}
-#else
-	DIR * dir;
-	struct dirent * dirp = nullptr;
-	if((dir = opendir(BufferIO::EncodeUTF8s(path).c_str())) != nullptr) {
-		struct stat fileStat;
-		while((dirp = readdir(dir)) != nullptr) {
-			cb(BufferIO::DecodeUTF8s(dirp->d_name), S_ISDIR(fileStat.st_mode));
-		}
-		closedir(dir);
-	}
-#endif
-}
 void CGUIFileSelectListBox::LoadFolderContents() {
 	Items.clear();
 	IsRoot = 0;
-	(curRelPath = NormalizePath(curRelPath.c_str()).c_str()).append(L"/");
+	curRelPath = (ygo::Utils::NormalizePath(curRelPath.c_str()) + L"/").c_str();
 	bool is_root = BaseIsRoot && curRelPath == basePath;
-	CreateFilelist(curRelPath.c_str(), [&](std::wstring name, bool is_directory) {
+	ygo::Utils::FindfolderFiles(curRelPath.c_str(), [&](std::wstring name, bool is_directory, void* payload) {
 		if(name == L".")
 			return;
 		if(name == L"..") {
@@ -736,7 +714,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 				return;
 		}
 		ListItem item;
-		item.reltext = NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name.c_str()).c_str();
+		item.reltext = ygo::Utils::NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name).c_str();
 		if(is_directory) {
 			item.reltext += L"/";
 			name = L"[" + name + L"]";
@@ -960,13 +938,13 @@ void CGUIFileSelectListBox::refreshList() {
 
 void CGUIFileSelectListBox::resetPath() {
 	curRelPath = basePath;
-	prevRelPath = curRelPath;
+	prevRelPath = "";
 	LoadFolderContents();
 }
 
 void CGUIFileSelectListBox::setWorkingPath(const std::wstring& newDirectory, bool setAsRoot) {
 	BaseIsRoot = setAsRoot;
-	basePath = (NormalizePath(newDirectory) + L"/").c_str();
+	basePath = (ygo::Utils::NormalizePath(newDirectory) + L"/").c_str();
 	curRelPath = basePath;
 	prevRelPath = curRelPath;
 	LoadFolderContents();
@@ -975,43 +953,6 @@ void CGUIFileSelectListBox::setWorkingPath(const std::wstring& newDirectory, boo
 void CGUIFileSelectListBox::addFilteredExtensions(std::vector<std::wstring> extensions) {
 	filtered_extensions = extensions;
 }
-
-std::wstring CGUIFileSelectListBox::NormalizePath(const std::wstring& path) {
-	std::wstring normalpath = path;
-	std::vector<std::wstring> paths;
-	auto delimiter = normalpath.find(L'/');
-	while(delimiter != std::wstring::npos) {
-		paths.push_back(normalpath.substr(0, delimiter));
-		normalpath = normalpath.substr(delimiter + 1, normalpath.size() - delimiter);
-		delimiter = normalpath.find(L'/');
-	}
-	if(normalpath.size())
-		paths.push_back(normalpath);
-	normalpath.clear();
-	if(paths.empty())
-		return path;
-	for(auto it = paths.begin(); it != paths.end();) {
-		if((*it).empty()) {
-			it = paths.erase(it);
-			continue;
-		}
-		if((*it) == L"." && it != paths.begin()) {
-			it = paths.erase(it);
-			continue;
-		}
-		if((*it) != L".." && it != paths.begin() && (it + 1) != paths.end() && (*(it + 1)) == L"..") {
-			it = paths.erase(paths.erase(it));
-			continue;
-		}
-		it++;
-	}
-	for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
-		normalpath += *it + L"/";
-	}
-	normalpath += paths.back();
-	return normalpath;
-}
-
 
 } // end namespace gui
 } // end namespace irr

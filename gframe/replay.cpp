@@ -1,5 +1,6 @@
 #include "replay.h"
 #include <algorithm>
+#include <fstream>
 #include "lzma/LzmaLib.h"
 
 namespace ygo {

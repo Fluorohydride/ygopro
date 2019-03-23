@@ -1,9 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include "config.h"
-#include <fstream>
+#include <irrlicht.h>
+#include <string>
 #include <vector>
+#include <functional>
 #ifndef _WIN32
 #include <dirent.h>
 #include <sys/stat.h>
@@ -25,7 +26,9 @@ namespace ygo {
 		static void CreateResourceFolders();
 		static void takeScreenshot(irr::IrrlichtDevice* device);
 		static void changeCursor(irr::gui::ECURSOR_ICON icon);
+		static void FindfolderFiles(const std::wstring & path, const std::function<void(std::wstring, bool, void*)>& cb, void* = nullptr);
 		static std::vector<std::wstring> FindfolderFiles(const std::wstring& path, std::vector<std::wstring> extensions, int subdirectorylayers = 0);
+		static std::wstring NormalizePath(const std::wstring& path);
 	};
 }
 

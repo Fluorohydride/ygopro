@@ -184,9 +184,6 @@ namespace gui
 		bool getSerializationLabels(EGUI_LISTBOX_COLOR colorType, core::stringc & useColorLabel, core::stringc & colorLabel) const;
 
 		void LoadFolderContents();
-		void CreateFilelist(const std::wstring & path, const std::function<void(std::wstring, bool)>& cb);
-
-		std::wstring NormalizePath(const std::wstring& path);
 
 		core::stringw basePath;
 		core::stringw prevRelPath;

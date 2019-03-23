@@ -1,5 +1,7 @@
 #include "utils.h"
 #include "game.h"
+#include <fstream>
+#include "bufferio.h"
 #ifndef TEXT
 #define TEXT(x) x
 #endif
@@ -170,73 +172,81 @@ namespace ygo {
 			cursor->setActiveIcon(icon);
 		}
 	}
-	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, std::vector<std::wstring> extensions, int subdirectorylayers) {
-		std::vector<std::wstring> res;
+	void Utils::FindfolderFiles(const std::wstring & path, const std::function<void(std::wstring, bool, void*)>& cb, void* payload) {
 #ifdef _WIN32
 		WIN32_FIND_DATAW fdataw;
 		HANDLE fh = FindFirstFileW((path + L"*.*").c_str(), &fdataw);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
-				std::wstring name = fdataw.cFileName;
-				if(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					if(subdirectorylayers) {
-						if(name == L".." || name == L".") {
-							continue;
-						}
-						std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extensions, subdirectorylayers - 1);
-						for(auto&file : res2) {
-							file = name + L"/" + file;
-						}
-						res.insert(res.end(), res2.begin(), res2.end());
-					}
-					continue;
-				}
-				if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-					size_t dotpos = name.find_last_of(L".");
-					if(dotpos == std::wstring::npos)
-						continue;
-					auto extension = name.substr(dotpos + 1);
-					std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-					if(extensions.size() && std::find(extensions.begin(), extensions.end(), extension) == extensions.end())
-						continue;
-					res.push_back(name.c_str());
-				}
+				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY), payload);
 			} while(FindNextFileW(fh, &fdataw));
 			FindClose(fh);
 		}
 #else
 		DIR * dir;
 		struct dirent * dirp = nullptr;
-		std::string _path = BufferIO::EncodeUTF8s(path);
-		if((dir = opendir(_path.c_str())) != nullptr) {
+		if((dir = opendir(BufferIO::EncodeUTF8s(path).c_str())) != nullptr) {
 			struct stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
-				stat((_path + dirp->d_name).c_str(), &fileStat);
-				std::wstring name = BufferIO::DecodeUTF8s(dirp->d_name);
-				if(S_ISDIR(fileStat.st_mode)) {
-					if(subdirectorylayers) {
-						if(name == L".." || name == L".")
-							continue;
-						std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extensions, subdirectorylayers - 1);
-						for(auto&file : res2) {
-							file = name + L"/" + file;
-						}
-						res.insert(res.end(), res2.begin(), res2.end());
-					}
-					continue;
-				}
-				size_t dotpos = name.find_last_of(L".");
-				if(dotpos == std::wstring::npos)
-					continue;
-				auto extension = name.substr(dotpos + 1);
-				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-				if(std::find(extensions.begin(), extensions.end(), extension) == extensions.end())
-					continue;
-				res.push_back(name.c_str());
+				cb(BufferIO::DecodeUTF8s(dirp->d_name), !!S_ISDIR(fileStat.st_mode), payload));
 			}
 			closedir(dir);
 		}
 #endif
+	}
+	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, std::vector<std::wstring> extensions, int subdirectorylayers) {
+		std::vector<std::wstring> res;
+		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](std::wstring name, bool isdir, void* payload) {
+			if(isdir) {
+				if(subdirectorylayers) {
+					if(name == L".." || name == L".") {
+						return;
+					}
+					std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extensions, subdirectorylayers - 1);
+					for(auto&file : res2) {
+						file = name + L"/" + file;
+					}
+					res.insert(res.end(), res2.begin(), res2.end());
+				}
+				return;
+			} else {
+				size_t dotpos = name.find_last_of(L".");
+				if(dotpos == std::wstring::npos)
+					return;
+				auto extension = name.substr(dotpos + 1);
+				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+				if(extensions.size() && std::find(extensions.begin(), extensions.end(), extension) == extensions.end())
+					return;
+				res.push_back(name.c_str());
+			}
+		});
 		return res;
 	}
+	std::wstring Utils::NormalizePath(const std::wstring & path) {
+		std::vector<std::wstring> paths = ygo::Game::TokenizeString(path, L"/");
+		if(paths.empty())
+			return path;
+		std::wstring normalpath;
+		for(auto it = paths.begin(); it != paths.end();) {
+			if((*it).empty()) {
+				it = paths.erase(it);
+				continue;
+			}
+			if((*it) == L"." && it != paths.begin()) {
+				it = paths.erase(it);
+				continue;
+			}
+			if((*it) != L".." && it != paths.begin() && (it + 1) != paths.end() && (*(it + 1)) == L"..") {
+				it = paths.erase(paths.erase(it));
+				continue;
+			}
+			it++;
+		}
+		for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
+			normalpath += *it + L"/";
+		}
+		normalpath += paths.back();
+		return normalpath;
+	}
 }
+

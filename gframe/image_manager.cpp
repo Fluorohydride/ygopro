@@ -1,5 +1,6 @@
 #include "image_manager.h"
 #include "game.h"
+#include <fstream>
 #include <curl/curl.h>
 
 namespace ygo {
