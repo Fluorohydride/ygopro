@@ -2199,6 +2199,7 @@ int GetSuitableReturn(uint32 maxseq, size_t size) {
 		return 3;
 	if(res == uint32size)
 		return 4;
+	return 1;
 }
 void ClientField::SetResponseSelectedCards() const {
 	if (mainGame->dInfo.lua64) {

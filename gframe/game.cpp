@@ -1846,7 +1846,7 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 	obj->setText(text.c_str());
 }
-std::vector<std::wstring> Game::tokenize(std::wstring input, const std::wstring& token) {
+std::vector<std::wstring> Game::TokenizeString(std::wstring input, const std::wstring& token) {
 	std::vector<std::wstring> res;
 	std::size_t pos;
 	while((pos = input.find(token)) != std::wstring::npos) {
@@ -1858,16 +1858,20 @@ std::vector<std::wstring> Game::tokenize(std::wstring input, const std::wstring&
 		res.push_back(input);
 	return res;
 }
+std::wstring Game::StringtoUpper(std::wstring input) {
+	std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+	return input;
+}
 bool Game::CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input, bool transform_token) {
 	if(input.empty() || tokens.empty())
 		return false;
 	if(transform_input)
-		std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+		input = StringtoUpper(input);
 	std::vector<std::wstring> alttokens;
 	if(transform_token) {
 		alttokens = tokens;
 		for(auto& token : alttokens)
-			std::transform(token.begin(), token.end(), token.begin(), ::toupper);
+			token = StringtoUpper(token);
 	}
 	std::size_t pos;
 	for(auto& token : transform_token ? alttokens : tokens) {
@@ -1881,11 +1885,11 @@ bool Game::CompareStrings(std::wstring input, const std::wstring & second_term, 
 	if(input.empty() || second_term.empty())
 		return false;
 	if(transform_input)
-		std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+		input = StringtoUpper(input);
 	std::vector<std::wstring> tokens;
 	tokens.push_back(second_term);
 	if(transform_term)
-		std::transform(tokens[0].begin(), tokens[0].end(), tokens[0].begin(), ::toupper);
+		tokens[0] = StringtoUpper(tokens[0]);
 	return CompareStrings(input, tokens);
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {

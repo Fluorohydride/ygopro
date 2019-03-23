@@ -168,7 +168,8 @@ public:
 	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
 	void ValidateName(irr::gui::IGUIElement* box);
-	static std::vector<std::wstring> tokenize(std::wstring input, const std::wstring& token);
+	static std::vector<std::wstring> TokenizeString(std::wstring input, const std::wstring& token);
+	static std::wstring StringtoUpper(std::wstring input);
 	static bool CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input = false, bool transform_token = false);
 	static bool CompareStrings(std::wstring input, const std::wstring& second_term, bool transform_input = false, bool transform_term = false);
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
