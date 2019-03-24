@@ -797,7 +797,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	if(searchterm.empty())
 		searchterms.push_back(searchterm);
 	else {
-		std::transform(searchterm.begin(), searchterm.end(), searchterm.begin(), ::toupper);
+		searchterm = Game::StringtoUpper(searchterm);
 		searchterms = Game::TokenizeString(searchterm, L"+");
 	}
 	if(FiltersChanged() || force_refresh)

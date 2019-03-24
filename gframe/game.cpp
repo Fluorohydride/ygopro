@@ -1858,10 +1858,32 @@ std::vector<std::wstring> Game::TokenizeString(std::wstring input, const std::ws
 		res.push_back(input);
 	return res;
 }
+#define CHK_RNG(range_start, range_end) (c >= range_start && c <= range_end)
 std::wstring Game::StringtoUpper(std::wstring input) {
-	std::transform(input.begin(), input.end(), input.begin(), ::toupper);
+	std::transform(input.begin(), input.end(), input.begin(), [](wchar_t c) {
+		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
+			return (wchar_t)'A';
+		}
+		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
+			return (wchar_t)'E';
+		}
+		if(CHK_RNG(200, 203) || CHK_RNG(232, 235)) {
+			return (wchar_t)'I';
+		}
+		if(CHK_RNG(210, 214) || CHK_RNG(242, 246)) {
+			return (wchar_t)'O';
+		}
+		if(CHK_RNG(217, 220) || CHK_RNG(249, 252)) {
+			return (wchar_t)'U';
+		}
+		if(c == 209 || c == 241) {
+			return (wchar_t)'N';
+		}
+		return (wchar_t)::toupper(c);
+	});
 	return input;
 }
+#undef CHK_RNG
 bool Game::CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input, bool transform_token) {
 	if(input.empty() || tokens.empty())
 		return false;
