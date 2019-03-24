@@ -256,6 +256,7 @@ std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
 	return res;
 }
 std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
+	git_libgit2_init();
 	git_repository *repo = nullptr;
 	int res = 0;
 	std::string errstring;
@@ -304,10 +305,14 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 	}
 	if(res < 0) {
 		const git_error *e = giterr_last();
-		return { e->message };
+		if(e)
+			return { e->message };
+		git_libgit2_shutdown();
+		return { "Unknown error" };
 	}
 	auto commits = GetCommitsInfo(repo, id);
 	git_repository_free(repo);
+	git_libgit2_shutdown();
 	return commits;
 }
 

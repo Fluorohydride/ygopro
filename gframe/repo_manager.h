@@ -38,12 +38,8 @@ public:
 	};
 
 
-	RepoManager() {
-		git_libgit2_init();
-	}
-	~RepoManager() {
-		git_libgit2_shutdown();
-	}
+	RepoManager() {}
+	~RepoManager() {}
 
 	std::vector<GitRepo> GetReadyRepos();
 
