@@ -1950,19 +1950,21 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 }
 std::vector<unsigned char> Game::LoadScript(const std::string& name, int& slen) {
 	std::vector<unsigned char> buffer;
+	buffer.clear();
 	slen = 0;
-	IReadFile* file = nullptr;
+	std::ifstream script;
 	for(auto& path : script_dirs) {
-		file = filesystem->createAndOpenFile((path + name).c_str());
-		if(file)
+		script.open(path + name, std::ifstream::binary);
+		if(script.is_open())
 			break;
 	}
-	if(!file && !(file = filesystem->createAndOpenFile(name.c_str())))
-		return buffer;
-	const auto size = file->getSize();
-	buffer.resize(size);
-	slen = file->read(buffer.data(), size);
-	file->drop();
+	if(!script.is_open()) {
+		script.open(name, std::ifstream::binary);
+		if(!script.is_open())
+			return buffer;
+	}
+	buffer.insert(buffer.begin(), std::istreambuf_iterator<char>(script), std::istreambuf_iterator<char>());
+	slen = buffer.size();
 	return buffer;
 }
 std::vector<unsigned char> Game::PreLoadScript(void* pduel, const std::string& script_name) {
