@@ -91,6 +91,7 @@ void DeckBuilder::Initialize() {
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
 	scroll_pos = 0;
+	mainGame->SetMesageWindow();
 	mainGame->device->setEventReceiver(this);
 }
 void DeckBuilder::Terminate() {
@@ -110,6 +111,7 @@ void DeckBuilder::Terminate() {
 	mainGame->ClearTextures();
 	mainGame->ClearCardInfo(0);
 	mainGame->scrFilter->setVisible(false);
+	mainGame->SetMesageWindow();
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)
 		mainGame->gameConf.lastdeck = mainGame->cbDBDecks->getItem(sel);

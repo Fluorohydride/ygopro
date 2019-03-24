@@ -873,6 +873,7 @@ void Game::MainLoop() {
 		}
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
+			bool refresh_db = false;
 			for(auto& repo : repos) {
 				if(repo.error.size()) {
 					ErrorLog("The repo " + repo.url + " couldn't be cloned");
@@ -883,12 +884,14 @@ void Game::MainLoop() {
 				pic_dirs.insert(pic_dirs.begin(), repo.pics_path);
 				auto files = Utils::FindfolderFiles(BufferIO::DecodeUTF8s(repo.data_path), { L"cdb" }, 0);
 				for(auto& file : files)
-					dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file));
+					refresh_db = dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file)) || refresh_db;
 				dataManager.LoadStrings(repo.data_path + "/strings.conf");
 				if(repo.has_core) {
 					cores_to_load.insert(cores_to_load.begin(), repo.core_path);
 				}
 			}
+			if(refresh_db && is_building && deckBuilder.results.size())
+				deckBuilder.StartFilter(true);
 		}
 #ifdef YGOPRO_BUILD_DLL
 		if(!dInfo.isStarted && cores_to_load.size() && repoManager.GetUpdatingRepos() == 0) {
