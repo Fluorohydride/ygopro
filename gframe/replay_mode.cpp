@@ -91,6 +91,7 @@ int ReplayMode::ReplayThread() {
 		return 0;
 	}
 	mainGame->dInfo.isStarted = true;
+	mainGame->SetMesageWindow();
 	mainGame->dInfo.turn = 0;
 	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
 	is_continuing = true;
@@ -113,6 +114,7 @@ int ReplayMode::ReplayThread() {
 				mainGame->dInfo.isStarted = true;
 				mainGame->dInfo.isReplaySkiping = false;
 				mainGame->dField.RefreshAllCards();
+				mainGame->SetMesageWindow();
 				mainGame->gMutex.unlock();
 			}
 			skip_step = step;
@@ -152,6 +154,7 @@ void ReplayMode::EndDuel() {
 		mainGame->closeSignal.unlock();
 		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wReplay);
+		mainGame->SetMesageWindow();
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();

@@ -31,6 +31,7 @@ namespace ygo {
 		}
 		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isOldReplay = true;
+		mainGame->SetMesageWindow();
 		mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
 		std::vector<uint8> duelBuffer;
 		is_continuing = true;

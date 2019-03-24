@@ -89,6 +89,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isStarted = true;
+	mainGame->SetMesageWindow();
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
 	std::vector<uint8> duelBuffer;
@@ -167,6 +168,7 @@ int SingleMode::SinglePlayThread() {
 		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wSinglePlay);
 		mainGame->stTip->setVisible(false);
+		mainGame->SetMesageWindow();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();
 		if(exit_on_return)

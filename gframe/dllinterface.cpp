@@ -59,8 +59,11 @@ CREATE_CLONE(preload_script)
 #undef CREATE_CLONE
 
 #ifdef _WIN32
+void* OpenLibrary(const std::wstring& path) {
+	return LoadLibrary((path + L"ocgcore.dll").c_str());
+}
 void* OpenLibrary(const std::string& path) {
-	return LoadLibrary(BufferIO::DecodeUTF8s(path + "ocgcore.dll").c_str());
+	return OpenLibrary(BufferIO::DecodeUTF8s(path));
 }
 void CloseLibrary(void *handle) {
 	FreeLibrary((HMODULE)handle);
@@ -70,6 +73,9 @@ void CloseLibrary(void *handle) {
 
 #else
 
+void* OpenLibrary(const std::wstring& path) {
+	return OpenLibrary(BufferIO::EncodeUTF8s(path));
+}
 void* OpenLibrary(const std::string& path) {
 #ifdef __APPLE__
 	return dlopen((path + "libocgcore.dylib").c_str(), RTLD_LAZY);
@@ -134,6 +140,10 @@ void ClearCopies() {
 	CLEAR_CLONE(set_responsei);
 	CLEAR_CLONE(set_responseb);
 	CLEAR_CLONE(preload_script);
+}
+
+void* LoadOCGcore(const std::wstring& path) {
+	return LoadOCGcore(BufferIO::EncodeUTF8s(path));
 }
 
 #define LOAD_FUNCTION(x) x = (decltype(x))GetFunction(newcore, #x);\
@@ -238,6 +248,10 @@ void UnloadCore(void *handle) {
 	set_responsei = nullptr;
 	set_responseb = nullptr;
 	preload_script = nullptr;
+}
+
+void* ChangeOCGcore(const std::wstring & path, void * handle) {
+	return ChangeOCGcore(BufferIO::EncodeUTF8s(path), handle);
 }
 
 #define CHANGE_WITH_COPY_CHECK(x) STORE_CLONE(x)\

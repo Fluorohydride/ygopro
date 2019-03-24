@@ -12,7 +12,9 @@ typedef uint32 (*card_reader)(uint32, card_data*);
 typedef uint32 (*message_handler)(void*, uint32);
 bool ReloadCore(void* handle);
 void UnloadCore(void *handle);
+void* LoadOCGcore(const std::wstring& path);
 void* LoadOCGcore(const std::string& path);
+void* ChangeOCGcore(const std::wstring& path, void* handle);
 void* ChangeOCGcore(const std::string& path, void* handle);
 
 extern int(*get_api_version)(int* min);

@@ -9,8 +9,12 @@ namespace ygo {
 
 DeckManager deckManager;
 
-void DeckManager::LoadLFListSingle(const char* path) {
+void DeckManager::LoadLFListSingle(const std::wstring& path) {
+#ifdef _WIN32
 	std::ifstream infile(path, std::ifstream::in);
+#else
+	std::ifstream infile(BufferIO::EncodeUTF8s(path), std::ifstream::in);
+#endif
 	if(!infile.is_open())
 		return;
 	LFList lflist;
@@ -55,8 +59,8 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	infile.close();
 }
 void DeckManager::LoadLFList() {
-	LoadLFListSingle("expansions/lflist.conf");
-	LoadLFListSingle("lflist.conf");
+	LoadLFListSingle(L"expansions/lflist.conf");
+	LoadLFListSingle(L"lflist.conf");
 	LFList nolimit;
 	nolimit.listName = L"N/A";
 	nolimit.hash = 0;

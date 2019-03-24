@@ -155,6 +155,7 @@ public:
 	void UpdateExtraRules();
 	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);
 	void SetPhaseButtons();
+	void SetMesageWindow();
 
 	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
 		irr::gui::IGUIElement* focus = env->getFocus();
@@ -250,10 +251,17 @@ public:
 	irr::scene::ICameraSceneNode* camera;
 	io::IFileSystem* filesystem;
 	void PopulateResourcesDirectories();
+#ifdef _WIN32
+	std::vector<std::wstring> field_dirs;
+	std::vector<std::wstring> pic_dirs;
+	std::vector<std::wstring> script_dirs;
+	std::vector<std::wstring> cores_to_load;
+#else
 	std::vector<std::string> field_dirs;
 	std::vector<std::string> pic_dirs;
 	std::vector<std::string> script_dirs;
 	std::vector<std::string> cores_to_load;
+#endif
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;

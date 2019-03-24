@@ -370,7 +370,7 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 		}
 	return true;
 }
-irr::video::IImage* ImageManager::GetTextureFromFile(const char* file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+irr::video::IImage* ImageManager::GetTextureFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* srcimg = driver->createImageFromFile(file);
 	if(srcimg == NULL || timestamp_id != source_timestamp_id.load()) {
 		if(srcimg)
@@ -394,10 +394,18 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 	int width = _width;
 	int height = _height;
 	for(auto& path : mainGame->pic_dirs) {
+#ifdef _WIN32
+		for(auto& extension : { L".png", L".jpg" }) {
+#else
 		for(auto& extension : { ".png", ".jpg" }) {
+#endif
 			if(timestamp_id != source_timestamp_id.load())
 				return std::make_pair(nullptr, "fail");
+#ifdef _WIN32
+			auto file = path + std::to_wstring(code) + extension;
+#else
 			auto file = path + std::to_string(code) + extension;
+#endif
 			if(width != _width || height != _height) {
 				width = _width;
 				height = _height;
@@ -414,7 +422,11 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 					height = _height;
 					goto __repeat;
 				}
+#ifdef _WIN32
+				return std::make_pair(img, BufferIO::EncodeUTF8s(file));
+#else
 				return std::make_pair(img, file);
+#endif
 			}
 			if(timestamp_id != source_timestamp_id.load())
 				return std::make_pair(nullptr, "fail");
@@ -539,9 +551,15 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 				return nullptr;
 		} else {
 			for(auto& path : mainGame->field_dirs) {
+#ifdef _WIN32
+				for(auto& extension : { L".png", L".jpg" }) {
+					if(img = driver->getTexture((path + std::to_wstring(code) + extension).c_str()))
+						break;
+#else
 				for(auto& extension : { ".png", ".jpg" }) {
 					if(img = driver->getTexture((path + std::to_string(code) + extension).c_str()))
 						break;
+#endif
 				}
 			}
 		}

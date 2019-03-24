@@ -389,7 +389,7 @@ bool Game::Initialize() {
 	btnFirst = env->addButton(rect<s32>(10, 30, 220, 55), wFTSelect, BUTTON_FIRST, dataManager.GetSysString(100).c_str());
 	btnSecond = env->addButton(rect<s32>(10, 60, 220, 85), wFTSelect, BUTTON_SECOND, dataManager.GetSysString(101).c_str());
 	//message (310)
-	wMessage = env->addWindow(rect<s32>(490, 200, 840, 340), false, dataManager.GetSysString(1216).c_str());
+	wMessage = env->addWindow(rect<s32>(510 - 175, 200, 510 + 175, 340), false, dataManager.GetSysString(1216).c_str());
 	wMessage->getCloseButton()->setVisible(false);
 	wMessage->setVisible(false);
 	stMessage = irr::gui::CGUICustomText::addCustomText(L"", false, env, wMessage, -1, rect<s32>(20, 20, 350, 100));
@@ -784,6 +784,7 @@ void Game::MainLoop() {
 	uint32 prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
 	int fps = 0;
+	std::wstring corename;
 	while(device->run()) {
 		fps++;
 		auto now = timer->getRealTime();
@@ -880,14 +881,23 @@ void Game::MainLoop() {
 					ErrorLog("Error: " + repo.error);
 					continue;
 				}
+#ifdef _WIN32
+				script_dirs.insert(script_dirs.begin(), BufferIO::DecodeUTF8s(repo.script_path));
+				pic_dirs.insert(pic_dirs.begin(), BufferIO::DecodeUTF8s(repo.pics_path));
+#else
 				script_dirs.insert(script_dirs.begin(), repo.script_path);
 				pic_dirs.insert(pic_dirs.begin(), repo.pics_path);
+#endif
 				auto files = Utils::FindfolderFiles(BufferIO::DecodeUTF8s(repo.data_path), { L"cdb" }, 0);
 				for(auto& file : files)
 					refresh_db = dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file)) || refresh_db;
 				dataManager.LoadStrings(repo.data_path + "/strings.conf");
 				if(repo.has_core) {
+#ifdef _WIN32
+					cores_to_load.insert(cores_to_load.begin(), BufferIO::DecodeUTF8s(repo.core_path));
+#else
 					cores_to_load.insert(cores_to_load.begin(), repo.core_path);
+#endif
 				}
 			}
 			if(refresh_db && is_building && deckBuilder.results.size())
@@ -898,6 +908,11 @@ void Game::MainLoop() {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
 				if((ncore = ChangeOCGcore(path, ocgcore))) {
+#ifdef _WIN32
+					corename = path;
+#else
+					corename = BufferIO::DecodeUTF8s(path);
+#endif
 					ocgcore = ncore;
 					if(!coreloaded) {
 						coreloaded = true;
@@ -909,6 +924,11 @@ void Game::MainLoop() {
 				}
 			}
 			cores_to_load.clear();
+		}
+		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && std::wstring(stMessage->getText())== L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.")) {
+			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
+			PopupElement(wMessage);
+			corename.clear();
 		}
 #endif //YGOPRO_BUILD_DLL
 		for(auto& repo : repoManager.GetRepoStatus()) {
@@ -1679,6 +1699,13 @@ void Game::SetPhaseButtons() {
 		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	}
 }
+void Game::SetMesageWindow() {
+	if(is_building || dInfo.isStarted)
+		wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
+	else {
+		wMessage->setRelativePosition(ResizeWin(510 - 175, 200, 510 + 175, 340));
+	}
+}
 void Game::OnResize() {
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
@@ -1746,7 +1773,7 @@ void Game::OnResize() {
 
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
-	wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
+	SetMesageWindow();
 	wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	auto pos = wOptions->getRelativePosition();
@@ -1773,6 +1800,7 @@ void Game::OnResize() {
 	if(showingcard)
 		ShowCardInfo(showingcard, true);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
+	tabSystem->setRelativePosition(Resize(0, 0, 300, 364));
 	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
 
 	wChat->setRelativePosition(ResizeWin(wInfos->getRelativePosition().LowerRightCorner.X + 6, 615, 1020, 640, true));
@@ -1951,11 +1979,16 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-std::vector<unsigned char> Game::LoadScript(const std::string& name, int& slen) {
+std::vector<unsigned char> Game::LoadScript(const std::string& _name, int& slen) {
 	std::vector<unsigned char> buffer;
 	buffer.clear();
 	slen = 0;
 	std::ifstream script;
+#ifdef _WIN32
+	std::wstring name = BufferIO::DecodeUTF8s(_name);
+#else
+	std::string name = name;
+#endif
 	for(auto& path : script_dirs) {
 		script.open(path + name, std::ifstream::binary);
 		if(script.is_open())
@@ -1999,12 +2032,12 @@ int Game::MessageHandler(void* fduel, int type) {
 	return 0;
 }
 void Game::PopulateResourcesDirectories() {
-	script_dirs.push_back("./expansions/script/");
-	script_dirs.push_back("./script/");
-	pic_dirs.push_back("./expansions/pics/");
-	pic_dirs.push_back("./pics/");
-	field_dirs.push_back("./expansions/pics/field/");
-	field_dirs.push_back("./pics/field/");
+	script_dirs.push_back(TEXT("./expansions/script/"));
+	script_dirs.push_back(TEXT("./script/TEXT("));
+	pic_dirs.push_back(TEXT("./expansions/pics/TEXT("));
+	pic_dirs.push_back(TEXT("./pics/TEXT("));
+	field_dirs.push_back(TEXT("./expansions/pics/field/TEXT("));
+	field_dirs.push_back(TEXT("./pics/field/TEXT("));
 }
 
 

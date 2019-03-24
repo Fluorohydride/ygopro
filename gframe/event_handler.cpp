@@ -128,6 +128,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->ShowElement(mainGame->wLanWindow);
+					mainGame->SetMesageWindow();
 					if(exit_on_return)
 						mainGame->device->closeDevice();
 				} else {

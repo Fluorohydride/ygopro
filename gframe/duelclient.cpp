@@ -195,6 +195,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->is_building = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->ShowElement(mainGame->wLanWindow);
+					mainGame->SetMesageWindow();
 					mainGame->gMutex.unlock();
 				}
 			}
@@ -395,6 +396,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		deckManager.pre_deck = deckManager.current_deck;
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type == 0;
+		mainGame->SetMesageWindow();
 		mainGame->gMutex.unlock();
 		break;
 	}
@@ -719,6 +721,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wChat->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		mainGame->SetPhaseButtons();
+		mainGame->SetMesageWindow();
 		if(!mainGame->dInfo.isTag && !mainGame->dInfo.isRelay) {
 			if(selftype > 1) {
 				mainGame->dInfo.player_type = 7;
@@ -815,6 +818,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->ShowElement(mainGame->wLanWindow);
+		mainGame->SetMesageWindow();
 		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);
 		if(exit_on_return)
@@ -1041,6 +1045,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->ShowElement(mainGame->wLanWindow);
+		mainGame->SetMesageWindow();
 		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);
 		if(exit_on_return)
