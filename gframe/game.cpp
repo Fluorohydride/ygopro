@@ -2033,11 +2033,11 @@ int Game::MessageHandler(void* fduel, int type) {
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));
-	script_dirs.push_back(TEXT("./script/TEXT("));
-	pic_dirs.push_back(TEXT("./expansions/pics/TEXT("));
-	pic_dirs.push_back(TEXT("./pics/TEXT("));
-	field_dirs.push_back(TEXT("./expansions/pics/field/TEXT("));
-	field_dirs.push_back(TEXT("./pics/field/TEXT("));
+	script_dirs.push_back(TEXT("./script/"));
+	pic_dirs.push_back(TEXT("./expansions/pics/"));
+	pic_dirs.push_back(TEXT("./pics/"));
+	field_dirs.push_back(TEXT("./expansions/pics/field/"));
+	field_dirs.push_back(TEXT("./pics/field/"));
 }
 
 
