@@ -724,6 +724,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 		item.isDirectory = is_directory;
 		Items.push_back(item);
 	});
+	Items.sort();
 	recalculateItemHeight();
 }
 

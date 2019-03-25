@@ -171,6 +171,20 @@ namespace gui
 				video::SColor Color;
 			};
 			ListItemOverrideColor OverrideColors[EGUI_LBC_COUNT];
+
+			bool operator ==(const struct ListItem& other) const {
+				if(isDirectory != other.isDirectory)
+					return false;
+
+				return reltext.equals_ignore_case(other.reltext);
+			}
+
+			bool operator <(const struct ListItem& other) const {
+				if(isDirectory != other.isDirectory)
+					return isDirectory;
+
+				return reltext.lower_ignore_case(other.reltext);
+			}
 		};
 
 		void recalculateItemHeight();
