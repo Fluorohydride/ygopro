@@ -888,23 +888,23 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		BufferIO::CopyWStr(pkt->name, name, 20);
 		if (mainGame->dInfo.isRelay) {
 			if (pkt->pos < 3)
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.hostname[pkt->pos][0], 20);
+				mainGame->dInfo.hostname[pkt->pos] = name;
 			else
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.clientname[pkt->pos - 3][0], 20);
+				mainGame->dInfo.clientname[pkt->pos - 3] = name;
 		} else if(mainGame->dInfo.isTag) {
 			if(pkt->pos == 0)
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.hostname[0][0], 20);
+				mainGame->dInfo.hostname[0] = name;
 			else if(pkt->pos == 1)
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.hostname[1][0], 20);
+				mainGame->dInfo.hostname[1] = name;
 			else if(pkt->pos == 2)
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.clientname[0][0], 20);
+				mainGame->dInfo.clientname[0] = name;
 			else if(pkt->pos == 3)
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.clientname[1][0], 20);
+				mainGame->dInfo.clientname[1] = name;
 		} else {
 			if(pkt->pos == 0)
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.hostname[0][0], 20);
+				mainGame->dInfo.hostname[0] = name;
 			else if(pkt->pos == 1)
-				BufferIO::CopyWStr(pkt->name, &mainGame->dInfo.clientname[0][0], 20);
+				mainGame->dInfo.clientname[0] = name;
 		}
 		mainGame->gMutex.lock();
 		mainGame->stHostPrepDuelist[pkt->pos]->setText(name);
