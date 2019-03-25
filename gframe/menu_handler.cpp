@@ -449,10 +449,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case LISTBOX_REPLAY_LIST: {
 				int sel = mainGame->lstReplayList->getSelected();
 				mainGame->stReplayInfo->setText(L"");
+				mainGame->btnLoadReplay->setEnabled(false);
+				mainGame->btnDeleteReplay->setEnabled(false);
+				mainGame->btnRenameReplay->setEnabled(false);
 				if(sel == -1)
 					break;
 				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)))
 					break;
+				mainGame->btnLoadReplay->setEnabled(true);
+				mainGame->btnDeleteReplay->setEnabled(true);
+				mainGame->btnRenameReplay->setEnabled(true);
 				std::wstring repinfo;
 				time_t curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);
@@ -474,10 +480,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
+				mainGame->btnLoadSinglePlay->setEnabled(false);
 				int sel = mainGame->lstSinglePlayList->getSelected();
 				mainGame->stSinglePlayInfo->setText(L"");
 				if(sel == -1)
 					break;
+				mainGame->btnLoadSinglePlay->setEnabled(true);
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true);
 				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(name).c_str());
 				break;
