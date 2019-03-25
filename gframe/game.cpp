@@ -132,7 +132,7 @@ bool Game::Initialize() {
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 #endif
 	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
-	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(L"Repositories Status", 1, true, true));
+	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(2045).c_str(), 1, true, true));
 	//main menu
 	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
@@ -337,6 +337,11 @@ bool Game::Initialize() {
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(18);
 	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272).c_str());
+	//chat
+	irr::gui::IGUITab* tabChat = wInfos->addTab(dataManager.GetSysString(1279).c_str());
+	lstChat = env->addListBox(rect<s32>(10, 10, 290, 290), tabChat, -1, false);
+	lstChat->setItemHeight(18);
+	btnClearChat = env->addButton(rect<s32>(160, 300, 260, 325), tabChat, BUTTON_CLEAR_CHAT, dataManager.GetSysString(1282).c_str());
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
 	chkMAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274).c_str());
@@ -369,7 +374,7 @@ bool Game::Initialize() {
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(20, 315, 280, 340), tabSystem, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	//log
-	tabRepositories = wInfos->addTab(L"Repositories Status");
+	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, rect<s32>(1, 275, 301, 639));
 	mTabRepositories->grab();
 	//
@@ -587,10 +592,10 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1241).c_str());
 	cbLimit->addItem(dataManager.GetSysString(1242).c_str());
 	if(chkAnime->isChecked()) {
-		cbLimit->addItem(dataManager.GetSysString(1243).c_str());
-		cbLimit->addItem(L"Illegal");
-		cbLimit->addItem(L"VG");
-		cbLimit->addItem(L"Custom");
+		cbLimit->addItem(dataManager.GetSysString(1264).c_str());
+		cbLimit->addItem(dataManager.GetSysString(1265).c_str());
+		cbLimit->addItem(dataManager.GetSysString(1266).c_str());
+		cbLimit->addItem(dataManager.GetSysString(1267).c_str());
 	}
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319).c_str(), rect<s32>(10, 28, 70, 48), false, false, wFilter);
 	cbAttribute = env->addComboBox(rect<s32>(60, 26, 190, 46), wFilter, COMBOBOX_OTHER_FILT);
@@ -656,8 +661,11 @@ bool Game::Initialize() {
 	lstReplayList->addFilteredExtensions(coreloaded ? std::vector<std::wstring>{L"yrp", L"yrpx"} : std::vector<std::wstring>{ L"yrpx" });
 	lstReplayList->setItemHeight(18);
 	btnLoadReplay = env->addButton(rect<s32>(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348).c_str());
+	btnLoadReplay->setEnabled(false);
 	btnDeleteReplay = env->addButton(rect<s32>(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, dataManager.GetSysString(1361).c_str());
+	btnDeleteReplay->setEnabled(false);
 	btnRenameReplay = env->addButton(rect<s32>(360, 385, 460, 410), wReplay, BUTTON_RENAME_REPLAY, dataManager.GetSysString(1362).c_str());
+	btnRenameReplay->setEnabled(false);
 	btnReplayCancel = env->addButton(rect<s32>(470, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, dataManager.GetSysString(1347).c_str());
 	env->addStaticText(dataManager.GetSysString(1349).c_str(), rect<s32>(360, 30, 570, 50), false, true, wReplay);
 	stReplayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wReplay, -1, rect<s32>(360, 60, 570, 350));
@@ -674,7 +682,8 @@ bool Game::Initialize() {
 	lstSinglePlayList->setItemHeight(18);
 	lstSinglePlayList->setWorkingPath(L"./single", true);
 	lstSinglePlayList->addFilteredExtensions({L"lua"});
-	btnLoadSinglePlay = env->addButton(rect<s32>(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1211).c_str());
+	btnLoadSinglePlay = env->addButton(rect<s32>(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1357).c_str());
+	btnLoadSinglePlay->setEnabled(false);
 	btnSinglePlayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210).c_str());
 	env->addStaticText(dataManager.GetSysString(1352).c_str(), rect<s32>(360, 30, 570, 50), false, true, wSinglePlay);
 	stSinglePlayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 350), false, true, wSinglePlay);
@@ -1445,6 +1454,7 @@ void Game::AddChatMsg(const std::wstring& msg, int player) {
 			chatMsg[0].append(L"[---]");
 	}
 	chatMsg[0].append(L": ").append(msg);
+	lstChat->addItem(chatMsg[0].c_str());
 }
 void Game::ClearChatMsg() {
 	for(int i = 7; i >= 0; --i) {
@@ -1521,6 +1531,7 @@ void Game::CloseDuelWindow() {
 	btnShuffle->setVisible(false);
 	wChat->setVisible(false);
 	lstLog->clear();
+	lstChat->clear();
 	logParam.clear();
 	lstHostList->clear();
 	DuelClient::hosts.clear();
@@ -1795,11 +1806,13 @@ void Game::OnResize() {
 	}
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
+	lstChat->setRelativePosition(Resize(10, 10, 290, 290));
 	imageManager.ClearTexture(true);
 
 	if(showingcard)
 		ShowCardInfo(showingcard, true);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
+	btnClearChat->setRelativePosition(Resize(160, 300, 260, 325));
 	tabSystem->setRelativePosition(Resize(0, 0, 300, 364));
 	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
 

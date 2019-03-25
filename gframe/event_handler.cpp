@@ -1726,6 +1726,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			case BUTTON_CLEAR_CHAT: {
+				mainGame->lstChat->clear();
+				return true;
+				break;
+			}
 			}
 			break;
 		}

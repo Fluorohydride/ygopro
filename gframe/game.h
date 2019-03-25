@@ -286,7 +286,9 @@ public:
 	irr::gui::IGUIStaticText* stText;
 	irr::gui::IGUIStaticText* stVolume;
 	irr::gui::IGUIListBox* lstLog;
+	irr::gui::IGUIListBox* lstChat;
 	irr::gui::IGUIButton* btnClearLog;
+	irr::gui::IGUIButton* btnClearChat;
 	irr::gui::IGUIButton* btnSaveLog;
 	irr::gui::IGUITab* tabRepositories;
 	irr::gui::IGUIContextMenu* mTabRepositories;
@@ -671,7 +673,7 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_OR_FINISH		267
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
-//#define SCROLL_CARDTEXT				280
+#define BUTTON_CLEAR_CHAT			272
 #define BUTTON_DISPLAY_0			290
 #define BUTTON_DISPLAY_1			291
 #define BUTTON_DISPLAY_2			292
