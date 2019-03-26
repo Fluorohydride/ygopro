@@ -29,8 +29,8 @@ HostInfo game_info;
 
 void Game::MainServerLoop() {
 	deckManager.LoadLFList();
-	LoadExpansionDB();
-	dataManager.LoadDB("cards.cdb");
+	LoadExpansions();
+	dataManager.LoadDB(L"cards.cdb");
 	
 	aServerPort = NetServer::StartServer(aServerPort);
 	NetServer::InitDuel();
@@ -86,8 +86,9 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
-	LoadExpansionDB();
-	if(!dataManager.LoadDB("cards.cdb")) {
+	dataManager.FileSystem = device->getFileSystem();
+	LoadExpansions();
+	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
 		return false;
 	}
@@ -893,14 +894,41 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	pControl->setText(dataManager.strBuffer);
 }
 #endif //YGOPRO_SERVER_MODE
-void Game::LoadExpansionDB() {
-	FileSystem::TraversalDir("./expansions", [](const char* name, bool isdir) {
-		if(!isdir && strrchr(name, '.') && !mystrncasecmp(strrchr(name, '.'), ".cdb", 4)) {
-			char fpath[1024];
-			sprintf(fpath, "./expansions/%s", name);
+void Game::LoadExpansions() {
+	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
+			wchar_t fpath[1024];
+			myswprintf(fpath, L"./expansions/%ls", name);
 			dataManager.LoadDB(fpath);
 		}
+#ifdef YGOPRO_SERVER_MODE
 	});
+#else
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4)) {
+			wchar_t fpath[1024];
+			myswprintf(fpath, L"./expansions/%ls", name);
+			dataManager.FileSystem->addFileArchive(fpath, true, false);
+		}
+	});
+	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
+		const IFileList* archive = DataManager::FileSystem->getFileArchive(i)->getFileList();
+		for(u32 j = 0; j < archive->getFileCount(); ++j) {
+#ifdef _WIN32
+			const wchar_t* fname = archive->getFullFileName(j).c_str();
+#else
+			wchar_t fname[1024];
+			const char* uname = archive->getFullFileName(j).c_str();
+			BufferIO::DecodeUTF8(uname, fname);
+#endif
+			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
+				dataManager.LoadDB(fname);
+			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
+				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
+				dataManager.LoadStrings(reader);
+			}
+		}
+	}
+#endif //YGOPRO_SERVER_MODE
 }
 #ifndef YGOPRO_SERVER_MODE
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
