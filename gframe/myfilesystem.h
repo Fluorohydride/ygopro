@@ -5,10 +5,7 @@
 #include <functional>
 #include "bufferio.h"
 
-#ifdef _WIN32
-#include <direct.h>
-#include <sys/stat.h>
-#else
+#ifndef _WIN32
 #include <dirent.h>
 #include <sys/stat.h>
 #endif
@@ -20,8 +17,8 @@
 class FileSystem {
 public:
 	static bool IsFileExists(const wchar_t* wfile) {
-		struct _stat fileStat;
-		return (_wstat(wfile, &fileStat) == 0) && !(fileStat.st_mode & _S_IFDIR);
+		DWORD attr = GetFileAttributesW(wfile);
+		return attr != INVALID_FILE_ATTRIBUTES && !(attr & FILE_ATTRIBUTE_DIRECTORY);
 	}
 
 	static bool IsFileExists(const char* file) {
@@ -31,8 +28,8 @@ public:
 	}
 
 	static bool IsDirExists(const wchar_t* wdir) {
-		struct _stat fileStat;
-		return (_wstat(wdir, &fileStat) == 0) && (fileStat.st_mode & _S_IFDIR);
+		DWORD attr = GetFileAttributesW(wdir);
+		return attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY);
 	}
 
 	static bool IsDirExists(const char* dir) {
@@ -42,7 +39,7 @@ public:
 	}
 
 	static bool MakeDir(const wchar_t* wdir) {
-		return _wmkdir(wdir) == 0;
+		return CreateDirectoryW(wdir, NULL);
 	}
 
 	static bool MakeDir(const char* dir) {
