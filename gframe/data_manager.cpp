@@ -7,23 +7,37 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[4096];
 byte DataManager::scriptBuffer[0x20000];
+IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
-bool DataManager::LoadDB(const char* file) {
-	sqlite3* pDB;
-	if(sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
-		return Error(pDB);
+bool DataManager::LoadDB(const wchar_t* wfile) {
+	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+	if(reader == NULL)
+		return false;
+	spmemvfs_db_t db;
+	spmembuffer_t* mem = (spmembuffer_t*)calloc(sizeof(spmembuffer_t), 1);
+	spmemvfs_env_init();
+	mem->total = mem->used = reader->getSize();
+	mem->data = (char*)malloc(mem->total + 1);
+	reader->read(mem->data, mem->total);
+	reader->drop();
+	(mem->data)[mem->total] = '\0';
+	char file[256];
+	BufferIO::EncodeUTF8(wfile, file);
+	if(spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
+		return Error(&db);
+	sqlite3* pDB = db.handle;
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
-		return Error(pDB);
+		return Error(&db);
 	CardDataC cd;
 	CardString cs;
 	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
 		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
-			return Error(pDB, pStmt);
+			return Error(&db, pStmt);
 		else if(step == SQLITE_ROW) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
@@ -63,7 +77,8 @@ bool DataManager::LoadDB(const char* file) {
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
-	sqlite3_close(pDB);
+	spmemvfs_close_db(&db);
+	spmemvfs_env_fini();
 	return true;
 }
 bool DataManager::LoadStrings(const char* file) {
@@ -71,40 +86,59 @@ bool DataManager::LoadStrings(const char* file) {
 	if(!fp)
 		return false;
 	char linebuf[256];
-	char strbuf[256];
-	int value;
 	while(fgets(linebuf, 256, fp)) {
-		if(linebuf[0] != '!')
-			continue;
-		sscanf(linebuf, "!%s", strbuf);
-		if(!strcmp(strbuf, "system")) {
-			sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_sysStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "victory")) {
-			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_victoryStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "counter")) {
-			sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_counterStrings[value] = strBuffer;
-		} else if(!strcmp(strbuf, "setname")) {
-			sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
-			BufferIO::DecodeUTF8(strbuf, strBuffer);
-			_setnameStrings[value] = strBuffer;
-		}
+		ReadStringConfLine(linebuf);
 	}
 	fclose(fp);
 	for(int i = 0; i < 255; ++i)
 		myswprintf(numStrings[i], L"%d", i);
 	return true;
 }
-bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
+bool DataManager::LoadStrings(IReadFile* reader) {
+	char ch[2] = " ";
+	char linebuf[256] = "";
+	while(reader->read(&ch[0], 1)) {
+		if(ch[0] == '\0')
+			break;
+		strcat(linebuf, ch);
+		if(ch[0] == '\n') {
+			ReadStringConfLine(linebuf);
+			linebuf[0] = '\0';
+		}
+	}
+	reader->drop();
+	return true;
+}
+void DataManager::ReadStringConfLine(const char* linebuf) {
+	if(linebuf[0] != '!')
+		return;
+	char strbuf[256];
+	int value;
+	sscanf(linebuf, "!%s", strbuf);
+	if(!strcmp(strbuf, "system")) {
+		sscanf(&linebuf[7], "%d %240[^\n]", &value, strbuf);
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_sysStrings[value] = strBuffer;
+	} else if(!strcmp(strbuf, "victory")) {
+		sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_victoryStrings[value] = strBuffer;
+	} else if(!strcmp(strbuf, "counter")) {
+		sscanf(&linebuf[8], "%x %240[^\n]", &value, strbuf);
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_counterStrings[value] = strBuffer;
+	} else if(!strcmp(strbuf, "setname")) {
+		sscanf(&linebuf[8], "%x %240[^\t\n]", &value, strbuf);//using tab for comment
+		BufferIO::DecodeUTF8(strbuf, strBuffer);
+		_setnameStrings[value] = strBuffer;
+	}
+}
+bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
+	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
-	sqlite3_close(pDB);
+	spmemvfs_close_db(pDB);
+	spmemvfs_env_fini();
 	return false;
 }
 bool DataManager::GetData(int code, CardData* pData) {
@@ -328,21 +362,19 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 		return ScriptReader(second, slen);
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
-	FILE *fp;
-#ifdef _WIN32
 	wchar_t fname[256];
 	BufferIO::DecodeUTF8(script_name, fname);
-	fp = _wfopen(fname, L"rb");
-#else
-	fp = fopen(script_name, "rb");
-#endif
-	if(!fp)
+	IReadFile* reader = FileSystem->createAndOpenFile(fname);
+	if(reader == NULL)
 		return 0;
-	int len = fread(scriptBuffer, 1, sizeof(scriptBuffer), fp);
-	fclose(fp);
-	if(len >= sizeof(scriptBuffer))
+	size_t size = reader->getSize();
+	if(size > sizeof(scriptBuffer)) {
+		reader->drop();
 		return 0;
-	*slen = len;
+	}
+	reader->read(scriptBuffer, size);
+	reader->drop();
+	*slen = size;
 	return scriptBuffer;
 }
 
