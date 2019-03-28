@@ -14,7 +14,8 @@ ReplayPacket::ReplayPacket(int msg, char* buf, int len) {
 void ReplayPacket::Set(int msg, char* buf, int len) {
 	message = msg;
 	data.resize(len);
-	memcpy(data.data(), buf, data.size());
+	if(len)
+		memcpy(data.data(), buf, data.size());
 }
 
 Replay::Replay() {
@@ -82,7 +83,8 @@ void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 		return;
 	const auto vec_size = replay_data.size();
 	replay_data.resize(vec_size + length);
-	std::memcpy(&replay_data[vec_size], data, length);
+	if(length)
+		std::memcpy(&replay_data[vec_size], data, length);
 	Write(data, length, flush);
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
@@ -219,7 +221,7 @@ ReplayDeck Replay::GetPlayerDecks() {
 	return decks;
 }
 bool Replay::ReadNextResponse(ReplayResponse* res) {
-	if(!can_read | !res)
+	if(!can_read || !res)
 		return false;
 	res->length = ReadInt8();
 	if(res->length < 1)
@@ -231,11 +233,12 @@ bool Replay::ReadNextResponse(ReplayResponse* res) {
 }
 void Replay::ParseNames() {
 	players.clear();
+	players.resize(6);
 	int iterations = (pheader.flag & REPLAY_RELAY) ? 6 : (pheader.flag & REPLAY_TAG) ? 4 : 2;
 	for(int i = 0; i < iterations; i++) {
 		wchar_t namebuf[20];
 		ReadName(namebuf);
-		players.push_back(namebuf);
+		players[i] = namebuf;
 	}
 }
 void Replay::ParseParams() {
@@ -293,11 +296,9 @@ void Replay::ParseStream() {
 		if(p.message == MSG_AI_NAME) {
 			char* pbuf = (char*)p.data.data();
 			int len = BufferIO::ReadInt16(pbuf);
-			char* begin = pbuf;
-			pbuf += len + 1;
 			std::string namebuf;
 			namebuf.resize(len);
-			memcpy(&namebuf[0], begin, len + 1);
+			memcpy(&namebuf[0], pbuf, len + 1);
 			players[1] = BufferIO::DecodeUTF8s(namebuf);
 			continue;
 		}
@@ -337,7 +338,8 @@ bool Replay::ReadData(void* data, unsigned int length) {
 		can_read = false;
 		return false;
 	}
-	memcpy(data, &replay_data[data_position], length);
+	if(length)
+		memcpy(data, &replay_data[data_position], length);
 	data_position += length;
 	return true;
 }
