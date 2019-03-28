@@ -4,7 +4,7 @@
 #include "config.h"
 #include "sqlite3.h"
 #ifndef YGOPRO_SERVER_MODE
-#include "spmemvfs.h"
+#include "spmemvfs/spmemvfs.h"
 #endif
 #include "client_card.h"
 #include <unordered_map>
