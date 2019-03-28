@@ -284,12 +284,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_LOAD_REPLAY: {
 				if(open_file) {
-					ReplayMode::cur_replay.OpenReplay(open_file_name);
+					bool res = ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
+					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
+						if(exit_on_return)
+							mainGame->device->closeDevice();
+						break;
+					}
 				} else {
 					if(mainGame->lstReplayList->getSelected() == -1)
 						break;
-					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true)))
+					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true)) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
 						break;
 				}
 				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)
@@ -392,7 +397,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_YES: {
 				mainGame->HideElement(mainGame->wQuery);
 				if(prev_operation == BUTTON_DELETE_REPLAY) {
-					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(prev_sel))) {
+					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(prev_sel, true))) {
 						mainGame->stReplayInfo->setText(L"");
 						mainGame->lstReplayList->refreshList();
 					}
@@ -410,12 +415,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_SAVE: {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
-					std::wstring newname(mainGame->ebRSName->getText());
-					newname = newname.substr(0, newname.find_last_of(L"."));
-					std::wstring oldname(mainGame->lstReplayList->getListItem(prev_sel));
-					auto oldextension = oldname.substr(oldname.find_last_of(L"."));
-					newname += oldextension;
-					if(Replay::RenameReplay(oldname, newname)) {
+					std::wstring oldname(mainGame->lstReplayList->getListItem(prev_sel, true));
+					auto oldpath = oldname.substr(0, oldname.find_last_of(L"/")) + L"/";
+					if(Replay::RenameReplay(oldname, oldpath + mainGame->ebRSName->getText())) {
 						mainGame->lstReplayList->refreshList();
 					} else {
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365).c_str());
@@ -454,7 +456,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnRenameReplay->setEnabled(false);
 				if(sel == -1)
 					break;
-				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)))
+				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
 					break;
 				mainGame->btnLoadReplay->setEnabled(true);
 				mainGame->btnDeleteReplay->setEnabled(true);
@@ -536,12 +538,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				if(open_file) {
-					ReplayMode::cur_replay.OpenReplay(open_file_name);
+					bool res = ReplayMode::cur_replay.OpenReplay(open_file_name);
 					open_file = false;
+					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
+						if(exit_on_return)
+							mainGame->device->closeDevice();
+						break;
+					}
 				} else {
 					if(mainGame->lstReplayList->getSelected() == -1)
 						break;
-					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true)))
+					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true)) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
 						break;
 				}
 				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)

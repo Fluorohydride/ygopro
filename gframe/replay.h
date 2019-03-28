@@ -114,6 +114,7 @@ private:
 	bool can_read;
 	std::vector<ReplayResponse> responses;
 	std::vector<std::wstring> players;
+	std::wstring replay_name;
 	ReplayDeck decks;
 	std::vector<ReplayResponse>::iterator responses_iterator;
 };

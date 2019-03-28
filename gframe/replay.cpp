@@ -167,6 +167,10 @@ bool Replay::OpenReplayFromBuffer(std::vector<uint8_t> contents) {
 	return true;
 }
 bool Replay::OpenReplay(const std::wstring& name) {
+	if(replay_name == name) {
+		Rewind();
+		return true;
+	}
 #ifdef _WIN32
 	std::ifstream replay_file(name, std::ifstream::binary);
 	if(!replay_file.is_open()) {
@@ -176,12 +180,19 @@ bool Replay::OpenReplay(const std::wstring& name) {
 	if(!replay_file.is_open()) {
 		replay_file.open("./replay/" + BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 #endif
-		if(!replay_file.is_open())
+		if(!replay_file.is_open()) {
+			replay_name.clear();
 			return false;
+		}
 	}
 	std::vector<uint8_t> contents((std::istreambuf_iterator<char>(replay_file)), std::istreambuf_iterator<char>());
 	replay_file.close();
-	return OpenReplayFromBuffer(contents);
+	if (OpenReplayFromBuffer(contents)){
+		replay_name = name;
+		return true;
+	}
+	replay_name.clear();
+	return false;
 }
 bool Replay::CheckReplay(const std::wstring& name) {
 #ifdef _WIN32
@@ -199,13 +210,13 @@ bool Replay::CheckReplay(const std::wstring& name) {
 	ReplayHeader rheader;
 	auto count = replay_file.read((char*)&rheader, sizeof(pheader)).gcount();
 	replay_file.close();
-	return count == 1 && (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
+	return (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
 }
 bool Replay::DeleteReplay(const std::wstring& name) {
-	return Utils::Deletefile(L"./replay/" + name + L".ydk");
+	return Utils::Deletefile(name);
 }
 bool Replay::RenameReplay(const std::wstring& oldname, const std::wstring& newname) {
-	return Utils::Movefile(L"./replay/" + oldname, L"./replay/" + newname);
+	return Utils::Movefile(oldname, newname);
 }
 bool Replay::GetNextResponse(ReplayResponse* res) {
 	if(responses_iterator == responses.end())
