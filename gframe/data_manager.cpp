@@ -13,14 +13,18 @@ IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
 bool DataManager::LoadDB(const wchar_t* wfile) {
-#ifdef YGOPRO_SERVER_MODE
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
+#ifdef YGOPRO_SERVER_MODE
 	sqlite3* pDB;
 	if(sqlite3_open_v2(file, &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
 #else
+#ifdef _WIN32
 	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(file);
+#endif
 	if(reader == NULL)
 		return false;
 	spmemvfs_db_t db;
@@ -31,8 +35,6 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	reader->read(mem->data, mem->total);
 	reader->drop();
 	(mem->data)[mem->total] = '\0';
-	char file[256];
-	BufferIO::EncodeUTF8(wfile, file);
 	if(spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
 		return Error(&db);
 	sqlite3* pDB = db.handle;
@@ -428,9 +430,13 @@ byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 		return 0;
 	*slen = len;
 #else
+#ifdef _WIN32
 	wchar_t fname[256];
 	BufferIO::DecodeUTF8(script_name, fname);
 	IReadFile* reader = FileSystem->createAndOpenFile(fname);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(script_name);
+#endif
 	if(reader == NULL)
 		return 0;
 	size_t size = reader->getSize();
