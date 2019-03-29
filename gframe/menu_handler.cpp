@@ -248,7 +248,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->gMutex.Lock();
 				wchar_t textBuffer[256];
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363));
-				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
