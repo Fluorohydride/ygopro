@@ -445,20 +445,21 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, 0);
+	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, 0x1));
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, 0x40));
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x1));
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x40));
-	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 18);
+	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 19);
 	startbuf[1] = 1;
-	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 18);
+	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 19);
 	if(!swapped)
 		startbuf[1] = 0x10;
 	else startbuf[1] = 0x11;
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-		NetServer::SendBufferToPlayer(*oit, STOC_GAME_MSG, startbuf, 18);
+		NetServer::SendBufferToPlayer(*oit, STOC_GAME_MSG, startbuf, 19);
 	RefreshExtra(0);
 	RefreshExtra(1);
 	start_duel(pduel, opt);
