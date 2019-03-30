@@ -204,7 +204,7 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	if(count < 1)
 		return false;
 	return rheader.id == REPLAY_RPY1 && rheader.version >= 0x12d0
-		|| rheader.id == REPLAY_RPYX;//&&rheader.version >= 0x1336
+		|| rheader.id == REPLAY_RPYX && rheader.version == PRO_VERSION;
 }
 bool Replay::DeleteReplay(const wchar_t* name) {
 	wchar_t fname[256];
