@@ -1863,7 +1863,7 @@ void TagDuel::RequestField(DuelPlayer* dp) {
 	BufferIO::WriteInt16(pbuf, 0);
 	BufferIO::WriteInt16(pbuf, 0);
 	BufferIO::WriteInt16(pbuf, 0);
-	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, startbuf, 18);
+	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, startbuf, 19);
 
 	int newturn_count = turn_count % 4;
 	if(newturn_count == 0)

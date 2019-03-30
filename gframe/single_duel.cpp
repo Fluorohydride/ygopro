@@ -1788,7 +1788,7 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	BufferIO::WriteInt16(pbuf, 0);
 	BufferIO::WriteInt16(pbuf, 0);
 	BufferIO::WriteInt16(pbuf, 0);
-	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, startbuf, 18);
+	NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, startbuf, 19);
 
 	int newturn_count = 1;
 	if(turn_player == 1)
