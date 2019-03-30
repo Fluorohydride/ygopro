@@ -1781,6 +1781,7 @@ void SingleDuel::RequestField(DuelPlayer* dp) {
 	char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);
 	BufferIO::WriteInt8(pbuf, player);
+	BufferIO::WriteInt8(pbuf, host_info.duel_rule);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt32(pbuf, host_info.start_lp);
 	BufferIO::WriteInt16(pbuf, 0);
