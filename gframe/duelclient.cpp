@@ -1068,6 +1068,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else
 				mainGame->dInfo.tag_player[0] = true;
 		}
+		mainGame->dInfo.duel_rule = BufferIO::ReadInt8(pbuf);
 		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::ReadInt32(pbuf);
 		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
 		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
