@@ -74,10 +74,10 @@ std::wstring DeckManager::GetLFListName(int lfhash) {
 		return (*it).listName.c_str();
 	return dataManager.unknown_string;
 }
-int DeckManager::TypeCount(std::vector<code_pointer> cards, int type) {
+int DeckManager::TypeCount(std::vector<CardDataC*> cards, int type) {
 	int count = 0;
 	for(auto card : cards) {
-		if(card->second.type & type)
+		if(card->type & type)
 			count++;
 	}
 	return count;
@@ -132,57 +132,57 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		}
 	}
 	for(size_t i = 0; i < deck.main.size(); ++i) {
-		code_pointer cit = deck.main[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
-		if((cit->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN)) || (cit->second.type & TYPE_LINK && cit->second.type & TYPE_MONSTER))
+		auto cit = deck.main[i];
+		if(!allow_ocg && (cit->ot == 0x1))
+			return (DECKERROR_OCGONLY << 28) + cit->code;
+		if(!allow_tcg && (cit->ot == 0x2))
+			return (DECKERROR_TCGONLY << 28) + cit->code;
+		if((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return (DECKERROR_EXTRACOUNT << 28);
-		int code = cit->second.alias ? cit->second.alias : cit->first;
+		int code = cit->alias ? cit->alias : cit->code;
 		ccount[code]++;
 		dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(cit->first);
+			return (DECKERROR_CARDCOUNT << 28) + cit->code;
+		auto it = list->find(cit->code);
 		if (it == list->end())
 			it = list->find(code);
 		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
-			return (DECKERROR_LFLIST << 28) + cit->first;
+			return (DECKERROR_LFLIST << 28) + cit->code;
 	}
 	for(size_t i = 0; i < deck.extra.size(); ++i) {
-		code_pointer cit = deck.extra[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
-		int code = cit->second.alias ? cit->second.alias : cit->first;
+		auto cit = deck.extra[i];
+		if(!allow_ocg && (cit->ot == 0x1))
+			return (DECKERROR_OCGONLY << 28) + cit->code;
+		if(!allow_tcg && (cit->ot == 0x2))
+			return (DECKERROR_TCGONLY << 28) + cit->code;
+		int code = cit->alias ? cit->alias : cit->code;
 		ccount[code]++;
 		dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(cit->first);
+			return (DECKERROR_CARDCOUNT << 28) + cit->code;
+		auto it = list->find(cit->code);
 		if(it == list->end())
 			it = list->find(code);
 		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
-			return (DECKERROR_LFLIST << 28) + cit->first;
+			return (DECKERROR_LFLIST << 28) + cit->code;
 	}
 	for(size_t i = 0; i < deck.side.size(); ++i) {
-		code_pointer cit = deck.side[i];
-		if(!allow_ocg && (cit->second.ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->first;
-		if(!allow_tcg && (cit->second.ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->first;
-		int code = cit->second.alias ? cit->second.alias : cit->first;
+		auto cit = deck.side[i];
+		if(!allow_ocg && (cit->ot == 0x1))
+			return (DECKERROR_OCGONLY << 28) + cit->code;
+		if(!allow_tcg && (cit->ot == 0x2))
+			return (DECKERROR_TCGONLY << 28) + cit->code;
+		int code = cit->alias ? cit->alias : cit->code;
 		ccount[code]++;
 		dc = ccount[code];
 		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->first;
-		auto it = list->find(cit->first);
+			return (DECKERROR_CARDCOUNT << 28) + cit->code;
+		auto it = list->find(cit->code);
 		if(it == list->end())
 			it = list->find(code);
 		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
-			return (DECKERROR_LFLIST << 28) + cit->first;
+			return (DECKERROR_LFLIST << 28) + cit->code;
 	}
 	return 0;
 }
@@ -210,9 +210,9 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		else if((cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd.type & TYPE_LINK && cd.type & TYPE_MONSTER))) {
-			deck.extra.push_back(dataManager.GetCodePointer(code));
+			deck.extra.push_back(dataManager.GetCardData(code));
 		} else {
-			deck.main.push_back(dataManager.GetCodePointer(code));
+			deck.main.push_back(dataManager.GetCardData(code));
 		}
 	}
 	for(auto code : sidelist) {
@@ -222,7 +222,7 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		deck.side.push_back(dataManager.GetCodePointer(code));	//verified by GetData()
+		deck.side.push_back(dataManager.GetCardData(code));	//verified by GetData()
 	}
 	return errorcode;
 }
@@ -272,21 +272,21 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::map<int, int> pcount;
 	std::map<int, int> ncount;
 	for(auto& card: deck.main)
-		pcount[card->first]++;
+		pcount[card->code]++;
 	for(auto& card : deck.extra)
-		pcount[card->first]++;
+		pcount[card->code]++;
 	for(auto& card : deck.side)
-		pcount[card->first]++;
+		pcount[card->code]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
 	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
 		return false;
 	for(auto& card : ndeck.main)
-		ncount[card->first]++;
+		ncount[card->code]++;
 	for(auto& card : ndeck.extra)
-		ncount[card->first]++;
+		ncount[card->code]++;
 	for(auto& card : ndeck.side)
-		ncount[card->first]++;
+		ncount[card->code]++;
 	if(!std::equal(pcount.begin(), pcount.end(), ncount.begin()))
 		return false;
 	deck = ndeck;
@@ -326,13 +326,13 @@ bool DeckManager::SaveDeck(Deck& deck, const std::wstring& name) {
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
 	for(auto card : deck.main)
-		deckfile << std::to_string(card->first) << "\n";
+		deckfile << std::to_string(card->code) << "\n";
 	deckfile << "#extra\n";
 	for(auto card : deck.extra)
-		deckfile << std::to_string(card->first) << "\n";
+		deckfile << std::to_string(card->code) << "\n";
 	deckfile << "!side\n";
 	for(auto card : deck.side)
-		deckfile << std::to_string(card->first) << "\n";
+		deckfile << std::to_string(card->code) << "\n";
 	deckfile.close();
 	return true;
 }

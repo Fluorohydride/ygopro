@@ -16,7 +16,6 @@ bool DataManager::LoadDB(const std::string& file) {
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
-	CardDataC cd;
 	CardString cs;
 	int step = 0;
 	do {
@@ -24,30 +23,31 @@ bool DataManager::LoadDB(const std::string& file) {
 		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
 			return Error(pDB, pStmt);
 		else if(step == SQLITE_ROW) {
-			cd.code = sqlite3_column_int(pStmt, 0);
-			cd.ot = sqlite3_column_int(pStmt, 1);
-			cd.alias = sqlite3_column_int(pStmt, 2);
-			cd.setcode = sqlite3_column_int64(pStmt, 3);
-			cd.type = sqlite3_column_int(pStmt, 4);
-			cd.attack = sqlite3_column_int(pStmt, 5);
-			cd.defense = sqlite3_column_int(pStmt, 6);
-			if(cd.type & TYPE_LINK) {
-				cd.link_marker = cd.defense;
-				cd.defense = 0;
+			CardDataC* cd = new CardDataC();
+			cd->code = sqlite3_column_int(pStmt, 0);
+			cd->ot = sqlite3_column_int(pStmt, 1);
+			cd->alias = sqlite3_column_int(pStmt, 2);
+			cd->setcode = sqlite3_column_int64(pStmt, 3);
+			cd->type = sqlite3_column_int(pStmt, 4);
+			cd->attack = sqlite3_column_int(pStmt, 5);
+			cd->defense = sqlite3_column_int(pStmt, 6);
+			if(cd->type & TYPE_LINK) {
+				cd->link_marker = cd->defense;
+				cd->defense = 0;
 			} else
-				cd.link_marker = 0;
+				cd->link_marker = 0;
 			int level = sqlite3_column_int(pStmt, 7);
 			if(level < 0) {
-				cd.level = -(level & 0xff);
+				cd->level = -(level & 0xff);
 			}
 			else
-				cd.level = level & 0xff;
-			cd.lscale = (level >> 24) & 0xff;
-			cd.rscale = (level >> 16) & 0xff;
-			cd.race = sqlite3_column_int(pStmt, 8);
-			cd.attribute = sqlite3_column_int(pStmt, 9);
-			cd.category = sqlite3_column_int(pStmt, 10);
-			_datas.insert(std::make_pair(cd.code, cd));
+				cd->level = level & 0xff;
+			cd->lscale = (level >> 24) & 0xff;
+			cd->rscale = (level >> 16) & 0xff;
+			cd->race = sqlite3_column_int(pStmt, 8);
+			cd->attribute = sqlite3_column_int(pStmt, 9);
+			cd->category = sqlite3_column_int(pStmt, 10);
+			_datas[cd->code] = cd;
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				cs.name = BufferIO::DecodeUTF8s(text);
 			}
@@ -59,7 +59,7 @@ bool DataManager::LoadDB(const std::string& file) {
 					cs.desc[i] = BufferIO::DecodeUTF8s(text);
 				}
 			}
-			_strings.emplace(cd.code, cs);
+			_strings.emplace(cd->code, cs);
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
@@ -109,11 +109,14 @@ bool DataManager::GetData(int code, CardData* pData) {
 	if(cdit == _datas.end())
 		return false;
 	if(pData)
-		*pData = *((CardData*)&cdit->second);
+		*pData = *((CardData*)cdit->second);
 	return true;
 }
-code_pointer DataManager::GetCodePointer(int code) {
-	return _datas.find(code);
+CardDataC* DataManager::GetCardData(int code) {
+	auto it = _datas.find(code);
+	if(it != _datas.end())
+		return it->second;
+	return nullptr;
 }
 bool DataManager::GetString(int code, CardString* pStr) {
 	auto csit = _strings.find(code);

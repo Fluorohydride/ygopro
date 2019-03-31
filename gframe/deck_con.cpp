@@ -41,14 +41,14 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 	return 0;
 }
 
-static bool check_set_code(const CardDataC& data, std::vector<unsigned int>& setcodes) {
+static bool check_set_code(CardDataC* data, std::vector<unsigned int>& setcodes) {
 	if(setcodes.empty())
 		return false;
-	unsigned long long card_setcode = data.setcode;
-	if (data.alias) {
-		auto aptr = dataManager._datas.find(data.alias);
+	unsigned long long card_setcode = data->setcode;
+	if (data->alias) {
+		auto aptr = dataManager._datas.find(data->alias);
 		if (aptr != dataManager._datas.end())
-			card_setcode = aptr->second.setcode;
+			card_setcode = aptr->second->setcode;
 	}
 	for(auto& set_code : setcodes) {
 		auto sc = card_setcode;
@@ -228,11 +228,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
 				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->code);
 				for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->code);
 				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->code);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 				break;
 			}
@@ -511,8 +511,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			click_pos = hovered_pos;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
-			draging_pointer = dataManager.GetCodePointer(hovered_code);
-			if(draging_pointer == dataManager._datas.end())
+			draging_pointer = dataManager.GetCardData(hovered_code);
+			if(!draging_pointer)
 				break;
 			if(hovered_pos == 4) {
 				if(!check_limit(draging_pointer))
@@ -561,8 +561,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				if(hovered_pos == 0 || hovered_seq == -1)
 					break;
-				auto pointer = dataManager.GetCodePointer(hovered_code);
-				if(pointer == dataManager._datas.end())
+				auto pointer = dataManager.GetCardData(hovered_code);
+				if(pointer)
 					break;
 				if(hovered_pos == 1) {
 					if(push_side(pointer))
@@ -588,8 +588,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				} else if(hovered_pos == 3) {
 					pop_side(hovered_seq);
 				} else {
-					auto pointer = dataManager.GetCodePointer(hovered_code);
-					if(pointer == dataManager._datas.end())
+					auto pointer = dataManager.GetCardData(hovered_code);
+					if(pointer)
 						break;
 					if(event.MouseInput.Shift)
 						push_side(pointer);
@@ -624,8 +624,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			if (is_draging)
 				break;
-			auto pointer = dataManager.GetCodePointer(hovered_code);
-			if(!check_limit(pointer))
+			auto pointer = dataManager.GetCardData(hovered_code);
+			if(!pointer || !check_limit(pointer))
 				break;
 			if (hovered_pos == 1) {
 				if(!push_main(pointer))
@@ -696,7 +696,7 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = deckManager.current_deck.main[hovered_seq]->first;
+				hovered_code = deckManager.current_deck.main[hovered_seq]->code;
 			}
 		} else if(y >= 466 && y <= 530) {
 			int lx = deckManager.current_deck.extra.size();
@@ -711,7 +711,7 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
+				hovered_code = deckManager.current_deck.extra[hovered_seq]->code;
 				if(x >= 772)
 					is_lastcard = 1;
 			}
@@ -728,7 +728,7 @@ void DeckBuilder::GetHoveredCard() {
 				hovered_seq = -1;
 				hovered_code = 0;
 			} else {
-				hovered_code = deckManager.current_deck.side[hovered_seq]->first;
+				hovered_code = deckManager.current_deck.side[hovered_seq]->code;
 				if(x >= 772)
 					is_lastcard = 1;
 			}
@@ -742,7 +742,7 @@ void DeckBuilder::GetHoveredCard() {
 			hovered_seq = -1;
 			hovered_code = 0;
 		} else {
-			hovered_code = results[pos]->first;
+			hovered_code = results[pos]->code;
 		}
 	}
 	if(is_draging) {
@@ -819,11 +819,11 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 			it++;
 	}
 	for(auto term : searchterms) {
-		std::vector<code_pointer> result;
+		std::vector<CardDataC*> result;
 		searched_terms[term] = result;
 		int trycode = BufferIO::GetVal(term.c_str());
 		if(trycode && dataManager.GetData(trycode, 0)) {
-			auto ptr = dataManager.GetCodePointer(trycode);	// verified by GetData()
+			auto ptr = dataManager.GetCardData(trycode);	// verified by GetData()
 			searched_terms[term].push_back(ptr);
 			continue;
 		}
@@ -842,9 +842,9 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		set_code = dataManager.GetSetCode(tokens);
 		auto strpointer = dataManager._strings.begin();
 		wchar_t checkterm = term.size() ? term[0] : 0;
-		for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
+		for(auto ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
 			if(CheckCard(ptr->second, strpointer->second, checkterm, tokens, set_code))
-				result.push_back(ptr);
+				result.push_back(ptr->second);
 		}
 		if(result.size())
 			searched_terms[term] = result;
@@ -867,69 +867,69 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		mainGame->scrFilter->setPos(0);
 	}
 }
-bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
-	if(data.type & TYPE_TOKEN || (data.ot > 3 && !mainGame->chkAnime->isChecked()))
+bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
+	if(data->type & TYPE_TOKEN || (data->ot > 3 && !mainGame->chkAnime->isChecked()))
 		return false;
 	switch(filter_type) {
 	case 1: {
-		if(!(data.type & TYPE_MONSTER) || (data.type & filter_type2) != filter_type2)
+		if(!(data->type & TYPE_MONSTER) || (data->type & filter_type2) != filter_type2)
 			return false;
-		if(filter_race && data.race != filter_race)
+		if(filter_race && data->race != filter_race)
 			return false;
-		if(filter_attrib && data.attribute != filter_attrib)
+		if(filter_attrib && data->attribute != filter_attrib)
 			return false;
 		if(filter_atktype) {
-			if((filter_atktype == 1 && data.attack != filter_atk) || (filter_atktype == 2 && data.attack < filter_atk)
-				|| (filter_atktype == 3 && data.attack <= filter_atk) || (filter_atktype == 4 && (data.attack > filter_atk || data.attack < 0))
-				|| (filter_atktype == 5 && (data.attack >= filter_atk || data.attack < 0)) || (filter_atktype == 6 && data.attack != -2))
+			if((filter_atktype == 1 && data->attack != filter_atk) || (filter_atktype == 2 && data->attack < filter_atk)
+				|| (filter_atktype == 3 && data->attack <= filter_atk) || (filter_atktype == 4 && (data->attack > filter_atk || data->attack < 0))
+				|| (filter_atktype == 5 && (data->attack >= filter_atk || data->attack < 0)) || (filter_atktype == 6 && data->attack != -2))
 				return false;
 		}
 		if(filter_deftype) {
-			if((filter_deftype == 1 && data.defense != filter_def) || (filter_deftype == 2 && data.defense < filter_def)
-				|| (filter_deftype == 3 && data.defense <= filter_def) || (filter_deftype == 4 && (data.defense > filter_def || data.defense < 0))
-				|| (filter_deftype == 5 && (data.defense >= filter_def || data.defense < 0)) || (filter_deftype == 6 && data.defense != -2)
-				|| (data.type & TYPE_LINK))
+			if((filter_deftype == 1 && data->defense != filter_def) || (filter_deftype == 2 && data->defense < filter_def)
+				|| (filter_deftype == 3 && data->defense <= filter_def) || (filter_deftype == 4 && (data->defense > filter_def || data->defense < 0))
+				|| (filter_deftype == 5 && (data->defense >= filter_def || data->defense < 0)) || (filter_deftype == 6 && data->defense != -2)
+				|| (data->type & TYPE_LINK))
 				return false;
 		}
 		if(filter_lvtype) {
-			if((filter_lvtype == 1 && data.level != filter_lv) || (filter_lvtype == 2 && data.level < filter_lv)
-				|| (filter_lvtype == 3 && data.level <= filter_lv) || (filter_lvtype == 4 && data.level > filter_lv)
-				|| (filter_lvtype == 5 && data.level >= filter_lv) || filter_lvtype == 6)
+			if((filter_lvtype == 1 && data->level != filter_lv) || (filter_lvtype == 2 && data->level < filter_lv)
+				|| (filter_lvtype == 3 && data->level <= filter_lv) || (filter_lvtype == 4 && data->level > filter_lv)
+				|| (filter_lvtype == 5 && data->level >= filter_lv) || filter_lvtype == 6)
 				return false;
 		}
 		if(filter_scltype) {
-			if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
-				|| (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
-				|| (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6
-				|| !(data.type & TYPE_PENDULUM))
+			if((filter_scltype == 1 && data->lscale != filter_scl) || (filter_scltype == 2 && data->lscale < filter_scl)
+				|| (filter_scltype == 3 && data->lscale <= filter_scl) || (filter_scltype == 4 && (data->lscale > filter_scl || data->lscale == 0))
+				|| (filter_scltype == 5 && (data->lscale >= filter_scl || data->lscale == 0)) || filter_scltype == 6
+				|| !(data->type & TYPE_PENDULUM))
 				return false;
 		}
 		break;
 	}
 	case 2: {
-		if(!(data.type & TYPE_SPELL))
+		if(!(data->type & TYPE_SPELL))
 			return false;
-		if(filter_type2 && data.type != filter_type2)
+		if(filter_type2 && data->type != filter_type2)
 			return false;
 		break;
 	}
 	case 3: {
-		if(!(data.type & TYPE_TRAP))
+		if(!(data->type & TYPE_TRAP))
 			return false;
-		if(filter_type2 && data.type != filter_type2)
+		if(filter_type2 && data->type != filter_type2)
 			return false;
 		break;
 	}
 	}
-	if(filter_effect && !(data.category & filter_effect))
+	if(filter_effect && !(data->category & filter_effect))
 		return false;
-	if(filter_marks && (data.link_marker & filter_marks) != filter_marks)
+	if(filter_marks && (data->link_marker & filter_marks) != filter_marks)
 		return false;
 	if(filter_lm) {
-		unsigned int limitcode = data.code;
+		unsigned int limitcode = data->code;
 		auto flit = filterList->content.find(limitcode);
 		if(flit == filterList->content.end())
-			limitcode = data.alias ? data.alias : data.code;
+			limitcode = data->alias ? data->alias : data->code;
 		if(filter_lm <= LIMITATION_FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
 			return false;
 		if(filter_lm == LIMITATION_FILTER_UNLIMITED) {
@@ -939,19 +939,19 @@ bool DeckBuilder::CheckCard(const CardDataC& data, const CardString& text, const
 			} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
 				return false;
 		}
-		if(filter_lm == LIMITATION_FILTER_OCG && data.ot != 0x1)
+		if(filter_lm == LIMITATION_FILTER_OCG && data->ot != 0x1)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG && data.ot != 0x2)
+		if(filter_lm == LIMITATION_FILTER_TCG && data->ot != 0x2)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data.ot != 0x3)
+		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->ot != 0x3)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ANIME && data.ot != 0x4)
+		if(filter_lm == LIMITATION_FILTER_ANIME && data->ot != 0x4)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data.ot != 0x8)
+		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->ot != 0x8)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data.ot != 0x10)
+		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->ot != 0x10)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_CUSTOM && data.ot != 0x20)
+		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->ot != 0x20)
 			return false;
 	}
 	if(tokens.size()) {
@@ -1001,7 +1001,7 @@ void DeckBuilder::ClearFilter() {
 void DeckBuilder::SortList() {
 	auto left = results.begin();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(searched_terms.find(Game::StringtoUpper(dataManager.GetName((*it)->first))) != searched_terms.end()) {
+		if(searched_terms.find(Game::StringtoUpper(dataManager.GetName((*it)->code))) != searched_terms.end()) {
 			std::iter_swap(left, it);
 			++left;
 		}
@@ -1021,8 +1021,8 @@ void DeckBuilder::SortList() {
 		break;
 	}
 }
-bool DeckBuilder::push_main(code_pointer pointer, int seq) {
-	if(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->second.type != (TYPE_SPELL | TYPE_LINK))
+bool DeckBuilder::push_main(CardDataC* pointer, int seq) {
+	if(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->type != (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.main;
 	if(!mainGame->is_siding && (int)container.size() >= 60)
@@ -1034,8 +1034,8 @@ bool DeckBuilder::push_main(code_pointer pointer, int seq) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
-	if(!(pointer->second.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) || pointer->second.type == (TYPE_SPELL | TYPE_LINK))
+bool DeckBuilder::push_extra(CardDataC* pointer, int seq) {
+	if(!(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) || pointer->type == (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.extra;
 	if(!mainGame->is_siding && (int)container.size() >= 15)
@@ -1047,7 +1047,7 @@ bool DeckBuilder::push_extra(code_pointer pointer, int seq) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_side(code_pointer pointer, int seq) {
+bool DeckBuilder::push_side(CardDataC* pointer, int seq) {
 	auto& container = deckManager.current_deck.side;
 	if(!mainGame->is_siding && (int)container.size() >= 15)
 		return false;
@@ -1073,8 +1073,8 @@ void DeckBuilder::pop_side(int seq) {
 	container.erase(container.begin() + seq);
 	GetHoveredCard();
 }
-bool DeckBuilder::check_limit(code_pointer pointer) {
-	unsigned int limitcode = pointer->second.alias ? pointer->second.alias : pointer->first;
+bool DeckBuilder::check_limit(CardDataC* pointer) {
+	unsigned int limitcode = pointer->alias ? pointer->alias : pointer->code;
 	int found = 0;
 	std::unordered_set<int> limit_codes;
 	auto f=[&](int code, int alias){
@@ -1083,15 +1083,15 @@ bool DeckBuilder::check_limit(code_pointer pointer) {
 		else
 			limit_codes.insert(alias);
 	};
-	auto f2 = [&](std::vector<code_pointer>& list) {
+	auto f2 = [&](std::vector<CardDataC*>& list) {
 		for(auto& it : list) {
-			if(it->first == limitcode || it->second.alias == limitcode) {
-				f(it->first, it->second.alias);
+			if(it->code == limitcode || it->alias == limitcode) {
+				f(it->code, it->alias);
 				found++;
 			}
 		}
 	};
-	f(pointer->first, limitcode);
+	f(pointer->code, limitcode);
 	f2(deckManager.current_deck.main);
 	f2(deckManager.current_deck.extra);
 	f2(deckManager.current_deck.side);

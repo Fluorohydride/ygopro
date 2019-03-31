@@ -15,9 +15,9 @@ struct LFList {
 	bool whitelist;
 };
 struct Deck {
-	std::vector<code_pointer> main;
-	std::vector<code_pointer> extra;
-	std::vector<code_pointer> side;
+	std::vector<CardDataC*> main;
+	std::vector<CardDataC*> extra;
+	std::vector<CardDataC*> side;
 	Deck() {}
 	Deck(const Deck& ndeck) {
 		main = ndeck.main;
@@ -41,7 +41,7 @@ public:
 	void LoadLFList();
 	std::wstring GetLFListName(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes = 0);
-	int TypeCount(std::vector<code_pointer> cards, int type);
+	int TypeCount(std::vector<CardDataC*> cards, int type);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0);
 	int LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);

@@ -1072,11 +1072,11 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gameConf.quick_animation && frame >= 12) ? 12 * 1000 / 60 : frame * 1000 / 60;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(code_pointer cp, position2di pos, LFList* lflist, bool drag, recti* cliprect, bool load_image) {
-	int code = cp->first;
-	int lcode = cp->first;
-	if(!lflist->content.count(lcode))
-		lcode = cp->second.alias ? cp->second.alias : cp->first;
+void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, recti* cliprect, bool load_image) {
+	int code = cp->code;
+	int lcode = cp->code;
+	if(!lflist->content.count(lcode) && cp->alias)
+		lcode = cp->alias;
 	irr::video::ITexture* img = load_image ? imageManager.GetTextureThumb(code) : imageManager.tUnknown;
 	if (img == NULL)
 		return; //NULL->getSize() will cause a crash
@@ -1222,61 +1222,61 @@ void Game::DrawDeckBd() {
 	//loads the thumb of one card before and one after to make the scroll smoother
 	int i = (card_position > 0) ? -1 : 0;
 	for(; i < 9 && (i + card_position) < (int)deckBuilder.results.size(); ++i) {
-		code_pointer ptr = deckBuilder.results[i + card_position];
+		auto ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
 		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect, draw_thumb);
-		if(ptr->second.type & TYPE_MONSTER) {
-			buffer = dataManager.GetName(ptr->first);
+		if(ptr->type & TYPE_MONSTER) {
+			buffer = dataManager.GetName(ptr->code);
 			textFont->draw(buffer.c_str(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
 			textFont->draw(buffer.c_str(), Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
-			if (ptr->second.type & TYPE_LINK) {
-				buffer = fmt::format(L"{}/{}", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race));
+			if (ptr->type & TYPE_LINK) {
+				buffer = fmt::format(L"{}/{}", dataManager.FormatAttribute(ptr->attribute), dataManager.FormatRace(ptr->race));
 				textFont->draw(buffer.c_str(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
 				textFont->draw(buffer.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-				if(ptr->second.attack < 0)
-					buffer = L"?/Link " + fmt::format(L"{}	", ptr->second.level);
+				if(ptr->attack < 0)
+					buffer = L"?/Link " + fmt::format(L"{}	", ptr->level);
 				else
-					buffer = fmt::format(L"{}/Link {}	", ptr->second.attack, ptr->second.level);
+					buffer = fmt::format(L"{}/Link {}	", ptr->attack, ptr->level);
 			} else {
 				const wchar_t* form = L"\u2605";
-				if(ptr->second.type & TYPE_XYZ) form = L"\u2606";
-				buffer = fmt::format(L"{}/{} {}{}", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), form, ptr->second.level);
+				if(ptr->type & TYPE_XYZ) form = L"\u2606";
+				buffer = fmt::format(L"{}/{} {}{}", dataManager.FormatAttribute(ptr->attribute), dataManager.FormatRace(ptr->race), form, ptr->level);
 				textFont->draw(buffer.c_str(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
 				textFont->draw(buffer.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-				if(ptr->second.attack < 0 && ptr->second.defense < 0)
+				if(ptr->attack < 0 && ptr->defense < 0)
 					buffer = L"?/?";
-				else if(ptr->second.attack < 0)
-					buffer = fmt::format(L"?/{}", ptr->second.defense);
-				else if(ptr->second.defense < 0)
-					buffer = fmt::format(L"{}/?", ptr->second.attack);
+				else if(ptr->attack < 0)
+					buffer = fmt::format(L"?/{}", ptr->defense);
+				else if(ptr->defense < 0)
+					buffer = fmt::format(L"{}/?", ptr->attack);
 				else
-					buffer = fmt::format(L"{}/{}", ptr->second.attack, ptr->second.defense);
+					buffer = fmt::format(L"{}/{}", ptr->attack, ptr->defense);
 			}
-			if(ptr->second.type & TYPE_PENDULUM) {
-				buffer.append(fmt::format(L" {}/{}", ptr->second.lscale, ptr->second.rscale));
+			if(ptr->type & TYPE_PENDULUM) {
+				buffer.append(fmt::format(L" {}/{}", ptr->lscale, ptr->rscale));
 			}
 			buffer.append(L" ");
 		} else {
-			buffer = dataManager.GetName(ptr->first);
+			buffer = dataManager.GetName(ptr->code);
 			textFont->draw(buffer.c_str(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
 			textFont->draw(buffer.c_str(), Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
-			buffer = dataManager.FormatType(ptr->second.type);
+			buffer = dataManager.FormatType(ptr->type);
 			textFont->draw(buffer.c_str(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
 			textFont->draw(buffer.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
 			buffer = L"";
 		}
-		if((ptr->second.ot & 0x1) == ptr->second.ot)
+		if((ptr->ot & 0x1) == ptr->ot)
 			buffer.append(L"[OCG]");
-		else if((ptr->second.ot & 0x2) == ptr->second.ot)
+		else if((ptr->ot & 0x2) == ptr->ot)
 			buffer.append(L"[TCG]");
-		else if((ptr->second.ot & 0x4) == ptr->second.ot)
+		else if((ptr->ot & 0x4) == ptr->ot)
 			buffer.append(L"[Anime]");
-		else if((ptr->second.ot & 0x8) == ptr->second.ot)
+		else if((ptr->ot & 0x8) == ptr->ot)
 			buffer.append(L"[Illegal]");
-		else if((ptr->second.ot & 0x10) == ptr->second.ot)
+		else if((ptr->ot & 0x10) == ptr->ot)
 			buffer.append(L"[VG]");
-		else if((ptr->second.ot & 0x20) == ptr->second.ot)
+		else if((ptr->ot & 0x20) == ptr->ot)
 			buffer.append(L"[Custom]");
 		textFont->draw(buffer.c_str(), Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
 		textFont->draw(buffer.c_str(), Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);

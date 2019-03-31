@@ -10,12 +10,16 @@ namespace ygo {
 
 class DataManager {
 public:
-	DataManager(): _datas(8192), _strings(8192) {}
+	DataManager() {}
+	~DataManager() {
+		for(auto& card : _datas)
+			delete card.second;
+	}
 	bool LoadDB(const std::string& file);
 	bool LoadStrings(const std::string& file);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
-	code_pointer GetCodePointer(int code);
+	CardDataC* GetCardData(int code);
 	bool GetString(int code, CardString* pStr);
 	std::wstring GetName(int code);
 	std::wstring GetText(int code);
@@ -33,7 +37,7 @@ public:
 	std::wstring FormatSetName(unsigned long long setcode);
 	std::wstring FormatLinkMarker(int link_marker);
 
-	std::unordered_map<unsigned int, CardDataC> _datas;
+	std::unordered_map<unsigned int, CardDataC*> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;

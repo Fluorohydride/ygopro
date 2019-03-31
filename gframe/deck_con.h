@@ -31,19 +31,19 @@ public:
 	void GetHoveredCard();
 	bool FiltersChanged();
 	void FilterCards(bool force_refresh = false);
-	bool CheckCard(const CardDataC& data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& setcode);
+	bool CheckCard(CardDataC* data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& setcode);
 	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
 	void ClearSearch();
 	void SortList();
 
-	bool push_main(code_pointer pointer, int seq = -1);
-	bool push_extra(code_pointer pointer, int seq = -1);
-	bool push_side(code_pointer pointer, int seq = -1);
+	bool push_main(CardDataC* pointer, int seq = -1);
+	bool push_extra(CardDataC* pointer, int seq = -1);
+	bool push_side(CardDataC* pointer, int seq = -1);
 	void pop_main(int seq);
 	void pop_extra(int seq);
 	void pop_side(int seq);
-	bool check_limit(code_pointer pointer);
+	bool check_limit(CardDataC* pointer);
 #define DECLARE_WITH_CACHE(type, name) type name;\
 										type prev_##name;
 	DECLARE_WITH_CACHE(long long, filter_effect)
@@ -73,13 +73,13 @@ public:
 	int scroll_pos;
 	int dragx;
 	int dragy;
-	code_pointer draging_pointer;
+	CardDataC* draging_pointer;
 	int prev_deck;
 	s32 prev_operation;
 
 	LFList* filterList;
-	std::map<std::wstring, std::vector<code_pointer>> searched_terms;
-	std::vector<code_pointer> results;
+	std::map<std::wstring, std::vector<CardDataC*>> searched_terms;
+	std::vector<CardDataC*> results;
 	std::wstring result_string;
 };
 

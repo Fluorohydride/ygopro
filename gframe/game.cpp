@@ -1344,7 +1344,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		if(cd.alias) {
 			auto aptr = dataManager._datas.find(cd.alias);
 			if(aptr != dataManager._datas.end())
-				sc = aptr->second.setcode;
+				sc = aptr->second->setcode;
 		}
 		if(sc) {
 			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(sc)).c_str());

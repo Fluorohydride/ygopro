@@ -51,8 +51,6 @@ struct loc_info {
 	u32 position;
 };
 
-typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
-
 class ClientCard {
 public:
 	irr::core::matrix4 mTransform;
@@ -124,10 +122,10 @@ public:
 	void ClearTarget();
 	static loc_info read_location_info(char*& p);
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
-	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
-	static bool deck_sort_atk(code_pointer l1, code_pointer l2);
-	static bool deck_sort_def(code_pointer l1, code_pointer l2);
-	static bool deck_sort_name(code_pointer l1, code_pointer l2);
+	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_def(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_name(CardDataC* l1, CardDataC* l2);
 };
 
 }
