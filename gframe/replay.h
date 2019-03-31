@@ -4,6 +4,7 @@
 #include "config.h"
 #include <ctime>
 #include <vector>
+#include <fstream>
 
 namespace ygo {
 
@@ -49,11 +50,11 @@ public:
 	Replay();
 	~Replay();
 	void BeginRecord(bool write = true);
-	void WriteStream(ReplayStream stream);
-	void WritePacket(ReplayPacket p);
+	void WriteStream(const ReplayStream& stream);
+	void WritePacket(const ReplayPacket& p);
 	template <typename  T>
-	void Write(const void* data, bool flush);
-	void Write(const void* data, size_t size, bool flush);
+	void Write(T data, bool flush);
+	void WritetoFile(const void* data, size_t size, bool flush);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
 	void WriteInt32(int32_t data, bool flush = true);
@@ -91,17 +92,10 @@ private:
 	bool ReadData(void* data, unsigned int length);
 	template <typename  T>
 	T Read();
-	int32_t ReadInt32();
-	int16_t ReadInt16();
-	int8_t ReadInt8();
 	bool ReadNextResponse(ReplayResponse* res);
 	bool ReadName(wchar_t* data);
 	bool ReadNextPacket(ReplayPacket* packet);
-#ifdef _WIN32
-	HANDLE fp;
-#else
-	FILE* fp;
-#endif
+	std::ofstream fp;
 	size_t data_position;
 	void ParseNames();
 	void ParseParams();
@@ -109,7 +103,6 @@ private:
 	void ParseStream();
 	bool ParseResponses();
 	bool is_recording;
-	bool is_writing;
 	bool is_replaying;
 	bool can_read;
 	std::vector<ReplayResponse> responses;

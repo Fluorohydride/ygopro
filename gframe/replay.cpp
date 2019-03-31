@@ -6,7 +6,7 @@
 namespace ygo {
 
 ReplayPacket::ReplayPacket(char* buf, int len) {
-	Set(BufferIO::ReadInt8(buf), buf, len);
+	Set(BufferIO::Read<int8_t>(buf), buf, len);
 }
 ReplayPacket::ReplayPacket(int msg, char* buf, int len) {
 	Set(msg, buf, len);
@@ -28,55 +28,39 @@ Replay::~Replay() {
 }
 void Replay::BeginRecord(bool write) {
 	Reset();
-#ifdef _WIN32
-	if(is_recording && is_writing)
-		CloseHandle(fp);
-	is_writing = write;
-	if(is_writing) {
-		fp = CreateFileW(L"./replay/_LastReplay.yrpX", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
-		if(fp == INVALID_HANDLE_VALUE)
+	if(fp.is_open())
+		fp.close();
+	is_recording = false;
+	if(write) {
+		fp.open("./replay/_LastReplay.yrpX", std::ofstream::binary);
+		if(!fp.is_open()) {
 			return;
+		}
 	}
-#else
-	if(is_recording && is_writing)
-		fclose(fp);
-	is_writing = write;
-	if(is_writing) {
-		fp = fopen("./replay/_LastReplay.yrpX", "wb");
-		if(!fp)
-			return;
-	}
-#endif
 	is_recording = true;
 }
-void Replay::WritePacket(ReplayPacket p) {
-	WriteInt8(p.message, false);
-	WriteInt32(p.data.size(), false);
+void Replay::WritePacket(const ReplayPacket& p) {
+	Write<int8_t>(p.message, false);
+	Write<int32_t>(p.data.size(), false);
 	WriteData((char*)p.data.data(), p.data.size());
 }
-void Replay::WriteStream(ReplayStream stream) {
-	for(auto packet : stream)
+void Replay::WriteStream(const ReplayStream& stream) {
+	for(auto& packet : stream)
 		WritePacket(packet);
 }
-void Replay::Write(const void* data, size_t size, bool flush){
-	if(!is_writing) return;
-#ifdef _WIN32
-	DWORD sizea;
-	WriteFile(fp, data, size, &sizea, NULL);
-#else
-	fwrite(data, size, 1, fp);
+void Replay::WritetoFile(const void* data, size_t size, bool flush){
+	if(!fp.is_open()) return;
+	fp.write((char*)data, size);
 	if(flush)
-		fflush(fp);
-#endif
-
+		fp.flush();
 }
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
-	Write<ReplayHeader>(&header, true);
+	Write<ReplayHeader>(header, true);
 }
 template<typename T>
-void Replay::Write(const void * data, bool flush) {
-	WriteData(data, sizeof(T), flush);
+void Replay::Write(T data, bool flush) {
+	WriteData(&data, sizeof(T), flush);
 }
 void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	if(!is_recording)
@@ -85,35 +69,28 @@ void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	replay_data.resize(vec_size + length);
 	if(length)
 		std::memcpy(&replay_data[vec_size], data, length);
-	Write(data, length, flush);
+	WritetoFile(data, length, flush);
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
-	Write<int32_t>(&data, flush);
+	Write<int32_t>(data, false);
 }
 void Replay::WriteInt16(int16_t data, bool flush) {
-	Write<int16_t>(&data, flush);
+	Write<int16_t>(data, false);
 }
 void Replay::WriteInt8(int8_t data, bool flush) {
-	Write<int8_t>(&data, flush);
+	Write<int8_t>(data, false);
 }
 void Replay::Flush() {
 	if(!is_recording)
 		return;
-	if(!is_writing) return;
-#ifdef _WIN32
-#else
-	fflush(fp);
-#endif
+	if(!fp.is_open()) return;
+	fp.flush();
 }
 void Replay::EndRecord(size_t size) {
 	if(!is_recording)
 		return;
-	if(is_writing)
-#ifdef _WIN32
-	CloseHandle(fp);
-#else
-	fclose(fp);
-#endif
+	if(fp.is_open())
+		fp.close();
 	pheader.datasize = replay_data.size() - sizeof(ReplayHeader);
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
@@ -234,7 +211,7 @@ ReplayDeck Replay::GetPlayerDecks() {
 bool Replay::ReadNextResponse(ReplayResponse* res) {
 	if(!can_read || !res)
 		return false;
-	res->length = ReadInt8();
+	res->length = Read<int8_t>();
 	if(res->length < 1)
 		return false;
 	res->response.resize(res->length);
@@ -255,16 +232,15 @@ void Replay::ParseNames() {
 void Replay::ParseParams() {
 	params = { 0 };
 	if(pheader.id == 0x31707279) {
-		params.start_lp = ReadInt32();
-		params.start_hand = ReadInt32();
-		params.draw_count = ReadInt32();
+		params.start_lp = Read<int32_t>();
+		params.start_hand = Read<int32_t>();
+		params.draw_count = Read<int32_t>();
 	}
-	params.duel_flags = ReadInt32();
+	params.duel_flags = Read<int32_t>();
 	if(pheader.flag & REPLAY_SINGLE_MODE && pheader.id == 0x31707279) {
-		size_t slen = ReadInt16();
+		size_t slen = Read<int16_t>();
 		scriptname.resize(slen);
 		ReadData(&scriptname[0], slen);
-		scriptname[slen] = 0;
 	}
 }
 void Replay::ParseDecks() {
@@ -274,24 +250,24 @@ void Replay::ParseDecks() {
 	int iterations = (pheader.flag & REPLAY_RELAY) ? 6 : (pheader.flag & REPLAY_TAG) ? 4 : 2;
 	for(int i = 0; i < iterations; i++) {
 		std::vector<int> main_deck;
-		int main = ReadInt32();
+		int main = Read<int32_t>();
 		for(int i = 0; i < main; ++i)
-			main_deck.push_back(ReadInt32());
+			main_deck.push_back(Read<int32_t>());
 		std::vector<int> extra_deck;
-		int extra = ReadInt32();
+		int extra = Read<int32_t>();
 		for(int i = 0; i < extra; ++i)
-			extra_deck.push_back(ReadInt32());
+			extra_deck.push_back(Read<int32_t>());
 		decks.push_back(std::make_pair(main_deck, extra_deck));
 	}
 }
 bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	if(!can_read)
 		return false;
-	unsigned char message = (unsigned char)ReadInt8();
+	unsigned char message = (unsigned char)Read<int8_t>();
 	if(!can_read)
 		return false;
 	packet->message = message;
-	int len = ReadInt32();
+	int len = Read<int32_t>();
 	if(!can_read || len == -1)
 		return false;
 	packet->data.resize(len);
@@ -306,7 +282,7 @@ void Replay::ParseStream() {
 	while(ReadNextPacket(&p)) {
 		if(p.message == MSG_AI_NAME) {
 			char* pbuf = (char*)p.data.data();
-			int len = BufferIO::ReadInt16(pbuf);
+			int len = BufferIO::Read<int16_t>(pbuf);
 			std::string namebuf;
 			namebuf.resize(len);
 			memcpy(&namebuf[0], pbuf, len + 1);
@@ -360,15 +336,6 @@ T Replay::Read() {
 	if(!ReadData(&ret, sizeof(T)))
 		return -1;
 	return ret;
-}
-int32_t Replay::ReadInt32() {
-	return Read<int32_t>();
-}
-int16_t Replay::ReadInt16() {
-	return Read<int16_t>();
-}
-int8_t Replay::ReadInt8() {
-	return Read<int8_t>();
 }
 void Replay::Rewind() {
 	data_position = 0;
