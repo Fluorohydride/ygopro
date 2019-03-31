@@ -101,6 +101,7 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);
+	mainGame->ErrorLog(error);
 	return false;
 }
 bool DataManager::GetData(int code, CardData* pData) {
