@@ -167,17 +167,15 @@ void CGUICustomText::draw()
 				if(hasVerticalAutoscrolling())
 					r.UpperLeftCorner.Y -= round((float)curFrame * animationStep);
 
-				for (u32 i= 0; i<BrokenText.size(); ++i)
-				{
-					if (HAlign == EGUIA_LOWERRIGHT)
-					{
+				for(u32 i = 0; i < BrokenText.size(); ++i) {
+					if(HAlign == EGUIA_LOWERRIGHT) {
 						r.UpperLeftCorner.X = frameRect.LowerRightCorner.X -
 							font->getDimension(BrokenText[i].c_str()).Width;
 					}
 
 					font->draw(BrokenText[i].c_str(), r,
-						OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
-						HAlign == EGUIA_CENTER, false, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
+							   OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
+							   HAlign == EGUIA_CENTER, false, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
 
 					r.LowerRightCorner.Y += height;
 					r.UpperLeftCorner.Y += height;
@@ -647,6 +645,7 @@ void CGUICustomText::setText(const wchar_t* text)
 
 void CGUICustomText::updateAbsolutePosition()
 {
+	auto prev_rect = RelativeRect;
 	IGUIElement::updateAbsolutePosition();
 	if(scrText) {
 		int width = RelativeRect.getWidth();
@@ -659,8 +658,10 @@ void CGUICustomText::updateAbsolutePosition()
 			width2 = width - round(width*0.1);
 		scrText->setRelativePosition(irr::core::rect<s32>(width2, 0, width, RelativeRect.getHeight()));
 	}
-	breakText();
-	updateAutoScrollingStuff();
+	if(prev_rect.getHeight() != RelativeRect.getHeight() || prev_rect.getWidth() != RelativeRect.getWidth()) {
+		breakText();
+		updateAutoScrollingStuff();
+	}
 }
 
 
