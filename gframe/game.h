@@ -114,7 +114,7 @@ public:
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
-	void CheckMutual(ClientCard* pcard, int mark);
+	bool CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawMisc();

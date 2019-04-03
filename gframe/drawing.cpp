@@ -264,6 +264,21 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			CheckMutual(pcard2, LINK_MARKER_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
 		}
+		if(mark & LINK_MARKER_BOTTOM_LEFT && dField.hovered_sequence > (0 + (dInfo.extraval & 0x1))) {
+			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
+			if(CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT))
+				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
+		}
+		if(mark & LINK_MARKER_BOTTOM_RIGHT && dField.hovered_sequence < (4 - (dInfo.extraval & 0x1))) {
+			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
+			if(CheckMutual(pcard2, LINK_MARKER_TOP_LEFT))
+				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
+		}
+		if(mark & LINK_MARKER_BOTTOM) {
+			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence];
+			if(CheckMutual(pcard2, LINK_MARKER_TOP))
+				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence], 4, matManager.iRectangle, 2);
+		}
 		if (dInfo.duel_field >= 4) {
 			if ((mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence == 2)
 				|| (mark & LINK_MARKER_TOP && dField.hovered_sequence == 1)
@@ -324,13 +339,15 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 		}
 	}
 }
-void Game::CheckMutual(ClientCard* pcard, int mark) {
+bool Game::CheckMutual(ClientCard* pcard, int mark) {
 	matManager.mSelField.AmbientColor = 0xff0261a2;
 	driver->setMaterial(matManager.mSelField);
 	if (pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
 		matManager.mSelField.AmbientColor = 0xff009900;
 		driver->setMaterial(matManager.mSelField);
+		return true;
 	}
+	return false;
 }
 void Game::DrawCards() {
 	for(int p = 0; p < 2; ++p) {
