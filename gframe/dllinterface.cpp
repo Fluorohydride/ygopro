@@ -155,7 +155,7 @@ void* LoadOCGcore(const std::string& path) {
 		return nullptr;
 	LOAD_FUNCTION(get_api_version);
 	int min;
-	if(get_api_version(&min) != 1 && min < 1) {
+	if(get_api_version(&min) != 1 && min != 2) {
 		UnloadCore(newcore);
 		return nullptr;
 	}

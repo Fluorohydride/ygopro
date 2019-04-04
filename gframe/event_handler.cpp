@@ -9,7 +9,7 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #include "materials.h"
-#include <bitset>
+#include "progressivebuffer.h"
 #include <algorithm>
 
 namespace ygo {
@@ -2192,10 +2192,10 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 	}
 }
 int GetSuitableReturn(uint32 maxseq, size_t size) {
-	int bitvaluesize = (maxseq < (3071 - (sizeof(int) * 8))) ? maxseq : -1;
-	int uint8size = (maxseq < 255 && size < (64 * 6 - 8)) ? size * 8 : -1;
-	int uint16size = (maxseq < 65535 && size < (32 * 6 - 4)) ? size * 16 : -1;
-	int uint32size = (maxseq < 4294967295 && size < (16 * 6 - 2)) ? size * 32 : -1;
+	int bitvaluesize = maxseq;
+	int uint8size = (maxseq < 255) ? size * 8 : -1;
+	int uint16size = (maxseq < 65535) ? size * 16 : -1;
+	int uint32size = (maxseq < 4294967295) ? size * 32 : -1;
 	int res = std::min((uint32)bitvaluesize, std::min((uint32)uint8size, std::min((uint32)uint16size, (uint32)uint32size)));
 	if(res == bitvaluesize)
 		return 1;
@@ -2210,55 +2210,45 @@ int GetSuitableReturn(uint32 maxseq, size_t size) {
 void ClientField::SetResponseSelectedCards() const {
 	if (mainGame->dInfo.lua64) {
 		if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD) {
-			unsigned int respbuf[16];
-			respbuf[0] = selected_cards.size();
-			for(size_t i = 0; i < selected_cards.size(); ++i)
-				respbuf[i + 1] = selected_cards[i]->select_seq;
-			DuelClient::SetResponseB((char*)respbuf, (selected_cards.size()*4) + 4);
+			unsigned int respbuf[] = { 1, selected_cards[0]->select_seq };
+			DuelClient::SetResponseB((char*)respbuf, sizeof(respbuf));
 		} else {
 			uint32 maxseq = 0;
 			size_t size = selected_cards.size();
-			for(auto c : selected_cards) {
+			for(auto& c : selected_cards) {
 				maxseq = std::max(maxseq, c->select_seq);
 			}
+			ProgressiveBuffer ret;
 			switch(GetSuitableReturn(maxseq, size)) {
 				case 1: {
-					std::bitset<64 * 8 * 6> bitvalue;
-					bitvalue.reset();
-					*(int*)&bitvalue = 3;
+					ret.at<int32>(0) = 3;
 					for(auto c : selected_cards)
-						bitvalue[c->select_seq + 1 + (sizeof(int) * 8)] = 1;
-					DuelClient::SetResponseB(&bitvalue, maxseq + 1 + sizeof(int));
+						ret.bitSet(c->select_seq + (sizeof(int) * 8));
 					break;
 				}
 				case 2:	{
-					unsigned char respbuf[64 * 6];
-					*(int*)&respbuf[0] = 2;
-					*(int*)&respbuf[4] = size;
+					ret.at<int32>(0) = 2;
+					ret.at<int32>(1) = size;
 					for(size_t i = 0; i < size; ++i)
-						respbuf[i + 8] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB((char*)respbuf, (size * 2) + 6);
+						ret.at<int8>(i + 8) = selected_cards[i]->select_seq;
 					break;
 				}
 				case 3:	{
-					unsigned short respbuf[32 * 6];
-					*(int*)&respbuf[0] = 1;
-					*(int*)&respbuf[2] = size;
+					ret.at<int32>(0) = 1;
+					ret.at<int32>(1) = size;
 					for(size_t i = 0; i < size; ++i)
-						respbuf[i + 4] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB((char*)respbuf, (size * 2) + 6);
+						ret.at<int16>(i + 4) = selected_cards[i]->select_seq;
 					break;
 				}
 				case 4:	{
-					unsigned int respbuf[16 * 6];
-					respbuf[0] = 0;
-					respbuf[1] = size;
+					ret.at<int32>(0) = 1;
+					ret.at<int32>(1) = size;
 					for(size_t i = 0; i < size; ++i)
-						respbuf[i + 2] = selected_cards[i]->select_seq;
-					DuelClient::SetResponseB((char*)respbuf, (size * 4) + 8);
+						ret.at<int32>(i + 2) = selected_cards[i]->select_seq;
 					break;
 				}
 			}
+			DuelClient::SetResponseB(ret.data.data(), ret.data.size());
 		}
 	} else {
 		unsigned char respbuf[64];
