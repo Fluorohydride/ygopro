@@ -268,7 +268,7 @@ void* ChangeOCGcore(const std::string& path, void *handle) {
 		return nullptr;
 	CHANGE_WITH_COPY_CHECK(get_api_version);
 	int min;
-	if(get_api_version(&min) != 1 && min < 1) {
+	if(get_api_version(&min) != 1 && min != 2) {
 		CloseLibrary(newcore);
 		RestoreFromCopies();
 		return nullptr;
