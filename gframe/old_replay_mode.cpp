@@ -13,6 +13,8 @@ namespace ygo {
 		return result;
 	}
 	int ReplayMode::OldReplayThread() {
+		mainGame->dInfo.isReplay = true;
+		mainGame->dInfo.isOldReplay = true;
 		if(!cur_replay.yrp) {
 			EndDuel();
 			return 0;
