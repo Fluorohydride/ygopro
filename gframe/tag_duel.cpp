@@ -413,16 +413,15 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		extracards.push_back(300);
 	if(host_info.extra_rules & DESTINY_DRAW)
 		extracards.push_back(511004000);
+	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
+		new_card(pduel, extracards[i], 0, 0, 0, 0, POS_FACEDOWN_DEFENSE);
+	}
 	last_replay.WriteInt32(pdeck[0].main.size(), false);
 	for(int32 i = (int32)pdeck[0].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].main[i]->code, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[0].main[i]->code, false);
 	}
-	last_replay.WriteInt32(pdeck[0].extra.size() + extracards.size(), false);
-	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
-		new_card(pduel, extracards[i], 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(extracards[i], false);
-	}
+	last_replay.WriteInt32(pdeck[0].extra.size(), false);
 	for(int32 i = (int32)pdeck[0].extra.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].extra[i]->code, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(pdeck[0].extra[i]->code, false);
@@ -459,6 +458,10 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	for(int32 i = (int32)pdeck[2].extra.size() - 1; i >= 0; --i) {
 		new_tag_card(pduel, pdeck[2].extra[i]->code, 1, LOCATION_EXTRA);
 		last_replay.WriteInt32(pdeck[2].extra[i]->code, false);
+	}
+	last_replay.WriteInt32(extracards.size(), false);
+	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
+		last_replay.WriteInt32(extracards[i], false);
 	}
 	last_replay.Flush();
 	char startbuf[32], *pbuf = startbuf;

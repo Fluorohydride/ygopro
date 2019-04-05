@@ -36,7 +36,11 @@ public:
 	std::vector<unsigned char> data;
 };
 
-using ReplayDeck = std::vector<std::pair<std::vector<int>, std::vector<int>>>;
+struct ReplayDeck {
+	std::vector<int> main_deck, extra_deck;
+};
+
+using ReplayDeckList = std::vector<ReplayDeck>;
 using ReplayStream = std::vector<ReplayPacket>;
 
 struct ReplayResponse {
@@ -70,7 +74,8 @@ public:
 	static bool RenameReplay(const std::wstring& oldname, const std::wstring& newname);
 	bool GetNextResponse(ReplayResponse* res);
 	std::vector<std::wstring> GetPlayerNames();
-	ReplayDeck GetPlayerDecks();
+	ReplayDeckList GetPlayerDecks();
+	std::vector<int> GetRuleCards();
 	ReplayStream packets_stream;
 	void Rewind();
 	std::unique_ptr<Replay> yrp;
@@ -108,9 +113,14 @@ private:
 	std::vector<ReplayResponse> responses;
 	std::vector<std::wstring> players;
 	std::wstring replay_name;
-	ReplayDeck decks;
+	ReplayDeckList decks;
+	std::vector<int> replay_custom_rule_cards;
 	std::vector<ReplayResponse>::iterator responses_iterator;
 };
+template<typename T>
+inline void Replay::Write(T data, bool flush) {
+	WriteData(&data, sizeof(T), flush);
+}
 
 }
 

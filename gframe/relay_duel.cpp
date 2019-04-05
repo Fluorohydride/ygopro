@@ -451,35 +451,37 @@ void RelayDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		extracards.push_back(300);
 	if(host_info.extra_rules & DESTINY_DRAW)
 		extracards.push_back(511004000);
+	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
+		new_card(pduel, extracards[i], 0, 0, 0, 0, POS_FACEDOWN_DEFENSE);
+	}
 	last_replay.WriteInt32(players[startp[0]].pdeck.main.size(), false);
 	for(int32 i = (int32)players[startp[0]].pdeck.main.size() - 1; i >= 0; --i) {
 		new_card(pduel, players[startp[0]].pdeck.main[i]->code, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(players[startp[0]].pdeck.main[i]->code, false);
 	}
-	last_replay.WriteInt32(players[startp[0]].pdeck.extra.size() + extracards.size(), false);
-	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
-		new_card(pduel, extracards[i], 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-		last_replay.WriteInt32(extracards[i], false);
-	}
+	last_replay.WriteInt32(players[startp[0]].pdeck.extra.size(), false);
 	for(int32 i = (int32)players[startp[0]].pdeck.extra.size() - 1; i >= 0; --i) {
 		new_card(pduel, players[startp[0]].pdeck.extra[i]->code, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
 		last_replay.WriteInt32(players[startp[0]].pdeck.extra[i]->code, false);
 	}
 	//
-	for(int p = startp[0] + 1, num = 1; p < 3; p++)
+	for(int p = startp[0] + 1, num = 1; p < 3; p++) {
 		if(players[p].player) {
 			last_replay.WriteInt32(players[p].pdeck.main.size(), false);
-			for (int32 i = (int32)players[p].pdeck.main.size() - 1; i >= 0; --i) {
+			for(int32 i = (int32)players[p].pdeck.main.size() - 1; i >= 0; --i) {
 				new_relay_card(pduel, players[p].pdeck.main[i]->code, 0, LOCATION_DECK, num);
 				last_replay.WriteInt32(players[p].pdeck.main[i]->code, false);
 			}
 			last_replay.WriteInt32(players[p].pdeck.extra.size(), false);
-			for (int32 i = (int32)players[p].pdeck.extra.size() - 1; i >= 0; --i) {
+			for(int32 i = (int32)players[p].pdeck.extra.size() - 1; i >= 0; --i) {
 				new_relay_card(pduel, players[p].pdeck.extra[i]->code, 0, LOCATION_EXTRA, num);
 				last_replay.WriteInt32(players[p].pdeck.extra[i]->code, false);
 			}
 			num++;
+		} else {
+			last_replay.Write<uint64_t>(0, false);
 		}
+	}
 	//
 	last_replay.WriteInt32(players[startp[1]].pdeck.main.size(), false);
 	for(int32 i = (int32)players[startp[1]].pdeck.main.size() - 1; i >= 0; --i) {
@@ -492,20 +494,27 @@ void RelayDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		last_replay.WriteInt32(players[startp[1]].pdeck.extra[i]->code, false);
 	}
 	//
-	for(int p = startp[1] + 1, num = 1; p < 6; p++)
+	for(int p = startp[1] + 1, num = 1; p < 6; p++) {
 		if(players[p].player) {
 			last_replay.WriteInt32(players[p].pdeck.main.size(), false);
-			for (int32 i = (int32)players[p].pdeck.main.size() - 1; i >= 0; --i) {
+			for(int32 i = (int32)players[p].pdeck.main.size() - 1; i >= 0; --i) {
 				new_relay_card(pduel, players[p].pdeck.main[i]->code, 1, LOCATION_DECK, num);
 				last_replay.WriteInt32(players[p].pdeck.main[i]->code, false);
 			}
 			last_replay.WriteInt32(players[p].pdeck.extra.size(), false);
-			for (int32 i = (int32)players[p].pdeck.extra.size() - 1; i >= 0; --i) {
+			for(int32 i = (int32)players[p].pdeck.extra.size() - 1; i >= 0; --i) {
 				new_relay_card(pduel, players[p].pdeck.extra[i]->code, 1, LOCATION_EXTRA, num);
 				last_replay.WriteInt32(players[p].pdeck.extra[i]->code, false);
 			}
 			num++;
+		} else {
+			last_replay.Write<int64>(0, false);
 		}
+	}
+	last_replay.WriteInt32(extracards.size(), false);
+	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
+		last_replay.WriteInt32(extracards[i], false);
+	}
 	last_replay.Flush();
 	char startbuf[32], *pbuf = startbuf;
 	BufferIO::WriteInt8(pbuf, MSG_START);

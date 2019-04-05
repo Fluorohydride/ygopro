@@ -58,10 +58,6 @@ void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
 	Write<ReplayHeader>(header, true);
 }
-template<typename T>
-void Replay::Write(T data, bool flush) {
-	WriteData(&data, sizeof(T), flush);
-}
 void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	if(!is_recording)
 		return;
@@ -205,8 +201,11 @@ bool Replay::GetNextResponse(ReplayResponse* res) {
 std::vector<std::wstring> Replay::GetPlayerNames() {
 	return players;
 }
-ReplayDeck Replay::GetPlayerDecks() {
+ReplayDeckList Replay::GetPlayerDecks() {
 	return decks;
+}
+std::vector<int> Replay::GetRuleCards() {
+	return replay_custom_rule_cards;
 }
 bool Replay::ReadNextResponse(ReplayResponse* res) {
 	if(!can_read || !res)
@@ -249,16 +248,20 @@ void Replay::ParseDecks() {
 		return;
 	int iterations = (pheader.flag & REPLAY_RELAY) ? 6 : (pheader.flag & REPLAY_TAG) ? 4 : 2;
 	for(int i = 0; i < iterations; i++) {
-		std::vector<int> main_deck;
+		ReplayDeck tmp;
 		int main = Read<int32_t>();
 		for(int i = 0; i < main; ++i)
-			main_deck.push_back(Read<int32_t>());
+			tmp.main_deck.push_back(Read<int32_t>());
 		std::vector<int> extra_deck;
 		int extra = Read<int32_t>();
 		for(int i = 0; i < extra; ++i)
-			extra_deck.push_back(Read<int32_t>());
-		decks.push_back(std::make_pair(main_deck, extra_deck));
+			tmp.extra_deck.push_back(Read<int32_t>());
+		decks.push_back(tmp);
 	}
+	replay_custom_rule_cards.clear();
+	int rules = Read<int32_t>();
+	for(int i = 0; i < rules; ++i)
+		replay_custom_rule_cards.push_back(Read<int32_t>());
 }
 bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	if(!can_read)
