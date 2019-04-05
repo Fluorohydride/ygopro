@@ -562,7 +562,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(hovered_pos == 0 || hovered_seq == -1)
 					break;
 				auto pointer = dataManager.GetCardData(hovered_code);
-				if(pointer)
+				if(!pointer)
 					break;
 				if(hovered_pos == 1) {
 					if(push_side(pointer))
@@ -589,7 +589,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					pop_side(hovered_seq);
 				} else {
 					auto pointer = dataManager.GetCardData(hovered_code);
-					if(pointer)
+					if(!pointer)
 						break;
 					if(event.MouseInput.Shift)
 						push_side(pointer);
