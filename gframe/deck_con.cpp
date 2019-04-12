@@ -185,11 +185,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				mainGame->gMutex.Lock();
 				mainGame->wDeckCode->setText(dataManager.GetSysString(1387));
-				wchar_t deck_code[2048];
-				char deck_code_utf8[1024];
-				deckManager.SaveDeckToCode(deckManager.current_deck, deck_code_utf8);
-				BufferIO::DecodeUTF8(deck_code_utf8, deck_code);
-				mainGame->ebDeckCode->setText(deck_code);
+				if(deckManager.current_deck.main.size() > 0 || deckManager.current_deck.extra.size() > 0 || deckManager.current_deck.side.size() > 0) {
+					wchar_t deck_code[2048];
+					char deck_code_utf8[1024];
+					deckManager.SaveDeckToCode(deckManager.current_deck, deck_code_utf8);
+					BufferIO::DecodeUTF8(deck_code_utf8, deck_code);
+					mainGame->ebDeckCode->setText(deck_code);
+				} else
+					mainGame->ebDeckCode->setText(L"");
 				mainGame->PopupElement(mainGame->wDeckCode);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
