@@ -515,11 +515,7 @@ bool Game::Initialize() {
 	btnSideSort->setVisible(false);
 	btnSideReload = env->addButton(rect<s32>(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, dataManager.GetSysString(1309));
 	btnSideReload->setVisible(false);
-<<<<<<< HEAD
-=======
-	btnRenameDeck = env->addButton(rect<s32>(170, 99, 220, 120), wDeckEdit, BUTTON_RENAME_DECK, dataManager.GetSysString(1362));
 	btnDeckCode = env->addButton(rect<s32>(225, 5, 290, 30), wDeckEdit, BUTTON_DECK_CODE, dataManager.GetSysString(1387));
->>>>>>> df2434cc... finish
 	//
 	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(10);
@@ -1579,11 +1575,7 @@ void Game::OnResize() {
 	btnSideSort->setRelativePosition(Resize(375, 100, 435, 130));
 	btnSideReload->setRelativePosition(Resize(440, 100, 500, 130));
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
-<<<<<<< HEAD
-=======
-	btnRenameDeck->setRelativePosition(Resize(170, 99, 220, 120));
 	btnDeckCode->setRelativePosition(Resize(225, 5, 290, 30));
->>>>>>> df2434cc... finish
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
