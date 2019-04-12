@@ -179,6 +179,44 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case BUTTON_DECK_CODE: {
+				int sel = mainGame->cbDBDecks->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->gMutex.Lock();
+				mainGame->wDeckCode->setText(dataManager.GetSysString(1387));
+				wchar_t deck_code[2048];
+				char deck_code_utf8[1024];
+				deckManager.SaveDeckToCode(deckManager.current_deck, deck_code_utf8);
+				BufferIO::DecodeUTF8(deck_code_utf8, deck_code);
+				mainGame->ebDeckCode->setText(deck_code);
+				mainGame->PopupElement(mainGame->wDeckCode);
+				mainGame->gMutex.Unlock();
+				prev_operation = id;
+				prev_sel = sel;
+				break;
+			}
+			case BUTTON_DECK_CODE_SAVE: {
+				mainGame->HideElement(mainGame->wDeckCode);
+				if(prev_operation == BUTTON_DECK_CODE) {
+					Deck new_deck;
+					char deck_code[1024];
+					BufferIO::EncodeUTF8(mainGame->ebDeckCode->getText(), deck_code);
+					if(deckManager.LoadDeckFromCode(new_deck, deck_code, strlen(deck_code)))
+						deckManager.current_deck = new_deck;
+					else
+						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1389));
+				}
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
+			case BUTTON_DECK_CODE_CANCEL: {
+				mainGame->HideElement(mainGame->wDeckCode);
+				prev_operation = 0;
+				prev_sel = -1;
+				break;
+			}
 			case BUTTON_DELETE_DECK: {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel == -1)

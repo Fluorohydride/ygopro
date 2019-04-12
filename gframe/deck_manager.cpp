@@ -2,6 +2,7 @@
 #include "data_manager.h"
 #include "network.h"
 #include "game.h"
+#include "base64.h"
 #include <algorithm>
 
 namespace ygo {
@@ -265,5 +266,30 @@ bool DeckManager::DeleteDeck(Deck& deck, const wchar_t* name) {
 	int result = unlink(filefn);
 	return result == 0;
 #endif
+}
+bool DeckManager::LoadDeckFromCode(Deck& deck, const char *code, int len) {
+	char data[1024], *pdeck = data, *data_ = data;
+	int decoded_len = Base64::DecodedLength(code, len);
+	if(decoded_len < 8 || !Base64::Decode(code, len, data_, decoded_len))
+		return false;
+	int mainc = BufferIO::ReadInt32(pdeck);
+	int sidec = BufferIO::ReadInt32(pdeck);
+	int errorcode = LoadDeck(deck, (int*)pdeck, mainc, sidec);
+	return (errorcode == 0);
+}
+int DeckManager::SaveDeckToCode(Deck& deck, char* code) {
+	char deckbuf[1024], *pdeck = deckbuf;
+	BufferIO::WriteInt32(pdeck, deck.main.size() + deck.extra.size());
+	BufferIO::WriteInt32(pdeck, deck.side.size());
+	for(size_t i = 0; i < deck.main.size(); ++i)
+		BufferIO::WriteInt32(pdeck, deck.main[i]->first);
+	for(size_t i = 0; i < deck.extra.size(); ++i)
+		BufferIO::WriteInt32(pdeck, deck.extra[i]->first);
+	for(size_t i = 0; i < deck.side.size(); ++i)
+		BufferIO::WriteInt32(pdeck, deck.side[i]->first);
+	int len = pdeck - deckbuf;
+	int encoded_len = Base64::EncodedLength(len);
+	Base64::Encode(deckbuf, len, code, encoded_len);
+	return encoded_len;
 }
 }

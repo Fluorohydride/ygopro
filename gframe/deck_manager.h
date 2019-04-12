@@ -45,6 +45,8 @@ public:
 	bool LoadDeck(const wchar_t* file);
 	bool SaveDeck(Deck& deck, const wchar_t* name);
 	bool DeleteDeck(Deck& deck, const wchar_t* name);
+	bool LoadDeckFromCode(Deck& deck, const char *code, int len);
+	int SaveDeckToCode(Deck &deck, char *code);
 };
 
 extern DeckManager deckManager;

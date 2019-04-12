@@ -515,11 +515,25 @@ bool Game::Initialize() {
 	btnSideSort->setVisible(false);
 	btnSideReload = env->addButton(rect<s32>(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, dataManager.GetSysString(1309));
 	btnSideReload->setVisible(false);
+<<<<<<< HEAD
+=======
+	btnRenameDeck = env->addButton(rect<s32>(170, 99, 220, 120), wDeckEdit, BUTTON_RENAME_DECK, dataManager.GetSysString(1362));
+	btnDeckCode = env->addButton(rect<s32>(225, 5, 290, 30), wDeckEdit, BUTTON_DECK_CODE, dataManager.GetSysString(1387));
+>>>>>>> df2434cc... finish
 	//
 	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(10);
 	scrFilter->setSmallStep(1);
 	scrFilter->setVisible(false);
+	//deck code
+	wDeckCode = env->addWindow(rect<s32>(510, 200, 820, 320), false, dataManager.GetSysString(1387));
+	wDeckCode->getCloseButton()->setVisible(false);
+	wDeckCode->setVisible(false);
+	env->addStaticText(dataManager.GetSysString(1388), rect<s32>(20, 25, 290, 45), false, false, wDeckCode);
+	ebDeckCode =  env->addEditBox(L"", rect<s32>(20, 50, 290, 70), true, wDeckCode, -1);
+	ebREName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	btnDeckCodeYes = env->addButton(rect<s32>(70, 80, 140, 105), wDeckCode, BUTTON_DECK_CODE_SAVE, dataManager.GetSysString(1341));
+	btnDeckCodeNo = env->addButton(rect<s32>(170, 80, 240, 105), wDeckCode, BUTTON_DECK_CODE_CANCEL, dataManager.GetSysString(1212));
 	//sort type
 	wSort = env->addStaticText(L"", rect<s32>(930, 132, 1020, 156), true, false, 0, -1, true);
 	cbSortType = env->addComboBox(rect<s32>(10, 2, 85, 22), wSort, COMBOBOX_SORTTYPE);
@@ -1565,6 +1579,11 @@ void Game::OnResize() {
 	btnSideSort->setRelativePosition(Resize(375, 100, 435, 130));
 	btnSideReload->setRelativePosition(Resize(440, 100, 500, 130));
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
+<<<<<<< HEAD
+=======
+	btnRenameDeck->setRelativePosition(Resize(170, 99, 220, 120));
+	btnDeckCode->setRelativePosition(Resize(225, 5, 290, 30));
+>>>>>>> df2434cc... finish
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
