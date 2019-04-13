@@ -174,11 +174,13 @@ int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid
 		return 0;
 	}, &count);
 
-	git_repository_fetchhead_foreach(repo, [](const char *ref_name, const char *remote_url, const git_oid *oid, unsigned int is_merge, void *payload)->int {
-		git_oid* id = static_cast<git_oid*>(payload);
-		*id = *oid;
-		return 1;
-	}, id);
+	if(id) {
+		git_repository_fetchhead_foreach(repo, [](const char *ref_name, const char *remote_url, const git_oid *oid, unsigned int is_merge, void *payload)->int {
+			git_oid* id = static_cast<git_oid*>(payload);
+			*id = *oid;
+			return 1;
+		}, id);
+	}
 
 	struct {
 		RepoManager* repo_manager = nullptr;
@@ -198,7 +200,7 @@ int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid
 }
 
 
-git_commit * getLastCommit(git_repository * repo) {
+git_commit * getLastCommit(git_repository * repo, git_oid* id) {
 	int rc;
 	git_commit * commit = nullptr; /* the result */
 	git_oid oid_parent_commit;  /* the SHA1 for last commit */
@@ -209,6 +211,8 @@ git_commit * getLastCommit(git_repository * repo) {
 		/* get the actual commit structure */
 		rc = git_commit_lookup(&commit, repo, &oid_parent_commit);
 		if(rc == 0) {
+			if(id)
+				*id = oid_parent_commit;
 			return commit;
 		}
 	}
@@ -246,16 +250,18 @@ std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
 		git_commit *c;
 		git_commit_lookup(&c, repo, &oid);
 		if(!memcmp(oid.id,id.id, sizeof(oid.id)))
-			res.clear();
+			break;
 		std::string message = git_commit_message(c);
 		std::string author = git_commit_author(c)->name;
 		git_commit_free(c);
-		res.push_back(message + "\n" + author);
+		res.push_back(message + "\n by " + author);
+		if(res.size() >= 30)
+			break;
 	}
 	res.insert(res.begin(), "");
 	return res;
 }
-std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
+std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 	git_libgit2_init();
 	git_repository *repo = nullptr;
 	int res = 0;
@@ -272,12 +278,12 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 			for(auto& file : modified) {
 				Utils::Deletefile(_repo.repo_path + "/" + file);
 			}
-			git_commit* commit = getLastCommit(repo);
+			git_commit* commit = getLastCommit(repo, &id);
 			if(commit) {
 				git_reset(repo, (git_object*)commit, GIT_RESET_HARD, nullptr);
 				git_commit_free(commit);
 			}
-			res = jsgitpull(repo, _repo.repo_path, &id);
+			res = jsgitpull(repo, _repo.repo_path, nullptr);
 		} else {
 			UpdateStatus(_repo.repo_path, 100);
 		}
@@ -303,17 +309,21 @@ std::vector<std::string> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 		opts.fetch_opts.callbacks.payload = &payload;
 		res = git_clone(&repo, _repo.url.c_str(), _repo.repo_path.c_str(), &opts);
 	}
+	std::vector<std::string> new_commits;
 	if(res < 0) {
 		const git_error *e = giterr_last();
 		if(e)
-			return { e->message };
+			return { { e->message }, new_commits };
 		git_libgit2_shutdown();
-		return { "Unknown error" };
+		return {{ "Unknown error" }, new_commits };
 	}
-	auto commits = GetCommitsInfo(repo, id);
+	if(id.id) {
+		new_commits = GetCommitsInfo(repo, id);
+	}
+	auto all_commits = GetCommitsInfo(repo, { 0 });
 	git_repository_free(repo);
 	git_libgit2_shutdown();
-	return commits;
+	return { all_commits, new_commits };
 }
 
 void RepoManager::UpdateReadyRepos() {
@@ -322,9 +332,10 @@ void RepoManager::UpdateReadyRepos() {
 			auto results = it->second.get();
 			for(auto& repo : available_repos) {
 				if(repo.repo_path == it->first) {
-					repo.error = results[0];
-					results.erase(results.begin());
-					repo.commit_history = results;
+					repo.error = results.first[0];
+					results.first.erase(results.first.begin());
+					repo.commit_history_full = results.first;
+					repo.commit_history_partial = results.second;
 					repo.ready = true;
 					break;
 				}

@@ -131,6 +131,14 @@ bool Game::Initialize() {
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 #endif
+	wCommitsLog = env->addWindow(rect<s32>(0, 0, 500 + 10, 400 + 35 + 35), false, L"Update log");
+	wCommitsLog->setVisible(false);
+	wCommitsLog->getCloseButton()->setEnabled(false);
+	wCommitsLog->getCloseButton()->setVisible(false);
+	stCommitLog = irr::gui::CGUICustomText::addCustomText(L"", false, env, wCommitsLog, -1, rect<s32>(5, 30, 505, 430));
+	stCommitLog->setWordWrap(true);
+	((CGUICustomText*)stCommitLog)->enableScrollBar(0, 0.04f);
+	btnCommitLogExit = env->addButton(rect<s32>(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, L"OK");
 	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
 	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(2045).c_str(), 1, true, true));
 	//main menu
@@ -908,6 +916,25 @@ void Game::MainLoop() {
 					cores_to_load.insert(cores_to_load.begin(), repo.core_path);
 #endif
 				}
+				std::wstring text;
+				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += BufferIO::DecodeUTF8s(n) + L"\n\n"; });
+				if(text.size())
+					text.erase(text.size() - 2, 2);
+				repoInfoGui[repo.repo_path].commit_history_full = text;
+				repoInfoGui[repo.repo_path].commit_history_partial.clear();
+				if(repo.commit_history_partial.size()) {
+					if(repo.commit_history_full.front() == repo.commit_history_partial.front() && repo.commit_history_full.back() == repo.commit_history_partial.back()) {
+						repoInfoGui[repo.repo_path].commit_history_partial = repoInfoGui[repo.repo_path].commit_history_full;
+					} else {
+						text.clear();
+						std::for_each(repo.commit_history_partial.begin(), repo.commit_history_partial.end(), [&text](const std::string& n) { text += BufferIO::DecodeUTF8s(n) + L"\n\n"; });
+						if(text.size())
+							text.erase(text.size() - 2, 2);
+						repoInfoGui[repo.repo_path].commit_history_partial = text;
+					}
+				}
+				repoInfoGui[repo.repo_path].history_button1->setEnabled(true);
+
 			}
 			if(refresh_db && is_building && deckBuilder.results.size())
 				deckBuilder.StartFilter(true);
@@ -941,8 +968,8 @@ void Game::MainLoop() {
 		}
 #endif //YGOPRO_BUILD_DLL
 		for(auto& repo : repoManager.GetRepoStatus()) {
-			repoInfoGui[repo.first].first->setProgress(repo.second);
-			repoInfoGui[repo.first].second->setProgress(repo.second);
+			repoInfoGui[repo.first].progress1->setProgress(repo.second);
+			repoInfoGui[repo.first].progress2->setProgress(repo.second);
 		}
 		if(gameConf.max_fps) {
 			int ndelta_time = timer->getRealTime() - prev_time;
@@ -1209,12 +1236,13 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	a->setDraggable(false);
 	a->setDrawTitlebar(false);
 	a->setDrawBackground(false);
-	env->addStaticText(name.c_str(), rect<s32>(5, 5, 170 + 295, 20 + 5), false, false, a);
-	IProgressBar * pb = new IProgressBar(env, rect<s32>(5, 20 + 15, 170 + 295, 20 + 30), -1, a);
-	pb->addBorder(1);
-	pb->drop();
+	env->addStaticText(name.c_str(), rect<s32>(5, 5, 90 + 295, 20 + 5), false, false, a);
+	repoInfoGui[repo.repo_path].progress1 = new IProgressBar(env, rect<s32>(5, 20 + 15, 170 + 295, 20 + 30), -1, a);
+	repoInfoGui[repo.repo_path].progress1->addBorder(1);
+	repoInfoGui[repo.repo_path].progress1->drop();
 	((CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
-	repoInfoGui[repo.repo_path].first = pb;
+	repoInfoGui[repo.repo_path].history_button1 = env->addButton(rect<s32>(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, L"Changelog");
+	repoInfoGui[repo.repo_path].history_button1->setEnabled(false);
 
 	auto b = env->addWindow(rect<s32>(0, 0, 300, 55), false, L"", tabRepositories);
 	b->getCloseButton()->setVisible(false);
@@ -1222,11 +1250,10 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	b->setDrawTitlebar(false);
 	b->setDrawBackground(false);
 	env->addStaticText(name.c_str(), rect<s32>(5, 5, 300, 20 + 5), false, false, b);
-	pb = new IProgressBar(env, rect<s32>(5, 20 + 15, 300 - 5, 20 + 30), -1, b);
-	pb->addBorder(1);
-	pb->drop();
+	repoInfoGui[repo.repo_path].progress2 = new IProgressBar(env, rect<s32>(5, 20 + 15, 300 - 5, 20 + 30), -1, b);
+	repoInfoGui[repo.repo_path].progress2->addBorder(1);
+	repoInfoGui[repo.repo_path].progress2->drop();
 	((CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
-	repoInfoGui[repo.repo_path].second = pb;
 }
 #define JSON_SET_IF_VALID(field, jsontype, cpptype)if(obj[#field].is_##jsontype())\
 													tmp_repo.field = obj[#field].get<cpptype>();
@@ -1719,6 +1746,7 @@ void Game::SetMesageWindow() {
 }
 void Game::OnResize() {
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
+	SetCentered(wCommitsLog);
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
 	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
@@ -1802,7 +1830,7 @@ void Game::OnResize() {
 	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
 	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
 	for(auto& window : repoInfoGui) {
-		window.second.second->setRelativePosition(recti(5, 20 + 15, ((300 - 8) * window_size.Width) / 1024 , 20 + 30));
+		window.second.progress2->setRelativePosition(recti(5, 20 + 15, ((300 - 8) * window_size.Width) / 1024 , 20 + 30));
 	}
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
@@ -1874,6 +1902,9 @@ recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
 }
+void Game::SetCentered(irr::gui::IGUIElement * elem) {
+	elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight()));
+}
 recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2) {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
@@ -1882,6 +1913,14 @@ recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2) {
 	x2 = sx + x;
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
+}
+recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2) {
+	auto size = driver->getScreenSize();
+	recti rect(0, 0, size.Width, size.Height);
+	auto center = rect.getCenter();
+	core::dimension2d<u32> sizes((x + x2) / 2, (y + y2) / 2);
+	recti rect2(x, y, x2, y2);
+	return recti(center.X - sizes.Width, center.Y - sizes.Height, center.X + sizes.Width, center.Y + sizes.Height);
 }
 void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	std::wstring text = obj->getText();

@@ -28,7 +28,8 @@ public:
 		bool has_core = false;
 		bool ready = false;
 		std::string error = "";
-		std::vector<std::string> commit_history;
+		std::vector<std::string> commit_history_partial;
+		std::vector<std::string> commit_history_full;
 		bool Sanitize();
 	};
 	struct RepoPayload {
@@ -57,7 +58,7 @@ private:
 
 	std::vector<GitRepo> available_repos;
 
-	std::vector<std::string> CloneorUpdateThreaded(GitRepo repo);
+	std::pair<std::vector<std::string>, std::vector<std::string>> CloneorUpdateThreaded(GitRepo repo);
 
 	int jsgitpull(git_repository * repo, std::string repo_path, git_oid* id);
 
@@ -65,7 +66,7 @@ private:
 
 	void UpdateReadyRepos();
 	
-	std::map<std::string, std::future<std::vector<std::string>>> working_repos;
+	std::map<std::string, std::future<std::pair<std::vector<std::string>, std::vector<std::string>>>> working_repos;
 
 	std::map<std::string, int> repos_status;
 	std::mutex repos_status_mutex;

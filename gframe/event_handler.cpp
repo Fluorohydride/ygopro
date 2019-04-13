@@ -1731,6 +1731,22 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			case BUTTON_REPO_CHANGELOG:	{
+				irr::gui::IGUIButton* button = (irr::gui::IGUIButton*)event.GUIEvent.Caller;
+				for(auto& repo : mainGame->repoInfoGui) {
+					if(repo.second.history_button1 == button || repo.second.history_button2 == button) {
+						mainGame->stCommitLog->setText(repo.second.commit_history_full.c_str());
+						mainGame->SetCentered(mainGame->wCommitsLog);
+						mainGame->PopupElement(mainGame->wCommitsLog);
+						break;
+					}
+				}
+				return true;
+				break;
+			}
+			case BUTTON_REPO_CHANGELOG_EXIT: {
+				mainGame->HideElement(mainGame->wCommitsLog);
+			}
 			}
 			break;
 		}

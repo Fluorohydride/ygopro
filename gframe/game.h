@@ -167,7 +167,9 @@ public:
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
 	vector2d<s32> Resize(s32 x, s32 y, bool reverse = false);
 	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2);
+	recti ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
+	void SetCentered(irr::gui::IGUIElement* elem);
 	void ValidateName(irr::gui::IGUIElement* box);
 	static std::vector<std::wstring> TokenizeString(std::wstring input, const std::wstring& token);
 	static std::wstring StringtoUpper(std::wstring input);
@@ -199,9 +201,14 @@ public:
 	std::vector<std::string> BGMList;
 	struct RepoGui {
 		std::string path;
-		IProgressBar* progress;
+		IProgressBar* progress1;
+		IProgressBar* progress2;
+		irr::gui::IGUIButton* history_button1;
+		irr::gui::IGUIButton* history_button2;
+		std::wstring commit_history_full;
+		std::wstring commit_history_partial;
 	};
-	std::map<std::string, std::pair<IProgressBar*, IProgressBar*>> repoInfoGui;
+	std::map<std::string, RepoGui> repoInfoGui;
 
 	uint32 delta_time;
 	int hideChatTimer;
@@ -305,6 +312,7 @@ public:
 	irr::gui::IGUIScrollBar* srcVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
+	irr::gui::IGUIWindow* wCommitsLog;
 	irr::gui::IGUIContextMenu* mTopMenu;
 	irr::gui::IGUIContextMenu* mRepositoriesInfo;
 	irr::gui::IGUIButton* btnLanMode;
@@ -313,6 +321,8 @@ public:
 	irr::gui::IGUIButton* btnTestMode;
 	irr::gui::IGUIButton* btnDeckEdit;
 	irr::gui::IGUIButton* btnModeExit;
+	irr::gui::IGUIButton* btnCommitLogExit;
+	irr::gui::IGUIStaticText* stCommitLog;
 	//lan
 	irr::gui::IGUIWindow* wLanWindow;
 	irr::gui::IGUIEditBox* ebNickName;
@@ -674,6 +684,8 @@ extern Game* mainGame;
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define BUTTON_CLEAR_CHAT			272
+#define BUTTON_REPO_CHANGELOG		273
+#define BUTTON_REPO_CHANGELOG_EXIT	274
 #define BUTTON_DISPLAY_0			290
 #define BUTTON_DISPLAY_1			291
 #define BUTTON_DISPLAY_2			292
