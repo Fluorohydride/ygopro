@@ -1,6 +1,10 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
+#ifndef TEXT
+#define TEXT(x) x
+#endif
+
 #ifdef _WIN32
 
 #include <WinSock2.h>
@@ -13,10 +17,6 @@
 #else
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
-#endif
-
-#ifndef TEXT
-#define TEXT(x) x
 #endif
 
 #define socklen_t int
