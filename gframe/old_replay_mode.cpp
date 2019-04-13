@@ -143,57 +143,60 @@ namespace ygo {
 		mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 		mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
 		mainGame->dInfo.turn = 0;
+		auto rule_cards = cur_replay.yrp->GetRuleCards();
+		for(auto card : rule_cards)
+			new_card(pduel, card, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE);
 		auto decks = cur_replay.yrp->GetPlayerDecks();
 		if (!mainGame->dInfo.isSingleMode) {
 			if (opt & DUEL_RELAY_MODE) {
-				for(auto card : decks[0].first)
+				for(auto card : decks[0].main_deck)
 					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[0].second)
+				for(auto card : decks[0].extra_deck)
 					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, decks[0].first.size(), decks[0].second.size());
-				for(auto card : decks[1].first)
+				mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
+				for(auto card : decks[1].main_deck)
 					new_tag_card(pduel, card, 0, LOCATION_DECK);
-				for(auto card : decks[1].second)
+				for(auto card : decks[1].extra_deck)
 					new_tag_card(pduel, card, 0, LOCATION_EXTRA);
-				for(auto card : decks[2].first)
+				for(auto card : decks[2].main_deck)
 					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[2].second)
+				for(auto card : decks[2].extra_deck)
 					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, decks[2].first.size(), decks[2].second.size());
-				for(auto card : decks[3].first)
+				mainGame->dField.Initial(1, decks[2].main_deck.size(), decks[2].extra_deck.size());
+				for(auto card : decks[3].main_deck)
 					new_tag_card(pduel, card, 1, LOCATION_DECK);
-				for(auto card : decks[3].second)
+				for(auto card : decks[3].extra_deck)
 					new_tag_card(pduel, card, 1, LOCATION_EXTRA);
 			} else if (opt & DUEL_TAG_MODE) {
-				for(auto card : decks[0].first)
+				for(auto card : decks[0].main_deck)
 					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[0].second)
+				for(auto card : decks[0].extra_deck)
 					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, decks[0].first.size(), decks[0].second.size());
-				for(auto card : decks[1].first)
+				mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
+				for(auto card : decks[1].main_deck)
 					new_tag_card(pduel, card, 0, LOCATION_DECK);
-				for(auto card : decks[1].second)
+				for(auto card : decks[1].extra_deck)
 					new_tag_card(pduel, card, 0, LOCATION_EXTRA);
-				for(auto card : decks[2].first)
+				for(auto card : decks[2].main_deck)
 					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[2].second)
+				for(auto card : decks[2].extra_deck)
 					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, decks[2].first.size(), decks[2].second.size());
-				for(auto card : decks[3].first)
+				mainGame->dField.Initial(1, decks[2].main_deck.size(), decks[2].extra_deck.size());
+				for(auto card : decks[3].main_deck)
 					new_tag_card(pduel, card, 1, LOCATION_DECK);
-				for(auto card : decks[3].second)
+				for(auto card : decks[3].extra_deck)
 					new_tag_card(pduel, card, 1, LOCATION_EXTRA);
 			} else {
-				for(auto card : decks[0].first)
+				for(auto card : decks[0].main_deck)
 					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[0].second)
+				for(auto card : decks[0].extra_deck)
 					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, decks[0].first.size(), decks[0].second.size());
-				for(auto card : decks[1].first)
+				mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
+				for(auto card : decks[1].main_deck)
 					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[1].second)
+				for(auto card : decks[1].extra_deck)
 					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, decks[1].first.size(), decks[1].second.size());
+				mainGame->dField.Initial(1, decks[1].main_deck.size(), decks[1].extra_deck.size());
 			}
 		} else {
 			if(!preload_script(pduel, (char*)cur_replay.yrp->scriptname.c_str(), 0, 0, nullptr))
