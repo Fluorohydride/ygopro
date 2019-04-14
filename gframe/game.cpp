@@ -10,7 +10,7 @@
 #include "netserver.h"
 #include "single_mode.h"
 
-const unsigned short PRO_VERSION = 0x1348;
+const unsigned short PRO_VERSION = 0x1349;
 
 namespace ygo {
 
@@ -397,6 +397,10 @@ bool Game::Initialize() {
 	for(int i = 0; i < 5; ++i) {
 		btnOption[i] = env->addButton(rect<s32>(10, 30 + 40 * i, 340, 60 + 40 * i), wOptions, BUTTON_OPTION_0 + i, L"");
 	}
+	scrOption = env->addScrollBar(false, rect<s32>(350, 30, 365, 220), wOptions, SCROLL_OPTION_SELECT);
+	scrOption->setLargeStep(1);
+	scrOption->setSmallStep(1);
+	scrOption->setMin(0);
 	//pos select
 	wPosSelect = env->addWindow(rect<s32>(340, 200, 935, 410), false, dataManager.GetSysString(561));
 	wPosSelect->getCloseButton()->setVisible(false);
@@ -927,7 +931,13 @@ void Game::LoadExpansions() {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4)) {
 			wchar_t fpath[1024];
 			myswprintf(fpath, L"./expansions/%ls", name);
+#ifdef _WIN32
 			dataManager.FileSystem->addFileArchive(fpath, true, false);
+#else
+			char upath[1024];
+			BufferIO::EncodeUTF8(fpath, upath);
+			dataManager.FileSystem->addFileArchive(upath, true, false);
+#endif
 		}
 	});
 	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
@@ -943,7 +953,11 @@ void Game::LoadExpansions() {
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
 				dataManager.LoadDB(fname);
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
+#ifdef _WIN32
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
+#else
+				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(uname);
+#endif
 				dataManager.LoadStrings(reader);
 			}
 		}
@@ -1640,6 +1654,8 @@ void Game::OnResize() {
 	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
 	if(showingcode)
 		ShowCardInfo(showingcode, true);
+	else
+		ClearCardInfo();
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
 
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));

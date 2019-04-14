@@ -11,7 +11,13 @@ IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
 bool DataManager::LoadDB(const wchar_t* wfile) {
+	char file[256];
+	BufferIO::EncodeUTF8(wfile, file);
+#ifdef _WIN32
 	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(file);
+#endif
 	if(reader == NULL)
 		return false;
 	spmemvfs_db_t db;
@@ -22,8 +28,6 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	reader->read(mem->data, mem->total);
 	reader->drop();
 	(mem->data)[mem->total] = '\0';
-	char file[256];
-	BufferIO::EncodeUTF8(wfile, file);
 	if(spmemvfs_open_db(&db, file, mem) != SQLITE_OK)
 		return Error(&db);
 	sqlite3* pDB = db.handle;
@@ -362,9 +366,13 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 		return ScriptReader(second, slen);
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
+#ifdef _WIN32
 	wchar_t fname[256];
 	BufferIO::DecodeUTF8(script_name, fname);
 	IReadFile* reader = FileSystem->createAndOpenFile(fname);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(script_name);
+#endif
 	if(reader == NULL)
 		return 0;
 	size_t size = reader->getSize();
