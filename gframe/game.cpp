@@ -1841,7 +1841,6 @@ void Game::OnResize() {
 		ShowCardInfo(showingcard, true);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
 	btnClearChat->setRelativePosition(Resize(160, 300, 260, 325));
-	tabSystem->setRelativePosition(Resize(0, 0, 300, 364));
 	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
 
 	wChat->setRelativePosition(ResizeWin(wInfos->getRelativePosition().LowerRightCorner.X + 6, 615, 1020, 640, true));
