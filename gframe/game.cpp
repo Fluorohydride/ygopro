@@ -397,6 +397,10 @@ bool Game::Initialize() {
 	for(int i = 0; i < 5; ++i) {
 		btnOption[i] = env->addButton(rect<s32>(10, 30 + 40 * i, 340, 60 + 40 * i), wOptions, BUTTON_OPTION_0 + i, L"");
 	}
+	scrOption = env->addScrollBar(false, rect<s32>(350, 30, 365, 220), wOptions, SCROLL_OPTION_SELECT);
+	scrOption->setLargeStep(1);
+	scrOption->setSmallStep(1);
+	scrOption->setMin(0);
 	//pos select
 	wPosSelect = env->addWindow(rect<s32>(340, 200, 935, 410), false, dataManager.GetSysString(561));
 	wPosSelect->getCloseButton()->setVisible(false);
