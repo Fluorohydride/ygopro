@@ -2038,7 +2038,7 @@ std::vector<unsigned char> Game::LoadScript(const std::string& _name, int& slen)
 #ifdef _WIN32
 	std::wstring name = BufferIO::DecodeUTF8s(_name);
 #else
-	std::string name = name;
+	std::string name = _name;
 #endif
 	for(auto& path : script_dirs) {
 		script.open(path + name, std::ifstream::binary);
