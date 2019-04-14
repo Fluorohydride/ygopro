@@ -73,15 +73,15 @@ void CloseLibrary(void *handle) {
 
 #else
 
-void* OpenLibrary(const std::wstring& path) {
-	return OpenLibrary(BufferIO::EncodeUTF8s(path));
-}
 void* OpenLibrary(const std::string& path) {
 #ifdef __APPLE__
 	return dlopen((path + "libocgcore.dylib").c_str(), RTLD_LAZY);
 #else
 	return dlopen((path + "libocgcore.so").c_str(), RTLD_LAZY);
 #endif
+}
+void* OpenLibrary(const std::wstring& path) {
+	return OpenLibrary(BufferIO::EncodeUTF8s(path));
 }
 
 void CloseLibrary(void *handle) {
