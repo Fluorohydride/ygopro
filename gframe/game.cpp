@@ -400,7 +400,7 @@ bool Game::Initialize() {
 	scrOption = env->addScrollBar(false, rect<s32>(350, 30, 365, 220), wOptions, SCROLL_OPTION_SELECT);
 	scrOption->setLargeStep(1);
 	scrOption->setSmallStep(1);
-	mainGame->scrOption->setMin(0);
+	scrOption->setMin(0);
 	//pos select
 	wPosSelect = env->addWindow(rect<s32>(340, 200, 935, 410), false, dataManager.GetSysString(561));
 	wPosSelect->getCloseButton()->setVisible(false);

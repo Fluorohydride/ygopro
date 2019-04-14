@@ -388,7 +388,7 @@ public:
 	irr::gui::IGUIButton* btnOptionn;
 	irr::gui::IGUIButton* btnOptionOK;
 	irr::gui::IGUIButton* btnOption[5];
-	irr::gui::IGUIScrollBar *scrOption;
+	irr::gui::IGUIScrollBar* scrOption;
 	//pos selection
 	irr::gui::IGUIWindow* wPosSelect;
 	irr::gui::CGUIImageButton* btnPSAU;

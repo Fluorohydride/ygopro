@@ -606,24 +606,22 @@ void ClientField::ShowSelectOption(int select_hint) {
 		const wchar_t* option = dataManager.GetDesc(select_options[i]);
 		mainGame->btnOption[i]->setText(option);
 	}
-	recti pos = mainGame->wOptions->getRelativePosition();
-	if(count > 5 && quickmode)
-		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + 375;
-	else
-		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + 350;
 	if(quickmode) {
-		mainGame->scrOption->setVisible(count > 5);
+		bool scrollbar = count > 5;
+		mainGame->scrOption->setVisible(scrollbar);
 		mainGame->scrOption->setPos(0);
-		mainGame->scrOption->setMax(count - 5);
+		mainGame->scrOption->setMax(scrollbar ? (count - 5) : 1);
 		mainGame->stOptions->setVisible(false);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(false);
 		mainGame->btnOptionOK->setVisible(false);
 		for(int i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(i < count);
-		int newheight = 30 + 40 * ((count > 5) ? 5 : count);
+		recti pos = mainGame->wOptions->getRelativePosition();
+		int newheight = 30 + 40 * (scrollbar ? 5 : count);
 		int oldheight = pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y;
 		pos.UpperLeftCorner.Y = pos.UpperLeftCorner.Y + (oldheight - newheight) / 2;
+		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + (scrollbar ? 375 : 350);
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
 		mainGame->wOptions->setRelativePosition(pos);
 	} else {
