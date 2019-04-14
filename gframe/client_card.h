@@ -89,8 +89,7 @@ public:
 	u8 location;
 	u8 sequence;
 	u8 position;
-	u8 is_disabled;
-	u8 is_public;
+	u32 status;
 	u8 cHint;
 	u32 chValue;
 	u32 opParam;
