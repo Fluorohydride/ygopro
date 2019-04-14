@@ -185,7 +185,7 @@ namespace ygo {
 		if((dir = opendir(BufferIO::EncodeUTF8s(path).c_str())) != nullptr) {
 			struct stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
-				cb(BufferIO::DecodeUTF8s(dirp->d_name), !!S_ISDIR(fileStat.st_mode), payload));
+				cb(BufferIO::DecodeUTF8s(dirp->d_name), !!S_ISDIR(fileStat.st_mode), payload);
 			}
 			closedir(dir);
 		}
