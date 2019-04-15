@@ -191,6 +191,111 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
+std::wstring DeckManager::SaveToString(Deck& deck) {
+	static const wchar_t* base64_chars = L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+	auto m = deck.main;
+	auto e = deck.extra;
+	auto s = deck.side;
+	Sort(deck);
+	wchar_t deck_string[1024] = { 0 };
+	wchar_t* deck_pstr = deck_string;
+	for(size_t i = 0; i < deck.main.size(); ++i) {
+		uint32_t count = 1;
+		uint32_t code = deck.main[i]->second.code;
+		while(i < deck.main.size() - 1 && code == deck.main[i + 1]->second.code) {
+			count++;
+			i++;
+		}
+		uint32_t packed_data = (code & 0x7ffffff) | (count << 27);
+		deck_pstr[4] = base64_chars[packed_data & 0x3f];
+		deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
+		deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
+		deck_pstr[1] = base64_chars[(packed_data >> 18) & 0x3f];
+		deck_pstr[0] = base64_chars[(packed_data >> 24) & 0x3f];
+		deck_pstr += 5;
+	}
+	for(size_t i = 0; i < deck.extra.size(); ++i) {
+		uint32_t count = 1;
+		uint32_t code = deck.extra[i]->second.code;
+		while(i < deck.extra.size() - 1 && code == deck.extra[i + 1]->second.code) {
+			count++;
+			i++;
+		}
+		uint32_t packed_data = (code & 0x7ffffff) | (count << 27);
+		deck_pstr[4] = base64_chars[packed_data & 0x3f];
+		deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
+		deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
+		deck_pstr[1] = base64_chars[(packed_data >> 18) & 0x3f];
+		deck_pstr[0] = base64_chars[(packed_data >> 24) & 0x3f];
+		deck_pstr += 5;
+	}
+	for(size_t i = 0; i < deck.side.size(); ++i) {
+		uint32_t count = 1;
+		uint32_t code = deck.side[i]->second.code;
+		while(i < deck.side.size() - 1 && code == deck.side[i + 1]->second.code) {
+			count++;
+			i++;
+		}
+		uint32_t packed_data = (code & 0x7ffffff) | (count << 27) | 0x20000000;
+		deck_pstr[4] = base64_chars[packed_data & 0x3f];
+		deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
+		deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
+		deck_pstr[1] = base64_chars[(packed_data >> 18) & 0x3f];
+		deck_pstr[0] = base64_chars[(packed_data >> 24) & 0x3f];
+		deck_pstr += 5;
+	}
+	deck.main = m;
+	deck.extra = e;
+	deck.side = s;
+	std::wstring deckstr(deck_string);
+	return deckstr;
+}
+void DeckManager::LoadFromString(Deck& deck, const std::wstring& deck_string) {
+	deck.clear();
+	static const wchar_t* base64_chars = L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+	static uint8_t base64_dec_table[256] = { 0 };
+	static bool base64_dec_init = false;
+	if(!base64_dec_init) {
+		base64_dec_init = true;
+		for(int32_t i = 0; i < 64; ++i)
+			base64_dec_table[(int32_t)base64_chars[i]] = i;
+	}
+	if((deck_string.size() == 0) || (deck_string.size() % 5))
+		return;
+	CardData cd;
+	for(size_t i = 0; i < deck_string.size(); i += 5) {
+		uint32_t packed_data = (uint32_t)base64_dec_table[(uint8_t)deck_string[i + 4]];
+		packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck_string[i + 3]]) << 6;
+		packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck_string[i + 2]]) << 12;
+		packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck_string[i + 1]]) << 18;
+		packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck_string[i + 0]]) << 24;
+		uint32_t code = packed_data & 0x7ffffff;
+		uint32_t count = (packed_data >> 27) & 0x3;
+		if(!dataManager.GetData(code, &cd) || (cd.type & TYPE_TOKEN))
+			continue;
+		if(packed_data & 0x20000000) {
+			for(uint32_t j = 0; j < count; ++j)
+				if(deck.side.size() < 15)
+					deck.side.push_back(dataManager.GetCodePointer(code));
+		} else {
+			if(cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) {
+				for(uint32_t j = 0; j < count; ++j)
+					if(deck.extra.size() < 15)
+						deck.extra.push_back(dataManager.GetCodePointer(code));
+			} else {
+				for(uint32_t j = 0; j < count; ++j)
+					if(deck.main.size() < 60)
+						deck.main.push_back(dataManager.GetCodePointer(code));
+			}
+		}
+	}
+	return;
+}
+void DeckManager::Sort(Deck& deck) {
+	std::sort(deck.main.begin(), deck.main.end(), ClientCard::deck_sort_lv);
+	std::sort(deck.extra.begin(), deck.extra.end(), ClientCard::deck_sort_lv);
+	std::sort(deck.side.begin(), deck.side.end(), ClientCard::deck_sort_lv);
+}
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #ifdef WIN32
 	FILE* fp = _wfopen(file, (wchar_t*)mode);

@@ -41,6 +41,9 @@ public:
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
+	std::wstring SaveToString(Deck& deck);
+	void LoadFromString(Deck& deck, const std::wstring& deck_string);
+	void Sort(Deck& deck);
 	FILE* OpenDeckFile(const wchar_t * file, const char * mode);
 	bool LoadDeck(const wchar_t* file);
 	bool SaveDeck(Deck& deck, const wchar_t* name);

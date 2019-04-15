@@ -676,6 +676,30 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
+		if(event.KeyInput.PressedDown && event.KeyInput.Control) {
+			switch(event.KeyInput.Key) {
+			case irr::KEY_KEY_C: {
+				if(!mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+					std::wstring deck_string = L"ydk://";
+					deck_string += deckManager.SaveToString(deckManager.current_deck);
+					mainGame->device->getOSOperator()->copyToClipboard(deck_string.c_str());
+					mainGame->stACMessage->setText(dataManager.GetSysString(1359));
+					mainGame->PopupElement(mainGame->wACMessage, 20);
+				}
+				break;
+			}
+			case irr::KEY_KEY_V: {
+				if(!mainGame->HasFocus(EGUIET_EDIT_BOX)) {
+					std::wstring deck_string = mainGame->device->getOSOperator()->getTextFromClipboard().c_str();
+					if(deck_string.find(L"ydk://") == 0)
+						deckManager.LoadFromString(deckManager.current_deck, deck_string.substr(6));
+				}
+				break;
+			}
+			default:
+				break;
+			}
+		}
 		break;
 	}
 	default: break;
