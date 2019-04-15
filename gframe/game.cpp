@@ -531,7 +531,7 @@ bool Game::Initialize() {
 	wDeckCode->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1388), rect<s32>(20, 25, 290, 45), false, false, wDeckCode);
 	ebDeckCode =  env->addEditBox(L"", rect<s32>(20, 50, 290, 70), true, wDeckCode, -1);
-	ebREName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	ebDeckCode->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnDeckCodeYes = env->addButton(rect<s32>(70, 80, 140, 105), wDeckCode, BUTTON_DECK_CODE_SAVE, dataManager.GetSysString(1341));
 	btnDeckCodeNo = env->addButton(rect<s32>(170, 80, 240, 105), wDeckCode, BUTTON_DECK_CODE_CANCEL, dataManager.GetSysString(1212));
 	//sort type
