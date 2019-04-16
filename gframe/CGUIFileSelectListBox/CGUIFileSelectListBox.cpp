@@ -705,7 +705,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 			}
 		}
 		if(!is_directory && filtered_extensions.size()) {
-			auto pos = name.find('.');
+			auto pos = name.find_last_of('.');
 			if(pos == std::wstring::npos)
 				return;
 			auto extension = name.substr(pos + 1);
