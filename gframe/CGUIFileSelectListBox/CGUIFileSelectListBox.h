@@ -15,216 +15,219 @@
 #include "IGUIListBox.h"
 #include "irrArray.h"
 
-namespace irr
-{
-namespace gui
-{
+namespace irr {
+namespace gui {
 
-	class IGUIFont;
-	class IGUIScrollBar;
+class IGUIFont;
+class IGUIScrollBar;
 
-	class CGUIFileSelectListBox : public IGUIListBox
-	{
-	public:
-		//! constructor
-		CGUIFileSelectListBox(IGUIEnvironment* environment, IGUIElement* parent,
-			s32 id, core::rect<s32> rectangle, io::IFileSystem* filesystem, bool clip=true,
-			bool drawBack=false, bool moveOverSelect=false);
+class CGUIFileSelectListBox : public IGUIListBox {
+public:
+	//! constructor
+	CGUIFileSelectListBox(IGUIEnvironment* environment, IGUIElement* parent,
+						  s32 id, core::rect<s32> rectangle, io::IFileSystem* filesystem, bool clip = true,
+						  bool drawBack = false, bool moveOverSelect = false);
 
-		static CGUIFileSelectListBox* addFileSelectListBox(IGUIEnvironment* environment, IGUIElement* parent,
-			s32 id, core::rect<s32> rectangle, io::IFileSystem* filesystem, bool clip = true,
-			bool drawBack = false, bool moveOverSelect = false);
+	static CGUIFileSelectListBox* addFileSelectListBox(IGUIEnvironment* environment, IGUIElement* parent,
+													   s32 id, core::rect<s32> rectangle, io::IFileSystem* filesystem, bool clip = true,
+													   bool drawBack = false, bool moveOverSelect = false);
 
-		//! destructor
-		virtual ~CGUIFileSelectListBox();
+	//! destructor
+	virtual ~CGUIFileSelectListBox();
 
-		//! returns amount of list items
-		virtual u32 getItemCount() const;
+	//! returns amount of list items
+	virtual u32 getItemCount() const;
 
-		//! returns string of a list item. the id may be a value from 0 to itemCount-1
+	//! returns string of a list item. the id may be a value from 0 to itemCount-1
 
-		virtual const wchar_t* getListItem(u32 id) const;
+	virtual const wchar_t* getListItem(u32 id) const;
 
-		virtual const wchar_t* getListItem(u32 id, bool relativepath) const;
+	virtual const wchar_t* getListItem(u32 id, bool relativepath) const;
 
-		//! adds an list item, returns id of item
-		virtual u32 addItem(const wchar_t* text);
+	//! adds an list item, returns id of item
+	virtual u32 addItem(const wchar_t* text);
 
-		//! clears the list
-		virtual void clear();
+	//! clears the list
+	virtual void clear();
 
-		//! returns id of selected item. returns -1 if no item is selected.
-		virtual s32 getSelected() const;
+	//! returns id of selected item. returns -1 if no item is selected.
+	virtual s32 getSelected() const;
 
-		//! sets the selected item. Set this to -1 if no item should be selected
-		virtual void setSelected(s32 id);
+	//! sets the selected item. Set this to -1 if no item should be selected
+	virtual void setSelected(s32 id);
 
-		//! sets the selected item. Set this to -1 if no item should be selected
-		virtual void setSelected(const wchar_t *item);
+	//! sets the selected item. Set this to -1 if no item should be selected
+	virtual void setSelected(const wchar_t *item);
 
-		//! called if an event happened.
-		virtual bool OnEvent(const SEvent& event);
+	//! called if an event happened.
+	virtual bool OnEvent(const SEvent& event);
 
-		//! draws the element and its children
-		virtual void draw();
+	//! draws the element and its children
+	virtual void draw();
 
-		//! adds an list item with an icon
-		//! \param text Text of list entry
-		//! \param icon Sprite index of the Icon within the current sprite bank. Set it to -1 if you want no icon
-		//! \return
-		//! returns the id of the new created item
-		virtual u32 addItem(const wchar_t* text, s32 icon);
+	//! adds an list item with an icon
+	//! \param text Text of list entry
+	//! \param icon Sprite index of the Icon within the current sprite bank. Set it to -1 if you want no icon
+	//! \return
+	//! returns the id of the new created item
+	virtual u32 addItem(const wchar_t* text, s32 icon);
 
-		//! Returns the icon of an item
-		virtual s32 getIcon(u32 id) const;
+	//! Returns the icon of an item
+	virtual s32 getIcon(u32 id) const;
 
-		//! removes an item from the list
-		virtual void removeItem(u32 id);
+	//! removes an item from the list
+	virtual void removeItem(u32 id);
 
-		//! get the the id of the item at the given absolute coordinates
-		virtual s32 getItemAt(s32 xpos, s32 ypos) const;
+	//! get the the id of the item at the given absolute coordinates
+	virtual s32 getItemAt(s32 xpos, s32 ypos) const;
 
-		//! Sets the sprite bank which should be used to draw list icons. This font is set to the sprite bank of
-		//! the built-in-font by default. A sprite can be displayed in front of every list item.
-		//! An icon is an index within the icon sprite bank. Several default icons are available in the
-		//! skin through getIcon
-		virtual void setSpriteBank(IGUISpriteBank* bank);
+	//! Sets the sprite bank which should be used to draw list icons. This font is set to the sprite bank of
+	//! the built-in-font by default. A sprite can be displayed in front of every list item.
+	//! An icon is an index within the icon sprite bank. Several default icons are available in the
+	//! skin through getIcon
+	virtual void setSpriteBank(IGUISpriteBank* bank);
 
-		//! set whether the listbox should scroll to newly selected items
-		virtual void setAutoScrollEnabled(bool scroll);
+	//! set whether the listbox should scroll to newly selected items
+	virtual void setAutoScrollEnabled(bool scroll);
 
-		//! returns true if automatic scrolling is enabled, false if not.
-		virtual bool isAutoScrollEnabled() const;
+	//! returns true if automatic scrolling is enabled, false if not.
+	virtual bool isAutoScrollEnabled() const;
 
-		//! Update the position and size of the listbox, and update the scrollbar
-		virtual void updateAbsolutePosition();
+	//! Update the position and size of the listbox, and update the scrollbar
+	virtual void updateAbsolutePosition();
 
-		//! Writes attributes of the element.
-		virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const;
+	//! Writes attributes of the element.
+	virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const;
 
-		//! Reads attributes of the element
-		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
+	//! Reads attributes of the element
+	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
 
-		//! set all item colors at given index to color
-		virtual void setItemOverrideColor(u32 index, video::SColor color);
+	//! set all item colors at given index to color
+	virtual void setItemOverrideColor(u32 index, video::SColor color);
 
-		//! set all item colors of specified type at given index to color
-		virtual void setItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType, video::SColor color);
+	//! set all item colors of specified type at given index to color
+	virtual void setItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType, video::SColor color);
 
-		//! clear all item colors at index
-		virtual void clearItemOverrideColor(u32 index);
+	//! clear all item colors at index
+	virtual void clearItemOverrideColor(u32 index);
 
-		//! clear item color at index for given colortype
-		virtual void clearItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType);
+	//! clear item color at index for given colortype
+	virtual void clearItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType);
 
-		//! has the item at index its color overwritten?
-		virtual bool hasItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
+	//! has the item at index its color overwritten?
+	virtual bool hasItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
 
-		//! return the overwrite color at given item index.
-		virtual video::SColor getItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
+	//! return the overwrite color at given item index.
+	virtual video::SColor getItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
 
-		//! return the default color which is used for the given colorType
-		virtual video::SColor getItemDefaultColor(EGUI_LISTBOX_COLOR colorType) const;
+	//! return the default color which is used for the given colorType
+	virtual video::SColor getItemDefaultColor(EGUI_LISTBOX_COLOR colorType) const;
 
-		//! set the item at the given index
-		virtual void setItem(u32 index, const wchar_t* text, s32 icon);
+	//! set the item at the given index
+	virtual void setItem(u32 index, const wchar_t* text, s32 icon);
 
-		//! Insert the item at the given index
-		//! Return the index on success or -1 on failure.
-		virtual s32 insertItem(u32 index, const wchar_t* text, s32 icon);
+	//! Insert the item at the given index
+	//! Return the index on success or -1 on failure.
+	virtual s32 insertItem(u32 index, const wchar_t* text, s32 icon);
 
-		//! Swap the items at the given indices
-		virtual void swapItems(u32 index1, u32 index2);
+	//! Swap the items at the given indices
+	virtual void swapItems(u32 index1, u32 index2);
 
-		//! set global itemHeight
-		virtual void setItemHeight(s32 height);
+	//! set global itemHeight
+	virtual void setItemHeight(s32 height);
 
-        //! Sets whether to draw the background
-		virtual void setDrawBackground(bool draw);
+	//! Sets whether to draw the background
+	virtual void setDrawBackground(bool draw);
 
-		void refreshList();
+	void refreshList();
 
-		void resetPath();
+	void resetPath();
 
-		void setWorkingPath(const std::wstring& newDirectory, bool setAsRoot = false);
+	void setWorkingPath(const std::wstring& newDirectory, bool setAsRoot = false);
 
-		void addFilteredExtensions(std::vector<std::wstring> extensions);
+	using callback = bool(std::wstring, bool, void*);
+
+	void addFilterFunction(callback* function);
+
+	void addFilteredExtensions(std::vector<std::wstring> extensions);
+
+	bool defaultFilter(std::wstring name, bool is_directory, void*);
 
 
-	private:
+private:
 
-		struct ListItem
-		{
-			ListItem() : icon(-1)
-			{}
+	struct ListItem {
+		ListItem() : icon(-1) {
+		}
 
-			core::stringw reltext;
-			bool isDirectory;
-			core::stringw text;
-			s32 icon;
+		core::stringw reltext;
+		bool isDirectory;
+		core::stringw text;
+		s32 icon;
 
-			// A multicolor extension
-			struct ListItemOverrideColor
-			{
-				ListItemOverrideColor() : Use(false) {}
-				bool Use;
-				video::SColor Color;
-			};
-			ListItemOverrideColor OverrideColors[EGUI_LBC_COUNT];
-
-			bool operator ==(const struct ListItem& other) const {
-				if(isDirectory != other.isDirectory)
-					return false;
-
-				return reltext.equals_ignore_case(other.reltext);
-			}
-
-			bool operator <(const struct ListItem& other) const {
-				if(isDirectory != other.isDirectory)
-					return isDirectory;
-
-				return reltext.lower_ignore_case(other.reltext);
-			}
+		// A multicolor extension
+		struct ListItemOverrideColor {
+			ListItemOverrideColor() : Use(false) {}
+			bool Use;
+			video::SColor Color;
 		};
+		ListItemOverrideColor OverrideColors[EGUI_LBC_COUNT];
 
-		void recalculateItemHeight();
-		void selectNew(s32 ypos, bool onlyHover=false);
-		void recalculateScrollPos();
+		bool operator ==(const struct ListItem& other) const {
+			if(isDirectory != other.isDirectory)
+				return false;
 
-		// extracted that function to avoid copy&paste code
-		void recalculateItemWidth(s32 icon);
+			return reltext.equals_ignore_case(other.reltext);
+		}
 
-		// get labels used for serialization
-		bool getSerializationLabels(EGUI_LISTBOX_COLOR colorType, core::stringc & useColorLabel, core::stringc & colorLabel) const;
+		bool operator <(const struct ListItem& other) const {
+			if(isDirectory != other.isDirectory)
+				return isDirectory;
 
-		void LoadFolderContents();
-
-		core::stringw basePath;
-		core::stringw prevRelPath;
-		core::stringw curRelPath;
-		io::IFileSystem* filesystem;
-		std::vector<std::wstring> filtered_extensions;
-
-		core::array< ListItem > Items;
-		s32 Selected;
-		s32 ItemHeight;
-		s32 ItemHeightOverride;
-		s32 TotalItemHeight;
-		s32 ItemsIconWidth;
-		gui::IGUIFont* Font;
-		gui::IGUISpriteBank* IconBank;
-		gui::IGUIScrollBar* ScrollBar;
-		u32 selectTime;
-		u32 LastKeyTime;
-		core::stringw KeyBuffer;
-		bool Selecting;
-		int IsRoot;
-		bool BaseIsRoot;
-		bool DrawBack;
-		bool MoveOverSelect;
-		bool AutoScroll;
-		bool HighlightWhenNotFocused;
+			return reltext.lower_ignore_case(other.reltext);
+		}
 	};
+
+	void recalculateItemHeight();
+	void selectNew(s32 ypos, bool onlyHover = false);
+	void recalculateScrollPos();
+
+	// extracted that function to avoid copy&paste code
+	void recalculateItemWidth(s32 icon);
+
+	// get labels used for serialization
+	bool getSerializationLabels(EGUI_LISTBOX_COLOR colorType, core::stringc & useColorLabel, core::stringc & colorLabel) const;
+
+	void LoadFolderContents();
+
+	core::stringw basePath;
+	core::stringw prevRelPath;
+	core::stringw curRelPath;
+	io::IFileSystem* filesystem;
+	callback* filter;
+	//std::function<bool(std::wstring, bool, void*)> filter;
+	std::vector<std::wstring> filtered_extensions;
+
+	core::array<ListItem> Items;
+	s32 Selected;
+	s32 ItemHeight;
+	s32 ItemHeightOverride;
+	s32 TotalItemHeight;
+	s32 ItemsIconWidth;
+	gui::IGUIFont* Font;
+	gui::IGUISpriteBank* IconBank;
+	gui::IGUIScrollBar* ScrollBar;
+	u32 selectTime;
+	u32 LastKeyTime;
+	core::stringw KeyBuffer;
+	bool Selecting;
+	int TotalFolders;
+	bool BaseIsRoot;
+	bool DrawBack;
+	bool MoveOverSelect;
+	bool AutoScroll;
+	bool HighlightWhenNotFocused;
+};
 
 
 } // end namespace gui
