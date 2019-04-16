@@ -357,6 +357,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CANCEL_SINGLEPLAY: {
+				if(mainGame->dInfo.isSingleMode)
+					break;
 				mainGame->HideElement(mainGame->wSinglePlay);
 				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
