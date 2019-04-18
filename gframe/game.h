@@ -21,10 +21,12 @@ struct Config {
 	wchar_t lastport[10];
 	wchar_t nickname[20];
 	wchar_t gamename[20];
+	wchar_t lastcategory[64];
 	wchar_t lastdeck[64];
 	wchar_t textfont[256];
 	wchar_t numfont[256];
 	wchar_t roompass[20];
+	wchar_t bot_deck_path[64];
 	//settings
 	int chkMAutoPos;
 	int chkSTAutoPos;
@@ -113,7 +115,9 @@ public:
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
 	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
 	void LoadExpansions();
-	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
+	void RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
+	void RefreshDeck(const wchar_t* deckpath, irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void RefreshBot();
@@ -332,6 +336,7 @@ public:
 	irr::gui::IGUIStaticText* stHostPrepDuelist[4];
 	irr::gui::IGUICheckBox* chkHostPrepReady[4];
 	irr::gui::IGUIButton* btnHostPrepKick[4];
+	irr::gui::IGUIComboBox* cbCategorySelect;
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIStaticText* stHostPrepRule;
 	irr::gui::IGUIStaticText* stHostPrepOB;
@@ -449,8 +454,9 @@ public:
 	irr::gui::IGUIButton* btnEP;
 	//deck edit
 	irr::gui::IGUIStaticText* wDeckEdit;
-	irr::gui::IGUIComboBox* cbDBLFList;
+	irr::gui::IGUIComboBox* cbDBCategory;
 	irr::gui::IGUIComboBox* cbDBDecks;
+	irr::gui::IGUIButton* btnManageDeck;
 	irr::gui::IGUIButton* btnClearDeck;
 	irr::gui::IGUIButton* btnSortDeck;
 	irr::gui::IGUIButton* btnShuffleDeck;
@@ -462,7 +468,7 @@ public:
 	irr::gui::IGUIButton* btnSideSort;
 	irr::gui::IGUIButton* btnSideReload;
 	irr::gui::IGUIEditBox* ebDeckname;
-	irr::gui::IGUIStaticText* stBanlist;
+	irr::gui::IGUIStaticText* stDBCategory;
 	irr::gui::IGUIStaticText* stDeck;
 	irr::gui::IGUIStaticText* stCategory;
 	irr::gui::IGUIStaticText* stLimit;
@@ -473,6 +479,19 @@ public:
 	irr::gui::IGUIStaticText* stStar;
 	irr::gui::IGUIStaticText* stSearch;
 	irr::gui::IGUIStaticText* stScale;
+	//deck manage
+	irr::gui::IGUIWindow* wManageDeck;
+	irr::gui::IGUIListBox* lstCategories;
+	irr::gui::IGUIListBox* lstDecks;
+	irr::gui::IGUIComboBox* cbDBLFList;
+	irr::gui::IGUIButton* btnNewCategory;
+	irr::gui::IGUIButton* btnRenameCategory;
+	irr::gui::IGUIButton* btnDeleteCategory;
+	irr::gui::IGUIButton* btnNewDeck;
+	irr::gui::IGUIButton* btnRenameDeck;
+	irr::gui::IGUIButton* btnManageDeleteDeck;
+	irr::gui::IGUIButton* btnMoveDeck;
+	irr::gui::IGUIButton* btnCopyDeck;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
@@ -570,6 +589,7 @@ extern Game* mainGame;
 #define CHECKBOX_HP_READY			125
 #define BUTTON_HP_READY				126
 #define BUTTON_HP_NOTREADY			127
+#define COMBOBOX_HP_CATEGORY		128
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
@@ -656,7 +676,8 @@ extern Game* mainGame;
 #define SCROLL_CARD_DISPLAY			295
 #define BUTTON_CARD_DISP_OK			296
 
-#define COMBOBOX_DBLFLIST			301
+#define BUTTON_MANAGE_DECK			300
+#define COMBOBOX_DBCATEGORY			301
 #define COMBOBOX_DBDECKS			302
 #define BUTTON_CLEAR_DECK			303
 #define BUTTON_SAVE_DECK			304
@@ -680,6 +701,20 @@ extern Game* mainGame;
 #define BUTTON_MARKS_FILTER			322
 #define BUTTON_MARKERS_OK			323
 #define COMBOBOX_SORTTYPE			324
+
+#define WINDOW_MANAGE_DECK			330
+#define BUTTON_NEW_CATEGORY			331
+#define BUTTON_RENAME_CATEGORY		332
+#define BUTTON_DELETE_CATEGORY		333
+#define BUTTON_NEW_DECK				334
+#define BUTTON_RENAME_DECK			335
+#define BUTTON_DELETE_DECK_MANAGE	336
+#define BUTTON_MOVE_DECK			337
+#define BUTTON_COPY_DECK			338
+#define COMBOBOX_DBLFLIST			339
+#define LISTBOX_CATEGORIES			340
+#define LISTBOX_CATEGORY_DECKS		341
+
 #define CHECKBOX_AUTO_SEARCH		360
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362

@@ -308,6 +308,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			}
 			soundManager.PlaySoundEffect(SOUND_INFO);
 			mainGame->env->addMessageBox(L"", msgbuf);
+			mainGame->cbCategorySelect->setEnabled(true);
 			mainGame->cbDeckSelect->setEnabled(true);
 			mainGame->gMutex.Unlock();
 			break;
@@ -471,7 +472,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->stHostPrepDuelist[3]->setText(L"");
 		mainGame->stHostPrepOB->setText(L"");
 		mainGame->SetStaticText(mainGame->stHostPrepRule, 180, mainGame->guiFont, str.c_str());
-		mainGame->RefreshDeck(mainGame->cbDeckSelect);
+		mainGame->RefreshCategoryDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect);
+		mainGame->cbCategorySelect->setEnabled(true);
 		mainGame->cbDeckSelect->setEnabled(true);
 		if(mainGame->wCreateHost->isVisible())
 			mainGame->HideElement(mainGame->wCreateHost);

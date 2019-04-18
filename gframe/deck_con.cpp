@@ -59,6 +59,10 @@ static bool check_set_code(const CardDataC& data, int set_code) {
 	return res;
 }
 
+static bool isHavePopupWindow() {
+	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wManageDeck->isVisible();
+}
+
 void DeckBuilder::Initialize() {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
@@ -85,6 +89,10 @@ void DeckBuilder::Initialize() {
 	is_draging = false;
 	is_starting_dragging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
+	prev_category = mainGame->cbDBCategory->getSelected();
+	readonly = prev_category < 2;
+	mainGame->btnSaveDeck->setEnabled(!readonly);
+	mainGame->btnDeleteDeck->setEnabled(!readonly);
 	prev_operation = 0;
 	prev_sel = -1;
 	is_modified = false;
@@ -106,9 +114,12 @@ void DeckBuilder::Terminate() {
 	mainGame->ClearTextures();
 	mainGame->showingcode = 0;
 	mainGame->scrFilter->setVisible(false);
-	int sel = mainGame->cbDBDecks->getSelected();
-	if(sel >= 0)
-		BufferIO::CopyWStr(mainGame->cbDBDecks->getItem(sel), mainGame->gameConf.lastdeck, 64);
+	int catesel = mainGame->cbDBCategory->getSelected();
+	if(catesel >= 0)
+		BufferIO::CopyWStr(mainGame->cbDBCategory->getItem(catesel), mainGame->gameConf.lastcategory, 64);
+	int decksel = mainGame->cbDBDecks->getSelected();
+	if(decksel >= 0)
+		BufferIO::CopyWStr(mainGame->cbDBDecks->getItem(decksel), mainGame->gameConf.lastdeck, 64);
 	if(exit_on_return)
 		mainGame->device->closeDevice();
 }
@@ -124,7 +135,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		if(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK)
 			break;
+		if(mainGame->wManageDeck->isVisible() && !(id >= WINDOW_MANAGE_DECK && id <= LISTBOX_CATEGORY_DECKS))
+			break;
 		switch(event.GUIEvent.EventType) {
+		case irr::gui::EGET_ELEMENT_CLOSED: {
+			if(id == WINDOW_MANAGE_DECK) {
+				mainGame->HideElement(mainGame->wManageDeck);
+				return true;
+				break;
+			}
+		}
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			soundManager.PlaySoundEffect(SOUND_BUTTON);
 			switch(id) {
@@ -148,7 +168,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SAVE_DECK: {
 				int sel = mainGame->cbDBDecks->getSelected();
-				if(sel >= 0 && deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
+				if(sel == -1)
+					break;
+				wchar_t filepath[256];
+				deckManager.GetDeckFile(filepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+				if(deckManager.SaveDeck(deckManager.current_deck, filepath)) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 					is_modified = false;
@@ -172,7 +196,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
-				if(deckManager.SaveDeck(deckManager.current_deck, dname)) {
+				wchar_t catepath[256];
+				deckManager.GetCategoryPath(catepath, mainGame->cbDBCategory);
+				wchar_t filepath[256];
+				myswprintf(filepath, L"%ls/%ls.ydk", catepath, dname);
+				if(deckManager.SaveDeck(deckManager.current_deck, filepath)) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 					is_modified = false;
@@ -194,7 +222,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
-				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
+				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
 					mainGame->gMutex.Lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
@@ -230,6 +258,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				InstantSearch();
 				break;
 			}
+			case BUTTON_MANAGE_DECK: {
+				mainGame->PopupElement(mainGame->wManageDeck);
+				break;
+			}
 			case BUTTON_SIDE_OK: {
 				if(deckManager.current_deck.main.size() != pre_mainc || deckManager.current_deck.extra.size() != pre_extrac
 				        || deckManager.current_deck.side.size() != pre_sidec) {
@@ -252,7 +284,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SIDE_RELOAD: {
-				deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()));
+				deckManager.LoadDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect);
 				break;
 			}
 			case BUTTON_MSG_OK: {
@@ -270,14 +302,17 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					deckManager.current_deck.side.clear();
 				} else if(prev_operation == BUTTON_DELETE_DECK) {
 					int sel = prev_sel;
-					if(deckManager.DeleteDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(sel))) {
+					mainGame->cbDBDecks->setSelected(sel);
+					wchar_t filepath[256];
+					deckManager.GetDeckFile(filepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+					if(deckManager.DeleteDeck(filepath)) {
 						mainGame->cbDBDecks->removeItem(sel);
 						int count = mainGame->cbDBDecks->getItemCount();
 						if(sel >= count)
 							sel = count - 1;
 						mainGame->cbDBDecks->setSelected(sel);
 						if(sel != -1)
-							deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
+							deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 						mainGame->stACMessage->setText(dataManager.GetSysString(1338));
 						mainGame->PopupElement(mainGame->wACMessage, 20);
 						prev_deck = sel;
@@ -286,10 +321,23 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					prev_sel = -1;
 				} else if(prev_operation == BUTTON_LEAVE_GAME) {
 					Terminate();
-				} else if(prev_operation == COMBOBOX_DBDECKS) {
-					int sel = mainGame->cbDBDecks->getSelected();
-					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
-					prev_deck = sel;
+				} else if(prev_operation == COMBOBOX_DBCATEGORY || prev_operation == COMBOBOX_DBDECKS) {
+					int catesel = mainGame->cbDBCategory->getSelected();
+					int decksel = mainGame->cbDBDecks->getSelected();
+					if(prev_operation == COMBOBOX_DBCATEGORY) {
+						if(catesel == 3) {
+							catesel = 2;
+							mainGame->cbDBCategory->setSelected(2);
+						}
+						readonly = catesel < 2;
+						mainGame->btnSaveDeck->setEnabled(!readonly);
+						mainGame->btnDeleteDeck->setEnabled(!readonly);
+						mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+						mainGame->cbDBDecks->setSelected(0);
+					}
+					deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+					prev_category = catesel;
+					prev_deck = decksel;
 					is_modified = false;
 				}
 				prev_operation = 0;
@@ -297,7 +345,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_NO: {
 				mainGame->HideElement(mainGame->wQuery);
-				if (prev_operation == COMBOBOX_DBDECKS) {
+				if(prev_operation == COMBOBOX_DBCATEGORY) {
+					mainGame->cbDBCategory->setSelected(prev_category);
+				}
+				else if(prev_operation == COMBOBOX_DBDECKS) {
 					mainGame->cbDBDecks->setSelected(prev_deck);
 				}
 				prev_operation = 0;
@@ -366,8 +417,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				filterList = deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
 				break;
 			}
-			case COMBOBOX_DBDECKS: {
-				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
+			case COMBOBOX_DBCATEGORY: {
+				int catesel = mainGame->cbDBCategory->getSelected();
+				if(catesel == 3) {
+					catesel = 2;
+					mainGame->cbDBCategory->setSelected(2);
+					if(prev_category == 2)
+						break;
+				}
+				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
 					mainGame->gMutex.Lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
@@ -375,10 +433,31 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					prev_operation = id;
 					break;
 				}
-				int sel = mainGame->cbDBDecks->getSelected();
-				if(sel >= 0)
-					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(sel));
-				prev_deck = sel;
+				if(catesel >= 0) {
+					readonly = catesel < 2;
+					mainGame->btnSaveDeck->setEnabled(!readonly);
+					mainGame->btnDeleteDeck->setEnabled(!readonly);
+					mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+					mainGame->cbDBDecks->setSelected(0);
+					deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+				}
+				prev_category = catesel;
+				break;
+			}
+			case COMBOBOX_DBDECKS: {
+				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
+					mainGame->gMutex.Lock();
+					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
+					mainGame->PopupElement(mainGame->wQuery);
+					mainGame->gMutex.Unlock();
+					prev_operation = id;
+					break;
+				}
+				int decksel = mainGame->cbDBDecks->getSelected();
+				if(decksel >= 0) {
+					deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+				}
+				prev_deck = decksel;
 				is_modified = false;
 				break;
 			}
@@ -508,7 +587,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) != root)
 				break;
-			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
+			if(isHavePopupWindow())
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;
@@ -572,7 +651,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
+			if(isHavePopupWindow())
 				break;
 			if(!is_draging) {
 				if(hovered_pos == 0 || hovered_seq == -1)
@@ -612,7 +691,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_MMOUSE_LEFT_UP: {
 			if (mainGame->is_siding)
 				break;
-			if (mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
+			if (isHavePopupWindow())
 				break;
 			if (hovered_pos == 0 || hovered_seq == -1)
 				break;

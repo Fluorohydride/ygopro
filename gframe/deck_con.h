@@ -60,10 +60,12 @@ public:
 	size_t pre_extrac;
 	size_t pre_sidec;
 	code_pointer draging_pointer;
+	int prev_category;
 	int prev_deck;
 	s32 prev_operation;
 	int prev_sel;
 	bool is_modified;
+	bool readonly;
 
 	std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;

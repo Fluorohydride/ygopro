@@ -59,7 +59,8 @@ public:
 		if(fh == INVALID_HANDLE_VALUE)
 			return;
 		do {
-			cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+			if(mywcsncasecmp(fdataw.cFileName, L".", 1) && mywcsncasecmp(fdataw.cFileName, L"..", 2))
+				cb(fdataw.cFileName, (fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
 		} while(FindNextFileW(fh, &fdataw));
 		FindClose(fh);
 	}

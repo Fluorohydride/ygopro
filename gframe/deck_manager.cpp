@@ -191,6 +191,37 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
+void DeckManager::GetCategoryPath(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory) {
+	wchar_t catepath[256];
+	switch(cbCategory->getSelected()) {
+	case 0:
+		myswprintf(catepath, L"./pack");
+		break;
+	case 1:
+		myswprintf(catepath, mainGame->gameConf.bot_deck_path);
+		break;
+	case -1:
+	case 2:
+	case 3:
+		myswprintf(catepath, L"./deck");
+		break;
+	default:
+		myswprintf(catepath, L"./deck/%ls", cbCategory->getItem(cbCategory->getSelected()));
+	}
+	BufferIO::CopyWStr(catepath, ret, 256);
+}
+void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+	wchar_t filepath[256];
+	wchar_t catepath[256];
+	GetCategoryPath(catepath, cbCategory);
+	myswprintf(filepath, L"%ls/%ls.ydk", catepath, cbDeck->getItem(cbDeck->getSelected()));
+	BufferIO::CopyWStr(filepath, ret, 256);
+}
+bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+	wchar_t filepath[256];
+	GetDeckFile(filepath, cbCategory, cbDeck);
+	return LoadDeck(filepath);
+}
 FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 #ifdef WIN32
 	FILE* fp = _wfopen(file, (wchar_t*)mode);
@@ -203,11 +234,11 @@ FILE* DeckManager::OpenDeckFile(const wchar_t* file, const char* mode) {
 }
 bool DeckManager::LoadDeck(const wchar_t* file) {
 	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
-	wchar_t localfile[64];
-	myswprintf(localfile, L"./deck/%ls.ydk", file);
-	FILE* fp = OpenDeckFile(localfile, "r");
+	FILE* fp = OpenDeckFile(file, "r");
 	if(!fp) {
-		fp = OpenDeckFile(file, "r");
+		wchar_t localfile[64];
+		myswprintf(localfile, L"./deck/%ls.ydk", file);
+		fp = OpenDeckFile(localfile, "r");
 	}
 	if(!fp)
 		return false;
@@ -233,11 +264,9 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	LoadDeck(current_deck, cardlist, mainc, sidec);
 	return true;
 }
-bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
+bool DeckManager::SaveDeck(Deck& deck, const wchar_t* file) {
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
-	wchar_t file[64];
-	myswprintf(file, L"./deck/%ls.ydk", name);
 	FILE* fp = OpenDeckFile(file, "w");
 	if(!fp)
 		return false;
@@ -253,9 +282,7 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	fclose(fp);
 	return true;
 }
-bool DeckManager::DeleteDeck(Deck& deck, const wchar_t* name) {
-	wchar_t file[64];
-	myswprintf(file, L"./deck/%ls.ydk", name);
+bool DeckManager::DeleteDeck(const wchar_t* file) {
 #ifdef WIN32
 	BOOL result = DeleteFileW(file);
 	return !!result;
