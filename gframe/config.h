@@ -1,10 +1,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#ifndef TEXT
-#define TEXT(x) x
-#endif
-
 #ifdef _WIN32
 
 #include <WinSock2.h>
@@ -48,6 +44,14 @@ inline int _wtoi(const wchar_t * s) {
 	wchar_t * endptr;
 	return (int)wcstol(s, &endptr, 10);
 }
+#endif
+
+#ifndef TEXT
+#ifdef UNICODE
+#define TEXT(x) L##x
+#else
+#define TEXT(x) x
+#endif // UNICODE
 #endif
 
 template<size_t N, typename... TR>
