@@ -157,7 +157,7 @@ void* LoadOCGcore(const std::string& path) {
 		return nullptr;
 	LOAD_FUNCTION(get_api_version);
 	int min;
-	if(CHECK_API(&min)) {
+	if(CHECK_API(min)) {
 		UnloadCore(newcore);
 		return nullptr;
 	}
@@ -270,7 +270,7 @@ void* ChangeOCGcore(const std::string& path, void *handle) {
 		return nullptr;
 	CHANGE_WITH_COPY_CHECK(get_api_version);
 	int min;
-	if(CHECK_API(&min)) {
+	if(CHECK_API(min)) {
 		CloseLibrary(newcore);
 		RestoreFromCopies();
 		return nullptr;
