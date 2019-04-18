@@ -31,26 +31,25 @@ ClientField::ClientField() {
 		szone[p].resize(8, 0);
 	}
 }
+#define CLEAR_VECTOR(vec)for(auto& pcard : vec)\
+							delete pcard;\
+						vec.clear();\
+						vec.shrink_to_fit();
 void ClientField::Clear() {
 	for(int i = 0; i < 2; ++i) {
-		for(auto zone : { &mzone[i] ,&szone[i] }) {
-			for(auto& pcard : *zone) {
-				if(pcard)
-					delete pcard;
-				pcard = 0;
-			}
-		}
-		for(auto zone : { &deck[i], &hand[i], &grave[i], &remove[i], &extra[i] }) {
-			for(auto& pcard : *zone)
-				delete pcard;
-			zone->clear();
-		}
+		CLEAR_VECTOR(mzone[i]);
+		CLEAR_VECTOR(szone[i]);
+		mzone[i].resize(7, 0);
+		szone[i].resize(8, 0);
+		CLEAR_VECTOR(deck[i]);
+		CLEAR_VECTOR(hand[i]);
+		CLEAR_VECTOR(grave[i]);
+		CLEAR_VECTOR(remove[i]);
+		CLEAR_VECTOR(extra[i]);
 	}
-	for(auto cit = limbo_temp.begin(); cit != limbo_temp.end(); ++cit)
-			delete *cit;
-	limbo_temp.clear();
-	for(auto sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
-		delete *sit;
+	CLEAR_VECTOR(limbo_temp);
+	for(auto& pcard : overlay_cards)
+		delete pcard;
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
@@ -81,6 +80,7 @@ void ClientField::Clear() {
 	conti_act = false;
 	deck_reversed = false;
 }
+#undef CLEAR_VECTOR
 void ClientField::Initial(int player, int deckc, int extrac) {
 	ClientCard* pcard;
 	for(int i = 0; i < deckc; ++i) {

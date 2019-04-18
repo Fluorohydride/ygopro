@@ -192,6 +192,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->closeSignal.unlock();
 					mainGame->gMutex.lock();
 					mainGame->dInfo.isStarted = false;
+					mainGame->dField.Clear();
 					mainGame->is_building = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->ShowElement(mainGame->wLanWindow);
@@ -810,6 +811,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeSignal.unlock();
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
+		mainGame->dField.Clear();
 		mainGame->is_building = false;
 		mainGame->wDeckEdit->setVisible(false);
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
@@ -1039,6 +1041,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->closeSignal.unlock();
 		ReplayPrompt(true);
 		mainGame->gMutex.lock();
+		mainGame->dField.Clear();
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 		mainGame->btnJoinHost->setEnabled(true);
@@ -4012,6 +4015,7 @@ void DuelClient::ReplayPrompt(bool need_header) {
 		last_replay.WriteStream(replay_stream);
 		last_replay.EndRecord();
 	}
+	replay_stream.clear();
 	mainGame->gMutex.lock();
 	mainGame->wPhase->setVisible(false);
 	if(mainGame->dInfo.player_type < 7)

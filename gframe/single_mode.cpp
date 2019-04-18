@@ -156,6 +156,11 @@ int SingleMode::SinglePlayThread() {
 	if(mainGame->saveReplay)
 		new_replay.SaveReplay(mainGame->ebRSName->getText());
 	end_duel(pduel);
+	new_replay.Reset();
+	last_replay.Reset();
+	mainGame->gMutex.lock();
+	mainGame->dField.Clear();
+	mainGame->gMutex.unlock();
 	if(!is_closing) {
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
@@ -825,6 +830,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			replay_stream.insert(replay_stream.begin(), p);
 		new_replay.WriteStream(replay_stream);
 		new_replay.Flush();
+		replay_stream.clear();
 	}
 	return is_continuing;
 }
