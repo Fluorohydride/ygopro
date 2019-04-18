@@ -146,6 +146,8 @@ void* LoadOCGcore(const std::wstring& path) {
 	return LoadOCGcore(BufferIO::EncodeUTF8s(path));
 }
 
+#define CHECK_API(minval) get_api_version(&minval) != 2
+
 #define LOAD_FUNCTION(x) x = (decltype(x))GetFunction(newcore, #x);\
 		if(!x){ UnloadCore(newcore); return nullptr; }
 
@@ -155,7 +157,7 @@ void* LoadOCGcore(const std::string& path) {
 		return nullptr;
 	LOAD_FUNCTION(get_api_version);
 	int min;
-	if(get_api_version(&min) != 1 && min != 2) {
+	if(CHECK_API(&min)) {
 		UnloadCore(newcore);
 		return nullptr;
 	}
@@ -268,7 +270,7 @@ void* ChangeOCGcore(const std::string& path, void *handle) {
 		return nullptr;
 	CHANGE_WITH_COPY_CHECK(get_api_version);
 	int min;
-	if(get_api_version(&min) != 1 && min != 2) {
+	if(CHECK_API(&min)) {
 		CloseLibrary(newcore);
 		RestoreFromCopies();
 		return nullptr;
@@ -299,6 +301,7 @@ void* ChangeOCGcore(const std::string& path, void *handle) {
 		CloseLibrary(handle);
 	return newcore;
 }
+#undef CHECK_API
 #undef CHANGE_WITH_COPY_CHECK
 #undef STORE_CLONE
 #undef CLEAR_CLONE

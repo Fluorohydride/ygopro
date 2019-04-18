@@ -215,9 +215,9 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SELECT_BATTLECMD: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 18;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 8 + 2;
 			SinglePlayRefresh();
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
@@ -229,17 +229,17 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SELECT_IDLECMD: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 7;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 18 + 3;
 			SinglePlayRefresh();
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
@@ -283,7 +283,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SELECT_CARD: {
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 3;
+			pbuf += 9;
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
@@ -295,7 +295,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SELECT_TRIBUTE: {
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 3;
+			pbuf += 9;
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 11;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
@@ -307,7 +307,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SELECT_UNSELECT_CARD: {
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 4;
+			pbuf += 10;
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
 			count = BufferIO::ReadInt32(pbuf);
@@ -321,7 +321,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += 10 + count * 23;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
@@ -366,10 +366,10 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_SUM: {
 			pbuf++;
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 6;
-			count = BufferIO::ReadInt8(pbuf);
+			pbuf += 12;
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
@@ -381,7 +381,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SORT_CARD:
 		case MSG_SORT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 19;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
@@ -392,21 +392,21 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_CONFIRM_DECKTOP: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_CONFIRM_EXTRATOP: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -419,14 +419,14 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SHUFFLE_HAND: {
 			/*int oplayer = */BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
+			int count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_SHUFFLE_EXTRA: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -449,13 +449,13 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_DECK_TOP: {
-			pbuf += 6;
+			pbuf += 9;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_SHUFFLE_SET_CARD: {
 			pbuf++;
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 20;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -532,7 +532,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_CHAINING: {
-			pbuf += 26;
+			pbuf += 32;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
@@ -573,20 +573,20 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_CARD_SELECTED:
 		case MSG_RANDOM_SELECTED: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_BECOME_TARGET: {
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 10;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_DRAW: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -751,8 +751,12 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_TAG_SWAP: {
-			player = pbuf[0];
-			pbuf += pbuf[2] * 4 + pbuf[4] * 4 + 9;
+			player = BufferIO::ReadInt8(pbuf);
+			/*int mcount = */BufferIO::ReadInt32(pbuf);
+			int ecount = BufferIO::ReadInt32(pbuf);
+			/*int pcount = */BufferIO::ReadInt32(pbuf);
+			int hcount = BufferIO::ReadInt32(pbuf);
+			pbuf += ecount * 4 + hcount * 4 + 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayRefresh(player, LOCATION_DECK, 0x181fff);
 			SinglePlayRefresh(player, LOCATION_EXTRA, 0x181fff);
@@ -769,16 +773,17 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 				for(int seq = 0; seq < 7; ++seq) {
 					int val = BufferIO::ReadInt8(pbuf);
 					if(val)
-						pbuf += 2;
+						pbuf += 5;
 				}
 				for(int seq = 0; seq < 8; ++seq) {
 					int val = BufferIO::ReadInt8(pbuf);
 					if(val)
 						pbuf++;
 				}
-				pbuf += 11;
+				pbuf += 24;
 			}
-			pbuf++;
+			int count = BufferIO::ReadInt32(pbuf);
+			pbuf += 20 * count;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayReload();
 			mainGame->gMutex.lock();
@@ -819,6 +824,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		if (record)
 			replay_stream.insert(replay_stream.begin(), p);
 		new_replay.WriteStream(replay_stream);
+		new_replay.Flush();
 	}
 	return is_continuing;
 }
