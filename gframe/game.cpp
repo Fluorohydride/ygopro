@@ -1041,6 +1041,7 @@ void Game::LoadConfig() {
 	gameConf.antialias = 0;
 	gameConf.use_d3d = false;
 	gameConf.max_fps = 60;
+	gameConf.game_version = 0;
 	gameConf.fullscreen = false;
 	gameConf.serverport = L"7911";
 	gameConf.textfontsize = 12;
@@ -1121,8 +1122,13 @@ void Game::LoadConfig() {
 			gameConf.lastport = BufferIO::DecodeUTF8s(str);
 		else if(type == "roompass")
 			gameConf.roompass = BufferIO::DecodeUTF8s(str);
-		else if(type == "game_version")
-			PRO_VERSION = std::stoi(str);
+		else if(type == "game_version") {
+			int version = std::stoi(str);
+			if(version) {
+				PRO_VERSION = std::stoi(str);
+				gameConf.game_version = PRO_VERSION;
+			}
+		}
 		else if(type == "automonsterpos")
 			gameConf.chkMAutoPos = std::stoi(str);
 		else if(type == "autospellpos")
@@ -1177,7 +1183,7 @@ void Game::SaveConfig() {
 	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";
 	conf_file << "lasthost = "			<< BufferIO::EncodeUTF8s(gameConf.lasthost) << "\n";
 	conf_file << "lastport = "			<< BufferIO::EncodeUTF8s(gameConf.lastport) << "\n";
-	conf_file << "game_version = "		<< std::to_string(PRO_VERSION) << "\n";
+	conf_file << "game_version = "		<< std::to_string(gameConf.game_version) << "\n";
 	conf_file << "automonsterpos = "	<< std::to_string(chkMAutoPos->isChecked() ? 1 : 0) << "\n";
 	conf_file << "autospellpos = "		<< std::to_string(chkSTAutoPos->isChecked() ? 1 : 0) << "\n";
 	conf_file << "randompos = "			<< std::to_string(chkRandomPos->isChecked() ? 1 : 0) << "\n";
