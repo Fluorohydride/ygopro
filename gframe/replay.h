@@ -78,6 +78,7 @@ public:
 	std::vector<int> GetRuleCards();
 	ReplayStream packets_stream;
 	void Rewind();
+	void Reset();
 	std::unique_ptr<Replay> yrp;
 	ReplayHeader pheader;
 	std::vector<uint8_t> replay_data;
@@ -93,7 +94,6 @@ public:
 	duel_parameters params;
 	std::string scriptname;
 private:
-	void Reset();
 	bool ReadData(void* data, unsigned int length);
 	template <typename  T>
 	T Read();

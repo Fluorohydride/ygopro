@@ -144,6 +144,7 @@ bool Replay::OpenReplay(const std::wstring& name) {
 		Rewind();
 		return true;
 	}
+	Reset();
 #ifdef _WIN32
 	std::ifstream replay_file(name, std::ifstream::binary);
 	if(!replay_file.is_open()) {
@@ -313,13 +314,18 @@ void Replay::Reset() {
 	yrp = nullptr;
 	scriptname.clear();
 	responses.clear();
+	responses.shrink_to_fit();
 	players.clear();
 	decks.clear();
+	decks.shrink_to_fit();
 	params = { 0 };
 	packets_stream.clear();
+	packets_stream.shrink_to_fit();
 	data_position = 0;
 	replay_data.clear();
+	replay_data.shrink_to_fit();
 	comp_data.clear();
+	comp_data.shrink_to_fit();
 }
 bool Replay::ReadData(void* data, unsigned int length) {
 	if(!is_replaying || !can_read)
