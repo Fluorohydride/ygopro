@@ -1,5 +1,6 @@
 include "lzma/."
 project "ygopro"
+	defines "YGOPRO_USE_IRRKLANG"
 	configuration "*DLL"
 		targetname "ygoprodll"
 		defines "YGOPRO_BUILD_DLL"

@@ -5,6 +5,7 @@
 #include "game.h"
 #include "duelclient.h"
 #include "data_manager.h"
+#include "sound_manager.h"
 #include "image_manager.h"
 #include "replay_mode.h"
 #include "single_mode.h"
@@ -1780,8 +1781,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			switch(id) {
 			case SCROLL_VOLUME: {
 				mainGame->gameConf.volume = (double)mainGame->srcVolume->getPos() / 100;
-				mainGame->engineSound->setSoundVolume(mainGame->gameConf.volume);
-				mainGame->engineMusic->setSoundVolume(mainGame->gameConf.volume);
+				soundManager.SetSoundVolume(mainGame->gameConf.volume);
+				soundManager.SetMusicVolume(mainGame->gameConf.volume);
 				break;
 			}
 			}
@@ -1790,8 +1791,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch (id) {
 			case CHECKBOX_ENABLE_MUSIC: {
-				if (!mainGame->chkEnableMusic->isChecked())
-					mainGame->engineMusic->stopAllSounds();
+				if(!mainGame->chkEnableMusic->isChecked())
+					soundManager.StopBGM();
 				break;
 			}
 			case CHECKBOX_QUICK_ANIMATION: {

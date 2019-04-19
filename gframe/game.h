@@ -22,6 +22,7 @@ namespace ygo {
 struct Config {
 	bool use_d3d;
 	int max_fps;
+	int game_version;
 	bool fullscreen;
 	unsigned short antialias;
 	std::wstring serverport;
@@ -144,10 +145,6 @@ public:
 	void ErrorLog(const std::string& msg);
 	void ClearTextures();
 	void CloseDuelWindow();
-	bool PlayChant(unsigned int code);
-	void PlaySoundEffect(const std::string& sound);
-	void PlayMusic(const std::string& song, bool loop);
-	void PlayBGM();
 
 	int LocalPlayer(int player);
 	std::wstring LocalName(int local_player);
@@ -198,7 +195,6 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
-	std::vector<std::string> BGMList;
 	struct RepoGui {
 		std::string path;
 		IProgressBar* progress1;
@@ -551,8 +547,6 @@ public:
 	//surrender/leave
 	irr::gui::IGUIButton* btnLeaveGame;
 	//soundEngine
-	irrklang::ISoundEngine* engineSound;
-	irrklang::ISoundEngine* engineMusic;
 	//swap
 	irr::gui::IGUIButton* btnSpectatorSwap;
 	//chain control

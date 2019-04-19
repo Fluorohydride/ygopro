@@ -172,7 +172,7 @@ namespace ygo {
 	void Utils::FindfolderFiles(const std::wstring & path, const std::function<void(std::wstring, bool, void*)>& cb, void* payload) {
 #ifdef _WIN32
 		WIN32_FIND_DATAW fdataw;
-		HANDLE fh = FindFirstFileW((path + L"*.*").c_str(), &fdataw);
+		HANDLE fh = FindFirstFileW((NormalizePath(path) + L"*.*").c_str(), &fdataw);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY), payload);
@@ -182,7 +182,7 @@ namespace ygo {
 #else
 		DIR * dir;
 		struct dirent * dirp = nullptr;
-		if((dir = opendir(BufferIO::EncodeUTF8s(path).c_str())) != nullptr) {
+		if((dir = opendir(BufferIO::EncodeUTF8s(NormalizePath(path)).c_str())) != nullptr) {
 			struct stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
 				cb(BufferIO::DecodeUTF8s(dirp->d_name), !!S_ISDIR(fileStat.st_mode), payload);
@@ -242,7 +242,7 @@ namespace ygo {
 		for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
 			normalpath += *it + L"/";
 		}
-		normalpath += paths.back();
+		normalpath += paths.back() + L"/";
 		return normalpath;
 	}
 }

@@ -1,5 +1,6 @@
 #include "config.h"
 #include "game.h"
+#include "sound_manager.h"
 #include "image_manager.h"
 #include "data_manager.h"
 #include "deck_manager.h"
@@ -753,8 +754,15 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	RefreshBGMList();
-	LoadConfig();
+	if(!soundManager.Init()) {
+		chkEnableSound->setChecked(false);
+		chkEnableSound->setEnabled(false);
+		chkEnableSound->setVisible(false);
+		chkEnableMusic->setChecked(false);
+		chkEnableMusic->setEnabled(false);
+		chkEnableMusic->setVisible(false);
+		srcVolume->setVisible(false);
+	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
@@ -773,9 +781,6 @@ bool Game::Initialize() {
 	board.y = FIELD_Y;
 	board.z = FIELD_Z;
 	board.atan = atan(FIELD_Y / FIELD_Z);
-	
-	engineSound = irrklang::createIrrKlangDevice();
-	engineMusic = irrklang::createIrrKlangDevice();
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -824,15 +829,15 @@ void Game::MainLoop() {
 		gMutex.lock();
 		if(dInfo.isStarted) {
 			if (showcardcode == 1 || showcardcode == 3)
-				PlayMusic("./sound/duelwin.mp3", true);
+				soundManager.PlayBGM(BGM_WIN);
 			else if (showcardcode == 2)
-				PlayMusic("./sound/duellose.mp3", true);
+				soundManager.PlayBGM(BGM_LOSE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] <= dInfo.lp[LocalPlayer(1)] / 2)
-				PlayMusic("./sound/song-disadvantage.mp3", true);
+				soundManager.PlayBGM(BGM_DISADVANTAGE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] >= dInfo.lp[LocalPlayer(1)] * 2)
-				PlayMusic("./sound/song-advantage.mp3", true);
+				soundManager.PlayBGM(BGM_ADVANTAGE);
 			else
-				PlayBGM();
+				soundManager.PlayBGM(BGM_DUEL);
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
@@ -841,14 +846,12 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
-			engineSound->stopAllSounds();
+			soundManager.PlayBGM(BGM_DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
-			PlayMusic("./sound/deck.mp3", true);
 		} else {
-			engineSound->stopAllSounds();
+			soundManager.PlayBGM(BGM_MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
-			PlayMusic("./sound/menu.mp3", true);
 		}
 		DrawGUI();
 		DrawSpec();
@@ -954,7 +957,7 @@ void Game::MainLoop() {
 						coreloaded = true;
 						btnSingleMode->setEnabled(true);
 						btnCreateHost->setEnabled(true);
-						lstReplayList->addFilteredExtensions({L"yrp", L"yrpx"});
+						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
 					}
 					break;
 				}
@@ -988,8 +991,6 @@ void Game::MainLoop() {
 	usleep(500000);
 #endif
 	SaveConfig();
-	engineSound->drop();
-	engineMusic->drop();
 #ifdef YGOPRO_BUILD_DLL
 	if(ocgcore)
 		UnloadCore(ocgcore);
@@ -1030,12 +1031,6 @@ void Game::RefreshReplay() {
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
-}
-void Game::RefreshBGMList() {
-	auto files = Utils::FindfolderFiles(L"./sound/BGM/", {L"mp3"});
-	for(auto& file : files) {
-		BGMList.push_back(BufferIO::EncodeUTF8s(file));
-	}
 }
 void Game::LoadConfig() {
 	gameConf.antialias = 0;
@@ -1310,49 +1305,6 @@ void Game::LoadGithubRepositories() {
 	}
 }
 #undef JSON_SET_IF_VALID
-bool Game::PlayChant(unsigned int code) {
-	std::string sound(fmt::format("./sound/chants/{}.wav", code));
-	if(filesystem->existFile(sound.c_str())) {
-		if (!engineSound->isCurrentlyPlaying(sound.c_str()))
-			PlaySoundEffect(sound);
-		return true;
-	}
-	return false;
-}
-void Game::PlaySoundEffect(const std::string& sound) {
-	if(chkEnableSound->isChecked() && (!dInfo.isReplay || !dInfo.isReplaySkiping)) {
-		engineSound->play2D(sound.c_str());
-		engineSound->setSoundVolume(gameConf.volume);
-	}
-}
-void Game::PlayMusic(const std::string& song, bool loop) {
-	if(chkEnableMusic->isChecked()) {
-		if(!engineMusic->isCurrentlyPlaying(song.c_str())) {
-			engineMusic->stopAllSounds();
-			engineMusic->play2D(song.c_str(), loop);
-			engineMusic->setSoundVolume(gameConf.volume);
-		}
-	}
-}
-void Game::PlayBGM() {
-	if(chkEnableMusic->isChecked() && BGMList.size() > 0) {
-		static bool is_playing = false;
-		static std::string strBuffer;
-		if(is_playing && !engineMusic->isCurrentlyPlaying(strBuffer.c_str()))
-			is_playing = false;
-		if(!is_playing) {
-			int count = BGMList.size();
-			int bgm = rand() % count;
-			strBuffer = "./sound/BGM/" + BGMList[bgm];
-		}
-		if(!engineMusic->isCurrentlyPlaying(strBuffer.c_str())) {
-			engineMusic->stopAllSounds();
-			engineMusic->play2D(strBuffer.c_str(), true);
-			engineMusic->setSoundVolume(gameConf.volume);
-			is_playing = true;
-		}
-	}
-}
 void Game::ShowCardInfo(int code, bool resize) {
 	if (showingcard == code && !resize && !cardimagetextureloading)
 		return;
@@ -1449,34 +1401,34 @@ void Game::AddChatMsg(const std::wstring& msg, int player) {
 	chatType[0] = player;
 	switch(player) {
 	case 0: //host 1
-		PlaySoundEffect("./sound/chatmessage.wav");
+		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
 		chatMsg[0].append(dInfo.hostname[0]);
 		break;
 	case 1: //client 1
-		PlaySoundEffect("./sound/chatmessage.wav");
+		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
 		chatMsg[0].append(dInfo.clientname[0]);
 		break;
 	case 2: //host 2
-		PlaySoundEffect("./sound/chatmessage.wav");
+		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
 		chatMsg[0].append(dInfo.hostname[1]);
 		break;
 	case 3: //client 2
-		PlaySoundEffect("./sound/chatmessage.wav");
+		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
 		chatMsg[0].append(dInfo.clientname[1]);
 		break;
 	case 4: //host 3
-		PlaySoundEffect("./sound/chatmessage.wav");
+		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
 		chatMsg[0].append(dInfo.hostname[2]);
 		break;
 	case 5: //client 3
-		PlaySoundEffect("./sound/chatmessage.wav");
+		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
 		chatMsg[0].append(dInfo.clientname[2]);
 		break;
 	case 7: //local name
 		chatMsg[0].append(ebNickName->getText());
 		break;
 	case 8: //system custom message, no prefix.
-		PlaySoundEffect("./sound/chatmessage.wav");
+		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
 		chatMsg[0].append(L"[System]");
 		break;
 	case 9: //error message
