@@ -1564,7 +1564,6 @@ void Game::CloseDuelWindow() {
 	btnShuffle->setVisible(false);
 	wChat->setVisible(false);
 	lstLog->clear();
-	lstChat->clear();
 	logParam.clear();
 	lstHostList->clear();
 	DuelClient::hosts.clear();
