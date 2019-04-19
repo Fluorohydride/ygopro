@@ -1267,6 +1267,8 @@ void Game::LoadGithubRepositories() {
 			f.close();
 			if(j.size()) {
 				for(auto& obj : j["repos"].get<std::vector<nlohmann::json>>()) {
+					if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
+						continue;
 					RepoManager::GitRepo tmp_repo;
 					JSON_SET_IF_VALID(url, string, std::string);
 					JSON_SET_IF_VALID(should_update, boolean, bool);
