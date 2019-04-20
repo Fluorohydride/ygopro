@@ -191,9 +191,9 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
-void DeckManager::GetCategoryPath(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory) {
+void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) {
 	wchar_t catepath[256];
-	switch(cbCategory->getSelected()) {
+	switch(index) {
 	case 0:
 		myswprintf(catepath, L"./pack");
 		break;
@@ -206,14 +206,14 @@ void DeckManager::GetCategoryPath(wchar_t* ret, irr::gui::IGUIComboBox* cbCatego
 		myswprintf(catepath, L"./deck");
 		break;
 	default:
-		myswprintf(catepath, L"./deck/%ls", cbCategory->getItem(cbCategory->getSelected()));
+		myswprintf(catepath, L"./deck/%ls", text);
 	}
 	BufferIO::CopyWStr(catepath, ret, 256);
 }
 void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t filepath[256];
 	wchar_t catepath[256];
-	GetCategoryPath(catepath, cbCategory);
+	GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
 	myswprintf(filepath, L"%ls/%ls.ydk", catepath, cbDeck->getItem(cbDeck->getSelected()));
 	BufferIO::CopyWStr(filepath, ret, 256);
 }

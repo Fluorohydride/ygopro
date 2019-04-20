@@ -59,8 +59,56 @@ static bool check_set_code(const CardDataC& data, int set_code) {
 	return res;
 }
 
-static bool isHavePopupWindow() {
+inline bool isHavePopupWindow() {
 	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wManageDeck->isVisible();
+}
+inline void refreshDeckList() {
+	irr::gui::IGUIListBox* lstCategories = mainGame->lstCategories;
+	irr::gui::IGUIListBox* lstDecks = mainGame->lstDecks;
+	wchar_t catepath[256];
+	deckManager.GetCategoryPath(catepath, lstCategories->getSelected(), lstCategories->getListItem(lstCategories->getSelected()));
+	lstDecks->clear();
+	FileSystem::TraversalDir(catepath, [lstDecks](const wchar_t* name, bool isdir) {
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
+			size_t len = wcslen(name);
+			wchar_t deckname[256];
+			wcsncpy(deckname, name, len - 4);
+			deckname[len - 4] = 0;
+			lstDecks->addItem(deckname);
+		}
+	});
+}
+inline void changeCategory(int catesel) {
+	mainGame->deckBuilder.readonly = catesel < 2;
+	mainGame->btnSaveDeck->setEnabled(!mainGame->deckBuilder.readonly);
+	mainGame->btnDeleteDeck->setEnabled(!mainGame->deckBuilder.readonly);
+	mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+	mainGame->cbDBDecks->setSelected(0);
+	deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+	mainGame->deckBuilder.is_modified = false;
+	mainGame->deckBuilder.prev_category = catesel;
+	mainGame->deckBuilder.prev_deck = 0;
+}
+inline void showManageDeck() {
+	mainGame->RefreshCategoryDeck(mainGame->cbDBCategory, mainGame->cbDBDecks, false);
+	mainGame->cbDBCategory->setSelected(mainGame->deckBuilder.prev_category);
+	mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+	mainGame->cbDBDecks->setSelected(mainGame->deckBuilder.prev_deck);
+	irr::gui::IGUIListBox* lstCategories = mainGame->lstCategories;
+	lstCategories->clear();
+	lstCategories->addItem(dataManager.GetSysString(1450));
+	lstCategories->addItem(dataManager.GetSysString(1451));
+	lstCategories->addItem(dataManager.GetSysString(1452));
+	lstCategories->addItem(dataManager.GetSysString(1453));
+	FileSystem::TraversalDir(L"./deck", [lstCategories](const wchar_t* name, bool isdir) {
+		if(isdir) {
+			lstCategories->addItem(name);
+		}
+	});
+	lstCategories->setSelected(mainGame->deckBuilder.prev_category);
+	refreshDeckList();
+	mainGame->lstDecks->setSelected(mainGame->deckBuilder.prev_deck);
+	mainGame->PopupElement(mainGame->wManageDeck);
 }
 
 void DeckBuilder::Initialize() {
@@ -129,14 +177,13 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
-		if(mainGame->wCategories->isVisible() && id != BUTTON_CATEGORY_OK)
+		if(((mainGame->wCategories->isVisible() && id != BUTTON_CATEGORY_OK) ||
+			(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) ||
+			(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK) ||
+			(mainGame->wManageDeck->isVisible() && !(id >= WINDOW_MANAGE_DECK && id <= LISTBOX_CATEGORY_DECKS)))
+			&& event.GUIEvent.EventType != irr::gui::EGET_COMBO_BOX_CHANGED) {
 			break;
-		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO)
-			break;
-		if(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK)
-			break;
-		if(mainGame->wManageDeck->isVisible() && !(id >= WINDOW_MANAGE_DECK && id <= LISTBOX_CATEGORY_DECKS))
-			break;
+		}
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_CLOSED: {
 			if(id == WINDOW_MANAGE_DECK) {
@@ -197,7 +244,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
 				wchar_t catepath[256];
-				deckManager.GetCategoryPath(catepath, mainGame->cbDBCategory);
+				deckManager.GetCategoryPath(catepath, mainGame->cbDBCategory->getSelected(), mainGame->cbDBCategory->getText());
 				wchar_t filepath[256];
 				myswprintf(filepath, L"%ls/%ls.ydk", catepath, dname);
 				if(deckManager.SaveDeck(deckManager.current_deck, filepath)) {
@@ -259,7 +306,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_MANAGE_DECK: {
-				mainGame->PopupElement(mainGame->wManageDeck);
+				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
+					mainGame->gMutex.Lock();
+					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
+					mainGame->PopupElement(mainGame->wQuery);
+					mainGame->gMutex.Unlock();
+					prev_operation = id;
+					break;
+				}
+				showManageDeck();
 				break;
 			}
 			case BUTTON_SIDE_OK: {
@@ -321,24 +376,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					prev_sel = -1;
 				} else if(prev_operation == BUTTON_LEAVE_GAME) {
 					Terminate();
-				} else if(prev_operation == COMBOBOX_DBCATEGORY || prev_operation == COMBOBOX_DBDECKS) {
+				} else if(prev_operation == COMBOBOX_DBCATEGORY) {
 					int catesel = mainGame->cbDBCategory->getSelected();
+					changeCategory(catesel);
+				} else if(prev_operation == COMBOBOX_DBDECKS) {
 					int decksel = mainGame->cbDBDecks->getSelected();
-					if(prev_operation == COMBOBOX_DBCATEGORY) {
-						if(catesel == 3) {
-							catesel = 2;
-							mainGame->cbDBCategory->setSelected(2);
-						}
-						readonly = catesel < 2;
-						mainGame->btnSaveDeck->setEnabled(!readonly);
-						mainGame->btnDeleteDeck->setEnabled(!readonly);
-						mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-						mainGame->cbDBDecks->setSelected(0);
-					}
 					deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-					prev_category = catesel;
 					prev_deck = decksel;
 					is_modified = false;
+				} else if(prev_operation == BUTTON_MANAGE_DECK) {
+					showManageDeck();
 				}
 				prev_operation = 0;
 				break;
@@ -418,6 +465,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case COMBOBOX_DBCATEGORY: {
+				if(isHavePopupWindow()) {
+					mainGame->cbDBCategory->setSelected(prev_category);
+					break;
+				}
 				int catesel = mainGame->cbDBCategory->getSelected();
 				if(catesel == 3) {
 					catesel = 2;
@@ -433,18 +484,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					prev_operation = id;
 					break;
 				}
-				if(catesel >= 0) {
-					readonly = catesel < 2;
-					mainGame->btnSaveDeck->setEnabled(!readonly);
-					mainGame->btnDeleteDeck->setEnabled(!readonly);
-					mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-					mainGame->cbDBDecks->setSelected(0);
-					deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
-				}
-				prev_category = catesel;
+				changeCategory(catesel);
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
+				if(isHavePopupWindow()) {
+					mainGame->cbDBDecks->setSelected(prev_deck);
+					break;
+				}
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
 					mainGame->gMutex.Lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
@@ -576,6 +623,37 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case COMBOBOX_LIMIT:
 				InstantSearch();
 			}
+		}
+		case irr::gui::EGET_LISTBOX_CHANGED: {
+			switch(id) {
+			case LISTBOX_CATEGORIES: {
+				int catesel = mainGame->lstCategories->getSelected();
+				if(catesel == 3) {
+					catesel = 2;
+					mainGame->lstCategories->setSelected(catesel);
+					break;
+				}
+				refreshDeckList();
+				mainGame->lstDecks->setSelected(0);
+				mainGame->cbDBCategory->setSelected(catesel);
+				changeCategory(catesel);
+				break;
+			}
+			case LISTBOX_CATEGORY_DECKS: {
+				int decksel = mainGame->lstDecks->getSelected();
+				mainGame->cbDBDecks->setSelected(decksel);
+				if(decksel == -1)
+					break;
+				wchar_t filepath[256];
+				wchar_t catepath[256];
+				deckManager.GetCategoryPath(catepath, mainGame->lstCategories->getSelected(), mainGame->lstCategories->getListItem(mainGame->lstCategories->getSelected()));
+				myswprintf(filepath, L"%ls/%ls.ydk", catepath, mainGame->lstDecks->getListItem(decksel));
+				deckManager.LoadDeck(filepath);
+				prev_deck = decksel;
+				break;
+			}
+			}
+			break;
 		}
 		default: break;
 		}

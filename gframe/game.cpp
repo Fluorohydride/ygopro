@@ -525,7 +525,7 @@ bool Game::Initialize() {
 
 	stDBCategory = env->addStaticText(dataManager.GetSysString(1300), rect<s32>(10, 9, 100, 29), false, false, wDeckEdit);
 	cbDBCategory = env->addComboBox(rect<s32>(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBCATEGORY);
-	cbDBCategory->setMaxSelectionRows(10);
+	cbDBCategory->setMaxSelectionRows(15);
 	stDeck = env->addStaticText(dataManager.GetSysString(1301), rect<s32>(10, 39, 100, 59), false, false, wDeckEdit);
 	cbDBDecks = env->addComboBox(rect<s32>(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
@@ -981,7 +981,7 @@ void Game::LoadExpansions() {
 		}
 	}
 }
-void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
+void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck, bool selectlastused) {
 	cbCategory->clear();
 	cbCategory->addItem(dataManager.GetSysString(1450));
 	cbCategory->addItem(dataManager.GetSysString(1451));
@@ -993,24 +993,28 @@ void Game::RefreshCategoryDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGU
 		}
 	});
 	cbCategory->setSelected(2);
-	for(size_t i = 0; i < cbCategory->getItemCount(); ++i) {
-		if(!wcscmp(cbCategory->getItem(i), gameConf.lastcategory)) {
-			cbCategory->setSelected(i);
-			break;
+	if(selectlastused) {
+		for(size_t i = 0; i < cbCategory->getItemCount(); ++i) {
+			if(!wcscmp(cbCategory->getItem(i), gameConf.lastcategory)) {
+				cbCategory->setSelected(i);
+				break;
+			}
 		}
 	}
 	RefreshDeck(cbCategory, cbDeck);
+	if(selectlastused) {
+		for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
+			if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
+				cbDeck->setSelected(i);
+				break;
+			}
+		}
+	}
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t catepath[256];
-	deckManager.GetCategoryPath(catepath, cbCategory);
+	deckManager.GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
 	RefreshDeck(catepath, cbDeck);
-	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
-		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
-			cbDeck->setSelected(i);
-			break;
-		}
-	}
 }
 void Game::RefreshDeck(const wchar_t* deckpath, irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
