@@ -219,7 +219,7 @@ namespace ygo {
 		});
 		return res;
 	}
-	std::wstring Utils::NormalizePath(const std::wstring & path) {
+	std::wstring Utils::NormalizePath(const std::wstring & path, bool trailing_slash) {
 		std::vector<std::wstring> paths = ygo::Game::TokenizeString(path, L"/");
 		if(paths.empty())
 			return path;
@@ -242,7 +242,9 @@ namespace ygo {
 		for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
 			normalpath += *it + L"/";
 		}
-		normalpath += paths.back() + L"/";
+		normalpath += paths.back();
+		if(trailing_slash)
+			normalpath += L"/";
 		return normalpath;
 	}
 }

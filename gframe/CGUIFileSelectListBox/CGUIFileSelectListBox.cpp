@@ -622,7 +622,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 	Items.clear();
 	Selected = -1;
 	TotalFolders = 0;
-	curRelPath = (ygo::Utils::NormalizePath(curRelPath.c_str()) + L"/").c_str();
+	curRelPath = ygo::Utils::NormalizePath(curRelPath.c_str()).c_str();
 	bool is_root = BaseIsRoot && curRelPath == basePath;
 	ygo::Utils::FindfolderFiles(curRelPath.c_str(), [&](std::wstring name, bool is_directory, void* payload) {
 		if(name == L".")
@@ -636,7 +636,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 			return;
 		}
 		ListItem item;
-		item.reltext = ygo::Utils::NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name).c_str();
+		item.reltext = ygo::Utils::NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name, false).c_str();
 		if(is_directory) {
 			TotalFolders++;
 			item.reltext += L"/";
@@ -840,7 +840,7 @@ void CGUIFileSelectListBox::resetPath() {
 
 void CGUIFileSelectListBox::setWorkingPath(const std::wstring& newDirectory, bool setAsRoot) {
 	BaseIsRoot = setAsRoot;
-	basePath = (ygo::Utils::NormalizePath(newDirectory) + L"/").c_str();
+	basePath = ygo::Utils::NormalizePath(newDirectory).c_str();
 	curRelPath = basePath;
 	prevRelPath = curRelPath;
 	LoadFolderContents();

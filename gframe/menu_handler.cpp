@@ -284,7 +284,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_LOAD_REPLAY: {
 				if(open_file) {
-					bool res = ReplayMode::cur_replay.OpenReplay(open_file_name);
+					bool res = ReplayMode::cur_replay.OpenReplay(L"./replay/" + open_file_name);
 					open_file = false;
 					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
 						if(exit_on_return)
@@ -540,7 +540,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				if(open_file) {
-					bool res = ReplayMode::cur_replay.OpenReplay(open_file_name);
+					bool res = ReplayMode::cur_replay.OpenReplay(L"./replay/" + open_file_name);
 					open_file = false;
 					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
 						if(exit_on_return)

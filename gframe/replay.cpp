@@ -148,11 +148,11 @@ bool Replay::OpenReplay(const std::wstring& name) {
 #ifdef _WIN32
 	std::ifstream replay_file(name, std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(L"./replay/" + name, std::ifstream::binary);
+		replay_file.open(name, std::ifstream::binary);
 #else
 	std::ifstream replay_file(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open("./replay/" + BufferIO::EncodeUTF8s(name), std::ifstream::binary);
+		replay_file.open(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
 #endif
 		if(!replay_file.is_open()) {
 			replay_name.clear();

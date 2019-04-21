@@ -63,8 +63,7 @@ int SingleMode::SinglePlayThread() {
 				loaded = false;
 		}
 	} else {
-		const std::wstring name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected());
-		script_name = BufferIO::EncodeUTF8s(L"./single/" + name);
+		script_name = BufferIO::EncodeUTF8s(mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true));
 		if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr))
 			loaded = false;
 	}
