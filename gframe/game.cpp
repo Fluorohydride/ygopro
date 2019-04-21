@@ -1146,7 +1146,7 @@ void Game::LoadConfig() {
 			gameConf.draw_field_spell = std::stoi(str);
 		else if(type == "quick_animation")
 			gameConf.quick_animation = std::stoi(str);
-		else if(type == "show_anime")
+		else if(type == "show_unofficial")
 			gameConf.chkAnime = std::stoi(str);
 		else if(type == "enable_sound")
 			gameConf.enablesound = !!std::stoi(str);
@@ -1163,7 +1163,11 @@ void Game::SaveConfig() {
 	std::ofstream conf_file("system.conf", std::ofstream::out);
 	if(!conf_file.is_open())
 		return;
-	conf_file << "#config file\n#nickname & gamename should be less than 20 characters\n";
+	conf_file << "#Configuration file\n";
+	conf_file << "#Nickname & Gamename should be less than 20 characters\n";
+	conf_file << "#The following parameters use 0 for 'disabled' or 1 for 'enabled':\n";
+	conf_file << "#use_d3d, fullscreen, automonsterpos, autospellpos, randompos, autochain, waitchain, mute_opponent, mute_spectators,\n";
+	conf_file <<  "hide_setname,hide_hint_button, draw_field_spell, quick_animation, show_unofficial, skin_index, enable_sound, enable_music\n";
 	conf_file << "use_d3d = "			<< std::to_string(gameConf.use_d3d ? 1 : 0) << "\n";
 	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
 	conf_file << "max_fps = "			<< std::to_string(gameConf.max_fps) << "\n";
@@ -1190,11 +1194,13 @@ void Game::SaveConfig() {
 	conf_file << "hide_hint_button = "	<< std::to_string(chkHideHintButton->isChecked() ? 1 : 0) << "\n";
 	conf_file << "draw_field_spell = "	<< std::to_string(gameConf.draw_field_spell) << "\n";
 	conf_file << "quick_animation = "	<< std::to_string(gameConf.quick_animation) << "\n";
-	conf_file << "show_anime = "		<< std::to_string(chkAnime->isChecked() ? 1 : 0) << "\n";
+	conf_file << "#shows the unofficial cards in deck edit, which includes anime, customs, etc\n";
+	conf_file << "show_unofficial = "	<< std::to_string(chkAnime->isChecked() ? 1 : 0) << "\n";
+	conf_file << "#if skins from the skin folder are in use\n";
 	conf_file << "skin_index = "		<< std::to_string(gameConf.skin_index) << "\n";
 	conf_file << "enable_sound = "		<< std::to_string(chkEnableSound->isChecked() ? 1 : 0) << "\n";
 	conf_file << "enable_music = "		<< std::to_string(chkEnableMusic->isChecked() ? 1 : 0) << "\n";
-	conf_file << "#Volume of sound and music, between 0 and 100\n";
+	conf_file << "#Volume of sounds and musics, integer between 0 and 100\n";
 	int vol = gameConf.volume * 100;
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
 	conf_file << "volume = "			<< std::to_string(vol) << "\n";
