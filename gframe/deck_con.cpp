@@ -373,6 +373,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				prev_operation = id;
 				break;
 			}
+			case BUTTON_RENAME_DECK: {
+				mainGame->gMutex.Lock();
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
+				mainGame->ebDMName->setVisible(true);
+				mainGame->ebDMName->setText(L"");
+				mainGame->PopupElement(mainGame->wDMQuery);
+				mainGame->gMutex.Unlock();
+				prev_operation = id;
+				break;
+			}
 			case BUTTON_DELETE_DECK_DM: {
 				mainGame->gMutex.Lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1337));
@@ -512,6 +522,40 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					for(int i = 0;i < mainGame->lstDecks->getItemCount();i++) {
 						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), deckname, 256)) {
 							deckManager.LoadDeck(filepath);
+							prev_deck = i;
+							mainGame->cbDBDecks->setSelected(prev_deck);
+							mainGame->lstDecks->setSelected(prev_deck);
+							if(!res) {
+								mainGame->stACMessage->setText(dataManager.GetSysString(1475));
+								mainGame->PopupElement(mainGame->wACMessage, 20);
+							}
+							break;
+						}
+					}
+					break;
+				}
+				case BUTTON_RENAME_DECK: {
+					int catesel = mainGame->lstCategories->getSelected();
+					int decksel = mainGame->lstDecks->getSelected();
+					const wchar_t* catename = mainGame->lstCategories->getListItem(catesel);
+					wchar_t oldfilepath[256];
+					deckManager.GetDeckFile(oldfilepath, mainGame->cbDBCategory, mainGame->cbDBDecks);
+					const wchar_t* newdeckname = mainGame->ebDMName->getText();
+					wchar_t newfilepath[256];
+					if(catesel == 2) {
+						myswprintf(newfilepath, L"./deck/%ls.ydk", newdeckname);
+					} else {
+						myswprintf(newfilepath, L"./deck/%ls/%ls.ydk", catename, newdeckname);
+					}
+					bool res = false;
+					if(!FileSystem::IsFileExists(newfilepath)) {
+						res = FileSystem::Rename(oldfilepath, newfilepath);
+					}
+					refreshDeckList();
+					changeCategory(catesel);
+					for(int i = 0;i < mainGame->lstDecks->getItemCount();i++) {
+						if(!mywcsncasecmp(mainGame->lstDecks->getListItem(i), newdeckname, 256)) {
+							deckManager.LoadDeck(newfilepath);
 							prev_deck = i;
 							mainGame->cbDBDecks->setSelected(prev_deck);
 							mainGame->lstDecks->setSelected(prev_deck);
