@@ -293,4 +293,31 @@ bool DeckManager::DeleteDeck(const wchar_t* file) {
 	return result == 0;
 #endif
 }
+bool DeckManager::CreateCategory(const wchar_t* name) {
+	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
+		return false;
+	if(name[0] == 0)
+		return false;
+	wchar_t localname[256];
+	myswprintf(localname, L"./deck/%ls", name);
+	return FileSystem::MakeDir(localname);
+}
+bool DeckManager::RenameCategory(const wchar_t* oldname, const wchar_t* newname) {
+	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
+		return false;
+	if(newname[0] == 0)
+		return false;
+	wchar_t oldlocalname[256];
+	wchar_t newlocalname[256];
+	myswprintf(oldlocalname, L"./deck/%ls", oldname);
+	myswprintf(newlocalname, L"./deck/%ls", newname);
+	return FileSystem::Rename(oldlocalname, newlocalname);
+}
+bool DeckManager::DeleteCategory(const wchar_t* name) {
+	wchar_t localname[256];
+	myswprintf(localname, L"./deck/%ls", name);
+	if(!FileSystem::IsDirExists(localname))
+		return false;
+	return FileSystem::DeleteDir(localname);
+}
 }

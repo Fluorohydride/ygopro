@@ -492,10 +492,12 @@ public:
 	irr::gui::IGUIButton* btnMoveDeck;
 	irr::gui::IGUIButton* btnCopyDeck;
 	irr::gui::IGUIWindow* wDMQuery;
+	irr::gui::IGUIStaticText* stDMMessage;
+	irr::gui::IGUIStaticText* stDMMessage2;
 	irr::gui::IGUIEditBox* ebDMName;
 	irr::gui::IGUIComboBox* cbDMCategory;
-	irr::gui::IGUIButton* btnDMYes;
-	irr::gui::IGUIButton* btnDMNo;
+	irr::gui::IGUIButton* btnDMOK;
+	irr::gui::IGUIButton* btnDMCancel;
 	irr::gui::IGUIComboBox* cbLFList;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;

@@ -498,10 +498,11 @@ bool Game::Initialize() {
 	wDeckEdit = env->addStaticText(L"", rect<s32>(309, 5, 605, 130), true, false, 0, -1, true);
 	wDeckEdit->setVisible(false);
 	btnManageDeck = env->addButton(rect<s32>(225, 5, 290, 30), wDeckEdit, BUTTON_MANAGE_DECK, L"管理");
-	wDeckManage = env->addWindow(rect<s32>(310, 135, 800, 465), false, L"管理卡组", 0, WINDOW_DECK_MANAGE);
+	//deck manage
+	wDeckManage = env->addWindow(rect<s32>(310, 135, 800, 465), false, L"卡组管理", 0, WINDOW_DECK_MANAGE);
 	wDeckManage->setVisible(false);
-	lstCategories = env->addListBox(rect<s32>(10, 30, 170, 320), wDeckManage, LISTBOX_CATEGORIES, true);
-	lstDecks = env->addListBox(rect<s32>(180, 30, 340, 320), wDeckManage, LISTBOX_DECKS, true);
+	lstCategories = env->addListBox(rect<s32>(10, 30, 140, 320), wDeckManage, LISTBOX_CATEGORIES, true);
+	lstDecks = env->addListBox(rect<s32>(150, 30, 340, 320), wDeckManage, LISTBOX_DECKS, true);
 	posY = 30;
 	btnNewCategory = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_NEW_CATEGORY, L"新建分类");
 	posY += 30;
@@ -523,6 +524,22 @@ bool Game::Initialize() {
 	cbLFList->setMaxSelectionRows(10);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
 		cbLFList->addItem(deckManager._lfList[i].listName);
+	//deck manage query
+	wDMQuery = env->addWindow(rect<s32>(400, 200, 710, 320), false, L"卡组管理");
+	wDMQuery->getCloseButton()->setVisible(false);
+	wDMQuery->setVisible(false);
+	stDMMessage = env->addStaticText(L"", rect<s32>(20, 25, 290, 45), false, false, wDMQuery);
+	stDMMessage2 = env->addStaticText(L"", rect<s32>(20, 50, 290, 70), false, false, wDMQuery, -1, true);
+	stDMMessage2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	ebDMName = env->addEditBox(L"", rect<s32>(20, 50, 290, 70), true, wDMQuery, -1);
+	ebDMName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	cbDMCategory = env->addComboBox(rect<s32>(20, 50, 290, 70), wDMQuery, -1);
+	stDMMessage2->setVisible(false);
+	ebDMName->setVisible(false);
+	cbDMCategory->setVisible(false);
+	cbDMCategory->setMaxSelectionRows(10);
+	btnDMOK = env->addButton(rect<s32>(70, 80, 140, 105), wDMQuery, BUTTON_DM_OK, dataManager.GetSysString(1211));
+	btnDMCancel = env->addButton(rect<s32>(170, 80, 240, 105), wDMQuery, BUTTON_DM_CANCEL, dataManager.GetSysString(1212));
 
 	stDBCategory = env->addStaticText(dataManager.GetSysString(1300), rect<s32>(10, 9, 100, 29), false, false, wDeckEdit);
 	cbDBCategory = env->addComboBox(rect<s32>(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBCATEGORY);
@@ -1659,6 +1676,7 @@ void Game::OnResize() {
 	wANAttribute->setRelativePosition(ResizeWin(500, 200, 830, 285));
 	wANRace->setRelativePosition(ResizeWin(480, 200, 850, 410));
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
+	wDMQuery->setRelativePosition(ResizeWin(400, 200, 710, 320));
 
 	stHintMsg->setRelativePosition(ResizeWin(660 - 160 * xScale, 60, 660 + 160 * xScale, 90));
 

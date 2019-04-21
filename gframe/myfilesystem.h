@@ -50,6 +50,31 @@ public:
 		return MakeDir(wdir);
 	}
 
+	static bool Rename(const wchar_t* woldname, const wchar_t* wnewname) {
+		return MoveFileW(woldname, wnewname);
+	}
+
+	static bool Rename(const char* oldname, const char* newname) {
+		wchar_t woldname[1024];
+		wchar_t wnewname[1024];
+		BufferIO::DecodeUTF8(oldname, woldname);
+		BufferIO::DecodeUTF8(newname, wnewname);
+		return Rename(woldname, wnewname);
+	}
+
+	static bool DeleteDir(const wchar_t* wdir) {
+		wchar_t pdir[256];
+		BufferIO::CopyWStr(wdir, pdir, 256);
+		pdir[wcslen(wdir) + 1] = 0;
+		SHFILEOPSTRUCTW lpFileOp;
+		lpFileOp.hwnd = NULL;
+		lpFileOp.wFunc = FO_DELETE;
+		lpFileOp.pFrom = pdir;
+		lpFileOp.pTo = 0;
+		lpFileOp.fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
+		return SHFileOperationW(&lpFileOp) == 0;
+	}
+
 	static void TraversalDir(const wchar_t* wpath, const std::function<void(const wchar_t*, bool)>& cb) {
 		wchar_t findstr[1024];
 		wcscpy(findstr, wpath);
