@@ -532,6 +532,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->lstDecks->removeItem(decksel);
 						mainGame->cbDBDecks->removeItem(decksel);
 						decksel--;
+						if(decksel == -1) {
+							decksel = mainGame->lstDecks->getItemCount() - 1;
+						}
 						if(decksel != -1) {
 							mainGame->lstDecks->setSelected(decksel);
 							mainGame->cbDBDecks->setSelected(decksel);
