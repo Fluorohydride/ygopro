@@ -498,30 +498,31 @@ bool Game::Initialize() {
 	wDeckEdit = env->addStaticText(L"", rect<s32>(309, 5, 605, 130), true, false, 0, -1, true);
 	wDeckEdit->setVisible(false);
 	btnManageDeck = env->addButton(rect<s32>(225, 5, 290, 30), wDeckEdit, BUTTON_MANAGE_DECK, L"管理");
-	wManageDeck = env->addWindow(rect<s32>(310, 135, 800, 465), false, L"管理卡组", 0, WINDOW_MANAGE_DECK);
-	wManageDeck->setVisible(false);
-	lstCategories = env->addListBox(rect<s32>(10, 30, 170, 320), wManageDeck, LISTBOX_CATEGORIES, true);
-	lstDecks = env->addListBox(rect<s32>(180, 30, 340, 320), wManageDeck, LISTBOX_CATEGORY_DECKS, true);
+	wDeckManage = env->addWindow(rect<s32>(310, 135, 800, 465), false, L"管理卡组", 0, WINDOW_DECK_MANAGE);
+	wDeckManage->setVisible(false);
+	lstCategories = env->addListBox(rect<s32>(10, 30, 170, 320), wDeckManage, LISTBOX_CATEGORIES, true);
+	lstDecks = env->addListBox(rect<s32>(180, 30, 340, 320), wDeckManage, LISTBOX_DECKS, true);
 	posY = 30;
-	btnNewCategory = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_NEW_CATEGORY, L"新建分类");
+	btnNewCategory = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_NEW_CATEGORY, L"新建分类");
 	posY += 30;
-	btnRenameCategory = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_RENAME_CATEGORY, L"重命名分类");
+	btnRenameCategory = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_RENAME_CATEGORY, L"重命名分类");
 	posY += 30;
-	btnDeleteCategory = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_DELETE_CATEGORY, L"删除分类");
+	btnDeleteCategory = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_DELETE_CATEGORY, L"删除分类");
 	posY += 30;
-	btnNewDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_NEW_DECK, L"新建卡组");
+	btnNewDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_NEW_DECK, L"新建卡组");
 	posY += 30;
-	btnRenameDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_RENAME_DECK, L"重命名卡组");
+	btnRenameDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_RENAME_DECK, L"重命名卡组");
 	posY += 30;
-	btnManageDeleteDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_DELETE_DECK_MANAGE, L"删除卡组");
+	btnDMDeleteDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_DELETE_DECK_DM, L"删除卡组");
 	posY += 30;
-	btnMoveDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_MOVE_DECK, L"移动到分类");
+	btnMoveDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_MOVE_DECK, L"移动到分类");
 	posY += 30;
-	btnCopyDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wManageDeck, BUTTON_COPY_DECK, L"复制到分类");
+	btnCopyDeck = env->addButton(rect<s32>(350, posY, 480, posY + 25), wDeckManage, BUTTON_COPY_DECK, L"复制到分类");
 	posY += 55;
-	//env->addStaticText(dataManager.GetSysString(1300), rect<s32>(350, posY, 440, posY + 25), false, false, wManageDeck);
-	cbDBLFList = env->addComboBox(rect<s32>(350, posY, 480, posY + 25), wManageDeck, COMBOBOX_DBLFLIST);
-	cbDBLFList->setMaxSelectionRows(10);
+	cbLFList = env->addComboBox(rect<s32>(350, posY, 480, posY + 25), wDeckManage, COMBOBOX_LFLIST);
+	cbLFList->setMaxSelectionRows(10);
+	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+		cbLFList->addItem(deckManager._lfList[i].listName);
 
 	stDBCategory = env->addStaticText(dataManager.GetSysString(1300), rect<s32>(10, 9, 100, 29), false, false, wDeckEdit);
 	cbDBCategory = env->addComboBox(rect<s32>(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBCATEGORY);
@@ -529,8 +530,6 @@ bool Game::Initialize() {
 	stDeck = env->addStaticText(dataManager.GetSysString(1301), rect<s32>(10, 39, 100, 59), false, false, wDeckEdit);
 	cbDBDecks = env->addComboBox(rect<s32>(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbDBLFList->addItem(deckManager._lfList[i].listName);
 	btnSaveDeck = env->addButton(rect<s32>(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302));
 	ebDeckname = env->addEditBox(L"", rect<s32>(80, 65, 220, 90), true, wDeckEdit, -1);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -1594,7 +1593,7 @@ void Game::OnResize() {
 	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
 	cbDBCategory->setRelativePosition(Resize(80, 5, 220, 30));
 	btnManageDeck->setRelativePosition(Resize(225, 5, 290, 30));
-	wManageDeck->setRelativePosition(ResizeWin(310, 135, 800, 465));
+	wDeckManage->setRelativePosition(ResizeWin(310, 135, 800, 465));
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
 	cbSortType->setRelativePosition(Resize(10, 2, 85, 22));

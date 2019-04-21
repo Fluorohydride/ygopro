@@ -480,18 +480,23 @@ public:
 	irr::gui::IGUIStaticText* stSearch;
 	irr::gui::IGUIStaticText* stScale;
 	//deck manage
-	irr::gui::IGUIWindow* wManageDeck;
+	irr::gui::IGUIWindow* wDeckManage;
 	irr::gui::IGUIListBox* lstCategories;
 	irr::gui::IGUIListBox* lstDecks;
-	irr::gui::IGUIComboBox* cbDBLFList;
 	irr::gui::IGUIButton* btnNewCategory;
 	irr::gui::IGUIButton* btnRenameCategory;
 	irr::gui::IGUIButton* btnDeleteCategory;
 	irr::gui::IGUIButton* btnNewDeck;
 	irr::gui::IGUIButton* btnRenameDeck;
-	irr::gui::IGUIButton* btnManageDeleteDeck;
+	irr::gui::IGUIButton* btnDMDeleteDeck;
 	irr::gui::IGUIButton* btnMoveDeck;
 	irr::gui::IGUIButton* btnCopyDeck;
+	irr::gui::IGUIWindow* wDMQuery;
+	irr::gui::IGUIEditBox* ebDMName;
+	irr::gui::IGUIComboBox* cbDMCategory;
+	irr::gui::IGUIButton* btnDMYes;
+	irr::gui::IGUIButton* btnDMNo;
+	irr::gui::IGUIComboBox* cbLFList;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
@@ -702,18 +707,20 @@ extern Game* mainGame;
 #define BUTTON_MARKERS_OK			323
 #define COMBOBOX_SORTTYPE			324
 
-#define WINDOW_MANAGE_DECK			330
+#define WINDOW_DECK_MANAGE			330
 #define BUTTON_NEW_CATEGORY			331
 #define BUTTON_RENAME_CATEGORY		332
 #define BUTTON_DELETE_CATEGORY		333
 #define BUTTON_NEW_DECK				334
 #define BUTTON_RENAME_DECK			335
-#define BUTTON_DELETE_DECK_MANAGE	336
+#define BUTTON_DELETE_DECK_DM		336
 #define BUTTON_MOVE_DECK			337
 #define BUTTON_COPY_DECK			338
-#define COMBOBOX_DBLFLIST			339
-#define LISTBOX_CATEGORIES			340
-#define LISTBOX_CATEGORY_DECKS		341
+#define LISTBOX_CATEGORIES			339
+#define LISTBOX_DECKS				340
+#define BUTTON_DM_OK				341
+#define BUTTON_DM_CANCEL			342
+#define COMBOBOX_LFLIST				349
 
 #define CHECKBOX_AUTO_SEARCH		360
 #define CHECKBOX_ENABLE_SOUND		361

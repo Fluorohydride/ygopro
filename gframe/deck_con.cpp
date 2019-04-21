@@ -59,8 +59,8 @@ static bool check_set_code(const CardDataC& data, int set_code) {
 	return res;
 }
 
-inline bool isHavePopupWindow() {
-	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wManageDeck->isVisible();
+inline bool havePopupWindow() {
+	return mainGame->wQuery->isVisible() || mainGame->wCategories->isVisible() || mainGame->wLinkMarks->isVisible() || mainGame->wDeckManage->isVisible();
 }
 inline void refreshDeckList() {
 	irr::gui::IGUIListBox* lstCategories = mainGame->lstCategories;
@@ -89,7 +89,7 @@ inline void changeCategory(int catesel) {
 	mainGame->deckBuilder.prev_category = catesel;
 	mainGame->deckBuilder.prev_deck = 0;
 }
-inline void showManageDeck() {
+inline void showDeckManage() {
 	mainGame->RefreshCategoryDeck(mainGame->cbDBCategory, mainGame->cbDBDecks, false);
 	mainGame->cbDBCategory->setSelected(mainGame->deckBuilder.prev_category);
 	mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
@@ -108,7 +108,7 @@ inline void showManageDeck() {
 	lstCategories->setSelected(mainGame->deckBuilder.prev_category);
 	refreshDeckList();
 	mainGame->lstDecks->setSelected(mainGame->deckBuilder.prev_deck);
-	mainGame->PopupElement(mainGame->wManageDeck);
+	mainGame->PopupElement(mainGame->wDeckManage);
 }
 
 void DeckBuilder::Initialize() {
@@ -127,7 +127,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
 	filterList = deckManager._lfList[0].content;
-	mainGame->cbDBLFList->setSelected(0);
+	mainGame->cbLFList->setSelected(0);
 	ClearSearch();
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
@@ -180,14 +180,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		if(((mainGame->wCategories->isVisible() && id != BUTTON_CATEGORY_OK) ||
 			(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) ||
 			(mainGame->wLinkMarks->isVisible() && id != BUTTON_MARKERS_OK) ||
-			(mainGame->wManageDeck->isVisible() && !(id >= WINDOW_MANAGE_DECK && id <= LISTBOX_CATEGORY_DECKS)))
+			(mainGame->wDeckManage->isVisible() && !(id >= WINDOW_DECK_MANAGE && id <= COMBOBOX_LFLIST)))
 			&& event.GUIEvent.EventType != irr::gui::EGET_COMBO_BOX_CHANGED) {
 			break;
 		}
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_CLOSED: {
-			if(id == WINDOW_MANAGE_DECK) {
-				mainGame->HideElement(mainGame->wManageDeck);
+			if(id == WINDOW_DECK_MANAGE) {
+				mainGame->HideElement(mainGame->wDeckManage);
 				return true;
 				break;
 			}
@@ -314,7 +314,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					prev_operation = id;
 					break;
 				}
-				showManageDeck();
+				showDeckManage();
 				break;
 			}
 			case BUTTON_SIDE_OK: {
@@ -385,7 +385,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					prev_deck = decksel;
 					is_modified = false;
 				} else if(prev_operation == BUTTON_MANAGE_DECK) {
-					showManageDeck();
+					showDeckManage();
 				}
 				prev_operation = 0;
 				break;
@@ -460,12 +460,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
-			case COMBOBOX_DBLFLIST: {
-				filterList = deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
+			case COMBOBOX_LFLIST: {
+				filterList = deckManager._lfList[mainGame->cbLFList->getSelected()].content;
 				break;
 			}
 			case COMBOBOX_DBCATEGORY: {
-				if(isHavePopupWindow()) {
+				if(havePopupWindow()) {
 					mainGame->cbDBCategory->setSelected(prev_category);
 					break;
 				}
@@ -488,7 +488,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
-				if(isHavePopupWindow()) {
+				if(havePopupWindow()) {
 					mainGame->cbDBDecks->setSelected(prev_deck);
 					break;
 				}
@@ -639,7 +639,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				changeCategory(catesel);
 				break;
 			}
-			case LISTBOX_CATEGORY_DECKS: {
+			case LISTBOX_DECKS: {
 				int decksel = mainGame->lstDecks->getSelected();
 				mainGame->cbDBDecks->setSelected(decksel);
 				if(decksel == -1)
@@ -665,7 +665,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) != root)
 				break;
-			if(isHavePopupWindow())
+			if(havePopupWindow())
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;
@@ -729,7 +729,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			if(isHavePopupWindow())
+			if(havePopupWindow())
 				break;
 			if(!is_draging) {
 				if(hovered_pos == 0 || hovered_seq == -1)
@@ -769,7 +769,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::EMIE_MMOUSE_LEFT_UP: {
 			if (mainGame->is_siding)
 				break;
-			if (isHavePopupWindow())
+			if (havePopupWindow())
 				break;
 			if (hovered_pos == 0 || hovered_seq == -1)
 				break;
