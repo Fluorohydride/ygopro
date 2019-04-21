@@ -333,7 +333,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_NEW_CATEGORY: {
 				mainGame->gMutex.Lock();
-				mainGame->stDMMessage->setText(L"请输入分类名：");
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1469));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
@@ -345,7 +345,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(mainGame->lstCategories->getSelected() < 4)
 					break;
 				mainGame->gMutex.Lock();
-				mainGame->stDMMessage->setText(L"请输入分类名：");
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1469));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
@@ -355,7 +355,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_DELETE_CATEGORY: {
 				mainGame->gMutex.Lock();
-				mainGame->stDMMessage->setText(L"确实要删除此分类和分类下全部卡组吗？");
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1470));
 				mainGame->stDMMessage2->setVisible(true);
 				mainGame->stDMMessage2->setText(mainGame->lstCategories->getListItem(mainGame->lstCategories->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
@@ -365,7 +365,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_NEW_DECK: {
 				mainGame->gMutex.Lock();
-				mainGame->stDMMessage->setText(L"请输入卡组名：");
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
@@ -385,7 +385,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_MOVE_DECK: {
 				mainGame->gMutex.Lock();
-				mainGame->stDMMessage->setText(L"请选择要移动到的分类：");
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1472));
 				mainGame->cbDMCategory->setVisible(true);
 				mainGame->cbDMCategory->clear();
 				int catesel = mainGame->lstCategories->getSelected();
@@ -402,7 +402,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_COPY_DECK: {
 				mainGame->gMutex.Lock();
-				mainGame->stDMMessage->setText(L"请选择要复制到的分类：");
+				mainGame->stDMMessage->setText(dataManager.GetSysString(1473));
 				mainGame->cbDMCategory->setVisible(true);
 				mainGame->cbDMCategory->clear();
 				int catesel = mainGame->lstCategories->getSelected();
@@ -431,7 +431,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						for(int i = 3;i < mainGame->lstCategories->getItemCount();i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), catename, 256)) {
 								catesel = i;
-								mainGame->stACMessage->setText(L"分类已存在");
+								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
 								mainGame->PopupElement(mainGame->wACMessage, 20);
 								break;
 							}
@@ -461,7 +461,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						for(int i = 3;i < mainGame->lstCategories->getItemCount();i++) {
 							if(!mywcsncasecmp(mainGame->lstCategories->getListItem(i), newcatename, 256)) {
 								catesel = i;
-								mainGame->stACMessage->setText(L"分类已存在");
+								mainGame->stACMessage->setText(dataManager.GetSysString(1474));
 								mainGame->PopupElement(mainGame->wACMessage, 20);
 								break;
 							}
@@ -489,7 +489,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBCategory->setSelected(catesel);
 						changeCategory(catesel);
 					} else {
-							mainGame->stACMessage->setText(L"删除失败");
+							mainGame->stACMessage->setText(dataManager.GetSysString(1476));
 							mainGame->PopupElement(mainGame->wACMessage, 20);
 					}
 					break;
@@ -516,7 +516,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							mainGame->cbDBDecks->setSelected(prev_deck);
 							mainGame->lstDecks->setSelected(prev_deck);
 							if(!res) {
-								mainGame->stACMessage->setText(L"卡组已存在");
+								mainGame->stACMessage->setText(dataManager.GetSysString(1475));
 								mainGame->PopupElement(mainGame->wACMessage, 20);
 							}
 							break;
@@ -539,7 +539,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						}
 						prev_deck = decksel;
 					} else {
-						mainGame->stACMessage->setText(L"删除失败");
+						mainGame->stACMessage->setText(dataManager.GetSysString(1476));
 						mainGame->PopupElement(mainGame->wACMessage, 20);
 					}
 					break;
@@ -576,7 +576,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							mainGame->cbDBDecks->setSelected(prev_deck);
 							mainGame->lstDecks->setSelected(prev_deck);
 							if(!res) {
-								mainGame->stACMessage->setText(L"卡组已存在");
+								mainGame->stACMessage->setText(dataManager.GetSysString(1475));
 								mainGame->PopupElement(mainGame->wACMessage, 20);
 							}
 							break;
@@ -614,7 +614,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							mainGame->cbDBDecks->setSelected(prev_deck);
 							mainGame->lstDecks->setSelected(prev_deck);
 							if(!res) {
-								mainGame->stACMessage->setText(L"卡组已存在");
+								mainGame->stACMessage->setText(dataManager.GetSysString(1475));
 								mainGame->PopupElement(mainGame->wACMessage, 20);
 							}
 							break;
