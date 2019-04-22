@@ -58,7 +58,7 @@ int SingleMode::SinglePlayThread() {
 		open_file = false;
 		script_name = BufferIO::EncodeUTF8s(open_file_name);
 		if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr)) {
-			script_name = BufferIO::EncodeUTF8s(L"./single/" + open_file_name);
+			script_name = BufferIO::EncodeUTF8s(L"./puzzles/" + open_file_name);
 			if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr))
 				loaded = false;
 		}

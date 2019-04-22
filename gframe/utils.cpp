@@ -134,6 +134,7 @@ namespace ygo {
 	void Utils::CreateResourceFolders() {
 		//create directories if missing
 		Makedirectory(TEXT("deck"));
+		Makedirectory(TEXT("puzzles"));
 		Makedirectory(TEXT("pics"));
 		Makedirectory(TEXT("pics/field"));
 		Makedirectory(TEXT("pics/temp/"));

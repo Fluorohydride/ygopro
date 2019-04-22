@@ -689,7 +689,7 @@ bool Game::Initialize() {
 	wSinglePlay->setVisible(false);
 	lstSinglePlayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wSinglePlay, LISTBOX_SINGLEPLAY_LIST, rect<s32>(10, 30, 350, 400), filesystem, true, true, false);
 	lstSinglePlayList->setItemHeight(18);
-	lstSinglePlayList->setWorkingPath(L"./single", true);
+	lstSinglePlayList->setWorkingPath(L"./puzzles", true);
 	lstSinglePlayList->addFilteredExtensions({L"lua"});
 	btnLoadSinglePlay = env->addButton(rect<s32>(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1357).c_str());
 	btnLoadSinglePlay->setEnabled(false);
