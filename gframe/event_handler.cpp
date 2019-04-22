@@ -291,33 +291,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->guiFont, dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
-			case BUTTON_OPTION_0: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 0;
-				SetResponseSelectedOption();
-				break;
-			}
-			case BUTTON_OPTION_1: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 1;
-				SetResponseSelectedOption();
-				break;
-			}
-			case BUTTON_OPTION_2: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 2;
-				SetResponseSelectedOption();
-				break;
-			}
-			case BUTTON_OPTION_3: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 3;
-				SetResponseSelectedOption();
-				break;
-			}
+			case BUTTON_OPTION_0:
+			case BUTTON_OPTION_1: 
+			case BUTTON_OPTION_2: 
+			case BUTTON_OPTION_3: 
 			case BUTTON_OPTION_4: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 4;
+				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
+				selected_option = id - BUTTON_OPTION_0 + step;
 				SetResponseSelectedOption();
 				break;
 			}
@@ -846,6 +827,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
+			case SCROLL_OPTION_SELECT: {
+				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
+				for(int i = 0; i < 5; i++) {
+					const wchar_t* option = dataManager.GetDesc(select_options[i + step]);
+					mainGame->btnOption[i]->setText(option);
+				}
+				break;
+			}
 			case SCROLL_CARD_SELECT: {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
