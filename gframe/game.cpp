@@ -695,7 +695,9 @@ bool Game::Initialize() {
 	btnLoadSinglePlay->setEnabled(false);
 	btnSinglePlayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210).c_str());
 	env->addStaticText(dataManager.GetSysString(1352).c_str(), rect<s32>(360, 30, 570, 50), false, true, wSinglePlay);
-	stSinglePlayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 350), false, true, wSinglePlay);
+	stSinglePlayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wSinglePlay, -1, rect<s32>(360, 60, 570, 350));
+	((CGUICustomText*)stSinglePlayInfo)->enableScrollBar(0, 0.07f);
+	stSinglePlayInfo->setWordWrap(true);
 	//replay save
 	wReplaySave = env->addWindow(rect<s32>(510, 200, 820, 320), false, dataManager.GetSysString(1340).c_str());
 	wReplaySave->getCloseButton()->setVisible(false);
