@@ -32,13 +32,17 @@ struct Deck {
 };
 
 class DeckManager {
+private:
+	int null_lflist_index = -1;
 public:
 	Deck current_deck;
 	Deck pre_deck;
 	std::vector<LFList> _lfList;
 
-	void LoadLFListSingle(const std::wstring& path);
+	bool LoadLFListSingle(const std::wstring& path);
+	bool LoadLFListFolder(std::wstring path);
 	void LoadLFList();
+	void RefreshLFList();
 	std::wstring GetLFListName(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes = 0);
 	int TypeCount(std::vector<CardDataC*> cards, int type);

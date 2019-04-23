@@ -9,14 +9,15 @@ namespace ygo {
 
 DeckManager deckManager;
 
-void DeckManager::LoadLFListSingle(const std::wstring& path) {
+bool DeckManager::LoadLFListSingle(const std::wstring& path) {
+	bool loaded = false;
 #ifdef _WIN32
 	std::ifstream infile(path, std::ifstream::in);
 #else
 	std::ifstream infile(BufferIO::EncodeUTF8s(path), std::ifstream::in);
 #endif
 	if(!infile.is_open())
-		return;
+		return loaded;
 	LFList lflist;
 	lflist.hash = 0;
 	std::string str;
@@ -56,17 +57,42 @@ void DeckManager::LoadLFListSingle(const std::wstring& path) {
 		lflist.content[code] = count;
 		lflist.hash = lflist.hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 	}
+	if(lflist.hash)
+		_lfList.push_back(lflist);
 	infile.close();
+	return loaded;
+}
+bool DeckManager::LoadLFListFolder(std::wstring path) {
+	path = Utils::NormalizePath(path);
+	bool loaded = false;
+	Utils::FindfolderFiles(path, [this, &path, &loaded](std::wstring name, bool isdir, void* payload) {
+		if(isdir) {
+			return;
+		} else {
+			if(Utils::GetFileExtension(name) == L"conf")
+				loaded = LoadLFListSingle(path + name);
+		}
+	});
+	return loaded;
 }
 void DeckManager::LoadLFList() {
-	LoadLFListSingle(L"expansions/lflist.conf");
-	LoadLFListSingle(L"lflist.conf");
+	LoadLFListSingle(L"./expansions/lflist.conf");
+	LoadLFListSingle(L"./lflist.conf");
+	LoadLFListFolder(L"./lflists/");
 	LFList nolimit;
 	nolimit.listName = L"N/A";
 	nolimit.hash = 0;
 	nolimit.content.clear();
 	nolimit.whitelist = false;
 	_lfList.push_back(nolimit);
+	null_lflist_index = _lfList.size() - 1;
+}
+//moves the "N/A" lflist at the bottom of the vector
+void DeckManager::RefreshLFList() {
+	if(null_lflist_index != -1 && null_lflist_index != _lfList.size() -1) {
+		auto it = _lfList.begin() + null_lflist_index;
+		std::rotate(it, it + 1, _lfList.end());
+	}
 }
 std::wstring DeckManager::GetLFListName(int lfhash) {
 	auto it = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](LFList list){return list.hash == (unsigned int)lfhash; });

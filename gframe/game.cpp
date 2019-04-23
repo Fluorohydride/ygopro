@@ -914,6 +914,12 @@ void Game::MainLoop() {
 				for(auto& file : files)
 					refresh_db = dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file)) || refresh_db;
 				dataManager.LoadStrings(repo.data_path + "/strings.conf");
+				if(deckManager.LoadLFListSingle(BufferIO::DecodeUTF8s(repo.data_path) + L"/lflist.conf") || deckManager.LoadLFListFolder(BufferIO::DecodeUTF8s(repo.data_path) + L"/lflists/")) {
+					deckManager.RefreshLFList();
+					cbDBLFList->clear();
+					for(auto& list : deckManager._lfList)
+						cbDBLFList->addItem(list.listName.c_str());
+				}
 				if(repo.has_core) {
 #ifdef _WIN32
 					cores_to_load.insert(cores_to_load.begin(), BufferIO::DecodeUTF8s(repo.core_path));
