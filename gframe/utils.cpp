@@ -208,12 +208,7 @@ namespace ygo {
 				}
 				return;
 			} else {
-				size_t dotpos = name.find_last_of(L".");
-				if(dotpos == std::wstring::npos)
-					return;
-				auto extension = name.substr(dotpos + 1);
-				std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
-				if(extensions.size() && std::find(extensions.begin(), extensions.end(), extension) == extensions.end())
+				if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension(name)) == extensions.end())
 					return;
 				res.push_back(name.c_str());
 			}
@@ -247,6 +242,30 @@ namespace ygo {
 		if(trailing_slash)
 			normalpath += L"/";
 		return normalpath;
+	}
+	std::wstring Utils::GetFileExtension(const std::wstring & file) {
+		size_t dotpos = file.find_last_of(L".");
+		if(dotpos == std::wstring::npos)
+			return file;
+		std::wstring extension = file.substr(dotpos + 1);
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+		return extension;
+	}
+	std::wstring Utils::GetFileName(const std::wstring & file) {
+		auto dash1 = file.find_last_of(L"\\");
+		auto dash2 = file.find_last_of(L"/");
+		size_t dash;
+		if(dash1 == std::wstring::npos && dash2 == std::wstring::npos)
+			dash = 0;
+		else if(dash1 != std::wstring::npos && dash2 != std::wstring::npos)
+			dash = std::max(dash1, dash2) + 1;
+		else
+			dash = std::min(dash1, dash2) + 1;
+		size_t dotpos = file.find_last_of(L".");
+		if(dotpos == std::wstring::npos)
+			dotpos = 0;
+		std::wstring name = file.substr(dash, dotpos - dash);
+		return name;
 	}
 }
 

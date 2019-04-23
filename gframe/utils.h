@@ -29,6 +29,8 @@ namespace ygo {
 		static void FindfolderFiles(const std::wstring & path, const std::function<void(std::wstring, bool, void*)>& cb, void* = nullptr);
 		static std::vector<std::wstring> FindfolderFiles(const std::wstring& path, std::vector<std::wstring> extensions, int subdirectorylayers = 0);
 		static std::wstring NormalizePath(const std::wstring& path, bool trailing_slash = true);
+		static std::wstring GetFileExtension(const std::wstring& file);
+		static std::wstring GetFileName(const std::wstring& file);
 	};
 }
 

@@ -42,9 +42,7 @@ int main(int argc, char* argv[]) {
 #endif //__APPLE__
 #if defined(_WIN32) && !defined(_DEBUG)
 	if(wargc == 2) {
-		std::wstring name(wargv[1]);
-		auto extension = name.substr(name.find_last_of(L"."));
-		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+		auto extension = ygo::Utils::GetFileExtension(wargv[1]);
 		if(extension == L".ydk" || extension == L".yrp" || extension == L".yrpx") {
 			wchar_t exepath[MAX_PATH];
 			GetModuleFileNameW(NULL, exepath, MAX_PATH);
@@ -134,8 +132,7 @@ int main(int argc, char* argv[]) {
 			break;
 		} else if(wargc == 2 && wcslen(wargv[1]) >= 4) {
 			std::wstring name(wargv[i]);
-			auto extension = name.substr(name.find_last_of(L"."));
-			std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+			auto extension = ygo::Utils::GetFileExtension(name);
 			if(extension == L".ydk") {
 				open_file = true;
 				open_file_name = name;

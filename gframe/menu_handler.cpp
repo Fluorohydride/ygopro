@@ -366,23 +366,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(open_file && deckManager.LoadDeck(open_file_name)) {
-#ifdef WIN32
-					auto dash = open_file_name.find_last_of(L"\\");
-#else
-					auto dash = open_file_name.find_last_of(L"/");
-#endif
-					auto dot = open_file_name.find_last_of(L".");
-					if(dash != std::wstring::npos && dot != std::wstring::npos) {
-						mainGame->ebDeckname->setText(open_file_name.substr(dash + 1, dot - dash - 1).c_str());
-						mainGame->cbDBDecks->setSelected(-1);
-					} else {
-						for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
-							if(mainGame->cbDBDecks->getItem(i) == open_file_name) {
-								mainGame->cbDBDecks->setSelected(i);
-								break;
-							}
-						}
-					}
+					auto name = Utils::GetFileName(open_file_name);
+					mainGame->ebDeckname->setText(name.c_str());
+					mainGame->cbDBDecks->setSelected(-1);
 					open_file = false;
 				} else if(mainGame->cbDBDecks->getSelected() != -1) {
 					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));

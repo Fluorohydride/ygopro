@@ -54,17 +54,13 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	}
 }
 void SoundManager::RefreshChantsList() {
-	if(!Utils::Makedirectory(TEXT("./sound/chants"))) {
-		auto files = Utils::FindfolderFiles(L"./sound/chants", { L"mp3", L"ogg", L"wav" });
-		for(auto& file : files) {
-			size_t dotpos = file.find_last_of(L".");
-			if(dotpos == std::wstring::npos)
-				return;
-			auto scode = file.substr(0, dotpos);
-			unsigned int code = std::stoi(scode);
-			if(code && !ChantsList.count(code))
-				ChantsList[code] = BufferIO::EncodeUTF8s(file);
-		}
+	Utils::Makedirectory(TEXT("./sound/chants"));
+	auto files = Utils::FindfolderFiles(L"./sound/chants", { L"mp3", L"ogg", L"wav" });
+	for(auto& file : files) {
+		auto scode = Utils::GetFileName(L"./sound/chants/" + file);
+		unsigned int code = std::stoi(scode);
+		if(code && !ChantsList.count(code))
+			ChantsList[code] = BufferIO::EncodeUTF8s(file);
 	}
 }
 void SoundManager::PlaySoundEffect(Sounds sound) {
