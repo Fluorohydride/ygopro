@@ -810,90 +810,6 @@ void Game::MainLoop() {
 	int fps = 0;
 	std::wstring corename;
 	while(device->run()) {
-		fps++;
-		auto now = timer->getRealTime();
-		delta_time = now - prev_time;
-		prev_time = now;
-		cur_time += delta_time;
-		dimension2du size = driver->getScreenSize();
-		if(window_size != size) {
-			window_size = size;
-			cardimagetextureloading = false;
-			OnResize();
-		}
-		frame_counter += (float)delta_time * 60.0f/1000.0f;
-		for(; frame_counter>=1; frame_counter--) {
-			linePatternD3D = (linePatternD3D + 1) % 30;
-		}
-		atkframe += 0.1f * (float)delta_time * 60.0f / 1000.0f;
-		atkdy = (float)sin(atkframe);
-		driver->beginScene(true, true, SColor(0, 0, 0, 0));
-		gMutex.lock();
-		if(dInfo.isStarted) {
-			if (showcardcode == 1 || showcardcode == 3)
-				soundManager.PlayBGM(BGM_WIN);
-			else if (showcardcode == 2)
-				soundManager.PlayBGM(BGM_LOSE);
-			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] <= dInfo.lp[LocalPlayer(1)] / 2)
-				soundManager.PlayBGM(BGM_DISADVANTAGE);
-			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] >= dInfo.lp[LocalPlayer(1)] * 2)
-				soundManager.PlayBGM(BGM_ADVANTAGE);
-			else
-				soundManager.PlayBGM(BGM_DUEL);
-			DrawBackImage(imageManager.tBackGround);
-			DrawBackGround();
-			DrawCards();
-			DrawMisc();
-			smgr->drawAll();
-			driver->setMaterial(irr::video::IdentityMaterial);
-			driver->clearZBuffer();
-		} else if(is_building) {
-			soundManager.PlayBGM(BGM_DECK);
-			DrawBackImage(imageManager.tBackGround_deck);
-			DrawDeckBd();
-		} else {
-			soundManager.PlayBGM(BGM_MENU);
-			DrawBackImage(imageManager.tBackGround_menu);
-		}
-		DrawGUI();
-		DrawSpec();
-		if(cardimagetextureloading) {
-			ShowCardInfo(showingcard, false);
-		}
-		gMutex.unlock();
-		if(signalFrame > 0) {
-			uint32 movetime = std::min((int)delta_time, signalFrame);
-			signalFrame -= movetime;
-			if(!signalFrame)
-				frameSignal.Set();
-		}
-		if(waitFrame >= 0.0f) {
-			waitFrame += (float)delta_time * 60.0f / 1000.0f;;
-			if((int)std::round(waitFrame) % 90 == 0) {
-				stHintMsg->setText(dataManager.GetSysString(1390).c_str());
-			} else if((int)std::round(waitFrame) % 90 == 30) {
-				stHintMsg->setText(dataManager.GetSysString(1391).c_str());
-			} else if((int)std::round(waitFrame) % 90 == 60) {
-				stHintMsg->setText(dataManager.GetSysString(1392).c_str());
-			}
-		}
-		driver->endScene();
-		if(!closeSignal.try_lock())
-			CloseDuelWindow();
-		else
-			closeSignal.unlock();
-		while(cur_time >= 1000) {
-			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
-			fps = 0;
-			cur_time -= 1000;
-			if(dInfo.time_player == 0 || dInfo.time_player == 1)
-				if(dInfo.time_left[dInfo.time_player])
-					dInfo.time_left[dInfo.time_player]--;
-		}
-		if (DuelClient::try_needed) {
-			DuelClient::try_needed = false;
-			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, false);
-		}
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
 			bool refresh_db = false;
@@ -972,7 +888,7 @@ void Game::MainLoop() {
 			}
 			cores_to_load.clear();
 		}
-		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && std::wstring(stMessage->getText())== L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.")) {
+		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && std::wstring(stMessage->getText()) == L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.")) {
 			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();
@@ -982,12 +898,91 @@ void Game::MainLoop() {
 			repoInfoGui[repo.first].progress1->setProgress(repo.second);
 			repoInfoGui[repo.first].progress2->setProgress(repo.second);
 		}
-		if(gameConf.max_fps) {
-			int ndelta_time = timer->getRealTime() - prev_time;
-			int sleep_time = (1000 / gameConf.max_fps) - ndelta_time;
-			if(sleep_time > 0) {
-				device->sleep(sleep_time);
+		fps++;
+		auto now = timer->getRealTime();
+		delta_time = now - prev_time;
+		prev_time = now;
+		cur_time += delta_time;
+		dimension2du size = driver->getScreenSize();
+		if(window_size != size) {
+			window_size = size;
+			cardimagetextureloading = false;
+			OnResize();
+		}
+		frame_counter += (float)delta_time * 60.0f/1000.0f;
+		for(; frame_counter>=1; frame_counter--) {
+			linePatternD3D = (linePatternD3D + 1) % 30;
+		}
+		atkframe += 0.1f * (float)delta_time * 60.0f / 1000.0f;
+		atkdy = (float)sin(atkframe);
+		driver->beginScene(true, true, SColor(0, 0, 0, 0));
+		gMutex.lock();
+		if(dInfo.isStarted) {
+			if (showcardcode == 1 || showcardcode == 3)
+				soundManager.PlayBGM(BGM_WIN);
+			else if (showcardcode == 2)
+				soundManager.PlayBGM(BGM_LOSE);
+			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] <= dInfo.lp[LocalPlayer(1)] / 2)
+				soundManager.PlayBGM(BGM_DISADVANTAGE);
+			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] >= dInfo.lp[LocalPlayer(1)] * 2)
+				soundManager.PlayBGM(BGM_ADVANTAGE);
+			else
+				soundManager.PlayBGM(BGM_DUEL);
+			DrawBackImage(imageManager.tBackGround);
+			DrawBackGround();
+			DrawCards();
+			DrawMisc();
+			smgr->drawAll();
+			driver->setMaterial(irr::video::IdentityMaterial);
+			driver->clearZBuffer();
+		} else if(is_building) {
+			soundManager.PlayBGM(BGM_DECK);
+			DrawBackImage(imageManager.tBackGround_deck);
+			DrawDeckBd();
+		} else {
+			soundManager.PlayBGM(BGM_MENU);
+			DrawBackImage(imageManager.tBackGround_menu);
+		}
+		DrawGUI();
+		DrawSpec();
+		if(cardimagetextureloading) {
+			ShowCardInfo(showingcard, false);
+		}
+		gMutex.unlock();
+		if(signalFrame > 0) {
+			uint32 movetime = std::min((int)delta_time, signalFrame);
+			signalFrame -= movetime;
+			if(!signalFrame)
+				frameSignal.Set();
+		}
+		if(waitFrame >= 0.0f) {
+			waitFrame += (float)delta_time * 60.0f / 1000.0f;;
+			if((int)std::round(waitFrame) % 90 == 0) {
+				stHintMsg->setText(dataManager.GetSysString(1390).c_str());
+			} else if((int)std::round(waitFrame) % 90 == 30) {
+				stHintMsg->setText(dataManager.GetSysString(1391).c_str());
+			} else if((int)std::round(waitFrame) % 90 == 60) {
+				stHintMsg->setText(dataManager.GetSysString(1392).c_str());
 			}
+		}
+		driver->endScene();
+		if(!closeSignal.try_lock())
+			CloseDuelWindow();
+		else
+			closeSignal.unlock();
+		if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
+			device->sleep(20);
+		while(cur_time >= 1000) {
+			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
+			fps = 0;
+			cur_time -= 1000;
+			if(dInfo.time_player == 0 || dInfo.time_player == 1)
+				if(dInfo.time_left[dInfo.time_player])
+					dInfo.time_left[dInfo.time_player]--;
+		}
+		if (DuelClient::try_needed) {
+			DuelClient::try_needed = false;
+			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, false);
 		}
 	}
 	DuelClient::StopClient(true);
