@@ -110,7 +110,6 @@ public:
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
-	void RefreshBGMList();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
@@ -546,7 +545,6 @@ public:
 	irr::gui::IGUIButton* btnReplaySwap;
 	//surrender/leave
 	irr::gui::IGUIButton* btnLeaveGame;
-	//soundEngine
 	//swap
 	irr::gui::IGUIButton* btnSpectatorSwap;
 	//chain control
