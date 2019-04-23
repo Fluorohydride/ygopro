@@ -156,6 +156,7 @@ public:
 	}
 	static std::string EncodeUTF8s(const std::wstring& source) {
 		std::string res;
+		res.reserve(source.size() * 3);
 		for(size_t i = 0; i < source.size(); i++) {
 			auto c = source[i];
 			if(c < 0x80) {
@@ -186,11 +187,13 @@ public:
 #endif
 			}
 		}
+		res.shrink_to_fit();
 		return res;
 	}
 	// UTF-8 to UTF-16/UTF-32
 	static std::wstring DecodeUTF8s(const std::string& source) {
-		std::wstring res = L"";
+		std::wstring res;
+		res.reserve(source.size());
 		for(size_t i = 0; i < source.size();) {
 			auto c = source[i];
 			if((c & 0x80) == 0) {
@@ -215,6 +218,7 @@ public:
 			} else
 				i++;
 		}
+		res.shrink_to_fit();
 		return res;
 	}
 	static int GetVal(const wchar_t* pstr) {
