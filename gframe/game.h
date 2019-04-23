@@ -105,6 +105,7 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
+	void ToggleFullscreen();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void LoadExpansionDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
@@ -191,6 +192,8 @@ public:
 	void* ocgcore;
 #endif
 	bool coreloaded;
+	bool is_fullscreen;
+	core::dimension2d<u32> unresized_screen_size;
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];

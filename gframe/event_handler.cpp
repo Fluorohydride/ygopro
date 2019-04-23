@@ -1842,6 +1842,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			return true;
 			break;
 		}
+		case irr::KEY_F11:
+		{
+			if(!event.KeyInput.PressedDown)
+				mainGame->ToggleFullscreen();
+			return true;
+			break;
+		}
 		case irr::KEY_F12: {
 			if (!event.KeyInput.PressedDown)
 				Utils::takeScreenshot(mainGame->device);

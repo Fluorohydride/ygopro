@@ -9,6 +9,9 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#ifdef _WIN32
+#include "../irrlicht/src/CIrrDeviceWin32.h"
+#endif
 #include <sstream>
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -27,6 +30,7 @@ Game* mainGame;
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
+	is_fullscreen = false;
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
 #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
@@ -36,12 +40,15 @@ bool Game::Initialize() {
 #endif
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
+#ifndef _WIN32
 	if(gameConf.fullscreen) {
-		IrrlichtDevice *nulldevice = createDevice(video::EDT_NULL);
+		irr::IrrlichtDevice* nulldevice = createDevice(video::EDT_NULL);
 		params.WindowSize = nulldevice->getVideoModeList()->getDesktopResolution();
 		nulldevice->drop();
 		params.Fullscreen = true;
+		is_fullscreen = true;
 	}
+#endif
 	device = irr::createDeviceEx(params);
 	if(!device) {
 		ErrorLog("Failed to create Irrlicht Engine device!");
@@ -132,6 +139,8 @@ bool Game::Initialize() {
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 #endif
+	if(gameConf.fullscreen)
+		ToggleFullscreen();
 	wCommitsLog = env->addWindow(rect<s32>(0, 0, 500 + 10, 400 + 35 + 35), false, L"Update log");
 	wCommitsLog->setVisible(false);
 	wCommitsLog->getCloseButton()->setEnabled(false);
@@ -998,7 +1007,51 @@ void Game::MainLoop() {
 	if(ocgcore)
 		UnloadCore(ocgcore);
 #endif //YGOPRO_BUILD_DLL
-//	device->drop();
+	device->drop();
+}
+void Game::ToggleFullscreen() {
+#ifdef _WIN32
+	is_fullscreen = !is_fullscreen;
+	HWND hWnd;
+	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
+	if(gameConf.use_d3d)
+		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
+	else
+		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
+	LONG_PTR style = WS_POPUP;
+	device->setResizable(false);
+
+	RECT clientSize;
+	clientSize.top = 0;
+	clientSize.left = 0;
+	if(is_fullscreen) {
+		unresized_screen_size = driver->getScreenSize();
+		style = WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+		auto a = device->getVideoModeList()->getDesktopResolution();
+		clientSize.right = a.Width;
+		clientSize.bottom = a.Height;
+	} else {
+		style = WS_THICKFRAME | WS_SYSMENU | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+		clientSize.right = unresized_screen_size.Width;
+		clientSize.bottom = unresized_screen_size.Height;
+	}
+
+	if(!SetWindowLongPtrW(hWnd, GWL_STYLE, style))
+		ErrorLog("Could not change window style.");
+
+	AdjustWindowRect(&clientSize, style, FALSE);
+
+	const s32 realWidth = clientSize.right - clientSize.left;
+	const s32 realHeight = clientSize.bottom - clientSize.top;
+
+	const s32 windowLeft = (GetSystemMetrics(SM_CXSCREEN) - realWidth) / 2;
+	const s32 windowTop = (GetSystemMetrics(SM_CYSCREEN) - realHeight) / 2;
+
+	SetWindowPos(hWnd, HWND_TOP, windowLeft, windowTop, realWidth, realHeight,
+				 SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+
+	static_cast<irr::CIrrDeviceWin32::CCursorControl*>(device->getCursorControl())->updateBorderSize(is_fullscreen, true);
+#endif
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
 	for(int i = 0; i < 16; ++i)
@@ -1174,7 +1227,7 @@ void Game::SaveConfig() {
 	conf_file << "use_d3d = "			<< std::to_string(gameConf.use_d3d ? 1 : 0) << "\n";
 	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
 	conf_file << "max_fps = "			<< std::to_string(gameConf.max_fps) << "\n";
-	conf_file << "fullscreen = "		<< std::to_string(gameConf.fullscreen ? 1 : 0) << "\n";
+	conf_file << "fullscreen = "		<< std::to_string(is_fullscreen ? 1 : 0) << "\n";
 	conf_file << "antialias = "			<< std::to_string(gameConf.antialias) << "\n";
 	conf_file << "errorlog = "			<< std::to_string(enable_log) << "\n";
 	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
