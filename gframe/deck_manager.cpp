@@ -9,6 +9,14 @@ namespace ygo {
 
 DeckManager deckManager;
 
+bool DeckManager::LoadLFListSingle(const std::string & path) {
+	return LoadLFListSingle(BufferIO::DecodeUTF8s(path));
+}
+
+bool DeckManager::LoadLFListFolder(std::string path) {
+	return LoadLFListFolder(BufferIO::DecodeUTF8s(path));
+}
+
 bool DeckManager::LoadLFListSingle(const std::wstring& path) {
 	bool loaded = false;
 #ifdef _WIN32

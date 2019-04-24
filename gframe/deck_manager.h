@@ -39,6 +39,8 @@ public:
 	Deck pre_deck;
 	std::vector<LFList> _lfList;
 
+	bool LoadLFListSingle(const std::string& path);
+	bool LoadLFListFolder(std::string path);
 	bool LoadLFListSingle(const std::wstring& path);
 	bool LoadLFListFolder(std::wstring path);
 	void LoadLFList();
