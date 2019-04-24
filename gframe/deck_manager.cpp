@@ -42,6 +42,7 @@ bool DeckManager::LoadLFListSingle(const std::wstring& path) {
 			lflist.content.clear();
 			lflist.hash = 0x7dfcee6a;
 			lflist.whitelist = false;
+			loaded = true;
 			continue;
 		}
 		const std::string key("$whitelist");
