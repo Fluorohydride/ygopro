@@ -387,17 +387,17 @@ void RepoManager::UpdateStatus(std::string repo, int percentage) {
 bool RepoManager::GitRepo::Sanitize() {
 	if(url.empty())
 		return false;
-	data_path = repo_path + "/" + data_path + "/";
+	data_path = Utils::NormalizePath(repo_path + "/" + data_path + "/");
 	if(script_path.size())
-		script_path = repo_path + "/" + script_path + "/";
+		script_path = Utils::NormalizePath(repo_path + "/" + script_path + "/");
 	else
-		script_path = repo_path + "/script/";
+		script_path = Utils::NormalizePath(repo_path + "/script/");
 	if(pics_path.size())
-		pics_path = repo_path + "/" + pics_path + "/";
+		pics_path = Utils::NormalizePath(repo_path + "/" + pics_path + "/");
 	else
-		pics_path = repo_path + "/pics/";
+		pics_path = Utils::NormalizePath(repo_path + "/pics/");
 	if(has_core)
-		core_path = repo_path + "/" + core_path + "/";
+		core_path = Utils::NormalizePath(repo_path + "/" + core_path + "/");
 	if(repo_name.empty()) {
 		size_t found = repo_path.find_last_of("/");
 		repo_name = repo_path.substr(found + 1);

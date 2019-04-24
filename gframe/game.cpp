@@ -838,8 +838,8 @@ void Game::MainLoop() {
 				auto files = Utils::FindfolderFiles(BufferIO::DecodeUTF8s(repo.data_path), { L"cdb" }, 0);
 				for(auto& file : files)
 					refresh_db = dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file)) || refresh_db;
-				dataManager.LoadStrings(repo.data_path + "/strings.conf");
-				if(deckManager.LoadLFListSingle(BufferIO::DecodeUTF8s(repo.data_path) + L"/lflist.conf") || deckManager.LoadLFListFolder(BufferIO::DecodeUTF8s(repo.data_path) + L"/lflists/")) {
+				dataManager.LoadStrings(repo.data_path + "strings.conf");
+				if(deckManager.LoadLFListSingle(repo.data_path + "lflist.conf") || deckManager.LoadLFListFolder(repo.data_path + "lflists/")) {
 					deckManager.RefreshLFList();
 					cbDBLFList->clear();
 					for(auto& list : deckManager._lfList)
@@ -852,21 +852,21 @@ void Game::MainLoop() {
 					cores_to_load.insert(cores_to_load.begin(), repo.core_path);
 #endif
 				}
-				std::wstring text;
-				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += BufferIO::DecodeUTF8s(n) + L"\n\n"; });
+				std::string text;
+				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += n + "\n\n"; });
 				if(text.size())
 					text.erase(text.size() - 2, 2);
-				repoInfoGui[repo.repo_path].commit_history_full = text;
+				repoInfoGui[repo.repo_path].commit_history_full = BufferIO::DecodeUTF8s(text);
 				repoInfoGui[repo.repo_path].commit_history_partial.clear();
 				if(repo.commit_history_partial.size()) {
 					if(repo.commit_history_full.front() == repo.commit_history_partial.front() && repo.commit_history_full.back() == repo.commit_history_partial.back()) {
 						repoInfoGui[repo.repo_path].commit_history_partial = repoInfoGui[repo.repo_path].commit_history_full;
 					} else {
 						text.clear();
-						std::for_each(repo.commit_history_partial.begin(), repo.commit_history_partial.end(), [&text](const std::string& n) { text += BufferIO::DecodeUTF8s(n) + L"\n\n"; });
+						std::for_each(repo.commit_history_partial.begin(), repo.commit_history_partial.end(), [&text](const std::string& n) { text += n + "\n\n"; });
 						if(text.size())
 							text.erase(text.size() - 2, 2);
-						repoInfoGui[repo.repo_path].commit_history_partial = text;
+						repoInfoGui[repo.repo_path].commit_history_partial = BufferIO::DecodeUTF8s(text);
 					}
 				}
 				repoInfoGui[repo.repo_path].history_button1->setEnabled(true);
@@ -1948,18 +1948,6 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	for(auto& forbid : chars)
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 	obj->setText(text.c_str());
-}
-std::vector<std::wstring> Game::TokenizeString(std::wstring input, const std::wstring& token) {
-	std::vector<std::wstring> res;
-	std::size_t pos;
-	while((pos = input.find(token)) != std::wstring::npos) {
-		if(pos != 0)
-			res.push_back(input.substr(0, pos));
-		input = input.substr(pos + 1);
-	}
-	if(input.size())
-		res.push_back(input);
-	return res;
 }
 #define CHK_RNG(range_start, range_end) (c >= range_start && c <= range_end)
 std::wstring Game::StringtoUpper(std::wstring input) {

@@ -216,7 +216,7 @@ namespace ygo {
 		return res;
 	}
 	std::wstring Utils::NormalizePath(const std::wstring & path, bool trailing_slash) {
-		std::vector<std::wstring> paths = ygo::Game::TokenizeString(path, L"/");
+		std::vector<std::wstring> paths = ygo::Game::TokenizeString<std::wstring>(path, L"/");
 		if(paths.empty())
 			return path;
 		std::wstring normalpath;
@@ -265,6 +265,58 @@ namespace ygo {
 		if(dotpos == std::wstring::npos)
 			dotpos = 0;
 		std::wstring name = file.substr(dash, dotpos - dash);
+		return name;
+	}
+	std::string Utils::NormalizePath(const std::string & path, bool trailing_slash) {
+		std::vector<std::string> paths = ygo::Game::TokenizeString<std::string>(path, "/");
+		if(paths.empty())
+			return path;
+		std::string normalpath;
+		for(auto it = paths.begin(); it != paths.end();) {
+			if((*it).empty()) {
+				it = paths.erase(it);
+				continue;
+			}
+			if((*it) == "." && it != paths.begin()) {
+				it = paths.erase(it);
+				continue;
+			}
+			if((*it) != ".." && it != paths.begin() && (it + 1) != paths.end() && (*(it + 1)) == "..") {
+				it = paths.erase(paths.erase(it));
+				continue;
+			}
+			it++;
+		}
+		for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
+			normalpath += *it + "/";
+		}
+		normalpath += paths.back();
+		if(trailing_slash)
+			normalpath += "/";
+		return normalpath;
+	}
+	std::string Utils::GetFileExtension(const std::string & file) {
+		size_t dotpos = file.find_last_of(".");
+		if(dotpos == std::string::npos)
+			return file;
+		std::string extension = file.substr(dotpos + 1);
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+		return extension;
+	}
+	std::string Utils::GetFileName(const std::string & file) {
+		auto dash1 = file.find_last_of("\\");
+		auto dash2 = file.find_last_of("/");
+		size_t dash;
+		if(dash1 == std::string::npos && dash2 == std::string::npos)
+			dash = 0;
+		else if(dash1 != std::string::npos && dash2 != std::string::npos)
+			dash = std::max(dash1, dash2) + 1;
+		else
+			dash = std::min(dash1, dash2) + 1;
+		size_t dotpos = file.find_last_of(".");
+		if(dotpos == std::string::npos)
+			dotpos = 0;
+		std::string name = file.substr(dash, dotpos - dash);
 		return name;
 	}
 }

@@ -800,7 +800,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		searchterms.push_back(searchterm);
 	else {
 		searchterm = Game::StringtoUpper(searchterm);
-		searchterms = Game::TokenizeString(searchterm, L"+");
+		searchterms = Game::TokenizeString<std::wstring>(searchterm, L"+");
 	}
 	if(FiltersChanged() || force_refresh)
 		searched_terms.clear();
@@ -832,9 +832,9 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		if(!term.empty()) {
 			if(term[0] == L'@' || term[0] == L'$') {
 				if(term.size() > 1)
-					tokens = Game::TokenizeString(&term[1], L"*");
+					tokens = Game::TokenizeString<std::wstring>(&term[1], L"*");
 			} else {
-				tokens = Game::TokenizeString(term, L"*");
+				tokens = Game::TokenizeString<std::wstring>(term, L"*");
 			}
 		}
 		if(tokens.empty())

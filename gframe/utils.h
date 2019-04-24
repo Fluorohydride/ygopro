@@ -31,6 +31,9 @@ namespace ygo {
 		static std::wstring NormalizePath(const std::wstring& path, bool trailing_slash = true);
 		static std::wstring GetFileExtension(const std::wstring& file);
 		static std::wstring GetFileName(const std::wstring& file);
+		static std::string NormalizePath(const std::string& path, bool trailing_slash = true);
+		static std::string GetFileExtension(const std::string& file);
+		static std::string GetFileName(const std::string& file);
 	};
 }
 
