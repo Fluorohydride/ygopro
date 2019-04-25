@@ -423,7 +423,7 @@ void CGUIFileSelectListBox::selectNew(s32 ypos, bool onlyHover) {
 
 	recalculateScrollPos();
 
-	bool selagain = (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
+	bool selagain = Selected >=0 && (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
 	prevRelPath = curRelPath;
 	selectTime = now;
 	if(selagain && Items[Selected].isDirectory) {
