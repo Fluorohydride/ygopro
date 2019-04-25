@@ -227,8 +227,8 @@ void SoundManager::StopBGM() {
 }
 bool SoundManager::PlayChant(unsigned int code) {
 	if(ChantsList.count(code)) {
-		if(!engineSound->isCurrentlyPlaying(("./sound/chants" + ChantsList[code]).c_str()))
-			engineSound->play2D(("./sound/chants" + ChantsList[code]).c_str());
+		if(!engineSound->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str()))
+			engineSound->play2D(("./sound/chants/" + ChantsList[code]).c_str());
 		return true;
 	}
 	return false;
