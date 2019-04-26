@@ -979,8 +979,10 @@ void Game::MainLoop() {
 			CloseDuelWindow();
 		else
 			closeSignal.unlock();
-		if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
-			device->sleep(20);
+		if(gameConf.max_fps) {
+			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
+				device->sleep(20);
+		}
 		while(cur_time >= 1000) {
 			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
 			fps = 0;
@@ -1007,7 +1009,7 @@ void Game::MainLoop() {
 	if(ocgcore)
 		UnloadCore(ocgcore);
 #endif //YGOPRO_BUILD_DLL
-	device->drop();
+	//device->drop();
 }
 void Game::ToggleFullscreen() {
 #ifdef _WIN32
