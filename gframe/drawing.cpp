@@ -545,16 +545,16 @@ void Game::DrawMisc() {
 		int32 movetime = std::min(lpframe, (int32)delta_time);
 		dInfo.lp[lpplayer] -= std::round(lpd * movetime);
 		dInfo.strLP[lpplayer] = fmt::to_wstring(dInfo.lp[lpplayer]);
-		lpccolor -= 0x19000000;
+		lpcalpha -= ((float)0x19 / (10.0f * 1000.0f / 60.0f)) * movetime;
 		lpframe -= movetime;
 	}
 	if(lpcstring.size()) {
 		if(lpplayer == 0) {
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 470, 920, 520), lpccolor | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 472, 922, 520), lpccolor, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 470, 920, 520), ((int)std::round(lpcalpha) << 24) | 0x00ffffff, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 472, 922, 520), ((int)std::round(lpcalpha) << 24) | lpccolor, true, false, 0);
 		} else {
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 160, 920, 210), lpccolor | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 162, 922, 210), lpccolor, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 160, 920, 210), ((int)std::round(lpcalpha) << 24) | 0x00ffffff, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 162, 922, 210), ((int)std::round(lpcalpha) << 24) | lpccolor, true, false, 0);
 		}
 	}
 	if(!dInfo.isReplay && dInfo.player_type < 7 && dInfo.time_limit) {

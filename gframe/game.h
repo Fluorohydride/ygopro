@@ -231,6 +231,7 @@ public:
 	float lpd;
 	int lpplayer;
 	int lpccolor;
+	float lpcalpha;
 	std::wstring lpcstring;
 	bool always_chain;
 	bool ignore_chain;

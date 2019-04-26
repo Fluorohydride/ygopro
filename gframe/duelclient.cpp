@@ -3047,7 +3047,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / (10 * 1000.0f / 60.0f);
 		event_string = fmt::sprintf(dataManager.GetSysString(1613 + player), val);
-		mainGame->lpccolor = 0xffff0000;
+		mainGame->lpccolor = 0xff0000;
+		mainGame->lpcalpha = 0xff;
 		mainGame->lpplayer = player;
 		mainGame->lpcstring = fmt::format(L"-{}", val);
 		mainGame->WaitFrameSignal(30);
@@ -3073,7 +3074,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / (10 * 1000.0f / 60.0f);
 		event_string = fmt::sprintf(dataManager.GetSysString(1615 + player), val);
-		mainGame->lpccolor = 0xff00ff00;
+		mainGame->lpccolor = 0x00ff00;
+		mainGame->lpcalpha = 0xff;
 		mainGame->lpplayer = player;
 		mainGame->lpcstring = fmt::format(L"+{}", val);
 		mainGame->WaitFrameSignal(30);
@@ -3203,7 +3205,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			return true;
 		}
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / (10 * 1000.0f / 60.0f);
-		mainGame->lpccolor = 0xff0000ff;
+		mainGame->lpccolor = 0x0000ff;
+		mainGame->lpcalpha = 0xff;
 		mainGame->lpplayer = player;
 		mainGame->lpcstring = fmt::format(L"-{}", cost);
 		mainGame->WaitFrameSignal(30);
