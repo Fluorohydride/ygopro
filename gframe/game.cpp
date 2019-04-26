@@ -61,7 +61,7 @@ bool Game::Initialize() {
 		coreloaded = false;
 #endif
 	auto logger = device->getLogger();
-	logger->setLogLevel(ELL_WARNING);
+	logger->setLogLevel(ELL_NONE);
 	// Apply skin
 	if (gameConf.skin_index >= 0)
 	{
