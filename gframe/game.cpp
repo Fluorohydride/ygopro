@@ -1353,9 +1353,7 @@ void Game::LoadGithubRepositories() {
 						JSON_SET_IF_VALID(pics_path, string, std::string);
 #ifdef YGOPRO_BUILD_DLL
 						JSON_SET_IF_VALID(core_path, string, std::string);
-						if(tmp_repo.core_path.size()) {
-							tmp_repo.has_core = true;
-						}
+						JSON_SET_IF_VALID(has_core, boolean, bool);
 #endif
 					}
 					if(tmp_repo.Sanitize()) {

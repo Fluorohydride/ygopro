@@ -231,11 +231,11 @@ std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
 		const git_error *e = giterr_last();
 		return { e->message };
 	}
-	if(git_revwalk_hide_glob(rewalk, "tags/*") < 0) {
+	/*if(git_revwalk_hide_glob(rewalk, "tags/*") < 0) {
 		const git_error *e = giterr_last();
 		return { e->message };
-	}
-	git_object *obj;
+	}*/
+	/*git_object *obj;
 	if(git_revparse_single(&obj, repo, "HEAD~10") < 0){
 		const git_error *e = giterr_last();
 		return { e->message };
@@ -244,7 +244,7 @@ std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
 		git_object_free(obj);
 		const git_error *e = giterr_last();
 		return { e->message };
-	}
+	}*/
 	git_oid oid;
 	while(git_revwalk_next(&oid, rewalk) == 0) {
 		git_commit *c;
@@ -387,22 +387,31 @@ void RepoManager::UpdateStatus(std::string repo, int percentage) {
 bool RepoManager::GitRepo::Sanitize() {
 	if(url.empty())
 		return false;
-	data_path = Utils::NormalizePath(repo_path + "/" + data_path + "/");
-	if(script_path.size())
-		script_path = Utils::NormalizePath(repo_path + "/" + script_path + "/");
-	else
-		script_path = Utils::NormalizePath(repo_path + "/script/");
-	if(pics_path.size())
-		pics_path = Utils::NormalizePath(repo_path + "/" + pics_path + "/");
-	else
-		pics_path = Utils::NormalizePath(repo_path + "/pics/");
-	if(has_core)
-		core_path = Utils::NormalizePath(repo_path + "/" + core_path + "/");
+	if(repo_name.empty() && repo_path.empty()) {
+		repo_name = Utils::GetFileName(url);
+		repo_path = fmt::format("./expansions/{}", repo_name);
+		if(repo_name.empty() || repo_path.empty())
+			return false;
+	}
 	if(repo_name.empty()) {
-		size_t found = repo_path.find_last_of("/");
-		repo_name = repo_path.substr(found + 1);
-		if(repo_name.empty())
-			repo_name = repo_path;
+		repo_name = Utils::GetFileName(repo_path);
+	}
+	if(repo_path.empty()) {
+		repo_path = fmt::format("./expansions/{}", repo_name);
+	}
+	repo_path = fmt::format("./{}", repo_path);
+	data_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, data_path));
+	if(script_path.size())
+		script_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, script_path));
+	else
+		script_path = Utils::NormalizePath(fmt::format("{}/script/", repo_path));
+	if(pics_path.size())
+		pics_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, pics_path));
+	else
+		pics_path = Utils::NormalizePath(fmt::format("{}/pics/", repo_path));
+	if(has_core || core_path.size()) {
+		has_core = true;
+		core_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, core_path));
 	}
 	return true;
 }
