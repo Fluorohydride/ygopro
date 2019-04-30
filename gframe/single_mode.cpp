@@ -459,7 +459,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_SHUFFLE_SET_CARD: {
 			pbuf++;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 20;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
