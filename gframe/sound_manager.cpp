@@ -181,6 +181,8 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 		PlaySoundEffect(SOUND_INFO);
 	} else if(element == mainGame->wQuery) {
 		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wSurrender) {
+		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wOptions) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wANAttribute) {
