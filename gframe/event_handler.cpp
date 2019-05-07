@@ -147,8 +147,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(exit_on_return)
 						mainGame->device->closeDevice();
 				} else {
-					DuelClient::SendPacketToServer(CTOS_SURRENDER);
+					mainGame->PopupElement(mainGame->wSurrender);
 				}
+				break;
+			}
+			case BUTTON_SURRENDER_YES: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				DuelClient::SendPacketToServer(CTOS_SURRENDER);
+				mainGame->HideElement(mainGame->wSurrender);
+				break;
+			}
+			case BUTTON_SURRENDER_NO: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				mainGame->HideElement(mainGame->wSurrender);
 				break;
 			}
 			case BUTTON_CHAIN_IGNORE: {
@@ -1422,6 +1433,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->chain_when_avail = false;
 				UpdateChainButtons();
 			}
+			if(mainGame->wSurrender->isVisible())
+				mainGame->HideElement(mainGame->wSurrender);
 			mainGame->wCmdMenu->setVisible(false);
 			if(mainGame->fadingList.size())
 				break;

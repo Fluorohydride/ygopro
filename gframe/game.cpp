@@ -385,6 +385,14 @@ bool Game::Initialize() {
 	stQMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnYes = env->addButton(rect<s32>(100, 105, 150, 130), wQuery, BUTTON_YES, dataManager.GetSysString(1213));
 	btnNo = env->addButton(rect<s32>(200, 105, 250, 130), wQuery, BUTTON_NO, dataManager.GetSysString(1214));
+	//surrender yes/no (310)
+	wSurrender = env->addWindow(rect<s32>(490, 200, 840, 340), false, dataManager.GetSysString(560));
+	wSurrender->getCloseButton()->setVisible(false);
+	wSurrender->setVisible(false);
+	stSurrenderMessage = env->addStaticText(dataManager.GetSysString(1359), rect<s32>(20, 20, 350, 100), false, true, wSurrender, -1, false);
+	stSurrenderMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
+	btnSurrenderYes = env->addButton(rect<s32>(100, 105, 150, 130), wSurrender, BUTTON_SURRENDER_YES, dataManager.GetSysString(1213));
+	btnSurrenderNo = env->addButton(rect<s32>(200, 105, 250, 130), wSurrender, BUTTON_SURRENDER_NO, dataManager.GetSysString(1214));
 	//options (310)
 	wOptions = env->addWindow(rect<s32>(490, 200, 840, 340), false, L"");
 	wOptions->getCloseButton()->setVisible(false);
@@ -1458,6 +1466,7 @@ void Game::CloseDuelWindow() {
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
+	wSurrender->setVisible(false);
 	wReplayControl->setVisible(false);
 	wReplaySave->setVisible(false);
 	stHintMsg->setVisible(false);
