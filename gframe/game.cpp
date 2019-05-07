@@ -752,6 +752,13 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
+	dimension2du size = driver->getScreenSize();
+	if(window_size != size) {
+		window_size = size;
+		xScale = window_size.Width / 1024.0;
+		yScale = window_size.Height / 640.0;
+		OnResize();
+	}
 	hideChat = false;
 	hideChatTimer = 0;
 	return true;
