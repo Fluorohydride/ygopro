@@ -33,21 +33,28 @@ struct Config {
 	int chkWaitChain;
 	int chkIgnore1;
 	int chkIgnore2;
-	int chkHideSetname;
-	int chkHideHintButton;
+	int hide_setname;
+	int hide_hint_button;
 	int control_mode;
 	int draw_field_spell;
 	int separate_clear_button;
 	int auto_search_limit;
+	int search_multiple_keywords;
 	int chkIgnoreDeckChanges;
 	int defaultOT;
 	int enable_bot_mode;
 	int quick_animation;
+	int auto_save_replay;
+	int prefer_expansion_script;
 	bool enable_sound;
 	bool enable_music;
 	double sound_volume;
 	double music_volume;
 	int music_mode;
+	bool window_maximized;
+	int window_width;
+	int window_height;
+	bool resize_popup_menu;
 };
 
 struct DuelInfo {
@@ -105,7 +112,7 @@ public:
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
 	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
-	void LoadExpansionDB();
+	void LoadExpansions();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
@@ -117,6 +124,7 @@ public:
 	void CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
+	void DrawShadowText(irr::gui::CGUITTFont* font, const core::stringw& text, const core::rect<s32>& position, const core::rect<s32>& padding, video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = 0);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard, int x1, int y1, int x2, int y2);
 	void DrawGUI();
@@ -126,16 +134,16 @@ public:
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist);
+	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag = false);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
-	void ShowCardInfo(int code);
-	void AddChatMsg(wchar_t* msg, int player);
+	void ShowCardInfo(int code, bool resize = false);
+	void ClearCardInfo(int player = 0);
+	void AddChatMsg(const wchar_t* msg, int player);
 	void ClearChatMsg();
-	void AddDebugMsg(char* msgbuf);
-	bool MakeDirectory(const std::string folder);
-	void initUtils();
+	void AddDebugMsg(const char* msgbuf);
+	void ErrorLog(const char* msgbuf);
 	void ClearTextures();
 	void CloseDuelWindow();
 
@@ -147,7 +155,22 @@ public:
 		return focus && focus->hasType(type);
 	}
 
+	void OnResize();
+	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
+	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
+	position2di Resize(s32 x, s32 y);
+	position2di ResizeReverse(s32 x, s32 y);
+	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
+	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2);
+	recti ResizeCardImgWin(s32 x, s32 y, s32 mx, s32 my);
+	recti ResizeCardHint(s32 x, s32 y, s32 x2, s32 y2);
+	position2di ResizeCardHint(s32 x, s32 y);
+	recti ResizeCardMid(s32 x, s32 y, s32 x2, s32 y2, s32 midx, s32 midy);
+	position2di ResizeCardMid(s32 x, s32 y, s32 midx, s32 midy);
+	recti ResizeFit(s32 x, s32 y, s32 x2, s32 y2);
+
 	void SetWindowsIcon();
+	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
 
@@ -176,6 +199,7 @@ public:
 	int waitFrame;
 	int signalFrame;
 	int actionParam;
+	int showingcode;
 	const wchar_t* showingtext;
 	int showcard;
 	int showcardcode;
@@ -197,6 +221,10 @@ public:
 
 	bool is_building;
 	bool is_siding;
+
+	irr::core::dimension2d<irr::u32> window_size;
+	float xScale;
+	float yScale;
 
 	ClientField dField;
 	DeckBuilder deckBuilder;
@@ -224,6 +252,7 @@ public:
 	//hint text
 	irr::gui::IGUIStaticText* stHintMsg;
 	irr::gui::IGUIStaticText* stTip;
+	irr::gui::IGUIStaticText* stCardListTip;
 	//infos
 	irr::gui::IGUITabControl* wInfos;
 	irr::gui::IGUIStaticText* stName;
@@ -235,21 +264,32 @@ public:
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
+	irr::gui::IGUIWindow* tabHelper;
+	irr::gui::IGUIElement* elmTabHelperLast;
+	irr::gui::IGUIScrollBar* scrTabHelper;
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
-	irr::gui::IGUICheckBox* chkHideSetname;
-	irr::gui::IGUICheckBox* chkHideHintButton;
+	irr::gui::IGUICheckBox* chkAutoSaveReplay;
+	irr::gui::IGUIWindow* tabSystem;
+	irr::gui::IGUIElement* elmTabSystemLast;
+	irr::gui::IGUIScrollBar* scrTabSystem;
 	irr::gui::IGUICheckBox* chkIgnoreDeckChanges;
 	irr::gui::IGUICheckBox* chkAutoSearch;
+	irr::gui::IGUICheckBox* chkMultiKeywords;
+	irr::gui::IGUICheckBox* chkPreferExpansionScript;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUICheckBox* chkMusicMode;
+	irr::gui::IGUIButton* btnWinResizeS;
+	irr::gui::IGUIButton* btnWinResizeM;
+	irr::gui::IGUIButton* btnWinResizeL;
+	irr::gui::IGUIButton* btnWinResizeXL;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIButton* btnLanMode;
@@ -353,6 +393,7 @@ public:
 	irr::gui::IGUIButton* btnOptionn;
 	irr::gui::IGUIButton* btnOptionOK;
 	irr::gui::IGUIButton* btnOption[5];
+	irr::gui::IGUIScrollBar* scrOption;
 	//pos selection
 	irr::gui::IGUIWindow* wPosSelect;
 	irr::gui::CGUIImageButton* btnPSAU;
@@ -426,6 +467,17 @@ public:
 	irr::gui::IGUIButton* btnSideSort;
 	irr::gui::IGUIButton* btnSideReload;
 	irr::gui::IGUIEditBox* ebDeckname;
+	irr::gui::IGUIStaticText* stBanlist;
+	irr::gui::IGUIStaticText* stDeck;
+	irr::gui::IGUIStaticText* stCategory;
+	irr::gui::IGUIStaticText* stLimit;
+	irr::gui::IGUIStaticText* stAttribute;
+	irr::gui::IGUIStaticText* stRace;
+	irr::gui::IGUIStaticText* stAttack;
+	irr::gui::IGUIStaticText* stDefense;
+	irr::gui::IGUIStaticText* stStar;
+	irr::gui::IGUIStaticText* stSearch;
+	irr::gui::IGUIStaticText* stScale;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
 	irr::gui::IGUIScrollBar* scrFilter;
@@ -528,7 +580,22 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_REPLAY		132
 #define BUTTON_DELETE_REPLAY		133
 #define BUTTON_RENAME_REPLAY		134
-#define EDITBOX_CHAT				140
+#define BUTTON_REPLAY_START			140
+#define BUTTON_REPLAY_PAUSE			141
+#define BUTTON_REPLAY_STEP			142
+#define BUTTON_REPLAY_UNDO			143
+#define BUTTON_REPLAY_EXIT			144
+#define BUTTON_REPLAY_SWAP			145
+#define BUTTON_REPLAY_SAVE			146
+#define BUTTON_REPLAY_CANCEL		147
+#define LISTBOX_SINGLEPLAY_LIST		150
+#define BUTTON_LOAD_SINGLEPLAY		151
+#define BUTTON_CANCEL_SINGLEPLAY	152
+#define LISTBOX_BOT_LIST			153
+#define BUTTON_BOT_START			154
+#define CHECKBOX_BOT_OLD_RULE		155
+#define EDITBOX_CHAT				199
+
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202
@@ -549,6 +616,7 @@ extern Game* mainGame;
 #define BUTTON_OPTION_2				225
 #define BUTTON_OPTION_3				226
 #define BUTTON_OPTION_4				227
+#define SCROLL_OPTION_SELECT		228
 #define BUTTON_CARD_0				230
 #define BUTTON_CARD_1				231
 #define BUTTON_CARD_2				232
@@ -556,6 +624,7 @@ extern Game* mainGame;
 #define BUTTON_CARD_4				234
 #define SCROLL_CARD_SELECT			235
 #define BUTTON_CARD_SEL_OK			236
+#define TEXT_CARD_LIST_TIP			237
 #define BUTTON_CMD_ACTIVATE			240
 #define BUTTON_CMD_SUMMON			241
 #define BUTTON_CMD_SPSUMMON			242
@@ -593,7 +662,7 @@ extern Game* mainGame;
 #define BUTTON_CARD_DISP_OK			296
 #define BUTTON_SURRENDER_YES		297
 #define BUTTON_SURRENDER_NO			298
-#define BUTTON_CATEGORY_OK			300
+
 #define COMBOBOX_DBLFLIST			301
 #define COMBOBOX_DBDECKS			302
 #define BUTTON_CLEAR_DECK			303
@@ -613,32 +682,25 @@ extern Game* mainGame;
 #define BUTTON_CLEAR_FILTER			317
 #define COMBOBOX_ATTRIBUTE			318
 #define COMBOBOX_RACE				319
-#define BUTTON_REPLAY_START			320
-#define BUTTON_REPLAY_PAUSE			321
-#define BUTTON_REPLAY_STEP			322
-#define BUTTON_REPLAY_UNDO			323
-#define BUTTON_REPLAY_EXIT			324
-#define BUTTON_REPLAY_SWAP			325
-#define BUTTON_REPLAY_SAVE			330
-#define BUTTON_REPLAY_CANCEL		331
-#define BUTTON_BOT_START			340
-#define LISTBOX_BOT_LIST			341
-#define CHECKBOX_BOT_OLD_RULE		342
-#define LISTBOX_SINGLEPLAY_LIST		350
-#define BUTTON_LOAD_SINGLEPLAY		351
-#define BUTTON_CANCEL_SINGLEPLAY	352
+#define COMBOBOX_LIMIT				320
+#define BUTTON_CATEGORY_OK			321
+#define BUTTON_MARKS_FILTER			322
+#define BUTTON_MARKERS_OK			323
+#define COMBOBOX_SORTTYPE			324
 #define CHECKBOX_AUTO_SEARCH		360
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
 #define SCROLL_VOLUME				363
 #define CHECKBOX_DISABLE_CHAT		364
+#define BUTTON_WINDOW_RESIZE_S		365
+#define BUTTON_WINDOW_RESIZE_M		366
+#define BUTTON_WINDOW_RESIZE_L		367
+#define BUTTON_WINDOW_RESIZE_XL		368
 #define CHECKBOX_QUICK_ANIMATION	369
-
-#define COMBOBOX_SORTTYPE			370
-#define COMBOBOX_LIMIT				371
-
-#define BUTTON_MARKS_FILTER			380
-#define BUTTON_MARKERS_OK			381
+#define SCROLL_TAB_HELPER			370
+#define SCROLL_TAB_SYSTEM			371
+#define CHECKBOX_MULTI_KEYWORDS		372
+#define CHECKBOX_PREFER_EXPANSION	373
 
 #define DEFAULT_DUEL_RULE			4
 

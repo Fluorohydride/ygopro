@@ -222,16 +222,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
 						break;
 				}
-				mainGame->imgCard->setImage(imageManager.tCover[0]);
+				mainGame->ClearCardInfo();
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wInfos->setVisible(true);
 				mainGame->wReplay->setVisible(true);
-				mainGame->stName->setText(L"");
-				mainGame->stInfo->setText(L"");
-				mainGame->stDataInfo->setText(L"");
-				mainGame->stSetName->setText(L"");
-				mainGame->stText->setText(L"");
-				mainGame->scrCardText->setVisible(false);
 				mainGame->wReplayControl->setVisible(true);
 				mainGame->btnReplayStart->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
@@ -254,7 +248,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->gMutex.Lock();
 				wchar_t textBuffer[256];
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->lstReplayList->getListItem(sel), dataManager.GetSysString(1363));
-				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.Unlock();
 				prev_operation = id;
@@ -291,7 +285,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					NetServer::StopServer();
 					break;
 				}
-				STARTUPINFO si;
+				STARTUPINFOW si;
 				PROCESS_INFORMATION pi;
 				ZeroMemory(&si, sizeof(si));
 				si.cb = sizeof(si);
@@ -445,7 +439,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				std::wstring repinfo;
 				time_t curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);
-				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
+				wcsftime(infobuf, 256, L"%Y/%m/%d %H:%M:%S\n", st);
 				repinfo.append(infobuf);
 				wchar_t namebuf[4][20];
 				ReplayMode::cur_replay.ReadName(namebuf[0]);
@@ -460,7 +454,57 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
-				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
+				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, repinfo.c_str());
+				break;
+			}
+			case LISTBOX_SINGLEPLAY_LIST: {
+				int sel = mainGame->lstSinglePlayList->getSelected();
+				if(sel == -1)
+					break;
+				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(sel);
+				wchar_t fname[256];
+				myswprintf(fname, L"./single/%ls", name);
+				FILE *fp;
+#ifdef _WIN32
+				fp = _wfopen(fname, L"rb");
+#else
+				char filename[256];
+				BufferIO::EncodeUTF8(fname, filename);
+				fp = fopen(filename, "rb");
+#endif
+				if(!fp) {
+					mainGame->stSinglePlayInfo->setText(L"");
+					break;
+				}
+				char linebuf[1024];
+				wchar_t wlinebuf[1024];
+				std::wstring message = L"";
+				bool in_message = false;
+				while(fgets(linebuf, 1024, fp)) {
+					if(!strncmp(linebuf, "--[[message", 11)) {
+						size_t len = strlen(linebuf);
+						char* msgend = strrchr(linebuf, ']');
+						if(len <= 13) {
+							in_message = true;
+							continue;
+						} else if(len > 15 && msgend) {
+							*(msgend - 1) = '\0';
+							BufferIO::DecodeUTF8(linebuf + 12, wlinebuf);
+							message.append(wlinebuf);
+							break;
+						}
+					}
+					if(!strncmp(linebuf, "]]", 2)) {
+						in_message = false;
+						break;
+					}
+					if(in_message) {
+						BufferIO::DecodeUTF8(linebuf, wlinebuf);
+						message.append(wlinebuf);
+					}
+				}
+				fclose(fp);
+				mainGame->SetStaticText(mainGame->stSinglePlayInfo, 200, mainGame->guiFont, message.c_str());
 				break;
 			}
 			case LISTBOX_BOT_LIST: {
