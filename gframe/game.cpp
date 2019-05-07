@@ -415,6 +415,14 @@ bool Game::Initialize() {
 	stQMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnYes = env->addButton(rect<s32>(100, 105, 150, 130), wQuery, BUTTON_YES, dataManager.GetSysString(1213));
 	btnNo = env->addButton(rect<s32>(200, 105, 250, 130), wQuery, BUTTON_NO, dataManager.GetSysString(1214));
+	//surrender yes/no (310)
+	wSurrender = env->addWindow(rect<s32>(490, 200, 840, 340), false, dataManager.GetSysString(560));
+	wSurrender->getCloseButton()->setVisible(false);
+	wSurrender->setVisible(false);
+	stSurrenderMessage = env->addStaticText(dataManager.GetSysString(1359), rect<s32>(20, 20, 350, 100), false, true, wSurrender, -1, false);
+	stSurrenderMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
+	btnSurrenderYes = env->addButton(rect<s32>(100, 105, 150, 130), wSurrender, BUTTON_SURRENDER_YES, dataManager.GetSysString(1213));
+	btnSurrenderNo = env->addButton(rect<s32>(200, 105, 250, 130), wSurrender, BUTTON_SURRENDER_NO, dataManager.GetSysString(1214));
 	//options (310)
 	wOptions = env->addWindow(rect<s32>(490, 200, 840, 340), false, L"");
 	wOptions->getCloseButton()->setVisible(false);
@@ -773,6 +781,13 @@ bool Game::Initialize() {
 		SColor col = env->getSkin()->getColor((EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
+	}
+	dimension2du size = driver->getScreenSize();
+	if(window_size != size) {
+		window_size = size;
+		xScale = window_size.Width / 1024.0;
+		yScale = window_size.Height / 640.0;
+		OnResize();
 	}
 	hideChat = false;
 	hideChatTimer = 0;
@@ -1500,6 +1515,7 @@ void Game::CloseDuelWindow() {
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
+	wSurrender->setVisible(false);
 	wReplayControl->setVisible(false);
 	wReplaySave->setVisible(false);
 	stHintMsg->setVisible(false);
@@ -1623,6 +1639,7 @@ void Game::OnResize() {
 	wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
+	wSurrender->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wOptions->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
 	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
