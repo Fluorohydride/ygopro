@@ -343,7 +343,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_SELECT_TP: {
 		mainGame->gMutex.Lock();
-		mainGame->ShowElement(mainGame->wFTSelect);
+		mainGame->PopupElement(mainGame->wFTSelect);
 		mainGame->gMutex.Unlock();
 		break;
 	}
