@@ -197,7 +197,7 @@ bool Game::Initialize() {
 	}
 	btnHostPrepOB = env->addButton(rect<s32>(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252));
 	myswprintf(dataManager.strBuffer, L"%ls%d", dataManager.GetSysString(1253), 0);
-	stHostPrepOB = env->addStaticText(dataManager.strBuffer, rect<s32>(10, 210, 270, 230), false, false, wHostPrepare);
+	stHostPrepOB = env->addStaticText(dataManager.strBuffer, rect<s32>(10, 285, 270, 305), false, false, wHostPrepare);
 	stHostPrepRule = env->addStaticText(L"", rect<s32>(280, 30, 460, 230), false, true, wHostPrepare);
 	env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 210, 110, 230), false, false, wHostPrepare);
 	cbCategorySelect = env->addComboBox(rect<s32>(10, 230, 138, 255), wHostPrepare, COMBOBOX_HP_CATEGORY);
