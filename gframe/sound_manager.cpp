@@ -195,6 +195,8 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wReplaySave) {
 		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wFTSelect) {
+		PlaySoundEffect(SOUND_QUESTION);
 	}
 }
 void SoundManager::PlayMusic(char* song, bool loop) {
