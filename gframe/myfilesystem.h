@@ -164,8 +164,6 @@ public:
 	static bool DeleteDir(const char* dir) {
 		bool success = true;
 		TraversalDir(dir, [dir, &success](const char *name, bool isdir) {
-			if(strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
-				return;
 			char full_path[256];
 			sprintf(full_path, "%s/%s", dir, name);
 			if (isdir)
