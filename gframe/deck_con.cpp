@@ -88,6 +88,7 @@ inline void refreshReadonly(int catesel) {
 	mainGame->btnRenameDeck->setEnabled(!mainGame->deckBuilder.readonly);
 	mainGame->btnDMDeleteDeck->setEnabled(!mainGame->deckBuilder.readonly);
 	mainGame->btnMoveDeck->setEnabled(!mainGame->deckBuilder.readonly);
+	mainGame->btnCopyDeck->setEnabled(!mainGame->deckBuilder.readonly);
 }
 inline void changeCategory(int catesel) {
 	refreshReadonly(catesel);
