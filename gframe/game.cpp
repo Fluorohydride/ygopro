@@ -1600,6 +1600,7 @@ void Game::OnResize() {
 	wANAttribute->setRelativePosition(ResizeWin(500, 200, 830, 285));
 	wANRace->setRelativePosition(ResizeWin(480, 200, 850, 410));
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
+	wDeckCode->setRelativePosition(ResizeWin(510, 200, 820, 320));
 
 	stHintMsg->setRelativePosition(ResizeWin(660 - 160 * xScale, 60, 660 + 160 * xScale, 90));
 
