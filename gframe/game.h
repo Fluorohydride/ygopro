@@ -141,6 +141,7 @@ public:
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player);
+	void AddLog(const std::wstring& msg, int param = 0);
 	void ClearChatMsg();
 	void AddDebugMsg(const std::string& msg);
 	void ErrorLog(const std::string& msg);

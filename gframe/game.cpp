@@ -1521,6 +1521,13 @@ void Game::AddChatMsg(const std::wstring& msg, int player) {
 	chatMsg[0].append(L": ").append(msg);
 	lstChat->addItem(chatMsg[0].c_str());
 }
+void Game::AddLog(const std::wstring& msg, int param) {
+	logParam.push_back(param);
+	lstLog->addItem(msg.c_str());
+	if(!env->hasFocus(lstLog)) {
+		lstLog->setSelected(-1);
+	}
+}
 void Game::ClearChatMsg() {
 	for(int i = 7; i >= 0; --i) {
 		chatTiming[i] = 0;
