@@ -184,7 +184,7 @@ namespace ygo {
 		DIR * dir;
 		struct dirent * dirp = nullptr;
 		auto _path = BufferIO::EncodeUTF8s(NormalizePath(path));
-		if((dir = opendir(path.c_str())) != nullptr) {
+		if((dir = opendir(_path.c_str())) != nullptr) {
 			struct stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
 				stat((_path + dirp->d_name).c_str(), &fileStat);
