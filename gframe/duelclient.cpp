@@ -25,6 +25,9 @@ char DuelClient::duel_client_write[0x2000];
 bool DuelClient::is_closing = false;
 int DuelClient::select_hint = 0;
 int DuelClient::select_unselect_hint = 0;
+int DuelClient::last_select_hint = 0;
+char DuelClient::last_successful_msg[2048];
+unsigned int DuelClient::last_successful_msg_length = 0;
 wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;
 
@@ -859,10 +862,14 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	}
 }
-int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
+int DuelClient::ClientAnalyze(char * msg, unsigned int len, bool retry) {
 	char* pbuf = msg;
 	wchar_t textBuffer[256];
 	mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
+	if(mainGame->dInfo.curMsg != MSG_RETRY && !retry) {
+		memcpy(last_successful_msg, msg, len);
+		last_successful_msg_length = len;
+	}
 	mainGame->wCmdMenu->setVisible(false);
 	if(!mainGame->dInfo.isReplay && mainGame->dInfo.curMsg != MSG_WAITING && mainGame->dInfo.curMsg != MSG_CARD_SELECTED) {
 		mainGame->waitFrame = -1;
@@ -884,6 +891,17 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dInfo.time_player = 2;
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
+		if(!retry && last_successful_msg_length) {
+			mainGame->gMutex.Lock();
+			mainGame->stMessage->setText(dataManager.GetDesc(1422));
+			mainGame->PopupElement(mainGame->wMessage);
+			mainGame->gMutex.Unlock();
+			mainGame->actionSignal.Reset();
+			mainGame->actionSignal.Wait();
+			select_hint = last_select_hint;
+			ClientAnalyze(last_successful_msg, last_successful_msg_length, true);
+			break;
+		}
 		mainGame->gMutex.Lock();
 		mainGame->stMessage->setText(L"Error occurs.");
 		mainGame->PopupElement(mainGame->wMessage);
@@ -935,6 +953,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		case HINT_SELECTMSG: {
 			select_hint = data;
+			last_select_hint = data;
 			break;
 		}
 		case HINT_OPSELECTED: {
@@ -1078,6 +1097,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
+		select_hint = 0;
+		select_unselect_hint = 0;
+		last_select_hint = 0;
+		last_successful_msg_length = 0;
 		if(mainGame->dInfo.isReplaySwapped) {
 			std::swap(mainGame->dInfo.hostname, mainGame->dInfo.clientname);
 			std::swap(mainGame->dInfo.hostname_tag, mainGame->dInfo.clientname_tag);

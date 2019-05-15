@@ -31,6 +31,9 @@ private:
 	static bool is_closing;
 	static int select_hint;
 	static int select_unselect_hint;
+	static int last_select_hint;
+	static char last_successful_msg[2048];
+	static unsigned int last_successful_msg_length;
 	static wchar_t event_string[256];
 	static mtrandom rnd;
 public:
@@ -41,7 +44,7 @@ public:
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread(void* param);
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
-	static int ClientAnalyze(char* msg, unsigned int len);
+	static int ClientAnalyze(char* msg, unsigned int len, bool retry = false);
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned char len);
 	static void SendResponse();
