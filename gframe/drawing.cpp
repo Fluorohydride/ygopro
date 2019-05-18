@@ -541,20 +541,19 @@ void Game::DrawMisc() {
 	if(dInfo.lp[1] >= dInfo.startlp)
 		driver->draw2DImage(imageManager.tLPBar, Resize(696, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
 	else driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * dInfo.lp[1] / dInfo.startlp, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
-	if(lpframe) {
-		int32 movetime = std::min(lpframe, (int32)delta_time);
-		dInfo.lp[lpplayer] -= std::round(lpd * movetime);
+	if(lpframe > 0 && mainGame->delta_frames) {
+		dInfo.lp[lpplayer] -= lpd * mainGame->delta_frames;
 		dInfo.strLP[lpplayer] = fmt::to_wstring(dInfo.lp[lpplayer]);
-		lpcalpha -= ((float)0x19 / (10.0f * 1000.0f / 60.0f)) * movetime;
-		lpframe -= movetime;
+		lpcalpha -= 0x19 * mainGame->delta_frames;
+		lpframe -= mainGame->delta_frames;
 	}
 	if(lpcstring.size()) {
 		if(lpplayer == 0) {
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 470, 920, 520), ((int)std::round(lpcalpha) << 24) | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 472, 922, 520), ((int)std::round(lpcalpha) << 24) | lpccolor, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 470, 920, 520), (lpcalpha << 24) | 0x00ffffff, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 472, 922, 520), (lpcalpha << 24) | lpccolor, true, false, 0);
 		} else {
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 160, 920, 210), ((int)std::round(lpcalpha) << 24) | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 162, 922, 210), ((int)std::round(lpcalpha) << 24) | lpccolor, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 160, 920, 210), (lpcalpha << 24) | 0x00ffffff, true, false, 0);
+			lpcFont->draw(lpcstring.c_str(), Resize(400, 162, 922, 210), (lpcalpha << 24) | lpccolor, true, false, 0);
 		}
 	}
 	if(!dInfo.isReplay && dInfo.player_type < 7 && dInfo.time_limit) {

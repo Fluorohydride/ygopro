@@ -919,7 +919,10 @@ void Game::MainLoop() {
 			OnResize();
 		}
 		frame_counter += (float)delta_time * 60.0f/1000.0f;
-		for(; frame_counter>=1; frame_counter--) {
+		float remainder;
+		frame_counter = modf(frame_counter, &remainder);
+		delta_frames = std::round(remainder);
+		for(int i = 0; i < delta_frames; i++){
 			linePatternD3D = (linePatternD3D + 1) % 30;
 		}
 		atkframe += 0.1f * (float)delta_time * 60.0f / 1000.0f;

@@ -3053,7 +3053,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->lpcstring = fmt::format(L"-{}", val);
 		mainGame->WaitFrameSignal(30);
 		//float milliseconds = (float)frame * 1000.0f / 60.0f;
-		mainGame->lpframe = (int)(10.0f * 1000.0f / 60.0f);
+		mainGame->lpframe = 10;
 		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = L"";
 		mainGame->dInfo.lp[player] = final;
@@ -3072,14 +3072,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			return true;
 		}
-		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / (10 * 1000.0f / 60.0f);
+		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		event_string = fmt::sprintf(dataManager.GetSysString(1615 + player), val);
 		mainGame->lpccolor = 0x00ff00;
 		mainGame->lpcalpha = 0xff;
 		mainGame->lpplayer = player;
 		mainGame->lpcstring = fmt::format(L"+{}", val);
 		mainGame->WaitFrameSignal(30);
-		mainGame->lpframe = (int)(10.0f * 1000.0f / 60.0f);
+		mainGame->lpframe = 10;
 		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = L"";
 		mainGame->dInfo.lp[player] = final;
@@ -3124,9 +3124,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			return true;
 		}
-		mainGame->lpd = (mainGame->dInfo.lp[player] - val) / (10 * 1000.0f / 60.0f);
+		mainGame->lpd = (mainGame->dInfo.lp[player] - val) / 10;
 		mainGame->lpplayer = player;
-		mainGame->lpframe = (int)(10.0f * 1000.0f / 60.0f);
+		mainGame->lpframe = 10;
 		mainGame->WaitFrameSignal(11);
 		mainGame->dInfo.lp[player] = val;
 		mainGame->gMutex.lock();
@@ -3204,13 +3204,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			return true;
 		}
-		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / (10 * 1000.0f / 60.0f);
+		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		mainGame->lpccolor = 0x0000ff;
 		mainGame->lpcalpha = 0xff;
 		mainGame->lpplayer = player;
 		mainGame->lpcstring = fmt::format(L"-{}", cost);
 		mainGame->WaitFrameSignal(30);
-		mainGame->lpframe = (int)(10.0f * 1000.0f / 60.0f);
+		mainGame->lpframe = 10;
 		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = L"";
 		mainGame->dInfo.lp[player] = final;

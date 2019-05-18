@@ -210,6 +210,7 @@ public:
 	std::map<std::string, RepoGui> repoInfoGui;
 
 	uint32 delta_time;
+	uint32 delta_frames;
 	int hideChatTimer;
 	bool hideChat;
 	float chatTiming[8];
@@ -231,7 +232,7 @@ public:
 	float lpd;
 	int lpplayer;
 	int lpccolor;
-	float lpcalpha;
+	int lpcalpha;
 	std::wstring lpcstring;
 	bool always_chain;
 	bool ignore_chain;
