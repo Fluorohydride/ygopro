@@ -216,6 +216,7 @@ public:
 	float chatTiming[8];
 	int chatType[8];
 	unsigned short linePatternD3D;
+	unsigned short linePatternGL;
 	float waitFrame;
 	int signalFrame;
 	int saveReplay;

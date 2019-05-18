@@ -5,28 +5,51 @@
 #include "duelclient.h"
 
 namespace ygo {
-
-void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* /*cv*/) {
-	driver->setMaterial(matManager.mOutLine);
-	if(strip) {
-		if(linePatternD3D < 15) {
-			driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D + 1) / 15.0);
-			driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D + 1) / 15.0);
-			driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D + 1) / 15.0);
-			driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D + 1) / 15.0);
-		} else {
-			driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D - 14) / 15.0, vec[1].Pos);
-			driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D - 14) / 15.0, vec[3].Pos);
-			driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D - 14) / 15.0, vec[2].Pos);
-			driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D - 14) / 15.0, vec[0].Pos);
-		}
+#define CONVERT_COLOR(col) (int)std::round((col + 1.0f) * (255.0f / 2.0f))
+#define CONVERT_ALPHA(col) (int)std::round((col + 1.0f) * 2.0f)
+void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv) {
+	if(false) {
+		float origin[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glLineWidth(width);
+		glLineStipple(1, linePatternGL);
+		if(strip)
+			glEnable(GL_LINE_STIPPLE);
+		glDisable(GL_TEXTURE_2D);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, cv);
+		glBegin(GL_LINE_LOOP);
+		glVertex3fv((float*)&vec[0].Pos);
+		glVertex3fv((float*)&vec[1].Pos);
+		glVertex3fv((float*)&vec[3].Pos);
+		glVertex3fv((float*)&vec[2].Pos);
+		glEnd();
+		glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
+		glDisable(GL_LINE_STIPPLE);
+		glEnable(GL_TEXTURE_2D);
 	} else {
-		driver->draw3DLine(vec[0].Pos, vec[1].Pos);
-		driver->draw3DLine(vec[1].Pos, vec[3].Pos);
-		driver->draw3DLine(vec[3].Pos, vec[2].Pos);
-		driver->draw3DLine(vec[2].Pos, vec[0].Pos);
+		irr::video::SColor color(CONVERT_ALPHA(cv[3]), CONVERT_COLOR(cv[0]), CONVERT_COLOR(cv[1]), CONVERT_COLOR(cv[2]));
+		driver->setMaterial(matManager.mOutLine);
+		if(strip) {
+			if(linePatternD3D < 15) {
+				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D + 1) / 15.0, color);
+				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D + 1) / 15.0, color);
+				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D + 1) / 15.0, color);
+				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D + 1) / 15.0, color);
+			} else {
+				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D - 14) / 15.0, vec[1].Pos, color);
+				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D - 14) / 15.0, vec[3].Pos, color);
+				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D - 14) / 15.0, vec[2].Pos, color);
+				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D - 14) / 15.0, vec[0].Pos, color);
+			}
+		} else {
+			driver->draw3DLine(vec[0].Pos, vec[1].Pos, color);
+			driver->draw3DLine(vec[1].Pos, vec[3].Pos, color);
+			driver->draw3DLine(vec[3].Pos, vec[2].Pos, color);
+			driver->draw3DLine(vec[2].Pos, vec[0].Pos, color);
+		}
 	}
 }
+#undef CONVERT_COLOR
+#undef CONVERT_ALPHA
 void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color) {
 	recti pos = element->getAbsolutePosition();
 	float x1 = pos.UpperLeftCorner.X;

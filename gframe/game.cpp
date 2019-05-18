@@ -74,6 +74,7 @@ bool Game::Initialize() {
 		}
 	}
 	linePatternD3D = 0;
+	linePatternGL = 0x0f0f;
 	waitFrame = 0.0f;
 	signalFrame = 0;
 	showcard = 0;
@@ -924,6 +925,7 @@ void Game::MainLoop() {
 		delta_frames = std::round(remainder);
 		for(int i = 0; i < delta_frames; i++){
 			linePatternD3D = (linePatternD3D + 1) % 30;
+			linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		}
 		atkframe += 0.1f * (float)delta_time * 60.0f / 1000.0f;
 		atkdy = (float)sin(atkframe);
