@@ -83,7 +83,7 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		mainGame->btnJoinCancel->setEnabled(true);
 		if(!mainGame->wLanWindow->isVisible())
 			mainGame->ShowElement(mainGame->wLanWindow);
-		mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400).c_str());
+		mainGame->PopupMessage(dataManager.GetSysString(1400));
 		mainGame->gMutex.unlock();
 	}
 	event_base_loopbreak(client_base);
@@ -162,7 +162,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				mainGame->btnJoinCancel->setEnabled(true);
 				if(!mainGame->wLanWindow->isVisible())
 					mainGame->ShowElement(mainGame->wLanWindow);
-				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400).c_str());
+				mainGame->PopupMessage(dataManager.GetSysString(1400));
 				mainGame->gMutex.unlock();
 			} else if(connect_state == 0x7) {
 				if(!mainGame->dInfo.isStarted && !mainGame->is_building) {
@@ -175,13 +175,13 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->ShowElement(mainGame->wLanWindow);
 					mainGame->wChat->setVisible(false);
 					if(events & BEV_EVENT_EOF)
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1401).c_str());
-					else mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402).c_str());
+						mainGame->PopupMessage(dataManager.GetSysString(1401));
+					else mainGame->PopupMessage(dataManager.GetSysString(1402));
 					mainGame->gMutex.unlock();
 				} else {
 					ReplayPrompt(false);
 					mainGame->gMutex.lock();
-					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1502).c_str());
+					mainGame->PopupMessage(dataManager.GetSysString(1502));
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);

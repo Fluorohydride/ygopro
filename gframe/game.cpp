@@ -1000,6 +1000,12 @@ void Game::MainLoop() {
 			DuelClient::try_needed = false;
 			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, false);
 		}
+		popupCheck.lock();
+		if(queued_msg.size()){
+			env->addMessageBox(L"",queued_msg.c_str());
+			queued_msg.clear();
+		}
+		popupCheck.unlock();
 	}
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
@@ -1597,6 +1603,11 @@ void Game::CloseDuelWindow() {
 	cardimagetextureloading = false;
 	showingcard = 0;
 	closeDoneSignal.Set();
+}
+void Game::PopupMessage(const std::wstring& text) {
+	popupCheck.lock();
+	queued_msg = text;
+	popupCheck.unlock();
 }
 int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;

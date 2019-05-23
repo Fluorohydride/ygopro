@@ -145,6 +145,7 @@ public:
 	void ErrorLog(const std::string& msg);
 	void ClearTextures();
 	void CloseDuelWindow();
+	void PopupMessage(const std::wstring& text);
 
 	int LocalPlayer(int player);
 	std::wstring LocalName(int local_player);
@@ -271,6 +272,8 @@ public:
 	std::vector<std::string> script_dirs;
 	std::vector<std::string> cores_to_load;
 #endif
+	std::mutex popupCheck;
+	std::wstring queued_msg;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;
