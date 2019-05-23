@@ -77,10 +77,10 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		return;
 	if(!is_closing) {
 		temp_ver = 0;
+		mainGame->gMutex.lock();
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
-		mainGame->gMutex.lock();
 		if(!mainGame->wLanWindow->isVisible())
 			mainGame->ShowElement(mainGame->wLanWindow);
 		mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400).c_str());
@@ -156,20 +156,20 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		if(!is_closing) {
 			if(connect_state == 0x1) {
 				temp_ver = 0;
+				mainGame->gMutex.lock();
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				mainGame->gMutex.lock();
 				if(!mainGame->wLanWindow->isVisible())
 					mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400).c_str());
 				mainGame->gMutex.unlock();
 			} else if(connect_state == 0x7) {
 				if(!mainGame->dInfo.isStarted && !mainGame->is_building) {
+					mainGame->gMutex.lock();
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->gMutex.lock();
 					mainGame->HideElement(mainGame->wHostPrepare);
 					mainGame->HideElement(mainGame->wHostPrepare2);
 					mainGame->ShowElement(mainGame->wLanWindow);
@@ -227,10 +227,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		switch(pkt->msg) {
 		case ERRMSG_JOINERROR: {
 			temp_ver = 0;
+			mainGame->gMutex.lock();
 			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 			mainGame->btnJoinHost->setEnabled(true);
 			mainGame->btnJoinCancel->setEnabled(true);
-			mainGame->gMutex.lock();
 			if(pkt->code == 0)
 				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1403).c_str());
 			else if(pkt->code == 1)
@@ -328,10 +328,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		case ERRMSG_VERERROR: {
 			if (temp_ver) {
 				temp_ver = 0;
+				mainGame->gMutex.lock();
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				mainGame->gMutex.lock();
 				mainGame->env->addMessageBox(L"", fmt::sprintf(dataManager.GetSysString(1411).c_str(), pkt->code >> 12, (pkt->code >> 4) & 0xff, pkt->code & 0xf).c_str());
 				mainGame->gMutex.unlock();
 				event_base_loopbreak(client_base);
