@@ -3045,7 +3045,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dInfo.strLP[player] = fmt::to_wstring(mainGame->dInfo.lp[player]);
 			return true;
 		}
-		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / (10 * 1000.0f / 60.0f);
+		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		event_string = fmt::sprintf(dataManager.GetSysString(1613 + player), val);
 		mainGame->lpccolor = 0xff0000;
 		mainGame->lpcalpha = 0xff;
@@ -3750,6 +3750,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			val = READ_LUA64(int8_t, int32_t, pbuf);
 			mainGame->dField.extra_p_count[p] = val;
 		}
+		mainGame->dInfo.startlp = std::max(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 		mainGame->dField.RefreshAllCards();
 		val = READ_LUA64(int8_t, int32_t, pbuf); //chains, always 0 in single mode
 		if(!mainGame->dInfo.isSingleMode) {
