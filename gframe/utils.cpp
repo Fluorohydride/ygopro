@@ -20,6 +20,8 @@ namespace ygo {
 	}
 #endif
 	bool Utils::Movefile(const std::string& source, const std::string& destination) {
+		if (source == destination)
+			return false;
 #ifndef _WIN32
 		std::ifstream  src(source, std::ios::binary);
 		if(!src.is_open())
@@ -36,6 +38,8 @@ namespace ygo {
 #endif
 	}
 	bool Utils::Movefile(const std::wstring& source, const std::wstring& destination) {
+		if (source == destination)
+			return false;
 #ifdef _WIN32
 		std::ifstream  src(source, std::ios::binary);
 		if(!src.is_open())
