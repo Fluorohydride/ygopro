@@ -349,6 +349,8 @@ T Replay::Read() {
 void Replay::Rewind() {
 	data_position = 0;
 	responses_iterator = responses.begin();
+	if(yrp)
+		yrp->Rewind();
 }
 bool Replay::ParseResponses() {
 	responses.clear();
