@@ -1758,7 +1758,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				char res = positions[(std::uniform_int_distribution<>(0, positions.size() - 1))(rnd)];
 				respbuf[0] = mainGame->LocalPlayer((res < 16) ? 0 : 1);
 				respbuf[1] = ((1 << res) & 0x7f007f) ? LOCATION_MZONE : LOCATION_SZONE;
-				respbuf[2] = res - (2 * (respbuf[1] - LOCATION_MZONE)) - (16 * respbuf[0]);
+				respbuf[2] = (res%16) - (2 * (respbuf[1] - LOCATION_MZONE));
 			} else {
 				unsigned int filter;
 				if(mainGame->dField.selectable_field & 0x7f) {
