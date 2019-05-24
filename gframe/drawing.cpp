@@ -955,10 +955,10 @@ void Game::DrawSpec() {
 				break;
 			}
 			auto pos = lpcFont->getDimension(lstr);
-			if(showcardp < 10) {
+			if(showcardp < 10.0f) {
 				int alpha = ((int)std::round(showcardp) * 25) << 24;
-				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 - (9 - std::round(showcardp)) * 40, 291, 950, 370), alpha);
-				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 - (9 - std::round(showcardp)) * 40, 290, 950, 370), alpha | 0xffffff);
+				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 - (9 - std::floor(showcardp)) * 40, 291, 950, 370), alpha);
+				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 - (9 - std::floor(showcardp)) * 40, 290, 950, 370), alpha | 0xffffff);
 			} else if(showcardp < showcarddif) {
 				recti loc = ResizeElem(650 - pos.Width / 2, 290, 950, 370);
 				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2, 291, 950, 370), 0xff000000);
@@ -973,12 +973,12 @@ void Game::DrawSpec() {
 					vicloc.UpperLeftCorner.Y -= 1;
 					guiFont->draw(dInfo.vic_string.c_str(), vicloc, 0xffffffff, true, true);
 				}
-			} else if(showcardp < showcarddif + 10) {
+			} else if(showcardp < showcarddif + 10.0f) {
 				int alpha = (int)std::round((((showcarddif + 10.0f - showcardp) * 25.0f) / 1000.0f) * (float)delta_time) << 24;
 				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 291, 950, 370), alpha);
 				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 290, 950, 370), alpha | 0xffffff);
 			}
-			showcardp += (float)delta_time * 60.0f / 1000.0f;
+			showcardp += std::min(((float)delta_time * 60.0f / 1000.0f), showcarddif - showcardp);
 			break;
 		}
 		}
