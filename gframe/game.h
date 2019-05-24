@@ -21,6 +21,7 @@ namespace ygo {
 
 struct Config {
 	bool use_d3d;
+	bool use_vsync;
 	int max_fps;
 	int game_version;
 	bool fullscreen;

@@ -39,6 +39,7 @@ bool Game::Initialize() {
 	else
 #endif
 		params.DriverType = irr::video::EDT_OPENGL;
+	params.Vsync = gameConf.use_vsync;
 	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
 #ifndef _WIN32
 	if(gameConf.fullscreen) {
@@ -984,7 +985,7 @@ void Game::MainLoop() {
 			CloseDuelWindow();
 		else
 			closeSignal.unlock();
-		if(gameConf.max_fps) {
+		if(gameConf.max_fps && !gameConf.use_vsync) {
 			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
 				device->sleep(20);
 		}
@@ -1104,6 +1105,7 @@ void Game::RefreshSingleplay() {
 void Game::LoadConfig() {
 	gameConf.antialias = 0;
 	gameConf.use_d3d = false;
+	gameConf.use_vsync = false;
 	gameConf.max_fps = 60;
 	gameConf.game_version = 0;
 	gameConf.fullscreen = false;
@@ -1154,6 +1156,8 @@ void Game::LoadConfig() {
 			gameConf.antialias = std::stoi(str);
 		else if(type == "use_d3d")
 			gameConf.use_d3d = std::stoi(str);
+		else if(type == "use_vsync")
+			gameConf.use_vsync = std::stoi(str);
 		else if(type == "max_fps") {
 			auto val = std::stoi(str);
 			if(val >= 0)
@@ -1235,9 +1239,10 @@ void Game::SaveConfig() {
 	conf_file << "#Configuration file\n";
 	conf_file << "#Nickname & Gamename should be less than 20 characters\n";
 	conf_file << "#The following parameters use 0 for 'disabled' or 1 for 'enabled':\n";
-	conf_file << "#use_d3d, fullscreen, automonsterpos, autospellpos, randompos, autochain, waitchain, mute_opponent, mute_spectators,\n";
+	conf_file << "#use_d3d, use_vsync, fullscreen, automonsterpos, autospellpos, randompos, autochain, waitchain, mute_opponent, mute_spectators,\n";
 	conf_file <<  "hide_setname,hide_hint_button, draw_field_spell, quick_animation, show_unofficial, skin_index, enable_sound, enable_music\n";
 	conf_file << "use_d3d = "			<< std::to_string(gameConf.use_d3d ? 1 : 0) << "\n";
+	conf_file << "use_vsync = "			<< std::to_string(gameConf.use_vsync ? 1 : 0) << "\n";
 	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
 	conf_file << "max_fps = "			<< std::to_string(gameConf.max_fps) << "\n";
 	conf_file << "fullscreen = "		<< std::to_string(is_fullscreen ? 1 : 0) << "\n";
