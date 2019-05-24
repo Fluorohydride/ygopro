@@ -6,7 +6,8 @@
 namespace ygo {
 
 ReplayPacket::ReplayPacket(char* buf, int len) {
-	Set(BufferIO::Read<int8_t>(buf), buf, len);
+	int msg = BufferIO::Read<uint8_t>(buf);
+	Set(msg, buf, len);
 }
 ReplayPacket::ReplayPacket(int msg, char* buf, int len) {
 	Set(msg, buf, len);
