@@ -1243,94 +1243,41 @@ static bool is_declarable(CardDataC* cd, int declarable_type) {
 	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
 		|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
 }
-static bool is_declarable(CardDataC* cd, const std::vector<int>& opcode) {
+#define BINARY_OP(opcode,op) case opcode: {\
+								if (stack.size() >= 2) {\
+									int rhs = stack.top();\
+									stack.pop();\
+									int lhs = stack.top();\
+									stack.pop();\
+									stack.push(lhs op rhs);\
+								}\
+								break;\
+							}
+#define UNARY_OP(opcode,op) case opcode: {\
+								if (stack.size() >= 1) {\
+									int val = stack.top();\
+									stack.pop();\
+									stack.push(op##val);\
+								}\
+								break;\
+							}
+#define UNARY_EQ_OP(opcode,val) UNARY_OP(opcode,cd->val == )
+static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcode) {
 	std::stack<int> stack;
 	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
 		switch(*it) {
-		case OPCODE_ADD: {
-			if (stack.size() >= 2) {
-				int rhs = stack.top();
-				stack.pop();
-				int lhs = stack.top();
-				stack.pop();
-				stack.push(lhs + rhs);
-			}
-			break;
-		}
-		case OPCODE_SUB: {
-			if (stack.size() >= 2) {
-				int rhs = stack.top();
-				stack.pop();
-				int lhs = stack.top();
-				stack.pop();
-				stack.push(lhs - rhs);
-			}
-			break;
-		}
-		case OPCODE_MUL: {
-			if (stack.size() >= 2) {
-				int rhs = stack.top();
-				stack.pop();
-				int lhs = stack.top();
-				stack.pop();
-				stack.push(lhs * rhs);
-			}
-			break;
-		}
-		case OPCODE_DIV: {
-			if (stack.size() >= 2) {
-				int rhs = stack.top();
-				stack.pop();
-				int lhs = stack.top();
-				stack.pop();
-				stack.push(lhs / rhs);
-			}
-			break;
-		}
-		case OPCODE_AND: {
-			if (stack.size() >= 2) {
-				int rhs = stack.top();
-				stack.pop();
-				int lhs = stack.top();
-				stack.pop();
-				stack.push(lhs && rhs);
-			}
-			break;
-		}
-		case OPCODE_OR: {
-			if (stack.size() >= 2) {
-				int rhs = stack.top();
-				stack.pop();
-				int lhs = stack.top();
-				stack.pop();
-				stack.push(lhs || rhs);
-			}
-			break;
-		}
-		case OPCODE_NEG: {
-			if (stack.size() >= 1) {
-				int val = stack.top();
-				stack.pop();
-				stack.push(-val);
-			}
-			break;
-		}
-		case OPCODE_NOT: {
-			if (stack.size() >= 1) {
-				int val = stack.top();
-				stack.pop();
-				stack.push(!val);
-			}
-			break;
-		}
-		case OPCODE_ISCODE: {
-			if (stack.size() >= 1) {
-				int code = stack.top();
-				stack.pop();
-				stack.push(cd->code == code);
-			}
-			break;
-		}
+		BINARY_OP(OPCODE_ADD, +);
+		BINARY_OP(OPCODE_SUB, -);
+		BINARY_OP(OPCODE_MUL, *);
+		BINARY_OP(OPCODE_DIV, /);
+		BINARY_OP(OPCODE_AND, &&);
+		BINARY_OP(OPCODE_OR, ||);
+		UNARY_OP(OPCODE_NEG, -);
+		UNARY_OP(OPCODE_NOT, !);
+		UNARY_EQ_OP(OPCODE_ISCODE, code);
+		UNARY_EQ_OP(OPCODE_ISTYPE, type);
+		UNARY_EQ_OP(OPCODE_ISRACE, race);
+		UNARY_EQ_OP(OPCODE_ISATTRIBUTE, attribute);
 		case OPCODE_ISSETCARD: {
 			if (stack.size() >= 1) {
 				int set_code = stack.top();
@@ -1348,30 +1295,6 @@ static bool is_declarable(CardDataC* cd, const std::vector<int>& opcode) {
 			}
 			break;
 		}
-		case OPCODE_ISTYPE: {
-			if (stack.size() >= 1) {
-				int val = stack.top();
-				stack.pop();
-				stack.push(cd->type & val);
-			}
-			break;
-		}
-		case OPCODE_ISRACE: {
-			if (stack.size() >= 1) {
-				int race = stack.top();
-				stack.pop();
-				stack.push(cd->race & race);
-			}
-			break;
-		}
-		case OPCODE_ISATTRIBUTE: {
-			if (stack.size() >= 1) {
-				int attribute = stack.top();
-				stack.pop();
-				stack.push(cd->attribute & attribute);
-			}
-			break;
-		}
 		default: {
 			stack.push(*it);
 			break;
@@ -1383,6 +1306,9 @@ static bool is_declarable(CardDataC* cd, const std::vector<int>& opcode) {
 	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
 		|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
 }
+#undef BINARY_OP
+#undef UNARY_OP
+#undef UNARY_EQ_OP
 void ClientField::UpdateDeclarableCodeType(bool enter) {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
@@ -1470,7 +1396,7 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto& string : dataManager._strings) {
-		if(Game::CompareStrings(string.second.name.c_str(), pname)) {
+		if(Game::CompareStrings(string.second.name.c_str(), pname, true, true)) {
 			auto cp = dataManager.GetCardData(string.first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(cp && is_declarable(cp, opcode)) {

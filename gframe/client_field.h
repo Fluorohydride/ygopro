@@ -68,7 +68,7 @@ public:
 	std::vector<ClientCard*> must_select_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> opcode;
+	std::vector<int64> opcode;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
