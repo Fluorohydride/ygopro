@@ -1105,7 +1105,7 @@ void Game::RefreshSingleplay() {
 void Game::LoadConfig() {
 	gameConf.antialias = 0;
 	gameConf.use_d3d = false;
-	gameConf.use_vsync = false;
+	gameConf.use_vsync = true;
 	gameConf.max_fps = 60;
 	gameConf.game_version = 0;
 	gameConf.fullscreen = false;
