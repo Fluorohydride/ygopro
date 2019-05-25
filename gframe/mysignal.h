@@ -32,6 +32,9 @@ public:
 	}
 	void SetNoWait(bool nowait) {
 		_nowait = nowait;
+		if (nowait){
+			Set();
+		}
 	}
 private:
 	std::mutex mut;
