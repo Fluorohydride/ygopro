@@ -2,6 +2,7 @@
 #define SINGLE_MODE_H
 
 #include "replay.h"
+#include "mysignal.h"
 
 namespace ygo {
 
@@ -22,6 +23,7 @@ public:
 	static void SinglePlayRefresh(int flag = 0xf81fff);
 	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	static void SinglePlayReload();
+	static Signal singleSignal;
 
 protected:
 	static Replay last_replay;

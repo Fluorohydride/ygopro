@@ -183,10 +183,10 @@ public:
 	static int MessageHandler(void* fduel, int type);
 
 	std::mutex gMutex;
+	std::mutex analyzeMutex;
 	Signal frameSignal;
 	Signal actionSignal;
 	Signal replaySignal;
-	Signal singleSignal;
 	std::mutex closeSignal;
 	Signal closeDoneSignal;
 	Config gameConf;

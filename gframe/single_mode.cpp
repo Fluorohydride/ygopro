@@ -11,6 +11,7 @@ bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
 Replay SingleMode::new_replay;
 ReplayStream SingleMode::replay_stream;
+Signal SingleMode::singleSignal;
 
 bool SingleMode::StartPlay() {
 	if(mainGame->dInfo.isSingleMode)
@@ -22,7 +23,7 @@ void SingleMode::StopPlay(bool is_exiting) {
 	is_closing = is_exiting;
 	is_continuing = false;
 	mainGame->actionSignal.Set();
-	mainGame->singleSignal.Set();
+	singleSignal.Set();
 }
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
@@ -141,6 +142,9 @@ int SingleMode::SinglePlayThread() {
 	new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), oldreplay.size()));
 
 	new_replay.EndRecord();
+	if(is_closing)
+		return 0;
+	end_duel(pduel);
 	time_t nowtime = time(NULL);
 	tm* localedtime = localtime(&nowtime);
 	wchar_t timetext[40];
@@ -154,7 +158,6 @@ int SingleMode::SinglePlayThread() {
 	mainGame->replaySignal.Wait();
 	if(mainGame->saveReplay)
 		new_replay.SaveReplay(mainGame->ebRSName->getText());
-	end_duel(pduel);
 	new_replay.Reset();
 	last_replay.Reset();
 	mainGame->gMutex.lock();
@@ -225,8 +228,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			pbuf += count * 8 + 2;
 			SinglePlayRefresh();
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -247,8 +250,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			pbuf += count * 18 + 3;
 			SinglePlayRefresh();
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -258,8 +261,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			pbuf += 22;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -268,8 +271,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 8;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -279,8 +282,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -291,8 +294,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -303,8 +306,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 11;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -317,8 +320,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -328,8 +331,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += 10 + count * 23;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -339,8 +342,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -349,8 +352,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -361,8 +364,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 9;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -376,8 +379,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -388,8 +391,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 19;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -691,8 +694,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_ROCK_PAPER_SCISSORS: {
 			player = BufferIO::ReadInt8(pbuf);
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -706,8 +709,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -716,8 +719,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -726,8 +729,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 4;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;
@@ -738,8 +741,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += 8 * count;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				mainGame->singleSignal.Reset();
-				mainGame->singleSignal.Wait();
+				singleSignal.Reset();
+				singleSignal.Wait();
 			}
 			record = false;
 			break;

@@ -109,7 +109,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_LEAVE_GAME: {
 				if(mainGame->dInfo.isSingleMode) {
-					mainGame->singleSignal.SetNoWait(true);
+					SingleMode::singleSignal.SetNoWait(true);
 					SingleMode::StopPlay(false);
 					break;
 				}

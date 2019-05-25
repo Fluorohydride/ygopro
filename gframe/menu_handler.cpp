@@ -353,7 +353,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_LOAD_SINGLEPLAY: {
 				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
 					break;
-				mainGame->singleSignal.SetNoWait(false);
+				SingleMode::singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
 				break;
 			}
@@ -566,7 +566,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case LISTBOX_SINGLEPLAY_LIST: {
 				if(!open_file && (mainGame->lstSinglePlayList->getSelected() == -1))
 					break;
-				mainGame->singleSignal.SetNoWait(false);
+				SingleMode::singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
 				break;
 			}

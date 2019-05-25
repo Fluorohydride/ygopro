@@ -92,10 +92,10 @@ void DuelClient::StopClient(bool is_exiting) {
 	if(connect_state != 0x7)
 		return;
 	is_closing = is_exiting;
-	if(!is_closing) {
-
-	}
 	event_base_loopbreak(client_base);
+	if(!is_closing) {
+		
+	}
 }
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
@@ -219,7 +219,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
-		ClientAnalyze(pdata, len - 1);
+		if(mainGame->analyzeMutex.try_lock()){
+			ClientAnalyze(pdata, len - 1);
+			mainGame->analyzeMutex.unlock();
+		}
 		break;
 	}
 	case STOC_ERROR_MSG: {
@@ -3862,7 +3865,7 @@ void DuelClient::SendResponse() {
 	replay_stream.pop_back();
 	if(mainGame->dInfo.isSingleMode) {
 		SingleMode::SetResponse(response_buf.data(), response_buf.size());
-		mainGame->singleSignal.Set();
+		SingleMode::singleSignal.Set();
 	} else if (!mainGame->dInfo.isReplay) {
 		mainGame->dInfo.time_player = 2;
 		SendBufferToServer(CTOS_RESPONSE, response_buf.data(), response_buf.size());
