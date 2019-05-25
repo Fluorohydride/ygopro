@@ -987,7 +987,7 @@ void Game::MainLoop() {
 			closeSignal.unlock();
 		if(gameConf.max_fps && !gameConf.use_vsync) {
 			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
-				device->sleep(20);
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
 		while(cur_time >= 1000) {
 			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
@@ -1011,11 +1011,7 @@ void Game::MainLoop() {
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
-#ifdef _WIN32
-	Sleep(500);
-#else
-	usleep(500000);
-#endif
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
 #ifdef YGOPRO_BUILD_DLL
 	if(ocgcore)
