@@ -20,6 +20,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
+		if(mainGame->fadingList.size())
+			break;
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
