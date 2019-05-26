@@ -3471,12 +3471,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return false;
 	}
 	case MSG_ANNOUNCE_CARD: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		mainGame->dField.declarable_type = BufferIO::ReadInt32(pbuf);
-		mainGame->dField.opcode.clear();
+		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		int declarable_type = BufferIO::ReadInt32(pbuf);
+		mainGame->dField.declare_opcodes.clear();
+		if(declarable_type) {
+			mainGame->dField.declare_opcodes.push_back(declarable_type);
+			mainGame->dField.declare_opcodes.push_back(OPCODE_ISTYPE);
+		}
 		mainGame->gMutex.lock();
 		mainGame->ebANCard->setText(L"");
-		mainGame->dField.UpdateDeclarableCode(false);
+		mainGame->dField.UpdateDeclarableList(false);
 		mainGame->wANCard->setText(dataManager.GetSysString(select_hint ? select_hint : 564).c_str());
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.unlock();
@@ -3500,16 +3504,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return false;
 	}
 	case MSG_ANNOUNCE_CARD_FILTER: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		int count = BufferIO::ReadInt8(pbuf);
-		mainGame->dField.declarable_type = 0;
-		mainGame->dField.opcode.clear();
+		/*int player = */mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
+		int count = BufferIO::ReadUInt8(pbuf);
+		mainGame->dField.declare_opcodes.clear();
 		for (int i = 0; i < count; ++i)
-			mainGame->dField.opcode.push_back(READ_LUA64(int32_t, int64_t, pbuf));
+			mainGame->dField.declare_opcodes.push_back(READ_LUA64(int32_t, int64_t, pbuf));
 		mainGame->gMutex.lock();
 		mainGame->ebANCard->setText(L"");
 		mainGame->wANCard->setText(dataManager.GetSysString(select_hint ? select_hint : 564).c_str());
-		mainGame->dField.UpdateDeclarableCode(false);
+		mainGame->dField.UpdateDeclarableList(false);
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.unlock();
 		select_hint = 0;

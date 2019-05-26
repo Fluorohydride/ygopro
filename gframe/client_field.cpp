@@ -1237,12 +1237,6 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 	       || (l2 > 0 && acc > l2 && check_sum(index, end, acc - l2, count + 1))
 	       || check_sum(index, end, acc, count);
 }
-static bool is_declarable(CardDataC* cd, int declarable_type) {
-	if(!(cd->type & declarable_type))
-		return false;
-	return cd->code == CARD_MARINE_DOLPHIN || cd->code == CARD_TWINKLE_MOSS
-		|| (!cd->alias && (cd->type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
-}
 #define BINARY_OP(opcode,op) case opcode: {\
 								if (stack.size() >= 2) {\
 									int rhs = stack.top();\
@@ -1261,11 +1255,15 @@ static bool is_declarable(CardDataC* cd, int declarable_type) {
 								}\
 								break;\
 							}
-#define UNARY_EQ_OP(opcode,val) UNARY_OP(opcode,cd->val == )
-static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcode) {
+#define UNARY_OP_OP(opcode,val,op) UNARY_OP(opcode,cd->val##op)
+#define GET_OP(opcode,val) case opcode: {\
+								stack.push(cd->val);\
+								break;\
+							}
+static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
 	std::stack<int> stack;
-	for(auto it = opcode.begin(); it != opcode.end(); ++it) {
-		switch(*it) {
+	for(auto& opcode : opcodes) {
+		switch(opcode) {
 		BINARY_OP(OPCODE_ADD, +);
 		BINARY_OP(OPCODE_SUB, -);
 		BINARY_OP(OPCODE_MUL, *);
@@ -1274,10 +1272,21 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcode) {
 		BINARY_OP(OPCODE_OR, ||);
 		UNARY_OP(OPCODE_NEG, -);
 		UNARY_OP(OPCODE_NOT, !);
-		UNARY_EQ_OP(OPCODE_ISCODE, code);
-		UNARY_EQ_OP(OPCODE_ISTYPE, type);
-		UNARY_EQ_OP(OPCODE_ISRACE, race);
-		UNARY_EQ_OP(OPCODE_ISATTRIBUTE, attribute);
+		BINARY_OP(OPCODE_BAND, &);
+		BINARY_OP(OPCODE_BOR, | );
+		UNARY_OP(OPCODE_BNOT, ~);
+		BINARY_OP(OPCODE_BXOR, ^);
+		BINARY_OP(OPCODE_LSHIFT, <<);
+		BINARY_OP(OPCODE_RSHIFT, >>);
+		UNARY_OP_OP(OPCODE_ISCODE, code, ==);
+		UNARY_OP_OP(OPCODE_ISTYPE, type, &);
+		UNARY_OP_OP(OPCODE_ISRACE, race, &);
+		UNARY_OP_OP(OPCODE_ISATTRIBUTE, attribute, &);
+		GET_OP(OPCODE_GETCODE, code);
+		GET_OP(OPCODE_GETTYPE, type);
+		GET_OP(OPCODE_GETRACE, race);
+		GET_OP(OPCODE_GETATTRIBUTE, attribute);
+		GET_OP(OPCODE_GETSETCARD, setcode);
 		case OPCODE_ISSETCARD: {
 			if (stack.size() >= 1) {
 				int set_code = stack.top();
@@ -1296,7 +1305,7 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcode) {
 			break;
 		}
 		default: {
-			stack.push(*it);
+			stack.push(opcode);
 			break;
 		}
 		}
@@ -1308,12 +1317,13 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcode) {
 }
 #undef BINARY_OP
 #undef UNARY_OP
-#undef UNARY_EQ_OP
-void ClientField::UpdateDeclarableCodeType(bool enter) {
+#undef UNARY_OP_OP
+#undef GET_OP
+void ClientField::UpdateDeclarableList(bool enter) {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	auto cd = dataManager.GetCardData(trycode);
-	if(cd && is_declarable(cd, declarable_type)) {
+	if(cd && is_declarable(cd, declare_opcodes)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
 		CardString cstr;
@@ -1330,58 +1340,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		mainGame->lstANCard->clear();
 		for(const auto& trycode : cache) {
 			cd = dataManager.GetCardData(trycode);
-			if(cd && is_declarable(cd, declarable_type)) {
-				ancard.push_back(trycode);
-				CardString cstr;
-				dataManager.GetString(trycode, &cstr);
-				mainGame->lstANCard->addItem(cstr.name.c_str());
-				if(trycode == selcode)
-					mainGame->lstANCard->setSelected(cstr.name.c_str());
-			}
-		}
-		if(!ancard.empty())
-			return;
-	}
-	mainGame->lstANCard->clear();
-	ancard.clear();
-	for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
-		if(Game::CompareStrings(cit->second.name, pname, true, true) != 0) {
-			auto cp = dataManager.GetCardData(cit->first);	//verified by _strings
-			//datas.alias can be double card names or alias
-			if(is_declarable(cp, declarable_type)) {
-				if(pname == cit->second.name) { //exact match
-					mainGame->lstANCard->insertItem(0, cit->second.name.c_str(), -1);
-					ancard.insert(ancard.begin(), cit->first);
-				} else {
-					mainGame->lstANCard->addItem(cit->second.name.c_str());
-					ancard.push_back(cit->first);
-				}
-			}
-		}
-	}
-}
-void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
-	const wchar_t* pname = mainGame->ebANCard->getText();
-	int trycode = BufferIO::GetVal(pname);
-	auto cd = dataManager.GetCardData(trycode);
-	if(cd && is_declarable(cd, opcode)) {
-		mainGame->lstANCard->clear();
-		ancard.clear();
-		CardString cstr;
-		dataManager.GetString(trycode, &cstr);
-		mainGame->lstANCard->addItem(cstr.name.c_str());
-		ancard.push_back(trycode);
-		return;
-	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter) {
-		std::vector<int> cache;
-		cache.swap(ancard);
-		int sel = mainGame->lstANCard->getSelected();
-		int selcode = (sel == -1) ? 0 : cache[sel];
-		mainGame->lstANCard->clear();
-		for(const auto& trycode : cache) {
-			cd = dataManager.GetCardData(trycode);
-			if(cd && is_declarable(cd, opcode)) {
+			if(cd && is_declarable(cd, declare_opcodes)) {
 				ancard.push_back(trycode);
 				CardString cstr;
 				dataManager.GetString(trycode, &cstr);
@@ -1399,7 +1358,7 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		if(Game::CompareStrings(string.second.name.c_str(), pname, true, true)) {
 			auto cp = dataManager.GetCardData(string.first);	//verified by _strings
 			//datas.alias can be double card names or alias
-			if(cp && is_declarable(cp, opcode)) {
+			if(cp && is_declarable(cp, declare_opcodes)) {
 				if(pname == string.second.name) { //exact match
 					mainGame->lstANCard->insertItem(0, string.second.name.c_str(), -1);
 					ancard.insert(ancard.begin(), string.first);
@@ -1410,11 +1369,5 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 			}
 		}
 	}
-}
-void ClientField::UpdateDeclarableCode(bool enter) {
-	if(opcode.size() == 0)
-		UpdateDeclarableCodeType(enter);
-	else
-		UpdateDeclarableCodeOpcode(enter);
 }
 }
