@@ -175,7 +175,7 @@ public:
 	static std::vector<T> TokenizeString(T input, const T& token);
 	static std::wstring StringtoUpper(std::wstring input);
 	static bool CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input = false, bool transform_token = false);
-	static bool CompareStrings(std::wstring input, const std::wstring& second_term, bool transform_input = false, bool transform_term = false);
+	static bool CompareStrings(std::wstring input, std::wstring second_term, bool transform_input = false, bool transform_term = false);
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
 	void* SetupDuel(uint32 seed);
 	std::vector<unsigned char> LoadScript(const std::string& script_name);

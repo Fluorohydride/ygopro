@@ -2022,16 +2022,14 @@ bool Game::CompareStrings(std::wstring input, const std::vector<std::wstring>& t
 	}
 	return true;
 }
-bool Game::CompareStrings(std::wstring input, const std::wstring & second_term, bool transform_input, bool transform_term) {
+bool Game::CompareStrings(std::wstring input, std::wstring second_term, bool transform_input, bool transform_term) {
 	if(input.empty() || second_term.empty())
 		return false;
 	if(transform_input)
 		input = StringtoUpper(input);
-	std::vector<std::wstring> tokens;
-	tokens.push_back(second_term);
 	if(transform_term)
-		tokens[0] = StringtoUpper(tokens[0]);
-	return CompareStrings(input, tokens);
+		second_term = StringtoUpper(second_term);
+	return input.find(second_term) != std::wstring::npos;
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 #ifdef _WIN32
