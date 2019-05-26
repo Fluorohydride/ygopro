@@ -1319,7 +1319,7 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
 #undef UNARY_OP
 #undef UNARY_OP_OP
 #undef GET_OP
-void ClientField::UpdateDeclarableList(bool enter) {
+void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	auto cd = dataManager.GetCardData(trycode);
@@ -1332,7 +1332,7 @@ void ClientField::UpdateDeclarableList(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+	if(pname[0] == 0) {
 		std::vector<int> cache;
 		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();

@@ -923,7 +923,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableList(false);
+				UpdateDeclarableList();
 				break;
 			}
 			case EDITBOX_REPLAY_NAME: {
@@ -936,7 +936,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableList(true);
+				UpdateDeclarableList();
 				break;
 			}
 			}

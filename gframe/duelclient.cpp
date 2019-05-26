@@ -3465,7 +3465,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		mainGame->gMutex.lock();
 		mainGame->ebANCard->setText(L"");
-		mainGame->dField.UpdateDeclarableList(false);
+		mainGame->dField.UpdateDeclarableList();
 		mainGame->wANCard->setText(dataManager.GetSysString(select_hint ? select_hint : 564).c_str());
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.unlock();
@@ -3497,7 +3497,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.lock();
 		mainGame->ebANCard->setText(L"");
 		mainGame->wANCard->setText(dataManager.GetSysString(select_hint ? select_hint : 564).c_str());
-		mainGame->dField.UpdateDeclarableList(false);
+		mainGame->dField.UpdateDeclarableList();
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.unlock();
 		select_hint = 0;
