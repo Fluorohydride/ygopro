@@ -3400,9 +3400,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_ANNOUNCE_CARD: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.opcode.clear();
+		mainGame->dField.declare_opcodes.clear();
 		for (int i = 0; i < count; ++i)
-			mainGame->dField.opcode.push_back(BufferIO::ReadInt32(pbuf));
+			mainGame->dField.declare_opcodes.push_back(BufferIO::ReadInt32(pbuf));
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
 		else myswprintf(textBuffer, dataManager.GetSysString(564));
