@@ -1353,14 +1353,16 @@ void Game::LoadGithubRepositories() {
 					JSON_SET_IF_VALID(url, string, std::string);
 					JSON_SET_IF_VALID(should_update, boolean, bool);
 					if(tmp_repo.url == "default") {
-						tmp_repo.url = "https://github.com/Ygoproco/Live2017Links/";
-						tmp_repo.repo_path = "./expansions/Live2017Links";
+#ifdef DEFAULT_LIVE_URL
+						tmp_repo.url = DEFAULT_LIVE_URL;
 #ifdef YGOPRO_BUILD_DLL
 						tmp_repo.has_core = true;
 #endif
+#endif //DEFAULT_LIVE_URL
 					} else if(tmp_repo.url == "default_anime") {
-						tmp_repo.url = "https://github.com/Ygoproco/LiveanimeLinks/";
-						tmp_repo.repo_path = "./expansions/LiveanimeLinks";
+#ifdef DEFAULT_LIVEANIME_URL
+						tmp_repo.url = DEFAULT_LIVEANIME_URL;
+#endif //DEFAULT_LIVEANIME_URL
 					} else {
 						JSON_SET_IF_VALID(repo_path, string, std::string);
 						JSON_SET_IF_VALID(repo_name, string, std::string);
