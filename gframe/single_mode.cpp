@@ -725,18 +725,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			record = false;
 			break;
 		}
-		case MSG_ANNOUNCE_CARD: {
-			player = BufferIO::ReadUInt8(pbuf);
-			pbuf += 4;
-			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
-				singleSignal.Reset();
-				singleSignal.Wait();
-			}
-			record = false;
-			break;
-		}
-		case MSG_ANNOUNCE_NUMBER:
-		case MSG_ANNOUNCE_CARD_FILTER: {
+		case MSG_ANNOUNCE_CARD:
+		case MSG_ANNOUNCE_NUMBER: {
 			player = BufferIO::ReadUInt8(pbuf);
 			count = BufferIO::ReadUInt8(pbuf);
 			pbuf += 8 * count;

@@ -697,13 +697,8 @@ namespace ygo {
 				pbuf += 5;
 				return ReadReplayResponse();
 			}
-			case MSG_ANNOUNCE_CARD: {
-				player = BufferIO::ReadUInt8(pbuf);
-				pbuf += 4;
-				return ReadReplayResponse();
-			}
-			case MSG_ANNOUNCE_NUMBER:
-			case MSG_ANNOUNCE_CARD_FILTER: {
+			case MSG_ANNOUNCE_CARD:
+			case MSG_ANNOUNCE_NUMBER: {
 				player = BufferIO::ReadUInt8(pbuf);
 				count = BufferIO::ReadUInt8(pbuf);
 				pbuf += 8 * count;
