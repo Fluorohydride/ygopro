@@ -1400,6 +1400,13 @@ void Game::ClearCardInfo(int player) {
 	stText->setText(L"");
 	scrCardText->setVisible(false);
 }
+void Game::AddLog(const wchar_t* msg, int param) {
+	logParam.push_back(param);
+	lstLog->addItem(msg);
+	if(!env->hasFocus(lstLog)) {
+		lstLog->setSelected(-1);
+	}
+}
 void Game::AddChatMsg(const wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
