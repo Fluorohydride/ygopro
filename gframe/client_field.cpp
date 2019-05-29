@@ -1251,11 +1251,11 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 								if (stack.size() >= 1) {\
 									int val = stack.top();\
 									stack.pop();\
-									stack.push(op##val);\
+									stack.push(op val);\
 								}\
 								break;\
 							}
-#define UNARY_OP_OP(opcode,val,op) UNARY_OP(opcode,cd->val##op)
+#define UNARY_OP_OP(opcode,val,op) UNARY_OP(opcode,cd->val op)
 #define GET_OP(opcode,val) case opcode: {\
 								stack.push(cd->val);\
 								break;\
