@@ -372,6 +372,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_CHANGE_SIDE: {
+		ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dField.Clear();
