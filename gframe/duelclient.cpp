@@ -1158,9 +1158,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcarddif = 110;
 		mainGame->showcardp = 0;
 		mainGame->dInfo.vic_string = L"";
-		mainGame->showcardcode = player + 1;
+		mainGame->showcardcode = 3;
 		std::wstring formatted_string = L"";
 		if(player < 2) {
+			mainGame->showcardcode = mainGame->LocalPlayer(player) + 1;
 			if(match_kill)
 				mainGame->dInfo.vic_string = fmt::sprintf(dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
 			else if(type < 0x10) {
