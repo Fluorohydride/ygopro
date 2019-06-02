@@ -21,12 +21,13 @@ namespace ygo {
 		}
 		const ReplayHeader& rh = cur_replay.yrp->pheader;
 		mainGame->dInfo.isFirst = true;
-		mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
 		mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
 		mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 		mainGame->dInfo.lua64 = true;
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
+		if(!mainGame->dInfo.isRelay)
+			mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
 		if (!StartDuel()) {
 			EndDuel();
 			return 0;
@@ -34,7 +35,7 @@ namespace ygo {
 		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isOldReplay = true;
 		mainGame->SetMesageWindow();
-		mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
+		mainGame->dInfo.isCatchingUp = (skip_turn > 0);
 		std::vector<uint8> duelBuffer;
 		is_continuing = true;
 		skip_step = 0;
@@ -54,7 +55,7 @@ namespace ygo {
 		}
 		exit_pending = false;
 		current_step = 0;
-		if (mainGame->dInfo.isReplaySkiping)
+		if (mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.lock();
 		while (is_continuing && !exit_pending) {
 			/*int flag = */process(pduel);
@@ -83,7 +84,7 @@ namespace ygo {
 					if (step == 0) {
 						Pause(true, false);
 						mainGame->dInfo.isStarted = true;
-						mainGame->dInfo.isReplaySkiping = false;
+						mainGame->dInfo.isCatchingUp = false;
 						mainGame->dField.RefreshAllCards();
 						mainGame->gMutex.unlock();
 					}
@@ -92,8 +93,8 @@ namespace ygo {
 				}
 			}
 		}
-		if (mainGame->dInfo.isReplaySkiping) {
-			mainGame->dInfo.isReplaySkiping = false;
+		if (mainGame->dInfo.isCatchingUp) {
+			mainGame->dInfo.isCatchingUp = false;
 			mainGame->dField.RefreshAllCards();
 			mainGame->gMutex.unlock();
 		}
@@ -104,22 +105,8 @@ namespace ygo {
 		const ReplayHeader& rh = cur_replay.yrp->pheader;
 		int seed = rh.seed;
 		auto names = ReplayMode::cur_replay.yrp->GetPlayerNames();
-		if(mainGame->dInfo.isRelay) {
-			mainGame->dInfo.hostname[0] = names[0];
-			mainGame->dInfo.hostname[1] = names[1];
-			mainGame->dInfo.hostname[2] = names[2];
-			mainGame->dInfo.clientname[0] = names[3];
-			mainGame->dInfo.clientname[1] = names[4];
-			mainGame->dInfo.clientname[2] = names[5];
-		} else if(mainGame->dInfo.isTag) {
-			mainGame->dInfo.hostname[0] = names[0];
-			mainGame->dInfo.hostname[1] = names[1];
-			mainGame->dInfo.clientname[1] = names[2];
-			mainGame->dInfo.clientname[0] = names[3];
-		} else {
-			mainGame->dInfo.hostname[0] = names[0];
-			mainGame->dInfo.clientname[0] = names[1];
-		}
+		mainGame->dInfo.hostname.insert(mainGame->dInfo.hostname.end(), names.begin(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0));
+		mainGame->dInfo.clientname.insert(mainGame->dInfo.clientname.end(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0), names.end());
 		std::mt19937 rnd(seed);
 		pduel = mainGame->SetupDuel(rnd());
 		int start_lp = cur_replay.yrp->params.start_lp;
@@ -145,59 +132,23 @@ namespace ygo {
 		mainGame->dInfo.turn = 0;
 		auto rule_cards = cur_replay.yrp->GetRuleCards();
 		for(auto card : rule_cards)
-			new_card(pduel, card, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE);
+			new_card(pduel, card, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE, 0);
 		auto decks = cur_replay.yrp->GetPlayerDecks();
 		if (!mainGame->dInfo.isSingleMode) {
-			if (opt & DUEL_RELAY_MODE) {
-				for(auto card : decks[0].main_deck)
-					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[0].extra_deck)
-					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
-				for(auto card : decks[1].main_deck)
-					new_tag_card(pduel, card, 0, LOCATION_DECK);
-				for(auto card : decks[1].extra_deck)
-					new_tag_card(pduel, card, 0, LOCATION_EXTRA);
-				for(auto card : decks[2].main_deck)
-					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[2].extra_deck)
-					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, decks[2].main_deck.size(), decks[2].extra_deck.size());
-				for(auto card : decks[3].main_deck)
-					new_tag_card(pduel, card, 1, LOCATION_DECK);
-				for(auto card : decks[3].extra_deck)
-					new_tag_card(pduel, card, 1, LOCATION_EXTRA);
-			} else if (opt & DUEL_TAG_MODE) {
-				for(auto card : decks[0].main_deck)
-					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[0].extra_deck)
-					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
-				for(auto card : decks[1].main_deck)
-					new_tag_card(pduel, card, 0, LOCATION_DECK);
-				for(auto card : decks[1].extra_deck)
-					new_tag_card(pduel, card, 0, LOCATION_EXTRA);
-				for(auto card : decks[2].main_deck)
-					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[2].extra_deck)
-					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, decks[2].main_deck.size(), decks[2].extra_deck.size());
-				for(auto card : decks[3].main_deck)
-					new_tag_card(pduel, card, 1, LOCATION_DECK);
-				for(auto card : decks[3].extra_deck)
-					new_tag_card(pduel, card, 1, LOCATION_EXTRA);
-			} else {
-				for(auto card : decks[0].main_deck)
-					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[0].extra_deck)
-					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
-				for(auto card : decks[1].main_deck)
-					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE);
-				for(auto card : decks[1].extra_deck)
-					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE);
-				mainGame->dField.Initial(1, decks[1].main_deck.size(), decks[1].extra_deck.size());
+			for(int i = 0; i < mainGame->dInfo.team1; i++) {
+				for(auto card : decks[i].main_deck)
+					new_card(pduel, card, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE, i);
+				for(auto card : decks[i].extra_deck)
+					new_card(pduel, card, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE, i);
 			}
+			for(int i = 0; i < mainGame->dInfo.team2; i++) {
+				for(auto card : decks[i + mainGame->dInfo.team1].main_deck)
+					new_card(pduel, card, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE, i);
+				for(auto card : decks[i + mainGame->dInfo.team1].extra_deck)
+					new_card(pduel, card, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE, i);
+			}
+			mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
+			mainGame->dField.Initial(1, decks[mainGame->dInfo.team1].main_deck.size(), decks[mainGame->dInfo.team1].extra_deck.size());
 		} else {
 			if(!preload_script(pduel, (char*)cur_replay.yrp->scriptname.c_str(), 0, 0, nullptr))
 				return false;
@@ -227,8 +178,8 @@ namespace ygo {
 			mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 			switch (mainGame->dInfo.curMsg) {
 			case MSG_RETRY: {
-				if (mainGame->dInfo.isReplaySkiping) {
-					mainGame->dInfo.isReplaySkiping = false;
+				if (mainGame->dInfo.isCatchingUp) {
+					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();
 					mainGame->gMutex.unlock();
 				}
@@ -246,8 +197,8 @@ namespace ygo {
 				break;
 			}
 			case MSG_WIN: {
-				if (mainGame->dInfo.isReplaySkiping) {
-					mainGame->dInfo.isReplaySkiping = false;
+				if (mainGame->dInfo.isCatchingUp) {
+					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();
 					mainGame->gMutex.unlock();
 				}
@@ -340,14 +291,13 @@ namespace ygo {
 			case MSG_SELECT_COUNTER: {
 				player = BufferIO::ReadUInt8(pbuf);
 				pbuf += 4;
-				count = BufferIO::ReadUInt8(pbuf);
+				count = BufferIO::ReadInt32(pbuf);
 				pbuf += count * 9;
 				return ReadReplayResponse();
 			}
 			case MSG_SELECT_SUM: {
-				pbuf++;
 				player = BufferIO::ReadUInt8(pbuf);
-				pbuf += 12;
+				pbuf += 13;
 				count = BufferIO::ReadInt32(pbuf);
 				pbuf += count * 17;
 				count = BufferIO::ReadInt32(pbuf);
@@ -435,7 +385,7 @@ namespace ygo {
 				if (skip_turn) {
 					skip_turn--;
 					if (skip_turn == 0) {
-						mainGame->dInfo.isReplaySkiping = false;
+						mainGame->dInfo.isCatchingUp = false;
 						mainGame->dField.RefreshAllCards();
 						mainGame->gMutex.unlock();
 					}
@@ -770,7 +720,7 @@ namespace ygo {
 					if (skip_step == 0) {
 						Pause(true, false);
 						mainGame->dInfo.isStarted = true;
-						mainGame->dInfo.isReplaySkiping = false;
+						mainGame->dInfo.isCatchingUp = false;
 						mainGame->dField.RefreshAllCards();
 						mainGame->gMutex.unlock();
 					}

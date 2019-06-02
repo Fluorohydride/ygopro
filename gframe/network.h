@@ -22,7 +22,10 @@ struct HostInfo {
 	unsigned char start_hand;
 	unsigned char draw_count;
 	unsigned short time_limit;
-	unsigned char check;
+	uint64 handshake;
+	int team1;
+	int team2;
+	int best_of;
 	unsigned int duel_flag;
 	int forbiddentypes;
 	unsigned short extra_rules;
@@ -154,6 +157,8 @@ public:
 #define NETWORK_SERVER_ID	0x7428
 #define NETWORK_CLIENT_ID	0xdef6
 
+#define SERVER_HANDSHAKE 4903489263569811227
+
 #define NETPLAYER_TYPE_PLAYER1		0
 #define NETPLAYER_TYPE_PLAYER2		1
 #define NETPLAYER_TYPE_PLAYER3		2
@@ -201,6 +206,7 @@ public:
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_WATCH_CHANGE	0x22
 
+#define STOC_CATCHUP		0xf0
 
 #define STOC_NEW_REPLAY			0x30
 

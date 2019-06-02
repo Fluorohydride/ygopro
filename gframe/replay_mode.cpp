@@ -58,29 +58,18 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.isReplay = true;
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
-	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
 	mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 	mainGame->dInfo.lua64 = !!(rh.flag & REPLAY_LUA64);
+	mainGame->dInfo.team1 = ReplayMode::cur_replay.GetPlayersCount(0);
+	mainGame->dInfo.team2 = ReplayMode::cur_replay.GetPlayersCount(1);
 	mainGame->dInfo.current_player[0] = 0;
 	mainGame->dInfo.current_player[1] = 0;
+	if(!mainGame->dInfo.isRelay)
+		mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
 	auto names = ReplayMode::cur_replay.GetPlayerNames();
-	if (mainGame->dInfo.isRelay) {
-		mainGame->dInfo.hostname[0] = names[0];
-		mainGame->dInfo.hostname[1] = names[1];
-		mainGame->dInfo.hostname[2] = names[2];
-		mainGame->dInfo.clientname[0] = names[3];
-		mainGame->dInfo.clientname[1] = names[4];
-		mainGame->dInfo.clientname[2] = names[5];
-	} else if (mainGame->dInfo.isTag) {
-		mainGame->dInfo.hostname[0] = names[0];
-		mainGame->dInfo.hostname[1] = names[1];
-		mainGame->dInfo.clientname[1] = names[2];
-		mainGame->dInfo.clientname[0] = names[3];
-	} else {
-		mainGame->dInfo.hostname[0] = names[0];
-		mainGame->dInfo.clientname[0] = names[1];
-	}
+	mainGame->dInfo.hostname.insert(mainGame->dInfo.hostname.end(), names.begin(), names.begin() + mainGame->dInfo.team1);
+	mainGame->dInfo.clientname.insert(mainGame->dInfo.clientname.end(), names.begin() + mainGame->dInfo.team1, names.end());
 	int opt = cur_replay.params.duel_flags;
 	mainGame->dInfo.duel_field = opt & 0xff;
 	mainGame->dInfo.extraval = ((opt >> 8) & SPEED_DUEL) ? 1 : 0;
@@ -93,12 +82,12 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.isStarted = true;
 	mainGame->SetMesageWindow();
 	mainGame->dInfo.turn = 0;
-	mainGame->dInfo.isReplaySkiping = (skip_turn > 0);
+	mainGame->dInfo.isCatchingUp = (skip_turn > 0);
 	is_continuing = true;
 	skip_step = 0;
 	exit_pending = false;
 	current_step = 0;
-	if(mainGame->dInfo.isReplaySkiping)
+	if(mainGame->dInfo.isCatchingUp)
 		mainGame->gMutex.lock();
 	for(auto it = current_stream.begin(); is_continuing && !exit_pending && it != current_stream.end();) {
 		is_continuing = ReplayAnalyze((*it));
@@ -112,7 +101,7 @@ int ReplayMode::ReplayThread() {
 			if (step == 0) {
 				Pause(true, false);
 				mainGame->dInfo.isStarted = true;
-				mainGame->dInfo.isReplaySkiping = false;
+				mainGame->dInfo.isCatchingUp = false;
 				mainGame->dField.RefreshAllCards();
 				mainGame->SetMesageWindow();
 				mainGame->gMutex.unlock();
@@ -122,8 +111,8 @@ int ReplayMode::ReplayThread() {
 		} else
 			it++;
 	}
-	if(mainGame->dInfo.isReplaySkiping) {
-		mainGame->dInfo.isReplaySkiping = false;
+	if(mainGame->dInfo.isCatchingUp) {
+		mainGame->dInfo.isCatchingUp = false;
 		mainGame->dField.RefreshAllCards();
 		mainGame->gMutex.unlock();
 	}
@@ -172,6 +161,12 @@ void ReplayMode::Restart(bool refresh) {
 	mainGame->dField.Clear();
 	mainGame->dInfo.current_player[0] = 0;
 	mainGame->dInfo.current_player[1] = 0;
+	if(!mainGame->dInfo.isRelay) {
+		if(mainGame->dInfo.isFirst)
+			mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
+		else
+			mainGame->dInfo.current_player[0] = mainGame->dInfo.team1 - 1;
+	}
 	if (yrp && !StartDuel()) {
 		EndDuel();
 	}
@@ -185,7 +180,7 @@ void ReplayMode::Restart(bool refresh) {
 void ReplayMode::Undo() {
 	if(skip_step > 0 || current_step == 0)
 		return;
-	mainGame->dInfo.isReplaySkiping = true;
+	mainGame->dInfo.isCatchingUp = true;
 	Restart(false);
 	Pause(false, false);
 }
@@ -206,8 +201,8 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 		mainGame->dInfo.curMsg = p.message;
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
-			if(mainGame->dInfo.isReplaySkiping) {
-				mainGame->dInfo.isReplaySkiping = false;
+			if(mainGame->dInfo.isCatchingUp) {
+				mainGame->dInfo.isCatchingUp = false;
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.unlock();
 			}
@@ -220,8 +215,8 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			return false;
 		}
 		case MSG_WIN: {
-			if (mainGame->dInfo.isReplaySkiping) {
-				mainGame->dInfo.isReplaySkiping = false;
+			if (mainGame->dInfo.isCatchingUp) {
+				mainGame->dInfo.isCatchingUp = false;
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.unlock();
 			}
@@ -259,7 +254,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			if(skip_turn) {
 				skip_turn--;
 				if(skip_turn == 0) {
-					mainGame->dInfo.isReplaySkiping = false;
+					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();
 					mainGame->gMutex.unlock();
 				}
@@ -288,7 +283,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				if(skip_step == 0) {
 					Pause(true, false);
 					mainGame->dInfo.isStarted = true;
-					mainGame->dInfo.isReplaySkiping = false;
+					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();
 					mainGame->gMutex.unlock();
 				}

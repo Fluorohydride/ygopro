@@ -30,9 +30,7 @@ extern void(*set_player_info)(ptr pduel, int32 playerid, int32 lp, int32 startco
 extern void(*get_log_message)(ptr pduel, byte* buf);
 extern int32(*get_message)(ptr pduel, byte* buf);
 extern int32(*process)(ptr pduel);
-extern void(*new_card)(ptr pduel, uint32 code, uint8 owner, uint8 playerid, uint8 location, uint8 sequence, uint8 position);
-extern void(*new_tag_card)(ptr pduel, uint32 code, uint8 owner, uint8 location);
-extern void(*new_relay_card)(ptr pduel, uint32 code, uint8 owner, uint8 location, uint8 playernum);
+extern void(*new_card)(ptr pduel, uint32 code, uint8 owner, uint8 playerid, uint8 location, uint8 sequence, uint8 position, uint32 duelist);
 extern int32(*get_cached_query)(ptr pduel, byte* buf);
 extern int32(*query_card)(ptr pduel, uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache, int32 ignore_cache);
 extern int32(*query_field_count)(ptr pduel, uint8 playerid, uint8 location);

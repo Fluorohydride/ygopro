@@ -54,7 +54,7 @@ ClientCard::ClientCard() {
 void ClientCard::SetCode(int code) {
 	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
 		this->code = code;
-		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
+		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->dField.MoveCard(this, 5);
 	} else
 		this->code = code;
@@ -68,7 +68,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		pdata = BufferIO::ReadInt32(buf);
 		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
 			code = pdata;
-			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
+			if(!mainGame->dInfo.isCatchingUp)
 				mainGame->dField.MoveCard(this, 5);
 		} else
 			code = pdata;

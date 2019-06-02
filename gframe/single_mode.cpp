@@ -49,8 +49,8 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.startlp = start_lp;
 	mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 	mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
-	mainGame->dInfo.hostname[0] = mainGame->ebNickName->getText();
-	mainGame->dInfo.clientname[0] = L"";
+	mainGame->dInfo.hostname.push_back(mainGame->ebNickName->getText());
+	mainGame->dInfo.clientname.push_back(L"");
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
 	bool loaded = true;
@@ -89,6 +89,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isStarted = true;
+	mainGame->dInfo.isCatchingUp = false;
 	mainGame->SetMesageWindow();
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
@@ -361,7 +362,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_COUNTER: {
 			player = BufferIO::ReadUInt8(pbuf);
 			pbuf += 4;
-			count = BufferIO::ReadUInt8(pbuf);
+			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 9;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				singleSignal.Reset();
@@ -371,9 +372,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_SELECT_SUM: {
-			pbuf++;
 			player = BufferIO::ReadUInt8(pbuf);
-			pbuf += 12;
+			pbuf += 13;
 			count = BufferIO::ReadInt32(pbuf);
 			pbuf += count * 14;
 			count = BufferIO::ReadInt32(pbuf);

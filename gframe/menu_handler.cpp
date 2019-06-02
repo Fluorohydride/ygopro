@@ -238,7 +238,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				DuelClient::SendPacketToServer(CTOS_HS_READY);
 				mainGame->cbDeckSelect->setEnabled(false);
 				mainGame->cbDeckSelect2->setEnabled(false);
-				if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+				if(mainGame->dInfo.team1 + mainGame->dInfo.team2 > 2)
 					mainGame->btnHostPrepDuelist->setEnabled(false);
 				break;
 			}
@@ -246,7 +246,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 				mainGame->cbDeckSelect->setEnabled(true);
 				mainGame->cbDeckSelect2->setEnabled(true);
-				if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+				if(mainGame->dInfo.team1 + mainGame->dInfo.team2 > 2)
 					mainGame->btnHostPrepDuelist->setEnabled(true);
 				break;
 			}
@@ -455,12 +455,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				tm* st = localtime(&curtime);
 				repinfo.append(fmt::format(L"{}/{}/{} {:02}:{:02}:{:02}\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec).c_str());
 				auto names = ReplayMode::cur_replay.GetPlayerNames();
-				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					repinfo.append(fmt::format(L"{}\n{}\n===VS===\n{}\n{}\n", names[0], names[1], names[2], names[3]));
-				else if (ReplayMode::cur_replay.pheader.flag & REPLAY_RELAY)
-					repinfo.append(fmt::format(L"{}\n{}\n{}\n===VS===\n{}\n{}\n{}\n", names[0], names[1], names[2], names[3], names[4], names[5]));
-				else
-					repinfo.append(fmt::format(L"{}\n===VS===\n{}\n", names[0], names[1]));
+				for(int i = 0; i < ReplayMode::cur_replay.GetPlayersCount(0); i++) {
+					repinfo.append(names[i] + L"\n");
+				}
+				repinfo.append(L"===VS===\n");
+				for(int i = 0; i < ReplayMode::cur_replay.GetPlayersCount(1); i++) {
+					repinfo.append(names[i + ReplayMode::cur_replay.GetPlayersCount(0)] + L"\n");
+				}
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->stReplayInfo->setText((wchar_t*)repinfo.c_str());
 				if(ReplayMode::cur_replay.pheader.id == 0x31707279 || !ReplayMode::cur_replay.yrp) {
@@ -593,13 +594,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					DuelClient::SendPacketToServer(CTOS_HS_READY);
 					mainGame->cbDeckSelect->setEnabled(false);
 					mainGame->cbDeckSelect2->setEnabled(false);
-					if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+					if(mainGame->dInfo.team1 + mainGame->dInfo.team2 > 2)
 						mainGame->btnHostPrepDuelist->setEnabled(false);
 				} else {
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 					mainGame->cbDeckSelect->setEnabled(true);
 					mainGame->cbDeckSelect2->setEnabled(true);
-					if(mainGame->dInfo.isTag || mainGame->dInfo.isRelay)
+					if(mainGame->dInfo.team1 + mainGame->dInfo.team2 > 2)
 						mainGame->btnHostPrepDuelist->setEnabled(true);
 				}
 				break;
@@ -627,13 +628,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				const wchar_t* input = mainGame->ebChatInput->getText();
 				if(input[0]) {
 					unsigned short msgbuf[256];
+					int player = mainGame->dInfo.player_type;
 					if(mainGame->dInfo.isStarted) {
-						if(mainGame->dInfo.player_type < 7) {
-							if(mainGame->dInfo.isTag && (mainGame->dInfo.player_type % 2))
-								mainGame->AddChatMsg((wchar_t*)input, 2);
-							else
-								mainGame->AddChatMsg((wchar_t*)input, 0);
-						} else
+						if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2)
+							mainGame->AddChatMsg(input, mainGame->LocalPlayer(player < mainGame->dInfo.team1 ? 0 : 1));
+						else
 							mainGame->AddChatMsg((wchar_t*)input, 10);
 					} else
 						mainGame->AddChatMsg((wchar_t*)input, 7);

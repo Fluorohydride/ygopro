@@ -222,13 +222,33 @@ bool Replay::ReadNextResponse(ReplayResponse* res) {
 }
 void Replay::ParseNames() {
 	players.clear();
-	players.resize(6);
-	int iterations = (pheader.flag & REPLAY_RELAY) ? 6 : (pheader.flag & REPLAY_TAG) ? 4 : 2;
-	for(int i = 0; i < iterations; i++) {
+	if(pheader.flag & REPLAY_SINGLE_MODE) {
 		wchar_t namebuf[20];
 		ReadName(namebuf);
-		players[i] = namebuf;
+		players.push_back(namebuf);
+		ReadName(namebuf);
+		players.push_back(namebuf);
+		home_count = 1;
+		opposing_count = 1;
+		return;
 	}
+	auto f = [this](size_t& count) {
+		if(pheader.flag & REPLAY_NEWREPLAY)
+			count = Read<size_t>();
+		else if(pheader.flag & REPLAY_TAG)
+			count = 2;
+		else if(pheader.flag & REPLAY_RELAY)
+			count = 3;
+		else
+			count = 1;
+		for(int i = 0; i < count; i++) {
+			wchar_t namebuf[20];
+			ReadName(namebuf);
+			players.push_back(namebuf);
+		}
+	};
+	f(home_count);
+	f(opposing_count);
 }
 void Replay::ParseParams() {
 	params = { 0 };
@@ -248,8 +268,7 @@ void Replay::ParseDecks() {
 	decks.clear();
 	if(pheader.id != 0x31707279 || pheader.flag & REPLAY_SINGLE_MODE)
 		return;
-	int iterations = (pheader.flag & REPLAY_RELAY) ? 6 : (pheader.flag & REPLAY_TAG) ? 4 : 2;
-	for(int i = 0; i < iterations; i++) {
+	for(int i = 0; i < home_count + opposing_count; i++) {
 		ReplayDeck tmp;
 		int main = Read<int32_t>();
 		for(int i = 0; i < main; ++i)
@@ -327,6 +346,11 @@ void Replay::Reset() {
 	replay_data.shrink_to_fit();
 	comp_data.clear();
 	comp_data.shrink_to_fit();
+}
+int Replay::GetPlayersCount(int side) {
+	if(side == 0)
+		return home_count;
+	return opposing_count;
 }
 bool Replay::ReadData(void* data, unsigned int length) {
 	if(!is_replaying || !can_read)

@@ -79,6 +79,7 @@ public:
 	ReplayStream packets_stream;
 	void Rewind();
 	void Reset();
+	int GetPlayersCount(int side);
 	std::unique_ptr<Replay> yrp;
 	ReplayHeader pheader;
 	std::vector<uint8_t> replay_data;
@@ -112,6 +113,8 @@ private:
 	bool can_read;
 	std::vector<ReplayResponse> responses;
 	std::vector<std::wstring> players;
+	size_t home_count;
+	size_t opposing_count;
 	std::wstring replay_name;
 	ReplayDeckList decks;
 	std::vector<int> replay_custom_rule_cards;

@@ -60,9 +60,8 @@ struct DuelInfo {
 	bool isStarted;
 	bool isReplay;
 	bool isOldReplay;
-	bool isReplaySkiping;
+	bool isCatchingUp;
 	bool isFirst;
-	bool isTag;
 	bool isRelay;
 	bool isSingleMode;
 	bool lua64;
@@ -74,8 +73,10 @@ struct DuelInfo {
 	int extraval;
 	int turn;
 	short curMsg;
-	std::wstring clientname[3];
-	std::wstring hostname[3];
+	int team1;
+	int team2;
+	std::vector<std::wstring> clientname;
+	std::vector<std::wstring> hostname;
 	std::wstring strLP[2];
 	std::wstring vic_string;
 	unsigned char player_type;

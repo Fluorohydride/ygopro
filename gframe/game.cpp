@@ -91,10 +91,6 @@ bool Game::Initialize() {
 	menuHandler.prev_operation = 0;
 	menuHandler.prev_sel = -1;
 	dInfo = {};
-	for(int i = 0; i < 3; i++) {
-		dInfo.clientname[i].reserve(20);
-		dInfo.hostname[i].reserve(20);
-	}
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
