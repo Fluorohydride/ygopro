@@ -3704,6 +3704,7 @@ void DuelClient::SendResponse() {
 	}
 }
 #undef READ_LUA64
+void DuelClient::BeginRefreshHost() {
 	if(is_refreshing)
 		return;
 	is_refreshing = true;
