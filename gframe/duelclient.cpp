@@ -3719,45 +3719,24 @@ void DuelClient::BeginRefreshHost() {
 	if(!host)
 		return;
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	sockaddr_in reply_addr;
-	memset(&reply_addr, 0, sizeof(reply_addr));
-	reply_addr.sin_family = AF_INET;
-	reply_addr.sin_port = htons(7921);
-	reply_addr.sin_addr.s_addr = 0;
-	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == SOCKET_ERROR) {
-		closesocket(reply);
-		return;
-	}
+	BOOL opt = TRUE;
+	setsockopt(reply, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
 	timeval timeout = {3, 0};
 	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
 	event_add(resp_event, &timeout);
 	std::thread(RefreshThread, std::ref(broadev)).detach();
 	//send request
-	SOCKADDR_IN local;
-	local.sin_family = AF_INET;
-	local.sin_port = htons(7922);
-	SOCKADDR_IN sockTo;
-	sockTo.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	SOCKADDR_IN sockTo = {};
 	sockTo.sin_family = AF_INET;
-	sockTo.sin_port = htons(7920);
+	sockTo.sin_port = htons(7911);
 	HostRequest hReq;
 	hReq.identifier = NETWORK_CLIENT_ID;
 	for(int i = 0; i < 8; ++i) {
 		if(host->h_addr_list[i] == 0)
 			break;
 		unsigned int local_addr = *(unsigned int*)host->h_addr_list[i];
-		local.sin_addr.s_addr = local_addr;
-		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-		if(sSend == INVALID_SOCKET)
-			break;
-		BOOL opt = TRUE;
-		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
-		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
-			closesocket(sSend);
-			break;
-		}
-		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
-		closesocket(sSend);
+		sockTo.sin_addr.s_addr = local_addr;
+		sendto(reply, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
 	}
 }
 int DuelClient::RefreshThread(event_base* broadev) {
@@ -3799,8 +3778,8 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(fmt::format(L"{:X}.0{:X}.{:X}", pHP->version >> 12, (pHP->version >> 4) & 0xff, pHP->version & 0xf));
 			hoststr.append(L"][");
 			int rule;
-			if(pHP->host.check == 2) {
-				mainGame->GetMasterRule(pHP->host.duel_flag, pHP->host.forbiddentypes, &rule);
+			if(pHP->host.handshake == SERVER_HANDSHAKE) {
+				mainGame->GetMasterRule(pHP->host.duel_flag & ~DUEL_RELAY_MODE, pHP->host.forbiddentypes, &rule);
 			} else
 				rule = pHP->host.duel_rule;
 			if(rule == 5)
