@@ -956,9 +956,9 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			player = BufferIO::ReadUInt8(pbuf);
 			pbuf += 13;
 			count = BufferIO::ReadInt32(pbuf);
-			pbuf += count * 17;
+			pbuf += count * 14;
 			count = BufferIO::ReadInt32(pbuf);
-			pbuf += count * 17;
+			pbuf += count * 14;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
