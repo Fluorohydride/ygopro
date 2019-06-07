@@ -9,16 +9,7 @@
 //#include "SkinLoader.h"
 #include "../CXMLRegistry/CXMLRegistry.h"
 
-#ifndef _WIN32
-	// gcc dosnt do 'debug'
-	#ifndef _DEBUG
-		#define _DEBUG
-	#endif
-#endif
-
-
 #define SKINSYSTEM_SKINFILE "/skin.xml"
-
 
 using namespace irr;
 class CGUISkinSystem {
