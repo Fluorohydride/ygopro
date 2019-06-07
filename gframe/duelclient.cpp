@@ -2263,7 +2263,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		soundManager.PlaySoundEffect(SoundManager::Sounds::NEXT_TURN);
 		int player = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
 		mainGame->dInfo.turn++;
-		if(mainGame->dInfo.player_type < (mainGame->dInfo.team1 + mainGame->dInfo.team2)) {
+		if(!mainGame->dInfo.isReplay && mainGame->dInfo.player_type < (mainGame->dInfo.team1 + mainGame->dInfo.team2)) {
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351).c_str());
 			mainGame->btnLeaveGame->setVisible(true);
 		}
