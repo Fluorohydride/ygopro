@@ -257,24 +257,28 @@ int ImageManager::LoadThumbThread(void* arg) {
 		sprintf(file, "pics/%d.jpg", code);
 		img = imageManager.driver->createImageFromFile(file);
 	}
-	imageManager.tThumbLoadingMutex.Lock();
 	if(img != NULL) {
 		int width = CARD_THUMB_WIDTH * mainGame->xScale;
 		int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 		if(img->getDimension() == irr::core::dimension2d<u32>(width, height)) {
 			img->grab();
+			imageManager.tThumbLoadingMutex.Lock();
 			imageManager.tThumbLoading[code] = img;
+			imageManager.tThumbLoadingMutex.Unlock();
 		} else {
 			irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<u32>(width, height));
 			imageScaleNNAA(img, destimg);
 			img->drop();
 			destimg->grab();
+			imageManager.tThumbLoadingMutex.Lock();
 			imageManager.tThumbLoading[code] = destimg;
+			imageManager.tThumbLoadingMutex.Unlock();
 		}
 	} else {
+		imageManager.tThumbLoadingMutex.Lock();
 		imageManager.tThumbLoading[code] = NULL;
+		imageManager.tThumbLoadingMutex.Unlock();
 	}
-	imageManager.tThumbLoadingMutex.Unlock();
 	return 0;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
