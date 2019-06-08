@@ -241,7 +241,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
 }
 int ImageManager::LoadThumbThread(void* arg) {
-	int code = reinterpret_cast<int>(arg);
+	intptr_t code = reinterpret_cast<intptr_t>(arg);
 	char file[256];
 	sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
 	irr::video::IImage* img = imageManager.driver->createImageFromFile(file);
