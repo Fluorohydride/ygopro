@@ -18,16 +18,20 @@ public:
 	irr::video::ITexture* GetTexture(int code, bool fit = false);
 	irr::video::ITexture* GetTextureThumb(int code);
 	irr::video::ITexture* GetTextureField(int code);
+	static int LoadThumbThread(void* arg);
 
 	std::unordered_map<int, irr::video::ITexture*> tMap[2];
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
 	std::unordered_map<int, irr::video::ITexture*> tFields;
+	std::unordered_map<int, irr::video::IImage*> tThumbLoading;
+	Mutex tThumbLoadingMutex;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::video::ITexture* tCover[4];
 	irr::video::ITexture* tUnknown;
 	irr::video::ITexture* tUnknownFit;
 	irr::video::ITexture* tUnknownThumb;
+	irr::video::ITexture* tLoading;
 	irr::video::ITexture* tAct;
 	irr::video::ITexture* tAttack;
 	irr::video::ITexture* tNegated;

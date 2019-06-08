@@ -15,6 +15,7 @@ bool ImageManager::Initial() {
 	tUnknown = NULL;
 	tUnknownFit = NULL;
 	tUnknownThumb = NULL;
+	tLoading = NULL;
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
 	tChain = driver->getTexture("textures/chain.png");
@@ -61,6 +62,7 @@ void ImageManager::ClearTexture() {
 	tMap[0].clear();
 	tMap[1].clear();
 	tThumb.clear();
+	tThumbLoading.clear();
 	tFields.clear();
 }
 void ImageManager::RemoveTexture(int code) {
@@ -96,9 +98,11 @@ void ImageManager::ResizeTexture() {
 	driver->removeTexture(tUnknown);
 	driver->removeTexture(tUnknownFit);
 	driver->removeTexture(tUnknownThumb);
+	driver->removeTexture(tLoading);
 	tUnknown = GetTextureFromFile("textures/unknown.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	tUnknownFit = GetTextureFromFile("textures/unknown.jpg", imgWidthFit, imgHeightFit);
 	tUnknownThumb = GetTextureFromFile("textures/unknown.jpg", imgWidthThumb, imgHeightThumb);
+	tLoading = GetTextureFromFile("textures/cover.jpg", imgWidthThumb, imgHeightThumb);
 	driver->removeTexture(tBackGround);
 	tBackGround = GetTextureFromFile("textures/bg.jpg", bgWidth, bgHeight);
 	driver->removeTexture(tBackGround_menu);
@@ -236,30 +240,66 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	else
 		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
 }
+int ImageManager::LoadThumbThread(void* arg) {
+	int code = reinterpret_cast<int>(arg);
+	char file[256];
+	sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
+	irr::video::IImage* img = imageManager.driver->createImageFromFile(file);
+	if(img == NULL) {
+		sprintf(file, "pics/thumbnail/%d.jpg", code);
+		img = imageManager.driver->createImageFromFile(file);
+	}
+	if(img == NULL && mainGame->gameConf.use_image_scale) {
+		sprintf(file, "expansions/pics/%d.jpg", code);
+		img = imageManager.driver->createImageFromFile(file);
+	}
+	if(img == NULL && mainGame->gameConf.use_image_scale) {
+		sprintf(file, "pics/%d.jpg", code);
+		img = imageManager.driver->createImageFromFile(file);
+	}
+	imageManager.tThumbLoadingMutex.Lock();
+	if(img != NULL) {
+		int width = CARD_THUMB_WIDTH * mainGame->xScale;
+		int height = CARD_THUMB_HEIGHT * mainGame->yScale;
+		if(img->getDimension() == irr::core::dimension2d<u32>(width, height)) {
+			img->grab();
+			imageManager.tThumbLoading[code] = img;
+		} else {
+			irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<u32>(width, height));
+			imageScaleNNAA(img, destimg);
+			img->drop();
+			destimg->grab();
+			imageManager.tThumbLoading[code] = destimg;
+		}
+	} else {
+		imageManager.tThumbLoading[code] = NULL;
+	}
+	imageManager.tThumbLoadingMutex.Unlock();
+	return 0;
+}
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
 		return tUnknownThumb;
-	auto tit = tThumb.find(code);
-	int width = CARD_THUMB_WIDTH * mainGame->xScale;
-	int height = CARD_THUMB_HEIGHT * mainGame->yScale;
-	if(tit == tThumb.end()) {
-		char file[256];
-		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
-		if(img == NULL) {
+	imageManager.tThumbLoadingMutex.Lock();
+	auto lit = tThumbLoading.find(code);
+	if(lit != tThumbLoading.end()) {
+		if(lit->second != NULL) {
+			char file[256];
 			sprintf(file, "pics/thumbnail/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
+			irr::video::ITexture* texture = driver->addTexture(file, lit->second); // textures must be added in the main thread due to OpenGL
+			lit->second->drop();
+			tThumb[code] = texture;
+		} else {
+			tThumb[code] = tUnknownThumb;
 		}
-		if(img == NULL && mainGame->gameConf.use_image_scale) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
-			if(img == NULL) {
-				sprintf(file, "pics/%d.jpg", code);
-				img = GetTextureFromFile(file, width, height);
-			}
-		}
-		tThumb[code] = img;
-		return (img == NULL) ? tUnknownThumb : img;
+		tThumbLoading.erase(lit);
+	}
+	imageManager.tThumbLoadingMutex.Unlock();
+	auto tit = tThumb.find(code);
+	if(tit == tThumb.end()) {
+		tThumb[code] = tLoading;
+		Thread::NewThread(LoadThumbThread, reinterpret_cast<void*>(code));
+		return tLoading;
 	}
 	if(tit->second)
 		return tit->second;
