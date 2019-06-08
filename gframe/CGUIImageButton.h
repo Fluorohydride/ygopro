@@ -27,7 +27,7 @@ public:
 
 private:
 	bool isDrawImage;
-	bool isFixSize;
+	bool isFixedSize;
 	f32 imageRotation;
 	core::vector2df imageScale;
 	core::dimension2di imageSize;

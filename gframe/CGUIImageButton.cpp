@@ -97,7 +97,7 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 CGUIImageButton::CGUIImageButton(IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle)
 	: CGUIButton(environment, parent, id, rectangle) {
 	isDrawImage = true;
-	isFixSize = false;
+	isFixedSize = false;
 	imageRotation = 0.0f;
 	imageScale = core::vector2df(1.0f, 1.0f);
 	imageSize = core::dimension2di(rectangle.getWidth(), rectangle.getHeight());
@@ -141,7 +141,7 @@ void CGUIImageButton::setImage(video::ITexture* image)
 	Image = image;
 	if(image) {
 		ImageRect = core::rect<s32>(core::position2d<s32>(0, 0), image->getOriginalSize());
-		if(isFixSize)
+		if(isFixedSize)
 			imageScale = core::vector2df((irr::f32)imageSize.Width / image->getSize().Width, (irr::f32)imageSize.Height / image->getSize().Height);
 	}
 
@@ -158,7 +158,7 @@ void CGUIImageButton::setImageScale(core::vector2df s) {
 	imageScale = s;
 }
 void CGUIImageButton::setImageSize(core::dimension2di s) {
-	isFixSize = true;
+	isFixedSize = true;
 	imageSize = s;
 }
 
