@@ -79,15 +79,17 @@ inline void refreshDeckList() {
 	});
 }
 inline void refreshReadonly(int catesel) {
+	bool hasDeck = mainGame->lstDecks->getItemCount() != 0;
 	mainGame->deckBuilder.readonly = catesel < 2;
 	mainGame->btnSaveDeck->setEnabled(!mainGame->deckBuilder.readonly);
-	mainGame->btnDeleteDeck->setEnabled(!mainGame->deckBuilder.readonly);
+	mainGame->btnDeleteDeck->setEnabled(hasDeck && !mainGame->deckBuilder.readonly);
 	mainGame->btnRenameCategory->setEnabled(catesel > 3);
 	mainGame->btnDeleteCategory->setEnabled(catesel > 3);
 	mainGame->btnNewDeck->setEnabled(!mainGame->deckBuilder.readonly);
-	mainGame->btnRenameDeck->setEnabled(!mainGame->deckBuilder.readonly);
-	mainGame->btnDMDeleteDeck->setEnabled(!mainGame->deckBuilder.readonly);
-	mainGame->btnMoveDeck->setEnabled(!mainGame->deckBuilder.readonly);
+	mainGame->btnRenameDeck->setEnabled(hasDeck && !mainGame->deckBuilder.readonly);
+	mainGame->btnDMDeleteDeck->setEnabled(hasDeck && !mainGame->deckBuilder.readonly);
+	mainGame->btnMoveDeck->setEnabled(hasDeck && !mainGame->deckBuilder.readonly);
+	mainGame->btnCopyDeck->setEnabled(hasDeck);
 }
 inline void changeCategory(int catesel) {
 	refreshReadonly(catesel);
@@ -584,6 +586,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							mainGame->cbDBDecks->setSelected(decksel);
 							deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 						}
+						refreshReadonly(prev_category);
 						prev_deck = decksel;
 					} else {
 						mainGame->stACMessage->setText(dataManager.GetSysString(1476));
