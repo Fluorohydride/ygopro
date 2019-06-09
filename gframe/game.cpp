@@ -826,13 +826,8 @@ void Game::MainLoop() {
 					ErrorLog("Error: " + repo.error);
 					continue;
 				}
-#ifdef _WIN32
-				script_dirs.insert(script_dirs.begin(), BufferIO::DecodeUTF8s(repo.script_path));
-				pic_dirs.insert(pic_dirs.begin(), BufferIO::DecodeUTF8s(repo.pics_path));
-#else
-				script_dirs.insert(script_dirs.begin(), repo.script_path);
-				pic_dirs.insert(pic_dirs.begin(), repo.pics_path);
-#endif
+				script_dirs.insert(script_dirs.begin(), Utils::ParseFilename(repo.script_path));
+				pic_dirs.insert(pic_dirs.begin(), Utils::ParseFilename(repo.pics_path));
 				auto files = Utils::FindfolderFiles(BufferIO::DecodeUTF8s(repo.data_path), { L"cdb" }, 0);
 				for(auto& file : files)
 					refresh_db = dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file)) || refresh_db;
@@ -844,11 +839,7 @@ void Game::MainLoop() {
 						cbDBLFList->addItem(list.listName.c_str());
 				}
 				if(repo.has_core) {
-#ifdef _WIN32
-					cores_to_load.insert(cores_to_load.begin(), BufferIO::DecodeUTF8s(repo.core_path));
-#else
-					cores_to_load.insert(cores_to_load.begin(), repo.core_path);
-#endif
+					cores_to_load.insert(cores_to_load.begin(), Utils::ParseFilename(repo.core_path));
 				}
 				std::string text;
 				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += n + "\n\n"; });
@@ -878,11 +869,7 @@ void Game::MainLoop() {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
 				if((ncore = ChangeOCGcore(path, ocgcore))) {
-#ifdef _WIN32
-					corename = path;
-#else
-					corename = BufferIO::DecodeUTF8s(path);
-#endif
+					corename = Utils::ParseFilename(path);
 					ocgcore = ncore;
 					if(!coreloaded) {
 						coreloaded = true;
@@ -2030,11 +2017,7 @@ bool Game::CompareStrings(std::wstring input, std::wstring second_term, bool tra
 	return input.find(second_term) != std::wstring::npos;
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
-#ifdef _WIN32
-	std::ifstream infile(script_name, std::ifstream::in);
-#else
-	std::ifstream infile(BufferIO::EncodeUTF8s(script_name), std::ifstream::in);
-#endif
+	std::ifstream infile(Utils::ParseFilename(script_name), std::ifstream::in);
 	std::string str;
 	std::string res = "";
 	size_t start = std::string::npos;
@@ -2066,11 +2049,7 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 std::vector<unsigned char> Game::LoadScript(const std::string& _name) {
 	std::vector<unsigned char> buffer;
 	std::ifstream script;
-#ifdef _WIN32
-	std::wstring name = BufferIO::DecodeUTF8s(_name);
-#else
-	std::string name = _name;
-#endif
+	path_string name = Utils::ParseFilename(_name);
 	for(auto& path : script_dirs) {
 		script.open(path + name, std::ifstream::binary);
 		if(script.is_open())

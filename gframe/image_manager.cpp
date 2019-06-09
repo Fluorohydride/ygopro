@@ -112,7 +112,7 @@ void ImageManager::RemoveTexture(int code) {
 				}\
 				dest[it->first] = driver->addTexture(pair.second.c_str(), pair.first);\
 				pair.first->drop();\
-			} else if(pair.second != "wait for download")\
+			} else if(pair.second != TEXT("wait for download"))\
 				dest[it->first] = nullptr;\
 			it = src->erase(it);\
 			continue;\
@@ -139,13 +139,17 @@ void ImageManager::ClearFutureObjects(loading_map* map) {
 	}
 	delete map;
 }
+#define PNG_HEADER 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a
+#define PNG_FILE 1
+#define JPG_HEADER 0xff, 0xd8, 0xff
+#define JPG_FILE 2
 int CheckImageHeader(char* header) {
-	unsigned char pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a }; //png header
-	unsigned char jpgheader[] = { 0xff, 0xd8, 0xff }; //jpg header
+	unsigned char pngheader[] = { PNG_HEADER }; //png header
+	unsigned char jpgheader[] = { JPG_HEADER }; //jpg header
 	if(!memcmp(pngheader, header, sizeof(pngheader))) {
-		return 1;
+		return PNG_FILE;
 	} else if(!memcmp(jpgheader, header, sizeof(jpgheader))) {
-		return 2;
+		return JPG_FILE;
 	} else
 		return 0;
 }
@@ -156,11 +160,11 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 		int header_written;
 	};
 	auto data = static_cast<payload*>(userdata);
-	if(data->header_written < 8) {
-		auto increase = std::min(nmemb * size, (size_t)(8 - data->header_written));
+	if(data->header_written < sizeof(data->header)) {
+		auto increase = std::min(nmemb * size, (size_t)(sizeof(data->header) - data->header_written));
 		memcpy(&data->header[data->header_written], ptr, increase);
 		data->header_written += increase;
-		if(data->header_written == 8 && !CheckImageHeader(data->header))
+		if(data->header_written == sizeof(data->header) && !CheckImageHeader(data->header))
 			return -1;
 	}
 	std::ofstream *out = data->stream;
@@ -168,20 +172,18 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	out->write(ptr, nbytes);
 	return nbytes;
 }
-const char* GetExtension(char* header) {
-	std::string extension;
-	int res = CheckImageHeader((char*)header);
-	if(res == 1)
-		return ".png";
-	else if(res == 2)
-		return ".jpg";
-	return "";
+const fschar_t* GetExtension(char* header) {
+	int res = CheckImageHeader(header);
+	if(res == PNG_FILE)
+		return TEXT(".png");
+	else if(res == JPG_FILE)
+		return TEXT(".jpg");
+	return TEXT("");
 }
 void ImageManager::DownloadPic(int code) {
-	auto id = std::to_string(code);
-	std::string dest_folder = "./pics/" + id;
-	auto name = "./pics/temp/" + id;
-	std::string ext;
+	path_string dest_folder = fmt::format(TEXT("./pics/{}"), code);
+	path_string name = fmt::format(TEXT("./pics/temp/{}"), code);
+	path_string ext;
 	pic_download.lock();
 	if(downloading_pics.find(code) == downloading_pics.end()) {
 		downloading_pics[code].first = 0;
@@ -230,10 +232,10 @@ void ImageManager::DownloadPic(int code) {
 	pic_download.unlock();
 }
 void ImageManager::DownloadField(int code) {
-	auto id = std::to_string(code);
-	std::string dest_folder = "./pics/field/" + id;
-	auto name = "./pics/temp/" + id + "_f";
-	std::string ext;
+	auto id = fmt::format(TEXT("{}"), code);
+	path_string dest_folder = fmt::format(TEXT("./pics/field/{}"), code);
+	path_string name = fmt::format(TEXT("./pics/temp/{}_f"), code);
+	path_string ext;
 	field_download.lock();
 	if(downloading_fields.find(code) == downloading_fields.end()) {
 		downloading_fields[code].first = 0;
@@ -394,18 +396,10 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 	int width = _width;
 	int height = _height;
 	for(auto& path : mainGame->pic_dirs) {
-#ifdef _WIN32
-		for(auto& extension : { L".png", L".jpg" }) {
-#else
-		for(auto& extension : { ".png", ".jpg" }) {
-#endif
+		for(auto extension : { TEXT(".png"), TEXT(".jpg") }) {
 			if(timestamp_id != source_timestamp_id.load())
-				return std::make_pair(nullptr, "fail");
-#ifdef _WIN32
-			auto file = path + std::to_wstring(code) + extension;
-#else
-			auto file = path + std::to_string(code) + extension;
-#endif
+				return std::make_pair(nullptr, TEXT("fail"));
+			auto file = fmt::format(TEXT("{}{}{}"), path, code, extension);
 			if(width != _width || height != _height) {
 				width = _width;
 				height = _height;
@@ -414,7 +408,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 			if(img = GetTextureFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id))) {
 				if(timestamp_id != source_timestamp_id.load()) {
 					img->drop();
-					return std::make_pair(nullptr, "fail");
+					return std::make_pair(nullptr, TEXT("fail"));
 				}
 				if(width != _width || height != _height) {
 					img->drop();
@@ -422,14 +416,10 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 					height = _height;
 					goto __repeat;
 				}
-#ifdef _WIN32
-				return std::make_pair(img, BufferIO::EncodeUTF8s(file));
-#else
-				return std::make_pair(img, file);
-#endif
+				return std::make_pair(img, Utils::ParseFilename(file));
 			}
 			if(timestamp_id != source_timestamp_id.load())
-				return std::make_pair(nullptr, "fail");
+				return std::make_pair(nullptr, TEXT("fail"));
 		}
 	}
 	pic_download.lock();
@@ -437,7 +427,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 		std::thread(&ImageManager::DownloadPic, this, code).detach();
 	}
 	pic_download.unlock();
-	return std::make_pair(img, "wait for download");
+	return std::make_pair(nullptr, TEXT("wait for download"));
 }
 irr::video::ITexture* ImageManager::GetTexture(int code, bool wait, bool fit, int* chk) {
 	if(chk)
@@ -551,15 +541,9 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 				return nullptr;
 		} else {
 			for(auto& path : mainGame->field_dirs) {
-#ifdef _WIN32
-				for(auto& extension : { L".png", L".jpg" }) {
-					if(img = driver->getTexture((path + std::to_wstring(code) + extension).c_str()))
+				for(auto extension : { TEXT(".png"), TEXT(".jpg") }) {
+					if(img = driver->getTexture(fmt::format(TEXT("{}{}{}"), path, code, extension).c_str()))
 						break;
-#else
-				for(auto& extension : { ".png", ".jpg" }) {
-					if(img = driver->getTexture((path + std::to_string(code) + extension).c_str()))
-						break;
-#endif
 				}
 			}
 		}

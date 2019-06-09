@@ -19,42 +19,6 @@ namespace ygo {
 		return !mkdir(&path[0], 0777) || errno == EEXIST;
 	}
 #endif
-	bool Utils::Movefile(const std::string& source, const std::string& destination) {
-		if (source == destination)
-			return false;
-#ifndef _WIN32
-		std::ifstream  src(source, std::ios::binary);
-		if(!src.is_open())
-			return false;
-		std::ofstream  dst(destination, std::ios::binary);
-		if(!dst.is_open())
-			return false;
-		dst << src.rdbuf();
-		src.close();
-		Deletefile(source);
-		return true;
-#else
-	return Movefile(BufferIO::DecodeUTF8s(source), BufferIO::DecodeUTF8s(destination));
-#endif
-	}
-	bool Utils::Movefile(const std::wstring& source, const std::wstring& destination) {
-		if (source == destination)
-			return false;
-#ifdef _WIN32
-		std::ifstream  src(source, std::ios::binary);
-		if(!src.is_open())
-			return false;
-		std::ofstream  dst(destination, std::ios::binary);
-		if(!dst.is_open())
-			return false;
-		dst << src.rdbuf();
-		src.close();
-		Deletefile(source);
-		return true;
-#else
-		return Movefile(BufferIO::EncodeUTF8s(source), BufferIO::EncodeUTF8s(destination));
-#endif
-	}
 	bool Utils::Deletefile(const std::string & source) {
 #ifdef _WIN32
 		return Deletefile(BufferIO::DecodeUTF8s(source));
@@ -221,7 +185,8 @@ namespace ygo {
 		});
 		return res;
 	}
-	std::wstring Utils::NormalizePath(const std::wstring & path, bool trailing_slash) {
+	std::wstring Utils::NormalizePath(std::wstring path, bool trailing_slash) {
+		std::replace(path.begin(), path.end(), L'\\', L'/');
 		std::vector<std::wstring> paths = ygo::Game::TokenizeString<std::wstring>(path, L"/");
 		if(paths.empty())
 			return path;
@@ -249,31 +214,29 @@ namespace ygo {
 			normalpath += L"/";
 		return normalpath;
 	}
-	std::wstring Utils::GetFileExtension(const std::wstring & file) {
+	std::wstring Utils::GetFileExtension(std::wstring file) {
 		size_t dotpos = file.find_last_of(L".");
 		if(dotpos == std::wstring::npos)
-			return file;
+			return L"";
 		std::wstring extension = file.substr(dotpos + 1);
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 		return extension;
 	}
-	std::wstring Utils::GetFileName(const std::wstring & file) {
-		auto dash1 = file.find_last_of(L"\\");
-		auto dash2 = file.find_last_of(L"/");
-		size_t dash;
-		if(dash1 == std::wstring::npos && dash2 == std::wstring::npos)
-			dash = 0;
-		else if(dash1 != std::wstring::npos && dash2 != std::wstring::npos)
-			dash = std::max(dash1, dash2) + 1;
+	std::wstring Utils::GetFileName(std::wstring file) {
+		std::replace(file.begin(), file.end(), L'\\', L'/');
+		size_t dashpos = file.find_last_of(L"/");
+		if(dashpos == std::wstring::npos)
+			dashpos = 0;
 		else
-			dash = std::min(dash1, dash2) + 1;
+			dashpos++;
 		size_t dotpos = file.find_last_of(L".");
 		if(dotpos == std::wstring::npos)
-			dotpos = 0;
-		std::wstring name = file.substr(dash, dotpos - dash);
+			dotpos = file.size();
+		std::wstring name = file.substr(dashpos, dotpos - dashpos);
 		return name;
 	}
-	std::string Utils::NormalizePath(const std::string & path, bool trailing_slash) {
+	std::string Utils::NormalizePath(std::string path, bool trailing_slash) {
+		std::replace(path.begin(), path.end(), '\\', '/');
 		std::vector<std::string> paths = ygo::Game::TokenizeString<std::string>(path, "/");
 		if(paths.empty())
 			return path;
@@ -301,29 +264,40 @@ namespace ygo {
 			normalpath += "/";
 		return normalpath;
 	}
-	std::string Utils::GetFileExtension(const std::string & file) {
+	std::string Utils::GetFileExtension(std::string file) {
 		size_t dotpos = file.find_last_of(".");
 		if(dotpos == std::string::npos)
-			return file;
+			return "";
 		std::string extension = file.substr(dotpos + 1);
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 		return extension;
 	}
-	std::string Utils::GetFileName(const std::string & file) {
-		auto dash1 = file.find_last_of("\\");
-		auto dash2 = file.find_last_of("/");
-		size_t dash;
-		if(dash1 == std::string::npos && dash2 == std::string::npos)
-			dash = 0;
-		else if(dash1 != std::string::npos && dash2 != std::string::npos)
-			dash = std::max(dash1, dash2) + 1;
+	std::string Utils::GetFileName(std::string file) {
+		std::replace(file.begin(), file.end(), '\\', '/');
+		size_t dashpos = file.find_last_of("/");
+		if(dashpos == std::wstring::npos)
+			dashpos = 0;
 		else
-			dash = std::min(dash1, dash2) + 1;
+			dashpos++;
 		size_t dotpos = file.find_last_of(".");
 		if(dotpos == std::string::npos)
-			dotpos = 0;
-		std::string name = file.substr(dash, dotpos - dash);
+			dotpos = file.size();
+		std::string name = file.substr(dashpos, dotpos - dashpos);
 		return name;
+	}
+	path_string Utils::ParseFilename(const std::wstring& input) {
+#ifdef _WIN32
+		return input;
+#else
+		return BufferIO::EncodeUTF8s(input);
+#endif
+	}
+	path_string Utils::ParseFilename(const std::string& input) {
+#ifdef _WIN32
+		return BufferIO::DecodeUTF8s(input);
+#else
+		return input;
+#endif
 	}
 }
 

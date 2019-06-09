@@ -80,6 +80,7 @@ public:
 	void Rewind();
 	void Reset();
 	int GetPlayersCount(int side);
+	std::wstring GetReplayName();
 	std::unique_ptr<Replay> yrp;
 	ReplayHeader pheader;
 	std::vector<uint8_t> replay_data;

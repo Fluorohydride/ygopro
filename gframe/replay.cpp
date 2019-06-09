@@ -98,11 +98,7 @@ void Replay::EndRecord(size_t size) {
 	is_recording = false;
 }
 void Replay::SaveReplay(const std::wstring& name) {
-#ifdef _WIN32
-	std::ofstream replay_file(L"./replay/" + name + L".yrpX", std::ofstream::binary);
-#else
-	std::ofstream replay_file("./replay/" + BufferIO::EncodeUTF8s(name) + ".yrpX", std::ofstream::binary);
-#endif
+	std::ofstream replay_file(Utils::ParseFilename(L"./replay/" + name + L".yrpX"), std::ofstream::binary);
 	if(!replay_file.is_open())
 		return;
 	replay_file.write((char*)&pheader, sizeof(pheader));
@@ -146,15 +142,9 @@ bool Replay::OpenReplay(const std::wstring& name) {
 		return true;
 	}
 	Reset();
-#ifdef _WIN32
-	std::ifstream replay_file(name, std::ifstream::binary);
+	std::ifstream replay_file(Utils::ParseFilename(name), std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(name, std::ifstream::binary);
-#else
-	std::ifstream replay_file(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
-	if(!replay_file.is_open()) {
-		replay_file.open(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
-#endif
+		replay_file.open(Utils::ParseFilename(L"./replay/" + name), std::ifstream::binary);
 		if(!replay_file.is_open()) {
 			replay_name.clear();
 			return false;
@@ -170,15 +160,9 @@ bool Replay::OpenReplay(const std::wstring& name) {
 	return false;
 }
 bool Replay::CheckReplay(const std::wstring& name) {
-#ifdef _WIN32
-	std::ifstream replay_file(name, std::ifstream::binary);
+	std::ifstream replay_file(Utils::ParseFilename(name), std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(L"./replay/" + name, std::ifstream::binary);
-#else
-	std::ifstream replay_file(BufferIO::EncodeUTF8s(name), std::ifstream::binary);
-	if(!replay_file.is_open()) {
-		replay_file.open("./replay/" + BufferIO::EncodeUTF8s(name), std::ifstream::binary);
-#endif
+		replay_file.open(Utils::ParseFilename(L"./replay/" + name), std::ifstream::binary);
 		if(!replay_file.is_open())
 			return false;
 	}
@@ -351,6 +335,9 @@ int Replay::GetPlayersCount(int side) {
 	if(side == 0)
 		return home_count;
 	return opposing_count;
+}
+std::wstring Replay::GetReplayName() {
+	return replay_name;
 }
 bool Replay::ReadData(void* data, unsigned int length) {
 	if(!is_replaying || !can_read)

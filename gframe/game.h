@@ -264,17 +264,10 @@ public:
 	irr::scene::ICameraSceneNode* camera;
 	io::IFileSystem* filesystem;
 	void PopulateResourcesDirectories();
-#ifdef _WIN32
-	std::vector<std::wstring> field_dirs;
-	std::vector<std::wstring> pic_dirs;
-	std::vector<std::wstring> script_dirs;
-	std::vector<std::wstring> cores_to_load;
-#else
-	std::vector<std::string> field_dirs;
-	std::vector<std::string> pic_dirs;
-	std::vector<std::string> script_dirs;
-	std::vector<std::string> cores_to_load;
-#endif
+	std::vector<path_string> field_dirs;
+	std::vector<path_string> pic_dirs;
+	std::vector<path_string> script_dirs;
+	std::vector<path_string> cores_to_load;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	//GUI
