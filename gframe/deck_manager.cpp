@@ -363,6 +363,22 @@ bool DeckManager::SaveDeck(Deck& deck, const std::wstring& name) {
 	deckfile.close();
 	return true;
 }
+bool DeckManager::SaveDeck(const std::wstring & name, std::vector<int> mainlist, std::vector<int> extralist, std::vector<int> sidelist) {
+	std::ofstream deckfile(Utils::ParseFilename(L"./deck/" + name + L".ydk"), std::ofstream::out);
+	if(!deckfile.is_open())
+		return false;
+	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
+	for(auto card : mainlist)
+		deckfile << std::to_string(card) << "\n";
+	deckfile << "#extra\n";
+	for(auto card : extralist)
+		deckfile << std::to_string(card) << "\n";
+	deckfile << "!side\n";
+	for(auto card : sidelist)
+		deckfile << std::to_string(card) << "\n";
+	deckfile.close();
+	return true;
+}
 bool DeckManager::DeleteDeck(Deck& deck, const std::wstring& name) {
 	return Utils::Deletefile(L"./deck/" + name + L".ydk");
 }

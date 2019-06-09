@@ -686,6 +686,8 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1349).c_str(), rect<s32>(360, 30, 570, 50), false, true, wReplay);
 	stReplayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wReplay, -1, rect<s32>(360, 60, 570, 350));
 	stReplayInfo->setWordWrap(true);
+	btnExportDeck = env->addButton(rect<s32>(470, 325, 570, 350), wReplay, BUTTON_EXPORT_DECK, dataManager.GetSysString(1358).c_str());
+	btnExportDeck->setEnabled(false);
 	chkYrp = env->addCheckBox(false, recti(360, 250, 560, 270), wReplay, -1, dataManager.GetSysString(1356).c_str());
 	env->addStaticText(dataManager.GetSysString(1353).c_str(), rect<s32>(360, 275, 570, 295), false, true, wReplay);
 	ebRepStartTurn = env->addEditBox(L"", rect<s32>(360, 300, 460, 320), true, wReplay, -1);

@@ -350,6 +350,24 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
 			}
+			case BUTTON_EXPORT_DECK: {
+				if(!ReplayMode::cur_replay.yrp)
+					break;
+				auto& replay = ReplayMode::cur_replay.yrp;
+				auto players = replay->GetPlayerNames();
+				if(players.empty())
+					break;
+				auto decks = replay->GetPlayerDecks();
+				if(players.size() > decks.size())
+					break;
+				auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
+				for(int i = 0; i < decks.size(); i++) {
+					deckManager.SaveDeck(fmt::format(L"player{:02} {} {}", i, players[i], replay_name), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
+				}
+				mainGame->stACMessage->setText(dataManager.GetSysString(1335).c_str());
+				mainGame->PopupElement(mainGame->wACMessage, 20);
+				break;
+			}
 			case BUTTON_LOAD_SINGLEPLAY: {
 				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
 					break;
@@ -443,6 +461,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnLoadReplay->setEnabled(false);
 				mainGame->btnDeleteReplay->setEnabled(false);
 				mainGame->btnRenameReplay->setEnabled(false);
+				mainGame->btnExportDeck->setEnabled(false);
 				if(sel == -1)
 					break;
 				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
@@ -450,6 +469,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnLoadReplay->setEnabled(true);
 				mainGame->btnDeleteReplay->setEnabled(true);
 				mainGame->btnRenameReplay->setEnabled(true);
+				mainGame->btnExportDeck->setEnabled(true);
 				std::wstring repinfo;
 				time_t curtime = ReplayMode::cur_replay.pheader.seed;
 				tm* st = localtime(&curtime);

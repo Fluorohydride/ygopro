@@ -54,6 +54,7 @@ public:
 	bool LoadDeck(const std::wstring& file, Deck* deck = nullptr);
 	bool LoadDeckDouble(const std::wstring& file, const std::wstring& file2, Deck* deck = nullptr);
 	bool SaveDeck(Deck& deck, const std::wstring& name);
+	bool SaveDeck(const std::wstring& name, std::vector<int> mainlist, std::vector<int>extralist, std::vector<int> sidelist);
 	bool DeleteDeck(Deck& deck, const std::wstring& name);
 };
 
