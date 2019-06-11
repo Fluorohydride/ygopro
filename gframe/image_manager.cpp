@@ -56,7 +56,7 @@ void ImageManager::ClearTexture() {
 			driver->removeTexture(tit->second);
 	}
 	for(auto tit = tThumb.begin(); tit != tThumb.end(); ++tit) {
-		if(tit->second)
+		if(tit->second && tit->second != tLoading)
 			driver->removeTexture(tit->second);
 	}
 	tMap[0].clear();
@@ -294,7 +294,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 			lit->second->drop();
 			tThumb[code] = texture;
 		} else {
-			tThumb[code] = tUnknownThumb;
+			tThumb[code] = NULL;
 		}
 		tThumbLoading.erase(lit);
 	}
