@@ -70,6 +70,7 @@ int SingleMode::SinglePlayThread() {
 	}
 	if(!loaded) {
 		end_duel(pduel);
+		mainGame->dInfo.isSingleMode = false;
 		return 0;
 	}
 	ReplayHeader rh;
