@@ -43,7 +43,7 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 
 static bool check_set_code(CardDataC* data, std::vector<unsigned int>& setcodes) {
 	if(setcodes.empty())
-		return false;
+		return true;
 	unsigned long long card_setcode = data->setcode;
 	if (data->alias) {
 		auto aptr = dataManager._datas.find(data->alias);
@@ -794,19 +794,16 @@ void DeckBuilder::StartFilter(bool force_refresh) {
 }
 void DeckBuilder::FilterCards(bool force_refresh) {
 	results.clear();
-	std::wstring searchterm(mainGame->ebCardName->getText());
 	std::vector<std::wstring> searchterms;
-	if(searchterm.empty())
-		searchterms.push_back(searchterm);
-	else {
-		searchterm = Game::StringtoUpper(searchterm);
-		searchterms = Game::TokenizeString<std::wstring>(searchterm, L"+");
-	}
+	if(wcslen(mainGame->ebCardName->getText())) {
+		searchterms = Game::TokenizeString<std::wstring>(Game::StringtoUpper(mainGame->ebCardName->getText()), L"+");
+	} else
+		searchterms = { L"" };
 	if(FiltersChanged() || force_refresh)
 		searched_terms.clear();
 	//removes no longer existing search terms from the cache
 	for(auto it = searched_terms.cbegin(); it != searched_terms.cend();) {
-		if(std::find(searchterms.begin(), searchterms.end(), (*it).first) == searchterms.end())
+		if(std::find(searchterms.begin(), searchterms.end(), it->first) == searchterms.end())
 			it = searched_terms.erase(it);
 		else
 			++it;
@@ -819,29 +816,26 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 			it++;
 	}
 	for(auto term : searchterms) {
-		std::vector<CardDataC*> result;
-		searched_terms[term] = result;
 		int trycode = BufferIO::GetVal(term.c_str());
-		if(trycode && dataManager.GetData(trycode, 0)) {
-			auto ptr = dataManager.GetCardData(trycode);	// verified by GetData()
-			searched_terms[term].push_back(ptr);
+		if(trycode && dataManager.GetData(trycode, nullptr)) {
+			searched_terms[term] = { dataManager.GetCardData(trycode) }; // verified by GetData()
 			continue;
 		}
-		std::vector<unsigned int> set_code;
 		std::vector<std::wstring> tokens;
 		if(!term.empty()) {
-			if(term[0] == L'@' || term[0] == L'$') {
+			if(term.front() == L'@' || term.front() == L'$') {
 				if(term.size() > 1)
 					tokens = Game::TokenizeString<std::wstring>(&term[1], L"*");
 			} else {
 				tokens = Game::TokenizeString<std::wstring>(term, L"*");
 			}
 		}
+		std::vector<unsigned int> set_code = dataManager.GetSetCode(tokens);
 		if(tokens.empty())
 			tokens.push_back(L"");
-		set_code = dataManager.GetSetCode(tokens);
 		auto strpointer = dataManager._strings.begin();
-		wchar_t checkterm = term.size() ? term[0] : 0;
+		wchar_t checkterm = term.size() ? term.front() : 0;
+		std::vector<CardDataC*> result;
 		for(auto ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
 			if(CheckCard(ptr->second, strpointer->second, checkterm, tokens, set_code))
 				result.push_back(ptr->second);
@@ -960,8 +954,7 @@ bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar
 		} else if(checkchar == L'@') {
 			return check_set_code(data, set_code);
 		} else {
-			if(!Game::CompareStrings(text.name, tokens, true) && !(Game::CompareStrings(text.text, tokens, true))
-				&& (!set_code.size() || !check_set_code(data, set_code)))
+			if(!check_set_code(data, set_code) || (!Game::CompareStrings(text.name, tokens, true) && !Game::CompareStrings(text.text, tokens, true)))
 				return false;
 		}
 	}

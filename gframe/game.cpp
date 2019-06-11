@@ -1968,24 +1968,24 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 std::wstring Game::StringtoUpper(std::wstring input) {
 	std::transform(input.begin(), input.end(), input.begin(), [](wchar_t c) {
 		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
-			return (wchar_t)'A';
+			return L'A';
 		}
 		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
-			return (wchar_t)'E';
+			return L'E';
 		}
 		if(CHK_RNG(200, 203) || CHK_RNG(232, 235)) {
-			return (wchar_t)'I';
+			return L'I';
 		}
 		if(CHK_RNG(210, 214) || CHK_RNG(242, 246)) {
-			return (wchar_t)'O';
+			return L'O';
 		}
 		if(CHK_RNG(217, 220) || CHK_RNG(249, 252)) {
-			return (wchar_t)'U';
+			return L'U';
 		}
 		if(c == 209 || c == 241) {
-			return (wchar_t)'N';
+			return L'N';
 		}
-		return (wchar_t)::toupper(c);
+		return (wchar_t)::towupper(c);
 	});
 	return input;
 }
