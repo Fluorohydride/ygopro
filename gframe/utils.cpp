@@ -191,26 +191,34 @@ namespace ygo {
 		if(paths.empty())
 			return path;
 		std::wstring normalpath;
+		if(paths.front() == L".") {
+			paths.erase(paths.begin());
+			normalpath += L".";
+		}
 		for(auto it = paths.begin(); it != paths.end();) {
 			if((*it).empty()) {
 				it = paths.erase(it);
 				continue;
 			}
-			if((*it) == L"." && it != paths.begin()) {
+			if((*it) == L".") {
 				it = paths.erase(it);
 				continue;
 			}
-			if((*it) != L".." && it != paths.begin() && (it + 1) != paths.end() && (*(it + 1)) == L"..") {
-				it = paths.erase(paths.erase(it));
+			if((*it) == L".." && it != paths.begin() && (*(it - 1)) != L"..") {
+				it = paths.erase(paths.erase(it - 1, it));
 				continue;
 			}
 			it++;
 		}
-		for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
-			normalpath += *it + L"/";
+		if(!paths.empty()) {
+			if(!normalpath.empty())
+				normalpath += L"/";
+			for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
+				normalpath += *it + L"/";
+			}
+			normalpath += paths.back();
 		}
-		normalpath += paths.back();
-		if(trailing_slash)
+		if(trailing_slash && normalpath.back() != L'/')
 			normalpath += L"/";
 		return normalpath;
 	}
