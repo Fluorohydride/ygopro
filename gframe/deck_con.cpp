@@ -117,8 +117,8 @@ inline void showDeckManage() {
 		}
 	});
 	lstCategories->setSelected(mainGame->deckBuilder.prev_category);
-	refreshReadonly(mainGame->deckBuilder.prev_category);
 	refreshDeckList();
+	refreshReadonly(mainGame->deckBuilder.prev_category);
 	mainGame->lstDecks->setSelected(mainGame->deckBuilder.prev_deck);
 	mainGame->PopupElement(mainGame->wDeckManage);
 }
