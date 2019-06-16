@@ -459,13 +459,13 @@ bool Game::Initialize() {
 	cbANNumber->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnANNumberOK = env->addButton(rect<s32>(80, 60, 150, 85), wANNumber, BUTTON_ANNUMBER_OK, dataManager.GetSysString(1211));
 	//announce card
-	wANCard = env->addWindow(rect<s32>(560, 170, 770, 370), false, L"");
+	wANCard = env->addWindow(rect<s32>(510, 120, 820, 420), false, L"");
 	wANCard->getCloseButton()->setVisible(false);
 	wANCard->setVisible(false);
-	ebANCard = env->addEditBox(L"", rect<s32>(20, 25, 190, 45), true, wANCard, EDITBOX_ANCARD);
+	ebANCard = env->addEditBox(L"", rect<s32>(20, 25, 290, 45), true, wANCard, EDITBOX_ANCARD);
 	ebANCard->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	lstANCard = env->addListBox(rect<s32>(20, 50, 190, 160), wANCard, LISTBOX_ANCARD, true);
-	btnANCardOK = env->addButton(rect<s32>(60, 165, 150, 190), wANCard, BUTTON_ANCARD_OK, dataManager.GetSysString(1211));
+	lstANCard = env->addListBox(rect<s32>(20, 50, 290, 265), wANCard, LISTBOX_ANCARD, true);
+	btnANCardOK = env->addButton(rect<s32>(110, 270, 200, 295), wANCard, BUTTON_ANCARD_OK, dataManager.GetSysString(1211));
 	//announce attribute
 	wANAttribute = env->addWindow(rect<s32>(500, 200, 830, 285), false, dataManager.GetSysString(562));
 	wANAttribute->getCloseButton()->setVisible(false);
@@ -1609,7 +1609,7 @@ void Game::OnResize() {
 	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
 	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
 	wANNumber->setRelativePosition(ResizeWin(550, 200, 780, 295));
-	wANCard->setRelativePosition(ResizeWin(560, 170, 770, 370));
+	wANCard->setRelativePosition(ResizeWin(510, 120, 820, 420));
 	wANAttribute->setRelativePosition(ResizeWin(500, 200, 830, 285));
 	wANRace->setRelativePosition(ResizeWin(480, 200, 850, 410));
 	wReplaySave->setRelativePosition(ResizeWin(510, 200, 820, 320));
