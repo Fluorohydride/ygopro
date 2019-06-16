@@ -280,12 +280,20 @@ void SingleDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 		return;
 	LeaveGame(players[pos]);
 }
-void SingleDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
+void SingleDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 	if(dp->type > 1 || ready[dp->type])
 		return;
 	char* deckbuf = (char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
+	// verify data
+	if((unsigned)mainc + (unsigned)sidec > (len - 8) / 4) {
+		STOC_ErrorMsg scem;
+		scem.msg = ERRMSG_DECKERROR;
+		scem.code = DECKERROR_MAINCOUNT << 28;
+		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+		return;
+	}
 	if(duel_count == 0) {
 		deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
 	} else {
