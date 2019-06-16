@@ -1,3 +1,12 @@
+#include <sstream>
+#include <fstream>
+#include <nlohmann/json.hpp>
+
+#ifndef _WIN32
+#include <sys/types.h>
+#include <dirent.h>
+#endif
+
 #include "config.h"
 #include "game.h"
 #include "sound_manager.h"
@@ -11,14 +20,6 @@
 #include "single_mode.h"
 #ifdef _WIN32
 #include "../irrlicht/src/CIrrDeviceWin32.h"
-#endif
-#include <sstream>
-#include <fstream>
-#include <nlohmann/json.hpp>
-
-#ifndef _WIN32
-#include <sys/types.h>
-#include <dirent.h>
 #endif
 
 unsigned short PRO_VERSION = 0x1348;
