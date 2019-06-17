@@ -290,7 +290,7 @@ void SingleDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 	if((unsigned)mainc + (unsigned)sidec > (len - 8) / 4) {
 		STOC_ErrorMsg scem;
 		scem.msg = ERRMSG_DECKERROR;
-		scem.code = DECKERROR_MAINCOUNT << 28;
+		scem.code = 0;
 		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 		return;
 	}
