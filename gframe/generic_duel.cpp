@@ -411,13 +411,21 @@ void GenericDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 		return;
 	LeaveGame(dueler.player);
 }
-void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
+void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 	auto& dueler = GetAtPos(dp->type);
 	if(dp->type >= (players.home_size + players.opposing_size) || dueler.ready)
 		return;
 	char* deckbuf = (char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
+	// verify data
+	if((unsigned)mainc + (unsigned)sidec > (len - 8) / 4) {
+		STOC_ErrorMsg scem;
+		scem.msg = ERRMSG_DECKERROR;
+		scem.code = DECKERROR_MAINCOUNT << 28;
+		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+		return;
+	}
 	if(match_result.empty()) {
 		dueler.deck_error = deckManager.LoadDeck(dueler.pdeck, (int*)deckbuf, mainc, sidec);
 	} else {
