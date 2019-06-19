@@ -183,7 +183,6 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			NetServer::StopServer();
 		}
 	}
 }
@@ -497,7 +496,6 @@ void SingleDuel::DuelEndProc() {
 		NetServer::ReSendToPlayer(players[1]);
 		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 			NetServer::ReSendToPlayer(*oit);
-		NetServer::StopServer();
 	} else {
 		int winc[3] = {0, 0, 0};
 		for(int i = 0; i < duel_count; ++i)
@@ -510,7 +508,6 @@ void SingleDuel::DuelEndProc() {
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			NetServer::StopServer();
 		} else {
 			if(players[0] != pplayer[0]) {
 				players[0] = pplayer[0];
