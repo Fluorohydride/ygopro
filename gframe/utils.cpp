@@ -227,7 +227,7 @@ namespace ygo {
 		if(dotpos == std::wstring::npos)
 			return L"";
 		std::wstring extension = file.substr(dotpos + 1);
-		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
 		return extension;
 	}
 	std::wstring Utils::GetFileName(std::wstring file) {
