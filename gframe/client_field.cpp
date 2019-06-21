@@ -594,18 +594,23 @@ void ClientField::ShowSelectOption(int select_hint) {
 	selected_option = 0;
 	wchar_t textBuffer[256];
 	int count = select_options.size();
-	bool quickmode = (count <= 5);
+	bool quickmode = true;
 	mainGame->gMutex.Lock();
-	for(int i = 0; (i < count) && quickmode; i++) {
-		const wchar_t* option = dataManager.GetDesc(select_options[i]);
-		irr::core::dimension2d<unsigned int> dtxt = mainGame->guiFont->getDimension(option);
-		if(dtxt.Width > 310) {
+	for(auto option : select_options) {
+		if(mainGame->guiFont->getDimension(dataManager.GetDesc(option)).Width > 310) {
 			quickmode = false;
 			break;
 		}
+	}
+	for(int i = 0; (i < count) && (i < 5) && quickmode; i++) {
+		const wchar_t* option = dataManager.GetDesc(select_options[i]);
 		mainGame->btnOption[i]->setText(option);
 	}
 	if(quickmode) {
+		bool scrollbar = count > 5;
+		mainGame->scrOption->setVisible(scrollbar);
+		mainGame->scrOption->setPos(0);
+		mainGame->scrOption->setMax(scrollbar ? (count - 5) : 1);
 		mainGame->stOptions->setVisible(false);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(false);
@@ -613,9 +618,10 @@ void ClientField::ShowSelectOption(int select_hint) {
 		for(int i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(i < count);
 		recti pos = mainGame->wOptions->getRelativePosition();
-		int newheight = 30 + 40 * count;
+		int newheight = 30 + 40 * (scrollbar ? 5 : count);
 		int oldheight = pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y;
 		pos.UpperLeftCorner.Y = pos.UpperLeftCorner.Y + (oldheight - newheight) / 2;
+		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + (scrollbar ? 375 : 350);
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
 		mainGame->wOptions->setRelativePosition(pos);
 	} else {
@@ -1412,7 +1418,7 @@ static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
 	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
 		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
 }
-void ClientField::UpdateDeclarableCodeType(bool enter) {
+void ClientField::UpdateDeclarableCodeType() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	CardString cstr;
@@ -1424,7 +1430,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+	if(pname[0] == 0) {
 		std::vector<int> cache;
 		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
@@ -1459,7 +1465,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		}
 	}
 }
-void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
+void ClientField::UpdateDeclarableCodeOpcode() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	CardString cstr;
@@ -1471,7 +1477,7 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+	if(pname[0] == 0) {
 		std::vector<int> cache;
 		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
@@ -1506,10 +1512,10 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		}
 	}
 }
-void ClientField::UpdateDeclarableCode(bool enter) {
+void ClientField::UpdateDeclarableCode() {
 	if(opcode.size() == 0)
-		UpdateDeclarableCodeType(enter);
+		UpdateDeclarableCodeType();
 	else
-		UpdateDeclarableCodeOpcode(enter);
+		UpdateDeclarableCodeOpcode();
 }
 }

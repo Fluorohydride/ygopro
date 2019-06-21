@@ -334,6 +334,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
+			switch(id) {
+			case SCROLL_FILTER: {
+				GetHoveredCard();
+				break;
+			}
+			}
 			break;
 		}
 		case irr::gui::EGET_EDITBOX_ENTER: {
@@ -978,6 +984,8 @@ void DeckBuilder::ClearSearch() {
 	mainGame->ebStar->setEnabled(false);
 	mainGame->ebScale->setEnabled(false);
 	mainGame->ebCardName->setText(L"");
+	mainGame->scrFilter->setVisible(false);
+	mainGame->scrFilter->setPos(0);
 	ClearFilter();
 	results.clear();
 	myswprintf(result_string, L"%d", 0);

@@ -97,8 +97,10 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 CGUIImageButton::CGUIImageButton(IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle)
 	: CGUIButton(environment, parent, id, rectangle) {
 	isDrawImage = true;
+	isFixedSize = false;
 	imageRotation = 0.0f;
 	imageScale = core::vector2df(1.0f, 1.0f);
+	imageSize = core::dimension2di(rectangle.getWidth(), rectangle.getHeight());
 }
 CGUIImageButton* CGUIImageButton::addImageButton(IGUIEnvironment *env, const core::rect<s32>& rectangle, IGUIElement* parent, s32 id) {
 	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : 0, id, rectangle);
@@ -129,6 +131,23 @@ void CGUIImageButton::draw() {
 		irr::gui::Draw2DImageRotation(driver, Image, ImageRect, pos, center, imageRotation, imageScale);
 	IGUIElement::draw();
 }
+void CGUIImageButton::setImage(video::ITexture* image)
+{
+	if(image)
+		image->grab();
+	if(Image)
+		Image->drop();
+
+	Image = image;
+	if(image) {
+		ImageRect = core::rect<s32>(core::position2d<s32>(0, 0), image->getOriginalSize());
+		if(isFixedSize)
+			imageScale = core::vector2df((irr::f32)imageSize.Width / image->getSize().Width, (irr::f32)imageSize.Height / image->getSize().Height);
+	}
+
+	if(!PressedImage)
+		setPressedImage(Image);
+}
 void CGUIImageButton::setDrawImage(bool b) {
 	isDrawImage = b;
 }
@@ -137,6 +156,10 @@ void CGUIImageButton::setImageRotation(f32 r) {
 }
 void CGUIImageButton::setImageScale(core::vector2df s) {
 	imageScale = s;
+}
+void CGUIImageButton::setImageSize(core::dimension2di s) {
+	isFixedSize = true;
+	imageSize = s;
 }
 
 IGUIFont* CGUIImageButton::getOverrideFont( void ) const

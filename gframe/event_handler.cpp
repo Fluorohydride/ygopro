@@ -20,6 +20,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
+		if(mainGame->fadingList.size())
+			break;
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
@@ -147,8 +149,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(exit_on_return)
 						mainGame->device->closeDevice();
 				} else {
-					DuelClient::SendPacketToServer(CTOS_SURRENDER);
+					mainGame->PopupElement(mainGame->wSurrender);
 				}
+				break;
+			}
+			case BUTTON_SURRENDER_YES: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				DuelClient::SendPacketToServer(CTOS_SURRENDER);
+				mainGame->HideElement(mainGame->wSurrender);
+				break;
+			}
+			case BUTTON_SURRENDER_NO: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				mainGame->HideElement(mainGame->wSurrender);
 				break;
 			}
 			case BUTTON_CHAIN_IGNORE: {
@@ -291,33 +304,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->guiFont, dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
-			case BUTTON_OPTION_0: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 0;
-				SetResponseSelectedOption();
-				break;
-			}
-			case BUTTON_OPTION_1: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 1;
-				SetResponseSelectedOption();
-				break;
-			}
-			case BUTTON_OPTION_2: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 2;
-				SetResponseSelectedOption();
-				break;
-			}
-			case BUTTON_OPTION_3: {
-				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 3;
-				SetResponseSelectedOption();
-				break;
-			}
+			case BUTTON_OPTION_0:
+			case BUTTON_OPTION_1: 
+			case BUTTON_OPTION_2: 
+			case BUTTON_OPTION_3: 
 			case BUTTON_OPTION_4: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
-				selected_option = 4;
+				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
+				selected_option = id - BUTTON_OPTION_0 + step;
 				SetResponseSelectedOption();
 				break;
 			}
@@ -620,6 +614,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CARD_4: {
 				if(mainGame->dInfo.isReplay)
 					break;
+				mainGame->stCardListTip->setVisible(false);
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_IDLECMD:
 				case MSG_SELECT_BATTLECMD:
@@ -765,6 +760,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CARD_SEL_OK: {
+				mainGame->stCardListTip->setVisible(false);
 				if(mainGame->dInfo.isReplay) {
 					mainGame->HideElement(mainGame->wCardSelect);
 					break;
@@ -846,6 +842,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
+			case SCROLL_OPTION_SELECT: {
+				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
+				for(int i = 0; i < 5; i++) {
+					const wchar_t* option = dataManager.GetDesc(select_options[i + step]);
+					mainGame->btnOption[i]->setText(option);
+				}
+				break;
+			}
 			case SCROLL_CARD_SELECT: {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
@@ -959,7 +963,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode(false);
+				UpdateDeclarableCode();
 				break;
 			}
 			}
@@ -968,7 +972,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode(true);
+				UpdateDeclarableCode();
 				break;
 			}
 			}
@@ -1433,6 +1437,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->chain_when_avail = false;
 				UpdateChainButtons();
 			}
+			if(mainGame->wSurrender->isVisible())
+				mainGame->HideElement(mainGame->wSurrender);
 			mainGame->wCmdMenu->setVisible(false);
 			if(mainGame->fadingList.size())
 				break;

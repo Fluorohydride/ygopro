@@ -181,6 +181,8 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 		PlaySoundEffect(SOUND_INFO);
 	} else if(element == mainGame->wQuery) {
 		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wSurrender) {
+		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wOptions) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wANAttribute) {
@@ -192,6 +194,8 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 	} else if(element == mainGame->wANRace) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wReplaySave) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wFTSelect) {
 		PlaySoundEffect(SOUND_QUESTION);
 	}
 }
