@@ -42,7 +42,7 @@ bool NetServer::StartBroadcast() {
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_port = server_port;
+	addr.sin_port = htons(server_port);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	if(bind(udp, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
 		closesocket(udp);
