@@ -889,7 +889,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						text = fmt::format(L"{}[{}]({})", dataManager.FormatLocation(display_cards[i + pos]->overlayTarget->location, display_cards[i + pos]->overlayTarget->sequence),
 							display_cards[i + pos]->overlayTarget->sequence + 1, display_cards[i + pos]->sequence + 1);
 					} else {
-						text = fmt::format(L"{}[{}]({})", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
+						text = fmt::format(L"{}[{}]", dataManager.FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
 							display_cards[i + pos]->sequence + 1);
 					}
 					mainGame->stDisplayPos[i]->setText(text.c_str());
