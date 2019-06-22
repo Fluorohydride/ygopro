@@ -500,7 +500,6 @@ void TagDuel::DuelEndProc() {
 	NetServer::ReSendToPlayer(players[3]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
-	NetServer::StopServer();
 }
 void TagDuel::Surrender(DuelPlayer* dp) {
 	return;
