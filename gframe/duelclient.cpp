@@ -686,8 +686,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnChainWhenAvail->setVisible(false);
 		mainGame->btnCancelOrFinish->setVisible(false);
 		mainGame->btnShuffle->setVisible(false);
-		time_t nowtime = time(NULL);
-		tm* localedtime = localtime(&nowtime);
+		char* prep = pdata;
+		Replay new_replay;
+		memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
+		time_t starttime = new_replay.pheader.seed;
+		tm* localedtime = localtime(&starttime);
 		wchar_t timetext[40];
 		wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
 		mainGame->ebRSName->setText(timetext);
@@ -708,9 +711,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->WaitFrameSignal(30);
 		}
 		if(mainGame->actionParam || !is_host) {
-			char* prep = pdata;
-			Replay new_replay;
-			memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
 			prep += sizeof(ReplayHeader);
 			memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
 			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
@@ -3431,7 +3431,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->ebANCard->setText(L"");
 		mainGame->wANCard->setText(textBuffer);
-		mainGame->dField.UpdateDeclarableCode(false);
+		mainGame->dField.UpdateDeclarableCode();
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.Unlock();
 		return false;
@@ -3458,7 +3458,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_ANNOUNCE_CARD_FILTER: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		int count = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadUInt8(pbuf);
 		mainGame->dField.declarable_type = 0;
 		mainGame->dField.opcode.clear();
 		for (int i = 0; i < count; ++i)
@@ -3470,7 +3470,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->ebANCard->setText(L"");
 		mainGame->wANCard->setText(textBuffer);
-		mainGame->dField.UpdateDeclarableCode(false);
+		mainGame->dField.UpdateDeclarableCode();
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.Unlock();
 		return false;
