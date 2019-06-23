@@ -44,7 +44,7 @@ public:
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread(void* param);
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
-	static int ClientAnalyze(char* msg, unsigned int len, bool retry = false);
+	static int ClientAnalyze(char* msg, unsigned int len);
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned char len);
 	static void SendResponse();

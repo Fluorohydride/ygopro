@@ -862,11 +862,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	}
 }
-int DuelClient::ClientAnalyze(char * msg, unsigned int len, bool retry) {
+int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	char* pbuf = msg;
 	wchar_t textBuffer[256];
 	mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
-	if(mainGame->dInfo.curMsg != MSG_RETRY && !retry) {
+	if(mainGame->dInfo.curMsg != MSG_RETRY) {
 		memcpy(last_successful_msg, msg, len);
 		last_successful_msg_length = len;
 	}
@@ -891,7 +891,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len, bool retry) {
 		mainGame->dInfo.time_player = 2;
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
-		if(!retry && last_successful_msg_length) {
+		if(last_successful_msg_length) {
 			mainGame->gMutex.Lock();
 			mainGame->stMessage->setText(dataManager.GetDesc(1422));
 			mainGame->PopupElement(mainGame->wMessage);
@@ -899,7 +899,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len, bool retry) {
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
 			select_hint = last_select_hint;
-			ClientAnalyze(last_successful_msg, last_successful_msg_length, true);
+			ClientAnalyze(last_successful_msg, last_successful_msg_length);
 			break;
 		}
 		mainGame->gMutex.Lock();
