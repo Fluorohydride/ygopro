@@ -899,8 +899,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
 			select_hint = last_select_hint;
-			ClientAnalyze(last_successful_msg, last_successful_msg_length);
-			break;
+			return ClientAnalyze(last_successful_msg, last_successful_msg_length);
 		}
 		mainGame->gMutex.Lock();
 		mainGame->stMessage->setText(L"Error occurs.");
@@ -908,27 +907,29 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Unlock();
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
-		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.Set();
-		mainGame->closeDoneSignal.Wait();
-		mainGame->gMutex.Lock();
-		mainGame->dInfo.isStarted = false;
-		mainGame->dInfo.isFinished = false;
-		mainGame->btnCreateHost->setEnabled(true);
-		mainGame->btnJoinHost->setEnabled(true);
-		mainGame->btnJoinCancel->setEnabled(true);
-		mainGame->btnStartBot->setEnabled(true);
-		mainGame->btnBotCancel->setEnabled(true);
-		mainGame->stTip->setVisible(false);
-		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		if(bot_mode)
-			mainGame->ShowElement(mainGame->wSinglePlay);
-		else
-			mainGame->ShowElement(mainGame->wLanWindow);
-		mainGame->gMutex.Unlock();
-		event_base_loopbreak(client_base);
-		if(exit_on_return)
-			mainGame->device->closeDevice();
+		if(!mainGame->dInfo.isSingleMode) {
+			mainGame->closeDoneSignal.Reset();
+			mainGame->closeSignal.Set();
+			mainGame->closeDoneSignal.Wait();
+			mainGame->gMutex.Lock();
+			mainGame->dInfo.isStarted = false;
+			mainGame->dInfo.isFinished = false;
+			mainGame->btnCreateHost->setEnabled(true);
+			mainGame->btnJoinHost->setEnabled(true);
+			mainGame->btnJoinCancel->setEnabled(true);
+			mainGame->btnStartBot->setEnabled(true);
+			mainGame->btnBotCancel->setEnabled(true);
+			mainGame->stTip->setVisible(false);
+			mainGame->device->setEventReceiver(&mainGame->menuHandler);
+			if(bot_mode)
+				mainGame->ShowElement(mainGame->wSinglePlay);
+			else
+				mainGame->ShowElement(mainGame->wLanWindow);
+			mainGame->gMutex.Unlock();
+			event_base_loopbreak(client_base);
+			if(exit_on_return)
+				mainGame->device->closeDevice();
+		}
 		return false;
 	}
 	case MSG_HINT: {
