@@ -892,8 +892,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
 		if(last_successful_msg_length) {
+			char* p = last_successful_msg;
+			auto last_msg = BufferIO::ReadUInt8(p);
+			int err_desc = 1422;
+			switch(last_msg) {
+			case MSG_ANNOUNCE_CARD:
+			case MSG_ANNOUNCE_CARD_FILTER:
+				err_desc = 1421;
+			//TODO: other cases
+			default:
+				break;
+			}
 			mainGame->gMutex.Lock();
-			mainGame->stMessage->setText(dataManager.GetDesc(1422));
+			mainGame->stMessage->setText(dataManager.GetDesc(err_desc));
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.Unlock();
 			mainGame->actionSignal.Reset();
