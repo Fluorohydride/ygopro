@@ -101,6 +101,8 @@ int ReplayMode::ReplayThread(void* param) {
 			if(is_restarting) {
 				mainGame->gMutex.Lock();
 				is_restarting = false;
+				mainGame->dInfo.isReplaySkiping = true;
+				Restart(false);
 				int step = current_step - 1;
 				if(step < 0)
 					step = 0;
@@ -109,9 +111,7 @@ int ReplayMode::ReplayThread(void* param) {
 					skip_step = 0;
 					int len = get_message(pduel, (byte*)engineBuffer);
 					if (len > 0) {
-						mainGame->gMutex.Unlock();
 						is_continuing = ReplayAnalyze(engineBuffer, len);
-						mainGame->gMutex.Lock();
 					}
 				} else {
 					ReplayRefreshDeck(0);
@@ -272,13 +272,11 @@ void ReplayMode::Restart(bool refresh) {
 		//mainGame->dInfo.isReplay = true;
 	}
 	skip_turn = 0;
-	is_restarting = true;
 }
 void ReplayMode::Undo() {
 	if(skip_step > 0 || current_step == 0)
 		return;
-	mainGame->dInfo.isReplaySkiping = true;
-	Restart(false);
+	is_restarting = true;
 	Pause(false, false);
 }
 bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
