@@ -113,6 +113,11 @@ int ReplayMode::ReplayThread(void* param) {
 						is_continuing = ReplayAnalyze(engineBuffer, len);
 						mainGame->gMutex.Lock();
 					}
+				} else {
+					ReplayRefreshDeck(0);
+					ReplayRefreshDeck(1);
+					ReplayRefreshExtra(0);
+					ReplayRefreshExtra(1);
 				}
 				if(step == 0) {
 					Pause(true, false);
