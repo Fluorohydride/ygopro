@@ -1279,10 +1279,14 @@ void Game::LoadPicUrls() {
 						if(obj["type"].get<std::string>() == "pic") {
 #ifdef DEFAULT_PIC_URL
 							imageManager.AddDownloadResource({ DEFAULT_PIC_URL, "pic" });
+#else
+							continue;
 #endif
 						} else {
 #ifdef DEFAULT_FIELD_URL
 							imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, "field" });
+#else
+							continue;
 #endif
 						}
 					} else {
@@ -1344,10 +1348,14 @@ void Game::LoadGithubRepositories() {
 #ifdef YGOPRO_BUILD_DLL
 						tmp_repo.has_core = true;
 #endif
+#else
+						continue;
 #endif //DEFAULT_LIVE_URL
 					} else if(tmp_repo.url == "default_anime") {
 #ifdef DEFAULT_LIVEANIME_URL
 						tmp_repo.url = DEFAULT_LIVEANIME_URL;
+#else
+						continue;
 #endif //DEFAULT_LIVEANIME_URL
 					} else {
 						JSON_SET_IF_VALID(repo_path, string, std::string);
