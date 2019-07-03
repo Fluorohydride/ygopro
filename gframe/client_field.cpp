@@ -1418,7 +1418,7 @@ static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
 	return cd.code == CARD_MARINE_DOLPHIN || cd.code == CARD_TWINKLE_MOSS
 		|| (!cd.alias && (cd.type & (TYPE_MONSTER + TYPE_TOKEN)) != (TYPE_MONSTER + TYPE_TOKEN));
 }
-void ClientField::UpdateDeclarableCodeType(bool enter) {
+void ClientField::UpdateDeclarableCodeType() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	CardString cstr;
@@ -1430,7 +1430,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+	if(pname[0] == 0) {
 		std::vector<int> cache;
 		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
@@ -1465,7 +1465,7 @@ void ClientField::UpdateDeclarableCodeType(bool enter) {
 		}
 	}
 }
-void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
+void ClientField::UpdateDeclarableCodeOpcode() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
 	CardString cstr;
@@ -1477,7 +1477,7 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		ancard.push_back(trycode);
 		return;
 	}
-	if((pname[0] == 0 || pname[1] == 0) && !enter) {
+	if(pname[0] == 0) {
 		std::vector<int> cache;
 		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
@@ -1512,10 +1512,10 @@ void ClientField::UpdateDeclarableCodeOpcode(bool enter) {
 		}
 	}
 }
-void ClientField::UpdateDeclarableCode(bool enter) {
+void ClientField::UpdateDeclarableCode() {
 	if(opcode.size() == 0)
-		UpdateDeclarableCodeType(enter);
+		UpdateDeclarableCodeType();
 	else
-		UpdateDeclarableCodeOpcode(enter);
+		UpdateDeclarableCodeOpcode();
 }
 }

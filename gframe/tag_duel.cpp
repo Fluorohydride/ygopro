@@ -256,12 +256,20 @@ void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 		return;
 	LeaveGame(players[pos]);
 }
-void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
+void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 	if(dp->type > 3 || ready[dp->type])
 		return;
 	char* deckbuf = (char*)pdata;
 	int mainc = BufferIO::ReadInt32(deckbuf);
 	int sidec = BufferIO::ReadInt32(deckbuf);
+	// verify data
+	if((unsigned)mainc + (unsigned)sidec > (len - 8) / 4) {
+		STOC_ErrorMsg scem;
+		scem.msg = ERRMSG_DECKERROR;
+		scem.code = 0;
+		NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+		return;
+	}
 	deck_error[dp->type] = deckManager.LoadDeck(pdeck[dp->type], (int*)deckbuf, mainc, sidec);
 }
 void TagDuel::StartDuel(DuelPlayer* dp) {
@@ -1396,7 +1404,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_ANNOUNCE_NUMBER:
 		case MSG_ANNOUNCE_CARD_FILTER: {
 			player = BufferIO::ReadInt8(pbuf);
-			count = BufferIO::ReadInt8(pbuf);
+			count = BufferIO::ReadUInt8(pbuf);
 			pbuf += 4 * count;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
