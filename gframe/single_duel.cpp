@@ -304,6 +304,7 @@ void SingleDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 				NetServer::SendPacketToPlayer(players[tp_player], STOC_SELECT_TP);
 				players[1 - tp_player]->state = 0xff;
 				players[tp_player]->state = CTOS_TP_RESULT;
+				duel_stage = DUEL_STAGE_FIRSTGO;
 			}
 		} else {
 			STOC_ErrorMsg scem;
