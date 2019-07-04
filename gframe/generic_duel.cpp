@@ -515,12 +515,12 @@ void GenericDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 		} else if((hand_result[0] == 1 && hand_result[1] == 2)
 		          || (hand_result[0] == 2 && hand_result[1] == 3)
 		          || (hand_result[0] == 3 && hand_result[1] == 1)) {
-			NetServer::SendPacketToPlayer(players.opposing.front().player, CTOS_TP_RESULT);
+			NetServer::SendPacketToPlayer(players.opposing.front().player, STOC_SELECT_TP);
 			players.home.front().player->state = 0xff;
 			players.opposing.front().player->state = CTOS_TP_RESULT;
 			duel_stage = DUEL_STAGE_FIRSTGO;
 		} else {
-			NetServer::SendPacketToPlayer(players.home.front().player, CTOS_TP_RESULT);
+			NetServer::SendPacketToPlayer(players.home.front().player, STOC_SELECT_TP);
 			players.opposing.front().player->state = 0xff;
 			players.home.front().player->state = CTOS_TP_RESULT;
 			duel_stage = DUEL_STAGE_FIRSTGO;
