@@ -818,7 +818,7 @@ void Game::MainLoop() {
 	uint32 prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
 	int fps = 0;
-	std::wstring corename;
+	path_string corename;
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
@@ -886,7 +886,7 @@ void Game::MainLoop() {
 			cores_to_load.clear();
 		}
 		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && std::wstring(stMessage->getText()) == L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.")) {
-			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
+			stMessage->setText(fmt::format(TEXT("Successfully loaded duel api from {}"), corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();
 		}
