@@ -144,6 +144,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 			EndDuel();
 			DuelEndProc();
 		}
+		NetServer::DisconnectPlayer(dp);
 	}
 }
 void TagDuel::ToDuelist(DuelPlayer* dp) {
