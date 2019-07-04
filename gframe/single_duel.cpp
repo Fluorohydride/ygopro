@@ -362,13 +362,13 @@ void SingleDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 		} else if((hand_result[0] == 1 && hand_result[1] == 2)
 		          || (hand_result[0] == 2 && hand_result[1] == 3)
 		          || (hand_result[0] == 3 && hand_result[1] == 1)) {
-			NetServer::SendPacketToPlayer(players[1], CTOS_TP_RESULT);
+			NetServer::SendPacketToPlayer(players[1], STOC_SELECT_TP);
 			tp_player = 1;
 			players[0]->state = 0xff;
 			players[1]->state = CTOS_TP_RESULT;
 			duel_stage = DUEL_STAGE_FIRSTGO;
 		} else {
-			NetServer::SendPacketToPlayer(players[0], CTOS_TP_RESULT);
+			NetServer::SendPacketToPlayer(players[0], STOC_SELECT_TP);
 			players[1]->state = 0xff;
 			players[0]->state = CTOS_TP_RESULT;
 			tp_player = 0;
