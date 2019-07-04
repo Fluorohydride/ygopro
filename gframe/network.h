@@ -121,7 +121,7 @@ struct DuelPlayer {
 
 class DuelMode {
 public:
-	DuelMode(): host_player(0), pduel(0) {}
+	DuelMode(): host_player(0), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
 	virtual void Chat(DuelPlayer* dp, void* pdata, int len) {}
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
@@ -147,6 +147,7 @@ public:
 	event* etimer;
 	DuelPlayer* host_player;
 	HostInfo host_info;
+	int duel_stage;
 	void* pduel;
 	wchar_t name[20];
 	wchar_t pass[20];
@@ -248,4 +249,11 @@ public:
 #define DOUBLE_DECK			0x400
 #define COMMAND_DUEL		0x800
 #define DECK_MASTER			0x1000
+
+#define DUEL_STAGE_BEGIN		0
+#define DUEL_STAGE_FINGER		1
+#define DUEL_STAGE_FIRSTGO		2
+#define DUEL_STAGE_DUELING		3
+#define DUEL_STAGE_SIDING		4
+#define DUEL_STAGE_END			5
 #endif //NETWORK_H

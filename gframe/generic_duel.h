@@ -97,7 +97,6 @@ protected:
 	unsigned char last_response;
 	Replay last_replay;
 	Replay new_replay;
-	bool game_started;
 	bool relay;
 	int best_of;
 	int match_kill;
