@@ -267,7 +267,7 @@ public:
 	std::vector<path_string> field_dirs;
 	std::vector<path_string> pic_dirs;
 	std::vector<path_string> script_dirs;
-	std::vector<path_string> cores_to_load;
+	std::vector<std::wstring> cores_to_load;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	//GUI
