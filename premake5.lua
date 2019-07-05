@@ -7,8 +7,9 @@ workspace "ygo"
 	language "C++"
 	objdir "obj"
 	startproject "ygopro"
+	staticruntime "on"
 
-	configurations { "Debug", "DebugDLL" , "Release", "ReleaseDLL" }
+	configurations { "Debug", "Release" }
 
 	filter "system:windows"
 		defines { "WIN32", "_WIN32", "NOMINMAX" }
@@ -18,8 +19,11 @@ workspace "ygo"
 		libdirs "/usr/local/lib"
 
 	filter "system:macosx"
-		includedirs "/opt/local/include"
-		libdirs "/opt/local/lib"
+		toolset "clang"
+		buildoptions { "-fms-extensions" }
+		includedirs { "/usr/local/include", "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
+		libdirs { "/usr/local/lib" }
+		links { "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
 
 	filter "action:vs*"
 		vectorextensions "SSE2"
@@ -32,27 +36,36 @@ workspace "ygo"
 	filter { "action:not vs*", "system:windows" }
 	  buildoptions { "-static-libgcc" }
 
-	filter "configurations:Debug*"
+	filter "configurations:Debug"
 		symbols "On"
 		defines "_DEBUG"
 		targetdir "bin/debug"
+		runtime "Debug"
 
 	filter { "configurations:Release*" , "action:not vs*" }
 		symbols "On"
 		defines "NDEBUG"
 		buildoptions "-march=native"
 
-	filter "configurations:Release*"
-		optimize "Speed"
+	filter "configurations:Release"
+		optimize "Size"
 		targetdir "bin/release"
-
+	subproject = true
 	include "ocgcore"
 	include "gframe"
-	include "fmt"
 	if os.istarget("windows") then
-		include "event"
-		include "freetype"
 		include "irrlicht"
-		include "lua"
-		include "sqlite3"
 	end
+
+local function vcpkgStaticTriplet(prj)
+	premake.w('<VcpkgTriplet Condition="\'$(Platform)\'==\'Win32\'">x86-windows-static</VcpkgTriplet>')
+	premake.w('<VcpkgTriplet Condition="\'$(Platform)\'==\'x64\'">x64-windows-static</VcpkgTriplet>')
+end
+
+require('vstudio')
+
+premake.override(premake.vstudio.vc2010.elements, "globals", function(base, prj)
+	local calls = base(prj)
+	table.insertafter(calls, premake.vstudio.vc2010.targetPlatformVersionGlobal, vcpkgStaticTriplet)
+	return calls
+end) 
