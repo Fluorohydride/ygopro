@@ -40,11 +40,13 @@ bool NetServer::StartBroadcast() {
 	if(!net_evbase)
 		return false;
 	SOCKET udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	BOOL opt = TRUE;
+	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
-	addr.sin_port = htons(7911);
-	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	addr.sin_port = htons(7920);
+	addr.sin_addr.s_addr = 0;
 	if(bind(udp, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
 		closesocket(udp);
 		return false;
@@ -83,13 +85,17 @@ void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 		return;
 	HostRequest* pHR = (HostRequest*)buf;
 	if(pHR->identifier == NETWORK_CLIENT_ID) {
+		SOCKADDR_IN sockTo;
+		sockTo.sin_addr.s_addr = bc_addr.sin_addr.s_addr;
+		sockTo.sin_family = AF_INET;
+		sockTo.sin_port = htons(7921);
 		HostPacket hp;
 		hp.identifier = NETWORK_SERVER_ID;
 		hp.port = server_port;
 		hp.version = PRO_VERSION;
 		hp.host = duel_mode->host_info;
 		BufferIO::CopyWStr(duel_mode->name, hp.name, 20);
-		sendto(fd, (const char*)&hp, sizeof(HostPacket), 0, (sockaddr*)&bc_addr, sz);
+		sendto(fd, (const char*)&hp, sizeof(HostPacket), 0, (sockaddr*)&sockTo, sizeof(sockTo));
 	}
 }
 void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx) {
