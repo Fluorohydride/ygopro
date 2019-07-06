@@ -96,7 +96,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		pdata = BufferIO::ReadInt32(buf);
 		if(rank != (unsigned int)pdata) {
 			rank = pdata;
-			rkstring = fmt::format(L"R{}", level);
+			rkstring = fmt::format(L"R{}", rank);
 		}
 	}
 	if(flag & QUERY_ATTRIBUTE)
