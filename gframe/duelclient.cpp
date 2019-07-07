@@ -904,7 +904,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			int err_desc = 1421;
 			switch(last_msg) {
 			case MSG_ANNOUNCE_CARD:
-			case MSG_ANNOUNCE_CARD_FILTER:
 				err_desc = 1422;
 				break;
 			case MSG_ANNOUNCE_ATTRIB:
