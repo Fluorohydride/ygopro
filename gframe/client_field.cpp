@@ -1416,7 +1416,7 @@ void ClientField::UpdateDeclarableList() {
 	int trycode = BufferIO::GetVal(pname);
 	CardString cstr;
 	CardData cd;
-	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, opcode)) {
+	if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) && is_declarable(cd, declare_opcodes)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
 		mainGame->lstANCard->addItem(cstr.name.c_str());
