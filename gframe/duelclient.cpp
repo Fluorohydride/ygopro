@@ -23,6 +23,7 @@ bufferevent* DuelClient::client_bev = 0;
 char DuelClient::duel_client_read[0x2000];
 char DuelClient::duel_client_write[0x2000];
 bool DuelClient::is_closing = false;
+bool DuelClient::is_swapping = false;
 int DuelClient::select_hint = 0;
 int DuelClient::select_unselect_hint = 0;
 int DuelClient::last_select_hint = 0;
@@ -889,6 +890,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	if(mainGame->dInfo.time_player == 1)
 		mainGame->dInfo.time_player = 2;
+	if(is_swapping) {
+		mainGame->gMutex.Lock();
+		mainGame->dField.ReplaySwap();
+		mainGame->gMutex.Unlock();
+		is_swapping = false;
+	}
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
 		if(last_successful_msg_length) {
@@ -3786,6 +3793,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	}
 	return true;
+}
+void DuelClient::SwapField() {
+	is_swapping = true;
 }
 void DuelClient::SetResponseI(int respI) {
 	*((int*)response_buf) = respI;

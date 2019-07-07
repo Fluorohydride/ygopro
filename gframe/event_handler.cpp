@@ -91,8 +91,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				if(mainGame->dInfo.isReplay)
 					ReplayMode::SwapField();
-				else if (mainGame->dInfo.player_type == 7)
-					mainGame->dField.ReplaySwap();
+				else if(mainGame->dInfo.player_type == 7)
+					DuelClient::SwapField();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {
