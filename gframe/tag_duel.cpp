@@ -177,7 +177,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 			NetServer::StopServer();
 			return;
 		}
-		if(!game_started) {
+		if(duel_stage == DUEL_STAGE_BEGIN) {
 			ready[host_pos] = false;
 			STOC_TypeChange sctc;
 			sctc.type = 0x10 | host_pos;
