@@ -113,7 +113,12 @@ void NetServer::StopServer() {
 		return;
 	if(duel_mode)
 		duel_mode->EndDuel();
+#ifdef YGOPRO_SERVER_MODE
+	timeval etv = { 0, 1 };
+	event_base_loopexit(net_evbase, &etv);
+#else
 	event_base_loopexit(net_evbase, 0);
+#endif
 }
 void NetServer::StopBroadcast() {
 	if(!net_evbase || !broadcast_ev)
