@@ -3468,8 +3468,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_ANNOUNCE_CARD: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		mainGame->dField.declarable_type = BufferIO::ReadInt32(pbuf);
-		mainGame->dField.opcode.clear();
+		int count = BufferIO::ReadUInt8(pbuf);
+		mainGame->dField.declare_opcodes.clear();
+		for (int i = 0; i < count; ++i)
+			mainGame->dField.declare_opcodes.push_back(BufferIO::ReadInt32(pbuf));
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
 		else myswprintf(textBuffer, dataManager.GetSysString(564));
@@ -3477,7 +3479,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->ebANCard->setText(L"");
 		mainGame->wANCard->setText(textBuffer);
-		mainGame->dField.UpdateDeclarableCode();
+		mainGame->dField.UpdateDeclarableList();
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.Unlock();
 		return false;
@@ -3499,25 +3501,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		select_hint = 0;
 		mainGame->wANNumber->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANNumber);
-		mainGame->gMutex.Unlock();
-		return false;
-	}
-	case MSG_ANNOUNCE_CARD_FILTER: {
-		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		int count = BufferIO::ReadUInt8(pbuf);
-		mainGame->dField.declarable_type = 0;
-		mainGame->dField.opcode.clear();
-		for (int i = 0; i < count; ++i)
-			mainGame->dField.opcode.push_back(BufferIO::ReadInt32(pbuf));
-		if(select_hint)
-			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
-		else myswprintf(textBuffer, dataManager.GetSysString(564));
-		select_hint = 0;
-		mainGame->gMutex.Lock();
-		mainGame->ebANCard->setText(L"");
-		mainGame->wANCard->setText(textBuffer);
-		mainGame->dField.UpdateDeclarableCode();
-		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.Unlock();
 		return false;
 	}

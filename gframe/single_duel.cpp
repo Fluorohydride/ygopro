@@ -1351,15 +1351,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
-		case MSG_ANNOUNCE_CARD: {
-			player = BufferIO::ReadInt8(pbuf);
-			WaitforResponse(player);
-			pbuf += 4;
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
-			return 1;
-		}
-		case MSG_ANNOUNCE_NUMBER:
-		case MSG_ANNOUNCE_CARD_FILTER: {
+		case MSG_ANNOUNCE_CARD:
+		case MSG_ANNOUNCE_NUMBER: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadUInt8(pbuf);
 			pbuf += 4 * count;
