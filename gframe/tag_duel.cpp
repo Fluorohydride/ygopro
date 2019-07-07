@@ -11,7 +11,6 @@ namespace ygo {
 extern unsigned short replay_mode;
 #endif
 TagDuel::TagDuel() {
-	game_started = false;
 	for(int i = 0; i < 4; ++i) {
 		players[i] = 0;
 		ready[i] = false;
@@ -192,7 +191,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 #endif //YGOPRO_SERVER_MODE
 		observers.erase(dp);
-		if(!game_started) {
+		if(duel_stage == DUEL_STAGE_BEGIN) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
 			for(int i = 0; i < 4; ++i)
@@ -209,7 +208,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 		}
 		NetServer::DisconnectPlayer(dp);
 	} else {
-		if(!game_started) {
+		if(duel_stage == DUEL_STAGE_BEGIN) {
 			STOC_HS_PlayerChange scpc;
 			players[dp->type] = 0;
 			ready[dp->type] = false;
@@ -226,10 +225,11 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 				NetServer::SendPacketToPlayer(replay_recorder, STOC_HS_PLAYER_CHANGE, scpc);
 #endif
 			NetServer::DisconnectPlayer(dp);
-		} else {
+		} else if(duel_stage != DUEL_STAGE_END) {
 			EndDuel();
 			DuelEndProc();
 		}
+		NetServer::DisconnectPlayer(dp);
 	}
 }
 void TagDuel::ToDuelist(DuelPlayer* dp) {
@@ -391,7 +391,6 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(!ready[0] || !ready[1] || !ready[2] || !ready[3])
 		return;
 	NetServer::StopListen();
-	game_started = true;
 	//NetServer::StopBroadcast();
 	for(int i = 0; i < 4; ++i)
 		NetServer::SendPacketToPlayer(players[i], STOC_DUEL_START);
@@ -412,6 +411,7 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 	hand_result[1] = 0;
 	players[0]->state = CTOS_HAND_RESULT;
 	players[2]->state = CTOS_HAND_RESULT;
+	duel_stage = DUEL_STAGE_FINGER;
 }
 void TagDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 	if(res > 3 || dp->state != CTOS_HAND_RESULT)
@@ -445,19 +445,22 @@ void TagDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 		} else if((hand_result[0] == 1 && hand_result[1] == 2)
 		          || (hand_result[0] == 2 && hand_result[1] == 3)
 		          || (hand_result[0] == 3 && hand_result[1] == 1)) {
-			NetServer::SendPacketToPlayer(players[2], CTOS_TP_RESULT);
+			NetServer::SendPacketToPlayer(players[2], STOC_SELECT_TP);
 			players[0]->state = 0xff;
 			players[2]->state = CTOS_TP_RESULT;
+			duel_stage = DUEL_STAGE_FIRSTGO;
 		} else {
-			NetServer::SendPacketToPlayer(players[0], CTOS_TP_RESULT);
+			NetServer::SendPacketToPlayer(players[0], STOC_SELECT_TP);
 			players[2]->state = 0xff;
 			players[0]->state = CTOS_TP_RESULT;
+			duel_stage = DUEL_STAGE_FIRSTGO;
 		}
 	}
 }
 void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(dp->state != CTOS_TP_RESULT)
 		return;
+	duel_stage = DUEL_STAGE_DUELING;
 	bool swapped = false;
 	mtrandom rnd;
 	pplayer[0] = players[0];
@@ -637,7 +640,7 @@ void TagDuel::DuelEndProc() {
 #ifdef YGOPRO_SERVER_MODE
 	NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
 #endif
-	NetServer::StopServer();
+	duel_stage = DUEL_STAGE_END;
 }
 void TagDuel::Surrender(DuelPlayer* dp) {
 	return;
