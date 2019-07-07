@@ -16,7 +16,7 @@
 #include "single_mode.h"
 #endif //YGOPRO_SERVER_MODE
 
-const unsigned short PRO_VERSION = 0x134A;
+const unsigned short PRO_VERSION = 0x134B;
 
 namespace ygo {
 
