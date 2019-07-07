@@ -2106,8 +2106,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			}
 			mainGame->WaitFrameSignal(11);
 		}
-		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
+		for(auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 			(*cit)->SetCode(BufferIO::ReadInt32(pbuf));
+			(*cit)->desc_hints.clear();
+		}
 		if(!mainGame->dInfo.isCatchingUp) {
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 				(*cit)->is_hovered = false;
