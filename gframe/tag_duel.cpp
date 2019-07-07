@@ -639,8 +639,10 @@ void TagDuel::DuelEndProc() {
 		NetServer::ReSendToPlayer(*oit);
 #ifdef YGOPRO_SERVER_MODE
 	NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
-#endif
+	NetServer::StopServer();
+#else
 	duel_stage = DUEL_STAGE_END;
+#endif
 }
 void TagDuel::Surrender(DuelPlayer* dp) {
 	return;
