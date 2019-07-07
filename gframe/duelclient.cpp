@@ -28,6 +28,7 @@ std::mt19937 DuelClient::rnd;
 ReplayStream DuelClient::replay_stream;
 Replay DuelClient::last_replay;
 bool DuelClient::old_replay = true;
+bool DuelClient::is_swapping = false;
 
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
@@ -890,6 +891,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	if(mainGame->dInfo.time_player == 1)
 		mainGame->dInfo.time_player = 2;
+	if(is_swapping) {
+		mainGame->gMutex.Lock();
+		mainGame->dField.ReplaySwap();
+		mainGame->gMutex.Unlock();
+		is_swapping = false;
+	}
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
 		mainGame->gMutex.lock();
@@ -3633,6 +3640,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	}
 	return true;
+}
+void DuelClient::SwapField() {
+	is_swapping = true;
 }
 void DuelClient::SetResponseI(int respI) {
 	response_buf.resize(sizeof(int));

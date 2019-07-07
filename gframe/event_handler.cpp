@@ -84,7 +84,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->dInfo.isReplay)
 					ReplayMode::SwapField();
 				else if (mainGame->dInfo.player_type == 7)
-					ReplaySwap();
+					DuelClient::SwapField();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {

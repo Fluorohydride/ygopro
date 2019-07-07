@@ -31,6 +31,7 @@ private:
 	static bool is_closing;
 	static u64 select_hint;
 	static std::wstring event_string;
+	static bool is_swapping;
 public:
 	static std::mt19937 rnd;
 	static unsigned int temp_ip;
@@ -50,6 +51,7 @@ public:
 	static Replay last_replay;
 	static bool old_replay;
 	static int ClientAnalyze(char* msg, unsigned int len);
+	static void SwapField();
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned int len);
 	static void SendResponse();
