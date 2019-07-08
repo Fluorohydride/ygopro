@@ -267,9 +267,12 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 					NetServer::ReSendToPlayer(*oit);
 #ifdef YGOPRO_SERVER_MODE
 				NetServer::ReSendToPlayers(cache_recorder, replay_recorder);
+				NetServer::StopServer();
 #endif
 			}
+#ifndef YGOPRO_SERVER_MODE
 			NetServer::DisconnectPlayer(dp);
+#endif
 		}
 	}
 }
