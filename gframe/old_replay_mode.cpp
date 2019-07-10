@@ -308,7 +308,7 @@ namespace ygo {
 			case MSG_SORT_CHAIN: {
 				player = BufferIO::ReadUInt8(pbuf);
 				count = BufferIO::ReadInt32(pbuf);
-				pbuf += count * 19;
+				pbuf += count * 13;
 				return ReadReplayResponse();
 			}
 			case MSG_CONFIRM_DECKTOP: {

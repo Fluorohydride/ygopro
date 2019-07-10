@@ -967,7 +967,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_SORT_CHAIN: {
 			player = BufferIO::ReadUInt8(pbuf);
 			count = BufferIO::ReadInt32(pbuf);
-			pbuf += count * 19;
+			pbuf += count * 13;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;

@@ -1832,7 +1832,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		for (int i = 0; i < count; ++i) {
 			code = (unsigned int)BufferIO::ReadInt32(pbuf);
 			c = mainGame->LocalPlayer(BufferIO::ReadUInt8(pbuf));
-			l = BufferIO::ReadUInt8(pbuf);
+			l = READ_LUA64(int8_t, int32_t, pbuf);
 			s = READ_LUA64(int8_t, int32_t, pbuf);
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0 && pcard->code != code)

@@ -390,7 +390,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SORT_CHAIN: {
 			player = BufferIO::ReadUInt8(pbuf);
 			count = BufferIO::ReadInt32(pbuf);
-			pbuf += count * 19;
+			pbuf += count * 13;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				singleSignal.Reset();
 				singleSignal.Wait();
