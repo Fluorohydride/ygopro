@@ -125,6 +125,7 @@ int SingleMode::SinglePlayThread(void* param) {
 		}
 	}
 	last_replay.EndRecord();
+	mainGame->gMutex.Lock();
 	time_t nowtime = time(NULL);
 	tm* localedtime = localtime(&nowtime);
 	wchar_t timetext[40];
