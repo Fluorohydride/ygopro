@@ -32,7 +32,7 @@ public:
 	static void SwapField();
 	static void Pause(bool is_pause, bool is_step);
 	static bool ReadReplayResponse();
-	static int ReplayThread(void* param);
+	static int ReplayThread();
 	static bool StartDuel();
 	static void EndDuel();
 	static void Restart(bool refresh);
