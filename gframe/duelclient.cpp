@@ -27,7 +27,7 @@ bool DuelClient::is_swapping = false;
 int DuelClient::select_hint = 0;
 int DuelClient::select_unselect_hint = 0;
 int DuelClient::last_select_hint = 0;
-char DuelClient::last_successful_msg[2048];
+char DuelClient::last_successful_msg[0x2000];
 unsigned int DuelClient::last_successful_msg_length = 0;
 wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;

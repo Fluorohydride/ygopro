@@ -33,7 +33,7 @@ private:
 	static int select_hint;
 	static int select_unselect_hint;
 	static int last_select_hint;
-	static char last_successful_msg[2048];
+	static char last_successful_msg[0x2000];
 	static unsigned int last_successful_msg_length;
 	static wchar_t event_string[256];
 	static mtrandom rnd;
