@@ -182,7 +182,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		}
 	}
 	dp->game = this;
-	if(duel_stage = DUEL_STAGE_FINGER || duel_stage = DUEL_STAGE_FIRSTGO || duel_stage = DUEL_STAGE_DUELING) {
+	if(duel_stage == DUEL_STAGE_FINGER || duel_stage == DUEL_STAGE_FIRSTGO || duel_stage == DUEL_STAGE_DUELING) {
 		STOC_JoinGame scjg;
 		scjg.info = host_info;
 		STOC_TypeChange sctc;

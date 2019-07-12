@@ -892,9 +892,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	if(mainGame->dInfo.time_player == 1)
 		mainGame->dInfo.time_player = 2;
 	if(is_swapping) {
-		mainGame->gMutex.Lock();
+		mainGame->gMutex.lock();
 		mainGame->dField.ReplaySwap();
-		mainGame->gMutex.Unlock();
+		mainGame->gMutex.unlock();
 		is_swapping = false;
 	}
 	switch(mainGame->dInfo.curMsg) {
