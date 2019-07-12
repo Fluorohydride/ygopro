@@ -1,4 +1,5 @@
 #include "data_manager.h"
+#include "readonlymemvfs.h"
 #include "game.h"
 #include <stdio.h>
 #include <fstream>
@@ -8,10 +9,25 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 DataManager dataManager;
 
-bool DataManager::LoadDB(const std::string& file) {
+bool DataManager::LoadDB(const std::string& file, bool usebuffer) {
+	if(usebuffer) {
+		std::ifstream db(Utils::ParseFilename(file), std::ifstream::binary);
+		return LoadDBFromBuffer({ std::istreambuf_iterator<char>(db), std::istreambuf_iterator<char>() });
+	}
 	sqlite3* pDB;
 	if(sqlite3_open_v2(file.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
+	return ParseDB(pDB);
+}
+bool DataManager::LoadDBFromBuffer(const std::vector<char>& buffer) {
+	sqlite3* pDB;
+	readonlymemvfs_init();
+	set_mem_db((void*)buffer.data(), buffer.size());
+	if(sqlite3_open_v2("0", &pDB, SQLITE_OPEN_READONLY, READONLY_MEM_VFS_NAME) != SQLITE_OK)
+		return Error(pDB);
+	return ParseDB(pDB);
+}
+bool DataManager::ParseDB(sqlite3 * pDB) {
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
@@ -39,8 +55,7 @@ bool DataManager::LoadDB(const std::string& file) {
 			int level = sqlite3_column_int(pStmt, 7);
 			if(level < 0) {
 				cd->level = -(level & 0xff);
-			}
-			else
+			} else
 				cd->level = level & 0xff;
 			cd->lscale = (level >> 24) & 0xff;
 			cd->rscale = (level >> 16) & 0xff;
