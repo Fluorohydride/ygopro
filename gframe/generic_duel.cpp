@@ -290,7 +290,7 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 			uint32 player = dp->type < players.home_size ? 0 : 1;
 			wbuf[0] = MSG_WIN;
 			wbuf[1] = 1 - player;
-			wbuf[2] = 0;
+			wbuf[2] = 0x4;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
 			ITERATE_PLAYERS(
 				NetServer::ReSendToPlayer(dueler.player);
