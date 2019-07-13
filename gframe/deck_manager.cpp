@@ -12,45 +12,72 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	LFList* cur = NULL;
 	FILE* fp = fopen(path, "r");
 	char linebuf[256];
-	wchar_t strBuffer[256];
 	if(fp) {
 		while(fgets(linebuf, 256, fp)) {
-			if(linebuf[0] == '#')
-				continue;
-			int p = 0, sa = 0, code, count;
-			if(linebuf[0] == '!') {
-				sa = BufferIO::DecodeUTF8((const char*)(&linebuf[1]), strBuffer);
-				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' ) sa--;
-				LFList newlist;
-				_lfList.push_back(newlist);
-				cur = &_lfList[_lfList.size() - 1];
-				memcpy(cur->listName, (const void*)strBuffer, 20 * sizeof(wchar_t));
-				cur->listName[sa] = 0;
-				cur->content = new std::unordered_map<int, int>;
-				cur->hash = 0x7dfcee6a;
-				continue;
-			}
-			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
-			if(linebuf[p] == 0)
-				continue;
-			linebuf[p++] = 0;
-			sa = p;
-			code = atoi(linebuf);
-			if(code == 0)
-				continue;
-			while(linebuf[p] == ' ' || linebuf[p] == '\t') p++;
-			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
-			linebuf[p] = 0;
-			count = atoi(&linebuf[sa]);
-			if(cur == NULL) continue;
-			(*cur->content)[code] = count;
-			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
+			cur = ReadLFListSingle(linebuf, cur);
 		}
 		fclose(fp);
 	}
 }
+void DeckManager::LoadLFListSingle(IReadFile* reader) {
+	LFList* cur = NULL;
+	char ch[2] = " ";
+	char linebuf[256] = "";
+	while(reader->read(&ch[0], 1)) {
+		if(ch[0] == '\0')
+			break;
+		strcat(linebuf, ch);
+		if(ch[0] == '\n') {
+			cur = ReadLFListSingle(linebuf, cur);
+			linebuf[0] = '\0';
+		}
+	}
+	reader->drop();
+}
+LFList* DeckManager::ReadLFListSingle(char* linebuf, LFList* cur) {
+	wchar_t strBuffer[256];
+	if(linebuf[0] == '#')
+		return cur;
+	int p = 0, sa = 0, code, count;
+	if(linebuf[0] == '!') {
+		sa = BufferIO::DecodeUTF8((const char*)(&linebuf[1]), strBuffer);
+		while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' ) sa--;
+		size_t len = wcslen(strBuffer);
+		wchar_t lfname[256];
+		wcsncpy(lfname, strBuffer, sa);
+		lfname[sa] = 0;
+		auto lit = std::find_if(_lfList.begin(), _lfList.end(), [&lfname](LFList &lf) { return wcscmp(lf.listName, lfname) == 0; });
+		if(lit == _lfList.end()) {
+			LFList newlist;
+			_lfList.push_back(newlist);
+			cur = &_lfList[_lfList.size() - 1];
+			memcpy(cur->listName, (const void*)strBuffer, 20 * sizeof(wchar_t));
+			cur->listName[sa] = 0;
+			cur->content = new std::unordered_map<int, int>;
+			cur->hash = 0x7dfcee6a;
+		} else {
+			cur = lit._Ptr;
+		}
+		return cur;
+	}
+	while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
+	if(linebuf[p] == 0)
+		return cur;
+	linebuf[p++] = 0;
+	sa = p;
+	code = atoi(linebuf);
+	if(code == 0)
+		return cur;
+	while(linebuf[p] == ' ' || linebuf[p] == '\t') p++;
+	while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
+	linebuf[p] = 0;
+	count = atoi(&linebuf[sa]);
+	if(cur == NULL) return cur;
+	(*cur->content)[code] = count;
+	cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
+	return cur;
+}
 void DeckManager::LoadLFList() {
-	LoadLFListSingle("expansions/lflist.conf");
 	LoadLFListSingle("lflist.conf");
 	LFList nolimit;
 	myswprintf(nolimit.listName, L"N/A");

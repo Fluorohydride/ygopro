@@ -49,7 +49,6 @@ bool Game::Initialize() {
 	menuHandler.prev_sel = -1;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
-	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
@@ -68,7 +67,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
-	dataManager.LoadStrings("./expansions/strings.conf");
+	deckManager.LoadLFList();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
@@ -927,12 +926,10 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	pControl->setText(dataManager.strBuffer);
 }
 void Game::LoadExpansions() {
+	dataManager.LoadExpansionDB(L"./expansions");
+	dataManager.LoadStrings("./expansions/strings.conf");
+	deckManager.LoadLFListSingle("expansions/lflist.conf");
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
-		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
-			wchar_t fpath[1024];
-			myswprintf(fpath, L"./expansions/%ls", name);
-			dataManager.LoadDB(fpath);
-		}
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".zip", 4)) {
 			wchar_t fpath[1024];
 			myswprintf(fpath, L"./expansions/%ls", name);
@@ -943,6 +940,17 @@ void Game::LoadExpansions() {
 			BufferIO::EncodeUTF8(fpath, upath);
 			dataManager.FileSystem->addFileArchive(upath, true, false);
 #endif
+		}
+		if(isdir && wcscmp(name, L".") && wcscmp(name, L"..") && wcscmp(name, L"pics") && wcscmp(name, L"script")) {
+			wchar_t fpath[1024];
+			char upath[1024];
+			myswprintf(fpath, L"./expansions/%ls", name);
+			dataManager.LoadExpansionDB(fpath);
+			BufferIO::EncodeUTF8(fpath, upath);
+			dataManager.LoadExpansionStrings(upath);
+			myswprintf(fpath, L"./expansions/%ls/lflist.conf", name);
+			BufferIO::EncodeUTF8(fpath, upath);
+			deckManager.LoadLFListSingle(upath);
 		}
 	});
 	for(u32 i = 0; i < DataManager::FileSystem->getFileArchiveCount(); ++i) {
@@ -957,13 +965,21 @@ void Game::LoadExpansions() {
 #endif
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
 				dataManager.LoadDB(fname);
-			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
+			if(wcscmp(fname, L"lflist.conf") && wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
 #ifdef _WIN32
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
 #else
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(uname);
 #endif
 				dataManager.LoadStrings(reader);
+			}
+			if(!wcscmp(fname, L"lflist.conf")) {
+#ifdef _WIN32
+				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
+#else
+				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(uname);
+#endif
+				deckManager.LoadLFListSingle(reader);
 			}
 		}
 	}

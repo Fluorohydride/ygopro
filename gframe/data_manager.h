@@ -13,9 +13,11 @@ class DataManager {
 public:
 	DataManager(): _datas(8192), _strings(8192) {}
 	bool LoadDB(const wchar_t* wfile);
+	void LoadExpansionDB(const wchar_t* wpath);
 	bool LoadStrings(const char* file);
 	bool LoadStrings(IReadFile* reader);
 	void ReadStringConfLine(const char* linebuf);
+	void LoadExpansionStrings(const char* upath);
 	bool Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
 	code_pointer GetCodePointer(int code);
@@ -56,6 +58,7 @@ public:
 	static const wchar_t* unknown_string;
 	static int CardReader(int, void*);
 	static byte* ScriptReaderEx(const char* script_name, int* slen);
+	static byte* ScriptReaderExDirectry(const char* path, const char* script_name, int* slen);
 	static byte* ScriptReader(const char* script_name, int* slen);
 	static IFileSystem* FileSystem;
 };

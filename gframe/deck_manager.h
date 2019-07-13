@@ -36,6 +36,8 @@ public:
 	std::vector<LFList> _lfList;
 
 	void LoadLFListSingle(const char* path);
+	void LoadLFListSingle(IReadFile* reader);
+	LFList* ReadLFListSingle(char* linebuf, LFList* cur);
 	void LoadLFList();
 	wchar_t* GetLFListName(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);

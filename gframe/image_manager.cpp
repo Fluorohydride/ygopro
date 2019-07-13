@@ -203,6 +203,29 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s3
 		return driver->getTexture(file);
 	}
 }
+irr::video::ITexture* ImageManager::GetTextureExpansions(char* file, s32 width, s32 height) {
+	irr::video::ITexture* img = GetTextureExpansionsDirectry("expansions", file, width, height);
+	if(img != NULL)
+		return img;
+	bool find = false;
+	FileSystem::TraversalDir("./expansions", [this, file, width, height, &img, &find](const char* name, bool isdir) {
+		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
+			char fname[1024];
+			sprintf(fname, "expansions/%s", name);
+			img = GetTextureExpansionsDirectry(fname, file, width, height);
+			if(img)
+				find = true;
+		}
+	});
+	if(find)
+		return img;
+	return img;
+}
+irr::video::ITexture* ImageManager::GetTextureExpansionsDirectry(const char* path, char* file, s32 width, s32 height) {
+	char fname[1024];
+	sprintf(fname, "%s/%s", path, file);
+	return GetTextureFromFile(fname, width, height);
+}
 irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	if(code == 0)
 		return fit ? tUnknownFit : tUnknown;
@@ -218,10 +241,9 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	auto tit = tMap[fit ? 1 : 0].find(code);
 	if(tit == tMap[fit ? 1 : 0].end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
+		sprintf(file, "pics/%d.jpg", code);
+		irr::video::ITexture* img = GetTextureExpansions(file, width, height);
 		if(img == NULL) {
-			sprintf(file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == NULL && !mainGame->gameConf.use_image_scale) {
@@ -244,17 +266,15 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 	if(tit == tThumb.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
+		sprintf(file, "pics/thumbnail/%d.jpg", code);
+		irr::video::ITexture* img = GetTextureExpansions(file, width, height);
 		if(img == NULL) {
-			sprintf(file, "pics/thumbnail/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
 		if(img == NULL && mainGame->gameConf.use_image_scale) {
-			sprintf(file, "expansions/pics/%d.jpg", code);
-			img = GetTextureFromFile(file, width, height);
+			sprintf(file, "pics/%d.jpg", code);
+			img = GetTextureExpansions(file, width, height);
 			if(img == NULL) {
-				sprintf(file, "pics/%d.jpg", code);
 				img = GetTextureFromFile(file, width, height);
 			}
 		}
@@ -272,11 +292,11 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		char file[256];
-		sprintf(file, "expansions/pics/field/%d.png", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+		sprintf(file, "pics/field/%d.png", code);
+		irr::video::ITexture* img = GetTextureExpansions(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		if(img == NULL) {
-			sprintf(file, "expansions/pics/field/%d.jpg", code);
-			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+			sprintf(file, "pics/field/%d.jpg", code);
+			img = GetTextureExpansions(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		}
 		if(img == NULL) {
 			sprintf(file, "pics/field/%d.png", code);

@@ -85,6 +85,15 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 	spmemvfs_env_fini();
 	return true;
 }
+void DataManager::LoadExpansionDB(const wchar_t* wpath) {
+	FileSystem::TraversalDir(wpath, [this, wpath](const wchar_t* name, bool isdir) {
+		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
+			wchar_t fpath[1024];
+			myswprintf(fpath, L"%ls/%ls", wpath, name);
+			LoadDB(fpath);
+		}
+	});
+}
 bool DataManager::LoadStrings(const char* file) {
 	FILE* fp = fopen(file, "r");
 	if(!fp)
@@ -136,6 +145,15 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 		BufferIO::DecodeUTF8(strbuf, strBuffer);
 		_setnameStrings[value] = strBuffer;
 	}
+}
+void DataManager::LoadExpansionStrings(const char* upath) {
+	FileSystem::TraversalDir(upath, [this, upath](const char* name, bool isdir) {
+		if(!isdir && strcmp(name, "lflist.conf") && strrchr(name, '.') && !mystrncasecmp(strrchr(name, '.'), ".conf", 5)) {
+			char fpath[1024];
+			sprintf(fpath, "%s/%s", upath, name);
+			LoadStrings(fpath);
+		}
+	});
 }
 bool DataManager::Error(spmemvfs_db_t* pDB, sqlite3_stmt* pStmt) {
 	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB->handle), strBuffer);
@@ -350,20 +368,40 @@ int DataManager::CardReader(int code, void* pData) {
 	return 0;
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
-	// default script name: ./script/c%d.lua
-	char first[256];
-	char second[256];
-	if(mainGame->gameConf.prefer_expansion_script) {
-		sprintf(first, "expansions/%s", script_name + 2);
-		sprintf(second, "%s", script_name + 2);
-	} else {
-		sprintf(first, "%s", script_name + 2);
-		sprintf(second, "expansions/%s", script_name + 2);
+	bool prefer = mainGame->gameConf.prefer_expansion_script ? true : false;
+	if(!prefer) {
+		char sname1[256];
+		sprintf(sname1, "%s", script_name + 2);
+		if(ScriptReader(sname1, slen))
+			return scriptBuffer;
 	}
-	if(ScriptReader(first, slen))
-		return scriptBuffer;
-	else
-		return ScriptReader(second, slen);
+	byte* buffer = ScriptReaderExDirectry("expansions", script_name, slen);
+	if(buffer)
+		return buffer;
+	bool find = false;
+	FileSystem::TraversalDir("./expansions", [script_name, slen, &buffer, &find](const char* name, bool isdir) {
+		if(!find && isdir && strcmp(name, ".") && strcmp(name, "..") && strcmp(name, "pics") && strcmp(name, "script")) {
+			char fpath[1024];
+			sprintf(fpath, "expansions/%s", name);
+			buffer = ScriptReaderExDirectry(fpath, script_name, slen);
+			if(buffer)
+				find = true;
+		}
+	});
+	if(find)
+		return buffer;
+	if(prefer) {
+		char sname2[256];
+		sprintf(sname2, "%s", script_name + 2);
+		if(ScriptReader(sname2, slen))
+			return scriptBuffer;
+	}
+	return 0;
+}
+byte* DataManager::ScriptReaderExDirectry(const char* path, const char* script_name, int* slen) {
+	char sname[256];
+	sprintf(sname, "%s/%s", path, script_name + 2); //default script name: ./script/c%d.lua
+	return ScriptReader(sname, slen);
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 #ifdef _WIN32
