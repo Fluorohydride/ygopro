@@ -148,7 +148,7 @@ void DataManager::ReadStringConfLine(const char* linebuf) {
 }
 void DataManager::LoadExpansionStrings(const char* upath) {
 	FileSystem::TraversalDir(upath, [this, upath](const char* name, bool isdir) {
-		if(!isdir && strcmp(name, "lflist.conf") && strrchr(name, '.') && !mystrncasecmp(strrchr(name, '.'), ".conf", 5)) {
+		if(!isdir && strcmp(name, "system.conf") && strcmp(name, "lflist.conf") && strrchr(name, '.') && !mystrncasecmp(strrchr(name, '.'), ".conf", 5)) {
 			char fpath[1024];
 			sprintf(fpath, "%s/%s", upath, name);
 			LoadStrings(fpath);

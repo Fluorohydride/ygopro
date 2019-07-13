@@ -965,7 +965,7 @@ void Game::LoadExpansions() {
 #endif
 			if(wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".cdb", 4))
 				dataManager.LoadDB(fname);
-			if(wcscmp(fname, L"lflist.conf") && wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
+			if(wcscmp(fname, L"system.conf") && wcscmp(fname, L"lflist.conf") && wcsrchr(fname, '.') && !mywcsncasecmp(wcsrchr(fname, '.'), L".conf", 5)) {
 #ifdef _WIN32
 				IReadFile* reader = DataManager::FileSystem->createAndOpenFile(fname);
 #else
