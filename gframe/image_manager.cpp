@@ -240,8 +240,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	else
 		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
 }
-int ImageManager::LoadThumbThread(void* arg) {
-	intptr_t code = reinterpret_cast<intptr_t>(arg);
+int ImageManager::LoadThumbThread(int code) {
 	char file[256];
 	sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
 	irr::video::IImage* img = imageManager.driver->createImageFromFile(file);
@@ -302,7 +301,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		tThumb[code] = tLoading;
-		Thread::NewThread(LoadThumbThread, reinterpret_cast<void*>(code));
+		std::thread(LoadThumbThread, code).detach();
 		return tLoading;
 	}
 	if(tit->second)
