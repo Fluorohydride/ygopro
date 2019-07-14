@@ -12,7 +12,7 @@ bool SingleMode::is_continuing = false;
 Replay SingleMode::last_replay;
 
 bool SingleMode::StartPlay() {
-	Thread::NewThread(SinglePlayThread, 0);
+	std::thread(SinglePlayThread).detach();
 	return true;
 }
 void SingleMode::StopPlay(bool is_exiting) {
@@ -28,7 +28,7 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	last_replay.WriteData(resp, len);
 	set_responseb(pduel, resp);
 }
-int SingleMode::SinglePlayThread(void* param) {
+int SingleMode::SinglePlayThread() {
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
