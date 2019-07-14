@@ -65,11 +65,11 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <stdlib.h>
 #include <memory.h>
 #include <time.h>
+#include <thread>
 #include "bufferio.h"
 #include "myfilesystem.h"
 #include "mymutex.h"
 #include "mysignal.h"
-#include "mythread.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
 
