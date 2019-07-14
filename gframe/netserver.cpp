@@ -78,7 +78,7 @@ bool NetServer::StartServer(unsigned short port) {
 		return false;
 	}
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
-	Thread::NewThread(ServerThread, net_evbase);
+	std::thread(ServerThread).detach();
 #ifdef YGOPRO_SERVER_MODE
 	evutil_socket_t fd = evconnlistener_get_fd(listener);
 	socklen_t addrlen = sizeof(sockaddr);
@@ -194,7 +194,7 @@ void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 		else DisconnectPlayer(dp);
 	}
 }
-int NetServer::ServerThread(void* param) {
+int NetServer::ServerThread() {
 	event_base_dispatch(net_evbase);
 	for(auto bit = users.begin(); bit != users.end(); ++bit) {
 		bufferevent_disable(bit->first, EV_READ);

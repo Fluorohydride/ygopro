@@ -24,7 +24,7 @@ bool ReplayMode::StartReplay(int skipturn) {
 	skip_turn = skipturn;
 	if(skip_turn < 0)
 		skip_turn = 0;
-	Thread::NewThread(ReplayThread, 0);
+	std::thread(ReplayThread).detach();
 	return true;
 }
 void ReplayMode::StopReplay(bool is_exiting) {
@@ -56,7 +56,7 @@ bool ReplayMode::ReadReplayResponse() {
 		set_responseb(pduel, resp);
 	return result;
 }
-int ReplayMode::ReplayThread(void* param) {
+int ReplayMode::ReplayThread() {
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTag = !!(rh.flag & REPLAY_TAG);
