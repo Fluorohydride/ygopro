@@ -956,8 +956,7 @@ bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar
 				return false;
 			return check_set_code(data, set_code);
 		} else {
-			if(!check_set_code(data, set_code) || (!Game::CompareStrings(text.name, tokens, true) && !Game::CompareStrings(text.text, tokens, true)))
-				return false;
+			return (set_code.size() && check_set_code(data, set_code)) || Game::CompareStrings(text.name, tokens, true) || Game::CompareStrings(text.text, tokens, true);
 		}
 	}
 	return true;
