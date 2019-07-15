@@ -160,6 +160,8 @@ void ClientCard::UpdateInfo(char* buf) {
 		owner = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_STATUS)
 		status = BufferIO::ReadInt32(buf);
+	if(flag & QUERY_IS_PUBLIC)
+		BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LSCALE) {
 		lscale = BufferIO::ReadInt32(buf);
 		lscstring = fmt::to_wstring(lscale);
