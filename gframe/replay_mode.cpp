@@ -90,7 +90,7 @@ int ReplayMode::ReplayThread() {
 	exit_pending = false;
 	current_step = 0;
 	if(mainGame->dInfo.isReplaySkiping)
-		mainGame->gMutex.Lock();
+		mainGame->gMutex.lock();
 	while (is_continuing && !exit_pending) {
 		int result = process(pduel);
 		int len = result & 0xffff;
@@ -99,7 +99,7 @@ int ReplayMode::ReplayThread() {
 			get_message(pduel, (byte*)engineBuffer);
 			is_continuing = ReplayAnalyze(engineBuffer, len);
 			if(is_restarting) {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				is_restarting = false;
 				mainGame->dInfo.isReplaySkiping = true;
 				Restart(false);
@@ -125,7 +125,7 @@ int ReplayMode::ReplayThread() {
 					mainGame->dInfo.isFinished = false;
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 				}
 				skip_step = step;
 				current_step = 0;
@@ -135,7 +135,7 @@ int ReplayMode::ReplayThread() {
 	if(mainGame->dInfo.isReplaySkiping) {
 		mainGame->dInfo.isReplaySkiping = false;
 		mainGame->dField.RefreshAllCards();
-		mainGame->gMutex.Unlock();
+		mainGame->gMutex.unlock();
 	}
 	EndDuel();
 	return 0;
@@ -231,26 +231,26 @@ void ReplayMode::EndDuel() {
 	end_duel(pduel);
 	if(!is_closing) {
 		mainGame->actionSignal.Reset();
-		mainGame->gMutex.Lock();
+		mainGame->gMutex.lock();
 		mainGame->stMessage->setText(dataManager.GetSysString(1501));
 		if(mainGame->wCardSelect->isVisible())
 			mainGame->HideElement(mainGame->wCardSelect);
 		mainGame->PopupElement(mainGame->wMessage);
-		mainGame->gMutex.Unlock();
+		mainGame->gMutex.unlock();
 		mainGame->actionSignal.Wait();
-		mainGame->gMutex.Lock();
+		mainGame->gMutex.lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isFinished = true;
 		mainGame->dInfo.isReplay = false;
-		mainGame->gMutex.Unlock();
+		mainGame->gMutex.unlock();
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
-		mainGame->gMutex.Lock();
+		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wReplay);
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->gMutex.Unlock();
+		mainGame->gMutex.unlock();
 		if(exit_on_return)
 			mainGame->device->closeDevice();
 	}
@@ -294,9 +294,9 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			return true;
 		}
 		if(is_swaping) {
-			mainGame->gMutex.Lock();
+			mainGame->gMutex.lock();
 			mainGame->dField.ReplaySwap();
-			mainGame->gMutex.Unlock();
+			mainGame->gMutex.unlock();
 			is_swaping = false;
 		}
 		char* offset = pbuf;
@@ -307,12 +307,12 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			if(mainGame->dInfo.isReplaySkiping) {
 				mainGame->dInfo.isReplaySkiping = false;
 				mainGame->dField.RefreshAllCards();
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 			}
-			mainGame->gMutex.Lock();
+			mainGame->gMutex.lock();
 			mainGame->stMessage->setText(L"Error occurs.");
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.Unlock();
+			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();
 			mainGame->actionSignal.Wait();
 			return false;
@@ -326,7 +326,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			if(mainGame->dInfo.isReplaySkiping) {
 				mainGame->dInfo.isReplaySkiping = false;
 				mainGame->dField.RefreshAllCards();
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 			}
 			pbuf += 2;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
@@ -508,7 +508,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 				if(skip_turn == 0) {
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 				}
 			}
 			player = BufferIO::ReadInt8(pbuf);
@@ -845,7 +845,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 					mainGame->dInfo.isFinished = false;
 					mainGame->dInfo.isReplaySkiping = false;
 					mainGame->dField.RefreshAllCards();
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 				}
 			}
 			if(is_pausing) {
