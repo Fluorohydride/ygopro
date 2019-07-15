@@ -42,14 +42,14 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 }
 
 static bool check_set_code(CardDataC* data, std::vector<unsigned int>& setcodes) {
-	if(setcodes.empty())
-		return true;
 	unsigned long long card_setcode = data->setcode;
 	if (data->alias) {
 		auto aptr = dataManager._datas.find(data->alias);
 		if (aptr != dataManager._datas.end())
 			card_setcode = aptr->second->setcode;
 	}
+	if(setcodes.empty())
+		return !!card_setcode;
 	for(auto& set_code : setcodes) {
 		auto sc = card_setcode;
 		int settype = set_code & 0xfff;
@@ -219,7 +219,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_SIDE_OK: {
 				if(deckManager.current_deck.main.size() != deckManager.pre_deck.main.size() || deckManager.current_deck.extra.size() != deckManager.pre_deck.extra.size()
 				        || deckManager.current_deck.side.size() != deckManager.pre_deck.side.size()) {
-					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1410).c_str());
+					mainGame->PopupMessage(dataManager.GetSysString(1410));
 					break;
 				}
 				mainGame->ClearCardInfo();
@@ -952,6 +952,8 @@ bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar
 		if(checkchar == L'$') {
 			return Game::CompareStrings(text.name, tokens, true);
 		} else if(checkchar == L'@') {
+			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
+				return false;
 			return check_set_code(data, set_code);
 		} else {
 			if(!check_set_code(data, set_code) || (!Game::CompareStrings(text.name, tokens, true) && !Game::CompareStrings(text.text, tokens, true)))
