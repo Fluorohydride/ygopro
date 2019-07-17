@@ -709,12 +709,12 @@ void Game::DrawStackIndicator(const std::wstring& text, S3DVertex* v, bool oppon
 /*Converts the coordinates from the 3d plane to the 2d plane (the window)
 */
 void Game::ConvertCoords(float x, float y, int* x1, int* y1) {
-	double angle = atan((y - board.y) / -board.z);
-	double screeny = tan(board.atan - angle);
+	double angle = atan((y - FIELD_Y) / -FIELD_Z);
+	double screeny = tan(FIELD_ANGLE - angle);
 	double vlen = sqrt(1.0 + screeny * screeny);
-	double screenx = (x - board.x) / (board.z / vlen / cos(angle));
-	*x1 = (screenx + 0.90) * 1024.0 / 1.35;
-	*y1 = (screeny + 0.42) * 640.0 / 0.84;
+	double screenx = (x - FIELD_X) / (FIELD_Z / vlen / cos(angle));
+	*x1 = (screenx - CAMERA_LEFT) * 1024.0 / (CAMERA_RIGHT - CAMERA_LEFT);
+	*y1 = (screeny - CAMERA_BOTTOM) * 640.0 / (CAMERA_TOP - CAMERA_BOTTOM);
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {

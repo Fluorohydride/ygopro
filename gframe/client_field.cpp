@@ -777,11 +777,11 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.5f + 0.001f * sequence;
 			}
 			if(pcard->code) {
-				r->X = -mainGame->board.atan;
+				r->X = -FIELD_ANGLE;
 				r->Y = 0.0f;
 				r->Z = 0.0f;
 			} else {
-				r->X = mainGame->board.atan;
+				r->X = FIELD_ANGLE;
 				r->Y = PI;
 				r->Z = 0;
 			}
@@ -801,11 +801,11 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.5f - 0.001f * sequence;
 			}
 			if (pcard->code == 0) {
-				r->X = mainGame->board.atan;
+				r->X = FIELD_ANGLE;
 				r->Y = PI;
 				r->Z = 0;
 			} else {
-				r->X = -mainGame->board.atan;
+				r->X = -FIELD_ANGLE;
 				r->Y = 0;
 				r->Z = 0;
 			}

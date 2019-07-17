@@ -1934,12 +1934,12 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * (5 - speed * 2));
 		}
 	} else {
-		double screenx = x / 1024.0 * 1.35 - 0.90;
-		double screeny = y / 640.0 * 0.84 - 0.42;
-		double angle = mainGame->board.atan - atan(screeny);
+		double screenx = x / 1024.0 * (CAMERA_RIGHT - CAMERA_LEFT) + CAMERA_LEFT;
+		double screeny = y / 640.0 * (CAMERA_TOP - CAMERA_BOTTOM) + CAMERA_BOTTOM;
+		double angle = FIELD_ANGLE - atan(screeny);
 		double vlen = sqrt(1.0 + screeny * screeny);
-		double boardx = mainGame->board.x + mainGame->board.z * screenx / vlen / cos(angle);
-		double boardy = mainGame->board.y - mainGame->board.z * tan(angle);
+		double boardx = FIELD_X + FIELD_Z * screenx / vlen / cos(angle);
+		double boardy = FIELD_Y - FIELD_Z * tan(angle);
 		hovered_location = 0;
 		if(boardx >= matManager.vFieldExtra[0][speed][0].Pos.X && boardx <= matManager.vFieldExtra[0][speed][1].Pos.X) {
 			if(boardy >= matManager.vFieldExtra[0][speed][0].Pos.Y && boardy <= matManager.vFieldExtra[0][speed][2].Pos.Y) {

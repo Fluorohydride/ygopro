@@ -98,10 +98,6 @@ struct FadingUnit {
 	irr::core::vector2di fadingDest;
 };
 
-struct Fieldmatrix {
-	float x, y, z, atan;
-};
-
 class Game {
 
 public:
@@ -561,8 +557,6 @@ public:
 
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
-
-	Fieldmatrix board;
 };
 
 extern Game* mainGame;
@@ -586,6 +580,12 @@ inline std::vector<T> Game::TokenizeString(T input, const T & token) {
 #define FIELD_X			4.2f	
 #define FIELD_Y			8.0f
 #define FIELD_Z			7.8f
+#define FIELD_ANGLE		atan(FIELD_Y / FIELD_Z)
+
+#define CAMERA_LEFT		-0.90f
+#define CAMERA_RIGHT	0.45f
+#define CAMERA_BOTTOM	-0.42f
+#define CAMERA_TOP		0.42f
 
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
