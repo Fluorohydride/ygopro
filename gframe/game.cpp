@@ -2014,8 +2014,10 @@ bool Game::CompareStrings(std::wstring input, const std::vector<std::wstring>& t
 	return true;
 }
 bool Game::CompareStrings(std::wstring input, std::wstring second_term, bool transform_input, bool transform_term) {
-	if(input.empty() || second_term.empty())
+	if(input.empty() && !second_term.empty())
 		return false;
+	if(second_term.empty())
+		return true;
 	if(transform_input)
 		input = StringtoUpper(input);
 	if(transform_term)
