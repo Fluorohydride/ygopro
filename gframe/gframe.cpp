@@ -86,8 +86,15 @@ int main(int argc, char* argv[]) {
 		ygo::game_info.mode = mode;
 		if(argv[5][0] == 'T')
 			ygo::game_info.duel_rule = DEFAULT_DUEL_RULE - 1;
-		else
+		else if(argv[5][0] == 'F')
 			ygo::game_info.duel_rule = DEFAULT_DUEL_RULE;
+		else {
+			int master_rule = atoi(argv[5]);
+			if(master_rule)
+				ygo::game_info.duel_rule = master_rule;
+			else
+				ygo::game_info.duel_rule = DEFAULT_DUEL_RULE;
+		}
 		if(argv[6][0] == 'T')
 			ygo::game_info.no_check_deck = true;
 		else
