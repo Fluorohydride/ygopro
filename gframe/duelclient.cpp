@@ -3849,15 +3849,15 @@ void DuelClient::ReplayPrompt(bool need_header) {
 		last_replay.BeginRecord(false);
 		last_replay.WriteHeader(pheader);
 		last_replay.pheader.id = 0x58707279;
-		last_replay.WriteInt32(mainGame->dInfo.clientname.size(), false);
+		last_replay.Write<int32_t>(mainGame->dInfo.clientname.size(), false);
 		for(auto& name : mainGame->dInfo.clientname) {
 			last_replay.WriteData(name.c_str(), 40, false);
 		}
-		last_replay.WriteInt32(mainGame->dInfo.hostname.size(), false);
+		last_replay.Write<int32_t>(mainGame->dInfo.hostname.size(), false);
 		for(auto& name : mainGame->dInfo.hostname) {
 			last_replay.WriteData(name.c_str(), 40, false);
 		}
-		last_replay.WriteInt32(mainGame->dInfo.duel_field | mainGame->dInfo.extraval >> 8);
+		last_replay.Write<int32_t>(mainGame->dInfo.duel_field | mainGame->dInfo.extraval >> 8);
 		last_replay.WriteStream(replay_stream);
 		last_replay.EndRecord();
 	}

@@ -61,9 +61,6 @@ public:
 	void WritetoFile(const void* data, size_t size, bool flush);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
-	void WriteInt32(int32_t data, bool flush = true);
-	void WriteInt16(int16_t data, bool flush = true);
-	void WriteInt8(int8_t data, bool flush = true);
 	void Flush();
 	void EndRecord(size_t size = 0x20000);
 	void SaveReplay(const std::wstring& name);

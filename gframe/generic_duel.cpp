@@ -559,14 +559,14 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	new_replay.BeginRecord();
 	rh.id = 0x58707279;
 	new_replay.WriteHeader(rh);
-	last_replay.WriteInt32(players.home.size(), false);
-	new_replay.WriteInt32(players.home.size(), false);
+	last_replay.Write<int32_t>(players.home.size(), false);
+	new_replay.Write<int32_t>(players.home.size(), false);
 	for(auto& dueler : players.home) {
 		last_replay.WriteData(dueler.player->name, 40, false);
 		new_replay.WriteData(dueler.player->name, 40, false);
 	}
-	last_replay.WriteInt32(players.opposing.size(), false);
-	new_replay.WriteInt32(players.opposing.size(), false);
+	last_replay.Write<int32_t>(players.opposing.size(), false);
+	new_replay.Write<int32_t>(players.opposing.size(), false);
 	for(auto& dueler : players.opposing) {
 		last_replay.WriteData(dueler.player->name, 40, false);
 		new_replay.WriteData(dueler.player->name, 40, false);
@@ -587,11 +587,11 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		opt |= DUEL_PSEUDO_SHUFFLE;
 	if(host_info.extra_rules & DUEL_SPEED)
 		opt |= SPEED_DUEL;
-	new_replay.WriteInt32((mainGame->GetMasterRule(opt, 0)) | (opt & SPEED_DUEL) << 8);
-	last_replay.WriteInt32(host_info.start_lp, false);
-	last_replay.WriteInt32(host_info.start_hand, false);
-	last_replay.WriteInt32(host_info.draw_count, false);
-	last_replay.WriteInt32(opt, false);
+	new_replay.Write<int32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & SPEED_DUEL) << 8);
+	last_replay.Write<int32_t>(host_info.start_lp, false);
+	last_replay.Write<int32_t>(host_info.start_hand, false);
+	last_replay.Write<int32_t>(host_info.draw_count, false);
+	last_replay.Write<int32_t>(opt, false);
 	last_replay.Flush();
 	//
 	std::vector<unsigned int> extracards;
@@ -622,33 +622,33 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	for(int32 j = 0; j < players.home.size(); j++) {
 		auto& dueler = players.home[j];
-		last_replay.WriteInt32(dueler.pdeck.main.size(), false);
+		last_replay.Write<int32_t>(dueler.pdeck.main.size(), false);
 		for(int32 i = (int32)dueler.pdeck.main.size() - 1; i >= 0; --i) {
 			new_card(pduel, dueler.pdeck.main[i]->code, 0, 0, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE, j);
-			last_replay.WriteInt32(dueler.pdeck.main[i]->code, false);
+			last_replay.Write<int32_t>(dueler.pdeck.main[i]->code, false);
 		}
-		last_replay.WriteInt32(dueler.pdeck.extra.size(), false);
+		last_replay.Write<int32_t>(dueler.pdeck.extra.size(), false);
 		for(int32 i = (int32)dueler.pdeck.extra.size() - 1; i >= 0; --i) {
 			new_card(pduel, dueler.pdeck.extra[i]->code, 0, 0, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE, j);
-			last_replay.WriteInt32(dueler.pdeck.extra[i]->code, false);
+			last_replay.Write<int32_t>(dueler.pdeck.extra[i]->code, false);
 		}
 	}
 	for(int32 j = 0; j < players.opposing.size(); j++) {
 		auto& dueler = players.opposing[j];
-		last_replay.WriteInt32(dueler.pdeck.main.size(), false);
+		last_replay.Write<int32_t>(dueler.pdeck.main.size(), false);
 		for(int32 i = (int32)dueler.pdeck.main.size() - 1; i >= 0; --i) {
 			new_card(pduel, dueler.pdeck.main[i]->code, 1, 1, LOCATION_DECK, 0, POS_FACEDOWN_DEFENSE, j);
-			last_replay.WriteInt32(dueler.pdeck.main[i]->code, false);
+			last_replay.Write<int32_t>(dueler.pdeck.main[i]->code, false);
 		}
-		last_replay.WriteInt32(dueler.pdeck.extra.size(), false);
+		last_replay.Write<int32_t>(dueler.pdeck.extra.size(), false);
 		for(int32 i = (int32)dueler.pdeck.extra.size() - 1; i >= 0; --i) {
 			new_card(pduel, dueler.pdeck.extra[i]->code, 1, 1, LOCATION_EXTRA, 0, POS_FACEDOWN_DEFENSE, j);
-			last_replay.WriteInt32(dueler.pdeck.extra[i]->code, false);
+			last_replay.Write<int32_t>(dueler.pdeck.extra[i]->code, false);
 		}
 	}
-	last_replay.WriteInt32(extracards.size(), false);
+	last_replay.Write<int32_t>(extracards.size(), false);
 	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
-		last_replay.WriteInt32(extracards[i], false);
+		last_replay.Write<int32_t>(extracards[i], false);
 	}
 	last_replay.Flush();
 	char startbuf[32], *pbuf = startbuf;
@@ -1805,7 +1805,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 	return 0;
 }
 void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
-	last_replay.WriteInt8(len);
+	last_replay.Write<int8_t>(len);
 	last_replay.WriteData(pdata, len);
 	set_responseb(pduel, (byte*)pdata, len);
 	GetAtPos(dp->type).player->state = 0xff;
