@@ -2238,7 +2238,7 @@ int GetSuitableReturn(uint32 maxseq, size_t size) {
 	return 1;
 }
 void ClientField::SetResponseSelectedCards() const {
-	if (mainGame->dInfo.lua64) {
+	if (!mainGame->dInfo.compat_mode) {
 		if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD) {
 			unsigned int respbuf[] = { 1, selected_cards[0]->select_seq };
 			DuelClient::SetResponseB((char*)respbuf, sizeof(respbuf));
@@ -2354,6 +2354,7 @@ void ClientField::CancelOrFinish() {
 				else
 					DuelClient::SendResponse();
 			}
+			break;
 		}
 		if (mainGame->wQuery->isVisible()) {
 			SetResponseSelectedCards();

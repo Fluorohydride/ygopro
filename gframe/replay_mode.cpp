@@ -60,7 +60,7 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
-	mainGame->dInfo.lua64 = !!(rh.flag & REPLAY_LUA64);
+	mainGame->dInfo.compat_mode = !(rh.flag & REPLAY_LUA64);
 	mainGame->dInfo.team1 = ReplayMode::cur_replay.GetPlayersCount(0);
 	mainGame->dInfo.team2 = ReplayMode::cur_replay.GetPlayersCount(1);
 	mainGame->dInfo.current_player[0] = 0;

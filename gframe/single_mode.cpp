@@ -41,7 +41,7 @@ int SingleMode::SinglePlayThread() {
 	time_t seed = time(0);
 	DuelClient::rnd.seed(seed);
 	pduel = mainGame->SetupDuel(DuelClient::rnd());
-	mainGame->dInfo.lua64 = true;
+	mainGame->dInfo.compat_mode = false;
 	set_player_info(pduel, 0, start_lp, start_hand, draw_count);
 	set_player_info(pduel, 1, start_lp, start_hand, draw_count);
 	mainGame->dInfo.lp[0] = start_lp;

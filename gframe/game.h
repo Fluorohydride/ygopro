@@ -64,7 +64,7 @@ struct DuelInfo {
 	bool isFirst;
 	bool isRelay;
 	bool isSingleMode;
-	bool lua64;
+	bool compat_mode;
 	bool is_shuffling;
 	int current_player[2];
 	int lp[2];

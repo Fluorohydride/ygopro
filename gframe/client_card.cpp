@@ -198,12 +198,12 @@ loc_info ClientCard::read_location_info(char*& p) {
 	loc_info info;
 	info.controler = BufferIO::ReadUInt8(p);
 	info.location = BufferIO::ReadUInt8(p);
-	if (mainGame->dInfo.lua64) {
-		info.sequence = BufferIO::ReadInt32(p);
-		info.position = BufferIO::ReadInt32(p);
-	} else {
+	if (mainGame->dInfo.compat_mode) {
 		info.sequence = BufferIO::ReadUInt8(p);
 		info.position = BufferIO::ReadUInt8(p);
+	} else {
+		info.sequence = BufferIO::ReadInt32(p);
+		info.position = BufferIO::ReadInt32(p);
 	}
 	return info;
 }

@@ -23,7 +23,7 @@ namespace ygo {
 		mainGame->dInfo.isFirst = true;
 		mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
 		mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
-		mainGame->dInfo.lua64 = true;
+		mainGame->dInfo.compat_mode = false;
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
 		if(!mainGame->dInfo.isRelay)
