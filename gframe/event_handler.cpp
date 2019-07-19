@@ -2344,7 +2344,8 @@ void ClientField::CancelOrFinish() {
 		mainGame->HideElement(mainGame->wQuery, true);
 		break;
 	}
-	case MSG_SELECT_CARD: {
+	case MSG_SELECT_CARD:
+	case MSG_SELECT_TRIBUTE: {
 		if (selected_cards.size() == 0) {
 			if(select_cancelable) {
 				DuelClient::SetResponseI(-1);
@@ -2375,34 +2376,6 @@ void ClientField::CancelOrFinish() {
 	case MSG_SELECT_UNSELECT_CARD: {
 		if(select_cancelable) {
 			DuelClient::SetResponseI(-1);
-			ShowCancelOrFinishButton(0);
-			if(mainGame->wCardSelect->isVisible())
-				mainGame->HideElement(mainGame->wCardSelect, true);
-			else
-				DuelClient::SendResponse();
-		}
-		break;
-	}
-	case MSG_SELECT_TRIBUTE: {
-		if (selected_cards.size() == 0) {
-			if (select_cancelable) {
-				ShowCancelOrFinishButton(0);
-				DuelClient::SetResponseI(-1);
-				if (mainGame->wCardSelect->isVisible())
-					mainGame->HideElement(mainGame->wCardSelect, true);
-				else
-					DuelClient::SendResponse();
-				}
-			break;
-		}
-		if (mainGame->wQuery->isVisible()) {
-			SetResponseSelectedCards();
-			ShowCancelOrFinishButton(0);
-			mainGame->HideElement(mainGame->wQuery, true);
-			break;
-		}
-		if(select_ready) {
-			SetResponseSelectedCards();
 			ShowCancelOrFinishButton(0);
 			if(mainGame->wCardSelect->isVisible())
 				mainGame->HideElement(mainGame->wCardSelect, true);
