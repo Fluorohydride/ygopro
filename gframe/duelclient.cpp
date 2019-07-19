@@ -201,7 +201,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					else mainGame->PopupMessage(dataManager.GetSysString(1402));
 					mainGame->gMutex.unlock();
 				} else {
-					ReplayPrompt(false);
+					ReplayPrompt(true);
 					mainGame->gMutex.lock();
 					mainGame->PopupMessage(dataManager.GetSysString(1502));
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
