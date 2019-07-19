@@ -3644,7 +3644,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	return true;
 }
 void DuelClient::SwapField() {
-	is_swapping = true;
+	if(mainGame->dInfo.curMsg != MSG_WAITING)
+		is_swapping = !is_swapping;
+	else {
+		mainGame->gMutex.lock();
+		mainGame->dField.ReplaySwap();
+		mainGame->gMutex.unlock();
+	}
 }
 void DuelClient::SetResponseI(int respI) {
 	response_buf.resize(sizeof(int));
