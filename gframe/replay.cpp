@@ -69,13 +69,13 @@ void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	WritetoFile(data, length, flush);
 }
 void Replay::WriteInt32(int32_t data, bool flush) {
-	Write<int32_t>(data, false);
+	Write<int32_t>(data, flush);
 }
 void Replay::WriteInt16(int16_t data, bool flush) {
-	Write<int16_t>(data, false);
+	Write<int16_t>(data, flush);
 }
 void Replay::WriteInt8(int8_t data, bool flush) {
-	Write<int8_t>(data, false);
+	Write<int8_t>(data, flush);
 }
 void Replay::Flush() {
 	if(!is_recording)

@@ -57,7 +57,7 @@ public:
 	void WriteStream(const ReplayStream& stream);
 	void WritePacket(const ReplayPacket& p);
 	template <typename  T>
-	void Write(T data, bool flush);
+	void Write(T data, bool flush = true);
 	void WritetoFile(const void* data, size_t size, bool flush);
 	void WriteHeader(ReplayHeader& header);
 	void WriteData(const void* data, unsigned int length, bool flush = true);
