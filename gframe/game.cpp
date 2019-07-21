@@ -863,7 +863,7 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(0))
+		if(closeSignal.Wait(1))
 			CloseDuelWindow();
 		fps++;
 		cur_time = timer->getTime();
