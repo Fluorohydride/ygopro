@@ -115,7 +115,6 @@ deploy:
   skip_cleanup: true
   script: bash ./build-support/travis-windows-deploy.sh
   on:
-    all_branches: true
     condition: "$TRAVIS_OS_NAME == windows"
 - provider: pages
   skip_cleanup: true
@@ -124,7 +123,6 @@ deploy:
   repo: $DEPLOY_REPO
   target_branch: $DEPLOY_BRANCH
   on:
-    all_branches: true
     condition: "$TRAVIS_OS_NAME != windows"
 before_cache:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
