@@ -68,8 +68,8 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
-#include "CGUITTFont.h"
-#include "CGUIImageButton.h"
+#include "CGUITTFont/CGUITTFont.h"
+#include "CGUIImageButton/CGUIImageButton.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>

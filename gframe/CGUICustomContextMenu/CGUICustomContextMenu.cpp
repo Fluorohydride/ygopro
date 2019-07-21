@@ -11,7 +11,7 @@
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
 #include "IGUISpriteBank.h"
-#include "os.h"
+#include "../IrrlichtCommonIncludes/os.h"
 
 namespace irr
 {

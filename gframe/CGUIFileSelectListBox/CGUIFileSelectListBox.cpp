@@ -12,8 +12,8 @@
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
 #include "IGUISpriteBank.h"
-#include "CGUIScrollBar.h"
-#include "os.h"
+#include "../IrrlichtCommonIncludes/CGUIScrollBar.h"
+#include "../IrrlichtCommonIncludes/os.h"
 #include "../utils.h"
 
 namespace irr {

@@ -13,6 +13,7 @@
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
 #include "CGUICustomContextMenu/CGUICustomContextMenu.h"
 #include "CGUICustomContextMenu/CGUICustomMenu.h"
+#include "CGUICustomTabControl/CGUICustomTabControl.h"
 #include "CProgressBar/CProgressBar.h"
 #include "deck_manager.h"
 #include "repo_manager.h"

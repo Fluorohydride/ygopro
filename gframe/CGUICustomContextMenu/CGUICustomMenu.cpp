@@ -11,7 +11,7 @@
 #include "IGUIFont.h"
 #include "IGUIWindow.h"
 
-#include "os.h"
+#include "../IrrlichtCommonIncludes/os.h"
 
 namespace irr
 {

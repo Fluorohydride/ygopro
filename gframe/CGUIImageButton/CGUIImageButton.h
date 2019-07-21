@@ -2,7 +2,7 @@
 #define _C_GUI_IMAGE_BUTTON_H_
 
 #include <irrlicht.h>
-#include "CGUIButton.h"
+#include "../IrrlichtCommonIncludes/CGUIButton.h"
 
 namespace irr {
 namespace gui {

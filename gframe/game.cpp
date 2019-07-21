@@ -20,7 +20,7 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #ifdef _WIN32
-#include "../irrlicht/src/CIrrDeviceWin32.h"
+#include "IrrlichtCommonIncludes/CIrrDeviceWin32.h"
 #endif
 
 unsigned short PRO_VERSION = 0x1348;
@@ -331,7 +331,7 @@ bool Game::Initialize() {
 	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
 	//tab
-	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
+	wInfos = irr::gui::CGUICustomTabControl::addCustomTabControl(env, rect<s32>(1, 275, 301, 639), 0, true);
 	wInfos->setVisible(false);
 	//info
 	irr::gui::IGUITab* tabInfo = wInfos->addTab(dataManager.GetSysString(1270).c_str());

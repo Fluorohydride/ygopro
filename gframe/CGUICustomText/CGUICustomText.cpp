@@ -6,7 +6,7 @@
 #include "IGUIFont.h"
 #include "IVideoDriver.h"
 #include "rect.h"
-#include "os.h"
+#include "../IrrlichtCommonIncludes/os.h"
 #include <algorithm>
 
 namespace irr
@@ -37,9 +37,9 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 
 CGUICustomText* CGUICustomText::addCustomText(const wchar_t* text, bool border, IGUIEnvironment* environment,
 	IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool background) {
-	CGUICustomText* button = new CGUICustomText(text, border, environment, parent, id, rectangle, background);
-	button->drop();
-	return button;
+	CGUICustomText* obj = new CGUICustomText(text, border, environment, parent, id, rectangle, background);
+	obj->drop();
+	return obj;
 }
 
 
