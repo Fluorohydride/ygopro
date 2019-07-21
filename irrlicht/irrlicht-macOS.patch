@@ -1,0 +1,262 @@
+diff -ur source/Irrlicht/CGUIEditBox.cpp source-fixed/Irrlicht/CGUIEditBox.cpp
+--- source/Irrlicht/CGUIEditBox.cpp	2019-07-03 12:39:20.000000000 -0400
++++ source-fixed/Irrlicht/CGUIEditBox.cpp	2019-07-03 12:07:02.000000000 -0400
+@@ -287,9 +287,11 @@
+ 				const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+-				core::stringc s;
+-				s = Text.subString(realmbgn, realmend - realmbgn).c_str();
+-				Operator->copyToClipboard(s.c_str());
++				const int max_char_size = sizeof(wchar_t) * 3 / 2;
++				int max_size = (realmend - realmbgn)*max_char_size + 1;
++				c8 *s = new char[max_size];
++				wcstombs(s, Text.subString(realmbgn, realmend-realmbgn).c_str(), max_size);
++				Operator->copyToClipboard(s);
+ 			}
+ 			break;
+ 		case KEY_KEY_X:
+@@ -300,9 +302,11 @@
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+ 				// copy
+-				core::stringc sc;
+-				sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
+-				Operator->copyToClipboard(sc.c_str());
++				const int max_char_size = sizeof(wchar_t) * 3 / 2;
++				int max_size = (realmend - realmbgn)*max_char_size + 1;
++				c8 *s = new char[max_size];
++				wcstombs(s, Text.subString(realmbgn, realmend-realmbgn).c_str(), max_size);
++				Operator->copyToClipboard(s);
+ 
+ 				if (isEnabled())
+ 				{
+diff -ur source/Irrlicht/MacOSX/AppDelegate.h source-fixed/Irrlicht/MacOSX/AppDelegate.h
+--- source/Irrlicht/MacOSX/AppDelegate.h	2019-07-03 12:39:20.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/AppDelegate.h	2019-07-03 12:16:07.000000000 -0400
+@@ -10,7 +10,7 @@
+ #import <Cocoa/Cocoa.h>
+ #import "CIrrDeviceMacOSX.h"
+ 
+-@interface AppDelegate : NSObject
++@interface AppDelegate : NSTextView <NSApplicationDelegate>
+ {
+ 	BOOL			_quit;
+ 	irr::CIrrDeviceMacOSX	*_device;
+diff -ur source/Irrlicht/MacOSX/AppDelegate.mm source-fixed/Irrlicht/MacOSX/AppDelegate.mm
+--- source/Irrlicht/MacOSX/AppDelegate.mm	2019-07-03 12:39:20.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/AppDelegate.mm	2019-07-03 12:12:13.000000000 -0400
+@@ -74,6 +74,29 @@
+ 	return (_quit);
+ }
+ 
++- (void)keyDown:(NSEvent *)event
++{
++	[self interpretKeyEvents:@[event]];
++}
++
++- (void)insertText:(id)string
++{
++	[self setString: @""];
++	if ([string isKindOfClass:[NSAttributedString class]])
++	{
++		_device->handleInputEvent([[string string] UTF8String]);
++	}
++	else
++	{
++		_device->handleInputEvent([string UTF8String]);
++	}
++}
++
++- (void)doCommandBySelector:(SEL)selector
++{
++	_device->processKeyEvent();
++}
++
+ @end
+ 
+ #endif // _IRR_COMPILE_WITH_OSX_DEVICE_
+diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
+--- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h	2019-07-03 12:39:20.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.h	2019-07-03 12:12:43.000000000 -0400
+@@ -95,6 +95,8 @@
+ 		void setMouseLocation(int x, int y);
+ 		void setResize(int width, int height);
+ 		void setCursorVisible(bool visible);
++		void handleInputEvent(const char *str);
++		void processKeyEvent();
+ 
+ 	private:
+ 
+diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
+--- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-07-03 12:39:20.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-07-03 12:20:39.000000000 -0400
+@@ -496,7 +496,7 @@
+ 		{
+ 			[[NSAutoreleasePool alloc] init];
+ 			[NSApplication sharedApplication];
+-			[NSApp setDelegate:(id<NSFileManagerDelegate>)[[[AppDelegate alloc] initWithDevice:this] autorelease]];
++			[NSApp setDelegate:[[[[AppDelegate alloc] initWithDevice:this] initWithFrame:NSZeroRect] autorelease]];
+ 			[NSBundle loadNibNamed:@"MainMenu" owner:[NSApp delegate]];
+ 			[NSApp finishLaunching];
+ 		}
+@@ -592,6 +592,38 @@
+ 	CGLContext = NULL;
+ }
+ 
++void CIrrDeviceMacOSX::processKeyEvent()
++{
++	irr::SEvent ievent;
++	NSEvent *event = [[NSApplication sharedApplication] currentEvent];
++	postKeyEvent(event, ievent, true);
++}
++
++void CIrrDeviceMacOSX::handleInputEvent(const char *cStr)
++{
++	SEvent ievent;
++
++	// TODO: we should have such a function in core::string
++	size_t lenOld = strlen(cStr);
++	wchar_t *ws = new wchar_t[lenOld + 1];
++	size_t len = mbstowcs(ws,cStr,lenOld);
++	ws[len] = 0;
++	irr::core::stringw widep(ws);
++	delete[] ws;
++
++	ievent.EventType = irr::EET_KEY_INPUT_EVENT;
++	ievent.KeyInput.Key = (irr::EKEY_CODE)0;
++	ievent.KeyInput.PressedDown = true;
++	ievent.KeyInput.Shift = false;
++	ievent.KeyInput.Control = false;
++
++	for (int i = 0; i < widep.size(); ++i)
++	{
++		ievent.KeyInput.Char = widep[i];
++		postEventFromUser(ievent);
++	}
++}
++
+ bool CIrrDeviceMacOSX::createWindow()
+ {
+ 	CGDisplayErr error;
+@@ -881,6 +913,8 @@
+ 			newSwapInterval = (CreationParams.Vsync) ? 1 : 0;
+ 			CGLSetParameter(CGLContext,kCGLCPSwapInterval,&newSwapInterval);
+ 		}
++
++		[[Window contentView] addSubview:(AppDelegate*)[NSApp delegate]];
+ 	}
+ 
+ 	return (result);
+@@ -971,6 +1005,33 @@
+ 	os::Timer::tick();
+ 	storeMouseLocation();
+ 
++	auto focusElement = getGUIEnvironment()->getFocus();
++	bool editing = focusElement && focusElement->getType() == irr::gui::EGUIET_EDIT_BOX;
++
++	if (!editing)
++	{
++		[Window makeFirstResponder:nil];
++	}
++	else
++	{
++		auto textView = (NSTextView*)[NSApp delegate];
++		auto crect = focusElement->getAbsolutePosition();
++
++		// ensure font height enough to fill the rect, otherwize ime window will overlaps the edit box
++		[textView setFont:[NSFont userFontOfSize:crect.getHeight()]];
++
++		// change origin from top left to bottom right
++		NSRect rect = {
++			crect.UpperLeftCorner.X,
++			[[textView superview] frame].size.height - crect.LowerRightCorner.Y,
++			crect.getWidth(), crect.getHeight(),
++		};
++		[textView setFrame:rect];
++
++		// start to receive input events
++		[Window makeFirstResponder:textView];
++	}
++
+ 	event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:[NSDate distantPast] inMode:NSDefaultRunLoopMode dequeue:YES];
+ 	if (event != nil)
+ 	{
+@@ -979,6 +1040,12 @@
+ 		switch([(NSEvent *)event type])
+ 		{
+ 			case NSKeyDown:
++				if (editing)
++				{
++					// delegate to text edit control to handle text input
++					[NSApp sendEvent:event];
++					break;
++				}
+ 				postKeyEvent(event,ievent,true);
+ 				break;
+ 
+@@ -1199,22 +1266,22 @@
+ 			}
+ 			else
+ 			{
+-				cStr = (unsigned char *)[str cStringUsingEncoding:NSWindowsCP1252StringEncoding];
++				cStr = (unsigned char *)[str UTF8String];
+ 				if (cStr != NULL && strlen((char*)cStr) > 0)
+ 				{
+ 					mchar = cStr[0];
+ 					mkey = toupper(mchar);
+-					if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
+-					{
+-						if (mkey == 'C' || mkey == 'V' || mkey == 'X')
+-						{
+-							mchar = 0;
+-							skipCommand = true;
+-						}
+-					}
+ 				}
+ 			}
+ 		}
++		if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
++		{
++			if (mkey == 'C' || mkey == 'V' || mkey == 'X')
++			{
++				mchar = 0;
++				skipCommand = true;
++			}
++		}
+ 
+ 		ievent.EventType = irr::EET_KEY_INPUT_EVENT;
+ 		ievent.KeyInput.Key = (irr::EKEY_CODE)mkey;
+diff -ur source/Irrlicht/MacOSX/OSXClipboard.mm source-fixed/Irrlicht/MacOSX/OSXClipboard.mm
+--- source/Irrlicht/MacOSX/OSXClipboard.mm	2019-07-03 12:39:20.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/OSXClipboard.mm	2019-07-03 12:21:20.000000000 -0400
+@@ -13,7 +13,7 @@
+ 
+ 	if ((text != NULL) && (strlen(text) > 0))
+ 	{
+-		str = [NSString stringWithCString:text encoding:NSWindowsCP1252StringEncoding];
++		str = [NSString stringWithUTF8String:text];
+ 		board = [NSPasteboard generalPasteboard];
+ 		[board declareTypes:[NSArray arrayWithObject:NSStringPboardType] owner:NSApp];
+ 		[board setString:str forType:NSStringPboardType];
+@@ -30,7 +30,7 @@
+ 	board = [NSPasteboard generalPasteboard];
+ 	str = [board stringForType:NSStringPboardType];
+ 	if (str != nil)
+-		result = (char*)[str cStringUsingEncoding:NSWindowsCP1252StringEncoding];
++		result = (char*)[str UTF8String];
+ 	return (result);
+ }
+ 
+diff -ur source/Irrlicht/libpng/pngpriv.h source-fixed/Irrlicht/libpng/pngpriv.h
+--- source/Irrlicht/libpng/pngpriv.h	2016-07-09 05:21:44.000000000 -0400
++++ ../source-fixed/Irrlicht/libpng/pngpriv.h	2019-07-03 15:15:50.000000000 -0400
+@@ -798,7 +798,7 @@
+  * must match that used in the build, or we must be using pnglibconf.h.prebuilt:
+  */
+ #if PNG_ZLIB_VERNUM != 0 && PNG_ZLIB_VERNUM != ZLIB_VERNUM
+-#  error ZLIB_VERNUM != PNG_ZLIB_VERNUM \
++#  warning ZLIB_VERNUM != PNG_ZLIB_VERNUM \
+       "-I (include path) error: see the notes in pngpriv.h"
+    /* This means that when pnglibconf.h was built the copy of zlib.h that it
+     * used is not the same as the one being used here.  Because the build of

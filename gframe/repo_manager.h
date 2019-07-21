@@ -4,6 +4,7 @@
 #include <atomic>
 #include <map>
 #include <future>
+#include <string>
 #include <vector>
 #include <mutex>
 extern "C" {

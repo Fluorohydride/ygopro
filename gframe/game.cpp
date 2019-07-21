@@ -904,7 +904,7 @@ void Game::MainLoop() {
 		}
 		frame_counter += (float)delta_time * 60.0f/1000.0f;
 		float remainder;
-		frame_counter = modf(frame_counter, &remainder);
+		frame_counter = std::modf(frame_counter, &remainder);
 		delta_frames = std::round(remainder);
 		for(int i = 0; i < delta_frames; i++){
 			linePatternD3D = (linePatternD3D + 1) % 30;

@@ -1,9 +1,7 @@
 project "Irrlicht"
 	kind "StaticLib"
-
-	includedirs { "include", "src/zlib", "src/jpeglib", "src/libpng", "$(DXSDK_DIR)Include" } 
-	libdirs "$(DXSDK_DIR)Lib/x86"
-	dofile("../irrlicht defines.lua")
+	includedirs "include"
+	dofile("defines.lua")
 	exceptionhandling "Off"
 	rtti "Off"
 	files { "**.cpp", "**.c", "**.cxx", "**.hpp", "**.h" }
@@ -13,6 +11,8 @@ project "Irrlicht"
 
 	filter "options:not no-direct3d"
 		defines "IRR_COMPILE_WITH_DX9_DEV_PACK"
+		includedirs "$(DXSDK_DIR)Include"
+		libdirs "$(DXSDK_DIR)Lib/x86"
 
 	filter "action:vs*"
 		defines { "IRRLICHT_FAST_MATH", "UNICODE", "_UNICODE" }

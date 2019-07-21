@@ -1,0 +1,147 @@
+language: cpp
+sudo: required
+dist: xenial
+git:
+  depth: 1
+  submodules: false
+env:
+  global:
+  - BUILD_CONFIG=release
+  - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
+addons:
+  apt:
+    update: true
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-9
+    - p7zip-full 
+    - libevent-dev 
+    - libfreetype6-dev
+    - libirrlicht-dev 
+    - liblua5.3-dev 
+    - libsqlite3-dev 
+    - libgl1-mesa-dev 
+    - libglu-dev 
+    - libgit2-dev
+  homebrew:
+    update: true
+    packages:
+    - dylibbundler
+    - gpatch
+    - p7zip
+    - libevent
+    - freetype
+    - sqlite 
+    - curl
+    - libgit2
+    - fmt
+    - nlohmann-json
+matrix:
+  include:
+  - name: "Windows 10"
+    os: windows
+    env: DEPLOY_BRANCH=travis-windows
+    cache: false
+  - name: "Mojave"
+    os: osx
+    osx_image: xcode10.2
+    env:  DEPLOY_BRANCH=travis-mojave
+  - name: "High Sierra"
+    os: osx
+    osx_image: xcode9.4
+    env: DEPLOY_BRANCH=travis-high-sierra
+  - name: "Sierra"
+    os: osx
+    osx_image: xcode9.2
+    env: DEPLOY_BRANCH=travis-sierra
+  - name: "El Capitan"
+    os: osx
+    osx_image: xcode8
+    env: DEPLOY_BRANCH=travis-el-capitan
+  - name: "Xenial GCC9"
+    os: linux
+    compiler: gcc  
+    env:
+    - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"  
+    - DEPLOY_BRANCH=travis-linux
+  - name: "Xenial GCC5.4"
+    os: linux
+    compiler: gcc
+    env: BUILD_CONFIG=release
+    deploy: false
+before_install:
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/install-windows-bin.sh; fi  
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-support/install-ubuntu-bin.sh; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-support/install-macOS-bin.sh; fi  
+install:
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 
+    export VCPKG_ROOT=/c/vcpkg;
+    ./build-support/install-windows-vcpkg-cache.sh;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 
+    if [[ -f cache/lib/libfmt.a ]]; then 
+      sudo cp -r cache/* /usr/local/ && rm -rf cache && echo "Loaded fmt and nlohmann-json from cache.";   
+    else
+      ./build-support/install-ubuntu-src.sh;
+    fi; 
+  fi 
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
+    if [[ -f cache/libIrrlicht.a ]]; then 
+      sudo cp -r cache/irrlicht /usr/local/include &&
+      sudo cp cache/lua.h cache/luaconf.h cache/lualib.h cache/lauxlib.h cache/lua.hpp /usr/local/include &&
+      sudo cp cache/*.a /usr/local/lib &&
+      rm -rf cache && echo "Loaded irrlicht and lua-c++ from cache.";   
+    else
+      ./build-support/install-macOS-src.sh; 
+    fi ;
+  fi
+before_script:
+- git submodule update --depth=1 --init --recursive; echo Ignoring script/ clone failures.
+script:
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    ./premake5 vs2017 --no-direct3d --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
+    "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln;
+  else
+    ./premake5 gmake2 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
+    make -Cbuild config=$BUILD_CONFIG;
+  fi
+before_deploy:
+- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/deploy-windows.sh; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-support/deploy-ubuntu.sh; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-support/deploy-macOS.sh; fi
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: bash ./build-support/travis-windows-deploy.sh
+  on:
+    all_branches: true
+    condition: "$TRAVIS_OS_NAME == windows"
+- provider: pages
+  skip_cleanup: true
+  local_dir: deploy
+  github_token: $DEPLOY_TOKEN
+  repo: $DEPLOY_REPO
+  target_branch: $DEPLOY_BRANCH
+  on:
+    all_branches: true
+    condition: "$TRAVIS_OS_NAME != windows"
+before_cache:
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    mkdir -p cache/include && mkdir -p cache/lib/cmake &&
+    cp -r /usr/local/lib/cmake/fmt cache/lib/cmake/fmt &&
+    cp -r /usr/local/lib/pkgconfig cache/lib/pkgconfig &&
+    cp /usr/local/lib/libfmt.a cache/lib/libfmt.a &&
+    cp -r /usr/local/include/fmt cache/include/fmt &&
+    cp -r /usr/local/include/nlohmann cache/include/nlohmann; 
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    mkdir -p cache &&
+    cp -r /usr/local/include/irrlicht cache/irrlicht &&
+    cp /usr/local/lib/libIrrlicht.a cache/libIrrlicht.a &&
+    cp /usr/local/include/lua.h /usr/local/include/luaconf.h /usr/local/include/lualib.h /usr/local/include/lauxlib.h /usr/local/include/lua.hpp cache &&
+    cp /usr/local/lib/liblua.a cache/liblua.a;
+  fi
+cache:
+  directories:
+  - cache

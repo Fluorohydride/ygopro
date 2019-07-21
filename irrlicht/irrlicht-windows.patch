@@ -1,0 +1,303 @@
+diff -ur --strip-trailing-cr irrlicht/src/Irrlicht.cpp irrlicht-fixed/src/Irrlicht.cpp
+--- irrlicht/src/Irrlicht.cpp	2012-11-03 14:08:00.000000000 -0400
++++ irrlicht-fixed/src/Irrlicht.cpp	2019-06-30 15:41:56.327847700 -0400
+@@ -127,7 +127,7 @@
+ } // end namespace irr
+ 
+ 
+-#if defined(_IRR_WINDOWS_API_)
++#if defined(_IRR_WINDOWS_API_) && !defined(_IRR_STATIC_LIB_)
+ 
+ BOOL APIENTRY DllMain( HANDLE hModule,
+                        DWORD  ul_reason_for_call,
+diff -ur --strip-trailing-cr irrlicht/include/IOSOperator.h irrlicht-fixed/include/IOSOperator.h
+--- irrlicht/include/IOSOperator.h	2012-11-03 19:08:34.000000000 +0800
++++ irrlicht-fixed/include/IOSOperator.h	2017-09-09 18:50:04.693119800 +0800
+@@ -26,11 +26,11 @@
+ 	}
+ 
+ 	//! Copies text to the clipboard
+-	virtual void copyToClipboard(const c8* text) const = 0;
++	virtual void copyToClipboard(const c16* text) const = 0;
+ 
+ 	//! Get text from the clipboard
+ 	/** \return Returns 0 if no string is in there. */
+-	virtual const c8* getTextFromClipboard() const = 0;
++	virtual const c16* getTextFromClipboard() const = 0;
+ 
+ 	//! Get the processor speed in megahertz
+ 	/** \param MHz The integer variable to store the speed in.
+diff -ur --strip-trailing-cr irrlicht/include/irrTypes.h irrlicht-fixed/include/irrTypes.h
+--- irrlicht/include/irrTypes.h	2012-11-19 18:20:40.000000000 +0800
++++ irrlicht-fixed/include/irrTypes.h	2017-09-09 18:54:19.126672600 +0800
+@@ -48,6 +48,9 @@
+ typedef signed short		s16;
+ #endif
+ 
++//! 16 bit character variable.
++/** This is a typedef for wchar_t, it ensures portability of the engine. */
++typedef wchar_t			c16;
+ 
+ 
+ //! 32 bit unsigned variable.
+diff -ur --strip-trailing-cr irrlicht/src/CGUIEditBox.cpp irrlicht-fixed/src/CGUIEditBox.cpp
+--- irrlicht/src/CGUIEditBox.cpp	2014-09-17 20:23:10.000000000 +0800
++++ irrlicht-fixed/src/CGUIEditBox.cpp	2017-09-09 18:50:04.709120800 +0800
+@@ -287,7 +287,7 @@
+ 				const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+-				core::stringc s;
++				core::stringw s;
+ 				s = Text.subString(realmbgn, realmend - realmbgn).c_str();
+ 				Operator->copyToClipboard(s.c_str());
+ 			}
+@@ -300,7 +300,7 @@
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+ 				// copy
+-				core::stringc sc;
++				core::stringw sc;
+ 				sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
+ 				Operator->copyToClipboard(sc.c_str());
+ 
+@@ -330,16 +330,10 @@
+ 				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+ 
+ 				// add new character
+-				const c8* p = Operator->getTextFromClipboard();
++				const c16* p = Operator->getTextFromClipboard();
+ 				if (p)
+ 				{
+-					// TODO: we should have such a function in core::string
+-					size_t lenOld = strlen(p);
+-					wchar_t *ws = new wchar_t[lenOld + 1];
+-					size_t len = mbstowcs(ws,p,lenOld);
+-					ws[len] = 0;
+-					irr::core::stringw widep(ws);
+-					delete[] ws;
++					irr::core::stringw widep(p);
+ 
+ 					if (MarkBegin == MarkEnd)
+ 					{
+@@ -664,6 +658,16 @@
+ 	case KEY_ESCAPE:
+ 	case KEY_TAB:
+ 	case KEY_SHIFT:
++	case KEY_LSHIFT:
++	case KEY_RSHIFT:
++	case KEY_MENU:
++	case KEY_LMENU:
++	case KEY_RMENU:
++	case KEY_LWIN:
++	case KEY_RWIN:
++	case KEY_CAPITAL:
++	case KEY_NUMLOCK:
++	case KEY_SCROLL:
+ 	case KEY_F1:
+ 	case KEY_F2:
+ 	case KEY_F3:
+diff -ur --strip-trailing-cr irrlicht/src/CGUIListBox.cpp irrlicht-fixed/src/CGUIListBox.cpp
+--- irrlicht/src/CGUIListBox.cpp	2016-05-26 12:09:34.000000000 +0800
++++ irrlicht-fixed/src/CGUIListBox.cpp	2017-09-09 18:50:04.720121400 +0800
+@@ -425,7 +425,7 @@
+ 				}
+ 
+ 				case EMIE_MOUSE_MOVED:
+-					if (Selecting || MoveOverSelect)
++					if (MoveOverSelect)
+ 					{
+ 						if (isPointInside(p))
+ 						{
+diff -ur --strip-trailing-cr irrlicht/src/CIrrDeviceWin32.cpp irrlicht-fixed/src/CIrrDeviceWin32.cpp
+--- irrlicht/src/CIrrDeviceWin32.cpp	2016-05-26 12:09:34.000000000 +0800
++++ irrlicht-fixed/src/CIrrDeviceWin32.cpp	2017-09-09 18:56:09.679995900 +0800
+@@ -20,6 +20,8 @@
+ #include "COSOperator.h"
+ #include "dimension2d.h"
+ #include "IGUISpriteBank.h"
++#include "IGUIEnvironment.h"
++#include "IGUIElement.h"
+ #include <winuser.h>
+ #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
+ #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
+@@ -749,6 +751,26 @@
+ 		return 0;
+ 	}
+ 
++	{
++		dev = getDeviceFromHWnd(hWnd);
++		if (dev)
++		{
++			irr::gui::IGUIElement* ele = dev->getGUIEnvironment()->getFocus();
++			if (!ele || (ele->getType() != irr::gui::EGUIET_EDIT_BOX) || !ele->isEnabled())
++			{
++				HIMC hIMC = ImmGetContext(hWnd);
++				if (hIMC)
++				{
++					ImmNotifyIME(hIMC, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
++					ImmReleaseContext(hWnd, hIMC);
++				}
++				ImmAssociateContextEx(hWnd, NULL, 0);
++			}
++			else
++				ImmAssociateContextEx(hWnd, NULL, IACE_DEFAULT);
++		}
++	}
++
+ 	switch (message)
+ 	{
+ 	case WM_PAINT:
+@@ -773,7 +795,11 @@
+ 			event.KeyInput.Key = (irr::EKEY_CODE)wParam;
+ 			event.KeyInput.PressedDown = (message==WM_KEYDOWN || message == WM_SYSKEYDOWN);
+ 
++#ifdef MAPVK_VSC_TO_VK_EX
++			const UINT MY_MAPVK_VSC_TO_VK_EX = MAPVK_VSC_TO_VK_EX;
++#else
+ 			const UINT MY_MAPVK_VSC_TO_VK_EX = 3; // MAPVK_VSC_TO_VK_EX should be in SDK according to MSDN, but isn't in mine.
++#endif
+ 			if ( event.KeyInput.Key == irr::KEY_SHIFT )
+ 			{
+ 				// this will fail on systems before windows NT/2000/XP, not sure _what_ will return there instead.
+@@ -904,6 +930,53 @@
+ 		KEYBOARD_INPUT_HKL = GetKeyboardLayout(0);
+ 		KEYBOARD_INPUT_CODEPAGE = LocaleIdToCodepage( LOWORD(KEYBOARD_INPUT_HKL) );
+ 		return 0;
++
++	case WM_IME_STARTCOMPOSITION:
++		{
++			dev = getDeviceFromHWnd(hWnd);
++			irr::gui::IGUIElement* ele = dev->getGUIEnvironment()->getFocus();
++			if (!ele)
++				break;
++			irr::core::position2di pos = ele->getAbsolutePosition().UpperLeftCorner;
++			COMPOSITIONFORM CompForm = { CFS_POINT, { pos.X, pos.Y + ele->getAbsolutePosition().getHeight() } };
++			HIMC hIMC = ImmGetContext(hWnd);
++			ImmSetCompositionWindow(hIMC, &CompForm);
++			ImmReleaseContext(hWnd, hIMC);
++		}
++		break;
++
++	case WM_IME_CHAR:
++		event.EventType = irr::EET_KEY_INPUT_EVENT;
++		event.KeyInput.PressedDown = true;
++#ifdef _UNICODE
++		event.KeyInput.Char = wParam;
++#else
++		BYTE ch[3];
++		if (wParam >> 8) {
++			ch[0] = wParam >> 8;
++			ch[1] = wParam & 0xff;
++			ch[2] = 0;
++		} else {
++			ch[0] = wParam;
++			ch[1] = 0;
++		}
++		WORD unicodeChar;
++		MultiByteToWideChar(
++			KEYBOARD_INPUT_CODEPAGE,
++			MB_PRECOMPOSED, // default
++			(LPCSTR)ch,
++			sizeof(wParam),
++			(WCHAR*)&unicodeChar,
++			1);
++		event.KeyInput.Char = unicodeChar;
++#endif
++		event.KeyInput.Key = irr::KEY_ACCEPT;
++		event.KeyInput.Shift = 0;
++		event.KeyInput.Control = 0;
++		dev = getDeviceFromHWnd(hWnd);
++		if (dev)
++			dev->postEventFromUser(event);
++		return 0;
+ 	}
+ 	return DefWindowProc(hWnd, message, wParam, lParam);
+ }
+@@ -1797,8 +1870,8 @@
+ 
+ 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+ 	{
+-		// No message translation because we don't use WM_CHAR and it would conflict with our
+-		// deadkey handling.
++		// conflict with deadkey handling.
++		TranslateMessage(&msg);
+ 
+ 		if (ExternalWindow && msg.hwnd == HWnd)
+ 			WndProc(HWnd, msg.message, msg.wParam, msg.lParam);
+diff -ur --strip-trailing-cr irrlicht/src/COSOperator.cpp irrlicht-fixed/src/COSOperator.cpp
+--- irrlicht/src/COSOperator.cpp	2012-11-03 19:07:52.000000000 +0800
++++ irrlicht-fixed/src/COSOperator.cpp	2017-09-09 18:50:04.715121100 +0800
+@@ -52,9 +52,9 @@
+ 
+ 
+ //! copies text to the clipboard
+-void COSOperator::copyToClipboard(const c8* text) const
++void COSOperator::copyToClipboard(const c16* text) const
+ {
+-	if (strlen(text)==0)
++	if (wcslen(text)==0)
+ 		return;
+ 
+ // Windows version
+@@ -66,15 +66,15 @@
+ 	EmptyClipboard();
+ 
+ 	HGLOBAL clipbuffer;
+-	char * buffer;
++	wchar_t * buffer;
+ 
+-	clipbuffer = GlobalAlloc(GMEM_DDESHARE, strlen(text)+1);
+-	buffer = (char*)GlobalLock(clipbuffer);
++	clipbuffer = GlobalAlloc(GMEM_DDESHARE, sizeof(wchar_t) * (wcslen(text) + 1));
++	buffer = (wchar_t*)GlobalLock(clipbuffer);
+ 
+-	strcpy(buffer, text);
++	wcscpy(buffer, text);
+ 
+ 	GlobalUnlock(clipbuffer);
+-	SetClipboardData(CF_TEXT, clipbuffer);
++	SetClipboardData(CF_UNICODETEXT, clipbuffer);
+ 	CloseClipboard();
+ 
+ // MacOSX version
+@@ -93,7 +93,7 @@
+ 
+ //! gets text from the clipboard
+ //! \return Returns 0 if no string is in there.
+-const c8* COSOperator::getTextFromClipboard() const
++const c16* COSOperator::getTextFromClipboard() const
+ {
+ #if defined(_IRR_XBOX_PLATFORM_)
+ 		return 0;
+@@ -101,10 +101,10 @@
+ 	if (!OpenClipboard(NULL))
+ 		return 0;
+ 
+-	char * buffer = 0;
++	wchar_t * buffer = 0;
+ 
+-	HANDLE hData = GetClipboardData( CF_TEXT );
+-	buffer = (char*)GlobalLock( hData );
++	HANDLE hData = GetClipboardData( CF_UNICODETEXT );
++	buffer = (wchar_t*)GlobalLock( hData );
+ 	GlobalUnlock( hData );
+ 	CloseClipboard();
+ 	return buffer;
+diff -ur --strip-trailing-cr irrlicht/src/COSOperator.h irrlicht-fixed/src/COSOperator.h
+--- irrlicht/src/COSOperator.h	2012-11-03 19:08:00.000000000 +0800
++++ irrlicht-fixed/src/COSOperator.h	2017-09-09 18:50:04.717121200 +0800
+@@ -27,11 +27,11 @@
+ 	virtual const core::stringc& getOperatingSystemVersion() const;
+ 
+ 	//! copies text to the clipboard
+-	virtual void copyToClipboard(const c8* text) const;
++	virtual void copyToClipboard(const c16* text) const;
+ 
+ 	//! gets text from the clipboard
+ 	//! \return Returns 0 if no string is in there.
+-	virtual const c8* getTextFromClipboard() const;
++	virtual const c16* getTextFromClipboard() const;
+ 
+ 	//! gets the processor speed in megahertz
+ 	//! \param Mhz:

@@ -1,6 +1,16 @@
 newoption {
 	trigger		= "no-direct3d",
-	description	= "Disable directx options in irrlicht if the DirectX SDK isn't installed"
+	description	= "Disable DirectX options in irrlicht if the DirectX SDK isn't installed"
+}
+newoption {
+	trigger = "pics",
+	value = "url_template",
+	description = "Default URL for card images"
+}
+newoption {
+	trigger = "fields",
+	value = "url_template",
+	description = "Default URL for Field Spell backgrounds"
 }
 workspace "ygo"
 	location "build"
@@ -21,7 +31,7 @@ workspace "ygo"
 	filter "system:macosx"
 		toolset "clang"
 		buildoptions { "-fms-extensions" }
-		includedirs { "/usr/local/include", "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
+		includedirs { "/usr/local/include" }
 		libdirs { "/usr/local/lib" }
 		links { "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
 
@@ -50,10 +60,12 @@ workspace "ygo"
 	filter "configurations:Release"
 		optimize "Size"
 		targetdir "bin/release"
+	
 	subproject = true
 	include "ocgcore"
 	include "gframe"
 	if os.istarget("windows") then
+		include "freetype"
 		include "irrlicht"
 	end
 
