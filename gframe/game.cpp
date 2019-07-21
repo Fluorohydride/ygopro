@@ -20,7 +20,7 @@
 #include "replay_mode.h"
 #include "single_mode.h"
 #ifdef _WIN32
-#include "IrrlichtCommonIncludes/CIrrDeviceWin32.h"
+#include "../irrlicht/src/CIrrDeviceWin32.h"
 #endif
 
 unsigned short PRO_VERSION = 0x1348;
