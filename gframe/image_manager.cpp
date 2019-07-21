@@ -261,29 +261,29 @@ int ImageManager::LoadThumbThread(int code) {
 		int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 		if(img->getDimension() == irr::core::dimension2d<u32>(width, height)) {
 			img->grab();
-			imageManager.tThumbLoadingMutex.Lock();
+			imageManager.tThumbLoadingMutex.lock();
 			imageManager.tThumbLoading[code] = img;
-			imageManager.tThumbLoadingMutex.Unlock();
+			imageManager.tThumbLoadingMutex.unlock();
 		} else {
 			irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<u32>(width, height));
 			imageScaleNNAA(img, destimg);
 			img->drop();
 			destimg->grab();
-			imageManager.tThumbLoadingMutex.Lock();
+			imageManager.tThumbLoadingMutex.lock();
 			imageManager.tThumbLoading[code] = destimg;
-			imageManager.tThumbLoadingMutex.Unlock();
+			imageManager.tThumbLoadingMutex.unlock();
 		}
 	} else {
-		imageManager.tThumbLoadingMutex.Lock();
+		imageManager.tThumbLoadingMutex.lock();
 		imageManager.tThumbLoading[code] = NULL;
-		imageManager.tThumbLoadingMutex.Unlock();
+		imageManager.tThumbLoadingMutex.unlock();
 	}
 	return 0;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
 		return tUnknownThumb;
-	imageManager.tThumbLoadingMutex.Lock();
+	imageManager.tThumbLoadingMutex.lock();
 	auto lit = tThumbLoading.find(code);
 	if(lit != tThumbLoading.end()) {
 		if(lit->second != NULL) {
@@ -297,7 +297,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		}
 		tThumbLoading.erase(lit);
 	}
-	imageManager.tThumbLoadingMutex.Unlock();
+	imageManager.tThumbLoadingMutex.unlock();
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		tThumb[code] = tLoading;

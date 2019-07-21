@@ -24,7 +24,7 @@ public:
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
 	std::unordered_map<int, irr::video::ITexture*> tFields;
 	std::unordered_map<int, irr::video::IImage*> tThumbLoading;
-	Mutex tThumbLoadingMutex;
+	std::mutex tThumbLoadingMutex;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::video::ITexture* tCover[4];
