@@ -212,10 +212,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			soundManager.PlaySoundEffect(SOUND_BUTTON);
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1339));
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
@@ -274,22 +274,22 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				wchar_t textBuffer[256];
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337));
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				prev_sel = sel;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.Lock();
+					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -323,10 +323,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_MANAGE_DECK: {
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.Lock();
+					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -334,69 +334,69 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_NEW_CATEGORY: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1469));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_RENAME_CATEGORY: {
 				if(mainGame->lstCategories->getSelected() < 4)
 					break;
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1469));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_DELETE_CATEGORY: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1470));
 				mainGame->stDMMessage2->setVisible(true);
 				mainGame->stDMMessage2->setText(mainGame->lstCategories->getListItem(mainGame->lstCategories->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_NEW_DECK: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_RENAME_DECK: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1471));
 				mainGame->ebDMName->setVisible(true);
 				mainGame->ebDMName->setText(L"");
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_DELETE_DECK_DM: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1337));
 				mainGame->stDMMessage2->setVisible(true);
 				mainGame->stDMMessage2->setText(mainGame->lstDecks->getListItem(mainGame->lstDecks->getSelected()));
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_MOVE_DECK: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1472));
 				mainGame->cbDMCategory->setVisible(true);
 				mainGame->cbDMCategory->clear();
@@ -408,12 +408,12 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
 			case BUTTON_COPY_DECK: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->stDMMessage->setText(dataManager.GetSysString(1473));
 				mainGame->cbDMCategory->setVisible(true);
 				mainGame->cbDMCategory->clear();
@@ -425,7 +425,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDMCategory->addItem(mainGame->lstCategories->getListItem(i));
 				}
 				mainGame->PopupElement(mainGame->wDMQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
@@ -849,10 +849,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						break;
 				}
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.Lock();
+					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -865,10 +865,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				if(is_modified && !readonly && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.Lock();
+					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}

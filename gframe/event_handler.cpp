@@ -91,8 +91,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				if(mainGame->dInfo.isReplay)
 					ReplayMode::SwapField();
-				else if (mainGame->dInfo.player_type == 7)
-					mainGame->dField.ReplaySwap();
+				else if(mainGame->dInfo.player_type == 7)
+					DuelClient::SwapField();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {
@@ -963,7 +963,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode();
+				UpdateDeclarableList();
 				break;
 			}
 			}
@@ -972,7 +972,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode();
+				UpdateDeclarableList();
 				break;
 			}
 			}
@@ -1537,8 +1537,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 							str.append(formatBuffer);
 							if(mcard->type & TYPE_MONSTER) {
-								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)
-								        && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
+								if(mcard->alias && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
@@ -1560,7 +1559,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(formatBuffer);
 								}
 							} else {
-								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
+								if(mcard->alias && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}

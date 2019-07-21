@@ -60,14 +60,13 @@ public:
 	bool select_panalmode;
 	bool select_ready;
 	int announce_count;
-	int declarable_type;
 	int select_counter_count;
 	int select_counter_type;
 	std::vector<ClientCard*> selectable_cards;
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> opcode;
+	std::vector<int> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
@@ -112,9 +111,7 @@ public:
 	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);
 	bool check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count);
 
-	void UpdateDeclarableCodeType();
-	void UpdateDeclarableCodeOpcode();
-	void UpdateDeclarableCode();
+	void UpdateDeclarableList();
 
 	irr::gui::IGUIElement* panel;
 	std::vector<int> ancard;
