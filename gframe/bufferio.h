@@ -31,37 +31,10 @@ public:
 		p += sizeof(T);
 		return ret;
 	}
-	inline static int64_t ReadInt64(char*& p) {
-		return Read<int64_t>(p);
-	}
-	inline static int32_t ReadInt32(char*& p) {
-		return Read<int32_t>(p);
-	}
-	inline static int16_t ReadInt16(char*& p) {
-		return Read<int16_t>(p);
-	}
-	inline static int8_t ReadInt8(char*& p) {
-		return Read<int8_t>(p);
-	}
-	inline static uint8_t ReadUInt8(char*& p) {
-		return Read<uint8_t>(p);
-	}
 	template<typename T>
 	inline static void Write(char*& p, T value) {
 		std::memcpy(p, &value, sizeof(T));
 		p += sizeof(T);
-	}
-	inline static void WriteInt64(char*& p, long long val) {
-		Write<int64_t>(p, val);
-	}
-	inline static void WriteInt32(char*& p, int val) {
-		Write<int32_t>(p, val);
-	}
-	inline static void WriteInt16(char*& p, short val) {
-		Write<int16_t>(p, val);
-	}
-	inline static void WriteInt8(char*& p, char val) {
-		Write<int8_t>(p, val);
 	}
 	template<typename T1, typename T2>
 	inline static int CopyWStr(T1* src, T2* pstr, int bufsize) {

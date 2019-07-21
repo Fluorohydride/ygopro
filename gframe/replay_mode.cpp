@@ -263,7 +263,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 		}
 		case MSG_AI_NAME: {
 			char* pbuf = (char*)p.data.data();
-			int len = BufferIO::ReadInt16(pbuf);
+			int len = BufferIO::Read<uint16_t>(pbuf);
 			char* begin = pbuf;
 			pbuf += len + 1;
 			std::string namebuf;

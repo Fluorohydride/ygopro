@@ -234,7 +234,7 @@ void Replay::ParseParams() {
 	}
 	params.duel_flags = Read<int32_t>();
 	if(pheader.flag & REPLAY_SINGLE_MODE && pheader.id == 0x31707279) {
-		size_t slen = Read<int16_t>();
+		size_t slen = Read<uint16_t>();
 		scriptname.resize(slen);
 		ReadData(&scriptname[0], slen);
 	}
@@ -281,7 +281,7 @@ void Replay::ParseStream() {
 	while(ReadNextPacket(&p)) {
 		if(p.message == MSG_AI_NAME) {
 			char* pbuf = (char*)p.data.data();
-			int len = BufferIO::Read<int16_t>(pbuf);
+			int len = BufferIO::Read<uint16_t>(pbuf);
 			std::string namebuf;
 			namebuf.resize(len);
 			memcpy(&namebuf[0], pbuf, len + 1);

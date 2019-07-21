@@ -225,14 +225,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->ClearCardInfo();
 				char deckbuf[1024];
 				char* pdeck = deckbuf;
-				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
-				BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
+				BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
+				BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.side.size());
 				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->code);
+					BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.main[i]->code);
 				for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->code);
+					BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.extra[i]->code);
 				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->code);
+					BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.side[i]->code);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 				break;
 			}

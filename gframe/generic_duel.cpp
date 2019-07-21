@@ -418,8 +418,8 @@ void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 	if(dp->type >= (players.home_size + players.opposing_size) || dueler.ready)
 		return;
 	char* deckbuf = (char*)pdata;
-	int mainc = BufferIO::ReadInt32(deckbuf);
-	int sidec = BufferIO::ReadInt32(deckbuf);
+	int mainc = BufferIO::Read<int32_t>(deckbuf);
+	int sidec = BufferIO::Read<int32_t>(deckbuf);
 	// verify data
 	if((unsigned)mainc + (unsigned)sidec > (len - 8) / 4) {
 		STOC_ErrorMsg scem;
@@ -652,14 +652,14 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	last_replay.Flush();
 	char startbuf[32], *pbuf = startbuf;
-	BufferIO::WriteInt8(pbuf, MSG_START);
-	BufferIO::WriteInt8(pbuf, 0);
-	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	BufferIO::WriteInt32(pbuf, host_info.start_lp);
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, 0x1));
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 0, 0x40));
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x1));
-	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x40));
+	BufferIO::Write<int8_t>(pbuf, MSG_START);
+	BufferIO::Write<int8_t>(pbuf, 0);
+	BufferIO::Write<int32_t>(pbuf, host_info.start_lp);
+	BufferIO::Write<int32_t>(pbuf, host_info.start_lp);
+	BufferIO::Write<int16_t>(pbuf, query_field_count(pduel, 0, 0x1));
+	BufferIO::Write<int16_t>(pbuf, query_field_count(pduel, 0, 0x40));
+	BufferIO::Write<int16_t>(pbuf, query_field_count(pduel, 1, 0x1));
+	BufferIO::Write<int16_t>(pbuf, query_field_count(pduel, 1, 0x40));
 	for (auto& dueler : players.home)
 		NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, startbuf, 18);
 	startbuf[1] = 1;
@@ -766,7 +766,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 		replay_stream.clear();
 		bool record = true;
 		offset = pbuf;
-		unsigned char message = BufferIO::ReadUInt8(pbuf);
+		unsigned char message = BufferIO::Read<uint8_t>(pbuf);
 		ReplayPacket pk(message, pbuf, len - 1);
 		switch (message) {
 		case MSG_RETRY: {
@@ -776,9 +776,9 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			return 1;
 		}
 		case MSG_HINT: {
-			type = BufferIO::ReadUInt8(pbuf);
-			player = BufferIO::ReadUInt8(pbuf);
-			BufferIO::ReadInt64(pbuf);
+			type = BufferIO::Read<uint8_t>(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			BufferIO::BufferIO::Read<int64_t>(pbuf);
 			switch (type) {
 			case 1:
 			case 2:
@@ -807,8 +807,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_WIN: {
-			player = BufferIO::ReadUInt8(pbuf);
-			type = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			type = BufferIO::Read<uint8_t>(pbuf);
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
 				NetServer::ReSendToPlayer(dueler.player);
@@ -824,10 +824,10 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			return 2;
 		}
 		case MSG_SELECT_BATTLECMD: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 18;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 8 + 2;
 			RefreshMzone(0);
 			RefreshMzone(1);
@@ -840,18 +840,18 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			return 1;
 		}
 		case MSG_SELECT_IDLECMD: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 7;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 18 + 3;
 			RefreshMzone(0);
 			RefreshMzone(1);
@@ -864,80 +864,80 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			return 1;
 		}
 		case MSG_SELECT_EFFECTYN: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 22;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_YESNO: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 8;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_OPTION: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 8;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_CARD: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 9;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			for(int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				/*code = */BufferIO::ReadInt32(pbuf);
+				/*code = */BufferIO::Read<int32_t>(pbuf);
 				loc_info info = ClientCard::read_location_info(pbuf);
-				if(info.controler != player) BufferIO::WriteInt32(pbufw, 0);
+				if(info.controler != player) BufferIO::Write<int32_t>(pbufw, 0);
 			}
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_TRIBUTE: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 9;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				/*code = */BufferIO::ReadInt32(pbuf);
-				int controler = BufferIO::ReadUInt8(pbuf);
+				/*code = */BufferIO::Read<int32_t>(pbuf);
+				int controler = BufferIO::Read<uint8_t>(pbuf);
 				pbuf += 6;
-				if(controler != player) BufferIO::WriteInt32(pbufw, 0);
+				if(controler != player) BufferIO::Write<int32_t>(pbufw, 0);
 			}
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_UNSELECT_CARD: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 10;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			for(int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				/*code = */BufferIO::ReadInt32(pbuf);
+				/*code = */BufferIO::Read<int32_t>(pbuf);
 				loc_info info = ClientCard::read_location_info(pbuf);
-				if(info.controler != player) BufferIO::WriteInt32(pbufw, 0);
+				if(info.controler != player) BufferIO::Write<int32_t>(pbufw, 0);
 			}
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			for(int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				/*code = */BufferIO::ReadInt32(pbuf);
+				/*code = */BufferIO::Read<int32_t>(pbuf);
 				loc_info info = ClientCard::read_location_info(pbuf);
-				if(info.controler != player) BufferIO::WriteInt32(pbufw, 0);
+				if(info.controler != player) BufferIO::Write<int32_t>(pbufw, 0);
 			}
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_CHAIN: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += 10 + count * 23;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
@@ -945,34 +945,34 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 		}
 		case MSG_SELECT_PLACE:
 		case MSG_SELECT_DISFIELD: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_POSITION: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_COUNTER: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 4;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 9;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_SUM: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 13;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 14;
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 14;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
@@ -980,16 +980,16 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 		}
 		case MSG_SORT_CARD:
 		case MSG_SORT_CHAIN: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 13;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_CONFIRM_DECKTOP: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1001,8 +1001,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_CONFIRM_EXTRATOP: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1014,8 +1014,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_CONFIRM_CARDS: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			if(pbuf[5] != LOCATION_DECK) {
 				pbuf += count * 10;
 				NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
@@ -1032,7 +1032,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_DECK: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
 				NetServer::ReSendToPlayer(dueler.player);
@@ -1044,12 +1044,12 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_HAND: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			for(auto& dueler : (player == 0) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
 			for(int i = 0; i < count; ++i)
-				BufferIO::WriteInt32(pbuf, 0);
+				BufferIO::Write<int32_t>(pbuf, 0);
 			for(auto& dueler : (player == 1) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -1059,12 +1059,12 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_EXTRA: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			for(auto& dueler : (player == 0) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
 			for(int i = 0; i < count; ++i)
-				BufferIO::WriteInt32(pbuf, 0);
+				BufferIO::Write<int32_t>(pbuf, 0);
 			for(auto& dueler : (player == 1) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -1085,7 +1085,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SWAP_GRAVE_DECK: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
 				NetServer::ReSendToPlayer(dueler.player);
@@ -1120,8 +1120,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_SET_CARD: {
-			int loc = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadUInt8(pbuf);
+			int loc = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count * 20;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1185,7 +1185,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			for(auto& dueler : (player == 0) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, pbuf - offset);
 			if (!(current.location & (LOCATION_GRAVE + LOCATION_OVERLAY)) && ((current.location & (LOCATION_DECK + LOCATION_HAND)) || (current.position & POS_FACEDOWN)))
-				BufferIO::WriteInt32(pbufw, 0);
+				BufferIO::Write<int32_t>(pbufw, 0);
 			for(auto& dueler : (player == 1) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -1214,7 +1214,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_SET: {
-			BufferIO::WriteInt32(pbuf, 0);
+			BufferIO::Write<int32_t>(pbuf, 0);
 			pbuf += 10;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1303,7 +1303,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_FLIPSUMMONING: {
-			BufferIO::ReadInt32(pbuf);
+			BufferIO::Read<int32_t>(pbuf);
 			loc_info info = ClientCard::read_location_info(pbuf);
 			RefreshSingle(info.controler, info.location, info.sequence);
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
@@ -1424,14 +1424,14 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_CARD_SELECTED: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 4;
 			break;
 		}
 		case MSG_RANDOM_SELECTED: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1443,7 +1443,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_BECOME_TARGET: {
-			count = BufferIO::ReadInt32(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbuf += count * 10;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1455,15 +1455,15 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_DRAW: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<int32_t>(pbuf);
 			pbufw = pbuf;
 			pbuf += count * 4;
 			for(auto& dueler : (player == 0) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, pbuf - offset);
 			for (int i = 0; i < count; ++i) {
 				if(!(pbufw[3] & 0x80))
-					BufferIO::WriteInt32(pbufw, 0);
+					BufferIO::Write<int32_t>(pbufw, 0);
 				else
 					pbufw += 4;
 			}
@@ -1647,8 +1647,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_TOSS_COIN: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1660,8 +1660,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_TOSS_DICE: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += count;
 			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
 			ITERATE_PLAYERS(
@@ -1673,7 +1673,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_ROCK_PAPER_SCISSORS: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
@@ -1690,14 +1690,14 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_ANNOUNCE_RACE: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_ANNOUNCE_ATTRIB: {
-			player = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 5;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
@@ -1705,8 +1705,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 		}
 		case MSG_ANNOUNCE_CARD:
 		case MSG_ANNOUNCE_NUMBER: {
-			player = BufferIO::ReadUInt8(pbuf);
-			count = BufferIO::ReadUInt8(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			count = BufferIO::Read<uint8_t>(pbuf);
 			pbuf += 8 * count;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
@@ -1735,24 +1735,24 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_TAG_SWAP: {
-			player = BufferIO::ReadUInt8(pbuf);
-			/*int mcount = */BufferIO::ReadInt32(pbuf);
-			int ecount = BufferIO::ReadInt32(pbuf);
-			/*int pcount = */BufferIO::ReadInt32(pbuf);
-			int hcount = BufferIO::ReadInt32(pbuf);
+			player = BufferIO::Read<uint8_t>(pbuf);
+			/*int mcount = */BufferIO::Read<int32_t>(pbuf);
+			int ecount = BufferIO::Read<int32_t>(pbuf);
+			/*int pcount = */BufferIO::Read<int32_t>(pbuf);
+			int hcount = BufferIO::Read<int32_t>(pbuf);
 			pbufw = pbuf + 4;
 			pbuf += hcount * 4 + ecount * 4 + 4;
 			for(auto& dueler : (player == 0) ? players.home : players.opposing)
 				NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, offset, pbuf - offset);
 			for (int i = 0; i < hcount; ++i) {
 				if(!(pbufw[3] & 0x80))
-					BufferIO::WriteInt32(pbufw, 0);
+					BufferIO::Write<int32_t>(pbufw, 0);
 				else
 					pbufw += 4;
 			}
 			for (int i = 0; i < ecount; ++i) {
 				if(!(pbufw[3] & 0x80))
-					BufferIO::WriteInt32(pbufw, 0);
+					BufferIO::Write<int32_t>(pbufw, 0);
 				else
 					pbufw += 4;
 			}
@@ -1783,7 +1783,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			break;
 		}
 		case MSG_MATCH_KILL: {
-			int code = BufferIO::ReadInt32(pbuf);
+			int code = BufferIO::Read<int32_t>(pbuf);
 			if(best_of) {
 				match_kill = code;
 				NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, offset, pbuf - offset);
@@ -1898,7 +1898,7 @@ void GenericDuel::RefreshMzone(int player, int flag, int use_cache) {
 	int qlen = 0;
 	char* qbuf = (char*)&buffer[3];
 	while(qlen < len) {
-		int clen = BufferIO::ReadInt32(qbuf);
+		int clen = BufferIO::Read<int32_t>(qbuf);
 		qlen += clen;
 		if (clen == 4)
 			continue;
@@ -1928,7 +1928,7 @@ void GenericDuel::RefreshSzone(int player, int flag, int use_cache) {
 	int qlen = 0;
 	char* qbuf = (char*)&buffer[3];
 	while(qlen < len) {
-		int clen = BufferIO::ReadInt32(qbuf);
+		int clen = BufferIO::Read<int32_t>(qbuf);
 		qlen += clen;
 		if(clen == 4)
 			continue;
@@ -1956,7 +1956,7 @@ void GenericDuel::RefreshHand(int player, int flag, int use_cache) {
 	int qlen = 0;
 	char* qbuf = (char*)&buffer[3];
 	while(qlen < len) {
-		int slen = BufferIO::ReadInt32(qbuf);
+		int slen = BufferIO::Read<int32_t>(qbuf);
 		int qflag = *(int*)qbuf;
 		int offset = 8;
 		if(!(qflag & QUERY_CODE))
