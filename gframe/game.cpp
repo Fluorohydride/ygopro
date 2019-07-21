@@ -17,6 +17,7 @@
 #include "materials.h"
 #include "duelclient.h"
 #include "netserver.h"
+#include "replay_mode.h"
 #include "single_mode.h"
 #ifdef _WIN32
 #include "../irrlicht/src/CIrrDeviceWin32.h"
@@ -996,6 +997,8 @@ void Game::MainLoop() {
 	ClearTextures();
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
+	if(dInfo.isReplay)
+		ReplayMode::StopReplay(true);
 	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
 #ifdef YGOPRO_BUILD_DLL

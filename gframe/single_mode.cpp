@@ -23,7 +23,10 @@ void SingleMode::StopPlay(bool is_exiting) {
 	is_closing = is_exiting;
 	is_continuing = false;
 	mainGame->actionSignal.Set();
-	singleSignal.Set();
+	if(is_closing)
+		singleSignal.SetNoWait(true);
+	else
+		singleSignal.Set();
 }
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
