@@ -640,31 +640,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case irr::gui::EGET_EDITBOX_ENTER: {
-			switch(id) {
-			case EDITBOX_CHAT: {
-				if(mainGame->dInfo.isReplay)
-					break;
-				const wchar_t* input = mainGame->ebChatInput->getText();
-				if(input[0]) {
-					unsigned short msgbuf[256];
-					int player = mainGame->dInfo.player_type;
-					if(mainGame->dInfo.isStarted) {
-						if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2)
-							mainGame->AddChatMsg(input, mainGame->LocalPlayer(player < mainGame->dInfo.team1 ? 0 : 1));
-						else
-							mainGame->AddChatMsg((wchar_t*)input, 10);
-					} else
-						mainGame->AddChatMsg((wchar_t*)input, 7);
-					int len = BufferIO::CopyWStr(input, msgbuf, 256);
-					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
-					mainGame->ebChatInput->setText(L"");
-				}
-				break;
-			}
-			}
-			break;
-		}
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_PORT_BOX: {
