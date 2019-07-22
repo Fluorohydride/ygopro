@@ -1068,6 +1068,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_START: {
 		int playertype = BufferIO::Read<uint8_t>(pbuf);
+		if(mainGame->dInfo.compat_mode)
+			/*duel_rule = */BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isCatchingUp) {
 			mainGame->showcardcode = 11;
 			mainGame->showcarddif = 30;
