@@ -187,7 +187,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				mainGame->PopupMessage(dataManager.GetSysString(1400));
 				mainGame->gMutex.unlock();
 			} else if(connect_state == 0x7) {
-				if(!mainGame->dInfo.isStarted && !mainGame->is_building) {
+				if(!mainGame->dInfo.isInDuel && !mainGame->is_building) {
 					mainGame->gMutex.lock();
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 					mainGame->btnJoinHost->setEnabled(true);
@@ -214,6 +214,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->closeDoneSignal.Wait();
 					mainGame->closeSignal.unlock();
 					mainGame->gMutex.lock();
+					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
 					mainGame->dField.Clear();
 					mainGame->is_building = false;
@@ -396,6 +397,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_CHANGE_SIDE: {
 		ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
+		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dField.Clear();
 		mainGame->is_building = true;
@@ -423,7 +425,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->deckBuilder.is_draging = false;
 		deckManager.pre_deck = deckManager.current_deck;
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
-		mainGame->dInfo.isFirst = mainGame->dInfo.player_type == 0;
+		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
 		mainGame->SetMesageWindow();
 		mainGame->gMutex.unlock();
 		break;
@@ -607,6 +609,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnHostPrepStart->setVisible(is_host);
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
 		mainGame->dInfo.player_type = selftype;
+		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
 		break;
 	}
 	case STOC_DUEL_START: {
@@ -615,7 +618,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
-		mainGame->dInfo.isStarted = true;
+		mainGame->dInfo.isInDuel = true;
+		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isCatchingUp = false;
 		mainGame->dInfo.lp[0] = 0;
 		mainGame->dInfo.lp[1] = 0;
@@ -661,7 +665,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnLeaveGame->setVisible(true);
 			mainGame->btnSpectatorSwap->setVisible(true);
 		}
-		if(selftype > mainGame->dInfo.team1) {
+		if(selftype >= mainGame->dInfo.team1) {
 			std::swap(mainGame->dInfo.clientname, mainGame->dInfo.hostname);
 		}
 		mainGame->dInfo.current_player[0] = 0;
@@ -692,6 +696,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
 		mainGame->gMutex.lock();
+		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dField.Clear();
 		mainGame->is_building = false;
@@ -727,12 +732,22 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_CHAT: {
 		STOC_Chat* pkt = (STOC_Chat*)pdata;
 		int player = pkt->player;
-		if(player < 6) {
-			if(mainGame->dInfo.isStarted)
-				player = mainGame->LocalPlayer(player < mainGame->dInfo.team1 ? 0 : 1);
-			if(mainGame->chkIgnore1->isChecked() && mainGame->LocalPlayer(player < mainGame->dInfo.team1 ? 0 : 1) == 1)
-				break;
+		int type = -1;
+		if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
+			if(mainGame->chkIgnore1->isChecked()) {
+				if(player >= mainGame->dInfo.team1 && mainGame->dInfo.isFirst)
+					break;
+				if(player < mainGame->dInfo.team1 && !mainGame->dInfo.isFirst)
+					break;
+			}
+			if(player >= mainGame->dInfo.team1) {
+				player -= mainGame->dInfo.team1;
+				type = !mainGame->dInfo.isInDuel ? 1 : mainGame->LocalPlayer(1);
+			} else {
+				type = !mainGame->dInfo.isInDuel ? 0 : mainGame->LocalPlayer(0);
+			}
 		} else {
+			type = 2;
 			if(player == 8) { //system custom message.
 				if(mainGame->chkIgnore1->isChecked())
 					break;
@@ -745,7 +760,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		wchar_t msg[256];
 		BufferIO::CopyWStr(pkt->msg, msg, 256);
 		mainGame->gMutex.lock();
-		mainGame->AddChatMsg(msg, player);
+		mainGame->AddChatMsg(msg, player, type);
 		mainGame->gMutex.unlock();
 		break;
 	}
@@ -912,6 +927,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ReplayPrompt(true);
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
+		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 		mainGame->btnJoinHost->setEnabled(true);
@@ -1061,6 +1077,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->showcard = 0;
 			mainGame->gMutex.lock();
 		}
+		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isFirst = (playertype & 0xf) ? false : true;
 		if(playertype & 0xf0)
 			mainGame->dInfo.player_type = 7;

@@ -32,8 +32,7 @@ void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	unsigned short* msg = (unsigned short*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
 	ITERATE_PLAYERS(
-		if(dueler.player != dp)
-				NetServer::SendBufferToPlayer(dueler.player, STOC_CHAT, &scc, 4 + msglen * 2);
+			NetServer::SendBufferToPlayer(dueler.player, STOC_CHAT, &scc, 4 + msglen * 2);
 	)
 }
 bool GenericDuel::CheckReady() {

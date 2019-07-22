@@ -79,6 +79,7 @@ int ReplayMode::ReplayThread() {
 		EndDuel();
 		return 0;
 	}
+	mainGame->dInfo.isInDuel = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->SetMesageWindow();
 	mainGame->dInfo.turn = 0;
@@ -100,6 +101,7 @@ int ReplayMode::ReplayThread() {
 				step = 0;
 			if (step == 0) {
 				Pause(true, false);
+				mainGame->dInfo.isInDuel = true;
 				mainGame->dInfo.isStarted = true;
 				mainGame->dInfo.isCatchingUp = false;
 				mainGame->dField.RefreshAllCards();
@@ -132,6 +134,7 @@ void ReplayMode::EndDuel() {
 		mainGame->gMutex.unlock();
 		mainGame->actionSignal.Wait();
 		mainGame->gMutex.lock();
+		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isReplay = false;
         mainGame->dInfo.isSingleMode = false;
@@ -156,6 +159,7 @@ void ReplayMode::Restart(bool refresh) {
 		end_duel(pduel);
 		cur_replay.Rewind();
 	}
+	mainGame->dInfo.isInDuel = false;
 	mainGame->dInfo.isStarted = false;
 	mainGame->dInfo.turn = 0;
 	mainGame->dField.Clear();
@@ -172,6 +176,7 @@ void ReplayMode::Restart(bool refresh) {
 	}
 	if(refresh) {
 		mainGame->dField.RefreshAllCards();
+		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = true;
 	}
 	skip_turn = 0;
@@ -282,6 +287,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				skip_step--;
 				if(skip_step == 0) {
 					Pause(true, false);
+					mainGame->dInfo.isInDuel = true;
 					mainGame->dInfo.isStarted = true;
 					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();

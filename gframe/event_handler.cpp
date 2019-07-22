@@ -115,6 +115,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(mainGame->dInfo.player_type == 7) {
 					DuelClient::StopClient();
+					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->mTopMenu->setVisible(true);
@@ -1004,7 +1005,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_LEFT_UP: {
-			if(!mainGame->dInfo.isStarted)
+			if(!mainGame->dInfo.isInDuel)
 				break;
 			hovered_location = 0;
 			position2di pos = mainGame->Resize(event.MouseInput.X, event.MouseInput.Y, true);
@@ -1402,7 +1403,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_MOVED: {
-			if(!mainGame->dInfo.isStarted)
+			if(!mainGame->dInfo.isInDuel)
 				break;
 			bool should_show_tip = false;
 			position2di pos = mainGame->Resize(event.MouseInput.X, event.MouseInput.Y, true);
@@ -1572,7 +1573,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
-			if(!mainGame->dInfo.isStarted)
+			if(!mainGame->dInfo.isInDuel)
 				break;
 			if(event.MouseInput.X > 300) {
 				mainGame->always_chain = event.MouseInput.isLeftPressed();
@@ -1583,7 +1584,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_RMOUSE_PRESSED_DOWN: {
-			if(!mainGame->dInfo.isStarted)
+			if(!mainGame->dInfo.isInDuel)
 				break;
 			if(event.MouseInput.X > 300) {
 				mainGame->ignore_chain = event.MouseInput.isRightPressed();
@@ -1635,7 +1636,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_F6:
 		case irr::KEY_F7:
 		case irr::KEY_F8: {
-			if(!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isStarted
+			if(!event.KeyInput.PressedDown && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type != 7 && mainGame->dInfo.isInDuel
 					&& !mainGame->wCardDisplay->isVisible() && !mainGame->HasFocus(EGUIET_EDIT_BOX)) {
 				int loc_id = 0;
 				display_cards.clear();
@@ -1735,6 +1736,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CLEAR_CHAT: {
 				mainGame->lstChat->clear();
+				for(int i = 0; i < 8; i++) {
+					mainGame->chatMsg[i].clear();
+					mainGame->chatType[i] = 0;
+					mainGame->chatTiming[i] = 0;
+				}
 				return true;
 				break;
 			}
@@ -1815,17 +1821,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				const wchar_t* input = mainGame->ebChatInput->getText();
 				if(input[0]) {
 					unsigned short msgbuf[256];
-					int player = mainGame->dInfo.player_type;
-					if(mainGame->dInfo.isStarted) {
-						if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2)
-							mainGame->AddChatMsg(input, mainGame->LocalPlayer(player < mainGame->dInfo.team1 ? 0 : 1));
-						else
-							mainGame->AddChatMsg(input, 10);
-					} else
-						mainGame->AddChatMsg(input, 7);
 					int len = BufferIO::CopyWStr(input, msgbuf, 256);
 					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
 					mainGame->ebChatInput->setText(L"");
+					return true;
 				}
 				break;
 			}

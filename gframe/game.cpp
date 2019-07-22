@@ -914,7 +914,7 @@ void Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.lock();
-		if(dInfo.isStarted) {
+		if(dInfo.isInDuel) {
 			if (showcardcode == 1 || showcardcode == 3)
 				soundManager.PlayBGM(BGM_WIN);
 			else if (showcardcode == 2)
@@ -1464,7 +1464,7 @@ void Game::ClearCardInfo(int player) {
 	cardimagetextureloading = false;
 	showingcard = 0;
 }
-void Game::AddChatMsg(const std::wstring& msg, int player) {
+void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
@@ -1473,44 +1473,28 @@ void Game::AddChatMsg(const std::wstring& msg, int player) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200.0f;
 	chatType[0] = player;
-	switch(player) {
-	case 0: //host 1
+	if(type == 0) {
 		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
-		chatMsg[0].append(dInfo.hostname[0]);
-		break;
-	case 1: //client 1
+		chatMsg[0].append(dInfo.hostname[player]);
+	} else if(type == 1) {
 		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
-		chatMsg[0].append(dInfo.clientname[0]);
-		break;
-	case 2: //host 2
-		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
-		chatMsg[0].append(dInfo.hostname[1]);
-		break;
-	case 3: //client 2
-		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
-		chatMsg[0].append(dInfo.clientname[1]);
-		break;
-	case 4: //host 3
-		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
-		chatMsg[0].append(dInfo.hostname[2]);
-		break;
-	case 5: //client 3
-		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
-		chatMsg[0].append(dInfo.clientname[2]);
-		break;
-	case 7: //local name
-		chatMsg[0].append(ebNickName->getText());
-		break;
-	case 8: //system custom message, no prefix.
-		soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
-		chatMsg[0].append(L"[System]");
-		break;
-	case 9: //error message
-		chatMsg[0].append(L"[Script Error]");
-		break;
-	default: //from watcher or unknown
-		if(player < 11 || player > 19)
-			chatMsg[0].append(L"[---]");
+		chatMsg[0].append(dInfo.clientname[player]);
+	} else if(type == 2) {
+		switch(player) {
+		case 7: //local name
+			chatMsg[0].append(ebNickName->getText());
+			break;
+		case 8: //system custom message, no prefix.
+			soundManager.PlaySoundEffect(SoundManager::Sounds::CHAT);
+			chatMsg[0].append(L"[System]");
+			break;
+		case 9: //error message
+			chatMsg[0].append(L"[Script Error]");
+			break;
+		default: //from watcher or unknown
+			if(player < 11 || player > 19)
+				chatMsg[0].append(L"[---]");
+		}
 	}
 	chatMsg[0].append(L": ").append(msg);
 	lstChat->addItem(chatMsg[0].c_str());
@@ -1528,12 +1512,10 @@ void Game::ClearChatMsg() {
 	}
 }
 void Game::AddDebugMsg(const std::string& msg) {
-	if (enable_log & 0x1) {
-		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9);
-	}
-	if (enable_log & 0x2) {
+	if (enable_log & 0x1)
+		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9, 2);
+	if (enable_log & 0x2)
 		ErrorLog("[Script Error]: " + msg);
-	}
 }
 void Game::ErrorLog(const std::string& msg) {
 	std::ofstream log("error.log", std::ofstream::app);
@@ -1781,7 +1763,7 @@ void Game::SetPhaseButtons() {
 	}
 }
 void Game::SetMesageWindow() {
-	if(is_building || dInfo.isStarted)
+	if(is_building || dInfo.isInDuel)
 		wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	else {
 		wMessage->setRelativePosition(ResizeWin(510 - 175, 200, 510 + 175, 340));

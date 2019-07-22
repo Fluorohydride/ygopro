@@ -92,6 +92,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
+	mainGame->dInfo.isInDuel = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isCatchingUp = false;
 	mainGame->SetMesageWindow();
@@ -170,6 +171,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->gMutex.unlock();
 	if(!is_closing) {
 		mainGame->gMutex.lock();
+		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->gMutex.unlock();

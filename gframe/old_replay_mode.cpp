@@ -32,6 +32,7 @@ namespace ygo {
 			EndDuel();
 			return 0;
 		}
+		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isOldReplay = true;
 		mainGame->SetMesageWindow();
@@ -83,6 +84,7 @@ namespace ygo {
 					}
 					if (step == 0) {
 						Pause(true, false);
+						mainGame->dInfo.isInDuel = true;
 						mainGame->dInfo.isStarted = true;
 						mainGame->dInfo.isCatchingUp = false;
 						mainGame->dField.RefreshAllCards();
@@ -719,6 +721,7 @@ namespace ygo {
 					skip_step--;
 					if (skip_step == 0) {
 						Pause(true, false);
+						mainGame->dInfo.isInDuel = true;
 						mainGame->dInfo.isStarted = true;
 						mainGame->dInfo.isCatchingUp = false;
 						mainGame->dField.RefreshAllCards();

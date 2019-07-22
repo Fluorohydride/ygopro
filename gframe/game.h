@@ -58,6 +58,7 @@ struct Config {
 };
 
 struct DuelInfo {
+	bool isInDuel;
 	bool isStarted;
 	bool isReplay;
 	bool isOldReplay;
@@ -138,7 +139,7 @@ public:
 	void LoadGithubRepositories();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
-	void AddChatMsg(const std::wstring& msg, int player);
+	void AddChatMsg(const std::wstring& msg, int player, int type);
 	void AddLog(const std::wstring& msg, int param = 0);
 	void ClearChatMsg();
 	void AddDebugMsg(const std::string& msg);
