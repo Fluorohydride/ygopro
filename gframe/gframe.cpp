@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 #if defined(_WIN32) && !defined(_DEBUG)
 	if(wargc == 2) {
 		auto extension = ygo::Utils::GetFileExtension(wargv[1]);
-		if(extension == L".ydk" || extension == L".yrp" || extension == L".yrpx") {
+		if(extension == L"ydk" || extension == L"yrp" || extension == L"yrpx") {
 			wchar_t exepath[MAX_PATH];
 			GetModuleFileNameW(NULL, exepath, MAX_PATH);
 			wchar_t* p = wcsrchr(exepath, '\\');
@@ -133,14 +133,14 @@ int main(int argc, char* argv[]) {
 		} else if(wargc == 2 && wcslen(wargv[1]) >= 4) {
 			std::wstring name(wargv[i]);
 			auto extension = ygo::Utils::GetFileExtension(name);
-			if(extension == L".ydk") {
+			if(extension == L"ydk") {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-			if(extension == L".yrp" || extension == L".yrpx") {
+			if(extension == L"yrp" || extension == L"yrpx") {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;
