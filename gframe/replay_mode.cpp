@@ -68,6 +68,8 @@ int ReplayMode::ReplayThread() {
 	if(!mainGame->dInfo.isRelay)
 		mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
 	auto names = ReplayMode::cur_replay.GetPlayerNames();
+	mainGame->dInfo.hostname.clear();
+	mainGame->dInfo.clientname.clear();
 	mainGame->dInfo.hostname.insert(mainGame->dInfo.hostname.end(), names.begin(), names.begin() + mainGame->dInfo.team1);
 	mainGame->dInfo.clientname.insert(mainGame->dInfo.clientname.end(), names.begin() + mainGame->dInfo.team1, names.end());
 	int opt = cur_replay.params.duel_flags;
