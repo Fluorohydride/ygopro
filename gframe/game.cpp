@@ -131,7 +131,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 30, 220, 50), false, false, wCreateHost);
 	cbLFlist = env->addComboBox(rect<s32>(140, 25, 300, 50), wCreateHost);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbLFlist->addItem(deckManager._lfList[i].listName, deckManager._lfList[i].hash);
+		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
 	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
 	cbRule->addItem(dataManager.GetSysString(1240));
@@ -531,7 +531,7 @@ bool Game::Initialize() {
 	cbLFList = env->addComboBox(rect<s32>(350, posY, 480, posY + 25), wDeckManage, COMBOBOX_LFLIST);
 	cbLFList->setMaxSelectionRows(10);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbLFList->addItem(deckManager._lfList[i].listName);
+		cbLFList->addItem(deckManager._lfList[i].listName.c_str());
 	//deck manage query
 	wDMQuery = env->addWindow(rect<s32>(400, 200, 710, 320), false, dataManager.GetSysString(1460));
 	wDMQuery->getCloseButton()->setVisible(false);

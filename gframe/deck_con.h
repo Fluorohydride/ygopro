@@ -67,7 +67,7 @@ public:
 	bool is_modified;
 	bool readonly;
 
-	std::unordered_map<int, int>* filterList;
+	const std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
 };

@@ -10,8 +10,8 @@ namespace ygo {
 
 struct LFList {
 	unsigned int hash;
-	wchar_t listName[20];
-	std::unordered_map<int, int>* content;
+	std::wstring listName;
+	std::unordered_map<int, int> content;
 };
 struct Deck {
 	std::vector<code_pointer> main;
@@ -37,7 +37,8 @@ public:
 
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
-	wchar_t* GetLFListName(int lfhash);
+	const wchar_t* GetLFListName(int lfhash);
+	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
