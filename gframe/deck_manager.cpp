@@ -213,9 +213,15 @@ void DeckManager::GetCategoryPath(wchar_t* ret, int index, const wchar_t* text) 
 void DeckManager::GetDeckFile(wchar_t* ret, irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t filepath[256];
 	wchar_t catepath[256];
-	GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
-	myswprintf(filepath, L"%ls/%ls.ydk", catepath, cbDeck->getItem(cbDeck->getSelected()));
-	BufferIO::CopyWStr(filepath, ret, 256);
+	wchar_t* deckname = (wchar_t*)cbDeck->getItem(cbDeck->getSelected());
+	if(deckname != NULL) {
+		GetCategoryPath(catepath, cbCategory->getSelected(), cbCategory->getText());
+		myswprintf(filepath, L"%ls/%ls.ydk", catepath, deckname);
+		BufferIO::CopyWStr(filepath, ret, 256);
+	}
+	else {
+		BufferIO::CopyWStr(L"", ret, 256);
+	}
 }
 bool DeckManager::LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck) {
 	wchar_t filepath[256];
