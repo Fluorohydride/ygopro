@@ -65,7 +65,7 @@ public:
 	int prev_sel;
 	bool is_modified;
 
-	std::unordered_map<int, int>* filterList;
+	const std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];
 };
