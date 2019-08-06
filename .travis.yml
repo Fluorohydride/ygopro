@@ -70,6 +70,10 @@ matrix:
     compiler: gcc
     env: BUILD_CONFIG=release
     deploy: false
+  allow_failures:
+  - name: "Sierra"
+  - name: "El Capitan"
+  fast_finish: true
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/install-windows-bin.sh; fi  
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-support/install-ubuntu-bin.sh; fi
