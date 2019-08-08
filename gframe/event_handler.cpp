@@ -1857,7 +1857,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::KEY_F11:
 		{
 			if(!event.KeyInput.PressedDown)
-				mainGame->ToggleFullscreen();
+				Utils::ToggleFullscreen();
 			return true;
 			break;
 		}
