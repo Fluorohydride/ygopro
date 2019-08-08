@@ -1025,9 +1025,8 @@ void Game::ToggleFullscreen() {
 	if(is_fullscreen) {
 		unresized_screen_size = driver->getScreenSize();
 		style = WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-		auto a = device->getVideoModeList()->getDesktopResolution();
-		clientSize.right = a.Width;
-		clientSize.bottom = a.Height;
+		clientSize.right = GetSystemMetrics(SM_CXSCREEN);
+		clientSize.bottom = GetSystemMetrics(SM_CYSCREEN);
 	} else {
 		style = WS_THICKFRAME | WS_SYSMENU | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
 		clientSize.right = unresized_screen_size.Width;
