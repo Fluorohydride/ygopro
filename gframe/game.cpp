@@ -132,7 +132,7 @@ bool Game::Initialize() {
 	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
 	HWND hWnd;
 	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
-	if(gameConf.use_d3d)
+	if(driver->getDriverType() == irr::video::EDT_DIRECT3D9)
 		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
 	else
 		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
@@ -1009,44 +1009,47 @@ void Game::MainLoop() {
 }
 void Game::ToggleFullscreen() {
 #ifdef _WIN32
+	static RECT nonFullscreenSize;
+	static std::vector<RECT> monitors;
+	if(monitors.empty()) {
+		EnumDisplayMonitors(0, 0, [](HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData) -> BOOL {
+			auto monitors = reinterpret_cast<std::vector<RECT>*>(pData);
+			monitors->push_back(*lprcMonitor);
+			return TRUE;
+		}, (LPARAM)&monitors);
+	}
 	is_fullscreen = !is_fullscreen;
 	HWND hWnd;
 	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
-	if(gameConf.use_d3d)
+	if(driver->getDriverType() == irr::video::EDT_DIRECT3D9)
 		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
 	else
 		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
 	LONG_PTR style = WS_POPUP;
-	device->setResizable(false);
 
-	RECT clientSize;
-	clientSize.top = 0;
-	clientSize.left = 0;
+	RECT clientSize = {};
 	if(is_fullscreen) {
-		unresized_screen_size = driver->getScreenSize();
+		GetWindowRect(hWnd, &nonFullscreenSize);
 		style = WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-		clientSize.right = GetSystemMetrics(SM_CXSCREEN);
-		clientSize.bottom = GetSystemMetrics(SM_CYSCREEN);
+		for(auto& rect : monitors) {
+			POINT windowCenter = { (nonFullscreenSize.left + (nonFullscreenSize.right - nonFullscreenSize.left) / 2), (nonFullscreenSize.top + (nonFullscreenSize.bottom - nonFullscreenSize.top) / 2) };
+			if(PtInRect(&rect, windowCenter)) {
+				clientSize = rect;
+				break;
+			}
+		}
 	} else {
 		style = WS_THICKFRAME | WS_SYSMENU | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-		clientSize.right = unresized_screen_size.Width;
-		clientSize.bottom = unresized_screen_size.Height;
+		clientSize = nonFullscreenSize;
 	}
 
-	if(!SetWindowLongPtrW(hWnd, GWL_STYLE, style))
+	if(!SetWindowLongPtr(hWnd, GWL_STYLE, style))
 		ErrorLog("Could not change window style.");
 
-	AdjustWindowRect(&clientSize, style, FALSE);
-
-	const s32 realWidth = clientSize.right - clientSize.left;
-	const s32 realHeight = clientSize.bottom - clientSize.top;
-
-	const s32 windowLeft = (GetSystemMetrics(SM_CXSCREEN) - realWidth) / 2;
-	const s32 windowTop = (GetSystemMetrics(SM_CYSCREEN) - realHeight) / 2;
-
-	SetWindowPos(hWnd, HWND_TOP, windowLeft, windowTop, realWidth, realHeight,
-				 SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-
+	const s32 width = clientSize.right - clientSize.left;
+	const s32 height = clientSize.bottom - clientSize.top;
+	
+	SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 	static_cast<irr::CIrrDeviceWin32::CCursorControl*>(device->getCursorControl())->updateBorderSize(is_fullscreen, true);
 #endif
 }
