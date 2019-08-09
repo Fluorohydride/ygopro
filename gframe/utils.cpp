@@ -4,6 +4,9 @@
 #include "bufferio.h"
 #ifdef _WIN32
 #include "../irrlicht/src/CIrrDeviceWin32.h"
+#elif defined(__linux__)
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #endif
 namespace ygo {
 	Utils utils;
@@ -186,6 +189,74 @@ namespace ygo {
 
 		SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 		static_cast<irr::CIrrDeviceWin32::CCursorControl*>(mainGame->device->getCursorControl())->updateBorderSize(mainGame->is_fullscreen, true);
+#elif defined(__linux__)
+		struct {
+			unsigned long   flags;
+			unsigned long   functions;
+			unsigned long   decorations;
+			long            inputMode;
+			unsigned long   status;
+		} hints = {};
+		Display *display = XOpenDisplay(NULL);;
+		Window window;
+		static bool wasHorizontalMaximized = false, wasVerticalMaximized = false;
+		Window child;
+		int revert;
+		mainGame->is_fullscreen = !mainGame->is_fullscreen;
+		//Window root =  XRootWindow(display, 0);
+		XGetInputFocus(display, &window, &revert);
+		
+		Atom wm_state  =  XInternAtom(display, "_NET_WM_STATE", false);
+		Atom max_horz  =  XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", false);
+		Atom max_vert  =  XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
+		
+		auto checkMaximized = [&] () {
+			long maxLength = 1024;
+			Atom actualType;
+			int actualFormat;
+			unsigned long i, numItems, bytesAfter;
+			unsigned char *propertyValue = NULL;
+			if (XGetWindowProperty(display, window, wm_state,
+				0l, maxLength, false, XA_ATOM, &actualType,
+				&actualFormat, &numItems, &bytesAfter,
+				&propertyValue) == Success) {
+				Atom *atoms = (Atom *) propertyValue;
+			
+				for (i = 0; i < numItems; ++i) {
+					if (atoms[i] == max_vert) {
+						wasVerticalMaximized = true;
+					} else if (atoms[i] == max_horz) {
+						wasHorizontalMaximized = true;
+					}
+				}
+				XFree(propertyValue);
+			}
+		};		
+		if(mainGame->is_fullscreen)
+			checkMaximized();
+		if(!wasHorizontalMaximized && !wasVerticalMaximized) {
+			XEvent xev = {};
+			xev.type = ClientMessage;
+			xev.xclient.window = window;
+			xev.xclient.message_type = wm_state;
+			xev.xclient.format = 32;
+			xev.xclient.data.l[0] = mainGame->is_fullscreen ? 1 : 0;
+			int i = 1;
+			if(!wasHorizontalMaximized)
+				xev.xclient.data.l[i++] = max_horz;
+			if(!wasVerticalMaximized)
+				xev.xclient.data.l[i++] = max_vert;
+			if(i == 2)
+				xev.xclient.data.l[i] = 0;
+			XSendEvent(display, DefaultRootWindow(display), False, SubstructureNotifyMask, &xev);
+		}
+		
+		Atom property = XInternAtom(display, "_MOTIF_WM_HINTS", true);
+		hints.flags = 2;
+		hints.decorations = mainGame->is_fullscreen ? 0 : 1;
+		XChangeProperty(display,window,property,property,32,PropModeReplace,(unsigned char *)&hints,5);
+		XMapWindow(display, window);
+		XFlush(display);
 #endif
 	}
 

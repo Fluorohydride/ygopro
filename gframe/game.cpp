@@ -40,7 +40,7 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.Vsync = gameConf.use_vsync;
 	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
-#ifndef _WIN32
+#ifdef __APPLE__
 	if(gameConf.fullscreen) {
 		irr::IrrlichtDevice* nulldevice = createDevice(video::EDT_NULL);
 		params.WindowSize = nulldevice->getVideoModeList()->getDesktopResolution();
@@ -136,8 +136,6 @@ bool Game::Initialize() {
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 #endif
-	if(gameConf.fullscreen)
-		Utils::ToggleFullscreen();
 	wCommitsLog = env->addWindow(rect<s32>(0, 0, 500 + 10, 400 + 35 + 35), false, L"Update log");
 	wCommitsLog->setVisible(false);
 	wCommitsLog->getCloseButton()->setEnabled(false);
@@ -812,6 +810,10 @@ void Game::MainLoop() {
 	float frame_counter = 0.0f;
 	int fps = 0;
 	std::wstring corename;
+#ifndef __APPLE__
+	if(gameConf.fullscreen)
+		Utils::ToggleFullscreen();
+#endif
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
