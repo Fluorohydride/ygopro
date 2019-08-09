@@ -137,7 +137,7 @@ namespace ygo {
 			image->drop();
 		}
 	}
-
+	
 	void Utils::ToggleFullscreen() {
 #ifdef _WIN32
 		static RECT nonFullscreenSize;
@@ -197,41 +197,39 @@ namespace ygo {
 			long            inputMode;
 			unsigned long   status;
 		} hints = {};
-		Display *display = XOpenDisplay(NULL);;
+		Display* display = XOpenDisplay(NULL);;
 		Window window;
 		static bool wasHorizontalMaximized = false, wasVerticalMaximized = false;
 		Window child;
 		int revert;
 		mainGame->is_fullscreen = !mainGame->is_fullscreen;
-		//Window root =  XRootWindow(display, 0);
 		XGetInputFocus(display, &window, &revert);
-		
-		Atom wm_state  =  XInternAtom(display, "_NET_WM_STATE", false);
-		Atom max_horz  =  XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", false);
-		Atom max_vert  =  XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
-		
-		auto checkMaximized = [&] () {
+
+		Atom wm_state = XInternAtom(display, "_NET_WM_STATE", false);
+		Atom max_horz = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_HORZ", false);
+		Atom max_vert = XInternAtom(display, "_NET_WM_STATE_MAXIMIZED_VERT", false);
+
+		auto checkMaximized = [&]() {
 			long maxLength = 1024;
 			Atom actualType;
 			int actualFormat;
 			unsigned long i, numItems, bytesAfter;
 			unsigned char *propertyValue = NULL;
-			if (XGetWindowProperty(display, window, wm_state,
-				0l, maxLength, false, XA_ATOM, &actualType,
-				&actualFormat, &numItems, &bytesAfter,
-				&propertyValue) == Success) {
-				Atom *atoms = (Atom *) propertyValue;
-			
-				for (i = 0; i < numItems; ++i) {
-					if (atoms[i] == max_vert) {
+			if(XGetWindowProperty(display, window, wm_state,
+								  0l, maxLength, false, XA_ATOM, &actualType,
+								  &actualFormat, &numItems, &bytesAfter,
+								  &propertyValue) == Success) {
+				Atom* atoms = (Atom *)propertyValue;
+				for(i = 0; i < numItems; ++i) {
+					if(atoms[i] == max_vert) {
 						wasVerticalMaximized = true;
-					} else if (atoms[i] == max_horz) {
+					} else if(atoms[i] == max_horz) {
 						wasHorizontalMaximized = true;
 					}
 				}
 				XFree(propertyValue);
 			}
-		};		
+		};
 		if(mainGame->is_fullscreen)
 			checkMaximized();
 		if(!wasHorizontalMaximized && !wasVerticalMaximized) {
@@ -250,11 +248,11 @@ namespace ygo {
 				xev.xclient.data.l[i] = 0;
 			XSendEvent(display, DefaultRootWindow(display), False, SubstructureNotifyMask, &xev);
 		}
-		
+
 		Atom property = XInternAtom(display, "_MOTIF_WM_HINTS", true);
 		hints.flags = 2;
 		hints.decorations = mainGame->is_fullscreen ? 0 : 1;
-		XChangeProperty(display,window,property,property,32,PropModeReplace,(unsigned char *)&hints,5);
+		XChangeProperty(display, window, property, property, 32, PropModeReplace, (unsigned char*)&hints, 5);
 		XMapWindow(display, window);
 		XFlush(display);
 #endif
