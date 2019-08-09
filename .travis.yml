@@ -1,6 +1,6 @@
 language: cpp
 sudo: required
-dist: xenial
+dist: bionic
 git:
   depth: 1
   submodules: false
@@ -12,7 +12,7 @@ addons:
   apt:
     update: true
     sources:
-    - ubuntu-toolchain-r-test
+    - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
     - g++-9
     - p7zip-full 
@@ -41,12 +41,24 @@ matrix:
   include:
   - name: "Windows 10"
     os: windows
-    env: DEPLOY_BRANCH=travis-windows
+    env:
+    - VCPKG_ROOT=/c/vcpkg
+    - VCPKG_DEFAULT_TRIPLET=x86-windows-static
+    - VCPKG_LIBS="libevent lua[cpp] sqlite3 fmt curl libgit2 nlohmann-json bzip2 libjpeg-turbo libpng zlib"
+    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed.zip
+    - DEPLOY_BRANCH=travis-windows
     cache: false
+  - name: "Bionic GCC9"
+    os: linux
+    compiler: gcc  
+    env:
+    - CC=gcc-9
+    - CXX=g++-9
+    - DEPLOY_BRANCH=travis-linux
   - name: "Mojave"
     os: osx
     osx_image: xcode10.2
-    env:  DEPLOY_BRANCH=travis-mojave
+    env: DEPLOY_BRANCH=travis-mojave
   - name: "High Sierra"
     os: osx
     osx_image: xcode9.4
@@ -59,17 +71,6 @@ matrix:
     os: osx
     osx_image: xcode8
     env: DEPLOY_BRANCH=travis-el-capitan
-  - name: "Xenial GCC9"
-    os: linux
-    compiler: gcc  
-    env:
-    - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"  
-    - DEPLOY_BRANCH=travis-linux
-  - name: "Xenial GCC5.4"
-    os: linux
-    compiler: gcc
-    env: BUILD_CONFIG=release
-    deploy: false
   allow_failures:
   - name: "Sierra"
   - name: "El Capitan"
@@ -80,7 +81,6 @@ before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-support/install-macOS-bin.sh; fi  
 install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 
-    export VCPKG_ROOT=/c/vcpkg;
     ./build-support/install-windows-vcpkg-cache.sh;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 
@@ -95,20 +95,20 @@ install:
       sudo cp -r cache/irrlicht /usr/local/include &&
       sudo cp cache/lua.h cache/luaconf.h cache/lualib.h cache/lauxlib.h cache/lua.hpp /usr/local/include &&
       sudo cp cache/*.a /usr/local/lib &&
-      rm -rf cache && echo "Loaded irrlicht and lua-c++ from cache.";   
+      rm -rf cache && echo "Loaded irrlicht and lua-c++ from cache.";
     else
       ./build-support/install-macOS-src.sh; 
     fi ;
   fi
 before_script:
-- git submodule update --depth=1 --init --recursive; echo Ignoring script/ clone failures.
+- git submodule update --depth=1 --init --recursive ocgcore
 script:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./premake5 vs2017 --no-direct3d --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
     "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln;
   else
     ./premake5 gmake2 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
-    make -Cbuild config=$BUILD_CONFIG;
+    make -Cbuild -j2 config=$BUILD_CONFIG;
   fi
 before_deploy:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/deploy-windows.sh; fi
