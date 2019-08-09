@@ -61,7 +61,7 @@ local ygopro_config=function(static_core)
 		includedirs { "/usr/include/freetype2", "/usr/include/irrlicht" }
 		linkoptions { "-Wl,-rpath=./" }
 		libdirs "../irrKlang/bin/linux-gcc-64/"
-		links "GL"
+		links { "GL", "X11" }
 		if static_core then
 			links  "lua5.3-c++"
 		end
