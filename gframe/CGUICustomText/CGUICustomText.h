@@ -1,10 +1,10 @@
 #ifndef __C_GUI_CUSTOM_TEXT_H_INCLUDED__
 #define __C_GUI_CUSTOM_TEXT_H_INCLUDED__
 
-#include <irrlicht.h>
 #include "IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
+#include <irrlicht.h>
 #include "IGUIStaticText.h"
 #include "irrArray.h"
 

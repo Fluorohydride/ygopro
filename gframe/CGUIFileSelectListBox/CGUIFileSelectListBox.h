@@ -5,13 +5,13 @@
 #ifndef __C_GUI_FILE_SELECT_LIST_BOX_H_INCLUDED__
 #define __C_GUI_FILE_SELECT_LIST_BOX_H_INCLUDED__
 
+#include "IrrCompileConfig.h"
+#ifdef _IRR_COMPILE_WITH_GUI_
+
 #include <irrlicht.h>
 #include <vector>
 #include <string>
 #include <functional>
-#include "IrrCompileConfig.h"
-#ifdef _IRR_COMPILE_WITH_GUI_
-
 #include "IGUIListBox.h"
 #include "irrArray.h"
 

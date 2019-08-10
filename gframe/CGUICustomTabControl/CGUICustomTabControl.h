@@ -5,7 +5,6 @@
 #ifndef __C_GUI_CUSTOM_TAB_CONTROL_H_INCLUDED__
 #define __C_GUI_CUSTOM_TAB_CONTROL_H_INCLUDED__
 
-#include <irrlicht.h>
 #include "IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
