@@ -4,6 +4,7 @@
 #include "config.h"
 #include "data_manager.h"
 #include <unordered_map>
+#include <queue>
 
 namespace ygo {
 
@@ -18,13 +19,15 @@ public:
 	irr::video::ITexture* GetTexture(int code, bool fit = false);
 	irr::video::ITexture* GetTextureThumb(int code);
 	irr::video::ITexture* GetTextureField(int code);
-	static int LoadThumbThread(int code);
+	static int LoadThumbThread();
 
 	std::unordered_map<int, irr::video::ITexture*> tMap[2];
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
 	std::unordered_map<int, irr::video::ITexture*> tFields;
 	std::unordered_map<int, irr::video::IImage*> tThumbLoading;
+	std::queue<int> tThumbLoadingCodes;
 	std::mutex tThumbLoadingMutex;
+	bool tThumbLoadingThreadRunning;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::video::ITexture* tCover[4];
