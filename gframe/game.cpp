@@ -326,6 +326,7 @@ bool Game::Initialize() {
 	btnEP = env->addButton(rect<s32>(320, 0, 370, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
 	//tab
+	infosExpanded = 0;
 	wInfos = irr::gui::CGUICustomTabControl::addCustomTabControl(env, rect<s32>(1, 275, 301, 639), 0, true);
 	wInfos->setVisible(false);
 	//info
@@ -346,15 +347,17 @@ bool Game::Initialize() {
 	((CGUICustomText*)stText)->enableScrollBar(0, 0.07f);
 	stText->setWordWrap(true);
 	//log
-	irr::gui::IGUITab* tabLog =  wInfos->addTab(dataManager.GetSysString(1271).c_str());
+	tabLog =  wInfos->addTab(dataManager.GetSysString(1271).c_str());
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(18);
 	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272).c_str());
+	btnExpandLog = env->addButton(rect<s32>(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, L"->");
 	//chat
-	irr::gui::IGUITab* tabChat = wInfos->addTab(dataManager.GetSysString(1279).c_str());
+	tabChat = wInfos->addTab(dataManager.GetSysString(1279).c_str());
 	lstChat = env->addListBox(rect<s32>(10, 10, 290, 290), tabChat, -1, false);
 	lstChat->setItemHeight(18);
 	btnClearChat = env->addButton(rect<s32>(160, 300, 260, 325), tabChat, BUTTON_CLEAR_CHAT, dataManager.GetSysString(1282).c_str());
+	btnExpandChat = env->addButton(rect<s32>(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, L"->");
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
 	chkMAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274).c_str());
@@ -1808,22 +1811,24 @@ void Game::OnResize() {
 
 	wCardImg->setRelativePosition(Resize(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18));
 	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
-	wInfos->setRelativePosition(Resize(1, 275, 301, 639));
+	wInfos->setRelativePosition(Resize(1, 275, (infosExpanded == 1) ? 1023 : 301, 639));
 	for(auto& window : repoInfoGui) {
-		window.second.progress2->setRelativePosition(recti(5, 20 + 15, ((300 - 8) * window_size.Width) / 1024 , 20 + 30));
+		window.second.progress2->setRelativePosition(recti(5, 20 + 15, ((300 - 8) * window_size.Width) / 1024, 20 + 30));
 	}
 	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
-	lstLog->setRelativePosition(Resize(10, 10, 290, 290));
-	lstChat->setRelativePosition(Resize(10, 10, 290, 290));
+	lstLog->setRelativePosition(Resize(10, 10, infosExpanded ? 1012 : 290, 290));
+	lstChat->setRelativePosition(Resize(10, 10, infosExpanded ? 1012 : 290, 290));
 	imageManager.ClearTexture(true);
 
 	if(showingcard)
 		ShowCardInfo(showingcard, true);
 	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
+	btnExpandLog->setRelativePosition(Resize(40, 300, 140, 325));
 	btnClearChat->setRelativePosition(Resize(160, 300, 260, 325));
-	srcVolume->setRelativePosition(rect<s32>(85, 295, wInfos->getRelativePosition().LowerRightCorner.X - 21, 310));
+	btnExpandChat->setRelativePosition(Resize(40, 300, 140, 325));
+	srcVolume->setRelativePosition(rect<s32>(85, 295, 301 * window_size.Width / 1024 - 21, 310));
 
-	wChat->setRelativePosition(ResizeWin(wInfos->getRelativePosition().LowerRightCorner.X + 6, 615, 1020, 640, true));
+	wChat->setRelativePosition(ResizeWin(301 * window_size.Width / 1024 + 6, 615, 1020, 640, true));
 	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));

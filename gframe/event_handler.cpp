@@ -1744,6 +1744,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 				break;
 			}
+			case BUTTON_EXPAND_INFOBOX: {
+				mainGame->infosExpanded = mainGame->infosExpanded ? 0 : 1;
+				mainGame->btnExpandLog->setText(mainGame->infosExpanded ? L"<-" : L"->");
+				mainGame->btnExpandChat->setText(mainGame->infosExpanded ? L"<-" : L"->");
+				mainGame->wInfos->setRelativePosition(mainGame->Resize(1, 275, mainGame->infosExpanded ? 1023 : 301, 639));
+				mainGame->lstLog->setRelativePosition(mainGame->Resize(10, 10, mainGame->infosExpanded ? 1012 : 290, 290));
+				mainGame->lstChat->setRelativePosition(mainGame->Resize(10, 10, mainGame->infosExpanded ? 1012 : 290, 290));
+				return true;
+				break;
+			}
 			case BUTTON_REPO_CHANGELOG:	{
 				irr::gui::IGUIButton* button = (irr::gui::IGUIButton*)event.GUIEvent.Caller;
 				for(auto& repo : mainGame->repoInfoGui) {
@@ -1795,6 +1805,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->gameConf.volume = (double)mainGame->srcVolume->getPos() / 100;
 				soundManager.SetSoundVolume(mainGame->gameConf.volume);
 				soundManager.SetMusicVolume(mainGame->gameConf.volume);
+				return true;
 				break;
 			}
 			}
@@ -1805,10 +1816,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			case CHECKBOX_ENABLE_MUSIC: {
 				if(!mainGame->chkEnableMusic->isChecked())
 					soundManager.StopBGM();
+				return true;
 				break;
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
 				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked() ? 1 : 0;
+				return true;
 			}
 			}
 			break;
@@ -1824,10 +1837,26 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 					int len = BufferIO::CopyWStr(input, msgbuf, 256);
 					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
 					mainGame->ebChatInput->setText(L"");
-					return true;
 				}
+				return true;
 				break;
 			}
+			}
+			break;
+		}
+		case irr::gui::EGET_TAB_CHANGED: {
+			if(event.GUIEvent.Caller == mainGame->wInfos) {
+				auto curTab = mainGame->wInfos->getTab(mainGame->wInfos->getActiveTab());
+				if((curTab != mainGame->tabLog && curTab != mainGame->tabChat) && mainGame->infosExpanded) {
+					if(mainGame->infosExpanded == 1)
+						mainGame->wInfos->setRelativePosition(mainGame->Resize(1, 275, 301, 639));
+					mainGame->infosExpanded = 2;
+				} else if(mainGame->infosExpanded) {
+					if(mainGame->infosExpanded == 2)
+						mainGame->wInfos->setRelativePosition(mainGame->Resize(1, 275, 1023, 639));
+					mainGame->infosExpanded = 1;
+				}
+				return true;
 			}
 			break;
 		}

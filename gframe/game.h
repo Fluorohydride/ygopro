@@ -105,7 +105,6 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
-	void ToggleFullscreen();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void LoadExpansionDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
@@ -196,7 +195,6 @@ public:
 #endif
 	bool coreloaded;
 	bool is_fullscreen;
-	core::dimension2d<u32> unresized_screen_size;
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
@@ -284,6 +282,7 @@ public:
 	irr::gui::IGUIStaticText* stTip;
 	irr::gui::IGUIStaticText* stCardListTip;
 	//infos
+	int infosExpanded; //0: not expanded, 1: expanded and to be shown as expanded, 2: expanded but not to be shown as expanded
 	irr::gui::IGUITabControl* wInfos;
 	irr::gui::IGUIStaticText* stName;
 	irr::gui::IGUIStaticText* stInfo;
@@ -291,10 +290,14 @@ public:
 	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
 	irr::gui::IGUIStaticText* stVolume;
+	irr::gui::IGUITab* tabLog;
 	irr::gui::IGUIListBox* lstLog;
+	irr::gui::IGUITab* tabChat;
 	irr::gui::IGUIListBox* lstChat;
 	irr::gui::IGUIButton* btnClearLog;
+	irr::gui::IGUIButton* btnExpandLog;
 	irr::gui::IGUIButton* btnClearChat;
+	irr::gui::IGUIButton* btnExpandChat;
 	irr::gui::IGUIButton* btnSaveLog;
 	irr::gui::IGUITab* tabRepositories;
 	irr::gui::IGUIContextMenu* mTabRepositories;
@@ -700,8 +703,9 @@ inline std::vector<T> Game::TokenizeString(T input, const T & token) {
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define BUTTON_CLEAR_CHAT			272
-#define BUTTON_REPO_CHANGELOG		273
-#define BUTTON_REPO_CHANGELOG_EXIT	274
+#define BUTTON_EXPAND_INFOBOX		273
+#define BUTTON_REPO_CHANGELOG		274
+#define BUTTON_REPO_CHANGELOG_EXIT	275
 #define BUTTON_DISPLAY_0			290
 #define BUTTON_DISPLAY_1			291
 #define BUTTON_DISPLAY_2			292
