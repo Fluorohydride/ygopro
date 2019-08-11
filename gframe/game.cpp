@@ -351,13 +351,13 @@ bool Game::Initialize() {
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(18);
 	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272).c_str());
-	btnExpandLog = env->addButton(rect<s32>(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, L"->");
+	btnExpandLog = env->addButton(rect<s32>(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2045).c_str());
 	//chat
 	tabChat = wInfos->addTab(dataManager.GetSysString(1279).c_str());
 	lstChat = env->addListBox(rect<s32>(10, 10, 290, 290), tabChat, -1, false);
 	lstChat->setItemHeight(18);
 	btnClearChat = env->addButton(rect<s32>(160, 300, 260, 325), tabChat, BUTTON_CLEAR_CHAT, dataManager.GetSysString(1282).c_str());
-	btnExpandChat = env->addButton(rect<s32>(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, L"->");
+	btnExpandChat = env->addButton(rect<s32>(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2043).c_str());
 	//system
 	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
 	chkMAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274).c_str());

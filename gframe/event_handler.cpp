@@ -1712,17 +1712,17 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
 			// Set cursor to an I-Beam if hovering over an edit box
-			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
-			{
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled()) {
 				Utils::changeCursor(ECI_IBEAM);
+				return true;
 			}
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
 			// Set cursor to normal if left an edit box
-			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX)
-			{
+			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX) {
 				Utils::changeCursor(ECI_NORMAL);
+				return true;
 			}
 			break;
 		}
@@ -1732,7 +1732,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->lstLog->clear();
 				mainGame->logParam.clear();
 				return true;
-				break;
 			}
 			case BUTTON_CLEAR_CHAT: {
 				mainGame->lstChat->clear();
@@ -1742,17 +1741,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 					mainGame->chatTiming[i] = 0;
 				}
 				return true;
-				break;
 			}
 			case BUTTON_EXPAND_INFOBOX: {
 				mainGame->infosExpanded = mainGame->infosExpanded ? 0 : 1;
-				mainGame->btnExpandLog->setText(mainGame->infosExpanded ? L"<-" : L"->");
-				mainGame->btnExpandChat->setText(mainGame->infosExpanded ? L"<-" : L"->");
+				mainGame->btnExpandLog->setText(mainGame->infosExpanded ? dataManager.GetSysString(2044).c_str() : dataManager.GetSysString(2043).c_str());
+				mainGame->btnExpandChat->setText(mainGame->infosExpanded ? dataManager.GetSysString(2044).c_str() : dataManager.GetSysString(2043).c_str());
 				mainGame->wInfos->setRelativePosition(mainGame->Resize(1, 275, mainGame->infosExpanded ? 1023 : 301, 639));
 				mainGame->lstLog->setRelativePosition(mainGame->Resize(10, 10, mainGame->infosExpanded ? 1012 : 290, 290));
 				mainGame->lstChat->setRelativePosition(mainGame->Resize(10, 10, mainGame->infosExpanded ? 1012 : 290, 290));
 				return true;
-				break;
 			}
 			case BUTTON_REPO_CHANGELOG:	{
 				irr::gui::IGUIButton* button = (irr::gui::IGUIButton*)event.GUIEvent.Caller;
@@ -1765,10 +1762,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 					}
 				}
 				return true;
-				break;
 			}
 			case BUTTON_REPO_CHANGELOG_EXIT: {
 				mainGame->HideElement(mainGame->wCommitsLog);
+				return true;
 			}
 			}
 			break;
@@ -1781,7 +1778,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 					mainGame->ShowCardInfo(mainGame->logParam[sel]);
 				}
 				return true;
-				break;
 			}
 			}
 			break;
@@ -1794,7 +1790,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 					mainGame->wInfos->setActiveTab(0);
 				}
 				return true;
-				break;
 			}
 			}
 			break;
@@ -1806,7 +1801,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				soundManager.SetSoundVolume(mainGame->gameConf.volume);
 				soundManager.SetMusicVolume(mainGame->gameConf.volume);
 				return true;
-				break;
 			}
 			}
 			break;
@@ -1817,7 +1811,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				if(!mainGame->chkEnableMusic->isChecked())
 					soundManager.StopBGM();
 				return true;
-				break;
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
 				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked() ? 1 : 0;
@@ -1839,7 +1832,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 					mainGame->ebChatInput->setText(L"");
 				}
 				return true;
-				break;
 			}
 			}
 			break;
@@ -1860,7 +1852,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		default: break;
 		}
 		break;
 	}
@@ -1869,32 +1860,27 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::KEY_KEY_R: {
 			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
-			break;
+			return true;
 		}
 		case irr::KEY_F9: {
 			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
 			return true;
-			break;
 		}
 		case irr::KEY_ESCAPE: {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
 			return true;
-			break;
 		}
-		case irr::KEY_F11:
-		{
+		case irr::KEY_F11: {
 			if(!event.KeyInput.PressedDown)
 				Utils::ToggleFullscreen();
 			return true;
-			break;
 		}
 		case irr::KEY_F12: {
 			if (!event.KeyInput.PressedDown)
 				Utils::takeScreenshot(mainGame->device);
 			return true;
-			break;
 		}
 		default: break;
 		}
