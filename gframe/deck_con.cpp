@@ -515,7 +515,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(!draging_pointer)
 				break;
 			if(hovered_pos == 4) {
-				if(!check_limit(draging_pointer))
+				if(!event.MouseInput.Shift && !check_limit(draging_pointer))
 					break;
 			}
 			is_draging = true;
@@ -594,7 +594,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					if(event.MouseInput.Shift)
 						push_side(pointer);
 					else {
-						if (!check_limit(pointer))
+						if (!event.MouseInput.Shift && !check_limit(pointer))
 							break;
 						if (!push_extra(pointer) && !push_main(pointer))
 							push_side(pointer);
@@ -625,7 +625,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if (is_draging)
 				break;
 			auto pointer = dataManager.GetCardData(hovered_code);
-			if(!pointer || !check_limit(pointer))
+			if(!pointer || (!event.MouseInput.Shift && !check_limit(pointer)))
 				break;
 			if (hovered_pos == 1) {
 				if(!push_main(pointer))
