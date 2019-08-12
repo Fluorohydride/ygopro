@@ -3,7 +3,7 @@ sudo: required
 dist: bionic
 git:
   depth: 1
-  submodules: false
+  submodules: true
 env:
   global:
   - BUILD_CONFIG=release
@@ -100,8 +100,6 @@ install:
       ./build-support/install-macOS-src.sh; 
     fi ;
   fi
-before_script:
-- git submodule update --depth=1 --init --recursive ocgcore
 script:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./premake5 vs2017 --no-direct3d --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
