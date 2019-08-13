@@ -880,11 +880,11 @@ void Game::DrawSpec() {
 		}
 		case 7: {
 			core::position2d<s32> corner[4];
-			float y = sin(showcarddif * PI / 180.0f) * CARD_IMG_HEIGHT * window_size.Height / 640;
-			corner[0] = core::position2d<s32>(574 * window_size.Width / 1024 - (CARD_IMG_HEIGHT * window_size.Height / 640 - y) * 0.3f, 404 * window_size.Height / 640 - y);
-			corner[1] = core::position2d<s32>(751 * window_size.Width / 1024 + (CARD_IMG_HEIGHT * window_size.Height / 640 - y) * 0.3f, 404 * window_size.Height / 640 - y);
-			corner[2] = core::position2d<s32>(574 * window_size.Width / 1024, 404 * window_size.Height / 640);
-			corner[3] = core::position2d<s32>(751 * window_size.Width / 1024, 404 * window_size.Height / 640);
+			float y = sin(showcarddif * PI / 180.0f) * CARD_IMG_HEIGHT * window_scale.Y;
+			corner[0] = core::position2d<s32>(574 * window_scale.X - (CARD_IMG_HEIGHT * window_scale.Y - y) * 0.3f, 404 * window_scale.Y - y);
+			corner[1] = core::position2d<s32>(751 * window_scale.X + (CARD_IMG_HEIGHT * window_scale.Y - y) * 0.3f, 404 * window_scale.Y - y);
+			corner[2] = core::position2d<s32>(574 * window_scale.X, 404 * window_scale.Y);
+			corner[3] = core::position2d<s32>(751 * window_scale.X, 404 * window_scale.Y);
 			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode), rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
 			showcardp += (float)delta_time * 60.0f / 1000.0f;
 			showcarddif += (540.0f / 1000.0f) * (float)delta_time;
@@ -1123,8 +1123,8 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 	recti dragloc = Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT);
 	recti limitloc = Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20);
 	if(drag) {
-		dragloc = recti(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH * window_size.Width / 1024, pos.Y + CARD_THUMB_HEIGHT * window_size.Height / 640);
-		limitloc = recti(pos.X, pos.Y, pos.X + 20 * window_size.Width / 1024, pos.Y + 20 * window_size.Height / 640);
+		dragloc = recti(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH * window_scale.X, pos.Y + CARD_THUMB_HEIGHT * window_scale.Y);
+		limitloc = recti(pos.X, pos.Y, pos.X + 20 * window_scale.X, pos.Y + 20 * window_scale.Y);
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
 	if(!is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {

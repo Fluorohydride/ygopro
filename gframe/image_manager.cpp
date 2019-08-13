@@ -58,10 +58,10 @@ bool ImageManager::Initial() {
 	tFieldTransparent[1][3] = driver->getTexture("textures/field-transparentSP4.png");
 	sizes[0].first = CARD_IMG_WIDTH;
 	sizes[0].second = CARD_IMG_HEIGHT;
-	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_size.Width / 1024;
-	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_size.Height / 640;
-	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024;
-	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640;
+	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X;
+	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y;
+	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X;
+	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y;
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
@@ -77,10 +77,10 @@ void ImageManager::ClearTexture(bool resize) {
 		map.clear();
 	};
 	if(resize) {
-		sizes[1].first = CARD_IMG_WIDTH * mainGame->window_size.Width / 1024;
-		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_size.Height / 640;
-		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_size.Width / 1024;
-		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_size.Height / 640;
+		sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X;
+		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y;
+		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X;
+		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y;
 	}
 	if(!resize) {
 		ClearCachedTextures(resize);
@@ -455,8 +455,8 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool wait, bool fit, in
 			int width = CARD_IMG_WIDTH;
 			int height = CARD_IMG_HEIGHT;
 			if(fit) {
-				width = width * mainGame->window_size.Width / 1024;
-				height = height * mainGame->window_size.Height / 640;
+				width = width * mainGame->window_scale.X;
+				height = height * mainGame->window_scale.Y;
 			}
 			if(wait) {
 				auto tmp_img = LoadCardTexture(code, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
