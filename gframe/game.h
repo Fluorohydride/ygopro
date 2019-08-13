@@ -248,6 +248,7 @@ public:
 	bool cardimagetextureloading;
 
 	irr::core::dimension2d<irr::u32> window_size;
+	irr::core::vector2d<irr::f32> window_scale;
 
 	CGUISkinSystem *skinSystem;
 

@@ -901,6 +901,8 @@ void Game::MainLoop() {
 		dimension2du size = driver->getScreenSize();
 		if(window_size != size) {
 			window_size = size;
+			window_scale.X = window_size.Width / 1024.0;
+			window_scale.Y = window_size.Height / 640.0;
 			cardimagetextureloading = false;
 			OnResize();
 		}
@@ -1399,17 +1401,17 @@ void Game::ShowCardInfo(int code, bool resize) {
 			stDataInfo->setText(L"");
 	}
 	int offset = 37;
-	stInfo->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, offset + stInfo->getTextHeight()));
+	stInfo->setRelativePosition(rect<s32>(15, offset, 287 * window_scale.X, offset + stInfo->getTextHeight()));
 	offset += stInfo->getTextHeight();
 	if(wcscmp(stDataInfo->getText(), L"")) {
-		stDataInfo->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, offset + stDataInfo->getTextHeight()));
+		stDataInfo->setRelativePosition(rect<s32>(15, offset, 287 * window_scale.X, offset + stDataInfo->getTextHeight()));
 		offset += stDataInfo->getTextHeight();
 	}
 	if(wcscmp(stSetName->getText(), L"")) {
-		stSetName->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, offset + stSetName->getTextHeight()));
+		stSetName->setRelativePosition(rect<s32>(15, offset, 287 * window_scale.X, offset + stSetName->getTextHeight()));
 		offset += stSetName->getTextHeight();
 	}
-	stText->setRelativePosition(rect<s32>(15, offset, 287 * window_size.Width / 1024, 324 * window_size.Height / 640));
+	stText->setRelativePosition(rect<s32>(15, offset, 287 * window_scale.X, 324 * window_scale.Y));
 	stText->setText(dataManager.GetText(code).c_str());
 }
 void Game::ClearCardInfo(int player) {
@@ -1813,9 +1815,9 @@ void Game::OnResize() {
 	imgCard->setRelativePosition(Resize(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT));
 	wInfos->setRelativePosition(Resize(1, 275, (infosExpanded == 1) ? 1023 : 301, 639));
 	for(auto& window : repoInfoGui) {
-		window.second.progress2->setRelativePosition(recti(5, 20 + 15, ((300 - 8) * window_size.Width) / 1024, 20 + 30));
+		window.second.progress2->setRelativePosition(recti(5, 20 + 15, (300 - 8) * window_scale.X, 20 + 30));
 	}
-	stName->setRelativePosition(recti(10, 10, 287 * window_size.Width / 1024, 32));
+	stName->setRelativePosition(recti(10, 10, 287 * window_scale.X, 32));
 	lstLog->setRelativePosition(Resize(10, 10, infosExpanded ? 1012 : 290, 290));
 	lstChat->setRelativePosition(Resize(10, 10, infosExpanded ? 1012 : 290, 290));
 	imageManager.ClearTexture(true);
@@ -1826,9 +1828,9 @@ void Game::OnResize() {
 	btnExpandLog->setRelativePosition(Resize(40, 300, 140, 325));
 	btnClearChat->setRelativePosition(Resize(160, 300, 260, 325));
 	btnExpandChat->setRelativePosition(Resize(40, 300, 140, 325));
-	srcVolume->setRelativePosition(rect<s32>(85, 295, 301 * window_size.Width / 1024 - 21, 310));
+	srcVolume->setRelativePosition(rect<s32>(85, 295, 301 * window_scale.X - 21, 310));
 
-	wChat->setRelativePosition(ResizeWin(301 * window_size.Width / 1024 + 6, 615, 1020, 640, true));
+	wChat->setRelativePosition(ResizeWin(301 * window_scale.X + 6, 615, 1020, 640, true));
 	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
@@ -1848,26 +1850,26 @@ void Game::OnResize() {
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
-	x = x * window_size.Width / 1024;
-	y = y * window_size.Height / 640;
-	x2 = x2 * window_size.Width / 1024;
-	y2 = y2 * window_size.Height / 640;
+	x = x * window_scale.X;
+	y = y * window_scale.Y;
+	x2 = x2 * window_scale.X;
+	y2 = y2 * window_scale.Y;
 	return recti(x, y, x2, y2);
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2) {
-	x = x * window_size.Width / 1024 + dx;
-	y = y * window_size.Height / 640 + dy;
-	x2 = x2 * window_size.Width / 1024 + dx2;
-	y2 = y2 * window_size.Height / 640 + dy2;
+	x = x * window_scale.X + dx;
+	y = y * window_scale.Y + dy;
+	x2 = x2 * window_scale.X + dx2;
+	y2 = y2 * window_scale.Y + dy2;
 	return recti(x, y, x2, y2);
 }
 vector2d<s32> Game::Resize(s32 x, s32 y, bool reverse) {
 	if(reverse) {
-		x = x * 1024 / window_size.Width;
-		y = y * 640 / window_size.Height;
+		x = x / window_scale.X;
+		y = y / window_scale.Y;
 	} else {
-		x = x * window_size.Width / 1024;
-		y = y * window_size.Height / 640;
+		x = x * window_scale.X;
+		y = y * window_scale.Y;
 	}
 	return vector2d<s32>(x, y);
 }
@@ -1880,8 +1882,8 @@ recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
 		y2 = y + sy;
 		return recti(x, y, x2, y2);
 	}
-	x = (x + sx / 2) * window_size.Width / 1024 - sx / 2;
-	y = (y + sy / 2) * window_size.Height / 640 - sy / 2;
+	x = (x + sx / 2) * window_scale.X - sx / 2;
+	y = (y + sy / 2) * window_scale.Y - sy / 2;
 	x2 = sx + x;
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
@@ -1892,8 +1894,8 @@ void Game::SetCentered(irr::gui::IGUIElement * elem) {
 recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2) {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
-	x = (x + sx / 2 - 100) * window_size.Width / 1024 - sx / 2 + 100;
-	y = y * window_size.Height / 640;
+	x = (x + sx / 2 - 100) * window_scale.X - sx / 2 + 100;
+	y = y * window_scale.Y;
 	x2 = sx + x;
 	y2 = sy + y;
 	return recti(x, y, x2, y2);
