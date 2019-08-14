@@ -8,6 +8,7 @@
 #include "rect.h"
 #include "../IrrlichtCommonIncludes/os.h"
 #include <algorithm>
+#include <cmath>
 
 namespace irr
 {
