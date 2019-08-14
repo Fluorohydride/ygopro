@@ -167,18 +167,17 @@ void CGUICustomText::draw()
 				if(hasVerticalAutoscrolling())
 					r.UpperLeftCorner.Y -= round((float)curFrame * animationStep);
 
-				for(u32 i = 0; i < BrokenText.size(); ++i) {
+				u32 end = std::min(BrokenText.size(), (u32)(std::floor((AbsoluteClippingRect.getHeight() + offset) / height) + 1));
+				u32 start = std::max(0, (s32)(end - std::floor(AbsoluteClippingRect.getHeight() / height) - 2));
+				r.UpperLeftCorner.Y += height * start;
+				for(u32 i = start; i < end; ++i, r.UpperLeftCorner.Y += height) {
 					if(HAlign == EGUIA_LOWERRIGHT) {
 						r.UpperLeftCorner.X = frameRect.LowerRightCorner.X -
 							font->getDimension(BrokenText[i].c_str()).Width;
 					}
-
 					font->draw(BrokenText[i].c_str(), r,
 							   OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
 							   HAlign == EGUIA_CENTER, false, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
-
-					r.LowerRightCorner.Y += height;
-					r.UpperLeftCorner.Y += height;
 				}
 			}
 		}
