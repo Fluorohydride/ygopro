@@ -320,7 +320,7 @@ bool CGUICustomContextMenu::OnEvent(const SEvent& event)
 			switch(event.GUIEvent.EventType)
 			{
 			case EGET_ELEMENT_FOCUS_LOST:
-				if (event.GUIEvent.Caller == this && !isMyChild(event.GUIEvent.Element) && AllowFocus)
+				if ((event.GUIEvent.Caller == this || (isMyChild(event.GUIEvent.Caller) && event.GUIEvent.Element != this)) && !isMyChild(event.GUIEvent.Element) && AllowFocus)
 				{
 					// set event parent of submenus
 					IGUIElement * p =  EventParent ? EventParent : Parent;

@@ -120,7 +120,7 @@ bool CGUICustomMenu::OnEvent(const SEvent& event)
 			switch(event.GUIEvent.EventType)
 			{
 			case gui::EGET_ELEMENT_FOCUS_LOST:
-				if (event.GUIEvent.Caller == this && !isMyChild(event.GUIEvent.Element))
+				if ((event.GUIEvent.Caller == this || (isMyChild(event.GUIEvent.Caller) && event.GUIEvent.Element != this)) && !isMyChild(event.GUIEvent.Element))
 				{
 					closeAllSubMenus();
 					HighLighted = -1;
