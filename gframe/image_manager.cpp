@@ -372,8 +372,12 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 		}
 	return true;
 }
-irr::video::IImage* ImageManager::GetTextureFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
-	irr::video::IImage* srcimg = driver->createImageFromFile(file);
+irr::video::IImage* ImageManager::GetTextureFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile) {
+	irr::video::IImage* srcimg = nullptr;
+	if(archivefile)
+		srcimg = driver->createImageFromFile(archivefile);
+	else
+		srcimg = driver->createImageFromFile(file);
 	if(srcimg == NULL || timestamp_id != source_timestamp_id.load()) {
 		if(srcimg)
 			srcimg->drop();
@@ -399,15 +403,25 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 		for(auto extension : { TEXT(".png"), TEXT(".jpg") }) {
 			if(timestamp_id != source_timestamp_id.load())
 				return std::make_pair(nullptr, TEXT("fail"));
-			auto file = fmt::format(TEXT("{}{}{}"), path, code, extension);
+			irr::io::IReadFile* reader = nullptr;
+			if(path == TEXT("archives")) {
+				reader = Utils::FindandOpenFileFromArchives(TEXT("pics"), fmt::format(TEXT("{}{}"), code, extension));
+				if(!reader)
+					continue;
+			}
 			if(width != _width || height != _height) {
 				width = _width;
 				height = _height;
 			}
+			auto file = reader ? reader->getFileName().c_str() : fmt::format(TEXT("{}{}{}"), path, code, extension);
 			__repeat:
-			if(img = GetTextureFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id))) {
+			if(img = GetTextureFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader)) {
 				if(timestamp_id != source_timestamp_id.load()) {
 					img->drop();
+					if(reader) {
+						reader->drop();
+						reader = nullptr;
+					}
 					return std::make_pair(nullptr, TEXT("fail"));
 				}
 				if(width != _width || height != _height) {
@@ -416,10 +430,23 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 					height = _height;
 					goto __repeat;
 				}
+				if(reader) {
+					reader->drop();
+					reader = nullptr;
+				}
 				return std::make_pair(img, Utils::ParseFilename(file));
 			}
-			if(timestamp_id != source_timestamp_id.load())
+			if(timestamp_id != source_timestamp_id.load()) {
+				if(reader) {
+					reader->drop();
+					reader = nullptr;
+				}
 				return std::make_pair(nullptr, TEXT("fail"));
+			}
+			if(reader) {
+				reader->drop();
+				reader = nullptr;
+			}
 		}
 	}
 	pic_download.lock();
@@ -542,8 +569,19 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		} else {
 			for(auto& path : mainGame->field_dirs) {
 				for(auto extension : { TEXT(".png"), TEXT(".jpg") }) {
-					if(img = driver->getTexture(fmt::format(TEXT("{}{}{}"), path, code, extension).c_str()))
-						break;
+					irr::io::IReadFile* reader = nullptr;
+					if(path == TEXT("archives")) {
+						reader = Utils::FindandOpenFileFromArchives(TEXT("pics"), fmt::format(TEXT("{}{}"), code, extension));
+						if(!reader)
+							continue;
+						img = driver->getTexture(reader);
+						reader->drop();
+						if(img)
+							break;
+					} else {
+						if(img = driver->getTexture(fmt::format(TEXT("{}{}{}"), path, code, extension).c_str()))
+							break;
+					}
 				}
 			}
 		}

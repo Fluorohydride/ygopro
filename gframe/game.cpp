@@ -104,6 +104,8 @@ bool Game::Initialize() {
 	if(!dataManager.LoadDB("cards.cdb"))
 		ErrorLog("cards.cdb not found in the root, loading anyways!");
 	LoadExpansionDB();
+	LoadZipArchives();
+	LoadArchivesDB();
 	if(!dataManager.LoadStrings("strings.conf")) {
 		ErrorLog("Failed to load strings!");
 		return false;
@@ -1022,10 +1024,33 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[11] = 1.0f;
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
+void Game::LoadZipArchives() {
+	IFileArchive* tmp_archive = nullptr;
+	for(auto& file : Utils::FindfolderFiles(L"./expansions/", { L"zip" })) {
+		filesystem->addFileArchive(Utils::ParseFilename(L"./expansions/" + file).c_str(), true, false, EFAT_ZIP, "", &tmp_archive);
+		if(tmp_archive) {
+			archives.emplace_back(tmp_archive);
+		}
+	}
+}
 void Game::LoadExpansionDB() {
-	auto files = Utils::FindfolderFiles(L"./expansions/", {L"cdb"}, 2);
-	for (auto& file : files)
+	for (auto& file : Utils::FindfolderFiles(L"./expansions/", { L"cdb" }, 2))
 		dataManager.LoadDB(BufferIO::EncodeUTF8s(L"./expansions/" + file));
+}
+void Game::LoadArchivesDB() {
+	for(auto& archive: archives) {
+		auto files = Utils::FindfolderFiles(archive, TEXT(""), { TEXT("cdb") }, 3);
+		for(auto& index : files) {
+			auto reader = archive.archive->createAndOpenFile(index);
+			if(reader == nullptr)
+				continue;
+			std::vector<char> buffer;
+			buffer.resize(reader->getSize());
+			reader->read(buffer.data(), buffer.size());
+			reader->drop();
+			dataManager.LoadDBFromBuffer(buffer);
+		}
+	}
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
@@ -2006,9 +2031,20 @@ std::vector<unsigned char> Game::LoadScript(const std::string& _name) {
 	std::ifstream script;
 	path_string name = Utils::ParseFilename(_name);
 	for(auto& path : script_dirs) {
-		script.open(path + name, std::ifstream::binary);
-		if(script.is_open())
-			break;
+		if(path == TEXT("archives")) {
+			auto reader = Utils::FindandOpenFileFromArchives(TEXT("script"), name);
+			if(reader == nullptr)
+				continue;
+			buffer.resize(reader->getSize());
+			bool readed = reader->read(buffer.data(), buffer.size()) == buffer.size();
+			reader->drop();
+			if(readed)
+				return buffer;
+		} else {
+			script.open(path + name, std::ifstream::binary);
+			if(script.is_open())
+				break;
+		}
 	}
 	if(!script.is_open()) {
 		script.open(name, std::ifstream::binary);
@@ -2051,10 +2087,13 @@ int Game::MessageHandler(void* fduel, int type) {
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));
+	script_dirs.push_back(TEXT("archives"));
 	script_dirs.push_back(TEXT("./script/"));
 	pic_dirs.push_back(TEXT("./expansions/pics/"));
+	pic_dirs.push_back(TEXT("archives"));
 	pic_dirs.push_back(TEXT("./pics/"));
 	field_dirs.push_back(TEXT("./expansions/pics/field/"));
+	field_dirs.push_back(TEXT("archives"));
 	field_dirs.push_back(TEXT("./pics/field/"));
 }
 

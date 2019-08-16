@@ -9,7 +9,6 @@
 #include <X11/Xatom.h>
 #endif
 namespace ygo {
-	Utils utils;
 #ifdef _WIN32
 	bool Utils::Makedirectory(const std::wstring& path) {
 		return CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
@@ -288,7 +287,7 @@ namespace ygo {
 		}
 #endif
 	}
-	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, std::vector<std::wstring> extensions, int subdirectorylayers) {
+	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, const std::vector<std::wstring>& extensions, int subdirectorylayers) {
 		std::vector<std::wstring> res;
 		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](std::wstring name, bool isdir, void* payload) {
 			if(isdir) {
@@ -310,6 +309,56 @@ namespace ygo {
 			}
 		});
 		return res;
+	}
+	void Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload) {
+		auto _path = ParseFilename(NormalizePath(path, false));
+		auto& indexfolders = archive.folderindexes[_path].first;
+		auto& indexfiles = archive.folderindexes[_path].second;
+		for(int i = indexfolders.first; i < indexfolders.second && cb(i, archive.archive->getFileList()->getFileName(i).c_str(), true, payload); i++) {}
+		for(int i = indexfiles.first; i < indexfiles.second && cb(i, archive.archive->getFileList()->getFileName(i).c_str(), false, payload); i++) {}
+
+	}
+	std::vector<int> Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::vector<path_string>& extensions, int subdirectorylayers) {
+		std::vector<int> res;
+		FindfolderFiles(archive, path, [&res, arc = archive.archive, extensions, path, subdirectorylayers, &archive](int index, path_string name, bool isdir, void* payload)->bool {
+			if(isdir) {
+				if(subdirectorylayers) {
+					if(name == L".." || name == L".") {
+						return true;
+					}
+					std::vector<int> res2 = FindfolderFiles(archive, path + name + L"/", extensions, subdirectorylayers - 1);
+					res.insert(res.end(), res2.begin(), res2.end());
+				}
+				return true;
+			} else {
+				if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension(name)) == extensions.end())
+					return true;
+				res.push_back(index);
+			}
+			return true;
+		});
+
+		return res;
+	}
+	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const path_string & path, const path_string & name) {
+		for(auto& archive : mainGame->archives) {
+			int res = -1;
+			Utils::FindfolderFiles(archive, path, [match = &name, &res](int index, path_string name, bool isdir, void* payload)->bool {
+				if(isdir)
+					return false;
+				if(name == (*match)) {
+					res = index;
+					return false;
+				}
+				return true;
+			});
+			if(res != -1) {
+				auto reader = archive.archive->createAndOpenFile(res);
+				if(reader)
+					return reader;
+			}
+		}
+		return nullptr;
 	}
 	std::wstring Utils::NormalizePath(std::wstring path, bool trailing_slash) {
 		std::replace(path.begin(), path.end(), L'\\', L'/');
@@ -432,6 +481,37 @@ namespace ygo {
 #else
 		return input;
 #endif
+	}
+	void Utils::IrrArchiveHelper::ParseList(irr::io::IFileArchive* _archive) {
+		archive = _archive;
+		auto list = archive->getFileList();
+		std::vector<path_string> list_full;
+		folderindexes[TEXT(".")] = { { -1, -1 }, { -1, -1 } };
+		for(u32 i = 0; i < list->getFileCount(); ++i) {
+			list_full.push_back(list->getFullFileName(i).c_str());
+			if(list->isDirectory(i)) {
+				folderindexes[list->getFullFileName(i).c_str()] = { { -1, -1 }, { -1, -1 } };
+				auto& name_path = list->getFullFileName(i);
+				auto& name = list->getFileName(i);
+				if(name_path.size() == name.size()) {
+					/*special case, root folder*/
+					folderindexes[TEXT("")] = { { std::min((unsigned)folderindexes[TEXT("")].first.first, i), i + 1 }, folderindexes[TEXT("")].second };
+				} else {
+					path_string path = NormalizePath(name_path.subString(0, name_path.size() - name.size() - 1).c_str(), false);
+					folderindexes[path] = { { std::min((unsigned)folderindexes[path].first.first, i), i + 1 }, folderindexes[path].second };
+				}
+			} else {
+				auto& name_path = list->getFullFileName(i);
+				auto& name = list->getFileName(i);
+				if(name_path.size() == name.size()) {
+					/*special case, root folder*/
+					folderindexes[TEXT("")] = { folderindexes[TEXT("")].first, { std::min((unsigned)folderindexes[TEXT("")].second.first, i), i + 1 } };
+				} else {
+					path_string path = NormalizePath(name_path.subString(0, name_path.size() - name.size() - 1).c_str(), false);
+					folderindexes[path] = { folderindexes[path].first, { std::min((unsigned)folderindexes[path].second.first, i), i + 1 } };
+				}
+			}
+		}
 	}
 }
 

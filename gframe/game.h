@@ -106,7 +106,9 @@ public:
 	bool Initialize();
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
+	void LoadZipArchives();
 	void LoadExpansionDB();
+	void LoadArchivesDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
@@ -265,6 +267,7 @@ public:
 	std::vector<path_string> pic_dirs;
 	std::vector<path_string> script_dirs;
 	std::vector<std::wstring> cores_to_load;
+	std::vector<Utils::IrrArchiveHelper> archives;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	//GUI
