@@ -19,11 +19,7 @@ bool DeckManager::LoadLFListFolder(std::string path) {
 
 bool DeckManager::LoadLFListSingle(const std::wstring& path) {
 	bool loaded = false;
-#ifdef _WIN32
-	std::ifstream infile(path, std::ifstream::in);
-#else
-	std::ifstream infile(BufferIO::EncodeUTF8s(path), std::ifstream::in);
-#endif
+	std::ifstream infile(Utils::ParseFilename(path), std::ifstream::in);
 	if(!infile.is_open())
 		return loaded;
 	LFList lflist;
