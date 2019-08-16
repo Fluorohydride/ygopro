@@ -27,7 +27,7 @@ private:
 
 public:
 	static Replay cur_replay;
-	static ReplayStream ReplayMode::current_stream;
+	static ReplayStream current_stream;
 	
 public:
 	static bool StartReplay(int skipturn, bool is_yrp);

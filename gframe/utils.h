@@ -45,9 +45,9 @@ namespace ygo {
 		static void ToggleFullscreen();
 		static void changeCursor(irr::gui::ECURSOR_ICON icon);
 		static void FindfolderFiles(const std::wstring & path, const std::function<void(std::wstring, bool, void*)>& cb, void* payload = nullptr);
-		static std::vector<std::wstring> FindfolderFiles(const std::wstring& path, const std::vector<std::wstring>& extensions, int subdirectorylayers = 0);
+		static std::vector<std::wstring> FindfolderFiles(const std::wstring& path, std::vector<std::wstring> extensions, int subdirectorylayers = 0);
 		static void FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload = nullptr);
-		static std::vector<int> FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::vector<std::wstring>& extensions, int subdirectorylayers = 0);
+		static std::vector<int> FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, std::vector<std::wstring> extensions, int subdirectorylayers = 0);
 		static irr::io::IReadFile* FindandOpenFileFromArchives(const path_string& path, const path_string& name);
 		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);
 		static std::wstring GetFileExtension(std::wstring file);

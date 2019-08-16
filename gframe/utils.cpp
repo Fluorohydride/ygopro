@@ -287,7 +287,7 @@ namespace ygo {
 		}
 #endif
 	}
-	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, const std::vector<std::wstring>& extensions, int subdirectorylayers) {
+	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, std::vector<std::wstring> extensions, int subdirectorylayers) {
 		std::vector<std::wstring> res;
 		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](std::wstring name, bool isdir, void* payload) {
 			if(isdir) {
@@ -318,7 +318,7 @@ namespace ygo {
 		for(int i = indexfiles.first; i < indexfiles.second && cb(i, archive.archive->getFileList()->getFileName(i).c_str(), false, payload); i++) {}
 
 	}
-	std::vector<int> Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::vector<path_string>& extensions, int subdirectorylayers) {
+	std::vector<int> Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
 		std::vector<int> res;
 		FindfolderFiles(archive, path, [&res, arc = archive.archive, extensions, path, subdirectorylayers, &archive](int index, path_string name, bool isdir, void* payload)->bool {
 			if(isdir) {
