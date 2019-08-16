@@ -1797,7 +1797,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
 			case SCROLL_VOLUME: {
-				mainGame->gameConf.volume = (double)mainGame->srcVolume->getPos() / 100;
+				mainGame->gameConf.volume = (double)mainGame->scrVolume->getPos() / 100;
 				soundManager.SetSoundVolume(mainGame->gameConf.volume);
 				soundManager.SetMusicVolume(mainGame->gameConf.volume);
 				return true;

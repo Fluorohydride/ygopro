@@ -15,6 +15,7 @@
 #include "CGUICustomContextMenu/CGUICustomMenu.h"
 #include "CGUICustomTabControl/CGUICustomTabControl.h"
 #include "CProgressBar/CProgressBar.h"
+#include "ResizeablePanel/ResizeablePanel.h"
 #include "deck_manager.h"
 #include "repo_manager.h"
 
@@ -305,6 +306,7 @@ public:
 	irr::gui::IGUIButton* btnSaveLog;
 	irr::gui::IGUITab* tabRepositories;
 	irr::gui::IGUIContextMenu* mTabRepositories;
+	irr::gui::Panel* tabSystem;
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
@@ -315,7 +317,7 @@ public:
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
-	irr::gui::IGUIScrollBar* srcVolume;
+	irr::gui::IGUIScrollBar* scrVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;

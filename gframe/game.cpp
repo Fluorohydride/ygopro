@@ -361,35 +361,38 @@ bool Game::Initialize() {
 	btnClearChat = env->addButton(rect<s32>(160, 300, 260, 325), tabChat, BUTTON_CLEAR_CHAT, dataManager.GetSysString(1282).c_str());
 	btnExpandChat = env->addButton(rect<s32>(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2043).c_str());
 	//system
-	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
-	chkMAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274).c_str());
+	irr::gui::IGUITab* _tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
+        auto aaa = rect<s32>(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight());
+        tabSystem = Panel::addPanel(env, _tabSystem, -1, aaa, true, false);
+	auto tabPanel = tabSystem->getSubpanel();
+	chkMAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1274).c_str());
 	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
-	chkSTAutoPos = env->addCheckBox(false, rect<s32>(20, 50, 280, 75), tabSystem, -1, dataManager.GetSysString(1278).c_str());
+	chkSTAutoPos = env->addCheckBox(false, rect<s32>(20, 50, 280, 75), tabPanel, -1, dataManager.GetSysString(1278).c_str());
 	chkSTAutoPos->setChecked(gameConf.chkSTAutoPos != 0);
-	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 80, 300, 105), tabSystem, -1, dataManager.GetSysString(1275).c_str());
+	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 80, 300, 105), tabPanel, -1, dataManager.GetSysString(1275).c_str());
 	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
-	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1276).c_str());
+	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabPanel, -1, dataManager.GetSysString(1276).c_str());
 	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
-	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 140, 280, 165), tabSystem, -1, dataManager.GetSysString(1277).c_str());
+	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1277).c_str());
 	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
-	chkHideHintButton = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1355).c_str());
+	chkHideHintButton = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabPanel, -1, dataManager.GetSysString(1355).c_str());
 	chkHideHintButton->setChecked(gameConf.chkHideHintButton != 0);
-	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1290).c_str());
+	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1290).c_str());
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
-	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 230, 280, 255), tabSystem, -1, dataManager.GetSysString(1291).c_str());
+	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1291).c_str());
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
-	chkEnableSound = env->addCheckBox(gameConf.enablesound, rect<s32>(140, 260, 300, 285), tabSystem, -1, dataManager.GetSysString(2046).c_str());
-	chkEnableSound->setChecked(gameConf.enablesound);
-	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, rect<s32>(20, 260, 140, 285), tabSystem, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2047).c_str());
+	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, rect<s32>(20, 260, 280, 285), tabPanel, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2047).c_str());
 	chkEnableMusic->setChecked(gameConf.enablemusic);
-	stVolume = env->addStaticText(L"Volume", rect<s32>(20, 290, 80, 310), false, true, tabSystem, -1, false);
-	srcVolume = env->addScrollBar(true, rect<s32>(85, 295, 280, 310), tabSystem, SCROLL_VOLUME);
-	srcVolume->setMax(100);
-	srcVolume->setMin(0);
-	srcVolume->setPos(gameConf.volume * 100);
-	srcVolume->setLargeStep(1);
-	srcVolume->setSmallStep(1);
-	chkQuickAnimation = env->addCheckBox(false, rect<s32>(20, 315, 280, 340), tabSystem, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
+	chkEnableSound = env->addCheckBox(gameConf.enablesound, rect<s32>(20, 290, 280, 315), tabPanel, -1, dataManager.GetSysString(2046).c_str());
+	chkEnableSound->setChecked(gameConf.enablesound);
+	stVolume = env->addStaticText(L"Volume", rect<s32>(20, 320, 80, 345), false, true, tabPanel, -1, false);
+	scrVolume = env->addScrollBar(true, rect<s32>(85, 325, 280, 340), tabPanel, SCROLL_VOLUME);
+	scrVolume->setMax(100);
+	scrVolume->setMin(0);
+	scrVolume->setPos(gameConf.volume * 100);
+	scrVolume->setLargeStep(1);
+	scrVolume->setSmallStep(1);
+	chkQuickAnimation = env->addCheckBox(false, rect<s32>(20, 345, 280, 370), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
@@ -774,7 +777,7 @@ bool Game::Initialize() {
 		chkEnableMusic->setChecked(false);
 		chkEnableMusic->setEnabled(false);
 		chkEnableMusic->setVisible(false);
-		srcVolume->setVisible(false);
+		scrVolume->setVisible(false);
 	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
@@ -1853,7 +1856,9 @@ void Game::OnResize() {
 	btnExpandLog->setRelativePosition(Resize(40, 300, 140, 325));
 	btnClearChat->setRelativePosition(Resize(160, 300, 260, 325));
 	btnExpandChat->setRelativePosition(Resize(40, 300, 140, 325));
-	srcVolume->setRelativePosition(rect<s32>(85, 295, 301 * window_scale.X - 21, 310));
+	tabSystem->setRelativePosition(Resize(0, 0, 300, 364));
+	//rect<s32>(0, 0, wInfos->getRelativePosition().getWidth(), wInfos->getRelativePosition().getHeight()));
+	scrVolume->setRelativePosition(rect<s32>(85, 325, std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, 300), 340));
 
 	wChat->setRelativePosition(ResizeWin(301 * window_scale.X + 6, 615, 1020, 640, true));
 	ebChatInput->setRelativePosition(recti(3, 2, window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, 22));
