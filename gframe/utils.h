@@ -12,11 +12,7 @@
 #include <sys/stat.h>
 #endif
 
-#ifdef _WIN32
-using path_string = std::wstring;
-#else
-using path_string = std::string;
-#endif
+using path_string = std::basic_string<irr::fschar_t>;
 
 namespace ygo {
 	class Utils {

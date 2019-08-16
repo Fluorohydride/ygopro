@@ -323,10 +323,10 @@ namespace ygo {
 		FindfolderFiles(archive, path, [&res, arc = archive.archive, extensions, path, subdirectorylayers, &archive](int index, path_string name, bool isdir, void* payload)->bool {
 			if(isdir) {
 				if(subdirectorylayers) {
-					if(name == L".." || name == L".") {
+					if(name == TEXT("..") || name == TEXT(".")) {
 						return true;
 					}
-					std::vector<int> res2 = FindfolderFiles(archive, path + name + L"/", extensions, subdirectorylayers - 1);
+					std::vector<int> res2 = FindfolderFiles(archive, path + name + TEXT("/"), extensions, subdirectorylayers - 1);
 					res.insert(res.end(), res2.begin(), res2.end());
 				}
 				return true;
