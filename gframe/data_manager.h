@@ -15,10 +15,10 @@ public:
 		for(auto& card : _datas)
 			delete card.second;
 	}
-	bool LoadDB(const std::string& file, bool usebuffer = false);
+	bool LoadDB(const path_string& file, bool usebuffer = false);
 	bool LoadDBFromBuffer(const std::vector<char>& buffer);
 	bool ParseDB(sqlite3* pDB);
-	bool LoadStrings(const std::string& file);
+	bool LoadStrings(const path_string& file);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
 	CardDataC* GetCardData(int code);

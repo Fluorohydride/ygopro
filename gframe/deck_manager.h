@@ -39,10 +39,8 @@ public:
 	Deck pre_deck;
 	std::vector<LFList> _lfList;
 
-	bool LoadLFListSingle(const std::string& path);
-	bool LoadLFListFolder(std::string path);
-	bool LoadLFListSingle(const std::wstring& path);
-	bool LoadLFListFolder(std::wstring path);
+	bool LoadLFListSingle(const path_string& path);
+	bool LoadLFListFolder(path_string path);
 	void LoadLFList();
 	void RefreshLFList();
 	std::wstring GetLFListName(int lfhash);
@@ -51,11 +49,11 @@ public:
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0);
 	int LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
-	bool LoadDeck(const std::wstring& file, Deck* deck = nullptr);
-	bool LoadDeckDouble(const std::wstring& file, const std::wstring& file2, Deck* deck = nullptr);
-	bool SaveDeck(Deck& deck, const std::wstring& name);
-	bool SaveDeck(const std::wstring& name, std::vector<int> mainlist, std::vector<int>extralist, std::vector<int> sidelist);
-	bool DeleteDeck(Deck& deck, const std::wstring& name);
+	bool LoadDeck(const path_string& file, Deck* deck = nullptr);
+	bool LoadDeckDouble(const path_string& file, const path_string& file2, Deck* deck = nullptr);
+	bool SaveDeck(Deck& deck, const path_string& name);
+	bool SaveDeck(const path_string& name, std::vector<int> mainlist, std::vector<int>extralist, std::vector<int> sidelist);
+	bool DeleteDeck(Deck& deck, const path_string& name);
 };
 
 extern DeckManager deckManager;

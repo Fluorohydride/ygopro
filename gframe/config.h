@@ -68,13 +68,11 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
-#include "CGUITTFont/CGUITTFont.h"
-#include "CGUIImageButton/CGUIImageButton.h"
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <memory.h>
-#include <time.h>
+#include <ctime>
 #include <set>
 #include <map>
 #include <unordered_set>
@@ -84,15 +82,15 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <mutex>
 #include "mysignal.h"
 #include <thread>
+#include <common.h>
+#include <fmt/format.h>
+#include <fmt/printf.h>
+#include "utils.h"
 #ifndef YGOPRO_BUILD_DLL
 #include <ocgapi.h>
 #else
 #include "dllinterface.h"
 #endif
-#include <common.h>
-#include <fmt/format.h>
-#include <fmt/printf.h>
-#include "utils.h"
 
 using namespace irr;
 using namespace core;
@@ -105,6 +103,6 @@ extern unsigned short PRO_VERSION;
 extern int enable_log;
 extern bool exit_on_return;
 extern bool open_file;
-extern std::wstring open_file_name;
+extern path_string open_file_name;
 
 #endif

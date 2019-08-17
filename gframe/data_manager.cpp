@@ -9,13 +9,13 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 DataManager dataManager;
 
-bool DataManager::LoadDB(const std::string& file, bool usebuffer) {
+bool DataManager::LoadDB(const path_string& file, bool usebuffer) {
 	if(usebuffer) {
-		std::ifstream db(Utils::ParseFilename(file), std::ifstream::binary);
+		std::ifstream db(file, std::ifstream::binary);
 		return LoadDBFromBuffer({ std::istreambuf_iterator<char>(db), std::istreambuf_iterator<char>() });
 	}
 	sqlite3* pDB;
-	if(sqlite3_open_v2(file.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
+	if(sqlite3_open_v2(Utils::ToUTF8IfNeeded(file).c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
 	return ParseDB(pDB);
 }
@@ -81,7 +81,7 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 	sqlite3_close(pDB);
 	return true;
 }
-bool DataManager::LoadStrings(const std::string& file) {
+bool DataManager::LoadStrings(const path_string& file) {
 	std::ifstream string_file(file, std::ifstream::in);
 	if(!string_file.is_open())
 		return false;

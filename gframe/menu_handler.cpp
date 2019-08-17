@@ -229,9 +229,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HP_READY: {
 				bool check = false;
 				if(!mainGame->cbDeckSelect2->isVisible())
-					check = (mainGame->cbDeckSelect->getSelected() == -1 || !deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())));
+					check = (mainGame->cbDeckSelect->getSelected() == -1 || !deckManager.LoadDeck(Utils::ParseFilename(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
 				else
-					check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !deckManager.LoadDeckDouble(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()), mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected())));
+					check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !deckManager.LoadDeckDouble(Utils::ParseFilename(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())), Utils::ParseFilename(mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected()))));
 				if(check)
 					break;
 				UpdateDeck();
@@ -284,7 +284,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_LOAD_REPLAY: {
 				if(open_file) {
-					bool res = ReplayMode::cur_replay.OpenReplay(L"./replay/" + open_file_name);
+					bool res = ReplayMode::cur_replay.OpenReplay(TEXT("./replay/") + open_file_name);
 					open_file = false;
 					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
 						if(exit_on_return)
@@ -294,7 +294,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				} else {
 					if(mainGame->lstReplayList->getSelected() == -1)
 						break;
-					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true)) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
+					if(!ReplayMode::cur_replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true))) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
 						break;
 				}
 				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)
@@ -362,7 +362,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
 				for(int i = 0; i < decks.size(); i++) {
-					deckManager.SaveDeck(fmt::format(L"player{:02} {} {}", i, players[i], replay_name), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
+					deckManager.SaveDeck(fmt::format(TEXT("player{:02} {} {}"), i, Utils::ParseFilename(players[i]).c_str(), replay_name.c_str()), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335).c_str());
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -386,11 +386,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(open_file && deckManager.LoadDeck(open_file_name)) {
 					auto name = Utils::GetFileName(open_file_name);
-					mainGame->ebDeckname->setText(name.c_str());
+					mainGame->ebDeckname->setText(Utils::ToUnicodeIfNeeded(name).c_str());
 					mainGame->cbDBDecks->setSelected(-1);
 					open_file = false;
 				} else if(mainGame->cbDBDecks->getSelected() != -1) {
-					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+					deckManager.LoadDeck(Utils::ParseFilename(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected())));
 					mainGame->ebDeckname->setText(L"");
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
@@ -404,7 +404,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_YES: {
 				mainGame->HideElement(mainGame->wQuery);
 				if(prev_operation == BUTTON_DELETE_REPLAY) {
-					if(Replay::DeleteReplay(mainGame->lstReplayList->getListItem(prev_sel, true))) {
+					if(Replay::DeleteReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(prev_sel, true)))) {
 						mainGame->stReplayInfo->setText(L"");
 						mainGame->lstReplayList->refreshList();
 					}
@@ -422,9 +422,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_SAVE: {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
-					std::wstring oldname(mainGame->lstReplayList->getListItem(prev_sel, true));
-					auto oldpath = oldname.substr(0, oldname.find_last_of(L"/")) + L"/";
-					if(Replay::RenameReplay(oldname, oldpath + mainGame->ebRSName->getText())) {
+					auto oldname = Utils::ParseFilename(mainGame->lstReplayList->getListItem(prev_sel, true));
+					auto oldpath = oldname.substr(0, oldname.find_last_of(TEXT("/"))) + TEXT("/");
+					if(Replay::RenameReplay(oldname, oldpath + Utils::ParseFilename(mainGame->ebRSName->getText()))) {
 						mainGame->lstReplayList->refreshList();
 					} else {
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365).c_str());
@@ -464,7 +464,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnExportDeck->setEnabled(false);
 				if(sel == -1)
 					break;
-				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(sel, true)) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
+				if(!ReplayMode::cur_replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(sel, true))) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
 					break;
 				mainGame->btnLoadReplay->setEnabled(true);
 				mainGame->btnDeleteReplay->setEnabled(true);
@@ -548,7 +548,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case LISTBOX_REPLAY_LIST: {
 				if(open_file) {
-					bool res = ReplayMode::cur_replay.OpenReplay(L"./replay/" + open_file_name);
+					bool res = ReplayMode::cur_replay.OpenReplay(TEXT("./replay/") + open_file_name);
 					open_file = false;
 					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
 						if(exit_on_return)
@@ -558,7 +558,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				} else {
 					if(mainGame->lstReplayList->getSelected() == -1)
 						break;
-					if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true)) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
+					if(!ReplayMode::cur_replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true))) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
 						break;
 				}
 				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)
@@ -603,9 +603,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					bool check = false;
 					if (!mainGame->cbDeckSelect2->isVisible())
-						check = (mainGame->cbDeckSelect->getSelected() == -1 || !deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())));
+						check = (mainGame->cbDeckSelect->getSelected() == -1 || !deckManager.LoadDeck(Utils::ParseFilename(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
 					else
-						check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !deckManager.LoadDeckDouble(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()), mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected())));
+						check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !deckManager.LoadDeckDouble(Utils::ParseFilename(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())), Utils::ParseFilename(mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected()))));
 					if(check) {
 						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
 						break;

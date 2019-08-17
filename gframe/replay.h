@@ -63,12 +63,12 @@ public:
 	void WriteData(const void* data, unsigned int length, bool flush = true);
 	void Flush();
 	void EndRecord(size_t size = 0x20000);
-	void SaveReplay(const std::wstring& name);
-	bool OpenReplay(const std::wstring& name);
+	void SaveReplay(const path_string& name);
+	bool OpenReplay(const path_string& name);
 	bool OpenReplayFromBuffer(std::vector<uint8_t> contents);
-	static bool CheckReplay(const std::wstring& name);
-	static bool DeleteReplay(const std::wstring& name);
-	static bool RenameReplay(const std::wstring& oldname, const std::wstring& newname);
+	static bool CheckReplay(const path_string& name);
+	static bool DeleteReplay(const path_string& name);
+	static bool RenameReplay(const path_string& oldname, const path_string& newname);
 	bool GetNextResponse(ReplayResponse* res);
 	std::vector<std::wstring> GetPlayerNames();
 	ReplayDeckList GetPlayerDecks();
@@ -77,7 +77,7 @@ public:
 	void Rewind();
 	void Reset();
 	int GetPlayersCount(int side);
-	std::wstring GetReplayName();
+	path_string GetReplayName();
 	std::unique_ptr<Replay> yrp;
 	ReplayHeader pheader;
 	std::vector<uint8_t> replay_data;
@@ -113,7 +113,7 @@ private:
 	std::vector<std::wstring> players;
 	size_t home_count;
 	size_t opposing_count;
-	std::wstring replay_name;
+	path_string replay_name;
 	ReplayDeckList decks;
 	std::vector<int> replay_custom_rule_cards;
 	std::vector<ReplayResponse>::iterator responses_iterator;

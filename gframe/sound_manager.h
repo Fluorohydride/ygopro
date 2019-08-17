@@ -19,7 +19,7 @@ private:
 	irrklang::ISoundEngine* engineMusic;
 	irrklang::ISound* soundBGM;
 #endif
-	void RefershBGMDir(std::wstring path, int scene);
+	void RefershBGMDir(path_string path, int scene);
 	void RefreshChantsList();
 	std::mt19937 rnd;
 

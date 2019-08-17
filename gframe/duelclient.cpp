@@ -3904,8 +3904,8 @@ void DuelClient::ReplayPrompt(bool need_header) {
 	mainGame->replaySignal.Wait();
 	if(mainGame->saveReplay || !is_host) {
 		if(mainGame->saveReplay)
-			last_replay.SaveReplay(mainGame->ebRSName->getText());
-		else last_replay.SaveReplay(L"_LastReplay");
+			last_replay.SaveReplay(Utils::ParseFilename(mainGame->ebRSName->getText()));
+		else last_replay.SaveReplay(TEXT("_LastReplay"));
 	}
 
 }

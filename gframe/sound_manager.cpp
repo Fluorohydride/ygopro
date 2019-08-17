@@ -37,30 +37,29 @@ void SoundManager::RefreshBGMList() {
 	Utils::Makedirectory(TEXT("./sound/BGM/disadvantage"));
 	Utils::Makedirectory(TEXT("./sound/BGM/win"));
 	Utils::Makedirectory(TEXT("./sound/BGM/lose"));
-	RefershBGMDir(L"", BGM_DUEL);
-	RefershBGMDir(L"duel", BGM_DUEL);
-	RefershBGMDir(L"menu", BGM_MENU);
-	RefershBGMDir(L"deck", BGM_DECK);
-	RefershBGMDir(L"advantage", BGM_ADVANTAGE);
-	RefershBGMDir(L"disadvantage", BGM_DISADVANTAGE);
-	RefershBGMDir(L"win", BGM_WIN);
-	RefershBGMDir(L"lose", BGM_LOSE);
+	Utils::Makedirectory(TEXT("./sound/chants"));
+	RefershBGMDir(TEXT(""), BGM_DUEL);
+	RefershBGMDir(TEXT("duel"), BGM_DUEL);
+	RefershBGMDir(TEXT("menu"), BGM_MENU);
+	RefershBGMDir(TEXT("deck"), BGM_DECK);
+	RefershBGMDir(TEXT("advantage"), BGM_ADVANTAGE);
+	RefershBGMDir(TEXT("disadvantage"), BGM_DISADVANTAGE);
+	RefershBGMDir(TEXT("win"), BGM_WIN);
+	RefershBGMDir(TEXT("lose"), BGM_LOSE);
 }
-void SoundManager::RefershBGMDir(std::wstring path, int scene) {
-	auto files = Utils::FindfolderFiles(L"./sound/BGM/" + path, { L"mp3", L"ogg", L"wav" });
-	for(auto& file : files) {
-		BGMList[BGM_ALL].push_back(BufferIO::EncodeUTF8s(path + L"/" + file));
-		BGMList[scene].push_back(BufferIO::EncodeUTF8s(path + L"/" + file));
+void SoundManager::RefershBGMDir(path_string path, int scene) {
+	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/BGM/") + path, { TEXT("mp3"), TEXT("ogg"), TEXT("wav") })) {
+		auto conv = Utils::ToUTF8IfNeeded(path + TEXT("/") + file);
+		BGMList[BGM_ALL].push_back(conv);
+		BGMList[scene].push_back(conv);
 	}
 }
 void SoundManager::RefreshChantsList() {
-	Utils::Makedirectory(TEXT("./sound/chants"));
-	auto files = Utils::FindfolderFiles(L"./sound/chants", { L"mp3", L"ogg", L"wav" });
-	for(auto& file : files) {
-		auto scode = Utils::GetFileName(L"./sound/chants/" + file);
+	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/chants"), { TEXT("mp3"), TEXT("ogg"), TEXT("wav") })) {
+		auto scode = Utils::GetFileName(TEXT("./sound/chants/") + file);
 		unsigned int code = std::stoi(scode);
 		if(code && !ChantsList.count(code))
-			ChantsList[code] = BufferIO::EncodeUTF8s(file);
+			ChantsList[code] = Utils::ToUTF8IfNeeded(file);
 	}
 }
 void SoundManager::PlaySoundEffect(Sounds sound) {

@@ -101,17 +101,17 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadPicUrls();
-	if(!dataManager.LoadDB("cards.cdb"))
+	if(!dataManager.LoadDB(TEXT("cards.cdb")))
 		ErrorLog("cards.cdb not found in the root, loading anyways!");
 	LoadExpansionDB();
 	LoadZipArchives();
 	LoadArchivesDB();
-	if(!dataManager.LoadStrings("strings.conf")) {
+	if(!dataManager.LoadStrings(TEXT("strings.conf"))) {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
 	PopulateResourcesDirectories();
-	dataManager.LoadStrings("./expansions/strings.conf");
+	dataManager.LoadStrings(TEXT("./expansions/strings.conf"));
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), 12);
@@ -137,6 +137,7 @@ bool Game::Initialize() {
 		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
+	DragAcceptFiles(hWnd, TRUE);
 #endif
 	wCommitsLog = env->addWindow(rect<s32>(0, 0, 500 + 10, 400 + 35 + 35), false, L"Update log");
 	wCommitsLog->setVisible(false);
@@ -834,11 +835,12 @@ void Game::MainLoop() {
 				}
 				script_dirs.insert(script_dirs.begin(), Utils::ParseFilename(repo.script_path));
 				pic_dirs.insert(pic_dirs.begin(), Utils::ParseFilename(repo.pics_path));
-				auto files = Utils::FindfolderFiles(BufferIO::DecodeUTF8s(repo.data_path), { L"cdb" }, 0);
+				auto data_path = Utils::ParseFilename(repo.data_path);
+				auto files = Utils::FindfolderFiles(data_path, { TEXT("cdb") }, 0);
 				for(auto& file : files)
-					refresh_db = dataManager.LoadDB(repo.data_path + BufferIO::EncodeUTF8s(file)) || refresh_db;
-				dataManager.LoadStrings(repo.data_path + "strings.conf");
-				if(deckManager.LoadLFListSingle(repo.data_path + "lflist.conf") || deckManager.LoadLFListFolder(repo.data_path + "lflists/")) {
+					refresh_db = dataManager.LoadDB(data_path + file) || refresh_db;
+				dataManager.LoadStrings(data_path + TEXT("strings.conf"));
+				if(deckManager.LoadLFListSingle(data_path + TEXT("lflist.conf")) || deckManager.LoadLFListFolder(data_path + TEXT("lflists/"))) {
 					deckManager.RefreshLFList();
 					cbDBLFList->clear();
 					for(auto& list : deckManager._lfList)
@@ -1030,16 +1032,16 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 }
 void Game::LoadZipArchives() {
 	IFileArchive* tmp_archive = nullptr;
-	for(auto& file : Utils::FindfolderFiles(L"./expansions/", { L"zip" })) {
-		filesystem->addFileArchive(Utils::ParseFilename(L"./expansions/" + file).c_str(), true, false, EFAT_ZIP, "", &tmp_archive);
+	for(auto& file : Utils::FindfolderFiles(TEXT("./expansions/"), { TEXT("zip") })) {
+		filesystem->addFileArchive((TEXT("./expansions/") + file).c_str(), true, false, EFAT_ZIP, "", &tmp_archive);
 		if(tmp_archive) {
 			archives.emplace_back(tmp_archive);
 		}
 	}
 }
 void Game::LoadExpansionDB() {
-	for (auto& file : Utils::FindfolderFiles(L"./expansions/", { L"cdb" }, 2))
-		dataManager.LoadDB(BufferIO::EncodeUTF8s(L"./expansions/" + file));
+	for (auto& file : Utils::FindfolderFiles(TEXT("./expansions/"), { TEXT("cdb") }, 2))
+		dataManager.LoadDB(TEXT("./expansions/") + file);
 }
 void Game::LoadArchivesDB() {
 	for(auto& archive: archives) {
@@ -1058,9 +1060,8 @@ void Game::LoadArchivesDB() {
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	auto files = Utils::FindfolderFiles(L"./deck/", {L"ydk"});
-	for(auto& file : files) {
-		cbDeck->addItem(file.substr(0, file.size() - 4).c_str());
+	for(auto& file : Utils::FindfolderFiles(TEXT("./deck/"), { TEXT("ydk") })) {
+		cbDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).c_str());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(gameConf.lastdeck == cbDeck->getItem(i)) {

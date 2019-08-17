@@ -60,9 +60,9 @@ int SingleMode::SinglePlayThread() {
 	std::string script_name = "";
 	if(open_file) {
 		open_file = false;
-		script_name = BufferIO::EncodeUTF8s(open_file_name);
+		script_name = Utils::ToUTF8IfNeeded(open_file_name);
 		if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr)) {
-			script_name = BufferIO::EncodeUTF8s(L"./puzzles/" + open_file_name);
+			script_name = Utils::ToUTF8IfNeeded(TEXT("./puzzles/") + open_file_name);
 			if(!preload_script(pduel, (char*)script_name.c_str(), 0, 0, nullptr))
 				loaded = false;
 		}
@@ -163,7 +163,7 @@ int SingleMode::SinglePlayThread() {
 	mainGame->replaySignal.Reset();
 	mainGame->replaySignal.Wait();
 	if(mainGame->saveReplay)
-		new_replay.SaveReplay(mainGame->ebRSName->getText());
+		new_replay.SaveReplay(Utils::ParseFilename(mainGame->ebRSName->getText()));
 	new_replay.Reset();
 	last_replay.Reset();
 	mainGame->gMutex.lock();

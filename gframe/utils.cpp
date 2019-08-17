@@ -9,38 +9,56 @@
 #include <X11/Xatom.h>
 #endif
 namespace ygo {
+	bool Utils::Makedirectory(const path_string& path) {
 #ifdef _WIN32
-	bool Utils::Makedirectory(const std::wstring& path) {
 		return CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
-	}
-	bool Utils::Makedirectory(const std::string& path) {
-		return Makedirectory(BufferIO::DecodeUTF8s(path));
-	}
 #else
-	bool Utils::Makedirectory(const std::wstring& path) {
-		return Makedirectory(BufferIO::EncodeUTF8s(path));
-	}
-	bool Utils::Makedirectory(const std::string& path) {
 		return !mkdir(&path[0], 0777) || errno == EEXIST;
-	}
 #endif
-	bool Utils::Deletefile(const std::string & source) {
+	}
+	bool Utils::Movefile(const path_string& _source, const path_string& _destination) {
+		path_string source = ParseFilename(_source);
+		path_string destination = ParseFilename(_destination);
+		if(source == destination)
+			return false;
+		std::ifstream src(source, std::ios::binary);
+		if(!src.is_open())
+			return false;
+		std::ofstream dst(destination, std::ios::binary);
+		if(!dst.is_open())
+			return false;
+		dst << src.rdbuf();
+		src.close();
+		Deletefile(source);
+		return true;
+	}
+	bool Utils::Deletefile(const path_string& source) {
 #ifdef _WIN32
-		return Deletefile(BufferIO::DecodeUTF8s(source));
+		return DeleteFile(source.c_str());
 #else
 		return remove(source.c_str()) == 0;
 #endif
 	}
-	bool Utils::Deletefile(const std::wstring & source) {
+	bool Utils::ClearDirectory(const path_string& path) {
 #ifdef _WIN32
-		return DeleteFile(source.c_str());
-#else
-		return Deletefile(BufferIO::EncodeUTF8s(source));
-#endif
-	}
-	bool Utils::ClearDirectory(const std::string & path) {
-#ifdef _WIN32
-		return ClearDirectory(BufferIO::DecodeUTF8s(path));
+		WIN32_FIND_DATA fdata;
+		HANDLE fh = FindFirstFile((path + TEXT("*.*")).c_str(), &fdata);
+		if(fh != INVALID_HANDLE_VALUE) {
+			do {
+				path_string name = fdata.cFileName;
+				if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+					if(name == TEXT("..") || name == TEXT(".")) {
+						continue;
+					}
+					Deletedirectory(path + name + TEXT("/"));
+					continue;
+				} else {
+					Deletefile(path + name);
+				}
+			} while(FindNextFile(fh, &fdata));
+			FindClose(fh);
+		}
+		return true;
 #else
 		DIR * dir;
 		struct dirent * dirp = nullptr;
@@ -64,44 +82,12 @@ namespace ygo {
 		return true;
 #endif
 	}
-	bool Utils::ClearDirectory(const std::wstring & path) {
-#ifdef _WIN32
-		WIN32_FIND_DATAW fdataw;
-		HANDLE fh = FindFirstFileW((path + L"*.*").c_str(), &fdataw);
-		if(fh != INVALID_HANDLE_VALUE) {
-			do {
-				std::wstring name = fdataw.cFileName;
-				if(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					if(name == L".." || name == L".") {
-						continue;
-					}
-					Deletedirectory(path + name + L"/");
-					continue;
-				} else {
-					Deletefile(path + name);
-				}
-			} while(FindNextFileW(fh, &fdataw));
-			FindClose(fh);
-		}
-		return true;
-#else
-		return ClearDirectory(BufferIO::EncodeUTF8s(path));
-#endif
-	}
-	bool Utils::Deletedirectory(const std::string & source) {
-#ifdef _WIN32
-		return Deletedirectory(BufferIO::DecodeUTF8s(source));
-#else
+	bool Utils::Deletedirectory(const path_string& source) {
 		ClearDirectory(source);
-		return rmdir(source.c_str()) == 0;
-#endif
-	}
-	bool Utils::Deletedirectory(const std::wstring & source) {
 #ifdef _WIN32
-		ClearDirectory(source);
 		return RemoveDirectory(source.c_str());
 #else
-		return Deletedirectory(BufferIO::EncodeUTF8s(source));
+		return rmdir(source.c_str()) == 0;
 #endif
 	}
 	void Utils::CreateResourceFolders() {
@@ -263,14 +249,14 @@ namespace ygo {
 			cursor->setActiveIcon(icon);
 		}
 	}
-	void Utils::FindfolderFiles(const std::wstring & path, const std::function<void(std::wstring, bool, void*)>& cb, void* payload) {
+	void Utils::FindfolderFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload) {
 #ifdef _WIN32
-		WIN32_FIND_DATAW fdataw;
-		HANDLE fh = FindFirstFileW((NormalizePath(path) + L"*.*").c_str(), &fdataw);
+		WIN32_FIND_DATA fdataw;
+		HANDLE fh = FindFirstFile((NormalizePath(path) + TEXT("*.*")).c_str(), &fdataw);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY), payload);
-			} while(FindNextFileW(fh, &fdataw));
+			} while(FindNextFile(fh, &fdataw));
 			FindClose(fh);
 		}
 #else
@@ -287,17 +273,17 @@ namespace ygo {
 		}
 #endif
 	}
-	std::vector<std::wstring> Utils::FindfolderFiles(const std::wstring & path, std::vector<std::wstring> extensions, int subdirectorylayers) {
-		std::vector<std::wstring> res;
-		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](std::wstring name, bool isdir, void* payload) {
+	std::vector<path_string> Utils::FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
+		std::vector<path_string> res;
+		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
 			if(isdir) {
 				if(subdirectorylayers) {
-					if(name == L".." || name == L".") {
+					if(name == TEXT("..") || name == TEXT(".")) {
 						return;
 					}
-					std::vector<std::wstring> res2 = FindfolderFiles(path + name + L"/", extensions, subdirectorylayers - 1);
+					std::vector<path_string> res2 = FindfolderFiles(path + name + TEXT("/"), extensions, subdirectorylayers - 1);
 					for(auto&file : res2) {
-						file = name + L"/" + file;
+						file = name + TEXT("/") + file;
 					}
 					res.insert(res.end(), res2.begin(), res2.end());
 				}
@@ -405,6 +391,15 @@ namespace ygo {
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
 		return extension;
 	}
+	std::wstring Utils::GetFilePath(std::wstring file) {
+		std::replace(file.begin(), file.end(), L'\\', L'/');
+		size_t slashpos = file.find_last_of(L'/');
+		if(slashpos == std::wstring::npos)
+			return file;
+		std::wstring extension = file.substr(0, slashpos);
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
+		return extension;
+	}
 	std::wstring Utils::GetFileName(std::wstring file) {
 		std::replace(file.begin(), file.end(), L'\\', L'/');
 		size_t dashpos = file.find_last_of(L"/");
@@ -455,6 +450,15 @@ namespace ygo {
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 		return extension;
 	}
+	std::string Utils::GetFilePath(std::string file) {
+		std::replace(file.begin(), file.end(), '\\', '/');
+		size_t slashpos = file.find_last_of(".");
+		if(slashpos == std::string::npos)
+			return file;
+		std::string extension = file.substr(0, slashpos);
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
+		return extension;
+	}
 	std::string Utils::GetFileName(std::string file) {
 		std::replace(file.begin(), file.end(), '\\', '/');
 		size_t dashpos = file.find_last_of("/");
@@ -469,17 +473,31 @@ namespace ygo {
 		return name;
 	}
 	path_string Utils::ParseFilename(const std::wstring& input) {
-#ifdef _WIN32
+#ifdef UNICODE
 		return input;
 #else
 		return BufferIO::EncodeUTF8s(input);
 #endif
 	}
 	path_string Utils::ParseFilename(const std::string& input) {
-#ifdef _WIN32
+#ifdef UNICODE
 		return BufferIO::DecodeUTF8s(input);
 #else
 		return input;
+#endif
+	}
+	std::string Utils::ToUTF8IfNeeded(const path_string& input) {
+#ifdef UNICODE
+		return BufferIO::EncodeUTF8s(input);
+#else
+		return input;
+#endif
+	}
+	std::wstring Utils::ToUnicodeIfNeeded(const path_string & input) {
+#ifdef UNICODE
+		return input;
+#else
+		return BufferIO::DecodeUTF8s(input);
 #endif
 	}
 	void Utils::IrrArchiveHelper::ParseList(irr::io::IFileArchive* _archive) {

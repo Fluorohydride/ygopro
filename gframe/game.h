@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include "CGUIImageButton/CGUIImageButton.h"
+#include "CGUITTFont/CGUITTFont.h"
 #include "CGUISkinSystem/CGUISkinSystem.h"
 #include "CGUICustomText/CGUICustomText.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"

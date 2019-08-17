@@ -10,7 +10,7 @@
 int enable_log = 0;
 bool exit_on_return = false;
 bool open_file = false;
-std::wstring open_file_name = L"";
+path_string open_file_name = TEXT("");
 
 void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;
@@ -20,15 +20,15 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 	ygo::mainGame->device->postEventFromUser(event);
 }
 #ifdef _WIN32
+#ifdef UNICODE
 #pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup") 
-int wmain(int wargc, wchar_t* wargv[]) {
+int wmain(int argc, wchar_t* argv[]) {
+#else
+#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") 
+int main(int argc, char* argv[]) {
+#endif
 #else
 int main(int argc, char* argv[]) {
-	int wargc = argc;
-	auto wargv = std::make_unique<wchar_t[][256]>(wargc);
-	for(int i = 0; i < argc; ++i) {
-		BufferIO::DecodeUTF8(argv[i], wargv[i]);
-	}
 	setlocale(LC_CTYPE, "UTF-8");
 #endif
 #ifdef __APPLE__
@@ -41,14 +41,13 @@ int main(int argc, char* argv[]) {
 	CFRelease(path);
 #endif //__APPLE__
 #if defined(_WIN32) && !defined(_DEBUG)
-	if(wargc == 2) {
-		auto extension = ygo::Utils::GetFileExtension(wargv[1]);
-		if(extension == L"ydk" || extension == L"yrp" || extension == L"yrpx") {
-			wchar_t exepath[MAX_PATH];
-			GetModuleFileNameW(NULL, exepath, MAX_PATH);
-			wchar_t* p = wcsrchr(exepath, '\\');
-			*p = '\0';
-			SetCurrentDirectoryW(exepath);
+	if(argc == 2) {
+		auto extension = ygo::Utils::GetFileExtension(argv[1]);
+		if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
+			fschar_t exepath[MAX_PATH];
+			GetModuleFileName(NULL, exepath, MAX_PATH);
+			auto path = ygo::Utils::GetFilePath(exepath);
+			SetCurrentDirectory(path.c_str());
 		}
 	}
 #endif //_WIN32 && !_DEBUG
@@ -66,81 +65,81 @@ int main(int argc, char* argv[]) {
 	if(!ygo::mainGame->Initialize())
 		return EXIT_FAILURE;
 	bool keep_on_return = false;
-	for(int i = 1; i < wargc; ++i) {
-		std::wstring parameter(wargv[i]);
-#define PARAM_CHECK(x) if(parameter == x)
-#define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < wargc) {y;} continue;}
+	for(int i = 1; i < argc; ++i) {
+		path_string parameter(argv[i]);
+#define PARAM_CHECK(x) if(parameter == TEXT(x))
+#define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < argc) {y;} continue;}
 		// Extra database
-		RUN_IF(L"-e", ygo::dataManager.LoadDB(BufferIO::EncodeUTF8s(wargv[i]).c_str()))
+		RUN_IF("-e", ygo::dataManager.LoadDB(argv[i]))
 		// Nickname
-		else RUN_IF(L"-n", ygo::mainGame->ebNickName->setText(wargv[i]))
+		else RUN_IF("-n", ygo::mainGame->ebNickName->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
 		// Host address
-		else RUN_IF(L"-h", ygo::mainGame->ebJoinHost->setText(wargv[i]))
+		else RUN_IF("-h", ygo::mainGame->ebJoinHost->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
 		// Host Port
-		else RUN_IF(L"-p", ygo::mainGame->ebJoinPort->setText(wargv[i]))
+		else RUN_IF("-p", ygo::mainGame->ebJoinPort->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
 		// Host password
-		else RUN_IF(L"-w", ygo::mainGame->ebJoinPass->setText(wargv[i]))
+		else RUN_IF("-w", ygo::mainGame->ebJoinPass->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
 #undef RUN_IF
-		else PARAM_CHECK(L"-k") { // Keep on return
+		else PARAM_CHECK("-k") { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
-		} else PARAM_CHECK(L"-d") { // Deck
+		} else PARAM_CHECK("-d") { // Deck
 			++i;
-			if(i + 1 < wargc) { // select deck
-				ygo::mainGame->gameConf.lastdeck = wargv[i];
+			if(i + 1 < argc) { // select deck
+				ygo::mainGame->gameConf.lastdeck = ygo::Utils::ToUnicodeIfNeeded(argv[i]);
 				continue;
 			} else { // open deck
 				exit_on_return = !keep_on_return;
-				if(i < wargc) {
+				if(i < argc) {
 					open_file = true;
-					open_file_name = wargv[i];
+					open_file_name = argv[i];
 				}
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-		} else PARAM_CHECK(L"-c") { // Create host
+		} else PARAM_CHECK("-c") { // Create host
 			exit_on_return = !keep_on_return;
 			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 			ClickButton(ygo::mainGame->btnHostConfirm);
 			break;
-		} else PARAM_CHECK(L"-j") { // Join host
+		} else PARAM_CHECK("-j") { // Join host
 			exit_on_return = !keep_on_return;
 			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
 			ClickButton(ygo::mainGame->btnJoinHost);
 			break;
-		} else PARAM_CHECK(L"-r") { // Replay
+		} else PARAM_CHECK("-r") { // Replay
 			exit_on_return = !keep_on_return;
 			++i;
-			if(i < wargc) {
+			if(i < argc) {
 				open_file = true;
-				open_file_name = wargv[i];
+				open_file_name = argv[i];
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadReplay);
 			break;
-		} else PARAM_CHECK(L"-s") { // Single
+		} else PARAM_CHECK("-s") { // Single
 			exit_on_return = !keep_on_return;
 			++i;
-			if(i < wargc) {
+			if(i < argc) {
 				open_file = true;
-				open_file_name = wargv[i];
+				open_file_name = argv[i];
 			}
 			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
-		} else if(wargc == 2 && wcslen(wargv[1]) >= 4) {
-			std::wstring name(wargv[i]);
+		} else if(argc == 2 && path_string(argv[1]).size() >= 4) {
+			path_string name(argv[i]);
 			auto extension = ygo::Utils::GetFileExtension(name);
-			if(extension == L"ydk") {
+			if(extension == TEXT("ydk")) {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-			if(extension == L"yrp" || extension == L"yrpx") {
+			if(extension == TEXT("yrp") || extension == TEXT("yrpx")) {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;

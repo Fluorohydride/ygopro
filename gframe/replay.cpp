@@ -88,8 +88,8 @@ void Replay::EndRecord(size_t size) {
 	comp_data.resize(comp_size);
 	is_recording = false;
 }
-void Replay::SaveReplay(const std::wstring& name) {
-	std::ofstream replay_file(Utils::ParseFilename(L"./replay/" + name + L".yrpX"), std::ofstream::binary);
+void Replay::SaveReplay(const path_string& name) {
+	std::ofstream replay_file(fmt::format(TEXT("./replay/{}.yrpX"), name.c_str()), std::ofstream::binary);
 	if(!replay_file.is_open())
 		return;
 	replay_file.write((char*)&pheader, sizeof(pheader));
@@ -127,15 +127,15 @@ bool Replay::OpenReplayFromBuffer(std::vector<uint8_t> contents) {
 	}
 	return true;
 }
-bool Replay::OpenReplay(const std::wstring& name) {
+bool Replay::OpenReplay(const path_string& name) {
 	if(replay_name == name) {
 		Rewind();
 		return true;
 	}
 	Reset();
-	std::ifstream replay_file(Utils::ParseFilename(name), std::ifstream::binary);
+	std::ifstream replay_file(name, std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(Utils::ParseFilename(L"./replay/" + name), std::ifstream::binary);
+		replay_file.open(TEXT("./replay/") + name, std::ifstream::binary);
 		if(!replay_file.is_open()) {
 			replay_name.clear();
 			return false;
@@ -150,10 +150,10 @@ bool Replay::OpenReplay(const std::wstring& name) {
 	replay_name.clear();
 	return false;
 }
-bool Replay::CheckReplay(const std::wstring& name) {
-	std::ifstream replay_file(Utils::ParseFilename(name), std::ifstream::binary);
+bool Replay::CheckReplay(const path_string& name) {
+	std::ifstream replay_file(name, std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(Utils::ParseFilename(L"./replay/" + name), std::ifstream::binary);
+		replay_file.open(TEXT("./replay/") + name, std::ifstream::binary);
 		if(!replay_file.is_open())
 			return false;
 	}
@@ -162,10 +162,10 @@ bool Replay::CheckReplay(const std::wstring& name) {
 	replay_file.close();
 	return (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
 }
-bool Replay::DeleteReplay(const std::wstring& name) {
+bool Replay::DeleteReplay(const path_string& name) {
 	return Utils::Deletefile(name);
 }
-bool Replay::RenameReplay(const std::wstring& oldname, const std::wstring& newname) {
+bool Replay::RenameReplay(const path_string& oldname, const path_string& newname) {
 	return Utils::Movefile(oldname, newname);
 }
 bool Replay::GetNextResponse(ReplayResponse* res) {
@@ -327,7 +327,7 @@ int Replay::GetPlayersCount(int side) {
 		return home_count;
 	return opposing_count;
 }
-std::wstring Replay::GetReplayName() {
+path_string Replay::GetReplayName() {
 	return replay_name;
 }
 bool Replay::ReadData(void* data, unsigned int length) {

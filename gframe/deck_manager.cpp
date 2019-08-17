@@ -9,17 +9,9 @@ namespace ygo {
 
 DeckManager deckManager;
 
-bool DeckManager::LoadLFListSingle(const std::string & path) {
-	return LoadLFListSingle(BufferIO::DecodeUTF8s(path));
-}
-
-bool DeckManager::LoadLFListFolder(std::string path) {
-	return LoadLFListFolder(BufferIO::DecodeUTF8s(path));
-}
-
-bool DeckManager::LoadLFListSingle(const std::wstring& path) {
+bool DeckManager::LoadLFListSingle(const path_string& path) {
 	bool loaded = false;
-	std::ifstream infile(Utils::ParseFilename(path), std::ifstream::in);
+	std::ifstream infile(path, std::ifstream::in);
 	if(!infile.is_open())
 		return loaded;
 	LFList lflist;
@@ -67,23 +59,23 @@ bool DeckManager::LoadLFListSingle(const std::wstring& path) {
 	infile.close();
 	return loaded;
 }
-bool DeckManager::LoadLFListFolder(std::wstring path) {
+bool DeckManager::LoadLFListFolder(path_string path) {
 	path = Utils::NormalizePath(path);
 	bool loaded = false;
-	Utils::FindfolderFiles(path, [this, &path, &loaded](std::wstring name, bool isdir, void* payload) {
+	Utils::FindfolderFiles(path, [this, &path, &loaded](path_string name, bool isdir, void* payload) {
 		if(isdir) {
 			return;
 		} else {
-			if(Utils::GetFileExtension(name) == L"conf")
+			if(Utils::GetFileExtension(name) == TEXT("conf"))
 				loaded = LoadLFListSingle(path + name);
 		}
 	});
 	return loaded;
 }
 void DeckManager::LoadLFList() {
-	LoadLFListSingle(L"./expansions/lflist.conf");
-	LoadLFListSingle(L"./lflist.conf");
-	LoadLFListFolder(L"./lflists/");
+	LoadLFListSingle(TEXT("./expansions/lflist.conf"));
+	LoadLFListSingle(TEXT("./lflist.conf"));
+	LoadLFListFolder(TEXT("./lflists/"));
 	LFList nolimit;
 	nolimit.listName = L"N/A";
 	nolimit.hash = 0;
@@ -257,8 +249,8 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 	}
 	return errorcode;
 }
-bool LoadCardList(const std::wstring& name, std::vector<int>* mainlist = nullptr, std::vector<int>* sidelist = nullptr, int* retmainc = nullptr, int* retsidec = nullptr) {
-	std::ifstream deck(Utils::ParseFilename(name), std::ifstream::in);
+bool LoadCardList(const path_string& name, std::vector<int>* mainlist = nullptr, std::vector<int>* sidelist = nullptr, int* retmainc = nullptr, int* retsidec = nullptr) {
+	std::ifstream deck(name, std::ifstream::in);
 	if(!deck.is_open())
 		return false;
 	std::vector<int> res;
@@ -319,10 +311,10 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	deck = ndeck;
 	return true;
 }
-bool DeckManager::LoadDeck(const std::wstring& file, Deck* deck) {
+bool DeckManager::LoadDeck(const path_string& file, Deck* deck) {
 	std::vector<int> mainlist;
 	std::vector<int> sidelist;
-	if(!LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist)) {
+	if(!LoadCardList(fmt::format(TEXT("./deck/{}.ydk"), file.c_str()), &mainlist, &sidelist)) {
 		if(!LoadCardList(file, &mainlist, &sidelist))
 			return false;
 	}
@@ -332,19 +324,19 @@ bool DeckManager::LoadDeck(const std::wstring& file, Deck* deck) {
 		LoadDeck(current_deck, mainlist, sidelist);
 	return true;
 }
-bool DeckManager::LoadDeckDouble(const std::wstring& file, const std::wstring& file2, Deck* deck) {
+bool DeckManager::LoadDeckDouble(const path_string& file, const path_string& file2, Deck* deck) {
 	std::vector<int> mainlist;
 	std::vector<int> sidelist;
-	LoadCardList(L"./deck/" + file + L".ydk", &mainlist, &sidelist);
-	LoadCardList(L"./deck/" + file2 + L".ydk", &mainlist, &sidelist);
+	LoadCardList(fmt::format(TEXT("./deck/{}.ydk"), file.c_str()), &mainlist, &sidelist);
+	LoadCardList(fmt::format(TEXT("./deck/{}.ydk"), file2.c_str()), &mainlist, &sidelist);
 	if(deck)
 		LoadDeck(*deck, mainlist, sidelist);
 	else
 		LoadDeck(current_deck, mainlist, sidelist);
 	return true;
 }
-bool DeckManager::SaveDeck(Deck& deck, const std::wstring& name) {
-	std::ofstream deckfile(Utils::ParseFilename(L"./deck/" + name + L".ydk"), std::ofstream::out);
+bool DeckManager::SaveDeck(Deck& deck, const path_string& name) {
+	std::ofstream deckfile(fmt::format(TEXT("./deck/{}.ydk"), name.c_str()), std::ofstream::out);
 	if(!deckfile.is_open())
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
@@ -359,8 +351,8 @@ bool DeckManager::SaveDeck(Deck& deck, const std::wstring& name) {
 	deckfile.close();
 	return true;
 }
-bool DeckManager::SaveDeck(const std::wstring & name, std::vector<int> mainlist, std::vector<int> extralist, std::vector<int> sidelist) {
-	std::ofstream deckfile(Utils::ParseFilename(L"./deck/" + name + L".ydk"), std::ofstream::out);
+bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, std::vector<int> extralist, std::vector<int> sidelist) {
+	std::ofstream deckfile(fmt::format(TEXT("./deck/{}.ydk"), name.c_str()), std::ofstream::out);
 	if(!deckfile.is_open())
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
@@ -375,7 +367,7 @@ bool DeckManager::SaveDeck(const std::wstring & name, std::vector<int> mainlist,
 	deckfile.close();
 	return true;
 }
-bool DeckManager::DeleteDeck(Deck& deck, const std::wstring& name) {
-	return Utils::Deletefile(L"./deck/" + name + L".ydk");
+bool DeckManager::DeleteDeck(Deck& deck, const path_string& name) {
+	return Utils::Deletefile(fmt::format(TEXT("./deck/{}.ydk"), name.c_str()));
 }
 }
