@@ -262,12 +262,12 @@ namespace ygo {
 #else
 		DIR * dir;
 		struct dirent * dirp = nullptr;
-		auto _path = BufferIO::EncodeUTF8s(NormalizePath(path));
+		auto _path = NormalizePath(path);
 		if((dir = opendir(_path.c_str())) != nullptr) {
 			struct stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
 				stat((_path + dirp->d_name).c_str(), &fileStat);
-				cb(BufferIO::DecodeUTF8s(dirp->d_name), !!S_ISDIR(fileStat.st_mode), payload);
+				cb(dirp->d_name, !!S_ISDIR(fileStat.st_mode), payload);
 			}
 			closedir(dir);
 		}
