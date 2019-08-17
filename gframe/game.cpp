@@ -843,6 +843,7 @@ void Game::MainLoop() {
 					cbDBLFList->clear();
 					for(auto& list : deckManager._lfList)
 						cbDBLFList->addItem(list.listName.c_str());
+					deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 				}
 				if(repo.has_core) {
 					cores_to_load.insert(cores_to_load.begin(), BufferIO::DecodeUTF8s(repo.core_path));
