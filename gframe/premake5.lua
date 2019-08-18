@@ -39,10 +39,11 @@ local ygopro_config=function(static_core)
 
 	filter "system:macosx"
 		defines "LUA_USE_MACOSX"
+		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
 		libdirs "../irrKlang/bin/macosx-gcc/"
-		links "OpenGL.framework"
+		links { "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
 		if static_core then
 			links  "lua"
 		end

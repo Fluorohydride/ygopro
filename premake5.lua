@@ -1,6 +1,6 @@
 newoption {
-	trigger		= "no-direct3d",
-	description	= "Disable DirectX options in irrlicht if the DirectX SDK isn't installed"
+	trigger	= "no-direct3d",
+	description = "Disable DirectX options in irrlicht if the DirectX SDK isn't installed"
 }
 newoption {
 	trigger = "pics",
@@ -25,11 +25,8 @@ workspace "ygo"
 		defines { "WIN32", "_WIN32", "NOMINMAX" }
 
 	filter "system:macosx"
-		toolset "clang"
-		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include" }
 		libdirs { "/usr/local/lib" }
-		links { "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
 
 	filter "action:vs*"
 		vectorextensions "SSE2"
