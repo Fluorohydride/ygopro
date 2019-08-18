@@ -80,10 +80,12 @@ install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
     ./build-support/install-macOS-sdk.sh $MACOSX_DEPLOYMENT_TARGET;
     if [[ -f cache/libIrrlicht.a ]]; then 
-      sudo cp -r cache/irrlicht /usr/local/include &&
-      sudo cp cache/lua.h cache/luaconf.h cache/lualib.h cache/lauxlib.h cache/lua.hpp /usr/local/include &&
-      sudo cp cache/*.a /usr/local/lib &&
-      rm -rf cache && echo "Loaded irrlicht and lua-c++ from cache.";
+      cp -r cache/irrlicht /usr/local/include &&
+      cp cache/lua.h cache/luaconf.h cache/lualib.h cache/lauxlib.h cache/lua.hpp /usr/local/include &&
+      cp cache/*.a /usr/local/lib &&
+      rm -rf /usr/local/Cellar/libevent/2.1.11 &&
+      cp -r cache/libevent /usr/local/Cellar/libevent/2.1.11 &&
+      rm -rf cache && echo "Loaded irrlicht, lua-c++, libevent from cache.";
     else
       ./build-support/install-macOS-src.sh; 
     fi ;
@@ -128,7 +130,8 @@ before_cache:
     cp -r /usr/local/include/irrlicht cache/irrlicht &&
     cp /usr/local/lib/libIrrlicht.a cache/libIrrlicht.a &&
     cp /usr/local/include/lua.h /usr/local/include/luaconf.h /usr/local/include/lualib.h /usr/local/include/lauxlib.h /usr/local/include/lua.hpp cache &&
-    cp /usr/local/lib/liblua.a cache/liblua.a;
+    cp /usr/local/lib/liblua.a cache/liblua.a &&
+    cp -r /usr/local/Cellar/libevent/2.1.11 cache/libevent;
   fi
 cache:
   directories:

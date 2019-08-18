@@ -18,3 +18,12 @@ tar xf lua-5.3.5.tar.gz
 cd lua-5.3.5
 make -j2 macosx CC=g++
 sudo make install
+
+# Install libevent from source due to binary compatibility issues with 10.13 and earlier
+cd /tmp
+curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/libevent/libevent/releases/download/release-2.1.11-stable/libevent-2.1.11-stable.tar.gz
+tar xf libevent-2.1.11-stable.tar.gz
+cd libevent-2.1.11-stable
+./configure --prefix /usr/local/Cellar/libevent/2.1.11
+make -j2
+make install
