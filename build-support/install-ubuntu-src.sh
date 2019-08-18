@@ -10,6 +10,13 @@ cmake .. -DFMT_TEST=OFF
 make
 sudo make install
 
+cd /tmp
+curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.3.5.tar.gz
+tar xf lua-5.3.5.tar.gz
+cd lua-5.3.5
+make -j2 linux
+sudo make install
+
 sudo mkdir -p /usr/local/include/nlohmann
 cd /usr/local/include/nlohmann
 sudo curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp

@@ -56,7 +56,7 @@ local ygopro_config=function(static_core)
 		libdirs "../irrKlang/bin/linux-gcc-64/"
 		links { "GL", "X11" }
 		if static_core then
-			links  "lua5.3-c++"
+			links  "lua:static"
 		end
 end
 

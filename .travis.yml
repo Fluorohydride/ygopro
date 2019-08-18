@@ -19,7 +19,6 @@ addons:
     - libevent-dev 
     - libfreetype6-dev
     - libirrlicht-dev 
-    - liblua5.3-dev 
     - libsqlite3-dev 
     - libgl1-mesa-dev 
     - libglu-dev 
@@ -123,6 +122,8 @@ before_cache:
     cp -r /usr/local/lib/pkgconfig cache/lib/pkgconfig &&
     cp /usr/local/lib/libfmt.a cache/lib/libfmt.a &&
     cp -r /usr/local/include/fmt cache/include/fmt &&
+    cp /usr/local/include/lua.h /usr/local/include/luaconf.h /usr/local/include/lualib.h /usr/local/include/lauxlib.h /usr/local/include/lua.hpp cache/include &&
+    cp /usr/local/lib/liblua.a cache/lib/liblua.a &&
     cp -r /usr/local/include/nlohmann cache/include/nlohmann; 
   fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
