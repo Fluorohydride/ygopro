@@ -7,6 +7,7 @@ local ygopro_config=function(static_core)
 	end
 	defines { "YGOPRO_USE_IRRKLANG", "CURL_STATICLIB" }
 	kind "WindowedApp"
+	cppdialect "C++14"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
 	includedirs { "../ocgcore", "../irrKlang/include" }
@@ -30,7 +31,7 @@ local ygopro_config=function(static_core)
 		libdirs "../irrKlang/lib/Win32-gcc"
 
 	filter "action:not vs*"
-		buildoptions { "-std=c++14", "-fno-rtti", "-fpermissive" }
+		buildoptions { "-fno-rtti", "-fpermissive" }
 
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
