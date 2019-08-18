@@ -57,24 +57,11 @@ matrix:
     - DEPLOY_BRANCH=travis-linux
   - name: "Mojave"
     os: osx
-    osx_image: xcode10.2
-    env: DEPLOY_BRANCH=travis-mojave
-  - name: "High Sierra"
-    os: osx
-    osx_image: xcode9.4
-    env: DEPLOY_BRANCH=travis-high-sierra
-  - name: "Sierra"
-    os: osx
-    osx_image: xcode9.2
-    env: DEPLOY_BRANCH=travis-sierra
-  - name: "El Capitan"
-    os: osx
-    osx_image: xcode8
-    env: DEPLOY_BRANCH=travis-el-capitan
-  allow_failures:
-  - name: "Sierra"
-  - name: "El Capitan"
-  fast_finish: true
+    osx_image: xcode10.3
+    env: 
+    - MACOSX_DEPLOYMENT_TARGET=10.11
+    - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk"
+    - DEPLOY_BRANCH=travis-macOS
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/install-windows-bin.sh; fi  
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-support/install-ubuntu-bin.sh; fi
@@ -91,6 +78,7 @@ install:
     fi; 
   fi 
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
+    ./build-support/install-macOS-sdk.sh $MACOSX_DEPLOYMENT_TARGET;
     if [[ -f cache/libIrrlicht.a ]]; then 
       sudo cp -r cache/irrlicht /usr/local/include &&
       sudo cp cache/lua.h cache/luaconf.h cache/lualib.h cache/lauxlib.h cache/lua.hpp /usr/local/include &&

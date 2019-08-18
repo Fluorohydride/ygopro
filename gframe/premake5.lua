@@ -7,6 +7,7 @@ local ygopro_config=function(static_core)
 	end
 	defines { "YGOPRO_USE_IRRKLANG", "CURL_STATICLIB" }
 	kind "WindowedApp"
+	cppdialect "C++14"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
 	includedirs { "../ocgcore", "../irrKlang/include" }
@@ -30,28 +31,20 @@ local ygopro_config=function(static_core)
 		libdirs "../irrKlang/lib/Win32-gcc"
 
 	filter "action:not vs*"
-		buildoptions { "-std=c++14", "-fno-rtti", "-fpermissive" }
+		buildoptions { "-fno-rtti", "-fpermissive" }
 
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
 		excludes "COSOperator.*"
 		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl" }
 
-	filter "system:bsd"
-		defines "LUA_USE_POSIX"
-		includedirs { "/usr/include/freetype2", "/usr/include/irrlicht" }
-		linkoptions { "-Wl,-rpath=./" }
-		links "GL"
-		if static_core then
-			links  "lua5.3-c++"
-		end
-
 	filter "system:macosx"
 		defines "LUA_USE_MACOSX"
+		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
 		libdirs "../irrKlang/bin/macosx-gcc/"
-		links "OpenGL.framework"
+		links { "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
 		if static_core then
 			links  "lua"
 		end
