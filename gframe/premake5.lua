@@ -37,15 +37,6 @@ local ygopro_config=function(static_core)
 		excludes "COSOperator.*"
 		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl" }
 
-	filter "system:bsd"
-		defines "LUA_USE_POSIX"
-		includedirs { "/usr/include/freetype2", "/usr/include/irrlicht" }
-		linkoptions { "-Wl,-rpath=./" }
-		links "GL"
-		if static_core then
-			links  "lua5.3-c++"
-		end
-
 	filter "system:macosx"
 		defines "LUA_USE_MACOSX"
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
