@@ -2293,7 +2293,7 @@ void ClientField::SetResponseSelectedCards() const {
 					break;
 				}
 				case 4:	{
-					ret.at<int32>(0) = 1;
+					ret.at<int32>(0) = 0;
 					ret.at<int32>(1) = size;
 					for(size_t i = 0; i < size; ++i)
 						ret.at<int32>(i + 2) = selected_cards[i]->select_seq;
