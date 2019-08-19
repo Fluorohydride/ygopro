@@ -400,8 +400,7 @@ irr::video::IImage* ImageManager::GetTextureImageFromFile(const io::path& file, 
 	}
 }
 irr::video::ITexture* ImageManager::GetTextureFromFile(const io::path & file, int width, int height) {
-	static std::atomic<chrono_time> tmp = 0;
-	auto img = GetTextureImageFromFile(file, width, height, tmp.load(), std::ref(tmp));
+	auto img = GetTextureImageFromFile(file, width, height, timestamp_id.load(), std::ref(timestamp_id));
 	if(img) {
 		auto texture = driver->addTexture(file, img);
 		img->drop();
