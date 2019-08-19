@@ -41,8 +41,12 @@ namespace gui {
 							subpanel->setRelativePosition({ -horizontal_size, -vertical_size, rect.getWidth() + horizontal_size, rect.getHeight() + vertical_size });
 						}
 					}
+					default:
+						break;
 				}
 			}
+			default:
+				break;
 		}
 		return false;
 	}
