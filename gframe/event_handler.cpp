@@ -827,7 +827,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i + pos]->chain_code));
 					else
 						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
-					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+					mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					// text
 					std::wstring text = L"";
 					if(sort_list.size()) {
@@ -886,7 +886,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i + pos]->code));
 					else
 						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
-					mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+					mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					std::wstring text;
 					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
 						text = fmt::format(L"{}[{}]({})", dataManager.FormatLocation(display_cards[i + pos]->overlayTarget->location, display_cards[i + pos]->overlayTarget->sequence),
@@ -1464,7 +1464,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->stTip->isVisible()) {
 					should_show_tip = true;
 					irr::core::recti tpos = mainGame->stTip->getRelativePosition();
-					mainGame->stTip->setRelativePosition(irr::core::position2di(mousepos.X - tpos.getWidth() - 10, mcard ? mousepos.Y - tpos.getHeight() - 10 : y + 10));
+					mainGame->stTip->setRelativePosition(irr::core::position2di(mousepos.X - tpos.getWidth() - mainGame->Scale(10), mcard ? mousepos.Y - tpos.getHeight() - mainGame->Scale(10) : y + mainGame->Scale(10)));
 				}
 			}
 			if(mcard != hovered_card) {
@@ -1537,8 +1537,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								str.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first)));
 							}
 							should_show_tip = true;
-							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
-							mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y - 10 - dtip.Height, mousepos.X - 10, mousepos.Y - 10));
+							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
+							mainGame->stTip->setRelativePosition(recti(mousepos.X - mainGame->Scale(10) - dtip.Width, mousepos.Y - mainGame->Scale(10) - dtip.Height, mousepos.X - mainGame->Scale(10), mousepos.Y - mainGame->Scale(10)));
 							mainGame->stTip->setText(str.c_str());
 						}
 					} else {
@@ -1560,8 +1560,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						player_name.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first)));
 					}
 					should_show_tip = true;
-					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(player_name.c_str()) + irr::core::dimension2d<unsigned int>(10, 10);
-					mainGame->stTip->setRelativePosition(recti(mousepos.X - 10 - dtip.Width, mousepos.Y + 10, mousepos.X - 10, mousepos.Y + 10 + dtip.Height));
+					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(player_name.c_str()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
+					mainGame->stTip->setRelativePosition(recti(mousepos.X - mainGame->Scale(10) - dtip.Width, mousepos.Y + mainGame->Scale(10), mousepos.X - mainGame->Scale(10), mousepos.Y + mainGame->Scale(10) + dtip.Height));
 					mainGame->stTip->setText(player_name.c_str());
 				}
 				hovered_player = mplayer;
@@ -1877,7 +1877,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				Utils::ToggleFullscreen();
 			return true;
 		}
-		case irr::KEY_F12: {
+		case irr::KEY_F10: {
 			if (!event.KeyInput.PressedDown)
 				Utils::takeScreenshot(mainGame->device);
 			return true;
@@ -2095,26 +2095,27 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		mainGame->wCmdMenu->setVisible(false);
 		return;
 	}
-	int height = 1;
+	int height = mainGame->Scale(1);
+	auto increase = mainGame->Scale(21);
 	if(flag & COMMAND_ACTIVATE) {
 		mainGame->btnActivate->setVisible(true);
 		mainGame->btnActivate->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnActivate->setVisible(false);
 	if(flag & COMMAND_SUMMON) {
 		mainGame->btnSummon->setVisible(true);
 		mainGame->btnSummon->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnSummon->setVisible(false);
 	if(flag & COMMAND_SPSUMMON) {
 		mainGame->btnSPSummon->setVisible(true);
 		mainGame->btnSPSummon->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnSPSummon->setVisible(false);
 	if(flag & COMMAND_MSET) {
 		mainGame->btnMSet->setVisible(true);
 		mainGame->btnMSet->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnMSet->setVisible(false);
 	if(flag & COMMAND_SSET) {
 		if(!(clicked_card->type & TYPE_MONSTER))
@@ -2123,7 +2124,7 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 			mainGame->btnSSet->setText(dataManager.GetSysString(1159).c_str());
 		mainGame->btnSSet->setVisible(true);
 		mainGame->btnSSet->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnSSet->setVisible(false);
 	if(flag & COMMAND_REPOS) {
 		if(clicked_card->position & POS_FACEDOWN)
@@ -2134,34 +2135,34 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 			mainGame->btnRepos->setText(dataManager.GetSysString(1156).c_str());
 		mainGame->btnRepos->setVisible(true);
 		mainGame->btnRepos->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnRepos->setVisible(false);
 	if(flag & COMMAND_ATTACK) {
 		mainGame->btnAttack->setVisible(true);
 		mainGame->btnAttack->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnAttack->setVisible(false);
 	if(flag & COMMAND_LIST) {
 		mainGame->btnShowList->setVisible(true);
 		mainGame->btnShowList->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnShowList->setVisible(false);
 	if(flag & COMMAND_OPERATION) {
 		mainGame->btnOperation->setVisible(true);
 		mainGame->btnOperation->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnOperation->setVisible(false);
 	if(flag & COMMAND_RESET) {
 		mainGame->btnReset->setVisible(true);
 		mainGame->btnReset->setRelativePosition(position2di(1, height));
-		height += 21;
+		height += increase;
 	} else mainGame->btnReset->setVisible(false);
 	panel = mainGame->wCmdMenu;
 	mainGame->wCmdMenu->setVisible(true);
 	position2di mouse = mainGame->Resize(x, y);
 	x = mouse.X;
 	y = mouse.Y;
-	mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - 20, y - 20 - height, x + 80, y - 20));
+	mainGame->wCmdMenu->setRelativePosition(irr::core::recti(x - mainGame->Scale(20), y - mainGame->Scale(20) - height, x + mainGame->Scale(80), y - mainGame->Scale(20)));
 }
 void ClientField::UpdateChainButtons() {
 	if(mainGame->btnChainAlways->isVisible()) {
@@ -2232,13 +2233,13 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 		s32 x = (ePos.UpperLeftCorner.X + ePos.LowerRightCorner.X) / 2;
 		s32 y = ePos.LowerRightCorner.Y;
 		mainGame->stCardListTip->setText(str.c_str());
-		irr::core::dimension2d<unsigned int> dTip = mainGame->guiFont->getDimension(mainGame->stCardListTip->getText()) + irr::core::dimension2d<unsigned int>(10, 10);
+		irr::core::dimension2d<unsigned int> dTip = mainGame->guiFont->getDimension(mainGame->stCardListTip->getText()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
 		s32 w = dTip.Width / 2;
-		if(x - w < 10)
-			x = w + 10;
-		if(x + w > 670)
-			x = 670 - w;
-		mainGame->stCardListTip->setRelativePosition(recti(x - w, y - 10, x + w, y - 10 + dTip.Height));
+		if(x - w < mainGame->Scale(10))
+			x = w + mainGame->Scale(10);
+		if(x + w > mainGame->Scale(670))
+			x = mainGame->Scale(670) - w;
+		mainGame->stCardListTip->setRelativePosition(recti(x - w, y - mainGame->Scale(10), x + w, y - mainGame->Scale(10) + dTip.Height));
 		mainGame->stCardListTip->setVisible(true);
 	}
 }

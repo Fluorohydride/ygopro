@@ -26,6 +26,7 @@ namespace ygo {
 struct Config {
 	bool use_d3d;
 	bool use_vsync;
+	float dpi_scale;
 	int max_fps;
 	int game_version;
 	bool fullscreen;
@@ -122,6 +123,7 @@ public:
 	bool CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
+	void DrawShadowText(irr::gui::CGUITTFont* font, const core::stringw& text, const core::rect<s32>& shadowposition, const core::rect<s32>& padding, video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = nullptr);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard);
 	void DrawPendScale(ClientCard* pcard);
@@ -166,10 +168,21 @@ public:
 	}
 
 	void OnResize();
+	template<typename T>
+	T Scale(T val);
+	template<typename T, typename T2, typename T3, typename T4>
+	rect<T> Scale(T x, T2 y, T3 x2, T4 y2);
+	template<typename T>
+	rect<T> Scale(rect<T> rect);
+	template<typename T>
+	vector2d<T> Scale(vector2d<T> vec);
+	template<typename T, typename T2>
+	vector2d<T> Scale(T x, T2 y);
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
 	vector2d<s32> Resize(s32 x, s32 y, bool reverse = false);
-	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2);
+	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2, bool scale = true);
+	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
 	recti ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2);
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
 	void SetCentered(irr::gui::IGUIElement* elem);
@@ -408,7 +421,7 @@ public:
 	irr::gui::IGUIButton* btnSinglePlayCancel;
 	//hand
 	irr::gui::IGUIWindow* wHand;
-	irr::gui::IGUIButton* btnHand[3];
+	irr::gui::CGUIImageButton* btnHand[3];
 	//
 	irr::gui::IGUIWindow* wFTSelect;
 	irr::gui::IGUIButton* btnFirst;
@@ -586,6 +599,28 @@ inline std::vector<T> Game::TokenizeString(T input, const T & token) {
 	if(input.size())
 		res.push_back(input);
 	return res;
+}
+
+template<typename T>
+inline vector2d<T> Game::Scale(vector2d<T> vec) {
+	return vector2d<T>(vec.X * gameConf.dpi_scale, vec.Y * gameConf.dpi_scale );
+}
+template<typename T, typename T2>
+inline vector2d<T> Game::Scale(T x, T2 y) {
+	return vector2d<T>((T)(x * gameConf.dpi_scale), (T)(y * gameConf.dpi_scale));
+}
+template<typename T>
+inline T Game::Scale(T val) {
+	return T(val * gameConf.dpi_scale);
+}
+template<typename T, typename T2, typename T3, typename T4>
+rect<T> Game::Scale(T x, T2 y, T3 x2, T4 y2) {
+	auto& scale = gameConf.dpi_scale;
+	return { (T)std::roundf(x * scale),(T)std::roundf(y * scale), (T)std::roundf(x2 * scale), (T)std::roundf(y2 * scale) };
+}
+template<typename T>
+rect<T> Game::Scale(rect<T> rect) {
+	return Scale(rect.UpperLeftCorner.X, rect.UpperLeftCorner.Y, rect.LowerRightCorner.X, rect.LowerRightCorner.Y);
 }
 
 }

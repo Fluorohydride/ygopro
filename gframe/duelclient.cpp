@@ -509,16 +509,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		mainGame->gMutex.lock();
 		int x = (pkt->info.mode == 3) ? 60 : 0;
-		mainGame->btnHostPrepOB->setRelativePosition(rect<s32>(10, 180 + x, 110, 205 + x));
-		mainGame->stHostPrepOB->setRelativePosition(rect<s32>(10, 210 + x, 270, 230 + x));
-		mainGame->stHostPrepRule->setRelativePosition(rect<s32>(280, 30, 460, 230 + x));
-		mainGame->stDeckSelect->setRelativePosition(rect<s32>(10, 235 + x, 110, 255 + x));
-		mainGame->cbDeckSelect->setRelativePosition(rect<s32>(120, 230 + x, 270, 255 + x));
-		mainGame->cbDeckSelect2->setRelativePosition(rect<s32>(280, 230 + x, 430, 255 + x));
-		mainGame->btnHostPrepReady->setRelativePosition(rect<s32>(170, 180 + x, 270, 205 + x));
-		mainGame->btnHostPrepNotReady->setRelativePosition(rect<s32>(170, 180 + x, 270, 205 + x));
-		mainGame->btnHostPrepStart->setRelativePosition(rect<s32>(230, 280 + x, 340, 305 + x));
-		mainGame->btnHostPrepCancel->setRelativePosition(rect<s32>(350, 280 + x, 460, 305 + x));
+		mainGame->btnHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 180 + x, 110, 205 + x));
+		mainGame->stHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 210 + x, 270, 230 + x));
+		mainGame->stHostPrepRule->setRelativePosition(mainGame->Scale<s32>(280, 30, 460, 230 + x));
+		mainGame->stDeckSelect->setRelativePosition(mainGame->Scale<s32>(10, 235 + x, 110, 255 + x));
+		mainGame->cbDeckSelect->setRelativePosition(mainGame->Scale<s32>(120, 230 + x, 270, 255 + x));
+		mainGame->cbDeckSelect2->setRelativePosition(mainGame->Scale<s32>(280, 230 + x, 430, 255 + x));
+		mainGame->btnHostPrepReady->setRelativePosition(mainGame->Scale<s32>(170, 180 + x, 270, 205 + x));
+		mainGame->btnHostPrepNotReady->setRelativePosition(mainGame->Scale<s32>(170, 180 + x, 270, 205 + x));
+		mainGame->btnHostPrepStart->setRelativePosition(mainGame->Scale<s32>(230, 280 + x, 340, 305 + x));
+		mainGame->btnHostPrepCancel->setRelativePosition(mainGame->Scale<s32>(350, 280 + x, 460, 305 + x));
 		mainGame->wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440 + x));
 		mainGame->wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
 		for(int i = 0; i < 6; i++) {
@@ -531,16 +531,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		for(int i = 0; i < pkt->info.team1; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
-			mainGame->stHostPrepDuelist[i]->setRelativePosition(rect<s32>(40, 65 + i * 25, 240, 85 + i * 25));
-			mainGame->btnHostPrepKick[i]->setRelativePosition(rect<s32>(10, 65 + i * 25, 30, 85 + i * 25));
-			mainGame->chkHostPrepReady[i]->setRelativePosition(rect<s32>(250, 65 + i * 25, 270, 85 + i * 25));
+			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
+			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 65 + i * 25, 30, 85 + i * 25));
+			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
 		for(int i = pkt->info.team1; i < pkt->info.team1 + pkt->info.team2; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
-			mainGame->stHostPrepDuelist[i]->setRelativePosition(rect<s32>(40, 75 + i * 25, 240, 95 + i * 25));
-			mainGame->btnHostPrepKick[i]->setRelativePosition(rect<s32>(10, 75 + i * 25, 30, 95 + i * 25));
-			mainGame->chkHostPrepReady[i]->setRelativePosition(rect<s32>(250, 75 + i * 25, 270, 95 + i * 25));
+			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 75 + i * 25, 240, 95 + i * 25));
+			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 75 + i * 25, 30, 95 + i * 25));
+			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 75 + i * 25, 270, 95 + i * 25));
 		}
 		mainGame->dInfo.hostname.resize(pkt->info.team1);
 		mainGame->dInfo.clientname.resize(pkt->info.team2);
@@ -1710,23 +1710,23 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		else startpos = 155;
 		if(positions & POS_FACEUP_ATTACK) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
-			mainGame->btnPSAU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAU->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAU->setVisible(false);
 		if(positions & POS_FACEDOWN_ATTACK) {
-			mainGame->btnPSAD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAD->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAD->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAD->setVisible(false);
 		if(positions & POS_FACEUP_DEFENSE) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
-			mainGame->btnPSDU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDU->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSDU->setVisible(false);
 		if(positions & POS_FACEDOWN_DEFENSE) {
-			mainGame->btnPSDD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDD->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDD->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSDD->setVisible(false);
@@ -3288,7 +3288,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		mainGame->gMutex.lock();
-		mainGame->PopupElement(mainGame->wHand);
+		mainGame->wHand->setVisible(true);
 		mainGame->gMutex.unlock();
 		return false;
 	}

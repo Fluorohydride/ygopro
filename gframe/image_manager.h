@@ -39,7 +39,8 @@ public:
 	void RefreshCachedTextures();
 	void ClearCachedTextures(bool resize);
 	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
-	irr::video::IImage* GetTextureFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile = nullptr);
+	irr::video::IImage* GetTextureImageFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile = nullptr);
+	irr::video::ITexture* GetTextureFromFile(const io::path& file, int width, int height);
 	irr::video::ITexture* GetTexture(int code, bool wait = false, bool fit = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(int code);

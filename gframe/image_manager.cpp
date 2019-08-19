@@ -13,55 +13,55 @@ void ImageManager::AddDownloadResource(PicSource src) {
 
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	tCover[0] = driver->getTexture("textures/cover.jpg");
-	tCover[1] = driver->getTexture("textures/cover2.jpg");
+	tCover[0] = GetTextureFromFile(TEXT("textures/cover.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
+	tCover[1] = GetTextureFromFile(TEXT("textures/cover2.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
 	if(!tCover[1])
 		tCover[1] = tCover[0];
-	tUnknown = driver->getTexture("textures/unknown.jpg");
-	tAct = driver->getTexture("textures/act.png");
-	tAttack = driver->getTexture("textures/attack.png");
-	tChain = driver->getTexture("textures/chain.png");
-	tNegated = driver->getTexture("textures/negated.png");
-	tNumber = driver->getTexture("textures/number.png");
-	tLPBar = driver->getTexture("textures/lp.png");
-	tLPFrame = driver->getTexture("textures/lpf.png");
-	tMask = driver->getTexture("textures/mask.png");
-	tEquip = driver->getTexture("textures/equip.png");
-	tTarget = driver->getTexture("textures/target.png");
-	tChainTarget = driver->getTexture("textures/chaintarget.png");
-	tLim = driver->getTexture("textures/lim.png");
-	tHand[0] = driver->getTexture("textures/f1.jpg");
-	tHand[1] = driver->getTexture("textures/f2.jpg");
-	tHand[2] = driver->getTexture("textures/f3.jpg");
-	tBackGround = driver->getTexture("textures/bg.jpg");
-	tBackGround_menu = driver->getTexture("textures/bg_menu.jpg");
+	tUnknown = driver->getTexture(TEXT("textures/unknown.jpg"));
+	tAct = driver->getTexture(TEXT("textures/act.png"));
+	tAttack = driver->getTexture(TEXT("textures/attack.png"));
+	tChain = driver->getTexture(TEXT("textures/chain.png"));
+	tNegated = driver->getTexture(TEXT("textures/negated.png"));
+	tNumber = driver->getTexture(TEXT("textures/number.png"));
+	tLPBar = driver->getTexture(TEXT("textures/lp.png"));
+	tLPFrame = driver->getTexture(TEXT("textures/lpf.png"));
+	tMask = driver->getTexture(TEXT("textures/mask.png"));
+	tEquip = driver->getTexture(TEXT("textures/equip.png"));
+	tTarget = driver->getTexture(TEXT("textures/target.png"));
+	tChainTarget = driver->getTexture(TEXT("textures/chaintarget.png"));
+	tLim = driver->getTexture(TEXT("textures/lim.png"));
+	tHand[0] = GetTextureFromFile(TEXT("textures/f1.jpg"), mainGame->Scale(89), mainGame->Scale(128));
+	tHand[1] = GetTextureFromFile(TEXT("textures/f2.jpg"), mainGame->Scale(89), mainGame->Scale(128));
+	tHand[2] = GetTextureFromFile(TEXT("textures/f3.jpg"), mainGame->Scale(89), mainGame->Scale(128));
+	tBackGround = driver->getTexture(TEXT("textures/bg.jpg"));
+	tBackGround_menu = driver->getTexture(TEXT("textures/bg_menu.jpg"));
 	if(!tBackGround_menu)
 		tBackGround_menu = tBackGround;
-	tBackGround_deck = driver->getTexture("textures/bg_deck.jpg");
+	tBackGround_deck = driver->getTexture(TEXT("textures/bg_deck.jpg"));
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
-	tField[0][0] = driver->getTexture("textures/field2.png");
-	tFieldTransparent[0][0] = driver->getTexture("textures/field-transparent2.png");
-	tField[0][1] = driver->getTexture("textures/field3.png");
-	tFieldTransparent[0][1] = driver->getTexture("textures/field-transparent3.png");
-	tField[0][2] = driver->getTexture("textures/field.png");
-	tFieldTransparent[0][2] = driver->getTexture("textures/field-transparent.png");
-	tField[0][3] = driver->getTexture("textures/field4.png");
-	tFieldTransparent[0][3] = driver->getTexture("textures/field-transparent4.png");
-	tField[1][0] = driver->getTexture("textures/fieldSP2.png");
-	tFieldTransparent[1][0] = driver->getTexture("textures/field-transparentSP2.png");
-	tField[1][1] = driver->getTexture("textures/fieldSP3.png");
-	tFieldTransparent[1][1] = driver->getTexture("textures/field-transparentSP3.png");
-	tField[1][2] = driver->getTexture("textures/fieldSP.png");
-	tFieldTransparent[1][2] = driver->getTexture("textures/field-transparentSP.png");
-	tField[1][3] = driver->getTexture("textures/fieldSP4.png");
-	tFieldTransparent[1][3] = driver->getTexture("textures/field-transparentSP4.png");
-	sizes[0].first = CARD_IMG_WIDTH;
-	sizes[0].second = CARD_IMG_HEIGHT;
-	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X;
-	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y;
-	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X;
-	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y;
+	tField[0][0] = driver->getTexture(TEXT("textures/field2.png"));
+	tFieldTransparent[0][0] = driver->getTexture(TEXT("textures/field-transparent2.png"));
+	tField[0][1] = driver->getTexture(TEXT("textures/field3.png"));
+	tFieldTransparent[0][1] = driver->getTexture(TEXT("textures/field-transparent3.png"));
+	tField[0][2] = driver->getTexture(TEXT("textures/field.png"));
+	tFieldTransparent[0][2] = driver->getTexture(TEXT("textures/field-transparent.png"));
+	tField[0][3] = driver->getTexture(TEXT("textures/field4.png"));
+	tFieldTransparent[0][3] = driver->getTexture(TEXT("textures/field-transparent4.png"));
+	tField[1][0] = driver->getTexture(TEXT("textures/fieldSP2.png"));
+	tFieldTransparent[1][0] = driver->getTexture(TEXT("textures/field-transparentSP2.png"));
+	tField[1][1] = driver->getTexture(TEXT("textures/fieldSP3.png"));
+	tFieldTransparent[1][1] = driver->getTexture(TEXT("textures/field-transparentSP3.png"));
+	tField[1][2] = driver->getTexture(TEXT("textures/fieldSP.png"));
+	tFieldTransparent[1][2] = driver->getTexture(TEXT("textures/field-transparentSP.png"));
+	tField[1][3] = driver->getTexture(TEXT("textures/fieldSP4.png"));
+	tFieldTransparent[1][3] = driver->getTexture(TEXT("textures/field-transparentSP4.png"));
+	sizes[0].first = CARD_IMG_WIDTH * mainGame->gameConf.dpi_scale;
+	sizes[0].second = CARD_IMG_HEIGHT * mainGame->gameConf.dpi_scale;
+	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
+	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
+	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
+	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
 	return true;
 }
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
@@ -77,10 +77,14 @@ void ImageManager::ClearTexture(bool resize) {
 		map.clear();
 	};
 	if(resize) {
-		sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X;
-		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y;
-		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X;
-		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y;
+		sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
+		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
+		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
+		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
+		driver->removeTexture(tCover[0]);
+		tCover[0] = GetTextureFromFile(TEXT("textures/cover.jpg"), sizes[1].first, sizes[1].second);
+		driver->removeTexture(tCover[1]);
+		tCover[1] = GetTextureFromFile(TEXT("textures/cover2.jpg"), sizes[1].first, sizes[1].second);
 	}
 	if(!resize) {
 		ClearCachedTextures(resize);
@@ -372,7 +376,7 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 		}
 	return true;
 }
-irr::video::IImage* ImageManager::GetTextureFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile) {
+irr::video::IImage* ImageManager::GetTextureImageFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile) {
 	irr::video::IImage* srcimg = nullptr;
 	if(archivefile)
 		srcimg = driver->createImageFromFile(archivefile);
@@ -395,6 +399,17 @@ irr::video::IImage* ImageManager::GetTextureFromFile(const io::path& file, int w
 		return destimg;
 	}
 }
+irr::video::ITexture* ImageManager::GetTextureFromFile(const io::path & file, int width, int height) {
+	static std::atomic<chrono_time> tmp = 0;
+	auto img = GetTextureImageFromFile(file, width, height, tmp.load(), std::ref(tmp));
+	if(img) {
+		auto texture = driver->addTexture(file, img);
+		img->drop();
+		if(texture)
+			return texture;
+	}
+	return driver->getTexture(file);
+}
 ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32>& _width, std::atomic<s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* img = nullptr;
 	int width = _width;
@@ -415,7 +430,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, std::atomic<s32
 			}
 			auto file = reader ? reader->getFileName().c_str() : fmt::format(TEXT("{}{}{}"), path, code, extension);
 			__repeat:
-			if(img = GetTextureFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader)) {
+			if(img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader)) {
 				if(timestamp_id != source_timestamp_id.load()) {
 					img->drop();
 					if(reader) {
@@ -485,6 +500,8 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool wait, bool fit, in
 				width = width * mainGame->window_scale.X;
 				height = height * mainGame->window_scale.Y;
 			}
+			width *= mainGame->gameConf.dpi_scale;
+			height *= mainGame->gameConf.dpi_scale;
 			if(wait) {
 				auto tmp_img = LoadCardTexture(code, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
 				if(tmp_img.first) {

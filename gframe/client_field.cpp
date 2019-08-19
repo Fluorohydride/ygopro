@@ -361,7 +361,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 		else
 			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler]);
-		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
@@ -410,7 +410,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
-		mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		mainGame->stCardPos[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	}
 	if(selectable_cards.size() <= 5) {
 		for(int i = selectable_cards.size(); i < 5; ++i) {
@@ -443,7 +443,7 @@ void ClientField::ShowChainCard() {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 		else
 			mainGame->btnCardSelect[i]->setImage(imageManager.tCover[selectable_cards[i]->controler]);
-		mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		mainGame->stCardPos[i]->setText(fmt::format(L"{}[{}]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
@@ -460,7 +460,7 @@ void ClientField::ShowChainCard() {
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
-		mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		mainGame->stCardPos[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	} 
 	if(selectable_cards.size() <= 5) {
 		for(int i = selectable_cards.size(); i < 5; ++i) {
@@ -496,7 +496,7 @@ void ClientField::ShowLocationCard() {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i]->code));
 		else
 			mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[display_cards[i]->controler]);
-		mainGame->btnCardDisplay[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
 		std::wstring text;
@@ -529,7 +529,7 @@ void ClientField::ShowLocationCard() {
 				mainGame->stDisplayPos[i]->setBackgroundColor(0xffffffff);
 		}
 		mainGame->stDisplayPos[i]->setVisible(true);
-		mainGame->stDisplayPos[i]->setRelativePosition(rect<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		mainGame->stDisplayPos[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	}
 	if(display_cards.size() <= 5) {
 		for(int i = display_cards.size(); i < 5; ++i) {
@@ -562,9 +562,9 @@ void ClientField::ShowSelectOption(int select_hint) {
 		mainGame->btnOption[i]->setText(dataManager.GetDesc(select_options[i]).c_str());
 	recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
-		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + 375;
+		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(375);
 	else
-		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + 350;
+		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(350);
 	if(quickmode) {
 		mainGame->scrOption->setVisible(count > 5);
 		mainGame->scrOption->setPos(0);
@@ -575,7 +575,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 		mainGame->btnOptionOK->setVisible(false);
 		for(int i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(i < count);
-		int newheight = 30 + 40 * ((count > 5) ? 5 : count);
+		int newheight = mainGame->Scale(30 + 40 * ((count > 5) ? 5 : count));
 		int oldheight = pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y;
 		pos.UpperLeftCorner.Y = pos.UpperLeftCorner.Y + (oldheight - newheight) / 2;
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
@@ -588,7 +588,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 		mainGame->btnOptionOK->setVisible(true);
 		for(int i = 0; i < 5; i++)
 			mainGame->btnOption[i]->setVisible(false);
-		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 140;
+		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + mainGame->Scale(140);
 		mainGame->wOptions->setRelativePosition(pos);
 	}
 	mainGame->wOptions->setText(dataManager.GetDesc(select_hint ? select_hint : 555).c_str());

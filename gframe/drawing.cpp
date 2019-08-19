@@ -472,6 +472,12 @@ void Game::DrawCard(ClientCard* pcard) {
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	}
 }
+void Game::DrawShadowText(irr::gui::CGUITTFont * font, const core::stringw & text, const core::rect<s32>& shadowposition, const core::rect<s32>& padding, video::SColor color, video::SColor shadowcolor, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
+	core::rect<s32> position = recti(shadowposition.UpperLeftCorner.X + padding.UpperLeftCorner.X, shadowposition.UpperLeftCorner.Y + padding.UpperLeftCorner.Y,
+										   shadowposition.LowerRightCorner.X + padding.LowerRightCorner.X, shadowposition.LowerRightCorner.Y + padding.LowerRightCorner.Y);
+	font->draw(text, shadowposition, shadowcolor, hcenter, vcenter, clip);
+	font->draw(text, position, color, hcenter, vcenter, clip);
+}
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
 	int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
@@ -572,11 +578,9 @@ void Game::DrawMisc() {
 	}
 	if(lpcstring.size()) {
 		if(lpplayer == 0) {
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 470, 920, 520), (lpcalpha << 24) | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 472, 922, 520), (lpcalpha << 24) | lpccolor, true, false, 0);
+			DrawShadowText(lpcFont, lpcstring.c_str(), Resize(400, 470, 920, 520), Resize(0, 2, 2, 0), (lpcalpha << 24) | lpccolor, (lpcalpha << 24) | 0x00ffffff, true);
 		} else {
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 160, 920, 210), (lpcalpha << 24) | 0x00ffffff, true, false, 0);
-			lpcFont->draw(lpcstring.c_str(), Resize(400, 162, 922, 210), (lpcalpha << 24) | lpccolor, true, false, 0);
+			DrawShadowText(lpcFont, lpcstring.c_str(), Resize(400, 160, 920, 210), Resize(0, 2, 2, 0), (lpcalpha << 24) | lpccolor, (lpcalpha << 24) | 0x00ffffff, true);
 		}
 	}
 	if(!dInfo.isReplay && dInfo.player_type < 7 && dInfo.time_limit) {
@@ -585,10 +589,9 @@ void Game::DrawMisc() {
 		driver->draw2DRectangle(Resize(795 - dInfo.time_left[1] * 100 / dInfo.time_limit, 34, 795, 44), 0xa0e0e0e0, 0xa0e0e0e0, 0xa0c0c0c0, 0xa0c0c0c0);
 		driver->draw2DRectangleOutline(Resize(695, 34, 795, 44), 0xffffffff);
 	}
-	numFont->draw(dInfo.strLP[0].c_str(), Resize(330, 11, 629, 30), 0xff000000, true, false, 0);
-	numFont->draw(dInfo.strLP[0].c_str(), Resize(330, 12, 631, 30), 0xffffff00, true, false, 0);
-	numFont->draw(dInfo.strLP[1].c_str(), Resize(691, 11, 990, 30), 0xff000000, true, false, 0);
-	numFont->draw(dInfo.strLP[1].c_str(), Resize(691, 12, 992, 30), 0xffffff00, true, false, 0);
+
+	DrawShadowText(numFont, dInfo.strLP[0].c_str(), Resize(330, 11, 629, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true);
+	DrawShadowText(numFont, dInfo.strLP[1].c_str(), Resize(691, 11, 990, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true);
 
 	recti p1size = Resize(335, 31, 629, 50);
 	recti p2size = Resize(986, 31, 986, 50);
@@ -598,8 +601,7 @@ void Game::DrawMisc() {
 	textFont->draw(dInfo.clientname[dInfo.current_player[1]].c_str(), p2size, 0xffffffff, false, false, 0);
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
-	lpcFont->draw(dataManager.GetNumString(dInfo.turn).c_str(), Resize(635, 5, 685, 40), 0x80000000, true, false, 0);
-	lpcFont->draw(dataManager.GetNumString(dInfo.turn).c_str(), Resize(635, 5, 687, 40), 0x8000ffff, true, false, 0);
+	DrawShadowText(lpcFont, dataManager.GetNumString(dInfo.turn).c_str(), Resize(635, 5, 685, 40), Resize(0, 0, 2, 0), 0x8000ffff, 0x80000000, true);
 	ClientCard* pcard;
 	int seq = (dInfo.duel_field != 4) ? 6 : (dInfo.extraval & 0x1) ? 1 : 0;
 	int increase = (dInfo.duel_field != 4) ? 1 : (dInfo.extraval & 0x1) ? 2 : 4;
@@ -636,42 +638,38 @@ void Game::DrawStatus(ClientCard* pcard) {
 		ConvertCoords(pcard->curPos.X, (pcard->curPos.Y - 0.66f), &x1, &y1);
 		ConvertCoords((pcard->curPos.X - 0.48f), (0.39f + pcard->curPos.Y), &x2, &y2);
 	}
+	auto tmp = Resize(x1, y1);
+	x1 = tmp.X;
+	y1 = tmp.Y;
+	tmp = Resize(x2, y2);
+	x2 = tmp.X;
+	y2 = tmp.Y;
+	auto atk = adFont->getDimension(pcard->atkstring);
+	auto slash = adFont->getDimension(L"/");
 	if(pcard->type & TYPE_LINK) {
-		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
-		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21),
-			pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, true, false, 0);
+		DrawShadowText(adFont, pcard->atkstring.c_str(), recti(x1 - std::floor(atk.Width / 2), y1, x1 + std::floor(atk.Width / 2), y1 + 1), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, true);
 	} else {
-		adFont->draw(L"/", Resize(x1 - 4, y1, x1 + 4, y1 + 20), 0xff000000, true, false, 0);
-		adFont->draw(L"/", Resize(x1 - 3, y1 + 1, x1 + 5, y1 + 21), 0xffffffff, true, false, 0);
-		int w = adFont->getDimension(pcard->atkstring).Width;
-		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 5, y1, x1 - 5, y1 + 20, -w, 0, 0, 0), 0xff000000, false, false, 0);
-		adFont->draw(pcard->atkstring.c_str(), Resize(x1 - 4, y1 + 1, x1 - 4, y1 + 21, -w, 0, 0, 0),
-			pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, false, false, 0);
-		w = adFont->getDimension(pcard->defstring).Width;
-		adFont->draw(pcard->defstring.c_str(), Resize(x1 + 4, y1, x1 + 4 + w, y1 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->defstring.c_str(), Resize(x1 + 5, y1 + 1, x1 + 5 + w, y1 + 21),
-			pcard->defense > pcard->base_defense ? 0xffffff00 : pcard->defense < pcard->base_defense ? 0xffff2090 : 0xffffffff, false, false, 0);
+		DrawShadowText(adFont, L"/", recti(x1 - std::floor(slash.Width / 2), y1, x1 + std::floor(slash.Width / 2), y1 + 1), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, true);
+		DrawShadowText(adFont, pcard->atkstring.c_str(), recti(x1 - std::floor(slash.Width / 2) - atk.Width - slash.Width, y1, x1 - std::floor(slash.Width / 2), y1 + 1),
+					   Resize(1, 1, 1, 1), pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff, 0xff000000);
+		DrawShadowText(adFont, pcard->defstring.c_str(), recti(x1 + std::floor(slash.Width / 2) + slash.Width, y1, x1 - std::floor(slash.Width / 2), y1 + 1),
+					   Resize(1, 1, 1, 1), pcard->defense > pcard->base_defense ? 0xffffff00 : pcard->defense < pcard->base_defense ? 0xffff2090 : 0xffffffff, 0xff000000);
 	}
 	if (pcard->level != 0 && pcard->rank != 0) {
-		adFont->draw(L"/", Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, true, false, 0);
-		adFont->draw(L"/", Resize(x2 + 1, y2 + 1, x2 + 3, y2 + 21), 0xffffffff, true, false, 0);
-		int w2 = adFont->getDimension(pcard->lvstring).Width;
-		adFont->draw(pcard->lvstring.c_str(), Resize(x2 - 5, y2, x2 - 5, y2 + 20, -w2, 0, 0, 0), 0xff000000, false, false, 0);
-		adFont->draw(pcard->lvstring.c_str(), Resize(x2 - 4, y2 +1 , x2 - 4, y2 + 21, -w2, 0, 0, 0), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
-		adFont->draw(pcard->rkstring.c_str(), Resize(x2 + 4, y2, x2 + 4 + w2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->rkstring.c_str(), Resize(x2 + 5, y2 + 1, x2 + 5 + w2, y2 + 21), 0xffff80ff, false, false, 0);
+		DrawShadowText(adFont, L"/", recti(x2 - std::floor(slash.Width / 2), y2, x2 + std::floor(slash.Width / 2), y2 + 1), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, true);
+		DrawShadowText(adFont, pcard->lvstring.c_str(), recti(x2 - std::floor(slash.Width / 2) - atk.Width - slash.Width, y2, x2 - std::floor(slash.Width / 2), y2 + 1),
+					   Resize(1, 1, 1, 1), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, 0xff000000);
+		DrawShadowText(adFont, pcard->rkstring.c_str(), recti(x2 + std::floor(slash.Width / 2) + slash.Width, y2, x2 - std::floor(slash.Width / 2), y2 + 1),
+					   Resize(1, 1, 1, 1), 0xffff80ff, 0xff000000);
 	}
 	else if (pcard->rank != 0) {
-		adFont->draw(pcard->rkstring.c_str(), Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->rkstring.c_str(), Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xffff80ff, false, false, 0);
+		DrawShadowText(adFont, pcard->rkstring.c_str(), recti(x2, y2, x2 + 1, y2 + 1), Resize(1, 0, 1, 1), 0xffff80ff, 0xff000000);
 	}
 	else if (pcard->level != 0) {
-		adFont->draw(pcard->lvstring.c_str(), Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->lvstring.c_str(), Resize(x2 + 1, y2, x2 + 3, y2 + 21), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
+		DrawShadowText(adFont, pcard->lvstring.c_str(), recti(x2, y2, x2 + 1, y2 + 1), Resize(1, 0, 1, 1), (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, 0xff000000);
 	}
 	else if (pcard->link != 0) {
-		adFont->draw(pcard->linkstring.c_str(), Resize(x2, y2, x2 + 2, y2 + 20), 0xff000000, false, false, 0);
-		adFont->draw(pcard->linkstring.c_str(), Resize(x2 + 1, y2, x2 + 3, y2 + 21), 0xff99ffff, false, false, 0);
+		DrawShadowText(adFont, pcard->linkstring.c_str(), recti(x2, y2, x2 + 1, y2 + 1), Resize(1, 0, 1, 1), 0xff99ffff, 0xff000000);
 	}
 }
 /*Draws the pendulum scale value of a card in the pendulum zone based on its relative position
@@ -693,8 +691,7 @@ void Game::DrawPendScale(ClientCard* pcard) {
 	} else
 		y0 = pcard->curPos.Y + 0.29f;
 	ConvertCoords(x0, y0, &x, &y);
-	adFont->draw(scale.c_str(), Resize(x - (12 * swap), y, x + (12 * (1 - swap)), y - 800), 0xff000000, true, false, 0);
-	adFont->draw(scale.c_str(), Resize(x + 1 - (12 * swap), y, x + 1 + (12 * (1 - swap)), y - 800), 0xffffffff, true, false, 0);
+	DrawShadowText(adFont, scale.c_str(), Resize(x - (12 * swap), y, x + (12 * (1 - swap)), y - 800), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, true);
 }
 /*Draws the text in the middle of the bottom side of the zone
 */
@@ -703,8 +700,10 @@ void Game::DrawStackIndicator(const std::wstring& text, S3DVertex* v, bool oppon
 	float x0 = (v[0].Pos.X + v[1].Pos.X) / 2;
 	float y0 = (opponent) ? v[0].Pos.Y : v[2].Pos.Y;
 	ConvertCoords(x0, y0, &x, &y);
-	numFont->draw(text.c_str(), Resize(x - width, y - height + 2, x + width, y + height), 0xff000000, true, false, 0);
-	numFont->draw(text.c_str(), Resize(x - width, y - height + 3, x + width, y + height + 1), 0xffffff00, true, false, 0);
+	auto tmp = Resize(x, y);
+	x = tmp.X;
+	y = tmp.Y;
+	DrawShadowText(numFont, text.c_str(), recti(x - width, y - height, x + width, y + height), Resize(0, 1, 0, 1), 0xffffff00, 0xff000000);
 }
 /*Converts the coordinates from the 3d plane to the 2d plane (the window)
 */
@@ -821,7 +820,7 @@ void Game::DrawSpec() {
 		case 1: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tMask, ResizeElem(574, 150, 574 + (showcarddif > CARD_IMG_WIDTH ? CARD_IMG_WIDTH : showcarddif), 404),
-			                    recti(CARD_IMG_HEIGHT - showcarddif, 0, CARD_IMG_HEIGHT - (showcarddif > CARD_IMG_WIDTH ? showcarddif - CARD_IMG_WIDTH : 0), CARD_IMG_HEIGHT), 0, 0, true);
+								mainGame->Scale<s32>(CARD_IMG_HEIGHT - showcarddif, 0, CARD_IMG_HEIGHT - (showcarddif > CARD_IMG_WIDTH ? showcarddif - CARD_IMG_WIDTH : 0), CARD_IMG_HEIGHT), 0, 0, true);
 			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(std::round(showcarddif) >= CARD_IMG_HEIGHT) {
 				showcard = 2;
@@ -831,7 +830,7 @@ void Game::DrawSpec() {
 		}
 		case 2: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
-			driver->draw2DImage(imageManager.tMask, ResizeElem(574 + showcarddif, 150, 751, 404), recti(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
+			driver->draw2DImage(imageManager.tMask, ResizeElem(574 + showcarddif, 150, 751, 404), mainGame->Scale(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
 			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;
@@ -840,7 +839,7 @@ void Game::DrawSpec() {
 		}
 		case 3: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
-			driver->draw2DImage(imageManager.tNegated, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), recti(0, 0, 128, 128), 0, 0, true);
+			driver->draw2DImage(imageManager.tNegated, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), mainGame->Scale(0, 0, 128, 128), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
@@ -851,7 +850,7 @@ void Game::DrawSpec() {
 			matManager.c2d[2] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			matManager.c2d[3] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), ResizeElem(574, 154, 751, 404),
-			                    recti(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
+								mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 255)
 				showcarddif += (1020.0f / 1000.0f) * (float)delta_time;
 			break;
@@ -862,7 +861,7 @@ void Game::DrawSpec() {
 			matManager.c2d[2] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			matManager.c2d[3] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), ResizeElem(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif),
-			                    recti(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
+			                    mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 127) {
 				showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 				if(showcarddif > 127.0f)
@@ -873,24 +872,26 @@ void Game::DrawSpec() {
 		case 6: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), Resize(574, 150));
 			driver->draw2DImage(imageManager.tNumber, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
-			                    recti(((int)std::round(showcardp) % 5) * 64, ((int)std::round(showcardp) / 5) * 64, ((int)std::round(showcardp) % 5 + 1) * 64, ((int)std::round(showcardp) / 5 + 1) * 64), 0, 0, true);
+								mainGame->Scale(((int)std::round(showcardp) % 5) * 64, ((int)std::round(showcardp) / 5) * 64, ((int)std::round(showcardp) % 5 + 1) * 64, ((int)std::round(showcardp) / 5 + 1) * 64), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
 		}
 		case 7: {
-			core::position2d<s32> corner[4];
-			float y = sin(showcarddif * PI / 180.0f) * CARD_IMG_HEIGHT * window_scale.Y;
-			corner[0] = core::position2d<s32>(574 * window_scale.X - (CARD_IMG_HEIGHT * window_scale.Y - y) * 0.3f, 404 * window_scale.Y - y);
-			corner[1] = core::position2d<s32>(751 * window_scale.X + (CARD_IMG_HEIGHT * window_scale.Y - y) * 0.3f, 404 * window_scale.Y - y);
-			corner[2] = core::position2d<s32>(574 * window_scale.X, 404 * window_scale.Y);
-			corner[3] = core::position2d<s32>(751 * window_scale.X, 404 * window_scale.Y);
-			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode), rect<s32>(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
+			core::vector2d<s32> corner[4];
+			float y = sin(showcarddif * PI / 180.0f) * CARD_IMG_HEIGHT;
+			auto a = mainGame->ResizeElem(574 - (CARD_IMG_HEIGHT - y) * 0.3f, (150 + CARD_IMG_HEIGHT) - y, 751 + (CARD_IMG_HEIGHT - y) * 0.3f, 150 + CARD_IMG_HEIGHT);
+			auto b = mainGame->ResizeElem(574, 150, 574 + CARD_IMG_WIDTH, 404);
+			corner[0] = a.UpperLeftCorner;
+			corner[1] = vector2d<s32>{ a.LowerRightCorner.X, a.UpperLeftCorner.Y };
+			corner[2] = vector2d<s32>{ b.UpperLeftCorner.X, b.LowerRightCorner.Y };
+			corner[3] = b.LowerRightCorner;
+			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode), mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
 			showcardp += (float)delta_time * 60.0f / 1000.0f;
 			showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= 90)
 				showcarddif = 90;
-			if(showcardp == 60) {
+			if(showcardp >= 60) {
 				showcardp = 0;
 				showcarddif = 0;
 			}
@@ -957,26 +958,16 @@ void Game::DrawSpec() {
 			auto pos = lpcFont->getDimension(lstr);
 			if(showcardp < 10.0f) {
 				int alpha = ((int)std::round(showcardp) * 25) << 24;
-				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 - (9 - std::floor(showcardp)) * 40, 291, 950, 370), alpha);
-				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 - (9 - std::floor(showcardp)) * 40, 290, 950, 370), alpha | 0xffffff);
+				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661 - (9 - showcardp) * 40, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
 			} else if(showcardp < showcarddif) {
-				recti loc = ResizeElem(650 - pos.Width / 2, 290, 950, 370);
-				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2, 291, 950, 370), 0xff000000);
-				lpcFont->draw(lstr, loc, 0xffffffff);
+				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), 0xffffffff);
 				if(dInfo.vic_string.size() && (showcardcode == 1 || showcardcode == 2)) {
-					s32 vicx = (260 + pos.Width) / 2 - 260;
-					recti vicloc = recti(loc.UpperLeftCorner.X + vicx, loc.UpperLeftCorner.Y + 50, loc.UpperLeftCorner.X + vicx + 260, loc.UpperLeftCorner.Y + 70);
-					vicloc += position2di(2, 2);
-					driver->draw2DRectangle(0xa0000000, vicloc);
-					guiFont->draw(dInfo.vic_string.c_str(), vicloc, 0xff000000, true, true);
-					vicloc.UpperLeftCorner.X -= 2;
-					vicloc.UpperLeftCorner.Y -= 1;
-					guiFont->draw(dInfo.vic_string.c_str(), vicloc, 0xffffffff, true, true);
+					driver->draw2DRectangle(0xa0000000, Resize(540, 320, 790, 340));
+					DrawShadowText(guiFont, dInfo.vic_string.c_str(), Resize(492, 321, 840, 340), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true);
 				}
 			} else if(showcardp < showcarddif + 10.0f) {
 				int alpha = (int)std::round((((showcarddif + 10.0f - showcardp) * 25.0f) / 1000.0f) * (float)delta_time) << 24;
-				lpcFont->draw(lstr, ResizeElem(651 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 291, 950, 370), alpha);
-				lpcFont->draw(lstr, ResizeElem(650 - pos.Width / 2 + std::round(showcardp - showcarddif) * 40, 290, 950, 370), alpha | 0xffffff);
+				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661 + (showcardp - showcarddif) * 40, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
 			}
 			showcardp += std::min(((float)delta_time * 60.0f / 1000.0f), showcarddif - showcardp);
 			break;
@@ -1062,7 +1053,7 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 		for(int i = 0; i < 5; ++i)
 			btnCardDisplay[i]->setDrawImage(false);
 	}
-	win->setRelativePosition(irr::core::recti(center.X, center.Y, 0, 0));
+	win->setRelativePosition(Scale(center.X, center.Y, 0, 0));
 	fadingList.push_back(fu);
 }
 void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
@@ -1123,8 +1114,8 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 	recti dragloc = Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT);
 	recti limitloc = Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20);
 	if(drag) {
-		dragloc = recti(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH * window_scale.X, pos.Y + CARD_THUMB_HEIGHT * window_scale.Y);
-		limitloc = recti(pos.X, pos.Y, pos.X + 20 * window_scale.X, pos.Y + 20 * window_scale.Y);
+		dragloc = recti(pos.X, pos.Y, pos.X + Scale(CARD_THUMB_WIDTH * window_scale.X), pos.Y + Scale(CARD_THUMB_HEIGHT * window_scale.Y));
+		limitloc = recti(pos.X, pos.Y, pos.X + Scale(20 * window_scale.X), pos.Y + Scale(20 * window_scale.Y));
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
 	if(!is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {
@@ -1321,7 +1312,7 @@ void Game::DrawDeckBd() {
 		textFont->draw(buffer.c_str(), Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
 	}
 	if(deckBuilder.is_draging) {
-		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - (CARD_THUMB_WIDTH / 2), deckBuilder.dragy - (CARD_THUMB_HEIGHT / 2)), deckBuilder.filterList, true);
+		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - Scale(CARD_THUMB_WIDTH / 2), deckBuilder.dragy - Scale(CARD_THUMB_HEIGHT / 2)), deckBuilder.filterList, true);
 	}
 }
 }
