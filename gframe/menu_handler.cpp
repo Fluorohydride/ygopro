@@ -664,12 +664,26 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 				}
 			}
+			case EDITBOX_TEAM_COUNT: {
+				auto& elem = event.GUIEvent.Caller;
+				auto text = elem->getText();
+				auto len = wcslen(text);
+				if(len < 1)
+					break;
+				if(text[len - 1] < L'1' || text[len - 1] > L'3') {
+					elem->setText(L"1");
+					break;
+				}
+				wchar_t string[] = { text[len - 1], 0 };
+				elem->setText(string);
+				break;
+			}
 			break;
 		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch (id) {
 			case COMBOBOX_DUEL_RULE: {
-				auto& combobox = mainGame->cbDuelRule;
+				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
 				switch (combobox->getSelected()) {
 				case 0:{
 					combobox->removeItem(4);
@@ -696,6 +710,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
+			}
+			case COMBOBOX_MATCH_MODE: {
+			auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
+			if(combobox->getSelected() == 4) {
+				mainGame->ebTeam1->setVisible(true);
+				mainGame->ebTeam2->setVisible(true);
+			} else {
+				mainGame->ebTeam1->setVisible(false);
+				mainGame->ebTeam2->setVisible(false);
+			}
 			}
 			}
 		}

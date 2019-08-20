@@ -363,6 +363,8 @@ public:
 	irr::gui::IGUIComboBox* cbMatchMode;
 	irr::gui::IGUIComboBox* cbRule;
 	irr::gui::IGUIEditBox* ebTimeLimit;
+	irr::gui::IGUIEditBox* ebTeam1;
+	irr::gui::IGUIEditBox* ebTeam2;
 	irr::gui::IGUIEditBox* ebStartLP;
 	irr::gui::IGUIEditBox* ebStartHand;
 	irr::gui::IGUIEditBox* ebDrawCount;
@@ -688,6 +690,8 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_DELETE_REPLAY		133
 #define BUTTON_RENAME_REPLAY		134
 #define BUTTON_EXPORT_DECK			135
+#define EDITBOX_TEAM_COUNT			136
+#define COMBOBOX_MATCH_MODE			137
 #define EDITBOX_CHAT				140
 #define EDITBOX_PORT_BOX			141
 #define BUTTON_MSG_OK				200

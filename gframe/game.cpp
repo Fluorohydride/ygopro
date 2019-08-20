@@ -196,11 +196,18 @@ bool Game::Initialize() {
 	cbRule->addItem(dataManager.GetSysString(1242).c_str());
 	cbRule->addItem(dataManager.GetSysString(1243).c_str());
 	env->addStaticText(dataManager.GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
-	cbMatchMode = env->addComboBox(Scale(140, 85, 300, 110), wCreateHost);
+	cbMatchMode = env->addComboBox(Scale(140, 85, 300, 110), wCreateHost, COMBOBOX_MATCH_MODE);
 	cbMatchMode->addItem(dataManager.GetSysString(1244).c_str());
 	cbMatchMode->addItem(dataManager.GetSysString(1245).c_str());
 	cbMatchMode->addItem(dataManager.GetSysString(1246).c_str());
 	cbMatchMode->addItem(dataManager.GetSysString(1247).c_str());
+	cbMatchMode->addItem(dataManager.GetSysString(1248).c_str());
+	ebTeam1 = env->addEditBox(L"1", Scale(305, 85, 335, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
+	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	ebTeam1->setVisible(false);
+	ebTeam2 = env->addEditBox(L"1", Scale(340, 85, 370, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
+	ebTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	ebTeam2->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1237).c_str(), Scale(20, 120, 320, 140), false, false, wCreateHost);
 	ebTimeLimit = env->addEditBox(L"180", Scale(140, 115, 220, 140), true, wCreateHost);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -1821,7 +1828,7 @@ void Game::OnResize() {
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
-	if (dInfo.isRelay) {
+	if (dInfo.clientname.size() + dInfo.hostname.size()>=5) {
 		wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 500));
 		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 500));
 	} else {

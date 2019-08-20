@@ -158,6 +158,11 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				cscg.info.best_of = 0;
 				cscg.info.duel_flag |= DUEL_RELAY_MODE;
 			}
+			if(cscg.info.mode == MODE_ARBITRARY) {
+				cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
+				cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
+				cscg.info.best_of = 0;
+			}
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
@@ -508,7 +513,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			str.append(fmt::format(L"*{}\n", dataManager.GetSysString(1230)));
 		}
 		mainGame->gMutex.lock();
-		int x = (pkt->info.mode == 3) ? 60 : 0;
+		int x = (pkt->info.team1 + pkt->info.team2 >= 5) ? 60 : 0;
 		mainGame->btnHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 180 + x, 110, 205 + x));
 		mainGame->stHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 210 + x, 270, 230 + x));
 		mainGame->stHostPrepRule->setRelativePosition(mainGame->Scale<s32>(280, 30, 460, 230 + x));
@@ -590,10 +595,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		for(int i = 0; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
 			mainGame->btnHostPrepKick[i]->setVisible(is_host);
 		}
+		for(int i = 0; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
+			mainGame->chkHostPrepReady[i]->setEnabled(false);
+		}
 		if(selftype >= mainGame->dInfo.team1 + mainGame->dInfo.team2) {
-			for(int i = 0; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
-				mainGame->chkHostPrepReady[i]->setEnabled(false);
-			}
 			mainGame->btnHostPrepDuelist->setEnabled(true);
 			mainGame->btnHostPrepOB->setEnabled(false);
 			mainGame->btnHostPrepReady->setVisible(false);

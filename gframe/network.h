@@ -235,6 +235,7 @@ public:
 #define MODE_MATCH		0x1
 #define MODE_TAG		0x2
 #define MODE_RELAY		0x3
+#define MODE_ARBITRARY	0x4
 
 #define SEALED_DUEL			0x1
 #define BOOSTER_DUEL		0x2
