@@ -962,8 +962,9 @@ void Game::DrawSpec() {
 			} else if(showcardp < showcarddif) {
 				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), 0xffffffff);
 				if(dInfo.vic_string.size() && (showcardcode == 1 || showcardcode == 2)) {
-					driver->draw2DRectangle(0xa0000000, Resize(540, 320, 790, 340));
-					DrawShadowText(guiFont, dInfo.vic_string.c_str(), Resize(492, 321, 840, 340), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true);
+					auto a = (291 + pos.Height + 2);
+					driver->draw2DRectangle(0xa0000000, Resize(540, a, 790, a + 20));
+					DrawShadowText(guiFont, dInfo.vic_string.c_str(), Resize(492, a + 1, 840, a + 20), Resize(-2, -1, 0, 0), 0xffffffff, 0xff000000, true, true);
 				}
 			} else if(showcardp < showcarddif + 10.0f) {
 				int alpha = (int)std::round((((showcarddif + 10.0f - showcardp) * 25.0f) / 1000.0f) * (float)delta_time) << 24;
