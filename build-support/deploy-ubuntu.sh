@@ -10,6 +10,8 @@ if [[ "$BUILD_CONFIG" -ne "debug" ]]; then
     strip deploy/ygoprodll
 fi
 cp irrKlang/bin/linux-gcc-64/libIrrKlang.so deploy/
+# Stopgap measure for Travis builds
+cp /usr/lib/x86_64-linux-gnu/libgit2.so.26 deploy/
 cp *.conf deploy/
 cp *.json deploy/
 if [[ ! -d deploy/textures ]]; then cp -r textures deploy/; fi

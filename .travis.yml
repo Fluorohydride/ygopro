@@ -3,7 +3,6 @@ sudo: required
 dist: bionic
 git:
   depth: 1
-  submodules: true
 env:
   global:
   - BUILD_CONFIG=release
@@ -11,10 +10,7 @@ env:
 addons:
   apt:
     update: true
-    sources:
-    - sourceline: 'ppa:ubuntu-toolchain-r/test'
     packages:
-    - g++-9
     - p7zip-full 
     - libevent-dev 
     - libfreetype6-dev
@@ -47,12 +43,10 @@ matrix:
     - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed.zip
     - DEPLOY_BRANCH=travis-windows
     cache: false
-  - name: "Bionic GCC9"
+  - name: "Bionic GCC7"
     os: linux
     compiler: gcc  
     env:
-    - CC=gcc-9
-    - CXX=g++-9
     - DEPLOY_BRANCH=travis-linux
   - name: "Mojave"
     os: osx
