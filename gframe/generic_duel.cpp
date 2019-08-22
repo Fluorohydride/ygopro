@@ -226,7 +226,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		STOC_HS_WatchChange scwc;
 		scwc.watch_count = observers.size();
 		ITERATE_PLAYERS(
-			NetServer::SendPacketToPlayer(dueler.player, STOC_HS_PLAYER_ENTER, scwc);
+			NetServer::SendPacketToPlayer(dueler.player, STOC_HS_WATCH_CHANGE, scwc);
 		)
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::SendPacketToPlayer(*pit, STOC_HS_WATCH_CHANGE, scwc);
