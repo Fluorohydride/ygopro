@@ -662,7 +662,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(changed)
 					caller->setText(filtered);
 				break;
-				}
 			}
 			case EDITBOX_TEAM_COUNT: {
 				auto& elem = event.GUIEvent.Caller;
@@ -677,6 +676,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				wchar_t string[] = { text[len - 1], 0 };
 				elem->setText(string);
 				break;
+			}
 			}
 			break;
 		}
