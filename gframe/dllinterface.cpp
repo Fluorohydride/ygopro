@@ -141,7 +141,7 @@ void* LoadOCGcore(const std::wstring& path) {
 bool check_api_version() {
 	int min = 0;
 	int max = get_api_version(&min);
-	return min == 1 && max == 3;
+	return max == 3;
 }
 
 #define LOAD_FUNCTION(x) x = (decltype(x))GetFunction(newcore, #x);\
