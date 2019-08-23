@@ -546,7 +546,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	cur_player[1] = players.opposing.front().player;
 	dp->state = CTOS_RESPONSE;
 	ReplayHeader rh;
-	rh.id = 0x31707279;
+	rh.id = REPLAY_YRP1;
 	rh.version = PRO_VERSION;
 	rh.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY;
 	time_t seed = time(0);
@@ -556,7 +556,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	std::mt19937 rnd(seed);
 	//records the replay with the new system
 	new_replay.BeginRecord();
-	rh.id = 0x58707279;
+	rh.id = REPLAY_YRPX;
 	new_replay.WriteHeader(rh);
 	last_replay.Write<int32_t>(players.home.size(), false);
 	new_replay.Write<int32_t>(players.home.size(), false);

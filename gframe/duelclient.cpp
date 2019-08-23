@@ -3867,12 +3867,11 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 void DuelClient::ReplayPrompt(bool need_header) {
 	if(need_header) {
 		ReplayHeader pheader;
-		pheader.id = 0x58707279;
+		pheader.id = REPLAY_YRPX;
 		pheader.version = PRO_VERSION;
 		pheader.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY;
 		last_replay.BeginRecord(false);
 		last_replay.WriteHeader(pheader);
-		last_replay.pheader.id = 0x58707279;
 		last_replay.Write<int32_t>(mainGame->dInfo.clientname.size(), false);
 		for(auto& name : mainGame->dInfo.clientname) {
 			last_replay.WriteData(name.c_str(), 40, false);

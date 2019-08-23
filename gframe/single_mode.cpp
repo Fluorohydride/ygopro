@@ -77,7 +77,7 @@ int SingleMode::SinglePlayThread() {
 		return 0;
 	}
 	ReplayHeader rh;
-	rh.id = 0x31707279;
+	rh.id = REPLAY_YRP1;
 	rh.version = PRO_VERSION;
 	rh.flag = REPLAY_SINGLE_MODE + REPLAY_LUA64;
 	rh.seed = seed;
@@ -105,7 +105,7 @@ int SingleMode::SinglePlayThread() {
 	last_replay.WriteHeader(rh);
 	//records the replay with the new system
 	new_replay.BeginRecord();
-	rh.id = 0x58707279;
+	rh.id = REPLAY_YRPX;
 	rh.flag |= REPLAY_NEWREPLAY;
 	new_replay.WriteHeader(rh);
 	replay_stream.clear();

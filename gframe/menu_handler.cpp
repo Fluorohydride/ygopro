@@ -24,6 +24,46 @@ void UpdateDeck() {
 		BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.side[i]->code);
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 }
+void LoadReplay() {
+	auto& replay = ReplayMode::cur_replay;
+	if(open_file) {
+		bool res = replay.OpenReplay(TEXT("./replay/") + open_file_name);
+		open_file = false;
+		if(!res || (replay.pheader.id == REPLAY_YRP1 && !mainGame->coreloaded)) {
+			if(exit_on_return)
+				mainGame->device->closeDevice();
+			return;
+		}
+	} else {
+		if(mainGame->lstReplayList->getSelected() == -1)
+			return;
+		if(!replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true))) || (replay.pheader.id == REPLAY_YRP1 && !mainGame->coreloaded))
+			return;
+	}
+	if(mainGame->chkYrp->isChecked() && !replay.yrp)
+		return;
+	if(replay.pheader.id == REPLAY_YRP1 && (!mainGame->coreloaded || !(replay.pheader.flag & REPLAY_NEWREPLAY)))
+		return;
+	replay.Rewind();
+	mainGame->ClearCardInfo();
+	mainGame->mTopMenu->setVisible(false);
+	mainGame->wCardImg->setVisible(true);
+	mainGame->wInfos->setVisible(true);
+	mainGame->wReplay->setVisible(true);
+	mainGame->wReplayControl->setVisible(true);
+	mainGame->btnReplayStart->setVisible(false);
+	mainGame->btnReplayPause->setVisible(true);
+	mainGame->btnReplayStep->setVisible(false);
+	mainGame->btnReplayUndo->setVisible(false);
+	mainGame->wPhase->setVisible(true);
+	mainGame->dField.Clear();
+	mainGame->HideElement(mainGame->wReplay);
+	mainGame->device->setEventReceiver(&mainGame->dField);
+	unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
+	if(start_turn == 1)
+		start_turn = 0;
+	ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
+}
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	if(mainGame->dField.OnCommonEvent(event))
 		return false;
@@ -270,54 +310,28 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_REPLAY_MODE: {
 				mainGame->HideElement(mainGame->wMainMenu);
-				mainGame->ShowElement(mainGame->wReplay);
-				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->stReplayInfo->setText(L"");
+				mainGame->btnLoadReplay->setEnabled(false);
+				mainGame->btnDeleteReplay->setEnabled(false);
+				mainGame->btnRenameReplay->setEnabled(false);
+				mainGame->btnExportDeck->setEnabled(false);
+				mainGame->ebRepStartTurn->setText(L"1");
+				mainGame->chkYrp->setChecked(false);
+				mainGame->chkYrp->setEnabled(false);
+				mainGame->ShowElement(mainGame->wReplay);
 				mainGame->RefreshReplay();
 				break;
 			}
 			case BUTTON_SINGLE_MODE: {
 				mainGame->HideElement(mainGame->wMainMenu);
+				mainGame->stSinglePlayInfo->setText(L"");
+				mainGame->btnLoadSinglePlay->setEnabled(false);
 				mainGame->ShowElement(mainGame->wSinglePlay);
 				mainGame->RefreshSingleplay();
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
-				if(open_file) {
-					bool res = ReplayMode::cur_replay.OpenReplay(TEXT("./replay/") + open_file_name);
-					open_file = false;
-					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
-						if(exit_on_return)
-							mainGame->device->closeDevice();
-						break;
-					}
-				} else {
-					if(mainGame->lstReplayList->getSelected() == -1)
-						break;
-					if(!ReplayMode::cur_replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(), true))) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
-						break;
-				}
-				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)
-					break;
-				ReplayMode::cur_replay.Rewind();
-				mainGame->ClearCardInfo();
-				mainGame->mTopMenu->setVisible(false);
-				mainGame->wCardImg->setVisible(true);
-				mainGame->wInfos->setVisible(true);
-				mainGame->wReplay->setVisible(true);
-				mainGame->wReplayControl->setVisible(true);
-				mainGame->btnReplayStart->setVisible(false);
-				mainGame->btnReplayPause->setVisible(true);
-				mainGame->btnReplayStep->setVisible(false);
-				mainGame->btnReplayUndo->setVisible(false);
-				mainGame->wPhase->setVisible(true);
-				mainGame->dField.Clear();
-				mainGame->HideElement(mainGame->wReplay);
-				mainGame->device->setEventReceiver(&mainGame->dField);
-				unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
-				if(start_turn == 1)
-					start_turn = 0;
-				ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
+				LoadReplay();
 				break;
 			}
 			case BUTTON_DELETE_REPLAY: {
@@ -351,18 +365,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {
-				if(!ReplayMode::cur_replay.yrp)
+				if(!ReplayMode::cur_replay.IsExportable())
 					break;
-				auto& replay = ReplayMode::cur_replay.yrp;
-				auto players = replay->GetPlayerNames();
+				auto& players = ReplayMode::cur_replay.GetPlayerNames();
 				if(players.empty())
 					break;
-				auto decks = replay->GetPlayerDecks();
+				auto& decks = ReplayMode::cur_replay.GetPlayerDecks();
 				if(players.size() > decks.size())
 					break;
 				auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
 				for(int i = 0; i < decks.size(); i++) {
-					deckManager.SaveDeck(fmt::format(TEXT("player{:02} {} {}"), i, Utils::ParseFilename(players[i]).c_str(), replay_name.c_str()), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
+					deckManager.SaveDeck(fmt::format(TEXT("{} player{:02} {}"), replay_name.c_str(), i, Utils::ParseFilename(players[i]).c_str()), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335).c_str());
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -464,31 +477,31 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnExportDeck->setEnabled(false);
 				if(sel == -1)
 					break;
-				if(!ReplayMode::cur_replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(sel, true))) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
+				auto& replay = ReplayMode::cur_replay;
+				if(!replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(sel, true))))
 					break;
-				mainGame->btnLoadReplay->setEnabled(true);
+				bool has_yrp = (replay.pheader.id == REPLAY_YRPX) && (replay.yrp != nullptr);
+				if(!(replay.pheader.id == REPLAY_YRP1 && (!mainGame->coreloaded || !(replay.pheader.flag & REPLAY_NEWREPLAY))))
+					mainGame->btnLoadReplay->setEnabled(true);
 				mainGame->btnDeleteReplay->setEnabled(true);
 				mainGame->btnRenameReplay->setEnabled(true);
-				mainGame->btnExportDeck->setEnabled(true);
+				mainGame->btnExportDeck->setEnabled(replay.IsExportable());
 				std::wstring repinfo;
-				time_t curtime = ReplayMode::cur_replay.pheader.seed;
+				time_t curtime = replay.pheader.seed;
 				tm* st = localtime(&curtime);
 				repinfo.append(fmt::format(L"{}/{}/{} {:02}:{:02}:{:02}\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec).c_str());
-				auto names = ReplayMode::cur_replay.GetPlayerNames();
-				for(int i = 0; i < ReplayMode::cur_replay.GetPlayersCount(0); i++) {
+				auto& names = replay.GetPlayerNames();
+				for(int i = 0; i < replay.GetPlayersCount(0); i++) {
 					repinfo.append(names[i] + L"\n");
 				}
 				repinfo.append(L"===VS===\n");
-				for(int i = 0; i < ReplayMode::cur_replay.GetPlayersCount(1); i++) {
-					repinfo.append(names[i + ReplayMode::cur_replay.GetPlayersCount(0)] + L"\n");
+				for(int i = 0; i < replay.GetPlayersCount(1); i++) {
+					repinfo.append(names[i + replay.GetPlayersCount(0)] + L"\n");
 				}
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->stReplayInfo->setText((wchar_t*)repinfo.c_str());
-				if(ReplayMode::cur_replay.pheader.id == 0x31707279 || !ReplayMode::cur_replay.yrp) {
-					mainGame->chkYrp->setChecked(false);
-					mainGame->chkYrp->setEnabled(false);
-				} else
-					mainGame->chkYrp->setEnabled(mainGame->coreloaded);
+				mainGame->chkYrp->setChecked(false);
+				mainGame->chkYrp->setEnabled(has_yrp && mainGame->coreloaded);
 				break;
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
@@ -508,6 +521,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_LISTBOX_SELECTED_AGAIN: {
 			switch(id) {
 			case LISTBOX_LAN_HOST: {
+				int sel = mainGame->lstHostList->getSelected();
+				if(sel == -1)
+					break;
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, ip, 16);
@@ -547,41 +563,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case LISTBOX_REPLAY_LIST: {
-				if(open_file) {
-					bool res = ReplayMode::cur_replay.OpenReplay(TEXT("./replay/") + open_file_name);
-					open_file = false;
-					if(!res || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded)) {
-						if(exit_on_return)
-							mainGame->device->closeDevice();
-						break;
-					}
-				} else {
-					if(mainGame->lstReplayList->getSelected() == -1)
-						break;
-					if(!ReplayMode::cur_replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected(),true))) || (ReplayMode::cur_replay.pheader.id == 0x31707279 && !mainGame->coreloaded))
-						break;
-				}
-				if(mainGame->chkYrp->isChecked() && !ReplayMode::cur_replay.yrp)
-					break;
-				ReplayMode::cur_replay.Rewind();
-				mainGame->ClearCardInfo();
-				mainGame->mTopMenu->setVisible(false);
-				mainGame->wCardImg->setVisible(true);
-				mainGame->wInfos->setVisible(true);
-				mainGame->wReplay->setVisible(true);
-				mainGame->wReplayControl->setVisible(true);
-				mainGame->btnReplayStart->setVisible(false);
-				mainGame->btnReplayPause->setVisible(true);
-				mainGame->btnReplayStep->setVisible(false);
-				mainGame->btnReplayUndo->setVisible(false);
-				mainGame->wPhase->setVisible(true);
-				mainGame->dField.Clear();
-				mainGame->HideElement(mainGame->wReplay);
-				mainGame->device->setEventReceiver(&mainGame->dField);
-				unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
-				if(start_turn == 1)
-					start_turn = 0;
-				ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
+				LoadReplay();
 				break;
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {

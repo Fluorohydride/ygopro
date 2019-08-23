@@ -99,7 +99,7 @@ void Replay::SaveReplay(const path_string& name) {
 bool Replay::OpenReplayFromBuffer(std::vector<uint8_t> contents) {
 	Reset();
 	memcpy(&pheader, contents.data(), sizeof(pheader));
-	if(pheader.id != 0x31707279 && pheader.id != 0x58707279) {
+	if(pheader.id != REPLAY_YRP1 && pheader.id != REPLAY_YRPX) {
 		Reset();
 		return false;
 	}
@@ -119,12 +119,18 @@ bool Replay::OpenReplayFromBuffer(std::vector<uint8_t> contents) {
 	can_read = true;
 	ParseNames();
 	ParseParams();
-	if(pheader.id == 0x31707279) {
+	if(pheader.id == REPLAY_YRP1) {
 		ParseDecks();
 		ParseResponses();
 	} else {
 		ParseStream();
 	}
+	return true;
+}
+bool Replay::IsExportable() {
+	auto& deck = (yrp != nullptr) ? yrp->GetPlayerDecks() : decks;
+	if(players.empty() || deck.empty() || players.size() > deck.size())
+		return false;
 	return true;
 }
 bool Replay::OpenReplay(const path_string& name) {
@@ -160,7 +166,7 @@ bool Replay::CheckReplay(const path_string& name) {
 	ReplayHeader rheader;
 	auto count = replay_file.read((char*)&rheader, sizeof(pheader)).gcount();
 	replay_file.close();
-	return (rheader.id == 0x31707279 || rheader.id == 0x58707279) && rheader.version >= 0x12d0;
+	return (rheader.id == REPLAY_YRP1 || rheader.id == REPLAY_YRPX) && rheader.version >= 0x12d0;
 }
 bool Replay::DeleteReplay(const path_string& name) {
 	return Utils::Deletefile(name);
@@ -179,6 +185,8 @@ std::vector<std::wstring> Replay::GetPlayerNames() {
 	return players;
 }
 ReplayDeckList Replay::GetPlayerDecks() {
+	if(pheader.id == REPLAY_YRPX && yrp)
+		return yrp->decks;
 	return decks;
 }
 std::vector<int> Replay::GetRuleCards() {
@@ -227,13 +235,13 @@ void Replay::ParseNames() {
 }
 void Replay::ParseParams() {
 	params = { 0 };
-	if(pheader.id == 0x31707279) {
+	if(pheader.id == REPLAY_YRP1) {
 		params.start_lp = Read<int32_t>();
 		params.start_hand = Read<int32_t>();
 		params.draw_count = Read<int32_t>();
 	}
 	params.duel_flags = Read<int32_t>();
-	if(pheader.flag & REPLAY_SINGLE_MODE && pheader.id == 0x31707279) {
+	if(pheader.flag & REPLAY_SINGLE_MODE && pheader.id == REPLAY_YRP1) {
 		size_t slen = Read<uint16_t>();
 		scriptname.resize(slen);
 		ReadData(&scriptname[0], slen);
@@ -241,7 +249,7 @@ void Replay::ParseParams() {
 }
 void Replay::ParseDecks() {
 	decks.clear();
-	if(pheader.id != 0x31707279 || pheader.flag & REPLAY_SINGLE_MODE)
+	if(pheader.id != REPLAY_YRP1 || pheader.flag & REPLAY_SINGLE_MODE)
 		return;
 	for(int i = 0; i < home_count + opposing_count; i++) {
 		ReplayDeck tmp;
@@ -255,9 +263,11 @@ void Replay::ParseDecks() {
 		decks.push_back(tmp);
 	}
 	replay_custom_rule_cards.clear();
-	int rules = Read<int32_t>();
-	for(int i = 0; i < rules; ++i)
-		replay_custom_rule_cards.push_back(Read<int32_t>());
+	if(pheader.flag & REPLAY_NEWREPLAY) {
+		int rules = Read<int32_t>();
+		for(int i = 0; i < rules; ++i)
+			replay_custom_rule_cards.push_back(Read<int32_t>());
+	}
 }
 bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	if(!can_read)
@@ -275,7 +285,7 @@ bool Replay::ReadNextPacket(ReplayPacket* packet) {
 }
 void Replay::ParseStream() {
 	packets_stream.clear();
-	if(pheader.id != 0x58707279)
+	if(pheader.id != REPLAY_YRPX)
 		return;
 	ReplayPacket p;
 	while(ReadNextPacket(&p)) {
@@ -357,7 +367,7 @@ void Replay::Rewind() {
 }
 bool Replay::ParseResponses() {
 	responses.clear();
-	if(pheader.id != 0x31707279)
+	if(pheader.id != REPLAY_YRP1)
 		return false;
 	ReplayResponse r;
 	while(ReadNextResponse(&r)) {

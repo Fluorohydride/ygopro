@@ -16,6 +16,9 @@ namespace ygo {
 #define REPLAY_NEWREPLAY	0x20
 #define REPLAY_RELAY		0x40
 
+#define REPLAY_YRP1			0x31707279
+#define REPLAY_YRPX			0x58707279
+
 struct ReplayHeader {
 	unsigned int id;
 	unsigned int version;
@@ -66,6 +69,7 @@ public:
 	void SaveReplay(const path_string& name);
 	bool OpenReplay(const path_string& name);
 	bool OpenReplayFromBuffer(std::vector<uint8_t> contents);
+	bool IsExportable();
 	static bool CheckReplay(const path_string& name);
 	static bool DeleteReplay(const path_string& name);
 	static bool RenameReplay(const path_string& oldname, const path_string& newname);
