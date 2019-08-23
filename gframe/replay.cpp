@@ -181,15 +181,15 @@ bool Replay::GetNextResponse(ReplayResponse* res) {
 	responses_iterator++;
 	return true;
 }
-std::vector<std::wstring> Replay::GetPlayerNames() {
+const std::vector<std::wstring>& Replay::GetPlayerNames() {
 	return players;
 }
-ReplayDeckList Replay::GetPlayerDecks() {
+const ReplayDeckList& Replay::GetPlayerDecks() {
 	if(pheader.id == REPLAY_YRPX && yrp)
 		return yrp->decks;
 	return decks;
 }
-std::vector<int> Replay::GetRuleCards() {
+const std::vector<int>& Replay::GetRuleCards() {
 	return replay_custom_rule_cards;
 }
 bool Replay::ReadNextResponse(ReplayResponse* res) {

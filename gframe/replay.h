@@ -74,9 +74,9 @@ public:
 	static bool DeleteReplay(const path_string& name);
 	static bool RenameReplay(const path_string& oldname, const path_string& newname);
 	bool GetNextResponse(ReplayResponse* res);
-	std::vector<std::wstring> GetPlayerNames();
-	ReplayDeckList GetPlayerDecks();
-	std::vector<int> GetRuleCards();
+	const std::vector<std::wstring>& GetPlayerNames();
+	const ReplayDeckList& GetPlayerDecks();
+	const std::vector<int>& GetRuleCards();
 	ReplayStream packets_stream;
 	void Rewind();
 	void Reset();

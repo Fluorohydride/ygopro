@@ -367,10 +367,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_EXPORT_DECK: {
 				if(!ReplayMode::cur_replay.IsExportable())
 					break;
-				auto& players = ReplayMode::cur_replay.GetPlayerNames();
+				auto players = ReplayMode::cur_replay.GetPlayerNames();
 				if(players.empty())
 					break;
-				auto& decks = ReplayMode::cur_replay.GetPlayerDecks();
+				auto decks = ReplayMode::cur_replay.GetPlayerDecks();
 				if(players.size() > decks.size())
 					break;
 				auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
@@ -490,7 +490,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				time_t curtime = replay.pheader.seed;
 				tm* st = localtime(&curtime);
 				repinfo.append(fmt::format(L"{}/{}/{} {:02}:{:02}:{:02}\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec).c_str());
-				auto& names = replay.GetPlayerNames();
+				auto names = replay.GetPlayerNames();
 				for(int i = 0; i < replay.GetPlayersCount(0); i++) {
 					repinfo.append(names[i] + L"\n");
 				}
@@ -646,7 +646,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case EDITBOX_TEAM_COUNT: {
-				auto& elem = event.GUIEvent.Caller;
+				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
 				auto text = elem->getText();
 				auto len = wcslen(text);
 				if(len < 1)
