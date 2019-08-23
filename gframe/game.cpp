@@ -101,6 +101,7 @@ bool Game::Initialize() {
 	LoadExpansionDB();
 	LoadZipArchives();
 	LoadArchivesDB();
+	RefreshAiDecks();
 	if(!dataManager.LoadStrings(TEXT("strings.conf"))) {
 		ErrorLog("Failed to load strings!");
 		return false;
@@ -337,10 +338,14 @@ bool Game::Initialize() {
 	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, dataManager.GetSysString(1251).c_str());
 	for(int i = 0; i < 6; ++i) {
 		stHostPrepDuelist[i] = env->addStaticText(L"", Scale(40, 65 + i * 25, 240, 85 + i * 25), true, false, wHostPrepare);
-		btnHostPrepKick[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_HP_KICK, L"X");
+		btnHostPrepKick[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_BOT_ADD, L"X");
 		chkHostPrepReady[i] = env->addCheckBox(false, Scale(250, 65 + i * 25, 270, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
 		chkHostPrepReady[i]->setEnabled(false);
+		//btnHostPrepWindbot[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_BOT_ADD, L"X");
 	}
+	/*wBot = env->addWindow(Scale(630, 100, 1000, 310), false, L"");
+	wBot->getCloseButton()->setVisible(false);
+	wBot->setVisible(true);*/
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", dataManager.GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(280, 30, 460, 230));
@@ -1315,6 +1320,50 @@ void Game::RefreshLFLists() {
 	}
 	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 }
+void Game::RefreshAiDecks() {
+	try {
+		std::ifstream bot_file("bot.json", std::ifstream::in);
+		if(bot_file.is_open()) {
+			nlohmann::json j;
+			bot_file >> j;
+			bot_file.close();
+			if(j.size()) {
+				for(auto& obj : j["windbots"].get<std::vector<nlohmann::json>>()) {
+					if(!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
+						continue;
+					BotInfo tmp = {};
+					tmp.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+					tmp.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
+					for(auto& flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
+#define CHECK_AND_SET_FLAG(flag) if(strflag == #flag)tmp.flags |= static_cast<int>(BotInfo::bot_params::flag)
+						auto strflag = flag.get<std::string>();
+						CHECK_AND_SET_FLAG(AI_LV1);
+						CHECK_AND_SET_FLAG(AI_LV2);
+						CHECK_AND_SET_FLAG(AI_LV3);
+						CHECK_AND_SET_FLAG(AI_ANTI_META);
+						CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_3);
+						CHECK_AND_SET_FLAG(SUPPORT_NEW_MASTER_RULE);
+#undef CHECK_AND_SET_FLAG
+					}
+					bots.push_back(tmp);
+				}
+			}
+		}
+	}
+	catch(std::exception& e) {
+		ErrorLog(std::string("Exception ocurred: ") + e.what());
+	}
+}
+#ifdef _WIN32
+path_string Game::GetAiParameter(BotInfo bot, int port) {
+	return fmt::format(TEXT("./Windbot/Windbot.exe Deck=\"a{}\" Port={} Version={}"),bot.deck.c_str(),port, PRO_VERSION);
+}
+#else
+Game::BotParams Game::GetAiParameter(BotInfo bot, int port) {
+	return { fmt::format("Deck=\"{}\"", BufferIO::EncodeUTF8s(bot.deck).c_str()), fmt::format("Port={}", port), fmt::format("Version={}", PRO_VERSION) };
+}
+
+#endif
 void Game::RefreshReplay() {
 	lstReplayList->resetPath();
 }

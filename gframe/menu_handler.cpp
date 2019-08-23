@@ -65,6 +65,28 @@ void LoadReplay() {
 		start_turn = 0;
 	ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
 }
+bool LaunchWindbot(const BotInfo& bot, int port) {
+	auto param = mainGame->GetAiParameter(bot, port);
+#ifdef _WIN32
+	STARTUPINFO si = {};
+	PROCESS_INFORMATION pi = {};
+	si.cb = sizeof(si);
+	si.dwFlags = STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_HIDE;
+	if(!CreateProcess(NULL, (TCHAR*)param.c_str(), NULL, NULL, FALSE, 0, NULL, mainGame->filesystem->getAbsolutePath(TEXT("./WindBot")).c_str(), &si, &pi)) {
+		return false;
+	}
+	return true;
+#else
+	int pid = fork();
+	if(pid== 0) {
+		chdir("WindBot");
+		execl("./WindBot.exe", "WindBot", param.arg1.c_str(), param.arg2.c_str(), param.arg3.c_str(), NULL);
+		exit(0);
+	}
+	return pid>0;
+#endif
+}
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	if(mainGame->dField.OnCommonEvent(event))
 		return false;
@@ -411,6 +433,26 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CANCEL_REPLAY: {
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->ShowElement(mainGame->wMainMenu);
+				break;
+			}
+			case BUTTON_BOT_START: {
+				int port = std::stoi(mainGame->gameConf.serverport);
+				int index = 2;
+				if(!NetServer::StartServer(port))
+					break;
+				if(!DuelClient::StartClient(0x7f000001, port)) {
+					NetServer::StopServer();
+					break;
+				}
+				if(!LaunchWindbot(mainGame->bots[index], port)) {
+					NetServer::StopServer();
+				}
+				break;
+			}
+			case BUTTON_BOT_ADD: {
+				int port = std::stoi(mainGame->gameConf.serverport);
+				volatile int index = 2;
+				LaunchWindbot(mainGame->bots[index], port);
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {

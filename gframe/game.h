@@ -115,6 +115,20 @@ struct FadingUnit {
 	irr::core::vector2di fadingDest;
 };
 
+struct BotInfo {
+	std::wstring name;
+	std::wstring deck;
+	enum bot_params {
+		AI_LV1 = 1,
+		AI_LV2 = 2,
+		AI_LV3 = 4,
+		AI_ANTI_META = 8,
+		SUPPORT_MASTER_RULE_3 = 16,
+		SUPPORT_NEW_MASTER_RULE = 32
+	};
+	int flags;
+};
+
 class Game {
 
 public:
@@ -126,6 +140,18 @@ public:
 	void LoadArchivesDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshLFLists();
+	void RefreshAiDecks();
+#ifdef _WIN32
+	path_string GetAiParameter(BotInfo bot, int port);
+#else
+	struct BotParams {
+		std::string arg1;
+		std::string arg2;
+		std::string arg3;
+	};
+	BotParams GetAiParameter(BotInfo bot, int port);
+
+#endif
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
@@ -307,6 +333,7 @@ public:
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
 	std::vector<Utils::IrrArchiveHelper> archives;
+	std::vector<BotInfo> bots;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;
@@ -426,9 +453,11 @@ public:
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
 	irr::gui::IGUIWindow* wHostPrepare2;
+	irr::gui::IGUIWindow* wBot;
 	irr::gui::IGUIStaticText* stHostCardRule;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
 	irr::gui::IGUIButton* btnHostPrepOB;
+	irr::gui::IGUIButton* btnHostPrepWindbot[6];
 	irr::gui::IGUIStaticText* stHostPrepDuelist[6];
 	irr::gui::IGUICheckBox* chkHostPrepReady[6];
 	irr::gui::IGUIButton* btnHostPrepKick[6];
@@ -762,8 +791,9 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_RENAME_REPLAY		134
 #define BUTTON_EXPORT_DECK			135
 #define EDITBOX_TEAM_COUNT			136
-#define BUTTON_BOT_START			137
-#define BUTTON_BOT_ADD				138
+#define COMBOBOX_MATCH_MODE			137
+#define BUTTON_BOT_START			138
+#define BUTTON_BOT_ADD				139
 #define EDITBOX_CHAT				140
 #define EDITBOX_PORT_BOX			141
 #define COMBOBOX_BOT_DECK			142
