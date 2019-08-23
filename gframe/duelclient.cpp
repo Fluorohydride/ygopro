@@ -560,7 +560,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->deckBuilder.filterList = &(*lit);
 		if(mainGame->deckBuilder.filterList == 0)
 			mainGame->deckBuilder.filterList = &deckManager._lfList[0];
-		mainGame->stHostPrepOB->setText(L"");
+		watching = 0;
+		mainGame->stHostPrepOB->setText(fmt::format(L"{} {}", dataManager.GetSysString(1253), watching).c_str());
 		mainGame->stHostPrepRule->setText((wchar_t*)str.c_str());
 		mainGame->stHostPrepRule2->setText((wchar_t*)str2.c_str());
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
@@ -584,7 +585,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.unlock();
 		mainGame->dInfo.extraval = (!mainGame->dInfo.compat_mode && pkt->info.extra_rules & DUEL_SPEED) ? 1 : 0;
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
-		watching = 0;
 		connect_state |= 0x4;
 		break;
 	}
@@ -827,7 +827,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			watching++;
 			mainGame->stHostPrepDuelist[pos]->setText(L"");
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
-			mainGame->stHostPrepOB->setText(fmt::format(L"{}{}", dataManager.GetSysString(1253), watching).c_str());
+			mainGame->stHostPrepOB->setText(fmt::format(L"{} {}", dataManager.GetSysString(1253), watching).c_str());
 		}
 		mainGame->btnHostPrepStart->setVisible(is_host);
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
@@ -838,7 +838,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		STOC_HS_WatchChange* pkt = (STOC_HS_WatchChange*)pdata;
 		watching = pkt->watch_count;
 		mainGame->gMutex.lock();
-		mainGame->stHostPrepOB->setText(fmt::format(L"{}{}", dataManager.GetSysString(1253), watching).c_str());
+		mainGame->stHostPrepOB->setText(fmt::format(L"{} {}", dataManager.GetSysString(1253), watching).c_str());
 		mainGame->gMutex.unlock();
 		break;
 	}
