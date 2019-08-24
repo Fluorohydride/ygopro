@@ -343,9 +343,14 @@ bool Game::Initialize() {
 		chkHostPrepReady[i]->setEnabled(false);
 		//btnHostPrepWindbot[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_BOT_ADD, L"X");
 	}
-	/*wBot = env->addWindow(Scale(630, 100, 1000, 310), false, L"");
-	wBot->getCloseButton()->setVisible(false);
-	wBot->setVisible(true);*/
+	gBot.window = env->addWindow(Scale(630, 100, 840, 310), false, L"Bot preferences");
+	gBot.window->getCloseButton()->setVisible(false);
+	gBot.window->setVisible(true);
+	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
+	//box->addItem(L"Decks");
+	gBot.deckProperties = env->addStaticText(L"This is where the deck info will go",Scale(10, 25, 200, 160), true, true, gBot.window);
+	//env->addStaticText(L"This is where the deck description will go",Scale(205, 25, 365, 190), true, true, gBot.window);
+	gBot.RefreshDecks(&bots);
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", dataManager.GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(280, 30, 460, 230));
@@ -2461,5 +2466,49 @@ void Game::PopulateResourcesDirectories() {
 	field_dirs.push_back(TEXT("./pics/field/"));
 }
 
+
+void Game::BotGui::RefreshDecks(std::vector<BotInfo>* _bots) {
+	bots = _bots;
+	deckBox->clear();
+	for(auto& bot : *bots)
+		deckBox->addItem(bot.name.c_str());
+	UpdateDeckDescription();
+}
+
+void Game::BotGui::UpdateDeckDescription() {
+	int sel = deckBox->getSelected();
+	if(sel < 0 || sel >= (*bots).size())
+		return;
+	auto& bot = (*bots)[sel];
+	int level = bot.GetAiLevel();
+	std::wstring params;
+	if(level > 0)
+		params.append(fmt::format(L"AI Level: {}\n", level));
+	else if(level == 0)
+		params.append(L"Anti Meta AI\n");
+	std::wstring mr;
+	if(bot.flags & static_cast<int>(BotInfo::SUPPORT_MASTER_RULE_3))
+		mr.append(L"3");
+	if(bot.flags & static_cast<int>(BotInfo::SUPPORT_NEW_MASTER_RULE)) {
+		if(mr.size())
+			mr.append(L",");
+		mr.append(L"4");
+	}
+	if(mr.size())
+		params.append(fmt::format(L"Master Rule supported: {}\n", mr.c_str()));
+	deckProperties->setText(params.c_str());
+}
+
+int BotInfo::GetAiLevel() {
+	if(flags & static_cast<int>(AI_LV1))
+		return 1;
+	if(flags & static_cast<int>(AI_LV2))
+		return 2;
+	if(flags & static_cast<int>(AI_LV3))
+		return 3;
+	if(flags & static_cast<int>(AI_ANTI_META))
+		return 0;
+	return -1;
+}
 
 }

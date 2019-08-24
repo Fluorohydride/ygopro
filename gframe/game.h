@@ -127,6 +127,7 @@ struct BotInfo {
 		SUPPORT_NEW_MASTER_RULE = 32
 	};
 	int flags;
+	int GetAiLevel();
 };
 
 class Game {
@@ -268,6 +269,16 @@ public:
 		irr::gui::IGUIButton* history_button2;
 		std::wstring commit_history_full;
 		std::wstring commit_history_partial;
+	};
+	struct BotGui {
+		irr::gui::IGUIWindow* window;
+		irr::gui::IGUIComboBox* deckBox;
+		irr::gui::IGUIButton* btnConfirm;
+		irr::gui::IGUIButton* btnCancel;
+		std::vector<BotInfo>* bots;
+		IGUIStaticText* deckProperties;
+		void RefreshDecks(std::vector<BotInfo>* _bots);
+		void UpdateDeckDescription();
 	};
 	std::map<std::string, RepoGui> repoInfoGui;
 
@@ -453,7 +464,7 @@ public:
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
 	irr::gui::IGUIWindow* wHostPrepare2;
-	irr::gui::IGUIWindow* wBot;
+	BotGui gBot;
 	irr::gui::IGUIStaticText* stHostCardRule;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
 	irr::gui::IGUIButton* btnHostPrepOB;

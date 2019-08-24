@@ -782,6 +782,19 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				}
 			}
+			case COMBOBOX_MATCH_MODE: {
+				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
+				if(combobox->getSelected() == 4) {
+					mainGame->ebTeam1->setVisible(true);
+					mainGame->ebTeam2->setVisible(true);
+				} else {
+					mainGame->ebTeam1->setVisible(false);
+					mainGame->ebTeam2->setVisible(false);
+				}
+			}
+			case COMBOBOX_BOT_DECK: {
+				mainGame->gBot.UpdateDeckDescription();
+			}
 			}
 		}
 		case EGET_TABLE_SELECTED_AGAIN: {
