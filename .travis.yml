@@ -41,6 +41,7 @@ matrix:
     - VCPKG_DEFAULT_TRIPLET=x86-windows-static
     - VCPKG_LIBS="libevent lua[cpp] sqlite3 fmt curl libgit2 nlohmann-json bzip2 libjpeg-turbo libpng zlib"
     - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed.zip
+    - DXSDK_DIR=/c/d3d9sdk/
     - DEPLOY_BRANCH=travis-windows
     cache: false
   - name: "Bionic GCC7"
@@ -62,6 +63,7 @@ before_install:
 install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 
     ./build-support/install-windows-vcpkg-cache.sh;
+    ./build-support/install-windows-d3d9sdk.sh;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 
     if [[ -f cache/lib/libfmt.a ]]; then 
@@ -85,7 +87,7 @@ install:
   fi
 script:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    ./premake5 vs2017 --no-direct3d --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
+    ./premake5 vs2017 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
     "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln;
   else
     ./premake5 gmake2 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
