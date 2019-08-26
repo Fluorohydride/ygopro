@@ -63,6 +63,9 @@ end
 include "lzma/."
 project "ygopro"
 	targetname "ygopro"
+	if _OPTIONS["prebuilt-core"] then
+		libdirs { _OPTIONS["prebuilt-core"] }
+	end
 	links { "ocgcore" }
 	ygopro_config(true)
 		

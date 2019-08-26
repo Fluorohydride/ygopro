@@ -12,6 +12,11 @@ newoption {
 	value = "url_template",
 	description = "Default URL for Field Spell backgrounds"
 }
+newoption {
+	trigger = "prebuilt-core",
+	value = "path",
+	description = "Path to library folder containing libocgcore"
+}
 workspace "ygo"
 	location "build"
 	language "C++"
@@ -55,7 +60,9 @@ workspace "ygo"
 		targetdir "bin/release"
 	
 	subproject = true
-	include "ocgcore"
+	if not _OPTIONS["prebuilt-core"] then
+		include "ocgcore"
+	end
 	include "gframe"
 	if os.istarget("windows") then
 		include "freetype"
