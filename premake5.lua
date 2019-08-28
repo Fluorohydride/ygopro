@@ -17,6 +17,11 @@ newoption {
 	value = "path",
 	description = "Path to library folder containing libocgcore"
 }
+newoption {
+	trigger = "vcpkg-root",
+	value = "path",
+	description = "Path to vcpkg installation"
+}
 workspace "ygo"
 	location "build"
 	language "C++"
@@ -32,6 +37,17 @@ workspace "ygo"
 	filter "system:macosx"
 		includedirs { "/usr/local/include" }
 		libdirs { "/usr/local/lib" }
+
+	if _OPTIONS["vcpkg-root"] then
+		filter "system:linux"
+			includedirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/include" }
+	
+		filter { "system:linux", "configurations:Debug" }
+			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/debug/lib" }
+	
+		filter { "system:linux", "configurations:Release" }
+			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/lib" }
+	end
 
 	filter "action:vs*"
 		vectorextensions "SSE2"
@@ -53,7 +69,6 @@ workspace "ygo"
 	filter { "configurations:Release*" , "action:not vs*" }
 		symbols "On"
 		defines "NDEBUG"
-		buildoptions "-march=native"
 
 	filter "configurations:Release"
 		optimize "Size"

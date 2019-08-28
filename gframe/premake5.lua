@@ -58,6 +58,9 @@ local ygopro_config=function(static_core)
 		if static_core then
 			links  "lua:static"
 		end
+		if _OPTIONS["vcpkg-root"] then
+			links { "ssl", "crypto", "z" }
+		end
 end
 
 include "lzma/."

@@ -14,7 +14,7 @@ cd /tmp
 curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.3.5.tar.gz
 tar xf lua-5.3.5.tar.gz
 cd lua-5.3.5
-make -j2 linux CC=$CXX MYCFLAGS=-fPIC
+make -j2 linux MYCFLAGS=-fPIC
 sudo make install
 
 sudo mkdir -p /usr/local/include/nlohmann

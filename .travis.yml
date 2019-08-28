@@ -12,13 +12,10 @@ addons:
     update: true
     packages:
     - p7zip-full 
-    - libevent-dev 
     - libfreetype6-dev
     - libirrlicht-dev 
-    - libsqlite3-dev 
     - libgl1-mesa-dev 
     - libglu-dev 
-    - libgit2-dev
   homebrew:
     update: true
     packages:
@@ -43,11 +40,13 @@ matrix:
     - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed.zip
     - DXSDK_DIR=/c/d3d9sdk/
     - DEPLOY_BRANCH=travis-windows
-    cache: false
   - name: "Bionic GCC7"
     os: linux
     compiler: gcc  
     env:
+    - VCPKG_ROOT=./vcpkg
+    - VCPKG_LIBS="lua libevent sqlite3 fmt nlohmann-json curl libgit2"
+    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed-linux.7z
     - DEPLOY_BRANCH=travis-linux
   - name: "Mojave"
     os: osx
@@ -56,6 +55,9 @@ matrix:
     - MACOSX_DEPLOYMENT_TARGET=10.11
     - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk"
     - DEPLOY_BRANCH=travis-macOS
+    cache:
+      directories:
+      - cache
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/install-windows-bin.sh; fi  
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-support/install-ubuntu-bin.sh; fi
@@ -66,11 +68,7 @@ install:
     ./build-support/install-windows-d3d9sdk.sh;
   fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 
-    if [[ -f cache/lib/libfmt.a ]]; then 
-      sudo cp -r cache/* /usr/local/ && rm -rf cache && echo "Loaded fmt and nlohmann-json from cache.";   
-    else
-      ./build-support/install-ubuntu-src.sh;
-    fi; 
+    ./build-support/install-linux-vcpkg-cache.sh;
   fi 
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
     ./build-support/install-macOS-sdk.sh $MACOSX_DEPLOYMENT_TARGET;
@@ -89,7 +87,12 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./premake5 vs2017 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
     "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln;
-  else
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    ./premake5 gmake2 --vcpkg-root=$VCPKG_ROOT --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
+    make -Cbuild -j2 config=$BUILD_CONFIG;
+  fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     ./premake5 gmake2 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
     make -Cbuild -j2 config=$BUILD_CONFIG;
   fi
@@ -112,16 +115,6 @@ deploy:
   on:
     condition: "$TRAVIS_OS_NAME != windows"
 before_cache:
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    mkdir -p cache/include && mkdir -p cache/lib/cmake &&
-    cp -r /usr/local/lib/cmake/fmt cache/lib/cmake/fmt &&
-    cp -r /usr/local/lib/pkgconfig cache/lib/pkgconfig &&
-    cp /usr/local/lib/libfmt.a cache/lib/libfmt.a &&
-    cp -r /usr/local/include/fmt cache/include/fmt &&
-    cp /usr/local/include/lua.h /usr/local/include/luaconf.h /usr/local/include/lualib.h /usr/local/include/lauxlib.h /usr/local/include/lua.hpp cache/include &&
-    cp /usr/local/lib/liblua.a cache/lib/liblua.a &&
-    cp -r /usr/local/include/nlohmann cache/include/nlohmann; 
-  fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     mkdir -p cache &&
     cp -r /usr/local/include/irrlicht cache/irrlicht &&
@@ -130,6 +123,3 @@ before_cache:
     cp /usr/local/lib/liblua.a cache/liblua.a &&
     cp -r /usr/local/Cellar/libevent/2.1.11 cache/libevent;
   fi
-cache:
-  directories:
-  - cache

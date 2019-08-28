@@ -16,7 +16,7 @@ cd /tmp
 curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.3.5.tar.gz
 tar xf lua-5.3.5.tar.gz
 cd lua-5.3.5
-make -j2 macosx CC=$CXX
+make -j2 macosx
 sudo make install
 
 # Install libevent from source due to binary compatibility issues with 10.13 and earlier
