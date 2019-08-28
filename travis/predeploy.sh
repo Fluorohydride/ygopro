@@ -13,7 +13,9 @@ function copy_if_exists {
 }
 
 function strip_if_exists {
-    if [[ "$BUILD_CONFIG" == "release" ]] && [[ -f bin/$BUILD_CONFIG/$1 ]]; then
+    # Unfortunately Windows seems to be allowing us to refer to exe files without the extensions
+    # so check for the existence of strip
+    if [[ "$(which strip)" != "" ]] && [[ "$BUILD_CONFIG" == "release" ]] && [[ -f bin/$BUILD_CONFIG/$1 ]]; then
         strip bin/$BUILD_CONFIG/$1
     fi
 }
