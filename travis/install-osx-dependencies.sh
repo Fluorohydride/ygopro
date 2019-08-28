@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -euxo pipefail
+
+# Install irrlicht from source with custom patches
+# Not easily included in local project structure due to Objective-C code
 cp irrlicht/irrlicht-macOS.patch /tmp
 cd /tmp
 curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://downloads.sourceforge.net/irrlicht/irrlicht-1.8.4.zip
@@ -11,15 +15,8 @@ sudo mkdir -p /usr/local/include/irrlicht
 sudo cp -r include/*.h /usr/local/include/irrlicht
 sudo cp source/Irrlicht/MacOSX/build/Release/libIrrlicht.a /usr/local/lib
 
-# Installs lua for C++ to /usr/local from source because brew's version is wonky
-cd /tmp
-curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.lua.org/ftp/lua-5.3.5.tar.gz
-tar xf lua-5.3.5.tar.gz
-cd lua-5.3.5
-make -j2 macosx
-sudo make install
-
 # Install libevent from source due to binary compatibility issues with 10.13 and earlier
+# Overwrite Homebrew's Cellar
 cd /tmp
 curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/libevent/libevent/releases/download/release-2.1.11-stable/libevent-2.1.11-stable.tar.gz
 tar xf libevent-2.1.11-stable.tar.gz

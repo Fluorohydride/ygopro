@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euxo pipefail
+
 if [[ "$#" -lt 1 ]]; then
     echo "Usage: ./install-macOS-sdk.sh [version] <...>"
     echo "  e.g. ./install-macOS-sdk.sh 10.9 10.12"

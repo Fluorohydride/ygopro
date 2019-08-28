@@ -6,6 +6,7 @@ git:
 env:
   global:
   - BUILD_CONFIG=release
+  - DEPLOY_BRANCH=travis-$TRAVIS_OS_NAME
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
 addons:
   apt:
@@ -22,9 +23,10 @@ addons:
     - dylibbundler
     - gpatch
     - p7zip
+    - lua
     - libevent
     - freetype
-    - sqlite 
+    - sqlite
     - curl
     - libgit2
     - fmt
@@ -39,71 +41,29 @@ matrix:
     - VCPKG_LIBS="libevent lua[cpp] sqlite3 fmt curl libgit2 nlohmann-json bzip2 libjpeg-turbo libpng zlib"
     - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed.zip
     - DXSDK_DIR=/c/d3d9sdk/
-    - DEPLOY_BRANCH=travis-windows
+    - DEPLOY_DIR=deploy
   - name: "Bionic GCC7"
     os: linux
     compiler: gcc  
     env:
     - VCPKG_ROOT=./vcpkg
     - VCPKG_LIBS="lua libevent sqlite3 fmt nlohmann-json curl libgit2"
-    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed-linux.7z
-    - DEPLOY_BRANCH=travis-linux
+    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed-linux.7z
   - name: "Mojave"
     os: osx
     osx_image: xcode10.3
     env: 
     - MACOSX_DEPLOYMENT_TARGET=10.11
     - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk"
-    - DEPLOY_BRANCH=travis-macOS
-    cache:
-      directories:
-      - cache
-before_install:
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/install-windows-bin.sh; fi  
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-support/install-ubuntu-bin.sh; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-support/install-macOS-bin.sh; fi  
-install:
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 
-    ./build-support/install-windows-vcpkg-cache.sh;
-    ./build-support/install-windows-d3d9sdk.sh;
-  fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then 
-    ./build-support/install-linux-vcpkg-cache.sh;
-  fi 
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then 
-    ./build-support/install-macOS-sdk.sh $MACOSX_DEPLOYMENT_TARGET;
-    if [[ -f cache/libIrrlicht.a ]]; then 
-      cp -r cache/irrlicht /usr/local/include &&
-      cp cache/lua.h cache/luaconf.h cache/lualib.h cache/lauxlib.h cache/lua.hpp /usr/local/include &&
-      cp cache/*.a /usr/local/lib &&
-      rm -rf /usr/local/Cellar/libevent/2.1.11 &&
-      cp -r cache/libevent /usr/local/Cellar/libevent/2.1.11 &&
-      rm -rf cache && echo "Loaded irrlicht, lua-c++, libevent from cache.";
-    else
-      ./build-support/install-macOS-src.sh; 
-    fi ;
-  fi
-script:
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    ./premake5 vs2017 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
-    "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln;
-  fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    ./premake5 gmake2 --vcpkg-root=$VCPKG_ROOT --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
-    make -Cbuild -j2 config=$BUILD_CONFIG;
-  fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    ./premake5 gmake2 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\";
-    make -Cbuild -j2 config=$BUILD_CONFIG;
-  fi
-before_deploy:
-- if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then ./build-support/deploy-windows.sh; fi
-- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-support/deploy-ubuntu.sh; fi
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-support/deploy-macOS.sh; fi
+    - CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/dependencies-osx.7z
+before_install: ./travis/install-premake5.sh
+install: ./travis/dependencies.sh
+script: ./travis/build.sh
+before_deploy: ./travis/predeploy.sh
 deploy:
 - provider: script
   skip_cleanup: true
-  script: bash ./build-support/travis-windows-deploy.sh
+  script: bash ./ocgcore/travis/deploy-windows.sh
   on:
     condition: "$TRAVIS_OS_NAME == windows"
 - provider: pages
@@ -114,12 +74,3 @@ deploy:
   target_branch: $DEPLOY_BRANCH
   on:
     condition: "$TRAVIS_OS_NAME != windows"
-before_cache:
-- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    mkdir -p cache &&
-    cp -r /usr/local/include/irrlicht cache/irrlicht &&
-    cp /usr/local/lib/libIrrlicht.a cache/libIrrlicht.a &&
-    cp /usr/local/include/lua.h /usr/local/include/luaconf.h /usr/local/include/lualib.h /usr/local/include/lauxlib.h /usr/local/include/lua.hpp cache &&
-    cp /usr/local/lib/liblua.a cache/liblua.a &&
-    cp -r /usr/local/Cellar/libevent/2.1.11 cache/libevent;
-  fi
