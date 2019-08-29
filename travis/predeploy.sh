@@ -5,6 +5,7 @@
 set -euxo pipefail
 
 BUILD_CONFIG=${BUILD_CONFIG:-release}
+PLATFORM=${1:-$TRAVIS_OS_NAME}
 
 function copy_if_exists {
     if [[ -f bin/$BUILD_CONFIG/$1 ]]; then
@@ -13,9 +14,7 @@ function copy_if_exists {
 }
 
 function strip_if_exists {
-    # Unfortunately Windows seems to be allowing us to refer to exe files without the extensions
-    # so check for the existence of strip
-    if [[ "$(which strip)" != "" ]] && [[ "$BUILD_CONFIG" == "release" ]] && [[ -f bin/$BUILD_CONFIG/$1 ]]; then
+    if [[ "$BUILD_CONFIG" == "release" ]] && [[ -f bin/$BUILD_CONFIG/$1 ]]; then
         strip bin/$BUILD_CONFIG/$1
     fi
 }
@@ -41,18 +40,22 @@ function bundle_if_exists {
 
 mkdir -p deploy
 
-copy_if_exists ocgcore.dll
-copy_if_exists ygopro.exe
-copy_if_exists ygoprodll.exe
-
-copy_if_exists libocgcore.so
-strip_if_exists ygopro
-copy_if_exists ygopro
-strip_if_exists ygoprodll
-copy_if_exists ygoprodll
-
-copy_if_exists libocgcore.dylib
-strip_if_exists ygopro.app
-bundle_if_exists ygopro
-strip_if_exists ygoprodll.app
-bundle_if_exists ygoprodll
+if [[ "$PLATFORM" == "windows" ]]; then
+	copy_if_exists ocgcore.dll
+	copy_if_exists ygopro.exe
+	copy_if_exists ygoprodll.exe
+fi
+if [[ "$PLATFORM" == "linux" ]]; then
+	copy_if_exists libocgcore.so
+	strip_if_exists ygopro
+	copy_if_exists ygopro
+	strip_if_exists ygoprodll
+	copy_if_exists ygoprodll
+fi
+if [[ "$PLATFORM" == "osx" ]]; then
+	copy_if_exists libocgcore.dylib
+	strip_if_exists ygopro.app
+	bundle_if_exists ygopro
+	strip_if_exists ygoprodll.app
+	bundle_if_exists ygoprodll
+fi
