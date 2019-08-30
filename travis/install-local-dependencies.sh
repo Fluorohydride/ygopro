@@ -2,6 +2,8 @@
 
 set -euxo pipefail
 
+TRAVIS_OS_NAME=${TRAVIS_OS_NAME:-$1}
+
 curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name http://www.ambiera.at/downloads/irrKlang-64bit-1.6.0.zip
 echo Extracting irrKlang64...
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
