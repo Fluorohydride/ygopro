@@ -15,22 +15,22 @@ private:
 	std::map<unsigned int,std::string> ChantsList;
 	int bgm_scene;
 #ifdef YGOPRO_USE_IRRKLANG
-	irrklang::ISoundEngine* engineSound;
-	irrklang::ISoundEngine* engineMusic;
+	irrklang::ISoundEngine* soundEngine;
 	irrklang::ISound* soundBGM;
 #endif
 	void RefershBGMDir(path_string path, int scene);
 	void RefreshChantsList();
 	std::mt19937 rnd;
-
+	bool soundsEnabled;
+	bool musicEnabled;
 public:
 	~SoundManager() {
-		if(engineSound)
-			engineSound->drop();
-		if(engineMusic)
-			engineMusic->drop();
+#ifdef YGOPRO_USE_IRRKLANG
+		if(soundEngine)
+			soundEngine->drop();
 		if(soundBGM)
 			soundBGM->drop();
+#endif
 	}
 	enum Sounds {
 		SUMMON,
@@ -58,7 +58,7 @@ public:
 		PLAYER_ENTER,
 		CHAT
 	};
-	bool Init();
+	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
 	void RefreshBGMList();
 	void PlaySoundEffect(Sounds sound);
 	void PlayMusic(const std::string& song, bool loop);
@@ -67,6 +67,8 @@ public:
 	bool PlayChant(unsigned int code);
 	void SetSoundVolume(double volume);
 	void SetMusicVolume(double volume);
+	void EnableSounds(bool enable);
+	void EnableMusic(bool enable);
 };
 
 extern SoundManager soundManager;

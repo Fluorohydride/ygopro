@@ -391,7 +391,7 @@ bool Game::Initialize() {
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
 	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 260, 280, 285), tabPanel, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2047).c_str());
 	chkEnableMusic->setChecked(gameConf.enablemusic);
-	chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 290, 280, 315), tabPanel, -1, dataManager.GetSysString(2046).c_str());
+	chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2046).c_str());
 	chkEnableSound->setChecked(gameConf.enablesound);
 	stVolume = env->addStaticText(L"Volume", Scale(20, 320, 80, 345), false, true, tabPanel, -1, false);
 	scrVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_VOLUME);
@@ -782,7 +782,7 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	if(!soundManager.Init()) {
+	if(!soundManager.Init(gameConf.volume, gameConf.volume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
 		chkEnableSound->setVisible(false);
@@ -790,6 +790,8 @@ bool Game::Initialize() {
 		chkEnableMusic->setEnabled(false);
 		chkEnableMusic->setVisible(false);
 		scrVolume->setVisible(false);
+		stVolume->setVisible(false);
+		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);

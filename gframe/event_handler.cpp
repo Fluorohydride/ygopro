@@ -1808,8 +1808,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch (id) {
 			case CHECKBOX_ENABLE_MUSIC: {
-				if(!mainGame->chkEnableMusic->isChecked())
-					soundManager.StopBGM();
+				soundManager.EnableMusic(mainGame->chkEnableMusic->isChecked());
+				return true;
+			}
+			case CHECKBOX_ENABLE_SOUND: {
+				soundManager.EnableSounds(mainGame->chkEnableSound->isChecked());
 				return true;
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
