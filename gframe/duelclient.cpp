@@ -3773,7 +3773,7 @@ void DuelClient::BeginRefreshHost() {
 	timeval timeout = { 3, 0 };
 	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
 	event_add(resp_event, &timeout);
-	std::thread(RefreshThread, std::ref(broadev)).detach();
+	std::thread(RefreshThread, broadev).detach();
 	//send request
 	SOCKADDR_IN local;
 	local.sin_family = AF_INET;
