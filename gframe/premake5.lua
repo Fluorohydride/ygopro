@@ -5,13 +5,16 @@ local ygopro_config=function(static_core)
 	if _OPTIONS["fields"] then
 		defines { "DEFAULT_FIELD_URL=" .. _OPTIONS["fields"] }
 	end
-	defines { "YGOPRO_USE_IRRKLANG", "CURL_STATICLIB" }
 	kind "WindowedApp"
 	cppdialect "C++14"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
 	includedirs { "../ocgcore", "../irrKlang/include" }
 	links { "clzma", "freetype", "Irrlicht", "IrrKlang" }
+	defines "CURL_STATICLIB"
+	filter "options:not no-irrklang"
+		defines "YGOPRO_USE_IRRKLANG"
+
 	filter "system:windows"
 		kind "ConsoleApp"
 		files "ygopro.rc"
