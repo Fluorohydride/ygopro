@@ -10,23 +10,8 @@
 namespace ygo {
 
 class SoundManager {
-private:
-	std::vector<std::string> BGMList[8];
-	std::map<unsigned int,std::string> ChantsList;
-	int bgm_scene;
-#ifdef YGOPRO_USE_IRRKLANG
-	irrklang::ISoundEngine* soundEngine;
-	irrklang::ISound* soundBGM;
-    std::mt19937 rnd;
-#endif
-	void RefreshBGMDir(path_string path, int scene);
-	void RefreshChantsList();
-	bool soundsEnabled;
-	bool musicEnabled;
-
 public:
-    ~SoundManager();
-	enum Sounds {
+	enum SFX {
 		SUMMON,
 		SPECIAL_SUMMON,
 		ACTIVATE,
@@ -52,29 +37,45 @@ public:
 		PLAYER_ENTER,
 		CHAT
 	};
+    enum BGM {
+        ALL,
+        DUEL,
+        MENU,
+        DECK,
+        ADVANTAGE,
+        DISADVANTAGE,
+        WIN,
+        LOSE
+    };
+    ~SoundManager();
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
 	void RefreshBGMList();
-	void PlaySoundEffect(Sounds sound);
+	void PlaySoundEffect(SFX sound);
 	void PlayMusic(const std::string& song, bool loop);
-	void PlayBGM(int scene);
+	void PlayBGM(BGM scene);
 	void StopBGM();
 	bool PlayChant(unsigned int code);
 	void SetSoundVolume(double volume);
 	void SetMusicVolume(double volume);
 	void EnableSounds(bool enable);
 	void EnableMusic(bool enable);
+
+private:
+    std::vector<std::string> BGMList[8];
+    std::map<unsigned int, std::string> ChantsList;
+    int bgm_scene;
+#ifdef YGOPRO_USE_IRRKLANG
+    irrklang::ISoundEngine* soundEngine;
+    irrklang::ISound* soundBGM;
+    std::mt19937 rnd;
+#endif
+    void RefreshBGMDir(path_string path, BGM scene);
+    void RefreshChantsList();
+    bool soundsEnabled;
+    bool musicEnabled;
 };
 
 extern SoundManager soundManager;
-
-#define BGM_ALL						0
-#define BGM_DUEL					1
-#define BGM_MENU					2
-#define BGM_DECK					3
-#define BGM_ADVANTAGE				4
-#define BGM_DISADVANTAGE			5
-#define BGM_WIN						6
-#define BGM_LOSE					7
 
 }
 

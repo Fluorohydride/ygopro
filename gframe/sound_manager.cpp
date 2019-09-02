@@ -48,19 +48,19 @@ void SoundManager::RefreshBGMList() {
 	Utils::Makedirectory(TEXT("./sound/BGM/win"));
 	Utils::Makedirectory(TEXT("./sound/BGM/lose"));
 	Utils::Makedirectory(TEXT("./sound/chants"));
-	RefreshBGMDir(TEXT(""), BGM_DUEL);
-	RefreshBGMDir(TEXT("duel"), BGM_DUEL);
-	RefreshBGMDir(TEXT("menu"), BGM_MENU);
-	RefreshBGMDir(TEXT("deck"), BGM_DECK);
-	RefreshBGMDir(TEXT("advantage"), BGM_ADVANTAGE);
-	RefreshBGMDir(TEXT("disadvantage"), BGM_DISADVANTAGE);
-	RefreshBGMDir(TEXT("win"), BGM_WIN);
-	RefreshBGMDir(TEXT("lose"), BGM_LOSE);
+	RefreshBGMDir(TEXT(""), BGM::DUEL);
+	RefreshBGMDir(TEXT("duel"), BGM::DUEL);
+	RefreshBGMDir(TEXT("menu"), BGM::MENU);
+	RefreshBGMDir(TEXT("deck"), BGM::DECK);
+	RefreshBGMDir(TEXT("advantage"), BGM::ADVANTAGE);
+	RefreshBGMDir(TEXT("disadvantage"), BGM::DISADVANTAGE);
+	RefreshBGMDir(TEXT("win"), BGM::WIN);
+	RefreshBGMDir(TEXT("lose"), BGM::LOSE);
 }
-void SoundManager::RefreshBGMDir(path_string path, int scene) {
+void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/BGM/") + path, { TEXT("mp3"), TEXT("ogg"), TEXT("wav") })) {
 		auto conv = Utils::ToUTF8IfNeeded(path + TEXT("/") + file);
-		BGMList[BGM_ALL].push_back(conv);
+		BGMList[BGM::ALL].push_back(conv);
 		BGMList[scene].push_back(conv);
 	}
 }
@@ -118,7 +118,7 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 	}
 #endif
 }
-void SoundManager::PlayBGM(int scene) {
+void SoundManager::PlayBGM(BGM scene) {
 #ifdef YGOPRO_USE_IRRKLANG
 	auto& list = BGMList[scene];
 	int count = list.size();
