@@ -1,9 +1,11 @@
 #ifndef SOUNDMANAGER_H
 #define SOUNDMANAGER_H
 
-#ifdef YGOPRO_USE_IRRKLANG
 #include <random>
+#ifdef YGOPRO_USE_IRRKLANG
 #include <irrKlang.h>
+#else
+#include "sound_openal.h"
 #endif
 #include "utils.h"
 
@@ -47,6 +49,9 @@ public:
         WIN,
         LOSE
     };
+#ifndef YGOPRO_USE_IRRKLANG
+    SoundManager() : alSound(nullptr) {}
+#endif
     ~SoundManager();
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
 	void RefreshBGMList();
@@ -64,10 +69,12 @@ private:
     std::vector<std::string> BGMList[8];
     std::map<unsigned int, std::string> ChantsList;
     int bgm_scene;
+    std::mt19937 rnd;
 #ifdef YGOPRO_USE_IRRKLANG
     irrklang::ISoundEngine* soundEngine;
     irrklang::ISound* soundBGM;
-    std::mt19937 rnd;
+#else
+    std::unique_ptr<YGOpen::OpenALSoundEngine> alSound;
 #endif
     void RefreshBGMDir(path_string path, BGM scene);
     void RefreshChantsList();
