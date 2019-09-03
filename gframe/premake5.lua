@@ -52,6 +52,11 @@ local ygopro_config=function(static_core)
 			links  "lua"
 		end
 
+	filter { "system:macosx", "options:no-irrklang" }
+		includedirs "/usr/local/opt/openal-soft/include"
+		libdirs "/usr/local/opt/openal-soft/lib"
+		links "openal"
+
 	filter "system:linux"
 		defines "LUA_USE_LINUX"
 		includedirs { "/usr/include/freetype2", "/usr/include/irrlicht" }

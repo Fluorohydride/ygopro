@@ -36,12 +36,12 @@ OpenALSoundEngine::~OpenALSoundEngine() {
     }
 }
 
-typedef union array_int32 {
+union array_int32 {
     char c[4];
     int32_t i;
 };
 
-typedef union array_int16 {
+union array_int16 {
     char c[2];
     int16_t i;
 };
@@ -138,7 +138,7 @@ bool OpenALSoundEngine::load(const std::string& filename)
     if (ygo::Utils::GetFileExtension(filename) == "wav") {
         auto data = loadWav(filename);
         if (!data) return false;
-        buffers.insert_or_assign(filename, data);
+        buffers[filename] =  data;
         return true;
     }
     return false;
