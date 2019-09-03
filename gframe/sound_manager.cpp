@@ -128,16 +128,18 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 #endif
 }
 void SoundManager::PlayBGM(BGM scene) {
-#ifdef YGOPRO_USE_IRRKLANG
 	auto& list = BGMList[scene];
 	int count = list.size();
+#ifdef YGOPRO_USE_IRRKLANG
 	if(musicEnabled && (scene != bgm_scene || (soundBGM && soundBGM->isFinished()) || !soundBGM) && count > 0) {
+#else
+	if (musicEnabled && scene != bgm_scene && count > 0) {
+#endif
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
 		std::string BGMName = "./sound/BGM/" + list[bgm];
 		PlayMusic(BGMName, true);
 	}
-#endif
 }
 void SoundManager::StopBGM() {
 #ifdef YGOPRO_USE_IRRKLANG

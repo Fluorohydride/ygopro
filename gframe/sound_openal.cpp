@@ -1,6 +1,7 @@
 #include "sound_openal.h"
 #include <array>
 #include <iterator>
+#include <mpg123.h>
 #include "utils.h"
 
 namespace YGOpen {
@@ -28,6 +29,7 @@ OpenALSoundEngine::OpenALSoundEngine() : device(nullptr, delete_ALCdevice), cont
     if (!alcMakeContextCurrent(context.get())) {
         throw std::runtime_error("Failed to set OpenAL audio context!");
     }
+    mpg123_init();
 }
 
 OpenALSoundEngine::~OpenALSoundEngine() {
@@ -35,6 +37,7 @@ OpenALSoundEngine::~OpenALSoundEngine() {
     for (const auto& iter : buffers) {
         alDeleteBuffers(1, &iter.second->id);
     }
+    mpg123_exit();
 }
 
 union array_int32 {
@@ -134,15 +137,40 @@ static std::shared_ptr<OpenALSoundBuffer> loadWav(const std::string& filename) {
     return data;
 }
 
+static std::shared_ptr<OpenALSoundBuffer> loadMp3(const std::string& filename) {
+    auto data = std::make_shared<OpenALSoundBuffer>();
+    std::vector<unsigned char> buffer;
+    size_t bufferSize;
+    int mpgError;
+    auto mpgHandle = mpg123_new(nullptr, &mpgError);
+    if (!mpgHandle) return nullptr;
+    if (mpg123_open(mpgHandle, filename.c_str()) != MPG123_OK) {
+        mpg123_delete(mpgHandle);
+        return nullptr;
+    }
+    bufferSize = mpg123_outblock(mpgHandle);
+    buffer.reserve(bufferSize);
+    for(size_t read = 1; read != 0 && mpgError == MPG123_OK; ) {
+        mpgError = mpg123_read(mpgHandle, buffer.data(), bufferSize, &read);
+        data->buffer.insert(data->buffer.end(), buffer.begin(), buffer.end());
+    }
+    mpg123_close(mpgHandle);
+    mpg123_delete(mpgHandle);
+    return mpgError == MPG123_OK ? data : nullptr;
+}
+
 bool OpenALSoundEngine::load(const std::string& filename)
 {
-    if (ygo::Utils::GetFileExtension(filename) == "wav") {
-        auto data = loadWav(filename);
-        if (!data) return false;
-        buffers[filename] =  data;
-        return true;
+    std::shared_ptr<OpenALSoundBuffer> data(nullptr);
+    auto ext = ygo::Utils::GetFileExtension(filename);
+    if (ext == "wav") {
+        data = loadWav(filename);
+    } else if (ext == "mp3") {
+        data = loadMp3(filename);
     }
-    return false;
+    if (!data) return false;
+    buffers[filename] =  data;
+    return true;
 }
 
 int OpenALSoundEngine::play(const std::string& filename, bool loop)
