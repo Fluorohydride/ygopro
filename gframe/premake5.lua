@@ -9,11 +9,12 @@ local ygopro_config=function(static_core)
 	cppdialect "C++14"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
-	includedirs { "../ocgcore", "../irrKlang/include" }
-	links { "clzma", "freetype", "Irrlicht", "IrrKlang" }
 	defines "CURL_STATICLIB"
+	includedirs { "../ocgcore", "../irrKlang/include" }
+	links { "clzma", "freetype", "Irrlicht" }
 	filter "options:not no-irrklang"
 		defines "YGOPRO_USE_IRRKLANG"
+		links "IrrKlang"
 
 	filter "system:windows"
 		kind "ConsoleApp"
@@ -39,7 +40,10 @@ local ygopro_config=function(static_core)
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
 		excludes "COSOperator.*"
-		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl" }
+		links { "sqlite3", "event", "event_pthreads", "dl", "pthread", "git2" }
+
+	filter { "system:not windows", "options:no-irrklang" }
+		links "openal"
 
 	filter "system:macosx"
 		defines "LUA_USE_MACOSX"
@@ -47,7 +51,7 @@ local ygopro_config=function(static_core)
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
 		libdirs "../irrKlang/bin/macosx-gcc/"
-		links { "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
+		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
 		if static_core then
 			links  "lua"
 		end
@@ -55,7 +59,12 @@ local ygopro_config=function(static_core)
 	filter { "system:macosx", "options:no-irrklang" }
 		includedirs "/usr/local/opt/openal-soft/include"
 		libdirs "/usr/local/opt/openal-soft/lib"
-		links "openal"
+
+	filter { "system:linux", "configurations:Debug" }
+		links { "fmtd", "curl-d" }
+
+        filter { "system:linux", "configurations:Release" }
+		links { "fmt", "curl" }	
 
 	filter "system:linux"
 		defines "LUA_USE_LINUX"

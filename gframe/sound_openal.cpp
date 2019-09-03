@@ -1,5 +1,6 @@
 #include "sound_openal.h"
 #include <array>
+#include <iterator>
 #include "utils.h"
 
 namespace YGOpen {
