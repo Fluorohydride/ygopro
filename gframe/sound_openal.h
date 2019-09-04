@@ -24,10 +24,18 @@ struct OpenALSoundBuffer
     std::vector<char> buffer;
 };
 
-class OpenALSoundEngine {
+class OpenALSingleton {
 public:
-    OpenALSoundEngine();
-    ~OpenALSoundEngine();
+    OpenALSingleton();
+    ~OpenALSingleton();
+    std::unique_ptr<ALCdevice, void (*)(ALCdevice* ptr)> device;
+    std::unique_ptr<ALCcontext, void(*)(ALCcontext* ptr)> context;
+};
+
+class OpenALSoundLayer {
+public:
+    OpenALSoundLayer(const std::unique_ptr<OpenALSingleton>& openal);
+    ~OpenALSoundLayer();
     bool load(const std::string& filename);
     int play(const std::string& filename, bool loop);
     bool exists(int sound);
@@ -36,8 +44,7 @@ public:
     void setVolume(float gain);
 private:
     void maintain();
-    std::unique_ptr<ALCdevice, void (*)(ALCdevice* ptr)> device;
-    std::unique_ptr<ALCcontext, void(*)(ALCcontext* ptr)> context;
+    const std::unique_ptr<OpenALSingleton>& openal;
     std::unordered_map<std::string, std::shared_ptr<OpenALSoundBuffer>> buffers;
     std::unordered_set<ALuint> playing;
     float volume = 1.0f;

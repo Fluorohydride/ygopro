@@ -28,7 +28,8 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 	}
 #else
     try {
-        alSound = std::make_unique<YGOpen::OpenALSoundEngine>();
+        openal = std::make_unique<YGOpen::OpenALSingleton>();
+        sfx = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
         return true;
     }
     catch (std::runtime_error& e) {
@@ -109,7 +110,7 @@ void SoundManager::PlaySoundEffect(SFX sound) {
 #ifdef YGOPRO_USE_IRRKLANG
     soundEngine->play2D(fx.at(sound));
 #else
-    alSound->play(fx.at(sound), false);
+    sfx->play(fx.at(sound), false);
 #endif
 }
 void SoundManager::PlayMusic(const std::string& song, bool loop) {
@@ -124,7 +125,7 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 		soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
 	}
 #else
-    alSound->play(song, loop);
+    sfx->play(song, loop);
 #endif
 }
 void SoundManager::PlayBGM(BGM scene) {
@@ -149,7 +150,7 @@ void SoundManager::StopBGM() {
 		soundBGM = nullptr;
 	}
 #else
-    alSound->stopAll();
+    sfx->stopAll();
 #endif
 }
 bool SoundManager::PlayChant(unsigned int code) {
@@ -159,7 +160,7 @@ bool SoundManager::PlayChant(unsigned int code) {
 		if(!soundEngine->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str()))
 			soundEngine->play2D(("./sound/chants/" + ChantsList[code]).c_str());
 #else
-        alSound->play("./sound/chants/" + ChantsList[code], false);
+        sfx->play("./sound/chants/" + ChantsList[code], false);
 #endif
 		return true;
 	}
@@ -169,14 +170,14 @@ void SoundManager::SetSoundVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
 	soundEngine->setSoundVolume(volume);
 #else
-    alSound->setVolume(volume);
+    sfx->setVolume(volume);
 #endif
 }
 void SoundManager::SetMusicVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
 	soundEngine->setSoundVolume(volume);
 #else
-    alSound->setVolume(volume);
+    sfx->setVolume(volume);
 #endif
 }
 void SoundManager::EnableSounds(bool enable) {
@@ -193,7 +194,7 @@ void SoundManager::EnableMusic(bool enable) {
 			soundBGM = nullptr;
 		}
 #endif
-        alSound->stopAll();
+        sfx->stopAll();
 	}
 }
 

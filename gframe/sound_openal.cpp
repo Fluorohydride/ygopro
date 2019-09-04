@@ -20,7 +20,7 @@ static void delete_ALCcontext(ALCcontext* ptr)
     }
 }
 
-OpenALSoundEngine::OpenALSoundEngine() : device(nullptr, delete_ALCdevice), context(nullptr, delete_ALCcontext), buffers(), playing() {
+OpenALSingleton::OpenALSingleton() : device(nullptr, delete_ALCdevice), context(nullptr, delete_ALCcontext) {
     device.reset(alcOpenDevice(nullptr));
     if (!device) {
         throw std::runtime_error("Failed to create OpenAL audio device!");
@@ -32,12 +32,17 @@ OpenALSoundEngine::OpenALSoundEngine() : device(nullptr, delete_ALCdevice), cont
     mpg123_init();
 }
 
-OpenALSoundEngine::~OpenALSoundEngine() {
+OpenALSingleton::~OpenALSingleton() {
+    mpg123_exit();
+}
+
+OpenALSoundLayer::OpenALSoundLayer(const std::unique_ptr<OpenALSingleton>& openal) : openal(openal), buffers(), playing() {}
+
+OpenALSoundLayer::~OpenALSoundLayer() {
     stopAll();
     for (const auto& iter : buffers) {
         alDeleteBuffers(1, &iter.second->id);
-    }
-    mpg123_exit();
+    }   
 }
 
 union array_int32 {
@@ -192,7 +197,7 @@ static std::shared_ptr<OpenALSoundBuffer> loadMp3(const std::string& filename) {
     return alUtilInitBuffer(data) ? data : nullptr;
 }
 
-bool OpenALSoundEngine::load(const std::string& filename)
+bool OpenALSoundLayer::load(const std::string& filename)
 {
     std::shared_ptr<OpenALSoundBuffer> data(nullptr);
     auto ext = ygo::Utils::GetFileExtension(filename);
@@ -206,7 +211,7 @@ bool OpenALSoundEngine::load(const std::string& filename)
     return true;
 }
 
-int OpenALSoundEngine::play(const std::string& filename, bool loop)
+int OpenALSoundLayer::play(const std::string& filename, bool loop)
 {
     maintain();
     if (buffers.find(filename) == buffers.end()) {
@@ -233,13 +238,13 @@ int OpenALSoundEngine::play(const std::string& filename, bool loop)
     return source;
 }
 
-bool OpenALSoundEngine::exists(int sound)
+bool OpenALSoundLayer::exists(int sound)
 {
     maintain();
     return playing.find(sound) != playing.end();
 }
 
-void OpenALSoundEngine::stop(int sound)
+void OpenALSoundLayer::stop(int sound)
 {
     maintain();
     const auto iter = playing.find(sound);
@@ -250,7 +255,7 @@ void OpenALSoundEngine::stop(int sound)
     }
 }
 
-void OpenALSoundEngine::stopAll()
+void OpenALSoundLayer::stopAll()
 {
     for (const auto& iter : playing) {
         alSourceStop(iter);
@@ -259,7 +264,7 @@ void OpenALSoundEngine::stopAll()
     playing.clear();
 }
 
-void OpenALSoundEngine::setVolume(float gain)
+void OpenALSoundLayer::setVolume(float gain)
 {
     volume = gain;
     for (const auto& iter : playing) {
@@ -267,7 +272,7 @@ void OpenALSoundEngine::setVolume(float gain)
     }
 }
 
-void OpenALSoundEngine::maintain() {
+void OpenALSoundLayer::maintain() {
     std::unordered_set<ALuint> toDelete;
     for (const auto& iter : playing) {
         ALint state;

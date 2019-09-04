@@ -50,7 +50,7 @@ public:
         LOSE
     };
 #ifndef YGOPRO_USE_IRRKLANG
-    SoundManager() : alSound(nullptr) {}
+    SoundManager() : openal(nullptr), sfx(nullptr) {}
 #endif
     ~SoundManager();
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
@@ -68,18 +68,19 @@ public:
 private:
     std::vector<std::string> BGMList[8];
     std::map<unsigned int, std::string> ChantsList;
-    int bgm_scene;
+    int bgm_scene = -1;
     std::mt19937 rnd;
 #ifdef YGOPRO_USE_IRRKLANG
     irrklang::ISoundEngine* soundEngine;
     irrklang::ISound* soundBGM;
 #else
-    std::unique_ptr<YGOpen::OpenALSoundEngine> alSound;
+    std::unique_ptr<YGOpen::OpenALSingleton> openal;
+    std::unique_ptr<YGOpen::OpenALSoundLayer> sfx;
 #endif
     void RefreshBGMDir(path_string path, BGM scene);
     void RefreshChantsList();
-    bool soundsEnabled;
-    bool musicEnabled;
+    bool soundsEnabled = false;
+    bool musicEnabled = false;
 };
 
 extern SoundManager soundManager;
