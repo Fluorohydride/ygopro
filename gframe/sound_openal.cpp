@@ -58,6 +58,19 @@ static inline void read16(std::istream& in, array_int16& out) {
     in.read(out.c, 2);
 }
 
+static inline bool alUtilInitBuffer(std::shared_ptr<OpenALSoundBuffer> data) {
+    alGetError();
+    alGenBuffers(1, &data->id);
+    ALenum error = alGetError();
+    if (error != AL_NO_ERROR) return false;
+
+    alBufferData(data->id, data->format, data->buffer.data(), data->buffer.size(), data->frequency);
+    error = alGetError();
+    if (error != AL_NO_ERROR) return false;
+
+    return true;
+}
+
 static inline ALenum alUtilFormatFromWav(const int16_t channels, const int16_t bitsPerSample) {
     if (channels == 1) {
         if (bitsPerSample == 8) {
@@ -122,41 +135,61 @@ static std::shared_ptr<OpenALSoundBuffer> loadWav(const std::string& filename) {
     read32(file, size);
     data->buffer.reserve(size.i);
     data->buffer.insert(data->buffer.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
-
-    alGetError();
-    alGenBuffers(1, &data->id);
-    ALenum error = alGetError();
-    if (error != AL_NO_ERROR) return nullptr;
-
-    alBufferData(data->id, alUtilFormatFromWav(channels.i, bitsPerSample.i), data->buffer.data(), size.i, sampleRate.i);
-    error = alGetError();
-    if (error != AL_NO_ERROR) return nullptr;
-
-    data->format = audioFormat.i;
+    data->format = alUtilFormatFromWav(channels.i, bitsPerSample.i);
     data->frequency = sampleRate.i;
-    return data;
+
+    return alUtilInitBuffer(data) ? data : nullptr;
+}
+
+static inline ALenum alUtilFormatFromMp3(const int channels, const int encoding) {
+    if (channels & MPG123_STEREO) {
+        if (encoding & MPG123_ENC_SIGNED_16) {
+            return AL_FORMAT_STEREO16;
+        }
+        else {
+            return AL_FORMAT_STEREO8;
+        }
+    }
+    else {
+        if (encoding & MPG123_ENC_SIGNED_16) {
+            return AL_FORMAT_MONO16;
+        }
+        else {
+            return AL_FORMAT_MONO8;
+        }
+    }
 }
 
 static std::shared_ptr<OpenALSoundBuffer> loadMp3(const std::string& filename) {
     auto data = std::make_shared<OpenALSoundBuffer>();
     std::vector<unsigned char> buffer;
     size_t bufferSize;
-    int mpgError;
+    int mpgError, channels, encoding;
+    long rate;
     auto mpgHandle = mpg123_new(nullptr, &mpgError);
     if (!mpgHandle) return nullptr;
-    if (mpg123_open(mpgHandle, filename.c_str()) != MPG123_OK) {
+    if (mpg123_open(mpgHandle, filename.c_str()) != MPG123_OK ||
+        mpg123_getformat(mpgHandle, &rate, &channels, &encoding) != MPG123_OK) {
         mpg123_delete(mpgHandle);
         return nullptr;
     }
+    mpg123_format_none(mpgHandle);
+    mpg123_format(mpgHandle, rate, channels, encoding);
+    
     bufferSize = mpg123_outblock(mpgHandle);
-    buffer.reserve(bufferSize);
+    buffer.resize(bufferSize);
     for(size_t read = 1; read != 0 && mpgError == MPG123_OK; ) {
         mpgError = mpg123_read(mpgHandle, buffer.data(), bufferSize, &read);
         data->buffer.insert(data->buffer.end(), buffer.begin(), buffer.end());
     }
     mpg123_close(mpgHandle);
     mpg123_delete(mpgHandle);
-    return mpgError == MPG123_OK ? data : nullptr;
+    if (mpgError != MPG123_DONE) return nullptr;
+
+    data->format = alUtilFormatFromMp3(channels, encoding);
+    data->frequency = rate;
+
+    return alUtilInitBuffer(data) ? data : nullptr;
 }
 
 bool OpenALSoundEngine::load(const std::string& filename)
