@@ -77,6 +77,7 @@ private:
     std::unique_ptr<YGOpen::OpenALSingleton> openal;
     std::unique_ptr<YGOpen::OpenALSoundLayer> sfx;
     std::unique_ptr<YGOpen::OpenALSoundLayer> bgm;
+    int bgmCurrent = -1;
 #endif
     void RefreshBGMDir(path_string path, BGM scene);
     void RefreshChantsList();

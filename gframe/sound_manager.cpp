@@ -124,7 +124,8 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 		soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
 	}
 #else
-    bgm->play(song, loop);
+    StopBGM();
+    bgmCurrent = bgm->play(song, loop);
 #endif
 }
 void SoundManager::PlayBGM(BGM scene) {
@@ -133,8 +134,7 @@ void SoundManager::PlayBGM(BGM scene) {
 #ifdef YGOPRO_USE_IRRKLANG
 	if(musicEnabled && (scene != bgm_scene || (soundBGM && soundBGM->isFinished()) || !soundBGM) && count > 0) {
 #else
-	if (musicEnabled && scene != bgm_scene && count > 0) {
-        StopBGM();
+	if (musicEnabled && (scene != bgm_scene || !bgm->exists(bgmCurrent)) && count > 0) {
 #endif
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
@@ -193,9 +193,10 @@ void SoundManager::EnableMusic(bool enable) {
 			soundBGM->drop();
 			soundBGM = nullptr;
 		}
-#endif
+#else
         StopBGM();
-	}
+#endif
+    }
 }
 
 } // namespace ygo
