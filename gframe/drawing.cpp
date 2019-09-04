@@ -1011,9 +1011,9 @@ void Game::DrawSpec() {
 			msgloc -= position2di(0, i * 20);
 			recti shadowloc = msgloc + position2di(1, 1);
 
-			driver->draw2DRectangle(rectloc, 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
-			textFont->draw(chatMsg[i].c_str(), msgloc, 0xff000000, false, false);
-			textFont->draw(chatMsg[i].c_str(), shadowloc, chatColor[chatType[i]], false, false);
+			driver->draw2DRectangle(Scale(rectloc), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
+			textFont->draw(chatMsg[i].c_str(), Scale(msgloc), 0xff000000, false, false);
+			textFont->draw(chatMsg[i].c_str(), Scale(shadowloc), chatColor[chatType[i]], false, false);
 		}
 	}
 }
