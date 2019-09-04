@@ -43,7 +43,7 @@ local ygopro_config=function(static_core)
 		links { "sqlite3", "event", "event_pthreads", "dl", "pthread", "git2" }
 
 	filter { "system:not windows", "options:no-irrklang" }
-		links { "openal", "mpg123" }
+		links { "openal", "mpg123", "sndfile", "vorbis", "vorbisenc", "ogg", "FLAC" }
 
 	filter "system:macosx"
 		defines "LUA_USE_MACOSX"

@@ -2,6 +2,7 @@
 #include <array>
 #include <iterator>
 #include <mpg123.h>
+#include <sndfile.h>
 #include "utils.h"
 
 namespace YGOpen {
@@ -45,24 +46,6 @@ OpenALSoundLayer::~OpenALSoundLayer() {
     }   
 }
 
-union array_int32 {
-    char c[4];
-    int32_t i;
-};
-
-union array_int16 {
-    char c[2];
-    int16_t i;
-};
-
-static inline void read32(std::istream& in, array_int32& out) {
-    in.read(out.c, 4);
-}
-
-static inline void read16(std::istream& in, array_int16& out) {
-    in.read(out.c, 2);
-}
-
 static inline bool alUtilInitBuffer(std::shared_ptr<OpenALSoundBuffer> data) {
     alGetError();
     alGenBuffers(1, &data->id);
@@ -74,76 +57,6 @@ static inline bool alUtilInitBuffer(std::shared_ptr<OpenALSoundBuffer> data) {
     if (error != AL_NO_ERROR) return false;
 
     return true;
-}
-
-static inline ALenum alUtilFormatFromWav(const int16_t channels, const int16_t bitsPerSample) {
-    if (channels == 1) {
-        if (bitsPerSample == 8) {
-            return AL_FORMAT_MONO8;
-        }
-        else { // Assume 16
-            return AL_FORMAT_MONO16;
-        }
-    }
-    else { // Assume 2
-        if (bitsPerSample == 8) {
-            return AL_FORMAT_STEREO8;
-        }
-        else { // Assume 16
-            return AL_FORMAT_STEREO16;
-        }
-    }
-}
-
-static constexpr std::array<char, 4> RIFF({ 'R','I','F','F' });
-static constexpr std::array<char, 4> WAVE({ 'W','A','V','E' });
-static constexpr std::array<char, 4> FMT_({ 'f','m','t',' ' });
-static constexpr std::array<char, 4> LIST({ 'L','I','S','T' });
-static constexpr std::array<char, 4> DATA({ 'd','a','t','a' });
-
-static std::shared_ptr<OpenALSoundBuffer> loadWav(const std::string& filename) {
-    std::array<char, 4> header;
-    array_int32 throwawayInt32;
-    std::array<char, 4> format;
-    std::array<char, 4> info;
-    array_int16 audioFormat, channels;
-    array_int32 sampleRate, byteRate;
-    array_int16 throwawayInt16, bitsPerSample;
-    std::array<char, 4> prefix;
-    array_int32 size;
-    auto data = std::make_shared<OpenALSoundBuffer>();
-    std::ifstream file(filename, std::ios_base::binary);
-
-    if (!file.good()) return nullptr;
-    file.read(header.data(), 4);
-    if (header != RIFF) return nullptr;
-    read32(file, throwawayInt32);
-    file.read(format.data(), 4);
-    if (format != WAVE) return nullptr;
-    file.read(info.data(), 4);
-    if (info != FMT_) return nullptr;
-    read32(file, throwawayInt32);
-    read16(file, audioFormat);
-    read16(file, channels);
-    read32(file, sampleRate);
-    read32(file, byteRate);
-    read16(file, throwawayInt16);
-    read16(file, bitsPerSample);
-
-    file.read(prefix.data(), 4);
-    if (prefix == LIST) {
-        read32(file, throwawayInt32);
-        file.seekg(throwawayInt32.i, std::ios_base::cur);
-        file.read(prefix.data(), 4);
-    }
-    if (prefix != DATA) return nullptr;
-    read32(file, size);
-    data->buffer.reserve(size.i);
-    data->buffer.insert(data->buffer.begin(), std::istream_iterator<char>(file), std::istream_iterator<char>());
-    data->format = alUtilFormatFromWav(channels.i, bitsPerSample.i);
-    data->frequency = sampleRate.i;
-
-    return alUtilInitBuffer(data) ? data : nullptr;
 }
 
 static inline ALenum alUtilFormatFromMp3(const int channels, const int encoding) {
@@ -197,14 +110,29 @@ static std::shared_ptr<OpenALSoundBuffer> loadMp3(const std::string& filename) {
     return alUtilInitBuffer(data) ? data : nullptr;
 }
 
+static std::shared_ptr<OpenALSoundBuffer> loadSnd(const std::string& filename) {
+    auto data = std::make_shared<OpenALSoundBuffer>();
+    SF_INFO info;
+    std::unique_ptr<SNDFILE, std::function<void(SNDFILE*)>> file(
+        sf_open(filename.c_str(), SFM_READ, &info), 
+        [](SNDFILE* ptr) { sf_close(ptr);  });
+    if (!file) return nullptr;
+    data->frequency = info.samplerate;
+    data->format = info.channels == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+    data->buffer.resize(info.frames * info.channels * sizeof(short));
+    if (sf_readf_short(file.get(), reinterpret_cast<short*>(data->buffer.data()), info.frames) != info.frames) return nullptr;
+    return alUtilInitBuffer(data) ? data : nullptr;
+}
+
 bool OpenALSoundLayer::load(const std::string& filename)
 {
     std::shared_ptr<OpenALSoundBuffer> data(nullptr);
     auto ext = ygo::Utils::GetFileExtension(filename);
-    if (ext == "wav") {
-        data = loadWav(filename);
-    } else if (ext == "mp3") {
+    if (ext == "mp3") {
         data = loadMp3(filename);
+    }
+    else {
+        data = loadSnd(filename);
     }
     if (!data) return false;
     buffers[filename] =  data;
