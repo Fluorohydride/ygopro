@@ -1447,18 +1447,18 @@ void Game::ShowCardInfo(int code, bool resize) {
 		} else
 			stDataInfo->setText(L"");
 	}
-	int offset = 37;
-	stInfo->setRelativePosition(Scale(15, offset, 287 * window_scale.X, offset + stInfo->getTextHeight()));
+	int offset = Scale(37);
+	stInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stInfo->getTextHeight()));
 	offset += stInfo->getTextHeight();
 	if(wcscmp(stDataInfo->getText(), L"")) {
-		stDataInfo->setRelativePosition(Scale(15, offset, 287 * window_scale.X, offset + stDataInfo->getTextHeight()));
+		stDataInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stDataInfo->getTextHeight()));
 		offset += stDataInfo->getTextHeight();
 	}
 	if(wcscmp(stSetName->getText(), L"")) {
-		stSetName->setRelativePosition(Scale(15, offset, 287 * window_scale.X, offset + stSetName->getTextHeight()));
+		stSetName->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stSetName->getTextHeight()));
 		offset += stSetName->getTextHeight();
 	}
-	stText->setRelativePosition(Scale(15, offset, 287 * window_scale.X, 324 * window_scale.Y));
+	stText->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), Scale(324 * window_scale.Y)));
 	stText->setText(dataManager.GetText(code).c_str());
 }
 void Game::ClearCardInfo(int player) {
@@ -1951,11 +1951,9 @@ recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2, bool scale) {
 	return scale ? Scale(x, y, x2, y2) : recti{x, y, x2, y2};
 }
 recti Game::ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width) {
-	x = x * window_scale.X - width / 2;
-	y = y * window_scale.Y;
-	x2 = x2 * window_scale.X;
-	y2 = y2 * window_scale.Y;
-	return Scale(x, y, x2, y2);
+	auto res = Resize(x, y, x2, y2);
+	res.UpperLeftCorner.X -= width / 2;
+	return res;
 }
 recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2) {
 	auto size = driver->getScreenSize();
