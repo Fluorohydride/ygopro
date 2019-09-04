@@ -6,8 +6,6 @@
 
 namespace ygo {
 
-SoundManager soundManager;
-
 bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload) {
 	soundsEnabled = sounds_enabled;
 	musicEnabled = music_enabled;

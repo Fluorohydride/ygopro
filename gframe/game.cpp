@@ -782,7 +782,8 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	if(!soundManager.Init(gameConf.volume, gameConf.volume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
+	soundManager = std::make_unique<SoundManager>();
+	if(!soundManager->Init(gameConf.volume, gameConf.volume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
 		chkEnableSound->setVisible(false);
@@ -941,15 +942,15 @@ void Game::MainLoop() {
 		gMutex.lock();
 		if(dInfo.isInDuel) {
 			if (showcardcode == 1 || showcardcode == 3)
-				soundManager.PlayBGM(SoundManager::BGM::WIN);
+				soundManager->PlayBGM(SoundManager::BGM::WIN);
 			else if (showcardcode == 2)
-				soundManager.PlayBGM(SoundManager::BGM::LOSE);
+				soundManager->PlayBGM(SoundManager::BGM::LOSE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] <= dInfo.lp[LocalPlayer(1)] / 2)
-				soundManager.PlayBGM(SoundManager::BGM::DISADVANTAGE);
+				soundManager->PlayBGM(SoundManager::BGM::DISADVANTAGE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] >= dInfo.lp[LocalPlayer(1)] * 2)
-				soundManager.PlayBGM(SoundManager::BGM::ADVANTAGE);
+				soundManager->PlayBGM(SoundManager::BGM::ADVANTAGE);
 			else
-				soundManager.PlayBGM(SoundManager::BGM::DUEL);
+				soundManager->PlayBGM(SoundManager::BGM::DUEL);
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
@@ -958,11 +959,11 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
-			soundManager.PlayBGM(SoundManager::BGM::DECK);
+			soundManager->PlayBGM(SoundManager::BGM::DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
-			soundManager.PlayBGM(SoundManager::BGM::MENU);
+			soundManager->PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
 		DrawGUI();
@@ -1481,10 +1482,10 @@ void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 	chatTiming[0] = 1200.0f;
 	chatType[0] = player;
 	if(type == 0) {
-		soundManager.PlaySoundEffect(SoundManager::SFX::CHAT);
+		soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 		chatMsg[0].append(dInfo.hostname[player]);
 	} else if(type == 1) {
-		soundManager.PlaySoundEffect(SoundManager::SFX::CHAT);
+		soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 		chatMsg[0].append(dInfo.clientname[player]);
 	} else if(type == 2) {
 		switch(player) {
@@ -1492,7 +1493,7 @@ void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 			chatMsg[0].append(ebNickName->getText());
 			break;
 		case 8: //system custom message, no prefix.
-			soundManager.PlaySoundEffect(SoundManager::SFX::CHAT);
+			soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 			chatMsg[0].append(L"[System]");
 			break;
 		case 9: //error message

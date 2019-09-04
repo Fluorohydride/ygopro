@@ -85,8 +85,6 @@ private:
     bool musicEnabled = false;
 };
 
-extern SoundManager soundManager;
-
 }
 
 #endif //SOUNDMANAGER_H
