@@ -30,6 +30,9 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
     try {
         openal = std::make_unique<YGOpen::OpenALSingleton>();
         sfx = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
+        bgm = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
+        sfx->setVolume(sounds_volume);
+        bgm->setVolume(music_volume);
         return true;
     }
     catch (std::runtime_error& e) {
@@ -117,15 +120,11 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 	if(!musicEnabled) return;
 #ifdef YGOPRO_USE_IRRKLANG
 	if(!soundBGM || soundBGM->getSoundSource()->getName() != song) {
-		if(soundBGM) {
-			soundBGM->stop();
-			soundBGM->drop();
-			soundBGM = nullptr;
-		}
+        StopBGM();
 		soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
 	}
 #else
-    sfx->play(song, loop);
+    bgm->play(song, loop);
 #endif
 }
 void SoundManager::PlayBGM(BGM scene) {
@@ -135,6 +134,7 @@ void SoundManager::PlayBGM(BGM scene) {
 	if(musicEnabled && (scene != bgm_scene || (soundBGM && soundBGM->isFinished()) || !soundBGM) && count > 0) {
 #else
 	if (musicEnabled && scene != bgm_scene && count > 0) {
+        StopBGM();
 #endif
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
@@ -150,7 +150,7 @@ void SoundManager::StopBGM() {
 		soundBGM = nullptr;
 	}
 #else
-    sfx->stopAll();
+    bgm->stopAll();
 #endif
 }
 bool SoundManager::PlayChant(unsigned int code) {
@@ -160,7 +160,7 @@ bool SoundManager::PlayChant(unsigned int code) {
 		if(!soundEngine->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str()))
 			soundEngine->play2D(("./sound/chants/" + ChantsList[code]).c_str());
 #else
-        sfx->play("./sound/chants/" + ChantsList[code], false);
+        bgm->play("./sound/chants/" + ChantsList[code], false);
 #endif
 		return true;
 	}
@@ -177,7 +177,7 @@ void SoundManager::SetMusicVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
 	soundEngine->setSoundVolume(volume);
 #else
-    sfx->setVolume(volume);
+    bgm->setVolume(volume);
 #endif
 }
 void SoundManager::EnableSounds(bool enable) {
@@ -194,7 +194,7 @@ void SoundManager::EnableMusic(bool enable) {
 			soundBGM = nullptr;
 		}
 #endif
-        sfx->stopAll();
+        StopBGM();
 	}
 }
 
