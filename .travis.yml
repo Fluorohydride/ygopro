@@ -23,7 +23,6 @@ addons:
     - dylibbundler
     - gpatch
     - p7zip
-    - lua
     - libevent
     - freetype
     - sqlite
@@ -47,7 +46,7 @@ matrix:
     compiler: gcc  
     env:
     - VCPKG_ROOT=./vcpkg
-    - VCPKG_LIBS="lua libevent sqlite3 fmt nlohmann-json curl libgit2"
+    - VCPKG_LIBS="libevent sqlite3 fmt nlohmann-json curl libgit2"
     - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed-linux.7z
   - name: "Mojave"
     os: osx
