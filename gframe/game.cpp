@@ -813,6 +813,8 @@ bool Game::Initialize() {
 	Utils::CreateResourceFolders();
 
 	LoadGithubRepositories();
+	
+	discord.Initialize(filesystem->getWorkingDirectory().c_str());
 
 	return true;
 }
@@ -940,6 +942,12 @@ void Game::MainLoop() {
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		gMutex.lock();
 		if(dInfo.isInDuel) {
+			if(dInfo.isReplay)
+				discord.UpdatePresence(DiscordWrapper::REPLAY);
+			else if(dInfo.isSingleMode)
+				discord.UpdatePresence(DiscordWrapper::PUZZLE);
+			else
+				discord.UpdatePresence(DiscordWrapper::DUEL);
 			if (showcardcode == 1 || showcardcode == 3)
 				soundManager.PlayBGM(SoundManager::BGM::WIN);
 			else if (showcardcode == 2)
@@ -958,10 +966,12 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
+			discord.UpdatePresence(DiscordWrapper::DECK);
 			soundManager.PlayBGM(SoundManager::BGM::DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
+			discord.UpdatePresence(DiscordWrapper::MENU);
 			soundManager.PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
@@ -1014,6 +1024,7 @@ void Game::MainLoop() {
 			queued_msg.clear();
 		}
 		popupCheck.unlock();
+		discord.Check();
 	}
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();

@@ -6,6 +6,7 @@
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#include "discord_wrapper.h"
 #include <unordered_map>
 #include <vector>
 #include <list>
@@ -211,6 +212,7 @@ public:
 	Signal closeDoneSignal;
 	Config gameConf;
 	DuelInfo dInfo;
+	DiscordWrapper discord;
 #ifdef YGOPRO_BUILD_DLL
 	void* ocgcore;
 #endif
