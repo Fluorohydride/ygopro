@@ -22,6 +22,11 @@ newoption {
 	value = "path",
 	description = "Path to vcpkg installation"
 }
+newoption {
+	trigger = "discord",
+	value = "app_id_token",
+	description = "Discord App ID for rich presence"
+}
 workspace "ygo"
 	location "build"
 	language "C++"

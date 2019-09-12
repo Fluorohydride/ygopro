@@ -2,7 +2,9 @@
 #include "discord_register.h"
 #include <chrono>
 #include <cstdio>
+#ifdef _WIN32
 #include <Windows.h>
+#endif
 #include "bufferio.h"
 
 DiscordWrapper::DiscordWrapper(): wasLaunched(false) {

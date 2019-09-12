@@ -5,6 +5,9 @@ local ygopro_config=function(static_core)
 	if _OPTIONS["fields"] then
 		defines { "DEFAULT_FIELD_URL=" .. _OPTIONS["fields"] }
 	end
+	if _OPTIONS["discord"] then
+		defines { "DISCORD_APP_ID=" .. _OPTIONS["discord"] }
+	end
 	defines { "YGOPRO_USE_IRRKLANG", "CURL_STATICLIB" }
 	kind "WindowedApp"
 	cppdialect "C++14"
@@ -36,7 +39,7 @@ local ygopro_config=function(static_core)
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
 		excludes "COSOperator.*"
-		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl" }
+		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl", "discord-rpc" }
 
 	filter "system:macosx"
 		defines "LUA_USE_MACOSX"
