@@ -15,6 +15,9 @@ local ygopro_config=function(static_core)
 	excludes "lzma/**"
 	includedirs { "../ocgcore", "../irrKlang/include" }
 	links { "clzma", "freetype", "Irrlicht", "IrrKlang" }
+	if _OPTIONS["discord"] then
+		links "discord-rpc"
+	end
 	filter "system:windows"
 		kind "ConsoleApp"
 		files "ygopro.rc"
@@ -39,7 +42,7 @@ local ygopro_config=function(static_core)
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
 		excludes "COSOperator.*"
-		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl", "discord-rpc" }
+		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl" }
 
 	filter "system:macosx"
 		defines "LUA_USE_MACOSX"
