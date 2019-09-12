@@ -2,10 +2,8 @@
 #include "discord_register.h"
 #include <chrono>
 #include <cstdio>
-#ifdef _WIN32
-#include <Windows.h>
-#endif
-#include "bufferio.h"
+//#include <Windows.h>
+#include "game.h"
 
 DiscordWrapper::DiscordWrapper(): wasLaunched(false) {
 }
@@ -16,11 +14,7 @@ DiscordWrapper::~DiscordWrapper() {
 #endif
 }
 
-#ifdef UNICODE
-bool DiscordWrapper::Initialize(std::wstring workingDir) {
-#else
-bool DiscordWrapper::Initialize(std::string workingDir) {
-#endif
+bool DiscordWrapper::Initialize(path_string workingDir) {
 #ifdef DISCORD_APP_ID
 	DiscordEventHandlers handlers = {};
 	handlers.ready = OnReady;
@@ -29,20 +23,19 @@ bool DiscordWrapper::Initialize(std::string workingDir) {
 	handlers.joinGame = OnJoin;
 	handlers.spectateGame = OnSpectate;
 	handlers.joinRequest = OnJoinRequest;
-#if defined(_WIN32)
-#define WINDOWS_DISCORD_APP_ID DISCORD_APP_ID
+#if defined(_WIN32) || defined(__linux__)
+#ifdef _WIN32
 	TCHAR exepath[MAX_PATH];
 	GetModuleFileName(nullptr, exepath, MAX_PATH);
 	std::wstring param = exepath + std::wstring(L" from_discord ") + workingDir;
-	Discord_Register(WINDOWS_DISCORD_APP_ID, BufferIO::EncodeUTF8s(param).c_str());
-	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
 #elif defined(__linux__)
 	std::string param = workingDir + "/run.sh from_discord " + workingDir;
-	Discord_Register(DISCORD_APP_ID,param.c_str());
-	Discord_Initialize(DISCORD_APP_ID, &handlers, false, nullptr);
+#endif
+	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).c_str());
+	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
 #else//mac os
 	Discord_Initialize(DISCORD_APP_ID, &handlers, true, nullptr);
-#endif //defined(__WIN32)
+#endif //defined(_WIN32) || defined(__linux__)
 #endif
 	return true;
 }
@@ -59,19 +52,22 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 		Discord_ClearPresence();
 		return;
 	}
-	char buffer[256];
 	DiscordRichPresence discordPresence = {};
 	switch(presence) {
 		case DiscordWrapper::MENU: {
 			discordPresence.details = "In menu";
 			break;
 		}
-		case DiscordWrapper::DUEL: {
+		case DiscordWrapper::DUEL:
+		case DiscordWrapper::DUEL_STARTED: {
 			discordPresence.details = "In duel";
 			break;
 		}
-		case DiscordWrapper::REPLAY:
-		{
+		/*case DiscordWrapper::DUEL_STARTED: {
+			discordPresence.details = "In duel";
+			break;
+		}*/
+		case DiscordWrapper::REPLAY: {
 			discordPresence.details = "Watching a replay";
 			break;
 		}
@@ -81,6 +77,10 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 		}
 		case DiscordWrapper::DECK: {
 			discordPresence.details = "Editing a deck";
+			break;
+		}
+		case DiscordWrapper::DECK_SIDING: {
+			discordPresence.details = "Side decking";
 			break;
 		}
 		case DiscordWrapper::CLEAR:

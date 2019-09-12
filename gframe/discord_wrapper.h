@@ -1,26 +1,26 @@
 #ifndef DISCORD_WRAPPER_H
 #define DISCORD_WRAPPER_H
+
 #ifdef DISCORD_APP_ID
 #include "discord_rpc.h"
 #endif
 #include <string>
+#include "utils.h"
 class DiscordWrapper {
 public:
 	enum PresenceType {
 		MENU,
 		DUEL,
+		DUEL_STARTED,
 		REPLAY,
 		PUZZLE,
 		DECK,
+		DECK_SIDING,
 		CLEAR
 	};
 	DiscordWrapper();
 	~DiscordWrapper();
-#ifdef UNICODE
-	bool Initialize(std::wstring workingDir);
-#else
-	bool Initialize(std::string workingDir);
-#endif
+	bool Initialize(path_string workingDir);
 	void UpdatePresence(PresenceType type);
 	void Check();
 private:
