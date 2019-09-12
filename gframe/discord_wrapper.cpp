@@ -2,7 +2,6 @@
 #include "discord_register.h"
 #include <chrono>
 #include <cstdio>
-//#include <Windows.h>
 #include "game.h"
 
 DiscordWrapper::DiscordWrapper(): wasLaunched(false) {
@@ -23,20 +22,18 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 	handlers.joinGame = OnJoin;
 	handlers.spectateGame = OnSpectate;
 	handlers.joinRequest = OnJoinRequest;
-#if defined(_WIN32) || defined(__linux__)
 #ifdef _WIN32
 	TCHAR exepath[MAX_PATH];
 	GetModuleFileName(nullptr, exepath, MAX_PATH);
 	std::wstring param = exepath + std::wstring(L" from_discord ") + workingDir;
 #elif defined(__linux__)
 	std::string param = workingDir + "/run.sh from_discord " + workingDir;
+#else
+	std::string param = "open " + workingDir + "/ygopro.app --args from_discord";
 #endif
 	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).c_str());
 	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
-#else//mac os
-	Discord_Initialize(DISCORD_APP_ID, &handlers, true, nullptr);
-#endif //defined(_WIN32) || defined(__linux__)
-#endif
+#endif //_WIN32
 	return true;
 }
 
