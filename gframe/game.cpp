@@ -946,8 +946,12 @@ void Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::REPLAY);
 			else if(dInfo.isSingleMode)
 				discord.UpdatePresence(DiscordWrapper::PUZZLE);
-			else
-				discord.UpdatePresence(DiscordWrapper::DUEL);
+			else {
+				if(dInfo.isStarted)
+					discord.UpdatePresence(DiscordWrapper::DUEL_STARTED);
+				else
+					discord.UpdatePresence(DiscordWrapper::DUEL);
+			}
 			if (showcardcode == 1 || showcardcode == 3)
 				soundManager.PlayBGM(SoundManager::BGM::WIN);
 			else if (showcardcode == 2)
@@ -966,12 +970,18 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();
 		} else if(is_building) {
-			discord.UpdatePresence(DiscordWrapper::DECK);
+			if(is_siding)
+				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
+			else
+				discord.UpdatePresence(DiscordWrapper::DECK);
 			soundManager.PlayBGM(SoundManager::BGM::DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
-			discord.UpdatePresence(DiscordWrapper::MENU);
+			if(dInfo.isInLobby)
+				discord.UpdatePresence(DiscordWrapper::IN_LOBBY);
+			else
+				discord.UpdatePresence(DiscordWrapper::MENU);
 			soundManager.PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}

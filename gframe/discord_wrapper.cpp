@@ -3,6 +3,7 @@
 #include <chrono>
 #include <cstdio>
 #include "game.h"
+#include "duelclient.h"
 
 DiscordWrapper::DiscordWrapper(): wasLaunched(false) {
 }
@@ -50,51 +51,64 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 		return;
 	}
 	DiscordRichPresence discordPresence = {};
+	std::string presenceState;
 	switch(presence) {
-		case DiscordWrapper::MENU: {
+		case MENU: {
 			discordPresence.details = "In menu";
 			break;
 		}
-		case DiscordWrapper::DUEL:
-		case DiscordWrapper::DUEL_STARTED: {
-			discordPresence.details = "In duel";
+		case IN_LOBBY:
+		case DUEL:
+		case DUEL_STARTED:
+		case DECK_SIDING: {
+			if(presence == IN_LOBBY) {
+				discordPresence.details = "Hosting a Duel";
+				auto count = ygo::DuelClient::GetPlayersCount();
+				discordPresence.partySize = count.first + count.second;
+				discordPresence.partyMax = ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2;
+				discordPresence.joinSecret = "join";
+			} else {
+				if(presence == DECK_SIDING)
+					discordPresence.details = "Side decking";
+				else
+					discordPresence.details = "Dueling";
+				discordPresence.spectateSecret = "look";
+			}
+			if(((ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2) > 2) || ygo::mainGame->dInfo.isRelay)
+				presenceState = fmt::format("{}: {} vs {}", ygo::mainGame->dInfo.isRelay ? "Relay" : "Tag", ygo::mainGame->dInfo.team1, ygo::mainGame->dInfo.team2).c_str();
+			else
+				presenceState = "1 vs 1";
+			if(ygo::mainGame->dInfo.best_of) {
+				presenceState += fmt::format(" (best of {})", ygo::mainGame->dInfo.best_of);
+			}
 			break;
 		}
-		/*case DiscordWrapper::DUEL_STARTED: {
-			discordPresence.details = "In duel";
-			break;
-		}*/
-		case DiscordWrapper::REPLAY: {
+		case REPLAY: {
 			discordPresence.details = "Watching a replay";
 			break;
 		}
-		case DiscordWrapper::PUZZLE: {
+		case PUZZLE: {
 			discordPresence.details = "Playing a puzzle";
 			break;
 		}
-		case DiscordWrapper::DECK: {
+		case DECK: {
 			discordPresence.details = "Editing a deck";
 			break;
 		}
-		case DiscordWrapper::DECK_SIDING: {
-			discordPresence.details = "Side decking";
-			break;
-		}
-		case DiscordWrapper::CLEAR:
+		case CLEAR:
 			break;
 		default:
 			break;
 	}
-	discordPresence.state = "Edopro FTW";
+	discordPresence.state = presenceState.c_str();
 	discordPresence.startTimestamp = start;
 	discordPresence.largeImageKey = "game-icon";
-	discordPresence.smallImageKey = "game-icon";
+	//discordPresence.smallImageKey = "game-icon";
 	discordPresence.partyId = "party1234";
-	discordPresence.partySize = 1;
-	discordPresence.partyMax = 2;
+	/*discordPresence.partySize = 1;
+	discordPresence.partyMax = 2;*/
 	/*discordPresence.matchSecret = "xyzzy";*/
-	discordPresence.joinSecret = "join";
-	discordPresence.spectateSecret = "look";
+	//discordPresence.joinSecret = "join";
 	discordPresence.instance = 0;
 	Discord_UpdatePresence(&discordPresence);
 #endif
