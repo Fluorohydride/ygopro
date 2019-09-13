@@ -630,20 +630,24 @@ void Game::DrawMisc() {
 /*Draws the stats of a card based on its relative position
 */
 void Game::DrawStatus(ClientCard* pcard) {
+	auto static collisionmanager = device->getSceneManager()->getSceneCollisionManager();
+	auto static getcoords = [&](const core::vector3df & pos3d) {return collisionmanager->getScreenCoordinatesFrom3DPosition(pos3d); };
 	int x1, y1, x2, y2;
 	if (pcard->controler == 0) {
-		ConvertCoords(pcard->curPos.X, (0.39f + pcard->curPos.Y), &x1, &y1);
-		ConvertCoords((pcard->curPos.X - 0.48f), (pcard->curPos.Y - 0.66f), &x2, &y2);
+		auto coords = getcoords({ pcard->curPos.X, (0.39f + pcard->curPos.Y), pcard->curPos.Z });
+		x1 = coords.X;
+		y1 = coords.Y;
+		coords = getcoords({ (pcard->curPos.X - 0.48f), (pcard->curPos.Y - 0.66f), pcard->curPos.Z });
+		x2 = coords.X;
+		y2 = coords.Y;
 	} else {
-		ConvertCoords(pcard->curPos.X, (pcard->curPos.Y - 0.66f), &x1, &y1);
-		ConvertCoords((pcard->curPos.X - 0.48f), (0.39f + pcard->curPos.Y), &x2, &y2);
+		auto coords = getcoords({ pcard->curPos.X, (pcard->curPos.Y - 0.66f), pcard->curPos.Z });
+		x1 = coords.X;
+		y1 = coords.Y;
+		coords = getcoords({ (pcard->curPos.X - 0.48f), (0.39f + pcard->curPos.Y), pcard->curPos.Z });
+		x2 = coords.X;
+		y2 = coords.Y;
 	}
-	auto tmp = Resize(x1, y1);
-	x1 = tmp.X;
-	y1 = tmp.Y;
-	tmp = Resize(x2, y2);
-	x2 = tmp.X;
-	y2 = tmp.Y;
 	auto atk = adFont->getDimension(pcard->atkstring);
 	auto slash = adFont->getDimension(L"/");
 	if(pcard->type & TYPE_LINK) {
@@ -675,7 +679,7 @@ void Game::DrawStatus(ClientCard* pcard) {
 /*Draws the pendulum scale value of a card in the pendulum zone based on its relative position
 */
 void Game::DrawPendScale(ClientCard* pcard) {
-	int x, y, swap = (pcard->sequence > 1 && pcard->sequence != 6) ? 1 : 0;
+	int swap = (pcard->sequence > 1 && pcard->sequence != 6) ? 1 : 0;
 	float x0, y0, reverse = (pcard->controler == 0) ? 1.0f : -1.0f;
 	std::wstring scale;
 	if (swap) {
@@ -690,30 +694,17 @@ void Game::DrawPendScale(ClientCard* pcard) {
 		y0 = pcard->curPos.Y - 0.56f;
 	} else
 		y0 = pcard->curPos.Y + 0.29f;
-	ConvertCoords(x0, y0, &x, &y);
-	DrawShadowText(adFont, scale.c_str(), Resize(x - (12 * swap), y, x + (12 * (1 - swap)), y - 800), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, true);
+	auto coords = device->getSceneManager()->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition({ x0, y0, pcard->curPos.Z });
+	DrawShadowText(adFont, scale.c_str(), recti(coords.X - (12 * swap), coords.Y, coords.X + (12 * (1 - swap)), coords.Y - 800), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, true);
 }
 /*Draws the text in the middle of the bottom side of the zone
 */
 void Game::DrawStackIndicator(const std::wstring& text, S3DVertex* v, bool opponent) {
-	int x, y, width = textFont->getDimension(text).Width / 2, height = textFont->getDimension(text).Height / 2;
+	int width = textFont->getDimension(text).Width / 2, height = textFont->getDimension(text).Height / 2;
 	float x0 = (v[0].Pos.X + v[1].Pos.X) / 2;
 	float y0 = (opponent) ? v[0].Pos.Y : v[2].Pos.Y;
-	ConvertCoords(x0, y0, &x, &y);
-	auto tmp = Resize(x, y);
-	x = tmp.X;
-	y = tmp.Y;
-	DrawShadowText(numFont, text.c_str(), recti(x - width, y - height, x + width, y + height), Resize(0, 1, 0, 1), 0xffffff00, 0xff000000);
-}
-/*Converts the coordinates from the 3d plane to the 2d plane (the window)
-*/
-void Game::ConvertCoords(float x, float y, int* x1, int* y1) {
-	double angle = atan((y - FIELD_Y) / -FIELD_Z);
-	double screeny = tan(FIELD_ANGLE - angle);
-	double vlen = sqrt(1.0 + screeny * screeny);
-	double screenx = (x - FIELD_X) / (FIELD_Z / vlen / cos(angle));
-	*x1 = (screenx - CAMERA_LEFT) * 1024.0 / (CAMERA_RIGHT - CAMERA_LEFT);
-	*y1 = (screeny - CAMERA_BOTTOM) * 640.0 / (CAMERA_TOP - CAMERA_BOTTOM);
+	auto coords = device->getSceneManager()->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition({ x0, y0, 0 });
+	DrawShadowText(numFont, text.c_str(), recti(coords.X - width, coords.Y - height, coords.X + width, coords.Y + height), Resize(0, 1, 0, 1), 0xffffff00, 0xff000000);
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {
