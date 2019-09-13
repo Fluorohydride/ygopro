@@ -47,6 +47,8 @@ public:
 	static int ClientThread();
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
 	static bool CheckReady();
+	static void SetPlayersCount();
+	static std::pair<int, int> GetPlayersCount();
 	static ReplayStream replay_stream;
 	static Replay last_replay;
 	static bool old_replay;

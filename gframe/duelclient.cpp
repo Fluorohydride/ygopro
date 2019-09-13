@@ -126,7 +126,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
 			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
 			cscg.info.rule = mainGame->cbRule->getSelected();
-			cscg.info.mode = mainGame->cbMatchMode->getSelected();
+			cscg.info.mode = 0;
 			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
 			cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
@@ -137,31 +137,15 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.handshake = SERVER_HANDSHAKE;
-			if(cscg.info.mode == MODE_SINGLE) {
-				cscg.info.team1 = 1;
-				cscg.info.team2 = 1;
-				cscg.info.best_of = 0;
+			cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
+			cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
+			try {
+				cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText());
+			} catch(...) {
+				cscg.info.best_of = 1;
 			}
-			if(cscg.info.mode == MODE_MATCH) {
-				cscg.info.team1 = 1;
-				cscg.info.team2 = 1;
-				cscg.info.best_of = 3;
-			}
-			if(cscg.info.mode == MODE_TAG) {
-				cscg.info.team1 = 2;
-				cscg.info.team2 = 2;
-				cscg.info.best_of = 0;
-			}
-			if(cscg.info.mode == MODE_RELAY) {
-				cscg.info.team1 = 3;
-				cscg.info.team2 = 3;
-				cscg.info.best_of = 0;
+			if(mainGame->btnRelayMode->isPressed()) {
 				cscg.info.duel_flag |= DUEL_RELAY_MODE;
-			}
-			if(cscg.info.mode == MODE_ARBITRARY) {
-				cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
-				cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
-				cscg.info.best_of = 0;
 			}
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
@@ -219,6 +203,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->closeDoneSignal.Wait();
 					mainGame->closeSignal.unlock();
 					mainGame->gMutex.lock();
+					mainGame->dInfo.isInLobby = false;
 					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
 					mainGame->dField.Clear();
@@ -402,6 +387,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_CHANGE_SIDE: {
 		ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
+		mainGame->dInfo.isInLobby = false;
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dField.Clear();
@@ -446,6 +432,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_JOIN_GAME: {
 		temp_ver = 0;
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
+		mainGame->dInfo.isInLobby = true;
 		mainGame->dInfo.compat_mode = pkt->info.handshake != SERVER_HANDSHAKE;
 		if(mainGame->dInfo.compat_mode) {
 			if(pkt->info.mode = MODE_SINGLE) {
@@ -468,6 +455,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		pkt->info.duel_flag &= ~DUEL_RELAY_MODE;
 		mainGame->dInfo.team1 = pkt->info.team1;
 		mainGame->dInfo.team2 = pkt->info.team2;
+		mainGame->dInfo.best_of = pkt->info.best_of;
 		std::wstring str, str2;
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist)));
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1225), dataManager.GetSysString(1240 + pkt->info.rule)));
@@ -623,6 +611,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
+		mainGame->dInfo.isInLobby = false;
 		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isCatchingUp = false;
@@ -657,6 +646,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->SetMesageWindow();
 		mainGame->dInfo.hostname.clear();
 		mainGame->dInfo.clientname.clear();
+		SetPlayersCount();
 		int i;
 		for(i = 0; i < mainGame->dInfo.team1; i++) {
 			mainGame->dInfo.hostname.push_back(mainGame->stHostPrepDuelist[i]->getText());
@@ -701,6 +691,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
 		mainGame->gMutex.lock();
+		mainGame->dInfo.isInLobby = false;
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dField.Clear();
@@ -882,6 +873,35 @@ bool DuelClient::CheckReady() {
 	}
 	return ready1 && ready2;
 }
+void DuelClient::SetPlayersCount() {
+	int count1 = 0, count2 = 0;
+	for(int i = 0; i < mainGame->dInfo.team1; i++) {
+		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+			count1++;
+		}
+	}
+	for(int i = mainGame->dInfo.team1; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
+		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+			count2++;
+		}
+	}
+	mainGame->dInfo.team1 = count1;
+	mainGame->dInfo.team2 = count2;
+}
+std::pair<int, int> DuelClient::GetPlayersCount() {
+	int count1 = 0, count2 = 0;
+	for(int i = 0; i < mainGame->dInfo.team1; i++) {
+		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+			count1++;
+		}
+	}
+	for(int i = mainGame->dInfo.team1; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
+		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+			count2++;
+		}
+	}
+	return { count1, count2 };
+}
 #define COMPAT_READ(val1,val2,buf) (mainGame->dInfo.compat_mode) ? BufferIO::Read<val1>(buf) : BufferIO::Read<val2>(buf)
 int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	char* pbuf = msg;
@@ -932,6 +952,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ReplayPrompt(true);
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
+		mainGame->dInfo.isInLobby = false;
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);

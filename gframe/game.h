@@ -69,6 +69,7 @@ struct DuelInfo {
 	bool isCatchingUp;
 	bool isFirst;
 	bool isRelay;
+	bool isInLobby;
 	bool isSingleMode;
 	bool compat_mode;
 	bool is_shuffling;
@@ -76,11 +77,13 @@ struct DuelInfo {
 	int lp[2];
 	int startlp;
 	int duel_field;
+	int duel_params;
 	int extraval;
 	int turn;
 	short curMsg;
 	int team1;
 	int team2;
+	int best_of;
 	std::vector<std::wstring> clientname;
 	std::vector<std::wstring> hostname;
 	std::wstring strLP[2];
@@ -128,7 +131,6 @@ public:
 	void DrawStatus(ClientCard* pcard);
 	void DrawPendScale(ClientCard* pcard);
 	void DrawStackIndicator(const std::wstring& text, S3DVertex* v, bool opponent);
-	void ConvertCoords(float x, float y, int* x1, int* y1);
 	void DrawGUI();
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture);
@@ -360,11 +362,13 @@ public:
 	//create host
 	irr::gui::IGUIWindow* wCreateHost;
 	irr::gui::IGUIComboBox* cbLFlist;
+	irr::gui::IGUIButton* btnRelayMode;
 	irr::gui::IGUIComboBox* cbMatchMode;
 	irr::gui::IGUIComboBox* cbRule;
 	irr::gui::IGUIEditBox* ebTimeLimit;
 	irr::gui::IGUIEditBox* ebTeam1;
 	irr::gui::IGUIEditBox* ebTeam2;
+	irr::gui::IGUIEditBox* ebBestOf;
 	irr::gui::IGUIEditBox* ebStartLP;
 	irr::gui::IGUIEditBox* ebStartHand;
 	irr::gui::IGUIEditBox* ebDrawCount;
@@ -691,7 +695,6 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_RENAME_REPLAY		134
 #define BUTTON_EXPORT_DECK			135
 #define EDITBOX_TEAM_COUNT			136
-#define COMBOBOX_MATCH_MODE			137
 #define EDITBOX_CHAT				140
 #define EDITBOX_PORT_BOX			141
 #define BUTTON_MSG_OK				200
