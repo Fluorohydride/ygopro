@@ -2431,6 +2431,7 @@ void ClientField::CancelOrFinish() {
 		if(selected_cards.size() == 0) {
 			if(select_cancelable) {
 				DuelClient::SetResponseI(-1);
+				ShowCancelOrFinishButton(0);
 				if(mainGame->wCardSelect->isVisible())
 					mainGame->HideElement(mainGame->wCardSelect, true);
 				else
