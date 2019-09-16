@@ -25,11 +25,6 @@ function bundle_if_exists {
         # Binary seems to be incorrectly named with the current premake
         cp bin/$BUILD_CONFIG/$1.app deploy/$1.app/Contents/MacOS/$1
         dylibbundler -x deploy/$1.app/Contents/MacOS/$1 -b -d deploy/$1.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ -cd
-        # OpenSSL isn't in /usr/local/lib because Apple has deprecated it.
-        # libssl for some reason doesn't link to the libcrypto symlink in /usr/local/opt/openssl/lib,
-        # but directly to the Cellar location, and this isn't caught by dylibbundler
-        # This line likely needs to be updated if libcrypto's version ever changes, but not openssl's version
-        install_name_tool -change /usr/local/Cellar/openssl/1.0.2s/lib/libcrypto.1.0.0.dylib @executable_path/../Frameworks/libcrypto.1.0.0.dylib deploy/$1.app/Contents/Frameworks/libssl.1.0.0.dylib
 
         mkdir -p deploy/$1.app/Contents/Resources
         cp gframe/ygopro.icns deploy/$1.app/Contents/Resources/edopro.icns
