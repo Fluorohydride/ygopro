@@ -108,6 +108,19 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->device->closeDevice();
 				break;
 			}
+			case BUTTON_ONLINE_MULTIPLAYER: {
+				mainGame->HideElement(mainGame->wMainMenu);
+				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				break;
+			}
+			case BUTTON_JOIN_HOST2: {
+				break;
+			}
+			case BUTTON_JOIN_CANCEL2: {
+				mainGame->HideElement(mainGame->wRoomListPlaceholder);
+				mainGame->ShowElement(mainGame->wMainMenu);
+				break;
+			}
 			case BUTTON_LAN_MODE: {
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);

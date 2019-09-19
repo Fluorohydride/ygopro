@@ -152,12 +152,12 @@ bool Game::Initialize() {
 	//main menu
 	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
-	btnLanMode = env->addButton(Scale(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200).c_str());
-	btnSingleMode = env->addButton(Scale(10, 65, 270, 95), wMainMenu, BUTTON_SINGLE_MODE, dataManager.GetSysString(1201).c_str());
-	btnReplayMode = env->addButton(Scale(10, 100, 270, 130), wMainMenu, BUTTON_REPLAY_MODE, dataManager.GetSysString(1202).c_str());
-//	btnTestMode = env->addButton(Scale(10, 135, 270, 165), wMainMenu, BUTTON_TEST_MODE, dataManager.GetSysString(1203).c_str());
-	btnDeckEdit = env->addButton(Scale(10, 135, 270, 165), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204).c_str());
-	btnModeExit = env->addButton(Scale(10, 170, 270, 200), wMainMenu, BUTTON_MODE_EXIT, dataManager.GetSysString(1210).c_str());
+	btnOnlineMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_ONLINE_MULTIPLAYER, dataManager.GetSysString(2042).c_str());
+	btnLanMode = env->addButton(Scale(10, 65, 270, 95), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200).c_str());
+	btnSingleMode = env->addButton(Scale(10, 100, 270, 130), wMainMenu, BUTTON_SINGLE_MODE, dataManager.GetSysString(1201).c_str());
+	btnReplayMode = env->addButton(Scale(10, 135, 270, 165), wMainMenu, BUTTON_REPLAY_MODE, dataManager.GetSysString(1202).c_str());
+	btnDeckEdit = env->addButton(Scale(10, 170, 270, 200), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204).c_str());
+	btnModeExit = env->addButton(Scale(10, 205, 270, 235), wMainMenu, BUTTON_MODE_EXIT, dataManager.GetSysString(1210).c_str());
 	btnSingleMode->setEnabled(coreloaded);
 	//lan mode
 	wLanWindow = env->addWindow(Scale(220, 100, 800, 520), false, dataManager.GetSysString(1200).c_str());
@@ -794,6 +794,122 @@ bool Game::Initialize() {
 		stVolume->setVisible(false);
 		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
+
+	//server lobby
+	auto size = driver->getScreenSize();
+	//wchar_t room_list_buffer[256];
+	wRoomListPlaceholder = env->addStaticText(L"", rect<s32>(1, 1, size.Width-1, size.Height), false, false, 0, -1,false);
+	wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT,EGUIA_LOWERRIGHT,EGUIA_UPPERLEFT,EGUIA_LOWERRIGHT);
+	wRoomListPlaceholder->setVisible(false);
+
+	//server choice dropdownlist
+	irr::gui::IGUIStaticText* statictext = env->addStaticText(dataManager.GetSysString(2041).c_str(), rect<s32>(10, 30, 110, 50), false, false, wRoomListPlaceholder,-1,false); // 2041 = Server:
+	statictext->setOverrideColor(SColor(255,255,255,255));
+	serverChoice = env->addComboBox(rect<s32>(90, 25, 385, 50), wRoomListPlaceholder, SERVER_CHOICE);
+
+	//online nickname
+	statictext = env->addStaticText(dataManager.GetSysString(1220).c_str(), rect<s32>(10, 60, 110, 80), false, false, wRoomListPlaceholder,-1,false); // 1220 = Nickname:
+	statictext->setOverrideColor(SColor(255,255,255,255));
+	ebNickNameOnline = env->addEditBox(gameConf.nickname.c_str(), rect<s32>(90, 55, 275, 80), true, wRoomListPlaceholder);
+
+	//top right host online game button
+	btnCreateHost2 = env->addButton(rect<s32>(size.Width-10-110, 25, size.Width-10, 50), wRoomListPlaceholder, BUTTON_CREATE_HOST2, dataManager.GetSysString(1224).c_str());
+	btnCreateHost2->setAlignment(EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+	
+	//filter dropdowns
+	cbFilterRule = env->addComboBox(rect<s32>(392, 25, 532, 50), wRoomListPlaceholder, CB_FILTER_ALLOWED_CARDS);
+	cbFilterMatchMode = env->addComboBox(rect<s32>(392, 55, 532, 80), wRoomListPlaceholder, CB_FILTER_MATCH_MODE);
+	cbFilterBanlist = env->addComboBox(rect<s32>(392, 85, 532, 110), wRoomListPlaceholder, CB_FILTER_BANLIST);
+	cbFilterRule->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+	cbFilterMatchMode->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+	cbFilterBanlist->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+
+	std::wstring str = fmt::format(L"[{}]", dataManager.GetSysString(1225));
+	cbFilterRule->addItem(str.c_str());
+	cbFilterRule->addItem(dataManager.GetSysString(1240).c_str());
+	cbFilterRule->addItem(dataManager.GetSysString(1241).c_str());
+	cbFilterRule->addItem(dataManager.GetSysString(1242).c_str());
+	cbFilterRule->addItem(dataManager.GetSysString(1243).c_str());
+
+	str = fmt::format(L"[{}]", dataManager.GetSysString(1226));
+	cbFilterBanlist->addItem(str.c_str());
+	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+		cbFilterBanlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+
+	str = fmt::format(L"[{}]", dataManager.GetSysString(1227));
+	cbFilterMatchMode->addItem(str.c_str());
+	cbFilterMatchMode->addItem(dataManager.GetSysString(1244).c_str());
+	cbFilterMatchMode->addItem(dataManager.GetSysString(1245).c_str());
+	cbFilterMatchMode->addItem(dataManager.GetSysString(1246).c_str());
+
+	//filter rooms textbox
+	ebRoomNameText = env->addStaticText(dataManager.GetSysString(2021).c_str(), rect<s32>(572, 30, 682, 50), false, false, wRoomListPlaceholder); //2021 = Filter: 
+	ebRoomNameText->setOverrideColor(SColor(255,255,255,255));
+	ebRoomName = env->addEditBox(L"", rect<s32>(642, 25, 782, 50), true, wRoomListPlaceholder,EDIT_ONLINE_ROOM_NAME); //filter textbox
+	ebRoomName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	ebRoomNameText->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+	ebRoomName->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+
+	//show locked rooms checkbox
+	chkShowPassword = env->addCheckBox(false, rect<s32>(642, 55, 800, 80),wRoomListPlaceholder,CHECK_SHOW_LOCKED_ROOMS,dataManager.GetSysString(1994).c_str());
+	chkShowPassword->setName(L"White");
+	chkShowPassword->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+
+	//show active rooms checkbox
+	chkShowActiveRooms = env->addCheckBox(false, rect<s32>(642, 85, 800, 110),wRoomListPlaceholder,CHECK_SHOW_ACTIVE_ROOMS,dataManager.GetSysString(1985).c_str());
+	chkShowActiveRooms->setName(L"White");
+	chkShowActiveRooms->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_UPPERLEFT,EGUIA_UPPERLEFT);
+
+	//show all rooms in a table
+	roomListTable = env->addTable(rect<s32>(1, 118, size.Width-2, 550), wRoomListPlaceholder, TABLE_ROOMLIST, true);
+	roomListTable->setResizableColumns(true);
+	roomListTable->setAlignment(EGUIA_UPPERLEFT,EGUIA_LOWERRIGHT,EGUIA_UPPERLEFT,EGUIA_LOWERRIGHT);
+	roomListTable->addColumn(L" ");//lock
+	roomListTable->addColumn(dataManager.GetSysString(1225).c_str());//Allowed Cards:
+	roomListTable->addColumn(dataManager.GetSysString(1227).c_str());//Duel Mode:
+	roomListTable->addColumn(dataManager.GetSysString(1236).c_str());//master rule
+	roomListTable->addColumn(dataManager.GetSysString(1226).c_str());//Forbidden List:
+	roomListTable->addColumn(dataManager.GetSysString(2030).c_str());//Players:
+	roomListTable->addColumn(dataManager.GetSysString(2024).c_str());//Notes:
+	roomListTable->addColumn(dataManager.GetSysString(1988).c_str());//Status
+	roomListTable->setColumnWidth(0, 30); //lock
+	roomListTable->setColumnWidth(1, 110);//Allowed Cards:
+	roomListTable->setColumnWidth(2, 100);//Duel Mode:
+	roomListTable->setColumnWidth(3, 50);//master rule
+	roomListTable->setColumnWidth(4, 135);//Forbidden List:
+	roomListTable->setColumnWidth(5, 115);//Players:
+	roomListTable->setColumnWidth(6, 405);//Notes:
+	roomListTable->setColumnWidth(7, 140);//Status
+	roomListTable->setColumnOrdering(0, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(1, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(2, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(3, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(4, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(5, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(6, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(7, EGCO_FLIP_ASCENDING_DESCENDING);
+
+	//refresh button center bottom
+	btnLanRefresh2 = env->addButton(rect<s32>(462, size.Height-10-25-25-5, 562, size.Height-10-25-5), wRoomListPlaceholder, BUTTON_LAN_REFRESH2, dataManager.GetSysString(1217).c_str());
+	btnLanRefresh2->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT);
+
+	//server room password
+	wRoomPassword = env->addWindow(rect<s32>(357, 200, 667, 320), false, L"");
+	wRoomPassword->getCloseButton()->setVisible(false);
+	wRoomPassword->setVisible(false);
+	wRoomPassword->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_CENTER,EGUIA_CENTER);
+	env->addStaticText(dataManager.GetSysString(2042).c_str(), rect<s32>(20, 25, 290, 45), false, false, wRoomPassword);
+	ebRPName =  env->addEditBox(L"", rect<s32>(20, 50, 290, 70), true, wRoomPassword, -1);
+	ebRPName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	btnRPYes = env->addButton(rect<s32>(70, 80, 140, 105), wRoomPassword, BUTTON_ROOMPASSWORD_OK, dataManager.GetSysString(1211).c_str());
+	btnRPNo = env->addButton(rect<s32>(170, 80, 240, 105), wRoomPassword, BUTTON_ROOMPASSWORD_CANCEL, dataManager.GetSysString(1212).c_str());
+
+	//join cancel buttons
+	btnJoinHost2 = env->addButton(rect<s32>(size.Width-10-110, size.Height-10-25-25-5, size.Width-10, size.Height-10-25-5), wRoomListPlaceholder, BUTTON_JOIN_HOST2, dataManager.GetSysString(1223).c_str());
+	btnJoinCancel2 = env->addButton(rect<s32>(size.Width-10-110, size.Height-10-25, size.Width-10, size.Height-10), wRoomListPlaceholder, BUTTON_JOIN_CANCEL2, dataManager.GetSysString(1212).c_str());
+	btnJoinHost2->setAlignment(EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT);
+	btnJoinCancel2->setAlignment(EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT);
+
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
@@ -1778,7 +1894,7 @@ void Game::SetMesageWindow() {
 	}
 }
 void Game::OnResize() {
-	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 415));
+	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 450));
 	SetCentered(wCommitsLog);
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));

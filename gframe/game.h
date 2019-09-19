@@ -343,6 +343,7 @@ public:
 	irr::gui::IGUIWindow* wCommitsLog;
 	irr::gui::IGUIContextMenu* mTopMenu;
 	irr::gui::IGUIContextMenu* mRepositoriesInfo;
+	irr::gui::IGUIButton* btnOnlineMode;
 	irr::gui::IGUIButton* btnLanMode;
 	irr::gui::IGUIButton* btnSingleMode;
 	irr::gui::IGUIButton* btnReplayMode;
@@ -592,6 +593,32 @@ public:
 
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
+
+	//server lobby
+	irr::gui::IGUITable* roomListTable;
+	irr::gui::IGUIStaticText* wRoomListPlaceholder;
+	irr::gui::IGUIComboBox* serverChoice;
+	irr::gui::IGUIEditBox* ebNickNameOnline;
+	irr::gui::IGUIButton* btnCreateHost2;
+	irr::gui::IGUIComboBox* cbFilterRule;
+	irr::gui::IGUIComboBox* cbFilterMatchMode;
+	irr::gui::IGUIComboBox* cbFilterBanlist;
+	irr::gui::IGUIStaticText* ebRoomNameText;
+	irr::gui::IGUIEditBox* ebRoomName;
+	irr::gui::IGUICheckBox* chkShowPassword;
+	irr::gui::IGUICheckBox* chkShowActiveRooms;
+	irr::gui::IGUIButton* btnLanRefresh2;
+	irr::gui::IGUICheckBox* chkLinuxUnranked;
+	irr::gui::IGUIStaticText* ebLinuxBetaDescription;
+	irr::gui::IGUIStaticText* ebPasswordText;
+	irr::gui::IGUIEditBox* ebPassword;
+	irr::gui::IGUIWindow* wRoomPassword;
+	irr::gui::IGUIEditBox* ebRPName;
+	irr::gui::IGUIButton* btnRPYes;
+	irr::gui::IGUIButton* btnRPNo;
+	irr::gui::IGUIButton* btnJoinHost2;
+	irr::gui::IGUIButton* btnJoinCancel2;
+	irr::gui::IGUIEditBox* gameDescription;
 };
 
 extern Game* mainGame;
@@ -821,4 +848,22 @@ rect<T> Game::Scale(rect<T> rect) {
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 
 #define DECK_SEARCH_SCROLL_STEP		100
+
+#define TABLE_ROOMLIST				500
+#define BUTTON_ROOMPASSWORD_OK		501
+#define BUTTON_JOIN_HOST2			502
+#define BUTTON_JOIN_CANCEL2			503
+#define BUTTON_LAN_REFRESH2			504
+#define CHECK_LINUX_UNRANKED		505
+#define SERVER_CHOICE				506
+#define BUTTON_CREATE_HOST2			507
+#define CB_FILTER_ALLOWED_CARDS		508
+#define CB_FILTER_MATCH_MODE		509
+#define CB_FILTER_BANLIST			510
+#define EDIT_ONLINE_ROOM_NAME		511
+#define CHECK_SHOW_LOCKED_ROOMS		512
+#define CHECK_SHOW_ACTIVE_ROOMS		513
+#define BUTTON_ROOMPASSWORD_CANCEL	514
+#define BUTTON_ONLINE_MULTIPLAYER	515 //first button on main menu
+
 #endif // GAME_H
