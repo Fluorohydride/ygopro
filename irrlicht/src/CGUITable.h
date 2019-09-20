@@ -95,7 +95,7 @@ namespace gui
 		virtual void removeRow(u32 rowIndex);
 
 		//! clear the table rows, but keep the columns intact
-		virtual void clearRows();
+		virtual void clearRows(bool report_event);
 
 		//! Swap two row positions. This is useful for a custom ordering algo.
 		virtual void swapRows(u32 rowIndexA, u32 rowIndexB);

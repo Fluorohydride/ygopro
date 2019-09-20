@@ -113,6 +113,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 				break;
 			}
+			case BUTTON_LAN_REFRESH2: {
+				//load online rooms
+				break;
+			}
 			case BUTTON_JOIN_HOST2: {
 				break;
 			}

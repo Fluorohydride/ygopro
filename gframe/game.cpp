@@ -152,7 +152,7 @@ bool Game::Initialize() {
 	//main menu
 	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
-	btnOnlineMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_ONLINE_MULTIPLAYER, dataManager.GetSysString(2042).c_str());
+	btnOnlineMode = env->addButton(Scale(10, 30, 270, 60), wMainMenu, BUTTON_ONLINE_MULTIPLAYER, dataManager.GetSysString(2042).c_str());
 	btnLanMode = env->addButton(Scale(10, 65, 270, 95), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200).c_str());
 	btnSingleMode = env->addButton(Scale(10, 100, 270, 130), wMainMenu, BUTTON_SINGLE_MODE, dataManager.GetSysString(1201).c_str());
 	btnReplayMode = env->addButton(Scale(10, 135, 270, 165), wMainMenu, BUTTON_REPLAY_MODE, dataManager.GetSysString(1202).c_str());
@@ -909,6 +909,22 @@ bool Game::Initialize() {
 	btnJoinCancel2 = env->addButton(rect<s32>(size.Width-10-110, size.Height-10-25, size.Width-10, size.Height-10), wRoomListPlaceholder, BUTTON_JOIN_CANCEL2, dataManager.GetSysString(1212).c_str());
 	btnJoinHost2->setAlignment(EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT);
 	btnJoinCancel2->setAlignment(EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT);
+
+	//load server(s)
+	ServerInfo *serverInfo = new ServerInfo();
+	serverInfo->name = L"Ygopro Server";
+#ifdef DEFAULT_SERVER_IP
+	serverInfo->address = DEFAULT_SERVER_IP;
+	serverInfo->roomaddress = DEFAULT_SERVER_IP;
+#else
+	serverInfo->address = "127.0.0.1";
+	serverInfo->roomaddress = "127.0.0.1";
+#endif
+	serverInfo->port = 9729;
+	serverInfo->roomport = 4709;
+	serversVector.push_back(*serverInfo);
+
+	mainGame->serverChoice->addItem(serverInfo->name.c_str());
 
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
