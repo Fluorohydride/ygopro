@@ -891,7 +891,7 @@ void Game::MainLoop() {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
 				if((ncore = ChangeOCGcore(path, ocgcore))) {
-					corename = path;
+					corename = Utils::ToUnicodeIfNeeded(path);
 					ocgcore = ncore;
 					if(!coreloaded) {
 						coreloaded = true;
