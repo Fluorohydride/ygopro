@@ -291,7 +291,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 void ClientField::UpdateCard(int controler, int location, int sequence, char* data, int len) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
 	if(pcard) {
-		CoreUtils::Query query(data, mainGame->dInfo.compat_mode);
+		CoreUtils::Query query(data, mainGame->dInfo.compat_mode, len);
 		pcard->UpdateInfo(query);
 	}
 }
@@ -299,7 +299,7 @@ void ClientField::UpdateFieldCard(int controler, int location, char* data, int l
 	auto lst = GetList(location, controler);
 	if(!lst)
 		return;
-	CoreUtils::QueryStream queries(data, mainGame->dInfo.compat_mode);
+	CoreUtils::QueryStream queries(data, mainGame->dInfo.compat_mode, len);
 	auto cit = lst->begin();
 	for(auto& query : queries.queries) {
 		auto pcard = *cit++;
