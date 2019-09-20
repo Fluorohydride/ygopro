@@ -2679,7 +2679,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SUMMONING: {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		/*loc_info info = */ClientCard::read_location_info(pbuf);
+		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
 		if(!mainGame->soundManager->PlayChant(code))
 			mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::SUMMON);
 		if(!mainGame->dInfo.isCatchingUp) {
@@ -2700,7 +2700,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SPSUMMONING: {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		/*loc_info info = */ClientCard::read_location_info(pbuf);
+		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
 		if(!mainGame->soundManager->PlayChant(code))
 			mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::SPECIAL_SUMMON);
 		if(!mainGame->dInfo.isCatchingUp) {
@@ -3007,8 +3007,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_EQUIP: {
 		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::EQUIP);
-		loc_info info1 = ClientCard::read_location_info(pbuf);
-		loc_info info2 = ClientCard::read_location_info(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(mainGame->LocalPlayer(info1.controler), info1.location, info1.sequence);
 		ClientCard* pc2 = mainGame->dField.GetCard(mainGame->LocalPlayer(info2.controler), info2.location, info2.sequence);
 		if(mainGame->dInfo.isCatchingUp) {
@@ -3182,7 +3182,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_ATTACK: {
 		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::ATTACK);
-		loc_info info1 = ClientCard::read_location_info(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
 		info1.controler = mainGame->LocalPlayer(info1.controler);
 		mainGame->dField.attacker = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
 		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
