@@ -165,6 +165,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 	} else if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		bufferevent_disable(bev, EV_READ);
 		if(!is_closing) {
+			mainGame->dInfo.isInLobby = false;
 			if(connect_state == 0x1) {
 				temp_ver = 0;
 				mainGame->gMutex.lock();
@@ -203,7 +204,6 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->closeDoneSignal.Wait();
 					mainGame->closeSignal.unlock();
 					mainGame->gMutex.lock();
-					mainGame->dInfo.isInLobby = false;
 					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
 					mainGame->dField.Clear();
@@ -427,6 +427,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->stHintMsg->setText(dataManager.GetSysString(1409).c_str());
 		mainGame->stHintMsg->setVisible(true);
 		mainGame->gMutex.unlock();
+		break;
+	}
+	case STOC_CREATE_GAME: {
 		break;
 	}
 	case STOC_JOIN_GAME: {
@@ -1145,7 +1148,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int location = BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.lock();
-		mainGame->dField.UpdateFieldCard(player, location, pbuf);
+		mainGame->dField.UpdateFieldCard(player, location, pbuf, len - 2);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.unlock();
 		return true;
@@ -1156,7 +1159,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int seq = BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.lock();
-		mainGame->dField.UpdateCard(player, loc, seq, pbuf);
+		mainGame->dField.UpdateCard(player, loc, seq, pbuf, len - 3);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.unlock();
 		break;
@@ -3621,9 +3624,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.lock();
 		mainGame->dField.Clear();
-		uint32_t opts = BufferIO::Read<uint32_t>(pbuf);
-		mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts, 1);
-		mainGame->dInfo.extraval = opts & DUEL_SPEED;
+		if(mainGame->dInfo.compat_mode) {
+			int field = BufferIO::Read<uint8_t>(pbuf);
+			mainGame->dInfo.duel_field = field & 0xf;
+			mainGame->dInfo.extraval = field >> 4;
+		} else {
+			uint32_t opts = BufferIO::Read<uint32_t>(pbuf);
+			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts, 1);
+			mainGame->dInfo.extraval = opts & DUEL_SPEED;
+		}
 		mainGame->SetPhaseButtons();
 		int val = 0;
 		for(int i = 0; i < 2; ++i) {

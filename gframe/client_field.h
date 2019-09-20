@@ -90,8 +90,8 @@ public:
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
-	void UpdateCard(int controler, int location, int sequence, char* data);
-	void UpdateFieldCard(int controler, int location, char* data);
+	void UpdateCard(int controler, int location, int sequence, char* data, int len);
+	void UpdateFieldCard(int controler, int location, char* data, int len);
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();

@@ -40,8 +40,9 @@ loc_info ReadLocInfo(char*& p, bool compat = false);
 class Query {
 public:
 	Query() {};
-	Query(char*& buff) { Parse(buff); };
+	Query(char*& buff, bool compat = false, int len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
 	void Parse(char*& buff);
+	void ParseCompat(char*& buff, int len);
 	bool onfield_skipped = false;
 	uint32_t flag;
 	uint32_t code;
@@ -78,8 +79,9 @@ class QueryStream {
 public:
 	std::vector<Query> queries;
 	QueryStream() {};
-	QueryStream(char*& buff) { Parse(buff); };
+	QueryStream(char*& buff, bool compat = false, int len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
 	void Parse(char*& buff);
+	void ParseCompat(char*& buff, int len);
 	void GenerateBuffer(std::vector<uint8_t>& buffer);
 	void GeneratePublicBuffer(std::vector<uint8_t>& buffer);
 };

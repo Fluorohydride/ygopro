@@ -77,6 +77,59 @@ void Query::Parse(char*& current) {
 		}
 	}
 }
+#undef PARSE_SINGLE
+#define PARSE_SINGLE(query,value) if(flag & query) {\
+value = BufferIO::Read<decltype(value)>(current);\
+}
+
+void Query::ParseCompat(char*& current, int len) {
+	if(len == 4) {
+		onfield_skipped = true;
+		return;
+	}
+	flag = BufferIO::Read<int32_t>(current);
+	PARSE_SINGLE(QUERY_CODE, code)
+	PARSE_SINGLE(QUERY_POSITION, position)
+	PARSE_SINGLE(QUERY_ALIAS, alias)
+	PARSE_SINGLE(QUERY_TYPE, type)
+	PARSE_SINGLE(QUERY_LEVEL, level)
+	PARSE_SINGLE(QUERY_RANK, rank)
+	PARSE_SINGLE(QUERY_ATTRIBUTE, attribute)
+	PARSE_SINGLE(QUERY_RACE, race)
+	PARSE_SINGLE(QUERY_ATTACK, attack)
+	PARSE_SINGLE(QUERY_DEFENSE, defense)
+	PARSE_SINGLE(QUERY_BASE_ATTACK, base_attack)
+	PARSE_SINGLE(QUERY_BASE_DEFENSE, base_defense)
+	PARSE_SINGLE(QUERY_REASON, reason)
+	if(flag & QUERY_REASON_CARD)
+		reason_card = ReadLocInfo(current);
+	if(flag &  QUERY_EQUIP_CARD)
+		equip_card = ReadLocInfo(current);
+	if(flag & QUERY_TARGET_CARD) {
+		uint32_t count = BufferIO::Read<uint32_t>(current);
+		for(uint32_t i = 0; i < count; i++)
+			target_cards.push_back(ReadLocInfo(current));
+	}
+	if(flag & QUERY_OVERLAY_CARD) {
+		uint32_t count = BufferIO::Read<uint32_t>(current);
+		for(uint32_t i = 0; i < count; i++)
+			overlay_cards.push_back(BufferIO::Read<uint32_t>(current));
+	}
+	if(flag & QUERY_COUNTERS) {
+		uint32_t count = BufferIO::Read<uint32_t>(current);
+		for(uint32_t i = 0; i < count; i++)
+			counters.push_back(BufferIO::Read<uint32_t>(current));
+	}
+	PARSE_SINGLE(QUERY_OWNER, owner)
+	PARSE_SINGLE(QUERY_STATUS, status)
+	PARSE_SINGLE(QUERY_IS_PUBLIC, is_public)
+	PARSE_SINGLE(QUERY_LSCALE, lscale)
+	PARSE_SINGLE(QUERY_RSCALE, rscale)
+	if(flag &QUERY_LINK) {
+		link = BufferIO::Read<uint32_t>(current);
+		link_marker = BufferIO::Read<uint32_t>(current);
+	}
+}
 
 template<typename T>
 void insert_value(std::vector<uint8_t>& vec, T val) {
@@ -295,6 +348,15 @@ void QueryStream::Parse(char*& buff) {
 	char* current = buff;
 	while((current - buff) < size) {
 		queries.emplace_back(current);
+	}
+}
+
+void QueryStream::ParseCompat(char*& buff, int len) {
+	char* start = buff;
+	while((buff - start) < len) {
+		int size = BufferIO::Read<int32_t>(buff);
+		queries.emplace_back(buff, true, size);
+		buff += size - 4;
 	}
 }
 
