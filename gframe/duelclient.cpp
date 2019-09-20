@@ -2082,7 +2082,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_DECK: {
-		soundManager.PlaySoundEffect(SoundManager::Sounds::SHUFFLE);
+		soundManager.PlaySoundEffect(SoundManager::SFX::SHUFFLE);
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		if(mainGame->dField.deck[player].size() < 2)
 			return true;
