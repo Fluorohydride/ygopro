@@ -2,6 +2,7 @@
 #define CLIENT_CARD_H
 
 #include "config.h"
+#include "core_utils.h"
 #include <vector>
 #include <set>
 #include <map>
@@ -43,12 +44,6 @@ struct CardString {
 	std::wstring name;
 	std::wstring text;
 	std::wstring desc[16];
-};
-struct loc_info {
-	u8 controler;
-	u8 location;
-	u32 sequence;
-	u32 position;
 };
 
 class ClientCard {
@@ -118,9 +113,8 @@ public:
 
 	ClientCard();
 	void SetCode(int code);
-	void UpdateInfo(char* buf);
+	void UpdateInfo(const CoreUtils::Query& query);
 	void ClearTarget();
-	static loc_info read_location_info(char*& p);
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
 	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
 	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);

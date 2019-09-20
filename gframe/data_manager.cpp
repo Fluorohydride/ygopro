@@ -300,10 +300,9 @@ std::wstring DataManager::FormatLinkMarker(int link_marker) {
 		res += L"[\u2198]";
 	return res;
 }
-int DataManager::CardReader(int code, void* pData) {
-	if(!dataManager.GetData(code, (CardData*)pData))
-		memset(pData, 0, sizeof(CardData));
-	return 0;
+void DataManager::CardReader(void* payload, int code, CardData* data) {
+	if(!static_cast<DataManager*>(payload)->GetData(code, (CardData*)data))
+		memset(data, 0, sizeof(CardData));
 }
 
 }

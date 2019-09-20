@@ -36,6 +36,7 @@ public:
 	void RefreshHand(int player, int flag = 0x781fff, int use_cache = 1);
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
 	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
+	void RefreshLocation(int player, int flag, int location, int use_cache = 1);
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
 	
 	static void GenericTimer(evutil_socket_t fd, short events, void* arg);
@@ -44,27 +45,7 @@ public:
 	static ReplayStream replay_stream;
 	
 protected:
-	class Packet {
-	public:
-		Packet() {}
-		Packet(char * buf, int len) {
-			uint8_t msg = BufferIO::Read<uint8_t>(buf);
-			Set(msg, buf, len);
-		};
-		Packet(int msg, char * buf, int len) {
-			Set(msg, buf, len);
-		};
-		void Set(int msg, char * buf, int len) {
-			message = msg;
-			data.resize(len);
-			if(len)
-				memcpy(data.data(), buf, data.size());
-			data.insert(data.begin(), (uint8_t)message);
-		};
-		uint8_t message;
-		std::vector<unsigned char> data;
-	};
-	std::vector<Packet> packets_cache;
+	std::vector<CoreUtils::Packet> packets_cache;
 	class duelist {
 	public:
 		DuelPlayer* player;

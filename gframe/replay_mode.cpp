@@ -25,7 +25,8 @@ bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
 		return false;
 	skip_turn = skipturn;
 	if(skip_turn < 0)
-		skip_turn = 0; 
+		skip_turn = 0;
+	yrp = is_yrp;
 	if(is_yrp)
 		std::thread(OldReplayThread).detach();
 	else
@@ -125,7 +126,7 @@ int ReplayMode::ReplayThread() {
 }
 void ReplayMode::EndDuel() {
 	if(yrp)
-		end_duel(pduel);
+		OCG_DestroyDuel(pduel);
 	if(!is_closing) {
 		mainGame->actionSignal.Reset();
 		mainGame->gMutex.lock();
@@ -158,7 +159,8 @@ void ReplayMode::EndDuel() {
 }
 void ReplayMode::Restart(bool refresh) {
 	if(yrp) {
-		end_duel(pduel);
+		OCG_DestroyDuel(pduel);
+		//end_duel(pduel);
 		cur_replay.Rewind();
 	}
 	mainGame->dInfo.isInDuel = false;
@@ -193,11 +195,11 @@ void ReplayMode::Undo() {
 }
 bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 	is_restarting = false;
-	while(true) {
+	{
 		if(is_closing)
 			return false;
 		if(is_restarting)
-			break;
+			return true;
 		if(is_swapping) {
 			mainGame->gMutex.lock();
 			mainGame->dField.ReplaySwap();
@@ -303,7 +305,6 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				is_paused = false;
 			}
 		}
-		break;
 	}
 	return true;
 }

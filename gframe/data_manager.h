@@ -47,7 +47,7 @@ public:
 	std::unordered_map<unsigned int, std::wstring> _sysStrings;
 
 	static const wchar_t* unknown_string;
-	static int CardReader(int, void*);
+	static void CardReader(void* payload, int code, CardData* data);
 
 };
 

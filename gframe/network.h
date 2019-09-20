@@ -1,6 +1,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include "dllinterface.h"
 #include "config.h"
 #include "deck_manager.h"
 #include <event2/event.h>
@@ -148,7 +149,7 @@ public:
 	DuelPlayer* host_player;
 	HostInfo host_info;
 	int duel_stage;
-	void* pduel;
+	OCG_Duel pduel;
 	wchar_t name[20];
 	wchar_t pass[20];
 };

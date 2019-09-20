@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "dllinterface.h"
 #include "config.h"
 #include "client_field.h"
 #include "deck_con.h"
@@ -195,11 +196,11 @@ public:
 	static bool CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input = false, bool transform_token = false);
 	static bool CompareStrings(std::wstring input, std::wstring second_term, bool transform_input = false, bool transform_term = false);
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
-	void* SetupDuel(uint32 seed);
-	std::vector<unsigned char> LoadScript(const std::string& script_name);
-	std::vector<unsigned char> PreLoadScript(void* pduel, const std::string& script_name);
-	static byte* ScriptReader(const char* script_name, int* slen);
-	static int MessageHandler(void* fduel, int type);
+	OCG_Duel SetupDuel(OCG_DuelOptions opts);
+	std::vector<char> LoadScript(const std::string& script_name);
+	bool LoadScript(OCG_Duel pduel, const std::string& script_name);
+	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
+	static void MessageHandler(void* payload, const char* string, int type);
 
 	std::mutex gMutex;
 	std::mutex analyzeMutex;

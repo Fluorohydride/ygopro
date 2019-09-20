@@ -57,7 +57,7 @@ bool Game::Initialize() {
 	filesystem = device->getFileSystem();
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
-	if(!(ocgcore = LoadOCGcore("./")) && !(ocgcore = LoadOCGcore("./expansions/")))
+	if(!(ocgcore = LoadOCGcore(TEXT("./"))) && !(ocgcore = LoadOCGcore(TEXT("./expansions/"))))
 		coreloaded = false;
 #endif
 	auto logger = device->getLogger();
@@ -2056,8 +2056,8 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-std::vector<unsigned char> Game::LoadScript(const std::string& _name) {
-	std::vector<unsigned char> buffer;
+std::vector<char> Game::LoadScript(const std::string& _name) {
+	std::vector<char> buffer;
 	std::ifstream script;
 	path_string name = Utils::ParseFilename(_name);
 	for(auto& path : script_dirs) {
@@ -2084,36 +2084,28 @@ std::vector<unsigned char> Game::LoadScript(const std::string& _name) {
 	buffer.insert(buffer.begin(), std::istreambuf_iterator<char>(script), std::istreambuf_iterator<char>());
 	return buffer;
 }
-std::vector<unsigned char> Game::PreLoadScript(void* pduel, const std::string& script_name) {
-	int len = 0;
-	std::vector<unsigned char> buf = LoadScript(script_name);
-	preload_script(pduel, (char*)script_name.c_str(), 0, buf.size(), (char*)buf.data());
-	return buf;
+bool Game::LoadScript(OCG_Duel pduel, const std::string& script_name) {
+	auto buf = LoadScript(script_name);
+	return buf.size() && OCG_LoadScript(pduel, buf.data(), buf.size(), script_name.c_str());
 }
-void* Game::SetupDuel(uint32 seed) {
-	set_script_reader((script_reader)ScriptReader);
-	set_card_reader((card_reader)DataManager::CardReader);
-	set_message_handler((message_handler)MessageHandler);
-	void* pduel = create_duel(seed);
-	PreLoadScript(pduel, "constant.lua");
-	PreLoadScript(pduel, "utility.lua");
+OCG_Duel Game::SetupDuel(OCG_DuelOptions opts) {
+	opts.cardReader = (OCG_DataReader)&DataManager::CardReader;
+	opts.payload1 = &dataManager;
+	opts.scriptReader = (OCG_ScriptReader)&ScriptReader;
+	opts.payload2 = this;
+	opts.logHandler = (OCG_LogHandler)&MessageHandler;
+	opts.payload3 = this;
+	OCG_Duel pduel = nullptr;
+	OCG_CreateDuel(&pduel, opts);
+	LoadScript(pduel, "constant.lua");
+	LoadScript(pduel, "utility.lua");
 	return pduel;
 }
-byte* Game::ScriptReader(const char* script_name, int* slen) {
-	static std::vector<unsigned char> buffer;
-	buffer = mainGame->LoadScript(script_name);
-    *slen = buffer.size();
-    if(buffer.empty())
-        return 0;
-	return buffer.data();
+int Game::ScriptReader(void* payload, OCG_Duel duel, const char* name) {
+	return static_cast<Game*>(payload)->LoadScript(duel, name);
 }
-int Game::MessageHandler(void* fduel, int type) {
-	if(!enable_log)
-		return 0;
-	char msgbuf[1024];
-	get_log_message(fduel, (byte*)msgbuf);
-	mainGame->AddDebugMsg(msgbuf);
-	return 0;
+void Game::MessageHandler(void* payload, const char* string, int type) {
+	static_cast<Game*>(payload)->AddDebugMsg(string);
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));

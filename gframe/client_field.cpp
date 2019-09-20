@@ -6,6 +6,7 @@
 #include "image_manager.h"
 #include "game.h"
 #include "materials.h"
+#include "core_utils.h"
 
 namespace ygo {
 
@@ -289,19 +290,21 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 }
 void ClientField::UpdateCard(int controler, int location, int sequence, char* data) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
-	if(pcard)
-		pcard->UpdateInfo(data + 4);
+	if(pcard) {
+		CoreUtils::Query query(data);
+		pcard->UpdateInfo(query);
+	}
 }
 void ClientField::UpdateFieldCard(int controler, int location, char* data) {
 	auto lst = GetList(location, controler);
 	if(!lst)
 		return;
-	int len;
-	for(auto cit = lst->begin(); cit != lst->end(); ++cit) {
-		len = BufferIO::Read<int32_t>(data);
-		if(len > 8)
-			(*cit)->UpdateInfo(data);
-		data += len - 4;
+	CoreUtils::QueryStream queries(data);
+	auto cit = lst->begin();
+	for(auto& query : queries.queries) {
+		auto pcard = *cit++;
+		if(pcard)
+			pcard->UpdateInfo(query);
 	}
 }
 void ClientField::ClearCommandFlag() {

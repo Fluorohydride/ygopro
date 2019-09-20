@@ -1,46 +1,36 @@
-#ifdef YGOPRO_BUILD_DLL
 #ifndef DLL_INTERFACE_H_
 #define DLL_INTERFACE_H_
-
-#include "common.h"
-#include "config.h"
-
-struct card_data;
-
-typedef byte* (*script_reader)(const char*, int*);
-typedef uint32 (*card_reader)(uint32, card_data*);
-typedef uint32 (*message_handler)(void*, uint32);
+#ifndef YGOPRO_BUILD_DLL
+#include <ocgapi.h>
+#else
+#include "ocgapi_types.h"
+#include <string>
 bool ReloadCore(void* handle);
 void UnloadCore(void *handle);
+#ifdef UNICODE
 void* LoadOCGcore(const std::wstring& path);
-void* LoadOCGcore(const std::string& path);
 void* ChangeOCGcore(const std::wstring& path, void* handle);
+#else
+void* LoadOCGcore(const std::string& path);
 void* ChangeOCGcore(const std::string& path, void* handle);
+#endif
 
-extern int(*get_api_version)(int* min);
+extern void(*OCG_GetVersion)(int* major, int* minor);
 
-extern void(*set_script_reader)(script_reader f);
-extern void(*set_card_reader)(card_reader f);
-extern void(*set_message_handler)(message_handler f);
+extern int(*OCG_CreateDuel)(OCG_Duel* duel, OCG_DuelOptions options);
+extern void(*OCG_DestroyDuel)(OCG_Duel duel);
+extern void(*OCG_DuelNewCard)(OCG_Duel duel, OCG_NewCardInfo info);
+extern int(*OCG_StartDuel)(OCG_Duel duel);
 
-extern ptr(*create_duel)(uint32 seed);
-extern void(*start_duel)(ptr pduel, int32 options);
-extern void(*end_duel)(ptr pduel);
-extern void(*set_player_info)(ptr pduel, int32 playerid, int32 lp, int32 startcount, int32 drawcount);
-extern void(*get_log_message)(ptr pduel, byte* buf);
-extern int32(*get_message)(ptr pduel, byte* buf);
-extern int32(*process)(ptr pduel);
-extern void(*new_card)(ptr pduel, uint32 code, uint8 owner, uint8 playerid, uint8 location, uint8 sequence, uint8 position, uint32 duelist);
-extern int32(*get_cached_query)(ptr pduel, byte* buf);
-extern int32(*query_card)(ptr pduel, uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache, int32 ignore_cache);
-extern int32(*query_field_count)(ptr pduel, uint8 playerid, uint8 location);
-extern int32(*query_field_card)(ptr pduel, uint8 playerid, uint8 location, int32 query_flag, byte* buf, int32 use_cache, int32 ignore_cache);
-extern int32(*query_field_info)(ptr pduel, byte* buf);
-extern void(*set_responsei)(ptr pduel, int32 value);
-extern void(*set_responseb)(ptr pduel, byte* buf, size_t len);
-extern int32(*preload_script)(ptr pduel, char* script, int32 len, int32 scriptlen, char* scriptbuff);
+extern int(*OCG_DuelProcess)(OCG_Duel duel);
+extern void*(*OCG_DuelGetMessage)(OCG_Duel duel, uint32_t* length);
+extern void(*OCG_DuelSetResponse)(OCG_Duel duel, void* buffer, uint32_t length);
+extern int(*OCG_LoadScript)(OCG_Duel duel, const char* buffer, uint32_t length, const char* name);
 
-byte* default_script_reader(const char* script_name, int* len);
+extern uint32_t(*OCG_DuelQueryCount)(OCG_Duel duel, uint8_t team, uint32_t loc);
+extern void*(*OCG_DuelQuery)(OCG_Duel duel, uint32_t* length, OCG_QueryInfo info);
+extern void*(*OCG_DuelQueryLocation)(OCG_Duel duel, uint32_t* length, OCG_QueryInfo info);
+extern void*(*OCG_DuelQueryField)(OCG_Duel duel, uint32_t* length);
 
-#endif /* DLL_INTERFACE_H_ */
 #endif //YGOPRO_BUILD_DLL
+#endif /* DLL_INTERFACE_H_ */

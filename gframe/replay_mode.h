@@ -1,17 +1,19 @@
 #ifndef REPLAY_MODE_H
 #define REPLAY_MODE_H
 
+#include "dllinterface.h"
 #include "config.h"
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "replay.h"
+#include "core_utils.h"
 #include <random>
 
 namespace ygo {
 
 class ReplayMode {
 private:
-	static void* pduel;
+	static OCG_Duel pduel;
 	static bool yrp;
 	static bool is_continuing;
 	static bool is_closing;
@@ -42,7 +44,7 @@ public:
 	static void Restart(bool refresh);
 	static void Undo();
 	static bool ReplayAnalyze(ReplayPacket p);
-	static bool ReplayAnalyze(char* msg, unsigned int len);
+	static bool ReplayAnalyze(CoreUtils::Packet packet);
 
 	static void ReplayRefresh(int player, int location, int flag = 0xf81fff);
 	static void ReplayRefresh(int flag = 0xf81fff);

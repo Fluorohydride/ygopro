@@ -32,9 +32,9 @@ struct ReplayHeader {
 class ReplayPacket {
 public:
 	ReplayPacket() {}
-	ReplayPacket(char * buf, int len);
-	ReplayPacket(int msg, char * buf, int len);
-	void Set(int msg, char * buf, int len);
+	ReplayPacket(char* buf, int len);
+	ReplayPacket(int msg, char* buf, int len);
+	void Set(int msg, char* buf, int len);
 	int message;
 	std::vector<unsigned char> data;
 };
