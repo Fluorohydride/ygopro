@@ -65,6 +65,7 @@ deploy:
   script: bash ./ocgcore/travis/deploy-windows.sh
   on:
     condition: "$TRAVIS_OS_NAME == windows"
+    repo: edo9300/ygopro
 - provider: pages
   skip_cleanup: true
   local_dir: deploy
@@ -73,3 +74,4 @@ deploy:
   target_branch: $DEPLOY_BRANCH
   on:
     condition: "$TRAVIS_OS_NAME != windows"
+    repo: edo9300/ygopro
