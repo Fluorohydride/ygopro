@@ -861,7 +861,7 @@ void Game::MainLoop() {
 					deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 				}
 				if(repo.has_core) {
-					cores_to_load.insert(cores_to_load.begin(), BufferIO::DecodeUTF8s(repo.core_path));
+					cores_to_load.insert(cores_to_load.begin(), Utils::ParseFilename(repo.core_path));
 				}
 				std::string text;
 				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += n + "\n\n"; });
