@@ -361,7 +361,6 @@ void QueryStream::ParseCompat(char*& buff, int len) {
 }
 
 void QueryStream::GenerateBuffer(std::vector<uint8_t>& buffer) {
-	insert_value<uint32_t>(buffer, 0);
 	std::vector<uint8_t> tmp_buffer;
 	for(auto& query : queries) {
 		query.GenerateBuffer(tmp_buffer, false);
@@ -371,13 +370,12 @@ void QueryStream::GenerateBuffer(std::vector<uint8_t>& buffer) {
 }
 
 void QueryStream::GeneratePublicBuffer(std::vector<uint8_t>& buffer) {
-	insert_value<uint32_t>(buffer, 0);
-	auto current = buffer.size();
+	std::vector<uint8_t> tmp_buffer;
 	for(auto& query : queries) {
-		query.GenerateBuffer(buffer, true);
+		query.GenerateBuffer(tmp_buffer, true);
 	}
-	uint32_t size = buffer.size() - current;
-	memcpy(&buffer[current - sizeof(size)], &size, sizeof(size));
+	insert_value<uint32_t>(buffer, tmp_buffer.size());
+	buffer.insert(buffer.end(), tmp_buffer.begin(), tmp_buffer.end());
 }
 
 PacketStream::PacketStream(char* buff, int len) {
