@@ -357,6 +357,9 @@ int ServerLobby::GetRoomsThread() {
 		mainGame->env->addMessageBox(L"Error 05", dataManager.GetSysString(2037).c_str());
 		curl_easy_cleanup(curl_handle);
 		Utils::changeCursor(ECI_NORMAL);
+		mainGame->btnLanRefresh2->setEnabled(true);
+		mainGame->serverChoice->setEnabled(true);
+		mainGame->roomListTable->setVisible(true);
 		return 0;
 	}
 
