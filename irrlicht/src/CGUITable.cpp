@@ -213,6 +213,10 @@ EGUI_ORDERING_MODE CGUITable::getActiveColumnOrdering() const
 	return CurrentOrdering;
 }
 
+void CGUITable::setActiveColumnOrdering(EGUI_ORDERING_MODE mode)
+{
+	CurrentOrdering = mode;
+}
 
 void CGUITable::setColumnWidth(u32 columnIndex, u32 width)
 {
@@ -603,6 +607,18 @@ bool CGUITable::OnEvent(const SEvent &event)
 						setSelected(Selected+1);
 					}
 					break;
+				case irr::KEY_HOME:
+					setSelected(0);
+					if(VerticalScrollBar->isVisible()) {
+						VerticalScrollBar->setPos(0);
+					}
+					break;
+				case irr::KEY_END:
+					setSelected(Rows.size()-1);
+					if(VerticalScrollBar->isVisible()) {
+						VerticalScrollBar->setPos(VerticalScrollBar->getMax());
+					}
+					break;
 			}
 			}
 			break;
@@ -969,9 +985,7 @@ void CGUITable::draw()
 
 	// draw background for whole element
 #ifdef ROOMLISTTABLEFULL
-	skin->draw3DSunkenPane(this, video::SColor(150,0,0,0), true, DrawBack, AbsoluteRect, &AbsoluteClippingRect);
-	irr::video::IVideoDriver* drvr = Environment->getVideoDriver();
-	video::ITexture * lockTexture = drvr->getTexture("textures/roombrowser/lock.png");
+	driver->draw2DRectangle(video::SColor(150, 0, 0, 0), AbsoluteRect, &AbsoluteClippingRect);
 #else
 	skin->draw3DSunkenPane(this, skin->getColor(EGDC_3D_HIGH_LIGHT), true, DrawBack, AbsoluteRect, &AbsoluteClippingRect);
 #endif
@@ -1002,7 +1016,7 @@ void CGUITable::draw()
 	for ( u32 i = 0 ; i < Rows.size() ; ++i )
 	{
 		if ( Rows[i].Items[0].Color == red) {
-			skin->draw3DSunkenPane(this, video::SColor(150,250,50,50), true, DrawBack, rowRect, &AbsoluteClippingRect);
+			driver->draw2DRectangle(video::SColor(150,250,50,50), rowRect, &AbsoluteClippingRect);
 		} else if ( Rows[i].Items[0].Color == gray) {
 			skin->draw3DSunkenPane(this, gray, true, DrawBack, rowRect, &AbsoluteClippingRect);
 		}
@@ -1032,6 +1046,7 @@ void CGUITable::draw()
 #ifdef ROOMLISTTABLEFULL
 				//! CUSTOM DRAW IMAGE START
 				if (Rows[i].Items[j].Text == "textures/roombrowser/lock.png") {
+					video::ITexture * lockTexture = driver->getTexture("textures/roombrowser/lock.png");
 					if(lockTexture != NULL) {
 						driver->draw2DImage(lockTexture, core::position2d<s32>(textRect.UpperLeftCorner.X+2, textRect.UpperLeftCorner.Y+4), irr::core::recti(0,0,14,16), &clientClip,irr::video::SColor(255,255,255,255),true);
 						textRect.UpperLeftCorner.X += lockTexture->getSize().Width + CellWidthPadding;

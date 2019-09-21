@@ -53,6 +53,7 @@ namespace gui
 
 		//! Returns the ordering used by the currently active column
 		virtual EGUI_ORDERING_MODE getActiveColumnOrdering() const;
+		virtual void setActiveColumnOrdering(EGUI_ORDERING_MODE);
 
 		//! set a column width
 		virtual void setColumnWidth(u32 columnIndex, u32 width);

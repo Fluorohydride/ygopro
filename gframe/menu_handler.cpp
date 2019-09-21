@@ -114,7 +114,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_REFRESH2: {
-				//load online rooms
+				mainGame->roomListTable->clearRows(true);
 				break;
 			}
 			case BUTTON_JOIN_HOST2: {
@@ -597,6 +597,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {
+			case CHECK_SHOW_LOCKED_ROOMS: {
+				mainGame->roomListTable->clearRows(false);
+				ServerLobby::FillOnlineRooms();
+				break;
+			}
+			case CHECK_SHOW_ACTIVE_ROOMS: {
+				mainGame->roomListTable->clearRows(true);
+				break;
+			}
 			case CHECKBOX_HP_READY: {
 				if(!caller->isEnabled())
 					break;
@@ -681,6 +690,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::gui::EGET_TABLE_CHANGED: {
+			break;
+		}
+		case irr::gui::EGET_TABLE_SELECTED_AGAIN: {
+			break;
+		}
+		case irr::gui::EGET_TABLE_ROWS_CLEARED: {
+			//load online rooms
+			ServerLobby::RefreshRooms();
+			break;
+		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch (id) {
 			case COMBOBOX_DUEL_RULE: {
@@ -728,6 +748,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_ESCAPE: {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
+			break;
+		}
+		case irr::KEY_F5: {
+			if (!event.KeyInput.PressedDown) {
+				if(mainGame->wRoomListPlaceholder->isVisible() && mainGame->btnLanRefresh2->isEnabled()) {
+					mainGame->roomListTable->clearRows(true);
+				}
+			}
+			return true;
 			break;
 		}
 		case irr::KEY_F12: {

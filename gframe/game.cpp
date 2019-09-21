@@ -920,8 +920,17 @@ bool Game::Initialize() {
 	serverInfo->address = "127.0.0.1";
 	serverInfo->roomaddress = "127.0.0.1";
 #endif
+#ifdef DEFAULT_SERVER_PORT
+	serverInfo->port = DEFAULT_SERVER_PORT;
+#else
 	serverInfo->port = 9729;
+#endif
+#ifdef DEFAULT_SERVER_ROOMPORT
+	serverInfo->roomport = DEFAULT_SERVER_ROOMPORT;
+#else
 	serverInfo->roomport = 4709;
+#endif
+	
 	serversVector.push_back(*serverInfo);
 
 	mainGame->serverChoice->addItem(serverInfo->name.c_str());

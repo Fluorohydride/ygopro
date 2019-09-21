@@ -104,15 +104,15 @@ struct ServerInfo {
 	int roomport;
 };
 struct RoomInfo {
-	std::string roomname;
+	std::wstring roomname;
 	int roomid;
 	bool isStarted;
 	bool passwordNeeded;
-	std::string host;
+	std::wstring players[4];
 	bool isMatch;
 	bool isTag;
 	bool isRated;
-	std::string roomdescription;
+	std::wstring roomdescription;
 	unsigned short banlist;
 };
 struct FadingUnit {
