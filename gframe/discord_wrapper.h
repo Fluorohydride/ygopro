@@ -10,6 +10,7 @@ class DiscordWrapper {
 public:
 	enum PresenceType {
 		MENU,
+		IN_LOBBY,
 		DUEL,
 		DUEL_STARTED,
 		REPLAY,
