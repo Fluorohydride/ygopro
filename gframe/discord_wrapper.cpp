@@ -23,6 +23,7 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 	handlers.joinGame = OnJoin;
 	handlers.spectateGame = OnSpectate;
 	handlers.joinRequest = OnJoinRequest;
+#if defined(_WIN32) || defined(__linux__)
 #ifdef _WIN32
 	TCHAR exepath[MAX_PATH];
 	GetModuleFileName(nullptr, exepath, MAX_PATH);
@@ -36,12 +37,13 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 		filename = ygo::Utils::GetFileName(buff);
 	}
 	std::string param = fmt::format("bash -c \"cd {}; ./{} from_discord\"", workingDir, filename);
-#else
-	std::string param = "open " + workingDir + "/ygopro.app --args from_discord";
-#endif
-	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).c_str());
-	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
 #endif //_WIN32
+	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).c_str());
+#else
+	RegisterURL(DISCORD_APP_ID);
+#endif //_WIN32
+	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
+#endif //DISCORD_APP_ID
 	return true;
 }
 

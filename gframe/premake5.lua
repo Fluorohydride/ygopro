@@ -45,6 +45,7 @@ local ygopro_config=function(static_core)
 		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl" }
 
 	filter "system:macosx"
+		files "discord_register_url_osx.m"
 		defines "LUA_USE_MACOSX"
 		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }

@@ -18,8 +18,12 @@
 extern "C" {
 #endif
 
+#ifdef __APPLE__
+void RegisterURL(const char* applicationId);
+#else
 DISCORD_EXPORT void Discord_Register(const char* applicationId, const char* command);
 DISCORD_EXPORT void Discord_RegisterSteamGame(const char* applicationId, const char* steamId);
+#endif //__APPLE__
 
 #ifdef __cplusplus
 }
