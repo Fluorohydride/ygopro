@@ -24,3 +24,11 @@ cd libevent-2.1.11-stable
 ./configure --prefix /usr/local/Cellar/libevent/2.1.11
 make -j2
 make install
+
+cd /tmp
+git clone --depth=1 https://github.com/discordapp/discord-rpc.git
+mkdir -p discord-rpc/build
+cd discord-rpc/build
+cmake ..
+cmake --build .
+cmake --install .
