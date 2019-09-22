@@ -145,7 +145,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				cscg.info.best_of = 1;
 			}
 			if(mainGame->btnRelayMode->isPressed()) {
-				cscg.info.duel_flag |= DUEL_RELAY_MODE;
+				cscg.info.duel_flag |= DUEL_RELAY;
 			}
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
@@ -454,8 +454,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				pkt->info.best_of = 0;
 			}
 		}
-		mainGame->dInfo.isRelay = pkt->info.duel_flag & DUEL_RELAY_MODE;
-		pkt->info.duel_flag &= ~DUEL_RELAY_MODE;
+		mainGame->dInfo.isRelay = pkt->info.duel_flag & DUEL_RELAY;
+		pkt->info.duel_flag &= ~DUEL_RELAY;
 		mainGame->dInfo.team1 = pkt->info.team1;
 		mainGame->dInfo.team2 = pkt->info.team2;
 		mainGame->dInfo.best_of = pkt->info.best_of;
@@ -574,7 +574,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.unlock();
-		mainGame->dInfo.extraval = (!mainGame->dInfo.compat_mode && pkt->info.extra_rules & DUEL_SPEED) ? 1 : 0;
+		mainGame->dInfo.extraval = (!mainGame->dInfo.compat_mode && pkt->info.extra_rules & SPEED_DUEL) ? 1 : 0;
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
 		connect_state |= 0x4;
 		break;
@@ -3631,7 +3631,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			uint32_t opts = BufferIO::Read<uint32_t>(pbuf);
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts, 1);
-			mainGame->dInfo.extraval = opts & DUEL_SPEED;
+			mainGame->dInfo.extraval = opts & SPEED_DUEL;
 		}
 		mainGame->SetPhaseButtons();
 		int val = 0;
@@ -3920,7 +3920,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(L"][");
 			int rule;
 			if(pHP->host.handshake == SERVER_HANDSHAKE) {
-				mainGame->GetMasterRule(pHP->host.duel_flag & ~DUEL_RELAY_MODE, pHP->host.forbiddentypes, &rule);
+				mainGame->GetMasterRule(pHP->host.duel_flag & ~DUEL_RELAY, pHP->host.forbiddentypes, &rule);
 			} else
 				rule = pHP->host.duel_rule;
 			if(rule == 5)

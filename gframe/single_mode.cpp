@@ -123,7 +123,7 @@ int SingleMode::SinglePlayThread() {
 	last_replay.Write<int16_t>(script_name.size(), false);
 	last_replay.WriteData(script_name.c_str(), script_name.size(), false);
 	last_replay.Flush();
-	new_replay.Write<int32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & SPEED_DUEL) << 8);
+	new_replay.Write<int32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & DUEL_SPEED) << 8);
 	int engFlag = 0;
 	auto msg = CoreUtils::ParseMessages(pduel);
 	{

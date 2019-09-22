@@ -184,23 +184,23 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CUSTOM_RULE: {
 				switch (mainGame->cbDuelRule->getSelected()) {
 				case 0: {
-					mainGame->duel_param = MASTER_RULE_1;
-					mainGame->forbiddentypes = MASTER_RULE_1_FORB;
+					mainGame->duel_param = DUEL_MODE_MR1;
+					mainGame->forbiddentypes = DUEL_MODE_MR1_FORB;
 					break;
 				}
 				case 1: {
-					mainGame->duel_param = MASTER_RULE_2;
-					mainGame->forbiddentypes = MASTER_RULE_2_FORB;
+					mainGame->duel_param = DUEL_MODE_MR2;
+					mainGame->forbiddentypes = DUEL_MODE_MR2_FORB;
 					break;
 				}
 				case 2: {
-					mainGame->duel_param = MASTER_RULE_3;
-					mainGame->forbiddentypes = MASTER_RULE_3_FORB;
+					mainGame->duel_param = DUEL_MODE_MR3;
+					mainGame->forbiddentypes = DUEL_MODE_MR3_FORB;
 					break;
 				}
 				case 3: {
-					mainGame->duel_param = MASTER_RULE_4;
-					mainGame->forbiddentypes = MASTER_RULE_4_FORB;
+					mainGame->duel_param = DUEL_MODE_MR4;
+					mainGame->forbiddentypes = DUEL_MODE_MR4_FORB;
 					break;
 				}
 				}
@@ -671,26 +671,26 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				switch (combobox->getSelected()) {
 				case 0:{
 					combobox->removeItem(4);
-					mainGame->duel_param = MASTER_RULE_1;
-					mainGame->forbiddentypes = MASTER_RULE_1_FORB;
+					mainGame->duel_param = DUEL_MODE_MR1;
+					mainGame->forbiddentypes = DUEL_MODE_MR1_FORB;
 					break;
 				}
 				case 1: {
 					combobox->removeItem(4);
-					mainGame->duel_param = MASTER_RULE_2;
-					mainGame->forbiddentypes = MASTER_RULE_2_FORB;
+					mainGame->duel_param = DUEL_MODE_MR2;
+					mainGame->forbiddentypes = DUEL_MODE_MR2_FORB;
 					break;
 				}
 				case 2: {
 					combobox->removeItem(4);
-					mainGame->duel_param = MASTER_RULE_3;
-					mainGame->forbiddentypes = MASTER_RULE_3_FORB;
+					mainGame->duel_param = DUEL_MODE_MR3;
+					mainGame->forbiddentypes = DUEL_MODE_MR3_FORB;
 					break;
 				}
 				case 3: {
 					combobox->removeItem(4);
-					mainGame->duel_param = MASTER_RULE_4;
-					mainGame->forbiddentypes = MASTER_RULE_4_FORB;
+					mainGame->duel_param = DUEL_MODE_MR4;
+					mainGame->forbiddentypes = DUEL_MODE_MR4_FORB;
 					break;
 				}
 				}

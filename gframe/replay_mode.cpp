@@ -75,7 +75,7 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.clientname.insert(mainGame->dInfo.clientname.end(), names.begin() + mainGame->dInfo.team1, names.end());
 	int opt = cur_replay.params.duel_flags;
 	mainGame->dInfo.duel_field = opt & 0xff;
-	mainGame->dInfo.extraval = ((opt >> 8) & SPEED_DUEL) ? 1 : 0;
+	mainGame->dInfo.extraval = ((opt >> 8) & DUEL_SPEED) ? 1 : 0;
 	mainGame->SetPhaseButtons();
 	current_stream = cur_replay.packets_stream;
 	if(!current_stream.size()) {

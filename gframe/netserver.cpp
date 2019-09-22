@@ -224,7 +224,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
 		if(pkt->info.handshake != SERVER_HANDSHAKE)
 			return;
-		duel_mode = new GenericDuel(pkt->info.team1, pkt->info.team2, !!(pkt->info.duel_flag & DUEL_RELAY_MODE), pkt->info.best_of);
+		duel_mode = new GenericDuel(pkt->info.team1, pkt->info.team2, !!(pkt->info.duel_flag & DUEL_RELAY), pkt->info.best_of);
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, GenericDuel::GenericTimer, duel_mode);
 		unsigned int hash = 1;
 		for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit) {

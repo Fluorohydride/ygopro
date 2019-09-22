@@ -577,8 +577,8 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	int opt = host_info.duel_flag;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
-	if(host_info.extra_rules & DUEL_SPEED)
-		opt |= SPEED_DUEL;
+	if(host_info.extra_rules & SPEED_DUEL)
+		opt |= DUEL_SPEED;
 	OCG_Player team = { host_info.start_lp, host_info.start_hand, host_info.draw_count };
 	pduel = mainGame->SetupDuel({ rnd(), opt, team, team });
 	if(!host_info.no_shuffle_deck) {
@@ -586,7 +586,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 				std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);
 		)
 	}
-	new_replay.Write<int32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & SPEED_DUEL) << 8);
+	new_replay.Write<int32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & DUEL_SPEED) << 8);
 	last_replay.Write<int32_t>(host_info.start_lp, false);
 	last_replay.Write<int32_t>(host_info.start_hand, false);
 	last_replay.Write<int32_t>(host_info.draw_count, false);

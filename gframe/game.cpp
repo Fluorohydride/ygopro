@@ -252,8 +252,8 @@ bool Game::Initialize() {
 	spacing++;
 	chkTypeLimit[4] = env->addCheckBox(false, Scale(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 353 + spacing, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1076)).c_str());
 	btnCustomRulesOK = env->addButton(Scale(55, 270, 155, 295), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211).c_str());
-	forbiddentypes = MASTER_RULE_4_FORB;
-	duel_param = MASTER_RULE_4;
+	forbiddentypes = DUEL_MODE_MR4_FORB;
+	duel_param = DUEL_MODE_MR4;
 	chkNoCheckDeck = env->addCheckBox(false, Scale(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229).c_str());
 	chkNoShuffleDeck = env->addCheckBox(false, Scale(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230).c_str());
 	env->addStaticText(dataManager.GetSysString(1231).c_str(), Scale(20, 240, 320, 260), false, false, wCreateHost);
@@ -1628,24 +1628,24 @@ void Game::UpdateDuelParam() {
 	cbDuelRule->addItem(dataManager.GetSysString(1262).c_str());
 	cbDuelRule->addItem(dataManager.GetSysString(1263).c_str());
 	switch (flag) {
-	case MASTER_RULE_1: {
+	case DUEL_MODE_MR1: {
 		cbDuelRule->setSelected(0);
-		if (flag2 == MASTER_RULE_1_FORB)
+		if (flag2 == DUEL_MODE_MR1_FORB)
 			break;
 	}
-	case MASTER_RULE_2: {
+	case DUEL_MODE_MR2: {
 		cbDuelRule->setSelected(1);
-		if (flag2 == MASTER_RULE_2_FORB)
+		if (flag2 == DUEL_MODE_MR2_FORB)
 			break;
 	}
-	case MASTER_RULE_3: {
+	case DUEL_MODE_MR3: {
 		cbDuelRule->setSelected(2);
-		if (flag2 == MASTER_RULE_3_FORB)
+		if (flag2 == DUEL_MODE_MR3_FORB)
 			break;
 	}
-	case MASTER_RULE_4: {
+	case DUEL_MODE_MR4: {
 		cbDuelRule->setSelected(3);
-		if (flag2 == MASTER_RULE_4_FORB)
+		if (flag2 == DUEL_MODE_MR4_FORB)
 			break;
 	}
 	default: {
@@ -1692,28 +1692,28 @@ void Game::UpdateExtraRules() {
 }
 int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	switch(param) {
-	case MASTER_RULE_1: {
+	case DUEL_MODE_MR1: {
 		if (truerule)
 			*truerule = 1;
-		if (forbiddentypes == MASTER_RULE_1_FORB)
+		if (forbiddentypes == DUEL_MODE_MR1_FORB)
 			return 1;
 	}
-	case MASTER_RULE_2: {
+	case DUEL_MODE_MR2: {
 		if (truerule)
 			*truerule = 2;
-		if (forbiddentypes == MASTER_RULE_2_FORB)
+		if (forbiddentypes == DUEL_MODE_MR2_FORB)
 			return 2;
 	}
-	case MASTER_RULE_3: {
+	case DUEL_MODE_MR3: {
 		if (truerule)
 			*truerule = 3;
-		if (forbiddentypes == MASTER_RULE_3_FORB)
+		if (forbiddentypes == DUEL_MODE_MR3_FORB)
 			return 3;
 	}
-	case MASTER_RULE_4: {
+	case DUEL_MODE_MR4: {
 		if (truerule)
 			*truerule = 4;
-		if (forbiddentypes == MASTER_RULE_4_FORB)
+		if (forbiddentypes == DUEL_MODE_MR4_FORB)
 			return 4;
 	}
 	default: {

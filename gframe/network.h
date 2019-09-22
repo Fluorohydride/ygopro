@@ -241,7 +241,7 @@ public:
 #define SEALED_DUEL			0x1
 #define BOOSTER_DUEL		0x2
 #define DESTINY_DRAW		0x4
-#define DUEL_SPEED			0x8
+#define SPEED_DUEL			0x8
 #define CONCENTRATION_DUEL	0x10
 #define BOSS_DUEL			0x20
 #define BATTLE_CITY			0x40
