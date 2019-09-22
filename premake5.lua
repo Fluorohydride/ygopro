@@ -88,6 +88,9 @@ workspace "ygo"
 		include "freetype"
 		include "irrlicht"
 	end
+	if os.istarget("macosx") and _OPTIONS["discord"] then
+		include "discord-launcher"
+	end
 
 local function vcpkgStaticTriplet(prj)
 	premake.w('<VcpkgTriplet Condition="\'$(Platform)\'==\'Win32\'">x86-windows-static</VcpkgTriplet>')
