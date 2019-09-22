@@ -28,7 +28,14 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 	GetModuleFileName(nullptr, exepath, MAX_PATH);
 	std::wstring param = exepath + std::wstring(L" from_discord ") + workingDir;
 #elif defined(__linux__)
-	std::string param = workingDir + "/run.sh from_discord " + workingDir;
+	char buff[PATH_MAX];
+	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
+	std::string filename;
+	if (len != -1) {
+		buff[len] = '\0';
+		filename = ygo::Utils::GetFileName(buff);
+	}
+	std::string param = fmt::format("bash -c \"cd {}; ./{} from_discord\"", workingDir, filename);
 #else
 	std::string param = "open " + workingDir + "/ygopro.app --args from_discord";
 #endif
