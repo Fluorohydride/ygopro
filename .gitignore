@@ -8,7 +8,6 @@ Source/Core/Common/scmrev.h
 /[Bb]uild*/
 /[Bb]in/
 /obj/
-/irrKlang/
 # Android cmake builds to here then copies to Source/Android.
 /libs/
 # Ignore various files created by visual studio/msbuild

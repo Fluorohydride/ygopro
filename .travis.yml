@@ -40,7 +40,7 @@ matrix:
     env:
     - VCPKG_ROOT=/c/vcpkg
     - VCPKG_DEFAULT_TRIPLET=x86-windows-static
-    - VCPKG_LIBS="libevent lua[cpp] sqlite3 fmt curl libgit2 nlohmann-json bzip2 libjpeg-turbo libpng zlib"
+    - VCPKG_LIBS="libevent lua[cpp] sqlite3 fmt curl libgit2 nlohmann-json bzip2 libjpeg-turbo libpng zlib openal-soft mpg123 libsndfile"
     - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed.zip
     - DXSDK_DIR=/c/d3d9sdk/
     - DEPLOY_DIR=deploy
@@ -49,7 +49,7 @@ matrix:
     compiler: gcc  
     env:
     - VCPKG_ROOT=./vcpkg
-    - VCPKG_LIBS="libevent sqlite3 fmt nlohmann-json curl libgit2"
+    - VCPKG_LIBS="libevent sqlite3 fmt nlohmann-json curl libgit2 openal-soft mpg123 libsndfile"
     - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed-linux.7z
   - name: "Mojave"
     os: osx
