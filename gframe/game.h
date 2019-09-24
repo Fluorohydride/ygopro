@@ -20,6 +20,7 @@
 #include "CProgressBar/CProgressBar.h"
 #include "ResizeablePanel/ResizeablePanel.h"
 #include "deck_manager.h"
+#include "sound_manager.h"
 #include "repo_manager.h"
 
 namespace ygo {
@@ -202,6 +203,7 @@ public:
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
 
+	std::unique_ptr<SoundManager> soundManager;
 	std::mutex gMutex;
 	std::mutex analyzeMutex;
 	Signal frameSignal;

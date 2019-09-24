@@ -30,6 +30,9 @@ addons:
     - libgit2
     - fmt
     - nlohmann-json
+    - openal-soft
+    - mpg123
+    - libsndfile
 matrix:
   include:
   - name: "Windows 10"
