@@ -2040,6 +2040,9 @@ void Game::OnResize() {
 	btnChainIgnore->setRelativePosition(Resize(205, 100, 295, 135));
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
+
+	roomListTable->setColumnWidth(6, window_size.Width-680); //Notes column
+	roomListTable->setSelected(9999);
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
 	x = x * window_scale.X;

@@ -29,14 +29,10 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 }
 
 std::wstring hex_to_wstring(std::string s) {
-	int currentPos = 0;
-	u32 total = 0;
 	std::wstring result;
 	if(s.length() % 4 == 0) {
-		while(total < s.length()) {
-			std::string s2 = s.substr(currentPos,4);
-			currentPos = currentPos + 4;
-			total = total + 4;		
+		for(int i = 0; i < s.length(); i+=4) {
+			std::string s2 = s.substr(i,4);
 			wchar_t resultC =  (wchar_t)strtoul(s2.c_str(),NULL,16);
 			result += resultC;
 		}
