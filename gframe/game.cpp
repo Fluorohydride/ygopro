@@ -182,7 +182,7 @@ bool Game::Initialize() {
 	btnCreateHost = env->addButton(Scale(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224).c_str());
 	btnCreateHost->setEnabled(coreloaded);
 	//create host
-	wCreateHost = env->addWindow(Scale(320, 100, 700, 520), false, dataManager.GetSysString(1224).c_str());
+	wCreateHost = env->addWindow(Scale(320, 100, 700, 550), false, dataManager.GetSysString(1224).c_str());
 	wCreateHost->getCloseButton()->setVisible(false);
 	wCreateHost->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1226).c_str(), Scale(20, 30, 220, 50), false, false, wCreateHost);
@@ -276,6 +276,11 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1238).c_str(), Scale(10, 390, 220, 410), false, false, wCreateHost);
 	ebHostPort = env->addEditBox(gameConf.serverport.c_str(), Scale(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
 	ebHostPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	env->addStaticText(dataManager.GetSysString(2024).c_str(), rect<s32>(10, 420, 220, 440), false, false, wCreateHost);
+	ebGameDescription = env->addEditBox(L"",Scale(110, 415, 370, 440),true,wCreateHost,-1);
+	ebGameDescription->setMax(100);
+	ebGameDescription->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
+	//ebGameDescription->setWordWrap(true);
 	//host(single)
 	wHostPrepare = env->addWindow(Scale(270, 120, 750, 440), false, dataManager.GetSysString(1250).c_str());
 	wHostPrepare->getCloseButton()->setVisible(false);
@@ -898,7 +903,7 @@ bool Game::Initialize() {
 	wRoomPassword->getCloseButton()->setVisible(false);
 	wRoomPassword->setVisible(false);
 	wRoomPassword->setAlignment(EGUIA_CENTER,EGUIA_CENTER,EGUIA_CENTER,EGUIA_CENTER);
-	env->addStaticText(dataManager.GetSysString(2042).c_str(), rect<s32>(20, 25, 290, 45), false, false, wRoomPassword);
+	env->addStaticText(dataManager.GetSysString(1222).c_str(), rect<s32>(20, 25, 290, 45), false, false, wRoomPassword);
 	ebRPName =  env->addEditBox(L"", rect<s32>(20, 50, 290, 70), true, wRoomPassword, -1);
 	ebRPName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnRPYes = env->addButton(rect<s32>(70, 80, 140, 105), wRoomPassword, BUTTON_ROOMPASSWORD_OK, dataManager.GetSysString(1211).c_str());
@@ -1971,7 +1976,7 @@ void Game::OnResize() {
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
-	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
+	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 550));
 	if (dInfo.clientname.size() + dInfo.hostname.size()>=5) {
 		wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 500));
 		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 500));

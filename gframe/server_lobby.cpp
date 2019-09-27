@@ -1,5 +1,6 @@
 #include "server_lobby.h"
 #include "data_manager.h"
+#include "duelclient.h"
 #include "game.h"
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
@@ -408,6 +409,46 @@ int ServerLobby::GetRoomsThread() {
 }
 void ServerLobby::RefreshRooms() {
 	std::thread(GetRoomsThread).detach();
+}
+
+void ServerLobby::JoinServer(bool host)
+{
+	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());
+	std::vector<RoomInfo> rv = mainGame->roomsVector;
+	ServerInfo s = mainGame->serversVector[mainGame->serverChoice->getSelected()];
+
+	if (host) {
+		char ip[20];
+		strcpy(ip, s.address.c_str());
+		unsigned int remote_addr = htonl(inet_addr(ip));
+		unsigned int remote_port = s.port;
+		if(DuelClient::StartClient(remote_addr, remote_port)) {
+			//started game from online room browser
+		}
+	} else {
+		//client
+		int index = (int)mainGame->roomListTable->getCellData(mainGame->roomListTable->getSelected(), 1);
+		RoomInfo room = rv[index];
+
+		if (room.passwordNeeded) {
+			if(!mainGame->wRoomPassword->isVisible()) {
+				mainGame->wRoomPassword->setVisible(true);
+				return;
+			} else {
+				if(wcslen(mainGame->ebRPName->getText()) == 0) {
+					return;
+				}
+			}
+		}
+
+		char ip[20];
+		strcpy(ip, s.address.c_str());
+		unsigned int remote_addr = htonl(inet_addr(ip));
+		unsigned int remote_port = room.roomid;
+		if(DuelClient::StartClient(remote_addr, remote_port, false)) {
+			//started game from online room browser
+		}
+	}
 }
 
 }

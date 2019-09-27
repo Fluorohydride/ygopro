@@ -118,11 +118,28 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST2: {
+				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
+					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname",true,EMBF_OK,0,0);
+					break;
+				}
+				ServerInfo s = mainGame->serversVector[mainGame->serverChoice->getSelected()];
+				if(mainGame->roomListTable->getSelected() >= 0) {
+					ServerLobby::JoinServer(false);
+				}
 				break;
 			}
 			case BUTTON_JOIN_CANCEL2: {
 				mainGame->HideElement(mainGame->wRoomListPlaceholder);
 				mainGame->ShowElement(mainGame->wMainMenu);
+				break;
+			}
+			case BUTTON_ROOMPASSWORD_OK: {
+				ServerLobby::JoinServer(false);
+				mainGame->wRoomPassword->setVisible(false);
+				break;
+			}
+			case BUTTON_ROOMPASSWORD_CANCEL: {
+				mainGame->wRoomPassword->setVisible(false);
 				break;
 			}
 			case BUTTON_LAN_MODE: {
@@ -190,6 +207,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ShowElement(mainGame->wCreateHost);
 				break;
 			}
+			case BUTTON_CREATE_HOST2: {
+				mainGame->btnHostConfirm->setEnabled(true);
+				mainGame->btnHostCancel->setEnabled(true);
+				//mainGame->HideElement(mainGame->wRoomListPlaceholder);
+				mainGame->ShowElement(mainGame->wCreateHost);
+				break;
+			}
 			case BUTTON_RULE_CARDS: {
 				mainGame->PopupElement(mainGame->wRules);
 				break;
@@ -239,17 +263,21 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				unsigned int host_port = std::stoi(mainGame->ebHostPort->getText());
-				mainGame->gameConf.gamename = mainGame->ebServerName->getText();
-				mainGame->gameConf.serverport = mainGame->ebHostPort->getText();
-				if(!NetServer::StartServer(host_port))
-					break;
-				if(!DuelClient::StartClient(0x7f000001, host_port)) {
-					NetServer::StopServer();
-					break;
+				if (mainGame->wRoomListPlaceholder->isVisible()) {
+					ServerLobby::JoinServer(true);
+				} else {
+					unsigned int host_port = std::stoi(mainGame->ebHostPort->getText());
+					mainGame->gameConf.gamename = mainGame->ebServerName->getText();
+					mainGame->gameConf.serverport = mainGame->ebHostPort->getText();
+					if(!NetServer::StartServer(host_port))
+						break;
+					if(!DuelClient::StartClient(0x7f000001, host_port)) {
+						NetServer::StopServer();
+						break;
+					}
+					mainGame->btnHostConfirm->setEnabled(false);
+					mainGame->btnHostCancel->setEnabled(false);
 				}
-				mainGame->btnHostConfirm->setEnabled(false);
-				mainGame->btnHostCancel->setEnabled(false);
 				break;
 			}
 			case BUTTON_HOST_CANCEL: {
@@ -260,7 +288,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->wRules->isVisible())
 					mainGame->HideElement(mainGame->wRules);
 				mainGame->HideElement(mainGame->wCreateHost);
-				mainGame->ShowElement(mainGame->wLanWindow);
+				if(!mainGame->wRoomListPlaceholder->isVisible()) {
+					mainGame->ShowElement(mainGame->wLanWindow);
+				}
 				break;
 			}
 			case BUTTON_HP_DUELIST: {

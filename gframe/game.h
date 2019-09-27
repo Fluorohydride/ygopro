@@ -639,7 +639,7 @@ public:
 	irr::gui::IGUIButton* btnRPNo;
 	irr::gui::IGUIButton* btnJoinHost2;
 	irr::gui::IGUIButton* btnJoinCancel2;
-	irr::gui::IGUIEditBox* gameDescription;
+	irr::gui::IGUIEditBox* ebGameDescription;
 };
 
 extern Game* mainGame;

@@ -121,34 +121,69 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		BufferIO::CopyWStr(mainGame->ebNickName->getText(), cspi.name, 20);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
 		if(create_game) {
-			CTOS_CreateGame cscg;
-			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
-			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
-			cscg.info.rule = mainGame->cbRule->getSelected();
-			cscg.info.mode = 0;
-			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
-			cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
-			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
-			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
-			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param, mainGame->forbiddentypes);
-			cscg.info.duel_flag = mainGame->duel_param;
-			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
-			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
-			cscg.info.handshake = SERVER_HANDSHAKE;
-			cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
-			cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
-			try {
-				cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText());
-			} catch(...) {
-				cscg.info.best_of = 1;
+			if (mainGame->wRoomListPlaceholder->isVisible()) {
+				CTOS_JoinGame2 csjg;
+				if (temp_ver)
+					csjg.version = temp_ver;
+				else
+					csjg.version = PRO_VERSION;
+				csjg.gameid = 0;
+
+				wchar_t roombuf[256];
+				char chk = '0';
+				char shuf = '0';
+				char prio = mainGame->cbDuelRule->getSelected() + '1'; 
+				if(mainGame->chkNoCheckDeck->isChecked()) {
+					chk = 'T';
+				}
+				if(mainGame->chkNoShuffleDeck->isChecked()) {
+					shuf = 'T';
+				}
+				//myswprintf(roombuf, L"%d%d%c%c%c%ls,%ls,%ls,%ls", mainGame->cbRule->getSelected(),  mainGame->cbMatchMode->getSelected(), prio, chk, shuf, mainGame->ebStartLP->getText(), mainGame->ebStartHand->getText(), mainGame->ebDrawCount->getText(), mainGame->ebServerName->getText());
+				myswprintf(roombuf, L"%d%d%c%c%c%ls,%ls,%ls,%ls", mainGame->cbRule->getSelected(),  0, prio, chk, shuf, mainGame->ebStartLP->getText(), mainGame->ebStartHand->getText(), mainGame->ebDrawCount->getText(), mainGame->ebServerName->getText()); //cbMatchMode is no longer there..
+				BufferIO::CopyWStr(roombuf, csjg.hostinfo, 20);
+				const wchar_t* mypass = mainGame->ebServerPass->getText();
+				BufferIO::CopyWStr(mainGame->ebServerPass->getText(), csjg.pass, 20);
+				BufferIO::CopyWStr(mainGame->ebGameDescription->getText(), csjg.description, 200);
+				s32 lflist_selected = mainGame->cbLFlist->getSelected();
+				if(lflist_selected >= 100) {
+					lflist_selected = 0;
+				}
+				wchar_t banlistbuf[3];
+				myswprintf(banlistbuf, L"%d", lflist_selected);
+				BufferIO::CopyWStr(banlistbuf, csjg.banlist, (lflist_selected < 10 ? 2 : 3));
+				mainGame->wRoomListPlaceholder->setVisible(false);
+				SendPacketToServer(CTOS_JOIN_GAME, csjg);
+			} else {
+				CTOS_CreateGame cscg;
+				BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
+				BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
+				cscg.info.rule = mainGame->cbRule->getSelected();
+				cscg.info.mode = 0;
+				cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
+				cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
+				cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
+				cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
+				cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
+				cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param, mainGame->forbiddentypes);
+				cscg.info.duel_flag = mainGame->duel_param;
+				cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
+				cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
+				cscg.info.handshake = SERVER_HANDSHAKE;
+				cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
+				cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
+				try {
+					cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText());
+				} catch(...) {
+					cscg.info.best_of = 1;
+				}
+				if(mainGame->btnRelayMode->isPressed()) {
+					cscg.info.duel_flag |= DUEL_RELAY;
+				}
+				cscg.info.forbiddentypes = mainGame->forbiddentypes;
+				cscg.info.extra_rules = mainGame->extra_rules;
+				SendPacketToServer(CTOS_CREATE_GAME, cscg);
 			}
-			if(mainGame->btnRelayMode->isPressed()) {
-				cscg.info.duel_flag |= DUEL_RELAY;
-			}
-			cscg.info.forbiddentypes = mainGame->forbiddentypes;
-			cscg.info.extra_rules = mainGame->extra_rules;
-			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
 			CTOS_JoinGame csjg;
 			if (temp_ver)
@@ -156,8 +191,14 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			else
 				csjg.version = PRO_VERSION;
 			csjg.gameid = 0;
-			BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
-			SendPacketToServer(CTOS_JOIN_GAME, csjg);
+			if (mainGame->wRoomListPlaceholder->isVisible()) {
+				BufferIO::CopyWStr(mainGame->ebRPName->getText(), csjg.pass, 20); //password from popup window
+				mainGame->wRoomListPlaceholder->setVisible(false);
+				SendPacketToServer(CTOS_JOIN_GAME, csjg);
+			} else {
+				BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
+				SendPacketToServer(CTOS_JOIN_GAME, csjg);
+			}
 		}
 		bufferevent_enable(bev, EV_READ);
 		connect_state |= 0x2;

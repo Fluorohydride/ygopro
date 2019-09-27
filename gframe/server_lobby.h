@@ -9,6 +9,7 @@ namespace ygo {
 			static void RefreshRooms();
 			static int GetRoomsThread();
 			static void FillOnlineRooms();
+			static void JoinServer(bool host);
 		private:
 	};
 	//extern ServerLobby serverLobby;
