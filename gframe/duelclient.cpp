@@ -152,7 +152,6 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				wchar_t banlistbuf[3];
 				myswprintf(banlistbuf, L"%d", lflist_selected);
 				BufferIO::CopyWStr(banlistbuf, csjg.banlist, (lflist_selected < 10 ? 2 : 3));
-				mainGame->wRoomListPlaceholder->setVisible(false);
 				SendPacketToServer(CTOS_JOIN_GAME, csjg);
 			} else {
 				CTOS_CreateGame cscg;
@@ -193,7 +192,6 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			csjg.gameid = 0;
 			if (mainGame->wRoomListPlaceholder->isVisible()) {
 				BufferIO::CopyWStr(mainGame->ebRPName->getText(), csjg.pass, 20); //password from popup window
-				mainGame->wRoomListPlaceholder->setVisible(false);
 				SendPacketToServer(CTOS_JOIN_GAME, csjg);
 			} else {
 				BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
@@ -204,6 +202,8 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		connect_state |= 0x2;
 	} else if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		bufferevent_disable(bev, EV_READ);
+		mainGame->btnHostConfirm->setEnabled(true);
+		mainGame->btnHostCancel->setEnabled(true);
 		if(!is_closing) {
 			mainGame->dInfo.isInLobby = false;
 			if(connect_state == 0x1) {
@@ -473,6 +473,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_JOIN_GAME: {
+		mainGame->wRoomListPlaceholder->setVisible(false);
 		temp_ver = 0;
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
 		mainGame->dInfo.isInLobby = true;

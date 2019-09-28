@@ -86,6 +86,7 @@ bool Game::Initialize() {
 	chain_when_avail = false;
 	is_building = false;
 	showingcard = 0;
+	return_to_room_browser = false;
 	cardimagetextureloading = false;
 	menuHandler.prev_operation = 0;
 	menuHandler.prev_sel = -1;
@@ -916,29 +917,29 @@ bool Game::Initialize() {
 	btnJoinCancel2->setAlignment(EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT,EGUIA_LOWERRIGHT);
 
 	//load server(s)
-	ServerInfo *serverInfo = new ServerInfo();
-	serverInfo->name = L"Ygopro Server";
+	ServerInfo serverInfo;
+	serverInfo.name = L"Ygopro Server";
 #ifdef DEFAULT_SERVER_IP
-	serverInfo->address = DEFAULT_SERVER_IP;
-	serverInfo->roomaddress = DEFAULT_SERVER_IP;
+	serverInfo.address = DEFAULT_SERVER_IP;
+	serverInfo.roomaddress = DEFAULT_SERVER_IP;
 #else
-	serverInfo->address = "127.0.0.1";
-	serverInfo->roomaddress = "127.0.0.1";
+	serverInfo.address = "127.0.0.1";
+	serverInfo.roomaddress = "127.0.0.1";
 #endif
 #ifdef DEFAULT_SERVER_PORT
-	serverInfo->port = DEFAULT_SERVER_PORT;
+	serverInfo.port = DEFAULT_SERVER_PORT;
 #else
-	serverInfo->port = 9729;
+	serverInfo.port = 9729;
 #endif
 #ifdef DEFAULT_SERVER_ROOMPORT
-	serverInfo->roomport = DEFAULT_SERVER_ROOMPORT;
+	serverInfo.roomport = DEFAULT_SERVER_ROOMPORT;
 #else
-	serverInfo->roomport = 4709;
+	serverInfo.roomport = 4709;
 #endif
 	
-	serversVector.push_back(*serverInfo);
+	serversVector.push_back(serverInfo);
 
-	mainGame->serverChoice->addItem(serverInfo->name.c_str());
+	mainGame->serverChoice->addItem(serverInfo.name.c_str());
 
 	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);

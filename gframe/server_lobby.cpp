@@ -413,6 +413,10 @@ void ServerLobby::RefreshRooms() {
 
 void ServerLobby::JoinServer(bool host)
 {
+	if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
+		mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname",true,EMBF_OK,0,0);
+		return;
+	}
 	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());
 	std::vector<RoomInfo> rv = mainGame->roomsVector;
 	ServerInfo s = mainGame->serversVector[mainGame->serverChoice->getSelected()];
@@ -422,11 +426,16 @@ void ServerLobby::JoinServer(bool host)
 		strcpy(ip, s.address.c_str());
 		unsigned int remote_addr = htonl(inet_addr(ip));
 		unsigned int remote_port = s.port;
+		mainGame->return_to_room_browser = true;
 		if(DuelClient::StartClient(remote_addr, remote_port)) {
 			//started game from online room browser
 		}
 	} else {
 		//client
+		if(mainGame->roomListTable->getSelected() == -1) {
+			//no room selected
+			return;
+		}
 		int index = (int)mainGame->roomListTable->getCellData(mainGame->roomListTable->getSelected(), 1);
 		RoomInfo room = rv[index];
 
@@ -445,6 +454,7 @@ void ServerLobby::JoinServer(bool host)
 		strcpy(ip, s.address.c_str());
 		unsigned int remote_addr = htonl(inet_addr(ip));
 		unsigned int remote_port = room.roomid;
+		mainGame->return_to_room_browser = true;
 		if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 			//started game from online room browser
 		}

@@ -118,14 +118,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST2: {
-				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname",true,EMBF_OK,0,0);
-					break;
-				}
-				ServerInfo s = mainGame->serversVector[mainGame->serverChoice->getSelected()];
-				if(mainGame->roomListTable->getSelected() >= 0) {
-					ServerLobby::JoinServer(false);
-				}
+				ServerLobby::JoinServer(false);
 				break;
 			}
 			case BUTTON_JOIN_CANCEL2: {
@@ -265,6 +258,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HOST_CONFIRM: {
 				if (mainGame->wRoomListPlaceholder->isVisible()) {
 					ServerLobby::JoinServer(true);
+					mainGame->btnHostConfirm->setEnabled(false);
+					mainGame->btnHostCancel->setEnabled(false);
 				} else {
 					unsigned int host_port = std::stoi(mainGame->ebHostPort->getText());
 					mainGame->gameConf.gamename = mainGame->ebServerName->getText();
@@ -724,6 +719,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_TABLE_SELECTED_AGAIN: {
+			ServerLobby::JoinServer(false);
 			break;
 		}
 		case irr::gui::EGET_TABLE_ROWS_CLEARED: {

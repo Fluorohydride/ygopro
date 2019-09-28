@@ -1014,6 +1014,10 @@ void Game::DrawBackImage(irr::video::ITexture* texture) {
 	driver->draw2DImage(texture, Resize(0, 0, 1024, 640), recti(0, 0, texture->getOriginalSize().Width, texture->getOriginalSize().Height));
 }
 void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
+	if (win == mainGame->wLanWindow && mainGame->return_to_room_browser) {
+		win = mainGame->wRoomListPlaceholder;
+		mainGame->return_to_room_browser = false;
+	}
 	FadingUnit fu;
 	fu.fadingSize = win->getRelativePosition();
 	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
