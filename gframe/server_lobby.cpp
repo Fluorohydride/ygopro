@@ -166,7 +166,7 @@ int ServerLobby::GetRoomsThread() {
 				try {
 					room.id = GET("roomid", int);
 					room.name = BufferIO::DecodeUTF8s(GET("roomname", std::string));
-					//room.description = BufferIO::DecodeUTF8s(GET("desc", std::string));
+					room.description = BufferIO::DecodeUTF8s(GET("roomnotes", std::string));
 					room.locked = GET("needpass", bool);
 					room.started = GET("istart", std::string) == "start";
 					room.info.mode = GET("roommode", int);
