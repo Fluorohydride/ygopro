@@ -40,7 +40,40 @@ unsigned short DuelClient::temp_port = 0;
 unsigned short DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
-bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
+std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wstring& address, const std::wstring& _port) {
+	char ip[20];
+	BufferIO::CopyWStr(address.c_str(), ip, 16);
+	unsigned int remote_addr = htonl(inet_addr(ip));
+	if(remote_addr == -1) {
+		char hostname[100];
+		char port[6];
+		BufferIO::CopyWStr(address.c_str(), hostname, 100);
+		BufferIO::CopyWStr(_port.c_str(), port, 6);
+		evutil_addrinfo hints;
+		evutil_addrinfo *answer = NULL;
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = AF_INET;
+		hints.ai_socktype = SOCK_STREAM;
+		hints.ai_protocol = IPPROTO_TCP;
+		hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
+		int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
+		if(status != 0) {
+			throw std::exception("Host not resolved");
+		} else {
+			sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
+			evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
+			remote_addr = htonl(inet_addr(ip));
+		}
+	}
+	return { remote_addr, (unsigned short)std::stoi(_port) };
+}
+
+std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wstring & address, int port) {
+	return DuelClient::ResolveServer(address, std::to_wstring(port));
+}
+
+bool DuelClient::StartClient(unsigned int ip, unsigned short port, unsigned int gameid, bool create_game) {
+	mainGame->dInfo.game_id = gameid;
 	if(connect_state)
 		return false;
 	sockaddr_in sin;
@@ -75,7 +108,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 	if(connect_state == 0x7)
 		return;
-	if(!is_closing) {
+	if(!is_closing && !exit_on_return) {
 		temp_ver = 0;
 		mainGame->gMutex.lock();
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
@@ -91,7 +124,7 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 void DuelClient::StopClient(bool is_exiting) {
 	if(connect_state != 0x7)
 		return;
-	is_closing = is_exiting;
+	is_closing = is_exiting || exit_on_return;
 	event_base_loopbreak(client_base);
 	if(!is_closing) {
 		
@@ -121,89 +154,49 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		BufferIO::CopyWStr(mainGame->ebNickName->getText(), cspi.name, 20);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
 		if(create_game) {
-			if (mainGame->wRoomListPlaceholder->isVisible()) {
-				CTOS_JoinGame2 csjg;
-				if (temp_ver)
-					csjg.version = temp_ver;
-				else
-					csjg.version = PRO_VERSION;
-				csjg.gameid = 0;
-
-				wchar_t roombuf[256];
-				char chk = '0';
-				char shuf = '0';
-				char prio = mainGame->cbDuelRule->getSelected() + '1'; 
-				if(mainGame->chkNoCheckDeck->isChecked()) {
-					chk = 'T';
-				}
-				if(mainGame->chkNoShuffleDeck->isChecked()) {
-					shuf = 'T';
-				}
-				//myswprintf(roombuf, L"%d%d%c%c%c%ls,%ls,%ls,%ls", mainGame->cbRule->getSelected(),  mainGame->cbMatchMode->getSelected(), prio, chk, shuf, mainGame->ebStartLP->getText(), mainGame->ebStartHand->getText(), mainGame->ebDrawCount->getText(), mainGame->ebServerName->getText());
-				myswprintf(roombuf, L"%d%d%c%c%c%ls,%ls,%ls,%ls", mainGame->cbRule->getSelected(),  0, prio, chk, shuf, mainGame->ebStartLP->getText(), mainGame->ebStartHand->getText(), mainGame->ebDrawCount->getText(), mainGame->ebServerName->getText()); //cbMatchMode is no longer there..
-				BufferIO::CopyWStr(roombuf, csjg.hostinfo, 20);
-				const wchar_t* mypass = mainGame->ebServerPass->getText();
-				BufferIO::CopyWStr(mainGame->ebServerPass->getText(), csjg.pass, 20);
-				BufferIO::CopyWStr(mainGame->ebGameDescription->getText(), csjg.description, 200);
-				s32 lflist_selected = mainGame->cbLFlist->getSelected();
-				if(lflist_selected >= 100) {
-					lflist_selected = 0;
-				}
-				wchar_t banlistbuf[3];
-				myswprintf(banlistbuf, L"%d", lflist_selected);
-				BufferIO::CopyWStr(banlistbuf, csjg.banlist, (lflist_selected < 10 ? 2 : 3));
-				SendPacketToServer(CTOS_JOIN_GAME, csjg);
-			} else {
-				CTOS_CreateGame cscg;
-				BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
-				BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
-				cscg.info.rule = mainGame->cbRule->getSelected();
-				cscg.info.mode = 0;
-				cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
-				cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
-				cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
-				cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
-				cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-				cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param, mainGame->forbiddentypes);
-				cscg.info.duel_flag = mainGame->duel_param;
-				cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
-				cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
-				cscg.info.handshake = SERVER_HANDSHAKE;
-				cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
-				cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
-				try {
-					cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText());
-				} catch(...) {
-					cscg.info.best_of = 1;
-				}
-				if(mainGame->btnRelayMode->isPressed()) {
-					cscg.info.duel_flag |= DUEL_RELAY;
-				}
-				cscg.info.forbiddentypes = mainGame->forbiddentypes;
-				cscg.info.extra_rules = mainGame->extra_rules;
-				SendPacketToServer(CTOS_CREATE_GAME, cscg);
+			CTOS_CreateGame cscg;
+			mainGame->dInfo.game_id = 0;
+			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
+			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
+			cscg.info.rule = mainGame->cbRule->getSelected();
+			cscg.info.mode = 0;
+			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
+			cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
+			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
+			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
+			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
+			cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param, mainGame->forbiddentypes);
+			cscg.info.duel_flag = mainGame->duel_param;
+			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
+			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
+			cscg.info.handshake = SERVER_HANDSHAKE;
+			cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
+			cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
+			try {
+				cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText());
+			} catch(...) {
+				cscg.info.best_of = 1;
 			}
+			if(mainGame->btnRelayMode->isPressed()) {
+				cscg.info.duel_flag |= DUEL_RELAY;
+			}
+			cscg.info.forbiddentypes = mainGame->forbiddentypes;
+			cscg.info.extra_rules = mainGame->extra_rules;
+			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
 			CTOS_JoinGame csjg;
 			if (temp_ver)
 				csjg.version = temp_ver;
 			else
 				csjg.version = PRO_VERSION;
-			csjg.gameid = 0;
-			if (mainGame->wRoomListPlaceholder->isVisible()) {
-				BufferIO::CopyWStr(mainGame->ebRPName->getText(), csjg.pass, 20); //password from popup window
-				SendPacketToServer(CTOS_JOIN_GAME, csjg);
-			} else {
-				BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
-				SendPacketToServer(CTOS_JOIN_GAME, csjg);
-			}
+			csjg.gameid = mainGame->dInfo.game_id;
+			BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
+			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		bufferevent_enable(bev, EV_READ);
 		connect_state |= 0x2;
 	} else if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		bufferevent_disable(bev, EV_READ);
-		mainGame->btnHostConfirm->setEnabled(true);
-		mainGame->btnHostCancel->setEnabled(true);
 		if(!is_closing) {
 			mainGame->dInfo.isInLobby = false;
 			if(connect_state == 0x1) {
@@ -212,10 +205,17 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				if(!mainGame->wLanWindow->isVisible())
-					mainGame->ShowElement(mainGame->wLanWindow);
+				if(mainGame->isHostingOnline) {
+					if(!mainGame->wRoomListPlaceholder->isVisible())
+						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				} else {
+					if(!mainGame->wLanWindow->isVisible())
+						mainGame->ShowElement(mainGame->wLanWindow);
+				}
 				mainGame->PopupMessage(dataManager.GetSysString(1400));
 				mainGame->gMutex.unlock();
+				if(exit_on_return)
+					mainGame->device->closeDevice();
 			} else if(connect_state == 0x7) {
 				if(!mainGame->dInfo.isInDuel && !mainGame->is_building) {
 					mainGame->gMutex.lock();
@@ -224,7 +224,11 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->HideElement(mainGame->wHostPrepare);
 					mainGame->HideElement(mainGame->wHostPrepare2);
-					mainGame->ShowElement(mainGame->wLanWindow);
+					if(mainGame->isHostingOnline) {
+						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+					} else {
+						mainGame->ShowElement(mainGame->wLanWindow);
+					}
 					mainGame->wChat->setVisible(false);
 					if(events & BEV_EVENT_EOF)
 						mainGame->PopupMessage(dataManager.GetSysString(1401));
@@ -283,6 +287,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		switch(pkt->msg) {
 		case ERRMSG_JOINERROR: {
 			temp_ver = 0;
+			if(mainGame->isHostingOnline && pkt->code == 9) {
+				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+			}
 			mainGame->gMutex.lock();
 			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 			mainGame->btnJoinHost->setEnabled(true);
@@ -470,10 +477,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_CREATE_GAME: {
+		STOC_CreateGame* pkt = (STOC_CreateGame*)pdata;
+		mainGame->dInfo.game_id = pkt->gameid;
 		break;
 	}
 	case STOC_JOIN_GAME: {
-		mainGame->wRoomListPlaceholder->setVisible(false);
 		temp_ver = 0;
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
 		mainGame->dInfo.isInLobby = true;
@@ -746,7 +754,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->ShowElement(mainGame->wLanWindow);
+		if(mainGame->isHostingOnline) {
+			mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+		} else {
+			mainGame->ShowElement(mainGame->wLanWindow);
+		}
 		mainGame->SetMesageWindow();
 		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);
@@ -1004,7 +1016,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->stTip->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->ShowElement(mainGame->wLanWindow);
+		if(mainGame->isHostingOnline) {
+			mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+		} else {
+			mainGame->ShowElement(mainGame->wLanWindow);
+		}
 		mainGame->SetMesageWindow();
 		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);

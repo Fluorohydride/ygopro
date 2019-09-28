@@ -114,11 +114,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_REFRESH2: {
-				mainGame->roomListTable->clearRows(true);
+				ServerLobby::RefreshRooms();
 				break;
 			}
 			case BUTTON_JOIN_HOST2: {
-				ServerLobby::JoinServer(false);
+				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
+					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, EMBF_OK, 0, 0);
+					break;
+				}
+				if(mainGame->roomListTable->getSelected() >= 0) {
+					mainGame->HideElement(mainGame->wRoomListPlaceholder);
+					ServerLobby::JoinServer(false);
+				}
 				break;
 			}
 			case BUTTON_JOIN_CANCEL2: {
@@ -144,43 +151,25 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
-				char ip[20];
-				const wchar_t* pstr = mainGame->ebJoinHost->getText();
-				BufferIO::CopyWStr(pstr, ip, 16);
-				unsigned int remote_addr = htonl(inet_addr(ip));
-				if(remote_addr == -1) {
-					char hostname[100];
-					char port[6];
-					BufferIO::CopyWStr(pstr, hostname, 100);
-					BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), port, 6);
-					struct evutil_addrinfo hints;
-					struct evutil_addrinfo *answer = NULL;
-					memset(&hints, 0, sizeof(hints));
-					hints.ai_family = AF_INET;
-					hints.ai_socktype = SOCK_STREAM;
-					hints.ai_protocol = IPPROTO_TCP;
-					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
-					if(status != 0) {
-						mainGame->gMutex.lock();
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
-						mainGame->gMutex.unlock();
-						break;
-					} else {
-						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
-						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
-						remote_addr = htonl(inet_addr(ip));
+				try {
+					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
+					mainGame->gameConf.lasthost = mainGame->ebJoinHost->getText();
+					mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
+					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
+						mainGame->dInfo.server_port = parsed.second;
+						mainGame->dInfo.server_address = parsed.first;
+						mainGame->btnCreateHost->setEnabled(false);
+						mainGame->btnJoinHost->setEnabled(false);
+						mainGame->btnJoinCancel->setEnabled(false);
 					}
+					break;
 				}
-				unsigned int remote_port = std::stoi(mainGame->ebJoinPort->getText());
-				mainGame->gameConf.lasthost = pstr;
-				mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
-				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
-					mainGame->btnCreateHost->setEnabled(false);
-					mainGame->btnJoinHost->setEnabled(false);
-					mainGame->btnJoinCancel->setEnabled(false);
+				catch(...) {
+					mainGame->gMutex.lock();
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
+					mainGame->gMutex.unlock();
+					break;
 				}
-				break;
 			}
 			case BUTTON_JOIN_CANCEL: {
 				mainGame->HideElement(mainGame->wLanWindow);
@@ -194,16 +183,26 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CREATE_HOST: {
+				mainGame->isHostingOnline = false;
 				mainGame->btnHostConfirm->setEnabled(true);
 				mainGame->btnHostCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wLanWindow);
+				mainGame->stHostPort->setVisible(true);
+				mainGame->ebHostPort->setVisible(true);
+				mainGame->stHostNotes->setVisible(false);
+				mainGame->ebHostNotes->setVisible(false);
 				mainGame->ShowElement(mainGame->wCreateHost);
 				break;
 			}
 			case BUTTON_CREATE_HOST2: {
+				mainGame->isHostingOnline = true;
 				mainGame->btnHostConfirm->setEnabled(true);
 				mainGame->btnHostCancel->setEnabled(true);
-				//mainGame->HideElement(mainGame->wRoomListPlaceholder);
+				mainGame->HideElement(mainGame->wRoomListPlaceholder);
+				mainGame->stHostPort->setVisible(false);
+				mainGame->ebHostPort->setVisible(false);
+				mainGame->stHostNotes->setVisible(true);
+				mainGame->ebHostNotes->setVisible(true);
 				mainGame->ShowElement(mainGame->wCreateHost);
 				break;
 			}
@@ -256,10 +255,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				if (mainGame->wRoomListPlaceholder->isVisible()) {
+				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
-					mainGame->btnHostConfirm->setEnabled(false);
-					mainGame->btnHostCancel->setEnabled(false);
 				} else {
 					unsigned int host_port = std::stoi(mainGame->ebHostPort->getText());
 					mainGame->gameConf.gamename = mainGame->ebServerName->getText();
@@ -283,7 +280,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->wRules->isVisible())
 					mainGame->HideElement(mainGame->wRules);
 				mainGame->HideElement(mainGame->wCreateHost);
-				if(!mainGame->wRoomListPlaceholder->isVisible()) {
+				if(mainGame->isHostingOnline) {
+					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				} else {
 					mainGame->ShowElement(mainGame->wLanWindow);
 				}
 				break;
@@ -346,7 +345,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wHostPrepare);
 				if(mainGame->wHostPrepare2->isVisible())
 					mainGame->HideElement(mainGame->wHostPrepare2);
-				mainGame->ShowElement(mainGame->wLanWindow);
+				if(mainGame->isHostingOnline)
+					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				else
+					mainGame->ShowElement(mainGame->wLanWindow);
 				mainGame->wChat->setVisible(false);
 				if(exit_on_return)
 					mainGame->device->closeDevice();
@@ -568,43 +570,25 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstHostList->getSelected();
 				if(sel == -1)
 					break;
-				char ip[20];
-				const wchar_t* pstr = mainGame->ebJoinHost->getText();
-				BufferIO::CopyWStr(pstr, ip, 16);
-				unsigned int remote_addr = htonl(inet_addr(ip));
-				if(remote_addr == -1) {
-					char hostname[100];
-					char port[6];
-					BufferIO::CopyWStr(pstr, hostname, 100);
-					BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), port, 6);
-					struct evutil_addrinfo hints;
-					struct evutil_addrinfo *answer = NULL;
-					memset(&hints, 0, sizeof(hints));
-					hints.ai_family = AF_INET;
-					hints.ai_socktype = SOCK_STREAM;
-					hints.ai_protocol = IPPROTO_TCP;
-					hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-					int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
-					if(status != 0) {
-						mainGame->gMutex.lock();
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
-						mainGame->gMutex.unlock();
-						break;
-					} else {
-						sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
-						evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
-						remote_addr = htonl(inet_addr(ip));
+				try {
+					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
+					mainGame->gameConf.lasthost = mainGame->ebJoinHost->getText();
+					mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
+					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
+						mainGame->dInfo.server_port = parsed.second;
+						mainGame->dInfo.server_address = parsed.first;
+						mainGame->btnCreateHost->setEnabled(false);
+						mainGame->btnJoinHost->setEnabled(false);
+						mainGame->btnJoinCancel->setEnabled(false);
 					}
+					break;
 				}
-				unsigned int remote_port = std::stoi(mainGame->ebJoinPort->getText());
-				mainGame->gameConf.lasthost = pstr;
-				mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
-				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
-					mainGame->btnCreateHost->setEnabled(false);
-					mainGame->btnJoinHost->setEnabled(false);
-					mainGame->btnJoinCancel->setEnabled(false);
+				catch(...) {
+					mainGame->gMutex.lock();
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
+					mainGame->gMutex.unlock();
+					break;
 				}
-				break;
 			}
 			case LISTBOX_REPLAY_LIST: {
 				LoadReplay();
@@ -623,12 +607,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {
 			case CHECK_SHOW_LOCKED_ROOMS: {
-				mainGame->roomListTable->clearRows(false);
 				ServerLobby::FillOnlineRooms();
 				break;
 			}
 			case CHECK_SHOW_ACTIVE_ROOMS: {
-				mainGame->roomListTable->clearRows(true);
+				ServerLobby::RefreshRooms();
 				break;
 			}
 			case CHECKBOX_HP_READY: {
@@ -700,31 +683,28 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case EDITBOX_TEAM_COUNT: {
 				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
+				wchar_t* min = L"1";
+				if(elem == mainGame->ebOnlineTeam1 || elem == mainGame->ebOnlineTeam2)
+					min = L"0";
 				auto text = elem->getText();
 				auto len = wcslen(text);
 				if(len < 1)
 					break;
-				if(text[len - 1] < L'1' || text[len - 1] > L'3') {
-					elem->setText(L"1");
+				if(text[len - 1] < min[0] || text[len - 1] > L'3') {
+					elem->setText(min);
 					break;
 				}
 				wchar_t string[] = { text[len - 1], 0 };
 				elem->setText(string);
 				break;
 			}
+			case EDITBOX_NICKNAME: {
+				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
+				auto target = (elem == mainGame->ebNickNameOnline) ? mainGame->ebNickName : mainGame->ebNickNameOnline;
+				target->setText(elem->getText());
+				break;
 			}
-			break;
-		}
-		case irr::gui::EGET_TABLE_CHANGED: {
-			break;
-		}
-		case irr::gui::EGET_TABLE_SELECTED_AGAIN: {
-			ServerLobby::JoinServer(false);
-			break;
-		}
-		case irr::gui::EGET_TABLE_ROWS_CLEARED: {
-			//load online rooms
-			ServerLobby::RefreshRooms();
+			}
 			break;
 		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
@@ -759,6 +739,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 			}
 			}
+		}
+		case EGET_TABLE_SELECTED_AGAIN: {
+			switch(id) {
+			case TABLE_ROOMLIST: {
+				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
+					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, EMBF_OK, 0, 0);
+					break;
+				}
+				if(mainGame->roomListTable->getSelected() >= 0) {
+					mainGame->HideElement(mainGame->wRoomListPlaceholder);
+					ServerLobby::JoinServer(false);
+				}
+				break;
+			}
+			}
+			break;
 		}
 		default: break;
 		}
