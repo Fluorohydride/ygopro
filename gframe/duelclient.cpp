@@ -291,6 +291,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		case ERRMSG_JOINERROR: {
 			temp_ver = 0;
 			if(mainGame->isHostingOnline && pkt->code == 9) {
+#define HIDE_AND_CHECK(obj) if(obj->isVisible()) mainGame->HideElement(obj);
+				HIDE_AND_CHECK(mainGame->wCreateHost);
+				HIDE_AND_CHECK(mainGame->wRules);
+				HIDE_AND_CHECK(mainGame->wCustomRules);
+#undef HIDE_AND_CHECK
 				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 			}
 			mainGame->gMutex.lock();
