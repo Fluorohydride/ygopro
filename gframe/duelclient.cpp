@@ -1113,9 +1113,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dInfo.player_type = 7;
 		if(!mainGame->dInfo.isRelay) {
 			if(mainGame->dInfo.isFirst)
-				mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
+				mainGame->dInfo.current_player[mainGame->LocalPlayer(1)] = mainGame->dInfo.team2 - 1;
 			else
-				mainGame->dInfo.current_player[0] = mainGame->dInfo.team1 - 1;
+				mainGame->dInfo.current_player[mainGame->LocalPlayer(0)] = mainGame->dInfo.team1 - 1;
 		}
 		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::Read<int32_t>(pbuf);
 		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::Read<int32_t>(pbuf);
