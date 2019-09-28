@@ -22,6 +22,8 @@
 
 unsigned short PRO_VERSION = 0x1348;
 
+nlohmann::json configs;
+
 namespace ygo {
 
 Game* mainGame;
@@ -1373,6 +1375,16 @@ void Game::LoadConfig() {
 			gameConf.enablemusic = !!std::stoi(str);
 	}
 	conf_file.close();
+	if(configs.empty()) {
+		conf_file.open(TEXT("configs.json"), std::ifstream::in);
+		try {
+			conf_file >> configs;
+		}
+		catch(std::exception& e) {
+			ErrorLog(std::string("Exception ocurred: ") + e.what());
+		}
+		conf_file.close();
+	}
 }
 void Game::SaveConfig() {
 	std::ofstream conf_file("system.conf", std::ofstream::out);
@@ -1425,30 +1437,24 @@ void Game::SaveConfig() {
 }
 void Game::LoadPicUrls() {
 	try {
-		std::ifstream f("pic_urls.json");
-		if(f.is_open()) {
-			nlohmann::json j;
-			f >> j;
-			f.close();
-			if(j.size()) {
-				for(auto& obj : j["urls"].get<std::vector<nlohmann::json>>()) {
-					if(obj["url"].get<std::string>() == "default") {
-						if(obj["type"].get<std::string>() == "pic") {
+		if(configs.size() && configs["urls"].is_array()) {
+			for(auto& obj : configs["urls"].get<std::vector<nlohmann::json>>()) {
+				if(obj["url"].get<std::string>() == "default") {
+					if(obj["type"].get<std::string>() == "pic") {
 #ifdef DEFAULT_PIC_URL
-							imageManager.AddDownloadResource({ DEFAULT_PIC_URL, "pic" });
+						imageManager.AddDownloadResource({ DEFAULT_PIC_URL, "pic" });
 #else
-							continue;
+						continue;
 #endif
-						} else {
-#ifdef DEFAULT_FIELD_URL
-							imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, "field" });
-#else
-							continue;
-#endif
-						}
 					} else {
-						imageManager.AddDownloadResource({ obj["url"].get<std::string>(),obj["type"].get<std::string>() });
+#ifdef DEFAULT_FIELD_URL
+						imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, "field" });
+#else
+						continue;
+#endif
 					}
+				} else {
+					imageManager.AddDownloadResource({ obj["url"].get<std::string>(),obj["type"].get<std::string>() });
 				}
 			}
 		}
@@ -1487,48 +1493,42 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 													tmp_repo.field = obj[#field].get<cpptype>();
 void Game::LoadGithubRepositories() {
 	try {
-		std::ifstream f("git_repo.json");
-		if(f.is_open()) {
-			nlohmann::json j;
-			f >> j;
-			f.close();
-			if(j.size()) {
-				for(auto& obj : j["repos"].get<std::vector<nlohmann::json>>()) {
-					if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
-						continue;
-					RepoManager::GitRepo tmp_repo;
-					JSON_SET_IF_VALID(url, string, std::string);
-					JSON_SET_IF_VALID(should_update, boolean, bool);
-					if(tmp_repo.url == "default") {
+		if(configs.size() && configs["repos"].is_array()) {
+			for(auto& obj : configs["repos"].get<std::vector<nlohmann::json>>()) {
+				if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
+					continue;
+				RepoManager::GitRepo tmp_repo;
+				JSON_SET_IF_VALID(url, string, std::string);
+				JSON_SET_IF_VALID(should_update, boolean, bool);
+				if(tmp_repo.url == "default") {
 #ifdef DEFAULT_LIVE_URL
-						tmp_repo.url = DEFAULT_LIVE_URL;
+					tmp_repo.url = DEFAULT_LIVE_URL;
 #ifdef YGOPRO_BUILD_DLL
-						tmp_repo.has_core = true;
+					tmp_repo.has_core = true;
 #endif
 #else
-						continue;
+					continue;
 #endif //DEFAULT_LIVE_URL
-					} else if(tmp_repo.url == "default_anime") {
+				} else if(tmp_repo.url == "default_anime") {
 #ifdef DEFAULT_LIVEANIME_URL
-						tmp_repo.url = DEFAULT_LIVEANIME_URL;
+					tmp_repo.url = DEFAULT_LIVEANIME_URL;
 #else
-						continue;
+					continue;
 #endif //DEFAULT_LIVEANIME_URL
-					} else {
-						JSON_SET_IF_VALID(repo_path, string, std::string);
-						JSON_SET_IF_VALID(repo_name, string, std::string);
-						JSON_SET_IF_VALID(data_path, string, std::string);
-						JSON_SET_IF_VALID(script_path, string, std::string);
-						JSON_SET_IF_VALID(pics_path, string, std::string);
+				} else {
+					JSON_SET_IF_VALID(repo_path, string, std::string);
+					JSON_SET_IF_VALID(repo_name, string, std::string);
+					JSON_SET_IF_VALID(data_path, string, std::string);
+					JSON_SET_IF_VALID(script_path, string, std::string);
+					JSON_SET_IF_VALID(pics_path, string, std::string);
 #ifdef YGOPRO_BUILD_DLL
-						JSON_SET_IF_VALID(core_path, string, std::string);
-						JSON_SET_IF_VALID(has_core, boolean, bool);
+					JSON_SET_IF_VALID(core_path, string, std::string);
+					JSON_SET_IF_VALID(has_core, boolean, bool);
 #endif
-					}
-					if(tmp_repo.Sanitize()) {
-						repoManager.AddRepo(tmp_repo);
-						AddGithubRepositoryStatusWindow(tmp_repo);
-					}
+				}
+				if(tmp_repo.Sanitize()) {
+					repoManager.AddRepo(tmp_repo);
+					AddGithubRepositoryStatusWindow(tmp_repo);
 				}
 			}
 		}
