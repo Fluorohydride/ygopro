@@ -101,19 +101,14 @@ void ServerLobby::FillOnlineRooms() {
 			color = SColor(255, 255, 255, 255);
 		else
 			color = red;
-
-		for(int i = 0; i < roomListTable->getColumnCount(); i++) {
-			roomListTable->setCellColor(i, 0, color);
-			roomListTable->setCellColor(i, 1, color);
-			roomListTable->setCellColor(i, 2, color);
-			roomListTable->setCellColor(i, 3, color);
-			roomListTable->setCellColor(i, 4, color);
-			roomListTable->setCellColor(i, 5, color);
-			roomListTable->setCellColor(i, 6, color);
-			roomListTable->setCellColor(i, 7, color);
-		}
-
-		//roomListTable->setCellData(index, 1, (void*)z);
+		roomListTable->setCellColor(index, 0, color);
+		roomListTable->setCellColor(index, 1, color);
+		roomListTable->setCellColor(index, 2, color);
+		roomListTable->setCellColor(index, 3, color);
+		roomListTable->setCellColor(index, 4, color);
+		roomListTable->setCellColor(index, 5, color);
+		roomListTable->setCellColor(index, 6, color);
+		roomListTable->setCellColor(index, 7, color);
 	}
 }
 int ServerLobby::GetRoomsThread() {
