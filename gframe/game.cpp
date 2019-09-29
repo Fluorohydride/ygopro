@@ -1540,22 +1540,16 @@ void Game::LoadGithubRepositories() {
 #undef JSON_SET_IF_VALID
 void Game::LoadServers() {
 	try {
-		std::ifstream f("servers.json");
-		if(f.is_open()) {
-			nlohmann::json j;
-			f >> j;
-			f.close();
-			if(j.size()) {
-				for(auto& obj : j["servers"].get<std::vector<nlohmann::json>>()) {
-					ServerInfo tmp_server;
-					tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-					tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
-					tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
-					tmp_server.roomlistport = obj["roomlistport"].get<int>();
-					tmp_server.duelport = obj["duelport"].get<int>();
-					mainGame->serverChoice->addItem(tmp_server.name.c_str());
-					serversVector.push_back(std::move(tmp_server));
-				}
+		if(configs.size() && configs["servers"].is_array()) {
+			for(auto& obj : configs["servers"].get<std::vector<nlohmann::json>>()) {
+				ServerInfo tmp_server;
+				tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+				tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
+				tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
+				tmp_server.roomlistport = obj["roomlistport"].get<int>();
+				tmp_server.duelport = obj["duelport"].get<int>();
+				mainGame->serverChoice->addItem(tmp_server.name.c_str());
+				serversVector.push_back(std::move(tmp_server));
 			}
 		}
 	}
