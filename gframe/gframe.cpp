@@ -5,6 +5,7 @@
 #include <memory>
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
+#include "osx_menu.h"
 #endif
 
 int enable_log = 0;
@@ -64,6 +65,9 @@ int main(int argc, char* argv[]) {
 	ygo::mainGame = &_game;
 	if(!ygo::mainGame->Initialize())
 		return EXIT_FAILURE;
+#ifdef __APPLE__
+	EDOPRO_SetupMenuBar();
+#endif
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
 		path_string parameter(argv[i]);

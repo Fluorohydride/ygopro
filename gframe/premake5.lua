@@ -49,6 +49,7 @@ local ygopro_config=function(static_core)
 		defines "LUA_USE_MACOSX"
 		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
+		files "osx_menu.m"
 		linkoptions { "-Wl,-rpath ./" }
 		libdirs "../irrKlang/bin/macosx-gcc/"
 		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
