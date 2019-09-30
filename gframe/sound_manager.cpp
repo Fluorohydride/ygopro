@@ -1,5 +1,6 @@
 #include "sound_manager.h"
 #include "config.h"
+#include "game.h"
 #ifdef IRRKLANG_STATIC
 #include "../ikpmp3/ikpMP3.h"
 #endif
@@ -108,6 +109,8 @@ void SoundManager::PlaySoundEffect(SFX sound) {
         {CHAT, "./sound/chatmessage.wav"}
     };
     if (!soundsEnabled) return;
+	if (mainGame->dInfo.isCatchingUp) return;
+
 #ifdef YGOPRO_USE_IRRKLANG
     if (soundEngine) soundEngine->play2D(fx.at(sound));
 #else
