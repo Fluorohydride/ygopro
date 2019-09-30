@@ -1826,7 +1826,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_SUM: {
 		/*int selecting_player*/
-		if(!mainGame->dInfo.compat_mode) {
+		if(mainGame->dInfo.compat_mode) {
 			mainGame->dField.select_mode = BufferIO::Read<uint8_t>(pbuf);
 			/*selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		} else {
