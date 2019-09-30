@@ -5,9 +5,7 @@
 extern "C" {
 #endif
 
-#ifdef __APPLE__
 void EDOPRO_SetupMenuBar();
-#endif
 
 #ifdef __cplusplus
 }
