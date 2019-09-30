@@ -1180,7 +1180,7 @@ void Game::MainLoop() {
 		}
 		if (DuelClient::try_needed) {
 			DuelClient::try_needed = false;
-			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, false);
+			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, dInfo.secret.game_id, false);
 		}
 		popupCheck.lock();
 		if(queued_msg.size()){
@@ -1189,6 +1189,12 @@ void Game::MainLoop() {
 		}
 		popupCheck.unlock();
 		discord.Check();
+		if(discord.connected && !discord_message_shown) {
+			discord_message_shown = true;
+			env->setFocus(stACMessage);
+			stACMessage->setText(L"Connected to Discord");
+			PopupElement(wACMessage, 30);
+		}
 	}
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();
@@ -1883,6 +1889,8 @@ void Game::UpdateExtraRules() {
 	}
 }
 int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
+	if(truerule)
+		*truerule = 0;
 	switch(param) {
 	case DUEL_MODE_MR1: {
 		if (truerule)
@@ -1909,7 +1917,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 			return 4;
 	}
 	default: {
-		if (truerule)
+		if (truerule && !*truerule)
 			*truerule = 5;
 		if ((param & DUEL_PZONE) && (param & DUEL_SEPARATE_PZONE) && (param & DUEL_EMZONE))
 			return 5;
@@ -1962,10 +1970,14 @@ void Game::SetPhaseButtons() {
 	}
 }
 void Game::SetMesageWindow() {
-	if(is_building || dInfo.isInDuel)
+	if(is_building || dInfo.isInDuel) {
 		wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	else {
-		wMessage->setRelativePosition(ResizeWin(510 - 175, 200, 510 + 175, 340));
+		wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
+	} else {
+		SetCentered(wMessage);
+		SetCentered(wACMessage);
+		/*wMessage->setRelativePosition(ResizeWin(510 - 175, 200, 510 + 175, 340));
+		wACMessage->setRelativePosition(ResizeWin(510 - 175, 240, 510 + 175, 300));*/
 	}
 }
 void Game::OnResize() {
@@ -2037,7 +2049,7 @@ void Game::OnResize() {
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
 	SetMesageWindow();
-	wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
+	//wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	auto pos = wOptions->getRelativePosition();
 	wOptions->setRelativePosition(ResizeWin(490, 200, 490 + (pos.LowerRightCorner.X - pos.UpperLeftCorner.X), 200 + (pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y)));
