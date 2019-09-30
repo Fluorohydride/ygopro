@@ -96,9 +96,7 @@ struct DuelInfo {
 	unsigned char time_player;
 	unsigned short time_limit;
 	unsigned short time_left[2];
-	unsigned int game_id;
-	unsigned short server_port;
-	unsigned int server_address;
+	DiscordWrapper::DiscordSecret secret;
 	bool isReplaySwapped;
 };
 

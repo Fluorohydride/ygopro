@@ -8,6 +8,12 @@
 #include "utils.h"
 class DiscordWrapper {
 public:
+	struct DiscordSecret {
+		unsigned int game_id;
+		unsigned int server_address;
+		unsigned short server_port;
+		unsigned short pass[20];
+	};
 	enum PresenceType {
 		MENU,
 		IN_LOBBY,
@@ -23,16 +29,17 @@ public:
 	~DiscordWrapper();
 	bool Initialize(path_string workingDir);
 	void UpdatePresence(PresenceType type);
+	std::string& CreateSecret() const;
+	bool connected;
 	void Check();
 private:
-	bool wasLaunched;
 #ifdef DISCORD_APP_ID
-	static void OnReady(const DiscordUser* connectedUser);
-	static void OnDisconnected(int errcode, const char* message);
-	static void OnError(int errcode, const char* message);
-	static void OnJoin(const char* secret);
-	static void OnSpectate(const char* secret);
-	static void OnJoinRequest(const DiscordUser* request);
+	static void OnReady(const DiscordUser* connectedUser, void* payload);
+	static void OnDisconnected(int errcode, const char* message, void* payload);
+	static void OnError(int errcode, const char* message, void* payload);
+	static void OnJoin(const char* secre, void* payloadt);
+	static void OnSpectate(const char* secret, void* payload);
+	static void OnJoinRequest(const DiscordUser* request, void* payload);
 #endif
 };
 

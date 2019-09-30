@@ -224,7 +224,6 @@ void ServerLobby::JoinServer(bool host) {
 		} else {
 			//client
 			RoomInfo* room = static_cast<RoomInfo*>(mainGame->roomListTable->getCellData(mainGame->roomListTable->getSelected(), 1));
-
 			if(room->locked) {
 				if(!mainGame->wRoomPassword->isVisible()) {
 					mainGame->wRoomPassword->setVisible(true);
@@ -235,13 +234,11 @@ void ServerLobby::JoinServer(bool host) {
 					}
 				}
 			}
-
+			BufferIO::CopyWStr(mainGame->ebRPName->getText(), mainGame->dInfo.secret.pass, 20);
 			if(!DuelClient::StartClient(serverinfo.first, serverinfo.second, room->id, false)) {
 				return;
 			}
 		}
-		mainGame->dInfo.server_port = serverinfo.second;
-		mainGame->dInfo.server_address = serverinfo.first;
 	}
 	catch(...) {
 		return;

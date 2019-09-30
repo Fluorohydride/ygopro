@@ -157,9 +157,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
 					mainGame->gameConf.lasthost = mainGame->ebJoinHost->getText();
 					mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
+					BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), mainGame->dInfo.secret.pass, 20);
 					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
-						mainGame->dInfo.server_port = parsed.second;
-						mainGame->dInfo.server_address = parsed.first;
 						mainGame->btnCreateHost->setEnabled(false);
 						mainGame->btnJoinHost->setEnabled(false);
 						mainGame->btnJoinCancel->setEnabled(false);
@@ -576,9 +575,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
 					mainGame->gameConf.lasthost = mainGame->ebJoinHost->getText();
 					mainGame->gameConf.lastport = mainGame->ebJoinPort->getText();
+					BufferIO::CopyWStr(mainGame->ebRPName->getText(), mainGame->dInfo.secret.pass, 20);
 					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
-						mainGame->dInfo.server_port = parsed.second;
-						mainGame->dInfo.server_address = parsed.first;
 						mainGame->btnCreateHost->setEnabled(false);
 						mainGame->btnJoinHost->setEnabled(false);
 						mainGame->btnJoinCancel->setEnabled(false);
@@ -750,8 +748,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {
-					mainGame->HideElement(mainGame->wRoomListPlaceholder);
-					ServerLobby::JoinServer(false);
+					RoomInfo* room = static_cast<RoomInfo*>(mainGame->roomListTable->getCellData(mainGame->roomListTable->getSelected(), 1));
+					if(room->locked) {
+						mainGame->wRoomPassword->setVisible(true);
+					} else {
+						mainGame->HideElement(mainGame->wRoomListPlaceholder);
+						ServerLobby::JoinServer(false);
+					}
 				}
 				break;
 			}
@@ -775,12 +778,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_F5: {
-			if (!event.KeyInput.PressedDown) {
-				if(mainGame->wRoomListPlaceholder->isVisible() && mainGame->btnLanRefresh2->isEnabled()) {
-					mainGame->roomListTable->clearRows(true);
-				}
-			}
-			return true;
+			ServerLobby::RefreshRooms();
 			break;
 		}
 		case irr::KEY_F12: {

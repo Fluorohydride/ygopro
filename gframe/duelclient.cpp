@@ -73,7 +73,6 @@ std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wst
 }
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, unsigned int gameid, bool create_game) {
-	mainGame->dInfo.game_id = gameid;
 	if(connect_state)
 		return false;
 	sockaddr_in sin;
@@ -102,6 +101,9 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, unsigned int 
 		event* resp_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
 		event_add(resp_event, &timeout);
 	}
+	mainGame->dInfo.secret.game_id = gameid;
+	mainGame->dInfo.secret.server_port = port;
+	mainGame->dInfo.secret.server_address = ip;
 	std::thread(ClientThread).detach();
 	return true;
 }
@@ -160,7 +162,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
 		if(create_game) {
 			CTOS_CreateGame cscg;
-			mainGame->dInfo.game_id = 0;
+			mainGame->dInfo.secret.game_id = 0;
 			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
 			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
 			cscg.info.rule = mainGame->cbRule->getSelected();
@@ -197,11 +199,8 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				csjg.version = temp_ver;
 			else
 				csjg.version = PRO_VERSION;
-			csjg.gameid = mainGame->dInfo.game_id;
-			if(mainGame->isHostingOnline)
-				BufferIO::CopyWStr(mainGame->ebRPName->getText(), csjg.pass, 20);
-			else
-				BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
+			csjg.gameid = mainGame->dInfo.secret.game_id;
+			BufferIO::CopyWStr(mainGame->dInfo.secret.pass, csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		bufferevent_enable(bev, EV_READ);
@@ -494,7 +493,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_CREATE_GAME: {
 		STOC_CreateGame* pkt = (STOC_CreateGame*)pdata;
-		mainGame->dInfo.game_id = pkt->gameid;
+		mainGame->dInfo.secret.game_id = pkt->gameid;
 		break;
 	}
 	case STOC_JOIN_GAME: {
