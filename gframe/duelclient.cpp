@@ -114,8 +114,13 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
-		if(!mainGame->wLanWindow->isVisible())
-			mainGame->ShowElement(mainGame->wLanWindow);
+		if(mainGame->isHostingOnline) {
+			if(!mainGame->wRoomListPlaceholder->isVisible())
+				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+		} else {
+			if(!mainGame->wLanWindow->isVisible())
+				mainGame->ShowElement(mainGame->wLanWindow);
+		}
 		mainGame->PopupMessage(dataManager.GetSysString(1400));
 		mainGame->gMutex.unlock();
 	}
@@ -193,7 +198,10 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			else
 				csjg.version = PRO_VERSION;
 			csjg.gameid = mainGame->dInfo.game_id;
-			BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
+			if(mainGame->isHostingOnline)
+				BufferIO::CopyWStr(mainGame->ebRPName->getText(), csjg.pass, 20);
+			else
+				BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		bufferevent_enable(bev, EV_READ);
