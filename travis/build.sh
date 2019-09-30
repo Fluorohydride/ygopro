@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -euo pipefail
 
 PICS_URL=${PICS_URL:-""}
 FIELDS_URL=${FIELDS_URL:-""}
