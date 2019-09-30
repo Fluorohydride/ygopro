@@ -108,8 +108,7 @@ void SoundManager::PlaySoundEffect(SFX sound) {
         {PLAYER_ENTER, "./sound/playerenter.wav"},
         {CHAT, "./sound/chatmessage.wav"}
     };
-    if (!soundsEnabled) return;
-	if (mainGame->dInfo.isCatchingUp) return;
+    if (!soundsEnabled || !mainGame->dInfo.isCatchingUp) return;
 
 #ifdef YGOPRO_USE_IRRKLANG
     if (soundEngine) soundEngine->play2D(fx.at(sound));
