@@ -8,13 +8,17 @@ local ygopro_config=function(static_core)
 	if _OPTIONS["discord"] then
 		defines { "DISCORD_APP_ID=" .. _OPTIONS["discord"] }
 	end
-	defines { "YGOPRO_USE_IRRKLANG", "CURL_STATICLIB" }
 	kind "WindowedApp"
 	cppdialect "C++14"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
+	defines "CURL_STATICLIB"
 	includedirs { "../ocgcore", "../irrKlang/include" }
-	links { "clzma", "freetype", "Irrlicht", "IrrKlang" }
+	links { "clzma", "freetype", "Irrlicht" }
+	filter "options:not no-irrklang"
+		defines "YGOPRO_USE_IRRKLANG"
+		links "IrrKlang"
+
 	filter "system:windows"
 		kind "ConsoleApp"
 		files "ygopro.rc"
@@ -39,7 +43,10 @@ local ygopro_config=function(static_core)
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
 		excludes "COSOperator.*"
-		links { "sqlite3", "event", "fmt", "event_pthreads", "dl", "pthread", "git2", "curl" }
+		links { "sqlite3", "event", "event_pthreads", "dl", "pthread", "git2" }
+
+	filter { "system:not windows", "options:no-irrklang" }
+		links { "openal", "mpg123", "sndfile", "vorbis", "vorbisenc", "ogg", "FLAC" }
 		if _OPTIONS["discord"] then
 			links "discord-rpc"
 		end
@@ -51,10 +58,20 @@ local ygopro_config=function(static_core)
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
 		libdirs "../irrKlang/bin/macosx-gcc/"
-		links { "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
+		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
 		if static_core then
 			links  "lua"
 		end
+
+	filter { "system:macosx", "options:no-irrklang" }
+		includedirs "/usr/local/opt/openal-soft/include"
+		libdirs "/usr/local/opt/openal-soft/lib"
+
+	filter { "system:linux", "configurations:Debug" }
+		links { "fmtd", "curl-d" }
+
+        filter { "system:linux", "configurations:Release" }
+		links { "fmt", "curl" }	
 
 	filter "system:linux"
 		defines "LUA_USE_LINUX"

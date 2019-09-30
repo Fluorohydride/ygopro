@@ -22,6 +22,8 @@
 
 unsigned short PRO_VERSION = 0x1348;
 
+nlohmann::json configs;
+
 namespace ygo {
 
 Game* mainGame;
@@ -782,7 +784,8 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	if(!soundManager.Init(gameConf.volume, gameConf.volume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
+	soundManager = std::make_unique<SoundManager>();
+	if(!soundManager->Init(gameConf.volume, gameConf.volume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
 		chkEnableSound->setVisible(false);
@@ -953,15 +956,15 @@ void Game::MainLoop() {
 					discord.UpdatePresence(DiscordWrapper::DUEL);
 			}
 			if (showcardcode == 1 || showcardcode == 3)
-				soundManager.PlayBGM(SoundManager::BGM::WIN);
+				soundManager->PlayBGM(SoundManager::BGM::WIN);
 			else if (showcardcode == 2)
-				soundManager.PlayBGM(SoundManager::BGM::LOSE);
+				soundManager->PlayBGM(SoundManager::BGM::LOSE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] <= dInfo.lp[LocalPlayer(1)] / 2)
-				soundManager.PlayBGM(SoundManager::BGM::DISADVANTAGE);
+				soundManager->PlayBGM(SoundManager::BGM::DISADVANTAGE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] >= dInfo.lp[LocalPlayer(1)] * 2)
-				soundManager.PlayBGM(SoundManager::BGM::ADVANTAGE);
+				soundManager->PlayBGM(SoundManager::BGM::ADVANTAGE);
 			else
-				soundManager.PlayBGM(SoundManager::BGM::DUEL);
+				soundManager->PlayBGM(SoundManager::BGM::DUEL);
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
@@ -974,7 +977,7 @@ void Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
 			else
 				discord.UpdatePresence(DiscordWrapper::DECK);
-			soundManager.PlayBGM(SoundManager::BGM::DECK);
+			soundManager->PlayBGM(SoundManager::BGM::DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
 			DrawDeckBd();
 		} else {
@@ -982,7 +985,7 @@ void Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::IN_LOBBY);
 			else
 				discord.UpdatePresence(DiscordWrapper::MENU);
-			soundManager.PlayBGM(SoundManager::BGM::MENU);
+			soundManager->PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
 		DrawGUI();
@@ -1242,6 +1245,16 @@ void Game::LoadConfig() {
 			gameConf.enablemusic = !!std::stoi(str);
 	}
 	conf_file.close();
+	if(configs.empty()) {
+		conf_file.open(TEXT("configs.json"), std::ifstream::in);
+		try {
+			conf_file >> configs;
+		}
+		catch(std::exception& e) {
+			ErrorLog(std::string("Exception ocurred: ") + e.what());
+		}
+		conf_file.close();
+	}
 }
 void Game::SaveConfig() {
 	std::ofstream conf_file("system.conf", std::ofstream::out);
@@ -1294,30 +1307,24 @@ void Game::SaveConfig() {
 }
 void Game::LoadPicUrls() {
 	try {
-		std::ifstream f("pic_urls.json");
-		if(f.is_open()) {
-			nlohmann::json j;
-			f >> j;
-			f.close();
-			if(j.size()) {
-				for(auto& obj : j["urls"].get<std::vector<nlohmann::json>>()) {
-					if(obj["url"].get<std::string>() == "default") {
-						if(obj["type"].get<std::string>() == "pic") {
+		if(configs.size() && configs["urls"].is_array()) {
+			for(auto& obj : configs["urls"].get<std::vector<nlohmann::json>>()) {
+				if(obj["url"].get<std::string>() == "default") {
+					if(obj["type"].get<std::string>() == "pic") {
 #ifdef DEFAULT_PIC_URL
-							imageManager.AddDownloadResource({ DEFAULT_PIC_URL, "pic" });
+						imageManager.AddDownloadResource({ DEFAULT_PIC_URL, "pic" });
 #else
-							continue;
+						continue;
 #endif
-						} else {
-#ifdef DEFAULT_FIELD_URL
-							imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, "field" });
-#else
-							continue;
-#endif
-						}
 					} else {
-						imageManager.AddDownloadResource({ obj["url"].get<std::string>(),obj["type"].get<std::string>() });
+#ifdef DEFAULT_FIELD_URL
+						imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, "field" });
+#else
+						continue;
+#endif
 					}
+				} else {
+					imageManager.AddDownloadResource({ obj["url"].get<std::string>(),obj["type"].get<std::string>() });
 				}
 			}
 		}
@@ -1356,48 +1363,42 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 													tmp_repo.field = obj[#field].get<cpptype>();
 void Game::LoadGithubRepositories() {
 	try {
-		std::ifstream f("git_repo.json");
-		if(f.is_open()) {
-			nlohmann::json j;
-			f >> j;
-			f.close();
-			if(j.size()) {
-				for(auto& obj : j["repos"].get<std::vector<nlohmann::json>>()) {
-					if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
-						continue;
-					RepoManager::GitRepo tmp_repo;
-					JSON_SET_IF_VALID(url, string, std::string);
-					JSON_SET_IF_VALID(should_update, boolean, bool);
-					if(tmp_repo.url == "default") {
+		if(configs.size() && configs["repos"].is_array()) {
+			for(auto& obj : configs["repos"].get<std::vector<nlohmann::json>>()) {
+				if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
+					continue;
+				RepoManager::GitRepo tmp_repo;
+				JSON_SET_IF_VALID(url, string, std::string);
+				JSON_SET_IF_VALID(should_update, boolean, bool);
+				if(tmp_repo.url == "default") {
 #ifdef DEFAULT_LIVE_URL
-						tmp_repo.url = DEFAULT_LIVE_URL;
+					tmp_repo.url = DEFAULT_LIVE_URL;
 #ifdef YGOPRO_BUILD_DLL
-						tmp_repo.has_core = true;
+					tmp_repo.has_core = true;
 #endif
 #else
-						continue;
+					continue;
 #endif //DEFAULT_LIVE_URL
-					} else if(tmp_repo.url == "default_anime") {
+				} else if(tmp_repo.url == "default_anime") {
 #ifdef DEFAULT_LIVEANIME_URL
-						tmp_repo.url = DEFAULT_LIVEANIME_URL;
+					tmp_repo.url = DEFAULT_LIVEANIME_URL;
 #else
-						continue;
+					continue;
 #endif //DEFAULT_LIVEANIME_URL
-					} else {
-						JSON_SET_IF_VALID(repo_path, string, std::string);
-						JSON_SET_IF_VALID(repo_name, string, std::string);
-						JSON_SET_IF_VALID(data_path, string, std::string);
-						JSON_SET_IF_VALID(script_path, string, std::string);
-						JSON_SET_IF_VALID(pics_path, string, std::string);
+				} else {
+					JSON_SET_IF_VALID(repo_path, string, std::string);
+					JSON_SET_IF_VALID(repo_name, string, std::string);
+					JSON_SET_IF_VALID(data_path, string, std::string);
+					JSON_SET_IF_VALID(script_path, string, std::string);
+					JSON_SET_IF_VALID(pics_path, string, std::string);
 #ifdef YGOPRO_BUILD_DLL
-						JSON_SET_IF_VALID(core_path, string, std::string);
-						JSON_SET_IF_VALID(has_core, boolean, bool);
+					JSON_SET_IF_VALID(core_path, string, std::string);
+					JSON_SET_IF_VALID(has_core, boolean, bool);
 #endif
-					}
-					if(tmp_repo.Sanitize()) {
-						repoManager.AddRepo(tmp_repo);
-						AddGithubRepositoryStatusWindow(tmp_repo);
-					}
+				}
+				if(tmp_repo.Sanitize()) {
+					repoManager.AddRepo(tmp_repo);
+					AddGithubRepositoryStatusWindow(tmp_repo);
 				}
 			}
 		}
@@ -1502,10 +1503,10 @@ void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 	chatTiming[0] = 1200.0f;
 	chatType[0] = player;
 	if(type == 0) {
-		soundManager.PlaySoundEffect(SoundManager::SFX::CHAT);
+		soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 		chatMsg[0].append(dInfo.hostname[player]);
 	} else if(type == 1) {
-		soundManager.PlaySoundEffect(SoundManager::SFX::CHAT);
+		soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 		chatMsg[0].append(dInfo.clientname[player]);
 	} else if(type == 2) {
 		switch(player) {
@@ -1513,7 +1514,7 @@ void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 			chatMsg[0].append(ebNickName->getText());
 			break;
 		case 8: //system custom message, no prefix.
-			soundManager.PlaySoundEffect(SoundManager::SFX::CHAT);
+			soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
 			chatMsg[0].append(L"[System]");
 			break;
 		case 9: //error message

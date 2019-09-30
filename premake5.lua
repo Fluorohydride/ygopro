@@ -3,6 +3,10 @@ newoption {
 	description = "Disable DirectX options in irrlicht if the DirectX SDK isn't installed"
 }
 newoption {
+	trigger = "no-irrklang",
+	description = "Disable irrKlang and use OpenAL Soft"
+}
+newoption {
 	trigger = "pics",
 	value = "url_template",
 	description = "Default URL for card images"
