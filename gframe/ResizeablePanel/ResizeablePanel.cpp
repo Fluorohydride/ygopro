@@ -68,6 +68,7 @@ namespace gui {
 		return { 0, 0, width, height };
 	}
 	void Panel::doResizingStuff() {
+		auto scrollsize = Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
 		subpanel->setRelativePosition({ 0, 0, AbsoluteClippingRect.getWidth(), AbsoluteClippingRect.getHeight() });
 		if(hasVerticalScrolling || hasHorizontalScrolling) {
 			horizontalScroll->setVisible(false);
@@ -80,13 +81,13 @@ namespace gui {
 				maxY = std::max(maxX, child->getAbsolutePosition().LowerRightCorner.Y);
 			}
 			if(hasHorizontalScrolling && maxX > rect.LowerRightCorner.X) {
-				horizontalScroll->setRelativePosition(irr::core::rect<s32>(5, rect.getHeight() - 20, rect.getWidth() - 5, rect.getHeight() - 5));
+				horizontalScroll->setRelativePosition(irr::core::rect<s32>(5, rect.getHeight() - (5 + scrollsize), rect.getWidth() - 5, rect.getHeight() - 5));
 				horizontalScroll->setVisible(true);
 				horizontalScroll->setMax(maxX - rect.LowerRightCorner.X);
 				horizontalScroll->setPos(0);
 			}
 			if(hasVerticalScrolling && maxY > rect.LowerRightCorner.Y) {
-				verticalScroll->setRelativePosition(irr::core::rect<s32>(rect.getWidth() - 25, 10, rect.getWidth() - 5, rect.getHeight() - 25));
+				verticalScroll->setRelativePosition(irr::core::rect<s32>(rect.getWidth() - (5 + scrollsize), 10, rect.getWidth() - 5, rect.getHeight() - 25));
 				verticalScroll->setVisible(true);
 				verticalScroll->setMax(maxY - rect.LowerRightCorner.Y);
 				verticalScroll->setPos(0);

@@ -8,7 +8,6 @@
 #include "rect.h"
 #include "../IrrlichtCommonIncludes/os.h"
 #include <algorithm>
-#include <cmath>
 
 namespace irr
 {
@@ -655,7 +654,7 @@ void CGUICustomText::updateAbsolutePosition()
 		else if(ScrollRatio)
 			width2 = width - round(width*ScrollRatio);
 		else
-			width2 = width - round(width*0.1);
+			width2 = width - Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
 		scrText->setRelativePosition(irr::core::rect<s32>(width2, 0, width, RelativeRect.getHeight()));
 	}
 	if(prev_rect.getHeight() != RelativeRect.getHeight() || prev_rect.getWidth() != RelativeRect.getWidth()) {

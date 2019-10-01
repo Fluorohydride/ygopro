@@ -124,6 +124,20 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load font(s)!");
 		return false;
 	}
+	auto skin = env->getSkin();
+#define SKIN_SCALE(elem)skin->setSize(elem, Scale(skin->getSize(elem)));
+	skin->setSize(EGDS_SCROLLBAR_SIZE, Scale(20));
+	SKIN_SCALE(EGDS_MENU_HEIGHT)
+	SKIN_SCALE(EGDS_WINDOW_BUTTON_WIDTH)
+	SKIN_SCALE(EGDS_CHECK_BOX_WIDTH)
+	SKIN_SCALE(EGDS_BUTTON_WIDTH)
+	SKIN_SCALE(EGDS_BUTTON_HEIGHT)
+	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_X)
+	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_Y)
+	SKIN_SCALE(EGDS_TEXT_DISTANCE_X)
+	SKIN_SCALE(EGDS_TEXT_DISTANCE_Y)
+	SKIN_SCALE(EGDS_MESSAGE_BOX_GAP_SPACE)
+#undef SKIN_SCALE
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"EDOPro");
 	device->setResizable(true);
@@ -147,7 +161,7 @@ bool Game::Initialize() {
 	wCommitsLog->getCloseButton()->setVisible(false);
 	stCommitLog = irr::gui::CGUICustomText::addCustomText(L"", false, env, wCommitsLog, -1, Scale(5, 30, 505, 430));
 	stCommitLog->setWordWrap(true);
-	((CGUICustomText*)stCommitLog)->enableScrollBar(0, 0.04f);
+	((CGUICustomText*)stCommitLog)->enableScrollBar();
 	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, L"OK");
 	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
 	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(2045).c_str(), 1, true, true));
@@ -169,7 +183,7 @@ bool Game::Initialize() {
 	ebNickName = env->addEditBox(gameConf.nickname.c_str(), Scale(110, 25, 450, 50), true, wLanWindow);
 	ebNickName->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	lstHostList = env->addListBox(Scale(10, 60, 570, 320), wLanWindow, LISTBOX_LAN_HOST, true);
-	lstHostList->setItemHeight(18);
+	lstHostList->setItemHeight(Scale(18));
 	btnLanRefresh = env->addButton(Scale(240, 325, 340, 350), wLanWindow, BUTTON_LAN_REFRESH, dataManager.GetSysString(1217).c_str());
 	env->addStaticText(dataManager.GetSysString(1221).c_str(), Scale(10, 360, 220, 380), false, false, wLanWindow);
 	ebJoinHost = env->addEditBox(gameConf.lasthost.c_str(), Scale(110, 355, 350, 380), true, wLanWindow);
@@ -356,18 +370,18 @@ bool Game::Initialize() {
 	stSetName->setWordWrap(true);
 	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
-	((CGUICustomText*)stText)->enableScrollBar(0, 0.07f);
+	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
 	//log
 	tabLog =  wInfos->addTab(dataManager.GetSysString(1271).c_str());
 	lstLog = env->addListBox(Scale(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
-	lstLog->setItemHeight(18);
+	lstLog->setItemHeight(Scale(18));
 	btnClearLog = env->addButton(Scale(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272).c_str());
 	btnExpandLog = env->addButton(Scale(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2045).c_str());
 	//chat
 	tabChat = wInfos->addTab(dataManager.GetSysString(1279).c_str());
 	lstChat = env->addListBox(Scale(10, 10, 290, 290), tabChat, -1, false);
-	lstChat->setItemHeight(18);
+	lstChat->setItemHeight(Scale(18));
 	btnClearChat = env->addButton(Scale(160, 300, 260, 325), tabChat, BUTTON_CLEAR_CHAT, dataManager.GetSysString(1282).c_str());
 	btnExpandChat = env->addButton(Scale(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2043).c_str());
 	//system
@@ -694,7 +708,7 @@ bool Game::Initialize() {
 	lstReplayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wReplay, LISTBOX_REPLAY_LIST, Scale(10, 30, 350, 400), filesystem, true, true, false);
 	lstReplayList->setWorkingPath(L"./replay", true);
 	lstReplayList->addFilteredExtensions(coreloaded ? std::vector<std::wstring>{L"yrp", L"yrpx"} : std::vector<std::wstring>{ L"yrpx" });
-	lstReplayList->setItemHeight(18);
+	lstReplayList->setItemHeight(Scale(18));
 	btnLoadReplay = env->addButton(Scale(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348).c_str());
 	btnLoadReplay->setEnabled(false);
 	btnDeleteReplay = env->addButton(Scale(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, dataManager.GetSysString(1361).c_str());
@@ -716,7 +730,7 @@ bool Game::Initialize() {
 	wSinglePlay->getCloseButton()->setVisible(false);
 	wSinglePlay->setVisible(false);
 	lstSinglePlayList = irr::gui::CGUIFileSelectListBox::addFileSelectListBox(env, wSinglePlay, LISTBOX_SINGLEPLAY_LIST, Scale(10, 30, 350, 400), filesystem, true, true, false);
-	lstSinglePlayList->setItemHeight(18);
+	lstSinglePlayList->setItemHeight(Scale(18));
 	lstSinglePlayList->setWorkingPath(L"./puzzles", true);
 	lstSinglePlayList->addFilteredExtensions({L"lua"});
 	btnLoadSinglePlay = env->addButton(Scale(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, dataManager.GetSysString(1357).c_str());
@@ -724,7 +738,7 @@ bool Game::Initialize() {
 	btnSinglePlayCancel = env->addButton(Scale(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210).c_str());
 	env->addStaticText(dataManager.GetSysString(1352).c_str(), Scale(360, 30, 570, 50), false, true, wSinglePlay);
 	stSinglePlayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wSinglePlay, -1, Scale(360, 60, 570, 350));
-	((CGUICustomText*)stSinglePlayInfo)->enableScrollBar(0, 0.07f);
+	((CGUICustomText*)stSinglePlayInfo)->enableScrollBar();
 	stSinglePlayInfo->setWordWrap(true);
 	//replay save
 	wReplaySave = env->addWindow(Scale(510, 200, 820, 320), false, dataManager.GetSysString(1340).c_str());
@@ -1962,7 +1976,7 @@ recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2) {
 	auto center = rect.getCenter();
 	core::dimension2d<u32> sizes((x + x2) / 2, (y + y2) / 2);
 	recti rect2(x, y, x2, y2);
-	return Scale<s32>((center.X - sizes.Width), center.Y - sizes.Height, center.X + sizes.Width, center.Y + sizes.Height);
+	return recti((center.X - sizes.Width), center.Y - sizes.Height, center.X + sizes.Width, center.Y + sizes.Height);
 }
 void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	std::wstring text = obj->getText();
