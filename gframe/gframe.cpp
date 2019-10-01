@@ -40,7 +40,9 @@ int main(int argc, char* argv[]) {
 	CFRelease(bundle_url);
 	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
 	CFRelease(bundle_base_url);
+#ifdef MAC_OS_DISCORD_LAUNCHER
 	system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+#endif
 	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
 	CFRelease(path);
 	CFRelease(bundle_path);

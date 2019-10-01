@@ -17,8 +17,12 @@ void RegisterURL(const char* applicationId)
 			fprintf(stderr, "No bundle id found\n");
 			return;
 		}
-
+		
+#ifdef MAC_OS_DISCORD_LAUNCHER
 		NSString* myBundleId = [NSString stringWithFormat:@"%@.discord", _myBundleId];
+#else
+		NSString* myBundleId = _myBundleId;
+#endif
 
 		NSURL* myURL = [[NSBundle mainBundle] bundleURL];
 		if (!myURL) {
