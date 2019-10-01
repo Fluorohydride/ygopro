@@ -156,9 +156,9 @@ int ServerLobby::GetRoomsThread() {
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
 		if(j.size()) {
 #define GET(field, type) obj[field].get<type>()
-			for(auto& obj : j["rooms"].get<std::vector<nlohmann::json>>()) {
-				RoomInfo room;
-				try {
+			try {
+				for(auto& obj : j["rooms"].get<std::vector<nlohmann::json>>()) {
+					RoomInfo room;
 					room.id = GET("roomid", int);
 					room.name = BufferIO::DecodeUTF8s(GET("roomname", std::string));
 					room.description = BufferIO::DecodeUTF8s(GET("roomnotes", std::string));
@@ -185,9 +185,9 @@ int ServerLobby::GetRoomsThread() {
 					}
 					mainGame->roomsVector.push_back(std::move(room));
 				}
-				catch(...) {
+			}
+			catch(...) {
 
-				}
 			}
 		}
 	}
@@ -240,8 +240,8 @@ void ServerLobby::JoinServer(bool host) {
 			}
 		}
 	}
-	catch(...) {
-		return;
+	catch(std::exception& e) {
+		mainGame->ErrorLog(std::string("Exception ocurred: ") + e.what());
 	}
 }
 
