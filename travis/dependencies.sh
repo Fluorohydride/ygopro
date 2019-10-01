@@ -2,8 +2,8 @@
 
 set -euxo pipefail
 
-./travis/install-local-dependencies.sh
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+    ./travis/get-windows-dependencies.sh
     ./travis/get-windows-vcpkg-cache.sh
     ./travis/get-windows-d3d9sdk.sh
 fi
