@@ -165,6 +165,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			mainGame->dInfo.secret.game_id = 0;
 			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
 			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
+			BufferIO::CopyWStr(cscg.pass, mainGame->dInfo.secret.pass, 20);
 			cscg.info.rule = mainGame->cbRule->getSelected();
 			cscg.info.mode = 0;
 			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());

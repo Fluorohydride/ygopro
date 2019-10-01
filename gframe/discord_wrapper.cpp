@@ -54,6 +54,7 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 #ifdef DISCORD_APP_ID
 	static int64_t start = 0;
 	static PresenceType presence = CLEAR;
+	static int previous_gameid = 0;
 	PresenceType previous = presence;
 	presence = type;
 	if(previous != presence)
@@ -94,7 +95,8 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 			if(ygo::mainGame->dInfo.best_of) {
 				presenceState += fmt::format(" (best of {})", ygo::mainGame->dInfo.best_of);
 			}
-			if(ygo::mainGame->dInfo.secret.game_id) {
+			if(ygo::mainGame->dInfo.secret.game_id && previous_gameid != ygo::mainGame->dInfo.secret.game_id) {
+				previous_gameid = ygo::mainGame->dInfo.secret.game_id;
 				partyid = fmt::format("{}{}", ygo::mainGame->dInfo.secret.game_id, ygo::mainGame->dInfo.secret.server_address);
 				discordPresence.joinSecret = CreateSecret().c_str();
 			}
@@ -128,21 +130,22 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 }
 
 void RawToString(const char* src, char* dest, size_t len) {
-	for(size_t i = 0; i < len; i++) {
-		dest[i] = src[i] + '0';
+	for(int i = 0; i < len; ++i) {
+		dest[2 * i] = ((src[i] & 0xF0) + '0') >> 4;
+		dest[2 * i + 1] = (src[i] & 0x0F) + '0';
 	}
 }
 
 void StringToRaw(const char* src, char* dest, size_t len) {
-	for(size_t i = 0; i < len; i++) {
-		dest[i] = src[i] - '0';
+	for(int i = 0; i < len; ++i) {
+		dest[i] = ((src[2 * i] - '0') << 4) | (src[2 * i + 1] - '0');
 	}
 }
 
 std::string& DiscordWrapper::CreateSecret() const {
 	static std::string string;
 	if(string.empty())
-		string.resize(sizeof(DiscordSecret));
+		string.resize(sizeof(DiscordSecret) * 2 + 1);
 	RawToString((char*)&ygo::mainGame->dInfo.secret, &string[0], sizeof(DiscordSecret));
 	return string;
 }
@@ -172,10 +175,9 @@ void DiscordWrapper::OnError(int errcode, const char * message, void* payload) {
 
 void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 	auto game = static_cast<ygo::Game*>(payload);
-	if(game->is_siding || game->dInfo.isInDuel || game->dInfo.isInLobby || game->dInfo.isReplay || game->wHostPrepare->isVisible())
+	if((game->is_building && game->is_siding) || game->dInfo.isInDuel || game->dInfo.isInLobby || game->dInfo.isReplay || game->wHostPrepare->isVisible())
 		return;
-	std::string secr;
-	secr.resize(sizeof(DiscordSecret));
+	std::string secr(secret);
 	StringToRaw(secr.data(), (char*)&game->dInfo.secret, sizeof(DiscordSecret));
 	if(ygo::DuelClient::StartClient(game->dInfo.secret.server_address, game->dInfo.secret.server_port, game->dInfo.secret.game_id, false)) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) game->HideElement(obj);
