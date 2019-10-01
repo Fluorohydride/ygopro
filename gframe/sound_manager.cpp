@@ -1,5 +1,8 @@
 #include "sound_manager.h"
 #include "config.h"
+#ifdef IRRKLANG_STATIC
+#include "../ikpmp3/ikpMP3.h"
+#endif
 
 namespace ygo {
 
@@ -10,6 +13,18 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 	bgm_scene = -1;
 	RefreshBGMList();
 	RefreshChantsList();
+#ifdef YGOPRO_USE_IRRKLANG
+	soundEngine = irrklang::createIrrKlangDevice();
+	if(!soundEngine) {
+		return soundsEnabled = musicEnabled = false;
+	} else {
+#ifdef IRRKLANG_STATIC
+		irrklang::ikpMP3Init(soundEngine);
+#endif
+        soundEngine->setSoundVolume(sounds_volume);
+        return true;
+	}
+#else
     try {
         openal = std::make_unique<YGOpen::OpenALSingleton>();
         sfx = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
@@ -21,6 +36,15 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
     catch (std::runtime_error& e) {
         return soundsEnabled = musicEnabled = false;
     }
+#endif // YGOPRO_USE_IRRKLANG
+}
+SoundManager::~SoundManager() {
+#ifdef YGOPRO_USE_IRRKLANG
+    if (soundBGM)
+        soundBGM->drop();
+    if (soundEngine)
+        soundEngine->drop();
+#endif
 }
 void SoundManager::RefreshBGMList() {
 	Utils::Makedirectory(TEXT("./sound/BGM/"));
@@ -84,17 +108,32 @@ void SoundManager::PlaySoundEffect(SFX sound) {
         {CHAT, "./sound/chatmessage.wav"}
     };
     if (!soundsEnabled) return;
+#ifdef YGOPRO_USE_IRRKLANG
+    if (soundEngine) soundEngine->play2D(fx.at(sound));
+#else
     if (sfx) sfx->play(fx.at(sound), false);
+#endif
 }
 void SoundManager::PlayMusic(const std::string& song, bool loop) {
 	if(!musicEnabled) return;
+#ifdef YGOPRO_USE_IRRKLANG
+	if(!soundBGM || soundBGM->getSoundSource()->getName() != song) {
+        StopBGM();
+		if (soundEngine) soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
+	}
+#else
     StopBGM();
     if (bgm) bgmCurrent = bgm->play(song, loop);
+#endif
 }
 void SoundManager::PlayBGM(BGM scene) {
 	auto& list = BGMList[scene];
 	int count = list.size();
+#ifdef YGOPRO_USE_IRRKLANG
+	if(musicEnabled && (scene != bgm_scene || (soundBGM && soundBGM->isFinished()) || !soundBGM) && count > 0) {
+#else
 	if (musicEnabled && (scene != bgm_scene || !bgm->exists(bgmCurrent)) && count > 0) {
+#endif
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
 		std::string BGMName = "./sound/BGM/" + list[bgm];
@@ -102,20 +141,41 @@ void SoundManager::PlayBGM(BGM scene) {
 	}
 }
 void SoundManager::StopBGM() {
+#ifdef YGOPRO_USE_IRRKLANG
+	if(soundBGM) {
+		soundBGM->stop();
+		soundBGM->drop();
+		soundBGM = nullptr;
+	}
+#else
     bgm->stopAll();
+#endif
 }
 bool SoundManager::PlayChant(unsigned int code) {
 	if(ChantsList.count(code)) {
+#ifdef YGOPRO_USE_IRRKLANG
+		if (soundEngine && !soundEngine->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str()))
+			soundEngine->play2D(("./sound/chants/" + ChantsList[code]).c_str());
+#else
         if (bgm) bgm->play("./sound/chants/" + ChantsList[code], false);
+#endif
 		return true;
 	}
 	return false;
 }
 void SoundManager::SetSoundVolume(double volume) {
+#ifdef YGOPRO_USE_IRRKLANG
+	if (soundEngine) soundEngine->setSoundVolume(volume);
+#else
     if (sfx) sfx->setVolume(volume);
+#endif
 }
 void SoundManager::SetMusicVolume(double volume) {
+#ifdef YGOPRO_USE_IRRKLANG
+	if (soundEngine) soundEngine->setSoundVolume(volume);
+#else
     if (bgm) bgm->setVolume(volume);
+#endif
 }
 void SoundManager::EnableSounds(bool enable) {
 	soundsEnabled = enable;
@@ -123,7 +183,16 @@ void SoundManager::EnableSounds(bool enable) {
 void SoundManager::EnableMusic(bool enable) {
 	musicEnabled = enable;
 	if(!musicEnabled) {
+#ifdef YGOPRO_USE_IRRKLANG
+		if(soundBGM){
+			if(!soundBGM->isFinished())
+				soundBGM->stop();
+			soundBGM->drop();
+			soundBGM = nullptr;
+		}
+#else
         StopBGM();
+#endif
     }
 }
 
