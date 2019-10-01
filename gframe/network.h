@@ -62,14 +62,6 @@ struct CTOS_JoinGame {
 	unsigned int gameid;
 	unsigned short pass[20];
 };
-struct CTOS_JoinGame2 {
-	unsigned short version;
-	unsigned int gameid;
-	unsigned short hostinfo[20];
-	unsigned short description[200];
-	unsigned short pass[20];
-	unsigned short banlist[3];
-};
 struct CTOS_Kick {
 	unsigned char pos;
 };
