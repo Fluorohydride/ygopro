@@ -179,6 +179,7 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 		return;
 	std::string secr(secret);
 	StringToRaw(secr.data(), (char*)&game->dInfo.secret, sizeof(DiscordSecret));
+	game->isHostingOnline = true;
 	if(ygo::DuelClient::StartClient(game->dInfo.secret.server_address, game->dInfo.secret.server_port, game->dInfo.secret.game_id, false)) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) game->HideElement(obj);
 		HIDE_AND_CHECK(game->wMainMenu)
