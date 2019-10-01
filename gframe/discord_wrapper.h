@@ -29,7 +29,7 @@ public:
 	~DiscordWrapper();
 	bool Initialize(path_string workingDir);
 	void UpdatePresence(PresenceType type);
-	std::string& CreateSecret() const;
+	std::string& CreateSecret(bool update) const;
 	bool connected;
 	void Check();
 private:

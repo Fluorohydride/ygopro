@@ -95,10 +95,10 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 			if(ygo::mainGame->dInfo.best_of) {
 				presenceState += fmt::format(" (best of {})", ygo::mainGame->dInfo.best_of);
 			}
-			if(ygo::mainGame->dInfo.secret.game_id && previous_gameid != ygo::mainGame->dInfo.secret.game_id) {
-				previous_gameid = ygo::mainGame->dInfo.secret.game_id;
+			if(ygo::mainGame->dInfo.secret.game_id) {
 				partyid = fmt::format("{}{}", ygo::mainGame->dInfo.secret.game_id, ygo::mainGame->dInfo.secret.server_address);
-				discordPresence.joinSecret = CreateSecret().c_str();
+				discordPresence.joinSecret = CreateSecret(previous_gameid != ygo::mainGame->dInfo.secret.game_id).c_str();
+				previous_gameid = ygo::mainGame->dInfo.secret.game_id;
 			}
 			break;
 		}
@@ -142,8 +142,10 @@ void StringToRaw(const char* src, char* dest, size_t len) {
 	}
 }
 
-std::string& DiscordWrapper::CreateSecret() const {
+std::string& DiscordWrapper::CreateSecret(bool update) const {
 	static std::string string;
+	if(!update)
+		return string;
 	if(string.empty())
 		string.resize(sizeof(DiscordSecret) * 2 + 1);
 	RawToString((char*)&ygo::mainGame->dInfo.secret, &string[0], sizeof(DiscordSecret));
