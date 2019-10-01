@@ -1183,8 +1183,9 @@ void Game::MainLoop() {
 		}
 		popupCheck.lock();
 		if(queued_msg.size()){
-			env->addMessageBox(L"",queued_msg.c_str());
+			env->addMessageBox(queued_caption.c_str(),queued_msg.c_str());
 			queued_msg.clear();
+			queued_caption.clear();
 		}
 		popupCheck.unlock();
 		discord.Check();
@@ -1796,9 +1797,10 @@ void Game::CloseDuelWindow() {
 	showingcard = 0;
 	closeDoneSignal.Set();
 }
-void Game::PopupMessage(const std::wstring& text) {
+void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 	popupCheck.lock();
 	queued_msg = text;
+	queued_caption = caption;
 	popupCheck.unlock();
 }
 int Game::LocalPlayer(int player) {

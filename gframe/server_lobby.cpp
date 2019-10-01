@@ -76,9 +76,9 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->setCellText(index, 1, dataManager.GetSysString(room.info.rule + 1240).c_str());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
 			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).c_str() : L"",
-			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());
+			(room.info.duel_flag & DUEL_RELAY_MODE) ? L" (Relay)" : L"").c_str());
 		int rule;
-		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
+		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY_MODE, room.info.forbiddentypes, &rule);
 		if(rule == 5)
 			roomListTable->setCellText(index, 3, "Custom");
 		else
@@ -141,7 +141,7 @@ int ServerLobby::GetRoomsThread() {
 	curl_easy_cleanup(curl_handle);
 	if(res != CURLE_OK) {
 		//error
-		mainGame->env->addMessageBox(L"Error 05", dataManager.GetSysString(2037).c_str());
+		mainGame->PopupMessage(dataManager.GetSysString(2037), L"Error 05");
 		Utils::changeCursor(ECI_NORMAL);
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
@@ -150,7 +150,7 @@ int ServerLobby::GetRoomsThread() {
 	}
 
 	if(retrieved_data == "[server busy]") {
-		mainGame->env->addMessageBox(L"Error 04", dataManager.GetSysString(2031).c_str());
+		mainGame->PopupMessage(dataManager.GetSysString(2031), L"Error 04");
 	} else {
 		mainGame->roomsVector.clear();
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
@@ -192,7 +192,7 @@ int ServerLobby::GetRoomsThread() {
 		}
 	}
 	if(mainGame->roomsVector.empty()) {
-		mainGame->env->addMessageBox(dataManager.GetSysString(2032).c_str(), dataManager.GetSysString(2033).c_str());
+		mainGame->PopupMessage(dataManager.GetSysString(2033), dataManager.GetSysString(2032));
 	} else {
 		FillOnlineRooms();
 		if(mainGame->chkShowActiveRooms->isChecked()) {

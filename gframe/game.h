@@ -160,7 +160,7 @@ public:
 	void ErrorLog(const std::string& msg);
 	void ClearTextures();
 	void CloseDuelWindow();
-	void PopupMessage(const std::wstring& text);
+	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
 
 	int LocalPlayer(int player);
 	std::wstring LocalName(int local_player);
@@ -300,6 +300,7 @@ public:
 	std::vector<Utils::IrrArchiveHelper> archives;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
+	std::wstring queued_caption;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;
