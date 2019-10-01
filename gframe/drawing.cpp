@@ -27,9 +27,6 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 		glEnable(GL_TEXTURE_2D);
 	} else {
 		irr::video::SColor color(CONVERT_ALPHA(cv[3]), CONVERT_COLOR(cv[0]), CONVERT_COLOR(cv[1]), CONVERT_COLOR(cv[2]));
-#ifdef _IRR_ANDROID_PLATFORM_
-		glLineWidth(width + 2);
-#endif
 		driver->setMaterial(matManager.mOutLine);
 		if(strip) {
 			if(linePatternD3D < 15) {
