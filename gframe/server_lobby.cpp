@@ -76,9 +76,9 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->setCellText(index, 1, dataManager.GetSysString(room.info.rule + 1240).c_str());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
 			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).c_str() : L"",
-			(room.info.duel_flag & DUEL_RELAY_MODE) ? L" (Relay)" : L"").c_str());
+			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());
 		int rule;
-		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY_MODE, room.info.forbiddentypes, &rule);
+		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
 		if(rule == 5)
 			roomListTable->setCellText(index, 3, "Custom");
 		else

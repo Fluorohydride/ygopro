@@ -65,7 +65,6 @@ int main(int argc, char* argv[]) {
 #endif //_WIN32
 		}
 	}
-#endif //_WIN32 && !_DEBUG
 #ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;

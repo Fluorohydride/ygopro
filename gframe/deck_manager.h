@@ -1,7 +1,7 @@
 #ifndef DECKMANAGER_H
 #define DECKMANAGER_H
 
-#include "config.h"
+#include "utils.h"
 #include "client_card.h"
 #include <unordered_map>
 #include <vector>
