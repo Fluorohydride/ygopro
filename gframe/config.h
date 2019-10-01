@@ -54,11 +54,6 @@ inline int _wtoi(const wchar_t * s) {
 #endif // UNICODE
 #endif
 
-template<size_t N, typename... TR>
-inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
-	return swprintf(buf, N, fmt, args...);
-}
-
 #include <irrlicht.h>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -102,6 +97,7 @@ using namespace gui;
 extern unsigned short PRO_VERSION;
 extern int enable_log;
 extern bool exit_on_return;
+extern bool is_from_discord;
 extern bool open_file;
 extern path_string open_file_name;
 

@@ -406,7 +406,7 @@ public:
 	irr::gui::IGUIButton* btnHostCancel;
 	irr::gui::IGUIStaticText* stHostPort;
 	irr::gui::IGUIEditBox* ebHostPort;
-	::gui::IGUIStaticText* stHostNotes;
+	irr::gui::IGUIStaticText* stHostNotes;
 	irr::gui::IGUIEditBox* ebHostNotes;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;

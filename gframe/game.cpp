@@ -112,6 +112,7 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
+	discord.Initialize(filesystem->getWorkingDirectory().c_str());
 	PopulateResourcesDirectories();
 	dataManager.LoadStrings(TEXT("./expansions/strings.conf"));
 	env = device->getGUIEnvironment();
@@ -967,9 +968,6 @@ bool Game::Initialize() {
 	Utils::CreateResourceFolders();
 
 	LoadGithubRepositories();
-	
-	discord.Initialize(filesystem->getWorkingDirectory().c_str());
-
 	return true;
 }
 void Game::MainLoop() {
@@ -987,6 +985,7 @@ void Game::MainLoop() {
 	uint32 prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
 	int fps = 0;
+	bool discord_message_shown = false;
 	std::wstring corename;
 #ifndef __APPLE__
 	if(gameConf.fullscreen)

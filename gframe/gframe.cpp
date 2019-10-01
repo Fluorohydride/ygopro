@@ -10,6 +10,7 @@
 
 int enable_log = 0;
 bool exit_on_return = false;
+bool is_from_discord = false;
 bool open_file = false;
 path_string open_file_name = TEXT("");
 
@@ -44,14 +45,24 @@ int main(int argc, char* argv[]) {
 	CFRelease(path);
 	CFRelease(bundle_path);
 #endif //__APPLE__
-#if defined(_WIN32) && !defined(_DEBUG)
-	if(argc == 2) {
-		auto extension = ygo::Utils::GetFileExtension(argv[1]);
-		if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
-			fschar_t exepath[MAX_PATH];
-			GetModuleFileName(NULL, exepath, MAX_PATH);
-			auto path = ygo::Utils::GetFilePath(exepath);
-			SetCurrentDirectory(path.c_str());
+	if(argc >= 2) {
+		if(argv[1] == path_string(TEXT("from_discord"))) {
+			is_from_discord = true;
+#if defined(_WIN32)
+			SetCurrentDirectory(argv[2]);
+#if !defined(_DEBUG)
+		} else {
+			auto extension = ygo::Utils::GetFileExtension(argv[1]);
+			if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
+				fschar_t exepath[MAX_PATH];
+				GetModuleFileName(NULL, exepath, MAX_PATH);
+				std::wcout << exepath << std::endl;
+				auto path = ygo::Utils::GetFilePath(exepath);
+				std::wcout << path << std::endl;
+				SetCurrentDirectory(path.c_str());
+			}
+#endif //_DEBUG
+#endif //_WIN32
 		}
 	}
 #endif //_WIN32 && !_DEBUG
