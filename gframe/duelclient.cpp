@@ -58,7 +58,7 @@ std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wst
 		hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
 		int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 		if(status != 0) {
-			throw std::exception("Host not resolved");
+			throw std::runtime_error("Host not resolved");
 		} else {
 			sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
 			evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
