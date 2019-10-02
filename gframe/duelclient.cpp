@@ -165,7 +165,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			mainGame->dInfo.secret.game_id = 0;
 			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
 			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
-			BufferIO::CopyWStr(cscg.pass, mainGame->dInfo.secret.pass, 20);
+			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebServerPass->getText());
 			cscg.info.rule = mainGame->cbRule->getSelected();
 			cscg.info.mode = 0;
 			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
@@ -201,7 +201,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			else
 				csjg.version = PRO_VERSION;
 			csjg.gameid = mainGame->dInfo.secret.game_id;
-			BufferIO::CopyWStr(mainGame->dInfo.secret.pass, csjg.pass, 20);
+			BufferIO::CopyWStr(BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass).c_str(), csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		bufferevent_enable(bev, EV_READ);

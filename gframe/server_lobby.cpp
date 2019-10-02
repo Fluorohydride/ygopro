@@ -234,7 +234,7 @@ void ServerLobby::JoinServer(bool host) {
 					}
 				}
 			}
-			BufferIO::CopyWStr(mainGame->ebRPName->getText(), mainGame->dInfo.secret.pass, 20);
+			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebRPName->getText());
 			if(!DuelClient::StartClient(serverinfo.first, serverinfo.second, room->id, false)) {
 				return;
 			}

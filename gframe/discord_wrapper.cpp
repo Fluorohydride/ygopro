@@ -1,7 +1,8 @@
-#include "discord_wrapper.h"
-#include "discord_register.h"
 #include <chrono>
 #include <cstdio>
+#include <nlohmann/json.hpp>
+#include "discord_wrapper.h"
+#include "discord_register.h"
 #include "game.h"
 #include "duelclient.h"
 
@@ -129,26 +130,13 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 #endif
 }
 
-void RawToString(const char* src, char* dest, size_t len) {
-	for(int i = 0; i < len; ++i) {
-		dest[2 * i] = ((src[i] & 0xF0) + '0') >> 4;
-		dest[2 * i + 1] = (src[i] & 0x0F) + '0';
-	}
-}
-
-void StringToRaw(const char* src, char* dest, size_t len) {
-	for(int i = 0; i < len; ++i) {
-		dest[i] = ((src[2 * i] - '0') << 4) | (src[2 * i + 1] - '0');
-	}
-}
-
 std::string& DiscordWrapper::CreateSecret(bool update) const {
 	static std::string string;
 	if(!update)
 		return string;
-	if(string.empty())
-		string.resize(sizeof(DiscordSecret) * 2 + 1);
-	RawToString((char*)&ygo::mainGame->dInfo.secret, &string[0], sizeof(DiscordSecret));
+	auto& secret = ygo::mainGame->dInfo.secret;
+	/*using fmt over nlohmann::json for an overall memory improvement as making a json object and converting taht to string would be way slower than creating it with a formatted string*/
+	string = fmt::format("{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : {} }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.c_str());
 	return string;
 }
 
@@ -179,10 +167,20 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 	auto game = static_cast<ygo::Game*>(payload);
 	if((game->is_building && game->is_siding) || game->dInfo.isInDuel || game->dInfo.isInLobby || game->dInfo.isReplay || game->wHostPrepare->isVisible())
 		return;
-	std::string secr(secret);
-	StringToRaw(secr.data(), (char*)&game->dInfo.secret, sizeof(DiscordSecret));
+	auto& host = ygo::mainGame->dInfo.secret;
+	try {
+		nlohmann::json json = nlohmann::json::parse(secret);
+		host.game_id = json["id"].get<int>();
+		host.server_address = json["addr"].get<int>();
+		host.server_port = json["port"].get<int>();
+		host.pass = json["pass"].get<std::string>();
+	}
+	catch(std::exception& e) {
+		game->ErrorLog(std::string("Exception ocurred: ") + e.what());
+		return;
+	}
 	game->isHostingOnline = true;
-	if(ygo::DuelClient::StartClient(game->dInfo.secret.server_address, game->dInfo.secret.server_port, game->dInfo.secret.game_id, false)) {
+	if(ygo::DuelClient::StartClient(host.server_address, host.server_port, host.game_id, false)) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) game->HideElement(obj);
 		HIDE_AND_CHECK(game->wMainMenu)
 		HIDE_AND_CHECK(game->wLanWindow)

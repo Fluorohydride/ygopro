@@ -12,7 +12,7 @@ public:
 		unsigned int game_id;
 		unsigned int server_address;
 		unsigned short server_port;
-		unsigned short pass[20];
+		std::string pass;
 	};
 	enum PresenceType {
 		MENU,
