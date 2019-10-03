@@ -74,6 +74,10 @@ void Query::Parse(char*& current) {
 			case QUERY_END: {
 				return;
 			}
+			default: {
+				current += size - sizeof(uint32_t);
+				break;
+			}
 		}
 	}
 }
