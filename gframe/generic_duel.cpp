@@ -1067,7 +1067,7 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			packets_cache.emplace_back(offset, pbuf - offset);
-			RefreshHand(player, 0x781fff, 0);
+			RefreshHand(player, 0x1781fff);
 			break;
 		}
 		case MSG_SHUFFLE_EXTRA: {
@@ -1143,12 +1143,12 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 				NetServer::ReSendToPlayer(*oit);
 			packets_cache.emplace_back(offset, pbuf - offset);
 			if(loc == LOCATION_MZONE) {
-				RefreshMzone(0, 0x181fff, 0);
-				RefreshMzone(1, 0x181fff, 0);
+				RefreshMzone(0, 0x1181fff);
+				RefreshMzone(1, 0x1181fff);
 			}
 			else {
-				RefreshSzone(0, 0x181fff, 0);
-				RefreshSzone(1, 0x181fff, 0);
+				RefreshSzone(0, 0x1181fff);
+				RefreshSzone(1, 0x1181fff);
 			}
 			break;
 		}
@@ -1786,12 +1786,12 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			}
 			PseudoRefreshDeck(player);
 			RefreshExtra(player);
-			RefreshMzone(0, 0x81fff, 0);
-			RefreshMzone(1, 0x81fff, 0);
-			RefreshSzone(0, 0x681fff, 0);
-			RefreshSzone(1, 0x681fff, 0);
-			RefreshHand(0, 0x781fff, 0);
-			RefreshHand(1, 0x781fff, 0);
+			RefreshMzone(0, 0x1081fff);
+			RefreshMzone(1, 0x1081fff);
+			RefreshSzone(0, 0x01681fff);
+			RefreshSzone(1, 0x10681fff);
+			RefreshHand(0);
+			RefreshHand(1);
 			break;
 		}
 		case MSG_MATCH_KILL: {
@@ -1907,19 +1907,19 @@ void GenericDuel::TimeConfirm(DuelPlayer* dp) {
 	timeval timeout = {1, 0};
 	event_add(etimer, &timeout);
 }
-void GenericDuel::RefreshMzone(int player, int flag, int use_cache) {
+void GenericDuel::RefreshMzone(int player, int flag) {
 	RefreshLocation(player, flag, LOCATION_MZONE);
 }
-void GenericDuel::RefreshSzone(int player, int flag, int use_cache) {
+void GenericDuel::RefreshSzone(int player, int flag) {
 	RefreshLocation(player, flag, LOCATION_SZONE);
 }
-void GenericDuel::RefreshHand(int player, int flag, int use_cache) {
+void GenericDuel::RefreshHand(int player, int flag) {
 	RefreshLocation(player, flag, LOCATION_HAND);
 }
-void GenericDuel::RefreshGrave(int player, int flag, int use_cache) {
+void GenericDuel::RefreshGrave(int player, int flag) {
 	RefreshLocation(player, flag, LOCATION_GRAVE);
 }
-void GenericDuel::RefreshExtra(int player, int flag, int use_cache) {
+void GenericDuel::RefreshExtra(int player, int flag) {
 	std::vector<uint8_t> buffer;
 	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
 	BufferIO::insert_value<uint8_t>(buffer, player);
@@ -1935,7 +1935,7 @@ void GenericDuel::RefreshExtra(int player, int flag, int use_cache) {
 		NetServer::ReSendToPlayer(dueler.player);
 	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
 }
-void GenericDuel::RefreshLocation(int player, int flag, int location, int use_cache) {
+void GenericDuel::RefreshLocation(int player, int flag, int location) {
 	std::vector<uint8_t> buffer;
 	BufferIO::insert_value<uint8_t>(buffer, MSG_UPDATE_DATA);
 	BufferIO::insert_value<uint8_t>(buffer, player);
@@ -1946,9 +1946,11 @@ void GenericDuel::RefreshLocation(int player, int flag, int location, int use_ca
 		return;
 	char* a = (char*)buff;
 	CoreUtils::QueryStream query(a);
-	query.GenerateBuffer(buffer);
-	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, buffer.data(), buffer.size());
+	query.GenerateBuffer(buffer, false);
 	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
+	buffer.resize(3);
+	query.GenerateBuffer(buffer, true);
+	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, buffer.data(), buffer.size());
 	for(auto& dueler : (player == 0) ? players.home : players.opposing)
 		NetServer::ReSendToPlayer(dueler.player);
 	buffer.resize(3);
@@ -1972,13 +1974,15 @@ void GenericDuel::RefreshSingle(int player, int location, int sequence, int flag
 		return;
 	char* a = (char*)buff;
 	CoreUtils::Query query(a);
-	query.GenerateBuffer(buffer, true);
+	query.GenerateBuffer(buffer, false, false);
 	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
+	buffer.resize(4);
+	query.GenerateBuffer(buffer, false, true);
 	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, buffer.data(), buffer.size());
 	for(auto& dueler : (player == 0) ? players.home : players.opposing)
 		NetServer::ReSendToPlayer(dueler.player);
 	buffer.resize(4);
-	query.GenerateBuffer(buffer, false);
+	query.GenerateBuffer(buffer, true, true);
 	for(auto& dueler : (player == 1) ? players.home : players.opposing)
 		NetServer::ReSendToPlayer(dueler.player);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)

@@ -31,17 +31,17 @@ public:
 	
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
-	void RefreshMzone(int player, int flag = 0x881fff, int use_cache = 1);
-	void RefreshSzone(int player, int flag = 0xe81fff, int use_cache = 1);
-	void RefreshHand(int player, int flag = 0x781fff, int use_cache = 1);
-	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
-	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
-	void RefreshLocation(int player, int flag, int location, int use_cache = 1);
-	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
+	void RefreshMzone(int player, int flag = 0x1881fff);
+	void RefreshSzone(int player, int flag = 0x1e81fff);
+	void RefreshHand(int player, int flag = 0x1781fff);
+	void RefreshGrave(int player, int flag = 0x181fff);
+	void RefreshExtra(int player, int flag = 0x181fff);
+	void RefreshLocation(int player, int flag, int location);
+	void RefreshSingle(int player, int location, int sequence, int flag = 0x1f81fff);
 	
 	static void GenericTimer(evutil_socket_t fd, short events, void* arg);
 
-	void PseudoRefreshDeck(int player, int flag = 0x181fff);
+	void PseudoRefreshDeck(int player, int flag = 0x1181fff);
 	static ReplayStream replay_stream;
 	
 protected:
