@@ -305,7 +305,7 @@ bool Game::Initialize() {
 	ebHostPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stHostNotes = env->addStaticText(dataManager.GetSysString(2024).c_str(), Scale(10, 390, 220, 410), false, false, wCreateHost);
 	stHostNotes->setVisible(false);
-	ebHostNotes = env->addEditBox(L"", Scale(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
+	ebHostNotes = env->addEditBox(L"", Scale(110, 385, 250, 410), true, wCreateHost);
 	ebHostNotes->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebHostNotes->setVisible(false);
 	//host(single)
