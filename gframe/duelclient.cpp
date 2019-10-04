@@ -217,7 +217,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				if(mainGame->isHostingOnline) {
-					if(!mainGame->wRoomListPlaceholder->isVisible())
+					if(!mainGame->wCreateHost->isVisible() && !mainGame->wRoomListPlaceholder->isVisible())
 						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 				} else {
 					if(!mainGame->wLanWindow->isVisible())
