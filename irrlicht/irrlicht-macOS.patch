@@ -1,6 +1,6 @@
 diff -ur source/Irrlicht/CGUIEditBox.cpp source-fixed/Irrlicht/CGUIEditBox.cpp
---- source/Irrlicht/CGUIEditBox.cpp	2019-07-03 12:39:20.000000000 -0400
-+++ source-fixed/Irrlicht/CGUIEditBox.cpp	2019-07-03 12:07:02.000000000 -0400
+--- source/Irrlicht/CGUIEditBox.cpp	2019-10-03 18:30:21.000000000 -0400
++++ source-fixed/Irrlicht/CGUIEditBox.cpp	2019-10-03 18:31:24.000000000 -0400
 @@ -287,9 +287,11 @@
  				const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
  				const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
@@ -32,9 +32,9 @@ diff -ur source/Irrlicht/CGUIEditBox.cpp source-fixed/Irrlicht/CGUIEditBox.cpp
  				if (isEnabled())
  				{
 diff -ur source/Irrlicht/MacOSX/AppDelegate.h source-fixed/Irrlicht/MacOSX/AppDelegate.h
---- source/Irrlicht/MacOSX/AppDelegate.h	2019-07-03 12:39:20.000000000 -0400
-+++ source-fixed/Irrlicht/MacOSX/AppDelegate.h	2019-07-03 12:16:07.000000000 -0400
-@@ -10,7 +10,7 @@
+--- source/Irrlicht/MacOSX/AppDelegate.h	2019-10-03 18:30:22.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/AppDelegate.h	2019-10-03 18:32:11.000000000 -0400
+@@ -10,14 +10,16 @@
  #import <Cocoa/Cocoa.h>
  #import "CIrrDeviceMacOSX.h"
  
@@ -43,10 +43,27 @@ diff -ur source/Irrlicht/MacOSX/AppDelegate.h source-fixed/Irrlicht/MacOSX/AppDe
  {
  	BOOL			_quit;
  	irr::CIrrDeviceMacOSX	*_device;
++	NSMenu *_dockMenu;
+ }
+ 
+ - (id)initWithDevice:(irr::CIrrDeviceMacOSX *)device;
+ - (BOOL)isQuit;
++- (NSMenu *)applicationDockMenu:(NSApplication *)sender;
+ 
+ @end
+ 
 diff -ur source/Irrlicht/MacOSX/AppDelegate.mm source-fixed/Irrlicht/MacOSX/AppDelegate.mm
---- source/Irrlicht/MacOSX/AppDelegate.mm	2019-07-03 12:39:20.000000000 -0400
-+++ source-fixed/Irrlicht/MacOSX/AppDelegate.mm	2019-07-03 12:12:13.000000000 -0400
-@@ -74,6 +74,29 @@
+--- source/Irrlicht/MacOSX/AppDelegate.mm	2019-10-03 18:30:22.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/AppDelegate.mm	2019-10-03 18:32:11.000000000 -0400
+@@ -13,6 +13,7 @@
+ {
+ 	self = [super init];
+ 	if (self) _device = device;
++	_dockMenu = [[[NSMenu alloc] init] autorelease];
+ 	return (self);
+ }
+ 
+@@ -74,6 +75,34 @@
  	return (_quit);
  }
  
@@ -73,12 +90,17 @@ diff -ur source/Irrlicht/MacOSX/AppDelegate.mm source-fixed/Irrlicht/MacOSX/AppD
 +	_device->processKeyEvent();
 +}
 +
++- (NSMenu *)applicationDockMenu:(NSApplication *)sender
++{
++	return _dockMenu;
++}
++
  @end
  
  #endif // _IRR_COMPILE_WITH_OSX_DEVICE_
 diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.h
---- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h	2019-07-03 12:39:20.000000000 -0400
-+++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.h	2019-07-03 12:12:43.000000000 -0400
+--- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h	2019-10-03 18:30:22.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.h	2019-10-03 18:31:24.000000000 -0400
 @@ -95,6 +95,8 @@
  		void setMouseLocation(int x, int y);
  		void setResize(int width, int height);
@@ -89,8 +111,8 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h source-fixed/Irrlicht/MacOSX/
  	private:
  
 diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
---- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-07-03 12:39:20.000000000 -0400
-+++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-07-03 12:20:39.000000000 -0400
+--- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-10-03 18:30:22.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-10-03 18:31:24.000000000 -0400
 @@ -496,7 +496,7 @@
  		{
  			[[NSAutoreleasePool alloc] init];
@@ -228,8 +250,8 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  		ievent.EventType = irr::EET_KEY_INPUT_EVENT;
  		ievent.KeyInput.Key = (irr::EKEY_CODE)mkey;
 diff -ur source/Irrlicht/MacOSX/OSXClipboard.mm source-fixed/Irrlicht/MacOSX/OSXClipboard.mm
---- source/Irrlicht/MacOSX/OSXClipboard.mm	2019-07-03 12:39:20.000000000 -0400
-+++ source-fixed/Irrlicht/MacOSX/OSXClipboard.mm	2019-07-03 12:21:20.000000000 -0400
+--- source/Irrlicht/MacOSX/OSXClipboard.mm	2019-10-03 18:30:22.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/OSXClipboard.mm	2019-10-03 18:31:24.000000000 -0400
 @@ -13,7 +13,7 @@
  
  	if ((text != NULL) && (strlen(text) > 0))
@@ -249,8 +271,8 @@ diff -ur source/Irrlicht/MacOSX/OSXClipboard.mm source-fixed/Irrlicht/MacOSX/OSX
  }
  
 diff -ur source/Irrlicht/libpng/pngpriv.h source-fixed/Irrlicht/libpng/pngpriv.h
---- source/Irrlicht/libpng/pngpriv.h	2016-07-09 05:21:44.000000000 -0400
-+++ ../source-fixed/Irrlicht/libpng/pngpriv.h	2019-07-03 15:15:50.000000000 -0400
+--- source/Irrlicht/libpng/pngpriv.h	2019-10-03 18:30:22.000000000 -0400
++++ source-fixed/Irrlicht/libpng/pngpriv.h	2019-10-03 18:31:24.000000000 -0400
 @@ -798,7 +798,7 @@
   * must match that used in the build, or we must be using pnglibconf.h.prebuilt:
   */

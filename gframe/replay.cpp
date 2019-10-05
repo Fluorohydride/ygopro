@@ -217,7 +217,7 @@ void Replay::ParseNames() {
 	}
 	auto f = [this](size_t& count) {
 		if(pheader.flag & REPLAY_NEWREPLAY)
-			count = Read<size_t>();
+			count = Read<uint32_t>();
 		else if(pheader.flag & REPLAY_TAG)
 			count = 2;
 		else if(pheader.flag & REPLAY_RELAY)

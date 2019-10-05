@@ -20,6 +20,7 @@ void EDOPRO_SetupMenuBar() {
         NSString* bundleName = @""; // Cannot actually set the main menu title at runtime
         NSMenu* systemMenuBar = [[[NSMenu alloc] initWithTitle:@"MainMenu"] autorelease];
         NSMenu* appMainMenu = [[[NSMenu alloc] initWithTitle:bundleName] autorelease];
+        NSMenu* dockMenu = [[NSApp delegate] applicationDockMenu:NSApp];
 
         NSMenuItem* appMainMenuOpener = [systemMenuBar addItemWithTitle:bundleName action:nil keyEquivalent:@""];
         [systemMenuBar setSubmenu:appMainMenu forItem:appMainMenuOpener];
@@ -28,6 +29,7 @@ void EDOPRO_SetupMenuBar() {
         NewAppInstanceHandler* handler = [[NewAppInstanceHandler alloc] init];
         [newWindowItem setTarget:handler];
         [newWindowItem setKeyEquivalentModifierMask:NSCommandKeyMask];
+        [dockMenu addItem:[newWindowItem copyWithZone:nil]];
 
         NSMenuItem* quitItem = [appMainMenu addItemWithTitle:@"Quit" action:@selector(terminate:) keyEquivalent:@"q"];
         [quitItem setKeyEquivalentModifierMask:NSCommandKeyMask];
