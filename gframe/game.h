@@ -624,17 +624,12 @@ public:
 	irr::gui::IGUICheckBox* chkShowPassword;
 	irr::gui::IGUICheckBox* chkShowActiveRooms;
 	irr::gui::IGUIButton* btnLanRefresh2;
-	irr::gui::IGUICheckBox* chkLinuxUnranked;
-	irr::gui::IGUIStaticText* ebLinuxBetaDescription;
-	irr::gui::IGUIStaticText* ebPasswordText;
-	irr::gui::IGUIEditBox* ebPassword;
 	irr::gui::IGUIWindow* wRoomPassword;
 	irr::gui::IGUIEditBox* ebRPName;
 	irr::gui::IGUIButton* btnRPYes;
 	irr::gui::IGUIButton* btnRPNo;
 	irr::gui::IGUIButton* btnJoinHost2;
 	irr::gui::IGUIButton* btnJoinCancel2;
-	irr::gui::IGUIEditBox* ebGameDescription;
 };
 
 extern Game* mainGame;
