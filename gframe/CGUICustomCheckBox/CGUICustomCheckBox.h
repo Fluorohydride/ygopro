@@ -22,6 +22,8 @@ namespace gui
 		//! constructor
 		CGUICustomCheckBox(bool checked, IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle);
 
+        static IGUICheckBox* addCustomCheckBox(bool checked, IGUIEnvironment* environment, core::rect<s32> rectangle, IGUIElement* parent = 0, s32 id = -1, const wchar_t* text = 0);
+
 		//! set if box is checked
 		virtual void setChecked(bool checked);
 

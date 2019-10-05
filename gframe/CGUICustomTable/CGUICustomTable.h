@@ -33,6 +33,9 @@ namespace gui
 		//! destructor
 		~CGUICustomTable();
 
+        static IGUITable* addCustomTable(IGUIEnvironment* environment, const core::rect<s32>& rectangle,
+            IGUIElement* parent = 0, s32 id = -1, bool drawBackground = false);
+
 		//! Adds a column
 		//! If columnIndex is outside the current range, do push new colum at the end
 		virtual void addColumn(const wchar_t* caption, s32 columnIndex=-1);

@@ -12,8 +12,7 @@
 #include "IGUIEnvironment.h"
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
-#include "CGUIScrollBar.h"
-#include "os.h"
+#include "IGUIScrollBar.h"
 
 #define ARROW_PAD 15
 
@@ -68,6 +67,15 @@ CGUICustomTable::~CGUICustomTable()
 
 	if (Font)
 		Font->drop();
+}
+
+
+IGUITable* CGUICustomTable::addCustomTable(IGUIEnvironment* environment, const core::rect<s32>& rectangle, IGUIElement* parent, s32 id, bool drawBackground) {
+    if (!parent)
+        parent = environment->getRootGUIElement();
+    IGUITable* b = new CGUICustomTable(environment, parent, id, rectangle, true, drawBackground, false);
+    b->drop();
+    return b;
 }
 
 

@@ -10,7 +10,7 @@
 #include "IGUIEnvironment.h"
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
-#include "os.h"
+#include "../IrrlichtCommonIncludes/os.h"
 
 namespace irr
 {
@@ -28,6 +28,17 @@ CGUICustomCheckBox::CGUICustomCheckBox(bool checked, IGUIEnvironment* environmen
 	// this element can be tabbed into
 	setTabStop(true);
 	setTabOrder(-1);
+}
+
+
+IGUICheckBox* CGUICustomCheckBox::addCustomCheckBox(bool checked, IGUIEnvironment* environment, core::rect<s32> rectangle, IGUIElement* parent, s32 id, const wchar_t* text) {
+    if (!parent)
+        parent = environment->getRootGUIElement();
+    IGUICheckBox* b = new CGUICustomCheckBox(checked, environment, parent, id, rectangle);
+    if (text)
+        b->setText(text);
+    b->drop();
+    return b;
 }
 
 

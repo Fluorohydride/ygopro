@@ -19,6 +19,8 @@
 #include "netserver.h"
 #include "replay_mode.h"
 #include "single_mode.h"
+#include "CGUICustomCheckBox/CGUICustomCheckBox.h"
+#include "CGUICustomTable/CGUICustomTable.h"
 
 unsigned short PRO_VERSION = 0x1348;
 
@@ -899,17 +901,17 @@ bool Game::Initialize() {
 	ebRoomName->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show locked rooms checkbox
-	chkShowPassword = env->addCheckBox(false, Scale(642, 55, 800, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, dataManager.GetSysString(1994).c_str());
+    chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 800, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, dataManager.GetSysString(1994).c_str());
 	chkShowPassword->setName(L"White");
 	chkShowPassword->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show active rooms checkbox
-	chkShowActiveRooms = env->addCheckBox(false, Scale(642, 85, 800, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, dataManager.GetSysString(1985).c_str());
+	chkShowActiveRooms = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 800, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, dataManager.GetSysString(1985).c_str());
 	chkShowActiveRooms->setName(L"White");
 	chkShowActiveRooms->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show all rooms in a table
-	roomListTable = env->addTable(Resize(1, 118, 1022, 550), wRoomListPlaceholder, TABLE_ROOMLIST, true);
+	roomListTable = CGUICustomTable::addCustomTable(env, Resize(1, 118, 1022, 550), wRoomListPlaceholder, TABLE_ROOMLIST, true);
 	roomListTable->setResizableColumns(true);
 	//roomListTable->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
 	roomListTable->addColumn(L" ");//lock
