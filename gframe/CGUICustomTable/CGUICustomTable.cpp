@@ -8,6 +8,7 @@
 #include "CGUICustomTable.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
+#include <cstdint>
 #include "IGUISkin.h"
 #include "IGUIEnvironment.h"
 #include "IVideoDriver.h"
