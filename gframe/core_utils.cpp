@@ -164,7 +164,7 @@ void Query::GenerateBuffer(std::vector<uint8_t>& buffer, bool is_public, bool ch
 		}
 		INSERT(QUERY_CODE, code)
 		INSERT(QUERY_POSITION, position)
-		INSERT(QUERY_ALIAS, code)
+		INSERT(QUERY_ALIAS, alias)
 		INSERT(QUERY_TYPE, type)
 		INSERT(QUERY_LEVEL, level)
 		INSERT(QUERY_RANK, rank)

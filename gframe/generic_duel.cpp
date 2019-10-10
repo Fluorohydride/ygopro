@@ -1983,6 +1983,7 @@ void GenericDuel::RefreshSingle(int player, int location, int sequence, int flag
 		NetServer::ReSendToPlayer(dueler.player);
 	buffer.resize(4);
 	query.GenerateBuffer(buffer, true, true);
+	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, buffer.data(), buffer.size());
 	for(auto& dueler : (player == 1) ? players.home : players.opposing)
 		NetServer::ReSendToPlayer(dueler.player);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)

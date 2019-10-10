@@ -975,6 +975,7 @@ std::pair<int, int> DuelClient::GetPlayersCount() {
 	return { count1, count2 };
 }
 #define COMPAT_READ(val1,val2,buf) (mainGame->dInfo.compat_mode) ? BufferIO::Read<val1>(buf) : BufferIO::Read<val2>(buf)
+#define PLAY_SOUND(sound) if (!mainGame->dInfo.isCatchingUp) mainGame->soundManager->PlaySoundEffect(sound)
 int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	char* pbuf = msg;
 	if(!mainGame->dInfo.isReplay) {
@@ -2158,7 +2159,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_SHUFFLE_DECK: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::SHUFFLE);
+		PLAY_SOUND(SoundManager::SFX::SHUFFLE);
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		if(mainGame->dField.deck[player].size() < 2)
 			return true;
@@ -2247,7 +2248,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			return true;
 		if(!mainGame->dInfo.isCatchingUp) {
 			if(count > 1)
-				mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::SHUFFLE);
+				PLAY_SOUND(SoundManager::SFX::SHUFFLE);
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 					if(!((*cit)->position & POS_FACEUP)) {
@@ -2390,7 +2391,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_NEW_TURN: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::NEXT_TURN);
+		PLAY_SOUND(SoundManager::SFX::NEXT_TURN);
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		mainGame->dInfo.turn++;
 		if(!mainGame->dInfo.isReplay && mainGame->dInfo.player_type < (mainGame->dInfo.team1 + mainGame->dInfo.team2)) {
@@ -2421,7 +2422,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_NEW_PHASE: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::PHASE);
+		PLAY_SOUND(SoundManager::SFX::PHASE);
 		unsigned short phase = BufferIO::Read<uint16_t>(pbuf);
 		mainGame->btnDP->setVisible(false);
 		mainGame->btnSP->setVisible(false);
@@ -2479,7 +2480,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		current.controler = mainGame->LocalPlayer(current.controler);
 		int reason = BufferIO::Read<int32_t>(pbuf);
 		if (reason & REASON_DESTROY && previous.location != current.location)
-			mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::DESTROYED);
+			PLAY_SOUND(SoundManager::SFX::DESTROYED);
 		if (previous.location == 0) {
 			ClientCard* pcard = new ClientCard();
 			pcard->position = current.position;
@@ -2706,7 +2707,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_SET: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::SET);
+		PLAY_SOUND(SoundManager::SFX::SET);
 		/*int code = */BufferIO::Read<int32_t>(pbuf);
 		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
 		event_string = dataManager.GetSysString(1601);
@@ -2755,7 +2756,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
 		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
 		if(!mainGame->soundManager->PlayChant(code))
-			mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::SUMMON);
+			PLAY_SOUND(SoundManager::SFX::SUMMON);
 		if(!mainGame->dInfo.isCatchingUp) {
 			event_string = fmt::sprintf(dataManager.GetSysString(1603), dataManager.GetName(code));
 			mainGame->showcardcode = code;
@@ -2776,7 +2777,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
 		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
 		if(!mainGame->soundManager->PlayChant(code))
-			mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::SPECIAL_SUMMON);
+			PLAY_SOUND(SoundManager::SFX::SPECIAL_SUMMON);
 		if(!mainGame->dInfo.isCatchingUp) {
 			event_string = fmt::sprintf(dataManager.GetSysString(1605), dataManager.GetName(code));
 			mainGame->showcardcode = code;
@@ -2797,7 +2798,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
 		info.controler = mainGame->LocalPlayer(info.controler);
 		if(!mainGame->soundManager->PlayChant(code))
-			mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::FLIP);
+			PLAY_SOUND(SoundManager::SFX::FLIP);
 		ClientCard* pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
 		pcard->SetCode(code);
 		pcard->position = info.position;
@@ -2820,7 +2821,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_CHAINING: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::ACTIVATE);
+		PLAY_SOUND(SoundManager::SFX::ACTIVATE);
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
 		int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
@@ -3010,7 +3011,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			}
 		} else {
 			for (int i = 0; i < count; ++i) {
-				mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::DRAW);
+				PLAY_SOUND(SoundManager::SFX::DRAW);
 				mainGame->gMutex.lock();
 				pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
 				mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
@@ -3025,7 +3026,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_DAMAGE: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::DAMAGE);
+		PLAY_SOUND(SoundManager::SFX::DAMAGE);
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int val = BufferIO::Read<int32_t>(pbuf);
 		int final = mainGame->dInfo.lp[player] - val;
@@ -3054,7 +3055,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_RECOVER: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::RECOVER);
+		PLAY_SOUND(SoundManager::SFX::RECOVER);
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int val = BufferIO::Read<int32_t>(pbuf);
 		int final = mainGame->dInfo.lp[player] + val;
@@ -3080,7 +3081,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_EQUIP: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::EQUIP);
+		PLAY_SOUND(SoundManager::SFX::EQUIP);
 		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
 		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(mainGame->LocalPlayer(info1.controler), info1.location, info1.sequence);
@@ -3184,7 +3185,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		break;
 	}
 	case MSG_PAY_LPCOST: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::DAMAGE);
+		PLAY_SOUND(SoundManager::SFX::DAMAGE);
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int cost = BufferIO::Read<int32_t>(pbuf);
 		int final = mainGame->dInfo.lp[player] - cost;
@@ -3211,7 +3212,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_ADD_COUNTER: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::COUNTER_ADD);
+		PLAY_SOUND(SoundManager::SFX::COUNTER_ADD);
 		int type = BufferIO::Read<uint16_t>(pbuf);
 		int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int l = BufferIO::Read<uint8_t>(pbuf);
@@ -3233,7 +3234,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_REMOVE_COUNTER: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::COUNTER_REMOVE);
+		PLAY_SOUND(SoundManager::SFX::COUNTER_REMOVE);
 		int type = BufferIO::Read<uint16_t>(pbuf);
 		int c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int l = BufferIO::Read<uint8_t>(pbuf);
@@ -3255,7 +3256,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_ATTACK: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::ATTACK);
+		PLAY_SOUND(SoundManager::SFX::ATTACK);
 		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
 		info1.controler = mainGame->LocalPlayer(info1.controler);
 		mainGame->dField.attacker = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
@@ -3354,7 +3355,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_TOSS_COIN: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::COIN);
+		PLAY_SOUND(SoundManager::SFX::COIN);
 		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int count = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isCatchingUp) {
@@ -3375,7 +3376,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_TOSS_DICE: {
-		mainGame->soundManager->PlaySoundEffect(SoundManager::SFX::DICE);
+		PLAY_SOUND(SoundManager::SFX::DICE);
 		/*int player = */mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int count = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.isCatchingUp) {
@@ -3818,6 +3819,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	return true;
 }
+#undef PLAY_SOUND
+#undef COMPAT_READ
 void DuelClient::SwapField() {
 	if(mainGame->dInfo.curMsg != MSG_WAITING)
 		is_swapping = !is_swapping;
@@ -3896,7 +3899,6 @@ void DuelClient::SendResponse() {
 		SendBufferToServer(CTOS_RESPONSE, response_buf.data(), response_buf.size());
 	}
 }
-#undef COMPAT_READ
 void DuelClient::BeginRefreshHost() {
 	if(is_refreshing)
 		return;
