@@ -8,4 +8,4 @@ curl --retry 5 --connect-timeout 30 --location --remote-header-name --output cac
 
 cp -r irrlicht/include /usr/local/include/irrlicht
 cp irrlicht/lib/* /usr/local/lib
-sudo cp -r libevent/ $(brew --cellar libevent)/$(brew list --versions libevent | cut -f2 -d" ")
+sudo cp -r libevent/ /usr/local/opt/libevent
