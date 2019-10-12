@@ -337,11 +337,11 @@ bool Game::Initialize() {
 	stHostPrepRule2->setWordWrap(true);
 	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, dataManager.GetSysString(1251).c_str());
 	for(int i = 0; i < 6; ++i) {
-		stHostPrepDuelist[i] = env->addStaticText(L"", Scale(40, 65 + i * 25, 240, 85 + i * 25), true, false, wHostPrepare);
-		btnHostPrepKick[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_BOT_ADD, L"X");
-		chkHostPrepReady[i] = env->addCheckBox(false, Scale(250, 65 + i * 25, 270, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
+		btnHostPrepKick[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_HP_KICK, L"X");
+        btnHostPrepWindbot[i] = env->addButton(Scale(35, 65 + i * 25, 55, 85 + i * 25), wHostPrepare, BUTTON_BOT_ADD, L"AI");
+        stHostPrepDuelist[i] = env->addStaticText(L"", Scale(65, 65 + i * 25, 265, 85 + i * 25), true, false, wHostPrepare);
+		chkHostPrepReady[i] = env->addCheckBox(false, Scale(275, 65 + i * 25, 295, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
 		chkHostPrepReady[i]->setEnabled(false);
-		//btnHostPrepWindbot[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_BOT_ADD, L"X");
 	}
 	gBot.window = env->addWindow(Scale(630, 100, 840, 310), false, L"Bot preferences");
 	gBot.window->getCloseButton()->setVisible(false);
@@ -353,7 +353,7 @@ bool Game::Initialize() {
 	gBot.RefreshDecks(&bots);
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", dataManager.GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
-	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(280, 30, 460, 230));
+	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(305, 30, 485, 230));
 	stHostPrepRule->setWordWrap(true);
 	stDeckSelect = env->addStaticText(dataManager.GetSysString(1254).c_str(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
 	cbDeckSelect = env->addComboBox(Scale(120, 230, 270, 255), wHostPrepare);
