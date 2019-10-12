@@ -8,4 +8,4 @@ curl --retry 5 --connect-timeout 30 --location --remote-header-name --output cac
 
 cp -r irrlicht/include /usr/local/include/irrlicht
 cp irrlicht/lib/* /usr/local/lib
-cp -r libevent /usr/local/Cellar/libevent/2.1.11
+cp -r libevent/ /usr/local/Cellar/libevent/2.1.11_1
