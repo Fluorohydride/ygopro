@@ -39,8 +39,14 @@ void ServerLobby::FillOnlineRooms() {
 			continue;
 		}
 		if(doFilter) {
-			if(!searchText.empty() && !(Game::CompareStrings(searchText, room.players, false, true) || !Game::CompareStrings(searchText, room.description, false, true)))
-				continue;
+			if(searchText.size()) {
+				bool res = false;
+				for(auto& name : room.players) {
+					res = res || Game::CompareStrings(name, searchText, true, false);
+				}
+				if(!res && (room.description.size() && !Game::CompareStrings(room.description, searchText, true, false)))
+					continue;
+			}
 			if(bestOf && room.info.best_of != bestOf)
 				continue;
 			if(team1 && room.info.team1 != team1)
