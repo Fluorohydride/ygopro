@@ -264,7 +264,11 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->dField.Clear();
 					mainGame->is_building = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
-					mainGame->ShowElement(mainGame->wLanWindow);
+					if(mainGame->isHostingOnline) {
+						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+					} else {
+						mainGame->ShowElement(mainGame->wLanWindow);
+					}
 					mainGame->SetMesageWindow();
 					mainGame->gMutex.unlock();
 				}
