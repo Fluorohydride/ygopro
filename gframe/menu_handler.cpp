@@ -748,13 +748,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {
-					RoomInfo* room = static_cast<RoomInfo*>(mainGame->roomListTable->getCellData(mainGame->roomListTable->getSelected(), 1));
-					if(room->locked) {
-						mainGame->wRoomPassword->setVisible(true);
-					} else {
-						mainGame->HideElement(mainGame->wRoomListPlaceholder);
-						ServerLobby::JoinServer(false);
-					}
+					mainGame->HideElement(mainGame->wRoomListPlaceholder);
+					ServerLobby::JoinServer(false);
 				}
 				break;
 			}
