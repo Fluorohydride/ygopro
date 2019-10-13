@@ -141,6 +141,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_ROOMPASSWORD_CANCEL: {
 				mainGame->wRoomPassword->setVisible(false);
+				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 				break;
 			}
 			case BUTTON_LAN_MODE: {
