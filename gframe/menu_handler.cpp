@@ -374,6 +374,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
+                mainGame->HideElement(mainGame->gBot.window);
 				if(mainGame->wHostPrepare2->isVisible())
 					mainGame->HideElement(mainGame->wHostPrepare2);
 				if(mainGame->isHostingOnline)

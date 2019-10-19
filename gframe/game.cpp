@@ -343,9 +343,9 @@ bool Game::Initialize() {
 		chkHostPrepReady[i] = env->addCheckBox(false, Scale(275, 65 + i * 25, 295, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
 		chkHostPrepReady[i]->setEnabled(false);
 	}
-	gBot.window = env->addWindow(Scale(630, 100, 840, 310), false, L"Bot preferences");
+	gBot.window = env->addWindow(Scale(750, 120, 960, 330), false, L"WindBot preferences");
 	gBot.window->getCloseButton()->setVisible(false);
-	gBot.window->setVisible(true);
+	gBot.window->setVisible(false);
 	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
 	//box->addItem(L"Decks");
 	gBot.deckProperties = env->addStaticText(L"This is where the deck info will go",Scale(10, 25, 200, 160), true, true, gBot.window);

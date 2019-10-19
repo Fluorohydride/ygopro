@@ -236,6 +236,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->HideElement(mainGame->wHostPrepare);
 					mainGame->HideElement(mainGame->wHostPrepare2);
+					mainGame->HideElement(mainGame->gBot.window);
 					if(mainGame->isHostingOnline) {
 						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 					} else {
@@ -611,6 +612,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnHostPrepCancel->setRelativePosition(mainGame->Scale<s32>(350, 280 + x, 460, 305 + x));
 		mainGame->wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440 + x));
 		mainGame->wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
+        mainGame->gBot.window->setRelativePosition(mainGame->ResizeWin(750, 120, 960, 330 + x));
 		for(int i = 0; i < 6; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(false);
 			mainGame->chkHostPrepReady[i]->setChecked(false);
@@ -667,6 +669,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
+        mainGame->ShowElement(mainGame->gBot.window);
 		if(str2.size())
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
@@ -708,6 +711,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_DUEL_START: {
 		mainGame->HideElement(mainGame->wHostPrepare);
+        mainGame->HideElement(mainGame->gBot.window);
 		mainGame->HideElement(mainGame->wHostPrepare2);
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.lock();
