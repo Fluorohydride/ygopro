@@ -1361,11 +1361,11 @@ void Game::RefreshAiDecks() {
 }
 #ifdef _WIN32
 path_string Game::GetAiParameter(BotInfo bot, int port) {
-	return fmt::format(TEXT("./Windbot/Windbot.exe Deck=\"a{}\" Port={} Version={}"),bot.deck.c_str(),port, PRO_VERSION);
+	return fmt::format(TEXT("./Windbot/Windbot.exe Deck=\"a{}\" Port={} Version={} name=\"[AI] {}\""),bot.deck.c_str(), port, PRO_VERSION, bot.name.c_str());
 }
 #else
 Game::BotParams Game::GetAiParameter(BotInfo bot, int port) {
-	return { fmt::format("Deck=\"{}\"", BufferIO::EncodeUTF8s(bot.deck).c_str()), fmt::format("Port={}", port), fmt::format("Version={}", PRO_VERSION) };
+	return { fmt::format("Deck={}", BufferIO::EncodeUTF8s(bot.deck).c_str()), fmt::format("Port={}", port), fmt::format("Version={}", PRO_VERSION), fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(bot.name).c_str())};
 }
 
 #endif
