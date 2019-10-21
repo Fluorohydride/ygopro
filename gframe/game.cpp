@@ -1009,7 +1009,11 @@ void Game::MainLoop() {
 			CloseDuelWindow();
 		else
 			closeSignal.unlock();
+#ifdef __APPLE__
+		if(gameConf.max_fps) {
+#else
 		if(gameConf.max_fps && !gameConf.use_vsync) {
+#endif
 			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
