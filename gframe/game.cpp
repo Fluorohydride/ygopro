@@ -1099,11 +1099,9 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 void Game::RefreshLFLists() {
 	cbDBLFList->clear();
 	cbDBLFList->setSelected(0);
-	std::cout << gameConf.lastlflist.c_str() << std::endl;
 	for (auto &list : deckManager._lfList) {
 		auto i = cbDBLFList->addItem(list.listName.c_str());
-		std::cout << list.listName.c_str() << std::endl;
-		if (gameConf.lastlflist == list.listName) {
+		if (gameConf.lastlflist == list.hash) {
 			cbDBLFList->setSelected(i);
 		}
 	}
@@ -1127,7 +1125,7 @@ void Game::LoadConfig() {
 	gameConf.nickname = L"";
 	gameConf.gamename = L"";
 	gameConf.lastdeck = L"";
-	gameConf.lastlflist = L"";
+	gameConf.lastlflist = 0;
 	gameConf.numfont = L"";
 	gameConf.textfont = L"";
 	gameConf.lasthost = L"";
@@ -1187,9 +1185,10 @@ void Game::LoadConfig() {
 			gameConf.gamename = BufferIO::DecodeUTF8s(str);
 		else if(type == "lastdeck")
 			gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
-		else if(type == "lastlflist")
-			gameConf.lastlflist = BufferIO::DecodeUTF8s(str);
-		else if(type == "textfont") {
+		else if(type == "lastlflist") {
+			auto val = std::stoi(str);
+			gameConf.lastlflist = val >= 0 ? val : 0;
+		} else if(type == "textfont") {
 			pos = str.find(L' ');
 			if(pos == std::wstring::npos) {
 				gameConf.textfont = BufferIO::DecodeUTF8s(str);
@@ -1280,7 +1279,7 @@ void Game::SaveConfig() {
 	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
 	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
 	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
-	conf_file << "lastlflist = "		<< BufferIO::EncodeUTF8s(gameConf.lastlflist) << "\n";
+	conf_file << "lastlflist = "		<< std::to_string(gameConf.lastlflist) << "\n";
 	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
 	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
 	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";

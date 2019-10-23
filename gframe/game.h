@@ -40,7 +40,7 @@ struct Config {
 	std::wstring nickname;
 	std::wstring gamename;
 	std::wstring lastdeck;
-	std::wstring lastlflist;
+	unsigned int lastlflist;
 	std::wstring textfont;
 	std::wstring numfont;
 	std::wstring roompass;

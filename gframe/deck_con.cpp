@@ -114,7 +114,7 @@ void DeckBuilder::Terminate() {
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)
 		mainGame->gameConf.lastdeck = mainGame->cbDBDecks->getItem(sel);
-	mainGame->gameConf.lastlflist = deckManager._lfList[mainGame->cbDBLFList->getSelected()].listName.c_str();
+	mainGame->gameConf.lastlflist = deckManager._lfList[mainGame->cbDBLFList->getSelected()].hash;
 	if(exit_on_return)
 		mainGame->device->closeDevice();
 }
