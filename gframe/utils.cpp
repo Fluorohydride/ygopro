@@ -247,7 +247,7 @@ namespace ygo {
 		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
 
 		CGEventRef keyDown = CGEventCreateKeyboardEvent(source, kVK_ANSI_F, TRUE);
-		CGEventSetFlags(keyDown, kCGEventFlagMaskControl^kCGEventFlagMaskCommand);
+		CGEventSetFlags(keyDown, CGEventFlags(kCGEventFlagMaskControl|kCGEventFlagMaskCommand));
 		CGEventRef keyUp = CGEventCreateKeyboardEvent(source, kVK_ANSI_F, FALSE);
 
 		CGEventPost(kCGAnnotatedSessionEventTap, keyDown);
