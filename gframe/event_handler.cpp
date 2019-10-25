@@ -1864,7 +1864,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->textFont->setTransparency(true);
 			return true;
 		}
-		case irr::KEY_F9: {
+		case irr::KEY_F8: {
 			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
 			return true;
@@ -1874,7 +1874,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->device->minimizeWindow();
 			return true;
 		}
-		case irr::KEY_F11: {
+		case irr::KEY_F9: {
 			if(!event.KeyInput.PressedDown)
 				Utils::ToggleFullscreen();
 			return true;
