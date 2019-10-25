@@ -42,15 +42,6 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.Vsync = gameConf.use_vsync;
 	params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
-#ifdef __APPLE__
-	if(gameConf.fullscreen) {
-		irr::IrrlichtDevice* nulldevice = createDevice(video::EDT_NULL);
-		params.WindowSize = nulldevice->getVideoModeList()->getDesktopResolution();
-		nulldevice->drop();
-		params.Fullscreen = true;
-		is_fullscreen = true;
-	}
-#endif
 	device = irr::createDeviceEx(params);
 	if(!device) {
 		ErrorLog("Failed to create Irrlicht Engine device!");
@@ -848,10 +839,8 @@ void Game::MainLoop() {
 	float frame_counter = 0.0f;
 	int fps = 0;
 	std::wstring corename;
-#ifndef __APPLE__
 	if(gameConf.fullscreen)
 		Utils::ToggleFullscreen();
-#endif
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
