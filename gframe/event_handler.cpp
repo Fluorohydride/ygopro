@@ -1864,11 +1864,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->textFont->setTransparency(true);
 			return true;
 		}
-		case irr::KEY_F9: {
-			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
-				mainGame->textFont->setTransparency(true);
-			return true;
-		}
 		case irr::KEY_ESCAPE: {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
