@@ -111,8 +111,8 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h source-fixed/Irrlicht/MacOSX/
  	private:
  
 diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
---- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-10-03 18:30:22.000000000 -0400
-+++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-10-03 18:31:24.000000000 -0400
+--- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-10-25 23:26:26.000000000 -0400
++++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2019-10-25 23:26:50.000000000 -0400
 @@ -496,7 +496,7 @@
  		{
  			[[NSAutoreleasePool alloc] init];
@@ -170,7 +170,16 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  	}
  
  	return (result);
-@@ -971,6 +1005,33 @@
+@@ -901,6 +935,8 @@
+ 	{
+ 		NSRect driverFrame = [Window contentRectForFrameRect:[Window frame]];
+ 		getVideoDriver()->OnResize(core::dimension2d<u32>( (s32)driverFrame.size.width, (s32)driverFrame.size.height));
++		DeviceWidth = (s32)driverFrame.size.width;
++		DeviceHeight = (s32)driverFrame.size.height;
+ 	}
+ 	else
+ 		getVideoDriver()->OnResize(core::dimension2d<u32>( (s32)width, (s32)height));
+@@ -971,6 +1007,33 @@
  	os::Timer::tick();
  	storeMouseLocation();
  

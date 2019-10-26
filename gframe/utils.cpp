@@ -7,6 +7,8 @@
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#elif defined(__APPLE__)
+#include "osx_menu.h"
 #endif
 namespace ygo {
 	bool Utils::Makedirectory(const path_string& path) {
@@ -240,6 +242,8 @@ namespace ygo {
 		XChangeProperty(display, window, property, property, 32, PropModeReplace, (unsigned char*)&hints, 5);
 		XMapWindow(display, window);
 		XFlush(display);
+#elif defined(__APPLE__)
+		EDOPRO_ToggleFullScreen();
 #endif
 	}
 

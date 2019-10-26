@@ -79,8 +79,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
-	filterList = &deckManager._lfList[0];
-	mainGame->cbDBLFList->setSelected(0);
+	filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 	ClearSearch();
 	mouse_pos.set(0, 0);
 	hovered_code = 0;
@@ -115,6 +114,7 @@ void DeckBuilder::Terminate() {
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)
 		mainGame->gameConf.lastdeck = mainGame->cbDBDecks->getItem(sel);
+	mainGame->gameConf.lastlflist = deckManager._lfList[mainGame->cbDBLFList->getSelected()].hash;
 	if(exit_on_return)
 		mainGame->device->closeDevice();
 }

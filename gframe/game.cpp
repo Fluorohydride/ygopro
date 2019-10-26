@@ -44,15 +44,6 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.Vsync = gameConf.use_vsync;
 	params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
-#ifdef __APPLE__
-	if(gameConf.fullscreen) {
-		irr::IrrlichtDevice* nulldevice = createDevice(video::EDT_NULL);
-		params.WindowSize = nulldevice->getVideoModeList()->getDesktopResolution();
-		nulldevice->drop();
-		params.Fullscreen = true;
-		is_fullscreen = true;
-	}
-#endif
 	device = irr::createDeviceEx(params);
 	if(!device) {
 		ErrorLog("Failed to create Irrlicht Engine device!");
@@ -603,8 +594,7 @@ bool Game::Initialize() {
 	stDeck = env->addStaticText(dataManager.GetSysString(1301).c_str(), Scale(10, 39, 100, 59), false, false, wDeckEdit);
 	cbDBDecks = env->addComboBox(Scale(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbDBLFList->addItem(deckManager._lfList[i].listName.c_str());
+	RefreshLFLists();
 	btnSaveDeck = env->addButton(Scale(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302).c_str());
 	ebDeckname = env->addEditBox(L"", Scale(80, 65, 220, 90), true, wDeckEdit, EDITBOX_DECK_NAME);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -1003,10 +993,8 @@ void Game::MainLoop() {
 	int fps = 0;
 	bool discord_message_shown = false;
 	std::wstring corename;
-#ifndef __APPLE__
 	if(gameConf.fullscreen)
 		Utils::ToggleFullscreen();
-#endif
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
@@ -1026,10 +1014,7 @@ void Game::MainLoop() {
 				dataManager.LoadStrings(data_path + TEXT("strings.conf"));
 				if(deckManager.LoadLFListSingle(data_path + TEXT("lflist.conf")) || deckManager.LoadLFListFolder(data_path + TEXT("lflists/"))) {
 					deckManager.RefreshLFList();
-					cbDBLFList->clear();
-					for(auto& list : deckManager._lfList)
-						cbDBLFList->addItem(list.listName.c_str());
-					deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
+					RefreshLFLists();
 				}
 				if(repo.has_core) {
 					cores_to_load.insert(cores_to_load.begin(), Utils::ParseFilename(repo.core_path));
@@ -1280,6 +1265,17 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 		}
 	}
 }
+void Game::RefreshLFLists() {
+	cbDBLFList->clear();
+	cbDBLFList->setSelected(0);
+	for (auto &list : deckManager._lfList) {
+		auto i = cbDBLFList->addItem(list.listName.c_str());
+		if (gameConf.lastlflist == list.hash) {
+			cbDBLFList->setSelected(i);
+		}
+	}
+	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
+}
 void Game::RefreshReplay() {
 	lstReplayList->resetPath();
 }
@@ -1298,6 +1294,7 @@ void Game::LoadConfig() {
 	gameConf.nickname = L"";
 	gameConf.gamename = L"";
 	gameConf.lastdeck = L"";
+	gameConf.lastlflist = 0;
 	gameConf.numfont = L"";
 	gameConf.textfont = L"";
 	gameConf.lasthost = L"";
@@ -1357,7 +1354,10 @@ void Game::LoadConfig() {
 			gameConf.gamename = BufferIO::DecodeUTF8s(str);
 		else if(type == "lastdeck")
 			gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
-		else if(type == "textfont") {
+		else if(type == "lastlflist") {
+			auto val = std::stoi(str);
+			gameConf.lastlflist = val >= 0 ? val : 0;
+		} else if(type == "textfont") {
 			pos = str.find(L' ');
 			if(pos == std::wstring::npos) {
 				gameConf.textfont = BufferIO::DecodeUTF8s(str);
@@ -1448,6 +1448,7 @@ void Game::SaveConfig() {
 	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
 	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
 	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
+	conf_file << "lastlflist = "		<< std::to_string(gameConf.lastlflist) << "\n";
 	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
 	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
 	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";

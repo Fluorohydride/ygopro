@@ -42,6 +42,7 @@ struct Config {
 	std::wstring nickname;
 	std::wstring gamename;
 	std::wstring lastdeck;
+	unsigned int lastlflist;
 	std::wstring textfont;
 	std::wstring numfont;
 	std::wstring roompass;
@@ -122,6 +123,7 @@ public:
 	void LoadExpansionDB();
 	void LoadArchivesDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
+	void RefreshLFLists();
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
