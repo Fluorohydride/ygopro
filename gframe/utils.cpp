@@ -7,9 +7,6 @@
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
-#elif defined(__APPLE__)
-#include <ApplicationServices/ApplicationServices.h>
-#include <Carbon/Carbon.h>
 #endif
 namespace ygo {
 	bool Utils::Makedirectory(const path_string& path) {
@@ -243,19 +240,6 @@ namespace ygo {
 		XChangeProperty(display, window, property, property, 32, PropModeReplace, (unsigned char*)&hints, 5);
 		XMapWindow(display, window);
 		XFlush(display);
-#elif defined (__APPLE__)
-		CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStateCombinedSessionState);
-
-		CGEventRef keyDown = CGEventCreateKeyboardEvent(source, kVK_ANSI_F, TRUE);
-		CGEventSetFlags(keyDown, CGEventFlags(kCGEventFlagMaskControl|kCGEventFlagMaskCommand));
-		CGEventRef keyUp = CGEventCreateKeyboardEvent(source, kVK_ANSI_F, FALSE);
-
-		CGEventPost(kCGAnnotatedSessionEventTap, keyDown);
-		CGEventPost(kCGAnnotatedSessionEventTap, keyUp);
-
-		CFRelease(keyUp);
-		CFRelease(keyDown);
-		CFRelease(source);
 #endif
 	}
 
