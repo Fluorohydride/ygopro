@@ -3,9 +3,12 @@
 
 #ifdef __cplusplus
 extern "C" {
+#else
+#include <stdbool.h>
 #endif
 
-void EDOPRO_SetupMenuBar();
+void EDOPRO_SetupMenuBar(bool *fullScreenState);
+void EDOPRO_ToggleFullScreen();
 
 #ifdef __cplusplus
 }
