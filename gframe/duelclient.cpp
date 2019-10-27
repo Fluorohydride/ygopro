@@ -302,18 +302,19 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		switch(pkt->msg) {
 		case ERRMSG_JOINERROR: {
 			temp_ver = 0;
-			if(mainGame->isHostingOnline && pkt->code == 9) {
+			mainGame->gMutex.lock();
+			if(mainGame->isHostingOnline) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) mainGame->HideElement(obj);
 				HIDE_AND_CHECK(mainGame->wCreateHost);
 				HIDE_AND_CHECK(mainGame->wRules);
 				HIDE_AND_CHECK(mainGame->wCustomRules);
 #undef HIDE_AND_CHECK
 				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+			} else {
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
 			}
-			mainGame->gMutex.lock();
-			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-			mainGame->btnJoinHost->setEnabled(true);
-			mainGame->btnJoinCancel->setEnabled(true);
 			if(pkt->code == 0)
 				mainGame->PopupMessage(dataManager.GetSysString(1403));
 			else if(pkt->code == 1)
