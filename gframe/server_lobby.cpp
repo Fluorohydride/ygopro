@@ -28,7 +28,7 @@ void ServerLobby::FillOnlineRooms() {
 	int team1 = std::stoi(mainGame->ebOnlineTeam1->getText());
 	int team2 = std::stoi(mainGame->ebOnlineTeam2->getText());
 
-	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2;
+	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2 || mainGame->btnFilterRelayMode->isPressed();
 
 	SColor normal = SColor(255, 0, 0, 0);
 	SColor red = SColor(255, 255, 100, 100);
@@ -63,6 +63,8 @@ void ServerLobby::FillOnlineRooms() {
 					continue;
 				}
 			}
+			if(mainGame->btnFilterRelayMode->isPressed() && !(room.info.duel_flag & DUEL_RELAY_MODE))
+				continue;
 		}
 		std::wstring banlist;
 

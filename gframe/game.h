@@ -628,6 +628,7 @@ public:
 	irr::gui::IGUIButton* btnLanRefresh2;
 	irr::gui::IGUIWindow* wRoomPassword;
 	irr::gui::IGUIEditBox* ebRPName;
+	irr::gui::IGUIButton* btnFilterRelayMode;
 	irr::gui::IGUIButton* btnRPYes;
 	irr::gui::IGUIButton* btnRPNo;
 	irr::gui::IGUIButton* btnJoinHost2;
@@ -738,9 +739,8 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_RENAME_REPLAY		134
 #define BUTTON_EXPORT_DECK			135
 #define EDITBOX_TEAM_COUNT			136
-#define BUTTON_RELAY_MODE			137
-#define BUTTON_BOT_START			138
-#define BUTTON_BOT_ADD				139
+#define BUTTON_BOT_START			137
+#define BUTTON_BOT_ADD				138
 #define EDITBOX_CHAT				140
 #define EDITBOX_PORT_BOX			141
 #define COMBOBOX_BOT_DECK			142
