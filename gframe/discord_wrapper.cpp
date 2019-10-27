@@ -191,6 +191,8 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 		HIDE_AND_CHECK(game->wRules)
 		HIDE_AND_CHECK(game->wCustomRules)
 		HIDE_AND_CHECK(game->wRoomListPlaceholder)
+		if(game->is_building)
+			game->deckBuilder.Terminate();
 		game->device->setEventReceiver(&game->menuHandler);
 #undef HIDE_AND_CHECK
 	}
