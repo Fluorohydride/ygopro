@@ -1326,35 +1326,29 @@ void Game::RefreshLFLists() {
 	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 }
 void Game::RefreshAiDecks() {
-	try {
-		std::ifstream bot_file("bot.json", std::ifstream::in);
-		if(bot_file.is_open()) {
-			nlohmann::json j;
-			bot_file >> j;
-			bot_file.close();
-			if(j.size()) {
-				for(auto& obj : j["windbots"].get<std::vector<nlohmann::json>>()) {
-					if(!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
-						continue;
-					BotInfo tmp = {};
-					tmp.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-					tmp.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
-					for(auto& flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
+    try {
+        if (configs.size() && configs["windbots"].is_array()) {
+            for (auto& obj : configs["windbots"].get<std::vector<nlohmann::json>>()) {
+                if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
+                    continue;
+                BotInfo tmp = {};
+                tmp.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+                tmp.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
+                for (auto& flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
 #define CHECK_AND_SET_FLAG(flag) if(strflag == #flag)tmp.flags |= static_cast<int>(BotInfo::bot_params::flag)
-						auto strflag = flag.get<std::string>();
-						CHECK_AND_SET_FLAG(AI_LV1);
-						CHECK_AND_SET_FLAG(AI_LV2);
-						CHECK_AND_SET_FLAG(AI_LV3);
-						CHECK_AND_SET_FLAG(AI_ANTI_META);
-						CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_3);
-						CHECK_AND_SET_FLAG(SUPPORT_NEW_MASTER_RULE);
+                    auto strflag = flag.get<std::string>();
+                    CHECK_AND_SET_FLAG(AI_LV1);
+                    CHECK_AND_SET_FLAG(AI_LV2);
+                    CHECK_AND_SET_FLAG(AI_LV3);
+                    CHECK_AND_SET_FLAG(AI_ANTI_META);
+                    CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_3);
+                    CHECK_AND_SET_FLAG(SUPPORT_NEW_MASTER_RULE);
 #undef CHECK_AND_SET_FLAG
-					}
-					bots.push_back(tmp);
-				}
-			}
-		}
-	}
+                }
+                bots.push_back(tmp);
+            }
+        }
+    }
 	catch(std::exception& e) {
 		ErrorLog(std::string("Exception ocurred: ") + e.what());
 	}
