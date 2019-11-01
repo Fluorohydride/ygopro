@@ -1405,6 +1405,8 @@ int GenericDuel::Analyze(char* msgbuffer, unsigned int len) {
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			packets_cache.emplace_back(offset, pbuf - offset);
+			PseudoRefreshDeck(0);
+			PseudoRefreshDeck(1);
 			RefreshMzone(0);
 			RefreshMzone(1);
 			RefreshSzone(0);
