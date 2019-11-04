@@ -24,20 +24,23 @@ public:
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
 	virtual void Process();
 	virtual void Surrender(DuelPlayer* dp);
-	virtual int Analyze(char* msgbuffer, unsigned int len);
+	virtual int Analyze(CoreUtils::Packet packet);
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void TimeConfirm(DuelPlayer* dp);
 	virtual void EndDuel();
-	
+
+	void BeforeParsing(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
+	void Sending(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
+	void AfterParsing(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last);
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
-	void RefreshMzone(int player, int flag = 0x1881fff);
-	void RefreshSzone(int player, int flag = 0x1e81fff);
-	void RefreshHand(int player, int flag = 0x1781fff);
-	void RefreshGrave(int player, int flag = 0x181fff);
-	void RefreshExtra(int player, int flag = 0x181fff);
+	void RefreshMzone(int player, int flag = 0x3881fff);
+	void RefreshSzone(int player, int flag = 0x3e81fff);
+	void RefreshHand(int player, int flag = 0x3781fff);
+	void RefreshGrave(int player, int flag = 0x381fff);
+	void RefreshExtra(int player, int flag = 0x381fff);
 	void RefreshLocation(int player, int flag, int location);
-	void RefreshSingle(int player, int location, int sequence, int flag = 0x1f81fff);
+	void RefreshSingle(int player, int location, int sequence, int flag = 0x3f81fff);
 	
 	static void GenericTimer(evutil_socket_t fd, short events, void* arg);
 

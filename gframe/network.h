@@ -4,6 +4,7 @@
 #include "dllinterface.h"
 #include "config.h"
 #include "deck_manager.h"
+#include "core_utils.h"
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -136,7 +137,7 @@ public:
 	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
 	virtual void Process() {}
-	virtual int Analyze(char* msgbuffer, unsigned int len) {
+	virtual int Analyze(CoreUtils::Packet packet) {
 		return 0;
 	}
 	virtual void Surrender(DuelPlayer* dp) {}
