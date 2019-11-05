@@ -79,14 +79,9 @@ bool LaunchWindbot(const BotInfo& bot, int port) {
 	return true;
 #else
 	int pid = fork();
-	if(pid== 0) {
+	if(pid == 0) {
 		chdir("WindBot");
-		printf("%s %s %s %s\n", param.arg1.c_str(), param.arg2.c_str(), param.arg3.c_str(), param.arg4.c_str());
-#ifdef __APPLE__
 		execlp("mono", "WindBot.exe", "WindBot.exe", param.arg1.c_str(), param.arg2.c_str(), param.arg3.c_str(), param.arg4.c_str(), NULL);
-#else
-		execl("./WindBot.exe", "WindBot", param.arg1.c_str(), param.arg2.c_str(), param.arg3.c_str(), param.arg4.c_str(), NULL);
-#endif
 		perror("Failed to start WindBot");
 		exit(EXIT_FAILURE);
 	}
