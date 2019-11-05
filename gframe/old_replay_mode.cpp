@@ -117,7 +117,7 @@ namespace ygo {
 			mainGame->dInfo.duel_field = 4;
 		else if (opt & DUEL_PZONE)
 			mainGame->dInfo.duel_field = 3;
-		mainGame->dInfo.extraval = (opt & SPEED_DUEL) ? 1 : 0;
+		mainGame->dInfo.extraval = (opt & DUEL_SPEED) ? 1 : 0;
 		mainGame->SetPhaseButtons();
 		mainGame->dInfo.lp[0] = start_lp;
 		mainGame->dInfo.lp[1] = start_lp;
