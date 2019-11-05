@@ -1326,16 +1326,17 @@ void Game::RefreshLFLists() {
 	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 }
 void Game::RefreshAiDecks() {
+	bots.clear();
     try {
         if (configs.size() && configs["windbots"].is_array()) {
             for (auto& obj : configs["windbots"].get<std::vector<nlohmann::json>>()) {
                 if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
                     continue;
-                BotInfo tmp = {};
-                tmp.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-                tmp.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
+                WindBot bot;
+                bot.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+                bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
                 for (auto& flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
-#define CHECK_AND_SET_FLAG(flag) if(strflag == #flag)tmp.flags |= static_cast<int>(BotInfo::bot_params::flag)
+#define CHECK_AND_SET_FLAG(flag) if(strflag == #flag) bot.flags |= static_cast<int>(WindBot::Parameters::flag)
                     auto strflag = flag.get<std::string>();
                     CHECK_AND_SET_FLAG(AI_LV1);
                     CHECK_AND_SET_FLAG(AI_LV2);
@@ -1345,24 +1346,17 @@ void Game::RefreshAiDecks() {
                     CHECK_AND_SET_FLAG(SUPPORT_NEW_MASTER_RULE);
 #undef CHECK_AND_SET_FLAG
                 }
-                bots.push_back(tmp);
+				bot.version = PRO_VERSION;
+#ifdef _WIN32
+				bot.executablePath = mainGame->filesystem->getAbsolutePath(TEXT("./WindBot"));
+#endif
+                bots.push_back(bot);
             }
         }
-    }
-	catch(std::exception& e) {
-		ErrorLog(std::string("Exception ocurred: ") + e.what());
+    } catch(std::exception& e) {
+		ErrorLog(std::string("Exception occurred: ") + e.what());
 	}
 }
-#ifdef _WIN32
-path_string Game::GetAiParameter(BotInfo bot, int port) {
-	return fmt::format(TEXT("./Windbot/Windbot.exe Deck=\"{}\" Port={} Version={} name=\"[AI] {}\""),bot.deck.c_str(), port, PRO_VERSION, bot.name.c_str());
-}
-#else
-Game::BotParams Game::GetAiParameter(BotInfo bot, int port) {
-	return { fmt::format("Deck={}", BufferIO::EncodeUTF8s(bot.deck).c_str()), fmt::format("Port={}", port), fmt::format("Version={}", PRO_VERSION), fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(bot.name).c_str())};
-}
-
-#endif
 void Game::RefreshReplay() {
 	lstReplayList->resetPath();
 }
@@ -2461,7 +2455,7 @@ void Game::PopulateResourcesDirectories() {
 }
 
 
-void Game::BotGui::RefreshDecks(std::vector<BotInfo>* _bots) {
+void Game::BotGui::RefreshDecks(std::vector<WindBot>* _bots) {
 	bots = _bots;
 	deckBox->clear();
 	for(auto& bot : *bots)
@@ -2474,16 +2468,16 @@ void Game::BotGui::UpdateDeckDescription() {
 	if(sel < 0 || sel >= (*bots).size())
 		return;
 	auto& bot = (*bots)[sel];
-	int level = bot.GetAiLevel();
+	int level = bot.GetDifficulty();
 	std::wstring params;
 	if(level > 0)
 		params.append(fmt::format(L"AI Level: {}\n", level));
 	else if(level == 0)
 		params.append(L"Anti Meta AI\n");
 	std::wstring mr;
-	if(bot.flags & static_cast<int>(BotInfo::SUPPORT_MASTER_RULE_3))
+	if(bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_MASTER_RULE_3))
 		mr.append(L"3");
-	if(bot.flags & static_cast<int>(BotInfo::SUPPORT_NEW_MASTER_RULE)) {
+	if(bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_NEW_MASTER_RULE)) {
 		if(mr.size())
 			mr.append(L",");
 		mr.append(L"4");
@@ -2491,18 +2485,6 @@ void Game::BotGui::UpdateDeckDescription() {
 	if(mr.size())
 		params.append(fmt::format(L"Master Rule supported: {}\n", mr.c_str()));
 	deckProperties->setText(params.c_str());
-}
-
-int BotInfo::GetAiLevel() {
-	if(flags & static_cast<int>(AI_LV1))
-		return 1;
-	if(flags & static_cast<int>(AI_LV2))
-		return 2;
-	if(flags & static_cast<int>(AI_LV3))
-		return 3;
-	if(flags & static_cast<int>(AI_ANTI_META))
-		return 0;
-	return -1;
 }
 
 }

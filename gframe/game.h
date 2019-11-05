@@ -24,6 +24,7 @@
 #include "sound_manager.h"
 #include "repo_manager.h"
 #include "server_lobby.h"
+#include "windbot.h"
 
 namespace ygo {
 
@@ -115,21 +116,6 @@ struct FadingUnit {
 	irr::core::vector2di fadingDest;
 };
 
-struct BotInfo {
-	std::wstring name;
-	std::wstring deck;
-	enum bot_params {
-		AI_LV1 = 1,
-		AI_LV2 = 2,
-		AI_LV3 = 4,
-		AI_ANTI_META = 8,
-		SUPPORT_MASTER_RULE_3 = 16,
-		SUPPORT_NEW_MASTER_RULE = 32
-	};
-	int flags;
-	int GetAiLevel();
-};
-
 class Game {
 
 public:
@@ -142,18 +128,6 @@ public:
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshLFLists();
 	void RefreshAiDecks();
-#ifdef _WIN32
-	path_string GetAiParameter(BotInfo bot, int port);
-#else
-	struct BotParams {
-		std::string arg1;
-		std::string arg2;
-		std::string arg3;
-		std::string arg4;
-	};
-	BotParams GetAiParameter(BotInfo bot, int port);
-
-#endif
 	void RefreshReplay();
 	void RefreshSingleplay();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
@@ -276,9 +250,9 @@ public:
 		irr::gui::IGUIComboBox* deckBox;
 		irr::gui::IGUIButton* btnConfirm;
 		irr::gui::IGUIButton* btnCancel;
-		std::vector<BotInfo>* bots;
+		std::vector<WindBot>* bots;
 		IGUIStaticText* deckProperties;
-		void RefreshDecks(std::vector<BotInfo>* _bots);
+		void RefreshDecks(std::vector<WindBot>* _bots);
 		void UpdateDeckDescription();
 	};
 	std::map<std::string, RepoGui> repoInfoGui;
@@ -345,7 +319,7 @@ public:
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
 	std::vector<Utils::IrrArchiveHelper> archives;
-	std::vector<BotInfo> bots;
+	std::vector<WindBot> bots;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;
