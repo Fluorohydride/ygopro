@@ -416,22 +416,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_BOT_START: {
 				int port = std::stoi(mainGame->gameConf.serverport);
-				int index = mainGame->gBot.deckBox->getSelected();
 				if(!NetServer::StartServer(port))
 					break;
 				if(!DuelClient::StartClient(0x7f000001, port)) {
 					NetServer::StopServer();
 					break;
 				}
-				if(!mainGame->bots[index].Launch(port)) {
+				if(!mainGame->gBot.LaunchSelected(port)) {
 					NetServer::StopServer();
 				}
 				break;
 			}
 			case BUTTON_BOT_ADD: {
 				int port = std::stoi(mainGame->gameConf.serverport);
-				int index = mainGame->gBot.deckBox->getSelected();
-				mainGame->bots[index].Launch(port);
+				mainGame->gBot.LaunchSelected(port);
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {
@@ -772,7 +770,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 			}
 			case COMBOBOX_BOT_DECK: {
-				mainGame->gBot.UpdateDeckDescription();
+				mainGame->gBot.UpdateDescription();
 			}
 			}
 		}

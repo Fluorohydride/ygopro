@@ -24,7 +24,7 @@
 #include "sound_manager.h"
 #include "repo_manager.h"
 #include "server_lobby.h"
-#include "windbot.h"
+#include "windbot_panel.h"
 
 namespace ygo {
 
@@ -245,16 +245,6 @@ public:
 		std::wstring commit_history_full;
 		std::wstring commit_history_partial;
 	};
-	struct BotGui {
-		irr::gui::IGUIWindow* window;
-		irr::gui::IGUIComboBox* deckBox;
-		irr::gui::IGUIButton* btnConfirm;
-		irr::gui::IGUIButton* btnCancel;
-		std::vector<WindBot>* bots;
-		IGUIStaticText* deckProperties;
-		void RefreshDecks(std::vector<WindBot>* _bots);
-		void UpdateDeckDescription();
-	};
 	std::map<std::string, RepoGui> repoInfoGui;
 
 	uint32 delta_time;
@@ -319,7 +309,6 @@ public:
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
 	std::vector<Utils::IrrArchiveHelper> archives;
-	std::vector<WindBot> bots;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;
@@ -439,7 +428,7 @@ public:
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
 	irr::gui::IGUIWindow* wHostPrepare2;
-	BotGui gBot;
+	WindBotPanel gBot;
 	irr::gui::IGUIStaticText* stHostCardRule;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
 	irr::gui::IGUIButton* btnHostPrepOB;

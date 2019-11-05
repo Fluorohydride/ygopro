@@ -350,7 +350,7 @@ bool Game::Initialize() {
 	//box->addItem(L"Decks");
 	gBot.deckProperties = env->addStaticText(L"This is where the deck info will go",Scale(10, 25, 200, 160), true, true, gBot.window);
 	//env->addStaticText(L"This is where the deck description will go",Scale(205, 25, 365, 190), true, true, gBot.window);
-	gBot.RefreshDecks(&bots);
+	gBot.Refresh();
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", dataManager.GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(305, 30, 485, 230));
@@ -1326,7 +1326,7 @@ void Game::RefreshLFLists() {
 	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 }
 void Game::RefreshAiDecks() {
-	bots.clear();
+	gBot.bots.clear();
     try {
         if (configs.size() && configs["windbots"].is_array()) {
             for (auto& obj : configs["windbots"].get<std::vector<nlohmann::json>>()) {
@@ -1350,7 +1350,7 @@ void Game::RefreshAiDecks() {
 #ifdef _WIN32
 				bot.executablePath = mainGame->filesystem->getAbsolutePath(TEXT("./WindBot"));
 #endif
-                bots.push_back(bot);
+                gBot.bots.push_back(bot);
             }
         }
     } catch(std::exception& e) {
@@ -2452,39 +2452,6 @@ void Game::PopulateResourcesDirectories() {
 	field_dirs.push_back(TEXT("./expansions/pics/field/"));
 	field_dirs.push_back(TEXT("archives"));
 	field_dirs.push_back(TEXT("./pics/field/"));
-}
-
-
-void Game::BotGui::RefreshDecks(std::vector<WindBot>* _bots) {
-	bots = _bots;
-	deckBox->clear();
-	for(auto& bot : *bots)
-		deckBox->addItem(bot.name.c_str());
-	UpdateDeckDescription();
-}
-
-void Game::BotGui::UpdateDeckDescription() {
-	int sel = deckBox->getSelected();
-	if(sel < 0 || sel >= (*bots).size())
-		return;
-	auto& bot = (*bots)[sel];
-	int level = bot.GetDifficulty();
-	std::wstring params;
-	if(level > 0)
-		params.append(fmt::format(L"AI Level: {}\n", level));
-	else if(level == 0)
-		params.append(L"Anti Meta AI\n");
-	std::wstring mr;
-	if(bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_MASTER_RULE_3))
-		mr.append(L"3");
-	if(bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_NEW_MASTER_RULE)) {
-		if(mr.size())
-			mr.append(L",");
-		mr.append(L"4");
-	}
-	if(mr.size())
-		params.append(fmt::format(L"Master Rule supported: {}\n", mr.c_str()));
-	deckProperties->setText(params.c_str());
 }
 
 }
