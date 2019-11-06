@@ -25,7 +25,7 @@ void WindBotPanel::UpdateDescription() {
 	std::wstring mr;
 	if (bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_MASTER_RULE_3))
 		mr.append(L"3");
-	if (bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_NEW_MASTER_RULE)) {
+	if (bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_MASTER_RULE_4)) {
 		if (mr.size())
 			mr.append(L",");
 		mr.append(L"4");
