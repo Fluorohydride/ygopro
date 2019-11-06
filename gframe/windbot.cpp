@@ -21,11 +21,6 @@ int WindBot::GetDifficulty() {
 	return -1;
 }
 
-
-inline char* ptr(const std::string& str) {
-	return const_cast<char*>(str.c_str());
-}
-
 bool WindBot::Launch(int port, bool chat, int hand) {
 #ifdef _WIN32
 	auto args = fmt::format(
@@ -48,21 +43,18 @@ bool WindBot::Launch(int port, bool chat, int hand) {
 	}
 	return false;
 #else
-	const std::vector<char*> args = {
-		const_cast<char*>("mono"),
-		const_cast<char*>("WindBot.exe"),
-		ptr(fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck))),
-		ptr(fmt::format("Port={}", port)),
-		ptr(fmt::format("Version={}", version)),
-		ptr(fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(name))),
-		ptr(fmt::format("Chat={}", chat)),
-		hand ? ptr(fmt::format("Hand={}", hand)) : nullptr,
-		nullptr
-	};
 	int pid = fork();
 	if (pid == 0) {
+		std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck).c_str());
+		std::string argPort = fmt::format("Port={}", port);
+		std::string argVersion = fmt::format("Version={}", version);
+		std::string argName = fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(name).c_str());
+		std::string argChat = fmt::format("Chat={}", chat);
+		std::string argHand = fmt::format("Hand={}", hand);
 		chdir("WindBot");
-		execvp(args.front(), args.data());
+		execlp("mono", "WindBot.exe", "WindBot.exe", 
+			argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
+			hand ? argHand.c_str() : nullptr, nullptr);
 		perror("Failed to start WindBot");
 		exit(EXIT_FAILURE);
 	}
