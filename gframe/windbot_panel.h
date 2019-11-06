@@ -9,8 +9,8 @@ struct WindBotPanel {
 
     irr::gui::IGUIWindow *window;
     irr::gui::IGUIComboBox *deckBox;
-    irr::gui::IGUIButton *btnConfirm;
-    irr::gui::IGUIButton *btnCancel;
+    irr::gui::IGUICheckBox *chkThrowRock;
+    irr::gui::IGUICheckBox *chkMute;
     irr::gui::IGUIStaticText *deckProperties;
 
     void Refresh();

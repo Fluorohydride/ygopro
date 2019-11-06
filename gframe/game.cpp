@@ -346,10 +346,10 @@ bool Game::Initialize() {
 	gBot.window = env->addWindow(Scale(750, 120, 960, 330), false, L"WindBot preferences");
 	gBot.window->getCloseButton()->setVisible(false);
 	gBot.window->setVisible(false);
+	gBot.deckProperties = env->addStaticText(L"This is where the deck info will go", Scale(10, 25, 200, 100), true, true, gBot.window);
+	gBot.chkThrowRock = env->addCheckBox(false, Scale(10, 105, 200, 130), gBot.window, -1, L"Always throw rock");
+	gBot.chkMute = env->addCheckBox(false, Scale(10, 135, 135, 160), gBot.window, -1, L"Mute");
 	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
-	//box->addItem(L"Decks");
-	gBot.deckProperties = env->addStaticText(L"This is where the deck info will go",Scale(10, 25, 200, 160), true, true, gBot.window);
-	//env->addStaticText(L"This is where the deck description will go",Scale(205, 25, 365, 190), true, true, gBot.window);
 	gBot.Refresh();
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", dataManager.GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
@@ -1327,33 +1327,36 @@ void Game::RefreshLFLists() {
 }
 void Game::RefreshAiDecks() {
 	gBot.bots.clear();
-    try {
-        if (configs.size() && configs["windbots"].is_array()) {
-            for (auto& obj : configs["windbots"].get<std::vector<nlohmann::json>>()) {
-                if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
-                    continue;
-                WindBot bot;
-                bot.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-                bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
-                for (auto& flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
-#define CHECK_AND_SET_FLAG(flag) if(strflag == #flag) bot.flags |= static_cast<int>(WindBot::Parameters::flag)
-                    auto strflag = flag.get<std::string>();
-                    CHECK_AND_SET_FLAG(AI_LV1);
-                    CHECK_AND_SET_FLAG(AI_LV2);
-                    CHECK_AND_SET_FLAG(AI_LV3);
-                    CHECK_AND_SET_FLAG(AI_ANTI_META);
-                    CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_3);
-                    CHECK_AND_SET_FLAG(SUPPORT_NEW_MASTER_RULE);
+	try {
+		if (configs.size() && configs["windbots"].is_array()) {
+			for (auto &obj : configs["windbots"].get<std::vector<nlohmann::json>>()) {
+				if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
+					continue;
+				WindBot bot;
+				bot.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+				bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
+				bot.flags = 0;
+				for (auto &flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
+#define CHECK_AND_SET_FLAG(flag) if (strflag == #flag) bot.flags |= static_cast<int>(WindBot::Parameters::flag)
+					auto strflag = flag.get<std::string>();
+					CHECK_AND_SET_FLAG(AI_LV1);
+					CHECK_AND_SET_FLAG(AI_LV2);
+					CHECK_AND_SET_FLAG(AI_LV3);
+					CHECK_AND_SET_FLAG(AI_ANTI_META);
+					CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_3);
+					CHECK_AND_SET_FLAG(SUPPORT_NEW_MASTER_RULE);
 #undef CHECK_AND_SET_FLAG
-                }
+				}
 				bot.version = PRO_VERSION;
 #ifdef _WIN32
 				bot.executablePath = mainGame->filesystem->getAbsolutePath(TEXT("./WindBot"));
 #endif
-                gBot.bots.push_back(bot);
-            }
-        }
-    } catch(std::exception& e) {
+				gBot.bots.push_back(bot);
+			}
+		}
+	}
+	catch (std::exception &e)
+	{
 		ErrorLog(std::string("Exception occurred: ") + e.what());
 	}
 }
