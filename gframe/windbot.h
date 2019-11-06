@@ -6,7 +6,7 @@
 namespace ygo {
 
 struct WindBot {
-    std::wstring name;
+	std::wstring name;
 	std::wstring deck;
 	enum Parameters {
 		AI_LV1 = 1,
@@ -19,11 +19,11 @@ struct WindBot {
 	int flags;
 
 	int GetDifficulty();
-    bool Launch(int port);
+	bool Launch(int port, bool chat = true, int hand = 0);
 
-    // Can be made static
-    unsigned short version;
-    std::wstring executablePath;
+	// Can be made static
+	unsigned short version;
+	std::wstring executablePath;
 };
 
 }
