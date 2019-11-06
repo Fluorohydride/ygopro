@@ -1,3 +1,6 @@
+#ifndef WINDBOT_PANEL_H
+#define WINDBOT_PANEL_H
+
 #include <vector>
 #include <irrlicht.h>
 #include "windbot.h"
@@ -19,3 +22,5 @@ struct WindBotPanel {
 };
 
 }
+
+#endif

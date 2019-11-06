@@ -39,11 +39,12 @@ bool WindBot::Launch(int port) {
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	if (!CreateProcess(NULL, (TCHAR*) args.c_str(), NULL, NULL, FALSE, 0, NULL, 
-        executablePath.c_str(), &si, &pi)) {
+	if (CreateProcess(NULL, (TCHAR*)args.c_str(), NULL, NULL, FALSE, 0, NULL, executablePath.c_str(), &si, &pi)) {
+		CloseHandle(pi.hProcess);
+		return true;
+	} else {
 		return false;
 	}
-	return true;
 #else
     const std::vector<char*> args = {
         const_cast<char*>("mono"),

@@ -1,3 +1,6 @@
+#ifndef WINDBOT_H
+#define WINDBOT_H
+
 #include <string>
 
 namespace ygo {
@@ -24,3 +27,5 @@ struct WindBot {
 };
 
 }
+
+#endif

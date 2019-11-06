@@ -1349,7 +1349,7 @@ void Game::RefreshAiDecks() {
 				}
 				bot.version = PRO_VERSION;
 #ifdef _WIN32
-				bot.executablePath = mainGame->filesystem->getAbsolutePath(TEXT("./WindBot"));
+				bot.executablePath = filesystem->getAbsolutePath(TEXT("./WindBot")).c_str();
 #endif
 				gBot.bots.push_back(bot);
 			}
