@@ -63,7 +63,7 @@ void ServerLobby::FillOnlineRooms() {
 					continue;
 				}
 			}
-			if(mainGame->btnFilterRelayMode->isPressed() && !(room.info.duel_flag & DUEL_RELAY_MODE))
+			if(mainGame->btnFilterRelayMode->isPressed() && !(room.info.duel_flag & DUEL_RELAY))
 				continue;
 		}
 		std::wstring banlist;
