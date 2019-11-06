@@ -14,7 +14,7 @@ struct WindBot {
 		AI_LV3 = 4,
 		AI_ANTI_META = 8,
 		SUPPORT_MASTER_RULE_3 = 16,
-		SUPPORT_NEW_MASTER_RULE = 32
+		SUPPORT_MASTER_RULE_4 = 32
 	};
 	int flags;
 
