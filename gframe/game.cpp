@@ -1306,19 +1306,20 @@ void Game::LoadPicUrls() {
 				if(obj["url"].get<std::string>() == "default") {
 					if(obj["type"].get<std::string>() == "pic") {
 #ifdef DEFAULT_PIC_URL
-						imageManager.AddDownloadResource({ DEFAULT_PIC_URL, "pic" });
+						imageManager.AddDownloadResource({ DEFAULT_PIC_URL, ImageManager::ART });
 #else
 						continue;
 #endif
 					} else {
 #ifdef DEFAULT_FIELD_URL
-						imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, "field" });
+						imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, ImageManager::FIELD });
 #else
 						continue;
 #endif
 					}
 				} else {
-					imageManager.AddDownloadResource({ obj["url"].get<std::string>(),obj["type"].get<std::string>() });
+					auto type = obj["type"].get<std::string>();
+					imageManager.AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ? ImageManager::FIELD : (type == "pic") ? ImageManager::ART : ImageManager::COVER });
 				}
 			}
 		}
@@ -1407,7 +1408,7 @@ void Game::ShowCardInfo(int code, bool resize) {
 		return;
 	showingcard = code;
 	int shouldrefresh = -1;
-	auto img = imageManager.GetTexture(code, false, true, &shouldrefresh);
+	auto img = imageManager.GetTextureCard(code, ImageManager::ART, false, true, &shouldrefresh);
 	cardimagetextureloading = false;
 	if(shouldrefresh == 2)
 		cardimagetextureloading = true;
