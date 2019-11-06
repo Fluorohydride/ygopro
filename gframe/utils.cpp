@@ -98,6 +98,7 @@ namespace ygo {
 		Makedirectory(TEXT("puzzles"));
 		Makedirectory(TEXT("pics"));
 		Makedirectory(TEXT("pics/field"));
+		Makedirectory(TEXT("pics/cover"));
 		Makedirectory(TEXT("pics/temp/"));
 		ClearDirectory(TEXT("pics/temp/"));
 		Makedirectory(TEXT("replay"));
