@@ -107,13 +107,13 @@ void Query::ParseCompat(char*& current, int len) {
 	PARSE_SINGLE(QUERY_BASE_DEFENSE, base_defense)
 	PARSE_SINGLE(QUERY_REASON, reason)
 	if(flag & QUERY_REASON_CARD)
-		reason_card = ReadLocInfo(current);
+		reason_card = ReadLocInfo(current, true);
 	if(flag &  QUERY_EQUIP_CARD)
-		equip_card = ReadLocInfo(current);
+		equip_card = ReadLocInfo(current, true);
 	if(flag & QUERY_TARGET_CARD) {
 		uint32_t count = BufferIO::Read<uint32_t>(current);
 		for(uint32_t i = 0; i < count; i++)
-			target_cards.push_back(ReadLocInfo(current));
+			target_cards.push_back(ReadLocInfo(current, true));
 	}
 	if(flag & QUERY_OVERLAY_CARD) {
 		uint32_t count = BufferIO::Read<uint32_t>(current);
