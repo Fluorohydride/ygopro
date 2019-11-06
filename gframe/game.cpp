@@ -2131,6 +2131,9 @@ void Game::PopulateResourcesDirectories() {
 	pic_dirs.push_back(TEXT("./expansions/pics/"));
 	pic_dirs.push_back(TEXT("archives"));
 	pic_dirs.push_back(TEXT("./pics/"));
+	cover_dirs.push_back(TEXT("./expansions/pics/cover/"));
+	cover_dirs.push_back(TEXT("archives"));
+	cover_dirs.push_back(TEXT("./pics/cover/"));
 	field_dirs.push_back(TEXT("./expansions/pics/field/"));
 	field_dirs.push_back(TEXT("archives"));
 	field_dirs.push_back(TEXT("./pics/field/"));
