@@ -68,6 +68,7 @@ public:
 	loc_info reason_card;
 	loc_info equip_card;
 	uint8_t is_hidden;
+	uint32_t cover;
 	std::vector<loc_info> target_cards;
 	std::vector<uint32_t> overlay_cards;
 	std::vector<uint32_t> counters;

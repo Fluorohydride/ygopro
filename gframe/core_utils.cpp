@@ -41,6 +41,7 @@ void Query::Parse(char*& current) {
 			PARSE_SINGLE(QUERY_LSCALE, lscale)
 			PARSE_SINGLE(QUERY_RSCALE, rscale)
 			PARSE_SINGLE(QUERY_IS_HIDDEN, is_hidden)
+			PARSE_SINGLE(QUERY_COVER, cover)
 			case QUERY_REASON_CARD: {
 				reason_card = ReadLocInfo(current);
 				break;
@@ -181,6 +182,7 @@ void Query::GenerateBuffer(std::vector<uint8_t>& buffer, bool is_public, bool ch
 		INSERT(QUERY_LSCALE, lscale)
 		INSERT(QUERY_RSCALE, rscale)
 		INSERT(QUERY_IS_HIDDEN, is_hidden)
+		INSERT(QUERY_COVER, cover)
 		if(_flag == QUERY_REASON_CARD || _flag == QUERY_EQUIP_CARD) {
 			auto& info = (_flag == QUERY_REASON_CARD) ? reason_card : equip_card;
 			insert_value<uint8>(buffer, info.controler);
@@ -257,7 +259,8 @@ uint32_t Query::GetSize(uint32_t flag) {
 	case QUERY_REASON:
 	case QUERY_STATUS:
 	case QUERY_LSCALE:
-	case QUERY_RSCALE: {
+	case QUERY_RSCALE:
+	case QUERY_COVER: {
 		return sizeof(uint32_t);
 		break;
 	}
