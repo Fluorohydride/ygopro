@@ -90,6 +90,7 @@ public:
 	u32 sequence;
 	u8 position;
 	u32 status;
+	u32 cover;
 	u8 cHint;
 	u32 chValue;
 	u32 opParam;
