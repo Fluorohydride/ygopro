@@ -57,6 +57,7 @@ public:
 	f32 dAlpha;
 	s32 aniFrame;
 	bool is_moving;
+	bool refresh_on_stop;
 	bool is_fading;
 	bool is_hovered;
 	bool is_selectable;

@@ -1007,6 +1007,7 @@ void ClientField::MoveCard(ClientCard * pcard, int frame) {
 	else
 		pcard->dRot.Z = -(PI * 2 - diff) / milliseconds;
 	pcard->is_moving = true;
+	pcard->refresh_on_stop = true;
 	pcard->aniFrame = milliseconds;
 }
 void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {

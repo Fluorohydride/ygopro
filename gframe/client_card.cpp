@@ -10,6 +10,7 @@ ClientCard::ClientCard() {
 	dAlpha = 0;
 	aniFrame = 0;
 	is_moving = false;
+	refresh_on_stop = false;
 	is_fading = false;
 	is_hovered = false;
 	is_selectable = false;

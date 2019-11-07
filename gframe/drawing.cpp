@@ -410,7 +410,9 @@ void Game::DrawCard(ClientCard* pcard) {
 			pcard->aniFrame = 0;
 			pcard->is_moving = false;
 			pcard->is_fading = false;
-			dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+			if(pcard->refresh_on_stop)
+				dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+			pcard->refresh_on_stop = false;
 		}
 	}
 	matManager.mCard.AmbientColor = 0xffffffff;
