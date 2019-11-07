@@ -3359,7 +3359,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else mainGame->chkRace[i]->setVisible(false);
 		}
 		mainGame->gMutex.lock();
-		mainGame->wANRace->setText(dataManager.GetSysString(select_hint ? select_hint : 563).c_str());
+		mainGame->wANRace->setText(dataManager.GetDesc(select_hint ? select_hint : 563).c_str());
 		mainGame->PopupElement(mainGame->wANRace);
 		mainGame->gMutex.unlock();
 		select_hint = 0;
@@ -3376,7 +3376,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else mainGame->chkAttribute[i]->setVisible(false);
 		}
 		mainGame->gMutex.lock();
-		mainGame->wANAttribute->setText(dataManager.GetSysString(select_hint ? select_hint : 562).c_str());
+		mainGame->wANAttribute->setText(dataManager.GetDesc(select_hint ? select_hint : 562).c_str());
 		mainGame->PopupElement(mainGame->wANAttribute);
 		mainGame->gMutex.unlock();
 		select_hint = 0;
@@ -3390,7 +3390,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.declare_opcodes.push_back(COMPAT_READ(int32_t, int64_t, pbuf));
 		mainGame->gMutex.lock();
 		mainGame->ebANCard->setText(L"");
-		mainGame->wANCard->setText(dataManager.GetSysString(select_hint ? select_hint : 564).c_str());
+		mainGame->wANCard->setText(dataManager.GetDesc(select_hint ? select_hint : 564).c_str());
 		mainGame->dField.UpdateDeclarableList();
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.unlock();
@@ -3407,7 +3407,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->cbANNumber->addItem(fmt::format(L" {}", value).c_str(), value);
 		}
 		mainGame->cbANNumber->setSelected(0);
-		mainGame->wANNumber->setText(dataManager.GetSysString(select_hint ? select_hint : 565).c_str());
+		mainGame->wANNumber->setText(dataManager.GetDesc(select_hint ? select_hint : 565).c_str());
 		mainGame->PopupElement(mainGame->wANNumber);
 		mainGame->gMutex.unlock();
 		select_hint = 0;
