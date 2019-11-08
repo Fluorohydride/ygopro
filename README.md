@@ -1,6 +1,6 @@
 YGOPro
 A script engine for "yu-gi-oh!" and sample gui
-
+.
 中文说明
 
 Keys:
