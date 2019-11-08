@@ -46,9 +46,7 @@ void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	scc.player = dp->type;
 	unsigned short* msg = (unsigned short*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
-	ITERATE_PLAYERS(
-			NetServer::SendBufferToPlayer(dueler.player, STOC_CHAT, &scc, 4 + msglen * 2);
-	)
+	ITERATE_PLAYERS(NetServer::SendBufferToPlayer(dueler.player, STOC_CHAT, &scc, 4 + msglen * 2);)
 }
 bool GenericDuel::CheckReady() {
 	bool ready1 = false, ready2 = false;
@@ -445,9 +443,7 @@ void GenericDuel::StartDuel(DuelPlayer* dp) {
 	players.opposing_iterator = players.opposing.begin();
 	//NetServer::StopListen();
 	//NetServer::StopBroadcast();
-	ITERATE_PLAYERS(
-			NetServer::SendPacketToPlayer(dueler.player, STOC_DUEL_START);
-	)
+	ITERATE_PLAYERS(NetServer::SendPacketToPlayer(dueler.player, STOC_DUEL_START);)
 	observers_mutex.lock();
 	for(auto& obs : observers) {
 		obs->state = CTOS_LEAVE_GAME;
@@ -560,9 +556,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	OCG_Player team = { host_info.start_lp, host_info.start_hand, host_info.draw_count };
 	pduel = mainGame->SetupDuel({ rnd(), opt, team, team });
 	if(!host_info.no_shuffle_deck) {
-		ITERATE_PLAYERS(
-				std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);
-		)
+		ITERATE_PLAYERS(std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);)
 	}
 	new_replay.Write<int32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & DUEL_SPEED) << 8);
 	last_replay.Write<int32_t>(host_info.start_lp, false);
@@ -1225,9 +1219,7 @@ void GenericDuel::WaitforResponse(int playerid) {
 		sctl.player = playerid;
 		sctl.left_time = time_limit[playerid];
 		NetServer::SendPacketToPlayer(nullptr, STOC_TIME_LIMIT, sctl);
-		ITERATE_PLAYERS(
-			NetServer::ReSendToPlayer(dueler.player);
-		)
+		ITERATE_PLAYERS(NetServer::ReSendToPlayer(dueler.player);)
 		cur_player[playerid]->state = CTOS_TIME_CONFIRM;
 	} else
 		cur_player[playerid]->state = CTOS_RESPONSE;
@@ -1352,16 +1344,8 @@ void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 		wbuf[1] = 1 - player;
 		wbuf[2] = 0x3;
 		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
-		for(auto& dueler : sd->players.home) {
-				if(dueler.player) {
-					NetServer::ReSendToPlayer(dueler.player);
-				}
-		}
-		for(auto& dueler : sd->players.opposing) {
-				if(dueler.player) {
-					NetServer::ReSendToPlayer(dueler.player);
-				}
-		}
+		auto& players = sd->players;
+		ITERATE_PLAYERS(NetServer::ReSendToPlayer(dueler.player);)
 		ReplayPacket p((char*)wbuf, 3);
 		sd->replay_stream.push_back(p);
 		sd->EndDuel();
