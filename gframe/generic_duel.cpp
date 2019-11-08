@@ -702,7 +702,7 @@ void GenericDuel::DuelEndProc() {
 		int winc[3] = { 0, 0, 0 };
 		for(int i = 0; i < match_result.size(); ++i)
 			winc[match_result[i]]++;
-		int minvictories = std::ceil(best_of / 2);
+		int minvictories = std::ceil(best_of / 2.0);
 		if(match_kill || (winc[0] == minvictories || (winc[1] == minvictories || winc[2] == minvictories))) {
 			NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
