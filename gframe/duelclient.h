@@ -12,32 +12,33 @@
 #include "network.h"
 #include "data_manager.h"
 #include "deck_manager.h"
-#include "../ocgcore/mtrandom.h"
+#include <random>
+#include "replay.h"
 
 namespace ygo {
 
 class DuelClient {
 private:
 	static unsigned int connect_state;
-	static unsigned char response_buf[64];
-	static unsigned char response_len;
+	static std::vector<unsigned char> response_buf;
 	static unsigned int watching;
 	static unsigned char selftype;
 	static bool is_host;
 	static event_base* client_base;
 	static bufferevent* client_bev;
-	static char duel_client_read[0x2000];
-	static char duel_client_write[0x2000];
+	static std::vector<uint8_t> duel_client_read;
+	static std::vector<uint8_t> duel_client_write;
 	static bool is_closing;
+	static u64 select_hint;
+	static std::wstring event_string;
 	static bool is_swapping;
-	static int select_hint;
-	static int select_unselect_hint;
-	static int last_select_hint;
-	static char last_successful_msg[0x2000];
-	static unsigned int last_successful_msg_length;
-	static wchar_t event_string[256];
-	static mtrandom rnd;
 public:
+	static std::mt19937 rnd;
+	static unsigned int temp_ip;
+	static unsigned short temp_port;
+	static unsigned short temp_ver;
+	static bool try_needed;
+
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
 	static void StopClient(bool is_exiting = false);
@@ -45,32 +46,40 @@ public:
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
+	static bool CheckReady();
+	static void SetPlayersCount();
+	static std::pair<int, int> GetPlayersCount();
+	static ReplayStream replay_stream;
+	static Replay last_replay;
+	static bool old_replay;
 	static int ClientAnalyze(char* msg, unsigned int len);
 	static void SwapField();
 	static void SetResponseI(int respI);
-	static void SetResponseB(void* respB, unsigned char len);
+	static void SetResponseB(void* respB, unsigned int len);
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
-		char* p = duel_client_write;
-		BufferIO::WriteInt16(p, 1);
-		BufferIO::WriteInt8(p, proto);
-		bufferevent_write(client_bev, duel_client_write, 3);
+		duel_client_write.clear();
+		BufferIO::insert_value<int16_t>(duel_client_write, 1);
+		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, ST& st) {
-		char* p = duel_client_write;
-		BufferIO::WriteInt16(p, 1 + sizeof(ST));
-		BufferIO::WriteInt8(p, proto);
-		memcpy(p, &st, sizeof(ST));
-		bufferevent_write(client_bev, duel_client_write, sizeof(ST) + 3);
+		duel_client_write.clear();
+		BufferIO::insert_value<int16_t>(duel_client_write, 1 + sizeof(ST));
+		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		BufferIO::insert_value<ST>(duel_client_write, st);
+		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
-		char* p = duel_client_write;
-		BufferIO::WriteInt16(p, 1 + len);
-		BufferIO::WriteInt8(p, proto);
-		memcpy(p, buffer, len);
-		bufferevent_write(client_bev, duel_client_write, len + 3);
+		duel_client_write.clear();
+		BufferIO::insert_value<int16_t>(duel_client_write, 1 + len);
+		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		BufferIO::insert_data(duel_client_write, buffer, len);
+		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
+
+	static void ReplayPrompt(bool need_header = false);
 	
 protected:
 	static bool is_refreshing;

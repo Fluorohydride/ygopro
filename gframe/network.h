@@ -1,8 +1,10 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+#include "dllinterface.h"
 #include "config.h"
 #include "deck_manager.h"
+#include "core_utils.h"
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -22,6 +24,13 @@ struct HostInfo {
 	unsigned char start_hand;
 	unsigned char draw_count;
 	unsigned short time_limit;
+	uint64 handshake;
+	int team1;
+	int team2;
+	int best_of;
+	unsigned int duel_flag;
+	int forbiddentypes;
+	unsigned short extra_rules;
 };
 struct HostPacket {
 	unsigned short identifier;
@@ -128,7 +137,7 @@ public:
 	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
 	virtual void Process() {}
-	virtual int Analyze(char* msgbuffer, unsigned int len) {
+	virtual int Analyze(CoreUtils::Packet packet) {
 		return 0;
 	}
 	virtual void Surrender(DuelPlayer* dp) {}
@@ -141,7 +150,7 @@ public:
 	DuelPlayer* host_player;
 	HostInfo host_info;
 	int duel_stage;
-	unsigned long pduel;
+	OCG_Duel pduel;
 	wchar_t name[20];
 	wchar_t pass[20];
 };
@@ -150,6 +159,8 @@ public:
 
 #define NETWORK_SERVER_ID	0x7428
 #define NETWORK_CLIENT_ID	0xdef6
+
+#define SERVER_HANDSHAKE 4903489263569811227
 
 #define NETPLAYER_TYPE_PLAYER1		0
 #define NETPLAYER_TYPE_PLAYER2		1
@@ -198,6 +209,10 @@ public:
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_WATCH_CHANGE	0x22
 
+#define STOC_CATCHUP		0xf0
+
+#define STOC_NEW_REPLAY			0x30
+
 #define PLAYERCHANGE_OBSERVE	0x8
 #define PLAYERCHANGE_READY		0x9
 #define PLAYERCHANGE_NOTREADY	0xa
@@ -216,10 +231,27 @@ public:
 #define DECKERROR_MAINCOUNT		0x6
 #define DECKERROR_EXTRACOUNT	0x7
 #define DECKERROR_SIDECOUNT		0x8
+#define DECKERROR_FORBTYPE		0x9
 
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1
 #define MODE_TAG		0x2
+#define MODE_RELAY		0x3
+#define MODE_ARBITRARY	0x4
+
+#define SEALED_DUEL			0x1
+#define BOOSTER_DUEL		0x2
+#define DESTINY_DRAW		0x4
+#define SPEED_DUEL			0x8
+#define CONCENTRATION_DUEL	0x10
+#define BOSS_DUEL			0x20
+#define BATTLE_CITY			0x40
+#define DUELIST_KINGDOM		0x80
+#define DIMENSTION_DUEL		0x100
+#define TURBO_DUEL			0x200
+#define DOUBLE_DECK			0x400
+#define COMMAND_DUEL		0x800
+#define DECK_MASTER			0x1000
 
 #define DUEL_STAGE_BEGIN		0
 #define DUEL_STAGE_FINGER		1

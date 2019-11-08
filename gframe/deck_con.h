@@ -2,6 +2,7 @@
 #define DECK_CON_H
 
 #include "config.h"
+#include "deck_manager.h"
 #include <unordered_map>
 #include <vector>
 #include "client_card.h"
@@ -10,42 +11,58 @@ namespace ygo {
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
+	enum limitation_search_filters {
+		LIMITATION_FILTER_NONE,
+		LIMITATION_FILTER_BANNED,
+		LIMITATION_FILTER_LIMITED,
+		LIMITATION_FILTER_SEMI_LIMITED,
+		LIMITATION_FILTER_UNLIMITED,
+		LIMITATION_FILTER_OCG,
+		LIMITATION_FILTER_TCG,
+		LIMITATION_FILTER_TCG_OCG,
+		LIMITATION_FILTER_ANIME,
+		LIMITATION_FILTER_ILLEGAL,
+		LIMITATION_FILTER_VIDEOGAME,
+		LIMITATION_FILTER_CUSTOM
+	};
 	virtual bool OnEvent(const irr::SEvent& event);
 	void Initialize();
 	void Terminate();
 	void GetHoveredCard();
-	void FilterCards();
-	void StartFilter();
+	bool FiltersChanged();
+	void FilterCards(bool force_refresh = false);
+	bool CheckCard(CardDataC* data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& setcode);
+	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
-	void InstantSearch();
 	void ClearSearch();
 	void SortList();
 
-	bool CardNameContains(const wchar_t *haystack, const wchar_t *needle);
-
-	bool push_main(code_pointer pointer, int seq = -1);
-	bool push_extra(code_pointer pointer, int seq = -1);
-	bool push_side(code_pointer pointer, int seq = -1);
+	bool push_main(CardDataC* pointer, int seq = -1);
+	bool push_extra(CardDataC* pointer, int seq = -1);
+	bool push_side(CardDataC* pointer, int seq = -1);
 	void pop_main(int seq);
 	void pop_extra(int seq);
 	void pop_side(int seq);
-	bool check_limit(code_pointer pointer);
+	bool check_limit(CardDataC* pointer);
+#define DECLARE_WITH_CACHE(type, name) type name;\
+										type prev_##name;
+	DECLARE_WITH_CACHE(long long, filter_effect)
+	DECLARE_WITH_CACHE(unsigned int, filter_type)
+	DECLARE_WITH_CACHE(unsigned int, filter_type2)
+	DECLARE_WITH_CACHE(unsigned int, filter_attrib)
+	DECLARE_WITH_CACHE(unsigned int, filter_race)
+	DECLARE_WITH_CACHE(unsigned int, filter_atktype)
+	DECLARE_WITH_CACHE(int, filter_atk)
+	DECLARE_WITH_CACHE(unsigned int, filter_deftype)
+	DECLARE_WITH_CACHE(int, filter_def)
+	DECLARE_WITH_CACHE(unsigned int, filter_lvtype)
+	DECLARE_WITH_CACHE(unsigned int, filter_lv)
+	DECLARE_WITH_CACHE(unsigned int, filter_scltype)
+	DECLARE_WITH_CACHE(unsigned int, filter_scl)
+	DECLARE_WITH_CACHE(unsigned int, filter_marks)
+	DECLARE_WITH_CACHE(limitation_search_filters, filter_lm)
+#undef DECLARE_WITH_CACHE
 
-	long long filter_effect;
-	unsigned int filter_type;
-	unsigned int filter_type2;
-	unsigned int filter_attrib;
-	unsigned int filter_race;
-	unsigned int filter_atktype;
-	int filter_atk;
-	unsigned int filter_deftype;
-	int filter_def;
-	unsigned int filter_lvtype;
-	unsigned int filter_lv;
-	unsigned int filter_scltype;
-	unsigned int filter_scl;
-	unsigned int filter_marks;
-	int filter_lm;
 	position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;
@@ -53,21 +70,17 @@ public:
 	int is_lastcard;
 	int click_pos;
 	bool is_draging;
-	bool is_starting_dragging;
+	int scroll_pos;
 	int dragx;
 	int dragy;
-	size_t pre_mainc;
-	size_t pre_extrac;
-	size_t pre_sidec;
-	code_pointer draging_pointer;
+	CardDataC* draging_pointer;
 	int prev_deck;
 	s32 prev_operation;
-	int prev_sel;
-	bool is_modified;
 
-	const std::unordered_map<int, int>* filterList;
-	std::vector<code_pointer> results;
-	wchar_t result_string[8];
+	LFList* filterList;
+	std::map<std::wstring, std::vector<CardDataC*>> searched_terms;
+	std::vector<CardDataC*> results;
+	std::wstring result_string;
 };
 
 }

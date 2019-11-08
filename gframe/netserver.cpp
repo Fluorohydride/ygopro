@@ -1,6 +1,5 @@
 #include "netserver.h"
-#include "single_duel.h"
-#include "tag_duel.h"
+#include "generic_duel.h"
 
 namespace ygo {
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
@@ -9,8 +8,8 @@ event_base* NetServer::net_evbase = 0;
 event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
-char NetServer::net_server_read[0x2000];
-char NetServer::net_server_write[0x2000];
+char NetServer::net_server_read[0x20000];
+char NetServer::net_server_write[0x20000];
 unsigned short NetServer::last_sent = 0;
 
 bool NetServer::StartServer(unsigned short port) {
@@ -46,7 +45,7 @@ bool NetServer::StartBroadcast() {
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(7920);
-	addr.sin_addr.s_addr = 0;
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	if(bind(udp, (sockaddr*)&addr, sizeof(addr)) == SOCKET_ERROR) {
 		closesocket(udp);
 		return false;
@@ -172,14 +171,14 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	char* pdata = data;
-	unsigned char pktType = BufferIO::ReadUInt8(pdata);
+	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
 	switch(pktType) {
 	case CTOS_RESPONSE: {
 		if(!dp->game || !duel_mode->pduel)
 			return;
-		duel_mode->GetResponse(dp, pdata, len > 64 ? 64 : len - 1);
+		duel_mode->GetResponse(dp, pdata, len - 1);
 		break;
 	}
 	case CTOS_TIME_CONFIRM: {
@@ -223,20 +222,10 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		if(dp->game || duel_mode)
 			return;
 		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
-		if(pkt->info.mode == MODE_SINGLE) {
-			duel_mode = new SingleDuel(false);
-			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
-		} else if(pkt->info.mode == MODE_MATCH) {
-			duel_mode = new SingleDuel(true);
-			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
-		} else if(pkt->info.mode == MODE_TAG) {
-			duel_mode = new TagDuel();
-			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, TagDuel::TagTimer, duel_mode);
-		}
-		if(pkt->info.rule > 3)
-			pkt->info.rule = 0;
-		if(pkt->info.mode > 2)
-			pkt->info.mode = 0;
+		if(pkt->info.handshake != SERVER_HANDSHAKE)
+			return;
+		duel_mode = new GenericDuel(pkt->info.team1, pkt->info.team2, !!(pkt->info.duel_flag & DUEL_RELAY), pkt->info.best_of);
+		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, GenericDuel::GenericTimer, duel_mode);
 		unsigned int hash = 1;
 		for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit) {
 			if(pkt->info.lflist == lfit->hash) {

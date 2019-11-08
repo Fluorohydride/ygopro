@@ -14,7 +14,7 @@ struct ChainInfo {
 	irr::core::vector3df chain_pos;
 	ClientCard* chain_card;
 	int code;
-	int desc;
+	u64 desc;
 	int controler;
 	int location;
 	int sequence;
@@ -31,6 +31,7 @@ public:
 	std::vector<ClientCard*> grave[2];
 	std::vector<ClientCard*> remove[2];
 	std::vector<ClientCard*> extra[2];
+	std::vector<ClientCard*> limbo_temp;
 	std::set<ClientCard*> overlay_cards;
 	std::vector<ClientCard*> summonable_cards;
 	std::vector<ClientCard*> spsummonable_cards;
@@ -40,8 +41,8 @@ public:
 	std::vector<ClientCard*> activatable_cards;
 	std::vector<ClientCard*> attackable_cards;
 	std::vector<ClientCard*> conti_cards;
-	std::vector<std::pair<int,int>> activatable_descs;
-	std::vector<int> select_options;
+	std::vector<std::pair<u64,int>> activatable_descs;
+	std::vector<u64> select_options;
 	std::vector<ChainInfo> chains;
 	int extra_p_count[2];
 
@@ -57,16 +58,16 @@ public:
 	int select_sumval;
 	int select_mode;
 	bool select_cancelable;
-	bool select_panalmode;
 	bool select_ready;
 	int announce_count;
 	int select_counter_count;
 	int select_counter_type;
 	std::vector<ClientCard*> selectable_cards;
 	std::vector<ClientCard*> selected_cards;
+	std::vector<ClientCard*> must_select_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> declare_opcodes;
+	std::vector<int64> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
@@ -85,11 +86,12 @@ public:
 	ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
+	std::vector<ClientCard*>* GetList(int location, int controler);
 	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
-	void UpdateCard(int controler, int location, int sequence, char* data);
-	void UpdateFieldCard(int controler, int location, char* data);
+	void UpdateCard(int controler, int location, int sequence, char* data, int len = 0);
+	void UpdateFieldCard(int controler, int location, char* data, int len = 0);
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
@@ -104,7 +106,7 @@ public:
 	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
 	void MoveCard(ClientCard* pcard, int frame);
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
-	bool ShowSelectSum(bool panelmode);
+	bool ShowSelectSum();
 	bool CheckSelectSum();
 	bool check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max);
 	bool check_sel_sum_s(const std::set<ClientCard*>& left, int index, int acc);

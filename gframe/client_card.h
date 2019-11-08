@@ -2,6 +2,7 @@
 #define CLIENT_CARD_H
 
 #include "config.h"
+#include "core_utils.h"
 #include <vector>
 #include <set>
 #include <map>
@@ -28,7 +29,7 @@ struct CardDataC {
 	unsigned int alias;
 	unsigned long long setcode;
 	unsigned int type;
-	unsigned int level;
+	int level;
 	unsigned int attribute;
 	unsigned int race;
 	int attack;
@@ -44,7 +45,6 @@ struct CardString {
 	std::wstring text;
 	std::wstring desc[16];
 };
-typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
 
 class ClientCard {
 public:
@@ -53,10 +53,11 @@ public:
 	irr::core::vector3df curRot;
 	irr::core::vector3df dPos;
 	irr::core::vector3df dRot;
-	u32 curAlpha;
-	u32 dAlpha;
-	u32 aniFrame;
+	f32 curAlpha;
+	f32 dAlpha;
+	s32 aniFrame;
 	bool is_moving;
+	bool refresh_on_stop;
 	bool is_fading;
 	bool is_hovered;
 	bool is_selectable;
@@ -87,9 +88,10 @@ public:
 	u8 owner;
 	u8 controler;
 	u8 location;
-	u8 sequence;
+	u32 sequence;
 	u8 position;
 	u32 status;
+	u32 cover;
 	u8 cHint;
 	u32 chValue;
 	u32 opParam;
@@ -103,22 +105,23 @@ public:
 	std::set<ClientCard*> ownerTarget;
 	std::map<int, int> counters;
 	std::map<int, int> desc_hints;
-	wchar_t atkstring[16];
-	wchar_t defstring[16];
-	wchar_t lvstring[16];
-	wchar_t linkstring[16];
-	wchar_t lscstring[16];
-	wchar_t rscstring[16];
+	std::wstring atkstring;
+	std::wstring defstring;
+	std::wstring lvstring;
+	std::wstring rkstring;
+	std::wstring linkstring;
+	std::wstring lscstring;
+	std::wstring rscstring;
 
 	ClientCard();
 	void SetCode(int code);
-	void UpdateInfo(char* buf);
+	void UpdateInfo(const CoreUtils::Query& query);
 	void ClearTarget();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
-	static bool deck_sort_lv(code_pointer l1, code_pointer l2);
-	static bool deck_sort_atk(code_pointer l1, code_pointer l2);
-	static bool deck_sort_def(code_pointer l1, code_pointer l2);
-	static bool deck_sort_name(code_pointer l1, code_pointer l2);
+	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_def(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_name(CardDataC* l1, CardDataC* l2);
 };
 
 }

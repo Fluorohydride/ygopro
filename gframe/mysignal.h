@@ -1,51 +1,46 @@
 #ifndef SIGNAL_H
 #define SIGNAL_H
 
-#include <mutex>
 #include <condition_variable>
+#include <atomic>
 
 class Signal {
 public:
-	Signal() {
-		_state = false;
-		_nowait = false;
-	}
-	~Signal() {
-
-	}
+	Signal():_nowait(false), _signaled(false){}
+	~Signal() {}
 	void Set() {
-		std::unique_lock<std::mutex> lock(_mutex);
-		_state = true;
-		_cond.notify_all();
+		val.notify_one();
+		_signaled = true;
 	}
 	void Reset() {
-		std::unique_lock<std::mutex> lock(_mutex);
-		_state = false;
+		_signaled = false;
 	}
 	void Wait() {
 		if(_nowait)
 			return;
-		std::unique_lock<std::mutex> lock(_mutex);
-		_cond.wait(lock, [this]() { return _state; });
-		_state = false;
+		std::unique_lock<std::mutex> lk(mut);
+		val.wait(lk);
+		_signaled = false;
 	}
-
-	bool Wait(long milliseconds) {
+	bool Wait(int milli) {
 		if(_nowait)
 			return false;
-		std::unique_lock<std::mutex> lock(_mutex);
-		bool res = _cond.wait_for(lock, std::chrono::milliseconds(milliseconds), [this]() { return _state; });
-		_state = false;
+		std::unique_lock<std::mutex> lk(mut);
+		auto res = val.wait_for(lk, std::chrono::milliseconds(milli),[this]{ return _signaled.load(); });
+		_signaled = false;
 		return res;
 	}
 	void SetNoWait(bool nowait) {
 		_nowait = nowait;
+		if (nowait){
+			Set();
+		}
 	}
 private:
-	std::mutex _mutex;
-	std::condition_variable _cond;
-	bool _state;
+	std::mutex mut;
+	std::condition_variable val;
 	bool _nowait;
+	std::atomic<bool> _signaled;
 };
 
 #endif // SIGNAL_H

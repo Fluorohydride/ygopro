@@ -1,10 +1,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#pragma once
-
-#define _IRR_STATIC_LIB_
-#define IRR_COMPILE_WITH_DX9_DEV_PACK
 #ifdef _WIN32
 
 #include <WinSock2.h>
@@ -41,7 +37,7 @@
 #define SOCKADDR sockaddr
 #define SOCKET_ERRNO() (errno)
 
-#include <wchar.h>
+#include <cwchar>
 #define mywcsncasecmp wcsncasecmp
 #define mystrncasecmp strncasecmp
 inline int _wtoi(const wchar_t * s) {
@@ -50,28 +46,50 @@ inline int _wtoi(const wchar_t * s) {
 }
 #endif
 
+#ifndef TEXT
+#ifdef UNICODE
+#define TEXT(x) L##x
+#else
+#define TEXT(x) x
+#endif // UNICODE
+#endif
+
 template<size_t N, typename... TR>
 inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 	return swprintf(buf, N, fmt, args...);
 }
 
 #include <irrlicht.h>
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "CGUITTFont.h"
-#include "CGUIImageButton.h"
+#endif
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <memory.h>
-#include <time.h>
-#include <thread>
-#include <mutex>
+#include <ctime>
+#include <set>
+#include <map>
+#include <unordered_set>
+#include <unordered_map>
+#include <algorithm>
 #include "bufferio.h"
-#include "myfilesystem.h"
+#include <mutex>
 #include "mysignal.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/common.h"
+#include <thread>
+#include <common.h>
+#include <fmt/format.h>
+#include <fmt/printf.h>
+#include "utils.h"
+#ifndef YGOPRO_BUILD_DLL
+#include <ocgapi.h>
+#else
+#include "dllinterface.h"
+#endif
 
 using namespace irr;
 using namespace core;
@@ -80,11 +98,10 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
-extern const unsigned short PRO_VERSION;
+extern unsigned short PRO_VERSION;
 extern int enable_log;
 extern bool exit_on_return;
 extern bool open_file;
-extern wchar_t open_file_name[256];
-extern bool bot_mode;
+extern path_string open_file_name;
 
 #endif

@@ -1,0 +1,80 @@
+language: cpp
+sudo: required
+dist: bionic
+git:
+  depth: 1
+env:
+  global:
+  - BUILD_CONFIG=release
+  - DEPLOY_BRANCH=travis-$TRAVIS_OS_NAME
+  - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
+addons:
+  apt:
+    update: true
+    packages:
+    - p7zip-full 
+    - libfreetype6-dev
+    - libirrlicht-dev 
+    - libgl1-mesa-dev 
+    - libglu-dev 
+  homebrew:
+    update: true
+    packages:
+    - dylibbundler
+    - gpatch
+    - p7zip
+    - libevent
+    - freetype
+    - sqlite
+    - curl
+    - libgit2
+    - fmt
+    - nlohmann-json
+    - openal-soft
+    - mpg123
+    - libsndfile
+matrix:
+  include:
+  - name: "Windows 10"
+    os: windows
+    env:
+    - VCPKG_ROOT=/c/vcpkg
+    - VCPKG_DEFAULT_TRIPLET=x86-windows-static
+    - VCPKG_LIBS="libevent lua[cpp] sqlite3 fmt curl libgit2 nlohmann-json bzip2 libjpeg-turbo libpng zlib openal-soft mpg123 libsndfile"
+    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/vcpkg-windows.zip
+    - DXSDK_DIR=/c/d3d9sdk/
+    - DEPLOY_DIR=deploy
+  - name: "Bionic GCC7"
+    os: linux
+    compiler: gcc  
+    env:
+    - VCPKG_ROOT=./vcpkg
+    - VCPKG_LIBS="libevent sqlite3 fmt nlohmann-json curl libgit2 openal-soft mpg123 libsndfile"
+    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/installed-linux.7z
+  - name: "Mojave"
+    os: osx
+    osx_image: xcode10.3
+    env: 
+    - MACOSX_DEPLOYMENT_TARGET=10.11
+    - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk"
+    - CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/raw/master/dependencies-osx.7z
+before_install: ./travis/install-premake5.sh
+install: ./travis/dependencies.sh
+script: ./travis/build.sh
+before_deploy: ./travis/predeploy.sh
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: bash ./ocgcore/travis/deploy-windows.sh
+  on:
+    condition: "$TRAVIS_OS_NAME == windows"
+    repo: edo9300/ygopro
+- provider: pages
+  skip_cleanup: true
+  local_dir: deploy
+  github_token: $DEPLOY_TOKEN
+  repo: $DEPLOY_REPO
+  target_branch: $DEPLOY_BRANCH
+  on:
+    condition: "$TRAVIS_OS_NAME != windows"
+    repo: edo9300/ygopro
