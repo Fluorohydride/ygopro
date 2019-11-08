@@ -688,7 +688,7 @@ void GenericDuel::Process() {
 		DuelEndProc();
 }
 void GenericDuel::DuelEndProc() {
-	if(!best_of || match_result.size() == best_of) {
+	if(match_result.size() >= best_of) {
 		NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
 		duel_stage = DUEL_STAGE_END;
@@ -697,7 +697,7 @@ void GenericDuel::DuelEndProc() {
 		for(int i = 0; i < match_result.size(); ++i)
 			winc[match_result[i]]++;
 		int minvictories = std::ceil(best_of / 2.0);
-		if(match_kill || (winc[0] == minvictories || (winc[1] == minvictories || winc[2] == minvictories))) {
+		if(match_kill || (winc[0] >= minvictories || winc[1] >= minvictories)) {
 			NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
 			duel_stage = DUEL_STAGE_END;
@@ -1008,7 +1008,7 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		break;
 	}
 	case MSG_MATCH_KILL: {
-		if(best_of) {
+		if(best_of > 1) {
 			SEND(nullptr);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
 		}
@@ -1134,7 +1134,7 @@ void GenericDuel::AfterParsing(CoreUtils::Packet& packet, int& return_value, boo
 		break;
 	}
 	case MSG_MATCH_KILL: {
-		if(best_of) {
+		if(best_of > 1) {
 			match_kill = BufferIO::Read<int32_t>(pbuf);
 		}
 		break;
