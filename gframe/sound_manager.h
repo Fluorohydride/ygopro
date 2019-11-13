@@ -73,6 +73,8 @@ private:
 #ifdef YGOPRO_USE_IRRKLANG
     irrklang::ISoundEngine* soundEngine;
     irrklang::ISound* soundBGM;
+	double sfxVolume = 1.0;
+	double bgmVolume = 1.0;
 #else
     std::unique_ptr<YGOpen::OpenALSingleton> openal;
     std::unique_ptr<YGOpen::OpenALSoundLayer> sfx;

@@ -21,7 +21,8 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 #ifdef IRRKLANG_STATIC
 		irrklang::ikpMP3Init(soundEngine);
 #endif
-        soundEngine->setSoundVolume(sounds_volume);
+        sfxVolume = sounds_volume;
+		bgmVolume = music_volume;
         return true;
 	}
 #else
@@ -109,7 +110,11 @@ void SoundManager::PlaySoundEffect(SFX sound) {
     };
     if (!soundsEnabled) return;
 #ifdef YGOPRO_USE_IRRKLANG
-    if (soundEngine) soundEngine->play2D(fx.at(sound));
+    if (soundEngine) {
+		auto sfx = soundEngine->play2D(fx.at(sound), false, true);
+		sfx->setVolume(sfxVolume);
+		sfx->setIsPaused(false);
+	}
 #else
     if (sfx) sfx->play(fx.at(sound), false);
 #endif
@@ -119,7 +124,10 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 #ifdef YGOPRO_USE_IRRKLANG
 	if(!soundBGM || soundBGM->getSoundSource()->getName() != song) {
         StopBGM();
-		if (soundEngine) soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
+		if (soundEngine) {
+			soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
+			soundBGM->setVolume(bgmVolume);
+		}
 	}
 #else
     StopBGM();
@@ -154,8 +162,11 @@ void SoundManager::StopBGM() {
 bool SoundManager::PlayChant(unsigned int code) {
 	if(ChantsList.count(code)) {
 #ifdef YGOPRO_USE_IRRKLANG
-		if (soundEngine && !soundEngine->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str()))
-			soundEngine->play2D(("./sound/chants/" + ChantsList[code]).c_str());
+		if (soundEngine && !soundEngine->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str())) {
+			auto chant = soundEngine->play2D(("./sound/chants/" + ChantsList[code]).c_str());
+			chant->setVolume(sfxVolume);
+			chant->setIsPaused(false);
+		}
 #else
         if (bgm) bgm->play("./sound/chants/" + ChantsList[code], false);
 #endif
@@ -165,14 +176,15 @@ bool SoundManager::PlayChant(unsigned int code) {
 }
 void SoundManager::SetSoundVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
-	if (soundEngine) soundEngine->setSoundVolume(volume);
+	sfxVolume = volume;
 #else
     if (sfx) sfx->setVolume(volume);
 #endif
 }
 void SoundManager::SetMusicVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
-	if (soundEngine) soundEngine->setSoundVolume(volume);
+	if (soundBGM) soundBGM->setVolume(volume);
+	bgmVolume = volume;
 #else
     if (bgm) bgm->setVolume(volume);
 #endif
