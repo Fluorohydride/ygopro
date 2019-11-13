@@ -400,13 +400,13 @@ bool Game::Initialize() {
 	chkEnableMusic->setChecked(gameConf.enablemusic);
 	chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2046).c_str());
 	chkEnableSound->setChecked(gameConf.enablesound);
-	stVolume = env->addStaticText(L"Volume", Scale(20, 320, 80, 345), false, true, tabPanel, -1, false);
-	scrVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_VOLUME);
-	scrVolume->setMax(100);
-	scrVolume->setMin(0);
-	scrVolume->setPos(gameConf.volume * 100);
-	scrVolume->setLargeStep(1);
-	scrVolume->setSmallStep(1);
+	stMusicVolume = env->addStaticText(L"Music", Scale(20, 320, 80, 345), false, true, tabPanel, -1, false);
+	scrMusicVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_VOLUME);
+	scrMusicVolume->setMax(100);
+	scrMusicVolume->setMin(0);
+	scrMusicVolume->setPos(gameConf.musicVolume * 100);
+	scrMusicVolume->setLargeStep(1);
+	scrMusicVolume->setSmallStep(1);
 	chkQuickAnimation = env->addCheckBox(false, Scale(20, 345, 280, 370), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	//log
@@ -789,15 +789,15 @@ bool Game::Initialize() {
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
 	soundManager = std::make_unique<SoundManager>();
-	if(!soundManager->Init(gameConf.volume, gameConf.volume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
+	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
 		chkEnableSound->setVisible(false);
 		chkEnableMusic->setChecked(false);
 		chkEnableMusic->setEnabled(false);
 		chkEnableMusic->setVisible(false);
-		scrVolume->setVisible(false);
-		stVolume->setVisible(false);
+		scrMusicVolume->setVisible(false);
+		stMusicVolume->setVisible(false);
 		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
 	env->getSkin()->setFont(guiFont);
@@ -1131,9 +1131,10 @@ void Game::LoadConfig() {
 	gameConf.chkHideSetname = 0;
 	gameConf.chkHideHintButton = 0;
 	gameConf.skin_index = -1;
-	gameConf.enablesound = true;
-	gameConf.volume = 1.0;
 	gameConf.enablemusic = true;
+	gameConf.enablesound = true;
+	gameConf.musicVolume = 1.0;
+	gameConf.soundVolume = 1.0;
 	gameConf.draw_field_spell = 1;
 	gameConf.quick_animation = 0;
 	gameConf.chkAnime = 0;
@@ -1228,14 +1229,16 @@ void Game::LoadConfig() {
 			gameConf.chkAnime = std::stoi(str);
 		else if(type == "dpi_scale")
 			gameConf.dpi_scale = std::stof(str);
-		else if(type == "enable_sound")
-			gameConf.enablesound = !!std::stoi(str);
 		else if(type == "skin_index")
 			gameConf.skin_index = std::stoi(str);
-		else if(type == "volume")
-			gameConf.volume = std::stof(str)/100.0f;
 		else if(type == "enable_music")
 			gameConf.enablemusic = !!std::stoi(str);
+		else if(type == "enable_sound")
+			gameConf.enablesound = !!std::stoi(str);
+		else if(type == "music_volume")
+			gameConf.musicVolume = std::stof(str)/100.0f;
+		else if(type == "sound_volume")
+			gameConf.soundVolume = std::stof(str)/100.0f;
 	}
 	conf_file.close();
 	if(configs.empty()) {
@@ -1291,12 +1294,14 @@ void Game::SaveConfig() {
 	conf_file << "dpi_scale = "			<< std::to_string(gameConf.dpi_scale) << "\n";
 	conf_file << "#if skins from the skin folder are in use\n";
 	conf_file << "skin_index = "		<< std::to_string(gameConf.skin_index) << "\n";
-	conf_file << "enable_sound = "		<< std::to_string(chkEnableSound->isChecked() ? 1 : 0) << "\n";
 	conf_file << "enable_music = "		<< std::to_string(chkEnableMusic->isChecked() ? 1 : 0) << "\n";
-	conf_file << "#Volume of sounds and musics, integer between 0 and 100\n";
-	int vol = gameConf.volume * 100;
+	conf_file << "enable_sound = "		<< std::to_string(chkEnableSound->isChecked() ? 1 : 0) << "\n";
+	conf_file << "#integers between 0 and 100\n";
+	int vol = gameConf.musicVolume * 100;
 	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
-	conf_file << "volume = "			<< std::to_string(vol) << "\n";
+	conf_file << "music_volume = "		<< std::to_string(vol) << "\n";
+	vol = gameConf.soundVolume * 100;if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
+	conf_file << "sound_volume = "		<< std::to_string(vol) << "\n";
 	conf_file.close();
 }
 void Game::LoadPicUrls() {
@@ -1895,7 +1900,7 @@ void Game::OnResize() {
 	btnExpandChat->setRelativePosition(Resize(40, 300, 140, 325));
 	tabSystem->setRelativePosition(Resize(0, 0, 300, 364));
 	//rect<s32>(0, 0, wInfos->getRelativePosition().getWidth(), wInfos->getRelativePosition().getHeight()));
-	scrVolume->setRelativePosition(rect<s32>(Scale(85), Scale(325), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(340)));
+	scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(325), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(340)));
 
 	wChat->setRelativePosition(ResizeWin(301 * window_scale.X + 6, 615, 1020, 640, true));
 	ebChatInput->setRelativePosition(recti(Scale(3), Scale(2), window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, Scale(22)));

@@ -58,9 +58,10 @@ struct Config {
 	int quick_animation;
 
 	int chkAnime;
-	bool enablesound;
-	double volume;
 	bool enablemusic;
+	bool enablesound;
+	double musicVolume;
+	double soundVolume;
 	int skin_index;
 };
 
@@ -317,7 +318,8 @@ public:
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
-	irr::gui::IGUIStaticText* stVolume;
+	irr::gui::IGUIStaticText* stMusicVolume;
+	irr::gui::IGUIStaticText* stSoundVolume;
 	irr::gui::IGUITab* tabLog;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUITab* tabChat;
@@ -340,7 +342,8 @@ public:
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
-	irr::gui::IGUIScrollBar* scrVolume;
+	irr::gui::IGUIScrollBar* scrMusicVolume;
+	irr::gui::IGUIScrollBar* scrSoundVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;
