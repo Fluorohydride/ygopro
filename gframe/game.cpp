@@ -401,13 +401,20 @@ bool Game::Initialize() {
 	chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2046).c_str());
 	chkEnableSound->setChecked(gameConf.enablesound);
 	stMusicVolume = env->addStaticText(L"Music", Scale(20, 320, 80, 345), false, true, tabPanel, -1, false);
-	scrMusicVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_VOLUME);
+	scrMusicVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_MUSIC_VOLUME);
 	scrMusicVolume->setMax(100);
 	scrMusicVolume->setMin(0);
 	scrMusicVolume->setPos(gameConf.musicVolume * 100);
 	scrMusicVolume->setLargeStep(1);
 	scrMusicVolume->setSmallStep(1);
-	chkQuickAnimation = env->addCheckBox(false, Scale(20, 345, 280, 370), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
+	stSoundVolume = env->addStaticText(L"Sounds", Scale(20, 350, 80, 375), false, true, tabPanel, -1, false);
+	scrSoundVolume = env->addScrollBar(true, Scale(85, 355, 280, 370), tabPanel, SCROLL_SOUND_VOLUME);
+	scrSoundVolume->setMax(100);
+	scrSoundVolume->setMin(0);
+	scrSoundVolume->setPos(gameConf.soundVolume * 100);
+	scrSoundVolume->setLargeStep(1);
+	scrSoundVolume->setSmallStep(1);
+	chkQuickAnimation = env->addCheckBox(false, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
@@ -798,6 +805,8 @@ bool Game::Initialize() {
 		chkEnableMusic->setVisible(false);
 		scrMusicVolume->setVisible(false);
 		stMusicVolume->setVisible(false);
+		scrSoundVolume->setVisible(false);
+		stSoundVolume->setVisible(false);
 		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
 	env->getSkin()->setFont(guiFont);
@@ -1901,6 +1910,7 @@ void Game::OnResize() {
 	tabSystem->setRelativePosition(Resize(0, 0, 300, 364));
 	//rect<s32>(0, 0, wInfos->getRelativePosition().getWidth(), wInfos->getRelativePosition().getHeight()));
 	scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(325), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(340)));
+	scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(355), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(370)));
 
 	wChat->setRelativePosition(ResizeWin(301 * window_scale.X + 6, 615, 1020, 640, true));
 	ebChatInput->setRelativePosition(recti(Scale(3), Scale(2), window_size.Width - wChat->getRelativePosition().UpperLeftCorner.X - 6, Scale(22)));

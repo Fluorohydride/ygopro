@@ -1783,10 +1783,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
-			case SCROLL_VOLUME: {
+			case SCROLL_MUSIC_VOLUME: {
 				mainGame->gameConf.musicVolume = (double)mainGame->scrMusicVolume->getPos() / 100;
-				mainGame->soundManager->SetSoundVolume(mainGame->gameConf.soundVolume);
 				mainGame->soundManager->SetMusicVolume(mainGame->gameConf.musicVolume);
+				return true;
+			}
+			case SCROLL_SOUND_VOLUME: {
+				mainGame->gameConf.soundVolume = (double)mainGame->scrSoundVolume->getPos() / 100;
+				mainGame->soundManager->SetSoundVolume(mainGame->gameConf.soundVolume);
 				return true;
 			}
 			}
