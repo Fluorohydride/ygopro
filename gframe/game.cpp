@@ -130,7 +130,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 30, 220, 50), false, false, wCreateHost);
 	cbLFlist = env->addComboBox(rect<s32>(140, 25, 300, 50), wCreateHost);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbLFlist->addItem(deckManager._lfList[i].listName, deckManager._lfList[i].hash);
+		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
 	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
 	cbRule->addItem(dataManager.GetSysString(1240));
@@ -509,7 +509,7 @@ bool Game::Initialize() {
 	cbDBDecks = env->addComboBox(rect<s32>(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbDBLFList->addItem(deckManager._lfList[i].listName);
+		cbDBLFList->addItem(deckManager._lfList[i].listName.c_str());
 	btnSaveDeck = env->addButton(rect<s32>(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302));
 	ebDeckname = env->addEditBox(L"", rect<s32>(80, 65, 220, 90), true, wDeckEdit, -1);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -790,7 +790,7 @@ void Game::MainLoop() {
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
-		gMutex.Lock();
+		gMutex.lock();
 		if(dInfo.isStarted) {
 			if(dInfo.isFinished && showcardcode == 1)
 				soundManager.PlayBGM(BGM_WIN);
@@ -819,7 +819,7 @@ void Game::MainLoop() {
 		}
 		DrawGUI();
 		DrawSpec();
-		gMutex.Unlock();
+		gMutex.unlock();
 		if(signalFrame > 0) {
 			signalFrame--;
 			if(!signalFrame)
@@ -836,16 +836,12 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(closeSignal.Wait(0))
+		if(closeSignal.Wait(1))
 			CloseDuelWindow();
 		fps++;
 		cur_time = timer->getTime();
 		if(cur_time < fps * 17 - 20)
-#ifdef _WIN32
-			Sleep(20);
-#else
-			usleep(20000);
-#endif
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		if(cur_time >= 1000) {
 			myswprintf(cap, L"YGOPro FPS: %d", fps);
 			device->setWindowCaption(cap);
@@ -860,11 +856,7 @@ void Game::MainLoop() {
 	DuelClient::StopClient(true);
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
-#ifdef _WIN32
-	Sleep(500);
-#else
-	usleep(500000);
-#endif
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	SaveConfig();
 //	device->drop();
 }

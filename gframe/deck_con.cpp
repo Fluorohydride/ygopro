@@ -74,7 +74,7 @@ void DeckBuilder::Initialize() {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
-	filterList = deckManager._lfList[0].content;
+	filterList = &deckManager._lfList[0].content;
 	mainGame->cbDBLFList->setSelected(0);
 	ClearSearch();
 	mouse_pos.set(0, 0);
@@ -129,10 +129,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			soundManager.PlaySoundEffect(SOUND_BUTTON);
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1339));
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
@@ -183,22 +183,22 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.Lock();
+				mainGame->gMutex.lock();
 				wchar_t textBuffer[256];
 				myswprintf(textBuffer, L"%ls\n%ls", mainGame->cbDBDecks->getItem(sel), dataManager.GetSysString(1337));
 				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, textBuffer);
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.Unlock();
+				mainGame->gMutex.unlock();
 				prev_operation = id;
 				prev_sel = sel;
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
 				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.Lock();
+					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -363,15 +363,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
-				filterList = deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
+				filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
 				if(is_modified && !mainGame->chkIgnoreDeckChanges->isChecked()) {
-					mainGame->gMutex.Lock();
+					mainGame->gMutex.lock();
 					mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->guiFont, dataManager.GetSysString(1356));
 					mainGame->PopupElement(mainGame->wQuery);
-					mainGame->gMutex.Unlock();
+					mainGame->gMutex.unlock();
 					prev_operation = id;
 					break;
 				}
@@ -917,7 +917,7 @@ void DeckBuilder::FilterCards() {
 		if(filter_marks && (data.link_marker & filter_marks)!= filter_marks)
 			continue;
 		if(filter_lm) {
-			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1))
+			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList).at(ptr->first) != filter_lm - 1))
 				continue;
 			if(filter_lm == 4 && data.ot != 1)
 				continue;

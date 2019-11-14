@@ -9,7 +9,7 @@ namespace ygo {
 DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
-	LFList* cur = NULL;
+	LFList* cur = nullptr;
 	FILE* fp = fopen(path, "r");
 	char linebuf[256];
 	if(fp) {
@@ -20,7 +20,7 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	}
 }
 void DeckManager::LoadLFListSingle(IReadFile* reader) {
-	LFList* cur = NULL;
+	LFList* cur = nullptr;
 	char ch[2] = " ";
 	char linebuf[256] = "";
 	while(reader->read(&ch[0], 1)) {
@@ -38,70 +38,68 @@ LFList* DeckManager::ReadLFListSingle(char* linebuf, LFList* cur) {
 	wchar_t strBuffer[256];
 	if(linebuf[0] == '#')
 		return cur;
-	int p = 0, sa = 0, code, count;
 	if(linebuf[0] == '!') {
-		sa = BufferIO::DecodeUTF8((const char*)(&linebuf[1]), strBuffer);
+		int sa = BufferIO::DecodeUTF8(&linebuf[1], strBuffer);
 		while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' ) sa--;
-		size_t len = wcslen(strBuffer);
-		wchar_t lfname[256];
-		wcsncpy(lfname, strBuffer, sa);
-		lfname[sa] = 0;
-		auto lit = std::find_if(_lfList.begin(), _lfList.end(), [&lfname](LFList &lf) { return wcscmp(lf.listName, lfname) == 0; });
+		strBuffer[sa] = 0;
+		auto lit = std::find_if(_lfList.begin(), _lfList.end(), [&strBuffer](const ygo::LFList& list) {
+			return wcscmp(list.listName.c_str(), strBuffer) == 0;
+		});
 		if(lit == _lfList.end()) {
 			LFList newlist;
 			_lfList.push_back(newlist);
 			cur = &_lfList[_lfList.size() - 1];
-			memcpy(cur->listName, (const void*)strBuffer, 20 * sizeof(wchar_t));
-			cur->listName[sa] = 0;
-			cur->content = new std::unordered_map<int, int>;
+			cur->listName = strBuffer;
 			cur->hash = 0x7dfcee6a;
 		} else {
 			cur = lit._Ptr;
 		}
 		return cur;
 	}
+	int p = 0;
 	while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
 	if(linebuf[p] == 0)
 		return cur;
 	linebuf[p++] = 0;
-	sa = p;
-	code = atoi(linebuf);
+	int sa = p;
+	int code = atoi(linebuf);
 	if(code == 0)
 		return cur;
 	while(linebuf[p] == ' ' || linebuf[p] == '\t') p++;
 	while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
 	linebuf[p] = 0;
-	count = atoi(&linebuf[sa]);
-	if(cur == NULL) return cur;
-	(*cur->content)[code] = count;
+	int count = atoi(&linebuf[sa]);
+	if(!cur) return cur;
+	cur->content[code] = count;
 	cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 	return cur;
 }
 void DeckManager::LoadLFList() {
 	LoadLFListSingle("lflist.conf");
 	LFList nolimit;
-	myswprintf(nolimit.listName, L"N/A");
+	nolimit.listName = L"N/A";
 	nolimit.hash = 0;
-	nolimit.content = new std::unordered_map<int, int>;
 	_lfList.push_back(nolimit);
 }
-wchar_t* DeckManager::GetLFListName(int lfhash) {
-	for(size_t i = 0; i < _lfList.size(); ++i) {
-		if(_lfList[i].hash == (unsigned int)lfhash) {
-			return _lfList[i].listName;
-		}
-	}
-	return (wchar_t*)dataManager.unknown_string;
+const wchar_t* DeckManager::GetLFListName(int lfhash) {
+	auto lit = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](const ygo::LFList& list) {
+		return list.hash == lfhash;
+	});
+	if(lit != _lfList.end())
+		return lit->listName.c_str();
+	return dataManager.unknown_string;
+}
+const std::unordered_map<int, int>* DeckManager::GetLFListContent(int lfhash) {
+	auto lit = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](const ygo::LFList& list) {
+		return list.hash == lfhash;
+	});
+	if(lit != _lfList.end())
+		return &lit->content;
+	return nullptr;
 }
 int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
 	std::unordered_map<int, int> ccount;
-	std::unordered_map<int, int>* list = 0;
-	for(size_t i = 0; i < _lfList.size(); ++i) {
-		if(_lfList[i].hash == (unsigned int)lfhash) {
-			list = _lfList[i].content;
-			break;
-		}
-	}
+	auto list = GetLFListContent(lfhash);
 	if(!list)
 		return 0;
 	int dc = 0;
