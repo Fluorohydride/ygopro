@@ -188,7 +188,6 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s3
 	wchar_t name[1024];
 	BufferIO::DecodeUTF8(file, name);
 #else
-	FILE* fp = fopen(file, "r");
 	char* name = file;
 #endif // _WIN32
 	if(mainGame->gameConf.use_image_scale) {
