@@ -95,7 +95,13 @@ void DataManager::LoadExpansionDB(const wchar_t* wpath) {
 	});
 }
 bool DataManager::LoadStrings(const char* file) {
+#ifdef _WIN32
+	wchar_t fname[1024];
+	BufferIO::DecodeUTF8(file, fname);
+	FILE* fp = _wfopen(fname, L"r");
+#else
 	FILE* fp = fopen(file, "r");
+#endif // _WIN32
 	if(!fp)
 		return false;
 	char linebuf[256];

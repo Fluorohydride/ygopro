@@ -184,23 +184,30 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 		}
 }
 irr::video::ITexture* ImageManager::GetTextureFromFile(char* file, s32 width, s32 height) {
+#ifdef _WIN32
+	wchar_t name[1024];
+	BufferIO::DecodeUTF8(file, name);
+#else
+	FILE* fp = fopen(file, "r");
+	char* name = file;
+#endif // _WIN32
 	if(mainGame->gameConf.use_image_scale) {
 		irr::video::ITexture* texture;
-		irr::video::IImage* srcimg = driver->createImageFromFile(file);
+		irr::video::IImage* srcimg = driver->createImageFromFile(name);
 		if(srcimg == NULL)
 			return NULL;
 		if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
-			texture = driver->addTexture(file, srcimg);
+			texture = driver->addTexture(name, srcimg);
 		} else {
 			video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(width, height));
 			imageScaleNNAA(srcimg, destimg);
-			texture = driver->addTexture(file, destimg);
+			texture = driver->addTexture(name, destimg);
 			destimg->drop();
 		}
 		srcimg->drop();
 		return texture;
 	} else {
-		return driver->getTexture(file);
+		return driver->getTexture(name);
 	}
 }
 irr::video::ITexture* ImageManager::GetTextureExpansions(char* file, s32 width, s32 height) {

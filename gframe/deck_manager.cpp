@@ -10,7 +10,13 @@ DeckManager deckManager;
 
 void DeckManager::LoadLFListSingle(const char* path) {
 	LFList* cur = nullptr;
+#ifdef _WIN32
+	wchar_t fpath[1024];
+	BufferIO::DecodeUTF8(path, fpath);
+	FILE* fp = _wfopen(fpath, L"r");
+#else
 	FILE* fp = fopen(path, "r");
+#endif // _WIN32
 	char linebuf[256];
 	if(fp) {
 		while(fgets(linebuf, 256, fp)) {
