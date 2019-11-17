@@ -69,7 +69,6 @@ deploy:
   on:
     condition: "$TRAVIS_OS_NAME == windows"
     repo: edo9300/ygopro
-    branch: discord-rpc
 - provider: pages
   skip_cleanup: true
   local_dir: deploy
@@ -79,4 +78,3 @@ deploy:
   on:
     condition: "$TRAVIS_OS_NAME != windows"
     repo: edo9300/ygopro
-    branch: discord-rpc
