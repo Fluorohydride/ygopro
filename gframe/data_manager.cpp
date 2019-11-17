@@ -166,7 +166,7 @@ std::wstring DataManager::GetDesc(u64 strCode) {
 	return csit->second.desc[offset];
 }
 std::wstring DataManager::GetSysString(int code) {
-	if(code < 0)
+	if(code < 0 || code >= 10000)
 		return unknown_string;
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end() || csit->second.empty())
