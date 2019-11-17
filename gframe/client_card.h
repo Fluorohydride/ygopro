@@ -57,6 +57,7 @@ public:
 	irr::f32 dAlpha;
 	irr::s32 aniFrame;
 	bool is_moving;
+	bool refresh_on_stop;
 	bool is_fading;
 	bool is_hovered;
 	bool is_selectable;
@@ -90,6 +91,7 @@ public:
 	irr::u32 sequence;
 	irr::u8 position;
 	irr::u32 status;
+	irr::u32 cover;
 	irr::u8 cHint;
 	irr::u32 chValue;
 	irr::u32 opParam;

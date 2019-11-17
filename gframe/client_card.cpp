@@ -10,6 +10,7 @@ ClientCard::ClientCard() {
 	dAlpha = 0;
 	aniFrame = 0;
 	is_moving = false;
+	refresh_on_stop = false;
 	is_fading = false;
 	is_hovered = false;
 	is_selectable = false;
@@ -22,6 +23,7 @@ ClientCard::ClientCard() {
 	is_reversed = false;
 	cmdFlag = 0;
 	code = 0;
+	cover = 0;
 	chain_code = 0;
 	location = 0;
 	type = 0;
@@ -73,6 +75,7 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 	CHECK_AND_SET(QUERY_OWNER, owner)
 	CHECK_AND_SET(QUERY_REASON, reason)
 	CHECK_AND_SET(QUERY_STATUS, status)
+	CHECK_AND_SET(QUERY_COVER, cover)
 	if(query.flag & QUERY_CODE) {
 		if((location == LOCATION_HAND) && (query.code != code)) {
 			code = query.code;

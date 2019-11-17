@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #define OCG_VERSION_MAJOR 4
-#define OCG_VERSION_MINOR 1
+#define OCG_VERSION_MINOR 2
 
 typedef enum OCG_LogTypes {
 	OCG_LOG_TYPE_ERROR,

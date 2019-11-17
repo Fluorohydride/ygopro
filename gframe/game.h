@@ -60,9 +60,10 @@ struct Config {
 	int quick_animation;
 
 	int chkAnime;
-	bool enablesound;
-	double volume;
 	bool enablemusic;
+	bool enablesound;
+	double musicVolume;
+	double soundVolume;
 	int skin_index;
 };
 
@@ -297,6 +298,7 @@ public:
 	void PopulateResourcesDirectories();
 	std::vector<path_string> field_dirs;
 	std::vector<path_string> pic_dirs;
+	std::vector<path_string> cover_dirs;
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
 	std::vector<Utils::IrrArchiveHelper> archives;
@@ -326,7 +328,8 @@ public:
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
-	irr::gui::IGUIStaticText* stVolume;
+	irr::gui::IGUIStaticText* stMusicVolume;
+	irr::gui::IGUIStaticText* stSoundVolume;
 	irr::gui::IGUITab* tabLog;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUITab* tabChat;
@@ -349,7 +352,8 @@ public:
 	irr::gui::IGUICheckBox* chkHideHintButton;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUICheckBox* chkEnableMusic;
-	irr::gui::IGUIScrollBar* scrVolume;
+	irr::gui::IGUIScrollBar* scrMusicVolume;
+	irr::gui::IGUIScrollBar* scrSoundVolume;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;
@@ -845,11 +849,12 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_CANCEL_SINGLEPLAY	352
 #define CHECKBOX_EXTRA_RULE			353
 #define CHECKBOX_ENABLE_MUSIC		366
-#define CHECKBOX_ENABLE_SOUND	367
-#define SCROLL_VOLUME				368
-#define CHECKBOX_SHOW_ANIME			369
-#define CHECKBOX_QUICK_ANIMATION	370
-#define COMBOBOX_SORTTYPE			371
+#define CHECKBOX_ENABLE_SOUND		367
+#define SCROLL_MUSIC_VOLUME			368
+#define SCROLL_SOUND_VOLUME			369
+#define CHECKBOX_SHOW_ANIME			370
+#define CHECKBOX_QUICK_ANIMATION	371
+#define COMBOBOX_SORTTYPE			372
 
 #define BUTTON_MARKS_FILTER			380
 #define BUTTON_MARKERS_OK			381

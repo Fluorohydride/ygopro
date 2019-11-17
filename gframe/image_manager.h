@@ -6,30 +6,57 @@
 #include <unordered_map>
 #include <atomic>
 #include <future>
+#include <queue>
 
 namespace ygo {
 
-struct PicSource {
-	std::string url;
-	std::string type;
-};
-
 class ImageManager {
+public:
+	enum imgType {
+		ART,
+		FIELD,
+		COVER,
+		THUMB
+	};
+	struct PicSource {
+		std::string url;
+		imgType type;
+	};
 private:
 	using image_path = std::pair<IImage*, path_string>;
 	using loading_map = std::map<int, std::future<image_path>>;
 	using chrono_time = unsigned long long;
-	using downloading_map = std::map<int/*code*/, std::pair<int /*status: value not found: not yet downloaded, 0: downloading, 1: not correctly downloaded, 2: correctly downloaded*/, path_string>>;
+	enum downloadStatus {
+		DOWNLOADING,
+		DOWNLOAD_ERROR,
+		DOWNLOADED,
+		NONE
+	};
+	struct downloadParam {
+		int code;
+		imgType type;
+		downloadStatus status;
+		path_string path;
+	};
+	using downloading_map = std::map<int/*code*/, downloadParam>; /*if the value is not found, the download hasn't started yet*/
+	using texture_map = std::unordered_map<int, irr::video::ITexture*>;
 public:
 	ImageManager() {
 		loading_pics[0] = new loading_map();
 		loading_pics[1] = new loading_map();
 		loading_pics[2] = new loading_map();
+		loading_pics[3] = new loading_map();
 	}
 	~ImageManager() {
+		stop_threads = true;
+		cv.notify_all();
+		for(int i = 0; i < 8; i++) {
+			download_threads[i].join();
+		}
 		delete loading_pics[0];
 		delete loading_pics[1];
 		delete loading_pics[2];
+		delete loading_pics[3];
 	}
 	void AddDownloadResource(PicSource src);
 	bool Initial();
@@ -41,13 +68,15 @@ public:
 	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::IImage* GetTextureImageFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile = nullptr);
 	irr::video::ITexture* GetTextureFromFile(const io::path& file, int width, int height);
-	irr::video::ITexture* GetTexture(int code, bool wait = false, bool fit = false, int* chk = nullptr);
-	irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
+	irr::video::ITexture* GetTextureCard(int code, imgType type, bool wait = false, bool fit = false, int* chk = nullptr);
+	//irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(int code);
+	//irr::video::ITexture* GetTextureCustomCover(int code, bool wait = false, int* chk = nullptr);
 
-	std::unordered_map<int, irr::video::ITexture*> tMap[2];
-	std::unordered_map<int, irr::video::ITexture*> tThumb;
-	std::unordered_map<int, irr::video::ITexture*> tFields;
+	texture_map tMap[2];
+	texture_map tThumb;
+	texture_map tFields;
+	texture_map tCovers;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::video::ITexture* tCover[2];
@@ -71,18 +100,25 @@ public:
 	irr::video::ITexture* tField[2][4];
 	irr::video::ITexture* tFieldTransparent[2][4];
 private:
-	void ClearFutureObjects(loading_map* map);
-	void DownloadPic(int code);
-	void DownloadField(int code);
-	image_path LoadCardTexture(int code, std::atomic<s32>& width, std::atomic<s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
-	loading_map* loading_pics[3];
-	downloading_map downloading_pics;
-	downloading_map downloading_fields;
+	void ClearFutureObjects(loading_map* map1, loading_map* map2, loading_map* map3, loading_map* map4);
+	void DownloadPic();
+	void AddToDownloadQueue(int code, imgType type);
+	downloadStatus GetDownloadStatus(int code, imgType type);
+	path_string GetDownloadPath(int code, imgType type);
+	image_path LoadCardTexture(int code, imgType type, std::atomic<s32>& width, std::atomic<s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
+	loading_map* loading_pics[4];
+	downloading_map downloading_images[3];
+	std::queue<downloadParam> to_download;
+	std::vector<downloadParam> downloading;
 	std::pair<std::atomic<s32>, std::atomic<s32>> sizes[3];
 	std::mutex pic_download;
 	std::mutex field_download;
+	std::mutex mtx;
+	std::condition_variable cv;
 	std::atomic<chrono_time> timestamp_id;
+	std::atomic<bool> stop_threads;
 	std::vector<PicSource> pic_urls;
+	std::thread download_threads[8];
 };
 
 extern ImageManager imageManager;

@@ -49,10 +49,10 @@ namespace ygo {
 				is_continuing = ReplayAnalyze(message) && is_continuing;
 			}
 		} else {
-			ReplayRefresh(0, LOCATION_DECK, 0x181fff);
-			ReplayRefresh(1, LOCATION_DECK, 0x181fff);
-			ReplayRefresh(0, LOCATION_EXTRA, 0x181fff);
-			ReplayRefresh(1, LOCATION_EXTRA, 0x181fff);
+			ReplayRefresh(0, LOCATION_DECK, 0x2181fff);
+			ReplayRefresh(1, LOCATION_DECK, 0x2181fff);
+			ReplayRefresh(0, LOCATION_EXTRA, 0x2181fff);
+			ReplayRefresh(1, LOCATION_EXTRA, 0x2181fff);
 		}
 		exit_pending = false;
 		current_step = 0;
@@ -207,17 +207,17 @@ namespace ygo {
 		switch(mainGame->dInfo.curMsg) {
 			case MSG_SHUFFLE_DECK: {
 				player = BufferIO::Read<uint8_t>(pbuf);
-				ReplayRefresh(player, LOCATION_DECK, 0x181fff);
+				ReplayRefresh(player, LOCATION_DECK, 0x2181fff);
 				break;
 			}
 			case MSG_SWAP_GRAVE_DECK: {
 				player = BufferIO::Read<uint8_t>(pbuf);
-				ReplayRefresh(player, LOCATION_GRAVE, 0x181fff);
+				ReplayRefresh(player, LOCATION_GRAVE, 0x2181fff);
 				break;
 			}
 			case MSG_REVERSE_DECK: {
-				ReplayRefresh(0, LOCATION_DECK, 0x181fff);
-				ReplayRefresh(1, LOCATION_DECK, 0x181fff);
+				ReplayRefresh(0, LOCATION_DECK, 0x2181fff);
+				ReplayRefresh(1, LOCATION_DECK, 0x2181fff);
 				break;
 			}
 			case MSG_MOVE: {
@@ -230,8 +230,8 @@ namespace ygo {
 			}
 			case MSG_TAG_SWAP: {
 				player = BufferIO::Read<uint8_t>(pbuf);
-				ReplayRefresh(player, LOCATION_DECK, 0x181fff);
-				ReplayRefresh(player, LOCATION_EXTRA, 0x181fff);
+				ReplayRefresh(player, LOCATION_DECK, 0x2181fff);
+				ReplayRefresh(player, LOCATION_EXTRA, 0x2181fff);
 				break;
 			}
 			case MSG_NEW_PHASE:
@@ -240,12 +240,17 @@ namespace ygo {
 			case MSG_FLIPSUMMONED:
 			case MSG_CHAINED:
 			case MSG_CHAIN_SOLVED:
-			case MSG_CHAIN_END:
 			case MSG_DAMAGE_STEP_START:
 			case MSG_DAMAGE_STEP_END: {
 				ReplayRefresh();
 				break;
 			}
+		case MSG_CHAIN_END:	{
+			ReplayRefresh();
+			ReplayRefresh(0, LOCATION_DECK);
+			ReplayRefresh(1, LOCATION_DECK);
+			break;
+		}
 			case MSG_RELOAD_FIELD: {
 				ReplayReload();
 				mainGame->gMutex.lock();
@@ -278,7 +283,7 @@ namespace ygo {
 	void ReplayMode::ReplayReload() {
 		for(int p = 0; p < 2; p++)
 			for(int loc = LOCATION_DECK; loc != LOCATION_OVERLAY; loc <<= 1)
-				ReplayRefresh(p, loc, 0xffdfff);
+				ReplayRefresh(p, loc, 0x2ffdfff);
 	}
 
 }

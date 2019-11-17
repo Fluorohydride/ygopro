@@ -328,10 +328,15 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		case MSG_FLIPSUMMONED:
 		case MSG_CHAINED:
 		case MSG_CHAIN_SOLVED:
-		case MSG_CHAIN_END:
 		case MSG_DAMAGE_STEP_START:
 		case MSG_DAMAGE_STEP_END: {
 			SinglePlayRefresh();
+			break;
+		}
+		case MSG_CHAIN_END:	{
+			SinglePlayRefresh();
+			SinglePlayRefresh(0, LOCATION_DECK);
+			SinglePlayRefresh(1, LOCATION_DECK);
 			break;
 		}
 		case MSG_RELOAD_FIELD: {

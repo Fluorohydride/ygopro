@@ -1432,26 +1432,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				} else if(hovered_location == LOCATION_REMOVED) {
 					if(remove[hovered_controler].size()) {
 						mcard = remove[hovered_controler].back();
-						if(mcard->position & POS_FACEDOWN) {
-							mcard = 0;
-							mainGame->ClearCardInfo(0);
-						}
 					}
 				} else if(hovered_location == LOCATION_EXTRA) {
 					if(extra[hovered_controler].size()) {
 						mcard = extra[hovered_controler].back();
-						if(mcard->position & POS_FACEDOWN) {
-							mcard = 0;
-							mainGame->ClearCardInfo(0);
-						}
 					}
 				} else if(hovered_location == LOCATION_DECK) {
 					if(deck[hovered_controler].size())
 						mcard = deck[hovered_controler].back();
-					if(mcard && mcard->position & POS_FACEDOWN) {
-						mcard = 0;
-						mainGame->ClearCardInfo(0);
-					}
 				} else {
 					if(mainGame->Resize(327, 8, 630, 51).isPointInside(mousepos))
 						mplayer = 0;
@@ -1799,10 +1787,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
-			case SCROLL_VOLUME: {
-				mainGame->gameConf.volume = (double)mainGame->scrVolume->getPos() / 100;
-				mainGame->soundManager->SetSoundVolume(mainGame->gameConf.volume);
-				mainGame->soundManager->SetMusicVolume(mainGame->gameConf.volume);
+			case SCROLL_MUSIC_VOLUME: {
+				mainGame->gameConf.musicVolume = (double)mainGame->scrMusicVolume->getPos() / 100;
+				mainGame->soundManager->SetMusicVolume(mainGame->gameConf.musicVolume);
+				return true;
+			}
+			case SCROLL_SOUND_VOLUME: {
+				mainGame->gameConf.soundVolume = (double)mainGame->scrSoundVolume->getPos() / 100;
+				mainGame->soundManager->SetSoundVolume(mainGame->gameConf.soundVolume);
 				return true;
 			}
 			}

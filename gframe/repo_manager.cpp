@@ -8,7 +8,7 @@ RepoManager repoManager;
 *The "fetchead_foreach_cb" and "jsgitpull" functions were taken from Peter Johan Salomonsen's code:
 https://github.com/fintechneo/libgit2/blob/master/emscripten_hacks/jslib.c#L577
 */
-int fetchead_foreach_cb(const char *ref_name, const char *remote_url, const git_oid *oid, unsigned int is_merge, void *payload) {
+int fetchead_foreach_cb(const char* ref_name, const char* remote_url, const git_oid* oid, unsigned int is_merge, void* payload) {
 	struct payload_struct {
 		RepoManager* repo_manager = nullptr;
 		git_repository* repo = nullptr;
@@ -22,7 +22,7 @@ int fetchead_foreach_cb(const char *ref_name, const char *remote_url, const git_
 	int fetch_percent = (((100 * _payload->curr) / _payload->total) / 2) + 50;
 	_payload->repo_manager->UpdateStatus(_payload->path, fetch_percent);
 	if(is_merge) {
-		git_annotated_commit * fetchhead_annotated_commit;
+		git_annotated_commit* fetchhead_annotated_commit;
 		git_annotated_commit_lookup(&fetchhead_annotated_commit, repo, oid);
 
 		git_merge_options merge_opts = GIT_MERGE_OPTIONS_INIT;
@@ -31,7 +31,7 @@ int fetchead_foreach_cb(const char *ref_name, const char *remote_url, const git_
 		git_checkout_options checkout_opts = GIT_CHECKOUT_OPTIONS_INIT;
 		checkout_opts.checkout_strategy = (GIT_CHECKOUT_SAFE | GIT_CHECKOUT_ALLOW_CONFLICTS | GIT_CHECKOUT_CONFLICT_STYLE_DIFF3);
 
-		const git_annotated_commit *mergeheads[] = { fetchhead_annotated_commit };
+		const git_annotated_commit* mergeheads[] = { fetchhead_annotated_commit };
 
 		git_merge(repo, mergeheads, 1, &merge_opts, &checkout_opts);
 
@@ -43,31 +43,25 @@ int fetchead_foreach_cb(const char *ref_name, const char *remote_url, const git_
 
 		if(analysis == GIT_MERGE_ANALYSIS_NORMAL) {
 			//printf("Normal merge\n");
-			git_signature * signature;
+			git_signature* signature;
 			git_signature_default(&signature, repo);
-
 			git_oid commit_oid, oid_parent_commit, tree_oid;
-
-			git_commit * parent_commit;
-
-			git_commit * fetchhead_commit;
-
+			git_commit* parent_commit;
+			git_commit* fetchhead_commit;
 			git_commit_lookup(&fetchhead_commit, repo, oid);
-
 			git_reference_name_to_id(&oid_parent_commit, repo, "HEAD");
 			git_commit_lookup(&parent_commit, repo, &oid_parent_commit);
-
-			git_tree *tree;
-			git_index *index;
+			git_tree* tree;
+			git_index* index;
 
 			git_repository_index(&index, repo);
 			if(git_index_has_conflicts(index)) {
 				//printf("Index has conflicts\n");
 
-				git_index_conflict_iterator *conflicts;
-				const git_index_entry *ancestor;
-				const git_index_entry *our;
-				const git_index_entry *their;
+				git_index_conflict_iterator* conflicts;
+				const git_index_entry* ancestor;
+				const git_index_entry* our;
+				const git_index_entry* their;
 				int err = 0;
 
 				git_index_conflict_iterator_new(&conflicts, index);
@@ -100,10 +94,10 @@ int fetchead_foreach_cb(const char *ref_name, const char *remote_url, const git_
 			git_commit_free(fetchhead_commit);
 		} else if(analysis == (GIT_MERGE_ANALYSIS_NORMAL | GIT_MERGE_ANALYSIS_FASTFORWARD)) {
 			//printf("Fast forward\n");
-			git_reference * ref = nullptr;
+			git_reference* ref = nullptr;
 
 			git_reference_lookup(&ref, repo, "refs/heads/master");
-			git_reference *newref;
+			git_reference*newref;
 			git_reference_set_target(&newref, ref, oid, "pull");
 
 			git_reference_free(newref);
@@ -116,30 +110,19 @@ int fetchead_foreach_cb(const char *ref_name, const char *remote_url, const git_
 		} else {
 			//printf("Don't know how to merge\n");
 		}
-
-		//printf("Merged %s\n", remote_url);
 	}
 	return 0;
 }
-int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid* id) {
-	git_remote *remote = nullptr;
-	const git_transfer_progress *stats;
+int RepoManager::jsgitpull(git_repository* repo, std::string repo_path, git_oid* id) {
+	git_remote* remote = nullptr;
+	const git_transfer_progress* stats;
 	git_fetch_options fetch_opts = GIT_FETCH_OPTIONS_INIT;
-
 	int res = git_remote_lookup(&remote, repo, "origin");
-
 	if(res < 0) {
 		git_remote_free(remote);
 		return res;
 	}
-
-	/* Set up the callbacks (only update_tips for now) */
-	/*fetch_opts.callbacks.update_tips = &update_cb;
-	fetch_opts.callbacks.sideband_progress = &progress_cb;
-	fetch_opts.callbacks.transfer_progress = transfer_progress_cb;
-	fetch_opts.callbacks.credentials = cred_acquire_cb;*/
-
-	fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress *stats, void *payload)->int {
+	fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress* stats, void* payload)->int {
 		int fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 2;
 		RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 		repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
@@ -169,13 +152,13 @@ int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid
 
 	int count = 0;
 
-	git_repository_fetchhead_foreach(repo, [](const char *ref_name, const char *remote_url, const git_oid *oid, unsigned int is_merge, void *payload)->int {
+	git_repository_fetchhead_foreach(repo, [](const char* ref_name, const char* remote_url, const git_oid* oid, unsigned int is_merge, void* payload)->int {
 		(*(int*)payload)++;
 		return 0;
 	}, &count);
 
 	if(id) {
-		git_repository_fetchhead_foreach(repo, [](const char *ref_name, const char *remote_url, const git_oid *oid, unsigned int is_merge, void *payload)->int {
+		git_repository_fetchhead_foreach(repo, [](const char* ref_name, const char* remote_url, const git_oid* oid, unsigned int is_merge, void* payload)->int {
 			git_oid* id = static_cast<git_oid*>(payload);
 			*id = *oid;
 			return 1;
@@ -199,10 +182,9 @@ int RepoManager::jsgitpull(git_repository * repo, std::string repo_path, git_oid
 	return res;
 }
 
-
-git_commit * getLastCommit(git_repository * repo, git_oid* id) {
+git_commit* getLastCommit(git_repository* repo, git_oid* id) {
 	int rc;
-	git_commit * commit = nullptr; /* the result */
+	git_commit* commit = nullptr; /* the result */
 	git_oid oid_parent_commit;  /* the SHA1 for last commit */
 
 	/* resolve HEAD into a SHA1 */
@@ -218,36 +200,24 @@ git_commit * getLastCommit(git_repository * repo, git_oid* id) {
 	}
 	return nullptr;
 }
-std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
+
+std::vector<std::string> GetCommitsInfo(git_repository* repo, git_oid id) {
 	std::vector<std::string> res;
 	static git_oid tmp = { 0 };
 	git_revwalk* rewalk;
 	if(git_revwalk_new(&rewalk, repo) < 0) {
-		const git_error *e = giterr_last();
+		const git_error* e = giterr_last();
 		return { e->message };
 	}
 	git_revwalk_sorting(rewalk, GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
 	if(git_revwalk_push_head(rewalk) < 0) {
-		const git_error *e = giterr_last();
+		const git_error* e = giterr_last();
+		git_revwalk_free(rewalk);
 		return { e->message };
 	}
-	/*if(git_revwalk_hide_glob(rewalk, "tags/*") < 0) {
-		const git_error *e = giterr_last();
-		return { e->message };
-	}*/
-	/*git_object *obj;
-	if(git_revparse_single(&obj, repo, "HEAD~10") < 0){
-		const git_error *e = giterr_last();
-		return { e->message };
-	}
-	if(git_revwalk_hide(rewalk, git_object_id(obj)) < 0) {
-		git_object_free(obj);
-		const git_error *e = giterr_last();
-		return { e->message };
-	}*/
 	git_oid oid;
 	while(git_revwalk_next(&oid, rewalk) == 0) {
-		git_commit *c;
+		git_commit* c;
 		git_commit_lookup(&c, repo, &oid);
 		if(!memcmp(oid.id,id.id, sizeof(oid.id)))
 			break;
@@ -255,15 +225,17 @@ std::vector<std::string> GetCommitsInfo(git_repository *repo, git_oid id) {
 		std::string author = git_commit_author(c)->name;
 		git_commit_free(c);
 		res.push_back(message + "\n by " + author);
-		if(res.size() >= 30)
+		if(res.size() >= 1500)
 			break;
 	}
 	res.insert(res.begin(), "");
+	git_revwalk_free(rewalk);
 	return res;
 }
+
 std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 	git_libgit2_init();
-	git_repository *repo = nullptr;
+	git_repository* repo = nullptr;
 	int res = 0;
 	std::string errstring;
 	git_oid id = { 0 };
@@ -271,7 +243,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 		&repo, _repo.repo_path.c_str(), GIT_REPOSITORY_OPEN_NO_SEARCH, nullptr) == 0) {
 		if(_repo.should_update) {
 			std::vector<std::string> modified;
-			git_status_foreach(repo, [](const char *path, unsigned int status_flags, void *payload) -> int {
+			git_status_foreach(repo, [](const char* path, unsigned int status_flags, void* payload) -> int {
 				((std::vector<std::string>*)payload)->push_back(path);
 				return 0;
 			}, &modified);
@@ -291,7 +263,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 		repo = nullptr;
 		Utils::Deletedirectory(Utils::ParseFilename(_repo.repo_path + "/"));
 		git_clone_options opts = GIT_CLONE_OPTIONS_INIT;
-		opts.checkout_opts.progress_cb = [](const char *path, size_t cur, size_t tot, void *payload) {
+		opts.checkout_opts.progress_cb = [](const char* path, size_t cur, size_t tot, void* payload) {
 			int fetch_percent = (((100 * cur) / tot) / 2) + 50;
 			RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 			repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
@@ -300,7 +272,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 		payload.repo_manager = this;
 		payload.path = _repo.repo_path;
 		opts.checkout_opts.progress_payload = &payload;
-		opts.fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress *stats, void *payload) {
+		opts.fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress* stats, void* payload) {
 			int fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 2;
 			RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 			repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
@@ -311,7 +283,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 	}
 	std::vector<std::string> new_commits;
 	if(res < 0) {
-		const git_error *e = giterr_last();
+		const git_error* e = giterr_last();
 		if(e)
 			return { { e->message }, new_commits };
 		git_libgit2_shutdown();

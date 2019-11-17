@@ -39,20 +39,20 @@ public:
 		PLAYER_ENTER,
 		CHAT
 	};
-    enum BGM {
-        ALL,
-        DUEL,
-        MENU,
-        DECK,
-        ADVANTAGE,
-        DISADVANTAGE,
-        WIN,
-        LOSE
-    };
+	enum BGM {
+		ALL,
+		DUEL,
+		MENU,
+		DECK,
+		ADVANTAGE,
+		DISADVANTAGE,
+		WIN,
+		LOSE
+	};
 #ifndef YGOPRO_USE_IRRKLANG
-    SoundManager() : openal(nullptr), sfx(nullptr) {}
+	SoundManager() : openal(nullptr), sfx(nullptr) {}
 #endif
-    ~SoundManager();
+	~SoundManager();
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
 	void RefreshBGMList();
 	void PlaySoundEffect(SFX sound);
@@ -66,23 +66,25 @@ public:
 	void EnableMusic(bool enable);
 
 private:
-    std::vector<std::string> BGMList[8];
-    std::map<unsigned int, std::string> ChantsList;
-    int bgm_scene = -1;
-    std::mt19937 rnd;
+	std::vector<std::string> BGMList[8];
+	std::map<unsigned int, std::string> ChantsList;
+	int bgm_scene = -1;
+	std::mt19937 rnd;
 #ifdef YGOPRO_USE_IRRKLANG
-    irrklang::ISoundEngine* soundEngine;
-    irrklang::ISound* soundBGM;
+	irrklang::ISoundEngine* soundEngine;
+	irrklang::ISound* soundBGM;
+	double sfxVolume = 1.0;
+	double bgmVolume = 1.0;
 #else
-    std::unique_ptr<YGOpen::OpenALSingleton> openal;
-    std::unique_ptr<YGOpen::OpenALSoundLayer> sfx;
-    std::unique_ptr<YGOpen::OpenALSoundLayer> bgm;
-    int bgmCurrent = -1;
+	std::unique_ptr<YGOpen::OpenALSingleton> openal;
+	std::unique_ptr<YGOpen::OpenALSoundLayer> sfx;
+	std::unique_ptr<YGOpen::OpenALSoundLayer> bgm;
+	int bgmCurrent = -1;
 #endif
-    void RefreshBGMDir(path_string path, BGM scene);
-    void RefreshChantsList();
-    bool soundsEnabled = false;
-    bool musicEnabled = false;
+	void RefreshBGMDir(path_string path, BGM scene);
+	void RefreshChantsList();
+	bool soundsEnabled = false;
+	bool musicEnabled = false;
 };
 
 }
