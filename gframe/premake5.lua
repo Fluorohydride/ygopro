@@ -5,14 +5,18 @@ local ygopro_config=function(static_core)
 	if _OPTIONS["fields"] then
 		defines { "DEFAULT_FIELD_URL=" .. _OPTIONS["fields"] }
 	end
+	if _OPTIONS["discord"] then
+		defines { "DISCORD_APP_ID=" .. _OPTIONS["discord"] }
+	end
 	kind "WindowedApp"
 	cppdialect "C++14"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
 	defines "CURL_STATICLIB"
-	includedirs { "../ocgcore", "../irrKlang/include" }
+	includedirs "../ocgcore"
 	links { "clzma", "freetype", "Irrlicht" }
 	filter "options:not no-irrklang"
+		includedirs "../irrKlang/include"
 		defines "YGOPRO_USE_IRRKLANG"
 		links "IrrKlang"
 		excludes "sound_openal.cpp"
@@ -40,13 +44,13 @@ local ygopro_config=function(static_core)
 
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
-		excludes "COSOperator.*"
+		if _OPTIONS["discord"] then
+			links "discord-rpc"
+		end
 		links { "sqlite3", "event", "event_pthreads", "dl", "pthread", "git2" }
 
-	filter { "system:not windows", "options:no-irrklang" }
-		links { "openal", "mpg123", "sndfile", "vorbis", "vorbisenc", "ogg", "FLAC" }
-
 	filter "system:macosx"
+		files "discord_register_url_osx.m"
 		defines "LUA_USE_MACOSX"
 		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
@@ -61,6 +65,7 @@ local ygopro_config=function(static_core)
 	filter { "system:macosx", "options:no-irrklang" }
 		includedirs "/usr/local/opt/openal-soft/include"
 		libdirs "/usr/local/opt/openal-soft/lib"
+		links { "openal", "mpg123", "sndfile", "vorbis", "vorbisenc", "ogg", "FLAC" }
 
 	filter { "system:linux", "configurations:Debug" }
 		links { "fmtd", "curl-d" }

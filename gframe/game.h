@@ -6,6 +6,7 @@
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
+#include "discord_wrapper.h"
 #include <unordered_map>
 #include <vector>
 #include <list>
@@ -22,6 +23,7 @@
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "repo_manager.h"
+#include "server_lobby.h"
 
 namespace ygo {
 
@@ -96,6 +98,7 @@ struct DuelInfo {
 	unsigned char time_player;
 	unsigned short time_limit;
 	unsigned short time_left[2];
+	DiscordWrapper::DiscordSecret secret;
 	bool isReplaySwapped;
 };
 
@@ -150,6 +153,7 @@ public:
 	void LoadPicUrls();
 	void AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo);
 	void LoadGithubRepositories();
+	void LoadServers();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player, int type);
@@ -159,7 +163,7 @@ public:
 	void ErrorLog(const std::string& msg);
 	void ClearTextures();
 	void CloseDuelWindow();
-	void PopupMessage(const std::wstring& text);
+	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
 
 	int LocalPlayer(int player);
 	std::wstring LocalName(int local_player);
@@ -216,6 +220,7 @@ public:
 	Signal closeDoneSignal;
 	Config gameConf;
 	DuelInfo dInfo;
+	DiscordWrapper discord;
 #ifdef YGOPRO_BUILD_DLL
 	void* ocgcore;
 #endif
@@ -273,6 +278,10 @@ public:
 	uint32 showingcard;
 	bool cardimagetextureloading;
 
+	std::vector<RoomInfo> roomsVector;
+	std::vector<ServerInfo> serversVector;
+
+
 	irr::core::dimension2d<irr::u32> window_size;
 	irr::core::vector2d<irr::f32> window_scale;
 
@@ -295,6 +304,7 @@ public:
 	std::vector<Utils::IrrArchiveHelper> archives;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
+	std::wstring queued_caption;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;
@@ -349,6 +359,7 @@ public:
 	irr::gui::IGUIWindow* wCommitsLog;
 	irr::gui::IGUIContextMenu* mTopMenu;
 	irr::gui::IGUIContextMenu* mRepositoriesInfo;
+	irr::gui::IGUIButton* btnOnlineMode;
 	irr::gui::IGUIButton* btnLanMode;
 	irr::gui::IGUIButton* btnSingleMode;
 	irr::gui::IGUIButton* btnReplayMode;
@@ -378,6 +389,9 @@ public:
 	irr::gui::IGUIEditBox* ebTeam1;
 	irr::gui::IGUIEditBox* ebTeam2;
 	irr::gui::IGUIEditBox* ebBestOf;
+	irr::gui::IGUIEditBox* ebOnlineTeam1;
+	irr::gui::IGUIEditBox* ebOnlineTeam2;
+	irr::gui::IGUIEditBox* ebOnlineBestOf;
 	irr::gui::IGUIEditBox* ebStartLP;
 	irr::gui::IGUIEditBox* ebStartHand;
 	irr::gui::IGUIEditBox* ebDrawCount;
@@ -397,7 +411,10 @@ public:
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
 	irr::gui::IGUIButton* btnHostCancel;
+	irr::gui::IGUIStaticText* stHostPort;
 	irr::gui::IGUIEditBox* ebHostPort;
+	irr::gui::IGUIStaticText* stHostNotes;
+	irr::gui::IGUIEditBox* ebHostNotes;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
 	irr::gui::IGUIWindow* wHostPrepare2;
@@ -598,6 +615,28 @@ public:
 
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
+
+	//server lobby
+	bool isHostingOnline;
+	irr::gui::IGUITable* roomListTable;
+	irr::gui::IGUIStaticText* wRoomListPlaceholder;
+	irr::gui::IGUIComboBox* serverChoice;
+	irr::gui::IGUIEditBox* ebNickNameOnline;
+	irr::gui::IGUIButton* btnCreateHost2;
+	irr::gui::IGUIComboBox* cbFilterRule;
+	irr::gui::IGUIComboBox* cbFilterBanlist;
+	irr::gui::IGUIStaticText* ebRoomNameText;
+	irr::gui::IGUIEditBox* ebRoomName;
+	irr::gui::IGUICheckBox* chkShowPassword;
+	irr::gui::IGUICheckBox* chkShowActiveRooms;
+	irr::gui::IGUIButton* btnLanRefresh2;
+	irr::gui::IGUIWindow* wRoomPassword;
+	irr::gui::IGUIEditBox* ebRPName;
+	irr::gui::IGUIButton* btnFilterRelayMode;
+	irr::gui::IGUIButton* btnRPYes;
+	irr::gui::IGUIButton* btnRPNo;
+	irr::gui::IGUIButton* btnJoinHost2;
+	irr::gui::IGUIButton* btnJoinCancel2;
 };
 
 extern Game* mainGame;
@@ -704,8 +743,12 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_RENAME_REPLAY		134
 #define BUTTON_EXPORT_DECK			135
 #define EDITBOX_TEAM_COUNT			136
+#define BUTTON_BOT_START			137
+#define BUTTON_BOT_ADD				138
 #define EDITBOX_CHAT				140
 #define EDITBOX_PORT_BOX			141
+#define COMBOBOX_BOT_DECK			142
+#define EDITBOX_NICKNAME			143
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202
@@ -828,4 +871,22 @@ rect<T> Game::Scale(rect<T> rect) {
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 
 #define DECK_SEARCH_SCROLL_STEP		100
+
+#define TABLE_ROOMLIST				500
+#define BUTTON_ROOMPASSWORD_OK		501
+#define BUTTON_JOIN_HOST2			502
+#define BUTTON_JOIN_CANCEL2			503
+#define BUTTON_LAN_REFRESH2			504
+#define CHECK_LINUX_UNRANKED		505
+#define SERVER_CHOICE				506
+#define BUTTON_CREATE_HOST2			507
+#define CB_FILTER_ALLOWED_CARDS		508
+#define CB_FILTER_MATCH_MODE		509
+#define CB_FILTER_BANLIST			510
+#define EDIT_ONLINE_ROOM_NAME		511
+#define CHECK_SHOW_LOCKED_ROOMS		512
+#define CHECK_SHOW_ACTIVE_ROOMS		513
+#define BUTTON_ROOMPASSWORD_CANCEL	514
+#define BUTTON_ONLINE_MULTIPLAYER	515 //first button on main menu
+
 #endif // GAME_H

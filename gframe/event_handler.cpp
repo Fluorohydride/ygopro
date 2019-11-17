@@ -128,7 +128,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->ShowElement(mainGame->wLanWindow);
+					if(mainGame->isHostingOnline) {
+						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+					} else {
+						mainGame->ShowElement(mainGame->wLanWindow);
+					}
 					mainGame->SetMesageWindow();
 					if(exit_on_return)
 						mainGame->device->closeDevice();

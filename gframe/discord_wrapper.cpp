@@ -1,0 +1,208 @@
+#include <chrono>
+#include <cstdio>
+#include <nlohmann/json.hpp>
+#include "discord_wrapper.h"
+#include "discord_register.h"
+#include "game.h"
+#include "duelclient.h"
+
+DiscordWrapper::DiscordWrapper(): connected(false){
+}
+
+DiscordWrapper::~DiscordWrapper() {
+#ifdef DISCORD_APP_ID
+	Discord_Shutdown();
+#endif
+}
+
+bool DiscordWrapper::Initialize(path_string workingDir) {
+#ifdef DISCORD_APP_ID
+	DiscordEventHandlers handlers = {};
+	handlers.ready = OnReady;
+	handlers.disconnected = OnDisconnected;
+	handlers.errored = OnError;
+	handlers.joinGame = OnJoin;
+	handlers.spectateGame = OnSpectate;
+	handlers.joinRequest = OnJoinRequest;
+	handlers.payload = ygo::mainGame;
+#if defined(_WIN32) || defined(__linux__)
+#ifdef _WIN32
+	TCHAR exepath[MAX_PATH];
+	GetModuleFileName(nullptr, exepath, MAX_PATH);
+	path_string param = fmt::format(TEXT("{} from_discord {}"), exepath, workingDir);
+#elif defined(__linux__)
+	char buff[PATH_MAX];
+	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
+	std::string filename;
+	if (len != -1) {
+		buff[len] = '\0';
+		filename = ygo::Utils::GetFileName(buff);
+	}
+	std::string param = fmt::format("bash -c \"cd {}; ./{} from_discord\"", workingDir, filename);
+#endif //_WIN32
+	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).c_str());
+#else
+	RegisterURL(DISCORD_APP_ID);
+#endif //_WIN32
+	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
+#endif //DISCORD_APP_ID
+	return true;
+}
+
+
+
+void DiscordWrapper::UpdatePresence(PresenceType type) {
+#ifdef DISCORD_APP_ID
+	static int64_t start = 0;
+	static PresenceType presence = CLEAR;
+	static int previous_gameid = 0;
+	PresenceType previous = presence;
+	presence = type;
+	if(previous != presence)
+		start = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	if(type == CLEAR) {
+		Discord_ClearPresence();
+		return;
+	}
+	DiscordRichPresence discordPresence = {};
+	std::string presenceState;
+	std::string partyid;
+	switch(presence) {
+		case MENU: {
+			discordPresence.details = "In menu";
+			break;
+		}
+		case IN_LOBBY:
+		case DUEL:
+		case DUEL_STARTED:
+		case DECK_SIDING: {
+			if(presence == IN_LOBBY) {
+				discordPresence.details = "Hosting a Duel";
+				auto count = ygo::DuelClient::GetPlayersCount();
+				discordPresence.partySize = count.first + count.second;
+				discordPresence.partyMax = ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2;
+				//discordPresence.joinSecret = "join";
+			} else {
+				if(presence == DECK_SIDING)
+					discordPresence.details = "Side decking";
+				else
+					discordPresence.details = "Dueling";
+				discordPresence.spectateSecret = "look";
+			}
+			if(((ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2) > 2) || ygo::mainGame->dInfo.isRelay)
+				presenceState = fmt::format("{}: {} vs {}", ygo::mainGame->dInfo.isRelay ? "Relay" : "Tag", ygo::mainGame->dInfo.team1, ygo::mainGame->dInfo.team2).c_str();
+			else
+				presenceState = "1 vs 1";
+			if(ygo::mainGame->dInfo.best_of) {
+				presenceState += fmt::format(" (best of {})", ygo::mainGame->dInfo.best_of);
+			}
+			if(ygo::mainGame->dInfo.secret.game_id) {
+				partyid = fmt::format("{}{}", ygo::mainGame->dInfo.secret.game_id, ygo::mainGame->dInfo.secret.server_address);
+				discordPresence.joinSecret = CreateSecret(previous_gameid != ygo::mainGame->dInfo.secret.game_id).c_str();
+				previous_gameid = ygo::mainGame->dInfo.secret.game_id;
+			}
+			break;
+		}
+		case REPLAY: {
+			discordPresence.details = "Watching a replay";
+			break;
+		}
+		case PUZZLE: {
+			discordPresence.details = "Playing a puzzle";
+			break;
+		}
+		case DECK: {
+			discordPresence.details = "Editing a deck";
+			break;
+		}
+		case CLEAR:
+			break;
+		default:
+			break;
+	}
+	discordPresence.state = presenceState.c_str();
+	discordPresence.startTimestamp = start;
+	discordPresence.largeImageKey = "game-icon";
+	//discordPresence.smallImageKey = "game-icon";
+	discordPresence.partyId = partyid.c_str();
+	//discordPresence.joinSecret = "join";
+	Discord_UpdatePresence(&discordPresence);
+#endif
+}
+
+std::string& DiscordWrapper::CreateSecret(bool update) const {
+	static std::string string;
+	if(!update)
+		return string;
+	auto& secret = ygo::mainGame->dInfo.secret;
+	/*using fmt over nlohmann::json for an overall memory improvement as making a json object and converting that to string would be way slower than creating it with a formatted string*/
+	string = fmt::format("{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.c_str());
+	return string;
+}
+
+void DiscordWrapper::Check() {
+#ifdef DISCORD_APP_ID
+	Discord_RunCallbacks();
+#endif
+}
+
+#ifdef DISCORD_APP_ID
+void DiscordWrapper::OnReady(const DiscordUser* connectedUser, void* payload) {
+	printf("Discord: Connected to user %s#%s - %s\n",
+		   connectedUser->username,
+		   connectedUser->discriminator,
+		   connectedUser->userId);
+	std::cout << "ready at " << std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count() << std::endl;
+	std::cout << "ready at (ms) " << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() << std::endl;
+	static_cast<ygo::Game*>(payload)->discord.connected = true;
+}
+
+void DiscordWrapper::OnDisconnected(int errcode, const char * message, void* payload) {
+}
+
+void DiscordWrapper::OnError(int errcode, const char * message, void* payload) {
+}
+
+void DiscordWrapper::OnJoin(const char* secret, void* payload) {
+	auto game = static_cast<ygo::Game*>(payload);
+	if((game->is_building && game->is_siding) || game->dInfo.isInDuel || game->dInfo.isInLobby || game->dInfo.isReplay || game->wHostPrepare->isVisible())
+		return;
+	auto& host = ygo::mainGame->dInfo.secret;
+	try {
+		nlohmann::json json = nlohmann::json::parse(secret);
+		host.game_id = json["id"].get<int>();
+		host.server_address = json["addr"].get<int>();
+		host.server_port = json["port"].get<int>();
+		host.pass = json["pass"].get<std::string>();
+	}
+	catch(std::exception& e) {
+		game->ErrorLog(std::string("Exception ocurred: ") + e.what());
+		return;
+	}
+	game->isHostingOnline = true;
+	if(ygo::DuelClient::StartClient(host.server_address, host.server_port, host.game_id, false)) {
+#define HIDE_AND_CHECK(obj) if(obj->isVisible()) game->HideElement(obj);
+		HIDE_AND_CHECK(game->wMainMenu)
+		HIDE_AND_CHECK(game->wLanWindow)
+		HIDE_AND_CHECK(game->wCreateHost)
+		HIDE_AND_CHECK(game->wReplay)
+		HIDE_AND_CHECK(game->wSinglePlay)
+		HIDE_AND_CHECK(game->wDeckEdit)
+		HIDE_AND_CHECK(game->wRules)
+		HIDE_AND_CHECK(game->wCustomRules)
+		HIDE_AND_CHECK(game->wRoomListPlaceholder)
+		if(game->is_building)
+			game->deckBuilder.Terminate();
+		game->device->setEventReceiver(&game->menuHandler);
+#undef HIDE_AND_CHECK
+	}
+}
+
+void DiscordWrapper::OnSpectate(const char * secret, void* payload) {
+}
+
+void DiscordWrapper::OnJoinRequest(const DiscordUser* request, void* payload) {
+	printf("%s", request->userId);
+	Discord_Respond(request->userId, DISCORD_REPLY_YES);
+}
+#endif

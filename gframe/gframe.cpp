@@ -10,6 +10,7 @@
 
 int enable_log = 0;
 bool exit_on_return = false;
+bool is_from_discord = false;
 bool open_file = false;
 path_string open_file_name = TEXT("");
 
@@ -34,24 +35,38 @@ int main(int argc, char* argv[]) {
 #endif
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+	CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
 	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
 	CFRelease(bundle_url);
 	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
 	CFRelease(bundle_base_url);
+#ifdef MAC_OS_DISCORD_LAUNCHER
+	system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+#endif
 	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
 	CFRelease(path);
+	CFRelease(bundle_path);
 #endif //__APPLE__
-#if defined(_WIN32) && !defined(_DEBUG)
-	if(argc == 2) {
-		auto extension = ygo::Utils::GetFileExtension(argv[1]);
-		if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
-			fschar_t exepath[MAX_PATH];
-			GetModuleFileName(NULL, exepath, MAX_PATH);
-			auto path = ygo::Utils::GetFilePath(exepath);
-			SetCurrentDirectory(path.c_str());
+	if(argc >= 2) {
+		if(argv[1] == path_string(TEXT("from_discord"))) {
+			is_from_discord = true;
+#if defined(_WIN32)
+			SetCurrentDirectory(argv[2]);
+#if !defined(_DEBUG)
+		} else {
+			auto extension = ygo::Utils::GetFileExtension(argv[1]);
+			if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
+				fschar_t exepath[MAX_PATH];
+				GetModuleFileName(NULL, exepath, MAX_PATH);
+				std::wcout << exepath << std::endl;
+				auto path = ygo::Utils::GetFilePath(exepath);
+				std::wcout << path << std::endl;
+				SetCurrentDirectory(path.c_str());
+			}
+#endif //_DEBUG
+#endif //_WIN32
 		}
 	}
-#endif //_WIN32 && !_DEBUG
 #ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;

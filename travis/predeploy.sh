@@ -30,6 +30,13 @@ function bundle_if_exists {
         cp gframe/ygopro.icns deploy/$1.app/Contents/Resources/edopro.icns
         defaults write "$PWD/deploy/$1.app/Contents/Info.plist" "CFBundleIconFile" "edopro.icns"
         defaults write "$PWD/deploy/$1.app/Contents/Info.plist" "CFBundleIdentifier" "io.github.edo9300.$1"
+
+        if [[ -f bin/$BUILD_CONFIG/discord-launcher ]]; then
+            mkdir -p deploy/$1.app/Contents/MacOS/discord-launcher.app/Contents/MacOS
+            # Binary is named correctly and does not require external dylibs
+            cp bin/$BUILD_CONFIG/discord-launcher deploy/$1.app/Contents/MacOS/discord-launcher.app/Contents/MacOS
+            defaults write "$PWD/deploy/$1.app/Contents/MacOS/discord-launcher.app/Contents/Info.plist" "CFBundleIdentifier" "io.github.edo9300.$1.discord"
+        fi
     fi
 }
 
@@ -49,6 +56,7 @@ if [[ "$PLATFORM" == "linux" ]]; then
 fi
 if [[ "$PLATFORM" == "osx" ]]; then
 	copy_if_exists libocgcore.dylib
+    strip_if_exists discord-launcher
 	strip_if_exists ygopro.app
 	bundle_if_exists ygopro
 	strip_if_exists ygoprodll.app

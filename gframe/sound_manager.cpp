@@ -21,30 +21,30 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 #ifdef IRRKLANG_STATIC
 		irrklang::ikpMP3Init(soundEngine);
 #endif
-        sfxVolume = sounds_volume;
+		sfxVolume = sounds_volume;
 		bgmVolume = music_volume;
-        return true;
+		return true;
 	}
 #else
-    try {
-        openal = std::make_unique<YGOpen::OpenALSingleton>();
-        sfx = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
-        bgm = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
-        sfx->setVolume(sounds_volume);
-        bgm->setVolume(music_volume);
-        return true;
-    }
-    catch (std::runtime_error& e) {
-        return soundsEnabled = musicEnabled = false;
-    }
+	try {
+		openal = std::make_unique<YGOpen::OpenALSingleton>();
+		sfx = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
+		bgm = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
+		sfx->setVolume(sounds_volume);
+		bgm->setVolume(music_volume);
+		return true;
+	}
+	catch (std::runtime_error& e) {
+		return soundsEnabled = musicEnabled = false;
+	}
 #endif // YGOPRO_USE_IRRKLANG
 }
 SoundManager::~SoundManager() {
 #ifdef YGOPRO_USE_IRRKLANG
-    if (soundBGM)
-        soundBGM->drop();
-    if (soundEngine)
-        soundEngine->drop();
+	if (soundBGM)
+		soundBGM->drop();
+	if (soundEngine)
+		soundEngine->drop();
 #endif
 }
 void SoundManager::RefreshBGMList() {
@@ -82,56 +82,56 @@ void SoundManager::RefreshChantsList() {
 	}
 }
 void SoundManager::PlaySoundEffect(SFX sound) {
-    static const std::map<SFX, const char*> fx = {
-        {SUMMON, "./sound/summon.wav"},
-        {SPECIAL_SUMMON, "./sound/specialsummon.wav"},
-        {ACTIVATE, "./sound/activate.wav"},
-        {SET, "./sound/set.wav"},
-        {FLIP, "./sound/flip.wav"},
-        {REVEAL, "./sound/reveal.wav"},
-        {EQUIP, "./sound/equip.wav"},
-        {DESTROYED, "./sound/destroyed.wav"},
-        {BANISHED, "./sound/banished.wav"},
-        {TOKEN, "./sound/token.wav"},
-        {ATTACK, "./sound/attack.wav"},
-        {DIRECT_ATTACK, "./sound/directattack.wav"},
-        {DRAW, "./sound/draw.wav"},
-        {SHUFFLE, "./sound/shuffle.wav"},
-        {DAMAGE, "./sound/damage.wav"},
-        {RECOVER, "./sound/gainlp.wav"},
-        {COUNTER_ADD, "./sound/addcounter.wav"},
-        {COUNTER_REMOVE, "./sound/removecounter.wav"},
-        {COIN, "./sound/coinflip.wav"},
-        {DICE, "./sound/diceroll.wav"},
-        {NEXT_TURN, "./sound/nextturn.wav"},
-        {PHASE, "./sound/phase.wav"},
-        {PLAYER_ENTER, "./sound/playerenter.wav"},
-        {CHAT, "./sound/chatmessage.wav"}
-    };
-    if (!soundsEnabled) return;
+	static const std::map<SFX, const char*> fx = {
+		{SUMMON, "./sound/summon.wav"},
+		{SPECIAL_SUMMON, "./sound/specialsummon.wav"},
+		{ACTIVATE, "./sound/activate.wav"},
+		{SET, "./sound/set.wav"},
+		{FLIP, "./sound/flip.wav"},
+		{REVEAL, "./sound/reveal.wav"},
+		{EQUIP, "./sound/equip.wav"},
+		{DESTROYED, "./sound/destroyed.wav"},
+		{BANISHED, "./sound/banished.wav"},
+		{TOKEN, "./sound/token.wav"},
+		{ATTACK, "./sound/attack.wav"},
+		{DIRECT_ATTACK, "./sound/directattack.wav"},
+		{DRAW, "./sound/draw.wav"},
+		{SHUFFLE, "./sound/shuffle.wav"},
+		{DAMAGE, "./sound/damage.wav"},
+		{RECOVER, "./sound/gainlp.wav"},
+		{COUNTER_ADD, "./sound/addcounter.wav"},
+		{COUNTER_REMOVE, "./sound/removecounter.wav"},
+		{COIN, "./sound/coinflip.wav"},
+		{DICE, "./sound/diceroll.wav"},
+		{NEXT_TURN, "./sound/nextturn.wav"},
+		{PHASE, "./sound/phase.wav"},
+		{PLAYER_ENTER, "./sound/playerenter.wav"},
+		{CHAT, "./sound/chatmessage.wav"}
+	};
+	if (!soundsEnabled) return;
 #ifdef YGOPRO_USE_IRRKLANG
-    if (soundEngine) {
+	if (soundEngine) {
 		auto sfx = soundEngine->play2D(fx.at(sound), false, true);
 		sfx->setVolume(sfxVolume);
 		sfx->setIsPaused(false);
 	}
 #else
-    if (sfx) sfx->play(fx.at(sound), false);
+	if (sfx) sfx->play(fx.at(sound), false);
 #endif
 }
 void SoundManager::PlayMusic(const std::string& song, bool loop) {
 	if(!musicEnabled) return;
 #ifdef YGOPRO_USE_IRRKLANG
 	if(!soundBGM || soundBGM->getSoundSource()->getName() != song) {
-        StopBGM();
+		StopBGM();
 		if (soundEngine) {
 			soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
 			soundBGM->setVolume(bgmVolume);
 		}
 	}
 #else
-    StopBGM();
-    if (bgm) bgmCurrent = bgm->play(song, loop);
+	StopBGM();
+	if (bgm) bgmCurrent = bgm->play(song, loop);
 #endif
 }
 void SoundManager::PlayBGM(BGM scene) {
@@ -156,7 +156,7 @@ void SoundManager::StopBGM() {
 		soundBGM = nullptr;
 	}
 #else
-    bgm->stopAll();
+	bgm->stopAll();
 #endif
 }
 bool SoundManager::PlayChant(unsigned int code) {
@@ -168,7 +168,7 @@ bool SoundManager::PlayChant(unsigned int code) {
 			chant->setIsPaused(false);
 		}
 #else
-        if (bgm) bgm->play("./sound/chants/" + ChantsList[code], false);
+		if (bgm) bgm->play("./sound/chants/" + ChantsList[code], false);
 #endif
 		return true;
 	}
@@ -178,7 +178,7 @@ void SoundManager::SetSoundVolume(double volume) {
 #ifdef YGOPRO_USE_IRRKLANG
 	sfxVolume = volume;
 #else
-    if (sfx) sfx->setVolume(volume);
+	if (sfx) sfx->setVolume(volume);
 #endif
 }
 void SoundManager::SetMusicVolume(double volume) {
@@ -186,7 +186,7 @@ void SoundManager::SetMusicVolume(double volume) {
 	if (soundBGM) soundBGM->setVolume(volume);
 	bgmVolume = volume;
 #else
-    if (bgm) bgm->setVolume(volume);
+	if (bgm) bgm->setVolume(volume);
 #endif
 }
 void SoundManager::EnableSounds(bool enable) {
@@ -203,9 +203,9 @@ void SoundManager::EnableMusic(bool enable) {
 			soundBGM = nullptr;
 		}
 #else
-        StopBGM();
+		StopBGM();
 #endif
-    }
+	}
 }
 
 } // namespace ygo

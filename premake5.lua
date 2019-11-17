@@ -26,6 +26,11 @@ newoption {
 	value = "path",
 	description = "Path to vcpkg installation"
 }
+newoption {
+	trigger = "discord",
+	value = "app_id_token",
+	description = "Discord App ID for rich presence"
+}
 workspace "ygo"
 	location "build"
 	language "C++"
@@ -86,6 +91,9 @@ workspace "ygo"
 	if os.istarget("windows") then
 		include "freetype"
 		include "irrlicht"
+	end
+	if os.istarget("macosx") and _OPTIONS["discord"] then
+		include "discord-launcher"
 	end
 
 local function vcpkgStaticTriplet(prj)

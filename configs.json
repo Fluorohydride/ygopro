@@ -17,6 +17,15 @@
         "should_update" : false
     }
 	],
+	"servers": [
+	{
+		"name" : "localhost",
+		"address" : "127.0.0.1",
+		"roomaddress" : "127.0.0.1",
+		"roomlistport" : 7922,
+		"duelport" : 7911
+	}
+	],
 	"urls": [
 	{
 		"url" : "default",

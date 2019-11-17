@@ -9,3 +9,4 @@ curl --retry 5 --connect-timeout 30 --location --remote-header-name --output cac
 cp -r irrlicht/include /usr/local/include/irrlicht
 cp irrlicht/lib/* /usr/local/lib
 sudo cp -r libevent/ /usr/local/opt/libevent
+cp discord-rpc/lib/* /usr/local/lib
