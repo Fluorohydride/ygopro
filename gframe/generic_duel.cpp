@@ -1348,6 +1348,7 @@ void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 		ITERATE_PLAYERS(NetServer::ReSendToPlayer(dueler.player);)
 		ReplayPacket p((char*)wbuf, 3);
 		sd->replay_stream.push_back(p);
+		sd->match_result.push_back(1 - player);
 		sd->EndDuel();
 		sd->DuelEndProc();
 		event_del(sd->etimer);
