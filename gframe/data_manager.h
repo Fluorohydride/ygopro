@@ -26,7 +26,7 @@ public:
 	std::wstring GetName(int code);
 	std::wstring GetText(int code);
 	std::wstring GetDesc(u64 strCode);
-	std::wstring GetSysString(int code);
+	std::wstring GetSysString(u64 code);
 	std::wstring GetVictoryString(int code);
 	std::wstring GetCounterName(int code);
 	std::wstring GetSetName(int code);
