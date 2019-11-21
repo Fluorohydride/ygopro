@@ -155,9 +155,18 @@ std::wstring DataManager::GetText(int code) {
 		return unknown_string;
 	return csit->second.text;
 }
-std::wstring DataManager::GetDesc(u64 strCode) {
-	u32 code = strCode >> 32;
-	u32 stringid = strCode & 0xffffffff;
+std::wstring DataManager::GetDesc(u64 strCode, bool compat) {
+	u32 code = 0;
+	u32 stringid = 0;
+	if(compat) {
+		if(strCode < 10000)
+			return GetSysString(strCode);
+		code = strCode >> 4;
+		stringid = strCode & 0xf;
+	} else {
+		code = strCode >> 32;
+		stringid = strCode & 0xffffffff;
+	}
 	if(code == 0)
 		return GetSysString(stringid);
 	auto csit = _strings.find(code);
@@ -167,7 +176,7 @@ std::wstring DataManager::GetDesc(u64 strCode) {
 }
 std::wstring DataManager::GetSysString(u64 code) {
 	if(code >> 32)
-		return GetDesc(code);
+		return unknown_string;
 	auto csit = _sysStrings.find(code);
 	if(csit == _sysStrings.end() || csit->second.empty())
 		return unknown_string;

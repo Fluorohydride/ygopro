@@ -257,7 +257,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionn->setVisible(true);
 				if(selected_option == 0)
 					mainGame->btnOptionp->setVisible(false);
-				mainGame->stOptions->setText(dataManager.GetDesc(select_options[selected_option]).c_str());
+				mainGame->stOptions->setText(dataManager.GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).c_str());
 				break;
 			}
 			case BUTTON_OPTION_NEXT: {
@@ -265,7 +265,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionp->setVisible(true);
 				if(selected_option == select_options.size() - 1)
 					mainGame->btnOptionn->setVisible(false);
-				mainGame->stOptions->setText(dataManager.GetDesc(select_options[selected_option]).c_str());
+				mainGame->stOptions->setText(dataManager.GetDesc(select_options[selected_option], mainGame->dInfo.compat_mode).c_str());
 				break;
 			}
 			case BUTTON_OPTION_0:
@@ -618,7 +618,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							}
 							mainGame->HideElement(mainGame->wCardSelect, true);
 						} else {
-							mainGame->stOptions->setText(dataManager.GetDesc(select_options[0]).c_str());
+							mainGame->stOptions->setText(dataManager.GetDesc(select_options[0], mainGame->dInfo.compat_mode).c_str());
 							selected_option = 0;
 							mainGame->wCardSelect->setVisible(false);
 							ShowSelectOption();
@@ -813,7 +813,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_OPTION_SELECT: {
 				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
 				for(int i = 0; i < 5; i++) {
-					mainGame->btnOption[i]->setText(dataManager.GetDesc(select_options[i + step]).c_str());
+					mainGame->btnOption[i]->setText(dataManager.GetDesc(select_options[i + step], mainGame->dInfo.compat_mode).c_str());
 				}
 
 				break;
@@ -1525,7 +1525,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(fmt::format(L"\n{}{}", dataManager.GetSysString(215), mcard->chValue));
 							}
 							for(auto iter = mcard->desc_hints.begin(); iter != mcard->desc_hints.end(); ++iter) {
-								str.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first)));
+								str.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first, mainGame->dInfo.compat_mode)));
 							}
 							should_show_tip = true;
 							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
@@ -1548,7 +1548,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						player_name = mainGame->dInfo.clientname[mainGame->dInfo.current_player[mplayer]];
 					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
 					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {
-						player_name.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first)));
+						player_name.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first, mainGame->dInfo.compat_mode)));
 					}
 					should_show_tip = true;
 					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(player_name.c_str()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));

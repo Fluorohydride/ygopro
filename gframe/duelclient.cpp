@@ -1058,12 +1058,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			return true;
 		switch (type) {
 		case HINT_EVENT: {
-			event_string = dataManager.GetDesc(data);
+			event_string = dataManager.GetDesc(data, mainGame->dInfo.compat_mode);
 			break;
 		}
 		case HINT_MESSAGE: {
 			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(dataManager.GetDesc(data).c_str());
+			mainGame->stMessage->setText(dataManager.GetDesc(data, mainGame->dInfo.compat_mode).c_str());
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();
@@ -1075,7 +1075,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_OPSELECTED: {
-			std::wstring text(fmt::sprintf(dataManager.GetSysString(1510), dataManager.GetDesc(data)));
+			std::wstring text(fmt::sprintf(dataManager.GetSysString(1510), dataManager.GetDesc(data, mainGame->dInfo.compat_mode)));
 			mainGame->AddLog(text);
 			mainGame->gMutex.lock();
 			mainGame->stACMessage->setText(text.c_str());
@@ -1455,10 +1455,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			text = fmt::format(L"{}\n{}\n{}", event_string,
 				fmt::sprintf(dataManager.GetSysString(221), dataManager.FormatLocation(info.location, info.sequence), dataManager.GetName(code)),
 				dataManager.GetSysString(223));
-		} else if(desc < 2048) {
-			text = fmt::sprintf(dataManager.GetSysString(desc), dataManager.GetName(code));
 		} else {
-			text = fmt::sprintf(dataManager.GetDesc(desc), dataManager.GetName(code));
+			text = fmt::sprintf(dataManager.GetDesc(desc, mainGame->dInfo.compat_mode), dataManager.GetName(code));
 		}
 		mainGame->gMutex.lock();
 		mainGame->stQMessage->setText(text.c_str());
@@ -1471,7 +1469,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		u64 desc = COMPAT_READ(int32_t, int64_t, pbuf);
 		mainGame->dField.highlighting_card = 0;
 		mainGame->gMutex.lock();
-		mainGame->stQMessage->setText((wchar_t*)dataManager.GetDesc(desc).c_str());
+		mainGame->stQMessage->setText((wchar_t*)dataManager.GetDesc(desc, mainGame->dInfo.compat_mode).c_str());
 		mainGame->PopupElement(mainGame->wQuery);
 		mainGame->gMutex.unlock();
 		return false;
@@ -1521,7 +1519,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				panelmode = true;
 		}
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
-		std::wstring text = fmt::sprintf(L"%ls(%d-%d)", dataManager.GetDesc(select_hint ? select_hint : 560).c_str(),
+		std::wstring text = fmt::sprintf(L"%ls(%d-%d)", dataManager.GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode).c_str(),
 			mainGame->dField.select_min, mainGame->dField.select_max);
 		select_hint = 0;
 		if (panelmode) {
@@ -1600,7 +1598,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				panelmode = true;
 		}
 		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
-		std::wstring text = fmt::sprintf(L"%ls(%d-%d)", dataManager.GetDesc(select_hint ? select_hint : 560).c_str(),
+		std::wstring text = fmt::sprintf(L"%ls(%d-%d)", dataManager.GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode).c_str(),
 			mainGame->dField.select_min, mainGame->dField.select_max);
 		select_hint = 0;
 		if (panelmode) {
@@ -1732,9 +1730,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (select_hint) {
 				text = fmt::sprintf(dataManager.GetSysString(569), dataManager.GetName(select_hint));
 			} else
-				text = dataManager.GetDesc(560);
+				text = dataManager.GetDesc(560, mainGame->dInfo.compat_mode);
 		} else
-			text = dataManager.GetDesc(select_hint ? select_hint : 570);
+			text = dataManager.GetDesc(select_hint ? select_hint : 570, mainGame->dInfo.compat_mode);
 		select_hint = 0;
 		mainGame->stHintMsg->setText(text.c_str());
 		mainGame->stHintMsg->setVisible(true);
@@ -1870,7 +1868,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_selectable = true;
 		}
 		mainGame->gMutex.lock();
-		mainGame->stHintMsg->setText(fmt::sprintf(L"%ls(%d-%d)", dataManager.GetDesc(select_hint ? select_hint : 531), mainGame->dField.select_min, mainGame->dField.select_max).c_str());
+		mainGame->stHintMsg->setText(fmt::sprintf(L"%ls(%d-%d)", dataManager.GetDesc(select_hint ? select_hint : 531, mainGame->dInfo.compat_mode), mainGame->dField.select_min, mainGame->dField.select_max).c_str());
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dField.select_cancelable) {
 			mainGame->dField.ShowCancelOrFinishButton(1);
@@ -1947,7 +1945,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.selectsum_all.push_back(pcard);
 		}
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
-		std::wstring text = fmt::sprintf(L"%ls(%d)", dataManager.GetDesc(select_hint ? select_hint : 560), mainGame->dField.select_sumval);
+		std::wstring text = fmt::sprintf(L"%ls(%d)", dataManager.GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode), mainGame->dField.select_sumval);
 		select_hint = 0;
 		mainGame->wCardSelect->setText(text.c_str());
 		mainGame->stHintMsg->setText(text.c_str());
@@ -3438,7 +3436,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else mainGame->chkRace[i]->setVisible(false);
 		}
 		mainGame->gMutex.lock();
-		mainGame->wANRace->setText(dataManager.GetDesc(select_hint ? select_hint : 563).c_str());
+		mainGame->wANRace->setText(dataManager.GetDesc(select_hint ? select_hint : 563, mainGame->dInfo.compat_mode).c_str());
 		mainGame->PopupElement(mainGame->wANRace);
 		mainGame->gMutex.unlock();
 		select_hint = 0;
@@ -3455,7 +3453,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else mainGame->chkAttribute[i]->setVisible(false);
 		}
 		mainGame->gMutex.lock();
-		mainGame->wANAttribute->setText(dataManager.GetDesc(select_hint ? select_hint : 562).c_str());
+		mainGame->wANAttribute->setText(dataManager.GetDesc(select_hint ? select_hint : 562, mainGame->dInfo.compat_mode).c_str());
 		mainGame->PopupElement(mainGame->wANAttribute);
 		mainGame->gMutex.unlock();
 		select_hint = 0;
@@ -3469,7 +3467,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.declare_opcodes.push_back(COMPAT_READ(int32_t, int64_t, pbuf));
 		mainGame->gMutex.lock();
 		mainGame->ebANCard->setText(L"");
-		mainGame->wANCard->setText(dataManager.GetDesc(select_hint ? select_hint : 564).c_str());
+		mainGame->wANCard->setText(dataManager.GetDesc(select_hint ? select_hint : 564, mainGame->dInfo.compat_mode).c_str());
 		mainGame->dField.UpdateDeclarableList();
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.unlock();
@@ -3486,7 +3484,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->cbANNumber->addItem(fmt::format(L" {}", value).c_str(), value);
 		}
 		mainGame->cbANNumber->setSelected(0);
-		mainGame->wANNumber->setText(dataManager.GetDesc(select_hint ? select_hint : 565).c_str());
+		mainGame->wANNumber->setText(dataManager.GetDesc(select_hint ? select_hint : 565, mainGame->dInfo.compat_mode).c_str());
 		mainGame->PopupElement(mainGame->wANNumber);
 		mainGame->gMutex.unlock();
 		select_hint = 0;
@@ -3710,7 +3708,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			uint32_t opts = BufferIO::Read<uint32_t>(pbuf);
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts, 1);
-			mainGame->dInfo.extraval = opts & SPEED_DUEL;
+			mainGame->dInfo.extraval = opts & DUEL_SPEED;
 		}
 		mainGame->SetPhaseButtons();
 		int val = 0;

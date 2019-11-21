@@ -556,13 +556,13 @@ void ClientField::ShowSelectOption(int select_hint) {
 	bool quickmode = true;// (count <= 5);
 	mainGame->gMutex.lock();
 	for(auto option : select_options) {
-		if(mainGame->guiFont->getDimension(dataManager.GetDesc(option)).Width > 310) {
+		if(mainGame->guiFont->getDimension(dataManager.GetDesc(option, mainGame->dInfo.compat_mode)).Width > 310) {
 			quickmode = false;
 			break;
 		}
 	}
 	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
-		mainGame->btnOption[i]->setText(dataManager.GetDesc(select_options[i]).c_str());
+		mainGame->btnOption[i]->setText(dataManager.GetDesc(select_options[i], mainGame->dInfo.compat_mode).c_str());
 	recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(375);
@@ -584,7 +584,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
 		mainGame->wOptions->setRelativePosition(pos);
 	} else {
-		mainGame->stOptions->setText(dataManager.GetDesc(select_options[0]).c_str());
+		mainGame->stOptions->setText(dataManager.GetDesc(select_options[0], mainGame->dInfo.compat_mode).c_str());
 		mainGame->stOptions->setVisible(true);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(count > 1);
@@ -594,7 +594,7 @@ void ClientField::ShowSelectOption(int select_hint) {
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + mainGame->Scale(140);
 		mainGame->wOptions->setRelativePosition(pos);
 	}
-	mainGame->wOptions->setText(dataManager.GetDesc(select_hint ? select_hint : 555).c_str());
+	mainGame->wOptions->setText(dataManager.GetDesc(select_hint ? select_hint : 555, mainGame->dInfo.compat_mode).c_str());
 	mainGame->PopupElement(mainGame->wOptions);
 	mainGame->gMutex.unlock();
 }
