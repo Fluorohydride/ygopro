@@ -644,14 +644,14 @@ extern Game* mainGame;
 template<typename T>
 inline std::vector<T> Game::TokenizeString(const T& input, const T& token) {
 	std::vector<T> res;
-	T::size_type pos1, pos2 = 0;
+	typename T::size_type pos1, pos2 = 0;
 	while((pos1 = input.find(token, pos2)) != T::npos) {
 		if(pos1 != pos2)
-			res.push_back(input.substr(pos2, pos1));
+			res.emplace_back(input.begin() + pos2, input.begin() + pos1);
 		pos2 = pos1 + 1;
 	}
-	if(pos2 != pos1)
-		res.push_back(input.substr(pos2, pos1));
+	if(pos2 != input.size())
+		res.emplace_back(input.begin() + pos2, input.end());
 	return res;
 }
 
