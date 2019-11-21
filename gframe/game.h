@@ -199,7 +199,7 @@ public:
 	void SetCentered(irr::gui::IGUIElement* elem);
 	void ValidateName(irr::gui::IGUIElement* box);
 	template<typename T>
-	static std::vector<T> TokenizeString(T input, const T& token);
+	static std::vector<T> TokenizeString(const T& input, const T& token);
 	static std::wstring StringtoUpper(std::wstring input);
 	static bool CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input = false, bool transform_token = false);
 	static bool CompareStrings(std::wstring input, std::wstring second_term, bool transform_input = false, bool transform_term = false);
@@ -642,16 +642,16 @@ public:
 extern Game* mainGame;
 
 template<typename T>
-inline std::vector<T> Game::TokenizeString(T input, const T & token) {
+inline std::vector<T> Game::TokenizeString(const T& input, const T& token) {
 	std::vector<T> res;
-	std::size_t pos;
-	while((pos = input.find(token)) != T::npos) {
-		if(pos != 0)
-			res.push_back(input.substr(0, pos));
-		input = input.substr(pos + 1);
+	T::size_type pos1, pos2 = 0;
+	while((pos1 = input.find(token, pos2)) != T::npos) {
+		if(pos1 != pos2)
+			res.push_back(input.substr(pos2, pos1));
+		pos2 = pos1 + 1;
 	}
-	if(input.size())
-		res.push_back(input);
+	if(pos2 != pos1)
+		res.push_back(input.substr(pos2, pos1));
 	return res;
 }
 
