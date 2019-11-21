@@ -1436,7 +1436,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_SELECT_EFFECTYN: {
 		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info.controler = mainGame->LocalPlayer(info.controler);
 		ClientCard* pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
 		if (pcard->code != code)
@@ -1499,7 +1499,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
 			code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
 			if ((info.location & LOCATION_OVERLAY) > 0)
 				pcard = mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
@@ -1556,7 +1556,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ClientCard* pcard;
 		for (int i = 0; i < count1; ++i) {
 			code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
 			if ((info.location & LOCATION_OVERLAY) > 0)
 				pcard = mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
@@ -1578,7 +1578,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int count2 = COMPAT_READ(int8_t, int32_t, pbuf);
 		for (int i = count1; i < count1 + count2; ++i) {
 			code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
 			if ((info.location & LOCATION_OVERLAY) > 0)
 				pcard = mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
@@ -1640,7 +1640,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		for (int i = 0; i < count; ++i) {
 			int flag = BufferIO::Read<uint8_t>(pbuf);
 			code = BufferIO::Read<int32_t>(pbuf);
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
 			desc = COMPAT_READ(int32_t, int64_t, pbuf);
 			pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence, info.position);
@@ -2357,7 +2357,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ClientCard* swp;
 		int ps;
 		for (int i = 0; i < count; ++i) {
-			CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			previous.controler = mainGame->LocalPlayer(previous.controler);
 			mc[i] = lst[previous.controler][previous.sequence];
 			mc[i]->SetCode(0);
@@ -2372,7 +2372,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->WaitFrameSignal(20);
 		for (int i = 0; i < count; ++i) {
-			CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			previous.controler = mainGame->LocalPlayer(previous.controler);
 			ps = mc[i]->sequence;
 			if (previous.location > 0) {
@@ -2477,9 +2477,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_MOVE: {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		previous.controler = mainGame->LocalPlayer(previous.controler);
-		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		current.controler = mainGame->LocalPlayer(current.controler);
 		int reason = BufferIO::Read<int32_t>(pbuf);
 		if (reason & REASON_DESTROY && previous.location != current.location)
@@ -2712,16 +2712,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_SET: {
 		PLAY_SOUND(SoundManager::SFX::SET);
 		/*int code = */BufferIO::Read<int32_t>(pbuf);
-		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
+		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		event_string = dataManager.GetSysString(1601);
 		return true;
 	}
 	case MSG_SWAP: {
 		/*int code1 = */BufferIO::Read<int32_t>(pbuf);
-		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info1.controler = mainGame->LocalPlayer(info1.controler);
 		/*int code2 = */BufferIO::Read<int32_t>(pbuf);
-		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info2.controler = mainGame->LocalPlayer(info2.controler);
 		event_string = dataManager.GetSysString(1602);
 		ClientCard* pc1 = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
@@ -2757,7 +2757,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SUMMONING: {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
+		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		if(!mainGame->soundManager->PlayChant(code))
 			PLAY_SOUND(SoundManager::SFX::SUMMON);
 		if(!mainGame->dInfo.isCatchingUp) {
@@ -2778,7 +2778,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SPSUMMONING: {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf);
+		/*CoreUtils::loc_info info = */CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		if(!mainGame->soundManager->PlayChant(code))
 			PLAY_SOUND(SoundManager::SFX::SPECIAL_SUMMON);
 		if(!mainGame->dInfo.isCatchingUp) {
@@ -2798,7 +2798,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_FLIPSUMMONING: {
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info.controler = mainGame->LocalPlayer(info.controler);
 		if(!mainGame->soundManager->PlayChant(code))
 			PLAY_SOUND(SoundManager::SFX::FLIP);
@@ -2826,7 +2826,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_CHAINING: {
 		PLAY_SOUND(SoundManager::SFX::ACTIVATE);
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int cl = BufferIO::Read<uint8_t>(pbuf);
 		int cs = COMPAT_READ(int8_t, int32_t, pbuf);
@@ -2948,7 +2948,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		ClientCard* pcards[10];
 		for (int i = 0; i < count; ++i) {
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
 			if ((info.location & LOCATION_OVERLAY) > 0)
 				pcards[i] = mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
@@ -2968,7 +2968,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			return true;
 		}
 		for (int i = 0; i < count; ++i) {
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			ClientCard* pcard = mainGame->dField.GetCard(mainGame->LocalPlayer(info.controler), info.location, info.sequence);
 			pcard->is_highlighting = true;
 			mainGame->dField.current_chain.target.insert(pcard);
@@ -3085,8 +3085,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_EQUIP: {
 		PLAY_SOUND(SoundManager::SFX::EQUIP);
-		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
-		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
+		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		ClientCard* pc1 = mainGame->dField.GetCard(mainGame->LocalPlayer(info1.controler), info1.location, info1.sequence);
 		ClientCard* pc2 = mainGame->dField.GetCard(mainGame->LocalPlayer(info2.controler), info2.location, info2.sequence);
 		if(mainGame->dInfo.isCatchingUp) {
@@ -3130,7 +3130,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_UNEQUIP: {
-		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		ClientCard* pc = mainGame->dField.GetCard(mainGame->LocalPlayer(info.controler), info.location, info.sequence);
 		if(mainGame->dInfo.isCatchingUp) {
 			pc->equipTarget->equipped.erase(pc);
@@ -3148,8 +3148,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_CARD_TARGET: {
-		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
-		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
+		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		ClientCard* pc1 = mainGame->dField.GetCard(mainGame->LocalPlayer(info1.controler), info1.location, info1.sequence);
 		ClientCard* pc2 = mainGame->dField.GetCard(mainGame->LocalPlayer(info2.controler), info2.location, info2.sequence);
 		if(mainGame->dInfo.isCatchingUp) {
@@ -3168,8 +3168,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		break;
 	}
 	case MSG_CANCEL_TARGET: {
-		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
-		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
+		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		ClientCard* pc1 = mainGame->dField.GetCard(mainGame->LocalPlayer(info1.controler), info1.location, info1.sequence);
 		ClientCard* pc2 = mainGame->dField.GetCard(mainGame->LocalPlayer(info2.controler), info2.location, info2.sequence);
 		if(mainGame->dInfo.isCatchingUp) {
@@ -3260,10 +3260,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_ATTACK: {
 		PLAY_SOUND(SoundManager::SFX::ATTACK);
-		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info1.controler = mainGame->LocalPlayer(info1.controler);
 		mainGame->dField.attacker = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
-		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info2.controler = mainGame->LocalPlayer(info2.controler);
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
@@ -3305,12 +3305,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_BATTLE: {
-		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info1.controler = mainGame->LocalPlayer(info1.controler);
 		int aatk = BufferIO::Read<int32_t>(pbuf);
 		int adef = BufferIO::Read<int32_t>(pbuf);
 		/*int da = */BufferIO::Read<uint8_t>(pbuf);
-		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info2.controler = mainGame->LocalPlayer(info2.controler);
 		int datk = BufferIO::Read<int32_t>(pbuf);
 		int ddef = BufferIO::Read<int32_t>(pbuf);
@@ -3352,7 +3352,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_MISSED_EFFECT: {
-		CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
 		mainGame->AddLog(fmt::sprintf(dataManager.GetSysString(1622), dataManager.GetName(code)), code);
 		return true;
@@ -3491,7 +3491,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return false;
 	}
 	case MSG_CARD_HINT: {
-		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		int chtype = BufferIO::Read<uint8_t>(pbuf);
 		u64 value = COMPAT_READ(int32_t, int64_t, pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(mainGame->LocalPlayer(info.controler), info.location, info.sequence);
@@ -3547,7 +3547,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(count > 0) {
 			std::vector<ClientCard*> cards;
 			for(int i = 0; i < count; i++) {
-				CoreUtils::loc_info loc = CoreUtils::ReadLocInfo(pbuf);
+				CoreUtils::loc_info loc = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 				ClientCard* pcard = nullptr;
 				if(loc.location & LOCATION_OVERLAY) {
 					auto olcard = mainGame->dField.GetCard(loc.controler, (loc.location & (~LOCATION_OVERLAY)) & 0xff, loc.sequence);
@@ -3779,7 +3779,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!mainGame->dInfo.isSingleMode) {
 			for(int i = 0; i < val; ++i) {
 				unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
-				CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+				CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 				info.controler = mainGame->LocalPlayer(info.controler);
 				int cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 				int cl = BufferIO::Read<uint8_t>(pbuf);

@@ -280,6 +280,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		case MSG_ANNOUNCE_ATTRIB:
 		case MSG_ANNOUNCE_CARD:
 		case MSG_ANNOUNCE_NUMBER: {
+			record = false;
 			if(!ANALYZE) {
 				singleSignal.Reset();
 				singleSignal.Wait();
@@ -295,23 +296,23 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_SHUFFLE_DECK: {
 			player = BufferIO::Read<uint8_t>(pbuf);
-			SinglePlayRefresh(player, LOCATION_DECK, 0x181fff);
+			SinglePlayRefresh(player, LOCATION_DECK, 0x2181fff);
 			break;
 		}
 		case MSG_SWAP_GRAVE_DECK: {
 			player = BufferIO::Read<uint8_t>(pbuf);
-			SinglePlayRefresh(player, LOCATION_GRAVE, 0x181fff);
+			SinglePlayRefresh(player, LOCATION_GRAVE, 0x2181fff);
 			break;
 		}
 		case MSG_REVERSE_DECK: {
-			SinglePlayRefresh(0, LOCATION_DECK, 0x181fff);
-			SinglePlayRefresh(1, LOCATION_DECK, 0x181fff);
+			SinglePlayRefresh(0, LOCATION_DECK, 0x2181fff);
+			SinglePlayRefresh(1, LOCATION_DECK, 0x2181fff);
 			break;
 		}
 		case MSG_MOVE: {
 			pbuf += 4;
-			auto previous = CoreUtils::ReadLocInfo(pbuf);
-			auto current = CoreUtils::ReadLocInfo(pbuf);
+			auto previous = CoreUtils::ReadLocInfo(pbuf, false);
+			auto current = CoreUtils::ReadLocInfo(pbuf,false);
 			if(previous.location && !(current.location & 0x80) && (previous.location != current.location || previous.controler != current.controler))
 				SinglePlayRefreshSingle(current.controler, current.location, current.sequence);
 			break;
@@ -400,7 +401,7 @@ void SingleMode::SinglePlayRefresh(int flag) {
 void SingleMode::SinglePlayReload() {
 	for(int p = 0; p < 2; p++)
 		for(int loc = LOCATION_DECK; loc != LOCATION_OVERLAY; loc *= 2)
-			SinglePlayRefresh(p, loc, 0xffdfff);
+			SinglePlayRefresh(p, loc, 0x2ffdfff);
 }
 
 }

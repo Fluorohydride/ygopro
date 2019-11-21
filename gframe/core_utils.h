@@ -36,7 +36,7 @@ struct loc_info {
 	uint32_t sequence;
 	uint32_t position;
 };
-loc_info ReadLocInfo(char*& p, bool compat = false);
+loc_info ReadLocInfo(char*& p, bool compat);
 class Query {
 public:
 	Query() {};

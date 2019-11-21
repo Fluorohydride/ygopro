@@ -745,7 +745,7 @@ void GenericDuel::BeforeParsing(CoreUtils::Packet& packet, int& return_value, bo
 	}
 	case MSG_FLIPSUMMONING: {
 		pbuf += 4;
-		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, false);
 		RefreshSingle(info.controler, info.location, info.sequence);
 		break;
 	}
@@ -853,7 +853,7 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		for(int i = 0; i < count; ++i) {
 			pbufw = pbuf;
 			/*code = */BufferIO::Read<int32_t>(pbuf);
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, false);
 			if(info.controler != player) BufferIO::Write<int32_t>(pbufw, 0);
 		}
 		WaitforResponse(player);
@@ -884,14 +884,14 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		for(int i = 0; i < count; ++i) {
 			pbufw = pbuf;
 			/*code = */BufferIO::Read<int32_t>(pbuf);
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, false);
 			if(info.controler != player) BufferIO::Write<int32_t>(pbufw, 0);
 		}
 		count = BufferIO::Read<int32_t>(pbuf);
 		for(int i = 0; i < count; ++i) {
 			pbufw = pbuf;
 			/*code = */BufferIO::Read<int32_t>(pbuf);
-			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf);
+			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, false);
 			if(info.controler != player) BufferIO::Write<int32_t>(pbufw, 0);
 		}
 		WaitforResponse(player);
@@ -931,8 +931,8 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	case MSG_MOVE: {
 		pbufw = pbuf;
 		pbuf += 4;
-		/*CoreUtils::loc_info previous = */CoreUtils::ReadLocInfo(pbuf);
-		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf);
+		/*CoreUtils::loc_info previous = */CoreUtils::ReadLocInfo(pbuf, false);
+		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf, false);
 		player = current.controler;
 		SEND(nullptr);
 		for(auto& dueler : (player == 0) ? players.home : players.opposing)
@@ -1085,8 +1085,8 @@ void GenericDuel::AfterParsing(CoreUtils::Packet& packet, int& return_value, boo
 	}
 	case MSG_MOVE: {
 		pbuf += 4;
-		CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf);
-		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf, false);
+		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf, false);
 		if (current.location != 0 && (current.location & 0x80) == 0 && (current.location != previous.location || previous.controler != current.controler))
 			RefreshSingle(current.controler, current.location, current.sequence);
 		break;
@@ -1103,9 +1103,9 @@ void GenericDuel::AfterParsing(CoreUtils::Packet& packet, int& return_value, boo
 	}
 	case MSG_SWAP: {
 		pbuf += 4;
-		CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info previous = CoreUtils::ReadLocInfo(pbuf, false);
 		pbuf += 4;
-		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf);
+		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf, false);
 		RefreshSingle(previous.controler, previous.location, previous.sequence);
 		RefreshSingle(current.controler, current.location, current.sequence);
 		break;

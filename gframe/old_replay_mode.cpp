@@ -222,8 +222,8 @@ namespace ygo {
 			}
 			case MSG_MOVE: {
 				pbuf += 4;
-				auto previous = CoreUtils::ReadLocInfo(pbuf);
-				auto current = CoreUtils::ReadLocInfo(pbuf);
+				auto previous = CoreUtils::ReadLocInfo(pbuf, false);
+				auto current = CoreUtils::ReadLocInfo(pbuf, false);
 				if(previous.location && !(current.location & 0x80) && (previous.location != current.location || previous.controler != current.controler))
 					ReplayRefreshSingle(current.controler, current.location, current.sequence);
 				break;

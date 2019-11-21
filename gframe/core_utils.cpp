@@ -43,17 +43,17 @@ void Query::Parse(char*& current) {
 			PARSE_SINGLE(QUERY_IS_HIDDEN, is_hidden)
 			PARSE_SINGLE(QUERY_COVER, cover)
 			case QUERY_REASON_CARD: {
-				reason_card = ReadLocInfo(current);
+				reason_card = ReadLocInfo(current, false);
 				break;
 			}
 			case QUERY_EQUIP_CARD: {
-				equip_card = ReadLocInfo(current);
+				equip_card = ReadLocInfo(current, false);
 				break;
 			}
 			case QUERY_TARGET_CARD: {
 				uint32_t count = BufferIO::Read<uint32_t>(current);
 				for(uint32_t i = 0; i < count; i++)
-					target_cards.push_back(ReadLocInfo(current));
+					target_cards.push_back(ReadLocInfo(current, false));
 				break;
 			}
 			case QUERY_OVERLAY_CARD: {
