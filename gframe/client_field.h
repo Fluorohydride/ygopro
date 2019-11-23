@@ -70,7 +70,7 @@ public:
 	std::vector<int64> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
-	std::map<int, int> player_desc_hints[2];
+	std::map<int64, int> player_desc_hints[2];
 	bool grave_act;
 	bool remove_act;
 	bool deck_act;

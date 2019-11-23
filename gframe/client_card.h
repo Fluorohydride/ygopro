@@ -104,7 +104,7 @@ public:
 	std::set<ClientCard*> cardTarget;
 	std::set<ClientCard*> ownerTarget;
 	std::map<int, int> counters;
-	std::map<int, int> desc_hints;
+	std::map<irr::u64, int> desc_hints;
 	std::wstring atkstring;
 	std::wstring defstring;
 	std::wstring lvstring;
