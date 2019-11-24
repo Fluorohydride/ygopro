@@ -734,8 +734,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350).c_str());
 			mainGame->btnLeaveGame->setVisible(true);
 			mainGame->btnSpectatorSwap->setVisible(true);
-		}
-		if(selftype >= mainGame->dInfo.team1) {
+		} else if(selftype >= mainGame->dInfo.team1) {
 			std::swap(mainGame->dInfo.clientname, mainGame->dInfo.hostname);
 		}
 		mainGame->dInfo.current_player[0] = 0;
