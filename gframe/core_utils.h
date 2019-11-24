@@ -42,7 +42,7 @@ public:
 	Query() {};
 	Query(char*& buff, bool compat = false, int len = 0) { if(compat) ParseCompat(buff, len); else Parse(buff); };
 	void Parse(char*& buff);
-	void ParseCompat(char*& buff, int len);
+	void ParseCompat(char* buff, int len);
 	bool onfield_skipped = false;
 	uint32_t flag;
 	uint32_t code;

@@ -1227,7 +1227,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int location = BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.lock();
-		mainGame->dField.UpdateFieldCard(player, location, pbuf, len - 2);
+		mainGame->dField.UpdateFieldCard(player, location, pbuf, len - 3);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.unlock();
 		return true;
@@ -1238,7 +1238,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int seq = BufferIO::Read<uint8_t>(pbuf);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.lock();
-		mainGame->dField.UpdateCard(player, loc, seq, pbuf, len - 3);
+		mainGame->dField.UpdateCard(player, loc, seq, pbuf, len - 4);
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.unlock();
 		break;

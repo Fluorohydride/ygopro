@@ -88,14 +88,15 @@ void Query::Parse(char*& current) {
 value = BufferIO::Read<uint32_t>(current);\
 }
 
-void Query::ParseCompat(char*& current, int len) {
-	if(len == 4) {
+void Query::ParseCompat(char* current, int len) {
+	if(len <= 8) {
 		onfield_skipped = true;
 		return;
 	}
 	flag = BufferIO::Read<int32_t>(current);
 	PARSE_SINGLE(QUERY_CODE, code)
-	PARSE_SINGLE(QUERY_POSITION, position)
+	if(flag & QUERY_POSITION)
+		position = (BufferIO::Read<uint32_t>(current) >> 24) & 0xff;
 	PARSE_SINGLE(QUERY_ALIAS, alias)
 	PARSE_SINGLE(QUERY_TYPE, type)
 	PARSE_SINGLE(QUERY_LEVEL, level)
@@ -128,10 +129,9 @@ void Query::ParseCompat(char*& current, int len) {
 	}
 	PARSE_SINGLE(QUERY_OWNER, owner)
 	PARSE_SINGLE(QUERY_STATUS, status)
-	PARSE_SINGLE(QUERY_IS_PUBLIC, is_public)
 	PARSE_SINGLE(QUERY_LSCALE, lscale)
 	PARSE_SINGLE(QUERY_RSCALE, rscale)
-	if(flag &QUERY_LINK) {
+	if(flag & QUERY_LINK) {
 		link = BufferIO::Read<uint32_t>(current);
 		link_marker = BufferIO::Read<uint32_t>(current);
 	}

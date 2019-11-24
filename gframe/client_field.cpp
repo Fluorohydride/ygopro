@@ -291,6 +291,9 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 void ClientField::UpdateCard(int controler, int location, int sequence, char* data, int len) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
 	if(pcard) {
+		if(mainGame->dInfo.compat_mode) {
+			len = BufferIO::Read<int32>(data);
+		}
 		CoreUtils::Query query(data, mainGame->dInfo.compat_mode, len);
 		pcard->UpdateInfo(query);
 	}
