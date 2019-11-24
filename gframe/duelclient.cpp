@@ -3826,12 +3826,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 #undef PLAY_SOUND
 #undef COMPAT_READ
 void DuelClient::SwapField() {
-	if(mainGame->dInfo.curMsg != MSG_WAITING)
+	if(!mainGame->analyzeMutex.try_lock())
 		is_swapping = !is_swapping;
 	else {
 		mainGame->gMutex.lock();
 		mainGame->dField.ReplaySwap();
 		mainGame->gMutex.unlock();
+		mainGame->analyzeMutex.unlock();
 	}
 }
 void DuelClient::SetResponseI(int respI) {
