@@ -104,6 +104,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, unsigned int 
 	mainGame->dInfo.secret.game_id = gameid;
 	mainGame->dInfo.secret.server_port = port;
 	mainGame->dInfo.secret.server_address = ip;
+	mainGame->dInfo.isCatchingUp = false;
 	std::thread(ClientThread).detach();
 	return true;
 }
@@ -440,6 +441,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_HAND_RESULT: {
+		if(mainGame->dInfo.isCatchingUp)
+			break;
 		STOC_HandResult* pkt = (STOC_HandResult*)pdata;
 		mainGame->stHintMsg->setVisible(false);
 		mainGame->showcardcode = (pkt->res1 - 1) + ((pkt->res2 - 1) << 16);
@@ -687,7 +690,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.isInLobby = false;
 		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = false;
-		mainGame->dInfo.isCatchingUp = false;
 		mainGame->dInfo.lp[0] = 0;
 		mainGame->dInfo.lp[1] = 0;
 		mainGame->dInfo.turn = 0;
