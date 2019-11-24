@@ -4022,10 +4022,12 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 }
 void DuelClient::ReplayPrompt(bool need_header) {
 	if(need_header) {
-		ReplayHeader pheader;
+		ReplayHeader pheader{};
 		pheader.id = REPLAY_YRPX;
 		pheader.version = PRO_VERSION;
-		pheader.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY;
+		if(!mainGame->dInfo.compat_mode)
+			pheader.flag = REPLAY_LUA64;
+		pheader.flag |= REPLAY_NEWREPLAY;
 		last_replay.BeginRecord(false);
 		last_replay.WriteHeader(pheader);
 		last_replay.Write<int32_t>(mainGame->dInfo.clientname.size(), false);
