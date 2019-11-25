@@ -2336,10 +2336,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_DECK_TOP: {
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int seq = COMPAT_READ(int8_t, int32_t, pbuf);
-		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - seq);
-		pcard->SetCode(code & 0x7fffffff);
-		bool rev = (code & 0x80000000) != 0;
+		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+		bool rev;
+		if(!mainGame->dInfo.compat_mode) {
+			rev = (BufferIO::Read<uint32_t>(pbuf) & POS_FACEUP_DEFENSE) != 0;
+			pcard->SetCode(code);
+		} else {
+			rev = (code & 0x80000000) != 0;
+			pcard->SetCode(code & 0x7fffffff);
+		}
 		if(pcard->is_reversed != rev) {
 			pcard->is_reversed = rev;
 			mainGame->dField.MoveCard(pcard, 5);
