@@ -1255,20 +1255,22 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		//cards with effects that can be activated, can be an arbitrary size
 		count = COMPAT_READ(int8_t, int32_t, pbuf);
 		for (int i = 0; i < count; ++i) {
-			code = BufferIO::Read<int32_t>(pbuf);
+			code = BufferIO::Read<uint32_t>(pbuf);
 			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 			loc =  BufferIO::Read<uint8_t>(pbuf);
 			seq = COMPAT_READ(int8_t, int32_t, pbuf);
 			desc = COMPAT_READ(int32_t, int64_t, pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
-			int flag = 0;
-			if(code & 0x80000000) {
-				flag = EDESC_OPERATION;
+			int flag = EFFECT_CLIENT_MODE_NORMAL;
+			if(!mainGame->dInfo.compat_mode) {
+				flag = BufferIO::Read<uint8_t>(pbuf);
+			} else if(code & 0x80000000) {
+				flag = EFFECT_CLIENT_MODE_RESOLVE;
 				code &= 0x7fffffff;
 			}
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
-			if(flag == EDESC_OPERATION) {
+			if(flag == EFFECT_CLIENT_MODE_RESOLVE) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
@@ -1398,14 +1400,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			seq = COMPAT_READ(int8_t, int32_t, pbuf);
 			desc = COMPAT_READ(int32_t, int64_t, pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
-			int flag = 0;
-			if(code & 0x80000000) {
-				flag = EDESC_OPERATION;
+			int flag = EFFECT_CLIENT_MODE_NORMAL;
+			if(!mainGame->dInfo.compat_mode) {
+				flag = BufferIO::Read<uint8_t>(pbuf);
+			} else if(code & 0x80000000) {
+				flag = EFFECT_CLIENT_MODE_RESOLVE;
 				code &= 0x7fffffff;
 			}
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
-			if(flag == EDESC_OPERATION) {
+			if(flag == EFFECT_CLIENT_MODE_RESOLVE) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
@@ -1623,11 +1627,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_CHAIN: {
 		/*int selecting_player = */BufferIO::Read<uint8_t>(pbuf);
-		int count = COMPAT_READ(int8_t,int32_t,pbuf);
+		int count;
+		if(mainGame->dInfo.compat_mode)
+			count = BufferIO::Read<uint8_t>(pbuf);
 		int specount = BufferIO::Read<uint8_t>(pbuf);
 		int forced = BufferIO::Read<uint8_t>(pbuf);
 		/*int hint0 = */BufferIO::Read<int32_t>(pbuf);
 		/*int hint1 = */BufferIO::Read<int32_t>(pbuf);
+		if(!mainGame->dInfo.compat_mode)
+			count = BufferIO::Read<uint32_t>(pbuf);
 		int code;
 		u64 desc;
 		ClientCard* pcard;
@@ -1639,23 +1647,27 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.activatable_descs.clear();
 		mainGame->dField.conti_cards.clear();
 		for (int i = 0; i < count; ++i) {
-			int flag = BufferIO::Read<uint8_t>(pbuf);
+			int flag;
+			if(mainGame->dInfo.compat_mode)
+				flag = BufferIO::Read<uint8_t>(pbuf);
 			code = BufferIO::Read<int32_t>(pbuf);
 			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
 			desc = COMPAT_READ(int32_t, int64_t, pbuf);
+			if(!mainGame->dInfo.compat_mode)
+				flag = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence, info.position);
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(std::make_pair(desc, flag));
 			pcard->is_selected = false;
-			if(flag == EDESC_OPERATION) {
+			if(flag == EFFECT_CLIENT_MODE_RESOLVE) {
 				pcard->chain_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.conti_act = true;
 				conti_exist = true;
 			} else {
 				pcard->is_selectable = true;
-				if(flag == EDESC_RESET)
+				if(flag == EFFECT_CLIENT_MODE_RESET)
 					pcard->cmdFlag |= COMMAND_RESET;
 				else
 					pcard->cmdFlag |= COMMAND_ACTIVATE;
