@@ -386,7 +386,7 @@ bool Game::Initialize() {
 	lstLog = env->addListBox(Scale(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(Scale(18));
 	btnClearLog = env->addButton(Scale(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272).c_str());
-	btnExpandLog = env->addButton(Scale(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2045).c_str());
+	btnExpandLog = env->addButton(Scale(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2043).c_str());
 	//chat
 	tabChat = wInfos->addTab(dataManager.GetSysString(1279).c_str());
 	lstChat = env->addListBox(Scale(10, 10, 290, 290), tabChat, -1, false);
