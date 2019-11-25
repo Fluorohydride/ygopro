@@ -3700,7 +3700,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				(*mainGame->dField.deck[player].rbegin())->code = topcode;
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 				ClientCard* pcard = *cit;
-				pcard->code = BufferIO::Read<uint32_t>(pbuf);
+				if(!mainGame->dInfo.compat_mode) {
+					pcard->code = BufferIO::Read<uint32_t>(pbuf);
+					/*auto position =*/BufferIO::Read<uint32_t>(pbuf);
+				} else {
+					pcard->code = BufferIO::Read<uint32_t>(pbuf) & 0x7fffffff;
+				}
 				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;

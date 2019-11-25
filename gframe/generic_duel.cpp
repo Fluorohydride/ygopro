@@ -965,10 +965,13 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		for(auto& dueler : (player == 0) ? players.home : players.opposing)
 			NetServer::ReSendToPlayer(dueler.player);
 		for (int i = 0; i < count; ++i) {
-			if(!(pbufw[3] & 0x80))
+			/*int code = */BufferIO::Read<int32_t>(pbufw);
+			int pos = BufferIO::Read<int32_t>(pbufw);
+			if(!(pos & POS_FACEUP)) {
+				pbufw -= 8;
 				BufferIO::Write<int32_t>(pbufw, 0);
-			else
 				pbufw += 4;
+			}
 		}
 		SEND(nullptr);
 		for(auto& dueler : (player == 1) ? players.home : players.opposing)
@@ -994,10 +997,13 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		for(auto& dueler : (player == 0) ? players.home : players.opposing)
 			NetServer::ReSendToPlayer(dueler.player);
 		for (int i = 0; i < (hcount + ecount); ++i) {
-			if(!(pbufw[3] & 0x80))
+			/*int code = */BufferIO::Read<int32_t>(pbufw);
+			int pos = BufferIO::Read<int32_t>(pbufw);
+			if(!(pos & POS_FACEUP)) {
+				pbufw -= 8;
 				BufferIO::Write<int32_t>(pbufw, 0);
-			else
 				pbufw += 4;
+			}
 		}
 		SEND(nullptr);
 		for(auto& dueler : (player == 1) ? players.home : players.opposing)
