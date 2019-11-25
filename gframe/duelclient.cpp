@@ -2349,7 +2349,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		int seq = COMPAT_READ(int8_t, int32_t, pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - seq);
-		unsigned int code = (unsigned int)BufferIO::Read<int32_t>(pbuf);
+		const auto code = BufferIO::Read<uint32_t>(pbuf);
 		bool rev;
 		if(!mainGame->dInfo.compat_mode) {
 			rev = (BufferIO::Read<uint32_t>(pbuf) & POS_FACEUP_DEFENSE) != 0;
