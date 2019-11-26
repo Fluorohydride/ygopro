@@ -511,17 +511,20 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.isInLobby = true;
 		mainGame->dInfo.compat_mode = pkt->info.handshake != SERVER_HANDSHAKE;
 		if(mainGame->dInfo.compat_mode) {
-			if(pkt->info.mode = MODE_SINGLE) {
+			pkt->info.duel_flag = 0;
+			pkt->info.forbiddentypes = 0;
+			pkt->info.extra_rules = 0;
+			if(pkt->info.mode == MODE_SINGLE) {
 				pkt->info.team1 = 1;
 				pkt->info.team2 = 1;
 				pkt->info.best_of = 0;
 			}
-			if(pkt->info.mode = MODE_MATCH) {
+			if(pkt->info.mode == MODE_MATCH) {
 				pkt->info.team1 = 1;
 				pkt->info.team2 = 1;
 				pkt->info.best_of = 3;
 			}
-			if(pkt->info.mode = MODE_TAG) {
+			if(pkt->info.mode == MODE_TAG) {
 				pkt->info.team1 = 2;
 				pkt->info.team2 = 2;
 				pkt->info.best_of = 0;
