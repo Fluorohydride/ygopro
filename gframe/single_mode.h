@@ -21,9 +21,9 @@ public:
 	static int SinglePlayThread();
 	static bool SinglePlayAnalyze(CoreUtils::Packet packet);
 	
-	static void SinglePlayRefresh(int player, int location, int flag = 0xf81fff);
-	static void SinglePlayRefresh(int flag = 0xf81fff);
-	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
+	static void SinglePlayRefresh(int player, int location, int flag = 0x2f81fff);
+	static void SinglePlayRefresh(int flag = 0x2f81fff);
+	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0x2f81fff);
 	static void SinglePlayReload();
 	static Signal singleSignal;
 
