@@ -32,7 +32,7 @@ void SingleMode::StopPlay(bool is_exiting) {
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
-	last_replay.Write<int8_t>(len);
+	last_replay.Write<uint8_t>(len);
 	last_replay.WriteData(resp, len);
 	OCG_DuelSetResponse(pduel, resp, len);
 }
@@ -116,14 +116,14 @@ int SingleMode::SinglePlayThread() {
 	BufferIO::CopyWStr(mainGame->dInfo.clientname[0].c_str(), buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
 	new_replay.WriteData(buffer, 40, false);
-	last_replay.Write<int32_t>(start_lp, false);
-	last_replay.Write<int32_t>(start_hand, false);
-	last_replay.Write<int32_t>(draw_count, false);
-	last_replay.Write<int32_t>(opt, false);
-	last_replay.Write<int16_t>(script_name.size(), false);
+	last_replay.Write<uint32_t>(start_lp, false);
+	last_replay.Write<uint32_t>(start_hand, false);
+	last_replay.Write<uint32_t>(draw_count, false);
+	last_replay.Write<uint32_t>(opt, false);
+	last_replay.Write<uint16_t>(script_name.size(), false);
 	last_replay.WriteData(script_name.c_str(), script_name.size(), false);
 	last_replay.Flush();
-	new_replay.Write<int32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & DUEL_SPEED) << 8);
+	new_replay.Write<uint32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & DUEL_SPEED) << 8);
 	int engFlag = 0;
 	auto msg = CoreUtils::ParseMessages(pduel);
 	{
@@ -216,7 +216,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			char* pbuf = DATA;
 			int type = BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
-			/*int data = */BufferIO::Read<int64_t>(pbuf);
+			/*uint64_t data = BufferIO::Read<uint64_t>(pbuf);*/
 			if(player == 0)
 				ANALYZE;
 			if(type > 0 && type < 6 && type != 4)
