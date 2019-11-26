@@ -1835,7 +1835,7 @@ void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 	queued_caption = caption;
 	popupCheck.unlock();
 }
-int Game::LocalPlayer(int player) {
+uint8 Game::LocalPlayer(uint8 player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
 std::wstring Game::LocalName(int local_player) {

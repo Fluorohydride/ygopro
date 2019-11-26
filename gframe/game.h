@@ -165,7 +165,7 @@ public:
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
 
-	int LocalPlayer(int player);
+	uint8 LocalPlayer(uint8 player);
 	std::wstring LocalName(int local_player);
 	void UpdateDuelParam();
 	void UpdateExtraRules();

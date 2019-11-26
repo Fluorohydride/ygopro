@@ -53,8 +53,8 @@ ClientCard::ClientCard() {
 	overlayTarget = 0;
 	equipTarget = 0;
 }
-void ClientCard::SetCode(int code) {
-	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
+void ClientCard::SetCode(irr::u32 code) {
+	if((location == LOCATION_HAND) && (this->code != code)) {
 		this->code = code;
 		if(!mainGame->dInfo.isCatchingUp)
 			mainGame->dField.MoveCard(this, 5);
