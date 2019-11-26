@@ -114,7 +114,7 @@ public:
 	std::wstring rscstring;
 
 	ClientCard();
-	void SetCode(int code);
+	void SetCode(irr::u32 code);
 	void UpdateInfo(const CoreUtils::Query& query);
 	void ClearTarget();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
