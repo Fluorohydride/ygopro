@@ -34,8 +34,9 @@ void ServerLobby::FillOnlineRooms() {
 	SColor red = SColor(255, 255, 100, 100);
 	SColor color = normal;
 	bool show_password_checked = mainGame->chkShowPassword->isChecked();
+	bool show_started_checked = mainGame->chkShowActiveRooms->isChecked();
 	for(auto& room : rooms) {
-		if(room.locked && !show_password_checked) {
+		if((room.locked && !show_password_checked) || (room.started && !show_started_checked)) {
 			continue;
 		}
 		if(doFilter) {
