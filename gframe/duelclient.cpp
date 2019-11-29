@@ -420,6 +420,18 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->PopupMessage(fmt::sprintf(dataManager.GetSysString(1411).c_str(), pkt->code >> 12, (pkt->code >> 4) & 0xff, pkt->code & 0xf));
 				mainGame->gMutex.unlock();
 				event_base_loopbreak(client_base);
+				if(mainGame->isHostingOnline) {
+#define HIDE_AND_CHECK(obj) if(obj->isVisible()) mainGame->HideElement(obj);
+					HIDE_AND_CHECK(mainGame->wCreateHost);
+					HIDE_AND_CHECK(mainGame->wRules);
+					HIDE_AND_CHECK(mainGame->wCustomRules);
+#undef HIDE_AND_CHECK
+					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				} else {
+					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+					mainGame->btnJoinHost->setEnabled(true);
+					mainGame->btnJoinCancel->setEnabled(true);
+				}
 			} else {
 				event_base_loopbreak(client_base);
 				temp_ver = pkt->code;
