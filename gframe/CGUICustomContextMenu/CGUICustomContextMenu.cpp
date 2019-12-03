@@ -674,7 +674,6 @@ void CGUICustomContextMenu::recalculateSize()
 		}
 		else if(Items[i].IsCustom) {
 			Items[i].Dim = { (u32)Items[i].Element->getAbsolutePosition().getWidth(), (u32)Items[i].Element->getAbsolutePosition().getHeight() };
-			//core::vector2d<s32> newpos = { rect.UpperLeftCorner }
 			Items[i].Element->setRelativePosition({ 0, (s32)height });
 			if(Items[i].Dim.Width > width)
 				width = Items[i].Dim.Width;
