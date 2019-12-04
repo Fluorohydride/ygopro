@@ -10,6 +10,7 @@ local ygopro_config=function(static_core)
 	end
 	kind "WindowedApp"
 	cppdialect "C++14"
+	rtti "Off"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
 	defines "CURL_STATICLIB"
@@ -19,42 +20,35 @@ local ygopro_config=function(static_core)
 		includedirs "../irrKlang/include"
 		defines "YGOPRO_USE_IRRKLANG"
 		links "IrrKlang"
-		excludes "sound_openal.cpp"
+		excludes "sound_openal.*"
 
 	filter "system:windows"
 		kind "ConsoleApp"
 		files "ygopro.rc"
-		excludes "CGUIButton.cpp"
 		includedirs { "../freetype/include", "../irrlicht/include" }
 		dofile("../irrlicht/defines.lua")
 		libdirs "../irrKlang/lib/Win32-visualStudio"
 		links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "Wldap32", "Crypt32", "Advapi32", "Rpcrt4", "Ole32", "Winhttp" }
-		filter "options:no-direct3d"
-			defines "NO_IRR_COMPILE_WITH_DIRECT3D_9_"
 
-		filter "options:not no-direct3d"
-			defines "IRR_COMPILE_WITH_DX9_DEV_PACK"
+	filter { "system:windows", "options:no-direct3d" }
+		defines "NO_IRR_COMPILE_WITH_DIRECT3D_9_"
 
-	filter { "action:not vs*", "system:windows" }
-		includedirs { "/mingw/include/irrlicht", "/mingw/include/freetype2" }
-		libdirs "../irrKlang/lib/Win32-gcc"
-
-	filter "action:not vs*"
-		buildoptions { "-fno-rtti", "-fpermissive" }
+	filter { "system:windows", "options:not no-direct3d" }
+		defines "IRR_COMPILE_WITH_DX9_DEV_PACK"
 
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
+		buildoptions { "-fpermissive" }
 		if _OPTIONS["discord"] then
 			links "discord-rpc"
 		end
 		links { "sqlite3", "event", "event_pthreads", "dl", "pthread", "git2" }
 
 	filter "system:macosx"
-		files "discord_register_url_osx.m"
+		files "*.m"
 		defines "LUA_USE_MACOSX"
 		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
-		files "osx_menu.m"
 		linkoptions { "-Wl,-rpath ./" }
 		libdirs "../irrKlang/bin/macosx-gcc/"
 		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
@@ -70,7 +64,7 @@ local ygopro_config=function(static_core)
 	filter { "system:linux", "configurations:Debug" }
 		links { "fmtd", "curl-d" }
 
-        filter { "system:linux", "configurations:Release" }
+	filter { "system:linux", "configurations:Release" }
 		links { "fmt", "curl" }	
 
 	filter "system:linux"
