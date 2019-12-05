@@ -133,7 +133,7 @@ bool Game::Initialize() {
 	SKIN_SCALE(EGDS_MESSAGE_BOX_GAP_SPACE)
 #undef SKIN_SCALE
 	smgr = device->getSceneManager();
-	device->setWindowCaption(L"EDOPro by Project Ignis");
+	device->setWindowCaption(L"EDOPro");
 	device->setResizable(true);
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
@@ -1202,7 +1202,7 @@ void Game::MainLoop() {
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
 		while(cur_time >= 1000) {
-			device->setWindowCaption(fmt::format(L"EDOPro by Project Ignis | FPS: {}", fps).c_str());
+			device->setWindowCaption(fmt::format(L"EDOPro | FPS: {}", fps).c_str());
 			fps = 0;
 			cur_time -= 1000;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
