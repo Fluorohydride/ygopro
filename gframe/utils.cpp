@@ -299,6 +299,7 @@ namespace ygo {
 				res.push_back(name.c_str());
 			}
 		});
+		std::sort(res.begin(), res.end());
 		return res;
 	}
 	void Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload) {

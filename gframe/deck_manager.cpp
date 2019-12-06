@@ -62,14 +62,10 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 bool DeckManager::LoadLFListFolder(path_string path) {
 	path = Utils::NormalizePath(path);
 	bool loaded = false;
-	Utils::FindfolderFiles(path, [this, &path, &loaded](path_string name, bool isdir, void* payload) {
-		if(isdir) {
-			return;
-		} else {
-			if(Utils::GetFileExtension(name) == TEXT("conf"))
-				loaded = LoadLFListSingle(path + name);
-		}
-	});
+	auto lflists = Utils::FindfolderFiles(path, std::vector<path_string>({ TEXT("conf") }));
+	for (const auto& lflist : lflists) {
+		loaded = LoadLFListSingle(path + lflist);
+	}
 	return loaded;
 }
 void DeckManager::LoadLFList() {
