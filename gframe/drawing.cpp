@@ -1292,18 +1292,27 @@ void Game::DrawDeckBd() {
 			textFont->draw(buffer.c_str(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
 			buffer = L"";
 		}
-		if((ptr->ot & 0x1) == ptr->ot)
-			buffer.append(L"[OCG]");
-		else if((ptr->ot & 0x2) == ptr->ot)
-			buffer.append(L"[TCG]");
-		else if((ptr->ot & 0x4) == ptr->ot)
-			buffer.append(L"[Anime]");
-		else if((ptr->ot & 0x8) == ptr->ot)
-			buffer.append(L"[Illegal]");
-		else if((ptr->ot & 0x10) == ptr->ot)
-			buffer.append(L"[VG]");
-		else if((ptr->ot & 0x20) == ptr->ot)
-			buffer.append(L"[Custom]");
+		static const std::map<int, int> SCOPES = {
+			{0x1, 1240},
+			{0x2, 1241},
+			{0x4, 1264},
+			{0x8, 1265},
+			{0x10, 1266},
+			{0x20, 1267},
+			{0x100, 1269}
+		};
+		auto cardScopeCount = 0;
+		buffer.append(L"[");
+		for(const auto& scope : SCOPES) {
+			if (ptr->ot & scope.first) {
+				if (cardScopeCount) {
+					buffer.append(L"/");
+				}
+				buffer.append(dataManager.GetSysString(scope.second).c_str());
+				cardScopeCount++;
+			}
+		}
+		buffer.append(L"]");
 		textFont->draw(buffer.c_str(), Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
 		textFont->draw(buffer.c_str(), Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
 	}
