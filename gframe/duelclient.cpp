@@ -392,6 +392,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				text = dataManager.GetSysString(1421);
 				break;
 			}
+			case DECKERROR_NOPRERELEASE: {
+				text = fmt::sprintf(dataManager.GetSysString(1422).c_str(), dataManager.GetName(code).c_str());
+				break;
+			}
 			default: {
 				text = dataManager.GetSysString(1406);
 				break;
