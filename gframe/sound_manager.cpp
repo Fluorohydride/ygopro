@@ -20,7 +20,7 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 		mixer->SetMusicVolume(music_volume);
 		mixer->SetSoundVolume(sounds_volume);
 	}
-	catch(std::runtime_error& e) {
+	catch(...) {
 		return soundsEnabled = musicEnabled = false;
 	}
 	rnd.seed(time(0));
