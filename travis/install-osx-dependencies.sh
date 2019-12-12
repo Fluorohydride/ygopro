@@ -21,12 +21,12 @@ cd /tmp
 curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/libevent/libevent/releases/download/release-2.1.11-stable/libevent-2.1.11-stable.tar.gz
 tar xf libevent-2.1.11-stable.tar.gz
 cd libevent-2.1.11-stable
-./configure --prefix /usr/local/Cellar/libevent/2.1.11
+./configure --prefix /usr/local/opt/libevent
 make -j2
 make install
 
 cd /tmp
-git clone --depth=1 https://github.com/discordapp/discord-rpc.git
+git clone --depth=1 https://github.com/edo9300/discord-rpc.git
 mkdir -p discord-rpc/build
 cd discord-rpc/build
 cmake ..
