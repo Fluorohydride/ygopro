@@ -1,12 +1,13 @@
 #ifndef SOUND_SDL_MIXER_H
 #define SOUND_SDL_MIXER_H
+#include "sound_backend.h"
 #include <map>
 #include <string>
 struct _Mix_Music;
 typedef struct _Mix_Music Mix_Music;
 struct Mix_Chunk;
 
-class SoundMixer {
+class SoundMixer : public SoundBackend {
 public:
 	SoundMixer();
 	~SoundMixer();

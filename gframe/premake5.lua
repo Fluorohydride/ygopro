@@ -14,6 +14,7 @@ local ygopro_config=function(static_core)
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
 	excludes "sound_sdlmixer.*"
+	excludes "sound_irrklang.*"
 	defines "CURL_STATICLIB"
 	includedirs "../ocgcore"
 	links { "clzma", "freetype", "Irrlicht" }
@@ -21,6 +22,7 @@ local ygopro_config=function(static_core)
 		if _OPTIONS["sound"]=="irrklang" then
 			includedirs "../irrKlang/include"
 			defines "YGOPRO_USE_IRRKLANG"
+			files "sound_irrklang.*"
 			links "IrrKlang"
 		end
 		if _OPTIONS["sound"]=="sdl-mixer" then

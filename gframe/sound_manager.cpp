@@ -1,53 +1,39 @@
 #define WIN32_LEAN_AND_MEAN
 #include "sound_manager.h"
 #include "config.h"
-#ifdef IRRKLANG_STATIC
-#include "../ikpmp3/ikpMP3.h"
+#if defined(YGOPRO_USE_IRRKLANG)
+#include "sound_irrklang.h"
+#define BACKEND SoundIrrklang
+#elif defined(YGOPRO_USE_SDL_MIXER)
+#include "sound_sdlmixer.h"
+#define BACKEND SoundMixer
 #endif
 
 namespace ygo {
 
 bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload) {
+#ifdef BACKEND
 	soundsEnabled = sounds_enabled;
 	musicEnabled = music_enabled;
-#if defined(YGOPRO_USE_IRRKLANG)
-	soundEngine = irrklang::createIrrKlangDevice();
-	if(!soundEngine) {
-		return soundsEnabled = musicEnabled = false;
-	} else {
-#ifdef IRRKLANG_STATIC
-		irrklang::ikpMP3Init(soundEngine);
-#endif
-		sfxVolume = sounds_volume;
-		bgmVolume = music_volume;
-	}
-#elif defined(YGOPRO_USE_SDL_MIXER)
 	try {
-		mixer = std::make_unique<SoundMixer>();
+		mixer = std::make_unique<BACKEND>();
 		mixer->SetMusicVolume(music_volume);
 		mixer->SetSoundVolume(sounds_volume);
 	}
 	catch(std::runtime_error& e) {
 		return soundsEnabled = musicEnabled = false;
 	}
-#else
-	return soundsEnabled = musicEnabled = false;
-#endif // YGOPRO_USE_IRRKLANG
 	rnd.seed(time(0));
 	bgm_scene = -1;
 	RefreshBGMList();
 	RefreshChantsList();
 	return true;
-}
-SoundManager::~SoundManager() {
-#if defined(YGOPRO_USE_IRRKLANG)
-	if (soundBGM)
-		soundBGM->drop();
-	if (soundEngine)
-		soundEngine->drop();
-#endif
+#else
+	return soundsEnabled = musicEnabled = false;
+#endif // BACKEND
 }
 void SoundManager::RefreshBGMList() {
+#ifdef BACKEND
 	Utils::Makedirectory(TEXT("./sound/BGM/"));
 	Utils::Makedirectory(TEXT("./sound/BGM/duel"));
 	Utils::Makedirectory(TEXT("./sound/BGM/menu"));
@@ -65,23 +51,29 @@ void SoundManager::RefreshBGMList() {
 	RefreshBGMDir(TEXT("disadvantage"), BGM::DISADVANTAGE);
 	RefreshBGMDir(TEXT("win"), BGM::WIN);
 	RefreshBGMDir(TEXT("lose"), BGM::LOSE);
+#endif
 }
 void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
+#ifdef BACKEND
 	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/BGM/") + path, { TEXT("mp3"), TEXT("ogg"), TEXT("wav") })) {
 		auto conv = Utils::ToUTF8IfNeeded(path + TEXT("/") + file);
 		BGMList[BGM::ALL].push_back(conv);
 		BGMList[scene].push_back(conv);
 	}
+#endif
 }
 void SoundManager::RefreshChantsList() {
+#ifdef BACKEND
 	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/chants"), { TEXT("mp3"), TEXT("wav") })) {
 		auto scode = Utils::GetFileName(TEXT("./sound/chants/") + file);
 		unsigned int code = std::stoi(scode);
 		if(code && !ChantsList.count(code))
 			ChantsList[code] = Utils::ToUTF8IfNeeded(file);
 	}
+#endif
 }
 void SoundManager::PlaySoundEffect(SFX sound) {
+#ifdef BACKEND
 	static const std::map<SFX, const char*> fx = {
 		{SUMMON, "./sound/summon.wav"},
 		{SPECIAL_SUMMON, "./sound/specialsummon.wav"},
@@ -109,107 +101,65 @@ void SoundManager::PlaySoundEffect(SFX sound) {
 		{CHAT, "./sound/chatmessage.wav"}
 	};
 	if (!soundsEnabled) return;
-#if defined(YGOPRO_USE_IRRKLANG)
-	if (soundEngine) {
-		auto sfx = soundEngine->play2D(fx.at(sound), false, true);
-		sfx->setVolume(sfxVolume);
-		sfx->setIsPaused(false);
-	}
-#elif defined(YGOPRO_USE_SDL_MIXER)
 	mixer->PlaySound(fx.at(sound));
 #endif
 }
-void SoundManager::PlayMusic(const std::string& song, bool loop) {
-	if(!musicEnabled) return;
-#if defined(YGOPRO_USE_IRRKLANG)
-	if(!soundBGM || soundBGM->getSoundSource()->getName() != song) {
-		StopBGM();
-		if (soundEngine) {
-			soundBGM = soundEngine->play2D(song.c_str(), loop, false, true);
-			soundBGM->setVolume(bgmVolume);
-		}
-	}
-#elif defined(YGOPRO_USE_SDL_MIXER)
-	mixer->PlayMusic(song, loop);
-#endif
-}
 void SoundManager::PlayBGM(BGM scene) {
+#ifdef BACKEND
 	auto& list = BGMList[scene];
 	int count = list.size();
-#if defined(YGOPRO_USE_IRRKLANG)
-	if(musicEnabled && (scene != bgm_scene || (soundBGM && soundBGM->isFinished()) || !soundBGM) && count > 0) {
-#elif defined(YGOPRO_USE_SDL_MIXER)
 	if(musicEnabled && (scene != bgm_scene || !mixer->MusicPlaying()) && count > 0) {
-#else
-	if(false) {
-#endif
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
 		std::string BGMName = "./sound/BGM/" + list[bgm];
-		PlayMusic(BGMName, true);
+		mixer->PlayMusic(BGMName, true);
 	}
-}
-void SoundManager::StopBGM() {
-#if defined(YGOPRO_USE_IRRKLANG)
-	if(soundBGM) {
-		soundBGM->stop();
-		soundBGM->drop();
-		soundBGM = nullptr;
-	}
-#elif defined(YGOPRO_USE_SDL_MIXER)
 #endif
 }
 bool SoundManager::PlayChant(unsigned int code) {
+#ifdef BACKEND
+	if(!soundsEnabled) return false;
 	if(ChantsList.count(code)) {
-#if defined(YGOPRO_USE_IRRKLANG)
-		if (soundEngine && !soundEngine->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str())) {
-			auto chant = soundEngine->play2D(("./sound/chants/" + ChantsList[code]).c_str());
-			chant->setVolume(sfxVolume);
-			chant->setIsPaused(false);
-		}
-#elif defined(YGOPRO_USE_SDL_MIXER)
 		mixer->PlaySound("./sound/chants/" + ChantsList[code]);
-#endif
 		return true;
 	}
+#endif
 	return false;
 }
 void SoundManager::SetSoundVolume(double volume) {
-#if defined(YGOPRO_USE_IRRKLANG)
-	sfxVolume = volume;
-#elif defined(YGOPRO_USE_SDL_MIXER)
+#ifdef BACKEND
+	if(!mixer)
+		return;
 	mixer->SetSoundVolume(volume);
 #endif
 }
 void SoundManager::SetMusicVolume(double volume) {
-#if defined(YGOPRO_USE_IRRKLANG)
-	if (soundBGM) soundBGM->setVolume(volume);
-	bgmVolume = volume;
-#elif defined(YGOPRO_USE_SDL_MIXER)
+#ifdef BACKEND
+	if(!mixer)
+		return;
 	mixer->SetMusicVolume(volume);
 #endif
 }
 void SoundManager::EnableSounds(bool enable) {
+#ifdef BACKEND
+	if(!mixer)
+		return;
 	soundsEnabled = enable;
+#endif
 }
 void SoundManager::EnableMusic(bool enable) {
+#ifdef BACKEND
+	if(!mixer)
+		return;
 	musicEnabled = enable;
 	if(!musicEnabled) {
-#if defined(YGOPRO_USE_IRRKLANG)
-		if(soundBGM){
-			if(!soundBGM->isFinished())
-				soundBGM->stop();
-			soundBGM->drop();
-			soundBGM = nullptr;
-		}
-#elif defined(YGOPRO_USE_SDL_MIXER)
 		mixer->StopMusic();
-#endif
 	}
+#endif
 }
 
 void SoundManager::Tick() {
-#ifdef YGOPRO_USE_SDL_MIXER
+#ifdef BACKEND
 	if(mixer)
 		mixer->Tick();
 #endif

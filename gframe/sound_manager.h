@@ -3,11 +3,7 @@
 
 #include <random>
 #include "utils.h"
-#if defined(YGOPRO_USE_IRRKLANG)
-#include <irrKlang.h>
-#elif defined(YGOPRO_USE_SDL_MIXER)
-#include "sound_sdlmixer.h"
-#endif
+#include "sound_backend.h"
 
 namespace ygo {
 
@@ -49,13 +45,10 @@ public:
 		WIN,
 		LOSE
 	};
-	~SoundManager();
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
 	void RefreshBGMList();
 	void PlaySoundEffect(SFX sound);
-	void PlayMusic(const std::string& song, bool loop);
 	void PlayBGM(BGM scene);
-	void StopBGM();
 	bool PlayChant(unsigned int code);
 	void SetSoundVolume(double volume);
 	void SetMusicVolume(double volume);
@@ -68,14 +61,7 @@ private:
 	std::map<unsigned int, std::string> ChantsList;
 	int bgm_scene = -1;
 	std::mt19937 rnd;
-#if defined(YGOPRO_USE_IRRKLANG)
-	irrklang::ISoundEngine* soundEngine;
-	irrklang::ISound* soundBGM;
-	double sfxVolume = 1.0;
-	double bgmVolume = 1.0;
-#elif defined(YGOPRO_USE_SDL_MIXER)
-	std::unique_ptr<SoundMixer> mixer;
-#endif
+	std::unique_ptr<SoundBackend> mixer;
 	void RefreshBGMDir(path_string path, BGM scene);
 	void RefreshChantsList();
 	bool soundsEnabled = false;
