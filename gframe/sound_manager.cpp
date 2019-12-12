@@ -10,10 +10,6 @@ namespace ygo {
 bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload) {
 	soundsEnabled = sounds_enabled;
 	musicEnabled = music_enabled;
-	rnd.seed(time(0));
-	bgm_scene = -1;
-	RefreshBGMList();
-	RefreshChantsList();
 #ifdef YGOPRO_USE_IRRKLANG
 	soundEngine = irrklang::createIrrKlangDevice();
 	if(!soundEngine) {
@@ -24,7 +20,6 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 #endif
 		sfxVolume = sounds_volume;
 		bgmVolume = music_volume;
-		return true;
 	}
 #elif defined(YGOPRO_USE_OPENAL)
 	try {
@@ -33,7 +28,6 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 		bgm = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
 		sfx->setVolume(sounds_volume);
 		bgm->setVolume(music_volume);
-		return true;
 	}
 	catch (std::runtime_error& e) {
 		return soundsEnabled = musicEnabled = false;
@@ -43,12 +37,18 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 		mixer = std::make_unique<SoundMixer>();
 		mixer->SetMusicVolume(music_volume);
 		mixer->SetSoundVolume(sounds_volume);
-		return true;
 	}
 	catch(std::runtime_error& e) {
 		return soundsEnabled = musicEnabled = false;
 	}
+#else
+	return soundsEnabled = musicEnabled = false;
 #endif // YGOPRO_USE_IRRKLANG
+	rnd.seed(time(0));
+	bgm_scene = -1;
+	RefreshBGMList();
+	RefreshChantsList();
+	return true;
 }
 SoundManager::~SoundManager() {
 #ifdef YGOPRO_USE_IRRKLANG
