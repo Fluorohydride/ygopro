@@ -1101,6 +1101,7 @@ void Game::MainLoop() {
 			repoInfoGui[repo.first].progress1->setProgress(repo.second);
 			repoInfoGui[repo.first].progress2->setProgress(repo.second);
 		}
+		soundManager->Tick();
 		fps++;
 		auto now = timer->getRealTime();
 		delta_time = now - prev_time;
@@ -1202,7 +1203,7 @@ void Game::MainLoop() {
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
 		while(cur_time >= 1000) {
-			device->setWindowCaption(fmt::format(L"EDOPro | FPS: {}", fps).c_str());
+			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
 			fps = 0;
 			cur_time -= 1000;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)

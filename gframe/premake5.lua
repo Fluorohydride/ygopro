@@ -13,14 +13,28 @@ local ygopro_config=function(static_core)
 	rtti "Off"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
+	excludes "sound_openal.*"
+	excludes "sound_sdlmixer.*"
 	defines "CURL_STATICLIB"
 	includedirs "../ocgcore"
 	links { "clzma", "freetype", "Irrlicht" }
-	filter "options:not no-irrklang"
-		includedirs "../irrKlang/include"
-		defines "YGOPRO_USE_IRRKLANG"
-		links "IrrKlang"
-		excludes "sound_openal.*"
+	if _OPTIONS["sound"] then
+		if _OPTIONS["sound"]=="irrklang" then
+			includedirs "../irrKlang/include"
+			defines "YGOPRO_USE_IRRKLANG"
+			links "IrrKlang"
+		end
+		if _OPTIONS["sound"]=="sdl-mixer" then
+			defines "YGOPRO_USE_SDL_MIXER"
+			files "sound_sdlmixer.*"
+			filter "system:windows"
+				links "Version"
+		end
+		if _OPTIONS["sound"]=="openal" then
+			defines "YGOPRO_USE_OPENAL"
+			files "sound_openal.*"
+		end
+	end
 
 	filter "system:windows"
 		kind "ConsoleApp"

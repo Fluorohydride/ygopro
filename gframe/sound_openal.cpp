@@ -1,4 +1,5 @@
 #include "sound_openal.h"
+#ifdef YGOPRO_USE_OPENAL
 #include <array>
 #include <iterator>
 #include <mpg123.h>
@@ -217,3 +218,5 @@ void OpenALSoundLayer::maintain() {
 }
 
 } // namespace YGOpen
+
+#endif //YGOPRO_USE_OPENAL

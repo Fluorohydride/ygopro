@@ -3,8 +3,14 @@ newoption {
 	description = "Disable DirectX options in irrlicht if the DirectX SDK isn't installed"
 }
 newoption {
-	trigger = "no-irrklang",
-	description = "Disable irrKlang and use OpenAL Soft"
+	trigger = "sound",
+	value = "backend",
+	description = "Choose sound backend",
+	allowed = {
+      { "irrklang",  "irrklang" },
+      { "sdl-mixer",  "SDL2-mixer" },
+      { "openal",  "Openal (bugged and unstable)" }
+   }
 }
 newoption {
 	trigger = "pics",

@@ -2,12 +2,14 @@
 #define SOUNDMANAGER_H
 
 #include <random>
+#include "utils.h"
 #ifdef YGOPRO_USE_IRRKLANG
 #include <irrKlang.h>
-#else
+#elif defined(YGOPRO_USE_OPENAL)
 #include "sound_openal.h"
+#elif defined(YGOPRO_USE_SDL_MIXER)
+#include "sound_sdlmixer.h"
 #endif
-#include "utils.h"
 
 namespace ygo {
 
@@ -49,7 +51,7 @@ public:
 		WIN,
 		LOSE
 	};
-#ifndef YGOPRO_USE_IRRKLANG
+#ifdef YGOPRO_USE_OPENAL
 	SoundManager() : openal(nullptr), sfx(nullptr) {}
 #endif
 	~SoundManager();
@@ -64,6 +66,7 @@ public:
 	void SetMusicVolume(double volume);
 	void EnableSounds(bool enable);
 	void EnableMusic(bool enable);
+	void Tick();
 
 private:
 	std::vector<std::string> BGMList[8];
@@ -75,11 +78,13 @@ private:
 	irrklang::ISound* soundBGM;
 	double sfxVolume = 1.0;
 	double bgmVolume = 1.0;
-#else
+#elif defined(YGOPRO_USE_OPENAL)
 	std::unique_ptr<YGOpen::OpenALSingleton> openal;
 	std::unique_ptr<YGOpen::OpenALSoundLayer> sfx;
 	std::unique_ptr<YGOpen::OpenALSoundLayer> bgm;
 	int bgmCurrent = -1;
+#elif defined(YGOPRO_USE_SDL_MIXER)
+	std::unique_ptr<SoundMixer> mixer;
 #endif
 	void RefreshBGMDir(path_string path, BGM scene);
 	void RefreshChantsList();
