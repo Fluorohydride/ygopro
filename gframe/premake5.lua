@@ -13,7 +13,6 @@ local ygopro_config=function(static_core)
 	rtti "Off"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
 	excludes "lzma/**"
-	excludes "sound_openal.*"
 	excludes "sound_sdlmixer.*"
 	defines "CURL_STATICLIB"
 	includedirs "../ocgcore"
@@ -29,10 +28,6 @@ local ygopro_config=function(static_core)
 			files "sound_sdlmixer.*"
 			filter "system:windows"
 				links "Version"
-		end
-		if _OPTIONS["sound"]=="openal" then
-			defines "YGOPRO_USE_OPENAL"
-			files "sound_openal.*"
 		end
 	end
 

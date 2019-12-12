@@ -10,7 +10,7 @@ namespace ygo {
 bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload) {
 	soundsEnabled = sounds_enabled;
 	musicEnabled = music_enabled;
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	soundEngine = irrklang::createIrrKlangDevice();
 	if(!soundEngine) {
 		return soundsEnabled = musicEnabled = false;
@@ -20,17 +20,6 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 #endif
 		sfxVolume = sounds_volume;
 		bgmVolume = music_volume;
-	}
-#elif defined(YGOPRO_USE_OPENAL)
-	try {
-		openal = std::make_unique<YGOpen::OpenALSingleton>();
-		sfx = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
-		bgm = std::make_unique<YGOpen::OpenALSoundLayer>(openal);
-		sfx->setVolume(sounds_volume);
-		bgm->setVolume(music_volume);
-	}
-	catch (std::runtime_error& e) {
-		return soundsEnabled = musicEnabled = false;
 	}
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	try {
@@ -51,7 +40,7 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 	return true;
 }
 SoundManager::~SoundManager() {
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	if (soundBGM)
 		soundBGM->drop();
 	if (soundEngine)
@@ -120,21 +109,19 @@ void SoundManager::PlaySoundEffect(SFX sound) {
 		{CHAT, "./sound/chatmessage.wav"}
 	};
 	if (!soundsEnabled) return;
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	if (soundEngine) {
 		auto sfx = soundEngine->play2D(fx.at(sound), false, true);
 		sfx->setVolume(sfxVolume);
 		sfx->setIsPaused(false);
 	}
-#elif defined(YGOPRO_USE_OPENAL)
-	if (sfx) sfx->play(fx.at(sound), false);
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	mixer->PlaySound(fx.at(sound));
 #endif
 }
 void SoundManager::PlayMusic(const std::string& song, bool loop) {
 	if(!musicEnabled) return;
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	if(!soundBGM || soundBGM->getSoundSource()->getName() != song) {
 		StopBGM();
 		if (soundEngine) {
@@ -142,9 +129,6 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 			soundBGM->setVolume(bgmVolume);
 		}
 	}
-#elif defined(YGOPRO_USE_OPENAL)
-	StopBGM();
-	if (bgm) bgmCurrent = bgm->play(song, loop);
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	mixer->PlayMusic(song, loop);
 #endif
@@ -152,10 +136,8 @@ void SoundManager::PlayMusic(const std::string& song, bool loop) {
 void SoundManager::PlayBGM(BGM scene) {
 	auto& list = BGMList[scene];
 	int count = list.size();
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	if(musicEnabled && (scene != bgm_scene || (soundBGM && soundBGM->isFinished()) || !soundBGM) && count > 0) {
-#elif defined(YGOPRO_USE_OPENAL)
-	if(musicEnabled && (scene != bgm_scene || !bgm->exists(bgmCurrent)) && count > 0) {
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	if(musicEnabled && (scene != bgm_scene || !mixer->MusicPlaying()) && count > 0) {
 #else
@@ -168,27 +150,23 @@ void SoundManager::PlayBGM(BGM scene) {
 	}
 }
 void SoundManager::StopBGM() {
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	if(soundBGM) {
 		soundBGM->stop();
 		soundBGM->drop();
 		soundBGM = nullptr;
 	}
-#elif defined(YGOPRO_USE_OPENAL)
-	bgm->stopAll();
 #elif defined(YGOPRO_USE_SDL_MIXER)
 #endif
 }
 bool SoundManager::PlayChant(unsigned int code) {
 	if(ChantsList.count(code)) {
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 		if (soundEngine && !soundEngine->isCurrentlyPlaying(("./sound/chants/" + ChantsList[code]).c_str())) {
 			auto chant = soundEngine->play2D(("./sound/chants/" + ChantsList[code]).c_str());
 			chant->setVolume(sfxVolume);
 			chant->setIsPaused(false);
 		}
-#elif defined(YGOPRO_USE_OPENAL)
-		if (bgm) bgm->play("./sound/chants/" + ChantsList[code], false);
 #elif defined(YGOPRO_USE_SDL_MIXER)
 		mixer->PlaySound("./sound/chants/" + ChantsList[code]);
 #endif
@@ -197,20 +175,16 @@ bool SoundManager::PlayChant(unsigned int code) {
 	return false;
 }
 void SoundManager::SetSoundVolume(double volume) {
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	sfxVolume = volume;
-#elif defined(YGOPRO_USE_OPENAL)
-	if (sfx) sfx->setVolume(volume);
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	mixer->SetSoundVolume(volume);
 #endif
 }
 void SoundManager::SetMusicVolume(double volume) {
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	if (soundBGM) soundBGM->setVolume(volume);
 	bgmVolume = volume;
-#elif defined(YGOPRO_USE_OPENAL)
-	if (bgm) bgm->setVolume(volume);
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	mixer->SetMusicVolume(volume);
 #endif
@@ -221,15 +195,13 @@ void SoundManager::EnableSounds(bool enable) {
 void SoundManager::EnableMusic(bool enable) {
 	musicEnabled = enable;
 	if(!musicEnabled) {
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 		if(soundBGM){
 			if(!soundBGM->isFinished())
 				soundBGM->stop();
 			soundBGM->drop();
 			soundBGM = nullptr;
 		}
-#elif defined(YGOPRO_USE_OPENAL)
-		StopBGM();
 #elif defined(YGOPRO_USE_SDL_MIXER)
 		mixer->StopMusic();
 #endif

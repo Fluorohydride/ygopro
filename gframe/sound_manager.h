@@ -3,10 +3,8 @@
 
 #include <random>
 #include "utils.h"
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 #include <irrKlang.h>
-#elif defined(YGOPRO_USE_OPENAL)
-#include "sound_openal.h"
 #elif defined(YGOPRO_USE_SDL_MIXER)
 #include "sound_sdlmixer.h"
 #endif
@@ -51,9 +49,6 @@ public:
 		WIN,
 		LOSE
 	};
-#ifdef YGOPRO_USE_OPENAL
-	SoundManager() : openal(nullptr), sfx(nullptr) {}
-#endif
 	~SoundManager();
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
 	void RefreshBGMList();
@@ -73,16 +68,11 @@ private:
 	std::map<unsigned int, std::string> ChantsList;
 	int bgm_scene = -1;
 	std::mt19937 rnd;
-#ifdef YGOPRO_USE_IRRKLANG
+#if defined(YGOPRO_USE_IRRKLANG)
 	irrklang::ISoundEngine* soundEngine;
 	irrklang::ISound* soundBGM;
 	double sfxVolume = 1.0;
 	double bgmVolume = 1.0;
-#elif defined(YGOPRO_USE_OPENAL)
-	std::unique_ptr<YGOpen::OpenALSingleton> openal;
-	std::unique_ptr<YGOpen::OpenALSoundLayer> sfx;
-	std::unique_ptr<YGOpen::OpenALSoundLayer> bgm;
-	int bgmCurrent = -1;
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	std::unique_ptr<SoundMixer> mixer;
 #endif
