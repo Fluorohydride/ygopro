@@ -55,7 +55,7 @@ void SoundManager::RefreshBGMList() {
 }
 void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 #ifdef BACKEND
-	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/BGM/") + path, { TEXT("mp3"), TEXT("ogg"), TEXT("wav") })) {
+	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/BGM/") + path, { TEXT("mp3"), TEXT("ogg"), TEXT("wav"), TEXT("flac") })) {
 		auto conv = Utils::ToUTF8IfNeeded(path + TEXT("/") + file);
 		BGMList[BGM::ALL].push_back(conv);
 		BGMList[scene].push_back(conv);
