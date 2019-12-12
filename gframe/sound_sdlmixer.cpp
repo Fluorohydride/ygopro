@@ -46,13 +46,13 @@ bool SoundMixer::PlayMusic(const std::string& name, bool loop) {
 bool SoundMixer::PlaySound(const std::string& name) {
 	auto chunk = Mix_LoadWAV(name.c_str());
 	if(chunk) {
-		Mix_VolumeChunk(chunk, sound_volume);
 		auto channel = Mix_PlayChannel(-1, chunk, 0);
 		if(channel == -1) {
 			Mix_FreeChunk(chunk);
 			return false;
 		}
 		sounds[channel] = chunk;
+		Mix_Volume(-1, sound_volume);
 	} else {
 		return false;
 	}
