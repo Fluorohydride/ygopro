@@ -158,6 +158,8 @@ void SoundManager::PlayBGM(BGM scene) {
 	if(musicEnabled && (scene != bgm_scene || !bgm->exists(bgmCurrent)) && count > 0) {
 #elif defined(YGOPRO_USE_SDL_MIXER)
 	if(musicEnabled && (scene != bgm_scene || !mixer->MusicPlaying()) && count > 0) {
+#else
+	if(false) {
 #endif
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
