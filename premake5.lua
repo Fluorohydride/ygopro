@@ -48,10 +48,6 @@ workspace "ygo"
 	filter "system:windows"
 		defines { "WIN32", "_WIN32", "NOMINMAX" }
 
-	filter "system:macosx"
-		includedirs { "/usr/local/include" }
-		libdirs { "/usr/local/lib" }
-
 	if _OPTIONS["vcpkg-root"] then
 		filter "system:linux"
 			includedirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/include" }
@@ -71,6 +67,10 @@ workspace "ygo"
 		filter { "system:macosx", "configurations:Release" }
 			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-osx/lib" }
 	end
+
+	filter "system:macosx"
+		includedirs { "/usr/local/include" }
+		libdirs { "/usr/local/lib" }
 
 	filter "action:vs*"
 		vectorextensions "SSE2"
