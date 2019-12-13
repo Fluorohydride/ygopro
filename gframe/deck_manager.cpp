@@ -110,6 +110,8 @@ inline int CheckCards(const std::vector<CardDataC *> &cards, LFList* curlist, st
 			return (DECKERROR_OCGONLY << 28) + cit->code;
 		if (!allow_tcg && (cit->ot == 0x2))
 			return (DECKERROR_TCGONLY << 28) + cit->code;
+		if (cit->type & TYPE_TOKEN)
+			return (DECKERROR_EXTRACOUNT << 28);
 		int additional = additionalCheck(cit);
 		if (additional) {
 			return additional;
@@ -176,12 +178,16 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 		}
 	}
 	int currentCheck = CheckCards(deck.main, curlist, list, allow_ocg, allow_tcg, true, ccount, [](CardDataC* cit) {
-		if ((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
+		if ((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return (DECKERROR_EXTRACOUNT << 28);
 		return 0;
 	});
 	if (currentCheck) return currentCheck;
-	currentCheck = CheckCards(deck.extra, curlist, list, allow_ocg, allow_tcg, true, ccount);
+	currentCheck = CheckCards(deck.extra, curlist, list, allow_ocg, allow_tcg, true, ccount, [](CardDataC* cit) {
+		if (!(cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && !(cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
+			return (DECKERROR_EXTRACOUNT << 28);
+		return 0;
+	});
 	if (currentCheck) return currentCheck;
 	return CheckCards(deck.side, curlist, list, allow_ocg, allow_tcg, true, ccount);
 }
