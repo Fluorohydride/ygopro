@@ -17,6 +17,7 @@ addons:
     - libirrlicht-dev
     - libgl1-mesa-dev
     - libglu-dev
+    - libsndio-dev
   homebrew:
     update: true
     packages:

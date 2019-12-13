@@ -37,11 +37,11 @@ local ygopro_config=function(static_core)
 			filter "system:windows"
 				links { "version", "setupapi" }
 			filter { "system:linux", "configurations:Debug" }
-				links { "SDL2d", "sndio" }
+				links { "SDL2d" }
 			filter { "system:linux", "configurations:Release" }
-				links { "SDL2", "sndio" }
+				links { "SDL2" }
 			filter "system:linux"
-				links { "SDL2_mixer" }
+				links { "SDL2_mixer", "sndio" }
 		end
 	end
 
