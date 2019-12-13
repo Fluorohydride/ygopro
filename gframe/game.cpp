@@ -159,8 +159,30 @@ bool Game::Initialize() {
 	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, L"OK");
 	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
 	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(2045).c_str(), 1, true, true));
+	mAbout = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(1970).c_str(), 2, true, true));
+	wAbout = env->addWindow(Scale(0, 0, 450, 700), false, L"", mAbout);
+	wAbout->getCloseButton()->setVisible(false);
+	wAbout->setDraggable(false);
+	wAbout->setDrawTitlebar(false);
+	wAbout->setDrawBackground(false);
+	stAbout = env->addStaticText(L"EDOPro by Project Ignis\n"
+								 L"The bleeding-edge automatic duel simulator\n"
+								 L"\n"
+								 L"Copyright (C) 2019  Edoardo Lolletti (edo9300) and others\n"
+								 L"Card scripts by Project Ignis\n"
+								 L"Licensed under the GNU AGPLv3 or later. See LICENSE for more details.\n"
+								 L"https://github.com/edo9300/ygopro\n"
+								 L"https://github.com/edo9300/ygopro-core\n"
+								 L"More links and contributors to be added\n"
+								 L"\n"
+								 L"Forked from Fluorohydride's YGOPro.\n"
+								 L"\n"
+								 L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
+								 L"This project is not affiliated or endorsed by Shueisha or Konami.",
+								 Scale(10, 10, 440, 690), false, false, wAbout);
+	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	//main menu
-	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
+	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro by Project Ignis | {:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
 #define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, 270, 60 + offset)

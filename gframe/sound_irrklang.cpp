@@ -1,4 +1,5 @@
 #include "sound_irrklang.h"
+#include <stdexcept>
 #include <irrKlang.h>
 #ifdef IRRKLANG_STATIC
 #include "../ikpmp3/ikpMP3.h"

@@ -7,9 +7,9 @@ newoption {
 	value = "backend",
 	description = "Choose sound backend",
 	allowed = {
-      { "irrklang",  "irrklang" },
-      { "sdl-mixer",  "SDL2-mixer" }
-   }
+		{ "irrklang",  "irrklang" },
+		{ "sdl-mixer",  "SDL2-mixer" }
+	}
 }
 newoption {
 	trigger = "pics",
