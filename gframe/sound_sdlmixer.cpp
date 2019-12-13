@@ -10,6 +10,9 @@ SoundMixer::SoundMixer() {
 		throw std::runtime_error("Failed to init sdl audio device!");
 	int flags = MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_FLAC;
 	int initted = Mix_Init(flags);
+	printf("MIX_INIT_OGG: %s\n", initted&MIX_INIT_OGG ? "true" : "false");
+	printf("MIX_INIT_MP3: %s\n", initted&MIX_INIT_MP3 ? "true" : "false");
+	printf("MIX_INIT_FLAC: %s\n", initted&MIX_INIT_FLAC ? "true" : "false");
 	if((initted&flags) != flags) {
 		throw std::runtime_error("Not all flags set");
 	}
