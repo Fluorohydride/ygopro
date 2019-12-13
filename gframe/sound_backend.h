@@ -4,6 +4,7 @@
 
 class SoundBackend {
 public:
+	virtual ~SoundBackend() = default;
 	virtual void SetSoundVolume(double volume) = 0;
 	virtual void SetMusicVolume(double volume) = 0;
 	virtual bool PlayMusic(const std::string& name, bool loop) = 0;
