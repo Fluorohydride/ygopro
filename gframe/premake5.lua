@@ -36,6 +36,12 @@ local ygopro_config=function(static_core)
 			files "sound_sdlmixer.*"
 			filter "system:windows"
 				links { "version", "setupapi" }
+			filter { "system:linux", "configurations:Debug" }
+				links { "SDL2d", "sndio" }
+			filter { "system:linux", "configurations:Release" }
+				links { "SDL2", "sndio" }
+			filter "system:linux"
+				links { "SDL2_mixer" }
 		end
 	end
 
