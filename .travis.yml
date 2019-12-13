@@ -18,6 +18,8 @@ addons:
     - libgl1-mesa-dev
     - libglu-dev
     - libsndio-dev
+    - libasound2-dev
+    - libpulse-dev
   homebrew:
     update: true
     packages:
