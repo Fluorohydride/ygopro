@@ -36,12 +36,16 @@ local ygopro_config=function(static_core)
 			files "sound_sdlmixer.*"
 			filter "system:windows"
 				links { "version", "setupapi" }
-			filter { "system:linux", "configurations:Debug" }
+			filter { "system:not windows", "configurations:Debug" }
 				links { "SDL2d" }
-			filter { "system:linux", "configurations:Release" }
+			filter { "system:not windows", "configurations:Release" }
 				links { "SDL2" }
+			filter "system:not windows"
+				links { "SDL2_mixer", "FLAC", "mpg123", "vorbisfile", "vorbis", "ogg" }
 			filter "system:linux"
-				links { "SDL2_mixer", "sndio", "FLAC", "mpg123", "vorbisfile", "vorbis", "ogg" }
+				links "sndio"
+			filter "system:macosx"
+				links { "iconv", "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
 		end
 	end
 
@@ -76,11 +80,6 @@ local ygopro_config=function(static_core)
 		if static_core then
 			links "lua"
 		end
-
-	filter { "system:macosx", "options:no-irrklang" }
-		includedirs "/usr/local/opt/openal-soft/include"
-		libdirs "/usr/local/opt/openal-soft/lib"
-		links { "openal", "mpg123", "sndfile", "vorbis", "vorbisenc", "ogg", "FLAC" }
 
 	filter { "system:linux", "configurations:Debug" }
 		links { "fmtd", "curl-d" }

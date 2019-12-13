@@ -61,6 +61,15 @@ workspace "ygo"
 	
 		filter { "system:linux", "configurations:Release" }
 			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/lib" }
+
+		filter "system:macosx"
+			includedirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-osx/include" }
+
+		filter { "system:macosx", "configurations:Debug" }
+			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-osx/debug/lib" }
+
+		filter { "system:macosx", "configurations:Release" }
+			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-osx/lib" }
 	end
 
 	filter "action:vs*"
