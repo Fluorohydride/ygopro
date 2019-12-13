@@ -17,6 +17,7 @@ SoundMixer::SoundMixer() {
 		throw std::runtime_error("Not all flags set");
 	}
 	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) == -1)
+		printf("Mix_OpenAudio: %s\n", Mix_GetError());
 		throw std::runtime_error("Cannot open channels");
 }
 void SoundMixer::SetSoundVolume(double volume) {
