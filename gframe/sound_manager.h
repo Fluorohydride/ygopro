@@ -1,6 +1,7 @@
 #ifndef SOUNDMANAGER_H
 #define SOUNDMANAGER_H
 
+#include <memory>
 #include <random>
 #include "utils.h"
 #include "sound_backend.h"
