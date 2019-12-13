@@ -15,7 +15,7 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     make -Cbuild -j2 config=$BUILD_CONFIG ygoprodll
 fi
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    ./premake5 gmake2 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --discord=\"$DISCORD_APP_ID\" --sound=irrklang
+    ./premake5 gmake2 --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --discord=\"$DISCORD_APP_ID\" --sound=sdl-mixer
     make -Cbuild -j2 config=$BUILD_CONFIG ygoprodll
     make -Cbuild -j2 config=$BUILD_CONFIG discord-launcher
 fi

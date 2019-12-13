@@ -26,7 +26,6 @@ addons:
     - dylibbundler
     - gpatch
     - p7zip
-    - libevent
     - freetype
     - sqlite
     - curl
@@ -54,10 +53,12 @@ matrix:
   - name: "Mojave"
     os: osx
     osx_image: xcode10.3
-    env: 
+    env:
     - MACOSX_DEPLOYMENT_TARGET=10.11
     - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk"
-    - CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/latest/dependencies_osx.7z
+    - VCPKG_ROOT=./vcpkg
+    - VCPKG_LIBS="libevent[thread] sdl2-mixer-fixdynamic[libflac,mpg123,libvorbis] discord-rpc-payload"
+    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/latest/installed_x64-osx.7z
 before_install: ./travis/install-premake5.sh
 install: ./travis/dependencies.sh
 script: ./travis/build.sh
