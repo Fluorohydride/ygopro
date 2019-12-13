@@ -101,6 +101,32 @@ int DeckManager::TypeCount(std::vector<CardDataC*> cards, int type) {
 	}
 	return count;
 }
+inline int CheckCards(const std::vector<CardDataC *> &cards, LFList* curlist, std::unordered_map<int, int>* list,
+					  bool allow_ocg, bool allow_tcg, bool allow_prerelease,
+					  std::unordered_map<int, int> &ccount,
+					  std::function<int(CardDataC*)> additionalCheck = [](CardDataC*){ return 0; }) {
+	for (const auto cit : cards) {
+		if (!allow_ocg && (cit->ot == 0x1))
+			return (DECKERROR_OCGONLY << 28) + cit->code;
+		if (!allow_tcg && (cit->ot == 0x2))
+			return (DECKERROR_TCGONLY << 28) + cit->code;
+		int additional = additionalCheck(cit);
+		if (additional) {
+			return additional;
+		}
+		int code = cit->alias ? cit->alias : cit->code;
+		ccount[code]++;
+		int dc = ccount[code];
+		if (dc > 3)
+			return (DECKERROR_CARDCOUNT << 28) + cit->code;
+		auto it = list->find(cit->code);
+		if (it == list->end())
+			it = list->find(code);
+		if ((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
+			return (DECKERROR_LFLIST << 28) + cit->code;
+	}
+	return 0;
+}
 int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes) {
 	std::unordered_map<int, int> ccount;
 	LFList* curlist = nullptr;
@@ -113,7 +139,6 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 	if(!curlist)
 		return 0;
 	auto list = &curlist->content;
-	int dc = 0;
 	if(TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
 		return (DECKERROR_FORBTYPE << 28);
 	bool speed = mainGame->dInfo.extraval & 0x1;
@@ -150,60 +175,15 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 				return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
 		}
 	}
-	for(size_t i = 0; i < deck.main.size(); ++i) {
-		auto cit = deck.main[i];
-		if(!allow_ocg && (cit->ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->code;
-		if(!allow_tcg && (cit->ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->code;
-		if((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
+	int currentCheck = CheckCards(deck.main, curlist, list, allow_ocg, allow_tcg, true, ccount, [](CardDataC* cit) {
+		if ((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_TOKEN)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return (DECKERROR_EXTRACOUNT << 28);
-		int code = cit->alias ? cit->alias : cit->code;
-		ccount[code]++;
-		dc = ccount[code];
-		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->code;
-		auto it = list->find(cit->code);
-		if (it == list->end())
-			it = list->find(code);
-		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
-			return (DECKERROR_LFLIST << 28) + cit->code;
-	}
-	for(size_t i = 0; i < deck.extra.size(); ++i) {
-		auto cit = deck.extra[i];
-		if(!allow_ocg && (cit->ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->code;
-		if(!allow_tcg && (cit->ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->code;
-		int code = cit->alias ? cit->alias : cit->code;
-		ccount[code]++;
-		dc = ccount[code];
-		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->code;
-		auto it = list->find(cit->code);
-		if(it == list->end())
-			it = list->find(code);
-		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
-			return (DECKERROR_LFLIST << 28) + cit->code;
-	}
-	for(size_t i = 0; i < deck.side.size(); ++i) {
-		auto cit = deck.side[i];
-		if(!allow_ocg && (cit->ot == 0x1))
-			return (DECKERROR_OCGONLY << 28) + cit->code;
-		if(!allow_tcg && (cit->ot == 0x2))
-			return (DECKERROR_TCGONLY << 28) + cit->code;
-		int code = cit->alias ? cit->alias : cit->code;
-		ccount[code]++;
-		dc = ccount[code];
-		if(dc > 3)
-			return (DECKERROR_CARDCOUNT << 28) + cit->code;
-		auto it = list->find(cit->code);
-		if(it == list->end())
-			it = list->find(code);
-		if((it != list->end() && dc > it->second) || (curlist->whitelist && it == list->end()))
-			return (DECKERROR_LFLIST << 28) + cit->code;
-	}
-	return 0;
+		return 0;
+	});
+	if (currentCheck) return currentCheck;
+	currentCheck = CheckCards(deck.extra, curlist, list, allow_ocg, allow_tcg, true, ccount);
+	if (currentCheck) return currentCheck;
+	return CheckCards(deck.side, curlist, list, allow_ocg, allow_tcg, true, ccount);
 }
 int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2) {
 	std::vector<int> mainvect;
