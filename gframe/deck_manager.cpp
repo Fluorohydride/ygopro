@@ -129,7 +129,7 @@ inline int CheckCards(const std::vector<CardDataC *> &cards, LFList* curlist, st
 	}
 	return 0;
 }
-int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool doubled, int forbiddentypes) {
+int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool allow_prerelease, bool doubled, int forbiddentypes) {
 	std::unordered_map<int, int> ccount;
 	LFList* curlist = nullptr;
 	for(auto& list : _lfList) {
@@ -177,13 +177,13 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 				return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
 		}
 	}
-	int currentCheck = CheckCards(deck.main, curlist, list, allow_ocg, allow_tcg, true, ccount, [](CardDataC* cit) {
+	int currentCheck = CheckCards(deck.main, curlist, list, allow_ocg, allow_tcg, allow_prerelease, ccount, [](CardDataC* cit) {
 		if ((cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) || (cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return (DECKERROR_EXTRACOUNT << 28);
 		return 0;
 	});
 	if (currentCheck) return currentCheck;
-	currentCheck = CheckCards(deck.extra, curlist, list, allow_ocg, allow_tcg, true, ccount, [](CardDataC* cit) {
+	currentCheck = CheckCards(deck.extra, curlist, list, allow_ocg, allow_tcg, allow_prerelease, ccount, [](CardDataC* cit) {
 		if (!(cit->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && !(cit->type & TYPE_LINK && cit->type & TYPE_MONSTER))
 			return (DECKERROR_EXTRACOUNT << 28);
 		return 0;
