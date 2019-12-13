@@ -41,7 +41,7 @@ local ygopro_config=function(static_core)
 			filter { "system:linux", "configurations:Release" }
 				links { "SDL2" }
 			filter "system:linux"
-				links { "SDL2_mixer", "sndio" }
+				links { "SDL2_mixer", "sndio", "FLAC", "mpg123", "vorbisfile", "vorbis", "ogg" }
 		end
 	end
 
