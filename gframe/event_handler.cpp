@@ -320,6 +320,31 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				SetResponseSelectedOption();
 				break;
 			}
+			case BUTTON_ANNUMBER_1:
+			case BUTTON_ANNUMBER_2:
+			case BUTTON_ANNUMBER_3:
+			case BUTTON_ANNUMBER_4:
+			case BUTTON_ANNUMBER_5:
+			case BUTTON_ANNUMBER_6:
+			case BUTTON_ANNUMBER_7:
+			case BUTTON_ANNUMBER_8:
+			case BUTTON_ANNUMBER_9:
+			case BUTTON_ANNUMBER_10:
+			case BUTTON_ANNUMBER_11:
+			case BUTTON_ANNUMBER_12: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				for(int i = 0; i < mainGame->cbANNumber->getItemCount(); ++i) {
+					if(id - BUTTON_ANNUMBER_1 + 1 == mainGame->cbANNumber->getItemData(i)) {
+						mainGame->cbANNumber->setSelected(i);
+						break;
+					}
+				}
+				for(int i = 0; i < 12; ++i) {
+					mainGame->btnANNumber[i]->setPressed(event.GUIEvent.Caller == mainGame->btnANNumber[i]);
+				}
+				mainGame->btnANNumberOK->setEnabled(true);
+				break;
+			}
 			case BUTTON_ANNUMBER_OK: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				DuelClient::SetResponseI(mainGame->cbANNumber->getSelected());

@@ -415,6 +415,7 @@ public:
 	//announce number
 	irr::gui::IGUIWindow* wANNumber;
 	irr::gui::IGUIComboBox* cbANNumber;
+	irr::gui::IGUIButton* btnANNumber[12];
 	irr::gui::IGUIButton* btnANNumberOK;
 	//announce card
 	irr::gui::IGUIWindow* wANCard;
@@ -650,9 +651,18 @@ extern Game* mainGame;
 #define BUTTON_CHAIN_WHENAVAIL		266
 #define BUTTON_CANCEL_OR_FINISH		267
 #define BUTTON_PHASE				268
-#define BUTTON_CLEAR_LOG			270
-#define LISTBOX_LOG					271
-#define SCROLL_CARDTEXT				280
+#define BUTTON_ANNUMBER_1			270
+#define BUTTON_ANNUMBER_2			271
+#define BUTTON_ANNUMBER_3			272
+#define BUTTON_ANNUMBER_4			273
+#define BUTTON_ANNUMBER_5			274
+#define BUTTON_ANNUMBER_6			275
+#define BUTTON_ANNUMBER_7			276
+#define BUTTON_ANNUMBER_8			277
+#define BUTTON_ANNUMBER_9			278
+#define BUTTON_ANNUMBER_10			279
+#define BUTTON_ANNUMBER_11			280
+#define BUTTON_ANNUMBER_12			281
 #define BUTTON_DISPLAY_0			290
 #define BUTTON_DISPLAY_1			291
 #define BUTTON_DISPLAY_2			292
@@ -687,6 +697,9 @@ extern Game* mainGame;
 #define BUTTON_MARKS_FILTER			322
 #define BUTTON_MARKERS_OK			323
 #define COMBOBOX_SORTTYPE			324
+#define BUTTON_CLEAR_LOG			350
+#define LISTBOX_LOG					351
+#define SCROLL_CARDTEXT				352
 #define CHECKBOX_AUTO_SEARCH		360
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
