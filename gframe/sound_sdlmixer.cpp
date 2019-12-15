@@ -30,7 +30,7 @@ void SoundMixer::SetMusicVolume(double volume) {
 	Mix_VolumeMusic(music_volume);
 }
 bool SoundMixer::PlayMusic(const std::string& name, bool loop) {
-	if(cur_music == name)
+	if(music && cur_music == name)
 		return false;
 	if(music) {
 		Mix_HaltMusic();
@@ -64,13 +64,21 @@ bool SoundMixer::PlaySound(const std::string& name) {
 	}
 	return true;
 }
+void SoundMixer::StopSounds() {
+	Mix_HaltChannel(-1);
+}
 void SoundMixer::StopMusic() {
 	if(music) {
 		Mix_HaltMusic();
 		Mix_FreeMusic(music);
 		music = nullptr;
-		cur_music = "";
 	}
+}
+void SoundMixer::PauseMusic(bool pause) {
+	if(pause)
+		Mix_PauseMusic();
+	else
+		Mix_ResumeMusic();
 }
 bool SoundMixer::MusicPlaying() {
 	return Mix_PlayingMusic();

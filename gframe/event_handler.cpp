@@ -116,6 +116,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::StopClient();
 					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
+					mainGame->soundManager->StopSounds();
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->mTopMenu->setVisible(true);
 					mainGame->stTip->setVisible(false);

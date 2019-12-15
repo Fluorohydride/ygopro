@@ -15,7 +15,9 @@ public:
 	void SetMusicVolume(double volume);
 	bool PlayMusic(const std::string& name, bool loop);
 	bool PlaySound(const std::string& name);
+	void StopSounds();
 	void StopMusic();
+	void PauseMusic(bool pause);
 	bool MusicPlaying();
 	void Tick();
 private:

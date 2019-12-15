@@ -40,8 +40,12 @@ bool SoundIrrklang::PlaySound(const std::string& name) {
 		return false;
 	sfx->setVolume(sfxVolume);
 	sfx->setIsPaused(false);
-	sfx->drop();
+	sounds.push_back(sfx);
 	return true;
+}
+void SoundIrrklang::StopSounds() {
+	for(auto& sound : sounds)
+		sound->stop();
 }
 void SoundIrrklang::StopMusic() {
 	if(soundBGM) {
@@ -50,8 +54,23 @@ void SoundIrrklang::StopMusic() {
 		soundBGM = nullptr;
 	}
 }
+void SoundIrrklang::PauseMusic(bool pause) {
+	if(soundBGM)
+		soundBGM->setIsPaused(pause);
+}
 bool SoundIrrklang::MusicPlaying() {
 	return soundBGM && !soundBGM->isFinished();
+}
+void SoundIrrklang::Tick() {
+	for(auto itsound = sounds.begin(); itsound != sounds.end();) {
+		auto sound = *itsound;
+		if(sound->isFinished()) {
+			sound->drop();
+			itsound = sounds.erase(itsound);
+		} else {
+			itsound++;
+		}
+	}
 }
 SoundIrrklang::~SoundIrrklang() {
 	if(soundBGM)

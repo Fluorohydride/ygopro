@@ -247,6 +247,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					else mainGame->PopupMessage(dataManager.GetSysString(1402));
 					mainGame->gMutex.unlock();
 				} else {
+					mainGame->soundManager->StopSounds();
 					ReplayPrompt(true);
 					mainGame->gMutex.lock();
 					mainGame->PopupMessage(dataManager.GetSysString(1502));
@@ -468,6 +469,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_CHANGE_SIDE: {
+		mainGame->soundManager->StopSounds();
 		ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isInLobby = false;
@@ -761,6 +763,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_DUEL_END: {
+		mainGame->soundManager->StopSounds();
 		ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
 		if(mainGame->dInfo.player_type < 7)
@@ -1033,6 +1036,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
+		mainGame->soundManager->StopSounds();
 		mainGame->gMutex.lock();
 		mainGame->stMessage->setText(L"Error occurs.");
 		mainGame->PopupElement(mainGame->wMessage);
@@ -1053,6 +1057,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->stTip->setVisible(false);
+		mainGame->soundManager->StopSounds();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		if(mainGame->isHostingOnline) {
 			mainGame->ShowElement(mainGame->wRoomListPlaceholder);

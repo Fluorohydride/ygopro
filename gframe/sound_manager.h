@@ -55,6 +55,9 @@ public:
 	void SetMusicVolume(double volume);
 	void EnableSounds(bool enable);
 	void EnableMusic(bool enable);
+	void StopSounds();
+	void StopMusic();
+	void PauseMusic(bool pause);
 	void Tick();
 
 private:

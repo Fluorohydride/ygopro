@@ -151,6 +151,7 @@ int SingleMode::SinglePlayThread() {
 	new_replay.EndRecord();
 	if(is_closing)
 		return 0;
+	mainGame->soundManager->StopSounds();
 	time_t nowtime = time(NULL);
 	tm* localedtime = localtime(&nowtime);
 	wchar_t timetext[40];

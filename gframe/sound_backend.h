@@ -9,8 +9,10 @@ public:
 	virtual void SetMusicVolume(double volume) = 0;
 	virtual bool PlayMusic(const std::string& name, bool loop) = 0;
 	virtual bool PlaySound(const std::string& name) = 0;
+	virtual void StopSounds() = 0;
 	virtual void StopMusic() = 0;
 	virtual bool MusicPlaying() = 0;
+	virtual void PauseMusic(bool pause) = 0;
 	virtual void Tick() {};
 };
 

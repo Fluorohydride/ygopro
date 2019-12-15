@@ -145,6 +145,9 @@ void SoundManager::EnableSounds(bool enable) {
 	if(!mixer)
 		return;
 	soundsEnabled = enable;
+	if(!musicEnabled) {
+		mixer->StopSounds();
+	}
 #endif
 }
 void SoundManager::EnableMusic(bool enable) {
@@ -155,6 +158,24 @@ void SoundManager::EnableMusic(bool enable) {
 	if(!musicEnabled) {
 		mixer->StopMusic();
 	}
+#endif
+}
+void SoundManager::StopSounds() {
+#ifdef BACKEND
+	if(mixer)
+		mixer->StopSounds();
+#endif
+}
+void SoundManager::StopMusic() {
+#ifdef BACKEND
+	if(mixer)
+		mixer->StopMusic();
+#endif
+}
+void SoundManager::PauseMusic(bool pause) {
+#ifdef BACKEND
+	if(mixer)
+		mixer->PauseMusic(pause);
 #endif
 }
 

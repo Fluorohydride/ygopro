@@ -151,6 +151,7 @@ void ReplayMode::EndDuel() {
 		mainGame->ShowElement(mainGame->wReplay);
 		mainGame->SetMesageWindow();
 		mainGame->stTip->setVisible(false);
+		mainGame->soundManager->StopSounds();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();
 		if(exit_on_return)
