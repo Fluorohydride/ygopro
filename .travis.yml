@@ -6,7 +6,7 @@ git:
 env:
   global:
   - BUILD_CONFIG=release
-  - DEPLOY_BRANCH=travis-$TRAVIS_OS_NAME
+  - DEPLOY_BRANCH=$TRAVIS_BRANCH-$TRAVIS_OS_NAME
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
 addons:
   apt:
@@ -69,6 +69,7 @@ deploy:
   on:
     condition: "$TRAVIS_OS_NAME == windows"
     repo: edo9300/ygopro
+    branch: kevin/scope-prerelease
 - provider: pages
   skip_cleanup: true
   local_dir: deploy
@@ -78,3 +79,4 @@ deploy:
   on:
     condition: "$TRAVIS_OS_NAME != windows"
     repo: edo9300/ygopro
+    branch: kevin/scope-prerelease
