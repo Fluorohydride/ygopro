@@ -1705,7 +1705,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
 			if(mainGame->chkWaitChain->isChecked() && !mainGame->ignore_chain) {
-				mainGame->WaitFrameSignal(rnd() * 20 + 20);
+				mainGame->WaitFrameSignal(20);
 			}
 			DuelClient::SendResponse();
 			return true;
