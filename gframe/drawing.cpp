@@ -1293,26 +1293,28 @@ void Game::DrawDeckBd() {
 			buffer = L"";
 		}
 		static const std::map<int, int> SCOPES = {
-			{0x1, 1240},
-			{0x2, 1241},
+			{0x1, 1900},
+			{0x2, 1901},
 			{0x4, 1264},
 			{0x8, 1265},
 			{0x10, 1266},
 			{0x20, 1267},
-			{0x100, 1269}
+			{0x100, 1903}
 		};
-		auto cardScopeCount = 0;
-		buffer.append(L"[");
-		for(const auto& scope : SCOPES) {
-			if (ptr->ot & scope.first) {
-				if (cardScopeCount) {
-					buffer.append(L"/");
+		if (ptr->ot != 0x3) { // Special case: skip OCG/TCG
+			auto cardScopeCount = 0;
+			buffer.append(L"[");
+			for (const auto& scope : SCOPES) {
+				if (ptr->ot & scope.first) {
+					if (cardScopeCount) {
+						buffer.append(L"/");
+					}
+					buffer.append(dataManager.GetSysString(scope.second).c_str());
+					cardScopeCount++;
 				}
-				buffer.append(dataManager.GetSysString(scope.second).c_str());
-				cardScopeCount++;
 			}
+			buffer.append(L"]");
 		}
-		buffer.append(L"]");
 		textFont->draw(buffer.c_str(), Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
 		textFont->draw(buffer.c_str(), Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
 	}

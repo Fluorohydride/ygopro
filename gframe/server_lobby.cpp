@@ -84,7 +84,7 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->addRow(index);
 		roomListTable->setCellData(index, 0, room.locked ? (void*)1 : nullptr);
 		roomListTable->setCellData(index, 1, (void*)&room);
-		roomListTable->setCellText(index, 1, dataManager.GetSysString(room.info.rule + 1240).c_str());
+		roomListTable->setCellText(index, 1, dataManager.GetSysString(room.info.rule + 1900).c_str());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
 			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).c_str() : L"",
 			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());

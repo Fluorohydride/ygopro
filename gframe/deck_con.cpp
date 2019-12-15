@@ -500,9 +500,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1317).c_str());
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1318).c_str());
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1320).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1240).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1241).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1242).c_str());
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1900).c_str());
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1901).c_str());
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1902).c_str());
+					mainGame->cbLimit->addItem(dataManager.GetSysString(1903).c_str());
 					if(mainGame->chkAnime->isChecked()) {
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1264).c_str());
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1265).c_str());
@@ -883,7 +884,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	mainGame->scrFilter->setPos(0);
 }
 bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
-	if(data->type & TYPE_TOKEN || (data->ot > 3 && !mainGame->chkAnime->isChecked()))
+	if(data->type & TYPE_TOKEN || (data->ot > 3 && !(data->ot & 0x100) && !mainGame->chkAnime->isChecked()))
 		return false;
 	switch(filter_type) {
 	case 1: {
@@ -959,6 +960,8 @@ bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar
 		if(filter_lm == LIMITATION_FILTER_TCG && data->ot != 0x2)
 			return false;
 		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->ot != 0x3)
+			return false;
+		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->ot & 0x100))
 			return false;
 		if(filter_lm == LIMITATION_FILTER_ANIME && data->ot != 0x4)
 			return false;

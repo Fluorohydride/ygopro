@@ -233,10 +233,9 @@ bool Game::Initialize() {
 		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
 	env->addStaticText(dataManager.GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(Scale(140, 55, 300, 80), wCreateHost);
-	cbRule->addItem(dataManager.GetSysString(1240).c_str());
-	cbRule->addItem(dataManager.GetSysString(1241).c_str());
-	cbRule->addItem(dataManager.GetSysString(1242).c_str());
-	cbRule->addItem(dataManager.GetSysString(1243).c_str());
+	for (auto i = 1900; i <= 1904; ++i) {
+		cbRule->addItem(dataManager.GetSysString(i).c_str());
+	}
 	env->addStaticText(dataManager.GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	ebTeam1 = env->addEditBox(L"1", Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -676,9 +675,10 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1317).c_str());
 	cbLimit->addItem(dataManager.GetSysString(1318).c_str());
 	cbLimit->addItem(dataManager.GetSysString(1320).c_str());
-	cbLimit->addItem(dataManager.GetSysString(1240).c_str());
-	cbLimit->addItem(dataManager.GetSysString(1241).c_str());
-	cbLimit->addItem(dataManager.GetSysString(1242).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1900).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1901).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1902).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1903).c_str());
 	if(chkAnime->isChecked()) {
 		cbLimit->addItem(dataManager.GetSysString(1264).c_str());
 		cbLimit->addItem(dataManager.GetSysString(1265).c_str());
@@ -884,10 +884,9 @@ bool Game::Initialize() {
 	cbFilterBanlist->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	cbFilterRule->addItem(fmt::format(L"[{}]", dataManager.GetSysString(1225)).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1240).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1241).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1242).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1243).c_str());
+	for (auto i = 1900; i <= 1904; ++i) {
+		cbFilterRule->addItem(dataManager.GetSysString(i).c_str());
+	}
 
 	cbFilterBanlist->addItem(fmt::format(L"[{}]", dataManager.GetSysString(1226)).c_str());
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)

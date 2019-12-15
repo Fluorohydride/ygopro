@@ -110,6 +110,8 @@ inline int CheckCards(const std::vector<CardDataC *> &cards, LFList* curlist, st
 			return (DECKERROR_OCGONLY << 28) + cit->code;
 		if (!allow_tcg && (cit->ot == 0x2))
 			return (DECKERROR_TCGONLY << 28) + cit->code;
+		if (!allow_prerelease && (cit->ot & 0x100))
+			return (DECKERROR_NOPRERELEASE << 28) + cit->code;
 		if (cit->type & TYPE_TOKEN)
 			return (DECKERROR_EXTRACOUNT << 28);
 		int additional = additionalCheck(cit);
