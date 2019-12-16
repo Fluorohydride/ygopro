@@ -43,6 +43,7 @@ struct Config {
 	std::wstring gamename;
 	std::wstring lastdeck;
 	unsigned int lastlflist;
+	unsigned int lastallowedcards;
 	std::wstring textfont;
 	std::wstring numfont;
 	std::wstring roompass;

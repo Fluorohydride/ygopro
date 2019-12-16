@@ -229,13 +229,16 @@ bool Game::Initialize() {
 	wCreateHost->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1226).c_str(), Scale(20, 30, 220, 50), false, false, wCreateHost);
 	cbLFlist = env->addComboBox(Scale(140, 25, 300, 50), wCreateHost);
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+	for (unsigned int i = 0; i < deckManager._lfList.size(); ++i) {
 		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+		if (gameConf.lastlflist == deckManager._lfList[i].hash)
+			cbLFlist->setSelected(i);
+	}
 	env->addStaticText(dataManager.GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(Scale(140, 55, 300, 80), wCreateHost);
-	for (auto i = 1900; i <= 1904; ++i) {
+	for (auto i = 1900; i <= 1904; ++i)
 		cbRule->addItem(dataManager.GetSysString(i).c_str());
-	}
+	cbRule->setSelected(gameConf.lastallowedcards);
 	env->addStaticText(dataManager.GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	ebTeam1 = env->addEditBox(L"1", Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -884,9 +887,8 @@ bool Game::Initialize() {
 	cbFilterBanlist->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	cbFilterRule->addItem(fmt::format(L"[{}]", dataManager.GetSysString(1225)).c_str());
-	for (auto i = 1900; i <= 1904; ++i) {
+	for (auto i = 1900; i <= 1904; ++i)
 		cbFilterRule->addItem(dataManager.GetSysString(i).c_str());
-	}
 
 	cbFilterBanlist->addItem(fmt::format(L"[{}]", dataManager.GetSysString(1226)).c_str());
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
@@ -1332,6 +1334,7 @@ void Game::LoadConfig() {
 	gameConf.gamename = L"";
 	gameConf.lastdeck = L"";
 	gameConf.lastlflist = 0;
+	gameConf.lastallowedcards = static_cast<unsigned int>(DuelAllowedCards::ALLOWED_CARDS_WITH_PRERELEASE);
 	gameConf.numfont = L"";
 	gameConf.textfont = L"";
 	gameConf.lasthost = L"";
@@ -1395,6 +1398,9 @@ void Game::LoadConfig() {
 		else if(type == "lastlflist") {
 			auto val = std::stoi(str);
 			gameConf.lastlflist = val >= 0 ? val : 0;
+		} else if(type == "lastallowedcards") {
+			auto val = std::stoi(str);
+			gameConf.lastallowedcards = val >= 0 ? val : 0;
 		} else if(type == "textfont") {
 			pos = str.find(L' ');
 			if(pos == std::wstring::npos) {
@@ -1489,6 +1495,7 @@ void Game::SaveConfig() {
 	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
 	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
 	conf_file << "lastlflist = "		<< std::to_string(gameConf.lastlflist) << "\n";
+	conf_file << "lastallowedcards = "  << std::to_string(cbRule->getSelected()) << "\n";
 	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
 	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
 	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";
