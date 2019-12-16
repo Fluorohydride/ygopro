@@ -361,10 +361,7 @@ void GenericDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 			if(dueler.deck_error) {
 				deckerror = (DECKERROR_UNKNOWNCARD << 28) + dueler.deck_error;
 			} else {
-				bool allow_ocg = host_info.rule != 1;
-				bool allow_tcg = host_info.rule != 0;
-				bool allow_prerelease = host_info.rule >= 3;
-				deckerror = deckManager.CheckDeck(dueler.pdeck, host_info.lflist, allow_ocg, allow_tcg, allow_prerelease, host_info.extra_rules & DOUBLE_DECK, host_info.forbiddentypes);
+				deckerror = deckManager.CheckDeck(dueler.pdeck, host_info.lflist, static_cast<DuelAllowedCards>(host_info.rule), host_info.extra_rules & DOUBLE_DECK, host_info.forbiddentypes);
 			}
 		}
 		if(deckerror) {

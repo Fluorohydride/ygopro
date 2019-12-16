@@ -30,7 +30,13 @@ struct Deck {
 		side.clear();
 	}
 };
-
+enum class DuelAllowedCards {
+	ALLOWED_CARDS_OCG_ONLY,
+	ALLOWED_CARDS_TCG_ONLY,
+	ALLOWED_CARDS_OCG_TCG,
+	ALLOWED_CARDS_WITH_PRERELEASE,
+	ALLOWED_CARDS_ANY
+};
 class DeckManager {
 private:
 	int null_lflist_index = -1;
@@ -44,7 +50,7 @@ public:
 	void LoadLFList();
 	void RefreshLFList();
 	std::wstring GetLFListName(int lfhash);
-	int CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg, bool allow_prerelease, bool doubled, int forbiddentypes = 0);
+	int CheckDeck(Deck& deck, int lfhash, DuelAllowedCards allowedCards, bool doubled, int forbiddentypes = 0);
 	int TypeCount(std::vector<CardDataC*> cards, int type);
 	int LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2 = 0, int sidec2 = 0);
 	int LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist);
