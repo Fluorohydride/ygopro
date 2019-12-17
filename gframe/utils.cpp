@@ -296,11 +296,32 @@ namespace ygo {
 			} else {
 				if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension(name)) == extensions.end())
 					return;
-				res.push_back(name.c_str());
+				res.push_back(name);
 			}
 		});
 		std::sort(res.begin(), res.end());
 		return res;
+	}
+	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers) {
+		std::vector<path_string> results;
+		FindfolderFiles(path, [&results, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
+			if (isdir) {
+				if (name == TEXT("..") || name == TEXT(".")) {
+					return;
+				}
+				results.push_back(path + name + TEXT("/"));
+				if (subdirectorylayers > 1) {
+					auto subresults = FindSubfolders(path + name + TEXT("/"), subdirectorylayers - 1);
+					for (auto& folder : subresults) {
+						folder = name + TEXT("/") + folder;
+					}
+					results.insert(results.end(), subresults.begin(), subresults.end());
+				}
+				return;
+			}
+		});
+		std::sort(results.begin(), results.end());
+		return results;
 	}
 	void Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload) {
 		auto _path = ParseFilename(NormalizePath(path, false));
