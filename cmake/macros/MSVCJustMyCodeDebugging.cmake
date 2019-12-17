@@ -4,6 +4,9 @@
 #
 # Requires these CMake modules:
 #  ListCombinations.cmake
+#
+# The cmake property VS_JUST_MY_CODE_DEBUGGING introduced in CMake 3.15
+# also add /JMC to Release configuration, which is inappropriate
 
 if(MSVC AND NOT "${MSVC_VERSION}" LESS 1918)
 	# Only available in VS 2017 15.8 and newer
@@ -13,7 +16,7 @@ if(MSVC AND NOT "${MSVC_VERSION}" LESS 1918)
 		CMAKE_CXX_FLAGS_
 		SUFFIXES
 		DEBUG
-        RELWITHDEBINFO)
+		RELWITHDEBINFO)
 	foreach(_var ${_varnames})
 		set(${_var} "${${_var}} /JMC")
 	endforeach()
