@@ -2389,8 +2389,12 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));
+	auto expansions_subdirs = Utils::FindSubfolders(TEXT("./expansions/script/"));
+	script_dirs.insert(script_dirs.end(), expansions_subdirs.begin(), expansions_subdirs.end());
 	script_dirs.push_back(TEXT("archives"));
 	script_dirs.push_back(TEXT("./script/"));
+	auto script_subdirs = Utils::FindSubfolders(TEXT("./script/"));
+	script_dirs.insert(script_dirs.end(), script_subdirs.begin(), script_subdirs.end());
 	pic_dirs.push_back(TEXT("./expansions/pics/"));
 	pic_dirs.push_back(TEXT("archives"));
 	pic_dirs.push_back(TEXT("./pics/"));
