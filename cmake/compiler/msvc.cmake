@@ -3,3 +3,4 @@ add_definitions ( "-D_UNICODE" "-DUNICODE" "/utf-8" )
 
 include (MSVCMultipleProcessCompile)
 include (MSVCStaticRuntime)
+include (MSVCJustMyCodeDebugging)
