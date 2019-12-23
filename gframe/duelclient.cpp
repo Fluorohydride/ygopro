@@ -1881,7 +1881,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.select_cancelable = BufferIO::Read<uint8_t>(pbuf) != 0;
 		mainGame->dField.select_min = COMPAT_READ(uint8_t, uint32_t, pbuf);
 		mainGame->dField.select_max = COMPAT_READ(uint8_t, uint32_t, pbuf);
-		uint32_t count = BufferIO::Read<uint32_t>(pbuf);
+		uint32_t count = COMPAT_READ(uint8_t, uint32_t, pbuf);
 		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selected_cards.clear();
 		uint32_t code, s;
@@ -1916,7 +1916,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*uint8_t selecting_player = */BufferIO::Read<uint8_t>(pbuf);
 		mainGame->dField.select_counter_type = BufferIO::Read<uint16_t>(pbuf);
 		mainGame->dField.select_counter_count = BufferIO::Read<uint16_t>(pbuf);
-		uint32_t count = BufferIO::Read<uint32_t>(pbuf);
+		uint32_t count = COMPAT_READ(uint8_t, uint32_t, pbuf);
 		mainGame->dField.selectable_cards.clear();
 		/*uint32_t code;*/
 		uint16_t t;
