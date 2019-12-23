@@ -1074,7 +1074,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_HINT: {
 		uint8_t type = BufferIO::Read<uint8_t>(pbuf);
 		/*uint8_t player = */BufferIO::Read<uint8_t>(pbuf);
-		uint64_t data = COMPAT_READ(uint8_t, uint64_t, pbuf);
+		uint64_t data = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		switch (type) {
@@ -1280,7 +1280,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 			loc =  BufferIO::Read<uint8_t>(pbuf);
 			seq = COMPAT_READ(uint8_t, uint32_t, pbuf);
-			desc = COMPAT_READ(uint8_t, uint64_t, pbuf);
+			desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			uint8_t flag = EFFECT_CLIENT_MODE_NORMAL;
 			if(!mainGame->dInfo.compat_mode) {
@@ -1420,7 +1420,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			con = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 			loc = BufferIO::Read<uint8_t>(pbuf);
 			seq = COMPAT_READ(uint8_t, uint32_t, pbuf);
-			desc = COMPAT_READ(uint8_t, uint64_t, pbuf);
+			desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 			pcard = mainGame->dField.GetCard(con, loc, seq);
 			uint8_t flag = EFFECT_CLIENT_MODE_NORMAL;
 			if(!mainGame->dInfo.compat_mode) {
@@ -1472,7 +1472,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_highlighting = true;
 			mainGame->dField.highlighting_card = pcard;
 		}
-		uint64_t desc = COMPAT_READ(uint8_t, uint64_t, pbuf);
+		uint64_t desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		std::wstring text;
 		
 		if(desc == 0) {
@@ -1493,7 +1493,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_YESNO: {
 		/*uint8_t selecting_player = */BufferIO::Read<uint8_t>(pbuf);
-		uint64_t desc = COMPAT_READ(uint8_t, uint64_t, pbuf);
+		uint64_t desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		mainGame->dField.highlighting_card = 0;
 		mainGame->gMutex.lock();
 		mainGame->stQMessage->setText((wchar_t*)dataManager.GetDesc(desc, mainGame->dInfo.compat_mode).c_str());
@@ -1675,7 +1675,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			code = BufferIO::Read<uint32_t>(pbuf);
 			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
-			desc = COMPAT_READ(uint8_t, uint64_t, pbuf);
+			desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 			if(!mainGame->dInfo.compat_mode)
 				flag = BufferIO::Read<uint8_t>(pbuf);
 			pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence, info.position);
@@ -2874,7 +2874,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		uint8_t cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		uint8_t cl = BufferIO::Read<uint8_t>(pbuf);
 		uint32_t cs = COMPAT_READ(uint8_t, uint32_t, pbuf);
-		uint64_t desc = COMPAT_READ(uint8_t, uint64_t, pbuf);
+		uint64_t desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		/*uint32_t ct = */COMPAT_READ(uint8_t, uint32_t, pbuf);
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
@@ -3541,7 +3541,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_CARD_HINT: {
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		uint8_t chtype = BufferIO::Read<uint8_t>(pbuf);
-		uint64_t value = COMPAT_READ(uint8_t, uint64_t, pbuf);
+		uint64_t value = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(mainGame->LocalPlayer(info.controler), info.location, info.sequence);
 		if(!pcard)
 			return true;
@@ -3575,7 +3575,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_PLAYER_HINT: {
 		uint8_t player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		uint8_t chtype = BufferIO::Read<uint8_t>(pbuf);
-		uint64_t value = COMPAT_READ(uint8_t, uint64_t, pbuf);
+		uint64_t value = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		auto& player_desc_hints = mainGame->dField.player_desc_hints[player];
 		if(chtype == PHINT_DESC_ADD) {
 			player_desc_hints[value]++;
@@ -3842,7 +3842,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				uint8_t cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 				uint8_t cl = BufferIO::Read<uint8_t>(pbuf);
 				uint32_t cs = BufferIO::Read<uint32_t>(pbuf);
-				uint64_t desc = COMPAT_READ(uint8_t, uint64_t, pbuf);
+				uint64_t desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 				ClientCard* pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence, info.position);
 				mainGame->dField.current_chain.chain_card = pcard;
 				mainGame->dField.current_chain.code = code;
