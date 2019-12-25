@@ -21,6 +21,16 @@ int WindBot::GetDifficulty() {
 	return -1;
 }
 
+bool WindBot::SupportsMasterRule3()
+{
+	return flags & static_cast<int>(SUPPORT_MASTER_RULE_3);
+}
+
+bool WindBot::SupportsMasterRule4()
+{
+	return flags & static_cast<int>(SUPPORT_MASTER_RULE_4);
+}
+
 bool WindBot::Launch(int port, bool chat, int hand) {
 #ifdef _WIN32
 	auto args = fmt::format(

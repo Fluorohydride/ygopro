@@ -3,17 +3,34 @@
 
 namespace ygo {
 
-void WindBotPanel::Refresh() {
+void WindBotPanel::Refresh(int filterMasterRule) {
 	deckBox->clear();
-	for (auto& bot : bots)
-		deckBox->addItem(bot.name.c_str());
+	for (auto& bot : bots) {
+		switch (filterMasterRule) {
+		case 0:
+			deckBox->addItem(bot.name.c_str());
+			break;
+		case 3:
+			if (bot.SupportsMasterRule3())
+				deckBox->addItem(bot.name.c_str());
+			break;
+		case 4:
+			if (bot.SupportsMasterRule4())
+				deckBox->addItem(bot.name.c_str());
+			break;
+		default:
+			break;
+		}
+	}
 	UpdateDescription();
 }
 
 void WindBotPanel::UpdateDescription() {
 	int sel = deckBox->getSelected();
-	if (sel < 0 || sel >= bots.size())
+	if (sel < 0 || sel >= bots.size()) {
+		deckProperties->setText(L"");
 		return;
+	}
 	auto& bot = bots[sel];
 	int level = bot.GetDifficulty();
 	// TODO: Consider using a string buffer here instead and account for i18n
@@ -23,9 +40,9 @@ void WindBotPanel::UpdateDescription() {
 	else if (level == 0)
 		params.append(L"Anti Meta AI\n");
 	std::wstring mr;
-	if (bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_MASTER_RULE_3))
+	if (bot.SupportsMasterRule3())
 		mr.append(L"3");
-	if (bot.flags & static_cast<int>(WindBot::Parameters::SUPPORT_MASTER_RULE_4)) {
+	if (bot.SupportsMasterRule4()) {
 		if (mr.size())
 			mr.append(L",");
 		mr.append(L"4");

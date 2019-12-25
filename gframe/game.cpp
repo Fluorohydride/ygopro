@@ -350,7 +350,6 @@ bool Game::Initialize() {
 	gBot.chkThrowRock = env->addCheckBox(false, Scale(10, 105, 200, 130), gBot.window, -1, L"Always throw rock");
 	gBot.chkMute = env->addCheckBox(false, Scale(10, 135, 135, 160), gBot.window, -1, L"Mute");
 	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
-	gBot.Refresh();
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", dataManager.GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(305, 30, 485, 230));
@@ -429,8 +428,8 @@ bool Game::Initialize() {
 	btnExpandChat = env->addButton(Scale(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2043).c_str());
 	//system
 	irr::gui::IGUITab* _tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
-        auto aaa = Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight());
-        tabSystem = Panel::addPanel(env, _tabSystem, -1, aaa, true, false);
+	auto aaa = Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight());
+	tabSystem = Panel::addPanel(env, _tabSystem, -1, aaa, true, false);
 	auto tabPanel = tabSystem->getSubpanel();
 	chkMAutoPos = env->addCheckBox(false, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1274).c_str());
 	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);

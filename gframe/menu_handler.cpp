@@ -272,6 +272,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 					mainGame->btnHostConfirm->setEnabled(false);
 					mainGame->btnHostCancel->setEnabled(false);
+					mainGame->gBot.Refresh(mainGame->cbDuelRule->getSelected() + 1);
 				}
 				break;
 			}

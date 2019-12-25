@@ -19,6 +19,8 @@ struct WindBot {
 	int flags;
 
 	int GetDifficulty();
+	bool SupportsMasterRule3();
+	bool SupportsMasterRule4();
 	bool Launch(int port, bool chat = true, int hand = 0);
 
 	// Can be made static
