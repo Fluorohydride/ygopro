@@ -42,8 +42,6 @@ local ygopro_config=function(static_core)
 				links { "SDL2" }
 			filter "system:not windows"
 				links { "SDL2_mixer", "FLAC", "mpg123", "vorbisfile", "vorbis", "ogg" }
-			filter "system:linux"
-				links "sndio"
 			filter "system:macosx"
 				links { "iconv", "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
 		end
