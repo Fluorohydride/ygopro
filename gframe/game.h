@@ -90,6 +90,7 @@ struct BotInfo {
 	wchar_t desc[256];
 	bool support_master_rule_3;
 	bool support_new_master_rule;
+	bool support_master_rule_2020;
 };
 
 struct FadingUnit {
@@ -354,7 +355,7 @@ public:
 	irr::gui::IGUIStaticText* stBotInfo;
 	irr::gui::IGUIButton* btnStartBot;
 	irr::gui::IGUIButton* btnBotCancel;
-	irr::gui::IGUICheckBox* chkBotOldRule;
+	irr::gui::IGUIComboBox* cbBotRule;
 	irr::gui::IGUICheckBox* chkBotHand;
 	irr::gui::IGUICheckBox* chkBotNoCheckDeck;
 	irr::gui::IGUICheckBox* chkBotNoShuffleDeck;
@@ -594,7 +595,7 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_SINGLEPLAY	152
 #define LISTBOX_BOT_LIST			153
 #define BUTTON_BOT_START			154
-#define CHECKBOX_BOT_OLD_RULE		155
+#define COMBOBOX_BOT_RULE			155
 #define EDITBOX_CHAT				199
 
 #define BUTTON_MSG_OK				200
@@ -715,7 +716,7 @@ extern Game* mainGame;
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
 
-#define DEFAULT_DUEL_RULE			4
+#define DEFAULT_DUEL_RULE			5
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 #endif // GAME_H

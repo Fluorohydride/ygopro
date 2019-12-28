@@ -663,7 +663,11 @@ bool Game::Initialize() {
 		btnBotCancel = env->addButton(rect<s32>(459, 331, 569, 356), tabBot, BUTTON_CANCEL_SINGLEPLAY, dataManager.GetSysString(1210));
 		env->addStaticText(dataManager.GetSysString(1382), rect<s32>(360, 10, 550, 30), false, true, tabBot);
 		stBotInfo = env->addStaticText(L"", rect<s32>(360, 40, 560, 160), false, true, tabBot);
-		chkBotOldRule = env->addCheckBox(false, rect<s32>(360, 170, 560, 190), tabBot, CHECKBOX_BOT_OLD_RULE, dataManager.GetSysString(1383));
+		cbBotRule = env->addComboBox(rect<s32>(360, 165, 560, 190), tabBot, COMBOBOX_BOT_RULE);
+		cbBotRule->addItem(dataManager.GetSysString(1262));
+		cbBotRule->addItem(dataManager.GetSysString(1263));
+		cbBotRule->addItem(dataManager.GetSysString(1264));
+		cbBotRule->setSelected(DEFAULT_DUEL_RULE - 3);
 		chkBotHand = env->addCheckBox(false, rect<s32>(360, 200, 560, 220), tabBot, -1, dataManager.GetSysString(1384));
 		chkBotNoCheckDeck = env->addCheckBox(false, rect<s32>(360, 230, 560, 250), tabBot, -1, dataManager.GetSysString(1229));
 		chkBotNoShuffleDeck = env->addCheckBox(false, rect<s32>(360, 260, 560, 280), tabBot, -1, dataManager.GetSysString(1230));
@@ -1023,8 +1027,11 @@ void Game::RefreshBot() {
 				fgets(linebuf, 256, fp);
 				newinfo.support_master_rule_3 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_3");
 				newinfo.support_new_master_rule = !!strstr(linebuf, "SUPPORT_NEW_MASTER_RULE");
-				if((chkBotOldRule->isChecked() && newinfo.support_master_rule_3)
-					|| (!chkBotOldRule->isChecked() && newinfo.support_new_master_rule))
+				newinfo.support_master_rule_2020 = !!strstr(linebuf, "SUPPORT_MASTER_RULE_2020");
+				int rule = cbBotRule->getSelected() + 3;
+				if((rule == 3 && newinfo.support_master_rule_3)
+					|| (rule == 4 && newinfo.support_new_master_rule)
+					|| (rule == 5 && newinfo.support_master_rule_2020))
 					botInfo.push_back(newinfo);
 				continue;
 			}
