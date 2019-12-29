@@ -245,7 +245,7 @@ void CGUICustomCheckBox::serializeAttributes(io::IAttributes* out, io::SAttribut
 {
 	IGUICheckBox::serializeAttributes(out,options);
 	out->addBool("Checked",	Checked);
-#ifd IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 	out->addBool("Border", Border);
 	out->addBool("Background", Background);
 #endif
