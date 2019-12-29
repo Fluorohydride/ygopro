@@ -210,6 +210,7 @@ public:
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
 
+	path_string working_directory;
 	std::unique_ptr<SoundManager> soundManager;
 	std::mutex gMutex;
 	std::mutex analyzeMutex;
@@ -640,6 +641,18 @@ public:
 	irr::gui::IGUIButton* btnRPNo;
 	irr::gui::IGUIButton* btnJoinHost2;
 	irr::gui::IGUIButton* btnJoinCancel2;
+
+#ifdef __ANDROID__
+	ANDROID_APP appMain;
+	int glversion;
+	bool isPSEnabled;
+	bool isNPOTSupported;
+	s32 ogles2Solid;
+	s32 ogles2TrasparentAlpha;
+	s32 ogles2BlendTexture;
+	Signal externalSignal;
+	IGUIStaticText* fpsCounter;
+#endif
 };
 
 extern Game* mainGame;

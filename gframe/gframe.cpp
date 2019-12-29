@@ -7,6 +7,9 @@
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
 #endif
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 
 int enable_log = 0;
 bool exit_on_return = false;
@@ -32,6 +35,12 @@ int main(int argc, char* argv[]) {
 #else
 int main(int argc, char* argv[]) {
 	setlocale(LC_CTYPE, "UTF-8");
+#endif
+#ifdef __ANDROID__
+	porting::initAndroid();
+	porting::initializePathsAndroid();
+	if(chdir(porting::working_directory.c_str())!=0)
+		LOGE("failed to change direcroty");
 #endif
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
@@ -78,6 +87,12 @@ int main(int argc, char* argv[]) {
 #endif //_WIN32
 	ygo::Game _game;
 	ygo::mainGame = &_game;
+#ifdef __ANDROID__
+	ygo::mainGame->appMain = porting::app_global;
+	ygo::mainGame->working_directory = porting::working_directory;
+#else
+	ygo::mainGame->working_directory = TEXT("./");
+#endif
 	if(!ygo::mainGame->Initialize())
 		return EXIT_FAILURE;
 #ifdef __APPLE__

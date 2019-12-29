@@ -5,6 +5,9 @@
 #include "image_manager.h"
 #include "game.h"
 #include "duelclient.h"
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 #include <algorithm>
 #include <unordered_map>
 
@@ -119,6 +122,12 @@ void DeckBuilder::Terminate() {
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
+#ifdef __ANDROID__
+	irr::SEvent transferEvent;
+	if(porting::transformEvent(event)) {
+		return true;
+	}
+#endif
 	if(mainGame->dField.OnCommonEvent(event))
 		return false;
 	switch(event.EventType) {

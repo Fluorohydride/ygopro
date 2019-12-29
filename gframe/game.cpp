@@ -6,6 +6,13 @@
 #include <sys/types.h>
 #include <dirent.h>
 #endif
+#ifdef __ANDROID__
+#include <COGLES2ExtensionHandler.h>
+#include <COGLESExtensionHandler.h>
+#include <COGLES2Driver.h>
+#include <COGLESDriver.h>
+#include "porting_android.h"
+#endif
 
 #include "config.h"
 #include "game.h"
@@ -22,6 +29,12 @@
 #include "CGUICustomCheckBox/CGUICustomCheckBox.h"
 #include "CGUICustomTable/CGUICustomTable.h"
 
+#ifdef __ANDROID__
+#define MATERIAL_GUARD(f) do {mainGame->driver->enableMaterial2D(true); f; mainGame->driver->enableMaterial2D(false);} while(false);
+#else
+#define MATERIAL_GUARD(f) do {f;} while(false);
+#endif
+
 unsigned short PRO_VERSION = 0x1348;
 
 nlohmann::json configs;
@@ -36,32 +49,56 @@ bool Game::Initialize() {
 	is_fullscreen = false;
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
+#ifndef __ANDROID__
 #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
 	else
 #endif
 		params.DriverType = irr::video::EDT_OPENGL;
-	params.Vsync = gameConf.use_vsync;
 	params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
+#else
+	/*if(glversion == 0) {
+		params.DriverType = irr::video::EDT_OGLES1;
+	} else {*/
+		params.DriverType = irr::video::EDT_OGLES1;
+	//}
+	params.PrivateData = appMain;
+	params.Bits = 24;
+	params.ZBufferBits = 16;
+	params.AntiAlias = 0;
+	params.WindowSize = irr::core::dimension2d<u32>(0, 0);
+#endif
+	params.Vsync = gameConf.use_vsync;
 	device = irr::createDeviceEx(params);
 	if(!device) {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
 	}
 	filesystem = device->getFileSystem();
+#ifdef __ANDROID__
+	porting::mainDevice = device;
+	for(u32 i = 0; i < filesystem->getFileArchiveCount(); ++i) {
+		IFileArchive* archive = filesystem->getFileArchive(i);
+		if(archive->getType() == EFAT_ANDROID_ASSET) {
+			porting::assetsArchive = archive;
+			archive->addDirectoryToFileList("data/");
+			break;
+		}
+	}
+	porting::copyCertificate();
+#endif
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
-	if(!(ocgcore = LoadOCGcore(TEXT("./"))) && !(ocgcore = LoadOCGcore(TEXT("./expansions/"))))
+	if(!(ocgcore = LoadOCGcore(working_directory + TEXT("./"))) && !(ocgcore = LoadOCGcore(working_directory + TEXT("./expansions/"))))
 		coreloaded = false;
 #endif
 	auto logger = device->getLogger();
 	logger->setLogLevel(ELL_NONE);
 	// Apply skin
-	if (gameConf.skin_index >= 0)
-	{
-		skinSystem = new CGUISkinSystem("skin", device);
-		core::array<core::stringw> skins = skinSystem->listSkins();
+	if (gameConf.skin_index >= 0) {
+		skinSystem = new CGUISkinSystem((working_directory + "./skin").c_str(), device);
+		core::array<io::path> skins = skinSystem->listSkins();
 		if ((size_t)gameConf.skin_index < skins.size())
 		{
 			int index = skins.size() - gameConf.skin_index - 1; // reverse index
@@ -88,7 +125,21 @@ bool Game::Initialize() {
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
+#ifdef __ANDROID__
+	if(driver->getDriverType() == EDT_OGLES2) {
+		isNPOTSupported = ((COGLES2Driver *)driver)->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_OES_texture_npot);
+	} else {
+		isNPOTSupported = ((COGLES1Driver *)driver)->queryOpenGLFeature(COGLES1ExtensionHandler::IRR_OES_texture_npot);
+	}
+	if(isNPOTSupported) {
+		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	} else {
+		driver->setTextureCreationFlag(irr::video::ETCF_ALLOW_NON_POWER_2, true);
+		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	}
+#else
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+#endif
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial()) {
@@ -182,7 +233,7 @@ bool Game::Initialize() {
 								 Scale(10, 10, 440, 690), false, false, wAbout);
 	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	//main menu
-	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro by Project Ignis | {:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
+	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
 #define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, 270, 60 + offset)
@@ -470,7 +521,7 @@ bool Game::Initialize() {
 		btnHand[i] = irr::gui::CGUIImageButton::addImageButton(env, Scale(10 + 105 * i, 10, 105 + 105 * i, 144), wHand, BUTTON_HAND1 + i);
 		auto a = Scale<s32>(10 + 105 * i, 10, 105 + 105 * i, 144).getSize();
 		btnHand[i]->setImageSize(a);
-		((CGUIButton*)btnHand[i])->setImage(imageManager.tHand[i]);
+		btnHand[i]->setImage(imageManager.tHand[i]);
 	}
 	//
 	wFTSelect = env->addWindow(Scale(550, 240, 780, 340), false, L"");
@@ -530,14 +581,14 @@ bool Game::Initialize() {
 	btnPSAU->setImageSize(imgsize);
 	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, Scale(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
 	btnPSAD->setImageSize(imgsize);
-	((CGUIButton*)btnPSAD)->setImage(imageManager.tCover[0]);
+	btnPSAD->setImage(imageManager.tCover[0]);
 	btnPSDU = irr::gui::CGUIImageButton::addImageButton(env, Scale(300, 45, 440, 185), wPosSelect, BUTTON_POS_DU);
 	btnPSDU->setImageSize(imgsize);
 	btnPSDU->setImageRotation(270);
 	btnPSDD = irr::gui::CGUIImageButton::addImageButton(env, Scale(445, 45, 585, 185), wPosSelect, BUTTON_POS_DD);
 	btnPSDD->setImageSize(imgsize);
 	btnPSDD->setImageRotation(270);
-	((CGUIButton*)btnPSDD)->setImage(imageManager.tCover[0]);
+	btnPSDD->setImage(imageManager.tCover[0]);
 	//card select
 	imgsize = { Scale<s32>(CARD_IMG_WIDTH * 0.6f), Scale<s32>(CARD_IMG_HEIGHT * 0.6f) };
 	wCardSelect = env->addWindow(Scale(320, 100, 1000, 400), false, L"");
@@ -835,8 +886,8 @@ bool Game::Initialize() {
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	soundManager = std::make_unique<SoundManager>();
-	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
+	soundManager = std::unique_ptr<SoundManager>(new SoundManager());
+	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, working_directory)) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
 		chkEnableSound->setVisible(false);
@@ -993,6 +1044,9 @@ bool Game::Initialize() {
 		PopupElement(wMessage);
 	}
 #endif
+#ifdef __ANDROID__
+	fpsCounter = env->addStaticText(L"", Scale(15, 15, 100, 60));
+#endif
 	for (u32 i = 0; i < EGDC_COUNT; ++i) {
 		SColor col = env->getSkin()->getColor((EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
@@ -1024,6 +1078,37 @@ void Game::MainLoop() {
 	int fps = 0;
 	bool discord_message_shown = false;
 	std::wstring corename;
+#ifdef __ANDROID__
+	ogles2Solid = 0;
+	ogles2TrasparentAlpha = 0;
+	ogles2BlendTexture = 0;
+	ogles2Solid = video::EMT_SOLID;
+	ogles2TrasparentAlpha = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+	ogles2BlendTexture = video::EMT_ONETEXTURE_BLEND;
+	matManager.mCard.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mTexture.MaterialType = (video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
+	matManager.mBackLine.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mSelField.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mOutLine.MaterialType = (video::E_MATERIAL_TYPE)ogles2Solid;
+	matManager.mTRTexture.MaterialType = (video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
+	matManager.mATK.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	if(!isNPOTSupported) {
+		matManager.mCard.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mCard.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mTexture.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mTexture.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mBackLine.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mBackLine.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mSelField.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mSelField.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mOutLine.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mOutLine.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mTRTexture.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mTRTexture.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mATK.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mATK.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+	}
+#endif
 	if(gameConf.fullscreen)
 		Utils::ToggleFullscreen();
 	while(device->run()) {
@@ -1077,7 +1162,7 @@ void Game::MainLoop() {
 		if(!dInfo.isStarted && cores_to_load.size() && repoManager.GetUpdatingRepos() == 0) {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
-				if((ncore = ChangeOCGcore(path, ocgcore))) {
+				if((ncore = ChangeOCGcore(working_directory + path, ocgcore))) {
 					corename = Utils::ToUnicodeIfNeeded(path);
 					ocgcore = ncore;
 					if(!coreloaded) {
@@ -1148,13 +1233,14 @@ void Game::MainLoop() {
 				soundManager->PlayBGM(SoundManager::BGM::ADVANTAGE);
 			else
 				soundManager->PlayBGM(SoundManager::BGM::DUEL);
+			MATERIAL_GUARD(
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
 			DrawMisc();
 			smgr->drawAll();
 			driver->setMaterial(irr::video::IdentityMaterial);
-			driver->clearZBuffer();
+			driver->clearZBuffer();)
 		} else if(is_building) {
 			if(is_siding)
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
@@ -1162,7 +1248,7 @@ void Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::DECK);
 			soundManager->PlayBGM(SoundManager::BGM::DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
-			DrawDeckBd();
+			MATERIAL_GUARD(DrawDeckBd());
 		} else {
 			if(dInfo.isInLobby)
 				discord.UpdatePresence(DiscordWrapper::IN_LOBBY);
@@ -1171,8 +1257,7 @@ void Game::MainLoop() {
 			soundManager->PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
-		DrawGUI();
-		DrawSpec();
+		MATERIAL_GUARD(DrawGUI();	DrawSpec(););
 		if(cardimagetextureloading) {
 			ShowCardInfo(showingcard, false);
 		}
@@ -1198,12 +1283,18 @@ void Game::MainLoop() {
 			CloseDuelWindow();
 		else
 			closeSignal.unlock();
+#ifndef __ANDROID__
 		if(gameConf.max_fps && !gameConf.use_vsync) {
 			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
+#endif
 		while(cur_time >= 1000) {
+#ifndef __ANDROID__
 			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
+#else
+			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
+#endif
 			fps = 0;
 			cur_time -= 1000;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
@@ -1228,6 +1319,9 @@ void Game::MainLoop() {
 			stACMessage->setText(L"Connected to Discord");
 			PopupElement(wACMessage, 30);
 		}
+#ifdef __ANDROID__
+		device->yield(); // probably nicer to the battery
+#endif
 	}
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();

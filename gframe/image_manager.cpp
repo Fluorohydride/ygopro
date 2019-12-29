@@ -2,6 +2,9 @@
 #include "game.h"
 #include <fstream>
 #include <curl/curl.h>
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 
 namespace ygo {
 
@@ -282,6 +285,9 @@ void ImageManager::DownloadPic() {
 					curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
 					curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 					curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
+#ifdef __ANDROID__
+					curl_easy_setopt(curl, CURLOPT_CAINFO, (porting::internal_storage + "/cacert.cer").c_str());
+#endif
 					res = curl_easy_perform(curl);
 					curl_easy_cleanup(curl);
 					fp.close();

@@ -46,7 +46,7 @@ public:
 		WIN,
 		LOSE
 	};
-	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload = nullptr);
+	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const std::string& working_directory);
 	void RefreshBGMList();
 	void PlaySoundEffect(SFX sound);
 	void PlayBGM(BGM scene);
@@ -70,6 +70,7 @@ private:
 	void RefreshChantsList();
 	bool soundsEnabled = false;
 	bool musicEnabled = false;
+	std::string working_dir = "./";
 };
 
 }

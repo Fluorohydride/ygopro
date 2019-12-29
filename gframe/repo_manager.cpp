@@ -1,5 +1,8 @@
 #include "repo_manager.h"
 #include "game.h"
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 
 namespace ygo {
 
@@ -235,6 +238,9 @@ std::vector<std::string> GetCommitsInfo(git_repository* repo, git_oid id) {
 
 std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::CloneorUpdateThreaded(GitRepo _repo) {
 	git_libgit2_init();
+#ifdef __ANDROID__
+	git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, (porting::internal_storage + "/cacert.cer").c_str(), "/system/etc/security/cacerts");
+#endif
 	git_repository* repo = nullptr;
 	int res = 0;
 	std::string errstring;

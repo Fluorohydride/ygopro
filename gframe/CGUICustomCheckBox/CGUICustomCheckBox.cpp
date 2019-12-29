@@ -10,7 +10,11 @@
 #include "IGUIEnvironment.h"
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+#include "../IrrlichtCommonIncludes1.9/os.h"
+#else
 #include "../IrrlichtCommonIncludes/os.h"
+#endif
 
 namespace irr
 {
@@ -20,6 +24,7 @@ namespace gui
 //! constructor
 CGUICustomCheckBox::CGUICustomCheckBox(bool checked, IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle)
 : IGUICheckBox(environment, parent, id, rectangle), checkTime(0), Pressed(false), Checked(checked)
+, Border(false), Background(false)
 {
 	#ifdef _DEBUG
 	setDebugName("CGUICustomCheckBox");
@@ -140,6 +145,23 @@ void CGUICustomCheckBox::draw()
 	IGUISkin* skin = Environment->getSkin();
 	if (skin)
 	{
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+		video::IVideoDriver* driver = Environment->getVideoDriver();
+		core::rect<s32> frameRect(AbsoluteRect);
+
+		// draw background
+		if(Background) {
+			video::SColor bgColor = skin->getColor(gui::EGDC_3D_FACE);
+			driver->draw2DRectangle(bgColor, frameRect, &AbsoluteClippingRect);
+		}
+
+		// draw the border
+		if(Border) {
+			skin->draw3DSunkenPane(this, 0, true, false, frameRect, &AbsoluteClippingRect);
+			frameRect.UpperLeftCorner.X += skin->getSize(EGDS_TEXT_DISTANCE_X);
+			frameRect.LowerRightCorner.X -= skin->getSize(EGDS_TEXT_DISTANCE_X);
+		}
+#endif
 		const s32 height = skin->getSize(EGDS_CHECK_BOX_WIDTH);
 
 		core::rect<s32> checkRect(AbsoluteRect.UpperLeftCorner.X,
@@ -196,12 +218,37 @@ bool CGUICustomCheckBox::isChecked() const
 	return Checked;
 }
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+//! Sets whether to draw the background
+void CGUICustomCheckBox::setDrawBackground(bool draw) {
+	Background = draw;
+}
+
+//! Checks if background drawing is enabled
+bool CGUICustomCheckBox::isDrawBackgroundEnabled() const {
+	return Background;
+}
+
+//! Sets whether to draw the border
+void CGUICustomCheckBox::setDrawBorder(bool draw) {
+	Border = draw;
+}
+
+//! Checks if border drawing is enabled
+bool CGUICustomCheckBox::isDrawBorderEnabled() const {
+	return Border;
+}
+#endif
 
 //! Writes attributes of the element.
 void CGUICustomCheckBox::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options=0) const
 {
 	IGUICheckBox::serializeAttributes(out,options);
 	out->addBool("Checked",	Checked);
+#ifd IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	out->addBool("Border", Border);
+	out->addBool("Background", Background);
+#endif
 }
 
 
@@ -209,6 +256,10 @@ void CGUICustomCheckBox::serializeAttributes(io::IAttributes* out, io::SAttribut
 void CGUICustomCheckBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options=0)
 {
 	Checked = in->getAttributeAsBool ("Checked");
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	Border = in->getAttributeAsBool("Border", Border);
+	Background = in->getAttributeAsBool("Background", Background);
+#endif
 
 	IGUICheckBox::deserializeAttributes(in,options);
 }

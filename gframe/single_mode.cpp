@@ -45,7 +45,7 @@ int SingleMode::SinglePlayThread() {
 	time_t seed = time(0);
 	DuelClient::rnd.seed(seed);
 	OCG_Player team = { start_lp, start_hand, draw_count };
-	pduel = mainGame->SetupDuel({ DuelClient::rnd(), opt, team, team });
+	pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), opt, team, team });
 	mainGame->dInfo.compat_mode = false;
 	mainGame->dInfo.lp[0] = start_lp;
 	mainGame->dInfo.lp[1] = start_lp;

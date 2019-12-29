@@ -8,7 +8,7 @@ CGUISkinSystem::CGUISkinSystem(core::string<char*> path,IrrlichtDevice *dev) {
 	
 	
 }
-core::array<core::stringw> CGUISkinSystem::listSkins() {
+core::array<io::path> CGUISkinSystem::listSkins() {
 	return skinsList;
 }
 // This is our version of the skinloader
@@ -24,7 +24,7 @@ bool CGUISkinSystem::loadSkinList() {
 	fs->changeWorkingDirectoryTo(skinsPath);
 	fileList = fs->createFileList();
 	i = fileList->getFileCount();
-	core::stringw tmp;
+	io::path tmp;
 	while(i--) {
 		// Check only directories, skip . and ..
 		// Side effect, on linux this ignores hidden directories
@@ -108,7 +108,7 @@ void CGUISkinSystem::ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, cons
 // TO maintain compatability in case of upgrades
 // We dont touch the iterface to the skin itself.
 
-gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const c8 *skinname) {	
+gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {	
 	gui::CImageGUISkin* skin ;
 	gui::SImageGUISkinConfig skinConfig;
 	gui::EGUI_SKIN_TYPE fallbackType;
@@ -263,12 +263,11 @@ bool CGUISkinSystem::loadProperty(core::stringw key,gui::CImageGUISkin *skin) {
 	}
 	return false;
 }
-bool CGUISkinSystem::applySkin(const wchar_t *skinname) {
+bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 	io::path oldpath = fs->getWorkingDirectory();
-	core::stringc tmp = skinname;
 	fs->changeWorkingDirectoryTo(skinsPath);
 	registry = new CXMLRegistry(fs);
-	gui::CImageGUISkin* skin = loadSkinFromFile(tmp.c_str());
+	gui::CImageGUISkin* skin = loadSkinFromFile(skinname);
     if(skin == NULL) return false;
 	
     device->getGUIEnvironment()->setSkin(skin);

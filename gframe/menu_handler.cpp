@@ -7,6 +7,9 @@
 #include "single_mode.h"
 #include "image_manager.h"
 #include "game.h"
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 
 namespace ygo {
 
@@ -65,6 +68,11 @@ void LoadReplay() {
 	ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
 }
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
+#ifdef __ANDROID__
+	if(porting::transformEvent(event)) {
+		return true;
+	}
+#endif
 	if(mainGame->dField.OnCommonEvent(event))
 		return false;
 	switch(event.EventType) {

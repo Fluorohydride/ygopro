@@ -36,7 +36,7 @@ public:
 	virtual ~CGUIFileSelectListBox();
 
 	//! returns amount of list items
-	virtual u32 getItemCount() const;
+	virtual u32 getItemCount() const _IRR_OVERRIDE_;
 
 	//! returns string of a list item. the id may be a value from 0 to itemCount-1
 
@@ -45,41 +45,41 @@ public:
 	virtual const wchar_t* getListItem(u32 id, bool relativepath) const;
 
 	//! adds an list item, returns id of item
-	virtual u32 addItem(const wchar_t* text);
+	virtual u32 addItem(const wchar_t* text) _IRR_OVERRIDE_;
 
 	//! clears the list
-	virtual void clear();
+	virtual void clear() _IRR_OVERRIDE_;
 
 	//! returns id of selected item. returns -1 if no item is selected.
 	virtual s32 getSelected() const;
 
 	//! sets the selected item. Set this to -1 if no item should be selected
-	virtual void setSelected(s32 id);
+	virtual void setSelected(s32 id) _IRR_OVERRIDE_;
 
 	//! sets the selected item. Set this to -1 if no item should be selected
-	virtual void setSelected(const wchar_t *item);
+	virtual void setSelected(const wchar_t *item) _IRR_OVERRIDE_;
 
 	//! called if an event happened.
-	virtual bool OnEvent(const SEvent& event);
+	virtual bool OnEvent(const SEvent& event) _IRR_OVERRIDE_;
 
 	//! draws the element and its children
-	virtual void draw();
+	virtual void draw() _IRR_OVERRIDE_;
 
 	//! adds an list item with an icon
 	//! \param text Text of list entry
 	//! \param icon Sprite index of the Icon within the current sprite bank. Set it to -1 if you want no icon
 	//! \return
 	//! returns the id of the new created item
-	virtual u32 addItem(const wchar_t* text, s32 icon);
+	virtual u32 addItem(const wchar_t* text, s32 icon) _IRR_OVERRIDE_;
 
 	//! Returns the icon of an item
-	virtual s32 getIcon(u32 id) const;
+	virtual s32 getIcon(u32 id) const _IRR_OVERRIDE_;
 
 	//! removes an item from the list
 	virtual void removeItem(u32 id);
 
 	//! get the the id of the item at the given absolute coordinates
-	virtual s32 getItemAt(s32 xpos, s32 ypos) const;
+	virtual s32 getItemAt(s32 xpos, s32 ypos) const _IRR_OVERRIDE_;
 
 	//! Sets the sprite bank which should be used to draw list icons. This font is set to the sprite bank of
 	//! the built-in-font by default. A sprite can be displayed in front of every list item.
@@ -109,10 +109,10 @@ public:
 	virtual void setItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType, video::SColor color);
 
 	//! clear all item colors at index
-	virtual void clearItemOverrideColor(u32 index);
+	virtual void clearItemOverrideColor(u32 index) _IRR_OVERRIDE_;
 
 	//! clear item color at index for given colortype
-	virtual void clearItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType);
+	virtual void clearItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) _IRR_OVERRIDE_;
 
 	//! has the item at index its color overwritten?
 	virtual bool hasItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
@@ -121,23 +121,27 @@ public:
 	virtual video::SColor getItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
 
 	//! return the default color which is used for the given colorType
-	virtual video::SColor getItemDefaultColor(EGUI_LISTBOX_COLOR colorType) const;
+	virtual video::SColor getItemDefaultColor(EGUI_LISTBOX_COLOR colorType) const _IRR_OVERRIDE_;
 
 	//! set the item at the given index
-	virtual void setItem(u32 index, const wchar_t* text, s32 icon);
+	virtual void setItem(u32 index, const wchar_t* text, s32 icon) _IRR_OVERRIDE_;
 
 	//! Insert the item at the given index
 	//! Return the index on success or -1 on failure.
-	virtual s32 insertItem(u32 index, const wchar_t* text, s32 icon);
+	virtual s32 insertItem(u32 index, const wchar_t* text, s32 icon) _IRR_OVERRIDE_;
 
 	//! Swap the items at the given indices
-	virtual void swapItems(u32 index1, u32 index2);
+	virtual void swapItems(u32 index1, u32 index2) _IRR_OVERRIDE_;
 
 	//! set global itemHeight
-	virtual void setItemHeight(s32 height);
+	virtual void setItemHeight(s32 height) _IRR_OVERRIDE_;
 
 	//! Sets whether to draw the background
-	virtual void setDrawBackground(bool draw);
+	virtual void setDrawBackground(bool draw) _IRR_OVERRIDE_;
+	
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	virtual IGUIScrollBar* getVerticalScrollBar() const _IRR_OVERRIDE_;
+#endif
 
 	void refreshList();
 
