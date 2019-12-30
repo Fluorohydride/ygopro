@@ -17,13 +17,13 @@
 #elif defined(__APPLE__)
 #define CORENAME TEXT("libocgcore.dylib")
 #elif defined(__ANDROID__)
-#if defined(_ANDROIDARMV7_)
+#if defined(__arm__)
 #define CORENAME TEXT("libocgcorev7.so")
-#elif defined(_ANDROIDX86_)
+#elif defined(__i386__)
 #define CORENAME TEXT("libocgcorex86.so")
-#elif defined(_ANDROIDARMV8_)
+#elif defined(__aarch64__)
 #define CORENAME TEXT("libocgcorev8.so")
-#elif defined(_ANDROIDX64_)
+#elif defined(__x86_64__)
 #define CORENAME TEXT("libocgcorex64.so")
 #endif
 #else
