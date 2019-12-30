@@ -55,6 +55,46 @@ CGUICustomText::~CGUICustomText()
 		OverrideFont->drop();
 }
 
+bool CGUICustomText::OnEvent(const SEvent & event) {
+#ifndef __ANDROID__
+	return return IGUIElement::OnEvent(event);
+#else
+	static bool was_pressed = false;
+	static core::position2di prev_position = core::position2di(0, 0);
+	if(isEnabled()) {
+		switch(event.EventType) {
+			case EET_MOUSE_INPUT_EVENT: {
+				switch(event.MouseInput.Event) {
+					case EMIE_LMOUSE_PRESSED_DOWN: {
+						if(!was_pressed) {
+							was_pressed = true;
+							prev_position = core::position2di(event.MouseInput.X, event.MouseInput.Y);
+						}
+						break;
+					}
+					case EMIE_LMOUSE_LEFT_UP: {
+						was_pressed = false;
+						prev_position = core::position2di(0, 0);
+						break;
+					}
+					case EMIE_MOUSE_MOVED: {
+						if(was_pressed) {
+							if(scrText && scrText->isEnabled()) {
+								auto diff = prev_position.Y - event.MouseInput.Y;
+								prev_position = core::position2di(event.MouseInput.X, event.MouseInput.Y);
+								scrText->setPos(scrText->getPos() + diff);
+							}
+						}
+						break;
+					}
+				}
+			 }
+		}
+	}
+	return false;
+#endif
+}
+
 
 //! draws the element and its children
 void CGUICustomText::draw()
@@ -151,7 +191,7 @@ void CGUICustomText::draw()
 				if (font != LastBreakFont)
 					breakText();
 
-				int offset = (scrText && scrText->isVisible()) ? scrText->getPos() : 0;
+				int offset = (scrText && scrText->isEnabled()) ? scrText->getPos() : 0;
 
 				core::rect<s32> r = frameRect;
 				s32 height = font->getDimension(L"A").Height + font->getKerningHeight();
@@ -356,9 +396,13 @@ void CGUICustomText::breakText() {
 	breakText(false);
 	if(scrText) {
 		scrText->setVisible(false);
+		scrText->setEnabled(false);
 		if(getTextHeight() > RelativeRect.getHeight()) {
+			scrText->setEnabled(true);
+#ifndef __ANDROID__
 			scrText->setVisible(true);
 			breakText(true);
+#endif
 			scrText->setMin(0);
 			scrText->setMax((getTextHeight() - RelativeRect.getHeight()));
 			scrText->setPos(0);
