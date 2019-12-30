@@ -378,6 +378,8 @@ bool Game::CheckMutual(ClientCard* pcard, int mark) {
 	return false;
 }
 void Game::DrawCards() {
+	for(auto& pcard : dField.overlay_cards)
+		DrawCard(pcard);
 	for(int p = 0; p < 2; ++p) {
 		for(auto& pcard : dField.mzone[p])
 			if(pcard)
@@ -396,8 +398,6 @@ void Game::DrawCards() {
 		for(auto& pcard : dField.extra[p])
 			DrawCard(pcard);
 	}
-	for(auto& pcard : dField.overlay_cards)
-		DrawCard(pcard);
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame > 0) {
