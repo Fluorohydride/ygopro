@@ -79,7 +79,7 @@ inline void refreshDeckList() {
 	});
 }
 inline void refreshReadonly(int catesel) {
-	bool hasDeck = mainGame->lstDecks->getItemCount() != 0;
+	bool hasDeck = mainGame->cbDBDecks->getItemCount() != 0;
 	mainGame->deckBuilder.readonly = catesel < 2;
 	mainGame->btnSaveDeck->setEnabled(!mainGame->deckBuilder.readonly);
 	mainGame->btnDeleteDeck->setEnabled(hasDeck && !mainGame->deckBuilder.readonly);
@@ -92,10 +92,10 @@ inline void refreshReadonly(int catesel) {
 	mainGame->btnCopyDeck->setEnabled(hasDeck);
 }
 inline void changeCategory(int catesel) {
-	refreshReadonly(catesel);
 	mainGame->RefreshDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
 	mainGame->cbDBDecks->setSelected(0);
 	deckManager.LoadDeck(mainGame->cbDBCategory, mainGame->cbDBDecks);
+	refreshReadonly(catesel);
 	mainGame->deckBuilder.is_modified = false;
 	mainGame->deckBuilder.prev_category = catesel;
 	mainGame->deckBuilder.prev_deck = 0;
