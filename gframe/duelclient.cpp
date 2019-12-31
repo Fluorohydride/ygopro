@@ -3496,12 +3496,44 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int count = BufferIO::ReadInt8(pbuf);
 		mainGame->gMutex.lock();
 		mainGame->cbANNumber->clear();
+		bool quickmode = count <= 12;
+		if(quickmode) {
+			for(int i = 0; i < 12; ++i) {
+				mainGame->btnANNumber[i]->setEnabled(false);
+				mainGame->btnANNumber[i]->setPressed(false);
+				mainGame->btnANNumber[i]->setVisible(true);
+			}
+		}
 		for (int i = 0; i < count; ++i) {
 			int value = BufferIO::ReadInt32(pbuf);
 			myswprintf(textBuffer, L" % d", value);
 			mainGame->cbANNumber->addItem(textBuffer, value);
+			if(quickmode) {
+				if((value > 12 || value <= 0)) {
+					quickmode = false;
+				} else {
+					mainGame->btnANNumber[value - 1]->setEnabled(true);
+				}
+			}
 		}
 		mainGame->cbANNumber->setSelected(0);
+		if(quickmode) {
+			mainGame->cbANNumber->setVisible(false);
+			mainGame->btnANNumberOK->setRelativePosition(rect<s32>(20, 195, 210, 230));
+			mainGame->btnANNumberOK->setEnabled(false);
+			recti pos = mainGame->wANNumber->getRelativePosition();
+			pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 250;
+			mainGame->wANNumber->setRelativePosition(pos);
+		} else {
+			for(int i = 0; i < 12; ++i) {
+				mainGame->btnANNumber[i]->setVisible(false);
+			}
+			mainGame->cbANNumber->setVisible(true);
+			mainGame->btnANNumberOK->setRelativePosition(rect<s32>(80, 60, 150, 85));
+			recti pos = mainGame->wANNumber->getRelativePosition();
+			pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + 95;
+			mainGame->wANNumber->setRelativePosition(pos);
+		}
 		if(select_hint)
 			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
 		else myswprintf(textBuffer, dataManager.GetSysString(565));
