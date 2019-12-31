@@ -199,6 +199,8 @@ void ClientCard::ClearTarget() {
 	ownerTarget.clear();
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
+	if(c1->is_selected != c2->is_selected)
+		return c1->is_selected < c2->is_selected;
 	int32 cp1 = c1->overlayTarget ? c1->overlayTarget->controler : c1->controler;
 	int32 cp2 = c2->overlayTarget ? c2->overlayTarget->controler : c2->controler;
 	if(cp1 != cp2)
