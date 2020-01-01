@@ -387,7 +387,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
-				LoadReplay();
+				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstReplayList->getSelected()))
+					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstReplayList->getSelected());
+				else
+					LoadReplay();
 				break;
 			}
 			case BUTTON_DELETE_REPLAY: {
@@ -438,10 +441,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
-				if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
-					break;
-				SingleMode::singleSignal.SetNoWait(false);
-				SingleMode::StartPlay();
+				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstSinglePlayList->getSelected()))
+					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstSinglePlayList->getSelected());
+				else {
+					if(!open_file && mainGame->lstSinglePlayList->getSelected() == -1)
+						break;
+					SingleMode::singleSignal.SetNoWait(false);
+					SingleMode::StartPlay();
+				}
 				break;
 			}
 			case BUTTON_CANCEL_SINGLEPLAY: {
@@ -531,8 +538,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteReplay->setEnabled(false);
 				mainGame->btnRenameReplay->setEnabled(false);
 				mainGame->btnExportDeck->setEnabled(false);
+				mainGame->btnLoadReplay->setText(dataManager.GetSysString(1348).c_str());
 				if(sel == -1)
 					break;
+				if(mainGame->lstReplayList->isDirectory(sel)) {
+					mainGame->btnLoadReplay->setText(dataManager.GetSysString(1359).c_str());
+					mainGame->btnLoadReplay->setEnabled(true);
+					break;
+				}
 				auto& replay = ReplayMode::cur_replay;
 				if(!replay.OpenReplay(Utils::ParseFilename(mainGame->lstReplayList->getListItem(sel, true))))
 					break;
@@ -564,8 +577,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnLoadSinglePlay->setEnabled(false);
 				int sel = mainGame->lstSinglePlayList->getSelected();
 				mainGame->stSinglePlayInfo->setText(L"");
+				mainGame->btnLoadSinglePlay->setText(dataManager.GetSysString(1357).c_str());
 				if(sel == -1)
 					break;
+				if(mainGame->lstSinglePlayList->isDirectory(sel)) {
+					mainGame->btnLoadSinglePlay->setText(dataManager.GetSysString(1359).c_str());
+					mainGame->btnLoadSinglePlay->setEnabled(true);
+					break;
+				}
 				mainGame->btnLoadSinglePlay->setEnabled(true);
 				const wchar_t* name = mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true);
 				mainGame->stSinglePlayInfo->setText(mainGame->ReadPuzzleMessage(name).c_str());
@@ -600,18 +619,26 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 			}
 			case LISTBOX_REPLAY_LIST: {
-				LoadReplay();
+				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstReplayList->getSelected()))
+					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstReplayList->getSelected());
+				else
+					LoadReplay();
 				break;
 			}
 			case LISTBOX_SINGLEPLAY_LIST: {
-				if(!open_file && (mainGame->lstSinglePlayList->getSelected() == -1))
-					break;
-				SingleMode::singleSignal.SetNoWait(false);
-				SingleMode::StartPlay();
+				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstSinglePlayList->getSelected()))
+					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstSinglePlayList->getSelected());
+				else {
+					if(!open_file && (mainGame->lstSinglePlayList->getSelected() == -1))
+						break;
+					SingleMode::singleSignal.SetNoWait(false);
+					SingleMode::StartPlay();
+				}
 				break;
 			}
 			}
 			break;
+#endif
 		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {

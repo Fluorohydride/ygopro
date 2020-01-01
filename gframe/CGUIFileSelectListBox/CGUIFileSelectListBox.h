@@ -157,6 +157,12 @@ public:
 
 	bool defaultFilter(std::wstring name, bool is_directory, void*);
 
+	void nativeDirectory(bool native_directory);
+
+	bool isDirectory(u32 index);
+
+	void enterDirectory(u32 index);
+
 
 private:
 
@@ -231,6 +237,7 @@ private:
 	bool MoveOverSelect;
 	bool AutoScroll;
 	bool HighlightWhenNotFocused;
+	bool NativeDirectoryHandling;
 };
 
 
