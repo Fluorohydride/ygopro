@@ -638,7 +638,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			}
 			break;
-#endif
 		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {

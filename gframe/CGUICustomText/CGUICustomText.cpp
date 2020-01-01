@@ -57,7 +57,7 @@ CGUICustomText::~CGUICustomText()
 
 bool CGUICustomText::OnEvent(const SEvent & event) {
 #ifndef __ANDROID__
-	return return IGUIElement::OnEvent(event);
+	return IGUIElement::OnEvent(event);
 #else
 	static bool was_pressed = false;
 	static core::position2di prev_position = core::position2di(0, 0);

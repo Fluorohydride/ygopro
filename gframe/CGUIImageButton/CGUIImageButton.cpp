@@ -9,7 +9,11 @@
 #include "IGUIEnvironment.h"
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
-#include "os.h"
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+#include "../IrrlichtCommonIncludes1.9/os.h"
+#else
+#include "../IrrlichtCommonIncludes/os.h"
+#endif
 #ifdef __ANDROID__
 #include "../game.h"
 #endif
@@ -204,12 +208,24 @@ void CGUIImageButton::setSpriteBank(IGUISpriteBank* sprites) {
 }
 
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 void CGUIImageButton::setSprite(EGUI_BUTTON_STATE state, s32 index, video::SColor color, bool loop, bool scale) {
 	ButtonSprites[(u32)state].Index = index;
 	ButtonSprites[(u32)state].Color = color;
 	ButtonSprites[(u32)state].Loop = loop;
 	ButtonSprites[(u32)state].Scale = scale;
 }
+#else
+void CGUIImageButton::setSprite(EGUI_BUTTON_STATE state, s32 index, video::SColor color, bool loop) {
+	if(SpriteBank) {
+		ButtonSprites[(u32)state].Index = index;
+		ButtonSprites[(u32)state].Color = color;
+		ButtonSprites[(u32)state].Loop = loop;
+	} else {
+		ButtonSprites[(u32)state].Index = -1;
+	}
+}
+#endif
 
 //! Get the sprite-index for the given state or -1 when no sprite is set
 s32 CGUIImageButton::getSpriteIndex(EGUI_BUTTON_STATE state) const {
@@ -357,6 +373,7 @@ void CGUIImageButton::draw() {
 	IGUIElement::draw();
 }
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 void CGUIImageButton::drawSprite(EGUI_BUTTON_STATE state, u32 startTime, const core::position2di& center) {
 	u32 stateIdx = (u32)state;
 
@@ -373,6 +390,7 @@ void CGUIImageButton::drawSprite(EGUI_BUTTON_STATE state, u32 startTime, const c
 		}
 	}
 }
+#endif
 
 //! sets another skin independent font. if this is set to zero, the button uses the font of the skin.
 void CGUIImageButton::setOverrideFont(IGUIFont* font) {
@@ -402,10 +420,12 @@ IGUIFont* CGUIImageButton::getActiveFont() const {
 	return skin->getFont();
 }
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 void CGUIImageButton::setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image, const core::rect<s32>& sourceRect) {
 	setImage(image);
 	ImageRect = sourceRect;
 }
+#endif
 
 //! Sets an image which should be displayed on the button when it is in normal state.
 void CGUIImageButton::setImage(video::ITexture* image) {

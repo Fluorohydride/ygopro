@@ -97,7 +97,7 @@ bool Game::Initialize() {
 	logger->setLogLevel(ELL_NONE);
 	// Apply skin
 	if (gameConf.skin_index >= 0) {
-		skinSystem = new CGUISkinSystem((working_directory + "./skin").c_str(), device);
+		skinSystem = new CGUISkinSystem((working_directory + TEXT("./skin")).c_str(), device);
 		core::array<io::path> skins = skinSystem->listSkins();
 		if ((size_t)gameConf.skin_index < skins.size())
 		{

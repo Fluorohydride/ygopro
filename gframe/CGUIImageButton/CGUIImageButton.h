@@ -6,6 +6,9 @@
 #define __C_GUI_BUTTON_H_INCLUDED__
 
 #include "IrrCompileConfig.h"
+#ifndef _IRR_OVERRIDE_
+#define _IRR_OVERRIDE_
+#endif
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include <irrlicht.h>
@@ -50,8 +53,10 @@ public:
 	//! Get the font which is used right now for drawing
 	virtual IGUIFont* getActiveFont() const _IRR_OVERRIDE_;
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 	//! Sets an image which should be displayed on the button when it is in the given state.
 	virtual void setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image = 0, const core::rect<s32>& sourceRect = core::rect<s32>(0, 0, 0, 0))  _IRR_OVERRIDE_;
+#endif
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
 	virtual void setImage(video::ITexture* image = 0);
@@ -68,6 +73,7 @@ public:
 	//! Sets the sprite bank used by the button
 	virtual void setSpriteBank(IGUISpriteBank* bank = 0) _IRR_OVERRIDE_;
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 	//! Sets the animated sprite for a specific button state
 	/** \param index: Number of the sprite within the sprite bank, use -1 for no sprite
 	\param state: State of the button to set the sprite for
@@ -77,6 +83,17 @@ public:
 	virtual void setSprite(EGUI_BUTTON_STATE state, s32 index,
 						   video::SColor color = video::SColor(255, 255, 255, 255),
 						   bool loop = false, bool scale = false) _IRR_OVERRIDE_;
+#else
+	//! Sets the animated sprite for a specific button state
+	/** \param index: Number of the sprite within the sprite bank, use -1 for no sprite
+	\param state: State of the button to set the sprite for
+	\param index: The sprite number from the current sprite bank
+	\param color: The color of the sprite
+	\param loop: True if the animation should loop, false if not
+	*/
+	virtual void setSprite(EGUI_BUTTON_STATE state, s32 index,
+						   video::SColor color = video::SColor(255, 255, 255, 255), bool loop = false) _IRR_OVERRIDE_;
+#endif
 
 	//! Get the sprite-index for the given state or -1 when no sprite is set
 	virtual s32 getSpriteIndex(EGUI_BUTTON_STATE state) const _IRR_OVERRIDE_;
@@ -137,8 +154,9 @@ public:
 	virtual void setImageSize(core::dimension2di s);
 
 protected:
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 	void drawSprite(EGUI_BUTTON_STATE state, u32 startTime, const core::position2di& center);
-
+#endif
 	struct ButtonSprite {
 		ButtonSprite() : Index(-1), Loop(false), Scale(false) {
 		}
