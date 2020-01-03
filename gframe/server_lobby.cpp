@@ -7,6 +7,8 @@
 
 namespace ygo {
 
+std::atomic_bool ServerLobby::is_refreshing = false;
+
 static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 	size_t realsize = size * nmemb;
 	auto buff = static_cast<std::string*>(userp);
@@ -155,6 +157,7 @@ int ServerLobby::GetRoomsThread() {
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
 		mainGame->roomListTable->setVisible(true);
+		is_refreshing = false;
 		return 0;
 	}
 
@@ -214,9 +217,13 @@ int ServerLobby::GetRoomsThread() {
 	mainGame->btnLanRefresh2->setEnabled(true);
 	mainGame->serverChoice->setEnabled(true);
 	mainGame->roomListTable->setVisible(true);
+	is_refreshing = false;
 	return 0;
 }
 void ServerLobby::RefreshRooms() {
+	if(is_refreshing)
+		return;
+	is_refreshing = true;
 	mainGame->roomListTable->clearRows();
 	std::thread(GetRoomsThread).detach();
 }

@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "network.h"
+#include <atomic>
 
 namespace ygo {
 struct ServerInfo {
@@ -27,6 +28,7 @@ public:
 	static int GetRoomsThread();
 	static void FillOnlineRooms();
 	static void JoinServer(bool host);
+	static std::atomic_bool is_refreshing;
 };
 //extern ServerLobby serverLobby;
 }
