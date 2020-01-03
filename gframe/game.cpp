@@ -827,7 +827,7 @@ bool Game::Initialize() {
 	btnLeaveGame = env->addButton(Scale(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
 	//restart single
-	btnRestartSingle = env->addButton(Scale(205, 90, 295, 165), 0, BUTTON_RESTART_SINGLE, dataManager.GetSysString(1359).c_str());
+	btnRestartSingle = env->addButton(Scale(205, 90, 295, 165), 0, BUTTON_RESTART_SINGLE, dataManager.GetSysString(1366).c_str());
 	btnRestartSingle->setVisible(false);
 	//tip
 	stTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, 0, -1, true);
