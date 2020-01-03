@@ -93,7 +93,6 @@ inline int _wtoi(const wchar_t * s) {
 #include <fmt/format.h>
 #include <fmt/printf.h>
 #include "utils.h"
-#include "server_lobby.h"
 #ifndef YGOPRO_BUILD_DLL
 #include <ocgapi.h>
 #else

@@ -7,6 +7,7 @@
 #include "single_mode.h"
 #include "image_manager.h"
 #include "game.h"
+#include "server_lobby.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
@@ -808,7 +809,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_F5: {
-			ServerLobby::RefreshRooms();
+			if(!event.KeyInput.PressedDown && mainGame->wRoomListPlaceholder->isVisible())
+				ServerLobby::RefreshRooms();
 			break;
 		}
 		case irr::KEY_F12: {

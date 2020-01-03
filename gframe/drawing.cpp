@@ -1004,16 +1004,16 @@ void Game::DrawSpec() {
 			if(!showChat && i > 2)
 				continue;
 			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
-
-			recti rectloc(wChat->getRelativePosition().UpperLeftCorner.X, window_size.Height - 45, wChat->getRelativePosition().UpperLeftCorner.X + 2 + w, window_size.Height - 25);
-			rectloc -= position2di(0, i * 20);
-			recti msgloc(wChat->getRelativePosition().UpperLeftCorner.X, window_size.Height - 45, wChat->getRelativePosition().UpperLeftCorner.X - 4, window_size.Height - 25);
-			msgloc -= position2di(0, i * 20);
+			recti chatrect = wChat->getRelativePosition();
+			recti rectloc = chatrect;
+			rectloc -= position2di(0, (i + 1) * chatrect.getHeight() + Scale(1));
+			rectloc.LowerRightCorner.X = rectloc.UpperLeftCorner.X + w + Scale(4);
+			recti msgloc = chatrect;
+			msgloc -= position2di(Scale(-2), (i + 1) * chatrect.getHeight() + Scale(1));
 			recti shadowloc = msgloc + position2di(1, 1);
-
-			driver->draw2DRectangle(Scale(rectloc), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
-			textFont->draw(chatMsg[i].c_str(), Scale(msgloc), 0xff000000, false, false);
-			textFont->draw(chatMsg[i].c_str(), Scale(shadowloc), chatColor[chatType[i]], false, false);
+			driver->draw2DRectangle(rectloc, 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
+			textFont->draw(chatMsg[i].c_str(), msgloc, 0xff000000, false, false);
+			textFont->draw(chatMsg[i].c_str(), shadowloc, chatColor[chatType[i]], false, false);
 		}
 	}
 }

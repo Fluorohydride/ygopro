@@ -187,6 +187,10 @@ public:
 	rect<T> Scale(rect<T> rect);
 	template<typename T>
 	vector2d<T> Scale(vector2d<T> vec);
+	template<typename T>
+	T ResizeX(T x);
+	template<typename T>
+	T ResizeY(T y);
 	template<typename T, typename T2>
 	vector2d<T> Scale(T x, T2 y);
 	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
@@ -674,6 +678,14 @@ inline std::vector<T> Game::TokenizeString(const T& input, const T& token) {
 template<typename T>
 inline vector2d<T> Game::Scale(vector2d<T> vec) {
 	return vector2d<T>(vec.X * gameConf.dpi_scale, vec.Y * gameConf.dpi_scale );
+}
+template<typename T>
+inline T Game::ResizeX(T x) {
+	return Scale<T>(x * window_scale.X);
+}
+template<typename T>
+inline T Game::ResizeY(T y) {
+	return Scale<T>(y * window_scale.Y);
 }
 template<typename T, typename T2>
 inline vector2d<T> Game::Scale(T x, T2 y) {
