@@ -7,7 +7,7 @@
 
 namespace ygo {
 
-std::atomic_bool ServerLobby::is_refreshing = false;
+std::atomic_bool ServerLobby::is_refreshing{ false };
 
 static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp) {
 	size_t realsize = size * nmemb;
