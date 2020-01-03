@@ -853,7 +853,7 @@ bool Game::Initialize() {
 
 	//server lobby
 	wRoomListPlaceholder = env->addStaticText(L"", Scale(1, 1, 1024 - 1, 640), false, false, 0, -1, false);
-	wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+	//wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
 	wRoomListPlaceholder->setVisible(false);
 
 	//server choice dropdownlist
@@ -2038,6 +2038,7 @@ void Game::SetMesageWindow() {
 	}
 }
 void Game::OnResize() {
+	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
 	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 450));
 	SetCentered(wCommitsLog);
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
@@ -2159,7 +2160,7 @@ void Game::OnResize() {
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
 
-	roomListTable->setRelativePosition(Resize(1, 118, 1024 - 2, 550));
+	roomListTable->setRelativePosition(recti(ResizeX(1), chkShowActiveRooms->getRelativePosition().LowerRightCorner.Y + ResizeY(10), ResizeX(1024 - 2), btnLanRefresh2->getRelativePosition().UpperLeftCorner.Y - ResizeY(25)));
 	roomListTable->setColumnWidth(0, roomListTable->getColumnWidth(0));
 	roomListTable->addRow(roomListTable->getRowCount());
 	roomListTable->removeRow(roomListTable->getRowCount() - 1);
