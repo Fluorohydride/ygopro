@@ -9,6 +9,7 @@ namespace ygo {
 OCG_Duel SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
 bool SingleMode::is_continuing = false;
+bool SingleMode::is_restarting = false;
 Replay SingleMode::last_replay;
 Replay SingleMode::new_replay;
 ReplayStream SingleMode::replay_stream;
@@ -23,11 +24,16 @@ bool SingleMode::StartPlay() {
 void SingleMode::StopPlay(bool is_exiting) {
 	is_closing = is_exiting;
 	is_continuing = false;
+	is_restarting = false;
 	mainGame->actionSignal.Set();
 	if(is_closing)
 		singleSignal.SetNoWait(true);
 	else
 		singleSignal.Set();
+}
+void SingleMode::Restart() {
+	StopPlay();
+	is_restarting = true;
 }
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
@@ -37,11 +43,12 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	OCG_DuelSetResponse(pduel, resp, len);
 }
 int SingleMode::SinglePlayThread() {
-	mainGame->dInfo.isSingleMode = true;
 	const int start_lp = 8000;
 	const int start_hand = 5;
 	const int draw_count = 1;
 	const int opt = 0;
+restart:
+	mainGame->dInfo.isSingleMode = true;
 	time_t seed = time(0);
 	DuelClient::rnd.seed(seed);
 	OCG_Player team = { start_lp, start_hand, draw_count };
@@ -57,14 +64,42 @@ int SingleMode::SinglePlayThread() {
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
 	bool loaded = true;
+	bool hand_test = false;
 	std::string script_name = "";
 	if(open_file) {
-		open_file = false;
+		//open_file = false;
 		script_name = Utils::ToUTF8IfNeeded(open_file_name);
-		if(!mainGame->LoadScript(pduel, script_name)) {
-			script_name = Utils::ToUTF8IfNeeded(TEXT("./puzzles/") + open_file_name);
-			if(!mainGame->LoadScript(pduel, script_name))
-				loaded = false;
+		if(script_name == "hand-test-mode") {
+			hand_test = true;
+			OCG_DestroyDuel(pduel);
+			pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR4 | DUEL_SIMPLE_AI, { 8000, 5, 1 }, { 8000, 0, 0 } });
+			Deck playerdeck;
+			deckManager.LoadDeck(Utils::ParseFilename(mainGame->gameConf.lastdeck), &playerdeck);
+			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
+			OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
+			card_info.duelist = 0;
+			card_info.loc = LOCATION_DECK;
+			last_replay.Write<uint32_t>(playerdeck.main.size(), false);
+			for(int32 i = (int32)playerdeck.main.size() - 1; i >= 0; --i) {
+				card_info.code = playerdeck.main[i]->code;
+				OCG_DuelNewCard(pduel, card_info);
+				last_replay.Write<uint32_t>(playerdeck.main[i]->code, false);
+			}
+			card_info.loc = LOCATION_EXTRA;
+			last_replay.Write<uint32_t>(playerdeck.extra.size(), false);
+			for(int32 i = (int32)playerdeck.extra.size() - 1; i >= 0; --i) {
+				card_info.code = playerdeck.extra[i]->code;
+				OCG_DuelNewCard(pduel, card_info);
+				last_replay.Write<uint32_t>(playerdeck.extra[i]->code, false);
+			}
+			const char cmd[] = "Debug.ReloadFieldEnd()";
+			OCG_LoadScript(pduel, cmd, sizeof(cmd)-1, " ");
+		} else {
+			if(!mainGame->LoadScript(pduel, script_name)) {
+				script_name = Utils::ToUTF8IfNeeded(TEXT("./puzzles/") + open_file_name);
+				if(!mainGame->LoadScript(pduel, script_name))
+					loaded = false;
+			}
 		}
 	} else {
 		script_name = BufferIO::EncodeUTF8s(mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true));
@@ -73,22 +108,29 @@ int SingleMode::SinglePlayThread() {
 	}
 	if(!loaded) {
 		OCG_DestroyDuel(pduel);
+		pduel = nullptr;
 		mainGame->dInfo.isSingleMode = false;
+		open_file = false;
+		is_restarting = false;
 		return 0;
 	}
+	//OCG_SetAIPlayer(pduel, 1, TRUE);
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
 	rh.version = PRO_VERSION;
 	rh.flag = REPLAY_SINGLE_MODE + REPLAY_LUA64;
 	rh.seed = seed;
 	mainGame->gMutex.lock();
-	mainGame->HideElement(mainGame->wSinglePlay);
+	if(!hand_test && !is_restarting)
+		mainGame->HideElement(mainGame->wSinglePlay);
+	is_restarting = false;
 	mainGame->ClearCardInfo();
 	mainGame->mTopMenu->setVisible(false);
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wInfos->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);
 	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210).c_str());
+	mainGame->btnRestartSingle->setVisible(true);
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
@@ -101,14 +143,16 @@ int SingleMode::SinglePlayThread() {
 	std::vector<uint8> duelBuffer;
 	is_closing = false;
 	is_continuing = true;
-	last_replay.BeginRecord(false);
-	last_replay.WriteHeader(rh);
-	//records the replay with the new system
-	new_replay.BeginRecord();
-	rh.id = REPLAY_YRPX;
-	rh.flag |= REPLAY_NEWREPLAY;
-	new_replay.WriteHeader(rh);
-	replay_stream.clear();
+	if(!hand_test) {
+		last_replay.BeginRecord(false);
+		last_replay.WriteHeader(rh);
+		//records the replay with the new system
+		new_replay.BeginRecord();
+		rh.id = REPLAY_YRPX;
+		rh.flag |= REPLAY_NEWREPLAY;
+		new_replay.WriteHeader(rh);
+		replay_stream.clear();
+	}
 	unsigned short buffer[20];
 	BufferIO::CopyWStr(mainGame->dInfo.hostname[0].c_str(), buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
@@ -138,33 +182,43 @@ int SingleMode::SinglePlayThread() {
 		engFlag = OCG_DuelProcess(pduel);
 		msg = CoreUtils::ParseMessages(pduel);
 		for(auto& message : msg.packets) {
+			if(message.message == MSG_WIN)
+				continue;
 			is_continuing = SinglePlayAnalyze(message) && is_continuing;
 		}
 	} while(is_continuing && engFlag && mainGame->dInfo.curMsg != MSG_WIN);
 	end :
 	OCG_DestroyDuel(pduel);
-	last_replay.EndRecord(0x1000);
-	std::vector<unsigned char> oldreplay;
-	oldreplay.insert(oldreplay.end(), (unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
-	oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
-	new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), oldreplay.size()));
-	new_replay.EndRecord();
-	if(is_closing)
+	pduel = nullptr;
+	if(!hand_test && !is_restarting) {
+		last_replay.EndRecord(0x1000);
+		std::vector<unsigned char> oldreplay;
+		oldreplay.insert(oldreplay.end(), (unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
+		oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
+		new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), oldreplay.size()));
+		new_replay.EndRecord();
+	}
+	if(is_closing) {
+		open_file = false;
+		is_restarting = false;
 		return 0;
+	}
 	mainGame->soundManager->StopSounds();
-	time_t nowtime = time(NULL);
-	tm* localedtime = localtime(&nowtime);
-	wchar_t timetext[40];
-	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
-	mainGame->gMutex.lock();
-	mainGame->ebRSName->setText(timetext);
-	mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
-	mainGame->PopupElement(mainGame->wReplaySave);
-	mainGame->gMutex.unlock();
-	mainGame->replaySignal.Reset();
-	mainGame->replaySignal.Wait();
-	if(mainGame->saveReplay)
-		new_replay.SaveReplay(Utils::ParseFilename(mainGame->ebRSName->getText()));
+	if(!hand_test && !is_restarting) {
+		time_t nowtime = time(NULL);
+		tm* localedtime = localtime(&nowtime);
+		wchar_t timetext[40];
+		wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
+		mainGame->gMutex.lock();
+		mainGame->ebRSName->setText(timetext);
+		mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
+		mainGame->PopupElement(mainGame->wReplaySave);
+		mainGame->gMutex.unlock();
+		mainGame->replaySignal.Reset();
+		mainGame->replaySignal.Wait();
+		if(mainGame->saveReplay)
+			new_replay.SaveReplay(Utils::ParseFilename(mainGame->ebRSName->getText()));
+	}
 	new_replay.Reset();
 	last_replay.Reset();
 	mainGame->gMutex.lock();
@@ -180,15 +234,23 @@ int SingleMode::SinglePlayThread() {
 		mainGame->closeSignal.lock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
+		if(is_restarting)
+			goto restart;
 		mainGame->gMutex.lock();
-		mainGame->ShowElement(mainGame->wSinglePlay);
-		mainGame->stTip->setVisible(false);
+		if(!hand_test) {
+			mainGame->ShowElement(mainGame->wSinglePlay);
+			mainGame->stTip->setVisible(false);
+		}
 		mainGame->SetMesageWindow();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();
 		if(exit_on_return)
 			mainGame->device->closeDevice();
+		if(hand_test) {
+			mainGame->deckBuilder.Initialize(false);
+		}
 	}
+	open_file = false;
 	return 0;
 }
 

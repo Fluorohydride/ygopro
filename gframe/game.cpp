@@ -632,6 +632,7 @@ bool Game::Initialize() {
 	btnShuffleDeck = env->addButton(Scale(5, 99, 55, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307).c_str());
 	btnSortDeck = env->addButton(Scale(60, 99, 110, 120), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305).c_str());
 	btnClearDeck = env->addButton(Scale(115, 99, 165, 120), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304).c_str());
+	btnHandTest = env->addButton(Scale(170, 99, 220, 120), wDeckEdit, BUTTON_HAND_TEST, L"Test Hand");
 	btnSideOK = env->addButton(Scale(510, 40, 820, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334).c_str());
 	btnSideOK->setVisible(false);
 	btnSideShuffle = env->addButton(Scale(310, 100, 370, 130), 0, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307).c_str());
@@ -825,6 +826,9 @@ bool Game::Initialize() {
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(Scale(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
+	//restart single
+	btnRestartSingle = env->addButton(Scale(205, 90, 295, 165), 0, BUTTON_RESTART_SINGLE, dataManager.GetSysString(1359).c_str());
+	btnRestartSingle->setVisible(false);
 	//tip
 	stTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, 0, -1, true);
 	stTip->setBackgroundColor(0xc0ffffff);
@@ -1832,6 +1836,7 @@ void Game::CloseDuelWindow() {
 	btnSideSort->setVisible(false);
 	btnSideReload->setVisible(false);
 	btnLeaveGame->setVisible(false);
+	btnRestartSingle->setVisible(false);
 	btnSpectatorSwap->setVisible(false);
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
@@ -2047,6 +2052,7 @@ void Game::OnResize() {
 	btnClearDeck->setRelativePosition(Resize(115, 99, 165, 120));
 	btnSortDeck->setRelativePosition(Resize(60, 99, 110, 120));
 	btnShuffleDeck->setRelativePosition(Resize(5, 99, 55, 120));
+	btnHandTest->setRelativePosition(Resize(170, 99, 220, 120));
 	btnSaveDeck->setRelativePosition(Resize(225, 35, 290, 60));
 	btnSaveDeckAs->setRelativePosition(Resize(225, 65, 290, 90));
 	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
@@ -2145,6 +2151,7 @@ void Game::OnResize() {
 	wChat->setRelativePosition(rect<s32>(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 
 	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
+	btnRestartSingle->setRelativePosition(Resize(205, 90, 295, 165));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
 	btnReplayStart->setRelativePosition(Resize(5, 5, 85, 25));
 	btnReplayPause->setRelativePosition(Resize(5, 5, 85, 25));
@@ -2373,6 +2380,8 @@ int Game::ScriptReader(void* payload, OCG_Duel duel, const char* name) {
 }
 void Game::MessageHandler(void* payload, const char* string, int type) {
 	static_cast<Game*>(payload)->AddDebugMsg(string);
+	if(type > 1)
+		printf("%s\n", string);
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));

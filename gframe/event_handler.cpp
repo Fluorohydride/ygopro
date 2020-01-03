@@ -167,6 +167,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				CancelOrFinish();
 				break;
 			}
+			case BUTTON_RESTART_SINGLE: {
+				if(mainGame->dInfo.isSingleMode)
+					SingleMode::Restart();
+				break;
+			}
 			case BUTTON_MSG_OK: {
 				mainGame->HideElement(mainGame->wMessage);
 				mainGame->actionSignal.Set();

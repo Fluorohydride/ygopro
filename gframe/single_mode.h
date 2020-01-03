@@ -13,10 +13,12 @@ private:
 	static OCG_Duel pduel;
 	static bool is_closing;
 	static bool is_continuing;
+	static bool is_restarting;
 
 public:
 	static bool StartPlay();
 	static void StopPlay(bool is_exiting = false);
+	static void Restart();
 	static void SetResponse(unsigned char* resp, unsigned int len);
 	static int SinglePlayThread();
 	static bool SinglePlayAnalyze(CoreUtils::Packet packet);

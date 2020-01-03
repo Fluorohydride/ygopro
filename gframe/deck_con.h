@@ -26,8 +26,8 @@ public:
 		LIMITATION_FILTER_CUSTOM
 	};
 	virtual bool OnEvent(const irr::SEvent& event);
-	void Initialize();
-	void Terminate();
+	void Initialize(bool refresh = true);
+	void Terminate(bool showmenu = true);
 	void GetHoveredCard();
 	bool FiltersChanged();
 	void FilterCards(bool force_refresh = false);

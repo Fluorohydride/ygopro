@@ -549,6 +549,7 @@ public:
 	irr::gui::IGUIStaticText* wDeckEdit;
 	irr::gui::IGUIComboBox* cbDBLFList;
 	irr::gui::IGUIComboBox* cbDBDecks;
+	irr::gui::IGUIButton* btnHandTest;
 	irr::gui::IGUIButton* btnClearDeck;
 	irr::gui::IGUIButton* btnSortDeck;
 	irr::gui::IGUIButton* btnShuffleDeck;
@@ -613,6 +614,8 @@ public:
 	irr::gui::IGUIButton* btnReplaySwap;
 	//surrender/leave
 	irr::gui::IGUIButton* btnLeaveGame;
+	//restart
+	irr::gui::IGUIButton* btnRestartSingle;
 	//swap
 	irr::gui::IGUIButton* btnSpectatorSwap;
 	//chain control
@@ -817,6 +820,7 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_CHAIN_ALWAYS			265
 #define BUTTON_CHAIN_WHENAVAIL		266
 #define BUTTON_CANCEL_OR_FINISH		267
+#define BUTTON_RESTART_SINGLE		268
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define BUTTON_CLEAR_CHAT			272
@@ -849,6 +853,7 @@ rect<T> Game::Scale(rect<T> rect) {
 #define SCROLL_FILTER				315
 #define EDITBOX_KEYWORD				316
 #define BUTTON_CLEAR_FILTER			317
+#define BUTTON_HAND_TEST			318
 #define COMBOBOX_OTHER_FILT			319
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
