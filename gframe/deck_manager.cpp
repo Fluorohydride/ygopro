@@ -208,6 +208,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, bool allow_ocg, bool allow_tc
 int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2) {
 	std::vector<int> mainvect;
 	std::vector<int> sidevect;
+#ifndef __ANDROID__
 	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc);
 	dbuf += mainc;
 	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec);
@@ -215,6 +216,22 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc
 	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc2);
 	dbuf += mainc2;
 	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec2);
+#else
+	auto ins = [](std::vector<int>& vec, int* start, int* end) {
+		while(start != end) {
+			vec.push_back(*start);
+			start++;
+		}
+	};
+	int* start = dbuf;
+	ins(mainvect, dbuf, dbuf + mainc);
+	dbuf += mainc;
+	ins(sidevect, dbuf, dbuf + sidec);
+	dbuf += sidec;
+	ins(mainvect, dbuf, dbuf + mainc2);
+	dbuf += mainc2;
+	ins(sidevect, dbuf, dbuf + sidec2);
+#endif
 	return LoadDeck(deck, mainvect, sidevect);
 }
 int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist) {
