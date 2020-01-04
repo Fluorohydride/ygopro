@@ -481,7 +481,7 @@ bool Game::Initialize() {
 	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
 	chkWaitChain = env->addCheckBox(false, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1277).c_str());
 	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
-	chkHideHintButton = env->addCheckBox(false, Scale(20, 170, 280, 195), tabPanel, -1, dataManager.GetSysString(1355).c_str());
+	chkHideHintButton = env->addCheckBox(false, Scale(20, 170, 280, 195), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
 	chkHideHintButton->setChecked(gameConf.chkHideHintButton != 0);
 	chkIgnore1 = env->addCheckBox(false, Scale(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1290).c_str());
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
@@ -691,6 +691,8 @@ bool Game::Initialize() {
 	btnSideSort->setVisible(false);
 	btnSideReload = env->addButton(Scale(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, dataManager.GetSysString(1309).c_str());
 	btnSideReload->setVisible(false);
+	btnHandTest = env->addButton(Scale(205, 90, 295, 130), 0, BUTTON_HAND_TEST, dataManager.GetSysString(1297).c_str());
+	btnHandTest->setVisible(false);
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(100);
@@ -876,6 +878,9 @@ bool Game::Initialize() {
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(Scale(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
+	//restart single
+	btnRestartSingle = env->addButton(Scale(205, 90, 295, 165), 0, BUTTON_RESTART_SINGLE, dataManager.GetSysString(1366).c_str());
+	btnRestartSingle->setVisible(false);
 	//tip
 	stTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, 0, -1, true);
 	stTip->setBackgroundColor(0xc0ffffff);
@@ -1926,6 +1931,7 @@ void Game::CloseDuelWindow() {
 	btnSideSort->setVisible(false);
 	btnSideReload->setVisible(false);
 	btnLeaveGame->setVisible(false);
+	btnRestartSingle->setVisible(false);
 	btnSpectatorSwap->setVisible(false);
 	btnChainIgnore->setVisible(false);
 	btnChainAlways->setVisible(false);
@@ -2141,6 +2147,7 @@ void Game::OnResize() {
 	btnClearDeck->setRelativePosition(Resize(115, 99, 165, 120));
 	btnSortDeck->setRelativePosition(Resize(60, 99, 110, 120));
 	btnShuffleDeck->setRelativePosition(Resize(5, 99, 55, 120));
+	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
 	btnSaveDeck->setRelativePosition(Resize(225, 35, 290, 60));
 	btnSaveDeckAs->setRelativePosition(Resize(225, 65, 290, 90));
 	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
@@ -2238,7 +2245,10 @@ void Game::OnResize() {
 
 	wChat->setRelativePosition(rect<s32>(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 
-	btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
+	if(dInfo.isSingleMode)
+		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 45));
+	else
+		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
 	btnReplayStart->setRelativePosition(Resize(5, 5, 85, 25));
 	btnReplayPause->setRelativePosition(Resize(5, 5, 85, 25));
@@ -2467,6 +2477,8 @@ int Game::ScriptReader(void* payload, OCG_Duel duel, const char* name) {
 }
 void Game::MessageHandler(void* payload, const char* string, int type) {
 	static_cast<Game*>(payload)->AddDebugMsg(string);
+	if(type > 1)
+		printf("%s\n", string);
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));

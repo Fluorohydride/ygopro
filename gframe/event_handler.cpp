@@ -176,6 +176,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				CancelOrFinish();
 				break;
 			}
+			case BUTTON_RESTART_SINGLE: {
+				if(mainGame->dInfo.isSingleMode)
+					SingleMode::Restart();
+				break;
+			}
 			case BUTTON_MSG_OK: {
 				mainGame->HideElement(mainGame->wMessage);
 				mainGame->actionSignal.Set();
@@ -800,6 +805,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(count == announce_count) {
 					DuelClient::SetResponseI(rac);
 					mainGame->HideElement(mainGame->wANRace, true);
+				}
+				break;
+			}
+			case CHECKBOX_CHAIN_BUTTONS: {
+				if(mainGame->dInfo.isStarted && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
+					const bool checked = !mainGame->chkHideHintButton->isChecked();
+					mainGame->btnChainIgnore->setVisible(checked);
+					mainGame->btnChainAlways->setVisible(checked);
+					mainGame->btnChainWhenAvail->setVisible(checked);
 				}
 				break;
 			}
