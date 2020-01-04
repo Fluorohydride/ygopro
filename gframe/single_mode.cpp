@@ -47,12 +47,13 @@ int SingleMode::SinglePlayThread() {
 	const int start_hand = 5;
 	const int draw_count = 1;
 	const int opt = 0;
-restart:
-	mainGame->dInfo.isSingleMode = true;
+	mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 45));
 	time_t seed = time(0);
 	DuelClient::rnd.seed(seed);
+restart:
+	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { start_lp, start_hand, draw_count };
-	pduel = mainGame->SetupDuel({ DuelClient::rnd(), opt, team, team });
+	pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), opt, team, team });
 	mainGame->dInfo.compat_mode = false;
 	mainGame->dInfo.lp[0] = start_lp;
 	mainGame->dInfo.lp[1] = start_lp;
@@ -67,14 +68,12 @@ restart:
 	bool hand_test = false;
 	std::string script_name = "";
 	if(open_file) {
-		//open_file = false;
 		script_name = Utils::ToUTF8IfNeeded(open_file_name);
 		if(script_name == "hand-test-mode") {
 			hand_test = true;
 			OCG_DestroyDuel(pduel);
 			pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR4 | DUEL_SIMPLE_AI, { 8000, 5, 1 }, { 8000, 0, 0 } });
-			Deck playerdeck;
-			deckManager.LoadDeck(Utils::ParseFilename(mainGame->gameConf.lastdeck), &playerdeck);
+			Deck playerdeck(deckManager.current_deck);
 			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
 			OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
 			card_info.duelist = 0;
@@ -112,6 +111,9 @@ restart:
 		mainGame->dInfo.isSingleMode = false;
 		open_file = false;
 		is_restarting = false;
+		mainGame->gMutex.lock();
+		mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
+		mainGame->gMutex.unlock();
 		return 0;
 	}
 	//OCG_SetAIPlayer(pduel, 1, TRUE);
@@ -125,7 +127,8 @@ restart:
 		mainGame->HideElement(mainGame->wSinglePlay);
 	is_restarting = false;
 	mainGame->ClearCardInfo();
-	mainGame->mTopMenu->setVisible(false);
+	if(mainGame->mTopMenu->isVisible())
+		mainGame->mTopMenu->setVisible(false);
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wInfos->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);
@@ -182,7 +185,7 @@ restart:
 		engFlag = OCG_DuelProcess(pduel);
 		msg = CoreUtils::ParseMessages(pduel);
 		for(auto& message : msg.packets) {
-			if(message.message == MSG_WIN)
+			if(message.message == MSG_WIN && hand_test)
 				continue;
 			is_continuing = SinglePlayAnalyze(message) && is_continuing;
 		}
@@ -201,6 +204,9 @@ restart:
 	if(is_closing) {
 		open_file = false;
 		is_restarting = false;
+		mainGame->gMutex.lock();
+		mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
+		mainGame->gMutex.unlock();
 		return 0;
 	}
 	mainGame->soundManager->StopSounds();
@@ -237,6 +243,7 @@ restart:
 		if(is_restarting)
 			goto restart;
 		mainGame->gMutex.lock();
+		mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
 		if(!hand_test) {
 			mainGame->ShowElement(mainGame->wSinglePlay);
 			mainGame->stTip->setVisible(false);

@@ -20,7 +20,7 @@ bufferevent* DuelClient::client_bev = nullptr;
 std::vector<uint8_t> DuelClient::duel_client_read;
 std::vector<uint8_t> DuelClient::duel_client_write;
 bool DuelClient::is_closing = false;
-u64 DuelClient::select_hint = 0;
+uint64_t DuelClient::select_hint = 0;
 std::wstring DuelClient::event_string;
 std::mt19937 DuelClient::rnd;
 

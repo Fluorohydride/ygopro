@@ -80,6 +80,7 @@ void DeckBuilder::Initialize(bool refresh) {
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
+	mainGame->btnHandTest->setVisible(true);
 	filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 	if(refresh) {
 		ClearSearch();
@@ -109,11 +110,13 @@ void DeckBuilder::Terminate(bool showmenu) {
 	mainGame->wCategories->setVisible(false);
 	mainGame->wFilter->setVisible(false);
 	mainGame->wSort->setVisible(false);
-	mainGame->wCardImg->setVisible(false);
-	mainGame->wInfos->setVisible(false);
-	mainGame->btnLeaveGame->setVisible(false);
-	if(showmenu)
+	if(showmenu) {
+		mainGame->wCardImg->setVisible(false);
+		mainGame->wInfos->setVisible(false);
+		mainGame->btnLeaveGame->setVisible(false);
 		mainGame->PopupElement(mainGame->wMainMenu);
+	}
+	mainGame->btnHandTest->setVisible(false);
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
 	mainGame->ClearTextures();

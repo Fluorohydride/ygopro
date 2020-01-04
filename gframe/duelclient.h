@@ -29,7 +29,7 @@ private:
 	static std::vector<uint8_t> duel_client_read;
 	static std::vector<uint8_t> duel_client_write;
 	static bool is_closing;
-	static u64 select_hint;
+	static uint64_t select_hint;
 	static std::wstring event_string;
 	static bool is_swapping;
 public:

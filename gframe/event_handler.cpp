@@ -799,6 +799,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case CHECKBOX_CHAIN_BUTTONS: {
+				if(mainGame->dInfo.isStarted && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
+					const bool checked = !mainGame->chkHideHintButton->isChecked();
+					mainGame->btnChainIgnore->setVisible(checked);
+					mainGame->btnChainAlways->setVisible(checked);
+					mainGame->btnChainWhenAvail->setVisible(checked);
+				}
+				break;
+			}
 			}
 			break;
 		}
