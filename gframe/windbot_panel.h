@@ -15,6 +15,7 @@ struct WindBotPanel {
 	irr::gui::IGUICheckBox* chkThrowRock;
 	irr::gui::IGUICheckBox* chkMute;
 	irr::gui::IGUIStaticText* deckProperties;
+	irr::gui::IGUIButton* btnAdd;
 
 	void Refresh(int filterMasterRule = 0);
 	void UpdateDescription();

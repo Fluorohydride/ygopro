@@ -602,7 +602,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		int x = (pkt->info.team1 + pkt->info.team2 >= 5) ? 60 : 0;
 		mainGame->btnHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 180 + x, 110, 205 + x));
 		mainGame->stHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 210 + x, 270, 230 + x));
-		mainGame->stHostPrepRule->setRelativePosition(mainGame->Scale<s32>(305, 30, 485, 230 + x));
+		mainGame->stHostPrepRule->setRelativePosition(mainGame->Scale<s32>(280, 30, 460, 230 + x));
 		mainGame->stDeckSelect->setRelativePosition(mainGame->Scale<s32>(10, 235 + x, 110, 255 + x));
 		mainGame->cbDeckSelect->setRelativePosition(mainGame->Scale<s32>(120, 230 + x, 270, 255 + x));
 		mainGame->cbDeckSelect2->setRelativePosition(mainGame->Scale<s32>(280, 230 + x, 430, 255 + x));
@@ -612,12 +612,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnHostPrepCancel->setRelativePosition(mainGame->Scale<s32>(350, 280 + x, 460, 305 + x));
 		mainGame->wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440 + x));
 		mainGame->wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
-        mainGame->gBot.window->setRelativePosition(mainGame->ResizeWin(750, 120, 960, 330 + x));
+        mainGame->gBot.window->setRelativePosition(mainGame->ResizeWin(750, 120, 960, 360 + x));
 		for(int i = 0; i < 6; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(false);
 			mainGame->chkHostPrepReady[i]->setChecked(false);
 			mainGame->btnHostPrepKick[i]->setVisible(false);
-            mainGame->btnHostPrepWindbot[i]->setVisible(false);
 			mainGame->stHostPrepDuelist[i]->setVisible(false);
 			mainGame->stHostPrepDuelist[i]->setText(L"");
 		}
@@ -625,17 +624,15 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
 			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 65 + i * 25, 30, 85 + i * 25));
-            mainGame->btnHostPrepWindbot[i]->setRelativePosition(mainGame->Scale<s32>(35, 65 + i * 25, 55, 85 + i * 25));
-            mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(65, 65 + i * 25, 265, 85 + i * 25));
-			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(275, 65 + i * 25, 295, 85 + i * 25));
+            mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
+			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
 		for(int i = pkt->info.team1; i < pkt->info.team1 + pkt->info.team2; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
-			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 75 + i * 25, 30, 95 + i * 25));
-            mainGame->btnHostPrepWindbot[i]->setRelativePosition(mainGame->Scale<s32>(35, 75 + i * 25, 55, 95 + i * 25));
-            mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(65, 75 + i * 25, 265, 95 + i * 25));
-			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(275, 75 + i * 25, 295, 95 + i * 25));
+			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 65 + i * 25, 30, 85 + i * 25));
+			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
+			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
 		mainGame->dInfo.hostname.resize(pkt->info.team1);
 		mainGame->dInfo.clientname.resize(pkt->info.team2);
@@ -669,7 +666,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
-        mainGame->ShowElement(mainGame->gBot.window);
 		if(str2.size())
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
@@ -685,7 +681,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		is_host = ((pkt->type >> 4) & 0xf) != 0;
 		for(int i = 0; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
 			mainGame->btnHostPrepKick[i]->setVisible(is_host);
-            mainGame->btnHostPrepWindbot[i]->setVisible(is_host);
 		}
 		for(int i = 0; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
 			mainGame->chkHostPrepReady[i]->setEnabled(false);
@@ -703,6 +698,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnHostPrepReady->setVisible(true);
 			mainGame->btnHostPrepNotReady->setVisible(false);
 		}
+		mainGame->btnHostPrepWindBot->setVisible(is_host && !mainGame->isHostingOnline);
 		mainGame->btnHostPrepStart->setVisible(is_host);
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
 		mainGame->dInfo.player_type = selftype;

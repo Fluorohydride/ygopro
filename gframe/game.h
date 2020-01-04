@@ -431,8 +431,8 @@ public:
 	WindBotPanel gBot;
 	irr::gui::IGUIStaticText* stHostCardRule;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
+	irr::gui::IGUIButton* btnHostPrepWindBot;
 	irr::gui::IGUIButton* btnHostPrepOB;
-	irr::gui::IGUIButton* btnHostPrepWindbot[6];
 	irr::gui::IGUIStaticText* stHostPrepDuelist[6];
 	irr::gui::IGUICheckBox* chkHostPrepReady[6];
 	irr::gui::IGUIButton* btnHostPrepKick[6];
@@ -767,7 +767,7 @@ rect<T> Game::Scale(rect<T> rect) {
 #define BUTTON_EXPORT_DECK			135
 #define EDITBOX_TEAM_COUNT			136
 #define COMBOBOX_MATCH_MODE			137
-#define BUTTON_BOT_START			138
+#define BUTTON_HP_AI_TOGGLE			138
 #define BUTTON_BOT_ADD				139
 #define EDITBOX_CHAT				140
 #define EDITBOX_PORT_BOX			141

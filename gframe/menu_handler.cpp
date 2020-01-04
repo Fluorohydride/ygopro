@@ -415,16 +415,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
 			}
-			case BUTTON_BOT_START: {
-				int port = std::stoi(mainGame->gameConf.serverport);
-				if(!NetServer::StartServer(port))
-					break;
-				if(!DuelClient::StartClient(0x7f000001, port)) {
-					NetServer::StopServer();
-					break;
+			case BUTTON_HP_AI_TOGGLE: {
+				if (mainGame->gBot.window->isVisible()) {
+					mainGame->HideElement(mainGame->gBot.window);
 				}
-				if(!mainGame->gBot.LaunchSelected(port)) {
-					NetServer::StopServer();
+				else {
+					mainGame->ShowElement(mainGame->gBot.window);
 				}
 				break;
 			}

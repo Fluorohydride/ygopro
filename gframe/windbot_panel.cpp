@@ -1,5 +1,6 @@
 #include "windbot_panel.h"
 #include <fmt/format.h>
+#include "data_manager.h"
 
 namespace ygo {
 
@@ -36,9 +37,10 @@ void WindBotPanel::UpdateDescription() {
 	// TODO: Consider using a string buffer here instead and account for i18n
 	std::wstring params;
 	if (level > 0)
-		params.append(fmt::format(L"AI Level: {}\n", level));
+		params.append(fmt::format(dataManager.GetSysString(2055), level));
 	else if (level == 0)
-		params.append(L"Anti Meta AI\n");
+		params.append(dataManager.GetSysString(2056));
+	params.append(L"\n");
 	std::wstring mr;
 	if (bot.SupportsMasterRule3())
 		mr.append(L"3");
@@ -47,8 +49,10 @@ void WindBotPanel::UpdateDescription() {
 			mr.append(L",");
 		mr.append(L"4");
 	}
-	if (mr.size())
-		params.append(fmt::format(L"Master Rule supported: {}\n", mr.c_str()));
+	if (mr.size()) {
+		params.append(fmt::format(dataManager.GetSysString(2057), mr.c_str()));
+		params.append(L"\n");
+	}
 	deckProperties->setText(params.c_str());
 }
 
