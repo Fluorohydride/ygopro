@@ -562,7 +562,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			case CHECKBOX_BOT_OLD_RULE: {
+			}
+			break;
+		}
+		case irr::gui::EGET_COMBO_BOX_CHANGED: {
+			switch(id) {
+			case COMBOBOX_BOT_RULE: {
 				mainGame->RefreshBot();
 				break;
 			}
