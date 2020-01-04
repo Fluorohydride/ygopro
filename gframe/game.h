@@ -33,6 +33,7 @@ struct Config {
 	int chkWaitChain;
 	int chkIgnore1;
 	int chkIgnore2;
+	int default_rule;
 	int hide_setname;
 	int hide_hint_button;
 	int control_mode;
@@ -716,7 +717,7 @@ extern Game* mainGame;
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
 
-#define DEFAULT_DUEL_RULE			5
+#define DEFAULT_DUEL_RULE			4
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 #endif // GAME_H
