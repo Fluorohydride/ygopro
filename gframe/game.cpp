@@ -2155,6 +2155,7 @@ void Game::OnResize() {
 		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 45));
 	else
 		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
+	btnRestartSingle->setRelativePosition(Resize(205, 50, 295, 90));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
 	btnReplayStart->setRelativePosition(Resize(5, 5, 85, 25));
 	btnReplayPause->setRelativePosition(Resize(5, 5, 85, 25));
