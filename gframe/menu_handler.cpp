@@ -522,23 +522,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case irr::gui::EGET_COMBO_BOX_CHANGED: {
-			switch(id) {
-			case COMBOBOX_HP_CATEGORY: {
-				int catesel = mainGame->cbCategorySelect->getSelected();
-				if(catesel == 3) {
-					catesel = 2;
-					mainGame->cbCategorySelect->setSelected(2);
-				}
-				if(catesel >= 0) {
-					mainGame->RefreshDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect);
-					mainGame->cbDeckSelect->setSelected(0);
-				}
-				break;
-			}
-			}
-			break;
-		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {
 			case CHECKBOX_HP_READY: {
@@ -569,6 +552,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case COMBOBOX_BOT_RULE: {
 				mainGame->RefreshBot();
+				break;
+			}
+			case COMBOBOX_HP_CATEGORY: {
+				int catesel = mainGame->cbCategorySelect->getSelected();
+				if(catesel == 3) {
+					catesel = 2;
+					mainGame->cbCategorySelect->setSelected(2);
+				}
+				if(catesel >= 0) {
+					mainGame->RefreshDeck(mainGame->cbCategorySelect, mainGame->cbDeckSelect);
+					mainGame->cbDeckSelect->setSelected(0);
+				}
 				break;
 			}
 			}
