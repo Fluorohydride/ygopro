@@ -18,10 +18,10 @@ struct WindBot {
 	};
 	int flags;
 
-	int GetDifficulty();
-	bool SupportsMasterRule3();
-	bool SupportsMasterRule4();
-	bool Launch(int port, bool chat = true, int hand = 0);
+	int GetDifficulty() const;
+	bool SupportsMasterRule3() const;
+	bool SupportsMasterRule4() const;
+	bool Launch(int port, bool chat = true, int hand = 0) const;
 
 	// Can be made static
 	unsigned short version;
