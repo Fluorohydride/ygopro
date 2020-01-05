@@ -67,7 +67,8 @@ static bool check_set_code(CardDataC* data, std::vector<unsigned int>& setcodes)
 void DeckBuilder::Initialize(bool refresh) {
 	mainGame->is_building = true;
 	mainGame->is_siding = false;
-	mainGame->ClearCardInfo();
+	if(refresh)
+		mainGame->ClearCardInfo();
 	mainGame->mTopMenu->setVisible(false);
 	mainGame->wInfos->setVisible(true);
 	mainGame->wCardImg->setVisible(true);
@@ -104,8 +105,10 @@ void DeckBuilder::Initialize(bool refresh) {
 }
 void DeckBuilder::Terminate(bool showmenu) {
 	mainGame->is_building = false;
-	mainGame->ClearCardInfo();
-	mainGame->mTopMenu->setVisible(true);
+	if(showmenu) {
+		mainGame->ClearCardInfo();
+		mainGame->mTopMenu->setVisible(true);
+	}
 	mainGame->wDeckEdit->setVisible(false);
 	mainGame->wCategories->setVisible(false);
 	mainGame->wFilter->setVisible(false);
@@ -115,12 +118,12 @@ void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->wInfos->setVisible(false);
 		mainGame->btnLeaveGame->setVisible(false);
 		mainGame->PopupElement(mainGame->wMainMenu);
+		mainGame->ClearTextures();
+		mainGame->ClearCardInfo(0);
 	}
 	mainGame->btnHandTest->setVisible(false);
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
-	mainGame->ClearTextures();
-	mainGame->ClearCardInfo(0);
 	mainGame->scrFilter->setVisible(false);
 	mainGame->SetMesageWindow();
 	int sel = mainGame->cbDBDecks->getSelected();
