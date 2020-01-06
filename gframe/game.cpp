@@ -9,6 +9,7 @@
 
 #include "config.h"
 #include "game.h"
+#include "server_lobby.h"
 #include "sound_manager.h"
 #include "image_manager.h"
 #include "data_manager.h"
@@ -1696,7 +1697,7 @@ void Game::LoadServers() {
 				tmp_server.roomlistport = obj["roomlistport"].get<int>();
 				tmp_server.duelport = obj["duelport"].get<int>();
 				mainGame->serverChoice->addItem(tmp_server.name.c_str());
-				serversVector.push_back(std::move(tmp_server));
+				ServerLobby::serversVector.push_back(std::move(tmp_server));
 			}
 		}
 	}

@@ -23,7 +23,6 @@
 #include "deck_manager.h"
 #include "sound_manager.h"
 #include "repo_manager.h"
-#include "server_lobby.h"
 #include "windbot_panel.h"
 
 namespace ygo {
@@ -284,9 +283,6 @@ public:
 	uint32 duel_param;
 	uint32 showingcard;
 	bool cardimagetextureloading;
-
-	std::vector<RoomInfo> roomsVector;
-	std::vector<ServerInfo> serversVector;
 
 
 	irr::core::dimension2d<irr::u32> window_size;
