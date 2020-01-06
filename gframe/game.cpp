@@ -2452,7 +2452,7 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 			str = str.substr(0, pos);
 		game->AddDebugMsg(str);
 		if(type > 1)
-			printf("%s\n", str.c_str());
+			std::cout << str << std::endl;
 	}
 }
 void Game::PopulateResourcesDirectories() {
