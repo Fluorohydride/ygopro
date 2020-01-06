@@ -2442,9 +2442,17 @@ int Game::ScriptReader(void* payload, OCG_Duel duel, const char* name) {
 	return static_cast<Game*>(payload)->LoadScript(duel, name);
 }
 void Game::MessageHandler(void* payload, const char* string, int type) {
-	static_cast<Game*>(payload)->AddDebugMsg(string);
-	if(type > 1)
-		printf("%s\n", string);
+	Game* game = static_cast<Game*>(payload);
+	std::stringstream ss(string);
+	std::string str;
+	while(std::getline(ss, str)) {
+		auto pos = str.find_first_of("\n\r");
+		if(str.size() && pos != std::string::npos)
+			str = str.substr(0, pos);
+		game->AddDebugMsg(str);
+		if(type > 1)
+			printf("%s\n", str);
+	}
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));
