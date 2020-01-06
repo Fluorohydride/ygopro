@@ -241,7 +241,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SIDE_OK: {
 				if(deckManager.current_deck.main.size() != deckManager.pre_deck.main.size() || deckManager.current_deck.extra.size() != deckManager.pre_deck.extra.size()
-				        || deckManager.current_deck.side.size() != deckManager.pre_deck.side.size()) {
+						|| deckManager.current_deck.side.size() != deckManager.pre_deck.side.size()) {
 					mainGame->PopupMessage(dataManager.GetSysString(1410));
 					break;
 				}

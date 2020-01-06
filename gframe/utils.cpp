@@ -182,7 +182,7 @@ namespace ygo {
 			unsigned long   flags;
 			unsigned long   functions;
 			unsigned long   decorations;
-			long            inputMode;
+			long			inputMode;
 			unsigned long   status;
 		} hints = {};
 		Display* display = XOpenDisplay(NULL);;

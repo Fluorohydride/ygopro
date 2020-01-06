@@ -1499,7 +1499,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							std::wstring str(dataManager.GetName(mcard->code));
 							if(mcard->type & TYPE_MONSTER) {
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)
-								        && wcscmp(dataManager.GetName(mcard->code).c_str(), dataManager.GetName(mcard->alias).c_str())) {
+										&& wcscmp(dataManager.GetName(mcard->code).c_str(), dataManager.GetName(mcard->alias).c_str())) {
 									str.append(fmt::format(L"\n({})",dataManager.GetName(mcard->alias)));
 								}
 								if (mcard->type & TYPE_LINK) {

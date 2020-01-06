@@ -140,7 +140,7 @@ void ReplayMode::EndDuel() {
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isReplay = false;
-        mainGame->dInfo.isSingleMode = false;
+		mainGame->dInfo.isSingleMode = false;
 		mainGame->dInfo.isOldReplay = false;
 		mainGame->gMutex.unlock();
 		mainGame->closeDoneSignal.Reset();
