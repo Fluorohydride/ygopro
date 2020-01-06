@@ -7,6 +7,8 @@
 
 namespace ygo {
 
+std::vector<RoomInfo> ServerLobby::roomsVector;
+std::vector<ServerInfo> ServerLobby::serversVector;
 std::atomic_bool ServerLobby::is_refreshing{ false };
 
 static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, void* userp) {
@@ -20,7 +22,7 @@ static size_t WriteMemoryCallback(void* contents, size_t size, size_t nmemb, voi
 
 void ServerLobby::FillOnlineRooms() {
 	mainGame->roomListTable->clearRows();
-	std::vector<RoomInfo>& rooms = mainGame->roomsVector;
+	std::vector<RoomInfo>& rooms = roomsVector;
 
 	std::wstring searchText(Game::StringtoUpper(mainGame->ebRoomName->getText()));
 
@@ -84,7 +86,7 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->addRow(index);
 		roomListTable->setCellData(index, 0, room.locked ? (void*)1 : nullptr);
 		roomListTable->setCellData(index, 1, (void*)&room);
-		roomListTable->setCellText(index, 1, dataManager.GetSysString(room.info.rule + 1240).c_str());
+		roomListTable->setCellText(index, 1, dataManager.GetSysString(room.info.rule + 1900).c_str());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
 			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).c_str() : L"",
 			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());
@@ -128,7 +130,7 @@ int ServerLobby::GetRoomsThread() {
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
 
-	ServerInfo serverInfo = mainGame->serversVector[mainGame->serverChoice->getSelected()];
+	ServerInfo serverInfo = serversVector[mainGame->serverChoice->getSelected()];
 
 	CURL *curl_handle;
 	CURLcode res;
@@ -164,7 +166,7 @@ int ServerLobby::GetRoomsThread() {
 	if(retrieved_data == "[server busy]") {
 		mainGame->PopupMessage(dataManager.GetSysString(2031), L"Error 04");
 	} else {
-		mainGame->roomsVector.clear();
+		roomsVector.clear();
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
 		if(j.size()) {
 #define GET(field, type) obj[field].get<type>()
@@ -195,7 +197,7 @@ int ServerLobby::GetRoomsThread() {
 					for(auto& obj2 : obj["users"].get<std::vector<nlohmann::json>>()) {
 						room.players.push_back(BufferIO::DecodeUTF8s(obj2["name"].get<std::string>()));
 					}
-					mainGame->roomsVector.push_back(std::move(room));
+					roomsVector.push_back(std::move(room));
 				}
 			}
 			catch(...) {
@@ -203,7 +205,7 @@ int ServerLobby::GetRoomsThread() {
 			}
 		}
 	}
-	if(mainGame->roomsVector.empty()) {
+	if(roomsVector.empty()) {
 		mainGame->PopupMessage(dataManager.GetSysString(2033), dataManager.GetSysString(2032));
 	} else {
 		FillOnlineRooms();
@@ -229,8 +231,7 @@ void ServerLobby::RefreshRooms() {
 }
 void ServerLobby::JoinServer(bool host) {
 	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());
-	std::vector<RoomInfo> rv = mainGame->roomsVector;
-	ServerInfo server = mainGame->serversVector[mainGame->serverChoice->getSelected()];
+	ServerInfo server = serversVector[mainGame->serverChoice->getSelected()];
 	try {
 		auto serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 		if(host) {

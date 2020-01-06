@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include "game.h"
+#include "server_lobby.h"
 #include "sound_manager.h"
 #include "image_manager.h"
 #include "data_manager.h"
@@ -152,6 +153,7 @@ bool Game::Initialize() {
 	LoadExpansionDB();
 	LoadZipArchives();
 	LoadArchivesDB();
+	RefreshAiDecks();
 	if(!dataManager.LoadStrings(TEXT("strings.conf"))) {
 		ErrorLog("Failed to load strings!");
 		return false;
@@ -280,14 +282,16 @@ bool Game::Initialize() {
 	wCreateHost->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1226).c_str(), Scale(20, 30, 220, 50), false, false, wCreateHost);
 	cbLFlist = env->addComboBox(Scale(140, 25, 300, 50), wCreateHost);
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+	for (unsigned int i = 0; i < deckManager._lfList.size(); ++i) {
 		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+		if (gameConf.lastlflist == deckManager._lfList[i].hash)
+			cbLFlist->setSelected(i);
+	}
 	env->addStaticText(dataManager.GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(Scale(140, 55, 300, 80), wCreateHost);
-	cbRule->addItem(dataManager.GetSysString(1240).c_str());
-	cbRule->addItem(dataManager.GetSysString(1241).c_str());
-	cbRule->addItem(dataManager.GetSysString(1242).c_str());
-	cbRule->addItem(dataManager.GetSysString(1243).c_str());
+	for (auto i = 1900; i <= 1904; ++i)
+		cbRule->addItem(dataManager.GetSysString(i).c_str());
+	cbRule->setSelected(gameConf.lastallowedcards);
 	env->addStaticText(dataManager.GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	ebTeam1 = env->addEditBox(L"1", Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -384,12 +388,21 @@ bool Game::Initialize() {
 	stHostPrepRule2 = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare2, -1, Scale(10, 30, 460, 350));
 	stHostPrepRule2->setWordWrap(true);
 	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, dataManager.GetSysString(1251).c_str());
+	btnHostPrepWindBot = env->addButton(Scale(170, 30, 270, 55), wHostPrepare, BUTTON_HP_AI_TOGGLE, dataManager.GetSysString(2050).c_str());
 	for(int i = 0; i < 6; ++i) {
-		stHostPrepDuelist[i] = env->addStaticText(L"", Scale(40, 65 + i * 25, 240, 85 + i * 25), true, false, wHostPrepare);
 		btnHostPrepKick[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_HP_KICK, L"X");
+		stHostPrepDuelist[i] = env->addStaticText(L"", Scale(40, 65 + i * 25, 240, 85 + i * 25), true, false, wHostPrepare);
 		chkHostPrepReady[i] = env->addCheckBox(false, Scale(250, 65 + i * 25, 270, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
 		chkHostPrepReady[i]->setEnabled(false);
 	}
+	gBot.window = env->addWindow(Scale(750, 120, 960, 360), false, dataManager.GetSysString(2051).c_str());
+	gBot.window->getCloseButton()->setVisible(false);
+	gBot.window->setVisible(false);
+	gBot.deckProperties = env->addStaticText(L"", Scale(10, 25, 200, 100), true, true, gBot.window);
+	gBot.chkThrowRock = env->addCheckBox(false, Scale(10, 105, 200, 130), gBot.window, -1, dataManager.GetSysString(2052).c_str());
+	gBot.chkMute = env->addCheckBox(false, Scale(10, 135, 200, 160), gBot.window, -1, dataManager.GetSysString(2053).c_str());
+	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
+	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, dataManager.GetSysString(2054).c_str());
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
 	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", dataManager.GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(280, 30, 460, 230));
@@ -468,8 +481,8 @@ bool Game::Initialize() {
 	btnExpandChat = env->addButton(Scale(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2043).c_str());
 	//system
 	irr::gui::IGUITab* _tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
-        auto aaa = Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight());
-        tabSystem = Panel::addPanel(env, _tabSystem, -1, aaa, true, false);
+	auto aaa = Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight());
+	tabSystem = Panel::addPanel(env, _tabSystem, -1, aaa, true, false);
 	auto tabPanel = tabSystem->getSubpanel();
 	chkMAutoPos = env->addCheckBox(false, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1274).c_str());
 	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
@@ -727,9 +740,10 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1317).c_str());
 	cbLimit->addItem(dataManager.GetSysString(1318).c_str());
 	cbLimit->addItem(dataManager.GetSysString(1320).c_str());
-	cbLimit->addItem(dataManager.GetSysString(1240).c_str());
-	cbLimit->addItem(dataManager.GetSysString(1241).c_str());
-	cbLimit->addItem(dataManager.GetSysString(1242).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1900).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1901).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1902).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1903).c_str());
 	if(chkAnime->isChecked()) {
 		cbLimit->addItem(dataManager.GetSysString(1264).c_str());
 		cbLimit->addItem(dataManager.GetSysString(1265).c_str());
@@ -935,10 +949,8 @@ bool Game::Initialize() {
 	cbFilterBanlist->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	cbFilterRule->addItem(fmt::format(L"[{}]", dataManager.GetSysString(1225)).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1240).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1241).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1242).c_str());
-	cbFilterRule->addItem(dataManager.GetSysString(1243).c_str());
+	for (auto i = 1900; i <= 1904; ++i)
+		cbFilterRule->addItem(dataManager.GetSysString(i).c_str());
 
 	cbFilterBanlist->addItem(fmt::format(L"[{}]", dataManager.GetSysString(1226)).c_str());
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
@@ -1408,6 +1420,49 @@ void Game::RefreshLFLists() {
 	}
 	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
 }
+void Game::RefreshAiDecks() {
+	gBot.bots.clear();
+	std::ifstream windbots("WindBot/bots.json");
+	if (windbots) {
+		try {
+			nlohmann::json j;
+			windbots >> j;
+			if (j.size() && j.is_array()) {
+				for (auto& obj : j) {
+					if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
+						continue;
+					WindBot bot;
+					bot.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+					bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
+					bot.flags = 0;
+					for (auto& flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
+#define CHECK_AND_SET_FLAG(flag) if (strflag == #flag) bot.flags |= static_cast<int>(WindBot::Parameters::flag)
+						auto strflag = flag.get<std::string>();
+						CHECK_AND_SET_FLAG(AI_LV1);
+						CHECK_AND_SET_FLAG(AI_LV2);
+						CHECK_AND_SET_FLAG(AI_LV3);
+						CHECK_AND_SET_FLAG(AI_ANTI_META);
+						CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_3);
+						CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_4);
+#undef CHECK_AND_SET_FLAG
+					}
+					bot.version = PRO_VERSION;
+#ifdef _WIN32
+					bot.executablePath = filesystem->getAbsolutePath(TEXT("./WindBot")).c_str();
+#endif
+					gBot.bots.push_back(bot);
+				}
+			}
+		}
+		catch (std::exception& e)
+		{
+			ErrorLog(fmt::format("Failed to load WindBot Ignite config json: {}", e.what()));
+		}
+	}
+	else {
+		ErrorLog("Failed to open WindBot Ignite config json!");
+	}
+}
 void Game::RefreshReplay() {
 	lstReplayList->resetPath();
 }
@@ -1427,6 +1482,7 @@ void Game::LoadConfig() {
 	gameConf.gamename = L"";
 	gameConf.lastdeck = L"";
 	gameConf.lastlflist = 0;
+	gameConf.lastallowedcards = static_cast<unsigned int>(DuelAllowedCards::ALLOWED_CARDS_WITH_PRERELEASE);
 	gameConf.numfont = L"";
 	gameConf.textfont = L"";
 	gameConf.lasthost = L"";
@@ -1490,6 +1546,9 @@ void Game::LoadConfig() {
 		else if(type == "lastlflist") {
 			auto val = std::stoi(str);
 			gameConf.lastlflist = val >= 0 ? val : 0;
+		} else if(type == "lastallowedcards") {
+			auto val = std::stoi(str);
+			gameConf.lastallowedcards = val >= 0 ? val : 0;
 		} else if(type == "textfont") {
 			pos = str.find(L' ');
 			if(pos == std::wstring::npos) {
@@ -1584,6 +1643,7 @@ void Game::SaveConfig() {
 	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
 	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
 	conf_file << "lastlflist = "		<< std::to_string(gameConf.lastlflist) << "\n";
+	conf_file << "lastallowedcards = "  << std::to_string(cbRule->getSelected()) << "\n";
 	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
 	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
 	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";
@@ -1731,7 +1791,7 @@ void Game::LoadServers() {
 				tmp_server.roomlistport = obj["roomlistport"].get<int>();
 				tmp_server.duelport = obj["duelport"].get<int>();
 				mainGame->serverChoice->addItem(tmp_server.name.c_str());
-				serversVector.push_back(std::move(tmp_server));
+				ServerLobby::serversVector.push_back(std::move(tmp_server));
 			}
 		}
 	}
@@ -2249,6 +2309,7 @@ void Game::OnResize() {
 		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 45));
 	else
 		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 80));
+	btnRestartSingle->setRelativePosition(Resize(205, 50, 295, 90));
 	wReplayControl->setRelativePosition(Resize(205, 143, 295, 273));
 	btnReplayStart->setRelativePosition(Resize(5, 5, 85, 25));
 	btnReplayPause->setRelativePosition(Resize(5, 5, 85, 25));
@@ -2476,14 +2537,26 @@ int Game::ScriptReader(void* payload, OCG_Duel duel, const char* name) {
 	return static_cast<Game*>(payload)->LoadScript(duel, name);
 }
 void Game::MessageHandler(void* payload, const char* string, int type) {
-	static_cast<Game*>(payload)->AddDebugMsg(string);
-	if(type > 1)
-		printf("%s\n", string);
+	Game* game = static_cast<Game*>(payload);
+	std::stringstream ss(string);
+	std::string str;
+	while(std::getline(ss, str)) {
+		auto pos = str.find_first_of("\n\r");
+		if(str.size() && pos != std::string::npos)
+			str = str.substr(0, pos);
+		game->AddDebugMsg(str);
+		if(type > 1)
+			printf("%s\n", str.c_str());
+	}
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(TEXT("./expansions/script/"));
+	auto expansions_subdirs = Utils::FindSubfolders(TEXT("./expansions/script/"));
+	script_dirs.insert(script_dirs.end(), expansions_subdirs.begin(), expansions_subdirs.end());
 	script_dirs.push_back(TEXT("archives"));
 	script_dirs.push_back(TEXT("./script/"));
+	auto script_subdirs = Utils::FindSubfolders(TEXT("./script/"));
+	script_dirs.insert(script_dirs.end(), script_subdirs.begin(), script_subdirs.end());
 	pic_dirs.push_back(TEXT("./expansions/pics/"));
 	pic_dirs.push_back(TEXT("archives"));
 	pic_dirs.push_back(TEXT("./pics/"));
@@ -2494,6 +2567,5 @@ void Game::PopulateResourcesDirectories() {
 	field_dirs.push_back(TEXT("archives"));
 	field_dirs.push_back(TEXT("./pics/field/"));
 }
-
 
 }

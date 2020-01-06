@@ -24,6 +24,8 @@ struct RoomInfo {
 };
 class ServerLobby {
 public:
+	static std::vector<RoomInfo> roomsVector;
+	static std::vector<ServerInfo> serversVector;
 	static void RefreshRooms();
 	static int GetRoomsThread();
 	static void FillOnlineRooms();

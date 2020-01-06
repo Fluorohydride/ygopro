@@ -176,7 +176,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
-			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
+			cscg.info.lflist = mainGame->gameConf.lastlflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
 			cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param, mainGame->forbiddentypes);
 			cscg.info.duel_flag = mainGame->duel_param;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
@@ -239,6 +239,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->HideElement(mainGame->wHostPrepare);
 					mainGame->HideElement(mainGame->wHostPrepare2);
+					mainGame->HideElement(mainGame->gBot.window);
 					if(mainGame->isHostingOnline) {
 						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 					} else {
@@ -393,6 +394,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			}
 			case DECKERROR_FORBTYPE: {
 				text = dataManager.GetSysString(1421);
+				break;
+			}
+			case DECKERROR_UNOFFICIALCARD: {
+				text = fmt::sprintf(dataManager.GetSysString(1422).c_str(), dataManager.GetName(code).c_str());
 				break;
 			}
 			default: {
@@ -554,7 +559,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.best_of = pkt->info.best_of;
 		std::wstring str, str2;
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist)));
-		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1225), dataManager.GetSysString(1240 + pkt->info.rule)));
+		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1225), dataManager.GetSysString(1900 + pkt->info.rule)));
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1227), dataManager.GetSysString(1244 + pkt->info.mode)));
 		if(pkt->info.time_limit) {
 			str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1237), pkt->info.time_limit));
@@ -610,6 +615,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnHostPrepCancel->setRelativePosition(mainGame->Scale<s32>(350, 280 + x, 460, 305 + x));
 		mainGame->wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440 + x));
 		mainGame->wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
+        mainGame->gBot.window->setRelativePosition(mainGame->ResizeWin(750, 120, 960, 360 + x));
 		for(int i = 0; i < 6; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(false);
 			mainGame->chkHostPrepReady[i]->setChecked(false);
@@ -620,16 +626,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		for(int i = 0; i < pkt->info.team1; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
-			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
 			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 65 + i * 25, 30, 85 + i * 25));
+            mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
 			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
 		for(int i = pkt->info.team1; i < pkt->info.team1 + pkt->info.team2; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
-			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 75 + i * 25, 240, 95 + i * 25));
-			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 75 + i * 25, 30, 95 + i * 25));
-			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 75 + i * 25, 270, 95 + i * 25));
+			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 65 + i * 25, 30, 85 + i * 25));
+			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
+			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
 		mainGame->dInfo.hostname.resize(pkt->info.team1);
 		mainGame->dInfo.clientname.resize(pkt->info.team2);
@@ -695,6 +701,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnHostPrepReady->setVisible(true);
 			mainGame->btnHostPrepNotReady->setVisible(false);
 		}
+		mainGame->btnHostPrepWindBot->setVisible(is_host && !mainGame->isHostingOnline);
 		mainGame->btnHostPrepStart->setVisible(is_host);
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
 		mainGame->dInfo.player_type = selftype;
@@ -703,6 +710,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_DUEL_START: {
 		mainGame->HideElement(mainGame->wHostPrepare);
+        mainGame->HideElement(mainGame->gBot.window);
 		mainGame->HideElement(mainGame->wHostPrepare2);
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.lock();
@@ -4076,7 +4084,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hoststr.append(L"[");
 			hoststr.append(deckManager.GetLFListName(pHP->host.lflist));
 			hoststr.append(L"][");
-			hoststr.append(dataManager.GetSysString(pHP->host.rule + 1240));
+			hoststr.append(dataManager.GetSysString(pHP->host.rule + 1900));
 			hoststr.append(L"][");
 			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
 			hoststr.append(L"][");

@@ -280,6 +280,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 					mainGame->btnHostConfirm->setEnabled(false);
 					mainGame->btnHostCancel->setEnabled(false);
+					mainGame->gBot.Refresh(mainGame->cbDuelRule->getSelected() + 1);
 				}
 				break;
 			}
@@ -354,6 +355,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
+                mainGame->HideElement(mainGame->gBot.window);
 				if(mainGame->wHostPrepare2->isVisible())
 					mainGame->HideElement(mainGame->wHostPrepare2);
 				if(mainGame->isHostingOnline)
@@ -422,6 +424,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CANCEL_REPLAY: {
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->ShowElement(mainGame->wMainMenu);
+				break;
+			}
+			case BUTTON_HP_AI_TOGGLE: {
+				if (mainGame->gBot.window->isVisible()) {
+					mainGame->HideElement(mainGame->gBot.window);
+				}
+				else {
+					mainGame->ShowElement(mainGame->gBot.window);
+				}
+				break;
+			}
+			case BUTTON_BOT_ADD: {
+				int port = std::stoi(mainGame->gameConf.serverport);
+				mainGame->gBot.LaunchSelected(port);
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {
@@ -774,6 +790,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				}
 			}
+			case COMBOBOX_MATCH_MODE: {
+				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
+				if(combobox->getSelected() == 4) {
+					mainGame->ebTeam1->setVisible(true);
+					mainGame->ebTeam2->setVisible(true);
+				} else {
+					mainGame->ebTeam1->setVisible(false);
+					mainGame->ebTeam2->setVisible(false);
+				}
+				break;
+			}
+			case COMBOBOX_BOT_DECK: {
+				mainGame->gBot.UpdateDescription();
+				break;
+			}
+			default: break;
 			}
 		}
 		case EGET_TABLE_SELECTED_AGAIN: {

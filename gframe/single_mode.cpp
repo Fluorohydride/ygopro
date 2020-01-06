@@ -123,12 +123,12 @@ restart:
 	rh.flag = REPLAY_SINGLE_MODE + REPLAY_LUA64;
 	rh.seed = seed;
 	mainGame->gMutex.lock();
-	if(!hand_test && !is_restarting)
+	if(!hand_test && !is_restarting) {
 		mainGame->HideElement(mainGame->wSinglePlay);
+		mainGame->ClearCardInfo();
+	}
 	is_restarting = false;
-	mainGame->ClearCardInfo();
-	if(mainGame->mTopMenu->isVisible())
-		mainGame->mTopMenu->setVisible(false);
+	mainGame->mTopMenu->setVisible(false);
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wInfos->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);
@@ -231,17 +231,39 @@ restart:
 	mainGame->dField.Clear();
 	mainGame->gMutex.unlock();
 	if(!is_closing) {
+		if(is_restarting || hand_test) {
+			mainGame->gMutex.lock();
+			for(auto wit = mainGame->fadingList.begin(); wit != mainGame->fadingList.end(); ++wit) {
+				if(wit->isFadein)
+					wit->autoFadeoutFrame = 1;
+			}
+			mainGame->wACMessage->setVisible(false);
+			mainGame->wANAttribute->setVisible(false);
+			mainGame->wANCard->setVisible(false);
+			mainGame->wANNumber->setVisible(false);
+			mainGame->wANRace->setVisible(false);
+			mainGame->wCardSelect->setVisible(false);
+			mainGame->wCardDisplay->setVisible(false);
+			mainGame->wCmdMenu->setVisible(false);
+			mainGame->wMessage->setVisible(false);
+			mainGame->wOptions->setVisible(false);
+			mainGame->wPosSelect->setVisible(false);
+			mainGame->wQuery->setVisible(false);
+			mainGame->gMutex.unlock();
+			if(is_restarting)
+				goto restart;
+		}
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->gMutex.unlock();
-		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.lock();
-		mainGame->closeDoneSignal.Wait();
-		mainGame->closeSignal.unlock();
-		if(is_restarting)
-			goto restart;
+		if(!hand_test) {
+			mainGame->closeDoneSignal.Reset();
+			mainGame->closeSignal.lock();
+			mainGame->closeDoneSignal.Wait();
+			mainGame->closeSignal.unlock();
+		}
 		mainGame->gMutex.lock();
 		mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
 		if(!hand_test) {
@@ -254,7 +276,17 @@ restart:
 		if(exit_on_return)
 			mainGame->device->closeDevice();
 		if(hand_test) {
+			mainGame->gMutex.lock();
+			mainGame->btnChainIgnore->setVisible(false);
+			mainGame->btnChainAlways->setVisible(false);
+			mainGame->btnChainWhenAvail->setVisible(false);
+			mainGame->btnCancelOrFinish->setVisible(false);
+			mainGame->btnShuffle->setVisible(false);
+			mainGame->wChat->setVisible(false);
+			mainGame->btnRestartSingle->setVisible(false);
+			mainGame->wPhase->setVisible(false);
 			mainGame->deckBuilder.Initialize(false);
+			mainGame->gMutex.unlock();
 		}
 	}
 	open_file = false;
