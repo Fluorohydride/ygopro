@@ -655,6 +655,7 @@ bool Game::Initialize() {
 	btnSideReload->setVisible(false);
 	btnHandTest = env->addButton(Scale(205, 90, 295, 130), 0, BUTTON_HAND_TEST, dataManager.GetSysString(1297).c_str());
 	btnHandTest->setVisible(false);
+	btnHandTest->setEnabled(coreloaded);
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(100);
@@ -1007,7 +1008,7 @@ bool Game::Initialize() {
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
-		stMessage->setText(L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.");
+		stMessage->setText(dataManager.GetSysString(1430).c_str());
 		PopupElement(wMessage);
 	}
 #endif
@@ -1102,6 +1103,7 @@ void Game::MainLoop() {
 						coreloaded = true;
 						btnSingleMode->setEnabled(true);
 						btnCreateHost->setEnabled(true);
+						btnHandTest->setEnabled(true);
 						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
 					}
 					break;
