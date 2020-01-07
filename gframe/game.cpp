@@ -1111,7 +1111,7 @@ void Game::MainLoop() {
 			}
 			cores_to_load.clear();
 		}
-		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && std::wstring(stMessage->getText()) == L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.")) {
+		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && (std::wstring(stMessage->getText()) == dataManager.GetSysString(1430)))) {
 			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();
