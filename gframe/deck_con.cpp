@@ -505,10 +505,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1902).c_str());
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1903).c_str());
 					if(mainGame->chkAnime->isChecked()) {
-						mainGame->cbLimit->addItem(dataManager.GetSysString(1264).c_str());
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1265).c_str());
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1266).c_str());
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1267).c_str());
+						mainGame->cbLimit->addItem(dataManager.GetSysString(1268).c_str());
 					}
 					if (prevLimit < 8)
 						mainGame->cbLimit->setSelected(prevLimit);

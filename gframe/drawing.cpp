@@ -1295,10 +1295,10 @@ void Game::DrawDeckBd() {
 		static const std::map<int, int> SCOPES = {
 			{0x1, 1900},
 			{0x2, 1901},
-			{0x4, 1264},
-			{0x8, 1265},
-			{0x10, 1266},
-			{0x20, 1267},
+			{0x4, 1265},
+			{0x8, 1266},
+			{0x10, 1267},
+			{0x20, 1268},
 			{0x100, 1903}
 		};
 		if (ptr->ot != 0x3) { // Special case: skip OCG/TCG
