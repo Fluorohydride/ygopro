@@ -250,7 +250,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SIDE_OK: {
 				if(deckManager.current_deck.main.size() != deckManager.pre_deck.main.size() || deckManager.current_deck.extra.size() != deckManager.pre_deck.extra.size()
-				        || deckManager.current_deck.side.size() != deckManager.pre_deck.side.size()) {
+						|| deckManager.current_deck.side.size() != deckManager.pre_deck.side.size()) {
 					mainGame->PopupMessage(dataManager.GetSysString(1410));
 					break;
 				}
@@ -514,10 +514,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1902).c_str());
 					mainGame->cbLimit->addItem(dataManager.GetSysString(1903).c_str());
 					if(mainGame->chkAnime->isChecked()) {
-						mainGame->cbLimit->addItem(dataManager.GetSysString(1264).c_str());
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1265).c_str());
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1266).c_str());
 						mainGame->cbLimit->addItem(dataManager.GetSysString(1267).c_str());
+						mainGame->cbLimit->addItem(dataManager.GetSysString(1268).c_str());
 					}
 					if (prevLimit < 8)
 						mainGame->cbLimit->setSelected(prevLimit);

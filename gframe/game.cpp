@@ -325,9 +325,10 @@ bool Game::Initialize() {
 	cbDuelRule->addItem(dataManager.GetSysString(1261).c_str());
 	cbDuelRule->addItem(dataManager.GetSysString(1262).c_str());
 	cbDuelRule->addItem(dataManager.GetSysString(1263).c_str());
+	cbDuelRule->addItem(dataManager.GetSysString(1264).c_str());
 	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
 	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, dataManager.GetSysString(1626).c_str());
-	wCustomRules = env->addWindow(Scale(700, 100, 910, 410), false, L"");
+	wCustomRules = env->addWindow(Scale(700, 100, 910, 430), false, L"");
 	wCustomRules->getCloseButton()->setVisible(false);
 	wCustomRules->setDrawTitlebar(false);
 	wCustomRules->setDraggable(true);
@@ -335,7 +336,7 @@ bool Game::Initialize() {
 	int spacing = 0;
 	env->addStaticText(dataManager.GetSysString(1629).c_str(), Scale(10, 10 + spacing * 20, 200, 30 + spacing * 20), false, false, wCustomRules);
 	spacing++;
-	for(int i = 0; i < 6; ++i, ++spacing)
+	for(int i = 0; i < (sizeof(chkCustomRules) / sizeof(irr::gui::IGUICheckBox*)); ++i, ++spacing)
 		chkCustomRules[i] = env->addCheckBox(false, Scale(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 390 + i, dataManager.GetSysString(1631 + i).c_str());
 	env->addStaticText(dataManager.GetSysString(1628).c_str(), Scale(10, 10 + spacing * 20, 200, 30 + spacing * 20), false, false, wCustomRules);
 	spacing++;
@@ -348,9 +349,9 @@ bool Game::Initialize() {
 	chkTypeLimit[3] = env->addCheckBox(false, Scale(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, -1, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1074)).c_str());
 	spacing++;
 	chkTypeLimit[4] = env->addCheckBox(false, Scale(10, 10 + spacing * 20, 200, 30 + spacing * 20), wCustomRules, 353 + spacing, fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(1076)).c_str());
-	btnCustomRulesOK = env->addButton(Scale(55, 270, 155, 295), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211).c_str());
-	forbiddentypes = DUEL_MODE_MR4_FORB;
-	duel_param = DUEL_MODE_MR4;
+	btnCustomRulesOK = env->addButton(Scale(55, 290, 155, 315), wCustomRules, BUTTON_CUSTOM_RULE_OK, dataManager.GetSysString(1211).c_str());
+	forbiddentypes = DUEL_MODE_MR5_FORB;
+	duel_param = DUEL_MODE_MR5;
 	chkNoCheckDeck = env->addCheckBox(false, Scale(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229).c_str());
 	chkNoShuffleDeck = env->addCheckBox(false, Scale(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230).c_str());
 	env->addStaticText(dataManager.GetSysString(1231).c_str(), Scale(20, 240, 320, 260), false, false, wCreateHost);
@@ -650,14 +651,14 @@ bool Game::Initialize() {
 	wANAttribute->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 7; filter <<= 1, ++i)
 		chkAttribute[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 80, 25 + (i / 4) * 25, 90 + (i % 4) * 80, 50 + (i / 4) * 25),
-		                                   wANAttribute, CHECK_ATTRIBUTE, dataManager.FormatAttribute(filter).c_str());
+										   wANAttribute, CHECK_ATTRIBUTE, dataManager.FormatAttribute(filter).c_str());
 	//announce race
 	wANRace = env->addWindow(Scale(480, 200, 850, 410), false, dataManager.GetSysString(563).c_str());
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 25; filter <<= 1, ++i)
 		chkRace[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
-		                              wANRace, CHECK_RACE, dataManager.FormatRace(filter).c_str());
+									  wANRace, CHECK_RACE, dataManager.FormatRace(filter).c_str());
 	//selection hint
 	stHintMsg = env->addStaticText(L"", Scale(500, 60, 820, 90), true, false, 0, -1, false);
 	stHintMsg->setBackgroundColor(0xc0ffffff);
@@ -706,6 +707,7 @@ bool Game::Initialize() {
 	btnSideReload->setVisible(false);
 	btnHandTest = env->addButton(Scale(205, 90, 295, 130), 0, BUTTON_HAND_TEST, dataManager.GetSysString(1297).c_str());
 	btnHandTest->setVisible(false);
+	btnHandTest->setEnabled(coreloaded);
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(100);
@@ -745,10 +747,10 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1902).c_str());
 	cbLimit->addItem(dataManager.GetSysString(1903).c_str());
 	if(chkAnime->isChecked()) {
-		cbLimit->addItem(dataManager.GetSysString(1264).c_str());
 		cbLimit->addItem(dataManager.GetSysString(1265).c_str());
 		cbLimit->addItem(dataManager.GetSysString(1266).c_str());
 		cbLimit->addItem(dataManager.GetSysString(1267).c_str());
+		cbLimit->addItem(dataManager.GetSysString(1268).c_str());
 	}
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319).c_str(), Scale(10, 28, 70, 48), false, false, wFilter);
 	cbAttribute = env->addComboBox(Scale(60, 26, 190, 46), wFilter, COMBOBOX_OTHER_FILT);
@@ -991,7 +993,7 @@ bool Game::Initialize() {
 	ebRoomName->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show locked rooms checkbox
-    chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 800, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, dataManager.GetSysString(1994).c_str());
+	chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 800, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, dataManager.GetSysString(1994).c_str());
 	chkShowPassword->setName(L"White");
 	chkShowPassword->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
@@ -1058,7 +1060,7 @@ bool Game::Initialize() {
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
-		stMessage->setText(L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.");
+		stMessage->setText(dataManager.GetSysString(1430).c_str());
 		PopupElement(wMessage);
 	}
 #endif
@@ -1187,6 +1189,7 @@ void Game::MainLoop() {
 						coreloaded = true;
 						btnSingleMode->setEnabled(true);
 						btnCreateHost->setEnabled(true);
+						btnHandTest->setEnabled(true);
 						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
 					}
 					break;
@@ -1194,7 +1197,7 @@ void Game::MainLoop() {
 			}
 			cores_to_load.clear();
 		}
-		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && std::wstring(stMessage->getText()) == L"Couldn't load the duel api, you'll be limited to replay watching and online mode until the api is downloaded.")) {
+		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && (std::wstring(stMessage->getText()) == dataManager.GetSysString(1430)))) {
 			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();
@@ -2027,13 +2030,13 @@ std::wstring Game::LocalName(int local_player) {
 }
 void Game::UpdateDuelParam() {
 	uint32 flag = 0, filter = 0x100;
-	for (int i = 0; i < 6; ++i, filter <<= 1)
+	for (int i = 0; i < (sizeof(chkCustomRules)/sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1)
 		if (chkCustomRules[i]->isChecked()) {
 			flag |= filter;
 		}
 	uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 	uint32 flag2 = 0;
-	for (int i = 0; i < 5; ++i)
+	for (int i = 0; i < (sizeof(chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i)
 		if (chkTypeLimit[i]->isChecked()) {
 			flag2 |= limits[i];
 		}
@@ -2042,33 +2045,21 @@ void Game::UpdateDuelParam() {
 	cbDuelRule->addItem(dataManager.GetSysString(1261).c_str());
 	cbDuelRule->addItem(dataManager.GetSysString(1262).c_str());
 	cbDuelRule->addItem(dataManager.GetSysString(1263).c_str());
+	cbDuelRule->addItem(dataManager.GetSysString(1264).c_str());
+#define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) break; }
 	switch (flag) {
-	case DUEL_MODE_MR1: {
-		cbDuelRule->setSelected(0);
-		if (flag2 == DUEL_MODE_MR1_FORB)
-			break;
-	}
-	case DUEL_MODE_MR2: {
-		cbDuelRule->setSelected(1);
-		if (flag2 == DUEL_MODE_MR2_FORB)
-			break;
-	}
-	case DUEL_MODE_MR3: {
-		cbDuelRule->setSelected(2);
-		if (flag2 == DUEL_MODE_MR3_FORB)
-			break;
-	}
-	case DUEL_MODE_MR4: {
-		cbDuelRule->setSelected(3);
-		if (flag2 == DUEL_MODE_MR4_FORB)
-			break;
-	}
+	CHECK(1)
+	CHECK(2)
+	CHECK(3)
+	CHECK(4)
+	CHECK(5)
 	default: {
 		cbDuelRule->addItem(dataManager.GetSysString(1630).c_str());
-		cbDuelRule->setSelected(4);
+		cbDuelRule->setSelected(5);
 		break;
 	}
 	}
+#undef CHECK
 	duel_param = flag;
 	forbiddentypes = flag2;
 }
@@ -2108,31 +2099,13 @@ void Game::UpdateExtraRules() {
 int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	if(truerule)
 		*truerule = 0;
+#define CHECK(MR) case DUEL_MODE_MR##MR:{ if (truerule) *truerule = 1; if (forbiddentypes == DUEL_MODE_MR##MR##_FORB) return 1; }
 	switch(param) {
-	case DUEL_MODE_MR1: {
-		if (truerule)
-			*truerule = 1;
-		if (forbiddentypes == DUEL_MODE_MR1_FORB)
-			return 1;
-	}
-	case DUEL_MODE_MR2: {
-		if (truerule)
-			*truerule = 2;
-		if (forbiddentypes == DUEL_MODE_MR2_FORB)
-			return 2;
-	}
-	case DUEL_MODE_MR3: {
-		if (truerule)
-			*truerule = 3;
-		if (forbiddentypes == DUEL_MODE_MR3_FORB)
-			return 3;
-	}
-	case DUEL_MODE_MR4: {
-		if (truerule)
-			*truerule = 4;
-		if (forbiddentypes == DUEL_MODE_MR4_FORB)
-			return 4;
-	}
+	CHECK(1)
+	CHECK(2)
+	CHECK(3)
+	CHECK(4)
+	CHECK(5)
 	default: {
 		if (truerule && !*truerule)
 			*truerule = 5;
@@ -2146,6 +2119,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 			return 2;
 	}
 	}
+#undef CHECK
 }
 void Game::SetPhaseButtons() {
 	// reset master rule 4 phase button position
@@ -2261,9 +2235,10 @@ void Game::OnResize() {
 		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 440));
 	}
 	wRules->setRelativePosition(ResizeWin(630, 100, 1000, 310));
-	wCustomRules->setRelativePosition(ResizeWin(700, 100, 910, 410));
+	wCustomRules->setRelativePosition(ResizeWin(700, 100, 910, 430));
 	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wSinglePlay->setRelativePosition(ResizeWin(220, 100, 800, 520));
+	gBot.window->setRelativePosition(core::position2di(wHostPrepare->getAbsolutePosition().LowerRightCorner.X, wHostPrepare->getAbsolutePosition().UpperLeftCorner.Y));
 
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
@@ -2546,7 +2521,7 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 			str = str.substr(0, pos);
 		game->AddDebugMsg(str);
 		if(type > 1)
-			printf("%s\n", str.c_str());
+			std::cout << str << std::endl;
 	}
 }
 void Game::PopulateResourcesDirectories() {

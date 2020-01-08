@@ -861,7 +861,7 @@ void Game::DrawSpec() {
 			matManager.c2d[2] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			matManager.c2d[3] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), ResizeElem(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif),
-			                    mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
+								mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 127) {
 				showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 				if(showcarddif > 127.0f)
@@ -988,15 +988,15 @@ void Game::DrawSpec() {
 	}
 	bool showChat = true;
 	if(hideChat) {
-	    showChat = false;
-	    hideChatTimer = 10;
+		showChat = false;
+		hideChatTimer = 10;
 	} else if(hideChatTimer > 0) {
-	    showChat = false;
-	    hideChatTimer--;
+		showChat = false;
+		hideChatTimer--;
 	}
 	for(int i = 0; i < 8; ++i) {
 		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
-		                                   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
+										   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
 		if(chatTiming[i] > 0.0f) {
 			chatTiming[i] -= (float)delta_time * 60.0f / 1000.0f;
 			if(dInfo.isStarted && i >= 5)
@@ -1300,10 +1300,10 @@ void Game::DrawDeckBd() {
 		static const std::map<int, int> SCOPES = {
 			{0x1, 1900},
 			{0x2, 1901},
-			{0x4, 1264},
-			{0x8, 1265},
-			{0x10, 1266},
-			{0x20, 1267},
+			{0x4, 1265},
+			{0x8, 1266},
+			{0x10, 1267},
+			{0x20, 1268},
 			{0x100, 1903}
 		};
 		if (ptr->ot != 0x3) { // Special case: skip OCG/TCG

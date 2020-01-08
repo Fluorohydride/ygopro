@@ -226,36 +226,23 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CUSTOM_RULE: {
+#define CHECK(MR) case (MR - 1):{ mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; break; }
 				switch (mainGame->cbDuelRule->getSelected()) {
-				case 0: {
-					mainGame->duel_param = DUEL_MODE_MR1;
-					mainGame->forbiddentypes = DUEL_MODE_MR1_FORB;
-					break;
+				CHECK(1)
+				CHECK(2)
+				CHECK(3)
+				CHECK(4)
+				CHECK(5)
 				}
-				case 1: {
-					mainGame->duel_param = DUEL_MODE_MR2;
-					mainGame->forbiddentypes = DUEL_MODE_MR2_FORB;
-					break;
-				}
-				case 2: {
-					mainGame->duel_param = DUEL_MODE_MR3;
-					mainGame->forbiddentypes = DUEL_MODE_MR3_FORB;
-					break;
-				}
-				case 3: {
-					mainGame->duel_param = DUEL_MODE_MR4;
-					mainGame->forbiddentypes = DUEL_MODE_MR4_FORB;
-					break;
-				}
-				}
+#undef CHECK
 				uint32 filter = 0x100;
-				for (int i = 0; i < 6; ++i, filter <<= 1) {
+				for (int i = 0; i < (sizeof(mainGame->chkCustomRules) / sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1) {
 						mainGame->chkCustomRules[i]->setChecked(mainGame->duel_param & filter);
 					if(i == 3)
 						mainGame->chkCustomRules[4]->setEnabled(mainGame->duel_param & filter);
 				}
 				uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
-				for (int i = 0; i < 5; ++i, filter <<= 1)
+				for (int i = 0; i < (sizeof(mainGame->chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1)
 						mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 				mainGame->PopupElement(mainGame->wCustomRules);
 				break;
@@ -355,7 +342,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
-                mainGame->HideElement(mainGame->gBot.window);
+				mainGame->HideElement(mainGame->gBot.window);
 				if(mainGame->wHostPrepare2->isVisible())
 					mainGame->HideElement(mainGame->wHostPrepare2);
 				if(mainGame->isHostingOnline)
@@ -763,42 +750,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			switch (id) {
 			case COMBOBOX_DUEL_RULE: {
 				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
+#define CHECK(MR) case (MR - 1): { combobox->removeItem(5); mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; break; }
 				switch (combobox->getSelected()) {
-				case 0:{
-					combobox->removeItem(4);
-					mainGame->duel_param = DUEL_MODE_MR1;
-					mainGame->forbiddentypes = DUEL_MODE_MR1_FORB;
-					break;
+				CHECK(1)
+				CHECK(2)
+				CHECK(3)
+				CHECK(4)
+				CHECK(5)
 				}
-				case 1: {
-					combobox->removeItem(4);
-					mainGame->duel_param = DUEL_MODE_MR2;
-					mainGame->forbiddentypes = DUEL_MODE_MR2_FORB;
-					break;
-				}
-				case 2: {
-					combobox->removeItem(4);
-					mainGame->duel_param = DUEL_MODE_MR3;
-					mainGame->forbiddentypes = DUEL_MODE_MR3_FORB;
-					break;
-				}
-				case 3: {
-					combobox->removeItem(4);
-					mainGame->duel_param = DUEL_MODE_MR4;
-					mainGame->forbiddentypes = DUEL_MODE_MR4_FORB;
-					break;
-				}
-				}
-			}
-			case COMBOBOX_MATCH_MODE: {
-				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
-				if(combobox->getSelected() == 4) {
-					mainGame->ebTeam1->setVisible(true);
-					mainGame->ebTeam2->setVisible(true);
-				} else {
-					mainGame->ebTeam1->setVisible(false);
-					mainGame->ebTeam2->setVisible(false);
-				}
+#undef CHECK
 				break;
 			}
 			case COMBOBOX_BOT_DECK: {
