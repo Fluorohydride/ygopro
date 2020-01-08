@@ -470,6 +470,13 @@ public:
 	irr::gui::IGUIButton* btnSideSort;
 	irr::gui::IGUIButton* btnSideReload;
 	irr::gui::IGUIEditBox* ebDeckname;
+	irr::gui::IGUIButton* btnDeckCode;
+	//deck code
+	irr::gui::IGUIWindow* wDeckCode;
+	irr::gui::IGUIEditBox* ebDeckCode;
+	irr::gui::IGUIButton* btnDeckCodeYes;
+	irr::gui::IGUIButton* btnDeckCodeNo;
+  //
 	irr::gui::IGUIStaticText* stBanlist;
 	irr::gui::IGUIStaticText* stDeck;
 	irr::gui::IGUIStaticText* stCategory;
@@ -716,6 +723,10 @@ extern Game* mainGame;
 #define SCROLL_TAB_SYSTEM			371
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
+
+#define BUTTON_DECK_CODE			389
+#define BUTTON_DECK_CODE_SAVE		390
+#define BUTTON_DECK_CODE_CANCEL		391
 
 #define DEFAULT_DUEL_RULE			4
 
