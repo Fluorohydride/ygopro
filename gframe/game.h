@@ -409,7 +409,7 @@ public:
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
-	irr::gui::IGUICheckBox* chkCustomRules[6];
+	irr::gui::IGUICheckBox* chkCustomRules[7];
 	irr::gui::IGUICheckBox* chkTypeLimit[5];
 	irr::gui::IGUIWindow* wCustomRules;
 	irr::gui::IGUIButton* btnCustomRulesOK;
@@ -729,7 +729,7 @@ rect<T> Game::Scale(rect<T> rect) {
 
 #define POSITION_HINT		0x8000
 
-#define DEFAULT_DUEL_RULE			4
+#define DEFAULT_DUEL_RULE			5
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 
