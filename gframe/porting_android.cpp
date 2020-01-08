@@ -34,7 +34,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
 #include "bufferio.h"
 #include <thread>
-#define NATIVEACTIVITY_CLASS_NAME "android/app/NativeActivity"
+#include "game.h"
+
 extern int main(int argc, char *argv[]);
 
 void android_main(android_app *app)
@@ -95,10 +96,12 @@ extern "C" {
 			}
 		}
 	}
-	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_MinetestAssetCopy_assetsMutexUnlock(
-		JNIEnv * env, jclass thiz) {
-		LOGI("assetsMutexUnlock");
-		porting::assetscopied = true;
+
+	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_pauseApp(
+		JNIEnv * env, jclass thiz, jboolean pause) {
+		if(ygo::mainGame && ygo::mainGame->soundManager) {
+			ygo::mainGame->soundManager->PauseMusic(pause);
+		}
 	}
 }
 
@@ -107,10 +110,8 @@ namespace porting {
 std::string internal_storage = "";
 std::string working_directory = "";
 
-std::atomic<bool> assetscopied;
-
-android_app* app_global;
-JNIEnv*      jnienv;
+android_app* app_global = nullptr;
+JNIEnv*      jnienv = nullptr;
 jclass       nativeActivity;
 
 irr::IrrlichtDevice* mainDevice;
@@ -159,31 +160,6 @@ void copyCertificate(){
 			}
 		}
 	}
-}
-
-void copyAssets(bool forced) {
-	LOGI("In copyAssets");
-	std::string path = internal_storage + "/assets_copied";
-	struct stat buffer;
-	bool create = true;
-	if(stat(path.c_str(), &buffer) == 0 && !forced) {
-		LOGI("Assets already copied");
-		return;
-	}
-	std::ofstream flag(path);
-	flag.close();
-	jmethodID assetcopy = jnienv->GetMethodID(nativeActivity, "copyAssets", "(Ljava/lang/String;)V");
-
-	if(assetcopy == 0) {
-		assert("porting::copyAssets unable to find copy assets method" == 0);
-	}
-
-	jstring jworkingdir = jnienv->NewStringUTF(working_directory.c_str());
-
-	LOGI("Called java function");
-	jnienv->CallVoidMethod(app_global->activity->clazz, assetcopy, jworkingdir);
-	LOGI("Waiting");
-	porting::assetscopied = false;
 }
 
 void initAndroid()
@@ -460,12 +436,25 @@ void readConfigs() {
 int getLocalIP() {
 	jmethodID getIP = jnienv->GetMethodID(nativeActivity, "getLocalIpAddress",
 											   "()I");
-
 	if(getIP == 0) {
 		assert("porting::getLocalIP unable to find java getLocalIpAddress method" == 0);
 	}
-
 	int value = jnienv->CallIntMethod(app_global->activity->clazz, getIP);
 	return value;
+}
+
+void launchWindbot(const std::string& args) {
+	//std::string arg = "Deck=MokeyMokey Port=7911 Version=4936";
+	jmethodID launchwindbot = jnienv->GetMethodID(nativeActivity, "launchWindbot",
+											   "(Ljava/lang/String;)V");
+
+	if(launchwindbot == 0) {
+		assert("porting::launchWindbot unable to find java show dialog method" == 0);
+	}
+
+	jstring jargs = jnienv->NewStringUTF(args.c_str());
+
+	jnienv->CallVoidMethod(app_global->activity->clazz, launchwindbot,
+						   jargs);
 }
 }
