@@ -1999,7 +1999,7 @@ void Game::UpdateExtraRules() {
 int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	if(truerule)
 		*truerule = 0;
-#define CHECK(MR) case DUEL_MODE_MR##MR:{ if (truerule) *truerule = 1; if (forbiddentypes == DUEL_MODE_MR##MR##_FORB) return 1; }
+#define CHECK(MR) case DUEL_MODE_MR##MR:{ if (truerule) *truerule = MR; if (forbiddentypes == DUEL_MODE_MR##MR##_FORB) return MR; }
 	switch(param) {
 	CHECK(1)
 	CHECK(2)
