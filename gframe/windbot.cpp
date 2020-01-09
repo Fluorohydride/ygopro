@@ -9,28 +9,6 @@
 
 namespace ygo {
 
-int WindBot::GetDifficulty() const {
-	if (flags & static_cast<int>(AI_LV1))
-		return 1;
-	if (flags & static_cast<int>(AI_LV2))
-		return 2;
-	if (flags & static_cast<int>(AI_LV3))
-		return 3;
-	if (flags & static_cast<int>(AI_ANTI_META))
-		return 0;
-	return -1;
-}
-
-bool WindBot::SupportsMasterRule3() const
-{
-	return flags & static_cast<int>(SUPPORT_MASTER_RULE_3);
-}
-
-bool WindBot::SupportsMasterRule4() const
-{
-	return flags & static_cast<int>(SUPPORT_MASTER_RULE_4);
-}
-
 bool WindBot::Launch(int port, bool chat, int hand) const {
 #ifdef _WIN32
 	auto args = fmt::format(

@@ -1338,22 +1338,16 @@ void Game::RefreshAiDecks() {
 			windbots >> j;
 			if (j.size() && j.is_array()) {
 				for (auto& obj : j) {
-					if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["flags"].is_array())
+					if (!obj["name"].is_string() || !obj["deck"].is_string() || !obj["difficulty"].is_number() || !obj["masterRules"].is_array())
 						continue;
 					WindBot bot;
 					bot.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
 					bot.deck = BufferIO::DecodeUTF8s(obj["deck"].get<std::string>());
-					bot.flags = 0;
-					for (auto& flag : obj["flags"].get<std::vector<nlohmann::json>>()) {
-#define CHECK_AND_SET_FLAG(flag) if (strflag == #flag) bot.flags |= static_cast<int>(WindBot::Parameters::flag)
-						auto strflag = flag.get<std::string>();
-						CHECK_AND_SET_FLAG(AI_LV1);
-						CHECK_AND_SET_FLAG(AI_LV2);
-						CHECK_AND_SET_FLAG(AI_LV3);
-						CHECK_AND_SET_FLAG(AI_ANTI_META);
-						CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_3);
-						CHECK_AND_SET_FLAG(SUPPORT_MASTER_RULE_4);
-#undef CHECK_AND_SET_FLAG
+					bot.difficulty = obj["difficulty"].get<int>();
+					for (auto& masterRule : obj["masterRules"].get<std::vector<nlohmann::json>>()) {
+						if (masterRule.is_number()) {
+							bot.masterRules.insert(masterRule.get<int>());
+						}
 					}
 					bot.version = PRO_VERSION;
 #ifdef _WIN32
