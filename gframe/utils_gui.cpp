@@ -1,6 +1,8 @@
 #include "utils_gui.h"
 #ifdef _WIN32
+#include <vector>
 #include "../irrlicht/src/CIrrDeviceWin32.h"
+#include "logging.h"
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -77,8 +79,8 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	if(!SetWindowLongPtr(hWnd, GWL_STYLE, style))
 		ErrorLog("Could not change window style.");
 
-	const s32 width = clientSize.right - clientSize.left;
-	const s32 height = clientSize.bottom - clientSize.top;
+	const auto width = clientSize.right - clientSize.left;
+	const auto height = clientSize.bottom - clientSize.top;
 
 	SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 	static_cast<irr::CIrrDeviceWin32::CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
