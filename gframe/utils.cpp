@@ -2,6 +2,7 @@
 #include "game.h"
 #include <fstream>
 #include "bufferio.h"
+#include "logging.h"
 #ifdef _WIN32
 #include "../irrlicht/src/CIrrDeviceWin32.h"
 #elif defined(__linux__)
@@ -170,7 +171,7 @@ namespace ygo {
 		}
 
 		if(!SetWindowLongPtr(hWnd, GWL_STYLE, style))
-			mainGame->ErrorLog("Could not change window style.");
+			ErrorLog("Could not change window style.");
 
 		const s32 width = clientSize.right - clientSize.left;
 		const s32 height = clientSize.bottom - clientSize.top;

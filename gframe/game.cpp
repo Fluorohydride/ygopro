@@ -22,6 +22,7 @@
 #include "single_mode.h"
 #include "CGUICustomCheckBox/CGUICustomCheckBox.h"
 #include "CGUICustomTable/CGUICustomTable.h"
+#include "logging.h"
 
 unsigned short PRO_VERSION = 0x1348;
 
@@ -1839,17 +1840,6 @@ void Game::AddDebugMsg(const std::string& msg) {
 		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9, 2);
 	if (enable_log & 0x2)
 		ErrorLog("[Script Error]: " + msg);
-}
-void Game::ErrorLog(const std::string& msg) {
-	std::ofstream log("error.log", std::ofstream::app);
-	if(!log.is_open())
-		return;
-	time_t nowtime = time(NULL);
-	tm *localedtime = localtime(&nowtime);
-	char timebuf[40];
-	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
-	log << "[" << timebuf << "]" << msg << std::endl;
-	log.close();
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);

@@ -2,6 +2,7 @@
 #include "data_manager.h"
 #include "game.h"
 #include "duelclient.h"
+#include "logging.h"
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 
@@ -258,7 +259,7 @@ void ServerLobby::JoinServer(bool host) {
 		}
 	}
 	catch(std::exception& e) {
-		mainGame->ErrorLog(std::string("Exception ocurred: ") + e.what());
+		ErrorLog(std::string("Exception ocurred: ") + e.what());
 	}
 }
 

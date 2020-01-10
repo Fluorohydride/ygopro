@@ -162,7 +162,6 @@ public:
 	void AddLog(const std::wstring& msg, int param = 0);
 	void ClearChatMsg();
 	void AddDebugMsg(const std::string& msg);
-	void ErrorLog(const std::string& msg);
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");

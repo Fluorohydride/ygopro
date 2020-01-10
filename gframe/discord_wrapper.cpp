@@ -5,6 +5,7 @@
 #include "discord_register.h"
 #include "game.h"
 #include "duelclient.h"
+#include "logging.h"
 
 DiscordWrapper::DiscordWrapper(): connected(false){
 }
@@ -176,7 +177,7 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 		host.pass = json["pass"].get<std::string>();
 	}
 	catch(std::exception& e) {
-		game->ErrorLog(std::string("Exception ocurred: ") + e.what());
+		ygo::ErrorLog(std::string("Exception ocurred: ") + e.what());
 		return;
 	}
 	game->isHostingOnline = true;

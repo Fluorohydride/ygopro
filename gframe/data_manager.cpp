@@ -1,8 +1,8 @@
 #include "data_manager.h"
-#include "readonlymemvfs.h"
-#include "game.h"
-#include <stdio.h>
 #include <fstream>
+#include "readonlymemvfs.h"
+#include "logging.h"
+#include "game.h"
 
 namespace ygo {
 
@@ -116,7 +116,7 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);
-	mainGame->ErrorLog(error);
+	ErrorLog(error);
 	return false;
 }
 bool DataManager::GetData(int code, CardData* pData) {
