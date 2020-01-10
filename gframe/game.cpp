@@ -97,8 +97,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadPicUrls();
-	if(!dataManager.LoadDB(TEXT("cards.cdb")))
-		ErrorLog("cards.cdb not found in the root, loading anyways!");
+	dataManager.LoadDB(TEXT("cards.cdb"));
 	LoadExpansionDB();
 	LoadZipArchives();
 	LoadArchivesDB();
