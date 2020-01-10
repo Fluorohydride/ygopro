@@ -2005,10 +2005,15 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	CHECK(2)
 	CHECK(3)
 	CHECK(4)
-	CHECK(5)
+	case DUEL_MODE_MR5: {
+		if (truerule)
+			*truerule = 5;
+		if (forbiddentypes == DUEL_MODE_MR5_FORB)
+			return 4;
+	}
 	default: {
 		if (truerule && !*truerule)
-			*truerule = 5;
+			*truerule = 6;
 		if ((param & DUEL_PZONE) && (param & DUEL_SEPARATE_PZONE) && (param & DUEL_EMZONE))
 			return 5;
 		else if(param & DUEL_EMZONE)

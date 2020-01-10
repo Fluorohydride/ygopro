@@ -92,7 +92,7 @@ void ServerLobby::FillOnlineRooms() {
 			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());
 		int rule;
 		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
-		if(rule == 5)
+		if(rule == 6)
 			roomListTable->setCellText(index, 3, "Custom");
 		else
 			roomListTable->setCellText(index, 3, fmt::format(L"MR {}", (rule == 0) ? 3 : rule).c_str());
@@ -110,7 +110,7 @@ void ServerLobby::FillOnlineRooms() {
 
 		if(room.started)
 			color = SColor(100, 211, 211, 211);
-		else if(rule == 4 && !room.info.no_check_deck && !room.info.no_shuffle_deck && room.info.start_lp == 8000 && room.info.start_hand == 5 && room.info.draw_count == 1)
+		else if(rule == 5 && !room.info.no_check_deck && !room.info.no_shuffle_deck && room.info.start_lp == 8000 && room.info.start_hand == 5 && room.info.draw_count == 1)
 			color = SColor(255, 255, 255, 255);
 		else
 			color = red;
