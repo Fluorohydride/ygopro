@@ -1074,7 +1074,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				data = (data >> 16) | (data << 16);
 			for(unsigned filter = 0x1; filter != 0; filter <<= 1) {
 				std::wstring str;
-				wchar_t strbuffer[256];
 				if(unsigned s = filter & data) {
 					if(s & 0x60) {
 						str += dataManager.GetSysString(1006);
@@ -1102,8 +1101,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 							break;
 						++seq;
 					}
-					myswprintf(strbuffer, L"%ls(%d)", str.c_str(), seq);
-					myswprintf(textBuffer, dataManager.GetSysString(1510), strbuffer);
+					str += L"(" + std::to_wstring(seq) + L")";
+					myswprintf(textBuffer, dataManager.GetSysString(1510), str.c_str());
 					mainGame->AddLog(textBuffer);
 				}
 			}
