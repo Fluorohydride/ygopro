@@ -103,7 +103,7 @@ bool Game::Initialize() {
 	LoadZipArchives();
 	LoadArchivesDB();
 	RefreshAiDecks();
-	if(!dataManager.LoadStrings(TEXT("strings.conf"))) {
+	if(!dataManager.LoadStrings(TEXT("./config/strings.conf"))) {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
@@ -1410,7 +1410,7 @@ void Game::LoadConfig() {
 	gameConf.quick_animation = 0;
 	gameConf.chkAnime = 0;
 	gameConf.dpi_scale = 1.0f;
-	std::ifstream conf_file("system.conf", std::ifstream::in);
+	std::ifstream conf_file("./config/system.conf", std::ifstream::in);
 	if(!conf_file.is_open())
 		return;
 	std::string str;
@@ -1516,7 +1516,7 @@ void Game::LoadConfig() {
 	}
 	conf_file.close();
 	if(configs.empty()) {
-		conf_file.open(TEXT("configs.json"), std::ifstream::in);
+		conf_file.open(TEXT("./config/configs.json"), std::ifstream::in);
 		try {
 			conf_file >> configs;
 		}
@@ -1527,7 +1527,7 @@ void Game::LoadConfig() {
 	}
 }
 void Game::SaveConfig() {
-	std::ofstream conf_file("system.conf", std::ofstream::out);
+	std::ofstream conf_file("./config/system.conf", std::ofstream::out);
 	if(!conf_file.is_open())
 		return;
 	conf_file << "#Configuration file\n";
