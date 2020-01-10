@@ -79,15 +79,6 @@ bool Game::Initialize() {
 	filesystem = device->getFileSystem();
 #ifdef __ANDROID__
 	porting::mainDevice = device;
-	for(u32 i = 0; i < filesystem->getFileArchiveCount(); ++i) {
-		IFileArchive* archive = filesystem->getFileArchive(i);
-		if(archive->getType() == EFAT_ANDROID_ASSET) {
-			porting::assetsArchive = archive;
-			archive->addDirectoryToFileList("data/");
-			break;
-		}
-	}
-	porting::copyCertificate();
 #endif
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL

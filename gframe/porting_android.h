@@ -36,7 +36,6 @@ namespace porting {
 extern android_app *app_global;
 
 extern irr::IrrlichtDevice* mainDevice;
-extern irr::io::IFileArchive* assetsArchive;
 
 /** java <-> c++ interaction interface **/
 extern JNIEnv *jnienv;
@@ -55,11 +54,6 @@ void cleanupAndroid();
  * @param env Android JNI environment
  */
 void initializePathsAndroid();
-
-/**
- * use java function to copy media from assets to external storage
- */
-void copyCertificate();
 
 /**
  * show text input dialog in java

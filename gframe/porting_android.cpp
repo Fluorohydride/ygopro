@@ -115,7 +115,6 @@ JNIEnv*      jnienv = nullptr;
 jclass       nativeActivity;
 
 irr::IrrlichtDevice* mainDevice;
-irr::io::IFileArchive* assetsArchive;
 
 jclass findClass(std::string classname, JNIEnv* env = nullptr)
 {
@@ -137,29 +136,6 @@ jclass findClass(std::string classname, JNIEnv* env = nullptr)
 	jstring strClassName =
 			env->NewStringUTF(classname.c_str());
 	return (jclass) env->CallObjectMethod(cls, findClass, strClassName);
-}
-
-void copyCertificate(){
-	//copy ssl certificate to internal memory
-	auto reader = assetsArchive->createAndOpenFile("data/cacert.cer");
-	if(reader) {
-		std::vector<char> buffer;
-		buffer.resize(reader->getSize());
-		reader->read(buffer.data(), buffer.size());
-		reader->drop();
-		struct stat st;
-		if(stat((internal_storage + "/cacert.cer").c_str(), &st) == 0) {
-			LOGI("Certificate file already copied");
-		} else {
-			std::ofstream out(internal_storage + "/cacert.cer", std::ofstream::binary);
-			if(out.is_open()) {
-				out.write((char*)buffer.data(), buffer.size());
-				LOGI("Saved certificate file at: %s", (internal_storage + "/cacert.cer").c_str());
-			} else {
-				LOGI("Cannot open certificate file for writing");
-			}
-		}
-	}
 }
 
 void initAndroid()
