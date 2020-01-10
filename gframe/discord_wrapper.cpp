@@ -11,6 +11,7 @@ DiscordWrapper::DiscordWrapper(): connected(false){
 
 DiscordWrapper::~DiscordWrapper() {
 #ifdef DISCORD_APP_ID
+	Discord_ClearPresence();
 	Discord_Shutdown();
 #endif
 }
