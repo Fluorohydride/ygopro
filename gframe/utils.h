@@ -33,9 +33,9 @@ namespace ygo {
 		static std::vector<path_string> FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
 		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1);
-		static void FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload = nullptr);
-		static std::vector<int> FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
-		static irr::io::IReadFile* FindandOpenFileFromArchives(const path_string& path, const path_string& name);
+		static void FindfolderFiles(const IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload = nullptr);
+		static std::vector<int> FindfolderFiles(const IrrArchiveHelper& archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
+		static irr::io::IReadFile* FindandOpenFileFromArchives(const std::vector<IrrArchiveHelper>& archives, const path_string& path, const path_string& name);
 		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);
 		static std::wstring GetFileExtension(std::wstring file);
 		static std::wstring GetFilePath(std::wstring file);
@@ -44,7 +44,25 @@ namespace ygo {
 		static std::string GetFileExtension(std::string file);
 		static std::string GetFilePath(std::string file);
 		static std::string GetFileName(std::string file);
+
+		template<typename T>
+		static std::vector<T> TokenizeString(const T& input, const T& token);
 	};
+
+template<typename T>
+inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
+	std::vector<T> res;
+	typename T::size_type pos1, pos2 = 0;
+	while((pos1 = input.find(token, pos2)) != T::npos) {
+		if(pos1 != pos2)
+			res.emplace_back(input.begin() + pos2, input.begin() + pos1);
+		pos2 = pos1 + 1;
+	}
+	if(pos2 != input.size())
+		res.emplace_back(input.begin() + pos2, input.end());
+	return res;
+}
+
 }
 
 #endif //UTILS_H

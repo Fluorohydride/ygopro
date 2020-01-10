@@ -203,8 +203,7 @@ public:
 	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
 	void SetCentered(irr::gui::IGUIElement* elem);
 	void ValidateName(irr::gui::IGUIElement* box);
-	template<typename T>
-	static std::vector<T> TokenizeString(const T& input, const T& token);
+	
 	static std::wstring StringtoUpper(std::wstring input);
 	static bool CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input = false, bool transform_token = false);
 	static bool CompareStrings(std::wstring input, std::wstring second_term, bool transform_input = false, bool transform_term = false);
@@ -650,20 +649,6 @@ public:
 };
 
 extern Game* mainGame;
-
-template<typename T>
-inline std::vector<T> Game::TokenizeString(const T& input, const T& token) {
-	std::vector<T> res;
-	typename T::size_type pos1, pos2 = 0;
-	while((pos1 = input.find(token, pos2)) != T::npos) {
-		if(pos1 != pos2)
-			res.emplace_back(input.begin() + pos2, input.begin() + pos1);
-		pos2 = pos1 + 1;
-	}
-	if(pos2 != input.size())
-		res.emplace_back(input.begin() + pos2, input.end());
-	return res;
-}
 
 template<typename T>
 inline vector2d<T> Game::Scale(vector2d<T> vec) {

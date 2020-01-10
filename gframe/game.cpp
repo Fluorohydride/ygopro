@@ -2360,7 +2360,7 @@ std::vector<char> Game::LoadScript(const std::string& _name) {
 	path_string name = Utils::ParseFilename(_name);
 	for(auto& path : script_dirs) {
 		if(path == TEXT("archives")) {
-			auto reader = Utils::FindandOpenFileFromArchives(TEXT("script"), name);
+			auto reader = Utils::FindandOpenFileFromArchives(archives, TEXT("script"), name);
 			if(reader == nullptr)
 				continue;
 			buffer.resize(reader->getSize());

@@ -469,7 +469,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 				return std::make_pair(nullptr, TEXT("fail"));
 			irr::io::IReadFile* reader = nullptr;
 			if(path == TEXT("archives")) {
-				reader = Utils::FindandOpenFileFromArchives((type == ART) ? TEXT("pics") : TEXT("pics/cover"), fmt::format(TEXT("{}{}"), code, extension));
+				reader = Utils::FindandOpenFileFromArchives(mainGame->archives, (type == ART) ? TEXT("pics") : TEXT("pics/cover"), fmt::format(TEXT("{}{}"), code, extension));
 				if(!reader)
 					continue;
 			}
@@ -610,7 +610,7 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 				for(auto extension : { TEXT(".png"), TEXT(".jpg") }) {
 					irr::io::IReadFile* reader = nullptr;
 					if(path == TEXT("archives")) {
-						reader = Utils::FindandOpenFileFromArchives(TEXT("pics/field"), fmt::format(TEXT("{}{}"), code, extension));
+						reader = Utils::FindandOpenFileFromArchives(mainGame->archives, TEXT("pics/field"), fmt::format(TEXT("{}{}"), code, extension));
 						if(!reader)
 							continue;
 						img = driver->getTexture(reader);

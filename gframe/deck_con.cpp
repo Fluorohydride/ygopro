@@ -820,7 +820,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	results.clear();
 	std::vector<std::wstring> searchterms;
 	if(wcslen(mainGame->ebCardName->getText())) {
-		searchterms = Game::TokenizeString<std::wstring>(Game::StringtoUpper(mainGame->ebCardName->getText()), L"+");
+		searchterms = Utils::TokenizeString<std::wstring>(Game::StringtoUpper(mainGame->ebCardName->getText()), L"+");
 	} else
 		searchterms = { L"" };
 	if(FiltersChanged() || force_refresh)
@@ -849,9 +849,9 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		if(!term.empty()) {
 			if(term.front() == L'@' || term.front() == L'$') {
 				if(term.size() > 1)
-					tokens = Game::TokenizeString<std::wstring>(&term[1], L"*");
+					tokens = Utils::TokenizeString<std::wstring>(&term[1], L"*");
 			} else {
-				tokens = Game::TokenizeString<std::wstring>(term, L"*");
+				tokens = Utils::TokenizeString<std::wstring>(term, L"*");
 			}
 		}
 		std::vector<unsigned int> set_code = dataManager.GetSetCode(tokens);

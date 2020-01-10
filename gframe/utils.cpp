@@ -3,11 +3,12 @@
 #ifndef _WIN32
 #include <dirent.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #endif
 
+#include "config.h"
 #include "bufferio.h"
 #include "logging.h"
-#include "game.h"
 
 namespace ygo {
 	bool Utils::Makedirectory(const path_string& path) {
@@ -173,15 +174,15 @@ namespace ygo {
 		std::sort(results.begin(), results.end());
 		return results;
 	}
-	void Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload) {
+	void Utils::FindfolderFiles(const IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload) {
 		auto _path = ParseFilename(NormalizePath(path, false));
-		auto& indexfolders = archive.folderindexes[_path].first;
-		auto& indexfiles = archive.folderindexes[_path].second;
+		auto& indexfolders = archive.folderindexes.at(_path).first;
+		auto& indexfiles = archive.folderindexes.at(_path).second;
 		for(int i = indexfolders.first; i < indexfolders.second && cb(i, archive.archive->getFileList()->getFileName(i).c_str(), true, payload); i++) {}
 		for(int i = indexfiles.first; i < indexfiles.second && cb(i, archive.archive->getFileList()->getFileName(i).c_str(), false, payload); i++) {}
 
 	}
-	std::vector<int> Utils::FindfolderFiles(IrrArchiveHelper& archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
+	std::vector<int> Utils::FindfolderFiles(const IrrArchiveHelper& archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
 		std::vector<int> res;
 		FindfolderFiles(archive, path, [&res, arc = archive.archive, extensions, path, subdirectorylayers, &archive](int index, path_string name, bool isdir, void* payload)->bool {
 			if(isdir) {
@@ -203,8 +204,8 @@ namespace ygo {
 
 		return res;
 	}
-	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const path_string & path, const path_string & name) {
-		for(auto& archive : mainGame->archives) {
+	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const std::vector<IrrArchiveHelper>& archives, const path_string & path, const path_string & name) {
+		for(auto& archive : archives) {
 			int res = -1;
 			Utils::FindfolderFiles(archive, path, [match = &name, &res](int index, path_string name, bool isdir, void* payload)->bool {
 				if(isdir)
@@ -225,7 +226,7 @@ namespace ygo {
 	}
 	std::wstring Utils::NormalizePath(std::wstring path, bool trailing_slash) {
 		std::replace(path.begin(), path.end(), L'\\', L'/');
-		std::vector<std::wstring> paths = ygo::Game::TokenizeString<std::wstring>(path, L"/");
+		std::vector<std::wstring> paths = TokenizeString<std::wstring>(path, L"/");
 		if(paths.empty())
 			return path;
 		std::wstring normalpath;
@@ -292,7 +293,7 @@ namespace ygo {
 	}
 	std::string Utils::NormalizePath(std::string path, bool trailing_slash) {
 		std::replace(path.begin(), path.end(), '\\', '/');
-		std::vector<std::string> paths = ygo::Game::TokenizeString<std::string>(path, "/");
+		std::vector<std::string> paths = TokenizeString<std::string>(path, "/");
 		if(paths.empty())
 			return path;
 		std::string normalpath;
