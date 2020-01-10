@@ -1076,15 +1076,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				std::wstring str;
 				if(unsigned s = filter & data) {
 					if(s & 0x60) {
-						str += dataManager.GetSysString(1006);
+						str += dataManager.GetSysString(1081);
 						data &= ~0x600000;
 					} else if(s & 0xffff)
-						str += L"我方";
+						str += dataManager.GetSysString(102);
 					else if(s & 0xffff0000) {
-						str += L"对方";
+						str += dataManager.GetSysString(103);
 						s >>= 16;
 					}
-					if(s & 0xff)
+					if(s & 0x1f)
 						str += dataManager.GetSysString(1002);
 					else if(s & 0xff00) {
 						s >>= 8;
