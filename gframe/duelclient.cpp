@@ -982,7 +982,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_HINT: {
 		int type = BufferIO::ReadInt8(pbuf);
-		/*int player = */BufferIO::ReadInt8(pbuf);
+		int player = BufferIO::ReadInt8(pbuf);
 		int data = BufferIO::ReadInt32(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
@@ -1067,6 +1067,49 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->showcarddif = 0;
 			mainGame->showcard = 1;
 			mainGame->WaitFrameSignal(30);
+			break;
+		}
+		case HINT_ZONE: {
+			if(mainGame->LocalPlayer(player) == 1)
+				data = (data >> 16) | (data << 16);
+			for(unsigned filter = 0x1; filter != 0; filter <<= 1) {
+				std::wstring str;
+				wchar_t strbuffer[256];
+				if(unsigned s = filter & data) {
+					if(s & 0x60) {
+						str += dataManager.GetSysString(1006);
+						data &= ~0x600000;
+					} else if(s & 0xffff)
+						str += L"我方";
+					else if(s & 0xffff0000) {
+						str += L"对方";
+						s >>= 16;
+					}
+					if(s & 0xff)
+						str += dataManager.GetSysString(1002);
+					else if(s & 0xff00) {
+						s >>= 8;
+						if(s & 0x1f)
+							str += dataManager.GetSysString(1003);
+						else if(s & 0x20)
+							str += dataManager.GetSysString(1008);
+						else if(s & 0xc0)
+							str += dataManager.GetSysString(1009);
+					}
+					int seq = 1;
+					for(int i = 0x1; i < 0x100; i <<= 1) {
+						if(s & i)
+							break;
+						++seq;
+					}
+					myswprintf(strbuffer, L"%ls(%d)", str.c_str(), seq);
+					myswprintf(textBuffer, dataManager.GetSysString(1510), strbuffer);
+					mainGame->AddLog(textBuffer);
+				}
+			}
+			mainGame->dField.selectable_field = data;
+			mainGame->WaitFrameSignal(40);
+			mainGame->dField.selectable_field = 0;
 			break;
 		}
 		}
