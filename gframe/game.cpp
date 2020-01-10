@@ -23,6 +23,7 @@
 #include "CGUICustomCheckBox/CGUICustomCheckBox.h"
 #include "CGUICustomTable/CGUICustomTable.h"
 #include "logging.h"
+#include "utils_gui.h"
 
 unsigned short PRO_VERSION = 0x1348;
 
@@ -1046,7 +1047,7 @@ void Game::MainLoop() {
 	bool discord_message_shown = false;
 	std::wstring corename;
 	if(gameConf.fullscreen)
-		Utils::ToggleFullscreen();
+		GUIUtils::ToggleFullscreen(device, is_fullscreen);
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {

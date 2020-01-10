@@ -5,6 +5,7 @@
 #include "logging.h"
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
+#include "utils_gui.h"
 
 namespace ygo {
 
@@ -126,7 +127,7 @@ void ServerLobby::FillOnlineRooms() {
 	}
 }
 int ServerLobby::GetRoomsThread() {
-	Utils::changeCursor(ECI_WAIT);
+	GUIUtils::ChangeCursor(mainGame->device, ECI_WAIT);
 	mainGame->btnLanRefresh2->setEnabled(false);
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
@@ -156,7 +157,7 @@ int ServerLobby::GetRoomsThread() {
 	if(res != CURLE_OK) {
 		//error
 		mainGame->PopupMessage(dataManager.GetSysString(2037), L"Error 05");
-		Utils::changeCursor(ECI_NORMAL);
+		GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
 		mainGame->roomListTable->setVisible(true);
@@ -216,7 +217,7 @@ int ServerLobby::GetRoomsThread() {
 		}
 	}
 
-	Utils::changeCursor(ECI_NORMAL);
+	GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
 	mainGame->btnLanRefresh2->setEnabled(true);
 	mainGame->serverChoice->setEnabled(true);
 	mainGame->roomListTable->setVisible(true);

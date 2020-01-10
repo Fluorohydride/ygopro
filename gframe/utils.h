@@ -1,16 +1,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-#include <irrlicht.h>
+#include <functional>
+#include <map>
 #include <string>
 #include <vector>
-#include <functional>
-#include <fstream>
-#include <map>
-#ifndef _WIN32
-#include <dirent.h>
-#include <sys/stat.h>
-#endif
+#include <IFileArchive.h>
 
 using path_string = std::basic_string<irr::fschar_t>;
 
@@ -34,9 +29,6 @@ namespace ygo {
 		static bool ClearDirectory(const path_string& path);
 		static bool Deletedirectory(const path_string& source);
 		static void CreateResourceFolders();
-		static void takeScreenshot(irr::IrrlichtDevice* device);
-		static void ToggleFullscreen();
-		static void changeCursor(irr::gui::ECURSOR_ICON icon);
 		static void FindfolderFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload = nullptr);
 		static std::vector<path_string> FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
