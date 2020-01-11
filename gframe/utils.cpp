@@ -409,5 +409,31 @@ namespace ygo {
 			}
 		}
 	}
+	std::wstring Utils::ToUpperNoAccents(std::wstring input) {
+		std::transform(input.begin(), input.end(), input.begin(), [](wchar_t c) {
+#define IN_INTERVAL(start, end) (c >= start && c <= end)
+			if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+				return L'A';
+			}
+			if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+				return L'E';
+			}
+			if (IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
+				return L'I';
+			}
+			if (IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
+				return L'O';
+			}
+			if (IN_INTERVAL(217, 220) || IN_INTERVAL(249, 252)) {
+				return L'U';
+			}
+			if (c == 209 || c == 241) {
+				return L'N';
+			}
+			return (wchar_t)::towupper(c);
+#undef CHK_RNG
+			});
+		return input;
+	}
 }
 

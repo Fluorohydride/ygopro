@@ -2268,42 +2268,16 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 	obj->setText(text.c_str());
 }
-#define CHK_RNG(range_start, range_end) (c >= range_start && c <= range_end)
-std::wstring Game::StringtoUpper(std::wstring input) {
-	std::transform(input.begin(), input.end(), input.begin(), [](wchar_t c) {
-		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
-			return L'A';
-		}
-		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
-			return L'E';
-		}
-		if(CHK_RNG(200, 203) || CHK_RNG(232, 235)) {
-			return L'I';
-		}
-		if(CHK_RNG(210, 214) || CHK_RNG(242, 246)) {
-			return L'O';
-		}
-		if(CHK_RNG(217, 220) || CHK_RNG(249, 252)) {
-			return L'U';
-		}
-		if(c == 209 || c == 241) {
-			return L'N';
-		}
-		return (wchar_t)::towupper(c);
-	});
-	return input;
-}
-#undef CHK_RNG
 bool Game::CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input, bool transform_token) {
 	if(input.empty() || tokens.empty())
 		return false;
 	if(transform_input)
-		input = StringtoUpper(input);
+		input = Utils::ToUpperNoAccents(input);
 	std::vector<std::wstring> alttokens;
 	if(transform_token) {
 		alttokens = tokens;
 		for(auto& token : alttokens)
-			token = StringtoUpper(token);
+			token = Utils::ToUpperNoAccents(token);
 	}
 	std::size_t pos;
 	for(auto& token : transform_token ? alttokens : tokens) {
@@ -2319,9 +2293,9 @@ bool Game::CompareStrings(std::wstring input, std::wstring second_term, bool tra
 	if(second_term.empty())
 		return true;
 	if(transform_input)
-		input = StringtoUpper(input);
+		input = Utils::ToUpperNoAccents(input);
 	if(transform_term)
-		second_term = StringtoUpper(second_term);
+		second_term = Utils::ToUpperNoAccents(second_term);
 	return input.find(second_term) != std::wstring::npos;
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {

@@ -204,7 +204,6 @@ public:
 	void SetCentered(irr::gui::IGUIElement* elem);
 	void ValidateName(irr::gui::IGUIElement* box);
 	
-	static std::wstring StringtoUpper(std::wstring input);
 	static bool CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input = false, bool transform_token = false);
 	static bool CompareStrings(std::wstring input, std::wstring second_term, bool transform_input = false, bool transform_term = false);
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);

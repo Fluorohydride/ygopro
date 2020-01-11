@@ -47,6 +47,7 @@ namespace ygo {
 
 		template<typename T>
 		static std::vector<T> TokenizeString(const T& input, const T& token);
+		static std::wstring ToUpperNoAccents(std::wstring input);
 	};
 
 template<typename T>
