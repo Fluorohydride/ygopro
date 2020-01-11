@@ -11,6 +11,8 @@
 #include "logging.h"
 
 namespace ygo {
+	std::vector<Utils::IrrArchiveHelper> Utils::archives;
+
 	bool Utils::Makedirectory(const path_string& path) {
 #ifdef _WIN32
 		return CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
@@ -204,7 +206,7 @@ namespace ygo {
 
 		return res;
 	}
-	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const std::vector<IrrArchiveHelper>& archives, const path_string & path, const path_string & name) {
+	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const path_string & path, const path_string & name) {
 		for(auto& archive : archives) {
 			int res = -1;
 			Utils::FindfolderFiles(archive, path, [match = &name, &res](int index, path_string name, bool isdir, void* payload)->bool {

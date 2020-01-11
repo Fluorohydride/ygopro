@@ -1285,7 +1285,7 @@ void Game::LoadZipArchives() {
 	for(auto& file : Utils::FindfolderFiles(TEXT("./expansions/"), { TEXT("zip") })) {
 		filesystem->addFileArchive((TEXT("./expansions/") + file).c_str(), true, false, EFAT_ZIP, "", &tmp_archive);
 		if(tmp_archive) {
-			archives.emplace_back(tmp_archive);
+			Utils::archives.emplace_back(tmp_archive);
 		}
 	}
 }
@@ -1294,7 +1294,7 @@ void Game::LoadExpansionDB() {
 		dataManager.LoadDB(TEXT("./expansions/") + file);
 }
 void Game::LoadArchivesDB() {
-	for(auto& archive: archives) {
+	for(auto& archive: Utils::archives) {
 		auto files = Utils::FindfolderFiles(archive, TEXT(""), { TEXT("cdb") }, 3);
 		for(auto& index : files) {
 			auto reader = archive.archive->createAndOpenFile(index);
@@ -2304,7 +2304,7 @@ std::vector<char> Game::LoadScript(const std::string& _name) {
 	path_string name = Utils::ParseFilename(_name);
 	for(auto& path : script_dirs) {
 		if(path == TEXT("archives")) {
-			auto reader = Utils::FindandOpenFileFromArchives(archives, TEXT("script"), name);
+			auto reader = Utils::FindandOpenFileFromArchives(TEXT("script"), name);
 			if(reader == nullptr)
 				continue;
 			buffer.resize(reader->getSize());

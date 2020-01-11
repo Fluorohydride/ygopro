@@ -299,7 +299,6 @@ public:
 	std::vector<path_string> cover_dirs;
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
-	std::vector<Utils::IrrArchiveHelper> archives;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;
