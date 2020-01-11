@@ -149,7 +149,7 @@ void Game::DrawBackGround() {
 	driver->setMaterial(matManager.mBackLine);
 	//select field
 	if(dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD) {
-		irr::video::SColor outline_color = GetSkinColor(L"selectable_field", SColor(255, 0, 0, 255));
+		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_SELECTABLE_FIELD_OUTLINE", SColor(255, 0, 0, 255));
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
@@ -238,7 +238,7 @@ void Game::DrawBackGround() {
 			selFieldAlpha = 205;
 			selFieldDAlpha = -10;
 		}
-		matManager.mSelField.AmbientColor = GetSkinColor(L"hovered_zone", SColor(255, 255, 255, 255));
+		matManager.mSelField.AmbientColor = GetSkinColor(L"DUELFIELD_HOVERED", SColor(255, 255, 255, 255));
 		matManager.mSelField.DiffuseColor = (int)std::round(selFieldAlpha) << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
@@ -366,10 +366,10 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	}
 }
 bool Game::CheckMutual(ClientCard* pcard, int mark) {
-	matManager.mSelField.AmbientColor = GetSkinColor(L"linked_zone", SColor(255, 2, 97, 162));
+	matManager.mSelField.AmbientColor = GetSkinColor(L"DUELFIELD_LINKED", SColor(255, 2, 97, 162));
 	driver->setMaterial(matManager.mSelField);
 	if (pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
-		matManager.mSelField.AmbientColor = GetSkinColor(L"mutual_linked_zone", SColor(255, 0, 153, 0));
+		matManager.mSelField.AmbientColor = GetSkinColor(L"DUELFIELD_MUTUAL_LINKED", SColor(255, 0, 153, 0));
 		driver->setMaterial(matManager.mSelField);
 		return true;
 	}
@@ -435,14 +435,14 @@ void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->is_moving)
 		return;
 	if(pcard->is_selectable && (pcard->location & 0xe)) {
-		irr::video::SColor outline_color = GetSkinColor(L"selectable_card", SColor(255, 255, 255, 0));
+		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_SELECTABLE_CARD_OUTLINE", SColor(255, 255, 255, 0));
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
 			DrawSelectionLine(matManager.vCardOutline, !pcard->is_selected, 2, outline_color);
 		else
 			DrawSelectionLine(matManager.vCardOutliner, !pcard->is_selected, 2, outline_color);
 	}
 	if(pcard->is_highlighting) {
-		irr::video::SColor outline_color = GetSkinColor(L"highlighting_card", SColor(255, 0, 255, 255));
+		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_HIGHLIGHTING_CARD_OUTLINE", SColor(255, 0, 255, 255));
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
 			DrawSelectionLine(matManager.vCardOutline, true, 2, outline_color);
 		else

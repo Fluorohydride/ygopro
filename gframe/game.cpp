@@ -371,7 +371,7 @@ bool Game::Initialize() {
 	btnHostPrepCancel = env->addButton(Scale(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1210).c_str());
 	//img
 	wCardImg = env->addStaticText(L"", Scale(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, 0, -1, true);
-	wCardImg->setBackgroundColor(GetSkinColor(L"wCardImg", SColor(192, 192, 192, 192)));
+	wCardImg->setBackgroundColor(GetSkinColor(L"CARDINFO_IMAGE_BACKGROUND", SColor(192, 192, 192, 192)));
 	wCardImg->setVisible(false);
 	imgCard = env->addImage(Scale(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
 	imgCard->setImage(imageManager.tCover[0]);
@@ -409,13 +409,13 @@ bool Game::Initialize() {
 	((CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
 	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 37, 287, 60));
 	stInfo->setWordWrap(true);
-	stInfo->setOverrideColor(GetSkinColor(L"stInfo", SColor(255, 0, 0, 255)));
+	stInfo->setOverrideColor(GetSkinColor(L"CARDINFO_TYPES_COLOR", SColor(255, 0, 0, 255)));
 	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 60, 287, 83));
 	stDataInfo->setWordWrap(true);
-	stDataInfo->setOverrideColor(GetSkinColor(L"stDataInfo", SColor(255, 0, 0, 255)));
+	stDataInfo->setOverrideColor(GetSkinColor(L"CARDINFO_STATS_COLOR", SColor(255, 0, 0, 255)));
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
 	stSetName->setWordWrap(true);
-	stSetName->setOverrideColor(GetSkinColor(L"stSetName", SColor(255, 0, 0, 255)));
+	stSetName->setOverrideColor(GetSkinColor(L"CARDINFO_ARCHETYPE_TEXT_COLOR", SColor(255, 0, 0, 255)));
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
@@ -509,8 +509,8 @@ bool Game::Initialize() {
 	wACMessage->setDrawBackground(false);
 	stACMessage = irr::gui::CGUICustomText::addCustomText(L"", true, env, wACMessage, -1, Scale(0, 0, 350, 60), true);
 	stACMessage->setWordWrap(true);
-	stACMessage->setBackgroundColor(GetSkinColor(L"stACMessagebg", SColor(192, 192, 192, 192)));
-	auto tmp_color = GetSkinColor(L"stACMessage", 0);
+	stACMessage->setBackgroundColor(GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_BACGROUND_COLOR", SColor(192, 192, 192, 192)));
+	auto tmp_color = GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_COLOR", 0);
 	if(tmp_color != 0)
 		stACMessage->setOverrideColor(tmp_color);
 	stACMessage->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -615,8 +615,8 @@ bool Game::Initialize() {
 									  wANRace, CHECK_RACE, dataManager.FormatRace(filter).c_str());
 	//selection hint
 	stHintMsg = env->addStaticText(L"", Scale(500, 60, 820, 90), true, false, 0, -1, false);
-	stHintMsg->setBackgroundColor(GetSkinColor(L"stTipbg", SColor(192, 255, 255, 255)));
-	tmp_color = GetSkinColor(L"stTip", 0);
+	stHintMsg->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACGROUND_COLOR", SColor(192, 255, 255, 255)));
+	tmp_color = GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_COLOR", 0);
 	if(tmp_color != 0)
 		stHintMsg->setOverrideColor(tmp_color);
 	stHintMsg->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -856,15 +856,15 @@ bool Game::Initialize() {
 	btnRestartSingle->setVisible(false);
 	//tip
 	stTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, 0, -1, true);
-	stTip->setBackgroundColor(GetSkinColor(L"stTipbg", SColor(192, 255, 255, 255)));
-	tmp_color = GetSkinColor(L"stTip", 0);
+	stTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACGROUND_COLOR", SColor(192, 255, 255, 255)));
+	tmp_color = GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_COLOR", 0);
 	if(tmp_color != 0)
 		stTip->setOverrideColor(tmp_color);
 	stTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stTip->setVisible(false);
 	//tip for cards in select / display list
 	stCardListTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, wCardSelect, TEXT_CARD_LIST_TIP, true);
-	stCardListTip->setBackgroundColor(GetSkinColor(L"stTipbg", SColor(192, 255, 255, 255)));
+	stCardListTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACGROUND_COLOR", SColor(192, 255, 255, 255)));
 	if(tmp_color != 0)
 		stCardListTip->setOverrideColor(tmp_color);
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -890,7 +890,7 @@ bool Game::Initialize() {
 	//wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
 	wRoomListPlaceholder->setVisible(false);
 
-	auto roomlistcolor = GetSkinColor(L"roomlist", SColor(255, 255, 255, 255));
+	auto roomlistcolor = GetSkinColor(L"ROOMLIST_TEXTS_COLOR", SColor(255, 255, 255, 255));
 
 	//server choice dropdownlist
 	irr::gui::IGUIStaticText* statictext = env->addStaticText(dataManager.GetSysString(2041).c_str(), Scale(10, 30, 110, 50), false, false, wRoomListPlaceholder, -1, false); // 2041 = Server:
@@ -1943,34 +1943,7 @@ void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 	popupCheck.unlock();
 }
 irr::video::SColor Game::GetSkinColor(const std::wstring& value, irr::video::SColor fallback) {
-	static const std::map<std::wstring, const wchar_t*> alias = {
-		{L"stInfo", L"CARDINFO_TYPES_COLOR"},
-		{L"stDataInfo", L"CARDINFO_STATS_COLOR"},
-		{L"stSetName", L"CARDINFO_ARCHETYPE_TEXT_COLOR"},
-		{L"wCardImg", L"CARDINFO_IMAGE_BACKGROUND"},
-		{L"stACMessagebg", L"DUELFIELD_ANNOUNCE_TEXT_BACGROUND_COLOR"},
-		{L"stACMessage", L"DUELFIELD_ANNOUNCE_TEXT_COLOR"},
-		{L"stTipbg", L"DUELFIELD_TOOLTIP_TEXT_BACGROUND_COLOR"},
-		{L"stTip", L"DUELFIELD_TOOLTIP_TEXT_COLOR"},
-		{L"roomlist", L"ROOMLIST_TEXTS_COLOR"},
-		{L"normal_room", L"ROOMLIST_NORMAL_ROOM"},
-		{L"custom_room", L"ROOMLIST_CUSTOM_ROOM"},
-		{L"started_room", L"ROOMLIST_STARTED_ROOM"},
-		{L"hovered_zone", L"DUELFIELD_HOVERED"},
-		{L"linked_zone", L"DUELFIELD_LINKED"},
-		{L"mutual_linked_zone", L"DUELFIELD_MUTUAL_LINKED"},
-		{L"selectable_field", L"DUELFIELD_SELECTABLE_FIELD_OUTLINE"},
-		{L"selectable_card", L"DUELFIELD_SELECTABLE_CARD_OUTLINE"},
-		{L"highlighting_card", L"DUELFIELD_HIGHLIGHTING_CARD_OUTLINE"},
-		{L"card_self_bg", L"DUELFIELD_CARD_SELF_WINDOW_BACKGROUND"},
-		{L"card_oppo_bg", L"DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND"},
-		{L"card_overlay_oppo_text", L"DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT"},
-		{L"card_set_text", L"DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT"}
-	};
-	auto found = alias.find(value.c_str());
-	if(found != alias.end())
-		std::wcout << found->second << std::endl;
-	return mainGame->skinSystem ? (mainGame->skinSystem->getCustomColor(found != alias.end() ? found->second : value.c_str(), fallback)) : fallback;
+	return mainGame->skinSystem ? (mainGame->skinSystem->getCustomColor(value.c_str(), fallback)) : fallback;
 }
 uint8 Game::LocalPlayer(uint8 player) {
 	return dInfo.isFirst ? player : 1 - player;
