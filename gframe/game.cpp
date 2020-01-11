@@ -1042,7 +1042,7 @@ void Game::MainLoop() {
 	uint32 prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
 	int fps = 0;
-	bool discord_message_shown = false;
+	bool was_connected = false;
 	std::wstring corename;
 	if(gameConf.fullscreen)
 		Utils::ToggleFullscreen();
@@ -1243,10 +1243,15 @@ void Game::MainLoop() {
 		}
 		popupCheck.unlock();
 		discord.Check();
-		if(discord.connected && !discord_message_shown) {
-			discord_message_shown = true;
+		if(discord.connected && !was_connected) {
+			was_connected = true;
 			env->setFocus(stACMessage);
 			stACMessage->setText(L"Connected to Discord");
+			PopupElement(wACMessage, 30);
+		} else if(!discord.connected && was_connected) {
+			was_connected = false;
+			env->setFocus(stACMessage);
+			stACMessage->setText(L"Disconnected from Discord");
 			PopupElement(wACMessage, 30);
 		}
 	}
