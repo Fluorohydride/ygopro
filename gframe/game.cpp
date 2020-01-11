@@ -107,6 +107,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	discord.Initialize(filesystem->getWorkingDirectory().c_str());
+	mainGame->discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
 	dataManager.LoadStrings(TEXT("./expansions/strings.conf"));
 	env = device->getGUIEnvironment();

@@ -1,11 +1,9 @@
 #ifndef DISCORD_WRAPPER_H
 #define DISCORD_WRAPPER_H
 
-#ifdef DISCORD_APP_ID
-#include "discord_rpc.h"
-#endif
 #include <string>
 #include "utils.h"
+struct DiscordUser;
 class DiscordWrapper {
 public:
 	struct DiscordSecret {
@@ -23,7 +21,9 @@ public:
 		PUZZLE,
 		DECK,
 		DECK_SIDING,
-		CLEAR
+		CLEAR,
+		INITIALIZE,
+		TERMINATE
 	};
 	DiscordWrapper();
 	~DiscordWrapper();
@@ -33,6 +33,8 @@ public:
 	bool connected;
 	void Check();
 private:
+	static void Connect();
+	static void Disconnect();
 #ifdef DISCORD_APP_ID
 	static void OnReady(const DiscordUser* connectedUser, void* payload);
 	static void OnDisconnected(int errcode, const char* message, void* payload);

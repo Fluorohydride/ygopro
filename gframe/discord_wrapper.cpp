@@ -2,7 +2,10 @@
 #include <cstdio>
 #include <nlohmann/json.hpp>
 #include "discord_wrapper.h"
+#ifdef DISCORD_APP_ID
 #include "discord_register.h"
+#include "discord_rpc.h"
+#endif
 #include "game.h"
 #include "duelclient.h"
 
@@ -11,21 +14,12 @@ DiscordWrapper::DiscordWrapper(): connected(false){
 
 DiscordWrapper::~DiscordWrapper() {
 #ifdef DISCORD_APP_ID
-	Discord_ClearPresence();
-	Discord_Shutdown();
+	Disconnect();
 #endif
 }
 
 bool DiscordWrapper::Initialize(path_string workingDir) {
 #ifdef DISCORD_APP_ID
-	DiscordEventHandlers handlers = {};
-	handlers.ready = OnReady;
-	handlers.disconnected = OnDisconnected;
-	handlers.errored = OnError;
-	handlers.joinGame = OnJoin;
-	handlers.spectateGame = OnSpectate;
-	handlers.joinRequest = OnJoinRequest;
-	handlers.payload = ygo::mainGame;
 #if defined(_WIN32) || defined(__linux__)
 #ifdef _WIN32
 	TCHAR exepath[MAX_PATH];
@@ -33,9 +27,9 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 	path_string param = fmt::format(TEXT("{} from_discord {}"), exepath, workingDir);
 #elif defined(__linux__)
 	char buff[PATH_MAX];
-	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff)-1);
+	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
 	std::string filename;
-	if (len != -1) {
+	if(len != -1) {
 		buff[len] = '\0';
 		filename = ygo::Utils::GetFileName(buff);
 	}
@@ -45,7 +39,6 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 #else
 	RegisterURL(DISCORD_APP_ID);
 #endif //_WIN32
-	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
 #endif //DISCORD_APP_ID
 	return true;
 }
@@ -57,6 +50,19 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 	static int64_t start = 0;
 	static PresenceType presence = CLEAR;
 	static int previous_gameid = 0;
+	static bool running = false;
+	if(type == INITIALIZE && !running) {
+		Connect();
+		running = true;
+		return;
+	}
+	if(type == TERMINATE && running) {
+		Disconnect();
+		running = false;
+		return;
+	}
+	if(!running)
+		return;
 	PresenceType previous = presence;
 	presence = type;
 	if(previous != presence)
@@ -147,6 +153,27 @@ void DiscordWrapper::Check() {
 #endif
 }
 
+void DiscordWrapper::Connect() {
+#ifdef DISCORD_APP_ID
+	DiscordEventHandlers handlers = {};
+	handlers.ready = OnReady;
+	handlers.disconnected = OnDisconnected;
+	handlers.errored = OnError;
+	handlers.joinGame = OnJoin;
+	handlers.spectateGame = OnSpectate;
+	handlers.joinRequest = OnJoinRequest;
+	handlers.payload = ygo::mainGame;
+	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
+#endif
+}
+
+void DiscordWrapper::Disconnect() {
+#ifdef DISCORD_APP_ID
+	Discord_ClearPresence();
+	Discord_Shutdown();
+#endif
+}
+
 #ifdef DISCORD_APP_ID
 void DiscordWrapper::OnReady(const DiscordUser* connectedUser, void* payload) {
 	printf("Discord: Connected to user %s#%s - %s\n",
@@ -159,6 +186,10 @@ void DiscordWrapper::OnReady(const DiscordUser* connectedUser, void* payload) {
 }
 
 void DiscordWrapper::OnDisconnected(int errcode, const char * message, void* payload) {
+	printf("Discord: Disconnected, error code: %d - %s\n",
+		   errcode,
+		   message);
+	static_cast<ygo::Game*>(payload)->discord.connected = false;
 }
 
 void DiscordWrapper::OnError(int errcode, const char * message, void* payload) {
