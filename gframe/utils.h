@@ -48,6 +48,9 @@ namespace ygo {
 		template<typename T>
 		static std::vector<T> TokenizeString(const T& input, const T& token);
 		static std::wstring ToUpperNoAccents(std::wstring input);
+		/** Returns true if and only if all tokens are contained in the input. */
+		static bool ContainsSubstring(std::wstring input, const std::vector<std::wstring>& tokens, bool ignoreInputCasingAccents = false, bool ignoreTokenCasingAccents = false);
+		static bool ContainsSubstring(std::wstring input, std::wstring token, bool ignoreInputCasingAccents = false, bool ignoreTokenCasingAccents = false);
 	};
 
 template<typename T>

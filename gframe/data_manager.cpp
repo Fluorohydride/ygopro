@@ -2,7 +2,6 @@
 #include <fstream>
 #include "readonlymemvfs.h"
 #include "logging.h"
-#include "game.h"
 
 namespace ygo {
 
@@ -204,7 +203,7 @@ std::vector<unsigned int> DataManager::GetSetCode(std::vector<std::wstring>& set
 	std::vector<unsigned int> res;
 	for(auto& string : _setnameStrings) {
 		auto xpos = string.second.find_first_of(L'|');//setname|extra info
-		if(Game::CompareStrings(string.second.substr(0, xpos), setname, true))
+		if(Utils::ContainsSubstring(string.second.substr(0, xpos), setname, true))
 			res.push_back(string.first);
 	}
 	return res;

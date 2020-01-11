@@ -435,5 +435,35 @@ namespace ygo {
 			});
 		return input;
 	}
+	bool Utils::ContainsSubstring(std::wstring input, const std::vector<std::wstring>& tokens, bool ignoreInputCasingAccents, bool ignoreTokenCasingAccents) {
+		if (input.empty() || tokens.empty())
+			return false;
+		if (ignoreInputCasingAccents)
+			input = ToUpperNoAccents(input);
+		std::vector<std::wstring> alttokens;
+		if (ignoreTokenCasingAccents) {
+			alttokens = tokens;
+			for (auto& token : alttokens)
+				token = ToUpperNoAccents(token);
+		}
+		std::size_t pos;
+		for (auto& token : ignoreTokenCasingAccents ? alttokens : tokens) {
+			if ((pos = input.find(token)) == std::wstring::npos)
+				return false;
+			input = input.substr(pos + 1);
+		}
+		return true;
+	}
+	bool Utils::ContainsSubstring(std::wstring input, std::wstring token, bool ignoreInputCasingAccents, bool ignoreTokenCasingAccents) {
+		if (input.empty() && !token.empty())
+			return false;
+		if (token.empty())
+			return true;
+		if (ignoreInputCasingAccents)
+			input = ToUpperNoAccents(input);
+		if (ignoreTokenCasingAccents)
+			token = ToUpperNoAccents(token);
+		return input.find(token) != std::wstring::npos;
+	}
 }
 

@@ -1362,7 +1362,7 @@ void ClientField::UpdateDeclarableList() {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto& string : dataManager._strings) {
-		if(Game::CompareStrings(string.second.name.c_str(), pname, true, true)) {
+		if(Utils::ContainsSubstring(string.second.name.c_str(), pname, true, true)) {
 			auto cp = dataManager.GetCardData(string.first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(cp && is_declarable(cp, declare_opcodes)) {

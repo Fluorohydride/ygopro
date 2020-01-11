@@ -2268,36 +2268,6 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 	obj->setText(text.c_str());
 }
-bool Game::CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input, bool transform_token) {
-	if(input.empty() || tokens.empty())
-		return false;
-	if(transform_input)
-		input = Utils::ToUpperNoAccents(input);
-	std::vector<std::wstring> alttokens;
-	if(transform_token) {
-		alttokens = tokens;
-		for(auto& token : alttokens)
-			token = Utils::ToUpperNoAccents(token);
-	}
-	std::size_t pos;
-	for(auto& token : transform_token ? alttokens : tokens) {
-		if((pos = input.find(token)) == std::wstring::npos)
-			return false;
-		input = input.substr(pos + 1);
-	}
-	return true;
-}
-bool Game::CompareStrings(std::wstring input, std::wstring second_term, bool transform_input, bool transform_term) {
-	if(input.empty() && !second_term.empty())
-		return false;
-	if(second_term.empty())
-		return true;
-	if(transform_input)
-		input = Utils::ToUpperNoAccents(input);
-	if(transform_term)
-		second_term = Utils::ToUpperNoAccents(second_term);
-	return input.find(second_term) != std::wstring::npos;
-}
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	std::ifstream infile(Utils::ParseFilename(script_name), std::ifstream::in);
 	std::string str;

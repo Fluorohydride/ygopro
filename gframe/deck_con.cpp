@@ -974,13 +974,13 @@ bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar
 	}
 	if(tokens.size()) {
 		if(checkchar == L'$') {
-			return Game::CompareStrings(text.name, tokens, true);
+			return Utils::ContainsSubstring(text.name, tokens, true);
 		} else if(checkchar == L'@') {
 			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
 				return false;
 			return check_set_code(data, set_code);
 		} else {
-			return (set_code.size() && check_set_code(data, set_code)) || Game::CompareStrings(text.name, tokens, true) || Game::CompareStrings(text.text, tokens, true);
+			return (set_code.size() && check_set_code(data, set_code)) || Utils::ContainsSubstring(text.name, tokens, true) || Utils::ContainsSubstring(text.text, tokens, true);
 		}
 	}
 	return true;
