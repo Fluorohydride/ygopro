@@ -1181,6 +1181,47 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->WaitFrameSignal(30);
 			break;
 		}
+		case HINT_ZONE: {
+			if(mainGame->LocalPlayer(player) == 1)
+				data = (data >> 16) | (data << 16);
+			for(unsigned filter = 0x1; filter != 0; filter <<= 1) {
+				std::wstring str;
+				if(unsigned s = filter & data) {
+					if(s & 0x60) {
+						str += dataManager.GetSysString(1081);
+						data &= ~0x600000;
+					} else if(s & 0xffff)
+						str += dataManager.GetSysString(102);
+					else if(s & 0xffff0000) {
+						str += dataManager.GetSysString(103);
+						s >>= 16;
+					}
+					if(s & 0x1f)
+						str += dataManager.GetSysString(1002);
+					else if(s & 0xff00) {
+						s >>= 8;
+						if(s & 0x1f)
+							str += dataManager.GetSysString(1003);
+						else if(s & 0x20)
+							str += dataManager.GetSysString(1008);
+						else if(s & 0xc0)
+							str += dataManager.GetSysString(1009);
+					}
+					int seq = 1;
+					for(int i = 0x1; i < 0x100; i <<= 1) {
+						if(s & i)
+							break;
+						++seq;
+					}
+					str += L"(" + fmt::to_wstring(seq) + L")";
+					mainGame->AddLog(fmt::sprintf(dataManager.GetSysString(1510), str));
+				}
+			}
+			mainGame->dField.selectable_field = data;
+			mainGame->WaitFrameSignal(40);
+			mainGame->dField.selectable_field = 0;
+			break;
+		}
 		case HINT_SKILL: {
 			auto& pcard = mainGame->dField.skills[player];
 			if(!pcard) {
@@ -2563,30 +2604,36 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcardp = 0;
 		switch (phase) {
 		case PHASE_DRAW:
+			event_string = dataManager.GetSysString(20);
 			mainGame->btnDP->setVisible(true);
 			mainGame->showcardcode = 4;
 			break;
 		case PHASE_STANDBY:
+			event_string = dataManager.GetSysString(21);
 			mainGame->btnSP->setVisible(true);
 			mainGame->showcardcode = 5;
 			break;
 		case PHASE_MAIN1:
+			event_string = dataManager.GetSysString(22);
 			mainGame->btnM1->setVisible(true);
 			mainGame->showcardcode = 6;
 			break;
 		case PHASE_BATTLE_START:
+			event_string = dataManager.GetSysString(24);
 			mainGame->btnBP->setVisible(true);
 			mainGame->btnBP->setPressed(true);
 			mainGame->btnBP->setEnabled(false);
 			mainGame->showcardcode = 7;
 			break;
 		case PHASE_MAIN2:
+			event_string = dataManager.GetSysString(22);
 			mainGame->btnM2->setVisible(true);
 			mainGame->btnM2->setPressed(true);
 			mainGame->btnM2->setEnabled(false);
 			mainGame->showcardcode = 8;
 			break;
 		case PHASE_END:
+			event_string = dataManager.GetSysString(26);
 			mainGame->btnEP->setVisible(true);
 			mainGame->btnEP->setPressed(true);
 			mainGame->btnEP->setEnabled(false);
@@ -2607,11 +2654,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		current.controler = mainGame->LocalPlayer(current.controler);
 		uint32_t reason = BufferIO::Read<uint32_t>(pbuf);
-		if (previous.location != current.location)
-			if (reason & REASON_DESTROY)
-				PLAY_SOUND(SoundManager::SFX::DESTROYED);
-			if (current.location & LOCATION_REMOVED)
-				PLAY_SOUND(SoundManager::SFX::BANISHED);
+		if (reason & REASON_DESTROY && previous.location != current.location)
+			PLAY_SOUND(SoundManager::SFX::DESTROYED);
 		if (previous.location == 0) {
 			ClientCard* pcard = new ClientCard();
 			pcard->position = current.position;

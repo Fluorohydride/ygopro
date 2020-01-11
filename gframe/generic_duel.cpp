@@ -775,7 +775,8 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		case 6:
 		case 7:
 		case 8:
-		case 9: {
+		case 9:
+		case 11: {
 			SEND(nullptr);
 			ITERATE_PLAYERS_AND_OBS(
 				if(dueler != cur_player[player])
