@@ -1930,7 +1930,7 @@ void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 	queued_caption = caption;
 	popupCheck.unlock();
 }
-irr::video::SColor Game::GetSkinColor(const std::wstring& value, irr::video::SColor default) {
+irr::video::SColor Game::GetSkinColor(const std::wstring& value, irr::video::SColor fallback) {
 	static const std::map<std::wstring, const wchar_t*> alias = {
 		{L"stInfo", L"CARDINFO_TYPES_COLOR"},
 		{L"stDataInfo", L"CARDINFO_STATS_COLOR"},
@@ -1949,7 +1949,7 @@ irr::video::SColor Game::GetSkinColor(const std::wstring& value, irr::video::SCo
 	auto found = alias.find(value.c_str());
 	if(found != alias.end())
 		std::wcout << found->second << std::endl;
-	return mainGame->skinSystem ? (mainGame->skinSystem->getCustomColor(found != alias.end() ? found->second : value.c_str(), default)) : default;
+	return mainGame->skinSystem ? (mainGame->skinSystem->getCustomColor(found != alias.end() ? found->second : value.c_str(), fallback)) : fallback;
 }
 uint8 Game::LocalPlayer(uint8 player) {
 	return dInfo.isFirst ? player : 1 - player;
