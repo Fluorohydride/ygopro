@@ -129,7 +129,7 @@ public:
 	void RefreshAiDecks();
 	void RefreshReplay();
 	void RefreshSingleplay();
-	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
+	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
@@ -166,6 +166,7 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
+	static irr::video::SColor GetSkinColor(const std::wstring& value, irr::video::SColor default = NULL);
 
 	uint8 LocalPlayer(uint8 player);
 	std::wstring LocalName(int local_player);

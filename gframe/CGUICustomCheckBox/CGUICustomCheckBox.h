@@ -42,11 +42,14 @@ namespace gui
 		//! Reads attributes of the element
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
 
+		virtual void setColor(video::SColor color);
+
 	private:
 
 		u32 checkTime;
 		bool Pressed;
 		bool Checked;
+		video::SColor override_color;
 	};
 
 } // end namespace gui

@@ -20,6 +20,7 @@ namespace gui
 //! constructor
 CGUICustomCheckBox::CGUICustomCheckBox(bool checked, IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle)
 : IGUICheckBox(environment, parent, id, rectangle), checkTime(0), Pressed(false), Checked(checked)
+, override_color(NULL)
 {
 	#ifdef _DEBUG
 	setDebugName("CGUICustomCheckBox");
@@ -166,15 +167,9 @@ void CGUICustomCheckBox::draw()
 			checkRect.UpperLeftCorner.X += height + 5;
 
 			IGUIFont* font = skin->getFont();
-			if (font)
-			{
-				if(Name == "White") {
-					font->draw(Text.c_str(), checkRect,
-						irr::video::SColor(255,255,255,255), false, true, &AbsoluteClippingRect);
-				} else {
-					font->draw(Text.c_str(), checkRect,
-						skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT), false, true, &AbsoluteClippingRect);
-				}
+			if(font) {
+				font->draw(Text.c_str(), checkRect,
+						   override_color != NULL ? override_color : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT), false, true, &AbsoluteClippingRect);
 			}
 		}
 	}
@@ -211,6 +206,10 @@ void CGUICustomCheckBox::deserializeAttributes(io::IAttributes* in, io::SAttribu
 	Checked = in->getAttributeAsBool ("Checked");
 
 	IGUICheckBox::deserializeAttributes(in,options);
+}
+
+void CGUICustomCheckBox::setColor(video::SColor color) {
+	override_color = color;
 }
 
 

@@ -175,6 +175,9 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const c8 *skinname) {
 	loadProperty((core::stringw)L"Version",skin);
 	loadProperty((core::stringw)L"Date",skin);
 	loadProperty((core::stringw)L"Desc",skin);
+
+	loadCustomColors(skin);
+
 	skin->loadConfig(skinConfig);
 	
 	tmp = registry->getValueAsCStr(L"texture",L"Skin/Properties/Font");
@@ -235,6 +238,11 @@ core:: stringw CGUISkinSystem::getProperty(core::stringw key) {
 	return skin->getProperty(key);
 }
 
+video::SColor CGUISkinSystem::getCustomColor(core::stringw key, video::SColor fallback) {
+	gui::CImageGUISkin* skin = (gui::CImageGUISkin*)device->getGUIEnvironment()->getSkin();
+	return skin->getCustomColor(key, fallback);
+}
+
 bool CGUISkinSystem::checkSkinColor(gui::EGUI_DEFAULT_COLOR colToSet,const wchar_t *context,gui::CImageGUISkin *skin) {
 	video::SColor col = registry->getValueAsColor(context);
 	if(col != NULL) {
@@ -260,6 +268,18 @@ bool CGUISkinSystem::loadProperty(core::stringw key,gui::CImageGUISkin *skin) {
 	if(wtmp.size()) {
 		skin->setProperty(key,wtmp);
 		return true;
+	}
+	return false;
+}
+bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
+	core::stringw wtmp = "Skin/Custom/";
+	core::array<const wchar_t*>* children = registry->listNodeChildren(L"", wtmp.c_str());
+	if(!children) return false;
+	for(int i = 0; i < children->size(); i++) {
+		core::stringw tmpchild = (*children)[i];
+		video::SColor color= registry->getValueAsColor((wtmp + tmpchild).c_str());
+		if(color != NULL)
+			skin->setCustomColor(tmpchild, color);
 	}
 	return false;
 }

@@ -59,6 +59,7 @@ bool Game::Initialize() {
 	auto logger = device->getLogger();
 	logger->setLogLevel(ELL_NONE);
 	// Apply skin
+	skinSystem = nullptr;
 	if (gameConf.skin_index >= 0)
 	{
 		skinSystem = new CGUISkinSystem("skin", device);
@@ -407,13 +408,13 @@ bool Game::Initialize() {
 	((CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
 	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 37, 287, 60));
 	stInfo->setWordWrap(true);
-	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
+	stInfo->setOverrideColor(GetSkinColor(L"stInfo", SColor(255, 0, 0, 255)));
 	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 60, 287, 83));
 	stDataInfo->setWordWrap(true);
-	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
+	stDataInfo->setOverrideColor(GetSkinColor(L"stDataInfo", SColor(255, 0, 0, 255)));
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
 	stSetName->setWordWrap(true);
-	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
+	stSetName->setOverrideColor(GetSkinColor(L"stSetName", SColor(255, 0, 0, 255)));
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
@@ -877,14 +878,16 @@ bool Game::Initialize() {
 	//wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
 	wRoomListPlaceholder->setVisible(false);
 
+	auto roomlistcolor = GetSkinColor(L"roomlist", SColor(255, 255, 255, 255));
+
 	//server choice dropdownlist
 	irr::gui::IGUIStaticText* statictext = env->addStaticText(dataManager.GetSysString(2041).c_str(), Scale(10, 30, 110, 50), false, false, wRoomListPlaceholder, -1, false); // 2041 = Server:
-	statictext->setOverrideColor(SColor(255, 255, 255, 255));
+	statictext->setOverrideColor(roomlistcolor);
 	serverChoice = env->addComboBox(Scale(90, 25, 385, 50), wRoomListPlaceholder, SERVER_CHOICE);
 
 	//online nickname
 	statictext = env->addStaticText(dataManager.GetSysString(1220).c_str(), Scale(10, 60, 110, 80), false, false, wRoomListPlaceholder, -1, false); // 1220 = Nickname:
-	statictext->setOverrideColor(SColor(255, 255, 255, 255));
+	statictext->setOverrideColor(roomlistcolor);
 	ebNickNameOnline = env->addEditBox(gameConf.nickname.c_str(), Scale(90, 55, 275, 80), true, wRoomListPlaceholder, EDITBOX_NICKNAME);
 
 	//top right host online game button
@@ -918,14 +921,14 @@ bool Game::Initialize() {
 	vsstring = env->addStaticText(L"vs.", Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring->setOverrideColor(SColor(255, 255, 255, 255));
+	vsstring->setOverrideColor(roomlistcolor);
 	ebOnlineTeam2 = env->addEditBox(L"0", Scale(200 + (392 - 140), 55, 230 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam2->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	vsstring = env->addStaticText(L"Best of", Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring->setOverrideColor(SColor(255, 255, 255, 255));
+	vsstring->setOverrideColor(roomlistcolor);
 	ebOnlineBestOf = env->addEditBox(L"0", Scale(285 + (392 - 140), 55, 315 + (392 - 140), 80), true, wRoomListPlaceholder);
 	ebOnlineBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineBestOf->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
@@ -935,7 +938,7 @@ bool Game::Initialize() {
 
 	//filter rooms textbox
 	ebRoomNameText = env->addStaticText(dataManager.GetSysString(2021).c_str(), Scale(572, 30, 682, 50), false, false, wRoomListPlaceholder); //2021 = Filter: 
-	ebRoomNameText->setOverrideColor(SColor(255, 255, 255, 255));
+	ebRoomNameText->setOverrideColor(roomlistcolor);
 	ebRoomName = env->addEditBox(L"", Scale(642, 25, 782, 50), true, wRoomListPlaceholder, EDIT_ONLINE_ROOM_NAME); //filter textbox
 	ebRoomName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebRoomNameText->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
@@ -943,12 +946,12 @@ bool Game::Initialize() {
 
 	//show locked rooms checkbox
 	chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 800, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, dataManager.GetSysString(1994).c_str());
-	chkShowPassword->setName(L"White");
+	((CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
 	chkShowPassword->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show active rooms checkbox
 	chkShowActiveRooms = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 800, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, dataManager.GetSysString(1985).c_str());
-	chkShowActiveRooms->setName(L"White");
+	((CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
 	chkShowActiveRooms->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show all rooms in a table
@@ -1926,6 +1929,27 @@ void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 	queued_msg = text;
 	queued_caption = caption;
 	popupCheck.unlock();
+}
+irr::video::SColor Game::GetSkinColor(const std::wstring& value, irr::video::SColor default) {
+	static const std::map<std::wstring, const wchar_t*> alias = {
+		{L"stInfo", L"CARDINFO_TYPES_COLOR"},
+		{L"stDataInfo", L"CARDINFO_STATS_COLOR"},
+		{L"stSetName", L"CARDINFO_ARCHETYPE_TEXT_COLOR"},
+		{L"roomlist", L"ROOMLIST_TEXTS_COLOR"},
+		{L"normal_room", L"ROOMLIST_NORMAL_ROOM"},
+		{L"custom_room", L"ROOMLIST_CUSTOM_ROOM"},
+		{L"started_room", L"ROOMLIST_STARTED_ROOM"},
+		{L"hovered_zone", L"DUELFIELD_HOVERED"},
+		{L"linked_zone", L"DUELFIELD_LINKED"},
+		{L"mutual_linked_zone", L"DUELFIELD_MUTUAL_LINKED"},
+		{L"selectable_field", L"DUELFIELD_SELECTABLE_FIELD_OUTLINE"},
+		{L"selectable_card", L"DUELFIELD_SELECTABLE_CARD_OUTLINE"},
+		{L"highlighting_card", L"DUELFIELD_HIGHLIGHTING_CARD_OUTLINE"}
+	};
+	auto found = alias.find(value.c_str());
+	if(found != alias.end())
+		std::wcout << found->second << std::endl;
+	return mainGame->skinSystem ? (mainGame->skinSystem->getCustomColor(found != alias.end() ? found->second : value.c_str(), default)) : default;
 }
 uint8 Game::LocalPlayer(uint8 player) {
 	return dInfo.isFirst ? player : 1 - player;

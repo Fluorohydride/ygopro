@@ -133,6 +133,8 @@ public:
 		const core::rect<s32>& pos, const core::rect<s32>* clip = 0);
 	virtual void setProperty(core::stringw key, core::stringw value);
 	virtual core::stringw getProperty(core::stringw key);
+	virtual void setCustomColor(core::stringw key, video::SColor value);
+	virtual video::SColor getCustomColor(core::stringw key, video::SColor fallback = NULL);
 
 private:
     void drawElementStyle( const SImageGUIElementStyle& elem, const core::rect<s32>& rect, const core::rect<s32>* clip, video::SColor* color=0 );
@@ -142,6 +144,7 @@ private:
     SImageGUISkinConfig Config;
 	
 	core::map<core::stringw,core::stringw> properties;
+	core::map<core::stringw, video::SColor> custom_colors;
 };
 
 }

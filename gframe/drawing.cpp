@@ -5,11 +5,15 @@
 #include "duelclient.h"
 
 namespace ygo {
-#define CONVERT_COLOR(col) (int)std::round((col + 1.0f) * (255.0f / 2.0f))
-#define CONVERT_ALPHA(col) (int)std::round((col + 1.0f) * 2.0f)
-void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv) {
+void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color) {
 	if(false) {
 		float origin[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float cv[4];
+		SColorf conv(color);
+		cv[3] = conv.getAlpha();
+		cv[0] = conv.getRed();
+		cv[1] = conv.getGreen();
+		cv[2] = conv.getBlue();
 		glLineWidth(width);
 		glLineStipple(1, linePatternGL);
 		if(strip)
@@ -26,7 +30,6 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 		glDisable(GL_LINE_STIPPLE);
 		glEnable(GL_TEXTURE_2D);
 	} else {
-		irr::video::SColor color(CONVERT_ALPHA(cv[3]), CONVERT_COLOR(cv[0]), CONVERT_COLOR(cv[1]), CONVERT_COLOR(cv[2]));
 		driver->setMaterial(matManager.mOutLine);
 		if(strip) {
 			if(linePatternD3D < 15) {
@@ -146,26 +149,26 @@ void Game::DrawBackGround() {
 	driver->setMaterial(matManager.mBackLine);
 	//select field
 	if(dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD) {
-		float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};
+		irr::video::SColor outline_color = GetSkinColor(L"selectable_field", SColor(255, 0, 0, 255));
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(matManager.vFieldMzone[0][i], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldMzone[0][i], !(dField.selected_field & filter), 2, outline_color);
 		}
 		filter = 0x100;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(matManager.vFieldSzone[0][i][field][speed], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldSzone[0][i][field][speed], !(dField.selected_field & filter), 2, outline_color);
 		}
 		filter = 0x10000;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(matManager.vFieldMzone[1][i], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldMzone[1][i], !(dField.selected_field & filter), 2, outline_color);
 		}
 		filter = 0x1000000;
 		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
-				DrawSelectionLine(matManager.vFieldSzone[1][i][field][speed], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(matManager.vFieldSzone[1][i][field][speed], !(dField.selected_field & filter), 2, outline_color);
 		}
 	}
 	//disabled field
@@ -235,7 +238,7 @@ void Game::DrawBackGround() {
 			selFieldAlpha = 205;
 			selFieldDAlpha = -10;
 		}
-		matManager.mSelField.AmbientColor = 0xffffffff;
+		matManager.mSelField.AmbientColor = GetSkinColor(L"hovered_zone", SColor(255, 255, 255, 255));
 		matManager.mSelField.DiffuseColor = (int)std::round(selFieldAlpha) << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
@@ -363,10 +366,10 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	}
 }
 bool Game::CheckMutual(ClientCard* pcard, int mark) {
-	matManager.mSelField.AmbientColor = 0xff0261a2;
+	matManager.mSelField.AmbientColor = GetSkinColor(L"linked_zone", SColor(255, 2, 97, 162));
 	driver->setMaterial(matManager.mSelField);
 	if (pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
-		matManager.mSelField.AmbientColor = 0xff009900;
+		matManager.mSelField.AmbientColor = GetSkinColor(L"mutual_linked_zone", SColor(255, 0, 153, 0));
 		driver->setMaterial(matManager.mSelField);
 		return true;
 	}
@@ -432,18 +435,18 @@ void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->is_moving)
 		return;
 	if(pcard->is_selectable && (pcard->location & 0xe)) {
-		float cv[4] = {1.0f, 1.0f, 0.0f, 1.0f};
+		irr::video::SColor outline_color = GetSkinColor(L"selectable_card", SColor(255, 255, 255, 0));
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
-			DrawSelectionLine(matManager.vCardOutline, !pcard->is_selected, 2, cv);
+			DrawSelectionLine(matManager.vCardOutline, !pcard->is_selected, 2, outline_color);
 		else
-			DrawSelectionLine(matManager.vCardOutliner, !pcard->is_selected, 2, cv);
+			DrawSelectionLine(matManager.vCardOutliner, !pcard->is_selected, 2, outline_color);
 	}
 	if(pcard->is_highlighting) {
-		float cv[4] = {0.0f, 1.0f, 1.0f, 1.0f};
+		irr::video::SColor outline_color = GetSkinColor(L"highlighting_card", SColor(255, 0, 255, 255));
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
-			DrawSelectionLine(matManager.vCardOutline, true, 2, cv);
+			DrawSelectionLine(matManager.vCardOutline, true, 2, outline_color);
 		else
-			DrawSelectionLine(matManager.vCardOutliner, true, 2, cv);
+			DrawSelectionLine(matManager.vCardOutliner, true, 2, outline_color);
 	}
 	irr::core::matrix4 im;
 	im.setTranslation(pcard->curPos);

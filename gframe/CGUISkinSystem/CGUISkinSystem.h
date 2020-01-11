@@ -25,6 +25,7 @@ private :
 	bool checkSkinColor(gui::EGUI_DEFAULT_COLOR colToSet,const wchar_t *context,gui::CImageGUISkin *skin);
 	bool checkSkinSize(gui::EGUI_DEFAULT_SIZE sizeToSet,const wchar_t *context,const wchar_t *key,gui::CImageGUISkin *skin);
 	bool loadProperty(core::stringw key,gui::CImageGUISkin *skin);
+	bool loadCustomColors(gui::CImageGUISkin *skin);
 public:
 	// Constructor
 	// path = Path to skins
@@ -37,6 +38,7 @@ public:
 	gui::CGUIProgressBar *addProgressBar(gui::IGUIElement *parent,core::rect<s32> rect,bool bindColorsToSkin=true);
 	// Gets property from current skin
 	core::stringw getProperty(core::stringw key);	
+	video::SColor getCustomColor(core::stringw key, video::SColor fallback = NULL);
 	bool populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname);
 	
 };
