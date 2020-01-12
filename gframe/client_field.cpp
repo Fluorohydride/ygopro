@@ -18,6 +18,8 @@ ClientField::ClientField() {
 	hovered_controler = 0;
 	hovered_location = 0;
 	hovered_sequence = 0;
+	selectable_field = 0;
+	selected_field = 0;
 	deck_act = false;
 	grave_act = false;
 	remove_act = false;

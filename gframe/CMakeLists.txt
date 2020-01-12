@@ -48,6 +48,12 @@ else ()
     target_link_libraries (ygopro ${CMAKE_THREAD_LIBS_INIT} ${DL_LIBRARIES})
 endif ()
 
+if (APPLE)
+    find_library(COCOA_LIBRARY Cocoa)
+    find_library(IOKIT_LIBRARY IOKit)
+    target_link_libraries(ygopro ${COCOA_LIBRARY} ${IOKIT_LIBRARY})
+endif ()
+
 if (USE_IRRKLANG)
     add_definitions ( "-DYGOPRO_USE_IRRKLANG" )
     if (MSVC)
