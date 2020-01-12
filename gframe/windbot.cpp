@@ -4,6 +4,9 @@
 #else
 #include <unistd.h>
 #endif
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 #include <fmt/format.h>
 #include "bufferio.h"
 
@@ -31,6 +34,11 @@ bool WindBot::Launch(int port, bool chat, int hand) const {
 	}
 	return false;
 #else
+#ifdef __ANDROID__
+	std::string param = fmt::format("Deck={} Port={} Version={} Name='[AI] {}' Chat={} Hand={}", BufferIO::EncodeUTF8s(deck).c_str(), port, version, BufferIO::EncodeUTF8s(name).c_str(), chat ? 1 : 0, hand);
+	porting::launchWindbot(param);
+	return true;
+#else
 	int pid = fork();
 	if (pid == 0) {
 		std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck).c_str());
@@ -47,6 +55,7 @@ bool WindBot::Launch(int port, bool chat, int hand) const {
 		exit(EXIT_FAILURE);
 	}
 	return pid > 0;
+#endif
 #endif
 }
 

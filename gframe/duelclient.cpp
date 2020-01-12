@@ -7,6 +7,9 @@
 #include "replay.h"
 #include "replay_mode.h"
 #include <algorithm>
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 
 namespace ygo {
 
@@ -3977,11 +3980,18 @@ void DuelClient::BeginRefreshHost() {
 	remotes.clear();
 	hosts.clear();
 	event_base* broadev = event_base_new();
+#ifdef __ANDROID__
+	int ipaddr = porting::getLocalIP();
+	if(ipaddr == -1) {
+		return;
+	}
+#else
 	char hname[256];
 	gethostname(hname, 256);
 	hostent* host = gethostbyname(hname);
 	if(!host)
 		return;
+#endif
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
 	memset(&reply_addr, 0, sizeof(reply_addr));
@@ -4006,6 +4016,22 @@ void DuelClient::BeginRefreshHost() {
 	sockTo.sin_port = htons(7920);
 	HostRequest hReq;
 	hReq.identifier = NETWORK_CLIENT_ID;
+#ifdef __ANDROID__
+	local.sin_addr.s_addr = ipaddr;
+	SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if(sSend == INVALID_SOCKET)
+		return;
+	BOOL opt = TRUE;
+	setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt,
+			   sizeof(BOOL));
+	if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
+		closesocket(sSend);
+		return;
+	}
+	sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0,
+		(sockaddr*)&sockTo, sizeof(sockaddr));
+	closesocket(sSend);
+#else
 	for(int i = 0; i < 8; ++i) {
 		if(host->h_addr_list[i] == 0)
 			break;
@@ -4023,6 +4049,7 @@ void DuelClient::BeginRefreshHost() {
 		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
 		closesocket(sSend);
 	}
+#endif
 }
 int DuelClient::RefreshThread(event_base* broadev) {
 	event_base_dispatch(broadev);

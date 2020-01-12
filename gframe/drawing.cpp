@@ -7,6 +7,7 @@
 namespace ygo {
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color) {
 	if(false) {
+#ifndef __ANDROID__
 		float origin[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		float cv[4];
 		SColorf conv(color);
@@ -29,7 +30,11 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 		glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
 		glDisable(GL_LINE_STIPPLE);
 		glEnable(GL_TEXTURE_2D);
+#endif
 	} else {
+#ifdef __ANDROID__
+		glLineWidth(width + 2);
+#endif
 		driver->setMaterial(matManager.mOutLine);
 		if(strip) {
 			if(linePatternD3D < 15) {
@@ -376,6 +381,8 @@ bool Game::CheckMutual(ClientCard* pcard, int mark) {
 	return false;
 }
 void Game::DrawCards() {
+	for(auto& pcard : dField.overlay_cards)
+		DrawCard(pcard);
 	for(int p = 0; p < 2; ++p) {
 		for(auto& pcard : dField.mzone[p])
 			if(pcard)
@@ -394,8 +401,6 @@ void Game::DrawCards() {
 		for(auto& pcard : dField.extra[p])
 			DrawCard(pcard);
 	}
-	for(auto& pcard : dField.overlay_cards)
-		DrawCard(pcard);
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame > 0) {

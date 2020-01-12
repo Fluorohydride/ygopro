@@ -12,8 +12,13 @@
 #include "IVideoDriver.h"
 #include "IGUIFont.h"
 #include "IGUISpriteBank.h"
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+#include "../IrrlichtCommonIncludes1.9/CGUIScrollBar.h"
+#include "../IrrlichtCommonIncludes1.9/os.h"
+#else
 #include "../IrrlichtCommonIncludes/CGUIScrollBar.h"
 #include "../IrrlichtCommonIncludes/os.h"
+#endif
 #include "../utils.h"
 
 namespace irr {
@@ -28,7 +33,8 @@ CGUIFileSelectListBox::CGUIFileSelectListBox(IGUIEnvironment* environment, IGUIE
 	TotalItemHeight(0), ItemsIconWidth(0), Font(0), IconBank(0),
 	ScrollBar(0), selectTime(0), LastKeyTime(0), Selecting(false), DrawBack(drawBack),
 	MoveOverSelect(moveOverSelect), AutoScroll(true), HighlightWhenNotFocused(true),
-	filesystem(filesystem), basePath(0), curRelPath(0), TotalFolders(0), filter(0) {
+	filesystem(filesystem), basePath(0), curRelPath(0), TotalFolders(0), filter(0),
+	NativeDirectoryHandling(false) {
 #ifdef _DEBUG
 	setDebugName("CGUIFileSelectListBox");
 #endif
@@ -84,6 +90,7 @@ u32 CGUIFileSelectListBox::getItemCount() const {
 const wchar_t* CGUIFileSelectListBox::getListItem(u32 id) const {
 	return getListItem(id, false);
 }
+
 const wchar_t* CGUIFileSelectListBox::getListItem(u32 id, bool relativepath) const {
 	id += TotalFolders;
 	if(id >= Items.size())
@@ -389,7 +396,7 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 
 						return true;
 					}
-
+#ifndef __ANDROID__
 					case EMIE_MOUSE_MOVED:
 						if(Selecting || MoveOverSelect) {
 							if(isPointInside(p)) {
@@ -397,6 +404,7 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 								return true;
 							}
 						}
+#endif
 					default:
 						break;
 				}
@@ -413,6 +421,22 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 	return IGUIElement::OnEvent(event);
 }
 
+bool CGUIFileSelectListBox::isDirectory(u32 index) {
+	return index >= 0 && index < Items.size() && Items[index].isDirectory;
+}
+
+void CGUIFileSelectListBox::enterDirectory(u32 index) {
+	if(!isDirectory(index))
+		return;
+	u32 now = os::Timer::getTime();
+	selectTime = now;
+	curRelPath = Items[index].reltext;
+	Selected = -1;
+	if(ScrollBar)
+		ScrollBar->setPos(0);
+	LoadFolderContents();
+}
+
 void CGUIFileSelectListBox::selectNew(s32 ypos, bool onlyHover) {
 	u32 now = os::Timer::getTime();
 	s32 oldSelected = Selected;
@@ -426,13 +450,8 @@ void CGUIFileSelectListBox::selectNew(s32 ypos, bool onlyHover) {
 	bool selagain = Selected >=0 && (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
 	prevRelPath = curRelPath;
 	selectTime = now;
-	if(selagain && Items[Selected].isDirectory) {
-		selectTime = now;
-		curRelPath = Items[Selected].reltext;
-		Selected = -1;
-		if(ScrollBar)
-			ScrollBar->setPos(0);
-		LoadFolderContents();
+	if(selagain && Items[Selected].isDirectory && NativeDirectoryHandling) {
+		enterDirectory(Selected);
 		return;
 	}
 
@@ -639,7 +658,8 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 		ListItem item;
 		item.reltext = ygo::Utils::NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name, false).c_str();
 		if(is_directory) {
-			TotalFolders++;
+			if(NativeDirectoryHandling)
+				TotalFolders++;
 			item.reltext += L"/";
 			name = L"[" + name + L"]";
 		}
@@ -829,6 +849,13 @@ void CGUIFileSelectListBox::setDrawBackground(bool draw) {
 	DrawBack = draw;
 }
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+IGUIScrollBar* CGUIFileSelectListBox::getVerticalScrollBar() const {
+	return ScrollBar;
+}
+#endif
+
+
 void CGUIFileSelectListBox::refreshList() {
 	LoadFolderContents();
 }
@@ -867,6 +894,10 @@ bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory, 
 	if(std::find(filtered_extensions.begin(), filtered_extensions.end(), extension) == filtered_extensions.end())
 		return false;
 	return true;
+}
+
+void CGUIFileSelectListBox::nativeDirectory(bool native_directory) {
+	NativeDirectoryHandling = native_directory;
 }
 
 } // end namespace gui

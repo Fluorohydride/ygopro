@@ -6,6 +6,9 @@
 #include "game.h"
 #include "duelclient.h"
 #include "single_mode.h"
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 #include <algorithm>
 #include <unordered_map>
 
@@ -134,6 +137,12 @@ void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
+#ifdef __ANDROID__
+	irr::SEvent transferEvent;
+	if(porting::transformEvent(event)) {
+		return true;
+	}
+#endif
 	if(mainGame->dField.OnCommonEvent(event))
 		return false;
 	switch(event.EventType) {
@@ -233,7 +242,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->removeItem(sel);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->addItem(dname));
 				} else {
-					mainGame->stACMessage->setText(dataManager.GetSysString(1359).c_str());
+					mainGame->stACMessage->setText(dataManager.GetSysString(1364).c_str());
 					mainGame->PopupElement(mainGame->wACMessage, 30);
 				}
 				break;

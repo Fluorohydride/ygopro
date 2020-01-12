@@ -12,6 +12,10 @@
 #include <sys/stat.h>
 #endif
 
+#ifndef TEXT
+#define TEXT _IRR_TEXT
+#endif
+
 using path_string = std::basic_string<irr::fschar_t>;
 
 namespace ygo {

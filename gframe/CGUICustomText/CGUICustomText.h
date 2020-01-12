@@ -48,6 +48,9 @@ namespace gui
 		//! destructor
 		virtual ~CGUICustomText();
 
+		//! called if an event happened.
+		virtual bool OnEvent(const SEvent& event);
+
 		//! draws the element and its children
 		virtual void draw();
 
