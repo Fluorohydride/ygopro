@@ -558,6 +558,7 @@ public:
 	irr::gui::IGUIButton* btnSaveDeck;
 	irr::gui::IGUIButton* btnDeleteDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
+	irr::gui::IGUIButton* btnRenameDeck;
 	irr::gui::IGUIButton* btnSideOK;
 	irr::gui::IGUIButton* btnSideShuffle;
 	irr::gui::IGUIButton* btnSideSort;

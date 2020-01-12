@@ -60,6 +60,7 @@ public:
 	bool SaveDeck(Deck& deck, const path_string& name);
 	bool SaveDeck(const path_string& name, std::vector<int> mainlist, std::vector<int>extralist, std::vector<int> sidelist);
 	bool DeleteDeck(Deck& deck, const path_string& name);
+	bool RenameDeck(const path_string& oldname, const path_string& newname);
 };
 
 extern DeckManager deckManager;

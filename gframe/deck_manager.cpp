@@ -381,4 +381,7 @@ bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, s
 bool DeckManager::DeleteDeck(Deck& deck, const path_string& name) {
 	return Utils::Deletefile(fmt::format(TEXT("./deck/{}.ydk"), name.c_str()));
 }
+bool DeckManager::RenameDeck(const path_string& oldname, const path_string& newname) {
+	return Utils::Movefile(TEXT("./deck/") + oldname + TEXT(".ydk"), TEXT("./deck/") + newname + TEXT(".ydk"));
+}
 }

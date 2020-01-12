@@ -395,7 +395,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.lock();
-				mainGame->wReplaySave->setText(dataManager.GetSysString(1364).c_str());
+				mainGame->wReplaySave->setText(dataManager.GetSysString(1362).c_str());
 				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
 				mainGame->PopupElement(mainGame->wReplaySave);
 				mainGame->gMutex.unlock();
