@@ -1073,6 +1073,8 @@ void Game::MainLoop() {
 					continue;
 				}
 				script_dirs.insert(script_dirs.begin(), Utils::ParseFilename(repo.script_path));
+				auto script_subdirs = Utils::FindSubfolders(Utils::ParseFilename(repo.script_path));
+				script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
 				pic_dirs.insert(pic_dirs.begin(), Utils::ParseFilename(repo.pics_path));
 				auto data_path = Utils::ParseFilename(repo.data_path);
 				auto files = Utils::FindfolderFiles(data_path, { TEXT("cdb") }, 0);
