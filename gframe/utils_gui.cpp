@@ -3,7 +3,7 @@
 #include <vector>
 #include "../irrlicht/src/CIrrDeviceWin32.h"
 #include "logging.h"
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #elif defined(__APPLE__)
@@ -13,10 +13,12 @@
 namespace ygo {
 
 void GUIUtils::ChangeCursor(irr::IrrlichtDevice* device, irr::gui::ECURSOR_ICON icon) {
+#ifndef __ANDROID__
 	auto cursor = device->getCursorControl();
 	if (cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);
 	}
+#endif
 }
 
 void GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
@@ -84,7 +86,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 
 	SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 	static_cast<irr::CIrrDeviceWin32::CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
-#elif defined(__linux__)
+#elif defined(__linux__) && !defined(__ANDROID__)
 	struct {
 		unsigned long   flags;
 		unsigned long   functions;

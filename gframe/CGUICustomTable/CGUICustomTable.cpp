@@ -1131,6 +1131,55 @@ s32 CGUICustomTable::getDrawFlags() const
 	return DrawFlags;
 }
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+
+//! Sets another skin independent font.
+void CGUICustomTable::setOverrideFont(IGUIFont* font) {
+	if(OverrideFont == font)
+		return;
+
+	if(OverrideFont)
+		OverrideFont->drop();
+
+	OverrideFont = font;
+
+	if(OverrideFont)
+		OverrideFont->grab();
+
+	refreshControls();
+}
+
+//! Gets the override font (if any)
+IGUIFont * CGUICustomTable::getOverrideFont() const {
+	return OverrideFont;
+}
+
+//! Get the font which is used right now for drawing
+IGUIFont* CGUICustomTable::getActiveFont() const {
+	if(OverrideFont)
+		return OverrideFont;
+	IGUISkin* skin = Environment->getSkin();
+	if(skin)
+		return skin->getFont();
+	return 0;
+}
+
+//! Get the height of items/rows
+s32 CGUICustomTable::getItemHeight() const {
+	return ItemHeight;
+}
+
+//! Access the vertical scrollbar
+IGUIScrollBar* CGUICustomTable::getVerticalScrollBar() const {
+	return VerticalScrollBar;
+}
+
+//! Access the horizontal scrollbar
+IGUIScrollBar* CGUICustomTable::getHorizontalScrollBar() const {
+	return HorizontalScrollBar;
+}
+#endif
+
 
 //! Writes attributes of the element.
 void CGUICustomTable::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const

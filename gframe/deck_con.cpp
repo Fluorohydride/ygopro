@@ -6,6 +6,9 @@
 #include "game.h"
 #include "duelclient.h"
 #include "single_mode.h"
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 #include <algorithm>
 #include <unordered_map>
 
@@ -134,6 +137,12 @@ void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
+#ifdef __ANDROID__
+	irr::SEvent transferEvent;
+	if(porting::transformEvent(event)) {
+		return true;
+	}
+#endif
 	if(mainGame->dField.OnCommonEvent(event))
 		return false;
 	switch(event.EventType) {
@@ -191,9 +200,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 				}
-				if(sel >= 0)
-					mainGame->cbDBDecks->setSelected(sel);
-				else {
+				if(sel >= 0) {
+					mainGame->stACMessage->setText(dataManager.GetSysString(1339).c_str());
+					mainGame->PopupElement(mainGame->wACMessage, 30);
+					break;
+				} else {
 					mainGame->cbDBDecks->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
@@ -212,6 +223,28 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.unlock();
 				prev_operation = id;
+				break;
+			}
+			case BUTTON_RENAME_DECK: {
+				int sel = mainGame->cbDBDecks->getSelected();
+				const wchar_t* dname = mainGame->ebDeckname->getText();
+				if(sel == -1 || *dname == 0 || !wcscmp(dname, mainGame->cbDBDecks->getItem(sel)))
+					break;
+				for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
+					if(i == sel)continue;
+					if(!wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
+						mainGame->stACMessage->setText(dataManager.GetSysString(1339).c_str());
+						mainGame->PopupElement(mainGame->wACMessage, 30);
+						return false;
+					}
+				}
+				if(deckManager.RenameDeck(Utils::ParseFilename(mainGame->cbDBDecks->getItem(sel)), Utils::ParseFilename(dname))) {
+					mainGame->cbDBDecks->removeItem(sel);
+					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->addItem(dname));
+				} else {
+					mainGame->stACMessage->setText(dataManager.GetSysString(1364).c_str());
+					mainGame->PopupElement(mainGame->wACMessage, 30);
+				}
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {

@@ -1,10 +1,33 @@
 #ifdef YGOPRO_BUILD_DLL
 #include "dllinterface.h"
 #include <string>
+#include "utils.h"
 #ifdef _WIN32
 #include <Windows.h>
 #else
+#ifdef __ANDROID__
+#include <fstream>
+#include "porting_android.h"
+#endif
 #include <dlfcn.h>
+#endif
+
+#ifdef _WIN32
+#define CORENAME TEXT("ocgcore.dll")
+#elif defined(__APPLE__)
+#define CORENAME TEXT("libocgcore.dylib")
+#elif defined(__ANDROID__)
+#if defined(__arm__)
+#define CORENAME TEXT("libocgcorev7.so")
+#elif defined(__i386__)
+#define CORENAME TEXT("libocgcorex86.so")
+#elif defined(__aarch64__)
+#define CORENAME TEXT("libocgcorev8.so")
+#elif defined(__x86_64__)
+#define CORENAME TEXT("libocgcorex64.so")
+#endif
+#else
+#define CORENAME TEXT("libocgcore.so")
 #endif
 
 void(*OCG_GetVersion)(int* major, int* minor) = nullptr;
@@ -45,7 +68,7 @@ CREATE_CLONE(OCG_DuelQueryField)
 
 #ifdef _WIN32
 void* OpenLibrary(const std::basic_string<TCHAR>& path) {
-	return LoadLibrary((path + TEXT("ocgcore.dll")).c_str());
+	return LoadLibrary((path + CORENAME).c_str());
 }
 void CloseLibrary(void* handle) {
 	FreeLibrary((HMODULE)handle);
@@ -56,10 +79,19 @@ void CloseLibrary(void* handle) {
 #else
 
 void* OpenLibrary(const std::string& path) {
-#ifdef __APPLE__
-	return dlopen((path + "libocgcore.dylib").c_str(), RTLD_LAZY);
+#ifdef __ANDROID__
+	void* lib = nullptr;
+	const auto dest_dir = porting::internal_storage + TEXT("/libocgcore.so");
+	std::ifstream  src(path + CORENAME, std::ios::binary);
+	std::ofstream  dst(dest_dir, std::ios::binary);
+	dst << src.rdbuf();
+	dst.close();
+	src.close();
+	lib = dlopen(dest_dir.c_str(), RTLD_LAZY);
+	remove(dest_dir.c_str());
+	return lib;
 #else
-	return dlopen((path + "libocgcore.so").c_str(), RTLD_LAZY);
+	return dlopen((path + CORENAME).c_str(), RTLD_LAZY);
 #endif
 }
 

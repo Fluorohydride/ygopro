@@ -299,7 +299,7 @@ void Replay::ParseStream() {
 			continue;
 		}
 		if(p.message == OLD_REPLAY_MODE && !yrp) {
-			yrp = std::make_unique<Replay>();
+			yrp = std::unique_ptr<Replay>(new Replay());
 			yrp->OpenReplayFromBuffer(p.data);
 			continue;
 		}

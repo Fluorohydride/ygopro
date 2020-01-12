@@ -98,14 +98,17 @@ bool DataManager::LoadStrings(const path_string& file) {
 		pos = str.find(' ');
 		auto value = str.substr(0, pos);
 		str = str.substr(pos + 1);
-		if(type == "system")
-			_sysStrings[std::stoi(value)] = BufferIO::DecodeUTF8s(str);
-		else if(type == "victory")
-			_victoryStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
-		else if(type == "counter")
-			_counterStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
-		else if(type == "setname")
-			_setnameStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+		try {
+			if(type == "system")
+				_sysStrings[std::stoi(value)] = BufferIO::DecodeUTF8s(str);
+			else if(type == "victory")
+				_victoryStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+			else if(type == "counter")
+				_counterStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+			else if(type == "setname")
+				_setnameStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+		}
+		catch(...) {}
 	}
 	string_file.close();
 	return true;

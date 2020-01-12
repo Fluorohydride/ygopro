@@ -7,6 +7,9 @@
 #include "replay.h"
 #include "replay_mode.h"
 #include <algorithm>
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 
 namespace ygo {
 
@@ -174,18 +177,17 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->gameConf.lastlflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-			cscg.info.duel_rule = mainGame->GetMasterRule(mainGame->duel_param, mainGame->forbiddentypes);
+			cscg.info.duel_rule = 0;
 			cscg.info.duel_flag = mainGame->duel_param;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.handshake = SERVER_HANDSHAKE;
-			cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
-			cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
-			try {
-				cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText());
-			} catch(...) {
-				cscg.info.best_of = 1;
-			}
+			try { cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText()); }
+			catch(...) { cscg.info.team1 = 1; }
+			try { cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText()); }
+			catch(...) { cscg.info.team2 = 1; }
+			try { cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText()); }
+			catch(...) { cscg.info.best_of = 1; }
 			if(mainGame->btnRelayMode->isPressed()) {
 				cscg.info.duel_flag |= DUEL_RELAY;
 			}
@@ -576,7 +578,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		} else {
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt->info.duel_flag, pkt->info.forbiddentypes, &rule);
 		}
-		if (rule == 5) {
+		if (rule == 6) {
 			uint32_t filter = 0x100;
 			for (int i = 0; i < 6; ++i, filter <<= 1)
 				if (pkt->info.duel_flag & filter) {
@@ -2449,7 +2451,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		PLAY_SOUND(SoundManager::SFX::NEXT_TURN);
 		uint8_t player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		mainGame->dInfo.turn++;
-		if(!mainGame->dInfo.isReplay && mainGame->dInfo.player_type < (mainGame->dInfo.team1 + mainGame->dInfo.team2)) {
+		if(!mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode && mainGame->dInfo.player_type < (mainGame->dInfo.team1 + mainGame->dInfo.team2)) {
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351).c_str());
 			mainGame->btnLeaveGame->setVisible(true);
 		}
@@ -3978,11 +3980,18 @@ void DuelClient::BeginRefreshHost() {
 	remotes.clear();
 	hosts.clear();
 	event_base* broadev = event_base_new();
+#ifdef __ANDROID__
+	int ipaddr = porting::getLocalIP();
+	if(ipaddr == -1) {
+		return;
+	}
+#else
 	char hname[256];
 	gethostname(hname, 256);
 	hostent* host = gethostbyname(hname);
 	if(!host)
 		return;
+#endif
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
 	memset(&reply_addr, 0, sizeof(reply_addr));
@@ -4007,6 +4016,22 @@ void DuelClient::BeginRefreshHost() {
 	sockTo.sin_port = htons(7920);
 	HostRequest hReq;
 	hReq.identifier = NETWORK_CLIENT_ID;
+#ifdef __ANDROID__
+	local.sin_addr.s_addr = ipaddr;
+	SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if(sSend == INVALID_SOCKET)
+		return;
+	BOOL opt = TRUE;
+	setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt,
+			   sizeof(BOOL));
+	if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
+		closesocket(sSend);
+		return;
+	}
+	sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0,
+		(sockaddr*)&sockTo, sizeof(sockaddr));
+	closesocket(sSend);
+#else
 	for(int i = 0; i < 8; ++i) {
 		if(host->h_addr_list[i] == 0)
 			break;
@@ -4024,6 +4049,7 @@ void DuelClient::BeginRefreshHost() {
 		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
 		closesocket(sSend);
 	}
+#endif
 }
 int DuelClient::RefreshThread(event_base* broadev) {
 	event_base_dispatch(broadev);
@@ -4068,13 +4094,13 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 				mainGame->GetMasterRule(pHP->host.duel_flag & ~DUEL_RELAY, pHP->host.forbiddentypes, &rule);
 			} else
 				rule = pHP->host.duel_rule;
-			if(rule == 5)
+			if(rule == 6)
 				hoststr.append(L"Custom MR");
 			else
 				hoststr.append(fmt::format(L"MR {}", (rule == 0) ? 3 : rule));
 			hoststr.append(L"][");
 			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
-					&& !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck 
+					&& !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck
 					&& rule == DEFAULT_DUEL_RULE && pHP->host.extra_rules==0)
 				hoststr.append(dataManager.GetSysString(1280));
 			else hoststr.append(dataManager.GetSysString(1281));

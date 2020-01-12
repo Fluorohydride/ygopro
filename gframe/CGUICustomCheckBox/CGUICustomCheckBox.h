@@ -30,6 +30,23 @@ namespace gui
 		//! returns if box is checked
 		virtual bool isChecked() const;
 
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+
+		//! Sets whether to draw the background
+		virtual void setDrawBackground(bool draw) _IRR_OVERRIDE_;
+
+		//! Checks if background drawing is enabled
+		/** \return true if background drawing is enabled, false otherwise */
+		virtual bool isDrawBackgroundEnabled() const _IRR_OVERRIDE_;
+
+		//! Sets whether to draw the border
+		virtual void setDrawBorder(bool draw) _IRR_OVERRIDE_;
+
+		//! Checks if border drawing is enabled
+		/** \return true if border drawing is enabled, false otherwise */
+		virtual bool isDrawBorderEnabled() const _IRR_OVERRIDE_;
+#endif
+
 		//! called if an event happened.
 		virtual bool OnEvent(const SEvent& event);
 
@@ -42,11 +59,16 @@ namespace gui
 		//! Reads attributes of the element
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
 
+		virtual void setColor(video::SColor color);
+
 	private:
 
 		u32 checkTime;
 		bool Pressed;
 		bool Checked;
+		video::SColor override_color;
+		bool Border;
+		bool Background;
 	};
 
 } // end namespace gui

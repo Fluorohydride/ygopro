@@ -42,7 +42,9 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 		pos = str.find(" ");
 		if(pos == std::string::npos)
 			continue;
-		int code = std::stoi(str.substr(0, pos));
+		int code = 0;
+		try { code = std::stoi(str.substr(0, pos)); }
+		catch(...){}
 		if(!code)
 			continue;
 		str = str.substr(pos + 1);
@@ -50,7 +52,9 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 		pos = str.find(" ");
 		if(pos == std::string::npos)
 			continue;
-		int count = std::stoi(str.substr(0, pos));
+		int count = 0;
+		try { count = std::stoi(str.substr(0, pos)); }
+		catch(...) { continue; }
 		lflist.content[code] = count;
 		lflist.hash = lflist.hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 	}
@@ -214,6 +218,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, DuelAllowedCards allowedCards
 int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2) {
 	std::vector<int> mainvect;
 	std::vector<int> sidevect;
+#ifndef __ANDROID__
 	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc);
 	dbuf += mainc;
 	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec);
@@ -221,6 +226,22 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc
 	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc2);
 	dbuf += mainc2;
 	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec2);
+#else
+	auto ins = [](std::vector<int>& vec, int* start, int* end) {
+		while(start != end) {
+			vec.push_back(*start);
+			start++;
+		}
+	};
+	int* start = dbuf;
+	ins(mainvect, dbuf, dbuf + mainc);
+	dbuf += mainc;
+	ins(sidevect, dbuf, dbuf + sidec);
+	dbuf += sidec;
+	ins(mainvect, dbuf, dbuf + mainc2);
+	dbuf += mainc2;
+	ins(sidevect, dbuf, dbuf + sidec2);
+#endif
 	return LoadDeck(deck, mainvect, sidevect);
 }
 int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist) {
@@ -376,5 +397,8 @@ bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, s
 }
 bool DeckManager::DeleteDeck(Deck& deck, const path_string& name) {
 	return Utils::Deletefile(fmt::format(TEXT("./deck/{}.ydk"), name.c_str()));
+}
+bool DeckManager::RenameDeck(const path_string& oldname, const path_string& newname) {
+	return Utils::Movefile(TEXT("./deck/") + oldname + TEXT(".ydk"), TEXT("./deck/") + newname + TEXT(".ydk"));
 }
 }

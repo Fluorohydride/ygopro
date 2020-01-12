@@ -30,15 +30,22 @@ void ServerLobby::FillOnlineRooms() {
 
 	int searchRules = mainGame->cbFilterRule->getSelected();
 	int searchBanlist = mainGame->cbFilterBanlist->getSelected();
-	int bestOf = std::stoi(mainGame->ebOnlineBestOf->getText());
-	int team1 = std::stoi(mainGame->ebOnlineTeam1->getText());
-	int team2 = std::stoi(mainGame->ebOnlineTeam2->getText());
+	int bestOf = 0;
+	int team1 = 0;
+	int team2 = 0;
+	try { bestOf = std::stoi(mainGame->ebOnlineBestOf->getText()); }
+	catch(...) {}
+	try { team1 = std::stoi(mainGame->ebOnlineTeam1->getText()); }
+	catch(...) {}
+	try { team2 = std::stoi(mainGame->ebOnlineTeam2->getText()); }
+	catch(...) {}
 
 	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2 || mainGame->btnFilterRelayMode->isPressed();
 
-	SColor normal = SColor(255, 0, 0, 0);
-	SColor red = SColor(255, 255, 100, 100);
-	SColor color = normal;
+	SColor normal_room = Game::GetSkinColor(L"normal_room", SColor(255, 255, 255, 255));
+	SColor custom_room = Game::GetSkinColor(L"custom_room", SColor(255, 255, 100, 100));
+	SColor started_room = Game::GetSkinColor(L"started_room", SColor(100, 211, 211, 211));
+	SColor color;
 	bool show_password_checked = mainGame->chkShowPassword->isChecked();
 	bool show_started_checked = mainGame->chkShowActiveRooms->isChecked();
 	for(auto& room : rooms) {
@@ -94,7 +101,7 @@ void ServerLobby::FillOnlineRooms() {
 			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());
 		int rule;
 		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
-		if(rule == 5)
+		if(rule == 6)
 			roomListTable->setCellText(index, 3, "Custom");
 		else
 			roomListTable->setCellText(index, 3, fmt::format(L"MR {}", (rule == 0) ? 3 : rule).c_str());
@@ -111,11 +118,11 @@ void ServerLobby::FillOnlineRooms() {
 
 
 		if(room.started)
-			color = SColor(100, 211, 211, 211);
-		else if(rule == 4 && !room.info.no_check_deck && !room.info.no_shuffle_deck && room.info.start_lp == 8000 && room.info.start_hand == 5 && room.info.draw_count == 1)
-			color = SColor(255, 255, 255, 255);
+			color = started_room;
+		else if(rule == 5 && !room.info.no_check_deck && !room.info.no_shuffle_deck && room.info.start_lp == 8000 && room.info.start_hand == 5 && room.info.draw_count == 1)
+			color = normal_room;
 		else
-			color = red;
+			color = custom_room;
 		roomListTable->setCellColor(index, 0, color);
 		roomListTable->setCellColor(index, 1, color);
 		roomListTable->setCellColor(index, 2, color);

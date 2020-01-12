@@ -129,7 +129,7 @@ public:
 	void RefreshAiDecks();
 	void RefreshReplay();
 	void RefreshSingleplay();
-	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
+	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color);
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
@@ -165,6 +165,7 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
+	static irr::video::SColor GetSkinColor(const std::wstring& value, irr::video::SColor fallback = NULL);
 
 	uint8 LocalPlayer(uint8 player);
 	std::wstring LocalName(int local_player);
@@ -211,6 +212,7 @@ public:
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
 
+	path_string working_directory;
 	std::unique_ptr<SoundManager> soundManager;
 	std::mutex gMutex;
 	std::mutex analyzeMutex;
@@ -551,6 +553,7 @@ public:
 	irr::gui::IGUIButton* btnSaveDeck;
 	irr::gui::IGUIButton* btnDeleteDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
+	irr::gui::IGUIButton* btnRenameDeck;
 	irr::gui::IGUIButton* btnSideOK;
 	irr::gui::IGUIButton* btnSideShuffle;
 	irr::gui::IGUIButton* btnSideSort;
@@ -642,6 +645,18 @@ public:
 	irr::gui::IGUIButton* btnRPNo;
 	irr::gui::IGUIButton* btnJoinHost2;
 	irr::gui::IGUIButton* btnJoinCancel2;
+
+#ifdef __ANDROID__
+	ANDROID_APP appMain;
+	int glversion;
+	bool isPSEnabled;
+	bool isNPOTSupported;
+	s32 ogles2Solid;
+	s32 ogles2TrasparentAlpha;
+	s32 ogles2BlendTexture;
+	Signal externalSignal;
+	IGUIStaticText* fpsCounter;
+#endif
 };
 
 extern Game* mainGame;

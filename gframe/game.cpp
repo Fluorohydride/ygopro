@@ -6,6 +6,13 @@
 #include <sys/types.h>
 #include <dirent.h>
 #endif
+#ifdef __ANDROID__
+#include <COGLES2ExtensionHandler.h>
+#include <COGLESExtensionHandler.h>
+#include <COGLES2Driver.h>
+#include <COGLESDriver.h>
+#include "porting_android.h"
+#endif
 
 #include "config.h"
 #include "game.h"
@@ -25,6 +32,12 @@
 #include "logging.h"
 #include "utils_gui.h"
 
+#ifdef __ANDROID__
+#define MATERIAL_GUARD(f) do {mainGame->driver->enableMaterial2D(true); f; mainGame->driver->enableMaterial2D(false);} while(false);
+#else
+#define MATERIAL_GUARD(f) do {f;} while(false);
+#endif
+
 unsigned short PRO_VERSION = 0x1348;
 
 nlohmann::json configs;
@@ -39,32 +52,48 @@ bool Game::Initialize() {
 	is_fullscreen = false;
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
+#ifndef __ANDROID__
 #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
 	if(gameConf.use_d3d)
 		params.DriverType = irr::video::EDT_DIRECT3D9;
 	else
 #endif
 		params.DriverType = irr::video::EDT_OPENGL;
-	params.Vsync = gameConf.use_vsync;
 	params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
+#else
+	/*if(glversion == 0) {
+		params.DriverType = irr::video::EDT_OGLES1;
+	} else {*/
+		params.DriverType = irr::video::EDT_OGLES1;
+	//}
+	params.PrivateData = appMain;
+	params.Bits = 24;
+	params.ZBufferBits = 16;
+	params.AntiAlias = 0;
+	params.WindowSize = irr::core::dimension2d<u32>(0, 0);
+#endif
+	params.Vsync = gameConf.use_vsync;
 	device = irr::createDeviceEx(params);
 	if(!device) {
 		ErrorLog("Failed to create Irrlicht Engine device!");
 		return false;
 	}
 	filesystem = device->getFileSystem();
+#ifdef __ANDROID__
+	porting::mainDevice = device;
+#endif
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
-	if(!(ocgcore = LoadOCGcore(TEXT("./"))) && !(ocgcore = LoadOCGcore(TEXT("./expansions/"))))
+	if(!(ocgcore = LoadOCGcore(working_directory + TEXT("./"))) && !(ocgcore = LoadOCGcore(working_directory + TEXT("./expansions/"))))
 		coreloaded = false;
 #endif
 	auto logger = device->getLogger();
 	logger->setLogLevel(ELL_NONE);
 	// Apply skin
-	if (gameConf.skin_index >= 0)
-	{
-		skinSystem = new CGUISkinSystem("skin", device);
-		core::array<core::stringw> skins = skinSystem->listSkins();
+	skinSystem = nullptr;
+	if (gameConf.skin_index >= 0) {
+		skinSystem = new CGUISkinSystem((working_directory + TEXT("./skin")).c_str(), device);
+		auto skins = skinSystem->listSkins();
 		if ((size_t)gameConf.skin_index < skins.size())
 		{
 			int index = skins.size() - gameConf.skin_index - 1; // reverse index
@@ -91,7 +120,21 @@ bool Game::Initialize() {
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
+#ifdef __ANDROID__
+	if(driver->getDriverType() == EDT_OGLES2) {
+		isNPOTSupported = ((COGLES2Driver *)driver)->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_OES_texture_npot);
+	} else {
+		isNPOTSupported = ((COGLES1Driver *)driver)->queryOpenGLFeature(COGLES1ExtensionHandler::IRR_OES_texture_npot);
+	}
+	if(isNPOTSupported) {
+		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	} else {
+		driver->setTextureCreationFlag(irr::video::ETCF_ALLOW_NON_POWER_2, true);
+		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	}
+#else
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+#endif
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial()) {
@@ -99,8 +142,9 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadPicUrls();
-	if(!dataManager.LoadDB(TEXT("cards.cdb")))
-		ErrorLog("cards.cdb not found in the root, loading anyways!");
+	if (std::ifstream("cards.cdb").good()) {
+		dataManager.LoadDB(TEXT("cards.cdb"));
+	}
 	LoadExpansionDB();
 	LoadZipArchives();
 	LoadArchivesDB();
@@ -110,6 +154,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	discord.Initialize(filesystem->getWorkingDirectory().c_str());
+	mainGame->discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
 	dataManager.LoadStrings(TEXT("./expansions/strings.conf"));
 	env = device->getGUIEnvironment();
@@ -183,10 +228,11 @@ bool Game::Initialize() {
 								 L"\n"
 								 L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
 								 L"This project is not affiliated or endorsed by Shueisha or Konami.",
-								 Scale(10, 10, 440, 690), false, false, wAbout);
+								 Scale(10, 10, 440, 690), false, true, wAbout);
 	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
+	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth()), std::min(Scale(700), stAbout->getTextHeight())));
 	//main menu
-	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro by Project Ignis | {:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
+	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
 #define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, 270, 60 + offset)
@@ -371,7 +417,7 @@ bool Game::Initialize() {
 	btnHostPrepCancel = env->addButton(Scale(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1210).c_str());
 	//img
 	wCardImg = env->addStaticText(L"", Scale(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, 0, -1, true);
-	wCardImg->setBackgroundColor(0xc0c0c0c0);
+	wCardImg->setBackgroundColor(GetSkinColor(L"CARDINFO_IMAGE_BACKGROUND", SColor(192, 192, 192, 192)));
 	wCardImg->setVisible(false);
 	imgCard = env->addImage(Scale(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
 	imgCard->setImage(imageManager.tCover[0]);
@@ -409,13 +455,13 @@ bool Game::Initialize() {
 	((CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
 	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 37, 287, 60));
 	stInfo->setWordWrap(true);
-	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
+	stInfo->setOverrideColor(GetSkinColor(L"CARDINFO_TYPES_COLOR", SColor(255, 0, 0, 255)));
 	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 60, 287, 83));
 	stDataInfo->setWordWrap(true);
-	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
+	stDataInfo->setOverrideColor(GetSkinColor(L"CARDINFO_STATS_COLOR", SColor(255, 0, 0, 255)));
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
 	stSetName->setWordWrap(true);
-	stSetName->setOverrideColor(SColor(255, 0, 0, 255));
+	stSetName->setOverrideColor(GetSkinColor(L"CARDINFO_ARCHETYPE_TEXT_COLOR", SColor(255, 0, 0, 255)));
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
@@ -486,7 +532,7 @@ bool Game::Initialize() {
 		btnHand[i] = irr::gui::CGUIImageButton::addImageButton(env, Scale(10 + 105 * i, 10, 105 + 105 * i, 144), wHand, BUTTON_HAND1 + i);
 		auto a = Scale<s32>(10 + 105 * i, 10, 105 + 105 * i, 144).getSize();
 		btnHand[i]->setImageSize(a);
-		((CGUIButton*)btnHand[i])->setImage(imageManager.tHand[i]);
+		btnHand[i]->setImage(imageManager.tHand[i]);
 	}
 	//
 	wFTSelect = env->addWindow(Scale(550, 240, 780, 340), false, L"");
@@ -509,7 +555,10 @@ bool Game::Initialize() {
 	wACMessage->setDrawBackground(false);
 	stACMessage = irr::gui::CGUICustomText::addCustomText(L"", true, env, wACMessage, -1, Scale(0, 0, 350, 60), true);
 	stACMessage->setWordWrap(true);
-	stACMessage->setBackgroundColor(0xc0c0c0ff);
+	stACMessage->setBackgroundColor(GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_BACGROUND_COLOR", SColor(192, 192, 192, 192)));
+	auto tmp_color = GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_COLOR", 0);
+	if(tmp_color != 0)
+		stACMessage->setOverrideColor(tmp_color);
 	stACMessage->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//yes/no (310)
 	wQuery = env->addWindow(Scale(490, 200, 840, 340), false, dataManager.GetSysString(560).c_str());
@@ -546,14 +595,14 @@ bool Game::Initialize() {
 	btnPSAU->setImageSize(imgsize);
 	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, Scale(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
 	btnPSAD->setImageSize(imgsize);
-	((CGUIButton*)btnPSAD)->setImage(imageManager.tCover[0]);
+	btnPSAD->setImage(imageManager.tCover[0]);
 	btnPSDU = irr::gui::CGUIImageButton::addImageButton(env, Scale(300, 45, 440, 185), wPosSelect, BUTTON_POS_DU);
 	btnPSDU->setImageSize(imgsize);
 	btnPSDU->setImageRotation(270);
 	btnPSDD = irr::gui::CGUIImageButton::addImageButton(env, Scale(445, 45, 585, 185), wPosSelect, BUTTON_POS_DD);
 	btnPSDD->setImageSize(imgsize);
 	btnPSDD->setImageRotation(270);
-	((CGUIButton*)btnPSDD)->setImage(imageManager.tCover[0]);
+	btnPSDD->setImage(imageManager.tCover[0]);
 	//card select
 	imgsize = { Scale<s32>(CARD_IMG_WIDTH * 0.6f), Scale<s32>(CARD_IMG_HEIGHT * 0.6f) };
 	wCardSelect = env->addWindow(Scale(320, 100, 1000, 400), false, L"");
@@ -612,7 +661,10 @@ bool Game::Initialize() {
 									  wANRace, CHECK_RACE, dataManager.FormatRace(filter).c_str());
 	//selection hint
 	stHintMsg = env->addStaticText(L"", Scale(500, 60, 820, 90), true, false, 0, -1, false);
-	stHintMsg->setBackgroundColor(0xc0ffffff);
+	stHintMsg->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACGROUND_COLOR", SColor(192, 255, 255, 255)));
+	tmp_color = GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_COLOR", 0);
+	if(tmp_color != 0)
+		stHintMsg->setOverrideColor(tmp_color);
 	stHintMsg->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stHintMsg->setVisible(false);
 	//cmd menu
@@ -648,6 +700,7 @@ bool Game::Initialize() {
 	btnShuffleDeck = env->addButton(Scale(5, 99, 55, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307).c_str());
 	btnSortDeck = env->addButton(Scale(60, 99, 110, 120), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305).c_str());
 	btnClearDeck = env->addButton(Scale(115, 99, 165, 120), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304).c_str());
+	btnRenameDeck = env->addButton(Scale(170, 99, 220, 120), wDeckEdit, BUTTON_RENAME_DECK, dataManager.GetSysString(1362).c_str());
 	btnSideOK = env->addButton(Scale(510, 40, 820, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334).c_str());
 	btnSideOK->setVisible(false);
 	btnSideShuffle = env->addButton(Scale(310, 100, 370, 130), 0, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307).c_str());
@@ -850,17 +903,22 @@ bool Game::Initialize() {
 	btnRestartSingle->setVisible(false);
 	//tip
 	stTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, 0, -1, true);
-	stTip->setBackgroundColor(0xc0ffffff);
+	stTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACGROUND_COLOR", SColor(192, 255, 255, 255)));
+	tmp_color = GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_COLOR", 0);
+	if(tmp_color != 0)
+		stTip->setOverrideColor(tmp_color);
 	stTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stTip->setVisible(false);
 	//tip for cards in select / display list
 	stCardListTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, wCardSelect, TEXT_CARD_LIST_TIP, true);
-	stCardListTip->setBackgroundColor(0xc0ffffff);
+	stCardListTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACGROUND_COLOR", SColor(192, 255, 255, 255)));
+	if(tmp_color != 0)
+		stCardListTip->setOverrideColor(tmp_color);
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
-	soundManager = std::make_unique<SoundManager>();
-	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, nullptr)) {
+	soundManager = std::unique_ptr<SoundManager>(new SoundManager());
+	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, working_directory)) {
 		chkEnableSound->setChecked(false);
 		chkEnableSound->setEnabled(false);
 		chkEnableSound->setVisible(false);
@@ -879,14 +937,16 @@ bool Game::Initialize() {
 	//wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
 	wRoomListPlaceholder->setVisible(false);
 
+	auto roomlistcolor = GetSkinColor(L"ROOMLIST_TEXTS_COLOR", SColor(255, 255, 255, 255));
+
 	//server choice dropdownlist
 	irr::gui::IGUIStaticText* statictext = env->addStaticText(dataManager.GetSysString(2041).c_str(), Scale(10, 30, 110, 50), false, false, wRoomListPlaceholder, -1, false); // 2041 = Server:
-	statictext->setOverrideColor(SColor(255, 255, 255, 255));
+	statictext->setOverrideColor(roomlistcolor);
 	serverChoice = env->addComboBox(Scale(90, 25, 385, 50), wRoomListPlaceholder, SERVER_CHOICE);
 
 	//online nickname
 	statictext = env->addStaticText(dataManager.GetSysString(1220).c_str(), Scale(10, 60, 110, 80), false, false, wRoomListPlaceholder, -1, false); // 1220 = Nickname:
-	statictext->setOverrideColor(SColor(255, 255, 255, 255));
+	statictext->setOverrideColor(roomlistcolor);
 	ebNickNameOnline = env->addEditBox(gameConf.nickname.c_str(), Scale(90, 55, 275, 80), true, wRoomListPlaceholder, EDITBOX_NICKNAME);
 
 	//top right host online game button
@@ -920,14 +980,14 @@ bool Game::Initialize() {
 	vsstring = env->addStaticText(L"vs.", Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring->setOverrideColor(SColor(255, 255, 255, 255));
+	vsstring->setOverrideColor(roomlistcolor);
 	ebOnlineTeam2 = env->addEditBox(L"0", Scale(200 + (392 - 140), 55, 230 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam2->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	vsstring = env->addStaticText(L"Best of", Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring->setOverrideColor(SColor(255, 255, 255, 255));
+	vsstring->setOverrideColor(roomlistcolor);
 	ebOnlineBestOf = env->addEditBox(L"0", Scale(285 + (392 - 140), 55, 315 + (392 - 140), 80), true, wRoomListPlaceholder);
 	ebOnlineBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineBestOf->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
@@ -937,7 +997,7 @@ bool Game::Initialize() {
 
 	//filter rooms textbox
 	ebRoomNameText = env->addStaticText(dataManager.GetSysString(2021).c_str(), Scale(572, 30, 682, 50), false, false, wRoomListPlaceholder); //2021 = Filter: 
-	ebRoomNameText->setOverrideColor(SColor(255, 255, 255, 255));
+	ebRoomNameText->setOverrideColor(roomlistcolor);
 	ebRoomName = env->addEditBox(L"", Scale(642, 25, 782, 50), true, wRoomListPlaceholder, EDIT_ONLINE_ROOM_NAME); //filter textbox
 	ebRoomName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebRoomNameText->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
@@ -945,12 +1005,12 @@ bool Game::Initialize() {
 
 	//show locked rooms checkbox
 	chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 800, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, dataManager.GetSysString(1994).c_str());
-	chkShowPassword->setName(L"White");
+	((CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
 	chkShowPassword->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show active rooms checkbox
 	chkShowActiveRooms = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 800, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, dataManager.GetSysString(1985).c_str());
-	chkShowActiveRooms->setName(L"White");
+	((CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
 	chkShowActiveRooms->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show all rooms in a table
@@ -1015,6 +1075,9 @@ bool Game::Initialize() {
 		PopupElement(wMessage);
 	}
 #endif
+#ifdef __ANDROID__
+	fpsCounter = env->addStaticText(L"", Scale(15, 15, 100, 60));
+#endif
 	for (u32 i = 0; i < EGDC_COUNT; ++i) {
 		SColor col = env->getSkin()->getColor((EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
@@ -1044,8 +1107,39 @@ void Game::MainLoop() {
 	uint32 prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
 	int fps = 0;
-	bool discord_message_shown = false;
+	bool was_connected = false;
 	std::wstring corename;
+#ifdef __ANDROID__
+	ogles2Solid = 0;
+	ogles2TrasparentAlpha = 0;
+	ogles2BlendTexture = 0;
+	ogles2Solid = video::EMT_SOLID;
+	ogles2TrasparentAlpha = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+	ogles2BlendTexture = video::EMT_ONETEXTURE_BLEND;
+	matManager.mCard.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mTexture.MaterialType = (video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
+	matManager.mBackLine.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mSelField.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mOutLine.MaterialType = (video::E_MATERIAL_TYPE)ogles2Solid;
+	matManager.mTRTexture.MaterialType = (video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
+	matManager.mATK.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	if(!isNPOTSupported) {
+		matManager.mCard.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mCard.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mTexture.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mTexture.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mBackLine.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mBackLine.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mSelField.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mSelField.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mOutLine.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mOutLine.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mTRTexture.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mTRTexture.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mATK.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
+		matManager.mATK.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+	}
+#endif
 	if(gameConf.fullscreen)
 		GUIUtils::ToggleFullscreen(device, is_fullscreen);
 	while(device->run()) {
@@ -1059,6 +1153,8 @@ void Game::MainLoop() {
 					continue;
 				}
 				script_dirs.insert(script_dirs.begin(), Utils::ParseFilename(repo.script_path));
+				auto script_subdirs = Utils::FindSubfolders(Utils::ParseFilename(repo.script_path));
+				script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
 				pic_dirs.insert(pic_dirs.begin(), Utils::ParseFilename(repo.pics_path));
 				auto data_path = Utils::ParseFilename(repo.data_path);
 				auto files = Utils::FindfolderFiles(data_path, { TEXT("cdb") }, 0);
@@ -1099,7 +1195,7 @@ void Game::MainLoop() {
 		if(!dInfo.isStarted && cores_to_load.size() && repoManager.GetUpdatingRepos() == 0) {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
-				if((ncore = ChangeOCGcore(path, ocgcore))) {
+				if((ncore = ChangeOCGcore(working_directory + path, ocgcore))) {
 					corename = Utils::ToUnicodeIfNeeded(path);
 					ocgcore = ncore;
 					if(!coreloaded) {
@@ -1171,13 +1267,14 @@ void Game::MainLoop() {
 				soundManager->PlayBGM(SoundManager::BGM::ADVANTAGE);
 			else
 				soundManager->PlayBGM(SoundManager::BGM::DUEL);
+			MATERIAL_GUARD(
 			DrawBackImage(imageManager.tBackGround);
 			DrawBackGround();
 			DrawCards();
 			DrawMisc();
 			smgr->drawAll();
 			driver->setMaterial(irr::video::IdentityMaterial);
-			driver->clearZBuffer();
+			driver->clearZBuffer();)
 		} else if(is_building) {
 			if(is_siding)
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
@@ -1185,7 +1282,7 @@ void Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::DECK);
 			soundManager->PlayBGM(SoundManager::BGM::DECK);
 			DrawBackImage(imageManager.tBackGround_deck);
-			DrawDeckBd();
+			MATERIAL_GUARD(DrawDeckBd());
 		} else {
 			if(dInfo.isInLobby)
 				discord.UpdatePresence(DiscordWrapper::IN_LOBBY);
@@ -1194,8 +1291,7 @@ void Game::MainLoop() {
 			soundManager->PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu);
 		}
-		DrawGUI();
-		DrawSpec();
+		MATERIAL_GUARD(DrawGUI();	DrawSpec(););
 		if(cardimagetextureloading) {
 			ShowCardInfo(showingcard, false);
 		}
@@ -1221,12 +1317,18 @@ void Game::MainLoop() {
 			CloseDuelWindow();
 		else
 			closeSignal.unlock();
+#ifndef __ANDROID__
 		if(gameConf.max_fps && !gameConf.use_vsync) {
 			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
+#endif
 		while(cur_time >= 1000) {
+#ifndef __ANDROID__
 			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
+#else
+			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
+#endif
 			fps = 0;
 			cur_time -= 1000;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
@@ -1245,12 +1347,20 @@ void Game::MainLoop() {
 		}
 		popupCheck.unlock();
 		discord.Check();
-		if(discord.connected && !discord_message_shown) {
-			discord_message_shown = true;
+		if(discord.connected && !was_connected) {
+			was_connected = true;
 			env->setFocus(stACMessage);
 			stACMessage->setText(L"Connected to Discord");
 			PopupElement(wACMessage, 30);
+		} else if(!discord.connected && was_connected) {
+			was_connected = false;
+			env->setFocus(stACMessage);
+			stACMessage->setText(L"Disconnected from Discord");
+			PopupElement(wACMessage, 30);
 		}
+#ifdef __ANDROID__
+		device->yield(); // probably nicer to the battery
+#endif
 	}
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();
@@ -1428,93 +1538,94 @@ void Game::LoadConfig() {
 			continue;
 		auto type = str.substr(0, pos - 1);
 		str = str.substr(pos + 2);
-		if(type == "antialias")
-			gameConf.antialias = std::stoi(str);
-		else if(type == "use_d3d")
-			gameConf.use_d3d = std::stoi(str);
-		else if(type == "use_vsync")
-			gameConf.use_vsync = std::stoi(str);
-		else if(type == "max_fps") {
-			auto val = std::stoi(str);
-			if(val >= 0)
-				gameConf.max_fps = val;
-		} else if(type == "fullscreen")
-			gameConf.fullscreen = std::stoi(str);
-		else if(type == "errorlog")
-			enable_log = std::stoi(str);
-		else if(type == "nickname")
-			gameConf.nickname = BufferIO::DecodeUTF8s(str);
-		else if(type == "gamename")
-			gameConf.gamename = BufferIO::DecodeUTF8s(str);
-		else if(type == "lastdeck")
-			gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
-		else if(type == "lastlflist") {
-			auto val = std::stoi(str);
-			gameConf.lastlflist = val >= 0 ? val : 0;
-		} else if(type == "lastallowedcards") {
-			auto val = std::stoi(str);
-			gameConf.lastallowedcards = val >= 0 ? val : 0;
-		} else if(type == "textfont") {
-			pos = str.find(L' ');
-			if(pos == std::wstring::npos) {
-				gameConf.textfont = BufferIO::DecodeUTF8s(str);
-				continue;
-			}
-			gameConf.textfont = BufferIO::DecodeUTF8s(str.substr(0, pos));
-			gameConf.textfontsize = std::stoi(str.substr(pos));
-		} else if(type == "numfont")
-			gameConf.numfont = BufferIO::DecodeUTF8s(str);
-		else if(type == "serverport")
-			gameConf.serverport = BufferIO::DecodeUTF8s(str);
-		else if(type == "lasthost")
-			gameConf.lasthost = BufferIO::DecodeUTF8s(str);
-		else if(type == "lastport")
-			gameConf.lastport = BufferIO::DecodeUTF8s(str);
-		else if(type == "roompass")
-			gameConf.roompass = BufferIO::DecodeUTF8s(str);
-		else if(type == "game_version") {
-			int version = std::stoi(str);
-			if(version) {
-				PRO_VERSION = std::stoi(str);
-				gameConf.game_version = PRO_VERSION;
-			}
-		}
-		else if(type == "automonsterpos")
-			gameConf.chkMAutoPos = std::stoi(str);
-		else if(type == "autospellpos")
-			gameConf.chkSTAutoPos = std::stoi(str);
-		else if(type == "randompos")
-			gameConf.chkRandomPos = std::stoi(str);
-		else if(type == "autochain")
-			gameConf.chkAutoChain = std::stoi(str);
-		else if(type == "waitchain")
-			gameConf.chkWaitChain = std::stoi(str);
-		else if(type == "mute_opponent")
-			gameConf.chkIgnore1 = std::stoi(str);
-		else if(type == "mute_spectators")
-			gameConf.chkIgnore1 = std::stoi(str);
-		else if(type == "hide_setname")
-			gameConf.chkHideSetname = std::stoi(str);
-		else if(type == "hide_hint_button")
-			gameConf.chkHideHintButton = std::stoi(str);
-		else if(type == "draw_field_spell")
-			gameConf.draw_field_spell = std::stoi(str);
-		else if(type == "quick_animation")
-			gameConf.quick_animation = std::stoi(str);
-		else if(type == "show_unofficial")
-			gameConf.chkAnime = std::stoi(str);
-		else if(type == "dpi_scale")
-			gameConf.dpi_scale = std::stof(str);
-		else if(type == "skin_index")
-			gameConf.skin_index = std::stoi(str);
-		else if(type == "enable_music")
-			gameConf.enablemusic = !!std::stoi(str);
-		else if(type == "enable_sound")
-			gameConf.enablesound = !!std::stoi(str);
-		else if(type == "music_volume")
-			gameConf.musicVolume = std::stof(str)/100.0f;
-		else if(type == "sound_volume")
-			gameConf.soundVolume = std::stof(str)/100.0f;
+		try {
+			if(type == "antialias")
+				gameConf.antialias = std::stoi(str);
+			else if(type == "use_d3d")
+				gameConf.use_d3d = std::stoi(str);
+			else if(type == "use_vsync")
+				gameConf.use_vsync = std::stoi(str);
+			else if(type == "max_fps") {
+				auto val = std::stoi(str);
+				if(val >= 0)
+					gameConf.max_fps = val;
+			} else if(type == "fullscreen")
+				gameConf.fullscreen = std::stoi(str);
+			else if(type == "errorlog")
+				enable_log = std::stoi(str);
+			else if(type == "nickname")
+				gameConf.nickname = BufferIO::DecodeUTF8s(str);
+			else if(type == "gamename")
+				gameConf.gamename = BufferIO::DecodeUTF8s(str);
+			else if(type == "lastdeck")
+				gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
+			else if(type == "lastlflist") {
+				auto val = std::stoi(str);
+				gameConf.lastlflist = val >= 0 ? val : 0;
+			} else if(type == "lastallowedcards") {
+				auto val = std::stoi(str);
+				gameConf.lastallowedcards = val >= 0 ? val : 0;
+			} else if(type == "textfont") {
+				pos = str.find(L' ');
+				if(pos == std::wstring::npos) {
+					gameConf.textfont = BufferIO::DecodeUTF8s(str);
+					continue;
+				}
+				gameConf.textfont = BufferIO::DecodeUTF8s(str.substr(0, pos));
+				gameConf.textfontsize = std::stoi(str.substr(pos));
+			} else if(type == "numfont")
+				gameConf.numfont = BufferIO::DecodeUTF8s(str);
+			else if(type == "serverport")
+				gameConf.serverport = BufferIO::DecodeUTF8s(str);
+			else if(type == "lasthost")
+				gameConf.lasthost = BufferIO::DecodeUTF8s(str);
+			else if(type == "lastport")
+				gameConf.lastport = BufferIO::DecodeUTF8s(str);
+			else if(type == "roompass")
+				gameConf.roompass = BufferIO::DecodeUTF8s(str);
+			else if(type == "game_version") {
+				int version = std::stoi(str);
+				if(version) {
+					PRO_VERSION = std::stoi(str);
+					gameConf.game_version = PRO_VERSION;
+				}
+			} else if(type == "automonsterpos")
+				gameConf.chkMAutoPos = std::stoi(str);
+			else if(type == "autospellpos")
+				gameConf.chkSTAutoPos = std::stoi(str);
+			else if(type == "randompos")
+				gameConf.chkRandomPos = std::stoi(str);
+			else if(type == "autochain")
+				gameConf.chkAutoChain = std::stoi(str);
+			else if(type == "waitchain")
+				gameConf.chkWaitChain = std::stoi(str);
+			else if(type == "mute_opponent")
+				gameConf.chkIgnore1 = std::stoi(str);
+			else if(type == "mute_spectators")
+				gameConf.chkIgnore1 = std::stoi(str);
+			else if(type == "hide_setname")
+				gameConf.chkHideSetname = std::stoi(str);
+			else if(type == "hide_hint_button")
+				gameConf.chkHideHintButton = std::stoi(str);
+			else if(type == "draw_field_spell")
+				gameConf.draw_field_spell = std::stoi(str);
+			else if(type == "quick_animation")
+				gameConf.quick_animation = std::stoi(str);
+			else if(type == "show_unofficial")
+				gameConf.chkAnime = std::stoi(str);
+			else if(type == "dpi_scale")
+				gameConf.dpi_scale = std::stof(str);
+			else if(type == "skin_index")
+				gameConf.skin_index = std::stoi(str);
+			else if(type == "enable_music")
+				gameConf.enablemusic = !!std::stoi(str);
+			else if(type == "enable_sound")
+				gameConf.enablesound = !!std::stoi(str);
+			else if(type == "music_volume")
+				gameConf.musicVolume = std::stof(str) / 100.0f;
+			else if(type == "sound_volume")
+				gameConf.soundVolume = std::stof(str) / 100.0f;
+		} catch (...){}
 	}
 	conf_file.close();
 	if(configs.empty()) {
@@ -1913,6 +2024,9 @@ void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 	queued_caption = caption;
 	popupCheck.unlock();
 }
+irr::video::SColor Game::GetSkinColor(const std::wstring& value, irr::video::SColor fallback) {
+	return mainGame->skinSystem ? (mainGame->skinSystem->getCustomColor(value.c_str(), fallback)) : fallback;
+}
 uint8 Game::LocalPlayer(uint8 player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
@@ -1996,10 +2110,15 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	CHECK(2)
 	CHECK(3)
 	CHECK(4)
-	CHECK(5)
+	case DUEL_MODE_MR5: {
+		if (truerule)
+			*truerule = 5;
+		if (forbiddentypes == DUEL_MODE_MR5_FORB)
+			return 4;
+	}
 	default: {
 		if (truerule && !*truerule)
-			*truerule = 5;
+			*truerule = 6;
 		if ((param & DUEL_PZONE) && (param & DUEL_SEPARATE_PZONE) && (param & DUEL_EMZONE))
 			return 5;
 		else if(param & DUEL_EMZONE)
@@ -2115,6 +2234,7 @@ void Game::OnResize() {
 	btnSideSort->setRelativePosition(Resize(375, 100, 435, 130));
 	btnSideReload->setRelativePosition(Resize(440, 100, 500, 130));
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
+	btnRenameDeck->setRelativePosition(Resize(170, 99, 220, 120));
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));

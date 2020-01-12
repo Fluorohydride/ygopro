@@ -7,6 +7,7 @@ env:
   global:
   - BUILD_CONFIG=release
   - DEPLOY_BRANCH=travis-$TRAVIS_OS_NAME
+  - DEPLOY_DIR=deploy
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
 addons:
   apt:
@@ -41,7 +42,6 @@ matrix:
     - VCPKG_LIBS="lua[cpp] libevent sqlite3 bzip2 libjpeg-turbo libpng zlib curl libgit2 fmt nlohmann-json sdl2-mixer-fixdynamic[libflac,mpg123,libvorbis] discord-rpc-payload"
     - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/latest/installed_x86-windows-static.zip
     - DXSDK_DIR=/c/d3d9sdk/
-    - DEPLOY_DIR=deploy
   - name: "Bionic GCC7"
     os: linux
     compiler: gcc  
@@ -65,16 +65,6 @@ before_deploy: ./travis/predeploy.sh
 deploy:
 - provider: script
   skip_cleanup: true
-  script: bash ./ocgcore/travis/deploy-windows.sh
+  script: bash ./ocgcore/travis/deploy.sh
   on:
-    condition: "$TRAVIS_OS_NAME == windows"
-    repo: edo9300/ygopro
-- provider: pages
-  skip_cleanup: true
-  local_dir: deploy
-  github_token: $DEPLOY_TOKEN
-  repo: $DEPLOY_REPO
-  target_branch: $DEPLOY_BRANCH
-  on:
-    condition: "$TRAVIS_OS_NAME != windows"
     repo: edo9300/ygopro

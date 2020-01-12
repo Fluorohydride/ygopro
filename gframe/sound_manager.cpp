@@ -11,12 +11,13 @@
 
 namespace ygo {
 
-bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, void* payload) {
+bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const path_string& working_directory) {
 #ifdef BACKEND
+	working_dir = Utils::ToUTF8IfNeeded(working_directory);
 	soundsEnabled = sounds_enabled;
 	musicEnabled = music_enabled;
 	try {
-		mixer = std::make_unique<BACKEND>();
+		mixer = std::unique_ptr<SoundBackend>(new BACKEND());
 		mixer->SetMusicVolume(music_volume);
 		mixer->SetSoundVolume(sounds_volume);
 	}
@@ -64,11 +65,16 @@ void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 }
 void SoundManager::RefreshChantsList() {
 #ifdef BACKEND
-	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/chants"), { TEXT("mp3"), TEXT("wav") })) {
+	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/chants"), { TEXT("ogg"), TEXT("wav") })) {
 		auto scode = Utils::GetFileName(TEXT("./sound/chants/") + file);
-		unsigned int code = std::stoi(scode);
-		if(code && !ChantsList.count(code))
-			ChantsList[code] = Utils::ToUTF8IfNeeded(file);
+		try {
+			unsigned int code = std::stoi(scode);
+			if(code && !ChantsList.count(code))
+				ChantsList[code] = Utils::ToUTF8IfNeeded(file);
+		}
+		catch(...) {
+			continue;
+		}
 	}
 #endif
 }
@@ -101,7 +107,7 @@ void SoundManager::PlaySoundEffect(SFX sound) {
 		{CHAT, "./sound/chatmessage.wav"}
 	};
 	if (!soundsEnabled) return;
-	mixer->PlaySound(fx.at(sound));
+	mixer->PlaySound(working_dir + "/" + fx.at(sound));
 #endif
 }
 void SoundManager::PlayBGM(BGM scene) {
@@ -111,7 +117,7 @@ void SoundManager::PlayBGM(BGM scene) {
 	if(musicEnabled && (scene != bgm_scene || !mixer->MusicPlaying()) && count > 0) {
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
-		std::string BGMName = "./sound/BGM/" + list[bgm];
+		std::string BGMName = working_dir + "/./sound/BGM/" + list[bgm];
 		mixer->PlayMusic(BGMName, true);
 	}
 #endif
@@ -120,7 +126,7 @@ bool SoundManager::PlayChant(unsigned int code) {
 #ifdef BACKEND
 	if(!soundsEnabled) return false;
 	if(ChantsList.count(code)) {
-		mixer->PlaySound("./sound/chants/" + ChantsList[code]);
+		mixer->PlaySound(working_dir + "/./sound/chants/" + ChantsList[code]);
 		return true;
 	}
 #endif

@@ -152,7 +152,6 @@ namespace ygo {
 				res.push_back(name);
 			}
 		});
-		std::sort(res.begin(), res.end());
 		return res;
 	}
 	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers) {
@@ -433,8 +432,8 @@ namespace ygo {
 				return L'N';
 			}
 			return (wchar_t)::towupper(c);
-#undef CHK_RNG
-			});
+#undef IN_INTERVAL
+		});
 		return input;
 	}
 	bool Utils::ContainsSubstring(std::wstring input, const std::vector<std::wstring>& tokens, bool ignoreInputCasingAccents, bool ignoreTokenCasingAccents) {
