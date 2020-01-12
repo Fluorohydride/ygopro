@@ -140,7 +140,9 @@ bool Game::Initialize() {
 		return false;
 	}
 	LoadPicUrls();
-	dataManager.LoadDB(TEXT("cards.cdb"));
+	if (std::ifstream("cards.cdb").good()) {
+		dataManager.LoadDB(TEXT("cards.cdb"));
+	}
 	LoadExpansionDB();
 	LoadZipArchives();
 	LoadArchivesDB();
