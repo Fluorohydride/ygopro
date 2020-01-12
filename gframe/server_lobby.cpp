@@ -28,9 +28,15 @@ void ServerLobby::FillOnlineRooms() {
 
 	int searchRules = mainGame->cbFilterRule->getSelected();
 	int searchBanlist = mainGame->cbFilterBanlist->getSelected();
-	int bestOf = std::stoi(mainGame->ebOnlineBestOf->getText());
-	int team1 = std::stoi(mainGame->ebOnlineTeam1->getText());
-	int team2 = std::stoi(mainGame->ebOnlineTeam2->getText());
+	int bestOf = 0;
+	int team1 = 0;
+	int team2 = 0;
+	try { bestOf = std::stoi(mainGame->ebOnlineBestOf->getText()); }
+	catch(...) {}
+	try { team1 = std::stoi(mainGame->ebOnlineTeam1->getText()); }
+	catch(...) {}
+	try { team2 = std::stoi(mainGame->ebOnlineTeam2->getText()); }
+	catch(...) {}
 
 	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2 || mainGame->btnFilterRelayMode->isPressed();
 

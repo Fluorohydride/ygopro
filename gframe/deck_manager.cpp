@@ -42,7 +42,9 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 		pos = str.find(" ");
 		if(pos == std::string::npos)
 			continue;
-		int code = std::stoi(str.substr(0, pos));
+		int code = 0;
+		try { code = std::stoi(str.substr(0, pos)); }
+		catch(...){}
 		if(!code)
 			continue;
 		str = str.substr(pos + 1);
@@ -50,7 +52,9 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 		pos = str.find(" ");
 		if(pos == std::string::npos)
 			continue;
-		int count = std::stoi(str.substr(0, pos));
+		int count = 0;
+		try { count = std::stoi(str.substr(0, pos)); }
+		catch(...) { continue; }
 		lflist.content[code] = count;
 		lflist.hash = lflist.hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 	}

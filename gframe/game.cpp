@@ -1446,93 +1446,94 @@ void Game::LoadConfig() {
 			continue;
 		auto type = str.substr(0, pos - 1);
 		str = str.substr(pos + 2);
-		if(type == "antialias")
-			gameConf.antialias = std::stoi(str);
-		else if(type == "use_d3d")
-			gameConf.use_d3d = std::stoi(str);
-		else if(type == "use_vsync")
-			gameConf.use_vsync = std::stoi(str);
-		else if(type == "max_fps") {
-			auto val = std::stoi(str);
-			if(val >= 0)
-				gameConf.max_fps = val;
-		} else if(type == "fullscreen")
-			gameConf.fullscreen = std::stoi(str);
-		else if(type == "errorlog")
-			enable_log = std::stoi(str);
-		else if(type == "nickname")
-			gameConf.nickname = BufferIO::DecodeUTF8s(str);
-		else if(type == "gamename")
-			gameConf.gamename = BufferIO::DecodeUTF8s(str);
-		else if(type == "lastdeck")
-			gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
-		else if(type == "lastlflist") {
-			auto val = std::stoi(str);
-			gameConf.lastlflist = val >= 0 ? val : 0;
-		} else if(type == "lastallowedcards") {
-			auto val = std::stoi(str);
-			gameConf.lastallowedcards = val >= 0 ? val : 0;
-		} else if(type == "textfont") {
-			pos = str.find(L' ');
-			if(pos == std::wstring::npos) {
-				gameConf.textfont = BufferIO::DecodeUTF8s(str);
-				continue;
-			}
-			gameConf.textfont = BufferIO::DecodeUTF8s(str.substr(0, pos));
-			gameConf.textfontsize = std::stoi(str.substr(pos));
-		} else if(type == "numfont")
-			gameConf.numfont = BufferIO::DecodeUTF8s(str);
-		else if(type == "serverport")
-			gameConf.serverport = BufferIO::DecodeUTF8s(str);
-		else if(type == "lasthost")
-			gameConf.lasthost = BufferIO::DecodeUTF8s(str);
-		else if(type == "lastport")
-			gameConf.lastport = BufferIO::DecodeUTF8s(str);
-		else if(type == "roompass")
-			gameConf.roompass = BufferIO::DecodeUTF8s(str);
-		else if(type == "game_version") {
-			int version = std::stoi(str);
-			if(version) {
-				PRO_VERSION = std::stoi(str);
-				gameConf.game_version = PRO_VERSION;
-			}
-		}
-		else if(type == "automonsterpos")
-			gameConf.chkMAutoPos = std::stoi(str);
-		else if(type == "autospellpos")
-			gameConf.chkSTAutoPos = std::stoi(str);
-		else if(type == "randompos")
-			gameConf.chkRandomPos = std::stoi(str);
-		else if(type == "autochain")
-			gameConf.chkAutoChain = std::stoi(str);
-		else if(type == "waitchain")
-			gameConf.chkWaitChain = std::stoi(str);
-		else if(type == "mute_opponent")
-			gameConf.chkIgnore1 = std::stoi(str);
-		else if(type == "mute_spectators")
-			gameConf.chkIgnore1 = std::stoi(str);
-		else if(type == "hide_setname")
-			gameConf.chkHideSetname = std::stoi(str);
-		else if(type == "hide_hint_button")
-			gameConf.chkHideHintButton = std::stoi(str);
-		else if(type == "draw_field_spell")
-			gameConf.draw_field_spell = std::stoi(str);
-		else if(type == "quick_animation")
-			gameConf.quick_animation = std::stoi(str);
-		else if(type == "show_unofficial")
-			gameConf.chkAnime = std::stoi(str);
-		else if(type == "dpi_scale")
-			gameConf.dpi_scale = std::stof(str);
-		else if(type == "skin_index")
-			gameConf.skin_index = std::stoi(str);
-		else if(type == "enable_music")
-			gameConf.enablemusic = !!std::stoi(str);
-		else if(type == "enable_sound")
-			gameConf.enablesound = !!std::stoi(str);
-		else if(type == "music_volume")
-			gameConf.musicVolume = std::stof(str)/100.0f;
-		else if(type == "sound_volume")
-			gameConf.soundVolume = std::stof(str)/100.0f;
+		try {
+			if(type == "antialias")
+				gameConf.antialias = std::stoi(str);
+			else if(type == "use_d3d")
+				gameConf.use_d3d = std::stoi(str);
+			else if(type == "use_vsync")
+				gameConf.use_vsync = std::stoi(str);
+			else if(type == "max_fps") {
+				auto val = std::stoi(str);
+				if(val >= 0)
+					gameConf.max_fps = val;
+			} else if(type == "fullscreen")
+				gameConf.fullscreen = std::stoi(str);
+			else if(type == "errorlog")
+				enable_log = std::stoi(str);
+			else if(type == "nickname")
+				gameConf.nickname = BufferIO::DecodeUTF8s(str);
+			else if(type == "gamename")
+				gameConf.gamename = BufferIO::DecodeUTF8s(str);
+			else if(type == "lastdeck")
+				gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
+			else if(type == "lastlflist") {
+				auto val = std::stoi(str);
+				gameConf.lastlflist = val >= 0 ? val : 0;
+			} else if(type == "lastallowedcards") {
+				auto val = std::stoi(str);
+				gameConf.lastallowedcards = val >= 0 ? val : 0;
+			} else if(type == "textfont") {
+				pos = str.find(L' ');
+				if(pos == std::wstring::npos) {
+					gameConf.textfont = BufferIO::DecodeUTF8s(str);
+					continue;
+				}
+				gameConf.textfont = BufferIO::DecodeUTF8s(str.substr(0, pos));
+				gameConf.textfontsize = std::stoi(str.substr(pos));
+			} else if(type == "numfont")
+				gameConf.numfont = BufferIO::DecodeUTF8s(str);
+			else if(type == "serverport")
+				gameConf.serverport = BufferIO::DecodeUTF8s(str);
+			else if(type == "lasthost")
+				gameConf.lasthost = BufferIO::DecodeUTF8s(str);
+			else if(type == "lastport")
+				gameConf.lastport = BufferIO::DecodeUTF8s(str);
+			else if(type == "roompass")
+				gameConf.roompass = BufferIO::DecodeUTF8s(str);
+			else if(type == "game_version") {
+				int version = std::stoi(str);
+				if(version) {
+					PRO_VERSION = std::stoi(str);
+					gameConf.game_version = PRO_VERSION;
+				}
+			} else if(type == "automonsterpos")
+				gameConf.chkMAutoPos = std::stoi(str);
+			else if(type == "autospellpos")
+				gameConf.chkSTAutoPos = std::stoi(str);
+			else if(type == "randompos")
+				gameConf.chkRandomPos = std::stoi(str);
+			else if(type == "autochain")
+				gameConf.chkAutoChain = std::stoi(str);
+			else if(type == "waitchain")
+				gameConf.chkWaitChain = std::stoi(str);
+			else if(type == "mute_opponent")
+				gameConf.chkIgnore1 = std::stoi(str);
+			else if(type == "mute_spectators")
+				gameConf.chkIgnore1 = std::stoi(str);
+			else if(type == "hide_setname")
+				gameConf.chkHideSetname = std::stoi(str);
+			else if(type == "hide_hint_button")
+				gameConf.chkHideHintButton = std::stoi(str);
+			else if(type == "draw_field_spell")
+				gameConf.draw_field_spell = std::stoi(str);
+			else if(type == "quick_animation")
+				gameConf.quick_animation = std::stoi(str);
+			else if(type == "show_unofficial")
+				gameConf.chkAnime = std::stoi(str);
+			else if(type == "dpi_scale")
+				gameConf.dpi_scale = std::stof(str);
+			else if(type == "skin_index")
+				gameConf.skin_index = std::stoi(str);
+			else if(type == "enable_music")
+				gameConf.enablemusic = !!std::stoi(str);
+			else if(type == "enable_sound")
+				gameConf.enablesound = !!std::stoi(str);
+			else if(type == "music_volume")
+				gameConf.musicVolume = std::stof(str) / 100.0f;
+			else if(type == "sound_volume")
+				gameConf.soundVolume = std::stof(str) / 100.0f;
+		} catch (...){}
 	}
 	conf_file.close();
 	if(configs.empty()) {

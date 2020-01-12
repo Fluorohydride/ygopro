@@ -179,13 +179,12 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.handshake = SERVER_HANDSHAKE;
-			cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText());
-			cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText());
-			try {
-				cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText());
-			} catch(...) {
-				cscg.info.best_of = 1;
-			}
+			try { cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText()); }
+			catch(...) { cscg.info.team1 = 1; }
+			try { cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText()); }
+			catch(...) { cscg.info.team2 = 1; }
+			try { cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText()); }
+			catch(...) { cscg.info.best_of = 1; }
 			if(mainGame->btnRelayMode->isPressed()) {
 				cscg.info.duel_flag |= DUEL_RELAY;
 			}

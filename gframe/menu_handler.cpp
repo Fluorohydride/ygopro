@@ -248,7 +248,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
 				} else {
-					unsigned int host_port = std::stoi(mainGame->ebHostPort->getText());
+					unsigned int host_port;
+					try {
+						host_port = std::stoi(mainGame->ebHostPort->getText());
+					}
+					catch(...) {
+						break;
+					}
 					mainGame->gameConf.gamename = mainGame->ebServerName->getText();
 					mainGame->gameConf.serverport = mainGame->ebHostPort->getText();
 					if(!NetServer::StartServer(host_port))
@@ -412,8 +418,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_BOT_ADD: {
-				int port = std::stoi(mainGame->gameConf.serverport);
-				mainGame->gBot.LaunchSelected(port);
+				try {
+					int port = std::stoi(mainGame->gameConf.serverport);
+					mainGame->gBot.LaunchSelected(port);
+				}
+				catch(...) {
+				}
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {
