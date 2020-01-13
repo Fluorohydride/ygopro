@@ -40,9 +40,9 @@ void ServerLobby::FillOnlineRooms() {
 
 	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2 || mainGame->btnFilterRelayMode->isPressed();
 
-	SColor normal_room = Game::GetSkinColor(L"normal_room", SColor(255, 255, 255, 255));
-	SColor custom_room = Game::GetSkinColor(L"custom_room", SColor(255, 255, 100, 100));
-	SColor started_room = Game::GetSkinColor(L"started_room", SColor(100, 211, 211, 211));
+	SColor normal_room = Game::GetSkinColor(L"ROOMLIST_TEXTS_COLOR_NORMAL_ROOM", SColor(255, 255, 255, 255));
+	SColor custom_room = Game::GetSkinColor(L"ROOMLIST_TEXTS_COLOR_CUSTOM_ROOM", SColor(255, 255, 100, 100));
+	SColor started_room = Game::GetSkinColor(L"ROOMLIST_STARTED_ROOM", SColor(100, 211, 211, 211));
 	SColor color;
 	bool show_password_checked = mainGame->chkShowPassword->isChecked();
 	bool show_started_checked = mainGame->chkShowActiveRooms->isChecked();
