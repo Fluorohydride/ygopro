@@ -1,6 +1,7 @@
 #include "logging.h"
 #include <ctime>
 #include <fstream>
+#include <fmt/chrono.h>
 
 namespace ygo {
 
@@ -8,12 +9,8 @@ void ErrorLog(const std::string& msg) {
 	std::ofstream log("error.log", std::ofstream::app);
 	if (!log.is_open())
 		return;
-	time_t nowtime = time(NULL);
-	tm* localedtime = localtime(&nowtime);
-	char timebuf[40];
-	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
-	log << "[" << timebuf << "]" << msg << std::endl;
-	log.close();
+	auto now = std::time(nullptr);
+	log << fmt::format("[{:%Y-%m-%d %H:%M:%S}] {}", *std::localtime(&now), msg) << std::endl;
 }
 
 }
