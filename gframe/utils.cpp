@@ -131,6 +131,14 @@ namespace ygo {
 		}
 #endif
 	}
+
+	static inline bool CompareIgnoreCase(path_string a, path_string b) {
+		return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(),
+			[](irr::fschar_t c, irr::fschar_t d) {
+				return toupper(c) < toupper(d);
+			});
+	};
+
 	std::vector<path_string> Utils::FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
 		std::vector<path_string> res;
 		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
@@ -152,7 +160,7 @@ namespace ygo {
 				res.push_back(name);
 			}
 		});
-		std::sort(res.begin(), res.end());
+		std::sort(res.begin(), res.end(), CompareIgnoreCase);
 		return res;
 	}
 	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers) {
@@ -173,7 +181,7 @@ namespace ygo {
 				return;
 			}
 		});
-		std::sort(results.begin(), results.end());
+		std::sort(results.begin(), results.end(), CompareIgnoreCase);
 		return results;
 	}
 	void Utils::FindfolderFiles(const IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload) {
@@ -203,7 +211,6 @@ namespace ygo {
 			}
 			return true;
 		});
-		std::sort(res.begin(), res.end());
 		return res;
 	}
 	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const path_string & path, const path_string & name) {
