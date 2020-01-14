@@ -133,10 +133,7 @@ namespace ygo {
 	}
 
 	static inline bool CompareIgnoreCase(path_string a, path_string b) {
-		return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(),
-			[](irr::fschar_t c, irr::fschar_t d) {
-				return toupper(c) < toupper(d);
-			});
+		return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
 	};
 
 	std::vector<path_string> Utils::FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
@@ -417,32 +414,6 @@ namespace ygo {
 				}
 			}
 		}
-	}
-	std::wstring Utils::ToUpperNoAccents(std::wstring input) {
-		std::transform(input.begin(), input.end(), input.begin(), [](wchar_t c) {
-#define IN_INTERVAL(start, end) (c >= start && c <= end)
-			if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
-				return L'A';
-			}
-			if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
-				return L'E';
-			}
-			if (IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
-				return L'I';
-			}
-			if (IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
-				return L'O';
-			}
-			if (IN_INTERVAL(217, 220) || IN_INTERVAL(249, 252)) {
-				return L'U';
-			}
-			if (c == 209 || c == 241) {
-				return L'N';
-			}
-			return (wchar_t)::towupper(c);
-#undef IN_INTERVAL
-		});
-		return input;
 	}
 	bool Utils::ContainsSubstring(std::wstring input, const std::vector<std::wstring>& tokens, bool ignoreInputCasingAccents, bool ignoreTokenCasingAccents) {
 		if (input.empty() || tokens.empty())

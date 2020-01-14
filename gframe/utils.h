@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <cwctype>
 #include <functional>
 #include <map>
 #include <string>
@@ -52,7 +53,8 @@ namespace ygo {
 
 		template<typename T>
 		static std::vector<T> TokenizeString(const T& input, const T& token);
-		static std::wstring ToUpperNoAccents(std::wstring input);
+		template<typename T>
+		static T ToUpperNoAccents(T input);
 		/** Returns true if and only if all tokens are contained in the input. */
 		static bool ContainsSubstring(std::wstring input, const std::vector<std::wstring>& tokens, bool ignoreInputCasingAccents = false, bool ignoreTokenCasingAccents = false);
 		static bool ContainsSubstring(std::wstring input, std::wstring token, bool ignoreInputCasingAccents = false, bool ignoreTokenCasingAccents = false);
@@ -70,6 +72,41 @@ inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
 	if(pos2 != input.size())
 		res.emplace_back(input.begin() + pos2, input.end());
 	return res;
+}
+
+template<typename T>
+inline T Utils::ToUpperNoAccents(T input) {
+	std::transform(input.begin(), input.end(), input.begin(), [](wchar_t c) {
+#define IN_INTERVAL(start, end) (c >= start && c <= end)
+#define CHAR_T typename T::value_type
+#define CAST(c) static_cast<CHAR_T>(c)
+		if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+			return CAST('A');
+		}
+		if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+			return CAST('E');
+		}
+		if (IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
+			return CAST('I');
+		}
+		if (IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
+			return CAST('O');
+		}
+		if (IN_INTERVAL(217, 220) || IN_INTERVAL(249, 252)) {
+			return CAST('U');
+		}
+		if (c == 209 || c == 241) {
+			return CAST('N');
+		}
+		if (std::is_same<CHAR_T, wchar_t>::value)
+			return CAST(std::towupper(c));
+		else
+			return CAST(std::toupper(c));
+#undef CAST
+#undef CHAR_T
+#undef IN_INTERVAL
+	});
+	return input;
 }
 
 }
