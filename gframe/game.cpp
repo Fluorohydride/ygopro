@@ -29,6 +29,8 @@
 #include "single_mode.h"
 #include "CGUICustomCheckBox/CGUICustomCheckBox.h"
 #include "CGUICustomTable/CGUICustomTable.h"
+#include "logging.h"
+#include "utils_gui.h"
 
 #ifdef __ANDROID__
 #define MATERIAL_GUARD(f) do {mainGame->driver->enableMaterial2D(true); f; mainGame->driver->enableMaterial2D(false);} while(false);
@@ -1139,7 +1141,7 @@ void Game::MainLoop() {
 	}
 #endif
 	if(gameConf.fullscreen)
-		Utils::ToggleFullscreen();
+		GUIUtils::ToggleFullscreen(device, is_fullscreen);
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
@@ -1393,7 +1395,7 @@ void Game::LoadZipArchives() {
 	for(auto& file : Utils::FindfolderFiles(TEXT("./expansions/"), { TEXT("zip") })) {
 		filesystem->addFileArchive((TEXT("./expansions/") + file).c_str(), true, false, EFAT_ZIP, "", &tmp_archive);
 		if(tmp_archive) {
-			archives.emplace_back(tmp_archive);
+			Utils::archives.emplace_back(tmp_archive);
 		}
 	}
 }
@@ -1402,7 +1404,7 @@ void Game::LoadExpansionDB() {
 		dataManager.LoadDB(TEXT("./expansions/") + file);
 }
 void Game::LoadArchivesDB() {
-	for(auto& archive: archives) {
+	for(auto& archive: Utils::archives) {
 		auto files = Utils::FindfolderFiles(archive, TEXT(""), { TEXT("cdb") }, 3);
 		for(auto& index : files) {
 			auto reader = archive.archive->createAndOpenFile(index);
@@ -1951,17 +1953,6 @@ void Game::AddDebugMsg(const std::string& msg) {
 	if (enable_log & 0x2)
 		ErrorLog("[Script Error]: " + msg);
 }
-void Game::ErrorLog(const std::string& msg) {
-	std::ofstream log("error.log", std::ofstream::app);
-	if(!log.is_open())
-		return;
-	time_t nowtime = time(NULL);
-	tm *localedtime = localtime(&nowtime);
-	char timebuf[40];
-	strftime(timebuf, 40, "%Y-%m-%d %H:%M:%S", localedtime);
-	log << "[" << timebuf << "]" << msg << std::endl;
-	log.close();
-}
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	imgCard->setImage(imageManager.tCover[0]);
@@ -2396,62 +2387,6 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	for(auto& forbid : chars)
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 	obj->setText(text.c_str());
-}
-#define CHK_RNG(range_start, range_end) (c >= range_start && c <= range_end)
-std::wstring Game::StringtoUpper(std::wstring input) {
-	std::transform(input.begin(), input.end(), input.begin(), [](wchar_t c) {
-		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
-			return L'A';
-		}
-		if(CHK_RNG(192, 197) || CHK_RNG(224, 229)) {
-			return L'E';
-		}
-		if(CHK_RNG(200, 203) || CHK_RNG(232, 235)) {
-			return L'I';
-		}
-		if(CHK_RNG(210, 214) || CHK_RNG(242, 246)) {
-			return L'O';
-		}
-		if(CHK_RNG(217, 220) || CHK_RNG(249, 252)) {
-			return L'U';
-		}
-		if(c == 209 || c == 241) {
-			return L'N';
-		}
-		return (wchar_t)::towupper(c);
-	});
-	return input;
-}
-#undef CHK_RNG
-bool Game::CompareStrings(std::wstring input, const std::vector<std::wstring>& tokens, bool transform_input, bool transform_token) {
-	if(input.empty() || tokens.empty())
-		return false;
-	if(transform_input)
-		input = StringtoUpper(input);
-	std::vector<std::wstring> alttokens;
-	if(transform_token) {
-		alttokens = tokens;
-		for(auto& token : alttokens)
-			token = StringtoUpper(token);
-	}
-	std::size_t pos;
-	for(auto& token : transform_token ? alttokens : tokens) {
-		if((pos = input.find(token)) == std::wstring::npos)
-			return false;
-		input = input.substr(pos + 1);
-	}
-	return true;
-}
-bool Game::CompareStrings(std::wstring input, std::wstring second_term, bool transform_input, bool transform_term) {
-	if(input.empty() && !second_term.empty())
-		return false;
-	if(second_term.empty())
-		return true;
-	if(transform_input)
-		input = StringtoUpper(input);
-	if(transform_term)
-		second_term = StringtoUpper(second_term);
-	return input.find(second_term) != std::wstring::npos;
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	std::ifstream infile(Utils::ParseFilename(script_name), std::ifstream::in);

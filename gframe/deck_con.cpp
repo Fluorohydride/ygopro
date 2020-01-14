@@ -853,7 +853,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	results.clear();
 	std::vector<std::wstring> searchterms;
 	if(wcslen(mainGame->ebCardName->getText())) {
-		searchterms = Game::TokenizeString<std::wstring>(Game::StringtoUpper(mainGame->ebCardName->getText()), L"+");
+		searchterms = Utils::TokenizeString<std::wstring>(Utils::ToUpperNoAccents(mainGame->ebCardName->getText()), L"+");
 	} else
 		searchterms = { L"" };
 	if(FiltersChanged() || force_refresh)
@@ -882,9 +882,9 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		if(!term.empty()) {
 			if(term.front() == L'@' || term.front() == L'$') {
 				if(term.size() > 1)
-					tokens = Game::TokenizeString<std::wstring>(&term[1], L"*");
+					tokens = Utils::TokenizeString<std::wstring>(&term[1], L"*");
 			} else {
-				tokens = Game::TokenizeString<std::wstring>(term, L"*");
+				tokens = Utils::TokenizeString<std::wstring>(term, L"*");
 			}
 		}
 		std::vector<unsigned int> set_code = dataManager.GetSetCode(tokens);
@@ -1007,13 +1007,13 @@ bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar
 	}
 	if(tokens.size()) {
 		if(checkchar == L'$') {
-			return Game::CompareStrings(text.name, tokens, true);
+			return Utils::ContainsSubstring(text.name, tokens, true);
 		} else if(checkchar == L'@') {
 			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
 				return false;
 			return check_set_code(data, set_code);
 		} else {
-			return (set_code.size() && check_set_code(data, set_code)) || Game::CompareStrings(text.name, tokens, true) || Game::CompareStrings(text.text, tokens, true);
+			return (set_code.size() && check_set_code(data, set_code)) || Utils::ContainsSubstring(text.name, tokens, true) || Utils::ContainsSubstring(text.text, tokens, true);
 		}
 	}
 	return true;
@@ -1053,7 +1053,7 @@ void DeckBuilder::ClearFilter() {
 void DeckBuilder::SortList() {
 	auto left = results.begin();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(searched_terms.find(Game::StringtoUpper(dataManager.GetName((*it)->code))) != searched_terms.end()) {
+		if(searched_terms.find(Utils::ToUpperNoAccents(dataManager.GetName((*it)->code))) != searched_terms.end()) {
 			std::iter_swap(left, it);
 			++left;
 		}

@@ -2,8 +2,10 @@
 #include "data_manager.h"
 #include "game.h"
 #include "duelclient.h"
+#include "logging.h"
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
+#include "utils_gui.h"
 
 namespace ygo {
 
@@ -24,7 +26,7 @@ void ServerLobby::FillOnlineRooms() {
 	mainGame->roomListTable->clearRows();
 	std::vector<RoomInfo>& rooms = roomsVector;
 
-	std::wstring searchText(Game::StringtoUpper(mainGame->ebRoomName->getText()));
+	std::wstring searchText(Utils::ToUpperNoAccents(mainGame->ebRoomName->getText()));
 
 	int searchRules = mainGame->cbFilterRule->getSelected();
 	int searchBanlist = mainGame->cbFilterBanlist->getSelected();
@@ -54,9 +56,9 @@ void ServerLobby::FillOnlineRooms() {
 			if(searchText.size()) {
 				bool res = false;
 				for(auto& name : room.players) {
-					res = res || Game::CompareStrings(name, searchText, true, false);
+					res = res || Utils::ContainsSubstring(name, searchText, true, false);
 				}
-				if(!res && (room.description.size() && !Game::CompareStrings(room.description, searchText, true, false)))
+				if(!res && (room.description.size() && !Utils::ContainsSubstring(room.description, searchText, true, false)))
 					continue;
 			}
 			if(bestOf && room.info.best_of != bestOf)
@@ -132,7 +134,7 @@ void ServerLobby::FillOnlineRooms() {
 	}
 }
 int ServerLobby::GetRoomsThread() {
-	Utils::changeCursor(ECI_WAIT);
+	GUIUtils::ChangeCursor(mainGame->device, ECI_WAIT);
 	mainGame->btnLanRefresh2->setEnabled(false);
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
@@ -162,7 +164,7 @@ int ServerLobby::GetRoomsThread() {
 	if(res != CURLE_OK) {
 		//error
 		mainGame->PopupMessage(dataManager.GetSysString(2037), L"Error 05");
-		Utils::changeCursor(ECI_NORMAL);
+		GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
 		mainGame->roomListTable->setVisible(true);
@@ -222,7 +224,7 @@ int ServerLobby::GetRoomsThread() {
 		}
 	}
 
-	Utils::changeCursor(ECI_NORMAL);
+	GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
 	mainGame->btnLanRefresh2->setEnabled(true);
 	mainGame->serverChoice->setEnabled(true);
 	mainGame->roomListTable->setVisible(true);
@@ -265,7 +267,7 @@ void ServerLobby::JoinServer(bool host) {
 		}
 	}
 	catch(std::exception& e) {
-		mainGame->ErrorLog(std::string("Exception ocurred: ") + e.what());
+		ErrorLog(std::string("Exception ocurred: ") + e.what());
 	}
 }
 
