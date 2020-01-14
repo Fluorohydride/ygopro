@@ -301,6 +301,7 @@ namespace ygo {
 				res.push_back(name);
 			}
 		});
+		std::sort(res.begin(), res.end());
 		return res;
 	}
 	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers) {
@@ -351,7 +352,7 @@ namespace ygo {
 			}
 			return true;
 		});
-
+		std::sort(res.begin(), res.end());
 		return res;
 	}
 	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const path_string & path, const path_string & name) {
