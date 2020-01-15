@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <algorithm>
+#include <cctype>
 #include <cwctype>
 #include <functional>
 #include <map>
