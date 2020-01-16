@@ -17,5 +17,4 @@ fi
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     ./premake5 gmake2 --vcpkg-root=$VCPKG_ROOT --sound=sdl-mixer --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --discord=\"$DISCORD_APP_ID\"
     make -Cbuild -j2 config=$BUILD_CONFIG ygoprodll
-    make -Cbuild -j2 config=$BUILD_CONFIG discord-launcher
 fi
