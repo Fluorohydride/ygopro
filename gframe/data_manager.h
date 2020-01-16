@@ -2,9 +2,11 @@
 #define DATAMANAGER_H
 
 #include "config.h"
-#include "sqlite3.h"
 #include "client_card.h"
 #include <unordered_map>
+
+struct sqlite3;
+struct sqlite3_stmt;
 
 namespace ygo {
 
