@@ -1,6 +1,8 @@
 #include "data_manager.h"
 #include "sqlite3.h"
+#include <fstream>
 #include "readonlymemvfs.h"
+#include "logging.h"
 
 namespace ygo {
 
