@@ -213,14 +213,17 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 		else return c1->sequence < c2->sequence;
 	else {
 		if(c1->location & (LOCATION_DECK | LOCATION_GRAVE | LOCATION_REMOVED | LOCATION_EXTRA)) {
-			for(size_t i = 0; i < mainGame->dField.chains.size(); ++i) {
-				auto chit = mainGame->dField.chains[i];
-				if(c1 == chit.chain_card || chit.target.find(c1) != chit.target.end())
-					return true;
+			auto it1 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c1](const auto& ch) {
+				return c1 == ch.chain_card || ch.target.find(c1) != ch.target.end();
+				});
+			auto it2 = std::find_if(mainGame->dField.chains.rbegin(), mainGame->dField.chains.rend(), [c2](const auto& ch) {
+				return c2 == ch.chain_card || ch.target.find(c2) != ch.target.end();
+				});
+			if(it1 != mainGame->dField.chains.rend() || it2 != mainGame->dField.chains.rend()) {
+				return it1 < it2;
 			}
 			return c1->sequence > c2->sequence;
-		}
-		else
+		} else
 			return c1->sequence < c2->sequence;
 	}
 }

@@ -8,7 +8,6 @@
 #include "game.h"
 #include "replay.h"
 #include "replay_mode.h"
-#include <algorithm>
 
 namespace ygo {
 

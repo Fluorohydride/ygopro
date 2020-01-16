@@ -72,6 +72,7 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <time.h>
 #include <thread>
 #include <mutex>
+#include <algorithm>
 #include "bufferio.h"
 #include "myfilesystem.h"
 #include "mysignal.h"
