@@ -2,6 +2,7 @@
 #include "duelclient.h"
 #include "game.h"
 #include "core_utils.h"
+#include <fmt/chrono.h>
 #include <random>
 
 namespace ygo {
@@ -211,12 +212,8 @@ restart:
 	}
 	mainGame->soundManager->StopSounds();
 	if(!hand_test && !is_restarting) {
-		time_t nowtime = time(NULL);
-		tm* localedtime = localtime(&nowtime);
-		wchar_t timetext[40];
-		wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
-		mainGame->gMutex.lock();
-		mainGame->ebRSName->setText(timetext);
+		auto now = std::time(nullptr);
+		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).c_str());
 		mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.unlock();

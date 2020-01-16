@@ -9,6 +9,7 @@
 #include "game.h"
 #include "server_lobby.h"
 #include "utils_gui.h"
+#include <fmt/chrono.h>
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
@@ -572,8 +573,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnExportDeck->setEnabled(replay.IsExportable());
 				std::wstring repinfo;
 				time_t curtime = replay.pheader.seed;
-				tm* st = localtime(&curtime);
-				repinfo.append(fmt::format(L"{}/{}/{} {:02}:{:02}:{:02}\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec).c_str());
+				repinfo.append(fmt::format(L"{:%Y/%m/%d %H:%M:%S}\n", *std::localtime(&curtime)));
 				auto names = replay.GetPlayerNames();
 				for(int i = 0; i < replay.GetPlayersCount(0); i++) {
 					repinfo.append(names[i] + L"\n");

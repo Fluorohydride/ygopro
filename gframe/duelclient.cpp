@@ -7,6 +7,7 @@
 #include "replay.h"
 #include "replay_mode.h"
 #include <algorithm>
+#include <fmt/chrono.h>
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
@@ -4159,11 +4160,8 @@ void DuelClient::ReplayPrompt(bool need_header) {
 	mainGame->btnChainAlways->setVisible(false);
 	mainGame->btnChainWhenAvail->setVisible(false);
 	mainGame->btnCancelOrFinish->setVisible(false);
-	time_t nowtime = time(NULL);
-	tm *localedtime = localtime(&nowtime);
-	wchar_t timetext[40];
-	wcsftime(timetext, 40, L"%Y-%m-%d %H-%M-%S", localedtime);
-	mainGame->ebRSName->setText(timetext);
+	auto now = std::time(nullptr);
+	mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).c_str());
 	mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
 	mainGame->PopupElement(mainGame->wReplaySave);
 	mainGame->gMutex.unlock();
