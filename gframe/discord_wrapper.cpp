@@ -174,7 +174,6 @@ std::string& DiscordWrapper::CreateSecret(bool update) const {
 	/*using fmt over nlohmann::json for an overall memory improvement as making a json object and converting that to string would be way slower than creating it with a formatted string*/
 	string = fmt::format("{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.c_str());
 	return string;
-	return std::string();
 }
 void DiscordWrapper::OnReady(const DiscordUser* connectedUser, void* payload) {
 	printf("Discord: Connected to user %s#%s - %s\n",
