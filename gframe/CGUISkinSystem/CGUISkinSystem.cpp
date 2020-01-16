@@ -180,12 +180,12 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 
 	skin->loadConfig(skinConfig);
 	
-	tmp = registry->getValueAsCStr(L"texture",L"Skin/Properties/Font");
+	/*tmp = registry->getValueAsCStr(L"texture",L"Skin/Properties/Font");
 	gui::IGUIFont *font = device->getGUIEnvironment()->getFont(tmp.c_str());
 	if(font !=0) {
 		device->getGUIEnvironment()->getSkin()->setFont(font, gui::EGDF_DEFAULT);
 		device->getGUIEnvironment()->getSkin()->setFont(font, gui::EGDF_WINDOW);
-	}
+	}*/
 	// Get and set global alpha, problem with this, you can't set it to 0
 	// He does this to make ALL the default stuff completly transparent
 	// This has the downside that it whipes out things like checkbox and window button colors
