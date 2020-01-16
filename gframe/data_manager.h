@@ -14,8 +14,13 @@ class DataManager {
 public:
 	DataManager() {}
 	~DataManager() {
-		for(auto& card : _datas)
-			delete card.second;
+		for(auto& card : _datas) {
+			if(card.second) {
+				if(card.second->setcodes_p)
+					delete card.second->setcodes_p;
+				delete card.second;
+			}
+		}
 	}
 	bool LoadDB(const path_string& file, bool usebuffer = false);
 	bool LoadDBFromBuffer(const std::vector<char>& buffer);
@@ -39,6 +44,7 @@ public:
 	std::wstring FormatRace(int race);
 	std::wstring FormatType(int type);
 	std::wstring FormatSetName(unsigned long long setcode);
+	std::wstring FormatSetName(std::vector<uint16> setcodes);
 	std::wstring FormatLinkMarker(int link_marker);
 
 	std::unordered_map<unsigned int, CardDataC*> _datas;

@@ -46,23 +46,17 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 }
 
 static bool check_set_code(CardDataC* data, std::vector<unsigned int>& setcodes) {
-	unsigned long long card_setcode = data->setcode;
+	auto card_setcodes = data->setcodes;
 	if (data->alias) {
 		auto aptr = dataManager._datas.find(data->alias);
 		if (aptr != dataManager._datas.end())
-			card_setcode = aptr->second->setcode;
+			card_setcodes = aptr->second->setcodes;
 	}
 	if(setcodes.empty())
-		return !!card_setcode;
+		return card_setcodes.empty();
 	for(auto& set_code : setcodes) {
-		auto sc = card_setcode;
-		int settype = set_code & 0xfff;
-		int setsubtype = set_code & 0xf000;
-		while(sc) {
-			if((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
-				return true;
-			sc = sc >> 16;
-		}
+		if(std::find(card_setcodes.begin(), card_setcodes.end(), set_code) != card_setcodes.end())
+			return true;
 	}
 	return false;
 }

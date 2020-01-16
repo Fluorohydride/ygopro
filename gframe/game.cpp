@@ -1829,55 +1829,53 @@ void Game::ShowCardInfo(int code, bool resize) {
 	cardimagetextureloading = false;
 	if(shouldrefresh == 2)
 		cardimagetextureloading = true;
-	CardData cd;
-	if(!dataManager.GetData(code, &cd))
-		memset(&cd, 0, sizeof(CardData));
+	auto cd = dataManager.GetCardData(code);
 	imgCard->setImage(img);
 	imgCard->setScaleImage(true);
 	int tmp_code = code;
-	if(cd.alias && (cd.alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd.alias < CARD_ARTWORK_VERSIONS_OFFSET))
-		tmp_code = cd.alias;
+	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
+		tmp_code = cd->alias;
 	stName->setText(fmt::format(L"{}[{:08}]", dataManager.GetName(tmp_code), tmp_code).c_str());
 	stSetName->setText(L"");
 	if(!gameConf.chkHideSetname) {
-		unsigned long long sc = cd.setcode;
-		if(cd.alias) {
-			auto aptr = dataManager._datas.find(cd.alias);
+		auto setcodes = cd->setcodes;
+		if(cd->alias) {
+			auto aptr = dataManager._datas.find(cd->alias);
 			if(aptr != dataManager._datas.end())
-				sc = aptr->second->setcode;
+				setcodes = aptr->second->setcodes;
 		}
-		if(sc) {
-			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(sc)).c_str());
+		if(setcodes.size()) {
+			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());
 		}
 	}
 	std::wstring text = L"";
-	if(cd.type & TYPE_MONSTER) {
-		stInfo->setText(fmt::format(L"[{}] {}/{}", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute)).c_str());
-		if(cd.type & TYPE_LINK){
-			if(cd.attack < 0)
-				text.append(L"?/Link ").append(fmt::format(L"{}	", cd.level));
+	if(cd->type & TYPE_MONSTER) {
+		stInfo->setText(fmt::format(L"[{}] {}/{}", dataManager.FormatType(cd->type), dataManager.FormatRace(cd->race), dataManager.FormatAttribute(cd->attribute)).c_str());
+		if(cd->type & TYPE_LINK){
+			if(cd->attack < 0)
+				text.append(L"?/Link ").append(fmt::format(L"{}	", cd->level));
 			else
-				text.append(fmt::format(L"{}/Link {}	", cd.attack, cd.level));
-			text.append(dataManager.FormatLinkMarker(cd.link_marker));
+				text.append(fmt::format(L"{}/Link {}	", cd->attack, cd->level));
+			text.append(dataManager.FormatLinkMarker(cd->link_marker));
 		} else {
-			text.append(fmt::format(L"[{}{}] ", (cd.type & TYPE_XYZ) ? L"\u2606" : L"\u2605", cd.level));
-			if (cd.attack < 0 && cd.defense < 0)
+			text.append(fmt::format(L"[{}{}] ", (cd->type & TYPE_XYZ) ? L"\u2606" : L"\u2605", cd->level));
+			if (cd->attack < 0 && cd->defense < 0)
 				text.append(L"?/?");
-			else if (cd.attack < 0)
-				text.append(fmt::format(L"?/{}", cd.defense));
-			else if (cd.defense < 0)
-				text.append(fmt::format(L"{}/?", cd.attack));
+			else if (cd->attack < 0)
+				text.append(fmt::format(L"?/{}", cd->defense));
+			else if (cd->defense < 0)
+				text.append(fmt::format(L"{}/?", cd->attack));
 			else
-				text.append(fmt::format(L"{}/{}", cd.attack, cd.defense));
+				text.append(fmt::format(L"{}/{}", cd->attack, cd->defense));
 		}
-		if(cd.type & TYPE_PENDULUM) {
-			text.append(fmt::format(L"   {}/{}", cd.lscale, cd.rscale));
+		if(cd->type & TYPE_PENDULUM) {
+			text.append(fmt::format(L"   {}/{}", cd->lscale, cd->rscale));
 		}
 		stDataInfo->setText(text.c_str());
 	} else {
-		stInfo->setText(fmt::format(L"[{}]", dataManager.FormatType(cd.type)).c_str());
-		if(cd.type & TYPE_LINK) {
-			stDataInfo->setText(fmt::format(L"Link {}", cd.level, dataManager.FormatLinkMarker(cd.link_marker)).c_str());
+		stInfo->setText(fmt::format(L"[{}]", dataManager.FormatType(cd->type)).c_str());
+		if(cd->type & TYPE_LINK) {
+			stDataInfo->setText(fmt::format(L"Link {}", cd->level, dataManager.FormatLinkMarker(cd->link_marker)).c_str());
 		} else
 			stDataInfo->setText(L"");
 	}

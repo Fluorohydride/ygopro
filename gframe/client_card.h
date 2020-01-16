@@ -11,34 +11,35 @@
 namespace ygo {
 
 struct CardData {
-	unsigned int code;
-	unsigned int alias;
-	unsigned long long setcode;
-	unsigned int type;
-	unsigned int level;
-	unsigned int attribute;
-	unsigned int race;
-	int attack;
-	int defense;
-	unsigned int lscale;
-	unsigned int rscale;
-	unsigned int link_marker;
+	uint32_t code;
+	uint32_t alias;
+	uint16_t* setcodes;
+	uint32_t type;
+	uint32_t level;
+	uint32_t attribute;
+	uint32_t race;
+	int32_t attack;
+	int32_t defense;
+	uint32_t lscale;
+	uint32_t rscale;
+	uint32_t link_marker;
 };
 struct CardDataC {
-	unsigned int code;
-	unsigned int alias;
-	unsigned long long setcode;
-	unsigned int type;
-	int level;
-	unsigned int attribute;
-	unsigned int race;
-	int attack;
-	int defense;
-	unsigned int lscale;
-	unsigned int rscale;
-	unsigned int link_marker;
-	unsigned int ot;
-	unsigned int category;
+	uint32_t code;
+	uint32_t alias;
+	uint16_t* setcodes_p;
+	uint32_t type;
+	uint32_t level;
+	uint32_t attribute;
+	uint32_t race;
+	int32_t attack;
+	int32_t defense;
+	uint32_t lscale;
+	uint32_t rscale;
+	uint32_t link_marker;
+	uint32_t ot;
+	uint32_t category;
+	std::vector<uint16_t> setcodes;
 };
 struct CardString {
 	std::wstring name;

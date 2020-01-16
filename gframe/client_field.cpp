@@ -1297,19 +1297,19 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
 		GET_OP(OPCODE_GETTYPE, type);
 		GET_OP(OPCODE_GETRACE, race);
 		GET_OP(OPCODE_GETATTRIBUTE, attribute);
-		GET_OP(OPCODE_GETSETCARD, setcode);
+		//GET_OP(OPCODE_GETSETCARD, setcode);
 		case OPCODE_ISSETCARD: {
 			if (stack.size() >= 1) {
 				int set_code = stack.top();
 				stack.pop();
-				unsigned long long sc = cd->setcode;
 				bool res = false;
-				int settype = set_code & 0xfff;
-				int setsubtype = set_code & 0xf000;
-				while (sc) {
-					if ((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype)
+				uint16 settype = set_code & 0xfff;
+				uint16 setsubtype = set_code & 0xf000;
+				for(auto& sc : cd->setcodes) {
+					if((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype) {
 						res = true;
-					sc = sc >> 16;
+						break;
+					}
 				}
 				stack.push(res);
 			}
