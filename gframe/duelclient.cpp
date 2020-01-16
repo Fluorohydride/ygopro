@@ -3811,6 +3811,21 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_SZONE, seq);
 					ccard->position = BufferIO::Read<uint8_t>(pbuf);
+					if(!mainGame->dInfo.compat_mode) {
+						val = BufferIO::Read<uint32_t>(pbuf);
+						if(val) {
+							for(int xyz = 0; xyz < val; ++xyz) {
+								ClientCard* xcard = new ClientCard;
+								ccard->overlayed.push_back(xcard);
+								mainGame->dField.overlay_cards.insert(xcard);
+								xcard->overlayTarget = ccard;
+								xcard->location = LOCATION_OVERLAY;
+								xcard->sequence = ccard->overlayed.size() - 1;
+								xcard->owner = p;
+								xcard->controler = p;
+							}
+						}
+					}
 				}
 			}
 			val = COMPAT_READ(uint8_t, uint32_t, pbuf);
