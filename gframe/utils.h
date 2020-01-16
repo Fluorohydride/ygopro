@@ -8,13 +8,23 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <IFileArchive.h>
 
 #ifndef TEXT
-#define TEXT _IRR_TEXT
+#ifdef UNICODE
+#define TEXT(x) L##x
+using path_string = std::basic_string<wchar_t>;
+#else
+#define TEXT(x) x
+using path_string = std::basic_string<char>;
+#endif // UNICODE
 #endif
 
-using path_string = std::basic_string<irr::fschar_t>;
+namespace irr {
+namespace io {
+class IFileArchive;
+class IReadFile;
+}
+}
 
 namespace ygo {
 	class Utils {

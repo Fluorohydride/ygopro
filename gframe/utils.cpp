@@ -1,14 +1,15 @@
 #include "utils.h"
+#include <IFileArchive.h>
 #include <fstream>
-#ifndef _WIN32
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#else
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
-
-#include "config.h"
 #include "bufferio.h"
-#include "logging.h"
 
 namespace ygo {
 	std::vector<Utils::IrrArchiveHelper> Utils::archives;
@@ -389,7 +390,7 @@ namespace ygo {
 		auto list = archive->getFileList();
 		std::vector<path_string> list_full;
 		folderindexes[TEXT(".")] = { { -1, -1 }, { -1, -1 } };
-		for(u32 i = 0; i < list->getFileCount(); ++i) {
+		for(uint32_t i = 0; i < list->getFileCount(); ++i) {
 			list_full.push_back(list->getFullFileName(i).c_str());
 			if(list->isDirectory(i)) {
 				folderindexes[list->getFullFileName(i).c_str()] = { { -1, -1 }, { -1, -1 } };

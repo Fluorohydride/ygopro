@@ -1,14 +1,14 @@
+#ifdef DISCORD_APP_ID
 #include <chrono>
 #include <cstdio>
 #include <nlohmann/json.hpp>
-#include "discord_wrapper.h"
-#ifdef DISCORD_APP_ID
 #include "discord_register.h"
 #include "discord_rpc.h"
-#endif
 #include "game.h"
 #include "duelclient.h"
 #include "logging.h"
+#endif
+#include "discord_wrapper.h"
 
 DiscordWrapper::DiscordWrapper(): connected(false){
 }
@@ -40,11 +40,11 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 #else
 	RegisterURL(DISCORD_APP_ID);
 #endif //_WIN32
-#endif //DISCORD_APP_ID
 	return true;
+#else
+	return false;
+#endif //DISCORD_APP_ID
 }
-
-
 
 void DiscordWrapper::UpdatePresence(PresenceType type) {
 #ifdef DISCORD_APP_ID
@@ -138,16 +138,6 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 #endif
 }
 
-std::string& DiscordWrapper::CreateSecret(bool update) const {
-	static std::string string;
-	if(!update)
-		return string;
-	auto& secret = ygo::mainGame->dInfo.secret;
-	/*using fmt over nlohmann::json for an overall memory improvement as making a json object and converting that to string would be way slower than creating it with a formatted string*/
-	string = fmt::format("{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.c_str());
-	return string;
-}
-
 void DiscordWrapper::Check() {
 #ifdef DISCORD_APP_ID
 	Discord_RunCallbacks();
@@ -176,6 +166,16 @@ void DiscordWrapper::Disconnect() {
 }
 
 #ifdef DISCORD_APP_ID
+std::string& DiscordWrapper::CreateSecret(bool update) const {
+	static std::string string;
+	if(!update)
+		return string;
+	auto& secret = ygo::mainGame->dInfo.secret;
+	/*using fmt over nlohmann::json for an overall memory improvement as making a json object and converting that to string would be way slower than creating it with a formatted string*/
+	string = fmt::format("{{\"id\": {},\"addr\" : {},\"port\" : {},\"pass\" : \"{}\" }}", secret.game_id, secret.server_address, secret.server_port, secret.pass.c_str());
+	return string;
+	return std::string();
+}
 void DiscordWrapper::OnReady(const DiscordUser* connectedUser, void* payload) {
 	printf("Discord: Connected to user %s#%s - %s\n",
 		   connectedUser->username,
