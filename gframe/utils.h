@@ -9,15 +9,17 @@
 #include <string>
 #include <vector>
 
-#ifndef TEXT
 #ifdef UNICODE
+#ifndef TEXT
 #define TEXT(x) L##x
+#endif
 using path_string = std::basic_string<wchar_t>;
 #else
+#ifndef TEXT
 #define TEXT(x) x
+#endif
 using path_string = std::basic_string<char>;
 #endif // UNICODE
-#endif
 
 namespace irr {
 namespace io {
