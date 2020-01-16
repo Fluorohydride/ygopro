@@ -168,6 +168,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	auto skin = env->getSkin();
+	skin->setFont(guiFont);
 #define SKIN_SCALE(elem)skin->setSize(elem, Scale(skin->getSize(elem)));
 	skin->setSize(EGDS_SCROLLBAR_SIZE, Scale(20));
 	SKIN_SCALE(EGDS_MENU_HEIGHT)
@@ -230,7 +231,7 @@ bool Game::Initialize() {
 								 L"This project is not affiliated or endorsed by Shueisha or Konami.",
 								 Scale(10, 10, 440, 690), false, true, wAbout);
 	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
-	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth()), std::min(Scale(700), stAbout->getTextHeight())));
+	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
 	//main menu
 	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
@@ -1067,7 +1068,6 @@ bool Game::Initialize() {
 	//load server(s)
 	LoadServers();
 
-	env->getSkin()->setFont(guiFont);
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
@@ -1079,9 +1079,9 @@ bool Game::Initialize() {
 	fpsCounter = env->addStaticText(L"", Scale(15, 15, 100, 60));
 #endif
 	for (u32 i = 0; i < EGDC_COUNT; ++i) {
-		SColor col = env->getSkin()->getColor((EGUI_DEFAULT_COLOR)i);
+		SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
-		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
+		skin->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
 	hideChat = false;
 	hideChatTimer = 0;
