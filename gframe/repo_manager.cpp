@@ -1,5 +1,6 @@
 #include "repo_manager.h"
-#include "game.h"
+#include "utils.h"
+#include "fmt/format.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
@@ -345,6 +346,7 @@ std::vector<RepoManager::GitRepo> RepoManager::GetReadyRepos() {
 }
 
 std::map<std::string, int> RepoManager::GetRepoStatus() {
+	std::lock_guard<std::mutex> lk(repos_status_mutex);
 	return repos_status;
 }
 

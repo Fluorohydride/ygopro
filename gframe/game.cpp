@@ -1147,9 +1147,13 @@ void Game::MainLoop() {
 		if(!repos.empty()) {
 			bool refresh_db = false;
 			for(auto& repo : repos) {
+				auto& grepo = repoInfoGui[repo.repo_path];
 				if(repo.error.size()) {
 					ErrorLog("The repo " + repo.url + " couldn't be cloned");
 					ErrorLog("Error: " + repo.error);
+					grepo.history_button1->setText(L"Error!");
+					grepo.commit_history_full = fmt::format(L"The repo {} couldn't be cloned\nError: {}", BufferIO::DecodeUTF8s(repo.url).c_str(), BufferIO::DecodeUTF8s(repo.error).c_str());
+					grepo.commit_history_partial = grepo.commit_history_full;
 					continue;
 				}
 				script_dirs.insert(script_dirs.begin(), Utils::ParseFilename(repo.script_path));
@@ -1172,20 +1176,20 @@ void Game::MainLoop() {
 				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += n + "\n\n"; });
 				if(text.size())
 					text.erase(text.size() - 2, 2);
-				repoInfoGui[repo.repo_path].commit_history_full = BufferIO::DecodeUTF8s(text);
-				repoInfoGui[repo.repo_path].commit_history_partial.clear();
+				grepo.commit_history_full = BufferIO::DecodeUTF8s(text);
+				grepo.commit_history_partial.clear();
 				if(repo.commit_history_partial.size()) {
 					if(repo.commit_history_full.front() == repo.commit_history_partial.front() && repo.commit_history_full.back() == repo.commit_history_partial.back()) {
-						repoInfoGui[repo.repo_path].commit_history_partial = repoInfoGui[repo.repo_path].commit_history_full;
+						grepo.commit_history_partial = grepo.commit_history_full;
 					} else {
 						text.clear();
 						std::for_each(repo.commit_history_partial.begin(), repo.commit_history_partial.end(), [&text](const std::string& n) { text += n + "\n\n"; });
 						if(text.size())
 							text.erase(text.size() - 2, 2);
-						repoInfoGui[repo.repo_path].commit_history_partial = BufferIO::DecodeUTF8s(text);
+						grepo.commit_history_partial = BufferIO::DecodeUTF8s(text);
 					}
 				}
-				repoInfoGui[repo.repo_path].history_button1->setEnabled(true);
+				grepo.history_button1->setEnabled(true);
 
 			}
 			if(refresh_db && is_building && deckBuilder.results.size())
@@ -1729,12 +1733,13 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	a->setDrawTitlebar(false);
 	a->setDrawBackground(false);
 	env->addStaticText(name.c_str(), Scale(5, 5, 90 + 295, 20 + 5), false, false, a);
-	repoInfoGui[repo.repo_path].progress1 = new IProgressBar(env, Scale(5, 20 + 15, 170 + 295, 20 + 30), -1, a);
-	repoInfoGui[repo.repo_path].progress1->addBorder(1);
-	repoInfoGui[repo.repo_path].progress1->drop();
+	auto& grepo = repoInfoGui[repo.repo_path];
+	grepo.progress1 = new IProgressBar(env, Scale(5, 20 + 15, 170 + 295, 20 + 30), -1, a);
+	grepo.progress1->addBorder(1);
+	grepo.progress1->drop();
 	((CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
-	repoInfoGui[repo.repo_path].history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, L"Changelog");
-	repoInfoGui[repo.repo_path].history_button1->setEnabled(false);
+	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, L"Changelog");
+	grepo.history_button1->setEnabled(false);
 
 	auto b = env->addWindow(Scale(0, 0, 300, 55), false, L"", tabRepositories);
 	b->getCloseButton()->setVisible(false);
@@ -1742,9 +1747,9 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	b->setDrawTitlebar(false);
 	b->setDrawBackground(false);
 	env->addStaticText(name.c_str(), Scale(5, 5, 300, 20 + 5), false, false, b);
-	repoInfoGui[repo.repo_path].progress2 = new IProgressBar(env, Scale(5, 20 + 15, 300 - 5, 20 + 30), -1, b);
-	repoInfoGui[repo.repo_path].progress2->addBorder(1);
-	repoInfoGui[repo.repo_path].progress2->drop();
+	grepo.progress2 = new IProgressBar(env, Scale(5, 20 + 15, 300 - 5, 20 + 30), -1, b);
+	grepo.progress2->addBorder(1);
+	grepo.progress2->drop();
 	((CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
 }
 #define JSON_SET_IF_VALID(field, jsontype, cpptype)if(obj[#field].is_##jsontype())\
