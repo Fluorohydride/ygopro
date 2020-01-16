@@ -213,6 +213,7 @@ restart:
 	mainGame->soundManager->StopSounds();
 	if(!hand_test && !is_restarting) {
 		auto now = std::time(nullptr);
+		mainGame->gMutex.lock();
 		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).c_str());
 		mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
 		mainGame->PopupElement(mainGame->wReplaySave);
