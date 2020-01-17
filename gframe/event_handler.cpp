@@ -638,7 +638,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CARD_4: {
 				if(mainGame->dInfo.isReplay)
 					break;
-				mainGame->stCardListTip->setVisible(false);
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_IDLECMD:
 				case MSG_SELECT_BATTLECMD:
@@ -735,7 +734,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (selected_cards.size() > 0) {
 						SetResponseSelectedCards();
 						ShowCancelOrFinishButton(0);
-						mainGame->HideElement(mainGame->wCardSelect, true);}
+						mainGame->HideElement(mainGame->wCardSelect, true);
+					}
 					break;
 				}
 				case MSG_SELECT_SUM: {
@@ -784,7 +784,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CARD_SEL_OK: {
-				mainGame->stCardListTip->setVisible(false);
 				if(mainGame->dInfo.isReplay) {
 					mainGame->HideElement(mainGame->wCardSelect);
 					break;
@@ -1031,13 +1030,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
+			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4 && mainGame->stCardListTip->isVisible()) {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
 				SetShowMark(mcard, false);
 				mainGame->stCardListTip->setVisible(false);
 			}
-			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
+			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4 && mainGame->stCardListTip->isVisible()) {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
 				ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
 				SetShowMark(mcard, false);
