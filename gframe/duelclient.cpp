@@ -3777,7 +3777,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			uint32_t opts = BufferIO::Read<uint32_t>(pbuf);
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts, 1);
-			mainGame->dInfo.extraval = opts & DUEL_SPEED;
+			mainGame->dInfo.extraval = (opts & DUEL_SPEED) ? 1 : 0;
 		}
 		mainGame->SetPhaseButtons();
 		uint32_t val = 0;
