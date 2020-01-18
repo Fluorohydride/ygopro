@@ -66,9 +66,9 @@ void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 void SoundManager::RefreshChantsList() {
 #ifdef BACKEND
 	static const std::vector<std::pair<CHANT, path_string>> types = {
-		{CHANT::SUMMON, TEXT("summon") },
-		{CHANT::ATTACK, TEXT("attack") },
-		{CHANT::CHAIN,  TEXT("chain")  }
+		{CHANT::SUMMON,    TEXT("summon")},
+		{CHANT::ATTACK,    TEXT("attack")},
+		{CHANT::ACTIVATE,  TEXT("activate")}
 	};
 	for (const auto& chantType : types) {
 		const path_string searchPath = TEXT("./sound/") + chantType.second;

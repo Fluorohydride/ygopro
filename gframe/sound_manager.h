@@ -49,7 +49,7 @@ public:
 	enum class CHANT {
 		SUMMON,
 		ATTACK,
-		CHAIN
+		ACTIVATE
 	};
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const path_string& working_directory);
 	void RefreshBGMList();

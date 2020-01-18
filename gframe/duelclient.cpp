@@ -2879,8 +2879,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_CHAINING: {
-		PLAY_SOUND(SoundManager::SFX::ACTIVATE);
 		uint32_t code = BufferIO::Read<uint32_t>(pbuf);
+		if (!mainGame->soundManager->PlayChant(SoundManager::CHANT::ACTIVATE, code))
+			PLAY_SOUND(SoundManager::SFX::ACTIVATE);
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		uint8_t cc = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		uint8_t cl = BufferIO::Read<uint8_t>(pbuf);
@@ -3318,12 +3319,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return true;
 	}
 	case MSG_ATTACK: {
-		PLAY_SOUND(SoundManager::SFX::ATTACK);
 		CoreUtils::loc_info info1 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info1.controler = mainGame->LocalPlayer(info1.controler);
 		mainGame->dField.attacker = mainGame->dField.GetCard(info1.controler, info1.location, info1.sequence);
 		CoreUtils::loc_info info2 = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		info2.controler = mainGame->LocalPlayer(info2.controler);
+		if (!mainGame->soundManager->PlayChant(SoundManager::CHANT::ATTACK, mainGame->dField.attacker->code))
+			PLAY_SOUND(SoundManager::SFX::ATTACK);
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		float sy;
