@@ -65,15 +65,24 @@ void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 }
 void SoundManager::RefreshChantsList() {
 #ifdef BACKEND
-	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/chants"), { TEXT("ogg"), TEXT("wav") })) {
-		auto scode = Utils::GetFileName(TEXT("./sound/chants/") + file);
-		try {
-			unsigned int code = std::stoi(scode);
-			if(code && !ChantsList.count(code))
-				ChantsList[code] = Utils::ToUTF8IfNeeded(file);
-		}
-		catch(...) {
-			continue;
+	static const std::vector<std::pair<CHANT, path_string>> types = {
+		{CHANT::SUMMON, TEXT("summon") },
+		{CHANT::ATTACK, TEXT("attack") },
+		{CHANT::CHAIN,  TEXT("chain")  }
+	};
+	for (const auto& chantType : types) {
+		const path_string searchPath = TEXT("./sound/") + chantType.second;
+		for (auto& file : Utils::FindfolderFiles(searchPath, { TEXT("mp3"), TEXT("ogg"), TEXT("wav"), TEXT("flac") })) {
+			auto scode = Utils::GetFileName(searchPath + TEXT("/") + file);
+			try {
+				unsigned int code = std::stoi(scode);
+				auto key = std::make_pair(chantType.first, code);
+				if (code && !ChantsList.count(key))
+					ChantsList[key] = working_dir + "/" + Utils::ToUTF8IfNeeded(searchPath + TEXT("/") + file);
+			}
+			catch (...) {
+				continue;
+			}
 		}
 	}
 #endif
@@ -122,11 +131,12 @@ void SoundManager::PlayBGM(BGM scene) {
 	}
 #endif
 }
-bool SoundManager::PlayChant(unsigned int code) {
+bool SoundManager::PlayChant(CHANT chant, unsigned int code) {
 #ifdef BACKEND
 	if(!soundsEnabled) return false;
-	if(ChantsList.count(code)) {
-		mixer->PlaySound(working_dir + "/./sound/chants/" + ChantsList[code]);
+	auto key = std::make_pair(chant, code);
+	if (ChantsList.count(key)) {
+		mixer->PlaySound(ChantsList[key]);
 		return true;
 	}
 #endif
