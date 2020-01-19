@@ -1922,6 +1922,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				GUIUtils::TakeScreenshot(mainGame->device);
 			return true;
 		}
+		case irr::KEY_F9: {
+			if (!event.KeyInput.PressedDown) {
+				mainGame->soundManager->StopMusic();
+				mainGame->soundManager->StopSounds();
+				mainGame->soundManager->RefreshBGMList();
+				mainGame->soundManager->RefreshChantsList();
+			}
+			return true;
+		}
 		default: break;
 		}
 		break;

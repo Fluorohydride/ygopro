@@ -43,7 +43,9 @@ void SoundManager::RefreshBGMList() {
 	Utils::Makedirectory(TEXT("./sound/BGM/disadvantage"));
 	Utils::Makedirectory(TEXT("./sound/BGM/win"));
 	Utils::Makedirectory(TEXT("./sound/BGM/lose"));
-	Utils::Makedirectory(TEXT("./sound/chants"));
+	for (auto list : BGMList) {
+		list.clear();
+	}
 	RefreshBGMDir(TEXT(""), BGM::DUEL);
 	RefreshBGMDir(TEXT("duel"), BGM::DUEL);
 	RefreshBGMDir(TEXT("menu"), BGM::MENU);
@@ -70,8 +72,10 @@ void SoundManager::RefreshChantsList() {
 		{CHANT::ATTACK,    TEXT("attack")},
 		{CHANT::ACTIVATE,  TEXT("activate")}
 	};
+	ChantsList.clear();
 	for (const auto& chantType : types) {
 		const path_string searchPath = TEXT("./sound/") + chantType.second;
+		Utils::Makedirectory(searchPath);
 		for (auto& file : Utils::FindfolderFiles(searchPath, { TEXT("mp3"), TEXT("ogg"), TEXT("wav"), TEXT("flac") })) {
 			auto scode = Utils::GetFileName(searchPath + TEXT("/") + file);
 			try {

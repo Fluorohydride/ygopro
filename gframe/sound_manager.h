@@ -53,6 +53,7 @@ public:
 	};
 	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const path_string& working_directory);
 	void RefreshBGMList();
+	void RefreshChantsList();
 	void PlaySoundEffect(SFX sound);
 	void PlayBGM(BGM scene);
 	bool PlayChant(CHANT chant, unsigned int code);
@@ -72,7 +73,6 @@ private:
 	std::mt19937 rnd;
 	std::unique_ptr<SoundBackend> mixer;
 	void RefreshBGMDir(path_string path, BGM scene);
-	void RefreshChantsList();
 	bool soundsEnabled = false;
 	bool musicEnabled = false;
 	std::string working_dir = "./";
