@@ -1,0 +1,50 @@
+{
+    "repos": [
+        {
+            "url": "default",
+            "should_update": false,
+            "should_read": false
+        },
+        {
+            "url": "default_anime",
+            "should_update": false,
+            "should_read": false
+        },
+        {
+            "url": "https://github.com/Gideon9212/Livecustom",
+            "repo_path": "./expansions/Livecustom",
+            "data_path": "",
+            "script_path": "script",
+            "pics_path": "pics",
+            "should_update": false,
+            "should_read": false
+        }
+    ],
+    "urls": [
+        {
+            "url": "default",
+            "type": "pic"
+        },
+        {
+            "url": "default",
+            "type": "field"
+        },
+        {
+            "url": "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/{}.png",
+            "type": "pic"
+        },
+        {
+            "url": "https://raw.githubusercontent.com/Gideon9212/Livecustom/master/pics/field/{}.png",
+            "type": "field"
+        }
+    ],
+    "servers": [
+        {
+            "name": "localhost",
+            "address": "127.0.0.1",
+            "roomaddress": "127.0.0.1",
+            "roomlistport": 7922,
+            "duelport": 7911
+        }
+    ]
+}

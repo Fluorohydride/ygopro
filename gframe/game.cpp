@@ -149,7 +149,7 @@ bool Game::Initialize() {
 	LoadZipArchives();
 	LoadArchivesDB();
 	RefreshAiDecks();
-	if(!dataManager.LoadStrings(TEXT("strings.conf"))) {
+	if(!dataManager.LoadStrings(TEXT("./config/strings.conf"))) {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
@@ -233,7 +233,7 @@ bool Game::Initialize() {
 	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
 	//main menu
-	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro Version:{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
+	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro by Project Ignis | v{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
 #define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, 270, 60 + offset)
@@ -1215,7 +1215,7 @@ void Game::MainLoop() {
 			cores_to_load.clear();
 		}
 		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && (std::wstring(stMessage->getText()) == dataManager.GetSysString(1430)))) {
-			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
+			stMessage->setText(fmt::format(dataManager.GetSysString(1431).c_str(), corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();
 		}
@@ -1329,7 +1329,7 @@ void Game::MainLoop() {
 #endif
 		while(cur_time >= 1000) {
 #ifndef __ANDROID__
-			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
+			device->setWindowCaption(fmt::format(L"EDOPro by Project Ignis | FPS: {}", fps).c_str());
 #else
 			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
 #endif
@@ -1526,7 +1526,7 @@ void Game::LoadConfig() {
 	gameConf.quick_animation = 0;
 	gameConf.chkAnime = 0;
 	gameConf.dpi_scale = 1.0f;
-	std::ifstream conf_file("system.conf", std::ifstream::in);
+	std::ifstream conf_file("./config/system.conf", std::ifstream::in);
 	if(!conf_file.is_open())
 		return;
 	std::string str;
@@ -1633,7 +1633,7 @@ void Game::LoadConfig() {
 	}
 	conf_file.close();
 	if(configs.empty()) {
-		conf_file.open(TEXT("configs.json"), std::ifstream::in);
+		conf_file.open(TEXT("./config/configs.json"), std::ifstream::in);
 		try {
 			conf_file >> configs;
 		}
@@ -1644,7 +1644,7 @@ void Game::LoadConfig() {
 	}
 }
 void Game::SaveConfig() {
-	std::ofstream conf_file("system.conf", std::ofstream::out);
+	std::ofstream conf_file("./config/system.conf", std::ofstream::out);
 	if(!conf_file.is_open())
 		return;
 	conf_file << "#Configuration file\n";
