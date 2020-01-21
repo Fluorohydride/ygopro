@@ -1084,7 +1084,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_HINT: {
 		uint8_t type = BufferIO::Read<uint8_t>(pbuf);
-		/*uint8_t player = */BufferIO::Read<uint8_t>(pbuf);
+		uint8_t player = BufferIO::Read<uint8_t>(pbuf);
 		uint64_t data = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
@@ -1170,6 +1170,64 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->WaitFrameSignal(30);
 			break;
 		}
+		case HINT_SKILL: {
+			auto& pcard = mainGame->dField.skills[player];
+			if(!pcard) {
+				pcard = new ClientCard();
+				pcard->controler = player;
+				pcard->sequence = 0;
+				pcard->position = POS_FACEUP;
+				pcard->location = LOCATION_SKILL;
+			}
+			pcard->SetCode(data & 0xffffffff);
+			if(!mainGame->dInfo.isCatchingUp) {
+				mainGame->dField.MoveCard(pcard, 10);
+				mainGame->WaitFrameSignal(11);
+			}
+			break;
+		}
+		case HINT_SKILL_COVER: {
+			auto& pcard = mainGame->dField.skills[player];
+			if(!pcard) {
+				pcard = new ClientCard();
+				pcard->controler = player;
+				pcard->sequence = 0;
+				pcard->position = POS_FACEDOWN;
+				pcard->location = LOCATION_SKILL;
+			}
+			pcard->cover = data & 0xffffffff;
+			pcard->SetCode((data >> 32) & 0xffffffff);
+			if(!mainGame->dInfo.isCatchingUp) {
+				mainGame->dField.MoveCard(pcard, 10);
+				mainGame->WaitFrameSignal(11);
+			}
+			break;
+		}
+		case HINT_SKILL_FLIP: {
+			auto& pcard = mainGame->dField.skills[player];
+			if(!pcard) {
+				pcard = new ClientCard();
+				pcard->controler = player;
+				pcard->sequence = 0;
+				pcard->position = POS_FACEDOWN;
+				pcard->location = LOCATION_SKILL;
+			}
+			pcard->SetCode(data & 0xffffffff);
+			if(data & 0x100000000) {
+				pcard->position = POS_FACEUP;
+			} else if(data & 0x200000000) {
+				pcard->position = POS_FACEDOWN;
+			}
+			if(!mainGame->dInfo.isCatchingUp) {
+				mainGame->dField.MoveCard(pcard, 10);
+				mainGame->WaitFrameSignal(11);
+			}
+			break;
+		}
+		case HINT_SKILL_REMOVE: {
+			if(mainGame->dField.skills[player])
+				delete mainGame->dField.skills[player];
+			break;
 		}
 		break;
 	}

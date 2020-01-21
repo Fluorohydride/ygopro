@@ -28,6 +28,7 @@ ClientField::ClientField() {
 	deck_reversed = false;
 	conti_selecting = false;
 	for(int p = 0; p < 2; ++p) {
+		skills[p] = nullptr;
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
 	}
@@ -51,6 +52,14 @@ void ClientField::Clear() {
 	CLEAR_VECTOR(limbo_temp);
 	for(auto& pcard : overlay_cards)
 		delete pcard;
+	if(skills[0]) {
+		delete skills[0];
+		skills[0] = nullptr;
+	}
+	if(skills[1]) {
+		delete skills[1];
+		skills[1] = nullptr;
+	}
 	overlay_cards.clear();
 	extra_p_count[0] = 0;
 	extra_p_count[1] = 0;
@@ -974,6 +983,33 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.005f + pcard->sequence * 0.0001f;
 				r->X = 0.0f;
 				r->Y = 0.0f;
+				r->Z = PI;
+			}
+		}
+		break;
+	}
+	case LOCATION_SKILL: {
+		t->X = (matManager.vSkillZone[controler][field][speed][0].Pos.X + matManager.vSkillZone[controler][field][speed][1].Pos.X) / 2;
+		t->Y = (matManager.vSkillZone[controler][field][speed][0].Pos.Y + matManager.vSkillZone[controler][field][speed][2].Pos.Y) / 2;
+		t->Z = 0.01f + 0.01f * sequence;
+		if(controler == 0) {
+			if(pcard->position & POS_FACEUP) {
+				r->X = 0.0f;
+				r->Y = 0.0f;
+				r->Z = 0.0f;
+			} else {
+				r->X = 0.0f;
+				r->Y = PI;
+				r->Z = 0.0f;
+			}
+		} else {
+			if(pcard->position & POS_FACEUP) {
+				r->X = 0.0f;
+				r->Y = 0.0f;
+				r->Z = PI;
+			} else {
+				r->X = 0.0f;
+				r->Y = PI;
 				r->Z = PI;
 			}
 		}

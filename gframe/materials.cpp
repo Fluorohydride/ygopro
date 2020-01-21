@@ -288,6 +288,17 @@ Materials::Materials() {
 	vFieldContiAct[1][2] = irr::core::vector3df(0.3f, 1.3f, 0.0f);
 	vFieldContiAct[1][3] = irr::core::vector3df(1.1f, 1.3f, 0.0f);
 
+	//skill card zone
+	SetS3DVertex(vSkillZone[0][0][0], 0.0f, 1.4f, -0.8f, 2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vSkillZone[0][1][0], 0.2f, 0.1f, 1.0f, 1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vSkillZone[1][0][0], 7.9f, -0.1f, 8.7f, -1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vSkillZone[1][1][0], 7.7f, -0.1f, 6.9f, -1.3f, 0, 1, 0, 0, 0, 0);
+
+	SetS3DVertex(vSkillZone[0][0][1], 1.1f, 1.4f, 0.3f, 2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vSkillZone[0][1][1], 1.1f, 1.4f, 0.3f, 2.6f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vSkillZone[1][0][1], 6.8f, -0.1f, 7.6f, -1.3f, 0, 1, 0, 0, 0, 0);
+	SetS3DVertex(vSkillZone[1][1][1], 7.7f, -0.1f, 6.9f, -1.3f, 0, 1, 0, 0, 0, 0);
+
 
 	for(int i = 0; i < 40; ++i)
 		iArrow[i] = i;

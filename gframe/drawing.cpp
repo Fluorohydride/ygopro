@@ -212,7 +212,7 @@ void Game::DrawBackGround() {
 	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
 		&& !(dInfo.duel_field < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
 		&& !(dInfo.duel_field != 3 && dInfo.duel_field != 5 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
-		S3DVertex *vertex = 0;
+		S3DVertex *vertex = nullptr;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler][speed];
 		else if (dField.hovered_location == LOCATION_MZONE) {
@@ -400,6 +400,8 @@ void Game::DrawCards() {
 			DrawCard(pcard);
 		for(auto& pcard : dField.extra[p])
 			DrawCard(pcard);
+		if(dField.skills[p])
+			DrawCard(dField.skills[p]);
 	}
 }
 void Game::DrawCard(ClientCard* pcard) {

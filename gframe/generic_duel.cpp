@@ -787,10 +787,18 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 			)
 			break;
 		}
-		case 10: {
+		case 10:
+		case 201:
+		case 202:
+		case 203: {
 			SEND(nullptr);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
 			break;
+		}
+		case 200: {
+			SEND(nullptr);
+			for(auto& dueler : (player == 0) ? players.home : players.opposing)
+				NetServer::ReSendToPlayer(dueler.player);
 		}
 		}
 		break;

@@ -41,6 +41,7 @@ public:
 	std::vector<ClientCard*> activatable_cards;
 	std::vector<ClientCard*> attackable_cards;
 	std::vector<ClientCard*> conti_cards;
+	ClientCard* skills[2];
 	std::vector<std::pair<u64,int>> activatable_descs;
 	std::vector<u64> select_options;
 	std::vector<ChainInfo> chains;

@@ -29,6 +29,7 @@ public:
 	irr::video::S3DVertex vFieldRemove[2][2][2][4];
 	irr::video::S3DVertex vFieldMzone[2][7][4];
 	irr::video::S3DVertex vFieldSzone[2][8][2][2][4];
+	irr::video::S3DVertex vSkillZone[2][2][2][4];
 	irr::core::vector3df vFieldContiAct[2][4];
 	irr::video::S3DVertex vArrow[40];
 	irr::video::SColor c2d[4];

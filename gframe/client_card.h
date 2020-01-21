@@ -88,7 +88,7 @@ public:
 	irr::u32 select_seq;
 	irr::u8 owner;
 	irr::u8 controler;
-	irr::u8 location;
+	irr::u32 location;
 	irr::u32 sequence;
 	irr::u8 position;
 	irr::u32 status;
@@ -126,5 +126,10 @@ public:
 };
 
 }
+
+#define HINT_SKILL        200
+#define HINT_SKILL_COVER  201
+#define HINT_SKILL_FLIP   202
+#define HINT_SKILL_REMOVE 203
 
 #endif //CLIENT_CARD_H
