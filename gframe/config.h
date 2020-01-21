@@ -39,17 +39,6 @@
 #endif
 
 #include <irrlicht.h>
-#ifdef __ANDROID__
-#include <GLES/gl.h>
-#include <GLES/glext.h>
-#include <GLES/glplatform.h>
-#elif defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
 #include <cstdio>
 #include <cstdlib>
 #include <memory.h>

@@ -1,8 +1,9 @@
+#include <event2/thread.h>
+#include <memory>
 #include "config.h"
 #include "game.h"
 #include "data_manager.h"
-#include <event2/thread.h>
-#include <memory>
+#include "log.h"
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
 	porting::initAndroid();
 	porting::initializePathsAndroid();
 	if(chdir(porting::working_directory.c_str())!=0)
-		LOGE("failed to change direcroty");
+		LOGE("failed to change directory");
 #endif
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
