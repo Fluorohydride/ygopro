@@ -1344,6 +1344,12 @@ void Game::MainLoop() {
 		else
 			closeSignal.unlock();
 #ifndef __ANDROID__
+#ifdef __APPLE__
+		if(!device->isWindowActive()) {
+			if(cur_time < fps * 14)
+				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+		} else
+#endif
 		if(gameConf.max_fps && !gameConf.use_vsync) {
 			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
 				std::this_thread::sleep_for(std::chrono::milliseconds(20));
