@@ -1,4 +1,7 @@
 #ifdef DISCORD_APP_ID
+#ifdef __linux__
+#include <unistd.h>
+#endif
 #include <iostream>
 #include <chrono>
 #include <nlohmann/json.hpp>
