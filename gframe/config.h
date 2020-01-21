@@ -7,27 +7,10 @@
 #include <windows.h>
 #include <ws2tcpip.h>
 
-#ifdef _MSC_VER
-#define mywcsncasecmp _wcsnicmp
-#define mystrncasecmp _strnicmp
-#else
-#define mywcsncasecmp wcsncasecmp
-#define mystrncasecmp strncasecmp
-#endif
-
 #define socklen_t int
 
 #else //_WIN32
 
-#ifdef __ANDROID__
-#include <android_native_app_glue.h>
-#include <android/log.h>
-#define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, "Edopro", __VA_ARGS__);
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
-#else
-#define LOGI(...)
-#define LOGE(...)
-#endif
 #include <errno.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -45,14 +28,6 @@
 #define SOCKADDR_IN sockaddr_in
 #define SOCKADDR sockaddr
 #define SOCKET_ERRNO() (errno)
-
-#include <cwchar>
-#define mywcsncasecmp wcsncasecmp
-#define mystrncasecmp strncasecmp
-inline int _wtoi(const wchar_t * s) {
-	wchar_t * endptr;
-	return (int)wcstol(s, &endptr, 10);
-}
 #endif
 
 #ifndef TEXT
@@ -75,7 +50,6 @@ inline int _wtoi(const wchar_t * s) {
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
 #include <memory.h>
@@ -93,11 +67,6 @@ inline int _wtoi(const wchar_t * s) {
 #include <fmt/format.h>
 #include <fmt/printf.h>
 #include "utils.h"
-#ifndef YGOPRO_BUILD_DLL
-#include <ocgapi.h>
-#else
-#include "dllinterface.h"
-#endif
 
 using namespace irr;
 using namespace core;

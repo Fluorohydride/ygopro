@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <fmt/chrono.h>
 #include "duelclient.h"
 #include "client_card.h"
 #include "materials.h"
@@ -6,8 +8,8 @@
 #include "game.h"
 #include "replay.h"
 #include "replay_mode.h"
-#include <algorithm>
-#include <fmt/chrono.h>
+#include "sound_manager.h"
+#include "CGUIImageButton/CGUIImageButton.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
@@ -166,6 +168,8 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		BufferIO::CopyWStr(mainGame->ebNickName->getText(), cspi.name, 20);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
 		if(create_game) {
+#define TOI(what,from, def) try { what = std::stoi(from);  }\
+catch(...) { what = def; }
 			CTOS_CreateGame cscg;
 			mainGame->dInfo.secret.game_id = 0;
 			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
@@ -173,22 +177,20 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebServerPass->getText());
 			cscg.info.rule = mainGame->cbRule->getSelected();
 			cscg.info.mode = 0;
-			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
-			cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
-			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
-			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
+			TOI(cscg.info.start_hand, mainGame->ebStartHand->getText(), 5);
+			TOI(cscg.info.start_lp, mainGame->ebStartLP->getText(), 8000);
+			TOI(cscg.info.draw_count, mainGame->ebDrawCount->getText(), 1);
+			TOI(cscg.info.time_limit, mainGame->ebTimeLimit->getText(), 180);
 			cscg.info.lflist = mainGame->gameConf.lastlflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
 			cscg.info.duel_rule = 0;
 			cscg.info.duel_flag = mainGame->duel_param;
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			cscg.info.handshake = SERVER_HANDSHAKE;
-			try { cscg.info.team1 = std::stoi(mainGame->ebTeam1->getText()); }
-			catch(...) { cscg.info.team1 = 1; }
-			try { cscg.info.team2 = std::stoi(mainGame->ebTeam2->getText()); }
-			catch(...) { cscg.info.team2 = 1; }
-			try { cscg.info.best_of = std::stoi(mainGame->ebBestOf->getText()); }
-			catch(...) { cscg.info.best_of = 1; }
+			TOI(cscg.info.team1, mainGame->ebTeam1->getText(), 1);
+			TOI(cscg.info.team2, mainGame->ebTeam2->getText(), 1);
+			TOI(cscg.info.best_of, mainGame->ebBestOf->getText(), 1);
+#undef TOI
 			if(mainGame->btnRelayMode->isPressed()) {
 				cscg.info.duel_flag |= DUEL_RELAY;
 			}
@@ -1228,6 +1230,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(mainGame->dField.skills[player])
 				delete mainGame->dField.skills[player];
 			break;
+		}
 		}
 		break;
 	}

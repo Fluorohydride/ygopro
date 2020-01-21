@@ -7,6 +7,8 @@
 #include "game.h"
 #include "materials.h"
 #include "core_utils.h"
+#include "CGUIImageButton/CGUIImageButton.h"
+#include "CGUITTFont/CGUITTFont.h"
 
 namespace ygo {
 

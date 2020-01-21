@@ -1,6 +1,6 @@
 #ifdef DISCORD_APP_ID
+#include <iostream>
 #include <chrono>
-#include <cstdio>
 #include <nlohmann/json.hpp>
 #include "discord_register.h"
 #include "discord_rpc.h"

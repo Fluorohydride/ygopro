@@ -2,7 +2,9 @@
 #include "materials.h"
 #include "image_manager.h"
 #include "deck_manager.h"
-#include "duelclient.h"
+#include "duelclient.h""
+#include "CGUITTFont/CGUITTFont.h"
+#include "CGUIImageButton/CGUIImageButton.h"
 
 namespace ygo {
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color) {

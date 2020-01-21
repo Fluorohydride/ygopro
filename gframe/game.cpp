@@ -1,7 +1,7 @@
 #include <sstream>
 #include <fstream>
+#include <iostream>
 #include <nlohmann/json.hpp>
-
 #ifndef _WIN32
 #include <sys/types.h>
 #include <dirent.h>
@@ -13,7 +13,6 @@
 #include <COGLESDriver.h>
 #include "porting_android.h"
 #endif
-
 #include "config.h"
 #include "game.h"
 #include "server_lobby.h"
@@ -21,6 +20,7 @@
 #include "image_manager.h"
 #include "data_manager.h"
 #include "deck_manager.h"
+#include "dllinterface.h"
 #include "replay.h"
 #include "materials.h"
 #include "duelclient.h"
@@ -29,6 +29,16 @@
 #include "single_mode.h"
 #include "CGUICustomCheckBox/CGUICustomCheckBox.h"
 #include "CGUICustomTable/CGUICustomTable.h"
+#include "CGUICustomTabControl/CGUICustomTabControl.h"
+#include "CGUISkinSystem/CGUISkinSystem.h"
+#include "CGUICustomContextMenu/CGUICustomContextMenu.h"
+#include "CGUICustomContextMenu/CGUICustomMenu.h"
+#include "CGUICustomText/CGUICustomText.h"
+#include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include "CProgressBar/CProgressBar.h"
+#include "ResizeablePanel/ResizeablePanel.h"
+#include "CGUITTFont/CGUITTFont.h"
+#include "CGUIImageButton/CGUIImageButton.h"
 #include "logging.h"
 #include "utils_gui.h"
 
@@ -1215,7 +1225,7 @@ void Game::MainLoop() {
 			cores_to_load.clear();
 		}
 		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && (std::wstring(stMessage->getText()) == dataManager.GetSysString(1430)))) {
-			stMessage->setText(fmt::format(dataManager.GetSysString(1431).c_str(), corename).c_str());
+			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();
 		}
@@ -1329,7 +1339,7 @@ void Game::MainLoop() {
 #endif
 		while(cur_time >= 1000) {
 #ifndef __ANDROID__
-			device->setWindowCaption(fmt::format(L"EDOPro by Project Ignis | FPS: {}", fps).c_str());
+			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
 #else
 			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
 #endif

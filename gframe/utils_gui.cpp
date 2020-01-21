@@ -1,4 +1,6 @@
 #include "utils_gui.h"
+#include <IrrlichtDevice.h>
+#include <ICursorControl.h>
 #ifdef _WIN32
 #include <vector>
 #include "../irrlicht/src/CIrrDeviceWin32.h"
@@ -12,8 +14,9 @@
 
 namespace ygo {
 
-void GUIUtils::ChangeCursor(irr::IrrlichtDevice* device, irr::gui::ECURSOR_ICON icon) {
+void GUIUtils::ChangeCursor(irr::IrrlichtDevice* device, /*irr::gui::ECURSOR_ICON*/ int _icon) {
 #ifndef __ANDROID__
+	auto icon = static_cast<irr::gui::ECURSOR_ICON>(_icon);
 	auto cursor = device->getCursorControl();
 	if (cursor->getActiveIcon() != icon) {
 		cursor->setActiveIcon(icon);

@@ -1,3 +1,4 @@
+#include <fmt/chrono.h>
 #include "config.h"
 #include "menu_handler.h"
 #include "netserver.h"
@@ -9,7 +10,8 @@
 #include "game.h"
 #include "server_lobby.h"
 #include "utils_gui.h"
-#include <fmt/chrono.h>
+#include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include "CGUITTFont/CGUITTFont.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
@@ -65,7 +67,9 @@ void LoadReplay() {
 	mainGame->dField.Clear();
 	mainGame->HideElement(mainGame->wReplay);
 	mainGame->device->setEventReceiver(&mainGame->dField);
-	unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
+	unsigned int start_turn;
+	try { start_turn = std::stoi(mainGame->ebRepStartTurn->getText());  }
+	catch(...) { start_turn = 0; }
 	if(start_turn == 1)
 		start_turn = 0;
 	ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());

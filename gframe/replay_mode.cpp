@@ -2,6 +2,7 @@
 #include "duelclient.h"
 #include "game.h"
 #include "single_mode.h"
+#include "sound_manager.h"
 
 namespace ygo {
 

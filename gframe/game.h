@@ -1,31 +1,35 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "dllinterface.h"
+#ifdef __ANDROID__
+#include <android_native_app_glue.h>
+#endif
+#include <unordered_map>
+#include <vector>
+#include <list>
 #include "config.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
 #include "discord_wrapper.h"
-#include <unordered_map>
-#include <vector>
-#include <list>
-#include "CGUIImageButton/CGUIImageButton.h"
-#include "CGUITTFont/CGUITTFont.h"
-#include "CGUISkinSystem/CGUISkinSystem.h"
-#include "CGUICustomText/CGUICustomText.h"
-#include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
-#include "CGUICustomContextMenu/CGUICustomContextMenu.h"
-#include "CGUICustomContextMenu/CGUICustomMenu.h"
-#include "CGUICustomTabControl/CGUICustomTabControl.h"
-#include "CProgressBar/CProgressBar.h"
-#include "ResizeablePanel/ResizeablePanel.h"
-#include "deck_manager.h"
-#include "sound_manager.h"
 #include "repo_manager.h"
+#include "sound_manager.h"
 #include "windbot_panel.h"
+#include "ocgapi_types.h"
 
+class CGUISkinSystem;
+class IProgressBar;
+namespace irr {
+namespace gui {
+	class CGUIFileSelectListBox;
+	class CGUITTFont;
+	class CGUIImageButton;
+	class Panel;
+}
+}
 namespace ygo {
+
+class SoundManager;
 
 struct Config {
 	bool use_d3d;
@@ -285,7 +289,7 @@ public:
 	irr::core::dimension2d<irr::u32> window_size;
 	irr::core::vector2d<irr::f32> window_scale;
 
-	CGUISkinSystem *skinSystem;
+	CGUISkinSystem* skinSystem;
 
 	ClientField dField;
 	DeckBuilder deckBuilder;

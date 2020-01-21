@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "client_field.h"
 #include "math.h"
 #include "network.h"
@@ -9,11 +10,13 @@
 #include "single_mode.h"
 #include "materials.h"
 #include "progressivebuffer.h"
+#include "utils_gui.h"
+#include "sound_manager.h"
+#include "CGUIImageButton/CGUIImageButton.h"
+#include "CGUITTFont/CGUITTFont.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
-#include <algorithm>
-#include "utils_gui.h"
 
 namespace ygo {
 
@@ -1914,16 +1917,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->device->minimizeWindow();
 			return true;
 		}
-		case irr::KEY_F11: {
-			if(!event.KeyInput.PressedDown)
-				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->is_fullscreen);
-			return true;
-		}
-		case irr::KEY_F10: {
-			if (!event.KeyInput.PressedDown)
-				GUIUtils::TakeScreenshot(mainGame->device);
-			return true;
-		}
 		case irr::KEY_F9: {
 			if (!event.KeyInput.PressedDown) {
 				mainGame->soundManager->StopMusic();
@@ -1931,6 +1924,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->soundManager->RefreshBGMList();
 				mainGame->soundManager->RefreshChantsList();
 			}
+			return true;
+		}
+		case irr::KEY_F10: {
+			if (!event.KeyInput.PressedDown)
+				GUIUtils::TakeScreenshot(mainGame->device);
+			return true;
+		}
+		case irr::KEY_F11: {
+			if(!event.KeyInput.PressedDown)
+				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->is_fullscreen);
 			return true;
 		}
 		default: break;

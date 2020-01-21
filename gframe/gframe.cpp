@@ -67,9 +67,7 @@ int main(int argc, char* argv[]) {
 			if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
 				fschar_t exepath[MAX_PATH];
 				GetModuleFileName(NULL, exepath, MAX_PATH);
-				std::wcout << exepath << std::endl;
 				auto path = ygo::Utils::GetFilePath(exepath);
-				std::wcout << path << std::endl;
 				SetCurrentDirectory(path.c_str());
 			}
 #endif //_DEBUG
