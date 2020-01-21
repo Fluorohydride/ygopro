@@ -1,6 +1,6 @@
 #include <IGUIComboBox.h>
 #include <IGUIStaticText.h>
-#include <IGUICheckbox.h>
+#include <IGUICheckBox.h>
 #include "windbot_panel.h"
 #include <sstream>
 #include <fmt/format.h>
