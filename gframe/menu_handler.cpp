@@ -85,7 +85,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
-		s32 id = caller->getID();
+		int id = caller->getID();
 		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && id != CHECKBOX_EXTRA_RULE))
 			break;
 		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK)
@@ -103,17 +103,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {
 			// Set cursor to an I-Beam if hovering over an edit box
-			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
+			if (event.GUIEvent.Caller->getType() == irr::gui::EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
 			{
-				GUIUtils::ChangeCursor(mainGame->device, ECI_IBEAM);
+				GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_IBEAM);
 			}
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
 			// Set cursor to normal if left an edit box
-			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
+			if (event.GUIEvent.Caller->getType() == irr::gui::EGUIET_EDIT_BOX && event.GUIEvent.Caller->isEnabled())
 			{
-				GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
+				GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
 			}
 			break;
 		}
@@ -135,7 +135,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_JOIN_HOST2: {
 				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, EMBF_OK, 0, 0);
+					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, irr::gui::EMBF_OK, 0, 0);
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {
@@ -715,7 +715,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_PORT_BOX: {
-				stringw text = caller->getText();
+				std::wstring text = caller->getText();
 				wchar_t filtered[20];
 				int j = 0;
 				bool changed = false;
@@ -783,11 +783,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			default: break;
 			}
 		}
-		case EGET_TABLE_SELECTED_AGAIN: {
+		case irr::gui::EGET_TABLE_SELECTED_AGAIN: {
 			switch(id) {
 			case TABLE_ROOMLIST: {
 				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, EMBF_OK, 0, 0);
+					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, irr::gui::EMBF_OK, 0, 0);
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {
@@ -806,12 +806,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_R: {
-			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
+			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
 			break;
 		}
 		case irr::KEY_ESCAPE: {
-			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
+			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
 			break;
 		}

@@ -177,9 +177,9 @@ std::wstring DataManager::GetText(int code) {
 		return unknown_string;
 	return csit->second.text;
 }
-std::wstring DataManager::GetDesc(u64 strCode, bool compat) {
-	u32 code = 0;
-	u32 stringid = 0;
+std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
+	uint32 code = 0;
+	uint32 stringid = 0;
 	if(compat) {
 		if(strCode < 10000)
 			return GetSysString(strCode);
@@ -196,7 +196,7 @@ std::wstring DataManager::GetDesc(u64 strCode, bool compat) {
 		return unknown_string;
 	return csit->second.desc[stringid];
 }
-std::wstring DataManager::GetSysString(u64 code) {
+std::wstring DataManager::GetSysString(uint64 code) {
 	if(code >> 32)
 		return unknown_string;
 	auto csit = _sysStrings.find(code);

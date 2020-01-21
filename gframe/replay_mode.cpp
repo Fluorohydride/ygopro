@@ -1,3 +1,6 @@
+#include <IrrlichtDevice.h>
+#include <IGUIWindow.h>
+#include <IGUIStaticText.h>
 #include "replay_mode.h"
 #include "duelclient.h"
 #include "game.h"

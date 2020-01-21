@@ -1,3 +1,4 @@
+#include <irrlicht.h>
 #include "game.h"
 #include "materials.h"
 #include "image_manager.h"
@@ -16,6 +17,11 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
+
+using namespace irr;
+using namespace core;
+using namespace video;
+using namespace scene;
 
 namespace ygo {
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color) {

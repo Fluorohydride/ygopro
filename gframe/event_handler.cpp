@@ -18,6 +18,10 @@
 #include "porting_android.h"
 #endif
 
+using namespace irr;
+using namespace core;
+using namespace gui;
+
 namespace ygo {
 
 bool ClientField::OnEvent(const irr::SEvent& event) {
@@ -31,7 +35,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
-		s32 id = event.GUIEvent.Caller->getID();
+		int id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {

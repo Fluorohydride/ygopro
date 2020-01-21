@@ -1,3 +1,4 @@
+#include <irrlicht.h>
 #include "config.h"
 #include "deck_con.h"
 #include "data_manager.h"
@@ -6,6 +7,7 @@
 #include "game.h"
 #include "duelclient.h"
 #include "single_mode.h"
+#include "client_card.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
@@ -141,7 +143,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
-		s32 id = event.GUIEvent.Caller->getID();
+		int id = event.GUIEvent.Caller->getID();
 		if(mainGame->wCategories->isVisible() && id != BUTTON_CATEGORY_OK)
 			break;
 		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO)
@@ -725,7 +727,7 @@ void DeckBuilder::GetHoveredCard() {
 	irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 	if(root->getElementFromPoint(mouse_pos) != root)
 		return;
-	position2di pos = mainGame->Resize(mouse_pos.X, mouse_pos.Y, true);
+	irr::core::position2di pos = mainGame->Resize(mouse_pos.X, mouse_pos.Y, true);
 	int x = pos.X;
 	int y = pos.Y;
 	int pre_code = hovered_code;
@@ -888,7 +890,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		wchar_t checkterm = term.size() ? term.front() : 0;
 		std::vector<CardDataC*> result;
 		for(auto ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
-			if(CheckCard(ptr->second, strpointer->second, checkterm, tokens, set_code))
+			if(CheckCard(ptr->second, &strpointer->second, checkterm, tokens, set_code))
 				result.push_back(ptr->second);
 		}
 		if(result.size())
@@ -910,7 +912,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	}
 	mainGame->scrFilter->setPos(0);
 }
-bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
+bool DeckBuilder::CheckCard(CardDataC* data, CardString* text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
 	if(data->type & TYPE_TOKEN || ((data->ot & 0x103) != data->ot && !mainGame->chkAnime->isChecked()))
 		return false;
 	switch(filter_type) {
@@ -1001,13 +1003,13 @@ bool DeckBuilder::CheckCard(CardDataC* data, const CardString& text, const wchar
 	}
 	if(tokens.size()) {
 		if(checkchar == L'$') {
-			return Utils::ContainsSubstring(text.name, tokens, true);
+			return Utils::ContainsSubstring(text->name, tokens, true);
 		} else if(checkchar == L'@') {
 			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
 				return false;
 			return check_set_code(data, set_code);
 		} else {
-			return (set_code.size() && check_set_code(data, set_code)) || Utils::ContainsSubstring(text.name, tokens, true) || Utils::ContainsSubstring(text.text, tokens, true);
+			return (set_code.size() && check_set_code(data, set_code)) || Utils::ContainsSubstring(text->name, tokens, true) || Utils::ContainsSubstring(text->text, tokens, true);
 		}
 	}
 	return true;

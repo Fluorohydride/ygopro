@@ -2,8 +2,17 @@
 #define WINDBOT_PANEL_H
 
 #include <vector>
-#include <irrlicht.h>
 #include "windbot.h"
+
+namespace irr {
+namespace gui {
+class IGUIWindow;
+class IGUIComboBox;
+class IGUICheckBox;
+class IGUIStaticText;
+class IGUIButton;
+}
+}
 
 namespace ygo {
 

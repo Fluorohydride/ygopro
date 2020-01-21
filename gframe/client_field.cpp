@@ -1,4 +1,5 @@
 #include <stack>
+#include <irrlicht.h>
 #include "client_field.h"
 #include "client_card.h"
 #include "duelclient.h"
@@ -9,6 +10,10 @@
 #include "core_utils.h"
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "CGUITTFont/CGUITTFont.h"
+
+using namespace irr;
+using namespace core;
+using namespace video;
 
 namespace ygo {
 

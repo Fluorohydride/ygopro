@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
+#include <fmt/printf.h>
 
 SoundMixer::SoundMixer() {
 	SDL_SetMainReady();
@@ -10,14 +11,14 @@ SoundMixer::SoundMixer() {
 		throw std::runtime_error("Failed to init sdl audio device!");
 	int flags = MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_FLAC;
 	int initted = Mix_Init(flags);
-	printf("MIX_INIT_OGG: %s\n", initted&MIX_INIT_OGG ? "true" : "false");
-	printf("MIX_INIT_MP3: %s\n", initted&MIX_INIT_MP3 ? "true" : "false");
-	printf("MIX_INIT_FLAC: %s\n", initted&MIX_INIT_FLAC ? "true" : "false");
+	fmt::printf("MIX_INIT_OGG: %s\n", initted&MIX_INIT_OGG ? "true" : "false");
+	fmt::printf("MIX_INIT_MP3: %s\n", initted&MIX_INIT_MP3 ? "true" : "false");
+	fmt::printf("MIX_INIT_FLAC: %s\n", initted&MIX_INIT_FLAC ? "true" : "false");
 	if((initted&flags) != flags) {
 		throw std::runtime_error("Not all flags set");
 	}
 	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) == -1) {
-		printf("Mix_OpenAudio: %s\n", Mix_GetError());
+		fmt::printf("Mix_OpenAudio: %s\n", Mix_GetError());
 		throw std::runtime_error("Cannot open channels");
 	}
 }

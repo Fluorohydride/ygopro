@@ -2,11 +2,23 @@
 #define IMAGEMANAGER_H
 
 #include "config.h"
-#include "data_manager.h"
+#include <path.h>
 #include <unordered_map>
 #include <atomic>
 #include <future>
 #include <queue>
+
+namespace irr {
+class IrrlichtDevice;
+namespace io {
+class IReadFile;
+}
+namespace video {
+class IImage;
+class ITexture;
+class IVideoDriver;
+}
+}
 
 namespace ygo {
 
@@ -23,7 +35,7 @@ public:
 		imgType type;
 	};
 private:
-	using image_path = std::pair<IImage*, path_string>;
+	using image_path = std::pair<irr::video::IImage*, path_string>;
 	using loading_map = std::map<int, std::future<image_path>>;
 	using chrono_time = unsigned long long;
 	enum downloadStatus {
@@ -65,9 +77,9 @@ public:
 	void RemoveTexture(int code);
 	void RefreshCachedTextures();
 	void ClearCachedTextures(bool resize);
-	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
-	irr::video::IImage* GetTextureImageFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile = nullptr);
-	irr::video::ITexture* GetTextureFromFile(const io::path& file, int width, int height);
+	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
+	irr::video::IImage* GetTextureImageFromFile(const irr::io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile = nullptr);
+	irr::video::ITexture* GetTextureFromFile(const irr::io::path& file, int width, int height);
 	irr::video::ITexture* GetTextureCard(int code, imgType type, bool wait = false, bool fit = false, int* chk = nullptr);
 	//irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(int code);
@@ -105,12 +117,12 @@ private:
 	void AddToDownloadQueue(int code, imgType type);
 	downloadStatus GetDownloadStatus(int code, imgType type);
 	path_string GetDownloadPath(int code, imgType type);
-	image_path LoadCardTexture(int code, imgType type, std::atomic<s32>& width, std::atomic<s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
+	image_path LoadCardTexture(int code, imgType type, std::atomic<irr::s32>& width, std::atomic<irr::s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	loading_map* loading_pics[4];
 	downloading_map downloading_images[3];
 	std::queue<downloadParam> to_download;
 	std::vector<downloadParam> downloading;
-	std::pair<std::atomic<s32>, std::atomic<s32>> sizes[3];
+	std::pair<std::atomic<irr::s32>, std::atomic<irr::s32>> sizes[3];
 	std::mutex pic_download;
 	std::mutex field_download;
 	std::mutex mtx;
@@ -122,6 +134,11 @@ private:
 };
 
 extern ImageManager imageManager;
+
+#define CARD_IMG_WIDTH		177
+#define CARD_IMG_HEIGHT		254
+#define CARD_THUMB_WIDTH	44
+#define CARD_THUMB_HEIGHT	64
 
 }
 

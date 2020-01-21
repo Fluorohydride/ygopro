@@ -13,13 +13,14 @@
 #ifndef TEXT
 #define TEXT(x) L##x
 #endif
-using path_string = std::basic_string<wchar_t>;
+using path_char = wchar_t;
 #else
 #ifndef TEXT
 #define TEXT(x) x
 #endif
-using path_string = std::basic_string<char>;
+using path_char = char;
 #endif // UNICODE
+using path_string = std::basic_string<path_char>;
 
 namespace irr {
 namespace io {

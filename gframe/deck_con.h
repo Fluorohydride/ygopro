@@ -2,12 +2,16 @@
 #define DECK_CON_H
 
 #include "config.h"
-#include "deck_manager.h"
+#include <position2d.h>
+#include <IEventReceiver.h>
 #include <unordered_map>
 #include <vector>
-#include "client_card.h"
 
 namespace ygo {
+
+struct LFList;
+struct CardDataC;
+struct CardString;
 
 class DeckBuilder: public irr::IEventReceiver {
 public:
@@ -32,7 +36,7 @@ public:
 	void GetHoveredCard();
 	bool FiltersChanged();
 	void FilterCards(bool force_refresh = false);
-	bool CheckCard(CardDataC* data, const CardString& text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& setcode);
+	bool CheckCard(CardDataC* data, CardString* text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& setcode);
 	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
 	void ClearSearch();
@@ -64,7 +68,7 @@ public:
 	DECLARE_WITH_CACHE(limitation_search_filters, filter_lm)
 #undef DECLARE_WITH_CACHE
 
-	position2di mouse_pos;
+	irr::core::position2di mouse_pos;
 	int hovered_code;
 	int hovered_pos;
 	int hovered_seq;
@@ -76,7 +80,7 @@ public:
 	int dragy;
 	CardDataC* draging_pointer;
 	int prev_deck;
-	s32 prev_operation;
+	int prev_operation;
 
 	LFList* filterList;
 	std::map<std::wstring, std::vector<CardDataC*>> searched_terms;

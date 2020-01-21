@@ -301,7 +301,4 @@ bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 }
 CGUISkinSystem::~CGUISkinSystem() {
 	skinsList.clear();
-	
-
-	
 }

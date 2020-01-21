@@ -1,5 +1,13 @@
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
 #include <event2/thread.h>
-#include <memory>
+#include <IrrlichtDevice.h>
+#include <IGUIButton.h>
+#include <IGUIEditBox.h>
+#include <IGUIWindow.h>
 #include "config.h"
 #include "game.h"
 #include "data_manager.h"
@@ -66,7 +74,7 @@ int main(int argc, char* argv[]) {
 		} else {
 			auto extension = ygo::Utils::GetFileExtension(argv[1]);
 			if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
-				fschar_t exepath[MAX_PATH];
+				TCHAR exepath[MAX_PATH];
 				GetModuleFileName(NULL, exepath, MAX_PATH);
 				auto path = ygo::Utils::GetFilePath(exepath);
 				SetCurrentDirectory(path.c_str());
@@ -102,17 +110,19 @@ int main(int argc, char* argv[]) {
 		path_string parameter(argv[i]);
 #define PARAM_CHECK(x) if(parameter == TEXT(x))
 #define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < argc) {y;} continue;}
+#define SET_TXT(elem,txt) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(txt).c_str())
 		// Extra database
 		RUN_IF("-e", ygo::dataManager.LoadDB(argv[i]))
 		// Nickname
-		else RUN_IF("-n", ygo::mainGame->ebNickName->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
+		else RUN_IF("-n", SET_TXT(ebNickName,argv[i]))
 		// Host address
-		else RUN_IF("-h", ygo::mainGame->ebJoinHost->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
+		else RUN_IF("-h", SET_TXT(ebJoinHost, argv[i]))
 		// Host Port
-		else RUN_IF("-p", ygo::mainGame->ebJoinPort->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
+		else RUN_IF("-h", SET_TXT(ebJoinPort, argv[i]))
 		// Host password
-		else RUN_IF("-w", ygo::mainGame->ebJoinPass->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str()))
+		else RUN_IF("-h", SET_TXT(ebJoinPass, argv[i]))
 #undef RUN_IF
+#undef SET_TXT
 		else PARAM_CHECK("-k") { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
@@ -181,6 +191,7 @@ int main(int argc, char* argv[]) {
 				break;
 			}
 		}
+#undef ELEM
 #undef PARAM_CHECK
 	}
 	ygo::mainGame->MainLoop();

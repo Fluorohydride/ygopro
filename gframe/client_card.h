@@ -1,7 +1,8 @@
 #ifndef CLIENT_CARD_H
 #define CLIENT_CARD_H
 
-#include <irrlicht.h>
+#include <matrix4.h>
+#include <vector3d.h>
 #include <vector>
 #include <set>
 #include <map>
@@ -56,7 +57,7 @@ public:
 	irr::core::vector3df dRot;
 	irr::f32 curAlpha;
 	irr::f32 dAlpha;
-	irr::s32 aniFrame;
+	int32_t aniFrame;
 	bool is_moving;
 	bool refresh_on_stop;
 	bool is_fading;
@@ -68,36 +69,36 @@ public:
 	bool is_showchaintarget;
 	bool is_highlighting;
 	bool is_reversed;
-	irr::u32 code;
-	irr::u32 chain_code;
-	irr::u32 alias;
-	irr::u32 type;
-	irr::u32 level;
-	irr::u32 rank;
-	irr::u32 link;
-	irr::u32 attribute;
-	irr::u32 race;
-	irr::s32 attack;
-	irr::s32 defense;
-	irr::s32 base_attack;
-	irr::s32 base_defense;
-	irr::u32 lscale;
-	irr::u32 rscale;
-	irr::u32 link_marker;
-	irr::u32 reason;
-	irr::u32 select_seq;
-	irr::u8 owner;
-	irr::u8 controler;
-	irr::u32 location;
-	irr::u32 sequence;
-	irr::u8 position;
-	irr::u32 status;
-	irr::u32 cover;
-	irr::u8 cHint;
-	irr::u32 chValue;
-	irr::u32 opParam;
-	irr::u32 symbol;
-	irr::u32 cmdFlag;
+	uint32_t code;
+	uint32_t chain_code;
+	uint32_t alias;
+	uint32_t type;
+	uint32_t level;
+	uint32_t rank;
+	uint32_t link;
+	uint32_t attribute;
+	uint32_t race;
+	int32_t attack;
+	int32_t defense;
+	int32_t base_attack;
+	int32_t base_defense;
+	uint32_t lscale;
+	uint32_t rscale;
+	uint32_t link_marker;
+	uint32_t reason;
+	uint32_t select_seq;
+	uint8_t owner;
+	uint8_t controler;
+	uint32_t location;
+	uint32_t sequence;
+	uint8_t position;
+	uint32_t status;
+	uint32_t cover;
+	uint8_t cHint;
+	uint32_t chValue;
+	uint32_t opParam;
+	uint32_t symbol;
+	uint32_t cmdFlag;
 	ClientCard* overlayTarget;
 	std::vector<ClientCard*> overlayed;
 	ClientCard* equipTarget;
@@ -115,7 +116,7 @@ public:
 	std::wstring rscstring;
 
 	ClientCard();
-	void SetCode(irr::u32 code);
+	void SetCode(uint32_t code);
 	void UpdateInfo(const CoreUtils::Query& query);
 	void ClearTarget();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);

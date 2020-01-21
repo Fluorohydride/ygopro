@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <fmt/chrono.h>
+#include <irrlicht.h>
 #include "duelclient.h"
+#include "sockets.h"
 #include "client_card.h"
 #include "materials.h"
 #include "image_manager.h"
@@ -605,19 +607,19 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		mainGame->gMutex.lock();
 		int x = (pkt->info.team1 + pkt->info.team2 >= 5) ? 60 : 0;
-		mainGame->btnHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 180 + x, 110, 205 + x));
-		mainGame->stHostPrepOB->setRelativePosition(mainGame->Scale<s32>(10, 210 + x, 270, 230 + x));
-		mainGame->stHostPrepRule->setRelativePosition(mainGame->Scale<s32>(280, 30, 460, 230 + x));
-		mainGame->stDeckSelect->setRelativePosition(mainGame->Scale<s32>(10, 235 + x, 110, 255 + x));
-		mainGame->cbDeckSelect->setRelativePosition(mainGame->Scale<s32>(120, 230 + x, 270, 255 + x));
-		mainGame->cbDeckSelect2->setRelativePosition(mainGame->Scale<s32>(280, 230 + x, 430, 255 + x));
-		mainGame->btnHostPrepReady->setRelativePosition(mainGame->Scale<s32>(170, 180 + x, 270, 205 + x));
-		mainGame->btnHostPrepNotReady->setRelativePosition(mainGame->Scale<s32>(170, 180 + x, 270, 205 + x));
-		mainGame->btnHostPrepStart->setRelativePosition(mainGame->Scale<s32>(230, 280 + x, 340, 305 + x));
-		mainGame->btnHostPrepCancel->setRelativePosition(mainGame->Scale<s32>(350, 280 + x, 460, 305 + x));
+		mainGame->btnHostPrepOB->setRelativePosition(mainGame->Scale<irr::s32>(10, 180 + x, 110, 205 + x));
+		mainGame->stHostPrepOB->setRelativePosition(mainGame->Scale<irr::s32>(10, 210 + x, 270, 230 + x));
+		mainGame->stHostPrepRule->setRelativePosition(mainGame->Scale<irr::s32>(280, 30, 460, 230 + x));
+		mainGame->stDeckSelect->setRelativePosition(mainGame->Scale<irr::s32>(10, 235 + x, 110, 255 + x));
+		mainGame->cbDeckSelect->setRelativePosition(mainGame->Scale<irr::s32>(120, 230 + x, 270, 255 + x));
+		mainGame->cbDeckSelect2->setRelativePosition(mainGame->Scale<irr::s32>(280, 230 + x, 430, 255 + x));
+		mainGame->btnHostPrepReady->setRelativePosition(mainGame->Scale<irr::s32>(170, 180 + x, 270, 205 + x));
+		mainGame->btnHostPrepNotReady->setRelativePosition(mainGame->Scale<irr::s32>(170, 180 + x, 270, 205 + x));
+		mainGame->btnHostPrepStart->setRelativePosition(mainGame->Scale<irr::s32>(230, 280 + x, 340, 305 + x));
+		mainGame->btnHostPrepCancel->setRelativePosition(mainGame->Scale<irr::s32>(350, 280 + x, 460, 305 + x));
 		mainGame->wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440 + x));
 		mainGame->wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
-		mainGame->gBot.window->setRelativePosition(core::position2di(mainGame->wHostPrepare->getAbsolutePosition().LowerRightCorner.X, mainGame->wHostPrepare->getAbsolutePosition().UpperLeftCorner.Y));
+		mainGame->gBot.window->setRelativePosition(irr::core::position2di(mainGame->wHostPrepare->getAbsolutePosition().LowerRightCorner.X, mainGame->wHostPrepare->getAbsolutePosition().UpperLeftCorner.Y));
 		for(int i = 0; i < 6; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(false);
 			mainGame->chkHostPrepReady[i]->setChecked(false);
@@ -628,16 +630,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		for(int i = 0; i < pkt->info.team1; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
-			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 65 + i * 25, 30, 85 + i * 25));
-			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
-			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 65 + i * 25, 270, 85 + i * 25));
+			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<irr::s32>(10, 65 + i * 25, 30, 85 + i * 25));
+			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<irr::s32>(40, 65 + i * 25, 240, 85 + i * 25));
+			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<irr::s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
 		for(int i = pkt->info.team1; i < pkt->info.team1 + pkt->info.team2; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
-			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<s32>(10, 65 + i * 25, 30, 85 + i * 25));
-			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<s32>(40, 65 + i * 25, 240, 85 + i * 25));
-			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<s32>(250, 65 + i * 25, 270, 85 + i * 25));
+			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<irr::s32>(10, 65 + i * 25, 30, 85 + i * 25));
+			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<irr::s32>(40, 65 + i * 25, 240, 85 + i * 25));
+			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<irr::s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
 		mainGame->dInfo.hostname.resize(pkt->info.team1);
 		mainGame->dInfo.clientname.resize(pkt->info.team2);
@@ -1923,23 +1925,23 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		else startpos = 155;
 		if(positions & POS_FACEUP_ATTACK) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
-			mainGame->btnPSAU->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAU->setRelativePosition(mainGame->Scale<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAU->setVisible(false);
 		if(positions & POS_FACEDOWN_ATTACK) {
-			mainGame->btnPSAD->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAD->setRelativePosition(mainGame->Scale<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAD->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSAD->setVisible(false);
 		if(positions & POS_FACEUP_DEFENSE) {
 			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
-			mainGame->btnPSDU->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDU->setRelativePosition(mainGame->Scale<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDU->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSDU->setVisible(false);
 		if(positions & POS_FACEDOWN_DEFENSE) {
-			mainGame->btnPSDD->setRelativePosition(mainGame->Scale<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDD->setRelativePosition(mainGame->Scale<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDD->setVisible(true);
 			startpos += 145;
 		} else mainGame->btnPSDD->setVisible(false);
@@ -2122,7 +2124,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (player == 1) shift *= -1.0f;
 			pcard->dPos = irr::core::vector3df(shift, 0, 0);
 			if(!mainGame->dField.deck_reversed && !pcard->is_reversed)
-				pcard->dRot = irr::core::vector3df(0, PI / milliseconds, 0);
+				pcard->dRot = irr::core::vector3df(0, irr::core::PI / milliseconds, 0);
 			else pcard->dRot = irr::core::vector3df(0, 0, 0);
 			pcard->is_moving = true;
 			pcard->aniFrame = milliseconds;
@@ -2158,7 +2160,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->dPos = irr::core::vector3df(0, -1.0f / milliseconds, 0);
 			else
 				pcard->dPos = irr::core::vector3df(0.75f / milliseconds, 0, 0);
-			pcard->dRot = irr::core::vector3df(0, PI / milliseconds, 0);
+			pcard->dRot = irr::core::vector3df(0, irr::core::PI / milliseconds, 0);
 			pcard->is_moving = true;
 			pcard->aniFrame = milliseconds;
 			mainGame->WaitFrameSignal(45);
@@ -2203,7 +2205,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->dPos = irr::core::vector3df(shift, 0, 0);
 					if(((l == LOCATION_DECK) && mainGame->dField.deck_reversed) || pcard->is_reversed || (pcard->position & POS_FACEUP))
 						pcard->dRot = irr::core::vector3df(0, 0, 0);
-					else pcard->dRot = irr::core::vector3df(0, PI / milliseconds, 0);
+					else pcard->dRot = irr::core::vector3df(0, irr::core::PI / milliseconds, 0);
 					pcard->is_moving = true;
 					pcard->aniFrame = milliseconds;
 					mainGame->WaitFrameSignal(45);
@@ -2233,9 +2235,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					float milliseconds = 5.0f * 1000.0f / 60.0f;
 					pcard->dPos = irr::core::vector3df(0, 0, 0);
 					if (pcard->position == POS_FACEDOWN_ATTACK)
-						pcard->dRot = irr::core::vector3df(0, PI / milliseconds, 0);
+						pcard->dRot = irr::core::vector3df(0, irr::core::PI / milliseconds, 0);
 					else
-						pcard->dRot = irr::core::vector3df(PI / milliseconds, 0, 0);
+						pcard->dRot = irr::core::vector3df(irr::core::PI / milliseconds, 0, 0);
 					pcard->is_moving = true;
 					pcard->aniFrame = milliseconds;
 				} else if (l == LOCATION_SZONE) {
@@ -2243,7 +2245,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 						continue;
 					float milliseconds = 5.0f * 1000.0f / 60.0f;
 					pcard->dPos = irr::core::vector3df(0, 0, 0);
-					pcard->dRot = irr::core::vector3df(0, PI / milliseconds, 0);
+					pcard->dRot = irr::core::vector3df(0, irr::core::PI / milliseconds, 0);
 					pcard->is_moving = true;
 					pcard->aniFrame = milliseconds;
 				}
@@ -2322,7 +2324,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					if((*cit)->code) {
 						float milliseconds = 5.0f * 1000.0f / 60.0f;
 						(*cit)->dPos = irr::core::vector3df(0, 0, 0);
-						(*cit)->dRot = irr::core::vector3df(1.322f / milliseconds, PI / milliseconds, 0);
+						(*cit)->dRot = irr::core::vector3df(1.322f / milliseconds, irr::core::PI / milliseconds, 0);
 						(*cit)->is_moving = true;
 						(*cit)->is_hovered = false;
 						(*cit)->aniFrame = milliseconds;
@@ -3399,11 +3401,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			float xd = mainGame->dField.attack_target->curPos.X;
 			float yd = mainGame->dField.attack_target->curPos.Y;
 			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			mainGame->atk_t = irr::core::vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
 			if (info1.controler == 0)
-				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
 			else
-				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
 		} else {
 			event_string = fmt::sprintf(dataManager.GetSysString(1620), dataManager.GetName(mainGame->dField.attacker->code));
 			float xa = mainGame->dField.attacker->curPos.X;
@@ -3413,11 +3415,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (info1.controler == 0)
 				yd = -3.5f;
 			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			mainGame->atk_t = irr::core::vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
 			if (info1.controler == 0)
-				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
 			else
-				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+				mainGame->atk_r = irr::core::vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
 		}
 		matManager.GenArrow(sy);
 		mainGame->attack_sv = 0.0f;

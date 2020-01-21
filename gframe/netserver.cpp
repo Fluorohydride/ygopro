@@ -1,5 +1,7 @@
+#include <thread>
 #include "netserver.h"
 #include "generic_duel.h"
+#include "sockets.h"
 
 namespace ygo {
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;

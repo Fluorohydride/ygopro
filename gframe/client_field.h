@@ -2,6 +2,8 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
+#include <IEventReceiver.h>
+#include <vector3d.h>
 #include <vector>
 #include <set>
 #include <map>
@@ -14,7 +16,7 @@ struct ChainInfo {
 	irr::core::vector3df chain_pos;
 	ClientCard* chain_card;
 	int code;
-	u64 desc;
+	uint64 desc;
 	int controler;
 	int location;
 	int sequence;
@@ -42,8 +44,8 @@ public:
 	std::vector<ClientCard*> attackable_cards;
 	std::vector<ClientCard*> conti_cards;
 	ClientCard* skills[2];
-	std::vector<std::pair<u64,int>> activatable_descs;
-	std::vector<u64> select_options;
+	std::vector<std::pair<uint64,int>> activatable_descs;
+	std::vector<uint64> select_options;
 	std::vector<ChainInfo> chains;
 	int extra_p_count[2];
 

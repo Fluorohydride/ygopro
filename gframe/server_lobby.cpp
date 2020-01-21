@@ -1,3 +1,10 @@
+#include <IGUITable.h>
+#include <IGUIEditBox.h>
+#include <IGUIComboBox.h>
+#include <IGUIButton.h>
+#include <IGUICheckBox.h>
+#include <IGUIWindow.h>
+#include <ICursorControl.h>
 #include "server_lobby.h"
 #include "data_manager.h"
 #include "game.h"
@@ -42,10 +49,10 @@ void ServerLobby::FillOnlineRooms() {
 
 	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2 || mainGame->btnFilterRelayMode->isPressed();
 
-	SColor normal_room = Game::GetSkinColor(L"ROOMLIST_TEXTS_COLOR_NORMAL_ROOM", SColor(255, 255, 255, 255));
-	SColor custom_room = Game::GetSkinColor(L"ROOMLIST_TEXTS_COLOR_CUSTOM_ROOM", SColor(255, 255, 100, 100));
-	SColor started_room = Game::GetSkinColor(L"ROOMLIST_STARTED_ROOM", SColor(100, 211, 211, 211));
-	SColor color;
+	irr::video::SColor normal_room = Game::GetSkinColor(L"ROOMLIST_TEXTS_COLOR_NORMAL_ROOM", irr::video::SColor(255, 255, 255, 255));
+	irr::video::SColor custom_room = Game::GetSkinColor(L"ROOMLIST_TEXTS_COLOR_CUSTOM_ROOM", irr::video::SColor(255, 255, 100, 100));
+	irr::video::SColor started_room = Game::GetSkinColor(L"ROOMLIST_STARTED_ROOM", irr::video::SColor(100, 211, 211, 211));
+	irr::video::SColor color;
 	bool show_password_checked = mainGame->chkShowPassword->isChecked();
 	bool show_started_checked = mainGame->chkShowActiveRooms->isChecked();
 	for(auto& room : rooms) {
@@ -134,7 +141,7 @@ void ServerLobby::FillOnlineRooms() {
 	}
 }
 int ServerLobby::GetRoomsThread() {
-	GUIUtils::ChangeCursor(mainGame->device, ECI_WAIT);
+	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_WAIT);
 	mainGame->btnLanRefresh2->setEnabled(false);
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
@@ -164,7 +171,7 @@ int ServerLobby::GetRoomsThread() {
 	if(res != CURLE_OK) {
 		//error
 		mainGame->PopupMessage(dataManager.GetSysString(2037), L"Error 05");
-		GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
+		GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
 		mainGame->roomListTable->setVisible(true);
@@ -220,11 +227,11 @@ int ServerLobby::GetRoomsThread() {
 		FillOnlineRooms();
 		if(mainGame->chkShowActiveRooms->isChecked()) {
 			mainGame->roomListTable->setActiveColumn(7, true);
-			mainGame->roomListTable->orderRows(-1, EGOM_DESCENDING);
+			mainGame->roomListTable->orderRows(-1, irr::gui::EGOM_DESCENDING);
 		}
 	}
 
-	GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
+	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
 	mainGame->btnLanRefresh2->setEnabled(true);
 	mainGame->serverChoice->setEnabled(true);
 	mainGame->roomListTable->setVisible(true);

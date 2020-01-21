@@ -13,6 +13,7 @@
 #include <COGLESDriver.h>
 #include "porting_android.h"
 #endif
+#include <irrlicht.h>
 #include "config.h"
 #include "game.h"
 #include "server_lobby.h"
@@ -131,10 +132,10 @@ bool Game::Initialize() {
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 #ifdef __ANDROID__
-	if(driver->getDriverType() == EDT_OGLES2) {
-		isNPOTSupported = ((COGLES2Driver *)driver)->queryOpenGLFeature(COGLES2ExtensionHandler::IRR_OES_texture_npot);
+	if(driver->getDriverType() == irr::video::EDT_OGLES2) {
+		isNPOTSupported = ((irr::video::COGLES2Driver*)driver)->queryOpenGLFeature(irr::video::COGLES2ExtensionHandler::IRR_OES_texture_npot);
 	} else {
-		isNPOTSupported = ((COGLES1Driver *)driver)->queryOpenGLFeature(COGLES1ExtensionHandler::IRR_OES_texture_npot);
+		isNPOTSupported = ((irr::video::COGLES1Driver*)driver)->queryOpenGLFeature(irr::video::COGLES1ExtensionHandler::IRR_OES_texture_npot);
 	}
 	if(isNPOTSupported) {
 		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
@@ -428,7 +429,7 @@ bool Game::Initialize() {
 	btnHostPrepCancel = env->addButton(Scale(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1210).c_str());
 	//img
 	wCardImg = env->addStaticText(L"", Scale(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, 0, -1, true);
-	wCardImg->setBackgroundColor(GetSkinColor(L"CARDINFO_IMAGE_BACKGROUND", SColor(192, 192, 192, 192)));
+	wCardImg->setBackgroundColor(GetSkinColor(L"CARDINFO_IMAGE_BACKGROUND", irr::video::SColor(192, 192, 192, 192)));
 	wCardImg->setVisible(false);
 	imgCard = env->addImage(Scale(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
 	imgCard->setImage(imageManager.tCover[0]);
@@ -466,13 +467,13 @@ bool Game::Initialize() {
 	((CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
 	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 37, 287, 60));
 	stInfo->setWordWrap(true);
-	stInfo->setOverrideColor(GetSkinColor(L"CARDINFO_TYPES_COLOR", SColor(255, 0, 0, 255)));
+	stInfo->setOverrideColor(GetSkinColor(L"CARDINFO_TYPES_COLOR", irr::video::SColor(255, 0, 0, 255)));
 	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 60, 287, 83));
 	stDataInfo->setWordWrap(true);
-	stDataInfo->setOverrideColor(GetSkinColor(L"CARDINFO_STATS_COLOR", SColor(255, 0, 0, 255)));
+	stDataInfo->setOverrideColor(GetSkinColor(L"CARDINFO_STATS_COLOR", irr::video::SColor(255, 0, 0, 255)));
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
 	stSetName->setWordWrap(true);
-	stSetName->setOverrideColor(GetSkinColor(L"CARDINFO_ARCHETYPE_TEXT_COLOR", SColor(255, 0, 0, 255)));
+	stSetName->setOverrideColor(GetSkinColor(L"CARDINFO_ARCHETYPE_TEXT_COLOR", irr::video::SColor(255, 0, 0, 255)));
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
@@ -566,7 +567,7 @@ bool Game::Initialize() {
 	wACMessage->setDrawBackground(false);
 	stACMessage = irr::gui::CGUICustomText::addCustomText(L"", true, env, wACMessage, -1, Scale(0, 0, 350, 60), true);
 	stACMessage->setWordWrap(true);
-	stACMessage->setBackgroundColor(GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR", SColor(192, 192, 192, 192)));
+	stACMessage->setBackgroundColor(GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR", irr::video::SColor(192, 192, 192, 192)));
 	auto tmp_color = GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_COLOR", 0);
 	if(tmp_color != 0)
 		stACMessage->setOverrideColor(tmp_color);
@@ -672,7 +673,7 @@ bool Game::Initialize() {
 									  wANRace, CHECK_RACE, dataManager.FormatRace(filter).c_str());
 	//selection hint
 	stHintMsg = env->addStaticText(L"", Scale(500, 60, 820, 90), true, false, 0, -1, false);
-	stHintMsg->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", SColor(192, 255, 255, 255)));
+	stHintMsg->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", irr::video::SColor(192, 255, 255, 255)));
 	tmp_color = GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_COLOR", 0);
 	if(tmp_color != 0)
 		stHintMsg->setOverrideColor(tmp_color);
@@ -914,7 +915,7 @@ bool Game::Initialize() {
 	btnRestartSingle->setVisible(false);
 	//tip
 	stTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, 0, -1, true);
-	stTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", SColor(192, 255, 255, 255)));
+	stTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", irr::video::SColor(192, 255, 255, 255)));
 	tmp_color = GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_COLOR", 0);
 	if(tmp_color != 0)
 		stTip->setOverrideColor(tmp_color);
@@ -922,7 +923,7 @@ bool Game::Initialize() {
 	stTip->setVisible(false);
 	//tip for cards in select / display list
 	stCardListTip = env->addStaticText(L"", Scale(0, 0, 150, 150), false, true, wCardSelect, TEXT_CARD_LIST_TIP, true);
-	stCardListTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", SColor(192, 255, 255, 255)));
+	stCardListTip->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", irr::video::SColor(192, 255, 255, 255)));
 	if(tmp_color != 0)
 		stCardListTip->setOverrideColor(tmp_color);
 	stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -948,7 +949,7 @@ bool Game::Initialize() {
 	//wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
 	wRoomListPlaceholder->setVisible(false);
 
-	auto roomlistcolor = GetSkinColor(L"ROOMLIST_TEXTS_COLOR", SColor(255, 255, 255, 255));
+	auto roomlistcolor = GetSkinColor(L"ROOMLIST_TEXTS_COLOR", irr::video::SColor(255, 255, 255, 255));
 
 	//server choice dropdownlist
 	irr::gui::IGUIStaticText* statictext = env->addStaticText(dataManager.GetSysString(2041).c_str(), Scale(10, 30, 110, 50), false, false, wRoomListPlaceholder, -1, false); // 2041 = Server:
@@ -1089,7 +1090,7 @@ bool Game::Initialize() {
 	fpsCounter = env->addStaticText(L"", Scale(15, 15, 100, 60));
 #endif
 	for (u32 i = 0; i < EGDC_COUNT; ++i) {
-		SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
+		irr::video::SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
 		col.setAlpha(224);
 		skin->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
@@ -1102,6 +1103,17 @@ bool Game::Initialize() {
 	LoadGithubRepositories();
 	return true;
 }
+void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
+	for(int i = 0; i < 16; ++i)
+		mProjection[i] = 0;
+	mProjection[0] = 2.0f * znear / (right - left);
+	mProjection[5] = 2.0f * znear / (top - bottom);
+	mProjection[8] = (left + right) / (left - right);
+	mProjection[9] = (top + bottom) / (bottom - top);
+	mProjection[10] = zfar / (zfar - znear);
+	mProjection[11] = 1.0f;
+	mProjection[14] = znear * zfar / (znear - zfar);
+}
 void Game::MainLoop() {
 	camera = smgr->addCameraSceneNode(0);
 	irr::core::matrix4 mProjection;
@@ -1110,7 +1122,7 @@ void Game::MainLoop() {
 	
 	mProjection.buildCameraLookAtMatrixLH(vector3df(FIELD_X, FIELD_Y, FIELD_Z), vector3df(FIELD_X, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
-	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
+	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
 	irr::ITimer* timer = device->getTimer();
 	uint32 cur_time = 0;
@@ -1123,31 +1135,31 @@ void Game::MainLoop() {
 	ogles2Solid = 0;
 	ogles2TrasparentAlpha = 0;
 	ogles2BlendTexture = 0;
-	ogles2Solid = video::EMT_SOLID;
-	ogles2TrasparentAlpha = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-	ogles2BlendTexture = video::EMT_ONETEXTURE_BLEND;
-	matManager.mCard.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mTexture.MaterialType = (video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
-	matManager.mBackLine.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mSelField.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mOutLine.MaterialType = (video::E_MATERIAL_TYPE)ogles2Solid;
-	matManager.mTRTexture.MaterialType = (video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
-	matManager.mATK.MaterialType = (video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	ogles2Solid = irr::video::EMT_SOLID;
+	ogles2TrasparentAlpha = irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+	ogles2BlendTexture = irr::video::EMT_ONETEXTURE_BLEND;
+	matManager.mCard.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mTexture.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
+	matManager.mBackLine.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mSelField.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
+	matManager.mOutLine.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2Solid;
+	matManager.mTRTexture.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
+	matManager.mATK.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
 	if(!isNPOTSupported) {
-		matManager.mCard.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		matManager.mCard.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-		matManager.mTexture.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		matManager.mTexture.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-		matManager.mBackLine.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		matManager.mBackLine.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-		matManager.mSelField.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		matManager.mSelField.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-		matManager.mOutLine.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		matManager.mOutLine.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-		matManager.mTRTexture.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		matManager.mTRTexture.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-		matManager.mATK.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		matManager.mATK.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		matManager.mCard.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mCard.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mTexture.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mTexture.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mBackLine.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mBackLine.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mSelField.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mSelField.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mOutLine.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mOutLine.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mTRTexture.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mTRTexture.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mATK.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+		matManager.mATK.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
 	}
 #endif
 	if(gameConf.fullscreen)
@@ -1258,7 +1270,7 @@ void Game::MainLoop() {
 		}
 		atkframe += 0.1f * (float)delta_time * 60.0f / 1000.0f;
 		atkdy = (float)sin(atkframe);
-		driver->beginScene(true, true, SColor(0, 0, 0, 0));
+		driver->beginScene(true, true, irr::video::SColor(0, 0, 0, 0));
 		gMutex.lock();
 		if(dInfo.isInDuel) {
 			if(dInfo.isReplay)
@@ -1393,21 +1405,10 @@ void Game::MainLoop() {
 #endif //YGOPRO_BUILD_DLL
 	//device->drop();
 }
-void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
-	for(int i = 0; i < 16; ++i)
-		mProjection[i] = 0;
-	mProjection[0] = 2.0f * znear / (right - left);
-	mProjection[5] = 2.0f * znear / (top - bottom);
-	mProjection[8] = (left + right) / (left - right);
-	mProjection[9] = (top + bottom) / (bottom - top);
-	mProjection[10] = zfar / (zfar - znear);
-	mProjection[11] = 1.0f;
-	mProjection[14] = znear * zfar / (znear - zfar);
-}
 void Game::LoadZipArchives() {
-	IFileArchive* tmp_archive = nullptr;
+	irr::io::IFileArchive* tmp_archive = nullptr;
 	for(auto& file : Utils::FindfolderFiles(TEXT("./expansions/"), { TEXT("zip") })) {
-		filesystem->addFileArchive((TEXT("./expansions/") + file).c_str(), true, false, EFAT_ZIP, "", &tmp_archive);
+		filesystem->addFileArchive((TEXT("./expansions/") + file).c_str(), true, false, irr::io::EFAT_ZIP, "", &tmp_archive);
 		if(tmp_archive) {
 			Utils::archives.emplace_back(tmp_archive);
 		}
@@ -2193,6 +2194,10 @@ void Game::SetMesageWindow() {
 		/*wMessage->setRelativePosition(ResizeWin(510 - 175, 200, 510 + 175, 340));
 		wACMessage->setRelativePosition(ResizeWin(510 - 175, 240, 510 + 175, 300));*/
 	}
+}
+bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
+	irr::gui::IGUIElement* focus = env->getFocus();
+	return focus && focus->hasType(type);
 }
 void Game::OnResize() {
 	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));

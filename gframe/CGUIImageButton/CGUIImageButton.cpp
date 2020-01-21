@@ -63,8 +63,8 @@ void Draw2DImageRotation(video::IVideoDriver* driver, video::ITexture* image, co
 	material.TextureLayer[0].Texture = image;
 #if defined(__ANDROID__)
 	if(!ygo::mainGame->isNPOTSupported) {
-		material.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		material.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		material.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
+		material.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 	}
 	if(useAlphaChannel)
 		material.MaterialType = (video::E_MATERIAL_TYPE)ygo::mainGame->ogles2TrasparentAlpha;
@@ -113,8 +113,8 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 	material.TextureLayer[0].Texture = image;
 #if defined(__ANDROID__)
 	if(!ygo::mainGame->isNPOTSupported) {
-		material.TextureLayer[0].TextureWrapU = ETC_CLAMP_TO_EDGE;
-		material.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
+		material.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
+		material.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 	}
 	if(useAlphaChannel)
 		material.MaterialType = (video::E_MATERIAL_TYPE)ygo::mainGame->ogles2TrasparentAlpha;

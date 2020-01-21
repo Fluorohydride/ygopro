@@ -8,6 +8,9 @@
 #include <vector>
 #include <list>
 #include "config.h"
+#include <SColor.h>
+#include <rect.h>
+#include <EGUIElementTypes.h>
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
@@ -20,12 +23,38 @@
 class CGUISkinSystem;
 class IProgressBar;
 namespace irr {
-namespace gui {
-	class CGUIFileSelectListBox;
-	class CGUITTFont;
-	class CGUIImageButton;
-	class Panel;
-}
+	class IrrlichtDevice;
+	namespace gui {
+		class IGUIElement;
+		class CGUIFileSelectListBox;
+		class CGUITTFont;
+		class CGUIImageButton;
+		class Panel;
+		class IGUIComboBox;
+		class IGUIContextMenu;
+		class IGUIEditBox;
+		class IGUITabControl;
+		class IGUIEnvironment;
+		class IGUITable;
+		class IGUITab;
+		class IGUIScrollBar;
+		class IGUIListBox;
+		class IGUIButton;
+		class IGUIScrollBar;
+		class IGUIImage;
+	}
+	namespace video {
+		class IVideoDriver;
+		class S3DVertex;
+		class ITexture;
+	}
+	namespace io {
+		class IFileSystem;
+	}
+	namespace scene {
+		class ISceneManager;
+		class ICameraSceneNode;
+	}
 }
 namespace ygo {
 
@@ -124,7 +153,6 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
-	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void LoadZipArchives();
 	void LoadExpansionDB();
 	void LoadArchivesDB();
@@ -140,11 +168,11 @@ public:
 	bool CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
-	void DrawShadowText(irr::gui::CGUITTFont* font, const core::stringw& text, const core::rect<s32>& shadowposition, const core::rect<s32>& padding, video::SColor color = 0xffffffff, video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const core::rect<s32>* clip = nullptr);
+	void DrawShadowText(irr::gui::CGUITTFont* font, const irr::core::stringw& text, const irr::core::rect<irr::s32>& shadowposition, const irr::core::rect<irr::s32>& padding, irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<irr::s32>* clip = nullptr);
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard);
 	void DrawPendScale(ClientCard* pcard);
-	void DrawStackIndicator(const std::wstring& text, S3DVertex* v, bool opponent);
+	void DrawStackIndicator(const std::wstring& text, irr::video::S3DVertex* v, bool opponent);
 	void DrawGUI();
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture);
@@ -152,7 +180,7 @@ public:
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag = false, recti* cliprect = nullptr, bool loadimage = true);
+	void DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, bool drag = false, irr::core::recti* cliprect = nullptr, bool loadimage = true);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
@@ -179,33 +207,30 @@ public:
 	void SetPhaseButtons();
 	void SetMesageWindow();
 
-	bool HasFocus(EGUI_ELEMENT_TYPE type) const {
-		irr::gui::IGUIElement* focus = env->getFocus();
-		return focus && focus->hasType(type);
-	}
+	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const;
 
 	void OnResize();
 	template<typename T>
 	T Scale(T val);
 	template<typename T, typename T2, typename T3, typename T4>
-	rect<T> Scale(T x, T2 y, T3 x2, T4 y2);
+	irr::core::rect<T> Scale(T x, T2 y, T3 x2, T4 y2);
 	template<typename T>
-	rect<T> Scale(rect<T> rect);
+	irr::core::rect<T> Scale(irr::core::rect<T> rect);
 	template<typename T>
-	vector2d<T> Scale(vector2d<T> vec);
+	irr::core::vector2d<T> Scale(irr::core::vector2d<T> vec);
 	template<typename T>
 	T ResizeX(T x);
 	template<typename T>
 	T ResizeY(T y);
 	template<typename T, typename T2>
-	vector2d<T> Scale(T x, T2 y);
-	recti Resize(s32 x, s32 y, s32 x2, s32 y2);
-	recti Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2);
-	vector2d<s32> Resize(s32 x, s32 y, bool reverse = false);
-	recti ResizeElem(s32 x, s32 y, s32 x2, s32 y2, bool scale = true);
-	recti ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width);
-	recti ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2);
-	recti ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat = false);
+	irr::core::vector2d<T> Scale(T x, T2 y);
+	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
+	irr::core::recti Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 dx, irr::s32 dy, irr::s32 dx2, irr::s32 dy2);
+	irr::core::vector2d<irr::s32> Resize(irr::s32 x, irr::s32 y, bool reverse = false);
+	irr::core::recti ResizeElem(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, bool scale = true);
+	irr::core::recti ResizePhaseHint(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 width);
+	irr::core::recti ResizeWinFromCenter(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
+	irr::core::recti ResizeWin(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, bool chat = false);
 	void SetCentered(irr::gui::IGUIElement* elem);
 	void ValidateName(irr::gui::IGUIElement* box);
 	
@@ -298,7 +323,7 @@ public:
 	irr::video::IVideoDriver* driver;
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
-	io::IFileSystem* filesystem;
+	irr::io::IFileSystem* filesystem;
 	void PopulateResourcesDirectories();
 	std::vector<path_string> field_dirs;
 	std::vector<path_string> pic_dirs;
@@ -655,19 +680,19 @@ public:
 	int glversion;
 	bool isPSEnabled;
 	bool isNPOTSupported;
-	s32 ogles2Solid;
-	s32 ogles2TrasparentAlpha;
-	s32 ogles2BlendTexture;
+	irr::s32 ogles2Solid;
+	irr::s32 ogles2TrasparentAlpha;
+	irr::s32 ogles2BlendTexture;
 	Signal externalSignal;
-	IGUIStaticText* fpsCounter;
+	irr::gui::IGUIStaticText* fpsCounter;
 #endif
 };
 
 extern Game* mainGame;
 
 template<typename T>
-inline vector2d<T> Game::Scale(vector2d<T> vec) {
-	return vector2d<T>(vec.X * gameConf.dpi_scale, vec.Y * gameConf.dpi_scale );
+inline irr::core::vector2d<T> Game::Scale(irr::core::vector2d<T> vec) {
+	return irr::core::vector2d<T>(vec.X * gameConf.dpi_scale, vec.Y * gameConf.dpi_scale );
 }
 template<typename T>
 inline T Game::ResizeX(T x) {
@@ -678,20 +703,20 @@ inline T Game::ResizeY(T y) {
 	return Scale<T>(y * window_scale.Y);
 }
 template<typename T, typename T2>
-inline vector2d<T> Game::Scale(T x, T2 y) {
-	return vector2d<T>((T)(x * gameConf.dpi_scale), (T)(y * gameConf.dpi_scale));
+inline irr::core::vector2d<T> Game::Scale(T x, T2 y) {
+	return irr::core::vector2d<T>((T)(x * gameConf.dpi_scale), (T)(y * gameConf.dpi_scale));
 }
 template<typename T>
 inline T Game::Scale(T val) {
 	return T(val * gameConf.dpi_scale);
 }
 template<typename T, typename T2, typename T3, typename T4>
-rect<T> Game::Scale(T x, T2 y, T3 x2, T4 y2) {
+irr::core::rect<T> Game::Scale(T x, T2 y, T3 x2, T4 y2) {
 	auto& scale = gameConf.dpi_scale;
 	return { (T)std::roundf(x * scale),(T)std::roundf(y * scale), (T)std::roundf(x2 * scale), (T)std::roundf(y2 * scale) };
 }
 template<typename T>
-rect<T> Game::Scale(rect<T> rect) {
+irr::core::rect<T> Game::Scale(irr::core::rect<T> rect) {
 	return Scale(rect.UpperLeftCorner.X, rect.UpperLeftCorner.Y, rect.LowerRightCorner.X, rect.LowerRightCorner.Y);
 }
 
@@ -706,11 +731,6 @@ rect<T> Game::Scale(rect<T> rect) {
 #define CAMERA_RIGHT	0.45f
 #define CAMERA_BOTTOM	-0.42f
 #define CAMERA_TOP		0.42f
-
-#define CARD_IMG_WIDTH		177
-#define CARD_IMG_HEIGHT		254
-#define CARD_THUMB_WIDTH	44
-#define CARD_THUMB_HEIGHT	64
 
 #define UEVENT_EXIT			0x1
 #define UEVENT_TOWINDOW		0x2

@@ -53,7 +53,7 @@ ClientCard::ClientCard() {
 	overlayTarget = 0;
 	equipTarget = 0;
 }
-void ClientCard::SetCode(irr::u32 code) {
+void ClientCard::SetCode(uint32_t code) {
 	if((location == LOCATION_HAND) && (this->code != code)) {
 		this->code = code;
 		if(!mainGame->dInfo.isCatchingUp)

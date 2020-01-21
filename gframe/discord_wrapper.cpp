@@ -2,6 +2,12 @@
 #include <iostream>
 #include <chrono>
 #include <nlohmann/json.hpp>
+#include <IGUIElement.h>
+#include <IrrlichtDevice.h>
+#include <IGUIButton.h>
+#include <IGUIEditBox.h>
+#include <IGUIWindow.h>
+#include <IGUIStaticText.h>
 #include "discord_register.h"
 #include "discord_rpc.h"
 #include "game.h"

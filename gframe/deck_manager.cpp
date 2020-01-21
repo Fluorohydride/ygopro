@@ -2,6 +2,7 @@
 #include "data_manager.h"
 #include "network.h"
 #include "game.h"
+#include <IGUIEditBox.h>
 #include <algorithm>
 #include <fstream>
 

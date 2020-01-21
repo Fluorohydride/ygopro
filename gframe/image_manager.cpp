@@ -1,3 +1,7 @@
+#include <IImage.h>
+#include <IVideoDriver.h>
+#include <IrrlichtDevice.h>
+#include <IReadFile.h>
 #include "image_manager.h"
 #include "game.h"
 #include <fstream>
@@ -217,7 +221,7 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 	out->write(ptr, nbytes);
 	return nbytes;
 }
-const fschar_t* GetExtension(char* header) {
+const irr::fschar_t* GetExtension(char* header) {
 	int res = CheckImageHeader(header);
 	if(res == PNG_FILE)
 		return TEXT(".png");
@@ -351,9 +355,9 @@ void ImageManager::ClearCachedTextures(bool resize) {
 	}
 }
 // function by Warr1024, from https://github.com/minetest/minetest/issues/2419 , modified
-bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, s32 width, s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
-	u32 dy, dx;
+	irr::u32 dy, dx;
 	irr::video::SColor pxl;
 
 	// Cache rectsngle boundaries.
@@ -362,7 +366,7 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 
 	// Walk each destination image pixel.
 	// Note: loop y around x for better cache locality.
-	irr::core::dimension2d<u32> dim = dest->getDimension();
+	irr::core::dimension2d<irr::u32> dim = dest->getDimension();
 	if(timestamp_id != source_timestamp_id.load())
 		return false;
 	for(dy = 0; dy < dim.Height; dy++)
@@ -406,7 +410,7 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 
 					// Get source pixel and add it to totals, weighted
 					// by covered area and alpha.
-					pxl = src->getPixel((u32)sx, (u32)sy);
+					pxl = src->getPixel((irr::u32)sx, (irr::u32)sy);
 					area += pa;
 					ra += pa * pxl.getRed();
 					ga += pa * pxl.getGreen();
@@ -430,7 +434,7 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 		}
 	return true;
 }
-irr::video::IImage* ImageManager::GetTextureImageFromFile(const io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile) {
+irr::video::IImage* ImageManager::GetTextureImageFromFile(const irr::io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile) {
 	irr::video::IImage* srcimg = nullptr;
 	if(archivefile)
 		srcimg = driver->createImageFromFile(archivefile);
@@ -441,10 +445,10 @@ irr::video::IImage* ImageManager::GetTextureImageFromFile(const io::path& file, 
 			srcimg->drop();
 		return NULL;
 	}
-	if(srcimg->getDimension() == irr::core::dimension2d<u32>(width, height)) {
+	if(srcimg->getDimension() == irr::core::dimension2d<irr::u32>(width, height)) {
 		return srcimg;
 	} else {
-		video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(width, height));
+		irr::video::IImage *destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<irr::u32>(width, height));
 		if(timestamp_id != source_timestamp_id.load() || !imageScaleNNAA(srcimg, destimg, width, height, timestamp_id, std::ref(source_timestamp_id))) {
 			destimg->drop();
 			destimg = nullptr;
@@ -453,7 +457,7 @@ irr::video::IImage* ImageManager::GetTextureImageFromFile(const io::path& file, 
 		return destimg;
 	}
 }
-irr::video::ITexture* ImageManager::GetTextureFromFile(const io::path & file, int width, int height) {
+irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path & file, int width, int height) {
 	auto img = GetTextureImageFromFile(file, width, height, timestamp_id.load(), std::ref(timestamp_id));
 	if(img) {
 		auto texture = driver->addTexture(file, img);
@@ -463,7 +467,7 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const io::path & file, in
 	}
 	return driver->getTexture(file);
 }
-ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, std::atomic<s32>& _width, std::atomic<s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, std::atomic<irr::s32>& _width, std::atomic<irr::s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* img = nullptr;
 	int width = _width;
 	int height = _height;
