@@ -5,7 +5,6 @@
 #include "duelclient.h""
 #include "CGUITTFont/CGUITTFont.h"
 #include "CGUIImageButton/CGUIImageButton.h"
-#if 0
 #ifdef __ANDROID__
 #include <GLES/gl.h>
 #include <GLES/glext.h>
@@ -17,9 +16,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
-#endif
-
-void glLineWidth(float);
 
 namespace ygo {
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color) {
