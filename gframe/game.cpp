@@ -1345,14 +1345,18 @@ void Game::MainLoop() {
 			closeSignal.unlock();
 #ifndef __ANDROID__
 #ifdef __APPLE__
-		if(!device->isWindowActive()) {
-			if(cur_time < fps * 14)
-				std::this_thread::sleep_for(std::chrono::milliseconds(20));
-		} else
+		// Recent versions of macOS break OpenGL vsync while offscreen, resulting in
+		// astronomical FPS and CPU usage. As a workaround, while the game window is
+		// fully occluded, the game is restricted to 30 FPS.
+		int fpsLimit = device->isWindowActive() ? gameConf.max_fps : 30;
+		if (!device->isWindowActive() || (gameConf.max_fps && !gameConf.use_vsync)) {
+#else
+		int fpsLimit = gameConf.max_fps;
+		if (gameConf.max_fps && !gameConf.use_vsync) {
 #endif
-		if(gameConf.max_fps && !gameConf.use_vsync) {
-			if(cur_time < fps * std::round(1000.0f / (float)gameConf.max_fps) - 20)
-				std::this_thread::sleep_for(std::chrono::milliseconds(20));
+			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
+			if (delta >= 20)
+				std::this_thread::sleep_for(std::chrono::milliseconds(delta));
 		}
 #endif
 		while(cur_time >= 1000) {
