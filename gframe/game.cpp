@@ -1394,9 +1394,7 @@ void Game::MainLoop() {
 			stACMessage->setText(L"Disconnected from Discord");
 			PopupElement(wACMessage, 30);
 		}
-#ifdef __ANDROID__
-		device->yield(); // probably nicer to the battery
-#endif
+		device->yield();
 	}
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();
