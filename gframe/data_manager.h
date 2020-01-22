@@ -16,8 +16,6 @@ public:
 	~DataManager() {
 		for(auto& card : _datas) {
 			if(card.second) {
-				if(card.second->setcodes_p)
-					delete card.second->setcodes_p;
 				delete card.second;
 			}
 		}

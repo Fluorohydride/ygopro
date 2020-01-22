@@ -51,12 +51,8 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 					cd->setcodes.push_back(setcode);
 			}
 			if(cd->setcodes.size()) {
-				uint16_t* setptr = cd->setcodes_p = new uint16_t[cd->setcodes.size() + 1];
-				for(const auto& setcode : cd->setcodes) {
-					*setptr = setcode;
-					setptr++;
-				}
-				*setptr = 0;
+				cd->setcodes.push_back(0);
+				cd->setcodes_p = cd->setcodes.data();
 			}
 			cd->type = sqlite3_column_int(pStmt, 4);
 			cd->attack = sqlite3_column_int(pStmt, 5);
@@ -77,10 +73,6 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 			cd->attribute = sqlite3_column_int(pStmt, 9);
 			cd->category = sqlite3_column_int(pStmt, 10);
 			auto search = _datas.find(cd->code);
-			if(search != _datas.end()) {
-				if(search->second->setcodes_p)
-					delete search->second->setcodes_p;
-			}
 			_datas[cd->code] = cd;
 			if(const char* text = (const char*)sqlite3_column_text(pStmt, 12)) {
 				cs.name = BufferIO::DecodeUTF8s(text);
