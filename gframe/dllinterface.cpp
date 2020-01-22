@@ -1,5 +1,6 @@
 #ifdef YGOPRO_BUILD_DLL
 #include <string>
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #else
@@ -10,7 +11,6 @@
 #endif
 #include "dllinterface.h"
 #include "utils.h"
-#ifdef _WIN32
 
 #ifdef _WIN32
 #define CORENAME EPRO_TEXT("ocgcore.dll")
