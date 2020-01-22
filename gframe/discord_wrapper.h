@@ -2,7 +2,7 @@
 #define DISCORD_WRAPPER_H
 
 #include <string>
-#include "utils.h"
+#include "text_types.h"
 struct DiscordUser;
 class DiscordWrapper {
 public:

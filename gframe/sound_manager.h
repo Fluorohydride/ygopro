@@ -3,7 +3,8 @@
 
 #include <memory>
 #include <random>
-#include "utils.h"
+#include <map>
+#include "text_types.h"
 #include "sound_backend.h"
 
 namespace ygo {

@@ -34,7 +34,7 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 #ifdef _WIN32
 	TCHAR exepath[MAX_PATH];
 	GetModuleFileName(nullptr, exepath, MAX_PATH);
-	path_string param = fmt::format(TEXT("{} from_discord {}"), exepath, workingDir);
+	path_string param = fmt::format(EPRO_TEXT("{} from_discord {}"), exepath, workingDir);
 #elif defined(__linux__)
 	char buff[PATH_MAX];
 	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);

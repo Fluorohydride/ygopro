@@ -20,49 +20,49 @@ void ImageManager::AddDownloadResource(PicSource src) {
 
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	tCover[0] = GetTextureFromFile(TEXT("textures/cover.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
-	tCover[1] = GetTextureFromFile(TEXT("textures/cover2.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
+	tCover[0] = GetTextureFromFile(EPRO_TEXT("textures/cover.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
+	tCover[1] = GetTextureFromFile(EPRO_TEXT("textures/cover2.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
 	if(!tCover[1])
 		tCover[1] = tCover[0];
-	tUnknown = driver->getTexture(TEXT("textures/unknown.jpg"));
-	tAct = driver->getTexture(TEXT("textures/act.png"));
-	tAttack = driver->getTexture(TEXT("textures/attack.png"));
-	tChain = driver->getTexture(TEXT("textures/chain.png"));
-	tNegated = driver->getTexture(TEXT("textures/negated.png"));
-	tNumber = driver->getTexture(TEXT("textures/number.png"));
-	tLPBar = driver->getTexture(TEXT("textures/lp.png"));
-	tLPFrame = driver->getTexture(TEXT("textures/lpf.png"));
-	tMask = driver->getTexture(TEXT("textures/mask.png"));
-	tEquip = driver->getTexture(TEXT("textures/equip.png"));
-	tTarget = driver->getTexture(TEXT("textures/target.png"));
-	tChainTarget = driver->getTexture(TEXT("textures/chaintarget.png"));
-	tLim = driver->getTexture(TEXT("textures/lim.png"));
-	tHand[0] = GetTextureFromFile(TEXT("textures/f1.jpg"), mainGame->Scale(89), mainGame->Scale(128));
-	tHand[1] = GetTextureFromFile(TEXT("textures/f2.jpg"), mainGame->Scale(89), mainGame->Scale(128));
-	tHand[2] = GetTextureFromFile(TEXT("textures/f3.jpg"), mainGame->Scale(89), mainGame->Scale(128));
-	tBackGround = driver->getTexture(TEXT("textures/bg.jpg"));
-	tBackGround_menu = driver->getTexture(TEXT("textures/bg_menu.jpg"));
+	tUnknown = driver->getTexture(EPRO_TEXT("textures/unknown.jpg"));
+	tAct = driver->getTexture(EPRO_TEXT("textures/act.png"));
+	tAttack = driver->getTexture(EPRO_TEXT("textures/attack.png"));
+	tChain = driver->getTexture(EPRO_TEXT("textures/chain.png"));
+	tNegated = driver->getTexture(EPRO_TEXT("textures/negated.png"));
+	tNumber = driver->getTexture(EPRO_TEXT("textures/number.png"));
+	tLPBar = driver->getTexture(EPRO_TEXT("textures/lp.png"));
+	tLPFrame = driver->getTexture(EPRO_TEXT("textures/lpf.png"));
+	tMask = driver->getTexture(EPRO_TEXT("textures/mask.png"));
+	tEquip = driver->getTexture(EPRO_TEXT("textures/equip.png"));
+	tTarget = driver->getTexture(EPRO_TEXT("textures/target.png"));
+	tChainTarget = driver->getTexture(EPRO_TEXT("textures/chaintarget.png"));
+	tLim = driver->getTexture(EPRO_TEXT("textures/lim.png"));
+	tHand[0] = GetTextureFromFile(EPRO_TEXT("textures/f1.jpg"), mainGame->Scale(89), mainGame->Scale(128));
+	tHand[1] = GetTextureFromFile(EPRO_TEXT("textures/f2.jpg"), mainGame->Scale(89), mainGame->Scale(128));
+	tHand[2] = GetTextureFromFile(EPRO_TEXT("textures/f3.jpg"), mainGame->Scale(89), mainGame->Scale(128));
+	tBackGround = driver->getTexture(EPRO_TEXT("textures/bg.jpg"));
+	tBackGround_menu = driver->getTexture(EPRO_TEXT("textures/bg_menu.jpg"));
 	if(!tBackGround_menu)
 		tBackGround_menu = tBackGround;
-	tBackGround_deck = driver->getTexture(TEXT("textures/bg_deck.jpg"));
+	tBackGround_deck = driver->getTexture(EPRO_TEXT("textures/bg_deck.jpg"));
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
-	tField[0][0] = driver->getTexture(TEXT("textures/field2.png"));
-	tFieldTransparent[0][0] = driver->getTexture(TEXT("textures/field-transparent2.png"));
-	tField[0][1] = driver->getTexture(TEXT("textures/field3.png"));
-	tFieldTransparent[0][1] = driver->getTexture(TEXT("textures/field-transparent3.png"));
-	tField[0][2] = driver->getTexture(TEXT("textures/field.png"));
-	tFieldTransparent[0][2] = driver->getTexture(TEXT("textures/field-transparent.png"));
-	tField[0][3] = driver->getTexture(TEXT("textures/field4.png"));
-	tFieldTransparent[0][3] = driver->getTexture(TEXT("textures/field-transparent4.png"));
-	tField[1][0] = driver->getTexture(TEXT("textures/fieldSP2.png"));
-	tFieldTransparent[1][0] = driver->getTexture(TEXT("textures/field-transparentSP2.png"));
-	tField[1][1] = driver->getTexture(TEXT("textures/fieldSP3.png"));
-	tFieldTransparent[1][1] = driver->getTexture(TEXT("textures/field-transparentSP3.png"));
-	tField[1][2] = driver->getTexture(TEXT("textures/fieldSP.png"));
-	tFieldTransparent[1][2] = driver->getTexture(TEXT("textures/field-transparentSP.png"));
-	tField[1][3] = driver->getTexture(TEXT("textures/fieldSP4.png"));
-	tFieldTransparent[1][3] = driver->getTexture(TEXT("textures/field-transparentSP4.png"));
+	tField[0][0] = driver->getTexture(EPRO_TEXT("textures/field2.png"));
+	tFieldTransparent[0][0] = driver->getTexture(EPRO_TEXT("textures/field-transparent2.png"));
+	tField[0][1] = driver->getTexture(EPRO_TEXT("textures/field3.png"));
+	tFieldTransparent[0][1] = driver->getTexture(EPRO_TEXT("textures/field-transparent3.png"));
+	tField[0][2] = driver->getTexture(EPRO_TEXT("textures/field.png"));
+	tFieldTransparent[0][2] = driver->getTexture(EPRO_TEXT("textures/field-transparent.png"));
+	tField[0][3] = driver->getTexture(EPRO_TEXT("textures/field4.png"));
+	tFieldTransparent[0][3] = driver->getTexture(EPRO_TEXT("textures/field-transparent4.png"));
+	tField[1][0] = driver->getTexture(EPRO_TEXT("textures/fieldSP2.png"));
+	tFieldTransparent[1][0] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP2.png"));
+	tField[1][1] = driver->getTexture(EPRO_TEXT("textures/fieldSP3.png"));
+	tFieldTransparent[1][1] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP3.png"));
+	tField[1][2] = driver->getTexture(EPRO_TEXT("textures/fieldSP.png"));
+	tFieldTransparent[1][2] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP.png"));
+	tField[1][3] = driver->getTexture(EPRO_TEXT("textures/fieldSP4.png"));
+	tFieldTransparent[1][3] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP4.png"));
 	sizes[0].first = CARD_IMG_WIDTH * mainGame->gameConf.dpi_scale;
 	sizes[0].second = CARD_IMG_HEIGHT * mainGame->gameConf.dpi_scale;
 	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
@@ -92,12 +92,12 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
 		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
-		auto tmp_cover = GetTextureFromFile(TEXT("textures/cover.jpg"), sizes[1].first, sizes[1].second);
+		auto tmp_cover = GetTextureFromFile(EPRO_TEXT("textures/cover.jpg"), sizes[1].first, sizes[1].second);
 		if(tmp_cover) {
 			driver->removeTexture(tCover[0]);
 			tCover[0] = tmp_cover;
 		}
-		tmp_cover = GetTextureFromFile(TEXT("textures/cover2.jpg"), sizes[1].first, sizes[1].second);
+		tmp_cover = GetTextureFromFile(EPRO_TEXT("textures/cover2.jpg"), sizes[1].first, sizes[1].second);
 		if(tmp_cover) {
 			driver->removeTexture(tCover[1]);
 			tCover[1] = tmp_cover;
@@ -134,7 +134,7 @@ void ImageManager::RemoveTexture(int code) {
 				}\
 				dest[it->first] = driver->addTexture(pair.second.c_str(), pair.first);\
 				pair.first->drop();\
-			} else if(pair.second != TEXT("wait for download"))\
+			} else if(pair.second != EPRO_TEXT("wait for download"))\
 				dest[it->first] = nullptr;\
 			it = src->erase(it);\
 			continue;\
@@ -162,7 +162,7 @@ void ImageManager::RefreshCachedTextures() {
 					}
 					tCovers[it->first] = driver->addTexture(pair.second.c_str(), pair.first);
 					pair.first->drop();
-				} else if(pair.second != TEXT("wait for download"))
+				} else if(pair.second != EPRO_TEXT("wait for download"))
 					tCovers[it->first] = nullptr;
 				it = loading_pics[3]->erase(it);
 				continue;
@@ -224,14 +224,14 @@ size_t write_data(char *ptr, size_t size, size_t nmemb, void *userdata) {
 const irr::fschar_t* GetExtension(char* header) {
 	int res = CheckImageHeader(header);
 	if(res == PNG_FILE)
-		return TEXT(".png");
+		return EPRO_TEXT(".png");
 	else if(res == JPG_FILE)
-		return TEXT(".jpg");
-	return TEXT("");
+		return EPRO_TEXT(".jpg");
+	return EPRO_TEXT("");
 }
 void ImageManager::DownloadPic() {
-	path_string dest_folder;// = fmt::format(TEXT("./pics/{}"), code);
-	path_string name;// = fmt::format(TEXT("./pics/temp/{}"), code);
+	path_string dest_folder;// = fmt::format(EPRO_TEXT("./pics/{}"), code);
+	path_string name;// = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
 	path_string ext;
 	while(!stop_threads) {
 		if(to_download.size() == 0) {
@@ -250,23 +250,23 @@ void ImageManager::DownloadPic() {
 		downloading_images[type][file.code].status = DOWNLOADING;
 		downloading.push_back(std::move(file));
 		pic_download.unlock();
-		name = fmt::format(TEXT("./pics/temp/{}"), code);
+		name = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
 		if(type == THUMB)
 			type = ART;
 		switch(type) {
 			case ART:
 			case THUMB: {
-				dest_folder = fmt::format(TEXT("./pics/{}"), code);
+				dest_folder = fmt::format(EPRO_TEXT("./pics/{}"), code);
 				break;
 			}
 			case FIELD: {
-				dest_folder = fmt::format(TEXT("./pics/field/{}"), code);
-				name.append(TEXT("_f"));
+				dest_folder = fmt::format(EPRO_TEXT("./pics/field/{}"), code);
+				name.append(EPRO_TEXT("_f"));
 				break;
 			}
 			case COVER: {
-				dest_folder = fmt::format(TEXT("./pics/cover/{}"), code);
-				name.append(TEXT("_c"));
+				dest_folder = fmt::format(EPRO_TEXT("./pics/cover/{}"), code);
+				name.append(EPRO_TEXT("_c"));
 				break;
 			}
 		}
@@ -321,7 +321,7 @@ void ImageManager::AddToDownloadQueue(int code, imgType type) {
 	pic_download.lock();
 	if(downloading_images[index].find(code) == downloading_images[index].end()) {
 		downloading_images[index][code].status = DOWNLOADING;
-		to_download.push(downloadParam{ code, type, NONE, TEXT("") });
+		to_download.push(downloadParam{ code, type, NONE, EPRO_TEXT("") });
 	}
 	pic_download.unlock();
 	cv.notify_one();
@@ -341,7 +341,7 @@ path_string ImageManager::GetDownloadPath(int code, imgType type) {
 	int index = static_cast<int>(type);
 	std::lock_guard<std::mutex> lk(pic_download);
 	if(downloading_images[index].find(code) == downloading_images[index].end())
-		return TEXT("");
+		return EPRO_TEXT("");
 	return downloading_images[index][code].path;
 }
 void ImageManager::ClearCachedTextures(bool resize) {
@@ -474,12 +474,12 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 	if(type == THUMB)
 		type = ART;
 	for(auto& path : (type == ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
-		for(auto extension : { TEXT(".png"), TEXT(".jpg") }) {
+		for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 			if(timestamp_id != source_timestamp_id.load())
-				return std::make_pair(nullptr, TEXT("fail"));
+				return std::make_pair(nullptr, EPRO_TEXT("fail"));
 			irr::io::IReadFile* reader = nullptr;
-			if(path == TEXT("archives")) {
-				reader = Utils::FindandOpenFileFromArchives((type == ART) ? TEXT("pics") : TEXT("pics/cover"), fmt::format(TEXT("{}{}"), code, extension));
+			if(path == EPRO_TEXT("archives")) {
+				reader = Utils::FindandOpenFileFromArchives((type == ART) ? EPRO_TEXT("pics") : EPRO_TEXT("pics/cover"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
 				if(!reader)
 					continue;
 			}
@@ -487,7 +487,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 				width = _width;
 				height = _height;
 			}
-			auto file = reader ? reader->getFileName().c_str() : fmt::format(TEXT("{}{}{}"), path, code, extension);
+			auto file = reader ? reader->getFileName().c_str() : fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
 			__repeat:
 			if(img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader)) {
 				if(timestamp_id != source_timestamp_id.load()) {
@@ -496,7 +496,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 						reader->drop();
 						reader = nullptr;
 					}
-					return std::make_pair(nullptr, TEXT("fail"));
+					return std::make_pair(nullptr, EPRO_TEXT("fail"));
 				}
 				if(width != _width || height != _height) {
 					img->drop();
@@ -515,7 +515,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 					reader->drop();
 					reader = nullptr;
 				}
-				return std::make_pair(nullptr, TEXT("fail"));
+				return std::make_pair(nullptr, EPRO_TEXT("fail"));
 			}
 			if(reader) {
 				reader->drop();
@@ -526,7 +526,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 	if(GetDownloadStatus(code, type) == NONE) {
 		AddToDownloadQueue(code, type);
 	}
-	return std::make_pair(nullptr, TEXT("wait for download"));
+	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
 }
 irr::video::ITexture* ImageManager::GetTextureCard(int code, imgType type, bool wait, bool fit, int* chk) {
 	if(chk)
@@ -617,10 +617,10 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 				return nullptr;
 		} else {
 			for(auto& path : mainGame->field_dirs) {
-				for(auto extension : { TEXT(".png"), TEXT(".jpg") }) {
+				for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 					irr::io::IReadFile* reader = nullptr;
-					if(path == TEXT("archives")) {
-						reader = Utils::FindandOpenFileFromArchives(TEXT("pics/field"), fmt::format(TEXT("{}{}"), code, extension));
+					if(path == EPRO_TEXT("archives")) {
+						reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("pics/field"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
 						if(!reader)
 							continue;
 						img = driver->getTexture(reader);
@@ -628,7 +628,7 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 						if(img)
 							break;
 					} else {
-						if(img = driver->getTexture(fmt::format(TEXT("{}{}{}"), path, code, extension).c_str()))
+						if(img = driver->getTexture(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension).c_str()))
 							break;
 					}
 				}

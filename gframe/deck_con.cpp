@@ -156,7 +156,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HAND_TEST: {
 				Terminate(false);
 				open_file = true;
-				open_file_name = TEXT("hand-test-mode");
+				open_file_name = EPRO_TEXT("hand-test-mode");
 				SingleMode::singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
 				break;

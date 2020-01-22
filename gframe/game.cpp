@@ -95,7 +95,7 @@ bool Game::Initialize() {
 #endif
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
-	if(!(ocgcore = LoadOCGcore(working_directory + TEXT("./"))) && !(ocgcore = LoadOCGcore(working_directory + TEXT("./expansions/"))))
+	if(!(ocgcore = LoadOCGcore(working_directory + EPRO_TEXT("./"))) && !(ocgcore = LoadOCGcore(working_directory + EPRO_TEXT("./expansions/"))))
 		coreloaded = false;
 #endif
 	auto logger = device->getLogger();
@@ -103,7 +103,7 @@ bool Game::Initialize() {
 	// Apply skin
 	skinSystem = nullptr;
 	if (gameConf.skin_index >= 0) {
-		skinSystem = new CGUISkinSystem((working_directory + TEXT("./skin")).c_str(), device);
+		skinSystem = new CGUISkinSystem((working_directory + EPRO_TEXT("./skin")).c_str(), device);
 		auto skins = skinSystem->listSkins();
 		if ((size_t)gameConf.skin_index < skins.size())
 		{
@@ -154,27 +154,27 @@ bool Game::Initialize() {
 	}
 	LoadPicUrls();
 	if (std::ifstream("cards.cdb").good()) {
-		dataManager.LoadDB(TEXT("cards.cdb"));
+		dataManager.LoadDB(EPRO_TEXT("cards.cdb"));
 	}
 	LoadExpansionDB();
 	LoadZipArchives();
 	LoadArchivesDB();
 	RefreshAiDecks();
-	if(!dataManager.LoadStrings(TEXT("./config/strings.conf"))) {
+	if(!dataManager.LoadStrings(EPRO_TEXT("./config/strings.conf"))) {
 		ErrorLog("Failed to load strings!");
 		return false;
 	}
 	discord.Initialize(filesystem->getWorkingDirectory().c_str());
 	mainGame->discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
-	dataManager.LoadStrings(TEXT("./expansions/strings.conf"));
+	dataManager.LoadStrings(EPRO_TEXT("./expansions/strings.conf"));
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), Scale(16));
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), Scale(12));
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), Scale(48));
 	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont.c_str(), Scale(gameConf.textfontsize));
 	textFont = guiFont;
-	if(!numFont || !textFont) {
+	if(!numFont || !textFont || !adFont || !lpcFont || !guiFont) {
 		ErrorLog("Failed to load font(s)!");
 		return false;
 	}
@@ -1183,11 +1183,11 @@ void Game::MainLoop() {
 				script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
 				pic_dirs.insert(pic_dirs.begin(), Utils::ParseFilename(repo.pics_path));
 				auto data_path = Utils::ParseFilename(repo.data_path);
-				auto files = Utils::FindfolderFiles(data_path, { TEXT("cdb") }, 0);
+				auto files = Utils::FindfolderFiles(data_path, { EPRO_TEXT("cdb") }, 0);
 				for(auto& file : files)
 					refresh_db = dataManager.LoadDB(data_path + file) || refresh_db;
-				dataManager.LoadStrings(data_path + TEXT("strings.conf"));
-				if(deckManager.LoadLFListSingle(data_path + TEXT("lflist.conf")) || deckManager.LoadLFListFolder(data_path + TEXT("lflists/"))) {
+				dataManager.LoadStrings(data_path + EPRO_TEXT("strings.conf"));
+				if(deckManager.LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || deckManager.LoadLFListFolder(data_path + EPRO_TEXT("lflists/"))) {
 					deckManager.RefreshLFList();
 					RefreshLFLists();
 				}
@@ -1415,20 +1415,20 @@ void Game::MainLoop() {
 }
 void Game::LoadZipArchives() {
 	irr::io::IFileArchive* tmp_archive = nullptr;
-	for(auto& file : Utils::FindfolderFiles(TEXT("./expansions/"), { TEXT("zip") })) {
-		filesystem->addFileArchive((TEXT("./expansions/") + file).c_str(), true, false, irr::io::EFAT_ZIP, "", &tmp_archive);
+	for(auto& file : Utils::FindfolderFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("zip") })) {
+		filesystem->addFileArchive((EPRO_TEXT("./expansions/") + file).c_str(), true, false, irr::io::EFAT_ZIP, "", &tmp_archive);
 		if(tmp_archive) {
 			Utils::archives.emplace_back(tmp_archive);
 		}
 	}
 }
 void Game::LoadExpansionDB() {
-	for (auto& file : Utils::FindfolderFiles(TEXT("./expansions/"), { TEXT("cdb") }, 2))
-		dataManager.LoadDB(TEXT("./expansions/") + file);
+	for (auto& file : Utils::FindfolderFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2))
+		dataManager.LoadDB(EPRO_TEXT("./expansions/") + file);
 }
 void Game::LoadArchivesDB() {
 	for(auto& archive: Utils::archives) {
-		auto files = Utils::FindfolderFiles(archive, TEXT(""), { TEXT("cdb") }, 3);
+		auto files = Utils::FindfolderFiles(archive, EPRO_TEXT(""), { EPRO_TEXT("cdb") }, 3);
 		for(auto& index : files) {
 			auto reader = archive.archive->createAndOpenFile(index);
 			if(reader == nullptr)
@@ -1443,7 +1443,7 @@ void Game::LoadArchivesDB() {
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	for(auto& file : Utils::FindfolderFiles(TEXT("./deck/"), { TEXT("ydk") })) {
+	for(auto& file : Utils::FindfolderFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
 		cbDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).c_str());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
@@ -1486,7 +1486,7 @@ void Game::RefreshAiDecks() {
 					}
 					bot.version = PRO_VERSION;
 #ifdef _WIN32
-					bot.executablePath = filesystem->getAbsolutePath(TEXT("./WindBot")).c_str();
+					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
 #endif
 					gBot.bots.push_back(bot);
 				}
@@ -1652,7 +1652,7 @@ void Game::LoadConfig() {
 	}
 	conf_file.close();
 	if(configs.empty()) {
-		conf_file.open(TEXT("./config/configs.json"), std::ifstream::in);
+		conf_file.open(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
 		try {
 			conf_file >> configs;
 		}
@@ -2449,8 +2449,8 @@ std::vector<char> Game::LoadScript(const std::string& _name) {
 	std::ifstream script;
 	path_string name = Utils::ParseFilename(_name);
 	for(auto& path : script_dirs) {
-		if(path == TEXT("archives")) {
-			auto reader = Utils::FindandOpenFileFromArchives(TEXT("script"), name);
+		if(path == EPRO_TEXT("archives")) {
+			auto reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("script"), name);
 			if(reader == nullptr)
 				continue;
 			buffer.resize(reader->getSize());
@@ -2506,22 +2506,22 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 	}
 }
 void Game::PopulateResourcesDirectories() {
-	script_dirs.push_back(TEXT("./expansions/script/"));
-	auto expansions_subdirs = Utils::FindSubfolders(TEXT("./expansions/script/"));
+	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));
+	auto expansions_subdirs = Utils::FindSubfolders(EPRO_TEXT("./expansions/script/"));
 	script_dirs.insert(script_dirs.end(), expansions_subdirs.begin(), expansions_subdirs.end());
-	script_dirs.push_back(TEXT("archives"));
-	script_dirs.push_back(TEXT("./script/"));
-	auto script_subdirs = Utils::FindSubfolders(TEXT("./script/"));
+	script_dirs.push_back(EPRO_TEXT("archives"));
+	script_dirs.push_back(EPRO_TEXT("./script/"));
+	auto script_subdirs = Utils::FindSubfolders(EPRO_TEXT("./script/"));
 	script_dirs.insert(script_dirs.end(), script_subdirs.begin(), script_subdirs.end());
-	pic_dirs.push_back(TEXT("./expansions/pics/"));
-	pic_dirs.push_back(TEXT("archives"));
-	pic_dirs.push_back(TEXT("./pics/"));
-	cover_dirs.push_back(TEXT("./expansions/pics/cover/"));
-	cover_dirs.push_back(TEXT("archives"));
-	cover_dirs.push_back(TEXT("./pics/cover/"));
-	field_dirs.push_back(TEXT("./expansions/pics/field/"));
-	field_dirs.push_back(TEXT("archives"));
-	field_dirs.push_back(TEXT("./pics/field/"));
+	pic_dirs.push_back(EPRO_TEXT("./expansions/pics/"));
+	pic_dirs.push_back(EPRO_TEXT("archives"));
+	pic_dirs.push_back(EPRO_TEXT("./pics/"));
+	cover_dirs.push_back(EPRO_TEXT("./expansions/pics/cover/"));
+	cover_dirs.push_back(EPRO_TEXT("archives"));
+	cover_dirs.push_back(EPRO_TEXT("./pics/cover/"));
+	field_dirs.push_back(EPRO_TEXT("./expansions/pics/field/"));
+	field_dirs.push_back(EPRO_TEXT("archives"));
+	field_dirs.push_back(EPRO_TEXT("./pics/field/"));
 }
 
 }

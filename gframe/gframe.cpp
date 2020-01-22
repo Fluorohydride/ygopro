@@ -24,7 +24,7 @@ int enable_log = 0;
 bool exit_on_return = false;
 bool is_from_discord = false;
 bool open_file = false;
-path_string open_file_name = TEXT("");
+path_string open_file_name = EPRO_TEXT("");
 
 void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;
@@ -35,7 +35,7 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 }
 #ifdef _WIN32
 #ifdef UNICODE
-#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup") 
+//#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup") 
 int wmain(int argc, wchar_t* argv[]) {
 #else
 #pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") 
@@ -66,14 +66,14 @@ int main(int argc, char* argv[]) {
 	CFRelease(bundle_path);
 #endif //__APPLE__
 	if(argc >= 2) {
-		if(argv[1] == path_string(TEXT("from_discord"))) {
+		if(argv[1] == path_string(EPRO_TEXT("from_discord"))) {
 			is_from_discord = true;
 #if defined(_WIN32)
 			SetCurrentDirectory(argv[2]);
 #if !defined(_DEBUG)
 		} else {
 			auto extension = ygo::Utils::GetFileExtension(argv[1]);
-			if(extension == TEXT("ydk") || extension == TEXT("yrp") || extension == TEXT("yrpx")) {
+			if(extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
 				TCHAR exepath[MAX_PATH];
 				GetModuleFileName(NULL, exepath, MAX_PATH);
 				auto path = ygo::Utils::GetFilePath(exepath);
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 	ygo::mainGame->appMain = porting::app_global;
 	ygo::mainGame->working_directory = porting::working_directory;
 #else
-	ygo::mainGame->working_directory = TEXT("./");
+	ygo::mainGame->working_directory = EPRO_TEXT("./");
 #endif
 	if(!ygo::mainGame->Initialize())
 		return EXIT_FAILURE;
@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
 		path_string parameter(argv[i]);
-#define PARAM_CHECK(x) if(parameter == TEXT(x))
+#define PARAM_CHECK(x) if(parameter == EPRO_TEXT(x))
 #define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < argc) {y;} continue;}
 #define SET_TXT(elem,txt) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(txt).c_str())
 		// Extra database
@@ -175,14 +175,14 @@ int main(int argc, char* argv[]) {
 		} else if(argc == 2 && path_string(argv[1]).size() >= 4) {
 			path_string name(argv[i]);
 			auto extension = ygo::Utils::GetFileExtension(name);
-			if(extension == TEXT("ydk")) {
+			if(extension == EPRO_TEXT("ydk")) {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
-			if(extension == TEXT("yrp") || extension == TEXT("yrpx")) {
+			if(extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
 				open_file = true;
 				open_file_name = name;
 				exit_on_return = !keep_on_return;

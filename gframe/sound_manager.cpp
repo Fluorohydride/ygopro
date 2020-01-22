@@ -1,5 +1,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include "sound_manager.h"
+#include "utils.h"
 #include "config.h"
 #if defined(YGOPRO_USE_IRRKLANG)
 #include "sound_irrklang.h"
@@ -35,31 +36,31 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 }
 void SoundManager::RefreshBGMList() {
 #ifdef BACKEND
-	Utils::Makedirectory(TEXT("./sound/BGM/"));
-	Utils::Makedirectory(TEXT("./sound/BGM/duel"));
-	Utils::Makedirectory(TEXT("./sound/BGM/menu"));
-	Utils::Makedirectory(TEXT("./sound/BGM/deck"));
-	Utils::Makedirectory(TEXT("./sound/BGM/advantage"));
-	Utils::Makedirectory(TEXT("./sound/BGM/disadvantage"));
-	Utils::Makedirectory(TEXT("./sound/BGM/win"));
-	Utils::Makedirectory(TEXT("./sound/BGM/lose"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/duel"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/menu"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/deck"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/advantage"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/disadvantage"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/win"));
+	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/lose"));
 	for (auto list : BGMList) {
 		list.clear();
 	}
-	RefreshBGMDir(TEXT(""), BGM::DUEL);
-	RefreshBGMDir(TEXT("duel"), BGM::DUEL);
-	RefreshBGMDir(TEXT("menu"), BGM::MENU);
-	RefreshBGMDir(TEXT("deck"), BGM::DECK);
-	RefreshBGMDir(TEXT("advantage"), BGM::ADVANTAGE);
-	RefreshBGMDir(TEXT("disadvantage"), BGM::DISADVANTAGE);
-	RefreshBGMDir(TEXT("win"), BGM::WIN);
-	RefreshBGMDir(TEXT("lose"), BGM::LOSE);
+	RefreshBGMDir(EPRO_TEXT(""), BGM::DUEL);
+	RefreshBGMDir(EPRO_TEXT("duel"), BGM::DUEL);
+	RefreshBGMDir(EPRO_TEXT("menu"), BGM::MENU);
+	RefreshBGMDir(EPRO_TEXT("deck"), BGM::DECK);
+	RefreshBGMDir(EPRO_TEXT("advantage"), BGM::ADVANTAGE);
+	RefreshBGMDir(EPRO_TEXT("disadvantage"), BGM::DISADVANTAGE);
+	RefreshBGMDir(EPRO_TEXT("win"), BGM::WIN);
+	RefreshBGMDir(EPRO_TEXT("lose"), BGM::LOSE);
 #endif
 }
 void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 #ifdef BACKEND
-	for(auto& file : Utils::FindfolderFiles(TEXT("./sound/BGM/") + path, { TEXT("mp3"), TEXT("ogg"), TEXT("wav"), TEXT("flac") })) {
-		auto conv = Utils::ToUTF8IfNeeded(path + TEXT("/") + file);
+	for(auto& file : Utils::FindfolderFiles(EPRO_TEXT("./sound/BGM/") + path, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
+		auto conv = Utils::ToUTF8IfNeeded(path + EPRO_TEXT("/") + file);
 		BGMList[BGM::ALL].push_back(conv);
 		BGMList[scene].push_back(conv);
 	}
@@ -68,21 +69,21 @@ void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 void SoundManager::RefreshChantsList() {
 #ifdef BACKEND
 	static const std::vector<std::pair<CHANT, path_string>> types = {
-		{CHANT::SUMMON,    TEXT("summon")},
-		{CHANT::ATTACK,    TEXT("attack")},
-		{CHANT::ACTIVATE,  TEXT("activate")}
+		{CHANT::SUMMON,    EPRO_TEXT("summon")},
+		{CHANT::ATTACK,    EPRO_TEXT("attack")},
+		{CHANT::ACTIVATE,  EPRO_TEXT("activate")}
 	};
 	ChantsList.clear();
 	for (const auto& chantType : types) {
-		const path_string searchPath = TEXT("./sound/") + chantType.second;
+		const path_string searchPath = EPRO_TEXT("./sound/") + chantType.second;
 		Utils::Makedirectory(searchPath);
-		for (auto& file : Utils::FindfolderFiles(searchPath, { TEXT("mp3"), TEXT("ogg"), TEXT("wav"), TEXT("flac") })) {
-			auto scode = Utils::GetFileName(searchPath + TEXT("/") + file);
+		for (auto& file : Utils::FindfolderFiles(searchPath, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
+			auto scode = Utils::GetFileName(searchPath + EPRO_TEXT("/") + file);
 			try {
 				unsigned int code = std::stoi(scode);
 				auto key = std::make_pair(chantType.first, code);
 				if (code && !ChantsList.count(key))
-					ChantsList[key] = working_dir + "/" + Utils::ToUTF8IfNeeded(searchPath + TEXT("/") + file);
+					ChantsList[key] = working_dir + "/" + Utils::ToUTF8IfNeeded(searchPath + EPRO_TEXT("/") + file);
 			}
 			catch (...) {
 				continue;

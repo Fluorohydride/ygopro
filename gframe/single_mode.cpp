@@ -98,7 +98,7 @@ restart:
 			OCG_LoadScript(pduel, cmd, sizeof(cmd)-1, " ");
 		} else {
 			if(!mainGame->LoadScript(pduel, script_name)) {
-				script_name = Utils::ToUTF8IfNeeded(TEXT("./puzzles/") + open_file_name);
+				script_name = Utils::ToUTF8IfNeeded(EPRO_TEXT("./puzzles/") + open_file_name);
 				if(!mainGame->LoadScript(pduel, script_name))
 					loaded = false;
 			}

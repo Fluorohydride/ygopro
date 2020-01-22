@@ -8,19 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
-
-#ifdef UNICODE
-#ifndef TEXT
-#define TEXT(x) L##x
-#endif
-using path_char = wchar_t;
-#else
-#ifndef TEXT
-#define TEXT(x) x
-#endif
-using path_char = char;
-#endif // UNICODE
-using path_string = std::basic_string<path_char>;
+#include "text_types.h"
 
 namespace irr {
 namespace io {
@@ -41,6 +29,7 @@ namespace ygo {
 		};
 		static std::vector<IrrArchiveHelper> archives;
 		static bool Makedirectory(const path_string& path);
+		static bool Copyfile(const path_string& source, const path_string& destination);
 		static bool Movefile(const path_string& source, const path_string& destination);
 		static path_string ParseFilename(const std::wstring& input);
 		static path_string ParseFilename(const std::string& input);

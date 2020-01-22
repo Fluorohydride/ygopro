@@ -1,4 +1,5 @@
 #include "windbot.h"
+#include "utils.h"
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -15,26 +16,25 @@ namespace ygo {
 bool WindBot::Launch(int port, bool chat, int hand) const {
 #ifdef _WIN32
 	auto args = fmt::format(
-		TEXT("./WindBot/WindBot.exe Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} {}"),
+		L"./WindBot/WindBot.exe Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} {}",
 		deck.c_str(),
 		port,
 		version,
 		name.c_str(),
 		chat,
-		hand ? fmt::format(TEXT("Hand={}"), hand) : TEXT(""));
+		hand ? fmt::format(L"Hand={}", hand) : L"");
 	STARTUPINFO si = {};
 	PROCESS_INFORMATION pi = {};
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	if (CreateProcess(NULL, (TCHAR*)args.c_str(), NULL, NULL, FALSE, 0, NULL, executablePath.c_str(), &si, &pi)) {
+	if (CreateProcess(NULL, (TCHAR*)Utils::ParseFilename(args).c_str(), NULL, NULL, FALSE, 0, NULL, executablePath.c_str(), &si, &pi)) {
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 		return true;
 	}
 	return false;
-#else
-#ifdef __ANDROID__
+#elif defined(__ANDROID__)
 	std::string param = fmt::format("Deck={} Port={} Version={} Name='[AI] {}' Chat={} Hand={}", BufferIO::EncodeUTF8s(deck).c_str(), port, version, BufferIO::EncodeUTF8s(name).c_str(), chat ? 1 : 0, hand);
 	porting::launchWindbot(param);
 	return true;
@@ -55,7 +55,6 @@ bool WindBot::Launch(int port, bool chat, int hand) const {
 		exit(EXIT_FAILURE);
 	}
 	return pid > 0;
-#endif
 #endif
 }
 

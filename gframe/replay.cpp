@@ -89,7 +89,7 @@ void Replay::EndRecord(size_t size) {
 	is_recording = false;
 }
 void Replay::SaveReplay(const path_string& name) {
-	std::ofstream replay_file(fmt::format(TEXT("./replay/{}.yrpX"), name.c_str()), std::ofstream::binary);
+	std::ofstream replay_file(fmt::format(EPRO_TEXT("./replay/{}.yrpX"), name.c_str()), std::ofstream::binary);
 	if(!replay_file.is_open())
 		return;
 	replay_file.write((char*)&pheader, sizeof(pheader));
@@ -141,7 +141,7 @@ bool Replay::OpenReplay(const path_string& name) {
 	Reset();
 	std::ifstream replay_file(name, std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(TEXT("./replay/") + name, std::ifstream::binary);
+		replay_file.open(EPRO_TEXT("./replay/") + name, std::ifstream::binary);
 		if(!replay_file.is_open()) {
 			replay_name.clear();
 			return false;
@@ -159,7 +159,7 @@ bool Replay::OpenReplay(const path_string& name) {
 bool Replay::CheckReplay(const path_string& name) {
 	std::ifstream replay_file(name, std::ifstream::binary);
 	if(!replay_file.is_open()) {
-		replay_file.open(TEXT("./replay/") + name, std::ifstream::binary);
+		replay_file.open(EPRO_TEXT("./replay/") + name, std::ifstream::binary);
 		if(!replay_file.is_open())
 			return false;
 	}

@@ -21,9 +21,7 @@ namespace ygo {
 		return !mkdir(&path[0], 0777) || errno == EEXIST;
 #endif
 	}
-	bool Utils::Movefile(const path_string& _source, const path_string& _destination) {
-		path_string source = ParseFilename(_source);
-		path_string destination = ParseFilename(_destination);
+	bool Utils::Copyfile(const path_string& source, const path_string& destination) {
 		if(source == destination)
 			return false;
 		std::ifstream src(source, std::ios::binary);
@@ -34,6 +32,21 @@ namespace ygo {
 			return false;
 		dst << src.rdbuf();
 		src.close();
+		dst.close();
+		return true;
+	}
+	bool Utils::Movefile(const path_string& source, const path_string& destination) {
+		if(source == destination)
+			return false;
+		std::ifstream src(source, std::ios::binary);
+		if(!src.is_open())
+			return false;
+		std::ofstream dst(destination, std::ios::binary);
+		if(!dst.is_open())
+			return false;
+		dst << src.rdbuf();
+		src.close();
+		dst.close();
 		Deletefile(source);
 		return true;
 	}
@@ -47,15 +60,15 @@ namespace ygo {
 	bool Utils::ClearDirectory(const path_string& path) {
 #ifdef _WIN32
 		WIN32_FIND_DATA fdata;
-		HANDLE fh = FindFirstFile((path + TEXT("*.*")).c_str(), &fdata);
+		HANDLE fh = FindFirstFile((path + EPRO_TEXT("*.*")).c_str(), &fdata);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				path_string name = fdata.cFileName;
 				if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					if(name == TEXT("..") || name == TEXT(".")) {
+					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 						continue;
 					}
-					Deletedirectory(path + name + TEXT("/"));
+					Deletedirectory(path + name + EPRO_TEXT("/"));
 					continue;
 				} else {
 					Deletefile(path + name);
@@ -97,21 +110,21 @@ namespace ygo {
 	}
 	void Utils::CreateResourceFolders() {
 		//create directories if missing
-		Makedirectory(TEXT("deck"));
-		Makedirectory(TEXT("puzzles"));
-		Makedirectory(TEXT("pics"));
-		Makedirectory(TEXT("pics/field"));
-		Makedirectory(TEXT("pics/cover"));
-		Makedirectory(TEXT("pics/temp/"));
-		ClearDirectory(TEXT("pics/temp/"));
-		Makedirectory(TEXT("replay"));
-		Makedirectory(TEXT("screenshots"));
+		Makedirectory(EPRO_TEXT("deck"));
+		Makedirectory(EPRO_TEXT("puzzles"));
+		Makedirectory(EPRO_TEXT("pics"));
+		Makedirectory(EPRO_TEXT("pics/field"));
+		Makedirectory(EPRO_TEXT("pics/cover"));
+		Makedirectory(EPRO_TEXT("pics/temp/"));
+		ClearDirectory(EPRO_TEXT("pics/temp/"));
+		Makedirectory(EPRO_TEXT("replay"));
+		Makedirectory(EPRO_TEXT("screenshots"));
 	}
 
 	void Utils::FindfolderFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload) {
 #ifdef _WIN32
 		WIN32_FIND_DATA fdataw;
-		HANDLE fh = FindFirstFile((NormalizePath(path) + TEXT("*.*")).c_str(), &fdataw);
+		HANDLE fh = FindFirstFile((NormalizePath(path) + EPRO_TEXT("*.*")).c_str(), &fdataw);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY), payload);
@@ -142,12 +155,12 @@ namespace ygo {
 		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
 			if(isdir) {
 				if(subdirectorylayers) {
-					if(name == TEXT("..") || name == TEXT(".")) {
+					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 						return;
 					}
-					std::vector<path_string> res2 = FindfolderFiles(path + name + TEXT("/"), extensions, subdirectorylayers - 1);
+					std::vector<path_string> res2 = FindfolderFiles(path + name + EPRO_TEXT("/"), extensions, subdirectorylayers - 1);
 					for(auto&file : res2) {
-						file = name + TEXT("/") + file;
+						file = name + EPRO_TEXT("/") + file;
 					}
 					res.insert(res.end(), res2.begin(), res2.end());
 				}
@@ -165,14 +178,14 @@ namespace ygo {
 		std::vector<path_string> results;
 		FindfolderFiles(path, [&results, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
 			if (isdir) {
-				if (name == TEXT("..") || name == TEXT(".")) {
+				if (name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 					return;
 				}
-				results.push_back(path + name + TEXT("/"));
+				results.push_back(path + name + EPRO_TEXT("/"));
 				if (subdirectorylayers > 1) {
-					auto subresults = FindSubfolders(path + name + TEXT("/"), subdirectorylayers - 1);
+					auto subresults = FindSubfolders(path + name + EPRO_TEXT("/"), subdirectorylayers - 1);
 					for (auto& folder : subresults) {
-						folder = name + TEXT("/") + folder;
+						folder = name + EPRO_TEXT("/") + folder;
 					}
 					results.insert(results.end(), subresults.begin(), subresults.end());
 				}
@@ -195,10 +208,10 @@ namespace ygo {
 		FindfolderFiles(archive, path, [&res, arc = archive.archive, extensions, path, subdirectorylayers, &archive](int index, path_string name, bool isdir, void* payload)->bool {
 			if(isdir) {
 				if(subdirectorylayers) {
-					if(name == TEXT("..") || name == TEXT(".")) {
+					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 						return true;
 					}
-					std::vector<int> res2 = FindfolderFiles(archive, path + name + TEXT("/"), extensions, subdirectorylayers - 1);
+					std::vector<int> res2 = FindfolderFiles(archive, path + name + EPRO_TEXT("/"), extensions, subdirectorylayers - 1);
 					res.insert(res.end(), res2.begin(), res2.end());
 				}
 				return true;
@@ -389,7 +402,7 @@ namespace ygo {
 		archive = _archive;
 		auto list = archive->getFileList();
 		std::vector<path_string> list_full;
-		folderindexes[TEXT(".")] = { { -1, -1 }, { -1, -1 } };
+		folderindexes[EPRO_TEXT(".")] = { { -1, -1 }, { -1, -1 } };
 		for(uint32_t i = 0; i < list->getFileCount(); ++i) {
 			list_full.push_back(list->getFullFileName(i).c_str());
 			if(list->isDirectory(i)) {
@@ -398,7 +411,7 @@ namespace ygo {
 				auto& name = list->getFileName(i);
 				if(name_path.size() == name.size()) {
 					/*special case, root folder*/
-					folderindexes[TEXT("")] = { { std::min((unsigned)folderindexes[TEXT("")].first.first, i), i + 1 }, folderindexes[TEXT("")].second };
+					folderindexes[EPRO_TEXT("")] = { { std::min((unsigned)folderindexes[EPRO_TEXT("")].first.first, i), i + 1 }, folderindexes[EPRO_TEXT("")].second };
 				} else {
 					path_string path = NormalizePath(name_path.subString(0, name_path.size() - name.size() - 1).c_str(), false);
 					folderindexes[path] = { { std::min((unsigned)folderindexes[path].first.first, i), i + 1 }, folderindexes[path].second };
@@ -408,7 +421,7 @@ namespace ygo {
 				auto& name = list->getFileName(i);
 				if(name_path.size() == name.size()) {
 					/*special case, root folder*/
-					folderindexes[TEXT("")] = { folderindexes[TEXT("")].first, { std::min((unsigned)folderindexes[TEXT("")].second.first, i), i + 1 } };
+					folderindexes[EPRO_TEXT("")] = { folderindexes[EPRO_TEXT("")].first, { std::min((unsigned)folderindexes[EPRO_TEXT("")].second.first, i), i + 1 } };
 				} else {
 					path_string path = NormalizePath(name_path.subString(0, name_path.size() - name.size() - 1).c_str(), false);
 					folderindexes[path] = { folderindexes[path].first, { std::min((unsigned)folderindexes[path].second.first, i), i + 1 } };

@@ -3,6 +3,7 @@
 
 #include <set>
 #include <string>
+#include "text_types.h"
 
 namespace ygo {
 
@@ -16,7 +17,7 @@ struct WindBot {
 
 	// Can be made static
 	unsigned short version;
-	std::wstring executablePath;
+	path_string executablePath;
 };
 
 }
