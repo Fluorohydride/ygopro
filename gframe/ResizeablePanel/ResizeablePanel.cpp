@@ -78,7 +78,7 @@ namespace gui {
 			s32 maxY = rect.LowerRightCorner.Y;
 			for(auto& child : subpanel->getChildren()) {
 				maxX = std::max(maxX, child->getAbsolutePosition().LowerRightCorner.X);
-				maxY = std::max(maxX, child->getAbsolutePosition().LowerRightCorner.Y);
+				maxY = std::max(maxY, child->getAbsolutePosition().LowerRightCorner.Y);
 			}
 			if(hasHorizontalScrolling && maxX > rect.LowerRightCorner.X) {
 				horizontalScroll->setRelativePosition(irr::core::rect<s32>(5, rect.getHeight() - (5 + scrollsize), rect.getWidth() - 5, rect.getHeight() - 5));
