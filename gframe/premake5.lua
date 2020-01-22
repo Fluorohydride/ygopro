@@ -66,7 +66,7 @@ local ygopro_config=function(static_core)
 		if _OPTIONS["discord"] then
 			links "discord-rpc"
 		end
-		links { "sqlite3", "event", "event_pthreads", "dl", "pthread", "git2" }
+		links { "sqlite3", "event", "event_pthreads", "dl", "git2" }
 
 	filter "system:macosx"
 		files "*.m"
@@ -96,6 +96,9 @@ local ygopro_config=function(static_core)
 		if _OPTIONS["vcpkg-root"] then
 			links { "ssl", "crypto", "z" }
 		end
+
+	filter "system:not windows"
+		links { "pthread" }
 end
 
 include "lzma/."
