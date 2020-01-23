@@ -63,8 +63,8 @@ restart:
 	mainGame->dInfo.startlp = start_lp;
 	mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 	mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
-	mainGame->dInfo.hostname.push_back(mainGame->ebNickName->getText());
-	mainGame->dInfo.clientname.push_back(L"");
+	mainGame->dInfo.hostname = { mainGame->ebNickName->getText() };
+	mainGame->dInfo.clientname = { L"" };
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
 	bool loaded = true;
