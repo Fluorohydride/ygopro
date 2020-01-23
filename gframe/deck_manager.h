@@ -36,6 +36,8 @@ public:
 	std::vector<LFList> _lfList;
 
 	void LoadLFListSingle(const char* path);
+	void LoadLFListSingle(IReadFile* reader);
+	LFList* ReadLFListSingle(char* linebuf, LFList* cur);
 	void LoadLFList();
 	const wchar_t* GetLFListName(int lfhash);
 	const std::unordered_map<int, int>* GetLFListContent(int lfhash);
