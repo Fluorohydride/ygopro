@@ -517,6 +517,14 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 									if(font->getDimension((line + whitespace + word.subString(0, j + 1)).c_str()).Width > elWidth)
 										break;
 								}
+								//if not enough space for the word just give up and dont' try to calculate the broken lines
+								if(j == 0) {
+									BrokenText.push_back(line);
+									BrokenTextv.push_back(line);
+									length = wordlgth;
+									line = word;
+									break;
+								}
 								core::stringw first = word.subString(0, j);
 								second = word.subString(j, word.size() - j);
 								BrokenText.push_back(line + whitespace + first);
