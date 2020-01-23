@@ -441,6 +441,9 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 		elWidth -= 2*skin->getSize(EGDS_TEXT_DISTANCE_X);
 	if(scrollbar_spacing)
 		elWidth -= scrText->getRelativePosition().getWidth();
+	elWidth = std::max(elWidth, 0);
+	if(elWidth < font->getDimension(L"A").Width)
+		return;
 	wchar_t c;
 
 	// We have to deal with right-to-left and left-to-right differently
@@ -509,7 +512,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 							core::stringw second;
 							s32 secondLength;
 							while(wordlgth > elWidth) {
-								int j = 0;
+								int j = (word.size() > 1) ? 1 : 0;
 								for(; j < word.size() - 1; j++) {
 									if(font->getDimension((line + whitespace + word.subString(0, j + 1)).c_str()).Width > elWidth)
 										break;
