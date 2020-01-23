@@ -20,14 +20,7 @@ class IReadFile;
 namespace ygo {
 	class Utils {
 	public:
-		class IrrArchiveHelper {
-		public:
-			irr::io::IFileArchive* archive;
-			std::map<path_string/*folder name*/, std::pair<std::pair<int/*begin folder offset*/, int/*end folder offset*/>, std::pair<int/*begin file offset*/, int/*end file offset*/>>> folderindexes;
-			IrrArchiveHelper(irr::io::IFileArchive* archive) { ParseList(archive); };
-			void ParseList(irr::io::IFileArchive* archive);
-		};
-		static std::vector<IrrArchiveHelper> archives;
+		static std::vector<irr::io::IFileArchive*> archives;
 		static bool Makedirectory(const path_string& path);
 		static bool Copyfile(const path_string& source, const path_string& destination);
 		static bool Movefile(const path_string& source, const path_string& destination);
@@ -43,8 +36,7 @@ namespace ygo {
 		static std::vector<path_string> FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
 		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1);
-		static void FindfolderFiles(const IrrArchiveHelper& archive, const path_string& path, const std::function<bool(int, path_string, bool, void*)>& cb, void* payload = nullptr);
-		static std::vector<int> FindfolderFiles(const IrrArchiveHelper& archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
+		static std::vector<int> FindfolderFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		static irr::io::IReadFile* FindandOpenFileFromArchives(const path_string& path, const path_string& name);
 		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);
 		static std::wstring GetFileExtension(std::wstring file);

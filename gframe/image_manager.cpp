@@ -479,7 +479,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 				return std::make_pair(nullptr, EPRO_TEXT("fail"));
 			irr::io::IReadFile* reader = nullptr;
 			if(path == EPRO_TEXT("archives")) {
-				reader = Utils::FindandOpenFileFromArchives((type == ART) ? EPRO_TEXT("pics") : EPRO_TEXT("pics/cover"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+				reader = Utils::FindandOpenFileFromArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
 				if(!reader)
 					continue;
 			}
@@ -620,7 +620,7 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 				for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 					irr::io::IReadFile* reader = nullptr;
 					if(path == EPRO_TEXT("archives")) {
-						reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("pics/field"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+						reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
 						if(!reader)
 							continue;
 						img = driver->getTexture(reader);

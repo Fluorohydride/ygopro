@@ -1458,7 +1458,7 @@ void Game::LoadArchivesDB() {
 	for(auto& archive: Utils::archives) {
 		auto files = Utils::FindfolderFiles(archive, EPRO_TEXT(""), { EPRO_TEXT("cdb") }, 3);
 		for(auto& index : files) {
-			auto reader = archive.archive->createAndOpenFile(index);
+			auto reader = archive->createAndOpenFile(index);
 			if(reader == nullptr)
 				continue;
 			std::vector<char> buffer;
@@ -2490,7 +2490,7 @@ std::vector<char> Game::LoadScript(const std::string& _name) {
 	path_string name = Utils::ParseFilename(_name);
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives")) {
-			auto reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("script"), name);
+			auto reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("script/"), name);
 			if(reader == nullptr)
 				continue;
 			buffer.resize(reader->getSize());
