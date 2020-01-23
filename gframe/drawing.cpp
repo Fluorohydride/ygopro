@@ -261,6 +261,8 @@ void Game::DrawBackGround() {
 			selFieldAlpha = 205;
 			selFieldDAlpha = -10;
 		}
+		if(!vertex)
+			return;
 		matManager.mSelField.AmbientColor = GetSkinColor(L"DUELFIELD_HOVERED", SColor(255, 255, 255, 255));
 		matManager.mSelField.DiffuseColor = (int)std::round(selFieldAlpha) << 24;
 		driver->setMaterial(matManager.mSelField);
