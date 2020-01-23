@@ -98,7 +98,7 @@ struct Config {
 	bool enablesound;
 	double musicVolume;
 	double soundVolume;
-	int skin_index;
+	path_string skin;
 };
 
 struct DuelInfo {
@@ -153,6 +153,7 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
+	void ApplySkin(const path_string& skin, bool reload = false);
 	void LoadZipArchives();
 	void LoadExpansionDB();
 	void LoadArchivesDB();
@@ -367,6 +368,7 @@ public:
 	irr::gui::IGUIButton* btnClearChat;
 	irr::gui::IGUIButton* btnExpandChat;
 	irr::gui::IGUIButton* btnSaveLog;
+	irr::gui::IGUIButton* btnReloadSkin;
 	irr::gui::IGUITab* tabRepositories;
 	irr::gui::IGUIContextMenu* mTabRepositories;
 	irr::gui::Panel* tabSystem;
@@ -382,6 +384,7 @@ public:
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
+	irr::gui::IGUIComboBox* cbCurrentSkin;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;

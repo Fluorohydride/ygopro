@@ -98,19 +98,11 @@ bool Game::Initialize() {
 	if(!(ocgcore = LoadOCGcore(working_directory + EPRO_TEXT("./"))) && !(ocgcore = LoadOCGcore(working_directory + EPRO_TEXT("./expansions/"))))
 		coreloaded = false;
 #endif
+	skinSystem = new CGUISkinSystem((working_directory + EPRO_TEXT("./skin")).c_str(), device);
+	if(!skinSystem)
+		ErrorLog("Couldn't create skin system");
 	auto logger = device->getLogger();
 	logger->setLogLevel(ELL_NONE);
-	// Apply skin
-	skinSystem = nullptr;
-	if (gameConf.skin_index >= 0) {
-		skinSystem = new CGUISkinSystem((working_directory + EPRO_TEXT("./skin")).c_str(), device);
-		auto skins = skinSystem->listSkins();
-		if ((size_t)gameConf.skin_index < skins.size())
-		{
-			int index = skins.size() - gameConf.skin_index - 1; // reverse index
-			skinSystem->applySkin(skins[index].c_str());
-		}
-	}
 	linePatternD3D = 0;
 	linePatternGL = 0x0f0f;
 	waitFrame = 0.0f;
@@ -178,21 +170,6 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load font(s)!");
 		return false;
 	}
-	auto skin = env->getSkin();
-	skin->setFont(guiFont);
-#define SKIN_SCALE(elem)skin->setSize(elem, Scale(skin->getSize(elem)));
-	skin->setSize(EGDS_SCROLLBAR_SIZE, Scale(20));
-	SKIN_SCALE(EGDS_MENU_HEIGHT)
-	SKIN_SCALE(EGDS_WINDOW_BUTTON_WIDTH)
-	SKIN_SCALE(EGDS_CHECK_BOX_WIDTH)
-	SKIN_SCALE(EGDS_BUTTON_WIDTH)
-	SKIN_SCALE(EGDS_BUTTON_HEIGHT)
-	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_X)
-	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_Y)
-	SKIN_SCALE(EGDS_TEXT_DISTANCE_X)
-	SKIN_SCALE(EGDS_TEXT_DISTANCE_Y)
-	SKIN_SCALE(EGDS_MESSAGE_BOX_GAP_SPACE)
-#undef SKIN_SCALE
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"EDOPro");
 	device->setResizable(true);
@@ -530,6 +507,24 @@ bool Game::Initialize() {
 	scrSoundVolume->setSmallStep(1);
 	chkQuickAnimation = env->addCheckBox(false, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
+	cbCurrentSkin = env->addComboBox(Scale(90, 415, 190, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
+	cbCurrentSkin->addItem(L"none");
+	int sel_skin = 0;
+	auto skins = skinSystem->listSkins();
+	for(int i = skins.size() - 1; i >= 0; i--) {
+		if(sel_skin == 0 && gameConf.skin == skins[i].c_str()) {
+			sel_skin = i + 1;
+		}
+		cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
+	}
+	cbCurrentSkin->setSelected(sel_skin);
+	btnReloadSkin = env->addButton(Scale(90, 445, 190, 475), tabPanel, BUTTON_RELOAD_SKIN, L"Reload Skin");
+	if(sel_skin == 0) {
+		ApplySkin(EPRO_TEXT("none"));
+	} else {
+		ApplySkin(gameConf.skin);
+	}
+	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
@@ -1089,11 +1084,6 @@ bool Game::Initialize() {
 #ifdef __ANDROID__
 	fpsCounter = env->addStaticText(L"", Scale(15, 15, 100, 60));
 #endif
-	for (u32 i = 0; i < EGDC_COUNT; ++i) {
-		irr::video::SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
-		col.setAlpha(224);
-		skin->setColor((EGUI_DEFAULT_COLOR)i, col);
-	}
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -1414,6 +1404,41 @@ void Game::MainLoop() {
 #endif //YGOPRO_BUILD_DLL
 	//device->drop();
 }
+void Game::ApplySkin(const path_string& skinname, bool reload) {
+	static path_string prev_skin = EPRO_TEXT("");
+	if(!skinSystem || skinname == prev_skin || (reload && prev_skin == EPRO_TEXT("")))
+		return;
+	if(!reload)
+		prev_skin = skinname;
+	if(prev_skin == EPRO_TEXT("none")) {
+		auto skin = env->createSkin(gui::EGST_WINDOWS_METALLIC);
+		env->setSkin(skin);
+		skin->drop();
+	} else if(!skinSystem->applySkin(prev_skin.c_str()))
+		return;
+	auto skin = env->getSkin();
+	skin->setFont(guiFont);
+#define SKIN_SCALE(elem)skin->setSize(elem, Scale(skin->getSize(elem)));
+	skin->setSize(EGDS_SCROLLBAR_SIZE, Scale(20));
+	SKIN_SCALE(EGDS_MENU_HEIGHT)
+	SKIN_SCALE(EGDS_WINDOW_BUTTON_WIDTH)
+	SKIN_SCALE(EGDS_CHECK_BOX_WIDTH)
+	SKIN_SCALE(EGDS_BUTTON_WIDTH)
+	SKIN_SCALE(EGDS_BUTTON_HEIGHT)
+	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_X)
+	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_Y)
+	SKIN_SCALE(EGDS_TEXT_DISTANCE_X)
+	SKIN_SCALE(EGDS_TEXT_DISTANCE_Y)
+	SKIN_SCALE(EGDS_MESSAGE_BOX_GAP_SPACE)
+#undef SKIN_SCALE
+	if(prev_skin == EPRO_TEXT("none")){
+		for (u32 i = 0; i < EGDC_COUNT; ++i) {
+			irr::video::SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
+			col.setAlpha(224);
+			skin->setColor((EGUI_DEFAULT_COLOR)i, col);
+		}
+	}
+}
 void Game::LoadZipArchives() {
 	irr::io::IFileArchive* tmp_archive = nullptr;
 	for(auto& file : Utils::FindfolderFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("zip") })) {
@@ -1537,7 +1562,7 @@ void Game::LoadConfig() {
 	gameConf.chkIgnore2 = 0;
 	gameConf.chkHideSetname = 0;
 	gameConf.chkHideHintButton = 0;
-	gameConf.skin_index = -1;
+	gameConf.skin = EPRO_TEXT("none");
 	gameConf.enablemusic = true;
 	gameConf.enablesound = true;
 	gameConf.musicVolume = 1.0;
@@ -1639,8 +1664,8 @@ void Game::LoadConfig() {
 				gameConf.chkAnime = std::stoi(str);
 			else if(type == "dpi_scale")
 				gameConf.dpi_scale = std::stof(str);
-			else if(type == "skin_index")
-				gameConf.skin_index = std::stoi(str);
+			else if(type == "skin")
+				gameConf.skin = Utils::ParseFilename(str);
 			else if(type == "enable_music")
 				gameConf.enablemusic = !!std::stoi(str);
 			else if(type == "enable_sound")
@@ -1671,7 +1696,7 @@ void Game::SaveConfig() {
 	conf_file << "#Nickname & Gamename should be less than 20 characters\n";
 	conf_file << "#The following parameters use 0 for 'disabled' or 1 for 'enabled':\n";
 	conf_file << "#use_d3d, use_vsync, fullscreen, automonsterpos, autospellpos, randompos, autochain, waitchain, mute_opponent, mute_spectators,\n";
-	conf_file <<  "hide_setname,hide_hint_button, draw_field_spell, quick_animation, show_unofficial, skin_index, enable_sound, enable_music\n";
+	conf_file <<  "hide_setname,hide_hint_button, draw_field_spell, quick_animation, show_unofficial, skin, enable_sound, enable_music\n";
 	conf_file << "use_d3d = "			<< std::to_string(gameConf.use_d3d ? 1 : 0) << "\n";
 	conf_file << "use_vsync = "			<< std::to_string(gameConf.use_vsync ? 1 : 0) << "\n";
 	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
@@ -1705,7 +1730,7 @@ void Game::SaveConfig() {
 	conf_file << "show_unofficial = "	<< std::to_string(chkAnime->isChecked() ? 1 : 0) << "\n";
 	conf_file << "dpi_scale = "			<< std::to_string(gameConf.dpi_scale) << "\n";
 	conf_file << "#if skins from the skin folder are in use\n";
-	conf_file << "skin_index = "		<< std::to_string(gameConf.skin_index) << "\n";
+	conf_file << "skin = "				<< Utils::ToUTF8IfNeeded(gameConf.skin) << "\n";
 	conf_file << "enable_music = "		<< std::to_string(chkEnableMusic->isChecked() ? 1 : 0) << "\n";
 	conf_file << "enable_sound = "		<< std::to_string(chkEnableSound->isChecked() ? 1 : 0) << "\n";
 	conf_file << "#integers between 0 and 100\n";

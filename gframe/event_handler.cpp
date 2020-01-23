@@ -1814,6 +1814,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wCommitsLog);
 				return true;
 			}
+			case BUTTON_RELOAD_SKIN: {
+				mainGame->ApplySkin(EPRO_TEXT(""), true);
+				break;
+			}
 			}
 			break;
 		}
@@ -1903,6 +1907,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 					mainGame->infosExpanded = 1;
 				}
 				return true;
+			}
+			break;
+		}
+		case EGET_COMBO_BOX_CHANGED: {
+			switch(id) {
+			case COMBOBOX_CURRENT_SKIN: {
+				mainGame->gameConf.skin = Utils::ParseFilename(mainGame->cbCurrentSkin->getItem(mainGame->cbCurrentSkin->getSelected()));
+				mainGame->ApplySkin(mainGame->gameConf.skin);
+				return true;
+			}
 			}
 			break;
 		}
