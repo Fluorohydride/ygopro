@@ -2,7 +2,6 @@
 #include "data_manager.h"
 #include "network.h"
 #include "game.h"
-#include <algorithm>
 
 namespace ygo {
 

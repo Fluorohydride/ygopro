@@ -8,7 +8,6 @@
 #include "game.h"
 #include "replay.h"
 #include "replay_mode.h"
-#include <algorithm>
 
 namespace ygo {
 
@@ -1127,7 +1126,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		else if(mainGame->LocalPlayer(player) == 0) {
 			mainGame->showcardcode = 1;
 			if(match_kill)
-				myswprintf(vic_buf, dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
+				myswprintf(vic_buf, dataManager.GetVictoryString(0xffff), dataManager.GetName(match_kill));
 			else if(type < 0x10)
 				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.clientname, dataManager.GetVictoryString(type));
 			else
@@ -1136,7 +1135,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			mainGame->showcardcode = 2;
 			if(match_kill)
-				myswprintf(vic_buf, dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
+				myswprintf(vic_buf, dataManager.GetVictoryString(0xffff), dataManager.GetName(match_kill));
 			else if(type < 0x10)
 				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.hostname, dataManager.GetVictoryString(type));
 			else
@@ -1927,8 +1926,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		return mainGame->dField.ShowSelectSum(mainGame->dField.select_panalmode);
 	}
-	case MSG_SORT_CARD:
-	case MSG_SORT_CHAIN: {
+	case MSG_SORT_CARD: {
 		/*int player = */BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.selectable_cards.clear();
@@ -1948,16 +1946,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.selectable_cards.push_back(pcard);
 			mainGame->dField.sort_list.push_back(0);
 		}
-		if (mainGame->chkAutoChain->isChecked() && mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
-			mainGame->dField.sort_list.clear();
-			SetResponseI(-1);
-			DuelClient::SendResponse();
-			return true;
-		}
-		if(mainGame->dInfo.curMsg == MSG_SORT_CHAIN)
-			mainGame->wCardSelect->setText(dataManager.GetSysString(206));
-		else
-			mainGame->wCardSelect->setText(dataManager.GetSysString(205));
+		mainGame->wCardSelect->setText(dataManager.GetSysString(205));
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
