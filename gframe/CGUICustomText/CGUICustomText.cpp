@@ -520,7 +520,6 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 								//if not enough space for the word just give up and dont' try to calculate the broken lines
 								if(j == 0) {
 									BrokenText.push_back(line);
-									BrokenTextv.push_back(line);
 									length = wordlgth;
 									line = word;
 									break;
