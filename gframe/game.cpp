@@ -1436,6 +1436,7 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 			skin->setColor((EGUI_DEFAULT_COLOR)i, col);
 		}
 	}
+	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
 }
 void Game::LoadZipArchives() {
 	irr::io::IFileArchive* tmp_archive = nullptr;
