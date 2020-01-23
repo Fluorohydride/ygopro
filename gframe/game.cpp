@@ -508,22 +508,20 @@ bool Game::Initialize() {
 	chkQuickAnimation = env->addCheckBox(false, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	cbCurrentSkin = env->addComboBox(Scale(90, 415, 190, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
-	cbCurrentSkin->addItem(L"none");
-	int sel_skin = 0;
+	int sel_skin = cbCurrentSkin->addItem(L"none");
 	auto skins = skinSystem->listSkins();
 	for(int i = skins.size() - 1; i >= 0; i--) {
-		if(sel_skin == 0 && gameConf.skin == skins[i].c_str()) {
-			sel_skin = i + 1;
+		auto idx = cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
+		if(gameConf.skin == skins[i].c_str()) {
+			sel_skin = idx;
 		}
-		cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
 	}
 	cbCurrentSkin->setSelected(sel_skin);
 	btnReloadSkin = env->addButton(Scale(90, 445, 190, 475), tabPanel, BUTTON_RELOAD_SKIN, L"Reload Skin");
 	if(sel_skin == 0) {
-		ApplySkin(EPRO_TEXT("none"));
-	} else {
-		ApplySkin(gameConf.skin);
+		gameConf.skin = EPRO_TEXT("none");
 	}
+	ApplySkin(gameConf.skin);
 	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
