@@ -1163,6 +1163,8 @@ void Game::MainLoop() {
 					ErrorLog("Error: " + repo.error);
 					grepo.history_button1->setText(L"Error!");
 					grepo.history_button1->setEnabled(true);
+					grepo.history_button2->setText(L"Error!");
+					grepo.history_button2->setEnabled(true);
 					grepo.commit_history_full = fmt::format(L"The repo {} couldn't be cloned\nError: {}", BufferIO::DecodeUTF8s(repo.url).c_str(), BufferIO::DecodeUTF8s(repo.error).c_str());
 					grepo.commit_history_partial = grepo.commit_history_full;
 					continue;
@@ -1201,6 +1203,7 @@ void Game::MainLoop() {
 					}
 				}
 				grepo.history_button1->setEnabled(true);
+				grepo.history_button2->setEnabled(true);
 
 			}
 			if(refresh_db && is_building && deckBuilder.results.size())
@@ -1785,7 +1788,7 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, L"Changelog");
 	grepo.history_button1->setEnabled(false);
 
-	auto b = env->addWindow(Scale(0, 0, 300, 55), false, L"", tabRepositories);
+	auto b = env->addWindow(Scale(0, 0, 10000, 55), false, L"", tabRepositories);
 	b->getCloseButton()->setVisible(false);
 	b->setDraggable(false);
 	b->setDrawTitlebar(false);
@@ -1795,6 +1798,8 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	grepo.progress2->addBorder(1);
 	grepo.progress2->drop();
 	((CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
+	grepo.history_button2 = env->addButton(Scale(200, 5, 300 - 5, 20 + 10), b, BUTTON_REPO_CHANGELOG, L"Changelog");
+	grepo.history_button2->setEnabled(false);
 }
 #define JSON_SET_IF_VALID(field, jsontype, cpptype)if(obj[#field].is_##jsontype())\
 													tmp_repo.field = obj[#field].get<cpptype>();
@@ -2333,6 +2338,7 @@ void Game::OnResize() {
 	wInfos->setRelativePosition(Resize(1, 275, (infosExpanded == 1) ? 1023 : 301, 639));
 	for(auto& window : repoInfoGui) {
 		window.second.progress2->setRelativePosition(Scale(5, 20 + 15, (300 - 8) * window_scale.X, 20 + 30));
+		window.second.history_button2->setRelativePosition(recti(ResizeX(200), 5, ResizeX(300 - 5), Scale(20 + 10)));
 	}
 	stName->setRelativePosition(Scale(10, 10, 287 * window_scale.X, 32));
 	lstLog->setRelativePosition(Resize(10, 10, infosExpanded ? 1012 : 290, 290));
