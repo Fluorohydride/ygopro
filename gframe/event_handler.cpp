@@ -988,7 +988,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mcard->code) {
 					mainGame->ShowCardInfo(mcard->code);
 				} else {
-					mainGame->ClearCardInfo(mcard->controler);
+					if(mcard->cover)
+						mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
+					else
+						mainGame->ClearCardInfo(mcard->controler);
 				}
 			}
 			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
@@ -1000,7 +1003,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(mcard->code) {
 						mainGame->ShowCardInfo(mcard->code);
 					} else {
-						mainGame->ClearCardInfo(mcard->controler);
+						if(mcard->cover)
+							mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
+						else
+							mainGame->ClearCardInfo(mcard->controler);
 					}
 				}
 			}
@@ -1567,7 +1573,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						should_show_tip = false;
-						mainGame->ClearCardInfo(0);
+						mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
 					}
 				}
 				hovered_card = mcard;

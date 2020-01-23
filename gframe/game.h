@@ -11,6 +11,7 @@
 #include <SColor.h>
 #include <rect.h>
 #include <EGUIElementTypes.h>
+#include "image_manager.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
@@ -189,7 +190,7 @@ public:
 	void AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo);
 	void LoadGithubRepositories();
 	void LoadServers();
-	void ShowCardInfo(int code, bool resize = false);
+	void ShowCardInfo(int code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player, int type);
 	void AddLog(const std::wstring& msg, int param = 0);

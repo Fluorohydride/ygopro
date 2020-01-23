@@ -1308,7 +1308,7 @@ void Game::MainLoop() {
 		}
 		MATERIAL_GUARD(DrawGUI();	DrawSpec(););
 		if(cardimagetextureloading) {
-			ShowCardInfo(showingcard, false);
+			ShowCardInfo(showingcard);
 		}
 		gMutex.unlock();
 		if(signalFrame > 0) {
@@ -1863,18 +1863,28 @@ void Game::LoadServers() {
 		ErrorLog(std::string("Exception ocurred: ") + e.what());
 	}
 }
-void Game::ShowCardInfo(int code, bool resize) {
+void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
+	static ImageManager::imgType prevtype = ImageManager::imgType::ART;
+	if(code == 0) {
+		ClearCardInfo(0);
+		return;
+	}
 	if (showingcard == code && !resize && !cardimagetextureloading)
 		return;
+	auto cd = dataManager.GetCardData(code);
+	if(!cd) {
+		ClearCardInfo(0);
+	}
 	showingcard = code;
 	int shouldrefresh = -1;
-	auto img = imageManager.GetTextureCard(code, ImageManager::ART, false, true, &shouldrefresh);
+	auto img = imageManager.GetTextureCard(code, resize ? prevtype : type, false, true, &shouldrefresh);
 	cardimagetextureloading = false;
 	if(shouldrefresh == 2)
 		cardimagetextureloading = true;
-	auto cd = dataManager.GetCardData(code);
 	imgCard->setImage(img);
 	imgCard->setScaleImage(true);
+	if(!cd)
+		return;
 	int tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
