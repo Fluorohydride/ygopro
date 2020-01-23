@@ -1174,6 +1174,7 @@ void Game::MainLoop() {
 					ErrorLog("The repo " + repo.url + " couldn't be cloned");
 					ErrorLog("Error: " + repo.error);
 					grepo.history_button1->setText(L"Error!");
+					grepo.history_button1->setEnabled(true);
 					grepo.commit_history_full = fmt::format(L"The repo {} couldn't be cloned\nError: {}", BufferIO::DecodeUTF8s(repo.url).c_str(), BufferIO::DecodeUTF8s(repo.error).c_str());
 					grepo.commit_history_partial = grepo.commit_history_full;
 					continue;
