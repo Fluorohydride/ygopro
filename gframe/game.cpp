@@ -2316,8 +2316,7 @@ void Game::OnResize() {
 	SetMesageWindow();
 	//wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	auto pos = wOptions->getRelativePosition();
-	wOptions->setRelativePosition(ResizeWin(490, 200, 490 + (pos.LowerRightCorner.X - pos.UpperLeftCorner.X), 200 + (pos.LowerRightCorner.Y - pos.UpperLeftCorner.Y)));
+	SetCentered(wOptions);
 	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
 	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
 	wCardDisplay->setRelativePosition(ResizeWin(320, 100, 1000, 400));
