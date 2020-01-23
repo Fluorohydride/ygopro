@@ -1,13 +1,13 @@
 #include "CGUISkinSystem.h"
 
 CGUISkinSystem::CGUISkinSystem(core::string<char*> path,IrrlichtDevice *dev) {
+	loaded_skin = nullptr;
 	device = dev;
 	skinsPath = path;
 	fs = dev->getFileSystem();	
 	this->loadSkinList();
-	
-	
 }
+
 core::array<io::path> CGUISkinSystem::listSkins() {
 	return skinsList;
 }
@@ -58,6 +58,7 @@ bool CGUISkinSystem::populateTreeView(gui::IGUITreeView *control,const core::str
 	fs->changeWorkingDirectoryTo(skinsPath);
 	registry = new CXMLRegistry(fs);	
 	if(!registry->loadFile(SKINSYSTEM_SKINFILE,skinname.c_str())) {
+		fs->changeWorkingDirectoryTo(oldpath);
 		return ret;
 	}
 	ret = registry->populateTreeView(control);
@@ -233,14 +234,14 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 
 	return skin;
 }
-core:: stringw CGUISkinSystem::getProperty(core::stringw key) {
+core::stringw CGUISkinSystem::getProperty(core::stringw key) {
 	gui::CImageGUISkin* skin = (gui::CImageGUISkin*)device->getGUIEnvironment()->getSkin();
-	return skin->getProperty(key);
+	return loaded_skin == skin ? skin->getProperty(key) : core::stringw("");
 }
 
 video::SColor CGUISkinSystem::getCustomColor(core::stringw key, video::SColor fallback) {
 	gui::CImageGUISkin* skin = (gui::CImageGUISkin*)device->getGUIEnvironment()->getSkin();
-	return skin->getCustomColor(key, fallback);
+	return loaded_skin == skin ? skin->getCustomColor(key, fallback) : fallback;
 }
 
 bool CGUISkinSystem::checkSkinColor(gui::EGUI_DEFAULT_COLOR colToSet,const wchar_t *context,gui::CImageGUISkin *skin) {
@@ -287,10 +288,14 @@ bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
 	io::path oldpath = fs->getWorkingDirectory();
 	fs->changeWorkingDirectoryTo(skinsPath);
 	registry = new CXMLRegistry(fs);
+	loaded_skin = nullptr;
 	gui::CImageGUISkin* skin = loadSkinFromFile(skinname);
-    if(skin == NULL) return false;
-	
+	if(skin == NULL) {
+		fs->changeWorkingDirectoryTo(oldpath);
+		return false;
+	}
     device->getGUIEnvironment()->setSkin(skin);
+	loaded_skin = skin;
 	// If we're going to switch skin we need to find all the progress bars and overwrite their colors	
     skin->drop();	
 	delete registry;
