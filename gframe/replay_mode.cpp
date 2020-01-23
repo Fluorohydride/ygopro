@@ -422,8 +422,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			pbuf += count * 11;
 			return ReadReplayResponse();
 		}
-		case MSG_SORT_CARD:
-		case MSG_SORT_CHAIN: {
+		case MSG_SORT_CARD: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
