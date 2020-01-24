@@ -24,7 +24,7 @@ namespace gui
 //! constructor
 CGUICustomCheckBox::CGUICustomCheckBox(bool checked, IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle)
 : IGUICheckBox(environment, parent, id, rectangle), checkTime(0), Pressed(false), Checked(checked)
-, Border(false), Background(false), override_color(NULL)
+, Border(false), Background(false), override_color(0)
 {
 	#ifdef _DEBUG
 	setDebugName("CGUICustomCheckBox");

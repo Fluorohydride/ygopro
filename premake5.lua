@@ -69,6 +69,7 @@ workspace "ygo"
 	end
 
 	filter "system:macosx"
+		defines { "GL_SILENCE_DEPRECATION" }
 		includedirs { "/usr/local/include" }
 		libdirs { "/usr/local/lib" }
 

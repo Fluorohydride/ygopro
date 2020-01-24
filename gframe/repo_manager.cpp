@@ -296,9 +296,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 		git_libgit2_shutdown();
 		return {{ "Unknown error" }, new_commits };
 	}
-	if(id.id) {
-		new_commits = GetCommitsInfo(repo, id);
-	}
+	new_commits = GetCommitsInfo(repo, id);
 	auto all_commits = GetCommitsInfo(repo, { 0 });
 	git_repository_free(repo);
 	git_libgit2_shutdown();

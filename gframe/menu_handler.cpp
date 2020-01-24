@@ -737,7 +737,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case EDITBOX_TEAM_COUNT: {
 				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
-				wchar_t* min = L"1";
+				auto min = L"1";
 				if(elem == mainGame->ebOnlineTeam1 || elem == mainGame->ebOnlineTeam2)
 					min = L"0";
 				auto text = elem->getText();

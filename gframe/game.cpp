@@ -1231,7 +1231,10 @@ void Game::MainLoop() {
 			}
 			cores_to_load.clear();
 		}
-		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && (std::wstring(stMessage->getText()) == dataManager.GetSysString(1430)))) {
+		if(corename.size() && (
+			!wMessage->isVisible() ||
+			std::wstring(stMessage->getText()) == dataManager.GetSysString(1430)
+		)) {
 			stMessage->setText(fmt::format(dataManager.GetSysString(1431).c_str(), corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();

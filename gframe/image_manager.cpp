@@ -495,7 +495,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 			}
 			auto file = reader ? reader->getFileName().c_str() : fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
 			__repeat:
-			if(img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader)) {
+			if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader))) {
 				if(timestamp_id != source_timestamp_id.load()) {
 					img->drop();
 					if(reader) {
@@ -634,7 +634,7 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 						if(img)
 							break;
 					} else {
-						if(img = driver->getTexture(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension).c_str()))
+						if((img = driver->getTexture(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension).c_str())))
 							break;
 					}
 				}

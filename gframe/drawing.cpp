@@ -3,7 +3,7 @@
 #include "materials.h"
 #include "image_manager.h"
 #include "deck_manager.h"
-#include "duelclient.h""
+#include "duelclient.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "CGUIImageButton/CGUIImageButton.h"
 #ifdef __ANDROID__

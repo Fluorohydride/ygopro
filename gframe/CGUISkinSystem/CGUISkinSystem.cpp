@@ -1,6 +1,6 @@
 #include "CGUISkinSystem.h"
 
-CGUISkinSystem::CGUISkinSystem(core::string<char*> path,IrrlichtDevice *dev) {
+CGUISkinSystem::CGUISkinSystem(io::path path,IrrlichtDevice *dev) {
 	loaded_skin = nullptr;
 	device = dev;
 	skinsPath = path;
@@ -193,7 +193,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	video::SColor newCol = video::SColor();
 	video::SColor oldCol = newCol;
 	x = registry->getValueAsInt(L"guialpha",L"Skin/Global/");
-	if(x && x != NULL) {		
+	if(x) {		
 		i = gui::EGDC_COUNT;
 		while(i--) {
 			oldCol = skin->getColor((gui::EGUI_DEFAULT_COLOR)i);		
@@ -255,7 +255,7 @@ bool CGUISkinSystem::checkSkinColor(gui::EGUI_DEFAULT_COLOR colToSet,const wchar
 
 bool CGUISkinSystem::checkSkinSize(gui::EGUI_DEFAULT_SIZE sizeToSet,const wchar_t *context,const wchar_t *key,gui::CImageGUISkin *skin) {
 	u16 i = registry->getValueAsInt(key,context);
-	if(i != NULL) {
+	if(i) {
 		skin->setSize(sizeToSet,i);
 		return true;
 	}

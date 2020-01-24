@@ -200,7 +200,7 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
-	static irr::video::SColor GetSkinColor(const std::wstring& value, irr::video::SColor fallback = NULL);
+	static irr::video::SColor GetSkinColor(const std::wstring& value, irr::video::SColor fallback = irr::video::SColor());
 
 	uint8 LocalPlayer(uint8 player);
 	std::wstring LocalName(int local_player);

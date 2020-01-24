@@ -31,7 +31,7 @@ public:
 	// Constructor
 	// path = Path to skins
 	// dev = Irrlicht device
-	CGUISkinSystem(core::string<char*> path,IrrlichtDevice *dev);
+	CGUISkinSystem(io::path path, IrrlichtDevice *dev);
 	~CGUISkinSystem();
 	core::array<io::path> listSkins();
 	bool loadSkinList();

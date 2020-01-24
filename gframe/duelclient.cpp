@@ -954,7 +954,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_NEW_REPLAY: {
 		old_replay = false;
 		char* prep = pdata;
-		last_replay;
 		memcpy(&last_replay.pheader, prep, sizeof(ReplayHeader));
 		prep += sizeof(ReplayHeader);
 		last_replay.comp_data.resize(len - sizeof(ReplayHeader) - 1);
@@ -2226,7 +2225,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		std::vector<ClientCard*> panel_confirm;
 		ClientCard* pcard;
 		if(mainGame->dInfo.isCatchingUp) {
-			pbuf += count * (mainGame->dInfo.compat_mode) ? 7 : 10;
+			pbuf += count * (mainGame->dInfo.compat_mode ? 7 : 10);
 			return true;
 		}
 		mainGame->AddLog(fmt::sprintf(dataManager.GetSysString(208).c_str(), count));

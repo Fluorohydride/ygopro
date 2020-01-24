@@ -26,7 +26,7 @@ void CGUIProgressBar::setAutomaticText( const wchar_t* text )
         wchar_t* buffer = new wchar_t[ AutomaticTextFormat.size() + 10 ];
         swprintf( buffer, AutomaticTextFormat.size() + 10, AutomaticTextFormat.c_str(), 100*FilledRatio );
         Text = buffer;
-        delete buffer;
+        delete[] buffer;
     }
 }
 
@@ -59,7 +59,7 @@ void CGUIProgressBar::setProgress( f32 progress )
         wchar_t* buffer = new wchar_t[ AutomaticTextFormat.size() + 10 ];
         swprintf( buffer, AutomaticTextFormat.size() + 10, AutomaticTextFormat.c_str(), 100*FilledRatio );
         Text = buffer;
-        delete buffer;
+        delete[] buffer;
     }
 }
 
