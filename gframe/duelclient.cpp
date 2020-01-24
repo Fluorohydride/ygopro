@@ -565,7 +565,12 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		std::wstring str, str2;
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist)));
 		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1225), dataManager.GetSysString(1900 + pkt->info.rule)));
-		str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1227), dataManager.GetSysString(1244 + pkt->info.mode)));
+		if(mainGame->dInfo.compat_mode)
+			str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1227), dataManager.GetSysString(1244 + pkt->info.mode)));
+		else {
+
+			str.append(fmt::format(L"{}{} {}{}\n", dataManager.GetSysString(1227), dataManager.GetSysString(1381), mainGame->dInfo.best_of, mainGame->dInfo.isRelay ? L" Relay" : L""));
+		}
 		if(pkt->info.time_limit) {
 			str.append(fmt::format(L"{}{}\n", dataManager.GetSysString(1237), pkt->info.time_limit));
 		}
