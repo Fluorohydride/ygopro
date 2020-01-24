@@ -18,8 +18,8 @@ void ImageManager::AddDownloadResource(PicSource src) {
 	pic_urls.push_back(src);
 }
 #define GET(obj,fun1,fun2) obj=fun1; if(!obj) obj=fun2;
-#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GetTextureFromFile(EPRO_TEXT(path##".png"),mainGame->Scale(w),mainGame->Scale(h)),GetTextureFromFile(EPRO_TEXT(path##".jpg"),mainGame->Scale(w),mainGame->Scale(h)))
-#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(EPRO_TEXT(path##".png")),driver->getTexture(EPRO_TEXT(path##".jpg")))
+#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GetTextureFromFile(EPRO_TEXT(path".png"),mainGame->Scale(w),mainGame->Scale(h)),GetTextureFromFile(EPRO_TEXT(path".jpg"),mainGame->Scale(w),mainGame->Scale(h)))
+#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(EPRO_TEXT(path".png")),driver->getTexture(EPRO_TEXT(path".jpg")))
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	GET_TEXTURE_SIZED(tCover[0],"textures/cover", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
@@ -97,7 +97,7 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
 		irr::video::ITexture* tmp_cover = nullptr;
 #undef GET_TEXTURE_SIZED
-#define GET_TEXTURE_SIZED(obj,path) GET(tmp_cover,GetTextureFromFile(EPRO_TEXT(path##".png"),sizes[1].first,sizes[1].second),GetTextureFromFile(EPRO_TEXT(path##".jpg"),sizes[1].first,sizes[1].second))\
+#define GET_TEXTURE_SIZED(obj,path) GET(tmp_cover,GetTextureFromFile(EPRO_TEXT(path".png"),sizes[1].first,sizes[1].second),GetTextureFromFile(EPRO_TEXT(path".jpg"),sizes[1].first,sizes[1].second))\
 										if(tmp_cover) {\
 											driver->removeTexture(obj);\
 											obj = tmp_cover;\
