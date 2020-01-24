@@ -450,6 +450,8 @@ public:
 	irr::gui::IGUIEditBox* ebHostPort;
 	irr::gui::IGUIStaticText* stHostNotes;
 	irr::gui::IGUIEditBox* ebHostNotes;
+	irr::gui::IGUIStaticText* stVersus;
+	irr::gui::IGUIStaticText* stBestof;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
 	irr::gui::IGUIWindow* wHostPrepare2;

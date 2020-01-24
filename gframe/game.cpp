@@ -982,14 +982,14 @@ bool Game::Initialize() {
 	ebOnlineTeam1 = env->addEditBox(L"0", Scale(140 + (392 - 140), 55, 170 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam1->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring = env->addStaticText(dataManager.GetSysString(1380).c_str(), Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
+	stVersus = env->addStaticText(dataManager.GetSysString(1380).c_str(), Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	vsstring->setOverrideColor(roomlistcolor);
 	ebOnlineTeam2 = env->addEditBox(L"0", Scale(200 + (392 - 140), 55, 230 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam2->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring = env->addStaticText(dataManager.GetSysString(1381).c_str(), Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
+	stBestof = env->addStaticText(dataManager.GetSysString(1381).c_str(), Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	vsstring->setOverrideColor(roomlistcolor);
@@ -1410,6 +1410,35 @@ void Game::MainLoop() {
 }
 void Game::ApplySkin(const path_string& skinname, bool reload) {
 	static path_string prev_skin = EPRO_TEXT("");
+	auto reapply_colors= [&] () {
+		stInfo->setOverrideColor(GetSkinColor(L"CARDINFO_TYPES_COLOR", irr::video::SColor(255, 0, 0, 255)));
+		stDataInfo->setOverrideColor(GetSkinColor(L"CARDINFO_STATS_COLOR", irr::video::SColor(255, 0, 0, 255)));
+		stSetName->setOverrideColor(GetSkinColor(L"CARDINFO_ARCHETYPE_TEXT_COLOR", irr::video::SColor(255, 0, 0, 255)));
+		stACMessage->setBackgroundColor(GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR", irr::video::SColor(192, 192, 192, 192)));
+		auto tmp_color = GetSkinColor(L"DUELFIELD_ANNOUNCE_TEXT_COLOR", 0);
+		if(tmp_color != 0) {
+			stACMessage->setOverrideColor(tmp_color);
+		} else {
+			stACMessage->enableOverrideColor(false);
+		}
+		stHintMsg->setBackgroundColor(GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", irr::video::SColor(192, 255, 255, 255)));
+		tmp_color = GetSkinColor(L"DUELFIELD_TOOLTIP_TEXT_COLOR", 0);
+		if(tmp_color != 0) {
+			stHintMsg->setOverrideColor(tmp_color);
+		} else {
+			stHintMsg->enableOverrideColor(false);
+		}
+		auto roomlistcolor = GetSkinColor(L"ROOMLIST_TEXTS_COLOR", irr::video::SColor(255, 255, 255, 255));
+		stVersus->setOverrideColor(roomlistcolor);
+		stBestof->setOverrideColor(roomlistcolor);
+		ebRoomNameText->setOverrideColor(roomlistcolor);
+		((CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
+		((CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
+		for(auto& repo : repoInfoGui) {
+			repo.second.progress1->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
+			repo.second.progress2->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
+		}
+	};
 	if(!skinSystem || skinname == prev_skin || (reload && prev_skin == EPRO_TEXT("")))
 		return;
 	if(!reload)
@@ -1442,10 +1471,7 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 			skin->setColor((EGUI_DEFAULT_COLOR)i, col);
 		}
 	}
-	for(auto& repo : repoInfoGui) {
-		repo.second.progress1->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
-		repo.second.progress2->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
-	}
+	reapply_colors();
 	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
 }
 void Game::LoadZipArchives() {
