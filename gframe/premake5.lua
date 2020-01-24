@@ -80,7 +80,11 @@ local ygopro_config=function(static_core)
 		end
 
 	filter { "system:linux", "configurations:Debug" }
-		links { "fmtd", "curl-d" }
+		if _OPTIONS["vcpkg-root"] then
+			links { "fmtd", "curl-d" }
+		else
+			links { "fmt", "curl" }
+		end
 
 	filter { "system:linux", "configurations:Release" }
 		links { "fmt", "curl" }	
