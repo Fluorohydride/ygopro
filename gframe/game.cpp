@@ -1410,7 +1410,8 @@ void Game::MainLoop() {
 }
 void Game::ApplySkin(const path_string& skinname, bool reload) {
 	static path_string prev_skin = EPRO_TEXT("");
-	auto reapply_colors= [&] () {
+	static bool firstrun = true;
+	auto reapply_colors = [&] () {
 		stInfo->setOverrideColor(GetSkinColor(L"CARDINFO_TYPES_COLOR", irr::video::SColor(255, 0, 0, 255)));
 		stDataInfo->setOverrideColor(GetSkinColor(L"CARDINFO_STATS_COLOR", irr::video::SColor(255, 0, 0, 255)));
 		stSetName->setOverrideColor(GetSkinColor(L"CARDINFO_ARCHETYPE_TEXT_COLOR", irr::video::SColor(255, 0, 0, 255)));
@@ -1471,7 +1472,9 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 			skin->setColor((EGUI_DEFAULT_COLOR)i, col);
 		}
 	}
-	reapply_colors();
+	if(!firstrun)
+		reapply_colors();
+	firstrun = false;
 	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
 }
 void Game::LoadZipArchives() {
