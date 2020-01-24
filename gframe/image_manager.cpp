@@ -20,11 +20,13 @@ void ImageManager::AddDownloadResource(PicSource src) {
 
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	tCover[0] = GetTextureFromFile(EPRO_TEXT("textures/cover.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
-	tCover[1] = GetTextureFromFile(EPRO_TEXT("textures/cover2.jpg"), mainGame->Scale(CARD_IMG_WIDTH), mainGame->Scale(CARD_IMG_HEIGHT));
+#define GET_TEXTURE_FILE(a, b, w, h) GetTextureFromFile(EPRO_TEXT(a), EPRO_TEXT(b), mainGame->Scale(w), mainGame->Scale(h))
+	tCover[0] = GET_TEXTURE_FILE("textures/cover.png", "textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	tCover[1] = GET_TEXTURE_FILE("textures/cover2.png", "textures/cover2.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	if(!tCover[1])
 		tCover[1] = tCover[0];
-	tUnknown = driver->getTexture(EPRO_TEXT("textures/unknown.jpg"));
+#define GET_TEXTURE(a, b) GetTexture(EPRO_TEXT(a), EPRO_TEXT(b))
+	tUnknown = GET_TEXTURE("textures/unknown.png", "textures/unknown.jpg");
 	tAct = driver->getTexture(EPRO_TEXT("textures/act.png"));
 	tAttack = driver->getTexture(EPRO_TEXT("textures/attack.png"));
 	tChain = driver->getTexture(EPRO_TEXT("textures/chain.png"));
@@ -37,16 +39,18 @@ bool ImageManager::Initial() {
 	tTarget = driver->getTexture(EPRO_TEXT("textures/target.png"));
 	tChainTarget = driver->getTexture(EPRO_TEXT("textures/chaintarget.png"));
 	tLim = driver->getTexture(EPRO_TEXT("textures/lim.png"));
-	tHand[0] = GetTextureFromFile(EPRO_TEXT("textures/f1.jpg"), mainGame->Scale(89), mainGame->Scale(128));
-	tHand[1] = GetTextureFromFile(EPRO_TEXT("textures/f2.jpg"), mainGame->Scale(89), mainGame->Scale(128));
-	tHand[2] = GetTextureFromFile(EPRO_TEXT("textures/f3.jpg"), mainGame->Scale(89), mainGame->Scale(128));
-	tBackGround = driver->getTexture(EPRO_TEXT("textures/bg.jpg"));
-	tBackGround_menu = driver->getTexture(EPRO_TEXT("textures/bg_menu.jpg"));
+	tHand[0] = GET_TEXTURE_FILE("textures/f1.png", "textures/f1.jpg", 89, 128);
+	tHand[1] = GET_TEXTURE_FILE("textures/f2.png", "textures/f2.jpg", 89, 128);
+	tHand[2] = GET_TEXTURE_FILE("textures/f3.png", "textures/f3.jpg", 89, 128);
+	tBackGround = GET_TEXTURE("textures/bg.png", "textures/bg.jpg");
+	tBackGround_menu = GET_TEXTURE("textures/bg_menu.png", "textures/bg_menu.jpg");
 	if(!tBackGround_menu)
 		tBackGround_menu = tBackGround;
-	tBackGround_deck = driver->getTexture(EPRO_TEXT("textures/bg_deck.jpg"));
+	tBackGround_deck = GET_TEXTURE("textures/bg_deck.png", "textures/bg_deck.jpg");
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
+#undef GET_TEXTURE
+#undef GET_TEXTURE_FILE
 	tField[0][0] = driver->getTexture(EPRO_TEXT("textures/field2.png"));
 	tFieldTransparent[0][0] = driver->getTexture(EPRO_TEXT("textures/field-transparent2.png"));
 	tField[0][1] = driver->getTexture(EPRO_TEXT("textures/field3.png"));
@@ -92,16 +96,18 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
 		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
-		auto tmp_cover = GetTextureFromFile(EPRO_TEXT("textures/cover.jpg"), sizes[1].first, sizes[1].second);
+#define GET_TEXTURE_FILE(a, b, w, h) GetTextureFromFile(EPRO_TEXT(a), EPRO_TEXT(b), w, h)
+		auto tmp_cover = GET_TEXTURE_FILE("textures/cover.png", "textures/cover.jpg", sizes[1].first, sizes[1].second);
 		if(tmp_cover) {
 			driver->removeTexture(tCover[0]);
 			tCover[0] = tmp_cover;
 		}
-		tmp_cover = GetTextureFromFile(EPRO_TEXT("textures/cover2.jpg"), sizes[1].first, sizes[1].second);
+		tmp_cover = GET_TEXTURE_FILE("textures/cover2.png", "textures/cover2.jpg", sizes[1].first, sizes[1].second);
 		if(tmp_cover) {
 			driver->removeTexture(tCover[1]);
 			tCover[1] = tmp_cover;
 		}
+#undef GET_TEXTURE_FILE
 	}
 	if(!resize) {
 		ClearCachedTextures(resize);
@@ -466,6 +472,14 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path & fil
 			return texture;
 	}
 	return driver->getTexture(file);
+}
+irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path& file, const irr::io::path& fallback, int width, int height) {
+	auto first = GetTextureFromFile(file, width, height);
+	return first ? first : GetTextureFromFile(fallback, width, height);
+}
+irr::video::ITexture* ImageManager::GetTexture(const irr::io::path& file, const irr::io::path& fallback) {
+	auto first = driver->getTexture(file);
+	return first ? first : driver->getTexture(fallback);
 }
 ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, std::atomic<irr::s32>& _width, std::atomic<irr::s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* img = nullptr;
