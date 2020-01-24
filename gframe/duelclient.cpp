@@ -2607,8 +2607,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		CoreUtils::loc_info current = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 		current.controler = mainGame->LocalPlayer(current.controler);
 		uint32_t reason = BufferIO::Read<uint32_t>(pbuf);
-		if (reason & REASON_DESTROY && previous.location != current.location)
-			PLAY_SOUND(SoundManager::SFX::DESTROYED);
+		if (previous.location != current.location)
+			if (reason & REASON_DESTROY)
+				PLAY_SOUND(SoundManager::SFX::DESTROYED);
+			if (current.location & LOCATION_REMOVED)
+				PLAY_SOUND(SoundManager::SFX::BANISHED);
 		if (previous.location == 0) {
 			ClientCard* pcard = new ClientCard();
 			pcard->position = current.position;
