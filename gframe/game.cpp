@@ -1591,25 +1591,26 @@ void Game::LoadConfig() {
 	gameConf.lastport = L"";
 	gameConf.roompass = L"";
 	//settings
-	gameConf.chkMAutoPos = 0;
-	gameConf.chkSTAutoPos = 1;
-	gameConf.chkRandomPos = 0;
-	gameConf.chkAutoChain = 0;
-	gameConf.chkWaitChain = 0;
-	gameConf.chkIgnore1 = 0;
-	gameConf.chkIgnore2 = 0;
-	gameConf.chkHideSetname = 0;
-	gameConf.chkHideHintButton = 0;
+	gameConf.chkMAutoPos = false;
+	gameConf.chkSTAutoPos = true;
+	gameConf.chkRandomPos = false;
+	gameConf.chkAutoChain = false;
+	gameConf.chkWaitChain = false;
+	gameConf.chkIgnore1 = false;
+	gameConf.chkIgnore2 = false;
+	gameConf.chkHideSetname = false;
+	gameConf.chkHideHintButton = false;
 	gameConf.skin = EPRO_TEXT("none");
 	gameConf.enablemusic = true;
 	gameConf.enablesound = true;
 	gameConf.musicVolume = 1.0;
 	gameConf.soundVolume = 1.0;
-	gameConf.draw_field_spell = 1;
-	gameConf.quick_animation = 0;
-	gameConf.chkAnime = 0;
+	gameConf.draw_field_spell = true;
+	gameConf.quick_animation = false;
+	gameConf.scale_background = false;
+	gameConf.chkAnime = false;
 	gameConf.dpi_scale = 1.0f;
-	std::ifstream conf_file("./config/system.conf", std::ifstream::in);
+	std::ifstream conf_file("./system.conf", std::ifstream::in);
 	if(!conf_file.is_open())
 		return;
 	std::string str;
@@ -1629,15 +1630,15 @@ void Game::LoadConfig() {
 			if(type == "antialias")
 				gameConf.antialias = std::stoi(str);
 			else if(type == "use_d3d")
-				gameConf.use_d3d = std::stoi(str);
+				gameConf.use_d3d = !!std::stoi(str);
 			else if(type == "use_vsync")
-				gameConf.use_vsync = std::stoi(str);
+				gameConf.use_vsync = !!std::stoi(str);
 			else if(type == "max_fps") {
 				auto val = std::stoi(str);
 				if(val >= 0)
 					gameConf.max_fps = val;
 			} else if(type == "fullscreen")
-				gameConf.fullscreen = std::stoi(str);
+				gameConf.fullscreen = !!std::stoi(str);
 			else if(type == "errorlog")
 				enable_log = std::stoi(str);
 			else if(type == "nickname")
@@ -1677,33 +1678,35 @@ void Game::LoadConfig() {
 					gameConf.game_version = PRO_VERSION;
 				}
 			} else if(type == "automonsterpos")
-				gameConf.chkMAutoPos = std::stoi(str);
+				gameConf.chkMAutoPos = !!std::stoi(str);
 			else if(type == "autospellpos")
-				gameConf.chkSTAutoPos = std::stoi(str);
+				gameConf.chkSTAutoPos = !!std::stoi(str);
 			else if(type == "randompos")
-				gameConf.chkRandomPos = std::stoi(str);
+				gameConf.chkRandomPos = !!std::stoi(str);
 			else if(type == "autochain")
-				gameConf.chkAutoChain = std::stoi(str);
+				gameConf.chkAutoChain = !!std::stoi(str);
 			else if(type == "waitchain")
-				gameConf.chkWaitChain = std::stoi(str);
+				gameConf.chkWaitChain = !!std::stoi(str);
 			else if(type == "mute_opponent")
-				gameConf.chkIgnore1 = std::stoi(str);
+				gameConf.chkIgnore1 = !!std::stoi(str);
 			else if(type == "mute_spectators")
-				gameConf.chkIgnore1 = std::stoi(str);
+				gameConf.chkIgnore1 = !!std::stoi(str);
 			else if(type == "hide_setname")
-				gameConf.chkHideSetname = std::stoi(str);
+				gameConf.chkHideSetname = !!std::stoi(str);
 			else if(type == "hide_hint_button")
-				gameConf.chkHideHintButton = std::stoi(str);
+				gameConf.chkHideHintButton = !!std::stoi(str);
 			else if(type == "draw_field_spell")
-				gameConf.draw_field_spell = std::stoi(str);
+				gameConf.draw_field_spell = !!std::stoi(str);
 			else if(type == "quick_animation")
-				gameConf.quick_animation = std::stoi(str);
+				gameConf.quick_animation = !!std::stoi(str);
 			else if(type == "show_unofficial")
-				gameConf.chkAnime = std::stoi(str);
+				gameConf.chkAnime = !!std::stoi(str);
 			else if(type == "dpi_scale")
 				gameConf.dpi_scale = std::stof(str);
 			else if(type == "skin")
 				gameConf.skin = Utils::ParseFilename(str);
+			else if(type == "scale_background")
+				gameConf.scale_background = !!std::stoi(str);
 			else if(type == "enable_music")
 				gameConf.enablemusic = !!std::stoi(str);
 			else if(type == "enable_sound")
@@ -1716,7 +1719,7 @@ void Game::LoadConfig() {
 	}
 	conf_file.close();
 	if(configs.empty()) {
-		conf_file.open(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
+		conf_file.open(EPRO_TEXT("./configs.json"), std::ifstream::in);
 		try {
 			conf_file >> configs;
 		}
@@ -1727,7 +1730,7 @@ void Game::LoadConfig() {
 	}
 }
 void Game::SaveConfig() {
-	std::ofstream conf_file("./config/system.conf", std::ofstream::out);
+	std::ofstream conf_file("./system.conf", std::ofstream::out);
 	if(!conf_file.is_open())
 		return;
 	conf_file << "#Configuration file\n";
@@ -1735,48 +1738,46 @@ void Game::SaveConfig() {
 	conf_file << "#The following parameters use 0 for 'disabled' or 1 for 'enabled':\n";
 	conf_file << "#use_d3d, use_vsync, fullscreen, automonsterpos, autospellpos, randompos, autochain, waitchain, mute_opponent, mute_spectators,\n";
 	conf_file <<  "hide_setname,hide_hint_button, draw_field_spell, quick_animation, show_unofficial, skin, enable_sound, enable_music\n";
-	conf_file << "use_d3d = "			<< std::to_string(gameConf.use_d3d ? 1 : 0) << "\n";
-	conf_file << "use_vsync = "			<< std::to_string(gameConf.use_vsync ? 1 : 0) << "\n";
+	conf_file << "use_d3d = "			<< (gameConf.use_d3d ? 1 : 0) << "\n";
+	conf_file << "use_vsync = "			<< (gameConf.use_vsync ? 1 : 0) << "\n";
 	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
-	conf_file << "max_fps = "			<< std::to_string(gameConf.max_fps) << "\n";
-	conf_file << "fullscreen = "		<< std::to_string(is_fullscreen ? 1 : 0) << "\n";
-	conf_file << "antialias = "			<< std::to_string(gameConf.antialias) << "\n";
-	conf_file << "errorlog = "			<< std::to_string(enable_log) << "\n";
+	conf_file << "max_fps = "			<< gameConf.max_fps << "\n";
+	conf_file << "fullscreen = "		<< (is_fullscreen ? 1 : 0) << "\n";
+	conf_file << "antialias = "			<< gameConf.antialias << "\n";
+	conf_file << "errorlog = "			<< enable_log << "\n";
 	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
 	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
 	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
-	conf_file << "lastlflist = "		<< std::to_string(gameConf.lastlflist) << "\n";
-	conf_file << "lastallowedcards = "  << std::to_string(cbRule->getSelected()) << "\n";
+	conf_file << "lastlflist = "		<< gameConf.lastlflist << "\n";
+	conf_file << "lastallowedcards = "  << cbRule->getSelected() << "\n";
 	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
 	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
 	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";
 	conf_file << "lasthost = "			<< BufferIO::EncodeUTF8s(gameConf.lasthost) << "\n";
 	conf_file << "lastport = "			<< BufferIO::EncodeUTF8s(gameConf.lastport) << "\n";
-	conf_file << "game_version = "		<< std::to_string(gameConf.game_version) << "\n";
-	conf_file << "automonsterpos = "	<< std::to_string(chkMAutoPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "autospellpos = "		<< std::to_string(chkSTAutoPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "randompos = "			<< std::to_string(chkRandomPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "autochain = "			<< std::to_string(chkAutoChain->isChecked() ? 1 : 0) << "\n";
-	conf_file << "waitchain = "			<< std::to_string(chkWaitChain->isChecked() ? 1 : 0) << "\n";
-	conf_file << "mute_opponent = "		<< std::to_string(chkIgnore1->isChecked() ? 1 : 0) << "\n";
-	conf_file << "mute_spectators = "	<< std::to_string(chkIgnore2->isChecked() ? 1 : 0) << "\n";
-	conf_file << "hide_setname = "		<< std::to_string(gameConf.chkHideSetname ? 1 : 0) << "\n";
-	conf_file << "hide_hint_button = "	<< std::to_string(chkHideHintButton->isChecked() ? 1 : 0) << "\n";
-	conf_file << "draw_field_spell = "	<< std::to_string(gameConf.draw_field_spell) << "\n";
-	conf_file << "quick_animation = "	<< std::to_string(gameConf.quick_animation) << "\n";
+	conf_file << "game_version = "		<< gameConf.game_version << "\n";
+	conf_file << "automonsterpos = "	<< (chkMAutoPos->isChecked() ? 1 : 0) << "\n";
+	conf_file << "autospellpos = "		<< (chkSTAutoPos->isChecked() ? 1 : 0) << "\n";
+	conf_file << "randompos = "			<< (chkRandomPos->isChecked() ? 1 : 0) << "\n";
+	conf_file << "autochain = "			<< (chkAutoChain->isChecked() ? 1 : 0) << "\n";
+	conf_file << "waitchain = "			<< (chkWaitChain->isChecked() ? 1 : 0) << "\n";
+	conf_file << "mute_opponent = "		<< (chkIgnore1->isChecked() ? 1 : 0) << "\n";
+	conf_file << "mute_spectators = "	<< (chkIgnore2->isChecked() ? 1 : 0) << "\n";
+	conf_file << "hide_setname = "		<< (gameConf.chkHideSetname ? 1 : 0) << "\n";
+	conf_file << "hide_hint_button = "	<< (chkHideHintButton->isChecked() ? 1 : 0) << "\n";
+	conf_file << "draw_field_spell = "	<< (gameConf.draw_field_spell ? 1 : 0) << "\n";
+	conf_file << "quick_animation = "	<< (gameConf.quick_animation ? 1 : 0) << "\n";
 	conf_file << "#shows the unofficial cards in deck edit, which includes anime, customs, etc\n";
-	conf_file << "show_unofficial = "	<< std::to_string(chkAnime->isChecked() ? 1 : 0) << "\n";
-	conf_file << "dpi_scale = "			<< std::to_string(gameConf.dpi_scale) << "\n";
+	conf_file << "show_unofficial = "	<< (chkAnime->isChecked() ? 1 : 0) << "\n";
+	conf_file << "dpi_scale = "			<< gameConf.dpi_scale << "\n";
 	conf_file << "#if skins from the skin folder are in use\n";
 	conf_file << "skin = "				<< Utils::ToUTF8IfNeeded(gameConf.skin) << "\n";
-	conf_file << "enable_music = "		<< std::to_string(chkEnableMusic->isChecked() ? 1 : 0) << "\n";
-	conf_file << "enable_sound = "		<< std::to_string(chkEnableSound->isChecked() ? 1 : 0) << "\n";
+	conf_file << "scale_background = "  << (gameConf.scale_background ? 1 : 0) << "\n";
+	conf_file << "enable_music = "		<< (chkEnableMusic->isChecked() ? 1 : 0) << "\n";
+	conf_file << "enable_sound = "		<< (chkEnableSound->isChecked() ? 1 : 0) << "\n";
 	conf_file << "#integers between 0 and 100\n";
-	int vol = gameConf.musicVolume * 100;
-	if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
-	conf_file << "music_volume = "		<< std::to_string(vol) << "\n";
-	vol = gameConf.soundVolume * 100;if(vol < 0) vol = 0; else if(vol > 100) vol = 100;
-	conf_file << "sound_volume = "		<< std::to_string(vol) << "\n";
+	conf_file << "music_volume = "		<< std::min(std::max((int)(gameConf.musicVolume * 100), 0), 100) << "\n";
+	conf_file << "sound_volume = "		<< std::min(std::max((int)(gameConf.soundVolume * 100), 0), 100) << "\n";
 	conf_file.close();
 }
 void Game::LoadPicUrls() {

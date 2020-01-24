@@ -1045,7 +1045,22 @@ void Game::DrawSpec() {
 void Game::DrawBackImage(irr::video::ITexture* texture) {
 	if(!texture)
 		return;
-	driver->draw2DImage(texture, Resize(0, 0, 1024, 640), recti(0, 0, texture->getOriginalSize().Width, texture->getOriginalSize().Height));
+	recti dest_size = Resize(0, 0, 1024, 640);
+	recti bg_size = recti(0, 0, texture->getOriginalSize().Width, texture->getOriginalSize().Height);
+	if(!gameConf.scale_background) {
+		rectf dest_sizef = rectf(0, 0, dest_size.getWidth(), dest_size.getHeight());
+		rectf bg_sizef = rectf(0, 0, bg_size.getWidth(), bg_size.getHeight());
+		float width = ((bg_sizef.getWidth() / bg_sizef.getHeight()) * dest_sizef.getHeight()) - dest_sizef.getWidth();
+		float height = ((bg_sizef.getHeight() / bg_sizef.getWidth()) * dest_sizef.getWidth()) - dest_sizef.getHeight();
+		if(width > 0) {
+			int off = std::ceil(width * 0.5f);
+			dest_size = recti({ -off, 0, dest_size.getWidth() + off, dest_size.getHeight() });
+		} else if(height > 0) {
+			int off = std::ceil(height * 0.5f);
+			dest_size = recti({ 0, -off, dest_size.getWidth(), dest_size.getHeight() + off });
+		}
+	}
+	driver->draw2DImage(texture, dest_size, bg_size);
 }
 void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	FadingUnit fu;

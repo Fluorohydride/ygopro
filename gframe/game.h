@@ -46,7 +46,7 @@ namespace irr {
 	}
 	namespace video {
 		class IVideoDriver;
-		class S3DVertex;
+		struct S3DVertex;
 		class ITexture;
 	}
 	namespace io {
@@ -82,19 +82,20 @@ struct Config {
 	std::wstring numfont;
 	std::wstring roompass;
 	//settings
-	int chkMAutoPos;
-	int chkSTAutoPos;
-	int chkRandomPos;
-	int chkAutoChain;
-	int chkWaitChain;
-	int chkIgnore1;
-	int chkIgnore2;
-	int chkHideSetname;
-	int chkHideHintButton;
-	int draw_field_spell;
-	int quick_animation;
+	bool chkMAutoPos;
+	bool chkSTAutoPos;
+	bool chkRandomPos;
+	bool chkAutoChain;
+	bool chkWaitChain;
+	bool chkIgnore1;
+	bool chkIgnore2;
+	bool chkHideSetname;
+	bool chkHideHintButton;
+	bool draw_field_spell;
+	bool quick_animation;
 
-	int chkAnime;
+	bool scale_background;
+	bool chkAnime;
 	bool enablemusic;
 	bool enablesound;
 	double musicVolume;
