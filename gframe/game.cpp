@@ -171,7 +171,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	smgr = device->getSceneManager();
-	device->setWindowCaption(L"EDOPro");
+	device->setWindowCaption(L"EDOPro by Project Ignis");
 	device->setResizable(true);
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
@@ -187,14 +187,14 @@ bool Game::Initialize() {
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 	DragAcceptFiles(hWnd, TRUE);
 #endif
-	wCommitsLog = env->addWindow(Scale(0, 0, 500 + 10, 400 + 35 + 35), false, L"Update log");
+	wCommitsLog = env->addWindow(Scale(0, 0, 500 + 10, 400 + 35 + 35), false, dataManager.GetSysString(1209).c_str());
 	wCommitsLog->setVisible(false);
 	wCommitsLog->getCloseButton()->setEnabled(false);
 	wCommitsLog->getCloseButton()->setVisible(false);
 	stCommitLog = irr::gui::CGUICustomText::addCustomText(L"", false, env, wCommitsLog, -1, Scale(5, 30, 505, 430));
 	stCommitLog->setWordWrap(true);
 	((CGUICustomText*)stCommitLog)->enableScrollBar();
-	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, L"OK");
+	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, dataManager.GetSysString(1211).c_str());
 	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
 	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(2045).c_str(), 1, true, true));
 	mAbout = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(1970).c_str(), 2, true, true));
@@ -216,7 +216,7 @@ bool Game::Initialize() {
 								 L"Forked from Fluorohydride's YGOPro.\n"
 								 L"\n"
 								 L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
-								 L"This project is not affiliated or endorsed by Shueisha or Konami.",
+								 L"This project is not affiliated with or endorsed by Shueisha or Konami.",
 								 Scale(10, 10, 440, 690), false, true, wAbout);
 	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
@@ -281,15 +281,15 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	ebTeam1 = env->addEditBox(L"1", Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	auto vsstring = env->addStaticText(L"vs.", Scale(175, 85, 195, 110), false, false, wCreateHost);
+	auto vsstring = env->addStaticText(dataManager.GetSysString(1380).c_str(), Scale(175, 85, 195, 110), false, false, wCreateHost);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebTeam2 = env->addEditBox(L"1", Scale(200, 85, 230, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	vsstring = env->addStaticText(L"Best of", Scale(235, 85, 280, 110), false, false, wCreateHost);
+	vsstring = env->addStaticText(dataManager.GetSysString(1381).c_str(), Scale(235, 85, 280, 110), false, false, wCreateHost);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	ebBestOf = env->addEditBox(L"1", Scale(285, 85, 315, 110), true, wCreateHost);
 	ebBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnRelayMode = env->addButton(Scale(325, 85, 370, 110), wCreateHost, -1, L"Relay");
+	btnRelayMode = env->addButton(Scale(325, 85, 370, 110), wCreateHost, -1, dataManager.GetSysString(1247).c_str());
 	btnRelayMode->setIsPushButton(true);
 	env->addStaticText(dataManager.GetSysString(1237).c_str(), Scale(20, 120, 320, 140), false, false, wCreateHost);
 	ebTimeLimit = env->addEditBox(L"180", Scale(140, 115, 220, 140), true, wCreateHost);
@@ -582,8 +582,8 @@ bool Game::Initialize() {
 	stOptions->setWordWrap(true);
 	stOptions->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnOptionOK = env->addButton(Scale(130, 105, 220, 130), wOptions, BUTTON_OPTION_OK, dataManager.GetSysString(1211).c_str());
-	btnOptionp = env->addButton(Scale(20, 105, 60, 130), wOptions, BUTTON_OPTION_PREV, L"<<<");
-	btnOptionn = env->addButton(Scale(290, 105, 330, 130), wOptions, BUTTON_OPTION_NEXT, L">>>");
+	btnOptionp = env->addButton(Scale(20, 105, 60, 130), wOptions, BUTTON_OPTION_PREV, dataManager.GetSysString(1432).c_str());
+	btnOptionn = env->addButton(Scale(290, 105, 330, 130), wOptions, BUTTON_OPTION_NEXT, dataManager.GetSysString(1433).c_str());
 	for(int i = 0; i < 5; ++i) {
 		btnOption[i] = env->addButton(Scale(10, 30 + 40 * i, 340, 60 + 40 * i), wOptions, BUTTON_OPTION_0 + i, L"");
 	}
@@ -982,14 +982,14 @@ bool Game::Initialize() {
 	ebOnlineTeam1 = env->addEditBox(L"0", Scale(140 + (392 - 140), 55, 170 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam1->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring = env->addStaticText(L"vs.", Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
+	vsstring = env->addStaticText(dataManager.GetSysString(1380).c_str(), Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	vsstring->setOverrideColor(roomlistcolor);
 	ebOnlineTeam2 = env->addEditBox(L"0", Scale(200 + (392 - 140), 55, 230 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam2->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	vsstring = env->addStaticText(L"Best of", Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
+	vsstring = env->addStaticText(dataManager.GetSysString(1381).c_str(), Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	vsstring->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	vsstring->setOverrideColor(roomlistcolor);
@@ -1161,11 +1161,14 @@ void Game::MainLoop() {
 				if(repo.error.size()) {
 					ErrorLog("The repo " + repo.url + " couldn't be cloned");
 					ErrorLog("Error: " + repo.error);
-					grepo.history_button1->setText(L"Error!");
+					grepo.history_button1->setText(dataManager.GetSysString(1434).c_str());
 					grepo.history_button1->setEnabled(true);
-					grepo.history_button2->setText(L"Error!");
+					grepo.history_button2->setText(dataManager.GetSysString(1434).c_str());
 					grepo.history_button2->setEnabled(true);
-					grepo.commit_history_full = fmt::format(L"The repo {} couldn't be cloned\nError: {}", BufferIO::DecodeUTF8s(repo.url).c_str(), BufferIO::DecodeUTF8s(repo.error).c_str());
+					grepo.commit_history_full = fmt::format(L"{}\n{}",
+						fmt::format(dataManager.GetSysString(1435).c_str(), BufferIO::DecodeUTF8s(repo.url).c_str()).c_str(),
+						fmt::format(dataManager.GetSysString(1436).c_str(), BufferIO::DecodeUTF8s(repo.error).c_str()).c_str()
+					);
 					grepo.commit_history_partial = grepo.commit_history_full;
 					continue;
 				}
@@ -1229,7 +1232,7 @@ void Game::MainLoop() {
 			cores_to_load.clear();
 		}
 		if(corename.size() && ((!wMessage->isVisible()) || wMessage->isVisible() && (std::wstring(stMessage->getText()) == dataManager.GetSysString(1430)))) {
-			stMessage->setText(fmt::format(L"Successfully loaded duel api from {}", corename).c_str());
+			stMessage->setText(fmt::format(dataManager.GetSysString(1431).c_str(), corename).c_str());
 			PopupElement(wMessage);
 			corename.clear();
 		}
@@ -1353,7 +1356,7 @@ void Game::MainLoop() {
 #endif
 		while(cur_time >= 1000) {
 #ifndef __ANDROID__
-			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
+			device->setWindowCaption(fmt::format(L"EDOPro by Project Ignis | FPS: {}", fps).c_str());
 #else
 			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
 #endif
@@ -1378,12 +1381,12 @@ void Game::MainLoop() {
 		if(discord.connected && !was_connected) {
 			was_connected = true;
 			env->setFocus(stACMessage);
-			stACMessage->setText(L"Connected to Discord");
+			stACMessage->setText(dataManager.GetSysString(1437).c_str());
 			PopupElement(wACMessage, 30);
 		} else if(!discord.connected && was_connected) {
 			was_connected = false;
 			env->setFocus(stACMessage);
-			stACMessage->setText(L"Disconnected from Discord");
+			stACMessage->setText(dataManager.GetSysString(1438).c_str());
 			PopupElement(wACMessage, 30);
 		}
 		device->yield();
@@ -1984,14 +1987,14 @@ void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 			break;
 		case 8: //system custom message, no prefix.
 			soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
-			chatMsg[0].append(L"[System]");
+			chatMsg[0].append(dataManager.GetSysString(1439).c_str());
 			break;
 		case 9: //error message
-			chatMsg[0].append(L"[Script Error]");
+			chatMsg[0].append(dataManager.GetSysString(1440).c_str());
 			break;
 		default: //from watcher or unknown
 			if(player < 11 || player > 19)
-				chatMsg[0].append(L"[---]");
+				chatMsg[0].append(dataManager.GetSysString(1441).c_str());
 		}
 	}
 	chatMsg[0].append(L": ").append(msg);
@@ -2013,7 +2016,7 @@ void Game::AddDebugMsg(const std::string& msg) {
 	if (enable_log & 0x1)
 		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9, 2);
 	if (enable_log & 0x2)
-		ErrorLog("[Script Error]: " + msg);
+		ErrorLog(fmt::format("{}: {}", BufferIO::EncodeUTF8s(dataManager.GetSysString(1440)), msg));
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
