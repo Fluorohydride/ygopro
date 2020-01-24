@@ -256,7 +256,8 @@ catch(...) { what = def; }
 					mainGame->gMutex.unlock();
 				} else {
 					mainGame->soundManager->StopSounds();
-					ReplayPrompt(true);
+					if(!mainGame->is_siding)
+						ReplayPrompt(true);
 					mainGame->gMutex.lock();
 					mainGame->PopupMessage(dataManager.GetSysString(1502));
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
@@ -779,7 +780,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_DUEL_END: {
 		mainGame->soundManager->StopSounds();
-		ReplayPrompt(old_replay);
+		if(!mainGame->is_siding)
+			ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
