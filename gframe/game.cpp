@@ -1247,8 +1247,10 @@ void Game::MainLoop() {
 		delta_time = now - prev_time;
 		prev_time = now;
 		cur_time += delta_time;
+		bool resized = false;
 		dimension2du size = driver->getScreenSize();
 		if(window_size != size) {
+			resized = true;
 			window_size = size;
 			window_scale.X = (window_size.Width / 1024.0) / gameConf.dpi_scale;
 			window_scale.Y = (window_size.Height / 640.0) / gameConf.dpi_scale;
@@ -1289,7 +1291,7 @@ void Game::MainLoop() {
 			else
 				soundManager->PlayBGM(SoundManager::BGM::DUEL);
 			MATERIAL_GUARD(
-			DrawBackImage(imageManager.tBackGround);
+			DrawBackImage(imageManager.tBackGround, resized);
 			DrawBackGround();
 			DrawCards();
 			DrawMisc();
@@ -1302,7 +1304,7 @@ void Game::MainLoop() {
 			else
 				discord.UpdatePresence(DiscordWrapper::DECK);
 			soundManager->PlayBGM(SoundManager::BGM::DECK);
-			DrawBackImage(imageManager.tBackGround_deck);
+			DrawBackImage(imageManager.tBackGround_deck, resized);
 			MATERIAL_GUARD(DrawDeckBd());
 		} else {
 			if(dInfo.isInLobby)
@@ -1310,7 +1312,7 @@ void Game::MainLoop() {
 			else
 				discord.UpdatePresence(DiscordWrapper::MENU);
 			soundManager->PlayBGM(SoundManager::BGM::MENU);
-			DrawBackImage(imageManager.tBackGround_menu);
+			DrawBackImage(imageManager.tBackGround_menu, resized);
 		}
 		MATERIAL_GUARD(DrawGUI();	DrawSpec(););
 		if(cardimagetextureloading) {

@@ -178,7 +178,7 @@ public:
 	void DrawStackIndicator(const std::wstring& text, irr::video::S3DVertex* v, bool opponent);
 	void DrawGUI();
 	void DrawSpec();
-	void DrawBackImage(irr::video::ITexture* texture);
+	void DrawBackImage(irr::video::ITexture* texture, bool resized);
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);

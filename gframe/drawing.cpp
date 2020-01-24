@@ -1042,22 +1042,38 @@ void Game::DrawSpec() {
 		}
 	}
 }
-void Game::DrawBackImage(irr::video::ITexture* texture) {
+void Game::DrawBackImage(irr::video::ITexture* texture, bool resized) {
+	static irr::video::ITexture* prevbg = nullptr;
+	static recti dest_size = { 0,0,0,0 };
+	static recti bg_size = { 0,0,0,0 };
+	static bool was_scaled = false;
+	if(was_scaled && !gameConf.scale_background) {
+		was_scaled = false;
+		prevbg = nullptr;
+	} else if(!was_scaled && gameConf.scale_background) {
+		was_scaled = true;
+		prevbg = nullptr;
+	}
+	if(resized)
+		prevbg = nullptr;
 	if(!texture)
 		return;
-	recti dest_size = Resize(0, 0, 1024, 640);
-	recti bg_size = recti(0, 0, texture->getOriginalSize().Width, texture->getOriginalSize().Height);
-	if(!gameConf.scale_background) {
-		rectf dest_sizef = rectf(0, 0, dest_size.getWidth(), dest_size.getHeight());
-		rectf bg_sizef = rectf(0, 0, bg_size.getWidth(), bg_size.getHeight());
-		float width = ((bg_sizef.getWidth() / bg_sizef.getHeight()) * dest_sizef.getHeight()) - dest_sizef.getWidth();
-		float height = ((bg_sizef.getHeight() / bg_sizef.getWidth()) * dest_sizef.getWidth()) - dest_sizef.getHeight();
-		if(width > 0) {
-			int off = std::ceil(width * 0.5f);
-			dest_size = recti({ -off, 0, dest_size.getWidth() + off, dest_size.getHeight() });
-		} else if(height > 0) {
-			int off = std::ceil(height * 0.5f);
-			dest_size = recti({ 0, -off, dest_size.getWidth(), dest_size.getHeight() + off });
+	if(texture != prevbg) {
+		prevbg = texture;
+		dest_size = Resize(0, 0, 1024, 640);
+		bg_size = recti(0, 0, texture->getOriginalSize().Width, texture->getOriginalSize().Height);
+		if(!gameConf.scale_background) {
+			rectf dest_sizef = rectf(0, 0, dest_size.getWidth(), dest_size.getHeight());
+			rectf bg_sizef = rectf(0, 0, bg_size.getWidth(), bg_size.getHeight());
+			float width = ((bg_sizef.getWidth() / bg_sizef.getHeight()) * dest_sizef.getHeight()) - dest_sizef.getWidth();
+			float height = ((bg_sizef.getHeight() / bg_sizef.getWidth()) * dest_sizef.getWidth()) - dest_sizef.getHeight();
+			if(width > 0) {
+				int off = std::ceil(width * 0.5f);
+				dest_size = recti({ -off, 0, dest_size.getWidth() + off, dest_size.getHeight() });
+			} else if(height > 0) {
+				int off = std::ceil(height * 0.5f);
+				dest_size = recti({ 0, -off, dest_size.getWidth(), dest_size.getHeight() + off });
+			}
 		}
 	}
 	driver->draw2DImage(texture, dest_size, bg_size);
