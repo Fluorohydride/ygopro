@@ -512,6 +512,8 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		for(int i = 0; i < players.opposing.size(); i++) {
 			players.opposing[i].player->type = i + players.home_size;
 		}
+		players.home_iterator = players.home.begin();
+		players.opposing_iterator = players.opposing.begin();
 		swapped = true;
 	}
 	turn_count = 0;
@@ -686,29 +688,23 @@ void GenericDuel::Process() {
 		DuelEndProc();
 }
 void GenericDuel::DuelEndProc() {
-	if(match_result.size() >= best_of) {
+	int winc[3] = { 0, 0, 0 };
+	for(int i = 0; i < match_result.size(); ++i)
+		winc[match_result[i]]++;
+	int minvictories = std::ceil(best_of / 2.0);
+	if(match_kill || (winc[0] >= minvictories || winc[1] >= minvictories) || match_result.size() >= best_of) {
 		NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-		duel_stage = DUEL_STAGE_END;
-	} else {
-		int winc[3] = { 0, 0, 0 };
-		for(int i = 0; i < match_result.size(); ++i)
-			winc[match_result[i]]++;
-		int minvictories = std::ceil(best_of / 2.0);
-		if(match_kill || (winc[0] > minvictories || winc[1] > minvictories)) {
-			NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
 			duel_stage = DUEL_STAGE_END;
-		} else {
-			ITERATE_PLAYERS(
-				dueler.ready = false;
-				dueler.player->state = CTOS_UPDATE_DECK;
-				NetServer::SendPacketToPlayer(dueler.player, STOC_CHANGE_SIDE);
-			)
+	} else {
+		ITERATE_PLAYERS(
+			dueler.ready = false;
+		dueler.player->state = CTOS_UPDATE_DECK;
+		NetServer::SendPacketToPlayer(dueler.player, STOC_CHANGE_SIDE);
+		)
 			for(auto& obs : observers)
 				NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
-			duel_stage = DUEL_STAGE_SIDING;
-		}
+		duel_stage = DUEL_STAGE_SIDING;
 	}
 }
 void GenericDuel::Surrender(DuelPlayer* dp) {
