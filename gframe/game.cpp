@@ -1442,6 +1442,10 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 			skin->setColor((EGUI_DEFAULT_COLOR)i, col);
 		}
 	}
+	for(auto& repo : repoInfoGui) {
+		repo.second.progress1->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
+		repo.second.progress2->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
+	}
 	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
 }
 void Game::LoadZipArchives() {
@@ -1786,6 +1790,7 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	auto& grepo = repoInfoGui[repo.repo_path];
 	grepo.progress1 = new IProgressBar(env, Scale(5, 20 + 15, 170 + 295, 20 + 30), -1, a);
 	grepo.progress1->addBorder(1);
+	grepo.progress1->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
 	grepo.progress1->drop();
 	((CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
 	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, L"Changelog");
@@ -1799,6 +1804,7 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	env->addStaticText(name.c_str(), Scale(5, 5, 300, 20 + 5), false, false, b);
 	grepo.progress2 = new IProgressBar(env, Scale(5, 20 + 15, 300 - 5, 20 + 30), -1, b);
 	grepo.progress2->addBorder(1);
+	grepo.progress2->setColors(GetSkinColor(L"PROGRESSBAR_FILL_COLOR", irr::video::SColor(255, 255, 255, 255)), GetSkinColor(L"PROGRESSBAR_EMPTY_COLOR", irr::video::SColor(255, 255, 255, 255)));
 	grepo.progress2->drop();
 	((CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
 	grepo.history_button2 = env->addButton(Scale(200, 5, 300 - 5, 20 + 10), b, BUTTON_REPO_CHANGELOG, L"Changelog");
