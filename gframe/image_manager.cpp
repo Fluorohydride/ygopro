@@ -17,56 +17,54 @@ ImageManager imageManager;
 void ImageManager::AddDownloadResource(PicSource src) {
 	pic_urls.push_back(src);
 }
-
+#define GET(obj,fun1,fun2) obj=fun1; if(!obj) obj=fun2;
+#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GetTextureFromFile(EPRO_TEXT(path##".png"),mainGame->Scale(w),mainGame->Scale(h)),GetTextureFromFile(EPRO_TEXT(path##".jpg"),mainGame->Scale(w),mainGame->Scale(h)))
+#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(EPRO_TEXT(path##".png")),driver->getTexture(EPRO_TEXT(path##".jpg")))
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-#define GET_TEXTURE_FILE(a, b, w, h) GetTextureFromFile(EPRO_TEXT(a), EPRO_TEXT(b), mainGame->Scale(w), mainGame->Scale(h))
-	tCover[0] = GET_TEXTURE_FILE("textures/cover.png", "textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
-	tCover[1] = GET_TEXTURE_FILE("textures/cover2.png", "textures/cover2.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	GET_TEXTURE_SIZED(tCover[0],"textures/cover", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
+	GET_TEXTURE_SIZED(tCover[1],"textures/cover2", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
 	if(!tCover[1])
 		tCover[1] = tCover[0];
-#define GET_TEXTURE(a, b) GetTexture(EPRO_TEXT(a), EPRO_TEXT(b))
-	tUnknown = GET_TEXTURE("textures/unknown.png", "textures/unknown.jpg");
-	tAct = driver->getTexture(EPRO_TEXT("textures/act.png"));
-	tAttack = driver->getTexture(EPRO_TEXT("textures/attack.png"));
-	tChain = driver->getTexture(EPRO_TEXT("textures/chain.png"));
-	tNegated = driver->getTexture(EPRO_TEXT("textures/negated.png"));
-	tNumber = driver->getTexture(EPRO_TEXT("textures/number.png"));
-	tLPBar = driver->getTexture(EPRO_TEXT("textures/lp.png"));
-	tLPFrame = driver->getTexture(EPRO_TEXT("textures/lpf.png"));
-	tMask = driver->getTexture(EPRO_TEXT("textures/mask.png"));
-	tEquip = driver->getTexture(EPRO_TEXT("textures/equip.png"));
-	tTarget = driver->getTexture(EPRO_TEXT("textures/target.png"));
-	tChainTarget = driver->getTexture(EPRO_TEXT("textures/chaintarget.png"));
-	tLim = driver->getTexture(EPRO_TEXT("textures/lim.png"));
-	tHand[0] = GET_TEXTURE_FILE("textures/f1.png", "textures/f1.jpg", 89, 128);
-	tHand[1] = GET_TEXTURE_FILE("textures/f2.png", "textures/f2.jpg", 89, 128);
-	tHand[2] = GET_TEXTURE_FILE("textures/f3.png", "textures/f3.jpg", 89, 128);
-	tBackGround = GET_TEXTURE("textures/bg.png", "textures/bg.jpg");
-	tBackGround_menu = GET_TEXTURE("textures/bg_menu.png", "textures/bg_menu.jpg");
+	GET_TEXTURE(tUnknown,"textures/unknown")
+	GET_TEXTURE(tAct, "textures/act");
+	GET_TEXTURE(tAttack, "textures/attack");
+	GET_TEXTURE(tChain, "textures/chain");
+	GET_TEXTURE(tNegated, "textures/negated");
+	GET_TEXTURE(tNumber, "textures/number");
+	GET_TEXTURE(tLPBar, "textures/lp");
+	GET_TEXTURE(tLPFrame, "textures/lpf");
+	GET_TEXTURE(tMask, "textures/mask");
+	GET_TEXTURE(tEquip, "textures/equip");
+	GET_TEXTURE(tTarget, "textures/target");
+	GET_TEXTURE(tChainTarget, "textures/chaintarget");
+	GET_TEXTURE(tLim, "textures/lim");
+	GET_TEXTURE_SIZED(tHand[0], "textures/f1", 89, 128)
+	GET_TEXTURE_SIZED(tHand[1], "textures/f2", 89, 128)
+	GET_TEXTURE_SIZED(tHand[2], "textures/f3", 89, 128)
+	GET_TEXTURE(tBackGround, "textures/bg")
+	GET_TEXTURE(tBackGround_menu, "textures/bg_menu")
 	if(!tBackGround_menu)
 		tBackGround_menu = tBackGround;
-	tBackGround_deck = GET_TEXTURE("textures/bg_deck.png", "textures/bg_deck.jpg");
+	GET_TEXTURE(tBackGround_deck, "textures/bg_deck")
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
-#undef GET_TEXTURE
-#undef GET_TEXTURE_FILE
-	tField[0][0] = driver->getTexture(EPRO_TEXT("textures/field2.png"));
-	tFieldTransparent[0][0] = driver->getTexture(EPRO_TEXT("textures/field-transparent2.png"));
-	tField[0][1] = driver->getTexture(EPRO_TEXT("textures/field3.png"));
-	tFieldTransparent[0][1] = driver->getTexture(EPRO_TEXT("textures/field-transparent3.png"));
-	tField[0][2] = driver->getTexture(EPRO_TEXT("textures/field.png"));
-	tFieldTransparent[0][2] = driver->getTexture(EPRO_TEXT("textures/field-transparent.png"));
-	tField[0][3] = driver->getTexture(EPRO_TEXT("textures/field4.png"));
-	tFieldTransparent[0][3] = driver->getTexture(EPRO_TEXT("textures/field-transparent4.png"));
-	tField[1][0] = driver->getTexture(EPRO_TEXT("textures/fieldSP2.png"));
-	tFieldTransparent[1][0] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP2.png"));
-	tField[1][1] = driver->getTexture(EPRO_TEXT("textures/fieldSP3.png"));
-	tFieldTransparent[1][1] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP3.png"));
-	tField[1][2] = driver->getTexture(EPRO_TEXT("textures/fieldSP.png"));
-	tFieldTransparent[1][2] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP.png"));
-	tField[1][3] = driver->getTexture(EPRO_TEXT("textures/fieldSP4.png"));
-	tFieldTransparent[1][3] = driver->getTexture(EPRO_TEXT("textures/field-transparentSP4.png"));
+	GET_TEXTURE(tField[0][0], "textures/field2");
+	GET_TEXTURE(tFieldTransparent[0][0], "textures/field");
+	GET_TEXTURE(tField[0][1], "textures/field3");
+	GET_TEXTURE(tFieldTransparent[0][1], "textures/field");
+	GET_TEXTURE(tField[0][2], "textures/field");
+	GET_TEXTURE(tFieldTransparent[0][2], "textures/field");
+	GET_TEXTURE(tField[0][3], "textures/field4");
+	GET_TEXTURE(tFieldTransparent[0][3], "textures/field");
+	GET_TEXTURE(tField[1][0], "textures/fieldSP2");
+	GET_TEXTURE(tFieldTransparent[1][0], "textures/field");
+	GET_TEXTURE(tField[1][1], "textures/fieldSP3");
+	GET_TEXTURE(tFieldTransparent[1][1], "textures/field");
+	GET_TEXTURE(tField[1][2], "textures/fieldSP");
+	GET_TEXTURE(tFieldTransparent[1][2], "textures/field");
+	GET_TEXTURE(tField[1][3], "textures/fieldSP4");
+	GET_TEXTURE(tFieldTransparent[1][3], "textures/field");
 	sizes[0].first = CARD_IMG_WIDTH * mainGame->gameConf.dpi_scale;
 	sizes[0].second = CARD_IMG_HEIGHT * mainGame->gameConf.dpi_scale;
 	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
@@ -79,6 +77,7 @@ bool ImageManager::Initial() {
 	}
 	return true;
 }
+#undef GET_TEXTURE
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	device = dev;
 	driver = dev->getVideoDriver();
@@ -96,18 +95,17 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
 		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
-#define GET_TEXTURE_FILE(a, b, w, h) GetTextureFromFile(EPRO_TEXT(a), EPRO_TEXT(b), w, h)
-		auto tmp_cover = GET_TEXTURE_FILE("textures/cover.png", "textures/cover.jpg", sizes[1].first, sizes[1].second);
-		if(tmp_cover) {
-			driver->removeTexture(tCover[0]);
-			tCover[0] = tmp_cover;
-		}
-		tmp_cover = GET_TEXTURE_FILE("textures/cover2.png", "textures/cover2.jpg", sizes[1].first, sizes[1].second);
-		if(tmp_cover) {
-			driver->removeTexture(tCover[1]);
-			tCover[1] = tmp_cover;
-		}
-#undef GET_TEXTURE_FILE
+		irr::video::ITexture* tmp_cover = nullptr;
+#undef GET_TEXTURE_SIZED
+#define GET_TEXTURE_SIZED(obj,path) GET(tmp_cover,GetTextureFromFile(EPRO_TEXT(path##".png"),sizes[1].first,sizes[1].second),GetTextureFromFile(EPRO_TEXT(path##".jpg"),sizes[1].first,sizes[1].second))\
+										if(tmp_cover) {\
+											driver->removeTexture(obj);\
+											obj = tmp_cover;\
+										}
+		GET_TEXTURE_SIZED(tCover[0], "textures/cover");
+		GET_TEXTURE_SIZED(tCover[1], "textures/cover2");
+#undef GET_TEXTURE_SIZED
+#undef GET
 	}
 	if(!resize) {
 		ClearCachedTextures(resize);
@@ -472,14 +470,6 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path & fil
 			return texture;
 	}
 	return driver->getTexture(file);
-}
-irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path& file, const irr::io::path& fallback, int width, int height) {
-	auto first = GetTextureFromFile(file, width, height);
-	return first ? first : GetTextureFromFile(fallback, width, height);
-}
-irr::video::ITexture* ImageManager::GetTexture(const irr::io::path& file, const irr::io::path& fallback) {
-	auto first = driver->getTexture(file);
-	return first ? first : driver->getTexture(fallback);
 }
 ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, std::atomic<irr::s32>& _width, std::atomic<irr::s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* img = nullptr;

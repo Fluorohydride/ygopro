@@ -80,12 +80,10 @@ public:
 	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::IImage* GetTextureImageFromFile(const irr::io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile = nullptr);
 	irr::video::ITexture* GetTextureFromFile(const irr::io::path& file, int width, int height);
-	irr::video::ITexture* GetTextureFromFile(const irr::io::path& file, const irr::io::path& fallback, int width, int height);
 	irr::video::ITexture* GetTextureCard(int code, imgType type, bool wait = false, bool fit = false, int* chk = nullptr);
 	//irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(int code);
 	//irr::video::ITexture* GetTextureCustomCover(int code, bool wait = false, int* chk = nullptr);
-	irr::video::ITexture* GetTexture(const irr::io::path& file, const irr::io::path& fallback);
 
 	texture_map tMap[2];
 	texture_map tThumb;
