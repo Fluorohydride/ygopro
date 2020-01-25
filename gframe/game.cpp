@@ -1073,6 +1073,7 @@ bool Game::Initialize() {
 	//load server(s)
 	LoadServers();
 
+	env->getRootGUIElement()->bringToFront(mTopMenu);
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
