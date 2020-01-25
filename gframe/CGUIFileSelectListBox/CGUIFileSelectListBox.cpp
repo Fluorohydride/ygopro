@@ -409,11 +409,7 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 						break;
 				}
 			}
-			break;
-			case EET_LOG_TEXT_EVENT:
-			case EET_USER_EVENT:
-			case EET_JOYSTICK_INPUT_EVENT:
-			case EGUIET_FORCE_32_BIT:
+			default:
 				break;
 		}
 	}
