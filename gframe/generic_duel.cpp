@@ -512,6 +512,11 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	bool swapped = false;
 	if((tp && dp == players.opposing.front().player) || (!tp && dp == players.home.front().player)) {
 		std::swap(players.opposing, players.home);
+		std::swap(players.home_size, players.opposing_size);
+		for(auto& val : match_result) {
+			if(val < 2)
+				val = 1 - val;
+		}
 		for(int i = 0; i < players.home.size(); i++) {
 			players.home[i].player->type = i;
 		}
