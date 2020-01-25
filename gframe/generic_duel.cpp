@@ -49,20 +49,26 @@ void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	ITERATE_PLAYERS_AND_OBS(NetServer::SendBufferToPlayer(dueler, STOC_CHAT, &scc, 4 + msglen * 2);)
 }
 bool GenericDuel::CheckReady() {
-	bool ready1 = false, ready2 = false;
+	bool ready1 = true, ready2 = true;
+	bool ready_atleast11 = false, ready_atleast12 = false;
 	for(auto& dueler : players.home) {
 		if(dueler.player) {
-			ready1 = dueler.ready;
-		} else if(!relay) {
-			return false;
+			ready1 = dueler.ready && ready1;
+			ready_atleast11 = ready_atleast11 || dueler.ready;
+		} else {
+			ready1 = false;
 		}
 	}
 	for(auto& dueler : players.opposing) {
 		if(dueler.player) {
-			ready2 = dueler.ready;
-		} else if(!relay) {
-			return false;
+			ready2 = dueler.ready && ready2;
+			ready_atleast12 = ready_atleast12 || dueler.ready;
+		} else {
+			ready1 = false;
 		}
+	}
+	if(relay && match_result.empty()) {
+		return ready_atleast11 && ready_atleast12;
 	}
 	return ready1 && ready2;
 }
@@ -695,15 +701,15 @@ void GenericDuel::DuelEndProc() {
 	if(match_kill || (winc[0] >= minvictories || winc[1] >= minvictories) || match_result.size() >= best_of) {
 		NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-			duel_stage = DUEL_STAGE_END;
+		duel_stage = DUEL_STAGE_END;
 	} else {
 		ITERATE_PLAYERS(
 			dueler.ready = false;
-		dueler.player->state = CTOS_UPDATE_DECK;
-		NetServer::SendPacketToPlayer(dueler.player, STOC_CHANGE_SIDE);
+			dueler.player->state = CTOS_UPDATE_DECK;
+			NetServer::SendPacketToPlayer(dueler.player, STOC_CHANGE_SIDE);
 		)
-			for(auto& obs : observers)
-				NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
+		for(auto& obs : observers)
+			NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
 		duel_stage = DUEL_STAGE_SIDING;
 	}
 }
