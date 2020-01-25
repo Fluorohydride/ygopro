@@ -28,7 +28,7 @@ bool WindBot::Launch(int port, bool chat, int hand) const {
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	if (CreateProcess(NULL, (TCHAR*)Utils::ParseFilename(args).c_str(), NULL, NULL, FALSE, 0, NULL, executablePath.c_str(), &si, &pi)) {
+	if (CreateProcess(NULL, (TCHAR*)Utils::ToPathString(args).c_str(), NULL, NULL, FALSE, 0, NULL, executablePath.c_str(), &si, &pi)) {
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 		return true;

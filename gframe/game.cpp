@@ -1183,12 +1183,12 @@ void Game::MainLoop() {
 					grepo.commit_history_partial = grepo.commit_history_full;
 					continue;
 				}
-				script_dirs.insert(script_dirs.begin(), Utils::ParseFilename(repo.script_path));
-				auto script_subdirs = Utils::FindSubfolders(Utils::ParseFilename(repo.script_path));
+				script_dirs.insert(script_dirs.begin(), Utils::ToPathString(repo.script_path));
+				auto script_subdirs = Utils::FindSubfolders(Utils::ToPathString(repo.script_path));
 				script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
-				pic_dirs.insert(pic_dirs.begin(), Utils::ParseFilename(repo.pics_path));
-				auto data_path = Utils::ParseFilename(repo.data_path);
-				auto files = Utils::FindfolderFiles(data_path, { EPRO_TEXT("cdb") }, 0);
+				pic_dirs.insert(pic_dirs.begin(), Utils::ToPathString(repo.pics_path));
+				auto data_path = Utils::ToPathString(repo.data_path);
+				auto files = Utils::FindFiles(data_path, { EPRO_TEXT("cdb") }, 0);
 				for(auto& file : files)
 					refresh_db = dataManager.LoadDB(data_path + file) || refresh_db;
 				dataManager.LoadStrings(data_path + EPRO_TEXT("strings.conf"));
@@ -1197,7 +1197,7 @@ void Game::MainLoop() {
 					RefreshLFLists();
 				}
 				if(repo.has_core) {
-					cores_to_load.insert(cores_to_load.begin(), Utils::ParseFilename(repo.core_path));
+					cores_to_load.insert(cores_to_load.begin(), Utils::ToPathString(repo.core_path));
 				}
 				std::string text;
 				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += n + "\n\n"; });
@@ -1540,7 +1540,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 }
 void Game::LoadZipArchives() {
 	irr::io::IFileArchive* tmp_archive = nullptr;
-	for(auto& file : Utils::FindfolderFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("zip") })) {
+	for(auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("zip") })) {
 		filesystem->addFileArchive((EPRO_TEXT("./expansions/") + file).c_str(), true, false, irr::io::EFAT_ZIP, "", &tmp_archive);
 		if(tmp_archive) {
 			Utils::archives.emplace_back(tmp_archive);
@@ -1548,12 +1548,12 @@ void Game::LoadZipArchives() {
 	}
 }
 void Game::LoadExpansionDB() {
-	for (auto& file : Utils::FindfolderFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2))
+	for (auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2))
 		dataManager.LoadDB(EPRO_TEXT("./expansions/") + file);
 }
 void Game::LoadArchivesDB() {
 	for(auto& archive: Utils::archives) {
-		auto files = Utils::FindfolderFiles(archive, EPRO_TEXT(""), { EPRO_TEXT("cdb") }, 3);
+		auto files = Utils::FindFiles(archive, EPRO_TEXT(""), { EPRO_TEXT("cdb") }, 3);
 		for(auto& index : files) {
 			auto reader = archive->createAndOpenFile(index);
 			if(reader == nullptr)
@@ -1568,7 +1568,7 @@ void Game::LoadArchivesDB() {
 }
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
-	for(auto& file : Utils::FindfolderFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
+	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
 		cbDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).c_str());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
@@ -1770,7 +1770,7 @@ void Game::LoadConfig() {
 			else if(type == "dpi_scale")
 				gameConf.dpi_scale = std::stof(str);
 			else if(type == "skin")
-				gameConf.skin = Utils::ParseFilename(str);
+				gameConf.skin = Utils::ToPathString(str);
 			else if(type == "scale_background")
 				gameConf.scale_background = !!std::stoi(str);
 #ifndef __ANDROID__
@@ -2576,7 +2576,7 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	obj->setText(text.c_str());
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
-	std::ifstream infile(Utils::ParseFilename(script_name), std::ifstream::in);
+	std::ifstream infile(Utils::ToPathString(script_name), std::ifstream::in);
 	std::string str;
 	std::string res = "";
 	size_t start = std::string::npos;
@@ -2608,10 +2608,10 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 std::vector<char> Game::LoadScript(const std::string& _name) {
 	std::vector<char> buffer;
 	std::ifstream script;
-	path_string name = Utils::ParseFilename(_name);
+	path_string name = Utils::ToPathString(_name);
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives")) {
-			auto reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("script/"), name);
+			auto reader = Utils::FindFileInArchives(EPRO_TEXT("script/"), name);
 			if(reader == nullptr)
 				continue;
 			buffer.resize(reader->getSize());

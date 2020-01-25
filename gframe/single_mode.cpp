@@ -227,7 +227,7 @@ restart:
 		mainGame->replaySignal.Reset();
 		mainGame->replaySignal.Wait();
 		if(mainGame->saveReplay)
-			new_replay.SaveReplay(Utils::ParseFilename(mainGame->ebRSName->getText()));
+			new_replay.SaveReplay(Utils::ToPathString(mainGame->ebRSName->getText()));
 	}
 	new_replay.Reset();
 	last_replay.Reset();

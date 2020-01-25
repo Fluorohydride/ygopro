@@ -257,7 +257,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 				return 0;
 			}, &modified);
 			for(auto& file : modified) {
-				Utils::Deletefile(Utils::ParseFilename(_repo.repo_path + "/" + file));
+				Utils::FileDelete(Utils::ToPathString(_repo.repo_path + "/" + file));
 			}
 			git_commit* commit = getLastCommit(repo, &id);
 			if(commit) {
@@ -270,7 +270,7 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 		}
 	} else {
 		repo = nullptr;
-		Utils::Deletedirectory(Utils::ParseFilename(_repo.repo_path + "/"));
+		Utils::DeleteDirectory(Utils::ToPathString(_repo.repo_path + "/"));
 		git_clone_options opts = GIT_CLONE_OPTIONS_INIT;
 		opts.checkout_opts.progress_cb = [](const char* path, size_t cur, size_t tot, void* payload) {
 			int fetch_percent = (((100 * cur) / tot) / 2) + 50;

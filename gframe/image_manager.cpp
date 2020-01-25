@@ -307,10 +307,10 @@ void ImageManager::DownloadPic() {
 					fp.close();
 					if(res == CURLE_OK) {
 						ext = GetExtension(payload.header);
-						Utils::Movefile(name, dest_folder + ext);
+						Utils::FileMove(name, dest_folder + ext);
 						break;
 					} else {
-						Utils::Deletefile(name);
+						Utils::FileDelete(name);
 					}
 				}
 			}
@@ -489,7 +489,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 				return std::make_pair(nullptr, EPRO_TEXT("fail"));
 			irr::io::IReadFile* reader = nullptr;
 			if(path == EPRO_TEXT("archives")) {
-				reader = Utils::FindandOpenFileFromArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+				reader = Utils::FindFileInArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
 				if(!reader)
 					continue;
 			}
@@ -518,7 +518,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 					reader->drop();
 					reader = nullptr;
 				}
-				return std::make_pair(img, Utils::ParseFilename(file));
+				return std::make_pair(img, Utils::ToPathString(file));
 			}
 			if(timestamp_id != source_timestamp_id.load()) {
 				if(reader) {
@@ -631,7 +631,7 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 				for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 					irr::io::IReadFile* reader = nullptr;
 					if(path == EPRO_TEXT("archives")) {
-						reader = Utils::FindandOpenFileFromArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+						reader = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
 						if(!reader)
 							continue;
 						img = driver->getTexture(reader);

@@ -21,23 +21,23 @@ namespace ygo {
 	class Utils {
 	public:
 		static std::vector<irr::io::IFileArchive*> archives;
-		static bool Makedirectory(const path_string& path);
-		static bool Copyfile(const path_string& source, const path_string& destination);
-		static bool Movefile(const path_string& source, const path_string& destination);
-		static path_string ParseFilename(const std::wstring& input);
-		static path_string ParseFilename(const std::string& input);
+		static bool MakeDirectory(const path_string& path);
+		static bool FileCopy(const path_string& source, const path_string& destination);
+		static bool FileMove(const path_string& source, const path_string& destination);
+		static path_string ToPathString(const std::wstring& input);
+		static path_string ToPathString(const std::string& input);
 		static std::string ToUTF8IfNeeded(const path_string& input);
 		static std::wstring ToUnicodeIfNeeded(const path_string& input);
-		static bool Deletefile(const path_string& source);
+		static bool FileDelete(const path_string& source);
 		static bool ClearDirectory(const path_string& path);
-		static bool Deletedirectory(const path_string& source);
+		static bool DeleteDirectory(const path_string& source);
 		static void CreateResourceFolders();
-		static void FindfolderFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload = nullptr);
-		static std::vector<path_string> FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
+		static void FindFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload = nullptr);
+		static std::vector<path_string> FindFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
 		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1);
-		static std::vector<int> FindfolderFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
-		static irr::io::IReadFile* FindandOpenFileFromArchives(const path_string& path, const path_string& name);
+		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
+		static irr::io::IReadFile* FindFileInArchives(const path_string& path, const path_string& name);
 		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);
 		static std::wstring GetFileExtension(std::wstring file);
 		static std::wstring GetFilePath(std::wstring file);

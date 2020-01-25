@@ -14,14 +14,14 @@
 namespace ygo {
 	std::vector<irr::io::IFileArchive*> Utils::archives;
 
-	bool Utils::Makedirectory(const path_string& path) {
+	bool Utils::MakeDirectory(const path_string& path) {
 #ifdef _WIN32
 		return CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
 #else
 		return !mkdir(&path[0], 0777) || errno == EEXIST;
 #endif
 	}
-	bool Utils::Copyfile(const path_string& source, const path_string& destination) {
+	bool Utils::FileCopy(const path_string& source, const path_string& destination) {
 		if(source == destination)
 			return false;
 		std::ifstream src(source, std::ios::binary);
@@ -35,7 +35,7 @@ namespace ygo {
 		dst.close();
 		return true;
 	}
-	bool Utils::Movefile(const path_string& source, const path_string& destination) {
+	bool Utils::FileMove(const path_string& source, const path_string& destination) {
 		if(source == destination)
 			return false;
 		std::ifstream src(source, std::ios::binary);
@@ -47,10 +47,10 @@ namespace ygo {
 		dst << src.rdbuf();
 		src.close();
 		dst.close();
-		Deletefile(source);
+		FileDelete(source);
 		return true;
 	}
-	bool Utils::Deletefile(const path_string& source) {
+	bool Utils::FileDelete(const path_string& source) {
 #ifdef _WIN32
 		return DeleteFile(source.c_str());
 #else
@@ -68,10 +68,10 @@ namespace ygo {
 					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 						continue;
 					}
-					Deletedirectory(path + name + EPRO_TEXT("/"));
+					DeleteDirectory(path + name + EPRO_TEXT("/"));
 					continue;
 				} else {
-					Deletefile(path + name);
+					FileDelete(path + name);
 				}
 			} while(FindNextFile(fh, &fdata));
 			FindClose(fh);
@@ -89,10 +89,10 @@ namespace ygo {
 					if(name == ".." || name == ".") {
 						continue;
 					}
-					Deletedirectory(path + name + "/");
+					DeleteDirectory(path + name + "/");
 					continue;
 				} else {
-					Deletefile(path + name);
+					FileDelete(path + name);
 				}
 			}
 			closedir(dir);
@@ -100,7 +100,7 @@ namespace ygo {
 		return true;
 #endif
 	}
-	bool Utils::Deletedirectory(const path_string& source) {
+	bool Utils::DeleteDirectory(const path_string& source) {
 		ClearDirectory(source);
 #ifdef _WIN32
 		return RemoveDirectory(source.c_str());
@@ -110,18 +110,18 @@ namespace ygo {
 	}
 	void Utils::CreateResourceFolders() {
 		//create directories if missing
-		Makedirectory(EPRO_TEXT("deck"));
-		Makedirectory(EPRO_TEXT("puzzles"));
-		Makedirectory(EPRO_TEXT("pics"));
-		Makedirectory(EPRO_TEXT("pics/field"));
-		Makedirectory(EPRO_TEXT("pics/cover"));
-		Makedirectory(EPRO_TEXT("pics/temp/"));
+		MakeDirectory(EPRO_TEXT("deck"));
+		MakeDirectory(EPRO_TEXT("puzzles"));
+		MakeDirectory(EPRO_TEXT("pics"));
+		MakeDirectory(EPRO_TEXT("pics/field"));
+		MakeDirectory(EPRO_TEXT("pics/cover"));
+		MakeDirectory(EPRO_TEXT("pics/temp/"));
 		ClearDirectory(EPRO_TEXT("pics/temp/"));
-		Makedirectory(EPRO_TEXT("replay"));
-		Makedirectory(EPRO_TEXT("screenshots"));
+		MakeDirectory(EPRO_TEXT("replay"));
+		MakeDirectory(EPRO_TEXT("screenshots"));
 	}
 
-	void Utils::FindfolderFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload) {
+	void Utils::FindFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload) {
 #ifdef _WIN32
 		WIN32_FIND_DATA fdataw;
 		HANDLE fh = FindFirstFile((NormalizePath(path) + EPRO_TEXT("*.*")).c_str(), &fdataw);
@@ -150,15 +150,15 @@ namespace ygo {
 		return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
 	};
 
-	std::vector<path_string> Utils::FindfolderFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
+	std::vector<path_string> Utils::FindFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
 		std::vector<path_string> res;
-		FindfolderFiles(path, [&res, extensions, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
+		FindFiles(path, [&res, extensions, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
 			if(isdir) {
 				if(subdirectorylayers) {
 					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 						return;
 					}
-					std::vector<path_string> res2 = FindfolderFiles(path + name + EPRO_TEXT("/"), extensions, subdirectorylayers - 1);
+					std::vector<path_string> res2 = FindFiles(path + name + EPRO_TEXT("/"), extensions, subdirectorylayers - 1);
 					for(auto&file : res2) {
 						file = name + EPRO_TEXT("/") + file;
 					}
@@ -176,7 +176,7 @@ namespace ygo {
 	}
 	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers) {
 		std::vector<path_string> results;
-		FindfolderFiles(path, [&results, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
+		FindFiles(path, [&results, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
 			if (isdir) {
 				if (name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 					return;
@@ -195,7 +195,7 @@ namespace ygo {
 		std::sort(results.begin(), results.end(), CompareIgnoreCase);
 		return results;
 	}
-	std::vector<int> Utils::FindfolderFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
+	std::vector<int> Utils::FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
 		std::vector<int> res;
 		auto list = archive->getFileList();
 		for(int i = 0; i < list->getFileCount(); i++) {
@@ -210,7 +210,7 @@ namespace ygo {
 		}
 		return res;
 	}
-	irr::io::IReadFile* Utils::FindandOpenFileFromArchives(const path_string& path, const path_string& name) {
+	irr::io::IReadFile* Utils::FindFileInArchives(const path_string& path, const path_string& name) {
 		for(auto& archive : archives) {
 			int res = -1;
 			auto list = archive->getFileList();
@@ -349,14 +349,14 @@ namespace ygo {
 		std::string name = file.substr(dashpos, dotpos - dashpos);
 		return name;
 	}
-	path_string Utils::ParseFilename(const std::wstring& input) {
+	path_string Utils::ToPathString(const std::wstring& input) {
 #ifdef UNICODE
 		return input;
 #else
 		return BufferIO::EncodeUTF8s(input);
 #endif
 	}
-	path_string Utils::ParseFilename(const std::string& input) {
+	path_string Utils::ToPathString(const std::string& input) {
 #ifdef UNICODE
 		return BufferIO::DecodeUTF8s(input);
 #else

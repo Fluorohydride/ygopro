@@ -36,14 +36,14 @@ bool SoundManager::Init(double sounds_volume, double music_volume, bool sounds_e
 }
 void SoundManager::RefreshBGMList() {
 #ifdef BACKEND
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/"));
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/duel"));
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/menu"));
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/deck"));
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/advantage"));
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/disadvantage"));
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/win"));
-	Utils::Makedirectory(EPRO_TEXT("./sound/BGM/lose"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/duel"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/menu"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/deck"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/advantage"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/disadvantage"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/win"));
+	Utils::MakeDirectory(EPRO_TEXT("./sound/BGM/lose"));
 	for (auto list : BGMList) {
 		list.clear();
 	}
@@ -59,7 +59,7 @@ void SoundManager::RefreshBGMList() {
 }
 void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 #ifdef BACKEND
-	for(auto& file : Utils::FindfolderFiles(EPRO_TEXT("./sound/BGM/") + path, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
+	for(auto& file : Utils::FindFiles(EPRO_TEXT("./sound/BGM/") + path, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
 		auto conv = Utils::ToUTF8IfNeeded(path + EPRO_TEXT("/") + file);
 		BGMList[BGM::ALL].push_back(conv);
 		BGMList[scene].push_back(conv);
@@ -76,8 +76,8 @@ void SoundManager::RefreshChantsList() {
 	ChantsList.clear();
 	for (const auto& chantType : types) {
 		const path_string searchPath = EPRO_TEXT("./sound/") + chantType.second;
-		Utils::Makedirectory(searchPath);
-		for (auto& file : Utils::FindfolderFiles(searchPath, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
+		Utils::MakeDirectory(searchPath);
+		for (auto& file : Utils::FindFiles(searchPath, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
 			auto scode = Utils::GetFileName(searchPath + EPRO_TEXT("/") + file);
 			try {
 				unsigned int code = std::stoi(scode);

@@ -183,7 +183,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_SAVE_DECK: {
 				int sel = mainGame->cbDBDecks->getSelected();
-				if(sel >= 0 && deckManager.SaveDeck(deckManager.current_deck, Utils::ParseFilename(mainGame->cbDBDecks->getItem(sel)))) {
+				if(sel >= 0 && deckManager.SaveDeck(deckManager.current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335).c_str());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -208,7 +208,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
-				if(deckManager.SaveDeck(deckManager.current_deck, Utils::ParseFilename(dname))) {
+				if(deckManager.SaveDeck(deckManager.current_deck, Utils::ToPathString(dname))) {
 					mainGame->stACMessage->setText(dataManager.GetSysString(1335).c_str());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -238,7 +238,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						return false;
 					}
 				}
-				if(deckManager.RenameDeck(Utils::ParseFilename(mainGame->cbDBDecks->getItem(sel)), Utils::ParseFilename(dname))) {
+				if(deckManager.RenameDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)), Utils::ToPathString(dname))) {
 					mainGame->cbDBDecks->removeItem(sel);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->addItem(dname));
 				} else {
@@ -307,14 +307,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				if(prev_operation == BUTTON_DELETE_DECK) {
 					int sel = mainGame->cbDBDecks->getSelected();
-					if(deckManager.DeleteDeck(deckManager.current_deck, Utils::ParseFilename(mainGame->cbDBDecks->getItem(sel)))) {
+					if(deckManager.DeleteDeck(deckManager.current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
 						mainGame->cbDBDecks->removeItem(sel);
 						int count = mainGame->cbDBDecks->getItemCount();
 						if(sel >= count)
 							sel = count - 1;
 						mainGame->cbDBDecks->setSelected(sel);
 						if(sel != -1)
-							deckManager.LoadDeck(Utils::ParseFilename(mainGame->cbDBDecks->getItem(sel)));
+							deckManager.LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)));
 						mainGame->stACMessage->setText(dataManager.GetSysString(1338).c_str());
 						mainGame->PopupElement(mainGame->wACMessage, 20);
 						prev_deck = sel;
@@ -323,7 +323,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					Terminate();
 				} else if(prev_operation == COMBOBOX_DBDECKS) {
 					int sel = mainGame->cbDBDecks->getSelected();
-					deckManager.LoadDeck(Utils::ParseFilename(mainGame->cbDBDecks->getItem(sel)));
+					deckManager.LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)));
 					prev_deck = sel;
 				}
 				prev_operation = 0;
@@ -401,7 +401,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case COMBOBOX_DBDECKS: {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel >= 0)
-					deckManager.LoadDeck(Utils::ParseFilename(mainGame->cbDBDecks->getItem(sel)));
+					deckManager.LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)));
 				prev_deck = sel;
 				break;
 			}

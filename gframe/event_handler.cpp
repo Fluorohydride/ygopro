@@ -1932,7 +1932,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_CURRENT_SKIN: {
-				mainGame->gameConf.skin = Utils::ParseFilename(mainGame->cbCurrentSkin->getItem(mainGame->cbCurrentSkin->getSelected()));
+				mainGame->gameConf.skin = Utils::ToPathString(mainGame->cbCurrentSkin->getItem(mainGame->cbCurrentSkin->getSelected()));
 				mainGame->ApplySkin(mainGame->gameConf.skin);
 				return true;
 			}

@@ -67,7 +67,7 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 bool DeckManager::LoadLFListFolder(path_string path) {
 	path = Utils::NormalizePath(path);
 	bool loaded = false;
-	auto lflists = Utils::FindfolderFiles(path, std::vector<path_string>({ EPRO_TEXT("conf") }));
+	auto lflists = Utils::FindFiles(path, std::vector<path_string>({ EPRO_TEXT("conf") }));
 	for (const auto& lflist : lflists) {
 		loaded = LoadLFListSingle(path + lflist);
 	}
@@ -397,9 +397,9 @@ bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, s
 	return true;
 }
 bool DeckManager::DeleteDeck(Deck& deck, const path_string& name) {
-	return Utils::Deletefile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name.c_str()));
+	return Utils::FileDelete(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name.c_str()));
 }
 bool DeckManager::RenameDeck(const path_string& oldname, const path_string& newname) {
-	return Utils::Movefile(EPRO_TEXT("./deck/") + oldname + EPRO_TEXT(".ydk"), EPRO_TEXT("./deck/") + newname + EPRO_TEXT(".ydk"));
+	return Utils::FileMove(EPRO_TEXT("./deck/") + oldname + EPRO_TEXT(".ydk"), EPRO_TEXT("./deck/") + newname + EPRO_TEXT(".ydk"));
 }
 }

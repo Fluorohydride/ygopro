@@ -169,10 +169,10 @@ bool Replay::CheckReplay(const path_string& name) {
 	return (rheader.id == REPLAY_YRP1 || rheader.id == REPLAY_YRPX) && rheader.version >= 0x12d0;
 }
 bool Replay::DeleteReplay(const path_string& name) {
-	return Utils::Deletefile(name);
+	return Utils::FileDelete(name);
 }
 bool Replay::RenameReplay(const path_string& oldname, const path_string& newname) {
-	return Utils::Movefile(oldname, newname);
+	return Utils::FileMove(oldname, newname);
 }
 bool Replay::GetNextResponse(ReplayResponse* res) {
 	if(responses_iterator == responses.end())
