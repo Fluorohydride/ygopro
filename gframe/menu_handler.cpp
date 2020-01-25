@@ -444,6 +444,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_EXPORT_DECK: {
+				auto sanitize = [](path_string& text) {
+					const wchar_t chars[] = L"<>:\"/\\|?*";
+					for(auto& forbid : chars)
+						text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
+					return text;
+				};
 				if(!ReplayMode::cur_replay.IsExportable())
 					break;
 				auto players = ReplayMode::cur_replay.GetPlayerNames();
@@ -454,7 +460,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
 				for(int i = 0; i < decks.size(); i++) {
-					deckManager.SaveDeck(fmt::format(EPRO_TEXT("{} player{:02} {}"), replay_name.c_str(), i, Utils::ParseFilename(players[i]).c_str()), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
+					deckManager.SaveDeck(sanitize(fmt::format(EPRO_TEXT("{} player{:02} {}"), replay_name, i, Utils::ParseFilename(players[i]))), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
 				}
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335).c_str());
 				mainGame->PopupElement(mainGame->wACMessage, 20);
