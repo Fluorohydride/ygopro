@@ -195,6 +195,7 @@ bool Game::Initialize() {
 	stCommitLog->setWordWrap(true);
 	((CGUICustomText*)stCommitLog)->enableScrollBar();
 	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, dataManager.GetSysString(1211).c_str());
+	chkCommitLogExpand = env->addCheckBox(false, Scale(295, 435, 500, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXPAND, L"Show full history");
 	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
 	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(2045).c_str(), 1, true, true));
 	mAbout = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(1970).c_str(), 2, true, true));
@@ -1204,6 +1205,8 @@ void Game::MainLoop() {
 							text.erase(text.size() - 2, 2);
 						grepo.commit_history_partial = BufferIO::DecodeUTF8s(text);
 					}
+				} else {
+					grepo.commit_history_partial = L"No new commits";
 				}
 				grepo.history_button1->setEnabled(true);
 				grepo.history_button2->setEnabled(true);

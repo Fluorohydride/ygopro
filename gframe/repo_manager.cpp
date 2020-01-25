@@ -207,7 +207,6 @@ git_commit* getLastCommit(git_repository* repo, git_oid* id) {
 
 std::vector<std::string> GetCommitsInfo(git_repository* repo, git_oid id) {
 	std::vector<std::string> res;
-	static git_oid tmp = { 0 };
 	git_revwalk* rewalk;
 	if(git_revwalk_new(&rewalk, repo) < 0) {
 		const git_error* e = giterr_last();
@@ -245,7 +244,11 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 	git_repository* repo = nullptr;
 	int res = 0;
 	std::string errstring;
-	git_oid id = { 0 };
+	std::string errstring;
+	static git_oid cmp_id;
+	memset(cmp_id.id, 0, sizeof(cmp_id.id));
+	git_oid id;
+	memset(id.id, 0, sizeof(id.id));
 	if(git_repository_open_ext(
 		&repo, _repo.repo_path.c_str(), GIT_REPOSITORY_OPEN_NO_SEARCH, nullptr) == 0) {
 		if(_repo.should_update) {
@@ -296,7 +299,9 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 		git_libgit2_shutdown();
 		return {{ "Unknown error" }, new_commits };
 	}
-	new_commits = GetCommitsInfo(repo, id);
+	if(memcmp(id.id, cmp_id.id, sizeof(cmp_id.id))) {
+		new_commits = GetCommitsInfo(repo, id);
+	}
 	auto all_commits = GetCommitsInfo(repo, { 0 });
 	git_repository_free(repo);
 	git_libgit2_shutdown();

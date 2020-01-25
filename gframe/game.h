@@ -404,6 +404,7 @@ public:
 	irr::gui::IGUIButton* btnModeExit;
 	irr::gui::IGUIButton* btnCommitLogExit;
 	irr::gui::IGUIStaticText* stCommitLog;
+	irr::gui::IGUICheckBox* chkCommitLogExpand;
 	//lan
 	irr::gui::IGUIWindow* wLanWindow;
 	irr::gui::IGUIEditBox* ebNickName;

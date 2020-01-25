@@ -24,6 +24,8 @@ using namespace gui;
 
 namespace ygo {
 
+std::string showing_repo = "";
+
 bool ClientField::OnEvent(const irr::SEvent& event) {
 #ifdef __ANDROID__
 	irr::SEvent transferEvent;
@@ -1808,7 +1810,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				irr::gui::IGUIButton* button = (irr::gui::IGUIButton*)event.GUIEvent.Caller;
 				for(auto& repo : mainGame->repoInfoGui) {
 					if(repo.second.history_button1 == button || repo.second.history_button2 == button) {
-						mainGame->stCommitLog->setText(repo.second.commit_history_full.c_str());
+						showing_repo = repo.first;
+						mainGame->stCommitLog->setText(mainGame->chkCommitLogExpand->isChecked() ? repo.second.commit_history_full.c_str() : repo.second.commit_history_partial.c_str());
 						mainGame->SetCentered(mainGame->wCommitsLog);
 						mainGame->PopupElement(mainGame->wCommitsLog);
 						break;
@@ -1878,6 +1881,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
 				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked() ? 1 : 0;
+				return true;
+			}
+			case BUTTON_REPO_CHANGELOG_EXPAND: {
+				auto& repo = mainGame->repoInfoGui[showing_repo];
+				mainGame->stCommitLog->setText(mainGame->chkCommitLogExpand->isChecked() ? repo.commit_history_full.c_str() : repo.commit_history_partial.c_str());
 				return true;
 			}
 			}
