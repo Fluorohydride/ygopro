@@ -719,8 +719,8 @@ void GenericDuel::DuelEndProc() {
 	}
 }
 void GenericDuel::Surrender(DuelPlayer* dp) {
-	if((players.home.size() + players.opposing.size()) != 2 || (players.home.front().player != dp && players.opposing.front().player != dp) || !pduel)
-		return;
+	/*if((players.home.size() + players.opposing.size()) != 2 || (players.home.front().player != dp && players.opposing.front().player != dp) || !pduel)
+		return;*/
 	unsigned char wbuf[3];
 	uint32 player = dp->type < players.home_size ? 0 : 1;
 	wbuf[0] = MSG_WIN;
