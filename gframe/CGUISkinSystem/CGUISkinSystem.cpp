@@ -92,13 +92,13 @@ void CGUISkinSystem::ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, cons
 	elem.DstBorder.Left = box.UpperLeftCorner.Y;
 	elem.DstBorder.Bottom = box.LowerRightCorner.X;
 	elem.DstBorder.Right = box.LowerRightCorner.Y;	
-	if(nullcolors) elem.Color = NULL;
+	if(nullcolors) elem.Color = { 0 };
 	col = registry->getValueAsColor((context +"/Color").c_str());
-	if(col != NULL) 
+	if(col.color) 
 		elem.Color = col;
 	else {
 		col = registry->getValueAsColor((context +"/Colour").c_str());
-		if(col != NULL) 
+		if(col.color) 
 			elem.Color = col;
 	}
 }
@@ -165,9 +165,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	// If there was no progress bar colors set, set them in the config to the defaults
 	// otherwise their 0,0,0,0. This is neccicary for the old klagui.	
 
-	if(skinConfig.ProgressBar.Color == NULL) 
-		skinConfig.ProgressBar.Color = video::SColor();	
-	if(skinConfig.ProgressBarFilled.Color == NULL) 
+	if(skinConfig.ProgressBarFilled.Color == 0) 
 		skinConfig.ProgressBarFilled.Color = video::SColor(255,255,0,0);
 
 	// Load in the Info
@@ -246,7 +244,7 @@ video::SColor CGUISkinSystem::getCustomColor(core::stringw key, video::SColor fa
 
 bool CGUISkinSystem::checkSkinColor(gui::EGUI_DEFAULT_COLOR colToSet,const wchar_t *context,gui::CImageGUISkin *skin) {
 	video::SColor col = registry->getValueAsColor(context);
-	if(col != NULL) {
+	if(col.color) {
 		skin->setColor(colToSet,col);
 		return true;
 	}
@@ -279,7 +277,7 @@ bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
 	for(int i = 0; i < children->size(); i++) {
 		core::stringw tmpchild = (*children)[i];
 		video::SColor color= registry->getValueAsColor((wtmp + tmpchild).c_str());
-		if(color != NULL)
+		if(color.color)
 			skin->setCustomColor(tmpchild, color);
 	}
 	return false;

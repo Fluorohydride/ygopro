@@ -190,7 +190,7 @@ void CGUICustomCheckBox::draw()
 			IGUIFont* font = skin->getFont();
 			if(font) {
 				font->draw(Text.c_str(), checkRect,
-						   override_color != NULL ? override_color : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT), false, true, &AbsoluteClippingRect);
+						   override_color != 0 ? override_color : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT), false, true, &AbsoluteClippingRect);
 			}
 		}
 	}

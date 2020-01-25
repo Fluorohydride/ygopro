@@ -134,7 +134,7 @@ public:
 	virtual void setProperty(core::stringw key, core::stringw value);
 	virtual core::stringw getProperty(core::stringw key);
 	virtual void setCustomColor(core::stringw key, video::SColor value);
-	virtual video::SColor getCustomColor(core::stringw key, video::SColor fallback = NULL);
+	virtual video::SColor getCustomColor(core::stringw key, video::SColor fallback);
 
 private:
     void drawElementStyle( const SImageGUIElementStyle& elem, const core::rect<s32>& rect, const core::rect<s32>* clip, video::SColor* color=0 );

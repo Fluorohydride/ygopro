@@ -39,7 +39,7 @@ public:
 	gui::CGUIProgressBar *addProgressBar(gui::IGUIElement *parent,core::rect<s32> rect,bool bindColorsToSkin=true);
 	// Gets property from current skin
 	core::stringw getProperty(core::stringw key);
-	video::SColor getCustomColor(core::stringw key, video::SColor fallback = NULL);
+	video::SColor getCustomColor(core::stringw key, video::SColor fallback);
 	bool populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname);
 	
 };

@@ -244,7 +244,6 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 	git_repository* repo = nullptr;
 	int res = 0;
 	std::string errstring;
-	std::string errstring;
 	static git_oid cmp_id;
 	memset(cmp_id.id, 0, sizeof(cmp_id.id));
 	git_oid id;

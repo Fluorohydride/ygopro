@@ -19,9 +19,9 @@ bool CXMLRegistry::isTopLevelNode(const wchar_t *node) {
 	if(registry->findChildByName(node)) return true;
 	else return false;
 }
-CXMLNode *CXMLRegistry::resolveContext(const wchar_t* context) {
+CXMLNode* CXMLRegistry::resolveContext(const wchar_t* context) {
 	core::stringw sContext;
-	CXMLNode *currentNode;
+	CXMLNode* currentNode;
 	u16 start;
 	s16 end;
 	if(!context) return currentContext;
@@ -137,7 +137,7 @@ irr::core::rect<u32> CXMLRegistry::getValueAsRect(const wchar_t *context) {
 // Made more robust
 irr::video::SColor CXMLRegistry::getValueAsColor(const wchar_t *context) {
 	CXMLNode *targetNode = resolveContext(context);
-	if(!targetNode) return NULL;
+	if(!targetNode) return { 0 };
 	irr::u32 r,g,b,a;
 	irr::core::stringw tmp;
 	tmp = targetNode->findChildByName(L"r")->getValue();

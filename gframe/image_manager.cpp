@@ -558,9 +558,10 @@ irr::video::ITexture* ImageManager::GetTextureCard(int code, imgType type, bool 
 				size_index = 0;
 				return tCovers;
 			}
-			case FIELD: /*should never come here*/ {
+			// Should never come to these last cases
+			case FIELD:
+			default:
 				return tMap[0];
-			}
 		}
 	}();
 	if(code == 0)
