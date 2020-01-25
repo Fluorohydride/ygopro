@@ -726,6 +726,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isInLobby = false;
+		mainGame->is_siding = false;
 		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.lp[0] = 0;
