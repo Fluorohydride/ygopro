@@ -1,7 +1,7 @@
 #include "client_card.h"
 #include "data_manager.h"
 #include "game.h"
-#include <common.h>
+#include "common.h"
 
 namespace ygo {
 

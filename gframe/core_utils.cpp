@@ -1,7 +1,7 @@
 #include "core_utils.h"
 #include "bufferio.h"
 #include "dllinterface.h"
-#include <common.h>
+#include "common.h"
 
 namespace CoreUtils {
 
