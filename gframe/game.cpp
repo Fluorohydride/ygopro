@@ -1487,6 +1487,9 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 	SKIN_SCALE(EGDS_TEXT_DISTANCE_Y)
 	SKIN_SCALE(EGDS_MESSAGE_BOX_GAP_SPACE)
 #undef SKIN_SCALE
+	if(wInfos) {
+		wInfos->setTabHeight(skin->getSize(EGDS_BUTTON_HEIGHT));
+	}
 	if(prev_skin == EPRO_TEXT("none")){
 		for (u32 i = 0; i < EGDC_COUNT; ++i) {
 			irr::video::SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
@@ -1800,7 +1803,7 @@ void Game::SaveConfig() {
 	conf_file << "quick_animation = "	<< (gameConf.quick_animation ? 1 : 0) << "\n";
 	conf_file << "#shows the unofficial cards in deck edit, which includes anime, customs, etc\n";
 	conf_file << "show_unofficial = "	<< (chkAnime->isChecked() ? 1 : 0) << "\n";
-	conf_file << "dpi_scale = "			<< gameConf.dpi_scale << "\n";
+	conf_file << "dpi_scale = "			<< std::to_string(gameConf.dpi_scale) << "\n";
 	conf_file << "#if skins from the skin folder are in use\n";
 	conf_file << "skin = "				<< Utils::ToUTF8IfNeeded(gameConf.skin) << "\n";
 	conf_file << "scale_background = "  << (gameConf.scale_background ? 1 : 0) << "\n";
