@@ -95,6 +95,7 @@ struct Config {
 	bool quick_animation;
 
 	bool scale_background;
+	bool accurate_bg_resize;
 	bool chkAnime;
 	bool enablemusic;
 	bool enablesound;

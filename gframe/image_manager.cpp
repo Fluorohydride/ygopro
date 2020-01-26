@@ -7,6 +7,10 @@
 #include <fstream>
 #include <curl/curl.h>
 #ifdef __ANDROID__
+#include <COGLES2ExtensionHandler.h>
+#include <COGLESExtensionHandler.h>
+#include <COGLES2Driver.h>
+#include <COGLESDriver.h>
 #include "porting_android.h"
 #endif
 
@@ -649,4 +653,259 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	}
 	return (tit->second) ? tit->second : nullptr;
 }
+
+
+/*
+From minetest: Copyright (C) 2015 Aaron Suen <warr1024@gmail.com>
+https://github.com/minetest/minetest/blob/5506e97ed897dde2d4820fe1b021a4622bae03b3/src/client/guiscalingfilter.cpp
+originally under LGPL2.1+
+*/
+
+
+
+/* Fill in RGB values for transparent pixels, to correct for odd colors
+ * appearing at borders when blending.  This is because many PNG optimizers
+ * like to discard RGB values of transparent pixels, but when blending then
+ * with non-transparent neighbors, their RGB values will shpw up nonetheless.
+ *
+ * This function modifies the original image in-place.
+ *
+ * Parameter "threshold" is the alpha level below which pixels are considered
+ * transparent.  Should be 127 for 3d where alpha is threshold, but 0 for
+ * 2d where alpha is blended.
+ */
+void imageCleanTransparent(irr::video::IImage *src, irr::u32 threshold) {
+	irr::core::dimension2d<irr::u32> dim = src->getDimension();
+
+	// Walk each pixel looking for fully transparent ones.
+	// Note: loop y around x for better cache locality.
+	for(irr::u32 ctry = 0; ctry < dim.Height; ctry++)
+		for(irr::u32 ctrx = 0; ctrx < dim.Width; ctrx++) {
+
+			// Ignore opaque pixels.
+			irr::video::SColor c = src->getPixel(ctrx, ctry);
+			if(c.getAlpha() > threshold)
+				continue;
+
+			// Sample size and total weighted r, g, b values.
+			irr::u32 ss = 0, sr = 0, sg = 0, sb = 0;
+
+			// Walk each neighbor pixel (clipped to image bounds).
+			for(irr::u32 sy = (ctry < 1) ? 0 : (ctry - 1);
+				sy <= (ctry + 1) && sy < dim.Height; sy++)
+				for(irr::u32 sx = (ctrx < 1) ? 0 : (ctrx - 1);
+					sx <= (ctrx + 1) && sx < dim.Width; sx++) {
+
+				// Ignore transparent pixels.
+				irr::video::SColor d = src->getPixel(sx, sy);
+				if(d.getAlpha() <= threshold)
+					continue;
+
+				// Add RGB values weighted by alpha.
+				irr::u32 a = d.getAlpha();
+				ss += a;
+				sr += a * d.getRed();
+				sg += a * d.getGreen();
+				sb += a * d.getBlue();
+			}
+
+			// If we found any neighbor RGB data, set pixel to average
+			// weighted by alpha.
+			if(ss > 0) {
+				c.setRed(sr / ss);
+				c.setGreen(sg / ss);
+				c.setBlue(sb / ss);
+				src->setPixel(ctrx, ctry, c);
+			}
+		}
+}
+
+/* Scale a region of an image into another image, using nearest-neighbor with
+ * anti-aliasing; treat pixels as crisp rectangles, but blend them at boundaries
+ * to prevent non-integer scaling ratio artifacts.  Note that this may cause
+ * some blending at the edges where pixels don't line up perfectly, but this
+ * filter is designed to produce the most accurate results for both upscaling
+ * and downscaling.
+ */
+void imageScaleNNAAUnthreaded(irr::video::IImage *src, const irr::core::rect<irr::s32> &srcrect, irr::video::IImage *dest) {
+	double sx, sy, minsx, maxsx, minsy, maxsy, area, ra, ga, ba, aa, pw, ph, pa;
+	irr::u32 dy, dx;
+	irr::video::SColor pxl;
+
+	// Cache rectsngle boundaries.
+	double sox = srcrect.UpperLeftCorner.X * 1.0;
+	double soy = srcrect.UpperLeftCorner.Y * 1.0;
+	double sw = srcrect.getWidth() * 1.0;
+	double sh = srcrect.getHeight() * 1.0;
+
+	// Walk each destination image pixel.
+	// Note: loop y around x for better cache locality.
+	irr::core::dimension2d<irr::u32> dim = dest->getDimension();
+	for(dy = 0; dy < dim.Height; dy++)
+		for(dx = 0; dx < dim.Width; dx++) {
+
+			// Calculate floating-point source rectangle bounds.
+			// Do some basic clipping, and for mirrored/flipped rects,
+			// make sure min/max are in the right order.
+			minsx = sox + (dx * sw / dim.Width);
+			minsx = std::min(std::max(minsx, 0.0), sw);
+			maxsx = minsx + sw / dim.Width;
+			maxsx = std::min(std::max(maxsx, 0.0), sw);
+			if(minsx > maxsx)
+				std::swap(minsx, maxsx);
+			minsy = soy + (dy * sh / dim.Height);
+			minsy = std::min(std::max(minsy, 0.0), sh);
+			maxsy = minsy + sh / dim.Height;
+			maxsy = std::min(std::max(maxsy, 0.0), sh);
+			if(minsy > maxsy)
+				std::swap(minsy, maxsy);
+
+			// Total area, and integral of r, g, b values over that area,
+			// initialized to zero, to be summed up in next loops.
+			area = 0;
+			ra = 0;
+			ga = 0;
+			ba = 0;
+			aa = 0;
+
+			// Loop over the integral pixel positions described by those bounds.
+			for(sy = floor(minsy); sy < maxsy; sy++)
+				for(sx = floor(minsx); sx < maxsx; sx++) {
+
+					// Calculate width, height, then area of dest pixel
+					// that's covered by this source pixel.
+					pw = 1;
+					if(minsx > sx)
+						pw += sx - minsx;
+					if(maxsx < (sx + 1))
+						pw += maxsx - sx - 1;
+					ph = 1;
+					if(minsy > sy)
+						ph += sy - minsy;
+					if(maxsy < (sy + 1))
+						ph += maxsy - sy - 1;
+					pa = pw * ph;
+
+					// Get source pixel and add it to totals, weighted
+					// by covered area and alpha.
+					pxl = src->getPixel((irr::u32)sx, (irr::u32)sy);
+					area += pa;
+					ra += pa * pxl.getRed();
+					ga += pa * pxl.getGreen();
+					ba += pa * pxl.getBlue();
+					aa += pa * pxl.getAlpha();
+				}
+
+			// Set the destination image pixel to the average color.
+			if(area > 0) {
+				pxl.setRed(ra / area + 0.5);
+				pxl.setGreen(ga / area + 0.5);
+				pxl.setBlue(ba / area + 0.5);
+				pxl.setAlpha(aa / area + 0.5);
+			} else {
+				pxl.setRed(0);
+				pxl.setGreen(0);
+				pxl.setBlue(0);
+				pxl.setAlpha(0);
+			}
+			dest->setPixel(dx, dy, pxl);
+		}
+}
+#ifdef __ANDROID__
+bool hasNPotSupport() {
+	auto check = []()->bool {
+		bool isNPOTSupported;
+		if(driver->getDriverType() == irr::video::EDT_OGLES2) {
+			isNPOTSupported = ((irr::video::COGLES2Driver*)driver)->queryOpenGLFeature(irr::video::COGLES2ExtensionHandler::IRR_OES_texture_npot);
+		} else {
+			isNPOTSupported = ((irr::video::COGLES1Driver*)driver)->queryOpenGLFeature(irr::video::COGLES1ExtensionHandler::IRR_OES_texture_npot);
+		}
+		return isNPOTSupported;
+	}
+	static const bool supported = check();
+	return supported;
+}
+#endif
+/* Get a cached, high-quality pre-scaled texture for display purposes.  If the
+ * texture is not already cached, attempt to create it.  Returns a pre-scaled texture,
+ * or the original texture if unable to pre-scale it.
+ */
+irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture *src, const irr::core::rect<irr::s32> &srcrect,
+											const irr::core::rect<irr::s32> &destrect) {
+	static std::map<irr::io::path, irr::video::ITexture*> g_txrCache;
+	static std::map<irr::io::path, irr::video::IImage*> g_imgCache;;
+	if(src == NULL)
+		return src;
+
+	// Calculate scaled texture name.
+	irr::io::path rectstr = fmt::sprintf(TEXT("%d:%d:%d:%d:%d:%d"),
+						 srcrect.UpperLeftCorner.X,
+						 srcrect.UpperLeftCorner.Y,
+						 srcrect.getWidth(),
+						 srcrect.getHeight(),
+						 destrect.getWidth(),
+						 destrect.getHeight()).c_str();
+	irr::io::path origname = src->getName().getPath();
+	irr::io::path scalename = origname + "@guiScalingFilter:" + rectstr;
+
+	// Search for existing scaled texture.
+	irr::video::ITexture *scaled = g_txrCache[scalename];
+	if(scaled)
+		return scaled;
+
+	// Try to find the texture converted to an image in the cache.
+	// If the image was not found, try to extract it from the texture.
+	irr::video::IImage* srcimg = g_imgCache[origname];
+	if(srcimg == NULL) {
+		srcimg = driver->createImageFromData(src->getColorFormat(),
+											 src->getSize(), src->lock(), false);
+		src->unlock();
+		g_imgCache[origname] = srcimg;
+	}
+
+	// Create a new destination image and scale the source into it.
+	imageCleanTransparent(srcimg, 0);
+	irr::video::IImage *destimg = driver->createImage(src->getColorFormat(),
+													  irr::core::dimension2d<irr::u32>((irr::u32)destrect.getWidth(),
+													 (irr::u32)destrect.getHeight()));
+	imageScaleNNAAUnthreaded(srcimg, srcrect, destimg);
+
+#ifdef __ANDROID__
+	// Some platforms are picky about textures being powers of 2, so expand
+	// the image dimensions to the next power of 2, if necessary.
+	if(!hasNPotSupport()) {
+		irr::video::IImage *po2img = driver->createImage(src->getColorFormat(),
+													core::dimension2d<u32>(npot2((irr::u32)destrect.getWidth()),
+																		   npot2((irr::u32)destrect.getHeight())));
+		po2img->fill(irr::video::SColor(0, 0, 0, 0));
+		destimg->copyTo(po2img);
+		destimg->drop();
+		destimg = po2img;
+	}
+#endif
+
+	// Convert the scaled image back into a texture.
+	scaled = driver->addTexture(scalename, destimg, NULL);
+	destimg->drop();
+	g_txrCache[scalename] = scaled;
+
+	return scaled;
+}
+void ImageManager::draw2DImageFilterScaled(irr::video::ITexture* txr,
+							 const irr::core::rect<irr::s32>& destrect, const irr::core::rect<irr::s32>& srcrect,
+							 const irr::core::rect<irr::s32>* cliprect, const irr::video::SColor* const colors,
+							 bool usealpha) {
+	// Attempt to pre-scale image in software in high quality.
+	irr::video::ITexture *scaled = guiScalingResizeCached(txr, srcrect, destrect);
+	if(scaled == NULL)
+		return;
+
+	// Correct source rect based on scaled image.
+	const irr::core::rect<irr::s32> mysrcrect = (scaled != txr)
+		? irr::core::rect<irr::s32>(0, 0, destrect.getWidth(), destrect.getHeight())
+		: srcrect;
+
+	driver->draw2DImage(scaled, destrect, mysrcrect, cliprect, colors, usealpha);
+}
+
 }

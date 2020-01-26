@@ -171,7 +171,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	smgr = device->getSceneManager();
-	device->setWindowCaption(L"EDOPro by Project Ignis");
+	device->setWindowCaption(L"EDOPro");
 	device->setResizable(true);
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
@@ -1365,7 +1365,7 @@ void Game::MainLoop() {
 #endif
 		while(cur_time >= 1000) {
 #ifndef __ANDROID__
-			device->setWindowCaption(fmt::format(L"EDOPro by Project Ignis | FPS: {}", fps).c_str());
+			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
 #else
 			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
 #endif
@@ -1616,7 +1616,8 @@ void Game::LoadConfig() {
 	gameConf.soundVolume = 1.0;
 	gameConf.draw_field_spell = true;
 	gameConf.quick_animation = false;
-	gameConf.scale_background = false;
+	gameConf.scale_background = true;
+	gameConf.accurate_bg_resize = false;
 	gameConf.chkAnime = false;
 	gameConf.dpi_scale = 1.0f;
 	std::ifstream conf_file("./config/system.conf", std::ifstream::in);
@@ -1716,6 +1717,8 @@ void Game::LoadConfig() {
 				gameConf.skin = Utils::ParseFilename(str);
 			else if(type == "scale_background")
 				gameConf.scale_background = !!std::stoi(str);
+			else if(type == "accurate_bg_resize")
+				gameConf.accurate_bg_resize = !!std::stoi(str);
 			else if(type == "enable_music")
 				gameConf.enablemusic = !!std::stoi(str);
 			else if(type == "enable_sound")
@@ -1782,6 +1785,7 @@ void Game::SaveConfig() {
 	conf_file << "#if skins from the skin folder are in use\n";
 	conf_file << "skin = "				<< Utils::ToUTF8IfNeeded(gameConf.skin) << "\n";
 	conf_file << "scale_background = "  << (gameConf.scale_background ? 1 : 0) << "\n";
+	conf_file << "accurate_bg_resize = "<< (gameConf.accurate_bg_resize ? 1 : 0) << "\n";
 	conf_file << "enable_music = "		<< (chkEnableMusic->isChecked() ? 1 : 0) << "\n";
 	conf_file << "enable_sound = "		<< (chkEnableSound->isChecked() ? 1 : 0) << "\n";
 	conf_file << "#integers between 0 and 100\n";

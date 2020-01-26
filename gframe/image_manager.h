@@ -17,6 +17,7 @@ namespace video {
 class IImage;
 class ITexture;
 class IVideoDriver;
+class SColor;
 }
 }
 
@@ -84,6 +85,12 @@ public:
 	//irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
 	irr::video::ITexture* GetTextureField(int code);
 	//irr::video::ITexture* GetTextureCustomCover(int code, bool wait = false, int* chk = nullptr);
+	irr::video::ITexture* guiScalingResizeCached(irr::video::ITexture *src, const irr::core::rect<irr::s32> &srcrect,
+												 const irr::core::rect<irr::s32> &destrect);
+	void draw2DImageFilterScaled(irr::video::ITexture* txr,
+								 const irr::core::rect<irr::s32>& destrect, const irr::core::rect<irr::s32>& srcrect,
+								 const irr::core::rect<irr::s32>* cliprect = nullptr, const irr::video::SColor* const colors = nullptr,
+								 bool usealpha = false);
 
 	texture_map tMap[2];
 	texture_map tThumb;
