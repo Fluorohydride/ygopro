@@ -213,7 +213,9 @@ restart:
 		return 0;
 	}
 	mainGame->soundManager->StopSounds();
+	bool was_in_replay = false;
 	if(!hand_test && !is_restarting) {
+		was_in_replay = true;
 		auto now = std::time(nullptr);
 		mainGame->gMutex.lock();
 		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).c_str());
@@ -231,7 +233,7 @@ restart:
 	mainGame->dField.Clear();
 	mainGame->gMutex.unlock();
 	if(!is_closing) {
-		if(is_restarting || hand_test) {
+		if((is_restarting || hand_test) && !was_in_replay) {
 			mainGame->gMutex.lock();
 			for(auto wit = mainGame->fadingList.begin(); wit != mainGame->fadingList.end(); ++wit) {
 				if(wit->isFadein)
@@ -249,6 +251,7 @@ restart:
 			mainGame->wOptions->setVisible(false);
 			mainGame->wPosSelect->setVisible(false);
 			mainGame->wQuery->setVisible(false);
+			mainGame->stHintMsg->setVisible(false);
 			mainGame->gMutex.unlock();
 			if(is_restarting)
 				goto restart;
