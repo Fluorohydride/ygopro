@@ -172,7 +172,7 @@ void Game::DrawBackGround() {
 	driver->setMaterial(matManager.mBackLine);
 	//select field
 	if((dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD || dInfo.curMsg == MSG_HINT) && dField.selectable_field) {
-		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_SELECTABLE_FIELD_OUTLINE", SColor(255, 0, 0, 255));
+		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_SELECTABLE_FIELD_OUTLINE", SColor(255, 255, 255, 255));
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
