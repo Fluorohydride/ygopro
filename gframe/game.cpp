@@ -1116,6 +1116,7 @@ void Game::MainLoop() {
 	float atkframe = 0.1f;
 #if defined (__linux__) && !defined(__ANDROID__)
 	bool last_resize = false;
+	dimension2du prev_window_size;
 #endif
 	irr::ITimer* timer = device->getTimer();
 	uint32 cur_time = 0;
@@ -1260,9 +1261,11 @@ void Game::MainLoop() {
 		bool resized = false;
 		dimension2du size = driver->getScreenSize();
 #if defined (__linux__) && !defined(__ANDROID__)
-		if(window_size != size && !last_resize) {
+		prev_window_size = window_size;
+		window_size = size;
+		if(prev_window_size != window_size && !last_resize) {
 			last_resize = true;
-		} else if(window_size == size && last_resize) {
+		} else if(prev_window_size == window_size && last_resize) {
 			last_resize = false;
 #else
 		if(window_size != size) {
