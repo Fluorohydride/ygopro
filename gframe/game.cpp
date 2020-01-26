@@ -1262,7 +1262,7 @@ void Game::MainLoop() {
 #if defined (__linux__) && !defined(__ANDROID__)
 		if(window_size != size && !last_resize) {
 			last_resize = true;
-		} else if(last_resize) {
+		} else if(window_size == size && last_resize) {
 			last_resize = false;
 #else
 		if(window_size != size) {
