@@ -838,7 +838,7 @@ irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture 
 		return src;
 
 	// Calculate scaled texture name.
-	irr::io::path rectstr = fmt::sprintf(TEXT("%d:%d:%d:%d:%d:%d"),
+	irr::io::path rectstr = fmt::sprintf(EPRO_TEXT("%d:%d:%d:%d:%d:%d"),
 						 srcrect.UpperLeftCorner.X,
 						 srcrect.UpperLeftCorner.Y,
 						 srcrect.getWidth(),
