@@ -1114,6 +1114,9 @@ void Game::MainLoop() {
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
+#if defined (__linux__) && !defined(__ANDROID__)
+	bool last_resize = false;
+#endif
 	irr::ITimer* timer = device->getTimer();
 	uint32 cur_time = 0;
 	uint32 prev_time = timer->getRealTime();
@@ -1256,7 +1259,14 @@ void Game::MainLoop() {
 		cur_time += delta_time;
 		bool resized = false;
 		dimension2du size = driver->getScreenSize();
+#if defined (__linux__) && !defined(__ANDROID__)
+		if(window_size != size && !last_resize) {
+			last_resize = true;
+		} else if(last_resize) {
+			last_resize = false;
+#else
 		if(window_size != size) {
+#endif
 			resized = true;
 			window_size = size;
 			window_scale.X = (window_size.Width / 1024.0) / gameConf.dpi_scale;
