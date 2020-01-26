@@ -1630,7 +1630,11 @@ void Game::LoadConfig() {
 	gameConf.draw_field_spell = true;
 	gameConf.quick_animation = false;
 	gameConf.scale_background = true;
+#ifdef __ANDROID__
+	gameConf.accurate_bg_resize = true;
+#else
 	gameConf.accurate_bg_resize = false;
+#endif
 	gameConf.chkAnime = false;
 	gameConf.dpi_scale = 1.0f;
 	std::ifstream conf_file("./config/system.conf", std::ifstream::in);
@@ -1730,8 +1734,10 @@ void Game::LoadConfig() {
 				gameConf.skin = Utils::ParseFilename(str);
 			else if(type == "scale_background")
 				gameConf.scale_background = !!std::stoi(str);
+#ifndef __ANDROID__
 			else if(type == "accurate_bg_resize")
 				gameConf.accurate_bg_resize = !!std::stoi(str);
+#endif
 			else if(type == "enable_music")
 				gameConf.enablemusic = !!std::stoi(str);
 			else if(type == "enable_sound")
