@@ -1195,7 +1195,10 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 void Game::DrawDeckBd() {
 	std::wstring buffer;
 	//main deck
-	driver->draw2DRectangle(Resize(310, 137, 797, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+#define SKCOLOR(what,def) GetSkinColor(L"DECK_WINDOW_"#what, def)
+#define DECKCOLOR(what) SKCOLOR(what##"_TOP_LEFT", 0x400000ff), SKCOLOR(what##"_TOP_RIGHT", 0x400000ff), SKCOLOR(what##"_BOTTOM_LEFT", 0x40000000), SKCOLOR(what##"_BOTTOM_RIGHT", 0x40000000)
+#define	DRAWRECT(what,...) driver->draw2DRectangle(Resize(__VA_ARGS__), DECKCOLOR(what));
+	DRAWRECT(L"MAIN_INFO", 310, 137, 797, 157);
 	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(314, 136, 409, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(315, 137, 410, 157), 0xffffffff, false, true);
@@ -1206,7 +1209,7 @@ void Game::DrawDeckBd() {
 	}
 	numFont->draw(buffer.c_str(), Resize(379, 137, 439, 157), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(380, 138, 440, 158), 0xffffffff, false, true);
-	driver->draw2DRectangle(Resize(310, 160, 797, 436), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	DRAWRECT(L"MAIN", 310, 160, 797, 436);
 	recti mainpos = Resize(310, 137, 797, 157);
 	buffer = fmt::format(L"{} {} {} {} {} {}", dataManager.GetSysString(1312), deckManager.TypeCount(deckManager.current_deck.main, TYPE_MONSTER),
 		dataManager.GetSysString(1313), deckManager.TypeCount(deckManager.current_deck.main, TYPE_SPELL),
@@ -1232,7 +1235,7 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
 	}
 	//extra deck
-	driver->draw2DRectangle(Resize(310, 440, 797, 460), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	DRAWRECT(L"EXTRA_INFO", 310, 440, 797, 460);
 	driver->draw2DRectangleOutline(Resize(309, 439, 797, 460));
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(314, 439, 409, 459), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(315, 440, 410, 460), 0xffffffff, false, true);
@@ -1253,7 +1256,7 @@ void Game::DrawDeckBd() {
 		extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y), 0xff000000, false, true);
 	textFont->draw(buffer.c_str(), recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 4, extrapos.UpperLeftCorner.Y + 1,
 		extrapos.LowerRightCorner.X + 1, extrapos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
-	driver->draw2DRectangle(Resize(310, 463, 797, 533), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	DRAWRECT(L"EXTRA", 310, 463, 797, 533);
 	driver->draw2DRectangleOutline(Resize(309, 462, 797, 533));
 	if(deckManager.current_deck.extra.size() <= 10)
 		dx = 436.0f / 9;
@@ -1264,7 +1267,7 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531));
 	}
 	//side deck
-	driver->draw2DRectangle(Resize(310, 537, 797, 557), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	DRAWRECT(L"SIDE_INFO", 310, 537, 797, 557);
 	driver->draw2DRectangleOutline(Resize(309, 536, 797, 557));
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(314, 536, 409, 556), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(315, 537, 410, 557), 0xffffffff, false, true);
@@ -1284,7 +1287,7 @@ void Game::DrawDeckBd() {
 		sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y), 0xff000000, false, true);
 	textFont->draw(buffer.c_str(), recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 4, sidepos.UpperLeftCorner.Y + 1,
 		sidepos.LowerRightCorner.X + 1, sidepos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
-	driver->draw2DRectangle(Resize(310, 560, 797, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	DRAWRECT(L"SIDE", 310, 560, 797, 630);
 	driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));
 	if(deckManager.current_deck.side.size() <= 10)
 		dx = 436.0f / 9;
@@ -1295,13 +1298,13 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629));
 	}
 	//search result
-	driver->draw2DRectangle(Resize(805, 137, 915, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	DRAWRECT(L"SEARCH_RESULT_INFO", 805, 137, 915, 157);
 	driver->draw2DRectangleOutline(Resize(804, 136, 915, 157));
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(809, 136, 914, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(810, 137, 915, 157), 0xffffffff, false, true);
 	numFont->draw(deckBuilder.result_string.c_str(), Resize(874, 136, 934, 156), 0xff000000, false, true);
 	numFont->draw(deckBuilder.result_string.c_str(), Resize(875, 137, 935, 157), 0xffffffff, false, true);
-	driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
+	DRAWRECT(L"SEARCH_RESULT", 805, 160, 1020, 630);
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	int prev_pos = deckBuilder.scroll_pos;
 	deckBuilder.scroll_pos = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
@@ -1314,7 +1317,7 @@ void Game::DrawDeckBd() {
 	for(; i < 9 && (i + card_position) < (int)deckBuilder.results.size(); ++i) {
 		auto ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangle(0x80000000, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
+			driver->draw2DRectangle(GetSkinColor(L"DECK_WINDOW_HOVERED_CARD_RESULT", 0x80000000), Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
 		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect, draw_thumb);
 		if(ptr->type & TYPE_MONSTER) {
 			buffer = dataManager.GetName(ptr->code);
@@ -1385,5 +1388,8 @@ void Game::DrawDeckBd() {
 	if(deckBuilder.is_draging) {
 		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - Scale(CARD_THUMB_WIDTH / 2), deckBuilder.dragy - Scale(CARD_THUMB_HEIGHT / 2)), deckBuilder.filterList, true);
 	}
+#undef DRAWRECT
+#undef DECKCOLOR
+#undef SKCOLOR
 }
 }
