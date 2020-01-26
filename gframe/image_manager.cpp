@@ -812,8 +812,8 @@ void imageScaleNNAAUnthreaded(irr::video::IImage *src, const irr::core::rect<irr
 		}
 }
 #ifdef __ANDROID__
-bool hasNPotSupport() {
-	auto check = []()->bool {
+bool hasNPotSupport(irr::video::IVideoDriver* driver) {
+	auto check = [](irr::video::IVideoDriver* driver)->bool {
 		bool isNPOTSupported;
 		if(driver->getDriverType() == irr::video::EDT_OGLES2) {
 			isNPOTSupported = ((irr::video::COGLES2Driver*)driver)->queryOpenGLFeature(irr::video::COGLES2ExtensionHandler::IRR_OES_texture_npot);
@@ -821,9 +821,20 @@ bool hasNPotSupport() {
 			isNPOTSupported = ((irr::video::COGLES1Driver*)driver)->queryOpenGLFeature(irr::video::COGLES1ExtensionHandler::IRR_OES_texture_npot);
 		}
 		return isNPOTSupported;
-	}
-	static const bool supported = check();
+	};
+	static const bool supported = check(driver);
 	return supported;
+}
+// Compute next-higher power of 2 efficiently, e.g. for power-of-2 texture sizes.
+// Public Domain: https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+inline irr::u32 npot2(irr::u32 orig) {
+	orig--;
+	orig |= orig >> 1;
+	orig |= orig >> 2;
+	orig |= orig >> 4;
+	orig |= orig >> 8;
+	orig |= orig >> 16;
+	return orig + 1;
 }
 #endif
 /* Get a cached, high-quality pre-scaled texture for display purposes.  If the
@@ -873,9 +884,9 @@ irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture 
 #ifdef __ANDROID__
 	// Some platforms are picky about textures being powers of 2, so expand
 	// the image dimensions to the next power of 2, if necessary.
-	if(!hasNPotSupport()) {
+	if(!hasNPotSupport(driver)) {
 		irr::video::IImage *po2img = driver->createImage(src->getColorFormat(),
-													core::dimension2d<u32>(npot2((irr::u32)destrect.getWidth()),
+														 irr::core::dimension2d<irr::u32>(npot2((irr::u32)destrect.getWidth()),
 																		   npot2((irr::u32)destrect.getHeight())));
 		po2img->fill(irr::video::SColor(0, 0, 0, 0));
 		destimg->copyTo(po2img);

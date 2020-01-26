@@ -57,9 +57,9 @@ void* OpenLibrary(const path_string& path) {
 #ifdef __ANDROID__
 	void* lib = nullptr;
 	const auto dest_dir = porting::internal_storage + EPRO_TEXT("/libocgcore.so");
-	Utils;; Copyfile(path + CORENAME, dest_dir);
+	ygo::Utils::Copyfile(path + CORENAME, dest_dir);
 	lib = dlopen(dest_dir.c_str(), RTLD_LAZY);
-	Utils::Deletefile(dest_dir);
+	ygo::Utils::Deletefile(dest_dir);
 	return lib;
 #else
 	return dlopen((path + CORENAME).c_str(), RTLD_LAZY);
