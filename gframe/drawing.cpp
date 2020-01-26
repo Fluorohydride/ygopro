@@ -1195,8 +1195,8 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 void Game::DrawDeckBd() {
 	std::wstring buffer;
 	//main deck
-#define SKCOLOR(what,def) GetSkinColor(L"DECK_WINDOW_"#what, def)
-#define DECKCOLOR(what) SKCOLOR(what##"_TOP_LEFT", 0x400000ff), SKCOLOR(what##"_TOP_RIGHT", 0x400000ff), SKCOLOR(what##"_BOTTOM_LEFT", 0x40000000), SKCOLOR(what##"_BOTTOM_RIGHT", 0x40000000)
+#define SKCOLOR(what,def) GetSkinColor(L"DECK_WINDOW_" what, def)
+#define DECKCOLOR(what) SKCOLOR(what"_TOP_LEFT", 0x400000ff), SKCOLOR(what"_TOP_RIGHT", 0x400000ff), SKCOLOR(what"_BOTTOM_LEFT", 0x40000000), SKCOLOR(what"_BOTTOM_RIGHT", 0x40000000)
 #define	DRAWRECT(what,...) driver->draw2DRectangle(Resize(__VA_ARGS__), DECKCOLOR(what));
 	DRAWRECT(L"MAIN_INFO", 310, 137, 797, 157);
 	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
