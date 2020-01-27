@@ -1178,6 +1178,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->showcardcode = data;
 			mainGame->showcarddif = 0;
 			mainGame->showcard = 1;
+			PLAY_SOUND(SoundManager::SFX::ACTIVATE);
 			mainGame->WaitFrameSignal(30);
 			break;
 		}
