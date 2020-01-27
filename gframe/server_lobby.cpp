@@ -13,6 +13,7 @@
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 #include "utils_gui.h"
+#include "custom_skin_enum.h"
 
 namespace ygo {
 
@@ -49,9 +50,9 @@ void ServerLobby::FillOnlineRooms() {
 
 	bool doFilter = searchText.size() || searchRules > 0 || searchBanlist > 0 || bestOf || team1 || team2 || mainGame->btnFilterRelayMode->isPressed();
 
-	irr::video::SColor normal_room = Game::GetSkinColor(ROOMLIST_NORMAL_ROOM, irr::video::SColor(255, 255, 255, 255));
-	irr::video::SColor custom_room = Game::GetSkinColor(ROOMLIST_CUSTOM_ROOM, irr::video::SColor(255, 255, 100, 100));
-	irr::video::SColor started_room = Game::GetSkinColor(ROOMLIST_STARTED_ROOM, irr::video::SColor(100, 211, 211, 211));
+	irr::video::SColor normal_room = skin::ROOMLIST_NORMAL_ROOM_VAL;
+	irr::video::SColor custom_room = skin::ROOMLIST_CUSTOM_ROOM_VAL;
+	irr::video::SColor started_room = skin::ROOMLIST_STARTED_ROOM_VAL;
 	irr::video::SColor color;
 	bool show_password_checked = mainGame->chkShowPassword->isChecked();
 	bool show_started_checked = mainGame->chkShowActiveRooms->isChecked();

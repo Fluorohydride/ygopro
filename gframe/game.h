@@ -20,7 +20,6 @@
 #include "sound_manager.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
-#include "custom_skin_enum.h"
 
 class CGUISkinSystem;
 class IProgressBar;
@@ -202,7 +201,6 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
-	static irr::video::SColor GetSkinColor(CustomSkinElements value, irr::video::SColor fallback);
 
 	uint8 LocalPlayer(uint8 player);
 	std::wstring LocalName(int local_player);

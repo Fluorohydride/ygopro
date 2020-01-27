@@ -6,6 +6,7 @@
 #include "duelclient.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "CGUIImageButton/CGUIImageButton.h"
+#include "custom_skin_enum.h"
 #ifdef __ANDROID__
 #include <GLES/gl.h>
 #include <GLES/glext.h>
@@ -172,7 +173,7 @@ void Game::DrawBackGround() {
 	driver->setMaterial(matManager.mBackLine);
 	//select field
 	if((dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD || dInfo.curMsg == MSG_HINT) && dField.selectable_field) {
-		irr::video::SColor outline_color = GetSkinColor(DUELFIELD_SELECTABLE_FIELD_OUTLINE, SColor(255, 255, 255, 255));
+		irr::video::SColor outline_color = skin::DUELFIELD_SELECTABLE_FIELD_OUTLINE_VAL;
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
@@ -263,7 +264,7 @@ void Game::DrawBackGround() {
 		}
 		if(!vertex)
 			return;
-		matManager.mSelField.AmbientColor = GetSkinColor(DUELFIELD_HOVERED, SColor(255, 255, 255, 255));
+		matManager.mSelField.AmbientColor = skin::DUELFIELD_HOVERED_VAL;
 		matManager.mSelField.DiffuseColor = (int)std::round(selFieldAlpha) << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
@@ -391,10 +392,10 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	}
 }
 bool Game::CheckMutual(ClientCard* pcard, int mark) {
-	matManager.mSelField.AmbientColor = GetSkinColor(DUELFIELD_LINKED, SColor(255, 2, 97, 162));
+	matManager.mSelField.AmbientColor = skin::DUELFIELD_LINKED_VAL;
 	driver->setMaterial(matManager.mSelField);
 	if (pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
-		matManager.mSelField.AmbientColor = GetSkinColor(DUELFIELD_MUTUAL_LINKED, SColor(255, 0, 153, 0));
+		matManager.mSelField.AmbientColor = skin::DUELFIELD_MUTUAL_LINKED_VAL;
 		driver->setMaterial(matManager.mSelField);
 		return true;
 	}
@@ -462,14 +463,14 @@ void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->is_moving)
 		return;
 	if(pcard->is_selectable && (pcard->location & 0xe)) {
-		irr::video::SColor outline_color = GetSkinColor(DUELFIELD_SELECTABLE_CARD_OUTLINE, SColor(255, 255, 255, 0));
+		irr::video::SColor outline_color = skin::DUELFIELD_SELECTABLE_CARD_OUTLINE_VAL;
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
 			DrawSelectionLine(matManager.vCardOutline, !pcard->is_selected, 2, outline_color);
 		else
 			DrawSelectionLine(matManager.vCardOutliner, !pcard->is_selected, 2, outline_color);
 	}
 	if(pcard->is_highlighting) {
-		irr::video::SColor outline_color = GetSkinColor(DUELFIELD_HIGHLIGHTING_CARD_OUTLINE, SColor(255, 0, 255, 255));
+		irr::video::SColor outline_color = skin::DUELFIELD_HIGHLIGHTING_CARD_OUTLINE_VAL;
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
 			DrawSelectionLine(matManager.vCardOutline, true, 2, outline_color);
 		else
@@ -598,8 +599,8 @@ void Game::DrawMisc() {
 	driver->draw2DImage(imageManager.tLPFrame, Resize(330, 10, 629, 30), recti(0, 0, 200, 20), 0, 0, true);
 	driver->draw2DImage(imageManager.tLPFrame, Resize(691, 10, 990, 30), recti(0, 0, 200, 20), 0, 0, true);
 
-#define SKCOLOR(what,def) GetSkinColor(LPBAR##what, def)
-#define LPCOLOR(what) SKCOLOR(what##_TOP_LEFT, 0xff1599de), SKCOLOR(what##_TOP_RIGHT, 0xff1599de), SKCOLOR(what##_BOTTOM_LEFT, 0xff1d82d1), SKCOLOR(what##_BOTTOM_RIGHT, 0xff1d82d1)
+#define SKCOLOR(what) skin::LPBAR##what##_VAL
+#define LPCOLOR(what) SKCOLOR(what##_TOP_LEFT), SKCOLOR(what##_TOP_RIGHT), SKCOLOR(what##_BOTTOM_LEFT), SKCOLOR(what##_BOTTOM_RIGHT)
 #define	DRAWRECT(what,clip) driver->draw2DRectangle(lpbarpos, LPCOLOR(what),clip);
 
 	auto lpbarpos = Resize(335, 12, 625, 28);
@@ -1213,8 +1214,8 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 void Game::DrawDeckBd() {
 	std::wstring buffer;
 	//main deck
-#define SKCOLOR(what,def) GetSkinColor(DECK_WINDOW_##what, def)
-#define DECKCOLOR(what) SKCOLOR(what##_TOP_LEFT, 0x400000ff), SKCOLOR(what##_TOP_RIGHT, 0x400000ff), SKCOLOR(what##_BOTTOM_LEFT, 0x40000000), SKCOLOR(what##_BOTTOM_RIGHT, 0x40000000)
+#define SKCOLOR(what) skin::DECK_WINDOW_##what##_VAL
+#define DECKCOLOR(what) SKCOLOR(what##_TOP_LEFT), SKCOLOR(what##_TOP_RIGHT), SKCOLOR(what##_BOTTOM_LEFT), SKCOLOR(what##_BOTTOM_RIGHT)
 #define	DRAWRECT(what,...) driver->draw2DRectangle(Resize(__VA_ARGS__), DECKCOLOR(what));
 	DRAWRECT(MAIN_INFO, 310, 137, 797, 157);
 	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
@@ -1335,7 +1336,7 @@ void Game::DrawDeckBd() {
 	for(; i < 9 && (i + card_position) < (int)deckBuilder.results.size(); ++i) {
 		auto ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangle(GetSkinColor(DECK_WINDOW_HOVERED_CARD_RESULT, 0x80000000), Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
+			driver->draw2DRectangle(skin::DECK_WINDOW_HOVERED_CARD_RESULT_VAL, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
 		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect, draw_thumb);
 		if(ptr->type & TYPE_MONSTER) {
 			buffer = dataManager.GetName(ptr->code);

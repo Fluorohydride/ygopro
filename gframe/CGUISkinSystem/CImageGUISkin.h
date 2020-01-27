@@ -134,8 +134,8 @@ public:
 		const core::rect<s32>& pos, const core::rect<s32>* clip = 0);
 	virtual void setProperty(core::stringw key, core::stringw value);
 	virtual core::stringw getProperty(core::stringw key);
-	virtual void setCustomColor(ygo::CustomSkinElements key, video::SColor value);
-	virtual video::SColor getCustomColor(ygo::CustomSkinElements key, video::SColor fallback);
+	virtual void setCustomColor(ygo::skin::CustomSkinElements key, video::SColor value);
+	virtual video::SColor getCustomColor(ygo::skin::CustomSkinElements key, video::SColor fallback);
 
 private:
     void drawElementStyle( const SImageGUIElementStyle& elem, const core::rect<s32>& rect, const core::rect<s32>* clip, video::SColor* color=0 );
@@ -145,7 +145,7 @@ private:
     SImageGUISkinConfig Config;
 	
 	core::map<core::stringw,core::stringw> properties;
-	core::map<ygo::CustomSkinElements, video::SColor> custom_colors;
+	core::map<ygo::skin::CustomSkinElements, video::SColor> custom_colors;
 };
 
 }

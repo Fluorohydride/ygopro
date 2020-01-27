@@ -33,11 +33,11 @@ core::stringw CImageGUISkin::getProperty(core::stringw key) {
 		return core::stringw("");
 	else return node->getValue();
 }
-void CImageGUISkin::setCustomColor(ygo::CustomSkinElements key, video::SColor value) {
+void CImageGUISkin::setCustomColor(ygo::skin::CustomSkinElements key, video::SColor value) {
 	custom_colors.set(key,value);
 }
-video::SColor CImageGUISkin::getCustomColor(ygo::CustomSkinElements key, video::SColor fallback) {
-	core::map<ygo::CustomSkinElements, video::SColor>::Node* node = custom_colors.find(key);
+video::SColor CImageGUISkin::getCustomColor(ygo::skin::CustomSkinElements key, video::SColor fallback) {
+	core::map<ygo::skin::CustomSkinElements, video::SColor>::Node* node = custom_colors.find(key);
 	if(node == 0) 
 		return fallback;
 	else return node->getValue();
