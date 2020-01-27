@@ -172,7 +172,7 @@ void Game::DrawBackGround() {
 	driver->setMaterial(matManager.mBackLine);
 	//select field
 	if((dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD || dInfo.curMsg == MSG_HINT) && dField.selectable_field) {
-		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_SELECTABLE_FIELD_OUTLINE", SColor(255, 255, 255, 255));
+		irr::video::SColor outline_color = GetSkinColor(DUELFIELD_SELECTABLE_FIELD_OUTLINE, SColor(255, 255, 255, 255));
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
@@ -263,7 +263,7 @@ void Game::DrawBackGround() {
 		}
 		if(!vertex)
 			return;
-		matManager.mSelField.AmbientColor = GetSkinColor(L"DUELFIELD_HOVERED", SColor(255, 255, 255, 255));
+		matManager.mSelField.AmbientColor = GetSkinColor(DUELFIELD_HOVERED, SColor(255, 255, 255, 255));
 		matManager.mSelField.DiffuseColor = (int)std::round(selFieldAlpha) << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
@@ -391,10 +391,10 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	}
 }
 bool Game::CheckMutual(ClientCard* pcard, int mark) {
-	matManager.mSelField.AmbientColor = GetSkinColor(L"DUELFIELD_LINKED", SColor(255, 2, 97, 162));
+	matManager.mSelField.AmbientColor = GetSkinColor(DUELFIELD_LINKED, SColor(255, 2, 97, 162));
 	driver->setMaterial(matManager.mSelField);
 	if (pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
-		matManager.mSelField.AmbientColor = GetSkinColor(L"DUELFIELD_MUTUAL_LINKED", SColor(255, 0, 153, 0));
+		matManager.mSelField.AmbientColor = GetSkinColor(DUELFIELD_MUTUAL_LINKED, SColor(255, 0, 153, 0));
 		driver->setMaterial(matManager.mSelField);
 		return true;
 	}
@@ -462,14 +462,14 @@ void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->is_moving)
 		return;
 	if(pcard->is_selectable && (pcard->location & 0xe)) {
-		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_SELECTABLE_CARD_OUTLINE", SColor(255, 255, 255, 0));
+		irr::video::SColor outline_color = GetSkinColor(DUELFIELD_SELECTABLE_CARD_OUTLINE, SColor(255, 255, 255, 0));
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
 			DrawSelectionLine(matManager.vCardOutline, !pcard->is_selected, 2, outline_color);
 		else
 			DrawSelectionLine(matManager.vCardOutliner, !pcard->is_selected, 2, outline_color);
 	}
 	if(pcard->is_highlighting) {
-		irr::video::SColor outline_color = GetSkinColor(L"DUELFIELD_HIGHLIGHTING_CARD_OUTLINE", SColor(255, 0, 255, 255));
+		irr::video::SColor outline_color = GetSkinColor(DUELFIELD_HIGHLIGHTING_CARD_OUTLINE, SColor(255, 0, 255, 255));
 		if((pcard->location == LOCATION_HAND && pcard->code) || ((pcard->location & 0xc) && (pcard->position & POS_FACEUP)))
 			DrawSelectionLine(matManager.vCardOutline, true, 2, outline_color);
 		else
@@ -598,24 +598,24 @@ void Game::DrawMisc() {
 	driver->draw2DImage(imageManager.tLPFrame, Resize(330, 10, 629, 30), recti(0, 0, 200, 20), 0, 0, true);
 	driver->draw2DImage(imageManager.tLPFrame, Resize(691, 10, 990, 30), recti(0, 0, 200, 20), 0, 0, true);
 
-#define SKCOLOR(what,def) GetSkinColor(L"LPBAR" what, def)
-#define LPCOLOR(what) SKCOLOR(what"_TOP_LEFT", 0xff1599de), SKCOLOR(what"_TOP_RIGHT", 0xff1599de), SKCOLOR(what"_BOTTOM_LEFT", 0xff1d82d1), SKCOLOR(what"_BOTTOM_RIGHT", 0xff1d82d1)
+#define SKCOLOR(what,def) GetSkinColor(LPBAR##what, def)
+#define LPCOLOR(what) SKCOLOR(what##_TOP_LEFT, 0xff1599de), SKCOLOR(what##_TOP_RIGHT, 0xff1599de), SKCOLOR(what##_BOTTOM_LEFT, 0xff1d82d1), SKCOLOR(what##_BOTTOM_RIGHT, 0xff1d82d1)
 #define	DRAWRECT(what,clip) driver->draw2DRectangle(lpbarpos, LPCOLOR(what),clip);
 
 	auto lpbarpos = Resize(335, 12, 625, 28);
 	if(dInfo.lp[0] < dInfo.startlp) {
 		auto cliprect = Resize(335, 12, 335 + 290 * dInfo.lp[0] / dInfo.startlp, 28);
-		DRAWRECT(L"1_", &cliprect)
+		DRAWRECT(_1, &cliprect)
 	} else {
-		DRAWRECT(L"1_", nullptr)
+		DRAWRECT(_1, nullptr)
 	}
 	
 	lpbarpos = Resize(696, 12, 986, 28);
 	if(dInfo.lp[1] < dInfo.startlp) {
 		auto cliprect = Resize(986 - 290 * dInfo.lp[1] / dInfo.startlp, 12, 986, 28);
-		DRAWRECT(L"2_", &cliprect)
+		DRAWRECT(_2, &cliprect)
 	} else {
-		DRAWRECT(L"2_", nullptr)
+		DRAWRECT(_2, nullptr)
 	}
 #undef DRAWRECT
 #undef LPCOLOR
@@ -1213,10 +1213,10 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 void Game::DrawDeckBd() {
 	std::wstring buffer;
 	//main deck
-#define SKCOLOR(what,def) GetSkinColor(L"DECK_WINDOW_" what, def)
-#define DECKCOLOR(what) SKCOLOR(what"_TOP_LEFT", 0x400000ff), SKCOLOR(what"_TOP_RIGHT", 0x400000ff), SKCOLOR(what"_BOTTOM_LEFT", 0x40000000), SKCOLOR(what"_BOTTOM_RIGHT", 0x40000000)
+#define SKCOLOR(what,def) GetSkinColor(DECK_WINDOW_##what, def)
+#define DECKCOLOR(what) SKCOLOR(what##_TOP_LEFT, 0x400000ff), SKCOLOR(what##_TOP_RIGHT, 0x400000ff), SKCOLOR(what##_BOTTOM_LEFT, 0x40000000), SKCOLOR(what##_BOTTOM_RIGHT, 0x40000000)
 #define	DRAWRECT(what,...) driver->draw2DRectangle(Resize(__VA_ARGS__), DECKCOLOR(what));
-	DRAWRECT(L"MAIN_INFO", 310, 137, 797, 157);
+	DRAWRECT(MAIN_INFO, 310, 137, 797, 157);
 	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(314, 136, 409, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1330).c_str(), Resize(315, 137, 410, 157), 0xffffffff, false, true);
@@ -1227,7 +1227,7 @@ void Game::DrawDeckBd() {
 	}
 	numFont->draw(buffer.c_str(), Resize(379, 137, 439, 157), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(380, 138, 440, 158), 0xffffffff, false, true);
-	DRAWRECT(L"MAIN", 310, 160, 797, 436);
+	DRAWRECT(MAIN, 310, 160, 797, 436);
 	recti mainpos = Resize(310, 137, 797, 157);
 	buffer = fmt::format(L"{} {} {} {} {} {}", dataManager.GetSysString(1312), deckManager.TypeCount(deckManager.current_deck.main, TYPE_MONSTER),
 		dataManager.GetSysString(1313), deckManager.TypeCount(deckManager.current_deck.main, TYPE_SPELL),
@@ -1253,7 +1253,7 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
 	}
 	//extra deck
-	DRAWRECT(L"EXTRA_INFO", 310, 440, 797, 460);
+	DRAWRECT(EXTRA_INFO, 310, 440, 797, 460);
 	driver->draw2DRectangleOutline(Resize(309, 439, 797, 460));
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(314, 439, 409, 459), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1331).c_str(), Resize(315, 440, 410, 460), 0xffffffff, false, true);
@@ -1274,7 +1274,7 @@ void Game::DrawDeckBd() {
 		extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y), 0xff000000, false, true);
 	textFont->draw(buffer.c_str(), recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 4, extrapos.UpperLeftCorner.Y + 1,
 		extrapos.LowerRightCorner.X + 1, extrapos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
-	DRAWRECT(L"EXTRA", 310, 463, 797, 533);
+	DRAWRECT(EXTRA, 310, 463, 797, 533);
 	driver->draw2DRectangleOutline(Resize(309, 462, 797, 533));
 	if(deckManager.current_deck.extra.size() <= 10)
 		dx = 436.0f / 9;
@@ -1285,7 +1285,7 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531));
 	}
 	//side deck
-	DRAWRECT(L"SIDE_INFO", 310, 537, 797, 557);
+	DRAWRECT(SIDE_INFO, 310, 537, 797, 557);
 	driver->draw2DRectangleOutline(Resize(309, 536, 797, 557));
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(314, 536, 409, 556), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1332).c_str(), Resize(315, 537, 410, 557), 0xffffffff, false, true);
@@ -1305,7 +1305,7 @@ void Game::DrawDeckBd() {
 		sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y), 0xff000000, false, true);
 	textFont->draw(buffer.c_str(), recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 4, sidepos.UpperLeftCorner.Y + 1,
 		sidepos.LowerRightCorner.X + 1, sidepos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
-	DRAWRECT(L"SIDE", 310, 560, 797, 630);
+	DRAWRECT(SIDE, 310, 560, 797, 630);
 	driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));
 	if(deckManager.current_deck.side.size() <= 10)
 		dx = 436.0f / 9;
@@ -1316,13 +1316,13 @@ void Game::DrawDeckBd() {
 			driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629));
 	}
 	//search result
-	DRAWRECT(L"SEARCH_RESULT_INFO", 805, 137, 915, 157);
+	DRAWRECT(SEARCH_RESULT_INFO, 805, 137, 915, 157);
 	driver->draw2DRectangleOutline(Resize(804, 136, 915, 157));
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(809, 136, 914, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(810, 137, 915, 157), 0xffffffff, false, true);
 	numFont->draw(deckBuilder.result_string.c_str(), Resize(874, 136, 934, 156), 0xff000000, false, true);
 	numFont->draw(deckBuilder.result_string.c_str(), Resize(875, 137, 935, 157), 0xffffffff, false, true);
-	DRAWRECT(L"SEARCH_RESULT", 805, 160, 1020, 630);
+	DRAWRECT(SEARCH_RESULT, 805, 160, 1020, 630);
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	int prev_pos = deckBuilder.scroll_pos;
 	deckBuilder.scroll_pos = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
@@ -1335,7 +1335,7 @@ void Game::DrawDeckBd() {
 	for(; i < 9 && (i + card_position) < (int)deckBuilder.results.size(); ++i) {
 		auto ptr = deckBuilder.results[i + card_position];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangle(GetSkinColor(L"DECK_WINDOW_HOVERED_CARD_RESULT", 0x80000000), Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
+			driver->draw2DRectangle(GetSkinColor(DECK_WINDOW_HOVERED_CARD_RESULT, 0x80000000), Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
 		DrawThumb(ptr, position2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect, draw_thumb);
 		if(ptr->type & TYPE_MONSTER) {
 			buffer = dataManager.GetName(ptr->code);

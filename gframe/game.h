@@ -20,6 +20,7 @@
 #include "sound_manager.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
+#include "custom_skin_enum.h"
 
 class CGUISkinSystem;
 class IProgressBar;
@@ -201,7 +202,7 @@ public:
 	void ClearTextures();
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
-	static irr::video::SColor GetSkinColor(const std::wstring& value, irr::video::SColor fallback);
+	static irr::video::SColor GetSkinColor(CustomSkinElements value, irr::video::SColor fallback = NULL);
 
 	uint8 LocalPlayer(uint8 player);
 	std::wstring LocalName(int local_player);
@@ -701,7 +702,7 @@ extern Game* mainGame;
 
 template<typename T>
 inline irr::core::vector2d<T> Game::Scale(irr::core::vector2d<T> vec) {
-	return irr::core::vector2d<T>(vec.X * gameConf.dpi_scale, vec.Y * gameConf.dpi_scale );
+	return vector2d<T>(vec.X * gameConf.dpi_scale, vec.Y * gameConf.dpi_scale );
 }
 template<typename T>
 inline T Game::ResizeX(T x) {
@@ -713,7 +714,7 @@ inline T Game::ResizeY(T y) {
 }
 template<typename T, typename T2>
 inline irr::core::vector2d<T> Game::Scale(T x, T2 y) {
-	return irr::core::vector2d<T>((T)(x * gameConf.dpi_scale), (T)(y * gameConf.dpi_scale));
+	return vector2d<T>((T)(x * gameConf.dpi_scale), (T)(y * gameConf.dpi_scale));
 }
 template<typename T>
 inline T Game::Scale(T val) {

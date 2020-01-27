@@ -1,4 +1,5 @@
 #include "CGUISkinSystem.h"
+#include <map>
 
 CGUISkinSystem::CGUISkinSystem(io::path path,IrrlichtDevice *dev) {
 	loaded_skin = nullptr;
@@ -244,7 +245,7 @@ core::stringw CGUISkinSystem::getProperty(core::stringw key) {
 	return loaded_skin == skin ? skin->getProperty(key) : core::stringw("");
 }
 
-video::SColor CGUISkinSystem::getCustomColor(core::stringw key, video::SColor fallback) {
+video::SColor CGUISkinSystem::getCustomColor(ygo::CustomSkinElements key, video::SColor fallback) {
 	gui::CImageGUISkin* skin = (gui::CImageGUISkin*)device->getGUIEnvironment()->getSkin();
 	return loaded_skin == skin ? skin->getCustomColor(key, fallback) : fallback;
 }
@@ -278,14 +279,85 @@ bool CGUISkinSystem::loadProperty(core::stringw key,gui::CImageGUISkin *skin) {
 	return false;
 }
 bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
+	static const std::map<std::wstring, ygo::CustomSkinElements> alias = {
+		{ L"CARDINFO_ARCHETYPE_TEXT_COLOR", ygo::CustomSkinElements::CARDINFO_ARCHETYPE_TEXT_COLOR },
+		{ L"CARDINFO_IMAGE_BACKGROUND", ygo::CustomSkinElements::CARDINFO_IMAGE_BACKGROUND },
+		{ L"CARDINFO_STATS_COLOR", ygo::CustomSkinElements::CARDINFO_STATS_COLOR },
+		{ L"CARDINFO_TYPES_COLOR", ygo::CustomSkinElements::CARDINFO_TYPES_COLOR },
+		{ L"DECK_WINDOW_EXTRA_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_EXTRA_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_EXTRA_INFO_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_INFO_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_EXTRA_INFO_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_INFO_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_EXTRA_INFO_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_INFO_TOP_LEFT },
+		{ L"DECK_WINDOW_EXTRA_INFO_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_INFO_TOP_RIGHT },
+		{ L"DECK_WINDOW_EXTRA_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_TOP_LEFT },
+		{ L"DECK_WINDOW_EXTRA_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_EXTRA_TOP_RIGHT },
+		{ L"DECK_WINDOW_HOVERED_CARD_RESULT", ygo::CustomSkinElements::DECK_WINDOW_HOVERED_CARD_RESULT },
+		{ L"DECK_WINDOW_MAIN_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_MAIN_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_MAIN_INFO_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_INFO_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_MAIN_INFO_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_INFO_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_MAIN_INFO_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_INFO_TOP_LEFT },
+		{ L"DECK_WINDOW_MAIN_INFO_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_INFO_TOP_RIGHT },
+		{ L"DECK_WINDOW_MAIN_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_TOP_LEFT },
+		{ L"DECK_WINDOW_MAIN_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_MAIN_TOP_RIGHT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_INFO_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_INFO_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_INFO_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_INFO_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_INFO_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_INFO_TOP_LEFT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_INFO_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_INFO_TOP_RIGHT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_TOP_LEFT },
+		{ L"DECK_WINDOW_SEARCH_RESULT_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SEARCH_RESULT_TOP_RIGHT },
+		{ L"DECK_WINDOW_SIDE_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_SIDE_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_SIDE_INFO_BOTTOM_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_INFO_BOTTOM_LEFT },
+		{ L"DECK_WINDOW_SIDE_INFO_BOTTOM_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_INFO_BOTTOM_RIGHT },
+		{ L"DECK_WINDOW_SIDE_INFO_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_INFO_TOP_LEFT },
+		{ L"DECK_WINDOW_SIDE_INFO_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_INFO_TOP_RIGHT },
+		{ L"DECK_WINDOW_SIDE_TOP_LEFT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_TOP_LEFT },
+		{ L"DECK_WINDOW_SIDE_TOP_RIGHT", ygo::CustomSkinElements::DECK_WINDOW_SIDE_TOP_RIGHT },
+		{ L"DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR", ygo::CustomSkinElements::DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR },
+		{ L"DUELFIELD_ANNOUNCE_TEXT_COLOR", ygo::CustomSkinElements::DUELFIELD_ANNOUNCE_TEXT_COLOR },
+		{ L"DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND", ygo::CustomSkinElements::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND },
+		{ L"DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND", ygo::CustomSkinElements::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND },
+		{ L"DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT", ygo::CustomSkinElements::DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT },
+		{ L"DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT", ygo::CustomSkinElements::DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT },
+		{ L"DUELFIELD_CARD_SELF_WINDOW_BACKGROUND", ygo::CustomSkinElements::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND },
+		{ L"DUELFIELD_HIGHLIGHTING_CARD_OUTLINE", ygo::CustomSkinElements::DUELFIELD_HIGHLIGHTING_CARD_OUTLINE },
+		{ L"DUELFIELD_HOVERED", ygo::CustomSkinElements::DUELFIELD_HOVERED },
+		{ L"DUELFIELD_LINKED", ygo::CustomSkinElements::DUELFIELD_LINKED },
+		{ L"DUELFIELD_MUTUAL_LINKED", ygo::CustomSkinElements::DUELFIELD_MUTUAL_LINKED },
+		{ L"DUELFIELD_SELECTABLE_CARD_OUTLINE", ygo::CustomSkinElements::DUELFIELD_SELECTABLE_CARD_OUTLINE },
+		{ L"DUELFIELD_SELECTABLE_FIELD_OUTLINE", ygo::CustomSkinElements::DUELFIELD_SELECTABLE_FIELD_OUTLINE },
+		{ L"DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR", ygo::CustomSkinElements::DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR },
+		{ L"DUELFIELD_TOOLTIP_TEXT_COLOR", ygo::CustomSkinElements::DUELFIELD_TOOLTIP_TEXT_COLOR },
+		{ L"LPBAR_1_BOTTOM_LEFT", ygo::CustomSkinElements::LPBAR_1_BOTTOM_LEFT },
+		{ L"LPBAR_1_BOTTOM_RIGHT", ygo::CustomSkinElements::LPBAR_1_BOTTOM_RIGHT },
+		{ L"LPBAR_1_TOP_LEFT", ygo::CustomSkinElements::LPBAR_1_TOP_LEFT },
+		{ L"LPBAR_1_TOP_RIGHT", ygo::CustomSkinElements::LPBAR_1_TOP_RIGHT },
+		{ L"LPBAR_2_BOTTOM_LEFT", ygo::CustomSkinElements::LPBAR_2_BOTTOM_LEFT },
+		{ L"LPBAR_2_BOTTOM_RIGHT", ygo::CustomSkinElements::LPBAR_2_BOTTOM_RIGHT },
+		{ L"LPBAR_2_TOP_LEFT", ygo::CustomSkinElements::LPBAR_2_TOP_LEFT },
+		{ L"LPBAR_2_TOP_RIGHT", ygo::CustomSkinElements::LPBAR_2_TOP_RIGHT },
+		{ L"PROGRESSBAR_EMPTY_COLOR", ygo::CustomSkinElements::PROGRESSBAR_EMPTY_COLOR },
+		{ L"PROGRESSBAR_FILL_COLOR", ygo::CustomSkinElements::PROGRESSBAR_FILL_COLOR },
+		{ L"ROOMLIST_CUSTOM_ROOM", ygo::CustomSkinElements::ROOMLIST_CUSTOM_ROOM },
+		{ L"ROOMLIST_NORMAL_ROOM", ygo::CustomSkinElements::ROOMLIST_NORMAL_ROOM },
+		{ L"ROOMLIST_STARTED_ROOM", ygo::CustomSkinElements::ROOMLIST_STARTED_ROOM },
+		{ L"ROOMLIST_TEXTS_COLOR", ygo::CustomSkinElements::ROOMLIST_TEXTS_COLOR }
+	};
 	core::stringw wtmp = "Skin/Custom/";
 	core::array<const wchar_t*>* children = registry->listNodeChildren(L"", wtmp.c_str());
 	if(!children) return false;
 	for(int i = 0; i < children->size(); i++) {
 		core::stringw tmpchild = (*children)[i];
 		video::SColor color= registry->getValueAsColor((wtmp + tmpchild).c_str());
-		if(color.color)
-			skin->setCustomColor(tmpchild, color);
+		if(color != NULL) {
+			auto found = alias.find(tmpchild.c_str());
+			if(found != alias.end())
+				skin->setCustomColor(found->second, color);
+		}
 	}
 	return false;
 }
