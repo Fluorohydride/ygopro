@@ -662,7 +662,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND", 0xffffffff));
 					} else {
 						command_card->is_selected = true;
-						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(Game::GetSkinColor(L"card_selected_bg", 0xffffff00));
+						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND", 0xffffff00));
 						selected_cards.push_back(command_card);
 					}
 					int sel = selected_cards.size();
@@ -693,7 +693,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						else mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND", 0xffffffff));
 					} else {
 						command_card->is_selected = true;
-						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(Game::GetSkinColor(L"card_selected_bg", 0xffffff00));
+						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND", 0xffffff00));
 					}
 					selected_cards.push_back(command_card);
 					if (selected_cards.size() > 0) {
@@ -888,7 +888,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(selectable_cards[i + pos]->owner != selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setOverrideColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT", 0xff0000ff));
 						if(selectable_cards[i + pos]->is_selected)
-							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"card_selected_bg", 0xffffff00));
+							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND", 0xffffff00));
 						else if(selectable_cards[i + pos]->overlayTarget->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELF_WINDOW_BACKGROUND", 0xffd0d0d0));
 						else
@@ -897,14 +897,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(selectable_cards[i + pos]->position & POS_FACEDOWN)
 							mainGame->stCardPos[i]->setOverrideColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT", 0xff0000ff));
 						if(selectable_cards[i + pos]->is_selected)
-							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"card_selected_bg", 0xffffff00));
+							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND", 0xffffff00));
 						else if(selectable_cards[i + pos]->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELF_WINDOW_BACKGROUND", 0xffd0d0d0));
 						else
 							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND", 0xffffffff));
 					} else {
 						if(selectable_cards[i + pos]->is_selected)
-							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"card_selected_bg", 0xffffff00));
+							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND", 0xffffff00));
 						else if(selectable_cards[i + pos]->controler)
 							mainGame->stCardPos[i]->setBackgroundColor(Game::GetSkinColor(L"DUELFIELD_CARD_SELF_WINDOW_BACKGROUND", 0xffd0d0d0));
 						else
