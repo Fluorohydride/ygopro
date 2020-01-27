@@ -174,7 +174,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SHUFFLE_DECK: {
-				std::random_shuffle(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end());
+				std::shuffle(
+					deckManager.current_deck.main.begin(),
+					deckManager.current_deck.main.end(),
+					std::mt19937(time(nullptr))
+				);
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
