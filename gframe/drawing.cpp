@@ -601,7 +601,7 @@ void Game::DrawMisc() {
 
 #define SKCOLOR(what) skin::LPBAR_##what##_VAL
 #define LPCOLOR(what) SKCOLOR(what##_TOP_LEFT), SKCOLOR(what##_TOP_RIGHT), SKCOLOR(what##_BOTTOM_LEFT), SKCOLOR(what##_BOTTOM_RIGHT)
-#define	DRAWRECT(what,clip) driver->draw2DRectangle(lpbarpos, LPCOLOR(what));
+#define	DRAWRECT(what) driver->draw2DRectangle(lpbarpos, LPCOLOR(what));
 	if(dInfo.lp[0]) {
 		auto lpbarpos = Resize(335, 12, 625, 28);
 		DRAWRECT(1)
