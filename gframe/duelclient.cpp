@@ -3585,7 +3585,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		std::wstring text(dataManager.GetSysString(1624));
 		for (int i = 0; i < count; ++i) {
-			bool res = !!BufferIO::Read<uint8_t>(pbuf);
+			uint8_t res = BufferIO::Read<uint8_t>(pbuf);
 			text += L"[" + fmt::to_wstring(res) + L"]";
 		}
 		mainGame->gMutex.lock();
