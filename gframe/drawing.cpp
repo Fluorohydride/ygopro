@@ -597,12 +597,30 @@ void Game::DrawMisc() {
 	}
 	driver->draw2DImage(imageManager.tLPFrame, Resize(330, 10, 629, 30), recti(0, 0, 200, 20), 0, 0, true);
 	driver->draw2DImage(imageManager.tLPFrame, Resize(691, 10, 990, 30), recti(0, 0, 200, 20), 0, 0, true);
-	if(dInfo.lp[0] >= dInfo.startlp)
-		driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 625, 28), recti(0, 0, 16, 16), 0, 0, true);
-	else driver->draw2DImage(imageManager.tLPBar, Resize(335, 12, 335 + 290 * dInfo.lp[0] / dInfo.startlp, 28), recti(0, 0, 16, 16), 0, 0, true);
-	if(dInfo.lp[1] >= dInfo.startlp)
-		driver->draw2DImage(imageManager.tLPBar, Resize(696, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
-	else driver->draw2DImage(imageManager.tLPBar, Resize(986 - 290 * dInfo.lp[1] / dInfo.startlp, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
+
+#define SKCOLOR(what,def) GetSkinColor(L"LPBAR" what, def)
+#define LPCOLOR(what) SKCOLOR(what"_TOP_LEFT", 0xff1599de), SKCOLOR(what"_TOP_RIGHT", 0xff1599de), SKCOLOR(what"_BOTTOM_LEFT", 0xff1d82d1), SKCOLOR(what"_BOTTOM_RIGHT", 0xff1d82d1)
+#define	DRAWRECT(what,clip) driver->draw2DRectangle(lpbarpos, LPCOLOR(what),clip);
+
+	auto lpbarpos = Resize(335, 12, 625, 28);
+	if(dInfo.lp[0] < dInfo.startlp) {
+		auto cliprect = Resize(335, 12, 335 + 290 * dInfo.lp[0] / dInfo.startlp, 28);
+		DRAWRECT(L"1_", &cliprect)
+	} else {
+		DRAWRECT(L"1_", nullptr)
+	}
+	
+	lpbarpos = Resize(696, 12, 986, 28);
+	if(dInfo.lp[1] < dInfo.startlp) {
+		auto cliprect = Resize(986 - 290 * dInfo.lp[1] / dInfo.startlp, 12, 986, 28);
+		DRAWRECT(L"2_", &cliprect)
+	} else {
+		DRAWRECT(L"2_", nullptr)
+	}
+#undef DRAWRECT
+#undef LPCOLOR
+#undef SKCOLOR
+	
 	if(lpframe > 0 && mainGame->delta_frames) {
 		dInfo.lp[lpplayer] -= lpd * mainGame->delta_frames;
 		dInfo.strLP[lpplayer] = fmt::to_wstring(dInfo.lp[lpplayer]);
