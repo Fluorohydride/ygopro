@@ -91,7 +91,12 @@ local ygopro_config=function(static_core)
 
 	filter "system:linux"
 		defines "LUA_USE_LINUX"
-		includedirs { "/usr/include/freetype2", "/usr/include/irrlicht" }
+		includedirs "/usr/include/freetype2"
+		if _OPTIONS["vcpkg-root"] then
+			includedirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/include/irrlicht" }
+		else
+			includedirs "/usr/include/irrlicht"
+		end
 		linkoptions { "-Wl,-rpath=./" }
 		links { "GL", "X11" }
 		if static_core then
