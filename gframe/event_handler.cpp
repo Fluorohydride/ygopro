@@ -1943,6 +1943,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
 		case irr::KEY_KEY_R: {
+			if(event.KeyInput.Control) {
+				mainGame->ApplySkin(EPRO_TEXT(""), true);
+				return true;
+			}
 			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
 			return true;

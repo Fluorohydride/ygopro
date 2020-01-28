@@ -1092,6 +1092,7 @@ bool Game::Initialize() {
 	Utils::CreateResourceFolders();
 
 	LoadGithubRepositories();
+	ApplySkin(EPRO_TEXT(""), true);
 	return true;
 }
 void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
@@ -1452,6 +1453,14 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 		} else {
 			stHintMsg->enableOverrideColor(false);
 		}
+		stTip->setBackgroundColor(skin::DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR_VAL);
+		tmp_color = skin::DUELFIELD_TOOLTIP_TEXT_COLOR_VAL;
+		if(tmp_color != 0)
+			stTip->setOverrideColor(tmp_color);
+		stCardListTip->setBackgroundColor(skin::DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR_VAL);
+		if(tmp_color != 0)
+			stCardListTip->setOverrideColor(tmp_color);
+		stCardListTip->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 		auto roomlistcolor = skin::ROOMLIST_TEXTS_COLOR_VAL;
 		stVersus->setOverrideColor(roomlistcolor);
 		stBestof->setOverrideColor(roomlistcolor);
