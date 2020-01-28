@@ -26,7 +26,7 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 	HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_UPPERLEFT),
 	Border(border), OverrideColorEnabled(false), OverrideBGColorEnabled(false), WordWrap(false), Background(background),
 	RestrainTextInside(true), RightToLeft(false),
-	OverrideColor(video::SColor(101,255,255,255)), BGColor(video::SColor(101,210,210,210)),
+	OverrideColor(video::SColor(101,255,255,255)), BGColor(video::SColor(101,210,210,210)), animationWaitStart(0),
 	OverrideFont(0), LastBreakFont(0), scrText(0), prev_time(0), scrolling(NO_SCROLLING), maxFrame(0), curFrame(0), animationStep(0)
 {
 	#ifdef _DEBUG
