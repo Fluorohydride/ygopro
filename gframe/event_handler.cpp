@@ -1576,7 +1576,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						should_show_tip = false;
-						mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
+						if(mcard->cover)
+							mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
+						else
+							mainGame->ClearCardInfo(mcard->controler);
 					}
 				}
 				hovered_card = mcard;
