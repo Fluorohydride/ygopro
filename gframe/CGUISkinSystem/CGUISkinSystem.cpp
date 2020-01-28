@@ -292,7 +292,7 @@ bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
 	for(int i = 0; i < children->size(); i++) {
 		core::stringw tmpchild = (*children)[i];
 		video::SColor color= registry->getValueAsColor((wtmp + tmpchild).c_str());
-		if(color != NULL) {
+		if(color.color) {
 			auto found = alias.find(tmpchild.c_str());
 			if(found != alias.end())
 				skin->setCustomColor(found->second, color);
