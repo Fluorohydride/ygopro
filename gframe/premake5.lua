@@ -81,12 +81,15 @@ local ygopro_config=function(static_core)
 
 	filter { "system:linux", "configurations:Debug" }
 		if _OPTIONS["vcpkg-root"] then
-			links { "fmtd", "curl-d" }
+			links { "png16d", "bz2d", "fmtd", "curl-d" }
 		else
 			links { "fmt", "curl" }
 		end
 
 	filter { "system:linux", "configurations:Release" }
+		if _OPTIONS["vcpkg-root"] then
+			links { "png", "bz2" }
+		end
 		links { "fmt", "curl" }	
 
 	filter "system:linux"
@@ -103,7 +106,7 @@ local ygopro_config=function(static_core)
 			links  "lua:static"
 		end
 		if _OPTIONS["vcpkg-root"] then
-			links { "ssl", "crypto", "z" }
+			links { "ssl", "crypto", "z", "jpeg", "Xxf86vm" }
 		end
 
 	filter "system:not windows"
