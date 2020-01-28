@@ -46,7 +46,7 @@ matrix:
     compiler: gcc  
     env:
     - BUILD_CONFIG=debug
-    - VCPKG_ROOT=./vcpkg
+    - VCPKG_ROOT="$PWD/vcpkg"
     - VCPKG_LIBS="libevent sqlite3 irrlicht-rectclip curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
     - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/latest/installed_x64-linux.7z
   - name: "Mojave"
