@@ -595,6 +595,7 @@ bool CGUICustomTable::OnEvent(const SEvent &event)
 							setSelected(Selected + 1);
 						}
 						break;
+					default: break;
 				}
 			}
 			break;

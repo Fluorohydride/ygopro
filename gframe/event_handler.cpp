@@ -1722,6 +1722,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							}
 						}
 						break;
+					default: break;
 				}
 				if(display_cards.size()) {
 					mainGame->wCardDisplay->setText(fmt::format(L"{}({})", dataManager.GetSysString(loc_id), display_cards.size()).c_str());
@@ -1925,7 +1926,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		case EGET_COMBO_BOX_CHANGED: {
+		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_CURRENT_SKIN: {
 				mainGame->gameConf.skin = Utils::ParseFilename(mainGame->cbCurrentSkin->getItem(mainGame->cbCurrentSkin->getSelected()));
@@ -1935,6 +1936,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		default: break;
 		}
 		break;
 	}

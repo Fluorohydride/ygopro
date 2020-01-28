@@ -259,6 +259,7 @@ bool CXMLRegistry::loadFile(const c8 *fname, const c8 *path) {
 				currentNode->addChild(newNode);
 				break;
 */
+			default: break;
 		}		
 	}
 	//if(xml) xml->drop();
