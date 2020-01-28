@@ -1,6 +1,5 @@
 #include "CGUISkinSystem.h"
 #include <map>
-#include <string>
 
 CGUISkinSystem::CGUISkinSystem(io::path path,IrrlichtDevice *dev) {
 	loaded_skin = nullptr;
@@ -46,15 +45,18 @@ bool CGUISkinSystem::loadSkinList() {
 		return false;
 }
 gui::CGUIProgressBar *CGUISkinSystem::addProgressBar(gui::IGUIElement *parent,core::rect<s32> rect, bool bindColorsToSkin) {
+	/*
 	gui::CGUIProgressBar* bar = new gui::CGUIProgressBar(parent,device->getGUIEnvironment(), rect,bindColorsToSkin);
 	//gui::CImageGUISkin* skin = (gui::CImageGUISkin*)device->getGUIEnvironment()->getSkin();
 	parent->addChild(bar);    
 	bar->drop();
-	return bar;
+	return bar;*/
+	return nullptr;
 }
 
 
 bool CGUISkinSystem::populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname) {
+	/*
 	bool ret = false;
 	io::path oldpath = fs->getWorkingDirectory();
 	fs->changeWorkingDirectoryTo(skinsPath);
@@ -66,8 +68,9 @@ bool CGUISkinSystem::populateTreeView(gui::IGUITreeView *control,const core::str
 	ret = registry->populateTreeView(control);
 	delete registry;
 	registry = NULL;
-	fs->changeWorkingDirectoryTo(oldpath);	
-	return ret;
+	fs->changeWorkingDirectoryTo(oldpath);
+	return ret;*/
+	return false;
 }
 
 void CGUISkinSystem::ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, const core::stringc& name, bool nullcolors) {
@@ -81,7 +84,7 @@ void CGUISkinSystem::ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, cons
 	if(!ctmp.size()) 
 		err += "Could not load texture property from skin file";	
 	
-	elem.Texture = device->getVideoDriver()->getTexture(ctmp);	
+	elem.Texture = device->getVideoDriver()->getTexture(workingDir + "/" + ctmp);
 	
 	box = registry->getValueAsRect((context + "/SrcBorder").c_str());
 	elem.SrcBorder.Top = box.UpperLeftCorner.X;
@@ -120,7 +123,7 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	s32 i,x;
 	core::stringc tmp;
 	core::stringw wtmp;
-	core::stringc path = "./";
+	core::stringc path = workingDir + "/./";
 	path += skinname;
 	if(!registry->loadFile(SKINSYSTEM_SKINFILE,path.c_str())) {
 		return NULL;
@@ -143,7 +146,8 @@ gui::CImageGUISkin* CGUISkinSystem::loadSkinFromFile(const fschar_t *skinname) {
 	fallbackSkin->drop();
 
 	skin = new gui::CImageGUISkin(device->getVideoDriver(), device->getGUIEnvironment()->getSkin());
-	fs->changeWorkingDirectoryTo(path.c_str());
+	workingDir = path;
+	//fs->changeWorkingDirectoryTo(path.c_str());
 	ParseGUIElementStyle(skinConfig.Button,"Button");
 	ParseGUIElementStyle(skinConfig.ButtonPressed, "Button/Pressed");
 	ParseGUIElementStyle(skinConfig.ButtonDisabled, "Button/ButtonDisabled");
@@ -301,13 +305,13 @@ bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
 	return false;
 }
 bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
-	io::path oldpath = fs->getWorkingDirectory();
-	fs->changeWorkingDirectoryTo(skinsPath);
+	/*io::path oldpath = fs->getWorkingDirectory();
+	fs->changeWorkingDirectoryTo(skinsPath);*/
+	workingDir = skinsPath;
 	registry = new CXMLRegistry(fs);
 	loaded_skin = nullptr;
 	gui::CImageGUISkin* skin = loadSkinFromFile(skinname);
 	if(skin == NULL) {
-		fs->changeWorkingDirectoryTo(oldpath);
 		return false;
 	}
     device->getGUIEnvironment()->setSkin(skin);
@@ -316,7 +320,7 @@ bool CGUISkinSystem::applySkin(const fschar_t *skinname) {
     skin->drop();	
 	delete registry;
 	registry = NULL;
-	fs->changeWorkingDirectoryTo(oldpath);
+	//fs->changeWorkingDirectoryTo(oldpath);
 	
 	return true;
 }

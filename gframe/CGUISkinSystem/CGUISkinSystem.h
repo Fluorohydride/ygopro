@@ -17,6 +17,7 @@ private :
 	IrrlichtDevice *device;
 	io::IFileSystem *fs;
 	io::path skinsPath;
+	io::path workingDir;
 	core::array<io::path> skinsList;
 	gui::IGUISkin* loaded_skin;
 	
