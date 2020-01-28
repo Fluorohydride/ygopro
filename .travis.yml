@@ -14,7 +14,6 @@ addons:
     packages:
     - p7zip-full
     - libfreetype6-dev
-    - libirrlicht-dev
     - libgl1-mesa-dev
     - libglu-dev
     - libasound2-dev
@@ -39,7 +38,7 @@ matrix:
     - BUILD_CONFIG=release
     - VCPKG_ROOT=/c/vcpkg
     - VCPKG_DEFAULT_TRIPLET=x86-windows-static
-    - VCPKG_LIBS="lua[cpp] libevent sqlite3 bzip2 libjpeg-turbo libpng zlib curl libgit2 fmt nlohmann-json sdl2-mixer-fixdynamic[libflac,mpg123,libvorbis] discord-rpc-payload"
+    - VCPKG_LIBS="lua[cpp] libevent sqlite3 bzip2 libjpeg-turbo libpng zlib curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
     - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/latest/installed_x86-windows-static.zip
     - DXSDK_DIR=/c/d3d9sdk/
   - name: "Bionic GCC7"
@@ -48,7 +47,7 @@ matrix:
     env:
     - BUILD_CONFIG=debug
     - VCPKG_ROOT=./vcpkg
-    - VCPKG_LIBS="libevent sqlite3 curl libgit2 fmt nlohmann-json sdl2-mixer-fixdynamic[libflac,mpg123,libvorbis] discord-rpc-payload"
+    - VCPKG_LIBS="libevent sqlite3 irrlicht-rectclip curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
     - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/latest/installed_x64-linux.7z
   - name: "Mojave"
     os: osx
