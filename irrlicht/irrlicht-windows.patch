@@ -301,3 +301,438 @@ diff -ur --strip-trailing-cr irrlicht/src/COSOperator.h irrlicht-fixed/src/COSOp
  
  	//! gets the processor speed in megahertz
  	//! \param Mhz:
+diff -ur --strip-trailing-cr irrlicht/include/IVideoDriver.h irrlicht-fixed/include/IVideoDriver.h
+--- irrlicht/include/IVideoDriver.h	2016-06-26 17:14:38.000000000 -0400
++++ irrlicht-fixed/include/IVideoDriver.h	2020-01-28 08:51:49.000000000 -0500
+@@ -931,6 +931,12 @@
+ 				SColor colorLeftDown, SColor colorRightDown,
+ 				const core::rect<s32>* clip =0) =0;
+
++
++		virtual void draw2DRectangleClip(const core::rect<s32>& pos,
++				SColor colorLeftUp, SColor colorRightUp,
++				SColor colorLeftDown, SColor colorRightDown,
++				const core::rect<s32>* clamp =0, const core::rect<s32>* clip =0) =0;
++
+ 		//! Draws the outline of a 2D rectangle.
+ 		/** \param pos Position of the rectangle.
+ 		\param color Color of the rectangle to draw. The alpha component
+diff -ur --strip-trailing-cr irrlicht/src/CD3D9Driver.cpp irrlicht-fixed/src/CD3D9Driver.cpp
+--- irrlicht/src/CD3D9Driver.cpp
++++ irrlicht-fixed/src/CD3D9Driver.cpp
+@@ -384,9 +384,16 @@ bool CD3D9Driver::initDriver(HWND hwnd, bool pureSoftware)
+ 	}
+ 	else
+ 	{
+-		HRESULT hr = pID3D->CreateDevice(adapter, devtype, hwnd,
++		HRESULT hr = pID3D->CreateDevice(0, devtype, hwnd,
+ 				fpuPrecision | multithreaded | D3DCREATE_HARDWARE_VERTEXPROCESSING, &present, &pID3DDevice);
+-
++		/*hr = pID3D->CreateDevice(1, devtype, hwnd,
++								 fpuPrecision | multithreaded | D3DCREATE_HARDWARE_VERTEXPROCESSING, &present, &pID3DDevice);*/
++		/*
++		hr = pID3D->CreateDevice(2, devtype, hwnd,
++								 fpuPrecision | multithreaded | D3DCREATE_HARDWARE_VERTEXPROCESSING, &present, &pID3DDevice);*/
++		UINT b = 0;
++		D3DFORMAT c;
++		volatile int a = pID3D->GetAdapterCount();
+ 		if(FAILED(hr))
+ 			hr = pID3D->CreateDevice(adapter, devtype, hwnd,
+ 					fpuPrecision | multithreaded | D3DCREATE_MIXED_VERTEXPROCESSING , &present, &pID3DDevice);
+@@ -1961,6 +1968,58 @@ void CD3D9Driver::draw2DRectangle(const core::rect<s32>& position,
+ 		D3DFMT_INDEX16, &vtx[0], sizeof(S3DVertex));
+ }
+ 
++//!Draws a 2d rectangle with a gradient and proper clip.
++void CD3D9Driver::draw2DRectangleClip(const core::rect<s32>& position,
++			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
++			const core::rect<s32>* clamp, const core::rect<s32>* clipRect)
++{
++	core::rect<s32> pos(position);
++
++	if (clamp)
++		pos.clipAgainst(*clamp);
++
++	if (!pos.isValid())
++		return;
++
++	S3DVertex vtx[4];
++	vtx[0] = S3DVertex((f32)pos.UpperLeftCorner.X, (f32)pos.UpperLeftCorner.Y, 0.0f,
++			0.0f, 0.0f, 0.0f, colorLeftUp, 0.0f, 0.0f);
++	vtx[1] = S3DVertex((f32)pos.LowerRightCorner.X, (f32)pos.UpperLeftCorner.Y, 0.0f,
++			0.0f, 0.0f, 0.0f, colorRightUp, 0.0f, 1.0f);
++	vtx[2] = S3DVertex((f32)pos.LowerRightCorner.X, (f32)pos.LowerRightCorner.Y, 0.0f,
++			0.0f, 0.0f, 0.0f, colorRightDown, 1.0f, 0.0f);
++	vtx[3] = S3DVertex((f32)pos.UpperLeftCorner.X, (f32)pos.LowerRightCorner.Y, 0.0f,
++			0.0f, 0.0f, 0.0f, colorLeftDown, 1.0f, 1.0f);
++
++	s16 indices[6] = {0,1,2,0,2,3};
++
++	setRenderStates2DMode(
++		colorLeftUp.getAlpha() < 255 ||
++		colorRightUp.getAlpha() < 255 ||
++		colorLeftDown.getAlpha() < 255 ||
++		colorRightDown.getAlpha() < 255, false, false);
++
++	setActiveTexture(0,0);
++
++	setVertexShader(EVT_STANDARD);
++
++	if(clipRect) {
++		pID3DDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
++		RECT scissor;
++		scissor.left = clipRect->UpperLeftCorner.X;
++		scissor.top = clipRect->UpperLeftCorner.Y;
++		scissor.right = clipRect->LowerRightCorner.X;
++		scissor.bottom = clipRect->LowerRightCorner.Y;
++		pID3DDevice->SetScissorRect(&scissor);
++	}
++
++	pID3DDevice->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, &indices[0],
++		D3DFMT_INDEX16, &vtx[0], sizeof(S3DVertex));
++
++	if(clipRect)
++		pID3DDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
++}
++
+ 
+ //! Draws a 2d line.
+ void CD3D9Driver::draw2DLine(const core::position2d<s32>& start,
+@@ -3286,56 +3345,118 @@ IImage* CD3D9Driver::createScreenShot(video::ECOLOR_FORMAT format, video::E_REND
+ 		return 0;
+ 
+ 	// query the screen dimensions of the current adapter
+-	D3DDISPLAYMODE displayMode;
+-	pID3DDevice->GetDisplayMode(0, &displayMode);
++	/*D3DDISPLAYMODE displayMode;
++	pID3D->GetAdapterDisplayMode(0, &displayMode);
++	int totalScreens = pID3D->GetAdapterCount();
++	for(int i = 1; i < totalScreens; i++) {
++		D3DDISPLAYMODE tmpdisplayMode;
++		pID3D->GetAdapterDisplayMode(i, &tmpdisplayMode);
++		displayMode.Width += tmpdisplayMode.Width;
++	}*/
+ 
+ 	if (format==video::ECF_UNKNOWN)
+ 		format=video::ECF_A8R8G8B8;
+ 
+ 	// create the image surface to store the front buffer image [always A8R8G8B8]
++	//HRESULT hr;
++	//LPDIRECT3DSURFACE9 back_buffer;
++	//// read the back buffer into the image surface
++	//if (FAILED(hr = pID3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &back_buffer)))
++	//{
++	//	back_buffer->Release();
++	//	return 0;
++	//}
++	//D3DSURFACE_DESC desc;
++	//back_buffer->GetDesc(&desc);
++	//LPDIRECT3DSURFACE9 lpSurface;
++	//if(FAILED(hr = pID3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &lpSurface, 0)))
++	//	return 0;
++	//// try to load dll
++	io::path strDllName = "d3dx9_";
++	strDllName += (int)D3DX_SDK_VERSION;
++	strDllName += ".dll";
++
++	HMODULE hMod = LoadLibrary(strDllName.c_str());
++	typedef HRESULT(WINAPI *AAA)(LPD3DXBUFFER*             ppDestBuf,
++								 D3DXIMAGE_FILEFORMAT      DestFormat,
++								 LPDIRECT3DSURFACE9        pSrcSurface,
++								 CONST PALETTEENTRY*       pSrcPalette,
++								 CONST RECT*               pSrcRect);
++	typedef HRESULT(WINAPI *BBB)(LPCWSTR                   pDestFile,
++								 D3DXIMAGE_FILEFORMAT      DestFormat,
++								 LPDIRECT3DSURFACE9        pSrcSurface,
++								 CONST PALETTEENTRY*       pSrcPalette,
++								 CONST RECT*               pSrcRect);
++	static AAA D3DXSaveSurfaceToFileInmemory = 0;
++	static BBB D3DXSaveSurfaceTofile = 0;
++	if(hMod) {
++		D3DXSaveSurfaceToFileInmemory = (AAA)GetProcAddress(hMod, "D3DXSaveSurfaceToFileInMemory");
++		D3DXSaveSurfaceTofile = (BBB)GetProcAddress(hMod, "D3DXSaveSurfaceToFileW");
++	}
++	//	/*if(!pFn) {
++	//		LoadFailed = true;
++	//		os::Printer::log("Could not load shader function D3DXCompileShaderFromFileA from dll, shaders disabled",
++	//						 strDllName.c_str(), ELL_ERROR);
++	//	}*/
++		
++	//if(FAILED(hr = pID3DDevice->GetRenderTargetData(back_buffer, lpSurface)))
++	//	return 0;
++	//back_buffer->Release();
++
++	//// lock our area of the surface
++	//D3DLOCKED_RECT lockedRect;
++	//hr = lpSurface->LockRect(&lockedRect, NULL, D3DLOCK_READONLY);
++	//if (hr < 0)
++	//{
++	//	lpSurface->Release();
++	//	return 0;
++	//}
+ 	HRESULT hr;
+-	LPDIRECT3DSURFACE9 lpSurface;
+-	if (FAILED(hr = pID3DDevice->CreateOffscreenPlainSurface(displayMode.Width, displayMode.Height, D3DFMT_A8R8G8B8, D3DPOOL_SCRATCH, &lpSurface, 0)))
+-		return 0;
+-
+-	// read the front buffer into the image surface
+-	if (FAILED(hr = pID3DDevice->GetFrontBufferData(0, lpSurface)))
+ 	{
++		D3DDISPLAYMODE displayMode;
++		pID3DDevice->GetDisplayMode(0, &displayMode);
++		LPDIRECT3DSURFACE9 lpSurface;
++		if(FAILED(hr = pID3DDevice->CreateOffscreenPlainSurface(1366+1024, displayMode.Height, D3DFMT_A8R8G8B8, D3DPOOL_SCRATCH, &lpSurface, 0)))
++			return 0;
++
++		// read the front buffer into the image surface
++		if(FAILED(hr = pID3DDevice->GetFrontBufferData(0, lpSurface))) {
++			lpSurface->Release();
++			return 0;
++		}
++		D3DXSaveSurfaceTofile(L"Desktop2.bmp", D3DXIFF_BMP, lpSurface, NULL, NULL);
+ 		lpSurface->Release();
+-		return 0;
+ 	}
+-
+-	RECT clientRect;
+-	{
+-		POINT clientPoint;
+-		clientPoint.x = 0;
+-		clientPoint.y = 0;
+-
+-		ClientToScreen((HWND)getExposedVideoData().D3D9.HWnd, &clientPoint);
+-
+-		clientRect.left   = clientPoint.x;
+-		clientRect.top	= clientPoint.y;
+-		clientRect.right  = clientRect.left + ScreenSize.Width;
+-		clientRect.bottom = clientRect.top  + ScreenSize.Height;
+-
+-		// window can be off-screen partly, we can't take screenshots from that
+-		clientRect.left = core::max_(clientRect.left, 0l);
+-		clientRect.top = core::max_(clientRect.top, 0l);
+-		clientRect.right = core::min_(clientRect.right, (long)displayMode.Width);
+-		clientRect.bottom = core::min_(clientRect.bottom, (long)displayMode.Height );
++	LPDIRECT3DSURFACE9 back_buffer = NULL;
++	pID3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &back_buffer);
++	D3DLOCKED_RECT d3dlr;
++	D3DSURFACE_DESC desc;
++	LPDIRECT3DSURFACE9 offscreen_surface = NULL;
++	back_buffer->GetDesc(&desc);
++	if(FAILED(hr = pID3DDevice->CreateOffscreenPlainSurface(desc.Width, desc.Height, desc.Format, D3DPOOL_SYSTEMMEM, &offscreen_surface, NULL))) {
++		return 0;
+ 	}
++	//D3DXLoadSurfaceFromSurface()
++	//RECT a = { 0, 0, desc.Width, desc.Height };
+ 
+-	// lock our area of the surface
+-	D3DLOCKED_RECT lockedRect;
+-	if (FAILED(lpSurface->LockRect(&lockedRect, &clientRect, D3DLOCK_READONLY)))
+-	{
+-		lpSurface->Release();
++	/*if(FAILED(hr = pID3DDevice->StretchRect(back_buffer, &a, offscreen_surface, &a, D3DTEXF_NONE))) {
++		return 0;
++	}*/
++	if(FAILED(hr = pID3DDevice->GetRenderTargetData(back_buffer, offscreen_surface))) {
++		offscreen_surface->Release();
++		back_buffer->Release();
+ 		return 0;
+ 	}
++	offscreen_surface->LockRect(&d3dlr, NULL, D3DLOCK_NO_DIRTY_UPDATE | D3DLOCK_READONLY);
++	LPD3DXBUFFER buffer;
++	/*D3DXSaveSurfaceToFileInmemory(&buffer, D3DXIFF_BMP, back_buffer, NULL, NULL);
++	volatile DWORD imSize = buffer->GetBufferSize();
++	volatile void* imgBuffer = buffer->GetBufferPointer();
++	buffer->Release();*/
+ 
+ 	irr::core::dimension2d<u32> shotSize;
+-	shotSize.Width = core::min_( ScreenSize.Width, (u32)(clientRect.right-clientRect.left) );
+-	shotSize.Height = core::min_( ScreenSize.Height, (u32)(clientRect.bottom-clientRect.top) );
++	shotSize.Width = desc.Width;
++	shotSize.Height = desc.Height;
+ 
+ 	// this could throw, but we aren't going to worry about that case very much
+ 	IImage* newImage = createImage(format, shotSize);
+@@ -3344,12 +3465,12 @@ IImage* CD3D9Driver::createScreenShot(video::ECOLOR_FORMAT format, video::E_REND
+ 	{
+ 		// d3d pads the image, so we need to copy the correct number of bytes
+ 		u32* dP = (u32*)newImage->lock();
+-		u8 * sP = (u8 *)lockedRect.pBits;
++		u8 * sP = (u8 *)d3dlr.pBits;
+ 
+ 		// If the display mode format doesn't promise anything about the Alpha value
+ 		// and it appears that it's not presenting 255, then we should manually
+ 		// set each pixel alpha value to 255.
+-		if (D3DFMT_X8R8G8B8 == displayMode.Format && (0xFF000000 != (*dP & 0xFF000000)))
++		if (D3DFMT_X8R8G8B8 == desc.Format && (0xFF000000 != (*dP & 0xFF000000)))
+ 		{
+ 			for (u32 y = 0; y < shotSize.Height; ++y)
+ 			{
+@@ -3359,7 +3480,7 @@ IImage* CD3D9Driver::createScreenShot(video::ECOLOR_FORMAT format, video::E_REND
+ 					sP += 4;
+ 				}
+ 
+-				sP += lockedRect.Pitch - (4 * shotSize.Width);
++				sP += d3dlr.Pitch - (4 * shotSize.Width);
+ 			}
+ 		}
+ 		else
+@@ -3367,19 +3488,22 @@ IImage* CD3D9Driver::createScreenShot(video::ECOLOR_FORMAT format, video::E_REND
+ 			for (u32 y = 0; y < shotSize.Height; ++y)
+ 			{
+ 				convertColor(sP, video::ECF_A8R8G8B8, shotSize.Width, dP, format);
+-				sP += lockedRect.Pitch;
++				sP += d3dlr.Pitch;
+ 				dP += shotSize.Width;
+ 			}
+ 		}
+ 
+ 		newImage->unlock();
+ 	}
++	offscreen_surface->UnlockRect();
++	offscreen_surface->Release();
++	back_buffer->Release();
+ 
+ 	// we can unlock and release the surface
+-	lpSurface->UnlockRect();
++	//lpSurface->UnlockRect();
+ 
+ 	// release the image surface
+-	lpSurface->Release();
++	//lpSurface->Release();
+ 
+ 	// return status of save operation to caller
+ 	return newImage;
+diff -ur --strip-trailing-cr irrlicht/src/CD3D9Driver.h irrlicht-fixed/src/CD3D9Driver.h
+--- irrlicht/src/CD3D9Driver.h
++++ irrlicht-fixed/src/CD3D9Driver.h
+@@ -183,6 +183,11 @@ namespace video
+ 			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
+ 			const core::rect<s32>* clip);
+ 
++		//!Draws an 2d rectangle with a gradient and proper clip.
++		virtual void draw2DRectangleClip(const core::rect<s32>& pos,
++			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
++			const core::rect<s32>* clamp = 0, const core::rect<s32>* clip = 0);
++
+ 		//! Draws a 2d line.
+ 		virtual void draw2DLine(const core::position2d<s32>& start,
+ 					const core::position2d<s32>& end,
+diff -ur --strip-trailing-cr irrlicht/src/CNullDriver.cpp irrlicht-fixed/src/CNullDriver.cpp
+--- irrlicht/src/CNullDriver.cpp
++++ irrlicht-fixed/src/CNullDriver.cpp
+@@ -808,10 +808,18 @@ void CNullDriver::draw2DRectangle(SColor color, const core::rect<s32>& pos, cons
+ //! Draws a 2d rectangle with a gradient.
+ void CNullDriver::draw2DRectangle(const core::rect<s32>& pos,
+ 	SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
+-	const core::rect<s32>* clip)
++	const core::rect<s32>* clamp)
+ {
+ }
+ 
++//! Draws a 2d rectangle with a gradient.
++void CNullDriver::draw2DRectangleClip(const core::rect<s32>& pos,
++	SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
++	const core::rect<s32>* clamp, const core::rect<s32>* clip)
++{
++	draw2DRectangle(pos, colorLeftUp, colorRightUp, colorLeftDown, colorRightDown, clip);
++}
++
+ 
+ 
+ //! Draws a 2d line.
+diff -ur --strip-trailing-cr irrlicht/src/CNullDriver.h irrlicht-fixed/src/CNullDriver.h
+--- irrlicht/src/CNullDriver.h
++++ irrlicht-fixed/src/CNullDriver.h
+@@ -208,7 +208,12 @@ namespace video
+ 		//! Draws a 2d rectangle with a gradient.
+ 		virtual void draw2DRectangle(const core::rect<s32>& pos,
+ 			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
+-			const core::rect<s32>* clip = 0);
++			const core::rect<s32>* clamp = 0);
++
++		//! Draws a 2d rectangle with a gradient.
++		virtual void draw2DRectangleClip(const core::rect<s32>& pos,
++			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
++			const core::rect<s32>* clamp = 0, const core::rect<s32>* clip = 0);
+ 
+ 		//! Draws the outline of a 2d rectangle
+ 		virtual void draw2DRectangleOutline(const core::recti& pos, SColor color=SColor(255,255,255,255));
+diff -ur --strip-trailing-cr irrlicht/src/COpenGLDriver.cpp irrlicht-fixed/src/COpenGLDriver.cpp
+--- irrlicht/src/COpenGLDriver.cpp
++++ irrlicht-fixed/src/COpenGLDriver.cpp
+@@ -2379,6 +2379,60 @@ void COpenGLDriver::draw2DRectangle(const core::rect<s32>& position,
+ }
+ 
+ 
++void COpenGLDriver::draw2DRectangleClip(const core::rect<s32>& position,
++			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
++			const core::rect<s32>* clamp, const core::rect<s32>* clipRect)
++{
++	core::rect<s32> pos = position;
++
++	if (clamp)
++		pos.clipAgainst(*clamp);
++
++	if (!pos.isValid())
++		return;
++
++	disableTextures();
++
++	if (clipRect)
++	{
++		if (!clipRect->isValid())
++			return;
++
++		glEnable(GL_SCISSOR_TEST);
++		const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
++		glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height-clipRect->LowerRightCorner.Y,
++			clipRect->getWidth(), clipRect->getHeight());
++	}
++
++	setRenderStates2DMode(colorLeftUp.getAlpha() < 255 ||
++		colorRightUp.getAlpha() < 255 ||
++		colorLeftDown.getAlpha() < 255 ||
++		colorRightDown.getAlpha() < 255, false, false);
++
++	glBegin(GL_QUADS);
++	glColor4ub(colorLeftUp.getRed(), colorLeftUp.getGreen(),
++		colorLeftUp.getBlue(), colorLeftUp.getAlpha());
++	glVertex2f(GLfloat(pos.UpperLeftCorner.X), GLfloat(pos.UpperLeftCorner.Y));
++
++	glColor4ub(colorRightUp.getRed(), colorRightUp.getGreen(),
++		colorRightUp.getBlue(), colorRightUp.getAlpha());
++	glVertex2f(GLfloat(pos.LowerRightCorner.X), GLfloat(pos.UpperLeftCorner.Y));
++
++	glColor4ub(colorRightDown.getRed(), colorRightDown.getGreen(),
++		colorRightDown.getBlue(), colorRightDown.getAlpha());
++	glVertex2f(GLfloat(pos.LowerRightCorner.X), GLfloat(pos.LowerRightCorner.Y));
++
++	glColor4ub(colorLeftDown.getRed(), colorLeftDown.getGreen(),
++		colorLeftDown.getBlue(), colorLeftDown.getAlpha());
++	glVertex2f(GLfloat(pos.UpperLeftCorner.X), GLfloat(pos.LowerRightCorner.Y));
++
++	glEnd();
++
++	if(clipRect)
++		glDisable(GL_SCISSOR_TEST);
++}
++
++
+ //! Draws a 2d line.
+ void COpenGLDriver::draw2DLine(const core::position2d<s32>& start,
+ 				const core::position2d<s32>& end, SColor color)
+diff -ur --strip-trailing-cr irrlicht/src/COpenGLDriver.h irrlicht-fixed/src/COpenGLDriver.h
+--- irrlicht/src/COpenGLDriver.h
++++ irrlicht-fixed/src/COpenGLDriver.h
+@@ -201,6 +201,11 @@ namespace video
+ 			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
+ 			const core::rect<s32>* clip = 0);
+ 
++		//!Draws an 2d rectangle with a gradient and proper clip.
++		virtual void draw2DRectangleClip(const core::rect<s32>& pos,
++			SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
++			const core::rect<s32>* clamp = 0, const core::rect<s32>* clip = 0);
++
+ 		//! Draws a 2d line.
+ 		virtual void draw2DLine(const core::position2d<s32>& start,
+ 					const core::position2d<s32>& end,
