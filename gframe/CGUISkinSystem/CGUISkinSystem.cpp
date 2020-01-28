@@ -1,5 +1,6 @@
 #include "CGUISkinSystem.h"
 #include <map>
+#include <string>
 
 CGUISkinSystem::CGUISkinSystem(io::path path,IrrlichtDevice *dev) {
 	loaded_skin = nullptr;
