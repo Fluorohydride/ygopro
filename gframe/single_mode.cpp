@@ -53,6 +53,8 @@ int SingleMode::SinglePlayThread() {
 	mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 45));
 	time_t seed = time(0);
 	DuelClient::rnd.seed(seed);
+	is_continuing = false;
+	is_restarting = false;
 restart:
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { start_lp, start_hand, draw_count };
