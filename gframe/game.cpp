@@ -509,7 +509,7 @@ bool Game::Initialize() {
 	scrSoundVolume->setSmallStep(1);
 	chkQuickAnimation = env->addCheckBox(false, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
-	cbCurrentSkin = env->addComboBox(Scale(90, 415, 190, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
+	cbCurrentSkin = env->addComboBox(Scale(90, 415, 270, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
 	int sel_skin = cbCurrentSkin->addItem(L"none");
 	auto skins = skinSystem->listSkins();
 	for(int i = skins.size() - 1; i >= 0; i--) {
