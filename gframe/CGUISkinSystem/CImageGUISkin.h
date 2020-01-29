@@ -84,6 +84,10 @@ public:
             const core::rect<s32>& rect,
             const core::rect<s32>* clip=0);
 
+    virtual void draw3DButtonPaneDisabled(IGUIElement* element,
+            const core::rect<s32>& rect,
+            const core::rect<s32>* clip=0);
+
     virtual void draw3DButtonPanePressed(IGUIElement* element, 
             const core::rect<s32>& rect,
             const core::rect<s32>* clip=0);
