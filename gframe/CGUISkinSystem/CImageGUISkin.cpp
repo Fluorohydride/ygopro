@@ -154,7 +154,7 @@ void CImageGUISkin::draw3DButtonPaneDisabled(IGUIElement* element,
 		return;
 	}
 
-	VideoDriver->draw2DRectangle(getColor(EGDC_3D_SHADOW), rect, clip);
+	VideoDriver->draw2DRectangle(getColor(EGDC_3D_DARK_SHADOW), rect, clip);
 
 	rect.LowerRightCorner.X -= 1;
 	rect.LowerRightCorner.Y -= 1;

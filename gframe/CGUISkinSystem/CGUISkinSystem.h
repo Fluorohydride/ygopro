@@ -26,6 +26,8 @@ private :
 	void ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, const core::stringc& name,bool nullcolors=false);
 	bool checkSkinColor(gui::EGUI_DEFAULT_COLOR colToSet,const wchar_t *context,gui::CImageGUISkin *skin);
 	bool checkSkinSize(gui::EGUI_DEFAULT_SIZE sizeToSet,const wchar_t *context,const wchar_t *key,gui::CImageGUISkin *skin);
+	bool checkSkinIcon(gui::EGUI_DEFAULT_ICON iconToSet,const wchar_t *context,gui::CImageGUISkin *skin);
+	bool checkSkinText(gui::EGUI_DEFAULT_TEXT textToSet, const wchar_t *context, gui::CImageGUISkin *skin);
 	bool loadProperty(core::stringw key,gui::CImageGUISkin *skin);
 	bool loadCustomColors(gui::CImageGUISkin *skin);
 public:

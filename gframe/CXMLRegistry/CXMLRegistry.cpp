@@ -140,6 +140,14 @@ irr::video::SColor CXMLRegistry::getValueAsColor(const wchar_t *context) {
 	if(!targetNode) return { 0 };
 	irr::u32 r,g,b,a;
 	irr::core::stringw tmp;
+	auto tmpptr = targetNode->findChildByName(L"color");
+	if(tmpptr) {
+		tmp = tmpptr->getValue();
+		if(tmp.size()) {
+			r = strtol(irr::core::stringc(tmp).c_str(), NULL, 16);
+			return irr::video::SColor(r);
+		}
+	}
 	tmp = targetNode->findChildByName(L"r")->getValue();
 	if(tmp.size()) r = _wtoi(tmp.c_str());
 	tmp = targetNode->findChildByName(L"g")->getValue();
