@@ -389,8 +389,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
-				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstReplayList->getSelected()))
-					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstReplayList->getSelected());
+				if(mainGame->lstReplayList->isDirectory(mainGame->lstReplayList->getSelected()))
+					mainGame->lstReplayList->enterDirectory(mainGame->lstReplayList->getSelected());
 				else
 					LoadReplay();
 				break;
@@ -644,8 +644,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 			}
 			case LISTBOX_REPLAY_LIST: {
-				if(mainGame->lstSinglePlayList->isDirectory(mainGame->lstReplayList->getSelected()))
-					mainGame->lstSinglePlayList->enterDirectory(mainGame->lstReplayList->getSelected());
+				if(mainGame->lstReplayList->isDirectory(mainGame->lstReplayList->getSelected()))
+					mainGame->lstReplayList->enterDirectory(mainGame->lstReplayList->getSelected());
 				else
 					LoadReplay();
 				break;
