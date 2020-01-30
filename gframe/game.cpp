@@ -1440,6 +1440,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 	static bool firstrun = true;
 	bool applied = true;
 	auto reapply_colors = [&] () {
+		wCardImg->setBackgroundColor(skin::CARDINFO_IMAGE_BACKGROUND_VAL);
 		stInfo->setOverrideColor(skin::CARDINFO_TYPES_COLOR_VAL);
 		stDataInfo->setOverrideColor(skin::CARDINFO_STATS_COLOR_VAL);
 		stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
