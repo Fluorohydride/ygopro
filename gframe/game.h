@@ -156,7 +156,7 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
-	void ApplySkin(const path_string& skin, bool reload = false);
+	bool ApplySkin(const path_string& skin, bool reload = false);
 	void LoadZipArchives();
 	void LoadExpansionDB();
 	void LoadArchivesDB();
