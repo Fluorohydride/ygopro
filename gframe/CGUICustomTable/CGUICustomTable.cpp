@@ -950,17 +950,14 @@ void CGUICustomTable::draw()
 	core::rect<s32> rowRect(scrolledTableClient);
 	rowRect.LowerRightCorner.Y = rowRect.UpperLeftCorner.Y + ItemHeight;
 
-	irr::video::SColor red = irr::video::SColor(255, 255, 100, 100);
-	irr::video::SColor gray = irr::video::SColor(100, 211, 211, 211);
-	irr::video::SColor normal = irr::video::SColor(255, 255, 255, 255);
+	/*irr::video::SColor red = irr::video::SColor(255, 255, 100, 100);
+	irr::video::SColor gray = irr::video::SColor(100, 211, 211, 211);*/
+	static const irr::video::SColor normal = irr::video::SColor(255, 255, 255, 255);
 	u32 pos;
 	for ( u32 i = 0 ; i < Rows.size() ; ++i )
 	{
-		if(Rows[i].Items[0].Color == red) {
-			driver->draw2DRectangle(video::SColor(150, 250, 50, 50), rowRect, &AbsoluteClippingRect);
-			//skin->draw3DSunkenPane(this, video::SColor(150, 250, 50, 50), true, DrawBack, rowRect, &AbsoluteClippingRect);
-		} else if(Rows[i].Items[0].Color == gray) {
-			skin->draw3DSunkenPane(this, gray, true, DrawBack, rowRect, &AbsoluteClippingRect);
+		if(Rows[i].Items[0].IsOverrideColor) {
+			skin->draw3DSunkenPane(this, Rows[i].Items[0].Color, true, DrawBack, rowRect, &AbsoluteClippingRect);
 		}
 
 		if (rowRect.LowerRightCorner.Y >= AbsoluteRect.UpperLeftCorner.Y &&
