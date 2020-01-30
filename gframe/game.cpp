@@ -1403,7 +1403,7 @@ void Game::MainLoop() {
 			if(delta > 0) {
 				auto t = timer->getRealTime();
 				while((timer->getRealTime() - t) < delta) {
-					device->yield();
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				}
 			}
 		}
@@ -1420,7 +1420,7 @@ void Game::MainLoop() {
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
-		device->yield();
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();
