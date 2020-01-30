@@ -1095,7 +1095,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_HINT: {
 		uint8_t type = BufferIO::Read<uint8_t>(pbuf);
-		uint8_t player = BufferIO::Read<uint8_t>(pbuf);
+		uint8_t player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 		uint64_t data = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
@@ -1183,7 +1183,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_ZONE: {
-			if(mainGame->LocalPlayer(player) == 1)
+			if(player == 1)
 				data = (data >> 16) | (data << 16);
 			for(unsigned filter = 0x1; filter != 0; filter <<= 1) {
 				std::wstring str;
