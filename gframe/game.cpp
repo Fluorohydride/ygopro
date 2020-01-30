@@ -1365,34 +1365,6 @@ void Game::MainLoop() {
 			CloseDuelWindow();
 		else
 			closeSignal.unlock();
-#ifndef __ANDROID__
-#ifdef __APPLE__
-		// Recent versions of macOS break OpenGL vsync while offscreen, resulting in
-		// astronomical FPS and CPU usage. As a workaround, while the game window is
-		// fully occluded, the game is restricted to 30 FPS.
-		int fpsLimit = device->isWindowActive() ? gameConf.max_fps : 30;
-		if (!device->isWindowActive() || (gameConf.max_fps && !gameConf.use_vsync)) {
-#else
-		int fpsLimit = gameConf.max_fps;
-		if (gameConf.max_fps && !gameConf.use_vsync) {
-#endif
-			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
-			if (delta >= 20)
-				std::this_thread::sleep_for(std::chrono::milliseconds(delta));
-		}
-#endif
-		while(cur_time >= 1000) {
-#ifndef __ANDROID__
-			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
-#else
-			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
-#endif
-			fps = 0;
-			cur_time -= 1000;
-			if(dInfo.time_player == 0 || dInfo.time_player == 1)
-				if(dInfo.time_left[dInfo.time_player])
-					dInfo.time_left[dInfo.time_player]--;
-		}
 		if (DuelClient::try_needed) {
 			DuelClient::try_needed = false;
 			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, dInfo.secret.game_id, false);
@@ -1415,6 +1387,38 @@ void Game::MainLoop() {
 			env->setFocus(stACMessage);
 			stACMessage->setText(dataManager.GetSysString(1438).c_str());
 			PopupElement(wACMessage, 30);
+		}
+#ifndef __ANDROID__
+#ifdef __APPLE__
+		// Recent versions of macOS break OpenGL vsync while offscreen, resulting in
+		// astronomical FPS and CPU usage. As a workaround, while the game window is
+		// fully occluded, the game is restricted to 30 FPS.
+		int fpsLimit = device->isWindowActive() ? gameConf.max_fps : 30;
+		if (!device->isWindowActive() || (gameConf.max_fps && !gameConf.use_vsync)) {
+#else
+		int fpsLimit = gameConf.max_fps;
+		if (gameConf.max_fps && !gameConf.use_vsync) {
+#endif
+			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
+			if(delta > 0) {
+				auto t = timer->getRealTime();
+				while((timer->getRealTime() - t) < delta) {
+					device->yield();
+				}
+			}
+		}
+#endif
+		while(cur_time >= 1000) {
+#ifndef __ANDROID__
+			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
+#else
+			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
+#endif
+			fps = 0;
+			cur_time -= 1000;
+			if(dInfo.time_player == 0 || dInfo.time_player == 1)
+				if(dInfo.time_left[dInfo.time_player])
+					dInfo.time_left[dInfo.time_player]--;
 		}
 		device->yield();
 	}
