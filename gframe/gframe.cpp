@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 #else
 	evthread_use_pthreads();
 #endif //_WIN32
-	ygo::Game _game;
+	ygo::Game _game{};
 	ygo::mainGame = &_game;
 #ifdef __ANDROID__
 	ygo::mainGame->appMain = porting::app_global;

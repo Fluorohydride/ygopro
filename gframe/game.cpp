@@ -171,6 +171,9 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load font(s)!");
 		return false;
 	}
+	if(!ApplySkin(gameConf.skin)) {
+		gameConf.skin = EPRO_TEXT("none");
+	}
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"EDOPro");
 	device->setResizable(true);
@@ -520,10 +523,10 @@ bool Game::Initialize() {
 	}
 	cbCurrentSkin->setSelected(sel_skin);
 	btnReloadSkin = env->addButton(Scale(90, 445, 190, 475), tabPanel, BUTTON_RELOAD_SKIN, L"Reload Skin");
-	if(sel_skin == 0) {
+	/*if(sel_skin == 0) {
 		gameConf.skin = EPRO_TEXT("none");
-	}
-	ApplySkin(gameConf.skin);
+	}*/
+	//ApplySkin(gameConf.skin);
 	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
@@ -1432,9 +1435,10 @@ void Game::MainLoop() {
 #endif //YGOPRO_BUILD_DLL
 	//device->drop();
 }
-void Game::ApplySkin(const path_string& skinname, bool reload) {
+bool Game::ApplySkin(const path_string& skinname, bool reload) {
 	static path_string prev_skin = EPRO_TEXT("");
 	static bool firstrun = true;
+	bool applied = true;
 	auto reapply_colors = [&] () {
 		stInfo->setOverrideColor(skin::CARDINFO_TYPES_COLOR_VAL);
 		stDataInfo->setOverrideColor(skin::CARDINFO_STATS_COLOR_VAL);
@@ -1473,7 +1477,7 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 		}
 	};
 	if(!skinSystem || skinname == prev_skin || (reload && prev_skin == EPRO_TEXT("")))
-		return;
+		return false;
 	if(!reload)
 		prev_skin = skinname;
 	if(prev_skin == EPRO_TEXT("none")) {
@@ -1482,13 +1486,19 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 		skin->drop();
 		skin::ResetDefaults();
 	} else {
-		if(!skinSystem->applySkin(prev_skin.c_str()))
-			return;
+		if(skinSystem->applySkin(prev_skin.c_str())) {
 #define CLR(val1,val2,val3,val4) irr::video::SColor(val1,val2,val3,val4)
 #define DECLR(what,val) skin::what##_VAL = skinSystem->getCustomColor(skin::what,val);
 #include "custom_skin_enum.inl"
 #undef DECLR
 #undef CLR
+		} else {
+			applied = false;
+			auto skin = env->createSkin(gui::EGST_WINDOWS_METALLIC);
+			env->setSkin(skin);
+			skin->drop();
+			skin::ResetDefaults();
+		}
 	}
 	auto skin = env->getSkin();
 	skin->setFont(guiFont);
@@ -1506,7 +1516,8 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 	SKIN_SCALE(EGDS_MESSAGE_BOX_GAP_SPACE)
 #undef SKIN_SCALE
 	if(wInfos) {
-		wInfos->setTabHeight(skin->getSize(EGDS_BUTTON_HEIGHT));
+		wInfos->setTabHeight(skin->getSize(EGDS_BUTTON_HEIGHT) + Scale(2));
+		wInfos->setTabVerticalAlignment(irr::gui::EGUIA_UPPERLEFT);
 	}
 	if(prev_skin == EPRO_TEXT("none")){
 		for (u32 i = 0; i < EGDC_COUNT; ++i) {
@@ -1518,7 +1529,9 @@ void Game::ApplySkin(const path_string& skinname, bool reload) {
 	if(!firstrun)
 		reapply_colors();
 	firstrun = false;
-	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
+	if(wAbout)
+		wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
+	return applied;
 }
 void Game::LoadZipArchives() {
 	irr::io::IFileArchive* tmp_archive = nullptr;
@@ -2041,7 +2054,8 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 		stSetName->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stSetName->getTextHeight()));
 		offset += stSetName->getTextHeight();
 	}
-	stText->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), Scale(324 * window_scale.Y)));
+	auto parent = stText->getParent();
+	stText->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), parent->getAbsolutePosition().getHeight() - Scale(1)));
 	stText->setText(dataManager.GetText(code).c_str());
 }
 void Game::ClearCardInfo(int player) {
@@ -2430,17 +2444,30 @@ void Game::OnResize() {
 		window.second.history_button2->setRelativePosition(recti(ResizeX(200), 5, ResizeX(300 - 5), Scale(20 + 10)));
 	}
 	stName->setRelativePosition(Scale(10, 10, 287 * window_scale.X, 32));
-	lstLog->setRelativePosition(Resize(10, 10, infosExpanded ? 1012 : 290, 290));
-	lstChat->setRelativePosition(Resize(10, 10, infosExpanded ? 1012 : 290, 290));
-	imageManager.ClearTexture(true);
-
 	if(showingcard)
 		ShowCardInfo(showingcard, true);
-	btnClearLog->setRelativePosition(Resize(160, 300, 260, 325));
-	btnExpandLog->setRelativePosition(Resize(40, 300, 140, 325));
-	btnClearChat->setRelativePosition(Resize(160, 300, 260, 325));
-	btnExpandChat->setRelativePosition(Resize(40, 300, 140, 325));
-	tabSystem->setRelativePosition(Resize(0, 0, 300, 364));
+
+	auto logParentHeight = lstLog->getParent()->getAbsolutePosition().getHeight();
+
+	auto clearSize = Resize(160, 300 - Scale(7), 260, 325 - Scale(7));
+	auto expandSize = Resize(40, 300 - Scale(7), 140, 325 - Scale(7));
+
+	btnClearLog->setRelativePosition(clearSize);
+	btnExpandLog->setRelativePosition(expandSize);
+
+	btnClearChat->setRelativePosition(clearSize);
+	btnExpandChat->setRelativePosition(expandSize);
+
+	auto lstsSize = Resize(10, 10, infosExpanded ? 1012 : 290, 0);
+	lstsSize.LowerRightCorner.Y = expandSize.UpperLeftCorner.Y - Scale(10);
+
+	lstLog->setRelativePosition(lstsSize);
+	lstChat->setRelativePosition(lstsSize);
+
+	imageManager.ClearTexture(true);
+
+	auto tabsystemParentPos = tabSystem->getParent()->getAbsolutePosition();
+	tabSystem->setRelativePosition(recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
 	scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(325), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(340)));
 	scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(355), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(370)));
 
