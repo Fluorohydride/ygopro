@@ -83,8 +83,7 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 					cs.desc[i] = BufferIO::DecodeUTF8s(text);
 				}
 			}
-			_strings[cd.code] = std::move(cs);
-			_datas[cd.code] = std::move(cd);
+			cards[cd.code] = std::make_pair(std::move(cd), std::move(cs));
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
@@ -133,40 +132,40 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	return false;
 }
 bool DataManager::GetData(int code, CardData* pData) {
-	auto cdit = _datas.find(code);
-	if(cdit == _datas.end())
+	auto cdit = cards.find(code);
+	if(cdit == cards.end())
 		return false;
 	if(pData)
-		*pData = *((CardData*)&cdit->second);
+		*pData = *((CardData*)&cdit->second.first);
 	return true;
 }
 CardDataC* DataManager::GetCardData(int code) {
-	auto it = _datas.find(code);
-	if(it != _datas.end())
-		return &it->second;
+	auto it = cards.find(code);
+	if(it != cards.end())
+		return &it->second.first;
 	return nullptr;
 }
 bool DataManager::GetString(int code, CardString* pStr) {
-	auto csit = _strings.find(code);
-	if(csit == _strings.end()) {
+	auto csit = cards.find(code);
+	if(csit == cards.end()) {
 		pStr->name = unknown_string;
 		pStr->text = unknown_string;
 		return false;
 	}
-	*pStr = csit->second;
+	*pStr = csit->second.second;
 	return true;
 }
 std::wstring DataManager::GetName(int code) {
-	auto csit = _strings.find(code);
-	if(csit == _strings.end() || csit->second.name.empty())
+	auto csit = cards.find(code);
+	if(csit == cards.end() || csit->second.second.name.empty())
 		return unknown_string;
-	return csit->second.name;
+	return csit->second.second.name;
 }
 std::wstring DataManager::GetText(int code) {
-	auto csit = _strings.find(code);
-	if(csit == _strings.end() || csit->second.text.empty())
+	auto csit = cards.find(code);
+	if(csit == cards.end() || csit->second.second.text.empty())
 		return unknown_string;
-	return csit->second.text;
+	return csit->second.second.text;
 }
 std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
 	uint32 code = 0;
@@ -182,10 +181,10 @@ std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
 	}
 	if(code == 0)
 		return GetSysString(stringid);
-	auto csit = _strings.find(code);
-	if(csit == _strings.end() || csit->second.desc[stringid].empty())
+	auto csit = cards.find(code);
+	if(csit == cards.end() || csit->second.second.desc[stringid].empty())
 		return unknown_string;
-	return csit->second.desc[stringid];
+	return csit->second.second.desc[stringid];
 }
 std::wstring DataManager::GetSysString(uint64 code) {
 	if(code >> 32)

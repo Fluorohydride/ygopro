@@ -1413,17 +1413,18 @@ void ClientField::UpdateDeclarableList() {
 	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
-	for(auto& string : dataManager._strings) {
+	for(auto& _string : dataManager.cards) {
+		auto& string = _string.second;
 		if(Utils::ContainsSubstring(string.second.name.c_str(), pname, true, true)) {
-			auto cp = dataManager.GetCardData(string.first);	//verified by _strings
+			auto cp = dataManager.GetCardData(_string.first);	//verified by _strings
 			//datas.alias can be double card names or alias
 			if(cp && is_declarable(cp, declare_opcodes)) {
 				if(pname == string.second.name) { //exact match
 					mainGame->lstANCard->insertItem(0, string.second.name.c_str(), -1);
-					ancard.insert(ancard.begin(), string.first);
+					ancard.insert(ancard.begin(), _string.first);
 				} else {
 					mainGame->lstANCard->addItem(string.second.name.c_str());
-					ancard.push_back(string.first);
+					ancard.push_back(_string.first);
 				}
 			}
 		}
