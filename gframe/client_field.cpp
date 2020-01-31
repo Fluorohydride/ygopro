@@ -635,15 +635,14 @@ void ClientField::ReplaySwap() {
 	std::swap(remove[0], remove[1]);
 	std::swap(extra[0], extra[1]);
 	std::swap(extra_p_count[0], extra_p_count[1]);
-	auto resetloc = [&](std::vector<ClientCard*> zone) {
-		for(auto& pcard : zone) {
-			if(pcard) {
-				pcard->controler = 1 - pcard->controler;
-				GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-				pcard->is_moving = false;
-			}
-		}
-	};
+	std::swap(skills[0], skills[1]);
+#define resetloc(vec) for(auto& pcard : vec) {\
+						if(pcard) {\
+							pcard->controler = 1 - pcard->controler;\
+							GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);\
+							pcard->is_moving = false;\
+						}\
+						}
 	for(int p = 0; p < 2; ++p) {
 		resetloc(deck[p]);
 		resetloc(hand[p]);
@@ -653,11 +652,8 @@ void ClientField::ReplaySwap() {
 		resetloc(remove[p]);
 		resetloc(extra[p]);
 	}
-	for(auto& pcard : overlay_cards) {
-		pcard->controler = 1 - pcard->controler;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-		pcard->is_moving = false;
-	}
+	resetloc(overlay_cards)
+#undef resetloc
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
 	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
@@ -1415,7 +1411,7 @@ void ClientField::UpdateDeclarableList() {
 	ancard.clear();
 	for(auto& card : dataManager.cards) {
 		auto& name = card.second.second.name;
-		if(Utils::ContainsSubstring(name.c_str(), pname, true, true)) {
+		if(Utils::ContainsSubstring(name, pname, true, true)) {
 			//datas.alias can be double card names or alias
 			if(is_declarable(&card.second.first, declare_opcodes)) {
 				if(pname == name) { //exact match
