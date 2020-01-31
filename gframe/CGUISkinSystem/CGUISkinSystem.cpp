@@ -337,7 +337,7 @@ bool CGUISkinSystem::checkSkinSize(gui::EGUI_DEFAULT_SIZE sizeToSet,const wchar_
 
 bool CGUISkinSystem::checkSkinIcon(gui::EGUI_DEFAULT_ICON iconToSet, const wchar_t * context, gui::CImageGUISkin * skin) {
 	u32 i = registry->getValueAsInt(L"index", context);
-	if(i != NULL) {
+	if(i) {
 		skin->setIcon(iconToSet, i);
 		return true;
 	}
