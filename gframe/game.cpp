@@ -2011,7 +2011,7 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 		if(cd->alias) {
 			auto aptr = dataManager._datas.find(cd->alias);
 			if(aptr != dataManager._datas.end())
-				setcodes = aptr->second->setcodes;
+				setcodes = aptr->second.setcodes;
 		}
 		if(setcodes.size()) {
 			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());

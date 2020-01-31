@@ -52,7 +52,7 @@ static bool check_set_code(CardDataC* data, std::vector<unsigned int>& setcodes)
 	if (data->alias) {
 		auto aptr = dataManager._datas.find(data->alias);
 		if (aptr != dataManager._datas.end())
-			card_setcodes = aptr->second->setcodes;
+			card_setcodes = aptr->second.setcodes;
 	}
 	if(setcodes.empty())
 		return card_setcodes.empty();
@@ -894,8 +894,8 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		wchar_t checkterm = term.size() ? term.front() : 0;
 		std::vector<CardDataC*> result;
 		for(auto ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ptr++, strpointer++) {
-			if(CheckCard(ptr->second, &strpointer->second, checkterm, tokens, set_code))
-				result.push_back(ptr->second);
+			if(CheckCard(&ptr->second, &strpointer->second, checkterm, tokens, set_code))
+				result.push_back(&ptr->second);
 		}
 		if(result.size())
 			searched_terms[term] = result;

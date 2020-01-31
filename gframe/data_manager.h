@@ -12,14 +12,11 @@ namespace ygo {
 
 class DataManager {
 public:
-	DataManager() {}
-	~DataManager() {
-		for(auto& card : _datas) {
-			if(card.second) {
-				delete card.second;
-			}
-		}
+	DataManager() {
+		_datas.reserve(10000);
+		_strings.reserve(10000);
 	}
+	~DataManager() {}
 	bool LoadDB(const path_string& file, bool usebuffer = false);
 	bool LoadDBFromBuffer(const std::vector<char>& buffer);
 	bool ParseDB(sqlite3* pDB);
@@ -45,7 +42,7 @@ public:
 	std::wstring FormatSetName(std::vector<uint16> setcodes);
 	std::wstring FormatLinkMarker(int link_marker);
 
-	std::unordered_map<unsigned int, CardDataC*> _datas;
+	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
