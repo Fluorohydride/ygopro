@@ -235,7 +235,7 @@ catch(...) { what = def; }
 				mainGame->gMutex.unlock();
 				if(exit_on_return)
 					mainGame->device->closeDevice();
-			} else if(connect_state == 0x7) {
+			} else {
 				if(!mainGame->dInfo.isInDuel && !mainGame->is_building) {
 					mainGame->gMutex.lock();
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
