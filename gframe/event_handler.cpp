@@ -859,9 +859,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->stCardPos[i]->enableOverrideColor(false);
 					// image
 					if(selectable_cards[i + pos]->code)
-						mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i + pos]->code));
+						mainGame->imageLoading[mainGame->btnCardSelect[i]] = selectable_cards[i + pos]->code;
 					else if(conti_selecting)
-						mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i + pos]->chain_code));
+						mainGame->imageLoading[mainGame->btnCardSelect[i]] = selectable_cards[i + pos]->chain_code;
 					else
 						mainGame->btnCardSelect[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale(30 + i * 125, 55, 30 + 120 + i * 125, 225));
@@ -920,7 +920,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					// draw display_cards[i + pos] in btnCardDisplay[i]
 					mainGame->stDisplayPos[i]->enableOverrideColor(false);
 					if(display_cards[i + pos]->code)
-						mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardDisplay[i], display_cards[i + pos]->code));
+						mainGame->imageLoading[mainGame->btnCardDisplay[i]] = display_cards[i + pos]->code;
 					else
 						mainGame->btnCardDisplay[i]->setImage(imageManager.tCover[0]);
 					mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale(30 + i * 125, 55, 30 + 120 + i * 125, 225));

@@ -1991,7 +1991,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		else if(count == 3) startpos = 82;
 		else startpos = 155;
 		if(positions & POS_FACEUP_ATTACK) {
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
+			mainGame->imageLoading[mainGame->btnPSAU] = code;
 			mainGame->btnPSAU->setRelativePosition(mainGame->Scale<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSAU->setVisible(true);
 			startpos += 145;
@@ -2002,7 +2002,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			startpos += 145;
 		} else mainGame->btnPSAD->setVisible(false);
 		if(positions & POS_FACEUP_DEFENSE) {
-			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
+			mainGame->imageLoading[mainGame->btnPSDU] = code;
 			mainGame->btnPSDU->setRelativePosition(mainGame->Scale<irr::s32>(startpos, 45, startpos + 140, 185));
 			mainGame->btnPSDU->setVisible(true);
 			startpos += 145;
