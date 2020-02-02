@@ -54,7 +54,7 @@ local ygopro_config=function(static_core)
 		dofile("../irrlicht/defines.lua")
 		links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "wldap32", "crypt32", "advapi32", "rpcrt4", "ole32", "winhttp" }
 		
-	filter "system:windows and action:vs*"
+	filter { "system:windows", "action:vs*" }
 		files "../dpiawarescaleing.manifest"
 
 	filter { "system:windows", "options:no-direct3d" }
