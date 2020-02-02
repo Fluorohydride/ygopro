@@ -1053,7 +1053,6 @@ void GenericDuel::AfterParsing(CoreUtils::Packet& packet, int& return_value, boo
 	switch(message) {
 	case MSG_SHUFFLE_HAND:
 	case MSG_DRAW: {
-		case MSG_SHUFFLE_HAND: {
 		player = BufferIO::Read<uint8_t>(pbuf);
 		RefreshHand(player, 0x3781fff);
 		break;
