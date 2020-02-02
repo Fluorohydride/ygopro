@@ -2098,11 +2098,10 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SKILL;
 			}
-		} else if(speed == 1 && boardx >= matManager.vSkillZone[0][field][speed][1].Pos.X && boardx <= matManager.vSkillZone[0][field][speed][2].Pos.X) {
-			if(boardy >= matManager.vSkillZone[0][field][speed][0].Pos.Y && boardy <= matManager.vSkillZone[0][field][speed][2].Pos.Y) {
-				hovered_controler = 0;
-				hovered_location = LOCATION_SKILL;
-			}
+		} else if(speed == 1 && boardx >= matManager.vSkillZone[0][field][speed][1].Pos.X && boardx <= matManager.vSkillZone[0][field][speed][2].Pos.X &&
+				  boardy >= matManager.vSkillZone[0][field][speed][0].Pos.Y && boardy <= matManager.vSkillZone[0][field][speed][2].Pos.Y) {
+			hovered_controler = 0;
+			hovered_location = LOCATION_SKILL;
 		} else if(field == 1 && boardx >= matManager.vFieldSzone[1][7][field][speed][1].Pos.X && boardx <= matManager.vFieldSzone[1][7][field][speed][2].Pos.X) {
 			if(boardy >= matManager.vFieldSzone[1][7][field][speed][2].Pos.Y && boardy <= matManager.vFieldSzone[1][7][field][speed][0].Pos.Y) {
 				hovered_controler = 1;
