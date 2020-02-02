@@ -1050,7 +1050,8 @@ void GenericDuel::AfterParsing(CoreUtils::Packet& packet, int& return_value, boo
 	uint8_t& message = packet.message;
 	int player;
 	char* pbuf = DATA;
-	switch(message) {
+	case MSG_SHUFFLE_HAND:
+	case MSG_DRAW: {
 		case MSG_SHUFFLE_HAND: {
 		player = BufferIO::Read<uint8_t>(pbuf);
 		RefreshHand(player, 0x3781fff);
