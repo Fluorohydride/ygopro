@@ -309,7 +309,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HP_KICK: {
 				int id = 0;
-				while(id < 4) {
+				while(id < 6) {
 					if(mainGame->btnHostPrepKick[id] == caller)
 						break;
 					id++;
