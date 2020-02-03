@@ -93,7 +93,7 @@ bool ImageManager::Initial() {
 #undef GET_TEXTURE
 #undef GET_TEXTURE_SIZED
 #define GET(obj,fun1,fun2,fallback) obj=fun1; if(!obj) obj=fun2; if(!obj) obj=fallback;
-#define GET_TEXTURE_SIZED(obj,path,w,h,fallback) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h),def_##obj)
+#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h),def_##obj)
 #define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg")),def_##obj)
 void ImageManager::ChangeTextures(const path_string & _path) {
 	if(_path == textures_path)
