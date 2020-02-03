@@ -25,7 +25,6 @@ addons:
     - gpatch
     - p7zip
     - freetype
-    - sqlite
     - curl
     - libgit2
     - fmt
