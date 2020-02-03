@@ -1490,6 +1490,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		env->setSkin(skin);
 		skin->drop();
 		skin::ResetDefaults();
+		imageManager.ResetTextures();
 	} else {
 		if(skinSystem->applySkin(prev_skin.c_str())) {
 #define CLR(val1,val2,val3,val4) irr::video::SColor(val1,val2,val3,val4)
@@ -1497,12 +1498,14 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 #include "custom_skin_enum.inl"
 #undef DECLR
 #undef CLR
+		imageManager.ChangeTextures(EPRO_TEXT("./skin/") + prev_skin + EPRO_TEXT("/textures/"));
 		} else {
 			applied = false;
 			auto skin = env->createSkin(gui::EGST_WINDOWS_METALLIC);
 			env->setSkin(skin);
 			skin->drop();
 			skin::ResetDefaults();
+			imageManager.ResetTextures();
 		}
 	}
 	auto skin = env->getSkin();

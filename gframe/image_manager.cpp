@@ -14,37 +14,42 @@
 #include "porting_android.h"
 #endif
 
-#define BASE_PATH EPRO_TEXT("textures/")
+#define BASE_PATH EPRO_TEXT("./textures/")
 
 namespace ygo {
 
-ImageManager imageManager;
+ImageManager imageManager{};
 
 void ImageManager::AddDownloadResource(PicSource src) {
 	pic_urls.push_back(src);
 }
+#define X(x) (textures_path + EPRO_TEXT(x)).c_str()
 #define GET(obj,fun1,fun2) obj=fun1; if(!obj) obj=fun2;
-#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GetTextureFromFile(BASE_PATH path".png",mainGame->Scale(w),mainGame->Scale(h)),GetTextureFromFile(BASE_PATH path".jpg",mainGame->Scale(w),mainGame->Scale(h)))
-#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(BASE_PATH path".png"),driver->getTexture(BASE_PATH path".jpg"))
+#define GTFF(path,ext,w,h) GetTextureFromFile(X(path ext), mainGame->Scale(w), mainGame->Scale(h))
+#define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h)) def_##obj=obj;
+#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg"))) def_##obj=obj;
 bool ImageManager::Initial() {
 	timestamp_id = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	textures_path = BASE_PATH;
 	GET_TEXTURE_SIZED(tCover[0],"cover", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
 	GET_TEXTURE_SIZED(tCover[1],"cover2", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
-	if(!tCover[1])
+	if(!tCover[1]){
 		tCover[1] = tCover[0];
+		def_tCover[1] = tCover[1];
+	}
 	GET_TEXTURE(tUnknown,"unknown")
-	GET_TEXTURE(tAct, "act");
-	GET_TEXTURE(tAttack, "attack");
-	GET_TEXTURE(tChain, "chain");
-	GET_TEXTURE(tNegated, "negated");
-	GET_TEXTURE(tNumber, "number");
-	GET_TEXTURE(tLPBar, "lp");
-	GET_TEXTURE(tLPFrame, "lpf");
-	GET_TEXTURE(tMask, "mask");
-	GET_TEXTURE(tEquip, "equip");
-	GET_TEXTURE(tTarget, "target");
-	GET_TEXTURE(tChainTarget, "chaintarget");
-	GET_TEXTURE(tLim, "lim");
+	GET_TEXTURE(tAct, "act")
+	GET_TEXTURE(tAttack, "attack")
+	GET_TEXTURE(tChain, "chain")
+	GET_TEXTURE(tNegated, "negated")
+	GET_TEXTURE(tNumber, "number")
+	GET_TEXTURE(tLPBar, "lp")
+	GET_TEXTURE(tLPFrame, "lpf")
+	GET_TEXTURE(tMask, "mask")
+	GET_TEXTURE(tEquip, "equip")
+	GET_TEXTURE(tTarget, "target")
+	GET_TEXTURE(tChainTarget, "chaintarget")
+	GET_TEXTURE(tLim, "lim")
 	GET_TEXTURE_SIZED(tHand[0], "f1", 89, 128)
 	GET_TEXTURE_SIZED(tHand[1], "f2", 89, 128)
 	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128)
@@ -55,22 +60,22 @@ bool ImageManager::Initial() {
 	GET_TEXTURE(tBackGround_deck, "bg_deck")
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
-	GET_TEXTURE(tField[0][0], "field2");
-	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2");
-	GET_TEXTURE(tField[0][1], "field3");
-	GET_TEXTURE(tFieldTransparent[0][1], "field-transparent3");
-	GET_TEXTURE(tField[0][2], "field");
-	GET_TEXTURE(tFieldTransparent[0][2], "field-transparent");
-	GET_TEXTURE(tField[0][3], "field4");
-	GET_TEXTURE(tFieldTransparent[0][3], "field-transparent4");
-	GET_TEXTURE(tField[1][0], "fieldSP2");
-	GET_TEXTURE(tFieldTransparent[1][0], "field-transparentSP2");
-	GET_TEXTURE(tField[1][1], "fieldSP3");
-	GET_TEXTURE(tFieldTransparent[1][1], "field-transparentSP3");
-	GET_TEXTURE(tField[1][2], "fieldSP");
-	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP");
-	GET_TEXTURE(tField[1][3], "fieldSP4");
-	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4");
+	GET_TEXTURE(tField[0][0], "field2")
+	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2")
+	GET_TEXTURE(tField[0][1], "field3")
+	GET_TEXTURE(tFieldTransparent[0][1], "field-transparent3")
+	GET_TEXTURE(tField[0][2], "field")
+	GET_TEXTURE(tFieldTransparent[0][2], "field-transparent")
+	GET_TEXTURE(tField[0][3], "field4")
+	GET_TEXTURE(tFieldTransparent[0][3], "field-transparent4")
+	GET_TEXTURE(tField[1][0], "fieldSP2")
+	GET_TEXTURE(tFieldTransparent[1][0], "field-transparentSP2")
+	GET_TEXTURE(tField[1][1], "fieldSP3")
+	GET_TEXTURE(tFieldTransparent[1][1], "field-transparentSP3")
+	GET_TEXTURE(tField[1][2], "fieldSP")
+	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP")
+	GET_TEXTURE(tField[1][3], "fieldSP4")
+	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4")
 	sizes[0].first = CARD_IMG_WIDTH * mainGame->gameConf.dpi_scale;
 	sizes[0].second = CARD_IMG_HEIGHT * mainGame->gameConf.dpi_scale;
 	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
@@ -83,7 +88,64 @@ bool ImageManager::Initial() {
 	}
 	return true;
 }
+
+#undef GET
 #undef GET_TEXTURE
+#undef GET_TEXTURE_SIZED
+#define GET(obj,fun1,fun2,fallback) obj=fun1; if(!obj) obj=fun2; if(!obj) obj=fallback;
+#define GET_TEXTURE_SIZED(obj,path,w,h,fallback) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h),def_##obj)
+#define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg")),def_##obj)
+void ImageManager::ChangeTextures(const path_string & _path) {
+	if(_path == textures_path)
+		return;
+	textures_path = _path;
+	GET_TEXTURE(tUnknown,"unknown")
+	GET_TEXTURE(tAct, "act")
+	GET_TEXTURE(tAttack, "attack")
+	GET_TEXTURE(tChain, "chain")
+	GET_TEXTURE(tNegated, "negated")
+	GET_TEXTURE(tNumber, "number")
+	GET_TEXTURE(tLPBar, "lp")
+	GET_TEXTURE(tLPFrame, "lpf")
+	GET_TEXTURE(tMask, "mask")
+	GET_TEXTURE(tEquip, "equip")
+	GET_TEXTURE(tTarget, "target")
+	GET_TEXTURE(tChainTarget, "chaintarget")
+	GET_TEXTURE(tLim, "lim")
+	GET_TEXTURE_SIZED(tHand[0], "f1", 89, 128)
+	GET_TEXTURE_SIZED(tHand[1], "f2", 89, 128)
+	GET_TEXTURE_SIZED(tHand[2], "f3", 89, 128)
+	GET_TEXTURE(tBackGround, "bg")
+	GET_TEXTURE(tBackGround_menu, "bg_menu")
+	if(!tBackGround_menu)
+		tBackGround_menu = tBackGround;
+	GET_TEXTURE(tBackGround_deck, "bg_deck")
+	if(!tBackGround_deck)
+		tBackGround_deck = tBackGround;
+	GET_TEXTURE(tField[0][0], "field2")
+	GET_TEXTURE(tFieldTransparent[0][0], "field-transparent2")
+	GET_TEXTURE(tField[0][1], "field3")
+	GET_TEXTURE(tFieldTransparent[0][1], "field-transparent3")
+	GET_TEXTURE(tField[0][2], "field")
+	GET_TEXTURE(tFieldTransparent[0][2], "field-transparent")
+	GET_TEXTURE(tField[0][3], "field4")
+	GET_TEXTURE(tFieldTransparent[0][3], "field-transparent4")
+	GET_TEXTURE(tField[1][0], "fieldSP2")
+	GET_TEXTURE(tFieldTransparent[1][0], "field-transparentSP2")
+	GET_TEXTURE(tField[1][1], "fieldSP3")
+	GET_TEXTURE(tFieldTransparent[1][1], "field-transparentSP3")
+	GET_TEXTURE(tField[1][2], "fieldSP")
+	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP")
+	GET_TEXTURE(tField[1][3], "fieldSP4")
+	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4")
+	RefreshCovers();
+}
+void ImageManager::ResetTextures() {
+	ChangeTextures(BASE_PATH);
+}
+#undef GET_TEXTURE
+#undef GET_TEXTURE_SIZED
+#undef X
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	device = dev;
 	driver = dev->getVideoDriver();
@@ -101,17 +163,7 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
 		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->gameConf.dpi_scale;
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->gameConf.dpi_scale;
-		irr::video::ITexture* tmp_cover = nullptr;
-#undef GET_TEXTURE_SIZED
-#define GET_TEXTURE_SIZED(obj,path) GET(tmp_cover,GetTextureFromFile(BASE_PATH path".png",sizes[1].first,sizes[1].second),GetTextureFromFile(BASE_PATH path".jpg",sizes[1].first,sizes[1].second))\
-										if(tmp_cover) {\
-											driver->removeTexture(obj);\
-											obj = tmp_cover;\
-										}
-		GET_TEXTURE_SIZED(tCover[0], "cover");
-		GET_TEXTURE_SIZED(tCover[1], "cover2");
-#undef GET_TEXTURE_SIZED
-#undef GET
+		RefreshCovers();
 	}
 	if(!resize) {
 		ClearCachedTextures(resize);
@@ -335,6 +387,34 @@ void ImageManager::AddToDownloadQueue(int code, imgType type) {
 	}
 	pic_download.unlock();
 	cv.notify_one();
+}
+void ImageManager::RefreshCovers() {
+	irr::video::ITexture* tmp_cover = nullptr;
+#undef GET
+#define GET(obj,fun1,fun2) obj=fun1; if(!obj) obj=fun2;
+#define X(x) BASE_PATH x
+#define GET_TEXTURE_SIZED(obj,path) GET(tmp_cover,GetTextureFromFile(X( path".png"),sizes[1].first,sizes[1].second),GetTextureFromFile(X( path".jpg"),sizes[1].first,sizes[1].second))\
+										if(tmp_cover) {\
+											driver->removeTexture(obj);\
+											obj = tmp_cover;\
+										}
+	GET_TEXTURE_SIZED(tCover[0], "cover")
+	GET_TEXTURE_SIZED(tCover[1], "cover2")
+#undef X
+#define X(x) (textures_path + EPRO_TEXT(x)).c_str()
+	if(textures_path != path_string(BASE_PATH)) {
+		GET(tmp_cover, GetTextureFromFile(X("cover.png"), sizes[1].first, sizes[1].second), GetTextureFromFile(X("cover.jpg"), sizes[1].first, sizes[1].second))
+		if(tmp_cover){
+			tCover[0] = tmp_cover;
+		}
+		GET(tmp_cover, GetTextureFromFile(X("cover2.png"), sizes[1].first, sizes[1].second), GetTextureFromFile(X("cover2.jpg"), sizes[1].first, sizes[1].second))
+		if(tmp_cover){
+			tCover[1] = tmp_cover;
+		}
+	}
+#undef GET_TEXTURE_SIZED
+#undef GET
+#undef GTFF
 }
 ImageManager::downloadStatus ImageManager::GetDownloadStatus(int code, imgType type) {
 	if(type == THUMB)
