@@ -114,7 +114,7 @@ void NetServer::StopServer() {
 	if(duel_mode)
 		duel_mode->EndDuel();
 #ifdef YGOPRO_SERVER_MODE // For solving the problem of connection lost after duel. See https://github.com/Fluorohydride/ygopro/issues/2067 for details.
-	timeval etv = { 0, 1 };
+	timeval etv = { 0, 200 };
 	event_base_loopexit(net_evbase, &etv);
 #else
 	event_base_loopexit(net_evbase, 0);
