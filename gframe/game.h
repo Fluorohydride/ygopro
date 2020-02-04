@@ -93,6 +93,7 @@ struct Config {
 	bool chkHideHintButton;
 	bool draw_field_spell;
 	bool quick_animation;
+	bool showFPS;
 
 	bool scale_background;
 	bool accurate_bg_resize;
@@ -387,6 +388,7 @@ public:
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIComboBox* cbCurrentSkin;
+	irr::gui::IGUICheckBox* chkShowFPS;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;

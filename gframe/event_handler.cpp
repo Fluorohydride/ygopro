@@ -1888,6 +1888,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked() ? 1 : 0;
 				return true;
 			}
+			case CHECKBOX_SHOW_FPS: {
+				mainGame->gameConf.showFPS = mainGame->chkShowFPS->isChecked();
+				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);
+				return true;
+			}
 			case BUTTON_REPO_CHANGELOG_EXPAND: {
 				auto& repo = mainGame->repoInfoGui[showing_repo];
 				mainGame->stCommitLog->setText(mainGame->chkCommitLogExpand->isChecked() ? repo.commit_history_full.c_str() : repo.commit_history_partial.c_str());

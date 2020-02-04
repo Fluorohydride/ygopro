@@ -510,8 +510,7 @@ bool Game::Initialize() {
 	scrSoundVolume->setPos(gameConf.soundVolume * 100);
 	scrSoundVolume->setLargeStep(1);
 	scrSoundVolume->setSmallStep(1);
-	chkQuickAnimation = env->addCheckBox(false, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
-	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
+	chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	cbCurrentSkin = env->addComboBox(Scale(90, 415, 270, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
 	int sel_skin = cbCurrentSkin->addItem(L"none");
 	auto skins = skinSystem->listSkins();
@@ -527,6 +526,7 @@ bool Game::Initialize() {
 		gameConf.skin = EPRO_TEXT("none");
 	}*/
 	//ApplySkin(gameConf.skin);
+	chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 480, 280, 505), tabPanel, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
@@ -1086,6 +1086,7 @@ bool Game::Initialize() {
 	}
 #endif
 	fpsCounter = env->addStaticText(L"", Scale(950, 620, 1024, 640), false, false);
+	fpsCounter->setVisible(gameConf.showFPS);
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -1673,6 +1674,7 @@ void Game::LoadConfig() {
 	gameConf.soundVolume = 1.0;
 	gameConf.draw_field_spell = true;
 	gameConf.quick_animation = false;
+	gameConf.showFPS = true;
 	gameConf.scale_background = true;
 #ifdef __ANDROID__
 	gameConf.accurate_bg_resize = true;
@@ -1772,6 +1774,8 @@ void Game::LoadConfig() {
 				gameConf.quick_animation = !!std::stoi(str);
 			else if(type == "show_unofficial")
 				gameConf.chkAnime = !!std::stoi(str);
+			else if(type == "showFPS")
+				gameConf.showFPS = !!std::stoi(str);
 			else if(type == "dpi_scale")
 				gameConf.dpi_scale = std::stof(str);
 			else if(type == "skin")
@@ -1842,6 +1846,7 @@ void Game::SaveConfig() {
 	conf_file << "hide_hint_button = "	<< (chkHideHintButton->isChecked() ? 1 : 0) << "\n";
 	conf_file << "draw_field_spell = "	<< (gameConf.draw_field_spell ? 1 : 0) << "\n";
 	conf_file << "quick_animation = "	<< (gameConf.quick_animation ? 1 : 0) << "\n";
+	conf_file << "showFPS = "           << (gameConf.showFPS ? 1 : 0) << "\n";
 	conf_file << "#shows the unofficial cards in deck edit, which includes anime, customs, etc\n";
 	conf_file << "show_unofficial = "	<< (chkAnime->isChecked() ? 1 : 0) << "\n";
 	conf_file << "dpi_scale = "			<< std::to_string(gameConf.dpi_scale) << "\n";
