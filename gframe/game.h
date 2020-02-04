@@ -682,6 +682,7 @@ public:
 	irr::gui::IGUIButton* btnRPNo;
 	irr::gui::IGUIButton* btnJoinHost2;
 	irr::gui::IGUIButton* btnJoinCancel2;
+	irr::gui::IGUIStaticText* fpsCounter;
 
 #ifdef __ANDROID__
 	ANDROID_APP appMain;
@@ -692,7 +693,6 @@ public:
 	irr::s32 ogles2TrasparentAlpha;
 	irr::s32 ogles2BlendTexture;
 	Signal externalSignal;
-	irr::gui::IGUIStaticText* fpsCounter;
 #endif
 };
 

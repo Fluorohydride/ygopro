@@ -175,7 +175,7 @@ bool Game::Initialize() {
 		gameConf.skin = EPRO_TEXT("none");
 	}
 	smgr = device->getSceneManager();
-	device->setWindowCaption(L"EDOPro");
+	device->setWindowCaption(L"EDOPro by Project Ignis");
 	device->setResizable(true);
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
@@ -1085,9 +1085,7 @@ bool Game::Initialize() {
 		PopupElement(wMessage);
 	}
 #endif
-#ifdef __ANDROID__
-	fpsCounter = env->addStaticText(L"", Scale(15, 15, 100, 60));
-#endif
+	fpsCounter = env->addStaticText(L"", Scale(950, 620, 1024, 640), false, false);
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -1324,6 +1322,7 @@ void Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();)
 		} else if(is_building) {
+			
 			if(is_siding)
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
 			else
@@ -1338,6 +1337,13 @@ void Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::MENU);
 			soundManager->PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu, resized);
+		}
+		if (is_building || is_siding) {
+			fpsCounter->setRelativePosition(Resize(205, CARD_IMG_HEIGHT + 1, 300, CARD_IMG_HEIGHT + 21));
+		} else if (wChat->isVisible()) { // Move it above the chat box
+			fpsCounter->setRelativePosition(Resize(1024 - fpsCounter->getTextWidth() - 2, 600, 1024, 620));
+		} else { // bottom right of window with a little padding
+			fpsCounter->setRelativePosition(Resize(1024 - fpsCounter->getTextWidth() - 2, 620, 1024, 640));
 		}
 		MATERIAL_GUARD(DrawGUI();	DrawSpec(););
 		if(cardimagetextureloading) {
@@ -1409,11 +1415,7 @@ void Game::MainLoop() {
 		}
 #endif
 		while(cur_time >= 1000) {
-#ifndef __ANDROID__
-			device->setWindowCaption(fmt::format(L"EDOPro FPS: {}", fps).c_str());
-#else
 			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
-#endif
 			fps = 0;
 			cur_time -= 1000;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
