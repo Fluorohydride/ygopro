@@ -1415,7 +1415,7 @@ void Game::MainLoop() {
 		}
 #endif
 		while(cur_time >= 1000) {
-			fpsCounter->setText(fmt::format(L"FPS: {}", fps).c_str());
+			fpsCounter->setText(fmt::format(dataManager.GetSysString(1444), fps).c_str());
 			fps = 0;
 			cur_time -= 1000;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
@@ -1899,7 +1899,7 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	grepo.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 	grepo.progress1->drop();
 	((CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
-	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, L"Changelog");
+	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, dataManager.GetSysString(1443).c_str());
 	grepo.history_button1->setEnabled(false);
 
 	auto b = env->addWindow(Scale(0, 0, 10000, 55), false, L"", tabRepositories);

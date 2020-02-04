@@ -35,7 +35,7 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 }
 #ifdef _WIN32
 #ifdef UNICODE
-#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup") 
+//#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup") 
 int wmain(int argc, wchar_t* argv[]) {
 #else
 #pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") 
