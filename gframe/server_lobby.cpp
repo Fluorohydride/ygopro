@@ -275,7 +275,7 @@ void ServerLobby::JoinServer(bool host) {
 		}
 	}
 	catch(std::exception& e) {
-		ErrorLog(std::string("Exception ocurred: ") + e.what());
+		ErrorLog(std::string("Exception occurred: ") + e.what());
 	}
 }
 

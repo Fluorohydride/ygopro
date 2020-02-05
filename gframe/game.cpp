@@ -1803,7 +1803,7 @@ void Game::LoadConfig() {
 			conf_file >> configs;
 		}
 		catch(std::exception& e) {
-			ErrorLog(std::string("Exception ocurred: ") + e.what());
+			ErrorLog(std::string("Exception occurred: ") + e.what());
 		}
 		conf_file.close();
 	}
@@ -1887,7 +1887,7 @@ void Game::LoadPicUrls() {
 		}
 	}
 	catch(std::exception& e) {
-		ErrorLog(std::string("Exception ocurred: ") + e.what());
+		ErrorLog(std::string("Exception occurred: ") + e.what());
 	}
 }
 void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
@@ -1966,7 +1966,7 @@ void Game::LoadGithubRepositories() {
 		}
 	}
 	catch(std::exception& e) {
-		ErrorLog(std::string("Exception ocurred: ") + e.what());
+		ErrorLog(std::string("Exception occurred: ") + e.what());
 	}
 }
 #undef JSON_SET_IF_VALID
@@ -1986,7 +1986,7 @@ void Game::LoadServers() {
 		}
 	}
 	catch(std::exception& e) {
-		ErrorLog(std::string("Exception ocurred: ") + e.what());
+		ErrorLog(std::string("Exception occurred: ") + e.what());
 	}
 }
 void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
