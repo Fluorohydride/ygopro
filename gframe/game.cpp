@@ -2028,7 +2028,7 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 		}
 	}
 	if(cd->type & TYPE_MONSTER) {
-		stInfo->setText(fmt::format(L"[{}] {}/{}", dataManager.FormatType(cd->type), dataManager.FormatRace(cd->race), dataManager.FormatAttribute(cd->attribute)).c_str());
+		stInfo->setText(fmt::format(L"[{}] {} {}", dataManager.FormatType(cd->type), dataManager.FormatAttribute(cd->attribute), dataManager.FormatRace(cd->race)).c_str());
 		std::wstring text;
 		if(cd->type & TYPE_LINK){
 			if(cd->attack < 0)
