@@ -962,50 +962,8 @@ void Game::DrawSpec() {
 		}
 		case 101: {
 			const wchar_t* lstr = L"";
-			switch(showcardcode) {
-			case 1:
-				lstr = L"You Win!";
-				break;
-			case 2:
-				lstr = L"You Lose!";
-				break;
-			case 3:
-				lstr = L"Draw Game";
-				break;
-			case 4:
-				lstr = L"Draw Phase";
-				break;
-			case 5:
-				lstr = L"Standby Phase";
-				break;
-			case 6:
-				lstr = L"Main Phase 1";
-				break;
-			case 7:
-				lstr = L"Battle Phase";
-				break;
-			case 8:
-				lstr = L"Main Phase 2";
-				break;
-			case 9:
-				lstr = L"End Phase";
-				break;
-			case 10:
-				lstr = L"Next Players Turn";
-				break;
-			case 11:
-				lstr = L"Duel Start";
-				break;
-			case 12:
-				lstr = L"Duel1 Start";
-				break;
-			case 13:
-				lstr = L"Duel2 Start";
-				break;
-			case 14:
-				lstr = L"Duel3 Start";
-				break;
-			}
+			if (1 <= showcardcode && showcardcode <= 14)
+				lstr = dataManager.GetSysString(1700 + showcardcode).c_str();
 			auto pos = lpcFont->getDimension(lstr);
 			if(showcardp < 10.0f) {
 				int alpha = ((int)std::round(showcardp) * 25) << 24;

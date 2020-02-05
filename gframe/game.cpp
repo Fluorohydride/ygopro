@@ -1918,7 +1918,7 @@ void Game::AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo) {
 	grepo.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 	grepo.progress2->drop();
 	((CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
-	grepo.history_button2 = env->addButton(Scale(200, 5, 300 - 5, 20 + 10), b, BUTTON_REPO_CHANGELOG, L"Changelog");
+	grepo.history_button2 = env->addButton(Scale(200, 5, 300 - 5, 20 + 10), b, BUTTON_REPO_CHANGELOG, dataManager.GetSysString(1443).c_str());
 	grepo.history_button2->setEnabled(false);
 }
 #define JSON_SET_IF_VALID(field, jsontype, cpptype)if(obj[#field].is_##jsontype())\
