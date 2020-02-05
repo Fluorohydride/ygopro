@@ -2014,7 +2014,7 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 	int tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
-	stName->setText(fmt::format(L"{}[{:08}]", dataManager.GetName(tmp_code), tmp_code).c_str());
+	stName->setText(fmt::format(L"{} [{:08}]", dataManager.GetName(tmp_code), tmp_code).c_str());
 	stSetName->setText(L"");
 	if(!gameConf.chkHideSetname) {
 		auto setcodes = cd->setcodes;
@@ -2027,14 +2027,14 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());
 		}
 	}
-	std::wstring text = L"";
 	if(cd->type & TYPE_MONSTER) {
 		stInfo->setText(fmt::format(L"[{}] {}/{}", dataManager.FormatType(cd->type), dataManager.FormatRace(cd->race), dataManager.FormatAttribute(cd->attribute)).c_str());
+		std::wstring text;
 		if(cd->type & TYPE_LINK){
 			if(cd->attack < 0)
-				text.append(L"?/Link ").append(fmt::format(L"{}	", cd->level));
+				text.append(fmt::format(L"?/LINK {}	  ", cd->level));
 			else
-				text.append(fmt::format(L"{}/Link {}	", cd->attack, cd->level));
+				text.append(fmt::format(L"{}/LINK {}   ", cd->attack, cd->level));
 			text.append(dataManager.FormatLinkMarker(cd->link_marker));
 		} else {
 			text.append(fmt::format(L"[{}{}] ", (cd->type & TYPE_XYZ) ? L"\u2606" : L"\u2605", cd->level));
@@ -2054,7 +2054,7 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 	} else {
 		stInfo->setText(fmt::format(L"[{}]", dataManager.FormatType(cd->type)).c_str());
 		if(cd->type & TYPE_LINK) {
-			stDataInfo->setText(fmt::format(L"Link {}", cd->level, dataManager.FormatLinkMarker(cd->link_marker)).c_str());
+			stDataInfo->setText(fmt::format(L"LINK {}   {}", cd->level, dataManager.FormatLinkMarker(cd->link_marker)).c_str());
 		} else
 			stDataInfo->setText(L"");
 	}
