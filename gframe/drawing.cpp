@@ -649,8 +649,8 @@ void Game::DrawMisc() {
 		driver->draw2DRectangleOutline(Resize(695, 34, 795, 44), 0xffffffff);
 	}
 
-	DrawShadowText(numFont, dInfo.strLP[0].c_str(), Resize(330, 11, 629, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true);
-	DrawShadowText(numFont, dInfo.strLP[1].c_str(), Resize(691, 11, 990, 30), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true);
+	DrawShadowText(numFont, dInfo.strLP[0].c_str(), Resize(330, 11, 629, 29), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, true);
+	DrawShadowText(numFont, dInfo.strLP[1].c_str(), Resize(691, 11, 990, 29), Resize(0, 1, 2, 0), 0xffffff00, 0xff000000, true, true);
 
 	recti p1size = Resize(335, 31, 629, 50);
 	recti p2size = Resize(986, 31, 986, 50);
