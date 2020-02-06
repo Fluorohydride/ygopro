@@ -227,7 +227,7 @@ restart:
 		mainGame->replaySignal.Reset();
 		mainGame->replaySignal.Wait();
 		if(mainGame->saveReplay)
-			new_replay.SaveReplay(Utils::ToPathString(mainGame->ebRSName->getText()));
+			new_replay.SaveReplay(Utils::ParseFilename(mainGame->ebRSName->getText()));
 	}
 	new_replay.Reset();
 	last_replay.Reset();
@@ -324,7 +324,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			int type = BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
 			/*uint64_t data = BufferIO::Read<uint64_t>(pbuf);*/
-			if(player == 0 || type >= HINT_SKILL)
+			if(player == 0 || type >= HINT_SKILL_COVER)
 				ANALYZE;
 			if(type > 0 && type < 6 && type != 4)
 				record = false;
@@ -388,6 +388,12 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		case MSG_ANNOUNCE_CARD:
 		case MSG_ANNOUNCE_NUMBER: {
 			record = false;
+			if(mainGame->dInfo.curMsg == MSG_SELECT_CHAIN) {
+				SinglePlayRefresh(0, LOCATION_MZONE);
+				SinglePlayRefresh(1, LOCATION_MZONE);
+				SinglePlayRefresh(0, LOCATION_SZONE);
+				SinglePlayRefresh(1, LOCATION_SZONE);
+			}
 			if(!ANALYZE) {
 				singleSignal.Reset();
 				singleSignal.Wait();

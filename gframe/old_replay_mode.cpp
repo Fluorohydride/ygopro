@@ -174,7 +174,7 @@ namespace ygo {
 #define DATA (char*)(packet.data.data() + sizeof(uint8_t))
 
 	bool ReplayMode::ReplayAnalyze(CoreUtils::Packet packet) {
-		if(packet.message == MSG_SELECT_BATTLECMD || packet.message == MSG_SELECT_IDLECMD)
+		if(packet.message == MSG_SELECT_BATTLECMD || packet.message == MSG_SELECT_IDLECMD || packet.message == MSG_SELECT_CHAIN)
 			ReplayRefresh();
 		switch(packet.message) {
 			case MSG_SELECT_BATTLECMD:

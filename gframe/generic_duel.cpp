@@ -741,6 +741,17 @@ void GenericDuel::Surrender(DuelPlayer* dp) {
 void GenericDuel::BeforeParsing(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last) {
 	char* pbuf = DATA;
 	switch(packet.message) {
+	case MSG_SELECT_BATTLECMD:
+	case MSG_SELECT_IDLECMD: {
+		RefreshMzone(0);
+		RefreshMzone(1);
+		RefreshSzone(0);
+		RefreshSzone(1);
+		RefreshHand(0);
+		RefreshHand(1);
+		break;
+	}
+	case MSG_SELECT_CHAIN:
 	case MSG_NEW_TURN: {
 		RefreshMzone(0);
 		RefreshMzone(1);
@@ -814,12 +825,6 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	case MSG_SELECT_BATTLECMD:
 	case MSG_SELECT_IDLECMD: {
 		player = BufferIO::Read<uint8_t>(pbuf);
-		RefreshMzone(0);
-		RefreshMzone(1);
-		RefreshSzone(0);
-		RefreshSzone(1);
-		RefreshHand(0);
-		RefreshHand(1);
 		WaitforResponse(player);
 		SEND(cur_player[player]);
 		return_value = 1;
@@ -943,7 +948,6 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		for(auto& obs : observers)
 			NetServer::ReSendToPlayer(obs);
 		packets_cache.emplace_back(TO_SEND_BUFFER);
-		RefreshHand(player, 0x3781fff);
 		break;
 	}
 	case MSG_MOVE: {
