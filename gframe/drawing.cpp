@@ -631,7 +631,7 @@ void Game::DrawMisc() {
 	
 	if(lpframe > 0 && mainGame->delta_frames) {
 		dInfo.lp[lpplayer] -= lpd * mainGame->delta_frames;
-		dInfo.strLP[lpplayer] = fmt::to_wstring(dInfo.lp[lpplayer]);
+		dInfo.strLP[lpplayer] = fmt::to_wstring(std::max(0, dInfo.lp[lpplayer]));
 		lpcalpha -= 0x19 * mainGame->delta_frames;
 		lpframe -= mainGame->delta_frames;
 	}
