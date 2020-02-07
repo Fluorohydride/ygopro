@@ -278,7 +278,7 @@ std::wstring DataManager::FormatType(int type) {
 	std::wstring res;
 	unsigned filter = 1;
 	int i = 1050;
-	for(; filter != 0x8000000; filter <<= 1, ++i) {
+	for(; filter != 0x10000000; filter <<= 1, ++i) {
 		if(type & filter) {
 			if(!res.empty())
 				res += L"|";
