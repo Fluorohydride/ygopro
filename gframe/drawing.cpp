@@ -961,15 +961,15 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 101: {
-			const wchar_t* lstr = L"";
+			std::wstring lstr;
 			if (1 <= showcardcode && showcardcode <= 14)
-				lstr = dataManager.GetSysString(1700 + showcardcode).c_str();
+				lstr = dataManager.GetSysString(1700 + showcardcode);
 			auto pos = lpcFont->getDimension(lstr);
 			if(showcardp < 10.0f) {
 				int alpha = ((int)std::round(showcardp) * 25) << 24;
-				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661 - (9 - showcardp) * 40, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
+				DrawShadowText(lpcFont, lstr.c_str(), ResizePhaseHint(661 - (9 - showcardp) * 40, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
 			} else if(showcardp < showcarddif) {
-				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), 0xffffffff);
+				DrawShadowText(lpcFont, lstr.c_str(), ResizePhaseHint(661, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), 0xffffffff);
 				if(dInfo.vic_string.size() && (showcardcode == 1 || showcardcode == 2)) {
 					auto a = (291 + pos.Height + 2);
 					driver->draw2DRectangle(0xa0000000, Resize(540, a, 790, a + 20));
@@ -977,7 +977,7 @@ void Game::DrawSpec() {
 				}
 			} else if(showcardp < showcarddif + 10.0f) {
 				int alpha = (int)std::round((((showcarddif + 10.0f - showcardp) * 25.0f) / 1000.0f) * (float)delta_time) << 24;
-				DrawShadowText(lpcFont, lstr, ResizePhaseHint(661 + (showcardp - showcarddif) * 40, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
+				DrawShadowText(lpcFont, lstr.c_str(), ResizePhaseHint(661 + (showcardp - showcarddif) * 40, 291, 960, 370, pos.Width), Resize(-1, -1, 0, 0), alpha | 0xffffff, alpha);
 			}
 			showcardp += std::min(((float)delta_time * 60.0f / 1000.0f), showcarddif - showcardp);
 			break;
