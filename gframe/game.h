@@ -233,7 +233,7 @@ public:
 	irr::core::vector2d<irr::s32> Resize(irr::s32 x, irr::s32 y, bool reverse = false);
 	irr::core::recti ResizeElem(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, bool scale = true);
 	irr::core::recti ResizePhaseHint(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 width);
-	irr::core::recti ResizeWinFromCenter(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2);
+	irr::core::recti ResizeWinFromCenter(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 xoff = 0, irr::s32 yoff = 0);
 	irr::core::recti ResizeWin(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, bool chat = false);
 	void SetCentered(irr::gui::IGUIElement* elem);
 	void ValidateName(irr::gui::IGUIElement* box);

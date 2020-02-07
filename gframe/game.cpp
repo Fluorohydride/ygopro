@@ -2356,15 +2356,8 @@ void Game::SetPhaseButtons() {
 	}
 }
 void Game::SetMesageWindow() {
-	if(is_building || dInfo.isInDuel) {
-		wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
-		wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
-	} else {
-		SetCentered(wMessage);
-		SetCentered(wACMessage);
-		/*wMessage->setRelativePosition(ResizeWin(510 - 175, 200, 510 + 175, 340));
-		wACMessage->setRelativePosition(ResizeWin(510 - 175, 240, 510 + 175, 300));*/
-	}
+	SetCentered(wMessage);
+	SetCentered(wACMessage);
 }
 bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 	irr::gui::IGUIElement* focus = env->getFocus();
@@ -2443,9 +2436,8 @@ void Game::OnResize() {
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
 	SetMesageWindow();
-	//wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
-	SetCentered(wOptions);
+	wOptions->setRelativePosition(ResizeWinFromCenter(0, 0, wOptions->getRelativePosition().getWidth(), wOptions->getRelativePosition().getHeight(), 135));
 	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));
 	wCardSelect->setRelativePosition(ResizeWin(320, 100, 1000, 400));
 	wCardDisplay->setRelativePosition(ResizeWin(320, 100, 1000, 400));
@@ -2558,8 +2550,11 @@ recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
 	y2 = sy + y;
 	return Scale(x, y, x2, y2);
 }
-void Game::SetCentered(irr::gui::IGUIElement * elem) {
-	elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight()));
+void Game::SetCentered(irr::gui::IGUIElement* elem) {
+	if(is_building || dInfo.isInDuel)
+		elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight(), Scale(155)));
+	else
+		elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight()));
 }
 recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2, bool scale) {
 	s32 sx = x2 - x;
