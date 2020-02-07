@@ -2459,46 +2459,44 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SWAP_GRAVE_DECK: {
 		uint8_t player = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
-		if(mainGame->dInfo.isCatchingUp) {
-			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
-			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
-				(*cit)->location = LOCATION_GRAVE;
-			int m = 0;
-			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
-				if ((*cit)->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) {
-					(*cit)->position = POS_FACEDOWN;
-					mainGame->dField.AddCard(*cit, player, LOCATION_EXTRA, 0);
-					cit = mainGame->dField.deck[player].erase(cit);
-				} else {
-					(*cit)->location = LOCATION_DECK;
-					(*cit)->sequence = m++;
-					++cit;
-				}
-			}
-		} else {
-			mainGame->gMutex.lock();
-			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
-			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit) {
-				(*cit)->location = LOCATION_GRAVE;
-				mainGame->dField.MoveCard(*cit, 10);
-			}
-			int m = 0;
-			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
-				ClientCard* pcard = *cit;
-				if (pcard->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) {
-					pcard->position = POS_FACEDOWN;
-					mainGame->dField.AddCard(pcard, player, LOCATION_EXTRA, 0);
-					cit = mainGame->dField.deck[player].erase(cit);
-				} else {
-					pcard->location = LOCATION_DECK;
-					pcard->sequence = m++;
-					++cit;
-				}
-				mainGame->dField.MoveCard(pcard, 10);
-			}
-			mainGame->gMutex.unlock();
-			mainGame->WaitFrameSignal(11);
+		ProgressiveBuffer buff;
+		if(!mainGame->dInfo.compat_mode) {
+			/*uint32_t mainsize = */BufferIO::Read<uint32_t>(pbuf);
+			uint32_t extrabuffersize = BufferIO::Read<uint32_t>(pbuf);
+			buff.data.resize(extrabuffersize);
+			BufferIO::Read(pbuf, buff.data.data(), extrabuffersize);
 		}
+		auto checkextra = [&buff, compat = mainGame->dInfo.compat_mode] (int idx, ClientCard* pcard) -> bool {
+			if(compat)
+				return pcard->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK);
+			return buff.bitGet(idx);
+		};
+		mainGame->gMutex.lock();
+		mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
+		for(auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit) {
+			(*cit)->location = LOCATION_GRAVE;
+			if(!mainGame->dInfo.isCatchingUp)
+				mainGame->dField.MoveCard(*cit, 10);
+		}
+		int m = 0;
+		int i = 0;
+		for(auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); i++) {
+			ClientCard* pcard = *cit;
+			if(checkextra(i, pcard)) {
+				pcard->position = POS_FACEDOWN;
+				mainGame->dField.AddCard(pcard, player, LOCATION_EXTRA, 0);
+				cit = mainGame->dField.deck[player].erase(cit);
+			} else {
+				pcard->location = LOCATION_DECK;
+				pcard->sequence = m++;
+				++cit;
+			}
+			if(!mainGame->dInfo.isCatchingUp)
+				mainGame->dField.MoveCard(pcard, 10);
+		}
+		mainGame->gMutex.unlock();
+		if(!mainGame->dInfo.isCatchingUp)
+			mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_REVERSE_DECK: {
