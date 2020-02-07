@@ -280,6 +280,8 @@ std::wstring DataManager::FormatType(int type) {
 	if(type & TYPE_SKILL)
 		res += GetSysString(1077);
 	for(; filter != TYPE_SKILL; filter <<= 1, ++i) {
+		if(type & TYPE_TOKEN && type & TYPE_SKILL)
+			continue; // Skill cover back
 		if(type & filter) {
 			if(!res.empty())
 				res += L"|";
