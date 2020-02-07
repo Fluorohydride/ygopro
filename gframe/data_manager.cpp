@@ -176,8 +176,8 @@ std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
 		code = strCode >> 4;
 		stringid = strCode & 0xf;
 	} else {
-		code = strCode >> 32;
-		stringid = strCode & 0xffffffff;
+		code = strCode >> 20;
+		stringid = strCode & 0xfffff;
 	}
 	if(code == 0)
 		return GetSysString(stringid);
