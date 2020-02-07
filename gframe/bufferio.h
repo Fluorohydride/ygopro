@@ -24,6 +24,10 @@ public:
 		vec.resize(vec_size + val_size);
 		std::memcpy(&vec[vec_size], &val, val_size);
 	}
+	inline static void Read(char*& p, void* dest, size_t size) {
+		memcpy(dest, p, size);
+		p += size;
+	}
 	template<typename T>
 	inline static T Read(char*& p) {
 		T ret;
