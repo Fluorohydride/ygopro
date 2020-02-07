@@ -8,6 +8,8 @@
 struct sqlite3;
 struct sqlite3_stmt;
 
+#define TYPE_SKILL 0x8000000
+
 namespace ygo {
 
 class DataManager {
@@ -35,7 +37,7 @@ public:
 	std::wstring GetNumString(int num, bool bracket = false);
 	std::wstring FormatLocation(int location, int sequence);
 	std::wstring FormatAttribute(int attribute);
-	std::wstring FormatRace(int race);
+	std::wstring FormatRace(int race, bool isSkill = false);
 	std::wstring FormatType(int type);
 	std::wstring FormatSetName(unsigned long long setcode);
 	std::wstring FormatSetName(std::vector<uint16> setcodes);

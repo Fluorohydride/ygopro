@@ -259,11 +259,10 @@ std::wstring DataManager::FormatAttribute(int attribute) {
 		return unknown_string;
 	return res;
 }
-std::wstring DataManager::FormatRace(int race) {
+std::wstring DataManager::FormatRace(int race, bool isSkill) {
 	std::wstring res;
 	unsigned filter = 1;
-	int i = 1020;
-	for(; filter != 0x2000000; filter <<= 1, ++i) {
+	for(int i = isSkill ? 2100 : 1020; filter != 0x2000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			if(!res.empty())
 				res += L"|";
@@ -278,7 +277,9 @@ std::wstring DataManager::FormatType(int type) {
 	std::wstring res;
 	unsigned filter = 1;
 	int i = 1050;
-	for(; filter != 0x10000000; filter <<= 1, ++i) {
+	if(type & TYPE_SKILL)
+		res += GetSysString(1077);
+	for(; filter != TYPE_SKILL; filter <<= 1, ++i) {
 		if(type & filter) {
 			if(!res.empty())
 				res += L"|";

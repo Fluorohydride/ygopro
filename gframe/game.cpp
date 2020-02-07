@@ -2052,7 +2052,12 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 		}
 		stDataInfo->setText(text.c_str());
 	} else {
-		stInfo->setText(fmt::format(L"[{}]", dataManager.FormatType(cd->type)).c_str());
+		if(cd->type & TYPE_SKILL) { // TYPE_SKILL created by hints
+			// Hack: Race encodes the character for now
+			stInfo->setText(fmt::format(L"[{}|{}]", dataManager.FormatRace(cd->race, true), dataManager.FormatType(cd->type)).c_str());
+		} else {
+			stInfo->setText(fmt::format(L"[{}]", dataManager.FormatType(cd->type)).c_str());
+		}
 		if(cd->type & TYPE_LINK) {
 			stDataInfo->setText(fmt::format(L"LINK {}   {}", cd->level, dataManager.FormatLinkMarker(cd->link_marker)).c_str());
 		} else
