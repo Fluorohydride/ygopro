@@ -12,6 +12,7 @@
 #include "replay_mode.h"
 #include "sound_manager.h"
 #include "CGUIImageButton/CGUIImageButton.h"
+#include "progressivebuffer.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
