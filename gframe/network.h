@@ -241,19 +241,20 @@ public:
 #define MODE_RELAY		0x3
 #define MODE_ARBITRARY	0x4
 
-#define SEALED_DUEL			0x1
-#define BOOSTER_DUEL		0x2
-#define DESTINY_DRAW		0x4
-#define SPEED_DUEL			0x8
-#define CONCENTRATION_DUEL	0x10
-#define BOSS_DUEL			0x20
-#define BATTLE_CITY			0x40
-#define DUELIST_KINGDOM		0x80
-#define DIMENSTION_DUEL		0x100
-#define TURBO_DUEL			0x200
-#define DOUBLE_DECK			0x400
-#define COMMAND_DUEL		0x800
-#define DECK_MASTER			0x1000
+#define SEALED_DUEL         0x1
+#define BOOSTER_DUEL        0x2
+#define DESTINY_DRAW        0x4
+#define SPEED_DUEL          0x8
+#define CONCENTRATION_DUEL  0x10
+#define BOSS_DUEL           0x20
+#define BATTLE_CITY         0x40
+#define DUELIST_KINGDOM     0x80
+#define DIMENSION_DUEL      0x100
+#define TURBO_DUEL          0x200
+#define DOUBLE_DECK         0x400
+#define COMMAND_DUEL        0x800
+#define DECK_MASTER         0x1000
+#define ACTION_DUEL         0x2000
 
 #define DUEL_STAGE_BEGIN		0
 #define DUEL_STAGE_FINGER		1

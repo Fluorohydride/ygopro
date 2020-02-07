@@ -589,7 +589,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		extracards.push_back(511004014);
 	if(host_info.extra_rules & DUELIST_KINGDOM)
 		extracards.push_back(511002621);
-	if(host_info.extra_rules & DIMENSTION_DUEL)
+	if(host_info.extra_rules & DIMENSION_DUEL)
 		extracards.push_back(511600002);
 	if(host_info.extra_rules & TURBO_DUEL)
 		extracards.push_back(302);
@@ -599,6 +599,8 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		extracards.push_back(300);
 	if(host_info.extra_rules & DESTINY_DRAW)
 		extracards.push_back(511004000);
+	if(host_info.extra_rules & ACTION_DUEL)
+		extracards.push_back(301);
 	OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
 	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
 		card_info.code = extracards[i];

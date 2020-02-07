@@ -600,7 +600,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			str.append(fmt::format(L"*{}\n", dataManager.GetSysString(1260 + rule - 1)));
 		}
 		if(!mainGame->dInfo.compat_mode) {
-			for(int flag = SEALED_DUEL, i = 0; flag < DECK_MASTER + 1; flag = flag << 1, i++)
+			for(int flag = SEALED_DUEL, i = 0; flag < ACTION_DUEL + 1; flag = flag << 1, i++)
 				if(pkt->info.extra_rules & flag) {
 					str2.append(fmt::format(L"*{}\n", dataManager.GetSysString(1132 + i)));
 				}

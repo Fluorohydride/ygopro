@@ -307,7 +307,7 @@ bool Game::Initialize() {
 	wRules->setDraggable(true);
 	wRules->setVisible(false);
 	btnRulesOK = env->addButton(Scale(135, 175, 235, 200), wRules, BUTTON_RULE_OK, dataManager.GetSysString(1211).c_str());
-	for(int i = 0; i < 13; ++i)
+	for(int i = 0; i < 14; ++i)
 		chkRules[i] = env->addCheckBox(false, Scale(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, CHECKBOX_EXTRA_RULE, dataManager.GetSysString(1132 + i).c_str());
 	extra_rules = 0;
 	env->addStaticText(dataManager.GetSysString(1236).c_str(), Scale(20, 180, 220, 200), false, false, wCreateHost);
@@ -2249,7 +2249,7 @@ void Game::UpdateDuelParam() {
 	forbiddentypes = flag2;
 }
 void Game::UpdateExtraRules() {
-	for(int i = 0; i < 13; i++)
+	for(int i = 0; i < 14; i++)
 		chkRules[i]->setEnabled(true);
 	if(chkRules[0]->isChecked()) {
 		chkRules[1]->setEnabled(false);
@@ -2276,7 +2276,7 @@ void Game::UpdateExtraRules() {
 		chkRules[7]->setEnabled(false);
 	}
 	extra_rules = 0;
-	for(int flag = 1, i = 0; i < 13; i++, flag = flag << 1) {
+	for(int flag = 1, i = 0; i < 14; i++, flag = flag << 1) {
 		if(chkRules[i]->isChecked())
 			extra_rules |= flag;
 	}
