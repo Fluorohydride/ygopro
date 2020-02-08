@@ -2358,8 +2358,13 @@ void Game::SetPhaseButtons() {
 	}
 }
 void Game::SetMesageWindow() {
-	SetCentered(wMessage);
-	SetCentered(wACMessage);
+	if(is_building || dInfo.isInDuel) {
+		wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
+		wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
+	} else {
+		SetCentered(wMessage);
+		SetCentered(wACMessage);
+	}
 }
 bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 	irr::gui::IGUIElement* focus = env->getFocus();
