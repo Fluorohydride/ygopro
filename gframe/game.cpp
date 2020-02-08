@@ -2570,13 +2570,12 @@ recti Game::ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width) {
 	res.UpperLeftCorner.X -= width / 2;
 	return res;
 }
-recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2) {
+recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2, s32 xoff, s32 yoff) {
 	auto size = driver->getScreenSize();
 	recti rect(0, 0, size.Width, size.Height);
 	auto center = rect.getCenter();
 	core::dimension2d<u32> sizes((x + x2) / 2, (y + y2) / 2);
-	recti rect2(x, y, x2, y2);
-	return recti((center.X - sizes.Width), center.Y - sizes.Height, center.X + sizes.Width, center.Y + sizes.Height);
+	return recti((center.X - sizes.Width) + xoff, center.Y - sizes.Height + yoff, center.X + sizes.Width + xoff, center.Y + sizes.Height + yoff);
 }
 void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	std::wstring text = obj->getText();
