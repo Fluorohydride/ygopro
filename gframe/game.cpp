@@ -1086,6 +1086,7 @@ bool Game::Initialize() {
 	}
 #endif
 	fpsCounter = env->addStaticText(L"", Scale(950, 620, 1024, 640), false, false);
+	fpsCounter->setOverrideColor(skin::FPS_TEXT_COLOR_VAL);
 	fpsCounter->setVisible(gameConf.showFPS);
 	hideChat = false;
 	hideChatTimer = 0;
@@ -1479,6 +1480,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		ebRoomNameText->setOverrideColor(roomlistcolor);
 		((CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
 		((CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
+		fpsCounter->setOverrideColor(skin::FPS_TEXT_COLOR_VAL);
 		for(auto& repo : repoInfoGui) {
 			repo.second.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 			repo.second.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
