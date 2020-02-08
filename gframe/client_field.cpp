@@ -578,7 +578,7 @@ void ClientField::ShowLocationCard() {
 	mainGame->btnDisplayOK->setVisible(true);
 	mainGame->PopupElement(mainGame->wCardDisplay);
 }
-void ClientField::ShowSelectOption(int select_hint) {
+void ClientField::ShowSelectOption(uint64 select_hint) {
 	selected_option = 0;
 	int count = select_options.size();
 	bool quickmode = true;// (count <= 5);

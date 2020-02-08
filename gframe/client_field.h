@@ -101,7 +101,7 @@ public:
 	void ShowSelectCard(bool buttonok = false, bool chain = false);
 	void ShowChainCard();
 	void ShowLocationCard();
-	void ShowSelectOption(int select_hint = 0);
+	void ShowSelectOption(uint64 select_hint = 0);
 	void ReplaySwap();
 	void RefreshAllCards();
 
