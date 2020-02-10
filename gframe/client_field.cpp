@@ -658,7 +658,7 @@ void ClientField::ReplaySwap() {
 	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 	std::swap(mainGame->dInfo.strLP[0], mainGame->dInfo.strLP[1]);
-	std::swap(mainGame->dInfo.opponames, mainGame->dInfo.selfnames);
+	std::swap(mainGame->dInfo.selfnames, mainGame->dInfo.opponames);
 	for(auto& chit : chains) {
 		chit.controler = 1 - chit.controler;
 		GetChainLocation(chit.controler, chit.location, chit.sequence, &chit.chain_pos);

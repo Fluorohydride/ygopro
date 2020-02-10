@@ -73,10 +73,10 @@ int ReplayMode::ReplayThread() {
 	if(!mainGame->dInfo.isRelay)
 		mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
 	auto names = ReplayMode::cur_replay.GetPlayerNames();
-	mainGame->dInfo.opponames.clear();
 	mainGame->dInfo.selfnames.clear();
-	mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin(), names.begin() + mainGame->dInfo.team1);
-	mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin() + mainGame->dInfo.team1, names.end());
+	mainGame->dInfo.opponames.clear();
+	mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + mainGame->dInfo.team1);
+	mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + mainGame->dInfo.team1, names.end());
 	int opt = cur_replay.params.duel_flags;
 	mainGame->dInfo.duel_field = opt & 0xff;
 	mainGame->dInfo.extraval = ((opt >> 8) & DUEL_SPEED) ? 1 : 0;
@@ -283,7 +283,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			std::string namebuf;
 			namebuf.resize(len);
 			memcpy(&namebuf[0], begin, len + 1);
-			mainGame->dInfo.selfnames[0] = BufferIO::DecodeUTF8s(namebuf);
+			mainGame->dInfo.opponames[0] = BufferIO::DecodeUTF8s(namebuf);
 			return true;
 		}
 		case OLD_REPLAY_MODE:
