@@ -2463,8 +2463,6 @@ void Game::OnResize() {
 		window.second.history_button2->setRelativePosition(recti(ResizeX(200), 5, ResizeX(300 - 5), Scale(20 + 10)));
 	}
 	stName->setRelativePosition(Scale(10, 10, 287 * window_scale.X, 32));
-	if(showingcard)
-		ShowCardInfo(showingcard, true);
 
 	auto logParentHeight = lstLog->getParent()->getAbsolutePosition().getHeight();
 
@@ -2484,6 +2482,8 @@ void Game::OnResize() {
 	lstChat->setRelativePosition(lstsSize);
 
 	imageManager.ClearTexture(true);
+
+	ShowCardInfo(showingcard, true);
 
 	auto tabsystemParentPos = tabSystem->getParent()->getAbsolutePosition();
 	tabSystem->setRelativePosition(recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
