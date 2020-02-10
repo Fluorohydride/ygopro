@@ -112,6 +112,7 @@ struct DuelInfo {
 	bool isOldReplay;
 	bool isCatchingUp;
 	bool isFirst;
+	bool isTeam1;
 	bool isRelay;
 	bool isInLobby;
 	bool isSingleMode;
@@ -204,7 +205,6 @@ public:
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
 
 	uint8 LocalPlayer(uint8 player);
-	std::wstring LocalName(int local_player);
 	void UpdateDuelParam();
 	void UpdateExtraRules();
 	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);

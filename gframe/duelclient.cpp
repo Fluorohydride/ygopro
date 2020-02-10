@@ -516,6 +516,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		deckManager.pre_deck = deckManager.current_deck;
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
+		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		mainGame->SetMesageWindow();
 		mainGame->gMutex.unlock();
 		break;
@@ -686,6 +687,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.unlock();
 		mainGame->dInfo.extraval = (!mainGame->dInfo.compat_mode && pkt->info.extra_rules & SPEED_DUEL) ? 1 : 0;
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
+		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		connect_state |= 0x4;
 		break;
 	}
@@ -717,6 +719,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
 		mainGame->dInfo.player_type = selftype;
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
+		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		break;
 	}
 	case STOC_DUEL_START: {
@@ -774,8 +777,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350).c_str());
 			mainGame->btnLeaveGame->setVisible(true);
 			mainGame->btnSpectatorSwap->setVisible(true);
-		} else if(selftype >= mainGame->dInfo.team1) {
-			std::swap(mainGame->dInfo.opponames, mainGame->dInfo.selfnames);
+		} else {
+			mainGame->dInfo.isFirst = selftype < mainGame->dInfo.team1;
+			mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		}
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
@@ -851,16 +855,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		int type = -1;
 		if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
 			if(mainGame->chkIgnore1->isChecked()) {
-				if(player >= mainGame->dInfo.team1 && mainGame->dInfo.isFirst)
+				if(player >= mainGame->dInfo.team1 && mainGame->dInfo.isTeam1)
 					break;
-				if(player < mainGame->dInfo.team1 && !mainGame->dInfo.isFirst)
+				if(player < mainGame->dInfo.team1 && !mainGame->dInfo.isTeam1)
 					break;
 			}
 			if(player >= mainGame->dInfo.team1) {
 				player -= mainGame->dInfo.team1;
-				type = !mainGame->dInfo.isInDuel ? 1 : mainGame->LocalPlayer(1);
+				type = 1;
 			} else {
-				type = !mainGame->dInfo.isInDuel ? 0 : mainGame->LocalPlayer(0);
+				type = 0;
 			}
 		} else {
 			type = 2;
@@ -1295,13 +1299,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcardcode = 3;
 		std::wstring formatted_string = L"";
 		if(player < 2) {
-			mainGame->showcardcode = mainGame->LocalPlayer(player) + 1;
+			player = mainGame->LocalPlayer(player);
+			mainGame->showcardcode = player + 1;
 			if(match_kill)
 				mainGame->dInfo.vic_string = fmt::sprintf(dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
 			else if(type < 0x10) {
-				auto curplayer = mainGame->dInfo.current_player[mainGame->LocalPlayer(player)];
-				mainGame->dInfo.vic_string = fmt::format(L"[{}] {}", (mainGame->LocalPlayer(player) == 0) ? mainGame->dInfo.opponames[curplayer] : mainGame->dInfo.selfnames[curplayer],
-					dataManager.GetVictoryString(type));
+				auto curplayer = mainGame->dInfo.current_player[1 - player];
+				auto& names = (player == 0 && mainGame->dInfo.isFirst) ? mainGame->dInfo.opponames : mainGame->dInfo.selfnames;
+				mainGame->dInfo.vic_string = fmt::format(L"[{}] {}", names[curplayer], dataManager.GetVictoryString(type));
 			} else
 				mainGame->dInfo.vic_string = dataManager.GetVictoryString(type);
 		}
@@ -1333,14 +1338,27 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->gMutex.lock();
 		}
 		mainGame->dInfo.isStarted = true;
+		auto was_first = mainGame->dInfo.isFirst;
 		mainGame->dInfo.isFirst = (playertype & 0xf) ? false : true;
+		if(was_first != mainGame->dInfo.isFirst) {
+			std::swap(mainGame->dInfo.opponames, mainGame->dInfo.selfnames);
+			std::swap(mainGame->dInfo.team1, mainGame->dInfo.team2);
+			mainGame->dInfo.isTeam1 = !mainGame->dInfo.isTeam1;
+		}
 		if(playertype & 0xf0)
 			mainGame->dInfo.player_type = 7;
 		if(!mainGame->dInfo.isRelay) {
-			if(mainGame->dInfo.isFirst)
-				mainGame->dInfo.current_player[mainGame->LocalPlayer(1)] = mainGame->dInfo.team2 - 1;
-			else
-				mainGame->dInfo.current_player[mainGame->LocalPlayer(0)] = mainGame->dInfo.team1 - 1;
+			if(mainGame->dInfo.isFirst) {
+				if(mainGame->dInfo.isTeam1)
+					mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
+				else
+					mainGame->dInfo.current_player[1] = mainGame->dInfo.team1 - 1;
+			} else {
+				if(mainGame->dInfo.isTeam1)
+					mainGame->dInfo.current_player[0] = mainGame->dInfo.team1 - 1;
+				else
+					mainGame->dInfo.current_player[0] = mainGame->dInfo.team2 - 1;
+			}
 		}
 		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::Read<uint32_t>(pbuf);
 		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::Read<uint32_t>(pbuf);
@@ -3899,7 +3917,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->WaitFrameSignal(5);
 		}
 		mainGame->gMutex.lock();
-		mainGame->dInfo.current_player[player] = (mainGame->dInfo.current_player[player] + 1) % ((player == 0) ? mainGame->dInfo.opponames.size() : mainGame->dInfo.selfnames.size());
+		mainGame->dInfo.current_player[player] = (mainGame->dInfo.current_player[player] + 1) % ((player == 0 && mainGame->dInfo.isFirst) ? mainGame->dInfo.team1 : mainGame->dInfo.team2);
 		mainGame->gMutex.unlock();
 		break;
 	}

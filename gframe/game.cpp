@@ -2217,9 +2217,6 @@ void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 uint8 Game::LocalPlayer(uint8 player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
-std::wstring Game::LocalName(int local_player) {
-	return local_player == 0 ? dInfo.selfnames[0] : dInfo.opponames[0];
-}
 void Game::UpdateDuelParam() {
 	uint32 flag = 0, filter = 0x100;
 	for (int i = 0; i < (sizeof(chkCustomRules)/sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1)
