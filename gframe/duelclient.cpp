@@ -1305,7 +1305,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dInfo.vic_string = fmt::sprintf(dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
 			else if(type < 0x10) {
 				auto curplayer = mainGame->dInfo.current_player[1 - player];
-				auto& names = (player == 0 && mainGame->dInfo.isFirst) ? mainGame->dInfo.opponames : mainGame->dInfo.selfnames;
+				auto& self = mainGame->dInfo.isTeam1 ? mainGame->dInfo.selfnames : mainGame->dInfo.opponames;
+				auto& oppo = mainGame->dInfo.isTeam1 ? mainGame->dInfo.opponames : mainGame->dInfo.selfnames;
+				auto& names = (player == 0) ? oppo : self;
 				mainGame->dInfo.vic_string = fmt::format(L"[{}] {}", names[curplayer], dataManager.GetVictoryString(type));
 			} else
 				mainGame->dInfo.vic_string = dataManager.GetVictoryString(type);
