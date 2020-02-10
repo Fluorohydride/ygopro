@@ -54,9 +54,9 @@ std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wst
 	BufferIO::CopyWStr(address.c_str(), ip, 16);
 	unsigned int remote_addr = htonl(inet_addr(ip));
 	if(remote_addr == -1) {
-		char opponames[100];
+		char hostname[100];
 		char port[6];
-		BufferIO::CopyWStr(address.c_str(), opponames, 100);
+		BufferIO::CopyWStr(address.c_str(), hostname, 100);
 		BufferIO::CopyWStr(_port.c_str(), port, 6);
 		evutil_addrinfo hints;
 		evutil_addrinfo *answer = NULL;
@@ -65,7 +65,7 @@ std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wst
 		hints.ai_socktype = SOCK_STREAM;
 		hints.ai_protocol = IPPROTO_TCP;
 		hints.ai_flags = EVUTIL_AI_ADDRCONFIG;
-		int status = evutil_getaddrinfo(opponames, port, &hints, &answer);
+		int status = evutil_getaddrinfo(hostname, port, &hints, &answer);
 		if(status != 0) {
 			throw std::runtime_error("Host not resolved");
 		} else {
