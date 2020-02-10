@@ -444,7 +444,10 @@ void GenericDuel::StartDuel(DuelPlayer* dp) {
 	OrderPlayers(players.home);
 	OrderPlayers(players.opposing, players.home_size);
 	players.home_iterator = players.home.begin();
-	players.opposing_iterator = players.opposing.begin();
+	if(relay)
+		players.opposing_iterator = players.opposing.begin();
+	else
+		players.opposing_iterator = players.opposing.end() - 1;
 	//NetServer::StopListen();
 	//NetServer::StopBroadcast();
 	ITERATE_PLAYERS(NetServer::SendPacketToPlayer(dueler.player, STOC_DUEL_START);)
@@ -524,7 +527,10 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 			players.opposing[i].player->type = i + players.home_size;
 		}
 		players.home_iterator = players.home.begin();
-		players.opposing_iterator = players.opposing.begin();
+		if(relay)
+			players.opposing_iterator = players.opposing.begin();
+		else
+			players.opposing_iterator = players.opposing.end() - 1;
 		swapped = true;
 	}
 	turn_count = 0;
