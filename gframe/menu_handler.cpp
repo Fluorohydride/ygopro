@@ -793,7 +793,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case TABLE_ROOMLIST: {
 				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, irr::gui::EMBF_OK, 0, 0);
+					mainGame->env->addMessageBox(dataManager.GetSysString(1256).c_str(), dataManager.GetSysString(1257).c_str(), true, irr::gui::EMBF_OK, 0, 0);
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {

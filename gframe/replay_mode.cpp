@@ -221,7 +221,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				mainGame->gMutex.unlock();
 			}
 			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(L"Error occurs.");
+			mainGame->stMessage->setText(dataManager.GetSysString(1434).c_str());
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();
