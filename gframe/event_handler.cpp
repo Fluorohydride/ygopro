@@ -1588,9 +1588,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mplayer >= 0) {
 					std::wstring player_name;
 					if (mplayer == 0)
-						player_name = mainGame->dInfo.hostname[mainGame->dInfo.current_player[mplayer]];
+						player_name = mainGame->dInfo.opponames[mainGame->dInfo.current_player[mplayer]];
 					else
-						player_name = mainGame->dInfo.clientname[mainGame->dInfo.current_player[mplayer]];
+						player_name = mainGame->dInfo.selfnames[mainGame->dInfo.current_player[mplayer]];
 					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
 					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {
 						player_name.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first, mainGame->dInfo.compat_mode)));

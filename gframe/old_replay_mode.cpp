@@ -26,8 +26,8 @@ namespace ygo {
 		mainGame->dInfo.compat_mode = false;
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
-		mainGame->dInfo.clientname.clear();
-		mainGame->dInfo.hostname.clear();
+		mainGame->dInfo.selfnames.clear();
+		mainGame->dInfo.opponames.clear();
 		mainGame->dInfo.team1 = ReplayMode::cur_replay.GetPlayersCount(0);
 		mainGame->dInfo.team2 = ReplayMode::cur_replay.GetPlayersCount(1);
 		if(!mainGame->dInfo.isRelay)
@@ -101,8 +101,8 @@ namespace ygo {
 		const ReplayHeader& rh = cur_replay.yrp->pheader;
 		int seed = rh.seed;
 		auto names = ReplayMode::cur_replay.yrp->GetPlayerNames();
-		mainGame->dInfo.hostname.insert(mainGame->dInfo.hostname.end(), names.begin(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0));
-		mainGame->dInfo.clientname.insert(mainGame->dInfo.clientname.end(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0), names.end());
+		mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0));
+		mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0), names.end());
 		std::mt19937 rnd(seed);
 		int start_lp = cur_replay.yrp->params.start_lp;
 		int start_hand = cur_replay.yrp->params.start_hand;

@@ -128,8 +128,8 @@ struct DuelInfo {
 	int team1;
 	int team2;
 	int best_of;
-	std::vector<std::wstring> clientname;
-	std::vector<std::wstring> hostname;
+	std::vector<std::wstring> selfnames;
+	std::vector<std::wstring> opponames;
 	std::wstring strLP[2];
 	std::wstring vic_string;
 	unsigned char player_type;

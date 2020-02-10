@@ -65,8 +65,8 @@ restart:
 	mainGame->dInfo.startlp = start_lp;
 	mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 	mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
-	mainGame->dInfo.hostname = { mainGame->ebNickName->getText() };
-	mainGame->dInfo.clientname = { L"" };
+	mainGame->dInfo.opponames = { mainGame->ebNickName->getText() };
+	mainGame->dInfo.selfnames = { L"" };
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
 	bool loaded = true;
@@ -162,10 +162,10 @@ restart:
 		replay_stream.clear();
 	}
 	unsigned short buffer[20];
-	BufferIO::CopyWStr(mainGame->dInfo.hostname[0].c_str(), buffer, 20);
+	BufferIO::CopyWStr(mainGame->dInfo.opponames[0].c_str(), buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
 	new_replay.WriteData(buffer, 40, false);
-	BufferIO::CopyWStr(mainGame->dInfo.clientname[0].c_str(), buffer, 20);
+	BufferIO::CopyWStr(mainGame->dInfo.selfnames[0].c_str(), buffer, 20);
 	last_replay.WriteData(buffer, 40, false);
 	new_replay.WriteData(buffer, 40, false);
 	last_replay.Write<uint32_t>(start_lp, false);
@@ -338,7 +338,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			std::string namebuf;
 			namebuf.resize(len);
 			memcpy(&namebuf[0], begin, len + 1);
-			mainGame->dInfo.clientname[0] = BufferIO::DecodeUTF8s(namebuf);
+			mainGame->dInfo.selfnames[0] = BufferIO::DecodeUTF8s(namebuf);
 			break;
 		}
 		case MSG_SHOW_HINT: {

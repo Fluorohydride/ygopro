@@ -654,10 +654,10 @@ void Game::DrawMisc() {
 
 	recti p1size = Resize(335, 31, 629, 50);
 	recti p2size = Resize(986, 31, 986, 50);
-	textFont->draw(dInfo.hostname[dInfo.current_player[LocalPlayer(0)]].c_str(), p1size, 0xffffffff, false, false, 0);
-	auto cld = textFont->getDimension(dInfo.clientname[dInfo.current_player[LocalPlayer(1)]]);
+	textFont->draw(dInfo.opponames[dInfo.current_player[LocalPlayer(0)]].c_str(), p1size, 0xffffffff, false, false, 0);
+	auto cld = textFont->getDimension(dInfo.selfnames[dInfo.current_player[LocalPlayer(1)]]);
 	p2size.UpperLeftCorner.X -= cld.Width;
-	textFont->draw(dInfo.clientname[dInfo.current_player[LocalPlayer(1)]].c_str(), p2size, 0xffffffff, false, false, 0);
+	textFont->draw(dInfo.selfnames[dInfo.current_player[LocalPlayer(1)]].c_str(), p2size, 0xffffffff, false, false, 0);
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	DrawShadowText(lpcFont, dataManager.GetNumString(dInfo.turn).c_str(), Resize(635, 5, 685, 40), Resize(0, 0, 2, 0), 0x8000ffff, 0x80000000, true);

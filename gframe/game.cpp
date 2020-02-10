@@ -2101,10 +2101,10 @@ void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 	chatType[0] = player;
 	if(type == 0) {
 		soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
-		chatMsg[0].append(dInfo.hostname[player]);
+		chatMsg[0].append(dInfo.opponames[player]);
 	} else if(type == 1) {
 		soundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
-		chatMsg[0].append(dInfo.clientname[player]);
+		chatMsg[0].append(dInfo.selfnames[player]);
 	} else if(type == 2) {
 		switch(player) {
 		case 7: //local name
@@ -2218,7 +2218,7 @@ uint8 Game::LocalPlayer(uint8 player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
 std::wstring Game::LocalName(int local_player) {
-	return local_player == 0 ? dInfo.hostname[0] : dInfo.clientname[0];
+	return local_player == 0 ? dInfo.opponames[0] : dInfo.selfnames[0];
 }
 void Game::UpdateDuelParam() {
 	uint32 flag = 0, filter = 0x100;
@@ -2427,7 +2427,7 @@ void Game::OnResize() {
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
-	if (dInfo.clientname.size() + dInfo.hostname.size()>=5) {
+	if (dInfo.selfnames.size() + dInfo.opponames.size()>=5) {
 		wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 500));
 		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 500));
 	} else {
