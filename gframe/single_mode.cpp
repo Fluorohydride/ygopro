@@ -142,6 +142,7 @@ restart:
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
 	mainGame->dInfo.isFirst = true;
+	mainGame->dInfo.isTeam1 = true;
 	mainGame->dInfo.isInDuel = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isCatchingUp = false;

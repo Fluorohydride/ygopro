@@ -63,6 +63,7 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.isReplay = true;
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
+	mainGame->dInfo.isTeam1 = true;
 	mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 	mainGame->dInfo.compat_mode = !(rh.flag & REPLAY_LUA64);
