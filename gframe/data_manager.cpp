@@ -176,14 +176,51 @@ bool DataManager::LoadStrings(const path_string& file) {
 		auto value = str.substr(0, pos);
 		str = str.substr(pos + 1);
 		try {
+			LocaleStringHelper* obj = nullptr;
 			if(type == "system")
-				_sysStrings[std::stoi(value)] = BufferIO::DecodeUTF8s(str);
+				obj = &_sysStrings;
 			else if(type == "victory")
-				_victoryStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+				obj = &_victoryStrings;
 			else if(type == "counter")
-				_counterStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+				obj = &_counterStrings;
 			else if(type == "setname")
-				_setnameStrings[std::stoi(value, 0, 16)] = BufferIO::DecodeUTF8s(str);
+				obj = &_setnameStrings;
+			obj->SetMain(std::stoi(value), BufferIO::DecodeUTF8s(str));
+		}
+		catch(...) {}
+	}
+	string_file.close();
+	return true;
+}
+bool DataManager::LoadLocaleStrings(const path_string & file) {
+	std::ifstream string_file(file, std::ifstream::in);
+	if(!string_file.is_open())
+		return false;
+	std::string str;
+	while(std::getline(string_file, str)) {
+		auto pos = str.find_first_of("\n\r");
+		if(str.size() && pos != std::string::npos)
+			str = str.substr(0, pos);
+		if(str.empty() || str.at(0) != '!') {
+			continue;
+		}
+		pos = str.find(' ');
+		auto type = str.substr(1, pos - 1);
+		str = str.substr(pos + 1);
+		pos = str.find(' ');
+		auto value = str.substr(0, pos);
+		str = str.substr(pos + 1);
+		try {
+			LocaleStringHelper* obj = nullptr;
+			if(type == "system")
+				obj = &_sysStrings;
+			else if(type == "victory")
+				obj = &_victoryStrings;
+			else if(type == "counter")
+				obj = &_counterStrings;
+			else if(type == "setname")
+				obj = &_setnameStrings;
+			obj->SetLocale(std::stoi(value), BufferIO::DecodeUTF8s(str));
 		}
 		catch(...) {}
 	}
@@ -253,37 +290,38 @@ std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
 		return unknown_string;
 	return csit->second.GetStrings()->desc[stringid];
 }
-std::wstring DataManager::GetSysString(uint64 code) {
-	if(code >> 32)
+std::wstring DataManager::GetSysString(uint32 code) {
+	auto csit = _sysStrings.GetLocale(code);
+	if(!csit)
 		return unknown_string;
-	auto csit = _sysStrings.find(code);
-	if(csit == _sysStrings.end() || csit->second.empty())
-		return unknown_string;
-	return csit->second;
+	return csit;
 }
 std::wstring DataManager::GetVictoryString(int code) {
-	auto csit = _victoryStrings.find(code);
-	if(csit == _victoryStrings.end() || csit->second.empty())
+	auto csit = _victoryStrings.GetLocale(code);
+	if(!csit)
 		return unknown_string;
-	return csit->second;
+	return csit;
 }
 std::wstring DataManager::GetCounterName(int code) {
-	auto csit = _counterStrings.find(code);
-	if(csit == _counterStrings.end() || csit->second.empty())
+	auto csit = _counterStrings.GetLocale(code);
+	if(!csit)
 		return unknown_string;
-	return csit->second;
+	return csit;
 }
 std::wstring DataManager::GetSetName(int code) {
-	auto csit = _setnameStrings.find(code);
-	if(csit == _setnameStrings.end() || csit->second.empty())
+	auto csit = _setnameStrings.GetLocale(code);
+	if(!csit)
 		return L"";
-	return csit->second;
+	return csit;
 }
 std::vector<unsigned int> DataManager::GetSetCode(std::vector<std::wstring>& setname) {
 	std::vector<unsigned int> res;
-	for(auto& string : _setnameStrings) {
-		auto xpos = string.second.find_first_of(L'|');//setname|extra info
-		if(Utils::ContainsSubstring(string.second.substr(0, xpos), setname, true))
+	for(auto& string : _setnameStrings.map) {
+		if(string.second.first.empty())
+			continue;
+		auto str = string.second.second.size() ? string.second.second : string.second.first;
+		auto xpos = str.find_first_of(L'|');//setname|extra info
+		if(Utils::ContainsSubstring(str.substr(0, xpos), setname, true))
 			res.push_back(string.first);
 	}
 	return res;
