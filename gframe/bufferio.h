@@ -5,10 +5,6 @@
 #include <vector>
 #include <cstring>
 
-#ifdef _MSC_VER
-#pragma warning(disable: 4244)
-#endif
-
 class BufferIO {
 public:
 	static void insert_data(std::vector<uint8_t>& vec, void* val, size_t len) {
@@ -66,7 +62,7 @@ public:
 		char* pstr = str;
 		while(*wsrc != 0) {
 			if(*wsrc < 0x80) {
-				*str = *wsrc;
+				*str = static_cast<char>(*wsrc);
 				++str;
 			} else if(*wsrc < 0x800) {
 				str[0] = ((*wsrc >> 6) & 0x1f) | 0xc0;
@@ -132,71 +128,21 @@ public:
 		return wp - wstr;
 	}
 	static std::string EncodeUTF8s(const std::wstring& source) {
-		std::string res;
-		res.reserve(source.size() * 3);
-		for(size_t i = 0; i < source.size(); i++) {
-			auto c = source[i];
-			if(c < 0x80) {
-				res += ((char)c);
-			} else if(c < 0x800) {
-				res += ((char)(((c >> 6) & 0x1f) | 0xc0));
-				res += ((char)((c & 0x3f) | 0x80));
-			} else if(c < 0x10000 && (c < 0xd800 || c > 0xdfff)) {
-				res += ((char)(((c >> 12) & 0xf) | 0xe0));
-				res += ((char)(((c >> 6) & 0x3f) | 0x80));
-				res += ((char)(((c) & 0x3f) | 0x80));
-			} else {
-#ifdef _WIN32
-				unsigned unicode = 0;
-				unicode |= (c & 0x3ff) << 10;
-				c = source[++i];
-				unicode |= c & 0x3ff;
-				unicode += 0x10000;
-				res += ((char)(((unicode >> 18) & 0x7) | 0xf0));
-				res += ((char)(((unicode >> 12) & 0x3f) | 0x80));
-				res += ((char)(((unicode >> 6) & 0x3f) | 0x80));
-				res += ((char)(((unicode) & 0x3f) | 0x80));
-#else
-				res += ((char)(((c >> 18) & 0x7) | 0xf0));
-				res += ((char)(((c >> 12) & 0x3f) | 0x80));
-				res += ((char)(((c >> 6) & 0x3f) | 0x80));
-				res += ((char)(((c) & 0x3f) | 0x80));
-#endif
-			}
-		}
-		res.shrink_to_fit();
-		return res;
+		thread_local std::vector<char> res;
+		res.reserve(source.size() * 4 + 1);
+		EncodeUTF8(source.c_str(), const_cast<char*>(res.data()));
+		return res.data();
 	}
 	// UTF-8 to UTF-16/UTF-32
 	static std::wstring DecodeUTF8s(const std::string& source) {
-		std::wstring res;
-		res.reserve(source.size());
-		for(size_t i = 0; i < source.size();) {
-			auto c = source[i];
-			if((c & 0x80) == 0) {
-				res += ((wchar_t)c);
-				i++;
-			} else if((c & 0xe0) == 0xc0) {
-				res += ((wchar_t)((((unsigned)c & 0x1f) << 6) | ((unsigned)source[i + 1] & 0x3f)));
-				i += 2;
-			} else if((c & 0xf0) == 0xe0) {
-				res += ((wchar_t)((((unsigned)c & 0xf) << 12) | (((unsigned)source[i + 1] & 0x3f) << 6) | ((unsigned)source[i + 2] & 0x3f)));
-				i += 3;
-			} else if((c & 0xf8) == 0xf0) {
+		thread_local std::vector<wchar_t> res;
 #ifdef _WIN32
-				unsigned unicode = (((unsigned)c & 0x7) << 18) | (((unsigned)source[i + 1] & 0x3f) << 12) | (((unsigned)source[i + 2] & 0x3f) << 6) | ((unsigned)source[i + 3] & 0x3f);
-				unicode -= 0x10000;
-				res += ((wchar_t)((unicode >> 10) | 0xd800));
-				res += ((wchar_t)((unicode & 0x3ff) | 0xdc00));
+		res.reserve(source.size() * 2 + 1);
 #else
-				res += ((wchar_t)((((unsigned)c & 0x7) << 18) | (((unsigned)source[i + 1] & 0x3f) << 12) | (((unsigned)source[i + 2] & 0x3f) << 6) | ((unsigned)source[i + 3] & 0x3f)));
-#endif // _WIN32
-				i += 4;
-			} else
-				i++;
-		}
-		res.shrink_to_fit();
-		return res;
+		res.reserve(source.size() + 1);
+#endif
+		DecodeUTF8(source.c_str(), const_cast<wchar_t*>(res.data()));
+		return res.data();
 	}
 	static int GetVal(const wchar_t* pstr) {
 		int ret = 0;
