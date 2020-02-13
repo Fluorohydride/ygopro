@@ -8,7 +8,7 @@ namespace ygo {
 struct GameConfig
 {
 	bool Load(const char* filename);
-	void Save(const char* filename);
+	bool Save(const char* filename);
 
 	bool use_d3d = true;
 	bool use_vsync = true;

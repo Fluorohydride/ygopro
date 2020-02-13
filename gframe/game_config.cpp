@@ -128,8 +128,52 @@ bool GameConfig::Load(const char* filename)
 	return true;
 }
 
-void GameConfig::Save(const char* filename)
+bool GameConfig::Save(const char* filename)
 {
+	std::ofstream conf_file(filename, std::ofstream::out);
+	if (!conf_file.is_open())
+		return false;
+	conf_file << "# EDOPro by Project Ignis system.conf\n";
+	conf_file << "# Overwritten on normal game exit\n";
+	conf_file << "use_d3d = "            << use_d3d << "\n";
+	conf_file << "use_vsync = "          << use_vsync << "\n";
+	conf_file << "max_fps = "            << max_fps << "\n";
+	conf_file << "fullscreen = "         << fullscreen << "\n";
+	conf_file << "antialias = "          << antialias << "\n";
+	conf_file << "errorlog = "           << enable_log << "\n";
+	conf_file << "nickname = "           << BufferIO::EncodeUTF8s(nickname) << "\n";
+	conf_file << "gamename = "           << BufferIO::EncodeUTF8s(gamename) << "\n";
+	conf_file << "lastdeck = "           << BufferIO::EncodeUTF8s(lastdeck) << "\n";
+	conf_file << "lastlflist = "         << lastlflist << "\n";
+	conf_file << "lastallowedcards = "   << lastallowedcards << "\n";
+	conf_file << "textfont = "           << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
+	conf_file << "numfont = "            << BufferIO::EncodeUTF8s(numfont) << "\n";
+	conf_file << "serverport = "         << BufferIO::EncodeUTF8s(serverport) << "\n";
+	conf_file << "lasthost = "           << BufferIO::EncodeUTF8s(lasthost) << "\n";
+	conf_file << "lastport = "           << BufferIO::EncodeUTF8s(lastport) << "\n";
+	conf_file << "game_version = "       << game_version << "\n";
+	conf_file << "automonsterpos = "     << chkMAutoPos << "\n";
+	conf_file << "autospellpos = "       << chkSTAutoPos << "\n";
+	conf_file << "randompos = "          << chkRandomPos << "\n";
+	conf_file << "autochain = "          << chkAutoChain << "\n";
+	conf_file << "waitchain = "          << chkWaitChain << "\n";
+	conf_file << "mute_opponent = "      << chkIgnore1 << "\n";
+	conf_file << "mute_spectators = "    << chkIgnore2 << "\n";
+	conf_file << "hide_setname = "       << chkHideSetname << "\n";
+	conf_file << "hide_hint_button = "   << chkHideHintButton << "\n";
+	conf_file << "draw_field_spell = "   << draw_field_spell << "\n";
+	conf_file << "quick_animation = "    << quick_animation << "\n";
+	conf_file << "showFPS = "            << showFPS << "\n";
+	conf_file << "show_unofficial = "    << chkAnime << "\n";
+	conf_file << "dpi_scale = "          << std::to_string(dpi_scale) << "\n"; // Forces float to show decimals
+	conf_file << "skin = "            	 << Utils::ToUTF8IfNeeded(skin) << "\n";
+	conf_file << "scale_background = "   << scale_background << "\n";
+	conf_file << "accurate_bg_resize = " << accurate_bg_resize << "\n";
+	conf_file << "enable_music = "       << enablemusic << "\n";
+	conf_file << "enable_sound = "       << enablesound << "\n";
+	conf_file << "music_volume = "       << std::min(std::max(static_cast<int>(musicVolume * 100), 0), 100) << "\n";
+	conf_file << "sound_volume = "       << std::min(std::max(static_cast<int>(soundVolume * 100), 0), 100) << "\n";
+	return true;
 }
 
 }
