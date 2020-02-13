@@ -924,10 +924,12 @@ bool DeckBuilder::CheckCard(CardDataM* data, const wchar_t& checkchar, std::vect
 			return false;
 		if(filter_race && data->_data.race != filter_race)
 			return false;
-		if(filter_attrib && data->attribute != filter_attrib)
+		if(filter_attrib && data->_data.attribute != filter_attrib)
 			return false;
 		if(filter_atktype) {
 			if((filter_atktype == 1 && data->_data.attack != filter_atk) || (filter_atktype == 2 && data->_data.attack < filter_atk)
+				|| (filter_atktype == 3 && data->_data.attack <= filter_atk) || (filter_atktype == 4 && (data->_data.attack > filter_atk || data->_data.attack < 0))
+				|| (filter_atktype == 5 && (data->_data.attack >= filter_atk || data->_data.attack < 0)) || (filter_atktype == 6 && data->_data.attack != -2))
 				return false;
 		}
 		if(filter_deftype) {
