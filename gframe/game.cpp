@@ -1660,57 +1660,21 @@ void Game::LoadConfig() {
 	}
 }
 void Game::SaveConfig() {
-	std::ofstream conf_file("./config/system.conf", std::ofstream::out);
-	if(!conf_file.is_open())
-		return;
-	conf_file << "#Configuration file\n";
-	conf_file << "#Nickname & Gamename should be less than 20 characters\n";
-	conf_file << "#The following parameters use 0 for 'disabled' or 1 for 'enabled':\n";
-	conf_file << "#use_d3d, use_vsync, fullscreen, automonsterpos, autospellpos, randompos, autochain, waitchain, mute_opponent, mute_spectators,\n";
-	conf_file <<  "hide_setname,hide_hint_button, draw_field_spell, quick_animation, show_unofficial, skin, enable_sound, enable_music\n";
-	conf_file << "use_d3d = "			<< (gameConf.use_d3d ? 1 : 0) << "\n";
-	conf_file << "use_vsync = "			<< (gameConf.use_vsync ? 1 : 0) << "\n";
-	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
-	conf_file << "max_fps = "			<< gameConf.max_fps << "\n";
-	conf_file << "fullscreen = "		<< (is_fullscreen ? 1 : 0) << "\n";
-	conf_file << "antialias = "			<< gameConf.antialias << "\n";
-	conf_file << "errorlog = "			<< enable_log << "\n";
-	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
-	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
-	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
-	conf_file << "lastlflist = "		<< gameConf.lastlflist << "\n";
-	conf_file << "lastallowedcards = "  << cbRule->getSelected() << "\n";
-	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
-	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
-	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";
-	conf_file << "lasthost = "			<< BufferIO::EncodeUTF8s(gameConf.lasthost) << "\n";
-	conf_file << "lastport = "			<< BufferIO::EncodeUTF8s(gameConf.lastport) << "\n";
-	conf_file << "game_version = "		<< gameConf.game_version << "\n";
-	conf_file << "automonsterpos = "	<< (chkMAutoPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "autospellpos = "		<< (chkSTAutoPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "randompos = "			<< (chkRandomPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "autochain = "			<< (chkAutoChain->isChecked() ? 1 : 0) << "\n";
-	conf_file << "waitchain = "			<< (chkWaitChain->isChecked() ? 1 : 0) << "\n";
-	conf_file << "mute_opponent = "		<< (chkIgnore1->isChecked() ? 1 : 0) << "\n";
-	conf_file << "mute_spectators = "	<< (chkIgnore2->isChecked() ? 1 : 0) << "\n";
-	conf_file << "hide_setname = "		<< (gameConf.chkHideSetname ? 1 : 0) << "\n";
-	conf_file << "hide_hint_button = "	<< (chkHideHintButton->isChecked() ? 1 : 0) << "\n";
-	conf_file << "draw_field_spell = "	<< (gameConf.draw_field_spell ? 1 : 0) << "\n";
-	conf_file << "quick_animation = "	<< (gameConf.quick_animation ? 1 : 0) << "\n";
-	conf_file << "showFPS = "           << (gameConf.showFPS ? 1 : 0) << "\n";
-	conf_file << "#shows the unofficial cards in deck edit, which includes anime, customs, etc\n";
-	conf_file << "show_unofficial = "	<< (chkAnime->isChecked() ? 1 : 0) << "\n";
-	conf_file << "dpi_scale = "			<< std::to_string(gameConf.dpi_scale) << "\n";
-	conf_file << "#if skins from the skin folder are in use\n";
-	conf_file << "skin = "				<< Utils::ToUTF8IfNeeded(gameConf.skin) << "\n";
-	conf_file << "scale_background = "  << (gameConf.scale_background ? 1 : 0) << "\n";
-	conf_file << "accurate_bg_resize = "<< (gameConf.accurate_bg_resize ? 1 : 0) << "\n";
-	conf_file << "enable_music = "		<< (chkEnableMusic->isChecked() ? 1 : 0) << "\n";
-	conf_file << "enable_sound = "		<< (chkEnableSound->isChecked() ? 1 : 0) << "\n";
-	conf_file << "#integers between 0 and 100\n";
-	conf_file << "music_volume = "		<< std::min(std::max((int)(gameConf.musicVolume * 100), 0), 100) << "\n";
-	conf_file << "sound_volume = "		<< std::min(std::max((int)(gameConf.soundVolume * 100), 0), 100) << "\n";
-	conf_file.close();
+	gameConf.fullscreen = is_fullscreen;
+	gameConf.nickname = ebNickName->getText();
+	gameConf.lastallowedcards = cbRule->getSelected();
+	gameConf.chkMAutoPos = chkMAutoPos->isChecked();
+	gameConf.chkSTAutoPos = chkSTAutoPos->isChecked();
+	gameConf.chkRandomPos = chkRandomPos->isChecked();
+	gameConf.chkAutoChain = chkAutoChain->isChecked();
+	gameConf.chkWaitChain = chkWaitChain->isChecked();
+	gameConf.chkIgnore1 = chkIgnore1->isChecked();
+	gameConf.chkIgnore2 = chkIgnore2->isChecked();
+	gameConf.chkHideHintButton = chkHideHintButton->isChecked();
+	gameConf.chkAnime = chkAnime->isChecked();
+	gameConf.enablemusic = chkEnableMusic->isChecked();
+	gameConf.enablesound = chkEnableSound->isChecked();
+	gameConf.Save("./config/system.conf");
 }
 void Game::LoadPicUrls() {
 	try {
