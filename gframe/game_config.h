@@ -23,12 +23,12 @@ struct GameConfig
 	std::wstring lastport = L"7911";
 	std::wstring nickname = L"Player";
 	std::wstring gamename = L"Game";
-	std::wstring lastdeck;
-	unsigned int lastlflist;
+	std::wstring lastdeck = L"";
+	unsigned int lastlflist = 0;
 	unsigned int lastallowedcards = 3;
 	std::wstring textfont = L"fonts/NotoSansJP-Regular.otf";
 	std::wstring numfont = L"fonts/NotoSansJP-Regular.otf";
-	std::wstring roompass; // NOT SERIALIZED
+	std::wstring roompass = L""; // NOT SERIALIZED
 	//settings
 	bool chkMAutoPos = false;
 	bool chkSTAutoPos = false;
@@ -45,7 +45,7 @@ struct GameConfig
 
 	bool scale_background = true;
 #ifdef __ANDROID__
-	bool accurate_bg_resize = false;
+	bool accurate_bg_resize = true;
 #else
 	bool accurate_bg_resize = false;
 #endif
