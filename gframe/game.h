@@ -20,6 +20,7 @@
 #include "sound_manager.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
+#include "game_config.h"
 
 class CGUISkinSystem;
 class IProgressBar;
@@ -60,50 +61,6 @@ namespace irr {
 namespace ygo {
 
 class SoundManager;
-
-struct Config {
-	bool use_d3d;
-	bool use_vsync;
-	float dpi_scale;
-	int max_fps;
-	int game_version;
-	bool fullscreen;
-	unsigned short antialias;
-	std::wstring serverport;
-	unsigned char textfontsize;
-	std::wstring lasthost;
-	std::wstring lastport;
-	std::wstring nickname;
-	std::wstring gamename;
-	std::wstring lastdeck;
-	unsigned int lastlflist;
-	unsigned int lastallowedcards;
-	std::wstring textfont;
-	std::wstring numfont;
-	std::wstring roompass;
-	//settings
-	bool chkMAutoPos;
-	bool chkSTAutoPos;
-	bool chkRandomPos;
-	bool chkAutoChain;
-	bool chkWaitChain;
-	bool chkIgnore1;
-	bool chkIgnore2;
-	bool chkHideSetname;
-	bool chkHideHintButton;
-	bool draw_field_spell;
-	bool quick_animation;
-	bool showFPS;
-
-	bool scale_background;
-	bool accurate_bg_resize;
-	bool chkAnime;
-	bool enablemusic;
-	bool enablesound;
-	double musicVolume;
-	double soundVolume;
-	path_string skin;
-};
 
 struct DuelInfo {
 	bool isInDuel;
@@ -254,7 +211,7 @@ public:
 	Signal replaySignal;
 	std::mutex closeSignal;
 	Signal closeDoneSignal;
-	Config gameConf;
+	GameConfig gameConf;
 	DuelInfo dInfo;
 	DiscordWrapper discord;
 #ifdef YGOPRO_BUILD_DLL
