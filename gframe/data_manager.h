@@ -23,7 +23,6 @@ public:
 	CardDataM(){}
 	CardDataM(CardDataC&& data, CardString&& strings, CardString* locale_strings = nullptr):
 		_data(std::move(data)), _strings(std::move(strings)), _locale_strings(locale_strings){}
-private:
 	CardString _strings{};
 	CardString* _locale_strings = nullptr;
 };
@@ -34,11 +33,11 @@ public:
 		cards.reserve(10000);
 	}
 	~DataManager() {}
+	void ClearLocaleTexts();
+	bool LoadLocaleDB(const path_string& file, bool usebuffer = false);
 	bool LoadDB(const path_string& file, bool usebuffer = false);
 	bool LoadDBFromBuffer(const std::vector<char>& buffer);
-	bool ParseDB(sqlite3* pDB);
 	bool LoadStrings(const path_string& file);
-	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 	bool GetData(int code, CardData* pData);
 	CardDataC* GetCardData(int code);
 	bool GetString(int code, CardString* pStr);
@@ -60,6 +59,8 @@ public:
 	std::wstring FormatLinkMarker(int link_marker);
 
 	std::unordered_map<unsigned int, CardDataM> cards;
+	std::unordered_map<unsigned int, CardString> locales;
+	std::map<unsigned int, std::pair<CardDataM*, CardString*>> indexes;
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;
@@ -67,6 +68,10 @@ public:
 
 	static const wchar_t* unknown_string;
 	static void CardReader(void* payload, int code, CardData* data);
+private:
+	bool ParseDB(sqlite3* pDB);
+	bool ParseLocaleDB(sqlite3* pDB);
+	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
 
 };
 

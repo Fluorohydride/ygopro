@@ -9,6 +9,21 @@ namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
 DataManager dataManager;
 
+void DataManager::ClearLocaleTexts() {
+	for(auto& val : indexes) {
+		val.second.second = nullptr;
+		val.second.first->_locale_strings = nullptr;
+	}
+	locales.clear();
+}
+
+bool DataManager::LoadLocaleDB(const path_string & file, bool usebuffer) {
+	sqlite3* pDB;
+	if(sqlite3_open_v2(Utils::ToUTF8IfNeeded(file).c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
+		return Error(pDB);
+	return ParseLocaleDB(pDB);
+}
+
 bool DataManager::LoadDB(const path_string& file, bool usebuffer) {
 	if(usebuffer) {
 		std::ifstream db(file, std::ifstream::binary);
@@ -29,9 +44,10 @@ bool DataManager::LoadDBFromBuffer(const std::vector<char>& buffer) {
 }
 bool DataManager::ParseDB(sqlite3 * pDB) {
 	sqlite3_stmt* pStmt;
-	const char* sql = "select * from datas,texts where datas.id=texts.id";
+	const char* sql = "select * from datas,texts where datas.id=texts.id ORDER BY texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
+	auto indexesiterator = indexes.begin();
 	int step = 0;
 	do {
 		step = sqlite3_step(pStmt);
@@ -83,7 +99,58 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 					cs.desc[i] = BufferIO::DecodeUTF8s(text);
 				}
 			}
-			cards[cd.code] = { std::move(cd), std::move(cs), nullptr };
+			CardString* localestring = nullptr;
+			if(indexesiterator != indexes.end()) {
+				while(indexesiterator->first < cd.code && indexesiterator != indexes.end())
+					indexesiterator++;
+				if(indexesiterator != indexes.end() && indexesiterator->first == cd.code)
+					localestring = indexesiterator->second.second;
+			}
+			auto ptr = &(cards[cd.code] = { std::move(cd), std::move(cs), localestring });
+			indexes[cd.code] = { ptr, localestring };
+		}
+	} while(step != SQLITE_DONE);
+	sqlite3_finalize(pStmt);
+	sqlite3_close(pDB);
+	return true;
+}
+bool DataManager::ParseLocaleDB(sqlite3 * pDB) {
+	sqlite3_stmt* pStmt;
+	const char* sql = "select * from texts ORDER BY texts.id";
+	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
+		return Error(pDB);
+	auto indexesiterator = indexes.begin();
+	int step = 0;
+	do {
+		step = sqlite3_step(pStmt);
+		if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
+			return Error(pDB, pStmt);
+		else if(step == SQLITE_ROW) {
+			CardString cs{};
+			auto code = sqlite3_column_int(pStmt, 0);
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 1)) {
+				cs.name = BufferIO::DecodeUTF8s(text);
+			}
+			if(const char* text = (const char*)sqlite3_column_text(pStmt, 2)) {
+				cs.text = BufferIO::DecodeUTF8s(text);
+			}
+			for(int i = 0; i < 16; ++i) {
+				if(const char* text = (const char*)sqlite3_column_text(pStmt, i + 3)) {
+					cs.desc[i] = BufferIO::DecodeUTF8s(text);
+				}
+			}
+			CardDataM* card_data = nullptr;
+			if(indexesiterator != indexes.end()) {
+				while(indexesiterator->first < code && indexesiterator != indexes.end())
+					indexesiterator++;
+				if(indexesiterator != indexes.end() && indexesiterator->first == code)
+					card_data = indexesiterator->second.first;
+			}
+			auto ptr = &(locales[code] = std::move(cs));
+			if(card_data) {
+				card_data->_locale_strings = ptr;
+			}
+			indexes[code] = { card_data,ptr };
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
