@@ -2354,7 +2354,7 @@ void Game::SetPhaseButtons() {
 		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 	}
 }
-void Game::SetMesageWindow() {
+void Game::SetMessageWindow() {
 	if(is_building || dInfo.isInDuel) {
 		wMessage->setRelativePosition(ResizeWin(490, 200, 840, 340));
 		wACMessage->setRelativePosition(ResizeWin(490, 240, 840, 300));
@@ -2439,7 +2439,7 @@ void Game::OnResize() {
 
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
-	SetMesageWindow();
+	SetMessageWindow();
 	wQuery->setRelativePosition(ResizeWin(490, 200, 840, 340));
 	wOptions->setRelativePosition(ResizeWinFromCenter(0, 0, wOptions->getRelativePosition().getWidth(), wOptions->getRelativePosition().getHeight(), 135));
 	wPosSelect->setRelativePosition(ResizeWin(340, 200, 935, 410));

@@ -146,7 +146,7 @@ restart:
 	mainGame->dInfo.isInDuel = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isCatchingUp = false;
-	mainGame->SetMesageWindow();
+	mainGame->SetMessageWindow();
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
 	std::vector<uint8> duelBuffer;
@@ -276,7 +276,7 @@ restart:
 			mainGame->ShowElement(mainGame->wSinglePlay);
 			mainGame->stTip->setVisible(false);
 		}
-		mainGame->SetMesageWindow();
+		mainGame->SetMessageWindow();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();
 		if(exit_on_return)

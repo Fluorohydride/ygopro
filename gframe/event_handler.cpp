@@ -153,7 +153,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						mainGame->ShowElement(mainGame->wLanWindow);
 					}
-					mainGame->SetMesageWindow();
+					mainGame->SetMessageWindow();
 					if(exit_on_return)
 						mainGame->device->closeDevice();
 				} else {

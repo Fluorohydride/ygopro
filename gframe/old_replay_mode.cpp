@@ -39,7 +39,7 @@ namespace ygo {
 		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isOldReplay = true;
-		mainGame->SetMesageWindow();
+		mainGame->SetMessageWindow();
 		mainGame->dInfo.isCatchingUp = (skip_turn > 0);
 		is_continuing = true;
 		skip_step = 0;

@@ -209,7 +209,7 @@ public:
 	void UpdateExtraRules();
 	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);
 	void SetPhaseButtons();
-	void SetMesageWindow();
+	void SetMessageWindow();
 
 	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const;
 

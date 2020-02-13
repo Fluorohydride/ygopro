@@ -281,7 +281,7 @@ catch(...) { what = def; }
 					} else {
 						mainGame->ShowElement(mainGame->wLanWindow);
 					}
-					mainGame->SetMesageWindow();
+					mainGame->SetMessageWindow();
 					mainGame->gMutex.unlock();
 				}
 			}
@@ -517,7 +517,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
-		mainGame->SetMesageWindow();
+		mainGame->SetMessageWindow();
 		mainGame->gMutex.unlock();
 		break;
 	}
@@ -761,7 +761,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wChat->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		mainGame->SetPhaseButtons();
-		mainGame->SetMesageWindow();
+		mainGame->SetMessageWindow();
 		mainGame->dInfo.selfnames.clear();
 		mainGame->dInfo.opponames.clear();
 		SetPlayersCount();
@@ -827,7 +827,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		} else {
 			mainGame->ShowElement(mainGame->wLanWindow);
 		}
-		mainGame->SetMesageWindow();
+		mainGame->SetMessageWindow();
 		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);
 		if(exit_on_return)
@@ -1091,7 +1091,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			mainGame->ShowElement(mainGame->wLanWindow);
 		}
-		mainGame->SetMesageWindow();
+		mainGame->SetMessageWindow();
 		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);
 		if(exit_on_return)

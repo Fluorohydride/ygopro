@@ -99,7 +99,7 @@ void DeckBuilder::Initialize(bool refresh) {
 	is_draging = false;
 	prev_deck = mainGame->cbDBDecks->getSelected();
 	prev_operation = 0;
-	mainGame->SetMesageWindow();
+	mainGame->SetMessageWindow();
 	mainGame->device->setEventReceiver(this);
 }
 void DeckBuilder::Terminate(bool showmenu) {
@@ -124,7 +124,7 @@ void DeckBuilder::Terminate(bool showmenu) {
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
 	mainGame->scrFilter->setVisible(false);
-	mainGame->SetMesageWindow();
+	mainGame->SetMessageWindow();
 	int sel = mainGame->cbDBDecks->getSelected();
 	if(sel >= 0)
 		mainGame->gameConf.lastdeck = mainGame->cbDBDecks->getItem(sel);

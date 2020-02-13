@@ -89,7 +89,7 @@ int ReplayMode::ReplayThread() {
 	}
 	mainGame->dInfo.isInDuel = true;
 	mainGame->dInfo.isStarted = true;
-	mainGame->SetMesageWindow();
+	mainGame->SetMessageWindow();
 	mainGame->dInfo.turn = 0;
 	mainGame->dInfo.isCatchingUp = (skip_turn > 0);
 	is_continuing = true;
@@ -113,7 +113,7 @@ int ReplayMode::ReplayThread() {
 				mainGame->dInfo.isStarted = true;
 				mainGame->dInfo.isCatchingUp = false;
 				mainGame->dField.RefreshAllCards();
-				mainGame->SetMesageWindow();
+				mainGame->SetMessageWindow();
 				mainGame->gMutex.unlock();
 			}
 			skip_step = step;
@@ -154,7 +154,7 @@ void ReplayMode::EndDuel() {
 		mainGame->closeSignal.unlock();
 		mainGame->gMutex.lock();
 		mainGame->ShowElement(mainGame->wReplay);
-		mainGame->SetMesageWindow();
+		mainGame->SetMessageWindow();
 		mainGame->stTip->setVisible(false);
 		mainGame->soundManager->StopSounds();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
