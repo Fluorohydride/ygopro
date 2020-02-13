@@ -389,6 +389,8 @@ public:
 	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIComboBox* cbCurrentSkin;
 	irr::gui::IGUICheckBox* chkShowFPS;
+
+	irr::gui::IGUIWindow* wSettings;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;

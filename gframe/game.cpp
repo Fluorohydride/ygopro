@@ -528,6 +528,7 @@ bool Game::Initialize() {
 	//ApplySkin(gameConf.skin);
 	chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 480, 280, 505), tabPanel, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
+	wSettings = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
