@@ -47,12 +47,12 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 	return 0;
 }
 
-static bool check_set_code(CardDataC* data, std::vector<unsigned int>& setcodes) {
-	auto card_setcodes = data->setcodes;
-	if (data->alias) {
-		auto aptr = dataManager.cards.find(data->alias);
-		if (aptr != dataManager.cards.end())
-			card_setcodes = aptr->second.first.setcodes;
+static bool check_set_code(const CardDataC& data, std::vector<unsigned int>& setcodes) {
+	auto card_setcodes = data.setcodes;
+	if (data.alias) {
+		auto _data = dataManager.GetCardData(data.alias);
+		if(_data)
+			card_setcodes = _data->setcodes;
 	}
 	if(setcodes.empty())
 		return card_setcodes.empty();
@@ -893,8 +893,8 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		wchar_t checkterm = term.size() ? term.front() : 0;
 		std::vector<CardDataC*> result;
 		for(auto& card : dataManager.cards) {
-			if(CheckCard(&card.second.first, &card.second.second, checkterm, tokens, set_code))
-				result.push_back(&card.second.first);
+			if(CheckCard(&card.second, checkterm, tokens, set_code))
+				result.push_back(&card.second._data);
 		}
 		if(result.size())
 			searched_terms[term] = result;
@@ -915,69 +915,67 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	}
 	mainGame->scrFilter->setPos(0);
 }
-bool DeckBuilder::CheckCard(CardDataC* data, CardString* text, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
-	if(data->type & TYPE_TOKEN || ((data->ot & 0x103) != data->ot && !mainGame->chkAnime->isChecked()))
+bool DeckBuilder::CheckCard(CardDataM* data, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
+	if(data->_data.type & TYPE_TOKEN || ((data->_data.ot & 0x103) != data->_data.ot && !mainGame->chkAnime->isChecked()))
 		return false;
 	switch(filter_type) {
 	case 1: {
-		if(!(data->type & TYPE_MONSTER) || (data->type & filter_type2) != filter_type2)
+		if(!(data->_data.type & TYPE_MONSTER) || (data->_data.type & filter_type2) != filter_type2)
 			return false;
-		if(filter_race && data->race != filter_race)
+		if(filter_race && data->_data.race != filter_race)
 			return false;
 		if(filter_attrib && data->attribute != filter_attrib)
 			return false;
 		if(filter_atktype) {
-			if((filter_atktype == 1 && data->attack != filter_atk) || (filter_atktype == 2 && data->attack < filter_atk)
-				|| (filter_atktype == 3 && data->attack <= filter_atk) || (filter_atktype == 4 && (data->attack > filter_atk || data->attack < 0))
-				|| (filter_atktype == 5 && (data->attack >= filter_atk || data->attack < 0)) || (filter_atktype == 6 && data->attack != -2))
+			if((filter_atktype == 1 && data->_data.attack != filter_atk) || (filter_atktype == 2 && data->_data.attack < filter_atk)
 				return false;
 		}
 		if(filter_deftype) {
-			if((filter_deftype == 1 && data->defense != filter_def) || (filter_deftype == 2 && data->defense < filter_def)
-				|| (filter_deftype == 3 && data->defense <= filter_def) || (filter_deftype == 4 && (data->defense > filter_def || data->defense < 0))
-				|| (filter_deftype == 5 && (data->defense >= filter_def || data->defense < 0)) || (filter_deftype == 6 && data->defense != -2)
-				|| (data->type & TYPE_LINK))
+			if((filter_deftype == 1 && data->_data.defense != filter_def) || (filter_deftype == 2 && data->_data.defense < filter_def)
+				|| (filter_deftype == 3 && data->_data.defense <= filter_def) || (filter_deftype == 4 && (data->_data.defense > filter_def || data->_data.defense < 0))
+				|| (filter_deftype == 5 && (data->_data.defense >= filter_def || data->_data.defense < 0)) || (filter_deftype == 6 && data->_data.defense != -2)
+				|| (data->_data.type & TYPE_LINK))
 				return false;
 		}
 		if(filter_lvtype) {
-			if((filter_lvtype == 1 && data->level != filter_lv) || (filter_lvtype == 2 && data->level < filter_lv)
-				|| (filter_lvtype == 3 && data->level <= filter_lv) || (filter_lvtype == 4 && data->level > filter_lv)
-				|| (filter_lvtype == 5 && data->level >= filter_lv) || filter_lvtype == 6)
+			if((filter_lvtype == 1 && data->_data.level != filter_lv) || (filter_lvtype == 2 && data->_data.level < filter_lv)
+				|| (filter_lvtype == 3 && data->_data.level <= filter_lv) || (filter_lvtype == 4 && data->_data.level > filter_lv)
+				|| (filter_lvtype == 5 && data->_data.level >= filter_lv) || filter_lvtype == 6)
 				return false;
 		}
 		if(filter_scltype) {
-			if((filter_scltype == 1 && data->lscale != filter_scl) || (filter_scltype == 2 && data->lscale < filter_scl)
-				|| (filter_scltype == 3 && data->lscale <= filter_scl) || (filter_scltype == 4 && (data->lscale > filter_scl || data->lscale == 0))
-				|| (filter_scltype == 5 && (data->lscale >= filter_scl || data->lscale == 0)) || filter_scltype == 6
-				|| !(data->type & TYPE_PENDULUM))
+			if((filter_scltype == 1 && data->_data.lscale != filter_scl) || (filter_scltype == 2 && data->_data.lscale < filter_scl)
+				|| (filter_scltype == 3 && data->_data.lscale <= filter_scl) || (filter_scltype == 4 && (data->_data.lscale > filter_scl || data->_data.lscale == 0))
+				|| (filter_scltype == 5 && (data->_data.lscale >= filter_scl || data->_data.lscale == 0)) || filter_scltype == 6
+				|| !(data->_data.type & TYPE_PENDULUM))
 				return false;
 		}
 		break;
 	}
 	case 2: {
-		if(!(data->type & TYPE_SPELL))
+		if(!(data->_data.type & TYPE_SPELL))
 			return false;
-		if(filter_type2 && data->type != filter_type2)
+		if(filter_type2 && data->_data.type != filter_type2)
 			return false;
 		break;
 	}
 	case 3: {
-		if(!(data->type & TYPE_TRAP))
+		if(!(data->_data.type & TYPE_TRAP))
 			return false;
-		if(filter_type2 && data->type != filter_type2)
+		if(filter_type2 && data->_data.type != filter_type2)
 			return false;
 		break;
 	}
 	}
-	if(filter_effect && !(data->category & filter_effect))
+	if(filter_effect && !(data->_data.category & filter_effect))
 		return false;
-	if(filter_marks && (data->link_marker & filter_marks) != filter_marks)
+	if(filter_marks && (data->_data.link_marker & filter_marks) != filter_marks)
 		return false;
 	if(filter_lm) {
-		unsigned int limitcode = data->code;
+		unsigned int limitcode = data->_data.code;
 		auto flit = filterList->content.find(limitcode);
 		if(flit == filterList->content.end())
-			limitcode = data->alias ? data->alias : data->code;
+			limitcode = data->_data.alias ? data->_data.alias : data->_data.code;
 		if(filter_lm <= LIMITATION_FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
 			return false;
 		if(filter_lm == LIMITATION_FILTER_UNLIMITED) {
@@ -987,32 +985,33 @@ bool DeckBuilder::CheckCard(CardDataC* data, CardString* text, const wchar_t& ch
 			} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
 				return false;
 		}
-		if(filter_lm == LIMITATION_FILTER_OCG && data->ot != 0x1)
+		if(filter_lm == LIMITATION_FILTER_OCG && data->_data.ot != 0x1)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG && data->ot != 0x2)
+		if(filter_lm == LIMITATION_FILTER_TCG && data->_data.ot != 0x2)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->ot != 0x3)
+		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->_data.ot != 0x3)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->ot & 0x100))
+		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->_data.ot & 0x100))
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ANIME && data->ot != 0x4)
+		if(filter_lm == LIMITATION_FILTER_ANIME && data->_data.ot != 0x4)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->ot != 0x8)
+		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->_data.ot != 0x8)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->ot != 0x10)
+		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->_data.ot != 0x10)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->ot != 0x20)
+		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->_data.ot != 0x20)
 			return false;
 	}
 	if(tokens.size()) {
 		if(checkchar == L'$') {
-			return Utils::ContainsSubstring(text->name, tokens, true);
+			return Utils::ContainsSubstring(data->GetStrings()->name, tokens, true);
 		} else if(checkchar == L'@') {
 			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
 				return false;
-			return check_set_code(data, set_code);
+			return check_set_code(data->_data, set_code);
 		} else {
-			return (set_code.size() && check_set_code(data, set_code)) || Utils::ContainsSubstring(text->name, tokens, true) || Utils::ContainsSubstring(text->text, tokens, true);
+			return (set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(data->GetStrings()->name, tokens, true)
+					|| Utils::ContainsSubstring(data->GetStrings()->text, tokens, true);
 		}
 	}
 	return true;

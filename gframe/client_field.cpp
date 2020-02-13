@@ -1381,9 +1381,7 @@ void ClientField::UpdateDeclarableList() {
 	if(cd && is_declarable(cd, declare_opcodes)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		CardString cstr;
-		dataManager.GetString(trycode, &cstr);
-		mainGame->lstANCard->addItem(cstr.name.c_str());
+		mainGame->lstANCard->addItem(dataManager.GetName(trycode).c_str());
 		ancard.push_back(trycode);
 		return;
 	}
@@ -1397,11 +1395,10 @@ void ClientField::UpdateDeclarableList() {
 			cd = dataManager.GetCardData(trycode);
 			if(cd && is_declarable(cd, declare_opcodes)) {
 				ancard.push_back(trycode);
-				CardString cstr;
-				dataManager.GetString(trycode, &cstr);
-				mainGame->lstANCard->addItem(cstr.name.c_str());
+				auto name = dataManager.GetName(trycode);
+				mainGame->lstANCard->addItem(name.c_str());
 				if(trycode == selcode)
-					mainGame->lstANCard->setSelected(cstr.name.c_str());
+					mainGame->lstANCard->setSelected(name.c_str());
 			}
 		}
 		if(!ancard.empty())
@@ -1410,10 +1407,10 @@ void ClientField::UpdateDeclarableList() {
 	mainGame->lstANCard->clear();
 	ancard.clear();
 	for(auto& card : dataManager.cards) {
-		auto& name = card.second.second.name;
+		auto& name = card.second.GetStrings()->name;
 		if(Utils::ContainsSubstring(name, pname, true, true)) {
 			//datas.alias can be double card names or alias
-			if(is_declarable(&card.second.first, declare_opcodes)) {
+			if(is_declarable(&card.second._data, declare_opcodes)) {
 				if(pname == name) { //exact match
 					mainGame->lstANCard->insertItem(0, name.c_str(), -1);
 					ancard.insert(ancard.begin(), card.first);

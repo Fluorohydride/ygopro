@@ -12,6 +12,22 @@ struct sqlite3_stmt;
 
 namespace ygo {
 
+class CardDataM {
+public:
+	CardDataC _data{};
+	const CardString* GetStrings() {
+		if(_locale_strings)
+			return _locale_strings;
+		return &_strings;
+	}
+	CardDataM(){}
+	CardDataM(CardDataC&& data, CardString&& strings, CardString* locale_strings = nullptr):
+		_data(std::move(data)), _strings(std::move(strings)), _locale_strings(locale_strings){}
+private:
+	CardString _strings{};
+	CardString* _locale_strings = nullptr;
+};
+
 class DataManager {
 public:
 	DataManager() {
@@ -43,7 +59,7 @@ public:
 	std::wstring FormatSetName(std::vector<uint16> setcodes);
 	std::wstring FormatLinkMarker(int link_marker);
 
-	std::unordered_map<unsigned int, std::pair<CardDataC, CardString>> cards;
+	std::unordered_map<unsigned int, CardDataM> cards;
 	std::unordered_map<unsigned int, std::wstring> _counterStrings;
 	std::unordered_map<unsigned int, std::wstring> _victoryStrings;
 	std::unordered_map<unsigned int, std::wstring> _setnameStrings;

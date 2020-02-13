@@ -2021,9 +2021,9 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 	if(!gameConf.chkHideSetname) {
 		auto setcodes = cd->setcodes;
 		if(cd->alias) {
-			auto aptr = dataManager.cards.find(cd->alias);
-			if(aptr != dataManager.cards.end())
-				setcodes = aptr->second.first.setcodes;
+			auto data = dataManager.GetCardData(cd->alias);
+			if(data)
+				setcodes = data->setcodes;
 		}
 		if(setcodes.size()) {
 			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());

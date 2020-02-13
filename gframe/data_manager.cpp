@@ -83,7 +83,7 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 					cs.desc[i] = BufferIO::DecodeUTF8s(text);
 				}
 			}
-			cards[cd.code] = std::make_pair(std::move(cd), std::move(cs));
+			cards[cd.code] = { std::move(cd), std::move(cs), nullptr };
 		}
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
@@ -136,13 +136,13 @@ bool DataManager::GetData(int code, CardData* pData) {
 	if(cdit == cards.end())
 		return false;
 	if(pData)
-		*pData = *((CardData*)&cdit->second.first);
+		*pData = *((CardData*)&cdit->second._data);
 	return true;
 }
 CardDataC* DataManager::GetCardData(int code) {
 	auto it = cards.find(code);
 	if(it != cards.end())
-		return &it->second.first;
+		return &it->second._data;
 	return nullptr;
 }
 bool DataManager::GetString(int code, CardString* pStr) {
@@ -152,20 +152,20 @@ bool DataManager::GetString(int code, CardString* pStr) {
 		pStr->text = unknown_string;
 		return false;
 	}
-	*pStr = csit->second.second;
+	*pStr = *csit->second.GetStrings();
 	return true;
 }
 std::wstring DataManager::GetName(int code) {
 	auto csit = cards.find(code);
-	if(csit == cards.end() || csit->second.second.name.empty())
+	if(csit == cards.end() || csit->second.GetStrings()->name.empty())
 		return unknown_string;
-	return csit->second.second.name;
+	return csit->second.GetStrings()->name;
 }
 std::wstring DataManager::GetText(int code) {
 	auto csit = cards.find(code);
-	if(csit == cards.end() || csit->second.second.text.empty())
+	if(csit == cards.end() || csit->second.GetStrings()->text.empty())
 		return unknown_string;
-	return csit->second.second.text;
+	return csit->second.GetStrings()->text;
 }
 std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
 	uint32 code = 0;
@@ -182,9 +182,9 @@ std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
 	if(code == 0)
 		return GetSysString(stringid);
 	auto csit = cards.find(code);
-	if(csit == cards.end() || csit->second.second.desc[stringid].empty())
+	if(csit == cards.end() || csit->second.GetStrings()->desc[stringid].empty())
 		return unknown_string;
-	return csit->second.second.desc[stringid];
+	return csit->second.GetStrings()->desc[stringid];
 }
 std::wstring DataManager::GetSysString(uint64 code) {
 	if(code >> 32)
