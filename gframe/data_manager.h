@@ -54,7 +54,7 @@ public:
 	std::wstring GetNumString(int num, bool bracket = false);
 	std::wstring FormatLocation(int location, int sequence);
 	std::wstring FormatAttribute(int attribute);
-	std::wstring FormatRace(int race);
+	std::wstring FormatRace(int race, bool isSkill);
 	std::wstring FormatType(int type);
 	std::wstring FormatSetName(unsigned long long setcode);
 	std::wstring FormatSetName(std::vector<uint16> setcodes);
