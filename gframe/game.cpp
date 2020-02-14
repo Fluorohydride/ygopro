@@ -2619,6 +2619,14 @@ void Game::ReloadElementsStrings() {
 
 	mTopMenu->setItemText(0, dataManager.GetSysString(2045).c_str()); //mRepositoriesInfo
 	mTopMenu->setItemText(1, dataManager.GetSysString(1970).c_str()); //mAbout
+
+#define TYPECHK(id,stringid) chkTypeLimit[id]->setText(fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(stringid)).c_str());
+	TYPECHK(0, 1056);
+	TYPECHK(1, 1063);
+	TYPECHK(2, 1073);
+	TYPECHK(3, 1074);
+	TYPECHK(4, 1076);
+#undef TYPECHK
 }
 void Game::OnResize() {
 	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
