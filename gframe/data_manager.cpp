@@ -101,7 +101,7 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 			}
 			CardString* localestring = nullptr;
 			if(indexesiterator != indexes.end()) {
-				while(indexesiterator->first < cd.code && indexesiterator != indexes.end())
+				while(indexesiterator != indexes.end() && indexesiterator->first < cd.code)
 					indexesiterator++;
 				if(indexesiterator != indexes.end() && indexesiterator->first == cd.code)
 					localestring = indexesiterator->second.second;
@@ -141,7 +141,7 @@ bool DataManager::ParseLocaleDB(sqlite3 * pDB) {
 			}
 			CardDataM* card_data = nullptr;
 			if(indexesiterator != indexes.end()) {
-				while(indexesiterator->first < code && indexesiterator != indexes.end())
+				while(indexesiterator != indexes.end() && indexesiterator->first < code)
 					indexesiterator++;
 				if(indexesiterator != indexes.end() && indexesiterator->first == code)
 					card_data = indexesiterator->second.first;
