@@ -1889,7 +1889,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {
-				mainGame->gameConf.showFPS = mainGame->chkShowFPS->isChecked();
+				mainGame->gameConf.showFPS = mainGame->gSettings.chkShowFPS->isChecked();
 				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);
 				return true;
 			}

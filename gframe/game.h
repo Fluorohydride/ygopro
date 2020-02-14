@@ -318,8 +318,7 @@ public:
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
 	irr::gui::IGUIStaticText* stText;
-	irr::gui::IGUIStaticText* stMusicVolume;
-	irr::gui::IGUIStaticText* stSoundVolume;
+
 	irr::gui::IGUITab* tabLog;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUITab* tabChat;
@@ -341,12 +340,7 @@ public:
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
-	irr::gui::IGUICheckBox* chkEnableSound;
-	irr::gui::IGUICheckBox* chkEnableMusic;
-	irr::gui::IGUIScrollBar* scrMusicVolume;
-	irr::gui::IGUIScrollBar* scrSoundVolume;
 	irr::gui::IGUIComboBox* cbCurrentSkin;
-	irr::gui::IGUICheckBox* chkShowFPS;
 
 	SettingsWindow gSettings;
 	//main menu

@@ -492,24 +492,6 @@ bool Game::Initialize() {
 	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
 	chkIgnore2 = env->addCheckBox(false, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1291).c_str());
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
-	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 260, 280, 285), tabPanel, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2046).c_str());
-	chkEnableMusic->setChecked(gameConf.enablemusic);
-	chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
-	chkEnableSound->setChecked(gameConf.enablesound);
-	stMusicVolume = env->addStaticText(dataManager.GetSysString(2048).c_str(), Scale(20, 320, 80, 345), false, true, tabPanel, -1, false);
-	scrMusicVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_MUSIC_VOLUME);
-	scrMusicVolume->setMax(100);
-	scrMusicVolume->setMin(0);
-	scrMusicVolume->setPos(gameConf.musicVolume * 100);
-	scrMusicVolume->setLargeStep(1);
-	scrMusicVolume->setSmallStep(1);
-	stSoundVolume = env->addStaticText(dataManager.GetSysString(2049).c_str(), Scale(20, 350, 80, 375), false, true, tabPanel, -1, false);
-	scrSoundVolume = env->addScrollBar(true, Scale(85, 355, 280, 370), tabPanel, SCROLL_SOUND_VOLUME);
-	scrSoundVolume->setMax(100);
-	scrSoundVolume->setMin(0);
-	scrSoundVolume->setPos(gameConf.soundVolume * 100);
-	scrSoundVolume->setLargeStep(1);
-	scrSoundVolume->setSmallStep(1);
 	chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	cbCurrentSkin = env->addComboBox(Scale(90, 415, 270, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
 	int sel_skin = cbCurrentSkin->addItem(L"none");
@@ -526,9 +508,26 @@ bool Game::Initialize() {
 		gameConf.skin = EPRO_TEXT("none");
 	}*/
 	//ApplySkin(gameConf.skin);
-	chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 480, 280, 505), tabPanel, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
-	gSettings.wSettings = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
+	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
+	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
+	gSettings.chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
+	gSettings.stSoundVolume = env->addStaticText(dataManager.GetSysString(2049).c_str(), Scale(20, 95, 80, 120), false, true, gSettings.window);
+	gSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 95, 280, 120), gSettings.window, SCROLL_SOUND_VOLUME);
+	gSettings.scrSoundVolume->setMax(100);
+	gSettings.scrSoundVolume->setMin(0);
+	gSettings.scrSoundVolume->setPos(gameConf.soundVolume * 100);
+	gSettings.scrSoundVolume->setLargeStep(1);
+	gSettings.scrSoundVolume->setSmallStep(1);
+	gSettings.chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2046).c_str());
+	gSettings.stMusicVolume = env->addStaticText(dataManager.GetSysString(2048).c_str(), Scale(20, 155, 80, 180), false, true, gSettings.window);
+	gSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 155, 280, 180), gSettings.window, SCROLL_MUSIC_VOLUME);
+	gSettings.scrMusicVolume->setMax(100);
+	gSettings.scrMusicVolume->setMin(0);
+	gSettings.scrMusicVolume->setPos(gameConf.musicVolume * 100);
+	gSettings.scrMusicVolume->setLargeStep(1);
+	gSettings.scrMusicVolume->setSmallStep(1);
+	
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
@@ -930,16 +929,12 @@ bool Game::Initialize() {
 	device->setEventReceiver(&menuHandler);
 	soundManager = std::unique_ptr<SoundManager>(new SoundManager());
 	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, working_directory)) {
-		chkEnableSound->setChecked(false);
-		chkEnableSound->setEnabled(false);
-		chkEnableSound->setVisible(false);
-		chkEnableMusic->setChecked(false);
-		chkEnableMusic->setEnabled(false);
-		chkEnableMusic->setVisible(false);
-		scrMusicVolume->setVisible(false);
-		stMusicVolume->setVisible(false);
-		scrSoundVolume->setVisible(false);
-		stSoundVolume->setVisible(false);
+		gSettings.chkEnableSound->setVisible(false);
+		gSettings.stSoundVolume->setVisible(false);
+		gSettings.scrSoundVolume->setVisible(false);
+		gSettings.chkEnableMusic->setVisible(false);
+		gSettings.stMusicVolume->setVisible(false);
+		gSettings.scrMusicVolume->setVisible(false);
 		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
 
