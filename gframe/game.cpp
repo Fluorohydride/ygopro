@@ -1620,6 +1620,12 @@ void Game::RefreshAiDecks() {
 					bot.version = PRO_VERSION;
 #ifdef _WIN32
 					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
+#else
+					if (configs.size() && configs["posixPathExtension"].is_string()) {
+						bot.executablePath = configs["posixPathExtension"].get<path_string>();
+					} else {
+						bot.executablePath = EPRO_TEXT("");
+					}
 #endif
 					gBot.bots.push_back(bot);
 				}
