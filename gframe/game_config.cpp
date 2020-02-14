@@ -119,9 +119,9 @@ bool GameConfig::Load(const char* filename)
 			else if (type == "enable_sound")
 				enablesound = !!std::stoi(str);
 			else if (type == "music_volume")
-				musicVolume = std::stof(str) / 100.0f;
+				musicVolume = std::min(std::max(std::stoi(str), 0), 100);
 			else if (type == "sound_volume")
-				soundVolume = std::stof(str) / 100.0f;
+				soundVolume = std::min(std::max(std::stoi(str), 0), 100);
 		}
 		catch (...) {}
 	}
@@ -171,8 +171,8 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "accurate_bg_resize = " << accurate_bg_resize << "\n";
 	conf_file << "enable_music = "       << enablemusic << "\n";
 	conf_file << "enable_sound = "       << enablesound << "\n";
-	conf_file << "music_volume = "       << std::min(std::max(static_cast<int>(musicVolume * 100), 0), 100) << "\n";
-	conf_file << "sound_volume = "       << std::min(std::max(static_cast<int>(soundVolume * 100), 0), 100) << "\n";
+	conf_file << "music_volume = "       << musicVolume << "\n";
+	conf_file << "sound_volume = "       << soundVolume << "\n";
 	return true;
 }
 

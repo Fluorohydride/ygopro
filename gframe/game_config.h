@@ -52,8 +52,8 @@ struct GameConfig
 	bool chkAnime = false;
 	bool enablemusic = false;
 	bool enablesound = true;
-	double musicVolume = 20;
-	double soundVolume = 20;
+	int musicVolume = 20;
+	int soundVolume = 20;
 	path_string skin = EPRO_TEXT("none");
 };
 
