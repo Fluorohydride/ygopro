@@ -1877,15 +1877,17 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch (id) {
 			case CHECKBOX_ENABLE_MUSIC: {
-				mainGame->soundManager->EnableMusic(mainGame->chkEnableMusic->isChecked());
+				mainGame->gameConf.enablemusic = mainGame->gSettings.chkEnableMusic->isChecked();
+				mainGame->soundManager->EnableMusic(mainGame->gameConf.enablemusic);
 				return true;
 			}
 			case CHECKBOX_ENABLE_SOUND: {
-				mainGame->soundManager->EnableSounds(mainGame->chkEnableSound->isChecked());
+				mainGame->gameConf.enablesound = mainGame->gSettings.chkEnableSound->isChecked();
+				mainGame->soundManager->EnableSounds(mainGame->gameConf.enablesound);
 				return true;
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
-				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked() ? 1 : 0;
+				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked();
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {

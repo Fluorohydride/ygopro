@@ -21,7 +21,6 @@ struct SettingsWindow {
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIStaticText* stMusicVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
-	
 };
 
 }

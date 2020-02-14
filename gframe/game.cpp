@@ -513,18 +513,18 @@ bool Game::Initialize() {
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	gSettings.chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
 	gSettings.stSoundVolume = env->addStaticText(dataManager.GetSysString(2049).c_str(), Scale(20, 95, 80, 120), false, true, gSettings.window);
-	gSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 95, 280, 120), gSettings.window, SCROLL_SOUND_VOLUME);
+	gSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 95, 280, 115), gSettings.window, SCROLL_SOUND_VOLUME);
 	gSettings.scrSoundVolume->setMax(100);
 	gSettings.scrSoundVolume->setMin(0);
-	gSettings.scrSoundVolume->setPos(gameConf.soundVolume * 100);
+	gSettings.scrSoundVolume->setPos(gameConf.soundVolume);
 	gSettings.scrSoundVolume->setLargeStep(1);
 	gSettings.scrSoundVolume->setSmallStep(1);
 	gSettings.chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2046).c_str());
 	gSettings.stMusicVolume = env->addStaticText(dataManager.GetSysString(2048).c_str(), Scale(20, 155, 80, 180), false, true, gSettings.window);
-	gSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 155, 280, 180), gSettings.window, SCROLL_MUSIC_VOLUME);
+	gSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 155, 280, 175), gSettings.window, SCROLL_MUSIC_VOLUME);
 	gSettings.scrMusicVolume->setMax(100);
 	gSettings.scrMusicVolume->setMin(0);
-	gSettings.scrMusicVolume->setPos(gameConf.musicVolume * 100);
+	gSettings.scrMusicVolume->setPos(gameConf.musicVolume);
 	gSettings.scrMusicVolume->setLargeStep(1);
 	gSettings.scrMusicVolume->setSmallStep(1);
 	
@@ -1667,8 +1667,6 @@ void Game::SaveConfig() {
 	gameConf.chkIgnore2 = chkIgnore2->isChecked();
 	gameConf.chkHideHintButton = chkHideHintButton->isChecked();
 	gameConf.chkAnime = chkAnime->isChecked();
-	gameConf.enablemusic = chkEnableMusic->isChecked();
-	gameConf.enablesound = chkEnableSound->isChecked();
 	gameConf.Save("./config/system.conf");
 }
 void Game::LoadPicUrls() {
@@ -2292,8 +2290,8 @@ void Game::OnResize() {
 
 	auto tabsystemParentPos = tabSystem->getParent()->getAbsolutePosition();
 	tabSystem->setRelativePosition(recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
-	scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(325), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(340)));
-	scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(355), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(370)));
+
+	SetCentered(gSettings.window);
 
 	wChat->setRelativePosition(rect<s32>(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 
