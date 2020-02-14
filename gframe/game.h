@@ -21,6 +21,7 @@
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
 #include "game_config.h"
+#include "settings_window.h"
 
 class CGUISkinSystem;
 class IProgressBar;
@@ -347,7 +348,7 @@ public:
 	irr::gui::IGUIComboBox* cbCurrentSkin;
 	irr::gui::IGUICheckBox* chkShowFPS;
 
-	irr::gui::IGUIWindow* wSettings;
+	SettingsWindow gSettings;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;
