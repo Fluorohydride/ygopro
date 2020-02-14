@@ -176,16 +176,18 @@ bool DataManager::LoadStrings(const path_string& file) {
 		auto value = str.substr(0, pos);
 		str = str.substr(pos + 1);
 		try {
-			LocaleStringHelper* obj = nullptr;
-			if(type == "system")
-				obj = &_sysStrings;
-			else if(type == "victory")
-				obj = &_victoryStrings;
-			else if(type == "counter")
-				obj = &_counterStrings;
-			else if(type == "setname")
-				obj = &_setnameStrings;
-			obj->SetMain(std::stoi(value), BufferIO::DecodeUTF8s(str));
+			if(type == "system") {
+				_sysStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8s(str));
+			} else {
+				LocaleStringHelper* obj = nullptr;
+				if(type == "victory")
+					obj = &_victoryStrings;
+				else if(type == "counter")
+					obj = &_counterStrings;
+				else if(type == "setname")
+					obj = &_setnameStrings;
+				obj->SetMain(std::stoi(value, 0, 16), BufferIO::DecodeUTF8s(str));
+			}
 		}
 		catch(...) {}
 	}
@@ -211,16 +213,18 @@ bool DataManager::LoadLocaleStrings(const path_string & file) {
 		auto value = str.substr(0, pos);
 		str = str.substr(pos + 1);
 		try {
-			LocaleStringHelper* obj = nullptr;
-			if(type == "system")
-				obj = &_sysStrings;
-			else if(type == "victory")
-				obj = &_victoryStrings;
-			else if(type == "counter")
-				obj = &_counterStrings;
-			else if(type == "setname")
-				obj = &_setnameStrings;
-			obj->SetLocale(std::stoi(value), BufferIO::DecodeUTF8s(str));
+			if(type == "system") {
+				_sysStrings.SetLocale(std::stoi(value), BufferIO::DecodeUTF8s(str));
+			} else {
+				LocaleStringHelper* obj = nullptr;
+				if(type == "victory")
+					obj = &_victoryStrings;
+				else if(type == "counter")
+					obj = &_counterStrings;
+				else if(type == "setname")
+					obj = &_setnameStrings;
+				obj->SetLocale(std::stoi(value, 0, 16), BufferIO::DecodeUTF8s(str));
+			}
 		}
 		catch(...) {}
 	}

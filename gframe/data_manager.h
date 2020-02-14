@@ -73,6 +73,8 @@ private:
 	public:
 		indexed_map<std::wstring> map{};
 		const wchar_t* GetLocale(unsigned int code) {
+			if(!code)
+				return nullptr;
 			auto search = map.find(code);
 			if(search == map.end() || search->second.first.empty())
 				return nullptr;
