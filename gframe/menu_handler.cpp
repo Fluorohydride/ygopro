@@ -135,7 +135,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_JOIN_HOST2: {
 				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->env->addMessageBox(L"Nickname empty", L"Please enter a nickname", true, irr::gui::EMBF_OK, 0, 0);
+					mainGame->PopupMessage(L"Please enter a nickname", L"Nickname empty");
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {
@@ -182,9 +182,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				catch(...) {
-					mainGame->gMutex.lock();
-					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
-					mainGame->gMutex.unlock();
+					mainGame->PopupMessage(dataManager.GetSysString(1412));
 					break;
 				}
 			}
@@ -529,7 +527,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(Replay::RenameReplay(oldname, oldpath + Utils::ToPathString(mainGame->ebRSName->getText()))) {
 						mainGame->lstReplayList->refreshList();
 					} else {
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1365).c_str());
+						mainGame->PopupMessage(dataManager.GetSysString(1365));
 					}
 				}
 				prev_operation = 0;
@@ -637,9 +635,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				catch(...) {
-					mainGame->gMutex.lock();
-					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1412).c_str());
-					mainGame->gMutex.unlock();
+					mainGame->PopupMessage(dataManager.GetSysString(1412));
 					break;
 				}
 			}
@@ -793,7 +789,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case TABLE_ROOMLIST: {
 				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->env->addMessageBox(dataManager.GetSysString(1256).c_str(), dataManager.GetSysString(1257).c_str(), true, irr::gui::EMBF_OK, 0, 0);
+					mainGame->PopupMessage(dataManager.GetSysString(1257), dataManager.GetSysString(1256));
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {
