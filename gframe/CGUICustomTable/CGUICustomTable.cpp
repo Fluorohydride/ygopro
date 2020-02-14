@@ -1129,6 +1129,13 @@ s32 CGUICustomTable::getDrawFlags() const
 	return DrawFlags;
 }
 
+void CGUICustomTable::setColumnText(u32 columnIndex, const wchar_t* caption) {
+	if ( columnIndex >= Columns.size() )
+		return;
+
+	Columns[columnIndex].Name = caption;
+}
+
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 
 //! Sets another skin independent font.

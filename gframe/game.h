@@ -213,6 +213,8 @@ public:
 
 	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const;
 
+	void ReloadElementsStrings();
+
 	void OnResize();
 	template<typename T>
 	T Scale(T val);
@@ -696,6 +698,7 @@ public:
 	irr::s32 ogles2BlendTexture;
 	Signal externalSignal;
 #endif
+	std::vector<std::pair<irr::gui::IGUIElement*, int32>> defaultStrings;
 };
 
 extern Game* mainGame;
