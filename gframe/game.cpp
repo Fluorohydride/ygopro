@@ -493,22 +493,8 @@ bool Game::Initialize() {
 	chkIgnore2 = env->addCheckBox(false, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1291).c_str());
 	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
 	chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
-	cbCurrentSkin = env->addComboBox(Scale(90, 415, 270, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
-	int sel_skin = cbCurrentSkin->addItem(L"none");
-	auto skins = skinSystem->listSkins();
-	for(int i = skins.size() - 1; i >= 0; i--) {
-		auto idx = cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
-		if(gameConf.skin == skins[i].c_str()) {
-			sel_skin = idx;
-		}
-	}
-	cbCurrentSkin->setSelected(sel_skin);
-	btnReloadSkin = env->addButton(Scale(90, 445, 190, 475), tabPanel, BUTTON_RELOAD_SKIN, L"Reload Skin");
-	/*if(sel_skin == 0) {
-		gameConf.skin = EPRO_TEXT("none");
-	}*/
-	//ApplySkin(gameConf.skin);
 	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
+
 	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	gSettings.chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
@@ -527,7 +513,19 @@ bool Game::Initialize() {
 	gSettings.scrMusicVolume->setPos(gameConf.musicVolume);
 	gSettings.scrMusicVolume->setLargeStep(1);
 	gSettings.scrMusicVolume->setSmallStep(1);
-	
+	gSettings.stCurrentSkin = env->addStaticText(L"Skin", Scale(20, 185, 80, 210), false, true, gSettings.window);
+	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 185, 280, 210), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	int selectedSkin = gSettings.cbCurrentSkin->addItem(L"none");
+	auto skins = skinSystem->listSkins();
+	for (int i = skins.size() - 1; i >= 0; i--) {
+		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
+		if (gameConf.skin == skins[i].c_str()) {
+			selectedSkin = itemIndex;
+		}
+	}
+	gSettings.cbCurrentSkin->setSelected(selectedSkin);
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 215, 280, 240), gSettings.window, BUTTON_RELOAD_SKIN, L"Reload Skin");
+
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));

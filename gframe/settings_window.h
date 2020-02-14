@@ -7,6 +7,8 @@ class IGUIWindow;
 class IGUICheckBox;
 class IGUIStaticText;
 class IGUIScrollBar;
+class IGUIComboBox;
+class IGUIButton;
 }
 }
 
@@ -21,6 +23,10 @@ struct SettingsWindow {
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIStaticText* stMusicVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
+	irr::gui::IGUIStaticText* stNoAudioBackend;
+	irr::gui::IGUIStaticText* stCurrentSkin;
+	irr::gui::IGUIComboBox* cbCurrentSkin;
+	irr::gui::IGUIButton* btnReloadSkin;
 };
 
 }

@@ -328,7 +328,6 @@ public:
 	irr::gui::IGUIButton* btnClearChat;
 	irr::gui::IGUIButton* btnExpandChat;
 	irr::gui::IGUIButton* btnSaveLog;
-	irr::gui::IGUIButton* btnReloadSkin;
 	irr::gui::IGUITab* tabRepositories;
 	irr::gui::IGUIContextMenu* mTabRepositories;
 	irr::gui::Panel* tabSystem;
@@ -340,7 +339,6 @@ public:
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHideHintButton;
-	irr::gui::IGUIComboBox* cbCurrentSkin;
 
 	SettingsWindow gSettings;
 	//main menu
