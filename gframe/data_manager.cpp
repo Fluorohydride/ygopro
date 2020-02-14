@@ -227,6 +227,12 @@ bool DataManager::LoadLocaleStrings(const path_string & file) {
 	string_file.close();
 	return true;
 }
+void DataManager::ClearLocaleStrings() {
+	_sysStrings.ClearLocales();
+	_victoryStrings.ClearLocales();
+	_counterStrings.ClearLocales();
+	_setnameStrings.ClearLocales();
+}
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	auto error = sqlite3_errmsg(pDB);
 	if(pStmt)

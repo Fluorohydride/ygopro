@@ -40,6 +40,7 @@ public:
 	bool LoadDBFromBuffer(const std::vector<char>& buffer);
 	bool LoadStrings(const path_string& file);
 	bool LoadLocaleStrings(const path_string& file);
+	void ClearLocaleStrings();
 	bool GetData(int code, CardData* pData);
 	CardDataC* GetCardData(int code);
 	bool GetString(int code, CardString* pStr);
