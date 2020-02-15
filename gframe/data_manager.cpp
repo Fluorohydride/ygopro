@@ -292,6 +292,28 @@ std::wstring DataManager::FormatType(int type) {
 		return unknown_string;
 	return res;
 }
+std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
+	static const std::map<int, int> SCOPES = {
+		{0x1, 1900},
+		{0x2, 1901},
+		{0x4, 1265},
+		{0x8, 1266},
+		{0x10, 1267},
+		{0x20, 1268},
+		{0x100, 1903}
+	};
+	if (hideOCGTCG && scope == 0x3) return L"";
+	std::wstring buffer;
+	for (const auto& tuple : SCOPES) {
+		if (scope & tuple.first) {
+			if (!buffer.empty()) {
+				buffer += L"/";
+			}
+			buffer.append(dataManager.GetSysString(tuple.second).c_str());
+		}
+	}
+	return buffer;
+}
 std::wstring DataManager::FormatSetName(unsigned long long setcode) {
 	std::wstring res;
 	for(int i = 0; i < 4; ++i) {

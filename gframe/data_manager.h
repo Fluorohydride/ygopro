@@ -39,6 +39,7 @@ public:
 	std::wstring FormatAttribute(int attribute);
 	std::wstring FormatRace(int race, bool isSkill = false);
 	std::wstring FormatType(int type);
+	std::wstring FormatScope(int scope, bool hideOCGTCG = false);
 	std::wstring FormatSetName(unsigned long long setcode);
 	std::wstring FormatSetName(std::vector<uint16> setcodes);
 	std::wstring FormatLinkMarker(int link_marker);
