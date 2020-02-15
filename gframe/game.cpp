@@ -1816,16 +1816,14 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 		tmp_code = cd->alias;
 	stName->setText(fmt::format(L"{} [{:08}]", dataManager.GetName(tmp_code), tmp_code).c_str());
 	stSetName->setText(L"");
-	if(!gameConf.chkHideSetname) {
-		auto setcodes = cd->setcodes;
-		if(cd->alias) {
-			auto aptr = dataManager.cards.find(cd->alias);
-			if(aptr != dataManager.cards.end())
-				setcodes = aptr->second.first.setcodes;
-		}
-		if(setcodes.size()) {
-			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());
-		}
+	auto setcodes = cd->setcodes;
+	if(cd->alias) {
+		auto aptr = dataManager.cards.find(cd->alias);
+		if(aptr != dataManager.cards.end())
+			setcodes = aptr->second.first.setcodes;
+	}
+	if(setcodes.size()) {
+		stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());
 	}
 	if(cd->type & TYPE_MONSTER) {
 		stInfo->setText(fmt::format(L"[{}] {} {}", dataManager.FormatType(cd->type), dataManager.FormatAttribute(cd->attribute), dataManager.FormatRace(cd->race)).c_str());
@@ -1863,20 +1861,23 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 		} else
 			stDataInfo->setText(L"");
 	}
+	RefreshCardInfoTextPositions();
+	stText->setText(dataManager.GetText(code).c_str());
+}
+void Game::RefreshCardInfoTextPositions() {
 	int offset = Scale(37);
 	stInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stInfo->getTextHeight()));
 	offset += stInfo->getTextHeight();
-	if(wcscmp(stDataInfo->getText(), L"")) {
+	if (wcscmp(stDataInfo->getText(), L"")) {
 		stDataInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stDataInfo->getTextHeight()));
 		offset += stDataInfo->getTextHeight();
 	}
-	if(wcscmp(stSetName->getText(), L"")) {
+	if (stSetName->isVisible() && wcscmp(stSetName->getText(), L"")) {
 		stSetName->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stSetName->getTextHeight()));
 		offset += stSetName->getTextHeight();
 	}
 	auto parent = stText->getParent();
 	stText->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), parent->getAbsolutePosition().getHeight() - Scale(1)));
-	stText->setText(dataManager.GetText(code).c_str());
 }
 void Game::ClearCardInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);

@@ -1893,6 +1893,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			case CHECKBOX_HIDE_ARCHETYPES: {
 				mainGame->gameConf.chkHideSetname = mainGame->gSettings.chkHideSetname->isChecked();
 				mainGame->stSetName->setVisible(!mainGame->gameConf.chkHideSetname);
+				mainGame->RefreshCardInfoTextPositions();
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {

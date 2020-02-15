@@ -153,6 +153,7 @@ public:
 	void LoadGithubRepositories();
 	void LoadServers();
 	void ShowCardInfo(int code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
+	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player, int type);
 	void AddLog(const std::wstring& msg, int param = 0);
