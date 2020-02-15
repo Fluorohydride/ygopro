@@ -2220,6 +2220,7 @@ void Game::CloseDuelWindow() {
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
 	stText->setText(L"");
+	stTip->setText(L"");
 	cardimagetextureloading = false;
 	showingcard = 0;
 	closeDoneSignal.Set();
