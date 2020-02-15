@@ -14,6 +14,18 @@ class IGUIButton;
 
 namespace ygo {
 
+struct SettingsPane {
+	irr::gui::IGUICheckBox* chkIgnoreOpponents;
+	irr::gui::IGUICheckBox* chkIgnoreSpectators;
+	irr::gui::IGUICheckBox* chkQuickAnimation;
+	irr::gui::IGUICheckBox* chkHideChainButton;
+	irr::gui::IGUICheckBox* chkAutoChainOrder;
+	irr::gui::IGUICheckBox* chkNoChainDelay;
+	irr::gui::IGUICheckBox* chkMAutoPos;
+	irr::gui::IGUICheckBox* chkSTAutoPos;
+	irr::gui::IGUICheckBox* chkRandomPos;	
+};
+
 struct SettingsWindow {
 	irr::gui::IGUIWindow* window;
 	irr::gui::IGUICheckBox* chkShowFPS;
