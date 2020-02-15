@@ -513,6 +513,8 @@ bool Game::Initialize() {
 	gSettings.scrMusicVolume->setPos(gameConf.musicVolume);
 	gSettings.scrMusicVolume->setLargeStep(1);
 	gSettings.scrMusicVolume->setSmallStep(1);
+	gSettings.stNoAudioBackend = env->addStaticText(L"Failed to initialize audio backend", Scale(20, 65, 280, 180), false, true, gSettings.window);
+	gSettings.stNoAudioBackend->setVisible(false);
 	gSettings.stCurrentSkin = env->addStaticText(L"Skin", Scale(20, 185, 80, 210), false, true, gSettings.window);
 	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 185, 280, 210), gSettings.window, COMBOBOX_CURRENT_SKIN);
 	int selectedSkin = gSettings.cbCurrentSkin->addItem(L"none");
@@ -933,6 +935,7 @@ bool Game::Initialize() {
 		gSettings.chkEnableMusic->setVisible(false);
 		gSettings.stMusicVolume->setVisible(false);
 		gSettings.scrMusicVolume->setVisible(false);
+		gSettings.stNoAudioBackend->setVisible(true);
 		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
 
