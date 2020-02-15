@@ -473,26 +473,17 @@ bool Game::Initialize() {
 	btnExpandChat = env->addButton(Scale(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, dataManager.GetSysString(2043).c_str());
 	//system
 	irr::gui::IGUITab* _tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
-	auto aaa = Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight());
-	tabSystem = Panel::addPanel(env, _tabSystem, -1, aaa, true, false);
+	tabSystem = Panel::addPanel(env, _tabSystem, -1, Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight()), true, false);
 	auto tabPanel = tabSystem->getSubpanel();
-	chkMAutoPos = env->addCheckBox(false, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1274).c_str());
-	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
-	chkSTAutoPos = env->addCheckBox(false, Scale(20, 50, 280, 75), tabPanel, -1, dataManager.GetSysString(1278).c_str());
-	chkSTAutoPos->setChecked(gameConf.chkSTAutoPos != 0);
-	chkRandomPos = env->addCheckBox(false, Scale(40, 80, 300, 105), tabPanel, -1, dataManager.GetSysString(1275).c_str());
-	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
-	chkAutoChain = env->addCheckBox(false, Scale(20, 110, 280, 135), tabPanel, -1, dataManager.GetSysString(1276).c_str());
-	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
-	chkWaitChain = env->addCheckBox(false, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1277).c_str());
-	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
-	chkHideHintButton = env->addCheckBox(false, Scale(20, 170, 280, 195), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
-	chkHideHintButton->setChecked(gameConf.chkHideHintButton != 0);
-	chkIgnore1 = env->addCheckBox(false, Scale(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1290).c_str());
-	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
-	chkIgnore2 = env->addCheckBox(false, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1291).c_str());
-	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
-	chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
+	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1274).c_str());
+	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 50, 280, 75), tabPanel, -1, dataManager.GetSysString(1278).c_str());
+	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 80, 300, 105), tabPanel, -1, dataManager.GetSysString(1275).c_str());
+	tabSettings.chkAutoChainOrder = env->addCheckBox(gameConf.chkAutoChain, Scale(20, 110, 280, 135), tabPanel, -1, dataManager.GetSysString(1276).c_str());
+	tabSettings.chkNoChainDelay = env->addCheckBox(gameConf.chkWaitChain, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1277).c_str());
+	tabSettings.chkHideChainButtons = env->addCheckBox(gameConf.chkHideHintButton, Scale(20, 170, 280, 195), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
+	tabSettings.chkIgnoreOpponents = env->addCheckBox(gameConf.chkIgnore1, Scale(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1290).c_str());
+	tabSettings.chkIgnoreSpectators = env->addCheckBox(gameConf.chkIgnore2, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1291).c_str());
+	tabSettings.chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
 	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
 
 	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
@@ -936,7 +927,7 @@ bool Game::Initialize() {
 		gSettings.stMusicVolume->setVisible(false);
 		gSettings.scrMusicVolume->setVisible(false);
 		gSettings.stNoAudioBackend->setVisible(true);
-		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
+		tabSettings.chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
 
 	//server lobby
@@ -1659,14 +1650,14 @@ void Game::SaveConfig() {
 	gameConf.fullscreen = is_fullscreen;
 	gameConf.nickname = ebNickName->getText();
 	gameConf.lastallowedcards = cbRule->getSelected();
-	gameConf.chkMAutoPos = chkMAutoPos->isChecked();
-	gameConf.chkSTAutoPos = chkSTAutoPos->isChecked();
-	gameConf.chkRandomPos = chkRandomPos->isChecked();
-	gameConf.chkAutoChain = chkAutoChain->isChecked();
-	gameConf.chkWaitChain = chkWaitChain->isChecked();
-	gameConf.chkIgnore1 = chkIgnore1->isChecked();
-	gameConf.chkIgnore2 = chkIgnore2->isChecked();
-	gameConf.chkHideHintButton = chkHideHintButton->isChecked();
+	gameConf.chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
+	gameConf.chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();
+	gameConf.chkRandomPos = tabSettings.chkRandomPos->isChecked();
+	gameConf.chkAutoChain = tabSettings.chkAutoChainOrder->isChecked();
+	gameConf.chkWaitChain = tabSettings.chkNoChainDelay->isChecked();
+	gameConf.chkIgnore1 = tabSettings.chkIgnoreOpponents->isChecked();
+	gameConf.chkIgnore2 = tabSettings.chkIgnoreSpectators->isChecked();
+	gameConf.chkHideHintButton = tabSettings.chkHideChainButtons->isChecked();
 	gameConf.chkAnime = chkAnime->isChecked();
 	gameConf.Save("./config/system.conf");
 }

@@ -18,7 +18,7 @@ struct SettingsPane {
 	irr::gui::IGUICheckBox* chkIgnoreOpponents;
 	irr::gui::IGUICheckBox* chkIgnoreSpectators;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
-	irr::gui::IGUICheckBox* chkHideChainButton;
+	irr::gui::IGUICheckBox* chkHideChainButtons;
 	irr::gui::IGUICheckBox* chkAutoChainOrder;
 	irr::gui::IGUICheckBox* chkNoChainDelay;
 	irr::gui::IGUICheckBox* chkMAutoPos;

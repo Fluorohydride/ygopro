@@ -331,14 +331,8 @@ public:
 	irr::gui::IGUITab* tabRepositories;
 	irr::gui::IGUIContextMenu* mTabRepositories;
 	irr::gui::Panel* tabSystem;
-	irr::gui::IGUICheckBox* chkMAutoPos;
-	irr::gui::IGUICheckBox* chkSTAutoPos;
-	irr::gui::IGUICheckBox* chkRandomPos;
-	irr::gui::IGUICheckBox* chkAutoChain;
-	irr::gui::IGUICheckBox* chkWaitChain;
-	irr::gui::IGUICheckBox* chkQuickAnimation;
+	SettingsPane tabSettings;
 	irr::gui::IGUICheckBox* chkHideSetname;
-	irr::gui::IGUICheckBox* chkHideHintButton;
 
 	SettingsWindow gSettings;
 	//main menu
@@ -523,8 +517,6 @@ public:
 	irr::gui::IGUIWindow* wChat;
 	irr::gui::IGUIListBox* lstChatLog;
 	irr::gui::IGUIEditBox* ebChatInput;
-	irr::gui::IGUICheckBox* chkIgnore1;
-	irr::gui::IGUICheckBox* chkIgnore2;
 	//phase button
 	irr::gui::IGUIStaticText* wPhase;
 	irr::gui::IGUIButton* btnDP;

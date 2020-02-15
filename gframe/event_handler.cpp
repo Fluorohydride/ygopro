@@ -820,7 +820,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_CHAIN_BUTTONS: {
 				if(mainGame->dInfo.isStarted && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
-					const bool checked = !mainGame->chkHideHintButton->isChecked();
+					const bool checked = !mainGame->tabSettings.chkHideChainButtons->isChecked();
 					mainGame->btnChainIgnore->setVisible(checked);
 					mainGame->btnChainAlways->setVisible(checked);
 					mainGame->btnChainWhenAvail->setVisible(checked);
@@ -1887,7 +1887,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				return true;
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
-				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked();
+				mainGame->gameConf.quick_animation = mainGame->tabSettings.chkQuickAnimation->isChecked();
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {
