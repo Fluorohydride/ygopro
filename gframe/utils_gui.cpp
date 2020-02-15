@@ -2,8 +2,9 @@
 #include <IrrlichtDevice.h>
 #include <ICursorControl.h>
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
 #include <vector>
-#include "../irrlicht/src/CIrrDeviceWin32.h"
 #include "logging.h"
 #elif defined(__linux__) && !defined(__ANDROID__)
 #include <X11/Xlib.h>
@@ -88,7 +89,6 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 	const auto height = clientSize.bottom - clientSize.top;
 
 	SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-	static_cast<irr::CIrrDeviceWin32::CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
 #elif defined(__linux__) && !defined(__ANDROID__)
 	struct {
 		unsigned long   flags;
