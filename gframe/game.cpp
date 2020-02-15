@@ -475,16 +475,16 @@ bool Game::Initialize() {
 	irr::gui::IGUITab* _tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
 	tabSystem = Panel::addPanel(env, _tabSystem, -1, Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight()), true, false);
 	auto tabPanel = tabSystem->getSubpanel();
-	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1274).c_str());
-	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 50, 280, 75), tabPanel, -1, dataManager.GetSysString(1278).c_str());
-	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 80, 300, 105), tabPanel, -1, dataManager.GetSysString(1275).c_str());
-	tabSettings.chkAutoChainOrder = env->addCheckBox(gameConf.chkAutoChain, Scale(20, 110, 280, 135), tabPanel, -1, dataManager.GetSysString(1276).c_str());
-	tabSettings.chkNoChainDelay = env->addCheckBox(gameConf.chkWaitChain, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1277).c_str());
-	tabSettings.chkHideChainButtons = env->addCheckBox(gameConf.chkHideHintButton, Scale(20, 170, 280, 195), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
-	tabSettings.chkIgnoreOpponents = env->addCheckBox(gameConf.chkIgnore1, Scale(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1290).c_str());
-	tabSettings.chkIgnoreSpectators = env->addCheckBox(gameConf.chkIgnore2, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1291).c_str());
-	tabSettings.chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
-	env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
+	tabSettings.chkIgnoreOpponents = env->addCheckBox(gameConf.chkIgnore1, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1290).c_str());
+	tabSettings.chkIgnoreSpectators = env->addCheckBox(gameConf.chkIgnore2, Scale(20, 50, 280, 75), tabPanel, -1, dataManager.GetSysString(1291).c_str());
+	tabSettings.chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 80, 300, 105), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
+	tabSettings.chkHideChainButtons = env->addCheckBox(gameConf.chkHideHintButton, Scale(20, 110, 280, 135), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
+	tabSettings.chkAutoChainOrder = env->addCheckBox(gameConf.chkAutoChain, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1276).c_str());
+	tabSettings.chkNoChainDelay = env->addCheckBox(gameConf.chkWaitChain, Scale(20, 170, 280, 195), tabPanel, -1, dataManager.GetSysString(1277).c_str());
+	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1274).c_str());
+	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1278).c_str());
+	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 260, 280, 285), tabPanel, -1, dataManager.GetSysString(1275).c_str());
+	// Add a blank static text at the end to act as padding for scrolling if needed
 
 	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
@@ -927,7 +927,6 @@ bool Game::Initialize() {
 		gSettings.stMusicVolume->setVisible(false);
 		gSettings.scrMusicVolume->setVisible(false);
 		gSettings.stNoAudioBackend->setVisible(true);
-		tabSettings.chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
 	}
 
 	//server lobby
