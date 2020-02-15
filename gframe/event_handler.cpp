@@ -1890,6 +1890,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->gameConf.quick_animation = mainGame->tabSettings.chkQuickAnimation->isChecked();
 				return true;
 			}
+			case CHECKBOX_HIDE_ARCHETYPES: {
+				mainGame->gameConf.chkHideSetname = mainGame->gSettings.chkHideSetname->isChecked();
+				mainGame->stSetName->setVisible(!mainGame->gameConf.chkHideSetname);
+				return true;
+			}
 			case CHECKBOX_SHOW_FPS: {
 				mainGame->gameConf.showFPS = mainGame->gSettings.chkShowFPS->isChecked();
 				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);

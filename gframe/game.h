@@ -332,7 +332,6 @@ public:
 	irr::gui::IGUIContextMenu* mTabRepositories;
 	irr::gui::Panel* tabSystem;
 	SettingsPane tabSettings;
-	irr::gui::IGUICheckBox* chkHideSetname;
 
 	SettingsWindow gSettings;
 	//main menu

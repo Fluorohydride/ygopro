@@ -456,6 +456,7 @@ bool Game::Initialize() {
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
 	stSetName->setWordWrap(true);
 	stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
+	stSetName->setVisible(!gameConf.chkHideSetname);
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
@@ -518,7 +519,7 @@ bool Game::Initialize() {
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
 	gSettings.btnReloadSkin = env->addButton(Scale(20, 215, 280, 240), gSettings.window, BUTTON_RELOAD_SKIN, L"Reload Skin");
-
+	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
