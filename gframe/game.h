@@ -100,6 +100,7 @@ struct Config {
 	bool chkAnime;
 	bool enablemusic;
 	bool enablesound;
+	bool showConsole;
 	double musicVolume;
 	double soundVolume;
 	path_string skin;

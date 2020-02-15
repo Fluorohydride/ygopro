@@ -61,6 +61,10 @@ Game* mainGame;
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
+#ifdef _WIN32
+	if(!gameConf.showConsole)
+		FreeConsole();
+#endif
 	is_fullscreen = false;
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
@@ -1653,6 +1657,7 @@ void Game::LoadConfig() {
 	gameConf.max_fps = 60;
 	gameConf.game_version = 0;
 	gameConf.fullscreen = false;
+	gameConf.showConsole = false;
 	gameConf.serverport = L"7911";
 	gameConf.textfontsize = 12;
 	gameConf.nickname = L"";
@@ -1720,6 +1725,10 @@ void Game::LoadConfig() {
 					gameConf.max_fps = val;
 			} else if(type == "fullscreen")
 				gameConf.fullscreen = !!std::stoi(str);
+#ifdef _WIN32
+			else if(type == "show_console")
+				gameConf.showConsole = !!std::stoi(str);
+#endif
 			else if(type == "errorlog")
 				enable_log = std::stoi(str);
 			else if(type == "nickname")
@@ -1830,6 +1839,7 @@ void Game::SaveConfig() {
 	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
 	conf_file << "max_fps = "			<< gameConf.max_fps << "\n";
 	conf_file << "fullscreen = "		<< (is_fullscreen ? 1 : 0) << "\n";
+	conf_file << "show_console = "		<< (gameConf.showConsole ? 1 : 0) << "\n";
 	conf_file << "antialias = "			<< gameConf.antialias << "\n";
 	conf_file << "errorlog = "			<< enable_log << "\n";
 	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
