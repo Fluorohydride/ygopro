@@ -51,13 +51,8 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 		}, (LPARAM)&monitors);
 	}
 	fullscreen = !fullscreen;
-	HWND hWnd;
-    const auto driver = device->getVideoDriver();
-	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
-	if(driver->getDriverType() == irr::video::EDT_DIRECT3D9)
-		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
-	else
-		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
+	const auto driver = device->getVideoDriver();
+	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
 	LONG_PTR style = WS_POPUP;
 	RECT clientSize = {};
 	if(fullscreen) {
