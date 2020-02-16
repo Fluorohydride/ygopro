@@ -61,7 +61,8 @@ void NetServer::StopServer() {
 		return;
 	if(duel_mode)
 		duel_mode->EndDuel();
-	event_base_loopexit(net_evbase, 0);
+	timeval time{ 0,1 };
+	event_base_loopexit(net_evbase, &time);
 }
 void NetServer::StopBroadcast() {
 	if(!net_evbase || !broadcast_ev)

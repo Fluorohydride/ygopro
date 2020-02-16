@@ -20,6 +20,8 @@
 #include "sound_manager.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
+#include "game_config.h"
+#include "settings_window.h"
 
 class CGUISkinSystem;
 class IProgressBar;
@@ -60,50 +62,6 @@ namespace irr {
 namespace ygo {
 
 class SoundManager;
-
-struct Config {
-	bool use_d3d;
-	bool use_vsync;
-	float dpi_scale;
-	int max_fps;
-	int game_version;
-	bool fullscreen;
-	unsigned short antialias;
-	std::wstring serverport;
-	unsigned char textfontsize;
-	std::wstring lasthost;
-	std::wstring lastport;
-	std::wstring nickname;
-	std::wstring gamename;
-	std::wstring lastdeck;
-	unsigned int lastlflist;
-	unsigned int lastallowedcards;
-	std::wstring textfont;
-	std::wstring numfont;
-	std::wstring roompass;
-	//settings
-	bool chkMAutoPos;
-	bool chkSTAutoPos;
-	bool chkRandomPos;
-	bool chkAutoChain;
-	bool chkWaitChain;
-	bool chkIgnore1;
-	bool chkIgnore2;
-	bool chkHideSetname;
-	bool chkHideHintButton;
-	bool draw_field_spell;
-	bool quick_animation;
-	bool showFPS;
-
-	bool scale_background;
-	bool accurate_bg_resize;
-	bool chkAnime;
-	bool enablemusic;
-	bool enablesound;
-	double musicVolume;
-	double soundVolume;
-	path_string skin;
-};
 
 struct DuelInfo {
 	bool isInDuel;
@@ -158,6 +116,7 @@ class Game {
 public:
 	bool Initialize();
 	void MainLoop();
+	path_string NoSkinLabel();
 	bool ApplySkin(const path_string& skin, bool reload = false);
 	void LoadZipArchives();
 	void LoadExpansionDB();
@@ -195,6 +154,7 @@ public:
 	void LoadGithubRepositories();
 	void LoadServers();
 	void ShowCardInfo(int code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
+	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player, int type);
 	void AddLog(const std::wstring& msg, int param = 0);
@@ -256,14 +216,13 @@ public:
 	Signal replaySignal;
 	std::mutex closeSignal;
 	Signal closeDoneSignal;
-	Config gameConf;
+	GameConfig gameConf;
 	DuelInfo dInfo;
 	DiscordWrapper discord;
 #ifdef YGOPRO_BUILD_DLL
 	void* ocgcore;
 #endif
 	bool coreloaded;
-	bool is_fullscreen;
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
@@ -361,9 +320,9 @@ public:
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
+	irr::gui::IGUIStaticText* stPasscodeScope;
 	irr::gui::IGUIStaticText* stText;
-	irr::gui::IGUIStaticText* stMusicVolume;
-	irr::gui::IGUIStaticText* stSoundVolume;
+
 	irr::gui::IGUITab* tabLog;
 	irr::gui::IGUIListBox* lstLog;
 	irr::gui::IGUITab* tabChat;
@@ -373,24 +332,13 @@ public:
 	irr::gui::IGUIButton* btnClearChat;
 	irr::gui::IGUIButton* btnExpandChat;
 	irr::gui::IGUIButton* btnSaveLog;
-	irr::gui::IGUIButton* btnReloadSkin;
 	irr::gui::IGUITab* tabRepositories;
 	irr::gui::IGUIContextMenu* mTabRepositories;
 	irr::gui::Panel* tabSystem;
-	irr::gui::IGUICheckBox* chkMAutoPos;
-	irr::gui::IGUICheckBox* chkSTAutoPos;
-	irr::gui::IGUICheckBox* chkRandomPos;
-	irr::gui::IGUICheckBox* chkAutoChain;
-	irr::gui::IGUICheckBox* chkWaitChain;
-	irr::gui::IGUICheckBox* chkQuickAnimation;
-	irr::gui::IGUICheckBox* chkHideSetname;
-	irr::gui::IGUICheckBox* chkHideHintButton;
-	irr::gui::IGUICheckBox* chkEnableSound;
-	irr::gui::IGUICheckBox* chkEnableMusic;
-	irr::gui::IGUIScrollBar* scrMusicVolume;
-	irr::gui::IGUIScrollBar* scrSoundVolume;
-	irr::gui::IGUIComboBox* cbCurrentSkin;
-	irr::gui::IGUICheckBox* chkShowFPS;
+	SettingsPane tabSettings;
+	irr::gui::IGUIButton* btnTabShowSettings;
+
+	SettingsWindow gSettings;
 	//main menu
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;
@@ -573,8 +521,6 @@ public:
 	irr::gui::IGUIWindow* wChat;
 	irr::gui::IGUIListBox* lstChatLog;
 	irr::gui::IGUIEditBox* ebChatInput;
-	irr::gui::IGUICheckBox* chkIgnore1;
-	irr::gui::IGUICheckBox* chkIgnore2;
 	//phase button
 	irr::gui::IGUIStaticText* wPhase;
 	irr::gui::IGUIButton* btnDP;

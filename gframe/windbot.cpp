@@ -10,6 +10,7 @@
 #endif
 #include <fmt/format.h>
 #include "bufferio.h"
+#include "logging.h"
 
 namespace ygo {
 
@@ -48,10 +49,16 @@ bool WindBot::Launch(int port, bool chat, int hand) const {
 		std::string argChat = fmt::format("Chat={}", chat);
 		std::string argHand = fmt::format("Hand={}", hand);
 		chdir("WindBot");
+		if (executablePath.length()) {
+			std::string envPath = getenv("PATH") + (":" + executablePath);
+			setenv("PATH", envPath.c_str(), true);
+		}
 		execlp("mono", "WindBot.exe", "WindBot.exe", 
 			argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
 			hand ? argHand.c_str() : nullptr, nullptr);
-		perror("Failed to start WindBot");
+		auto message = fmt::format("Failed to start WindBot Ignite: {}", strerror(errno));
+		chdir("..");
+		ErrorLog(message);
 		exit(EXIT_FAILURE);
 	}
 	return pid > 0;

@@ -33,21 +33,10 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 	event.GUIEvent.Caller = btn;
 	ygo::mainGame->device->postEventFromUser(event);
 }
-#ifdef _WIN32
 #ifdef UNICODE
-#ifndef _DEBUG
-#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:wmainCRTStartup")
-#endif
 int wmain(int argc, wchar_t* argv[]) {
 #else
-#ifndef _DEBUG
-#pragma comment(linker, "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
-#endif
 int main(int argc, char* argv[]) {
-#endif
-#else
-int main(int argc, char* argv[]) {
-	setlocale(LC_CTYPE, "UTF-8");
 #endif
 #ifdef __ANDROID__
 	porting::initAndroid();
@@ -94,6 +83,7 @@ int main(int argc, char* argv[]) {
 	WSAStartup(wVersionRequested, &wsaData);
 	evthread_use_windows_threads();
 #else
+	setlocale(LC_CTYPE, "UTF-8");
 	evthread_use_pthreads();
 #endif //_WIN32
 	ygo::Game _game{};
@@ -107,24 +97,24 @@ int main(int argc, char* argv[]) {
 	if(!ygo::mainGame->Initialize())
 		return EXIT_FAILURE;
 #ifdef __APPLE__
-	EDOPRO_SetupMenuBar(&_game.is_fullscreen);
+	EDOPRO_SetupMenuBar(&_game.gameConf.fullscreen);
 #endif
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
 		path_string parameter(argv[i]);
 #define PARAM_CHECK(x) if(parameter == EPRO_TEXT(x))
 #define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < argc) {y;} continue;}
-#define SET_TXT(elem,txt) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(txt).c_str())
+#define SET_TXT(elem) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(parameter).c_str())
 		// Extra database
-		RUN_IF("-e", ygo::dataManager.LoadDB(argv[i]))
+		RUN_IF("-e", ygo::dataManager.LoadDB(parameter))
 		// Nickname
-		else RUN_IF("-n", SET_TXT(ebNickName,argv[i]))
+		else RUN_IF("-n", SET_TXT(ebNickName))
 		// Host address
-		else RUN_IF("-h", SET_TXT(ebJoinHost, argv[i]))
+		else RUN_IF("-h", SET_TXT(ebJoinHost))
 		// Host Port
-		else RUN_IF("-h", SET_TXT(ebJoinPort, argv[i]))
+		else RUN_IF("-h", SET_TXT(ebJoinPort))
 		// Host password
-		else RUN_IF("-h", SET_TXT(ebJoinPass, argv[i]))
+		else RUN_IF("-h", SET_TXT(ebJoinPass))
 #undef RUN_IF
 #undef SET_TXT
 		else PARAM_CHECK("-k") { // Keep on return
@@ -133,13 +123,13 @@ int main(int argc, char* argv[]) {
 		} else PARAM_CHECK("-d") { // Deck
 			++i;
 			if(i + 1 < argc) { // select deck
-				ygo::mainGame->gameConf.lastdeck = ygo::Utils::ToUnicodeIfNeeded(argv[i]);
+				ygo::mainGame->gameConf.lastdeck = ygo::Utils::ToUnicodeIfNeeded(parameter);
 				continue;
 			} else { // open deck
 				exit_on_return = !keep_on_return;
 				if(i < argc) {
 					open_file = true;
-					open_file_name = argv[i];
+					open_file_name = std::move(parameter);
 				}
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
@@ -159,7 +149,7 @@ int main(int argc, char* argv[]) {
 			++i;
 			if(i < argc) {
 				open_file = true;
-				open_file_name = argv[i];
+				open_file_name = std::move(parameter);
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
 			if(open_file)
@@ -170,25 +160,24 @@ int main(int argc, char* argv[]) {
 			++i;
 			if(i < argc) {
 				open_file = true;
-				open_file_name = argv[i];
+				open_file_name = std::move(parameter);
 			}
 			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
 		} else if(argc == 2 && path_string(argv[1]).size() >= 4) {
-			path_string name(argv[i]);
-			auto extension = ygo::Utils::GetFileExtension(name);
+			auto extension = ygo::Utils::GetFileExtension(parameter);
 			if(extension == EPRO_TEXT("ydk")) {
 				open_file = true;
-				open_file_name = name;
+				open_file_name = std::move(parameter);
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
 			if(extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
 				open_file = true;
-				open_file_name = name;
+				open_file_name = std::move(parameter);
 				exit_on_return = !keep_on_return;
 				ClickButton(ygo::mainGame->btnReplayMode);
 				ClickButton(ygo::mainGame->btnLoadReplay);

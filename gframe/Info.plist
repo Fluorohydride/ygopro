@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleIconFile</key>
+	<string>edopro.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>io.github.edo9300.ygoprodll</string>
+	<key>CFBundleExecutable</key>
+	<string>EDOPro</string>
+	<key>CFBundleName</key>
+	<string>EDOPro by Project Ignis</string>
+	<key>CFBundleDisplayName</key>
+	<string>EDOPro by Project Ignis</string>
+	<key>CFBundleShortVersionString</key>
+	<string>37.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>37.0.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.card-games</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.11.0</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
+</dict>
+</plist>

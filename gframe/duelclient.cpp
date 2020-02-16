@@ -142,6 +142,7 @@ void DuelClient::StopClient(bool is_exiting) {
 	if(connect_state != 0x7)
 		return;
 	is_closing = is_exiting || exit_on_return;
+	SendPacketToServer(CTOS_LEAVE_GAME);
 	event_base_loopbreak(client_base);
 	if(!is_closing) {
 		
@@ -854,7 +855,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		int player = pkt->player;
 		int type = -1;
 		if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
-			if(mainGame->chkIgnore1->isChecked()) {
+			if(mainGame->tabSettings.chkIgnoreOpponents->isChecked()) {
 				if(player >= mainGame->dInfo.team1 && mainGame->dInfo.isTeam1)
 					break;
 				if(player < mainGame->dInfo.team1 && !mainGame->dInfo.isTeam1)
@@ -869,10 +870,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		} else {
 			type = 2;
 			if(player == 8) { //system custom message.
-				if(mainGame->chkIgnore1->isChecked())
+				if(mainGame->tabSettings.chkIgnoreOpponents->isChecked())
 					break;
 			} else if(player < 11 || player > 19) {
-				if(mainGame->chkIgnore2->isChecked())
+				if(mainGame->tabSettings.chkIgnoreSpectators->isChecked())
 					break;
 				player = 10;
 			}
@@ -1871,13 +1872,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!select_trigger && !forced && (mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain)) && (count == 0 || !mainGame->chain_when_avail)) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
-			if(mainGame->chkWaitChain->isChecked() && !mainGame->ignore_chain) {
+			if(mainGame->tabSettings.chkNoChainDelay->isChecked() && !mainGame->ignore_chain) {
 				mainGame->WaitFrameSignal(20);
 			}
 			DuelClient::SendResponse();
 			return true;
 		}
-		if(mainGame->chkAutoChain->isChecked() && forced && !(mainGame->always_chain || mainGame->chain_when_avail)) {
+		if(mainGame->tabSettings.chkAutoChainOrder->isChecked() && forced && !(mainGame->always_chain || mainGame->chain_when_avail)) {
 			SetResponseI(0);
 			mainGame->dField.ClearChainSelect();
 			DuelClient::SendResponse();
@@ -1934,9 +1935,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->stHintMsg->setText(text.c_str());
 		mainGame->stHintMsg->setVisible(true);
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && (
-			(mainGame->chkMAutoPos->isChecked() && mainGame->dField.selectable_field & 0x7f007f) ||
-			(mainGame->chkSTAutoPos->isChecked() && !(mainGame->dField.selectable_field & 0x7f007f)))) {
-			if(mainGame->chkRandomPos->isChecked()) {
+			(mainGame->tabSettings.chkMAutoPos->isChecked() && mainGame->dField.selectable_field & 0x7f007f) ||
+			(mainGame->tabSettings.chkSTAutoPos->isChecked() && !(mainGame->dField.selectable_field & 0x7f007f)))) {
+			if(mainGame->tabSettings.chkRandomPos->isChecked()) {
 				std::vector<char> positions;
 				for(char i = 0; i < 32; i++) {
 					if(mainGame->dField.selectable_field & (1 << i))
@@ -2171,7 +2172,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.selectable_cards.push_back(pcard);
 			mainGame->dField.sort_list.push_back(0);
 		}
-		if (mainGame->chkAutoChain->isChecked() && mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
+		if (mainGame->tabSettings.chkAutoChainOrder->isChecked() && mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
 			mainGame->dField.sort_list.clear();
 			SetResponseI(-1);
 			DuelClient::SendResponse();
@@ -2606,7 +2607,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->btnLeaveGame->setVisible(true);
 		}
 		if(!mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
-			if(!mainGame->chkHideHintButton->isChecked()) {
+			if(!mainGame->tabSettings.chkHideChainButtons->isChecked()) {
 				mainGame->btnChainIgnore->setVisible(true);
 				mainGame->btnChainAlways->setVisible(true);
 				mainGame->btnChainWhenAvail->setVisible(true);

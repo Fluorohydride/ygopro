@@ -820,7 +820,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_CHAIN_BUTTONS: {
 				if(mainGame->dInfo.isStarted && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
-					const bool checked = !mainGame->chkHideHintButton->isChecked();
+					const bool checked = !mainGame->tabSettings.chkHideChainButtons->isChecked();
 					mainGame->btnChainIgnore->setVisible(checked);
 					mainGame->btnChainAlways->setVisible(checked);
 					mainGame->btnChainWhenAvail->setVisible(checked);
@@ -1832,6 +1832,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->ApplySkin(EPRO_TEXT(""), true);
 				break;
 			}
+			case BUTTON_SHOW_SETTINGS: {
+				if (!mainGame->gSettings.window->isVisible())
+					mainGame->ShowElement(mainGame->gSettings.window);
+				break;
+			}
+			case BUTTON_HIDE_SETTINGS: {
+				if (mainGame->gSettings.window->isVisible())
+					mainGame->HideElement(mainGame->gSettings.window);
+				break;
+			}
 			}
 			break;
 		}
@@ -1862,13 +1872,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
 			case SCROLL_MUSIC_VOLUME: {
-				mainGame->gameConf.musicVolume = (double)mainGame->scrMusicVolume->getPos() / 100;
-				mainGame->soundManager->SetMusicVolume(mainGame->gameConf.musicVolume);
+				mainGame->gameConf.musicVolume = mainGame->tabSettings.scrMusicVolume->getPos();
+				mainGame->soundManager->SetMusicVolume(mainGame->gameConf.musicVolume / 100.0);
 				return true;
 			}
 			case SCROLL_SOUND_VOLUME: {
-				mainGame->gameConf.soundVolume = (double)mainGame->scrSoundVolume->getPos() / 100;
-				mainGame->soundManager->SetSoundVolume(mainGame->gameConf.soundVolume);
+				mainGame->gameConf.soundVolume = mainGame->tabSettings.scrSoundVolume->getPos();
+				mainGame->soundManager->SetSoundVolume(mainGame->gameConf.soundVolume / 100.0);
 				return true;
 			}
 			}
@@ -1877,22 +1887,50 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch (id) {
 			case CHECKBOX_ENABLE_MUSIC: {
-				mainGame->soundManager->EnableMusic(mainGame->chkEnableMusic->isChecked());
+				mainGame->gameConf.enablemusic = mainGame->tabSettings.chkEnableMusic->isChecked();
+				mainGame->soundManager->EnableMusic(mainGame->gameConf.enablemusic);
 				return true;
 			}
 			case CHECKBOX_ENABLE_SOUND: {
-				mainGame->soundManager->EnableSounds(mainGame->chkEnableSound->isChecked());
+				mainGame->gameConf.enablesound = mainGame->tabSettings.chkEnableSound->isChecked();
+				mainGame->soundManager->EnableSounds(mainGame->gameConf.enablesound);
 				return true;
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
-				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked() ? 1 : 0;
+				mainGame->gameConf.quick_animation = mainGame->tabSettings.chkQuickAnimation->isChecked();
+				return true;
+			}
+			case CHECKBOX_HIDE_ARCHETYPES: {
+				mainGame->gameConf.chkHideSetname = mainGame->gSettings.chkHideSetname->isChecked();
+				mainGame->stSetName->setVisible(!mainGame->gameConf.chkHideSetname);
+				mainGame->RefreshCardInfoTextPositions();
+				return true;
+			}
+			case CHECKBOX_HIDE_PASSCODE_SCOPE: {
+				mainGame->gameConf.hidePasscodeScope = mainGame->gSettings.chkHidePasscodeScope->isChecked();
+				mainGame->stPasscodeScope->setVisible(!mainGame->gameConf.hidePasscodeScope);
+				mainGame->RefreshCardInfoTextPositions();
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {
-				mainGame->gameConf.showFPS = mainGame->chkShowFPS->isChecked();
+				mainGame->gameConf.showFPS = mainGame->gSettings.chkShowFPS->isChecked();
 				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);
 				return true;
 			}
+			case CHECKBOX_FULLSCREEN: {
+				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->gameConf.fullscreen);
+				return true;
+			}
+			case CHECKBOX_SCALE_BACKGROUND: {
+				mainGame->gameConf.scale_background = mainGame->gSettings.chkScaleBackground->isChecked();
+				return true;
+			}
+#ifndef ANDROID
+			case CHECKBOX_ACCURATE_BACKGROUND_RESIZE: {
+				mainGame->gameConf.accurate_bg_resize = mainGame->gSettings.chkAccurateBackgroundResize->isChecked();
+				return true;
+			}
+#endif
 			case BUTTON_REPO_CHANGELOG_EXPAND: {
 				auto& repo = mainGame->repoInfoGui[showing_repo];
 				mainGame->stCommitLog->setText(mainGame->chkCommitLogExpand->isChecked() ? repo.commit_history_full.c_str() : repo.commit_history_partial.c_str());
@@ -1937,7 +1975,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_CURRENT_SKIN: {
-				mainGame->gameConf.skin = Utils::ToPathString(mainGame->cbCurrentSkin->getItem(mainGame->cbCurrentSkin->getSelected()));
+				mainGame->gameConf.skin = Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected()));
 				mainGame->ApplySkin(mainGame->gameConf.skin);
 				return true;
 			}
@@ -1957,6 +1995,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->textFont->setTransparency(true);
+			return true;
+		}
+		case irr::KEY_KEY_O: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
+				if (mainGame->gSettings.window->isVisible())
+					mainGame->HideElement(mainGame->gSettings.window);
+				else
+					mainGame->ShowElement(mainGame->gSettings.window);
+			}
 			return true;
 		}
 		case irr::KEY_ESCAPE: {
@@ -1980,7 +2027,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_F11: {
 			if(!event.KeyInput.PressedDown)
-				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->is_fullscreen);
+				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->gameConf.fullscreen);
 			return true;
 		}
 		default: break;

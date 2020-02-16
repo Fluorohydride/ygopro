@@ -13,7 +13,7 @@ namespace gui {
 		subpanel = new IGUIElement(EGUIET_ELEMENT, env, parent, id, rectangle);
 		subpanel->drop();
 	}
-	Panel* Panel::addPanel(IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32>& rectangle, bool vertical, bool horizontal) {
+	Panel* Panel::addPanel(IGUIEnvironment* environment, IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool vertical, bool horizontal) {
 		if(!parent)
 			parent = environment->getRootGUIElement();
 		Panel* c = new Panel(environment, rectangle, id, parent, vertical, horizontal);

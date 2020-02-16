@@ -8,7 +8,19 @@
 struct sqlite3;
 struct sqlite3_stmt;
 
-#define TYPE_SKILL 0x8000000
+#define SCOPE_OCG        0x1
+#define SCOPE_TCG        0x2
+#define SCOPE_ANIME      0x4
+#define SCOPE_ILLEGAL    0x8
+#define SCOPE_VIDEO_GAME 0x10
+#define SCOPE_CUSTOM     0x20
+#define SCOPE_PRERELEASE 0x100
+#define SCOPE_HIDDEN     0x1000
+
+#define SCOPE_OFFICIAL   SCOPE_OCG | SCOPE_TCG | SCOPE_PRERELEASE
+
+#define TYPE_SKILL       0x8000000
+#define TYPE_ACTION      0x10000000
 
 namespace ygo {
 
@@ -57,6 +69,7 @@ public:
 	std::wstring FormatAttribute(int attribute);
 	std::wstring FormatRace(int race, bool isSkill = false);
 	std::wstring FormatType(int type);
+	std::wstring FormatScope(int scope, bool hideOCGTCG = false);
 	std::wstring FormatSetName(unsigned long long setcode);
 	std::wstring FormatSetName(std::vector<uint16> setcodes);
 	std::wstring FormatLinkMarker(int link_marker);

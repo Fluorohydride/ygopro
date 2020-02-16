@@ -390,13 +390,15 @@ std::wstring DataManager::FormatRace(int race, bool isSkill) {
 }
 std::wstring DataManager::FormatType(int type) {
 	std::wstring res;
-	unsigned filter = 1;
-	int i = 1050;
 	if(type & TYPE_SKILL)
 		res += GetSysString(1077);
-	for(; filter != TYPE_SKILL; filter <<= 1, ++i) {
-		if(type & TYPE_TOKEN && type & TYPE_SKILL)
-			continue; // Skill cover back
+	if(type & TYPE_ACTION) {
+		if (!res.empty())
+			res += L"|";
+		res += GetSysString(1078);
+	}
+	int i = 1050;
+	for(unsigned filter = 1; filter != TYPE_SKILL; filter <<= 1, ++i) {
 		if(type & filter) {
 			if(!res.empty())
 				res += L"|";
@@ -406,6 +408,28 @@ std::wstring DataManager::FormatType(int type) {
 	if(res.empty())
 		return unknown_string;
 	return res;
+}
+std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
+	static const std::map<int, int> SCOPES = {
+		{SCOPE_OCG, 1900},
+		{SCOPE_TCG, 1901},
+		{SCOPE_ANIME, 1265},
+		{SCOPE_ILLEGAL, 1266},
+		{SCOPE_VIDEO_GAME, 1267},
+		{SCOPE_CUSTOM, 1268},
+		{SCOPE_PRERELEASE, 1903}
+	};
+	if (hideOCGTCG && scope == 0x3) return L"";
+	std::wstring buffer;
+	for (const auto& tuple : SCOPES) {
+		if (scope & tuple.first) {
+			if (!buffer.empty()) {
+				buffer += L"/";
+			}
+			buffer.append(dataManager.GetSysString(tuple.second).c_str());
+		}
+	}
+	return buffer;
 }
 std::wstring DataManager::FormatSetName(unsigned long long setcode) {
 	std::wstring res;

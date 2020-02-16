@@ -61,7 +61,10 @@ Game* mainGame;
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
-	is_fullscreen = false;
+#ifdef _WIN32
+	if(!gameConf.showConsole)
+		FreeConsole();
+#endif
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
 #ifndef __ANDROID__
@@ -172,7 +175,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	if(!ApplySkin(gameConf.skin)) {
-		gameConf.skin = EPRO_TEXT("none");
+		gameConf.skin = NoSkinLabel();
 	}
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"EDOPro by Project Ignis");
@@ -181,12 +184,7 @@ bool Game::Initialize() {
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
 	HICON hSmallIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
-	HWND hWnd;
-	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
-	if(driver->getDriverType() == irr::video::EDT_DIRECT3D9)
-		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
-	else
-		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
+	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 	DragAcceptFiles(hWnd, TRUE);
@@ -518,7 +516,12 @@ bool Game::Initialize() {
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
 	stSetName->setWordWrap(true);
 	stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
-	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
+	stSetName->setVisible(!gameConf.chkHideSetname);
+	stPasscodeScope = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 129));
+	stPasscodeScope->setWordWrap(true);
+	stPasscodeScope->setOverrideColor(skin::CARDINFO_PASSCODE_SCOPE_TEXT_COLOR_VAL);
+	stPasscodeScope->setVisible(!gameConf.hidePasscodeScope);
+	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 129, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
 	//log
@@ -542,75 +545,84 @@ bool Game::Initialize() {
 	//system
 	irr::gui::IGUITab* _tabSystem = wInfos->addTab(dataManager.GetSysString(1273).c_str());
 	defaultStrings.emplace_back(_tabSystem, 1273);
-	auto aaa = Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight());
-	tabSystem = Panel::addPanel(env, _tabSystem, -1, aaa, true, false);
+	tabSystem = Panel::addPanel(env, _tabSystem, -1, Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight()), true, false);
 	auto tabPanel = tabSystem->getSubpanel();
-	chkMAutoPos = env->addCheckBox(false, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1274).c_str());
-	defaultStrings.emplace_back(chkMAutoPos, 1274);
-	chkMAutoPos->setChecked(gameConf.chkMAutoPos != 0);
-	chkSTAutoPos = env->addCheckBox(false, Scale(20, 50, 280, 75), tabPanel, -1, dataManager.GetSysString(1278).c_str());
-	defaultStrings.emplace_back(chkSTAutoPos, 1278);
-	chkSTAutoPos->setChecked(gameConf.chkSTAutoPos != 0);
-	chkRandomPos = env->addCheckBox(false, Scale(40, 80, 300, 105), tabPanel, -1, dataManager.GetSysString(1275).c_str());
-	defaultStrings.emplace_back(chkRandomPos, 1275);
-	chkRandomPos->setChecked(gameConf.chkRandomPos != 0);
-	chkAutoChain = env->addCheckBox(false, Scale(20, 110, 280, 135), tabPanel, -1, dataManager.GetSysString(1276).c_str());
-	defaultStrings.emplace_back(chkAutoChain, 1276);
-	chkAutoChain->setChecked(gameConf.chkAutoChain != 0);
-	chkWaitChain = env->addCheckBox(false, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1277).c_str());
-	defaultStrings.emplace_back(chkWaitChain, 1277);
-	chkWaitChain->setChecked(gameConf.chkWaitChain != 0);
-	chkHideHintButton = env->addCheckBox(false, Scale(20, 170, 280, 195), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
-	defaultStrings.emplace_back(chkHideHintButton, 1355);
-	chkHideHintButton->setChecked(gameConf.chkHideHintButton != 0);
-	chkIgnore1 = env->addCheckBox(false, Scale(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1290).c_str());
-	defaultStrings.emplace_back(chkIgnore1, 1290);
-	chkIgnore1->setChecked(gameConf.chkIgnore1 != 0);
-	chkIgnore2 = env->addCheckBox(false, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1291).c_str());
-	defaultStrings.emplace_back(chkIgnore2, 1291);
-	chkIgnore2->setChecked(gameConf.chkIgnore2 != 0);
-	chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 260, 280, 285), tabPanel, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2046).c_str());
-	defaultStrings.emplace_back(chkEnableMusic, 2046);
-	chkEnableMusic->setChecked(gameConf.enablemusic);
-	chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
-	defaultStrings.emplace_back(chkEnableSound, 2047);
-	chkEnableSound->setChecked(gameConf.enablesound);
-	stMusicVolume = env->addStaticText(dataManager.GetSysString(2048).c_str(), Scale(20, 320, 80, 345), false, true, tabPanel, -1, false);
-	defaultStrings.emplace_back(stMusicVolume, 2048);
-	scrMusicVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_MUSIC_VOLUME);
-	scrMusicVolume->setMax(100);
-	scrMusicVolume->setMin(0);
-	scrMusicVolume->setPos(gameConf.musicVolume * 100);
-	scrMusicVolume->setLargeStep(1);
-	scrMusicVolume->setSmallStep(1);
-	stSoundVolume = env->addStaticText(dataManager.GetSysString(2049).c_str(), Scale(20, 350, 80, 375), false, true, tabPanel, -1, false);
-	defaultStrings.emplace_back(stSoundVolume, 2049);
-	scrSoundVolume = env->addScrollBar(true, Scale(85, 355, 280, 370), tabPanel, SCROLL_SOUND_VOLUME);
-	scrSoundVolume->setMax(100);
-	scrSoundVolume->setMin(0);
-	scrSoundVolume->setPos(gameConf.soundVolume * 100);
-	scrSoundVolume->setLargeStep(1);
-	scrSoundVolume->setSmallStep(1);
-	chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 380, 280, 405), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
-	defaultStrings.emplace_back(chkQuickAnimation, 1299);
-	cbCurrentSkin = env->addComboBox(Scale(90, 415, 270, 440), tabPanel, COMBOBOX_CURRENT_SKIN);
-	int sel_skin = cbCurrentSkin->addItem(L"none");
+	tabSettings.chkIgnoreOpponents = env->addCheckBox(gameConf.chkIgnore1, Scale(20, 20, 280, 45), tabPanel, -1, dataManager.GetSysString(1290).c_str());
+	defaultStrings.emplace_back(tabSettings.chkIgnoreOpponents, 1290);
+	tabSettings.chkIgnoreSpectators = env->addCheckBox(gameConf.chkIgnore2, Scale(20, 50, 280, 75), tabPanel, -1, dataManager.GetSysString(1291).c_str());
+	defaultStrings.emplace_back(tabSettings.chkIgnoreSpectators, 1291);
+	tabSettings.chkQuickAnimation = env->addCheckBox(gameConf.quick_animation, Scale(20, 80, 300, 105), tabPanel, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299).c_str());
+	defaultStrings.emplace_back(tabSettings.chkQuickAnimation, 1299);
+	tabSettings.chkHideChainButtons = env->addCheckBox(gameConf.chkHideHintButton, Scale(20, 110, 280, 135), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
+	defaultStrings.emplace_back(tabSettings.chkHideChainButtons, 1355);
+	tabSettings.chkAutoChainOrder = env->addCheckBox(gameConf.chkAutoChain, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1276).c_str());
+	defaultStrings.emplace_back(tabSettings.chkAutoChainOrder, 1276);
+	tabSettings.chkNoChainDelay = env->addCheckBox(gameConf.chkWaitChain, Scale(20, 170, 280, 195), tabPanel, -1, dataManager.GetSysString(1277).c_str());
+	defaultStrings.emplace_back(tabSettings.chkNoChainDelay, 1277);
+	tabSettings.chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 200, 280, 225), tabPanel, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
+	defaultStrings.emplace_back(tabSettings.chkEnableSound, 2047);
+	tabSettings.stSoundVolume = env->addStaticText(dataManager.GetSysString(2049).c_str(), Scale(20, 230, 80, 255), false, true, tabPanel);
+	defaultStrings.emplace_back(tabSettings.stSoundVolume, 2049);
+	tabSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 235, 280, 250), tabPanel, SCROLL_SOUND_VOLUME);
+	tabSettings.scrSoundVolume->setMax(100);
+	tabSettings.scrSoundVolume->setMin(0);
+	tabSettings.scrSoundVolume->setPos(gameConf.soundVolume);
+	tabSettings.scrSoundVolume->setLargeStep(1);
+	tabSettings.scrSoundVolume->setSmallStep(1);
+	tabSettings.chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 260, 280, 285), tabPanel, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2046).c_str());
+	defaultStrings.emplace_back(tabSettings.chkEnableMusic, 2046);
+	tabSettings.stMusicVolume = env->addStaticText(dataManager.GetSysString(2048).c_str(), Scale(20, 290, 80, 315), false, true, tabPanel);
+	defaultStrings.emplace_back(tabSettings.stMusicVolume, 2048);
+	tabSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 295, 280, 310), tabPanel, SCROLL_MUSIC_VOLUME);
+	tabSettings.scrMusicVolume->setMax(100);
+	tabSettings.scrMusicVolume->setMin(0);
+	tabSettings.scrMusicVolume->setPos(gameConf.musicVolume);
+	tabSettings.scrMusicVolume->setLargeStep(1);
+	tabSettings.scrMusicVolume->setSmallStep(1);
+	tabSettings.stNoAudioBackend = env->addStaticText(dataManager.GetSysString(2058).c_str(), Scale(20, 200, 280, 315), false, true, tabPanel);
+	defaultStrings.emplace_back(tabSettings.stNoAudioBackend, 2058);
+	tabSettings.stNoAudioBackend->setVisible(false);
+	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 320, 280, 345), tabPanel, -1, dataManager.GetSysString(1274).c_str());
+	defaultStrings.emplace_back(tabSettings.chkMAutoPos, 1274);
+	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, dataManager.GetSysString(1278).c_str());
+	defaultStrings.emplace_back(tabSettings.chkSTAutoPos, 1278);
+	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 380, 280, 405), tabPanel, -1, dataManager.GetSysString(1275).c_str());
+	defaultStrings.emplace_back(tabSettings.chkRandomPos, 1275);
+	btnTabShowSettings = env->addButton(Scale(20, 410, 280, 435), tabPanel, BUTTON_SHOW_SETTINGS, dataManager.GetSysString(2059).c_str());
+	defaultStrings.emplace_back(btnTabShowSettings, 2059);
+	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
+
+	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, dataManager.GetSysString(1273).c_str());
+	defaultStrings.emplace_back(gSettings.window, 1273);
+	gSettings.window->getCloseButton()->setVisible(false);
+	gSettings.window->setVisible(false);
+	gSettings.btnClose = env->addButton(Scale(555, 5, 575, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
+	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
+	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
+	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_FULLSCREEN, dataManager.GetSysString(2060).c_str());
+	defaultStrings.emplace_back(gSettings.chkFullscreen, 2060);
+	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, dataManager.GetSysString(2061).c_str());
+	defaultStrings.emplace_back(gSettings.chkScaleBackground, 2061);
+	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gameConf.accurate_bg_resize, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, dataManager.GetSysString(2062).c_str());
+	defaultStrings.emplace_back(gSettings.chkAccurateBackgroundResize, 2062);
+	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 155, 280, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
+	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, dataManager.GetSysString(2063).c_str());
+	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
+	gSettings.stCurrentSkin = env->addStaticText(dataManager.GetSysString(2064).c_str(), Scale(20, 215, 80, 240), false, true, gSettings.window);
+	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
+	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 215, 280, 240), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	int selectedSkin = gSettings.cbCurrentSkin->addItem(dataManager.GetSysString(2065).c_str()); // NoSkinLabel "none"
 	auto skins = skinSystem->listSkins();
-	for(int i = skins.size() - 1; i >= 0; i--) {
-		auto idx = cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
-		if(gameConf.skin == skins[i].c_str()) {
-			sel_skin = idx;
+	for (int i = skins.size() - 1; i >= 0; i--) {
+		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
+		if (gameConf.skin == skins[i].c_str()) {
+			selectedSkin = itemIndex;
 		}
 	}
-	cbCurrentSkin->setSelected(sel_skin);
-	btnReloadSkin = env->addButton(Scale(90, 445, 190, 475), tabPanel, BUTTON_RELOAD_SKIN, L"Reload Skin");
-	/*if(sel_skin == 0) {
-		gameConf.skin = EPRO_TEXT("none");
-	}*/
-	//ApplySkin(gameConf.skin);
-	chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 480, 280, 505), tabPanel, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
-	defaultStrings.emplace_back(chkShowFPS, 1445);
- 	tmpptr = env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
+	gSettings.cbCurrentSkin->setSelected(selectedSkin);
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 245, 280, 270), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
+	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	defaultStrings.emplace_back(tabRepositories, 2045);
@@ -1100,17 +1112,13 @@ bool Game::Initialize() {
 	device->setEventReceiver(&menuHandler);
 	soundManager = std::unique_ptr<SoundManager>(new SoundManager());
 	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, working_directory)) {
-		chkEnableSound->setChecked(false);
-		chkEnableSound->setEnabled(false);
-		chkEnableSound->setVisible(false);
-		chkEnableMusic->setChecked(false);
-		chkEnableMusic->setEnabled(false);
-		chkEnableMusic->setVisible(false);
-		scrMusicVolume->setVisible(false);
-		stMusicVolume->setVisible(false);
-		scrSoundVolume->setVisible(false);
-		stSoundVolume->setVisible(false);
-		chkQuickAnimation->setRelativePosition(Scale(20, 260, 280, 285));
+		tabSettings.chkEnableSound->setVisible(false);
+		tabSettings.stSoundVolume->setVisible(false);
+		tabSettings.scrSoundVolume->setVisible(false);
+		tabSettings.chkEnableMusic->setVisible(false);
+		tabSettings.stMusicVolume->setVisible(false);
+		tabSettings.scrMusicVolume->setVisible(false);
+		tabSettings.stNoAudioBackend->setVisible(true);
 	}
 
 	//server lobby
@@ -1347,8 +1355,11 @@ void Game::MainLoop() {
 		matManager.mATK.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
 	}
 #endif
-	if(gameConf.fullscreen)
-		GUIUtils::ToggleFullscreen(device, is_fullscreen);
+	if (gameConf.fullscreen) {
+		// Synchronize actual fullscreen state with config struct
+		bool currentlyFullscreen = false;
+		GUIUtils::ToggleFullscreen(device, currentlyFullscreen);
+	}
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
@@ -1631,6 +1642,9 @@ void Game::MainLoop() {
 #endif //YGOPRO_BUILD_DLL
 	//device->drop();
 }
+path_string Game::NoSkinLabel() {
+	return Utils::ToPathString(dataManager.GetSysString(2059));
+}
 bool Game::ApplySkin(const path_string& skinname, bool reload) {
 	static path_string prev_skin = EPRO_TEXT("");
 	static bool firstrun = true;
@@ -1640,6 +1654,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		stInfo->setOverrideColor(skin::CARDINFO_TYPES_COLOR_VAL);
 		stDataInfo->setOverrideColor(skin::CARDINFO_STATS_COLOR_VAL);
 		stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
+		stPasscodeScope->setOverrideColor(skin::CARDINFO_PASSCODE_SCOPE_TEXT_COLOR_VAL);
 		stACMessage->setBackgroundColor(skin::DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR_VAL);
 		auto tmp_color = skin::DUELFIELD_ANNOUNCE_TEXT_COLOR_VAL;
 		if(tmp_color != 0) {
@@ -1678,7 +1693,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		return false;
 	if(!reload)
 		prev_skin = skinname;
-	if(prev_skin == EPRO_TEXT("none")) {
+	if(prev_skin == NoSkinLabel()) {
 		auto skin = env->createSkin(gui::EGST_WINDOWS_METALLIC);
 		env->setSkin(skin);
 		skin->drop();
@@ -1720,7 +1735,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		wInfos->setTabHeight(skin->getSize(EGDS_BUTTON_HEIGHT) + Scale(2));
 		wInfos->setTabVerticalAlignment(irr::gui::EGUIA_UPPERLEFT);
 	}
-	if(prev_skin == EPRO_TEXT("none")){
+	if(prev_skin == NoSkinLabel()){
 		for (u32 i = 0; i < EGDC_COUNT; ++i) {
 			irr::video::SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
 			col.setAlpha(224);
@@ -1808,6 +1823,12 @@ void Game::RefreshAiDecks() {
 					bot.version = PRO_VERSION;
 #ifdef _WIN32
 					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
+#else
+					if (configs.size() && configs["posixPathExtension"].is_string()) {
+						bot.executablePath = configs["posixPathExtension"].get<path_string>();
+					} else {
+						bot.executablePath = EPRO_TEXT("");
+					}
 #endif
 					gBot.bots.push_back(bot);
 				}
@@ -1829,227 +1850,30 @@ void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
 }
 void Game::LoadConfig() {
-	gameConf.antialias = 0;
-	gameConf.use_d3d = false;
-	gameConf.use_vsync = true;
-	gameConf.max_fps = 60;
-	gameConf.game_version = 0;
-	gameConf.fullscreen = false;
-	gameConf.serverport = L"7911";
-	gameConf.textfontsize = 12;
-	gameConf.nickname = L"";
-	gameConf.gamename = L"";
-	gameConf.lastdeck = L"";
-	gameConf.lastlflist = 0;
-	gameConf.lastallowedcards = static_cast<unsigned int>(DuelAllowedCards::ALLOWED_CARDS_WITH_PRERELEASE);
-	gameConf.numfont = L"";
-	gameConf.textfont = L"";
-	gameConf.lasthost = L"";
-	gameConf.lastport = L"";
-	gameConf.roompass = L"";
-	//settings
-	gameConf.chkMAutoPos = false;
-	gameConf.chkSTAutoPos = true;
-	gameConf.chkRandomPos = false;
-	gameConf.chkAutoChain = false;
-	gameConf.chkWaitChain = false;
-	gameConf.chkIgnore1 = false;
-	gameConf.chkIgnore2 = false;
-	gameConf.chkHideSetname = false;
-	gameConf.chkHideHintButton = false;
-	gameConf.skin = EPRO_TEXT("none");
-	gameConf.enablemusic = true;
-	gameConf.enablesound = true;
-	gameConf.musicVolume = 1.0;
-	gameConf.soundVolume = 1.0;
-	gameConf.draw_field_spell = true;
-	gameConf.quick_animation = false;
-	gameConf.showFPS = true;
-	gameConf.scale_background = true;
-#ifdef __ANDROID__
-	gameConf.accurate_bg_resize = true;
-#else
-	gameConf.accurate_bg_resize = false;
-#endif
-	gameConf.chkAnime = false;
-	gameConf.dpi_scale = 1.0f;
-	std::ifstream conf_file("./config/system.conf", std::ifstream::in);
-	if(!conf_file.is_open())
-		return;
-	std::string str;
-	while(std::getline(conf_file, str)) {
-		auto pos = str.find_first_of("\n\r");
-		if(str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
-		if(str.empty() || str.at(0) == '#') {
-			continue;
-		}
-		pos = str.find_first_of("=");
-		if(pos == std::wstring::npos)
-			continue;
-		auto type = str.substr(0, pos - 1);
-		str = str.substr(pos + 2);
-		try {
-			if(type == "antialias")
-				gameConf.antialias = std::stoi(str);
-			else if(type == "use_d3d")
-				gameConf.use_d3d = !!std::stoi(str);
-			else if(type == "use_vsync")
-				gameConf.use_vsync = !!std::stoi(str);
-			else if(type == "max_fps") {
-				auto val = std::stoi(str);
-				if(val >= 0)
-					gameConf.max_fps = val;
-			} else if(type == "fullscreen")
-				gameConf.fullscreen = !!std::stoi(str);
-			else if(type == "errorlog")
-				enable_log = std::stoi(str);
-			else if(type == "nickname")
-				gameConf.nickname = BufferIO::DecodeUTF8s(str);
-			else if(type == "gamename")
-				gameConf.gamename = BufferIO::DecodeUTF8s(str);
-			else if(type == "lastdeck")
-				gameConf.lastdeck = BufferIO::DecodeUTF8s(str);
-			else if(type == "lastlflist") {
-				auto val = std::stoi(str);
-				gameConf.lastlflist = val >= 0 ? val : 0;
-			} else if(type == "lastallowedcards") {
-				auto val = std::stoi(str);
-				gameConf.lastallowedcards = val >= 0 ? val : 0;
-			} else if(type == "textfont") {
-				pos = str.find(L' ');
-				if(pos == std::wstring::npos) {
-					gameConf.textfont = BufferIO::DecodeUTF8s(str);
-					continue;
-				}
-				gameConf.textfont = BufferIO::DecodeUTF8s(str.substr(0, pos));
-				gameConf.textfontsize = std::stoi(str.substr(pos));
-			} else if(type == "numfont")
-				gameConf.numfont = BufferIO::DecodeUTF8s(str);
-			else if(type == "serverport")
-				gameConf.serverport = BufferIO::DecodeUTF8s(str);
-			else if(type == "lasthost")
-				gameConf.lasthost = BufferIO::DecodeUTF8s(str);
-			else if(type == "lastport")
-				gameConf.lastport = BufferIO::DecodeUTF8s(str);
-			else if(type == "roompass")
-				gameConf.roompass = BufferIO::DecodeUTF8s(str);
-			else if(type == "game_version") {
-				int version = std::stoi(str);
-				if(version) {
-					PRO_VERSION = std::stoi(str);
-					gameConf.game_version = PRO_VERSION;
-				}
-			} else if(type == "automonsterpos")
-				gameConf.chkMAutoPos = !!std::stoi(str);
-			else if(type == "autospellpos")
-				gameConf.chkSTAutoPos = !!std::stoi(str);
-			else if(type == "randompos")
-				gameConf.chkRandomPos = !!std::stoi(str);
-			else if(type == "autochain")
-				gameConf.chkAutoChain = !!std::stoi(str);
-			else if(type == "waitchain")
-				gameConf.chkWaitChain = !!std::stoi(str);
-			else if(type == "mute_opponent")
-				gameConf.chkIgnore1 = !!std::stoi(str);
-			else if(type == "mute_spectators")
-				gameConf.chkIgnore1 = !!std::stoi(str);
-			else if(type == "hide_setname")
-				gameConf.chkHideSetname = !!std::stoi(str);
-			else if(type == "hide_hint_button")
-				gameConf.chkHideHintButton = !!std::stoi(str);
-			else if(type == "draw_field_spell")
-				gameConf.draw_field_spell = !!std::stoi(str);
-			else if(type == "quick_animation")
-				gameConf.quick_animation = !!std::stoi(str);
-			else if(type == "show_unofficial")
-				gameConf.chkAnime = !!std::stoi(str);
-			else if(type == "showFPS")
-				gameConf.showFPS = !!std::stoi(str);
-			else if(type == "dpi_scale")
-				gameConf.dpi_scale = std::stof(str);
-			else if(type == "skin")
-				gameConf.skin = Utils::ToPathString(str);
-			else if(type == "scale_background")
-				gameConf.scale_background = !!std::stoi(str);
-#ifndef __ANDROID__
-			else if(type == "accurate_bg_resize")
-				gameConf.accurate_bg_resize = !!std::stoi(str);
-#endif
-			else if(type == "enable_music")
-				gameConf.enablemusic = !!std::stoi(str);
-			else if(type == "enable_sound")
-				gameConf.enablesound = !!std::stoi(str);
-			else if(type == "music_volume")
-				gameConf.musicVolume = std::stof(str) / 100.0f;
-			else if(type == "sound_volume")
-				gameConf.soundVolume = std::stof(str) / 100.0f;
-		} catch (...){}
-	}
-	conf_file.close();
+	gameConf.Load("./config/system.conf");
 	if(configs.empty()) {
-		conf_file.open(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
+		std::ifstream conf_file(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
 		try {
 			conf_file >> configs;
 		}
 		catch(std::exception& e) {
 			ErrorLog(std::string("Exception occurred: ") + e.what());
 		}
-		conf_file.close();
 	}
 }
 void Game::SaveConfig() {
-	std::ofstream conf_file("./config/system.conf", std::ofstream::out);
-	if(!conf_file.is_open())
-		return;
-	conf_file << "#Configuration file\n";
-	conf_file << "#Nickname & Gamename should be less than 20 characters\n";
-	conf_file << "#The following parameters use 0 for 'disabled' or 1 for 'enabled':\n";
-	conf_file << "#use_d3d, use_vsync, fullscreen, automonsterpos, autospellpos, randompos, autochain, waitchain, mute_opponent, mute_spectators,\n";
-	conf_file <<  "hide_setname,hide_hint_button, draw_field_spell, quick_animation, show_unofficial, skin, enable_sound, enable_music\n";
-	conf_file << "use_d3d = "			<< (gameConf.use_d3d ? 1 : 0) << "\n";
-	conf_file << "use_vsync = "			<< (gameConf.use_vsync ? 1 : 0) << "\n";
-	conf_file << "#limit the framerate, 0 unlimited, default 60\n";
-	conf_file << "max_fps = "			<< gameConf.max_fps << "\n";
-	conf_file << "fullscreen = "		<< (is_fullscreen ? 1 : 0) << "\n";
-	conf_file << "antialias = "			<< gameConf.antialias << "\n";
-	conf_file << "errorlog = "			<< enable_log << "\n";
-	conf_file << "nickname = "			<< BufferIO::EncodeUTF8s(ebNickName->getText()) << "\n";
-	conf_file << "gamename = "			<< BufferIO::EncodeUTF8s(gameConf.gamename) << "\n";
-	conf_file << "lastdeck = "			<< BufferIO::EncodeUTF8s(gameConf.lastdeck) << "\n";
-	conf_file << "lastlflist = "		<< gameConf.lastlflist << "\n";
-	conf_file << "lastallowedcards = "  << cbRule->getSelected() << "\n";
-	conf_file << "textfont = "			<< BufferIO::EncodeUTF8s(gameConf.textfont) << " " << std::to_string(gameConf.textfontsize) << "\n";
-	conf_file << "numfont = "			<< BufferIO::EncodeUTF8s(gameConf.numfont) << "\n";
-	conf_file << "serverport = "		<< BufferIO::EncodeUTF8s(gameConf.serverport) << "\n";
-	conf_file << "lasthost = "			<< BufferIO::EncodeUTF8s(gameConf.lasthost) << "\n";
-	conf_file << "lastport = "			<< BufferIO::EncodeUTF8s(gameConf.lastport) << "\n";
-	conf_file << "game_version = "		<< gameConf.game_version << "\n";
-	conf_file << "automonsterpos = "	<< (chkMAutoPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "autospellpos = "		<< (chkSTAutoPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "randompos = "			<< (chkRandomPos->isChecked() ? 1 : 0) << "\n";
-	conf_file << "autochain = "			<< (chkAutoChain->isChecked() ? 1 : 0) << "\n";
-	conf_file << "waitchain = "			<< (chkWaitChain->isChecked() ? 1 : 0) << "\n";
-	conf_file << "mute_opponent = "		<< (chkIgnore1->isChecked() ? 1 : 0) << "\n";
-	conf_file << "mute_spectators = "	<< (chkIgnore2->isChecked() ? 1 : 0) << "\n";
-	conf_file << "hide_setname = "		<< (gameConf.chkHideSetname ? 1 : 0) << "\n";
-	conf_file << "hide_hint_button = "	<< (chkHideHintButton->isChecked() ? 1 : 0) << "\n";
-	conf_file << "draw_field_spell = "	<< (gameConf.draw_field_spell ? 1 : 0) << "\n";
-	conf_file << "quick_animation = "	<< (gameConf.quick_animation ? 1 : 0) << "\n";
-	conf_file << "showFPS = "           << (gameConf.showFPS ? 1 : 0) << "\n";
-	conf_file << "#shows the unofficial cards in deck edit, which includes anime, customs, etc\n";
-	conf_file << "show_unofficial = "	<< (chkAnime->isChecked() ? 1 : 0) << "\n";
-	conf_file << "dpi_scale = "			<< std::to_string(gameConf.dpi_scale) << "\n";
-	conf_file << "#if skins from the skin folder are in use\n";
-	conf_file << "skin = "				<< Utils::ToUTF8IfNeeded(gameConf.skin) << "\n";
-	conf_file << "scale_background = "  << (gameConf.scale_background ? 1 : 0) << "\n";
-	conf_file << "accurate_bg_resize = "<< (gameConf.accurate_bg_resize ? 1 : 0) << "\n";
-	conf_file << "enable_music = "		<< (chkEnableMusic->isChecked() ? 1 : 0) << "\n";
-	conf_file << "enable_sound = "		<< (chkEnableSound->isChecked() ? 1 : 0) << "\n";
-	conf_file << "#integers between 0 and 100\n";
-	conf_file << "music_volume = "		<< std::min(std::max((int)(gameConf.musicVolume * 100), 0), 100) << "\n";
-	conf_file << "sound_volume = "		<< std::min(std::max((int)(gameConf.soundVolume * 100), 0), 100) << "\n";
-	conf_file.close();
+	gameConf.nickname = ebNickName->getText();
+	gameConf.lastallowedcards = cbRule->getSelected();
+	gameConf.chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
+	gameConf.chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();
+	gameConf.chkRandomPos = tabSettings.chkRandomPos->isChecked();
+	gameConf.chkAutoChain = tabSettings.chkAutoChainOrder->isChecked();
+	gameConf.chkWaitChain = tabSettings.chkNoChainDelay->isChecked();
+	gameConf.chkIgnore1 = tabSettings.chkIgnoreOpponents->isChecked();
+	gameConf.chkIgnore2 = tabSettings.chkIgnoreSpectators->isChecked();
+	gameConf.chkHideHintButton = tabSettings.chkHideChainButtons->isChecked();
+	gameConf.chkAnime = chkAnime->isChecked();
+	gameConf.Save("./config/system.conf");
 }
 void Game::LoadPicUrls() {
 	try {
@@ -2206,18 +2030,17 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 	int tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
-	stName->setText(fmt::format(L"{} [{:08}]", dataManager.GetName(tmp_code), tmp_code).c_str());
+	stName->setText(dataManager.GetName(tmp_code).c_str());
+	stPasscodeScope->setText(fmt::format(L"[{:08}] {}", tmp_code, dataManager.FormatScope(cd->ot)).c_str());
 	stSetName->setText(L"");
-	if(!gameConf.chkHideSetname) {
-		auto setcodes = cd->setcodes;
-		if(cd->alias) {
-			auto data = dataManager.GetCardData(cd->alias);
-			if(data)
-				setcodes = data->setcodes;
-		}
-		if(setcodes.size()) {
-			stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());
-		}
+	auto setcodes = cd->setcodes;
+	if (cd->alias) {
+		auto data = dataManager.GetCardData(cd->alias);
+		if(data)
+			setcodes = data->setcodes;
+	}
+	if (setcodes.size()) {
+		stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());
 	}
 	if(cd->type & TYPE_MONSTER) {
 		stInfo->setText(fmt::format(L"[{}] {} {}", dataManager.FormatType(cd->type), dataManager.FormatAttribute(cd->attribute), dataManager.FormatRace(cd->race)).c_str());
@@ -2255,20 +2078,24 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 		} else
 			stDataInfo->setText(L"");
 	}
-	int offset = Scale(37);
-	stInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stInfo->getTextHeight()));
-	offset += stInfo->getTextHeight();
-	if(wcscmp(stDataInfo->getText(), L"")) {
-		stDataInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stDataInfo->getTextHeight()));
-		offset += stDataInfo->getTextHeight();
-	}
-	if(wcscmp(stSetName->getText(), L"")) {
-		stSetName->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stSetName->getTextHeight()));
-		offset += stSetName->getTextHeight();
-	}
-	auto parent = stText->getParent();
-	stText->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), parent->getAbsolutePosition().getHeight() - Scale(1)));
+	RefreshCardInfoTextPositions();
 	stText->setText(dataManager.GetText(code).c_str());
+}
+void Game::RefreshCardInfoTextPositions() {
+	const int xLeft = Scale(15);
+	const int xRight = Scale(287 * window_scale.X);
+	int offset = Scale(37);
+	auto offsetIfVisibleWithContent = [&](IGUIStaticText* st) {
+		if (st->isVisible() && wcscmp(st->getText(), L"")) {
+			st->setRelativePosition(recti(xLeft, offset, xRight, offset + st->getTextHeight()));
+			offset += st->getTextHeight();
+		}
+	};
+	offsetIfVisibleWithContent(stInfo);
+	offsetIfVisibleWithContent(stDataInfo);
+	offsetIfVisibleWithContent(stSetName);
+	offsetIfVisibleWithContent(stPasscodeScope);
+	stText->setRelativePosition(recti(xLeft, offset, xRight, stText->getParent()->getAbsolutePosition().getHeight() - Scale(1)));
 }
 void Game::ClearCardInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
@@ -2276,6 +2103,7 @@ void Game::ClearCardInfo(int player) {
 	stInfo->setText(L"");
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
+	stPasscodeScope->setText(L"");
 	stText->setText(L"");
 	cardimagetextureloading = false;
 	showingcard = 0;
@@ -2394,6 +2222,7 @@ void Game::CloseDuelWindow() {
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
 	stText->setText(L"");
+	stTip->setText(L"");
 	cardimagetextureloading = false;
 	showingcard = 0;
 	closeDoneSignal.Set();
@@ -2627,6 +2456,15 @@ void Game::ReloadElementsStrings() {
 	TYPECHK(3, 1074);
 	TYPECHK(4, 1076);
 #undef TYPECHK
+
+	prev = gSettings.cbCurrentSkin->getSelected();
+	gSettings.cbCurrentSkin->clear();
+	gSettings.cbCurrentSkin->addItem(dataManager.GetSysString(2065).c_str());
+	auto skins = skinSystem->listSkins();
+	for(int i = skins.size() - 1; i >= 0; i--) {
+		gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
+	}
+	gSettings.cbCurrentSkin->setSelected(prev);
 }
 void Game::OnResize() {
 	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
@@ -2745,8 +2583,11 @@ void Game::OnResize() {
 
 	auto tabsystemParentPos = tabSystem->getParent()->getAbsolutePosition();
 	tabSystem->setRelativePosition(recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
-	scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(325), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(340)));
-	scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(355), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(370)));
+	tabSettings.scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(235), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(250)));
+	tabSettings.scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(295), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(310)));
+	btnTabShowSettings->setRelativePosition(rect<s32>(Scale(20), Scale(415), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(435)));
+
+	SetCentered(gSettings.window);
 
 	wChat->setRelativePosition(rect<s32>(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 

@@ -28,8 +28,12 @@ function bundle_if_exists {
 
         mkdir -p deploy/$1.app/Contents/Resources
         cp gframe/ygopro.icns deploy/$1.app/Contents/Resources/edopro.icns
-        defaults write "$PWD/deploy/$1.app/Contents/Info.plist" "CFBundleIconFile" "edopro.icns"
-        defaults write "$PWD/deploy/$1.app/Contents/Info.plist" "CFBundleIdentifier" "io.github.edo9300.$1"
+        cp gframe/Info.plist deploy/$1.app/Contents/Info.plist
+        # Not strictly necessary but avoids text-editor-level tampering
+        plutil -convert binary1 deploy/$1.app/Contents/Info.plist
+        # Writes to a binary plist
+        # defaults write "$PWD/deploy/$1.app/Contents/Info.plist" "CFBundleIconFile" "edopro.icns"
+        # defaults write "$PWD/deploy/$1.app/Contents/Info.plist" "CFBundleIdentifier" "io.github.edo9300.$1"
 
         if [[ -f bin/$BUILD_CONFIG/discord-launcher ]]; then
             mkdir -p deploy/$1.app/Contents/MacOS/discord-launcher.app/Contents/MacOS
