@@ -635,10 +635,14 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
 	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_LOCALE);
-	gSettings.cbCurrentLocale->addItem(L"en");
+	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"en");
 	for(auto& locale : locales) {
-		gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
+		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
+		if(gameConf.locale == locale) {
+			selectedLocale = itemIndex;
+		}
 	}
+	gSettings.cbCurrentLocale->setSelected(selectedLocale);
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	defaultStrings.emplace_back(tabRepositories, 2045);
@@ -1306,6 +1310,8 @@ bool Game::Initialize() {
 
 	LoadGithubRepositories();
 	ApplySkin(EPRO_TEXT(""), true);
+	if(selectedLocale)
+		ApplyLocale(selectedLocale);
 	return true;
 }
 void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
@@ -2823,7 +2829,7 @@ void Game::PopulateLocales() {
 
 void Game::ApplyLocale(int index) {
 	static int previndex = 0;
-	if(index < 0)
+	if(index < 0 || index > locales.size())
 		return;
 	if(previndex == index)
 		return;
@@ -2832,6 +2838,7 @@ void Game::ApplyLocale(int index) {
 	dataManager.ClearLocaleTexts();
 	if(index > 0) {
 		try {
+			gameConf.locale = locales[index - 1];
 			auto locale = fmt::format(EPRO_TEXT("./config/languages/{}"), locales[index - 1]);
 			for(auto& file : Utils::FindFiles(locale, { EPRO_TEXT("cdb") })) {
 				dataManager.LoadLocaleDB(fmt::format(EPRO_TEXT("{}/{}"), locale, file));
@@ -2841,7 +2848,8 @@ void Game::ApplyLocale(int index) {
 		catch(...) {
 			return;
 		}
-	}
+	} else
+		gameConf.locale = EPRO_TEXT("en");
 	ReloadElementsStrings();
 }
 
