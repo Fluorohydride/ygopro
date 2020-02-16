@@ -1998,7 +1998,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			return true;
 		}
 		case irr::KEY_KEY_O: {
-			if (!event.KeyInput.PressedDown) {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown) {
 				if (mainGame->gSettings.window->isVisible())
 					mainGame->HideElement(mainGame->gSettings.window);
 				else
