@@ -1983,6 +1983,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->textFont->setTransparency(true);
 			return true;
 		}
+		case irr::KEY_KEY_O: {
+			if (!event.KeyInput.PressedDown) {
+				if (mainGame->gSettings.window->isVisible())
+					mainGame->HideElement(mainGame->gSettings.window);
+				else
+					mainGame->ShowElement(mainGame->gSettings.window);
+			}
+			return true;
+		}
 		case irr::KEY_ESCAPE: {
 			if(!mainGame->HasFocus(EGUIET_EDIT_BOX))
 				mainGame->device->minimizeWindow();
