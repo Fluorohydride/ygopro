@@ -37,11 +37,16 @@ struct SettingsWindow {
 	irr::gui::IGUIWindow* window;
 	irr::gui::IGUIButton* btnClose;
 	irr::gui::IGUICheckBox* chkShowFPS;
+	irr::gui::IGUICheckBox* chkFullscreen;
+	irr::gui::IGUICheckBox* chkScaleBackground;
+	irr::gui::IGUICheckBox* chkAccurateBackgroundResize;
+	irr::gui::IGUICheckBox* chkHideSetname;
+	irr::gui::IGUICheckBox* chkHidePasscodeScope;
+	irr::gui::IGUICheckBox* chkDrawFieldSpells;
 	irr::gui::IGUIStaticText* stCurrentSkin;
 	irr::gui::IGUIComboBox* cbCurrentSkin;
 	irr::gui::IGUIButton* btnReloadSkin;
-	irr::gui::IGUICheckBox* chkHideSetname;
-	irr::gui::IGUICheckBox* chkHidePasscodeScope;
+	
 };
 
 }

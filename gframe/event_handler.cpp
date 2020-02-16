@@ -1917,6 +1917,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);
 				return true;
 			}
+			case CHECKBOX_SCALE_BACKGROUND: {
+				mainGame->gameConf.scale_background = mainGame->gSettings.chkScaleBackground->isChecked();
+				return true;
+			}
+			case CHECKBOX_ACCURATE_BACKGROUND_RESIZE: {
+				mainGame->gameConf.accurate_bg_resize = mainGame->gSettings.chkAccurateBackgroundResize->isChecked();
+				return true;
+			}
 			case BUTTON_REPO_CHANGELOG_EXPAND: {
 				auto& repo = mainGame->repoInfoGui[showing_repo];
 				mainGame->stCommitLog->setText(mainGame->chkCommitLogExpand->isChecked() ? repo.commit_history_full.c_str() : repo.commit_history_partial.c_str());

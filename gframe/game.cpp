@@ -507,17 +507,20 @@ bool Game::Initialize() {
 	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, dataManager.GetSysString(1278).c_str());
 	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 380, 280, 405), tabPanel, -1, dataManager.GetSysString(1275).c_str());
 	btnTabShowSettings = env->addButton(Scale(20, 410, 280, 435), tabPanel, BUTTON_SHOW_SETTINGS, L"More settings");
-	/* padding = */ env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
+	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
 
 	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
 	gSettings.window->getCloseButton()->setVisible(false);
 	gSettings.window->setVisible(false);
 	gSettings.btnClose = env->addButton(Scale(555, 5, 575, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
-	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
-	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, L"Hide passcodes and scopes in card display");
-	gSettings.stCurrentSkin = env->addStaticText(L"Skin", Scale(20, 185, 80, 210), false, true, gSettings.window);
-	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 185, 280, 210), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_FULLSCREEN, L"Fullscreen (desktop only)");
+	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, L"Fit background");
+	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gameConf.accurate_bg_resize, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, L"Accurate background resize (desktop only)");
+	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 155, 280, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, L"Hide passcodes and scopes in card display");
+	gSettings.stCurrentSkin = env->addStaticText(L"Skin", Scale(20, 215, 80, 240), false, true, gSettings.window);
+	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 215, 280, 240), gSettings.window, COMBOBOX_CURRENT_SKIN);
 	int selectedSkin = gSettings.cbCurrentSkin->addItem(L"none");
 	auto skins = skinSystem->listSkins();
 	for (int i = skins.size() - 1; i >= 0; i--) {
@@ -527,7 +530,7 @@ bool Game::Initialize() {
 		}
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
-	gSettings.btnReloadSkin = env->addButton(Scale(20, 215, 280, 240), gSettings.window, BUTTON_RELOAD_SKIN, L"Reload Skin");
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 245, 280, 270), gSettings.window, BUTTON_RELOAD_SKIN, L"Reload Skin");
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
