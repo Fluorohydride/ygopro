@@ -2229,6 +2229,7 @@ void Game::CloseDuelWindow() {
 	stInfo->setText(L"");
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
+	stPasscodeScope->setText(L"");
 	stText->setText(L"");
 	stTip->setText(L"");
 	cardimagetextureloading = false;
