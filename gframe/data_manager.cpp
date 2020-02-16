@@ -275,13 +275,15 @@ std::wstring DataManager::FormatRace(int race, bool isSkill) {
 }
 std::wstring DataManager::FormatType(int type) {
 	std::wstring res;
-	unsigned filter = 1;
-	int i = 1050;
 	if(type & TYPE_SKILL)
 		res += GetSysString(1077);
-	for(; filter != TYPE_SKILL; filter <<= 1, ++i) {
-		if(type & TYPE_TOKEN && type & TYPE_SKILL)
-			continue; // Skill cover back
+	if(type & TYPE_ACTION) {
+		if (!res.empty())
+			res += L"|";
+		res += GetSysString(1078);
+	}
+	int i = 1050;
+	for(unsigned filter = 1; filter != TYPE_SKILL; filter <<= 1, ++i) {
 		if(type & filter) {
 			if(!res.empty())
 				res += L"|";
