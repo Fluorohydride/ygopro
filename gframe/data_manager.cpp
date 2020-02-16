@@ -294,13 +294,13 @@ std::wstring DataManager::FormatType(int type) {
 }
 std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
 	static const std::map<int, int> SCOPES = {
-		{0x1, 1900},
-		{0x2, 1901},
-		{0x4, 1265},
-		{0x8, 1266},
-		{0x10, 1267},
-		{0x20, 1268},
-		{0x100, 1903}
+		{SCOPE_OCG, 1900},
+		{SCOPE_TCG, 1901},
+		{SCOPE_ANIME, 1265},
+		{SCOPE_ILLEGAL, 1266},
+		{SCOPE_VIDEO_GAME, 1267},
+		{SCOPE_CUSTOM, 1268},
+		{SCOPE_PRERELEASE, 1903}
 	};
 	if (hideOCGTCG && scope == 0x3) return L"";
 	std::wstring buffer;
