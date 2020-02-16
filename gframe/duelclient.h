@@ -53,7 +53,6 @@ public:
 	static std::pair<int, int> GetPlayersCount();
 	static ReplayStream replay_stream;
 	static Replay last_replay;
-	static bool old_replay;
 	static int ClientAnalyze(char* msg, unsigned int len);
 	static void SwapField();
 	static void SetResponseI(int respI);

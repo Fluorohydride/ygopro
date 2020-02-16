@@ -35,7 +35,6 @@ std::mt19937 DuelClient::rnd;
 
 ReplayStream DuelClient::replay_stream;
 Replay DuelClient::last_replay;
-bool DuelClient::old_replay = true;
 bool DuelClient::is_swapping = false;
 
 bool DuelClient::is_refreshing = false;
@@ -485,7 +484,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_CHANGE_SIDE: {
 		mainGame->soundManager->StopSounds();
-		ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isInLobby = false;
 		mainGame->dInfo.isInDuel = false;
@@ -787,13 +785,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.unlock();
 		match_kill = 0;
 		replay_stream.clear();
-		old_replay = true;
 		break;
 	}
 	case STOC_DUEL_END: {
 		mainGame->soundManager->StopSounds();
-		if(!mainGame->is_siding && mainGame->dInfo.isStarted)
-			ReplayPrompt(old_replay);
 		mainGame->gMutex.lock();
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
@@ -836,9 +831,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_REPLAY: {
-		if(!old_replay) break;
-		char* prep = pdata;
-		replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, prep, len - 1));
+		if(!mainGame->dInfo.compat_mode) {
+			char* prep = pdata;
+			replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, prep, len - 1));
+		}
+		ReplayPrompt(mainGame->dInfo.compat_mode);
 		break;
 	}
 	case STOC_TIME_LIMIT: {
@@ -959,7 +956,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_NEW_REPLAY: {
-		old_replay = false;
 		char* prep = pdata;
 		memcpy(&last_replay.pheader, prep, sizeof(ReplayHeader));
 		prep += sizeof(ReplayHeader);
