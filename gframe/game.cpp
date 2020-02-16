@@ -457,7 +457,10 @@ bool Game::Initialize() {
 	stSetName->setWordWrap(true);
 	stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
 	stSetName->setVisible(!gameConf.chkHideSetname);
-	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 324));
+	stPasscodeScope = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 129));
+	stPasscodeScope->setWordWrap(true);
+	stPasscodeScope->setOverrideColor(skin::CARDINFO_PASSCODE_SCOPE_TEXT_COLOR_VAL);
+	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 129, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
 	//log
@@ -1440,6 +1443,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		stInfo->setOverrideColor(skin::CARDINFO_TYPES_COLOR_VAL);
 		stDataInfo->setOverrideColor(skin::CARDINFO_STATS_COLOR_VAL);
 		stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
+		stPasscodeScope->setOverrideColor(skin::CARDINFO_PASSCODE_SCOPE_TEXT_COLOR_VAL);
 		stACMessage->setBackgroundColor(skin::DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR_VAL);
 		auto tmp_color = skin::DUELFIELD_ANNOUNCE_TEXT_COLOR_VAL;
 		if(tmp_color != 0) {
@@ -1814,15 +1818,16 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 	int tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
-	stName->setText(fmt::format(L"{} [{:08}]", dataManager.GetName(tmp_code), tmp_code).c_str());
+	stName->setText(dataManager.GetName(tmp_code).c_str());
+	stPasscodeScope->setText(fmt::format(L"[{:08}] {}", tmp_code, dataManager.FormatScope(cd->ot)).c_str());
 	stSetName->setText(L"");
 	auto setcodes = cd->setcodes;
-	if(cd->alias) {
+	if (cd->alias) {
 		auto aptr = dataManager.cards.find(cd->alias);
-		if(aptr != dataManager.cards.end())
+		if (aptr != dataManager.cards.end())
 			setcodes = aptr->second.first.setcodes;
 	}
-	if(setcodes.size()) {
+	if (setcodes.size()) {
 		stSetName->setText((dataManager.GetSysString(1329) + dataManager.FormatSetName(setcodes)).c_str());
 	}
 	if(cd->type & TYPE_MONSTER) {
@@ -1865,19 +1870,20 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 	stText->setText(dataManager.GetText(code).c_str());
 }
 void Game::RefreshCardInfoTextPositions() {
+	const int xLeft = Scale(15);
+	const int xRight = Scale(287 * window_scale.X);
 	int offset = Scale(37);
-	stInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stInfo->getTextHeight()));
-	offset += stInfo->getTextHeight();
-	if (wcscmp(stDataInfo->getText(), L"")) {
-		stDataInfo->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stDataInfo->getTextHeight()));
-		offset += stDataInfo->getTextHeight();
-	}
-	if (stSetName->isVisible() && wcscmp(stSetName->getText(), L"")) {
-		stSetName->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), offset + stSetName->getTextHeight()));
-		offset += stSetName->getTextHeight();
-	}
-	auto parent = stText->getParent();
-	stText->setRelativePosition(recti(Scale(15), offset, Scale(287 * window_scale.X), parent->getAbsolutePosition().getHeight() - Scale(1)));
+	auto offsetIfVisibleWithContent = [&](IGUIStaticText* st) {
+		if (st->isVisible() && wcscmp(st->getText(), L"")) {
+			st->setRelativePosition(recti(xLeft, offset, xRight, offset + st->getTextHeight()));
+			offset += st->getTextHeight();
+		}
+	};
+	offsetIfVisibleWithContent(stInfo);
+	offsetIfVisibleWithContent(stDataInfo);
+	offsetIfVisibleWithContent(stSetName);
+	offsetIfVisibleWithContent(stPasscodeScope);
+	stText->setRelativePosition(recti(xLeft, offset, xRight, stText->getParent()->getAbsolutePosition().getHeight() - Scale(1)));
 }
 void Game::ClearCardInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
@@ -1885,6 +1891,7 @@ void Game::ClearCardInfo(int player) {
 	stInfo->setText(L"");
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
+	stPasscodeScope->setText(L"");
 	stText->setText(L"");
 	cardimagetextureloading = false;
 	showingcard = 0;

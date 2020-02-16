@@ -318,6 +318,7 @@ public:
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stSetName;
+	irr::gui::IGUIStaticText* stPasscodeScope;
 	irr::gui::IGUIStaticText* stText;
 
 	irr::gui::IGUITab* tabLog;
