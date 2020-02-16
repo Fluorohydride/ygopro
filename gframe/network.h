@@ -152,6 +152,7 @@ public:
 	HostInfo host_info;
 	int duel_stage;
 	OCG_Duel pduel;
+	bool seeking_rematch;
 	wchar_t name[20];
 	wchar_t pass[20];
 };
