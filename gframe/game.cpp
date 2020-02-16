@@ -601,10 +601,18 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
 	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_FULLSCREEN, dataManager.GetSysString(2060).c_str());
 	defaultStrings.emplace_back(gSettings.chkFullscreen, 2060);
+#ifdef __ANDROID__
+	gSettings.chkFullscreen->setChecked(true);
+	gSettings.chkFullscreen->setEnabled(false);
+#endif
 	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, dataManager.GetSysString(2061).c_str());
 	defaultStrings.emplace_back(gSettings.chkScaleBackground, 2061);
 	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gameConf.accurate_bg_resize, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, dataManager.GetSysString(2062).c_str());
 	defaultStrings.emplace_back(gSettings.chkAccurateBackgroundResize, 2062);
+#ifdef __ANDROID__
+	gSettings.chkAccurateBackgroundResize->setChecked(true);
+	gSettings.chkAccurateBackgroundResize->setEnabled(false);
+#endif
 	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 155, 280, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
 	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, dataManager.GetSysString(2063).c_str());
