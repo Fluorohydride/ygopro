@@ -295,6 +295,9 @@ public:
 	std::vector<path_string> cover_dirs;
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
+	void PopulateLocales();
+	void ApplyLocale(int index);
+	std::vector<path_string> locales;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;

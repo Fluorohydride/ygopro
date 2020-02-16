@@ -174,16 +174,19 @@ namespace ygo {
 		std::sort(res.begin(), res.end(), CompareIgnoreCase);
 		return res;
 	}
-	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers) {
+	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers, bool addparentpath) {
 		std::vector<path_string> results;
-		FindFiles(path, [&results, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
+		FindFiles(path, [&results, path, subdirectorylayers, addparentpath](path_string name, bool isdir, void* payload) {
 			if (isdir) {
 				if (name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 					return;
 				}
-				results.push_back(path + name + EPRO_TEXT("/"));
+				if(addparentpath)
+					results.push_back(path + name + EPRO_TEXT("/"));
+				else
+					results.push_back(name);
 				if (subdirectorylayers > 1) {
-					auto subresults = FindSubfolders(path + name + EPRO_TEXT("/"), subdirectorylayers - 1);
+					auto subresults = FindSubfolders(path + name + EPRO_TEXT("/"), subdirectorylayers - 1, false);
 					for (auto& folder : subresults) {
 						folder = name + EPRO_TEXT("/") + folder;
 					}

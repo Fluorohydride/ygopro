@@ -1981,6 +1981,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->ApplySkin(mainGame->gameConf.skin);
 				return true;
 			}
+			case COMBOBOX_CURRENT_LOCALE: {
+				mainGame->ApplyLocale(mainGame->gSettings.cbCurrentLocale->getSelected());
+				return true;
+			}
 			}
 			break;
 		}

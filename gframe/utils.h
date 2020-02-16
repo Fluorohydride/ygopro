@@ -35,7 +35,7 @@ namespace ygo {
 		static void FindFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload = nullptr);
 		static std::vector<path_string> FindFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
-		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1);
+		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1, bool addparentpath = true);
 		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		static irr::io::IReadFile* FindFileInArchives(const path_string& path, const path_string& name);
 		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);

@@ -46,6 +46,8 @@ struct SettingsWindow {
 	irr::gui::IGUIStaticText* stCurrentSkin;
 	irr::gui::IGUIComboBox* cbCurrentSkin;
 	irr::gui::IGUIButton* btnReloadSkin;
+	irr::gui::IGUIStaticText* stCurrentLocale;
+	irr::gui::IGUIComboBox* cbCurrentLocale;
 	
 };
 

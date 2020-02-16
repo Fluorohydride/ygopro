@@ -12,7 +12,8 @@ DataManager dataManager;
 void DataManager::ClearLocaleTexts() {
 	for(auto& val : indexes) {
 		val.second.second = nullptr;
-		val.second.first->_locale_strings = nullptr;
+		if(val.second.first)
+			val.second.first->_locale_strings = nullptr;
 	}
 	locales.clear();
 }

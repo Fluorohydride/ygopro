@@ -631,6 +631,14 @@ bool Game::Initialize() {
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
 	gSettings.btnReloadSkin = env->addButton(Scale(20, 245, 280, 270), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
 	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
+	gSettings.stCurrentLocale = env->addStaticText(dataManager.GetSysString(2067).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
+	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
+	PopulateLocales();
+	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_LOCALE);
+	gSettings.cbCurrentLocale->addItem(L"en");
+	for(auto& locale : locales) {
+		gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
+	}
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	defaultStrings.emplace_back(tabRepositories, 2045);
@@ -2396,7 +2404,7 @@ bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 	return focus && focus->hasType(type);
 }
 void Game::ReloadElementsStrings() {
-	ShowCardInfo(showcardcode, true);
+	ShowCardInfo(showingcard, true);
 	UpdateDuelParam();
 
 	for(auto& elem : defaultStrings) {
@@ -2807,6 +2815,34 @@ void Game::PopulateResourcesDirectories() {
 	field_dirs.push_back(EPRO_TEXT("./expansions/pics/field/"));
 	field_dirs.push_back(EPRO_TEXT("archives"));
 	field_dirs.push_back(EPRO_TEXT("./pics/field/"));
+}
+
+void Game::PopulateLocales() {
+	locales = Utils::FindSubfolders(EPRO_TEXT("./config/languages/"), 1, false);
+}
+
+void Game::ApplyLocale(int index) {
+	static int previndex = 0;
+	if(index < 0)
+		return;
+	if(previndex == index)
+		return;
+	previndex = index;
+	dataManager.ClearLocaleStrings();
+	dataManager.ClearLocaleTexts();
+	if(index > 0) {
+		try {
+			auto locale = fmt::format(EPRO_TEXT("./config/languages/{}"), locales[index - 1]);
+			for(auto& file : Utils::FindFiles(locale, { EPRO_TEXT("cdb") })) {
+				dataManager.LoadLocaleDB(fmt::format(EPRO_TEXT("{}/{}"), locale, file));
+			}
+			dataManager.LoadLocaleStrings(fmt::format(EPRO_TEXT("{}/strings.conf"), locale));
+		}
+		catch(...) {
+			return;
+		}
+	}
+	ReloadElementsStrings();
 }
 
 }
