@@ -35,6 +35,7 @@ struct SettingsPane {
 
 struct SettingsWindow {
 	irr::gui::IGUIWindow* window;
+	irr::gui::IGUIButton* btnClose;
 	irr::gui::IGUICheckBox* chkShowFPS;
 	irr::gui::IGUIStaticText* stCurrentSkin;
 	irr::gui::IGUIComboBox* cbCurrentSkin;

@@ -1832,6 +1832,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->ApplySkin(EPRO_TEXT(""), true);
 				break;
 			}
+			case BUTTON_SHOW_SETTINGS: {
+				if (!mainGame->gSettings.window->isVisible())
+					mainGame->ShowElement(mainGame->gSettings.window);
+				break;
+			}
+			case BUTTON_HIDE_SETTINGS: {
+				if (mainGame->gSettings.window->isVisible())
+					mainGame->HideElement(mainGame->gSettings.window);
+				break;
+			}
 			}
 			break;
 		}

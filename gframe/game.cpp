@@ -507,9 +507,13 @@ bool Game::Initialize() {
 	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 320, 280, 345), tabPanel, -1, dataManager.GetSysString(1274).c_str());
 	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, dataManager.GetSysString(1278).c_str());
 	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 380, 280, 405), tabPanel, -1, dataManager.GetSysString(1275).c_str());
-	// Add a blank static text at the end to act as padding for scrolling if needed
+	btnTabShowSettings = env->addButton(Scale(20, 410, 280, 435), tabPanel, BUTTON_SHOW_SETTINGS, L"More settings");
+	/* padding = */ env->addStaticText(L"", Scale(20, 440, 80, 485), false, true, tabPanel, -1, false);
 
 	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
+	gSettings.window->getCloseButton()->setVisible(false);
+	gSettings.window->setVisible(false);
+	gSettings.btnClose = env->addButton(Scale(555, 5, 575, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
 	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, L"Hide passcodes and scopes in card display");
@@ -2294,6 +2298,7 @@ void Game::OnResize() {
 	tabSystem->setRelativePosition(recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
 	tabSettings.scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(235), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(250)));
 	tabSettings.scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(295), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(310)));
+	btnTabShowSettings->setRelativePosition(rect<s32>(Scale(20), Scale(415), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(435)));
 
 	SetCentered(gSettings.window);
 

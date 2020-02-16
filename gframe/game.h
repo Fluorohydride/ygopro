@@ -334,6 +334,7 @@ public:
 	irr::gui::IGUIContextMenu* mTabRepositories;
 	irr::gui::Panel* tabSystem;
 	SettingsPane tabSettings;
+	irr::gui::IGUIButton* btnTabShowSettings;
 
 	SettingsWindow gSettings;
 	//main menu
