@@ -257,8 +257,6 @@ catch(...) { what = def; }
 					mainGame->gMutex.unlock();
 				} else {
 					mainGame->soundManager->StopSounds();
-					if(!mainGame->is_siding && mainGame->dInfo.isStarted)
-						ReplayPrompt(true);
 					mainGame->gMutex.lock();
 					mainGame->PopupMessage(dataManager.GetSysString(1502));
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
@@ -1071,7 +1069,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->closeSignal.lock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
-		ReplayPrompt(true);
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isInLobby = false;
