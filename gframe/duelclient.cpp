@@ -142,6 +142,7 @@ void DuelClient::StopClient(bool is_exiting) {
 	if(connect_state != 0x7)
 		return;
 	is_closing = is_exiting || exit_on_return;
+	SendPacketToServer(CTOS_LEAVE_GAME);
 	event_base_loopbreak(client_base);
 	if(!is_closing) {
 		
