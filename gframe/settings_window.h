@@ -21,14 +21,6 @@ struct SettingsPane {
 	irr::gui::IGUICheckBox* chkHideChainButtons;
 	irr::gui::IGUICheckBox* chkAutoChainOrder;
 	irr::gui::IGUICheckBox* chkNoChainDelay;
-	irr::gui::IGUICheckBox* chkMAutoPos;
-	irr::gui::IGUICheckBox* chkSTAutoPos;
-	irr::gui::IGUICheckBox* chkRandomPos;	
-};
-
-struct SettingsWindow {
-	irr::gui::IGUIWindow* window;
-	irr::gui::IGUICheckBox* chkShowFPS;
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUIStaticText* stSoundVolume;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -36,6 +28,14 @@ struct SettingsWindow {
 	irr::gui::IGUIStaticText* stMusicVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUIStaticText* stNoAudioBackend;
+	irr::gui::IGUICheckBox* chkMAutoPos;
+	irr::gui::IGUICheckBox* chkSTAutoPos;
+	irr::gui::IGUICheckBox* chkRandomPos;
+};
+
+struct SettingsWindow {
+	irr::gui::IGUIWindow* window;
+	irr::gui::IGUICheckBox* chkShowFPS;
 	irr::gui::IGUIStaticText* stCurrentSkin;
 	irr::gui::IGUIComboBox* cbCurrentSkin;
 	irr::gui::IGUIButton* btnReloadSkin;

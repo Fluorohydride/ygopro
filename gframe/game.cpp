@@ -486,31 +486,33 @@ bool Game::Initialize() {
 	tabSettings.chkHideChainButtons = env->addCheckBox(gameConf.chkHideHintButton, Scale(20, 110, 280, 135), tabPanel, CHECKBOX_CHAIN_BUTTONS, dataManager.GetSysString(1355).c_str());
 	tabSettings.chkAutoChainOrder = env->addCheckBox(gameConf.chkAutoChain, Scale(20, 140, 280, 165), tabPanel, -1, dataManager.GetSysString(1276).c_str());
 	tabSettings.chkNoChainDelay = env->addCheckBox(gameConf.chkWaitChain, Scale(20, 170, 280, 195), tabPanel, -1, dataManager.GetSysString(1277).c_str());
-	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 200, 280, 225), tabPanel, -1, dataManager.GetSysString(1274).c_str());
-	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 230, 280, 255), tabPanel, -1, dataManager.GetSysString(1278).c_str());
-	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 260, 280, 285), tabPanel, -1, dataManager.GetSysString(1275).c_str());
+	tabSettings.chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 200, 280, 225), tabPanel, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
+	tabSettings.stSoundVolume = env->addStaticText(dataManager.GetSysString(2049).c_str(), Scale(20, 230, 80, 255), false, true, tabPanel);
+	tabSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 235, 280, 250), tabPanel, SCROLL_SOUND_VOLUME);
+	tabSettings.scrSoundVolume->setMax(100);
+	tabSettings.scrSoundVolume->setMin(0);
+	tabSettings.scrSoundVolume->setPos(gameConf.soundVolume);
+	tabSettings.scrSoundVolume->setLargeStep(1);
+	tabSettings.scrSoundVolume->setSmallStep(1);
+	tabSettings.chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 260, 280, 285), tabPanel, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2046).c_str());
+	tabSettings.stMusicVolume = env->addStaticText(dataManager.GetSysString(2048).c_str(), Scale(20, 290, 80, 315), false, true, tabPanel);
+	tabSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 295, 280, 310), tabPanel, SCROLL_MUSIC_VOLUME);
+	tabSettings.scrMusicVolume->setMax(100);
+	tabSettings.scrMusicVolume->setMin(0);
+	tabSettings.scrMusicVolume->setPos(gameConf.musicVolume);
+	tabSettings.scrMusicVolume->setLargeStep(1);
+	tabSettings.scrMusicVolume->setSmallStep(1);
+	tabSettings.stNoAudioBackend = env->addStaticText(L"Failed to initialize audio backend", Scale(20, 200, 280, 315), false, true, tabPanel);
+	tabSettings.stNoAudioBackend->setVisible(false);
+	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 320, 280, 345), tabPanel, -1, dataManager.GetSysString(1274).c_str());
+	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, dataManager.GetSysString(1278).c_str());
+	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 380, 280, 405), tabPanel, -1, dataManager.GetSysString(1275).c_str());
 	// Add a blank static text at the end to act as padding for scrolling if needed
 
 	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
-	gSettings.chkEnableSound = env->addCheckBox(gameConf.enablesound, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_ENABLE_SOUND, dataManager.GetSysString(2047).c_str());
-	gSettings.stSoundVolume = env->addStaticText(dataManager.GetSysString(2049).c_str(), Scale(20, 95, 80, 120), false, true, gSettings.window);
-	gSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 95, 280, 115), gSettings.window, SCROLL_SOUND_VOLUME);
-	gSettings.scrSoundVolume->setMax(100);
-	gSettings.scrSoundVolume->setMin(0);
-	gSettings.scrSoundVolume->setPos(gameConf.soundVolume);
-	gSettings.scrSoundVolume->setLargeStep(1);
-	gSettings.scrSoundVolume->setSmallStep(1);
-	gSettings.chkEnableMusic = env->addCheckBox(gameConf.enablemusic, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ENABLE_MUSIC, dataManager.GetSysString(2046).c_str());
-	gSettings.stMusicVolume = env->addStaticText(dataManager.GetSysString(2048).c_str(), Scale(20, 155, 80, 180), false, true, gSettings.window);
-	gSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 155, 280, 175), gSettings.window, SCROLL_MUSIC_VOLUME);
-	gSettings.scrMusicVolume->setMax(100);
-	gSettings.scrMusicVolume->setMin(0);
-	gSettings.scrMusicVolume->setPos(gameConf.musicVolume);
-	gSettings.scrMusicVolume->setLargeStep(1);
-	gSettings.scrMusicVolume->setSmallStep(1);
-	gSettings.stNoAudioBackend = env->addStaticText(L"Failed to initialize audio backend", Scale(20, 65, 280, 180), false, true, gSettings.window);
-	gSettings.stNoAudioBackend->setVisible(false);
+	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, L"Hide passcodes and scopes in card display");
 	gSettings.stCurrentSkin = env->addStaticText(L"Skin", Scale(20, 185, 80, 210), false, true, gSettings.window);
 	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 185, 280, 210), gSettings.window, COMBOBOX_CURRENT_SKIN);
 	int selectedSkin = gSettings.cbCurrentSkin->addItem(L"none");
@@ -523,8 +525,6 @@ bool Game::Initialize() {
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
 	gSettings.btnReloadSkin = env->addButton(Scale(20, 215, 280, 240), gSettings.window, BUTTON_RELOAD_SKIN, L"Reload Skin");
-	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
-	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 275, 280, 300), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, L"Hide passcodes and scopes in card display");
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
@@ -926,13 +926,13 @@ bool Game::Initialize() {
 	device->setEventReceiver(&menuHandler);
 	soundManager = std::unique_ptr<SoundManager>(new SoundManager());
 	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, working_directory)) {
-		gSettings.chkEnableSound->setVisible(false);
-		gSettings.stSoundVolume->setVisible(false);
-		gSettings.scrSoundVolume->setVisible(false);
-		gSettings.chkEnableMusic->setVisible(false);
-		gSettings.stMusicVolume->setVisible(false);
-		gSettings.scrMusicVolume->setVisible(false);
-		gSettings.stNoAudioBackend->setVisible(true);
+		tabSettings.chkEnableSound->setVisible(false);
+		tabSettings.stSoundVolume->setVisible(false);
+		tabSettings.scrSoundVolume->setVisible(false);
+		tabSettings.chkEnableMusic->setVisible(false);
+		tabSettings.stMusicVolume->setVisible(false);
+		tabSettings.scrMusicVolume->setVisible(false);
+		tabSettings.stNoAudioBackend->setVisible(true);
 	}
 
 	//server lobby
@@ -2292,6 +2292,8 @@ void Game::OnResize() {
 
 	auto tabsystemParentPos = tabSystem->getParent()->getAbsolutePosition();
 	tabSystem->setRelativePosition(recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
+	tabSettings.scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(235), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(250)));
+	tabSettings.scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(295), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(310)));
 
 	SetCentered(gSettings.window);
 

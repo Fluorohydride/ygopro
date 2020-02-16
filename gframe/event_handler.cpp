@@ -1862,12 +1862,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
 			switch(id) {
 			case SCROLL_MUSIC_VOLUME: {
-				mainGame->gameConf.musicVolume = mainGame->gSettings.scrMusicVolume->getPos();
+				mainGame->gameConf.musicVolume = mainGame->tabSettings.scrMusicVolume->getPos();
 				mainGame->soundManager->SetMusicVolume(mainGame->gameConf.musicVolume / 100.0);
 				return true;
 			}
 			case SCROLL_SOUND_VOLUME: {
-				mainGame->gameConf.soundVolume = mainGame->gSettings.scrSoundVolume->getPos();
+				mainGame->gameConf.soundVolume = mainGame->tabSettings.scrSoundVolume->getPos();
 				mainGame->soundManager->SetSoundVolume(mainGame->gameConf.soundVolume / 100.0);
 				return true;
 			}
@@ -1877,12 +1877,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch (id) {
 			case CHECKBOX_ENABLE_MUSIC: {
-				mainGame->gameConf.enablemusic = mainGame->gSettings.chkEnableMusic->isChecked();
+				mainGame->gameConf.enablemusic = mainGame->tabSettings.chkEnableMusic->isChecked();
 				mainGame->soundManager->EnableMusic(mainGame->gameConf.enablemusic);
 				return true;
 			}
 			case CHECKBOX_ENABLE_SOUND: {
-				mainGame->gameConf.enablesound = mainGame->gSettings.chkEnableSound->isChecked();
+				mainGame->gameConf.enablesound = mainGame->tabSettings.chkEnableSound->isChecked();
 				mainGame->soundManager->EnableSounds(mainGame->gameConf.enablesound);
 				return true;
 			}
