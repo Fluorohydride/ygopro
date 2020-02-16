@@ -42,7 +42,7 @@ struct GameConfig
 	bool draw_field_spell = true;
 	bool quick_animation = false;
 	bool showFPS = true;
-
+	bool hidePasscodeScope = false;
 	bool scale_background = true;
 #ifdef __ANDROID__
 	bool accurate_bg_resize = true;

@@ -460,6 +460,7 @@ bool Game::Initialize() {
 	stPasscodeScope = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 129));
 	stPasscodeScope->setWordWrap(true);
 	stPasscodeScope->setOverrideColor(skin::CARDINFO_PASSCODE_SCOPE_TEXT_COLOR_VAL);
+	stPasscodeScope->setVisible(!gameConf.hidePasscodeScope);
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 129, 287, 324));
 	((CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
@@ -523,6 +524,7 @@ bool Game::Initialize() {
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
 	gSettings.btnReloadSkin = env->addButton(Scale(20, 215, 280, 240), gSettings.window, BUTTON_RELOAD_SKIN, L"Reload Skin");
 	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 275, 280, 300), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, L"Hide passcodes and scopes in card display");
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));

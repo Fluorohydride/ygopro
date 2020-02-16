@@ -104,6 +104,8 @@ bool GameConfig::Load(const char* filename)
 				chkAnime = !!std::stoi(str);
 			else if (type == "showFPS")
 				showFPS = !!std::stoi(str);
+			else if (type == "hidePasscodeScope")
+				hidePasscodeScope = !!std::stoi(str);
 			else if (type == "dpi_scale")
 				dpi_scale = std::stof(str);
 			else if (type == "skin")
@@ -164,6 +166,7 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "draw_field_spell = "   << draw_field_spell << "\n";
 	conf_file << "quick_animation = "    << quick_animation << "\n";
 	conf_file << "showFPS = "            << showFPS << "\n";
+	conf_file << "hidePasscodeScope = "  << hidePasscodeScope << "\n";
 	conf_file << "show_unofficial = "    << chkAnime << "\n";
 	conf_file << "dpi_scale = "          << std::to_string(dpi_scale) << "\n"; // Forces float to show decimals
 	conf_file << "skin = "            	 << Utils::ToUTF8IfNeeded(skin) << "\n";

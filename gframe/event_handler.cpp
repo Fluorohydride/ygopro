@@ -1896,6 +1896,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->RefreshCardInfoTextPositions();
 				return true;
 			}
+			case CHECKBOX_HIDE_PASSCODE_SCOPE: {
+				mainGame->gameConf.hidePasscodeScope = mainGame->gSettings.chkHidePasscodeScope->isChecked();
+				mainGame->stPasscodeScope->setVisible(!mainGame->gameConf.hidePasscodeScope);
+				mainGame->RefreshCardInfoTextPositions();
+				return true;
+			}
 			case CHECKBOX_SHOW_FPS: {
 				mainGame->gameConf.showFPS = mainGame->gSettings.chkShowFPS->isChecked();
 				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);
