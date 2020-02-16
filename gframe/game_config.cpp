@@ -36,6 +36,8 @@ bool GameConfig::Load(const char* filename)
 			}
 			else if (type == "fullscreen")
 				fullscreen = !!std::stoi(str);
+			else if (type == "show_console")
+				showConsole = !!std::stoi(str);
 			else if (type == "errorlog")
 				enable_log = std::stoi(str);
 			else if (type == "nickname")
@@ -141,6 +143,7 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "use_vsync = "          << use_vsync << "\n";
 	conf_file << "max_fps = "            << max_fps << "\n";
 	conf_file << "fullscreen = "         << fullscreen << "\n";
+	conf_file << "show_console = "       << showConsole << "\n";
 	conf_file << "antialias = "          << antialias << "\n";
 	conf_file << "errorlog = "           << enable_log << "\n";
 	conf_file << "nickname = "           << BufferIO::EncodeUTF8s(nickname) << "\n";

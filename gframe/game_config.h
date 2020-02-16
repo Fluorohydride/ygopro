@@ -16,6 +16,7 @@ struct GameConfig
 	int max_fps = 60;
 	int game_version = 0;
 	bool fullscreen = false;
+	bool showConsole = false;
 	unsigned short antialias = 0;
 	std::wstring serverport = L"7911";
 	unsigned char textfontsize = 13;

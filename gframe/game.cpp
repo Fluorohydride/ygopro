@@ -61,6 +61,10 @@ Game* mainGame;
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
+#ifdef _WIN32
+	if(!gameConf.showConsole)
+		FreeConsole();
+#endif
 	is_fullscreen = false;
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
@@ -181,12 +185,7 @@ bool Game::Initialize() {
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
 	HICON hSmallIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
 	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
-	HWND hWnd;
-	irr::video::SExposedVideoData exposedData = driver->getExposedVideoData();
-	if(driver->getDriverType() == irr::video::EDT_DIRECT3D9)
-		hWnd = reinterpret_cast<HWND>(exposedData.D3D9.HWnd);
-	else
-		hWnd = reinterpret_cast<HWND>(exposedData.OpenGLWin32.HWnd);
+	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 	DragAcceptFiles(hWnd, TRUE);
@@ -2016,6 +2015,7 @@ void Game::CloseDuelWindow() {
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
 	stText->setText(L"");
+	stTip->setText(L"");
 	cardimagetextureloading = false;
 	showingcard = 0;
 	closeDoneSignal.Set();
