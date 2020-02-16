@@ -175,7 +175,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	if(!ApplySkin(gameConf.skin)) {
-		gameConf.skin = EPRO_TEXT("none");
+		gameConf.skin = NoSkinLabel();
 	}
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"EDOPro by Project Ignis");
@@ -500,27 +500,27 @@ bool Game::Initialize() {
 	tabSettings.scrMusicVolume->setPos(gameConf.musicVolume);
 	tabSettings.scrMusicVolume->setLargeStep(1);
 	tabSettings.scrMusicVolume->setSmallStep(1);
-	tabSettings.stNoAudioBackend = env->addStaticText(L"Failed to initialize audio backend", Scale(20, 200, 280, 315), false, true, tabPanel);
+	tabSettings.stNoAudioBackend = env->addStaticText(dataManager.GetSysString(2058).c_str(), Scale(20, 200, 280, 315), false, true, tabPanel);
 	tabSettings.stNoAudioBackend->setVisible(false);
 	tabSettings.chkMAutoPos = env->addCheckBox(gameConf.chkMAutoPos, Scale(20, 320, 280, 345), tabPanel, -1, dataManager.GetSysString(1274).c_str());
 	tabSettings.chkSTAutoPos = env->addCheckBox(gameConf.chkSTAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, dataManager.GetSysString(1278).c_str());
 	tabSettings.chkRandomPos = env->addCheckBox(gameConf.chkRandomPos, Scale(40, 380, 280, 405), tabPanel, -1, dataManager.GetSysString(1275).c_str());
-	btnTabShowSettings = env->addButton(Scale(20, 410, 280, 435), tabPanel, BUTTON_SHOW_SETTINGS, L"More settings");
+	btnTabShowSettings = env->addButton(Scale(20, 410, 280, 435), tabPanel, BUTTON_SHOW_SETTINGS, dataManager.GetSysString(2059).c_str());
 	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
 
-	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, L"Settings");
+	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, dataManager.GetSysString(1273).c_str());
 	gSettings.window->getCloseButton()->setVisible(false);
 	gSettings.window->setVisible(false);
 	gSettings.btnClose = env->addButton(Scale(555, 5, 575, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
-	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_FULLSCREEN, L"Fullscreen (desktop only)");
-	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, L"Fit background");
-	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gameConf.accurate_bg_resize, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, L"Accurate background resize (desktop only)");
+	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_FULLSCREEN, dataManager.GetSysString(2060).c_str());
+	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, dataManager.GetSysString(2061).c_str());
+	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gameConf.accurate_bg_resize, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, dataManager.GetSysString(2062).c_str());
 	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 155, 280, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
-	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, L"Hide passcodes and scopes in card display");
-	gSettings.stCurrentSkin = env->addStaticText(L"Skin", Scale(20, 215, 80, 240), false, true, gSettings.window);
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, dataManager.GetSysString(2063).c_str());
+	gSettings.stCurrentSkin = env->addStaticText(dataManager.GetSysString(2064).c_str(), Scale(20, 215, 80, 240), false, true, gSettings.window);
 	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 215, 280, 240), gSettings.window, COMBOBOX_CURRENT_SKIN);
-	int selectedSkin = gSettings.cbCurrentSkin->addItem(L"none");
+	int selectedSkin = gSettings.cbCurrentSkin->addItem(dataManager.GetSysString(2065).c_str()); // NoSkinLabel "none"
 	auto skins = skinSystem->listSkins();
 	for (int i = skins.size() - 1; i >= 0; i--) {
 		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
@@ -529,7 +529,7 @@ bool Game::Initialize() {
 		}
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
-	gSettings.btnReloadSkin = env->addButton(Scale(20, 245, 280, 270), gSettings.window, BUTTON_RELOAD_SKIN, L"Reload Skin");
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 245, 280, 270), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
 	//log
 	tabRepositories = wInfos->addTab(dataManager.GetSysString(2045).c_str());
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
@@ -1444,6 +1444,9 @@ void Game::MainLoop() {
 #endif //YGOPRO_BUILD_DLL
 	//device->drop();
 }
+path_string Game::NoSkinLabel() {
+	return Utils::ToPathString(dataManager.GetSysString(2059));
+}
 bool Game::ApplySkin(const path_string& skinname, bool reload) {
 	static path_string prev_skin = EPRO_TEXT("");
 	static bool firstrun = true;
@@ -1492,7 +1495,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		return false;
 	if(!reload)
 		prev_skin = skinname;
-	if(prev_skin == EPRO_TEXT("none")) {
+	if(prev_skin == NoSkinLabel()) {
 		auto skin = env->createSkin(gui::EGST_WINDOWS_METALLIC);
 		env->setSkin(skin);
 		skin->drop();
@@ -1534,7 +1537,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload) {
 		wInfos->setTabHeight(skin->getSize(EGDS_BUTTON_HEIGHT) + Scale(2));
 		wInfos->setTabVerticalAlignment(irr::gui::EGUIA_UPPERLEFT);
 	}
-	if(prev_skin == EPRO_TEXT("none")){
+	if(prev_skin == NoSkinLabel()){
 		for (u32 i = 0; i < EGDC_COUNT; ++i) {
 			irr::video::SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
 			col.setAlpha(224);
