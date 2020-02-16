@@ -1917,14 +1917,20 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);
 				return true;
 			}
+			case CHECKBOX_FULLSCREEN: {
+				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->gameConf.fullscreen);
+				return true;
+			}
 			case CHECKBOX_SCALE_BACKGROUND: {
 				mainGame->gameConf.scale_background = mainGame->gSettings.chkScaleBackground->isChecked();
 				return true;
 			}
+#ifndef ANDROID
 			case CHECKBOX_ACCURATE_BACKGROUND_RESIZE: {
 				mainGame->gameConf.accurate_bg_resize = mainGame->gSettings.chkAccurateBackgroundResize->isChecked();
 				return true;
 			}
+#endif
 			case BUTTON_REPO_CHANGELOG_EXPAND: {
 				auto& repo = mainGame->repoInfoGui[showing_repo];
 				mainGame->stCommitLog->setText(mainGame->chkCommitLogExpand->isChecked() ? repo.commit_history_full.c_str() : repo.commit_history_partial.c_str());
@@ -2021,7 +2027,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 		}
 		case irr::KEY_F11: {
 			if(!event.KeyInput.PressedDown)
-				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->is_fullscreen);
+				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->gameConf.fullscreen);
 			return true;
 		}
 		default: break;

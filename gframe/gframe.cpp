@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
 	if(!ygo::mainGame->Initialize())
 		return EXIT_FAILURE;
 #ifdef __APPLE__
-	EDOPRO_SetupMenuBar(&_game.is_fullscreen);
+	EDOPRO_SetupMenuBar(&_game.gameConf.fullscreen);
 #endif
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {

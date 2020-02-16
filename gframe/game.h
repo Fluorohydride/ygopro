@@ -220,7 +220,6 @@ public:
 	void* ocgcore;
 #endif
 	bool coreloaded;
-	bool is_fullscreen;
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];

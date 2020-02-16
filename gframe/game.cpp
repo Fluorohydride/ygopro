@@ -65,7 +65,6 @@ bool Game::Initialize() {
 	if(!gameConf.showConsole)
 		FreeConsole();
 #endif
-	is_fullscreen = false;
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
 #ifndef __ANDROID__
@@ -1160,8 +1159,11 @@ void Game::MainLoop() {
 		matManager.mATK.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
 	}
 #endif
-	if(gameConf.fullscreen)
-		GUIUtils::ToggleFullscreen(device, is_fullscreen);
+	if (gameConf.fullscreen) {
+		// Synchronize actual fullscreen state with config struct
+		bool currentlyFullscreen = false;
+		GUIUtils::ToggleFullscreen(device, currentlyFullscreen);
+	}
 	while(device->run()) {
 		auto repos = repoManager.GetReadyRepos();
 		if(!repos.empty()) {
@@ -1659,7 +1661,6 @@ void Game::LoadConfig() {
 	}
 }
 void Game::SaveConfig() {
-	gameConf.fullscreen = is_fullscreen;
 	gameConf.nickname = ebNickName->getText();
 	gameConf.lastallowedcards = cbRule->getSelected();
 	gameConf.chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
