@@ -987,21 +987,21 @@ bool DeckBuilder::CheckCard(CardDataC* data, CardString* text, const wchar_t& ch
 			} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
 				return false;
 		}
-		if(filter_lm == LIMITATION_FILTER_OCG && data->ot != 0x1)
+		if(filter_lm == LIMITATION_FILTER_OCG && data->ot != SCOPE_OCG)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG && data->ot != 0x2)
+		if(filter_lm == LIMITATION_FILTER_TCG && data->ot != SCOPE_TCG)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->ot != 0x3)
+		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->ot != SCOPE_OCG_TCG)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->ot & 0x100))
+		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->ot & SCOPE_PRERELEASE))
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ANIME && data->ot != 0x4)
+		if(filter_lm == LIMITATION_FILTER_ANIME && data->ot != SCOPE_ANIME)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->ot != 0x8)
+		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->ot != SCOPE_ILLEGAL)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->ot != 0x10)
+		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->ot != SCOPE_VIDEO_GAME)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->ot != 0x20)
+		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->ot != SCOPE_CUSTOM)
 			return false;
 	}
 	if(tokens.size()) {
