@@ -2416,7 +2416,18 @@ void Game::ReloadElementsStrings() {
 		elem.first->setText(dataManager.GetSysString(elem.second).c_str());
 	}
 
-	auto prev = cbSortType->getSelected();
+	unsigned int nullLFlist = deckManager._lfList.size() - 1;
+	deckManager._lfList[nullLFlist].listName = dataManager.GetSysString(1442);
+	auto prev = cbDBLFList->getSelected();
+	cbDBLFList->removeItem(nullLFlist);
+	cbDBLFList->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
+	cbDBLFList->setSelected(prev);
+	prev = cbLFlist->getSelected();
+	cbLFlist->removeItem(nullLFlist);
+	cbLFlist->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
+	cbLFlist->setSelected(prev);
+
+	prev = cbSortType->getSelected();
 	cbSortType->clear();
 	for(int i = 1370; i <= 1373; i++)
 		cbSortType->addItem(dataManager.GetSysString(i).c_str());

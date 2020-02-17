@@ -90,6 +90,7 @@ void DeckManager::RefreshLFList() {
 	if(null_lflist_index != -1 && null_lflist_index != _lfList.size() -1) {
 		auto it = _lfList.begin() + null_lflist_index;
 		std::rotate(it, it + 1, _lfList.end());
+		null_lflist_index = _lfList.size() - 1;
 	}
 }
 std::wstring DeckManager::GetLFListName(int lfhash) {
