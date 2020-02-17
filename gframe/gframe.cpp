@@ -6,6 +6,7 @@
 #include <event2/thread.h>
 #include <IrrlichtDevice.h>
 #include <IGUIButton.h>
+#include <IGUICheckBox.h>
 #include <IGUIEditBox.h>
 #include <IGUIWindow.h>
 #include "config.h"
@@ -26,13 +27,23 @@ bool is_from_discord = false;
 bool open_file = false;
 path_string open_file_name = EPRO_TEXT("");
 
-void ClickButton(irr::gui::IGUIElement* btn) {
+inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
 	event.EventType = irr::EET_GUI_EVENT;
-	event.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
-	event.GUIEvent.Caller = btn;
+	event.GUIEvent.EventType = type;
+	event.GUIEvent.Caller = target;
 	ygo::mainGame->device->postEventFromUser(event);
 }
+
+inline void ClickButton(irr::gui::IGUIElement* btn) {
+	TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
+}
+
+inline void SetCheckbox(irr::gui::IGUICheckBox* chk, bool state) {
+	chk->setChecked(state);
+	TriggerEvent(chk, irr::gui::EGET_CHECKBOX_CHANGED);
+}
+
 #ifdef UNICODE
 int wmain(int argc, wchar_t* argv[]) {
 #else
@@ -120,6 +131,9 @@ int main(int argc, char* argv[]) {
 		else PARAM_CHECK("-k") { // Keep on return
 			exit_on_return = false;
 			keep_on_return = true;
+		} else PARAM_CHECK("-m") { // Mute
+			SetCheckbox(ygo::mainGame->tabSettings.chkEnableSound, false);
+			SetCheckbox(ygo::mainGame->tabSettings.chkEnableMusic, false);
 		} else PARAM_CHECK("-d") { // Deck
 			++i;
 			if(i + 1 < argc) { // select deck
