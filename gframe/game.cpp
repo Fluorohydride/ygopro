@@ -125,7 +125,6 @@ bool Game::Initialize() {
 	menuHandler.prev_sel = -1;
 	dInfo = {};
 	memset(chatTiming, 0, sizeof(chatTiming));
-	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 #ifdef __ANDROID__
 	if(driver->getDriverType() == irr::video::EDT_OGLES2) {
@@ -164,6 +163,7 @@ bool Game::Initialize() {
 	mainGame->discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
 	dataManager.LoadStrings(EPRO_TEXT("./expansions/strings.conf"));
+	deckManager.LoadLFList();
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), Scale(16));
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont.c_str(), Scale(12));
@@ -2411,7 +2411,6 @@ bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 }
 void Game::ReloadElementsStrings() {
 	ShowCardInfo(showingcard, true);
-	UpdateDuelParam();
 
 	for(auto& elem : defaultStrings) {
 		elem.first->setText(dataManager.GetSysString(elem.second).c_str());
@@ -2423,12 +2422,92 @@ void Game::ReloadElementsStrings() {
 		cbSortType->addItem(dataManager.GetSysString(i).c_str());
 	cbSortType->setSelected(prev);
 
+	prev = cbCardType->getSelected();
+	cbCardType->clear();
+	cbCardType->addItem(dataManager.GetSysString(1310).c_str());
+	cbCardType->addItem(dataManager.GetSysString(1312).c_str());
+	cbCardType->addItem(dataManager.GetSysString(1313).c_str());
+	cbCardType->addItem(dataManager.GetSysString(1314).c_str());
+	cbCardType->setSelected(prev);
+
+	prev = cbCardType2->getSelected();
+	cbCardType2->clear();
+	switch (cbCardType->getSelected()) {
+	case 0:
+		cbCardType2->addItem(dataManager.GetSysString(1310).c_str(), 0);
+		break;
+	case 1:
+		cbCardType2->addItem(dataManager.GetSysString(1080).c_str(), 0);
+		cbCardType2->addItem(dataManager.GetSysString(1054).c_str(), TYPE_MONSTER + TYPE_NORMAL);
+		cbCardType2->addItem(dataManager.GetSysString(1055).c_str(), TYPE_MONSTER + TYPE_EFFECT);
+		cbCardType2->addItem(dataManager.GetSysString(1056).c_str(), TYPE_MONSTER + TYPE_FUSION);
+		cbCardType2->addItem(dataManager.GetSysString(1057).c_str(), TYPE_MONSTER + TYPE_RITUAL);
+		cbCardType2->addItem(dataManager.GetSysString(1063).c_str(), TYPE_MONSTER + TYPE_SYNCHRO);
+		cbCardType2->addItem(dataManager.GetSysString(1073).c_str(), TYPE_MONSTER + TYPE_XYZ);
+		cbCardType2->addItem(dataManager.GetSysString(1074).c_str(), TYPE_MONSTER + TYPE_PENDULUM);
+		cbCardType2->addItem(dataManager.GetSysString(1076).c_str(), TYPE_MONSTER + TYPE_LINK);
+		cbCardType2->addItem(dataManager.GetSysString(1075).c_str(), TYPE_MONSTER + TYPE_SPSUMMON);
+		cbCardType2->addItem((dataManager.GetSysString(1054) + L"|" + dataManager.GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
+		cbCardType2->addItem((dataManager.GetSysString(1054) + L"|" + dataManager.GetSysString(1074)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
+		cbCardType2->addItem((dataManager.GetSysString(1063) + L"|" + dataManager.GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
+		cbCardType2->addItem(dataManager.GetSysString(1062).c_str(), TYPE_MONSTER + TYPE_TUNER);
+		cbCardType2->addItem(dataManager.GetSysString(1061).c_str(), TYPE_MONSTER + TYPE_GEMINI);
+		cbCardType2->addItem(dataManager.GetSysString(1060).c_str(), TYPE_MONSTER + TYPE_UNION);
+		cbCardType2->addItem(dataManager.GetSysString(1059).c_str(), TYPE_MONSTER + TYPE_SPIRIT);
+		cbCardType2->addItem(dataManager.GetSysString(1071).c_str(), TYPE_MONSTER + TYPE_FLIP);
+		cbCardType2->addItem(dataManager.GetSysString(1072).c_str(), TYPE_MONSTER + TYPE_TOON);
+		break;
+	case 2:
+		cbCardType2->addItem(dataManager.GetSysString(1080).c_str(), 0);
+		cbCardType2->addItem(dataManager.GetSysString(1054).c_str(), TYPE_SPELL);
+		cbCardType2->addItem(dataManager.GetSysString(1066).c_str(), TYPE_SPELL + TYPE_QUICKPLAY);
+		cbCardType2->addItem(dataManager.GetSysString(1067).c_str(), TYPE_SPELL + TYPE_CONTINUOUS);
+		cbCardType2->addItem(dataManager.GetSysString(1057).c_str(), TYPE_SPELL + TYPE_RITUAL);
+		cbCardType2->addItem(dataManager.GetSysString(1068).c_str(), TYPE_SPELL + TYPE_EQUIP);
+		cbCardType2->addItem(dataManager.GetSysString(1069).c_str(), TYPE_SPELL + TYPE_FIELD);
+		cbCardType2->addItem(dataManager.GetSysString(1076).c_str(), TYPE_SPELL + TYPE_LINK);
+		break;
+	case 3:
+		cbCardType2->addItem(dataManager.GetSysString(1080).c_str(), 0);
+		cbCardType2->addItem(dataManager.GetSysString(1054).c_str(), TYPE_TRAP);
+		cbCardType2->addItem(dataManager.GetSysString(1067).c_str(), TYPE_TRAP + TYPE_CONTINUOUS);
+		cbCardType2->addItem(dataManager.GetSysString(1070).c_str(), TYPE_TRAP + TYPE_COUNTER);
+		break;
+	}
+	cbCardType2->setSelected(prev);
+
+	prev = cbLimit->getSelected();
+	cbLimit->clear();
+	cbLimit->addItem(dataManager.GetSysString(1310).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1316).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1317).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1318).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1320).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1900).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1901).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1902).c_str());
+	cbLimit->addItem(dataManager.GetSysString(1903).c_str());
+	if (chkAnime->isChecked()) {
+		cbLimit->addItem(dataManager.GetSysString(1265).c_str());
+		cbLimit->addItem(dataManager.GetSysString(1266).c_str());
+		cbLimit->addItem(dataManager.GetSysString(1267).c_str());
+		cbLimit->addItem(dataManager.GetSysString(1268).c_str());
+	}
+	cbLimit->setSelected(prev);
+
 	prev = cbAttribute->getSelected();
 	cbAttribute->clear();
 	cbAttribute->addItem(dataManager.GetSysString(1310).c_str(), 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
 		cbAttribute->addItem(dataManager.FormatAttribute(filter).c_str(), filter);
-	cbSortType->setSelected(prev);
+	cbAttribute->setSelected(prev);
+
+	prev = cbRace->getSelected();
+	cbRace->clear();
+	cbRace->addItem(dataManager.GetSysString(1310).c_str(), 0);
+	for (int filter = 0x1; filter != 0x2000000; filter <<= 1)
+		cbRace->addItem(dataManager.FormatRace(filter).c_str(), filter);
+	cbRace->setSelected(prev);
 
 	if(is_building) {
 		btnLeaveGame->setText(dataManager.GetSysString(1306).c_str());
@@ -2453,6 +2532,20 @@ void Game::ReloadElementsStrings() {
 	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
 		cbFilterBanlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
 	cbFilterBanlist->setSelected(prev);
+
+	prev = cbDuelRule->getSelected();
+	if (prev >= 5) {
+		UpdateDuelParam();
+	}
+	else {
+		cbDuelRule->clear();
+		cbDuelRule->addItem(dataManager.GetSysString(1260).c_str());
+		cbDuelRule->addItem(dataManager.GetSysString(1261).c_str());
+		cbDuelRule->addItem(dataManager.GetSysString(1262).c_str());
+		cbDuelRule->addItem(dataManager.GetSysString(1263).c_str());
+		cbDuelRule->addItem(dataManager.GetSysString(1264).c_str());
+		cbDuelRule->setSelected(prev);
+	}
 
 	prev = cbRule->getSelected();
 	cbRule->clear();
