@@ -848,6 +848,7 @@ void DeckBuilder::StartFilter(bool force_refresh) {
 		filter_scl = parse_filter(mainGame->ebScale->getText(), &filter_scltype);
 	}
 	FilterCards(force_refresh);
+	GetHoveredCard();
 }
 void DeckBuilder::FilterCards(bool force_refresh) {
 	results.clear();
