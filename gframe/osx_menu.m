@@ -16,7 +16,8 @@ void togglePointer() {
 -(void)spawn {
 	const char* abspath = [[[NSBundle mainBundle] bundlePath] UTF8String];
 	char command[256] = "open -n ";
-	system(strcat(command, abspath));
+	strcat(command, abspath);
+	system(strcat(command, " --args -m"));
 }
 
 -(void)toggle {
