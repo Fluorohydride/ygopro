@@ -224,7 +224,8 @@ bool DataManager::LoadLocaleStrings(const path_string & file) {
 					obj = &_counterStrings;
 				else if(type == "setname")
 					obj = &_setnameStrings;
-				obj->SetLocale(std::stoi(value, 0, 16), BufferIO::DecodeUTF8s(str));
+				if(obj)
+					obj->SetLocale(std::stoi(value, 0, 16), BufferIO::DecodeUTF8s(str));
 			}
 		}
 		catch(...) {}
