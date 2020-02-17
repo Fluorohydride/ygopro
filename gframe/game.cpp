@@ -904,8 +904,8 @@ bool Game::Initialize() {
 	cbCardType2 = env->addComboBox(Scale(130, 3, 190, 23), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(20);
 	cbCardType2->addItem(dataManager.GetSysString(1310).c_str(), 0);
-	chkAnime = env->addCheckBox(false, Scale(10, 96, 150, 118), wFilter, CHECKBOX_SHOW_ANIME, dataManager.GetSysString(1999).c_str());
-	chkAnime->setChecked(gameConf.chkAnime != 0);
+	chkAnime = env->addCheckBox(gameConf.chkAnime, Scale(10, 96, 150, 118), wFilter, CHECKBOX_SHOW_ANIME, dataManager.GetSysString(1999).c_str());
+	defaultStrings.emplace_back(chkAnime, 1999);
 	stLimit = env->addStaticText(dataManager.GetSysString(1315).c_str(), Scale(205, 5, 280, 25), false, false, wFilter);
 	defaultStrings.emplace_back(stLimit, 1315);
 	cbLimit = env->addComboBox(Scale(260, 3, 390, 23), wFilter, COMBOBOX_OTHER_FILT);
