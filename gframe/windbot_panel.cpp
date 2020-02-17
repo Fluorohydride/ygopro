@@ -49,7 +49,15 @@ bool WindBotPanel::LaunchSelected(int port) {
 	int sel = deckBox->getSelected();
 	if (sel < 0 || sel >= bots.size()) return false;
 	// 1 = scissors, 2 = rock, 3 = paper
+#if defined(_WIN32) || defined(__ANDROID__)
 	return bots[sel].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+#else
+	auto pid = bots[sel].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	if(pid > 0) {
+		windbotsPids.push_back(pid);
+	}
+	return pid > 0;
+#endif
 }
 
 }

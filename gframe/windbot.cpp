@@ -1,7 +1,7 @@
 #include "windbot.h"
 #include "utils.h"
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #else
 #include <unistd.h>
 #endif
@@ -14,7 +14,11 @@
 
 namespace ygo {
 
-bool WindBot::Launch(int port, bool chat, int hand) const {
+#if defined(_WIN32) || defined(__ANDROID__)
+int WindBot::Launch(int port, bool chat, int hand) const {
+#else
+pid_t WindBot::Launch(int port, bool chat, int hand) const {
+#endif
 #ifdef _WIN32
 	auto args = fmt::format(
 		L"./WindBot/WindBot.exe Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} {}",
@@ -40,7 +44,7 @@ bool WindBot::Launch(int port, bool chat, int hand) const {
 	porting::launchWindbot(param);
 	return true;
 #else
-	int pid = fork();
+	pid_t pid = fork();
 	if (pid == 0) {
 		std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck).c_str());
 		std::string argPort = fmt::format("Port={}", port);
@@ -61,7 +65,7 @@ bool WindBot::Launch(int port, bool chat, int hand) const {
 		ErrorLog(message);
 		exit(EXIT_FAILURE);
 	}
-	return pid > 0;
+	return pid;
 #endif
 }
 

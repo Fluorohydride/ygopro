@@ -3,6 +3,9 @@
 
 #include <vector>
 #include "windbot.h"
+#if !defined(_WIN32) && !defined(__ANDROID__)
+#include <sys/types.h>
+#endif
 
 namespace irr {
 namespace gui {
@@ -18,6 +21,9 @@ namespace ygo {
 
 struct WindBotPanel {
 	std::vector<WindBot> bots;
+#if !defined(_WIN32) && !defined(__ANDROID__)
+	std::vector<pid_t> windbotsPids;
+#endif
 
 	irr::gui::IGUIWindow* window;
 	irr::gui::IGUIComboBox* deckBox;

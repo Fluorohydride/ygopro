@@ -1,5 +1,9 @@
 #include <algorithm>
 #include <fmt/chrono.h>
+#if !defined(_WIN32) && !defined(__ANDROID__)
+#include <sys/types.h>
+#include <signal.h>
+#endif
 #include <irrlicht.h>
 #include "duelclient.h"
 #include "sockets.h"
@@ -141,8 +145,13 @@ void DuelClient::StopClient(bool is_exiting) {
 	if(connect_state != 0x7)
 		return;
 	is_closing = is_exiting || exit_on_return;
-	SendPacketToServer(CTOS_LEAVE_GAME);
 	event_base_loopbreak(client_base);
+#if !defined(_WIN32) && !defined(__ANDROID__)
+	for(auto& pid : mainGame->gBot.windbotsPids) {
+		kill(pid, SIGKILL);
+	}
+	mainGame->gBot.windbotsPids.clear();
+#endif
 	if(!is_closing) {
 		
 	}

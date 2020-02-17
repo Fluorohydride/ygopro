@@ -3,6 +3,10 @@
 
 #include <set>
 #include <string>
+#include <vector>
+#if !defined(_WIN32) && !defined(__ANDROID__)
+#include <sys/types.h>
+#endif
 #include "text_types.h"
 
 namespace ygo {
@@ -13,7 +17,11 @@ struct WindBot {
 	int difficulty;
 	std::set<int> masterRules;
 
-	bool Launch(int port, bool chat = true, int hand = 0) const;
+#if defined(_WIN32) || defined(__ANDROID__)
+	int Launch(int port, bool chat = true, int hand = 0) const;
+#else
+	pid_t Launch(int port, bool chat = true, int hand = 0) const;
+#endif
 
 	// Can be made static
 	unsigned short version;
