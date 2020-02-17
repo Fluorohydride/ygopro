@@ -368,6 +368,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
+			case EDITBOX_ATTACK:
+			case EDITBOX_DEFENSE:
+			case EDITBOX_STAR:
+			case EDITBOX_SCALE:
 			case EDITBOX_KEYWORD: {
 				StartFilter();
 				break;
@@ -377,11 +381,27 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch (id) {
+			case EDITBOX_ATTACK: {
+				std::wstring filter = mainGame->ebAttack->getText();
+				if (filter.size() > 2)
+					StartFilter();
+				break;
+			}
+			case EDITBOX_DEFENSE: {
+				std::wstring filter = mainGame->ebDefense->getText();
+				if (filter.size() > 2)
+					StartFilter();
+				break;
+			}
 			case EDITBOX_KEYWORD: {
 				std::wstring filter = mainGame->ebCardName->getText();
-				if (filter.size() > 2) {
+				if (filter.size() > 2)
 					StartFilter();
-				}
+				break;
+			}
+			case EDITBOX_STAR:
+			case EDITBOX_SCALE: {
+				StartFilter();
 				break;
 			}
 			case EDITBOX_DECK_NAME: {
