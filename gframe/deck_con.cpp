@@ -1055,6 +1055,7 @@ void DeckBuilder::ClearSearch() {
 	results.clear();
 	result_string = L"0";
 	scroll_pos = 0;
+	mainGame->env->setFocus(mainGame->ebCardName);
 }
 void DeckBuilder::ClearFilter() {
 	mainGame->cbAttribute->setSelected(0);
