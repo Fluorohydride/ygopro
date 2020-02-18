@@ -27,7 +27,6 @@ bool exit_on_return = false;
 bool is_from_discord = false;
 bool open_file = false;
 path_string open_file_name = EPRO_TEXT("");
-//ygo::RepoManager* repoManager = nullptr;
 
 inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
@@ -212,7 +211,7 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 #ifdef _WIN32
-	//if(!data->configs->showConsole)
+	if(!data->configs->showConsole)
 		FreeConsole();
 #endif
 #ifdef __APPLE__

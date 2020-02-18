@@ -50,11 +50,7 @@
 #define MATERIAL_GUARD(f) do {f;} while(false);
 #endif
 
-//extern ygo::RepoManager* repoManager; //gframe.cpp
-
 unsigned short PRO_VERSION = 0x1348;
-
-//nlohmann::json configs;
 
 namespace ygo {
 
