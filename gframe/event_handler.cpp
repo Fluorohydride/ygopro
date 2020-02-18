@@ -2030,8 +2030,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			return true;
 		}
 		case irr::KEY_F11: {
-			if(!event.KeyInput.PressedDown)
+			if(!event.KeyInput.PressedDown) {
 				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->gameConf.fullscreen);
+				mainGame->gSettings.chkFullscreen->setChecked(mainGame->gameConf.fullscreen);
+			}
 			return true;
 		}
 		default: break;
