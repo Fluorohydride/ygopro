@@ -604,6 +604,8 @@ bool Game::Initialize() {
 #ifdef __ANDROID__
 	gSettings.chkFullscreen->setChecked(true);
 	gSettings.chkFullscreen->setEnabled(false);
+#elif defined(__APPLE__)
+	gSettings.chkFullscreen->setEnabled(false);
 #endif
 	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, dataManager.GetSysString(2061).c_str());
 	defaultStrings.emplace_back(gSettings.chkScaleBackground, 2061);
