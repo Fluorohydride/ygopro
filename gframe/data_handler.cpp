@@ -84,7 +84,7 @@ DataHandler::DataHandler() {
 	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));
 	strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./expansions/strings.conf")) || strings_loaded;
 	if(!strings_loaded) {
-		throw std::exception("Failed to load strings!");
+		throw std::runtime_error("Failed to load strings!");
 	}
 }
 DataHandler::~DataHandler() {
