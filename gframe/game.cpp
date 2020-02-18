@@ -619,9 +619,13 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
 	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, dataManager.GetSysString(2063).c_str());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.stCurrentSkin = env->addStaticText(dataManager.GetSysString(2064).c_str(), Scale(20, 215, 80, 240), false, true, gSettings.window);
+	gSettings.chkDrawFieldSpells = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 215, 280, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, dataManager.GetSysString(2068).c_str());
+	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
+	gSettings.chkFilterBot = env->addCheckBox(gameConf.filterBot, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_FILTER_BOT, dataManager.GetSysString(2069).c_str());
+	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
+	gSettings.stCurrentSkin = env->addStaticText(dataManager.GetSysString(2064).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
-	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 215, 280, 240), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
 	int selectedSkin = gSettings.cbCurrentSkin->addItem(dataManager.GetSysString(2065).c_str()); // NoSkinLabel "none"
 	auto skins = skinSystem->listSkins();
 	for (int i = skins.size() - 1; i >= 0; i--) {
@@ -631,12 +635,12 @@ bool Game::Initialize() {
 		}
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
-	gSettings.btnReloadSkin = env->addButton(Scale(20, 245, 280, 270), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 305, 280, 330), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
 	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
-	gSettings.stCurrentLocale = env->addStaticText(dataManager.GetSysString(2067).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
+	gSettings.stCurrentLocale = env->addStaticText(dataManager.GetSysString(2067).c_str(), Scale(20, 335, 80, 360), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
-	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_LOCALE);
+	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 335, 280, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
 	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"en");
 	for(auto& locale : locales) {
 		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());

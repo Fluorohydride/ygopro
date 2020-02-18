@@ -1917,6 +1917,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->fpsCounter->setVisible(mainGame->gameConf.showFPS);
 				return true;
 			}
+			case CHECKBOX_DRAW_FIELD_SPELLS: {
+				mainGame->gameConf.draw_field_spell = mainGame->gSettings.chkDrawFieldSpells->isChecked();
+				return true;
+			}
+			case CHECKBOX_FILTER_BOT: {
+				mainGame->gameConf.filterBot = mainGame->gSettings.chkFilterBot->isChecked();
+				mainGame->gBot.Refresh(mainGame->gameConf.filterBot* (mainGame->cbDuelRule->getSelected() + 1));
+				return true;
+			}
 			case CHECKBOX_FULLSCREEN: {
 				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->gameConf.fullscreen);
 				return true;
