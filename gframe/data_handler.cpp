@@ -1,7 +1,7 @@
 #include "data_handler.h"
 #include <fstream>
 #include <curl/curl.h>
-#include <Irrlicht.h>
+#include <irrlicht.h>
 #include "logging.h"
 #include "utils.h"
 
