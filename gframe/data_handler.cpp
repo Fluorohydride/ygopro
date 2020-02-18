@@ -36,13 +36,13 @@ void DataHandler::LoadPicUrls() {
 				if(obj["url"].get<std::string>() == "default") {
 					if(obj["type"].get<std::string>() == "pic") {
 #ifdef DEFAULT_PIC_URL
-						ImageDownloader.AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
+						imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
 #else
 						continue;
 #endif
 					} else {
 #ifdef DEFAULT_FIELD_URL
-						ImageDownloader.AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
+						imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
 #else
 						continue;
 #endif
