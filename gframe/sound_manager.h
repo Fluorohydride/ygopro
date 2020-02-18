@@ -52,7 +52,8 @@ public:
 		ATTACK,
 		ACTIVATE
 	};
-	bool Init(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const path_string& working_directory);
+	SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const path_string& working_directory);
+	bool IsUsable();
 	void RefreshBGMList();
 	void RefreshChantsList();
 	void PlaySoundEffect(SFX sound);
@@ -77,6 +78,7 @@ private:
 	bool soundsEnabled = false;
 	bool musicEnabled = false;
 	std::string working_dir = "./";
+	bool succesfully_initied = false;
 };
 
 }

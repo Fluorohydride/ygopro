@@ -1,3 +1,4 @@
+#include <nlohmann/json.hpp>
 #include "replay_mode.h"
 #include "duelclient.h"
 #include "game.h"

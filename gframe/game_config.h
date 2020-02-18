@@ -1,12 +1,14 @@
 #ifndef GAME_CONFIG_H
 #define GAME_CONFIG_H
 
+#include <nlohmann/json.hpp>
 #include "text_types.h"
 
 namespace ygo {
 
 struct GameConfig
 {
+	GameConfig();
 	bool Load(const char* filename);
 	bool Save(const char* filename);
 
@@ -57,6 +59,9 @@ struct GameConfig
 	int soundVolume = 20;
 	path_string skin = EPRO_TEXT("none");
 	path_string locale = EPRO_TEXT("en");
+	path_string working_directory = EPRO_TEXT("./");
+
+	nlohmann::json configs;
 };
 
 }

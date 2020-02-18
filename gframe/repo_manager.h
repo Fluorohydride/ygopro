@@ -3,10 +3,12 @@
 
 #include <atomic>
 #include <map>
+#include <forward_list>
 #include <future>
 #include <string>
 #include <vector>
 #include <mutex>
+#include <nlohmann/json.hpp>
 extern "C" {
 #include <git2.h>
 }
@@ -43,7 +45,9 @@ public:
 	RepoManager() {}
 	~RepoManager() {}
 
-	std::vector<GitRepo> GetReadyRepos();
+	std::vector<const GitRepo*> GetReadyRepos();
+
+	std::vector<const GitRepo*> GetAllRepos();
 
 	std::map<std::string, int> GetRepoStatus();
 
@@ -51,13 +55,17 @@ public:
 		return working_repos.size();
 	};
 
+	void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs);
+
 	bool AddRepo(GitRepo repo);
 
 	void UpdateStatus(std::string repo, int percentage);
 
 private:
 
-	std::vector<GitRepo> available_repos;
+	std::forward_list<GitRepo> all_repos;
+
+	std::vector<GitRepo*> available_repos;
 
 	std::pair<std::vector<std::string>, std::vector<std::string>> CloneorUpdateThreaded(GitRepo repo);
 
@@ -73,7 +81,7 @@ private:
 	std::mutex repos_status_mutex;
 };
 
-extern RepoManager repoManager;
+//extern RepoManager repoManager;
 
 }
 

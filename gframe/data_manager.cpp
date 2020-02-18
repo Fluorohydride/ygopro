@@ -7,7 +7,7 @@
 namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
-DataManager dataManager;
+//DataManager dataManager;
 
 void DataManager::ClearLocaleTexts() {
 	for(auto& val : indexes) {
@@ -421,14 +421,14 @@ std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
 		{SCOPE_CUSTOM, 1268},
 		{SCOPE_PRERELEASE, 1903}
 	};
-	if (hideOCGTCG && scope == SCOPE_OCG_TCG) return L"";
+	if (hideOCGTCG && scope == 0x3) return L"";
 	std::wstring buffer;
 	for (const auto& tuple : SCOPES) {
 		if (scope & tuple.first) {
 			if (!buffer.empty()) {
 				buffer += L"/";
 			}
-			buffer.append(dataManager.GetSysString(tuple.second).c_str());
+			buffer.append(GetSysString(tuple.second).c_str());
 		}
 	}
 	return buffer;

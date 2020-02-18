@@ -9,8 +9,9 @@
 #include <IGUIEditBox.h>
 #include <IGUIWindow.h>
 #include "config.h"
+#include "data_handler.h"
+#include "logging.h"
 #include "game.h"
-#include "data_manager.h"
 #include "log.h"
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
@@ -25,6 +26,7 @@ bool exit_on_return = false;
 bool is_from_discord = false;
 bool open_file = false;
 path_string open_file_name = EPRO_TEXT("");
+//ygo::RepoManager* repoManager = nullptr;
 
 void ClickButton(irr::gui::IGUIElement* btn) {
 	irr::SEvent event;
@@ -33,72 +35,9 @@ void ClickButton(irr::gui::IGUIElement* btn) {
 	event.GUIEvent.Caller = btn;
 	ygo::mainGame->device->postEventFromUser(event);
 }
-#ifdef UNICODE
-int wmain(int argc, wchar_t* argv[]) {
-#else
-int main(int argc, char* argv[]) {
-#endif
-#ifdef __ANDROID__
-	porting::initAndroid();
-	porting::initializePathsAndroid();
-	if(chdir(porting::working_directory.c_str())!=0)
-		LOGE("failed to change directory");
-#endif
-#ifdef __APPLE__
-	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-	CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
-	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
-	CFRelease(bundle_url);
-	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
-	CFRelease(bundle_base_url);
-#ifdef MAC_OS_DISCORD_LAUNCHER
-	system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
-#endif
-	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
-	CFRelease(path);
-	CFRelease(bundle_path);
-#endif //__APPLE__
-	if(argc >= 2) {
-		if(argv[1] == path_string(EPRO_TEXT("from_discord"))) {
-			is_from_discord = true;
-#if defined(_WIN32)
-			SetCurrentDirectory(argv[2]);
-#if !defined(_DEBUG)
-		} else {
-			auto extension = ygo::Utils::GetFileExtension(argv[1]);
-			if(extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
-				TCHAR exepath[MAX_PATH];
-				GetModuleFileName(NULL, exepath, MAX_PATH);
-				auto path = ygo::Utils::GetFilePath(exepath);
-				SetCurrentDirectory(path.c_str());
-			}
-#endif //_DEBUG
-#endif //_WIN32
-		}
-	}
-#ifdef _WIN32
-	WORD wVersionRequested;
-	WSADATA wsaData;
-	wVersionRequested = MAKEWORD(2, 2);
-	WSAStartup(wVersionRequested, &wsaData);
-	evthread_use_windows_threads();
-#else
-	setlocale(LC_CTYPE, "UTF-8");
-	evthread_use_pthreads();
-#endif //_WIN32
-	ygo::Game _game{};
-	ygo::mainGame = &_game;
-#ifdef __ANDROID__
-	ygo::mainGame->appMain = porting::app_global;
-	ygo::mainGame->working_directory = porting::working_directory;
-#else
-	ygo::mainGame->working_directory = EPRO_TEXT("./");
-#endif
-	if(!ygo::mainGame->Initialize())
-		return EXIT_FAILURE;
-#ifdef __APPLE__
-	EDOPRO_SetupMenuBar(&_game.gameConf.fullscreen);
-#endif
+
+
+void CheckArguments(int argc, path_char* argv[]) {
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
 		path_string parameter(argv[i]);
@@ -106,10 +45,10 @@ int main(int argc, char* argv[]) {
 #define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < argc) {y;} continue;}
 #define SET_TXT(elem) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(parameter).c_str())
 		// Extra database
-		RUN_IF("-e", ygo::dataManager.LoadDB(parameter))
-		// Nickname
-		else RUN_IF("-n", SET_TXT(ebNickName))
-		// Host address
+		RUN_IF("-e", ygo::mainGame->globalHandlers->dataManager->LoadDB(parameter))
+			// Nickname
+else RUN_IF("-n", SET_TXT(ebNickName))
+// Host address
 		else RUN_IF("-h", SET_TXT(ebJoinHost))
 		// Host Port
 		else RUN_IF("-h", SET_TXT(ebJoinPort))
@@ -118,12 +57,12 @@ int main(int argc, char* argv[]) {
 #undef RUN_IF
 #undef SET_TXT
 		else PARAM_CHECK("-k") { // Keep on return
-			exit_on_return = false;
-			keep_on_return = true;
+		exit_on_return = false;
+		keep_on_return = true;
 		} else PARAM_CHECK("-d") { // Deck
 			++i;
 			if(i + 1 < argc) { // select deck
-				ygo::mainGame->gameConf.lastdeck = ygo::Utils::ToUnicodeIfNeeded(parameter);
+				ygo::mainGame->globalHandlers->configs->lastdeck = ygo::Utils::ToUnicodeIfNeeded(parameter);
 				continue;
 			} else { // open deck
 				exit_on_return = !keep_on_return;
@@ -187,9 +126,100 @@ int main(int argc, char* argv[]) {
 #undef ELEM
 #undef PARAM_CHECK
 	}
-	ygo::mainGame->MainLoop();
+}
+
+
 #ifdef _WIN32
-	WSACleanup();
+#define Cleanup WSACleanup();
+#else
+#define Cleanup
 #endif //_WIN32
+
+
+#ifdef UNICODE
+int wmain(int argc, wchar_t* argv[]) {
+#else
+int main(int argc, char* argv[]) {
+#endif
+#ifdef __ANDROID__
+	porting::initAndroid();
+	porting::initializePathsAndroid();
+	if(chdir(porting::working_directory.c_str())!=0)
+		LOGE("failed to change directory");
+#endif
+#ifdef __APPLE__
+	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+	CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
+	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
+	CFRelease(bundle_url);
+	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
+	CFRelease(bundle_base_url);
+#ifdef MAC_OS_DISCORD_LAUNCHER
+	system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+#endif
+	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
+	CFRelease(path);
+	CFRelease(bundle_path);
+#endif //__APPLE__
+	if(argc >= 2) {
+		if(argv[1] == path_string(EPRO_TEXT("from_discord"))) {
+			is_from_discord = true;
+#if defined(_WIN32)
+			SetCurrentDirectory(argv[2]);
+#if !defined(_DEBUG)
+		} else {
+			auto extension = ygo::Utils::GetFileExtension(argv[1]);
+			if(extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
+				TCHAR exepath[MAX_PATH];
+				GetModuleFileName(NULL, exepath, MAX_PATH);
+				auto path = ygo::Utils::GetFilePath(exepath);
+				SetCurrentDirectory(path.c_str());
+			}
+#endif //_DEBUG
+#endif //_WIN32
+		}
+	}
+#ifdef _WIN32
+	WORD wVersionRequested;
+	WSADATA wsaData;
+	wVersionRequested = MAKEWORD(2, 2);
+	WSAStartup(wVersionRequested, &wsaData);
+	evthread_use_windows_threads();
+#else
+	setlocale(LC_CTYPE, "UTF-8");
+	evthread_use_pthreads();
+#endif //_WIN32
+	std::shared_ptr<ygo::DataHandler> data = nullptr;
+	try {
+		data = std::make_shared<ygo::DataHandler>();
+	}
+	catch(std::exception e) {
+		ygo::ErrorLog(e.what());
+		Cleanup
+		return EXIT_FAILURE;
+	}
+#ifdef _WIN32
+	//if(!data->configs->showConsole)
+		FreeConsole();
+#endif
+#ifdef __APPLE__
+	EDOPRO_SetupMenuBar(&data->configs.fullscreen);
+#endif
+	bool reset = false;
+	bool firstlaunch = false;
+	do {
+		ygo::Game _game{};
+		ygo::mainGame = &_game;
+		if(!ygo::mainGame->Initialize(data)) {
+			Cleanup
+			return EXIT_FAILURE;
+		}
+		if(firstlaunch) {
+			firstlaunch = false;
+			CheckArguments(argc, argv);
+		}
+		reset = ygo::mainGame->MainLoop();
+	} while(reset);
+	Cleanup
 	return EXIT_SUCCESS;
 }

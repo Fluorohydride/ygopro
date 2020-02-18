@@ -1,8 +1,22 @@
 #include "game_config.h"
 #include <fstream>
 #include "config.h"
+#include "logging.h"
 
 namespace ygo {
+
+GameConfig::GameConfig() {
+	Load("./config/system.conf");
+	if(configs.empty()) {
+		std::ifstream conf_file(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
+		try {
+			conf_file >> configs;
+		}
+		catch(std::exception& e) {
+			ErrorLog(std::string("Exception occurred: ") + e.what());
+		}
+	}
+}
 
 bool GameConfig::Load(const char* filename)
 {

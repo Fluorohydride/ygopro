@@ -1,6 +1,7 @@
+#include <nlohmann/json.hpp>
 #include "client_card.h"
-#include "data_manager.h"
 #include "game.h"
+#include "data_manager.h"
 #include "common.h"
 
 namespace ygo {
@@ -257,7 +258,7 @@ bool ClientCard::deck_sort_def(CardDataC* p1, CardDataC* p2) {
 	return p1->code < p2->code;
 }
 bool ClientCard::deck_sort_name(CardDataC* p1, CardDataC* p2) {
-	int res = dataManager.GetName(p1->code).compare(dataManager.GetName(p2->code));
+	int res = mainGame->globalHandlers->dataManager->GetName(p1->code).compare(mainGame->globalHandlers->dataManager->GetName(p2->code));
 	if(res != 0)
 		return res < 0;
 	return p1->code < p2->code;

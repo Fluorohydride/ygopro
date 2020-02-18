@@ -1,13 +1,14 @@
 #include "repo_manager.h"
 #include "utils.h"
 #include "fmt/format.h"
+#include "logging.h"
 #ifdef __ANDROID__
 #include "porting_android.h"
 #endif
 
 namespace ygo {
 
-RepoManager repoManager;
+//RepoManager repoManager;
 /**
 *The "fetchead_foreach_cb" and "jsgitpull" functions were taken from Peter Johan Salomonsen's code:
 https://github.com/fintechneo/libgit2/blob/master/emscripten_hacks/jslib.c#L577
@@ -312,12 +313,12 @@ void RepoManager::UpdateReadyRepos() {
 		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 			auto results = it->second.get();
 			for(auto& repo : available_repos) {
-				if(repo.repo_path == it->first) {
-					repo.error = results.first[0];
+				if(repo->repo_path == it->first) {
+					repo->error = results.first[0];
 					results.first.erase(results.first.begin());
-					repo.commit_history_full = results.first;
-					repo.commit_history_partial = results.second;
-					repo.ready = true;
+					repo->commit_history_full = results.first;
+					repo->commit_history_partial = results.second;
+					repo->ready = true;
 					break;
 				}
 			}
@@ -335,15 +336,22 @@ bool RepoManager::CloneorUpdate(GitRepo repo) {
 	return true;
 }
 
-std::vector<RepoManager::GitRepo> RepoManager::GetReadyRepos() {
-	std::vector<GitRepo> res;
+std::vector<const RepoManager::GitRepo*> RepoManager::GetReadyRepos() {
+	std::vector<const GitRepo*> res;
 	UpdateReadyRepos();
 	for(auto it = available_repos.begin(); it != available_repos.end();) {
-		if(!it->ready)
+		if(!(*it)->ready)
 			break;
 		res.push_back(*it);
 		it = available_repos.erase(it);
 	}
+	return res;
+}
+
+std::vector<const RepoManager::GitRepo*> RepoManager::GetAllRepos() {
+	std::vector<const GitRepo*> res;
+	for(auto& repo : all_repos)
+		res.insert(res.begin(), &repo);
 	return res;
 }
 
@@ -352,9 +360,59 @@ std::map<std::string, int> RepoManager::GetRepoStatus() {
 	return repos_status;
 }
 
+#define JSON_SET_IF_VALID(field, jsontype, cpptype)if(obj[#field].is_##jsontype())\
+													tmp_repo.field = obj[#field].get<cpptype>();
+void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
+	try {
+		if(configs.size() && configs["repos"].is_array()) {
+			for(auto& obj : configs["repos"].get<std::vector<nlohmann::json>>()) {
+				if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
+					continue;
+				RepoManager::GitRepo tmp_repo;
+				JSON_SET_IF_VALID(url, string, std::string);
+				JSON_SET_IF_VALID(should_update, boolean, bool);
+				if(tmp_repo.url == "default") {
+#ifdef DEFAULT_LIVE_URL
+					tmp_repo.url = DEFAULT_LIVE_URL;
+#ifdef YGOPRO_BUILD_DLL
+					tmp_repo.has_core = true;
+#endif
+#else
+					continue;
+#endif //DEFAULT_LIVE_URL
+				} else if(tmp_repo.url == "default_anime") {
+#ifdef DEFAULT_LIVEANIME_URL
+					tmp_repo.url = DEFAULT_LIVEANIME_URL;
+#else
+					continue;
+#endif //DEFAULT_LIVEANIME_URL
+				} else {
+					JSON_SET_IF_VALID(repo_path, string, std::string);
+					JSON_SET_IF_VALID(repo_name, string, std::string);
+					JSON_SET_IF_VALID(data_path, string, std::string);
+					JSON_SET_IF_VALID(script_path, string, std::string);
+					JSON_SET_IF_VALID(pics_path, string, std::string);
+#ifdef YGOPRO_BUILD_DLL
+					JSON_SET_IF_VALID(core_path, string, std::string);
+					JSON_SET_IF_VALID(has_core, boolean, bool);
+#endif
+				}
+				if(tmp_repo.Sanitize()) {
+					AddRepo(tmp_repo);
+				}
+			}
+		}
+	}
+	catch(std::exception& e) {
+		ErrorLog(std::string("Exception occurred: ") + e.what());
+	}
+}
+
 bool RepoManager::AddRepo(GitRepo repo) {
 	if(CloneorUpdate(repo)) {
-		available_repos.push_back(repo);
+		all_repos.push_front(repo);
+		available_repos.push_back(&all_repos.front());
+		//all_repos.push_back(repo);
 		return true;
 	}
 	return false;

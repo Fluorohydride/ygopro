@@ -17,8 +17,7 @@ struct sqlite3_stmt;
 #define SCOPE_PRERELEASE 0x100
 #define SCOPE_HIDDEN     0x1000
 
-#define SCOPE_OCG_TCG    (SCOPE_OCG | SCOPE_TCG)
-#define SCOPE_OFFICIAL   (SCOPE_OCG | SCOPE_TCG | SCOPE_PRERELEASE)
+#define SCOPE_OFFICIAL   SCOPE_OCG | SCOPE_TCG | SCOPE_PRERELEASE
 
 #define TYPE_SKILL       0x8000000
 #define TYPE_ACTION      0x10000000
@@ -114,7 +113,7 @@ private:
 	LocaleStringHelper _sysStrings;
 };
 
-extern DataManager dataManager;
+//extern DataManager dataManager;
 
 }
 

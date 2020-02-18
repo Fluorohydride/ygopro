@@ -1,5 +1,6 @@
 #include <fmt/chrono.h>
 #include <random>
+#include <nlohmann/json.hpp>
 #include "single_mode.h"
 #include "duelclient.h"
 #include "game.h"
@@ -137,7 +138,7 @@ restart:
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wInfos->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);
-	mainGame->btnLeaveGame->setText(dataManager.GetSysString(1210).c_str());
+	mainGame->btnLeaveGame->setText(mainGame->globalHandlers->dataManager->GetSysString(1210).c_str());
 	mainGame->btnRestartSingle->setVisible(true);
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
@@ -215,14 +216,14 @@ restart:
 		mainGame->gMutex.unlock();
 		return 0;
 	}
-	mainGame->soundManager->StopSounds();
+	mainGame->globalHandlers->sounds->StopSounds();
 	bool was_in_replay = false;
 	if(!hand_test && !is_restarting) {
 		was_in_replay = true;
 		auto now = std::time(nullptr);
 		mainGame->gMutex.lock();
 		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).c_str());
-		mainGame->wReplaySave->setText(dataManager.GetSysString(1340).c_str());
+		mainGame->wReplaySave->setText(mainGame->globalHandlers->dataManager->GetSysString(1340).c_str());
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.unlock();
 		mainGame->replaySignal.Reset();

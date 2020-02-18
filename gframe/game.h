@@ -7,10 +7,12 @@
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include "game_config.h"
 #include "config.h"
 #include <SColor.h>
 #include <rect.h>
 #include <EGUIElementTypes.h>
+#include "data_handler.h"
 #include "image_manager.h"
 #include "client_field.h"
 #include "deck_con.h"
@@ -20,7 +22,6 @@
 #include "sound_manager.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
-#include "game_config.h"
 #include "settings_window.h"
 
 class CGUISkinSystem;
@@ -114,10 +115,11 @@ struct FadingUnit {
 class Game {
 
 public:
-	bool Initialize();
-	void MainLoop();
+	//Game(std::shared_ptr<DataHandler> handlers):globalHandlers(handlers) {};
+	bool Initialize(std::shared_ptr<DataHandler> handlers);
+	bool MainLoop();
 	path_string NoSkinLabel();
-	bool ApplySkin(const path_string& skin, bool reload = false);
+	bool ApplySkin(const path_string& skin, bool reload = false, bool firstrun = false);
 	void LoadZipArchives();
 	void LoadExpansionDB();
 	void LoadArchivesDB();
@@ -150,8 +152,18 @@ public:
 	void LoadConfig();
 	void SaveConfig();
 	void LoadPicUrls();
-	void AddGithubRepositoryStatusWindow(const RepoManager::GitRepo& repo);
+	struct RepoGui {
+		std::string path;
+		IProgressBar* progress1;
+		IProgressBar* progress2;
+		irr::gui::IGUIButton* history_button1;
+		irr::gui::IGUIButton* history_button2;
+		std::wstring commit_history_full;
+		std::wstring commit_history_partial;
+	};
+	RepoGui* AddGithubRepositoryStatusWindow(const RepoManager::GitRepo* repo);
 	void LoadGithubRepositories();
+	void UpdateRepoInfo(const RepoManager::GitRepo* repo, RepoGui* grepo);
 	void LoadServers();
 	void ShowCardInfo(int code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
 	void RefreshCardInfoTextPositions();
@@ -207,8 +219,8 @@ public:
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
 
-	path_string working_directory;
-	std::unique_ptr<SoundManager> soundManager;
+	std::shared_ptr<DataHandler> globalHandlers;
+	//SoundManager* soundManager;
 	std::mutex gMutex;
 	std::mutex analyzeMutex;
 	Signal frameSignal;
@@ -216,9 +228,11 @@ public:
 	Signal replaySignal;
 	std::mutex closeSignal;
 	Signal closeDoneSignal;
-	GameConfig gameConf;
+	//GameConfig* gameConf;
+	//RepoManager* repoManager;
 	DuelInfo dInfo;
 	DiscordWrapper discord;
+	ImageManager imageManager;
 #ifdef YGOPRO_BUILD_DLL
 	void* ocgcore;
 #endif
@@ -226,15 +240,6 @@ public:
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
-	struct RepoGui {
-		std::string path;
-		IProgressBar* progress1;
-		IProgressBar* progress2;
-		irr::gui::IGUIButton* history_button1;
-		irr::gui::IGUIButton* history_button2;
-		std::wstring commit_history_full;
-		std::wstring commit_history_partial;
-	};
 	std::map<std::string, RepoGui> repoInfoGui;
 
 	uint32 delta_time;
@@ -296,7 +301,7 @@ public:
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
 	void PopulateLocales();
-	void ApplyLocale(int index);
+	void ApplyLocale(int index, bool forced = false);
 	std::vector<path_string> locales;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
@@ -638,7 +643,6 @@ public:
 	irr::gui::IGUIStaticText* fpsCounter;
 
 #ifdef __ANDROID__
-	ANDROID_APP appMain;
 	int glversion;
 	bool isPSEnabled;
 	bool isNPOTSupported;
@@ -654,7 +658,7 @@ extern Game* mainGame;
 
 template<typename T>
 inline irr::core::vector2d<T> Game::Scale(irr::core::vector2d<T> vec) {
-	return irr::core::vector2d<T>(vec.X * gameConf.dpi_scale, vec.Y * gameConf.dpi_scale );
+	return irr::core::vector2d<T>(vec.X * globalHandlers->configs->dpi_scale, vec.Y * globalHandlers->configs->dpi_scale );
 }
 template<typename T>
 inline T Game::ResizeX(T x) {
@@ -666,15 +670,15 @@ inline T Game::ResizeY(T y) {
 }
 template<typename T, typename T2>
 inline irr::core::vector2d<T> Game::Scale(T x, T2 y) {
-	return irr::core::vector2d<T>((T)(x * gameConf.dpi_scale), (T)(y * gameConf.dpi_scale));
+	return irr::core::vector2d<T>((T)(x * globalHandlers->configs->dpi_scale), (T)(y * globalHandlers->configs->dpi_scale));
 }
 template<typename T>
 inline T Game::Scale(T val) {
-	return T(val * gameConf.dpi_scale);
+	return T(val * globalHandlers->configs->dpi_scale);
 }
 template<typename T, typename T2, typename T3, typename T4>
 irr::core::rect<T> Game::Scale(T x, T2 y, T3 x2, T4 y2) {
-	auto& scale = gameConf.dpi_scale;
+	auto& scale = globalHandlers->configs->dpi_scale;
 	return { (T)std::roundf(x * scale),(T)std::roundf(y * scale), (T)std::roundf(x2 * scale), (T)std::roundf(y2 * scale) };
 }
 template<typename T>

@@ -11,7 +11,7 @@ namespace ygo {
 
 struct LFList;
 struct CardDataC;
-struct CardDataM;
+class CardDataM;
 struct CardString;
 
 class DeckBuilder: public irr::IEventReceiver {
