@@ -162,7 +162,7 @@ bool Game::Initialize(std::shared_ptr<DataHandler> handlers) {
 		ErrorLog("Failed to load font(s)!");
 		return false;
 	}
-	if(!ApplySkin(globalHandlers->configs->skin, true, true)) {
+	if(!ApplySkin(globalHandlers->configs->skin, false, true)) {
 		globalHandlers->configs->skin = NoSkinLabel();
 	}
 	smgr = device->getSceneManager();
@@ -1650,7 +1650,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 			repo.second.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		}
 	};
-	if(!skinSystem || (skinname == prev_skin && reload))
+	if(!skinSystem || ((skinname == prev_skin || (reload && prev_skin == EPRO_TEXT(""))) && !firstrun))
 		return false;
 	if(!reload)
 		prev_skin = skinname;
@@ -1784,8 +1784,8 @@ void Game::RefreshAiDecks() {
 #ifdef _WIN32
 					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
 #else
-					if (configs.size() && configs["posixPathExtension"].is_string()) {
-						bot.executablePath = configs["posixPathExtension"].get<path_string>();
+					if (globalHandlers->configs->configs.size() && globalHandlers->configs->configs["posixPathExtension"].is_string()) {
+						bot.executablePath = globalHandlers->configs->configs["posixPathExtension"].get<path_string>();
 					} else {
 						bot.executablePath = EPRO_TEXT("");
 					}
