@@ -607,9 +607,9 @@ bool Game::Initialize(std::shared_ptr<DataHandler> handlers) {
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
 	gSettings.chkHidePasscodeScope = env->addCheckBox(globalHandlers->configs->hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, globalHandlers->dataManager->GetSysString(2063).c_str());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.chkDrawFieldSpells = env->addCheckBox(globalHandlers->configs->chkHideSetname, Scale(20, 215, 280, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, dataManager.GetSysString(2068).c_str());
+	gSettings.chkDrawFieldSpells = env->addCheckBox(globalHandlers->configs->chkHideSetname, Scale(20, 215, 280, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS,globalHandlers->dataManager->GetSysString(2068).c_str());
 	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
-	gSettings.chkFilterBot = env->addCheckBox(globalHandlers->configs->filterBot, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_FILTER_BOT, dataManager.GetSysString(2069).c_str());
+	gSettings.chkFilterBot = env->addCheckBox(globalHandlers->configs->filterBot, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_FILTER_BOT,globalHandlers->dataManager->GetSysString(2069).c_str());
 	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
 	gSettings.stCurrentSkin = env->addStaticText(globalHandlers->dataManager->GetSysString(2064).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
@@ -942,8 +942,8 @@ bool Game::Initialize(std::shared_ptr<DataHandler> handlers) {
 	ebDefense->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stStar = env->addStaticText(globalHandlers->dataManager->GetSysString(1324).c_str(), Scale(10, 74, 80, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stStar, 1324);
-	ebStar = env->addEditBox(L"", Scale(60, 72, 100, 92), true, wFilter);
-	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, EDITBOX_STAR);
+	ebStar = env->addEditBox(L"", Scale(60, 72, 100, 92), true, wFilter, EDITBOX_STAR);
+	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stScale = env->addStaticText(globalHandlers->dataManager->GetSysString(1336).c_str(), Scale(110, 74, 150, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stScale, 1336);
 	ebScale = env->addEditBox(L"", Scale(150, 72, 190, 92), true, wFilter, EDITBOX_SCALE);
