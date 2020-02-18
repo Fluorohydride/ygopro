@@ -1671,7 +1671,7 @@ void Game::MainLoop() {
 	//device->drop();
 }
 path_string Game::NoSkinLabel() {
-	return Utils::ToPathString(dataManager.GetSysString(2059));
+	return Utils::ToPathString(dataManager.GetSysString(2065));
 }
 bool Game::ApplySkin(const path_string& skinname, bool reload) {
 	static path_string prev_skin = EPRO_TEXT("");
