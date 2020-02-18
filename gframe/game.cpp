@@ -641,7 +641,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
 	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 335, 280, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
-	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"en");
+	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"English");
 	for(auto& locale : locales) {
 		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
 		if(gameConf.locale == locale) {
