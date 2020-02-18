@@ -1920,6 +1920,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->fpsCounter->setVisible(mainGame->globalHandlers->configs->showFPS);
 				return true;
 			}
+			case CHECKBOX_DRAW_FIELD_SPELLS: {
+				mainGame->globalHandlers->configs->draw_field_spell = mainGame->gSettings.chkDrawFieldSpells->isChecked();
+				return true;
+			}
+			case CHECKBOX_FILTER_BOT: {
+				mainGame->globalHandlers->configs->filterBot = mainGame->gSettings.chkFilterBot->isChecked();
+				mainGame->gBot.Refresh(mainGame->globalHandlers->configs->filterBot* (mainGame->cbDuelRule->getSelected() + 1));
+				return true;
+			}
 			case CHECKBOX_FULLSCREEN: {
 				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->globalHandlers->configs->fullscreen);
 				return true;
@@ -2033,8 +2042,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			return true;
 		}
 		case irr::KEY_F11: {
-			if(!event.KeyInput.PressedDown)
+			if(!event.KeyInput.PressedDown) {
 				GUIUtils::ToggleFullscreen(mainGame->device, mainGame->globalHandlers->configs->fullscreen);
+				mainGame->gSettings.chkFullscreen->setChecked(mainGame->globalHandlers->configs->fullscreen);
+			}
 			return true;
 		}
 		default: break;

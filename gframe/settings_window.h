@@ -43,6 +43,7 @@ struct SettingsWindow {
 	irr::gui::IGUICheckBox* chkHideSetname;
 	irr::gui::IGUICheckBox* chkHidePasscodeScope;
 	irr::gui::IGUICheckBox* chkDrawFieldSpells;
+	irr::gui::IGUICheckBox* chkFilterBot;
 	irr::gui::IGUIStaticText* stCurrentSkin;
 	irr::gui::IGUIComboBox* cbCurrentSkin;
 	irr::gui::IGUIButton* btnReloadSkin;

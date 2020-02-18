@@ -592,6 +592,8 @@ bool Game::Initialize(std::shared_ptr<DataHandler> handlers) {
 #ifdef __ANDROID__
 	gSettings.chkFullscreen->setChecked(true);
 	gSettings.chkFullscreen->setEnabled(false);
+#elif defined(__APPLE__)
+	gSettings.chkFullscreen->setEnabled(false);
 #endif
 	gSettings.chkScaleBackground = env->addCheckBox(globalHandlers->configs->scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, globalHandlers->dataManager->GetSysString(2061).c_str());
 	defaultStrings.emplace_back(gSettings.chkScaleBackground, 2061);
@@ -605,9 +607,13 @@ bool Game::Initialize(std::shared_ptr<DataHandler> handlers) {
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
 	gSettings.chkHidePasscodeScope = env->addCheckBox(globalHandlers->configs->hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, globalHandlers->dataManager->GetSysString(2063).c_str());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.stCurrentSkin = env->addStaticText(globalHandlers->dataManager->GetSysString(2064).c_str(), Scale(20, 215, 80, 240), false, true, gSettings.window);
+	gSettings.chkDrawFieldSpells = env->addCheckBox(globalHandlers->configs->chkHideSetname, Scale(20, 215, 280, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, dataManager.GetSysString(2068).c_str());
+	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
+	gSettings.chkFilterBot = env->addCheckBox(globalHandlers->configs->filterBot, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_FILTER_BOT, dataManager.GetSysString(2069).c_str());
+	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
+	gSettings.stCurrentSkin = env->addStaticText(globalHandlers->dataManager->GetSysString(2064).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
-	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 215, 280, 240), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
 	int selectedSkin = gSettings.cbCurrentSkin->addItem(globalHandlers->dataManager->GetSysString(2065).c_str()); // NoSkinLabel "none"
 	auto skins = skinSystem->listSkins();
 	for (int i = skins.size() - 1; i >= 0; i--) {
@@ -617,13 +623,13 @@ bool Game::Initialize(std::shared_ptr<DataHandler> handlers) {
 		}
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
-	gSettings.btnReloadSkin = env->addButton(Scale(20, 245, 280, 270), gSettings.window, BUTTON_RELOAD_SKIN, globalHandlers->dataManager->GetSysString(2066).c_str());
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 305, 280, 330), gSettings.window, BUTTON_RELOAD_SKIN, globalHandlers->dataManager->GetSysString(2066).c_str());
 	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
-	gSettings.stCurrentLocale = env->addStaticText(globalHandlers->dataManager->GetSysString(2067).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
+	gSettings.stCurrentLocale = env->addStaticText(globalHandlers->dataManager->GetSysString(2067).c_str(), Scale(20, 335, 80, 360), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
-	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_LOCALE);
-	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"en");
+	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 335, 280, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
+	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"English");
 	for(auto& locale : locales) {
 		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
 		if(globalHandlers->configs->locale == locale) {
@@ -928,19 +934,19 @@ bool Game::Initialize(std::shared_ptr<DataHandler> handlers) {
 		cbRace->addItem(globalHandlers->dataManager->FormatRace(filter).c_str(), filter);
 	stAttack = env->addStaticText(globalHandlers->dataManager->GetSysString(1322).c_str(), Scale(205, 28, 280, 48), false, false, wFilter);
 	defaultStrings.emplace_back(stAttack, 1322);
-	ebAttack = env->addEditBox(L"", Scale(260, 26, 340, 46), true, wFilter);
+	ebAttack = env->addEditBox(L"", Scale(260, 26, 340, 46), true, wFilter, EDITBOX_ATTACK);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stDefense = env->addStaticText(globalHandlers->dataManager->GetSysString(1323).c_str(), Scale(205, 51, 280, 71), false, false, wFilter);
 	defaultStrings.emplace_back(stDefense, 1323);
-	ebDefense = env->addEditBox(L"", Scale(260, 49, 340, 69), true, wFilter);
+	ebDefense = env->addEditBox(L"", Scale(260, 49, 340, 69), true, wFilter, EDITBOX_DEFENSE);
 	ebDefense->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stStar = env->addStaticText(globalHandlers->dataManager->GetSysString(1324).c_str(), Scale(10, 74, 80, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stStar, 1324);
 	ebStar = env->addEditBox(L"", Scale(60, 72, 100, 92), true, wFilter);
-	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, EDITBOX_STAR);
 	stScale = env->addStaticText(globalHandlers->dataManager->GetSysString(1336).c_str(), Scale(110, 74, 150, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stScale, 1336);
-	ebScale = env->addEditBox(L"", Scale(150, 72, 190, 92), true, wFilter);
+	ebScale = env->addEditBox(L"", Scale(150, 72, 190, 92), true, wFilter, EDITBOX_SCALE);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stSearch = env->addStaticText(globalHandlers->dataManager->GetSysString(1325).c_str(), Scale(205, 74, 280, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stSearch, 1325);
@@ -1605,7 +1611,7 @@ bool Game::MainLoop() {
 	return false;
 }
 path_string Game::NoSkinLabel() {
-	return Utils::ToPathString(globalHandlers->dataManager->GetSysString(2059));
+	return Utils::ToPathString(globalHandlers->dataManager->GetSysString(2065));
 }
 bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 	static path_string prev_skin = EPRO_TEXT("");

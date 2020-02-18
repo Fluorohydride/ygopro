@@ -7,7 +7,7 @@ extern "C" {
 #include <stdbool.h>
 #endif
 
-void EDOPRO_SetupMenuBar(bool *fullScreenState);
+void EDOPRO_SetupMenuBar(void (*callback)(void));
 void EDOPRO_ToggleFullScreen();
 
 #ifdef __cplusplus

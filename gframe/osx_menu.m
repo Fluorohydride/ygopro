@@ -1,11 +1,7 @@
 #include "osx_menu.h"
 #import <AppKit/AppKit.h>
 
-bool *appFullScreenState = NULL;
-
-void togglePointer() {
-	*appFullScreenState = !*appFullScreenState;
-}
+void (*toggleFullScreenCallback)(void) = NULL;
 
 @interface EdoproHandler : NSObject
 -(void)spawn;
@@ -16,20 +12,21 @@ void togglePointer() {
 -(void)spawn {
 	const char* abspath = [[[NSBundle mainBundle] bundlePath] UTF8String];
 	char command[256] = "open -n ";
-	system(strcat(command, abspath));
+	strcat(command, abspath);
+	system(strcat(command, " --args -m"));
 }
 
 -(void)toggle {
 	[NSApp activateIgnoringOtherApps:YES];
 	[[NSApp mainWindow] toggleFullScreen:nil];
-	togglePointer();
+	toggleFullScreenCallback();
 }
 @end
 
 EdoproHandler* handler;
 
-void EDOPRO_SetupMenuBar(bool *fullScreenState) {
-	appFullScreenState = fullScreenState;
+void EDOPRO_SetupMenuBar(void (*callback)(void)) {
+	toggleFullScreenCallback = callback;
 	@autoreleasepool {
 		// Apparently in a newer version of Irrlicht's CIrrDeviceOSX.mm
 
