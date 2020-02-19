@@ -448,7 +448,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 			}
 		}
 	}
-	if(mainGame->globalHandlers->imageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type)) == NONE) {
+	if(mainGame->globalHandlers->imageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type)) == ImageDownloader::NONE) {
 		mainGame->globalHandlers->imageDownloader->AddToDownloadQueue(code, static_cast<ImageDownloader::imgType>(type));
 	}
 	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
@@ -488,16 +488,16 @@ irr::video::ITexture* ImageManager::GetTextureCard(int code, imgType type, bool 
 	auto tit = map.find(code);
 	if(tit == map.end()) {
 		auto status = mainGame->globalHandlers->imageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type));
-		if(status == DOWNLOADING) {
+		if(status == ImageDownloader::DOWNLOADING) {
 			if(chk)
 				*chk = 2;
 			return ret_unk;
 		}
-		if(status == DOWNLOADED) {
+		if(status == ImageDownloader::DOWNLOADED) {
 			map[code] = driver->getTexture(mainGame->globalHandlers->imageDownloader->GetDownloadPath(code, static_cast<ImageDownloader::imgType>(type)).c_str());
 			return map[code] ? map[code] : ret_unk;
 		}
-		if(status == DOWNLOAD_ERROR) {
+		if(status == ImageDownloader::DOWNLOAD_ERROR) {
 			map[code] = nullptr;
 			return ret_unk;
 		}
@@ -534,10 +534,10 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
 		auto status = mainGame->globalHandlers->imageDownloader->GetDownloadStatus(code, ImageDownloader::FIELD);
-		bool should_download = status == NONE;
+		bool should_download = status == ImageDownloader::NONE;
 		irr::video::ITexture* img = nullptr;
 		if(!should_download) {
-			if(status == DOWNLOADED) {
+			if(status == ImageDownloader::DOWNLOADED) {
 				img = driver->getTexture(mainGame->globalHandlers->imageDownloader->GetDownloadPath(code, ImageDownloader::FIELD).c_str());
 			} else
 				return nullptr;

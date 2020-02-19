@@ -35,12 +35,6 @@ private:
 	using image_path = std::pair<irr::video::IImage*, path_string>;
 	using loading_map = std::map<int, std::future<image_path>>;
 	using chrono_time = unsigned long long;
-	enum downloadStatus {
-		DOWNLOADING,
-		DOWNLOAD_ERROR,
-		DOWNLOADED,
-		NONE
-	};
 	using texture_map = std::unordered_map<int, irr::video::ITexture*>;
 public:
 	ImageManager() {

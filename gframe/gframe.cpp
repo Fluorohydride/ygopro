@@ -216,8 +216,8 @@ int main(int argc, char* argv[]) {
 #endif
 #ifdef __APPLE__
 	EDOPRO_SetupMenuBar([]() {
-		data->configs.fullscreen = !data->configs.fullscreen;
-		ygo::mainGame->gSettings.chkFullscreen->setChecked(data->configs.fullscreen);
+		ygo::mainGame->globalHandlers->configs->fullscreen = !ygo::mainGame->globalHandlers->configs->fullscreen;
+		ygo::mainGame->gSettings.chkFullscreen->setChecked(ygo::mainGame->globalHandlers->configs->fullscreen);
 	});
 #endif
 	bool reset = false;
