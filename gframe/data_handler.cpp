@@ -75,10 +75,14 @@ void DataHandler::LoadZipArchives() {
 	}
 }
 DataHandler::DataHandler() {
+	configs = std::make_shared<GameConfig>();
+#ifndef __ANDROID__
+	auto dim = irr::core::dimension2d<irr::u32>(1024 * configs->dpi_scale, 640 * configs->dpi_scale);
+	auto tmp_device = irr::createDevice(irr::video::EDT_OPENGL, dim);
+#endif
 	filesystem = new irr::io::CFileSystem();
 	LoadZipArchives();
 	gitManager = std::make_shared<RepoManager>();
-	configs = std::make_shared<GameConfig>();
 #ifdef __ANDROID__
 	configs->working_directory = porting::working_directory;
 #endif
@@ -89,6 +93,10 @@ DataHandler::DataHandler() {
 	LoadDatabases();
 	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));
 	strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./expansions/strings.conf")) || strings_loaded;
+#ifndef __ANDROID__
+	tmp_device->closeDevice();
+	while(tmp_device->run()) {}
+#endif
 	if(!strings_loaded) {
 		throw std::runtime_error("Failed to load strings!");
 	}
