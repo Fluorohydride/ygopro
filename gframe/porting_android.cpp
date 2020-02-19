@@ -34,7 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
 #include "bufferio.h"
 #include <thread>
-#include "game.h"
+#include "sound_manager.h"
 
 extern int main(int argc, char *argv[]);
 
@@ -99,8 +99,8 @@ extern "C" {
 
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_pauseApp(
 		JNIEnv * env, jclass thiz, jboolean pause) {
-		if(ygo::mainGame && ygo::mainGame->soundManager) {
-			ygo::mainGame->soundManager->PauseMusic(pause);
+		if(ygo::gSoundManager) {
+			ygo::gSoundManager->PauseMusic(pause);
 		}
 	}
 }

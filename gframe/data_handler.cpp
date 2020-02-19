@@ -4,6 +4,9 @@
 #include <irrlicht.h>
 #include "logging.h"
 #include "utils.h"
+#ifdef __ANDROID__
+#include "porting_android.h"
+#endif
 
 namespace ygo {
 

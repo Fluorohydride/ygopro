@@ -55,7 +55,7 @@ public:
 		return working_repos.size();
 	};
 
-	void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs);
+	void LoadRepositoriesFromJson(const nlohmann::json& configs);
 
 	bool AddRepo(GitRepo repo);
 
