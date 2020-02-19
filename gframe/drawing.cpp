@@ -1289,8 +1289,8 @@ void Game::DrawDeckBd() {
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(809, 136, 914, 156), 0xff000000, false, true);
 	textFont->draw(dataManager.GetSysString(1333).c_str(), Resize(810, 137, 915, 157), 0xffffffff, false, true);
 	auto size = textFont->getDimension(dataManager.GetSysString(1333).c_str()).Width + ResizeX(5);
-	numFont->draw(deckBuilder.result_string.c_str(), Resize(809 + size, 136, 934, 156), 0xff000000, false, true);
-	numFont->draw(deckBuilder.result_string.c_str(), Resize(810 + size, 137, 935, 157), 0xffffffff, false, true);
+	numFont->draw(deckBuilder.result_string.c_str(), recti(ResizeX(809) + size, ResizeY(136), ResizeX(809) + size + 10, ResizeY(156)), 0xff000000, false, true);
+	numFont->draw(deckBuilder.result_string.c_str(), recti(ResizeX(809) + size, ResizeY(137), ResizeX(809) + size + 10, ResizeY(157)), 0xffffffff, false, true);
 	DRAWRECT(SEARCH_RESULT, 805, 160, 1020, 630);
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
 	int prev_pos = deckBuilder.scroll_pos;
