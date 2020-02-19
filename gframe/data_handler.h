@@ -26,6 +26,7 @@ class DataHandler {
 public:
 	DataHandler();
 	~DataHandler();
+	irr::IrrlichtDevice* tmp_device;
 	std::shared_ptr<RepoManager> gitManager = nullptr;
 	std::shared_ptr<GameConfig> configs = nullptr;
 	std::shared_ptr<SoundManager> sounds = nullptr;

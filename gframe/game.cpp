@@ -60,33 +60,35 @@ namespace ygo {
 bool Game::Initialize() {
 	srand(time(0));
 	dpi_scale = gGameConfig->dpi_scale;
-	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
-	params.AntiAlias = gGameConfig->antialias;
+	if(!device) {
+		irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+		params.AntiAlias = gGameConfig->antialias;
 #ifndef __ANDROID__
 #ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-	if(gGameConfig->use_d3d)
-		params.DriverType = irr::video::EDT_DIRECT3D9;
-	else
+		if(gGameConfig->use_d3d)
+			params.DriverType = irr::video::EDT_DIRECT3D9;
+		else
 #endif
-		params.DriverType = irr::video::EDT_OPENGL;
-	params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
+			params.DriverType = irr::video::EDT_OPENGL;
+		params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
 #else
-	/*if(glversion == 0) {
+		/*if(glversion == 0) {
+			params.DriverType = irr::video::EDT_OGLES1;
+		} else {*/
 		params.DriverType = irr::video::EDT_OGLES1;
-	} else {*/
-		params.DriverType = irr::video::EDT_OGLES1;
-	//}
-	params.PrivateData = porting::app_global;
-	params.Bits = 24;
-	params.ZBufferBits = 16;
-	params.AntiAlias = 0;
-	params.WindowSize = irr::core::dimension2d<u32>(0, 0);
+		//}
+		params.PrivateData = porting::app_global;
+		params.Bits = 24;
+		params.ZBufferBits = 16;
+		params.AntiAlias = 0;
+		params.WindowSize = irr::core::dimension2d<u32>(0, 0);
 #endif
-	params.Vsync = gGameConfig->use_vsync;
-	device = irr::createDeviceEx(params);
-	if(!device) {
-		ErrorLog("Failed to create Irrlicht Engine device!");
-		return false;
+		params.Vsync = gGameConfig->use_vsync;
+		device = irr::createDeviceEx(params);
+		if(!device) {
+			ErrorLog("Failed to create Irrlicht Engine device!");
+			return false;
+		}
 	}
 	filesystem = device->getFileSystem();
 #ifdef __ANDROID__

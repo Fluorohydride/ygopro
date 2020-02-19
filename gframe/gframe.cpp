@@ -235,6 +235,10 @@ int main(int argc, char* argv[]) {
 	bool firstlaunch = false;
 	do {
 		ygo::mainGame = std::make_shared<ygo::Game>();
+		if(data->tmp_device) {
+			ygo::mainGame->device = data->tmp_device;
+			data->tmp_device = nullptr;
+		}
 		if(!ygo::mainGame->Initialize()) {
 			Cleanup
 			return EXIT_FAILURE;

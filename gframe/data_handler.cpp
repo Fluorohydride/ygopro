@@ -77,8 +77,20 @@ void DataHandler::LoadZipArchives() {
 DataHandler::DataHandler() {
 	configs = std::make_shared<GameConfig>();
 #ifndef __ANDROID__
-	auto dim = irr::core::dimension2d<irr::u32>(1024 * configs->dpi_scale, 640 * configs->dpi_scale);
-	auto tmp_device = irr::createDevice(irr::video::EDT_OPENGL, dim);
+	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+	params.AntiAlias = configs->antialias;
+#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
+	if(configs->use_d3d)
+		params.DriverType = irr::video::EDT_DIRECT3D9;
+	else
+#endif
+		params.DriverType = irr::video::EDT_OPENGL;
+	params.WindowSize = irr::core::dimension2d<irr::u32>(1024 * configs->dpi_scale, 640 * configs->dpi_scale);
+	params.Vsync = configs->use_vsync;
+	tmp_device = irr::createDeviceEx(params);
+	if(!tmp_device) {
+		throw std::runtime_error("Failed to create Irrlicht Engine device!");
+	}
 #endif
 	filesystem = new irr::io::CFileSystem();
 	LoadZipArchives();
@@ -94,10 +106,6 @@ DataHandler::DataHandler() {
 	LoadPicUrls();
 	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));
 	strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./expansions/strings.conf")) || strings_loaded;
-#ifndef __ANDROID__
-	tmp_device->closeDevice();
-	while(tmp_device->run()) {}
-#endif
 	if(!strings_loaded) {
 		throw std::runtime_error("Failed to load strings!");
 	}
