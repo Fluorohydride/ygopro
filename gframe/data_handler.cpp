@@ -91,6 +91,7 @@ DataHandler::DataHandler() {
 	dataManager = std::make_shared<DataManager>();
 	imageDownloader = std::make_shared<ImageDownloader>();
 	LoadDatabases();
+	LoadPicUrls();
 	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));
 	strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./expansions/strings.conf")) || strings_loaded;
 #ifndef __ANDROID__

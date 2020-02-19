@@ -142,7 +142,6 @@ bool Game::Initialize() {
 		ErrorLog("Failed to load textures!");
 		return false;
 	}
-	LoadPicUrls();
 	RefreshAiDecks();
 	discord.Initialize(filesystem->getWorkingDirectory().c_str());
 	discord.UpdatePresence(DiscordWrapper::INITIALIZE);
@@ -1805,35 +1804,6 @@ void Game::SaveConfig() {
 	gGameConfig->chkHideHintButton = tabSettings.chkHideChainButtons->isChecked();
 	gGameConfig->chkAnime = chkAnime->isChecked();
 	gGameConfig->Save("./config/system.conf");
-}
-void Game::LoadPicUrls() {
-	try {
-		if(gGameConfig->configs.size() && gGameConfig->configs["urls"].is_array()) {
-			for(auto& obj : gGameConfig->configs["urls"].get<std::vector<nlohmann::json>>()) {
-				if(obj["url"].get<std::string>() == "default") {
-					if(obj["type"].get<std::string>() == "pic") {
-#ifdef DEFAULT_PIC_URL
-						gImageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
-#else
-						continue;
-#endif
-					} else {
-#ifdef DEFAULT_FIELD_URL
-						gImageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
-#else
-						continue;
-#endif
-					}
-				} else {
-					auto type = obj["type"].get<std::string>();
-					gImageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ? ImageDownloader::FIELD : (type == "pic") ? ImageDownloader::ART : ImageDownloader::COVER });
-				}
-			}
-		}
-	}
-	catch(std::exception& e) {
-		ErrorLog(std::string("Exception occurred: ") + e.what());
-	}
 }
 Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
 	std::wstring name = BufferIO::DecodeUTF8s(repo->repo_name);
