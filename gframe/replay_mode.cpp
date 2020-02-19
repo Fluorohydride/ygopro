@@ -135,7 +135,7 @@ void ReplayMode::EndDuel() {
 	if(!is_closing) {
 		mainGame->actionSignal.Reset();
 		mainGame->gMutex.lock();
-		mainGame->stMessage->setText(mainGame->globalHandlers->dataManager->GetSysString(1501).c_str());
+		mainGame->stMessage->setText(gDataManager->GetSysString(1501).c_str());
 		if(mainGame->wCardSelect->isVisible())
 			mainGame->HideElement(mainGame->wCardSelect);
 		mainGame->PopupElement(mainGame->wMessage);
@@ -156,7 +156,7 @@ void ReplayMode::EndDuel() {
 		mainGame->ShowElement(mainGame->wReplay);
 		mainGame->SetMessageWindow();
 		mainGame->stTip->setVisible(false);
-		mainGame->globalHandlers->sounds->StopSounds();
+		gSoundManager->StopSounds();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.unlock();
 		if(exit_on_return)
@@ -222,7 +222,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				mainGame->gMutex.unlock();
 			}
 			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(mainGame->globalHandlers->dataManager->GetSysString(1434).c_str());
+			mainGame->stMessage->setText(gDataManager->GetSysString(1434).c_str());
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();

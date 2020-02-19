@@ -1,4 +1,3 @@
-#include <nlohmann/json.hpp>
 #include "generic_duel.h"
 #include "netserver.h"
 #include "game.h"

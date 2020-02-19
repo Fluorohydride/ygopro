@@ -114,6 +114,8 @@ private:
 	LocaleStringHelper _sysStrings;
 };
 
+extern std::shared_ptr<DataManager> gDataManager;
+
 }
 
 #endif // DATAMANAGER_H

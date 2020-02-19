@@ -336,7 +336,7 @@ bool RepoManager::CloneorUpdate(GitRepo repo) {
 	return true;
 }
 
-std::vector<const RepoManager::GitRepo*> RepoManager::GetReadyRepos() {
+std::vector<const GitRepo*> RepoManager::GetReadyRepos() {
 	std::vector<const GitRepo*> res;
 	UpdateReadyRepos();
 	for(auto it = available_repos.begin(); it != available_repos.end();) {
@@ -348,7 +348,7 @@ std::vector<const RepoManager::GitRepo*> RepoManager::GetReadyRepos() {
 	return res;
 }
 
-std::vector<const RepoManager::GitRepo*> RepoManager::GetAllRepos() {
+std::vector<const GitRepo*> RepoManager::GetAllRepos() {
 	std::vector<const GitRepo*> res;
 	for(auto& repo : all_repos)
 		res.insert(res.begin(), &repo);
@@ -368,7 +368,7 @@ void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 			for(auto& obj : configs["repos"].get<std::vector<nlohmann::json>>()) {
 				if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
 					continue;
-				RepoManager::GitRepo tmp_repo;
+				GitRepo tmp_repo;
 				JSON_SET_IF_VALID(url, string, std::string);
 				JSON_SET_IF_VALID(should_update, boolean, bool);
 				if(tmp_repo.url == "default") {
@@ -424,7 +424,7 @@ void RepoManager::UpdateStatus(std::string repo, int percentage) {
 	repos_status_mutex.unlock();
 }
 
-bool RepoManager::GitRepo::Sanitize() {
+bool GitRepo::Sanitize() {
 	if(url.empty())
 		return false;
 	if(repo_name.empty() && repo_path.empty()) {

@@ -81,6 +81,8 @@ private:
 	bool succesfully_initied = false;
 };
 
+extern std::shared_ptr<SoundManager> gSoundManager;
+
 }
 
 #endif //SOUNDMANAGER_H

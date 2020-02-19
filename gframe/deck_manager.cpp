@@ -1,4 +1,3 @@
-#include <nlohmann/json.hpp>
 #include "deck_manager.h"
 #include "data_manager.h"
 #include "network.h"
@@ -79,7 +78,7 @@ void DeckManager::LoadLFList() {
 	LoadLFListSingle(EPRO_TEXT("./lflist.conf"));
 	LoadLFListFolder(EPRO_TEXT("./lflists/"));
 	LFList nolimit;
-	nolimit.listName = mainGame->globalHandlers->dataManager->GetSysString(1442); // N/A
+	nolimit.listName = gDataManager->GetSysString(1442); // N/A
 	nolimit.hash = 0;
 	nolimit.content.clear();
 	nolimit.whitelist = false;
@@ -98,7 +97,7 @@ std::wstring DeckManager::GetLFListName(int lfhash) {
 	auto it = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](LFList list){return list.hash == (unsigned int)lfhash; });
 	if(it != _lfList.end())
 		return (*it).listName.c_str();
-	return mainGame->globalHandlers->dataManager->unknown_string;
+	return gDataManager->unknown_string;
 }
 int DeckManager::TypeCount(std::vector<CardDataC*> cards, int type) {
 	int count = 0;
@@ -252,26 +251,26 @@ int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int
 	int errorcode = 0;
 	CardData cd;
 	for(auto code : mainlist) {
-		if(!mainGame->globalHandlers->dataManager->GetData(code, &cd)) {
+		if(!gDataManager->GetData(code, &cd)) {
 			errorcode = code;
 			continue;
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		else if((cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd.type & TYPE_LINK && cd.type & TYPE_MONSTER))) {
-			deck.extra.push_back(mainGame->globalHandlers->dataManager->GetCardData(code));
+			deck.extra.push_back(gDataManager->GetCardData(code));
 		} else {
-			deck.main.push_back(mainGame->globalHandlers->dataManager->GetCardData(code));
+			deck.main.push_back(gDataManager->GetCardData(code));
 		}
 	}
 	for(auto code : sidelist) {
-		if(!mainGame->globalHandlers->dataManager->GetData(code, &cd)) {
+		if(!gDataManager->GetData(code, &cd)) {
 			errorcode = code;
 			continue;
 		}
 		if(cd.type & TYPE_TOKEN)
 			continue;
-		deck.side.push_back(mainGame->globalHandlers->dataManager->GetCardData(code));	//verified by GetData()
+		deck.side.push_back(gDataManager->GetCardData(code));	//verified by GetData()
 	}
 	return errorcode;
 }

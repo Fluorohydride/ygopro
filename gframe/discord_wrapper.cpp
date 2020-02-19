@@ -162,7 +162,7 @@ void DiscordWrapper::Connect() {
 	handlers.joinGame = OnJoin;
 	handlers.spectateGame = OnSpectate;
 	handlers.joinRequest = OnJoinRequest;
-	handlers.payload = ygo::mainGame;
+	handlers.payload = &(*ygo::mainGame);
 	Discord_Initialize(DISCORD_APP_ID, &handlers, 0, nullptr);
 #endif
 }

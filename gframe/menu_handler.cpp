@@ -1,5 +1,5 @@
-#include <nlohmann/json.hpp>
 #include <fmt/chrono.h>
+#include "game_config.h"
 #include "config.h"
 #include "menu_handler.h"
 #include "netserver.h"
@@ -20,7 +20,7 @@
 namespace ygo {
 
 void UpdateDeck() {
-	mainGame->globalHandlers->configs->lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
+	gGameConfig->lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
 	char deckbuf[1024];
 	char* pdeck = deckbuf;
 	BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
@@ -172,8 +172,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_JOIN_HOST: {
 				try {
 					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
-					mainGame->globalHandlers->configs->lasthost = mainGame->ebJoinHost->getText();
-					mainGame->globalHandlers->configs->lastport = mainGame->ebJoinPort->getText();
+					gGameConfig->lasthost = mainGame->ebJoinHost->getText();
+					gGameConfig->lastport = mainGame->ebJoinPort->getText();
 					mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebJoinPass->getText());
 					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
 						mainGame->btnCreateHost->setEnabled(false);
@@ -183,7 +183,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				catch(...) {
-					mainGame->PopupMessage(mainGame->globalHandlers->dataManager->GetSysString(1412));
+					mainGame->PopupMessage(gDataManager->GetSysString(1412));
 					break;
 				}
 			}
@@ -268,8 +268,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					catch(...) {
 						break;
 					}
-					mainGame->globalHandlers->configs->gamename = mainGame->ebServerName->getText();
-					mainGame->globalHandlers->configs->serverport = mainGame->ebHostPort->getText();
+					gGameConfig->gamename = mainGame->ebServerName->getText();
+					gGameConfig->serverport = mainGame->ebHostPort->getText();
 					if(!NetServer::StartServer(host_port))
 						break;
 					if(!DuelClient::StartClient(0x7f000001, host_port)) {
@@ -278,7 +278,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 					mainGame->btnHostConfirm->setEnabled(false);
 					mainGame->btnHostCancel->setEnabled(false);
-					mainGame->gBot.Refresh(mainGame->globalHandlers->configs->filterBot * (mainGame->cbDuelRule->getSelected() + 1));
+					mainGame->gBot.Refresh(gGameConfig->filterBot * (mainGame->cbDuelRule->getSelected() + 1));
 				}
 				break;
 			}
@@ -399,7 +399,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.lock();
-				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->lstReplayList->getListItem(sel), mainGame->globalHandlers->dataManager->GetSysString(1363)).c_str());
+				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->lstReplayList->getListItem(sel), gDataManager->GetSysString(1363)).c_str());
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.unlock();
 				prev_operation = id;
@@ -411,7 +411,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.lock();
-				mainGame->wReplaySave->setText(mainGame->globalHandlers->dataManager->GetSysString(1362).c_str());
+				mainGame->wReplaySave->setText(gDataManager->GetSysString(1362).c_str());
 				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
 				mainGame->PopupElement(mainGame->wReplaySave);
 				mainGame->gMutex.unlock();
@@ -435,7 +435,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_BOT_ADD: {
 				try {
-					int port = std::stoi(mainGame->globalHandlers->configs->serverport);
+					int port = std::stoi(gGameConfig->serverport);
 					mainGame->gBot.LaunchSelected(port);
 				}
 				catch(...) {
@@ -461,7 +461,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				for(int i = 0; i < decks.size(); i++) {
 					deckManager.SaveDeck(sanitize(fmt::format(EPRO_TEXT("{} player{:02} {}"), replay_name, i, Utils::ToPathString(players[i]))), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
 				}
-				mainGame->stACMessage->setText(mainGame->globalHandlers->dataManager->GetSysString(1335).c_str());
+				mainGame->stACMessage->setText(gDataManager->GetSysString(1335).c_str());
 				mainGame->PopupElement(mainGame->wACMessage, 20);
 				break;
 			}
@@ -528,7 +528,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(Replay::RenameReplay(oldname, oldpath + Utils::ToPathString(mainGame->ebRSName->getText()))) {
 						mainGame->lstReplayList->refreshList();
 					} else {
-						mainGame->PopupMessage(mainGame->globalHandlers->dataManager->GetSysString(1365));
+						mainGame->PopupMessage(gDataManager->GetSysString(1365));
 					}
 				}
 				prev_operation = 0;
@@ -563,11 +563,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnDeleteReplay->setEnabled(false);
 				mainGame->btnRenameReplay->setEnabled(false);
 				mainGame->btnExportDeck->setEnabled(false);
-				mainGame->btnLoadReplay->setText(mainGame->globalHandlers->dataManager->GetSysString(1348).c_str());
+				mainGame->btnLoadReplay->setText(gDataManager->GetSysString(1348).c_str());
 				if(sel == -1)
 					break;
 				if(mainGame->lstReplayList->isDirectory(sel)) {
-					mainGame->btnLoadReplay->setText(mainGame->globalHandlers->dataManager->GetSysString(1359).c_str());
+					mainGame->btnLoadReplay->setText(gDataManager->GetSysString(1359).c_str());
 					mainGame->btnLoadReplay->setEnabled(true);
 					break;
 				}
@@ -601,11 +601,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnLoadSinglePlay->setEnabled(false);
 				int sel = mainGame->lstSinglePlayList->getSelected();
 				mainGame->stSinglePlayInfo->setText(L"");
-				mainGame->btnLoadSinglePlay->setText(mainGame->globalHandlers->dataManager->GetSysString(1357).c_str());
+				mainGame->btnLoadSinglePlay->setText(gDataManager->GetSysString(1357).c_str());
 				if(sel == -1)
 					break;
 				if(mainGame->lstSinglePlayList->isDirectory(sel)) {
-					mainGame->btnLoadSinglePlay->setText(mainGame->globalHandlers->dataManager->GetSysString(1359).c_str());
+					mainGame->btnLoadSinglePlay->setText(gDataManager->GetSysString(1359).c_str());
 					mainGame->btnLoadSinglePlay->setEnabled(true);
 					break;
 				}
@@ -625,8 +625,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				try {
 					auto parsed = DuelClient::ResolveServer(mainGame->ebJoinHost->getText(), mainGame->ebJoinPort->getText());
-					mainGame->globalHandlers->configs->lasthost = mainGame->ebJoinHost->getText();
-					mainGame->globalHandlers->configs->lastport = mainGame->ebJoinPort->getText();
+					gGameConfig->lasthost = mainGame->ebJoinHost->getText();
+					gGameConfig->lastport = mainGame->ebJoinPort->getText();
 					mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebJoinPass->getText());
 					if(DuelClient::StartClient(parsed.first, parsed.second, 0, false)) {
 						mainGame->btnCreateHost->setEnabled(false);
@@ -636,7 +636,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				catch(...) {
-					mainGame->PopupMessage(mainGame->globalHandlers->dataManager->GetSysString(1412));
+					mainGame->PopupMessage(gDataManager->GetSysString(1412));
 					break;
 				}
 			}
@@ -790,7 +790,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case TABLE_ROOMLIST: {
 				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->PopupMessage(mainGame->globalHandlers->dataManager->GetSysString(1257), mainGame->globalHandlers->dataManager->GetSysString(1256));
+					mainGame->PopupMessage(gDataManager->GetSysString(1257), gDataManager->GetSysString(1256));
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {

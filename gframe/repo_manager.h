@@ -15,26 +15,26 @@ extern "C" {
 
 namespace ygo {
 
+class GitRepo {
+public:
+	std::string url = "";
+	std::string repo_name = "";
+	std::string repo_path = "";
+	std::string data_path = "";
+	std::string script_path = "script";
+	std::string pics_path = "pics";
+	std::string core_path = "";
+	bool should_update = true;
+	bool has_core = false;
+	bool ready = false;
+	std::string error = "";
+	std::vector<std::string> commit_history_partial;
+	std::vector<std::string> commit_history_full;
+	bool Sanitize();
+};
+
 class RepoManager {
 public:
-
-	class GitRepo {
-	public:
-		std::string url = "";
-		std::string repo_name = "";
-		std::string repo_path = "";
-		std::string data_path = "";
-		std::string script_path = "script";
-		std::string pics_path = "pics";
-		std::string core_path = "";
-		bool should_update = true;
-		bool has_core = false;
-		bool ready = false;
-		std::string error = "";
-		std::vector<std::string> commit_history_partial;
-		std::vector<std::string> commit_history_full;
-		bool Sanitize();
-	};
 	struct RepoPayload {
 		RepoManager* repo_manager = nullptr;
 		git_repository* repo = nullptr;
@@ -81,7 +81,7 @@ private:
 	std::mutex repos_status_mutex;
 };
 
-//extern RepoManager repoManager;
+extern std::shared_ptr<RepoManager> gRepoManager;
 
 }
 

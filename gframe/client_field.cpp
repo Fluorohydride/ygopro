@@ -1,5 +1,4 @@
 #include <stack>
-#include <nlohmann/json.hpp>
 #include <irrlicht.h>
 #include "client_field.h"
 #include "client_card.h"
@@ -398,10 +397,10 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			if(conti_selecting)
 				text = DataManager::unknown_string;
 			else if(selectable_cards[i]->location == LOCATION_OVERLAY) {
-				text = fmt::format(L"{}[{}]({})", mainGame->globalHandlers->dataManager->FormatLocation(selectable_cards[i]->overlayTarget->location, selectable_cards[i]->overlayTarget->sequence),
+				text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(selectable_cards[i]->overlayTarget->location, selectable_cards[i]->overlayTarget->sequence),
 					selectable_cards[i]->overlayTarget->sequence + 1, selectable_cards[i]->sequence + 1);
 			} else if(selectable_cards[i]->location) {
-				text = fmt::format(L"{}[{}]", mainGame->globalHandlers->dataManager->FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+				text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
 					selectable_cards[i]->sequence + 1);
 			}
 			mainGame->stCardPos[i]->setText(text.c_str());
@@ -476,7 +475,7 @@ void ClientField::ShowChainCard() {
 		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
-		mainGame->stCardPos[i]->setText(fmt::format(L"{}[{}]", mainGame->globalHandlers->dataManager->FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+		mainGame->stCardPos[i]->setText(fmt::format(L"{}[{}]", gDataManager->FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
 			selectable_cards[i]->sequence + 1).c_str());
 		if(selectable_cards[i]->location == LOCATION_OVERLAY) {
 			if(selectable_cards[i]->owner != selectable_cards[i]->overlayTarget->controler)
@@ -533,10 +532,10 @@ void ClientField::ShowLocationCard() {
 		mainGame->btnCardDisplay[i]->setVisible(true);
 		std::wstring text;
 		if(display_cards[i]->location == LOCATION_OVERLAY) {
-			text = fmt::format(L"{}[{}]({})", mainGame->globalHandlers->dataManager->FormatLocation(display_cards[i]->overlayTarget->location, display_cards[i]->overlayTarget->sequence),
+			text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(display_cards[i]->overlayTarget->location, display_cards[i]->overlayTarget->sequence),
 				display_cards[i]->overlayTarget->sequence + 1, display_cards[i]->sequence + 1);
 		} else if(display_cards[i]->location) {
-			text = fmt::format(L"{}[{}]", mainGame->globalHandlers->dataManager->FormatLocation(display_cards[i]->location, display_cards[i]->sequence),
+			text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(display_cards[i]->location, display_cards[i]->sequence),
 				display_cards[i]->sequence + 1);
 		}
 		mainGame->stDisplayPos[i]->setText(text.c_str());
@@ -585,13 +584,13 @@ void ClientField::ShowSelectOption(uint64 select_hint) {
 	bool quickmode = true;// (count <= 5);
 	mainGame->gMutex.lock();
 	for(auto option : select_options) {
-		if(mainGame->guiFont->getDimension(mainGame->globalHandlers->dataManager->GetDesc(option, mainGame->dInfo.compat_mode)).Width > 310) {
+		if(mainGame->guiFont->getDimension(gDataManager->GetDesc(option, mainGame->dInfo.compat_mode)).Width > 310) {
 			quickmode = false;
 			break;
 		}
 	}
 	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
-		mainGame->btnOption[i]->setText(mainGame->globalHandlers->dataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).c_str());
+		mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).c_str());
 	recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(375);
@@ -613,7 +612,7 @@ void ClientField::ShowSelectOption(uint64 select_hint) {
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + newheight;
 		mainGame->wOptions->setRelativePosition(pos);
 	} else {
-		mainGame->stOptions->setText(mainGame->globalHandlers->dataManager->GetDesc(select_options[0], mainGame->dInfo.compat_mode).c_str());
+		mainGame->stOptions->setText(gDataManager->GetDesc(select_options[0], mainGame->dInfo.compat_mode).c_str());
 		mainGame->stOptions->setVisible(true);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(count > 1);
@@ -623,7 +622,7 @@ void ClientField::ShowSelectOption(uint64 select_hint) {
 		pos.LowerRightCorner.Y = pos.UpperLeftCorner.Y + mainGame->Scale(140);
 		mainGame->wOptions->setRelativePosition(pos);
 	}
-	mainGame->wOptions->setText(mainGame->globalHandlers->dataManager->GetDesc(select_hint ? select_hint : 555, mainGame->dInfo.compat_mode).c_str());
+	mainGame->wOptions->setText(gDataManager->GetDesc(select_hint ? select_hint : 555, mainGame->dInfo.compat_mode).c_str());
 	mainGame->PopupElement(mainGame->wOptions);
 	mainGame->gMutex.unlock();
 }
@@ -1378,11 +1377,11 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
 void ClientField::UpdateDeclarableList() {
 	const wchar_t* pname = mainGame->ebANCard->getText();
 	int trycode = BufferIO::GetVal(pname);
-	auto cd = mainGame->globalHandlers->dataManager->GetCardData(trycode);
+	auto cd = gDataManager->GetCardData(trycode);
 	if(cd && is_declarable(cd, declare_opcodes)) {
 		mainGame->lstANCard->clear();
 		ancard.clear();
-		mainGame->lstANCard->addItem(mainGame->globalHandlers->dataManager->GetName(trycode).c_str());
+		mainGame->lstANCard->addItem(gDataManager->GetName(trycode).c_str());
 		ancard.push_back(trycode);
 		return;
 	}
@@ -1393,10 +1392,10 @@ void ClientField::UpdateDeclarableList() {
 		int selcode = (sel == -1) ? 0 : cache[sel];
 		mainGame->lstANCard->clear();
 		for(const auto& trycode : cache) {
-			cd = mainGame->globalHandlers->dataManager->GetCardData(trycode);
+			cd = gDataManager->GetCardData(trycode);
 			if(cd && is_declarable(cd, declare_opcodes)) {
 				ancard.push_back(trycode);
-				auto name = mainGame->globalHandlers->dataManager->GetName(trycode);
+				auto name = gDataManager->GetName(trycode);
 				mainGame->lstANCard->addItem(name.c_str());
 				if(trycode == selcode)
 					mainGame->lstANCard->setSelected(name.c_str());
@@ -1407,7 +1406,7 @@ void ClientField::UpdateDeclarableList() {
 	}
 	mainGame->lstANCard->clear();
 	ancard.clear();
-	for(auto& card : mainGame->globalHandlers->dataManager->cards) {
+	for(auto& card : gDataManager->cards) {
 		auto& name = card.second.GetStrings()->name;
 		if(Utils::ContainsSubstring(name, pname, true, true)) {
 			//datas.alias can be double card names or alias

@@ -1,8 +1,10 @@
+#include "game_config.h"
 #include <IImage.h>
 #include <IVideoDriver.h>
 #include <IrrlichtDevice.h>
 #include <IReadFile.h>
 #include "image_manager.h"
+#include "image_downloader.h"
 #include "game.h"
 #include <fstream>
 #include <curl/curl.h>
@@ -71,12 +73,12 @@ bool ImageManager::Initial() {
 	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP")
 	GET_TEXTURE(tField[1][3], "fieldSP4")
 	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4")
-	sizes[0].first = CARD_IMG_WIDTH * mainGame->globalHandlers->configs->dpi_scale;
-	sizes[0].second = CARD_IMG_HEIGHT * mainGame->globalHandlers->configs->dpi_scale;
-	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * mainGame->globalHandlers->configs->dpi_scale;
-	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->globalHandlers->configs->dpi_scale;
-	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->globalHandlers->configs->dpi_scale;
-	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->globalHandlers->configs->dpi_scale;
+	sizes[0].first = CARD_IMG_WIDTH * gGameConfig->dpi_scale;
+	sizes[0].second = CARD_IMG_HEIGHT * gGameConfig->dpi_scale;
+	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
+	sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
+	sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
+	sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
 	return true;
 }
 
@@ -150,10 +152,10 @@ void ImageManager::ClearTexture(bool resize) {
 		map.clear();
 	};
 	if(resize) {
-		sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * mainGame->globalHandlers->configs->dpi_scale;
-		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * mainGame->globalHandlers->configs->dpi_scale;
-		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * mainGame->globalHandlers->configs->dpi_scale;
-		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * mainGame->globalHandlers->configs->dpi_scale;
+		sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
+		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
+		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
+		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
 		RefreshCovers();
 	}
 	if(!resize) {
@@ -448,8 +450,8 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 			}
 		}
 	}
-	if(mainGame->globalHandlers->imageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type)) == ImageDownloader::NONE) {
-		mainGame->globalHandlers->imageDownloader->AddToDownloadQueue(code, static_cast<ImageDownloader::imgType>(type));
+	if(gImageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type)) == ImageDownloader::NONE) {
+		gImageDownloader->AddToDownloadQueue(code, static_cast<ImageDownloader::imgType>(type));
 	}
 	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
 }
@@ -487,14 +489,14 @@ irr::video::ITexture* ImageManager::GetTextureCard(int code, imgType type, bool 
 		return ret_unk;
 	auto tit = map.find(code);
 	if(tit == map.end()) {
-		auto status = mainGame->globalHandlers->imageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type));
+		auto status = gImageDownloader->GetDownloadStatus(code, static_cast<ImageDownloader::imgType>(type));
 		if(status == ImageDownloader::DOWNLOADING) {
 			if(chk)
 				*chk = 2;
 			return ret_unk;
 		}
 		if(status == ImageDownloader::DOWNLOADED) {
-			map[code] = driver->getTexture(mainGame->globalHandlers->imageDownloader->GetDownloadPath(code, static_cast<ImageDownloader::imgType>(type)).c_str());
+			map[code] = driver->getTexture(gImageDownloader->GetDownloadPath(code, static_cast<ImageDownloader::imgType>(type)).c_str());
 			return map[code] ? map[code] : ret_unk;
 		}
 		if(status == ImageDownloader::DOWNLOAD_ERROR) {
@@ -533,12 +535,12 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		return nullptr;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
-		auto status = mainGame->globalHandlers->imageDownloader->GetDownloadStatus(code, ImageDownloader::FIELD);
+		auto status = gImageDownloader->GetDownloadStatus(code, ImageDownloader::FIELD);
 		bool should_download = status == ImageDownloader::NONE;
 		irr::video::ITexture* img = nullptr;
 		if(!should_download) {
 			if(status == ImageDownloader::DOWNLOADED) {
-				img = driver->getTexture(mainGame->globalHandlers->imageDownloader->GetDownloadPath(code, ImageDownloader::FIELD).c_str());
+				img = driver->getTexture(gImageDownloader->GetDownloadPath(code, ImageDownloader::FIELD).c_str());
 			} else
 				return nullptr;
 		} else {
@@ -561,7 +563,7 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 			}
 		}
 		if(should_download && !img)
-			mainGame->globalHandlers->imageDownloader->AddToDownloadQueue(code, ImageDownloader::FIELD);
+			gImageDownloader->AddToDownloadQueue(code, ImageDownloader::FIELD);
 		else
 			tFields[code] = img;
 		return img;

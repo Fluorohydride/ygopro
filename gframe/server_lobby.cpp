@@ -103,7 +103,7 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->addRow(index);
 		roomListTable->setCellData(index, 0, room.locked ? (void*)1 : nullptr);
 		roomListTable->setCellData(index, 1, (void*)&room);
-		roomListTable->setCellText(index, 1, mainGame->globalHandlers->dataManager->GetSysString(room.info.rule + 1900).c_str());
+		roomListTable->setCellText(index, 1, gDataManager->GetSysString(room.info.rule + 1900).c_str());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
 			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).c_str() : L"",
 			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());
@@ -122,7 +122,7 @@ void ServerLobby::FillOnlineRooms() {
 			players.resize(players.size() - 2);
 		roomListTable->setCellText(index, 5, players.c_str());
 		roomListTable->setCellText(index, 6, room.description.c_str());
-		roomListTable->setCellText(index, 7, room.started ? mainGame->globalHandlers->dataManager->GetSysString(1986).c_str() : mainGame->globalHandlers->dataManager->GetSysString(1987).c_str());
+		roomListTable->setCellText(index, 7, room.started ? gDataManager->GetSysString(1986).c_str() : gDataManager->GetSysString(1987).c_str());
 
 
 		if(room.started)
@@ -171,7 +171,7 @@ int ServerLobby::GetRoomsThread() {
 	curl_easy_cleanup(curl_handle);
 	if(res != CURLE_OK) {
 		//error
-		mainGame->PopupMessage(mainGame->globalHandlers->dataManager->GetSysString(2037), L"Error 05");
+		mainGame->PopupMessage(gDataManager->GetSysString(2037), L"Error 05");
 		GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
@@ -181,7 +181,7 @@ int ServerLobby::GetRoomsThread() {
 	}
 
 	if(retrieved_data == "[server busy]") {
-		mainGame->PopupMessage(mainGame->globalHandlers->dataManager->GetSysString(2031), L"Error 04");
+		mainGame->PopupMessage(gDataManager->GetSysString(2031), L"Error 04");
 	} else {
 		roomsVector.clear();
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
@@ -223,7 +223,7 @@ int ServerLobby::GetRoomsThread() {
 		}
 	}
 	if(roomsVector.empty()) {
-		mainGame->PopupMessage(mainGame->globalHandlers->dataManager->GetSysString(2033), mainGame->globalHandlers->dataManager->GetSysString(2032));
+		mainGame->PopupMessage(gDataManager->GetSysString(2033), gDataManager->GetSysString(2032));
 	} else {
 		FillOnlineRooms();
 		if(mainGame->chkShowActiveRooms->isChecked()) {

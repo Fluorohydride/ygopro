@@ -7,19 +7,15 @@
 #include <unordered_map>
 #include <vector>
 #include <list>
-#include "game_config.h"
 #include "config.h"
 #include <SColor.h>
 #include <rect.h>
 #include <EGUIElementTypes.h>
-#include "data_handler.h"
 #include "image_manager.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
 #include "discord_wrapper.h"
-#include "repo_manager.h"
-#include "sound_manager.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
 #include "settings_window.h"
@@ -62,7 +58,7 @@ namespace irr {
 }
 namespace ygo {
 
-class SoundManager;
+class GitRepo;
 
 struct DuelInfo {
 	bool isInDuel;
@@ -116,13 +112,11 @@ class Game {
 
 public:
 	//Game(std::shared_ptr<DataHandler> handlers):globalHandlers(handlers) {};
-	bool Initialize(std::shared_ptr<DataHandler> handlers);
+	bool Initialize();
 	bool MainLoop();
 	path_string NoSkinLabel();
 	bool ApplySkin(const path_string& skin, bool reload = false, bool firstrun = false);
 	void LoadZipArchives();
-	void LoadExpansionDB();
-	void LoadArchivesDB();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshLFLists();
 	void RefreshAiDecks();
@@ -161,9 +155,9 @@ public:
 		std::wstring commit_history_full;
 		std::wstring commit_history_partial;
 	};
-	RepoGui* AddGithubRepositoryStatusWindow(const RepoManager::GitRepo* repo);
+	RepoGui* AddGithubRepositoryStatusWindow(const GitRepo* repo);
 	void LoadGithubRepositories();
-	void UpdateRepoInfo(const RepoManager::GitRepo* repo, RepoGui* grepo);
+	void UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo);
 	void LoadServers();
 	void ShowCardInfo(int code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
 	void RefreshCardInfoTextPositions();
@@ -219,8 +213,6 @@ public:
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
 
-	std::shared_ptr<DataHandler> globalHandlers;
-	//SoundManager* soundManager;
 	std::mutex gMutex;
 	std::mutex analyzeMutex;
 	Signal frameSignal;
@@ -228,8 +220,6 @@ public:
 	Signal replaySignal;
 	std::mutex closeSignal;
 	Signal closeDoneSignal;
-	//GameConfig* gameConf;
-	//RepoManager* repoManager;
 	DuelInfo dInfo;
 	DiscordWrapper discord;
 	ImageManager imageManager;
@@ -279,6 +269,7 @@ public:
 	uint32 duel_param;
 	uint32 showingcard;
 	bool cardimagetextureloading;
+	float dpi_scale;
 
 
 	irr::core::dimension2d<irr::u32> window_size;
@@ -654,11 +645,11 @@ public:
 	std::vector<std::pair<irr::gui::IGUIElement*, int32>> defaultStrings;
 };
 
-extern Game* mainGame;
+extern std::shared_ptr<Game> mainGame;
 
 template<typename T>
 inline irr::core::vector2d<T> Game::Scale(irr::core::vector2d<T> vec) {
-	return irr::core::vector2d<T>(vec.X * globalHandlers->configs->dpi_scale, vec.Y * globalHandlers->configs->dpi_scale );
+	return irr::core::vector2d<T>(vec.X * dpi_scale, vec.Y * dpi_scale );
 }
 template<typename T>
 inline T Game::ResizeX(T x) {
@@ -670,15 +661,15 @@ inline T Game::ResizeY(T y) {
 }
 template<typename T, typename T2>
 inline irr::core::vector2d<T> Game::Scale(T x, T2 y) {
-	return irr::core::vector2d<T>((T)(x * globalHandlers->configs->dpi_scale), (T)(y * globalHandlers->configs->dpi_scale));
+	return irr::core::vector2d<T>((T)(x * dpi_scale), (T)(y * dpi_scale));
 }
 template<typename T>
 inline T Game::Scale(T val) {
-	return T(val * globalHandlers->configs->dpi_scale);
+	return T(val * dpi_scale);
 }
 template<typename T, typename T2, typename T3, typename T4>
 irr::core::rect<T> Game::Scale(T x, T2 y, T3 x2, T4 y2) {
-	auto& scale = globalHandlers->configs->dpi_scale;
+	auto& scale = dpi_scale;
 	return { (T)std::roundf(x * scale),(T)std::roundf(y * scale), (T)std::roundf(x2 * scale), (T)std::roundf(y2 * scale) };
 }
 template<typename T>
