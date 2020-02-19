@@ -126,9 +126,9 @@ int main(int argc, char* argv[]) {
 		// Host address
 		else RUN_IF("-h", SET_TXT(ebJoinHost))
 		// Host Port
-		else RUN_IF("-h", SET_TXT(ebJoinPort))
+		else RUN_IF("-p", SET_TXT(ebJoinPort))
 		// Host password
-		else RUN_IF("-h", SET_TXT(ebJoinPass))
+		else RUN_IF("-w", SET_TXT(ebJoinPass))
 #undef RUN_IF
 #undef SET_TXT
 		else PARAM_CHECK("-k") { // Keep on return
