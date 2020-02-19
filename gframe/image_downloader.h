@@ -2,6 +2,7 @@
 #define IMAGE_DOWNLOADER_H
 #include <memory>
 #include <mutex>
+#include <condition_variable>
 #include <vector>
 #include <thread>
 #include <atomic>
