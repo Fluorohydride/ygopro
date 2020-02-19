@@ -143,7 +143,6 @@ public:
 	void WaitFrameSignal(int frame);
 	void DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, bool drag = false, irr::core::recti* cliprect = nullptr, bool loadimage = true);
 	void DrawDeckBd();
-	void LoadConfig();
 	void SaveConfig();
 	void LoadPicUrls();
 	struct RepoGui {

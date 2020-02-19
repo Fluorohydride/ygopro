@@ -145,7 +145,7 @@ bool Game::Initialize() {
 	LoadPicUrls();
 	RefreshAiDecks();
 	discord.Initialize(filesystem->getWorkingDirectory().c_str());
-	mainGame->discord.UpdatePresence(DiscordWrapper::INITIALIZE);
+	discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
 	deckManager.LoadLFList();
 	env = device->getGUIEnvironment();
@@ -1719,26 +1719,7 @@ void Game::LoadZipArchives() {
 			Utils::archives.emplace_back(tmp_archive);
 		}
 	}
-}/*
-void Game::LoadExpansionDB() {
-	for (auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("cdb") }, 2))
-		gDataManager->LoadDB(EPRO_TEXT("./expansions/") + file);
 }
-void Game::LoadArchivesDB() {
-	for(auto& archive: Utils::archives) {
-		auto files = Utils::FindFiles(archive, EPRO_TEXT(""), { EPRO_TEXT("cdb") }, 3);
-		for(auto& index : files) {
-			auto reader = archive->createAndOpenFile(index);
-			if(reader == nullptr)
-				continue;
-			std::vector<char> buffer;
-			buffer.resize(reader->getSize());
-			reader->read(buffer.data(), buffer.size());
-			reader->drop();
-			gDataManager->LoadDBFromBuffer(buffer);
-		}
-	}
-}*/
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
@@ -1810,18 +1791,6 @@ void Game::RefreshReplay() {
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
-}
-void Game::LoadConfig() {
-	/*gGameConfig->Load("./config/system.conf");
-	if(configs.empty()) {
-		std::ifstream conf_file(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
-		try {
-			conf_file >> configs;
-		}
-		catch(std::exception& e) {
-			ErrorLog(std::string("Exception occurred: ") + e.what());
-		}
-	}*/
 }
 void Game::SaveConfig() {
 	gGameConfig->nickname = ebNickName->getText();
