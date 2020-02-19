@@ -4,7 +4,10 @@
 #include <irrlicht.h>
 #include "logging.h"
 #include "utils.h"
-#ifdef __ANDROID__
+#ifndef __ANDROID__
+#include "IrrlichtCommonIncludes/CFileSystem.h"
+#else
+#include "IrrlichtCommonIncludes1.9/CFileSystem.h"
 #include "porting_android.h"
 #endif
 
@@ -72,8 +75,7 @@ void DataHandler::LoadZipArchives() {
 	}
 }
 DataHandler::DataHandler() {
-	tmp_device = irr::createDevice(irr::video::EDT_NULL);
-	filesystem = tmp_device->getFileSystem();
+	filesystem = new irr::io::CFileSystem();
 	LoadZipArchives();
 	gitManager = std::make_shared<RepoManager>();
 	configs = std::make_shared<GameConfig>();
@@ -92,8 +94,8 @@ DataHandler::DataHandler() {
 	}
 }
 DataHandler::~DataHandler() {
-	if(tmp_device)
-		tmp_device->drop();
+	if(filesystem)
+		filesystem->drop();
 }
 
 }

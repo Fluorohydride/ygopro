@@ -17,7 +17,6 @@ class IFileSystem;
 namespace ygo {
 
 class DataHandler {
-	irr::IrrlichtDevice* tmp_device = nullptr;
 	irr::io::IFileSystem* filesystem = nullptr;
 	void LoadDatabases();
 	void LoadZipArchives();
