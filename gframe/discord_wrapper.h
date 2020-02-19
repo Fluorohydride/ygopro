@@ -23,10 +23,10 @@ public:
 		DECK_SIDING,
 		CLEAR,
 		INITIALIZE,
+		DISCONNECT,
 		TERMINATE
 	};
 	DiscordWrapper();
-	~DiscordWrapper();
 	bool Initialize(path_string workingDir);
 	void UpdatePresence(PresenceType type);
 	bool connected;

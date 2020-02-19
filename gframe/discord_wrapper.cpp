@@ -22,21 +22,6 @@
 DiscordWrapper::DiscordWrapper(): connected(false){
 }
 
-DiscordWrapper::~DiscordWrapper() {
-#ifdef DISCORD_APP_ID
-	DiscordEventHandlers handlers = {};
-	handlers.ready = nullptr;
-	handlers.disconnected = nullptr;
-	handlers.errored = nullptr;
-	handlers.joinGame = nullptr;
-	handlers.spectateGame = nullptr;
-	handlers.joinRequest = nullptr;
-	handlers.payload = nullptr;
-	Discord_UpdateHandlers(&handlers);
-	Disconnect();
-#endif
-}
-
 bool DiscordWrapper::Initialize(path_string workingDir) {
 #ifdef DISCORD_APP_ID
 #if defined(_WIN32) || defined(__linux__)
@@ -75,7 +60,18 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 		running = true;
 		return;
 	}
-	if(type == TERMINATE && running) {
+	if((type == TERMINATE || type == DISCONNECT) && running) {
+		if(type == TERMINATE) {
+			DiscordEventHandlers handlers = {};
+			handlers.ready = nullptr;
+			handlers.disconnected = nullptr;
+			handlers.errored = nullptr;
+			handlers.joinGame = nullptr;
+			handlers.spectateGame = nullptr;
+			handlers.joinRequest = nullptr;
+			handlers.payload = nullptr;
+			Discord_UpdateHandlers(&handlers);
+		}
 		Disconnect();
 		running = false;
 		return;

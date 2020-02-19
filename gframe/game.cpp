@@ -1587,6 +1587,7 @@ bool Game::MainLoop() {
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
+	discord.UpdatePresence(DiscordWrapper::TERMINATE);
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();
 	DuelClient::StopClient(true);
