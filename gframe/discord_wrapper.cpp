@@ -24,6 +24,15 @@ DiscordWrapper::DiscordWrapper(): connected(false){
 
 DiscordWrapper::~DiscordWrapper() {
 #ifdef DISCORD_APP_ID
+	DiscordEventHandlers handlers = {};
+	handlers.ready = nullptr;
+	handlers.disconnected = nullptr;
+	handlers.errored = nullptr;
+	handlers.joinGame = nullptr;
+	handlers.spectateGame = nullptr;
+	handlers.joinRequest = nullptr;
+	handlers.payload = nullptr;
+	Discord_UpdateHandlers(&handlers);
 	Disconnect();
 #endif
 }
@@ -194,7 +203,7 @@ void DiscordWrapper::OnReady(const DiscordUser* connectedUser, void* payload) {
 	static_cast<ygo::Game*>(payload)->discord.connected = true;
 }
 
-void DiscordWrapper::OnDisconnected(int errcode, const char * message, void* payload) {
+void DiscordWrapper::OnDisconnected(int errcode, const char* message, void* payload) {
 	printf("Discord: Disconnected, error code: %d - %s\n",
 		   errcode,
 		   message);
