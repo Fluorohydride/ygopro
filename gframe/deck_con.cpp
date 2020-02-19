@@ -1008,21 +1008,21 @@ bool DeckBuilder::CheckCard(CardDataM* data, const wchar_t& checkchar, std::vect
 			} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
 				return false;
 		}
-		if(filter_lm == LIMITATION_FILTER_OCG && data->_data.ot != 0x1)
+		if(filter_lm == LIMITATION_FILTER_OCG && data->_data.ot != SCOPE_OCG)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG && data->_data.ot != 0x2)
+		if(filter_lm == LIMITATION_FILTER_TCG && data->_data.ot != SCOPE_TCG)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->_data.ot != 0x3)
+		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->_data.ot != SCOPE_OCG_TCG)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->_data.ot & 0x100))
+		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->_data.ot & SCOPE_PRERELEASE))
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ANIME && data->_data.ot != 0x4)
+		if(filter_lm == LIMITATION_FILTER_ANIME && data->_data.ot != SCOPE_ANIME)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->_data.ot != 0x8)
+		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->_data.ot != SCOPE_ILLEGAL)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->_data.ot != 0x10)
+		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->_data.ot != SCOPE_VIDEO_GAME)
 			return false;
-		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->_data.ot != 0x20)
+		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->_data.ot != SCOPE_CUSTOM)
 			return false;
 	}
 	if(tokens.size()) {
