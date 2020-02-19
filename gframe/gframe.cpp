@@ -72,8 +72,8 @@ void CheckArguments(int argc, path_char* argv[]) {
 #undef RUN_IF
 #undef SET_TXT
 		else PARAM_CHECK("-k") { // Keep on return
-		exit_on_return = false;
-		keep_on_return = true;
+			exit_on_return = false;
+			keep_on_return = true;
 		} else PARAM_CHECK("-m") { // Mute
 			SetCheckbox(ygo::mainGame->tabSettings.chkEnableSound, false);
 			SetCheckbox(ygo::mainGame->tabSettings.chkEnableMusic, false);

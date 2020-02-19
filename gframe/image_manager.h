@@ -133,8 +133,6 @@ private:
 	std::map<irr::io::path, irr::video::IImage*> g_imgCache;
 };
 
-//extern ImageManager imageManager;
-
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
 #define CARD_THUMB_WIDTH	44

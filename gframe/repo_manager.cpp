@@ -8,7 +8,6 @@
 
 namespace ygo {
 
-//RepoManager repoManager;
 /**
 *The "fetchead_foreach_cb" and "jsgitpull" functions were taken from Peter Johan Salomonsen's code:
 https://github.com/fintechneo/libgit2/blob/master/emscripten_hacks/jslib.c#L577
@@ -412,7 +411,6 @@ bool RepoManager::AddRepo(GitRepo repo) {
 	if(CloneorUpdate(repo)) {
 		all_repos.push_front(repo);
 		available_repos.push_back(&all_repos.front());
-		//all_repos.push_back(repo);
 		return true;
 	}
 	return false;

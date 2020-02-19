@@ -2165,6 +2165,7 @@ void Game::CloseDuelWindow() {
 	stInfo->setText(L"");
 	stDataInfo->setText(L"");
 	stSetName->setText(L"");
+	stPasscodeScope->setText(L"");
 	stText->setText(L"");
 	stTip->setText(L"");
 	cardimagetextureloading = false;
@@ -2353,6 +2354,7 @@ void Game::ReloadElementsStrings() {
 	for(int i = 1370; i <= 1373; i++)
 		cbSortType->addItem(gDataManager->GetSysString(i).c_str());
 	cbSortType->setSelected(prev);
+
 	prev = cbCardType->getSelected();
 	cbCardType->clear();
 	cbCardType->addItem(gDataManager->GetSysString(1310).c_str());
@@ -2363,47 +2365,47 @@ void Game::ReloadElementsStrings() {
 
 	prev = cbCardType2->getSelected();
 	cbCardType2->clear();
-	switch(cbCardType->getSelected()) {
-		case 0:
-			cbCardType2->addItem(gDataManager->GetSysString(1310).c_str(), 0);
-			break;
-		case 1:
-			cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
-			cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_MONSTER + TYPE_NORMAL);
-			cbCardType2->addItem(gDataManager->GetSysString(1055).c_str(), TYPE_MONSTER + TYPE_EFFECT);
-			cbCardType2->addItem(gDataManager->GetSysString(1056).c_str(), TYPE_MONSTER + TYPE_FUSION);
-			cbCardType2->addItem(gDataManager->GetSysString(1057).c_str(), TYPE_MONSTER + TYPE_RITUAL);
-			cbCardType2->addItem(gDataManager->GetSysString(1063).c_str(), TYPE_MONSTER + TYPE_SYNCHRO);
-			cbCardType2->addItem(gDataManager->GetSysString(1073).c_str(), TYPE_MONSTER + TYPE_XYZ);
-			cbCardType2->addItem(gDataManager->GetSysString(1074).c_str(), TYPE_MONSTER + TYPE_PENDULUM);
-			cbCardType2->addItem(gDataManager->GetSysString(1076).c_str(), TYPE_MONSTER + TYPE_LINK);
-			cbCardType2->addItem(gDataManager->GetSysString(1075).c_str(), TYPE_MONSTER + TYPE_SPSUMMON);
-			cbCardType2->addItem((gDataManager->GetSysString(1054) + L"|" + gDataManager->GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
-			cbCardType2->addItem((gDataManager->GetSysString(1054) + L"|" + gDataManager->GetSysString(1074)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
-			cbCardType2->addItem((gDataManager->GetSysString(1063) + L"|" + gDataManager->GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
-			cbCardType2->addItem(gDataManager->GetSysString(1062).c_str(), TYPE_MONSTER + TYPE_TUNER);
-			cbCardType2->addItem(gDataManager->GetSysString(1061).c_str(), TYPE_MONSTER + TYPE_GEMINI);
-			cbCardType2->addItem(gDataManager->GetSysString(1060).c_str(), TYPE_MONSTER + TYPE_UNION);
-			cbCardType2->addItem(gDataManager->GetSysString(1059).c_str(), TYPE_MONSTER + TYPE_SPIRIT);
-			cbCardType2->addItem(gDataManager->GetSysString(1071).c_str(), TYPE_MONSTER + TYPE_FLIP);
-			cbCardType2->addItem(gDataManager->GetSysString(1072).c_str(), TYPE_MONSTER + TYPE_TOON);
-			break;
-		case 2:
-			cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
-			cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_SPELL);
-			cbCardType2->addItem(gDataManager->GetSysString(1066).c_str(), TYPE_SPELL + TYPE_QUICKPLAY);
-			cbCardType2->addItem(gDataManager->GetSysString(1067).c_str(), TYPE_SPELL + TYPE_CONTINUOUS);
-			cbCardType2->addItem(gDataManager->GetSysString(1057).c_str(), TYPE_SPELL + TYPE_RITUAL);
-			cbCardType2->addItem(gDataManager->GetSysString(1068).c_str(), TYPE_SPELL + TYPE_EQUIP);
-			cbCardType2->addItem(gDataManager->GetSysString(1069).c_str(), TYPE_SPELL + TYPE_FIELD);
-			cbCardType2->addItem(gDataManager->GetSysString(1076).c_str(), TYPE_SPELL + TYPE_LINK);
-			break;
-		case 3:
-			cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
-			cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_TRAP);
-			cbCardType2->addItem(gDataManager->GetSysString(1067).c_str(), TYPE_TRAP + TYPE_CONTINUOUS);
-			cbCardType2->addItem(gDataManager->GetSysString(1070).c_str(), TYPE_TRAP + TYPE_COUNTER);
-			break;
+	switch (cbCardType->getSelected()) {
+	case 0:
+		cbCardType2->addItem(gDataManager->GetSysString(1310).c_str(), 0);
+		break;
+	case 1:
+		cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
+		cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_MONSTER + TYPE_NORMAL);
+		cbCardType2->addItem(gDataManager->GetSysString(1055).c_str(), TYPE_MONSTER + TYPE_EFFECT);
+		cbCardType2->addItem(gDataManager->GetSysString(1056).c_str(), TYPE_MONSTER + TYPE_FUSION);
+		cbCardType2->addItem(gDataManager->GetSysString(1057).c_str(), TYPE_MONSTER + TYPE_RITUAL);
+		cbCardType2->addItem(gDataManager->GetSysString(1063).c_str(), TYPE_MONSTER + TYPE_SYNCHRO);
+		cbCardType2->addItem(gDataManager->GetSysString(1073).c_str(), TYPE_MONSTER + TYPE_XYZ);
+		cbCardType2->addItem(gDataManager->GetSysString(1074).c_str(), TYPE_MONSTER + TYPE_PENDULUM);
+		cbCardType2->addItem(gDataManager->GetSysString(1076).c_str(), TYPE_MONSTER + TYPE_LINK);
+		cbCardType2->addItem(gDataManager->GetSysString(1075).c_str(), TYPE_MONSTER + TYPE_SPSUMMON);
+		cbCardType2->addItem((gDataManager->GetSysString(1054) + L"|" + gDataManager->GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
+		cbCardType2->addItem((gDataManager->GetSysString(1054) + L"|" + gDataManager->GetSysString(1074)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
+		cbCardType2->addItem((gDataManager->GetSysString(1063) + L"|" + gDataManager->GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
+		cbCardType2->addItem(gDataManager->GetSysString(1062).c_str(), TYPE_MONSTER + TYPE_TUNER);
+		cbCardType2->addItem(gDataManager->GetSysString(1061).c_str(), TYPE_MONSTER + TYPE_GEMINI);
+		cbCardType2->addItem(gDataManager->GetSysString(1060).c_str(), TYPE_MONSTER + TYPE_UNION);
+		cbCardType2->addItem(gDataManager->GetSysString(1059).c_str(), TYPE_MONSTER + TYPE_SPIRIT);
+		cbCardType2->addItem(gDataManager->GetSysString(1071).c_str(), TYPE_MONSTER + TYPE_FLIP);
+		cbCardType2->addItem(gDataManager->GetSysString(1072).c_str(), TYPE_MONSTER + TYPE_TOON);
+		break;
+	case 2:
+		cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
+		cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_SPELL);
+		cbCardType2->addItem(gDataManager->GetSysString(1066).c_str(), TYPE_SPELL + TYPE_QUICKPLAY);
+		cbCardType2->addItem(gDataManager->GetSysString(1067).c_str(), TYPE_SPELL + TYPE_CONTINUOUS);
+		cbCardType2->addItem(gDataManager->GetSysString(1057).c_str(), TYPE_SPELL + TYPE_RITUAL);
+		cbCardType2->addItem(gDataManager->GetSysString(1068).c_str(), TYPE_SPELL + TYPE_EQUIP);
+		cbCardType2->addItem(gDataManager->GetSysString(1069).c_str(), TYPE_SPELL + TYPE_FIELD);
+		cbCardType2->addItem(gDataManager->GetSysString(1076).c_str(), TYPE_SPELL + TYPE_LINK);
+		break;
+	case 3:
+		cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
+		cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_TRAP);
+		cbCardType2->addItem(gDataManager->GetSysString(1067).c_str(), TYPE_TRAP + TYPE_CONTINUOUS);
+		cbCardType2->addItem(gDataManager->GetSysString(1070).c_str(), TYPE_TRAP + TYPE_COUNTER);
+		break;
 	}
 	cbCardType2->setSelected(prev);
 
@@ -2418,7 +2420,7 @@ void Game::ReloadElementsStrings() {
 	cbLimit->addItem(gDataManager->GetSysString(1901).c_str());
 	cbLimit->addItem(gDataManager->GetSysString(1902).c_str());
 	cbLimit->addItem(gDataManager->GetSysString(1903).c_str());
-	if(chkAnime->isChecked()) {
+	if (chkAnime->isChecked()) {
 		cbLimit->addItem(gDataManager->GetSysString(1265).c_str());
 		cbLimit->addItem(gDataManager->GetSysString(1266).c_str());
 		cbLimit->addItem(gDataManager->GetSysString(1267).c_str());

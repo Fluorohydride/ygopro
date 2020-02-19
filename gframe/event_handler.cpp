@@ -1769,8 +1769,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 #endif
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
-		if(mainGame->gSettings.window->isVisible() && (event.GUIEvent.Caller != mainGame->gSettings.window && !mainGame->gSettings.window->isMyChild(event.GUIEvent.Caller)))
-			return true;
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_ELEMENT_HOVERED: {

@@ -6,7 +6,6 @@
 #include <IGUICheckBox.h>
 #include "data_manager.h"
 
-
 namespace ygo {
 
 void WindBotPanel::Refresh(int filterMasterRule) {

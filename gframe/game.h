@@ -111,7 +111,6 @@ struct FadingUnit {
 class Game {
 
 public:
-	//Game(std::shared_ptr<DataHandler> handlers):globalHandlers(handlers) {};
 	bool Initialize();
 	bool MainLoop();
 	path_string NoSkinLabel();
