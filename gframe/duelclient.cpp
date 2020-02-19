@@ -1635,11 +1635,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		std::wstring text;
 		
 		if(desc == 0) {
-			text = fmt::sprintf(L"%ls\n%ls", event_string,
-				fmt::sprintf(dataManager.GetSysString(200), dataManager.FormatLocation(info.location, info.sequence), dataManager.GetName(code)));
+			text = fmt::sprintf(L"{}\n{}", event_string,
+				fmt::sprintf(dataManager.GetSysString(200), dataManager.GetName(code), dataManager.FormatLocation(info.location, info.sequence)));
 		} else if(desc == 221) {
 			text = fmt::format(L"{}\n{}\n{}", event_string,
-				fmt::sprintf(dataManager.GetSysString(221), dataManager.FormatLocation(info.location, info.sequence), dataManager.GetName(code)),
+				fmt::sprintf(dataManager.GetSysString(221), dataManager.GetName(code), dataManager.FormatLocation(info.location, info.sequence)),
 				dataManager.GetSysString(223));
 		} else {
 			text = fmt::sprintf(dataManager.GetDesc(desc, mainGame->dInfo.compat_mode), dataManager.GetName(code));
