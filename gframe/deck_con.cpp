@@ -426,7 +426,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case COMBOBOX_MAINTYPE: {
-				mainGame->cbCardType2->setSelected(0);
+				mainGame->ReloadCBCardType2();
 				mainGame->cbAttribute->setSelected(0);
 				mainGame->cbRace->setSelected(0);
 				mainGame->ebAttack->setText(L"");
@@ -435,8 +435,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->ebScale->setText(L"");
 				switch(mainGame->cbCardType->getSelected()) {
 				case 0: {
-					mainGame->cbCardType2->setEnabled(false);
-					mainGame->cbCardType2->setSelected(0);
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
@@ -446,67 +444,30 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case 1: {
-					mainGame->cbCardType2->setEnabled(true);
 					mainGame->cbRace->setEnabled(true);
 					mainGame->cbAttribute->setEnabled(true);
 					mainGame->ebAttack->setEnabled(true);
 					mainGame->ebDefense->setEnabled(true);
 					mainGame->ebStar->setEnabled(true);
 					mainGame->ebScale->setEnabled(true);
-					mainGame->cbCardType2->clear();
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1080).c_str(), 0);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1054).c_str(), TYPE_MONSTER + TYPE_NORMAL);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1055).c_str(), TYPE_MONSTER + TYPE_EFFECT);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1056).c_str(), TYPE_MONSTER + TYPE_FUSION);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1057).c_str(), TYPE_MONSTER + TYPE_RITUAL);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1063).c_str(), TYPE_MONSTER + TYPE_SYNCHRO);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1073).c_str(), TYPE_MONSTER + TYPE_XYZ);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1074).c_str(), TYPE_MONSTER + TYPE_PENDULUM);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1076).c_str(), TYPE_MONSTER + TYPE_LINK);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1075).c_str(), TYPE_MONSTER + TYPE_SPSUMMON);
-					mainGame->cbCardType2->addItem((dataManager.GetSysString(1054) + L"|" + dataManager.GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
-					mainGame->cbCardType2->addItem((dataManager.GetSysString(1054) + L"|" + dataManager.GetSysString(1074)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
-					mainGame->cbCardType2->addItem((dataManager.GetSysString(1063) + L"|" + dataManager.GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1062).c_str(), TYPE_MONSTER + TYPE_TUNER);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1061).c_str(), TYPE_MONSTER + TYPE_GEMINI);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1060).c_str(), TYPE_MONSTER + TYPE_UNION);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1059).c_str(), TYPE_MONSTER + TYPE_SPIRIT);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1071).c_str(), TYPE_MONSTER + TYPE_FLIP);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1072).c_str(), TYPE_MONSTER + TYPE_TOON);
 					break;
 				}
 				case 2: {
-					mainGame->cbCardType2->setEnabled(true);
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
 					mainGame->ebDefense->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
 					mainGame->ebScale->setEnabled(false);
-					mainGame->cbCardType2->clear();
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1080).c_str(), 0);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1054).c_str(), TYPE_SPELL);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1066).c_str(), TYPE_SPELL + TYPE_QUICKPLAY);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1067).c_str(), TYPE_SPELL + TYPE_CONTINUOUS);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1057).c_str(), TYPE_SPELL + TYPE_RITUAL);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1068).c_str(), TYPE_SPELL + TYPE_EQUIP);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1069).c_str(), TYPE_SPELL + TYPE_FIELD);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1076).c_str(), TYPE_SPELL + TYPE_LINK);
 					break;
 				}
 				case 3: {
-					mainGame->cbCardType2->setEnabled(true);
 					mainGame->cbRace->setEnabled(false);
 					mainGame->cbAttribute->setEnabled(false);
 					mainGame->ebAttack->setEnabled(false);
 					mainGame->ebDefense->setEnabled(false);
 					mainGame->ebStar->setEnabled(false);
 					mainGame->ebScale->setEnabled(false);
-					mainGame->cbCardType2->clear();
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1080).c_str(), 0);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1054).c_str(), TYPE_TRAP);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1067).c_str(), TYPE_TRAP + TYPE_CONTINUOUS);
-					mainGame->cbCardType2->addItem(dataManager.GetSysString(1070).c_str(), TYPE_TRAP + TYPE_COUNTER);
 					break;
 				}
 				}
@@ -547,22 +508,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			switch (id) {
 				case CHECKBOX_SHOW_ANIME: {
 					int prevLimit = mainGame->cbLimit->getSelected();
-					mainGame->cbLimit->clear();
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1310).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1316).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1317).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1318).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1320).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1900).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1901).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1902).c_str());
-					mainGame->cbLimit->addItem(dataManager.GetSysString(1903).c_str());
-					if(mainGame->chkAnime->isChecked()) {
-						mainGame->cbLimit->addItem(dataManager.GetSysString(1265).c_str());
-						mainGame->cbLimit->addItem(dataManager.GetSysString(1266).c_str());
-						mainGame->cbLimit->addItem(dataManager.GetSysString(1267).c_str());
-						mainGame->cbLimit->addItem(dataManager.GetSysString(1268).c_str());
-					}
+					mainGame->ReloadCBLimit();
 					if (prevLimit < 8)
 						mainGame->cbLimit->setSelected(prevLimit);
 					StartFilter(true);

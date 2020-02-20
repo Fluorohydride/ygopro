@@ -178,6 +178,17 @@ public:
 #endif
 	std::wstring GetLocalizedExpectedCore();
 	std::wstring GetLocalizedCompatVersion();
+	void ReloadCBSortType();
+	void ReloadCBCardType();
+	void ReloadCBCardType2();
+	void ReloadCBLimit();
+	void ReloadCBAttribute();
+	void ReloadCBRace();
+	void ReloadCBFilterRule();
+	void ReloadCBFilterBanlist();
+	void ReloadCBDuelRule();
+	void ReloadCBRule();
+	void ReloadCBCurrentSkin();
 	void ReloadElementsStrings();
 
 	void OnResize();
