@@ -2045,6 +2045,31 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			return true;
 		}
+		case irr::KEY_KEY_1: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(0);
+			break;
+		}
+		case irr::KEY_KEY_2: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(1);
+			break;
+		}
+		case irr::KEY_KEY_3: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(2);
+			break;
+		}
+		case irr::KEY_KEY_4: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(3);
+			break;
+		}
+		case irr::KEY_KEY_5: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(4);
+			break;
+		}
 		default: break;
 		}
 		break;
