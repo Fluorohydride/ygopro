@@ -12,6 +12,9 @@ local ygopro_config=function(static_core)
 	if _OPTIONS["fields"] then
 		defines { "DEFAULT_FIELD_URL=" .. _OPTIONS["fields"] }
 	end
+	if _OPTIONS["covers"] then
+		defines { "DEFAULT_COVER_URL=" .. _OPTIONS["covers"] }
+	end
 	if _OPTIONS["discord"] then
 		defines { "DISCORD_APP_ID=" .. _OPTIONS["discord"] }
 	end
