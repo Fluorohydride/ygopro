@@ -619,14 +619,14 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnTabShowSettings, 2059);
 	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
 
-	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, dataManager.GetSysString(1273).c_str());
+	gSettings.window = env->addWindow(Scale(200, 100, 820, 520), false, dataManager.GetSysString(1273).c_str());
 	defaultStrings.emplace_back(gSettings.window, 1273);
 	gSettings.window->getCloseButton()->setVisible(false);
 	gSettings.window->setVisible(false);
-	gSettings.btnClose = env->addButton(Scale(555, 5, 575, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
-	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
+	gSettings.btnClose = env->addButton(Scale(595, 5, 615, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
+	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 300, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
-	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_FULLSCREEN, dataManager.GetSysString(2060).c_str());
+	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 300, 90), gSettings.window, CHECKBOX_FULLSCREEN, dataManager.GetSysString(2060).c_str());
 	defaultStrings.emplace_back(gSettings.chkFullscreen, 2060);
 #ifdef __ANDROID__
 	gSettings.chkFullscreen->setChecked(true);
@@ -634,32 +634,32 @@ bool Game::Initialize() {
 #elif defined(__APPLE__)
 	gSettings.chkFullscreen->setEnabled(false);
 #endif
-	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, dataManager.GetSysString(2061).c_str());
+	gSettings.chkScaleBackground = env->addCheckBox(gameConf.scale_background, Scale(20, 95, 300, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, dataManager.GetSysString(2061).c_str());
 	defaultStrings.emplace_back(gSettings.chkScaleBackground, 2061);
-	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gameConf.accurate_bg_resize, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, dataManager.GetSysString(2062).c_str());
+	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gameConf.accurate_bg_resize, Scale(20, 125, 300, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, dataManager.GetSysString(2062).c_str());
 	defaultStrings.emplace_back(gSettings.chkAccurateBackgroundResize, 2062);
 #ifdef __ANDROID__
 	gSettings.chkAccurateBackgroundResize->setChecked(true);
 	gSettings.chkAccurateBackgroundResize->setEnabled(false);
 #endif
-	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 155, 280, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
+	gSettings.chkHideSetname = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 155, 300, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, dataManager.GetSysString(1354).c_str());
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
-	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, dataManager.GetSysString(2063).c_str());
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 300, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, dataManager.GetSysString(2063).c_str());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.chkDrawFieldSpells = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 215, 280, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, dataManager.GetSysString(2068).c_str());
+	gSettings.chkDrawFieldSpells = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 215, 300, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, dataManager.GetSysString(2068).c_str());
 	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
-	gSettings.chkFilterBot = env->addCheckBox(gameConf.filterBot, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_FILTER_BOT, dataManager.GetSysString(2069).c_str());
+	gSettings.chkFilterBot = env->addCheckBox(gameConf.filterBot, Scale(20, 245, 300, 270), gSettings.window, CHECKBOX_FILTER_BOT, dataManager.GetSysString(2069).c_str());
 	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
-	gSettings.stCurrentSkin = env->addStaticText(dataManager.GetSysString(2064).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
+	gSettings.stCurrentSkin = env->addStaticText(dataManager.GetSysString(2064).c_str(), Scale(20, 275, 90, 300), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
-	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	gSettings.cbCurrentSkin = env->addComboBox(Scale(95, 275, 300, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
 	ReloadCBCurrentSkin();
-	gSettings.btnReloadSkin = env->addButton(Scale(20, 305, 280, 330), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 305, 300, 330), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
 	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
 	gSettings.stCurrentLocale = env->addStaticText(dataManager.GetSysString(2067).c_str(), Scale(20, 335, 80, 360), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
-	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 335, 280, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
+	gSettings.cbCurrentLocale = env->addComboBox(Scale(95, 335, 300, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
 	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"English");
 	for(auto& locale : locales) {
 		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
