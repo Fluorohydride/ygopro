@@ -1905,9 +1905,15 @@ void Game::LoadPicUrls() {
 #else
 						continue;
 #endif
-					} else {
+					} else if(obj["type"].get<std::string>() == "field") {
 #ifdef DEFAULT_FIELD_URL
 						imageManager.AddDownloadResource({ DEFAULT_FIELD_URL, ImageManager::FIELD });
+#else
+						continue;
+#endif
+					} else if(obj["type"].get<std::string>() == "cover") {
+#ifdef DEFAULT_COVER_URL
+						imageManager.AddDownloadResource({ DEFAULT_COVER_URL, ImageManager::COVER });
 #else
 						continue;
 #endif
