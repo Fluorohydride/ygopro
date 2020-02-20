@@ -173,6 +173,11 @@ public:
 
 	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const;
 
+#ifdef YGOPRO_BUILD_DLL
+	void RefreshUICoreVersion();
+#endif
+	std::wstring GetLocalizedExpectedCore();
+	std::wstring GetLocalizedCompatVersion();
 	void ReloadElementsStrings();
 
 	void OnResize();
@@ -350,6 +355,13 @@ public:
 	irr::gui::IGUIContextMenu* mAbout;
 	irr::gui::IGUIWindow* wAbout;
 	irr::gui::IGUIStaticText* stAbout;
+	irr::gui::IGUIContextMenu* mVersion;
+	irr::gui::IGUIWindow* wVersion;
+	irr::gui::IGUIStaticText* stVersion;
+	irr::gui::IGUIStaticText* stCoreVersion;
+	irr::gui::IGUIStaticText* stExpectedCoreVersion;
+	irr::gui::IGUIStaticText* stCompatVersion;
+	irr::gui::IGUIContextMenu* mBeta;
 	irr::gui::IGUIButton* btnOnlineMode;
 	irr::gui::IGUIButton* btnLanMode;
 	irr::gui::IGUIButton* btnSingleMode;

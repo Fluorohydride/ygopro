@@ -50,7 +50,11 @@
 #define MATERIAL_GUARD(f) do {f;} while(false);
 #endif
 
-unsigned short PRO_VERSION = 0x1348;
+unsigned short PRO_VERSION = 0x1350;
+#define EDOPRO_VERSION_MAJOR 37
+#define EDOPRO_VERSION_MINOR 0
+#define EDOPRO_VERSION_PATCH 0
+#define EDOPRO_VERSION_CODENAME L"Spider Shark"
 
 nlohmann::json configs;
 
@@ -226,8 +230,30 @@ bool Game::Initialize() {
 								 Scale(10, 10, 440, 690), false, true, wAbout);
 	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
+	mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(dataManager.GetSysString(2040).c_str(), 3, true, true));
+	wVersion = env->addWindow(Scale(0, 0, 300, 135), false, L"", mVersion);
+	wVersion->getCloseButton()->setVisible(false);
+	wVersion->setDraggable(false);
+	wVersion->setDrawTitlebar(false);
+	wVersion->setDrawBackground(false);
+	auto formatVersion = []() {
+		return fmt::format(L"EDOPro by Project Ignis | {}.{}.{} \"{}\"", EDOPRO_VERSION_MAJOR, EDOPRO_VERSION_MINOR, EDOPRO_VERSION_PATCH, EDOPRO_VERSION_CODENAME);
+	};
+	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, true, wVersion);
+#ifdef YGOPRO_BUILD_DLL
+	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 290, 65), false, true, wVersion);
+	RefreshUICoreVersion();
+#endif
+	stExpectedCoreVersion = env->addStaticText(
+		GetLocalizedExpectedCore().c_str(),
+		Scale(10, 70, 290, 95), false, true, wVersion);
+	stCompatVersion = env->addStaticText(
+		GetLocalizedCompatVersion().c_str(),
+		Scale(10, 100, 290, 125), false, true, wVersion);
+	((CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
+	mBeta = mTopMenu->getSubMenu(mTopMenu->addItem(L"CLOSED BETA ONLY", 4));
 	//main menu
-	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro by Project Ignis | v{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
+	wMainMenu = env->addWindow(Scale(370, 200, 650, 450), false, formatVersion().c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
 #define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, 270, 60 + offset)
@@ -1465,6 +1491,7 @@ void Game::MainLoop() {
 						btnCreateHost->setEnabled(true);
 						btnHandTest->setEnabled(true);
 						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
+						RefreshUICoreVersion();
 					}
 					break;
 				}
@@ -2415,6 +2442,23 @@ bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 	irr::gui::IGUIElement* focus = env->getFocus();
 	return focus && focus->hasType(type);
 }
+#ifdef YGOPRO_BUILD_DLL
+void Game::RefreshUICoreVersion() {
+	if (coreloaded) {
+		int major, minor;
+		OCG_GetVersion(&major, &minor);
+		stCoreVersion->setText(fmt::format(dataManager.GetSysString(2010), major, minor).c_str());
+	} else {
+		stCoreVersion->setText(L"");
+	}
+}
+#endif
+std::wstring Game::GetLocalizedExpectedCore() {
+	return fmt::format(dataManager.GetSysString(2011), OCG_VERSION_MAJOR, OCG_VERSION_MINOR);
+}
+std::wstring Game::GetLocalizedCompatVersion() {
+	return fmt::format(dataManager.GetSysString(2012), PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
+}
 void Game::ReloadElementsStrings() {
 	ShowCardInfo(showingcard, true);
 
@@ -2581,6 +2625,10 @@ void Game::ReloadElementsStrings() {
 
 	mTopMenu->setItemText(0, dataManager.GetSysString(2045).c_str()); //mRepositoriesInfo
 	mTopMenu->setItemText(1, dataManager.GetSysString(1970).c_str()); //mAbout
+	mTopMenu->setItemText(2, dataManager.GetSysString(2040).c_str()); //mVersion
+	RefreshUICoreVersion();
+	stExpectedCoreVersion->setText(GetLocalizedExpectedCore().c_str());
+	stCompatVersion->setText(GetLocalizedCompatVersion().c_str());
 
 #define TYPECHK(id,stringid) chkTypeLimit[id]->setText(fmt::sprintf(dataManager.GetSysString(1627), dataManager.GetSysString(stringid)).c_str());
 	TYPECHK(0, 1056);
