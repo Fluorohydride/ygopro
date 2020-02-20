@@ -621,9 +621,7 @@ bool Game::Initialize() {
 
 	gSettings.window = env->addWindow(Scale(200, 100, 820, 520), false, dataManager.GetSysString(1273).c_str());
 	defaultStrings.emplace_back(gSettings.window, 1273);
-	gSettings.window->getCloseButton()->setVisible(false);
 	gSettings.window->setVisible(false);
-	gSettings.btnClose = env->addButton(Scale(595, 5, 615, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
 	gSettings.chkShowFPS = env->addCheckBox(gameConf.showFPS, Scale(20, 35, 300, 60), gSettings.window, CHECKBOX_SHOW_FPS, dataManager.GetSysString(1445).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
 	gSettings.chkFullscreen = env->addCheckBox(gameConf.fullscreen, Scale(20, 65, 300, 90), gSettings.window, CHECKBOX_FULLSCREEN, dataManager.GetSysString(2060).c_str());

@@ -35,7 +35,6 @@ struct SettingsPane {
 
 struct SettingsWindow {
 	irr::gui::IGUIWindow* window;
-	irr::gui::IGUIButton* btnClose;
 	irr::gui::IGUICheckBox* chkShowFPS;
 	irr::gui::IGUICheckBox* chkFullscreen;
 	irr::gui::IGUICheckBox* chkScaleBackground;
