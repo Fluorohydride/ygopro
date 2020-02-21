@@ -1,6 +1,6 @@
 EDOPro by Project Ignis. The bleeding-edge automatic duel simulator.
 --------------------------------------------------------------------
-Copyright (C) 2019  Edoardo Lolletti (edo9300)
+Copyright (C) 2020  Edoardo Lolletti (edo9300)
 See version history for a full list of authors.
 
 Independently-written client modules and the script engine are licensed under the AGPLv3.
@@ -21,6 +21,10 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program (COPYING).  If not, see <https://www.gnu.org/licenses/>.
+
+
+Icon (C) 2020  LogicalNonsense.
+All Rights Reserved. May only be used with an official build.
 
 
 Modified from Fluorohydride's YGOPro <https://github.com/Fluorohydride/ygopro>
