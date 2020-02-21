@@ -301,7 +301,7 @@ void Replay::ParseStream() {
 		if(p.message == OLD_REPLAY_MODE && !yrp) {
 			yrp = std::unique_ptr<Replay>(new Replay());
 			yrp->OpenReplayFromBuffer(p.data);
-			continue;
+			break;
 		}
 		packets_stream.push_back(p);
 	}
