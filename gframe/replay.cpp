@@ -280,8 +280,7 @@ bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	if(!can_read || len == -1)
 		return false;
 	packet->data.resize(len);
-	ReadData((char*)packet->data.data(), packet->data.size());
-	return true;
+	return ReadData((char*)packet->data.data(), packet->data.size());
 }
 void Replay::ParseStream() {
 	packets_stream.clear();
@@ -298,10 +297,12 @@ void Replay::ParseStream() {
 			players[1] = BufferIO::DecodeUTF8s(namebuf);
 			continue;
 		}
-		if(p.message == OLD_REPLAY_MODE && !yrp) {
-			yrp = std::unique_ptr<Replay>(new Replay());
-			yrp->OpenReplayFromBuffer(p.data);
-			break;
+		if(p.message == OLD_REPLAY_MODE) {
+			if(!yrp) {
+				yrp = std::unique_ptr<Replay>(new Replay());
+				yrp->OpenReplayFromBuffer(p.data);
+			}
+			continue;
 		}
 		packets_stream.push_back(p);
 	}
