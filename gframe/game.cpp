@@ -1597,7 +1597,7 @@ bool Game::MainLoop() {
 		UnloadCore(ocgcore);
 #endif //YGOPRO_BUILD_DLL
 	//device->drop();
-	return false;
+	return restart;
 }
 path_string Game::NoSkinLabel() {
 	return Utils::ToPathString(gDataManager->GetSysString(2065));
