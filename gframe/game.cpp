@@ -1417,7 +1417,7 @@ void Game::MainLoop() {
 					cores_to_load.insert(cores_to_load.begin(), Utils::ToPathString(repo.core_path));
 				}
 				std::string text;
-				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { text += n + "\n\n"; });
+				std::for_each(repo.commit_history_full.begin(), repo.commit_history_full.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 				if(text.size())
 					text.erase(text.size() - 2, 2);
 				grepo.commit_history_full = BufferIO::DecodeUTF8s(text);
@@ -1427,7 +1427,7 @@ void Game::MainLoop() {
 						grepo.commit_history_partial = grepo.commit_history_full;
 					} else {
 						text.clear();
-						std::for_each(repo.commit_history_partial.begin(), repo.commit_history_partial.end(), [&text](const std::string& n) { text += n + "\n\n"; });
+						std::for_each(repo.commit_history_partial.begin(), repo.commit_history_partial.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 						if(text.size())
 							text.erase(text.size() - 2, 2);
 						grepo.commit_history_partial = BufferIO::DecodeUTF8s(text);
