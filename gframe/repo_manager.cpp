@@ -23,7 +23,9 @@ int fetchead_foreach_cb(const char* ref_name, const char* remote_url, const git_
 	payload_struct* _payload = static_cast<payload_struct*>(payload);
 	git_repository* repo = _payload->repo;
 	_payload->curr++;
-	int fetch_percent = (((100 * _payload->curr) / _payload->total) / 2) + 50;
+	int fetch_percent = 100;
+	if(_payload->total)
+		fetch_percent = (((100 * _payload->curr) / _payload->total) / 2) + 50;
 	_payload->repo_manager->UpdateStatus(_payload->path, fetch_percent);
 	if(is_merge) {
 		git_annotated_commit* fetchhead_annotated_commit;
@@ -127,7 +129,9 @@ int RepoManager::jsgitpull(git_repository* repo, std::string repo_path, git_oid*
 		return res;
 	}
 	fetch_opts.callbacks.transfer_progress = [](const git_transfer_progress* stats, void* payload)->int {
-		int fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 2;
+		int fetch_percent = 50;
+		if(stats->total_objects)
+			fetch_percent = ((100 * stats->received_objects) / stats->total_objects) / 2;
 		RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 		repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
 		return 0;
@@ -273,7 +277,9 @@ std::pair<std::vector<std::string>, std::vector<std::string>> RepoManager::Clone
 		Utils::DeleteDirectory(Utils::ToPathString(_repo.repo_path + "/"));
 		git_clone_options opts = GIT_CLONE_OPTIONS_INIT;
 		opts.checkout_opts.progress_cb = [](const char* path, size_t cur, size_t tot, void* payload) {
-			int fetch_percent = (((100 * cur) / tot) / 2) + 50;
+			int fetch_percent = 100;
+			if(tot)
+				fetch_percent = (((100 * cur) / tot) / 2) + 50;
 			RepoPayload* repo_status = static_cast<RepoPayload*>(payload);
 			repo_status->repo_manager->UpdateStatus(repo_status->path, fetch_percent);
 		};

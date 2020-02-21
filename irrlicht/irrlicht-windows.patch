@@ -40,6 +40,18 @@ diff -ur --strip-trailing-cr irrlicht/include/irrTypes.h irrlicht-fixed/include/
  
  
  //! 32 bit unsigned variable.
+diff -ur --strip-trailing-cr irrlicht/src/CFileSystem.cpp irrlicht-fixed/src/CFileSystem.cpp
+--- irrlicht/src/CFileSystem.cpp	2016-05-26 06:09:34.000000000 -0400
++++ irrlicht-fixed/src/CFileSystem.cpp	2020-02-20 20:32:26.866999100 -0500
+@@ -840,7 +840,7 @@
+ 		#ifdef _IRR_WINDOWS_API_
+ 		#if !defined ( _WIN32_WCE )
+ 
+-		r = new CFileList(Path, true, false);
++		r = new CFileList(Path, false, false);
+ 
+ 		// TODO: Should be unified once mingw adapts the proper types
+ #if defined(__GNUC__)
 diff -ur --strip-trailing-cr irrlicht/src/CGUIEditBox.cpp irrlicht-fixed/src/CGUIEditBox.cpp
 --- irrlicht/src/CGUIEditBox.cpp	2014-09-17 20:23:10.000000000 +0800
 +++ irrlicht-fixed/src/CGUIEditBox.cpp	2017-09-09 18:50:04.709120800 +0800

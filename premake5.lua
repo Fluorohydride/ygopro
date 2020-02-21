@@ -22,6 +22,11 @@ newoption {
 	description = "Default URL for Field Spell backgrounds"
 }
 newoption {
+	trigger = "covers",
+	value = "url_template",
+	description = "Default URL for cover images"
+}
+newoption {
 	trigger = "prebuilt-core",
 	value = "path",
 	description = "Path to library folder containing libocgcore"

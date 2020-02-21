@@ -35,8 +35,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		return true;
 	}
 #endif
-	if(OnCommonEvent(event))
-		return false;
+	bool returntrue = false;
+	if(OnCommonEvent(event, &returntrue))
+		return returntrue;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		int id = event.GUIEvent.Caller->getID();
@@ -1743,7 +1744,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	}
 	return false;
 }
-bool ClientField::OnCommonEvent(const irr::SEvent& event) {
+bool ClientField::OnCommonEvent(const irr::SEvent& event, bool* returntrue) {
 #ifdef __ANDROID__
 	if(event.EventType == EET_MOUSE_INPUT_EVENT &&
 	   event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN) {
@@ -1783,6 +1784,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			// Set cursor to normal if left an edit box
 			if (event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX) {
 				GUIUtils::ChangeCursor(mainGame->device, ECI_NORMAL);
+				return true;
+			}
+			break;
+		}
+		case irr::gui::EGET_ELEMENT_CLOSED: {
+			if(event.GUIEvent.Caller == mainGame->gSettings.window) {
+				if(returntrue)
+					*returntrue = true;
+				mainGame->HideElement(mainGame->gSettings.window);
 				return true;
 			}
 			break;
@@ -1836,11 +1846,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			case BUTTON_SHOW_SETTINGS: {
 				if (!mainGame->gSettings.window->isVisible())
 					mainGame->ShowElement(mainGame->gSettings.window);
-				break;
-			}
-			case BUTTON_HIDE_SETTINGS: {
-				if (mainGame->gSettings.window->isVisible())
-					mainGame->HideElement(mainGame->gSettings.window);
 				break;
 			}
 			}
@@ -2045,6 +2050,31 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->gSettings.chkFullscreen->setChecked(gGameConfig->fullscreen);
 			}
 			return true;
+		}
+		case irr::KEY_KEY_1: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(0);
+			break;
+		}
+		case irr::KEY_KEY_2: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(1);
+			break;
+		}
+		case irr::KEY_KEY_3: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(2);
+			break;
+		}
+		case irr::KEY_KEY_4: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(3);
+			break;
+		}
+		case irr::KEY_KEY_5: {
+			if (event.KeyInput.Control && !event.KeyInput.PressedDown)
+				mainGame->wInfos->setActiveTab(4);
+			break;
 		}
 		default: break;
 		}

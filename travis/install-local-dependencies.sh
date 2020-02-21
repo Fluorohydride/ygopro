@@ -3,21 +3,24 @@
 set -euxo pipefail
 
 TRAVIS_OS_NAME=${TRAVIS_OS_NAME:-$1}
+USE_IRRKLANG=${2:-""}
 
-curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name http://www.ambiera.at/downloads/irrKlang-64bit-1.6.0.zip
-echo Extracting irrKlang64...
-if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
-    unzip -uo irrKlang-64bit-1.6.0.zip > /dev/null
-else
-    7z x irrKlang-64bit-1.6.0.zip
-fi
-rm -rf irrKlang
-mv irrKlang-64bit-1.6.0 irrKlang
-rm irrKlang-64bit-1.6.0.zip
+if [[ ! -z $USE_IRRKLANG ]]; then
+    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name http://www.ambiera.at/downloads/irrKlang-64bit-1.6.0.zip
+    echo Extracting irrKlang64...
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+        unzip -uo irrKlang-64bit-1.6.0.zip > /dev/null
+    else
+        7z x irrKlang-64bit-1.6.0.zip
+    fi
+    rm -rf irrKlang
+    mv irrKlang-64bit-1.6.0 irrKlang
+    rm irrKlang-64bit-1.6.0.zip
 
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then  
-    # For convenience with dylibbundler
-    cp -f irrKlang/bin/macosx-gcc/libirrklang.dylib /usr/local/lib
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then  
+        # For convenience with dylibbundler
+        cp -f irrKlang/bin/macosx-gcc/libirrklang.dylib /usr/local/lib
+    fi
 fi
 
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
@@ -31,17 +34,19 @@ if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     rm -rf freetype-2.6.5
     rm freetype-2.6.5.tar.bz2
 
-    # We wrap irrKlang32's extract because its zip has a hidden macOS directory that we don't want
-    curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
-    echo Extracting irrKlang32...
-    unzip -uo irrKlang-32bit-1.6.0.zip -d irrKlang-tmp > /dev/null
-    # Merge 32-bit binaries into folder
-    mv irrKlang-tmp/irrKlang-1.6.0/bin/win32-gcc irrKlang/bin/win32-gcc
-    mv irrKlang-tmp/irrKlang-1.6.0/bin/win32-visualStudio irrKlang/bin/win32-visualStudio
-    mv irrKlang-tmp/irrKlang-1.6.0/lib/Win32-gcc irrKlang/lib/Win32-gcc
-    mv irrKlang-tmp/irrKlang-1.6.0/lib/Win32-visualStudio irrKlang/lib/Win32-visualStudio
-    rm -rf irrKlang-tmp
-    rm irrKlang-32bit-1.6.0.zip
+    if [[ ! -z $USE_IRRKLANG ]]; then
+        # We wrap irrKlang32's extract because its zip has a hidden macOS directory that we don't want
+        curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://www.ambiera.at/downloads/irrKlang-32bit-1.6.0.zip
+        echo Extracting irrKlang32...
+        unzip -uo irrKlang-32bit-1.6.0.zip -d irrKlang-tmp > /dev/null
+        # Merge 32-bit binaries into folder
+        mv irrKlang-tmp/irrKlang-1.6.0/bin/win32-gcc irrKlang/bin/win32-gcc
+        mv irrKlang-tmp/irrKlang-1.6.0/bin/win32-visualStudio irrKlang/bin/win32-visualStudio
+        mv irrKlang-tmp/irrKlang-1.6.0/lib/Win32-gcc irrKlang/lib/Win32-gcc
+        mv irrKlang-tmp/irrKlang-1.6.0/lib/Win32-visualStudio irrKlang/lib/Win32-visualStudio
+        rm -rf irrKlang-tmp
+        rm irrKlang-32bit-1.6.0.zip
+    fi
 
     curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://downloads.sourceforge.net/irrlicht/irrlicht-1.8.4.zip
     echo Extracting irrlicht... this may take some time.

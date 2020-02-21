@@ -53,7 +53,11 @@
 #define MATERIAL_GUARD(f) do {f;} while(false);
 #endif
 
-unsigned short PRO_VERSION = 0x1348;
+unsigned short PRO_VERSION = 0x1350;
+#define EDOPRO_VERSION_MAJOR 37
+#define EDOPRO_VERSION_MINOR 0
+#define EDOPRO_VERSION_PATCH 0
+#define EDOPRO_VERSION_CODENAME L"Spider Shark"
 
 namespace ygo {
 
@@ -197,22 +201,50 @@ bool Game::Initialize() {
 	stAbout = env->addStaticText(L"EDOPro by Project Ignis\n"
 								 L"The bleeding-edge automatic duel simulator\n"
 								 L"\n"
-								 L"Copyright (C) 2019  Edoardo Lolletti (edo9300) and others\n"
-								 L"Card scripts by Project Ignis\n"
+								 L"Copyright (C) 2020  Edoardo Lolletti (edo9300) and others\n"
+								 L"Card scripts and other assets by Project Ignis.\n"
 								 L"Licensed under the GNU AGPLv3 or later. See LICENSE for more details.\n"
 								 L"https://github.com/edo9300/ygopro\n"
 								 L"https://github.com/edo9300/ygopro-core\n"
-								 L"More links and contributors to be added\n"
+								 L"Assets may be distributed under their own licenses.\n"
 								 L"\n"
-								 L"Forked from Fluorohydride's YGOPro.\n"
+								 L"Project Ignis:\n"
+								 L"ahtelel, AlphaKretin, AndreOliveiraMendes, Cybercatman, Dragon3989, DyXel, edo9300, "
+								 L"EerieCode, Gideon, Hatter, Hel, kevinlul, Larry126, LogicalNonsense, NaimSantos, "
+								 L"pyrQ, Sanct, senpaizuri, Tungnon, WolfOfWolves, Yamato\n"
+								 L"Default background: LogicalNonsense\n"
+								 L"Default fields: Icematoro\n"
 								 L"\n"
+								 L"Forked from Fluorohydride's YGOPro, maintainers DailyShana, mercury233.\n"
 								 L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
 								 L"This project is not affiliated with or endorsed by Shueisha or Konami.",
 								 Scale(10, 10, 440, 690), false, true, wAbout);
 	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
+	mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2040).c_str(), 3, true, true));
+	wVersion = env->addWindow(Scale(0, 0, 300, 135), false, L"", mVersion);
+	wVersion->getCloseButton()->setVisible(false);
+	wVersion->setDraggable(false);
+	wVersion->setDrawTitlebar(false);
+	wVersion->setDrawBackground(false);
+	auto formatVersion = []() {
+		return fmt::format(L"EDOPro by Project Ignis | {}.{}.{} \"{}\"", EDOPRO_VERSION_MAJOR, EDOPRO_VERSION_MINOR, EDOPRO_VERSION_PATCH, EDOPRO_VERSION_CODENAME);
+	};
+	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, true, wVersion);
+#ifdef YGOPRO_BUILD_DLL
+	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 290, 65), false, true, wVersion);
+	RefreshUICoreVersion();
+#endif
+	stExpectedCoreVersion = env->addStaticText(
+		GetLocalizedExpectedCore().c_str(),
+		Scale(10, 70, 290, 95), false, true, wVersion);
+	stCompatVersion = env->addStaticText(
+		GetLocalizedCompatVersion().c_str(),
+		Scale(10, 100, 290, 125), false, true, wVersion);
+	((CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
+	mBeta = mTopMenu->getSubMenu(mTopMenu->addItem(L"CLOSED BETA ONLY", 4));
 	//main menu
-	wMainMenu = env->addWindow(Scale(370, 200, 650, 415), false, fmt::format(L"EDOPro by Project Ignis | v{:X}.0{:X}.{:X}", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf).c_str());
+	wMainMenu = env->addWindow(Scale(370, 200, 650, 450), false, formatVersion().c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
 #define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, 270, 60 + offset)
@@ -283,8 +315,7 @@ bool Game::Initialize() {
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1225);
 	cbRule = env->addComboBox(Scale(140, 55, 300, 80), wCreateHost);
-	for (auto i = 1900; i <= 1904; ++i)
-		cbRule->addItem(gDataManager->GetSysString(i).c_str());
+	ReloadCBRule();
 	cbRule->setSelected(gGameConfig->lastallowedcards);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1227);
@@ -326,11 +357,7 @@ bool Game::Initialize() {
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).c_str(), Scale(20, 180, 220, 200), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1236);
 	cbDuelRule = env->addComboBox(Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
-	cbDuelRule->addItem(gDataManager->GetSysString(1260).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1261).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1262).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1263).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1264).c_str());
+	ReloadCBDuelRule();
 	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
 	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, gDataManager->GetSysString(1626).c_str());
 	defaultStrings.emplace_back(btnCustomRule, 1626);
@@ -577,14 +604,12 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnTabShowSettings, 2059);
 	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
 
-	gSettings.window = env->addWindow(Scale(220, 100, 800, 520), false, gDataManager->GetSysString(1273).c_str());
+	gSettings.window = env->addWindow(Scale(200, 100, 820, 520), false, gDataManager->GetSysString(1273).c_str());
 	defaultStrings.emplace_back(gSettings.window, 1273);
-	gSettings.window->getCloseButton()->setVisible(false);
 	gSettings.window->setVisible(false);
-	gSettings.btnClose = env->addButton(Scale(555, 5, 575, 25), gSettings.window, BUTTON_HIDE_SETTINGS, L"X");
-	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(20, 35, 280, 60), gSettings.window, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).c_str());
+	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(20, 35, 300, 60), gSettings.window, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
-	gSettings.chkFullscreen = env->addCheckBox(gGameConfig->fullscreen, Scale(20, 65, 280, 90), gSettings.window, CHECKBOX_FULLSCREEN, gDataManager->GetSysString(2060).c_str());
+	gSettings.chkFullscreen = env->addCheckBox(gGameConfig->fullscreen, Scale(20, 65, 300, 90), gSettings.window, CHECKBOX_FULLSCREEN, gDataManager->GetSysString(2060).c_str());
 	defaultStrings.emplace_back(gSettings.chkFullscreen, 2060);
 #ifdef __ANDROID__
 	gSettings.chkFullscreen->setChecked(true);
@@ -592,40 +617,32 @@ bool Game::Initialize() {
 #elif defined(__APPLE__)
 	gSettings.chkFullscreen->setEnabled(false);
 #endif
-	gSettings.chkScaleBackground = env->addCheckBox(gGameConfig->scale_background, Scale(20, 95, 280, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, gDataManager->GetSysString(2061).c_str());
+	gSettings.chkScaleBackground = env->addCheckBox(gGameConfig->scale_background, Scale(20, 95, 300, 120), gSettings.window, CHECKBOX_SCALE_BACKGROUND, gDataManager->GetSysString(2061).c_str());
 	defaultStrings.emplace_back(gSettings.chkScaleBackground, 2061);
-	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gGameConfig->accurate_bg_resize, Scale(20, 125, 280, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, gDataManager->GetSysString(2062).c_str());
+	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gGameConfig->accurate_bg_resize, Scale(20, 125, 300, 150), gSettings.window, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, gDataManager->GetSysString(2062).c_str());
 	defaultStrings.emplace_back(gSettings.chkAccurateBackgroundResize, 2062);
 #ifdef __ANDROID__
 	gSettings.chkAccurateBackgroundResize->setChecked(true);
 	gSettings.chkAccurateBackgroundResize->setEnabled(false);
 #endif
-	gSettings.chkHideSetname = env->addCheckBox(gGameConfig->chkHideSetname, Scale(20, 155, 280, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, gDataManager->GetSysString(1354).c_str());
+	gSettings.chkHideSetname = env->addCheckBox(gGameConfig->chkHideSetname, Scale(20, 155, 300, 180), gSettings.window, CHECKBOX_HIDE_ARCHETYPES, gDataManager->GetSysString(1354).c_str());
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
-	gSettings.chkHidePasscodeScope = env->addCheckBox(gGameConfig->hidePasscodeScope, Scale(20, 185, 280, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, gDataManager->GetSysString(2063).c_str());
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gGameConfig->hidePasscodeScope, Scale(20, 185, 300, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, gDataManager->GetSysString(2063).c_str());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.chkDrawFieldSpells = env->addCheckBox(gGameConfig->chkHideSetname, Scale(20, 215, 280, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS,gDataManager->GetSysString(2068).c_str());
+	gSettings.chkDrawFieldSpells = env->addCheckBox(gGameConfig->chkHideSetname, Scale(20, 215, 300, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, gDataManager->GetSysString(2068).c_str());
 	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
-	gSettings.chkFilterBot = env->addCheckBox(gGameConfig->filterBot, Scale(20, 245, 280, 270), gSettings.window, CHECKBOX_FILTER_BOT,gDataManager->GetSysString(2069).c_str());
+	gSettings.chkFilterBot = env->addCheckBox(gGameConfig->filterBot, Scale(20, 245, 300, 270), gSettings.window, CHECKBOX_FILTER_BOT, gDataManager->GetSysString(2069).c_str());
 	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
-	gSettings.stCurrentSkin = env->addStaticText(gDataManager->GetSysString(2064).c_str(), Scale(20, 275, 80, 300), false, true, gSettings.window);
+	gSettings.stCurrentSkin = env->addStaticText(gDataManager->GetSysString(2064).c_str(), Scale(20, 275, 90, 300), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
-	gSettings.cbCurrentSkin = env->addComboBox(Scale(85, 275, 280, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
-	int selectedSkin = gSettings.cbCurrentSkin->addItem(gDataManager->GetSysString(2065).c_str()); // NoSkinLabel "none"
-	auto skins = skinSystem->listSkins();
-	for (int i = skins.size() - 1; i >= 0; i--) {
-		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
-		if (gGameConfig->skin == skins[i].c_str()) {
-			selectedSkin = itemIndex;
-		}
-	}
-	gSettings.cbCurrentSkin->setSelected(selectedSkin);
-	gSettings.btnReloadSkin = env->addButton(Scale(20, 305, 280, 330), gSettings.window, BUTTON_RELOAD_SKIN, gDataManager->GetSysString(2066).c_str());
+	gSettings.cbCurrentSkin = env->addComboBox(Scale(95, 275, 300, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	ReloadCBCurrentSkin();
+	gSettings.btnReloadSkin = env->addButton(Scale(20, 305, 300, 330), gSettings.window, BUTTON_RELOAD_SKIN, gDataManager->GetSysString(2066).c_str());
 	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
 	gSettings.stCurrentLocale = env->addStaticText(gDataManager->GetSysString(2067).c_str(), Scale(20, 335, 80, 360), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
-	gSettings.cbCurrentLocale = env->addComboBox(Scale(85, 335, 280, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
+	gSettings.cbCurrentLocale = env->addComboBox(Scale(95, 335, 300, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
 	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"English");
 	for(auto& locale : locales) {
 		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
@@ -879,8 +896,7 @@ bool Game::Initialize() {
 	wSort = env->addStaticText(L"", Scale(930, 132, 1020, 156), true, false, 0, -1, true);
 	cbSortType = env->addComboBox(Scale(10, 2, 85, 22), wSort, COMBOBOX_SORTTYPE);
 	cbSortType->setMaxSelectionRows(10);
-	for(int i = 1370; i <= 1373; i++)
-		cbSortType->addItem(gDataManager->GetSysString(i).c_str());
+	ReloadCBSortType();
 	wSort->setVisible(false);
 	//filters
 	wFilter = env->addStaticText(L"", Scale(610, 5, 1020, 130), true, false, 0, -1, true);
@@ -888,10 +904,7 @@ bool Game::Initialize() {
 	stCategory = env->addStaticText(gDataManager->GetSysString(1311).c_str(), Scale(10, 5, 70, 25), false, false, wFilter);
 	defaultStrings.emplace_back(stCategory, 1311);
 	cbCardType = env->addComboBox(Scale(60, 3, 120, 23), wFilter, COMBOBOX_MAINTYPE);
-	cbCardType->addItem(gDataManager->GetSysString(1310).c_str());
-	cbCardType->addItem(gDataManager->GetSysString(1312).c_str());
-	cbCardType->addItem(gDataManager->GetSysString(1313).c_str());
-	cbCardType->addItem(gDataManager->GetSysString(1314).c_str());
+	ReloadCBCardType();
 	cbCardType2 = env->addComboBox(Scale(130, 3, 190, 23), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(20);
 	cbCardType2->addItem(gDataManager->GetSysString(1310).c_str(), 0);
@@ -901,34 +914,16 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(stLimit, 1315);
 	cbLimit = env->addComboBox(Scale(260, 3, 390, 23), wFilter, COMBOBOX_OTHER_FILT);
 	cbLimit->setMaxSelectionRows(10);
-	cbLimit->addItem(gDataManager->GetSysString(1310).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1316).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1317).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1318).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1320).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1900).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1901).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1902).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1903).c_str());
-	if(chkAnime->isChecked()) {
-		cbLimit->addItem(gDataManager->GetSysString(1265).c_str());
-		cbLimit->addItem(gDataManager->GetSysString(1266).c_str());
-		cbLimit->addItem(gDataManager->GetSysString(1267).c_str());
-		cbLimit->addItem(gDataManager->GetSysString(1268).c_str());
-	}
+	ReloadCBLimit();
 	stAttribute = env->addStaticText(gDataManager->GetSysString(1319).c_str(), Scale(10, 28, 70, 48), false, false, wFilter);
 	defaultStrings.emplace_back(stAttribute, 1319);
 	cbAttribute = env->addComboBox(Scale(60, 26, 190, 46), wFilter, COMBOBOX_OTHER_FILT);
 	cbAttribute->setMaxSelectionRows(10);
-	cbAttribute->addItem(gDataManager->GetSysString(1310).c_str(), 0);
-	for(int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(gDataManager->FormatAttribute(filter).c_str(), filter);
+	ReloadCBAttribute();
 	stRace = env->addStaticText(gDataManager->GetSysString(1321).c_str(), Scale(10, 51, 70, 71), false, false, wFilter);
 	cbRace = env->addComboBox(Scale(60, 49, 190, 69), wFilter, COMBOBOX_OTHER_FILT);
 	cbRace->setMaxSelectionRows(10);
-	cbRace->addItem(gDataManager->GetSysString(1310).c_str(), 0);
-	for(int filter = 0x1; filter != 0x2000000; filter <<= 1)
-		cbRace->addItem(gDataManager->FormatRace(filter).c_str(), filter);
+	ReloadCBRace();
 	stAttack = env->addStaticText(gDataManager->GetSysString(1322).c_str(), Scale(205, 28, 280, 48), false, false, wFilter);
 	defaultStrings.emplace_back(stAttack, 1322);
 	ebAttack = env->addEditBox(L"", Scale(260, 26, 340, 46), true, wFilter, EDITBOX_ATTACK);
@@ -1163,13 +1158,8 @@ bool Game::Initialize() {
 	//cbFilterMatchMode->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	cbFilterBanlist->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
-	cbFilterRule->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1225)).c_str());
-	for (auto i = 1900; i <= 1904; ++i)
-		cbFilterRule->addItem(gDataManager->GetSysString(i).c_str());
-
-	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).c_str());
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbFilterBanlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+	ReloadCBFilterRule();
+	ReloadCBFilterBanlist();
 
 	/*cbFilterMatchMode->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1227)).c_str());
 	cbFilterMatchMode->addItem(gDataManager->GetSysString(1244).c_str());
@@ -1270,9 +1260,9 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnRPNo, 1212);
 
 	//join cancel buttons
-	btnJoinHost2 = env->addButton(Scale(1024 - 10 - 110, 640 - 10 - 25 - 25 - 5, 1024 - 10, 640 - 10 - 25 - 5), wRoomListPlaceholder, BUTTON_JOIN_HOST2, gDataManager->GetSysString(1223).c_str());
+	btnJoinHost2 = env->addButton(Scale(1024 - 10 - 110, 640 - 20 - 25 - 25 - 5, 1024 - 10, 640 - 20 - 25 - 5), wRoomListPlaceholder, BUTTON_JOIN_HOST2, gDataManager->GetSysString(1223).c_str());
 	defaultStrings.emplace_back(btnJoinHost2, 1223);
-	btnJoinCancel2 = env->addButton(Scale(1024 - 10 - 110, 640 - 10 - 25, 1024 - 10, 640 - 10), wRoomListPlaceholder, BUTTON_JOIN_CANCEL2, gDataManager->GetSysString(1212).c_str());
+	btnJoinCancel2 = env->addButton(Scale(1024 - 10 - 110, 640 - 20 - 25, 1024 - 10, 640 - 20), wRoomListPlaceholder, BUTTON_JOIN_CANCEL2, gDataManager->GetSysString(1212).c_str());
 	defaultStrings.emplace_back(btnJoinCancel2, 1212);
 	btnJoinHost2->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT);
 	btnJoinCancel2->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT);
@@ -1401,6 +1391,7 @@ bool Game::MainLoop() {
 						btnCreateHost->setEnabled(true);
 						btnHandTest->setEnabled(true);
 						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
+						RefreshUICoreVersion();
 					}
 					break;
 				}
@@ -1874,7 +1865,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
 	pic_dirs.insert(pic_dirs.begin(), Utils::ToPathString(repo->pics_path));
 	std::string text;
-	std::for_each(repo->commit_history_full.begin(), repo->commit_history_full.end(), [&text](const std::string& n) { text += n + "\n\n"; });
+	std::for_each(repo->commit_history_full.begin(), repo->commit_history_full.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 	if(text.size())
 		text.erase(text.size() - 2, 2);
 	grepo->commit_history_full = BufferIO::DecodeUTF8s(text);
@@ -1884,7 +1875,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 			grepo->commit_history_partial = grepo->commit_history_full;
 		} else {
 			text.clear();
-			std::for_each(repo->commit_history_partial.begin(), repo->commit_history_partial.end(), [&text](const std::string& n) { text += n + "\n\n"; });
+			std::for_each(repo->commit_history_partial.begin(), repo->commit_history_partial.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 			if(text.size())
 				text.erase(text.size() - 2, 2);
 			grepo->commit_history_partial = BufferIO::DecodeUTF8s(text);
@@ -2166,12 +2157,7 @@ void Game::UpdateDuelParam() {
 		if (chkTypeLimit[i]->isChecked()) {
 			flag2 |= limits[i];
 		}
-	cbDuelRule->clear();
-	cbDuelRule->addItem(gDataManager->GetSysString(1260).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1261).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1262).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1263).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1264).c_str());
+	ReloadCBDuelRule();
 #define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) break; }
 	switch (flag) {
 	CHECK(1)
@@ -2304,42 +2290,41 @@ bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 	irr::gui::IGUIElement* focus = env->getFocus();
 	return focus && focus->hasType(type);
 }
-void Game::ReloadElementsStrings() {
-	ShowCardInfo(showingcard, true);
-
-	for(auto& elem : defaultStrings) {
-		elem.first->setText(gDataManager->GetSysString(elem.second).c_str());
+#ifdef YGOPRO_BUILD_DLL
+void Game::RefreshUICoreVersion() {
+	if (coreloaded) {
+		int major, minor;
+		OCG_GetVersion(&major, &minor);
+		stCoreVersion->setText(fmt::format(gDataManager->GetSysString(2010), major, minor).c_str());
+	} else {
+		stCoreVersion->setText(L"");
 	}
-
-	unsigned int nullLFlist = deckManager._lfList.size() - 1;
-	deckManager._lfList[nullLFlist].listName = gDataManager->GetSysString(1442);
-	auto prev = cbDBLFList->getSelected();
-	cbDBLFList->removeItem(nullLFlist);
-	cbDBLFList->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
-	cbDBLFList->setSelected(prev);
-	prev = cbLFlist->getSelected();
-	cbLFlist->removeItem(nullLFlist);
-	cbLFlist->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
-	cbLFlist->setSelected(prev);
-
-	prev = cbSortType->getSelected();
+}
+#endif
+std::wstring Game::GetLocalizedExpectedCore() {
+	return fmt::format(gDataManager->GetSysString(2011), OCG_VERSION_MAJOR, OCG_VERSION_MINOR);
+}
+std::wstring Game::GetLocalizedCompatVersion() {
+	return fmt::format(gDataManager->GetSysString(2012), PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
+}
+void Game::ReloadCBSortType() {
 	cbSortType->clear();
-	for(int i = 1370; i <= 1373; i++)
+	for (int i = 1370; i <= 1373; i++)
 		cbSortType->addItem(gDataManager->GetSysString(i).c_str());
-	cbSortType->setSelected(prev);
-
-	prev = cbCardType->getSelected();
+}
+void Game::ReloadCBCardType() {
 	cbCardType->clear();
 	cbCardType->addItem(gDataManager->GetSysString(1310).c_str());
 	cbCardType->addItem(gDataManager->GetSysString(1312).c_str());
 	cbCardType->addItem(gDataManager->GetSysString(1313).c_str());
 	cbCardType->addItem(gDataManager->GetSysString(1314).c_str());
-	cbCardType->setSelected(prev);
-
-	prev = cbCardType2->getSelected();
+}
+void Game::ReloadCBCardType2() {
 	cbCardType2->clear();
+	mainGame->cbCardType2->setEnabled(true);
 	switch (cbCardType->getSelected()) {
 	case 0:
+		mainGame->cbCardType2->setEnabled(false);
 		cbCardType2->addItem(gDataManager->GetSysString(1310).c_str(), 0);
 		break;
 	case 1:
@@ -2380,9 +2365,8 @@ void Game::ReloadElementsStrings() {
 		cbCardType2->addItem(gDataManager->GetSysString(1070).c_str(), TYPE_TRAP + TYPE_COUNTER);
 		break;
 	}
-	cbCardType2->setSelected(prev);
-
-	prev = cbLimit->getSelected();
+}
+void Game::ReloadCBLimit() {
 	cbLimit->clear();
 	cbLimit->addItem(gDataManager->GetSysString(1310).c_str());
 	cbLimit->addItem(gDataManager->GetSysString(1316).c_str());
@@ -2399,20 +2383,95 @@ void Game::ReloadElementsStrings() {
 		cbLimit->addItem(gDataManager->GetSysString(1267).c_str());
 		cbLimit->addItem(gDataManager->GetSysString(1268).c_str());
 	}
+}
+void Game::ReloadCBAttribute() {
+	cbAttribute->clear();
+	cbAttribute->addItem(gDataManager->GetSysString(1310).c_str(), 0);
+	for (int filter = 0x1; filter != 0x80; filter <<= 1)
+		cbAttribute->addItem(gDataManager->FormatAttribute(filter).c_str(), filter);
+}
+void Game::ReloadCBRace() {
+	cbRace->clear();
+	cbRace->addItem(gDataManager->GetSysString(1310).c_str(), 0);
+	for (int filter = 0x1; filter != 0x2000000; filter <<= 1)
+		cbRace->addItem(gDataManager->FormatRace(filter).c_str(), filter);
+}
+void Game::ReloadCBFilterRule() {
+	cbFilterRule->clear();
+	cbFilterRule->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1225)).c_str());
+	for (auto i = 1900; i <= 1904; ++i)
+		cbFilterRule->addItem(gDataManager->GetSysString(i).c_str());
+}
+void Game::ReloadCBFilterBanlist() {
+	cbFilterBanlist->clear();
+	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).c_str());
+	for (unsigned int i = 0; i < deckManager._lfList.size(); ++i)
+		cbFilterBanlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+}
+void Game::ReloadCBDuelRule() {
+	cbDuelRule->clear();
+	cbDuelRule->addItem(gDataManager->GetSysString(1260).c_str());
+	cbDuelRule->addItem(gDataManager->GetSysString(1261).c_str());
+	cbDuelRule->addItem(gDataManager->GetSysString(1262).c_str());
+	cbDuelRule->addItem(gDataManager->GetSysString(1263).c_str());
+	cbDuelRule->addItem(gDataManager->GetSysString(1264).c_str());
+}
+void Game::ReloadCBRule() {
+	cbRule->clear();
+	for (auto i = 1900; i <= 1904; ++i)
+		cbRule->addItem(gDataManager->GetSysString(i).c_str());
+}
+void Game::ReloadCBCurrentSkin() {
+	gSettings.cbCurrentSkin->clear();
+	int selectedSkin = gSettings.cbCurrentSkin->addItem(gDataManager->GetSysString(2065).c_str());
+	auto skins = skinSystem->listSkins();
+	for (int i = skins.size() - 1; i >= 0; i--) {
+		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
+		if (gGameConfig->skin == skins[i].c_str())
+			selectedSkin = itemIndex;
+	}
+	gSettings.cbCurrentSkin->setSelected(selectedSkin);
+}
+void Game::ReloadElementsStrings() {
+	ShowCardInfo(showingcard, true);
+
+	for(auto& elem : defaultStrings) {
+		elem.first->setText(gDataManager->GetSysString(elem.second).c_str());
+	}
+
+	unsigned int nullLFlist = deckManager._lfList.size() - 1;
+	deckManager._lfList[nullLFlist].listName = gDataManager->GetSysString(1442);
+	auto prev = cbDBLFList->getSelected();
+	cbDBLFList->removeItem(nullLFlist);
+	cbDBLFList->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
+	cbDBLFList->setSelected(prev);
+	prev = cbLFlist->getSelected();
+	cbLFlist->removeItem(nullLFlist);
+	cbLFlist->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
+	cbLFlist->setSelected(prev);
+
+	prev = cbSortType->getSelected();
+	ReloadCBSortType();
+	cbSortType->setSelected(prev);
+
+	prev = cbCardType->getSelected();
+	ReloadCBCardType();
+	cbCardType->setSelected(prev);
+
+	prev = cbCardType2->getSelected();
+	ReloadCBCardType2();
+	cbCardType2->setSelected(prev);
+
+	prev = cbLimit->getSelected();
+	ReloadCBLimit();
 	cbLimit->setSelected(prev);
 
 	prev = cbAttribute->getSelected();
-	cbAttribute->clear();
-	cbAttribute->addItem(gDataManager->GetSysString(1310).c_str(), 0);
-	for(int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(gDataManager->FormatAttribute(filter).c_str(), filter);
+	ReloadCBAttribute();
 	cbAttribute->setSelected(prev);
 
 	prev = cbRace->getSelected();
-	cbRace->clear();
-	cbRace->addItem(gDataManager->GetSysString(1310).c_str(), 0);
-	for(int filter = 0x1; filter != 0x2000000; filter <<= 1)
-		cbRace->addItem(gDataManager->FormatRace(filter).c_str(), filter);
+	ReloadCBRace();
 	cbRace->setSelected(prev);
 
 	if(is_building) {
@@ -2426,37 +2485,23 @@ void Game::ReloadElementsStrings() {
 	}
 
 	prev = cbFilterRule->getSelected();
-	cbFilterRule->clear();
-	cbFilterRule->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1225)).c_str());
-	for(auto i = 1900; i <= 1904; ++i)
-		cbFilterRule->addItem(gDataManager->GetSysString(i).c_str());
+	ReloadCBFilterRule();
 	cbFilterRule->setSelected(prev);
 
 	prev = cbFilterBanlist->getSelected();
-	cbFilterBanlist->clear();
-	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).c_str());
-	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbFilterBanlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+	ReloadCBFilterBanlist();
 	cbFilterBanlist->setSelected(prev);
 	
 	prev = cbDuelRule->getSelected();
 	if (prev >= 5) {
 		UpdateDuelParam();
-	}
-	else {
-		cbDuelRule->clear();
-		cbDuelRule->addItem(gDataManager->GetSysString(1260).c_str());
-		cbDuelRule->addItem(gDataManager->GetSysString(1261).c_str());
-		cbDuelRule->addItem(gDataManager->GetSysString(1262).c_str());
-		cbDuelRule->addItem(gDataManager->GetSysString(1263).c_str());
-		cbDuelRule->addItem(gDataManager->GetSysString(1264).c_str());
+	} else {
+		ReloadCBDuelRule();
 		cbDuelRule->setSelected(prev);
 	}
 
 	prev = cbRule->getSelected();
-	cbRule->clear();
-	for(auto i = 1900; i <= 1904; ++i)
-		cbRule->addItem(gDataManager->GetSysString(i).c_str());
+	ReloadCBRule();
 	cbRule->setSelected(prev);
 
 	((CGUICustomTable*)roomListTable)->setColumnText(1, gDataManager->GetSysString(1225).c_str());
@@ -2470,6 +2515,12 @@ void Game::ReloadElementsStrings() {
 
 	mTopMenu->setItemText(0, gDataManager->GetSysString(2045).c_str()); //mRepositoriesInfo
 	mTopMenu->setItemText(1, gDataManager->GetSysString(1970).c_str()); //mAbout
+	mTopMenu->setItemText(2, gDataManager->GetSysString(2040).c_str()); //mVersion
+#ifdef YGOPRO_BUILD_DLL
+	RefreshUICoreVersion();
+#endif
+	stExpectedCoreVersion->setText(GetLocalizedExpectedCore().c_str());
+	stCompatVersion->setText(GetLocalizedCompatVersion().c_str());
 
 #define TYPECHK(id,stringid) chkTypeLimit[id]->setText(fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).c_str());
 	TYPECHK(0, 1056);
@@ -2479,14 +2530,7 @@ void Game::ReloadElementsStrings() {
 	TYPECHK(4, 1076);
 #undef TYPECHK
 
-	prev = gSettings.cbCurrentSkin->getSelected();
-	gSettings.cbCurrentSkin->clear();
-	gSettings.cbCurrentSkin->addItem(gDataManager->GetSysString(2065).c_str());
-	auto skins = skinSystem->listSkins();
-	for(int i = skins.size() - 1; i >= 0; i--) {
-		gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
-	}
-	gSettings.cbCurrentSkin->setSelected(prev);
+	ReloadCBCurrentSkin();
 }
 void Game::OnResize() {
 	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));

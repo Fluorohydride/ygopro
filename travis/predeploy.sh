@@ -53,16 +53,16 @@ if [[ "$PLATFORM" == "windows" ]]; then
 fi
 if [[ "$PLATFORM" == "linux" ]]; then
 	copy_if_exists libocgcore.so
-	strip_if_exists ygopro
+	# strip_if_exists ygopro
 	copy_if_exists ygopro
-	strip_if_exists ygoprodll
+	# strip_if_exists ygoprodll
 	copy_if_exists ygoprodll
 fi
 if [[ "$PLATFORM" == "osx" ]]; then
 	copy_if_exists libocgcore.dylib
-    strip_if_exists discord-launcher
-	strip_if_exists ygopro.app
+    # strip_if_exists discord-launcher
+	# strip_if_exists ygopro.app
 	bundle_if_exists ygopro
-	strip_if_exists ygoprodll.app
+	# strip_if_exists ygoprodll.app
 	bundle_if_exists ygoprodll
 fi

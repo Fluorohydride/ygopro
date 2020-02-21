@@ -81,8 +81,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		return true;
 	}
 #endif
-	if(mainGame->dField.OnCommonEvent(event))
-		return false;
+	bool returntrue = false;
+	if(mainGame->dField.OnCommonEvent(event, &returntrue))
+		return returntrue;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
