@@ -1262,8 +1262,8 @@ void Game::DrawDeckBd() {
 	} else {
 		buffer = fmt::to_wstring(deckManager.current_deck.side.size());
 	}
-	numFont->draw(buffer.c_str(), Resize(380, 538, 439, 557), 0xff000000, false, true);
-	numFont->draw(buffer.c_str(), Resize(379, 537, 439, 557), 0xffffffff, false, true);
+	numFont->draw(buffer.c_str(), Resize(379, 536, 439, 556), 0xff000000, false, true);
+	numFont->draw(buffer.c_str(), Resize(380, 537, 440, 557), 0xffffffff, false, true);
 	recti sidepos = Resize(310, 537, 797, 557);
 	buffer = fmt::format(L"{} {} {} {} {} {}", dataManager.GetSysString(1312), deckManager.TypeCount(deckManager.current_deck.side, TYPE_MONSTER),
 		dataManager.GetSysString(1313), deckManager.TypeCount(deckManager.current_deck.side, TYPE_SPELL),
