@@ -246,10 +246,8 @@ bool Game::Initialize() {
 		return fmt::format(L"EDOPro by Project Ignis | {}.{}.{} \"{}\"", EDOPRO_VERSION_MAJOR, EDOPRO_VERSION_MINOR, EDOPRO_VERSION_PATCH, EDOPRO_VERSION_CODENAME);
 	};
 	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, true, wVersion);
-#ifdef YGOPRO_BUILD_DLL
 	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 290, 65), false, true, wVersion);
 	RefreshUICoreVersion();
-#endif
 	stExpectedCoreVersion = env->addStaticText(
 		GetLocalizedExpectedCore().c_str(),
 		Scale(10, 70, 290, 95), false, true, wVersion);
@@ -2407,7 +2405,6 @@ bool Game::HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const {
 	irr::gui::IGUIElement* focus = env->getFocus();
 	return focus && focus->hasType(type);
 }
-#ifdef YGOPRO_BUILD_DLL
 void Game::RefreshUICoreVersion() {
 	if (coreloaded) {
 		int major, minor;
@@ -2417,7 +2414,6 @@ void Game::RefreshUICoreVersion() {
 		stCoreVersion->setText(L"");
 	}
 }
-#endif
 std::wstring Game::GetLocalizedExpectedCore() {
 	return fmt::format(dataManager.GetSysString(2011), OCG_VERSION_MAJOR, OCG_VERSION_MINOR);
 }
@@ -2633,9 +2629,7 @@ void Game::ReloadElementsStrings() {
 	mTopMenu->setItemText(0, dataManager.GetSysString(2045).c_str()); //mRepositoriesInfo
 	mTopMenu->setItemText(1, dataManager.GetSysString(1970).c_str()); //mAbout
 	mTopMenu->setItemText(2, dataManager.GetSysString(2040).c_str()); //mVersion
-#ifdef YGOPRO_BUILD_DLL
 	RefreshUICoreVersion();
-#endif
 	stExpectedCoreVersion->setText(GetLocalizedExpectedCore().c_str());
 	stCompatVersion->setText(GetLocalizedCompatVersion().c_str());
 
