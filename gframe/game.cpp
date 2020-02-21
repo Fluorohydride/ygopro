@@ -651,6 +651,12 @@ bool Game::Initialize() {
 		}
 	}
 	gSettings.cbCurrentLocale->setSelected(selectedLocale);
+	gSettings.stDpiScale = env->addStaticText(gDataManager->GetSysString(2070).c_str(), Scale(20, 365, 100, 390), false, false, gSettings.window);
+	defaultStrings.emplace_back(gSettings.stDpiScale, 2070);
+	gSettings.ebDpiScale = env->addEditBox(fmt::to_wstring((int)(gGameConfig->dpi_scale*100.0)).c_str(), Scale(115, 365, 170, 390), true, gSettings.window);
+	env->addStaticText(L"%", Scale(175, 365, 190, 390), false, false, gSettings.window);
+	gSettings.ebDpiScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	gSettings.btnRestart = env->addButton(Scale(195, 365, 300, 390), gSettings.window, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).c_str());
 	//log
 	tabRepositories = wInfos->addTab(gDataManager->GetSysString(2045).c_str());
 	defaultStrings.emplace_back(tabRepositories, 2045);
