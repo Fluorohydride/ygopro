@@ -1635,7 +1635,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		std::wstring text;
 		
 		if(desc == 0) {
-			text = fmt::sprintf(L"{}\n{}", event_string,
+			text = fmt::format(L"{}\n{}", event_string,
 				fmt::sprintf(dataManager.GetSysString(200), dataManager.GetName(code), dataManager.FormatLocation(info.location, info.sequence)));
 		} else if(desc == 221) {
 			text = fmt::format(L"{}\n{}\n{}", event_string,
