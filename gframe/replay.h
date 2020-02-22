@@ -98,6 +98,7 @@ public:
 	std::string scriptname;
 private:
 	bool ReadData(void* data, unsigned int length);
+	bool ReadData(std::vector<uint8_t>& data, unsigned int length);
 	template <typename  T>
 	T Read();
 	bool ReadNextResponse(ReplayResponse* res);

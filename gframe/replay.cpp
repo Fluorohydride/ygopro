@@ -198,10 +198,7 @@ bool Replay::ReadNextResponse(ReplayResponse* res) {
 	res->length = Read<int8_t>();
 	if(res->length < 1)
 		return false;
-	res->response.resize(res->length);
-	if(!ReadData(res->response.data(), res->length))
-		return false;
-	return true;
+	return ReadData(res->response, res->length);
 }
 void Replay::ParseNames() {
 	players.clear();
@@ -279,9 +276,7 @@ bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	int len = Read<int32_t>();
 	if(!can_read || len == -1)
 		return false;
-	packet->data.resize(len);
-	ReadData((char*)packet->data.data(), packet->data.size());
-	return true;
+	return ReadData(packet->data, len);
 }
 void Replay::ParseStream() {
 	packets_stream.clear();
@@ -298,9 +293,11 @@ void Replay::ParseStream() {
 			players[1] = BufferIO::DecodeUTF8s(namebuf);
 			continue;
 		}
-		if(p.message == OLD_REPLAY_MODE && !yrp) {
-			yrp = std::unique_ptr<Replay>(new Replay());
-			yrp->OpenReplayFromBuffer(p.data);
+		if(p.message == OLD_REPLAY_MODE) {
+			if(!yrp) {
+				yrp = std::unique_ptr<Replay>(new Replay());
+				yrp->OpenReplayFromBuffer(p.data);
+			}
 			continue;
 		}
 		packets_stream.push_back(p);
@@ -350,6 +347,20 @@ bool Replay::ReadData(void* data, unsigned int length) {
 	if(length)
 		memcpy(data, &replay_data[data_position], length);
 	data_position += length;
+	return true;
+}
+bool Replay::ReadData(std::vector<uint8_t>& data, unsigned int length) {
+	if(!is_replaying || !can_read)
+		return false;
+	if((replay_data.size() - data_position) < length) {
+		can_read = false;
+		return false;
+	}
+	if(length) {
+		data.resize(length);
+		memcpy(data.data(), &replay_data[data_position], length);
+		data_position += length;
+	}
 	return true;
 }
 template<typename T>

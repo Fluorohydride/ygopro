@@ -35,9 +35,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		return true;
 	}
 #endif
-	bool returntrue = false;
-	if(OnCommonEvent(event, &returntrue))
-		return returntrue;
+	bool stopPropagation = false;
+	if(OnCommonEvent(event, stopPropagation))
+		return stopPropagation;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		int id = event.GUIEvent.Caller->getID();
@@ -1744,7 +1744,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	}
 	return false;
 }
-bool ClientField::OnCommonEvent(const irr::SEvent& event, bool* returntrue) {
+bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation) {
 #ifdef __ANDROID__
 	if(event.EventType == EET_MOUSE_INPUT_EVENT &&
 	   event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN) {
@@ -1790,8 +1790,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool* returntrue) {
 		}
 		case irr::gui::EGET_ELEMENT_CLOSED: {
 			if(event.GUIEvent.Caller == mainGame->gSettings.window) {
-				if(returntrue)
-					*returntrue = true;
+				stopPropagation = true;
 				mainGame->HideElement(mainGame->gSettings.window);
 				return true;
 			}
@@ -2087,6 +2086,25 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool* returntrue) {
 		default: break;
 		}
 		break;
+	}
+	case irr::EET_MOUSE_INPUT_EVENT: {
+		if (event.MouseInput.Control) {
+			auto SimulateMouse = [&](irr::EMOUSE_INPUT_EVENT type) {
+				irr::SEvent simulated = event;
+				simulated.MouseInput.Event = type;
+				mainGame->device->postEventFromUser(simulated);
+				return true;
+			};
+			switch (event.MouseInput.Event) {
+#define REMAP(TYPE) case irr::EMIE_LMOUSE_##TYPE: return SimulateMouse(irr::EMIE_RMOUSE_##TYPE)
+				REMAP(PRESSED_DOWN);
+				REMAP(LEFT_UP);
+				REMAP(DOUBLE_CLICK);
+				REMAP(TRIPLE_CLICK);
+#undef REMAP
+			default: break;
+			}
+		}
 	}
 	default: break;
 	}

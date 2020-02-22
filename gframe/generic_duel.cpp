@@ -633,8 +633,13 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	card_info.team = 1;
 	card_info.con = 1;
+	auto idxinc = [relay=relay, size=players.opposing.size()](int i)->int {
+		if(relay)
+			return i;
+		return (i + size - 1) % size;
+	};
 	for(int32 j = 0; j < players.opposing.size(); j++) {
-		auto& dueler = players.opposing[j];
+		auto& dueler = players.opposing[idxinc(j)];
 		card_info.duelist = j;
 		card_info.loc = LOCATION_DECK;
 		last_replay.Write<uint32_t>(dueler.pdeck.main.size(), false);
@@ -708,6 +713,7 @@ void GenericDuel::Process() {
 		DuelEndProc();
 }
 void GenericDuel::DuelEndProc() {
+	packets_cache.clear();
 	int winc[3] = { 0, 0, 0 };
 	for(int i = 0; i < match_result.size(); ++i)
 		winc[match_result[i]]++;
@@ -717,7 +723,6 @@ void GenericDuel::DuelEndProc() {
 		observers_mutex.lock();
 		for(auto& obs : observers) {
 			obs->state = CTOS_LEAVE_GAME;
-			NetServer::ReSendToPlayer(obs);
 		}
 		observers_mutex.unlock();
 		unsigned char rematch[10];
@@ -738,6 +743,8 @@ void GenericDuel::DuelEndProc() {
 			dueler.ready = false;
 		)
 		duel_stage = DUEL_STAGE_BEGIN;
+		for(auto& obs : observers)
+			NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
 	} else {
 		ITERATE_PLAYERS(
 			dueler.ready = false;
@@ -1232,7 +1239,7 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 		if(len < sizeof(int32_t) || !(*(int32_t*)pdata)) {
 			NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-				duel_stage = DUEL_STAGE_END;
+			duel_stage = DUEL_STAGE_END;
 			return;
 		}
 		dp->state = 0xff;

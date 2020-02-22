@@ -176,9 +176,7 @@ public:
 
 	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const;
 
-#ifdef YGOPRO_BUILD_DLL
 	void RefreshUICoreVersion();
-#endif
 	std::wstring GetLocalizedExpectedCore();
 	std::wstring GetLocalizedCompatVersion();
 	void ReloadCBSortType();
