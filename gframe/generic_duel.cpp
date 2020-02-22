@@ -718,7 +718,6 @@ void GenericDuel::DuelEndProc() {
 		observers_mutex.lock();
 		for(auto& obs : observers) {
 			obs->state = CTOS_LEAVE_GAME;
-			NetServer::ReSendToPlayer(obs);
 		}
 		observers_mutex.unlock();
 		unsigned char rematch[10];
@@ -1233,7 +1232,7 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 		if(len < sizeof(int32_t) || !(*(int32_t*)pdata)) {
 			NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-				duel_stage = DUEL_STAGE_END;
+			duel_stage = DUEL_STAGE_END;
 			return;
 		}
 		dp->state = 0xff;
