@@ -1130,7 +1130,7 @@ bool Game::Initialize() {
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
 	soundManager = std::unique_ptr<SoundManager>(new SoundManager());
-	if(!soundManager->Init(gameConf.soundVolume, gameConf.musicVolume, gameConf.enablesound, gameConf.enablemusic, working_directory)) {
+	if(!soundManager->Init(gameConf.soundVolume / 100.0, gameConf.musicVolume / 100.0, gameConf.enablesound, gameConf.enablemusic, working_directory)) {
 		tabSettings.chkEnableSound->setVisible(false);
 		tabSettings.stSoundVolume->setVisible(false);
 		tabSettings.scrSoundVolume->setVisible(false);
