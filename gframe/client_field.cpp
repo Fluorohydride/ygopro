@@ -682,6 +682,10 @@ void ClientField::RefreshAllCards() {
 		refreshloc(grave[p]);
 		refreshloc(remove[p]);
 		refreshloc(extra[p]);
+		if(skills[p]) {
+			GetCardLocation(skills[p], &skills[p]->curPos, &skills[p]->curRot, true);
+			skills[p]->is_moving = false;
+		}
 	}
 	for(auto& pcard : overlay_cards) {
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
