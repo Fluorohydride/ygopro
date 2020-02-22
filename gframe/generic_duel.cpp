@@ -708,6 +708,7 @@ void GenericDuel::Process() {
 		DuelEndProc();
 }
 void GenericDuel::DuelEndProc() {
+	packets_cache.clear();
 	int winc[3] = { 0, 0, 0 };
 	for(int i = 0; i < match_result.size(); ++i)
 		winc[match_result[i]]++;
