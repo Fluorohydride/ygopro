@@ -633,8 +633,13 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	card_info.team = 1;
 	card_info.con = 1;
+	auto idxinc = [relay=relay, size=players.opposing.size()](int i)->int {
+		if(relay)
+			return i;
+		return (i + size - 1) % size;
+	};
 	for(int32 j = 0; j < players.opposing.size(); j++) {
-		auto& dueler = players.opposing[j];
+		auto& dueler = players.opposing[idxinc(j)];
 		card_info.duelist = j;
 		card_info.loc = LOCATION_DECK;
 		last_replay.Write<uint32_t>(dueler.pdeck.main.size(), false);
