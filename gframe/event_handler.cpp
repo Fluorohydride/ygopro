@@ -2078,6 +2078,25 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		}
 		break;
 	}
+	case irr::EET_MOUSE_INPUT_EVENT: {
+		if (event.MouseInput.Control) {
+			auto SimulateMouse = [&](irr::EMOUSE_INPUT_EVENT type) {
+				irr::SEvent simulated = event;
+				simulated.MouseInput.Event = type;
+				mainGame->device->postEventFromUser(simulated);
+				return true;
+			};
+			switch (event.MouseInput.Event) {
+#define REMAP(TYPE) case irr::EMIE_LMOUSE_##TYPE: return SimulateMouse(irr::EMIE_RMOUSE_##TYPE)
+				REMAP(PRESSED_DOWN);
+				REMAP(LEFT_UP);
+				REMAP(DOUBLE_CLICK);
+				REMAP(TRIPLE_CLICK);
+#undef REMAP
+			default: break;
+			}
+		}
+	}
 	default: break;
 	}
 	return false;
