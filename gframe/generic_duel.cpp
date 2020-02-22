@@ -738,6 +738,8 @@ void GenericDuel::DuelEndProc() {
 			dueler.ready = false;
 		)
 		duel_stage = DUEL_STAGE_BEGIN;
+		for(auto& obs : observers)
+			NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
 	} else {
 		ITERATE_PLAYERS(
 			dueler.ready = false;
