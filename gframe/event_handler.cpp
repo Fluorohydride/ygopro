@@ -134,7 +134,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(mainGame->dInfo.player_type == 7) {
 					DuelClient::StopClient();
-					mainGame->dField.Clear();
 					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
 					mainGame->soundManager->StopSounds();
