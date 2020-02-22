@@ -98,7 +98,7 @@ DataHandler::DataHandler() {
 #ifdef __ANDROID__
 	configs->working_directory = porting::working_directory;
 #endif
-	sounds = std::make_shared<SoundManager>(configs->soundVolume, configs->musicVolume, configs->enablesound, configs->enablemusic, configs->working_directory);
+	sounds = std::make_shared<SoundManager>(configs->soundVolume, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic / 100.0, configs->working_directory);
 	gitManager->LoadRepositoriesFromJson(configs->configs);
 	dataManager = std::make_shared<DataManager>();
 	imageDownloader = std::make_shared<ImageDownloader>();
