@@ -525,6 +525,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
+			if (event.MouseInput.Control)
+				break;
 			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
 			if(root->getElementFromPoint(mouse_pos) != root)
 				break;
@@ -554,6 +556,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_LMOUSE_LEFT_UP: {
+			if (event.MouseInput.Control)
+				goto HANDLER_RMOUSE_UP;
 			if(!is_draging) {
 				mouse_pos.set(event.MouseInput.X, event.MouseInput.Y);
 				GetHoveredCard();
@@ -580,6 +584,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_RMOUSE_LEFT_UP: {
+			HANDLER_RMOUSE_UP:
 			if(mainGame->is_siding) {
 				if(is_draging)
 					break;
