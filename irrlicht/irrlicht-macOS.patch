@@ -266,7 +266,7 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  		}
 +		if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
 +		{
-+			if (mkey == 'C' || mkey == 'V' || mkey == 'X')
++			if (mkey == 'A' || mkey == 'C' || mkey == 'V' || mkey == 'X')
 +			{
 +				mchar = 0;
 +				skipCommand = true;
@@ -275,7 +275,16 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  
  		ievent.EventType = irr::EET_KEY_INPUT_EVENT;
  		ievent.KeyInput.Key = (irr::EKEY_CODE)mkey;
-@@ -1258,6 +1328,9 @@
+@@ -1225,8 +1295,6 @@
+ 
+ 		if (skipCommand)
+ 			ievent.KeyInput.Control = true;
+-		else if ([(NSEvent *)event modifierFlags] & NSCommandKeyMask)
+-			[NSApp sendEvent:(NSEvent *)event];
+ 
+ 		postEventFromUser(ievent);
+ 	}
+@@ -1258,6 +1326,9 @@
  			post = false;
  	}
  
