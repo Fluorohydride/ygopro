@@ -34,9 +34,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		return true;
 	}
 #endif
-	bool returntrue = false;
-	if(OnCommonEvent(event, &returntrue))
-		return returntrue;
+	bool stopPropagation = false;
+	if(OnCommonEvent(event, stopPropagation))
+		return stopPropagation;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		int id = event.GUIEvent.Caller->getID();
@@ -1743,7 +1743,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	}
 	return false;
 }
-bool ClientField::OnCommonEvent(const irr::SEvent& event, bool* returntrue) {
+bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation) {
 #ifdef __ANDROID__
 	if(event.EventType == EET_MOUSE_INPUT_EVENT &&
 	   event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN) {
@@ -1789,8 +1789,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool* returntrue) {
 		}
 		case irr::gui::EGET_ELEMENT_CLOSED: {
 			if(event.GUIEvent.Caller == mainGame->gSettings.window) {
-				if(returntrue)
-					*returntrue = true;
+				stopPropagation = true;
 				mainGame->HideElement(mainGame->gSettings.window);
 				return true;
 			}

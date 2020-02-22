@@ -139,9 +139,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		return true;
 	}
 #endif
-	bool returntrue = false;
-	if(mainGame->dField.OnCommonEvent(event, &returntrue))
-		return returntrue;
+	bool stopPropagation = false;
+	if(mainGame->dField.OnCommonEvent(event, stopPropagation))
+		return stopPropagation;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		int id = event.GUIEvent.Caller->getID();

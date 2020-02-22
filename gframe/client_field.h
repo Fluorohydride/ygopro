@@ -134,7 +134,7 @@ public:
 	int list_command;
 
 	virtual bool OnEvent(const irr::SEvent& event);
-	virtual bool OnCommonEvent(const irr::SEvent& event, bool* returntrue);
+	virtual bool OnCommonEvent(const irr::SEvent& event, bool& stopPropagation);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
 	void UpdateChainButtons();
