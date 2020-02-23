@@ -2088,7 +2088,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		break;
 	}
 	case irr::EET_MOUSE_INPUT_EVENT: {
-		if (mainGame->gameConf.ctrlClickIsRMB && event.MouseInput.Control) {
+		if (gGameConfig->ctrlClickIsRMB && event.MouseInput.Control) {
 			auto SimulateMouse = [&](irr::EMOUSE_INPUT_EVENT type) {
 				irr::SEvent simulated = event;
 				simulated.MouseInput.Event = type;
