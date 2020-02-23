@@ -1601,7 +1601,7 @@ bool Game::MainLoop() {
 	if(ocgcore)
 		UnloadCore(ocgcore);
 #endif //YGOPRO_BUILD_DLL
-	//device->drop();
+	device->drop();
 	return restart;
 }
 path_string Game::NoSkinLabel() {
