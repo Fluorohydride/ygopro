@@ -112,7 +112,7 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.h source-fixed/Irrlicht/MacOSX/
  
 diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
 --- source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2020-01-21 17:47:34.000000000 -0500
-+++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2020-01-21 17:46:54.000000000 -0500
++++ source-fixed/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm	2020-02-22 20:28:06.000000000 -0500
 @@ -7,6 +7,7 @@
  
  #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
@@ -187,54 +187,52 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  	}
  	else
  		getVideoDriver()->OnResize(core::dimension2d<u32>( (s32)width, (s32)height));
-@@ -971,6 +1008,33 @@
+@@ -971,6 +1008,21 @@
  	os::Timer::tick();
  	storeMouseLocation();
  
 +	auto focusElement = getGUIEnvironment()->getFocus();
 +	bool editing = focusElement && focusElement->getType() == irr::gui::EGUIET_EDIT_BOX;
-+
++	auto textView = (NSTextView*)[NSApp delegate];
++	// Fix mouse up events not being raised as a side effect of the IME workaround changing the frame
++	[textView setFrame:NSRect()]; // This sets the NSWindow frame to 0 via the delegate
 +	if (!editing)
 +	{
 +		[Window makeFirstResponder:nil];
 +	}
 +	else
 +	{
-+		auto textView = (NSTextView*)[NSApp delegate];
-+		auto crect = focusElement->getAbsolutePosition();
-+
-+		// ensure font height enough to fill the rect, otherwize ime window will overlaps the edit box
-+		[textView setFont:[NSFont userFontOfSize:crect.getHeight()]];
-+
-+		// change origin from top left to bottom right
-+		NSRect rect = {
-+			crect.UpperLeftCorner.X,
-+			[[textView superview] frame].size.height - crect.LowerRightCorner.Y,
-+			crect.getWidth(), crect.getHeight(),
-+		};
-+		[textView setFrame:rect];
-+
-+		// start to receive input events
++		// Send input events to fake NSTextView that is also the AppDelegate
 +		[Window makeFirstResponder:textView];
 +	}
 +
  	event = [NSApp nextEventMatchingMask:NSAnyEventMask untilDate:[NSDate distantPast] inMode:NSDefaultRunLoopMode dequeue:YES];
  	if (event != nil)
  	{
-@@ -979,6 +1043,12 @@
+@@ -979,6 +1031,22 @@
  		switch([(NSEvent *)event type])
  		{
  			case NSKeyDown:
 +				if (editing)
 +				{
-+					// delegate to text edit control to handle text input
-+					[NSApp sendEvent:event];
++					auto crect = focusElement->getAbsolutePosition();
++					// Ensure font height is enough to fill the edit box so the IME window doesn't overlap it
++					[textView setFont:[NSFont userFontOfSize:crect.getHeight()]];
++					// Change origin from top left to bottom right
++					NSRect rect = {
++						crect.UpperLeftCorner.X,
++						[[textView superview] frame].size.height - crect.LowerRightCorner.Y,
++						crect.getWidth(), crect.getHeight(),
++					};
++					// Workaround for correct IME positioning below the edit box
++					[textView setFrame:rect]; // Reset to 0 at the start of the loop to not break other events
++					[NSApp sendEvent:event]; // Delegate to fake text edit control to handle text input
 +					break;
 +				}
  				postKeyEvent(event,ievent,true);
  				break;
  
-@@ -1148,7 +1218,7 @@
+@@ -1148,7 +1216,7 @@
  
  bool CIrrDeviceMacOSX::isWindowActive() const
  {
@@ -243,7 +241,7 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  }
  
  
-@@ -1199,22 +1269,22 @@
+@@ -1199,22 +1267,22 @@
  			}
  			else
  			{
@@ -275,7 +273,7 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  
  		ievent.EventType = irr::EET_KEY_INPUT_EVENT;
  		ievent.KeyInput.Key = (irr::EKEY_CODE)mkey;
-@@ -1225,8 +1295,6 @@
+@@ -1225,8 +1293,6 @@
  
  		if (skipCommand)
  			ievent.KeyInput.Control = true;
@@ -284,7 +282,7 @@ diff -ur source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm source-fixed/Irrlicht/MacOSX
  
  		postEventFromUser(ievent);
  	}
-@@ -1258,6 +1326,9 @@
+@@ -1258,6 +1324,9 @@
  			post = false;
  	}
  
