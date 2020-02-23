@@ -765,6 +765,7 @@ bool Game::Initialize() {
 		btnCardSelect[i]->setImageSize(imgsize);
 	}
 	scrCardList = env->addScrollBar(true, Scale(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
+	scrCardList->setLargeStep(scrCardList->getMax());
 	btnSelectOK = env->addButton(Scale(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, gDataManager->GetSysString(1211).c_str());
 	defaultStrings.emplace_back(btnSelectOK, 1211);
 	//card display

@@ -54,6 +54,11 @@ struct GameConfig
 	bool accurate_bg_resize = false;
 #endif
 	bool chkAnime = false;
+#ifdef __APPLE__
+	bool ctrlClickIsRMB = true;
+#else
+	bool ctrlClickIsRMB = false;
+#endif
 	bool enablemusic = false;
 	bool enablesound = true;
 	int musicVolume = 20;

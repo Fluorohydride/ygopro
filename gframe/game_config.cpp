@@ -136,6 +136,8 @@ bool GameConfig::Load(const char* filename)
 			else if (type == "accurate_bg_resize")
 				accurate_bg_resize = !!std::stoi(str);
 #endif
+			else if (type == "ctrlClickIsRMB")
+				ctrlClickIsRMB = !!std::stoi(str);
 			else if (type == "enable_music")
 				enablemusic = !!std::stoi(str);
 			else if (type == "enable_sound")
@@ -190,6 +192,7 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "hidePasscodeScope = "  << hidePasscodeScope << "\n";
 	conf_file << "filterBot = "          << filterBot << "\n";
 	conf_file << "show_unofficial = "    << chkAnime << "\n";
+	conf_file << "ctrlClickIsRMB = "     << ctrlClickIsRMB << "\n";
 	conf_file << "dpi_scale = "          << std::to_string(dpi_scale) << "\n"; // Forces float to show decimals
 	conf_file << "skin = "            	 << Utils::ToUTF8IfNeeded(skin) << "\n";
 	conf_file << "language = "           << Utils::ToUTF8IfNeeded(locale) << "\n";
