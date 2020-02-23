@@ -58,7 +58,7 @@ private:
 	std::thread download_threads[8];
 };
 
-extern std::shared_ptr<ImageDownloader> gImageDownloader;
+extern ImageDownloader* gImageDownloader;
 
 }
 

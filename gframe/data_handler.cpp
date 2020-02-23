@@ -75,7 +75,7 @@ void DataHandler::LoadZipArchives() {
 	}
 }
 DataHandler::DataHandler() {
-	configs = std::make_shared<GameConfig>();
+	configs = std::unique_ptr<GameConfig>(new GameConfig);
 #ifndef __ANDROID__
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = configs->antialias;
@@ -94,14 +94,14 @@ DataHandler::DataHandler() {
 #endif
 	filesystem = new irr::io::CFileSystem();
 	LoadZipArchives();
-	gitManager = std::make_shared<RepoManager>();
+	gitManager = std::unique_ptr<RepoManager>(new RepoManager());
 #ifdef __ANDROID__
 	configs->working_directory = porting::working_directory;
 #endif
-	sounds = std::make_shared<SoundManager>(configs->soundVolume, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic / 100.0, configs->working_directory);
+	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic / 100.0, configs->working_directory));
 	gitManager->LoadRepositoriesFromJson(configs->configs);
-	dataManager = std::make_shared<DataManager>();
-	imageDownloader = std::make_shared<ImageDownloader>();
+	dataManager = std::unique_ptr<DataManager>(new DataManager());
+	imageDownloader = std::unique_ptr<ImageDownloader>(new ImageDownloader());
 	LoadDatabases();
 	LoadPicUrls();
 	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));

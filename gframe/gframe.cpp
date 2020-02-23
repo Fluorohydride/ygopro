@@ -27,12 +27,12 @@ bool exit_on_return = false;
 bool is_from_discord = false;
 bool open_file = false;
 path_string open_file_name = EPRO_TEXT("");
-std::shared_ptr<ygo::Game> ygo::mainGame = nullptr;
-std::shared_ptr<ygo::ImageDownloader> ygo::gImageDownloader = nullptr;
-std::shared_ptr<ygo::DataManager> ygo::gDataManager = nullptr;
-std::shared_ptr<ygo::SoundManager> ygo::gSoundManager = nullptr;
-std::shared_ptr<ygo::GameConfig> ygo::gGameConfig = nullptr;
-std::shared_ptr<ygo::RepoManager> ygo::gRepoManager = nullptr;
+ygo::Game* ygo::mainGame = nullptr;
+ygo::ImageDownloader* ygo::gImageDownloader = nullptr;
+ygo::DataManager* ygo::gDataManager = nullptr;
+ygo::SoundManager* ygo::gSoundManager = nullptr;
+ygo::GameConfig* ygo::gGameConfig = nullptr;
+ygo::RepoManager* ygo::gRepoManager = nullptr;
 
 inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
@@ -210,11 +210,11 @@ int main(int argc, char* argv[]) {
 	std::shared_ptr<ygo::DataHandler> data = nullptr;
 	try {
 		data = std::make_shared<ygo::DataHandler>();
-		ygo::gImageDownloader = data->imageDownloader;
-		ygo::gDataManager = data->dataManager;
-		ygo::gSoundManager = data->sounds;
-		ygo::gGameConfig = data->configs;
-		ygo::gRepoManager = data->gitManager;
+		ygo::gImageDownloader = data->imageDownloader.get();
+		ygo::gDataManager = data->dataManager.get();
+		ygo::gSoundManager = data->sounds.get();
+		ygo::gGameConfig = data->configs.get();
+		ygo::gRepoManager = data->gitManager.get();
 	}
 	catch(std::exception e) {
 		ygo::ErrorLog(e.what());
@@ -234,7 +234,8 @@ int main(int argc, char* argv[]) {
 	bool reset = false;
 	bool firstlaunch = false;
 	do {
-		ygo::mainGame = std::make_shared<ygo::Game>();
+		ygo::Game _game{};
+		ygo::mainGame = &_game;
 		if(data->tmp_device) {
 			ygo::mainGame->device = data->tmp_device;
 			data->tmp_device = nullptr;

@@ -70,7 +70,7 @@ struct GameConfig
 	nlohmann::json configs;
 };
 
-extern std::shared_ptr<GameConfig> gGameConfig;
+extern GameConfig* gGameConfig;
 
 }
 

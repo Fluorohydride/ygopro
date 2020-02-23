@@ -81,7 +81,7 @@ private:
 	std::mutex repos_status_mutex;
 };
 
-extern std::shared_ptr<RepoManager> gRepoManager;
+extern RepoManager* gRepoManager;
 
 }
 

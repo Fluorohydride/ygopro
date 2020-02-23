@@ -664,7 +664,7 @@ public:
 	std::vector<std::pair<irr::gui::IGUIElement*, int32>> defaultStrings;
 };
 
-extern std::shared_ptr<Game> mainGame;
+extern Game* mainGame;
 
 template<typename T>
 inline irr::core::vector2d<T> Game::Scale(irr::core::vector2d<T> vec) {
