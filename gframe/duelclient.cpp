@@ -838,10 +838,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_REPLAY: {
-		if(!mainGame->dInfo.compat_mode) {
-			char* prep = pdata;
-			replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, prep, len - 1));
-		}
 		ReplayPrompt(mainGame->dInfo.compat_mode);
 		break;
 	}
@@ -1078,6 +1074,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->closeSignal.lock();
 		mainGame->closeDoneSignal.Wait();
 		mainGame->closeSignal.unlock();
+		ReplayPrompt(true);
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isInLobby = false;
