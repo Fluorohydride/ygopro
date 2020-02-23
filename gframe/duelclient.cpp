@@ -805,6 +805,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnChainWhenAvail->setVisible(false);
 		mainGame->stMessage->setText(dataManager.GetSysString(1500).c_str());
 		mainGame->btnCancelOrFinish->setVisible(false);
+		if(mainGame->wQuery->isVisible())
+			mainGame->HideElement(mainGame->wQuery);
 		mainGame->PopupElement(mainGame->wMessage);
 		mainGame->gMutex.unlock();
 		mainGame->actionSignal.Reset();
