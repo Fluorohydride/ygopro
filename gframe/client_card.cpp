@@ -196,14 +196,14 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 			return c1->sequence < c2->sequence;
 	}
 }
+bool is_skill(uint32_t type) {
+	return (type & (TYPE_SKILL | TYPE_ACTION));
+}
 bool check_both_skills(uint32_t type1, uint32_t type2) {
 	return is_skill(type1) && is_skill(type2);
 }
 bool check_either_skills(uint32_t type1, uint32_t type2) {
 	return is_skill(type1) || is_skill(type2);
-}
-bool is_skill(uint32_t type) {
-	return (type & (TYPE_SKILL | TYPE_ACTION));
 }
 bool check_skills(CardDataC* p1, CardDataC* p2) {
 	if(check_both_skills(p1->type, p2->type)) {
