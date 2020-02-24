@@ -563,58 +563,86 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 	int height = _height;
 	if(type == THUMB)
 		type = ART;
-	for(auto& path : (type == ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
-		for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
-			if(timestamp_id != source_timestamp_id.load())
+	auto status =  GetDownloadStatus(code, type);
+	if(status == DOWNLOADED) {
+		if(timestamp_id != source_timestamp_id.load())
+			return std::make_pair(nullptr, EPRO_TEXT("fail"));
+		if(width != _width || height != _height) {
+			width = _width;
+			height = _height;
+		}
+		auto file =  GetDownloadPath(code, type);
+		__repeat2:
+		if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), nullptr))) {
+			if(timestamp_id != source_timestamp_id.load()) {
+				img->drop();
 				return std::make_pair(nullptr, EPRO_TEXT("fail"));
-			irr::io::IReadFile* reader = nullptr;
-			if(path == EPRO_TEXT("archives")) {
-				reader = Utils::FindFileInArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
-				if(!reader)
-					continue;
 			}
 			if(width != _width || height != _height) {
+				img->drop();
 				width = _width;
 				height = _height;
+				goto __repeat2;
 			}
-			auto file = reader ? reader->getFileName().c_str() : fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
-			__repeat:
-			if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader))) {
+			return std::make_pair(img, file);
+		}
+		if(timestamp_id != source_timestamp_id.load()) {
+			return std::make_pair(nullptr, EPRO_TEXT("fail"));
+		}
+	} else {
+		for(auto& path : (type == ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
+			for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
+				if(timestamp_id != source_timestamp_id.load())
+					return std::make_pair(nullptr, EPRO_TEXT("fail"));
+				irr::io::IReadFile* reader = nullptr;
+				if(path == EPRO_TEXT("archives")) {
+					reader = Utils::FindFileInArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+					if(!reader)
+						continue;
+				}
+				if(width != _width || height != _height) {
+					width = _width;
+					height = _height;
+				}
+				auto file = reader ? reader->getFileName().c_str() : fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
+				__repeat:
+				if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader))) {
+					if(timestamp_id != source_timestamp_id.load()) {
+						img->drop();
+						if(reader) {
+							reader->drop();
+							reader = nullptr;
+						}
+						return std::make_pair(nullptr, EPRO_TEXT("fail"));
+					}
+					if(width != _width || height != _height) {
+						img->drop();
+						width = _width;
+						height = _height;
+						goto __repeat;
+					}
+					if(reader) {
+						reader->drop();
+						reader = nullptr;
+					}
+					return std::make_pair(img, Utils::ToPathString(file));
+				}
 				if(timestamp_id != source_timestamp_id.load()) {
-					img->drop();
 					if(reader) {
 						reader->drop();
 						reader = nullptr;
 					}
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
 				}
-				if(width != _width || height != _height) {
-					img->drop();
-					width = _width;
-					height = _height;
-					goto __repeat;
-				}
 				if(reader) {
 					reader->drop();
 					reader = nullptr;
 				}
-				return std::make_pair(img, Utils::ToPathString(file));
-			}
-			if(timestamp_id != source_timestamp_id.load()) {
-				if(reader) {
-					reader->drop();
-					reader = nullptr;
-				}
-				return std::make_pair(nullptr, EPRO_TEXT("fail"));
-			}
-			if(reader) {
-				reader->drop();
-				reader = nullptr;
 			}
 		}
 	}
-	if(GetDownloadStatus(code, type) == NONE) {
-		AddToDownloadQueue(code, type);
+	if(status == NONE) {
+		 AddToDownloadQueue(code, type);
 	}
 	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
 }
@@ -658,10 +686,11 @@ irr::video::ITexture* ImageManager::GetTextureCard(int code, imgType type, bool 
 				*chk = 2;
 			return ret_unk;
 		}
-		if(status == DOWNLOADED) {
+		//pic will be loaded below instead
+		/*if(status == DOWNLOADED) {
 			map[code] = driver->getTexture(GetDownloadPath(code, type).c_str());
 			return map[code] ? map[code] : ret_unk;
-		}
+		}*/
 		if(status == DOWNLOAD_ERROR) {
 			map[code] = nullptr;
 			return ret_unk;
