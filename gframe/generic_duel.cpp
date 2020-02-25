@@ -720,11 +720,6 @@ void GenericDuel::DuelEndProc() {
 	int minvictories = std::ceil(best_of / 2.0);
 	if(match_kill || (winc[0] >= minvictories || winc[1] >= minvictories) || match_result.size() >= best_of) {
 		seeking_rematch = true;
-		observers_mutex.lock();
-		for(auto& obs : observers) {
-			obs->state = CTOS_LEAVE_GAME;
-		}
-		observers_mutex.unlock();
 		unsigned char rematch[10];
 		rematch[0] = MSG_SELECT_YESNO;
 		rematch[1] = 0;
@@ -1248,10 +1243,11 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 		NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 		if(CheckReady()) {
 			seeking_rematch = false;
+			auto& player = match_result[match_result.size() - 1] == 0 ? players.opposing.front().player : players.home.front().player;
 			match_result.clear();
-			NetServer::SendPacketToPlayer(players.home.front().player, STOC_SELECT_TP);
+			NetServer::SendPacketToPlayer(player, STOC_SELECT_TP);
 			ITERATE_PLAYERS(
-				if(dueler.player != players.home.front().player)
+				if(dueler.player != player)
 					dueler.player->state = 0xff;
 			)
 			players.home.front().player->state = CTOS_TP_RESULT;
