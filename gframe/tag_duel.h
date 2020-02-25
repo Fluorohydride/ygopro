@@ -18,7 +18,7 @@ public:
 	virtual void ToObserver(DuelPlayer* dp);
 	virtual void PlayerReady(DuelPlayer* dp, bool ready);
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos);
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata);
+	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void StartDuel(DuelPlayer* dp);
 	virtual void HandResult(DuelPlayer* dp, unsigned char res);
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
@@ -37,7 +37,7 @@ public:
 	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
 	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
 	void RefreshSingle(int player, int location, int sequence, int flag = 0xf81fff);
-	
+
 	static int MessageHandler(long fduel, int type);
 	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 	
@@ -48,10 +48,10 @@ protected:
 	std::set<DuelPlayer*> observers;
 	bool ready[4];
 	Deck pdeck[4];
+	int deck_error[4];
 	unsigned char hand_result[2];
 	unsigned char last_response;
 	Replay last_replay;
-	bool game_started;
 	unsigned char turn_count;
 	unsigned short time_limit[2];
 	unsigned short time_elapsed;

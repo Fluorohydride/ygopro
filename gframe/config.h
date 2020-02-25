@@ -12,9 +12,11 @@
 #include <ws2tcpip.h>
 
 #ifdef _MSC_VER
-#define myswprintf _swprintf
+#define mywcsncasecmp _wcsnicmp
+#define mystrncasecmp _strnicmp
 #else
-#define myswprintf swprintf
+#define mywcsncasecmp wcsncasecmp
+#define mystrncasecmp strncasecmp
 #endif
 
 #define socklen_t int
@@ -40,16 +42,27 @@
 #define SOCKET_ERRNO() (errno)
 
 #include <wchar.h>
-#define myswprintf(buf, fmt, ...) swprintf(buf, 4096, fmt, ##__VA_ARGS__)
+#define mywcsncasecmp wcsncasecmp
+#define mystrncasecmp strncasecmp
 inline int _wtoi(const wchar_t * s) {
 	wchar_t * endptr;
 	return (int)wcstol(s, &endptr, 10);
 }
 #endif
 
+template<size_t N, typename... TR>
+inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
+	return swprintf(buf, N, fmt, args...);
+}
+
 #include <irrlicht.h>
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else //__APPLE__
 #include <GL/gl.h>
 #include <GL/glu.h>
+#endif //__APPLE__
 #include "CGUITTFont.h"
 #include "CGUIImageButton.h"
 #include <iostream>
@@ -57,12 +70,14 @@ inline int _wtoi(const wchar_t * s) {
 #include <stdlib.h>
 #include <memory.h>
 #include <time.h>
+#include <thread>
+#include <mutex>
+#include <algorithm>
 #include "bufferio.h"
-#include "mymutex.h"
+#include "myfilesystem.h"
 #include "mysignal.h"
-#include "mythread.h"
 #include "../ocgcore/ocgapi.h"
-#include "../ocgcore/card.h"
+#include "../ocgcore/common.h"
 
 using namespace irr;
 using namespace core;
@@ -76,5 +91,6 @@ extern int enable_log;
 extern bool exit_on_return;
 extern bool open_file;
 extern wchar_t open_file_name[256];
+extern bool bot_mode;
 
 #endif

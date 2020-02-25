@@ -4,6 +4,7 @@
 #include "config.h"
 #include <vector>
 #include <set>
+#include <map>
 #include <unordered_map>
 
 namespace ygo {
@@ -39,9 +40,9 @@ struct CardDataC {
 	unsigned int category;
 };
 struct CardString {
-	wchar_t* name;
-	wchar_t* text;
-	wchar_t* desc[16];
+	std::wstring name;
+	std::wstring text;
+	std::wstring desc[16];
 };
 typedef std::unordered_map<unsigned int, CardDataC>::const_iterator code_pointer;
 
@@ -88,8 +89,7 @@ public:
 	u8 location;
 	u8 sequence;
 	u8 position;
-	u8 is_disabled;
-	u8 is_public;
+	u32 status;
 	u8 cHint;
 	u32 chValue;
 	u32 opParam;

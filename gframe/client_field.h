@@ -4,6 +4,7 @@
 #include "config.h"
 #include <vector>
 #include <set>
+#include <map>
 
 namespace ygo {
 
@@ -54,19 +55,18 @@ public:
 	int select_max;
 	int must_select_count;
 	int select_sumval;
-	int select_cancelable;
 	int select_mode;
+	bool select_cancelable;
 	bool select_panalmode;
 	bool select_ready;
 	int announce_count;
-	int declarable_type;
 	int select_counter_count;
 	int select_counter_type;
 	std::vector<ClientCard*> selectable_cards;
 	std::vector<ClientCard*> selected_cards;
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
-	std::vector<int> opcode;
+	std::vector<int> declare_opcodes;
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int, int> player_desc_hints[2];
@@ -96,6 +96,7 @@ public:
 	void ShowSelectCard(bool buttonok = false, bool chain = false);
 	void ShowChainCard();
 	void ShowLocationCard();
+	void ShowSelectOption(int select_hint = 0);
 	void ReplaySwap();
 	void RefreshAllCards();
 
@@ -110,9 +111,7 @@ public:
 	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);
 	bool check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count);
 
-	void UpdateDeclarableCodeType(bool enter);
-	void UpdateDeclarableCodeOpcode(bool enter);
-	void UpdateDeclarableCode(bool enter);
+	void UpdateDeclarableList();
 
 	irr::gui::IGUIElement* panel;
 	std::vector<int> ancard;
@@ -136,7 +135,10 @@ public:
 	void UpdateChainButtons();
 	void ShowCancelOrFinishButton(int buttonOp);
 	void SetShowMark(ClientCard* pcard, bool enable);
+	void ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* element, irr::gui::IGUIElement* parent);
 	void SetResponseSelectedCards() const;
+	void SetResponseSelectedOption() const;
+	void CancelOrFinish();
 };
 
 }
