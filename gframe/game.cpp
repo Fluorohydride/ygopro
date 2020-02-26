@@ -53,7 +53,7 @@
 unsigned short PRO_VERSION = 0x1350;
 #define EDOPRO_VERSION_MAJOR 37
 #define EDOPRO_VERSION_MINOR 0
-#define EDOPRO_VERSION_PATCH 1
+#define EDOPRO_VERSION_PATCH 2
 #define EDOPRO_VERSION_CODENAME L"Spider Shark"
 
 nlohmann::json configs;
