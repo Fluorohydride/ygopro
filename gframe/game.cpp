@@ -642,7 +642,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
 	gSettings.chkHidePasscodeScope = env->addCheckBox(gameConf.hidePasscodeScope, Scale(20, 185, 300, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, dataManager.GetSysString(2063).c_str());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.chkDrawFieldSpells = env->addCheckBox(gameConf.chkHideSetname, Scale(20, 215, 300, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, dataManager.GetSysString(2068).c_str());
+	gSettings.chkDrawFieldSpells = env->addCheckBox(gameConf.draw_field_spell, Scale(20, 215, 300, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, dataManager.GetSysString(2068).c_str());
 	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
 	gSettings.chkFilterBot = env->addCheckBox(gameConf.filterBot, Scale(20, 245, 300, 270), gSettings.window, CHECKBOX_FILTER_BOT, dataManager.GetSysString(2069).c_str());
 	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
