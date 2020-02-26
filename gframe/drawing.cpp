@@ -133,7 +133,7 @@ void Game::DrawBackGround() {
 			break;
 		}
 	}
-	int speed = (dInfo.extraval & 0x1) ? 1 : 0;
+	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(gameConf.draw_field_spell) {
 		int fieldcode1 = -1;
 		int fieldcode2 = -1;
@@ -273,12 +273,12 @@ void Game::DrawBackGround() {
 void Game::DrawLinkedZones(ClientCard* pcard) {
 	int mark = pcard->link_marker;
 	ClientCard* pcard2;
+	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(dField.hovered_location == LOCATION_SZONE) {
 		int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
-		int speed = (dInfo.extraval & 0x1) ? 1 : 0;
 		if(dField.hovered_sequence > 4)
 			return;
-		if(mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence > (0 + (dInfo.extraval & 0x1))) {
+		if(mark & LINK_MARKER_TOP_LEFT && dField.hovered_sequence > (0 + speed)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
 			CheckMutual(pcard2, LINK_MARKER_BOTTOM_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
@@ -288,17 +288,17 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			CheckMutual(pcard2, LINK_MARKER_BOTTOM);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence < (4 - (dInfo.extraval & 0x1))) {
+		if(mark & LINK_MARKER_TOP_RIGHT && dField.hovered_sequence < (4 - speed)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence + 1];
 			CheckMutual(pcard2, LINK_MARKER_BOTTOM_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_LEFT && dField.hovered_sequence >(0 + (dInfo.extraval & 0x1))) {
+		if(mark & LINK_MARKER_LEFT && dField.hovered_sequence >(0 + speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
 			CheckMutual(pcard2, LINK_MARKER_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence - 1][field][speed], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - (dInfo.extraval & 0x1))) {
+		if(mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
 			CheckMutual(pcard2, LINK_MARKER_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence + 1][field][speed], 4, matManager.iRectangle, 2);
@@ -306,22 +306,22 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 		return;
 	}
 	if (dField.hovered_sequence < 5) {
-		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > (0 + (dInfo.extraval & 0x1))) {
+		if (mark & LINK_MARKER_LEFT && dField.hovered_sequence > (0 + speed)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence - 1];
 			CheckMutual(pcard2, LINK_MARKER_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - (dInfo.extraval & 0x1))) {
+		if (mark & LINK_MARKER_RIGHT && dField.hovered_sequence < (4 - speed)) {
 			pcard2 = dField.mzone[dField.hovered_controler][dField.hovered_sequence + 1];
 			CheckMutual(pcard2, LINK_MARKER_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_BOTTOM_LEFT && dField.hovered_sequence > (0 + (dInfo.extraval & 0x1))) {
+		if(mark & LINK_MARKER_BOTTOM_LEFT && dField.hovered_sequence > (0 + speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence - 1];
 			if(CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT))
 				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence - 1], 4, matManager.iRectangle, 2);
 		}
-		if(mark & LINK_MARKER_BOTTOM_RIGHT && dField.hovered_sequence < (4 - (dInfo.extraval & 0x1))) {
+		if(mark & LINK_MARKER_BOTTOM_RIGHT && dField.hovered_sequence < (4 - speed)) {
 			pcard2 = dField.szone[dField.hovered_controler][dField.hovered_sequence + 1];
 			if(CheckMutual(pcard2, LINK_MARKER_TOP_LEFT))
 				driver->drawVertexPrimitiveList(&matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence + 1], 4, matManager.iRectangle, 2);
@@ -359,7 +359,7 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 		}
 	} else {
 		int swap = (dField.hovered_sequence == 5) ? 0 : 2;
-		if (mark & LINK_MARKER_BOTTOM_LEFT && !((dInfo.extraval & 0x1) && swap == 0)) {
+		if (mark & LINK_MARKER_BOTTOM_LEFT && !(speed && swap == 0)) {
 			pcard2 = dField.mzone[dField.hovered_controler][0 + swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][0 + swap], 4, matManager.iRectangle, 2);
@@ -369,12 +369,12 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			CheckMutual(pcard2, LINK_MARKER_TOP);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][1 + swap], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_BOTTOM_RIGHT && !((dInfo.extraval & 0x1) && swap == 2)) {
+		if (mark & LINK_MARKER_BOTTOM_RIGHT && !(speed && swap == 2)) {
 			pcard2 = dField.mzone[dField.hovered_controler][2 + swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[dField.hovered_controler][2 + swap], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_TOP_LEFT && !((dInfo.extraval & 0x1) && swap == 0)) {
+		if (mark & LINK_MARKER_TOP_LEFT && !(speed && swap == 0)) {
 			pcard2 = dField.mzone[1 - dField.hovered_controler][4 - swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_LEFT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][4 - swap], 4, matManager.iRectangle, 2);
@@ -384,7 +384,7 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			CheckMutual(pcard2, LINK_MARKER_TOP);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][3 - swap], 4, matManager.iRectangle, 2);
 		}
-		if (mark & LINK_MARKER_TOP_RIGHT && !((dInfo.extraval & 0x1) && swap == 2)) {
+		if (mark & LINK_MARKER_TOP_RIGHT && !(speed && swap == 2)) {
 			pcard2 = dField.mzone[1 - dField.hovered_controler][2 - swap];
 			CheckMutual(pcard2, LINK_MARKER_TOP_RIGHT);
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][2 - swap], 4, matManager.iRectangle, 2);
@@ -520,7 +520,7 @@ void Game::DrawShadowText(irr::gui::CGUITTFont * font, const core::stringw & tex
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
 	int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (dInfo.extraval & 0x1) ? 1 : 0;
+	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot.Z += (1.2f / 1000.0f) * delta_time;
 	im.setRotationRadians(act_rot);
@@ -664,8 +664,8 @@ void Game::DrawMisc() {
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	DrawShadowText(lpcFont, dataManager.GetNumString(dInfo.turn).c_str(), Resize(635, 5, 685, 40), Resize(0, 0, 2, 0), 0x8000ffff, 0x80000000, true);
 	ClientCard* pcard;
-	int seq = (dInfo.duel_field != 4) ? 6 : (dInfo.extraval & 0x1) ? 1 : 0;
-	int increase = (dInfo.duel_field != 4) ? 1 : (dInfo.extraval & 0x1) ? 2 : 4;
+	int seq = (dInfo.duel_field != 4) ? 6 : (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	int increase = (dInfo.duel_field != 4) ? 1 : (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 2 : 4;
 	for (int p = 0, seq2 = seq; p < 2; ++p, seq2 = seq) {
 		for (int i = 0; i < 7; ++i) {
 			pcard = dField.mzone[p][i];

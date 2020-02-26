@@ -2104,13 +2104,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 void ClientField::GetHoverField(int x, int y) {
 	irr::core::recti sfRect(430, 504, 875, 600);
 	irr::core::recti ofRect(531, 135, 800, 191);
-	if(mainGame->dInfo.extraval & 0x1) {
+	if(mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
 		sfRect = recti(509, 504, 796, 600);
 		ofRect = recti(531+ 46, 135, 800- 46, 191);
 	}
 	irr::core::position2di pos(x, y);
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (mainGame->dInfo.extraval & 0x1) ? 1 : 0;
+	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
 		int cardSize = 66;
@@ -2278,7 +2278,7 @@ void ClientField::GetHoverField(int x, int y) {
 			int sequence = (boardx - matManager.vFieldMzone[0][0][0].Pos.X) / (matManager.vFieldMzone[0][0][1].Pos.X - matManager.vFieldMzone[0][0][0].Pos.X);
 			if(sequence > 4)
 				sequence = 4;
-			if((mainGame->dInfo.extraval & 0x1) && (sequence == 0 || sequence== 4))
+			if((mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) && (sequence == 0 || sequence== 4))
 				hovered_location = 0;
 			else if(boardy > matManager.vFieldSzone[0][0][field][speed][0].Pos.Y && boardy <= matManager.vFieldSzone[0][0][field][speed][2].Pos.Y) {
 				hovered_controler = 0;

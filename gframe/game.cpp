@@ -2357,7 +2357,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 void Game::SetPhaseButtons() {
 	// reset master rule 4 phase button position
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	if (dInfo.extraval & 0x1) {
+	if (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
 		if (dInfo.duel_field >= 4) {
 			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
 			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));

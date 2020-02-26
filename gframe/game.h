@@ -81,7 +81,6 @@ struct DuelInfo {
 	int startlp;
 	int duel_field;
 	int duel_params;
-	int extraval;
 	int turn;
 	short curMsg;
 	int team1;

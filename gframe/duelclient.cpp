@@ -348,7 +348,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.lock();
 			int mainmin = 40, mainmax = 60, extramax = 15, sidemax = 15;
 			if (mainGame->cbDeckSelect2->isVisible()) {
-				if (mainGame->dInfo.extraval & 0x1) {
+				if (mainGame->dInfo.duel_params & DUEL_SPEED) {
 					mainmin = 40;
 					mainmax = 60;
 					extramax = 10;
@@ -359,7 +359,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					extramax = 30;
 					sidemax = 30;
 				}
-			} else if (mainGame->dInfo.extraval & 0x1) {
+			} else if (mainGame->dInfo.duel_params & DUEL_SPEED) {
 				mainmin = 20;
 				mainmax = 30;
 				extramax = 10;
@@ -565,6 +565,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				pkt->info.best_of = 0;
 			}
 		}
+		mainGame->dInfo.duel_params = pkt->info.duel_flag;
 		mainGame->dInfo.isRelay = pkt->info.duel_flag & DUEL_RELAY;
 		pkt->info.duel_flag &= ~DUEL_RELAY;
 		mainGame->dInfo.team1 = pkt->info.team1;
@@ -691,7 +692,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.unlock();
-		mainGame->dInfo.extraval = (!mainGame->dInfo.compat_mode && pkt->info.extra_rules & SPEED_DUEL) ? 1 : 0;
 		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		connect_state |= 0x4;
@@ -1521,7 +1521,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
 			else {
-				int seq = mainGame->dInfo.duel_field == 4 ? (mainGame->dInfo.extraval & 0x1) ? 1 : 0 : 6;
+				int seq = mainGame->dInfo.duel_field == 4 ? (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0 : 6;
 				if (pcard->location == LOCATION_SZONE && pcard->sequence == seq && (pcard->type & TYPE_PENDULUM) && !pcard->equipTarget)
 					mainGame->dField.pzone_act[pcard->controler] = true;
 			}
@@ -3932,11 +3932,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(mainGame->dInfo.compat_mode) {
 			uint8_t field = BufferIO::Read<uint8_t>(pbuf);
 			mainGame->dInfo.duel_field = field & 0xf;
-			mainGame->dInfo.extraval = field >> 4;
+			mainGame->dInfo.duel_params = 0;
 		} else {
 			uint32_t opts = BufferIO::Read<uint32_t>(pbuf);
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts, 1);
-			mainGame->dInfo.extraval = (opts & DUEL_SPEED) ? 1 : 0;
+			mainGame->dInfo.duel_params = opts;
 		}
 		mainGame->SetPhaseButtons();
 		uint32_t val = 0;
@@ -4315,7 +4315,7 @@ void DuelClient::ReplayPrompt(bool need_header) {
 		for(auto& name : mainGame->dInfo.opponames) {
 			last_replay.WriteData(name.c_str(), 40, false);
 		}
-		last_replay.Write<uint32_t>(mainGame->dInfo.duel_field | mainGame->dInfo.extraval >> 8);
+		last_replay.Write<uint32_t>(mainGame->dInfo.duel_params);
 		last_replay.WriteStream(replay_stream);
 		last_replay.EndRecord();
 	}

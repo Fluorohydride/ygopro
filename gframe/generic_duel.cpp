@@ -576,7 +576,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(!host_info.no_shuffle_deck) {
 		ITERATE_PLAYERS(std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);)
 	}
-	new_replay.Write<uint32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & DUEL_SPEED) << 8);
+	new_replay.Write<uint32_t>(opt);
 	last_replay.Write<uint32_t>(host_info.start_lp, false);
 	last_replay.Write<uint32_t>(host_info.start_hand, false);
 	last_replay.Write<uint32_t>(host_info.draw_count, false);
