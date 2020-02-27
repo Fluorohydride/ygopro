@@ -27,6 +27,9 @@ struct GameConfig
 	std::wstring lastdeck = L"";
 	unsigned int lastlflist = 0;
 	unsigned int lastallowedcards = 3;
+	bool botThrowRock = false;
+	bool botMute = false;
+	int lastBot = 0;
 	std::wstring textfont = L"fonts/NotoSansJP-Regular.otf";
 	std::wstring numfont = L"fonts/NotoSansJP-Regular.otf";
 	std::wstring roompass = L""; // NOT SERIALIZED

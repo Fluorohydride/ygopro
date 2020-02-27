@@ -465,9 +465,9 @@ bool Game::Initialize() {
 	gBot.window->getCloseButton()->setVisible(false);
 	gBot.window->setVisible(false);
 	gBot.deckProperties = env->addStaticText(L"", Scale(10, 25, 200, 100), true, true, gBot.window);
-	gBot.chkThrowRock = env->addCheckBox(false, Scale(10, 105, 200, 130), gBot.window, -1, dataManager.GetSysString(2052).c_str());
+	gBot.chkThrowRock = env->addCheckBox(gameConf.botThrowRock, Scale(10, 105, 200, 130), gBot.window, -1, dataManager.GetSysString(2052).c_str());
 	defaultStrings.emplace_back(gBot.chkThrowRock, 2052);
-	gBot.chkMute = env->addCheckBox(false, Scale(10, 135, 200, 160), gBot.window, -1, dataManager.GetSysString(2053).c_str());
+	gBot.chkMute = env->addCheckBox(gameConf.botMute, Scale(10, 135, 200, 160), gBot.window, -1, dataManager.GetSysString(2053).c_str());
 	defaultStrings.emplace_back(gBot.chkMute, 2053);
 	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
 	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, dataManager.GetSysString(2054).c_str());
@@ -1882,6 +1882,9 @@ void Game::LoadConfig() {
 void Game::SaveConfig() {
 	gameConf.nickname = ebNickName->getText();
 	gameConf.lastallowedcards = cbRule->getSelected();
+	gameConf.botThrowRock = gBot.chkThrowRock->isChecked();
+	gameConf.botMute = gBot.chkMute->isChecked();
+	gameConf.lastBot = gBot.CurrentIndex();
 	gameConf.chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
 	gameConf.chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();
 	gameConf.chkRandomPos = tabSettings.chkRandomPos->isChecked();

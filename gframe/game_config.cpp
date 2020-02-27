@@ -54,6 +54,12 @@ bool GameConfig::Load(const char* filename)
 				auto val = std::stoi(str);
 				lastallowedcards = val >= 0 ? val : 0;
 			}
+			else if (type == "botThrowRock")
+				botThrowRock = !!std::stoi(str);
+			else if (type == "botMute")
+				botMute = !!std::stoi(str);
+			else if (type == "lastBot")
+				lastBot = std::stoi(str);
 			else if (type == "textfont") {
 				pos = str.find(L' ');
 				if (pos == std::wstring::npos) {
@@ -162,6 +168,9 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "serverport = "         << BufferIO::EncodeUTF8s(serverport) << "\n";
 	conf_file << "lasthost = "           << BufferIO::EncodeUTF8s(lasthost) << "\n";
 	conf_file << "lastport = "           << BufferIO::EncodeUTF8s(lastport) << "\n";
+	conf_file << "botThrowRock = "       << botThrowRock << "\n";
+	conf_file << "botMute = "            << botMute << "\n";
+	conf_file << "lastBot = "            << lastBot << "\n";
 	conf_file << "game_version = "       << game_version << "\n";
 	conf_file << "automonsterpos = "     << chkMAutoPos << "\n";
 	conf_file << "autospellpos = "       << chkSTAutoPos << "\n";
