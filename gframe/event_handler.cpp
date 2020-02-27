@@ -1588,10 +1588,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(mplayer != hovered_player) {
 				if(mplayer >= 0) {
 					std::wstring player_name;
+					auto& self = mainGame->dInfo.isTeam1 ? mainGame->dInfo.selfnames : mainGame->dInfo.opponames;
+					auto& oppo = mainGame->dInfo.isTeam1 ? mainGame->dInfo.opponames : mainGame->dInfo.selfnames;
 					if (mplayer == 0)
-						player_name = mainGame->dInfo.selfnames[mainGame->dInfo.current_player[mplayer]];
+						player_name = self[mainGame->dInfo.current_player[mplayer]];
 					else
-						player_name = mainGame->dInfo.opponames[mainGame->dInfo.current_player[mplayer]];
+						player_name = oppo[mainGame->dInfo.current_player[mplayer]];
 					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
 					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {
 						player_name.append(fmt::format(L"\n*{}", dataManager.GetDesc(iter->first, mainGame->dInfo.compat_mode)));
