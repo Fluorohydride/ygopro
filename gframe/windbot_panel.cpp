@@ -50,13 +50,14 @@ void WindBotPanel::UpdateDescription() {
 }
 
 bool WindBotPanel::LaunchSelected(int port) {
-	int sel = deckBox->getSelected();
-	if (sel < 0 || sel >= bots.size()) return false;
+	int selected = deckBox->getSelected();
+	if (selected < 0) return false;
+	int index = deckBox->getItemData(selected);
 	// 1 = scissors, 2 = rock, 3 = paper
 #if defined(_WIN32) || defined(__ANDROID__)
-	return bots[sel].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	return bots[index].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
 #else
-	auto pid = bots[sel].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	auto pid = bots[index].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
 	if(pid > 0) {
 		windbotsPids.push_back(pid);
 	}
