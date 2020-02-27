@@ -957,12 +957,22 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	}
 	case MSG_CONFIRM_CARDS: {
 		player = BufferIO::Read<uint8_t>(pbuf);
-		if(pbuf[5] != LOCATION_DECK) {
+		int count = BufferIO::Read<uint32>(pbuf);
+		if(count > 0) {
+			/*uint32 code = */BufferIO::Read<uint32>(pbuf);
+			/*uint32 controler = */BufferIO::Read<uint8_t>(pbuf);
+			uint8_t location = BufferIO::Read<uint8_t>(pbuf);
+			if(location != LOCATION_DECK) {
+				SEND(nullptr);
+				ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+					packets_cache.emplace_back(TO_SEND_BUFFER);
+			} else {
+				SEND(cur_player[player]);
+			}
+		} else {
 			SEND(nullptr);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-			packets_cache.emplace_back(TO_SEND_BUFFER);
-		} else {
-			SEND(cur_player[player]);
+				packets_cache.emplace_back(TO_SEND_BUFFER);
 		}
 		break;
 	}
