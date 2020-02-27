@@ -9,11 +9,15 @@
 namespace ygo {
 
 void WindBotPanel::Refresh(int filterMasterRule) {
+	int selected = deckBox->getSelected();
+	int lastBot = selected >= 0 ? deckBox->getItemData(selected) : 0;
 	deckBox->clear();
 	for (int i = 0; i < bots.size(); i++) {
 		const auto& bot = bots[i];
 		if (filterMasterRule == 0 || bot.masterRules.find(filterMasterRule) != bot.masterRules.end()) {
-			deckBox->addItem(bot.name.c_str(), i);
+			int index = deckBox->addItem(bot.name.c_str(), i);
+			if (i == lastBot)
+				deckBox->setSelected(i);
 		}
 	}
 	UpdateDescription();
