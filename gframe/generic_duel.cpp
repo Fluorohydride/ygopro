@@ -1260,7 +1260,7 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 				if(dueler.player != player)
 					dueler.player->state = 0xff;
 			)
-			players.home.front().player->state = CTOS_TP_RESULT;
+			player->state = CTOS_TP_RESULT;
 			duel_stage = DUEL_STAGE_FIRSTGO;
 		}
 		return;
