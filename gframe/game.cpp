@@ -1885,6 +1885,7 @@ void Game::SaveConfig() {
 	gameConf.botThrowRock = gBot.chkThrowRock->isChecked();
 	gameConf.botMute = gBot.chkMute->isChecked();
 	gameConf.lastBot = gBot.CurrentIndex();
+	gameConf.lastServer = serverChoice->getItem(serverChoice->getSelected());
 	gameConf.chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
 	gameConf.chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();
 	gameConf.chkRandomPos = tabSettings.chkRandomPos->isChecked();
@@ -2023,7 +2024,9 @@ void Game::LoadServers() {
 				tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
 				tmp_server.roomlistport = obj["roomlistport"].get<int>();
 				tmp_server.duelport = obj["duelport"].get<int>();
-				mainGame->serverChoice->addItem(tmp_server.name.c_str());
+				int i = serverChoice->addItem(tmp_server.name.c_str());
+				if (gameConf.lastServer == tmp_server.name)
+					serverChoice->setSelected(i);
 				ServerLobby::serversVector.push_back(std::move(tmp_server));
 			}
 		}

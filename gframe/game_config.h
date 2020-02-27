@@ -30,6 +30,7 @@ struct GameConfig
 	bool botThrowRock = false;
 	bool botMute = false;
 	int lastBot = 0;
+	std::wstring lastServer = L"";
 	std::wstring textfont = L"fonts/NotoSansJP-Regular.otf";
 	std::wstring numfont = L"fonts/NotoSansJP-Regular.otf";
 	std::wstring roompass = L""; // NOT SERIALIZED

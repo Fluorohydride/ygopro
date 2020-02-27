@@ -60,6 +60,8 @@ bool GameConfig::Load(const char* filename)
 				botMute = !!std::stoi(str);
 			else if (type == "lastBot")
 				lastBot = std::stoi(str);
+			else if (type == "lastServer")
+				lastServer = BufferIO::DecodeUTF8s(str);
 			else if (type == "textfont") {
 				pos = str.find(L' ');
 				if (pos == std::wstring::npos) {
@@ -171,6 +173,7 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "botThrowRock = "       << botThrowRock << "\n";
 	conf_file << "botMute = "            << botMute << "\n";
 	conf_file << "lastBot = "            << lastBot << "\n";
+	conf_file << "lastServer = "         << BufferIO::EncodeUTF8s(lastServer) << "\n";
 	conf_file << "game_version = "       << game_version << "\n";
 	conf_file << "automonsterpos = "     << chkMAutoPos << "\n";
 	conf_file << "autospellpos = "       << chkSTAutoPos << "\n";
