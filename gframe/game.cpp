@@ -871,20 +871,20 @@ bool Game::Initialize() {
 	RefreshLFLists();
 	btnSaveDeck = env->addButton(Scale(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302).c_str());
 	defaultStrings.emplace_back(btnSaveDeck, 1302);
+	btnRenameDeck = env->addButton(Scale(5, 65, 75, 90), wDeckEdit, BUTTON_RENAME_DECK, dataManager.GetSysString(1362).c_str());
+	defaultStrings.emplace_back(btnRenameDeck, 1362);
 	ebDeckname = env->addEditBox(L"", Scale(80, 65, 220, 90), true, wDeckEdit, EDITBOX_DECK_NAME);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnSaveDeckAs = env->addButton(Scale(225, 65, 290, 90), wDeckEdit, BUTTON_SAVE_DECK_AS, dataManager.GetSysString(1303).c_str());
 	defaultStrings.emplace_back(btnSaveDeckAs, 1303);
+	btnShuffleDeck = env->addButton(Scale(5, 95, 75, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307).c_str());
+	defaultStrings.emplace_back(btnShuffleDeck, 1307);
+	btnSortDeck = env->addButton(Scale(80, 95, 145, 120), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305).c_str());
+	defaultStrings.emplace_back(btnSortDeck, 1305);
+	btnClearDeck = env->addButton(Scale(155, 95, 220, 120), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304).c_str());
+	defaultStrings.emplace_back(btnClearDeck, 1304);
 	btnDeleteDeck = env->addButton(Scale(225, 95, 290, 120), wDeckEdit, BUTTON_DELETE_DECK, dataManager.GetSysString(1308).c_str());
 	defaultStrings.emplace_back(btnDeleteDeck, 1308);
-	btnShuffleDeck = env->addButton(Scale(5, 99, 55, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307).c_str());
-	defaultStrings.emplace_back(btnShuffleDeck, 1307);
-	btnSortDeck = env->addButton(Scale(60, 99, 110, 120), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305).c_str());
-	defaultStrings.emplace_back(btnSortDeck, 1305);
-	btnClearDeck = env->addButton(Scale(115, 99, 165, 120), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304).c_str());
-	defaultStrings.emplace_back(btnClearDeck, 1304);
-	btnRenameDeck = env->addButton(Scale(170, 99, 220, 120), wDeckEdit, BUTTON_RENAME_DECK, dataManager.GetSysString(1362).c_str());
-	defaultStrings.emplace_back(btnRenameDeck, 1362);
 	btnSideOK = env->addButton(Scale(510, 40, 820, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334).c_str());
 	defaultStrings.emplace_back(btnSideOK, 1334);
 	btnSideOK->setVisible(false);
@@ -2657,13 +2657,15 @@ void Game::OnResize() {
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
 	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
-	btnClearDeck->setRelativePosition(Resize(115, 99, 165, 120));
-	btnSortDeck->setRelativePosition(Resize(60, 99, 110, 120));
-	btnShuffleDeck->setRelativePosition(Resize(5, 99, 55, 120));
-	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
 	btnSaveDeck->setRelativePosition(Resize(225, 35, 290, 60));
-	btnSaveDeckAs->setRelativePosition(Resize(225, 65, 290, 90));
+	btnRenameDeck->setRelativePosition(Resize(5, 65, 75, 90));
 	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
+	btnSaveDeckAs->setRelativePosition(Resize(225, 65, 290, 90));
+	btnShuffleDeck->setRelativePosition(Resize(5, 95, 75, 120));
+	btnSortDeck->setRelativePosition(Resize(80, 95, 145, 120));
+	btnClearDeck->setRelativePosition(Resize(155, 95, 220, 120));
+	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
+	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
 	cbSortType->setRelativePosition(Resize(10, 2, 85, 22));
@@ -2702,8 +2704,6 @@ void Game::OnResize() {
 	btnSideShuffle->setRelativePosition(Resize(310, 100, 370, 130));
 	btnSideSort->setRelativePosition(Resize(375, 100, 435, 130));
 	btnSideReload->setRelativePosition(Resize(440, 100, 500, 130));
-	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
-	btnRenameDeck->setRelativePosition(Resize(170, 99, 220, 120));
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
