@@ -65,6 +65,11 @@ bool GameConfig::Load(const char* filename)
 			DESERIALIZE_UNSIGNED(startHand)
 			DESERIALIZE_UNSIGNED(drawCount)
 #undef DESERIALIZE_UNSIGNED
+#define DESERIALIZE_BOOL(name) else if (type == #name) name = !!std::stoi(str);
+			DESERIALIZE_BOOL(relayDuel)
+			DESERIALIZE_BOOL(noCheckDeck)
+			DESERIALIZE_BOOL(noShuffleDeck)
+#undef DESERIALIZE_BOOL
 			else if (type == "botThrowRock")
 				botThrowRock = !!std::stoi(str);
 			else if (type == "botMute")
@@ -198,6 +203,9 @@ bool GameConfig::Save(const char* filename)
 	SERIALIZE(startLP);
 	SERIALIZE(startHand);
 	SERIALIZE(drawCount);
+	SERIALIZE(relayDuel);
+	SERIALIZE(noShuffleDeck);
+	SERIALIZE(noCheckDeck);
 	conf_file << "textfont = "           << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
 	conf_file << "numfont = "            << BufferIO::EncodeUTF8s(numfont) << "\n";
 	conf_file << "serverport = "         << BufferIO::EncodeUTF8s(serverport) << "\n";

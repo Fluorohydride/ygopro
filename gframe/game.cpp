@@ -348,6 +348,7 @@ bool Game::Initialize() {
 	btnRelayMode = env->addButton(Scale(325, 85, 370, 110), wCreateHost, -1, dataManager.GetSysString(1247).c_str());
 	defaultStrings.emplace_back(btnRelayMode, 1247);
 	btnRelayMode->setIsPushButton(true);
+	btnRelayMode->setPressed(gameConf.relayDuel);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1237).c_str(), Scale(20, 120, 320, 140), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1237);
 	ebTimeLimit = env->addEditBox(WStr(gameConf.timeLimit), Scale(140, 115, 220, 140), true, wCreateHost, EDITBOX_NUMERIC);
@@ -402,9 +403,9 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnCustomRulesOK, 1211);
 	forbiddentypes = DUEL_MODE_MR5_FORB;
 	duel_param = DUEL_MODE_MR5;
-	chkNoCheckDeck = env->addCheckBox(false, Scale(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229).c_str());
+	chkNoCheckDeck = env->addCheckBox(gameConf.noCheckDeck, Scale(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229).c_str());
 	defaultStrings.emplace_back(chkNoCheckDeck, 1229);
-	chkNoShuffleDeck = env->addCheckBox(false, Scale(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230).c_str());
+	chkNoShuffleDeck = env->addCheckBox(gameConf.noShuffleDeck, Scale(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230).c_str());
 	defaultStrings.emplace_back(chkNoShuffleDeck, 1230);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1231).c_str(), Scale(20, 240, 320, 260), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1231);
@@ -1898,6 +1899,9 @@ void Game::SaveConfig() {
 	TrySaveInt(gameConf.startLP, ebStartLP);
 	TrySaveInt(gameConf.startHand, ebStartHand);
 	TrySaveInt(gameConf.drawCount, ebDrawCount);
+	gameConf.relayDuel = btnRelayMode->isPressed();
+	gameConf.noCheckDeck = chkNoCheckDeck->isChecked();
+	gameConf.noShuffleDeck = chkNoShuffleDeck->isChecked();
 	gameConf.botThrowRock = gBot.chkThrowRock->isChecked();
 	gameConf.botMute = gBot.chkMute->isChecked();
 	gameConf.lastBot = gBot.CurrentIndex();

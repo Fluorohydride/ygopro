@@ -37,6 +37,9 @@ struct GameConfig
 	unsigned int startLP = 8000;
 	unsigned int startHand = 5;
 	unsigned int drawCount = 1;
+	bool relayDuel = false;
+	bool noCheckDeck = false;
+	bool noShuffleDeck = false;
 	bool botThrowRock = false;
 	bool botMute = false;
 	int lastBot = 0;
