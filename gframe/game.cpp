@@ -332,24 +332,25 @@ bool Game::Initialize() {
 	cbRule->setSelected(gameConf.lastallowedcards);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1227);
-	ebTeam1 = env->addEditBox(L"1", Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
+#define WStr(i) std::to_wstring(i).c_str()
+	ebTeam1 = env->addEditBox(WStr(gameConf.team1count), Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	auto vsstring = env->addStaticText(dataManager.GetSysString(1380).c_str(), Scale(175, 85, 195, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(vsstring, 1380);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebTeam2 = env->addEditBox(L"1", Scale(200, 85, 230, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
+	ebTeam2 = env->addEditBox(WStr(gameConf.team2count), Scale(200, 85, 230, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	vsstring = env->addStaticText(dataManager.GetSysString(1381).c_str(), Scale(235, 85, 280, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(vsstring, 1381);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	ebBestOf = env->addEditBox(L"1", Scale(285, 85, 315, 110), true, wCreateHost, EDITBOX_NUMERIC);
+	ebBestOf = env->addEditBox(WStr(gameConf.bestOf), Scale(285, 85, 315, 110), true, wCreateHost, EDITBOX_NUMERIC);
 	ebBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnRelayMode = env->addButton(Scale(325, 85, 370, 110), wCreateHost, -1, dataManager.GetSysString(1247).c_str());
 	defaultStrings.emplace_back(btnRelayMode, 1247);
 	btnRelayMode->setIsPushButton(true);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1237).c_str(), Scale(20, 120, 320, 140), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1237);
-	ebTimeLimit = env->addEditBox(L"180", Scale(140, 115, 220, 140), true, wCreateHost, EDITBOX_NUMERIC);
+	ebTimeLimit = env->addEditBox(WStr(gameConf.timeLimit), Scale(140, 115, 220, 140), true, wCreateHost, EDITBOX_NUMERIC);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1228).c_str(), Scale(20, 150, 320, 170), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1228);
@@ -407,16 +408,17 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(chkNoShuffleDeck, 1230);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1231).c_str(), Scale(20, 240, 320, 260), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1231);
-	ebStartLP = env->addEditBox(L"8000", Scale(140, 235, 220, 260), true, wCreateHost, EDITBOX_NUMERIC);
+	ebStartLP = env->addEditBox(WStr(gameConf.startLP), Scale(140, 235, 220, 260), true, wCreateHost, EDITBOX_NUMERIC);
 	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1232).c_str(), Scale(20, 270, 320, 290), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1232);
-	ebStartHand = env->addEditBox(L"5", Scale(140, 265, 220, 290), true, wCreateHost, EDITBOX_NUMERIC);
+	ebStartHand = env->addEditBox(WStr(gameConf.startHand), Scale(140, 265, 220, 290), true, wCreateHost, EDITBOX_NUMERIC);
 	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1233).c_str(), Scale(20, 300, 320, 320), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1233);
-	ebDrawCount = env->addEditBox(L"1", Scale(140, 295, 220, 320), true, wCreateHost, EDITBOX_NUMERIC);
+	ebDrawCount = env->addEditBox(WStr(gameConf.drawCount), Scale(140, 295, 220, 320), true, wCreateHost, EDITBOX_NUMERIC);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+#undef WStr
 	tmpptr = env->addStaticText(dataManager.GetSysString(1234).c_str(), Scale(10, 330, 220, 350), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1234);
 	ebServerName = env->addEditBox(gameConf.gamename.c_str(), Scale(110, 325, 250, 350), true, wCreateHost);
@@ -1882,6 +1884,20 @@ void Game::LoadConfig() {
 void Game::SaveConfig() {
 	gameConf.nickname = ebNickName->getText();
 	gameConf.lastallowedcards = cbRule->getSelected();
+	gameConf.lastDuelRule = std::min(DEFAULT_DUEL_RULE - 1, cbDuelRule->getSelected());
+	auto TrySaveInt = [](unsigned int& dest, const IGUIElement* src) {
+		try {
+			dest = std::stoi(src->getText());
+		}
+		catch (...) {}
+	};
+	TrySaveInt(gameConf.timeLimit, ebTimeLimit);
+	TrySaveInt(gameConf.team1count, ebTeam1);
+	TrySaveInt(gameConf.team2count, ebTeam2);
+	TrySaveInt(gameConf.bestOf, ebBestOf);
+	TrySaveInt(gameConf.startLP, ebStartLP);
+	TrySaveInt(gameConf.startHand, ebStartHand);
+	TrySaveInt(gameConf.drawCount, ebDrawCount);
 	gameConf.botThrowRock = gBot.chkThrowRock->isChecked();
 	gameConf.botMute = gBot.chkMute->isChecked();
 	gameConf.lastBot = gBot.CurrentIndex();

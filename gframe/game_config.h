@@ -30,6 +30,7 @@ struct GameConfig
 	unsigned int lastlflist = 0;
 	unsigned int lastallowedcards = 3;
 	unsigned int lastDuelRule = DEFAULT_DUEL_RULE - 1;
+	unsigned int timeLimit = 180;
 	unsigned int team1count = 1;
 	unsigned int team2count = 1;
 	unsigned int bestOf = 1;

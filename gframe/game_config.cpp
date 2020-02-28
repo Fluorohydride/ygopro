@@ -57,6 +57,7 @@ bool GameConfig::Load(const char* filename)
 			}
 			DESERIALIZE_UNSIGNED(lastlflist)
 			DESERIALIZE_UNSIGNED(lastallowedcards)
+			DESERIALIZE_UNSIGNED(timeLimit)
 			DESERIALIZE_UNSIGNED(team1count)
 			DESERIALIZE_UNSIGNED(team2count)
 			DESERIALIZE_UNSIGNED(bestOf)
@@ -156,6 +157,19 @@ bool GameConfig::Load(const char* filename)
 	return true;
 }
 
+template<typename T>
+inline void Serialize(std::ofstream& conf_file, const char* name, T value) {
+	conf_file << name << " = " << value << "\n";
+}
+template<>
+inline void Serialize(std::ofstream& conf_file, const char* name, float value) {
+	conf_file << name << " = " << std::to_string(value) << "\n"; // Forces float to show decimals
+}
+template<>
+inline void Serialize(std::ofstream& conf_file, const char* name, std::wstring value) {
+	conf_file << name << " = " << BufferIO::EncodeUTF8s(value) << "\n";
+}
+
 bool GameConfig::Save(const char* filename)
 {
 	std::ofstream conf_file(filename, std::ofstream::out);
@@ -163,6 +177,7 @@ bool GameConfig::Save(const char* filename)
 		return false;
 	conf_file << "# EDOPro by Project Ignis system.conf\n";
 	conf_file << "# Overwritten on normal game exit\n";
+#define SERIALIZE(name) Serialize(conf_file, #name, name)
 	conf_file << "use_d3d = "            << use_d3d << "\n";
 	conf_file << "use_vsync = "          << use_vsync << "\n";
 	conf_file << "max_fps = "            << max_fps << "\n";
@@ -175,6 +190,14 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "lastdeck = "           << BufferIO::EncodeUTF8s(lastdeck) << "\n";
 	conf_file << "lastlflist = "         << lastlflist << "\n";
 	conf_file << "lastallowedcards = "   << lastallowedcards << "\n";
+	SERIALIZE(lastDuelRule);
+	SERIALIZE(timeLimit);
+	SERIALIZE(team1count);
+	SERIALIZE(team2count);
+	SERIALIZE(bestOf);
+	SERIALIZE(startLP);
+	SERIALIZE(startHand);
+	SERIALIZE(drawCount);
 	conf_file << "textfont = "           << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
 	conf_file << "numfont = "            << BufferIO::EncodeUTF8s(numfont) << "\n";
 	conf_file << "serverport = "         << BufferIO::EncodeUTF8s(serverport) << "\n";
@@ -210,6 +233,7 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "enable_sound = "       << enablesound << "\n";
 	conf_file << "music_volume = "       << musicVolume << "\n";
 	conf_file << "sound_volume = "       << soundVolume << "\n";
+#undef SERIALIZE
 	return true;
 }
 
