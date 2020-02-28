@@ -754,28 +754,34 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CARD_SEL_OK: {
-				mainGame->stCardListTip->setVisible(false);
+				// Space and Return trigger the last focused button so the hide animation can be triggered again
+				// even if it's already hidden along with its child OK button
+				auto HideCardSelectIfVisible = [](bool setAction = false) {
+					if (mainGame->wCardSelect->isVisible())
+						mainGame->HideElement(mainGame->wCardSelect, setAction);
+				};
+ 				mainGame->stCardListTip->setVisible(false);
 				if(mainGame->dInfo.isReplay) {
-					mainGame->HideElement(mainGame->wCardSelect);
+					HideCardSelectIfVisible();
 					break;
 				}
 				if(mainGame->dInfo.curMsg == MSG_SELECT_CARD || mainGame->dInfo.curMsg == MSG_SELECT_SUM) {
 					if(select_ready) {
 						SetResponseSelectedCards();
 						ShowCancelOrFinishButton(0);
-						mainGame->HideElement(mainGame->wCardSelect, true);
+						HideCardSelectIfVisible(true);
 					}
 					break;
 				} else if(mainGame->dInfo.curMsg == MSG_CONFIRM_CARDS) {
-					mainGame->HideElement(mainGame->wCardSelect);
+					HideCardSelectIfVisible();
 					mainGame->actionSignal.Set();
 					break;
 				} else if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD){
 					DuelClient::SetResponseI(-1);
 					ShowCancelOrFinishButton(0);
-					mainGame->HideElement(mainGame->wCardSelect, true);
+					HideCardSelectIfVisible(true);
 				} else {
-					mainGame->HideElement(mainGame->wCardSelect);
+					HideCardSelectIfVisible();
 					if (mainGame->dInfo.curMsg == MSG_SELECT_CHAIN && !chain_forced)
 						ShowCancelOrFinishButton(1);
 					break;
