@@ -54,6 +54,7 @@ namespace ygo {
 		/** Returns true if and only if all tokens are contained in the input. */
 		static bool ContainsSubstring(std::wstring input, const std::vector<std::wstring>& tokens, bool ignoreInputCasingAccents = false, bool ignoreTokenCasingAccents = false);
 		static bool ContainsSubstring(std::wstring input, std::wstring token, bool ignoreInputCasingAccents = false, bool ignoreTokenCasingAccents = false);
+		static std::wstring KeepOnlyDigits(std::wstring input);
 	};
 
 template<typename T>
@@ -102,6 +103,16 @@ inline T Utils::ToUpperNoAccents(T input) {
 #undef CHAR_T
 #undef IN_INTERVAL
 	});
+	return input;
+}
+
+inline std::wstring Utils::KeepOnlyDigits(std::wstring input) {
+	for (auto it = input.begin(); it < input.end(); it++) {
+		if (*it && (*it < L'0' || *it > L'9')) {
+			input.erase(it);
+			continue;
+		}
+	}
 	return input;
 }
 

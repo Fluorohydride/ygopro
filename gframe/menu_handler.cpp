@@ -756,16 +756,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case EDITBOX_NUMERIC: {
-				std::wstring text = caller->getText();
-				if (text.length() < 1)
-					break;
-				for (auto it = text.begin(); it < text.end(); it++) {
-					if (*it != 0 && (*it < L'0' || *it > L'9')) {
-						text.erase(it);
-						continue;
-					}
-				}
-				caller->setText(text.c_str());
+				caller->setText(Utils::KeepOnlyDigits(caller->getText()).c_str());
 				break;
 			}
 			case EDITBOX_NICKNAME: {
