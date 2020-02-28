@@ -46,14 +46,24 @@ bool GameConfig::Load(const char* filename)
 				gamename = BufferIO::DecodeUTF8s(str);
 			else if (type == "lastdeck")
 				lastdeck = BufferIO::DecodeUTF8s(str);
-			else if (type == "lastlflist") {
+			else if (type == "lastDuelRule") {
 				auto val = std::stoi(str);
-				lastlflist = val >= 0 ? val : 0;
+				lastDuelRule = std::min(DEFAULT_DUEL_RULE - 1, std::max(0, val));
 			}
-			else if (type == "lastallowedcards") {
-				auto val = std::stoi(str);
-				lastallowedcards = val >= 0 ? val : 0;
+#define DESERIALIZE_UNSIGNED(name) \
+			else if (type == #name) { \
+				auto val = std::stoi(str); \
+				name = val >= 0 ? val : 0; \
 			}
+			DESERIALIZE_UNSIGNED(lastlflist)
+			DESERIALIZE_UNSIGNED(lastallowedcards)
+			DESERIALIZE_UNSIGNED(team1count)
+			DESERIALIZE_UNSIGNED(team2count)
+			DESERIALIZE_UNSIGNED(bestOf)
+			DESERIALIZE_UNSIGNED(startLP)
+			DESERIALIZE_UNSIGNED(startHand)
+			DESERIALIZE_UNSIGNED(drawCount)
+#undef DESERIALIZE_UNSIGNED
 			else if (type == "botThrowRock")
 				botThrowRock = !!std::stoi(str);
 			else if (type == "botMute")

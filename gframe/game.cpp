@@ -371,7 +371,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tmpptr, 1236);
 	cbDuelRule = env->addComboBox(Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
 	ReloadCBDuelRule();
-	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
+	cbDuelRule->setSelected(gameConf.lastDuelRule);
 	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, dataManager.GetSysString(1626).c_str());
 	defaultStrings.emplace_back(btnCustomRule, 1626);
 	wCustomRules = env->addWindow(Scale(700, 100, 910, 430), false, L"");
