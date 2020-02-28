@@ -755,6 +755,19 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				elem->setText(string);
 				break;
 			}
+			case EDITBOX_NUMERIC: {
+				std::wstring text = caller->getText();
+				if (text.length() < 1)
+					break;
+				for (auto it = text.begin(); it < text.end(); it++) {
+					if (*it != 0 && (*it < L'0' || *it > L'9')) {
+						text.erase(it);
+						continue;
+					}
+				}
+				caller->setText(text.c_str());
+				break;
+			}
 			case EDITBOX_NICKNAME: {
 				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
 				auto target = (elem == mainGame->ebNickNameOnline) ? mainGame->ebNickName : mainGame->ebNickNameOnline;
