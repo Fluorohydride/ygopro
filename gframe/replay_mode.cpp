@@ -79,8 +79,8 @@ int ReplayMode::ReplayThread() {
 	mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + mainGame->dInfo.team1);
 	mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + mainGame->dInfo.team1, names.end());
 	int opt = cur_replay.params.duel_flags;
-	mainGame->dInfo.duel_field = opt & 0xff;
-	mainGame->dInfo.extraval = ((opt >> 8) & DUEL_SPEED) ? 1 : 0;
+	mainGame->dInfo.duel_field = mainGame->GetMasterRule(opt, 0);
+	mainGame->dInfo.duel_params = opt;
 	mainGame->SetPhaseButtons();
 	current_stream = cur_replay.packets_stream;
 	if(!current_stream.size()) {

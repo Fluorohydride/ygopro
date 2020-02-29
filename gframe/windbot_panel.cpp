@@ -8,24 +8,33 @@
 
 namespace ygo {
 
-void WindBotPanel::Refresh(int filterMasterRule) {
+int WindBotPanel::CurrentIndex() {
+	int selected = deckBox->getSelected();
+	return selected >= 0 ? deckBox->getItemData(selected) : selected;
+}
+
+void WindBotPanel::Refresh(int filterMasterRule, int lastIndex) {
+	int oldIndex = CurrentIndex();
+	int lastBot = oldIndex >= 0 ? oldIndex : lastIndex;
 	deckBox->clear();
 	for (int i = 0; i < bots.size(); i++) {
 		const auto& bot = bots[i];
 		if (filterMasterRule == 0 || bot.masterRules.find(filterMasterRule) != bot.masterRules.end()) {
-			deckBox->addItem(bot.name.c_str(), i);
+			int newIndex = deckBox->addItem(bot.name.c_str(), i);
+			if (i == lastBot)
+				deckBox->setSelected(newIndex);
 		}
 	}
 	UpdateDescription();
 }
 
 void WindBotPanel::UpdateDescription() {
-	int selected = deckBox->getSelected();
-	if (selected < 0) {
+	int index = CurrentIndex();
+	if (index < 0) {
 		deckProperties->setText(L"");
 		return;
 	}
-	auto& bot = bots[deckBox->getItemData(selected)];
+	auto& bot = bots[index];
 	std::wstringstream params;
 	if (bot.difficulty != 0)
 		params << fmt::format(gDataManager->GetSysString(2055), bot.difficulty);
@@ -46,13 +55,13 @@ void WindBotPanel::UpdateDescription() {
 }
 
 bool WindBotPanel::LaunchSelected(int port) {
-	int sel = deckBox->getSelected();
-	if (sel < 0 || sel >= bots.size()) return false;
+	int index = CurrentIndex();
+	if (index < 0) return false;
 	// 1 = scissors, 2 = rock, 3 = paper
 #if defined(_WIN32) || defined(__ANDROID__)
-	return bots[sel].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	return bots[index].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
 #else
-	auto pid = bots[sel].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	auto pid = bots[index].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
 	if(pid > 0) {
 		windbotsPids.push_back(pid);
 	}

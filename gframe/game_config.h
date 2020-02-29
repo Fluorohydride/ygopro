@@ -4,6 +4,8 @@
 #include <nlohmann/json.hpp>
 #include "text_types.h"
 
+#define DEFAULT_DUEL_RULE 5
+
 namespace ygo {
 
 struct GameConfig
@@ -29,6 +31,21 @@ struct GameConfig
 	std::wstring lastdeck = L"";
 	unsigned int lastlflist = 0;
 	unsigned int lastallowedcards = 3;
+	unsigned int lastDuelRule = DEFAULT_DUEL_RULE - 1;
+	unsigned int timeLimit = 180;
+	unsigned int team1count = 1;
+	unsigned int team2count = 1;
+	unsigned int bestOf = 1;
+	unsigned int startLP = 8000;
+	unsigned int startHand = 5;
+	unsigned int drawCount = 1;
+	bool relayDuel = false;
+	bool noCheckDeck = false;
+	bool noShuffleDeck = false;
+	bool botThrowRock = false;
+	bool botMute = false;
+	int lastBot = 0;
+	std::wstring lastServer = L"";
 	std::wstring textfont = L"fonts/NotoSansJP-Regular.otf";
 	std::wstring numfont = L"fonts/NotoSansJP-Regular.otf";
 	std::wstring roompass = L""; // NOT SERIALIZED

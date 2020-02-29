@@ -60,14 +60,38 @@ bool GameConfig::Load(const char* filename)
 				gamename = BufferIO::DecodeUTF8s(str);
 			else if (type == "lastdeck")
 				lastdeck = BufferIO::DecodeUTF8s(str);
-			else if (type == "lastlflist") {
+			else if (type == "lastDuelRule") {
 				auto val = std::stoi(str);
-				lastlflist = val >= 0 ? val : 0;
+				lastDuelRule = std::min(DEFAULT_DUEL_RULE - 1, std::max(0, val));
 			}
-			else if (type == "lastallowedcards") {
-				auto val = std::stoi(str);
-				lastallowedcards = val >= 0 ? val : 0;
+#define DESERIALIZE_UNSIGNED(name) \
+			else if (type == #name) { \
+				auto val = std::stoi(str); \
+				name = val >= 0 ? val : 0; \
 			}
+			DESERIALIZE_UNSIGNED(lastlflist)
+			DESERIALIZE_UNSIGNED(lastallowedcards)
+			DESERIALIZE_UNSIGNED(timeLimit)
+			DESERIALIZE_UNSIGNED(team1count)
+			DESERIALIZE_UNSIGNED(team2count)
+			DESERIALIZE_UNSIGNED(bestOf)
+			DESERIALIZE_UNSIGNED(startLP)
+			DESERIALIZE_UNSIGNED(startHand)
+			DESERIALIZE_UNSIGNED(drawCount)
+#undef DESERIALIZE_UNSIGNED
+#define DESERIALIZE_BOOL(name) else if (type == #name) name = !!std::stoi(str);
+			DESERIALIZE_BOOL(relayDuel)
+			DESERIALIZE_BOOL(noCheckDeck)
+			DESERIALIZE_BOOL(noShuffleDeck)
+#undef DESERIALIZE_BOOL
+			else if (type == "botThrowRock")
+				botThrowRock = !!std::stoi(str);
+			else if (type == "botMute")
+				botMute = !!std::stoi(str);
+			else if (type == "lastBot")
+				lastBot = std::stoi(str);
+			else if (type == "lastServer")
+				lastServer = BufferIO::DecodeUTF8s(str);
 			else if (type == "textfont") {
 				pos = str.find(L' ');
 				if (pos == std::wstring::npos) {
@@ -152,6 +176,19 @@ bool GameConfig::Load(const char* filename)
 	return true;
 }
 
+template<typename T>
+inline void Serialize(std::ofstream& conf_file, const char* name, T value) {
+	conf_file << name << " = " << value << "\n";
+}
+template<>
+inline void Serialize(std::ofstream& conf_file, const char* name, float value) {
+	conf_file << name << " = " << std::to_string(value) << "\n"; // Forces float to show decimals
+}
+template<>
+inline void Serialize(std::ofstream& conf_file, const char* name, std::wstring value) {
+	conf_file << name << " = " << BufferIO::EncodeUTF8s(value) << "\n";
+}
+
 bool GameConfig::Save(const char* filename)
 {
 	std::ofstream conf_file(filename, std::ofstream::out);
@@ -159,6 +196,7 @@ bool GameConfig::Save(const char* filename)
 		return false;
 	conf_file << "# EDOPro by Project Ignis system.conf\n";
 	conf_file << "# Overwritten on normal game exit\n";
+#define SERIALIZE(name) Serialize(conf_file, #name, name)
 	conf_file << "use_d3d = "            << use_d3d << "\n";
 	conf_file << "use_vsync = "          << use_vsync << "\n";
 	conf_file << "max_fps = "            << max_fps << "\n";
@@ -171,11 +209,26 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "lastdeck = "           << BufferIO::EncodeUTF8s(lastdeck) << "\n";
 	conf_file << "lastlflist = "         << lastlflist << "\n";
 	conf_file << "lastallowedcards = "   << lastallowedcards << "\n";
+	SERIALIZE(lastDuelRule);
+	SERIALIZE(timeLimit);
+	SERIALIZE(team1count);
+	SERIALIZE(team2count);
+	SERIALIZE(bestOf);
+	SERIALIZE(startLP);
+	SERIALIZE(startHand);
+	SERIALIZE(drawCount);
+	SERIALIZE(relayDuel);
+	SERIALIZE(noShuffleDeck);
+	SERIALIZE(noCheckDeck);
 	conf_file << "textfont = "           << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
 	conf_file << "numfont = "            << BufferIO::EncodeUTF8s(numfont) << "\n";
 	conf_file << "serverport = "         << BufferIO::EncodeUTF8s(serverport) << "\n";
 	conf_file << "lasthost = "           << BufferIO::EncodeUTF8s(lasthost) << "\n";
 	conf_file << "lastport = "           << BufferIO::EncodeUTF8s(lastport) << "\n";
+	conf_file << "botThrowRock = "       << botThrowRock << "\n";
+	conf_file << "botMute = "            << botMute << "\n";
+	conf_file << "lastBot = "            << lastBot << "\n";
+	conf_file << "lastServer = "         << BufferIO::EncodeUTF8s(lastServer) << "\n";
 	conf_file << "game_version = "       << game_version << "\n";
 	conf_file << "automonsterpos = "     << chkMAutoPos << "\n";
 	conf_file << "autospellpos = "       << chkSTAutoPos << "\n";
@@ -202,6 +255,7 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "enable_sound = "       << enablesound << "\n";
 	conf_file << "music_volume = "       << musicVolume << "\n";
 	conf_file << "sound_volume = "       << soundVolume << "\n";
+#undef SERIALIZE
 	return true;
 }
 

@@ -56,7 +56,7 @@
 unsigned short PRO_VERSION = 0x1350;
 #define EDOPRO_VERSION_MAJOR 37
 #define EDOPRO_VERSION_MINOR 0
-#define EDOPRO_VERSION_PATCH 1
+#define EDOPRO_VERSION_PATCH 2
 #define EDOPRO_VERSION_CODENAME L"Spider Shark"
 
 namespace ygo {
@@ -317,24 +317,26 @@ bool Game::Initialize() {
 	cbRule->setSelected(gGameConfig->lastallowedcards);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1227);
-	ebTeam1 = env->addEditBox(L"1", Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
+#define WStr(i) std::to_wstring(i).c_str()
+	ebTeam1 = env->addEditBox(WStr(gGameConfig->team1count), Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	auto vsstring = env->addStaticText(gDataManager->GetSysString(1380).c_str(), Scale(175, 85, 195, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(vsstring, 1380);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebTeam2 = env->addEditBox(L"1", Scale(200, 85, 230, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
+	ebTeam2 = env->addEditBox(WStr(gGameConfig->team2count), Scale(200, 85, 230, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	vsstring = env->addStaticText(gDataManager->GetSysString(1381).c_str(), Scale(235, 85, 280, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(vsstring, 1381);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	ebBestOf = env->addEditBox(L"1", Scale(285, 85, 315, 110), true, wCreateHost);
+	ebBestOf = env->addEditBox(WStr(gGameConfig->bestOf), Scale(285, 85, 315, 110), true, wCreateHost, EDITBOX_NUMERIC);
 	ebBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnRelayMode = env->addButton(Scale(325, 85, 370, 110), wCreateHost, -1, gDataManager->GetSysString(1247).c_str());
 	defaultStrings.emplace_back(btnRelayMode, 1247);
 	btnRelayMode->setIsPushButton(true);
+	btnRelayMode->setPressed(gGameConfig->relayDuel);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1237).c_str(), Scale(20, 120, 320, 140), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1237);
-	ebTimeLimit = env->addEditBox(L"180", Scale(140, 115, 220, 140), true, wCreateHost);
+	ebTimeLimit = env->addEditBox(WStr(gGameConfig->timeLimit), Scale(140, 115, 220, 140), true, wCreateHost, EDITBOX_NUMERIC);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1228).c_str(), Scale(20, 150, 320, 170), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1228);
@@ -356,7 +358,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tmpptr, 1236);
 	cbDuelRule = env->addComboBox(Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
 	ReloadCBDuelRule();
-	cbDuelRule->setSelected(DEFAULT_DUEL_RULE - 1);
+	cbDuelRule->setSelected(gGameConfig->lastDuelRule);
 	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, gDataManager->GetSysString(1626).c_str());
 	defaultStrings.emplace_back(btnCustomRule, 1626);
 	wCustomRules = env->addWindow(Scale(700, 100, 910, 430), false, L"");
@@ -386,22 +388,23 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnCustomRulesOK, 1211);
 	forbiddentypes = DUEL_MODE_MR5_FORB;
 	duel_param = DUEL_MODE_MR5;
-	chkNoCheckDeck = env->addCheckBox(false, Scale(20, 210, 170, 230), wCreateHost, -1, gDataManager->GetSysString(1229).c_str());
+	chkNoCheckDeck = env->addCheckBox(gGameConfig->noCheckDeck, Scale(20, 210, 170, 230), wCreateHost, -1, gDataManager->GetSysString(1229).c_str());
 	defaultStrings.emplace_back(chkNoCheckDeck, 1229);
-	chkNoShuffleDeck = env->addCheckBox(false, Scale(180, 210, 360, 230), wCreateHost, -1, gDataManager->GetSysString(1230).c_str());
+	chkNoShuffleDeck = env->addCheckBox(gGameConfig->noShuffleDeck, Scale(180, 210, 360, 230), wCreateHost, -1, gDataManager->GetSysString(1230).c_str());
 	defaultStrings.emplace_back(chkNoShuffleDeck, 1230);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1231).c_str(), Scale(20, 240, 320, 260), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1231);
-	ebStartLP = env->addEditBox(L"8000", Scale(140, 235, 220, 260), true, wCreateHost);
+	ebStartLP = env->addEditBox(WStr(gGameConfig->startLP), Scale(140, 235, 220, 260), true, wCreateHost, EDITBOX_NUMERIC);
 	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1232).c_str(), Scale(20, 270, 320, 290), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1232);
-	ebStartHand = env->addEditBox(L"5", Scale(140, 265, 220, 290), true, wCreateHost);
+	ebStartHand = env->addEditBox(WStr(gGameConfig->startHand), Scale(140, 265, 220, 290), true, wCreateHost, EDITBOX_NUMERIC);
 	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1233).c_str(), Scale(20, 300, 320, 320), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1233);
-	ebDrawCount = env->addEditBox(L"1", Scale(140, 295, 220, 320), true, wCreateHost);
+	ebDrawCount = env->addEditBox(WStr(gGameConfig->drawCount), Scale(140, 295, 220, 320), true, wCreateHost, EDITBOX_NUMERIC);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+#undef WStr
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1234).c_str(), Scale(10, 330, 220, 350), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1234);
 	ebServerName = env->addEditBox(gGameConfig->gamename.c_str(), Scale(110, 325, 250, 350), true, wCreateHost);
@@ -450,9 +453,9 @@ bool Game::Initialize() {
 	gBot.window->getCloseButton()->setVisible(false);
 	gBot.window->setVisible(false);
 	gBot.deckProperties = env->addStaticText(L"", Scale(10, 25, 200, 100), true, true, gBot.window);
-	gBot.chkThrowRock = env->addCheckBox(false, Scale(10, 105, 200, 130), gBot.window, -1, gDataManager->GetSysString(2052).c_str());
+	gBot.chkThrowRock = env->addCheckBox(gGameConfig->botThrowRock, Scale(10, 105, 200, 130), gBot.window, -1, gDataManager->GetSysString(2052).c_str());
 	defaultStrings.emplace_back(gBot.chkThrowRock, 2052);
-	gBot.chkMute = env->addCheckBox(false, Scale(10, 135, 200, 160), gBot.window, -1, gDataManager->GetSysString(2053).c_str());
+	gBot.chkMute = env->addCheckBox(gGameConfig->botMute, Scale(10, 135, 200, 160), gBot.window, -1, gDataManager->GetSysString(2053).c_str());
 	defaultStrings.emplace_back(gBot.chkMute, 2053);
 	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
 	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, gDataManager->GetSysString(2054).c_str());
@@ -627,7 +630,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
 	gSettings.chkHidePasscodeScope = env->addCheckBox(gGameConfig->hidePasscodeScope, Scale(20, 185, 300, 210), gSettings.window, CHECKBOX_HIDE_PASSCODE_SCOPE, gDataManager->GetSysString(2063).c_str());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.chkDrawFieldSpells = env->addCheckBox(gGameConfig->chkHideSetname, Scale(20, 215, 300, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, gDataManager->GetSysString(2068).c_str());
+	gSettings.chkDrawFieldSpells = env->addCheckBox(gGameConfig->draw_field_spell, Scale(20, 215, 300, 240), gSettings.window, CHECKBOX_DRAW_FIELD_SPELLS, gDataManager->GetSysString(2068).c_str());
 	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
 	gSettings.chkFilterBot = env->addCheckBox(gGameConfig->filterBot, Scale(20, 245, 300, 270), gSettings.window, CHECKBOX_FILTER_BOT, gDataManager->GetSysString(2069).c_str());
 	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
@@ -862,20 +865,20 @@ bool Game::Initialize() {
 	RefreshLFLists();
 	btnSaveDeck = env->addButton(Scale(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, gDataManager->GetSysString(1302).c_str());
 	defaultStrings.emplace_back(btnSaveDeck, 1302);
+	btnRenameDeck = env->addButton(Scale(5, 65, 75, 90), wDeckEdit, BUTTON_RENAME_DECK, gDataManager->GetSysString(1362).c_str());
+	defaultStrings.emplace_back(btnRenameDeck, 1362);
 	ebDeckname = env->addEditBox(L"", Scale(80, 65, 220, 90), true, wDeckEdit, EDITBOX_DECK_NAME);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnSaveDeckAs = env->addButton(Scale(225, 65, 290, 90), wDeckEdit, BUTTON_SAVE_DECK_AS, gDataManager->GetSysString(1303).c_str());
 	defaultStrings.emplace_back(btnSaveDeckAs, 1303);
+	btnShuffleDeck = env->addButton(Scale(5, 95, 75, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, gDataManager->GetSysString(1307).c_str());
+	defaultStrings.emplace_back(btnShuffleDeck, 1307);
+	btnSortDeck = env->addButton(Scale(80, 95, 145, 120), wDeckEdit, BUTTON_SORT_DECK, gDataManager->GetSysString(1305).c_str());
+	defaultStrings.emplace_back(btnSortDeck, 1305);
+	btnClearDeck = env->addButton(Scale(155, 95, 220, 120), wDeckEdit, BUTTON_CLEAR_DECK, gDataManager->GetSysString(1304).c_str());
+	defaultStrings.emplace_back(btnClearDeck, 1304);
 	btnDeleteDeck = env->addButton(Scale(225, 95, 290, 120), wDeckEdit, BUTTON_DELETE_DECK, gDataManager->GetSysString(1308).c_str());
 	defaultStrings.emplace_back(btnDeleteDeck, 1308);
-	btnShuffleDeck = env->addButton(Scale(5, 99, 55, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, gDataManager->GetSysString(1307).c_str());
-	defaultStrings.emplace_back(btnShuffleDeck, 1307);
-	btnSortDeck = env->addButton(Scale(60, 99, 110, 120), wDeckEdit, BUTTON_SORT_DECK, gDataManager->GetSysString(1305).c_str());
-	defaultStrings.emplace_back(btnSortDeck, 1305);
-	btnClearDeck = env->addButton(Scale(115, 99, 165, 120), wDeckEdit, BUTTON_CLEAR_DECK, gDataManager->GetSysString(1304).c_str());
-	defaultStrings.emplace_back(btnClearDeck, 1304);
-	btnRenameDeck = env->addButton(Scale(170, 99, 220, 120), wDeckEdit, BUTTON_RENAME_DECK, gDataManager->GetSysString(1362).c_str());
-	defaultStrings.emplace_back(btnRenameDeck, 1362);
 	btnSideOK = env->addButton(Scale(510, 40, 820, 80), 0, BUTTON_SIDE_OK, gDataManager->GetSysString(1334).c_str());
 	defaultStrings.emplace_back(btnSideOK, 1334);
 	btnSideOK->setVisible(false);
@@ -1187,7 +1190,7 @@ bool Game::Initialize() {
 	stBestof->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	stBestof->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	stBestof->setOverrideColor(roomlistcolor);
-	ebOnlineBestOf = env->addEditBox(L"0", Scale(285 + (392 - 140), 55, 315 + (392 - 140), 80), true, wRoomListPlaceholder);
+	ebOnlineBestOf = env->addEditBox(L"0", Scale(285 + (392 - 140), 55, 315 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_NUMERIC);
 	ebOnlineBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineBestOf->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	btnFilterRelayMode = env->addButton(Scale(325 + (392 - 140), 55, 370 + (392 - 140), 80), wRoomListPlaceholder, -1, gDataManager->GetSysString(1247).c_str());
@@ -1649,6 +1652,8 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 			repo.second.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 			repo.second.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		}
+		btnPSAD->setImage(imageManager.tCover[0]);
+		btnPSDD->setImage(imageManager.tCover[0]);
 	};
 	if(!skinSystem || ((skinname == prev_skin || (reload && prev_skin == EPRO_TEXT(""))) && !firstrun))
 		return false;
@@ -1793,6 +1798,27 @@ void Game::RefreshSingleplay() {
 void Game::SaveConfig() {
 	gGameConfig->nickname = ebNickName->getText();
 	gGameConfig->lastallowedcards = cbRule->getSelected();
+	gGameConfig->lastDuelRule = std::min(DEFAULT_DUEL_RULE - 1, cbDuelRule->getSelected());
+	auto TrySaveInt = [](unsigned int& dest, const IGUIElement* src) {
+		try {
+			dest = std::stoi(src->getText());
+		}
+		catch (...) {}
+	};
+	TrySaveInt(gGameConfig->timeLimit, ebTimeLimit);
+	TrySaveInt(gGameConfig->team1count, ebTeam1);
+	TrySaveInt(gGameConfig->team2count, ebTeam2);
+	TrySaveInt(gGameConfig->bestOf, ebBestOf);
+	TrySaveInt(gGameConfig->startLP, ebStartLP);
+	TrySaveInt(gGameConfig->startHand, ebStartHand);
+	TrySaveInt(gGameConfig->drawCount, ebDrawCount);
+	gGameConfig->relayDuel = btnRelayMode->isPressed();
+	gGameConfig->noCheckDeck = chkNoCheckDeck->isChecked();
+	gGameConfig->noShuffleDeck = chkNoShuffleDeck->isChecked();
+	gGameConfig->botThrowRock = gBot.chkThrowRock->isChecked();
+	gGameConfig->botMute = gBot.chkMute->isChecked();
+	gGameConfig->lastBot = gBot.CurrentIndex();
+	gGameConfig->lastServer = serverChoice->getItem(serverChoice->getSelected());
 	gGameConfig->chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
 	gGameConfig->chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();
 	gGameConfig->chkRandomPos = tabSettings.chkRandomPos->isChecked();
@@ -1909,7 +1935,9 @@ void Game::LoadServers() {
 				tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
 				tmp_server.roomlistport = obj["roomlistport"].get<int>();
 				tmp_server.duelport = obj["duelport"].get<int>();
-				mainGame->serverChoice->addItem(tmp_server.name.c_str());
+				int i = serverChoice->addItem(tmp_server.name.c_str());
+				if (gGameConfig->lastServer == tmp_server.name)
+					serverChoice->setSelected(i);
 				ServerLobby::serversVector.push_back(std::move(tmp_server));
 			}
 		}
@@ -2246,7 +2274,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 void Game::SetPhaseButtons() {
 	// reset master rule 4 phase button position
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	if (dInfo.extraval & 0x1) {
+	if (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
 		if (dInfo.duel_field >= 4) {
 			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
 			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
@@ -2540,13 +2568,15 @@ void Game::OnResize() {
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
 	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
-	btnClearDeck->setRelativePosition(Resize(115, 99, 165, 120));
-	btnSortDeck->setRelativePosition(Resize(60, 99, 110, 120));
-	btnShuffleDeck->setRelativePosition(Resize(5, 99, 55, 120));
-	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
 	btnSaveDeck->setRelativePosition(Resize(225, 35, 290, 60));
-	btnSaveDeckAs->setRelativePosition(Resize(225, 65, 290, 90));
+	btnRenameDeck->setRelativePosition(Resize(5, 65, 75, 90));
 	ebDeckname->setRelativePosition(Resize(80, 65, 220, 90));
+	btnSaveDeckAs->setRelativePosition(Resize(225, 65, 290, 90));
+	btnShuffleDeck->setRelativePosition(Resize(5, 95, 75, 120));
+	btnSortDeck->setRelativePosition(Resize(80, 95, 145, 120));
+	btnClearDeck->setRelativePosition(Resize(155, 95, 220, 120));
+	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
+	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
 	cbSortType->setRelativePosition(Resize(10, 2, 85, 22));
@@ -2585,8 +2615,6 @@ void Game::OnResize() {
 	btnSideShuffle->setRelativePosition(Resize(310, 100, 370, 130));
 	btnSideSort->setRelativePosition(Resize(375, 100, 435, 130));
 	btnSideReload->setRelativePosition(Resize(440, 100, 500, 130));
-	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
-	btnRenameDeck->setRelativePosition(Resize(170, 99, 220, 120));
 
 	wLanWindow->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));

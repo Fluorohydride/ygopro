@@ -697,7 +697,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	t->Y = 0;
 	t->Z = 0;
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (mainGame->dInfo.extraval & 0x1) ? 1 : 0;
+	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	S3DVertex loc[4];
 	if ((location & (~LOCATION_OVERLAY)) == LOCATION_HAND) {
 		if (controler == 0) {
@@ -760,7 +760,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 	int sequence = pcard->sequence;
 	int location = pcard->location;
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (mainGame->dInfo.extraval & 0x1) ? 1 : 0;
+	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	switch (location) {
 	case LOCATION_DECK: {
 		t->X = (matManager.vFieldDeck[controler][speed][0].Pos.X + matManager.vFieldDeck[controler][speed][1].Pos.X) / 2;

@@ -576,7 +576,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(!host_info.no_shuffle_deck) {
 		ITERATE_PLAYERS(std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);)
 	}
-	new_replay.Write<uint32_t>((mainGame->GetMasterRule(opt, 0)) | (opt & DUEL_SPEED) << 8);
+	new_replay.Write<uint32_t>(opt);
 	last_replay.Write<uint32_t>(host_info.start_lp, false);
 	last_replay.Write<uint32_t>(host_info.start_hand, false);
 	last_replay.Write<uint32_t>(host_info.draw_count, false);
@@ -720,11 +720,6 @@ void GenericDuel::DuelEndProc() {
 	int minvictories = std::ceil(best_of / 2.0);
 	if(match_kill || (winc[0] >= minvictories || winc[1] >= minvictories) || match_result.size() >= best_of) {
 		seeking_rematch = true;
-		observers_mutex.lock();
-		for(auto& obs : observers) {
-			obs->state = CTOS_LEAVE_GAME;
-		}
-		observers_mutex.unlock();
 		unsigned char rematch[10];
 		rematch[0] = MSG_SELECT_YESNO;
 		rematch[1] = 0;
@@ -962,12 +957,22 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	}
 	case MSG_CONFIRM_CARDS: {
 		player = BufferIO::Read<uint8_t>(pbuf);
-		if(pbuf[5] != LOCATION_DECK) {
+		int count = BufferIO::Read<uint32>(pbuf);
+		if(count > 0) {
+			/*uint32 code = */BufferIO::Read<uint32>(pbuf);
+			/*uint32 controler = */BufferIO::Read<uint8_t>(pbuf);
+			uint8_t location = BufferIO::Read<uint8_t>(pbuf);
+			if(location != LOCATION_DECK) {
+				SEND(nullptr);
+				ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+					packets_cache.emplace_back(TO_SEND_BUFFER);
+			} else {
+				SEND(cur_player[player]);
+			}
+		} else {
 			SEND(nullptr);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-			packets_cache.emplace_back(TO_SEND_BUFFER);
-		} else {
-			SEND(cur_player[player]);
+				packets_cache.emplace_back(TO_SEND_BUFFER);
 		}
 		break;
 	}
@@ -1248,13 +1253,14 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 		NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 		if(CheckReady()) {
 			seeking_rematch = false;
+			auto& player = match_result[match_result.size() - 1] == 0 ? players.opposing.front().player : players.home.front().player;
 			match_result.clear();
-			NetServer::SendPacketToPlayer(players.home.front().player, STOC_SELECT_TP);
+			NetServer::SendPacketToPlayer(player, STOC_SELECT_TP);
 			ITERATE_PLAYERS(
-				if(dueler.player != players.home.front().player)
+				if(dueler.player != player)
 					dueler.player->state = 0xff;
 			)
-			players.home.front().player->state = CTOS_TP_RESULT;
+			player->state = CTOS_TP_RESULT;
 			duel_stage = DUEL_STAGE_FIRSTGO;
 		}
 		return;

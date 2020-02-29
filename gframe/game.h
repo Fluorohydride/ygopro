@@ -78,7 +78,6 @@ struct DuelInfo {
 	int startlp;
 	int duel_field;
 	int duel_params;
-	int extraval;
 	int turn;
 	short curMsg;
 	int team1;
@@ -723,8 +722,6 @@ irr::core::rect<T> Game::Scale(irr::core::rect<T> rect) {
 #define COMMAND_RESET		0x0200
 
 #define POSITION_HINT		0x8000
-
-#define DEFAULT_DUEL_RULE			5
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 

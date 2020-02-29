@@ -382,32 +382,31 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_EDITBOX_CHANGED: {
+			auto caller = event.GUIEvent.Caller;
+			auto StartFilterIfLongerThan = [&](int length) {
+				std::wstring filter = caller->getText();
+				if (filter.size() > 2)
+					StartFilter();
+			};
 			switch (id) {
-			case EDITBOX_ATTACK: {
-				std::wstring filter = mainGame->ebAttack->getText();
-				if (filter.size() > 2)
-					StartFilter();
-				break;
-			}
+			case EDITBOX_ATTACK:
 			case EDITBOX_DEFENSE: {
-				std::wstring filter = mainGame->ebDefense->getText();
-				if (filter.size() > 2)
-					StartFilter();
+				caller->setText(Utils::KeepOnlyDigits(caller->getText()).c_str());
+				StartFilterIfLongerThan(2);
 				break;
-			}
+			} // Could also do case fallthrough but that could get confusing
 			case EDITBOX_KEYWORD: {
-				std::wstring filter = mainGame->ebCardName->getText();
-				if (filter.size() > 2)
-					StartFilter();
+				StartFilterIfLongerThan(2);
 				break;
 			}
 			case EDITBOX_STAR:
 			case EDITBOX_SCALE: {
+				caller->setText(Utils::KeepOnlyDigits(caller->getText()).c_str());
 				StartFilter();
 				break;
 			}
 			case EDITBOX_DECK_NAME: {
-				mainGame->ValidateName(event.GUIEvent.Caller);
+				mainGame->ValidateName(caller);
 				break;
 			}
 			}
@@ -998,6 +997,7 @@ void DeckBuilder::ClearSearch() {
 	mainGame->ebStar->setEnabled(false);
 	mainGame->ebScale->setEnabled(false);
 	mainGame->ebCardName->setText(L"");
+	mainGame->scrFilter->setVisible(false);
 	searched_terms.clear();
 	ClearFilter();
 	results.clear();

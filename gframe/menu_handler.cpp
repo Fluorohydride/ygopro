@@ -279,7 +279,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					}
 					mainGame->btnHostConfirm->setEnabled(false);
 					mainGame->btnHostCancel->setEnabled(false);
-					mainGame->gBot.Refresh(gGameConfig->filterBot * (mainGame->cbDuelRule->getSelected() + 1));
+					mainGame->gBot.Refresh(gGameConfig->filterBot * (mainGame->cbDuelRule->getSelected() + 1), gGameConfig->lastBot);
 				}
 				break;
 			}
@@ -754,6 +754,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				wchar_t string[] = { text[len - 1], 0 };
 				elem->setText(string);
+				break;
+			}
+			case EDITBOX_NUMERIC: {
+				caller->setText(Utils::KeepOnlyDigits(caller->getText()).c_str());
 				break;
 			}
 			case EDITBOX_NICKNAME: {
