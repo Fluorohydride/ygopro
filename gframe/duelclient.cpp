@@ -208,6 +208,9 @@ catch(...) { what = def; }
 			}
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
+			if(mainGame->extra_rules & SPEED_DUEL) {
+				cscg.info.duel_flag |= DUEL_SPEED;
+			}
 			if(mainGame->ebHostNotes->isVisible()) {
 				BufferIO::CopyWStr(BufferIO::EncodeUTF8s(mainGame->ebHostNotes->getText()).c_str(), cscg.notes, 200);
 			}
