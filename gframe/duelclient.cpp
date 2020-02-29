@@ -1067,7 +1067,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_RETRY: {
 		mainGame->soundManager->StopSounds();
 		mainGame->gMutex.lock();
-		mainGame->stMessage->setText(L"Error occurs.");
+		mainGame->stMessage->setText(dataManager.GetSysString(1434).c_str());
 		mainGame->PopupElement(mainGame->wMessage);
 		mainGame->gMutex.unlock();
 		mainGame->actionSignal.Reset();
