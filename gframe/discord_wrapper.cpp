@@ -104,7 +104,7 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 					discordPresence.details = "Side decking";
 				else
 					discordPresence.details = "Dueling";
-				discordPresence.spectateSecret = "look";
+				//discordPresence.spectateSecret = "look";
 			}
 			if(((ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2) > 2) || ygo::mainGame->dInfo.isRelay)
 				presenceState = fmt::format("{}: {} vs {}", ygo::mainGame->dInfo.isRelay ? "Relay" : "Tag", ygo::mainGame->dInfo.team1, ygo::mainGame->dInfo.team2).c_str();
