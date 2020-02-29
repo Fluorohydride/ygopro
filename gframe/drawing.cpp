@@ -133,7 +133,7 @@ void Game::DrawBackGround() {
 			break;
 		}
 	}
-	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(gameConf.draw_field_spell) {
 		int fieldcode1 = -1;
 		int fieldcode2 = -1;
@@ -273,7 +273,7 @@ void Game::DrawBackGround() {
 void Game::DrawLinkedZones(ClientCard* pcard) {
 	int mark = pcard->link_marker;
 	ClientCard* pcard2;
-	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(dField.hovered_location == LOCATION_SZONE) {
 		int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 		if(dField.hovered_sequence > 4)
@@ -520,7 +520,7 @@ void Game::DrawShadowText(irr::gui::CGUITTFont * font, const core::stringw & tex
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
 	int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot.Z += (1.2f / 1000.0f) * delta_time;
 	im.setRotationRadians(act_rot);
@@ -629,11 +629,11 @@ void Game::DrawMisc() {
 #undef LPCOLOR
 #undef SKCOLOR
 	
-	if(lpframe > 0 && mainGame->delta_frames) {
-		dInfo.lp[lpplayer] -= lpd * mainGame->delta_frames;
+	if(lpframe > 0 && delta_frames) {
+		dInfo.lp[lpplayer] -= lpd * delta_frames;
 		dInfo.strLP[lpplayer] = fmt::to_wstring(std::max(0, dInfo.lp[lpplayer]));
-		lpcalpha -= 0x19 * mainGame->delta_frames;
-		lpframe -= mainGame->delta_frames;
+		lpcalpha -= 0x19 * delta_frames;
+		lpframe -= delta_frames;
 	}
 	if(lpcstring.size()) {
 		if(lpplayer == 0) {
@@ -654,8 +654,8 @@ void Game::DrawMisc() {
 
 	recti p1size = Resize(335, 31, 629, 50);
 	recti p2size = Resize(986, 31, 986, 50);
-	auto& self = mainGame->dInfo.isTeam1 ? dInfo.selfnames : dInfo.opponames;
-	auto& oppo = mainGame->dInfo.isTeam1 ? dInfo.opponames : dInfo.selfnames;
+	auto& self = dInfo.isTeam1 ? dInfo.selfnames : dInfo.opponames;
+	auto& oppo = dInfo.isTeam1 ? dInfo.opponames : dInfo.selfnames;
 	textFont->draw(self[dInfo.current_player[0]].c_str(), p1size, 0xffffffff, false, false, 0);
 	auto cld = textFont->getDimension(oppo[dInfo.current_player[1]]);
 	p2size.UpperLeftCorner.X -= cld.Width;
@@ -664,8 +664,8 @@ void Game::DrawMisc() {
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	DrawShadowText(lpcFont, dataManager.GetNumString(dInfo.turn).c_str(), Resize(635, 5, 685, 40), Resize(0, 0, 2, 0), 0x8000ffff, 0x80000000, true);
 	ClientCard* pcard;
-	int seq = (dInfo.duel_field != 4) ? 6 : (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	int increase = (dInfo.duel_field != 4) ? 1 : (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 2 : 4;
+	int seq = (dInfo.duel_field != 4) ? 6 : (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	int increase = (dInfo.duel_field != 4) ? 1 : (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 2 : 4;
 	for (int p = 0, seq2 = seq; p < 2; ++p, seq2 = seq) {
 		for (int i = 0; i < 7; ++i) {
 			pcard = dField.mzone[p][i];
@@ -873,7 +873,7 @@ void Game::DrawSpec() {
 		case 1: {
 			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
 			driver->draw2DImage(imageManager.tMask, ResizeElem(574, 150, 574 + (showcarddif > CARD_IMG_WIDTH ? CARD_IMG_WIDTH : showcarddif), 404),
-								mainGame->Scale<s32>(CARD_IMG_HEIGHT - showcarddif, 0, CARD_IMG_HEIGHT - (showcarddif > CARD_IMG_WIDTH ? showcarddif - CARD_IMG_WIDTH : 0), CARD_IMG_HEIGHT), 0, 0, true);
+								Scale<s32>(CARD_IMG_HEIGHT - showcarddif, 0, CARD_IMG_HEIGHT - (showcarddif > CARD_IMG_WIDTH ? showcarddif - CARD_IMG_WIDTH : 0), CARD_IMG_HEIGHT), 0, 0, true);
 			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(std::round(showcarddif) >= CARD_IMG_HEIGHT) {
 				showcard = 2;
@@ -883,7 +883,7 @@ void Game::DrawSpec() {
 		}
 		case 2: {
 			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
-			driver->draw2DImage(imageManager.tMask, ResizeElem(574 + showcarddif, 150, 751, 404), mainGame->Scale(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
+			driver->draw2DImage(imageManager.tMask, ResizeElem(574 + showcarddif, 150, 751, 404), Scale(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
 			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;
@@ -892,7 +892,7 @@ void Game::DrawSpec() {
 		}
 		case 3: {
 			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
-			driver->draw2DImage(imageManager.tNegated, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), mainGame->Scale(0, 0, 128, 128), 0, 0, true);
+			driver->draw2DImage(imageManager.tNegated, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), Scale(0, 0, 128, 128), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
@@ -903,7 +903,7 @@ void Game::DrawSpec() {
 			matManager.c2d[2] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			matManager.c2d[3] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), ResizeElem(574, 154, 751, 404),
-								mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
+								Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 255)
 				showcarddif += (1020.0f / 1000.0f) * (float)delta_time;
 			break;
@@ -914,7 +914,7 @@ void Game::DrawSpec() {
 			matManager.c2d[2] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			matManager.c2d[3] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), ResizeElem(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif),
-								mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
+								Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
 			if(showcarddif < 127) {
 				showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 				if(showcarddif > 127.0f)
@@ -925,7 +925,7 @@ void Game::DrawSpec() {
 		case 6: {
 			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
 			driver->draw2DImage(imageManager.tNumber, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
-								mainGame->Scale(((int)std::round(showcardp) % 5) * 64, ((int)std::round(showcardp) / 5) * 64, ((int)std::round(showcardp) % 5 + 1) * 64, ((int)std::round(showcardp) / 5 + 1) * 64), 0, 0, true);
+								Scale(((int)std::round(showcardp) % 5) * 64, ((int)std::round(showcardp) / 5) * 64, ((int)std::round(showcardp) % 5 + 1) * 64, ((int)std::round(showcardp) / 5 + 1) * 64), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
@@ -933,13 +933,13 @@ void Game::DrawSpec() {
 		case 7: {
 			core::vector2d<s32> corner[4];
 			float y = sin(showcarddif * PI / 180.0f) * CARD_IMG_HEIGHT;
-			auto a = mainGame->ResizeElem(574 - (CARD_IMG_HEIGHT - y) * 0.3f, (150 + CARD_IMG_HEIGHT) - y, 751 + (CARD_IMG_HEIGHT - y) * 0.3f, 150 + CARD_IMG_HEIGHT);
-			auto b = mainGame->ResizeElem(574, 150, 574 + CARD_IMG_WIDTH, 404);
+			auto a = ResizeElem(574 - (CARD_IMG_HEIGHT - y) * 0.3f, (150 + CARD_IMG_HEIGHT) - y, 751 + (CARD_IMG_HEIGHT - y) * 0.3f, 150 + CARD_IMG_HEIGHT);
+			auto b = ResizeElem(574, 150, 574 + CARD_IMG_WIDTH, 404);
 			corner[0] = a.UpperLeftCorner;
 			corner[1] = vector2d<s32>{ a.LowerRightCorner.X, a.UpperLeftCorner.Y };
 			corner[2] = vector2d<s32>{ b.UpperLeftCorner.X, b.LowerRightCorner.Y };
 			corner[3] = b.LowerRightCorner;
-			irr::gui::Draw2DImageQuad(driver, imageManager.GetTextureCard(showcardcode, ImageManager::ART), mainGame->Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
+			irr::gui::Draw2DImageQuad(driver, imageManager.GetTextureCard(showcardcode, ImageManager::ART), Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
 			showcardp += (float)delta_time * 60.0f / 1000.0f;
 			showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= 90)
