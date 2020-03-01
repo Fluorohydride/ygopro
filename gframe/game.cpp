@@ -45,8 +45,11 @@
 #include "custom_skin_enum.h"
 
 #ifdef __ANDROID__
+#include "CGUICustomComboBox/CGUICustomComboBox.h"
+#define ADDComboBox(...) CGUICustomComboBox::addCustomComboBox(env, __VA_ARGS__)
 #define MATERIAL_GUARD(f) do {mainGame->driver->enableMaterial2D(true); f; mainGame->driver->enableMaterial2D(false);} while(false);
 #else
+#define ADDComboBox(...) env->addComboBox(__VA_ARGS__)
 #define MATERIAL_GUARD(f) do {f;} while(false);
 #endif
 
@@ -319,7 +322,7 @@ bool Game::Initialize() {
 	wCreateHost->setVisible(false);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1226).c_str(), Scale(20, 30, 220, 50), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1226);
-	cbLFlist = env->addComboBox(Scale(140, 25, 300, 50), wCreateHost);
+	cbLFlist = ADDComboBox(Scale(140, 25, 300, 50), wCreateHost);
 	for (unsigned int i = 0; i < deckManager._lfList.size(); ++i) {
 		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
 		if (gameConf.lastlflist == deckManager._lfList[i].hash)
@@ -327,7 +330,7 @@ bool Game::Initialize() {
 	}
 	tmpptr = env->addStaticText(dataManager.GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1225);
-	cbRule = env->addComboBox(Scale(140, 55, 300, 80), wCreateHost);
+	cbRule = ADDComboBox(Scale(140, 55, 300, 80), wCreateHost);
 	ReloadCBRule();
 	cbRule->setSelected(gameConf.lastallowedcards);
 	tmpptr = env->addStaticText(dataManager.GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
@@ -371,7 +374,7 @@ bool Game::Initialize() {
 	extra_rules = 0;
 	tmpptr = env->addStaticText(dataManager.GetSysString(1236).c_str(), Scale(20, 180, 220, 200), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1236);
-	cbDuelRule = env->addComboBox(Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
+	cbDuelRule = ADDComboBox(Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
 	ReloadCBDuelRule();
 	cbDuelRule->setSelected(gameConf.lastDuelRule);
 	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, dataManager.GetSysString(1626).c_str());
@@ -472,7 +475,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gBot.chkThrowRock, 2052);
 	gBot.chkMute = env->addCheckBox(gameConf.botMute, Scale(10, 135, 200, 160), gBot.window, -1, dataManager.GetSysString(2053).c_str());
 	defaultStrings.emplace_back(gBot.chkMute, 2053);
-	gBot.deckBox = env->addComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
+	gBot.deckBox = ADDComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
 	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, dataManager.GetSysString(2054).c_str());
 	defaultStrings.emplace_back(gBot.btnAdd, 2054);
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252).c_str());
@@ -483,9 +486,9 @@ bool Game::Initialize() {
 	stHostPrepRule->setWordWrap(true);
 	stDeckSelect = env->addStaticText(dataManager.GetSysString(1254).c_str(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
 	defaultStrings.emplace_back(stDeckSelect, 1254);
-	cbDeckSelect = env->addComboBox(Scale(120, 230, 270, 255), wHostPrepare);
+	cbDeckSelect = ADDComboBox(Scale(120, 230, 270, 255), wHostPrepare);
 	cbDeckSelect->setMaxSelectionRows(10);
-	cbDeckSelect2 = env->addComboBox(Scale(280, 230, 430, 255), wHostPrepare);
+	cbDeckSelect2 = ADDComboBox(Scale(280, 230, 430, 255), wHostPrepare);
 	cbDeckSelect2->setMaxSelectionRows(10);
 	btnHostPrepReady = env->addButton(Scale(170, 180, 270, 205), wHostPrepare, BUTTON_HP_READY, dataManager.GetSysString(1218).c_str());
 	defaultStrings.emplace_back(btnHostPrepReady, 1218);
@@ -651,14 +654,14 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
 	gSettings.stCurrentSkin = env->addStaticText(dataManager.GetSysString(2064).c_str(), Scale(20, 275, 90, 300), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
-	gSettings.cbCurrentSkin = env->addComboBox(Scale(95, 275, 300, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
+	gSettings.cbCurrentSkin = ADDComboBox(Scale(95, 275, 300, 300), gSettings.window, COMBOBOX_CURRENT_SKIN);
 	ReloadCBCurrentSkin();
 	gSettings.btnReloadSkin = env->addButton(Scale(20, 305, 300, 330), gSettings.window, BUTTON_RELOAD_SKIN, dataManager.GetSysString(2066).c_str());
 	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
 	gSettings.stCurrentLocale = env->addStaticText(dataManager.GetSysString(2067).c_str(), Scale(20, 335, 80, 360), false, true, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
-	gSettings.cbCurrentLocale = env->addComboBox(Scale(95, 335, 300, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
+	gSettings.cbCurrentLocale = ADDComboBox(Scale(95, 335, 300, 360), gSettings.window, COMBOBOX_CURRENT_LOCALE);
 	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"English");
 	for(auto& locale : locales) {
 		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
@@ -798,7 +801,7 @@ bool Game::Initialize() {
 	wANNumber = env->addWindow(Scale(550, 200, 780, 295), false, L"");
 	wANNumber->getCloseButton()->setVisible(false);
 	wANNumber->setVisible(false);
-	cbANNumber =  env->addComboBox(Scale(40, 30, 190, 50), wANNumber, -1);
+	cbANNumber =  ADDComboBox(Scale(40, 30, 190, 50), wANNumber, -1);
 	cbANNumber->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnANNumberOK = env->addButton(Scale(80, 60, 150, 85), wANNumber, BUTTON_ANNUMBER_OK, dataManager.GetSysString(1211).c_str());
 	defaultStrings.emplace_back(btnANNumberOK, 1211);
@@ -865,11 +868,11 @@ bool Game::Initialize() {
 	wDeckEdit->setVisible(false);
 	stBanlist = env->addStaticText(dataManager.GetSysString(1300).c_str(), Scale(10, 9, 100, 29), false, false, wDeckEdit);
 	defaultStrings.emplace_back(stBanlist, 1300);
-	cbDBLFList = env->addComboBox(Scale(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBLFLIST);
+	cbDBLFList = ADDComboBox(Scale(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBLFLIST);
 	cbDBLFList->setMaxSelectionRows(10);
 	stDeck = env->addStaticText(dataManager.GetSysString(1301).c_str(), Scale(10, 39, 100, 59), false, false, wDeckEdit);
 	defaultStrings.emplace_back(stDeck, 1301);
-	cbDBDecks = env->addComboBox(Scale(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
+	cbDBDecks = ADDComboBox(Scale(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
 	RefreshLFLists();
 	btnSaveDeck = env->addButton(Scale(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302).c_str());
@@ -911,7 +914,7 @@ bool Game::Initialize() {
 	scrFilter->setVisible(false);
 	//sort type
 	wSort = env->addStaticText(L"", Scale(930, 132, 1020, 156), true, false, 0, -1, true);
-	cbSortType = env->addComboBox(Scale(10, 2, 85, 22), wSort, COMBOBOX_SORTTYPE);
+	cbSortType = ADDComboBox(Scale(10, 2, 85, 22), wSort, COMBOBOX_SORTTYPE);
 	cbSortType->setMaxSelectionRows(10);
 	ReloadCBSortType();
 	wSort->setVisible(false);
@@ -920,25 +923,25 @@ bool Game::Initialize() {
 	wFilter->setVisible(false);
 	stCategory = env->addStaticText(dataManager.GetSysString(1311).c_str(), Scale(10, 5, 70, 25), false, false, wFilter);
 	defaultStrings.emplace_back(stCategory, 1311);
-	cbCardType = env->addComboBox(Scale(60, 3, 120, 23), wFilter, COMBOBOX_MAINTYPE);
+	cbCardType = ADDComboBox(Scale(60, 3, 120, 23), wFilter, COMBOBOX_MAINTYPE);
 	ReloadCBCardType();
-	cbCardType2 = env->addComboBox(Scale(130, 3, 190, 23), wFilter, COMBOBOX_SECONDTYPE);
+	cbCardType2 = ADDComboBox(Scale(130, 3, 190, 23), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(20);
 	cbCardType2->addItem(dataManager.GetSysString(1310).c_str(), 0);
 	chkAnime = env->addCheckBox(gameConf.chkAnime, Scale(10, 96, 150, 118), wFilter, CHECKBOX_SHOW_ANIME, dataManager.GetSysString(1999).c_str());
 	defaultStrings.emplace_back(chkAnime, 1999);
 	stLimit = env->addStaticText(dataManager.GetSysString(1315).c_str(), Scale(205, 5, 280, 25), false, false, wFilter);
 	defaultStrings.emplace_back(stLimit, 1315);
-	cbLimit = env->addComboBox(Scale(260, 3, 390, 23), wFilter, COMBOBOX_OTHER_FILT);
+	cbLimit = ADDComboBox(Scale(260, 3, 390, 23), wFilter, COMBOBOX_OTHER_FILT);
 	cbLimit->setMaxSelectionRows(10);
 	ReloadCBLimit();
 	stAttribute = env->addStaticText(dataManager.GetSysString(1319).c_str(), Scale(10, 28, 70, 48), false, false, wFilter);
 	defaultStrings.emplace_back(stAttribute, 1319);
-	cbAttribute = env->addComboBox(Scale(60, 26, 190, 46), wFilter, COMBOBOX_OTHER_FILT);
+	cbAttribute = ADDComboBox(Scale(60, 26, 190, 46), wFilter, COMBOBOX_OTHER_FILT);
 	cbAttribute->setMaxSelectionRows(10);
 	ReloadCBAttribute();
 	stRace = env->addStaticText(dataManager.GetSysString(1321).c_str(), Scale(10, 51, 70, 71), false, false, wFilter);
-	cbRace = env->addComboBox(Scale(60, 49, 190, 69), wFilter, COMBOBOX_OTHER_FILT);
+	cbRace = ADDComboBox(Scale(60, 49, 190, 69), wFilter, COMBOBOX_OTHER_FILT);
 	cbRace->setMaxSelectionRows(10);
 	ReloadCBRace();
 	stAttack = env->addStaticText(dataManager.GetSysString(1322).c_str(), Scale(205, 28, 280, 48), false, false, wFilter);
@@ -1155,7 +1158,7 @@ bool Game::Initialize() {
 	irr::gui::IGUIStaticText* statictext = env->addStaticText(dataManager.GetSysString(2041).c_str(), Scale(10, 30, 110, 50), false, false, wRoomListPlaceholder, -1, false); // 2041 = Server:
 	defaultStrings.emplace_back(statictext, 2041);
 	statictext->setOverrideColor(roomlistcolor);
-	serverChoice = env->addComboBox(Scale(90, 25, 385, 50), wRoomListPlaceholder, SERVER_CHOICE);
+	serverChoice = ADDComboBox(Scale(90, 25, 385, 50), wRoomListPlaceholder, SERVER_CHOICE);
 
 	//online nickname
 	statictext = env->addStaticText(dataManager.GetSysString(1220).c_str(), Scale(10, 60, 110, 80), false, false, wRoomListPlaceholder, -1, false); // 1220 = Nickname:
@@ -1169,9 +1172,9 @@ bool Game::Initialize() {
 	btnCreateHost2->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//filter dropdowns
-	cbFilterRule = env->addComboBox(Scale(392, 25, 532, 50), wRoomListPlaceholder, CB_FILTER_ALLOWED_CARDS);
-	//cbFilterMatchMode = env->addComboBox(Scale(392, 55, 532, 80), wRoomListPlaceholder, CB_FILTER_MATCH_MODE);
-	cbFilterBanlist = env->addComboBox(Scale(392, 85, 532, 110), wRoomListPlaceholder, CB_FILTER_BANLIST);
+	cbFilterRule = ADDComboBox(Scale(392, 25, 532, 50), wRoomListPlaceholder, CB_FILTER_ALLOWED_CARDS);
+	//cbFilterMatchMode = ADDComboBox(Scale(392, 55, 532, 80), wRoomListPlaceholder, CB_FILTER_MATCH_MODE);
+	cbFilterBanlist = ADDComboBox(Scale(392, 85, 532, 110), wRoomListPlaceholder, CB_FILTER_BANLIST);
 	cbFilterRule->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	//cbFilterMatchMode->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 	cbFilterBanlist->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);

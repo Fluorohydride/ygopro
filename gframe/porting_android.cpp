@@ -23,6 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "porting_android.h"
 
+#include <irrlicht.h>
 #include <sstream>
 #include <exception>
 #include <cstdlib>
@@ -93,6 +94,25 @@ extern "C" {
 				enterEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_ENTER;
 				editbox->getParent()->OnEvent(enterEvent);
 				env->DeleteLocalRef(textString);
+			}
+		}
+	}
+
+	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_putComboBoxResult(
+		JNIEnv * env, jclass thiz, jint index) {
+		if(porting::mainDevice) {
+			auto device = static_cast<irr::IrrlichtDevice*>(porting::mainDevice);
+			auto irrenv = device->getGUIEnvironment();
+			auto element = irrenv->getFocus();
+			if(element && element->getType() == irr::gui::EGUIET_COMBO_BOX) {
+				auto combobox = static_cast<irr::gui::IGUIComboBox*>(element);
+				combobox->setSelected(index);
+				irr::SEvent changeEvent;
+				changeEvent.EventType = irr::EET_GUI_EVENT;
+				changeEvent.GUIEvent.Caller = combobox;
+				changeEvent.GUIEvent.Element = 0;
+				changeEvent.GUIEvent.EventType = irr::gui::EGET_COMBO_BOX_CHANGED;
+				combobox->getParent()->OnEvent(changeEvent);
 			}
 		}
 	}
@@ -245,6 +265,24 @@ void showInputDialog(const std::string& acceptButton, const  std::string& hint,
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, showdialog,
 			jacceptButton, jhint, jcurrent, jeditType);
+}
+
+void showComboBox(const std::vector<std::string>& list) {
+	jmethodID showbox = jnienv->GetMethodID(nativeActivity,"showComboBox",
+		"([Ljava/lang/String;)V");
+
+	jstring str;
+	jobjectArray jlist = 0;
+	jsize len = list.size();
+
+	jlist = jnienv->NewObjectArray(len, jnienv->FindClass("java/lang/String"), 0);
+
+	for(int i = 0; i < list.size(); i++) {
+		str = jnienv->NewStringUTF(list[i].c_str());
+		jnienv->SetObjectArrayElement(jlist, i, str);
+	}
+
+	jnienv->CallVoidMethod(app_global->activity->clazz, showbox, jlist);
 }
 
 float getDisplayDensity()

@@ -1755,23 +1755,23 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 #ifdef __ANDROID__
 	if(event.EventType == EET_MOUSE_INPUT_EVENT &&
 	   event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN) {
-		gui::IGUIElement *hovered =
-			mainGame->env->getRootGUIElement()->getElementFromPoint(
-				core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y));
-		if((hovered) && (hovered->getType() == irr::gui::EGUIET_EDIT_BOX)) {
-			bool retval = hovered->OnEvent(event);
-			if(retval)
-				mainGame->env->setFocus(hovered);
-			int type = 2;
-			// multi line text input
-			if(((gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
-				type = 1;
-			// passwords are always single line
-			if(((gui::IGUIEditBox *)hovered)->isPasswordBox())
-				type = 3;
-			porting::showInputDialog("ok", "",
-									 BufferIO::EncodeUTF8s(((gui::IGUIEditBox *)hovered)->getText()), type);
-			return retval;
+		gui::IGUIElement *hovered = mainGame->env->getRootGUIElement()->getElementFromPoint(core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y));
+		if(hovered && hovered->isEnabled()) {
+			if(hovered->getType() == irr::gui::EGUIET_EDIT_BOX) {
+				bool retval = hovered->OnEvent(event);
+				if(retval)
+					mainGame->env->setFocus(hovered);
+				int type = 2;
+				// multi line text input
+				if(((gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
+					type = 1;
+				// passwords are always single line
+				if(((gui::IGUIEditBox *)hovered)->isPasswordBox())
+					type = 3;
+				porting::showInputDialog("ok", "",
+										 BufferIO::EncodeUTF8s(((gui::IGUIEditBox *)hovered)->getText()), type);
+				return retval;
+			}
 		}
 	}
 #endif
