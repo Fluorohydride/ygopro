@@ -351,68 +351,65 @@ bool transformEvent(const irr::SEvent & event) {
 		translated.MouseInput.Y = event.TouchInput.Y;
 		translated.MouseInput.Control = false;
 
-		bool dont_send_event = false;
-
-		if(event.TouchInput.touchedCount == 1) {
-			switch(event.TouchInput.Event) {
-				case irr::ETIE_PRESSED_DOWN:
-					m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
-					translated.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
-					translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-					irr::SEvent hoverEvent;
-					hoverEvent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-					hoverEvent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-					hoverEvent.MouseInput.X = event.TouchInput.X;
-					hoverEvent.MouseInput.Y = event.TouchInput.Y;
-					device->postEventFromUser(hoverEvent);
-					break;
-				case irr::ETIE_MOVED:
-					m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
-					translated.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-					translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-					break;
-				case irr::ETIE_LEFT_UP:
-					translated.MouseInput.Event = irr::EMIE_LMOUSE_LEFT_UP;
-					translated.MouseInput.ButtonStates = 0;
-					// we don't have a valid pointer element use last
-					// known pointer pos
+		switch(event.TouchInput.touchedCount) {
+			case 1:	{
+				switch(event.TouchInput.Event) {
+					case irr::ETIE_PRESSED_DOWN:
+						m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
+						translated.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
+						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
+						irr::SEvent hoverEvent;
+						hoverEvent.EventType = irr::EET_MOUSE_INPUT_EVENT;
+						hoverEvent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
+						hoverEvent.MouseInput.X = event.TouchInput.X;
+						hoverEvent.MouseInput.Y = event.TouchInput.Y;
+						device->postEventFromUser(hoverEvent);
+						break;
+					case irr::ETIE_MOVED:
+						m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
+						translated.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
+						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
+						break;
+					case irr::ETIE_LEFT_UP:
+						translated.MouseInput.Event = irr::EMIE_LMOUSE_LEFT_UP;
+						translated.MouseInput.ButtonStates = 0;
+						// we don't have a valid pointer element use last
+						// known pointer pos
+						translated.MouseInput.X = m_pointer.X;
+						translated.MouseInput.Y = m_pointer.Y;
+						break;
+					default:
+						return true;
+				}
+				break;
+			}
+			case 2: {
+				if(event.TouchInput.Event == irr::ETIE_PRESSED_DOWN) {
+					translated.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
+					translated.MouseInput.ButtonStates = irr::EMBSM_LEFT | irr::EMBSM_RIGHT;
 					translated.MouseInput.X = m_pointer.X;
 					translated.MouseInput.Y = m_pointer.Y;
-					break;
-				default:
-					dont_send_event = true;
-					// this is not supposed to happen
-					//errorstream << "GUIModalMenu::preprocessEvent"
-					//	<< " unexpected usecase irr::Event="
-					//	<< event.TouchInput.Event << std::endl;
+					device->postEventFromUser(translated);
+
+					translated.MouseInput.Event = irr::EMIE_RMOUSE_LEFT_UP;
+					translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
+
+					device->postEventFromUser(translated);
+				}
+				return true;
 			}
-		} else if((event.TouchInput.touchedCount == 2) &&
-			(event.TouchInput.Event == irr::ETIE_PRESSED_DOWN)) {
-
-			translated.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
-			translated.MouseInput.ButtonStates = irr::EMBSM_LEFT | irr::EMBSM_RIGHT;
-			translated.MouseInput.X = m_pointer.X;
-			translated.MouseInput.Y = m_pointer.Y;
-			device->postEventFromUser(translated);
-
-			translated.MouseInput.Event = irr::EMIE_RMOUSE_LEFT_UP;
-			translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-
-			device->postEventFromUser(translated);
-			dont_send_event = true;
-		}
-		// ignore unhandled 2 touch events ... accidental moving for example
-		else if(event.TouchInput.touchedCount == 2) {
-			dont_send_event = true;
-		} else if(event.TouchInput.touchedCount > 2) {
-			//errorstream << "GUIModalMenu::preprocessEvent"
-			//	<< " to many multitouch events "
-			//	<< event.TouchInput.touchedCount << " ignoring them"
-			//	<< std::endl;
-		}
-
-		if(dont_send_event) {
-			return true;
+			case 3:	{
+				if(event.TouchInput.Event == irr::ETIE_LEFT_UP) {
+					translated.EventType = irr::EET_KEY_INPUT_EVENT;
+					translated.KeyInput.Control = true;
+					translated.KeyInput.PressedDown = false;
+					translated.KeyInput.Key = irr::KEY_KEY_O;
+					device->postEventFromUser(translated);
+				}
+				return true;
+			}
+			default:
+				return true;
 		}
 
 		// check if translated event needs to be preprocessed again
