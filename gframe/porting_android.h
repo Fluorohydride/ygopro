@@ -27,9 +27,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <android_native_app_glue.h>
 #include <android/log.h>
 
+#include <vector>
 #include <string>
 #include <atomic>
-#include <irrlicht.h>
+#include <IEventReceiver.h>
+
+namespace irr {
+class IrrlichtDevice;
+}
+
 
 namespace porting {
 /** java app **/
@@ -65,6 +71,8 @@ void initializePathsAndroid();
  */
 void showInputDialog(const std::string& acceptButton,
 		const  std::string& hint, const std::string& current, int editType);
+
+void showComboBox(const std::vector<std::string>& list);
 
 #ifndef SERVER
 float getDisplayDensity();
