@@ -76,6 +76,7 @@ void DataHandler::LoadZipArchives() {
 }
 DataHandler::DataHandler() {
 	configs = std::unique_ptr<GameConfig>(new GameConfig);
+	tmp_device = nullptr;
 #ifndef __ANDROID__
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = configs->antialias;
