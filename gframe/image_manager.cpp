@@ -7,10 +7,6 @@
 #include <fstream>
 #include <curl/curl.h>
 #ifdef __ANDROID__
-#include <COGLES2ExtensionHandler.h>
-#include <COGLESExtensionHandler.h>
-#include <COGLES2Driver.h>
-#include <COGLESDriver.h>
 #include "porting_android.h"
 #endif
 
@@ -923,13 +919,7 @@ void imageScaleNNAAUnthreaded(irr::video::IImage *src, const irr::core::rect<irr
 #ifdef __ANDROID__
 bool hasNPotSupport(irr::video::IVideoDriver* driver) {
 	auto check = [](irr::video::IVideoDriver* driver)->bool {
-		bool isNPOTSupported;
-		if(driver->getDriverType() == irr::video::EDT_OGLES2) {
-			isNPOTSupported = ((irr::video::COGLES2Driver*)driver)->queryOpenGLFeature(irr::video::COGLES2ExtensionHandler::IRR_OES_texture_npot);
-		} else {
-			isNPOTSupported = ((irr::video::COGLES1Driver*)driver)->queryOpenGLFeature(irr::video::COGLES1ExtensionHandler::IRR_OES_texture_npot);
-		}
-		return isNPOTSupported;
+		return driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT);
 	};
 	static const bool supported = check(driver);
 	return supported;
