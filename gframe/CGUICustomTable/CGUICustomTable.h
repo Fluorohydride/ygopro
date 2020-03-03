@@ -151,6 +151,12 @@ namespace gui
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 		//! Sets another skin independent font.
 		virtual void setOverrideFont(IGUIFont* font = 0);
+		
+		//! Sets another skin independent font.
+		virtual void setDrawBackground(bool draw){};
+		
+		//! Sets another skin independent font.
+		virtual bool isDrawBackgroundEnabled() const {return false;};
 
 		//! Gets the override font (if any)
 		virtual IGUIFont* getOverrideFont() const;

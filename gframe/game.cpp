@@ -79,11 +79,11 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
 #else
-	/*if(glversion == 0) {
+	if(gGameConfig->use_d3d) {
 		params.DriverType = irr::video::EDT_OGLES1;
-	} else {*/
-		params.DriverType = irr::video::EDT_OGLES1;
-	//}
+	} else {
+		params.DriverType = irr::video::EDT_OGLES2;
+	}
 	params.PrivateData = appMain;
 	params.Bits = 24;
 	params.ZBufferBits = 16;

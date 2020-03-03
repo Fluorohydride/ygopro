@@ -302,7 +302,6 @@ video::SColor CGUICustomText::getBackgroundColor() const
 //! Checks if background drawing is enabled
 bool CGUICustomText::isDrawBackgroundEnabled() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Background;
 }
 
@@ -317,7 +316,6 @@ void CGUICustomText::setDrawBorder(bool draw)
 //! Checks if border drawing is enabled
 bool CGUICustomText::isDrawBorderEnabled() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Border;
 }
 
@@ -357,7 +355,6 @@ void CGUICustomText::enableOverrideColor(bool enable)
 
 bool CGUICustomText::isOverrideColorEnabled() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return OverrideColorEnabled;
 }
 
@@ -374,7 +371,6 @@ void CGUICustomText::setWordWrap(bool enable)
 
 bool CGUICustomText::isWordWrapEnabled() const
 {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return WordWrap;
 }
 
