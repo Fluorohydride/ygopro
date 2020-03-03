@@ -500,8 +500,8 @@ void CGUICustomTabControl::draw()
 
 		pos += len;
 
-		if ( text )
-			Tabs[i]->refreshSkinColors();
+		// if ( text )
+			// Tabs[i]->refreshSkinColors();
 
 		if ((s32)i == ActiveTab)
 		{

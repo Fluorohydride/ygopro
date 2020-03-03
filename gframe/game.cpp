@@ -7,10 +7,6 @@
 #include <dirent.h>
 #endif
 #ifdef __ANDROID__
-#include <COGLES2ExtensionHandler.h>
-#include <COGLESExtensionHandler.h>
-#include <COGLES2Driver.h>
-#include <COGLESDriver.h>
 #include "porting_android.h"
 #endif
 #include "game_config.h"
@@ -59,7 +55,7 @@
 unsigned short PRO_VERSION = 0x1350;
 #define EDOPRO_VERSION_MAJOR 37
 #define EDOPRO_VERSION_MINOR 0
-#define EDOPRO_VERSION_PATCH 2
+#define EDOPRO_VERSION_PATCH 3
 #define EDOPRO_VERSION_CODENAME L"Spider Shark"
 
 namespace ygo {
@@ -79,12 +75,12 @@ bool Game::Initialize() {
 			params.DriverType = irr::video::EDT_OPENGL;
 		params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
 #else
-		/*if(glversion == 0) {
+		if(gGameConfig->use_d3d) {
 			params.DriverType = irr::video::EDT_OGLES1;
-		} else {*/
-		params.DriverType = irr::video::EDT_OGLES1;
-		//}
-		params.PrivateData = porting::app_global;
+		} else {
+			params.DriverType = irr::video::EDT_OGLES2;
+		}
+		params.PrivateData = appMain;
 		params.Bits = 24;
 		params.ZBufferBits = 16;
 		params.AntiAlias = 0;
@@ -100,6 +96,17 @@ bool Game::Initialize() {
 	filesystem = device->getFileSystem();
 #ifdef __ANDROID__
 	porting::mainDevice = device;
+
+	// The Android assets file-system does not know which sub-directories it has (blame google).
+	// So we have to add all sub-directories in assets manually. Otherwise we could still open the files,
+	// but existFile checks will fail (which are for example needed by getFont).
+	for(u32 i = 0; i < filesystem->getFileArchiveCount(); ++i) {
+		auto archive = filesystem->getFileArchive(i);
+		if(archive->getType() == irr::io::EFAT_ANDROID_ASSET) {
+			archive->addDirectoryToFileList("media/");
+			break;
+		}
+	}
 #endif
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
@@ -131,11 +138,7 @@ bool Game::Initialize() {
 	memset(chatTiming, 0, sizeof(chatTiming));
 	driver = device->getVideoDriver();
 #ifdef __ANDROID__
-	if(driver->getDriverType() == irr::video::EDT_OGLES2) {
-		isNPOTSupported = ((irr::video::COGLES2Driver*)driver)->queryOpenGLFeature(irr::video::COGLES2ExtensionHandler::IRR_OES_texture_npot);
-	} else {
-		isNPOTSupported = ((irr::video::COGLES1Driver*)driver)->queryOpenGLFeature(irr::video::COGLES1ExtensionHandler::IRR_OES_texture_npot);
-	}
+	isNPOTSupported = driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT);
 	if(isNPOTSupported) {
 		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	} else {

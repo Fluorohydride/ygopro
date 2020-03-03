@@ -2120,6 +2120,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.select_min = COMPAT_READ(uint8_t, uint32_t, pbuf);
 		mainGame->dField.select_max = COMPAT_READ(uint8_t, uint32_t, pbuf);
 		mainGame->dField.must_select_count = COMPAT_READ(uint8_t, uint32_t, pbuf);
+		mainGame->dField.selectable_cards.clear();
 		mainGame->dField.selectsum_all.clear();
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.must_select_cards.clear();

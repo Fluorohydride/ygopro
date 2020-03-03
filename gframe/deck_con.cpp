@@ -385,23 +385,18 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			auto caller = event.GUIEvent.Caller;
 			auto StartFilterIfLongerThan = [&](int length) {
 				std::wstring filter = caller->getText();
-				if (filter.size() > 2)
+				if (filter.size() > length)
 					StartFilter();
 			};
 			switch (id) {
 			case EDITBOX_ATTACK:
-			case EDITBOX_DEFENSE: {
-				caller->setText(Utils::KeepOnlyDigits(caller->getText()).c_str());
-				StartFilterIfLongerThan(2);
-				break;
-			} // Could also do case fallthrough but that could get confusing
+			case EDITBOX_DEFENSE:
 			case EDITBOX_KEYWORD: {
 				StartFilterIfLongerThan(2);
 				break;
 			}
 			case EDITBOX_STAR:
 			case EDITBOX_SCALE: {
-				caller->setText(Utils::KeepOnlyDigits(caller->getText()).c_str());
 				StartFilter();
 				break;
 			}
