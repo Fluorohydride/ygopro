@@ -80,7 +80,7 @@ bool Game::Initialize() {
 		} else {
 			params.DriverType = irr::video::EDT_OGLES2;
 		}
-		params.PrivateData = appMain;
+		params.PrivateData = porting::app_global;
 		params.Bits = 24;
 		params.ZBufferBits = 16;
 		params.AntiAlias = 0;
