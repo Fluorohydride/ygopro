@@ -67,6 +67,8 @@ struct GameConfig
 	bool scale_background = true;
 #ifdef __ANDROID__
 	bool accurate_bg_resize = true;
+	bool native_keyboard = false;
+	bool native_mouse = false;
 #else
 	bool accurate_bg_resize = false;
 #endif

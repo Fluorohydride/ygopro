@@ -36,7 +36,7 @@ void UpdateDeck() {
 void LoadReplay() {
 	auto& replay = ReplayMode::cur_replay;
 	if(open_file) {
-		bool res = replay.OpenReplay(EPRO_TEXT("./replay/") + open_file_name);
+		bool res = replay.OpenReplay(open_file_name);
 		open_file = false;
 		if(!res || (replay.pheader.id == REPLAY_YRP1 && !mainGame->coreloaded)) {
 			if(exit_on_return)
