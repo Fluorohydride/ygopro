@@ -1761,7 +1761,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				bool retval = hovered->OnEvent(event);
 				if(retval)
 					mainGame->env->setFocus(hovered);
-				if(gGameConfig->native_keyboard) {
+				if(mainGame->gameConf.native_keyboard) {
 					porting::displayKeyboard(true);
 				} else {
 					int type = 2;
@@ -1777,7 +1777,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				return retval;
 			}
 		}
-	} else if(event.EventType == EET_KEY_INPUT_EVENT && gGameConfig->native_keyboard) {
+	} else if(event.EventType == EET_KEY_INPUT_EVENT && mainGame->gameConf.native_keyboard) {
 		if(event.KeyInput.Key == KEY_RETURN) {
 			porting::displayKeyboard(false);
 		}
