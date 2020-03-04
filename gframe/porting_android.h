@@ -61,6 +61,8 @@ void cleanupAndroid();
  */
 void initializePathsAndroid();
 
+void displayKeyboard(bool pShow);
+
 /**
  * show text input dialog in java
  * @param acceptButton text to display on accept button

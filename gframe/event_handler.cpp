@@ -1761,17 +1761,25 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				bool retval = hovered->OnEvent(event);
 				if(retval)
 					mainGame->env->setFocus(hovered);
-				int type = 2;
-				// multi line text input
-				if(((gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
-					type = 1;
-				// passwords are always single line
-				if(((gui::IGUIEditBox *)hovered)->isPasswordBox())
-					type = 3;
-				porting::showInputDialog("ok", "",
-										 BufferIO::EncodeUTF8s(((gui::IGUIEditBox *)hovered)->getText()), type);
+				if(gGameConfig->native_keyboard) {
+					porting::displayKeyboard(true);
+				} else {
+					int type = 2;
+					// multi line text input
+					if(((gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
+						type = 1;
+					// passwords are always single line
+					if(((gui::IGUIEditBox *)hovered)->isPasswordBox())
+						type = 3;
+					porting::showInputDialog("ok", "",
+											 BufferIO::EncodeUTF8s(((gui::IGUIEditBox *)hovered)->getText()), type);
+				}
 				return retval;
 			}
+		}
+	} else if(event.EventType == EET_KEY_INPUT_EVENT && gGameConfig->native_keyboard) {
+		if(event.KeyInput.Key == KEY_RETURN) {
+			porting::displayKeyboard(false);
 		}
 	}
 #endif
