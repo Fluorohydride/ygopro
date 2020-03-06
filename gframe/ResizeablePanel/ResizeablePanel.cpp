@@ -58,11 +58,11 @@ namespace gui {
 		auto width = AbsoluteClippingRect.getWidth();
 		auto height = AbsoluteClippingRect.getHeight();
 		if(horizontalScroll->isVisible()) {
-			height -= 20;
+			height -= Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
 			verticalScroll->setMax(verticalScroll->getMax() + 20);
 		}
 		if(verticalScroll->isVisible()) {
-			width -= 30;
+			width -= (Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE) + 10);
 			horizontalScroll->setMax(horizontalScroll->getMax() + 30);
 		}
 		return { 0, 0, width, height };
