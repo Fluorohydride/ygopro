@@ -33,6 +33,7 @@
 
 #include <irrlicht.h>
 #include <ft2build.h>
+#include <list>
 #include "irrUString.h"
 #include FT_FREETYPE_H
 
@@ -201,10 +202,10 @@ public:
 	//! \param antialias set the use_monochrome (opposite to antialias) flag
 	//! \param transparency set the use_transparency flag
 	//! \return Returns a pointer to a CGUITTFont.  Will return 0 if the font failed to load.
-	static CGUITTFont* createTTFont(IGUIEnvironment *env, const io::path& filename, const u32 size, const bool antialias = true, const bool transparency = true);
-	static CGUITTFont* createTTFont(IrrlichtDevice *device, const io::path& filename, const u32 size, const bool antialias = true, const bool transparency = true);
-	static CGUITTFont* create(IGUIEnvironment *env, const io::path& filename, const u32 size, const bool antialias = true, const bool transparency = true);
-	static CGUITTFont* create(IrrlichtDevice *device, const io::path& filename, const u32 size, const bool antialias = true, const bool transparency = true);
+	static CGUITTFont* createTTFont(IGUIEnvironment *env, const io::path& filename, const u32 size, std::list<io::path> fallback, const bool antialias = true, const bool transparency = true);
+	static CGUITTFont* createTTFont(IrrlichtDevice *device, const io::path& filename, const u32 size, std::list<io::path> fallback, const bool antialias = true, const bool transparency = true);
+	static CGUITTFont* create(IGUIEnvironment *env, const io::path& filename, const u32 size, const std::list<io::path>& fallback, const bool antialias = true, const bool transparency = true);
+	static CGUITTFont* create(IrrlichtDevice *device, const io::path& filename, const u32 size, const std::list<io::path>& fallback, const bool antialias = true, const bool transparency = true);
 
 	//! Destructor
 	virtual ~CGUITTFont();
@@ -323,6 +324,11 @@ public:
 	(const wchar_t* text, scene::ISceneManager* smgr, scene::ISceneNode* parent = 0,
 	 const video::SColor& color = video::SColor(255, 0, 0, 0), bool center = false );
 
+	u32 getGlyphIndexByChar(wchar_t c, core::array<SGUITTGlyph>** glyphs, core::array<CGUITTGlyphPage*>** glyphpages, bool fallback = false) const;
+	u32 getGlyphIndexByChar(uchar32_t c, core::array<SGUITTGlyph>** glyphs, core::array<CGUITTGlyphPage*>** glyphpages, bool fallback = false) const;
+
+	virtual void clearGlyphPages();
+
 protected:
 	bool use_monochrome;
 	bool use_transparency;
@@ -356,8 +362,6 @@ private:
 	u32 getWidthFromCharacter(uchar32_t c) const;
 	u32 getHeightFromCharacter(wchar_t c) const;
 	u32 getHeightFromCharacter(uchar32_t c) const;
-	u32 getGlyphIndexByChar(wchar_t c) const;
-	u32 getGlyphIndexByChar(uchar32_t c) const;
 	core::vector2di getKerning(const wchar_t thisLetter, const wchar_t previousLetter) const;
 	core::vector2di getKerning(const uchar32_t thisLetter, const uchar32_t previousLetter) const;
 	core::dimension2d<u32> getDimensionUntilEndOfLine(const wchar_t* p) const;
@@ -379,6 +383,8 @@ private:
 	s32 GlobalKerningHeight;
 	s32 supposed_line_height;
 	core::ustring Invisible;
+
+	CGUITTFont* fallback;
 };
 
 } // end namespace gui

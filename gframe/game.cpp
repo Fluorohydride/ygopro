@@ -160,10 +160,10 @@ bool Game::Initialize() {
 	PopulateResourcesDirectories();
 	deckManager.LoadLFList();
 	env = device->getGUIEnvironment();
-	numFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(16));
-	adFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(12));
-	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(48));
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->textfont.c_str(), Scale(gGameConfig->textfontsize));
+	numFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(16), {});
+	adFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(12), {});
+	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(48), {});
+	guiFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->textfont.c_str(), Scale(gGameConfig->textfontsize), {});
 	textFont = guiFont;
 	if(!numFont || !textFont || !adFont || !lpcFont || !guiFont) {
 		ErrorLog("Failed to load font(s)!");
