@@ -684,8 +684,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	observers_mutex.unlock();
 	packets_cache.emplace_back(startbuf, 18);
 	startbuf[1] = 0;
-	ReplayPacket p((char*)startbuf, 17);
-	replay_stream.push_back(p);
+	replay_stream.emplace_back(startbuf, 17);
 	PseudoRefreshDeck(0);
 	PseudoRefreshDeck(1);
 	RefreshExtra(0);
@@ -761,8 +760,7 @@ void GenericDuel::Surrender(DuelPlayer* dp) {
 	wbuf[2] = 0;
 	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
 	ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-	ReplayPacket p((char*)wbuf, 3);
-	replay_stream.push_back(p);
+	replay_stream.emplace_back((char*)wbuf, 3);
 	match_result.push_back(1 - player);
 	EndDuel();
 	DuelEndProc();
@@ -1220,17 +1218,16 @@ int GenericDuel::Analyze(CoreUtils::Packet packet) {
 	bool record = true;
 	bool record_last = false;
 	unsigned char message = packet.message;
-	ReplayPacket pk = { (char*)packet.data.data(), (int)(packet.data.size() - sizeof(uint8_t)) };
 	BeforeParsing(packet, return_value, record, record_last);
 	Sending(packet, return_value, record, record_last);
 	AfterParsing(packet, return_value, record, record_last);
 	if(record && (return_value != 1 && message != MSG_RETRY)) {
 		if(!record_last) {
-			new_replay.WritePacket(pk);
+			new_replay.WritePacket(packet);
 			new_replay.WriteStream(replay_stream);
 		} else {
 			new_replay.WriteStream(replay_stream);
-			new_replay.WritePacket(pk);
+			new_replay.WritePacket(packet);
 		}
 		new_replay.Flush();
 	} else {
@@ -1286,7 +1283,7 @@ void GenericDuel::EndDuel() {
 	oldreplay.insert(oldreplay.end(),(unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
 	oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
 
-	replay_stream.push_back(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), sizeof(ReplayHeader) + last_replay.comp_size));
+	replay_stream.emplace_back(OLD_REPLAY_MODE, (char*)oldreplay.data(), sizeof(ReplayHeader) + last_replay.comp_size);
 
 	//in case of remaining packets, e.g. MSG_WIN
 	new_replay.WriteStream(replay_stream);
@@ -1359,7 +1356,7 @@ void GenericDuel::RefreshExtra(int player, int flag) {
 	SEND(nullptr);
 	for(auto& dueler : (player == 0) ? players.home : players.opposing)
 		NetServer::ReSendToPlayer(dueler.player);
-	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
+	replay_stream.emplace_back((char*)buffer.data(), buffer.size() - 1);
 }
 void GenericDuel::RefreshLocation(int player, int flag, int location) {
 	std::vector<uint8_t> buffer;
@@ -1373,7 +1370,7 @@ void GenericDuel::RefreshLocation(int player, int flag, int location) {
 	char* a = (char*)buff;
 	CoreUtils::QueryStream query(a);
 	query.GenerateBuffer(buffer, false);
-	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
+	replay_stream.emplace_back((char*)buffer.data(), buffer.size() - 1);
 	buffer.resize(3);
 	query.GenerateBuffer(buffer, true);
 	SEND(nullptr);
@@ -1401,7 +1398,7 @@ void GenericDuel::RefreshSingle(int player, int location, int sequence, int flag
 	char* a = (char*)buff;
 	CoreUtils::Query query(a);
 	query.GenerateBuffer(buffer, false, false);
-	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
+	replay_stream.emplace_back((char*)buffer.data(), buffer.size() - 1);
 	buffer.resize(4);
 	query.GenerateBuffer(buffer, false, true);
 	SEND(nullptr);
@@ -1429,7 +1426,7 @@ void GenericDuel::PseudoRefreshDeck(int player, int flag) {
 		return;
 	buffer.resize(buffer.size() + len);
 	memcpy(&buffer[3], buff, len);
-	replay_stream.push_back(ReplayPacket((char*)buffer.data(), buffer.size() - 1));
+	replay_stream.emplace_back((char*)buffer.data(), buffer.size() - 1);
 }
 void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 	GenericDuel* sd = static_cast<GenericDuel*>(arg);
@@ -1443,8 +1440,7 @@ void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
 		auto& players = sd->players;
 		ITERATE_PLAYERS(NetServer::ReSendToPlayer(dueler.player);)
-		ReplayPacket p((char*)wbuf, 3);
-		sd->replay_stream.push_back(p);
+		sd->replay_stream.emplace_back((char*)wbuf, 3);
 		sd->match_result.push_back(1 - player);
 		sd->EndDuel();
 		sd->DuelEndProc();

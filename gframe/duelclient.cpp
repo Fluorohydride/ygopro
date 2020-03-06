@@ -1038,8 +1038,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	if(!mainGame->dInfo.isReplay) {
 		mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
 		if(mainGame->dInfo.curMsg != MSG_WAITING && !mainGame->dInfo.isSingleMode) {
-			ReplayPacket p(mainGame->dInfo.curMsg, pbuf, len - 1);
-			replay_stream.push_back(p);
+			replay_stream.emplace_back(mainGame->dInfo.curMsg, pbuf, len - 1);
 		}
 	}
 	mainGame->wCmdMenu->setVisible(false);

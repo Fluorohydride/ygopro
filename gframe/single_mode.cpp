@@ -463,13 +463,12 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		}
 	}
 	if(record) {
-		ReplayPacket replay_packet = { (char*)packet.data.data(), (int)(packet.data.size() - sizeof(uint8_t)) };
 		if(!record_last) {
-			new_replay.WritePacket(replay_packet);
+			new_replay.WritePacket(packet);
 			new_replay.WriteStream(replay_stream);
 		} else {
 			new_replay.WriteStream(replay_stream);
-			new_replay.WritePacket(replay_packet);
+			new_replay.WritePacket(packet);
 		}
 		new_replay.Flush();
 	}
@@ -488,7 +487,7 @@ void SingleMode::SinglePlayRefresh(int player, int location, int flag) {
 	mainGame->gMutex.unlock();
 	buffer.insert(buffer.begin(), location);
 	buffer.insert(buffer.begin(), player);
-	replay_stream.push_back(ReplayPacket(MSG_UPDATE_DATA, (char*)buffer.data(), buffer.size()));
+	replay_stream.emplace_back(MSG_UPDATE_DATA, (char*)buffer.data(), buffer.size());
 }
 void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
 	std::vector<uint8_t> buffer;
@@ -504,8 +503,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 	buffer.insert(buffer.begin(), sequence);
 	buffer.insert(buffer.begin(), location);
 	buffer.insert(buffer.begin(), player);
-	ReplayPacket p(MSG_UPDATE_CARD, (char*)buffer.data(), buffer.size());
-	replay_stream.push_back(p);
+	replay_stream.emplace_back(MSG_UPDATE_CARD, (char*)buffer.data(), buffer.size());
 }
 void SingleMode::SinglePlayRefresh(int flag) {
 	for(int p = 0; p < 2; p++)

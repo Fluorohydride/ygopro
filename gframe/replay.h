@@ -2,6 +2,7 @@
 #define REPLAY_H
 
 #include "config.h"
+#include "core_utils.h"
 #include <ctime>
 #include <vector>
 #include <fstream>
@@ -32,6 +33,7 @@ struct ReplayHeader {
 class ReplayPacket {
 public:
 	ReplayPacket() {}
+	ReplayPacket(const CoreUtils::Packet& packet);
 	ReplayPacket(char* buf, int len);
 	ReplayPacket(int msg, char* buf, int len);
 	void Set(int msg, char* buf, int len);
