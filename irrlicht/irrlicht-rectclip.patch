@@ -440,3 +440,16 @@ index 693052c..a0b4687 100644
  		//! Draws a 2d line.
  		virtual void draw2DLine(const core::position2d<s32>& start,
  					const core::position2d<s32>& end,
+diff --git a/source/Irrlicht/CIrrDeviceLinux.cpp b/source/Irrlicht/CIrrDeviceLinux.cpp
+index 1bbdf85f..405b5692 100644
+--- a/source/Irrlicht/CIrrDeviceLinux.cpp
++++ b/source/Irrlicht/CIrrDeviceLinux.cpp
+@@ -1875,7 +1875,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
+ 	Clipboard = "";
+ 	if (ownerWindow != None )
+ 	{
+-		XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
++		XConvertSelection (display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
+ 		XFlush (display);
+ 
+ 		// check for data
