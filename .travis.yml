@@ -6,7 +6,7 @@ git:
 env:
   global:
   - BUILD_CONFIG=release
-  - DEPLOY_BRANCH=$TRAVIS_BRANCH-$TRAVIS_OS_NAME
+  - DEPLOY_BRANCH=travis-$TRAVIS_OS_NAME
   - DEPLOY_DIR=deploy
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
 addons:
@@ -66,4 +66,3 @@ deploy:
   script: bash ./ocgcore/travis/deploy.sh
   on:
     repo: edo9300/ygopro
-    branch: separate-graphics
