@@ -29,7 +29,7 @@
 */
 
 #include <irrlicht.h>
-#include <set>
+#include <unordered_set>
 #include "CGUITTFont.h"
 
 namespace irr {
@@ -537,7 +537,7 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 	core::ustring utext(text);
 
 	// Set up our render map.
-	std::set<CGUITTGlyphPage*> Render_Map;
+	std::unordered_set<CGUITTGlyphPage*> Render_Map;
 
 	// Start parsing characters.
 	u32 n;
