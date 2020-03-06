@@ -2782,7 +2782,8 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	const wchar_t chars[] = L"<>:\"/\\|?*";
 	for(auto& forbid : chars)
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
-	obj->setText(text.c_str());
+	if(text.size() != wcslen(obj->getText()))
+		obj->setText(text.c_str());
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	std::ifstream infile(Utils::ToPathString(script_name), std::ifstream::in);
