@@ -109,15 +109,8 @@ namespace ygo {
 		int draw_count = cur_replay.yrp->params.draw_count;
 		OCG_Player team = { start_lp, start_hand, draw_count };
 		pduel = mainGame->SetupDuel({ (uint32_t)rnd(), cur_replay.yrp->params.duel_flags, team, team });
-		int opt = cur_replay.yrp->params.duel_flags;
-		mainGame->dInfo.duel_field = 2;
-		if ((opt & DUEL_PZONE) && (opt & DUEL_SEPARATE_PZONE) && (opt & DUEL_EMZONE))
-			mainGame->dInfo.duel_field = 5;
-		else if (opt & DUEL_EMZONE)
-			mainGame->dInfo.duel_field = 4;
-		else if (opt & DUEL_PZONE)
-			mainGame->dInfo.duel_field = 3;
-		mainGame->dInfo.duel_params = opt;
+		mainGame->dInfo.duel_params = cur_replay.yrp->params.duel_flags;
+		mainGame->dInfo.duel_field = mainGame->GetMasterRule(mainGame->dInfo.duel_params);
 		mainGame->SetPhaseButtons();
 		mainGame->dInfo.lp[0] = start_lp;
 		mainGame->dInfo.lp[1] = start_lp;

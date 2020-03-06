@@ -169,7 +169,7 @@ public:
 	uint8 LocalPlayer(uint8 player);
 	void UpdateDuelParam();
 	void UpdateExtraRules();
-	int GetMasterRule(uint32 param, uint32 forbidden, int* truerule = 0);
+	int GetMasterRule(uint32 param, uint32 forbidden = 0, int* truerule = 0);
 	void SetPhaseButtons();
 	void SetMessageWindow();
 

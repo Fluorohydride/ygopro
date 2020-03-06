@@ -3940,7 +3940,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dInfo.duel_params = 0;
 		} else {
 			uint32_t opts = BufferIO::Read<uint32_t>(pbuf);
-			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts, 1);
+			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts);
 			mainGame->dInfo.duel_params = opts;
 		}
 		mainGame->SetPhaseButtons();

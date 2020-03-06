@@ -2250,32 +2250,25 @@ void Game::UpdateExtraRules() {
 int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	if(truerule)
 		*truerule = 0;
-#define CHECK(MR) case DUEL_MODE_MR##MR:{ if (truerule) *truerule = MR; if (forbiddentypes == DUEL_MODE_MR##MR##_FORB) return MR; }
+#define CHECK(MR) case DUEL_MODE_MR##MR:{ if (truerule && forbiddentypes == DUEL_MODE_MR##MR##_FORB) *truerule = MR; break; }
 	switch(param) {
-	CHECK(1)
-	CHECK(2)
-	CHECK(3)
-	CHECK(4)
-	case DUEL_MODE_MR5: {
-		if (truerule)
-			*truerule = 5;
-		if (forbiddentypes == DUEL_MODE_MR5_FORB)
-			return 4;
-	}
-	default: {
-		if (truerule && !*truerule)
-			*truerule = 6;
-		if ((param & DUEL_PZONE) && (param & DUEL_SEPARATE_PZONE) && (param & DUEL_EMZONE))
-			return 5;
-		else if(param & DUEL_EMZONE)
-			return 4;
-		else if (param & DUEL_PZONE)
-			return 3;
-		else
-			return 2;
-	}
+		CHECK(1)
+		CHECK(2)
+		CHECK(3)
+		CHECK(4)
+		CHECK(5)
 	}
 #undef CHECK
+	if (truerule && !*truerule)
+		*truerule = 6;
+	if ((param & DUEL_PZONE) && (param & DUEL_SEPARATE_PZONE) && (param & DUEL_EMZONE))
+		return 5;
+	else if(param & DUEL_EMZONE)
+		return 4;
+	else if (param & DUEL_PZONE)
+		return 3;
+	else
+		return 2;
 }
 void Game::SetPhaseButtons() {
 	// reset master rule 4 phase button position
