@@ -204,7 +204,7 @@ int main(int argc, char* argv[]) {
 	WSAStartup(wVersionRequested, &wsaData);
 	evthread_use_windows_threads();
 #else
-	setlocale(LC_CTYPE, "UTF-8");
+	setlocale(LC_ALL, "");
 	evthread_use_pthreads();
 #endif //_WIN32
 	std::shared_ptr<ygo::DataHandler> data = nullptr;
