@@ -477,8 +477,9 @@ index 1bbdf85f..c4129f08 100644
                                 break;
 +                       case SelectionNotify:
 +                               {
-+                                       Clipboard = false;
++                                       ClipboardWaiting = false;
 +                               }
++                               break;
 
                         default:
                                 break;
