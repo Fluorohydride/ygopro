@@ -441,15 +441,77 @@ index 693052c..a0b4687 100644
  		virtual void draw2DLine(const core::position2d<s32>& start,
  					const core::position2d<s32>& end,
 diff --git a/source/Irrlicht/CIrrDeviceLinux.cpp b/source/Irrlicht/CIrrDeviceLinux.cpp
-index 1bbdf85f..405b5692 100644
+index 1bbdf85f..c4129f08 100644
 --- a/source/Irrlicht/CIrrDeviceLinux.cpp
 +++ b/source/Irrlicht/CIrrDeviceLinux.cpp
-@@ -1875,7 +1875,7 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
- 	Clipboard = "";
- 	if (ownerWindow != None )
- 	{
--		XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
-+		XConvertSelection (display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
- 		XFlush (display);
- 
- 		// check for data
+@@ -74,7 +74,7 @@ const char* wmDeleteWindow = "WM_DELETE_WINDOW";
+ CIrrDeviceLinux::CIrrDeviceLinux(const SIrrlichtCreationParameters& param)
+        : CIrrDeviceStub(param),
+ #ifdef _IRR_COMPILE_WITH_X11_
+-       display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0),
++       display(0), visual(0), screennr(0), window(0), StdHints(0), SoftwareImage(0), ClipboardWaiting(false),
+ #ifdef _IRR_COMPILE_WITH_OPENGL_
+        glxWin(0),
+        Context(0),
+@@ -1106,7 +1106,7 @@ bool CIrrDeviceLinux::run()
+                                {
+                                        XEvent respond;
+                                        XSelectionRequestEvent *req = &(event.xselectionrequest);
+-                                       if (  req->target == XA_STRING)
++                                       if (  req->target == X_ATOM_UTF8_STRING)
+                                        {
+                                                XChangeProperty (display,
+                                                                req->requestor,
+@@ -1122,7 +1122,7 @@ bool CIrrDeviceLinux::run()
+                                                long data[2];
+
+                                                data[0] = X_ATOM_TEXT;
+-                                               data[1] = XA_STRING;
++                                               data[1] = X_ATOM_UTF8_STRING;
+
+                                                XChangeProperty (display, req->requestor,
+                                                                req->property, req->target,
+@@ -1145,6 +1145,10 @@ bool CIrrDeviceLinux::run()
+                                        XFlush (display);
+                                }
+                                break;
++                       case SelectionNotify:
++                               {
++                                       Clipboard = false;
++                               }
+
+                        default:
+                                break;
+@@ -1875,8 +1879,19 @@ const c8* CIrrDeviceLinux::getTextFromClipboard() const
+        Clipboard = "";
+        if (ownerWindow != None )
+        {
+-               XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
+-               XFlush (display);
++               XConvertSelection (display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, XA_PRIMARY, ownerWindow, CurrentTime);+               ClipboardWaiting = true;
++               u32 startTime = Device->getTimer()->getRealTime();
++               u32 elapsedTime = 0;
++               while(ClipboardWaiting) {
++                       this->run();
++                       elapsedTime = Device->getTimer()->getRealTime() - startTime;
++                       if(elapsedTime > 1000) {
++                               ClipboardWaiting = false;
++                               copyToClipboard("");
++                               return Clipboard;
++                       }
++               }
+
+                // check for data
+                Atom type;
+diff --git a/source/Irrlicht/CIrrDeviceLinux.h b/source/Irrlicht/CIrrDeviceLinux.h
+index 624bc953..b8193a55 100644
+--- a/source/Irrlicht/CIrrDeviceLinux.h
++++ b/source/Irrlicht/CIrrDeviceLinux.h
+@@ -409,6 +409,7 @@ namespace irr
+                bool UseGLXWindow;
+                bool ExternalWindow;
+                int AutorepeatSupport;
++               bool ClipboardWaiting;
+
+                struct SKeyMap
+                {
