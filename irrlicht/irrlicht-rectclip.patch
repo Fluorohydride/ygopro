@@ -488,7 +488,8 @@ index 1bbdf85f..c4129f08 100644
         {
 -               XConvertSelection (display, X_ATOM_CLIPBOARD, XA_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
 -               XFlush (display);
-+               XConvertSelection (display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, XA_PRIMARY, ownerWindow, CurrentTime);+               ClipboardWaiting = true;
++               XConvertSelection (display, X_ATOM_CLIPBOARD, X_ATOM_UTF8_STRING, XA_PRIMARY, ownerWindow, CurrentTime);
++               ClipboardWaiting = true;
 +               u32 startTime = Device->getTimer()->getRealTime();
 +               u32 elapsedTime = 0;
 +               while(ClipboardWaiting) {
@@ -515,3 +516,4 @@ index 624bc953..b8193a55 100644
 
                 struct SKeyMap
                 {
+				
