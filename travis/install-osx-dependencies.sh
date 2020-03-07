@@ -4,12 +4,10 @@ set -euxo pipefail
 
 # Install irrlicht from source with custom patches
 # Not easily included in local project structure due to Objective-C code
-cp irrlicht/irrlicht-macOS.patch /tmp
 cd /tmp
-curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://downloads.sourceforge.net/irrlicht/irrlicht-1.8.4.zip
-7z x irrlicht-1.8.4.zip
-cd irrlicht-1.8.4
-/usr/local/opt/gpatch/bin/patch -p0 --binary -i ../irrlicht-macOS.patch
+curl --retry 5 --connect-timeout 30 --location --remote-header-name --remote-name https://github.com/edo9300/irrlicht1-8-4/archive/master.zip
+7z x irrlicht1-8-4-master.zip
+cd irrlicht1-8-4-master
 xcodebuild -project source/Irrlicht/MacOSX/MacOSX.xcodeproj -configuration Release -target libIrrlicht.a SYMROOT=build -sdk $SDKROOT -parallelizeTargets
 sudo mkdir -p /usr/local/include/irrlicht
 sudo cp -r include/*.h /usr/local/include/irrlicht

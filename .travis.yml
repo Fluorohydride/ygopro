@@ -23,7 +23,6 @@ addons:
     update: true
     packages:
     - dylibbundler
-    - gpatch
     - p7zip
     - freetype
     - curl
