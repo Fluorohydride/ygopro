@@ -107,7 +107,7 @@ local ygopro_config=function(static_core)
 			includedirs "/usr/include/irrlicht"
 		end
 		linkoptions { "-Wl,-rpath=./" }
-		links { "pcre", "GL", "X11" }
+		links { "GL", "X11" }
 		if static_core then
 			links  "lua:static"
 		end
