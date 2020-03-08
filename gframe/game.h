@@ -237,6 +237,7 @@ public:
 	void* ocgcore;
 #endif
 	bool coreloaded;
+	std::wstring corename;
 	bool restart = false;
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;

@@ -1339,7 +1339,6 @@ bool Game::MainLoop() {
 	float frame_counter = 0.0f;
 	int fps = 0;
 	bool was_connected = false;
-	std::wstring corename;
 #ifdef __ANDROID__
 	ogles2Solid = 0;
 	ogles2TrasparentAlpha = 0;
@@ -1393,11 +1392,13 @@ bool Game::MainLoop() {
 				deckBuilder.StartFilter(true);
 		}
 #ifdef YGOPRO_BUILD_DLL
+		bool coreJustLoaded = false;
 		if(!dInfo.isStarted && cores_to_load.size() && gRepoManager->GetUpdatingRepos() == 0) {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
 				if((ncore = ChangeOCGcore(gGameConfig->working_directory + path, ocgcore))) {
 					corename = Utils::ToUnicodeIfNeeded(path);
+					coreJustLoaded = true;
 					ocgcore = ncore;
 					if(!coreloaded) {
 						coreloaded = true;
@@ -1405,20 +1406,20 @@ bool Game::MainLoop() {
 						btnCreateHost->setEnabled(true);
 						btnHandTest->setEnabled(true);
 						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
-						RefreshUICoreVersion();
 					}
 					break;
 				}
 			}
 			cores_to_load.clear();
 		}
-		if(corename.size() && (
-			!wMessage->isVisible() ||
-			std::wstring(stMessage->getText()) == gDataManager->GetSysString(1430)
-		)) {
-			stMessage->setText(fmt::format(gDataManager->GetSysString(1431).c_str(), corename).c_str());
-			PopupElement(wMessage);
-			corename.clear();
+		if (coreJustLoaded) {
+			if (std::wstring(stMessage->getText()) == gDataManager->GetSysString(1430))
+				HideElement(wMessage);
+			RefreshUICoreVersion();
+			env->setFocus(stACMessage);
+			stACMessage->setText(fmt::format(gDataManager->GetSysString(1431).c_str(), corename).c_str());
+			PopupElement(wACMessage, 30);
+			coreJustLoaded = false;
 		}
 #endif //YGOPRO_BUILD_DLL
 		for(auto& repo : gRepoManager->GetRepoStatus()) {
@@ -2326,7 +2327,10 @@ void Game::RefreshUICoreVersion() {
 	if (coreloaded) {
 		int major, minor;
 		OCG_GetVersion(&major, &minor);
-		stCoreVersion->setText(fmt::format(gDataManager->GetSysString(2010), major, minor).c_str());
+		auto label = corename.length()
+			? fmt::format(gDataManager->GetSysString(2013), major, minor, corename)
+			: fmt::format(gDataManager->GetSysString(2010), major, minor);
+		stCoreVersion->setText(label.c_str());
 	} else {
 		stCoreVersion->setText(L"");
 	}
