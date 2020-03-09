@@ -19,7 +19,7 @@
 #include "osx_menu.h"
 #endif
 #ifdef __ANDROID__
-#include "porting_android.h"
+#include "Android/porting_android.h"
 #endif
 
 int enable_log = 0;

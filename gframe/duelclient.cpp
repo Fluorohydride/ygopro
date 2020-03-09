@@ -19,7 +19,7 @@
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "progressivebuffer.h"
 #ifdef __ANDROID__
-#include "porting_android.h"
+#include "Android/porting_android.h"
 #endif
 
 namespace ygo {

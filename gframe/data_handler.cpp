@@ -8,7 +8,7 @@
 #include "IrrlichtCommonIncludes/CFileSystem.h"
 #else
 #include "IrrlichtCommonIncludes1.9/CFileSystem.h"
-#include "porting_android.h"
+#include "Android/porting_android.h"
 #endif
 
 namespace ygo {

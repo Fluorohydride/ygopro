@@ -17,7 +17,7 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
 #ifdef __ANDROID__
-#include "porting_android.h"
+#include "Android/porting_android.h"
 #endif
 
 using namespace irr;

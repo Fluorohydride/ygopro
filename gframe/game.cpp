@@ -7,7 +7,7 @@
 #include <dirent.h>
 #endif
 #ifdef __ANDROID__
-#include "porting_android.h"
+#include "Android/porting_android.h"
 #endif
 #include "game_config.h"
 #include "repo_manager.h"

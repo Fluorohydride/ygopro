@@ -5,7 +5,7 @@
 #include <Windows.h>
 #else
 #ifdef __ANDROID__
-#include "porting_android.h"
+#include "Android/porting_android.h"
 #endif
 #include <dlfcn.h>
 #endif
