@@ -15,7 +15,7 @@
 #include "IGUIButton.h"
 #include "CGUIListBox.h"
 #include "os.h"
-#include "../porting_android.h"
+#include "../Android/porting_android.h"
 #include "../bufferio.h"
 
 namespace irr
