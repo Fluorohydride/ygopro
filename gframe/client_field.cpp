@@ -598,8 +598,9 @@ void ClientField::ShowSelectOption(uint64 select_hint) {
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(350);
 	if(quickmode) {
 		mainGame->scrOption->setVisible(count > 5);
-		mainGame->scrOption->setPos(0);
 		mainGame->scrOption->setMax(count - 5);
+		mainGame->scrOption->setMin(0);
+		mainGame->scrOption->setPos(0);
 		mainGame->stOptions->setVisible(false);
 		mainGame->btnOptionp->setVisible(false);
 		mainGame->btnOptionn->setVisible(false);
