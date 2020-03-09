@@ -33,9 +33,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <vector>
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, "Edopro", __VA_ARGS__);
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
-#include "bufferio.h"
+#include "../bufferio.h"
 #include <thread>
-#include "sound_manager.h"
+#include "../sound_manager.h"
 
 extern int main(int argc, char *argv[]);
 
@@ -536,17 +536,41 @@ int getLocalIP() {
 }
 
 void launchWindbot(const std::string& args) {
-	//std::string arg = "Deck=MokeyMokey Port=7911 Version=4936";
 	jmethodID launchwindbot = jnienv->GetMethodID(nativeActivity, "launchWindbot",
 											   "(Ljava/lang/String;)V");
 
 	if(launchwindbot == 0) {
-		assert("porting::launchWindbot unable to find java show dialog method" == 0);
+		assert("porting::launchWindbot unable to find java launchWindbot method" == 0);
 	}
 
 	jstring jargs = jnienv->NewStringUTF(args.c_str());
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, launchwindbot,
 						   jargs);
+}
+
+void setTextToClipboard(const wchar_t* text) {
+	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard",
+											   "(Ljava/lang/String;)V");
+
+	if(setClip == 0) {
+		assert("porting::setTextToClipboard unable to find java setClipboard method" == 0);
+	}
+	jstring jargs = jnienv->NewStringUTF(BufferIO::EncodeUTF8s(text).c_str());
+
+	jnienv->CallVoidMethod(app_global->activity->clazz, setClip, jargs);
+}
+
+const wchar_t* getTextFromClipboard() {
+	static std::wstring text;
+	jmethodID getClip = jnienv->GetMethodID(nativeActivity, "getClipboard",
+										  "()Ljava/lang/String;");
+	if(getClip == 0) {
+		assert("porting::getTextFromClipboard unable to find java getClipboard method" == 0);
+	}
+	jstring js_clip = (jstring)jnienv->CallObjectMethod(app_global->activity->clazz, getClip);
+	text = BufferIO::DecodeUTF8s(javaStringToUTF8(js_clip));
+	return text.c_str();
+
 }
 }

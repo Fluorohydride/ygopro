@@ -8,6 +8,7 @@
 #endif
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
+#include "Android/COSAndroidOperator.h"
 #endif
 #include "game_config.h"
 #include "repo_manager.h"
@@ -158,6 +159,11 @@ bool Game::Initialize() {
 	PopulateResourcesDirectories();
 	deckManager.LoadLFList();
 	env = device->getGUIEnvironment();
+#ifdef __ANDROID__
+	irr::IOSOperator* Operator = new irr::COSAndroidOperator();
+	env->setOSOperator(Operator);
+	Operator->drop();
+#endif
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(16), {});
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(12), {});
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(48), {});

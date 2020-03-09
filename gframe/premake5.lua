@@ -3,7 +3,7 @@ local ygopro_config=function(static_core)
 	cppdialect "C++14"
 	rtti "Off"
 	files { "**.cpp", "**.cc", "**.c", "**.h" }
-	excludes { "lzma/**", "sound_sdlmixer.*", "sound_irrklang.*", "Android/porting_android.*" }
+	excludes { "lzma/**", "sound_sdlmixer.*", "sound_irrklang.*", "Android/**" }
 
 	defines "CURL_STATICLIB"
 	if _OPTIONS["pics"] then
