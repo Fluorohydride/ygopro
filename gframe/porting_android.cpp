@@ -70,8 +70,8 @@ extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_TextEntry_putMessageBoxResult(
 		JNIEnv * env, jclass thiz, jstring textString)
 	{
-		if (porting::mainDevice) {
-			auto device = static_cast<irr::IrrlichtDevice*>(porting::mainDevice);
+		if (porting::app_global->userData) {
+			auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
 			auto irrenv = device->getGUIEnvironment();
 			auto element = irrenv->getFocus();
 			if (element && element->getType() == irr::gui::EGUIET_EDIT_BOX) {
@@ -100,8 +100,8 @@ extern "C" {
 
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_putComboBoxResult(
 		JNIEnv * env, jclass thiz, jint index) {
-		if(porting::mainDevice) {
-			auto device = static_cast<irr::IrrlichtDevice*>(porting::mainDevice);
+		if(porting::app_global->userData) {
+			auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
 			auto irrenv = device->getGUIEnvironment();
 			auto element = irrenv->getFocus();
 			if(element && element->getType() == irr::gui::EGUIET_COMBO_BOX) {
@@ -133,8 +133,6 @@ std::string working_directory = "";
 android_app* app_global = nullptr;
 JNIEnv*      jnienv = nullptr;
 jclass       nativeActivity;
-
-irr::IrrlichtDevice* mainDevice;
 
 jclass findClass(std::string classname, JNIEnv* env = nullptr)
 {
@@ -424,7 +422,7 @@ std::pair<int,int> getDisplaySize()
 */
 bool transformEvent(const irr::SEvent & event) {
 	static irr::core::position2di m_pointer = irr::core::position2di(0, 0);
-	auto device = static_cast<irr::IrrlichtDevice*>(porting::mainDevice);
+	auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
 	if(event.EventType == irr::EET_TOUCH_INPUT_EVENT) {
 		irr::SEvent translated;
 		memset(&translated, 0, sizeof(irr::SEvent));

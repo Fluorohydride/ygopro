@@ -41,8 +41,6 @@ namespace porting {
 /** java app **/
 extern android_app *app_global;
 
-extern irr::IrrlichtDevice* mainDevice;
-
 /** java <-> c++ interaction interface **/
 extern JNIEnv *jnienv;
 
