@@ -434,7 +434,7 @@ bool GitRepo::Sanitize() {
 		return false;
 	if(repo_name.empty() && repo_path.empty()) {
 		repo_name = Utils::GetFileName(url);
-		repo_path = fmt::format("./expansions/{}", repo_name);
+		repo_path = fmt::format("./repositories/{}", repo_name);
 		if(repo_name.empty() || repo_path.empty())
 			return false;
 	}
@@ -442,7 +442,7 @@ bool GitRepo::Sanitize() {
 		repo_name = Utils::GetFileName(repo_path);
 	}
 	if(repo_path.empty()) {
-		repo_path = fmt::format("./expansions/{}", repo_name);
+		repo_path = fmt::format("./repositories/{}", repo_name);
 	}
 	repo_path = fmt::format("./{}", repo_path);
 	data_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, data_path));
