@@ -395,6 +395,7 @@ void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 					JSON_SET_IF_VALID(repo_path, string, std::string);
 					JSON_SET_IF_VALID(repo_name, string, std::string);
 					JSON_SET_IF_VALID(data_path, string, std::string);
+					JSON_SET_IF_VALID(lflist_path, string, std::string);
 					JSON_SET_IF_VALID(script_path, string, std::string);
 					JSON_SET_IF_VALID(pics_path, string, std::string);
 #ifdef YGOPRO_BUILD_DLL
@@ -445,6 +446,10 @@ bool GitRepo::Sanitize() {
 	}
 	repo_path = fmt::format("./{}", repo_path);
 	data_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, data_path));
+	if(lflist_path.size())
+		lflist_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, lflist_path));
+	else
+		lflist_path = Utils::NormalizePath(fmt::format("{}/lflists/", repo_path));
 	if(script_path.size())
 		script_path = Utils::NormalizePath(fmt::format("{}/{}/", repo_path, script_path));
 	else

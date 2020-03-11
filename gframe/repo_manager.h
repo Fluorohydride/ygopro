@@ -21,6 +21,7 @@ public:
 	std::string repo_name = "";
 	std::string repo_path = "";
 	std::string data_path = "";
+	std::string lflist_path = "lflists";
 	std::string script_path = "script";
 	std::string pics_path = "pics";
 	std::string core_path = "";

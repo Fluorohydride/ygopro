@@ -1931,7 +1931,8 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		cores_to_load.insert(cores_to_load.begin(), Utils::ToPathString(repo->core_path));
 	}
 	auto data_path = Utils::ToPathString(repo->data_path);
-	if(deckManager.LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || deckManager.LoadLFListFolder(data_path + EPRO_TEXT("lflists/"))) {
+	auto lflist_path = Utils::ToPathString(repo->lflist_path);
+	if(deckManager.LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || deckManager.LoadLFListFolder(lflist_path)) {
 		deckManager.RefreshLFList();
 		RefreshLFLists();
 	}
