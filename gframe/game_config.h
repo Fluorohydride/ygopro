@@ -4,8 +4,6 @@
 #include <nlohmann/json.hpp>
 #include "text_types.h"
 
-#define DEFAULT_DUEL_RULE 5
-
 namespace ygo {
 
 struct GameConfig
@@ -31,7 +29,8 @@ struct GameConfig
 	std::wstring lastdeck = L"";
 	unsigned int lastlflist = 0;
 	unsigned int lastallowedcards = 3;
-	unsigned int lastDuelRule = DEFAULT_DUEL_RULE - 1;
+	unsigned int lastDuelParam = 0x6800; //#define DUEL_MODE_MR5 0x6800 //DUEL_PZONE | DUEL_EMZONE | DUEL_FSX_MMZONE
+	unsigned int lastDuelForbidden = 0; //#define DUEL_MODE_MR5_FORB
 	unsigned int timeLimit = 180;
 	unsigned int team1count = 1;
 	unsigned int team2count = 1;

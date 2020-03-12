@@ -22,6 +22,7 @@
 #include "Android/porting_android.h"
 #endif
 
+#define DEFAULT_DUEL_RULE 5
 namespace ygo {
 
 unsigned DuelClient::connect_state = 0;
