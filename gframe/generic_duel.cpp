@@ -869,7 +869,7 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		if(player > 1)
 			match_result.push_back(2);
 		else
-			match_result.push_back(1 - player);
+			match_result.push_back(player);
 		EndDuel();
 		return_value = 2;
 		break;
