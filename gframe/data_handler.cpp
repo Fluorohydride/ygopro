@@ -40,22 +40,28 @@ void DataHandler::LoadPicUrls() {
 	try {
 		if(configs->configs.size() && configs->configs["urls"].is_array()) {
 			for(auto& obj : configs->configs["urls"].get<std::vector<nlohmann::json>>()) {
+				auto type = obj["type"].get<std::string>();
 				if(obj["url"].get<std::string>() == "default") {
-					if(obj["type"].get<std::string>() == "pic") {
+					if(type == "pic") {
 #ifdef DEFAULT_PIC_URL
 						imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
 #else
 						continue;
 #endif
-					} else {
+					} else if (type == "field") {
 #ifdef DEFAULT_FIELD_URL
 						imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
 #else
 						continue;
 #endif
+					} else if (type == "cover") {
+#ifdef DEFAULT_COVER_URL
+						imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, ImageDownloader::COVER });
+#else
+						continue;
+#endif
 					}
 				} else {
-					auto type = obj["type"].get<std::string>();
 					imageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ? ImageDownloader::FIELD : (type == "pic") ? ImageDownloader::ART : ImageDownloader::COVER });
 				}
 			}
