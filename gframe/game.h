@@ -388,7 +388,7 @@ public:
 	irr::gui::IGUIButton* btnCreateHost;
 	//create host
 	irr::gui::IGUIWindow* wCreateHost;
-	irr::gui::IGUIComboBox* cbLFlist;
+	irr::gui::IGUIComboBox* cbHostLFList;
 	irr::gui::IGUIButton* btnRelayMode;
 	irr::gui::IGUIComboBox* cbMatchMode;
 	irr::gui::IGUIComboBox* cbRule;

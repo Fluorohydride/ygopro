@@ -314,12 +314,7 @@ bool Game::Initialize() {
 	wCreateHost->setVisible(false);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1226).c_str(), Scale(20, 30, 220, 50), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1226);
-	cbLFlist = ADDComboBox(Scale(140, 25, 300, 50), wCreateHost);
-	for (unsigned int i = 0; i < deckManager._lfList.size(); ++i) {
-		cbLFlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
-		if (gGameConfig->lastlflist == deckManager._lfList[i].hash)
-			cbLFlist->setSelected(i);
-	}
+	cbHostLFList = ADDComboBox(Scale(140, 25, 300, 50), wCreateHost);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1225);
 	cbRule = ADDComboBox(Scale(140, 55, 300, 80), wCreateHost);
@@ -1747,12 +1742,16 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	}
 }
 void Game::RefreshLFLists() {
+	cbHostLFList->clear();
+	cbHostLFList->setSelected(0);
 	cbDBLFList->clear();
 	cbDBLFList->setSelected(0);
 	for (auto &list : deckManager._lfList) {
-		auto i = cbDBLFList->addItem(list.listName.c_str());
+		auto hostIndex = cbHostLFList->addItem(list.listName.c_str(), list.hash);
+		auto deckIndex = cbDBLFList->addItem(list.listName.c_str(), list.hash);
 		if (gGameConfig->lastlflist == list.hash) {
-			cbDBLFList->setSelected(i);
+			cbHostLFList->setSelected(hostIndex);
+			cbDBLFList->setSelected(deckIndex);
 		}
 	}
 	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
@@ -2485,10 +2484,10 @@ void Game::ReloadElementsStrings() {
 	cbDBLFList->removeItem(nullLFlist);
 	cbDBLFList->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
 	cbDBLFList->setSelected(prev);
-	prev = cbLFlist->getSelected();
-	cbLFlist->removeItem(nullLFlist);
-	cbLFlist->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
-	cbLFlist->setSelected(prev);
+	prev = cbHostLFList->getSelected();
+	cbHostLFList->removeItem(nullLFlist);
+	cbHostLFList->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
+	cbHostLFList->setSelected(prev);
 
 	prev = cbSortType->getSelected();
 	ReloadCBSortType();
