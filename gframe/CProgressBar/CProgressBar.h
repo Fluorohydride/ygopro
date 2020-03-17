@@ -9,7 +9,7 @@ using namespace gui;
 class IProgressBar : public IGUIElement {
 public:
 
-	IProgressBar(IGUIEnvironment * guienv, const core::rect<s32>& rectangle, s32 id = -1, IGUIElement * parent = 0);
+	IProgressBar(IGUIEnvironment* guienv, const core::rect<s32>& rectangle, s32 id = -1, IGUIElement* parent = 0);
 
 
 	/*Set percentage in positive percentual (0~100). Please note that a call to this function with others values, will set the progress bar to 0.*/
@@ -37,6 +37,8 @@ private:
 	irr::video::SColor fillcolor;
 	irr::video::SColor emptycolor;
 	irr::video::SColor bordercolor;
+
+	irr::gui::IGUIStaticText* progressText;
 
 	void updateProgress();
 

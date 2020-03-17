@@ -1,8 +1,12 @@
 #include "CProgressBar.h"
+#include <string>
 
-IProgressBar::IProgressBar(IGUIEnvironment * guienv, const core::rect<s32>& rectangle, s32 id, IGUIElement * parent) : IGUIElement(EGUIET_ELEMENT, guienv, parent, id, rectangle) {
+IProgressBar::IProgressBar(IGUIEnvironment* guienv, const core::rect<s32>& rectangle, s32 id, IGUIElement * parent) : IGUIElement(EGUIET_ELEMENT, guienv, parent, id, rectangle) {
 	//total = rectangle.LowerRightCorner.X - rectangle.UpperLeftCorner.X;
 	bar = rectangle;
+	progressText = guienv->addStaticText(L"0%", { 0,0,rectangle.getWidth(),rectangle.getHeight() }, false, false, this);
+	progressText->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+	progressText->setOverrideColor({ 255,0,0,0 });
 	fillcolor.set(255, 255, 255, 255);
 	emptycolor.set(255, 0, 0, 0);
 	border = bar;
@@ -28,6 +32,7 @@ void IProgressBar::setProgress(irr::s32 _progress) {
 		progress = 0;
 	else
 		progress = _progress;
+	progressText->setText((std::to_wstring(progress) + L"%").c_str());
 }
 void IProgressBar::draw() {
 	if(!IsVisible)
@@ -38,6 +43,8 @@ void IProgressBar::draw() {
 	skin->draw2DRectangle(this, bordercolor, getAbsoluteRect(border, AbsoluteRect));
 	skin->draw2DRectangle(this, fillcolor, getAbsoluteRect(tofill, AbsoluteRect));
 	skin->draw2DRectangle(this, emptycolor, getAbsoluteRect(empty, AbsoluteRect));
+	progressText->setRelativePosition({ 0,0,AbsoluteRect.getWidth(),AbsoluteRect.getHeight() });
+	IGUIElement::draw();
 }
 void IProgressBar::updateProgress() {
 	u32 xpercentage;
