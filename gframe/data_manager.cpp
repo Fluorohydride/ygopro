@@ -10,6 +10,17 @@ byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
+bool DataManager::LoadDB(const char* file) {
+#ifdef _WIN32
+	char wfile[256];
+	BufferIO::DecodeUTF8(file, wfile);
+	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(file);
+#endif
+	return LoadDB(file, reader);
+}
+
 bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
@@ -18,6 +29,10 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #else
 	IReadFile* reader = FileSystem->createAndOpenFile(file);
 #endif
+	return LoadDB(file, reader);
+}
+
+bool DataManager::LoadDB(const char* file, IReadFile* reader) {
 	if(reader == NULL)
 		return false;
 	spmemvfs_db_t db;
