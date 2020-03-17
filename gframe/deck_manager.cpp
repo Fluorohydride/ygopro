@@ -48,8 +48,10 @@ void DeckManager::LoadLFListSingle(const char* path) {
 	}
 }
 void DeckManager::LoadLFList() {
+#ifndef YGOPRO_DATA_PATH
 	LoadLFListSingle("expansions/lflist.conf");
 	LoadLFListSingle("lflist.conf");
+#endif
 	LFList nolimit;
 	nolimit.listName = L"N/A";
 	nolimit.hash = 0;

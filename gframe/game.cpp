@@ -49,7 +49,9 @@ bool Game::Initialize() {
 	menuHandler.prev_sel = -1;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
+#ifndef YGOPRO_ENVIRONMENT_PATHS
 	deckManager.LoadLFList();
+#endif
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
@@ -59,6 +61,10 @@ bool Game::Initialize() {
 		return false;
 	}
 	dataManager.FileSystem = device->getFileSystem();
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+	LoadDataDirs();
+	deckManager.LoadLFList();
+#else
 	LoadExpansions();
 	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
@@ -69,6 +75,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	dataManager.LoadStrings("./expansions/strings.conf");
+#endif
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
@@ -928,6 +935,47 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+bool Game::LoadDataDirs() {
+	const char* data_path = getenv("YGOPRO_DATA_PATH");
+	if(!data_path) {
+		ErrorLog("No data dirs");
+		return false;
+	}
+	bool found_cdb = false;
+	bool found_strings = false;
+	path_foreach<char>(// Explicit template needed for implicit lambda conversion
+		std::string(data_path), ':',
+		[&](const std::string& prefix) {
+			FileSystem::TraversalDir(
+				prefix.c_str(),
+				[&](const char* name, bool isdir) {
+					if (isdir) return;
+					size_t len = strlen(name);
+					std::string full_path = prefix + "/" + name;
+					if (len > 4 && !strncmp(name + len - 4, ".cdb", 4)) {
+						dataManager.LoadDB(full_path.c_str());
+						found_cdb = true;
+					}
+					if (len == 12 && !strncmp(name, "strings.conf", 12)) {
+						dataManager.LoadStrings(full_path.c_str());
+						found_strings = true;
+					}
+					if (len == 11 && !strncmp(name, "lflist.conf", 11)) {
+						deckManager.LoadLFListSingle(full_path.c_str());
+					}
+				});
+		});
+	if(!found_cdb) {
+		ErrorLog("No card database found");
+		return false;
+	} else if (!found_strings) {
+		ErrorLog("No strings found");
+		return false;
+	}
+	return true;
+}
+#else
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
@@ -970,6 +1018,7 @@ void Game::LoadExpansions() {
 		}
 	}
 }
+#endif // USE_ENVIRONMENT_PATHS
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	FileSystem::TraversalDir(L"./deck", [cbDeck](const wchar_t* name, bool isdir) {
