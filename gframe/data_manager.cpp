@@ -365,6 +365,19 @@ int DataManager::CardReader(int code, void* pData) {
 	return 0;
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+	// default script name: ./script/c%d.lua -> /c%d.lua
+	std::string file_name(script_name + 8);
+	const char* _script_path = getenv("YGOPRO_SCRIPT_PATH");
+	if (!_script_path) return NULL;
+	byte* res = NULL;
+	path_foreach<char>(std::string(_script_path), ':',
+					   [&](const std::string& prefix) {
+						   std::string full_path = prefix + file_name;
+						   res = res ? res : ScriptReader(full_path.c_str(), slen);
+					   });
+	return res;
+#else
 	// default script name: ./script/c%d.lua
 	char first[256];
 	char second[256];
@@ -379,6 +392,7 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 		return scriptBuffer;
 	else
 		return ScriptReader(second, slen);
+#endif
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 #ifdef _WIN32
