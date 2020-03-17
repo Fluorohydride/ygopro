@@ -14,6 +14,7 @@ GameConfig::GameConfig() {
 		}
 		catch(std::exception& e) {
 			ErrorLog(std::string("Exception occurred: ") + e.what());
+			throw(e);
 		}
 	}
 }
