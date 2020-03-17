@@ -54,7 +54,6 @@ template<size_t N, typename... TR>
 inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 	return swprintf(buf, N, fmt, args...);
 }
-
 #include <irrlicht.h>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -66,6 +65,7 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include "CGUITTFont.h"
 #include "CGUIImageButton.h"
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -73,11 +73,21 @@ inline int myswprintf(wchar_t(&buf)[N], const wchar_t* fmt, TR... args) {
 #include <thread>
 #include <mutex>
 #include <algorithm>
+#include <functional>
 #include "bufferio.h"
 #include "myfilesystem.h"
 #include "mysignal.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
+
+template<typename CharT>
+inline void path_foreach(const std::basic_string<CharT>& path, CharT pathSep,
+						 const std::function<void(const std::basic_string<CharT>&)>& cb) {
+	std::basic_istringstream<CharT> path_(path);
+	std::basic_string<CharT> dir;
+	while(std::getline(path_, dir, pathSep))
+		cb(dir);
+}
 
 using namespace irr;
 using namespace core;
