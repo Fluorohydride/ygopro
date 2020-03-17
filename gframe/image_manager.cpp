@@ -6,6 +6,10 @@ namespace ygo {
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+	const char *_image_path = getenv("YGOPRO_IMAGE_PATH");
+	image_path = _image_path ? _image_path : "";
+#endif
 	tCover[0] = NULL;
 	tCover[1] = NULL;
 	tCover[2] = GetTextureFromFile("textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
@@ -183,6 +187,18 @@ void imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *dest) {
 			dest->setPixel(dx, dy, pxl);
 		}
 }
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+irr::video::ITexture* ImageManager::GetTextureFromImagePath(const char* file, s32 width, s32 height) {
+	irr::video::ITexture* img = NULL;
+	path_foreach<char>(image_path, ':',
+					   [&](const std::string& prefix) {
+						   std::string full_path = prefix + "/" + file;
+						   if(!img && FileSystem::IsFileExists(full_path.c_str()))
+							   img = GetTextureFromFile(full_path.c_str(), width, height);
+					   });
+	return img;
+}
+#endif
 irr::video::ITexture* ImageManager::GetTextureFromFile(const char* file, s32 width, s32 height) {
 	if(mainGame->gameConf.use_image_scale) {
 		irr::video::ITexture* texture;
@@ -217,13 +233,20 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 	}
 	auto tit = tMap[fit ? 1 : 0].find(code);
 	if(tit == tMap[fit ? 1 : 0].end()) {
+		irr::video::ITexture* img;
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+		char file[32];
+		sprintf(file, "%d.jpg", code);
+		img = GetTextureFromImagePath(file, width, height);
+#else
 		char file[256];
 		sprintf(file, "expansions/pics/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
+		img = GetTextureFromFile(file, width, height);
 		if(img == NULL) {
 			sprintf(file, "pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
+#endif
 		if(img == NULL && !mainGame->gameConf.use_image_scale) {
 			tMap[fit ? 1 : 0][code] = NULL;
 			return GetTextureThumb(code);
@@ -243,20 +266,32 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	int width = CARD_THUMB_WIDTH * mainGame->xScale;
 	int height = CARD_THUMB_HEIGHT * mainGame->yScale;
 	if(tit == tThumb.end()) {
+		irr::video::ITexture* img;
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+		char file[64];
+		sprintf(file, "thumbnail/%d.jpg", code);
+		img = GetTextureFromImagePath(file, width, height);
+#else
 		char file[256];
 		sprintf(file, "expansions/pics/thumbnail/%d.jpg", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, width, height);
+		img = GetTextureFromFile(file, width, height);
 		if(img == NULL) {
 			sprintf(file, "pics/thumbnail/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 		}
+#endif
 		if(img == NULL && mainGame->gameConf.use_image_scale) {
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+			sprintf(file, "%d.jpg", code);
+			img = GetTextureFromImagePath(file, width, height);
+#else
 			sprintf(file, "expansions/pics/%d.jpg", code);
 			img = GetTextureFromFile(file, width, height);
 			if(img == NULL) {
 				sprintf(file, "pics/%d.jpg", code);
 				img = GetTextureFromFile(file, width, height);
 			}
+#endif
 		}
 		tThumb[code] = img;
 		return (img == NULL) ? tUnknownThumb : img;
@@ -271,9 +306,19 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		return NULL;
 	auto tit = tFields.find(code);
 	if(tit == tFields.end()) {
+		irr::video::ITexture* img;
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+		char png_file[64];
+		char jpg_file[64];
+		sprintf(png_file, "field/%d.png", code);
+		sprintf(jpg_file, "field/%d.jpg", code);
+		img = GetTextureFromImagePath(png_file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+		if (img == NULL)
+			img = GetTextureFromImagePath(jpg_file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+#else
 		char file[256];
 		sprintf(file, "expansions/pics/field/%d.png", code);
-		irr::video::ITexture* img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
+		img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
 		if(img == NULL) {
 			sprintf(file, "expansions/pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
@@ -285,17 +330,10 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		if(img == NULL) {
 			sprintf(file, "pics/field/%d.jpg", code);
 			img = GetTextureFromFile(file, 512 * mainGame->xScale, 512 * mainGame->yScale);
-			if(img == NULL) {
-				tFields[code] = NULL;
-				return NULL;
-			} else {
-				tFields[code] = img;
-				return img;
-			}
-		} else {
-			tFields[code] = img;
-			return img;
 		}
+#endif
+		tFields[code] = img;
+		return img;
 	}
 	if(tit->second)
 		return tit->second;
