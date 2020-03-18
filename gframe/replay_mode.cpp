@@ -248,7 +248,6 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 		case MSG_CHAIN_SOLVING:
 		case MSG_CHAIN_SOLVED:
 		case MSG_CHAIN_END:
-		case MSG_CARD_SELECTED:
 		case MSG_RANDOM_SELECTED:
 		case MSG_EQUIP:
 		case MSG_UNEQUIP:

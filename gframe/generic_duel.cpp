@@ -1017,9 +1017,6 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		packets_cache.emplace_back(TO_SEND_BUFFER);
 		break;
 	}
-	case MSG_CARD_SELECTED: {
-		break;
-	}
 	case MSG_DRAW: {
 		player = BufferIO::Read<uint8_t>(pbuf);
 		count = BufferIO::Read<uint32_t>(pbuf);

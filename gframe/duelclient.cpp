@@ -1043,7 +1043,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 	}
 	mainGame->wCmdMenu->setVisible(false);
-	if(!mainGame->dInfo.isReplay && mainGame->dInfo.curMsg != MSG_WAITING && mainGame->dInfo.curMsg != MSG_CARD_SELECTED) {
+	if(!mainGame->dInfo.isReplay && mainGame->dInfo.curMsg != MSG_WAITING) {
 		mainGame->waitFrame = -1;
 		mainGame->stHintMsg->setVisible(false);
 		if(mainGame->wCardSelect->isVisible()) {
@@ -3154,9 +3154,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		return true;
 	}
-	case MSG_CARD_SELECTED: {
-		return true;
-	}
 	case MSG_RANDOM_SELECTED: {
 		/*uint8_t player = */BufferIO::Read<uint8_t>(pbuf);
 		uint32_t count = COMPAT_READ(uint8_t, uint32_t, pbuf);
@@ -3179,6 +3176,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcards[i]->is_highlighting = false;
 		return true;
 	}
+	case MSG_CARD_SELECTED:
 	case MSG_BECOME_TARGET: {
 		uint32_t count = COMPAT_READ(uint8_t, uint32_t, pbuf);
 		if(mainGame->dInfo.isCatchingUp) {
@@ -3188,7 +3186,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			ClientCard* pcard = mainGame->dField.GetCard(mainGame->LocalPlayer(info.controler), info.location, info.sequence);
 			pcard->is_highlighting = true;
-			mainGame->dField.current_chain.target.insert(pcard);
+			if(mainGame->dInfo.curMsg == MSG_BECOME_TARGET)
+				mainGame->dField.current_chain.target.insert(pcard);
 			if(pcard->location & LOCATION_ONFIELD) {
 				for (int j = 0; j < 3; ++j) {
 					mainGame->dField.FadeCard(pcard, 5, 5);
@@ -3208,7 +3207,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.MoveCard(pcard, 5);
 			} else
 				mainGame->WaitFrameSignal(30);
-			mainGame->AddLog(fmt::sprintf(gDataManager->GetSysString(1610), gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1), pcard->code);
+			mainGame->AddLog(fmt::sprintf(gDataManager->GetSysString((mainGame->dInfo.curMsg == MSG_BECOME_TARGET) ? 1610 : 1680), gDataManager->GetName(pcard->code), gDataManager->FormatLocation(info.location, info.sequence), info.sequence + 1), pcard->code);
 			pcard->is_highlighting = false;
 		}
 		return true;
