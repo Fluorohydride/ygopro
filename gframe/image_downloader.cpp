@@ -152,7 +152,7 @@ void ImageDownloader::DownloadPic() {
 		pic_download.unlock();
 	}
 }
-void ImageDownloader::AddToDownloadQueue(int code, imgType type) {
+void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
 	if(type == THUMB)
 		type = ART;
 	int index = static_cast<int>(type);
@@ -164,7 +164,7 @@ void ImageDownloader::AddToDownloadQueue(int code, imgType type) {
 	pic_download.unlock();
 	cv.notify_one();
 }
-ImageDownloader::downloadStatus ImageDownloader::GetDownloadStatus(int code, imgType type) {
+ImageDownloader::downloadStatus ImageDownloader::GetDownloadStatus(uint32_t code, imgType type) {
 	if(type == THUMB)
 		type = ART;
 	int index = static_cast<int>(type);
@@ -173,7 +173,7 @@ ImageDownloader::downloadStatus ImageDownloader::GetDownloadStatus(int code, img
 		return NONE;
 	return downloading_images[index][code].status;
 }
-path_string ImageDownloader::GetDownloadPath(int code, imgType type) {
+path_string ImageDownloader::GetDownloadPath(uint32_t code, imgType type) {
 	if(type == THUMB)
 		type = ART;
 	int index = static_cast<int>(type);

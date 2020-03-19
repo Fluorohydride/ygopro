@@ -27,7 +27,7 @@ public:
 		NONE
 	};
 	struct downloadParam {
-		int code;
+		uint32_t code;
 		imgType type;
 		downloadStatus status;
 		path_string path;
@@ -36,13 +36,13 @@ public:
 		std::string url;
 		imgType type;
 	};
-	using downloading_map = std::map<int/*code*/, downloadParam>; /*if the value is not found, the download hasn't started yet*/
+	using downloading_map = std::map<uint32_t/*code*/, downloadParam>; /*if the value is not found, the download hasn't started yet*/
 	ImageDownloader();
 	~ImageDownloader();
 	void AddDownloadResource(PicSource src);
-	downloadStatus GetDownloadStatus(int code, imgType type);
-	path_string GetDownloadPath(int code, imgType type);
-	void AddToDownloadQueue(int code, imgType type);
+	downloadStatus GetDownloadStatus(uint32_t code, imgType type);
+	path_string GetDownloadPath(uint32_t code, imgType type);
+	void AddToDownloadQueue(uint32_t code, imgType type);
 private:
 	void DownloadPic();
 	downloading_map downloading_images[3];

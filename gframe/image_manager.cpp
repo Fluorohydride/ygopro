@@ -140,7 +140,7 @@ void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	driver = dev->getVideoDriver();
 }
 void ImageManager::ClearTexture(bool resize) {
-	auto f = [&](std::unordered_map<int, irr::video::ITexture*> &map) {
+	auto f = [&](texture_map &map) {
 		for(auto tit = map.begin(); tit != map.end(); ++tit) {
 			if(tit->second)
 				driver->removeTexture(tit->second);
@@ -163,7 +163,7 @@ void ImageManager::ClearTexture(bool resize) {
 	f(tFields);
 	f(tCovers);
 }
-void ImageManager::RemoveTexture(int code) {
+void ImageManager::RemoveTexture(uint32_t code) {
 	for(auto map : { &tMap[0], &tMap[1] }) {
 		auto tit = map->find(code);
 		if(tit != map->end()) {
@@ -390,7 +390,7 @@ irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path & fil
 	}
 	return driver->getTexture(file);
 }
-ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, std::atomic<irr::s32>& _width, std::atomic<irr::s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
+ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType type, std::atomic<irr::s32>& _width, std::atomic<irr::s32>& _height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id) {
 	irr::video::IImage* img = nullptr;
 	int width = _width;
 	int height = _height;
@@ -479,7 +479,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(int code, imgType type, s
 	}
 	return std::make_pair(nullptr, EPRO_TEXT("wait for download"));
 }
-irr::video::ITexture* ImageManager::GetTextureCard(int code, imgType type, bool wait, bool fit, int* chk) {
+irr::video::ITexture* ImageManager::GetTextureCard(uint32_t code, imgType type, bool wait, bool fit, int* chk) {
 	if(chk)
 		*chk = 1;
 	irr::video::ITexture* ret_unk = tUnknown;
@@ -555,7 +555,7 @@ irr::video::ITexture* ImageManager::GetTextureCard(int code, imgType type, bool 
 		*chk = 0;
 	return (tit->second) ? tit->second : ret_unk;
 }
-irr::video::ITexture* ImageManager::GetTextureField(int code) {
+irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 	if(code == 0)
 		return nullptr;
 	auto tit = tFields.find(code);

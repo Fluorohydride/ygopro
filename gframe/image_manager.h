@@ -35,7 +35,7 @@ private:
 	using image_path = std::pair<irr::video::IImage*, path_string>;
 	using loading_map = std::map<int, std::future<image_path>>;
 	using chrono_time = unsigned long long;
-	using texture_map = std::unordered_map<int, irr::video::ITexture*>;
+	using texture_map = std::unordered_map<uint32_t, irr::video::ITexture*>;
 public:
 	ImageManager() {
 		loading_pics[0] = new loading_map();
@@ -54,16 +54,14 @@ public:
 	void ResetTextures();
 	void SetDevice(irr::IrrlichtDevice* dev);
 	void ClearTexture(bool resize = false);
-	void RemoveTexture(int code);
+	void RemoveTexture(uint32_t code);
 	void RefreshCachedTextures();
 	void ClearCachedTextures(bool resize);
 	bool imageScaleNNAA(irr::video::IImage *src, irr::video::IImage* dest, irr::s32 width, irr::s32 height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	irr::video::IImage* GetTextureImageFromFile(const irr::io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile = nullptr);
 	irr::video::ITexture* GetTextureFromFile(const irr::io::path& file, int width, int height);
-	irr::video::ITexture* GetTextureCard(int code, imgType type, bool wait = false, bool fit = false, int* chk = nullptr);
-	//irr::video::ITexture* GetTextureThumb(int code, bool wait = false, int* chk = nullptr);
-	irr::video::ITexture* GetTextureField(int code);
-	//irr::video::ITexture* GetTextureCustomCover(int code, bool wait = false, int* chk = nullptr);
+	irr::video::ITexture* GetTextureCard(uint32_t code, imgType type, bool wait = false, bool fit = false, int* chk = nullptr);
+	irr::video::ITexture* GetTextureField(uint32_t code);
 	irr::video::ITexture* guiScalingResizeCached(irr::video::ITexture *src, const irr::core::rect<irr::s32> &srcrect,
 												 const irr::core::rect<irr::s32> &destrect);
 	void draw2DImageFilterScaled(irr::video::ITexture* txr,
@@ -124,7 +122,7 @@ private:
 #undef A
 	void ClearFutureObjects(loading_map* map1, loading_map* map2, loading_map* map3, loading_map* map4);
 	void RefreshCovers();
-	image_path LoadCardTexture(int code, imgType type, std::atomic<irr::s32>& width, std::atomic<irr::s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
+	image_path LoadCardTexture(uint32_t code, imgType type, std::atomic<irr::s32>& width, std::atomic<irr::s32>& height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id);
 	loading_map* loading_pics[4];
 	path_string textures_path;
 	std::pair<std::atomic<irr::s32>, std::atomic<irr::s32>> sizes[3];
