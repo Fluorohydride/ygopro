@@ -28,6 +28,14 @@ solution "ygo"
         if _OPTIONS["environment-paths"] then
             defines { "YGOPRO_ENVIRONMENT_PATHS" }
         end
+        newoption
+        {
+            trigger = "xdg-environment",
+            description = "Read config and data from XDG directories"
+        }
+        if _OPTIONS["xdg-environment"] then
+            defines { "XDG_ENVIRONMENT" }
+        end
 
     configuration "vs*"
         flags "EnableSSE2"
