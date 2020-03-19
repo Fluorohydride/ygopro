@@ -1,6 +1,12 @@
 #include "image_manager.h"
 #include "game.h"
 
+#ifdef XDG_ENVIRONMENT
+#define DATA(x) mainGame->FindDataFile(x).c_str()
+#else
+#define DATA(x) x
+#endif
+
 namespace ygo {
 
 ImageManager imageManager;
@@ -12,36 +18,36 @@ bool ImageManager::Initial() {
 #endif
 	tCover[0] = NULL;
 	tCover[1] = NULL;
-	tCover[2] = GetTextureFromFile("textures/cover.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
-	tCover[3] = GetTextureFromFile("textures/cover2.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	tCover[2] = GetTextureFromFile(DATA("textures/cover.jpg"), CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	tCover[3] = GetTextureFromFile(DATA("textures/cover2.jpg"), CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
 	if(!tCover[3])
 		tCover[3] = tCover[2];
 	tUnknown = NULL;
 	tUnknownFit = NULL;
 	tUnknownThumb = NULL;
-	tAct = driver->getTexture("textures/act.png");
-	tAttack = driver->getTexture("textures/attack.png");
-	tChain = driver->getTexture("textures/chain.png");
-	tNegated = driver->getTexture("textures/negated.png");
-	tNumber = driver->getTexture("textures/number.png");
-	tLPBar = driver->getTexture("textures/lp.png");
-	tLPFrame = driver->getTexture("textures/lpf.png");
-	tMask = driver->getTexture("textures/mask.png");
-	tEquip = driver->getTexture("textures/equip.png");
-	tTarget = driver->getTexture("textures/target.png");
-	tChainTarget = driver->getTexture("textures/chaintarget.png");
-	tLim = driver->getTexture("textures/lim.png");
-	tOT = driver->getTexture("textures/ot.png");
-	tHand[0] = driver->getTexture("textures/f1.jpg");
-	tHand[1] = driver->getTexture("textures/f2.jpg");
-	tHand[2] = driver->getTexture("textures/f3.jpg");
+	tAct = driver->getTexture(DATA("textures/act.png"));
+	tAttack = driver->getTexture(DATA("textures/attack.png"));
+	tChain = driver->getTexture(DATA("textures/chain.png"));
+	tNegated = driver->getTexture(DATA("textures/negated.png"));
+	tNumber = driver->getTexture(DATA("textures/number.png"));
+	tLPBar = driver->getTexture(DATA("textures/lp.png"));
+	tLPFrame = driver->getTexture(DATA("textures/lpf.png"));
+	tMask = driver->getTexture(DATA("textures/mask.png"));
+	tEquip = driver->getTexture(DATA("textures/equip.png"));
+	tTarget = driver->getTexture(DATA("textures/target.png"));
+	tChainTarget = driver->getTexture(DATA("textures/chaintarget.png"));
+	tLim = driver->getTexture(DATA("textures/lim.png"));
+	tOT = driver->getTexture(DATA("textures/ot.png"));
+	tHand[0] = driver->getTexture(DATA("textures/f1.jpg"));
+	tHand[1] = driver->getTexture(DATA("textures/f2.jpg"));
+	tHand[2] = driver->getTexture(DATA("textures/f3.jpg"));
 	tBackGround = NULL;
 	tBackGround_menu = NULL;
 	tBackGround_deck = NULL;
-	tField[0] = driver->getTexture("textures/field2.png");
-	tFieldTransparent[0] = driver->getTexture("textures/field-transparent2.png");
-	tField[1] = driver->getTexture("textures/field3.png");
-	tFieldTransparent[1] = driver->getTexture("textures/field-transparent3.png");
+	tField[0] = driver->getTexture(DATA("textures/field2.png"));
+	tFieldTransparent[0] = driver->getTexture(DATA("textures/field-transparent2.png"));
+	tField[1] = driver->getTexture(DATA("textures/field3.png"));
+	tFieldTransparent[1] = driver->getTexture(DATA("textures/field-transparent3.png"));
 	ResizeTexture();
 	return true;
 }
@@ -93,24 +99,24 @@ void ImageManager::ResizeTexture() {
 	irr::s32 bgHeight = 640 * mainGame->yScale;
 	driver->removeTexture(tCover[0]);
 	driver->removeTexture(tCover[1]);
-	tCover[0] = GetTextureFromFile("textures/cover.jpg", imgWidth, imgHeight);
-	tCover[1] = GetTextureFromFile("textures/cover2.jpg", imgWidth, imgHeight);
+	tCover[0] = GetTextureFromFile(DATA("textures/cover.jpg"), imgWidth, imgHeight);
+	tCover[1] = GetTextureFromFile(DATA("textures/cover2.jpg"), imgWidth, imgHeight);
 	if(!tCover[1])
 		tCover[1] = tCover[0];
 	driver->removeTexture(tUnknown);
 	driver->removeTexture(tUnknownFit);
 	driver->removeTexture(tUnknownThumb);
-	tUnknown = GetTextureFromFile("textures/unknown.jpg", CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
-	tUnknownFit = GetTextureFromFile("textures/unknown.jpg", imgWidthFit, imgHeightFit);
-	tUnknownThumb = GetTextureFromFile("textures/unknown.jpg", imgWidthThumb, imgHeightThumb);
+	tUnknown = GetTextureFromFile(DATA("textures/unknown.jpg"), CARD_IMG_WIDTH, CARD_IMG_HEIGHT);
+	tUnknownFit = GetTextureFromFile(DATA("textures/unknown.jpg"), imgWidthFit, imgHeightFit);
+	tUnknownThumb = GetTextureFromFile(DATA("textures/unknown.jpg"), imgWidthThumb, imgHeightThumb);
 	driver->removeTexture(tBackGround);
-	tBackGround = GetTextureFromFile("textures/bg.jpg", bgWidth, bgHeight);
+	tBackGround = GetTextureFromFile(DATA("textures/bg.jpg"), bgWidth, bgHeight);
 	driver->removeTexture(tBackGround_menu);
-	tBackGround_menu = GetTextureFromFile("textures/bg_menu.jpg", bgWidth, bgHeight);
+	tBackGround_menu = GetTextureFromFile(DATA("textures/bg_menu.jpg"), bgWidth, bgHeight);
 	if(!tBackGround_menu)
 		tBackGround_menu = tBackGround;
 	driver->removeTexture(tBackGround_deck);
-	tBackGround_deck = GetTextureFromFile("textures/bg_deck.jpg", bgWidth, bgHeight);
+	tBackGround_deck = GetTextureFromFile(DATA("textures/bg_deck.jpg"), bgWidth, bgHeight);
 	if(!tBackGround_deck)
 		tBackGround_deck = tBackGround;
 }
@@ -341,3 +347,5 @@ irr::video::ITexture* ImageManager::GetTextureField(int code) {
 		return NULL;
 }
 }
+
+#undef DATA
