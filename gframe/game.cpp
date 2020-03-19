@@ -1075,6 +1075,18 @@ void Game::LoadExpansions() {
 #endif // USE_ENVIRONMENT_PATHS
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
+#ifdef XDG_ENVIRONMENT
+	std::string deck_dir = DATA_HOME + "/deck";
+	FileSystem::TraversalDir(deck_dir.c_str(), [cbDeck](const char* name, bool isdir) {
+		if(!isdir && strchr(name, '.') && !strncmp(strchr(name, '.'), ".ydk", 4)) {
+			size_t len = strlen(name);
+			wchar_t deckname[256];
+			BufferIO::DecodeUTF8(name, deckname);
+			deckname[wcslen(deckname) - 4] = 0;
+			cbDeck->addItem(deckname);
+		}
+	});
+#else
 	FileSystem::TraversalDir(L"./deck", [cbDeck](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
 			size_t len = wcslen(name);
@@ -1084,6 +1096,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 			cbDeck->addItem(deckname);
 		}
 	});
+#endif
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
 			cbDeck->setSelected(i);

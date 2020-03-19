@@ -208,7 +208,17 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	int sp = 0, ct = 0, mainc = 0, sidec = 0, code;
 	wchar_t localfile[64];
 	myswprintf(localfile, L"./deck/%ls.ydk", file);
+#ifdef XDG_ENVIRONMENT
+	FILE* fp;
+	{
+		char file2[256];
+		BufferIO::EncodeUTF8(localfile, file2);
+		std::string path = mainGame->FindDataFile(file2);
+		fp = fopen(path.c_str(), "r");
+	}
+#else
 	FILE* fp = OpenDeckFile(localfile, "r");
+#endif
 	if(!fp) {
 		fp = OpenDeckFile(file, "r");
 	}
@@ -237,11 +247,30 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
+#ifdef XDG_ENVIRONMENT
+	std::string deck_path = mainGame->DATA_HOME + "/deck";
+	if(!FileSystem::IsDirExists(mainGame->DATA_HOME.c_str()) &&
+	   !FileSystem::MakeDir(mainGame->DATA_HOME.c_str()))
+		return false;
+	if(!FileSystem::IsDirExists(deck_path.c_str()) &&
+	   !FileSystem::MakeDir(deck_path.c_str()))
+		return false;
+	wchar_t file[64];
+	myswprintf(file, L"deck/%ls.ydk", name);
+	FILE* fp;
+	{
+		char file2[256];
+		BufferIO::EncodeUTF8(file, file2);
+		std::string real_file = mainGame->FindDataFile(file2, false);
+		fp = fopen(real_file.c_str(), "w");
+	}
+#else
 	if(!FileSystem::IsDirExists(L"./deck") && !FileSystem::MakeDir(L"./deck"))
 		return false;
 	wchar_t file[64];
 	myswprintf(file, L"./deck/%ls.ydk", name);
 	FILE* fp = OpenDeckFile(file, "w");
+#endif
 	if(!fp)
 		return false;
 	fprintf(fp, "#created by ...\n#main\n");
@@ -265,7 +294,12 @@ bool DeckManager::DeleteDeck(Deck& deck, const wchar_t* name) {
 #else
 	char filefn[256];
 	BufferIO::EncodeUTF8(file, filefn);
+#ifdef XDG_ENVIRONMENT
+	std::string real_file = mainGame->FindDataFile(filefn);
+	int result = unlink(real_file.c_str());
+#else
 	int result = unlink(filefn);
+#endif
 	return result == 0;
 #endif
 }
