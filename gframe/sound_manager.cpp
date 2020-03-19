@@ -3,6 +3,12 @@
 #include "../ikpmp3/ikpMP3.h"
 #endif
 
+#ifdef XDG_ENVIRONMENT
+#define DATA(x) mainGame->FindDataFile(x).c_str()
+#else
+#define DATA(x) "./" x
+#endif
+
 namespace ygo {
 
 SoundManager soundManager;
@@ -26,6 +32,15 @@ bool SoundManager::Init() {
 	return false;
 }
 void SoundManager::RefreshBGMList() {
+#ifdef XDG_ENVIRONMENT
+	RefreshBGMDir("duel", BGM_DUEL);
+	RefreshBGMDir("menu", BGM_MENU);
+	RefreshBGMDir("deck", BGM_DECK);
+	RefreshBGMDir("advantage", BGM_ADVANTAGE);
+	RefreshBGMDir("disadvantage", BGM_DISADVANTAGE);
+	RefreshBGMDir("win", BGM_WIN);
+	RefreshBGMDir("lose", BGM_LOSE);
+#else
 	RefershBGMDir(L"", BGM_DUEL);
 	RefershBGMDir(L"duel", BGM_DUEL);
 	RefershBGMDir(L"menu", BGM_MENU);
@@ -34,7 +49,29 @@ void SoundManager::RefreshBGMList() {
 	RefershBGMDir(L"disadvantage", BGM_DISADVANTAGE);
 	RefershBGMDir(L"win", BGM_WIN);
 	RefershBGMDir(L"lose", BGM_LOSE);
+#endif
 }
+#ifdef XDG_ENVIRONMENT
+void SoundManager::RefreshBGMDir1(std::string path, int scene) {
+	FileSystem::TraversalDir(path.c_str(), [this, &path, scene](const char* name, bool isdir)
+	{
+		if (isdir || !strchr(name, '.'))
+			return;
+		const char* suffix = strchr(name, '.');
+		if (!strncmp(suffix, ".mp3", 4) || !strncmp(suffix, ".ogg", 4)) {
+			std::string full_path = path + "/" + name;
+			BGMList[BGM_ALL].push_back(full_path);
+			BGMList[scene].push_back(full_path);
+		}
+
+	});
+}
+
+void SoundManager::RefreshBGMDir(std::string path, int scene) {
+	RefreshBGMDir1(mainGame->DATA_HOME + "/bgm/" + path, scene);
+	RefreshBGMDir1(std::string(mainGame->sysdatadir) + "/bgm/" + path, scene);
+}
+#else
 void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 	std::wstring search = L"./sound/BGM/" + path;
 	FileSystem::TraversalDir(search.c_str(), [this, &path, scene](const wchar_t* name, bool isdir) {
@@ -45,6 +82,7 @@ void SoundManager::RefershBGMDir(std::wstring path, int scene) {
 		}
 	});
 }
+#endif
 void SoundManager::PlaySoundEffect(int sound) {
 #ifdef YGOPRO_USE_IRRKLANG
 	if(!mainGame->chkEnableSound->isChecked())
@@ -52,123 +90,123 @@ void SoundManager::PlaySoundEffect(int sound) {
 	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 	switch(sound) {
 	case SOUND_SUMMON: {
-		engineSound->play2D("./sound/summon.wav");
+		engineSound->play2D(DATA("sound/summon.wav"));
 		break;
 	}
 	case SOUND_SPECIAL_SUMMON: {
-		engineSound->play2D("./sound/specialsummon.wav");
+		engineSound->play2D(DATA("sound/specialsummon.wav"));
 		break;
 	}
 	case SOUND_ACTIVATE: {
-		engineSound->play2D("./sound/activate.wav");
+		engineSound->play2D(DATA("sound/activate.wav"));
 		break;
 	}
 	case SOUND_SET: {
-		engineSound->play2D("./sound/set.wav");
+		engineSound->play2D(DATA("sound/set.wav"));
 		break;
 	}
 	case SOUND_FILP: {
-		engineSound->play2D("./sound/flip.wav");
+		engineSound->play2D(DATA("sound/flip.wav"));
 		break;
 	}
 	case SOUND_REVEAL: {
-		engineSound->play2D("./sound/reveal.wav");
+		engineSound->play2D(DATA("sound/reveal.wav"));
 		break;
 	}
 	case SOUND_EQUIP: {
-		engineSound->play2D("./sound/equip.wav");
+		engineSound->play2D(DATA("sound/equip.wav"));
 		break;
 	}
 	case SOUND_DESTROYED: {
-		engineSound->play2D("./sound/destroyed.wav");
+		engineSound->play2D(DATA("sound/destroyed.wav"));
 		break;
 	}
 	case SOUND_BANISHED: {
-		engineSound->play2D("./sound/banished.wav");
+		engineSound->play2D(DATA("sound/banished.wav"));
 		break;
 	}
 	case SOUND_TOKEN: {
-		engineSound->play2D("./sound/token.wav");
+		engineSound->play2D(DATA("sound/token.wav"));
 		break;
 	}
 	case SOUND_ATTACK: {
-		engineSound->play2D("./sound/attack.wav");
+		engineSound->play2D(DATA("sound/attack.wav"));
 		break;
 	}
 	case SOUND_DIRECT_ATTACK: {
-		engineSound->play2D("./sound/directattack.wav");
+		engineSound->play2D(DATA("sound/directattack.wav"));
 		break;
 	}
 	case SOUND_DRAW: {
-		engineSound->play2D("./sound/draw.wav");
+		engineSound->play2D(DATA("sound/draw.wav"));
 		break;
 	}
 	case SOUND_SHUFFLE: {
-		engineSound->play2D("./sound/shuffle.wav");
+		engineSound->play2D(DATA("sound/shuffle.wav"));
 		break;
 	}
 	case SOUND_DAMAGE: {
-		engineSound->play2D("./sound/damage.wav");
+		engineSound->play2D(DATA("sound/damage.wav"));
 		break;
 	}
 	case SOUND_RECOVER: {
-		engineSound->play2D("./sound/gainlp.wav");
+		engineSound->play2D(DATA("sound/gainlp.wav"));
 		break;
 	}
 	case SOUND_COUNTER_ADD: {
-		engineSound->play2D("./sound/addcounter.wav");
+		engineSound->play2D(DATA("sound/addcounter.wav"));
 		break;
 	}
 	case SOUND_COUNTER_REMOVE: {
-		engineSound->play2D("./sound/removecounter.wav");
+		engineSound->play2D(DATA("sound/removecounter.wav"));
 		break;
 	}
 	case SOUND_COIN: {
-		engineSound->play2D("./sound/coinflip.wav");
+		engineSound->play2D(DATA("sound/coinflip.wav"));
 		break;
 	}
 	case SOUND_DICE: {
-		engineSound->play2D("./sound/diceroll.wav");
+		engineSound->play2D(DATA("sound/diceroll.wav"));
 		break;
 	}
 	case SOUND_NEXT_TURN: {
-		engineSound->play2D("./sound/nextturn.wav");
+		engineSound->play2D(DATA("sound/nextturn.wav"));
 		break;
 	}
 	case SOUND_PHASE: {
-		engineSound->play2D("./sound/phase.wav");
+		engineSound->play2D(DATA("sound/phase.wav"));
 		break;
 	}
 	case SOUND_MENU: {
-		engineSound->play2D("./sound/menu.wav");
+		engineSound->play2D(DATA("sound/menu.wav"));
 		break;
 	}
 	case SOUND_BUTTON: {
-		engineSound->play2D("./sound/button.wav");
+		engineSound->play2D(DATA("sound/button.wav"));
 		break;
 	}
 	case SOUND_INFO: {
-		engineSound->play2D("./sound/info.wav");
+		engineSound->play2D(DATA("sound/info.wav"));
 		break;
 	}
 	case SOUND_QUESTION: {
-		engineSound->play2D("./sound/question.wav");
+		engineSound->play2D(DATA("sound/question.wav"));
 		break;
 	}
 	case SOUND_CARD_PICK: {
-		engineSound->play2D("./sound/cardpick.wav");
+		engineSound->play2D(DATA("sound/cardpick.wav"));
 		break;
 	}
 	case SOUND_CARD_DROP: {
-		engineSound->play2D("./sound/carddrop.wav");
+		engineSound->play2D(DATA("sound/carddrop.wav"));
 		break;
 	}
 	case SOUND_PLAYER_ENTER: {
-		engineSound->play2D("./sound/playerenter.wav");
+		engineSound->play2D(DATA("sound/playerenter.wav"));
 		break;
 	}
 	case SOUND_CHAT: {
-		engineSound->play2D("./sound/chatmessage.wav");
+		engineSound->play2D(DATA("sound/chatmessage.wav"));
 		break;
 	}
 	default:
@@ -224,10 +262,14 @@ void SoundManager::PlayBGM(int scene) {
 		bgm_scene = scene;
 		int bgm = rand() % count;
 		auto name = BGMList[scene][bgm].c_str();
+#ifdef XDG_ENVIRONMENT
+		PlayMusic(name.c_str(), false);
+#else
 		wchar_t fname[1024];
 		myswprintf(fname, L"./sound/BGM/%ls", name);
 		BufferIO::EncodeUTF8(fname, BGMName);
 		PlayMusic(BGMName, false);
+#endif
 	}
 #endif
 }

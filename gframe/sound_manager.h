@@ -10,14 +10,23 @@ namespace ygo {
 
 class SoundManager {
 private:
+#ifdef XDG_ENVIRONMENT
+	std::vector<std::string> BGMList[8];
+#else
 	std::vector<std::wstring> BGMList[8];
+#endif
 	int bgm_scene;
 #ifdef YGOPRO_USE_IRRKLANG
 	irrklang::ISoundEngine* engineSound;
 	irrklang::ISoundEngine* engineMusic;
 	irrklang::ISound* soundBGM;
 #endif
+#ifdef XDG_ENVIRONMENT
+	void RefreshBGMDir(std::string path, int scene);
+	void RefreshBGMDir1(std::string path, int scene);
+#else
 	void RefershBGMDir(std::wstring path, int scene);
+#endif
 
 public:
 	bool Init();
