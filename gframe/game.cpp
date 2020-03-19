@@ -1958,7 +1958,7 @@ void Game::LoadServers() {
 		ErrorLog(std::string("Exception occurred: ") + e.what());
 	}
 }
-void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
+void Game::ShowCardInfo(uint32 code, bool resize, ImageManager::imgType type) {
 	static ImageManager::imgType prevtype = ImageManager::imgType::ART;
 	if(code == 0) {
 		ClearCardInfo(0);
