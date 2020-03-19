@@ -246,7 +246,7 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	ErrorLog(error);
 	return false;
 }
-bool DataManager::GetData(int code, CardData* pData) {
+bool DataManager::GetData(uint32 code, CardData* pData) {
 	auto cdit = cards.find(code);
 	if(cdit == cards.end())
 		return false;
@@ -254,13 +254,13 @@ bool DataManager::GetData(int code, CardData* pData) {
 		*pData = *((CardData*)&cdit->second._data);
 	return true;
 }
-CardDataC* DataManager::GetCardData(int code) {
+CardDataC* DataManager::GetCardData(uint32 code) {
 	auto it = cards.find(code);
 	if(it != cards.end())
 		return &it->second._data;
 	return nullptr;
 }
-bool DataManager::GetString(int code, CardString* pStr) {
+bool DataManager::GetString(uint32 code, CardString* pStr) {
 	auto csit = cards.find(code);
 	if(csit == cards.end()) {
 		pStr->name = unknown_string;
@@ -270,13 +270,13 @@ bool DataManager::GetString(int code, CardString* pStr) {
 	*pStr = *csit->second.GetStrings();
 	return true;
 }
-std::wstring DataManager::GetName(int code) {
+std::wstring DataManager::GetName(uint32 code) {
 	auto csit = cards.find(code);
 	if(csit == cards.end() || csit->second.GetStrings()->name.empty())
 		return unknown_string;
 	return csit->second.GetStrings()->name;
 }
-std::wstring DataManager::GetText(int code) {
+std::wstring DataManager::GetText(uint32 code) {
 	auto csit = cards.find(code);
 	if(csit == cards.end() || csit->second.GetStrings()->text.empty())
 		return unknown_string;

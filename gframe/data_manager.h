@@ -54,11 +54,11 @@ public:
 	bool LoadStrings(const path_string& file);
 	bool LoadLocaleStrings(const path_string& file);
 	void ClearLocaleStrings();
-	bool GetData(int code, CardData* pData);
-	CardDataC* GetCardData(int code);
-	bool GetString(int code, CardString* pStr);
-	std::wstring GetName(int code);
-	std::wstring GetText(int code);
+	bool GetData(uint32 code, CardData* pData);
+	CardDataC* GetCardData(uint32 code);
+	bool GetString(uint32 code, CardString* pStr);
+	std::wstring GetName(uint32 code);
+	std::wstring GetText(uint32 code);
 	std::wstring GetDesc(uint64 strCode, bool compat);
 	std::wstring GetSysString(uint32 code);
 	std::wstring GetVictoryString(int code);

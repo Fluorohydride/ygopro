@@ -1980,7 +1980,7 @@ void Game::ShowCardInfo(int code, bool resize, ImageManager::imgType type) {
 	imgCard->setScaleImage(true);
 	if(!cd)
 		return;
-	int tmp_code = code;
+	auto tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
 	stName->setText(gDataManager->GetName(tmp_code).c_str());
