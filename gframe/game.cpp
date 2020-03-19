@@ -1106,10 +1106,23 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 }
 void Game::RefreshReplay() {
 	lstReplayList->clear();
+#ifdef XDG_ENVIRONMENT
+	std::string replay_dir = DATA_HOME + "/replay";
+	FileSystem::TraversalDir(replay_dir.c_str(), [this](const char* name, bool isdir) {
+		if(!isdir && strchr(name, '.') && !strncmp(strchr(name, '.'), ".yrp", 4)) {
+			size_t len = strlen(name);
+			wchar_t replay[256];
+			BufferIO::DecodeUTF8(name, replay);
+			if (Replay::CheckReplay(replay))
+				lstReplayList->addItem(replay);
+		}
+	});
+#else
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
 			lstReplayList->addItem(name);
 	});
+#endif
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
