@@ -107,7 +107,7 @@ int DeckManager::TypeCount(std::vector<CardDataC*> cards, int type) {
 	}
 	return count;
 }
-inline int CheckCards(const std::vector<CardDataC *> &cards, LFList* curlist, std::unordered_map<int, int>* list,
+inline int CheckCards(const std::vector<CardDataC *> &cards, LFList* curlist, std::unordered_map<uint32_t, int>* list,
 					  DuelAllowedCards allowedCards,
 					  std::unordered_map<int, int> &ccount,
 					  std::function<int(CardDataC*)> additionalCheck = [](CardDataC*){ return 0; }) {
