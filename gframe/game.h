@@ -107,7 +107,6 @@ struct FadingUnit {
 };
 
 class Game {
-
 public:
 	bool Initialize();
 	void MainLoop();
@@ -180,6 +179,16 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
+
+#ifdef XDG_ENVIRONMENT
+	std::string FindConfigFile(const std::string& file, bool existing = true);
+	std::string FindDataFile(const std::string& file, bool existing = true);
+
+	constexpr static const char* sysconfdir = "/etc/ygopro";
+	constexpr static const char* sysdatadir = "/usr/share/ygopro";
+	std::string CONFIG_HOME;
+	std::string DATA_HOME;
+#endif
 
 	std::mutex gMutex;
 	Signal frameSignal;

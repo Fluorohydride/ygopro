@@ -16,8 +16,62 @@ namespace ygo {
 
 Game* mainGame;
 
+#ifdef XDG_ENVIRONMENT
+std::string Game::FindConfigFile(const std::string& file, bool existing) {
+	{
+		std::string base(CONFIG_HOME);
+		base += "/";
+		base += file;
+		if (!existing || FileSystem::IsFileExists(base.c_str()))
+			return base;
+	}
+	{
+		std::string base(sysconfdir);
+		base += "/";
+		base += file;
+		return base;
+	}
+}
+
+std::string Game::FindDataFile(const std::string& file, bool existing) {
+	{
+		std::string base(DATA_HOME);
+		base += "/";
+		base += file;
+		if (!existing || FileSystem::IsFileExists(base.c_str()))
+			return base;
+	}
+	{
+		std::string base(sysdatadir);
+		base += "/";
+		base += file;
+		return base;
+	}
+}
+#endif
+
 bool Game::Initialize() {
 	srand(time(0));
+#ifdef XDG_ENVIRONMENT
+	{
+		const char* xdg_config_home = getenv("XDG_CONFIG_HOME");
+		const char* xdg_data_home = getenv("XDG_DATA_HOME");
+		if (xdg_config_home)
+			CONFIG_HOME = xdg_config_home;
+		else {
+			CONFIG_HOME = getenv("HOME");
+			CONFIG_HOME += "/.config";
+		}
+		if (xdg_data_home)
+			DATA_HOME = xdg_data_home;
+		else {
+			DATA_HOME = getenv("HOME");
+			DATA_HOME += "/.local/share";
+		}
+		CONFIG_HOME += "/ygopro";
+		DATA_HOME += "/ygopro";
+	}
+#endif
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
@@ -1056,7 +1110,12 @@ void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
 		return;
 	botInfo.clear();
+#ifdef XDG_ENVIRONMENT
+	FILE* fp;
+	{ std::string path = FindConfigFile("bot.conf"); fp = fopen(path.c_str(), "r"); }
+#else
 	FILE* fp = fopen("bot.conf", "r");
+#endif
 	char linebuf[256];
 	char strbuf[256];
 	if(fp) {
@@ -1096,7 +1155,12 @@ void Game::RefreshBot() {
 		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
 }
 void Game::LoadConfig() {
+#ifdef XDG_ENVIRONMENT
+	FILE* fp;
+	{ std::string path = FindConfigFile("system.conf"); fp = fopen(path.c_str(), "r"); }
+#else
 	FILE* fp = fopen("system.conf", "r");
+#endif
 	if(!fp)
 		return;
 	char linebuf[256];
@@ -1259,7 +1323,15 @@ void Game::LoadConfig() {
 	fclose(fp);
 }
 void Game::SaveConfig() {
+#ifdef XDG_ENVIRONMENT
+	if (!FileSystem::IsDirExists(CONFIG_HOME.c_str()) &&
+		!FileSystem::MakeDir(CONFIG_HOME.c_str()))
+		return;
+	FILE* fp;
+	{ std::string path = FindConfigFile("system.conf", false); fp = fopen(path.c_str(), "w"); }
+#else
 	FILE* fp = fopen("system.conf", "w");
+#endif
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[256];
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
