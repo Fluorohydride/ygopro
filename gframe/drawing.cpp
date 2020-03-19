@@ -1150,8 +1150,8 @@ void Game::WaitFrameSignal(int frame) {
 	frameSignal.Wait();
 }
 void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, recti* cliprect, bool load_image) {
-	int code = cp->code;
-	int lcode = cp->code;
+	auto code = cp->code;
+	auto lcode = cp->code;
 	if(!lflist->content.count(lcode) && cp->alias)
 		lcode = cp->alias;
 	irr::video::ITexture* img = load_image ? imageManager.GetTextureCard(code, ImageManager::THUMB) : imageManager.tUnknown;

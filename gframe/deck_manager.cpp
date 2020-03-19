@@ -43,8 +43,8 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 		pos = str.find(" ");
 		if(pos == std::string::npos)
 			continue;
-		int code = 0;
-		try { code = std::stoi(str.substr(0, pos)); }
+		uint32 code = 0;
+		try { code = std::stoul(str.substr(0, pos)); }
 		catch(...){}
 		if(!code)
 			continue;

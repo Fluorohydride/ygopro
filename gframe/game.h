@@ -155,7 +155,7 @@ public:
 	void LoadGithubRepositories();
 	void UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo);
 	void LoadServers();
-	void ShowCardInfo(int code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
+	void ShowCardInfo(uint32 code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
 	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player, int type);
@@ -256,7 +256,7 @@ public:
 	int signalFrame;
 	int saveReplay;
 	int showcard;
-	int showcardcode;
+	uint32 showcardcode;
 	float showcarddif;
 	float showcardp;
 	bool is_attacking;
@@ -316,7 +316,7 @@ public:
 	irr::gui::CGUITTFont* numFont;
 	irr::gui::CGUITTFont* adFont;
 	irr::gui::CGUITTFont* lpcFont;
-	std::map<irr::gui::CGUIImageButton*, int> imageLoading;
+	std::map<irr::gui::CGUIImageButton*, uint32> imageLoading;
 	//card image
 	irr::gui::IGUIStaticText* wCardImg;
 	irr::gui::IGUIImage* imgCard;
