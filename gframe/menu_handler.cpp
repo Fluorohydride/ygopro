@@ -741,9 +741,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case EDITBOX_TEAM_COUNT: {
 				auto elem = static_cast<irr::gui::IGUIEditBox*>(event.GUIEvent.Caller);
-				auto min = L"1";
-				if(elem == mainGame->ebOnlineTeam1 || elem == mainGame->ebOnlineTeam2)
-					min = L"0";
+				auto min = (elem == mainGame->ebOnlineTeam1 || elem == mainGame->ebOnlineTeam2) ? L"0" : L"1";
 				auto text = elem->getText();
 				auto len = wcslen(text);
 				if(len < 1)
@@ -757,7 +755,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case EDITBOX_NUMERIC: {
-				caller->setText(Utils::KeepOnlyDigits(caller->getText()).c_str());
+				std::wstring tmp(caller->getText());
+				if(Utils::KeepOnlyDigits(tmp))
+					caller->setText(tmp.c_str());
 				break;
 			}
 			case EDITBOX_NICKNAME: {
