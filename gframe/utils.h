@@ -64,7 +64,7 @@ inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
 	while((pos1 = input.find(token, pos2)) != T::npos) {
 		if(pos1 != pos2)
 			res.emplace_back(input.begin() + pos2, input.begin() + pos1);
-		pos2 = pos1 + 1;
+		pos2 = pos1 + token.size();
 	}
 	if(pos2 != input.size())
 		res.emplace_back(input.begin() + pos2, input.end());
