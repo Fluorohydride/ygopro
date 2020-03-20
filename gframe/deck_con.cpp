@@ -10,7 +10,7 @@
 #include "single_mode.h"
 #include "client_card.h"
 #ifdef __ANDROID__
-#include "Android/porting_android.h"
+#include "porting_android.h"
 #endif
 #include <algorithm>
 #include <unordered_map>
@@ -48,7 +48,7 @@ static int parse_filter(const wchar_t* pstr, unsigned int* type) {
 	return 0;
 }
 
-static bool check_set_code(const CardDataC& data, std::vector<unsigned int>& setcodes) {
+static bool check_set_code(const CardDataC& data, const std::vector<unsigned int>& setcodes) {
 	auto card_setcodes = data.setcodes;
 	if (data.alias) {
 		auto _data = gDataManager->GetCardData(data.alias);
@@ -835,7 +835,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		else
 			it++;
 	}
-	for(auto term : searchterms) {
+	for(const auto& term : searchterms) {
 		int trycode = BufferIO::GetVal(term.c_str());
 		CardDataC* data = nullptr;
 		if(trycode && (data = gDataManager->GetCardData(trycode))) {
@@ -863,7 +863,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		if(result.size())
 			searched_terms[term] = result;
 	}
-	for(auto& res : searched_terms) {
+	for(const auto& res : searched_terms) {
 		results.insert(results.end(), res.second.begin(), res.second.end());
 	}
 	SortList();
@@ -879,7 +879,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	}
 	mainGame->scrFilter->setPos(0);
 }
-bool DeckBuilder::CheckCard(CardDataM* data, const wchar_t& checkchar, std::vector<std::wstring>& tokens, std::vector<unsigned int>& set_code) {
+bool DeckBuilder::CheckCard(CardDataM* data, const wchar_t& checkchar, const std::vector<std::wstring>& tokens, const std::vector<unsigned int>& set_code) {
 	if(data->_data.type & TYPE_TOKEN  || data->_data.ot & SCOPE_HIDDEN || ((data->_data.ot & SCOPE_OFFICIAL) != data->_data.ot && !mainGame->chkAnime->isChecked()))
 		return false;
 	switch(filter_type) {

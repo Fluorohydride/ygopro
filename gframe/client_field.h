@@ -116,7 +116,7 @@ public:
 	void check_sel_sum_t(const std::set<ClientCard*>& left, int acc);
 	bool check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count);
 
-	void UpdateDeclarableList();
+	void UpdateDeclarableList(bool refresh = false);
 
 	irr::gui::IGUIElement* panel;
 	std::vector<int> ancard;

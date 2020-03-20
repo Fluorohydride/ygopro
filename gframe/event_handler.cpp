@@ -984,7 +984,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableList();
+				UpdateDeclarableList(true);
 				break;
 			}
 			}

@@ -64,9 +64,9 @@ void ServerLobby::FillOnlineRooms() {
 			if(searchText.size()) {
 				bool res = false;
 				for(auto& name : room.players) {
-					res = res || Utils::ContainsSubstring(name, searchText, true, false);
+					res = res || Utils::ContainsSubstring(name, searchText, true);
 				}
-				if(!res && (room.description.size() && !Utils::ContainsSubstring(room.description, searchText, true, false)))
+				if(!res && (room.description.size() && !Utils::ContainsSubstring(room.description, searchText, true)))
 					continue;
 			}
 			if(bestOf && room.info.best_of != bestOf)

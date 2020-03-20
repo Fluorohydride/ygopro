@@ -380,35 +380,35 @@ namespace ygo {
 		return BufferIO::DecodeUTF8s(input);
 #endif
 	}
-	bool Utils::ContainsSubstring(std::wstring input, const std::vector<std::wstring>& tokens, bool ignoreInputCasingAccents, bool ignoreTokenCasingAccents) {
+	bool Utils::ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
+		static std::vector<std::wstring> alttokens;
+		static std::wstring casedinput;
+		auto string = &input;
 		if (input.empty() || tokens.empty())
 			return false;
-		if (ignoreInputCasingAccents)
-			input = ToUpperNoAccents(input);
-		std::vector<std::wstring> alttokens;
-		if (ignoreTokenCasingAccents) {
-			alttokens = tokens;
-			for (auto& token : alttokens)
-				token = ToUpperNoAccents(token);
+		if(convertInputCasing) {
+			casedinput = ToUpperNoAccents(input);
+			string = &casedinput;
 		}
-		std::size_t pos;
-		for (auto& token : ignoreTokenCasingAccents ? alttokens : tokens) {
-			if ((pos = input.find(token)) == std::wstring::npos)
+		if (convertTokenCasing) {
+			alttokens.clear();
+			for (const auto& token : tokens)
+				alttokens.push_back(ToUpperNoAccents(token));
+		}
+		std::size_t pos1, pos2 = 0;
+		for (auto& token : convertTokenCasing ? alttokens : tokens) {
+			if ((pos1 = string->find(token, pos2)) == std::wstring::npos)
 				return false;
-			input = input.substr(pos + 1);
+			pos2 = pos1 + token.size();
 		}
 		return true;
 	}
-	bool Utils::ContainsSubstring(std::wstring input, std::wstring token, bool ignoreInputCasingAccents, bool ignoreTokenCasingAccents) {
+	bool Utils::ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing, bool convertTokenCasing) {
 		if (input.empty() && !token.empty())
 			return false;
 		if (token.empty())
 			return true;
-		if (ignoreInputCasingAccents)
-			input = ToUpperNoAccents(input);
-		if (ignoreTokenCasingAccents)
-			token = ToUpperNoAccents(token);
-		return input.find(token) != std::wstring::npos;
+		return (convertInputCasing ? ToUpperNoAccents(input) : input).find(convertTokenCasing ? ToUpperNoAccents(token) : token) != std::wstring::npos;
 	}
 }
 
