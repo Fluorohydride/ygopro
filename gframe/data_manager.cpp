@@ -365,6 +365,8 @@ int DataManager::CardReader(int code, void* pData) {
 	return 0;
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+	if (script_name[0] == '/') // absolute path
+		return ScriptReader(script_name, slen);
 #ifdef YGOPRO_ENVIRONMENT_PATHS
 	// default script name: ./script/c%d.lua -> /c%d.lua
 	std::string file_name(script_name + 8);
