@@ -860,7 +860,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 					start++;
 				}
 			}
-			tokens = Utils::TokenizeString<std::wstring>(term.data() + start, L"&&");
+			tokens = Utils::TokenizeString<std::wstring>(term.data() + start, L"*");
 		}
 		std::vector<unsigned int> set_code = gDataManager->GetSetCode(tokens);
 		if(tokens.empty())
