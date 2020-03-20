@@ -249,28 +249,28 @@ int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc
 int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist) {
 	deck.clear();
 	int errorcode = 0;
-	CardData cd;
+	CardDataC* cd = nullptr;
 	for(auto code : mainlist) {
-		if(!gDataManager->GetData(code, &cd)) {
+		if(!(cd = gDataManager->GetCardData(code))) {
 			errorcode = code;
 			continue;
 		}
-		if(cd.type & TYPE_TOKEN)
+		if(cd->type & TYPE_TOKEN)
 			continue;
-		else if((cd.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd.type & TYPE_LINK && cd.type & TYPE_MONSTER))) {
-			deck.extra.push_back(gDataManager->GetCardData(code));
+		else if((cd->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ) || (cd->type & TYPE_LINK && cd->type & TYPE_MONSTER))) {
+			deck.extra.push_back(cd);
 		} else {
-			deck.main.push_back(gDataManager->GetCardData(code));
+			deck.main.push_back(cd);
 		}
 	}
 	for(auto code : sidelist) {
-		if(!gDataManager->GetData(code, &cd)) {
+		if(!(cd = gDataManager->GetCardData(code))) {
 			errorcode = code;
 			continue;
 		}
-		if(cd.type & TYPE_TOKEN)
+		if(cd->type & TYPE_TOKEN)
 			continue;
-		deck.side.push_back(gDataManager->GetCardData(code));	//verified by GetData()
+		deck.side.push_back(cd);
 	}
 	return errorcode;
 }

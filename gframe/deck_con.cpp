@@ -837,8 +837,9 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	}
 	for(auto term : searchterms) {
 		int trycode = BufferIO::GetVal(term.c_str());
-		if(trycode && gDataManager->GetData(trycode, nullptr)) {
-			searched_terms[term] = { gDataManager->GetCardData(trycode) }; // verified by GetData()
+		CardDataC* data = nullptr;
+		if(trycode && (data = gDataManager->GetCardData(trycode))) {
+			searched_terms[term] = { data };
 			continue;
 		}
 		std::vector<std::wstring> tokens;
