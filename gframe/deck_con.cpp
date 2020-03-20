@@ -518,11 +518,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_MOUSE_INPUT_EVENT: {
+		irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+		if(root->getElementFromPoint(mouse_pos) != root)
+			break;
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
-			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-			if(root->getElementFromPoint(mouse_pos) != root)
-				break;
 			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
