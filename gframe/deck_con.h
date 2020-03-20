@@ -31,13 +31,18 @@ public:
 		LIMITATION_FILTER_VIDEOGAME,
 		LIMITATION_FILTER_CUSTOM
 	};
+	enum SEARCH_MODIFIER {
+		SEARCH_MODIFIER_NAME_ONLY = 0x1,
+		SEARCH_MODIFIER_ARCHETYPE_ONLY = 0x2,
+		SEARCH_MODIFIER_NEGATIVE_LOOKUP = 0x4
+	};
 	virtual bool OnEvent(const irr::SEvent& event);
 	void Initialize(bool refresh = true);
 	void Terminate(bool showmenu = true);
 	void GetHoveredCard();
 	bool FiltersChanged();
 	void FilterCards(bool force_refresh = false);
-	bool CheckCard(CardDataM* data, const wchar_t& checkchar, const std::vector<std::wstring>& tokens, const std::vector<unsigned int>& setcode);
+	bool CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std::vector<std::wstring>& tokens, const std::vector<unsigned int>& setcode);
 	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
 	void ClearSearch();

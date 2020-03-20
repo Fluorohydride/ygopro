@@ -816,7 +816,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	results.clear();
 	std::vector<std::wstring> searchterms;
 	if(wcslen(mainGame->ebCardName->getText())) {
-		searchterms = Utils::TokenizeString<std::wstring>(Utils::ToUpperNoAccents<std::wstring>(mainGame->ebCardName->getText()), L"+");
+		searchterms = Utils::TokenizeString<std::wstring>(Utils::ToUpperNoAccents<std::wstring>(mainGame->ebCardName->getText()), L"||");
 	} else
 		searchterms = { L"" };
 	if(FiltersChanged() || force_refresh)
@@ -843,13 +843,24 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 			continue;
 		}
 		std::vector<std::wstring> tokens;
+		int modif = 0;
 		if(!term.empty()) {
-			if(term.front() == L'@' || term.front() == L'$') {
-				if(term.size() > 1)
-					tokens = Utils::TokenizeString<std::wstring>(&term[1], L"*");
-			} else {
-				tokens = Utils::TokenizeString<std::wstring>(term, L"*");
+			size_t start = 0;
+			if(term.size() >= 2 && memcmp(L"!!", term.data(), sizeof(wchar_t) * 2) == 0) {
+				modif |= SEARCH_MODIFIER::SEARCH_MODIFIER_NEGATIVE_LOOKUP;
+				start += 2;
 			}
+			if(term.size() + start >= 1) {
+				if(term[start] == L'@') {
+					modif |= SEARCH_MODIFIER::SEARCH_MODIFIER_ARCHETYPE_ONLY;
+					start++;
+				}
+				else if(term[start] == L'$') {
+					modif |= SEARCH_MODIFIER::SEARCH_MODIFIER_NAME_ONLY;
+					start++;
+				}
+			}
+			tokens = Utils::TokenizeString<std::wstring>(term.data() + start, L"&&");
 		}
 		std::vector<unsigned int> set_code = gDataManager->GetSetCode(tokens);
 		if(tokens.empty())
@@ -857,7 +868,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		wchar_t checkterm = term.size() ? term.front() : 0;
 		std::vector<CardDataC*> result;
 		for(auto& card : gDataManager->cards) {
-			if(CheckCard(&card.second, checkterm, tokens, set_code))
+			if(CheckCard(&card.second, static_cast<SEARCH_MODIFIER>(modif), tokens, set_code))
 				result.push_back(&card.second._data);
 		}
 		if(result.size())
@@ -879,7 +890,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	}
 	mainGame->scrFilter->setPos(0);
 }
-bool DeckBuilder::CheckCard(CardDataM* data, const wchar_t& checkchar, const std::vector<std::wstring>& tokens, const std::vector<unsigned int>& set_code) {
+bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std::vector<std::wstring>& tokens, const std::vector<unsigned int>& set_code) {
 	if(data->_data.type & TYPE_TOKEN  || data->_data.ot & SCOPE_HIDDEN || ((data->_data.ot & SCOPE_OFFICIAL) != data->_data.ot && !mainGame->chkAnime->isChecked()))
 		return false;
 	switch(filter_type) {
@@ -969,15 +980,20 @@ bool DeckBuilder::CheckCard(CardDataM* data, const wchar_t& checkchar, const std
 			return false;
 	}
 	if(tokens.size()) {
-		if(checkchar == L'$') {
-			return Utils::ContainsSubstring(data->GetStrings()->name, tokens, true);
-		} else if(checkchar == L'@') {
+		const auto checkNeg = [negative = !!(modifier & SEARCH_MODIFIER::SEARCH_MODIFIER_NEGATIVE_LOOKUP)] (bool res) -> bool {
+			if(negative)
+				return !res;
+			return res;
+		};
+		if(modifier & SEARCH_MODIFIER::SEARCH_MODIFIER_NAME_ONLY) {
+			return checkNeg(Utils::ContainsSubstring(data->GetStrings()->name, tokens, true));
+		} else if(modifier & SEARCH_MODIFIER::SEARCH_MODIFIER_ARCHETYPE_ONLY) {
 			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
-				return false;
-			return check_set_code(data->_data, set_code);
+				return checkNeg(false);
+			return checkNeg(check_set_code(data->_data, set_code));
 		} else {
-			return (set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(data->GetStrings()->name, tokens, true)
-					|| Utils::ContainsSubstring(data->GetStrings()->text, tokens, true);
+			return checkNeg((set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(data->GetStrings()->name, tokens, true)
+					|| Utils::ContainsSubstring(data->GetStrings()->text, tokens, true));
 		}
 	}
 	return true;
