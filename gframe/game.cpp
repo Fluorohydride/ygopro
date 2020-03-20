@@ -1127,10 +1127,22 @@ void Game::RefreshReplay() {
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
 	stSinglePlayInfo->setText(L"");
+#ifdef XDG_ENVIRONMENT
+	std::string single_dir = DATA_HOME + "/single";
+	FileSystem::TraversalDir(single_dir.c_str(), [this](const char* name, bool isdir) {
+		if(!isdir && strchr(name, '.') && !strncmp(strchr(name, '.'), ".lua", 4)) {
+			size_t len = strlen(name);
+			wchar_t single[256];
+			BufferIO::DecodeUTF8(name, single);
+			lstSinglePlayList->addItem(single);
+		}
+	});
+#else
 	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
 			lstSinglePlayList->addItem(name);
 	});
+#endif
 }
 void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
