@@ -518,11 +518,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_MOUSE_INPUT_EVENT: {
-		irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-		if(root->getElementFromPoint(mouse_pos) != root)
-			break;
+		bool isroot = mainGame->env->getRootGUIElement()->getElementFromPoint(mouse_pos) == mainGame->env->getRootGUIElement();
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
+			if(!isroot)
+				break;
 			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
@@ -549,6 +549,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_LMOUSE_LEFT_UP: {
+			if(!isroot)
+				break;
 			if(!is_draging) {
 				mouse_pos.set(event.MouseInput.X, event.MouseInput.Y);
 				GetHoveredCard();
@@ -575,6 +577,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_RMOUSE_LEFT_UP: {
+			if(!isroot)
+				break;
 			if(mainGame->is_siding) {
 				if(is_draging)
 					break;
@@ -635,6 +639,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MMOUSE_LEFT_UP: {
+			if(!isroot)
+				break;
 			if (mainGame->is_siding)
 				break;
 			if (mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
