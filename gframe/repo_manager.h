@@ -1,6 +1,5 @@
 #ifndef REPOMANAGER_H
 #define REPOMANAGER_H
-
 #include <atomic>
 #include <map>
 #include <forward_list>
@@ -8,78 +7,77 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include <atomic>
 #include <nlohmann/json.hpp>
-extern "C" {
-#include <git2.h>
-}
+#include <git2/version.h>
+
+// libgit2 forward declarations
+struct git_repository;
+#if LIBGIT2_VER_MINOR==99
+struct git_indexer_progress;
+#else
+struct git_transfer_progress;
+using git_indexer_progress = git_transfer_progress;
+#endif
 
 namespace ygo {
 
 class GitRepo {
 public:
-	std::string url = "";
-	std::string repo_name = "";
-	std::string repo_path = "";
-	std::string data_path = "";
-	std::string lflist_path = "lflists";
-	std::string script_path = "script";
-	std::string pics_path = "pics";
-	std::string core_path = "";
-	bool should_update = true;
-	bool has_core = false;
-	bool ready = false;
-	std::string error = "";
-	std::vector<std::string> commit_history_partial;
-	std::vector<std::string> commit_history_full;
+	std::string url{};
+	std::string repo_name{};
+	std::string repo_path{};
+	std::string data_path{};
+	std::string lflist_path{"lflists"};
+	std::string script_path{"script"};
+	std::string pics_path{"pics"};
+	std::string core_path{};
+	bool should_update{true};
+	bool has_core{false};
+	bool ready{false};
+	std::string error{};
+	std::vector<std::string> commit_history_partial{};
+	std::vector<std::string> commit_history_full{};
 	bool Sanitize();
 };
 
 class RepoManager {
 public:
-	struct RepoPayload {
-		RepoManager* repo_manager = nullptr;
-		git_repository* repo = nullptr;
-		std::string path;
-	};
+	// first = all changes history, second = only HEAD..FETCH_HEAD changes
+	using CommitHistory = std::pair<std::vector<std::string>, std::vector<std::string>>;
+	
+	// Cancel fetching of repos and synchronize with futures
+	~RepoManager();
 
-
-	RepoManager() {}
-	~RepoManager() {}
-
-	std::vector<const GitRepo*> GetReadyRepos();
-
-	std::vector<const GitRepo*> GetAllRepos();
-
-	std::map<std::string, int> GetRepoStatus();
-
-	size_t GetUpdatingRepos() {
-		return working_repos.size();
-	};
+	size_t GetUpdatingReposNumber() const;
+	std::vector<const GitRepo*> GetAllRepos() const;
+	std::vector<const GitRepo*> GetReadyRepos(); // changes available_repos
+	std::map<std::string, int> GetRepoStatus(); // locks mutex
 
 	void LoadRepositoriesFromJson(const nlohmann::json& configs);
-
-	bool AddRepo(GitRepo repo);
-
-	void UpdateStatus(std::string repo, int percentage);
-
 private:
+	std::forward_list<GitRepo> all_repos{};
+	std::vector<GitRepo*> available_repos{};
+	std::map<std::string, std::future<CommitHistory>> working_repos{};
+	std::map<std::string, int> repos_status{};
+	std::mutex repos_status_mutex{};
+	// Initialized with GIT_OK (0), changed to cancel fetching
+	std::atomic<int> fetchReturnValue{0};
 
-	std::forward_list<GitRepo> all_repos;
-
-	std::vector<GitRepo*> available_repos;
-
-	std::pair<std::vector<std::string>, std::vector<std::string>> CloneorUpdateThreaded(GitRepo repo);
-
-	int jsgitpull(git_repository * repo, std::string repo_path, git_oid* id);
-
-	bool CloneorUpdate(GitRepo repo);
-
-	void UpdateReadyRepos();
+	void AddRepo(GitRepo repo);
+	bool TryCloneOrUpdate(GitRepo repo);
+	void SetRepoPercentage(const std::string& path, int percent);
 	
-	std::map<std::string, std::future<std::pair<std::vector<std::string>, std::vector<std::string>>>> working_repos;
-
-	std::map<std::string, int> repos_status;
-	std::mutex repos_status_mutex;
+	// Will be started on a new thread
+	CommitHistory CloneOrUpdateTask(GitRepo repo);
+	
+	// libgit2 Callbacks stuff
+	struct FetchCbPayload
+	{
+		RepoManager* rm;
+		const std::string& path;
+	};
+	static int FetchCb(const git_indexer_progress* stats, void* payload);
 };
 
 extern RepoManager* gRepoManager;

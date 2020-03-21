@@ -1437,7 +1437,7 @@ bool Game::MainLoop() {
 		}
 #ifdef YGOPRO_BUILD_DLL
 		bool coreJustLoaded = false;
-		if(!dInfo.isStarted && cores_to_load.size() && gRepoManager->GetUpdatingRepos() == 0) {
+		if(!dInfo.isStarted && cores_to_load.size() && gRepoManager->GetUpdatingReposNumber() == 0) {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
 				if((ncore = ChangeOCGcore(gGameConfig->working_directory + path, ocgcore))) {
