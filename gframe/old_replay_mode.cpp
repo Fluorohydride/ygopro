@@ -65,6 +65,7 @@ namespace ygo {
 				is_continuing = ReplayAnalyze(message) && is_continuing;
 			}
 			if(is_restarting) {
+				mainGame->gMutex.lock();
 				is_restarting = false;
 				int step = current_step - 1;
 				if(step < 0)
@@ -194,7 +195,8 @@ namespace ygo {
 				return ReadReplayResponse();
 			}
 		}
-		bool ret = ReplayAnalyze(ReplayPacket((char*)packet.data.data(), (int)(packet.data.size() - sizeof(uint8_t))));
+		if(!ReplayAnalyze(ReplayPacket((char*)packet.data.data(), (int)(packet.data.size() - sizeof(uint8_t)))))
+			return false;
 		char* pbuf = DATA;
 		int player;
 		switch(mainGame->dInfo.curMsg) {
@@ -238,12 +240,12 @@ namespace ygo {
 				ReplayRefresh();
 				break;
 			}
-		case MSG_CHAIN_END:	{
-			ReplayRefresh();
-			ReplayRefresh(0, LOCATION_DECK);
-			ReplayRefresh(1, LOCATION_DECK);
-			break;
-		}
+			case MSG_CHAIN_END:	{
+				ReplayRefresh();
+				ReplayRefresh(0, LOCATION_DECK);
+				ReplayRefresh(1, LOCATION_DECK);
+				break;
+			}
 			case MSG_RELOAD_FIELD: {
 				ReplayReload();
 				mainGame->gMutex.lock();
@@ -252,7 +254,7 @@ namespace ygo {
 				break;
 			}
 		}
-		return ret;
+		return true;
 	}
 	void ReplayMode::ReplayRefresh(int player, int location, int flag) {
 		uint32 len = 0;
