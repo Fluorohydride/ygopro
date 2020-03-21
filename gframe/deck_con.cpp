@@ -10,7 +10,7 @@
 #include "single_mode.h"
 #include "client_card.h"
 #ifdef __ANDROID__
-#include "porting_android.h"
+#include "Android/porting_android.h"
 #endif
 #include <algorithm>
 #include <unordered_map>
