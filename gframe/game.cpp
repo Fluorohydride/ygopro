@@ -1946,6 +1946,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 												fmt::format(gDataManager->GetSysString(1436).c_str(), BufferIO::DecodeUTF8s(repo->error).c_str()).c_str()
 		);
 		grepo->commit_history_partial = grepo->commit_history_full;
+		return;
 	}
 	script_dirs.insert(script_dirs.begin(), Utils::ToPathString(repo->script_path));
 	auto script_subdirs = Utils::FindSubfolders(Utils::ToPathString(repo->script_path));
