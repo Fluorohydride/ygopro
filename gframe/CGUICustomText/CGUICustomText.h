@@ -151,6 +151,8 @@ namespace gui
 
 		virtual bool hasHorizontalAutoscrolling() const;
 
+		virtual void setTouchControl(bool touch) { TouchControl = touch; breakText(); }
+
 	private:
 
 		//! Breaks the single text line.
@@ -165,6 +167,9 @@ namespace gui
 		bool Background;
 		bool RestrainTextInside;
 		bool RightToLeft;
+		bool TouchControl;
+		bool was_pressed;
+		core::position2di prev_position;
 
 		video::SColor OverrideColor, BGColor;
 		gui::IGUIFont* OverrideFont;

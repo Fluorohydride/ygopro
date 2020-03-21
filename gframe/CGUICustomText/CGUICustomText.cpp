@@ -29,7 +29,7 @@ CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment
 	OverrideColor(video::SColor(101,255,255,255)), BGColor(video::SColor(101,210,210,210)), animationWaitStart(0),
 	OverrideFont(nullptr), LastBreakFont(nullptr), scrText(nullptr), prev_time(0), scrolling(NO_SCROLLING), maxFrame(0), curFrame(0.0f),
 	frameTimer(0.0f), forcedSteps(0), forcedStepsRatio(0.0f), animationStep(0), animationWaitEnd(0), increasingFrame(false),
-	waitingEndFrame(false), ScrollWidth(0), ScrollRatio(0.0f)
+	waitingEndFrame(false), ScrollWidth(0), ScrollRatio(0.0f), TouchControl(false), was_pressed(false), prev_position(core::position2di(0, 0))
 {
 	#ifdef _DEBUG
 	setDebugName("CGUICustomText");
@@ -58,11 +58,8 @@ CGUICustomText::~CGUICustomText()
 }
 
 bool CGUICustomText::OnEvent(const SEvent & event) {
-#ifndef __ANDROID__
-	return IGUIElement::OnEvent(event);
-#else
-	static bool was_pressed = false;
-	static core::position2di prev_position = core::position2di(0, 0);
+	if(!TouchControl)
+		return IGUIElement::OnEvent(event);
 	if(isEnabled()) {
 		switch(event.EventType) {
 			case EET_MOUSE_INPUT_EVENT: {
@@ -94,7 +91,6 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 		}
 	}
 	return false;
-#endif
 }
 
 
@@ -397,10 +393,10 @@ void CGUICustomText::breakText() {
 		scrText->setEnabled(false);
 		if(getTextHeight() > RelativeRect.getHeight()) {
 			scrText->setEnabled(true);
-#ifndef __ANDROID__
-			scrText->setVisible(true);
-			breakText(true);
-#endif
+			if(!TouchControl) {
+				scrText->setVisible(true);
+				breakText(true);
+			}
 			scrText->setMin(0);
 			scrText->setMax((getTextHeight() - RelativeRect.getHeight()));
 			scrText->setPos(0);
