@@ -105,6 +105,7 @@ struct FadingUnit {
 	irr::core::vector2di fadingUL;
 	irr::core::vector2di fadingLR;
 	irr::core::vector2di fadingDest;
+	bool wasEnabled;
 };
 
 class Game {

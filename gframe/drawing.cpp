@@ -863,8 +863,12 @@ void Game::DrawGUI() {
 			fu.autoFadeoutFrame -= movetime;
 			if(!fu.autoFadeoutFrame)
 				HideElement(fu.guiFading);
-		} else
+			else
+				fu.guiFading->setEnabled(fu.wasEnabled);
+		} else {
+			fu.guiFading->setEnabled(fu.wasEnabled);
 			fit = fadingList.erase(fthis);
+		}
 	}
 	env->drawAll();
 }
@@ -1101,6 +1105,8 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 			btnCardDisplay[i]->setDrawImage(false);
 	}
 	win->setRelativePosition(Scale(center.X, center.Y, 0, 0));
+	fu.wasEnabled = win->isEnabled();
+	win->setEnabled(false);
 	fadingList.push_back(fu);
 }
 void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
@@ -1133,6 +1139,8 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 		for(int i = 0; i < 5; ++i)
 			btnCardDisplay[i]->setDrawImage(false);
 	}
+	fu.wasEnabled = win->isEnabled();
+	win->setEnabled(false);
 	fadingList.push_back(fu);
 }
 void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
