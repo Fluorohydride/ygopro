@@ -106,7 +106,7 @@ void CheckArguments(int argc, path_char* argv[]) {
 			++i;
 			if(i < argc) {
 				open_file = true;
-				open_file_name = std::move(parameter);
+				open_file_name = argv[i];
 			}
 			ClickButton(ygo::mainGame->btnReplayMode);
 			if(open_file)
@@ -117,13 +117,14 @@ void CheckArguments(int argc, path_char* argv[]) {
 			++i;
 			if(i < argc) {
 				open_file = true;
-				open_file_name = std::move(parameter);
+				open_file_name = argv[i];
 			}
 			ClickButton(ygo::mainGame->btnSingleMode);
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
 		} else if(argc == 2 && path_string(argv[1]).size() >= 4) {
+			parameter = argv[1];
 			auto extension = ygo::Utils::GetFileExtension(parameter);
 			if(extension == EPRO_TEXT("ydk")) {
 				open_file = true;
