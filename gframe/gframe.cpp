@@ -232,7 +232,7 @@ int main(int argc, char* argv[]) {
 	});
 #endif
 	//bool reset = false;
-	bool firstlaunch = false;
+	bool firstlaunch = true;
 	do {
 		ygo::Game _game{};
 		ygo::mainGame = &_game;
