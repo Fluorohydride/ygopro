@@ -48,9 +48,9 @@ public:
 	void ClearSearch();
 	void SortList();
 
-	bool push_main(CardDataC* pointer, int seq = -1);
-	bool push_extra(CardDataC* pointer, int seq = -1);
-	bool push_side(CardDataC* pointer, int seq = -1);
+	bool push_main(CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_extra(CardDataC* pointer, int seq = -1, bool forced = false);
+	bool push_side(CardDataC* pointer, int seq = -1, bool forced = false);
 	void pop_main(int seq);
 	void pop_extra(int seq);
 	void pop_side(int seq);

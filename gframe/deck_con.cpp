@@ -558,11 +558,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			bool pushed = false;
 			if(hovered_pos == 1)
-				pushed = push_main(draging_pointer, hovered_seq);
+				pushed = push_main(draging_pointer, hovered_seq, event.MouseInput.Shift);
 			else if(hovered_pos == 2)
-				pushed = push_extra(draging_pointer, hovered_seq + is_lastcard);
+				pushed = push_extra(draging_pointer, hovered_seq + is_lastcard, event.MouseInput.Shift);
 			else if(hovered_pos == 3)
-				pushed = push_side(draging_pointer, hovered_seq + is_lastcard);
+				pushed = push_side(draging_pointer, hovered_seq + is_lastcard, event.MouseInput.Shift);
 			else if(hovered_pos == 4 && !mainGame->is_siding)
 				pushed = true;
 			if(!pushed) {
@@ -614,14 +614,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					auto pointer = gDataManager->GetCardData(hovered_code);
 					if(!pointer)
 						break;
-					if(event.MouseInput.Shift)
+					if(!check_limit(pointer))
+						break;
+					if(!push_extra(pointer) && !push_main(pointer))
 						push_side(pointer);
-					else {
-						if (!event.MouseInput.Shift && !check_limit(pointer))
-							break;
-						if (!push_extra(pointer) && !push_main(pointer))
-							push_side(pointer);
-					}
 				}
 			} else {
 				if(click_pos == 1) {
@@ -1061,11 +1057,11 @@ void DeckBuilder::SortList() {
 		break;
 	}
 }
-bool DeckBuilder::push_main(CardDataC* pointer, int seq) {
+bool DeckBuilder::push_main(CardDataC* pointer, int seq, bool forced) {
 	if(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK) && pointer->type != (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.main;
-	if(!mainGame->is_siding && (int)container.size() >= 60)
+	if(!mainGame->is_siding && !forced && (int)container.size() >= 60)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);
@@ -1074,11 +1070,11 @@ bool DeckBuilder::push_main(CardDataC* pointer, int seq) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_extra(CardDataC* pointer, int seq) {
+bool DeckBuilder::push_extra(CardDataC* pointer, int seq, bool forced) {
 	if(!(pointer->type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)) || pointer->type == (TYPE_SPELL | TYPE_LINK))
 		return false;
 	auto& container = deckManager.current_deck.extra;
-	if(!mainGame->is_siding && (int)container.size() >= 15)
+	if(!mainGame->is_siding && !forced && (int)container.size() >= 15)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);
@@ -1087,9 +1083,9 @@ bool DeckBuilder::push_extra(CardDataC* pointer, int seq) {
 	GetHoveredCard();
 	return true;
 }
-bool DeckBuilder::push_side(CardDataC* pointer, int seq) {
+bool DeckBuilder::push_side(CardDataC* pointer, int seq, bool forced) {
 	auto& container = deckManager.current_deck.side;
-	if(!mainGame->is_siding && (int)container.size() >= 15)
+	if(!mainGame->is_siding && !forced && (int)container.size() >= 15)
 		return false;
 	if(seq >= 0 && seq < (int)container.size())
 		container.insert(container.begin() + seq, pointer);
