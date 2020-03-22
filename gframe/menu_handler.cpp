@@ -462,7 +462,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				for(int i = 0; i < decks.size(); i++) {
 					deckManager.SaveDeck(sanitize(fmt::format(EPRO_TEXT("{} player{:02} {}"), replay_name, i, Utils::ToPathString(players[i]))), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
 				}
-				mainGame->stACMessage->setText(gDataManager->GetSysString(1335).c_str());
+				mainGame->stACMessage->setText(gDataManager->GetSysString(1367).c_str());
 				mainGame->PopupElement(mainGame->wACMessage, 20);
 				break;
 			}
