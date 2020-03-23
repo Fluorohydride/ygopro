@@ -1559,12 +1559,17 @@ bool Game::MainLoop() {
 			gSoundManager->PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu, resized);
 		}
+#ifndef __ANDROID__
+		int fpsCounterWidth = fpsCounter->getTextWidth() / dpi_scale + 2;
+#else
+		int fpsCounterWidth = fpsCounter->getTextWidth() / dpi_scale + 20; // corner may be curved
+#endif
 		if (is_building || is_siding) {
 			fpsCounter->setRelativePosition(Resize(205, CARD_IMG_HEIGHT + 1, 300, CARD_IMG_HEIGHT + 21));
 		} else if (wChat->isVisible()) { // Move it above the chat box
-			fpsCounter->setRelativePosition(Resize(1024 - fpsCounter->getTextWidth() - 2, 600, 1024, 620));
+			fpsCounter->setRelativePosition(Resize(1024 - fpsCounterWidth, 600, 1024, 620));
 		} else { // bottom right of window with a little padding
-			fpsCounter->setRelativePosition(Resize(1024 - fpsCounter->getTextWidth() - 2, 620, 1024, 640));
+			fpsCounter->setRelativePosition(Resize(1024 - fpsCounterWidth, 620, 1024, 640));
 		}
 		MATERIAL_GUARD(DrawGUI();	DrawSpec(););
 		if(cardimagetextureloading) {
