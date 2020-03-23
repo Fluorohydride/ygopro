@@ -243,7 +243,9 @@ bool Game::Initialize() {
 	auto formatVersion = []() {
 		return fmt::format(L"EDOPro by Project Ignis | {}.{}.{} \"{}\"", EDOPRO_VERSION_MAJOR, EDOPRO_VERSION_MINOR, EDOPRO_VERSION_PATCH, EDOPRO_VERSION_CODENAME);
 	};
-	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, true, wVersion);
+	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, false, wVersion);
+	int titleWidth = stVersion->getTextWidth();
+	stVersion->setRelativePosition(recti(Scale(10), Scale(10), titleWidth + Scale(10), Scale(35)));
 	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 290, 65), false, true, wVersion);
 	RefreshUICoreVersion();
 	stExpectedCoreVersion = env->addStaticText(
@@ -253,12 +255,16 @@ bool Game::Initialize() {
 		GetLocalizedCompatVersion().c_str(),
 		Scale(10, 100, 290, 125), false, true, wVersion);
 	((CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
+	wVersion->setRelativePosition(recti(0, 0, std::max(Scale(300), stVersion->getTextWidth() + Scale(20)), Scale(135)));
 	mBeta = mTopMenu->getSubMenu(mTopMenu->addItem(L"CLOSED BETA ONLY", 4));
 	//main menu
-	wMainMenu = env->addWindow(Scale(370, 200, 650, 450), false, formatVersion().c_str());
+	int mainMenuWidth = std::max(280, static_cast<int>(titleWidth / dpi_scale + 15));
+	mainMenuLeftX = 510 - mainMenuWidth / 2;
+	mainMenuRightX = 510 + mainMenuWidth / 2;
+	wMainMenu = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, formatVersion().c_str());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
-#define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, 270, 60 + offset)
+#define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, mainMenuWidth - 10, 60 + offset)
 	int offset = 0;
 	btnOnlineMode = env->addButton(OFFSET(10, 30, 270, 60), wMainMenu, BUTTON_ONLINE_MULTIPLAYER, gDataManager->GetSysString(2042).c_str());
 	defaultStrings.emplace_back(btnOnlineMode, 2042);
@@ -2617,7 +2623,7 @@ void Game::ReloadElementsStrings() {
 }
 void Game::OnResize() {
 	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
-	wMainMenu->setRelativePosition(ResizeWin(370, 200, 650, 450));
+	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	SetCentered(wCommitsLog);
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));

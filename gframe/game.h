@@ -352,6 +352,8 @@ public:
 
 	SettingsWindow gSettings;
 	//main menu
+	int mainMenuLeftX;
+	int mainMenuRightX;
 	irr::gui::IGUIWindow* wMainMenu;
 	irr::gui::IGUIWindow* wCommitsLog;
 	irr::gui::IGUIContextMenu* mTopMenu;
