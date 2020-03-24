@@ -1861,6 +1861,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			case BUTTON_SHOW_SETTINGS: {
 				if (!mainGame->gSettings.window->isVisible())
 					mainGame->ShowElement(mainGame->gSettings.window);
+				mainGame->env->setFocus(mainGame->gSettings.window);
 				break;
 			}
 			case BUTTON_APPLY_RESTART: {

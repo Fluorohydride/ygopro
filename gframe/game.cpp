@@ -1589,6 +1589,7 @@ bool Game::MainLoop() {
 		} else { // bottom right of window with a little padding
 			fpsCounter->setRelativePosition(Resize(1024 - fpsCounterWidth, 620, 1024, 640));
 		}
+		wBtnSettings->setVisible(!(is_building || is_siding || dInfo.isInDuel || open_file));
 		MATERIAL_GUARD(DrawGUI();	DrawSpec(););
 		if(cardimagetextureloading) {
 			ShowCardInfo(showingcard);
