@@ -697,6 +697,15 @@ bool Game::Initialize() {
 	gSettings.ebDpiScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	gSettings.btnRestart = env->addButton(Scale(175, 365, 320, 390), gSettings.window, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).c_str());
 	defaultStrings.emplace_back(gSettings.btnRestart, 2071);
+
+	wBtnSettings = env->addWindow(Scale(0, 580, 60, 640));
+	wBtnSettings->getCloseButton()->setVisible(false);
+	wBtnSettings->setDraggable(false);
+	wBtnSettings->setDrawTitlebar(false);
+	auto dimBtnSettings = Scale(0, 0, 60, 60);
+	btnSettings = irr::gui::CGUIImageButton::addImageButton(env, dimBtnSettings, wBtnSettings, BUTTON_SHOW_SETTINGS);
+	btnSettings->setImageSize(dimBtnSettings.getSize());
+	btnSettings->setImage(imageManager.tSettings);
 	//log
 	tabRepositories = wInfos->addTab(gDataManager->GetSysString(2045).c_str());
 	defaultStrings.emplace_back(tabRepositories, 2045);
@@ -709,9 +718,9 @@ bool Game::Initialize() {
 	wHand->setDrawTitlebar(false);
 	wHand->setVisible(false);
 	for(int i = 0; i < 3; ++i) {
-		btnHand[i] = irr::gui::CGUIImageButton::addImageButton(env, Scale(10 + 105 * i, 10, 105 + 105 * i, 144), wHand, BUTTON_HAND1 + i);
-		auto a = Scale<s32>(10 + 105 * i, 10, 105 + 105 * i, 144).getSize();
-		btnHand[i]->setImageSize(a);
+		auto dim = Scale(10 + 105 * i, 10, 105 + 105 * i, 144);
+		btnHand[i] = irr::gui::CGUIImageButton::addImageButton(env, dim, wHand, BUTTON_HAND1 + i);
+		btnHand[i]->setImageSize(dim.getSize());
 		btnHand[i]->setImage(imageManager.tHand[i]);
 	}
 	//
@@ -1725,6 +1734,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 		}
 		btnPSAD->setImage(imageManager.tCover[0]);
 		btnPSDD->setImage(imageManager.tCover[0]);
+		btnSettings->setImage(imageManager.tSettings);
 	};
 	if(!skinSystem || ((skinname == prev_skin || (reload && prev_skin == EPRO_TEXT(""))) && !firstrun))
 		return false;

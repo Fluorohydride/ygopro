@@ -96,6 +96,7 @@ public:
 	A(tBackGround_deck)
 	A(tField[2][4])
 	A(tFieldTransparent[2][4])
+	A(tSettings)
 #undef A
 private:
 #define A(what) irr::video::ITexture* def_##what;
@@ -119,6 +120,7 @@ private:
 	A(tBackGround_deck)
 	A(tField[2][4])
 	A(tFieldTransparent[2][4])
+	A(tSettings)
 #undef A
 	void ClearFutureObjects(loading_map* map1, loading_map* map2, loading_map* map3, loading_map* map4);
 	void RefreshCovers();

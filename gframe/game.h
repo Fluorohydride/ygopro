@@ -351,6 +351,8 @@ public:
 	irr::gui::IGUIButton* btnTabShowSettings;
 
 	SettingsWindow gSettings;
+	irr::gui::IGUIWindow* wBtnSettings;
+	irr::gui::CGUIImageButton* btnSettings;
 	//main menu
 	int mainMenuLeftX;
 	int mainMenuRightX;

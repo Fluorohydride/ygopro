@@ -69,6 +69,7 @@ bool ImageManager::Initial() {
 	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP")
 	GET_TEXTURE(tField[1][3], "fieldSP4")
 	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4")
+	GET_TEXTURE(tSettings, "settings")
 	sizes[0].first = CARD_IMG_WIDTH * gGameConfig->dpi_scale;
 	sizes[0].second = CARD_IMG_HEIGHT * gGameConfig->dpi_scale;
 	sizes[1].first = CARD_IMG_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
@@ -127,6 +128,7 @@ void ImageManager::ChangeTextures(const path_string & _path) {
 	GET_TEXTURE(tFieldTransparent[1][2], "field-transparentSP")
 	GET_TEXTURE(tField[1][3], "fieldSP4")
 	GET_TEXTURE(tFieldTransparent[1][3], "field-transparentSP4")
+	GET_TEXTURE(tSettings, "settings")
 	RefreshCovers();
 }
 void ImageManager::ResetTextures() {
