@@ -49,6 +49,7 @@ public:
 	bool LoadLFListFolder(path_string path);
 	void LoadLFList();
 	void RefreshLFList();
+	LFList* GetLFList(int lfhash);
 	std::wstring GetLFListName(int lfhash);
 	int CheckDeck(Deck& deck, int lfhash, DuelAllowedCards allowedCards, bool doubled, int forbiddentypes = 0);
 	int TypeCount(std::vector<CardDataC*> cards, int type);

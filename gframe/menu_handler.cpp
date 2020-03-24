@@ -773,6 +773,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch (id) {
+			case COMBOBOX_HOST_LFLIST: {
+				int selected = mainGame->cbHostLFList->getSelected();
+				if (selected < 0) break;
+				LFList* lflist = deckManager.GetLFList(mainGame->cbHostLFList->getItemData(selected));
+				if (lflist && lflist->whitelist) {
+					mainGame->cbRule->setSelected(static_cast<int>(DuelAllowedCards::ALLOWED_CARDS_ANY));
+				}  // heuristic for general use case of whitelists
+				break;
+			}
 			case COMBOBOX_DUEL_RULE: {
 				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
 #define CHECK(MR) case (MR - 1): { combobox->removeItem(5); mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; break; }

@@ -93,11 +93,13 @@ void DeckManager::RefreshLFList() {
 		null_lflist_index = _lfList.size() - 1;
 	}
 }
+LFList* DeckManager::GetLFList(int lfhash) {
+	auto it = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](LFList list) {return list.hash == (unsigned int)lfhash; });
+	return it != _lfList.end() ? &*it : nullptr;
+}
 std::wstring DeckManager::GetLFListName(int lfhash) {
-	auto it = std::find_if(_lfList.begin(), _lfList.end(), [lfhash](LFList list){return list.hash == (unsigned int)lfhash; });
-	if(it != _lfList.end())
-		return (*it).listName.c_str();
-	return gDataManager->unknown_string;
+	auto lflist = GetLFList(lfhash);
+	return lflist ? lflist->listName.c_str() : gDataManager->unknown_string;
 }
 int DeckManager::TypeCount(std::vector<CardDataC*> cards, int type) {
 	int count = 0;

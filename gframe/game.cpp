@@ -323,7 +323,7 @@ bool Game::Initialize() {
 	wCreateHost->setVisible(false);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1226).c_str(), Scale(20, 30, 220, 50), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1226);
-	cbHostLFList = ADDComboBox(Scale(140, 25, 300, 50), wCreateHost);
+	cbHostLFList = ADDComboBox(Scale(140, 25, 300, 50), wCreateHost, COMBOBOX_HOST_LFLIST);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1225);
 	cbRule = ADDComboBox(Scale(140, 55, 300, 80), wCreateHost);
