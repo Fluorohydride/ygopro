@@ -526,7 +526,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->deckBuilder.is_draging = false;
 		deckManager.pre_deck = deckManager.current_deck;
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
-		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
+		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >=7);
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		mainGame->SetMessageWindow();
 		mainGame->gMutex.unlock();
@@ -697,7 +697,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->ShowElement(mainGame->wHostPrepare2);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.unlock();
-		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
+		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >= 7);
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		connect_state |= 0x4;
 		break;
@@ -729,7 +729,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnHostPrepStart->setVisible(is_host);
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
 		mainGame->dInfo.player_type = selftype;
-		mainGame->dInfo.isFirst = mainGame->dInfo.player_type < mainGame->dInfo.team1;
+		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >= 7);
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
 		break;
 	}
@@ -1384,11 +1384,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
 		mainGame->dInfo.turn = 0;
 		mainGame->dInfo.is_shuffling = false;
-		if(mainGame->dInfo.isReplaySwapped) {
-			std::swap(mainGame->dInfo.selfnames, mainGame->dInfo.opponames);
-			mainGame->dInfo.isReplaySwapped = false;
-			mainGame->dField.ReplaySwap();
-		}
 		if (!mainGame->dInfo.isCatchingUp)
 			mainGame->gMutex.unlock();
 		return true;
