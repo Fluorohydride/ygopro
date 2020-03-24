@@ -1347,6 +1347,12 @@ bool Game::Initialize() {
 	fpsCounter = env->addStaticText(L"", Scale(950, 620, 1024, 640), false, false);
 	fpsCounter->setOverrideColor(skin::FPS_TEXT_COLOR_VAL);
 	fpsCounter->setVisible(gGameConfig->showFPS);
+	fpsCounter->setTextRestrainedInside(false);
+#ifndef __ANDROID__
+	fpsCounter->setTextAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT);
+#else
+	fpsCounter->setTextAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+#endif
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -1561,9 +1567,11 @@ bool Game::MainLoop() {
 			DrawBackImage(imageManager.tBackGround_menu, resized);
 		}
 #ifndef __ANDROID__
-		int fpsCounterWidth = fpsCounter->getTextWidth() / dpi_scale + 2;
+		// text width is actual size, other pixels are relative to the assumed 1024x640
+		// so we recompensate for the scale factor and window resizing
+		int fpsCounterWidth = fpsCounter->getTextWidth() / (dpi_scale * window_scale.X);
 #else
-		int fpsCounterWidth = fpsCounter->getTextWidth() / dpi_scale + 20; // corner may be curved
+		int fpsCounterWidth = fpsCounter->getTextWidth() / (dpi_scale * window_scale.X) + 20; // corner may be curved
 #endif
 		if (is_building || is_siding) {
 			fpsCounter->setRelativePosition(Resize(205, CARD_IMG_HEIGHT + 1, 300, CARD_IMG_HEIGHT + 21));
