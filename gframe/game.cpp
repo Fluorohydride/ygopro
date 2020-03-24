@@ -698,12 +698,14 @@ bool Game::Initialize() {
 	gSettings.btnRestart = env->addButton(Scale(175, 365, 320, 390), gSettings.window, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).c_str());
 	defaultStrings.emplace_back(gSettings.btnRestart, 2071);
 
-	wBtnSettings = env->addWindow(Scale(0, 580, 60, 640));
+	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
 	wBtnSettings->getCloseButton()->setVisible(false);
 	wBtnSettings->setDraggable(false);
 	wBtnSettings->setDrawTitlebar(false);
-	auto dimBtnSettings = Scale(0, 0, 60, 60);
+	wBtnSettings->setDrawBackground(false);
+	auto dimBtnSettings = Scale(0, 0, 30, 30);
 	btnSettings = irr::gui::CGUIImageButton::addImageButton(env, dimBtnSettings, wBtnSettings, BUTTON_SHOW_SETTINGS);
+	btnSettings->setDrawBorder(false);
 	btnSettings->setImageSize(dimBtnSettings.getSize());
 	btnSettings->setImage(imageManager.tSettings);
 	//log
@@ -2649,6 +2651,7 @@ void Game::ReloadElementsStrings() {
 void Game::OnResize() {
 	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
+	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
 	SetCentered(wCommitsLog);
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
