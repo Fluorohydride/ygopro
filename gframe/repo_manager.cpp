@@ -179,6 +179,10 @@ void RepoManager::SetRepoPercentage(const std::string& path, int percent)
 	repos_status[path] = percent;
 }
 
+constexpr const char* UPDATE_ERR_MSG =
+R"("Error while updating repository.
+Make sure you have a working internet connection.)";
+
 RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 	git_libgit2_init();
 #ifdef __ANDROID__
@@ -231,19 +235,24 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 			auto walker = Git::MakeUnique(git_revwalk_new, repo.get());
 			git_revwalk_sorting(walker.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
 			if(_repo.should_update) {
-				// git fetch
-				git_fetch_options fetchOpts = GIT_FETCH_OPTIONS_INIT;
-				fetchOpts.callbacks.transfer_progress = &RepoManager::FetchCb;
-				fetchOpts.callbacks.payload = &payload;
-				auto remote = Git::MakeUnique(git_remote_lookup, repo.get(), "origin");
-				Git::Check(git_remote_fetch(remote.get(), nullptr, &fetchOpts, nullptr));
-				QueryPartialHistory(repo.get(), walker.get());
-				// git reset --hard FETCH_HEAD
-				git_oid oid;
-				Git::Check(git_reference_name_to_id(&oid, repo.get(), "FETCH_HEAD"));
-				auto commit = Git::MakeUnique(git_commit_lookup, repo.get(), &oid);
-				Git::Check(git_reset(repo.get(), reinterpret_cast<git_object*>(commit.get()),
-				                     GIT_RESET_HARD, nullptr));
+				try {
+					// git fetch
+					git_fetch_options fetchOpts = GIT_FETCH_OPTIONS_INIT;
+					fetchOpts.callbacks.transfer_progress = &RepoManager::FetchCb;
+					fetchOpts.callbacks.payload = &payload;
+					auto remote = Git::MakeUnique(git_remote_lookup, repo.get(), "origin");
+					Git::Check(git_remote_fetch(remote.get(), nullptr, &fetchOpts, nullptr));
+					QueryPartialHistory(repo.get(), walker.get());
+					// git reset --hard FETCH_HEAD
+					git_oid oid;
+					Git::Check(git_reference_name_to_id(&oid, repo.get(), "FETCH_HEAD"));
+					auto commit = Git::MakeUnique(git_commit_lookup, repo.get(), &oid);
+					Git::Check(git_reset(repo.get(), reinterpret_cast<git_object*>(commit.get()),
+					                     GIT_RESET_HARD, nullptr));
+				} catch(...) {
+					// TODO(edo9300): Add proper handling for warnings.
+					history.second.push_back(UPDATE_ERR_MSG);
+				}
 			}
 			QueryFullHistory(repo.get(), walker.get());
 		} else {
