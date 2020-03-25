@@ -535,8 +535,8 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		swapped = true;
 	}
 	turn_count = 0;
-	cur_player[0] = players.home.front().player;
-	cur_player[1] = players.opposing.front().player;
+	cur_player[0] = players.home_iterator->player;
+	cur_player[1] = players.opposing_iterator->player;
 	dp->state = CTOS_RESPONSE;
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
