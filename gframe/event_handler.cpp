@@ -2045,7 +2045,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				if (mainGame->gSettings.window->isVisible())
 					mainGame->HideElement(mainGame->gSettings.window);
 				else
-					mainGame->ShowElement(mainGame->gSettings.window);
+					mainGame->PopupElement(mainGame->gSettings.window);
 			}
 			return true;
 		}
