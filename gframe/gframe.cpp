@@ -232,7 +232,7 @@ int main(int argc, char* argv[]) {
 		ygo::mainGame->gSettings.chkFullscreen->setChecked(ygo::gGameConfig->fullscreen);
 	});
 #endif
-	//bool reset = false;
+	bool reset = false;
 	bool firstlaunch = true;
 	do {
 		ygo::Game _game{};
@@ -249,8 +249,8 @@ int main(int argc, char* argv[]) {
 			firstlaunch = false;
 			CheckArguments(argc, argv);
 		}
-		/*reset = */ygo::mainGame->MainLoop();
-	} while(false);
+		reset = ygo::mainGame->MainLoop();
+	} while(reset);
 	Cleanup
 	return EXIT_SUCCESS;
 }
