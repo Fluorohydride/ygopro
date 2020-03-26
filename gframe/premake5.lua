@@ -2,7 +2,7 @@ local ygopro_config=function(static_core)
 	kind "WindowedApp"
 	cppdialect "C++14"
 	rtti "Off"
-	files { "**.cpp", "**.cc", "**.c", "**.h" }
+	files { "**.cpp", "**.cc", "**.c", "**.h", "**.hpp" }
 	excludes { "lzma/**", "sound_sdlmixer.*", "sound_irrklang.*", "Android/**" }
 
 	defines "CURL_STATICLIB"
@@ -56,7 +56,7 @@ local ygopro_config=function(static_core)
 		includedirs { "../freetype/include", "../irrlicht/include" }
 		dofile("../irrlicht/defines.lua")
 		links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "wldap32", "crypt32", "advapi32", "rpcrt4", "ole32", "winhttp" }
-		
+
 	filter { "system:windows", "action:vs*" }
 		files "dpiawarescaling.manifest"
 
@@ -96,7 +96,7 @@ local ygopro_config=function(static_core)
 		if _OPTIONS["vcpkg-root"] then
 			links { "png", "bz2" }
 		end
-		links { "fmt", "curl" }	
+		links { "fmt", "curl" }
 
 	filter "system:linux"
 		defines "LUA_USE_LINUX"
@@ -127,8 +127,8 @@ project "ygopro"
 	end
 	links { "ocgcore" }
 	ygopro_config(true)
-		
+
 project "ygoprodll"
 	targetname "ygoprodll"
 	defines "YGOPRO_BUILD_DLL"
-	ygopro_config()	
+	ygopro_config()
