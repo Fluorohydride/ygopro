@@ -2002,7 +2002,12 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 			grepo->commit_history_partial = BufferIO::DecodeUTF8s(text);
 		}
 	} else {
-		grepo->commit_history_partial = gDataManager->GetSysString(1446);
+		if(repo->warning.size()) {
+			grepo->history_button1->setText(L"Warning!");
+			grepo->commit_history_partial = L"Error while updating repository.\nMake sure you have a working internet connection.\n\n" + BufferIO::DecodeUTF8s(repo->warning);
+		} else {
+			grepo->commit_history_partial = gDataManager->GetSysString(1446);
+		}
 	}
 	grepo->history_button1->setEnabled(true);
 	grepo->history_button2->setEnabled(true);
@@ -2010,8 +2015,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		cores_to_load.insert(cores_to_load.begin(), Utils::ToPathString(repo->core_path));
 	}
 	auto data_path = Utils::ToPathString(repo->data_path);
-	auto lflist_path = Utils::ToPathString(repo->lflist_path);
-	if(deckManager.LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || deckManager.LoadLFListFolder(lflist_path)) {
+	if(deckManager.LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || deckManager.LoadLFListFolder(data_path + EPRO_TEXT("lflists/"))) {
 		deckManager.RefreshLFList();
 		RefreshLFLists();
 	}

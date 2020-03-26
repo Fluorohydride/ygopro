@@ -40,6 +40,7 @@ public:
 	bool has_core{false};
 	bool ready{false};
 	std::string error{};
+	std::string warning{};
 	std::vector<std::string> commit_history_partial{};
 	std::vector<std::string> commit_history_full{};
 	bool Sanitize();
@@ -48,7 +49,12 @@ public:
 class RepoManager {
 public:
 	// first = all changes history, second = only HEAD..FETCH_HEAD changes
-	using CommitHistory = std::pair<std::vector<std::string>, std::vector<std::string>>;
+	struct CommitHistory {
+		std::vector<std::string> full_history;
+		std::vector<std::string> partial_history;
+		std::string error;
+		std::string warning;
+	};
 	
 	// Cancel fetching of repos and synchronize with futures
 	~RepoManager();

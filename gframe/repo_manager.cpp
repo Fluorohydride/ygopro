@@ -83,10 +83,10 @@ std::vector<const GitRepo*> RepoManager::GetReadyRepos() {
 			auto results = it->second.get();
 			for(auto& repo : available_repos) {
 				if(repo->repo_path == it->first) {
-					repo->error = results.first[0];
-					results.first.erase(results.first.begin());
-					repo->commit_history_full = results.first;
-					repo->commit_history_partial = results.second;
+					repo->error = results.error;
+					repo->warning = results.warning;
+					repo->commit_history_full = results.full_history;
+					repo->commit_history_partial = results.partial_history;
 					repo->ready = true;
 					break;
 				}
@@ -184,17 +184,12 @@ void RepoManager::SetRepoPercentage(const std::string& path, int percent)
 	repos_status[path] = percent;
 }
 
-constexpr const char* UPDATE_ERR_MSG =
-R"("Error while updating repository.
-Make sure you have a working internet connection.)";
-
 RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 	git_libgit2_init();
 #ifdef __ANDROID__
 	git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, (porting::internal_storage + "/cacert.cer").c_str(), "/system/etc/security/cacerts");
 #endif
 	CommitHistory history;
-	history.first.push_back("");
 	try {
 		auto DoesRepoExist = [](const char* path) -> bool {
 			git_repository* tmp = nullptr;
@@ -216,9 +211,9 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 			for(git_oid oid; git_revwalk_next(&oid, walker) == 0;)
 			{
 				auto commit = Git::MakeUnique(git_commit_lookup, repo, &oid);
-				if(git_oid_iszero(&oid) || history.first.size() > 1500)
+				if(git_oid_iszero(&oid) || history.full_history.size() > 1500)
 					break;
-				AppendCommit(history.first, commit.get());
+				AppendCommit(history.full_history, commit.get());
 			}
 		};
 		auto QueryPartialHistory = [&](git_repository* repo, git_revwalk* walker) {
@@ -228,7 +223,7 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 			for(git_oid oid; git_revwalk_next(&oid, walker) == 0;)
 			{
 				auto commit = Git::MakeUnique(git_commit_lookup, repo, &oid);
-				AppendCommit(history.second, commit.get());
+				AppendCommit(history.partial_history, commit.get());
 			}
 		};
 		const std::string& url = _repo.url;
@@ -254,9 +249,10 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 					auto commit = Git::MakeUnique(git_commit_lookup, repo.get(), &oid);
 					Git::Check(git_reset(repo.get(), reinterpret_cast<git_object*>(commit.get()),
 					                     GIT_RESET_HARD, nullptr));
-				} catch(...) {
-					// TODO(edo9300): Add proper handling for warnings.
-					history.second.push_back(UPDATE_ERR_MSG);
+				} catch(std::exception& e) {
+					history.partial_history.clear();
+					history.warning = e.what();
+					ErrorLog(fmt::format("Warning occurred in repo {}: {}", url, e.what()));
 				}
 			}
 			QueryFullHistory(repo.get(), walker.get());
@@ -273,8 +269,8 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 		}
 		SetRepoPercentage(path, 100);
 	} catch(std::exception& e) {
-		history.first[0] = e.what();
-		ErrorLog(std::string("Exception occurred: ") + e.what());
+		history.error = e.what();
+		ErrorLog(fmt::format("Exception occurred in repo {}: {}", _repo.url, e.what()));
 	}
 	git_libgit2_shutdown();
 	return history;
