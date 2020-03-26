@@ -93,7 +93,7 @@ DataHandler::DataHandler() {
 #endif
 		params.DriverType = irr::video::EDT_OPENGL;
 	params.WindowSize = irr::core::dimension2d<irr::u32>(1024 * configs->dpi_scale, 640 * configs->dpi_scale);
-	params.Vsync = configs->use_vsync;
+	params.Vsync = configs->vsync;
 	tmp_device = irr::createDeviceEx(params);
 	if(!tmp_device) {
 		throw std::runtime_error("Failed to create Irrlicht Engine device!");

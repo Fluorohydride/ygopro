@@ -52,7 +52,14 @@ struct SettingsWindow {
 	irr::gui::IGUIStaticText* stDpiScale;
 	irr::gui::IGUIEditBox* ebDpiScale;
 	irr::gui::IGUIButton* btnRestart;
-	
+	irr::gui::IGUICheckBox* chkVSync;
+	irr::gui::IGUIStaticText* stFPSCap;
+	irr::gui::IGUIEditBox* ebFPSCap;
+	irr::gui::IGUICheckBox* chkShowConsole;
+	irr::gui::IGUIStaticText* stCoreLogOutput;
+	irr::gui::IGUIComboBox* cbCoreLogOutput;
+
+
 };
 
 }

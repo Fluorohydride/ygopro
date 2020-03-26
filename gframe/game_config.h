@@ -18,7 +18,7 @@ struct GameConfig
 	bool Save(const char* filename);
 
 	bool use_d3d = true;
-	bool use_vsync = true;
+	bool vsync = true;
 	float dpi_scale = 1.0f;
 	int max_fps = 60;
 	int game_version = 0;

@@ -87,7 +87,7 @@ bool Game::Initialize() {
 		params.AntiAlias = 0;
 		params.WindowSize = irr::core::dimension2d<u32>(0, 0);
 #endif
-		params.Vsync = gGameConfig->use_vsync;
+		params.Vsync = gGameConfig->vsync;
 		device = irr::createDeviceEx(params);
 		if(!device) {
 			ErrorLog("Failed to create Irrlicht Engine device!");
@@ -643,7 +643,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnTabShowSettings, 2059);
 	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
 
-	gSettings.window = env->addWindow(Scale(180, 100, 840, 520), false, gDataManager->GetSysString(1273).c_str());
+	gSettings.window = env->addWindow(Scale(180, 90, 840, 530), false, gDataManager->GetSysString(1273).c_str());
 	defaultStrings.emplace_back(gSettings.window, 1273);
 	gSettings.window->setVisible(false);
 	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(15, 35, 320, 60), gSettings.window, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).c_str());
@@ -697,6 +697,7 @@ bool Game::Initialize() {
 	gSettings.ebDpiScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	gSettings.btnRestart = env->addButton(Scale(175, 365, 320, 390), gSettings.window, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).c_str());
 	defaultStrings.emplace_back(gSettings.btnRestart, 2071);
+	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(15, 395, 320, 420), gSettings.window, -1, gDataManager->GetSysString(2073).c_str());
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
 	wBtnSettings->getCloseButton()->setVisible(false);
@@ -1650,7 +1651,7 @@ bool Game::MainLoop() {
 		if (!device->isWindowActive() || (gGameConfig->max_fps && !gGameConfig->use_vsync)) {
 #else
 		int fpsLimit = gGameConfig->max_fps;
-		if (gGameConfig->max_fps && !gGameConfig->use_vsync) {
+		if (gGameConfig->max_fps && !gGameConfig->vsync) {
 #endif
 			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
 			if(delta > 0) {
@@ -1901,6 +1902,7 @@ void Game::SaveConfig() {
 	TrySaveInt(gGameConfig->startLP, ebStartLP);
 	TrySaveInt(gGameConfig->startHand, ebStartHand);
 	TrySaveInt(gGameConfig->drawCount, ebDrawCount);
+	gGameConfig->vsync = gSettings.chkVSync->isChecked();
 	gGameConfig->relayDuel = btnRelayMode->isPressed();
 	gGameConfig->noCheckDeck = chkNoCheckDeck->isChecked();
 	gGameConfig->noShuffleDeck = chkNoShuffleDeck->isChecked();
