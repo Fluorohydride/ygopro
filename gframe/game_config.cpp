@@ -51,10 +51,6 @@ bool GameConfig::Load(const char* filename)
 			}
 			else if (type == "fullscreen")
 				fullscreen = !!std::stoi(str);
-			else if (type == "show_console")
-				showConsole = !!std::stoi(str);
-			else if (type == "errorlog")
-				enable_log = std::stoi(str);
 			else if (type == "nickname")
 				nickname = BufferIO::DecodeUTF8s(str);
 			else if (type == "gamename")
@@ -70,6 +66,7 @@ bool GameConfig::Load(const char* filename)
 				auto val = std::stoi(str); \
 				name = val >= 0 ? val : 0; \
 			}
+			DESERIALIZE_UNSIGNED(coreLogOutput)
 			DESERIALIZE_UNSIGNED(lastlflist)
 			DESERIALIZE_UNSIGNED(lastallowedcards)
 			DESERIALIZE_UNSIGNED(timeLimit)
@@ -84,6 +81,7 @@ bool GameConfig::Load(const char* filename)
 			DESERIALIZE_BOOL(relayDuel)
 			DESERIALIZE_BOOL(noCheckDeck)
 			DESERIALIZE_BOOL(noShuffleDeck)
+			DESERIALIZE_BOOL(showConsole)
 #undef DESERIALIZE_BOOL
 			else if (type == "botThrowRock")
 				botThrowRock = !!std::stoi(str);
@@ -208,9 +206,9 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "use_vsync = "          << use_vsync << "\n";
 	conf_file << "max_fps = "            << max_fps << "\n";
 	conf_file << "fullscreen = "         << fullscreen << "\n";
-	conf_file << "show_console = "       << showConsole << "\n";
+	SERIALIZE(showConsole);
 	conf_file << "antialias = "          << antialias << "\n";
-	conf_file << "errorlog = "           << enable_log << "\n";
+	SERIALIZE(coreLogOutput);
 	conf_file << "nickname = "           << BufferIO::EncodeUTF8s(nickname) << "\n";
 	conf_file << "gamename = "           << BufferIO::EncodeUTF8s(gamename) << "\n";
 	conf_file << "lastdeck = "           << BufferIO::EncodeUTF8s(lastdeck) << "\n";

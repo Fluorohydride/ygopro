@@ -6,6 +6,11 @@
 
 namespace ygo {
 
+enum CoreLogOutput {
+	CORE_LOG_TO_CHAT = 0x1,
+	CORE_LOG_TO_FILE = 0x2
+};
+
 struct GameConfig
 {
 	GameConfig();
@@ -19,6 +24,7 @@ struct GameConfig
 	int game_version = 0;
 	bool fullscreen = false;
 	bool showConsole = false;
+	unsigned int coreLogOutput = CORE_LOG_TO_CHAT | CORE_LOG_TO_FILE;
 	unsigned short antialias = 0;
 	std::wstring serverport = L"7911";
 	unsigned char textfontsize = 13;

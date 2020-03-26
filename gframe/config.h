@@ -15,7 +15,6 @@
 #include "utils.h"
 
 extern unsigned short PRO_VERSION;
-extern int enable_log;
 extern bool exit_on_return;
 extern bool is_from_discord;
 extern bool open_file;

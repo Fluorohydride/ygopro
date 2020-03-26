@@ -2196,9 +2196,9 @@ void Game::ClearChatMsg() {
 	}
 }
 void Game::AddDebugMsg(const std::string& msg) {
-	if (enable_log & 0x1)
+	if (gGameConfig->coreLogOutput & CORE_LOG_TO_CHAT)
 		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9, 2);
-	if (enable_log & 0x2)
+	if (gGameConfig->coreLogOutput & CORE_LOG_TO_FILE)
 		ErrorLog(fmt::format("{}: {}", BufferIO::EncodeUTF8s(gDataManager->GetSysString(1440)), msg));
 }
 void Game::ClearTextures() {

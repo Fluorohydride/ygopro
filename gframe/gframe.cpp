@@ -22,7 +22,6 @@
 #include "Android/porting_android.h"
 #endif
 
-int enable_log = 0;
 bool exit_on_return = false;
 bool is_from_discord = false;
 bool open_file = false;
