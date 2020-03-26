@@ -1,3 +1,8 @@
+// Copyright (c) 2019-2020 Edoardo Lolletti <edoardo762@gmail.com>
+// Copyright (c) 2020 Dylam De La Torre <dyxel04@gmail.com>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Refer to the COPYING file included.
+
 #ifndef REPOMANAGER_H
 #define REPOMANAGER_H
 #include <atomic>
@@ -7,7 +12,6 @@
 #include <string>
 #include <vector>
 #include <mutex>
-#include <atomic>
 #include <nlohmann/json.hpp>
 #include <git2/version.h>
 

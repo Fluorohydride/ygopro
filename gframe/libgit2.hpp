@@ -1,5 +1,5 @@
-// Copyright 2020 Dylam De La Torre <dyxel04@gmail.com>
-// Licensed under AGPL
+// Copyright (c) 2020 Dylam De La Torre <dyxel04@gmail.com>
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Refer to the COPYING file included.
 
 #ifndef LIBGIT2_HPP

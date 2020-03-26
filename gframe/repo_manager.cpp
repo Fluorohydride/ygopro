@@ -1,11 +1,16 @@
+// Copyright (c) 2019-2020 Edoardo Lolletti <edoardo762@gmail.com>
+// Copyright (c) 2020 Dylam De La Torre <dyxel04@gmail.com>
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Refer to the COPYING file included.
+
 #include "repo_manager.h"
-#include "utils.h"
-#include "fmt/format.h"
+#include <fmt/format.h>
 #include "logging.h"
+#include "utils.h"
+#include "libgit2.hpp"
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
-#include "libgit2.hpp"
 
 namespace ygo {
 
