@@ -2122,6 +2122,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			default: break;
 			}
 		}
+		break;
 	}
 	default: break;
 	}
