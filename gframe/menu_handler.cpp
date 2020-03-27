@@ -885,14 +885,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->HideElement(mainGame->wMainMenu);
 						mainGame->deckBuilder.Initialize();
 						return true;
-					} else if(extension == L"lua" && !mainGame->wReplay->isVisible()) {
+					} else if(mainGame->coreloaded && extension == L"lua" && !mainGame->wReplay->isVisible()) {
 						open_file = true;
 						open_file_name = Utils::ToPathString(to_open_file);
 						if(!mainGame->wSinglePlay->isVisible())
 							ClickButton(mainGame->btnSingleMode);
 						ClickButton(mainGame->btnLoadSinglePlay);
 						return true;
-					} else if(extension == L"yrpx" && !mainGame->wSinglePlay->isVisible()) {
+					} else if(mainGame->coreloaded && extension == L"yrpx" && !mainGame->wSinglePlay->isVisible()) {
 						open_file = true;
 						open_file_name = Utils::ToPathString(to_open_file);
 						if(!mainGame->wReplay->isVisible())
