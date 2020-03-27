@@ -417,6 +417,48 @@ const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 	decktbuf(deck.side);
 	return res.data();
 }
+const wchar_t * DeckManager::ExportDeckCardNames(Deck deck) {
+	static std::wstring res;
+	res.clear();
+	std::sort(deck.main.begin(), deck.main.end(), ClientCard::deck_sort_lv);
+	std::sort(deck.extra.begin(), deck.extra.end(), ClientCard::deck_sort_lv);
+	std::sort(deck.side.begin(), deck.side.end(), ClientCard::deck_sort_lv);
+	auto serialize = [&res=res](const std::vector<CardDataC*>& list) {
+		uint32 prev = 0;
+		uint32 count = 0;
+		for(const auto& card : list) {
+			auto code = card->code;
+			if(card->alias && abs((int)(card->alias - card->code)) < 10) {
+				code = card->alias;
+			}
+			if(!prev) {
+				prev = code;
+				count = 1;
+			} else if(prev && code != prev) {
+				res.append(gDataManager->GetName(prev)).append(L" x").append(fmt::to_wstring(count)).append(L"\n");
+				count = 1;
+				prev = code;
+			} else {
+				count++;
+			}
+		}
+		if(prev)
+			res.append(gDataManager->GetName(prev)).append(L" x").append(fmt::to_wstring(count)).append(L"\n");
+	};
+	if(deck.main.size()) {
+		res.append(L"Main Deck:\n");
+		serialize(deck.main);
+	}
+	if(deck.extra.size()) {
+		res.append(L"Extra Deck:\n");
+		serialize(deck.extra);
+	}
+	if(deck.side.size()) {
+		res.append(L"Side Deck:\n");
+		serialize(deck.side);
+	}
+	return res.c_str();
+}
 void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
 	static std::vector<uint8_t> deck_data;
 	buffer += (sizeof(L"ydke://") / sizeof(wchar_t)) - 1;

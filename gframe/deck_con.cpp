@@ -690,34 +690,34 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
-		if(event.KeyInput.PressedDown && event.KeyInput.Control) {
-		switch(event.KeyInput.Key) {
-		case irr::KEY_KEY_C: {
-			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-				auto deck_string = deckManager.ExportDeckBase64(deckManager.current_deck);
-				if(deck_string) {
-					mainGame->device->getOSOperator()->copyToClipboard(deck_string);
-					mainGame->stACMessage->setText(L"Deck copied");
-				} else {
-					mainGame->stACMessage->setText(L"Deck not copied");
+		if(event.KeyInput.PressedDown && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+			switch(event.KeyInput.Key) {
+			case irr::KEY_KEY_C: {
+				if(event.KeyInput.Control) {
+					auto deck_string = event.KeyInput.Shift ? deckManager.ExportDeckCardNames(deckManager.current_deck) : deckManager.ExportDeckBase64(deckManager.current_deck);
+					if(deck_string) {
+						mainGame->device->getOSOperator()->copyToClipboard(deck_string);
+						mainGame->stACMessage->setText(L"Deck copied");
+					} else {
+						mainGame->stACMessage->setText(L"Deck not copied");
+					}
+					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
-				mainGame->PopupElement(mainGame->wACMessage, 20);
+				break;
 			}
-			break;
-		}
-		case irr::KEY_KEY_V: {
-			if(!mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-				const wchar_t* deck_string = mainGame->device->getOSOperator()->getTextFromClipboard();
-				if(deck_string && wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0) {
-					deckManager.ImportDeckBase64(deckManager.current_deck, deck_string);
+			case irr::KEY_KEY_V: {
+				if(event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
+					const wchar_t* deck_string = mainGame->device->getOSOperator()->getTextFromClipboard();
+					if(deck_string && wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0) {
+						deckManager.ImportDeckBase64(deckManager.current_deck, deck_string);
+					}
 				}
+				break;
 			}
-			break;
+			default:
+				break;
+			}
 		}
-		default:
-			break;
-		}
-	}
 		break;
 	}
 #ifndef __ANDROID__
