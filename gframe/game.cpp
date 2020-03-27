@@ -2003,8 +2003,11 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		}
 	} else {
 		if(repo->warning.size()) {
-			grepo->history_button1->setText(L"Warning!");
-			grepo->commit_history_partial = L"Error while updating repository.\nMake sure you have a working internet connection.\n\n" + BufferIO::DecodeUTF8s(repo->warning);
+			grepo->history_button1->setText(gDataManager->GetSysString(1448).c_str());
+			grepo->commit_history_partial = fmt::format(L"{}\n{}\n\n{}",
+				gDataManager->GetSysString(1449),
+				gDataManager->GetSysString(1450),
+				BufferIO::DecodeUTF8s(repo->warning)).c_str();
 		} else {
 			grepo->commit_history_partial = gDataManager->GetSysString(1446);
 		}
