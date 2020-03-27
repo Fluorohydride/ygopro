@@ -1872,6 +1872,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				} catch(...){}
 				break;
 			}
+			case BUTTON_FPS_CAP: {
+				try {
+					gGameConfig->maxFPS = std::stoi(mainGame->gSettings.ebFPSCap->getText());
+				} catch (...) {
+					mainGame->gSettings.ebFPSCap->setText(fmt::to_wstring(gGameConfig->maxFPS).c_str());
+				}
+				break;
+			}
 			}
 			break;
 		}
@@ -2020,6 +2028,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case COMBOBOX_CURRENT_LOCALE: {
 				mainGame->ApplyLocale(mainGame->gSettings.cbCurrentLocale->getSelected());
+				return true;
+			}
+			case COMBOBOX_CORE_LOG_OUTPUT: {
+				int selected = mainGame->gSettings.cbCoreLogOutput->getSelected();
+				if (selected < 0) return true;
+				gGameConfig->coreLogOutput = mainGame->gSettings.cbCoreLogOutput->getItemData(selected);
 				return true;
 			}
 			}

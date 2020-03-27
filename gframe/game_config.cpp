@@ -42,11 +42,6 @@ bool GameConfig::Load(const char* filename)
 				antialias = std::stoi(str);
 			else if (type == "use_d3d")
 				use_d3d = !!std::stoi(str);
-			else if (type == "max_fps") {
-				auto val = std::stoi(str);
-				if (val >= 0)
-					max_fps = val;
-			}
 			else if (type == "fullscreen")
 				fullscreen = !!std::stoi(str);
 			else if (type == "nickname")
@@ -64,6 +59,7 @@ bool GameConfig::Load(const char* filename)
 				auto val = std::stoi(str); \
 				name = val >= 0 ? val : 0; \
 			}
+			DESERIALIZE_UNSIGNED(maxFPS)
 			DESERIALIZE_UNSIGNED(coreLogOutput)
 			DESERIALIZE_UNSIGNED(lastlflist)
 			DESERIALIZE_UNSIGNED(lastallowedcards)
@@ -79,8 +75,10 @@ bool GameConfig::Load(const char* filename)
 			DESERIALIZE_BOOL(relayDuel)
 			DESERIALIZE_BOOL(noCheckDeck)
 			DESERIALIZE_BOOL(noShuffleDeck)
-			DESERIALIZE_BOOL(showConsole)
 			DESERIALIZE_BOOL(vsync)
+#ifdef WIN32
+			DESERIALIZE_BOOL(showConsole)
+#endif
 #undef DESERIALIZE_BOOL
 			else if (type == "botThrowRock")
 				botThrowRock = !!std::stoi(str);
@@ -203,7 +201,7 @@ bool GameConfig::Save(const char* filename)
 #define SERIALIZE(name) Serialize(conf_file, #name, name)
 	conf_file << "use_d3d = "            << use_d3d << "\n";
 	SERIALIZE(vsync);
-	conf_file << "max_fps = "            << max_fps << "\n";
+	SERIALIZE(maxFPS);
 	conf_file << "fullscreen = "         << fullscreen << "\n";
 	SERIALIZE(showConsole);
 	conf_file << "antialias = "          << antialias << "\n";

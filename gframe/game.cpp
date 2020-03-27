@@ -692,12 +692,29 @@ bool Game::Initialize() {
 	gSettings.cbCurrentLocale->setSelected(selectedLocale);
 	gSettings.stDpiScale = env->addStaticText(gDataManager->GetSysString(2070).c_str(), Scale(15, 365, 90, 390), false, false, gSettings.window);
 	defaultStrings.emplace_back(gSettings.stDpiScale, 2070);
-	gSettings.ebDpiScale = env->addEditBox(fmt::to_wstring((int)(gGameConfig->dpi_scale*100.0)).c_str(), Scale(95, 365, 150, 390), true, gSettings.window, EDITBOX_NUMERIC);
+	gSettings.ebDpiScale = env->addEditBox(fmt::to_wstring<int>(gGameConfig->dpi_scale * 100).c_str(), Scale(95, 365, 150, 390), true, gSettings.window, EDITBOX_NUMERIC);
 	env->addStaticText(L"%", Scale(155, 365, 170, 390), false, false, gSettings.window);
 	gSettings.ebDpiScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	gSettings.btnRestart = env->addButton(Scale(175, 365, 320, 390), gSettings.window, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).c_str());
 	defaultStrings.emplace_back(gSettings.btnRestart, 2071);
 	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(15, 395, 320, 420), gSettings.window, -1, gDataManager->GetSysString(2073).c_str());
+	defaultStrings.emplace_back(gSettings.chkVSync, 2073);
+
+	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).c_str(), Scale(340, 35, 545, 60), false, true, gSettings.window);
+	defaultStrings.emplace_back(gSettings.stFPSCap, 2074);
+	gSettings.ebFPSCap = env->addEditBox(fmt::to_wstring(gGameConfig->maxFPS).c_str(), Scale(550, 35, 600, 60), true, gSettings.window, EDITBOX_NUMERIC);
+	gSettings.btnFPSCap = env->addButton(Scale(605, 35, 645, 60), gSettings.window, BUTTON_FPS_CAP, gDataManager->GetSysString(1211).c_str());
+	defaultStrings.emplace_back(gSettings.btnFPSCap, 1211);
+	gSettings.chkShowConsole = env->addCheckBox(gGameConfig->showConsole, Scale(340, 65, 645, 90), gSettings.window, -1, gDataManager->GetSysString(2072).c_str());
+	defaultStrings.emplace_back(gSettings.chkShowConsole, 2072);
+#ifndef _WIN32
+	gSettings.chkShowConsole->setChecked(false);
+	gSettings.chkShowConsole->setEnabled(false);
+#endif
+	gSettings.stCoreLogOutput = env->addStaticText(gDataManager->GetSysString(1998).c_str(), Scale(340, 95, 430, 120), false, true, gSettings.window);
+	defaultStrings.emplace_back(gSettings.stCoreLogOutput, 1998);
+	gSettings.cbCoreLogOutput = ADDComboBox(Scale(435, 95, 645, 120), gSettings.window, COMBOBOX_CORE_LOG_OUTPUT);
+	ReloadCBCoreLogOutput();
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
 	wBtnSettings->getCloseButton()->setVisible(false);
@@ -1647,11 +1664,11 @@ bool Game::MainLoop() {
 		// Recent versions of macOS break OpenGL vsync while offscreen, resulting in
 		// astronomical FPS and CPU usage. As a workaround, while the game window is
 		// fully occluded, the game is restricted to 30 FPS.
-		int fpsLimit = device->isWindowActive() ? gGameConfig->max_fps : 30;
-		if (!device->isWindowActive() || (gGameConfig->max_fps && !gGameConfig->use_vsync)) {
+		int fpsLimit = device->isWindowActive() ? gGameConfig->maxFPS : 30;
+		if (!device->isWindowActive() || (gGameConfig->maxFPS && !gGameConfig->use_vsync)) {
 #else
-		int fpsLimit = gGameConfig->max_fps;
-		if (gGameConfig->max_fps && !gGameConfig->vsync) {
+		int fpsLimit = gGameConfig->maxFPS;
+		if (gGameConfig->maxFPS && !gGameConfig->vsync) {
 #endif
 			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
 			if(delta > 0) {
@@ -1902,6 +1919,7 @@ void Game::SaveConfig() {
 	TrySaveInt(gGameConfig->startLP, ebStartLP);
 	TrySaveInt(gGameConfig->startHand, ebStartHand);
 	TrySaveInt(gGameConfig->drawCount, ebDrawCount);
+	gGameConfig->showConsole = gSettings.chkShowConsole->isChecked();
 	gGameConfig->vsync = gSettings.chkVSync->isChecked();
 	gGameConfig->relayDuel = btnRelayMode->isPressed();
 	gGameConfig->noCheckDeck = chkNoCheckDeck->isChecked();
@@ -2560,6 +2578,15 @@ void Game::ReloadCBCurrentSkin() {
 	}
 	gSettings.cbCurrentSkin->setSelected(selectedSkin);
 }
+void Game::ReloadCBCoreLogOutput() {
+	gSettings.cbCoreLogOutput->clear();
+	for (int i = CORE_LOG_NONE; i <= 3; i++) {
+		auto itemIndex = gSettings.cbCoreLogOutput->addItem(gDataManager->GetSysString(2000 + i).c_str(), i);
+		if (gGameConfig->coreLogOutput == i) {
+			gSettings.cbCoreLogOutput->setSelected(itemIndex);
+		}
+	}
+}
 void Game::ReloadElementsStrings() {
 	ShowCardInfo(showingcard, true);
 
@@ -2631,6 +2658,10 @@ void Game::ReloadElementsStrings() {
 	prev = cbRule->getSelected();
 	ReloadCBRule();
 	cbRule->setSelected(prev);
+
+	prev = gSettings.cbCoreLogOutput->getSelected();
+	ReloadCBCoreLogOutput();
+	gSettings.cbCoreLogOutput->setSelected(prev);
 
 	((CGUICustomTable*)roomListTable)->setColumnText(1, gDataManager->GetSysString(1225).c_str());
 	((CGUICustomTable*)roomListTable)->setColumnText(2, gDataManager->GetSysString(1227).c_str());

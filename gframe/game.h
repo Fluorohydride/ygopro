@@ -190,6 +190,7 @@ public:
 	void ReloadCBDuelRule();
 	void ReloadCBRule();
 	void ReloadCBCurrentSkin();
+	void ReloadCBCoreLogOutput();
 	void ReloadElementsStrings();
 
 	void OnResize();

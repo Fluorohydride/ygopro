@@ -55,6 +55,7 @@ struct SettingsWindow {
 	irr::gui::IGUICheckBox* chkVSync;
 	irr::gui::IGUIStaticText* stFPSCap;
 	irr::gui::IGUIEditBox* ebFPSCap;
+	irr::gui::IGUIButton* btnFPSCap;
 	irr::gui::IGUICheckBox* chkShowConsole;
 	irr::gui::IGUIStaticText* stCoreLogOutput;
 	irr::gui::IGUIComboBox* cbCoreLogOutput;
