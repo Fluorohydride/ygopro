@@ -94,6 +94,35 @@ bool Game::Initialize() {
 			return false;
 		}
 	}
+#ifndef __ANDROID__
+	device->enableDragDrop(true, [](irr::core::vector2di pos, bool isFile) ->bool {
+		if(isFile) {
+			if(ygo::mainGame->dInfo.isInDuel || ygo::mainGame->dInfo.isInLobby || ygo::mainGame->is_siding
+			   || ygo::mainGame->wRoomListPlaceholder->isVisible() || ygo::mainGame->wLanWindow->isVisible()
+			   || ygo::mainGame->wCreateHost->isVisible() || ygo::mainGame->wHostPrepare->isVisible())
+				return false;
+			else
+				return true;
+		} else {
+			auto elem = ygo::mainGame->env->getRootGUIElement()->getElementFromPoint(pos);
+			if(elem && elem != ygo::mainGame->env->getRootGUIElement()) {
+				if(elem->hasType(irr::gui::EGUIET_EDIT_BOX) && elem->isEnabled())
+					return true;
+				return false;
+			}
+			irr::core::position2di convpos = mainGame->Resize(pos.X, pos.Y, true);
+			auto x = convpos.X;
+			auto y = convpos.Y;
+			if(ygo::mainGame->is_building && !ygo::mainGame->is_siding) {
+				if(x >= 314 && x <= 794) {
+					if((y >= 164 && y <= 435) || (y >= 466 && y <= 530) || (y >= 564 && y <= 628))
+						return true;
+				}
+			}
+		}
+		return false;
+	});
+#endif
 	filesystem = device->getFileSystem();
 #ifdef __ANDROID__
 	// The Android assets file-system does not know which sub-directories it has (blame google).
