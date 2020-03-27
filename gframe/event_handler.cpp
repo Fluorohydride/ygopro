@@ -2045,6 +2045,17 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
+		case irr::KEY_KEY_C: {
+			if(event.KeyInput.Control && mainGame->HasFocus(EGUIET_LIST_BOX)) {
+				auto focus = static_cast<irr::gui::IGUIListBox*>(mainGame->env->getFocus());
+				int sel = focus->getSelected();
+				if(sel != -1) {
+					mainGame->device->getOSOperator()->copyToClipboard(focus->getListItem(sel));
+					return true;
+				}
+			}
+			return false;
+		}
 		case irr::KEY_KEY_R: {
 			if(event.KeyInput.Control) {
 				mainGame->ApplySkin(EPRO_TEXT(""), true);
