@@ -9,20 +9,20 @@
 namespace ygo {
 
 int WindBotPanel::CurrentIndex() {
-	int selected = deckBox->getSelected();
-	return selected >= 0 ? deckBox->getItemData(selected) : selected;
+	int selected = cbBotDeck->getSelected();
+	return selected >= 0 ? cbBotDeck->getItemData(selected) : selected;
 }
 
 void WindBotPanel::Refresh(int filterMasterRule, int lastIndex) {
 	int oldIndex = CurrentIndex();
 	int lastBot = oldIndex >= 0 ? oldIndex : lastIndex;
-	deckBox->clear();
+	cbBotDeck->clear();
 	for (int i = 0; i < bots.size(); i++) {
 		const auto& bot = bots[i];
 		if (filterMasterRule == 0 || bot.masterRules.find(filterMasterRule) != bot.masterRules.end()) {
-			int newIndex = deckBox->addItem(bot.name.c_str(), i);
+			int newIndex = cbBotDeck->addItem(bot.name.c_str(), i);
 			if (i == lastBot)
-				deckBox->setSelected(newIndex);
+				cbBotDeck->setSelected(newIndex);
 		}
 	}
 	UpdateDescription();

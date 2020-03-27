@@ -796,6 +796,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case COMBOBOX_BOT_DECK: {
+				gGameConfig->lastBot = mainGame->gBot.CurrentIndex();
 				mainGame->gBot.UpdateDescription();
 				break;
 			}

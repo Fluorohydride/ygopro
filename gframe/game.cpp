@@ -474,7 +474,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gBot.chkThrowRock, 2052);
 	gBot.chkMute = env->addCheckBox(gGameConfig->botMute, Scale(10, 135, 200, 160), gBot.window, -1, gDataManager->GetSysString(2053).c_str());
 	defaultStrings.emplace_back(gBot.chkMute, 2053);
-	gBot.deckBox = ADDComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
+	gBot.cbBotDeck = ADDComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
 	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, gDataManager->GetSysString(2054).c_str());
 	defaultStrings.emplace_back(gBot.btnAdd, 2054);
 	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, gDataManager->GetSysString(1252).c_str());
@@ -1665,7 +1665,7 @@ bool Game::MainLoop() {
 		// astronomical FPS and CPU usage. As a workaround, while the game window is
 		// fully occluded, the game is restricted to 30 FPS.
 		int fpsLimit = device->isWindowActive() ? gGameConfig->maxFPS : 30;
-		if (!device->isWindowActive() || (gGameConfig->maxFPS && !gGameConfig->use_vsync)) {
+		if (!device->isWindowActive() || (gGameConfig->maxFPS && !gGameConfig->vsync)) {
 #else
 		int fpsLimit = gGameConfig->maxFPS;
 		if (gGameConfig->maxFPS && !gGameConfig->vsync) {
@@ -1926,7 +1926,6 @@ void Game::SaveConfig() {
 	gGameConfig->noShuffleDeck = chkNoShuffleDeck->isChecked();
 	gGameConfig->botThrowRock = gBot.chkThrowRock->isChecked();
 	gGameConfig->botMute = gBot.chkMute->isChecked();
-	gGameConfig->lastBot = gBot.CurrentIndex();
 	gGameConfig->lastServer = serverChoice->getItem(serverChoice->getSelected());
 	gGameConfig->chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
 	gGameConfig->chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();

@@ -70,6 +70,7 @@ bool GameConfig::Load(const char* filename)
 			DESERIALIZE_UNSIGNED(startLP)
 			DESERIALIZE_UNSIGNED(startHand)
 			DESERIALIZE_UNSIGNED(drawCount)
+			DESERIALIZE_UNSIGNED(lastBot)
 #undef DESERIALIZE_UNSIGNED
 #define DESERIALIZE_BOOL(name) else if (type == #name) name = !!std::stoi(str);
 			DESERIALIZE_BOOL(relayDuel)
@@ -84,8 +85,6 @@ bool GameConfig::Load(const char* filename)
 				botThrowRock = !!std::stoi(str);
 			else if (type == "botMute")
 				botMute = !!std::stoi(str);
-			else if (type == "lastBot")
-				lastBot = std::stoi(str);
 			else if (type == "lastServer")
 				lastServer = BufferIO::DecodeUTF8s(str);
 			else if (type == "textfont") {
@@ -230,7 +229,7 @@ bool GameConfig::Save(const char* filename)
 	conf_file << "lastport = "           << BufferIO::EncodeUTF8s(lastport) << "\n";
 	conf_file << "botThrowRock = "       << botThrowRock << "\n";
 	conf_file << "botMute = "            << botMute << "\n";
-	conf_file << "lastBot = "            << lastBot << "\n";
+	SERIALIZE(lastBot);
 	conf_file << "lastServer = "         << BufferIO::EncodeUTF8s(lastServer) << "\n";
 	conf_file << "game_version = "       << game_version << "\n";
 	conf_file << "automonsterpos = "     << chkMAutoPos << "\n";

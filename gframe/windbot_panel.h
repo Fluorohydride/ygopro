@@ -26,7 +26,7 @@ struct WindBotPanel {
 #endif
 
 	irr::gui::IGUIWindow* window;
-	irr::gui::IGUIComboBox* deckBox;
+	irr::gui::IGUIComboBox* cbBotDeck;
 	irr::gui::IGUICheckBox* chkThrowRock;
 	irr::gui::IGUICheckBox* chkMute;
 	irr::gui::IGUIStaticText* deckProperties;
