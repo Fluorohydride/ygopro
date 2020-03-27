@@ -445,15 +445,22 @@ const wchar_t * DeckManager::ExportDeckCardNames(Deck deck) {
 		if(prev)
 			res.append(gDataManager->GetName(prev)).append(L" x").append(fmt::to_wstring(count)).append(L"\n");
 	};
+	bool prev = false;
 	if(deck.main.size()) {
 		res.append(L"Main Deck:\n");
 		serialize(deck.main);
+		prev = true;
 	}
 	if(deck.extra.size()) {
+		if(prev)
+			res.append(L"\n\n");
 		res.append(L"Extra Deck:\n");
 		serialize(deck.extra);
+		prev = true;
 	}
 	if(deck.side.size()) {
+		if(prev)
+			res.append(L"\n\n");
 		res.append(L"Side Deck:\n");
 		serialize(deck.side);
 	}
