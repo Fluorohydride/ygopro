@@ -1424,15 +1424,9 @@ bool Game::Initialize() {
 	return true;
 }
 void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
-	for(int i = 0; i < 16; ++i)
-		mProjection[i] = 0;
-	mProjection[0] = 2.0f * znear / (right - left);
-	mProjection[5] = 2.0f * znear / (top - bottom);
+	mProjection.buildProjectionMatrixPerspectiveLH(right - left, top - bottom, znear, zfar);
 	mProjection[8] = (left + right) / (left - right);
 	mProjection[9] = (top + bottom) / (bottom - top);
-	mProjection[10] = zfar / (zfar - znear);
-	mProjection[11] = 1.0f;
-	mProjection[14] = znear * zfar / (znear - zfar);
 }
 bool Game::MainLoop() {
 	camera = smgr->addCameraSceneNode(0);

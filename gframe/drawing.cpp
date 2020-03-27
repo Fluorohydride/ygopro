@@ -1168,22 +1168,34 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 	dimension2d<u32> size = img->getOriginalSize();
 	recti dragloc = Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT);
 	recti limitloc = Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20);
+	recti otloc = Resize(pos.X + 7, pos.Y + 50, pos.X + 37, pos.Y + 65);
 	if(drag) {
 		dragloc = recti(pos.X, pos.Y, pos.X + Scale(CARD_THUMB_WIDTH * window_scale.X), pos.Y + Scale(CARD_THUMB_HEIGHT * window_scale.Y));
 		limitloc = recti(pos.X, pos.Y, pos.X + Scale(20 * window_scale.X), pos.Y + Scale(20 * window_scale.Y));
+		otloc = recti(pos.X + 7, pos.Y + 50 * window_scale.Y, pos.X + 37 * window_scale.X, pos.Y + 65 * window_scale.Y);
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
 	if(!is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {
 		switch(lflist->content[lcode]) {
 		case 0:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
+			imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
 			break;
 		case 1:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), cliprect, 0, true);
+			imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), cliprect, 0, true);
 			break;
 		case 2:
-			driver->draw2DImage(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), cliprect, 0, true);
+			imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), cliprect, 0, true);
 			break;
+		}
+	}
+	if(mainGame->cbLimit->getSelected() >= 4) {
+		switch(cp->ot & (SCOPE_OCG | SCOPE_TCG)) {
+			case SCOPE_OCG:
+				imageManager.draw2DImageFilterScaled(imageManager.tOT, otloc, recti(0, 0, 128, 64), cliprect, 0, true);
+				break;
+			case SCOPE_TCG:
+				imageManager.draw2DImageFilterScaled(imageManager.tOT, otloc, recti(0, 64, 128, 128), cliprect, 0, true);
+				break;
 		}
 	}
 }
