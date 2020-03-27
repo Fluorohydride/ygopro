@@ -5,6 +5,7 @@
 #include <IGUIEditBox.h>
 #include <algorithm>
 #include <fstream>
+#include "Base64.h"
 
 namespace ygo {
 
@@ -398,6 +399,45 @@ bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, s
 		deckfile << std::to_string(card) << "\n";
 	deckfile.close();
 	return true;
+}
+const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
+	static std::wstring res;
+	auto decktbuf = [&res=res](const std::vector<CardDataC*>& src) {
+		static std::vector<int> cards;
+		cards.resize(src.size());
+		auto buf = cards.data();
+		for(size_t i = 0; i < src.size(); i++) {
+			buf[i] = src[i]->code;
+		}
+		res += base64_encode((uint8_t*)buf, cards.size() * 4) + L"!";
+	};
+	res = L"ydke://";
+	decktbuf(deck.main);
+	decktbuf(deck.extra);
+	decktbuf(deck.side);
+	return res.data();
+}
+void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
+	static std::vector<uint8_t> deck_data;
+	buffer += (sizeof(L"ydke://") / sizeof(wchar_t)) - 1;
+	auto buf = buffer;
+	size_t delimiters[3];
+	int delim = 0;
+	for(int i = 0; delim < 3 && buf[i]; i++) {
+		if(buf[i] == L'!') {
+			delimiters[delim++] = i;
+		}
+	}
+	if(delim != 3)
+		return;
+	deck_data = base64_decode(buf, wcslen(buf));
+	auto tmpbuf = base64_decode(buf + delimiters[0] + 1, delimiters[1] - delimiters[0]);
+	deck_data.insert(deck_data.end(), tmpbuf.begin(), tmpbuf.end());
+	int mainc = deck_data.size() / 4;
+	tmpbuf = base64_decode(buf + delimiters[1] + 1, delimiters[2] - delimiters[1]);
+	deck_data.insert(deck_data.end(), tmpbuf.begin(), tmpbuf.end());
+	int sidec = (deck_data.size() / 4) - mainc;
+	LoadDeck(deck, (int*)deck_data.data(), mainc, sidec);
 }
 bool DeckManager::DeleteDeck(Deck& deck, const path_string& name) {
 	return Utils::FileDelete(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name.c_str()));

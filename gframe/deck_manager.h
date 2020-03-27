@@ -60,6 +60,8 @@ public:
 	bool LoadDeckDouble(const path_string& file, const path_string& file2, Deck* deck = nullptr);
 	bool SaveDeck(Deck& deck, const path_string& name);
 	bool SaveDeck(const path_string& name, std::vector<int> mainlist, std::vector<int>extralist, std::vector<int> sidelist);
+	const wchar_t* ExportDeckBase64(Deck& deck);
+	void ImportDeckBase64(Deck& deck, const wchar_t* buffer);
 	bool DeleteDeck(Deck& deck, const path_string& name);
 	bool RenameDeck(const path_string& oldname, const path_string& newname);
 };
