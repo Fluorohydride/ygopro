@@ -56,7 +56,7 @@ bool GameConfig::Load(const char* filename)
 				lastDuelForbidden = std::stoi(str);
 #define DESERIALIZE_UNSIGNED(name) \
 			else if (type == #name) { \
-				int val = static_cast<uint32_t>(std::stol(str)); \
+				int val = static_cast<uint32_t>(std::stoul(str)); \
 				name = val; \
 			}
 			DESERIALIZE_UNSIGNED(maxFPS)

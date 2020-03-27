@@ -298,7 +298,7 @@ bool LoadCardList(const path_string& name, std::vector<int>* mainlist = nullptr,
 		if(str.find_first_of("0123456789") != std::string::npos) {
 			int code = 0;
 			try {
-				code = std::stoi(str);
+				code = std::stoul(str);
 			} catch (...){
 				continue;
 			}
