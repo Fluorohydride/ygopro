@@ -75,6 +75,17 @@ void LoadReplay() {
 		start_turn = 0;
 	ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
 }
+inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
+	irr::SEvent event;
+	event.EventType = irr::EET_GUI_EVENT;
+	event.GUIEvent.EventType = type;
+	event.GUIEvent.Caller = target;
+	ygo::mainGame->device->postEventFromUser(event);
+}
+
+inline void ClickButton(irr::gui::IGUIElement* btn) {
+	TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
+}
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
 #ifdef __ANDROID__
 	if(porting::transformEvent(event)) {
@@ -850,6 +861,54 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		break;
 	}
+#ifndef __ANDROID__
+	case irr::EET_DROP_EVENT: {
+		static std::wstring to_open_file;
+		switch(event.DropEvent.DropType) {
+			case irr::DROP_START: {
+				to_open_file.clear();
+				break;
+			}
+			case irr::DROP_FILE: {
+				to_open_file = event.DropEvent.Text;
+				break;
+			}
+			case irr::DROP_END:	{
+				if(to_open_file.size()) {
+					auto extension = Utils::GetFileExtension(to_open_file);
+					bool isMenu = !mainGame->wSinglePlay->isVisible() && !mainGame->wReplay->isVisible();
+					if(extension == L"ydk" && isMenu && deckManager.LoadDeck(Utils::ToPathString(to_open_file))) {
+						mainGame->RefreshDeck(mainGame->cbDBDecks);
+						auto name = Utils::GetFileName(to_open_file);
+						mainGame->ebDeckname->setText(name.c_str());
+						mainGame->cbDBDecks->setSelected(-1);
+						mainGame->HideElement(mainGame->wMainMenu);
+						mainGame->deckBuilder.Initialize();
+						return true;
+					} else if(extension == L"lua" && !mainGame->wReplay->isVisible()) {
+						open_file = true;
+						open_file_name = Utils::ToPathString(to_open_file);
+						if(!mainGame->wSinglePlay->isVisible())
+							ClickButton(mainGame->btnSingleMode);
+						ClickButton(mainGame->btnLoadSinglePlay);
+						return true;
+					} else if(extension == L"yrpx" && !mainGame->wSinglePlay->isVisible()) {
+						open_file = true;
+						open_file_name = Utils::ToPathString(to_open_file);
+						if(!mainGame->wReplay->isVisible())
+							ClickButton(mainGame->btnReplayMode);
+						ClickButton(mainGame->btnLoadReplay);
+						return true;
+					}
+					to_open_file.clear();
+				}
+				break;
+			}
+			default: break;
+		}
+		break;
+	}
+#endif
 	default: break;
 	}
 	return false;

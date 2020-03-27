@@ -9,7 +9,9 @@
 #include "duelclient.h"
 #include "single_mode.h"
 #include "client_card.h"
-#ifdef __ANDROID__
+#ifndef __ANDROID__
+#include <sstream>
+#else
 #include "Android/porting_android.h"
 #endif
 #include <algorithm>
@@ -687,6 +689,72 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		break;
 	}
+#ifndef __ANDROID__
+	case irr::EET_DROP_EVENT: {
+		static std::wstring to_open_deck;
+		switch(event.DropEvent.DropType) {
+			case irr::DROP_FILE: {
+				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+				if(root->getElementFromPoint({ event.DropEvent.X, event.DropEvent.Y }) != root)
+					break;
+				to_open_deck = event.DropEvent.Text;
+				break;
+			}
+			case irr::DROP_TEXT: {
+				if(mainGame->is_siding)
+					break;
+				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+				if(root->getElementFromPoint({ event.DropEvent.X, event.DropEvent.Y }) != root)
+					break;
+				std::wstringstream ss(Utils::ToUpperNoAccents<std::wstring>(event.DropEvent.Text));
+				std::wstring to;
+				while(std::getline(ss, to)) {
+					(to = to.substr(to.find_first_not_of(L" \n\r\t")));
+					to.erase(to.find_last_not_of(L" \n\r\t") + 1);
+					int code = BufferIO::GetVal(to.c_str());
+					CardDataC* pointer = nullptr;
+					if(code && (pointer = gDataManager->GetCardData(code))) {
+					} else {
+						for(auto& card : gDataManager->cards) {
+							auto name = Utils::ToUpperNoAccents<std::wstring>(card.second.GetStrings()->name);
+							if(name == to) {
+								pointer = &card.second._data;
+								break;
+							}
+						}
+					}
+					if(!pointer)
+						continue;
+					mouse_pos.set(event.DropEvent.X, event.DropEvent.Y);
+					is_draging = true;
+					hovered_code = code;
+					draging_pointer = pointer;
+					GetHoveredCard();
+					if(hovered_pos == 3)
+						push_side(draging_pointer, hovered_seq + is_lastcard);
+					else {
+						push_main(draging_pointer, hovered_seq) || push_extra(draging_pointer, hovered_seq + is_lastcard);
+					}
+					is_draging = false;
+				}
+				return true;
+			}
+			case irr::DROP_END:	{
+				if(to_open_deck.size()) {
+					if(Utils::GetFileExtension(to_open_deck) == L"ydk" && deckManager.LoadDeck(Utils::ToPathString(to_open_deck))) {
+						auto name = Utils::GetFileName(to_open_deck);
+						mainGame->ebDeckname->setText(name.c_str());
+						mainGame->cbDBDecks->setSelected(-1);
+					}
+					to_open_deck.clear();
+				}
+				break;
+			}
+			default: break;
+		}
+		break;
+	}
+#endif
 	default: break;
 	}
 	return false;
