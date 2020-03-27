@@ -753,18 +753,20 @@ void GenericDuel::DuelEndProc() {
 void GenericDuel::Surrender(DuelPlayer* dp) {
 	/*if((players.home.size() + players.opposing.size()) != 2 || (players.home.front().player != dp && players.opposing.front().player != dp) || !pduel)
 		return;*/
-	unsigned char wbuf[3];
-	uint32 player = dp->type < players.home_size ? 0 : 1;
-	wbuf[0] = MSG_WIN;
-	wbuf[1] = 1 - player;
-	wbuf[2] = 0;
-	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
-	ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-	replay_stream.emplace_back((char*)wbuf, 3);
-	match_result.push_back(1 - player);
-	EndDuel();
-	DuelEndProc();
-	event_del(etimer);
+	if(pduel) {
+		unsigned char wbuf[3];
+		uint32 player = dp->type < players.home_size ? 0 : 1;
+		wbuf[0] = MSG_WIN;
+		wbuf[1] = 1 - player;
+		wbuf[2] = 0;
+		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
+		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+			replay_stream.emplace_back((char*)wbuf, 3);
+		match_result.push_back(1 - player);
+		EndDuel();
+		DuelEndProc();
+		event_del(etimer);
+	}
 }
 #define DATA (char*)(packet.data.data() + sizeof(uint8_t))
 #define TO_SEND_BUFFER (char*)packet.data.data(), packet.data.size()
