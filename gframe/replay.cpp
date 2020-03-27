@@ -28,6 +28,7 @@ Replay::Replay() {
 	is_recording = false;
 	is_replaying = false;
 	can_read = false;
+	turn_count = 0;
 }
 Replay::~Replay() {
 }
@@ -297,6 +298,9 @@ void Replay::ParseStream() {
 			players[1] = BufferIO::DecodeUTF8s(namebuf);
 			continue;
 		}
+		if(p.message == MSG_NEW_TURN) {
+			turn_count++;
+		}
 		if(p.message == OLD_REPLAY_MODE) {
 			if(!yrp) {
 				yrp = std::unique_ptr<Replay>(new Replay());
@@ -332,11 +336,15 @@ void Replay::Reset() {
 	replay_data.shrink_to_fit();
 	comp_data.clear();
 	comp_data.shrink_to_fit();
+	turn_count = 0;
 }
 int Replay::GetPlayersCount(int side) {
 	if(side == 0)
 		return home_count;
 	return opposing_count;
+}
+int Replay::GetTurnsCount() {
+	return turn_count;
 }
 path_string Replay::GetReplayName() {
 	return replay_name;

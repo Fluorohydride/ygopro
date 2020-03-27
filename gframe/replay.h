@@ -83,6 +83,7 @@ public:
 	void Rewind();
 	void Reset();
 	int GetPlayersCount(int side);
+	int GetTurnsCount();
 	path_string GetReplayName();
 	std::unique_ptr<Replay> yrp;
 	ReplayHeader pheader;
@@ -124,6 +125,7 @@ private:
 	ReplayDeckList decks;
 	std::vector<int> replay_custom_rule_cards;
 	std::vector<ReplayResponse>::iterator responses_iterator;
+	int turn_count;
 };
 template<typename T>
 inline void Replay::Write(T data, bool flush) {
