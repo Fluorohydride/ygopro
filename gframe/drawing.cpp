@@ -861,10 +861,9 @@ void Game::DrawGUI() {
 			fit++;
 			uint32 movetime = std::min((int32)delta_time, fu.autoFadeoutFrame);
 			fu.autoFadeoutFrame -= movetime;
+			fu.guiFading->setEnabled(fu.wasEnabled);
 			if(!fu.autoFadeoutFrame)
 				HideElement(fu.guiFading);
-			else
-				fu.guiFading->setEnabled(fu.wasEnabled);
 		} else {
 			fu.guiFading->setEnabled(fu.wasEnabled);
 			fit = fadingList.erase(fthis);
