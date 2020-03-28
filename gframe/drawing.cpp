@@ -1074,9 +1074,15 @@ void Game::DrawBackImage(irr::video::ITexture* texture, bool resized) {
 void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	FadingUnit fu;
 	fu.fadingSize = win->getRelativePosition();
-	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
-		if(win == fit->guiFading && win != wOptions) // the size of wOptions is always setted by ClientField::ShowSelectOption before showing it
-			fu.fadingSize = fit->fadingSize;
+	fu.wasEnabled = win->isEnabled();
+	win->setEnabled(false);
+	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit) {
+		if(win == fit->guiFading) {
+			if(win != wOptions) // the size of wOptions is always set by ClientField::ShowSelectOption before showing it
+				fu.fadingSize = fit->fadingSize;
+			fu.wasEnabled = fit->wasEnabled;
+		}
+	}
 	irr::core::position2di center = fu.fadingSize.getCenter();
 	fu.fadingFrame = 10.0f * 1000.0f / 60.0f;
 	fu.fadingDest.X = fu.fadingSize.getWidth() / fu.fadingFrame;
@@ -1104,16 +1110,19 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 			btnCardDisplay[i]->setDrawImage(false);
 	}
 	win->setRelativePosition(Scale(center.X, center.Y, 0, 0));
-	fu.wasEnabled = win->isEnabled();
-	win->setEnabled(false);
 	fadingList.push_back(fu);
 }
 void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	FadingUnit fu;
 	fu.fadingSize = win->getRelativePosition();
-	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
-		if(win == fit->guiFading)
+	fu.wasEnabled = win->isEnabled();
+	win->setEnabled(false);
+	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit) {
+		if(win == fit->guiFading) {
 			fu.fadingSize = fit->fadingSize;
+			fu.wasEnabled = fit->wasEnabled;
+		}
+	}
 	fu.fadingFrame = 10.0f * 1000.0f / 60.0f;
 	fu.fadingDest.X = fu.fadingSize.getWidth() / fu.fadingFrame;
 	fu.fadingDest.Y = (fu.fadingSize.getHeight() - 4) / fu.fadingFrame;
@@ -1138,8 +1147,6 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 		for(int i = 0; i < 5; ++i)
 			btnCardDisplay[i]->setDrawImage(false);
 	}
-	fu.wasEnabled = win->isEnabled();
-	win->setEnabled(false);
 	fadingList.push_back(fu);
 }
 void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
