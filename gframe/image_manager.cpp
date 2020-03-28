@@ -693,13 +693,13 @@ void imageScaleNNAAUnthreaded(irr::video::IImage *src, const irr::core::rect<irr
 			// Calculate floating-point source rectangle bounds.
 			// Do some basic clipping, and for mirrored/flipped rects,
 			// make sure min/max are in the right order.
-			minsx = (dx * sw / dim.Width);
+			minsx = sox + (dx * sw / dim.Width);
 			minsx = std::min(std::max(minsx, 0.0), sw + sox);
 			maxsx = minsx + sw / dim.Width;
 			maxsx = std::min(std::max(maxsx, 0.0), sw + sox);
 			if(minsx > maxsx)
 				std::swap(minsx, maxsx);
-			minsy = (dy * sh / dim.Height);
+			minsy = soy + (dy * sh / dim.Height);
 			minsy = std::min(std::max(minsy, 0.0), sh + soy);
 			maxsy = minsy + sh / dim.Height;
 			maxsy = std::min(std::max(maxsy, 0.0), sh + soy);
