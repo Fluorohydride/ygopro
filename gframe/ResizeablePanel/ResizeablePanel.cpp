@@ -4,16 +4,23 @@
 
 namespace irr {
 namespace gui {
+
+	class SubPanel : public IGUIElement {
+	public:
+		SubPanel(IGUIEnvironment* env, IGUIElement* parent, s32 id, const core::rect<s32>& rectangle) : IGUIElement(EGUIET_ELEMENT, env, parent, id, rectangle) {};
+		virtual bool isPointInside(const core::position2d<s32>& point) const { return false; };
+	};
+
 	Panel::Panel(IGUIEnvironment* env, const core::rect<s32>& rectangle, s32 id, IGUIElement* parent, bool vertical, bool horizontal) : IGUIElement(EGUIET_ELEMENT, env, parent, id, rectangle),
 		hasHorizontalScrolling(horizontal), hasVerticalScrolling(vertical)  {
 		verticalScroll = Environment->addScrollBar(false, { 0, 0, 1, 1 }, this, -1);
 		verticalScroll->setVisible(false);
 		horizontalScroll = Environment->addScrollBar(true, { 0, 0, 1, 1 }, this, -1);
 		horizontalScroll->setVisible(false);
-		subpanel = new IGUIElement(EGUIET_ELEMENT, env, parent, id, rectangle);
+		subpanel = new SubPanel(env, parent, id, rectangle);
 		subpanel->drop();
 	}
-	Panel* Panel::addPanel(IGUIEnvironment* environment, IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool vertical, bool horizontal) {
+	Panel* Panel::addPanel(IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32>& rectangle, bool vertical, bool horizontal) {
 		if(!parent)
 			parent = environment->getRootGUIElement();
 		Panel* c = new Panel(environment, rectangle, id, parent, vertical, horizontal);
