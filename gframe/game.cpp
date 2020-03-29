@@ -675,7 +675,9 @@ bool Game::Initialize() {
 	gSettings.window = env->addWindow(Scale(180, 90, 840, 530), false, gDataManager->GetSysString(1273).c_str());
 	defaultStrings.emplace_back(gSettings.window, 1273);
 	gSettings.window->setVisible(false);
-	gSettings.panel = Panel::addPanel(env, gSettings.window, -250, gSettings.window->getClientRect(), true, false);
+	auto sRect = gSettings.window->getClientRect();
+	sRect.UpperLeftCorner.Y += Scale(30);
+	gSettings.panel = Panel::addPanel(env, gSettings.window, -1, sRect, true, false);
 	auto sPanel = gSettings.panel->getSubpanel();
 	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(15, 35, 320, 60), sPanel, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
@@ -2836,7 +2838,9 @@ void Game::OnResize() {
 	btnTabShowSettings->setRelativePosition(rect<s32>(Scale(20), Scale(415), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(435)));
 
 	SetCentered(gSettings.window);
-	gSettings.panel->setRelativePosition(gSettings.window->getClientRect());
+	auto sRect = gSettings.window->getClientRect();
+	sRect.UpperLeftCorner.Y += Scale(30);
+	gSettings.panel->setRelativePosition(sRect);
 
 	wChat->setRelativePosition(rect<s32>(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 
