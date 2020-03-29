@@ -604,7 +604,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					repinfo.append(names[i + replay.GetPlayersCount(0)] + L"\n");
 				}
 				if(replay.GetTurnsCount())
-					repinfo.append(fmt::format(L"\n\n\nTurns: {}", replay.GetTurnsCount()));
+					repinfo.append(fmt::format(L"\n\n\n{}: {}", gDataManager->GetSysString(2009), replay.GetTurnsCount()));
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->stReplayInfo->setText((wchar_t*)repinfo.c_str());
 				mainGame->chkYrp->setChecked(false);
