@@ -55,7 +55,7 @@ namespace gui {
 			default:
 				break;
 		}
-		return false;
+		return IGUIElement::OnEvent(event);
 	}
 	void Panel::updateAbsolutePosition() {
 		IGUIElement::updateAbsolutePosition();
