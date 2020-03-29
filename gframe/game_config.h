@@ -15,8 +15,8 @@ enum CoreLogOutput {
 struct GameConfig
 {
 	GameConfig();
-	bool Load(const char* filename);
-	bool Save(const char* filename);
+	bool Load(const path_char* filename);
+	bool Save(const path_char* filename);
 
 	bool use_d3d = true;
 	bool vsync = true;

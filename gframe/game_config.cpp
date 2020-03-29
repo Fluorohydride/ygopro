@@ -6,7 +6,7 @@
 namespace ygo {
 
 GameConfig::GameConfig() {
-	Load("./config/system.conf");
+	Load(EPRO_TEXT("./config/system.conf"));
 	if(configs.empty()) {
 		std::ifstream conf_file(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
 		try {
@@ -19,7 +19,7 @@ GameConfig::GameConfig() {
 	}
 }
 
-bool GameConfig::Load(const char* filename)
+bool GameConfig::Load(const path_char* filename)
 {
 	std::ifstream conf_file(filename, std::ifstream::in);
 	if(!conf_file.is_open())
@@ -190,7 +190,7 @@ inline void Serialize(std::ofstream& conf_file, const char* name, std::wstring v
 	conf_file << name << " = " << BufferIO::EncodeUTF8s(value) << "\n";
 }
 
-bool GameConfig::Save(const char* filename)
+bool GameConfig::Save(const path_char* filename)
 {
 	std::ofstream conf_file(filename, std::ofstream::out);
 	if (!conf_file.is_open())

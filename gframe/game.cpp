@@ -1961,7 +1961,7 @@ void Game::SaveConfig() {
 	gGameConfig->chkIgnore2 = tabSettings.chkIgnoreSpectators->isChecked();
 	gGameConfig->chkHideHintButton = tabSettings.chkHideChainButtons->isChecked();
 	gGameConfig->chkAnime = chkAnime->isChecked();
-	gGameConfig->Save("./config/system.conf");
+	gGameConfig->Save(EPRO_TEXT("./config/system.conf"));
 }
 Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
 	std::wstring name = BufferIO::DecodeUTF8s(repo->repo_name);
