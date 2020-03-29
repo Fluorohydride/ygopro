@@ -1894,7 +1894,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				try {
 					gGameConfig->dpi_scale = (std::stoi(mainGame->gSettings.ebDpiScale->getText()) / 100.0);
 					mainGame->restart = true;
-					mainGame->device->closeDevice();
+					//mainGame->device->closeDevice();
 				} catch(...){}
 				break;
 			}

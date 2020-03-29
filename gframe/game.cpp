@@ -1486,7 +1486,7 @@ bool Game::MainLoop() {
 		bool currentlyFullscreen = false;
 		GUIUtils::ToggleFullscreen(device, currentlyFullscreen);
 	}
-	while(device->run()) {
+	while(!restart && device->run()) {
 		auto repos = gRepoManager->GetReadyRepos();
 		if(!repos.empty()) {
 			bool refresh_db = false;
@@ -1730,7 +1730,7 @@ bool Game::MainLoop() {
 	if(ocgcore)
 		UnloadCore(ocgcore);
 #endif //YGOPRO_BUILD_DLL
-	device->drop();
+	//device->drop();
 	return restart;
 }
 path_string Game::NoSkinLabel() {

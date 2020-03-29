@@ -9,6 +9,8 @@
 #include <IGUICheckBox.h>
 #include <IGUIEditBox.h>
 #include <IGUIWindow.h>
+#include <IGUIEnvironment.h>
+#include <ISceneManager.h>
 #include "config.h"
 #include "data_handler.h"
 #include "logging.h"
@@ -249,6 +251,17 @@ int main(int argc, char* argv[]) {
 			CheckArguments(argc, argv);
 		}
 		reset = ygo::mainGame->MainLoop();
+		if(reset) {
+			data->tmp_device = ygo::mainGame->device;
+			data->tmp_device->setEventReceiver(nullptr);
+			/*the gles drivers have an additional cache, that isn't cleared when the textures are removed,
+			since it's not a big deal clearing them, as they'll be reused, they aren't cleared*/
+			/*data->tmp_device->getVideoDriver()->removeAllTextures();*/
+			data->tmp_device->getVideoDriver()->removeAllHardwareBuffers();
+			data->tmp_device->getVideoDriver()->removeAllOcclusionQueries();
+			data->tmp_device->getSceneManager()->clear();
+			data->tmp_device->getGUIEnvironment()->clear();
+		}
 	} while(reset);
 	Cleanup
 	return EXIT_SUCCESS;
