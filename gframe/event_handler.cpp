@@ -17,6 +17,7 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
 #ifdef __ANDROID__
+#include <android_native_app_glue.h>
 #include "Android/porting_android.h"
 #endif
 
@@ -1754,34 +1755,59 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 }
 bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation) {
 #ifdef __ANDROID__
-	if(event.EventType == EET_MOUSE_INPUT_EVENT &&
-	   event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN) {
-		gui::IGUIElement *hovered = mainGame->env->getRootGUIElement()->getElementFromPoint(core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y));
-		if(hovered && hovered->isEnabled()) {
-			if(hovered->getType() == irr::gui::EGUIET_EDIT_BOX) {
-				bool retval = hovered->OnEvent(event);
-				if(retval)
-					mainGame->env->setFocus(hovered);
-				if(gGameConfig->native_keyboard) {
-					porting::displayKeyboard(true);
-				} else {
-					int type = 2;
-					// multi line text input
-					if(((gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
-						type = 1;
-					// passwords are always single line
-					if(((gui::IGUIEditBox *)hovered)->isPasswordBox())
-						type = 3;
-					porting::showInputDialog("ok", "",
-											 BufferIO::EncodeUTF8s(((gui::IGUIEditBox *)hovered)->getText()), type);
+	switch(event.EventType) {
+	case EET_MOUSE_INPUT_EVENT: {
+		if(event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN) {
+			gui::IGUIElement *hovered = mainGame->env->getRootGUIElement()->getElementFromPoint(core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y));
+			if(hovered && hovered->isEnabled()) {
+				if(hovered->getType() == irr::gui::EGUIET_EDIT_BOX) {
+					bool retval = hovered->OnEvent(event);
+					if(retval)
+						mainGame->env->setFocus(hovered);
+					if(gGameConfig->native_keyboard) {
+						porting::displayKeyboard(true);
+					} else {
+						int type = 2;
+						// multi line text input
+						if(((gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
+							type = 1;
+						// passwords are always single line
+						if(((gui::IGUIEditBox *)hovered)->isPasswordBox())
+							type = 3;
+						porting::showInputDialog("ok", "",
+												 BufferIO::EncodeUTF8s(((gui::IGUIEditBox *)hovered)->getText()), type);
+					}
+					return retval;
 				}
-				return retval;
 			}
 		}
-	} else if(event.EventType == EET_KEY_INPUT_EVENT && gGameConfig->native_keyboard) {
-		if(event.KeyInput.Key == KEY_RETURN) {
+		break;
+	}
+	case EET_KEY_INPUT_EVENT: {
+		if(gGameConfig->native_keyboard && event.KeyInput.Key == KEY_RETURN) {
 			porting::displayKeyboard(false);
 		}
+		break;
+	}
+	case EET_SYSTEM_EVENT: {
+		switch(event.SystemEvent.AndroidCmd.Cmd) {
+			case APP_CMD_PAUSE: {
+				gSoundManager->PauseMusic(true);
+				break;
+			}
+			case APP_CMD_RESUME: {
+				gSoundManager->PauseMusic(false);
+				break;
+			}
+			case APP_CMD_DESTROY: {
+				mainGame->SaveConfig();
+				break;
+			}
+			default: break;
+		}
+		return false;
+	}
+	default: break;
 	}
 #endif
 	switch(event.EventType) {

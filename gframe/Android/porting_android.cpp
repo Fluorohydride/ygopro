@@ -116,13 +116,6 @@ extern "C" {
 			}
 		}
 	}
-
-	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_pauseApp(
-		JNIEnv * env, jclass thiz, jboolean pause) {
-		if(ygo::gSoundManager) {
-			ygo::gSoundManager->PauseMusic(pause);
-		}
-	}
 }
 
 namespace porting {
