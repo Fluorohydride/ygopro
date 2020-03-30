@@ -427,7 +427,7 @@ std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
 			if (!buffer.empty()) {
 				buffer += L"/";
 			}
-			buffer.append(GetSysString(tuple.second).c_str());
+			buffer += GetSysString(tuple.second);
 		}
 	}
 	return buffer;

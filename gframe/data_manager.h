@@ -14,7 +14,10 @@ struct sqlite3_stmt;
 #define SCOPE_ILLEGAL    0x8
 #define SCOPE_VIDEO_GAME 0x10
 #define SCOPE_CUSTOM     0x20
+#define SCOPE_SPEED      0x40
 #define SCOPE_PRERELEASE 0x100
+#define SCOPE_RUSH       0x200
+#define SCOPE_LEGEND     0x400
 #define SCOPE_HIDDEN     0x1000
 
 #define SCOPE_OCG_TCG    (SCOPE_OCG | SCOPE_TCG)
