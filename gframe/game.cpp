@@ -55,7 +55,7 @@
 
 unsigned short PRO_VERSION = 0x1350;
 #define EDOPRO_VERSION_MAJOR 37
-#define EDOPRO_VERSION_MINOR 2
+#define EDOPRO_VERSION_MINOR 3
 #define EDOPRO_VERSION_PATCH 0
 #define EDOPRO_VERSION_CODENAME L"Spider Shark"
 
@@ -206,7 +206,7 @@ bool Game::Initialize() {
 		gGameConfig->skin = NoSkinLabel();
 	}
 	smgr = device->getSceneManager();
-	device->setWindowCaption(L"EDOPro by Project Ignis");
+	device->setWindowCaption(L"Project Ignis: EDOPro");
 	device->setResizable(true);
 #ifdef _WIN32
 	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
@@ -240,7 +240,7 @@ bool Game::Initialize() {
 	wAbout->setDraggable(false);
 	wAbout->setDrawTitlebar(false);
 	wAbout->setDrawBackground(false);
-	stAbout = env->addStaticText(L"EDOPro by Project Ignis\n"
+	stAbout = env->addStaticText(L"Project Ignis: EDOPro\n"
 								 L"The bleeding-edge automatic duel simulator\n"
 								 L"\n"
 								 L"Copyright (C) 2020  Edoardo Lolletti (edo9300) and others\n"
@@ -252,8 +252,8 @@ bool Game::Initialize() {
 								 L"\n"
 								 L"Project Ignis:\n"
 								 L"ahtelel, AlphaKretin, AndreOliveiraMendes, Cybercatman, Dragon3989, DyXel, edo9300, "
-								 L"EerieCode, Gideon, Hatter, Hel, kevinlul, Larry126, LogicalNonsense, NaimSantos, "
-								 L"pyrQ, Sanct, senpaizuri, Tungnon, WolfOfWolves, Yamato\n"
+								 L"EerieCode, Gideon, Hatter, Hel, Icematoro, kevinlul, Larry126, LogicalNonsense, "
+								 L"NaimSantos, pyrQ, Sanct, senpaizuri, Tungnon, WolfOfWolves, Yamato\n"
 								 L"Default background: LogicalNonsense\n"
 								 L"Default fields: Icematoro\n"
 								 L"\n"
@@ -270,7 +270,7 @@ bool Game::Initialize() {
 	wVersion->setDrawTitlebar(false);
 	wVersion->setDrawBackground(false);
 	auto formatVersion = []() {
-		return fmt::format(L"EDOPro by Project Ignis | {}.{}.{} \"{}\"", EDOPRO_VERSION_MAJOR, EDOPRO_VERSION_MINOR, EDOPRO_VERSION_PATCH, EDOPRO_VERSION_CODENAME);
+		return fmt::format(L"Project Ignis: EDOPro | {}.{}.{} \"{}\"", EDOPRO_VERSION_MAJOR, EDOPRO_VERSION_MINOR, EDOPRO_VERSION_PATCH, EDOPRO_VERSION_CODENAME);
 	};
 	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, false, wVersion);
 	int titleWidth = stVersion->getTextWidth();
