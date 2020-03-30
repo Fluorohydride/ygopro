@@ -679,6 +679,8 @@ bool Game::Initialize() {
 	sRect.UpperLeftCorner.Y += Scale(30);
 	gSettings.panel = Panel::addPanel(env, gSettings.window, -1, sRect, true, false);
 	auto sPanel = gSettings.panel->getSubpanel();
+	gSettings.chkShowScopeLabel = env->addCheckBox(gGameConfig->showScopeLabel, Scale(15, 5, 320, 30), sPanel, -1, gDataManager->GetSysString(2076).c_str());
+	defaultStrings.emplace_back(gSettings.chkShowScopeLabel, 2076);
 	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(15, 35, 320, 60), sPanel, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
 	gSettings.chkFullscreen = env->addCheckBox(gGameConfig->fullscreen, Scale(15, 65, 320, 90), sPanel, CHECKBOX_FULLSCREEN, gDataManager->GetSysString(2060).c_str());
@@ -730,23 +732,26 @@ bool Game::Initialize() {
 	gSettings.ebDpiScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	gSettings.btnRestart = env->addButton(Scale(175, 365, 320, 390), sPanel, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).c_str());
 	defaultStrings.emplace_back(gSettings.btnRestart, 2071);
-	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(15, 395, 320, 420), sPanel, -1, gDataManager->GetSysString(2073).c_str());
-	defaultStrings.emplace_back(gSettings.chkVSync, 2073);
 
-	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).c_str(), Scale(340, 35, 545, 60), false, true, sPanel);
+	gSettings.stAntiAlias = env->addStaticText(gDataManager->GetSysString(2075).c_str(), Scale(340, 5, 545, 30), false, true, sPanel);
+	defaultStrings.emplace_back(gSettings.stAntiAlias, 2075);
+	gSettings.ebAntiAlias = env->addEditBox(fmt::to_wstring(gGameConfig->antialias).c_str(), Scale(550, 5, 645, 30), true, sPanel, EDITBOX_NUMERIC);
+	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(340, 35, 645, 60), sPanel, -1, gDataManager->GetSysString(2073).c_str());
+	defaultStrings.emplace_back(gSettings.chkVSync, 2073);
+	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).c_str(), Scale(340, 65, 545, 90), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stFPSCap, 2074);
-	gSettings.ebFPSCap = env->addEditBox(fmt::to_wstring(gGameConfig->maxFPS).c_str(), Scale(550, 35, 600, 60), true, sPanel, EDITBOX_NUMERIC);
-	gSettings.btnFPSCap = env->addButton(Scale(605, 35, 645, 60), sPanel, BUTTON_FPS_CAP, gDataManager->GetSysString(1211).c_str());
+	gSettings.ebFPSCap = env->addEditBox(fmt::to_wstring(gGameConfig->maxFPS).c_str(), Scale(550, 65, 600, 90), true, sPanel, EDITBOX_NUMERIC);
+	gSettings.btnFPSCap = env->addButton(Scale(605, 65, 645, 90), sPanel, BUTTON_FPS_CAP, gDataManager->GetSysString(1211).c_str());
 	defaultStrings.emplace_back(gSettings.btnFPSCap, 1211);
-	gSettings.chkShowConsole = env->addCheckBox(gGameConfig->showConsole, Scale(340, 65, 645, 90), sPanel, -1, gDataManager->GetSysString(2072).c_str());
+	gSettings.chkShowConsole = env->addCheckBox(gGameConfig->showConsole, Scale(340, 95, 645, 120), sPanel, -1, gDataManager->GetSysString(2072).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowConsole, 2072);
 #ifndef _WIN32
 	gSettings.chkShowConsole->setChecked(false);
 	gSettings.chkShowConsole->setEnabled(false);
 #endif
-	gSettings.stCoreLogOutput = env->addStaticText(gDataManager->GetSysString(1998).c_str(), Scale(340, 95, 430, 120), false, true, sPanel);
+	gSettings.stCoreLogOutput = env->addStaticText(gDataManager->GetSysString(1998).c_str(), Scale(340, 125, 430, 150), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stCoreLogOutput, 1998);
-	gSettings.cbCoreLogOutput = ADDComboBox(Scale(435, 95, 645, 120), sPanel, COMBOBOX_CORE_LOG_OUTPUT);
+	gSettings.cbCoreLogOutput = ADDComboBox(Scale(435, 125, 645, 150), sPanel, COMBOBOX_CORE_LOG_OUTPUT);
 	ReloadCBCoreLogOutput();
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));

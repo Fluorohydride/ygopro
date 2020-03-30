@@ -69,6 +69,7 @@ struct GameConfig
 	bool quick_animation = false;
 	bool showFPS = true;
 	bool hidePasscodeScope = false;
+	bool showScopeLabel = true;
 	bool filterBot = true;
 	bool scale_background = true;
 #ifdef __ANDROID__

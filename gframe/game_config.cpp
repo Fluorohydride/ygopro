@@ -77,6 +77,7 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_BOOL(noCheckDeck)
 			DESERIALIZE_BOOL(noShuffleDeck)
 			DESERIALIZE_BOOL(vsync)
+			DESERIALIZE_BOOL(showScopeLabel)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
 #endif
@@ -245,6 +246,7 @@ bool GameConfig::Save(const path_char* filename)
 	conf_file << "quick_animation = "    << quick_animation << "\n";
 	conf_file << "showFPS = "            << showFPS << "\n";
 	conf_file << "hidePasscodeScope = "  << hidePasscodeScope << "\n";
+	SERIALIZE(showScopeLabel);
 	conf_file << "filterBot = "          << filterBot << "\n";
 	conf_file << "show_unofficial = "    << chkAnime << "\n";
 	conf_file << "ctrlClickIsRMB = "     << ctrlClickIsRMB << "\n";
