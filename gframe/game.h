@@ -417,9 +417,10 @@ public:
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
-	irr::gui::IGUICheckBox* chkCustomRules[7];
+	irr::gui::IGUICheckBox* chkCustomRules[7+11];
 	irr::gui::IGUICheckBox* chkTypeLimit[5];
-	irr::gui::IGUIWindow* wCustomRules;
+	irr::gui::IGUIWindow* wCustomRulesL;
+	irr::gui::IGUIWindow* wCustomRulesR;
 	irr::gui::IGUIButton* btnCustomRulesOK;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
