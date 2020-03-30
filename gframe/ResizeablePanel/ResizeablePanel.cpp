@@ -17,7 +17,7 @@ namespace gui {
 		verticalScroll->setVisible(false);
 		horizontalScroll = Environment->addScrollBar(true, { 0, 0, 1, 1 }, this, -1);
 		horizontalScroll->setVisible(false);
-		subpanel = new SubPanel(env, parent, id, rectangle);
+		subpanel = new SubPanel(env, this, id, getSubPaneRect());
 		subpanel->drop();
 	}
 	Panel* Panel::addPanel(IGUIEnvironment* environment, IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool vertical, bool horizontal) {
