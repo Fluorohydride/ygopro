@@ -1976,6 +1976,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				mainGame->RefreshCardInfoTextPositions();
 				return true;
 			}
+			case CHECKBOX_SHOW_SCOPE_LABEL: {
+				gGameConfig->showScopeLabel = mainGame->gSettings.chkShowScopeLabel->isChecked();
+				return true;
+			}
 			case CHECKBOX_SHOW_FPS: {
 				gGameConfig->showFPS = mainGame->gSettings.chkShowFPS->isChecked();
 				mainGame->fpsCounter->setVisible(gGameConfig->showFPS);

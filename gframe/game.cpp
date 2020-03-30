@@ -679,7 +679,7 @@ bool Game::Initialize() {
 	sRect.UpperLeftCorner.Y += Scale(30);
 	gSettings.panel = Panel::addPanel(env, gSettings.window, -1, sRect, true, false);
 	auto sPanel = gSettings.panel->getSubpanel();
-	gSettings.chkShowScopeLabel = env->addCheckBox(gGameConfig->showScopeLabel, Scale(15, 5, 320, 30), sPanel, -1, gDataManager->GetSysString(2076).c_str());
+	gSettings.chkShowScopeLabel = env->addCheckBox(gGameConfig->showScopeLabel, Scale(15, 5, 320, 30), sPanel, CHECKBOX_SHOW_SCOPE_LABEL, gDataManager->GetSysString(2076).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowScopeLabel, 2076);
 	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(15, 35, 320, 60), sPanel, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
@@ -1933,17 +1933,18 @@ void Game::RefreshReplay() {
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
 }
+template<typename T>
+inline void TrySaveInt(T& dest, const IGUIElement* src) {
+	try {
+		dest = static_cast<T>(std::stoul(src->getText()));
+	}
+	catch (...) {}
+}
 void Game::SaveConfig() {
 	gGameConfig->nickname = ebNickName->getText();
 	gGameConfig->lastallowedcards = cbRule->getSelected();
 	gGameConfig->lastDuelParam = duel_param;
 	gGameConfig->lastDuelForbidden = forbiddentypes;
-	auto TrySaveInt = [](unsigned int& dest, const IGUIElement* src) {
-		try {
-			dest = std::stoi(src->getText());
-		}
-		catch (...) {}
-	};
 	TrySaveInt(gGameConfig->timeLimit, ebTimeLimit);
 	TrySaveInt(gGameConfig->team1count, ebTeam1);
 	TrySaveInt(gGameConfig->team2count, ebTeam2);
@@ -1951,6 +1952,7 @@ void Game::SaveConfig() {
 	TrySaveInt(gGameConfig->startLP, ebStartLP);
 	TrySaveInt(gGameConfig->startHand, ebStartHand);
 	TrySaveInt(gGameConfig->drawCount, ebDrawCount);
+	TrySaveInt(gGameConfig->antialias, gSettings.ebAntiAlias);
 	gGameConfig->showConsole = gSettings.chkShowConsole->isChecked();
 	gGameConfig->vsync = gSettings.chkVSync->isChecked();
 	gGameConfig->relayDuel = btnRelayMode->isPressed();

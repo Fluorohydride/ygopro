@@ -1194,7 +1194,7 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 			break;
 		}
 	}
-	if(mainGame->cbLimit->getSelected() >= 4) {
+	if(gGameConfig->showScopeLabel) {
 		switch(cp->ot & (SCOPE_OCG | SCOPE_TCG)) {
 			case SCOPE_OCG:
 				imageManager.draw2DImageFilterScaled(imageManager.tOT, otloc, recti(0, 0, 128, 64), cliprect, 0, true);
