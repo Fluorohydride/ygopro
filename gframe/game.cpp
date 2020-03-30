@@ -1494,6 +1494,15 @@ bool Game::MainLoop() {
 		GUIUtils::ToggleFullscreen(device, currentlyFullscreen);
 	}
 	while(!restart && device->run()) {
+		if(should_reload_skin) {
+			should_reload_skin = false;
+			if(Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected())) != gGameConfig->skin) {
+				gGameConfig->skin = Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected()));
+				ApplySkin(gGameConfig->skin);
+			} else {
+				ApplySkin(EPRO_TEXT(""), true);
+			}
+		}
 		auto repos = gRepoManager->GetReadyRepos();
 		if(!repos.empty()) {
 			bool refresh_db = false;

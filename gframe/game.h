@@ -311,6 +311,7 @@ public:
 	std::mutex popupCheck;
 	std::wstring queued_msg;
 	std::wstring queued_caption;
+	bool should_reload_skin;
 	//GUI
 	irr::gui::IGUIEnvironment* env;
 	irr::gui::CGUITTFont* guiFont;

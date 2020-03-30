@@ -1881,7 +1881,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				return true;
 			}
 			case BUTTON_RELOAD_SKIN: {
-				mainGame->ApplySkin(EPRO_TEXT(""), true);
+				mainGame->should_reload_skin = true;
 				break;
 			}
 			case BUTTON_SHOW_SETTINGS: {
@@ -2052,8 +2052,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_CURRENT_SKIN: {
-				gGameConfig->skin = Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected()));
-				mainGame->ApplySkin(gGameConfig->skin);
+				auto newskin = Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected()));
+				mainGame->should_reload_skin = newskin != gGameConfig->skin;
 				return true;
 			}
 			case COMBOBOX_CURRENT_LOCALE: {
@@ -2088,7 +2088,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		}
 		case irr::KEY_KEY_R: {
 			if(event.KeyInput.Control) {
-				mainGame->ApplySkin(EPRO_TEXT(""), true);
+				mainGame->should_reload_skin = true;
 				return true;
 			}
 			if(!event.KeyInput.PressedDown && !mainGame->HasFocus(EGUIET_EDIT_BOX))

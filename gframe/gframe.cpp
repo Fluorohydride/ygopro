@@ -191,7 +191,7 @@ int main(int argc, char* argv[]) {
 #if !defined(_DEBUG)
 		} else {
 			auto extension = ygo::Utils::GetFileExtension(argv[1]);
-			if(extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
+			if(extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua")) {
 				TCHAR exepath[MAX_PATH];
 				GetModuleFileName(NULL, exepath, MAX_PATH);
 				auto path = ygo::Utils::GetFilePath(exepath);
