@@ -2556,6 +2556,8 @@ void Game::ReloadCBLimit() {
 	cbLimit->addItem(gDataManager->GetSysString(1901).c_str());
 	cbLimit->addItem(gDataManager->GetSysString(1902).c_str());
 	cbLimit->addItem(gDataManager->GetSysString(1903).c_str());
+	cbLimit->addItem(gDataManager->GetSysString(1910).c_str());
+	cbLimit->addItem(gDataManager->GetSysString(1911).c_str());
 	if (chkAnime->isChecked()) {
 		cbLimit->addItem(gDataManager->GetSysString(1265).c_str());
 		cbLimit->addItem(gDataManager->GetSysString(1266).c_str());

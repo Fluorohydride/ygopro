@@ -1077,6 +1077,10 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 			return false;
 		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->_data.ot & SCOPE_PRERELEASE))
 			return false;
+		if (filter_lm == LIMITATION_FILTER_SPEED && !(data->_data.ot & SCOPE_SPEED))
+			return false;
+		if (filter_lm == LIMITATION_FILTER_RUSH && !(data->_data.ot & SCOPE_RUSH))
+			return false;
 		if(filter_lm == LIMITATION_FILTER_ANIME && data->_data.ot != SCOPE_ANIME)
 			return false;
 		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->_data.ot != SCOPE_ILLEGAL)
