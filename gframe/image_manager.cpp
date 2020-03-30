@@ -250,7 +250,6 @@ void ImageManager::RefreshCovers() {
 #define X(x) BASE_PATH x
 #define GET_TEXTURE_SIZED(obj,path) GET(tmp_cover,GetTextureFromFile(X( path".png"),sizes[1].first,sizes[1].second),GetTextureFromFile(X( path".jpg"),sizes[1].first,sizes[1].second))\
 										if(tmp_cover) {\
-											driver->removeTexture(obj);\
 											obj = tmp_cover;\
 										}
 	GET_TEXTURE_SIZED(tCover[0], "cover")
