@@ -1181,59 +1181,43 @@ void Game::DrawThumb(CardDataC* cp, position2di pos, LFList* lflist, bool drag, 
 		otloc = recti(pos.X + 7, pos.Y + 50 * window_scale.Y, pos.X + 37 * window_scale.X, pos.Y + 65 * window_scale.Y);
 	}
 	driver->draw2DImage(img, dragloc, rect<s32>(0, 0, size.Width, size.Height), cliprect);
-	if(!is_siding && (lflist->content.count(lcode) || lflist->whitelist)) {
-		switch(lflist->content[lcode]) {
-		case 0:
-			imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
-			break;
-		case 1:
-			imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), cliprect, 0, true);
-			break;
-		case 2:
-			imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), cliprect, 0, true);
-			break;
+	if(!is_siding) {
+		if(lflist->content.count(lcode) || lflist->whitelist) {
+			switch(lflist->content[lcode]) {
+				case 0:
+					imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(0, 0, 64, 64), cliprect, 0, true);
+					break;
+				case 1:
+					imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(64, 0, 128, 64), cliprect, 0, true);
+					break;
+				case 2:
+					imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, rect<s32>(0, 64, 64, 128), cliprect, 0, true);
+					break;
+			}
 		}
-	}
-	if(gGameConfig->showScopeLabel) {
-		// Label display logic:
-		// If it contains exactly one bit between Anime, Illegal, Video Game, Custom, and Prerelease, display that.
-		// Else, if it contains exactly Speed or exactly Rush, display that.
-		// Else, if it contains exactly one bit between OCG and TCG, display that.
-		recti sprite;
-		auto spriteIndex = [](int i) {
-			return recti(0, i * 64, 128, i * 64 + 64);
-		};
-		switch(cp->ot & (SCOPE_OCG | SCOPE_TCG)) {
-		case SCOPE_OCG:
-			sprite = spriteIndex(0);
-			break;
-		case SCOPE_TCG:
-			sprite = spriteIndex(1);
-			break;
+#define IDX(scope,idx) case SCOPE_##scope:\
+							index = idx;\
+							goto draw;
+		if(gGameConfig->showScopeLabel) {
+			// Label display logic:
+			// If it contains exactly one bit between Anime, Illegal, Video Game, Custom, and Prerelease, display that.
+			// Else, if it contains exactly one bit between OCG and TCG, display that.
+			switch(cp->ot & ~SCOPE_PRERELEASE) {
+				int index;
+				IDX(OCG,0)
+				IDX(TCG,1)
+				IDX(ILLEGAL,2)
+				IDX(ANIME,3)
+				IDX(VIDEO_GAME,5)
+				IDX(CUSTOM,6)
+				IDX(SPEED,8)
+				IDX(RUSH,9)
+				default: break;
+				draw:
+				imageManager.draw2DImageFilterScaled(imageManager.tOT, otloc, recti(0, index * 64, 128, index * 64 + 64), cliprect, 0, true);
+			}
 		}
-		if ((cp->ot & SCOPE_SPEED) == SCOPE_SPEED) sprite = spriteIndex(8);
-		if ((cp->ot & SCOPE_RUSH) == SCOPE_RUSH) sprite = spriteIndex(9);
-		switch (cp->ot & (SCOPE_ANIME | SCOPE_ILLEGAL | SCOPE_VIDEO_GAME | SCOPE_CUSTOM | SCOPE_PRERELEASE)) {
-		case SCOPE_ILLEGAL:
-			sprite = spriteIndex(2);
-			break;
-		case SCOPE_ANIME:
-			sprite = spriteIndex(3);
-			break;
-		// SCOPE_MANGA
-		case SCOPE_VIDEO_GAME:
-			sprite = spriteIndex(5);
-			break;
-		case SCOPE_CUSTOM:
-			sprite = spriteIndex(6);
-			break;
-		case SCOPE_PRERELEASE:
-			sprite = spriteIndex(7);
-			break;
-		}
-		if (sprite != recti()) {
-			imageManager.draw2DImageFilterScaled(imageManager.tOT, otloc, sprite, cliprect, 0, true);
-		}
+#undef IDX
 	}
 }
 void Game::DrawDeckBd() {
