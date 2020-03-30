@@ -130,16 +130,27 @@ void CheckArguments(int argc, path_char* argv[]) {
 			if(extension == EPRO_TEXT("ydk")) {
 				open_file = true;
 				open_file_name = std::move(parameter);
-				exit_on_return = !keep_on_return;
+				keep_on_return = true;
+				exit_on_return = false;
 				ClickButton(ygo::mainGame->btnDeckEdit);
 				break;
 			}
 			if(extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx")) {
 				open_file = true;
 				open_file_name = std::move(parameter);
-				exit_on_return = !keep_on_return;
+				keep_on_return = true;
+				exit_on_return = false;
 				ClickButton(ygo::mainGame->btnReplayMode);
 				ClickButton(ygo::mainGame->btnLoadReplay);
+				break;
+			}
+			if(extension == EPRO_TEXT("lua")) {
+				open_file = true;
+				open_file_name = std::move(parameter);
+				keep_on_return = true;
+				exit_on_return = false;
+				ClickButton(ygo::mainGame->btnSingleMode);
+				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 				break;
 			}
 		}
