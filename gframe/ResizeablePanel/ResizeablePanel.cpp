@@ -17,7 +17,7 @@ namespace gui {
 		verticalScroll->setVisible(false);
 		horizontalScroll = Environment->addScrollBar(true, { 0, 0, 1, 1 }, this, -1);
 		horizontalScroll->setVisible(false);
-		subpanel = new SubPanel(env, this, id, getSubPaneRect());
+		subpanel = new SubPanel(env, parent, id, rectangle);
 		subpanel->drop();
 	}
 	Panel* Panel::addPanel(IGUIEnvironment* environment, IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool vertical, bool horizontal) {
@@ -62,21 +62,20 @@ namespace gui {
 		doResizingStuff();
 	}
 	irr::core::recti Panel::getSubPaneRect() {
-		auto width = AbsoluteClippingRect.getWidth();
-		auto height = AbsoluteClippingRect.getHeight();
+		auto rect = RelativeRect;
 		if(horizontalScroll->isVisible()) {
-			height -= Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
+			rect.LowerRightCorner.Y -= Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
 			verticalScroll->setMax(verticalScroll->getMax() + 20);
 		}
 		if(verticalScroll->isVisible()) {
-			width -= (Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE) + 10);
+			rect.LowerRightCorner.X -= (Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE) + 10);
 			horizontalScroll->setMax(horizontalScroll->getMax() + 30);
 		}
-		return { 0, 0, width, height };
+		return rect;
 	}
 	void Panel::doResizingStuff() {
 		auto scrollsize = Environment->getSkin()->getSize(EGDS_SCROLLBAR_SIZE);
-		subpanel->setRelativePosition({ 0, 0, AbsoluteClippingRect.getWidth(), AbsoluteClippingRect.getHeight() });
+		subpanel->setRelativePosition(RelativeRect);
 		if(hasVerticalScrolling || hasHorizontalScrolling) {
 			horizontalScroll->setVisible(false);
 			verticalScroll->setVisible(false);
