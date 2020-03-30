@@ -35,7 +35,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, "Edopro", __VA_ARGS__);
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
 #include <thread>
-#include "../sound_manager.h"
+#include "../bufferio.h"
 
 extern int main(int argc, char *argv[]);
 
