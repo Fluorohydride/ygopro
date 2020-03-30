@@ -20,9 +20,6 @@
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
 #endif
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#endif
 
 bool exit_on_return = false;
 bool is_from_discord = false;
@@ -171,12 +168,6 @@ void CheckArguments(int argc, path_char* argv[]) {
 int wmain(int argc, wchar_t* argv[]) {
 #else
 int main(int argc, char* argv[]) {
-#endif
-#ifdef __ANDROID__
-	porting::initAndroid();
-	porting::initializePathsAndroid();
-	if(chdir(porting::working_directory.c_str())!=0)
-		LOGE("failed to change directory");
 #endif
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());

@@ -31,24 +31,62 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fstream>
 #include <android/log.h>
 #include <vector>
+#include <unistd.h>
 #define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, "Edopro", __VA_ARGS__);
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
-#include "../bufferio.h"
 #include <thread>
 #include "../sound_manager.h"
 
 extern int main(int argc, char *argv[]);
 
+namespace porting {
+std::vector<std::string> GetExtraParameters() {
+	std::vector<std::string> ret;
+	ret.push_back("");//dummy arg 0
+
+	jobject me = app_global->activity->clazz;
+
+	jclass acl = jnienv->GetObjectClass(me); //class pointer of NativeActivity
+	jmethodID giid = jnienv->GetMethodID(acl, "getIntent", "()Landroid/content/Intent;");
+	jobject intent = jnienv->CallObjectMethod(me, giid); //Got our intent
+
+	jclass icl = jnienv->GetObjectClass(intent); //class pointer of Intent
+	jmethodID gseid = jnienv->GetMethodID(icl, "getStringArrayExtra", "(Ljava/lang/String;)[Ljava/lang/String;");
+
+	jobjectArray stringArrays = (jobjectArray)jnienv->CallObjectMethod(intent, gseid, jnienv->NewStringUTF("ARGUMENTS"));
+
+	int size = jnienv->GetArrayLength(stringArrays);
+
+	for(int i = 0; i < size; ++i) {
+		jstring string = (jstring)jnienv->GetObjectArrayElement(stringArrays, i);
+		const char* mayarray = jnienv->GetStringUTFChars(string, 0);
+		ret.push_back(mayarray);
+		jnienv->DeleteLocalRef(string);
+	}
+	return ret;
+}
+}
+
 void android_main(android_app *app)
 {
 	int retval = 0;
 	porting::app_global = app;
+	porting::initAndroid();
+	porting::initializePathsAndroid();
 
-// 	Thread::setName("Main");
+	if(chdir(porting::working_directory.c_str()) != 0)
+		LOGE("failed to change directory");
+
+	auto strparams = porting::GetExtraParameters();
+	std::vector<const char*> params;
+
+	for(auto& param : strparams) {
+		params.push_back(param.c_str());
+	}
 
 	try {
 		app_dummy();
-		main(0, nullptr);
+		main(params.size(), (char**)params.data());
 	} catch (std::exception &e) {
 // 		errorstream << "Uncaught exception in main thread: " << e.what() << std::endl;
 		retval = -1;
@@ -76,7 +114,7 @@ extern "C" {
 			auto element = irrenv->getFocus();
 			if (element && element->getType() == irr::gui::EGUIET_EDIT_BOX) {
 				auto editbox = static_cast<irr::gui::IGUIEditBox*>(element);
-				const char* text = env->GetStringUTFChars(textString, NULL);
+				const char* text = env->GetStringUTFChars(textString, nullptr);
 				auto wtext = BufferIO::DecodeUTF8s(text);
 				editbox->setText(wtext.c_str());
 				irrenv->removeFocus(editbox);
@@ -151,18 +189,18 @@ jclass findClass(std::string classname, JNIEnv* env = nullptr)
 
 void initAndroid()
 {
-	porting::jnienv = NULL;
+	jnienv = nullptr;
 	JavaVM *jvm = app_global->activity->vm;
 	JavaVMAttachArgs lJavaVMAttachArgs;
 	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
 	lJavaVMAttachArgs.name = "Edopro NativeThread";
-	lJavaVMAttachArgs.group = NULL;
+	lJavaVMAttachArgs.group = nullptr;
 #ifdef NDEBUG
 	// This is a ugly hack as arm v7a non debuggable builds crash without this
 	// printf ... if someone finds out why please fix it!
 	// infostream << "Attaching native thread. " << std::endl;
 #endif
-	if ( jvm->AttachCurrentThread(&porting::jnienv, &lJavaVMAttachArgs) == JNI_ERR) {
+	if ( jvm->AttachCurrentThread(&jnienv, &lJavaVMAttachArgs) == JNI_ERR) {
 		// errorstream << "Failed to attach native thread to jvm" << std::endl;
 		exit(-1);
 	}
@@ -185,7 +223,7 @@ static std::string javaStringToUTF8(jstring js)
 {
 	std::string str;
 	// Get string as a UTF-8 c-string
-	const char *c_str = jnienv->GetStringUTFChars(js, NULL);
+	const char *c_str = jnienv->GetStringUTFChars(js, nullptr);
 	// Save it
 	str = c_str;
 	// And free the c-string
@@ -249,7 +287,7 @@ void displayKeyboard(bool pShow) {
 	JavaVMAttachArgs lJavaVMAttachArgs;
 	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
 	lJavaVMAttachArgs.name = "NativeThread";
-	lJavaVMAttachArgs.group = NULL;
+	lJavaVMAttachArgs.group = nullptr;
 
 	lResult = lJavaVM->AttachCurrentThread(&lJNIEnv, &lJavaVMAttachArgs);
 	if(lResult == JNI_ERR) {
