@@ -186,7 +186,6 @@ bool Game::Initialize() {
 	discord.Initialize(filesystem->getWorkingDirectory().c_str());
 	discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
-	deckManager.LoadLFList();
 	env = device->getGUIEnvironment();
 #ifdef __ANDROID__
 	irr::IOSOperator* Operator = new irr::COSAndroidOperator();
@@ -1882,7 +1881,7 @@ void Game::RefreshLFLists() {
 	cbHostLFList->setSelected(0);
 	cbDBLFList->clear();
 	cbDBLFList->setSelected(0);
-	for (auto &list : deckManager._lfList) {
+	for (auto &list : gdeckManager->_lfList) {
 		auto hostIndex = cbHostLFList->addItem(list.listName.c_str(), list.hash);
 		auto deckIndex = cbDBLFList->addItem(list.listName.c_str(), list.hash);
 		if (gGameConfig->lastlflist == list.hash) {
@@ -1890,7 +1889,7 @@ void Game::RefreshLFLists() {
 			cbDBLFList->setSelected(deckIndex);
 		}
 	}
-	deckBuilder.filterList = &deckManager._lfList[mainGame->cbDBLFList->getSelected()];
+	deckBuilder.filterList = &gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()];
 }
 void Game::RefreshAiDecks() {
 	gBot.bots.clear();
@@ -2080,8 +2079,8 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	}
 	auto data_path = Utils::ToPathString(repo->data_path);
 	auto lflist_path = Utils::ToPathString(repo->lflist_path);
-	if (deckManager.LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || deckManager.LoadLFListFolder(lflist_path)) {
-		deckManager.RefreshLFList();
+	if (gdeckManager->LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || gdeckManager->LoadLFListFolder(lflist_path)) {
+		gdeckManager->RefreshLFList();
 		RefreshLFLists();
 	}
 }
@@ -2597,8 +2596,8 @@ void Game::ReloadCBFilterRule() {
 void Game::ReloadCBFilterBanlist() {
 	cbFilterBanlist->clear();
 	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).c_str());
-	for (unsigned int i = 0; i < deckManager._lfList.size(); ++i)
-		cbFilterBanlist->addItem(deckManager._lfList[i].listName.c_str(), deckManager._lfList[i].hash);
+	for (unsigned int i = 0; i < gdeckManager->_lfList.size(); ++i)
+		cbFilterBanlist->addItem(gdeckManager->_lfList[i].listName.c_str(), gdeckManager->_lfList[i].hash);
 }
 void Game::ReloadCBDuelRule() {
 	cbDuelRule->clear();
@@ -2640,15 +2639,15 @@ void Game::ReloadElementsStrings() {
 		elem.first->setText(gDataManager->GetSysString(elem.second).c_str());
 	}
 
-	unsigned int nullLFlist = deckManager._lfList.size() - 1;
-	deckManager._lfList[nullLFlist].listName = gDataManager->GetSysString(1442);
+	unsigned int nullLFlist = gdeckManager->_lfList.size() - 1;
+	gdeckManager->_lfList[nullLFlist].listName = gDataManager->GetSysString(1442);
 	auto prev = cbDBLFList->getSelected();
 	cbDBLFList->removeItem(nullLFlist);
-	cbDBLFList->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
+	cbDBLFList->addItem(gdeckManager->_lfList[nullLFlist].listName.c_str(), gdeckManager->_lfList[nullLFlist].hash);
 	cbDBLFList->setSelected(prev);
 	prev = cbHostLFList->getSelected();
 	cbHostLFList->removeItem(nullLFlist);
-	cbHostLFList->addItem(deckManager._lfList[nullLFlist].listName.c_str(), deckManager._lfList[nullLFlist].hash);
+	cbHostLFList->addItem(gdeckManager->_lfList[nullLFlist].listName.c_str(), gdeckManager->_lfList[nullLFlist].hash);
 	cbHostLFList->setSelected(prev);
 
 	prev = cbSortType->getSelected();

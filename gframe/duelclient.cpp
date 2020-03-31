@@ -524,7 +524,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->deckBuilder.results.clear();
 		mainGame->deckBuilder.hovered_code = 0;
 		mainGame->deckBuilder.is_draging = false;
-		deckManager.pre_deck = deckManager.current_deck;
+		gdeckManager->pre_deck = gdeckManager->current_deck;
 		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >=7);
 		mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
@@ -577,7 +577,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.team2 = pkt->info.team2;
 		mainGame->dInfo.best_of = pkt->info.best_of;
 		std::wstring str, str2;
-		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist)));
+		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1226), gdeckManager->GetLFListName(pkt->info.lflist)));
 		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1225), gDataManager->GetSysString(1900 + pkt->info.rule)));
 		if(mainGame->dInfo.compat_mode)
 			str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1227), gDataManager->GetSysString(1244 + pkt->info.mode)));
@@ -669,11 +669,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.time_left[0] = 0;
 		mainGame->dInfo.time_left[1] = 0;
 		mainGame->deckBuilder.filterList = 0;
-		for(auto lit = deckManager._lfList.begin(); lit != deckManager._lfList.end(); ++lit)
+		for(auto lit = gdeckManager->_lfList.begin(); lit != gdeckManager->_lfList.end(); ++lit)
 			if(lit->hash == pkt->info.lflist)
 				mainGame->deckBuilder.filterList = &(*lit);
 		if(mainGame->deckBuilder.filterList == 0)
-			mainGame->deckBuilder.filterList = &deckManager._lfList[0];
+			mainGame->deckBuilder.filterList = &gdeckManager->_lfList[0];
 		watching = 0;
 		mainGame->stHostPrepOB->setText(fmt::format(L"{} {}", gDataManager->GetSysString(1253), watching).c_str());
 		mainGame->stHostPrepRule->setText((wchar_t*)str.c_str());
@@ -4264,7 +4264,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 			hosts.push_back(*pHP);
 			std::wstring hoststr;
 			hoststr.append(L"[");
-			hoststr.append(deckManager.GetLFListName(pHP->host.lflist));
+			hoststr.append(gdeckManager->GetLFListName(pHP->host.lflist));
 			hoststr.append(L"][");
 			hoststr.append(gDataManager->GetSysString(pHP->host.rule + 1900));
 			hoststr.append(L"][");

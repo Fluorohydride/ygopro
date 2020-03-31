@@ -1231,17 +1231,17 @@ void Game::DrawDeckBd() {
 	textFont->draw(gDataManager->GetSysString(1330).c_str(), Resize(314, 136, 409, 156), 0xff000000, false, true);
 	textFont->draw(gDataManager->GetSysString(1330).c_str(), Resize(315, 137, 410, 157), 0xffffffff, false, true);
 	if(is_siding) {
-		buffer = fmt::format(L"{} ({})", deckManager.current_deck.main.size(),  deckManager.pre_deck.main.size());
+		buffer = fmt::format(L"{} ({})", gdeckManager->current_deck.main.size(),  gdeckManager->pre_deck.main.size());
 	} else {
-		buffer = fmt::to_wstring(deckManager.current_deck.main.size());
+		buffer = fmt::to_wstring(gdeckManager->current_deck.main.size());
 	}
 	numFont->draw(buffer.c_str(), Resize(379, 137, 439, 157), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(380, 138, 440, 158), 0xffffffff, false, true);
 	DRAWRECT(MAIN, 310, 160, 797, 436);
 	recti mainpos = Resize(310, 137, 797, 157);
-	buffer = fmt::format(L"{} {} {} {} {} {}", gDataManager->GetSysString(1312), deckManager.TypeCount(deckManager.current_deck.main, TYPE_MONSTER),
-		gDataManager->GetSysString(1313), deckManager.TypeCount(deckManager.current_deck.main, TYPE_SPELL),
-		gDataManager->GetSysString(1314), deckManager.TypeCount(deckManager.current_deck.main, TYPE_TRAP));
+	buffer = fmt::format(L"{} {} {} {} {} {}", gDataManager->GetSysString(1312), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_MONSTER),
+		gDataManager->GetSysString(1313), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_SPELL),
+		gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_TRAP));
 	irr::core::dimension2d<u32> mainDeckTypeSize = textFont->getDimension(buffer);
 	textFont->draw(buffer.c_str(), recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 5, mainpos.UpperLeftCorner.Y,
 		mainpos.LowerRightCorner.X, mainpos.LowerRightCorner.Y), 0xff000000, false, true);
@@ -1250,15 +1250,15 @@ void Game::DrawDeckBd() {
 	driver->draw2DRectangleOutline(Resize(309, 159, 797, 436));
 	int lx;
 	float dx;
-	if(deckManager.current_deck.main.size() <= 40) {
+	if(gdeckManager->current_deck.main.size() <= 40) {
 		dx = 436.0f / 9;
 		lx = 10;
 	} else {
-		lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
+		lx = (gdeckManager->current_deck.main.size() - 41) / 4 + 11;
 		dx = 436.0f / (lx - 1);
 	}
-	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i) {
-		DrawThumb(deckManager.current_deck.main[i], position2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
+	for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i) {
+		DrawThumb(gdeckManager->current_deck.main[i], position2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
 		if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
 	}
@@ -1268,17 +1268,17 @@ void Game::DrawDeckBd() {
 	textFont->draw(gDataManager->GetSysString(1331).c_str(), Resize(314, 439, 409, 459), 0xff000000, false, true);
 	textFont->draw(gDataManager->GetSysString(1331).c_str(), Resize(315, 440, 410, 460), 0xffffffff, false, true);
 	if(is_siding) {
-		buffer = fmt::format(L"{} ({})", deckManager.current_deck.extra.size(), deckManager.pre_deck.extra.size());
+		buffer = fmt::format(L"{} ({})", gdeckManager->current_deck.extra.size(), gdeckManager->pre_deck.extra.size());
 	} else {
-		buffer = fmt::to_wstring(deckManager.current_deck.extra.size());
+		buffer = fmt::to_wstring(gdeckManager->current_deck.extra.size());
 	}
 	numFont->draw(buffer.c_str(), Resize(379, 440, 439, 460), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(380, 441, 440, 461), 0xffffffff, false, true);
 	recti extrapos = Resize(310, 440, 797, 460);
-	buffer = fmt::format(L"{} {} {} {} {} {} {} {}", gDataManager->GetSysString(1056), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_FUSION),
-		gDataManager->GetSysString(1073), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_XYZ),
-		gDataManager->GetSysString(1063), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_SYNCHRO),
-		gDataManager->GetSysString(1076), deckManager.TypeCount(deckManager.current_deck.extra, TYPE_LINK));
+	buffer = fmt::format(L"{} {} {} {} {} {} {} {}", gDataManager->GetSysString(1056), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_FUSION),
+		gDataManager->GetSysString(1073), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_XYZ),
+		gDataManager->GetSysString(1063), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_SYNCHRO),
+		gDataManager->GetSysString(1076), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_LINK));
 	irr::core::dimension2d<u32> extraDeckTypeSize = textFont->getDimension(buffer);
 	textFont->draw(buffer.c_str(), recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
 		extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y), 0xff000000, false, true);
@@ -1286,11 +1286,11 @@ void Game::DrawDeckBd() {
 		extrapos.LowerRightCorner.X + 1, extrapos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
 	DRAWRECT(EXTRA, 310, 463, 797, 533);
 	driver->draw2DRectangleOutline(Resize(309, 462, 797, 533));
-	if(deckManager.current_deck.extra.size() <= 10)
+	if(gdeckManager->current_deck.extra.size() <= 10)
 		dx = 436.0f / 9;
-	else dx = 436.0f / (deckManager.current_deck.extra.size() - 1);
-	for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i) {
-		DrawThumb(deckManager.current_deck.extra[i], position2di(314 + i * dx, 466), deckBuilder.filterList);
+	else dx = 436.0f / (gdeckManager->current_deck.extra.size() - 1);
+	for(size_t i = 0; i < gdeckManager->current_deck.extra.size(); ++i) {
+		DrawThumb(gdeckManager->current_deck.extra[i], position2di(314 + i * dx, 466), deckBuilder.filterList);
 		if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531));
 	}
@@ -1300,16 +1300,16 @@ void Game::DrawDeckBd() {
 	textFont->draw(gDataManager->GetSysString(1332).c_str(), Resize(314, 536, 409, 556), 0xff000000, false, true);
 	textFont->draw(gDataManager->GetSysString(1332).c_str(), Resize(315, 537, 410, 557), 0xffffffff, false, true);
 	if(is_siding) {
-		buffer = fmt::format(L"{} ({})", deckManager.current_deck.side.size(), deckManager.pre_deck.side.size());
+		buffer = fmt::format(L"{} ({})", gdeckManager->current_deck.side.size(), gdeckManager->pre_deck.side.size());
 	} else {
-		buffer = fmt::to_wstring(deckManager.current_deck.side.size());
+		buffer = fmt::to_wstring(gdeckManager->current_deck.side.size());
 	}
 	numFont->draw(buffer.c_str(), Resize(379, 536, 439, 556), 0xff000000, false, true);
 	numFont->draw(buffer.c_str(), Resize(380, 537, 440, 557), 0xffffffff, false, true);
 	recti sidepos = Resize(310, 537, 797, 557);
-	buffer = fmt::format(L"{} {} {} {} {} {}", gDataManager->GetSysString(1312), deckManager.TypeCount(deckManager.current_deck.side, TYPE_MONSTER),
-		gDataManager->GetSysString(1313), deckManager.TypeCount(deckManager.current_deck.side, TYPE_SPELL),
-		gDataManager->GetSysString(1314), deckManager.TypeCount(deckManager.current_deck.side, TYPE_TRAP));
+	buffer = fmt::format(L"{} {} {} {} {} {}", gDataManager->GetSysString(1312), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_MONSTER),
+		gDataManager->GetSysString(1313), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_SPELL),
+		gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_TRAP));
 	irr::core::dimension2d<u32> sideDeckTypeSize = textFont->getDimension(buffer);
 	textFont->draw(buffer.c_str(), recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 5, sidepos.UpperLeftCorner.Y,
 		sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y), 0xff000000, false, true);
@@ -1317,11 +1317,11 @@ void Game::DrawDeckBd() {
 		sidepos.LowerRightCorner.X + 1, sidepos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
 	DRAWRECT(SIDE, 310, 560, 797, 630);
 	driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));
-	if(deckManager.current_deck.side.size() <= 10)
+	if(gdeckManager->current_deck.side.size() <= 10)
 		dx = 436.0f / 9;
-	else dx = 436.0f / (deckManager.current_deck.side.size() - 1);
-	for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i) {
-		DrawThumb(deckManager.current_deck.side[i], position2di(314 + i * dx, 564), deckBuilder.filterList);
+	else dx = 436.0f / (gdeckManager->current_deck.side.size() - 1);
+	for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i) {
+		DrawThumb(gdeckManager->current_deck.side[i], position2di(314 + i * dx, 564), deckBuilder.filterList);
 		if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629));
 	}

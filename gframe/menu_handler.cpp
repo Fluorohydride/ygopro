@@ -23,14 +23,14 @@ void UpdateDeck() {
 	gGameConfig->lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
 	char deckbuf[1024];
 	char* pdeck = deckbuf;
-	BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
-	BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.side.size());
-	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.main[i]->code);
-	for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.extra[i]->code);
-	for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, deckManager.current_deck.side[i]->code);
+	BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.main.size() + gdeckManager->current_deck.extra.size());
+	BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.side.size());
+	for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i)
+		BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.main[i]->code);
+	for(size_t i = 0; i < gdeckManager->current_deck.extra.size(); ++i)
+		BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.extra[i]->code);
+	for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i)
+		BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.side[i]->code);
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 }
 void LoadReplay() {
@@ -333,9 +333,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HP_READY: {
 				bool check = false;
 				if(!mainGame->cbDeckSelect2->isVisible())
-					check = (mainGame->cbDeckSelect->getSelected() == -1 || !deckManager.LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
+					check = (mainGame->cbDeckSelect->getSelected() == -1 || !gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
 				else
-					check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !deckManager.LoadDeckDouble(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())), Utils::ToPathString(mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected()))));
+					check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !gdeckManager->LoadDeckDouble(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())), Utils::ToPathString(mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected()))));
 				if(check)
 					break;
 				UpdateDeck();
@@ -471,7 +471,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				auto replay_name = Utils::GetFileName(ReplayMode::cur_replay.GetReplayName());
 				for(int i = 0; i < decks.size(); i++) {
-					deckManager.SaveDeck(sanitize(fmt::format(EPRO_TEXT("{} player{:02} {}"), replay_name, i, Utils::ToPathString(players[i]))), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
+					gdeckManager->SaveDeck(sanitize(fmt::format(EPRO_TEXT("{} player{:02} {}"), replay_name, i, Utils::ToPathString(players[i]))), decks[i].main_deck, decks[i].extra_deck, std::vector<int>());
 				}
 				mainGame->stACMessage->setText(gDataManager->GetSysString(1367).c_str());
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -497,13 +497,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
-				if(open_file && deckManager.LoadDeck(open_file_name)) {
+				if(open_file && gdeckManager->LoadDeck(open_file_name)) {
 					auto name = Utils::GetFileName(open_file_name);
 					mainGame->ebDeckname->setText(Utils::ToUnicodeIfNeeded(name).c_str());
 					mainGame->cbDBDecks->setSelected(-1);
 					open_file = false;
 				} else if(mainGame->cbDBDecks->getSelected() != -1) {
-					deckManager.LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected())));
+					gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected())));
 					mainGame->ebDeckname->setText(L"");
 				}
 				mainGame->HideElement(mainGame->wMainMenu);
@@ -694,9 +694,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					bool check = false;
 					if (!mainGame->cbDeckSelect2->isVisible())
-						check = (mainGame->cbDeckSelect->getSelected() == -1 || !deckManager.LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
+						check = (mainGame->cbDeckSelect->getSelected() == -1 || !gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))));
 					else
-						check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !deckManager.LoadDeckDouble(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())), Utils::ToPathString(mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected()))));
+						check = (mainGame->cbDeckSelect->getSelected() == -1 || mainGame->cbDeckSelect2->getSelected() == -1 || !gdeckManager->LoadDeckDouble(Utils::ToPathString(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected())), Utils::ToPathString(mainGame->cbDeckSelect2->getItem(mainGame->cbDeckSelect2->getSelected()))));
 					if(check) {
 						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
 						break;
@@ -789,7 +789,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case COMBOBOX_HOST_LFLIST: {
 				int selected = mainGame->cbHostLFList->getSelected();
 				if (selected < 0) break;
-				LFList* lflist = deckManager.GetLFList(mainGame->cbHostLFList->getItemData(selected));
+				LFList* lflist = gdeckManager->GetLFList(mainGame->cbHostLFList->getItemData(selected));
 				if (lflist && lflist->whitelist) {
 					mainGame->cbRule->setSelected(static_cast<int>(DuelAllowedCards::ALLOWED_CARDS_ANY));
 				}  // heuristic for general use case of whitelists
@@ -879,7 +879,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(to_open_file.size()) {
 					auto extension = Utils::GetFileExtension(to_open_file);
 					bool isMenu = !mainGame->wSinglePlay->isVisible() && !mainGame->wReplay->isVisible();
-					if(extension == L"ydk" && isMenu && deckManager.LoadDeck(Utils::ToPathString(to_open_file))) {
+					if(extension == L"ydk" && isMenu && gdeckManager->LoadDeck(Utils::ToPathString(to_open_file))) {
 						mainGame->RefreshDeck(mainGame->cbDBDecks);
 						auto name = Utils::GetFileName(to_open_file);
 						mainGame->ebDeckname->setText(name.c_str());

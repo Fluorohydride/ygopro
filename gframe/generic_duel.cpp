@@ -368,7 +368,7 @@ void GenericDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 			if(dueler.deck_error) {
 				deckerror = (DECKERROR_UNKNOWNCARD << 28) + dueler.deck_error;
 			} else {
-				deckerror = deckManager.CheckDeck(dueler.pdeck, host_info.lflist, static_cast<DuelAllowedCards>(host_info.rule), host_info.extra_rules & DOUBLE_DECK, host_info.forbiddentypes);
+				deckerror = gdeckManager->CheckDeck(dueler.pdeck, host_info.lflist, static_cast<DuelAllowedCards>(host_info.rule), host_info.extra_rules & DOUBLE_DECK, host_info.forbiddentypes);
 			}
 		}
 		if(deckerror) {
@@ -410,9 +410,9 @@ void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 		return;
 	}
 	if(match_result.empty()) {
-		dueler.deck_error = deckManager.LoadDeck(dueler.pdeck, (int*)deckbuf, mainc, sidec);
+		dueler.deck_error = gdeckManager->LoadDeck(dueler.pdeck, (int*)deckbuf, mainc, sidec);
 	} else {
-		if(deckManager.LoadSide(dueler.pdeck, (int*)deckbuf, mainc, sidec)) {
+		if(gdeckManager->LoadSide(dueler.pdeck, (int*)deckbuf, mainc, sidec)) {
 			dueler.ready = true;
 			NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 			if(CheckReady()) {

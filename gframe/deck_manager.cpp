@@ -9,8 +9,6 @@
 
 namespace ygo {
 
-DeckManager deckManager;
-
 bool DeckManager::LoadLFListSingle(const path_string& path) {
 	bool loaded = false;
 	std::ifstream infile(path, std::ifstream::in);
@@ -79,7 +77,7 @@ void DeckManager::LoadLFList() {
 	LoadLFListSingle(EPRO_TEXT("./lflist.conf"));
 	LoadLFListFolder(EPRO_TEXT("./lflists/"));
 	LFList nolimit;
-	nolimit.listName = gDataManager->GetSysString(1442); // N/A
+	nolimit.listName = L"N/A"; // N/A
 	nolimit.hash = 0;
 	nolimit.content.clear();
 	nolimit.whitelist = false;

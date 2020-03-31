@@ -2,6 +2,7 @@
 #include <fstream>
 #include <curl/curl.h>
 #include <irrlicht.h>
+#include "deck_manager.h"
 #include "logging.h"
 #include "utils.h"
 #ifndef __ANDROID__
@@ -101,6 +102,7 @@ DataHandler::DataHandler() {
 #endif
 	filesystem = new irr::io::CFileSystem();
 	LoadZipArchives();
+	deckManager = std::unique_ptr<DeckManager>(new DeckManager());
 	gitManager = std::unique_ptr<RepoManager>(new RepoManager());
 #ifdef __ANDROID__
 	configs->working_directory = porting::working_directory;
@@ -111,6 +113,7 @@ DataHandler::DataHandler() {
 	imageDownloader = std::unique_ptr<ImageDownloader>(new ImageDownloader());
 	LoadDatabases();
 	LoadPicUrls();
+	deckManager->LoadLFList();
 	auto strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./config/strings.conf"));
 	strings_loaded = dataManager->LoadStrings(EPRO_TEXT("./expansions/strings.conf")) || strings_loaded;
 	if(!strings_loaded) {

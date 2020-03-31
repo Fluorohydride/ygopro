@@ -31,6 +31,7 @@ ygo::DataManager* ygo::gDataManager = nullptr;
 ygo::SoundManager* ygo::gSoundManager = nullptr;
 ygo::GameConfig* ygo::gGameConfig = nullptr;
 ygo::RepoManager* ygo::gRepoManager = nullptr;
+ygo::DeckManager* ygo::gdeckManager = nullptr;
 
 inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
@@ -219,6 +220,7 @@ int main(int argc, char* argv[]) {
 		ygo::gSoundManager = data->sounds.get();
 		ygo::gGameConfig = data->configs.get();
 		ygo::gRepoManager = data->gitManager.get();
+		ygo::gdeckManager = data->deckManager.get();
 	}
 	catch(std::exception e) {
 		ygo::ErrorLog(e.what());

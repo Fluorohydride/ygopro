@@ -78,7 +78,7 @@ restart:
 			hand_test = true;
 			OCG_DestroyDuel(pduel);
 			pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR5 | DUEL_SIMPLE_AI, { 8000, 5, 1 }, { 8000, 0, 0 } });
-			Deck playerdeck(deckManager.current_deck);
+			Deck playerdeck(gdeckManager->current_deck);
 			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
 			OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
 			card_info.duelist = 0;

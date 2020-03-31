@@ -81,7 +81,7 @@ void ServerLobby::FillOnlineRooms() {
 			}
 			/*add mutex for banlist access*/
 			if(searchBanlist > 0) {
-				if(room.info.lflist != deckManager._lfList[searchBanlist - 1].hash) {
+				if(room.info.lflist != gdeckManager->_lfList[searchBanlist - 1].hash) {
 					continue;
 				}
 			}
@@ -90,7 +90,7 @@ void ServerLobby::FillOnlineRooms() {
 		}
 		std::wstring banlist;
 
-		for(auto& list : deckManager._lfList) {
+		for(auto& list : gdeckManager->_lfList) {
 			if(list.hash == room.info.lflist) {
 				banlist = list.listName;
 				break;

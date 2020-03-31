@@ -6,6 +6,7 @@
 #include "game_config.h"
 #include "sound_manager.h"
 #include "data_manager.h"
+#include "deck_manager.h"
 
 namespace irr {
 class IrrlichtDevice;
@@ -27,6 +28,7 @@ public:
 	DataHandler();
 	~DataHandler();
 	irr::IrrlichtDevice* tmp_device;
+	std::unique_ptr<DeckManager> deckManager = nullptr;
 	std::unique_ptr<RepoManager> gitManager = nullptr;
 	std::unique_ptr<GameConfig> configs = nullptr;
 	std::unique_ptr<SoundManager> sounds = nullptr;

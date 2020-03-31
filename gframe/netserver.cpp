@@ -230,14 +230,14 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode = new GenericDuel(pkt->info.team1, pkt->info.team2, !!(pkt->info.duel_flag & DUEL_RELAY), pkt->info.best_of);
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, GenericDuel::GenericTimer, duel_mode);
 		unsigned int hash = 1;
-		for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit) {
+		for(auto lfit = gdeckManager->_lfList.begin(); lfit != gdeckManager->_lfList.end(); ++lfit) {
 			if(pkt->info.lflist == lfit->hash) {
 				hash = pkt->info.lflist;
 				break;
 			}
 		}
 		if(hash == 1)
-			pkt->info.lflist = deckManager._lfList[0].hash;
+			pkt->info.lflist = gdeckManager->_lfList[0].hash;
 		duel_mode->host_info = pkt->info;
 		BufferIO::CopyWStr(pkt->name, duel_mode->name, 20);
 		BufferIO::CopyWStr(pkt->pass, duel_mode->pass, 20);
