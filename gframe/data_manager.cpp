@@ -339,10 +339,8 @@ std::vector<unsigned int> DataManager::GetSetCode(std::vector<std::wstring>& set
 				}
 			}
 		} else {
-			if(Utils::ContainsSubstring(str, setname)) {
+			if(Utils::ContainsSubstring(str, setname))
 				res.push_back(string.first);
-				break;
-			}
 		}
 	}
 	return res;
