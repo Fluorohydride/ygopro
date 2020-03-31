@@ -878,8 +878,10 @@ void CGUIFileSelectListBox::addFilteredExtensions(std::vector<std::wstring> exte
 }
 
 bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory, void *) {
-	if(is_directory)
-		return true;
+	if (is_directory) {
+		auto elements = ygo::Utils::TokenizeString<std::wstring>(name, L"/");
+		return !(elements.size() && elements.back().size() && elements.back().front() == L'.' && elements.back() != L"..");
+	}
 	auto pos = name.find_last_of('.');
 	if(pos == std::wstring::npos)
 		return false;
