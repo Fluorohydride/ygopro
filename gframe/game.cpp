@@ -275,7 +275,7 @@ bool Game::Initialize() {
 	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, false, wVersion);
 	int titleWidth = stVersion->getTextWidth();
 	stVersion->setRelativePosition(recti(Scale(10), Scale(10), titleWidth + Scale(10), Scale(35)));
-	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 290, 65), false, true, wVersion);
+	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 500, 65), false, false, wVersion);
 	RefreshUICoreVersion();
 	stExpectedCoreVersion = env->addStaticText(
 		GetLocalizedExpectedCore().c_str(),
@@ -284,7 +284,6 @@ bool Game::Initialize() {
 		GetLocalizedCompatVersion().c_str(),
 		Scale(10, 100, 290, 125), false, true, wVersion);
 	((CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
-	wVersion->setRelativePosition(recti(0, 0, std::max(Scale(300), stVersion->getTextWidth() + Scale(20)), Scale(135)));
 	mBeta = mTopMenu->getSubMenu(mTopMenu->addItem(L"CLOSED BETA ONLY", 4));
 	//main menu
 	int mainMenuWidth = std::max(280, static_cast<int>(titleWidth / dpi_scale + 15));
@@ -2488,6 +2487,9 @@ void Game::RefreshUICoreVersion() {
 	} else {
 		stCoreVersion->setText(L"");
 	}
+	auto w1 = stVersion->getTextWidth();
+	auto w2 = stCoreVersion->getTextWidth();
+	wVersion->setRelativePosition(recti(0, 0, Scale(20) + std::max({ Scale(280), w1, w2 }), Scale(135)));
 }
 std::wstring Game::GetLocalizedExpectedCore() {
 	return fmt::format(gDataManager->GetSysString(2011), OCG_VERSION_MAJOR, OCG_VERSION_MINOR);
