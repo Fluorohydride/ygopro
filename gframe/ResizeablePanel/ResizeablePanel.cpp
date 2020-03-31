@@ -45,7 +45,7 @@ namespace gui {
 							auto rect = getSubPaneRect();
 							auto horizontal_size = horizontalScroll->isVisible() ? horizontalScroll->getPos() : 0;
 							auto vertical_size = verticalScroll->isVisible() ? verticalScroll->getPos() : 0;
-							rect.UpperLeftCorner -= irr::core::vector2di({horizontal_size, vertical_size});
+							rect.UpperLeftCorner -= irr::core::vector2di(horizontal_size, vertical_size);
 							subpanel->setRelativePosition(rect);
 						}
 					}
