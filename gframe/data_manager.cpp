@@ -330,10 +330,20 @@ std::vector<unsigned int> DataManager::GetSetCode(std::vector<std::wstring>& set
 	for(auto& string : _setnameStrings.map) {
 		if(string.second.first.empty())
 			continue;
-		auto str = string.second.second.size() ? string.second.second : string.second.first;
-		auto xpos = str.find_first_of(L'|');//setname|extra info
-		if(Utils::ContainsSubstring(str.substr(0, xpos), setname, true))
-			res.push_back(string.first);
+		auto str = Utils::ToUpperNoAccents(string.second.second.size() ? string.second.second : string.second.first);
+		if(str.find(L'|') != std::wstring::npos){
+			for(auto& name : Utils::TokenizeString<std::wstring>(Utils::ToUpperNoAccents(str), L"|")) {
+				if(Utils::ContainsSubstring(name, setname)) {
+					res.push_back(string.first);
+					break;
+				}
+			}
+		} else {
+			if(Utils::ContainsSubstring(str, setname)) {
+				res.push_back(string.first);
+				break;
+			}
+		}
 	}
 	return res;
 }
