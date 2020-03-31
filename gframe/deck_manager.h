@@ -67,7 +67,7 @@ public:
 	bool RenameDeck(const path_string& oldname, const path_string& newname);
 };
 
-extern DeckManager* deckManager;
+extern DeckManager* gdeckManager;
 
 }
 
