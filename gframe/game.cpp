@@ -693,7 +693,6 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.window, 1273);
 	gSettings.window->setVisible(false);
 	auto sRect = gSettings.window->getClientRect();
-	sRect.UpperLeftCorner.Y += Scale(30);
 	gSettings.panel = Panel::addPanel(env, gSettings.window, -1, sRect, true, false);
 	auto sPanel = gSettings.panel->getSubpanel();
 	gSettings.chkShowScopeLabel = env->addCheckBox(gGameConfig->showScopeLabel, Scale(15, 5, 320, 30), sPanel, CHECKBOX_SHOW_SCOPE_LABEL, gDataManager->GetSysString(2076).c_str());
@@ -2881,9 +2880,6 @@ void Game::OnResize() {
 	btnTabShowSettings->setRelativePosition(rect<s32>(Scale(20), Scale(415), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(435)));
 
 	SetCentered(gSettings.window);
-	auto sRect = gSettings.window->getClientRect();
-	sRect.UpperLeftCorner.Y += Scale(30);
-	gSettings.panel->setRelativePosition(sRect);
 
 	wChat->setRelativePosition(rect<s32>(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 
