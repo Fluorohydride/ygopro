@@ -315,7 +315,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_RETRY:	{
 			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(L"Error occurs.");
+			mainGame->stMessage->setText(gDataManager->GetSysString(1434).c_str());
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();

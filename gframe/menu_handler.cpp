@@ -148,7 +148,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_JOIN_HOST2: {
 				if(wcslen(mainGame->ebNickNameOnline->getText()) <= 0) {
-					mainGame->PopupMessage(L"Please enter a nickname", L"Nickname empty");
+					mainGame->PopupMessage(gDataManager->GetSysString(1257).c_str(), gDataManager->GetSysString(1256).c_str());
 					break;
 				}
 				if(mainGame->roomListTable->getSelected() >= 0) {

@@ -91,7 +91,7 @@ struct GameConfig
 	int musicVolume = 20;
 	int soundVolume = 20;
 	path_string skin = EPRO_TEXT("none");
-	path_string locale = EPRO_TEXT("en");
+	path_string locale = EPRO_TEXT("English");
 	path_string working_directory = EPRO_TEXT("./");
 
 	nlohmann::json configs;

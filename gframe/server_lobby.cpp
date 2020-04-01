@@ -171,7 +171,7 @@ int ServerLobby::GetRoomsThread() {
 	curl_easy_cleanup(curl_handle);
 	if(res != CURLE_OK) {
 		//error
-		mainGame->PopupMessage(gDataManager->GetSysString(2037), L"Error 05");
+		mainGame->PopupMessage(gDataManager->GetSysString(2037));
 		GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
 		mainGame->btnLanRefresh2->setEnabled(true);
 		mainGame->serverChoice->setEnabled(true);
@@ -181,7 +181,7 @@ int ServerLobby::GetRoomsThread() {
 	}
 
 	if(retrieved_data == "[server busy]") {
-		mainGame->PopupMessage(gDataManager->GetSysString(2031), L"Error 04");
+		mainGame->PopupMessage(gDataManager->GetSysString(2031));
 	} else {
 		roomsVector.clear();
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
