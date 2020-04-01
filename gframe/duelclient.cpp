@@ -611,7 +611,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		if (rule == 6) {
 			uint32_t filter = 0x100;
-			for (int i = 0; i < 6; ++i, filter <<= 1)
+			for (int i = 0; i < 7 + 12; ++i, filter <<= 1)
 				if (pkt->info.duel_flag & filter) {
 					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
 				}
@@ -641,6 +641,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		for (const auto pair : MONSTER_TYPES) {
 			if (pkt->info.forbiddentypes & pair.first) {
 				strL += fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(pair.second));
+				strL += L"\n";
 			}
 		}
 		mainGame->gMutex.lock();

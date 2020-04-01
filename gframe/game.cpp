@@ -401,35 +401,35 @@ bool Game::Initialize() {
 	forbiddentypes = gGameConfig->lastDuelForbidden;
 	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, gDataManager->GetSysString(1626).c_str());
 	defaultStrings.emplace_back(btnCustomRule, 1626);
-	wCustomRulesL = env->addWindow(Scale(50, 100, 320, 430), false, L"");
+	wCustomRulesL = env->addWindow(Scale(20, 100, 320, 430), false, L"");
 	wCustomRulesL->getCloseButton()->setVisible(false);
 	wCustomRulesL->setDrawTitlebar(false);
 	wCustomRulesL->setVisible(false);
-	wCustomRulesR = env->addWindow(Scale(700, 100, 970, 430), false, L"");
+	wCustomRulesR = env->addWindow(Scale(700, 100, 1000, 430), false, L"");
 	wCustomRulesR->getCloseButton()->setVisible(false);
 	wCustomRulesR->setDrawTitlebar(false);
 	wCustomRulesR->setVisible(false);
 	int spacingL = 0, spacingR = 0;
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1629).c_str(), Scale(10, 10 + spacingL * 20, 250, 30 + spacingL * 20), false, false, wCustomRulesL);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1629).c_str(), Scale(10, 10 + spacingL * 20, 290, 30 + spacingL * 20), false, false, wCustomRulesL);
 	defaultStrings.emplace_back(tmpptr, 1629);
 	spacingL++;
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1629).c_str(), Scale(10, 10 + spacingR * 20, 250, 30 + spacingR * 20), false, false, wCustomRulesR);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1629).c_str(), Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), false, false, wCustomRulesR);
 	defaultStrings.emplace_back(tmpptr, 1629);
 	spacingR++;
 	std::wcout << DUEL_MODE_MR5 << std::endl;
 	for(int i = 0; i < 7; ++i, ++spacingR) {
-		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100<<i, Scale(10, 10 + spacingR * 20, 250, 30 + spacingR * 20), wCustomRulesR, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
+		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100<<i, Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), wCustomRulesR, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}
 	for(int i = 7; i < 7 + 12; ++i, ++spacingL) {
-		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100 << i, Scale(10, 10 + spacingL * 20, 250, 30 + spacingL * 20), wCustomRulesL, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
+		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100 << i, Scale(10, 10 + spacingL * 20, 290, 30 + spacingL * 20), wCustomRulesL, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1628).c_str(), Scale(10, 10 + spacingR * 20, 250, 30 + spacingR * 20), false, false, wCustomRulesR);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1628).c_str(), Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), false, false, wCustomRulesR);
 	defaultStrings.emplace_back(tmpptr, 1628);
 	const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 #define TYPECHK(id,stringid) spacingR++;\
-	chkTypeLimit[id] = env->addCheckBox(forbiddentypes & limits[id], Scale(10, 10 + spacingR * 20, 250, 30 + spacingR * 20), wCustomRulesR, -1, fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).c_str());
+	chkTypeLimit[id] = env->addCheckBox(forbiddentypes & limits[id], Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), wCustomRulesR, -1, fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).c_str());
 	TYPECHK(0, 1056);
 	TYPECHK(1, 1063);
 	TYPECHK(2, 1073);
@@ -491,12 +491,12 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(wHostPrepareL, 1628);
 	wHostPrepareL->getCloseButton()->setVisible(false);
 	wHostPrepareL->setVisible(false);
-	stHostPrepRuleR = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareR, -1, Scale(10, 30, 460, 350));
+	stHostPrepRuleR = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareR, -1, Scale(10, 30, 190, 350));
 	stHostPrepRuleR->setWordWrap(true);
 #ifdef __ANDROID__
 	((CGUICustomText*)stHostPrepRuleR)->setTouchControl(!gGameConfig->native_mouse);
 #endif
-	stHostPrepRuleL = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareL, -1, Scale(10, 30, 460, 350));
+	stHostPrepRuleL = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareL, -1, Scale(10, 30, 190, 350));
 	stHostPrepRuleL->setWordWrap(true);
 #ifdef __ANDROID__
 	((CGUICustomText*)stHostPrepRuleL)->setTouchControl(!gGameConfig->native_mouse);
@@ -1350,13 +1350,13 @@ bool Game::Initialize() {
 	ebRoomName->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show locked rooms checkbox
-	chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 800, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, gDataManager->GetSysString(1994).c_str());
+	chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 1024, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, gDataManager->GetSysString(1994).c_str());
 	defaultStrings.emplace_back(chkShowPassword, 1994);
 	((CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
 	chkShowPassword->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	//show active rooms checkbox
-	chkShowActiveRooms = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 800, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, gDataManager->GetSysString(1985).c_str());
+	chkShowActiveRooms = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 1024, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, gDataManager->GetSysString(1985).c_str());
 	defaultStrings.emplace_back(chkShowActiveRooms, 1985);
 	((CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
 	chkShowActiveRooms->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
@@ -2822,8 +2822,8 @@ void Game::OnResize() {
 		wHostPrepareL->setRelativePosition(ResizeWin(70, 120, 270, 440));
 	}
 	wRules->setRelativePosition(ResizeWin(630, 100, 1000, 310));
-	wCustomRulesL->setRelativePosition(ResizeWin(50, 100, 320, 430));
-	wCustomRulesR->setRelativePosition(ResizeWin(700, 100, 970, 430));
+	wCustomRulesL->setRelativePosition(ResizeWin(20, 100, 320, 430));
+	wCustomRulesR->setRelativePosition(ResizeWin(700, 100, 1000, 430));
 	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wSinglePlay->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	gBot.window->setRelativePosition(core::position2di(wHostPrepare->getAbsolutePosition().LowerRightCorner.X, wHostPrepare->getAbsolutePosition().UpperLeftCorner.Y));
