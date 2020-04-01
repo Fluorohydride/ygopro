@@ -281,8 +281,10 @@ core::rect<s32> CImageGUISkin::draw3DWindowBackground(IGUIElement* element,
         return FallbackSkin->draw3DWindowBackground(element, drawTitleBar, titleBarColor, rect, clip, checkClientArea);
     }
 
-	if(checkClientArea)
+	if(checkClientArea) {
 		*checkClientArea = rect;
+		checkClientArea->UpperLeftCorner.Y = rect.UpperLeftCorner.Y + Config.Window.DstBorder.Top;
+	}
 
 	drawElementStyle( Config.Window, rect, clip );
     
