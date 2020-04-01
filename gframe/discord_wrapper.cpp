@@ -98,18 +98,16 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 		case DUEL:
 		case DUEL_STARTED:
 		case DECK_SIDING: {
+			auto count = ygo::DuelClient::GetPlayersCount();
+			discordPresence.partySize = std::max(1, count.first + count.second);
+			discordPresence.partyMax = ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2 + ygo::DuelClient::GetSpectatorsCount() + 1;
 			if(presence == IN_LOBBY) {
 				discordPresence.details = "Hosting a Duel";
-				auto count = ygo::DuelClient::GetPlayersCount();
-				discordPresence.partySize = count.first + count.second;
-				discordPresence.partyMax = ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2;
-				//discordPresence.joinSecret = "join";
 			} else {
 				if(presence == DECK_SIDING)
 					discordPresence.details = "Side decking";
 				else
 					discordPresence.details = "Dueling";
-				//discordPresence.spectateSecret = "look";
 			}
 			if(((ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2) > 2) || ygo::mainGame->dInfo.isRelay)
 				presenceState = fmt::format("{}: {} vs {}", ygo::mainGame->dInfo.isRelay ? "Relay" : "Tag", ygo::mainGame->dInfo.team1, ygo::mainGame->dInfo.team2).c_str();
@@ -145,9 +143,7 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 	discordPresence.state = presenceState.c_str();
 	discordPresence.startTimestamp = start;
 	discordPresence.largeImageKey = "game-icon";
-	//discordPresence.smallImageKey = "game-icon";
 	discordPresence.partyId = partyid.c_str();
-	//discordPresence.joinSecret = "join";
 	Discord_UpdatePresence(&discordPresence);
 #endif
 }

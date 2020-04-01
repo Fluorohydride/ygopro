@@ -54,6 +54,9 @@ public:
 	static ReplayStream replay_stream;
 	static Replay last_replay;
 	static int ClientAnalyze(char* msg, unsigned int len);
+	static int GetSpectatorsCount() {
+		return watching;
+	};
 	static void SwapField();
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned int len);
