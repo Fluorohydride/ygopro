@@ -225,8 +225,13 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		if(dp->game || duel_mode)
 			return;
 		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
-		if(pkt->info.handshake != SERVER_HANDSHAKE)
+		if(pkt->info.handshake != SERVER_HANDSHAKE) {
+			STOC_ErrorMsg scem;
+			scem.msg = ERRMSG_VERERROR2;
+			scem.code = CLIENT_VERSION;
+			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 			return;
+		}
 		duel_mode = new GenericDuel(pkt->info.team1, pkt->info.team2, !!(pkt->info.duel_flag & DUEL_RELAY), pkt->info.best_of);
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, GenericDuel::GenericTimer, duel_mode);
 		unsigned int hash = 1;
