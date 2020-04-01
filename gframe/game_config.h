@@ -28,7 +28,7 @@ struct GameConfig
 	unsigned int coreLogOutput = CORE_LOG_TO_CHAT | CORE_LOG_TO_FILE;
 	unsigned short antialias = 0;
 	std::wstring serverport = L"7911";
-	unsigned char textfontsize = 13;
+	unsigned char textfontsize = 12;
 	std::wstring lasthost = L"127.0.0.1";
 	std::wstring lastport = L"7911";
 	std::wstring nickname = L"Player";
@@ -36,7 +36,7 @@ struct GameConfig
 	std::wstring lastdeck = L"";
 	unsigned int lastlflist = 0;
 	unsigned int lastallowedcards = 3;
-	unsigned int lastDuelParam = 0x6800; //#define DUEL_MODE_MR5 0x6800 //DUEL_PZONE | DUEL_EMZONE | DUEL_FSX_MMZONE
+	unsigned int lastDuelParam = 0x2E800; //#define DUEL_MODE_MR5
 	unsigned int lastDuelForbidden = 0; //#define DUEL_MODE_MR5_FORB
 	unsigned int timeLimit = 180;
 	unsigned int team1count = 1;
