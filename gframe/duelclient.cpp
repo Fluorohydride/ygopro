@@ -257,7 +257,7 @@ catch(...) { what = def; }
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->HideElement(mainGame->wHostPrepare);
-					mainGame->HideElement(mainGame->wHostPrepare2);
+					mainGame->HideElement(mainGame->wHostPrepareR);
 					mainGame->HideElement(mainGame->gBot.window);
 					if(mainGame->isHostingOnline) {
 						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
@@ -578,7 +578,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.team1 = pkt->info.team1;
 		mainGame->dInfo.team2 = pkt->info.team2;
 		mainGame->dInfo.best_of = pkt->info.best_of;
-		std::wstring str, str2;
+		std::wstring str, strR, strL;
 		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1226), gdeckManager->GetLFListName(pkt->info.lflist)));
 		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1225), gDataManager->GetSysString(1900 + pkt->info.rule)));
 		if(mainGame->dInfo.compat_mode)
@@ -609,7 +609,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			uint32_t filter = 0x100;
 			for (int i = 0; i < 6; ++i, filter <<= 1)
 				if (pkt->info.duel_flag & filter) {
-					str2.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
+					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
 				}
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1630)));
 		} else if (rule != DEFAULT_DUEL_RULE) {
@@ -618,7 +618,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(!mainGame->dInfo.compat_mode) {
 			for(int flag = SEALED_DUEL, i = 0; flag < ACTION_DUEL + 1; flag = flag << 1, i++)
 				if(pkt->info.extra_rules & flag) {
-					str2.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1132 + i)));
+					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1132 + i)));
 				}
 		}
 		if(pkt->info.no_check_deck) {
@@ -626,6 +626,18 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		if(pkt->info.no_shuffle_deck) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1230)));
+		}
+		static const std::map<unsigned int, unsigned int> MONSTER_TYPES = {
+			{ TYPE_FUSION, 1056 },
+			{ TYPE_SYNCHRO, 1063 },
+			{ TYPE_XYZ, 1073 },
+			{ TYPE_PENDULUM, 1074 },
+			{ TYPE_LINK, 1076 }
+		};
+		for (const auto pair : MONSTER_TYPES) {
+			if (pkt->info.forbiddentypes & pair.first) {
+				strL += fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(pair.second));
+			}
 		}
 		mainGame->gMutex.lock();
 		int x = (pkt->info.team1 + pkt->info.team2 >= 5) ? 60 : 0;
@@ -640,7 +652,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnHostPrepStart->setRelativePosition(mainGame->Scale<irr::s32>(230, 280 + x, 340, 305 + x));
 		mainGame->btnHostPrepCancel->setRelativePosition(mainGame->Scale<irr::s32>(350, 280 + x, 460, 305 + x));
 		mainGame->wHostPrepare->setRelativePosition(mainGame->ResizeWin(270, 120, 750, 440 + x));
-		mainGame->wHostPrepare2->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
+		mainGame->wHostPrepareR->setRelativePosition(mainGame->ResizeWin(750, 120, 950, 440 + x));
+		mainGame->wHostPrepareL->setRelativePosition(mainGame->ResizeWin(70, 120, 270, 440 + x));
 		mainGame->gBot.window->setRelativePosition(irr::core::position2di(mainGame->wHostPrepare->getAbsolutePosition().LowerRightCorner.X, mainGame->wHostPrepare->getAbsolutePosition().UpperLeftCorner.Y));
 		for(int i = 0; i < 6; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(false);
@@ -678,8 +691,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->deckBuilder.filterList = &gdeckManager->_lfList[0];
 		watching = 0;
 		mainGame->stHostPrepOB->setText(fmt::format(L"{} {}", gDataManager->GetSysString(1253), watching).c_str());
-		mainGame->stHostPrepRule->setText((wchar_t*)str.c_str());
-		mainGame->stHostPrepRule2->setText((wchar_t*)str2.c_str());
+		mainGame->stHostPrepRule->setText(str.c_str());
+		mainGame->stHostPrepRuleR->setText(strR.c_str());
+		mainGame->stHostPrepRuleL->setText(strL.c_str());
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		mainGame->RefreshDeck(mainGame->cbDeckSelect2);
 		mainGame->cbDeckSelect->setEnabled(true);
@@ -695,8 +709,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
-		if(str2.size())
-			mainGame->ShowElement(mainGame->wHostPrepare2);
+		if(strR.size())
+			mainGame->ShowElement(mainGame->wHostPrepareR);
+		if(strL.size())
+			mainGame->ShowElement(mainGame->wHostPrepareL);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.unlock();
 		mainGame->dInfo.isFirst = (mainGame->dInfo.player_type < mainGame->dInfo.team1) || (mainGame->dInfo.player_type >= 7);
@@ -738,7 +754,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_DUEL_START: {
 		mainGame->HideElement(mainGame->wHostPrepare);
 		mainGame->HideElement(mainGame->gBot.window);
-		mainGame->HideElement(mainGame->wHostPrepare2);
+		mainGame->HideElement(mainGame->wHostPrepareR);
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();

@@ -487,14 +487,23 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(wHostPrepare, 1250);
 	wHostPrepare->getCloseButton()->setVisible(false);
 	wHostPrepare->setVisible(false);
-	wHostPrepare2 = env->addWindow(Scale(750, 120, 950, 440), false, gDataManager->GetSysString(1625).c_str());
-	defaultStrings.emplace_back(wHostPrepare2, 1625);
-	wHostPrepare2->getCloseButton()->setVisible(false);
-	wHostPrepare2->setVisible(false);
-	stHostPrepRule2 = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare2, -1, Scale(10, 30, 460, 350));
-	stHostPrepRule2->setWordWrap(true);
+	wHostPrepareR = env->addWindow(Scale(750, 120, 950, 440), false, gDataManager->GetSysString(1625).c_str());
+	defaultStrings.emplace_back(wHostPrepareR, 1625);
+	wHostPrepareR->getCloseButton()->setVisible(false);
+	wHostPrepareR->setVisible(false);
+	wHostPrepareL = env->addWindow(Scale(70, 120, 270, 440), false, gDataManager->GetSysString(1628).c_str());
+	defaultStrings.emplace_back(wHostPrepareL, 1628);
+	wHostPrepareL->getCloseButton()->setVisible(false);
+	wHostPrepareL->setVisible(false);
+	stHostPrepRuleR = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareR, -1, Scale(10, 30, 460, 350));
+	stHostPrepRuleR->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stHostPrepRule2)->setTouchControl(!gGameConfig->native_mouse);
+	((CGUICustomText*)stHostPrepRuleR)->setTouchControl(!gGameConfig->native_mouse);
+#endif
+	stHostPrepRuleL = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareL, -1, Scale(10, 30, 460, 350));
+	stHostPrepRuleL->setWordWrap(true);
+#ifdef __ANDROID__
+	((CGUICustomText*)stHostPrepRuleL)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, gDataManager->GetSysString(1251).c_str());
 	defaultStrings.emplace_back(btnHostPrepDuelist, 1251);
@@ -2810,10 +2819,12 @@ void Game::OnResize() {
 	wCreateHost->setRelativePosition(ResizeWin(320, 100, 700, 520));
 	if (dInfo.opponames.size() + dInfo.selfnames.size()>=5) {
 		wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 500));
-		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 500));
+		wHostPrepareR->setRelativePosition(ResizeWin(750, 120, 950, 500));
+		wHostPrepareL->setRelativePosition(ResizeWin(70, 120, 270, 500));
 	} else {
 		wHostPrepare->setRelativePosition(ResizeWin(270, 120, 750, 440));
-		wHostPrepare2->setRelativePosition(ResizeWin(750, 120, 950, 440));
+		wHostPrepareR->setRelativePosition(ResizeWin(750, 120, 950, 440));
+		wHostPrepareL->setRelativePosition(ResizeWin(70, 120, 270, 440));
 	}
 	wRules->setRelativePosition(ResizeWin(630, 100, 1000, 310));
 	wCustomRulesL->setRelativePosition(ResizeWin(50, 100, 320, 430));

@@ -434,7 +434,8 @@ public:
 	irr::gui::IGUIStaticText* stBestof;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
-	irr::gui::IGUIWindow* wHostPrepare2;
+	irr::gui::IGUIWindow* wHostPrepareR;
+	irr::gui::IGUIWindow* wHostPrepareL;
 	WindBotPanel gBot;
 	irr::gui::IGUIStaticText* stHostCardRule;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
@@ -446,7 +447,8 @@ public:
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIComboBox* cbDeckSelect2;
 	irr::gui::IGUIStaticText* stHostPrepRule;
-	irr::gui::IGUIStaticText* stHostPrepRule2;
+	irr::gui::IGUIStaticText* stHostPrepRuleR;
+	irr::gui::IGUIStaticText* stHostPrepRuleL;
 	irr::gui::IGUIStaticText* stHostPrepOB;
 	irr::gui::IGUIStaticText* stDeckSelect;
 	irr::gui::IGUIButton* btnHostPrepReady;
