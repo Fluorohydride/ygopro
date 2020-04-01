@@ -161,18 +161,6 @@ bool Replay::OpenReplay(const path_string& name) {
 	replay_name.clear();
 	return false;
 }
-bool Replay::CheckReplay(const path_string& name) {
-	std::ifstream replay_file(name, std::ifstream::binary);
-	if(!replay_file.is_open()) {
-		replay_file.open(EPRO_TEXT("./replay/") + name, std::ifstream::binary);
-		if(!replay_file.is_open())
-			return false;
-	}
-	ReplayHeader rheader;
-	auto count = replay_file.read((char*)&rheader, sizeof(pheader)).gcount();
-	replay_file.close();
-	return (rheader.id == REPLAY_YRP1 || rheader.id == REPLAY_YRPX) && rheader.version >= 0x12d0;
-}
 bool Replay::DeleteReplay(const path_string& name) {
 	return Utils::FileDelete(name);
 }

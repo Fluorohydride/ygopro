@@ -180,10 +180,10 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			return;
 		}
 		CTOS_JoinGame* pkt = (CTOS_JoinGame*)pdata;
-		if(pkt->version != PRO_VERSION) {
+		if(pkt->version != CLIENT_VERSION) {
 			STOC_ErrorMsg scem;
-			scem.msg = ERRMSG_VERERROR;
-			scem.code = PRO_VERSION;
+			scem.msg = ERRMSG_VERERROR2;
+			scem.code = CLIENT_VERSION;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 			return;
 		}
@@ -540,7 +540,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	dp->state = CTOS_RESPONSE;
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
-	rh.version = PRO_VERSION;
+	rh.version = CLIENT_VERSION;
 	rh.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY;
 	time_t seed = time(0);
 	rh.seed = seed;

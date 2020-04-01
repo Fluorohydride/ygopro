@@ -57,10 +57,6 @@ extern android_app* app_global;
 #endif
 
 unsigned short PRO_VERSION = 0x1350;
-#define EDOPRO_VERSION_MAJOR 37
-#define EDOPRO_VERSION_MINOR 3
-#define EDOPRO_VERSION_PATCH 0
-#define EDOPRO_VERSION_CODENAME L"Spider Shark"
 
 namespace ygo {
 

@@ -125,7 +125,7 @@ restart:
 	//OCG_SetAIPlayer(pduel, 1, TRUE);
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
-	rh.version = PRO_VERSION;
+	rh.version = CLIENT_VERSION;
 	rh.flag = REPLAY_SINGLE_MODE + REPLAY_LUA64;
 	rh.seed = seed;
 	mainGame->gMutex.lock();

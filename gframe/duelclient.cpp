@@ -222,7 +222,7 @@ catch(...) { what = def; }
 			if (temp_ver)
 				csjg.version = temp_ver;
 			else
-				csjg.version = PRO_VERSION;
+				csjg.version = CLIENT_VERSION;
 			csjg.gameid = mainGame->dInfo.secret.game_id;
 			BufferIO::CopyWStr(BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass).c_str(), csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
@@ -438,14 +438,18 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.unlock();
 			break;
 		}
-		case ERRMSG_VERERROR: {
-			if (temp_ver) {
+		case ERRMSG_VERERROR:
+		case ERRMSG_VERERROR2: {
+			if(temp_ver || (pkt->msg == ERRMSG_VERERROR2)) {
 				temp_ver = 0;
 				mainGame->gMutex.lock();
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411).c_str(), pkt->code >> 12, (pkt->code >> 4) & 0xff, pkt->code & 0xf));
+				if(pkt->msg == ERRMSG_VERERROR2)
+					mainGame->PopupMessage(fmt::format(gDataManager->GetSysString(1423).c_str(), EXPAND_VERSION(pkt->code)));
+				else
+					mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411).c_str(), pkt->code >> 12, (pkt->code >> 4) & 0xff, pkt->code & 0xf));
 				mainGame->gMutex.unlock();
 				event_base_loopbreak(client_base);
 				if(mainGame->isHostingOnline) {
@@ -4318,7 +4322,7 @@ void DuelClient::ReplayPrompt(bool need_header) {
 	if(need_header) {
 		ReplayHeader pheader{};
 		pheader.id = REPLAY_YRPX;
-		pheader.version = PRO_VERSION;
+		pheader.version = CLIENT_VERSION;
 		if(!mainGame->dInfo.compat_mode)
 			pheader.flag = REPLAY_LUA64;
 		pheader.flag |= REPLAY_NEWREPLAY;
