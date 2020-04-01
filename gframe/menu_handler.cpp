@@ -95,7 +95,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK)
 			break;
-		if(mainGame->wCustomRules->isVisible() && id != BUTTON_CUSTOM_RULE_OK && (id < CHECKBOX_OBSOLETE || id > CHECKBOX_EMZONE))
+		if(mainGame->wCustomRulesR->isVisible() && id != BUTTON_CUSTOM_RULE_OK && (id < CHECKBOX_OBSOLETE || id > CHECKBOX_EMZONE))
 			break;
 		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) {
 			mainGame->wQuery->getParent()->bringToFront(mainGame->wQuery);
@@ -253,12 +253,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 				for (int i = 0; i < (sizeof(mainGame->chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1)
 						mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
-				mainGame->PopupElement(mainGame->wCustomRules);
+				mainGame->PopupElement(mainGame->wCustomRulesL);
+				mainGame->PopupElement(mainGame->wCustomRulesR);
 				break;
 			}
 			case BUTTON_CUSTOM_RULE_OK: {
 				mainGame->UpdateDuelParam();
-				mainGame->HideElement(mainGame->wCustomRules);
+				mainGame->HideElement(mainGame->wCustomRulesL);
+				mainGame->HideElement(mainGame->wCustomRulesR);
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
@@ -358,8 +360,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
 				mainGame->HideElement(mainGame->gBot.window);
-				if(mainGame->wHostPrepare2->isVisible())
-					mainGame->HideElement(mainGame->wHostPrepare2);
+				if (mainGame->wHostPrepareR->isVisible())
+					mainGame->HideElement(mainGame->wHostPrepareR);
+				if (mainGame->wHostPrepareL->isVisible())
+					mainGame->HideElement(mainGame->wHostPrepareL);
 				if(mainGame->isHostingOnline)
 					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 				else

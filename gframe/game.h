@@ -417,9 +417,10 @@ public:
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
-	irr::gui::IGUICheckBox* chkCustomRules[7];
+	irr::gui::IGUICheckBox* chkCustomRules[7+12];
 	irr::gui::IGUICheckBox* chkTypeLimit[5];
-	irr::gui::IGUIWindow* wCustomRules;
+	irr::gui::IGUIWindow* wCustomRulesL;
+	irr::gui::IGUIWindow* wCustomRulesR;
 	irr::gui::IGUIButton* btnCustomRulesOK;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
@@ -433,7 +434,8 @@ public:
 	irr::gui::IGUIStaticText* stBestof;
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
-	irr::gui::IGUIWindow* wHostPrepare2;
+	irr::gui::IGUIWindow* wHostPrepareR;
+	irr::gui::IGUIWindow* wHostPrepareL;
 	WindBotPanel gBot;
 	irr::gui::IGUIStaticText* stHostCardRule;
 	irr::gui::IGUIButton* btnHostPrepDuelist;
@@ -445,7 +447,8 @@ public:
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIComboBox* cbDeckSelect2;
 	irr::gui::IGUIStaticText* stHostPrepRule;
-	irr::gui::IGUIStaticText* stHostPrepRule2;
+	irr::gui::IGUIStaticText* stHostPrepRuleR;
+	irr::gui::IGUIStaticText* stHostPrepRuleL;
 	irr::gui::IGUIStaticText* stHostPrepOB;
 	irr::gui::IGUIStaticText* stDeckSelect;
 	irr::gui::IGUIButton* btnHostPrepReady;
