@@ -87,6 +87,7 @@ struct GameConfig
 #endif
 	bool enablemusic = false;
 	bool enablesound = true;
+	bool saveHandTest = true;
 	int musicVolume = 20;
 	int soundVolume = 20;
 	path_string skin = EPRO_TEXT("none");

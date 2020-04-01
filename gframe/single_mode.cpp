@@ -1,6 +1,7 @@
+#include "single_mode.h"
 #include <fmt/chrono.h>
 #include <random>
-#include "single_mode.h"
+#include "game_config.h"
 #include "duelclient.h"
 #include "game.h"
 #include "core_utils.h"
@@ -152,7 +153,8 @@ restart:
 	std::vector<uint8> duelBuffer;
 	is_closing = false;
 	is_continuing = true;
-	if(!hand_test) {
+	bool saveReplay = !hand_test || gGameConfig->saveHandTest;
+	if(saveReplay) {
 		last_replay.BeginRecord(false);
 		last_replay.WriteHeader(rh);
 		//records the replay with the new system
@@ -199,7 +201,7 @@ restart:
 	end :
 	OCG_DestroyDuel(pduel);
 	pduel = nullptr;
-	if(!hand_test && !is_restarting) {
+	if(saveReplay && !is_restarting) {
 		last_replay.EndRecord(0x1000);
 		std::vector<unsigned char> oldreplay;
 		oldreplay.insert(oldreplay.end(), (unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
@@ -217,7 +219,7 @@ restart:
 	}
 	gSoundManager->StopSounds();
 	bool was_in_replay = false;
-	if(!hand_test && !is_restarting) {
+	if(saveReplay && !is_restarting) {
 		was_in_replay = true;
 		auto now = std::time(nullptr);
 		mainGame->gMutex.lock();

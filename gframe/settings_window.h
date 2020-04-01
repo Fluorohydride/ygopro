@@ -64,6 +64,7 @@ struct SettingsWindow {
 	irr::gui::IGUIComboBox* cbCoreLogOutput;
 	irr::gui::IGUIStaticText* stAntiAlias;
 	irr::gui::IGUIEditBox* ebAntiAlias;
+	irr::gui::IGUICheckBox* chkSaveHandTest;
 
 };
 

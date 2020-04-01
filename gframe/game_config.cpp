@@ -78,6 +78,7 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_BOOL(noShuffleDeck)
 			DESERIALIZE_BOOL(vsync)
 			DESERIALIZE_BOOL(showScopeLabel)
+			DESERIALIZE_BOOL(saveHandTest)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
 #endif
@@ -196,7 +197,7 @@ bool GameConfig::Save(const path_char* filename)
 	std::ofstream conf_file(filename, std::ofstream::out);
 	if (!conf_file.is_open())
 		return false;
-	conf_file << "# EDOPro by Project Ignis system.conf\n";
+	conf_file << "# Project Ignis: EDOPro system.conf\n";
 	conf_file << "# Overwritten on normal game exit\n";
 #define SERIALIZE(name) Serialize(conf_file, #name, name)
 	conf_file << "use_d3d = "            << use_d3d << "\n";
@@ -259,6 +260,7 @@ bool GameConfig::Save(const path_char* filename)
 	conf_file << "enable_sound = "       << enablesound << "\n";
 	conf_file << "music_volume = "       << musicVolume << "\n";
 	conf_file << "sound_volume = "       << soundVolume << "\n";
+	SERIALIZE(saveHandTest);
 #ifdef __ANDROID__
 	conf_file << "native_keyboard = "    << native_keyboard << "\n";
 	conf_file << "native_mouse = "       << native_mouse << "\n";

@@ -2013,6 +2013,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				mainGame->stCommitLog->setText(mainGame->chkCommitLogExpand->isChecked() ? repo.commit_history_full.c_str() : repo.commit_history_partial.c_str());
 				return true;
 			}
+			case CHECKBOX_SAVE_HAND_TEST_REPLAY: {
+				gGameConfig->saveHandTest = mainGame->gSettings.chkSaveHandTest->isChecked();
+				return true;
+			}
 			}
 			break;
 		}
