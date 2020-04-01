@@ -13,9 +13,6 @@
 #include "utils_gui.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
 #include "CGUITTFont/CGUITTFont.h"
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#endif
 
 namespace ygo {
 
@@ -87,11 +84,6 @@ inline void ClickButton(irr::gui::IGUIElement* btn) {
 	TriggerEvent(btn, irr::gui::EGET_BUTTON_CLICKED);
 }
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
-#ifdef __ANDROID__
-	if(porting::transformEvent(event)) {
-		return true;
-	}
-#endif
 	bool stopPropagation = false;
 	if(mainGame->dField.OnCommonEvent(event, stopPropagation))
 		return stopPropagation;

@@ -7,7 +7,6 @@
 #include <dirent.h>
 #endif
 #ifdef __ANDROID__
-#include "Android/porting_android.h"
 #include "Android/COSAndroidOperator.h"
 #endif
 #include "game_config.h"
@@ -46,6 +45,10 @@
 
 #ifdef __ANDROID__
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
+class android_app;
+namespace porting {
+extern android_app* app_global;
+}
 #define ADDComboBox(...) (gGameConfig->native_mouse ? env->addComboBox(__VA_ARGS__): CGUICustomComboBox::addCustomComboBox(env, __VA_ARGS__))
 #define MATERIAL_GUARD(f) do {mainGame->driver->enableMaterial2D(true); f; mainGame->driver->enableMaterial2D(false);} while(false);
 #else

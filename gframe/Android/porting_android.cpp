@@ -36,6 +36,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
 #include <thread>
 #include "../bufferio.h"
+#include "../sound_manager.h"
+#include "../game_config.h"
+#include "../game.h"
 
 extern int main(int argc, char *argv[]);
 
@@ -451,10 +454,64 @@ std::pair<int,int> getDisplaySize()
 * implementation from https://github.com/minetest/minetest/blob/02a23892f94d3c83a6bdc301defc0e7ade7e1c2b/src/gui/modalMenu.cpp#L116
 * with this patch applied to the engine https://github.com/minetest/minetest/blob/02a23892f94d3c83a6bdc301defc0e7ade7e1c2b/build/android/patches/irrlicht-touchcount.patch
 */
-bool transformEvent(const irr::SEvent & event) {
+bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 	static irr::core::position2di m_pointer = irr::core::position2di(0, 0);
 	auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
-	if(event.EventType == irr::EET_TOUCH_INPUT_EVENT) {
+	switch(event.EventType) {
+		case irr::EET_MOUSE_INPUT_EVENT: {
+		if(event.MouseInput.Event == irr::EMIE_LMOUSE_PRESSED_DOWN) {
+			auto hovered = ygo::mainGame->env->getRootGUIElement()->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
+			if(hovered && hovered->isEnabled()) {
+				if(hovered->getType() == irr::gui::EGUIET_EDIT_BOX) {
+					bool retval = hovered->OnEvent(event);
+					if(retval)
+						ygo::mainGame->env->setFocus(hovered);
+					if(ygo::gGameConfig->native_keyboard) {
+						porting::displayKeyboard(true);
+					} else {
+						int type = 2;
+						// multi line text input
+						if(((irr::gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
+							type = 1;
+						// passwords are always single line
+						if(((irr::gui::IGUIEditBox *)hovered)->isPasswordBox())
+							type = 3;
+						porting::showInputDialog("ok", "",
+												 BufferIO::EncodeUTF8s(((irr::gui::IGUIEditBox *)hovered)->getText()), type);
+					}
+					stopPropagation = retval;
+					return retval;
+				}
+			}
+		}
+		break;
+	}
+	case irr::EET_KEY_INPUT_EVENT: {
+		if(ygo::gGameConfig->native_keyboard && event.KeyInput.Key == irr::KEY_RETURN) {
+			porting::displayKeyboard(false);
+		}
+		break;
+	}
+	case irr::EET_SYSTEM_EVENT: {
+		switch(event.SystemEvent.AndroidCmd.Cmd) {
+			case APP_CMD_PAUSE: {
+				ygo::gSoundManager->PauseMusic(true);
+				break;
+			}
+			case APP_CMD_RESUME: {
+				ygo::gSoundManager->PauseMusic(false);
+				break;
+			}
+			case APP_CMD_DESTROY: {
+				ygo::mainGame->SaveConfig();
+				break;
+			}
+			default: break;
+		}
+		stopPropagation = false;
+		return true;
+	}
+	case irr::EET_TOUCH_INPUT_EVENT: {
 		irr::SEvent translated;
 		memset(&translated, 0, sizeof(irr::SEvent));
 		translated.EventType = irr::EET_MOUSE_INPUT_EVENT;
@@ -491,6 +548,7 @@ bool transformEvent(const irr::SEvent & event) {
 						translated.MouseInput.Y = m_pointer.Y;
 						break;
 					default:
+						stopPropagation = true;
 						return true;
 				}
 				break;
@@ -524,18 +582,15 @@ bool transformEvent(const irr::SEvent & event) {
 				return true;
 		}
 
-		// check if translated event needs to be preprocessed again
-		if(transformEvent(translated)) {
-			return true;
-		}
-
-		bool retval = device->postEventFromUser(translated);;
+		bool retval = device->postEventFromUser(translated);
 
 		if(event.TouchInput.Event == irr::ETIE_LEFT_UP) {
-			// reset pointer
 			m_pointer = irr::core::position2di(0, 0);
 		}
-		return retval;
+		stopPropagation = retval;
+		return true;
+	}
+	default: break;
 	}
 	return false;
 }

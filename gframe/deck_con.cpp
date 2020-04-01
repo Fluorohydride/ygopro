@@ -11,8 +11,6 @@
 #include "client_card.h"
 #ifndef __ANDROID__
 #include <sstream>
-#else
-#include "Android/porting_android.h"
 #endif
 #include <algorithm>
 #include <unordered_map>
@@ -136,12 +134,6 @@ void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->device->closeDevice();
 }
 bool DeckBuilder::OnEvent(const irr::SEvent& event) {
-#ifdef __ANDROID__
-	irr::SEvent transferEvent;
-	if(porting::transformEvent(event)) {
-		return true;
-	}
-#endif
 	bool stopPropagation = false;
 	if(mainGame->dField.OnCommonEvent(event, stopPropagation))
 		return stopPropagation;

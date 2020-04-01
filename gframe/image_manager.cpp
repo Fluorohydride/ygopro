@@ -8,9 +8,6 @@
 #include "game.h"
 #include <fstream>
 #include <curl/curl.h>
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#endif
 
 #define BASE_PATH EPRO_TEXT("./textures/")
 
