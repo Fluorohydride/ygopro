@@ -425,7 +425,7 @@ bool Game::Initialize() {
 		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100<<i, Scale(10, 10 + spacingR * 20, 250, 30 + spacingR * 20), wCustomRulesR, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}
-	for(int i = 7; i < 7 + 11; ++i, ++spacingL) {
+	for(int i = 7; i < 7 + 12; ++i, ++spacingL) {
 		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100 << i, Scale(10, 10 + spacingL * 20, 250, 30 + spacingL * 20), wCustomRulesL, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}

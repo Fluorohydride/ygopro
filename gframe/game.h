@@ -417,7 +417,7 @@ public:
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
-	irr::gui::IGUICheckBox* chkCustomRules[7+11];
+	irr::gui::IGUICheckBox* chkCustomRules[7+12];
 	irr::gui::IGUICheckBox* chkTypeLimit[5];
 	irr::gui::IGUIWindow* wCustomRulesL;
 	irr::gui::IGUIWindow* wCustomRulesR;
