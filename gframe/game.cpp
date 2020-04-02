@@ -389,7 +389,7 @@ bool Game::Initialize() {
 	wRules->setVisible(false);
 	btnRulesOK = env->addButton(Scale(135, 175, 235, 200), wRules, BUTTON_RULE_OK, gDataManager->GetSysString(1211).c_str());
 	defaultStrings.emplace_back(btnRulesOK, 1211);
-	for(int i = 0; i < 14; ++i) {
+	for(int i = 0; i < (sizeof(chkRules) / sizeof(irr::gui::IGUICheckBox*)); ++i) {
 		chkRules[i] = env->addCheckBox(false, Scale(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, CHECKBOX_EXTRA_RULE, gDataManager->GetSysString(1132 + i).c_str());
 		defaultStrings.emplace_back(chkRules[i], 1132 + i);
 	}
@@ -416,13 +416,12 @@ bool Game::Initialize() {
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1629).c_str(), Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), false, false, wCustomRulesR);
 	defaultStrings.emplace_back(tmpptr, 1629);
 	spacingR++;
-	std::wcout << DUEL_MODE_MR5 << std::endl;
 	for(int i = 0; i < 7; ++i, ++spacingR) {
-		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100<<i, Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), wCustomRulesR, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
+		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100<<i, Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), wCustomRulesR, CHECKBOX_OBSOLETE + i, gDataManager->GetSysString(1631 + i).c_str());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}
-	for(int i = 7; i < 7 + 12; ++i, ++spacingL) {
-		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100 << i, Scale(10, 10 + spacingL * 20, 290, 30 + spacingL * 20), wCustomRulesL, 390 + i, gDataManager->GetSysString(1631 + i).c_str());
+	for(int i = 7; i < schkCustomRules; ++i, ++spacingL) {
+		chkCustomRules[i] = env->addCheckBox(duel_param & 0x100 << i, Scale(10, 10 + spacingL * 20, 290, 30 + spacingL * 20), wCustomRulesL, CHECKBOX_OBSOLETE + i, gDataManager->GetSysString(1631 + i).c_str());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1628).c_str(), Scale(10, 10 + spacingR * 20, 290, 30 + spacingR * 20), false, false, wCustomRulesR);
@@ -491,12 +490,17 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(wHostPrepareL, 1628);
 	wHostPrepareL->getCloseButton()->setVisible(false);
 	wHostPrepareL->setVisible(false);
-	stHostPrepRuleR = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareR, -1, Scale(10, 30, 190, 350));
+	auto wHostPrepareRrect = wHostPrepareR->getClientRect();
+	wHostPrepareRrect.UpperLeftCorner.X += Scale(10);
+	wHostPrepareRrect.LowerRightCorner.X -= Scale(10);
+	stHostPrepRuleR = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareR, -1, wHostPrepareRrect);
+	((CGUICustomText*)stHostPrepRuleR)->enableScrollBar();
 	stHostPrepRuleR->setWordWrap(true);
 #ifdef __ANDROID__
 	((CGUICustomText*)stHostPrepRuleR)->setTouchControl(!gGameConfig->native_mouse);
 #endif
-	stHostPrepRuleL = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareL, -1, Scale(10, 30, 190, 350));
+	stHostPrepRuleL = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareL, -1, wHostPrepareRrect);
+	((CGUICustomText*)stHostPrepRuleL)->enableScrollBar();
 	stHostPrepRuleL->setWordWrap(true);
 #ifdef __ANDROID__
 	((CGUICustomText*)stHostPrepRuleL)->setTouchControl(!gGameConfig->native_mouse);
@@ -2360,7 +2364,7 @@ uint8 Game::LocalPlayer(uint8 player) {
 void Game::UpdateDuelParam() {
 	ReloadCBDuelRule();
 	uint32 flag = 0, filter = 0x100;
-	for (int i = 0; i < (sizeof(chkCustomRules)/sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1)
+	for (int i = 0; i < schkCustomRules; ++i, filter <<= 1)
 		if (chkCustomRules[i]->isChecked()) {
 			flag |= filter;
 		}
@@ -2377,9 +2381,17 @@ void Game::UpdateDuelParam() {
 	CHECK(3)
 	CHECK(4)
 	CHECK(5)
+	case DUEL_MODE_SPEED: {
+		cbDuelRule->setSelected(5);
+		break;
+	}
+	case DUEL_MODE_RUSH: {
+		cbDuelRule->setSelected(6);
+		break;
+	}
 	default: {
 		cbDuelRule->addItem(gDataManager->GetSysString(1630).c_str());
-		cbDuelRule->setSelected(5);
+		cbDuelRule->setSelected(7);
 		break;
 	}
 	}
@@ -2388,34 +2400,34 @@ void Game::UpdateDuelParam() {
 	forbiddentypes = flag2;
 }
 void Game::UpdateExtraRules() {
-	for(int i = 0; i < 14; i++)
+	for(int i = 0; i < (sizeof(chkRules) / sizeof(irr::gui::IGUICheckBox*)); i++)
 		chkRules[i]->setEnabled(true);
 	if(chkRules[0]->isChecked()) {
 		chkRules[1]->setEnabled(false);
-		chkRules[5]->setEnabled(false);
+		chkRules[4]->setEnabled(false);
 	}
 	if(chkRules[1]->isChecked()) {
 		chkRules[0]->setEnabled(false);
-		chkRules[5]->setEnabled(false);
+		chkRules[4]->setEnabled(false);
 	}
-	if(chkRules[5]->isChecked()) {
+	if(chkRules[4]->isChecked()) {
 		chkRules[0]->setEnabled(false);
 		chkRules[1]->setEnabled(false);
 	}
-	if(chkRules[6]->isChecked()) {
+	if(chkRules[5]->isChecked()) {
+		chkRules[6]->setEnabled(false);
 		chkRules[7]->setEnabled(false);
-		chkRules[8]->setEnabled(false);
+	}
+	if(chkRules[6]->isChecked()) {
+		chkRules[5]->setEnabled(false);
+		chkRules[7]->setEnabled(false);
 	}
 	if(chkRules[7]->isChecked()) {
+		chkRules[5]->setEnabled(false);
 		chkRules[6]->setEnabled(false);
-		chkRules[8]->setEnabled(false);
-	}
-	if(chkRules[8]->isChecked()) {
-		chkRules[6]->setEnabled(false);
-		chkRules[7]->setEnabled(false);
 	}
 	extra_rules = 0;
-	for(int flag = 1, i = 0; i < 14; i++, flag = flag << 1) {
+	for(int flag = 1, i = 0; i < (sizeof(chkRules) / sizeof(irr::gui::IGUICheckBox*)); i++, flag = flag << 1) {
 		if(chkRules[i]->isChecked())
 			extra_rules |= flag;
 	}
@@ -2626,6 +2638,8 @@ void Game::ReloadCBDuelRule() {
 	cbDuelRule->addItem(gDataManager->GetSysString(1262).c_str());
 	cbDuelRule->addItem(gDataManager->GetSysString(1263).c_str());
 	cbDuelRule->addItem(gDataManager->GetSysString(1264).c_str());
+	cbDuelRule->addItem(gDataManager->GetSysString(1258).c_str());
+	cbDuelRule->addItem(gDataManager->GetSysString(1259).c_str());
 }
 void Game::ReloadCBRule() {
 	cbRule->clear();

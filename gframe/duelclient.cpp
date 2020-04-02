@@ -210,9 +210,6 @@ catch(...) { what = def; }
 			}
 			cscg.info.forbiddentypes = mainGame->forbiddentypes;
 			cscg.info.extra_rules = mainGame->extra_rules;
-			if(mainGame->extra_rules & SPEED_DUEL) {
-				cscg.info.duel_flag |= DUEL_MODE_SPEED;
-			}
 			if(mainGame->ebHostNotes->isVisible()) {
 				BufferIO::CopyWStr(BufferIO::EncodeUTF8s(mainGame->ebHostNotes->getText()).c_str(), cscg.notes, 200);
 			}
@@ -589,7 +586,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(mainGame->dInfo.compat_mode)
 			str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1227), gDataManager->GetSysString(1244 + pkt->info.mode)));
 		else {
-
 			str.append(fmt::format(L"{}{} {}{}\n", gDataManager->GetSysString(1227), gDataManager->GetSysString(1381), mainGame->dInfo.best_of, mainGame->dInfo.isRelay ? L" Relay" : L""));
 		}
 		if(pkt->info.time_limit) {
@@ -612,7 +608,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		if (rule == 6) {
 			uint32_t filter = 0x100;
-			for (int i = 0; i < 7 + 12; ++i, filter <<= 1)
+			for (int i = 0; filter && i < schkCustomRules; ++i, filter <<= 1)
 				if (pkt->info.duel_flag & filter) {
 					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
 				}

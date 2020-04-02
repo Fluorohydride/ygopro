@@ -95,7 +95,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK)
 			break;
-		if(mainGame->wCustomRulesR->isVisible() && id != BUTTON_CUSTOM_RULE_OK && (id < CHECKBOX_OBSOLETE || id > CHECKBOX_EMZONE))
+		if(mainGame->wCustomRulesR->isVisible() && id != BUTTON_CUSTOM_RULE_OK && ((id < CHECKBOX_OBSOLETE || id > INVERTED_PRIORITY) && id != COMBOBOX_DUEL_RULE))
 			break;
 		if(mainGame->wQuery->isVisible() && id != BUTTON_YES && id != BUTTON_NO) {
 			mainGame->wQuery->getParent()->bringToFront(mainGame->wQuery);
@@ -242,6 +242,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				CHECK(3)
 				CHECK(4)
 				CHECK(5)
+				case 5:	{
+					mainGame->duel_param = DUEL_MODE_SPEED;
+					mainGame->forbiddentypes = 0;
+					break;
+				}
+				case 6:	{
+					mainGame->duel_param = DUEL_MODE_RUSH;
+					mainGame->forbiddentypes = 0;
+					break;
+				}
 				}
 #undef CHECK
 				uint32 filter = 0x100;
@@ -793,15 +803,37 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case COMBOBOX_DUEL_RULE: {
 				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
-#define CHECK(MR) case (MR - 1): { combobox->removeItem(5); mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; break; }
+#define CHECK(MR) case (MR - 1): { mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; goto remove; }
 				switch (combobox->getSelected()) {
 				CHECK(1)
 				CHECK(2)
 				CHECK(3)
 				CHECK(4)
 				CHECK(5)
+				case 5:	{
+					mainGame->duel_param = DUEL_MODE_SPEED;
+					mainGame->forbiddentypes = 0;
+					goto remove;
+				}
+				case 6:	{
+					mainGame->duel_param = DUEL_MODE_RUSH;
+					mainGame->forbiddentypes = 0;
+					goto remove;
+				}
+				default: break;
+				remove:
+				combobox->removeItem(7);
 				}
 #undef CHECK
+				uint32 filter = 0x100;
+				for(int i = 0; i < (sizeof(mainGame->chkCustomRules) / sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1) {
+					mainGame->chkCustomRules[i]->setChecked(mainGame->duel_param & filter);
+					if(i == 3)
+						mainGame->chkCustomRules[4]->setEnabled(mainGame->duel_param & filter);
+				}
+				const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+				for(int i = 0; i < (sizeof(mainGame->chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i, filter <<= 1)
+					mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 				break;
 			}
 			case COMBOBOX_BOT_DECK: {
