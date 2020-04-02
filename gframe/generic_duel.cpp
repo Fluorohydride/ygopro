@@ -607,7 +607,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(host_info.extra_rules & DESTINY_DRAW)
 		extracards.push_back(511004000);
 	if(host_info.extra_rules & ACTION_DUEL)
-		extracards.push_back(301);
+		extracards.push_back(151999999);
 	OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
 	for(int32 i = (int32)extracards.size() - 1; i >= 0; --i) {
 		card_info.code = extracards[i];
