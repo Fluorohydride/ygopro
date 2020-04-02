@@ -21,7 +21,7 @@ namespace ygo {
 		}
 		const ReplayHeader& rh = cur_replay.yrp->pheader;
 		mainGame->dInfo.isFirst = true;
-		mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
+		mainGame->dInfo.isRelay = !!(cur_replay.params.duel_flags & DUEL_RELAY);
 		mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 		mainGame->dInfo.compat_mode = false;
 		mainGame->dInfo.current_player[0] = 0;
@@ -119,7 +119,7 @@ namespace ygo {
 		mainGame->dInfo.strLP[0] = fmt::to_wstring(mainGame->dInfo.lp[0]);
 		mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
 		mainGame->dInfo.turn = 0;
-		if (!mainGame->dInfo.isSingleMode) {
+		if (!mainGame->dInfo.isSingleMode || (rh.flag & REPLAY_HAND_TEST)) {
 			auto rule_cards = cur_replay.yrp->GetRuleCards();
 			OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
 			for(auto card : rule_cards) {
@@ -155,8 +155,13 @@ namespace ygo {
 					OCG_DuelNewCard(pduel, card_info);
 				}
 			}
-			mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
-			mainGame->dField.Initial(1, decks[mainGame->dInfo.team1].main_deck.size(), decks[mainGame->dInfo.team1].extra_deck.size());
+			if(rh.flag & REPLAY_HAND_TEST) {
+				const char cmd[] = "Debug.ReloadFieldEnd()";
+				OCG_LoadScript(pduel, cmd, sizeof(cmd) - 1, " ");
+			} else {
+				mainGame->dField.Initial(0, decks[0].main_deck.size(), decks[0].extra_deck.size());
+				mainGame->dField.Initial(1, decks[mainGame->dInfo.team1].main_deck.size(), decks[mainGame->dInfo.team1].extra_deck.size());
+			}
 		} else {
 			if(!mainGame->LoadScript(pduel, cur_replay.yrp->scriptname))
 				return false;

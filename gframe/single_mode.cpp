@@ -47,18 +47,40 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	OCG_DuelSetResponse(pduel, resp, len);
 }
 int SingleMode::SinglePlayThread() {
-	const int start_lp = 8000;
-	const int start_hand = 5;
-	const int draw_count = 1;
-	const int opt = 0;
+	int start_lp = 8000;
+	int start_hand = 5;
+	int draw_count = 1;
+	int opt = 0;
+	std::string script_name = "";
+	auto InitReplay = [&]() {
+		unsigned short buffer[20];
+		BufferIO::CopyWStr(mainGame->dInfo.selfnames[0].c_str(), buffer, 20);
+		last_replay.WriteData(buffer, 40, false);
+		new_replay.WriteData(buffer, 40, false);
+		BufferIO::CopyWStr(mainGame->dInfo.opponames[0].c_str(), buffer, 20);
+		last_replay.WriteData(buffer, 40, false);
+		new_replay.WriteData(buffer, 40, false);
+		last_replay.Write<uint32_t>(start_lp, false);
+		last_replay.Write<uint32_t>(start_hand, false);
+		last_replay.Write<uint32_t>(draw_count, false);
+		last_replay.Write<uint32_t>(opt, false);
+		last_replay.Write<uint16_t>(script_name.size(), false);
+		last_replay.WriteData(script_name.c_str(), script_name.size(), false);
+		last_replay.Flush();
+		new_replay.Write<uint32_t>(opt);
+	};
 	mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 45));
-	time_t seed = time(0);
-	DuelClient::rnd.seed(seed);
 	is_continuing = false;
 	is_restarting = false;
 restart:
+	time_t seed = time(0);
+	DuelClient::rnd.seed(seed);
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { start_lp, start_hand, draw_count };
+	bool hand_test = open_file && open_file_name == L"hand-test-mode";
+	if(hand_test) {
+		opt = DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR5 | DUEL_SIMPLE_AI;
+	}
 	pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), opt, team, team });
 	mainGame->dInfo.compat_mode = false;
 	mainGame->dInfo.lp[0] = start_lp;
@@ -71,45 +93,65 @@ restart:
 	mainGame->dInfo.player_type = 0;
 	mainGame->dInfo.turn = 0;
 	bool loaded = true;
-	bool hand_test = false;
-	std::string script_name = "";
-	if(open_file) {
-		script_name = Utils::ToUTF8IfNeeded(open_file_name);
-		if(script_name == "hand-test-mode") {
-			hand_test = true;
-			OCG_DestroyDuel(pduel);
-			pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR5 | DUEL_SIMPLE_AI, { 8000, 5, 1 }, { 8000, 0, 0 } });
-			Deck playerdeck(gdeckManager->current_deck);
-			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
-			OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
-			card_info.duelist = 0;
-			card_info.loc = LOCATION_DECK;
-			last_replay.Write<uint32_t>(playerdeck.main.size(), false);
-			for(int32 i = (int32)playerdeck.main.size() - 1; i >= 0; --i) {
-				card_info.code = playerdeck.main[i]->code;
-				OCG_DuelNewCard(pduel, card_info);
-				last_replay.Write<uint32_t>(playerdeck.main[i]->code, false);
-			}
-			card_info.loc = LOCATION_EXTRA;
-			last_replay.Write<uint32_t>(playerdeck.extra.size(), false);
-			for(int32 i = (int32)playerdeck.extra.size() - 1; i >= 0; --i) {
-				card_info.code = playerdeck.extra[i]->code;
-				OCG_DuelNewCard(pduel, card_info);
-				last_replay.Write<uint32_t>(playerdeck.extra[i]->code, false);
-			}
-			const char cmd[] = "Debug.ReloadFieldEnd()";
-			OCG_LoadScript(pduel, cmd, sizeof(cmd)-1, " ");
-		} else {
+	ReplayHeader rh;
+	rh.id = REPLAY_YRP1;
+	rh.version = CLIENT_VERSION;
+	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64;
+	if(hand_test)
+		rh.flag |= REPLAY_HAND_TEST;
+	rh.seed = seed;
+	bool saveReplay = !hand_test || gGameConfig->saveHandTest;
+	if(saveReplay) {
+		last_replay.BeginRecord(false);
+		last_replay.WriteHeader(rh);
+		//records the replay with the new system
+		new_replay.BeginRecord();
+		rh.id = REPLAY_YRPX;
+		rh.flag |= REPLAY_NEWREPLAY;
+		new_replay.WriteHeader(rh);
+		replay_stream.clear();
+	}
+	if(hand_test) {
+		script_name = "hand-test-mode";
+		InitReplay();
+		Deck playerdeck(gdeckManager->current_deck);
+		std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
+		OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
+		card_info.duelist = 0;
+		card_info.loc = LOCATION_DECK;
+		last_replay.Write<uint32_t>(playerdeck.main.size(), false);
+		for(int32 i = (int32)playerdeck.main.size() - 1; i >= 0; --i) {
+			card_info.code = playerdeck.main[i]->code;
+			OCG_DuelNewCard(pduel, card_info);
+			last_replay.Write<uint32_t>(playerdeck.main[i]->code, false);
+		}
+		card_info.loc = LOCATION_EXTRA;
+		last_replay.Write<uint32_t>(playerdeck.extra.size(), false);
+		for(int32 i = (int32)playerdeck.extra.size() - 1; i >= 0; --i) {
+			card_info.code = playerdeck.extra[i]->code;
+			OCG_DuelNewCard(pduel, card_info);
+			last_replay.Write<uint32_t>(playerdeck.extra[i]->code, false);
+		}
+		last_replay.Write<uint32_t>(0, false);
+		last_replay.Write<uint32_t>(0, false);
+		last_replay.Flush();
+		const char cmd[] = "Debug.ReloadFieldEnd()";
+		OCG_LoadScript(pduel, cmd, sizeof(cmd) - 1, " ");
+		loaded = true;
+	} else {
+		if(open_file) {
+			script_name = Utils::ToUTF8IfNeeded(open_file_name);
 			if(!mainGame->LoadScript(pduel, script_name)) {
 				script_name = Utils::ToUTF8IfNeeded(EPRO_TEXT("./puzzles/") + open_file_name);
 				if(!mainGame->LoadScript(pduel, script_name))
 					loaded = false;
 			}
+		} else {
+			script_name = BufferIO::EncodeUTF8s(mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true));
+			if(!mainGame->LoadScript(pduel, script_name))
+				loaded = false;
 		}
-	} else {
-		script_name = BufferIO::EncodeUTF8s(mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true));
-		if(!mainGame->LoadScript(pduel, script_name))
-			loaded = false;
+		InitReplay();
 	}
 	if(!loaded) {
 		OCG_DestroyDuel(pduel);
@@ -117,17 +159,14 @@ restart:
 		mainGame->dInfo.isSingleMode = false;
 		open_file = false;
 		is_restarting = false;
+		last_replay.EndRecord();
+		new_replay.EndRecord();
 		mainGame->gMutex.lock();
 		mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
 		mainGame->gMutex.unlock();
 		return 0;
 	}
 	//OCG_SetAIPlayer(pduel, 1, TRUE);
-	ReplayHeader rh;
-	rh.id = REPLAY_YRP1;
-	rh.version = CLIENT_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE + REPLAY_LUA64;
-	rh.seed = seed;
 	mainGame->gMutex.lock();
 	if(!hand_test && !is_restarting) {
 		mainGame->HideElement(mainGame->wSinglePlay);
@@ -153,32 +192,6 @@ restart:
 	std::vector<uint8> duelBuffer;
 	is_closing = false;
 	is_continuing = true;
-	bool saveReplay = !hand_test || gGameConfig->saveHandTest;
-	if(saveReplay) {
-		last_replay.BeginRecord(false);
-		last_replay.WriteHeader(rh);
-		//records the replay with the new system
-		new_replay.BeginRecord();
-		rh.id = REPLAY_YRPX;
-		rh.flag |= REPLAY_NEWREPLAY;
-		new_replay.WriteHeader(rh);
-		replay_stream.clear();
-	}
-	unsigned short buffer[20];
-	BufferIO::CopyWStr(mainGame->dInfo.selfnames[0].c_str(), buffer, 20);
-	last_replay.WriteData(buffer, 40, false);
-	new_replay.WriteData(buffer, 40, false);
-	BufferIO::CopyWStr(mainGame->dInfo.opponames[0].c_str(), buffer, 20);
-	last_replay.WriteData(buffer, 40, false);
-	new_replay.WriteData(buffer, 40, false);
-	last_replay.Write<uint32_t>(start_lp, false);
-	last_replay.Write<uint32_t>(start_hand, false);
-	last_replay.Write<uint32_t>(draw_count, false);
-	last_replay.Write<uint32_t>(opt, false);
-	last_replay.Write<uint16_t>(script_name.size(), false);
-	last_replay.WriteData(script_name.c_str(), script_name.size(), false);
-	last_replay.Flush();
-	new_replay.Write<uint32_t>(opt);
 	int engFlag = 0;
 	auto msg = CoreUtils::ParseMessages(pduel);
 	{

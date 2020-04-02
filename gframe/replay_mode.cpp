@@ -63,7 +63,7 @@ int ReplayMode::ReplayThread() {
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;
 	mainGame->dInfo.isTeam1 = true;
-	mainGame->dInfo.isRelay = !!(rh.flag & REPLAY_RELAY);
+	mainGame->dInfo.isRelay = !!(cur_replay.params.duel_flags & DUEL_RELAY);
 	mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 	mainGame->dInfo.compat_mode = !(rh.flag & REPLAY_LUA64);
 	mainGame->dInfo.team1 = ReplayMode::cur_replay.GetPlayersCount(0);
@@ -237,7 +237,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				mainGame->gMutex.unlock();
 			}
 			DuelClient::ClientAnalyze((char*)p.data.data(), p.data.size());
-			return false;
+			return !yrp || !(cur_replay.yrp->pheader.flag & REPLAY_HAND_TEST);
 		}
 		case MSG_START:
 		case MSG_UPDATE_DATA:

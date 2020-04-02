@@ -210,8 +210,6 @@ void Replay::ParseNames() {
 			count = Read<uint32_t>();
 		else if(pheader.flag & REPLAY_TAG)
 			count = 2;
-		else if(pheader.flag & REPLAY_RELAY)
-			count = 3;
 		else
 			count = 1;
 		for(int i = 0; i < count; i++) {
@@ -239,7 +237,7 @@ void Replay::ParseParams() {
 }
 void Replay::ParseDecks() {
 	decks.clear();
-	if(pheader.id != REPLAY_YRP1 || pheader.flag & REPLAY_SINGLE_MODE)
+	if(pheader.id != REPLAY_YRP1 || (pheader.flag & REPLAY_SINGLE_MODE && !(pheader.flag & REPLAY_HAND_TEST)))
 		return;
 	for(int i = 0; i < home_count + opposing_count; i++) {
 		ReplayDeck tmp;
@@ -253,7 +251,7 @@ void Replay::ParseDecks() {
 		decks.push_back(tmp);
 	}
 	replay_custom_rule_cards.clear();
-	if(pheader.flag & REPLAY_NEWREPLAY) {
+	if(pheader.flag & REPLAY_NEWREPLAY && !(pheader.flag & REPLAY_HAND_TEST)) {
 		int rules = Read<int32_t>();
 		for(int i = 0; i < rules; ++i)
 			replay_custom_rule_cards.push_back(Read<int32_t>());
