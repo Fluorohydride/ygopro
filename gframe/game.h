@@ -371,7 +371,6 @@ public:
 	irr::gui::IGUIStaticText* stCoreVersion;
 	irr::gui::IGUIStaticText* stExpectedCoreVersion;
 	irr::gui::IGUIStaticText* stCompatVersion;
-	irr::gui::IGUIContextMenu* mBeta;
 	irr::gui::IGUIButton* btnOnlineMode;
 	irr::gui::IGUIButton* btnLanMode;
 	irr::gui::IGUIButton* btnSingleMode;

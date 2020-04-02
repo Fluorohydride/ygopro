@@ -282,7 +282,6 @@ bool Game::Initialize() {
 		GetLocalizedCompatVersion().c_str(),
 		Scale(10, 100, 290, 125), false, true, wVersion);
 	((CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
-	mBeta = mTopMenu->getSubMenu(mTopMenu->addItem(L"CLOSED BETA ONLY", 4));
 	//main menu
 	int mainMenuWidth = std::max(280, static_cast<int>(titleWidth / dpi_scale + 15));
 	mainMenuLeftX = 510 - mainMenuWidth / 2;
