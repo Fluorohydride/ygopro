@@ -257,6 +257,7 @@ catch(...) { what = def; }
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->HideElement(mainGame->wCreateHost);
 					mainGame->HideElement(mainGame->wHostPrepare);
+					mainGame->HideElement(mainGame->wHostPrepareL);
 					mainGame->HideElement(mainGame->wHostPrepareR);
 					mainGame->HideElement(mainGame->gBot.window);
 					if(mainGame->isHostingOnline) {
@@ -758,6 +759,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_DUEL_START: {
 		mainGame->HideElement(mainGame->wHostPrepare);
 		mainGame->HideElement(mainGame->gBot.window);
+		mainGame->HideElement(mainGame->wHostPrepareL);
 		mainGame->HideElement(mainGame->wHostPrepareR);
 		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.lock();
