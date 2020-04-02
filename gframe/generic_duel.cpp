@@ -180,7 +180,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			return;
 		}
 		CTOS_JoinGame* pkt = (CTOS_JoinGame*)pdata;
-		if(pkt->version != CLIENT_VERSION) {
+		if(pkt->version2 != CLIENT_VERSION) {
 			STOC_ErrorMsg scem;
 			scem.msg = ERRMSG_VERERROR2;
 			scem.code = CLIENT_VERSION;

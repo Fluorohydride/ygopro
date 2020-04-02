@@ -218,8 +218,10 @@ catch(...) { what = def; }
 			CTOS_JoinGame csjg;
 			if (temp_ver)
 				csjg.version = temp_ver;
-			else
-				csjg.version = CLIENT_VERSION;
+			else {
+				csjg.version = PRO_VERSION;
+				csjg.version2 = CLIENT_VERSION;
+			}
 			csjg.gameid = mainGame->dInfo.secret.game_id;
 			BufferIO::CopyWStr(BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass).c_str(), csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
