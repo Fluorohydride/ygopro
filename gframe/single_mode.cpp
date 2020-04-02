@@ -77,7 +77,7 @@ restart:
 	DuelClient::rnd.seed(seed);
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { start_lp, start_hand, draw_count };
-	bool hand_test = open_file && open_file_name == L"hand-test-mode";
+	bool hand_test = open_file && open_file_name == EPRO_TEXT("hand-test-mode");
 	if(hand_test) {
 		opt = DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR5 | DUEL_SIMPLE_AI;
 	}
