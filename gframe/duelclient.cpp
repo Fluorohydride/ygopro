@@ -3756,7 +3756,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->is_highlighting = true;
 				mainGame->showcardcode = pcard->code;
 				mainGame->showcarddif = 0;
-				mainGame->showcardp = value - 1;
+				mainGame->showcardp = (value & 0xffff) - 1;
 				mainGame->showcard = 6;
 				mainGame->WaitFrameSignal(30);
 				pcard->is_highlighting = false;
