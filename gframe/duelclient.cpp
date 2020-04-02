@@ -256,6 +256,7 @@ catch(...) { what = def; }
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
+					mainGame->HideElement(mainGame->wCreateHost);
 					mainGame->HideElement(mainGame->wHostPrepare);
 					mainGame->HideElement(mainGame->wHostPrepareR);
 					mainGame->HideElement(mainGame->gBot.window);
