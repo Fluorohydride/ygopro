@@ -1935,7 +1935,7 @@ void Game::RefreshAiDecks() {
 							bot.masterRules.insert(masterRule.get<int>());
 						}
 					}
-					bot.version = PRO_VERSION;
+					bot.version = CLIENT_VERSION;
 #ifdef _WIN32
 					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
 #else
