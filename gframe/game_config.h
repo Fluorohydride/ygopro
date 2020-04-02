@@ -37,6 +37,7 @@ struct GameConfig
 	unsigned int lastlflist = 0;
 	unsigned int lastallowedcards = 3;
 	unsigned int lastDuelParam = 0x2E800; //#define DUEL_MODE_MR5
+	unsigned int lastExtraRules = 0;
 	unsigned int lastDuelForbidden = 0; //#define DUEL_MODE_MR5_FORB
 	unsigned int timeLimit = 180;
 	unsigned int team1count = 1;

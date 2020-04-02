@@ -169,7 +169,7 @@ public:
 
 	uint8 LocalPlayer(uint8 player);
 	void UpdateDuelParam();
-	void UpdateExtraRules();
+	void UpdateExtraRules(bool set = false);
 	int GetMasterRule(uint32 param, uint32 forbidden = 0, int* truerule = 0);
 	void SetPhaseButtons();
 	void SetMessageWindow();
@@ -413,7 +413,7 @@ public:
 	irr::gui::IGUIEditBox* ebServerPass;
 	irr::gui::IGUIButton* btnRuleCards;
 	irr::gui::IGUIWindow* wRules;
-	irr::gui::IGUICheckBox* chkRules[13];
+	irr::gui::IGUICheckBox* chkRules[14];
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;

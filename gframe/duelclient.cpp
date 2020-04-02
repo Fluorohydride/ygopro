@@ -355,7 +355,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.lock();
 			int mainmin = 40, mainmax = 60, extramax = 15, sidemax = 15;
 			if (mainGame->cbDeckSelect2->isVisible()) {
-				if (mainGame->dInfo.duel_params & DUEL_MODE_SPEED) {
+				if (mainGame->extra_rules & DECK_LIMIT_20) {
 					mainmin = 40;
 					mainmax = 60;
 					extramax = 10;
@@ -366,7 +366,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					extramax = 30;
 					sidemax = 30;
 				}
-			} else if (mainGame->dInfo.duel_params & DUEL_MODE_SPEED) {
+			} else if (mainGame->extra_rules & DECK_LIMIT_20) {
 				mainmin = 20;
 				mainmax = 30;
 				extramax = 10;
@@ -609,7 +609,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		} else {
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt->info.duel_flag, pkt->info.forbiddentypes, &rule);
 		}
-		if (rule == 6) {
+		if((pkt->info.duel_flag & DUEL_MODE_SPEED) == pkt->info.duel_flag) {
+			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1258)));
+		} else if((pkt->info.duel_flag & DUEL_MODE_RUSH) == pkt->info.duel_flag) {
+			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1259)));
+		} else if (rule == 6) {
 			uint32_t filter = 0x100;
 			for (int i = 0; filter && i < schkCustomRules; ++i, filter <<= 1)
 				if (pkt->info.duel_flag & filter) {
@@ -620,7 +624,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1260 + rule - 1)));
 		}
 		if(!mainGame->dInfo.compat_mode) {
-			for(int flag = SEALED_DUEL, i = 0; flag < ACTION_DUEL + 1; flag = flag << 1, i++)
+			for(int flag = SEALED_DUEL, i = 0; flag < DECK_LIMIT_20 + 1; flag = flag << 1, i++)
 				if(pkt->info.extra_rules & flag) {
 					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1132 + i)));
 				}

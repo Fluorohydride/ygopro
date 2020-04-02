@@ -52,6 +52,8 @@ bool GameConfig::Load(const path_char* filename)
 				lastdeck = BufferIO::DecodeUTF8s(str);
 			else if (type == "lastDuelParam")
 				lastDuelParam = std::stoi(str);
+			else if (type == "lastExtraRules")
+				lastExtraRules = std::stoi(str);
 			else if (type == "lastDuelForbidden")
 				lastDuelForbidden = std::stoi(str);
 #define DESERIALIZE_UNSIGNED(name) \
@@ -213,6 +215,7 @@ bool GameConfig::Save(const path_char* filename)
 	conf_file << "lastlflist = "         << lastlflist << "\n";
 	conf_file << "lastallowedcards = "   << lastallowedcards << "\n";
 	SERIALIZE(lastDuelParam);
+	SERIALIZE(lastExtraRules);
 	SERIALIZE(lastDuelForbidden);
 	SERIALIZE(timeLimit);
 	SERIALIZE(team1count);

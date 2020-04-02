@@ -257,6 +257,7 @@ public:
 #define COMMAND_DUEL        0x400
 #define DECK_MASTER         0x800
 #define ACTION_DUEL         0x1000
+#define DECK_LIMIT_20       0x2000
 
 #define DUEL_STAGE_BEGIN		0
 #define DUEL_STAGE_FINGER		1

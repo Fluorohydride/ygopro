@@ -91,7 +91,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		int id = caller->getID();
-		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && id != CHECKBOX_EXTRA_RULE))
+		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && id != CHECKBOX_EXTRA_RULE && id != COMBOBOX_DUEL_RULE))
 			break;
 		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK)
 			break;
@@ -803,7 +803,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case COMBOBOX_DUEL_RULE: {
 				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
-#define CHECK(MR) case (MR - 1): { mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; goto remove; }
+#define CHECK(MR) case (MR - 1): { mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; mainGame->chkRules[13]->setChecked(false); goto remove; }
 				switch (combobox->getSelected()) {
 				CHECK(1)
 				CHECK(2)
@@ -813,16 +813,19 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				case 5:	{
 					mainGame->duel_param = DUEL_MODE_SPEED;
 					mainGame->forbiddentypes = 0;
+					mainGame->chkRules[13]->setChecked(true);
 					goto remove;
 				}
 				case 6:	{
 					mainGame->duel_param = DUEL_MODE_RUSH;
 					mainGame->forbiddentypes = 0;
+					mainGame->chkRules[13]->setChecked(false);
 					goto remove;
 				}
 				default: break;
 				remove:
 				combobox->removeItem(7);
+				mainGame->UpdateExtraRules();
 				}
 #undef CHECK
 				uint32 filter = 0x100;

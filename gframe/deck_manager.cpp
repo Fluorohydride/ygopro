@@ -170,7 +170,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, DuelAllowedCards allowedCards
 	auto list = &curlist->content;
 	if(TypeCount(deck.main, forbiddentypes) > 0 || TypeCount(deck.extra, forbiddentypes) > 0 || TypeCount(deck.side, forbiddentypes) > 0)
 		return (DECKERROR_FORBTYPE << 28);
-	bool speed = mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD;
+	bool speed = mainGame->extra_rules & DECK_LIMIT_20;
 	if(doubled){
 		if(speed){
 			if(deck.main.size() < 40 || deck.main.size() > 60)

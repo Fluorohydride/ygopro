@@ -393,7 +393,8 @@ bool Game::Initialize() {
 		chkRules[i] = env->addCheckBox(false, Scale(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, CHECKBOX_EXTRA_RULE, gDataManager->GetSysString(1132 + i).c_str());
 		defaultStrings.emplace_back(chkRules[i], 1132 + i);
 	}
-	extra_rules = 0;
+	extra_rules = gGameConfig->lastExtraRules;
+	UpdateExtraRules(true);
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).c_str(), Scale(20, 180, 220, 200), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1236);
 	cbDuelRule = ADDComboBox(Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
@@ -1975,6 +1976,7 @@ void Game::SaveConfig() {
 	gGameConfig->nickname = ebNickName->getText();
 	gGameConfig->lastallowedcards = cbRule->getSelected();
 	gGameConfig->lastDuelParam = duel_param;
+	gGameConfig->lastExtraRules = extra_rules;
 	gGameConfig->lastDuelForbidden = forbiddentypes;
 	TrySaveInt(gGameConfig->timeLimit, ebTimeLimit);
 	TrySaveInt(gGameConfig->team1count, ebTeam1);
@@ -2399,9 +2401,14 @@ void Game::UpdateDuelParam() {
 	duel_param = flag;
 	forbiddentypes = flag2;
 }
-void Game::UpdateExtraRules() {
+void Game::UpdateExtraRules(bool set) {
 	for(int i = 0; i < (sizeof(chkRules) / sizeof(irr::gui::IGUICheckBox*)); i++)
 		chkRules[i]->setEnabled(true);
+	if(set) {
+		for(int flag = 1, i = 0; i < (sizeof(chkRules) / sizeof(irr::gui::IGUICheckBox*)); i++, flag = flag << 1)
+			chkRules[i]->setChecked(extra_rules & flag);
+		return;
+	}
 	if(chkRules[0]->isChecked()) {
 		chkRules[1]->setEnabled(false);
 		chkRules[4]->setEnabled(false);
