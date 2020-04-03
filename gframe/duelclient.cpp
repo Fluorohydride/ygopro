@@ -1157,7 +1157,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_OPSELECTED: {
-			std::wstring text(fmt::sprintf(gDataManager->GetSysString(1510), gDataManager->GetDesc(data, mainGame->dInfo.compat_mode)));
+			std::wstring text(fmt::sprintf(gDataManager->GetSysString(player == 0 ? 1510 : 1512), gDataManager->GetDesc(data, mainGame->dInfo.compat_mode)));
 			mainGame->AddLog(text);
 			mainGame->gMutex.lock();
 			mainGame->stACMessage->setText(text.c_str());
