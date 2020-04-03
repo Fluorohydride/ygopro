@@ -225,7 +225,7 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 	if(ygo::DuelClient::StartClient(host.server_address, host.server_port, host.game_id, false)) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) game->HideElement(obj);
 		if(game->is_building)
-			game->deckBuilder.Terminate();
+			game->deckBuilder.Terminate(false);
 		HIDE_AND_CHECK(game->wMainMenu)
 		HIDE_AND_CHECK(game->wLanWindow)
 		HIDE_AND_CHECK(game->wCreateHost)
