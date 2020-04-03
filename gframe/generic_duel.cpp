@@ -597,7 +597,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(host_info.extra_rules & DIMENSION_DUEL)
 		extracards.push_back(511600002);
 	if(host_info.extra_rules & TURBO_DUEL)
-		extracards.push_back(302);
+		extracards.push_back(110000000);
 	if(host_info.extra_rules & COMMAND_DUEL)
 		extracards.push_back(95200000);
 	if(host_info.extra_rules & DECK_MASTER)
