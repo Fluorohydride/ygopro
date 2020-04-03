@@ -251,7 +251,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		break;
 	}
 	case CTOS_JOIN_GAME: {
-		if(!duel_mode || len < sizeof(CTOS_JoinGame*))
+		if(!duel_mode || ((len - 1) < sizeof(CTOS_JoinGame)))
 			break;
 		duel_mode->JoinGame(dp, pdata, false);
 		break;
