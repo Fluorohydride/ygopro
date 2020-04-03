@@ -58,6 +58,9 @@ public:
 		return watching;
 	};
 	static void SwapField();
+	static bool IsConnected() {
+		return !!connect_state;
+	};
 	static void SetResponseI(int respI);
 	static void SetResponseB(void* respB, unsigned int len);
 	static void SendResponse();
