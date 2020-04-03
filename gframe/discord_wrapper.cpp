@@ -224,6 +224,8 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 	game->isHostingOnline = true;
 	if(ygo::DuelClient::StartClient(host.server_address, host.server_port, host.game_id, false)) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) game->HideElement(obj);
+		if(game->is_building)
+			game->deckBuilder.Terminate();
 		HIDE_AND_CHECK(game->wMainMenu)
 		HIDE_AND_CHECK(game->wLanWindow)
 		HIDE_AND_CHECK(game->wCreateHost)
@@ -234,8 +236,6 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 		HIDE_AND_CHECK(game->wCustomRulesL)
 		HIDE_AND_CHECK(game->wCustomRulesR)
 		HIDE_AND_CHECK(game->wRoomListPlaceholder)
-		if(game->is_building)
-			game->deckBuilder.Terminate();
 		game->device->setEventReceiver(&game->menuHandler);
 #undef HIDE_AND_CHECK
 	}
