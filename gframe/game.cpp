@@ -251,7 +251,7 @@ bool Game::Initialize() {
 								 L"Project Ignis:\n"
 								 L"ahtelel, AlphaKretin, AndreOliveiraMendes, Cybercatman, Dragon3989, DyXel, edo9300, "
 								 L"EerieCode, Gideon, Hatter, Hel, Icematoro, kevinlul, Larry126, LogicalNonsense, "
-								 L"NaimSantos, pyrQ, Sanct, senpaizuri, Tungnon, WolfOfWolves, Yamato\n"
+								 L"NaimSantos, pyrQ, Sanct, senpaizuri, Steeldarkeagel, Tungnon, WolfOfWolves, Yamato\n"
 								 L"Default background: LogicalNonsense\n"
 								 L"Default fields: Icematoro\n"
 								 L"\n"
