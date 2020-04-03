@@ -886,6 +886,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_CHAT: {
+		if(mainGame->dInfo.isCatchingUp && !mainGame->dInfo.isReplay)
+			break;
 		STOC_Chat* pkt = (STOC_Chat*)pdata;
 		int player = pkt->player;
 		int type = -1;
