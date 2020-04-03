@@ -1021,8 +1021,8 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 		}
 		if(filter_scltype) {
 			if((filter_scltype == 1 && data->_data.lscale != filter_scl) || (filter_scltype == 2 && data->_data.lscale < filter_scl)
-				|| (filter_scltype == 3 && data->_data.lscale <= filter_scl) || (filter_scltype == 4 && (data->_data.lscale > filter_scl || data->_data.lscale == 0))
-				|| (filter_scltype == 5 && (data->_data.lscale >= filter_scl || data->_data.lscale == 0)) || filter_scltype == 6
+				|| (filter_scltype == 3 && data->_data.lscale <= filter_scl) || (filter_scltype == 4 && (data->_data.lscale > filter_scl))
+				|| (filter_scltype == 5 && (data->_data.lscale >= filter_scl)) || filter_scltype == 6
 				|| !(data->_data.type & TYPE_PENDULUM))
 				return false;
 		}
