@@ -1157,7 +1157,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_OPSELECTED: {
-			std::wstring text(fmt::sprintf(gDataManager->GetSysString(player == 0 ? 1510 : 1512), gDataManager->GetDesc(data, mainGame->dInfo.compat_mode)));
+			std::wstring text(fmt::format(gDataManager->GetSysString(player == 0 ? 1510 : 1512), gDataManager->GetDesc(data, mainGame->dInfo.compat_mode)));
 			mainGame->AddLog(text);
 			mainGame->gMutex.lock();
 			mainGame->stACMessage->setText(text.c_str());
@@ -1174,7 +1174,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_RACE: {
-			std::wstring text(fmt::sprintf(gDataManager->GetSysString(1511), gDataManager->FormatRace(data)));
+			std::wstring text(fmt::format(gDataManager->GetSysString(1511), gDataManager->FormatRace(data)));
 			mainGame->AddLog(text);
 			mainGame->gMutex.lock();
 			mainGame->stACMessage->setText(text.c_str());
@@ -1184,7 +1184,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_ATTRIB: {
-			std::wstring text(fmt::sprintf(gDataManager->GetSysString(1511), gDataManager->FormatAttribute(data)));
+			std::wstring text(fmt::format(gDataManager->GetSysString(1511), gDataManager->FormatAttribute(data)));
 			mainGame->AddLog(text);
 			mainGame->gMutex.lock();
 			mainGame->stACMessage->setText(text.c_str());
@@ -1194,7 +1194,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_CODE: {
-			std::wstring text(fmt::sprintf(gDataManager->GetSysString(1511), gDataManager->GetName(data)));
+			std::wstring text(fmt::format(gDataManager->GetSysString(1511), gDataManager->GetName(data)));
 			mainGame->AddLog(text);
 			mainGame->gMutex.lock();
 			mainGame->stACMessage->setText(text.c_str());
@@ -1204,7 +1204,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_NUMBER: {
-			std::wstring text(fmt::sprintf(gDataManager->GetSysString(1512), data));
+			std::wstring text(fmt::format(gDataManager->GetSysString(1512), data));
 			mainGame->AddLog(text);
 			mainGame->gMutex.lock();
 			mainGame->stACMessage->setText(text.c_str());
@@ -1254,7 +1254,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 						++seq;
 					}
 					str += L"(" + fmt::to_wstring(seq) + L")";
-					mainGame->AddLog(fmt::sprintf(gDataManager->GetSysString(1510), str));
+					mainGame->AddLog(fmt::format(gDataManager->GetSysString(1510), str));
 				}
 			}
 			mainGame->dField.selectable_field = data;
