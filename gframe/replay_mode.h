@@ -7,7 +7,7 @@
 #include "deck_manager.h"
 #include "replay.h"
 #include "core_utils.h"
-#include <random>
+#include "random_fwd.h"
 
 namespace ygo {
 

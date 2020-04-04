@@ -2,7 +2,7 @@
 #include "duelclient.h"
 #include "game.h"
 #include "single_mode.h"
-#include <random>
+#include "random_fwd.h"
 
 namespace ygo {
 	bool ReplayMode::ReadReplayResponse() {
@@ -104,7 +104,7 @@ namespace ygo {
 		auto names = ReplayMode::cur_replay.yrp->GetPlayerNames();
 		mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0));
 		mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0), names.end());
-		std::mt19937 rnd(seed);
+		randengine rnd(seed);
 		int start_lp = cur_replay.yrp->params.start_lp;
 		int start_hand = cur_replay.yrp->params.start_hand;
 		int draw_count = cur_replay.yrp->params.draw_count;

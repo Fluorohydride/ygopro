@@ -2,7 +2,7 @@
 #include "netserver.h"
 #include "game.h"
 #include "core_utils.h"
-#include <random>
+#include "random_fwd.h"
 
 namespace ygo {
 
@@ -546,7 +546,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.seed = seed;
 	last_replay.BeginRecord(false);
 	last_replay.WriteHeader(rh);
-	std::mt19937 rnd(seed);
+	randengine rnd(seed);
 	//records the replay with the new system
 	new_replay.BeginRecord();
 	rh.id = REPLAY_YRPX;

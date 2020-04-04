@@ -1,6 +1,6 @@
 #include "single_mode.h"
 #include <fmt/chrono.h>
-#include <random>
+#include "random_fwd.h"
 #include "game_config.h"
 #include "duelclient.h"
 #include "game.h"

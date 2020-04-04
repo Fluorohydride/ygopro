@@ -1,5 +1,6 @@
 #include "game_config.h"
 #include <irrlicht.h>
+#include "random_fwd.h"
 #include "config.h"
 #include "deck_con.h"
 #include "data_manager.h"
@@ -173,7 +174,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				std::shuffle(
 					gdeckManager->current_deck.main.begin(),
 					gdeckManager->current_deck.main.end(),
-					std::mt19937(time(nullptr))
+					randengine(time(nullptr))
 				);
 				break;
 			}
