@@ -1881,12 +1881,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			case SCROLL_MUSIC_VOLUME: {
 				gGameConfig->musicVolume = static_cast<IGUIScrollBar*>(event.GUIEvent.Caller)->getPos();
 				mainGame->tabSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
+				mainGame->gSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
 				gSoundManager->SetMusicVolume(gGameConfig->musicVolume / 100.0);
 				return true;
 			}
 			case SCROLL_SOUND_VOLUME: {
 				gGameConfig->soundVolume = static_cast<IGUIScrollBar*>(event.GUIEvent.Caller)->getPos();
 				mainGame->tabSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
+				mainGame->gSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
 				gSoundManager->SetSoundVolume(gGameConfig->soundVolume / 100.0);
 				return true;
 			}
@@ -1898,12 +1900,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			case CHECKBOX_ENABLE_MUSIC: {
 				gGameConfig->enablemusic = static_cast<IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
 				mainGame->tabSettings.chkEnableMusic->setChecked(gGameConfig->enablemusic);
+				mainGame->gSettings.chkEnableMusic->setChecked(gGameConfig->enablemusic);
 				gSoundManager->EnableMusic(gGameConfig->enablemusic);
 				return true;
 			}
 			case CHECKBOX_ENABLE_SOUND: {
 				gGameConfig->enablesound = static_cast<IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
 				mainGame->tabSettings.chkEnableSound->setChecked(gGameConfig->enablesound);
+				mainGame->gSettings.chkEnableSound->setChecked(gGameConfig->enablesound);
 				gSoundManager->EnableSounds(gGameConfig->enablesound);
 				return true;
 			}

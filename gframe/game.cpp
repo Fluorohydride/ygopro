@@ -1298,13 +1298,8 @@ bool Game::Initialize() {
 	stCardListTip->setVisible(false);
 	device->setEventReceiver(&menuHandler);
 	if(!gSoundManager->IsUsable()) {
-		tabSettings.chkEnableSound->setVisible(false);
-		tabSettings.stSoundVolume->setVisible(false);
-		tabSettings.scrSoundVolume->setVisible(false);
-		tabSettings.chkEnableMusic->setVisible(false);
-		tabSettings.stMusicVolume->setVisible(false);
-		tabSettings.scrMusicVolume->setVisible(false);
-		tabSettings.stNoAudioBackend->setVisible(true);
+		tabSettings.DisableAudio();
+		gSettings.DisableAudio();
 	}
 
 	//server lobby
