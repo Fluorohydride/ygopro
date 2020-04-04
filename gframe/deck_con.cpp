@@ -606,12 +606,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					pop_side(hovered_seq);
 				} else {
 					auto pointer = gDataManager->GetCardData(hovered_code);
-					if(!pointer)
+					if(!pointer || !check_limit(pointer))
 						break;
-					if(!check_limit(pointer))
-						break;
-					if(!push_extra(pointer) && !push_main(pointer))
+					if (event.MouseInput.Shift) {
 						push_side(pointer);
+					}
+					else {
+						if (!push_extra(pointer) && !push_main(pointer))
+							push_side(pointer);
+					}
 				}
 			} else {
 				if(click_pos == 1) {
