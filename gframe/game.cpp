@@ -660,6 +660,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tabSettings.chkAutoChainOrder, 1276);
 	tabSettings.chkNoChainDelay = env->addCheckBox(gGameConfig->chkWaitChain, Scale(20, 170, 280, 195), tabPanel, -1, gDataManager->GetSysString(1277).c_str());
 	defaultStrings.emplace_back(tabSettings.chkNoChainDelay, 1277);
+	// audio
 	tabSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(20, 200, 280, 225), tabPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).c_str());
 	defaultStrings.emplace_back(tabSettings.chkEnableSound, 2047);
 	tabSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).c_str(), Scale(20, 230, 80, 255), false, true, tabPanel);
@@ -683,6 +684,7 @@ bool Game::Initialize() {
 	tabSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(20, 200, 280, 315), false, true, tabPanel);
 	defaultStrings.emplace_back(tabSettings.stNoAudioBackend, 2058);
 	tabSettings.stNoAudioBackend->setVisible(false);
+	// end audio
 	tabSettings.chkMAutoPos = env->addCheckBox(gGameConfig->chkMAutoPos, Scale(20, 320, 280, 345), tabPanel, -1, gDataManager->GetSysString(1274).c_str());
 	defaultStrings.emplace_back(tabSettings.chkMAutoPos, 1274);
 	tabSettings.chkSTAutoPos = env->addCheckBox(gGameConfig->chkSTAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, gDataManager->GetSysString(1278).c_str());
@@ -775,6 +777,31 @@ bool Game::Initialize() {
 	ReloadCBCoreLogOutput();
 	gSettings.chkSaveHandTest = env->addCheckBox(gGameConfig->saveHandTest, Scale(340, 155, 645, 180), sPanel, CHECKBOX_SAVE_HAND_TEST_REPLAY, gDataManager->GetSysString(2077).c_str());
 	defaultStrings.emplace_back(gSettings.chkSaveHandTest, 2077);
+	// audio
+	gSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(340, 185, 645, 210), sPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).c_str());
+	defaultStrings.emplace_back(gSettings.chkEnableSound, 2047);
+	gSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).c_str(), Scale(340, 215, 400, 240), false, true, sPanel);
+	defaultStrings.emplace_back(gSettings.stSoundVolume, 2049);
+	gSettings.scrSoundVolume = env->addScrollBar(true, Scale(405, 215, 645, 235), sPanel, SCROLL_SOUND_VOLUME);
+	gSettings.scrSoundVolume->setMax(100);
+	gSettings.scrSoundVolume->setMin(0);
+	gSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
+	gSettings.scrSoundVolume->setLargeStep(1);
+	gSettings.scrSoundVolume->setSmallStep(1);
+	gSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, Scale(340, 245, 645, 270), sPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).c_str());
+	defaultStrings.emplace_back(gSettings.chkEnableMusic, 2046);
+	gSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).c_str(), Scale(340, 275, 400, 300), false, true, sPanel);
+	defaultStrings.emplace_back(gSettings.stMusicVolume, 2048);
+	gSettings.scrMusicVolume = env->addScrollBar(true, Scale(405, 275, 645, 295), sPanel, SCROLL_MUSIC_VOLUME);
+	gSettings.scrMusicVolume->setMax(100);
+	gSettings.scrMusicVolume->setMin(0);
+	gSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
+	gSettings.scrMusicVolume->setLargeStep(1);
+	gSettings.scrMusicVolume->setSmallStep(1);
+	gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(340, 305, 645, 330), false, true, sPanel);
+	defaultStrings.emplace_back(gSettings.stNoAudioBackend, 2058);
+	gSettings.stNoAudioBackend->setVisible(false);
+	// end audio
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
 	wBtnSettings->getCloseButton()->setVisible(false);

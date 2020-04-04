@@ -25,7 +25,4 @@ void SettingsWindow::DisableAudio() {
 	stNoAudioBackend->setVisible(true);
 }
 
-#undef GUI_ARGS
-}
-
 }
