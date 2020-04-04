@@ -780,6 +780,7 @@ void GenericDuel::BeforeParsing(CoreUtils::Packet& packet, int& return_value, bo
 		RefreshSzone(1);
 		RefreshHand(0);
 		RefreshHand(1);
+		record_last = false;
 		break;
 	}
 	case MSG_SELECT_CHAIN:
@@ -788,12 +789,14 @@ void GenericDuel::BeforeParsing(CoreUtils::Packet& packet, int& return_value, bo
 		RefreshMzone(1);
 		RefreshSzone(0);
 		RefreshSzone(1);
+		record_last = false;
 		break;
 	}
 	case MSG_FLIPSUMMONING: {
 		pbuf += 4;
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, false);
 		RefreshSingle(info.controler, info.location, info.sequence);
+		record_last = false;
 		break;
 	}
 	default:
@@ -1215,16 +1218,17 @@ int GenericDuel::Analyze(CoreUtils::Packet packet) {
 	bool record = true;
 	bool record_last = false;
 	unsigned char message = packet.message;
+	auto packetcpy = packet;
 	BeforeParsing(packet, return_value, record, record_last);
 	Sending(packet, return_value, record, record_last);
 	AfterParsing(packet, return_value, record, record_last);
 	if(record && (return_value != 1 && message != MSG_RETRY)) {
 		if(!record_last) {
-			new_replay.WritePacket(packet);
+			new_replay.WritePacket(packetcpy);
 			new_replay.WriteStream(replay_stream);
 		} else {
 			new_replay.WriteStream(replay_stream);
-			new_replay.WritePacket(packet);
+			new_replay.WritePacket(packetcpy);
 		}
 		new_replay.Flush();
 	} else {
