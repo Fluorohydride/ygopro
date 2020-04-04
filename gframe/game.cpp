@@ -2402,7 +2402,7 @@ void Game::UpdateDuelParam() {
 		if (chkTypeLimit[i]->isChecked()) {
 			flag2 |= limits[i];
 		}
-#define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) { cbDuelRule->removeItem(5); break; } }
+#define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) { cbDuelRule->removeItem(7); break; } }
 	switch (flag) {
 	CHECK(1)
 	CHECK(2)
