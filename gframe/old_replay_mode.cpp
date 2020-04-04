@@ -21,6 +21,7 @@ namespace ygo {
 		}
 		const ReplayHeader& rh = cur_replay.yrp->pheader;
 		mainGame->dInfo.isFirst = true;
+		mainGame->dInfo.isTeam1 = true;
 		mainGame->dInfo.isRelay = !!(cur_replay.params.duel_flags & DUEL_RELAY);
 		mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
 		mainGame->dInfo.compat_mode = false;
