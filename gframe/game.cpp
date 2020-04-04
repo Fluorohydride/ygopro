@@ -1002,7 +1002,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(stDeck, 1301);
 	cbDBDecks = ADDComboBox(Scale(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
-	RefreshLFLists();
+
 	btnSaveDeck = env->addButton(Scale(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, gDataManager->GetSysString(1302).c_str());
 	defaultStrings.emplace_back(btnSaveDeck, 1302);
 	btnRenameDeck = env->addButton(Scale(5, 65, 75, 90), wDeckEdit, BUTTON_RENAME_DECK, gDataManager->GetSysString(1362).c_str());
@@ -1313,7 +1313,7 @@ bool Game::Initialize() {
 	cbFilterBanlist->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
 
 	ReloadCBFilterRule();
-	ReloadCBFilterBanlist();
+	RefreshLFLists();
 
 	/*cbFilterMatchMode->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1227)).c_str());
 	cbFilterMatchMode->addItem(gDataManager->GetSysString(1244).c_str());
@@ -1905,15 +1905,20 @@ void Game::RefreshLFLists() {
 	cbHostLFList->setSelected(0);
 	cbDBLFList->clear();
 	cbDBLFList->setSelected(0);
+	auto prevFilter = std::max(0, cbFilterBanlist->getSelected());
+	cbFilterBanlist->clear();
+	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).c_str());
 	for (auto &list : gdeckManager->_lfList) {
 		auto hostIndex = cbHostLFList->addItem(list.listName.c_str(), list.hash);
 		auto deckIndex = cbDBLFList->addItem(list.listName.c_str(), list.hash);
+		cbFilterBanlist->addItem(list.listName.c_str(), list.hash);
 		if (gGameConfig->lastlflist == list.hash) {
 			cbHostLFList->setSelected(hostIndex);
 			cbDBLFList->setSelected(deckIndex);
 		}
 	}
 	deckBuilder.filterList = &gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()];
+	cbFilterBanlist->setSelected(prevFilter);
 }
 void Game::RefreshAiDecks() {
 	gBot.bots.clear();
@@ -2631,12 +2636,6 @@ void Game::ReloadCBFilterRule() {
 	for (auto i = 1900; i <= 1904; ++i)
 		cbFilterRule->addItem(gDataManager->GetSysString(i).c_str());
 }
-void Game::ReloadCBFilterBanlist() {
-	cbFilterBanlist->clear();
-	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).c_str());
-	for (unsigned int i = 0; i < gdeckManager->_lfList.size(); ++i)
-		cbFilterBanlist->addItem(gdeckManager->_lfList[i].listName.c_str(), gdeckManager->_lfList[i].hash);
-}
 void Game::ReloadCBDuelRule() {
 	cbDuelRule->clear();
 	cbDuelRule->addItem(gDataManager->GetSysString(1260).c_str());
@@ -2727,10 +2726,6 @@ void Game::ReloadElementsStrings() {
 	prev = cbFilterRule->getSelected();
 	ReloadCBFilterRule();
 	cbFilterRule->setSelected(prev);
-
-	prev = cbFilterBanlist->getSelected();
-	ReloadCBFilterBanlist();
-	cbFilterBanlist->setSelected(prev);
 	
 	prev = cbDuelRule->getSelected();
 	if (prev >= 5) {

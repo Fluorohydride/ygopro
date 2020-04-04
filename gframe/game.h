@@ -186,7 +186,6 @@ public:
 	void ReloadCBAttribute();
 	void ReloadCBRace();
 	void ReloadCBFilterRule();
-	void ReloadCBFilterBanlist();
 	void ReloadCBDuelRule();
 	void ReloadCBRule();
 	void ReloadCBCurrentSkin();
