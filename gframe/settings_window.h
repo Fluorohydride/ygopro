@@ -23,6 +23,7 @@ struct SettingsPane {
 	irr::gui::IGUICheckBox* chkHideChainButtons;
 	irr::gui::IGUICheckBox* chkAutoChainOrder;
 	irr::gui::IGUICheckBox* chkNoChainDelay;
+	// audio
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUIStaticText* stSoundVolume;
 	irr::gui::IGUIScrollBar* scrSoundVolume;
@@ -30,9 +31,12 @@ struct SettingsPane {
 	irr::gui::IGUIStaticText* stMusicVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUIStaticText* stNoAudioBackend;
+	// end audio
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
+
+	void DisableAudio();
 };
 
 struct SettingsWindow {
@@ -65,7 +69,17 @@ struct SettingsWindow {
 	irr::gui::IGUIStaticText* stAntiAlias;
 	irr::gui::IGUIEditBox* ebAntiAlias;
 	irr::gui::IGUICheckBox* chkSaveHandTest;
+	// audio
+	irr::gui::IGUICheckBox* chkEnableSound;
+	irr::gui::IGUIStaticText* stSoundVolume;
+	irr::gui::IGUIScrollBar* scrSoundVolume;
+	irr::gui::IGUICheckBox* chkEnableMusic;
+	irr::gui::IGUIStaticText* stMusicVolume;
+	irr::gui::IGUIScrollBar* scrMusicVolume;
+	irr::gui::IGUIStaticText* stNoAudioBackend;
+	// end audio
 
+	void DisableAudio();
 };
 
 }
