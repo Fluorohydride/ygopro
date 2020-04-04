@@ -231,13 +231,16 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			return false;
 		}
 		case MSG_WIN: {
-			if (mainGame->dInfo.isCatchingUp) {
-				mainGame->dInfo.isCatchingUp = false;
-				mainGame->dField.RefreshAllCards();
-				mainGame->gMutex.unlock();
+			if(!yrp || !(cur_replay.yrp->pheader.flag & REPLAY_HAND_TEST)) {
+				if (mainGame->dInfo.isCatchingUp) {
+					mainGame->dInfo.isCatchingUp = false;
+					mainGame->dField.RefreshAllCards();
+					mainGame->gMutex.unlock();
+				}
+				DuelClient::ClientAnalyze((char*)p.data.data(), p.data.size());
+				return false;
 			}
-			DuelClient::ClientAnalyze((char*)p.data.data(), p.data.size());
-			return !yrp || !(cur_replay.yrp->pheader.flag & REPLAY_HAND_TEST);
+			return true;
 		}
 		case MSG_START:
 		case MSG_UPDATE_DATA:
