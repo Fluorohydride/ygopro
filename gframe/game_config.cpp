@@ -81,6 +81,7 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_BOOL(vsync)
 			DESERIALIZE_BOOL(showScopeLabel)
 			DESERIALIZE_BOOL(saveHandTest)
+			DESERIALIZE_BOOL(discordIntegration)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
 #endif
@@ -264,6 +265,7 @@ bool GameConfig::Save(const path_char* filename)
 	conf_file << "music_volume = "       << musicVolume << "\n";
 	conf_file << "sound_volume = "       << soundVolume << "\n";
 	SERIALIZE(saveHandTest);
+	SERIALIZE(discordIntegration);
 #ifdef __ANDROID__
 	conf_file << "native_keyboard = "    << native_keyboard << "\n";
 	conf_file << "native_mouse = "       << native_mouse << "\n";

@@ -183,7 +183,8 @@ bool Game::Initialize() {
 	}
 	RefreshAiDecks();
 	discord.Initialize(filesystem->getWorkingDirectory().c_str());
-	discord.UpdatePresence(DiscordWrapper::INITIALIZE);
+	if(gGameConfig->discordIntegration)
+		discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
 	env = device->getGUIEnvironment();
 #ifdef __ANDROID__
@@ -801,6 +802,8 @@ bool Game::Initialize() {
 	gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(340, 305, 645, 330), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stNoAudioBackend, 2058);
 	gSettings.stNoAudioBackend->setVisible(false);
+	gSettings.chkDiscordIntegration = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 305, 645, 330), sPanel, CHECKBOX_DISCORD_INTEGRATION, gDataManager->GetSysString(2078).c_str());
+	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2078);
 	// end audio
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));

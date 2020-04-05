@@ -78,6 +78,7 @@ struct SettingsWindow {
 	irr::gui::IGUIScrollBar* scrMusicVolume;
 	irr::gui::IGUIStaticText* stNoAudioBackend;
 	// end audio
+	irr::gui::IGUICheckBox* chkDiscordIntegration;
 
 	void DisableAudio();
 };
