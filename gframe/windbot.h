@@ -18,9 +18,9 @@ struct WindBot {
 	std::set<int> masterRules;
 
 #if defined(_WIN32) || defined(__ANDROID__)
-	int Launch(int port, bool chat = true, int hand = 0) const;
+	int Launch(int port, const std::wstring& pass, bool chat = true, int hand = 0) const;
 #else
-	pid_t Launch(int port, bool chat = true, int hand = 0) const;
+	pid_t Launch(int port, const std::wstring& pass, bool chat = true, int hand = 0) const;
 #endif
 
 	// Can be made static

@@ -456,7 +456,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_BOT_ADD: {
 				try {
 					int port = std::stoi(gGameConfig->serverport);
-					mainGame->gBot.LaunchSelected(port);
+					mainGame->gBot.LaunchSelected(port, BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass));
 				}
 				catch(...) {
 				}

@@ -15,13 +15,14 @@
 namespace ygo {
 
 #if defined(_WIN32) || defined(__ANDROID__)
-int WindBot::Launch(int port, bool chat, int hand) const {
+int WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
 #else
-pid_t WindBot::Launch(int port, bool chat, int hand) const {
+pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
 #endif
 #ifdef _WIN32
 	auto args = fmt::format(
-		L"./WindBot/WindBot.exe Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} {}",
+		L"./WindBot/WindBot.exe HostInfo=\"{}\" Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} {}",
+		pass.c_str(),
 		deck.c_str(),
 		port,
 		version,
@@ -40,12 +41,13 @@ pid_t WindBot::Launch(int port, bool chat, int hand) const {
 	}
 	return false;
 #elif defined(__ANDROID__)
-	std::string param = fmt::format("Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}", BufferIO::EncodeUTF8s(deck).c_str(), port, version, BufferIO::EncodeUTF8s(name).c_str(), chat ? 1 : 0, hand);
+	std::string param = fmt::format("Deck='{}' HostInfo='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}", BufferIO::EncodeUTF8s(pass).c_str(),BufferIO::EncodeUTF8s(deck).c_str(), port, version, BufferIO::EncodeUTF8s(name).c_str(), chat ? 1 : 0, hand);
 	porting::launchWindbot(param);
 	return true;
 #else
 	pid_t pid = fork();
 	if (pid == 0) {
+		std::string argPass = fmt::format("HostInfo={}", BufferIO::EncodeUTF8s(pass).c_str());
 		std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck).c_str());
 		std::string argPort = fmt::format("Port={}", port);
 		std::string argVersion = fmt::format("Version={}", version);
@@ -58,7 +60,7 @@ pid_t WindBot::Launch(int port, bool chat, int hand) const {
 			setenv("PATH", envPath.c_str(), true);
 		}
 		execlp("mono", "WindBot.exe", "WindBot.exe", 
-			argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
+			   argPass.c_str(), argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
 			hand ? argHand.c_str() : nullptr, nullptr);
 		auto message = fmt::format("Failed to start WindBot Ignite: {}", strerror(errno));
 		chdir("..");

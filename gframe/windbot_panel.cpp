@@ -54,14 +54,14 @@ void WindBotPanel::UpdateDescription() {
 	deckProperties->setText(params.str().c_str());
 }
 
-bool WindBotPanel::LaunchSelected(int port) {
+bool WindBotPanel::LaunchSelected(int port, const std::wstring& pass) {
 	int index = CurrentIndex();
 	if (index < 0) return false;
 	// 1 = scissors, 2 = rock, 3 = paper
 #if defined(_WIN32) || defined(__ANDROID__)
-	return bots[index].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	return bots[index].Launch(port, pass, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
 #else
-	auto pid = bots[index].Launch(port, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
+	auto pid = bots[index].Launch(port, pass, !chkMute->isChecked(), chkThrowRock->isChecked() * 2);
 	if(pid > 0) {
 		windbotsPids.push_back(pid);
 	}

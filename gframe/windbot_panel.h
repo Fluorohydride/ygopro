@@ -35,7 +35,7 @@ struct WindBotPanel {
 	int CurrentIndex();
 	void Refresh(int filterMasterRule = 0, int lastIndex = 0);
 	void UpdateDescription();
-	bool LaunchSelected(int port);
+	bool LaunchSelected(int port, const std::wstring& pass);
 };
 
 }
