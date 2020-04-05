@@ -561,6 +561,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				prev_sel = -1;
 				break;
 			}
+			case BUTTON_FILTER_RELAY: {
+				ServerLobby::FillOnlineRooms();
+				break;
+			}
 			}
 			break;
 		}
@@ -692,7 +696,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case CHECK_SHOW_ACTIVE_ROOMS: {
-				ServerLobby::RefreshRooms();
+				ServerLobby::FillOnlineRooms();
+				//atm the behaviour for locked rooms is the same, so no need to refresh
+				//ServerLobby::RefreshRooms();
 				break;
 			}
 			case CHECKBOX_HP_READY: {
@@ -790,6 +796,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			}
+			if(caller->getParent() == mainGame->wRoomListPlaceholder)
+				ServerLobby::FillOnlineRooms();
 			break;
 		}
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
@@ -848,6 +856,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			default: break;
 			}
+			if(caller->getParent() == mainGame->wRoomListPlaceholder)
+				ServerLobby::FillOnlineRooms();
+			break;
 		}
 		case irr::gui::EGET_TABLE_SELECTED_AGAIN: {
 			switch(id) {

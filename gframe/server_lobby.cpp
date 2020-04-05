@@ -62,11 +62,11 @@ void ServerLobby::FillOnlineRooms() {
 		}
 		if(doFilter) {
 			if(searchText.size()) {
-				bool res = false;
+				bool res = Utils::ContainsSubstring(room.description, searchText, true);
 				for(auto& name : room.players) {
 					res = res || Utils::ContainsSubstring(name, searchText, true);
 				}
-				if(!res && (room.description.size() && !Utils::ContainsSubstring(room.description, searchText, true)))
+				if(!res)
 					continue;
 			}
 			if(bestOf && room.info.best_of != bestOf)
