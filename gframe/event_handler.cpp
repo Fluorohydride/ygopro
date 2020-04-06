@@ -136,6 +136,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->mTopMenu->setVisible(true);
 					mainGame->stTip->setVisible(false);
+					mainGame->stHintMsg->setVisible(false);
 					mainGame->wCardImg->setVisible(false);
 					mainGame->wInfos->setVisible(false);
 					mainGame->wPhase->setVisible(false);

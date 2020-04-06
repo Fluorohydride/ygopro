@@ -278,6 +278,7 @@ catch(...) { what = def; }
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->stTip->setVisible(false);
+					mainGame->stHintMsg->setVisible(false);
 					mainGame->gMutex.unlock();
 					mainGame->closeDoneSignal.Reset();
 					mainGame->closeSignal.lock();
