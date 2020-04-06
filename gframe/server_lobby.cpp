@@ -184,11 +184,11 @@ int ServerLobby::GetRoomsThread() {
 		mainGame->PopupMessage(gDataManager->GetSysString(2031));
 	} else {
 		roomsVector.clear();
-		nlohmann::json j = nlohmann::json::parse(retrieved_data);
-		if(j.size()) {
+		try {
+			nlohmann::json j = nlohmann::json::parse(retrieved_data);
+			if (j.size()) {
 #define GET(field, type) obj[field].get<type>()
-			try {
-				for(auto& obj : j["rooms"].get<std::vector<nlohmann::json>>()) {
+				for (auto& obj : j["rooms"].get<std::vector<nlohmann::json>>()) {
 					RoomInfo room;
 					room.id = GET("roomid", int);
 					room.name = BufferIO::DecodeUTF8s(GET("roomname", std::string));
@@ -211,15 +211,15 @@ int ServerLobby::GetRoomsThread() {
 					room.info.no_shuffle_deck = GET("no_shuffle", bool);
 					room.info.lflist = GET("banlist_hash", int);
 #undef GET
-					for(auto& obj2 : obj["users"].get<std::vector<nlohmann::json>>()) {
+					for (auto& obj2 : obj["users"].get<std::vector<nlohmann::json>>()) {
 						room.players.push_back(BufferIO::DecodeUTF8s(obj2["name"].get<std::string>()));
 					}
 					roomsVector.push_back(std::move(room));
 				}
 			}
-			catch(...) {
-
-			}
+		}
+		catch (const std::exception& e) {
+			ErrorLog(fmt::format("Exception occurred parsing server rooms: {}", e.what()));
 		}
 	}
 	if(roomsVector.empty()) {
