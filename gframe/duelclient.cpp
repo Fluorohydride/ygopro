@@ -4186,7 +4186,8 @@ void DuelClient::SendResponse() {
 		SingleMode::SetResponse(response_buf.data(), response_buf.size());
 		SingleMode::singleSignal.Set();
 	} else if (!mainGame->dInfo.isReplay) {
-		replay_stream.pop_back();
+		if(replay_stream.size())
+			replay_stream.pop_back();
 		mainGame->dInfo.time_player = 2;
 		SendBufferToServer(CTOS_RESPONSE, response_buf.data(), response_buf.size());
 	}
