@@ -254,9 +254,11 @@ namespace ygo {
 			}
 			case MSG_RELOAD_FIELD: {
 				ReplayReload();
-				mainGame->gMutex.lock();
+				if(!mainGame->dInfo.isCatchingUp)
+					mainGame->gMutex.lock();
 				mainGame->dField.RefreshAllCards();
-				mainGame->gMutex.unlock();
+				if(!mainGame->dInfo.isCatchingUp)
+					mainGame->gMutex.unlock();
 				break;
 			}
 		}
