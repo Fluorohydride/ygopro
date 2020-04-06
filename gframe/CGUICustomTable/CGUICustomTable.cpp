@@ -823,7 +823,21 @@ void CGUICustomTable::orderRows(s32 columnIndex, EGUI_ORDERING_MODE mode)
 		{
 			for ( s32 j = 0 ; j < s32(Rows.size()) - i - 1 ; ++j )
 			{
-				if ( Rows[j+1].Items[columnIndex].Text < Rows[j].Items[columnIndex].Text )
+
+				if(Rows[j].Items[columnIndex].Text.size() + Rows[j + 1].Items[columnIndex].Text.size() == 0) {
+					if((uintptr_t)Rows[j].Items[columnIndex].Data == 1 && (uintptr_t)Rows[j + 1].Items[columnIndex].Data != 1) {
+
+						swap = Rows[j];
+						Rows[j] = Rows[j + 1];
+						Rows[j + 1] = swap;
+
+						if(Selected == j)
+							Selected = j + 1;
+						else if(Selected == j + 1)
+							Selected = j;
+					}
+
+				} else if ( Rows[j+1].Items[columnIndex].Text < Rows[j].Items[columnIndex].Text )
 				{
 					swap = Rows[j];
 					Rows[j] = Rows[j+1];
@@ -843,7 +857,20 @@ void CGUICustomTable::orderRows(s32 columnIndex, EGUI_ORDERING_MODE mode)
 		{
 			for ( s32 j = 0 ; j < s32(Rows.size()) - i - 1 ; ++j )
 			{
-				if ( Rows[j].Items[columnIndex].Text < Rows[j+1].Items[columnIndex].Text)
+				if(Rows[j].Items[columnIndex].Text.size() + Rows[j + 1].Items[columnIndex].Text.size() == 0) {
+					if((uintptr_t)Rows[j].Items[columnIndex].Data != 1 && (uintptr_t)Rows[j + 1].Items[columnIndex].Data == 1) {
+
+						swap = Rows[j];
+						Rows[j] = Rows[j + 1];
+						Rows[j + 1] = swap;
+
+						if(Selected == j)
+							Selected = j + 1;
+						else if(Selected == j + 1)
+							Selected = j;
+					}
+
+				} else if ( Rows[j].Items[columnIndex].Text < Rows[j+1].Items[columnIndex].Text)
 				{
 					swap = Rows[j];
 					Rows[j] = Rows[j+1];

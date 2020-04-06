@@ -140,6 +140,7 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->setCellColor(index, 6, color);
 		roomListTable->setCellColor(index, 7, color);
 	}
+	mainGame->roomListTable->setActiveColumn(mainGame->roomListTable->getActiveColumn(), true);
 }
 int ServerLobby::GetRoomsThread() {
 	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_WAIT);
