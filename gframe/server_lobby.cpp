@@ -76,7 +76,7 @@ void ServerLobby::FillOnlineRooms() {
 			if(team2 && room.info.team2 != team2)
 				continue;
 			if(searchRules > 0) {
-				if(searchRules != room.info.rule - 1)
+				if(searchRules != room.info.rule + 1)
 					continue;
 			}
 			/*add mutex for banlist access*/
