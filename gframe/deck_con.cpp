@@ -406,6 +406,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
 				filterList = &gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()];
+				if (filterList->whitelist) { // heuristic to help with restricted card pools
+					mainGame->chkAnime->setChecked(true);
+					mainGame->cbLimit->setSelected(4); // unlimited
+				}
 				StartFilter(true);
 				break;
 			}

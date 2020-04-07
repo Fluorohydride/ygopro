@@ -830,6 +830,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					mainGame->duel_param = DUEL_MODE_RUSH;
 					mainGame->forbiddentypes = 0;
 					mainGame->chkRules[13]->setChecked(false);
+					mainGame->ebStartHand->setText(L"4");
 					goto remove;
 				}
 				default: break;
