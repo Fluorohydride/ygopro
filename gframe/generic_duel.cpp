@@ -8,7 +8,7 @@ namespace ygo {
 
 ReplayStream GenericDuel::replay_stream;
 
-GenericDuel::GenericDuel(int team1, int team2, bool relay, int best_of) :relay(relay), best_of(best_of), match_kill(0) {
+GenericDuel::GenericDuel(int team1, int team2, bool relay, int best_of) :relay(relay), best_of(best_of), match_kill(0), swapped(false){
 	players.home.resize(team1);
 	players.opposing.resize(team2);
 	players.home_size = team1;
@@ -513,8 +513,9 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(dp->state != CTOS_TP_RESULT)
 		return;
 	duel_stage = DUEL_STAGE_DUELING;
-	bool swapped = false;
-	if((tp && dp == players.opposing.front().player) || (!tp && dp == players.home.front().player)) {
+	if(swapped) tp = 1 - tp;
+	if((!swapped && ((tp == 1 && dp == players.opposing.front().player) || (tp == 0 && dp == players.home.front().player))) ||
+		(swapped && ((tp == 0 && dp == players.opposing.front().player) || (tp == 1 && dp == players.home.front().player)))) {
 		std::swap(players.opposing, players.home);
 		std::swap(players.home_size, players.opposing_size);
 		for(auto& val : match_result) {
@@ -527,13 +528,13 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		for(int i = 0; i < players.opposing.size(); i++) {
 			players.opposing[i].player->type = i + players.home_size;
 		}
-		players.home_iterator = players.home.begin();
-		if(relay)
-			players.opposing_iterator = players.opposing.begin();
-		else
-			players.opposing_iterator = players.opposing.end() - 1;
-		swapped = true;
+		swapped = !swapped;
 	}
+	players.home_iterator = players.home.begin();
+	if(relay)
+		players.opposing_iterator = players.opposing.begin();
+	else
+		players.opposing_iterator = players.opposing.end() - 1;
 	turn_count = 0;
 	cur_player[0] = players.home_iterator->player;
 	cur_player[1] = players.opposing_iterator->player;

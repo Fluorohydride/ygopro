@@ -46,6 +46,8 @@ public:
 
 	void PseudoRefreshDeck(int player, int flag = 0x1181fff);
 	static ReplayStream replay_stream;
+
+	bool swapped;
 	
 protected:
 	std::vector<CoreUtils::Packet> packets_cache;
