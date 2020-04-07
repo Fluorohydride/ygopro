@@ -268,8 +268,10 @@ void ServerLobby::JoinServer(bool host) {
 						return;
 					}
 				}
+				mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebRPName->getText());
+			} else {
+				mainGame->dInfo.secret.pass = "";
 			}
-			mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebRPName->getText());
 			if(!DuelClient::StartClient(serverinfo.first, serverinfo.second, room->id, false)) {
 				return;
 			}
