@@ -1844,6 +1844,9 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 		btnPSAD->setImage(imageManager.tCover[0]);
 		btnPSDD->setImage(imageManager.tCover[0]);
 		btnSettings->setImage(imageManager.tSettings);
+		btnHand[0]->setImage(imageManager.tHand[0]);
+		btnHand[1]->setImage(imageManager.tHand[1]);
+		btnHand[2]->setImage(imageManager.tHand[2]);
 	};
 	if(!skinSystem || ((skinname == prev_skin || (reload && prev_skin == EPRO_TEXT(""))) && !firstrun))
 		return false;
