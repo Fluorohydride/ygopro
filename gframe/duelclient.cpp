@@ -893,18 +893,23 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		int player = pkt->player;
 		int type = -1;
 		if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
-			if(mainGame->tabSettings.chkIgnoreOpponents->isChecked()) {
-				if(player >= mainGame->dInfo.team1 && mainGame->dInfo.isTeam1)
-					break;
-				if(player < mainGame->dInfo.team1 && !mainGame->dInfo.isTeam1)
-					break;
+			int team1 = mainGame->dInfo.team1;
+			int team2 = mainGame->dInfo.team2;
+			if((mainGame->dInfo.isTeam1 && !mainGame->dInfo.isFirst) ||
+				(!mainGame->dInfo.isTeam1 && mainGame->dInfo.isFirst)) {
+				std::swap(team1, team2);
 			}
-			if(player >= mainGame->dInfo.team1) {
-				player -= mainGame->dInfo.team1;
+			if(player >= team1) {
+				player -= team1;
 				type = 1;
 			} else {
 				type = 0;
 			}
+			if((!mainGame->dInfo.isFirst && mainGame->dInfo.isTeam1) ||
+				(mainGame->dInfo.isFirst && !mainGame->dInfo.isTeam1))
+				type = 1 - type;
+			if(((type == 1 && mainGame->dInfo.isTeam1) || (type == 0 && !mainGame->dInfo.isTeam1)) && mainGame->tabSettings.chkIgnoreOpponents->isChecked())
+				break;
 		} else {
 			type = 2;
 			if(player == 8) { //system custom message.
@@ -1383,13 +1388,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->gMutex.lock();
 		}
 		mainGame->dInfo.isStarted = true;
-		auto was_first = mainGame->dInfo.isFirst;
 		mainGame->dInfo.isFirst = (playertype & 0xf) ? false : true;
-		if(was_first != mainGame->dInfo.isFirst) {
-			std::swap(mainGame->dInfo.opponames, mainGame->dInfo.selfnames);
-			std::swap(mainGame->dInfo.team1, mainGame->dInfo.team2);
-			mainGame->dInfo.isTeam1 = !mainGame->dInfo.isTeam1;
-		}
 		if(playertype & 0xf0)
 			mainGame->dInfo.player_type = 7;
 		if(!mainGame->dInfo.isRelay) {
