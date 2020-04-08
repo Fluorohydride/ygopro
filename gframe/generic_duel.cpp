@@ -722,6 +722,10 @@ void GenericDuel::DuelEndProc() {
 		rematch[0] = MSG_SELECT_YESNO;
 		rematch[1] = 0;
 		*((uint64_t*)&rematch[2]) = 1989;
+		ITERATE_PLAYERS(
+			dueler.player->state = CTOS_RESPONSE;
+			dueler.ready = false;
+		)
 		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, rematch, sizeof(rematch));
 		for(auto& duelist : players.home) {
 			NetServer::ReSendToPlayer(duelist.player);
@@ -731,10 +735,6 @@ void GenericDuel::DuelEndProc() {
 		for(auto& duelist : players.opposing) {
 			NetServer::ReSendToPlayer(duelist.player);
 		}
-		ITERATE_PLAYERS(
-			dueler.player->state = CTOS_RESPONSE;
-			dueler.ready = false;
-		)
 		duel_stage = DUEL_STAGE_BEGIN;
 		for(auto& obs : observers)
 			NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
