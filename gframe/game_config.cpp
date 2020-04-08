@@ -131,7 +131,7 @@ bool GameConfig::Load(const path_char* filename)
 			else if (type == "mute_opponent")
 				chkIgnore1 = !!std::stoi(str);
 			else if (type == "mute_spectators")
-				chkIgnore1 = !!std::stoi(str);
+				chkIgnore2 = !!std::stoi(str);
 			else if (type == "hide_setname")
 				chkHideSetname = !!std::stoi(str);
 			else if (type == "hide_hint_button")
