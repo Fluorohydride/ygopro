@@ -1652,9 +1652,9 @@ bool Game::MainLoop() {
 				gSoundManager->PlayBGM(SoundManager::BGM::WIN);
 			else if (showcardcode == 2)
 				gSoundManager->PlayBGM(SoundManager::BGM::LOSE);
-			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] <= dInfo.lp[LocalPlayer(1)] / 2)
+			else if (dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
 				gSoundManager->PlayBGM(SoundManager::BGM::DISADVANTAGE);
-			else if (dInfo.lp[0] > 0 && dInfo.lp[LocalPlayer(0)] >= dInfo.lp[LocalPlayer(1)] * 2)
+			else if (dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
 				gSoundManager->PlayBGM(SoundManager::BGM::ADVANTAGE);
 			else
 				gSoundManager->PlayBGM(SoundManager::BGM::DUEL);
