@@ -280,16 +280,19 @@ namespace ygo {
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
 		return extension;
 	}
-	std::wstring Utils::GetFileName(std::wstring file) {
+	std::wstring Utils::GetFileName(std::wstring file, bool keepextension) {
 		std::replace(file.begin(), file.end(), L'\\', L'/');
 		size_t dashpos = file.find_last_of(L"/");
 		if(dashpos == std::wstring::npos)
 			dashpos = 0;
 		else
 			dashpos++;
-		size_t dotpos = file.find_last_of(L".");
-		if(dotpos == std::wstring::npos)
-			dotpos = file.size();
+		size_t dotpos = file.size();
+		if(!keepextension) {
+			dotpos = file.find_last_of(L".");
+			if(dotpos == std::wstring::npos)
+				dotpos = file.size();
+		}
 		std::wstring name = file.substr(dashpos, dotpos - dashpos);
 		return name;
 	}
@@ -339,16 +342,19 @@ namespace ygo {
 		std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
 		return extension;
 	}
-	std::string Utils::GetFileName(std::string file) {
+	std::string Utils::GetFileName(std::string file, bool keepextension) {
 		std::replace(file.begin(), file.end(), '\\', '/');
 		size_t dashpos = file.find_last_of("/");
 		if(dashpos == std::wstring::npos)
 			dashpos = 0;
 		else
 			dashpos++;
-		size_t dotpos = file.find_last_of(".");
-		if(dotpos == std::string::npos)
-			dotpos = file.size();
+		size_t dotpos = file.size();
+		if(!keepextension) {
+			dotpos = file.find_last_of(".");
+			if(dotpos == std::string::npos)
+				dotpos = file.size();
+		}
 		std::string name = file.substr(dashpos, dotpos - dashpos);
 		return name;
 	}

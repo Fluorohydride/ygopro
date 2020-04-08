@@ -223,6 +223,7 @@ public:
 	bool LoadScript(OCG_Duel pduel, const std::string& script_name);
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
+	static void UpdateDownloadBar(int percentage, void* payload);
 
 	std::mutex gMutex;
 	std::mutex analyzeMutex;
@@ -354,6 +355,9 @@ public:
 	SettingsWindow gSettings;
 	irr::gui::IGUIWindow* wBtnSettings;
 	irr::gui::CGUIImageButton* btnSettings;
+
+	irr::gui::IGUIWindow* updateWindow;
+	IProgressBar* updateProgress;
 	//main menu
 	int mainMenuLeftX;
 	int mainMenuRightX;

@@ -9,6 +9,7 @@
 #ifdef __ANDROID__
 #include "Android/COSAndroidOperator.h"
 #endif
+#include "client_updater.h"
 #include "game_config.h"
 #include "repo_manager.h"
 #include "image_downloader.h"
@@ -1471,6 +1472,14 @@ bool Game::Initialize() {
 #else
 	fpsCounter->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 #endif
+	//update window
+	updateWindow = env->addWindow(Scale(490, 200, 840, 340), true, L"");
+	updateProgress = new IProgressBar(env, Scale(5, 20 + 15, 300 - 5, 20 + 30), -1, updateWindow);
+	updateProgress->addBorder(1);
+	updateProgress->setProgress(0);
+	updateProgress->drop();
+	updateWindow->getCloseButton()->setVisible(false);
+	updateWindow->setVisible(false);
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -1508,6 +1517,7 @@ bool Game::MainLoop() {
 	float frame_counter = 0.0f;
 	int fps = 0;
 	bool was_connected = false;
+	bool update_prompted = false;
 #ifdef __ANDROID__
 	ogles2Solid = 0;
 	ogles2TrasparentAlpha = 0;
@@ -1751,6 +1761,16 @@ bool Game::MainLoop() {
 			stACMessage->setText(gDataManager->GetSysString(1438).c_str());
 			PopupElement(wACMessage, 30);
 		}
+		if(!update_prompted && !(ygo::mainGame->dInfo.isInDuel || ygo::mainGame->dInfo.isInLobby || ygo::mainGame->is_siding
+			|| ygo::mainGame->wRoomListPlaceholder->isVisible() || ygo::mainGame->wLanWindow->isVisible()
+			|| ygo::mainGame->wCreateHost->isVisible() || ygo::mainGame->wHostPrepare->isVisible()) && updater::HasUpdate()) {
+			gMutex.lock();
+			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
+			stQMessage->setText(L"A new update is available, do you want to download it?");
+			PopupElement(wQuery);
+			gMutex.unlock();
+			update_prompted = true;
+		}
 #ifndef __ANDROID__
 #ifdef __APPLE__
 		// Recent versions of macOS break OpenGL vsync while offscreen, resulting in
@@ -1845,6 +1865,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 			repo.second.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 			repo.second.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		}
+		updateProgress->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		btnPSAD->setImage(imageManager.tCover[0]);
 		btnPSDD->setImage(imageManager.tCover[0]);
 		btnSettings->setImage(imageManager.tSettings);
@@ -2808,6 +2829,7 @@ void Game::OnResize() {
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
 	SetCentered(wCommitsLog);
+	SetCentered(updateWindow);
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
 	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
@@ -3124,6 +3146,12 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 		if(type > 1)
 			std::cout << str << std::endl;
 	}
+}
+void Game::UpdateDownloadBar(int percentage, void* payload) {
+	Game* game = static_cast<Game*>(payload);
+	game->gMutex.lock();
+	game->updateProgress->setProgress(percentage);
+	game->gMutex.unlock();
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));

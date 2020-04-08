@@ -41,11 +41,11 @@ namespace ygo {
 		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);
 		static std::wstring GetFileExtension(std::wstring file);
 		static std::wstring GetFilePath(std::wstring file);
-		static std::wstring GetFileName(std::wstring file);
+		static std::wstring GetFileName(std::wstring file, bool keepextension = false);
 		static std::string NormalizePath(std::string path, bool trailing_slash = true);
 		static std::string GetFileExtension(std::string file);
 		static std::string GetFilePath(std::string file);
-		static std::string GetFileName(std::string file);
+		static std::string GetFileName(std::string file, bool keepextension = false);
 
 		template<typename T>
 		static std::vector<T> TokenizeString(const T& input, const T& token);
