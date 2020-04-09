@@ -5,19 +5,31 @@ bool ygo::updater::HasUpdate() { return false; }
 bool ygo::updater::StartUpdate(void(*)(int, void*), void*, const path_string&) { return false; }
 bool ygo::updater::UpdateDownloaded() { return false; }
 #else
+#if defined(_WIN32)
+#define OSSTRING "Windows"
+#elif defined(__APPLE__)
+#define OSSTRING "MacOs"
+#elif defined (__linux__) && !defined(__ANDROID__)
+#define OSSTRING "Linux"
+#endif
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 #include <thread>
 #include <fstream>
 #include <atomic>
 #include <sstream>
+#include <fmt/format.h>
+#include "config.h"
 #include "utils.h"
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#define USERAGENT "Edopro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)
 
 std::atomic<bool> has_update{ false };
 std::atomic<bool> downloaded{ false };
 std::atomic<bool> downloading{ false };
 
-std::string update_url = "";
+std::vector<std::pair<std::string, std::string>> update_urls;
 
 void* Lock = nullptr;
 
@@ -43,8 +55,11 @@ void FreeLock() {
 #endif
 }
 struct Payload {
-	void(*callback)(int, void*) = nullptr;
+	update_callback callback = nullptr;
+	int current = 1;
+	int total = 1;
 	void* payload = nullptr;
+	const char* filename = nullptr;
 };
 
 int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownloaded, curl_off_t TotalToUpload, curl_off_t NowUploaded) {
@@ -55,7 +70,7 @@ int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownl
 	if(payload && payload->callback) {
 		double fractiondownloaded = NowDownloaded / TotalToDownload;
 		int percentage = std::round(fractiondownloaded * 100);
-		payload->callback(percentage, payload->payload);
+		payload->callback(percentage, payload->current, payload->total, payload->filename, payload->payload);
 	}
 	return 0;
 }
@@ -73,7 +88,7 @@ CURL* setupHandle(const std::string& url, void* func, void* payload, void* paylo
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, func);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 5L);
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, payload);
-	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "EDOPro-Autoupdater");
+	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, USERAGENT);
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROXY, "*");
 	curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1);
 	curl_easy_setopt(curl_handle, CURLOPT_DNS_CACHE_TIMEOUT, 0);
@@ -101,18 +116,15 @@ void CheckUpdate() {
 			for(auto& asset : j["assets"]) {
 				try {
 					auto name = asset["name"].get<std::string>();
-					auto id = asset["id"].get<int>();
-					if(name == "include.zip") {
-						update_url = asset["browser_download_url"].get<std::string>();
-						has_update = true;
-						break;
-					}
+					update_urls.emplace_back(name, asset["browser_download_url"].get<std::string>());
 				}
 				catch(...) {}
 			}
+			if(update_urls.size())
+				has_update = true;
 		}
 	}
-	catch(...) { return; }
+	catch(...) { update_urls.clear(); }
 }
 
 void ygo::updater::CheckUpdates() {
@@ -120,9 +132,10 @@ void ygo::updater::CheckUpdates() {
 	if(!Lock)
 		return;
 	try {
+		update_urls.clear();
 		std::thread(CheckUpdate).detach();
 	}
-	catch(...) {}
+	catch(...) { update_urls.clear(); }
 }
 
 bool ygo::updater::HasUpdate() {
@@ -133,27 +146,35 @@ bool ygo::updater::UpdateDownloaded() {
 	return downloaded;
 }
 
-void DownloadUpdate(path_string dest_path, void* payload, void(*callback)(int, void*)) {
-	Payload cbpayload = { callback, payload };
-	auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::GetFileName(ygo::Utils::ToPathString(update_url), true);
-	std::ofstream stream(name, std::ofstream::binary);
-	auto curl_handle = setupHandle(update_url, reinterpret_cast<void*>(WriteCallback), &stream, &cbpayload);
-	try {
-		CURLcode res = curl_easy_perform(curl_handle);
-		if(res != CURLE_OK)
-			throw 1;
-		stream.close();
-		curl_easy_cleanup(curl_handle);
-	}
-	catch(...) {
-		stream.close();
-		ygo::Utils::FileDelete(name);
+void DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
+	downloading = true;
+	Payload cbpayload = { callback, 1, static_cast<int>(update_urls.size()), payload, nullptr };
+	int i = 1;
+	for(auto& file : update_urls) {
+		auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::ToPathString(file.first);
+		cbpayload.current = i;
+		cbpayload.filename = file.first.data();
+		auto& update_url = file.second;
+		std::ofstream stream(name, std::ofstream::binary);
+		auto curl_handle = setupHandle(update_url, reinterpret_cast<void*>(WriteCallback), &stream, &cbpayload);
+		try {
+			CURLcode res = curl_easy_perform(curl_handle);
+			if(res != CURLE_OK)
+				throw 1;
+			stream.close();
+			curl_easy_cleanup(curl_handle);
+		}
+		catch(...) {
+			stream.close();
+			ygo::Utils::FileDelete(name);
+		}
+		i++;
 	}
 	downloaded = true;
 }
 
-bool ygo::updater::StartUpdate(void(*callback)(int percentage, void* payload), void* payload, const path_string& dest) {
-	if(!has_update || update_url.empty())
+bool ygo::updater::StartUpdate(update_callback callback, void* payload, const path_string& dest) {
+	if(!has_update || downloading)
 		return false;
 	try {
 		std::thread(DownloadUpdate, dest, payload, callback).detach();

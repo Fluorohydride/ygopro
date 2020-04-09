@@ -3147,7 +3147,7 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 			std::cout << str << std::endl;
 	}
 }
-void Game::UpdateDownloadBar(int percentage, void* payload) {
+void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, void* payload) {
 	Game* game = static_cast<Game*>(payload);
 	game->gMutex.lock();
 	game->updateProgress->setProgress(percentage);
