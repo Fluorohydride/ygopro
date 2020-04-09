@@ -1404,12 +1404,12 @@ bool Game::Initialize() {
 	roomListTable->addColumn(gDataManager->GetSysString(1988).c_str());//Status
 	roomListTable->setColumnWidth(0, 30); //lock
 	roomListTable->setColumnWidth(1, 110);//Allowed Cards:
-	roomListTable->setColumnWidth(2, 150);//Duel Mode:
+	roomListTable->setColumnWidth(2, 100);//Duel Mode:
 	roomListTable->setColumnWidth(3, 50);//master rule
-	roomListTable->setColumnWidth(4, 130);//Forbidden List:
+	roomListTable->setColumnWidth(4, 135);//Forbidden List:
 	roomListTable->setColumnWidth(5, 115);//Players:
-	roomListTable->setColumnWidth(6, 355);//Notes:
-	roomListTable->setColumnWidth(7, 60);//Status
+	roomListTable->setColumnWidth(6, 405);//Notes:
+	roomListTable->setColumnWidth(7, 140);//Status
 	roomListTable->setColumnOrdering(0, EGCO_FLIP_ASCENDING_DESCENDING);
 	roomListTable->setColumnOrdering(1, EGCO_FLIP_ASCENDING_DESCENDING);
 	roomListTable->setColumnOrdering(2, EGCO_FLIP_ASCENDING_DESCENDING);
@@ -3117,6 +3117,15 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 			std::cout << str << std::endl;
 	}
 }
+<<<<<<< Updated upstream
+=======
+void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, void* payload) {
+	Game* game = static_cast<Game*>(payload);
+	game->gMutex.lock();
+	game->updateProgress->setProgress(percentage);
+	game->gMutex.unlock();
+}
+>>>>>>> Stashed changes
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));
 	auto expansions_subdirs = Utils::FindSubfolders(EPRO_TEXT("./expansions/script/"));

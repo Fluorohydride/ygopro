@@ -4,6 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 #include <fmt/printf.h>
+#include <thread>
+#include <atomic>
 
 SoundMixer::SoundMixer() {
 	SDL_SetMainReady();
@@ -93,7 +95,14 @@ void SoundMixer::Tick() {
 			chunk++;
 	}
 }
+void KillSwitch(std::atomic_bool& die) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
+	if(die)
+		exit(0);
+}
 SoundMixer::~SoundMixer() {
+	std::atomic_bool die = true;
+	std::thread(KillSwitch, std::ref(die)).detach();
 	Mix_HaltChannel(-1);
 	Mix_HaltMusic();
 	for(auto& chunk : sounds) {
@@ -103,4 +112,5 @@ SoundMixer::~SoundMixer() {
 	if(music)
 		Mix_FreeMusic(music);
 	Mix_CloseAudio();
+	die = false;
 }
