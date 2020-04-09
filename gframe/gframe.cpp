@@ -1,5 +1,6 @@
 #ifdef _WIN32
 #include <Windows.h>
+#include <Tchar.h>
 #else
 #include <unistd.h>
 #endif
@@ -184,15 +185,27 @@ int main(int argc, char* argv[]) {
 	CFRelease(path);
 	CFRelease(bundle_path);
 #endif //__APPLE__
-	if(argc >= 2) {
-		if(argv[1] == path_string(EPRO_TEXT("from_discord"))) {
+	bool is_in_sys32 = false;
+#ifdef _WIN32
+	wchar_t* buffer;
+	if((buffer = _tgetcwd(NULL, 0))) {
+		auto workdir = ygo::Utils::ToUpperNoAccents(ygo::Utils::GetFileName(buffer));
+		is_in_sys32 = workdir == EPRO_TEXT("SYSTEM32");
+		free(buffer);
+	}
+#endif
+	if(argc >= 2 || is_in_sys32) {
+		if(!is_in_sys32 && argv[1] == path_string(EPRO_TEXT("from_discord"))) {
 			is_from_discord = true;
 #if defined(_WIN32)
 			SetCurrentDirectory(argv[2]);
 #if !defined(_DEBUG)
 		} else {
-			auto extension = ygo::Utils::GetFileExtension(argv[1]);
-			if(extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua")) {
+			if(!is_in_sys32) {
+				auto extension = ygo::Utils::GetFileExtension(argv[1]);
+				is_in_sys32 = (extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua"));
+			}
+			if(is_in_sys32) {
 				TCHAR exepath[MAX_PATH];
 				GetModuleFileName(NULL, exepath, MAX_PATH);
 				auto path = ygo::Utils::GetFilePath(exepath);
@@ -212,6 +225,7 @@ int main(int argc, char* argv[]) {
 	setlocale(LC_CTYPE, "UTF-8");
 	evthread_use_pthreads();
 #endif //_WIN32
+	ygo::updater::CheckUpdates();
 	std::shared_ptr<ygo::DataHandler> data = nullptr;
 	try {
 		data = std::make_shared<ygo::DataHandler>();
