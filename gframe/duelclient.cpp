@@ -817,6 +817,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnLeaveGame->setText(gDataManager->GetSysString(1350).c_str());
 			mainGame->btnLeaveGame->setVisible(true);
 			mainGame->btnSpectatorSwap->setVisible(true);
+			mainGame->dInfo.isFirst = true;
+			mainGame->dInfo.isTeam1 = true;
 		} else {
 			mainGame->dInfo.isFirst = selftype < mainGame->dInfo.team1;
 			mainGame->dInfo.isTeam1 = mainGame->dInfo.isFirst;
