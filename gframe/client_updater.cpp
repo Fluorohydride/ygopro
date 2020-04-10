@@ -72,6 +72,7 @@ struct Payload {
 	update_callback callback = nullptr;
 	int current = 1;
 	int total = 1;
+	bool is_new = true;
 	void* payload = nullptr;
 	const char* filename = nullptr;
 };
@@ -82,10 +83,11 @@ int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownl
 	}
 	Payload* payload = reinterpret_cast<Payload*>(ptr);
 	if(payload && payload->callback) {
-		double fractiondownloaded = NowDownloaded / TotalToDownload;
+		double fractiondownloaded = (double)NowDownloaded / (double)TotalToDownload;
 		int percentage = std::round(fractiondownloaded * 100);
-		payload->callback(percentage, payload->current, payload->total, payload->filename, payload->payload);
+		payload->callback(percentage, payload->current, payload->total, payload->filename, payload->is_new, payload->payload);
 	}
+	payload->is_new = false;
 	return 0;
 }
 
@@ -116,8 +118,8 @@ CURL* setupHandle(const std::string& url, void* func, void* payload, void* paylo
 
 void CheckUpdate() {
 	std::vector<char> retrieved_data;
-	auto curl_handle = setupHandle(UPDATE_URL, reinterpret_cast<void*>(WriteCallback), &retrieved_data);
 	try {
+		auto curl_handle = setupHandle(UPDATE_URL, reinterpret_cast<void*>(WriteCallback), &retrieved_data);
 		CURLcode res = curl_easy_perform(curl_handle);
 		if(res != CURLE_OK)
 			return;
@@ -223,12 +225,13 @@ bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) 
 
 void DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
 	downloading = true;
-	Payload cbpayload = { callback, 1, static_cast<int>(update_urls.size()), payload, nullptr };
+	Payload cbpayload = { callback, 1, static_cast<int>(update_urls.size()), true, payload, nullptr };
 	int i = 1;
 	for(auto& file : update_urls) {
 		auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::ToPathString(file.name);
 		cbpayload.current = i;
 		cbpayload.filename = file.name.data();
+		cbpayload.is_new = true;
 		std::vector<uint8_t> binmd5;
 		for(std::string::size_type i = 0; i < file.md5.length(); i += 2) {
 			uint8_t b = static_cast<uint8_t>(strtoul(file.md5.substr(i, 2).c_str(), nullptr, 16));
@@ -251,6 +254,7 @@ void DownloadUpdate(path_string dest_path, void* payload, update_callback callba
 			if(res != CURLE_OK)
 				throw 1;
 			if(CheckMd5(buffer, binmd5)) {
+				ygo::Utils::CreatePath(name);
 				std::ofstream stream(name, std::ofstream::binary);
 				if(stream.good()) {
 					stream.write(buffer.data(), buffer.size());

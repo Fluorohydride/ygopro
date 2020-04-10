@@ -416,5 +416,26 @@ namespace ygo {
 			return true;
 		return (convertInputCasing ? ToUpperNoAccents(input) : input).find(convertTokenCasing ? ToUpperNoAccents(token) : token) != std::wstring::npos;
 	}
+	bool Utils::CreatePath(const path_string& path, const path_string& workingdir) {
+		std::vector<path_string> folders;
+		path_string temp;
+		for(int i = 0; i < (int)path.size(); i++) {
+			if(path[i] == TEXT('/')) {
+				folders.push_back(temp);
+				temp.clear();
+			} else
+				temp += path[i];
+		}
+		temp.clear();
+		for(auto folder : folders) {
+			if(temp.empty() && !workingdir.empty())
+				temp = workingdir + TEXT("/") + folder;
+			else
+				temp += TEXT("/") + folder;
+			if(!MakeDirectory(temp.c_str()))
+				return false;
+		}
+		return true;
+	}
 }
 

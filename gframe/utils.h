@@ -54,6 +54,7 @@ namespace ygo {
 		/** Returns true if and only if all tokens are contained in the input. */
 		static bool ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
+		static bool Utils::CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
 		static bool KeepOnlyDigits(std::wstring& input);
 	};
 

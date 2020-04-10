@@ -3,7 +3,7 @@
 
 #include "text_types.h"
 
-using update_callback = void(*)(int percentage, int cur, int tot, const char* filename, void* payload);
+using update_callback = void(*)(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload);
 
 namespace ygo {
 namespace updater {

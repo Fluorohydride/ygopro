@@ -1474,10 +1474,11 @@ bool Game::Initialize() {
 #endif
 	//update window
 	updateWindow = env->addWindow(Scale(490, 200, 840, 340), true, L"");
-	updateProgress = new IProgressBar(env, Scale(5, 20 + 15, 300 - 5, 20 + 30), -1, updateWindow);
+	updateProgress = new IProgressBar(env, Scale(5, 115, 335, 130), -1, updateWindow);
 	updateProgress->addBorder(1);
 	updateProgress->setProgress(0);
 	updateProgress->drop();
+	updateProgressText = env->addStaticText(L"", Scale(5, 5, 345, 110), false, true, updateWindow);
 	updateWindow->getCloseButton()->setVisible(false);
 	updateWindow->setVisible(false);
 	hideChat = false;
@@ -1770,6 +1771,9 @@ bool Game::MainLoop() {
 			PopupElement(wQuery);
 			gMutex.unlock();
 			update_prompted = true;
+		}
+		if(updater::UpdateDownloaded()) {
+			updater::StartUnzipper();
 		}
 #ifndef __ANDROID__
 #ifdef __APPLE__
@@ -3147,11 +3151,12 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 			std::cout << str << std::endl;
 	}
 }
-void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, void* payload) {
+void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload) {
 	Game* game = static_cast<Game*>(payload);
-	game->gMutex.lock();
+	std::lock_guard<std::mutex> lk(game->gMutex);
 	game->updateProgress->setProgress(percentage);
-	game->gMutex.unlock();
+	if(is_new)
+		game->updateProgressText->setText(fmt::format(L"Downloading {}\n({} of {})", BufferIO::DecodeUTF8s(filename), cur, tot).c_str());
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));
