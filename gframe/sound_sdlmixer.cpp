@@ -101,7 +101,7 @@ void KillSwitch(std::atomic_bool& die) {
 		exit(0);
 }
 SoundMixer::~SoundMixer() {
-	std::atomic_bool die = true;
+	std::atomic_bool die{true};
 	std::thread(KillSwitch, std::ref(die)).detach();
 	Mix_HaltChannel(-1);
 	Mix_HaltMusic();
