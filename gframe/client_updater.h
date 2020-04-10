@@ -12,6 +12,7 @@ void CheckUpdates();
 bool HasUpdate();
 bool StartUpdate(update_callback callback, void* payload, const path_string& dest = EPRO_TEXT("./updates"));
 bool UpdateDownloaded();
+void StartUnzipper();
 
 };
 };

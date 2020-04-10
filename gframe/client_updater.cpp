@@ -1,9 +1,11 @@
 #include "client_updater.h"
+#define UPDATE_URL "test"
 #ifndef UPDATE_URL
 void ygo::updater::CheckUpdates() {}
 bool ygo::updater::HasUpdate() { return false; }
-bool ygo::updater::StartUpdate(void(*)(int, void*), void*, const path_string&) { return false; }
+bool ygo::updater::StartUpdate(update_callback, void*, const path_string&) { return false; }
 bool ygo::updater::UpdateDownloaded() { return false; }
+void ygo::updater::StartUnzipper() {}
 #else
 #if defined(_WIN32)
 #define OSSTRING "Windows"
@@ -123,7 +125,7 @@ void CheckUpdate() {
 			for(auto& asset : j) {
 				try {
 					auto url = asset["url"].get<std::string>();
-					auto name = ygo::Utils::GetFileName(url, true);
+					auto name = asset["name"].get<std::string>();
 					auto md5 = asset["md5"].get<std::string>();
 					update_urls.push_back({ name, url, md5 });
 				}
@@ -153,6 +155,55 @@ bool ygo::updater::HasUpdate() {
 
 bool ygo::updater::UpdateDownloaded() {
 	return downloaded;
+}
+
+void ygo::updater::StartUnzipper() {
+#ifdef _WIN32
+	STARTUPINFO si;
+	PROCESS_INFORMATION pi;
+	ZeroMemory(&si, sizeof(si));
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi));
+	TCHAR exepath[MAX_PATH];
+	GetModuleFileName(NULL, exepath, MAX_PATH);
+	path_string str(EPRO_TEXT("./unzipper.exe ./ "));
+	str.append(exepath);
+	for(auto& file : update_urls) {
+		auto name = EPRO_TEXT(" ./updates/") + ygo::Utils::ToPathString(file.name);
+		str.append(name);
+	}
+	CreateProcess(nullptr, (LPWSTR)str.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+#else
+	std::vector<std::string> args;
+	args.push_back("./");
+#ifdef __APPLE__
+	args.push_back("io.github.edo9300.ygoprodll");
+#else
+	char buff[PATH_MAX];
+	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
+	std::string filename;
+	if(len != -1) {
+		buff[len] = '\0';
+	}
+	args.push_back(buff);
+#endif
+	for(auto& file : update_urls) {
+		auto name = EPRO_TEXT("./updates/") + ygo::Utils::ToPathString(file.name);
+		args.push_back(name);
+	}
+	std::vector<const char*> argsbuf;
+	for(const auto& arg : args)
+		argsbuf.push_back(arg.data());
+	argsbuf.push_back(nullptr);
+	pid_t pid = fork();
+	if(pid == 0) {
+		execv("./unzipper", "show_changelog");
+		exit(EXIT_FAILURE);
+	}
+#endif
+	exit(0);
 }
 
 bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
