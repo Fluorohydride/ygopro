@@ -5,7 +5,7 @@ void ygo::updater::CheckUpdates() {}
 bool ygo::updater::HasUpdate() { return false; }
 bool ygo::updater::StartUpdate(update_callback, void*, const path_string&) { return false; }
 bool ygo::updater::UpdateDownloaded() { return false; }
-void ygo::updater::StartUnzipper() {}
+void ygo::updater::StartUnzipper(const path_string&) {}
 #else
 #if defined(_WIN32)
 #define OSSTRING "Windows"
@@ -27,6 +27,7 @@ void ygo::updater::StartUnzipper() {}
 #include <atomic>
 #include <sstream>
 #include <openssl/md5.h>
+#include "config.h"
 #include "utils.h"
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
@@ -163,7 +164,7 @@ bool ygo::updater::UpdateDownloaded() {
 	return downloaded;
 }
 
-void ygo::updater::StartUnzipper() {
+void ygo::updater::StartUnzipper(const path_string& dest) {
 #ifdef _WIN32
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -175,7 +176,7 @@ void ygo::updater::StartUnzipper() {
 	path_string str(EPRO_TEXT("./unzipper.exe ./ "));
 	str.append(exepath);
 	for(auto& file : update_urls) {
-		auto name = EPRO_TEXT(" ./updates/") + ygo::Utils::ToPathString(file.name);
+		auto name = EPRO_TEXT(" ") + dest + ygo::Utils::ToPathString(file.name);
 		str.append(name);
 	}
 	CreateProcess(nullptr, (LPWSTR)str.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
@@ -196,7 +197,7 @@ void ygo::updater::StartUnzipper() {
 	args.push_back(buff);
 #endif
 	for(auto& file : update_urls) {
-		auto name = EPRO_TEXT("./updates/") + ygo::Utils::ToPathString(file.name);
+		auto name = dest + ygo::Utils::ToPathString(file.name);
 		args.push_back(name);
 	}
 	std::vector<const char*> argsbuf;
@@ -217,7 +218,7 @@ bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) 
 		return false;
 	uint8_t result[MD5_DIGEST_LENGTH];
 	MD5((uint8_t*)buffer.data(), buffer.size(), result);
-	return memcmp(result, md5.data(), MD5_DIGEST_LENGTH);
+	return memcmp(result, md5.data(), MD5_DIGEST_LENGTH) == 0;
 }
 
 void DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
