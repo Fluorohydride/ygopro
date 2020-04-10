@@ -225,7 +225,6 @@ int main(int argc, char* argv[]) {
 	setlocale(LC_CTYPE, "UTF-8");
 	evthread_use_pthreads();
 #endif //_WIN32
-	ygo::updater::CheckUpdates();
 	std::shared_ptr<ygo::DataHandler> data = nullptr;
 	try {
 		data = std::make_shared<ygo::DataHandler>();
