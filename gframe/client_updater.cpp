@@ -115,7 +115,7 @@ CURL* setupHandle(const std::string& url, void* func, void* payload, void* paylo
 
 void CheckUpdate() {
 	std::vector<char> retrieved_data;
-	auto curl_handle = setupHandle(UPDATE_URL, static_cast<void*>(WriteCallback), &retrieved_data);
+	auto curl_handle = setupHandle(UPDATE_URL, reinterpret_cast<void*>(WriteCallback), &retrieved_data);
 	try {
 		CURLcode res = curl_easy_perform(curl_handle);
 		if(res != CURLE_OK)
@@ -205,7 +205,7 @@ void ygo::updater::StartUnzipper() {
 	argsbuf.push_back(nullptr);
 	pid_t pid = fork();
 	if(pid == 0) {
-		execv("./unzipper", "show_changelog");
+		execv("./unzipper", argsbuf.data());
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -244,7 +244,7 @@ void DownloadUpdate(path_string dest_path, void* payload, update_callback callba
 		}
 		auto& update_url = file.url;
 		std::vector<char> buffer;
-		auto curl_handle = setupHandle(update_url, static_cast<void*>(WriteCallback), &buffer, &cbpayload);
+		auto curl_handle = setupHandle(update_url, reinterpret_cast<void*>(WriteCallback), &buffer, &cbpayload);
 		try {
 			CURLcode res = curl_easy_perform(curl_handle);
 			if(res != CURLE_OK)
