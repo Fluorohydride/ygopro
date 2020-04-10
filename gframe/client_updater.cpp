@@ -14,6 +14,12 @@ void ygo::updater::StartUnzipper() {}
 #elif defined (__linux__) && !defined(__ANDROID__)
 #define OSSTRING "Linux"
 #endif
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <sys/file.h>
+#include <unistd.h>
+#endif
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 #include <thread>
