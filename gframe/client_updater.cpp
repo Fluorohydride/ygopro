@@ -18,8 +18,7 @@ bool ygo::updater::UpdateDownloaded() { return false; }
 #include <fstream>
 #include <atomic>
 #include <sstream>
-#include <fmt/format.h>
-#include "config.h"
+#include <openssl/md5.h>
 #include "utils.h"
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
@@ -29,7 +28,13 @@ std::atomic<bool> has_update{ false };
 std::atomic<bool> downloaded{ false };
 std::atomic<bool> downloading{ false };
 
-std::vector<std::pair<std::string, std::string>> update_urls;
+struct DownloadInfo {
+	std::string name;
+	std::string url;
+	std::string md5;
+};
+
+std::vector<DownloadInfo> update_urls;
 
 void* Lock = nullptr;
 
@@ -77,8 +82,10 @@ int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownl
 
 size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
 	size_t realsize = size * nmemb;
-	auto buff = static_cast<std::ostream*>(userp);
-	buff->write(static_cast<const char*>(contents), realsize);
+	auto buff = static_cast<std::vector<char>*>(userp);
+	size_t prev_size = buff->size();
+	buff->resize(prev_size + realsize);
+	memcpy((char*)buff->data() + prev_size, contents, realsize);
 	return realsize;
 }
 
@@ -99,8 +106,8 @@ CURL* setupHandle(const std::string& url, void* func, void* payload, void* paylo
 }
 
 void CheckUpdate() {
-	std::stringstream retrieved_data;
-	auto curl_handle = setupHandle(UPDATE_URL, reinterpret_cast<void*>(WriteCallback), &retrieved_data);
+	std::vector<char> retrieved_data;
+	auto curl_handle = setupHandle(UPDATE_URL, static_cast<void*>(WriteCallback), &retrieved_data);
 	try {
 		CURLcode res = curl_easy_perform(curl_handle);
 		if(res != CURLE_OK)
@@ -112,11 +119,13 @@ void CheckUpdate() {
 	}
 	try {
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
-		if(j["assets"].is_array()) {
-			for(auto& asset : j["assets"]) {
+		if(j.is_array()) {
+			for(auto& asset : j) {
 				try {
-					auto name = asset["name"].get<std::string>();
-					update_urls.emplace_back(name, asset["browser_download_url"].get<std::string>());
+					auto url = asset["url"].get<std::string>();
+					auto name = ygo::Utils::GetFileName(url, true);
+					auto md5 = asset["md5"].get<std::string>();
+					update_urls.push_back({ name, url, md5 });
 				}
 				catch(...) {}
 			}
@@ -146,28 +155,53 @@ bool ygo::updater::UpdateDownloaded() {
 	return downloaded;
 }
 
+bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
+	if(md5.size() < MD5_DIGEST_LENGTH)
+		return false;
+	uint8_t result[MD5_DIGEST_LENGTH];
+	MD5((uint8_t*)buffer.data(), buffer.size(), result);
+	return memcmp(result, md5.data(), MD5_DIGEST_LENGTH);
+}
+
 void DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
 	downloading = true;
 	Payload cbpayload = { callback, 1, static_cast<int>(update_urls.size()), payload, nullptr };
 	int i = 1;
 	for(auto& file : update_urls) {
-		auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::ToPathString(file.first);
+		auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::ToPathString(file.name);
 		cbpayload.current = i;
-		cbpayload.filename = file.first.data();
-		auto& update_url = file.second;
-		std::ofstream stream(name, std::ofstream::binary);
-		auto curl_handle = setupHandle(update_url, reinterpret_cast<void*>(WriteCallback), &stream, &cbpayload);
+		cbpayload.filename = file.name.data();
+		std::vector<uint8_t> binmd5;
+		for(std::string::size_type i = 0; i < file.md5.length(); i += 2) {
+			uint8_t b = static_cast<uint8_t>(strtoul(file.md5.substr(i, 2).c_str(), nullptr, 16));
+			binmd5.push_back(b);
+		}
+		{
+			std::ifstream file(name, std::ifstream::binary);
+			if(file.good()) {
+				if(CheckMd5({ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() }, binmd5)) {
+					i++;
+					continue;
+				}
+			}
+		}
+		auto& update_url = file.url;
+		std::vector<char> buffer;
+		auto curl_handle = setupHandle(update_url, static_cast<void*>(WriteCallback), &buffer, &cbpayload);
 		try {
 			CURLcode res = curl_easy_perform(curl_handle);
 			if(res != CURLE_OK)
 				throw 1;
-			stream.close();
+			if(CheckMd5(buffer, binmd5)) {
+				std::ofstream stream(name, std::ofstream::binary);
+				if(stream.good()) {
+					stream.write(buffer.data(), buffer.size());
+					stream.close();
+				}
+			}
 			curl_easy_cleanup(curl_handle);
 		}
-		catch(...) {
-			stream.close();
-			ygo::Utils::FileDelete(name);
-		}
+		catch(...) {}
 		i++;
 	}
 	downloaded = true;
