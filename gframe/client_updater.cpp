@@ -83,16 +83,16 @@ struct Payload {
 };
 
 int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownloaded, curl_off_t TotalToUpload, curl_off_t NowUploaded) {
-	if(TotalToDownload <= 0.0) {
-		return 0;
-	}
 	Payload* payload = reinterpret_cast<Payload*>(ptr);
 	if(payload && payload->callback) {
-		double fractiondownloaded = (double)NowDownloaded / (double)TotalToDownload;
-		int percentage = std::round(fractiondownloaded * 100);
+		int percentage = 0;
+		if(TotalToDownload > 0.0) {
+			double fractiondownloaded = (double)NowDownloaded / (double)TotalToDownload;
+			percentage = std::round(fractiondownloaded * 100);
+		}
 		payload->callback(percentage, payload->current, payload->total, payload->filename, payload->is_new, payload->payload);
+		payload->is_new = false;
 	}
-	payload->is_new = false;
 	return 0;
 }
 
