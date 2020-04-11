@@ -101,6 +101,7 @@ DataHandler::DataHandler() {
 	}
 #endif
 	filesystem = new irr::io::CFileSystem();
+	Utils::filesystem = filesystem;
 	LoadZipArchives();
 	deckManager = std::unique_ptr<DeckManager>(new DeckManager());
 	gitManager = std::unique_ptr<RepoManager>(new RepoManager());

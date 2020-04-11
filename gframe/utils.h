@@ -13,6 +13,7 @@
 namespace irr {
 namespace io {
 class IFileArchive;
+class IFileSystem;
 class IReadFile;
 }
 }
@@ -21,6 +22,7 @@ namespace ygo {
 	class Utils {
 	public:
 		static std::vector<irr::io::IFileArchive*> archives;
+		static irr::io::IFileSystem* filesystem;
 		static bool MakeDirectory(const path_string& path);
 		static bool FileCopy(const path_string& source, const path_string& destination);
 		static bool FileMove(const path_string& source, const path_string& destination);
@@ -54,8 +56,9 @@ namespace ygo {
 		/** Returns true if and only if all tokens are contained in the input. */
 		static bool ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
-		static bool Utils::CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
+		static bool CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
 		static bool KeepOnlyDigits(std::wstring& input);
+		static bool UnzipArchive(const path_string& input, const path_string& dest = EPRO_TEXT("./"));
 	};
 
 template<typename T>

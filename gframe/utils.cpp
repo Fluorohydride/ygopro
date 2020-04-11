@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <IFileArchive.h>
+#include <IFileSystem.h>
 #include <fstream>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -13,6 +14,7 @@
 
 namespace ygo {
 	std::vector<irr::io::IFileArchive*> Utils::archives;
+	irr::io::IFileSystem* Utils::filesystem;
 
 	bool Utils::MakeDirectory(const path_string& path) {
 #ifdef _WIN32
@@ -435,6 +437,44 @@ namespace ygo {
 			if(!MakeDirectory(temp.c_str()))
 				return false;
 		}
+		return true;
+	}
+
+	bool Utils::UnzipArchive(const path_string& input, const path_string& dest) {
+		if(!filesystem)
+			return false;
+		irr::io::IFileArchive* archive = nullptr;
+		if(!filesystem->addFileArchive(input.c_str(), false, false, irr::io::EFAT_ZIP, "", &archive))
+			return false;
+
+		auto filelist = archive->getFileList();
+		auto count = filelist->getFileCount();
+
+		for(int i = 0; i < count; i++) {
+			auto filename = path_string(filelist->getFullFileName(i).c_str());
+			bool isdir = filelist->isDirectory(i);
+			if(isdir)
+				CreatePath(filename + TEXT("/"), dest);
+			else
+				CreatePath(filename, dest);
+			if(!isdir) {
+				auto reader = archive->createAndOpenFile(i);
+				if(reader) {
+					std::ofstream out(dest + TEXT("/") + filename, std::ofstream::binary);
+					char buff[0x80000];
+					const int sz = sizeof(buff) / sizeof(*buff);
+					int r, rx = reader->getSize();
+					for(r = 0; r < rx; /**/) {
+						int wx = reader->read(buff, sz);
+						out.write(buff, wx);
+						r += wx;
+					}
+					out.close();
+					reader->drop();
+				}
+			}
+		}
+		filesystem->removeFileArchive(archive);
 		return true;
 	}
 }

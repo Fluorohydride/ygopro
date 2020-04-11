@@ -16,6 +16,7 @@ void ygo::updater::StartUnzipper(const path_string&) {}
 #endif
 #ifdef _WIN32
 #include <Windows.h>
+#include <tchar.h>
 #else
 #include <sys/file.h>
 #include <unistd.h>
@@ -49,6 +50,10 @@ void* Lock = nullptr;
 
 void* GetLock() {
 #ifdef _WIN32
+	TCHAR exepath[MAX_PATH];
+	GetModuleFileName(NULL, exepath, MAX_PATH);
+	path_string pathname(exepath);
+	_tremove((pathname + EPRO_TEXT(".old")).c_str());
 	HANDLE hFile = CreateFile(EPRO_TEXT("./edopro_lock"), GENERIC_READ, 0, NULL, CREATE_ALWAYS, 0, NULL);
 	return hFile == INVALID_HANDLE_VALUE ? nullptr : hFile;
 #else
@@ -166,29 +171,29 @@ bool ygo::updater::UpdateDownloaded() {
 	return downloaded;
 }
 
-void ygo::updater::StartUnzipper(const path_string& dest) {
+void ygo::updater::StartUnzipper(const path_string& src) {
+#ifdef _WIN32
+	TCHAR exepath[MAX_PATH];
+	GetModuleFileName(NULL, exepath, MAX_PATH);
+	path_string pathname(exepath);
+	_trename(exepath, (pathname + EPRO_TEXT(".old")).c_str());
+#endif
+	for(auto& file : update_urls) {
+		auto name = src + ygo::Utils::ToPathString(file.name);
+		ygo::Utils::UnzipArchive(src + ygo::Utils::ToPathString(file.name));
+	}
 #ifdef _WIN32
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
-	TCHAR exepath[MAX_PATH];
-	GetModuleFileName(NULL, exepath, MAX_PATH);
-	path_string str(EPRO_TEXT("./unzipper.exe ./ "));
-	str.append(exepath);
-	for(auto& file : update_urls) {
-		auto name = EPRO_TEXT(" ") + dest + ygo::Utils::ToPathString(file.name);
-		str.append(name);
-	}
-	CreateProcess(nullptr, (LPWSTR)str.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
+	pathname.append(EPRO_TEXT(" show_changelog"));
+	CreateProcess(nullptr, (LPWSTR)pathname.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-#else
-	std::vector<std::string> args;
-	args.push_back("./");
-#ifdef __APPLE__
-	args.push_back("io.github.edo9300.ygoprodll");
+#elif defined(__APPLE__)
+	system("open - b io.github.edo9300.ygoprodll --args show_changelog")
 #else
 	char buff[PATH_MAX];
 	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
@@ -196,19 +201,9 @@ void ygo::updater::StartUnzipper(const path_string& dest) {
 	if(len != -1) {
 		buff[len] = '\0';
 	}
-	args.push_back(buff);
-#endif
-	for(auto& file : update_urls) {
-		auto name = dest + ygo::Utils::ToPathString(file.name);
-		args.push_back(name);
-	}
-	std::vector<const char*> argsbuf;
-	for(const auto& arg : args)
-		argsbuf.push_back(arg.data());
-	argsbuf.push_back(nullptr);
 	pid_t pid = fork();
 	if(pid == 0) {
-		execv("./unzipper", argsbuf.data());
+		execl(filename.c_str(), "show_changelog", nullptr);
 		exit(EXIT_FAILURE);
 	}
 #endif
