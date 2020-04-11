@@ -78,6 +78,7 @@ struct Payload {
 	int current = 1;
 	int total = 1;
 	bool is_new = true;
+	int previous_percent = 0;
 	void* payload = nullptr;
 	const char* filename = nullptr;
 };
@@ -90,8 +91,11 @@ int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownl
 			double fractiondownloaded = (double)NowDownloaded / (double)TotalToDownload;
 			percentage = std::round(fractiondownloaded * 100);
 		}
-		payload->callback(percentage, payload->current, payload->total, payload->filename, payload->is_new, payload->payload);
-		payload->is_new = false;
+		if(percentage != payload->previous_percent) {
+			payload->callback(percentage, payload->current, payload->total, payload->filename, payload->is_new, payload->payload);
+			payload->is_new = false;
+			payload->previous_percent = percentage;
+		}
 	}
 	return 0;
 }
@@ -193,7 +197,7 @@ void ygo::updater::StartUnzipper(const path_string& src) {
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #elif defined(__APPLE__)
-	system("open - b io.github.edo9300.ygoprodll --args show_changelog")
+	system("open -b io.github.edo9300.ygoprodll --args show_changelog")
 #else
 	char buff[PATH_MAX];
 	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
@@ -220,13 +224,17 @@ bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) 
 
 void DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
 	downloading = true;
-	Payload cbpayload = { callback, 1, static_cast<int>(update_urls.size()), true, payload, nullptr };
+	Payload cbpayload{};
+	cbpayload.callback = callback;
+	cbpayload.total = static_cast<int>(update_urls.size());
+	cbpayload.payload = payload;
 	int i = 1;
 	for(auto& file : update_urls) {
 		auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::ToPathString(file.name);
 		cbpayload.current = i;
 		cbpayload.filename = file.name.data();
 		cbpayload.is_new = true;
+		cbpayload.previous_percent = -1;
 		std::vector<uint8_t> binmd5;
 		for(std::string::size_type i = 0; i < file.md5.length(); i += 2) {
 			uint8_t b = static_cast<uint8_t>(strtoul(file.md5.substr(i, 2).c_str(), nullptr, 16));
