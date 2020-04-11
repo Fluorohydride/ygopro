@@ -454,13 +454,13 @@ namespace ygo {
 			auto filename = path_string(filelist->getFullFileName(i).c_str());
 			bool isdir = filelist->isDirectory(i);
 			if(isdir)
-				CreatePath(filename + TEXT("/"), dest);
+				CreatePath(filename + EPRO_TEXT("/"), dest);
 			else
 				CreatePath(filename, dest);
 			if(!isdir) {
 				auto reader = archive->createAndOpenFile(i);
 				if(reader) {
-					std::ofstream out(dest + TEXT("/") + filename, std::ofstream::binary);
+					std::ofstream out(dest + EPRO_TEXT("/") + filename, std::ofstream::binary);
 					char buff[0x80000];
 					const int sz = sizeof(buff) / sizeof(*buff);
 					int r, rx = reader->getSize();
