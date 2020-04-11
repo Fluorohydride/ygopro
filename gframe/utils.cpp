@@ -422,7 +422,7 @@ namespace ygo {
 		std::vector<path_string> folders;
 		path_string temp;
 		for(int i = 0; i < (int)path.size(); i++) {
-			if(path[i] == TEXT('/')) {
+			if(path[i] == EPRO_TEXT('/')) {
 				folders.push_back(temp);
 				temp.clear();
 			} else
@@ -431,9 +431,9 @@ namespace ygo {
 		temp.clear();
 		for(auto folder : folders) {
 			if(temp.empty() && !workingdir.empty())
-				temp = workingdir + TEXT("/") + folder;
+				temp = workingdir + EPRO_TEXT("/") + folder;
 			else
-				temp += TEXT("/") + folder;
+				temp += EPRO_TEXT("/") + folder;
 			if(!MakeDirectory(temp.c_str()))
 				return false;
 		}
