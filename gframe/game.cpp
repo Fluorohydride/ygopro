@@ -2913,6 +2913,8 @@ void Game::OnResize() {
 	lstChat->setRelativePosition(lstsSize);
 
 	imageManager.ClearTexture(true);
+	btnPSAD->setImage(imageManager.tCover[0]);
+	btnPSDD->setImage(imageManager.tCover[0]);
 
 	ShowCardInfo(showingcard, true);
 
