@@ -203,15 +203,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CREATE_HOST: {
-				mainGame->isHostingOnline = false;
-				mainGame->btnHostConfirm->setEnabled(true);
-				mainGame->btnHostCancel->setEnabled(true);
-				mainGame->HideElement(mainGame->wLanWindow);
-				mainGame->stHostPort->setVisible(true);
-				mainGame->ebHostPort->setVisible(true);
-				mainGame->stHostNotes->setVisible(false);
-				mainGame->ebHostNotes->setVisible(false);
-				mainGame->ShowElement(mainGame->wCreateHost);
+				if (wcslen(mainGame->ebNickName->getText())) {
+					mainGame->isHostingOnline = false;
+					mainGame->btnHostConfirm->setEnabled(true);
+					mainGame->btnHostCancel->setEnabled(true);
+					mainGame->HideElement(mainGame->wLanWindow);
+					mainGame->stHostPort->setVisible(true);
+					mainGame->ebHostPort->setVisible(true);
+					mainGame->stHostNotes->setVisible(false);
+					mainGame->ebHostNotes->setVisible(false);
+					mainGame->ShowElement(mainGame->wCreateHost);
+				}
 				break;
 			}
 			case BUTTON_CREATE_HOST2: {
