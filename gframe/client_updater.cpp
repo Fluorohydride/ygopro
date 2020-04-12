@@ -20,6 +20,8 @@ void ygo::updater::StartUnzipper(const path_string&) {}
 #else
 #include <sys/file.h>
 #include <unistd.h>
+#define _trename rename
+#define _tremove remove
 #endif
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
@@ -48,17 +50,47 @@ std::vector<DownloadInfo> update_urls;
 
 void* Lock = nullptr;
 
+const path_string& GetExePath() {
+	static path_string binarypath = EPRO_TEXT("");
+	if(binarypath.empty()) {
+#ifdef _WIN32
+		TCHAR exepath[MAX_PATH];
+		GetModuleFileName(NULL, exepath, MAX_PATH);
+		binarypath = exepath;
+#elif defined(__linux__) && !defined(__ANDROID__)
+		char buff[PATH_MAX];
+		ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
+		if(len != -1) {
+			buff[len] = '\0';
+		}
+		binarypath = buff;
+#endif
+	}
+	return binarypath;
+}
+
+void DeleteOld() {
+#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
+	_tremove((GetExePath() + EPRO_TEXT(".old")).c_str());
+#endif
+}
+
 void* GetLock() {
 #ifdef _WIN32
-	TCHAR exepath[MAX_PATH];
-	GetModuleFileName(NULL, exepath, MAX_PATH);
-	path_string pathname(exepath);
-	_tremove((pathname + EPRO_TEXT(".old")).c_str());
 	HANDLE hFile = CreateFile(EPRO_TEXT("./edopro_lock"), GENERIC_READ, 0, NULL, CREATE_ALWAYS, 0, NULL);
-	return hFile == INVALID_HANDLE_VALUE ? nullptr : hFile;
+	if(!hFile || hFile == INVALID_HANDLE_VALUE)
+		return nullptr;
+	DeleteOld();
+	return hFile;
 #else
-	size_t file = open("edopro_lock", O_CREAT, S_IRWXU);
-	return flock(file, LOCK_EX | LOCK_NB) ? nullptr : (void*)file;
+	size_t file = open("./edopro_lock", O_CREAT, S_IRWXU);
+	if(flock(file, LOCK_EX | LOCK_NB)) {
+		if(file)
+			close(file);
+		return nullptr;
+	}
+	DeleteOld();
+	return (void*)file;
 #endif
 	return nullptr;
 }
@@ -176,11 +208,9 @@ bool ygo::updater::UpdateDownloaded() {
 }
 
 void ygo::updater::StartUnzipper(const path_string& src) {
-#ifdef _WIN32
-	TCHAR exepath[MAX_PATH];
-	GetModuleFileName(NULL, exepath, MAX_PATH);
-	path_string pathname(exepath);
-	_trename(exepath, (pathname + EPRO_TEXT(".old")).c_str());
+#if defined(_WIN32) || (defined(__LINUX__) && !defined(__ANDROID__))
+	auto pathstring = GetExePath() + EPRO_TEXT(".old");
+	_trename(GetExePath().c_str(), pathstring.c_str());
 #endif
 	for(auto& file : update_urls) {
 		auto name = src + ygo::Utils::ToPathString(file.name);
@@ -192,22 +222,16 @@ void ygo::updater::StartUnzipper(const path_string& src) {
 	ZeroMemory(&si, sizeof(si));
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
-	pathname.append(EPRO_TEXT(" show_changelog"));
-	CreateProcess(nullptr, (LPWSTR)pathname.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
+	pathstring = GetExePath() + EPRO_TEXT(" show_changelog");
+	CreateProcess(nullptr, (LPWSTR)pathstring.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #elif defined(__APPLE__)
-	system("open -b io.github.edo9300.ygoprodll --args show_changelog")
+	system("open -b io.github.edo9300.ygoprodll --args show_changelog");
 #else
-	char buff[PATH_MAX];
-	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
-	std::string filename;
-	if(len != -1) {
-		buff[len] = '\0';
-	}
 	pid_t pid = fork();
 	if(pid == 0) {
-		execl(filename.c_str(), "show_changelog", nullptr);
+		execl(GetExePath().c_str(), "show_changelog", nullptr);
 		exit(EXIT_FAILURE);
 	}
 #endif
