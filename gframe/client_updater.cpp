@@ -105,6 +105,7 @@ void FreeLock() {
 	remove("./edopro_lock");
 #endif
 }
+
 struct Payload {
 	update_callback callback = nullptr;
 	int current = 1;
@@ -141,10 +142,10 @@ size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
 	return realsize;
 }
 
-CURL* setupHandle(const std::string& url, void* func, void* payload, void* payload2 = nullptr) {
+CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	CURL* curl_handle = curl_easy_init();
-	curl_easy_setopt(curl_handle, CURLOPT_URL, url.c_str());
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, func);
+	curl_easy_setopt(curl_handle, CURLOPT_URL, url);
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, reinterpret_cast<void*>(WriteCallback));
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 5L);
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, payload);
 	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, USERAGENT);
@@ -154,49 +155,38 @@ CURL* setupHandle(const std::string& url, void* func, void* payload, void* paylo
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFOFUNCTION, progress_callback);
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFODATA, payload2);
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 0L);
-	return curl_handle;
+	CURLcode res = curl_easy_perform(curl_handle);
+	curl_easy_cleanup(curl_handle);
+	return res;
 }
 
 void CheckUpdate() {
 	std::vector<char> retrieved_data;
-	try {
-		auto curl_handle = setupHandle(UPDATE_URL, reinterpret_cast<void*>(WriteCallback), &retrieved_data);
-		CURLcode res = curl_easy_perform(curl_handle);
-		if(res != CURLE_OK)
-			return;
-		curl_easy_cleanup(curl_handle);
-	}
-	catch(...) {
+	if(curlPerform(UPDATE_URL, &retrieved_data) != CURLE_OK)
 		return;
-	}
 	try {
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
-		if(j.is_array()) {
-			for(auto& asset : j) {
-				try {
-					auto url = asset["url"].get<std::string>();
-					auto name = asset["name"].get<std::string>();
-					auto md5 = asset["md5"].get<std::string>();
-					update_urls.push_back({ name, url, md5 });
-				}
-				catch(...) {}
+		if(!j.is_array())
+			return;
+		for(auto& asset : j) {
+			try {
+				auto url = asset["url"].get<std::string>();
+				auto name = asset["name"].get<std::string>();
+				auto md5 = asset["md5"].get<std::string>();
+				update_urls.push_back({ name, url, md5 });
 			}
-			if(update_urls.size())
-				has_update = true;
+			catch(...) {}
 		}
+		has_update = !!update_urls.size();
 	}
 	catch(...) { update_urls.clear(); }
 }
 
 void ygo::updater::CheckUpdates() {
-	Lock = GetLock();
-	if(!Lock)
+	if(!(Lock = GetLock()))
 		return;
-	try {
-		update_urls.clear();
-		std::thread(CheckUpdate).detach();
-	}
-	catch(...) { update_urls.clear(); }
+	update_urls.clear();
+	std::thread(CheckUpdate).detach();
 }
 
 bool ygo::updater::HasUpdate() {
@@ -207,22 +197,14 @@ bool ygo::updater::UpdateDownloaded() {
 	return downloaded;
 }
 
-void ygo::updater::StartUnzipper(const path_string& src) {
-#if defined(_WIN32) || (defined(__LINUX__) && !defined(__ANDROID__))
-	auto pathstring = GetExePath() + EPRO_TEXT(".old");
-	_trename(GetExePath().c_str(), pathstring.c_str());
-#endif
-	for(auto& file : update_urls) {
-		auto name = src + ygo::Utils::ToPathString(file.name);
-		ygo::Utils::UnzipArchive(src + ygo::Utils::ToPathString(file.name));
-	}
+void Reboot(){
 #ifdef _WIN32
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
 	ZeroMemory(&si, sizeof(si));
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
-	pathstring = GetExePath() + EPRO_TEXT(" show_changelog");
+	auto pathstring = GetExePath() + EPRO_TEXT(" show_changelog");
 	CreateProcess(nullptr, (LPWSTR)pathstring.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
@@ -238,7 +220,20 @@ void ygo::updater::StartUnzipper(const path_string& src) {
 	exit(0);
 }
 
+void ygo::updater::StartUnzipper(const path_string& src) {
+#if defined(_WIN32) || (defined(__LINUX__) && !defined(__ANDROID__))
+	auto pathstring = GetExePath() + EPRO_TEXT(".old");
+	_trename(GetExePath().c_str(), pathstring.c_str());
+#endif
+	for(auto& file : update_urls) {
+		auto name = src + ygo::Utils::ToPathString(file.name);
+		ygo::Utils::UnzipArchive(src + ygo::Utils::ToPathString(file.name));
+	}
+	Reboot();
+}
+
 bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
+	return true;
 	if(md5.size() < MD5_DIGEST_LENGTH)
 		return false;
 	uint8_t result[MD5_DIGEST_LENGTH];
@@ -255,7 +250,7 @@ void DownloadUpdate(path_string dest_path, void* payload, update_callback callba
 	int i = 1;
 	for(auto& file : update_urls) {
 		auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::ToPathString(file.name);
-		cbpayload.current = i;
+		cbpayload.current = i++;
 		cbpayload.filename = file.name.data();
 		cbpayload.is_new = true;
 		cbpayload.previous_percent = -1;
@@ -266,32 +261,17 @@ void DownloadUpdate(path_string dest_path, void* payload, update_callback callba
 		}
 		{
 			std::ifstream file(name, std::ifstream::binary);
-			if(file.good()) {
-				if(CheckMd5({ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() }, binmd5)) {
-					i++;
-					continue;
-				}
-			}
+			if(file.good() && CheckMd5({ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() }, binmd5))
+				continue;
 		}
-		auto& update_url = file.url;
 		std::vector<char> buffer;
-		auto curl_handle = setupHandle(update_url, reinterpret_cast<void*>(WriteCallback), &buffer, &cbpayload);
-		try {
-			CURLcode res = curl_easy_perform(curl_handle);
-			if(res != CURLE_OK)
-				throw 1;
-			if(CheckMd5(buffer, binmd5)) {
-				ygo::Utils::CreatePath(name);
-				std::ofstream stream(name, std::ofstream::binary);
-				if(stream.good()) {
-					stream.write(buffer.data(), buffer.size());
-					stream.close();
-				}
-			}
-			curl_easy_cleanup(curl_handle);
-		}
-		catch(...) {}
-		i++;
+		if((curlPerform(file.url.c_str(), &buffer, &cbpayload) != CURLE_OK)
+		   || !CheckMd5(buffer, binmd5)
+		   || !ygo::Utils::CreatePath(name))
+			continue;
+		std::ofstream stream(name, std::ofstream::binary);
+		if(stream.good())
+			stream.write(buffer.data(), buffer.size());
 	}
 	downloaded = true;
 }
@@ -299,10 +279,7 @@ void DownloadUpdate(path_string dest_path, void* payload, update_callback callba
 bool ygo::updater::StartUpdate(update_callback callback, void* payload, const path_string& dest) {
 	if(!has_update || downloading)
 		return false;
-	try {
-		std::thread(DownloadUpdate, dest, payload, callback).detach();
-	}
-	catch(...) { return false; }
+	std::thread(DownloadUpdate, dest, payload, callback).detach();
 	return true;
 }
 #endif
