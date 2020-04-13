@@ -2404,17 +2404,12 @@ void Game::UpdateDuelParam() {
 		}
 	const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 	uint32 flag2 = 0;
-	for (int i = 0; i < (sizeof(chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i)
+	for (int i = 0; i < (sizeof(chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i) {
 		if (chkTypeLimit[i]->isChecked()) {
 			flag2 |= limits[i];
 		}
-#define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) { cbDuelRule->removeItem(7); break; } }
+	}
 	switch (flag) {
-	CHECK(1)
-	CHECK(2)
-	CHECK(3)
-	CHECK(4)
-	CHECK(5)
 	case DUEL_MODE_SPEED: {
 		cbDuelRule->setSelected(5);
 		break;
@@ -2423,13 +2418,20 @@ void Game::UpdateDuelParam() {
 		cbDuelRule->setSelected(6);
 		break;
 	}
+// NOTE: intentional case fallthrough
+#define CHECK(MR) case DUEL_MODE_MR##MR:{ cbDuelRule->setSelected(MR - 1); if (flag2 == DUEL_MODE_MR##MR##_FORB) { cbDuelRule->removeItem(7); break; } }
+	CHECK(1)
+	CHECK(2)
+	CHECK(3)
+	CHECK(4)
+	CHECK(5)
+#undef CHECK
 	default: {
 		cbDuelRule->addItem(gDataManager->GetSysString(1630).c_str());
 		cbDuelRule->setSelected(7);
 		break;
 	}
 	}
-#undef CHECK
 	duel_param = flag;
 	forbiddentypes = flag2;
 }
