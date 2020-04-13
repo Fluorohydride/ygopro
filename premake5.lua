@@ -21,7 +21,8 @@ solution "ygo"
 
     configuration { "Release", "vs*" }
         optimize "Speed"
-        flags { "StaticRuntime", "LinkTimeOptimization" }
+        flags { "LinkTimeOptimization" }
+        staticruntime "On"
         disablewarnings { "4244", "4267", "4838", "4577", "4819", "4018", "4996", "4477", "4091", "4828", "4800" }
 
     configuration { "Release", "not vs*" }
@@ -47,7 +48,7 @@ solution "ygo"
 
     include "ocgcore"
     include "gframe"
-    if os.is("windows") then
+    if os.ishost("windows") then
     include "lua"
     include "event"
     include "sqlite3"
