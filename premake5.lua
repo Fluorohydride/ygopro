@@ -22,7 +22,7 @@ solution "ygo"
     configuration { "Release", "vs*" }
         optimize "Speed"
         flags { "StaticRuntime", "LinkTimeOptimization" }
-        disablewarnings { "4244", "4267", "4838", "4577", "4819", "4018", "4996", "4477" }
+        disablewarnings { "4244", "4267", "4838", "4577", "4819", "4018", "4996", "4477", "4091", "4828", "4800" }
 
     configuration { "Release", "not vs*" }
         symbols "On"
@@ -33,7 +33,8 @@ solution "ygo"
         defines { "_ITERATOR_DEBUG_LEVEL=0" }
 
     configuration "vs*"
-        flags "EnableSSE2"
+        vectorextensions "SSE2"
+        buildoptions { "/utf-8" }
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     configuration "not vs*"
@@ -44,10 +45,10 @@ solution "ygo"
 
     startproject "ygopro"
 
-    include "lua"
     include "ocgcore"
     include "gframe"
     if os.is("windows") then
+    include "lua"
     include "event"
     include "sqlite3"
     end
