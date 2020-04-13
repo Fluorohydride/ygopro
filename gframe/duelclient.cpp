@@ -562,21 +562,25 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			pkt->info.duel_flag = 0;
 			pkt->info.forbiddentypes = 0;
 			pkt->info.extra_rules = 0;
-			if(pkt->info.mode == MODE_SINGLE) {
-				pkt->info.team1 = 1;
-				pkt->info.team2 = 1;
-				pkt->info.best_of = 0;
-			}
+			pkt->info.best_of = 1;
+			pkt->info.team1 = 1;
+			pkt->info.team2 = 1;
 			if(pkt->info.mode == MODE_MATCH) {
-				pkt->info.team1 = 1;
-				pkt->info.team2 = 1;
 				pkt->info.best_of = 3;
 			}
 			if(pkt->info.mode == MODE_TAG) {
 				pkt->info.team1 = 2;
 				pkt->info.team2 = 2;
-				pkt->info.best_of = 0;
 			}
+#define CHK(rule) case rule : pkt->info.duel_flag = DUEL_MODE_MR##rule;break;
+			switch(pkt->info.duel_rule) {
+				CHK(1)
+				CHK(2)
+				CHK(3)
+				CHK(4)
+				CHK(5)
+			}
+#undef CHK
 		}
 		mainGame->dInfo.duel_params = pkt->info.duel_flag;
 		mainGame->dInfo.isRelay = pkt->info.duel_flag & DUEL_RELAY;
@@ -600,16 +604,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1232), pkt->info.start_hand));
 		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1233), pkt->info.draw_count));
 		int rule;
-		if (mainGame->dInfo.compat_mode) {
+		mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt->info.duel_flag, pkt->info.forbiddentypes, &rule);
+		if(mainGame->dInfo.compat_mode)
 			rule = pkt->info.duel_rule;
-			if(rule == 0) {
-				mainGame->dInfo.duel_field = 3;
-				rule = 3;
-			} else
-				mainGame->dInfo.duel_field = rule;
-		} else {
-			mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt->info.duel_flag, pkt->info.forbiddentypes, &rule);
-		}
 		if((pkt->info.duel_flag & DUEL_MODE_SPEED) == pkt->info.duel_flag) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1258)));
 		} else if((pkt->info.duel_flag & DUEL_MODE_RUSH) == pkt->info.duel_flag) {
@@ -4230,10 +4227,12 @@ void DuelClient::SendResponse() {
 		for(int i = 0; i < mainGame->dField.must_select_cards.size(); ++i) {
 			mainGame->dField.must_select_cards[i]->is_selected = false;
 		}
+		mainGame->dField.must_select_cards.clear();
 		for(size_t i = 0; i < mainGame->dField.selectsum_all.size(); ++i) {
 			mainGame->dField.selectsum_all[i]->is_selectable = false;
 			mainGame->dField.selectsum_all[i]->is_selected = false;
 		}
+		mainGame->dField.selectsum_all.clear();
 		break;
 	}
 	case MSG_CONFIRM_CARDS: {

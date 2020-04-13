@@ -2579,10 +2579,11 @@ void ClientField::SetResponseSelectedCards() const {
 		}
 	} else {
 		unsigned char respbuf[64];
-		respbuf[0] = selected_cards.size();
-		for (size_t i = 0; i < selected_cards.size(); ++i)
-			respbuf[i + 1] = selected_cards[i]->select_seq;
-		DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+		respbuf[0] = selected_cards.size() + must_select_cards.size();
+		auto offset = must_select_cards.size() + 1;
+		for(size_t i = 0; i < selected_cards.size(); ++i)
+			respbuf[i + offset] = selected_cards[i]->select_seq;
+		DuelClient::SetResponseB(respbuf, selected_cards.size() + must_select_cards.size() + 1);
 	}
 }
 void ClientField::SetResponseSelectedOption() const {
