@@ -3522,7 +3522,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_ANNOUNCE_NUMBER: {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		int count = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadUInt8(pbuf);
 		mainGame->gMutex.lock();
 		mainGame->cbANNumber->clear();
 		bool quickmode = count <= 12;

@@ -14,14 +14,13 @@ project "ygopro"
             "single_duel.cpp", "single_duel.h",
             "tag_duel.cpp", "tag_duel.h" }
     includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "sqlite3", "lua" , "event"}
+    links { "ocgcore", "clzma", "sqlite3", "event"}
 
     configuration "windows"
         files "ygopro.rc"
         includedirs { "../event/include", "../sqlite3" }
-        links { "ws2_32" }
-
+        links { "ws2_32", "lua" }
     configuration "not vs*"
-        buildoptions { "-std=c++1y", "-fno-rtti" }
+        buildoptions { "-std=c++14", "-fno-rtti" }
     configuration "not windows"
-        links { "event_pthreads", "dl", "pthread" }
+        links { "lua5.3-c++", "event_pthreads", "dl", "pthread" }
