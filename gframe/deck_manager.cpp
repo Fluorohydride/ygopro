@@ -177,7 +177,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, DuelAllowedCards allowedCards
 				return (DECKERROR_MAINCOUNT << 28) + deck.main.size();
 			if(deck.extra.size() > 10)
 				return (DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
-			if(deck.side.size())
+			if(deck.side.size() > 12)
 				return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
 		} else {
 			if(deck.main.size() != 100)
@@ -193,7 +193,7 @@ int DeckManager::CheckDeck(Deck& deck, int lfhash, DuelAllowedCards allowedCards
 				return (DECKERROR_MAINCOUNT << 28) + deck.main.size();
 			if(deck.extra.size() > 5)
 				return (DECKERROR_EXTRACOUNT << 28) + deck.extra.size();
-			if(deck.side.size())
+			if(deck.side.size() > 6)
 				return (DECKERROR_SIDECOUNT << 28) + deck.side.size();
 		} else {
 			if(deck.main.size() < 40 || deck.main.size() > 60)
