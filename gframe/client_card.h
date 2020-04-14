@@ -69,6 +69,7 @@ public:
 	bool is_showchaintarget;
 	bool is_highlighting;
 	bool is_reversed;
+	bool is_public;
 	uint32_t code;
 	uint32_t chain_code;
 	uint32_t alias;

@@ -3103,7 +3103,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(mainGame->dInfo.isCatchingUp)
 			return true;
 		ClientCard* pcard = mainGame->dField.GetCard(mainGame->LocalPlayer(info.controler), info.location, info.sequence, info.position);
-		if(pcard->code != code) {
+		if(pcard->code != code || (!pcard->is_public && !mainGame->dInfo.compat_mode)) {
+			pcard->is_public = mainGame->dInfo.compat_mode;
 			pcard->code = code;
 			mainGame->dField.MoveCard(pcard, 10);
 		}

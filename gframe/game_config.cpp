@@ -77,6 +77,7 @@ bool GameConfig::Load(const path_char* filename)
 #define DESERIALIZE_BOOL(name) else if (type == #name) name = !!std::stoi(str);
 			DESERIALIZE_BOOL(relayDuel)
 			DESERIALIZE_BOOL(noCheckDeck)
+			DESERIALIZE_BOOL(hideHandsInReplays)
 			DESERIALIZE_BOOL(noShuffleDeck)
 			DESERIALIZE_BOOL(vsync)
 			DESERIALIZE_BOOL(showScopeLabel)
@@ -228,6 +229,7 @@ bool GameConfig::Save(const path_char* filename)
 	SERIALIZE(relayDuel);
 	SERIALIZE(noShuffleDeck);
 	SERIALIZE(noCheckDeck);
+	SERIALIZE(hideHandsInReplays);
 	conf_file << "textfont = "           << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
 	conf_file << "numfont = "            << BufferIO::EncodeUTF8s(numfont) << "\n";
 	conf_file << "serverport = "         << BufferIO::EncodeUTF8s(serverport) << "\n";

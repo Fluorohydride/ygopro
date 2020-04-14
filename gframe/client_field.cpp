@@ -1,4 +1,5 @@
 #include <stack>
+#include "game_config.h"
 #include <irrlicht.h>
 #include "client_field.h"
 #include "client_card.h"
@@ -809,14 +810,14 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Y = 4.0f;
 				t->Z = 0.5f + 0.001f * sequence;
 			}
-			if(pcard->code) {
+			if(pcard->code && (!mainGame->dInfo.isReplay || !gGameConfig->hide_hands_in_replays || pcard->is_public || pcard->is_hovered)) {
 				r->X = -FIELD_ANGLE;
 				r->Y = 0.0f;
 				r->Z = 0.0f;
 			} else {
 				r->X = FIELD_ANGLE;
 				r->Y = PI;
-				r->Z = 0;
+				r->Z = 0.0f;
 			}
 		} else {
 			if (count <= (6 - speed * 2))
@@ -833,14 +834,14 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Y = -3.4f;
 				t->Z = 0.5f - 0.001f * sequence;
 			}
-			if (pcard->code == 0) {
+			if (pcard->code && (!mainGame->dInfo.isReplay || !gGameConfig->hide_hands_in_replays || pcard->is_public || pcard->is_hovered)) {
+				r->X = -FIELD_ANGLE;
+				r->Y = 0.0f;
+				r->Z = 0.0f;
+			} else {
 				r->X = FIELD_ANGLE;
 				r->Y = PI;
-				r->Z = 0;
-			} else {
-				r->X = -FIELD_ANGLE;
-				r->Y = 0;
-				r->Z = 0;
+				r->Z = 0.0f;
 			}
 		}
 		break;

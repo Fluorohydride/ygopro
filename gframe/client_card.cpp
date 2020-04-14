@@ -21,6 +21,7 @@ ClientCard::ClientCard() {
 	is_highlighting = false;
 	status = 0;
 	is_reversed = false;
+	is_public = false;
 	cmdFlag = 0;
 	code = 0;
 	cover = 0;
@@ -140,8 +141,13 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 			counters[ctype] = ccount;
 		}
 	}
-	/*if(query.flag & QUERY_IS_PUBLIC) {
-	}*/
+	if(query.flag & QUERY_IS_PUBLIC) {
+		if(is_public != query.is_public && !mainGame->dInfo.isCatchingUp) {
+			is_public = query.is_public;
+			mainGame->dField.MoveCard(this, 5);
+		} else
+			is_public = query.is_public;
+	}
 	if(query.flag & QUERY_LSCALE) {
 		lscale = query.lscale;
 		lscstring = fmt::to_wstring(lscale);
