@@ -671,7 +671,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_WHEEL: {
-			if(!mainGame->scrFilter->isVisible())
+			if(!mainGame->scrFilter->isVisible() || mainGame->env->getFocus() == mainGame->scrFilter)
 				break;
 			if(!mainGame->Resize(805, 160, 1020, 630).isPointInside(mouse_pos))
 				break;

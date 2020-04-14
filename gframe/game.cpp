@@ -1067,8 +1067,8 @@ bool Game::Initialize() {
 	btnHandTest->setEnabled(coreloaded);
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
-	scrFilter->setLargeStep(100);
-	scrFilter->setSmallStep(10);
+	scrFilter->setLargeStep(DECK_SEARCH_SCROLL_STEP);
+	scrFilter->setSmallStep(DECK_SEARCH_SCROLL_STEP);
 	scrFilter->setVisible(false);
 	//sort type
 	wSort = env->addStaticText(L"", Scale(930, 132, 1020, 156), true, false, 0, -1, true);
