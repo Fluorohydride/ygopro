@@ -2347,8 +2347,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		if (field_confirm.size() > 0) {
 			mainGame->WaitFrameSignal(5);
-			for(size_t i = 0; i < field_confirm.size(); ++i) {
-				pcard = field_confirm[i];
+			for(auto& pcard : field_confirm) {
 				c = pcard->controler;
 				l = pcard->location;
 				if (l == LOCATION_HAND) {
@@ -2379,8 +2378,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->WaitFrameSignal(30);
 			else
 				mainGame->WaitFrameSignal(90);
-			for(size_t i = 0; i < field_confirm.size(); ++i) {
-				pcard = field_confirm[i];
+			for(auto& pcard : field_confirm) {
 				mainGame->dField.MoveCard(pcard, 5);
 				pcard->is_highlighting = false;
 			}
@@ -2562,10 +2560,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_REVERSE_DECK: {
 		mainGame->dField.deck_reversed = !mainGame->dField.deck_reversed;
 		if(!mainGame->dInfo.isCatchingUp) {
-			for(size_t i = 0; i < mainGame->dField.deck[0].size(); ++i)
-				mainGame->dField.MoveCard(mainGame->dField.deck[0][i], 10);
-			for(size_t i = 0; i < mainGame->dField.deck[1].size(); ++i)
-				mainGame->dField.MoveCard(mainGame->dField.deck[1][i], 10);
+			for(auto& pcard : mainGame->dField.deck[0])
+				mainGame->dField.MoveCard(pcard, 10);
+			for(auto& pcard : mainGame->dField.deck[1])
+				mainGame->dField.MoveCard(pcard, 10);
 		}
 		return true;
 	}
@@ -3214,18 +3212,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		std::vector<ClientCard*> pcards;
 		pcards.resize(count);
-		for (int i = 0; i < count; ++i) {
+		for (auto& pcard : pcards) {
 			CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
 			info.controler = mainGame->LocalPlayer(info.controler);
 			if ((info.location & LOCATION_OVERLAY) > 0)
-				pcards[i] = mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
+				pcard = mainGame->dField.GetCard(info.controler, info.location & (~LOCATION_OVERLAY) & 0xff, info.sequence)->overlayed[info.position];
 			else
-				pcards[i] = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
-			pcards[i]->is_highlighting = true;
+				pcard = mainGame->dField.GetCard(info.controler, info.location, info.sequence);
+			pcard->is_highlighting = true;
 		}
 		mainGame->WaitFrameSignal(30);
-		for(int i = 0; i < count; ++i)
-			pcards[i]->is_highlighting = false;
+		for(auto& pcard : pcards)
+			pcard->is_highlighting = false;
 		return true;
 	}
 	case MSG_CARD_SELECTED:
@@ -3296,8 +3294,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
 				mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
 				mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
-				for(size_t i = 0; i < mainGame->dField.hand[player].size(); ++i)
-					mainGame->dField.MoveCard(mainGame->dField.hand[player][i], 10);
+				for(auto& pcard : mainGame->dField.hand[player])
+					mainGame->dField.MoveCard(pcard, 10);
 				mainGame->gMutex.unlock();
 				mainGame->WaitFrameSignal(5);
 			}
@@ -3854,23 +3852,21 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		uint32_t count = BufferIO::Read<uint32_t>(pbuf);
 		if(count > 0) {
 			std::vector<ClientCard*> cards;
-			for(int i = 0; i < count; i++) {
+			cards.resize(count);
+			for(auto& pcard : cards) {
 				CoreUtils::loc_info loc = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
-				ClientCard* pcard = nullptr;
 				if(loc.location & LOCATION_OVERLAY) {
 					auto olcard = mainGame->dField.GetCard(loc.controler, (loc.location & (~LOCATION_OVERLAY)) & 0xff, loc.sequence);
 					pcard = *(olcard->overlayed.begin() + loc.position);
 				}else
 					pcard = mainGame->dField.GetCard(loc.controler, loc.location, loc.sequence);
-				cards.push_back(pcard);
 			}
 			if(!mainGame->dInfo.isCatchingUp) {
 				for(auto& pcard : cards)
 					mainGame->dField.FadeCard(pcard, 5, 5);
 				mainGame->WaitFrameSignal(5);
 			}
-			for(size_t i = 0; i < cards.size(); i++) {
-				auto& pcard = cards[i];
+			for(auto& pcard : cards) {
 				if(!mainGame->dInfo.isCatchingUp && !mainGame->dInfo.isReplay)
 					mainGame->gMutex.lock();
 				if(pcard == mainGame->dField.hovered_card)
@@ -4180,65 +4176,45 @@ void DuelClient::SetResponseB(void* respB, unsigned int len) {
 	memcpy(response_buf.data(), respB, len);
 }
 void DuelClient::SendResponse() {
-	switch(mainGame->dInfo.curMsg) {
-	case MSG_SELECT_BATTLECMD: {
-		for(auto cit = mainGame->dField.limbo_temp.begin(); cit != mainGame->dField.limbo_temp.end(); ++cit)
-			delete *cit;
+	auto& msg = mainGame->dInfo.curMsg;
+	switch(msg) {
+	case MSG_SELECT_BATTLECMD:
+	case MSG_SELECT_IDLECMD: {
+		for(auto& pcard : mainGame->dField.limbo_temp)
+			delete pcard;
 		mainGame->dField.limbo_temp.clear();
 		mainGame->dField.ClearCommandFlag();
 		mainGame->btnM2->setVisible(false);
-		mainGame->btnEP->setVisible(false);
-		break;
-	}
-	case MSG_SELECT_IDLECMD: {
-		for(auto cit = mainGame->dField.limbo_temp.begin(); cit != mainGame->dField.limbo_temp.end(); ++cit)
-			delete *cit;
-		mainGame->dField.limbo_temp.clear();
-		mainGame->dField.ClearCommandFlag();
-		mainGame->btnBP->setVisible(false);
 		mainGame->btnEP->setVisible(false);
 		mainGame->btnShuffle->setVisible(false);
 		break;
 	}
 	case MSG_SELECT_CARD:
-	case MSG_SELECT_UNSELECT_CARD: {
-		mainGame->dField.ClearSelect();
-		for (auto cit = mainGame->dField.limbo_temp.begin(); cit != mainGame->dField.limbo_temp.end(); ++cit)
-			delete *cit;
+	case MSG_SELECT_UNSELECT_CARD:
+	case MSG_SELECT_CHAIN:
+	case MSG_CONFIRM_CARDS: {
+		for(auto& pcard : mainGame->dField.limbo_temp)
+			delete pcard;
 		mainGame->dField.limbo_temp.clear();
-		break;
+		if(msg == MSG_SELECT_CHAIN)
+			mainGame->dField.ClearChainSelect();
+		if(msg != MSG_SELECT_CARD && msg != MSG_SELECT_CARD)
+			break;
 	}
-	case MSG_SELECT_CHAIN: {
-		for(auto cit = mainGame->dField.limbo_temp.begin(); cit != mainGame->dField.limbo_temp.end(); ++cit)
-			delete *cit;
-		mainGame->dField.limbo_temp.clear();
-		mainGame->dField.ClearChainSelect();
-		break;
-	}
-	case MSG_SELECT_TRIBUTE: {
-		mainGame->dField.ClearSelect();
-		break;
-	}
+	case MSG_SELECT_TRIBUTE:
 	case MSG_SELECT_COUNTER: {
 		mainGame->dField.ClearSelect();
 		break;
 	}
 	case MSG_SELECT_SUM: {
-		for(int i = 0; i < mainGame->dField.must_select_cards.size(); ++i) {
-			mainGame->dField.must_select_cards[i]->is_selected = false;
+		for(auto& pcard : mainGame->dField.must_select_cards)
+			pcard->is_selected = false;
+		for(auto& pcard : mainGame->dField.selectsum_all) {
+			pcard->is_selectable = false;
+			pcard->is_selected = false;
 		}
 		mainGame->dField.must_select_cards.clear();
-		for(size_t i = 0; i < mainGame->dField.selectsum_all.size(); ++i) {
-			mainGame->dField.selectsum_all[i]->is_selectable = false;
-			mainGame->dField.selectsum_all[i]->is_selected = false;
-		}
 		mainGame->dField.selectsum_all.clear();
-		break;
-	}
-	case MSG_CONFIRM_CARDS: {
-		for (auto cit = mainGame->dField.limbo_temp.begin(); cit != mainGame->dField.limbo_temp.end(); ++cit)
-			delete *cit;
-		mainGame->dField.limbo_temp.clear();
 		break;
 	}
 	}
