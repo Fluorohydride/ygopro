@@ -810,7 +810,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Y = 4.0f;
 				t->Z = 0.5f + 0.001f * sequence;
 			}
-			if(pcard->code && (!mainGame->dInfo.isReplay || !gGameConfig->hide_hands_in_replays || pcard->is_public || pcard->is_hovered)) {
+			if(pcard->code && (!mainGame->dInfo.isReplay || !gGameConfig->hideHandsInReplays || pcard->is_public || pcard->is_hovered)) {
 				r->X = -FIELD_ANGLE;
 				r->Y = 0.0f;
 				r->Z = 0.0f;
@@ -834,7 +834,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Y = -3.4f;
 				t->Z = 0.5f - 0.001f * sequence;
 			}
-			if (pcard->code && (!mainGame->dInfo.isReplay || !gGameConfig->hide_hands_in_replays || pcard->is_public || pcard->is_hovered)) {
+			if (pcard->code && (!mainGame->dInfo.isReplay || !gGameConfig->hideHandsInReplays || pcard->is_public || pcard->is_hovered)) {
 				r->X = -FIELD_ANGLE;
 				r->Y = 0.0f;
 				r->Z = 0.0f;
