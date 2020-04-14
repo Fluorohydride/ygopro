@@ -4198,7 +4198,7 @@ void DuelClient::SendResponse() {
 		mainGame->dField.limbo_temp.clear();
 		if(msg == MSG_SELECT_CHAIN)
 			mainGame->dField.ClearChainSelect();
-		if(msg != MSG_SELECT_CARD && msg != MSG_SELECT_CARD)
+		if(msg != MSG_SELECT_CARD && msg != MSG_SELECT_UNSELECT_CARD)
 			break;
 	}
 	case MSG_SELECT_TRIBUTE:
