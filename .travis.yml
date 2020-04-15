@@ -26,7 +26,6 @@ addons:
     - p7zip
     - freetype
     - curl
-    - libgit2
     - fmt
     - nlohmann-json
 matrix:
@@ -41,7 +40,7 @@ matrix:
     - DXSDK_DIR=/c/d3d9sdk/
   - name: "Bionic GCC7"
     os: linux
-    compiler: gcc  
+    compiler: gcc
     env:
     - VCPKG_ROOT="$PWD/vcpkg"
     - VCPKG_LIBS="libevent sqlite3 irrlicht-rectclip curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"

@@ -80,7 +80,7 @@ local ygopro_config=function(static_core)
 		buildoptions { "-fms-extensions" }
 		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
-		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework" }
+		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework", "Security.framework" }
 		if static_core then
 			links "lua"
 		end
