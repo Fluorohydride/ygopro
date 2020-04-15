@@ -857,6 +857,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->gBot.UpdateDescription();
 				break;
 			}
+			case SERVER_CHOICE: {
+				ServerLobby::RefreshRooms();
+				break;
+			}
 			default: break;
 			}
 			if(caller->getParent() == mainGame->wRoomListPlaceholder)
