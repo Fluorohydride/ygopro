@@ -49,7 +49,7 @@ class android_app;
 namespace porting {
 extern android_app* app_global;
 }
-#define ADDComboBox(...) (gGameConfig->native_mouse ? env->addComboBox(__VA_ARGS__): CGUICustomComboBox::addCustomComboBox(env, __VA_ARGS__))
+#define ADDComboBox(...) (gGameConfig->native_mouse ? env->addComboBox(__VA_ARGS__): irr::gui::CGUICustomComboBox::addCustomComboBox(env, __VA_ARGS__))
 #define MATERIAL_GUARD(f) do {mainGame->driver->enableMaterial2D(true); f; mainGame->driver->enableMaterial2D(false);} while(false);
 #else
 #define ADDComboBox(...) env->addComboBox(__VA_ARGS__)
@@ -127,7 +127,7 @@ bool Game::Initialize() {
 	// The Android assets file-system does not know which sub-directories it has (blame google).
 	// So we have to add all sub-directories in assets manually. Otherwise we could still open the files,
 	// but existFile checks will fail (which are for example needed by getFont).
-	for(u32 i = 0; i < filesystem->getFileArchiveCount(); ++i) {
+	for(int i = 0; i < filesystem->getFileArchiveCount(); ++i) {
 		auto archive = filesystem->getFileArchive(i);
 		if(archive->getType() == irr::io::EFAT_ANDROID_ASSET) {
 			archive->addDirectoryToFileList("media/");
@@ -1466,11 +1466,7 @@ bool Game::Initialize() {
 	fpsCounter->setOverrideColor(skin::FPS_TEXT_COLOR_VAL);
 	fpsCounter->setVisible(gGameConfig->showFPS);
 	fpsCounter->setTextRestrainedInside(false);
-#ifndef __ANDROID__
 	fpsCounter->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
-#else
-	fpsCounter->setTextAlignment(EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
-#endif
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;

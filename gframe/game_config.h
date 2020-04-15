@@ -79,8 +79,8 @@ struct GameConfig
 	bool native_mouse = false;
 #else
 	bool accurate_bg_resize = false;
-	bool hideHandsInReplays = false;
 #endif
+	bool hideHandsInReplays = false;
 	bool chkAnime = false;
 #ifdef __APPLE__
 	bool ctrlClickIsRMB = true;
