@@ -2,14 +2,10 @@
 #define IPROGRESSBAR_H_
 #include <irrlicht.h>
 
-using namespace irr;
-using namespace core;
-using namespace scene;
-using namespace gui;
-class IProgressBar : public IGUIElement {
+class IProgressBar : public irr::gui::IGUIElement {
 public:
 
-	IProgressBar(IGUIEnvironment* guienv, const core::rect<s32>& rectangle, s32 id = -1, IGUIElement* parent = 0);
+	IProgressBar(irr::gui::IGUIEnvironment* guienv, const irr::core::recti& rectangle, irr::s32 id = -1, irr::gui::IGUIElement* parent = 0);
 
 
 	/*Set percentage in positive percentual (0~100). Please note that a call to this function with others values, will set the progress bar to 0.*/
@@ -25,14 +21,14 @@ public:
 	virtual void draw();
 private:
 	//irr::s32 total; //Dimension (X) of the bar, to calculate relative percentage.
-	rect<s32> bar; //Dimension of the bar
-	rect<s32> position; //Bar
-	rect<s32> border; //Border 
-	rect<s32> tofill; //Percentage indicator
-	rect<s32> empty; //"Empty" indicator
+	irr::core::recti bar; //Dimension of the bar
+	irr::core::recti position; //Bar
+	irr::core::recti border; //Border 
+	irr::core::recti tofill; //Percentage indicator
+	irr::core::recti empty; //"Empty" indicator
 
 	int progress;
-	vector2d<float> resize_ratio;
+	irr::core::vector2df resize_ratio;
 
 	irr::video::SColor fillcolor;
 	irr::video::SColor emptycolor;
@@ -42,7 +38,7 @@ private:
 
 	void updateProgress();
 
-	core::rect<s32> getAbsoluteRect(const core::rect<s32>& relative, const core::rect<s32>& absolute);
+	irr::core::recti getAbsoluteRect(const irr::core::recti& relative, const irr::core::recti& absolute);
 
 	void updateResizeRatio();
 

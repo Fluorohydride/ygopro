@@ -223,9 +223,9 @@ bool Game::Initialize() {
 	wCommitsLog->getCloseButton()->setVisible(false);
 	stCommitLog = irr::gui::CGUICustomText::addCustomText(L"", false, env, wCommitsLog, -1, Scale(5, 30, 505, 430));
 	stCommitLog->setWordWrap(true);
-	((CGUICustomText*)stCommitLog)->enableScrollBar();
+	((irr::gui::CGUICustomText*)stCommitLog)->enableScrollBar();
 #ifdef __ANDROID__
-	((CGUICustomText*)stCommitLog)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stCommitLog)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, gDataManager->GetSysString(1211).c_str());
 	defaultStrings.emplace_back(btnCommitLogExit, 1211);
@@ -260,8 +260,8 @@ bool Game::Initialize() {
 								 L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
 								 L"This project is not affiliated with or endorsed by Shueisha or Konami.",
 								 Scale(10, 10, 440, 690), false, true, wAbout);
-	((CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
-	wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
+	((irr::gui::CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
+	wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
 	mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2040).c_str(), 3, true, true));
 	wVersion = env->addWindow(Scale(0, 0, 300, 135), false, L"", mVersion);
 	wVersion->getCloseButton()->setVisible(false);
@@ -273,7 +273,7 @@ bool Game::Initialize() {
 	};
 	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, false, wVersion);
 	int titleWidth = stVersion->getTextWidth();
-	stVersion->setRelativePosition(recti(Scale(10), Scale(10), titleWidth + Scale(10), Scale(35)));
+	stVersion->setRelativePosition(irr::core::recti(Scale(10), Scale(10), titleWidth + Scale(10), Scale(35)));
 	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 500, 65), false, false, wVersion);
 	RefreshUICoreVersion();
 	stExpectedCoreVersion = env->addStaticText(
@@ -282,7 +282,7 @@ bool Game::Initialize() {
 	stCompatVersion = env->addStaticText(
 		GetLocalizedCompatVersion().c_str(),
 		Scale(10, 100, 290, 125), false, true, wVersion);
-	((CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
+	((irr::gui::CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
 	//main menu
 	int mainMenuWidth = std::max(280, static_cast<int>(titleWidth / dpi_scale + 15));
 	mainMenuLeftX = 510 - mainMenuWidth / 2;
@@ -495,16 +495,16 @@ bool Game::Initialize() {
 	wHostPrepareRrect.UpperLeftCorner.X += Scale(10);
 	wHostPrepareRrect.LowerRightCorner.X -= Scale(10);
 	stHostPrepRuleR = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareR, -1, wHostPrepareRrect);
-	((CGUICustomText*)stHostPrepRuleR)->enableScrollBar();
+	((irr::gui::CGUICustomText*)stHostPrepRuleR)->enableScrollBar();
 	stHostPrepRuleR->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stHostPrepRuleR)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stHostPrepRuleR)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stHostPrepRuleL = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepareL, -1, wHostPrepareRrect);
-	((CGUICustomText*)stHostPrepRuleL)->enableScrollBar();
+	((irr::gui::CGUICustomText*)stHostPrepRuleL)->enableScrollBar();
 	stHostPrepRuleL->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stHostPrepRuleL)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stHostPrepRuleL)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, gDataManager->GetSysString(1251).c_str());
 	defaultStrings.emplace_back(btnHostPrepDuelist, 1251);
@@ -534,7 +534,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(stHostPrepOB, 1253);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(280, 30, 460, 230));
 #ifdef __ANDROID__
-	((CGUICustomText*)stHostPrepRule)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stHostPrepRule)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stHostPrepRule->setWordWrap(true);
 	stDeckSelect = env->addStaticText(gDataManager->GetSysString(1254).c_str(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
@@ -590,41 +590,41 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tabInfo, 1270);
 	stName = irr::gui::CGUICustomText::addCustomText(L"", true, env, tabInfo, -1, Scale(10, 10, 287, 32));
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	((CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
+	((irr::gui::CGUICustomText*)stName)->setTextAutoScrolling(irr::gui::CGUICustomText::LEFT_TO_RIGHT_BOUNCING, 0, 1.0f, 0, 120, 300);
 #ifdef __ANDROID__
-	((CGUICustomText*)stName)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stName)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 37, 287, 60));
 #ifdef __ANDROID__
-	((CGUICustomText*)stInfo)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stInfo)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stInfo->setWordWrap(true);
 	stInfo->setOverrideColor(skin::CARDINFO_TYPES_COLOR_VAL);
 	stDataInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 60, 287, 83));
 #ifdef __ANDROID__
-	((CGUICustomText*)stDataInfo)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stDataInfo)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stDataInfo->setWordWrap(true);
 	stDataInfo->setOverrideColor(skin::CARDINFO_STATS_COLOR_VAL);
 	stSetName = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 83, 287, 106));
 #ifdef __ANDROID__
-	((CGUICustomText*)stSetName)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stSetName)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stSetName->setWordWrap(true);
 	stSetName->setOverrideColor(skin::CARDINFO_ARCHETYPE_TEXT_COLOR_VAL);
 	stSetName->setVisible(!gGameConfig->chkHideSetname);
 	stPasscodeScope = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 106, 287, 129));
 #ifdef __ANDROID__
-	((CGUICustomText*)stPasscodeScope)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stPasscodeScope)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stPasscodeScope->setWordWrap(true);
 	stPasscodeScope->setOverrideColor(skin::CARDINFO_PASSCODE_SCOPE_TEXT_COLOR_VAL);
 	stPasscodeScope->setVisible(!gGameConfig->hidePasscodeScope);
 	stText = irr::gui::CGUICustomText::addCustomText(L"", false, env, tabInfo, -1, Scale(15, 129, 287, 324));
 #ifdef __ANDROID__
-	((CGUICustomText*)stText)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stText)->setTouchControl(!gGameConfig->native_mouse);
 #endif
-	((CGUICustomText*)stText)->enableScrollBar();
+	((irr::gui::CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
 	//log
 	tabLog =  wInfos->addTab(gDataManager->GetSysString(1271).c_str());
@@ -647,7 +647,7 @@ bool Game::Initialize() {
 	//system
 	irr::gui::IGUITab* _tabSystem = wInfos->addTab(gDataManager->GetSysString(1273).c_str());
 	defaultStrings.emplace_back(_tabSystem, 1273);
-	tabSystem = Panel::addPanel(env, _tabSystem, -1, Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight()), true, false);
+	tabSystem = irr::gui::Panel::addPanel(env, _tabSystem, -1, Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight()), true, false);
 	auto tabPanel = tabSystem->getSubpanel();
 	tabSettings.chkIgnoreOpponents = env->addCheckBox(gGameConfig->chkIgnore1, Scale(20, 20, 280, 45), tabPanel, -1, gDataManager->GetSysString(1290).c_str());
 	defaultStrings.emplace_back(tabSettings.chkIgnoreOpponents, 1290);
@@ -700,7 +700,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.window, 1273);
 	gSettings.window->setVisible(false);
 	auto sRect = gSettings.window->getClientRect();
-	gSettings.panel = Panel::addPanel(env, gSettings.window, -1, sRect, true, false);
+	gSettings.panel = irr::gui::Panel::addPanel(env, gSettings.window, -1, sRect, true, false);
 	auto sPanel = gSettings.panel->getSubpanel();
 	gSettings.chkShowScopeLabel = env->addCheckBox(gGameConfig->showScopeLabel, Scale(15, 5, 320, 30), sPanel, CHECKBOX_SHOW_SCOPE_LABEL, gDataManager->GetSysString(2076).c_str());
 	defaultStrings.emplace_back(gSettings.chkShowScopeLabel, 2076);
@@ -853,7 +853,7 @@ bool Game::Initialize() {
 	stMessage = irr::gui::CGUICustomText::addCustomText(L"", false, env, wMessage, -1, Scale(20, 20, 350, 100));
 	stMessage->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stMessage)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stMessage)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnMsgOK = env->addButton(Scale(130, 105, 220, 130), wMessage, BUTTON_MSG_OK, gDataManager->GetSysString(1211).c_str());
@@ -866,7 +866,7 @@ bool Game::Initialize() {
 	stACMessage = irr::gui::CGUICustomText::addCustomText(L"", true, env, wACMessage, -1, Scale(0, 0, 350, 60), true);
 	stACMessage->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stACMessage)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stACMessage)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stACMessage->setBackgroundColor(skin::DUELFIELD_ANNOUNCE_TEXT_BACKGROUND_COLOR_VAL);
 	auto tmp_color = skin::DUELFIELD_ANNOUNCE_TEXT_COLOR_VAL;
@@ -881,7 +881,7 @@ bool Game::Initialize() {
 	stQMessage = irr::gui::CGUICustomText::addCustomText(L"", false, env, wQuery, -1, Scale(20, 20, 350, 100));
 	stQMessage->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stQMessage)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stQMessage)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stQMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnYes = env->addButton(Scale(100, 105, 150, 130), wQuery, BUTTON_YES, gDataManager->GetSysString(1213).c_str());
@@ -895,7 +895,7 @@ bool Game::Initialize() {
 	stOptions = irr::gui::CGUICustomText::addCustomText(L"", false, env, wOptions, -1, Scale(20, 20, 350, 100));
 	stOptions->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stOptions)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stOptions)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stOptions->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	btnOptionOK = env->addButton(Scale(130, 105, 220, 130), wOptions, BUTTON_OPTION_OK, gDataManager->GetSysString(1211).c_str());
@@ -1187,7 +1187,7 @@ bool Game::Initialize() {
 	stReplayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wReplay, -1, Scale(360, 60, 570, 350));
 	stReplayInfo->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stReplayInfo)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stReplayInfo)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	btnExportDeck = env->addButton(Scale(470, 325, 570, 350), wReplay, BUTTON_EXPORT_DECK, gDataManager->GetSysString(1358).c_str());
 	defaultStrings.emplace_back(btnExportDeck, 1358);
@@ -1215,10 +1215,10 @@ bool Game::Initialize() {
  	tmpptr = env->addStaticText(gDataManager->GetSysString(1352).c_str(), Scale(360, 30, 570, 50), false, true, wSinglePlay);
 	defaultStrings.emplace_back(tmpptr, 1352);
 	stSinglePlayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wSinglePlay, -1, Scale(360, 60, 570, 350));
-	((CGUICustomText*)stSinglePlayInfo)->enableScrollBar();
+	((irr::gui::CGUICustomText*)stSinglePlayInfo)->enableScrollBar();
 	stSinglePlayInfo->setWordWrap(true);
 #ifdef __ANDROID__
-	((CGUICustomText*)stSinglePlayInfo)->setTouchControl(!gGameConfig->native_mouse);
+	((irr::gui::CGUICustomText*)stSinglePlayInfo)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	//replay save
 	wReplaySave = env->addWindow(Scale(510, 200, 820, 320), false, gDataManager->GetSysString(1340).c_str());
@@ -1255,7 +1255,7 @@ bool Game::Initialize() {
 	wChat->setDrawTitlebar(false);
 	wChat->setVisible(false);
 	ebChatInput = env->addEditBox(L"", Scale(3, 2, 710, 22), true, wChat, EDITBOX_CHAT);
-	ebChatInput->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+	ebChatInput->setAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 	//swap
 	btnSpectatorSwap = env->addButton(Scale(205, 100, 295, 135), 0, BUTTON_REPLAY_SWAP, gDataManager->GetSysString(1346).c_str());
 	defaultStrings.emplace_back(btnSpectatorSwap, 1346);
@@ -1311,7 +1311,7 @@ bool Game::Initialize() {
 
 	//server lobby
 	wRoomListPlaceholder = env->addStaticText(L"", Scale(1, 1, 1024 - 1, 640), false, false, 0, -1, false);
-	//wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+	//wRoomListPlaceholder->setAlignment(EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 	wRoomListPlaceholder->setVisible(false);
 
 	auto roomlistcolor = skin::ROOMLIST_TEXTS_COLOR_VAL;
@@ -1331,15 +1331,15 @@ bool Game::Initialize() {
 	//top right host online game button
 	btnCreateHost2 = env->addButton(Scale(904, 25, 1014, 50), wRoomListPlaceholder, BUTTON_CREATE_HOST2, gDataManager->GetSysString(1224).c_str());
 	defaultStrings.emplace_back(btnCreateHost2, 1224);
-	btnCreateHost2->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	btnCreateHost2->setAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//filter dropdowns
 	cbFilterRule = ADDComboBox(Scale(392, 25, 532, 50), wRoomListPlaceholder, CB_FILTER_ALLOWED_CARDS);
 	//cbFilterMatchMode = ADDComboBox(Scale(392, 55, 532, 80), wRoomListPlaceholder, CB_FILTER_MATCH_MODE);
 	cbFilterBanlist = ADDComboBox(Scale(392, 85, 532, 110), wRoomListPlaceholder, CB_FILTER_BANLIST);
-	cbFilterRule->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	//cbFilterMatchMode->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	cbFilterBanlist->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	cbFilterRule->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
+	//cbFilterMatchMode->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
+	cbFilterBanlist->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	ReloadCBFilterRule();
 	RefreshLFLists();
@@ -1351,27 +1351,27 @@ bool Game::Initialize() {
 	//Scale(392, 55, 532, 80)
 	ebOnlineTeam1 = env->addEditBox(L"0", Scale(140 + (392 - 140), 55, 170 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebOnlineTeam1->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	ebOnlineTeam1->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 	stVersus = env->addStaticText(gDataManager->GetSysString(1380).c_str(), Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	defaultStrings.emplace_back(stVersus, 1380);
 	stVersus->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stVersus->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	stVersus->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 	stVersus->setOverrideColor(roomlistcolor);
 	ebOnlineTeam2 = env->addEditBox(L"0", Scale(200 + (392 - 140), 55, 230 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebOnlineTeam2->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	ebOnlineTeam2->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 	stBestof = env->addStaticText(gDataManager->GetSysString(1381).c_str(), Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	defaultStrings.emplace_back(stBestof, 1381);
 	stBestof->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	stBestof->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	stBestof->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 	stBestof->setOverrideColor(roomlistcolor);
 	ebOnlineBestOf = env->addEditBox(L"0", Scale(285 + (392 - 140), 55, 315 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_NUMERIC);
 	ebOnlineBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebOnlineBestOf->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	ebOnlineBestOf->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 	btnFilterRelayMode = env->addButton(Scale(325 + (392 - 140), 55, 370 + (392 - 140), 80), wRoomListPlaceholder, BUTTON_FILTER_RELAY, gDataManager->GetSysString(1247).c_str());
 	defaultStrings.emplace_back(btnFilterRelayMode, 1247);
 	btnFilterRelayMode->setIsPushButton(true);
-	btnFilterRelayMode->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	btnFilterRelayMode->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//filter rooms textbox
 	ebRoomNameText = env->addStaticText(gDataManager->GetSysString(2021).c_str(), Scale(572, 30, 682, 50), false, false, wRoomListPlaceholder); //2021 = Filter:
@@ -1379,25 +1379,25 @@ bool Game::Initialize() {
 	ebRoomNameText->setOverrideColor(roomlistcolor);
 	ebRoomName = env->addEditBox(L"", Scale(642, 25, 782, 50), true, wRoomListPlaceholder, EDIT_ONLINE_ROOM_NAME); //filter textbox
 	ebRoomName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebRoomNameText->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
-	ebRoomName->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	ebRoomNameText->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
+	ebRoomName->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//show locked rooms checkbox
-	chkShowPassword = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 1024, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, gDataManager->GetSysString(1994).c_str());
+	chkShowPassword = irr::gui::CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 1024, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, gDataManager->GetSysString(1994).c_str());
 	defaultStrings.emplace_back(chkShowPassword, 1994);
-	((CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
-	chkShowPassword->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	((irr::gui::CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
+	chkShowPassword->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//show active rooms checkbox
-	chkShowActiveRooms = CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 1024, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, gDataManager->GetSysString(1985).c_str());
+	chkShowActiveRooms = irr::gui::CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 1024, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, gDataManager->GetSysString(1985).c_str());
 	defaultStrings.emplace_back(chkShowActiveRooms, 1985);
-	((CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
-	chkShowActiveRooms->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_UPPERLEFT, EGUIA_UPPERLEFT);
+	((irr::gui::CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
+	chkShowActiveRooms->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//show all rooms in a table
-	roomListTable = CGUICustomTable::addCustomTable(env, Resize(1, 118, 1022, 550), wRoomListPlaceholder, TABLE_ROOMLIST, true);
+	roomListTable = irr::gui::CGUICustomTable::addCustomTable(env, Resize(1, 118, 1022, 550), wRoomListPlaceholder, TABLE_ROOMLIST, true);
 	roomListTable->setResizableColumns(true);
-	//roomListTable->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+	//roomListTable->setAlignment(EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 	roomListTable->addColumn(L" ");//lock
 	roomListTable->addColumn(gDataManager->GetSysString(1225).c_str());//Allowed Cards:
 	roomListTable->addColumn(gDataManager->GetSysString(1227).c_str());//Duel Mode:
@@ -1414,25 +1414,25 @@ bool Game::Initialize() {
 	roomListTable->setColumnWidth(5, 115);//Players:
 	roomListTable->setColumnWidth(6, 355);//Notes:
 	roomListTable->setColumnWidth(7, 60);//Status
-	roomListTable->setColumnOrdering(0, EGCO_FLIP_ASCENDING_DESCENDING);
-	roomListTable->setColumnOrdering(1, EGCO_FLIP_ASCENDING_DESCENDING);
-	roomListTable->setColumnOrdering(2, EGCO_FLIP_ASCENDING_DESCENDING);
-	roomListTable->setColumnOrdering(3, EGCO_FLIP_ASCENDING_DESCENDING);
-	roomListTable->setColumnOrdering(4, EGCO_FLIP_ASCENDING_DESCENDING);
-	roomListTable->setColumnOrdering(5, EGCO_FLIP_ASCENDING_DESCENDING);
-	roomListTable->setColumnOrdering(6, EGCO_FLIP_ASCENDING_DESCENDING);
-	roomListTable->setColumnOrdering(7, EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(0, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(1, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(2, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(3, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(4, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(5, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(6, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
+	roomListTable->setColumnOrdering(7, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
 
 	//refresh button center bottom
 	btnLanRefresh2 = env->addButton(Scale(462, 640 - 10 - 25 - 25 - 5, 562, 640 - 10 - 25 - 5), wRoomListPlaceholder, BUTTON_LAN_REFRESH2, gDataManager->GetSysString(1217).c_str());
 	defaultStrings.emplace_back(btnLanRefresh2, 1217);
-	btnLanRefresh2->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT);
+	btnLanRefresh2->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
 
 	//server room password
 	wRoomPassword = env->addWindow(Scale(357, 200, 667, 320), false, L"");
 	wRoomPassword->getCloseButton()->setVisible(false);
 	wRoomPassword->setVisible(false);
-	wRoomPassword->setAlignment(EGUIA_CENTER, EGUIA_CENTER, EGUIA_CENTER, EGUIA_CENTER);
+	wRoomPassword->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
  	tmpptr = env->addStaticText(gDataManager->GetSysString(2038).c_str(), Scale(20, 25, 290, 45), false, false, wRoomPassword);
 	defaultStrings.emplace_back(tmpptr, 2038);
 	ebRPName = env->addEditBox(L"", Scale(20, 50, 290, 70), true, wRoomPassword, -1);
@@ -1447,8 +1447,8 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnJoinHost2, 1223);
 	btnJoinCancel2 = env->addButton(Scale(1024 - 10 - 110, 640 - 20 - 25, 1024 - 10, 640 - 20), wRoomListPlaceholder, BUTTON_JOIN_CANCEL2, gDataManager->GetSysString(1212).c_str());
 	defaultStrings.emplace_back(btnJoinCancel2, 1212);
-	btnJoinHost2->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT);
-	btnJoinCancel2->setAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT);
+	btnJoinHost2->setAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
+	btnJoinCancel2->setAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
 
 
 	//load server(s)
@@ -1467,9 +1467,9 @@ bool Game::Initialize() {
 	fpsCounter->setVisible(gGameConfig->showFPS);
 	fpsCounter->setTextRestrainedInside(false);
 #ifndef __ANDROID__
-	fpsCounter->setTextAlignment(EGUIA_LOWERRIGHT, EGUIA_LOWERRIGHT);
+	fpsCounter->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
 #else
-	fpsCounter->setTextAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
+	fpsCounter->setTextAlignment(EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 #endif
 	hideChat = false;
 	hideChatTimer = 0;
@@ -1494,7 +1494,7 @@ bool Game::MainLoop() {
 	BuildProjectionMatrix(mProjection, CAMERA_LEFT, CAMERA_RIGHT, CAMERA_BOTTOM, CAMERA_TOP, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
 	
-	mProjection.buildCameraLookAtMatrixLH(vector3df(FIELD_X, FIELD_Y, FIELD_Z), vector3df(FIELD_X, 0, 0), vector3df(0, 0, 1));
+	mProjection.buildCameraLookAtMatrixLH(irr::core::vector3df(FIELD_X, FIELD_Y, FIELD_Z), irr::core::vector3df(FIELD_X, 0, 0), irr::core::vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
@@ -1611,7 +1611,7 @@ bool Game::MainLoop() {
 		prev_time = now;
 		cur_time += delta_time;
 		bool resized = false;
-		dimension2du size = driver->getScreenSize();
+		auto size = driver->getScreenSize();
 #if defined (__linux__) && !defined(__ANDROID__)
 		prev_window_size = window_size;
 		window_size = size;
@@ -1838,8 +1838,8 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 		stVersus->setOverrideColor(roomlistcolor);
 		stBestof->setOverrideColor(roomlistcolor);
 		ebRoomNameText->setOverrideColor(roomlistcolor);
-		((CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
-		((CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
+		((irr::gui::CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
+		((irr::gui::CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
 		fpsCounter->setOverrideColor(skin::FPS_TEXT_COLOR_VAL);
 		for(auto& repo : repoInfoGui) {
 			repo.second.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
@@ -1882,33 +1882,33 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 	auto skin = env->getSkin();
 	skin->setFont(guiFont);
 #define SKIN_SCALE(elem)skin->setSize(elem, Scale(skin->getSize(elem)));
-	skin->setSize(EGDS_SCROLLBAR_SIZE, Scale(20));
-	SKIN_SCALE(EGDS_MENU_HEIGHT)
-	SKIN_SCALE(EGDS_WINDOW_BUTTON_WIDTH)
-	SKIN_SCALE(EGDS_CHECK_BOX_WIDTH)
-	SKIN_SCALE(EGDS_BUTTON_WIDTH)
-	SKIN_SCALE(EGDS_BUTTON_HEIGHT)
-	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_X)
-	SKIN_SCALE(EGDS_TITLEBARTEXT_DISTANCE_Y)
-	SKIN_SCALE(EGDS_TEXT_DISTANCE_X)
-	SKIN_SCALE(EGDS_TEXT_DISTANCE_Y)
-	SKIN_SCALE(EGDS_MESSAGE_BOX_GAP_SPACE)
+	skin->setSize(irr::gui::EGDS_SCROLLBAR_SIZE, Scale(20));
+	SKIN_SCALE(irr::gui::EGDS_MENU_HEIGHT)
+	SKIN_SCALE(irr::gui::EGDS_WINDOW_BUTTON_WIDTH)
+	SKIN_SCALE(irr::gui::EGDS_CHECK_BOX_WIDTH)
+	SKIN_SCALE(irr::gui::EGDS_BUTTON_WIDTH)
+	SKIN_SCALE(irr::gui::EGDS_BUTTON_HEIGHT)
+	SKIN_SCALE(irr::gui::EGDS_TITLEBARTEXT_DISTANCE_X)
+	SKIN_SCALE(irr::gui::EGDS_TITLEBARTEXT_DISTANCE_Y)
+	SKIN_SCALE(irr::gui::EGDS_TEXT_DISTANCE_X)
+	SKIN_SCALE(irr::gui::EGDS_TEXT_DISTANCE_Y)
+	SKIN_SCALE(irr::gui::EGDS_MESSAGE_BOX_GAP_SPACE)
 #undef SKIN_SCALE
 	if(wInfos) {
-		wInfos->setTabHeight(skin->getSize(EGDS_BUTTON_HEIGHT) + Scale(2));
+		wInfos->setTabHeight(skin->getSize(irr::gui::EGDS_BUTTON_HEIGHT) + Scale(2));
 		wInfos->setTabVerticalAlignment(irr::gui::EGUIA_UPPERLEFT);
 	}
 	if(prev_skin == NoSkinLabel()){
-		for (u32 i = 0; i < EGDC_COUNT; ++i) {
-			irr::video::SColor col = skin->getColor((EGUI_DEFAULT_COLOR)i);
+		for (u32 i = 0; i < irr::gui::EGDC_COUNT; ++i) {
+			irr::video::SColor col = skin->getColor((irr::gui::EGUI_DEFAULT_COLOR)i);
 			col.setAlpha(224);
-			skin->setColor((EGUI_DEFAULT_COLOR)i, col);
+			skin->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
 		}
 	}
 	if(!firstrun)
 		reapply_colors();
 	if(wAbout)
-		wAbout->setRelativePosition(recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
+		wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
 	return applied;
 }
 void Game::LoadZipArchives() {
@@ -2002,7 +2002,7 @@ void Game::RefreshSingleplay() {
 	lstSinglePlayList->resetPath();
 }
 template<typename T>
-inline void TrySaveInt(T& dest, const IGUIElement* src) {
+inline void TrySaveInt(T& dest, const irr::gui::IGUIElement* src) {
 	try {
 		dest = static_cast<T>(std::stoul(src->getText()));
 	}
@@ -2054,7 +2054,7 @@ Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
 	grepo.progress1->addBorder(1);
 	grepo.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 	grepo.progress1->drop();
-	((CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
+	((irr::gui::CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
 	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, gDataManager->GetSysString(1443).c_str());
 	defaultStrings.emplace_back(grepo.history_button1, 1443);
 	grepo.history_button1->setEnabled(repo->ready);
@@ -2069,7 +2069,7 @@ Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
 	grepo.progress2->addBorder(1);
 	grepo.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 	grepo.progress2->drop();
-	((CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
+	((irr::gui::CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
 	grepo.history_button2 = env->addButton(Scale(200, 5, 300 - 5, 20 + 10), b, BUTTON_REPO_CHANGELOG, gDataManager->GetSysString(1443).c_str());
 	defaultStrings.emplace_back(grepo.history_button2, 1443);
 	grepo.history_button2->setEnabled(repo->ready);
@@ -2247,9 +2247,9 @@ void Game::RefreshCardInfoTextPositions() {
 	const int xLeft = Scale(15);
 	const int xRight = Scale(287 * window_scale.X);
 	int offset = Scale(37);
-	auto offsetIfVisibleWithContent = [&](IGUIStaticText* st) {
+	auto offsetIfVisibleWithContent = [&](irr::gui::IGUIStaticText* st) {
 		if (st->isVisible() && wcscmp(st->getText(), L"")) {
-			st->setRelativePosition(recti(xLeft, offset, xRight, offset + st->getTextHeight()));
+			st->setRelativePosition(irr::core::recti(xLeft, offset, xRight, offset + st->getTextHeight()));
 			offset += st->getTextHeight();
 		}
 	};
@@ -2257,7 +2257,7 @@ void Game::RefreshCardInfoTextPositions() {
 	offsetIfVisibleWithContent(stDataInfo);
 	offsetIfVisibleWithContent(stSetName);
 	offsetIfVisibleWithContent(stPasscodeScope);
-	stText->setRelativePosition(recti(xLeft, offset, xRight, stText->getParent()->getAbsolutePosition().getHeight() - Scale(1)));
+	stText->setRelativePosition(irr::core::recti(xLeft, offset, xRight, stText->getParent()->getAbsolutePosition().getHeight() - Scale(1)));
 }
 void Game::ClearCardInfo(int player) {
 	imgCard->setImage(imageManager.tCover[player]);
@@ -2565,7 +2565,7 @@ void Game::RefreshUICoreVersion() {
 	}
 	auto w1 = stVersion->getTextWidth();
 	auto w2 = stCoreVersion->getTextWidth();
-	wVersion->setRelativePosition(recti(0, 0, Scale(20) + std::max({ Scale(280), w1, w2 }), Scale(135)));
+	wVersion->setRelativePosition(irr::core::recti(0, 0, Scale(20) + std::max({ Scale(280), w1, w2 }), Scale(135)));
 }
 std::wstring Game::GetLocalizedExpectedCore() {
 	return fmt::format(gDataManager->GetSysString(2011), OCG_VERSION_MAJOR, OCG_VERSION_MINOR);
@@ -2777,13 +2777,13 @@ void Game::ReloadElementsStrings() {
 	ReloadCBCoreLogOutput();
 	gSettings.cbCoreLogOutput->setSelected(prev);
 
-	((CGUICustomTable*)roomListTable)->setColumnText(1, gDataManager->GetSysString(1225).c_str());
-	((CGUICustomTable*)roomListTable)->setColumnText(2, gDataManager->GetSysString(1227).c_str());
-	((CGUICustomTable*)roomListTable)->setColumnText(3, gDataManager->GetSysString(1236).c_str());
-	((CGUICustomTable*)roomListTable)->setColumnText(4, gDataManager->GetSysString(1226).c_str());
-	((CGUICustomTable*)roomListTable)->setColumnText(5, gDataManager->GetSysString(2030).c_str());
-	((CGUICustomTable*)roomListTable)->setColumnText(6, gDataManager->GetSysString(2024).c_str());
-	((CGUICustomTable*)roomListTable)->setColumnText(7, gDataManager->GetSysString(1988).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(1, gDataManager->GetSysString(1225).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(2, gDataManager->GetSysString(1227).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(3, gDataManager->GetSysString(1236).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(4, gDataManager->GetSysString(1226).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(5, gDataManager->GetSysString(2030).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(6, gDataManager->GetSysString(2024).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(7, gDataManager->GetSysString(1988).c_str());
 	roomListTable->setColumnWidth(0, roomListTable->getColumnWidth(0));
 
 	mTopMenu->setItemText(0, gDataManager->GetSysString(2045).c_str()); //mRepositoriesInfo
@@ -2804,7 +2804,7 @@ void Game::ReloadElementsStrings() {
 	ReloadCBCurrentSkin();
 }
 void Game::OnResize() {
-	wRoomListPlaceholder->setRelativePosition(recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
+	wRoomListPlaceholder->setRelativePosition(irr::core::recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
 	SetCentered(wCommitsLog);
@@ -2897,7 +2897,7 @@ void Game::OnResize() {
 	wInfos->setRelativePosition(Resize(1, 275, (infosExpanded == 1) ? 1023 : 301, 639));
 	for(auto& window : repoInfoGui) {
 		window.second.progress2->setRelativePosition(Scale(5, 20 + 15, (300 - 8) * window_scale.X, 20 + 30));
-		window.second.history_button2->setRelativePosition(recti(ResizeX(200), 5, ResizeX(300 - 5), Scale(20 + 10)));
+		window.second.history_button2->setRelativePosition(irr::core::recti(ResizeX(200), 5, ResizeX(300 - 5), Scale(20 + 10)));
 	}
 	stName->setRelativePosition(Scale(10, 10, 287 * window_scale.X, 32));
 
@@ -2925,14 +2925,14 @@ void Game::OnResize() {
 	ShowCardInfo(showingcard, true);
 
 	auto tabsystemParentPos = tabSystem->getParent()->getAbsolutePosition();
-	tabSystem->setRelativePosition(recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
-	tabSettings.scrSoundVolume->setRelativePosition(rect<s32>(Scale(85), Scale(235), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(250)));
-	tabSettings.scrMusicVolume->setRelativePosition(rect<s32>(Scale(85), Scale(295), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(310)));
-	btnTabShowSettings->setRelativePosition(rect<s32>(Scale(20), Scale(415), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(435)));
+	tabSystem->setRelativePosition(irr::core::recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
+	tabSettings.scrSoundVolume->setRelativePosition(irr::core::recti(Scale(85), Scale(235), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(250)));
+	tabSettings.scrMusicVolume->setRelativePosition(irr::core::recti(Scale(85), Scale(295), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(310)));
+	btnTabShowSettings->setRelativePosition(irr::core::recti(Scale(20), Scale(415), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(435)));
 
 	SetCentered(gSettings.window);
 
-	wChat->setRelativePosition(rect<s32>(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
+	wChat->setRelativePosition(irr::core::recti(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 
 	if(dInfo.isSingleMode)
 		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 45));
@@ -2954,27 +2954,27 @@ void Game::OnResize() {
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
 
-	roomListTable->setRelativePosition(recti(ResizeX(1), chkShowActiveRooms->getRelativePosition().LowerRightCorner.Y + ResizeY(10), ResizeX(1024 - 2), btnLanRefresh2->getRelativePosition().UpperLeftCorner.Y - ResizeY(25)));
+	roomListTable->setRelativePosition(irr::core::recti(ResizeX(1), chkShowActiveRooms->getRelativePosition().LowerRightCorner.Y + ResizeY(10), ResizeX(1024 - 2), btnLanRefresh2->getRelativePosition().UpperLeftCorner.Y - ResizeY(25)));
 	roomListTable->setColumnWidth(0, roomListTable->getColumnWidth(0));
 	roomListTable->addRow(roomListTable->getRowCount());
 	roomListTable->removeRow(roomListTable->getRowCount() - 1);
 	roomListTable->setSelected(-1);
 }
-recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
+irr::core::recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
 	x = x * window_scale.X;
 	y = y * window_scale.Y;
 	x2 = x2 * window_scale.X;
 	y2 = y2 * window_scale.Y;
 	return Scale(x, y, x2, y2);
 }
-recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2) {
+irr::core::recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2) {
 	x = x * window_scale.X + dx;
 	y = y * window_scale.Y + dy;
 	x2 = x2 * window_scale.X + dx2;
 	y2 = y2 * window_scale.Y + dy2;
 	return Scale(x, y, x2, y2);
 }
-vector2d<s32> Game::Resize(s32 x, s32 y, bool reverse) {
+irr::core::vector2di Game::Resize(s32 x, s32 y, bool reverse) {
 	if(reverse) {
 		x = (x / window_scale.X) / gGameConfig->dpi_scale;
 		y = (y / window_scale.Y) / gGameConfig->dpi_scale;
@@ -2984,7 +2984,7 @@ vector2d<s32> Game::Resize(s32 x, s32 y, bool reverse) {
 	}
 	return { x, y };
 }
-recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
+irr::core::recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
 	if(chat) {
@@ -3005,26 +3005,26 @@ void Game::SetCentered(irr::gui::IGUIElement* elem) {
 	else
 		elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight()));
 }
-recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2, bool scale) {
+irr::core::recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2, bool scale) {
 	s32 sx = x2 - x;
 	s32 sy = y2 - y;
 	x = (x + sx / 2 - 100) * window_scale.X - sx / 2 + 100;
 	y = y * window_scale.Y;
 	x2 = sx + x;
 	y2 = sy + y;
-	return scale ? Scale(x, y, x2, y2) : recti{x, y, x2, y2};
+	return scale ? Scale(x, y, x2, y2) : irr::core::recti{x, y, x2, y2};
 }
-recti Game::ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width) {
+irr::core::recti Game::ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width) {
 	auto res = Resize(x, y, x2, y2);
 	res.UpperLeftCorner.X -= width / 2;
 	return res;
 }
-recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2, s32 xoff, s32 yoff) {
+irr::core::recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2, s32 xoff, s32 yoff) {
 	auto size = driver->getScreenSize();
-	recti rect(0, 0, size.Width, size.Height);
+	irr::core::recti rect(0, 0, size.Width, size.Height);
 	auto center = rect.getCenter();
 	core::dimension2d<u32> sizes((x + x2) / 2, (y + y2) / 2);
-	return recti((center.X - sizes.Width) + xoff, center.Y - sizes.Height + yoff, center.X + sizes.Width + xoff, center.Y + sizes.Height + yoff);
+	return irr::core::recti((center.X - sizes.Width) + xoff, center.Y - sizes.Height + yoff, center.X + sizes.Width + xoff, center.Y + sizes.Height + yoff);
 }
 void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	std::wstring text = obj->getText();

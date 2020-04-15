@@ -1,17 +1,18 @@
 #include "CProgressBar.h"
 #include <string>
 
-IProgressBar::IProgressBar(IGUIEnvironment* guienv, const core::rect<s32>& rectangle, s32 id, IGUIElement * parent) : IGUIElement(EGUIET_ELEMENT, guienv, parent, id, rectangle) {
+IProgressBar::IProgressBar(irr::gui::IGUIEnvironment* guienv, const irr::core::recti& rectangle, irr::s32 id, irr::gui::IGUIElement* parent) :
+	irr::gui::IGUIElement(irr::gui::EGUIET_ELEMENT, guienv, parent, id, rectangle) {
 	//total = rectangle.LowerRightCorner.X - rectangle.UpperLeftCorner.X;
 	bar = rectangle;
 	progressText = guienv->addStaticText(L"0%", { 0,0,rectangle.getWidth(),rectangle.getHeight() }, false, false, this);
-	progressText->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+	progressText->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	progressText->setOverrideColor({ 255,0,0,0 });
 	fillcolor.set(255, 255, 255, 255);
 	emptycolor.set(255, 0, 0, 0);
 	border = bar;
 	progress = 0;
-	resize_ratio = vector2d<float>(0, 0);
+	resize_ratio = irr::core::vector2df(0, 0);
 }
 void IProgressBar::setColors(irr::video::SColor progress, irr::video::SColor filling) {
 	fillcolor = progress;
@@ -41,7 +42,7 @@ void IProgressBar::setProgress(irr::s32 _progress) {
 void IProgressBar::draw() {
 	if(!IsVisible)
 		return;
-	IGUISkin* skin = Environment->getSkin();
+	auto skin = Environment->getSkin();
 	updateResizeRatio();
 	updateProgress();
 	skin->draw2DRectangle(this, bordercolor, getAbsoluteRect(border, AbsoluteRect));
@@ -51,15 +52,14 @@ void IProgressBar::draw() {
 	IGUIElement::draw();
 }
 void IProgressBar::updateProgress() {
-	u32 xpercentage;
-	xpercentage = (progress * bar.getWidth()) / (100); //Reducing to the bar size
+	irr::u32 xpercentage = (progress * bar.getWidth()) / (100); //Reducing to the bar size
 	tofill.UpperLeftCorner.set(bar.UpperLeftCorner.X, bar.UpperLeftCorner.Y);
 	tofill.LowerRightCorner.set(bar.UpperLeftCorner.X + xpercentage, bar.LowerRightCorner.Y);
 	empty.UpperLeftCorner.set(tofill.LowerRightCorner.X, tofill.UpperLeftCorner.Y);
 	empty.LowerRightCorner.set(bar.LowerRightCorner.X, bar.LowerRightCorner.Y);
 }
-core::rect<s32> IProgressBar::getAbsoluteRect(const core::rect<s32>& relative, const core::rect<s32>& absolute) {
-	core::rect<s32> r = absolute;
+irr::core::recti IProgressBar::getAbsoluteRect(const irr::core::recti& relative, const irr::core::recti& absolute) {
+	irr::core::recti r = absolute;
 	//r.UpperLeftCorner += relative.UpperLeftCorner;
 	//r.UpperLeftCorner.X += relative.UpperLeftCorner.X / resize_ratio.X;
 	r.LowerRightCorner.Y = (int)((r.UpperLeftCorner.Y + relative.getHeight()) / resize_ratio.Y);
