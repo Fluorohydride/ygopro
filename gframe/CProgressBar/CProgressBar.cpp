@@ -33,6 +33,10 @@ void IProgressBar::setProgress(irr::s32 _progress) {
 	else
 		progress = _progress;
 	progressText->setText((std::to_wstring(progress) + L"%").c_str());
+	if(progress<50)
+		progressText->setOverrideColor({ 255,255,255,255 });
+	else
+		progressText->setOverrideColor({ 255,0,0,0 });
 }
 void IProgressBar::draw() {
 	if(!IsVisible)
@@ -57,9 +61,10 @@ void IProgressBar::updateProgress() {
 core::rect<s32> IProgressBar::getAbsoluteRect(const core::rect<s32>& relative, const core::rect<s32>& absolute) {
 	core::rect<s32> r = absolute;
 	//r.UpperLeftCorner += relative.UpperLeftCorner;
-	r.UpperLeftCorner.X += relative.UpperLeftCorner.X / resize_ratio.X;
+	//r.UpperLeftCorner.X += relative.UpperLeftCorner.X / resize_ratio.X;
 	r.LowerRightCorner.Y = (int)((r.UpperLeftCorner.Y + relative.getHeight()) / resize_ratio.Y);
 	r.LowerRightCorner.X = (int)((r.UpperLeftCorner.X + relative.getWidth()) / resize_ratio.X);
+	r.UpperLeftCorner.X += relative.UpperLeftCorner.X / resize_ratio.X;
 	return r;
 }
 void IProgressBar::updateResizeRatio() {
