@@ -682,7 +682,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					std::wstring deck_string = L"ydk://";
 					deck_string += deckManager.SaveToString(deckManager.current_deck);
 					mainGame->device->getOSOperator()->copyToClipboard(deck_string.c_str());
-					mainGame->stACMessage->setText(dataManager.GetSysString(1359));
+					mainGame->stACMessage->setText(dataManager.GetSysString(1368));
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
 				break;
