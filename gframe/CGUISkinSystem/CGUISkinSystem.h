@@ -11,40 +11,39 @@
 
 #define SKINSYSTEM_SKINFILE "/skin.xml"
 
-using namespace irr;
 class CGUISkinSystem {
-private :
-	IrrlichtDevice *device;
-	io::IFileSystem *fs;
-	io::path skinsPath;
-	io::path workingDir;
-	core::array<io::path> skinsList;
-	gui::IGUISkin* loaded_skin;
-	
+private:
+	irr::IrrlichtDevice *device;
+	irr::io::IFileSystem *fs;
+	irr::io::path skinsPath;
+	irr::io::path workingDir;
+	irr::core::array<irr::io::path> skinsList;
+	irr::gui::IGUISkin* loaded_skin;
+
 	CXMLRegistry *registry;
-	gui::CImageGUISkin* loadSkinFromFile(const fschar_t *skinfile);
-	void ParseGUIElementStyle(gui::SImageGUIElementStyle& elem, const core::stringc& name,bool nullcolors=false);
-	bool checkSkinColor(gui::EGUI_DEFAULT_COLOR colToSet,const wchar_t *context,gui::CImageGUISkin *skin);
-	bool checkSkinSize(gui::EGUI_DEFAULT_SIZE sizeToSet,const wchar_t *context,const wchar_t *key,gui::CImageGUISkin *skin);
-	bool checkSkinIcon(gui::EGUI_DEFAULT_ICON iconToSet,const wchar_t *context,gui::CImageGUISkin *skin);
-	bool checkSkinText(gui::EGUI_DEFAULT_TEXT textToSet, const wchar_t *context, gui::CImageGUISkin *skin);
-	bool loadProperty(core::stringw key,gui::CImageGUISkin *skin);
-	bool loadCustomColors(gui::CImageGUISkin *skin);
+	irr::gui::CImageGUISkin* loadSkinFromFile(const irr::fschar_t *skinfile);
+	void ParseGUIElementStyle(irr::gui::SImageGUIElementStyle& elem, const irr::core::stringc& name, bool nullcolors = false);
+	bool checkSkinColor(irr::gui::EGUI_DEFAULT_COLOR colToSet, const wchar_t *context, irr::gui::CImageGUISkin *skin);
+	bool checkSkinSize(irr::gui::EGUI_DEFAULT_SIZE sizeToSet, const wchar_t *context, const wchar_t *key, irr::gui::CImageGUISkin *skin);
+	bool checkSkinIcon(irr::gui::EGUI_DEFAULT_ICON iconToSet, const wchar_t *context, irr::gui::CImageGUISkin *skin);
+	bool checkSkinText(irr::gui::EGUI_DEFAULT_TEXT textToSet, const wchar_t *context, irr::gui::CImageGUISkin *skin);
+	bool loadProperty(irr::core::stringw key, irr::gui::CImageGUISkin *skin);
+	bool loadCustomColors(irr::gui::CImageGUISkin *skin);
 public:
 	// Constructor
 	// path = Path to skins
 	// dev = Irrlicht device
-	CGUISkinSystem(io::path path, IrrlichtDevice *dev);
+	CGUISkinSystem(irr::io::path path, irr::IrrlichtDevice *dev);
 	~CGUISkinSystem();
-	core::array<io::path> listSkins();
+	irr::core::array<irr::io::path> listSkins();
 	bool loadSkinList();
-	bool applySkin(const fschar_t *skinname);
-	gui::CGUIProgressBar *addProgressBar(gui::IGUIElement *parent,core::rect<s32> rect,bool bindColorsToSkin=true);
+	bool applySkin(const irr::fschar_t *skinname);
+	irr::gui::CGUIProgressBar *addProgressBar(irr::gui::IGUIElement *parent, irr::core::recti rect, bool bindColorsToSkin = true);
 	// Gets property from current skin
-	core::stringw getProperty(core::stringw key);
-	video::SColor getCustomColor(ygo::skin::CustomSkinElements key, video::SColor fallback);
-	bool populateTreeView(gui::IGUITreeView *control,const core::stringc& skinname);
-	
+	irr::core::stringw getProperty(irr::core::stringw key);
+	irr::video::SColor getCustomColor(ygo::skin::CustomSkinElements key, irr::video::SColor fallback);
+	bool populateTreeView(irr::gui::IGUITreeView *control, const irr::core::stringc& skinname);
+
 };
 
 #endif

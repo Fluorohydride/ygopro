@@ -7,23 +7,20 @@
 #include <vector2d.h>
 #include <vector3d.h>
 
-using namespace irr;
-
-class CConfigMap
-{
+class CConfigMap {
 public:
-    core::stringc getConfig( const core::stringc& name );
-    s32 getConfigAsInt( const core::stringc& name );
-    f32 getConfigAsFloat( const core::stringc& name );
-    core::vector2df getConfigAsVector2df( const core::stringc& name );
-    core::vector3df getConfigAsVector3df( const core::stringc& name );
+	irr::core::stringc getConfig(const irr::core::stringc& name);
+	irr::s32 getConfigAsInt(const irr::core::stringc& name);
+	irr::f32 getConfigAsFloat(const irr::core::stringc& name);
+	irr::core::vector2df getConfigAsVector2df(const irr::core::stringc& name);
+	irr::core::vector3df getConfigAsVector3df(const irr::core::stringc& name);
 
-    bool hasConfig( const core::stringc& name );
+	bool hasConfig(const irr::core::stringc& name);
 
-    void setConfig( const core::stringc& name, const core::stringc& value );
+	void setConfig(const irr::core::stringc& name, const irr::core::stringc& value);
 
 private:
-    core::map<core::stringc,core::stringc> Map;
+	irr::core::map<irr::core::stringc, irr::core::stringc> Map;
 };
 
 #endif

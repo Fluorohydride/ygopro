@@ -4,7 +4,6 @@
 #define __C_XMLNODE_H_INCLUDED__
 
 #include <irrlicht.h>
-using namespace irr;
 
 enum CXMLNODETYPE {
 	CXMLNODETYPE_VALUE,
@@ -39,8 +38,8 @@ public :
 	// Careful with these, mem leak waiting to happen
 	// Maby I should steal IReferenceCounted from irrlicht, would at 
 	// least give me autodetection of mem leaks
-	core::array<const wchar_t *> *listNonNodeChildren();
-	core::array<const wchar_t *> *listNodeChildren();
+	irr::core::array<const wchar_t *> *listNonNodeChildren();
+	irr::core::array<const wchar_t *> *listNodeChildren();
 	CXMLNode *getThis();
 	CXMLNode *findChildByName(const wchar_t *name);	
 	CXMLNode *getParent();

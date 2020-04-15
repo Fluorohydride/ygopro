@@ -2,6 +2,8 @@
 #include <map>
 #include <string>
 
+using namespace irr;
+
 CGUISkinSystem::CGUISkinSystem(io::path path,IrrlichtDevice *dev) {
 	loaded_skin = nullptr;
 	device = dev;

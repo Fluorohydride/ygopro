@@ -73,7 +73,7 @@ bool Game::Initialize() {
 		else
 #endif
 			params.DriverType = irr::video::EDT_OPENGL;
-		params.WindowSize = irr::core::dimension2d<u32>(Scale(1024), Scale(640));
+		params.WindowSize = irr::core::dimension2du(Scale(1024), Scale(640));
 #else
 		if(gGameConfig->use_d3d) {
 			params.DriverType = irr::video::EDT_OGLES1;
@@ -84,7 +84,7 @@ bool Game::Initialize() {
 		params.Bits = 24;
 		params.ZBufferBits = 16;
 		params.AntiAlias = 0;
-		params.WindowSize = irr::core::dimension2d<u32>(0, 0);
+		params.WindowSize = irr::core::dimension2du(0, 0);
 #endif
 		params.Vsync = gGameConfig->vsync;
 		device = irr::createDeviceEx(params);
@@ -144,7 +144,7 @@ bool Game::Initialize() {
 	if(!skinSystem)
 		ErrorLog("Couldn't create skin system");
 	auto logger = device->getLogger();
-	logger->setLogLevel(ELL_NONE);
+	logger->setLogLevel(irr::ELL_NONE);
 	linePatternD3D = 0;
 	linePatternGL = 0x0f0f;
 	waitFrame = 0.0f;
@@ -916,7 +916,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(wPosSelect, 561);
 	wPosSelect->getCloseButton()->setVisible(false);
 	wPosSelect->setVisible(false);
-	core::dimension2di imgsize = { Scale<s32>(CARD_IMG_WIDTH * 0.5f), Scale<s32>(CARD_IMG_HEIGHT * 0.5f) };
+	irr::core::dimension2di imgsize = { Scale<irr::s32>(CARD_IMG_WIDTH * 0.5f), Scale<irr::s32>(CARD_IMG_HEIGHT * 0.5f) };
 	btnPSAU = irr::gui::CGUIImageButton::addImageButton(env, Scale(10, 45, 150, 185), wPosSelect, BUTTON_POS_AU);
 	btnPSAU->setImageSize(imgsize);
 	btnPSAD = irr::gui::CGUIImageButton::addImageButton(env, Scale(155, 45, 295, 185), wPosSelect, BUTTON_POS_AD);
@@ -930,7 +930,7 @@ bool Game::Initialize() {
 	btnPSDD->setImageRotation(270);
 	btnPSDD->setImage(imageManager.tCover[0]);
 	//card select
-	imgsize = { Scale<s32>(CARD_IMG_WIDTH * 0.6f), Scale<s32>(CARD_IMG_HEIGHT * 0.6f) };
+	imgsize = { Scale<irr::s32>(CARD_IMG_WIDTH * 0.6f), Scale<irr::s32>(CARD_IMG_HEIGHT * 0.6f) };
 	wCardSelect = env->addWindow(Scale(320, 100, 1000, 400), false, L"");
 	wCardSelect->getCloseButton()->setVisible(false);
 	wCardSelect->setVisible(false);
@@ -1483,7 +1483,7 @@ bool Game::Initialize() {
 		ApplyLocale(selectedLocale, true);
 	return true;
 }
-void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
+void BuildProjectionMatrix(irr::core::matrix4& mProjection, irr::f32 left, irr::f32 right, irr::f32 bottom, irr::f32 top, irr::f32 znear, irr::f32 zfar) {
 	mProjection.buildProjectionMatrixPerspectiveLH(right - left, top - bottom, znear, zfar);
 	mProjection[8] = (left + right) / (left - right);
 	mProjection[9] = (top + bottom) / (bottom - top);
@@ -1653,15 +1653,15 @@ bool Game::MainLoop() {
 					discord.UpdatePresence(DiscordWrapper::DUEL);
 			}
 			if (showcardcode == 1 || showcardcode == 3)
-				gSoundManager->PlayBGM(SoundManager::BGM::WIN, gGameConfig->loopMusic);
+				gSoundManager->PlayBGM(SoundManager::BGM::WIN);
 			else if (showcardcode == 2)
-				gSoundManager->PlayBGM(SoundManager::BGM::LOSE, gGameConfig->loopMusic);
+				gSoundManager->PlayBGM(SoundManager::BGM::LOSE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
-				gSoundManager->PlayBGM(SoundManager::BGM::DISADVANTAGE, gGameConfig->loopMusic);
+				gSoundManager->PlayBGM(SoundManager::BGM::DISADVANTAGE);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
-				gSoundManager->PlayBGM(SoundManager::BGM::ADVANTAGE, gGameConfig->loopMusic);
+				gSoundManager->PlayBGM(SoundManager::BGM::ADVANTAGE);
 			else
-				gSoundManager->PlayBGM(SoundManager::BGM::DUEL, gGameConfig->loopMusic);
+				gSoundManager->PlayBGM(SoundManager::BGM::DUEL);
 			MATERIAL_GUARD(
 			DrawBackImage(imageManager.tBackGround, resized);
 			DrawBackGround();
@@ -1676,7 +1676,7 @@ bool Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
 			else
 				discord.UpdatePresence(DiscordWrapper::DECK);
-			gSoundManager->PlayBGM(SoundManager::BGM::DECK, gGameConfig->loopMusic);
+			gSoundManager->PlayBGM(SoundManager::BGM::DECK);
 			DrawBackImage(imageManager.tBackGround_deck, resized);
 			MATERIAL_GUARD(DrawDeckBd());
 		} else {
@@ -1684,7 +1684,7 @@ bool Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::IN_LOBBY);
 			else
 				discord.UpdatePresence(DiscordWrapper::MENU);
-			gSoundManager->PlayBGM(SoundManager::BGM::MENU, gGameConfig->loopMusic);
+			gSoundManager->PlayBGM(SoundManager::BGM::MENU);
 			DrawBackImage(imageManager.tBackGround_menu, resized);
 		}
 #ifndef __ANDROID__
@@ -1845,6 +1845,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 			repo.second.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 			repo.second.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		}
+		updateProgress->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		btnPSAD->setImage(imageManager.tCover[0]);
 		btnPSDD->setImage(imageManager.tCover[0]);
 		btnSettings->setImage(imageManager.tSettings);
@@ -1857,7 +1858,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 	if(!reload)
 		prev_skin = skinname;
 	if(prev_skin == NoSkinLabel()) {
-		auto skin = env->createSkin(gui::EGST_WINDOWS_METALLIC);
+		auto skin = env->createSkin(irr::gui::EGST_WINDOWS_METALLIC);
 		env->setSkin(skin);
 		skin->drop();
 		skin::ResetDefaults();
@@ -1872,7 +1873,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 		imageManager.ChangeTextures(EPRO_TEXT("./skin/") + prev_skin + EPRO_TEXT("/textures/"));
 		} else {
 			applied = false;
-			auto skin = env->createSkin(gui::EGST_WINDOWS_METALLIC);
+			auto skin = env->createSkin(irr::gui::EGST_WINDOWS_METALLIC);
 			env->setSkin(skin);
 			skin->drop();
 			skin::ResetDefaults();
@@ -1899,7 +1900,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 		wInfos->setTabVerticalAlignment(irr::gui::EGUIA_UPPERLEFT);
 	}
 	if(prev_skin == NoSkinLabel()){
-		for (u32 i = 0; i < irr::gui::EGDC_COUNT; ++i) {
+		for (int i = 0; i < irr::gui::EGDC_COUNT; ++i) {
 			irr::video::SColor col = skin->getColor((irr::gui::EGUI_DEFAULT_COLOR)i);
 			col.setAlpha(224);
 			skin->setColor((irr::gui::EGUI_DEFAULT_COLOR)i, col);
@@ -2875,7 +2876,7 @@ void Game::OnResize() {
 	wCustomRulesR->setRelativePosition(ResizeWin(700, 100, 1000, 430));
 	wReplay->setRelativePosition(ResizeWin(220, 100, 800, 520));
 	wSinglePlay->setRelativePosition(ResizeWin(220, 100, 800, 520));
-	gBot.window->setRelativePosition(core::position2di(wHostPrepare->getAbsolutePosition().LowerRightCorner.X, wHostPrepare->getAbsolutePosition().UpperLeftCorner.Y));
+	gBot.window->setRelativePosition(irr::core::position2di(wHostPrepare->getAbsolutePosition().LowerRightCorner.X, wHostPrepare->getAbsolutePosition().UpperLeftCorner.Y));
 
 	wHand->setRelativePosition(ResizeWin(500, 450, 825, 605));
 	wFTSelect->setRelativePosition(ResizeWin(550, 240, 780, 340));
@@ -2932,7 +2933,7 @@ void Game::OnResize() {
 
 	SetCentered(gSettings.window);
 
-	wChat->setRelativePosition(irr::core::recti(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
+	wChat->setRelativePosition(irr::core::recti(wInfos->getRelativePosition().LowerRightCorner.X + Scale(4), Scale<irr::s32>(615.0f  * window_scale.Y), (window_size.Width - Scale(4 * window_scale.X)), (window_size.Height - Scale(2))));
 
 	if(dInfo.isSingleMode)
 		btnLeaveGame->setRelativePosition(Resize(205, 5, 295, 45));
@@ -2960,21 +2961,21 @@ void Game::OnResize() {
 	roomListTable->removeRow(roomListTable->getRowCount() - 1);
 	roomListTable->setSelected(-1);
 }
-irr::core::recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
+irr::core::recti Game::Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2) {
 	x = x * window_scale.X;
 	y = y * window_scale.Y;
 	x2 = x2 * window_scale.X;
 	y2 = y2 * window_scale.Y;
 	return Scale(x, y, x2, y2);
 }
-irr::core::recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2, s32 dx, s32 dy, s32 dx2, s32 dy2) {
+irr::core::recti Game::Resize(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 dx, irr::s32 dy, irr::s32 dx2, irr::s32 dy2) {
 	x = x * window_scale.X + dx;
 	y = y * window_scale.Y + dy;
 	x2 = x2 * window_scale.X + dx2;
 	y2 = y2 * window_scale.Y + dy2;
 	return Scale(x, y, x2, y2);
 }
-irr::core::vector2di Game::Resize(s32 x, s32 y, bool reverse) {
+irr::core::vector2di Game::Resize(irr::s32 x, irr::s32 y, bool reverse) {
 	if(reverse) {
 		x = (x / window_scale.X) / gGameConfig->dpi_scale;
 		y = (y / window_scale.Y) / gGameConfig->dpi_scale;
@@ -2984,9 +2985,9 @@ irr::core::vector2di Game::Resize(s32 x, s32 y, bool reverse) {
 	}
 	return { x, y };
 }
-irr::core::recti Game::ResizeWin(s32 x, s32 y, s32 x2, s32 y2, bool chat) {
-	s32 sx = x2 - x;
-	s32 sy = y2 - y;
+irr::core::recti Game::ResizeWin(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, bool chat) {
+	irr::s32 sx = x2 - x;
+	irr::s32 sy = y2 - y;
 	if(chat) {
 		y = window_size.Height - sy;
 		x2 = window_size.Width;
@@ -3005,25 +3006,25 @@ void Game::SetCentered(irr::gui::IGUIElement* elem) {
 	else
 		elem->setRelativePosition(ResizeWinFromCenter(0, 0, elem->getRelativePosition().getWidth(), elem->getRelativePosition().getHeight()));
 }
-irr::core::recti Game::ResizeElem(s32 x, s32 y, s32 x2, s32 y2, bool scale) {
-	s32 sx = x2 - x;
-	s32 sy = y2 - y;
+irr::core::recti Game::ResizeElem(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, bool scale) {
+	irr::s32 sx = x2 - x;
+	irr::s32 sy = y2 - y;
 	x = (x + sx / 2 - 100) * window_scale.X - sx / 2 + 100;
 	y = y * window_scale.Y;
 	x2 = sx + x;
 	y2 = sy + y;
 	return scale ? Scale(x, y, x2, y2) : irr::core::recti{x, y, x2, y2};
 }
-irr::core::recti Game::ResizePhaseHint(s32 x, s32 y, s32 x2, s32 y2, s32 width) {
+irr::core::recti Game::ResizePhaseHint(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 width) {
 	auto res = Resize(x, y, x2, y2);
 	res.UpperLeftCorner.X -= width / 2;
 	return res;
 }
-irr::core::recti Game::ResizeWinFromCenter(s32 x, s32 y, s32 x2, s32 y2, s32 xoff, s32 yoff) {
+irr::core::recti Game::ResizeWinFromCenter(irr::s32 x, irr::s32 y, irr::s32 x2, irr::s32 y2, irr::s32 xoff, irr::s32 yoff) {
 	auto size = driver->getScreenSize();
 	irr::core::recti rect(0, 0, size.Width, size.Height);
 	auto center = rect.getCenter();
-	core::dimension2d<u32> sizes((x + x2) / 2, (y + y2) / 2);
+	irr::core::dimension2du sizes((x + x2) / 2, (y + y2) / 2);
 	return irr::core::recti((center.X - sizes.Width) + xoff, center.Y - sizes.Height + yoff, center.X + sizes.Width + xoff, center.Y + sizes.Height + yoff);
 }
 void Game::ValidateName(irr::gui::IGUIElement* obj) {

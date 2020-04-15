@@ -6,6 +6,8 @@ inline int _wtoi(const wchar_t * str){
 }
 #endif
 
+using namespace irr;
+
 CXMLRegistry::CXMLRegistry(io::IFileSystem *fsys) {
 	fileSystem = fsys;
 	fileSystem->grab();

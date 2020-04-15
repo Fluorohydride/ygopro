@@ -1,79 +1,74 @@
 #include "CConfigMap.h"
 
-core::stringc CConfigMap::getConfig( const core::stringc& name )
-{
-    core::map<core::stringc,core::stringc>::Node* node = Map.find(name);
+using namespace irr;
 
-    if ( node == 0 )
-        return core::stringc();
+core::stringc CConfigMap::getConfig(const core::stringc& name) {
+	core::map<core::stringc, core::stringc>::Node* node = Map.find(name);
 
-    return node->getValue();
+	if(node == 0)
+		return core::stringc();
+
+	return node->getValue();
 }
 
-s32 CConfigMap::getConfigAsInt( const core::stringc& name )
-{
-    core::stringc cfg = getConfig(name);
+s32 CConfigMap::getConfigAsInt(const core::stringc& name) {
+	core::stringc cfg = getConfig(name);
 
-    if ( cfg.size() == 0 )
-        return 0;
+	if(cfg.size() == 0)
+		return 0;
 
-    s32 x = 0;
-    sscanf( cfg.c_str(), "%d", &x );
+	s32 x = 0;
+	sscanf(cfg.c_str(), "%d", &x);
 
-    return x;
+	return x;
 }
 
-f32 CConfigMap::getConfigAsFloat( const core::stringc& name )
-{
-    core::stringc cfg = getConfig(name);
+f32 CConfigMap::getConfigAsFloat(const core::stringc& name) {
+	core::stringc cfg = getConfig(name);
 
-    if ( cfg.size() == 0 )
-        return 0;
+	if(cfg.size() == 0)
+		return 0;
 
-    f32 x = 0.0f;
-    sscanf( cfg.c_str(), "%f", &x );
+	f32 x = 0.0f;
+	sscanf(cfg.c_str(), "%f", &x);
 
-    return x;
+	return x;
 }
 
 
-core::vector2df CConfigMap::getConfigAsVector2df( const core::stringc& name )
-{
-    core::stringc cfg = getConfig(name);
+core::vector2df CConfigMap::getConfigAsVector2df(const core::stringc& name) {
+	core::stringc cfg = getConfig(name);
 
-    if ( cfg.size() == 0 )
-        return core::vector2df(0,0);
+	if(cfg.size() == 0)
+		return core::vector2df(0, 0);
 
-    core::vector2df vec;
+	core::vector2df vec;
 
-    sscanf( cfg.c_str(), "%f , %f", &vec.X, &vec.Y );
+	sscanf(cfg.c_str(), "%f , %f", &vec.X, &vec.Y);
 
-    return vec;
+	return vec;
 }
 
-core::vector3df CConfigMap::getConfigAsVector3df( const core::stringc& name )
-{
-    core::stringc cfg = getConfig(name);
+core::vector3df CConfigMap::getConfigAsVector3df(const core::stringc& name) {
+	core::stringc cfg = getConfig(name);
 
-    if ( cfg.size() == 0 )
-        return core::vector3df(0,0,0);
+	if(cfg.size() == 0)
+		return core::vector3df(0, 0, 0);
 
-    core::vector3df vec;
+	core::vector3df vec;
 
-    sscanf( cfg.c_str(), "%f , %f , %f", &vec.X, &vec.Y, &vec.Z );
+	sscanf(cfg.c_str(), "%f , %f , %f", &vec.X, &vec.Y, &vec.Z);
 
-    return vec;
+	return vec;
 }
 
-bool CConfigMap::hasConfig( const core::stringc& name )
-{
-    core::map<core::stringc,core::stringc>::Node* node = Map.find(name);
+bool CConfigMap::hasConfig(const core::stringc& name) {
+	core::map<core::stringc, core::stringc>::Node* node = Map.find(name);
 
-    return ( node != 0 );
+	return (node != 0);
 }
 
-void CConfigMap::setConfig( const core::stringc& name, const core::stringc& value )
-{
-    Map.set(name,value);
+void CConfigMap::setConfig(const core::stringc& name, const core::stringc& value) {
+	Map.set(name, value);
 }
 

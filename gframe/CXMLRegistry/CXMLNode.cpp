@@ -1,5 +1,7 @@
 #include "CXMLNode.h"
 
+using namespace irr;
+
 CXMLNODETYPE CXMLNode::getType() { return type; }
 
 void CXMLNode::setType(CXMLNODETYPE newtype) { type = newtype; }
