@@ -222,8 +222,8 @@ const wchar_t* DataManager::GetSetName(int code) {
 }
 unsigned int DataManager::GetSetCode(const wchar_t* setname) {
 	for(auto csit = _setnameStrings.begin(); csit != _setnameStrings.end(); ++csit) {
-		auto xpos = csit->second.find_first_of(L'|');//setname|extra info
-		if(csit->second.compare(0, xpos, setname) == 0)
+		auto xpos = csit->second.find_first_of(L'|');//setname|another setname or extra info
+		if(csit->second.compare(0, xpos, setname) == 0 || csit->second.compare(xpos + 1, csit->second.length(), setname) == 0)
 			return csit->first;
 	}
 	return 0;

@@ -11,7 +11,6 @@
 #include "single_mode.h"
 #include "materials.h"
 #include "../ocgcore/common.h"
-#include <algorithm>
 
 namespace ygo {
 
@@ -20,6 +19,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		return false;
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
+		if(mainGame->fadingList.size())
+			break;
 		s32 id = event.GUIEvent.Caller->getID();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
@@ -89,8 +90,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				if(mainGame->dInfo.isReplay)
 					ReplayMode::SwapField();
-				else if (mainGame->dInfo.player_type == 7)
-					mainGame->dField.ReplaySwap();
+				else if(mainGame->dInfo.player_type == 7)
+					DuelClient::SwapField();
 				break;
 			}
 			case BUTTON_REPLAY_UNDO: {
@@ -147,8 +148,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(exit_on_return)
 						mainGame->device->closeDevice();
 				} else {
-					DuelClient::SendPacketToServer(CTOS_SURRENDER);
+					mainGame->PopupElement(mainGame->wSurrender);
 				}
+				break;
+			}
+			case BUTTON_SURRENDER_YES: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				DuelClient::SendPacketToServer(CTOS_SURRENDER);
+				mainGame->HideElement(mainGame->wSurrender);
+				break;
+			}
+			case BUTTON_SURRENDER_NO: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				mainGame->HideElement(mainGame->wSurrender);
 				break;
 			}
 			case BUTTON_CHAIN_IGNORE: {
@@ -305,6 +317,31 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_OPTION_OK: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				SetResponseSelectedOption();
+				break;
+			}
+			case BUTTON_ANNUMBER_1:
+			case BUTTON_ANNUMBER_2:
+			case BUTTON_ANNUMBER_3:
+			case BUTTON_ANNUMBER_4:
+			case BUTTON_ANNUMBER_5:
+			case BUTTON_ANNUMBER_6:
+			case BUTTON_ANNUMBER_7:
+			case BUTTON_ANNUMBER_8:
+			case BUTTON_ANNUMBER_9:
+			case BUTTON_ANNUMBER_10:
+			case BUTTON_ANNUMBER_11:
+			case BUTTON_ANNUMBER_12: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				for(int i = 0; i < mainGame->cbANNumber->getItemCount(); ++i) {
+					if(id - BUTTON_ANNUMBER_1 + 1 == mainGame->cbANNumber->getItemData(i)) {
+						mainGame->cbANNumber->setSelected(i);
+						break;
+					}
+				}
+				for(int i = 0; i < 12; ++i) {
+					mainGame->btnANNumber[i]->setPressed(event.GUIEvent.Caller == mainGame->btnANNumber[i]);
+				}
+				mainGame->btnANNumberOK->setEnabled(true);
 				break;
 			}
 			case BUTTON_ANNUMBER_OK: {
@@ -697,7 +734,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (selected_cards.size() > 0) {
 						SetResponseSelectedCards();
 						ShowCancelOrFinishButton(0);
-						mainGame->HideElement(mainGame->wCardSelect, true);}
+						mainGame->HideElement(mainGame->wCardSelect, true);
+					}
 					break;
 				}
 				case MSG_SELECT_SUM: {
@@ -706,7 +744,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					ShowSelectSum(true);
 					break;
 				}
-				case MSG_SORT_CHAIN:
 				case MSG_SORT_CARD: {
 					int offset = mainGame->scrCardList->getPos() / 10;
 					int sel_seq = id - BUTTON_CARD_0 + offset;
@@ -948,7 +985,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode(false);
+				UpdateDeclarableList();
 				break;
 			}
 			}
@@ -957,7 +994,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
 			case EDITBOX_ANCARD: {
-				UpdateDeclarableCode(true);
+				UpdateDeclarableList();
 				break;
 			}
 			}
@@ -992,13 +1029,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
+			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4 && mainGame->stCardListTip->isVisible()) {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
 				SetShowMark(mcard, false);
 				mainGame->stCardListTip->setVisible(false);
 			}
-			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
+			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4 && mainGame->stCardListTip->isVisible()) {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
 				ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
 				SetShowMark(mcard, false);
@@ -1422,6 +1459,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->chain_when_avail = false;
 				UpdateChainButtons();
 			}
+			if(mainGame->wSurrender->isVisible())
+				mainGame->HideElement(mainGame->wSurrender);
 			mainGame->wCmdMenu->setVisible(false);
 			if(mainGame->fadingList.size())
 				break;
@@ -1520,8 +1559,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 							str.append(formatBuffer);
 							if(mcard->type & TYPE_MONSTER) {
-								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)
-								        && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
+								if(mcard->alias && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
@@ -1543,7 +1581,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(formatBuffer);
 								}
 							} else {
-								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
+								if(mcard->alias && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
@@ -2415,6 +2453,7 @@ void ClientField::CancelOrFinish() {
 		if(selected_cards.size() == 0) {
 			if(select_cancelable) {
 				DuelClient::SetResponseI(-1);
+				ShowCancelOrFinishButton(0);
 				if(mainGame->wCardSelect->isVisible())
 					mainGame->HideElement(mainGame->wCardSelect, true);
 				else
@@ -2461,7 +2500,6 @@ void ClientField::CancelOrFinish() {
 		}
 		break;
 	}
-	case MSG_SORT_CHAIN:
 	case MSG_SORT_CARD: {
 		if(mainGame->wCardSelect->isVisible()) {
 			DuelClient::SetResponseI(-1);

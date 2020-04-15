@@ -16,15 +16,19 @@ endif ()
 
 if (MSVC)
     add_executable (ygopro WIN32 ${AUTO_FILES_RESULT})
-    set_target_properties (ygopro PROPERTIES LINK_FLAGS /ENTRY:"mainCRTStartup")
+    set_target_properties (ygopro PROPERTIES
+        LINK_FLAGS /ENTRY:"mainCRTStartup"
+        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    )
+    set_property(DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ygopro)
 else ()
     add_executable (ygopro ${AUTO_FILES_RESULT})
 endif ()
 
-target_link_libraries (ygopro ocgcore lua clzma)
+target_link_libraries (ygopro ocgcore clzma)
 
 if (MSVC)
-    target_link_libraries (ygopro irrlicht freetype sqlite3 event)
+    target_link_libraries (ygopro irrlicht freetype sqlite3 event lua)
     include_directories ( "../irrlicht/include" "../freetype/include" "../event/include" "../sqlite3" )
 else ()
     target_link_libraries (ygopro
@@ -32,6 +36,7 @@ else ()
         ${FREETYPE_LIBRARIES}
         ${SQLITE_LIBRARIES}
         ${LIBEVENT_LIBRARIES}
+        ${LUA_LIBRARIES}
         ${OPENGL_gl_LIBRARY}
     )
     include_directories (
@@ -42,6 +47,12 @@ else ()
         ${OPENGL_INCLUDE_DIR}
     )
     target_link_libraries (ygopro ${CMAKE_THREAD_LIBS_INIT} ${DL_LIBRARIES})
+endif ()
+
+if (APPLE)
+    find_library(COCOA_LIBRARY Cocoa)
+    find_library(IOKIT_LIBRARY IOKit)
+    target_link_libraries(ygopro ${COCOA_LIBRARY} ${IOKIT_LIBRARY})
 endif ()
 
 if (USE_IRRKLANG)

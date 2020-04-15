@@ -49,6 +49,7 @@ void SoundManager::PlaySoundEffect(int sound) {
 #ifdef YGOPRO_USE_IRRKLANG
 	if(!mainGame->chkEnableSound->isChecked())
 		return;
+	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 	switch(sound) {
 	case SOUND_SUMMON: {
 		engineSound->play2D("./sound/summon.wav");
@@ -173,13 +174,14 @@ void SoundManager::PlaySoundEffect(int sound) {
 	default:
 		break;
 	}
-	engineSound->setSoundVolume(mainGame->gameConf.sound_volume);
 #endif
 }
 void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 	if(element == mainGame->wMessage) {
 		PlaySoundEffect(SOUND_INFO);
 	} else if(element == mainGame->wQuery) {
+		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wSurrender) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wOptions) {
 		PlaySoundEffect(SOUND_QUESTION);
@@ -193,6 +195,8 @@ void SoundManager::PlayDialogSound(irr::gui::IGUIElement * element) {
 		PlaySoundEffect(SOUND_QUESTION);
 	} else if(element == mainGame->wReplaySave) {
 		PlaySoundEffect(SOUND_QUESTION);
+	} else if(element == mainGame->wFTSelect) {
+		PlaySoundEffect(SOUND_QUESTION);
 	}
 }
 void SoundManager::PlayMusic(char* song, bool loop) {
@@ -201,8 +205,8 @@ void SoundManager::PlayMusic(char* song, bool loop) {
 		return;
 	if(!engineMusic->isCurrentlyPlaying(song)) {
 		engineMusic->stopAllSounds();
-		soundBGM = engineMusic->play2D(song, loop, false, true);
 		engineMusic->setSoundVolume(mainGame->gameConf.music_volume);
+		soundBGM = engineMusic->play2D(song, loop, false, true);
 	}
 #endif
 }

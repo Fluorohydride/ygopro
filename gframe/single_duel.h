@@ -18,7 +18,7 @@ public:
 	virtual void ToObserver(DuelPlayer* dp);
 	virtual void PlayerReady(DuelPlayer* dp, bool ready);
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos);
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata);
+	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void StartDuel(DuelPlayer* dp);
 	virtual void HandResult(DuelPlayer* dp, unsigned char res);
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
@@ -53,7 +53,6 @@ protected:
 	Replay last_replay;
 	bool match_mode;
 	int match_kill;
-	bool game_started;
 	unsigned char duel_count;
 	unsigned char tp_player;
 	unsigned char match_result[3];

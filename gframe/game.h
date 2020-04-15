@@ -33,6 +33,7 @@ struct Config {
 	int chkWaitChain;
 	int chkIgnore1;
 	int chkIgnore2;
+	int default_rule;
 	int hide_setname;
 	int hide_hint_button;
 	int control_mode;
@@ -90,6 +91,7 @@ struct BotInfo {
 	wchar_t desc[256];
 	bool support_master_rule_3;
 	bool support_new_master_rule;
+	bool support_master_rule_2020;
 };
 
 struct FadingUnit {
@@ -134,12 +136,13 @@ public:
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
-	void DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist, bool drag = false);
+	void DrawThumb(code_pointer cp, position2di pos, const std::unordered_map<int,int>* lflist, bool drag = false);
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code, bool resize = false);
 	void ClearCardInfo(int player = 0);
+	void AddLog(const wchar_t* msg, int param = 0);
 	void AddChatMsg(const wchar_t* msg, int player);
 	void ClearChatMsg();
 	void AddDebugMsg(const char* msgbuf);
@@ -174,8 +177,7 @@ public:
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
 
-	Mutex gMutex;
-	Mutex gBuffer;
+	std::mutex gMutex;
 	Signal frameSignal;
 	Signal actionSignal;
 	Signal replaySignal;
@@ -354,7 +356,7 @@ public:
 	irr::gui::IGUIStaticText* stBotInfo;
 	irr::gui::IGUIButton* btnStartBot;
 	irr::gui::IGUIButton* btnBotCancel;
-	irr::gui::IGUICheckBox* chkBotOldRule;
+	irr::gui::IGUIComboBox* cbBotRule;
 	irr::gui::IGUICheckBox* chkBotHand;
 	irr::gui::IGUICheckBox* chkBotNoCheckDeck;
 	irr::gui::IGUICheckBox* chkBotNoShuffleDeck;
@@ -381,6 +383,11 @@ public:
 	irr::gui::IGUIStaticText* stQMessage;
 	irr::gui::IGUIButton* btnYes;
 	irr::gui::IGUIButton* btnNo;
+	//surrender yes/no
+	irr::gui::IGUIWindow* wSurrender;
+	irr::gui::IGUIStaticText* stSurrenderMessage;
+	irr::gui::IGUIButton* btnSurrenderYes;
+	irr::gui::IGUIButton* btnSurrenderNo;
 	//options
 	irr::gui::IGUIWindow* wOptions;
 	irr::gui::IGUIStaticText* stOptions;
@@ -410,6 +417,7 @@ public:
 	//announce number
 	irr::gui::IGUIWindow* wANNumber;
 	irr::gui::IGUIComboBox* cbANNumber;
+	irr::gui::IGUIButton* btnANNumber[12];
 	irr::gui::IGUIButton* btnANNumberOK;
 	//announce card
 	irr::gui::IGUIWindow* wANCard;
@@ -575,7 +583,22 @@ extern Game* mainGame;
 #define BUTTON_CANCEL_REPLAY		132
 #define BUTTON_DELETE_REPLAY		133
 #define BUTTON_RENAME_REPLAY		134
-#define EDITBOX_CHAT				140
+#define BUTTON_REPLAY_START			140
+#define BUTTON_REPLAY_PAUSE			141
+#define BUTTON_REPLAY_STEP			142
+#define BUTTON_REPLAY_UNDO			143
+#define BUTTON_REPLAY_EXIT			144
+#define BUTTON_REPLAY_SWAP			145
+#define BUTTON_REPLAY_SAVE			146
+#define BUTTON_REPLAY_CANCEL		147
+#define LISTBOX_SINGLEPLAY_LIST		150
+#define BUTTON_LOAD_SINGLEPLAY		151
+#define BUTTON_CANCEL_SINGLEPLAY	152
+#define LISTBOX_BOT_LIST			153
+#define BUTTON_BOT_START			154
+#define COMBOBOX_BOT_RULE			155
+#define EDITBOX_CHAT				199
+
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202
@@ -630,9 +653,18 @@ extern Game* mainGame;
 #define BUTTON_CHAIN_WHENAVAIL		266
 #define BUTTON_CANCEL_OR_FINISH		267
 #define BUTTON_PHASE				268
-#define BUTTON_CLEAR_LOG			270
-#define LISTBOX_LOG					271
-#define SCROLL_CARDTEXT				280
+#define BUTTON_ANNUMBER_1			270
+#define BUTTON_ANNUMBER_2			271
+#define BUTTON_ANNUMBER_3			272
+#define BUTTON_ANNUMBER_4			273
+#define BUTTON_ANNUMBER_5			274
+#define BUTTON_ANNUMBER_6			275
+#define BUTTON_ANNUMBER_7			276
+#define BUTTON_ANNUMBER_8			277
+#define BUTTON_ANNUMBER_9			278
+#define BUTTON_ANNUMBER_10			279
+#define BUTTON_ANNUMBER_11			280
+#define BUTTON_ANNUMBER_12			281
 #define BUTTON_DISPLAY_0			290
 #define BUTTON_DISPLAY_1			291
 #define BUTTON_DISPLAY_2			292
@@ -640,7 +672,9 @@ extern Game* mainGame;
 #define BUTTON_DISPLAY_4			294
 #define SCROLL_CARD_DISPLAY			295
 #define BUTTON_CARD_DISP_OK			296
-#define BUTTON_CATEGORY_OK			300
+#define BUTTON_SURRENDER_YES		297
+#define BUTTON_SURRENDER_NO			298
+
 #define COMBOBOX_DBLFLIST			301
 #define COMBOBOX_DBDECKS			302
 #define BUTTON_CLEAR_DECK			303
@@ -660,25 +694,15 @@ extern Game* mainGame;
 #define BUTTON_CLEAR_FILTER			317
 #define COMBOBOX_ATTRIBUTE			318
 #define COMBOBOX_RACE				319
-#define BUTTON_REPLAY_START			320
-#define BUTTON_REPLAY_PAUSE			321
-#define BUTTON_REPLAY_STEP			322
-#define BUTTON_REPLAY_UNDO			323
-#define BUTTON_REPLAY_EXIT			324
-#define BUTTON_REPLAY_SWAP			325
-#define BUTTON_REPLAY_SAVE			330
-#define BUTTON_REPLAY_CANCEL		331
-#define BUTTON_BOT_START			340
-#define LISTBOX_BOT_LIST			341
-#define CHECKBOX_BOT_OLD_RULE		342
-#define LISTBOX_SINGLEPLAY_LIST		343
-#define BUTTON_LOAD_SINGLEPLAY		344
-#define BUTTON_CANCEL_SINGLEPLAY	345
-#define SCROLL_TAB_HELPER			350
-#define SCROLL_TAB_SYSTEM			351
+#define COMBOBOX_LIMIT				320
+#define BUTTON_CATEGORY_OK			321
+#define BUTTON_MARKS_FILTER			322
+#define BUTTON_MARKERS_OK			323
+#define COMBOBOX_SORTTYPE			324
+#define BUTTON_CLEAR_LOG			350
+#define LISTBOX_LOG					351
+#define SCROLL_CARDTEXT				352
 #define CHECKBOX_AUTO_SEARCH		360
-#define CHECKBOX_MULTI_KEYWORDS		372
-#define CHECKBOX_PREFER_EXPANSION	373
 #define CHECKBOX_ENABLE_SOUND		361
 #define CHECKBOX_ENABLE_MUSIC		362
 #define SCROLL_VOLUME				363
@@ -688,12 +712,10 @@ extern Game* mainGame;
 #define BUTTON_WINDOW_RESIZE_L		367
 #define BUTTON_WINDOW_RESIZE_XL		368
 #define CHECKBOX_QUICK_ANIMATION	369
-
-#define COMBOBOX_SORTTYPE			370
-#define COMBOBOX_LIMIT				371
-
-#define BUTTON_MARKS_FILTER			380
-#define BUTTON_MARKERS_OK			381
+#define SCROLL_TAB_HELPER			370
+#define SCROLL_TAB_SYSTEM			371
+#define CHECKBOX_MULTI_KEYWORDS		372
+#define CHECKBOX_PREFER_EXPANSION	373
 
 #define DEFAULT_DUEL_RULE			4
 
