@@ -13,10 +13,6 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
 
-using namespace irr;
-using namespace core;
-using namespace video;
-
 namespace ygo {
 
 ClientField::ClientField() {
@@ -389,7 +385,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			mainGame->imageLoading[mainGame->btnCardSelect[i]] = selectable_cards[i]->chain_code;
 		else
 			mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover[selectable_cards[i]->controler]);
-		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
@@ -440,7 +436,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
-		mainGame->stCardPos[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		mainGame->stCardPos[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	}
 	if(selectable_cards.size() <= 5) {
 		for(int i = selectable_cards.size(); i < 5; ++i) {
@@ -473,7 +469,7 @@ void ClientField::ShowChainCard() {
 			mainGame->imageLoading[mainGame->btnCardSelect[i]] = selectable_cards[i]->code;
 		else
 			mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover[selectable_cards[i]->controler]);
-		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardSelect[i]->setPressed(false);
 		mainGame->btnCardSelect[i]->setVisible(true);
 		mainGame->stCardPos[i]->setText(fmt::format(L"{}[{}]", gDataManager->FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
@@ -492,7 +488,7 @@ void ClientField::ShowChainCard() {
 				mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 		}
 		mainGame->stCardPos[i]->setVisible(true);
-		mainGame->stCardPos[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		mainGame->stCardPos[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	} 
 	if(selectable_cards.size() <= 5) {
 		for(int i = selectable_cards.size(); i < 5; ++i) {
@@ -528,7 +524,7 @@ void ClientField::ShowLocationCard() {
 			mainGame->imageLoading[mainGame->btnCardDisplay[i]] = display_cards[i]->code;
 		else
 			mainGame->btnCardDisplay[i]->setImage(mainGame->imageManager.tCover[display_cards[i]->controler]);
-		mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+		mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 		mainGame->btnCardDisplay[i]->setPressed(false);
 		mainGame->btnCardDisplay[i]->setVisible(true);
 		std::wstring text;
@@ -561,7 +557,7 @@ void ClientField::ShowLocationCard() {
 				mainGame->stDisplayPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 		}
 		mainGame->stDisplayPos[i]->setVisible(true);
-		mainGame->stDisplayPos[i]->setRelativePosition(mainGame->Scale<s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
+		mainGame->stDisplayPos[i]->setRelativePosition(mainGame->Scale<irr::s32>(startpos + i * 125, 30, startpos + 120 + i * 125, 50));
 	}
 	if(display_cards.size() <= 5) {
 		for(int i = display_cards.size(); i < 5; ++i) {
@@ -592,7 +588,7 @@ void ClientField::ShowSelectOption(uint64 select_hint) {
 	}
 	for(int i = 0; (i < count) && (i < 5) && quickmode; i++)
 		mainGame->btnOption[i]->setText(gDataManager->GetDesc(select_options[i], mainGame->dInfo.compat_mode).c_str());
-	recti pos = mainGame->wOptions->getRelativePosition();
+	irr::core::recti pos = mainGame->wOptions->getRelativePosition();
 	if(count > 5 && quickmode)
 		pos.LowerRightCorner.X = pos.UpperLeftCorner.X + mainGame->Scale(375);
 	else
@@ -701,7 +697,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	t->Z = 0;
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
 	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	S3DVertex loc[4];
+	irr::video::S3DVertex loc[4];
 	if ((location & (~LOCATION_OVERLAY)) == LOCATION_HAND) {
 		if (controler == 0) {
 			t->X = 2.95f;
@@ -772,7 +768,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		if (controler == 0) {
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
-				r->Y = PI;
+				r->Y = irr::core::PI;
 				r->Z = 0.0f;
 			} else {
 				r->X = 0.0f;
@@ -782,12 +778,12 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		} else {
 			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
-				r->Y = PI;
-				r->Z = PI;
+				r->Y = irr::core::PI;
+				r->Z = irr::core::PI;
 			} else {
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = PI;
+				r->Z = irr::core::PI;
 			}
 		}
 		break;
@@ -816,7 +812,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			} else {
 				r->X = FIELD_ANGLE;
-				r->Y = PI;
+				r->Y = irr::core::PI;
 				r->Z = 0.0f;
 			}
 		} else {
@@ -840,7 +836,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			} else {
 				r->X = FIELD_ANGLE;
-				r->Y = PI;
+				r->Y = irr::core::PI;
 				r->Z = 0.0f;
 			}
 		}
@@ -853,29 +849,29 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		if (controler == 0) {
 			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
-				r->Z = -HALF_PI;
+				r->Z = -irr::core::HALF_PI;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = PI + 0.001f;
+					r->Y = irr::core::PI + 0.001f;
 				else r->Y = 0.0f;
 			} else {
 				r->X = 0.0f;
 				r->Z = 0.0f;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = PI;
+					r->Y = irr::core::PI;
 				else r->Y = 0.0f;
 			}
 		} else {
 			if (pcard->position & POS_DEFENSE) {
 				r->X = 0.0f;
-				r->Z = HALF_PI;
+				r->Z = irr::core::HALF_PI;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = PI + 0.001f;
+					r->Y = irr::core::PI + 0.001f;
 				else r->Y = 0.0f;
 			} else {
 				r->X = 0.0f;
-				r->Z = PI;
+				r->Z = irr::core::PI;
 				if (pcard->position & POS_FACEDOWN)
-					r->Y = PI;
+					r->Y = irr::core::PI;
 				else r->Y = 0.0f;
 			}
 		}
@@ -889,13 +885,13 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			r->X = 0.0f;
 			r->Z = 0.0f;
 			if (pcard->position & POS_FACEDOWN)
-				r->Y = PI;
+				r->Y = irr::core::PI;
 			else r->Y = 0.0f;
 		} else {
 			r->X = 0.0f;
-			r->Z = PI;
+			r->Z = irr::core::PI;
 			if (pcard->position & POS_FACEDOWN)
-				r->Y = PI;
+				r->Y = irr::core::PI;
 			else r->Y = 0.0f;
 		}
 		break;
@@ -911,7 +907,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		} else {
 			r->X = 0.0f;
 			r->Y = 0.0f;
-			r->Z = PI;
+			r->Z = irr::core::PI;
 		}
 		break;
 	}
@@ -926,18 +922,18 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			} else {
 				r->X = 0.0f;
-				r->Y = PI;
+				r->Y = irr::core::PI;
 				r->Z = 0.0f;
 			}
 		} else {
 			if(pcard->position & POS_FACEUP) {
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = PI;
+				r->Z = irr::core::PI;
 			} else {
 				r->X = 0.0f;
-				r->Y = PI;
-				r->Z = PI;
+				r->Y = irr::core::PI;
+				r->Z = irr::core::PI;
 			}
 		}
 		break;
@@ -950,14 +946,14 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			r->X = 0.0f;
 			if(pcard->position & POS_FACEUP)
 				r->Y = 0.0f;
-			else r->Y = PI;
+			else r->Y = irr::core::PI;
 			r->Z = 0.0f;
 		} else {
 			r->X = 0.0f;
 			if(pcard->position & POS_FACEUP)
 				r->Y = 0.0f;
-			else r->Y = PI;
-			r->Z = PI;
+			else r->Y = irr::core::PI;
+			r->Z = irr::core::PI;
 		}
 		break;
 	}
@@ -981,7 +977,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.005f + pcard->sequence * 0.0001f;
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = PI;
+				r->Z = irr::core::PI;
 			}
 		} else {
 			if (pcard->overlayTarget->controler == 0) {
@@ -998,7 +994,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Z = 0.005f + pcard->sequence * 0.0001f;
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = PI;
+				r->Z = irr::core::PI;
 			}
 		}
 		break;
@@ -1014,18 +1010,18 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 0.0f;
 			} else {
 				r->X = 0.0f;
-				r->Y = PI;
+				r->Y = irr::core::PI;
 				r->Z = 0.0f;
 			}
 		} else {
 			if(pcard->position & POS_FACEUP) {
 				r->X = 0.0f;
 				r->Y = 0.0f;
-				r->Z = PI;
+				r->Z = irr::core::PI;
 			} else {
 				r->X = 0.0f;
-				r->Y = PI;
-				r->Z = PI;
+				r->Y = irr::core::PI;
+				r->Z = irr::core::PI;
 			}
 		}
 		break;
@@ -1043,27 +1039,27 @@ void ClientField::MoveCard(ClientCard * pcard, int frame) {
 	GetCardLocation(pcard, &trans, &rot);
 	pcard->dPos = (trans - pcard->curPos) / milliseconds;
 	float diff = rot.X - pcard->curRot.X;
-	while (diff < 0) diff += PI * 2;
-	while (diff > PI * 2)
-		diff -= PI * 2;
-	if (diff < PI)
+	while (diff < 0) diff += irr::core::PI * 2;
+	while (diff > irr::core::PI * 2)
+		diff -= irr::core::PI * 2;
+	if (diff < irr::core::PI)
 		pcard->dRot.X = diff / milliseconds;
 	else
-		pcard->dRot.X = -(PI * 2 - diff) / milliseconds;
+		pcard->dRot.X = -(irr::core::PI * 2 - diff) / milliseconds;
 	diff = rot.Y - pcard->curRot.Y;
-	while (diff < 0) diff += PI * 2;
-	while (diff > PI * 2) diff -= PI * 2;
-	if (diff < PI)
+	while (diff < 0) diff += irr::core::PI * 2;
+	while (diff > irr::core::PI * 2) diff -= irr::core::PI * 2;
+	if (diff < irr::core::PI)
 		pcard->dRot.Y = diff / milliseconds;
 	else
-		pcard->dRot.Y = -(PI * 2 - diff) / milliseconds;
+		pcard->dRot.Y = -(irr::core::PI * 2 - diff) / milliseconds;
 	diff = rot.Z - pcard->curRot.Z;
-	while (diff < 0) diff += PI * 2;
-	while (diff > PI * 2) diff -= PI * 2;
-	if (diff < PI)
+	while (diff < 0) diff += irr::core::PI * 2;
+	while (diff > irr::core::PI * 2) diff -= irr::core::PI * 2;
+	if (diff < irr::core::PI)
 		pcard->dRot.Z = diff / milliseconds;
 	else
-		pcard->dRot.Z = -(PI * 2 - diff) / milliseconds;
+		pcard->dRot.Z = -(irr::core::PI * 2 - diff) / milliseconds;
 	pcard->is_moving = true;
 	pcard->refresh_on_stop = true;
 	pcard->aniFrame = milliseconds;

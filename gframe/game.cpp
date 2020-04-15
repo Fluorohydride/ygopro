@@ -1500,7 +1500,7 @@ bool Game::MainLoop() {
 	float atkframe = 0.1f;
 #if defined (__linux__) && !defined(__ANDROID__)
 	bool last_resize = false;
-	dimension2du prev_window_size;
+	irr::core::dimension2d<irr::u32> prev_window_size;
 #endif
 	irr::ITimer* timer = device->getTimer();
 	uint32 cur_time = 0;
