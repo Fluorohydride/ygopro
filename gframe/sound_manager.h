@@ -57,7 +57,7 @@ public:
 	void RefreshBGMList();
 	void RefreshChantsList();
 	void PlaySoundEffect(SFX sound);
-	void PlayBGM(BGM scene);
+	void PlayBGM(BGM scene, bool loop = true);
 	bool PlayChant(CHANT chant, unsigned int code);
 	void SetSoundVolume(double volume);
 	void SetMusicVolume(double volume);

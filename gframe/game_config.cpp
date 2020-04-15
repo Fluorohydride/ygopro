@@ -83,6 +83,7 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_BOOL(showScopeLabel)
 			DESERIALIZE_BOOL(saveHandTest)
 			DESERIALIZE_BOOL(discordIntegration)
+			DESERIALIZE_BOOL(loopMusic)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
 #endif
@@ -266,6 +267,7 @@ bool GameConfig::Save(const path_char* filename)
 	conf_file << "enable_sound = "       << enablesound << "\n";
 	conf_file << "music_volume = "       << musicVolume << "\n";
 	conf_file << "sound_volume = "       << soundVolume << "\n";
+	SERIALIZE(loopMusic);
 	SERIALIZE(saveHandTest);
 	SERIALIZE(discordIntegration);
 #ifdef __ANDROID__

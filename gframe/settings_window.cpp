@@ -22,6 +22,7 @@ void SettingsWindow::DisableAudio() {
 	chkEnableMusic->setVisible(false);
 	stMusicVolume->setVisible(false);
 	scrMusicVolume->setVisible(false);
+	chkLoopMusic->setVisible(false);
 	stNoAudioBackend->setVisible(true);
 }
 

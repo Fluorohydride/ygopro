@@ -93,6 +93,7 @@ struct GameConfig
 	bool saveHandTest = true;
 	int musicVolume = 20;
 	int soundVolume = 20;
+	bool loopMusic = true;
 	path_string skin = EPRO_TEXT("none");
 	path_string locale = EPRO_TEXT("English");
 	path_string working_directory = EPRO_TEXT("./");

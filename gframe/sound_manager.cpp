@@ -128,7 +128,7 @@ void SoundManager::PlaySoundEffect(SFX sound) {
 	mixer->PlaySound(working_dir + "/" + fx.at(sound));
 #endif
 }
-void SoundManager::PlayBGM(BGM scene) {
+void SoundManager::PlayBGM(BGM scene, bool loop) {
 #ifdef BACKEND
 	auto& list = BGMList[scene];
 	int count = list.size();
@@ -136,7 +136,7 @@ void SoundManager::PlayBGM(BGM scene) {
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
 		std::string BGMName = working_dir + "/./sound/BGM/" + list[bgm];
-		mixer->PlayMusic(BGMName, true);
+		mixer->PlayMusic(BGMName, loop);
 	}
 #endif
 }

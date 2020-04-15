@@ -76,9 +76,11 @@ struct SettingsWindow {
 	irr::gui::IGUICheckBox* chkEnableMusic;
 	irr::gui::IGUIStaticText* stMusicVolume;
 	irr::gui::IGUIScrollBar* scrMusicVolume;
+	irr::gui::IGUICheckBox* chkLoopMusic; // exclusive to window
 	irr::gui::IGUIStaticText* stNoAudioBackend;
 	// end audio
 	irr::gui::IGUICheckBox* chkDiscordIntegration;
+	irr::gui::IGUICheckBox* chkHideHandsInReplays;
 
 	void DisableAudio();
 };
