@@ -1466,7 +1466,11 @@ bool Game::Initialize() {
 	fpsCounter->setOverrideColor(skin::FPS_TEXT_COLOR_VAL);
 	fpsCounter->setVisible(gGameConfig->showFPS);
 	fpsCounter->setTextRestrainedInside(false);
+#ifndef __ANDROID__
 	fpsCounter->setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
+#else
+	fpsCounter->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
+#endif
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
