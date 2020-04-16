@@ -272,6 +272,9 @@ catch(...) { what = def; }
 					mainGame->gMutex.unlock();
 				} else {
 					gSoundManager->StopSounds();
+					if(mainGame->dInfo.isStarted) {
+						ReplayPrompt(true);
+					}
 					mainGame->gMutex.lock();
 					mainGame->PopupMessage(gDataManager->GetSysString(1502));
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
