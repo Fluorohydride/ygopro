@@ -54,6 +54,9 @@ ClientCard::ClientCard() {
 	overlayTarget = 0;
 	equipTarget = 0;
 }
+void ClientCard::UpdateDrawCoordniates(bool setTrans) {
+	mainGame->dField.GetCardDrawCoordinates(this, &curPos, &curRot, setTrans);
+}
 void ClientCard::SetCode(uint32_t code) {
 	if((location == LOCATION_HAND) && (this->code != code)) {
 		this->code = code;

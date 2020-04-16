@@ -2752,7 +2752,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->gMutex.lock();
 				mainGame->dField.AddCard(pcard, current.controler, current.location, current.sequence);
 				mainGame->gMutex.unlock();
-				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+				pcard->UpdateDrawCoordniates(true);
 				pcard->curAlpha = 5;
 				mainGame->dField.FadeCard(pcard, 255, 20);
 				mainGame->WaitFrameSignal(20);
@@ -3144,7 +3144,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.current_chain.controler = cc;
 		mainGame->dField.current_chain.location = cl;
 		mainGame->dField.current_chain.sequence = cs;
-		mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
+		mainGame->dField.current_chain.UpdateDrawCoordinates();
 		mainGame->dField.current_chain.solved = false;
 		mainGame->dField.current_chain.target.clear();
 		int chc = 0;
@@ -3987,7 +3987,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!mainGame->dInfo.isCatchingUp) {
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
 				ClientCard* pcard = *cit;
-				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+				pcard->UpdateDrawCoordniates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
 				mainGame->dField.MoveCard(*cit, 5);
@@ -4002,7 +4002,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				} else {
 					pcard->code = BufferIO::Read<uint32_t>(pbuf) & 0x7fffffff;
 				}
-				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+				pcard->UpdateDrawCoordniates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
 				mainGame->dField.MoveCard(*cit, 5);
@@ -4015,7 +4015,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				} else {
 					pcard->code = BufferIO::Read<uint32_t>(pbuf) & 0x7fffffff;
 				}
-				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+				pcard->UpdateDrawCoordniates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
 				mainGame->dField.MoveCard(*cit, 5);
@@ -4139,7 +4139,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.current_chain.controler = cc;
 				mainGame->dField.current_chain.location = cl;
 				mainGame->dField.current_chain.sequence = cs;
-				mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
+				mainGame->dField.current_chain.UpdateDrawCoordinates();
 				mainGame->dField.current_chain.solved = false;
 				int chc = 0;
 				for(auto chit = mainGame->dField.chains.begin(); chit != mainGame->dField.chains.end(); ++chit) {

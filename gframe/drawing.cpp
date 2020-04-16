@@ -438,7 +438,7 @@ void Game::DrawCard(ClientCard* pcard) {
 			pcard->is_moving = false;
 			pcard->is_fading = false;
 			if(pcard->refresh_on_stop)
-				dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+				pcard->UpdateDrawCoordniates(true);
 			pcard->refresh_on_stop = false;
 		}
 	}

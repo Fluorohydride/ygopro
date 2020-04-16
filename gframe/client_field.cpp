@@ -110,7 +110,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = LOCATION_DECK;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		pcard->UpdateDrawCoordniates(true);
 	}
 	for(int i = 0; i < extrac; ++i) {
 		pcard = new ClientCard;
@@ -120,7 +120,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = LOCATION_EXTRA;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		pcard->UpdateDrawCoordniates(true);
 	}
 }
 std::vector<ClientCard*>* ClientField::GetList(int location, int controler) {
@@ -625,6 +625,17 @@ void ClientField::ShowSelectOption(uint64 select_hint) {
 	mainGame->gMutex.unlock();
 }
 void ClientField::ReplaySwap() {
+	auto reset = [](ClientCard* pcard)->void {
+		if(pcard) {
+			pcard->controler = 1 - pcard->controler;
+			pcard->UpdateDrawCoordniates(true);
+			pcard->is_moving = false;
+		}
+	};
+	auto resetloc = [&reset](std::vector<ClientCard*> zone)->void {
+		for(auto& pcard : zone)
+			reset(pcard);
+	};
 	std::swap(deck[0], deck[1]);
 	std::swap(hand[0], hand[1]);
 	std::swap(mzone[0], mzone[1]);
@@ -634,13 +645,6 @@ void ClientField::ReplaySwap() {
 	std::swap(extra[0], extra[1]);
 	std::swap(extra_p_count[0], extra_p_count[1]);
 	std::swap(skills[0], skills[1]);
-#define resetloc(vec) for(auto& pcard : vec) {\
-						if(pcard) {\
-							pcard->controler = 1 - pcard->controler;\
-							GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);\
-							pcard->is_moving = false;\
-						}\
-						}
 	for(int p = 0; p < 2; ++p) {
 		resetloc(deck[p]);
 		resetloc(hand[p]);
@@ -649,9 +653,10 @@ void ClientField::ReplaySwap() {
 		resetloc(grave[p]);
 		resetloc(remove[p]);
 		resetloc(extra[p]);
+		reset(skills[p]);
 	}
-	resetloc(overlay_cards)
-#undef resetloc
+	for(auto& pcard : overlay_cards)
+		reset(pcard);
 	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
 	mainGame->dInfo.isTeam1 = !mainGame->dInfo.isTeam1;
 	mainGame->dInfo.isReplaySwapped = !mainGame->dInfo.isReplaySwapped;
@@ -660,18 +665,20 @@ void ClientField::ReplaySwap() {
 	std::swap(mainGame->dInfo.current_player[0], mainGame->dInfo.current_player[1]);
 	for(auto& chit : chains) {
 		chit.controler = 1 - chit.controler;
-		GetChainLocation(chit.controler, chit.location, chit.sequence, &chit.chain_pos);
+		chit.UpdateDrawCoordinates();
 	}
 	disabled_field = (disabled_field >> 16) | (disabled_field << 16);
 }
 void ClientField::RefreshAllCards() {
-	auto refreshloc = [&](std::vector<ClientCard*> zone) {
-		for(auto& pcard : zone) {
-			if(pcard) {
-				GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-				pcard->is_moving = false;
-			}
+	auto refresh = [](ClientCard* pcard) {
+		if(pcard) {
+			pcard->UpdateDrawCoordniates(true);
+			pcard->is_moving = false;
 		}
+	};
+	auto refreshloc = [&refresh](std::vector<ClientCard*> zone) {
+		for(auto& pcard : zone)
+			refresh(pcard);
 	};
 	for(int p = 0; p < 2; ++p) {
 		refreshloc(deck[p]);
@@ -681,17 +688,12 @@ void ClientField::RefreshAllCards() {
 		refreshloc(grave[p]);
 		refreshloc(remove[p]);
 		refreshloc(extra[p]);
-		if(skills[p]) {
-			GetCardLocation(skills[p], &skills[p]->curPos, &skills[p]->curRot, true);
-			skills[p]->is_moving = false;
-		}
+		refresh(skills[p]);
 	}
-	for(auto& pcard : overlay_cards) {
-		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
-		pcard->is_moving = false;
-	}
+	for(auto& pcard : overlay_cards)
+		refresh(pcard);
 }
-void ClientField::GetChainLocation(int controler, int location, int sequence, irr::core::vector3df* t) {
+void ClientField::GetChainDrawCoordinates(int controler, int location, int sequence, irr::core::vector3df* t) {
 	t->X = 0;
 	t->Y = 0;
 	t->Z = 0;
@@ -754,7 +756,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 		t->Y = (loc[0].Pos.Y + loc[2].Pos.Y) / 2;
 	}
 }
-void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
+void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
 	int controler = pcard->controler;
 	int sequence = pcard->sequence;
 	int location = pcard->location;
@@ -1036,7 +1038,7 @@ void ClientField::MoveCard(ClientCard * pcard, int frame) {
 	float milliseconds = (float)frame * 1000.0f / 60.0f;
 	irr::core::vector3df trans = pcard->curPos;
 	irr::core::vector3df rot = pcard->curRot;
-	GetCardLocation(pcard, &trans, &rot);
+	GetCardDrawCoordinates(pcard, &trans, &rot);
 	pcard->dPos = (trans - pcard->curPos) / milliseconds;
 	float diff = rot.X - pcard->curRot.X;
 	while (diff < 0) diff += irr::core::PI * 2;
@@ -1425,5 +1427,8 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 			}
 		}
 	}
+}
+void ChainInfo::UpdateDrawCoordinates() {
+	mainGame->dField.GetChainDrawCoordinates(controler, location, sequence, &chain_pos);
 }
 }

@@ -22,6 +22,7 @@ struct ChainInfo {
 	int sequence;
 	bool solved;
 	std::set<ClientCard*> target;
+	void UpdateDrawCoordinates();
 };
 
 class ClientField: public irr::IEventReceiver {
@@ -105,8 +106,8 @@ public:
 	void ReplaySwap();
 	void RefreshAllCards();
 
-	void GetChainLocation(int controler, int location, int sequence, irr::core::vector3df* t);
-	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
+	void GetChainDrawCoordinates(int controler, int location, int sequence, irr::core::vector3df* t);
+	void GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
 	void MoveCard(ClientCard* pcard, int frame);
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
 	bool ShowSelectSum();
