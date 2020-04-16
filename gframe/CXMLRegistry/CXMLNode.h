@@ -3,7 +3,18 @@
 #ifndef __C_XMLNODE_H_INCLUDED__
 #define __C_XMLNODE_H_INCLUDED__
 
-#include <irrlicht.h>
+#include <irrArray.h>
+#include <irrString.h>
+#include <irrlist.h>
+
+namespace irr {
+namespace io {
+class IXMLWriter;
+}
+namespace gui {
+class IGUITreeViewNode;
+}
+}
 
 enum CXMLNODETYPE {
 	CXMLNODETYPE_VALUE,

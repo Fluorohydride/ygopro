@@ -2,6 +2,7 @@
 #include <IVideoDriver.h>
 #include <ITexture.h>
 #include <IGUIElement.h>
+#include <IGUISpriteBank.h>
 #include "clipRects.h"
 
 namespace irr {

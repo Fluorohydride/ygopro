@@ -70,8 +70,7 @@ std::vector<std::string> GetExtraParameters() {
 }
 }
 
-void android_main(android_app *app)
-{
+void android_main(android_app *app) {
 	int retval = 0;
 	porting::app_global = app;
 	porting::initAndroid();
@@ -90,10 +89,12 @@ void android_main(android_app *app)
 	try {
 		app_dummy();
 		main(params.size(), (char**)params.data());
-	} catch (std::exception &e) {
-// 		errorstream << "Uncaught exception in main thread: " << e.what() << std::endl;
+	}
+	catch(std::exception &e) {
+		// 		errorstream << "Uncaught exception in main thread: " << e.what() << std::endl;
 		retval = -1;
-	} catch (...) {
+	}
+	catch(...) {
 		// errorstream << "Uncaught exception in main thread!" << std::endl;
 		retval = -1;
 	}
@@ -109,13 +110,12 @@ void android_main(android_app *app)
 /* for it right now */
 extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_TextEntry_putMessageBoxResult(
-		JNIEnv * env, jclass thiz, jstring textString)
-	{
-		if (porting::app_global->userData) {
+		JNIEnv * env, jclass thiz, jstring textString) {
+		if(porting::app_global->userData) {
 			auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
 			auto irrenv = device->getGUIEnvironment();
 			auto element = irrenv->getFocus();
-			if (element && element->getType() == irr::gui::EGUIET_EDIT_BOX) {
+			if(element && element->getType() == irr::gui::EGUIET_EDIT_BOX) {
 				auto editbox = static_cast<irr::gui::IGUIEditBox*>(element);
 				const char* text = env->GetStringUTFChars(textString, nullptr);
 				auto wtext = BufferIO::DecodeUTF8s(text);
@@ -168,30 +168,28 @@ android_app* app_global = nullptr;
 JNIEnv*      jnienv = nullptr;
 jclass       nativeActivity;
 
-jclass findClass(std::string classname, JNIEnv* env = nullptr)
-{
+jclass findClass(std::string classname, JNIEnv* env = nullptr) {
 	env = env ? env : jnienv;
-	if (env == 0) {
+	if(env == 0) {
 		return 0;
 	}
 
 	jclass nativeactivity = env->FindClass("android/app/NativeActivity");
 	jmethodID getClassLoader =
-	env->GetMethodID(nativeactivity,"getClassLoader",
-					"()Ljava/lang/ClassLoader;");
+		env->GetMethodID(nativeactivity, "getClassLoader",
+						 "()Ljava/lang/ClassLoader;");
 	jobject cls =
-	env->CallObjectMethod(app_global->activity->clazz, getClassLoader);
+		env->CallObjectMethod(app_global->activity->clazz, getClassLoader);
 	jclass classLoader = env->FindClass("java/lang/ClassLoader");
 	jmethodID findClass =
-			env->GetMethodID(classLoader, "loadClass",
-					"(Ljava/lang/String;)Ljava/lang/Class;");
+		env->GetMethodID(classLoader, "loadClass",
+						 "(Ljava/lang/String;)Ljava/lang/Class;");
 	jstring strClassName =
-			env->NewStringUTF(classname.c_str());
-	return (jclass) env->CallObjectMethod(cls, findClass, strClassName);
+		env->NewStringUTF(classname.c_str());
+	return (jclass)env->CallObjectMethod(cls, findClass, strClassName);
 }
 
-void initAndroid()
-{
+void initAndroid() {
 	jnienv = nullptr;
 	JavaVM *jvm = app_global->activity->vm;
 	JavaVMAttachArgs lJavaVMAttachArgs;
@@ -203,27 +201,25 @@ void initAndroid()
 	// printf ... if someone finds out why please fix it!
 	// infostream << "Attaching native thread. " << std::endl;
 #endif
-	if ( jvm->AttachCurrentThread(&jnienv, &lJavaVMAttachArgs) == JNI_ERR) {
+	if(jvm->AttachCurrentThread(&jnienv, &lJavaVMAttachArgs) == JNI_ERR) {
 		// errorstream << "Failed to attach native thread to jvm" << std::endl;
 		exit(-1);
 	}
 
 	nativeActivity = findClass("io/github/edo9300/edopro/EpNativeActivity");
-	if (nativeActivity == 0) {
+	if(nativeActivity == 0) {
 		// errorstream <<
 // 			"porting::initAndroid unable to find java native activity class" <<
 // 			std::endl;
 	}
 }
 
-void cleanupAndroid()
-{
+void cleanupAndroid() {
 	JavaVM *jvm = app_global->activity->vm;
 	jvm->DetachCurrentThread();
 }
 
-static std::string javaStringToUTF8(jstring js)
-{
+static std::string javaStringToUTF8(jstring js) {
 	std::string str;
 	// Get string as a UTF-8 c-string
 	const char *c_str = jnienv->GetStringUTFChars(js, nullptr);
@@ -236,48 +232,46 @@ static std::string javaStringToUTF8(jstring js)
 
 // Calls static method if obj is NULL
 static std::string getAndroidPath(jclass cls, jobject obj, jclass cls_File,
-		jmethodID mt_getAbsPath, const char *getter)
-{
+								  jmethodID mt_getAbsPath, const char *getter) {
 	// Get getter method
 	jmethodID mt_getter;
-	if (obj)
+	if(obj)
 		mt_getter = jnienv->GetMethodID(cls, getter,
-				"()Ljava/io/File;");
+										"()Ljava/io/File;");
 	else
 		mt_getter = jnienv->GetStaticMethodID(cls, getter,
-				"()Ljava/io/File;");
+											  "()Ljava/io/File;");
 
 	// Call getter
 	jobject ob_file;
-	if (obj)
+	if(obj)
 		ob_file = jnienv->CallObjectMethod(obj, mt_getter);
 	else
 		ob_file = jnienv->CallStaticObjectMethod(cls, mt_getter);
 
 	// Call getAbsolutePath
-	jstring js_path = (jstring) jnienv->CallObjectMethod(ob_file,
-			mt_getAbsPath);
+	jstring js_path = (jstring)jnienv->CallObjectMethod(ob_file,
+														mt_getAbsPath);
 
 	return javaStringToUTF8(js_path);
 }
 
-void initializePathsAndroid()
-{
- 	// Get Environment class
- 	jclass cls_Env = jnienv->FindClass("android/os/Environment");
- 	// Get File class
- 	jclass cls_File = jnienv->FindClass("java/io/File");
- 	// Get getAbsolutePath method
- 	jmethodID mt_getAbsPath = jnienv->GetMethodID(cls_File,
- 				"getAbsolutePath", "()Ljava/lang/String;");
- 
-//  	path_cache   = getAndroidPath(nativeActivity, app_global->activity->clazz,
-// 			cls_File, mt_getAbsPath, "getCacheDir");
+void initializePathsAndroid() {
+	// Get Environment class
+	jclass cls_Env = jnienv->FindClass("android/os/Environment");
+	// Get File class
+	jclass cls_File = jnienv->FindClass("java/io/File");
+	// Get getAbsolutePath method
+	jmethodID mt_getAbsPath = jnienv->GetMethodID(cls_File,
+												  "getAbsolutePath", "()Ljava/lang/String;");
+
+	//  	path_cache   = getAndroidPath(nativeActivity, app_global->activity->clazz,
+	// 			cls_File, mt_getAbsPath, "getCacheDir");
 	internal_storage = app_global->activity->internalDataPath;
 
 	readConfigs();
-// 	path_user    = path_storage + DIR_DELIM + PROJECT_NAME_C;
-// 	path_share   = path_storage + DIR_DELIM + PROJECT_NAME_C;
+	// 	path_user    = path_storage + DIR_DELIM + PROJECT_NAME_C;
+	// 	path_share   = path_storage + DIR_DELIM + PROJECT_NAME_C;
 }
 void displayKeyboard(bool pShow) {
 	// Attaches the current thread to the JVM.
@@ -364,27 +358,26 @@ void displayKeyboard(bool pShow) {
 }
 
 void showInputDialog(const std::string& acceptButton, const  std::string& hint,
-		const std::string& current, int editType)
-{
-	jmethodID showdialog = jnienv->GetMethodID(nativeActivity,"showDialog",
-		"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
+					 const std::string& current, int editType) {
+	jmethodID showdialog = jnienv->GetMethodID(nativeActivity, "showDialog",
+											   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
 
-	if (showdialog == 0) {
+	if(showdialog == 0) {
 		assert("porting::showInputDialog unable to find java show dialog method" == 0);
 	}
 
 	jstring jacceptButton = jnienv->NewStringUTF(acceptButton.c_str());
-	jstring jhint         = jnienv->NewStringUTF(hint.c_str());
-	jstring jcurrent      = jnienv->NewStringUTF(current.c_str());
-	jint    jeditType     = editType;
+	jstring jhint = jnienv->NewStringUTF(hint.c_str());
+	jstring jcurrent = jnienv->NewStringUTF(current.c_str());
+	jint    jeditType = editType;
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, showdialog,
-			jacceptButton, jhint, jcurrent, jeditType);
+						   jacceptButton, jhint, jcurrent, jeditType);
 }
 
 void showComboBox(const std::vector<std::string>& list) {
-	jmethodID showbox = jnienv->GetMethodID(nativeActivity,"showComboBox",
-		"([Ljava/lang/String;)V");
+	jmethodID showbox = jnienv->GetMethodID(nativeActivity, "showComboBox",
+											"([Ljava/lang/String;)V");
 
 	jstring str;
 	jobjectArray jlist = 0;
@@ -400,16 +393,15 @@ void showComboBox(const std::vector<std::string>& list) {
 	jnienv->CallVoidMethod(app_global->activity->clazz, showbox, jlist);
 }
 
-float getDisplayDensity()
-{
+float getDisplayDensity() {
 	static bool firstrun = true;
 	static float value = 0;
 
-	if (firstrun) {
+	if(firstrun) {
 		jmethodID getDensity = jnienv->GetMethodID(nativeActivity, "getDensity",
-					"()F");
+												   "()F");
 
-		if (getDensity == 0) {
+		if(getDensity == 0) {
 			assert("porting::getDisplayDensity unable to find java getDensity method" == 0);
 		}
 
@@ -419,31 +411,30 @@ float getDisplayDensity()
 	return value;
 }
 
-std::pair<int,int> getDisplaySize()
-{
+std::pair<int, int> getDisplaySize() {
 	static bool firstrun = true;
-	static std::pair<int,int> retval;
+	static std::pair<int, int> retval;
 
-	if (firstrun) {
+	if(firstrun) {
 		jmethodID getDisplayWidth = jnienv->GetMethodID(nativeActivity,
-				"getDisplayWidth", "()I");
+														"getDisplayWidth", "()I");
 
-		if (getDisplayWidth == 0) {
+		if(getDisplayWidth == 0) {
 			assert("porting::getDisplayWidth unable to find java getDisplayWidth method" == 0);
 		}
 
 		retval.first = jnienv->CallIntMethod(app_global->activity->clazz,
-				getDisplayWidth);
+											 getDisplayWidth);
 
 		jmethodID getDisplayHeight = jnienv->GetMethodID(nativeActivity,
-				"getDisplayHeight", "()I");
+														 "getDisplayHeight", "()I");
 
-		if (getDisplayHeight == 0) {
+		if(getDisplayHeight == 0) {
 			assert("porting::getDisplayHeight unable to find java getDisplayHeight method" == 0);
 		}
 
 		retval.second = jnienv->CallIntMethod(app_global->activity->clazz,
-				getDisplayHeight);
+											  getDisplayHeight);
 
 		firstrun = false;
 	}
@@ -459,138 +450,138 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 	auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
 	switch(event.EventType) {
 		case irr::EET_MOUSE_INPUT_EVENT: {
-		if(event.MouseInput.Event == irr::EMIE_LMOUSE_PRESSED_DOWN) {
-			auto hovered = ygo::mainGame->env->getRootGUIElement()->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
-			if(hovered && hovered->isEnabled()) {
-				if(hovered->getType() == irr::gui::EGUIET_EDIT_BOX) {
-					bool retval = hovered->OnEvent(event);
-					if(retval)
-						ygo::mainGame->env->setFocus(hovered);
-					if(ygo::gGameConfig->native_keyboard) {
-						porting::displayKeyboard(true);
-					} else {
-						int type = 2;
-						// multi line text input
-						if(((irr::gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
-							type = 1;
-						// passwords are always single line
-						if(((irr::gui::IGUIEditBox *)hovered)->isPasswordBox())
-							type = 3;
-						porting::showInputDialog("ok", "",
-												 BufferIO::EncodeUTF8s(((irr::gui::IGUIEditBox *)hovered)->getText()), type);
+			if(event.MouseInput.Event == irr::EMIE_LMOUSE_PRESSED_DOWN) {
+				auto hovered = ygo::mainGame->env->getRootGUIElement()->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
+				if(hovered && hovered->isEnabled()) {
+					if(hovered->getType() == irr::gui::EGUIET_EDIT_BOX) {
+						bool retval = hovered->OnEvent(event);
+						if(retval)
+							ygo::mainGame->env->setFocus(hovered);
+						if(ygo::gGameConfig->native_keyboard) {
+							porting::displayKeyboard(true);
+						} else {
+							int type = 2;
+							// multi line text input
+							if(((irr::gui::IGUIEditBox *)hovered)->isMultiLineEnabled())
+								type = 1;
+							// passwords are always single line
+							if(((irr::gui::IGUIEditBox *)hovered)->isPasswordBox())
+								type = 3;
+							porting::showInputDialog("ok", "",
+													 BufferIO::EncodeUTF8s(((irr::gui::IGUIEditBox *)hovered)->getText()), type);
+						}
+						stopPropagation = retval;
+						return retval;
 					}
-					stopPropagation = retval;
-					return retval;
 				}
 			}
+			break;
 		}
-		break;
-	}
-	case irr::EET_KEY_INPUT_EVENT: {
-		if(ygo::gGameConfig->native_keyboard && event.KeyInput.Key == irr::KEY_RETURN) {
-			porting::displayKeyboard(false);
+		case irr::EET_KEY_INPUT_EVENT: {
+			if(ygo::gGameConfig->native_keyboard && event.KeyInput.Key == irr::KEY_RETURN) {
+				porting::displayKeyboard(false);
+			}
+			break;
 		}
-		break;
-	}
-	case irr::EET_SYSTEM_EVENT: {
-		switch(event.SystemEvent.AndroidCmd.Cmd) {
-			case APP_CMD_PAUSE: {
-				ygo::gSoundManager->PauseMusic(true);
-				break;
+		case irr::EET_SYSTEM_EVENT: {
+			switch(event.SystemEvent.AndroidCmd.Cmd) {
+				case APP_CMD_PAUSE: {
+					ygo::gSoundManager->PauseMusic(true);
+					break;
+				}
+				case APP_CMD_RESUME: {
+					ygo::gSoundManager->PauseMusic(false);
+					break;
+				}
+				case APP_CMD_DESTROY: {
+					ygo::mainGame->SaveConfig();
+					break;
+				}
+				default: break;
 			}
-			case APP_CMD_RESUME: {
-				ygo::gSoundManager->PauseMusic(false);
-				break;
-			}
-			case APP_CMD_DESTROY: {
-				ygo::mainGame->SaveConfig();
-				break;
-			}
-			default: break;
+			stopPropagation = false;
+			return true;
 		}
-		stopPropagation = false;
-		return true;
-	}
-	case irr::EET_TOUCH_INPUT_EVENT: {
-		irr::SEvent translated;
-		memset(&translated, 0, sizeof(irr::SEvent));
-		translated.EventType = irr::EET_MOUSE_INPUT_EVENT;
+		case irr::EET_TOUCH_INPUT_EVENT: {
+			irr::SEvent translated;
+			memset(&translated, 0, sizeof(irr::SEvent));
+			translated.EventType = irr::EET_MOUSE_INPUT_EVENT;
 
-		translated.MouseInput.X = event.TouchInput.X;
-		translated.MouseInput.Y = event.TouchInput.Y;
-		translated.MouseInput.Control = false;
+			translated.MouseInput.X = event.TouchInput.X;
+			translated.MouseInput.Y = event.TouchInput.Y;
+			translated.MouseInput.Control = false;
 
-		switch(event.TouchInput.touchedCount) {
-			case 1:	{
-				switch(event.TouchInput.Event) {
-					case irr::ETIE_PRESSED_DOWN:
-						m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
-						translated.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
-						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-						irr::SEvent hoverEvent;
-						hoverEvent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-						hoverEvent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-						hoverEvent.MouseInput.X = event.TouchInput.X;
-						hoverEvent.MouseInput.Y = event.TouchInput.Y;
-						device->postEventFromUser(hoverEvent);
-						break;
-					case irr::ETIE_MOVED:
-						m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
-						translated.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
-						break;
-					case irr::ETIE_LEFT_UP:
-						translated.MouseInput.Event = irr::EMIE_LMOUSE_LEFT_UP;
-						translated.MouseInput.ButtonStates = 0;
-						// we don't have a valid pointer element use last
-						// known pointer pos
+			switch(event.TouchInput.touchedCount) {
+				case 1: {
+					switch(event.TouchInput.Event) {
+						case irr::ETIE_PRESSED_DOWN:
+							m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
+							translated.MouseInput.Event = irr::EMIE_LMOUSE_PRESSED_DOWN;
+							translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
+							irr::SEvent hoverEvent;
+							hoverEvent.EventType = irr::EET_MOUSE_INPUT_EVENT;
+							hoverEvent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
+							hoverEvent.MouseInput.X = event.TouchInput.X;
+							hoverEvent.MouseInput.Y = event.TouchInput.Y;
+							device->postEventFromUser(hoverEvent);
+							break;
+						case irr::ETIE_MOVED:
+							m_pointer = irr::core::position2di(event.TouchInput.X, event.TouchInput.Y);
+							translated.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
+							translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
+							break;
+						case irr::ETIE_LEFT_UP:
+							translated.MouseInput.Event = irr::EMIE_LMOUSE_LEFT_UP;
+							translated.MouseInput.ButtonStates = 0;
+							// we don't have a valid pointer element use last
+							// known pointer pos
+							translated.MouseInput.X = m_pointer.X;
+							translated.MouseInput.Y = m_pointer.Y;
+							break;
+						default:
+							stopPropagation = true;
+							return true;
+					}
+					break;
+				}
+				case 2: {
+					if(event.TouchInput.Event == irr::ETIE_PRESSED_DOWN) {
+						translated.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
+						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT | irr::EMBSM_RIGHT;
 						translated.MouseInput.X = m_pointer.X;
 						translated.MouseInput.Y = m_pointer.Y;
-						break;
-					default:
-						stopPropagation = true;
-						return true;
-				}
-				break;
-			}
-			case 2: {
-				if(event.TouchInput.Event == irr::ETIE_PRESSED_DOWN) {
-					translated.MouseInput.Event = irr::EMIE_RMOUSE_PRESSED_DOWN;
-					translated.MouseInput.ButtonStates = irr::EMBSM_LEFT | irr::EMBSM_RIGHT;
-					translated.MouseInput.X = m_pointer.X;
-					translated.MouseInput.Y = m_pointer.Y;
-					device->postEventFromUser(translated);
+						device->postEventFromUser(translated);
 
-					translated.MouseInput.Event = irr::EMIE_RMOUSE_LEFT_UP;
-					translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
+						translated.MouseInput.Event = irr::EMIE_RMOUSE_LEFT_UP;
+						translated.MouseInput.ButtonStates = irr::EMBSM_LEFT;
 
-					device->postEventFromUser(translated);
+						device->postEventFromUser(translated);
+					}
+					return true;
 				}
-				return true;
-			}
-			case 3:	{
-				if(event.TouchInput.Event == irr::ETIE_LEFT_UP) {
-					translated.EventType = irr::EET_KEY_INPUT_EVENT;
-					translated.KeyInput.Control = true;
-					translated.KeyInput.PressedDown = false;
-					translated.KeyInput.Key = irr::KEY_KEY_O;
-					device->postEventFromUser(translated);
+				case 3: {
+					if(event.TouchInput.Event == irr::ETIE_LEFT_UP) {
+						translated.EventType = irr::EET_KEY_INPUT_EVENT;
+						translated.KeyInput.Control = true;
+						translated.KeyInput.PressedDown = false;
+						translated.KeyInput.Key = irr::KEY_KEY_O;
+						device->postEventFromUser(translated);
+					}
+					return true;
 				}
-				return true;
+				default:
+					return true;
 			}
-			default:
-				return true;
+
+			bool retval = device->postEventFromUser(translated);
+
+			if(event.TouchInput.Event == irr::ETIE_LEFT_UP) {
+				m_pointer = irr::core::position2di(0, 0);
+			}
+			stopPropagation = retval;
+			return true;
 		}
-
-		bool retval = device->postEventFromUser(translated);
-
-		if(event.TouchInput.Event == irr::ETIE_LEFT_UP) {
-			m_pointer = irr::core::position2di(0, 0);
-		}
-		stopPropagation = retval;
-		return true;
-	}
-	default: break;
+		default: break;
 	}
 	return false;
 }
@@ -604,7 +595,7 @@ void readConfigs() {
 		std::getline(confs, working_directory);
 		LOGI("Working directory: %s", working_directory.c_str());
 	}
-	if(working_directory.empty()){
+	if(working_directory.empty()) {
 		LOGI("working_dir not found");
 		exit(1);
 	}
@@ -613,7 +604,7 @@ void readConfigs() {
 
 int getLocalIP() {
 	jmethodID getIP = jnienv->GetMethodID(nativeActivity, "getLocalIpAddress",
-											   "()I");
+										  "()I");
 	if(getIP == 0) {
 		assert("porting::getLocalIP unable to find java getLocalIpAddress method" == 0);
 	}
@@ -623,7 +614,7 @@ int getLocalIP() {
 
 void launchWindbot(const std::string& args) {
 	jmethodID launchwindbot = jnienv->GetMethodID(nativeActivity, "launchWindbot",
-											   "(Ljava/lang/String;)V");
+												  "(Ljava/lang/String;)V");
 
 	if(launchwindbot == 0) {
 		assert("porting::launchWindbot unable to find java launchWindbot method" == 0);
@@ -637,7 +628,7 @@ void launchWindbot(const std::string& args) {
 
 void setTextToClipboard(const wchar_t* text) {
 	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard",
-											   "(Ljava/lang/String;)V");
+											"(Ljava/lang/String;)V");
 
 	if(setClip == 0) {
 		assert("porting::setTextToClipboard unable to find java setClipboard method" == 0);
@@ -650,7 +641,7 @@ void setTextToClipboard(const wchar_t* text) {
 const wchar_t* getTextFromClipboard() {
 	static std::wstring text;
 	jmethodID getClip = jnienv->GetMethodID(nativeActivity, "getClipboard",
-										  "()Ljava/lang/String;");
+											"()Ljava/lang/String;");
 	if(getClip == 0) {
 		assert("porting::getTextFromClipboard unable to find java getClipboard method" == 0);
 	}

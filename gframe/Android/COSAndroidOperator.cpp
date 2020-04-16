@@ -7,21 +7,18 @@
 #include "COSAndroidOperator.h"
 #include "porting_android.h"
 
-namespace irr
-{
+namespace irr {
 
 // constructor
-COSAndroidOperator::COSAndroidOperator()
-{
-	#ifdef _DEBUG
+COSAndroidOperator::COSAndroidOperator() {
+#ifdef _DEBUG
 	setDebugName("COSAndroidOperator");
-	#endif
+#endif
 }
 
 
 //! returns the current operating system version as string.
-const core::stringc& COSAndroidOperator::getOperatingSystemVersion() const
-{
+const core::stringc& COSAndroidOperator::getOperatingSystemVersion() const {
 	return OperatingSystem;
 }
 
@@ -41,13 +38,11 @@ const wchar_t* COSAndroidOperator::getTextFromClipboard() const {
 }
 
 
-bool COSAndroidOperator::getProcessorSpeedMHz(u32* MHz) const
-{
+bool COSAndroidOperator::getProcessorSpeedMHz(u32* MHz) const {
 	return false;
 }
 
-bool COSAndroidOperator::getSystemMemory(u32* Total, u32* Avail) const
-{
+bool COSAndroidOperator::getSystemMemory(u32* Total, u32* Avail) const {
 	return false;
 }
 

@@ -70,13 +70,13 @@ void displayKeyboard(bool pShow);
  * (1==multiline text input; 2==single line text input; 3=password field)
  */
 void showInputDialog(const std::string& acceptButton,
-		const  std::string& hint, const std::string& current, int editType);
+					 const  std::string& hint, const std::string& current, int editType);
 
 void showComboBox(const std::vector<std::string>& list);
 
 #ifndef SERVER
 float getDisplayDensity();
-std::pair<int,int> getDisplaySize();
+std::pair<int, int> getDisplaySize();
 #endif
 
 bool transformEvent(const irr::SEvent& event, bool& stopPropagation);

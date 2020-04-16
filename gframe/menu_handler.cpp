@@ -13,6 +13,17 @@
 #include "utils_gui.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
 #include "CGUITTFont/CGUITTFont.h"
+#include <IrrlichtDevice.h>
+#include <IGUIEnvironment.h>
+#include <IGUIButton.h>
+#include <IGUICheckBox.h>
+#include <IGUIComboBox.h>
+#include <IGUIContextMenu.h>
+#include <IGUIEditBox.h>
+#include <IGUIStaticText.h>
+#include <IGUITabControl.h>
+#include <IGUItable.h>
+#include <IGUIWindow.h>
 
 namespace ygo {
 

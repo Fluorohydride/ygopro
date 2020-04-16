@@ -5,45 +5,42 @@
 #ifndef __C_GUI_MENU_H_INCLUDED__
 #define __C_GUI_MENU_H_INCLUDED__
 
-#include "IrrCompileConfig.h"
+#include <IrrCompileConfig.h>
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include "CGUICustomContextMenu.h"
 
-namespace irr
-{
-namespace gui
-{
+namespace irr {
+namespace gui {
 
-	//! GUI menu interface.
-	class CGUICustomMenu : public CGUICustomContextMenu
-	{
-	public:
+//! GUI menu interface.
+class CGUICustomMenu : public CGUICustomContextMenu {
+public:
 
-		//! constructor
-		CGUICustomMenu(IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle);
+	//! constructor
+	CGUICustomMenu(IGUIEnvironment* environment, IGUIElement* parent, s32 id, core::rect<s32> rectangle);
 
-		static IGUIContextMenu* addCustomMenu(IGUIEnvironment* environment, IGUIElement* parent = nullptr, s32 id = -1, core::rect<s32>* rectangle = nullptr);
+	static IGUIContextMenu* addCustomMenu(IGUIEnvironment* environment, IGUIElement* parent = nullptr, s32 id = -1, core::rect<s32>* rectangle = nullptr);
 
-		//! draws the element and its children
-		virtual void draw();
+	//! draws the element and its children
+	virtual void draw();
 
-		//! called if an event happened.
-		virtual bool OnEvent(const SEvent& event);
+	//! called if an event happened.
+	virtual bool OnEvent(const SEvent& event);
 
-		//! Updates the absolute position.
-		virtual void updateAbsolutePosition();
+	//! Updates the absolute position.
+	virtual void updateAbsolutePosition();
 
-	protected:
+protected:
 
-		virtual void recalculateSize();
+	virtual void recalculateSize();
 
-		//! returns the item highlight-area
-		virtual core::rect<s32> getHRect(const SItem& i, const core::rect<s32>& absolute) const;
+	//! returns the item highlight-area
+	virtual core::rect<s32> getHRect(const SItem& i, const core::rect<s32>& absolute) const;
 
-		//! Gets drawing rect of Item
-		virtual core::rect<s32> getRect(const SItem& i, const core::rect<s32>& absolute) const;
-	};
+	//! Gets drawing rect of Item
+	virtual core::rect<s32> getRect(const SItem& i, const core::rect<s32>& absolute) const;
+};
 
 } // end namespace gui
 } // end namespace irr

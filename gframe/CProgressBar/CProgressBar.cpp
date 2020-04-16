@@ -1,4 +1,7 @@
 #include "CProgressBar.h"
+#include <IGUIEnvironment.h>
+#include <IGUIScrollBar.h>
+#include <IGUIStaticText.h>
 #include <string>
 
 IProgressBar::IProgressBar(irr::gui::IGUIEnvironment* guienv, const irr::core::recti& rectangle, irr::s32 id, irr::gui::IGUIElement* parent) :

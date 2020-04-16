@@ -7,11 +7,10 @@
 
 #include <algorithm> // std::find
 
-#include "IGUISkin.h"
-#include "IGUIEnvironment.h"
-#include "IVideoDriver.h"
-#include "IGUIFont.h"
-#include "IGUISpriteBank.h"
+#include <IGUISkin.h>
+#include <IGUIEnvironment.h>
+#include <IGUIFont.h>
+#include <IGUISpriteBank.h>
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 #include "../IrrlichtCommonIncludes1.9/CGUIScrollBar.h"
 #include "../IrrlichtCommonIncludes1.9/os.h"
@@ -443,7 +442,7 @@ void CGUIFileSelectListBox::selectNew(s32 ypos, bool onlyHover) {
 
 	recalculateScrollPos();
 
-	bool selagain = Selected >=0 && (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
+	bool selagain = Selected >= 0 && (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
 	prevRelPath = curRelPath;
 	selectTime = now;
 	if(selagain && Items[Selected].isDirectory && NativeDirectoryHandling) {
@@ -605,6 +604,7 @@ void CGUIFileSelectListBox::setAutoScrollEnabled(bool scroll) {
 
 
 bool CGUIFileSelectListBox::isAutoScrollEnabled() const {
+	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return AutoScroll;
 }
 
@@ -879,10 +879,8 @@ void CGUIFileSelectListBox::addFilteredExtensions(std::vector<std::wstring> exte
 }
 
 bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory, void *) {
-	if (is_directory) {
-		auto elements = ygo::Utils::TokenizeString<std::wstring>(name, L"/");
-		return !(elements.size() && elements.back().size() && elements.back().front() == L'.' && elements.back() != L"..");
-	}
+	if(is_directory)
+		return true;
 	auto pos = name.find_last_of('.');
 	if(pos == std::wstring::npos)
 		return false;

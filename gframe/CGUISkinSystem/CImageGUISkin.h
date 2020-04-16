@@ -4,7 +4,6 @@
 #include <IGUISkin.h>
 #include <irrString.h>
 #include <irrMap.h>
-#include <IGUISpriteBank.h>
 #include "../custom_skin_enum.h"
 
 namespace irr {
@@ -13,6 +12,8 @@ class IVideoDriver;
 class ITexture;
 }
 namespace gui {
+
+class IGUISpriteBank;
 
 struct SImageGUIElementStyle {
 	struct SBorder {

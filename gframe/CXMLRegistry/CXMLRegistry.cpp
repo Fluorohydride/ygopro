@@ -1,14 +1,17 @@
 #include "CXMLRegistry.h"
+#include <IFileSystem.h>
+#include <IGUITreeView.h>
+#include <IXMLWriter.h>
 
 #ifndef _WIN32
-inline int _wtoi(const wchar_t * str){
+inline int _wtoi(const wchar_t*  str){
 	return (int)wcstol(str, 0, 10);
 }
 #endif
 
 using namespace irr;
 
-CXMLRegistry::CXMLRegistry(io::IFileSystem *fsys) {
+CXMLRegistry::CXMLRegistry(io::IFileSystem* fsys) {
 	fileSystem = fsys;
 	fileSystem->grab();
 	registry = NULL;
@@ -17,7 +20,7 @@ CXMLRegistry::~CXMLRegistry() {
 	if(registry != NULL) registry->drop();
 	fileSystem->drop();
 }
-bool CXMLRegistry::isTopLevelNode(const wchar_t *node) {
+bool CXMLRegistry::isTopLevelNode(const wchar_t* node) {
 	if(registry->findChildByName(node)) return true;
 	else return false;
 }
@@ -46,23 +49,23 @@ CXMLNode* CXMLRegistry::resolveContext(const wchar_t* context) {
 	return currentNode;
 }
 
-void CXMLRegistry::setContext(const wchar_t *context) { currentContext = resolveContext(context); }
-const wchar_t *CXMLRegistry::convertBoolToText(bool boolval) {
+void CXMLRegistry::setContext(const wchar_t* context) { currentContext = resolveContext(context); }
+const wchar_t* CXMLRegistry::convertBoolToText(bool boolval) {
 	if(boolval) return L"true";
 	else return L"false";
 }
-bool CXMLRegistry::convertTextToBool(const wchar_t *textval) {
+bool CXMLRegistry::convertTextToBool(const wchar_t* textval) {
 	if(((core::stringw)textval).equals_ignore_case(L"true")) return true;
 	return false;
 }
-bool CXMLRegistry::setValue(const wchar_t *index, bool boolval, const wchar_t *context) {
+bool CXMLRegistry::setValue(const wchar_t* index, bool boolval, const wchar_t* context) {
 	return setValue(index,convertBoolToText(boolval),context);
 }
-bool CXMLRegistry::setValue(const wchar_t *index, u16 intval, const wchar_t *context) {
+bool CXMLRegistry::setValue(const wchar_t* index, u16 intval, const wchar_t* context) {
 	return setValue(index,((core::stringw)intval).c_str(),context);
 }
-bool CXMLRegistry::setValue(const wchar_t *index, const wchar_t * txtval, const wchar_t *context) {
-	CXMLNode *targetNode;
+bool CXMLRegistry::setValue(const wchar_t* index, const wchar_t*  txtval, const wchar_t* context) {
+	CXMLNode* targetNode;
 	targetNode = resolveContext(context);
 	if(!targetNode) return false;
 	targetNode = targetNode->findChildByName(index);
@@ -70,8 +73,8 @@ bool CXMLRegistry::setValue(const wchar_t *index, const wchar_t * txtval, const 
 	targetNode->setValue(txtval);
 	return true;
 }
-bool CXMLRegistry::populateTreeView(irr::gui::IGUITreeView *control, const wchar_t *context) {
-	CXMLNode *targetNode = NULL;
+bool CXMLRegistry::populateTreeView(irr::gui::IGUITreeView* control, const wchar_t* context) {
+	CXMLNode* targetNode = NULL;
 	if(context == 0) 
 		targetNode = registry;
 	else 
@@ -82,23 +85,23 @@ bool CXMLRegistry::populateTreeView(irr::gui::IGUITreeView *control, const wchar
 	
 }
 
-bool CXMLRegistry::getValueAsBool(const wchar_t *index, const wchar_t *context) {
+bool CXMLRegistry::getValueAsBool(const wchar_t* index, const wchar_t* context) {
 	return convertTextToBool(getValueAsCStr(index,context));
 }
 // little more robust
-u16 CXMLRegistry::getValueAsInt(const wchar_t *index, const wchar_t *context) {
+u16 CXMLRegistry::getValueAsInt(const wchar_t* index, const wchar_t* context) {
 	core::stringw tmp = getValueAsCStr(index,context);
 	if(tmp.equals_ignore_case("")) return 0;
 	else return _wtoi(tmp.c_str());
 }
-core::array<const wchar_t*>* CXMLRegistry::listNonNodeChildren(const wchar_t *node,const wchar_t *context) {
-	CXMLNode *targetNode;
+core::array<const wchar_t*>* CXMLRegistry::listNonNodeChildren(const wchar_t* node,const wchar_t* context) {
+	CXMLNode* targetNode;
 	targetNode = resolveContext(context);
 	if(!targetNode) return 0;
 	return targetNode->listNonNodeChildren();
 }
-core::array<const wchar_t*>* CXMLRegistry::listNodeChildren(const wchar_t *node,const wchar_t *context) {
-	CXMLNode *targetNode;
+core::array<const wchar_t*>* CXMLRegistry::listNodeChildren(const wchar_t* node,const wchar_t* context) {
+	CXMLNode* targetNode;
 	targetNode = resolveContext(context);
 	if(!targetNode) return 0;
 	return targetNode->listNodeChildren();
@@ -106,23 +109,23 @@ core::array<const wchar_t*>* CXMLRegistry::listNodeChildren(const wchar_t *node,
 
 //BROKEN
 /*
-const irr::c8 *CXMLRegistry::getValueAsCharCStr(const wchar_t *index, const wchar_t *context) {
+const irr::c8* CXMLRegistry::getValueAsCharCStr(const wchar_t* index, const wchar_t* context) {
 	irr::core::stringc temp;
 	temp = getValueAsCStr(index,context);
-	return (const irr::c8 *)temp.c_str();
+	return (const irr::c8* )temp.c_str();
 
 }
 */
-const wchar_t *CXMLRegistry::getValueAsCStr(const wchar_t *index, const wchar_t *context) {
-	CXMLNode *targetNode;
+const wchar_t* CXMLRegistry::getValueAsCStr(const wchar_t* index, const wchar_t* context) {
+	CXMLNode* targetNode;
 	targetNode = resolveContext(context);
 	if(!targetNode) return 0;
 	targetNode = targetNode->findChildByName(index);
 	if(!targetNode) return 0;
 	return targetNode->getValue();
 }
-irr::core::rect<u32> CXMLRegistry::getValueAsRect(const wchar_t *context) {
-	CXMLNode *targetNode = resolveContext(context);
+irr::core::rect<u32> CXMLRegistry::getValueAsRect(const wchar_t* context) {
+	CXMLNode* targetNode = resolveContext(context);
 	irr::u32 tx,ty,bx,by;	
 	if(!targetNode) return irr::core::rect<u32>(0,0,0,0);
 	tx =  _wtoi(targetNode->findChildByName(L"tlx")->getValue());
@@ -137,8 +140,8 @@ irr::core::rect<u32> CXMLRegistry::getValueAsRect(const wchar_t *context) {
 	else return irr::core::rect<u32>(tx,ty,bx,by);
 }
 // Made more robust
-irr::video::SColor CXMLRegistry::getValueAsColor(const wchar_t *context) {
-	CXMLNode *targetNode = resolveContext(context);
+irr::video::SColor CXMLRegistry::getValueAsColor(const wchar_t* context) {
+	CXMLNode* targetNode = resolveContext(context);
 	if(!targetNode) return { 0 };
 	irr::u32 r,g,b,a;
 	irr::core::stringw tmp;
@@ -160,9 +163,9 @@ irr::video::SColor CXMLRegistry::getValueAsColor(const wchar_t *context) {
 	if(tmp.size()) a = _wtoi(tmp.c_str());
 	return irr::video::SColor(a,r,g,b);
 }
-bool CXMLRegistry::writeFile(const irr::c8 *fname,const c8 *path) {
+bool CXMLRegistry::writeFile(const irr::c8* fname,const c8* path) {
 	io::IXMLWriter* xml; 
-	CXMLNode *currentnode = 0;
+	CXMLNode* currentnode = 0;
     core::stringw wstmp;
 	core::stringc fileName;
 	wstmp = fname;
@@ -182,7 +185,7 @@ bool CXMLRegistry::writeFile(const irr::c8 *fname,const c8 *path) {
 	return true;
 }
 // check current folder, if there isnt anything in current, use default
-const c8 *CXMLRegistry::resolveConfigPath(const c8 *fname) {
+const c8* CXMLRegistry::resolveConfigPath(const c8* fname) {
 	core::string <c8> filename;
 	bool useCurrent = true;
 	filename = "config/current/";
@@ -194,20 +197,20 @@ const c8 *CXMLRegistry::resolveConfigPath(const c8 *fname) {
 	return useCurrent?"config/current/":"config/defaults/";
 }
 
-bool CXMLRegistry::loadConfigFile(const c8 *fname) {	
+bool CXMLRegistry::loadConfigFile(const c8* fname) {	
 	return loadFile(fname, resolveConfigPath(fname));
 }
-bool CXMLRegistry::writeConfigFile(const c8 *fname) {
+bool CXMLRegistry::writeConfigFile(const c8* fname) {
 	return writeFile(fname,"config/current/");
 }
 
 
 // This is tricky, we have to keep track of which nodes are 'open'
-bool CXMLRegistry::loadFile(const c8 *fname, const c8 *path) {
+bool CXMLRegistry::loadFile(const c8* fname, const c8* path) {
 	io::IXMLReader* xml;
-	CXMLNode *currentNode = 0;
-	CXMLNode *topNode = 0;
-	CXMLNode *currentParent;
+	CXMLNode* currentNode = 0;
+	CXMLNode* topNode = 0;
+	CXMLNode* currentParent;
 	core::string <c8> filename;	
 	
 	filename = path;
@@ -225,7 +228,7 @@ bool CXMLRegistry::loadFile(const c8 *fname, const c8 *path) {
 		registry->setType(CXMLNODETYPE_NODE);
 	}
 	while(xml && xml->read()) {
-		CXMLNode *newNode = 0;			
+		CXMLNode* newNode = 0;			
 		switch(xml->getNodeType()) {
 			case io::EXN_ELEMENT :
 				u16 i;

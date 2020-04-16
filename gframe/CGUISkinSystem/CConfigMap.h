@@ -3,7 +3,6 @@
 
 #include <irrMap.h>
 #include <irrString.h>
-#include <irrTypes.h>
 #include <vector2d.h>
 #include <vector3d.h>
 

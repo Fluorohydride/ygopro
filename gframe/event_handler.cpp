@@ -20,6 +20,17 @@
 #include <android_native_app_glue.h>
 #include "Android/porting_android.h"
 #endif
+#include <IrrlichtDevice.h>
+#include <IGUIEnvironment.h>
+#include <IGUIWindow.h>
+#include <IGUIStaticText.h>
+#include <IGUIEditBox.h>
+#include <IGUIComboBox.h>
+#include <IGUIListBox.h>
+#include <IGUICheckBox.h>
+#include <IGUIContextMenu.h>
+#include <IGUITabControl.h>
+#include <IGUIScrollBar.h>
 
 namespace ygo {
 
@@ -2582,11 +2593,11 @@ void ClientField::SetResponseSelectedCards() const {
 			DuelClient::SetResponseB(ret.data.data(), ret.data.size());
 		}
 	} else {
-		unsigned char respbuf[64];
-		respbuf[0] = selected_cards.size() + must_select_cards.size();
+		uint8_t respbuf[64];
+		respbuf[0] = static_cast<uint8_t>(selected_cards.size() + must_select_cards.size());
 		auto offset = must_select_cards.size() + 1;
 		for(size_t i = 0; i < selected_cards.size(); ++i)
-			respbuf[i + offset] = selected_cards[i]->select_seq;
+			respbuf[i + offset] = static_cast<uint8_t>(selected_cards[i]->select_seq);
 		DuelClient::SetResponseB(respbuf, selected_cards.size() + must_select_cards.size() + 1);
 	}
 }

@@ -5,16 +5,14 @@
 
 #ifdef __ANDROID__
 
-#include "IOSOperator.h"
+#include <IOSOperator.h>
 
-namespace irr
-{
+namespace irr {
 
 class CIrrDeviceLinux;
 
 //! The Operating system operator provides operation system specific methods and information.
-class COSAndroidOperator : public IOSOperator
-{
+class COSAndroidOperator : public IOSOperator {
 public:
 
 	COSAndroidOperator();

@@ -1,11 +1,12 @@
 #include "CGUICustomText.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
-#include "IGUISkin.h"
-#include "IGUIEnvironment.h"
-#include "IGUIFont.h"
-#include "IVideoDriver.h"
-#include "rect.h"
+#include <IGUISkin.h>
+#include <IGUIEnvironment.h>
+#include <IGUIScrollBar.h>
+#include <IGUIFont.h>
+#include <IVideoDriver.h>
+#include <rect.h>
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 #include "../IrrlichtCommonIncludes1.9/os.h"
 #else
@@ -14,36 +15,32 @@
 #include <algorithm>
 #include <cmath>
 
-namespace irr
-{
-namespace gui
-{
+namespace irr {
+namespace gui {
 
 //! constructor
 CGUICustomText::CGUICustomText(const wchar_t* text, bool border, IGUIEnvironment* environment, IGUIElement* parent,
-			s32 id, const core::rect<s32>& rectangle, bool background)
-: IGUIStaticText(environment, parent, id, rectangle),
+							   s32 id, const core::rect<s32>& rectangle, bool background)
+	: IGUIStaticText(environment, parent, id, rectangle),
 	HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_UPPERLEFT),
 	Border(border), OverrideColorEnabled(false), OverrideBGColorEnabled(false), WordWrap(false), Background(background),
 	RestrainTextInside(true), RightToLeft(false),
-	OverrideColor(video::SColor(101,255,255,255)), BGColor(video::SColor(101,210,210,210)), animationWaitStart(0),
+	OverrideColor(video::SColor(101, 255, 255, 255)), BGColor(video::SColor(101, 210, 210, 210)), animationWaitStart(0),
 	OverrideFont(nullptr), LastBreakFont(nullptr), scrText(nullptr), prev_time(0), scrolling(NO_SCROLLING), maxFrame(0), curFrame(0.0f),
 	frameTimer(0.0f), forcedSteps(0), forcedStepsRatio(0.0f), animationStep(0), animationWaitEnd(0), increasingFrame(false),
-	waitingEndFrame(false), ScrollWidth(0), ScrollRatio(0.0f), TouchControl(false), was_pressed(false), prev_position(core::position2di(0, 0))
-{
-	#ifdef _DEBUG
+	waitingEndFrame(false), ScrollWidth(0), ScrollRatio(0.0f), TouchControl(false), was_pressed(false), prev_position(core::position2di(0, 0)) {
+#ifdef _DEBUG
 	setDebugName("CGUICustomText");
-	#endif
+#endif
 
 	Text = text;
-	if (environment && environment->getSkin())
-	{
+	if(environment && environment->getSkin()) {
 		BGColor = environment->getSkin()->getColor(gui::EGDC_3D_FACE);
 	}
 }
 
 CGUICustomText* CGUICustomText::addCustomText(const wchar_t* text, bool border, IGUIEnvironment* environment,
-	IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool background) {
+											  IGUIElement* parent, s32 id, const core::rect<s32>& rectangle, bool background) {
 	CGUICustomText* obj = new CGUICustomText(text, border, environment, parent, id, rectangle, background);
 	obj->drop();
 	return obj;
@@ -51,9 +48,8 @@ CGUICustomText* CGUICustomText::addCustomText(const wchar_t* text, bool border, 
 
 
 //! destructor
-CGUICustomText::~CGUICustomText()
-{
-	if (OverrideFont)
+CGUICustomText::~CGUICustomText() {
+	if(OverrideFont)
 		OverrideFont->drop();
 }
 
@@ -62,21 +58,25 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 		return IGUIElement::OnEvent(event);
 	if(isEnabled()) {
 		switch(event.EventType) {
-			case EET_MOUSE_INPUT_EVENT: {
+			case EET_MOUSE_INPUT_EVENT:
+			{
 				switch(event.MouseInput.Event) {
-					case EMIE_LMOUSE_PRESSED_DOWN: {
+					case EMIE_LMOUSE_PRESSED_DOWN:
+					{
 						if(!was_pressed) {
 							was_pressed = true;
 							prev_position = core::position2di(event.MouseInput.X, event.MouseInput.Y);
 						}
 						break;
 					}
-					case EMIE_LMOUSE_LEFT_UP: {
+					case EMIE_LMOUSE_LEFT_UP:
+					{
 						was_pressed = false;
 						prev_position = core::position2di(0, 0);
 						break;
 					}
-					case EMIE_MOUSE_MOVED: {
+					case EMIE_MOUSE_MOVED:
+					{
 						if(was_pressed) {
 							if(scrText && scrText->isEnabled()) {
 								auto diff = prev_position.Y - event.MouseInput.Y;
@@ -87,7 +87,7 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 						break;
 					}
 				}
-			 }
+			}
 		}
 	}
 	return false;
@@ -95,13 +95,12 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 
 
 //! draws the element and its children
-void CGUICustomText::draw()
-{
-	if (!IsVisible)
+void CGUICustomText::draw() {
+	if(!IsVisible)
 		return;
 
 	IGUISkin* skin = Environment->getSkin();
-	if (!skin)
+	if(!skin)
 		return;
 	video::IVideoDriver* driver = Environment->getVideoDriver();
 
@@ -109,9 +108,8 @@ void CGUICustomText::draw()
 
 	// draw background
 
-	if (Background)
-	{
-		if ( !OverrideBGColorEnabled )	// skin-colors can change
+	if(Background) {
+		if(!OverrideBGColorEnabled)	// skin-colors can change
 			BGColor = skin->getColor(gui::EGDC_3D_FACE);
 
 		driver->draw2DRectangle(BGColor, frameRect, &AbsoluteClippingRect);
@@ -119,8 +117,7 @@ void CGUICustomText::draw()
 
 	// draw the border
 
-	if (Border)
-	{
+	if(Border) {
 		skin->draw3DSunkenPane(this, 0, true, false, frameRect, &AbsoluteClippingRect);
 		frameRect.UpperLeftCorner.X += skin->getSize(EGDS_TEXT_DISTANCE_X);
 	}
@@ -128,12 +125,10 @@ void CGUICustomText::draw()
 	auto delta_time = now - prev_time;
 	prev_time = now;
 	// draw the text
-	if (Text.size())
-	{
+	if(Text.size()) {
 		IGUIFont* font = getActiveFont();
 
-		if (font)
-		{
+		if(font) {
 			bool autoscrolling = scrolling != NO_SCROLLING && !!animationStep;
 			if(frameTimer)
 				frameTimer -= std::min((float)delta_time * 60.0f / 1000.0f, frameTimer);
@@ -162,15 +157,12 @@ void CGUICustomText::draw()
 					}
 				}
 			}
-			if (!WordWrap)
-			{
-				if (VAlign == EGUIA_LOWERRIGHT)
-				{
+			if(!WordWrap) {
+				if(VAlign == EGUIA_LOWERRIGHT) {
 					frameRect.UpperLeftCorner.Y = frameRect.LowerRightCorner.Y -
 						font->getDimension(L"A").Height - font->getKerningHeight();
 				}
-				if (HAlign == EGUIA_LOWERRIGHT)
-				{
+				if(HAlign == EGUIA_LOWERRIGHT) {
 					frameRect.UpperLeftCorner.X = frameRect.LowerRightCorner.X -
 						font->getDimension(Text.c_str()).Width;
 				}
@@ -181,12 +173,10 @@ void CGUICustomText::draw()
 					frameRect.UpperLeftCorner.Y -= round((float)curFrame * animationStep);
 
 				font->draw(Text.c_str(), frameRect,
-					OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
-					HAlign == EGUIA_CENTER && !autoscrolling && hasHorizontalAutoscrolling(), VAlign == EGUIA_CENTER && !autoscrolling && hasVerticalAutoscrolling(), (RestrainTextInside ? &AbsoluteClippingRect : NULL));
-			}
-			else
-			{
-				if (font != LastBreakFont)
+						   OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
+						   HAlign == EGUIA_CENTER && !autoscrolling && hasHorizontalAutoscrolling(), VAlign == EGUIA_CENTER && !autoscrolling && hasVerticalAutoscrolling(), (RestrainTextInside ? &AbsoluteClippingRect : NULL));
+			} else {
+				if(font != LastBreakFont)
 					breakText();
 
 				int offset = (scrText && scrText->isEnabled()) ? scrText->getPos() : 0;
@@ -194,12 +184,9 @@ void CGUICustomText::draw()
 				core::rect<s32> r = frameRect;
 				s32 height = font->getDimension(L"A").Height + font->getKerningHeight();
 				s32 totalHeight = height * BrokenText.size();
-				if (VAlign == EGUIA_CENTER)
-				{
+				if(VAlign == EGUIA_CENTER) {
 					r.UpperLeftCorner.Y = r.getCenter().Y - (totalHeight / 2);
-				}
-				else if (VAlign == EGUIA_LOWERRIGHT)
-				{
+				} else if(VAlign == EGUIA_LOWERRIGHT) {
 					r.UpperLeftCorner.Y = r.LowerRightCorner.Y - totalHeight;
 				}
 
@@ -231,50 +218,45 @@ void CGUICustomText::draw()
 
 
 //! Sets another skin independent font.
-void CGUICustomText::setOverrideFont(IGUIFont* font)
-{
-	if (OverrideFont == font)
+void CGUICustomText::setOverrideFont(IGUIFont* font) {
+	if(OverrideFont == font)
 		return;
 
-	if (OverrideFont)
+	if(OverrideFont)
 		OverrideFont->drop();
 
 	OverrideFont = font;
 
-	if (OverrideFont)
+	if(OverrideFont)
 		OverrideFont->grab();
 
 	breakText();
 }
 
 //! Gets the override font (if any)
-IGUIFont * CGUICustomText::getOverrideFont() const
-{
+IGUIFont * CGUICustomText::getOverrideFont() const {
 	return OverrideFont;
 }
 
 //! Get the font which is used right now for drawing
-IGUIFont* CGUICustomText::getActiveFont() const
-{
-	if ( OverrideFont )
+IGUIFont* CGUICustomText::getActiveFont() const {
+	if(OverrideFont)
 		return OverrideFont;
 	IGUISkin* skin = Environment->getSkin();
-	if (skin)
+	if(skin)
 		return skin->getFont();
 	return 0;
 }
 
 //! Sets another color for the text.
-void CGUICustomText::setOverrideColor(video::SColor color)
-{
+void CGUICustomText::setOverrideColor(video::SColor color) {
 	OverrideColor = color;
 	OverrideColorEnabled = true;
 }
 
 
 //! Sets another color for the text.
-void CGUICustomText::setBackgroundColor(video::SColor color)
-{
+void CGUICustomText::setBackgroundColor(video::SColor color) {
 	BGColor = color;
 	OverrideBGColorEnabled = true;
 	Background = true;
@@ -282,107 +264,95 @@ void CGUICustomText::setBackgroundColor(video::SColor color)
 
 
 //! Sets whether to draw the background
-void CGUICustomText::setDrawBackground(bool draw)
-{
+void CGUICustomText::setDrawBackground(bool draw) {
 	Background = draw;
 }
 
 
 //! Gets the background color
-video::SColor CGUICustomText::getBackgroundColor() const
-{
+video::SColor CGUICustomText::getBackgroundColor() const {
 	return BGColor;
 }
 
 
 //! Checks if background drawing is enabled
-bool CGUICustomText::isDrawBackgroundEnabled() const
-{
+bool CGUICustomText::isDrawBackgroundEnabled() const {
+	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Background;
 }
 
 
 //! Sets whether to draw the border
-void CGUICustomText::setDrawBorder(bool draw)
-{
+void CGUICustomText::setDrawBorder(bool draw) {
 	Border = draw;
 }
 
 
 //! Checks if border drawing is enabled
-bool CGUICustomText::isDrawBorderEnabled() const
-{
+bool CGUICustomText::isDrawBorderEnabled() const {
+	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Border;
 }
 
 
-void CGUICustomText::setTextRestrainedInside(bool restrainTextInside)
-{
+void CGUICustomText::setTextRestrainedInside(bool restrainTextInside) {
 	RestrainTextInside = restrainTextInside;
 }
 
 
-bool CGUICustomText::isTextRestrainedInside() const
-{
+bool CGUICustomText::isTextRestrainedInside() const {
 	return RestrainTextInside;
 }
 
 
-void CGUICustomText::setTextAlignment(EGUI_ALIGNMENT horizontal, EGUI_ALIGNMENT vertical)
-{
+void CGUICustomText::setTextAlignment(EGUI_ALIGNMENT horizontal, EGUI_ALIGNMENT vertical) {
 	HAlign = horizontal;
 	VAlign = vertical;
 }
 
 
-video::SColor CGUICustomText::getOverrideColor() const
-{
+video::SColor CGUICustomText::getOverrideColor() const {
 	return OverrideColor;
 }
 
 
 //! Sets if the static text should use the overide color or the
 //! color in the gui skin.
-void CGUICustomText::enableOverrideColor(bool enable)
-{
+void CGUICustomText::enableOverrideColor(bool enable) {
 	OverrideColorEnabled = enable;
 }
 
 
-bool CGUICustomText::isOverrideColorEnabled() const
-{
+bool CGUICustomText::isOverrideColorEnabled() const {
+	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return OverrideColorEnabled;
 }
 
 
 //! Enables or disables word wrap for using the static text as
 //! multiline text control.
-void CGUICustomText::setWordWrap(bool enable)
-{
+void CGUICustomText::setWordWrap(bool enable) {
 	WordWrap = enable;
 	breakText();
 	updateAutoScrollingStuff();
 }
 
 
-bool CGUICustomText::isWordWrapEnabled() const
-{
+bool CGUICustomText::isWordWrapEnabled() const {
+	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return WordWrap;
 }
 
 
-void CGUICustomText::setRightToLeft(bool rtl)
-{
-	if (RightToLeft != rtl)
-	{
+void CGUICustomText::setRightToLeft(bool rtl) {
+	if(RightToLeft != rtl) {
 		RightToLeft = rtl;
 		breakText();
 	}
 }
 
 
-bool CGUICustomText::isRightToLeft() const
-{
+bool CGUICustomText::isRightToLeft() const {
 	return RightToLeft;
 }
 
@@ -408,9 +378,8 @@ void CGUICustomText::breakText() {
 }
 
 //! Breaks the single text line.
-void CGUICustomText::breakText(bool scrollbar_spacing)
-{
-	if (!WordWrap)
+void CGUICustomText::breakText(bool scrollbar_spacing) {
+	if(!WordWrap)
 		return;
 
 	if(scrollbar_spacing && !scrText)
@@ -420,7 +389,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 
 	IGUISkin* skin = Environment->getSkin();
 	IGUIFont* font = getActiveFont();
-	if (!font)
+	if(!font)
 		return;
 
 	LastBreakFont = font;
@@ -431,8 +400,8 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 	s32 size = Text.size();
 	s32 length = 0;
 	s32 elWidth = RelativeRect.getWidth();
-	if (Border)
-		elWidth -= 2*skin->getSize(EGDS_TEXT_DISTANCE_X);
+	if(Border)
+		elWidth -= 2 * skin->getSize(EGDS_TEXT_DISTANCE_X);
 	if(scrollbar_spacing)
 		elWidth -= scrText->getRelativePosition().getWidth();
 	elWidth = std::max(elWidth, 0);
@@ -443,64 +412,54 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 	// We have to deal with right-to-left and left-to-right differently
 	// However, most parts of the following code is the same, it's just
 	// some order and boundaries which change.
-	if (!RightToLeft)
-	{
+	if(!RightToLeft) {
 		// regular (left-to-right)
-		for (s32 i=0; i<size; ++i)
-		{
+		for(s32 i = 0; i < size; ++i) {
 			c = Text[i];
 			bool lineBreak = false;
 
-			if (c == L'\r') // Mac or Windows breaks
+			if(c == L'\r') // Mac or Windows breaks
 			{
 				lineBreak = true;
-				if (Text[i+1] == L'\n') // Windows breaks
+				if(Text[i + 1] == L'\n') // Windows breaks
 				{
-					Text.erase(i+1);
+					Text.erase(i + 1);
 					--size;
 				}
 				c = '\0';
-			}
-			else if (c == L'\n') // Unix breaks
+			} else if(c == L'\n') // Unix breaks
 			{
 				lineBreak = true;
 				c = '\0';
 			}
 
 			bool isWhitespace = (c == L' ' || c == 0);
-			if ( !isWhitespace )
-			{
+			if(!isWhitespace) {
 				// part of a word
 				word += c;
 			}
 
-			if ( isWhitespace || i == (size-1))
-			{
-				if (word.size())
-				{
+			if(isWhitespace || i == (size - 1)) {
+				if(word.size()) {
 					// here comes the next whitespace, look if
 					// we must break the last word to the next line.
 					const s32 whitelgth = font->getDimension(whitespace.c_str()).Width;
 					s32 wordlgth = font->getDimension(word.c_str()).Width;
 
-					if (wordlgth > elWidth)
-					{
+					if(wordlgth > elWidth) {
 						// This word is too long to fit in the available space, look for
 						// the Unicode Soft HYphen (SHY / 00AD) character for a place to
 						// break the word at
-						int where = word.findFirst( wchar_t(0x00AD) );
-						if (where != -1)
-						{
-							core::stringw first  = word.subString(0, where);
+						int where = word.findFirst(wchar_t(0x00AD));
+						if(where != -1) {
+							core::stringw first = word.subString(0, where);
 							core::stringw second = word.subString(where, word.size() - where);
 							BrokenText.push_back(line + first + L"-");
 							const s32 secondLength = font->getDimension(second.c_str()).Width;
 
 							length = secondLength;
 							line = second;
-						}
-						else
-						{
+						} else {
 							// No soft hyphen found, so there's nothing more we can do
 							// break line in pieces
 							core::stringw second;
@@ -530,16 +489,12 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 							line = second;
 							length = secondLength;
 						}
-					}
-					else if (length && (length + wordlgth + whitelgth > elWidth))
-					{
+					} else if(length && (length + wordlgth + whitelgth > elWidth)) {
 						// break to next line
 						BrokenText.push_back(line);
 						length = wordlgth;
 						line = word;
-					}
-					else
-					{
+					} else {
 						// add word to line
 						line += whitespace;
 						line += word;
@@ -550,14 +505,12 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 					whitespace = L"";
 				}
 
-				if ( isWhitespace )
-				{
+				if(isWhitespace) {
 					whitespace += c;
 				}
 
 				// compute line break
-				if (lineBreak)
-				{
+				if(lineBreak) {
 					line += whitespace;
 					line += word;
 					BrokenText.push_back(line);
@@ -572,49 +525,40 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 		line += whitespace;
 		line += word;
 		BrokenText.push_back(line);
-	}
-	else
-	{
+	} else {
 		// right-to-left
-		for (s32 i=size; i>=0; --i)
-		{
+		for(s32 i = size; i >= 0; --i) {
 			c = Text[i];
 			bool lineBreak = false;
 
-			if (c == L'\r') // Mac or Windows breaks
+			if(c == L'\r') // Mac or Windows breaks
 			{
 				lineBreak = true;
-				if ((i>0) && Text[i-1] == L'\n') // Windows breaks
+				if((i > 0) && Text[i - 1] == L'\n') // Windows breaks
 				{
-					Text.erase(i-1);
+					Text.erase(i - 1);
 					--size;
 				}
 				c = '\0';
-			}
-			else if (c == L'\n') // Unix breaks
+			} else if(c == L'\n') // Unix breaks
 			{
 				lineBreak = true;
 				c = '\0';
 			}
 
-			if (c==L' ' || c==0 || i==0)
-			{
-				if (word.size())
-				{
+			if(c == L' ' || c == 0 || i == 0) {
+				if(word.size()) {
 					// here comes the next whitespace, look if
 					// we must break the last word to the next line.
 					const s32 whitelgth = font->getDimension(whitespace.c_str()).Width;
 					const s32 wordlgth = font->getDimension(word.c_str()).Width;
 
-					if (length && (length + wordlgth + whitelgth > elWidth))
-					{
+					if(length && (length + wordlgth + whitelgth > elWidth)) {
 						// break to next line
 						BrokenText.push_back(line);
 						length = wordlgth;
 						line = word;
-					}
-					else
-					{
+					} else {
 						// add word to line
 						line = whitespace + line;
 						line = word + line;
@@ -625,12 +569,11 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 					whitespace = L"";
 				}
 
-				if (c != 0)
+				if(c != 0)
 					whitespace = core::stringw(&c, 1) + whitespace;
 
 				// compute line break
-				if (lineBreak)
-				{
+				if(lineBreak) {
 					line = whitespace + line;
 					line = word + line;
 					BrokenText.push_back(line);
@@ -639,9 +582,7 @@ void CGUICustomText::breakText(bool scrollbar_spacing)
 					whitespace = L"";
 					length = 0;
 				}
-			}
-			else
-			{
+			} else {
 				// yippee this is a word..
 				word = core::stringw(&c, 1) + word;
 			}
@@ -687,16 +628,14 @@ void CGUICustomText::updateAutoScrollingStuff() {
 }
 
 //! Sets the new caption of this element.
-void CGUICustomText::setText(const wchar_t* text)
-{
+void CGUICustomText::setText(const wchar_t* text) {
 	IGUIElement::setText(text);
 	breakText();
 	updateAutoScrollingStuff();
 }
 
 
-void CGUICustomText::updateAbsolutePosition()
-{
+void CGUICustomText::updateAbsolutePosition() {
 	auto prev_rect = RelativeRect;
 	IGUIElement::updateAbsolutePosition();
 	if(scrText) {
@@ -718,33 +657,29 @@ void CGUICustomText::updateAbsolutePosition()
 
 
 //! Returns the height of the text in pixels when it is drawn.
-s32 CGUICustomText::getTextHeight() const
-{
+s32 CGUICustomText::getTextHeight() const {
 	IGUIFont* font = getActiveFont();
-	if (!font)
+	if(!font)
 		return 0;
 
 	s32 height = font->getDimension(L"A").Height + font->getKerningHeight();
 
-	if (WordWrap)
+	if(WordWrap)
 		height *= BrokenText.size();
 
 	return height;
 }
 
 
-s32 CGUICustomText::getTextWidth() const
-{
+s32 CGUICustomText::getTextWidth() const {
 	IGUIFont * font = getActiveFont();
 	if(!font)
 		return 0;
 
-	if(WordWrap)
-	{
+	if(WordWrap) {
 		s32 widest = 0;
 
-		for(u32 line = 0; line < BrokenText.size(); ++line)
-		{
+		for(u32 line = 0; line < BrokenText.size(); ++line) {
 			s32 width = font->getDimension(BrokenText[line].c_str()).Width;
 
 			if(width > widest)
@@ -752,9 +687,7 @@ s32 CGUICustomText::getTextWidth() const
 		}
 
 		return widest;
-	}
-	else
-	{
+	} else {
 		return font->getDimension(Text.c_str()).Width;
 	}
 }
@@ -763,30 +696,28 @@ s32 CGUICustomText::getTextWidth() const
 //! Writes attributes of the element.
 //! Implement this to expose the attributes of your element for
 //! scripting languages, editors, debuggers or xml serialization purposes.
-void CGUICustomText::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options=0) const
-{
-	IGUIStaticText::serializeAttributes(out,options);
+void CGUICustomText::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options = 0) const {
+	IGUIStaticText::serializeAttributes(out, options);
 
-	out->addBool	("Border",              Border);
-	out->addBool	("OverrideColorEnabled",OverrideColorEnabled);
-	out->addBool	("OverrideBGColorEnabled",OverrideBGColorEnabled);
-	out->addBool	("WordWrap",		WordWrap);
-	out->addBool	("Background",          Background);
-	out->addBool	("RightToLeft",         RightToLeft);
-	out->addBool	("RestrainTextInside",  RestrainTextInside);
-	out->addColor	("OverrideColor",       OverrideColor);
-	out->addColor	("BGColor",       	BGColor);
-	out->addEnum	("HTextAlign",          HAlign, GUIAlignmentNames);
-	out->addEnum	("VTextAlign",          VAlign, GUIAlignmentNames);
+	out->addBool("Border", Border);
+	out->addBool("OverrideColorEnabled", OverrideColorEnabled);
+	out->addBool("OverrideBGColorEnabled", OverrideBGColorEnabled);
+	out->addBool("WordWrap", WordWrap);
+	out->addBool("Background", Background);
+	out->addBool("RightToLeft", RightToLeft);
+	out->addBool("RestrainTextInside", RestrainTextInside);
+	out->addColor("OverrideColor", OverrideColor);
+	out->addColor("BGColor", BGColor);
+	out->addEnum("HTextAlign", HAlign, GUIAlignmentNames);
+	out->addEnum("VTextAlign", VAlign, GUIAlignmentNames);
 
 	// out->addFont ("OverrideFont",	OverrideFont);
 }
 
 
 //! Reads attributes of the element
-void CGUICustomText::deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options=0)
-{
-	IGUIStaticText::deserializeAttributes(in,options);
+void CGUICustomText::deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options = 0) {
+	IGUIStaticText::deserializeAttributes(in, options);
 
 	Border = in->getAttributeAsBool("Border");
 	enableOverrideColor(in->getAttributeAsBool("OverrideColorEnabled"));
@@ -798,8 +729,8 @@ void CGUICustomText::deserializeAttributes(io::IAttributes* in, io::SAttributeRe
 	OverrideColor = in->getAttributeAsColor("OverrideColor");
 	BGColor = in->getAttributeAsColor("BGColor");
 
-	setTextAlignment( (EGUI_ALIGNMENT) in->getAttributeAsEnumeration("HTextAlign", GUIAlignmentNames),
-                      (EGUI_ALIGNMENT) in->getAttributeAsEnumeration("VTextAlign", GUIAlignmentNames));
+	setTextAlignment((EGUI_ALIGNMENT)in->getAttributeAsEnumeration("HTextAlign", GUIAlignmentNames),
+		(EGUI_ALIGNMENT)in->getAttributeAsEnumeration("VTextAlign", GUIAlignmentNames));
 
 	// OverrideFont = in->getAttributeAsFont("OverrideFont");
 }

@@ -1,6 +1,12 @@
 #ifndef IPROGRESSBAR_H_
 #define IPROGRESSBAR_H_
-#include <irrlicht.h>
+#include <IGUIElement.h>
+
+namespace irr {
+namespace gui {
+class IGUIStaticText;
+}
+}
 
 class IProgressBar : public irr::gui::IGUIElement {
 public:

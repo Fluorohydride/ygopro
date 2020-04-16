@@ -7,46 +7,43 @@
 
 #include <string>
 #include <vector>
-#include "IGUIEnvironment.h"
-#include "IVideoDriver.h"
-#include "IGUISkin.h"
-#include "IGUIEnvironment.h"
-#include "IGUIFont.h"
-#include "IGUIButton.h"
-#include "CGUIListBox.h"
-#include "os.h"
-#include "../Android/porting_android.h"
+#include <IGUIEnvironment.h>
+#include <IVideoDriver.h>
+#include <IGUISkin.h>
+#include <IGUIEnvironment.h>
+#include <IGUIFont.h>
+#include <IGUIButton.h>
+#include <CGUIListBox.h>
+#include "../IrrlichtCommonIncludes1.9/os.h"
+#include "../porting_android.h"
 #include "../bufferio.h"
 
-namespace irr
-{
-namespace gui
-{
+namespace irr {
+namespace gui {
 
 IGUIComboBox* CGUICustomComboBox::addCustomComboBox(IGUIEnvironment* environment, const core::rect<s32>& rectangle,
-		IGUIElement* parent, s32 id) {
-    if (!parent)
-        parent = environment->getRootGUIElement();
-    auto b = new CGUICustomComboBox(environment, parent, id, rectangle);
-    b->drop();
-    return b;
+													IGUIElement* parent, s32 id) {
+	if(!parent)
+		parent = environment->getRootGUIElement();
+	auto b = new CGUICustomComboBox(environment, parent, id, rectangle);
+	b->drop();
+	return b;
 }
 
 //! constructor
 CGUICustomComboBox::CGUICustomComboBox(IGUIEnvironment* environment, IGUIElement* parent,
-	s32 id, core::rect<s32> rectangle)
+									   s32 id, core::rect<s32> rectangle)
 	: IGUIComboBox(environment, parent, id, rectangle),
 	ListButton(0), SelectedText(0), ListBox(0), LastFocus(0),
-	Selected(-1), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER), MaxSelectionRows(5), HasFocus(false)
-{
-	#ifdef _DEBUG
+	Selected(-1), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER), MaxSelectionRows(5), HasFocus(false) {
+#ifdef _DEBUG
 	setDebugName("CGUICustomComboBox");
-	#endif
+#endif
 
 	IGUISkin* skin = Environment->getSkin();
 
 	s32 width = 15;
-	if (skin)
+	if(skin)
 		width = skin->getSize(EGDS_WINDOW_BUTTON_WIDTH);
 
 	core::rect<s32> r;
@@ -57,8 +54,7 @@ CGUICustomComboBox::CGUICustomComboBox(IGUIEnvironment* environment, IGUIElement
 	r.LowerRightCorner.Y = rectangle.getHeight() - 2;
 
 	ListButton = Environment->addButton(r, this, -1, L"");
-	if (skin && skin->getSpriteBank())
-	{
+	if(skin && skin->getSpriteBank()) {
 		ListButton->setSpriteBank(skin->getSpriteBank());
 		ListButton->setSprite(EGBS_BUTTON_UP, skin->getIcon(EGDI_CURSOR_DOWN), skin->getColor(EGDC_WINDOW_SYMBOL));
 		ListButton->setSprite(EGBS_BUTTON_DOWN, skin->getIcon(EGDI_CURSOR_DOWN), skin->getColor(EGDC_WINDOW_SYMBOL));
@@ -76,7 +72,7 @@ CGUICustomComboBox::CGUICustomComboBox(IGUIEnvironment* environment, IGUIElement
 	SelectedText->setSubElement(true);
 	SelectedText->setAlignment(EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT, EGUIA_UPPERLEFT, EGUIA_LOWERRIGHT);
 	SelectedText->setTextAlignment(EGUIA_UPPERLEFT, EGUIA_CENTER);
-	if (skin)
+	if(skin)
 		SelectedText->setOverrideColor(skin->getColor(EGDC_BUTTON_TEXT));
 	SelectedText->enableOverrideColor(true);
 
@@ -86,8 +82,7 @@ CGUICustomComboBox::CGUICustomComboBox(IGUIEnvironment* environment, IGUIElement
 }
 
 
-void CGUICustomComboBox::setTextAlignment(EGUI_ALIGNMENT horizontal, EGUI_ALIGNMENT vertical)
-{
+void CGUICustomComboBox::setTextAlignment(EGUI_ALIGNMENT horizontal, EGUI_ALIGNMENT vertical) {
 	HAlign = horizontal;
 	VAlign = vertical;
 	SelectedText->setTextAlignment(horizontal, vertical);
@@ -95,49 +90,42 @@ void CGUICustomComboBox::setTextAlignment(EGUI_ALIGNMENT horizontal, EGUI_ALIGNM
 
 
 //! Set the maximal number of rows for the selection listbox
-void CGUICustomComboBox::setMaxSelectionRows(u32 max)
-{
+void CGUICustomComboBox::setMaxSelectionRows(u32 max) {
 	MaxSelectionRows = max;
 }
 
 //! Get the maximimal number of rows for the selection listbox
-u32 CGUICustomComboBox::getMaxSelectionRows() const
-{
+u32 CGUICustomComboBox::getMaxSelectionRows() const {
 	return MaxSelectionRows;
 }
 
 
 //! Returns amount of items in box
-u32 CGUICustomComboBox::getItemCount() const
-{
+u32 CGUICustomComboBox::getItemCount() const {
 	return Items.size();
 }
 
 
 //! returns string of an item. the idx may be a value from 0 to itemCount-1
-const wchar_t* CGUICustomComboBox::getItem(u32 idx) const
-{
-	if (idx >= Items.size())
+const wchar_t* CGUICustomComboBox::getItem(u32 idx) const {
+	if(idx >= Items.size())
 		return 0;
 
 	return Items[idx].Name.c_str();
 }
 
 //! returns string of an item. the idx may be a value from 0 to itemCount-1
-u32 CGUICustomComboBox::getItemData(u32 idx) const
-{
-	if (idx >= Items.size())
+u32 CGUICustomComboBox::getItemData(u32 idx) const {
+	if(idx >= Items.size())
 		return 0;
 
 	return Items[idx].Data;
 }
 
 //! Returns index based on item data
-s32 CGUICustomComboBox::getIndexForItemData(u32 data ) const
-{
-	for ( u32 i = 0; i < Items.size (); ++i )
-	{
-		if ( Items[i].Data == data )
+s32 CGUICustomComboBox::getIndexForItemData(u32 data) const {
+	for(u32 i = 0; i < Items.size(); ++i) {
+		if(Items[i].Data == data)
 			return i;
 	}
 	return -1;
@@ -145,12 +133,11 @@ s32 CGUICustomComboBox::getIndexForItemData(u32 data ) const
 
 
 //! Removes an item from the combo box.
-void CGUICustomComboBox::removeItem(u32 idx)
-{
-	if (idx >= Items.size())
+void CGUICustomComboBox::removeItem(u32 idx) {
+	if(idx >= Items.size())
 		return;
 
-	if (Selected == (s32)idx)
+	if(Selected == (s32)idx)
 		setSelected(-1);
 
 	Items.erase(idx);
@@ -158,18 +145,16 @@ void CGUICustomComboBox::removeItem(u32 idx)
 
 
 //! Returns caption of this element.
-const wchar_t* CGUICustomComboBox::getText() const
-{
+const wchar_t* CGUICustomComboBox::getText() const {
 	return getItem(Selected);
 }
 
 
 //! adds an item and returns the index of it
-u32 CGUICustomComboBox::addItem(const wchar_t* text, u32 data)
-{
-	Items.push_back( SComboData ( text, data ) );
+u32 CGUICustomComboBox::addItem(const wchar_t* text, u32 data) {
+	Items.push_back(SComboData(text, data));
 
-	if (Selected == -1)
+	if(Selected == -1)
 		setSelected(0);
 
 	return Items.size() - 1;
@@ -177,28 +162,25 @@ u32 CGUICustomComboBox::addItem(const wchar_t* text, u32 data)
 
 
 //! deletes all items in the combo box
-void CGUICustomComboBox::clear()
-{
+void CGUICustomComboBox::clear() {
 	Items.clear();
 	setSelected(-1);
 }
 
 
 //! returns id of selected item. returns -1 if no item is selected.
-s32 CGUICustomComboBox::getSelected() const
-{
+s32 CGUICustomComboBox::getSelected() const {
 	return Selected;
 }
 
 
 //! sets the selected item. Set this to -1 if no item should be selected
-void CGUICustomComboBox::setSelected(s32 idx)
-{
-	if (idx < -1 || idx >= (s32)Items.size())
+void CGUICustomComboBox::setSelected(s32 idx) {
+	if(idx < -1 || idx >= (s32)Items.size())
 		return;
 
 	Selected = idx;
-	if (Selected == -1)
+	if(Selected == -1)
 		SelectedText->setText(L"");
 	else
 		SelectedText->setText(Items[Selected].Name.c_str());
@@ -206,44 +188,38 @@ void CGUICustomComboBox::setSelected(s32 idx)
 
 
 //! called if an event happened.
-bool CGUICustomComboBox::OnEvent(const SEvent& event)
-{
-	if (isEnabled())
-	{
-		switch(event.EventType)
-		{
-		case EET_GUI_EVENT:
+bool CGUICustomComboBox::OnEvent(const SEvent& event) {
+	if(isEnabled()) {
+		switch(event.EventType) {
+			case EET_GUI_EVENT:
 
-			switch(event.GUIEvent.EventType)
-			{
-			case EGET_BUTTON_CLICKED:
-				if (event.GUIEvent.Caller == ListButton)
-				{
-					Environment->setFocus(this);
-					openCloseMenu();
-					return true;
+				switch(event.GUIEvent.EventType) {
+					case EGET_BUTTON_CLICKED:
+						if(event.GUIEvent.Caller == ListButton) {
+							Environment->setFocus(this);
+							openCloseMenu();
+							return true;
+						}
+						break;
+					default:
+						break;
+				}
+				break;
+			case EET_MOUSE_INPUT_EVENT:
+
+				switch(event.MouseInput.Event) {
+					case EMIE_LMOUSE_LEFT_UP:
+					{
+						Environment->setFocus(this);
+						openCloseMenu();
+						return true;
+					}
+					default:
+						break;
 				}
 				break;
 			default:
 				break;
-			}
-			break;
-		case EET_MOUSE_INPUT_EVENT:
-
-			switch(event.MouseInput.Event)
-			{
-			case EMIE_LMOUSE_LEFT_UP:
-				{
-					Environment->setFocus(this);
-					openCloseMenu();
-					return true;
-				}
-			default:
-				break;
-			}
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -251,10 +227,8 @@ bool CGUICustomComboBox::OnEvent(const SEvent& event)
 }
 
 
-void CGUICustomComboBox::sendSelectionChangedEvent()
-{
-	if (Parent)
-	{
+void CGUICustomComboBox::sendSelectionChangedEvent() {
+	if(Parent) {
 		SEvent event;
 
 		event.EventType = EET_GUI_EVENT;
@@ -267,28 +241,23 @@ void CGUICustomComboBox::sendSelectionChangedEvent()
 
 
 //! draws the element and its children
-void CGUICustomComboBox::draw()
-{
-	if (!IsVisible)
+void CGUICustomComboBox::draw() {
+	if(!IsVisible)
 		return;
 
 	IGUISkin* skin = Environment->getSkin();
 	IGUIElement *currentFocus = Environment->getFocus();
-	if (currentFocus != LastFocus)
-	{
+	if(currentFocus != LastFocus) {
 		HasFocus = currentFocus == this || isMyChild(currentFocus);
 		LastFocus = currentFocus;
 	}
 
 	// set colors each time as skin-colors can be changed
 	SelectedText->setBackgroundColor(skin->getColor(EGDC_HIGH_LIGHT));
-	if(isEnabled())
-	{
+	if(isEnabled()) {
 		SelectedText->setDrawBackground(HasFocus);
 		SelectedText->setOverrideColor(skin->getColor(HasFocus ? EGDC_HIGH_LIGHT_TEXT : EGDC_BUTTON_TEXT));
-	}
-	else
-	{
+	} else {
 		SelectedText->setDrawBackground(false);
 		SelectedText->setOverrideColor(skin->getColor(EGDC_GRAY_TEXT));
 	}
@@ -301,15 +270,14 @@ void CGUICustomComboBox::draw()
 	// draw the border
 
 	skin->draw3DSunkenPane(this, skin->getColor(EGDC_3D_HIGH_LIGHT),
-		true, true, frameRect, &AbsoluteClippingRect);
+						   true, true, frameRect, &AbsoluteClippingRect);
 
 	// draw children
 	IGUIElement::draw();
 }
 
 
-void CGUICustomComboBox::openCloseMenu()
-{
+void CGUICustomComboBox::openCloseMenu() {
 	std::vector<std::string> parameters;
 	for(int i = 0; i < Items.size(); i++) {
 		parameters.push_back(BufferIO::EncodeUTF8s(Items[i].Name.c_str()));
@@ -319,18 +287,16 @@ void CGUICustomComboBox::openCloseMenu()
 
 
 //! Writes attributes of the element.
-void CGUICustomComboBox::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options=0) const
-{
-	IGUIComboBox::serializeAttributes(out,options);
+void CGUICustomComboBox::serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options = 0) const {
+	IGUIComboBox::serializeAttributes(out, options);
 
-	out->addEnum ("HTextAlign", HAlign, GUIAlignmentNames);
-	out->addEnum ("VTextAlign", VAlign, GUIAlignmentNames);
-	out->addInt("MaxSelectionRows", (s32)MaxSelectionRows );
+	out->addEnum("HTextAlign", HAlign, GUIAlignmentNames);
+	out->addEnum("VTextAlign", VAlign, GUIAlignmentNames);
+	out->addInt("MaxSelectionRows", (s32)MaxSelectionRows);
 
-	out->addInt	("Selected",	Selected );
-	out->addInt	("ItemCount",	Items.size());
-	for (u32 i=0; i < Items.size(); ++i)
-	{
+	out->addInt("Selected", Selected);
+	out->addInt("ItemCount", Items.size());
+	for(u32 i = 0; i < Items.size(); ++i) {
 		core::stringc s = "Item";
 		s += i;
 		s += "Text";
@@ -340,21 +306,19 @@ void CGUICustomComboBox::serializeAttributes(io::IAttributes* out, io::SAttribut
 
 
 //! Reads attributes of the element
-void CGUICustomComboBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options=0)
-{
-	IGUIComboBox::deserializeAttributes(in,options);
+void CGUICustomComboBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options = 0) {
+	IGUIComboBox::deserializeAttributes(in, options);
 
-	setTextAlignment( (EGUI_ALIGNMENT) in->getAttributeAsEnumeration("HTextAlign", GUIAlignmentNames),
-                      (EGUI_ALIGNMENT) in->getAttributeAsEnumeration("VTextAlign", GUIAlignmentNames));
-	setMaxSelectionRows( (u32)(in->getAttributeAsInt("MaxSelectionRows")) );
+	setTextAlignment((EGUI_ALIGNMENT)in->getAttributeAsEnumeration("HTextAlign", GUIAlignmentNames),
+		(EGUI_ALIGNMENT)in->getAttributeAsEnumeration("VTextAlign", GUIAlignmentNames));
+	setMaxSelectionRows((u32)(in->getAttributeAsInt("MaxSelectionRows")));
 
 	// clear the list
 	clear();
 	// get item count
 	u32 c = in->getAttributeAsInt("ItemCount");
 	// add items
-	for (u32 i=0; i < c; ++i)
-	{
+	for(u32 i = 0; i < c; ++i) {
 		core::stringc s = "Item";
 		s += i;
 		s += "Text";

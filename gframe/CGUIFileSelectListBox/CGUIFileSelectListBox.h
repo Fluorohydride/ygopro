@@ -5,20 +5,22 @@
 #ifndef __C_GUI_FILE_SELECT_LIST_BOX_H_INCLUDED__
 #define __C_GUI_FILE_SELECT_LIST_BOX_H_INCLUDED__
 
-#include "IrrCompileConfig.h"
+#include <IrrCompileConfig.h>
 #ifndef _IRR_OVERRIDE_
 #define _IRR_OVERRIDE_
 #endif
 #ifdef _IRR_COMPILE_WITH_GUI_
 
-#include <irrlicht.h>
 #include <vector>
 #include <string>
 #include <functional>
-#include "IGUIListBox.h"
-#include "irrArray.h"
+#include <IGUIListBox.h>
+#include <irrArray.h>
 
 namespace irr {
+namespace io {
+class IFileSystem;
+}
 namespace gui {
 
 class IGUIFont;
@@ -141,7 +143,7 @@ public:
 
 	//! Sets whether to draw the background
 	virtual void setDrawBackground(bool draw) _IRR_OVERRIDE_;
-	
+
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 	virtual IGUIScrollBar* getVerticalScrollBar() const _IRR_OVERRIDE_;
 #endif

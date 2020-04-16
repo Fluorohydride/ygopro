@@ -5,30 +5,27 @@
 #include "CGUICustomMenu.h"
 #ifdef _IRR_COMPILE_WITH_GUI_
 
-#include "IGUISkin.h"
-#include "IGUIEnvironment.h"
-#include "IVideoDriver.h"
-#include "IGUIFont.h"
-#include "IGUIWindow.h"
+#include <IGUISkin.h>
+#include <IGUIEnvironment.h>
+#include <IVideoDriver.h>
+#include <IGUIFont.h>
+#include <IGUIWindow.h>
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 #include "../IrrlichtCommonIncludes1.9/os.h"
 #else
 #include "../IrrlichtCommonIncludes/os.h"
 #endif
 
-namespace irr
-{
-namespace gui
-{
+namespace irr {
+namespace gui {
 
 //! constructor
 CGUICustomMenu::CGUICustomMenu(IGUIEnvironment* environment, IGUIElement* parent,
-		s32 id, core::rect<s32> rectangle)
-	: CGUICustomContextMenu(environment, parent, id, rectangle, false, true)
-{
-	#ifdef _DEBUG
+							   s32 id, core::rect<s32> rectangle)
+	: CGUICustomContextMenu(environment, parent, id, rectangle, false, true) {
+#ifdef _DEBUG
 	setDebugName("CGUICustomMenu");
-	#endif
+#endif
 
 	Type = EGUIET_MENU;
 
@@ -50,20 +47,18 @@ IGUIContextMenu * CGUICustomMenu::addCustomMenu(IGUIEnvironment * environment, I
 
 
 //! draws the element and its children
-void CGUICustomMenu::draw()
-{
-	if (!IsVisible)
+void CGUICustomMenu::draw() {
+	if(!IsVisible)
 		return;
 
 	IGUISkin* skin = Environment->getSkin();
 	IGUIFont* font = skin->getFont(EGDF_MENU);
 
-	if (font != LastFont)
-	{
-		if (LastFont)
+	if(font != LastFont) {
+		if(LastFont)
 			LastFont->drop();
 		LastFont = font;
-		if (LastFont)
+		if(LastFont)
 			LastFont->grab();
 
 		recalculateSize();
@@ -79,31 +74,28 @@ void CGUICustomMenu::draw()
 
 	rect = AbsoluteRect;
 
-	for (s32 i=0; i<(s32)Items.size(); ++i)
-	{
-		if (!Items[i].IsSeparator)
-		{
+	for(s32 i = 0; i < (s32)Items.size(); ++i) {
+		if(!Items[i].IsSeparator) {
 			rect = getRect(Items[i], AbsoluteRect);
 
 			// draw highlighted
-			if (i == HighLighted && Items[i].Enabled)
-			{
+			if(i == HighLighted && Items[i].Enabled) {
 				skin->draw3DSunkenPane(this, skin->getColor(EGDC_3D_DARK_SHADOW),
-					true, true, rect, &AbsoluteClippingRect);
+									   true, true, rect, &AbsoluteClippingRect);
 			}
 			// draw text
 
 			EGUI_DEFAULT_COLOR c = EGDC_BUTTON_TEXT;
 
-			if (i == HighLighted)
+			if(i == HighLighted)
 				c = EGDC_HIGH_LIGHT_TEXT;
 
-			if (!Items[i].Enabled)
+			if(!Items[i].Enabled)
 				c = EGDC_GRAY_TEXT;
 
-			if (font)
+			if(font)
 				font->draw(Items[i].Text.c_str(), rect,
-					skin->getColor(c), true, true, &AbsoluteClippingRect);
+						   skin->getColor(c), true, true, &AbsoluteClippingRect);
 		}
 	}
 
@@ -112,107 +104,89 @@ void CGUICustomMenu::draw()
 
 
 //! called if an event happened.
-bool CGUICustomMenu::OnEvent(const SEvent& event)
-{
-	if (isEnabled())
-	{
+bool CGUICustomMenu::OnEvent(const SEvent& event) {
+	if(isEnabled()) {
 
-		switch(event.EventType)
-		{
-		case EET_GUI_EVENT:
-			switch(event.GUIEvent.EventType)
-			{
-			case gui::EGET_ELEMENT_FOCUS_LOST:
-				if ((event.GUIEvent.Caller == this || (isMyChild(event.GUIEvent.Caller) && event.GUIEvent.Element != this)) && !isMyChild(event.GUIEvent.Element))
-				{
-					closeAllSubMenus();
-					HighLighted = -1;
+		switch(event.EventType) {
+			case EET_GUI_EVENT:
+				switch(event.GUIEvent.EventType) {
+					case gui::EGET_ELEMENT_FOCUS_LOST:
+						if((event.GUIEvent.Caller == this || (isMyChild(event.GUIEvent.Caller) && event.GUIEvent.Element != this)) && !isMyChild(event.GUIEvent.Element)) {
+							closeAllSubMenus();
+							HighLighted = -1;
+						}
+						break;
+					case gui::EGET_ELEMENT_FOCUSED:
+						if(event.GUIEvent.Caller == this && Parent) {
+							Parent->bringToFront(this);
+						}
+						break;
+					default:
+						break;
 				}
 				break;
-			case gui::EGET_ELEMENT_FOCUSED:
-				if (event.GUIEvent.Caller == this && Parent)
-				{
-					Parent->bringToFront(this);
+			case EET_MOUSE_INPUT_EVENT:
+				switch(event.MouseInput.Event) {
+					case EMIE_LMOUSE_PRESSED_DOWN:
+					{
+						if(!Environment->hasFocus(this)) {
+							Environment->setFocus(this);
+						}
+
+						if(Parent)
+							Parent->bringToFront(this);
+
+						core::position2d<s32> p(event.MouseInput.X, event.MouseInput.Y);
+						bool shouldCloseSubMenu = hasOpenSubMenu();
+						if(!AbsoluteClippingRect.isPointInside(p)) {
+							shouldCloseSubMenu = false;
+						}
+						highlight(core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y), true);
+						if(shouldCloseSubMenu) {
+							Environment->removeFocus(this);
+						}
+
+						return true;
+					}
+					case EMIE_LMOUSE_LEFT_UP:
+					{
+						core::position2d<s32> p(event.MouseInput.X, event.MouseInput.Y);
+						if(!AbsoluteClippingRect.isPointInside(p)) {
+							s32 t = sendClick(p);
+							if((t == 0 || t == 1) && Environment->hasFocus(this))
+								Environment->removeFocus(this);
+						}
+
+						return true;
+					}
+					case EMIE_MOUSE_MOVED:
+						if(Environment->hasFocus(this) && HighLighted >= 0) {
+							s32 oldHighLighted = HighLighted;
+							highlight(core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y), true);
+							if(HighLighted < 0)
+								HighLighted = oldHighLighted;   // keep last hightlight active when moving outside the area
+						}
+						return true;
+					default:
+						break;
 				}
 				break;
 			default:
 				break;
-			}
-			break;
-		case EET_MOUSE_INPUT_EVENT:
-			switch(event.MouseInput.Event)
-			{
-			case EMIE_LMOUSE_PRESSED_DOWN:
-			{
-				if (!Environment->hasFocus(this))
-				{
-					Environment->setFocus(this);
-				}
-
-				if (Parent)
-					Parent->bringToFront(this);
-
-				core::position2d<s32> p(event.MouseInput.X, event.MouseInput.Y);
-				bool shouldCloseSubMenu = hasOpenSubMenu();
-				if (!AbsoluteClippingRect.isPointInside(p))
-				{
-					shouldCloseSubMenu = false;
-				}
-				highlight(core::position2d<s32>(event.MouseInput.X,	event.MouseInput.Y), true);
-				if ( shouldCloseSubMenu )
-				{
-                    Environment->removeFocus(this);
-				}
-
-				return true;
-			}
-			case EMIE_LMOUSE_LEFT_UP:
-			{
-                core::position2d<s32> p(event.MouseInput.X, event.MouseInput.Y);
-				if (!AbsoluteClippingRect.isPointInside(p))
-				{
-					s32 t = sendClick(p);
-					if ((t==0 || t==1) && Environment->hasFocus(this))
-						Environment->removeFocus(this);
-				}
-
-			    return true;
-			}
-			case EMIE_MOUSE_MOVED:
-				if (Environment->hasFocus(this) && HighLighted >= 0)
-				{
-				    s32 oldHighLighted = HighLighted;
-					highlight(core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y), true);
-					if ( HighLighted < 0 )
-                        HighLighted = oldHighLighted;   // keep last hightlight active when moving outside the area
-				}
-				return true;
-			default:
-				break;
-			}
-			break;
-		default:
-			break;
 		}
 	}
 
 	return IGUIElement::OnEvent(event);
 }
 
-void CGUICustomMenu::recalculateSize()
-{
+void CGUICustomMenu::recalculateSize() {
 	core::rect<s32> clientRect; // client rect of parent
-	if ( Parent && Parent->hasType(EGUIET_WINDOW) )
-	{
+	if(Parent && Parent->hasType(EGUIET_WINDOW)) {
 		clientRect = static_cast<IGUIWindow*>(Parent)->getClientRect();
-	}
-	else if ( Parent )
-	{
-		clientRect = core::rect<s32>(0,0, Parent->getAbsolutePosition().getWidth(),
-					Parent->getAbsolutePosition().getHeight());
-	}
-	else
-	{
+	} else if(Parent) {
+		clientRect = core::rect<s32>(0, 0, Parent->getAbsolutePosition().getWidth(),
+									 Parent->getAbsolutePosition().getHeight());
+	} else {
 		clientRect = RelativeRect;
 	}
 
@@ -220,11 +194,10 @@ void CGUICustomMenu::recalculateSize()
 	IGUISkin* skin = Environment->getSkin();
 	IGUIFont* font = skin->getFont(EGDF_MENU);
 
-	if (!font)
-	{
-		if (Parent && skin)
+	if(!font) {
+		if(Parent && skin)
 			RelativeRect = core::rect<s32>(clientRect.UpperLeftCorner.X, clientRect.UpperLeftCorner.Y,
-					clientRect.LowerRightCorner.X, clientRect.UpperLeftCorner.Y+skin->getSize(EGDS_MENU_HEIGHT));
+										   clientRect.LowerRightCorner.X, clientRect.UpperLeftCorner.Y + skin->getSize(EGDS_MENU_HEIGHT));
 		return;
 	}
 
@@ -236,15 +209,11 @@ void CGUICustomMenu::recalculateSize()
 	s32 width = rect.UpperLeftCorner.X;
 	s32 i;
 
-	for (i=0; i<(s32)Items.size(); ++i)
-	{
-		if (Items[i].IsSeparator)
-		{
+	for(i = 0; i < (s32)Items.size(); ++i) {
+		if(Items[i].IsSeparator) {
 			Items[i].Dim.Width = 0;
 			Items[i].Dim.Height = height;
-		}
-		else
-		{
+		} else {
 			Items[i].Dim = font->getDimension(Items[i].Text.c_str());
 			Items[i].Dim.Width += 20;
 		}
@@ -261,23 +230,21 @@ void CGUICustomMenu::recalculateSize()
 	setRelativePosition(rect);
 
 	// recalculate submenus
-	for (i=0; i<(s32)Items.size(); ++i)
-		if (Items[i].SubMenu)
-		{
+	for(i = 0; i < (s32)Items.size(); ++i)
+		if(Items[i].SubMenu) {
 			// move submenu
 			s32 w = Items[i].SubMenu->getAbsolutePosition().getWidth();
 			s32 h = Items[i].SubMenu->getAbsolutePosition().getHeight();
 
 			Items[i].SubMenu->setRelativePosition(
-				core::rect<s32>(Items[i].PosY, height ,
-					Items[i].PosY+w-5, height+h));
+				core::rect<s32>(Items[i].PosY, height,
+								Items[i].PosY + w - 5, height + h));
 		}
 }
 
 
 //! returns the item highlight-area
-core::rect<s32> CGUICustomMenu::getHRect(const SItem& i, const core::rect<s32>& absolute) const
-{
+core::rect<s32> CGUICustomMenu::getHRect(const SItem& i, const core::rect<s32>& absolute) const {
 	core::rect<s32> r = absolute;
 	r.UpperLeftCorner.X += i.PosY;
 	r.LowerRightCorner.X = r.UpperLeftCorner.X + i.Dim.Width;
@@ -286,15 +253,13 @@ core::rect<s32> CGUICustomMenu::getHRect(const SItem& i, const core::rect<s32>& 
 
 
 //! Gets drawing rect of Item
-core::rect<s32> CGUICustomMenu::getRect(const SItem& i, const core::rect<s32>& absolute) const
-{
+core::rect<s32> CGUICustomMenu::getRect(const SItem& i, const core::rect<s32>& absolute) const {
 	return getHRect(i, absolute);
 }
 
 
-void CGUICustomMenu::updateAbsolutePosition()
-{
-	if (Parent)
+void CGUICustomMenu::updateAbsolutePosition() {
+	if(Parent)
 		DesiredRect.LowerRightCorner.X = Parent->getAbsolutePosition().getWidth();
 
 	IGUIElement::updateAbsolutePosition();

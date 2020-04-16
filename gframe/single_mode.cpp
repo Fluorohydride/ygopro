@@ -7,6 +7,13 @@
 #include "core_utils.h"
 #include "sound_manager.h"
 #include "CGUIFileSelectListBox/CGUIFileSelectListBox.h"
+#include <IrrlichtDevice.h>
+#include <IGUIWindow.h>
+#include <IGUIStaticText.h>
+#include <IGUIEditBox.h>
+#include <IGUIButton.h>
+#include <IGUIContextMenu.h>
+#include <IGUITabControl.h>
 
 namespace ygo {
 
