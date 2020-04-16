@@ -1110,40 +1110,50 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
-		gSoundManager->StopSounds();
-		mainGame->gMutex.lock();
-		mainGame->stMessage->setText(gDataManager->GetSysString(1434).c_str());
-		mainGame->PopupElement(mainGame->wMessage);
-		mainGame->gMutex.unlock();
-		mainGame->actionSignal.Reset();
-		mainGame->actionSignal.Wait();
-		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.lock();
-		mainGame->closeDoneSignal.Wait();
-		mainGame->closeSignal.unlock();
-		ReplayPrompt(true);
-		mainGame->gMutex.lock();
-		mainGame->dField.Clear();
-		mainGame->dInfo.isInLobby = false;
-		mainGame->dInfo.isInDuel = false;
-		mainGame->dInfo.isStarted = false;
-		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-		mainGame->btnJoinHost->setEnabled(true);
-		mainGame->btnJoinCancel->setEnabled(true);
-		mainGame->stTip->setVisible(false);
-		gSoundManager->StopSounds();
-		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		if(mainGame->isHostingOnline) {
-			mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+		if(!mainGame->dInfo.compat_mode) {
+			mainGame->gMutex.lock();
+			mainGame->stMessage->setText(gDataManager->GetSysString(1434).c_str());
+			mainGame->PopupElement(mainGame->wMessage);
+			mainGame->gMutex.unlock();
+			mainGame->actionSignal.Reset();
+			mainGame->actionSignal.Wait();
+			return true;
 		} else {
-			mainGame->ShowElement(mainGame->wLanWindow);
+			gSoundManager->StopSounds();
+			mainGame->gMutex.lock();
+			mainGame->stMessage->setText(gDataManager->GetSysString(1434).c_str());
+			mainGame->PopupElement(mainGame->wMessage);
+			mainGame->gMutex.unlock();
+			mainGame->actionSignal.Reset();
+			mainGame->actionSignal.Wait();
+			mainGame->closeDoneSignal.Reset();
+			mainGame->closeSignal.lock();
+			mainGame->closeDoneSignal.Wait();
+			mainGame->closeSignal.unlock();
+			ReplayPrompt(true);
+			mainGame->gMutex.lock();
+			mainGame->dField.Clear();
+			mainGame->dInfo.isInLobby = false;
+			mainGame->dInfo.isInDuel = false;
+			mainGame->dInfo.isStarted = false;
+			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+			mainGame->btnJoinHost->setEnabled(true);
+			mainGame->btnJoinCancel->setEnabled(true);
+			mainGame->stTip->setVisible(false);
+			gSoundManager->StopSounds();
+			mainGame->device->setEventReceiver(&mainGame->menuHandler);
+			if(mainGame->isHostingOnline) {
+				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+			} else {
+				mainGame->ShowElement(mainGame->wLanWindow);
+			}
+			mainGame->SetMessageWindow();
+			mainGame->gMutex.unlock();
+			event_base_loopbreak(client_base);
+			if(exit_on_return)
+				mainGame->device->closeDevice();
+			return false;
 		}
-		mainGame->SetMessageWindow();
-		mainGame->gMutex.unlock();
-		event_base_loopbreak(client_base);
-		if(exit_on_return)
-			mainGame->device->closeDevice();
-		return false;
 	}
 	case MSG_HINT: {
 		uint8_t type = BufferIO::Read<uint8_t>(pbuf);
@@ -4371,8 +4381,8 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 		}
 	}
 }
-void DuelClient::ReplayPrompt(bool need_header) {
-	if(need_header) {
+void DuelClient::ReplayPrompt(bool local_stream) {
+	if(local_stream) {
 		ReplayHeader pheader{};
 		pheader.id = REPLAY_YRPX;
 		pheader.version = CLIENT_VERSION;
