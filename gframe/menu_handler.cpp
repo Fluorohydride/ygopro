@@ -904,12 +904,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				ServerLobby::RefreshRooms();
 			break;
 		}
-		case irr::KEY_F12: {
-			if (!event.KeyInput.PressedDown)
-				GUIUtils::TakeScreenshot(mainGame->device);
-			return true;
-			break;
-		}
 		default: break;
 		}
 		break;

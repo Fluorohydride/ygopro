@@ -2083,16 +2083,16 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			return true;
 		}
-		case irr::KEY_F10: {
-			if (!event.KeyInput.PressedDown)
-				GUIUtils::TakeScreenshot(mainGame->device);
-			return true;
-		}
 		case irr::KEY_F11: {
 			if(!event.KeyInput.PressedDown) {
 				GUIUtils::ToggleFullscreen(mainGame->device, gGameConfig->fullscreen);
 				mainGame->gSettings.chkFullscreen->setChecked(gGameConfig->fullscreen);
 			}
+			return true;
+		}
+		case irr::KEY_F12: {
+			if (!event.KeyInput.PressedDown)
+				GUIUtils::TakeScreenshot(mainGame->device);
 			return true;
 		}
 		case irr::KEY_KEY_1: {
