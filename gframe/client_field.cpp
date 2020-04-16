@@ -694,67 +694,54 @@ void ClientField::RefreshAllCards() {
 		refresh(pcard);
 }
 void ClientField::GetChainDrawCoordinates(int controler, int location, int sequence, irr::core::vector3df* t) {
-	t->X = 0;
-	t->Y = 0;
-	t->Z = 0;
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
 	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	irr::video::S3DVertex loc[4];
 	if ((location & (~LOCATION_OVERLAY)) == LOCATION_HAND) {
-		if (controler == 0) {
-			t->X = 2.95f;
-			t->Y = 3.15f;
-			t->Z = 0.03f;
-		} else {
-			t->X = 2.95f;
-			t->Y = -3.15f;
-			t->Z = 0.03f;
-		}
+		t->X = 2.95f;
+		t->Y = (controler == 0) ? 3.15f : (-3.15f);
+		t->Z = 0.03f;
 		return;
 	}
-	bool chk = false;
+	irr::video::S3DVertex* loc = nullptr;
 	switch((location & (~LOCATION_OVERLAY))) {
 	case LOCATION_DECK: {
-		std::copy(matManager.vFieldDeck[controler][speed], matManager.vFieldDeck[controler][speed] + 4, loc);
+		loc = matManager.vFieldDeck[controler][speed];
 		t->Z = deck[controler].size() * 0.01f + 0.03f;
-		chk = true;
 		break;
 	}
 	case LOCATION_MZONE: {
-		std::copy(matManager.vFieldMzone[controler][sequence], matManager.vFieldMzone[controler][sequence] + 4, loc);
+		loc = matManager.vFieldMzone[controler][sequence];
 		t->Z = 0.03f;
-		chk = true;
 		break;
 	}
 	case LOCATION_SZONE: {
-		std::copy(matManager.vFieldSzone[controler][sequence][field][speed], matManager.vFieldSzone[controler][sequence][field][speed] + 4, loc);
+		loc = matManager.vFieldSzone[controler][sequence][field][speed];
 		t->Z = 0.03f;
-		chk = true;
 		break;
 	}
 	case LOCATION_GRAVE: {
-		std::copy(matManager.vFieldGrave[controler][field][speed], matManager.vFieldGrave[controler][field][speed] + 4, loc);
+		loc = matManager.vFieldGrave[controler][field][speed];
 		t->Z = grave[controler].size() * 0.01f + 0.03f;
-		chk = true;
 		break;
 	}
 	case LOCATION_REMOVED: {
-		std::copy(matManager.vFieldRemove[controler][field][speed], matManager.vFieldRemove[controler][field][speed] + 4, loc);
+		loc = matManager.vFieldRemove[controler][field][speed];
 		t->Z = remove[controler].size() * 0.01f + 0.03f;
-		chk = true;
 		break;
 	}
 	case LOCATION_EXTRA: {
-		std::copy(matManager.vFieldExtra[controler][speed], matManager.vFieldExtra[controler][speed] + 4, loc);
+		loc = matManager.vFieldExtra[controler][speed];
 		t->Z = extra[controler].size() * 0.01f + 0.03f;
-		chk = true;
 		break;
 	}
+	default:
+		t->X = 0;
+		t->Y = 0;
+		t->Z = 0;
+		return;
 	}
-	if(chk) {
-		t->X = (loc[0].Pos.X + loc[1].Pos.X) / 2;
-		t->Y = (loc[0].Pos.Y + loc[2].Pos.Y) / 2;
-	}
+	t->X = (loc[0].Pos.X + loc[1].Pos.X) / 2;
+	t->Y = (loc[0].Pos.Y + loc[2].Pos.Y) / 2;
 }
 void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
 	static const irr::core::vector3df selfATK{ 0.0f, 0.0f, 0.0f };
