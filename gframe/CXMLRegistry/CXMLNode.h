@@ -5,7 +5,7 @@
 
 #include <irrArray.h>
 #include <irrString.h>
-#include <irrlist.h>
+#include <irrList.h>
 
 namespace irr {
 namespace io {

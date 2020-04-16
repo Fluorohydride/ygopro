@@ -22,7 +22,7 @@
 #include <IGUIEditBox.h>
 #include <IGUIStaticText.h>
 #include <IGUITabControl.h>
-#include <IGUItable.h>
+#include <IGUITable.h>
 #include <IGUIWindow.h>
 
 namespace ygo {
