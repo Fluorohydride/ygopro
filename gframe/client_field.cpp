@@ -790,15 +790,15 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 		t->X = GetMiddleX(pos);
 		t->Y = GetMiddleY(pos);
 		t->Z = 0.01f;
-		if(location == LOCATION_MZONE){
+		if(location == LOCATION_MZONE) {
 			if(controler == 0)
 				*r = (pcard->position & POS_DEFENSE) ? selfDEF : selfATK;
 			else
 				*r = (pcard->position & POS_DEFENSE) ? oppoDEF : oppoATK;
 		} else
 			*r = (controler == 0) ? selfATK : oppoATK;
-		if((location == LOCATION_DECK && deck_reversed == pcard->is_reversed) ||
-			(location != LOCATION_GRAVE && pcard->position & POS_FACEDOWN)) {
+		if((location != LOCATION_GRAVE) && (location == LOCATION_DECK && deck_reversed == pcard->is_reversed) ||
+			(location != LOCATION_DECK && pcard->position & POS_FACEDOWN)) {
 			*r += facedown;
 			if(location == LOCATION_MZONE && pcard->position & POS_DEFENSE)
 				r->Y = irr::core::PI + 0.001f;
