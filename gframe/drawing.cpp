@@ -439,7 +439,7 @@ void Game::DrawCard(ClientCard* pcard) {
 			pcard->is_fading = false;
 			pcard->curAlpha = pcard->dAlpha > 0.0f ? 255 : 5;
 			if(pcard->refresh_on_stop)
-				pcard->UpdateDrawCoordniates(true);
+				pcard->UpdateDrawCoordinates(true);
 			pcard->refresh_on_stop = false;
 		}
 	}

@@ -2752,7 +2752,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->gMutex.lock();
 				mainGame->dField.AddCard(pcard, current.controler, current.location, current.sequence);
 				mainGame->gMutex.unlock();
-				pcard->UpdateDrawCoordniates(true);
+				pcard->UpdateDrawCoordinates(true);
 				pcard->curAlpha = 5;
 				mainGame->dField.FadeCard(pcard, 255, 20);
 				mainGame->WaitFrameSignal(20);
@@ -3987,7 +3987,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(!mainGame->dInfo.isCatchingUp) {
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
 				ClientCard* pcard = *cit;
-				pcard->UpdateDrawCoordniates();
+				pcard->UpdateDrawCoordinates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
 				mainGame->dField.MoveCard(*cit, 5);
@@ -4002,7 +4002,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				} else {
 					pcard->code = BufferIO::Read<uint32_t>(pbuf) & 0x7fffffff;
 				}
-				pcard->UpdateDrawCoordniates();
+				pcard->UpdateDrawCoordinates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
 				mainGame->dField.MoveCard(*cit, 5);
@@ -4015,7 +4015,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				} else {
 					pcard->code = BufferIO::Read<uint32_t>(pbuf) & 0x7fffffff;
 				}
-				pcard->UpdateDrawCoordniates();
+				pcard->UpdateDrawCoordinates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
 				else pcard->curPos.Y -= 3.0f;
 				mainGame->dField.MoveCard(*cit, 5);

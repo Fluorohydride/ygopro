@@ -110,7 +110,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = LOCATION_DECK;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		pcard->UpdateDrawCoordniates(true);
+		pcard->UpdateDrawCoordinates(true);
 	}
 	for(int i = 0; i < extrac; ++i) {
 		pcard = new ClientCard;
@@ -120,7 +120,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->location = LOCATION_EXTRA;
 		pcard->sequence = i;
 		pcard->position = POS_FACEDOWN_DEFENSE;
-		pcard->UpdateDrawCoordniates(true);
+		pcard->UpdateDrawCoordinates(true);
 	}
 }
 std::vector<ClientCard*>* ClientField::GetList(int location, int controler) {
@@ -628,7 +628,7 @@ void ClientField::ReplaySwap() {
 	auto reset = [](ClientCard* pcard)->void {
 		if(pcard) {
 			pcard->controler = 1 - pcard->controler;
-			pcard->UpdateDrawCoordniates(true);
+			pcard->UpdateDrawCoordinates(true);
 			pcard->is_moving = false;
 		}
 	};
@@ -672,7 +672,7 @@ void ClientField::ReplaySwap() {
 void ClientField::RefreshAllCards() {
 	auto refresh = [](ClientCard* pcard) {
 		if(pcard) {
-			pcard->UpdateDrawCoordniates(true);
+			pcard->UpdateDrawCoordinates(true);
 			pcard->is_moving = false;
 		}
 	};

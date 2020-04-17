@@ -117,7 +117,7 @@ public:
 	std::wstring rscstring;
 
 	ClientCard();
-	void UpdateDrawCoordniates(bool setTrans = false);
+	void UpdateDrawCoordinates(bool setTrans = false);
 	void SetCode(uint32_t code);
 	void UpdateInfo(const CoreUtils::Query& query);
 	void ClearTarget();
