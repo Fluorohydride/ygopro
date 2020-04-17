@@ -50,6 +50,7 @@ if [[ "$PLATFORM" == "windows" ]]; then
 	copy_if_exists ocgcore.dll
 	copy_if_exists ygopro.exe
 	copy_if_exists ygoprodll.exe
+	copy_if_exists ygoprodll.pdb
 fi
 if [[ "$PLATFORM" == "linux" ]]; then
 	copy_if_exists libocgcore.so
