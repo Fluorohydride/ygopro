@@ -65,7 +65,7 @@ bool GenericDuel::CheckReady() {
 			ready2 = dueler.ready && ready2;
 			ready_atleast12 = ready_atleast12 || dueler.ready;
 		} else {
-			ready1 = false;
+			ready2 = false;
 		}
 	}
 	if(relay && match_result.empty()) {
