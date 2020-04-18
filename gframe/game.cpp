@@ -2495,7 +2495,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 		return 5;
 	else if(param & DUEL_EMZONE)
 		return 4;
-	else if (param & DUEL_PZONE)
+	else if ((param & DUEL_PZONE) && (param & DUEL_SEPARATE_PZONE))
 		return 3;
 	else
 		return 2;
