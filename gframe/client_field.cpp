@@ -182,6 +182,8 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			for(int i = deck[controler].size() - 1; i > 0; --i) {
 				deck[controler][i] = deck[controler][i - 1];
 				deck[controler][i]->sequence++;
+				deck[controler][i]->curPos += irr::core::vector3df(0, 0, 0.01f);
+				deck[controler][i]->mTransform.setTranslation(deck[controler][i]->curPos);
 			}
 			deck[controler][0] = pcard;
 			pcard->sequence = 0;
