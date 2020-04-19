@@ -106,6 +106,7 @@ void DeckBuilder::Initialize(bool refresh) {
 }
 void DeckBuilder::Terminate(bool showmenu) {
 	mainGame->is_building = false;
+	mainGame->is_siding = false;
 	if(showmenu) {
 		mainGame->ClearCardInfo();
 		mainGame->mTopMenu->setVisible(true);
