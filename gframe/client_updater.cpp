@@ -10,7 +10,7 @@ void ygo::updater::StartUnzipper(const path_string&) {}
 #if defined(_WIN32)
 #define OSSTRING "Windows"
 #elif defined(__APPLE__)
-#define OSSTRING "MacOs"
+#define OSSTRING "Mac"
 #elif defined (__linux__) && !defined(__ANDROID__)
 #define OSSTRING "Linux"
 #endif
