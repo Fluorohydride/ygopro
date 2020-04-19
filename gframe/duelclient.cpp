@@ -1689,9 +1689,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SELECT_PLACE:
 	case MSG_SELECT_DISFIELD: {
-		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
+		int selecting_player = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
+		if(selecting_player == mainGame->LocalPlayer(1))
+			mainGame->dField.selectable_field = (mainGame->dField.selectable_field >> 16) | (mainGame->dField.selectable_field << 16);
 		mainGame->dField.selected_field = 0;
 		unsigned char respbuf[64];
 		int pzone = 0;

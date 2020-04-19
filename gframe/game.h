@@ -736,7 +736,7 @@ extern HostInfo game_info;
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
 
-#define DEFAULT_DUEL_RULE			4
+#define DEFAULT_DUEL_RULE			5
 
 #define CARD_ARTWORK_VERSIONS_OFFSET	10
 #endif // GAME_H
