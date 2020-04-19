@@ -1,5 +1,4 @@
 #include "client_updater.h"
-#define UPDATE_URL "test"
 #ifndef UPDATE_URL
 void ygo::updater::CheckUpdates() {}
 bool ygo::updater::HasUpdate() { return false; }

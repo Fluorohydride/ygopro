@@ -41,6 +41,11 @@ newoption {
 	value = "app_id_token",
 	description = "Discord App ID for rich presence"
 }
+newoption {
+	trigger = "update-url",
+	value = "url",
+	description = "API endpoint to check for updates from"
+}
 workspace "ygo"
 	location "build"
 	language "C++"
@@ -56,10 +61,10 @@ workspace "ygo"
 	if _OPTIONS["vcpkg-root"] then
 		filter "system:linux"
 			includedirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/include" }
-	
+
 		filter { "system:linux", "configurations:Debug" }
 			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/debug/lib" }
-	
+
 		filter { "system:linux", "configurations:Release" }
 			libdirs { _OPTIONS["vcpkg-root"] .. "/installed/x64-linux/lib" }
 
@@ -102,7 +107,7 @@ workspace "ygo"
 	filter "configurations:Release"
 		optimize "Size"
 		targetdir "bin/release"
-	
+
 	subproject = true
 	if not _OPTIONS["prebuilt-core"] then
 		include "ocgcore"
@@ -127,4 +132,4 @@ premake.override(premake.vstudio.vc2010.elements, "globals", function(base, prj)
 	local calls = base(prj)
 	table.insertafter(calls, premake.vstudio.vc2010.targetPlatformVersionGlobal, vcpkgStaticTriplet)
 	return calls
-end) 
+end)

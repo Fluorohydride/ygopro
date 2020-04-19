@@ -18,7 +18,9 @@ local ygopro_config=function(static_core)
 	if _OPTIONS["discord"] then
 		defines { "DISCORD_APP_ID=" .. _OPTIONS["discord"] }
 	end
-
+	if _OPTIONS["update-url"] then
+		defines { "UPDATE_URL=" .. _OPTIONS["update-url"] }
+	end
 	includedirs "../ocgcore"
 	links { "clzma", "freetype", "Irrlicht" }
 	if _OPTIONS["sound"] then
