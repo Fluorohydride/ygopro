@@ -55,6 +55,7 @@ protected:
 	public:
 		DuelPlayer* player;
 		bool ready;
+		Deck odeck;
 		Deck pdeck;
 		int deck_error;
 		duelist() : player(0), ready(false), deck_error(0) {}
