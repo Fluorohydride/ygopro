@@ -219,7 +219,7 @@ void Reboot(){
 	exit(0);
 }
 
-void ygo::updater::StartUnzipper(const path_string& src) {
+void Unzip(path_string src) {
 #if defined(_WIN32) || (defined(__LINUX__) && !defined(__ANDROID__))
 	auto pathstring = GetExePath() + EPRO_TEXT(".old");
 	_trename(GetExePath().c_str(), pathstring.c_str());
@@ -229,6 +229,10 @@ void ygo::updater::StartUnzipper(const path_string& src) {
 		ygo::Utils::UnzipArchive(src + ygo::Utils::ToPathString(file.name));
 	}
 	Reboot();
+}
+
+void ygo::updater::StartUnzipper(const path_string& src) {
+	std::thread(Unzip, src).detach();
 }
 
 bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
