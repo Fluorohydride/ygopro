@@ -3135,7 +3135,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(pcard->location & 0x30) {
 			float milliseconds = 5.0f * 1000.0f / 60.0f;
 			float shift = -0.75f / milliseconds;
-			if(info.controler == 1) milliseconds *= -1.0f;
+			if(info.controler == 1) shift *= -1.0f;
 			pcard->dPos = irr::core::vector3df(shift, 0, 0);
 			pcard->dRot = irr::core::vector3df(0, 0, 0);
 			pcard->is_moving = true;
@@ -3269,7 +3269,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			} else if(pcard->location & 0x30) {
 				float milliseconds = 5.0f * 1000.0f / 60.0f;
 				float shift = -0.75f / milliseconds;
-				if(info.controler == 1) milliseconds *= -1.0f;
+				if(info.controler == 1) shift *= -1.0f;
 				pcard->dPos = irr::core::vector3df(shift, 0, 0);
 				pcard->dRot = irr::core::vector3df(0, 0, 0);
 				pcard->is_moving = true;
