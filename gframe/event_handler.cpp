@@ -1994,6 +1994,15 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			return true;
 			break;
 		}
+		case irr::KEY_KEY_V: {
+			IGUIElement* focus = mainGame->env->getFocus();
+			if(focus->getType() == EGUIET_EDIT_BOX && event.KeyInput.Control) {
+				irr::core::stringw t(focus->getText());
+				t.trim();
+				focus->setText(t.c_str());
+			}
+			break;
+		}
 		default: break;
 		}
 		break;
