@@ -157,6 +157,9 @@ void Query::GenerateBuffer(std::vector<uint8_t>& buffer, bool is_public, bool ch
 		if(((is_public || (check_hidden && ((this->flag & QUERY_IS_HIDDEN) && is_hidden))) && !IsPublicQuery(_flag))) {
 			continue;
 		}
+		if((_flag == QUERY_REASON_CARD && reason_card.location == 0) ||
+			(_flag == QUERY_EQUIP_CARD && equip_card.location == 0))
+			continue;
 		insert_value<uint16_t>(buffer, GetSize(_flag) + sizeof(uint32_t));
 		insert_value<uint32>(buffer, _flag);
 		/*if(((is_public || (check_hidden && ((this->flag & QUERY_IS_HIDDEN) && is_hidden))) && !IsPublicQuery(_flag))) {
