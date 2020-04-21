@@ -154,15 +154,18 @@ void Query::GenerateBuffer(std::vector<uint8_t>& buffer, bool is_public, bool ch
 	for(uint64_t _flag = 1; _flag <= QUERY_END; _flag <<= 1) {
 		if((this->flag & _flag) != _flag)
 			continue;
+		if(((is_public || (check_hidden && ((this->flag & QUERY_IS_HIDDEN) && is_hidden))) && !IsPublicQuery(_flag))) {
+			continue;
+		}
 		insert_value<uint16_t>(buffer, GetSize(_flag) + sizeof(uint32_t));
 		insert_value<uint32>(buffer, _flag);
-		if(((is_public || (check_hidden && ((this->flag & QUERY_IS_HIDDEN) && is_hidden))) && !IsPublicQuery(_flag))) {
+		/*if(((is_public || (check_hidden && ((this->flag & QUERY_IS_HIDDEN) && is_hidden))) && !IsPublicQuery(_flag))) {
 			const auto vec_size = buffer.size();
 			const auto flag_size = GetSize(_flag);
 			buffer.resize(vec_size + flag_size);
 			std::memset(&buffer[vec_size], 0, flag_size);
 			continue;
-		}
+		}*/
 		INSERT(QUERY_CODE, code)
 		INSERT(QUERY_POSITION, position)
 		INSERT(QUERY_ALIAS, alias)
