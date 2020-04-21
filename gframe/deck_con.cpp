@@ -471,6 +471,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
+				mainGame->env->setFocus(0);
 				InstantSearch();
 				break;
 			}
@@ -488,13 +489,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->ebDefense->setEnabled(true);
 					}
 				}
+				mainGame->env->setFocus(0);
 				InstantSearch();
 				break;
 			}
 			case COMBOBOX_ATTRIBUTE:
 			case COMBOBOX_RACE:
 			case COMBOBOX_LIMIT:
+				mainGame->env->setFocus(0);
 				InstantSearch();
+				break;
 			}
 		}
 		default: break;
