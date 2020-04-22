@@ -546,7 +546,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY;
 	time_t seed = time(0);
 	rh.seed = seed;
-	last_replay.BeginRecord(false);
+	last_replay.BeginRecord(true, EPRO_TEXT("./replay/_LastReplay.yrp"));
 	last_replay.WriteHeader(rh);
 	randengine rnd(seed);
 	//records the replay with the new system
@@ -1272,7 +1272,7 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 		}
 		return;
 	}
-	last_replay.Write<uint8_t>(len);
+	last_replay.Write<uint8_t>(len, false);
 	last_replay.WriteData(pdata, len);
 	OCG_DuelSetResponse(pduel, pdata, len);
 	GetAtPos(dp->type).player->state = 0xff;

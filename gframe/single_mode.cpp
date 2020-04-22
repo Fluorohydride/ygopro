@@ -49,7 +49,7 @@ void SingleMode::Restart() {
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
-	last_replay.Write<uint8_t>(len);
+	last_replay.Write<uint8_t>(len, false);
 	last_replay.WriteData(resp, len);
 	OCG_DuelSetResponse(pduel, resp, len);
 }
@@ -109,7 +109,7 @@ restart:
 	rh.seed = seed;
 	bool saveReplay = !hand_test || gGameConfig->saveHandTest;
 	if(saveReplay) {
-		last_replay.BeginRecord(false);
+		last_replay.BeginRecord(true, EPRO_TEXT("./replay/_LastReplay.yrp"));
 		last_replay.WriteHeader(rh);
 		//records the replay with the new system
 		new_replay.BeginRecord();

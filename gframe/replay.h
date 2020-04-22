@@ -6,6 +6,7 @@
 #include <ctime>
 #include <vector>
 #include <fstream>
+#include "text_types.h"
 
 namespace ygo {
 
@@ -58,7 +59,7 @@ class Replay {
 public:
 	Replay();
 	~Replay();
-	void BeginRecord(bool write = true);
+	void BeginRecord(bool write = true, path_string name = EPRO_TEXT("./replay/_LastReplay.yrpX"));
 	void WriteStream(const ReplayStream& stream);
 	void WritePacket(const ReplayPacket& p);
 	template <typename  T>
