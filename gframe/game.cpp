@@ -2029,7 +2029,9 @@ void Game::SaveConfig() {
 	gGameConfig->noShuffleDeck = chkNoShuffleDeck->isChecked();
 	gGameConfig->botThrowRock = gBot.chkThrowRock->isChecked();
 	gGameConfig->botMute = gBot.chkMute->isChecked();
-	gGameConfig->lastServer = serverChoice->getItem(serverChoice->getSelected());
+	auto lastServerIndex = serverChoice->getSelected();
+	if (lastServerIndex >= 0)
+		gGameConfig->lastServer = serverChoice->getItem(lastServerIndex);
 	gGameConfig->chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
 	gGameConfig->chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();
 	gGameConfig->chkRandomPos = tabSettings.chkRandomPos->isChecked();

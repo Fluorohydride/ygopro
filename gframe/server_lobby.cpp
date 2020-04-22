@@ -143,12 +143,14 @@ void ServerLobby::FillOnlineRooms() {
 	mainGame->roomListTable->setActiveColumn(mainGame->roomListTable->getActiveColumn(), true);
 }
 int ServerLobby::GetRoomsThread() {
+	auto selected = mainGame->serverChoice->getSelected();
+	if (selected < 0) return 0;
+	ServerInfo serverInfo = serversVector[selected];
+
 	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_WAIT);
 	mainGame->btnLanRefresh2->setEnabled(false);
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
-
-	ServerInfo serverInfo = serversVector[mainGame->serverChoice->getSelected()];
 
 	CURL *curl_handle;
 	CURLcode res;
@@ -250,7 +252,9 @@ void ServerLobby::RefreshRooms() {
 }
 void ServerLobby::JoinServer(bool host) {
 	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());
-	ServerInfo server = serversVector[mainGame->serverChoice->getSelected()];
+	auto selected = mainGame->serverChoice->getSelected();
+	if (selected < 0) return;
+	ServerInfo server = serversVector[selected];
 	try {
 		auto serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 		if(host) {
