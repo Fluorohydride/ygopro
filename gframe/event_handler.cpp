@@ -2006,6 +2006,12 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				}
 				return true;
 			}
+			case EDITBOX_NUMERIC: {
+				std::wstring tmp(event.GUIEvent.Caller->getText());
+				if(Utils::KeepOnlyDigits(tmp))
+					event.GUIEvent.Caller->setText(tmp.c_str());
+				break;
+			}
 			}
 			break;
 		}
