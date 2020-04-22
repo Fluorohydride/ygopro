@@ -24,7 +24,6 @@ addons:
     packages:
     - dylibbundler
     - p7zip
-    - freetype
     - curl
     - fmt
     - nlohmann-json
