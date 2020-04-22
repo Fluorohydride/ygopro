@@ -763,7 +763,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.chkVSync, 2073);
 	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).c_str(), Scale(340, 65, 545, 90), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stFPSCap, 2074);
-	gSettings.ebFPSCap = env->addEditBox(fmt::to_wstring(gGameConfig->maxFPS).c_str(), Scale(550, 65, 600, 90), true, sPanel, EDITBOX_NUMERIC);
+	gSettings.ebFPSCap = env->addEditBox(fmt::to_wstring(gGameConfig->maxFPS).c_str(), Scale(550, 65, 600, 90), true, sPanel, EDITBOX_FPS_CAP);
 	gSettings.btnFPSCap = env->addButton(Scale(605, 65, 645, 90), sPanel, BUTTON_FPS_CAP, gDataManager->GetSysString(1211).c_str());
 	defaultStrings.emplace_back(gSettings.btnFPSCap, 1211);
 	gSettings.chkShowConsole = env->addCheckBox(gGameConfig->showConsole, Scale(340, 95, 645, 120), sPanel, -1, gDataManager->GetSysString(2072).c_str());
@@ -1757,10 +1757,10 @@ bool Game::MainLoop() {
 		// astronomical FPS and CPU usage. As a workaround, while the game window is
 		// fully occluded, the game is restricted to 30 FPS.
 		int fpsLimit = device->isWindowActive() ? gGameConfig->maxFPS : 30;
-		if (!device->isWindowActive() || (gGameConfig->maxFPS && !gGameConfig->vsync)) {
+		if (!device->isWindowActive() || (gGameConfig->maxFPS > 0 && !gGameConfig->vsync)) {
 #else
 		int fpsLimit = gGameConfig->maxFPS;
-		if (gGameConfig->maxFPS && !gGameConfig->vsync) {
+		if(gGameConfig->maxFPS > 0 && !gGameConfig->vsync) {
 #endif
 			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
 			if(delta > 0) {
@@ -1779,7 +1779,8 @@ bool Game::MainLoop() {
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		if(gGameConfig->maxFPS != -1 || gGameConfig->vsync)
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	discord.UpdatePresence(DiscordWrapper::TERMINATE);
 	frameSignal.SetNoWait(true);

@@ -21,7 +21,7 @@ struct GameConfig
 	bool use_d3d = true;
 	bool vsync = true;
 	float dpi_scale = 1.0f;
-	unsigned int maxFPS = 60;
+	int maxFPS = 60;
 	int game_version = 0;
 	bool fullscreen = false;
 	bool showConsole = false;

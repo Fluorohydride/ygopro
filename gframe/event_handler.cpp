@@ -1843,7 +1843,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case BUTTON_APPLY_RESTART: {
 				try {
-					gGameConfig->dpi_scale = (std::stoi(mainGame->gSettings.ebDpiScale->getText()) / 100.0);
+					gGameConfig->dpi_scale = static_cast<uint32_t>(std::stol(mainGame->gSettings.ebDpiScale->getText())) / 100.0;
 					mainGame->restart = true;
 					//mainGame->device->closeDevice();
 				} catch(...){}
@@ -1851,7 +1851,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case BUTTON_FPS_CAP: {
 				try {
-					gGameConfig->maxFPS = std::stoi(mainGame->gSettings.ebFPSCap->getText());
+					gGameConfig->maxFPS = static_cast<int32_t>(std::stol(mainGame->gSettings.ebFPSCap->getText()));
 				} catch (...) {
 					mainGame->gSettings.ebFPSCap->setText(fmt::to_wstring(gGameConfig->maxFPS).c_str());
 				}
@@ -2006,10 +2006,27 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				}
 				return true;
 			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_CHANGED: {
+			switch(id) {
 			case EDITBOX_NUMERIC: {
 				std::wstring tmp(event.GUIEvent.Caller->getText());
 				if(Utils::KeepOnlyDigits(tmp))
 					event.GUIEvent.Caller->setText(tmp.c_str());
+				break;
+			}
+			case EDITBOX_FPS_CAP: {
+				std::wstring tmp(event.GUIEvent.Caller->getText());
+				if(Utils::KeepOnlyDigits(tmp, true) || tmp.size() > 1) {
+					if(tmp.size()>1)
+						if(tmp[0] == L'-' && (tmp[1] != L'1' || tmp.size() != 2)) {
+							event.GUIEvent.Caller->setText(L"-");
+							break;
+						}
+					event.GUIEvent.Caller->setText(tmp.c_str());
+				}
 				break;
 			}
 			}

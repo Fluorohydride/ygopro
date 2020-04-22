@@ -56,12 +56,17 @@ bool GameConfig::Load(const path_char* filename)
 				lastExtraRules = std::stoi(str);
 			else if (type == "lastDuelForbidden")
 				lastDuelForbidden = std::stoi(str);
+			else if (type == "maxFPS") {
+				int val = static_cast<int32_t>(std::stol(str));
+				if(val < 0 && val != -1)
+					val = static_cast<uint32_t>(std::stoul(str));
+				maxFPS = val;
+			}
 #define DESERIALIZE_UNSIGNED(name) \
 			else if (type == #name) { \
-				int val = static_cast<uint32_t>(std::stoul(str)); \
+				uint32_t val = static_cast<uint32_t>(std::stoul(str)); \
 				name = val; \
 			}
-			DESERIALIZE_UNSIGNED(maxFPS)
 			DESERIALIZE_UNSIGNED(coreLogOutput)
 			DESERIALIZE_UNSIGNED(lastlflist)
 			DESERIALIZE_UNSIGNED(lastallowedcards)

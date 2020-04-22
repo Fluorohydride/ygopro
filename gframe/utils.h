@@ -54,7 +54,7 @@ namespace ygo {
 		/** Returns true if and only if all tokens are contained in the input. */
 		static bool ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
-		static bool KeepOnlyDigits(std::wstring& input);
+		static bool KeepOnlyDigits(std::wstring& input, bool negative = false);
 	};
 
 template<typename T>
@@ -106,9 +106,13 @@ inline T Utils::ToUpperNoAccents(T input) {
 	return input;
 }
 
-inline bool Utils::KeepOnlyDigits(std::wstring& input) {
+inline bool Utils::KeepOnlyDigits(std::wstring& input, bool negative) {
 	bool changed = false;
 	for (auto it = input.begin(); it != input.end();) {
+		if(*it == L'-' && negative && it == input.begin()) {
+			it++;
+			continue;
+		}
 		if ((unsigned)(*it - L'0') > 9) {
 			it = input.erase(it);
 			changed = true;
