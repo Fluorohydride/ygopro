@@ -1465,8 +1465,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			irr::s32 x = pos.X;
 			irr::s32 y = pos.Y;
 			if(x < 300) {
-				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-				irr::gui::IGUIElement* elem = root->getElementFromPoint(pos);
 				mainGame->stTip->setVisible(should_show_tip);
 				break;
 			}
@@ -2159,22 +2157,42 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		break;
 	}
 	case irr::EET_MOUSE_INPUT_EVENT: {
-		if (gGameConfig->ctrlClickIsRMB && event.MouseInput.Control) {
-			auto SimulateMouse = [&](irr::EMOUSE_INPUT_EVENT type) {
-				irr::SEvent simulated = event;
-				simulated.MouseInput.Event = type;
-				mainGame->device->postEventFromUser(simulated);
-				return true;
-			};
-			switch (event.MouseInput.Event) {
-#define REMAP(TYPE) case irr::EMIE_LMOUSE_##TYPE: return SimulateMouse(irr::EMIE_RMOUSE_##TYPE)
-				REMAP(PRESSED_DOWN);
-				REMAP(LEFT_UP);
-				REMAP(DOUBLE_CLICK);
-				REMAP(TRIPLE_CLICK);
-#undef REMAP
-			default: break;
+		auto SimulateMouse = [device=mainGame->device, &event](irr::EMOUSE_INPUT_EVENT type) {
+			irr::SEvent simulated = event;
+			simulated.MouseInput.Event = type;
+			device->postEventFromUser(simulated);
+			return true;
+		};
+		switch (event.MouseInput.Event) {
+			case irr::EMIE_MOUSE_WHEEL: {
+				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+				irr::gui::IGUIElement* elem = root->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
+				auto checkstatic = [](irr::gui::IGUIElement* elem) -> bool {
+					return elem && elem->getType() == irr::gui::EGUIET_STATIC_TEXT;
+				};
+				auto checkscroll = [&checkstatic](irr::gui::IGUIElement* elem) -> bool {
+					return elem && (elem->getType() == irr::gui::EGUIET_SCROLL_BAR) && checkstatic(elem->getParent());
+				};
+				auto checkbutton = [&checkscroll](irr::gui::IGUIElement* elem) -> bool {
+					return elem && (elem->getType() == irr::gui::EGUIET_BUTTON) && checkscroll(elem->getParent());
+				};
+				if(checkstatic(elem) || checkscroll(elem) || checkbutton(elem)) {
+					if(elem->OnEvent(event)) {
+						stopPropagation = true;
+						return true;
+					}
+				}
+				break;
 			}
+			if(!gGameConfig->ctrlClickIsRMB || !event.MouseInput.Control)
+				break;
+#define REMAP(TYPE) case irr::EMIE_LMOUSE_##TYPE: return SimulateMouse(irr::EMIE_RMOUSE_##TYPE)
+			REMAP(PRESSED_DOWN);
+			REMAP(LEFT_UP);
+			REMAP(DOUBLE_CLICK);
+			REMAP(TRIPLE_CLICK);
+#undef REMAP
+		default: break;
 		}
 		break;
 	}
