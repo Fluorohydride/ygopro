@@ -2184,15 +2184,18 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				}
 				break;
 			}
-			if(!gGameConfig->ctrlClickIsRMB || !event.MouseInput.Control)
-				break;
+			default: break;
+		}
+		if(!gGameConfig->ctrlClickIsRMB || !event.MouseInput.Control)
+			break;
+		switch(event.MouseInput.Event) {
 #define REMAP(TYPE) case irr::EMIE_LMOUSE_##TYPE: return SimulateMouse(irr::EMIE_RMOUSE_##TYPE)
 			REMAP(PRESSED_DOWN);
 			REMAP(LEFT_UP);
 			REMAP(DOUBLE_CLICK);
 			REMAP(TRIPLE_CLICK);
 #undef REMAP
-		default: break;
+			default: break;
 		}
 		break;
 	}
