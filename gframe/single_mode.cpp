@@ -103,7 +103,7 @@ restart:
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
 	rh.version = CLIENT_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64;
+	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64 | REPLAY_NEWREPLAY;
 	if(hand_test)
 		rh.flag |= REPLAY_HAND_TEST;
 	rh.seed = seed;
@@ -114,7 +114,6 @@ restart:
 		//records the replay with the new system
 		new_replay.BeginRecord();
 		rh.id = REPLAY_YRPX;
-		rh.flag |= REPLAY_NEWREPLAY;
 		new_replay.WriteHeader(rh);
 		replay_stream.clear();
 	}

@@ -12,6 +12,7 @@ namespace ygo {
 void* ReplayMode::pduel = 0;
 bool ReplayMode::yrp = false;
 Replay ReplayMode::cur_replay;
+Replay* ReplayMode::cur_yrp = nullptr;
 bool ReplayMode::is_continuing = true;
 bool ReplayMode::is_closing = false;
 bool ReplayMode::is_pausing = false;
@@ -30,9 +31,15 @@ bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
 	if(skip_turn < 0)
 		skip_turn = 0;
 	yrp = is_yrp;
-	if(is_yrp)
+	if(is_yrp) {
+		if(cur_replay.pheader.id == REPLAY_YRP1)
+			cur_yrp = &cur_replay;
+		else
+			cur_yrp = cur_replay.yrp.get();
+		if(!cur_yrp)
+			return false;
 		std::thread(OldReplayThread).detach();
-	else
+	} else
 		std::thread(ReplayThread).detach();
 	return true;
 }
@@ -231,7 +238,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			return false;
 		}
 		case MSG_WIN: {
-			if(!yrp || !(cur_replay.yrp->pheader.flag & REPLAY_HAND_TEST)) {
+			if(!yrp || !cur_yrp || !(cur_yrp->pheader.flag & REPLAY_HAND_TEST)) {
 				if (mainGame->dInfo.isCatchingUp) {
 					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();

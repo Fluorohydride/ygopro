@@ -81,7 +81,7 @@ void LoadReplay() {
 	catch(...) { start_turn = 0; }
 	if(start_turn == 1)
 		start_turn = 0;
-	ReplayMode::StartReplay(start_turn, mainGame->chkYrp->isChecked());
+	ReplayMode::StartReplay(start_turn, (mainGame->chkYrp->isChecked() || replay.pheader.id == REPLAY_YRP1));
 }
 inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
