@@ -107,14 +107,17 @@ struct FadingUnit {
 };
 
 class Game {
-
 public:
 	bool Initialize();
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
 	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
 	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+	bool LoadDataDirs();
+#else
 	void LoadExpansions();
+#endif
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
@@ -176,6 +179,16 @@ public:
 	void SetWindowsScale(float scale);
 	void FlashWindow();
 	void SetCursor(ECURSOR_ICON icon);
+
+#ifdef XDG_ENVIRONMENT
+	std::string FindConfigFile(const std::string& file, bool existing = true);
+	std::string FindDataFile(const std::string& file, bool existing = true);
+
+	constexpr static const char* sysconfdir = "/etc/ygopro";
+	constexpr static const char* sysdatadir = "/usr/share/ygopro";
+	std::string CONFIG_HOME;
+	std::string DATA_HOME;
+#endif
 
 	std::mutex gMutex;
 	Signal frameSignal;

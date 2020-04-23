@@ -4,6 +4,12 @@
 #include "../ocgcore/common.h"
 #include "../ocgcore/mtrandom.h"
 
+#ifdef XDG_ENVIRONMENT
+#define DATA(x) mainGame->FindDataFile(x).c_str()
+#else
+#define DATA(x) x
+#endif
+
 namespace ygo {
 
 long SingleMode::pduel = 0;
@@ -59,7 +65,7 @@ int SingleMode::SinglePlayThread() {
 			wchar_t fname[256];
 			myswprintf(fname, L"./single/%ls", open_file_name);
 			slen = BufferIO::EncodeUTF8(fname, filename);
-			if(!preload_script(pduel, filename, 0))
+			if(!preload_script(pduel, DATA(filename), 0))
 				slen = 0;
 		}
 	} else {
@@ -67,7 +73,7 @@ int SingleMode::SinglePlayThread() {
 		wchar_t fname[256];
 		myswprintf(fname, L"./single/%ls", name);
 		slen = BufferIO::EncodeUTF8(fname, filename);
-		if(!preload_script(pduel, filename, 0))
+		if(!preload_script(pduel, DATA(filename), 0))
 			slen = 0;
 	}
 	if(slen == 0) {

@@ -1,4 +1,5 @@
 #include "replay.h"
+#include "game.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
 #include "lzma/LzmaLib.h"
@@ -16,8 +17,18 @@ Replay::~Replay() {
 	delete[] comp_data;
 }
 void Replay::BeginRecord() {
+#ifdef XDG_ENVIRONMENT
+	std::string replay_path = mainGame->DATA_HOME + "/replay";
+	if(!FileSystem::IsDirExists(mainGame->DATA_HOME.c_str()) &&
+	   !FileSystem::MakeDir(mainGame->DATA_HOME.c_str()))
+		return;
+	if(!FileSystem::IsDirExists(replay_path.c_str()) &&
+	   !FileSystem::MakeDir(replay_path.c_str()))
+		return;
+#else
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
+#endif
 #ifdef _WIN32
 	if(is_recording)
 		CloseHandle(recording_fp);
@@ -27,7 +38,11 @@ void Replay::BeginRecord() {
 #else
 	if(is_recording)
 		fclose(fp);
+#ifdef XDG_ENVIRONMENT
+	{ std::string new_replay = mainGame->FindDataFile("replay/_LastReplay.yrp", false); fp = fopen(new_replay.c_str(), "wb"); }
+#else
 	fp = fopen("./replay/_LastReplay.yrp", "wb");
+#endif
 	if(!fp)
 		return;
 #endif
@@ -124,8 +139,18 @@ void Replay::EndRecord() {
 	is_recording = false;
 }
 void Replay::SaveReplay(const wchar_t* name) {
+#ifdef XDG_ENVIRONMENT
+	std::string replay_path = mainGame->DATA_HOME + "/replay";
+	if(!FileSystem::IsDirExists(mainGame->DATA_HOME.c_str()) &&
+	   !FileSystem::MakeDir(mainGame->DATA_HOME.c_str()))
+		return;
+	if(!FileSystem::IsDirExists(replay_path.c_str()) &&
+	   !FileSystem::MakeDir(replay_path.c_str()))
+		return;
+#else
 	if(!FileSystem::IsDirExists(L"./replay") && !FileSystem::MakeDir(L"./replay"))
 		return;
+#endif
 	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
 #ifdef WIN32
@@ -133,7 +158,11 @@ void Replay::SaveReplay(const wchar_t* name) {
 #else
 	char fname2[256];
 	BufferIO::EncodeUTF8(fname, fname2);
+#ifdef XDG_ENVIRONMENT
+	{ std::string rp = mainGame->FindDataFile(fname2, false); fp = fopen(rp.c_str(), "wb"); }
+#else
 	fp = fopen(fname2, "wb");
+#endif
 #endif
 	if(!fp)
 		return;
@@ -147,7 +176,11 @@ bool Replay::OpenReplay(const wchar_t* name) {
 #else
 	char name2[256];
 	BufferIO::EncodeUTF8(name, name2);
+#ifdef XDG_ENVIRONMENT
+	{ std::string rp = mainGame->FindDataFile(name2); fp = fopen(rp.c_str(), "rb"); }
+#else
 	fp = fopen(name2, "rb");
+#endif
 #endif
 	if(!fp) {
 		wchar_t fname[256];
@@ -157,7 +190,11 @@ bool Replay::OpenReplay(const wchar_t* name) {
 #else
 		char fname2[256];
 		BufferIO::EncodeUTF8(fname, fname2);
+#ifdef XDG_ENVIRONMENT
+		{ std::string rp = mainGame->FindDataFile(fname2); fp = fopen(rp.c_str(), "rb"); }
+#else
 		fp = fopen(fname2, "rb");
+#endif
 #endif
 	}
 	if(!fp)
@@ -189,7 +226,12 @@ bool Replay::CheckReplay(const wchar_t* name) {
 #else
 	char fname2[256];
 	BufferIO::EncodeUTF8(fname, fname2);
+#ifdef XDG_ENVIRONMENT
+	FILE* rfp;
+	{ std::string rp = mainGame->FindDataFile(fname2); rfp = fopen(rp.c_str(), "rb"); }
+#else
 	FILE* rfp = fopen(fname2, "rb");
+#endif
 #endif
 	if(!rfp)
 		return false;
@@ -207,7 +249,12 @@ bool Replay::DeleteReplay(const wchar_t* name) {
 #else
 	char filefn[256];
 	BufferIO::EncodeUTF8(fname, filefn);
+#ifdef XDG_ENVIRONMENT
+	std::string real_file = mainGame->FindDataFile(filefn);
+	int result = unlink(real_file.c_str());
+#else
 	int result = unlink(filefn);
+#endif
 	return result == 0;
 #endif
 }
@@ -224,7 +271,13 @@ bool Replay::RenameReplay(const wchar_t* oldname, const wchar_t* newname) {
 	char newfilefn[256];
 	BufferIO::EncodeUTF8(oldfname, oldfilefn);
 	BufferIO::EncodeUTF8(newfname, newfilefn);
+#ifdef XDG_ENVIRONMENT
+	std::string old_path = mainGame->FindDataFile(oldfilefn);
+	std::string new_path = mainGame->FindDataFile(newfilefn, false);
+	int result = rename(old_path.c_str(), new_path.c_str());
+#else
 	int result = rename(oldfilefn, newfilefn);
+#endif
 	return result == 0;
 #endif
 }

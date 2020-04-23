@@ -16,8 +16,62 @@ namespace ygo {
 
 Game* mainGame;
 
+#ifdef XDG_ENVIRONMENT
+std::string Game::FindConfigFile(const std::string& file, bool existing) {
+	{
+		std::string base(CONFIG_HOME);
+		base += "/";
+		base += file;
+		if (!existing || FileSystem::IsFileExists(base.c_str()))
+			return base;
+	}
+	{
+		std::string base(sysconfdir);
+		base += "/";
+		base += file;
+		return base;
+	}
+}
+
+std::string Game::FindDataFile(const std::string& file, bool existing) {
+	{
+		std::string base(DATA_HOME);
+		base += "/";
+		base += file;
+		if (!existing || FileSystem::IsFileExists(base.c_str()))
+			return base;
+	}
+	{
+		std::string base(sysdatadir);
+		base += "/";
+		base += file;
+		return base;
+	}
+}
+#endif
+
 bool Game::Initialize() {
 	srand(time(0));
+#ifdef XDG_ENVIRONMENT
+	{
+		const char* xdg_config_home = getenv("XDG_CONFIG_HOME");
+		const char* xdg_data_home = getenv("XDG_DATA_HOME");
+		if (xdg_config_home)
+			CONFIG_HOME = xdg_config_home;
+		else {
+			CONFIG_HOME = getenv("HOME");
+			CONFIG_HOME += "/.config";
+		}
+		if (xdg_data_home)
+			DATA_HOME = xdg_data_home;
+		else {
+			DATA_HOME = getenv("HOME");
+			DATA_HOME += "/.local/share";
+		}
+		CONFIG_HOME += "/ygopro";
+		DATA_HOME += "/ygopro";
+	}
+#endif
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
@@ -49,7 +103,9 @@ bool Game::Initialize() {
 	menuHandler.prev_sel = -1;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	memset(chatTiming, 0, sizeof(chatTiming));
+#ifndef YGOPRO_ENVIRONMENT_PATHS
 	deckManager.LoadLFList();
+#endif
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
@@ -59,6 +115,10 @@ bool Game::Initialize() {
 		return false;
 	}
 	dataManager.FileSystem = device->getFileSystem();
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+	LoadDataDirs();
+	deckManager.LoadLFList();
+#else
 	LoadExpansions();
 	if(!dataManager.LoadDB(L"cards.cdb")) {
 		ErrorLog("Failed to load card database (cards.cdb)!");
@@ -69,6 +129,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	dataManager.LoadStrings("./expansions/strings.conf");
+#endif
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
@@ -930,6 +991,47 @@ void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gu
 	dataManager.strBuffer[pbuffer] = 0;
 	pControl->setText(dataManager.strBuffer);
 }
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+bool Game::LoadDataDirs() {
+	const char* data_path = getenv("YGOPRO_DATA_PATH");
+	if(!data_path) {
+		ErrorLog("No data dirs");
+		return false;
+	}
+	bool found_cdb = false;
+	bool found_strings = false;
+	path_foreach<char>(// Explicit template needed for implicit lambda conversion
+		std::string(data_path), ':',
+		[&](const std::string& prefix) {
+			FileSystem::TraversalDir(
+				prefix.c_str(),
+				[&](const char* name, bool isdir) {
+					if (isdir) return;
+					size_t len = strlen(name);
+					std::string full_path = prefix + "/" + name;
+					if (len > 4 && !strncmp(name + len - 4, ".cdb", 4)) {
+						dataManager.LoadDB(full_path.c_str());
+						found_cdb = true;
+					}
+					if (len == 12 && !strncmp(name, "strings.conf", 12)) {
+						dataManager.LoadStrings(full_path.c_str());
+						found_strings = true;
+					}
+					if (len == 11 && !strncmp(name, "lflist.conf", 11)) {
+						deckManager.LoadLFListSingle(full_path.c_str());
+					}
+				});
+		});
+	if(!found_cdb) {
+		ErrorLog("No card database found");
+		return false;
+	} else if (!found_strings) {
+		ErrorLog("No strings found");
+		return false;
+	}
+	return true;
+}
+#else
 void Game::LoadExpansions() {
 	FileSystem::TraversalDir(L"./expansions", [](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".cdb", 4)) {
@@ -972,8 +1074,21 @@ void Game::LoadExpansions() {
 		}
 	}
 }
+#endif // USE_ENVIRONMENT_PATHS
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
+#ifdef XDG_ENVIRONMENT
+	std::string deck_dir = DATA_HOME + "/deck";
+	FileSystem::TraversalDir(deck_dir.c_str(), [cbDeck](const char* name, bool isdir) {
+		if(!isdir && strchr(name, '.') && !strncmp(strchr(name, '.'), ".ydk", 4)) {
+			size_t len = strlen(name);
+			wchar_t deckname[256];
+			BufferIO::DecodeUTF8(name, deckname);
+			deckname[wcslen(deckname) - 4] = 0;
+			cbDeck->addItem(deckname);
+		}
+	});
+#else
 	FileSystem::TraversalDir(L"./deck", [cbDeck](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".ydk", 4)) {
 			size_t len = wcslen(name);
@@ -983,6 +1098,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 			cbDeck->addItem(deckname);
 		}
 	});
+#endif
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
 			cbDeck->setSelected(i);
@@ -992,24 +1108,54 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 }
 void Game::RefreshReplay() {
 	lstReplayList->clear();
+#ifdef XDG_ENVIRONMENT
+	std::string replay_dir = DATA_HOME + "/replay";
+	FileSystem::TraversalDir(replay_dir.c_str(), [this](const char* name, bool isdir) {
+		if(!isdir && strchr(name, '.') && !strncmp(strchr(name, '.'), ".yrp", 4)) {
+			size_t len = strlen(name);
+			wchar_t replay[256];
+			BufferIO::DecodeUTF8(name, replay);
+			if (Replay::CheckReplay(replay))
+				lstReplayList->addItem(replay);
+		}
+	});
+#else
 	FileSystem::TraversalDir(L"./replay", [this](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".yrp", 4) && Replay::CheckReplay(name))
 			lstReplayList->addItem(name);
 	});
+#endif
 }
 void Game::RefreshSingleplay() {
 	lstSinglePlayList->clear();
 	stSinglePlayInfo->setText(L"");
+#ifdef XDG_ENVIRONMENT
+	std::string single_dir = DATA_HOME + "/single";
+	FileSystem::TraversalDir(single_dir.c_str(), [this](const char* name, bool isdir) {
+		if(!isdir && strchr(name, '.') && !strncmp(strchr(name, '.'), ".lua", 4)) {
+			size_t len = strlen(name);
+			wchar_t single[256];
+			BufferIO::DecodeUTF8(name, single);
+			lstSinglePlayList->addItem(single);
+		}
+	});
+#else
 	FileSystem::TraversalDir(L"./single", [this](const wchar_t* name, bool isdir) {
 		if(!isdir && wcsrchr(name, '.') && !mywcsncasecmp(wcsrchr(name, '.'), L".lua", 4))
 			lstSinglePlayList->addItem(name);
 	});
+#endif
 }
 void Game::RefreshBot() {
 	if(!gameConf.enable_bot_mode)
 		return;
 	botInfo.clear();
+#ifdef XDG_ENVIRONMENT
+	FILE* fp;
+	{ std::string path = FindConfigFile("bot.conf"); fp = fopen(path.c_str(), "r"); }
+#else
 	FILE* fp = fopen("bot.conf", "r");
+#endif
 	char linebuf[256];
 	char strbuf[256];
 	if(fp) {
@@ -1049,7 +1195,12 @@ void Game::RefreshBot() {
 		SetStaticText(stBotInfo, 200, guiFont, dataManager.GetSysString(1385));
 }
 void Game::LoadConfig() {
+#ifdef XDG_ENVIRONMENT
+	FILE* fp;
+	{ std::string path = FindConfigFile("system.conf"); fp = fopen(path.c_str(), "r"); }
+#else
 	FILE* fp = fopen("system.conf", "r");
+#endif
 	if(!fp)
 		return;
 	char linebuf[256];
@@ -1212,7 +1363,15 @@ void Game::LoadConfig() {
 	fclose(fp);
 }
 void Game::SaveConfig() {
+#ifdef XDG_ENVIRONMENT
+	if (!FileSystem::IsDirExists(CONFIG_HOME.c_str()) &&
+		!FileSystem::MakeDir(CONFIG_HOME.c_str()))
+		return;
+	FILE* fp;
+	{ std::string path = FindConfigFile("system.conf", false); fp = fopen(path.c_str(), "w"); }
+#else
 	FILE* fp = fopen("system.conf", "w");
+#endif
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[256];
 	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);

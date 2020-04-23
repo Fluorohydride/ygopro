@@ -10,6 +10,17 @@ byte DataManager::scriptBuffer[0x20000];
 IFileSystem* DataManager::FileSystem;
 DataManager dataManager;
 
+bool DataManager::LoadDB(const char* file) {
+#ifdef _WIN32
+	char wfile[256];
+	BufferIO::DecodeUTF8(file, wfile);
+	IReadFile* reader = FileSystem->createAndOpenFile(wfile);
+#else
+	IReadFile* reader = FileSystem->createAndOpenFile(file);
+#endif
+	return LoadDB(file, reader);
+}
+
 bool DataManager::LoadDB(const wchar_t* wfile) {
 	char file[256];
 	BufferIO::EncodeUTF8(wfile, file);
@@ -18,6 +29,10 @@ bool DataManager::LoadDB(const wchar_t* wfile) {
 #else
 	IReadFile* reader = FileSystem->createAndOpenFile(file);
 #endif
+	return LoadDB(file, reader);
+}
+
+bool DataManager::LoadDB(const char* file, IReadFile* reader) {
 	if(reader == NULL)
 		return false;
 	spmemvfs_db_t db;
@@ -350,6 +365,21 @@ int DataManager::CardReader(int code, void* pData) {
 	return 0;
 }
 byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
+	if (script_name[0] == '/') // absolute path
+		return ScriptReader(script_name, slen);
+#ifdef YGOPRO_ENVIRONMENT_PATHS
+	// default script name: ./script/c%d.lua -> /c%d.lua
+	std::string file_name(script_name + 8);
+	const char* _script_path = getenv("YGOPRO_SCRIPT_PATH");
+	if (!_script_path) return NULL;
+	byte* res = NULL;
+	path_foreach<char>(std::string(_script_path), ':',
+					   [&](const std::string& prefix) {
+						   std::string full_path = prefix + file_name;
+						   res = res ? res : ScriptReader(full_path.c_str(), slen);
+					   });
+	return res;
+#else
 	// default script name: ./script/c%d.lua
 	char first[256];
 	char second[256];
@@ -364,6 +394,7 @@ byte* DataManager::ScriptReaderEx(const char* script_name, int* slen) {
 		return scriptBuffer;
 	else
 		return ScriptReader(second, slen);
+#endif
 }
 byte* DataManager::ScriptReader(const char* script_name, int* slen) {
 #ifdef _WIN32
