@@ -800,14 +800,14 @@ bool Game::Initialize() {
 	gSettings.scrMusicVolume->setLargeStep(1);
 	gSettings.scrMusicVolume->setSmallStep(1);
 	gSettings.chkLoopMusic = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 305, 645, 330), sPanel, CHECKBOX_LOOP_MUSIC, gDataManager->GetSysString(2079).c_str());
-	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2079);
+	defaultStrings.emplace_back(gSettings.chkLoopMusic, 2079);
 	gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(340, 215, 645, 330), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stNoAudioBackend, 2058);
 	gSettings.stNoAudioBackend->setVisible(false);
 	gSettings.chkDiscordIntegration = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 335, 645, 360), sPanel, CHECKBOX_DISCORD_INTEGRATION, gDataManager->GetSysString(2078).c_str());
 	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2078);
 	gSettings.chkHideHandsInReplays = env->addCheckBox(gGameConfig->hideHandsInReplays, Scale(340, 365, 645, 390), sPanel, CHECKBOX_HIDE_HANDS_REPLAY, gDataManager->GetSysString(2080).c_str());
-	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2080);
+	defaultStrings.emplace_back(gSettings.chkHideHandsInReplays, 2080);
 	// end audio
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
