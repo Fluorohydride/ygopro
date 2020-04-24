@@ -29,8 +29,11 @@ namespace ygo {
 
 void UpdateDeck() {
 	gGameConfig->lastdeck = mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected());
-	char deckbuf[1024];
+	char deckbuf[0xf000];
 	char* pdeck = deckbuf;
+	const auto totsize = gdeckManager->current_deck.main.size() + gdeckManager->current_deck.extra.size() + gdeckManager->current_deck.side.size();
+	if(totsize > (sizeof(deckbuf) - 2 * sizeof(int32_t)))
+		return;
 	BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.main.size() + gdeckManager->current_deck.extra.size());
 	BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.side.size());
 	for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i)
