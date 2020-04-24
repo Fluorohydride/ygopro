@@ -1096,7 +1096,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->HideElement(mainGame->wCardDisplay);
 			mainGame->gMutex.unlock();
 			mainGame->WaitFrameSignal(11);
-		}
+		}*/
 		if(mainGame->wOptions->isVisible()) {
 			mainGame->gMutex.lock();
 			mainGame->HideElement(mainGame->wOptions);
