@@ -9,12 +9,24 @@ GameConfig::GameConfig() {
 	Load(EPRO_TEXT("./config/system.conf"));
 	if(configs.empty()) {
 		std::ifstream conf_file(EPRO_TEXT("./config/configs.json"), std::ifstream::in);
-		try {
-			conf_file >> configs;
+		if(conf_file.good()) {
+			try {
+				conf_file >> configs;
+			}
+			catch(std::exception& e) {
+				ErrorLog(std::string("Exception occurred while loading configs.json: ") + e.what());
+				//throw(e);
+			}
 		}
-		catch(std::exception& e) {
-			ErrorLog(std::string("Exception occurred: ") + e.what());
-			throw(e);
+		std::ifstream user_conf_file(EPRO_TEXT("./config/user_configs.json"), std::ifstream::in);
+		if(user_conf_file.good()) {
+			try {
+				user_conf_file >> user_configs;
+			}
+			catch(std::exception& e) {
+				ErrorLog(std::string("Exception occurred while loading user_configs.json: ") + e.what());
+				//throw(e);
+			}
 		}
 	}
 }

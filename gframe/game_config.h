@@ -99,6 +99,7 @@ struct GameConfig
 	path_string working_directory = EPRO_TEXT("./");
 
 	nlohmann::json configs;
+	nlohmann::json user_configs;
 };
 
 extern GameConfig* gGameConfig;

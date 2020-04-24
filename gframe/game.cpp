@@ -1977,7 +1977,9 @@ void Game::RefreshAiDecks() {
 #ifdef _WIN32
 					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
 #else
-					if (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
+					if(gGameConfig->user_configs.size() && gGameConfig->user_configs["posixPathExtension"].is_string()) {
+						bot.executablePath = gGameConfig->user_configs["posixPathExtension"].get<path_string>();
+					} elseif (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
 						bot.executablePath = gGameConfig->configs["posixPathExtension"].get<path_string>();
 					} else {
 						bot.executablePath = EPRO_TEXT("");
@@ -2151,18 +2153,21 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 }
 void Game::LoadServers() {
 	try {
-		if(gGameConfig->configs.size() && gGameConfig->configs["servers"].is_array()) {
-			for(auto& obj : gGameConfig->configs["servers"].get<std::vector<nlohmann::json>>()) {
-				ServerInfo tmp_server;
-				tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-				tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
-				tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
-				tmp_server.roomlistport = obj["roomlistport"].get<int>();
-				tmp_server.duelport = obj["duelport"].get<int>();
-				int i = serverChoice->addItem(tmp_server.name.c_str());
-				if (gGameConfig->lastServer == tmp_server.name)
-					serverChoice->setSelected(i);
-				ServerLobby::serversVector.push_back(std::move(tmp_server));
+		for(auto& _config : { std::ref(gGameConfig->user_configs), std::ref(gGameConfig->configs) }) {
+			auto& config = _config.get();
+			if(config.size() && config["servers"].is_array()) {
+				for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
+					ServerInfo tmp_server;
+					tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+					tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
+					tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
+					tmp_server.roomlistport = obj["roomlistport"].get<int>();
+					tmp_server.duelport = obj["duelport"].get<int>();
+					int i = serverChoice->addItem(tmp_server.name.c_str());
+					if(gGameConfig->lastServer == tmp_server.name)
+						serverChoice->setSelected(i);
+					ServerLobby::serversVector.push_back(std::move(tmp_server));
+				}
 			}
 		}
 	}

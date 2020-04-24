@@ -38,38 +38,41 @@ void DataHandler::LoadArchivesDB() {
 }
 
 void DataHandler::LoadPicUrls() {
-	try {
-		if(configs->configs.size() && configs->configs["urls"].is_array()) {
-			for(auto& obj : configs->configs["urls"].get<std::vector<nlohmann::json>>()) {
-				auto type = obj["type"].get<std::string>();
-				if(obj["url"].get<std::string>() == "default") {
-					if(type == "pic") {
+	for(auto& _config : { std::ref(configs->user_configs), std::ref(configs->configs) }) {
+		auto& config = _config.get();
+		try {
+			if(config.size() && config["urls"].is_array()) {
+				for(auto& obj : config["urls"].get<std::vector<nlohmann::json>>()) {
+					auto type = obj["type"].get<std::string>();
+					if(obj["url"].get<std::string>() == "default") {
+						if(type == "pic") {
 #ifdef DEFAULT_PIC_URL
-						imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
+							imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
 #else
-						continue;
+							continue;
 #endif
-					} else if (type == "field") {
+						} else if(type == "field") {
 #ifdef DEFAULT_FIELD_URL
-						imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
+							imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
 #else
-						continue;
+							continue;
 #endif
-					} else if (type == "cover") {
+						} else if(type == "cover") {
 #ifdef DEFAULT_COVER_URL
-						imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, ImageDownloader::COVER });
+							imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, ImageDownloader::COVER });
 #else
-						continue;
+							continue;
 #endif
+						}
+					} else {
+						imageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ? ImageDownloader::FIELD : (type == "pic") ? ImageDownloader::ART : ImageDownloader::COVER });
 					}
-				} else {
-					imageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ? ImageDownloader::FIELD : (type == "pic") ? ImageDownloader::ART : ImageDownloader::COVER });
 				}
 			}
 		}
-	}
-	catch(std::exception& e) {
-		ErrorLog(std::string("Exception occurred: ") + e.what());
+		catch(std::exception& e) {
+			ErrorLog(std::string("Exception occurred: ") + e.what());
+		}
 	}
 }
 void DataHandler::LoadZipArchives() {
@@ -108,6 +111,7 @@ DataHandler::DataHandler() {
 	configs->working_directory = porting::working_directory;
 #endif
 	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume / 100.0, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic / 100.0, configs->working_directory));
+	gitManager->LoadRepositoriesFromJson(configs->user_configs);
 	gitManager->LoadRepositoriesFromJson(configs->configs);
 	dataManager = std::unique_ptr<DataManager>(new DataManager());
 	imageDownloader = std::unique_ptr<ImageDownloader>(new ImageDownloader());
