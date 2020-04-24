@@ -1979,7 +1979,7 @@ void Game::RefreshAiDecks() {
 #else
 					if(gGameConfig->user_configs.size() && gGameConfig->user_configs["posixPathExtension"].is_string()) {
 						bot.executablePath = gGameConfig->user_configs["posixPathExtension"].get<path_string>();
-					} elseif (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
+					} else if (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
 						bot.executablePath = gGameConfig->configs["posixPathExtension"].get<path_string>();
 					} else {
 						bot.executablePath = EPRO_TEXT("");

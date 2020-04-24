@@ -1976,6 +1976,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				gGameConfig->saveHandTest = mainGame->gSettings.chkSaveHandTest->isChecked();
 				return true;
 			}
+			case CHECKBOX_LOOP_MUSIC: {
+				gGameConfig->loopMusic = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
+				break;
+			}
 			case CHECKBOX_DISCORD_INTEGRATION: {
 				gGameConfig->discordIntegration = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
 				mainGame->discord.UpdatePresence(gGameConfig->discordIntegration ? DiscordWrapper::INITIALIZE : DiscordWrapper::TERMINATE);
