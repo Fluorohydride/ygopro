@@ -64,6 +64,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_JOIN_HOST: {
 				bot_mode = false;
+				mainGame->TrimText(mainGame->ebJoinHost);
+				mainGame->TrimText(mainGame->ebJoinPort);
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, ip, 16);

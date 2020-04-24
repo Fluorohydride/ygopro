@@ -6,7 +6,6 @@
 #include "sound_manager.h"
 #include "game.h"
 #include "duelclient.h"
-#include <algorithm>
 
 namespace ygo {
 
@@ -814,6 +813,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
+			case EDITBOX_INPUTS:
 			case EDITBOX_KEYWORD: {
 				StartFilter();
 				break;
@@ -970,6 +970,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
+				mainGame->env->setFocus(0);
 				InstantSearch();
 				break;
 			}
@@ -987,13 +988,16 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->ebDefense->setEnabled(true);
 					}
 				}
+				mainGame->env->setFocus(0);
 				InstantSearch();
 				break;
 			}
 			case COMBOBOX_ATTRIBUTE:
 			case COMBOBOX_RACE:
 			case COMBOBOX_LIMIT:
+				mainGame->env->setFocus(0);
 				InstantSearch();
+				break;
 			}
 		}
 		case irr::gui::EGET_LISTBOX_CHANGED: {
@@ -1428,8 +1432,8 @@ void DeckBuilder::FilterCards() {
 			}
 			if(filter_scltype) {
 				if((filter_scltype == 1 && data.lscale != filter_scl) || (filter_scltype == 2 && data.lscale < filter_scl)
-				        || (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl || data.lscale == 0))
-				        || (filter_scltype == 5 && (data.lscale >= filter_scl || data.lscale == 0)) || filter_scltype == 6
+				        || (filter_scltype == 3 && data.lscale <= filter_scl) || (filter_scltype == 4 && (data.lscale > filter_scl))
+				        || (filter_scltype == 5 && (data.lscale >= filter_scl)) || filter_scltype == 6
 				        || !(data.type & TYPE_PENDULUM))
 					continue;
 			}
@@ -1608,6 +1612,7 @@ bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needl
 				return true;
 			}
 		} else {
+			i -= j;
 			j = 0;
 		}
 		i++;
