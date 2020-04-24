@@ -997,15 +997,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
-				SetShowMark(mcard, true);
-				ShowCardInfoInList(mcard, mainGame->btnCardSelect[id - BUTTON_CARD_0], mainGame->wCardSelect);
-				if(mcard->code) {
-					mainGame->ShowCardInfo(mcard->code);
-				} else {
-					if(mcard->cover)
-						mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
-					else
-						mainGame->ClearCardInfo(mcard->controler);
+				if(mcard) {
+					SetShowMark(mcard, true);
+					ShowCardInfoInList(mcard, mainGame->btnCardSelect[id - BUTTON_CARD_0], mainGame->wCardSelect);
+					if(mcard->code) {
+						mainGame->ShowCardInfo(mcard->code);
+					} else {
+						if(mcard->cover)
+							mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
+						else
+							mainGame->ClearCardInfo(mcard->controler);
+					}
 				}
 			}
 			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
@@ -1973,10 +1975,6 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			case CHECKBOX_SAVE_HAND_TEST_REPLAY: {
 				gGameConfig->saveHandTest = mainGame->gSettings.chkSaveHandTest->isChecked();
 				return true;
-			}
-			case CHECKBOX_LOOP_MUSIC: {
-				gGameConfig->loopMusic = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
-				break;
 			}
 			case CHECKBOX_DISCORD_INTEGRATION: {
 				gGameConfig->discordIntegration = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
