@@ -1074,6 +1074,7 @@ bool DeckBuilder::CardNameContains(const wchar_t *haystack, const wchar_t *needl
 				return true;
 			}
 		} else {
+			i -= j;
 			j = 0;
 		}
 		i++;
