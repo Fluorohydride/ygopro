@@ -299,9 +299,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_OPTION_0:
-			case BUTTON_OPTION_1: 
-			case BUTTON_OPTION_2: 
-			case BUTTON_OPTION_3: 
+			case BUTTON_OPTION_1:
+			case BUTTON_OPTION_2:
+			case BUTTON_OPTION_3:
 			case BUTTON_OPTION_4: {
 				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
 				selected_option = id - BUTTON_OPTION_0 + step;
@@ -1937,6 +1937,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case CHECKBOX_SHOW_SCOPE_LABEL: {
 				gGameConfig->showScopeLabel = mainGame->gSettings.chkShowScopeLabel->isChecked();
+				return true;
+			}
+			case CHECKBOX_VSYNC: {
+				gGameConfig->vsync = mainGame->gSettings.chkVSync->isChecked();
+				mainGame->driver->setVsync(gGameConfig->vsync);
 				return true;
 			}
 			case CHECKBOX_SHOW_FPS: {

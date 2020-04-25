@@ -759,7 +759,7 @@ bool Game::Initialize() {
 	gSettings.stAntiAlias = env->addStaticText(gDataManager->GetSysString(2075).c_str(), Scale(340, 5, 545, 30), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stAntiAlias, 2075);
 	gSettings.ebAntiAlias = env->addEditBox(fmt::to_wstring(gGameConfig->antialias).c_str(), Scale(550, 5, 645, 30), true, sPanel, EDITBOX_NUMERIC);
-	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(340, 35, 645, 60), sPanel, -1, gDataManager->GetSysString(2073).c_str());
+	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(340, 35, 645, 60), sPanel, CHECKBOX_VSYNC, gDataManager->GetSysString(2073).c_str());
 	defaultStrings.emplace_back(gSettings.chkVSync, 2073);
 	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).c_str(), Scale(340, 65, 545, 90), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stFPSCap, 2074);
@@ -1493,7 +1493,7 @@ bool Game::MainLoop() {
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, CAMERA_LEFT, CAMERA_RIGHT, CAMERA_BOTTOM, CAMERA_TOP, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-	
+
 	mProjection.buildCameraLookAtMatrixLH(irr::core::vector3df(FIELD_X, FIELD_Y, FIELD_Z), irr::core::vector3df(FIELD_X, 0, 0), irr::core::vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
@@ -1671,7 +1671,7 @@ bool Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();)
 		} else if(is_building) {
-			
+
 			if(is_siding)
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
 			else
@@ -2768,7 +2768,7 @@ void Game::ReloadElementsStrings() {
 	prev = cbFilterRule->getSelected();
 	ReloadCBFilterRule();
 	cbFilterRule->setSelected(prev);
-	
+
 	prev = cbDuelRule->getSelected();
 	if (prev >= 5) {
 		UpdateDuelParam();
