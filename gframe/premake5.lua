@@ -68,7 +68,6 @@ local ygopro_config=function(static_core)
 
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
-		buildoptions { "-fpermissive" }
 		if _OPTIONS["discord"] then
 			links "discord-rpc"
 		end
