@@ -1697,7 +1697,7 @@ bool Game::MainLoop() {
 		if (is_building || is_siding) {
 			fpsCounter->setRelativePosition(Resize(205, CARD_IMG_HEIGHT + 1, 300, CARD_IMG_HEIGHT + 21));
 		} else if (wChat->isVisible()) { // Move it above the chat box
-			fpsCounter->setRelativePosition(Resize(1024 - fpsCounterWidth, 600, 1024, 620));
+			fpsCounter->setRelativePosition(Resize(1020 - fpsCounterWidth, 595, 1020, 615));
 		} else { // bottom right of window with a little padding
 			fpsCounter->setRelativePosition(Resize(1024 - fpsCounterWidth, 620, 1024, 640));
 		}
