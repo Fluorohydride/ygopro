@@ -35,7 +35,7 @@ matrix:
     - VCPKG_ROOT=/c/vcpkg
     - VCPKG_DEFAULT_TRIPLET=x86-windows-static
     - VCPKG_LIBS="lua[cpp] libevent sqlite3 bzip2 libjpeg-turbo libpng zlib curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200422/installed_x86-windows-static.zip
+    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200425/installed_x86-windows-static.zip
     - DXSDK_DIR=/c/d3d9sdk/
   - name: "Bionic GCC7"
     os: linux
@@ -43,7 +43,7 @@ matrix:
     env:
     - VCPKG_ROOT="$PWD/vcpkg"
     - VCPKG_LIBS="libevent sqlite3 freetype irrlicht-rectclip curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200422/installed_x64-linux.7z
+    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200425/installed_x64-linux.7z
   - name: "Mojave"
     os: osx
     osx_image: xcode11.3
@@ -52,7 +52,7 @@ matrix:
     - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk"
     - VCPKG_ROOT=./vcpkg
     - VCPKG_LIBS="libevent sdl2-mixer-fixdynamic[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200422/installed_x64-osx.7z
+    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200425/installed_x64-osx.7z
 before_install: ./travis/install-premake5.sh
 install: ./travis/dependencies.sh
 script: ./travis/build.sh
