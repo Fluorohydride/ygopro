@@ -84,7 +84,7 @@ restart:
 	DuelClient::rnd.seed(seed);
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { start_lp, start_hand, draw_count };
-	bool hand_test = open_file && open_file_name == EPRO_TEXT("hand-test-mode");
+	bool hand_test = mainGame->dInfo.isHandTest = open_file && open_file_name == EPRO_TEXT("hand-test-mode");
 	if(hand_test) {
 		opt = DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR5 | DUEL_SIMPLE_AI;
 	}
@@ -163,6 +163,7 @@ restart:
 		OCG_DestroyDuel(pduel);
 		pduel = nullptr;
 		mainGame->dInfo.isSingleMode = false;
+		mainGame->dInfo.isHandTest = false;
 		open_file = false;
 		is_restarting = false;
 		last_replay.EndRecord();
@@ -283,6 +284,7 @@ restart:
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
+		mainGame->dInfo.isHandTest = false;
 		mainGame->gMutex.unlock();
 		if(!hand_test) {
 			mainGame->closeDoneSignal.Reset();

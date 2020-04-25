@@ -71,6 +71,7 @@ struct DuelInfo {
 	bool isRelay;
 	bool isInLobby;
 	bool isSingleMode;
+	bool isHandTest;
 	bool compat_mode;
 	bool is_shuffling;
 	int current_player[2];

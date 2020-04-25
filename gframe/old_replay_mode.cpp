@@ -24,6 +24,7 @@ namespace ygo {
 		mainGame->dInfo.isTeam1 = true;
 		mainGame->dInfo.isRelay = !!(cur_yrp->params.duel_flags & DUEL_RELAY);
 		mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
+		mainGame->dInfo.isHandTest = !!(rh.flag & REPLAY_HAND_TEST);
 		mainGame->dInfo.compat_mode = false;
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;

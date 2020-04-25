@@ -19,6 +19,7 @@ public:
 		DUEL_STARTED,
 		REPLAY,
 		PUZZLE,
+		HAND_TEST,
 		DECK,
 		DECK_SIDING,
 		CLEAR,

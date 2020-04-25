@@ -1644,6 +1644,8 @@ bool Game::MainLoop() {
 		if(dInfo.isInDuel) {
 			if(dInfo.isReplay)
 				discord.UpdatePresence(DiscordWrapper::REPLAY);
+			else if(dInfo.isHandTest)
+				discord.UpdatePresence(DiscordWrapper::HAND_TEST);
 			else if(dInfo.isSingleMode)
 				discord.UpdatePresence(DiscordWrapper::PUZZLE);
 			else {
