@@ -148,27 +148,19 @@ GenericDuel::duelist& GenericDuel::GetAtPos(int pos) {
 	}
 }
 void GenericDuel::Catchup(DuelPlayer * dp) {
-	observers_mutex.lock();
 	if(!pduel) {
 		observers.insert(dp);
-		observers_mutex.unlock();
 		return;
 	}
-	observers_mutex.unlock();
 	char buf = 1;
 	NetServer::SendPacketToPlayer(dp, STOC_CATCHUP, buf);
 	int i = 0;
 	for(i = 0; i < packets_cache.size(); i++) {
 		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, packets_cache[i].data.data(), packets_cache[i].data.size());
 	}
-	observers_mutex.lock();
-	for(; i < packets_cache.size(); i++) {
-		NetServer::SendBufferToPlayer(dp, STOC_GAME_MSG, packets_cache[i].data.data(), packets_cache[i].data.size());
-	}
 	buf = 0;
 	NetServer::SendPacketToPlayer(dp, STOC_CATCHUP, buf);
 	observers.insert(dp);
-	observers_mutex.unlock();
 }
 void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 	if(!is_creater) {
@@ -198,12 +190,11 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		}
 	}
 	dp->game = this;
-	if(duel_stage == DUEL_STAGE_FINGER || duel_stage == DUEL_STAGE_FIRSTGO || duel_stage == DUEL_STAGE_DUELING) {
+	if(duel_stage == DUEL_STAGE_FINGER || duel_stage == DUEL_STAGE_FIRSTGO || duel_stage == DUEL_STAGE_DUELING || duel_stage == DUEL_STAGE_SIDING || seeking_rematch) {
 		STOC_JoinGame scjg;
 		scjg.info = host_info;
 		STOC_TypeChange sctc;
-		sctc.type = 0;
-		sctc.type |= NETPLAYER_TYPE_OBSERVER;
+		sctc.type = NETPLAYER_TYPE_OBSERVER;
 		NetServer::SendPacketToPlayer(dp, STOC_JOIN_GAME, scjg);
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 		dp->type = NETPLAYER_TYPE_OBSERVER;
@@ -215,6 +206,9 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 		)
 		NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
+		if(seeking_rematch || duel_stage == DUEL_STAGE_SIDING) {
+			NetServer::SendPacketToPlayer(dp, STOC_WAITING_SIDE);
+		}
 		Catchup(dp);
 		return;
 	}
@@ -265,9 +259,7 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 		EndDuel();
 		NetServer::StopServer();
 	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
-		observers_mutex.lock();
 		observers.erase(dp);
-		observers_mutex.unlock();
 		if(duel_stage == DUEL_STAGE_BEGIN) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
@@ -453,12 +445,10 @@ void GenericDuel::StartDuel(DuelPlayer* dp) {
 	//NetServer::StopListen();
 	//NetServer::StopBroadcast();
 	ITERATE_PLAYERS(NetServer::SendPacketToPlayer(dueler.player, STOC_DUEL_START);)
-	observers_mutex.lock();
 	for(auto& obs : observers) {
 		obs->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(obs);
 	}
-	observers_mutex.unlock();
 	NetServer::SendPacketToPlayer(players.home.front().player, STOC_SELECT_HAND);
 	NetServer::ReSendToPlayer(players.opposing.front().player);
 	hand_result[0] = 0;
@@ -480,10 +470,8 @@ void GenericDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 		schr.res2 = hand_result[1];
 		for (auto& dueler : players.home)
 			NetServer::SendPacketToPlayer(dueler.player, STOC_HAND_RESULT, schr);
-		observers_mutex.lock();
 		for(auto& obs : observers)
 			NetServer::ReSendToPlayer(obs);
-		observers_mutex.unlock();
 		schr.res1 = hand_result[1];
 		schr.res2 = hand_result[0];
 		for(auto& dueler : players.opposing)
@@ -678,10 +666,8 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(!swapped)
 		startbuf[1] = 0x10;
 	else startbuf[1] = 0x11;
-	observers_mutex.lock();
 	for(auto& obs : observers)
 		NetServer::SendBufferToPlayer(obs, STOC_GAME_MSG, startbuf, 18);
-	observers_mutex.unlock();
 	packets_cache.emplace_back(startbuf, 18);
 	startbuf[1] = 0;
 	replay_stream.emplace_back(startbuf, 17);
@@ -701,9 +687,7 @@ void GenericDuel::Process() {
 		engFlag = OCG_DuelProcess(pduel);
 		auto msg = CoreUtils::ParseMessages(pduel);
 		for(auto& message : msg.packets) {
-			observers_mutex.lock();
 			stop = Analyze(message);
-			observers_mutex.unlock();
 			if(stop)
 				break;
 		}

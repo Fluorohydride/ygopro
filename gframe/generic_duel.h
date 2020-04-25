@@ -78,7 +78,6 @@ protected:
 		std::vector<duelist>::iterator home_iterator, opposing_iterator;
 	} players;
 	DuelPlayer* cur_player[2];
-	std::mutex observers_mutex;
 	std::set<DuelPlayer*> observers;
 	unsigned char hand_result[2];
 	unsigned char last_response;
