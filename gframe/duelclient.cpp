@@ -119,6 +119,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, unsigned int 
 	mainGame->dInfo.secret.server_port = port;
 	mainGame->dInfo.secret.server_address = ip;
 	mainGame->dInfo.isCatchingUp = false;
+	mainGame->dInfo.checkRematch = false;
 	std::thread(ClientThread).detach();
 	return true;
 }
@@ -288,6 +289,7 @@ catch(...) { what = def; }
 					mainGame->closeDoneSignal.Wait();
 					mainGame->closeSignal.unlock();
 					mainGame->gMutex.lock();
+					mainGame->dInfo.checkRematch = false;
 					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
 					mainGame->dField.Clear();
@@ -508,6 +510,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_CHANGE_SIDE: {
 		gSoundManager->StopSounds();
 		mainGame->gMutex.lock();
+		mainGame->dInfo.checkRematch = false;
 		mainGame->dInfo.isInLobby = false;
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
@@ -543,10 +546,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.unlock();
 		break;
 	}
-	case STOC_WAITING_SIDE: {
+	case STOC_WAITING_SIDE:
+	case STOC_WAITING_REMATCH: {
 		mainGame->gMutex.lock();
 		mainGame->dField.Clear();
-		mainGame->stHintMsg->setText(gDataManager->GetSysString(1409).c_str());
+		mainGame->stHintMsg->setText(gDataManager->GetSysString(pktType == STOC_WAITING_SIDE ?  1409 : 1424).c_str());
 		mainGame->stHintMsg->setVisible(true);
 		mainGame->gMutex.unlock();
 		break;
@@ -771,6 +775,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dField.Clear();
 		mainGame->dInfo.isInLobby = false;
 		mainGame->is_siding = false;
+		mainGame->dInfo.checkRematch = false;
 		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.lp[0] = 0;
@@ -853,6 +858,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->closeSignal.unlock();
 		mainGame->gMutex.lock();
 		mainGame->dInfo.isInLobby = false;
+		mainGame->dInfo.checkRematch = false;
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dField.Clear();
@@ -1022,6 +1028,14 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		break;
 	}
+	case STOC_REMATCH: {
+		mainGame->gMutex.lock();
+		mainGame->dInfo.checkRematch = true;
+		mainGame->stQMessage->setText((wchar_t*)gDataManager->GetSysString(1989).c_str());
+		mainGame->PopupElement(mainGame->wQuery);
+		mainGame->gMutex.unlock();
+		break;
+	}
 	}
 }
 bool DuelClient::CheckReady() {
@@ -1139,6 +1153,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.Clear();
 			mainGame->dInfo.isInLobby = false;
 			mainGame->dInfo.isInDuel = false;
+			mainGame->dInfo.checkRematch = false;
 			mainGame->dInfo.isStarted = false;
 			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 			mainGame->btnJoinHost->setEnabled(true);

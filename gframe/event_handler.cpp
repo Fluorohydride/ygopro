@@ -202,6 +202,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_YES: {
+				if(mainGame->dInfo.checkRematch) {
+					mainGame->HideElement(mainGame->wQuery);
+					CTOS_RematchResponse crr;
+					crr.rematch = true;
+					DuelClient::SendPacketToServer(CTOS_REMATCH_RESPONSE, crr);
+					break;
+				}
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
@@ -232,6 +239,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_NO: {
+				if(mainGame->dInfo.checkRematch) {
+					mainGame->HideElement(mainGame->wQuery);
+					CTOS_RematchResponse crr;
+					crr.rematch = false;
+					DuelClient::SendPacketToServer(CTOS_REMATCH_RESPONSE, crr);
+					break;
+				}
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
@@ -2669,6 +2683,13 @@ void ClientField::SetResponseSelectedOption() const {
 	mainGame->HideElement(mainGame->wOptions, true);
 }
 void ClientField::CancelOrFinish() {
+	if(mainGame->dInfo.checkRematch) {
+		mainGame->HideElement(mainGame->wQuery);
+		CTOS_RematchResponse crr;
+		crr.rematch = false;
+		DuelClient::SendPacketToServer(CTOS_REMATCH_RESPONSE, crr);
+		return;
+	}
 	switch (mainGame->dInfo.curMsg) {
 	case MSG_WAITING: {
 		if (mainGame->wCardSelect->isVisible()) {

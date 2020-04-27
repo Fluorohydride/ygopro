@@ -67,6 +67,9 @@ struct CTOS_JoinGame {
 struct CTOS_Kick {
 	unsigned char pos;
 };
+struct CTOS_RematchResponse {
+	unsigned char rematch;
+};
 struct STOC_ErrorMsg {
 	unsigned char msg;
 	unsigned int code;
@@ -137,6 +140,7 @@ public:
 	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {}
 	virtual void StartDuel(DuelPlayer* dp) {}
 	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
+	virtual void RematchResult(DuelPlayer* dp, unsigned char rematch) {}
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
 	virtual void Process() {}
 	virtual int Analyze(CoreUtils::Packet packet) {
@@ -191,6 +195,8 @@ public:
 #define CTOS_HS_KICK		0x24
 #define CTOS_HS_START		0x25
 
+#define CTOS_REMATCH_RESPONSE 0xf0
+
 #define STOC_GAME_MSG		0x1
 #define STOC_ERROR_MSG		0x2
 #define STOC_SELECT_HAND	0x3
@@ -213,6 +219,8 @@ public:
 #define STOC_HS_WATCH_CHANGE	0x22
 
 #define STOC_CATCHUP		0xf0
+#define STOC_REMATCH		0xf1
+#define STOC_WAITING_REMATCH	0xf2
 
 #define STOC_NEW_REPLAY			0x30
 

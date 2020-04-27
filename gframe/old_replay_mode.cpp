@@ -41,6 +41,7 @@ namespace ygo {
 		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isOldReplay = true;
+		mainGame->dInfo.checkRematch = false;
 		mainGame->SetMessageWindow();
 		mainGame->dInfo.isCatchingUp = (skip_turn > 0);
 		is_continuing = true;
@@ -84,6 +85,7 @@ namespace ygo {
 					Pause(true, false);
 					mainGame->dInfo.isInDuel = true;
 					mainGame->dInfo.isStarted = true;
+					mainGame->dInfo.checkRematch = false;
 					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();
 					mainGame->gMutex.unlock();

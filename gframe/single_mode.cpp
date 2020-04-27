@@ -193,6 +193,7 @@ restart:
 	mainGame->dInfo.isInDuel = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isCatchingUp = false;
+	mainGame->dInfo.checkRematch = false;
 	mainGame->SetMessageWindow();
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();

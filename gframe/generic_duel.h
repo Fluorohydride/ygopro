@@ -21,6 +21,7 @@ public:
 	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void StartDuel(DuelPlayer* dp);
 	virtual void HandResult(DuelPlayer* dp, unsigned char res);
+	virtual void RematchResult(DuelPlayer* dp, unsigned char rematch);
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
 	virtual void Process();
 	virtual void Surrender(DuelPlayer* dp);

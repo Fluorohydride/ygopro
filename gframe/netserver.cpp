@@ -179,7 +179,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		return;
 	switch(pktType) {
 	case CTOS_RESPONSE: {
-		if(!dp->game || (!duel_mode->pduel && !duel_mode->seeking_rematch))
+		if(!dp->game || !duel_mode->pduel)
 			return;
 		duel_mode->GetResponse(dp, pdata, len - 1);
 		break;
@@ -298,6 +298,13 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		if(!duel_mode || duel_mode->pduel)
 			break;
 		duel_mode->StartDuel(dp);
+		break;
+	}
+	case CTOS_REMATCH_RESPONSE:	{
+		if(!dp->game || !duel_mode || !duel_mode->seeking_rematch)
+			break;
+		CTOS_RematchResponse* pkt = (CTOS_RematchResponse*)pdata;
+		duel_mode->RematchResult(dp, pkt->rematch);
 		break;
 	}
 	}
