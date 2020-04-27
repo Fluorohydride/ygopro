@@ -799,7 +799,7 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 				*r = (pcard->position & POS_DEFENSE) ? oppoDEF : oppoATK;
 		} else
 			*r = (controler == 0) ? selfATK : oppoATK;
-		if((location != LOCATION_GRAVE) && ((location == LOCATION_DECK && deck_reversed == pcard->is_reversed) ||
+		if(((location & (LOCATION_GRAVE | LOCATION_OVERLAY)) == 0) && ((location == LOCATION_DECK && deck_reversed == pcard->is_reversed) ||
 			(location != LOCATION_DECK && pcard->position & POS_FACEDOWN))) {
 			*r += facedown;
 			if(location == LOCATION_MZONE && pcard->position & POS_DEFENSE)
