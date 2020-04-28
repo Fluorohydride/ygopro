@@ -365,7 +365,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					mainmin = 40;
 					mainmax = 60;
 					extramax = 10;
-					sidemax = 0;
+					sidemax = 12;
 				} else {
 					mainmin = 100;
 					mainmax = 100;
@@ -375,8 +375,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			} else if (mainGame->extra_rules & DECK_LIMIT_20) {
 				mainmin = 20;
 				mainmax = 30;
-				extramax = 10;
-				sidemax = 0;
+				extramax = 5;
+				sidemax = 6;
 			}
 			unsigned int code = pkt->code & 0xFFFFFFF;
 			int flag = pkt->code >> 28;
