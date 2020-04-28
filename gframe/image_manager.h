@@ -137,6 +137,8 @@ private:
 
 #define CARD_IMG_WIDTH		177
 #define CARD_IMG_HEIGHT		254
+#define CARD_IMG_WIDTH_F	177.0f
+#define CARD_IMG_HEIGHT_F	254.0f
 #define CARD_THUMB_WIDTH	44
 #define CARD_THUMB_HEIGHT	64
 

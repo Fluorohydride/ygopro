@@ -879,11 +879,14 @@ void Game::DrawGUI() {
 	env->drawAll();
 }
 void Game::DrawSpec() {
+	const auto drawrect2 = ResizeWin(574, 150, 574 + CARD_IMG_WIDTH, 150 + CARD_IMG_HEIGHT);
 	if(showcard) {
 		switch(showcard) {
 		case 1: {
-			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
-			driver->draw2DImage(imageManager.tMask, ResizeElem(574, 150, 574 + (showcarddif > CARD_IMG_WIDTH ? CARD_IMG_WIDTH : showcarddif), 404),
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
+			driver->draw2DImage(cardtxt, drawrect2, cardrect);
+			driver->draw2DImage(imageManager.tMask, ResizeWin(574, 150, 574 + (showcarddif > CARD_IMG_WIDTH ? CARD_IMG_WIDTH : showcarddif), 404),
 								Scale<irr::s32>(CARD_IMG_HEIGHT - showcarddif, 0, CARD_IMG_HEIGHT - (showcarddif > CARD_IMG_WIDTH ? showcarddif - CARD_IMG_WIDTH : 0), CARD_IMG_HEIGHT), 0, 0, true);
 			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(std::round(showcarddif) >= CARD_IMG_HEIGHT) {
@@ -893,8 +896,10 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 2: {
-			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
-			driver->draw2DImage(imageManager.tMask, ResizeElem(574 + showcarddif, 150, 751, 404), Scale(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
+			driver->draw2DImage(cardtxt, drawrect2, cardrect);
+			driver->draw2DImage(imageManager.tMask, ResizeWin(574 + showcarddif, 150, 751, 404), Scale(0, 0, CARD_IMG_WIDTH - showcarddif, 254), 0, 0, true);
 			showcarddif += (900.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= CARD_IMG_WIDTH) {
 				showcard = 0;
@@ -902,55 +907,64 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 3: {
-			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
-			driver->draw2DImage(imageManager.tNegated, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), Scale(0, 0, 128, 128), 0, 0, true);
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
+			driver->draw2DImage(cardtxt, drawrect2, cardrect);
+			driver->draw2DImage(imageManager.tNegated, ResizeWin(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), Scale(0, 0, 128, 128), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
 		}
 		case 4: {
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			matManager.c2d[0] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			matManager.c2d[1] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			matManager.c2d[2] = ((int)std::round(showcarddif) << 24) | 0xffffff;
 			matManager.c2d[3] = ((int)std::round(showcarddif) << 24) | 0xffffff;
-			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), ResizeElem(574, 154, 751, 404),
-								Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
+			driver->draw2DImage(cardtxt, drawrect2, cardrect, 0, matManager.c2d, true);
 			if(showcarddif < 255)
 				showcarddif += (1020.0f / 1000.0f) * (float)delta_time;
 			break;
 		}
 		case 5: {
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			matManager.c2d[0] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			matManager.c2d[1] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			matManager.c2d[2] = ((int)std::round(showcarddif) << 25) | 0xffffff;
 			matManager.c2d[3] = ((int)std::round(showcarddif) << 25) | 0xffffff;
-			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), ResizeElem(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif),
-								Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), 0, matManager.c2d, true);
-			if(showcarddif < 127) {
+			auto rect = ResizeWin(662 - showcarddif * (CARD_IMG_WIDTH_F / CARD_IMG_HEIGHT_F), 277 - showcarddif, 662 + showcarddif * (CARD_IMG_WIDTH_F / CARD_IMG_HEIGHT_F), 277 + showcarddif);
+			driver->draw2DImage(cardtxt, rect, cardrect, 0, matManager.c2d, true);
+			if(showcarddif < 127.0f) {
 				showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 				if(showcarddif > 127.0f)
-					showcarddif = 127;
+					showcarddif = 127.0f;
 			}
 			break;
 		}
 		case 6: {
-			driver->draw2DImage(imageManager.GetTextureCard(showcardcode, ImageManager::ART), Resize(574, 150));
-			driver->draw2DImage(imageManager.tNumber, ResizeElem(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
+			driver->draw2DImage(cardtxt, drawrect2, cardrect);
+			driver->draw2DImage(imageManager.tNumber, ResizeWin(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
 								Scale(((int)std::round(showcardp) % 5) * 64, ((int)std::round(showcardp) / 5) * 64, ((int)std::round(showcardp) % 5 + 1) * 64, ((int)std::round(showcardp) / 5 + 1) * 64), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += (240.0f / 1000.0f) * (float)delta_time;
 			break;
 		}
 		case 7: {
+			auto cardtxt = imageManager.GetTextureCard(showcardcode, ImageManager::ART);
+			auto cardrect = irr::core::rect<irr::s32>(irr::core::vector2di(0, 0), irr::core::dimension2di(cardtxt->getOriginalSize()));
 			irr::core::vector2di corner[4];
 			float y = sin(showcarddif * irr::core::PI / 180.0f) * CARD_IMG_HEIGHT;
-			auto a = ResizeElem(574 - (CARD_IMG_HEIGHT - y) * 0.3f, (150 + CARD_IMG_HEIGHT) - y, 751 + (CARD_IMG_HEIGHT - y) * 0.3f, 150 + CARD_IMG_HEIGHT);
-			auto b = ResizeElem(574, 150, 574 + CARD_IMG_WIDTH, 404);
+			auto a = ResizeWin(574 - (CARD_IMG_HEIGHT - y) * 0.3f, (150 + CARD_IMG_HEIGHT) - y, 751 + (CARD_IMG_HEIGHT - y) * 0.3f, 150 + CARD_IMG_HEIGHT);
+			auto b = ResizeWin(574, 150, 574 + CARD_IMG_WIDTH, 404);
 			corner[0] = a.UpperLeftCorner;
 			corner[1] = irr::core::vector2di{ a.LowerRightCorner.X, a.UpperLeftCorner.Y };
 			corner[2] = irr::core::vector2di{ b.UpperLeftCorner.X, b.LowerRightCorner.Y };
 			corner[3] = b.LowerRightCorner;
-			irr::gui::Draw2DImageQuad(driver, imageManager.GetTextureCard(showcardcode, ImageManager::ART), Scale(0, 0, CARD_IMG_WIDTH, CARD_IMG_HEIGHT), corner);
+			irr::gui::Draw2DImageQuad(driver, cardtxt, cardrect, corner);
 			showcardp += (float)delta_time * 60.0f / 1000.0f;
 			showcarddif += (540.0f / 1000.0f) * (float)delta_time;
 			if(showcarddif >= 90)
