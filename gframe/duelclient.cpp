@@ -3875,6 +3875,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			cards.resize(count);
 			for(auto& pcard : cards) {
 				CoreUtils::loc_info loc = CoreUtils::ReadLocInfo(pbuf, mainGame->dInfo.compat_mode);
+				loc.controler = mainGame->LocalPlayer(loc.controler);
 				if(loc.location & LOCATION_OVERLAY) {
 					auto olcard = mainGame->dField.GetCard(loc.controler, (loc.location & (~LOCATION_OVERLAY)) & 0xff, loc.sequence);
 					pcard = *(olcard->overlayed.begin() + loc.position);
