@@ -328,18 +328,20 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 		(*oit)->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(*oit);
 	}
-	char deckbuff[8];
+	char deckbuff[12];
 	char* pbuf = deckbuff;
 	BufferIO::WriteInt16(pbuf, pdeck[0].main.size());
 	BufferIO::WriteInt16(pbuf, pdeck[0].extra.size());
+	BufferIO::WriteInt16(pbuf, pdeck[0].side.size());
 	BufferIO::WriteInt16(pbuf, pdeck[1].main.size());
 	BufferIO::WriteInt16(pbuf, pdeck[1].extra.size());
-	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 8);
-	std::swap(deckbuff[0], deckbuff[4]);
-	std::swap(deckbuff[1], deckbuff[5]);
-	std::swap(deckbuff[2], deckbuff[6]);
-	std::swap(deckbuff[3], deckbuff[7]);
-	NetServer::SendBufferToPlayer(players[1], STOC_DECK_COUNT, deckbuff, 8);
+	BufferIO::WriteInt16(pbuf, pdeck[1].side.size());
+	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
+	char tempbuff[6];
+	memcpy(tempbuff, deckbuff, 6);
+	memcpy(deckbuff, deckbuff + 6, 6);
+	memcpy(deckbuff + 6, tempbuff, 6);
+	NetServer::SendBufferToPlayer(players[1], STOC_DECK_COUNT, deckbuff, 12);
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
 	NetServer::ReSendToPlayer(players[1]);
 	hand_result[0] = 0;

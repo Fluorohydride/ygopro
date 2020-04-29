@@ -409,12 +409,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_DECK_COUNT: {
+		mainGame->gMutex.lock();
 		int deckc = BufferIO::ReadInt16(pdata);
 		int extrac = BufferIO::ReadInt16(pdata);
+		int sidec = BufferIO::ReadInt16(pdata);
 		mainGame->dField.Initial(0, deckc, extrac);
 		deckc = BufferIO::ReadInt16(pdata);
 		extrac = BufferIO::ReadInt16(pdata);
+		sidec = BufferIO::ReadInt16(pdata);
 		mainGame->dField.Initial(1, deckc, extrac);
+		mainGame->gMutex.unlock();
 		break;
 	}
 	case STOC_JOIN_GAME: {
