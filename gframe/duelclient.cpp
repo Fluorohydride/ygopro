@@ -221,7 +221,7 @@ catch(...) { what = def; }
 				csjg.version = temp_ver;
 			else {
 				csjg.version = PRO_VERSION;
-				csjg.version2 = CLIENT_VERSION;
+				csjg.version2 = { EXPAND_VERSION(CLIENT_VERSION) };
 			}
 			csjg.gameid = mainGame->dInfo.secret.game_id;
 			BufferIO::CopyWStr(BufferIO::DecodeUTF8s(mainGame->dInfo.secret.pass).c_str(), csjg.pass, 20);
@@ -329,9 +329,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_ERROR_MSG: {
-		STOC_ErrorMsg* pkt = (STOC_ErrorMsg*)pdata;
-		switch(pkt->msg) {
-		case ERRMSG_JOINERROR: {
+		STOC_ErrorMsg* _pkt = (STOC_ErrorMsg*)pdata;
+		switch(_pkt->type) {
+		case ERROR_TYPE::JOINERROR: {
+			JoinError* pkt = (JoinError*)pdata;
 			temp_ver = 0;
 			mainGame->gMutex.lock();
 			if(mainGame->isHostingOnline) {
@@ -347,82 +348,77 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 			}
-			if(pkt->code == 0)
-				mainGame->PopupMessage(gDataManager->GetSysString(1403));
-			else if(pkt->code == 1)
-				mainGame->PopupMessage(gDataManager->GetSysString(1404));
-			else if(pkt->code == 2)
-				mainGame->PopupMessage(gDataManager->GetSysString(1405));
+			int stringid = 1406;
+			switch(pkt->error) {
+				case JoinError::JERR_UNABLE:	stringid--;
+				case JoinError::JERR_PASSWORD:	stringid--;
+				case JoinError::JERR_REFUSED:	stringid--;
+			}
+			if(stringid < 1406)
+				mainGame->PopupMessage(gDataManager->GetSysString(stringid));
 			mainGame->gMutex.unlock();
 			event_base_loopbreak(client_base);
 			break;
 		}
-		case ERRMSG_DECKERROR: {
+		case ERROR_TYPE::DECKERROR: {
+			DeckError* pkt = (DeckError*)pdata;
 			mainGame->gMutex.lock();
 			int mainmin = 40, mainmax = 60, extramax = 15, sidemax = 15;
-			if (mainGame->cbDeckSelect2->isVisible()) {
-				if (mainGame->extra_rules & DECK_LIMIT_20) {
-					mainmin = 40;
-					mainmax = 60;
-					extramax = 10;
-					sidemax = 12;
-				} else {
-					mainmin = 100;
-					mainmax = 100;
-					extramax = 30;
-					sidemax = 30;
-				}
-			} else if (mainGame->extra_rules & DECK_LIMIT_20) {
-				mainmin = 20;
-				mainmax = 30;
-				extramax = 5;
-				sidemax = 6;
+			uint32_t code = 0, curcount = 0;
+			DeckError::DERR_TYPE flag = DeckError::NONE;
+			if(mainGame->dInfo.compat_mode) {
+				curcount = pkt->code;
+				code = pkt->code & 0xFFFFFFF;
+				flag = static_cast<DeckError::DERR_TYPE>(pkt->code >> 28);
+			} else {
+				code = pkt->code;
+				flag = pkt->type;
+				mainmin = pkt->count.minimum;
+				mainmax = extramax = sidemax = pkt->count.maximum;
+				curcount = pkt->count.current;
 			}
-			unsigned int code = pkt->code & 0xFFFFFFF;
-			int flag = pkt->code >> 28;
 			std::wstring text;
-			switch(flag)
-			{
-			case DECKERROR_LFLIST: {
+			switch(flag) {
+			case DeckError::LFLIST: {
 				text = fmt::sprintf(gDataManager->GetSysString(1407).c_str(), gDataManager->GetName(code).c_str());
 				break;
 			}
-			case DECKERROR_OCGONLY: {
+			case DeckError::OCGONLY: {
 				text = fmt::sprintf(gDataManager->GetSysString(1413).c_str(), gDataManager->GetName(code).c_str());
 				break;
 			}
-			case DECKERROR_TCGONLY: {
+			case DeckError::TCGONLY: {
 				text = fmt::sprintf(gDataManager->GetSysString(1414).c_str(), gDataManager->GetName(code).c_str());
 				break;
 			}
-			case DECKERROR_UNKNOWNCARD: {
+			case DeckError::UNKNOWNCARD: {
 				text = fmt::sprintf(gDataManager->GetSysString(1415).c_str(), gDataManager->GetName(code).c_str(), code);
 				break;
 			}
-			case DECKERROR_CARDCOUNT: {
+			case DeckError::CARDCOUNT: {
 				text = fmt::sprintf(gDataManager->GetSysString(1416).c_str(), gDataManager->GetName(code).c_str());
 				break;
 			}
-			case DECKERROR_MAINCOUNT: {
-				text = fmt::sprintf(gDataManager->GetSysString(1417).c_str(), mainmin, mainmax, code);
+			case DeckError::MAINCOUNT: {
+				text = fmt::sprintf(gDataManager->GetSysString(1417).c_str(), mainmin, mainmax, curcount);
 				break;
 			}
-			case DECKERROR_EXTRACOUNT: {
-				if(code>0)
-					text = fmt::sprintf(gDataManager->GetSysString(1418).c_str(), extramax, code);
+			case DeckError::EXTRACOUNT: {
+				if(curcount > 0)
+					text = fmt::sprintf(gDataManager->GetSysString(1418).c_str(), extramax, curcount);
 				else
 					text = gDataManager->GetSysString(1420);
 				break;
 			}
-			case DECKERROR_SIDECOUNT: {
-				text = fmt::sprintf(gDataManager->GetSysString(1419).c_str(), sidemax, code);
+			case DeckError::SIDECOUNT: {
+				text = fmt::sprintf(gDataManager->GetSysString(1419).c_str(), sidemax, curcount);
 				break;
 			}
-			case DECKERROR_FORBTYPE: {
+			case DeckError::FORBTYPE: {
 				text = gDataManager->GetSysString(1421);
 				break;
 			}
-			case DECKERROR_UNOFFICIALCARD: {
+			case DeckError::UNOFFICIALCARD: {
 				text = fmt::sprintf(gDataManager->GetSysString(1422).c_str(), gDataManager->GetName(code).c_str());
 				break;
 			}
@@ -439,24 +435,28 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.unlock();
 			break;
 		}
-		case ERRMSG_SIDEERROR: {
+		case ERROR_TYPE::SIDEERROR: {
 			mainGame->gMutex.lock();
 			mainGame->PopupMessage(gDataManager->GetSysString(1408));
 			mainGame->gMutex.unlock();
 			break;
 		}
-		case ERRMSG_VERERROR:
-		case ERRMSG_VERERROR2: {
-			if(temp_ver || (pkt->msg == ERRMSG_VERERROR2)) {
+		case ERROR_TYPE::VERERROR:
+		case ERROR_TYPE::VERERROR2: {
+			if(temp_ver || (_pkt->type == ERROR_TYPE::VERERROR2)) {
 				temp_ver = 0;
 				mainGame->gMutex.lock();
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				if(pkt->msg == ERRMSG_VERERROR2)
-					mainGame->PopupMessage(fmt::format(gDataManager->GetSysString(1423).c_str(), EXPAND_VERSION(pkt->code)));
-				else
-					mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411).c_str(), pkt->code >> 12, (pkt->code >> 4) & 0xff, pkt->code & 0xf));
+				if(_pkt->type == ERROR_TYPE::VERERROR2) {
+					auto& version = ((VersionError*)pdata)->version;
+					mainGame->PopupMessage(fmt::format(gDataManager->GetSysString(1423).c_str(),
+													   version.client.major, version.client.minor,
+													   version.core.major, version.core.minor));
+				} else {
+					mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411).c_str(), _pkt->code >> 12, (_pkt->code >> 4) & 0xff, _pkt->code & 0xf));
+				}
 				mainGame->gMutex.unlock();
 				event_base_loopbreak(client_base);
 				if(mainGame->isHostingOnline) {
@@ -474,7 +474,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				}
 			} else {
 				event_base_loopbreak(client_base);
-				temp_ver = pkt->code;
+				temp_ver = _pkt->code;
 				try_needed = true;
 			}
 			break;
