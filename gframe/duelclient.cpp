@@ -809,7 +809,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->SetMessageWindow();
 		mainGame->dInfo.selfnames.clear();
 		mainGame->dInfo.opponames.clear();
-		SetPlayersCount();
 		int i;
 		for(i = 0; i < mainGame->dInfo.team1; i++) {
 			mainGame->dInfo.selfnames.push_back(mainGame->stHostPrepDuelist[i]->getText());
@@ -1055,21 +1054,6 @@ bool DuelClient::CheckReady() {
 		}
 	}
 	return ready1 && ready2;
-}
-void DuelClient::SetPlayersCount() {
-	int count1 = 0, count2 = 0;
-	for(int i = 0; i < mainGame->dInfo.team1; i++) {
-		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
-			count1++;
-		}
-	}
-	for(int i = mainGame->dInfo.team1; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
-		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
-			count2++;
-		}
-	}
-	mainGame->dInfo.team1 = count1;
-	mainGame->dInfo.team2 = count2;
 }
 std::pair<int, int> DuelClient::GetPlayersCount() {
 	int count1 = 0, count2 = 0;
