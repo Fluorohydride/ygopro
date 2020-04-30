@@ -214,11 +214,8 @@ bool CGUICustomContextMenu::getItemAutoChecking(u32 idx) const {
 //! Returns if a menu item is enabled
 bool CGUICustomContextMenu::isItemEnabled(u32 idx) const {
 	if(idx >= Items.size()) {
-		_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 		return false;
 	}
-
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Items[idx].Enabled;
 }
 
@@ -226,11 +223,8 @@ bool CGUICustomContextMenu::isItemEnabled(u32 idx) const {
 //! Returns if a menu item is checked
 bool CGUICustomContextMenu::isItemChecked(u32 idx) const {
 	if(idx >= Items.size()) {
-		_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 		return false;
 	}
-
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Items[idx].Checked;
 }
 

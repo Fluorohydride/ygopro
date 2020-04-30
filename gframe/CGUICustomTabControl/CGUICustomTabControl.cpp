@@ -444,8 +444,10 @@ void CGUICustomTabControl::draw() {
 
 		pos += len;
 
+#if !(IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9)
 		if(text)
 			Tabs[i]->refreshSkinColors();
+#endif
 
 		if((s32)i == ActiveTab) {
 			left = frameRect.UpperLeftCorner.X;
