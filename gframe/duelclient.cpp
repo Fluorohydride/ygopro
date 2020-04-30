@@ -422,6 +422,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				text = fmt::sprintf(gDataManager->GetSysString(1422).c_str(), gDataManager->GetName(code).c_str());
 				break;
 			}
+			case DeckError::INVALIDSIZE: {
+				text = gDataManager->GetSysString(1425);
+				break;
+			}
 			default: {
 				text = gDataManager->GetSysString(1406);
 				break;
