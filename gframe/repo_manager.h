@@ -36,9 +36,11 @@ public:
 	std::string script_path{"script"};
 	std::string pics_path{"pics"};
 	std::string core_path{};
+	std::string language{};
 	bool should_update{true};
 	bool has_core{false};
 	bool ready{false};
+	bool is_language{false};
 	std::string error{};
 	std::string warning{};
 	std::vector<std::string> commit_history_partial{};

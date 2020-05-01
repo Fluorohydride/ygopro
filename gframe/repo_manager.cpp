@@ -146,6 +146,10 @@ void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 					JSON_SET_IF_VALID(lflist_path, string, std::string);
 					JSON_SET_IF_VALID(script_path, string, std::string);
 					JSON_SET_IF_VALID(pics_path, string, std::string);
+					JSON_SET_IF_VALID(is_language, boolean, bool);
+					if(tmp_repo.is_language) {
+						JSON_SET_IF_VALID(language, string, std::string);
+					}
 #ifdef YGOPRO_BUILD_DLL
 					JSON_SET_IF_VALID(core_path, string, std::string);
 					JSON_SET_IF_VALID(has_core, boolean, bool);
