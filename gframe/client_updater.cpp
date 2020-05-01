@@ -4,7 +4,7 @@ void ygo::updater::CheckUpdates() {}
 bool ygo::updater::HasUpdate() { return false; }
 bool ygo::updater::StartUpdate(update_callback, void*, const path_string&) { return false; }
 bool ygo::updater::UpdateDownloaded() { return false; }
-void ygo::updater::StartUnzipper(const path_string&) {}
+void ygo::updater::StartUnzipper(unzip_callback callback, void* payload, const path_string&) {}
 #else
 #if defined(_WIN32)
 #define OSSTRING "Windows"
@@ -27,13 +27,16 @@ void ygo::updater::StartUnzipper(const path_string&) {}
 #include <thread>
 #include <fstream>
 #include <atomic>
-#include <sstream>
 #include <openssl/md5.h>
 #include "config.h"
 #include "utils.h"
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
 #define USERAGENT "Edopro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)
+
+namespace ygo {
+
+namespace updater {
 
 std::atomic<bool> has_update{ false };
 std::atomic<bool> downloaded{ false };
@@ -176,27 +179,27 @@ void CheckUpdate() {
 			}
 			catch(...) {}
 		}
-		has_update = !!update_urls.size();
 	}
 	catch(...) { update_urls.clear(); }
+	has_update = !!update_urls.size();
 }
 
-void ygo::updater::CheckUpdates() {
+void CheckUpdates() {
 	if(!(Lock = GetLock()))
 		return;
 	update_urls.clear();
 	std::thread(CheckUpdate).detach();
 }
 
-bool ygo::updater::HasUpdate() {
+bool HasUpdate() {
 	return has_update;
 }
 
-bool ygo::updater::UpdateDownloaded() {
+bool UpdateDownloaded() {
 	return downloaded;
 }
 
-void Reboot(){
+void Reboot() {
 #ifdef _WIN32
 	STARTUPINFO si;
 	PROCESS_INFORMATION pi;
@@ -219,20 +222,29 @@ void Reboot(){
 	exit(0);
 }
 
-void Unzip(path_string src) {
+void Unzip(path_string src, void* payload, unzip_callback callback) {
 #if defined(_WIN32) || (defined(__LINUX__) && !defined(__ANDROID__))
 	auto pathstring = GetExePath() + EPRO_TEXT(".old");
 	_trename(GetExePath().c_str(), pathstring.c_str());
 #endif
+	unzip_payload cbpayload{};
+	UnzipperPayload uzpl;
+	uzpl.payload = payload;
+	uzpl.cur = -1;
+	uzpl.tot = static_cast<int>(update_urls.size());
+	cbpayload.payload = &uzpl;
+	int i = 1;
 	for(auto& file : update_urls) {
+		cbpayload.cur = i++;
 		auto name = src + ygo::Utils::ToPathString(file.name);
-		ygo::Utils::UnzipArchive(src + ygo::Utils::ToPathString(file.name));
+		uzpl.filename = name.c_str();
+		ygo::Utils::UnzipArchive(src + ygo::Utils::ToPathString(file.name), callback, &cbpayload);
 	}
 	Reboot();
 }
 
-void ygo::updater::StartUnzipper(const path_string& src) {
-	std::thread(Unzip, src).detach();
+void StartUnzipper(unzip_callback callback, void* payload, const path_string& src) {
+	std::thread(Unzip, src, payload, callback).detach();
 }
 
 bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
@@ -279,10 +291,14 @@ void DownloadUpdate(path_string dest_path, void* payload, update_callback callba
 	downloaded = true;
 }
 
-bool ygo::updater::StartUpdate(update_callback callback, void* payload, const path_string& dest) {
+bool StartUpdate(update_callback callback, void* payload, const path_string& dest) {
 	if(!has_update || downloading)
 		return false;
 	std::thread(DownloadUpdate, dest, payload, callback).detach();
 	return true;
 }
+
+};
+
+};
 #endif

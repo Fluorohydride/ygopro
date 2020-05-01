@@ -18,6 +18,17 @@ class IReadFile;
 }
 }
 
+struct unzip_payload {
+	int percentage;
+	int cur;
+	int tot;
+	const path_char* filename;
+	bool is_new;
+	void* payload;
+};
+
+using unzip_callback = void(*)(unzip_payload* payload);
+
 namespace ygo {
 	class Utils {
 	public:
@@ -58,7 +69,7 @@ namespace ygo {
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
 		static bool KeepOnlyDigits(std::wstring& input, bool negative = false);
-		static bool UnzipArchive(const path_string& input, const path_string& dest = EPRO_TEXT("./"));
+		static bool UnzipArchive(const path_string& input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, const path_string& dest = EPRO_TEXT("./"));
 	};
 
 template<typename T>

@@ -1775,7 +1775,7 @@ bool Game::MainLoop() {
 			update_prompted = true;
 		}
 		if(updater::UpdateDownloaded()) {
-			updater::StartUnzipper();
+			updater::StartUnzipper(Game::UpdateUnzipBar, mainGame);
 		}
 #ifndef __ANDROID__
 #ifdef __APPLE__
@@ -3168,6 +3168,16 @@ void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filen
 	game->updateProgress->setProgress(percentage);
 	if(is_new)
 		game->updateProgressText->setText(fmt::format(L"Downloading {}\n({} of {})", BufferIO::DecodeUTF8s(filename), cur, tot).c_str());
+}
+void Game::UpdateUnzipBar(unzip_payload* payload) {
+	UnzipperPayload* unzipper = static_cast<UnzipperPayload*>(payload->payload);
+	Game* _game = static_cast<Game*>(unzipper->payload);
+	std::lock_guard<std::mutex> lk(_game->gMutex);
+	//unzipper->cur=current archive, unzipper->tot=total archives to extract
+	//Name 1: unzipper->filename (name of the archive)
+	//Progress bar 1: payload->cur/payload->tot * 100
+	//Name 2: payload->filename (name of the file being extracted)
+	//Progress bar 2: payload->percentage
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));

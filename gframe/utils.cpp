@@ -440,7 +440,7 @@ namespace ygo {
 		return true;
 	}
 
-	bool Utils::UnzipArchive(const path_string& input, const path_string& dest) {
+	bool Utils::UnzipArchive(const path_string& input, unzip_callback callback, unzip_payload* payload, const path_string& dest) {
 		if(!filesystem)
 			return false;
 		irr::io::IFileArchive* archive = nullptr;
@@ -450,6 +450,16 @@ namespace ygo {
 		auto filelist = archive->getFileList();
 		auto count = filelist->getFileCount();
 
+		int totsize = 0;
+		int cur_fullsize = 0;
+
+		for(int i = 0; i < count; i++) {
+			totsize += filelist->getFileSize(i);
+		}
+
+		if(payload)
+			payload->tot = count;
+
 		for(int i = 0; i < count; i++) {
 			auto filename = path_string(filelist->getFullFileName(i).c_str());
 			bool isdir = filelist->isDirectory(i);
@@ -458,16 +468,32 @@ namespace ygo {
 			else
 				CreatePath(filename, dest);
 			if(!isdir) {
+				int percentage = 0;
 				auto reader = archive->createAndOpenFile(i);
 				if(reader) {
 					std::ofstream out(dest + EPRO_TEXT("/") + filename, std::ofstream::binary);
 					char buff[0x80000];
 					const int sz = sizeof(buff) / sizeof(*buff);
 					int r, rx = reader->getSize();
+					if(payload)
+						payload->is_new = true;
 					for(r = 0; r < rx; /**/) {
 						int wx = reader->read(buff, sz);
 						out.write(buff, wx);
 						r += wx;
+						cur_fullsize += wx;
+						if(callback && totsize) {
+							double fractiondownloaded = (double)cur_fullsize / (double)totsize;
+							percentage = std::round(fractiondownloaded * 100);
+							if(payload) {
+								payload->cur = i;
+								payload->percentage = percentage;
+								payload->filename = filename.c_str();
+							}
+							callback(payload);
+							if(payload)
+								payload->is_new = false;
+						}
 					}
 					out.close();
 					reader->drop();
