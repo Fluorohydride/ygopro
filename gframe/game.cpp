@@ -1573,7 +1573,7 @@ bool Game::MainLoop() {
 							refresh_db = gDataManager->LoadLocaleDB(data_path + file) || refresh_db;
 						gDataManager->LoadLocaleStrings(data_path + EPRO_TEXT("strings.conf"));
 					}
-					auto& langpath = Utils::ToPathString(repo->language);
+					auto langpath = Utils::ToPathString(repo->language);
 					auto lang = Utils::ToUpperNoAccents(langpath);
 					auto it = std::find_if(locales.begin(), locales.end(),
 										   [&lang]
