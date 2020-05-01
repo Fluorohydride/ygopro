@@ -143,12 +143,14 @@ void ServerLobby::FillOnlineRooms() {
 	mainGame->roomListTable->setActiveColumn(mainGame->roomListTable->getActiveColumn(), true);
 }
 int ServerLobby::GetRoomsThread() {
+	auto selected = mainGame->serverChoice->getSelected();
+	if (selected < 0) return 0;
+	ServerInfo serverInfo = serversVector[selected];
+
 	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_WAIT);
 	mainGame->btnLanRefresh2->setEnabled(false);
 	mainGame->serverChoice->setEnabled(false);
 	mainGame->roomListTable->setVisible(false);
-
-	ServerInfo serverInfo = serversVector[mainGame->serverChoice->getSelected()];
 
 	CURL *curl_handle;
 	CURLcode res;
@@ -224,14 +226,10 @@ int ServerLobby::GetRoomsThread() {
 			ErrorLog(fmt::format("Exception occurred parsing server rooms: {}", e.what()));
 		}
 	}
-	if(roomsVector.empty()) {
-		mainGame->PopupMessage(gDataManager->GetSysString(2033), gDataManager->GetSysString(2032));
-	} else {
-		FillOnlineRooms();
-		if(mainGame->chkShowActiveRooms->isChecked()) {
-			mainGame->roomListTable->setActiveColumn(7, true);
-			mainGame->roomListTable->orderRows(-1, irr::gui::EGOM_DESCENDING);
-		}
+	FillOnlineRooms();
+	if(!roomsVector.empty() && mainGame->chkShowActiveRooms->isChecked()) {
+		mainGame->roomListTable->setActiveColumn(7, true);
+		mainGame->roomListTable->orderRows(-1, irr::gui::EGOM_DESCENDING);
 	}
 
 	GUIUtils::ChangeCursor(mainGame->device, irr::gui::ECI_NORMAL);
@@ -250,7 +248,9 @@ void ServerLobby::RefreshRooms() {
 }
 void ServerLobby::JoinServer(bool host) {
 	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());
-	ServerInfo server = serversVector[mainGame->serverChoice->getSelected()];
+	auto selected = mainGame->serverChoice->getSelected();
+	if (selected < 0) return;
+	ServerInfo server = serversVector[selected];
 	try {
 		auto serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 		if(host) {

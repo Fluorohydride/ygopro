@@ -4,6 +4,7 @@
 #include "config.h"
 #include "network.h"
 #include "replay.h"
+#include "deck_manager.h"
 
 namespace ygo {
 
@@ -21,6 +22,7 @@ public:
 	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void StartDuel(DuelPlayer* dp);
 	virtual void HandResult(DuelPlayer* dp, unsigned char res);
+	virtual void RematchResult(DuelPlayer* dp, unsigned char rematch);
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
 	virtual void Process();
 	virtual void Surrender(DuelPlayer* dp);
@@ -55,6 +57,7 @@ protected:
 	public:
 		DuelPlayer* player;
 		bool ready;
+		Deck odeck;
 		Deck pdeck;
 		int deck_error;
 		duelist() : player(0), ready(false), deck_error(0) {}
@@ -77,7 +80,6 @@ protected:
 		std::vector<duelist>::iterator home_iterator, opposing_iterator;
 	} players;
 	DuelPlayer* cur_player[2];
-	std::mutex observers_mutex;
 	std::set<DuelPlayer*> observers;
 	unsigned char hand_result[2];
 	unsigned char last_response;

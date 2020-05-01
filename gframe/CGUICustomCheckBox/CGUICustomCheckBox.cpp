@@ -184,7 +184,6 @@ void CGUICustomCheckBox::setChecked(bool checked) {
 
 //! returns if box is checked
 bool CGUICustomCheckBox::isChecked() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Checked;
 }
 

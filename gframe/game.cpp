@@ -760,11 +760,11 @@ bool Game::Initialize() {
 	gSettings.stAntiAlias = env->addStaticText(gDataManager->GetSysString(2075).c_str(), Scale(340, 5, 545, 30), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stAntiAlias, 2075);
 	gSettings.ebAntiAlias = env->addEditBox(fmt::to_wstring(gGameConfig->antialias).c_str(), Scale(550, 5, 645, 30), true, sPanel, EDITBOX_NUMERIC);
-	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(340, 35, 645, 60), sPanel, -1, gDataManager->GetSysString(2073).c_str());
+	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(340, 35, 645, 60), sPanel, CHECKBOX_VSYNC, gDataManager->GetSysString(2073).c_str());
 	defaultStrings.emplace_back(gSettings.chkVSync, 2073);
 	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).c_str(), Scale(340, 65, 545, 90), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stFPSCap, 2074);
-	gSettings.ebFPSCap = env->addEditBox(fmt::to_wstring(gGameConfig->maxFPS).c_str(), Scale(550, 65, 600, 90), true, sPanel, EDITBOX_NUMERIC);
+	gSettings.ebFPSCap = env->addEditBox(fmt::to_wstring(gGameConfig->maxFPS).c_str(), Scale(550, 65, 600, 90), true, sPanel, EDITBOX_FPS_CAP);
 	gSettings.btnFPSCap = env->addButton(Scale(605, 65, 645, 90), sPanel, BUTTON_FPS_CAP, gDataManager->GetSysString(1211).c_str());
 	defaultStrings.emplace_back(gSettings.btnFPSCap, 1211);
 	gSettings.chkShowConsole = env->addCheckBox(gGameConfig->showConsole, Scale(340, 95, 645, 120), sPanel, -1, gDataManager->GetSysString(2072).c_str());
@@ -801,14 +801,14 @@ bool Game::Initialize() {
 	gSettings.scrMusicVolume->setLargeStep(1);
 	gSettings.scrMusicVolume->setSmallStep(1);
 	gSettings.chkLoopMusic = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 305, 645, 330), sPanel, CHECKBOX_LOOP_MUSIC, gDataManager->GetSysString(2079).c_str());
-	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2079);
+	defaultStrings.emplace_back(gSettings.chkLoopMusic, 2079);
 	gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(340, 215, 645, 330), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stNoAudioBackend, 2058);
 	gSettings.stNoAudioBackend->setVisible(false);
 	gSettings.chkDiscordIntegration = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 335, 645, 360), sPanel, CHECKBOX_DISCORD_INTEGRATION, gDataManager->GetSysString(2078).c_str());
 	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2078);
 	gSettings.chkHideHandsInReplays = env->addCheckBox(gGameConfig->hideHandsInReplays, Scale(340, 365, 645, 390), sPanel, CHECKBOX_HIDE_HANDS_REPLAY, gDataManager->GetSysString(2080).c_str());
-	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2080);
+	defaultStrings.emplace_back(gSettings.chkHideHandsInReplays, 2080);
 	// end audio
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
@@ -1503,7 +1503,7 @@ bool Game::MainLoop() {
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, CAMERA_LEFT, CAMERA_RIGHT, CAMERA_BOTTOM, CAMERA_TOP, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-	
+
 	mProjection.buildCameraLookAtMatrixLH(irr::core::vector3df(FIELD_X, FIELD_Y, FIELD_Z), irr::core::vector3df(FIELD_X, 0, 0), irr::core::vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(irr::video::SColorf(1.0f, 1.0f, 1.0f));
@@ -1655,6 +1655,8 @@ bool Game::MainLoop() {
 		if(dInfo.isInDuel) {
 			if(dInfo.isReplay)
 				discord.UpdatePresence(DiscordWrapper::REPLAY);
+			else if(dInfo.isHandTest)
+				discord.UpdatePresence(DiscordWrapper::HAND_TEST);
 			else if(dInfo.isSingleMode)
 				discord.UpdatePresence(DiscordWrapper::PUZZLE);
 			else {
@@ -1682,7 +1684,7 @@ bool Game::MainLoop() {
 			driver->setMaterial(irr::video::IdentityMaterial);
 			driver->clearZBuffer();)
 		} else if(is_building) {
-			
+
 			if(is_siding)
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
 			else
@@ -1708,7 +1710,7 @@ bool Game::MainLoop() {
 		if (is_building || is_siding) {
 			fpsCounter->setRelativePosition(Resize(205, CARD_IMG_HEIGHT + 1, 300, CARD_IMG_HEIGHT + 21));
 		} else if (wChat->isVisible()) { // Move it above the chat box
-			fpsCounter->setRelativePosition(Resize(1024 - fpsCounterWidth, 600, 1024, 620));
+			fpsCounter->setRelativePosition(Resize(1020 - fpsCounterWidth, 595, 1020, 615));
 		} else { // bottom right of window with a little padding
 			fpsCounter->setRelativePosition(Resize(1024 - fpsCounterWidth, 620, 1024, 640));
 		}
@@ -1781,10 +1783,10 @@ bool Game::MainLoop() {
 		// astronomical FPS and CPU usage. As a workaround, while the game window is
 		// fully occluded, the game is restricted to 30 FPS.
 		int fpsLimit = device->isWindowActive() ? gGameConfig->maxFPS : 30;
-		if (!device->isWindowActive() || (gGameConfig->maxFPS && !gGameConfig->vsync)) {
+		if (!device->isWindowActive() || (gGameConfig->maxFPS > 0 && !gGameConfig->vsync)) {
 #else
 		int fpsLimit = gGameConfig->maxFPS;
-		if (gGameConfig->maxFPS && !gGameConfig->vsync) {
+		if(gGameConfig->maxFPS > 0 && !gGameConfig->vsync) {
 #endif
 			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
 			if(delta > 0) {
@@ -1803,9 +1805,11 @@ bool Game::MainLoop() {
 				if(dInfo.time_left[dInfo.time_player])
 					dInfo.time_left[dInfo.time_player]--;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		if(gGameConfig->maxFPS != -1 || gGameConfig->vsync)
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	discord.UpdatePresence(DiscordWrapper::TERMINATE);
+	replaySignal.SetNoWait(true);
 	frameSignal.SetNoWait(true);
 	analyzeMutex.lock();
 	DuelClient::StopClient(true);
@@ -2001,7 +2005,9 @@ void Game::RefreshAiDecks() {
 #ifdef _WIN32
 					bot.executablePath = filesystem->getAbsolutePath(EPRO_TEXT("./WindBot")).c_str();
 #else
-					if (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
+					if(gGameConfig->user_configs.size() && gGameConfig->user_configs["posixPathExtension"].is_string()) {
+						bot.executablePath = gGameConfig->user_configs["posixPathExtension"].get<path_string>();
+					} else if (gGameConfig->configs.size() && gGameConfig->configs["posixPathExtension"].is_string()) {
 						bot.executablePath = gGameConfig->configs["posixPathExtension"].get<path_string>();
 					} else {
 						bot.executablePath = EPRO_TEXT("");
@@ -2054,7 +2060,9 @@ void Game::SaveConfig() {
 	gGameConfig->noShuffleDeck = chkNoShuffleDeck->isChecked();
 	gGameConfig->botThrowRock = gBot.chkThrowRock->isChecked();
 	gGameConfig->botMute = gBot.chkMute->isChecked();
-	gGameConfig->lastServer = serverChoice->getItem(serverChoice->getSelected());
+	auto lastServerIndex = serverChoice->getSelected();
+	if (lastServerIndex >= 0)
+		gGameConfig->lastServer = serverChoice->getItem(lastServerIndex);
 	gGameConfig->chkMAutoPos = tabSettings.chkMAutoPos->isChecked();
 	gGameConfig->chkSTAutoPos = tabSettings.chkSTAutoPos->isChecked();
 	gGameConfig->chkRandomPos = tabSettings.chkRandomPos->isChecked();
@@ -2173,18 +2181,21 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 }
 void Game::LoadServers() {
 	try {
-		if(gGameConfig->configs.size() && gGameConfig->configs["servers"].is_array()) {
-			for(auto& obj : gGameConfig->configs["servers"].get<std::vector<nlohmann::json>>()) {
-				ServerInfo tmp_server;
-				tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-				tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
-				tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
-				tmp_server.roomlistport = obj["roomlistport"].get<int>();
-				tmp_server.duelport = obj["duelport"].get<int>();
-				int i = serverChoice->addItem(tmp_server.name.c_str());
-				if (gGameConfig->lastServer == tmp_server.name)
-					serverChoice->setSelected(i);
-				ServerLobby::serversVector.push_back(std::move(tmp_server));
+		for(auto& _config : { std::ref(gGameConfig->user_configs), std::ref(gGameConfig->configs) }) {
+			auto& config = _config.get();
+			if(config.size() && config["servers"].is_array()) {
+				for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
+					ServerInfo tmp_server;
+					tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+					tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
+					tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
+					tmp_server.roomlistport = obj["roomlistport"].get<int>();
+					tmp_server.duelport = obj["duelport"].get<int>();
+					int i = serverChoice->addItem(tmp_server.name.c_str());
+					if(gGameConfig->lastServer == tmp_server.name)
+						serverChoice->setSelected(i);
+					ServerLobby::serversVector.push_back(std::move(tmp_server));
+				}
 			}
 		}
 	}
@@ -2785,7 +2796,7 @@ void Game::ReloadElementsStrings() {
 	prev = cbFilterRule->getSelected();
 	ReloadCBFilterRule();
 	cbFilterRule->setSelected(prev);
-	
+
 	prev = cbDuelRule->getSelected();
 	if (prev >= 5) {
 		UpdateDuelParam();

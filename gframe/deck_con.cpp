@@ -672,7 +672,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_MOUSE_WHEEL: {
-			if(!mainGame->scrFilter->isVisible() || mainGame->env->getFocus() == mainGame->scrFilter)
+			if(!mainGame->scrFilter->isVisible())
 				break;
 			if(!mainGame->Resize(805, 160, 1020, 630).isPointInside(mouse_pos))
 				break;
@@ -684,7 +684,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->scrFilter->setPos(mainGame->scrFilter->getPos() - DECK_SEARCH_SCROLL_STEP);
 			}
 			GetHoveredCard();
-			break;
+			return true;
 		}
 		default: break;
 		}

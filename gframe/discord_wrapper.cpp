@@ -131,6 +131,10 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 			discordPresence.details = "Playing a puzzle";
 			break;
 		}
+		case HAND_TEST: {
+			discordPresence.details = "Testing hands";
+			break;
+		}
 		case DECK: {
 			discordPresence.details = "Editing a deck";
 			break;

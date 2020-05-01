@@ -49,7 +49,7 @@ void SingleMode::Restart() {
 void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	if(!pduel)
 		return;
-	last_replay.Write<uint8_t>(len);
+	last_replay.Write<uint8_t>(len, false);
 	last_replay.WriteData(resp, len);
 	OCG_DuelSetResponse(pduel, resp, len);
 }
@@ -84,7 +84,7 @@ restart:
 	DuelClient::rnd.seed(seed);
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { start_lp, start_hand, draw_count };
-	bool hand_test = open_file && open_file_name == EPRO_TEXT("hand-test-mode");
+	bool hand_test = mainGame->dInfo.isHandTest = open_file && open_file_name == EPRO_TEXT("hand-test-mode");
 	if(hand_test) {
 		opt = DUEL_ATTACK_FIRST_TURN | DUEL_MODE_MR5 | DUEL_SIMPLE_AI;
 	}
@@ -103,18 +103,17 @@ restart:
 	ReplayHeader rh;
 	rh.id = REPLAY_YRP1;
 	rh.version = CLIENT_VERSION;
-	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64;
+	rh.flag = REPLAY_SINGLE_MODE | REPLAY_LUA64 | REPLAY_NEWREPLAY;
 	if(hand_test)
 		rh.flag |= REPLAY_HAND_TEST;
 	rh.seed = seed;
 	bool saveReplay = !hand_test || gGameConfig->saveHandTest;
 	if(saveReplay) {
-		last_replay.BeginRecord(false);
+		last_replay.BeginRecord(true, EPRO_TEXT("./replay/_LastReplay.yrp"));
 		last_replay.WriteHeader(rh);
 		//records the replay with the new system
 		new_replay.BeginRecord();
 		rh.id = REPLAY_YRPX;
-		rh.flag |= REPLAY_NEWREPLAY;
 		new_replay.WriteHeader(rh);
 		replay_stream.clear();
 	}
@@ -164,6 +163,7 @@ restart:
 		OCG_DestroyDuel(pduel);
 		pduel = nullptr;
 		mainGame->dInfo.isSingleMode = false;
+		mainGame->dInfo.isHandTest = false;
 		open_file = false;
 		is_restarting = false;
 		last_replay.EndRecord();
@@ -193,6 +193,7 @@ restart:
 	mainGame->dInfo.isInDuel = true;
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isCatchingUp = false;
+	mainGame->dInfo.checkRematch = false;
 	mainGame->SetMessageWindow();
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
@@ -284,6 +285,7 @@ restart:
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
+		mainGame->dInfo.isHandTest = false;
 		mainGame->gMutex.unlock();
 		if(!hand_test) {
 			mainGame->closeDoneSignal.Reset();

@@ -66,11 +66,13 @@ struct DuelInfo {
 	bool isReplay;
 	bool isOldReplay;
 	bool isCatchingUp;
+	bool checkRematch;
 	bool isFirst;
 	bool isTeam1;
 	bool isRelay;
 	bool isInLobby;
 	bool isSingleMode;
+	bool isHandTest;
 	bool compat_mode;
 	bool is_shuffling;
 	int current_player[2];

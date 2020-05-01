@@ -15,7 +15,7 @@
 #include <IGUIButton.h>
 #include <CGUIListBox.h>
 #include "../IrrlichtCommonIncludes1.9/os.h"
-#include "../porting_android.h"
+#include "../Android/porting_android.h"
 #include "../bufferio.h"
 
 namespace irr {

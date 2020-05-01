@@ -70,7 +70,6 @@ local ygopro_config=function(static_core)
 
 	filter "system:not windows"
 		defines "LUA_COMPAT_5_2"
-		buildoptions { "-fpermissive" }
 		if _OPTIONS["discord"] then
 			links "discord-rpc"
 		end
@@ -79,8 +78,7 @@ local ygopro_config=function(static_core)
 	filter "system:macosx"
 		files "*.m"
 		defines "LUA_USE_MACOSX"
-		buildoptions { "-fms-extensions" }
-		includedirs { "/usr/local/include/freetype2", "/usr/local/include/irrlicht" }
+		includedirs { "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
 		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework", "Security.framework" }
 		if static_core then

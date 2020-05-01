@@ -56,8 +56,27 @@ public:
 	virtual IGUIFont* getActiveFont() const _IRR_OVERRIDE_;
 
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+	//! Sets another color for the button text.
+	virtual void setOverrideColor(video::SColor color)  _IRR_OVERRIDE_ {};
+
 	//! Sets an image which should be displayed on the button when it is in the given state.
 	virtual void setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image = 0, const core::rect<s32>& sourceRect = core::rect<s32>(0, 0, 0, 0))  _IRR_OVERRIDE_;
+	//! Gets the override color
+	virtual video::SColor getOverrideColor(void) const  _IRR_OVERRIDE_ { return 0; };
+
+	//! Sets if the button text should use the override color or the color in the gui skin.
+	virtual void enableOverrideColor(bool enable)  _IRR_OVERRIDE_ {};
+
+	//! Checks if an override color is enabled
+	virtual bool isOverrideColorEnabled(void) const  _IRR_OVERRIDE_ { return false; };
+	virtual bool getClickShiftState() const	_IRR_OVERRIDE_ {
+		return false;
+	}
+
+	virtual bool getClickControlState() const _IRR_OVERRIDE_ {
+		return false;
+	}
+
 #endif
 
 	//! Sets an image which should be displayed on the button when it is in normal state.

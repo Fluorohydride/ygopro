@@ -57,7 +57,7 @@ namespace ygo {
 		static bool ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
-		static bool KeepOnlyDigits(std::wstring& input);
+		static bool KeepOnlyDigits(std::wstring& input, bool negative = false);
 		static bool UnzipArchive(const path_string& input, const path_string& dest = EPRO_TEXT("./"));
 	};
 
@@ -110,9 +110,13 @@ inline T Utils::ToUpperNoAccents(T input) {
 	return input;
 }
 
-inline bool Utils::KeepOnlyDigits(std::wstring& input) {
+inline bool Utils::KeepOnlyDigits(std::wstring& input, bool negative) {
 	bool changed = false;
 	for (auto it = input.begin(); it != input.end();) {
+		if(*it == L'-' && negative && it == input.begin()) {
+			it++;
+			continue;
+		}
 		if ((unsigned)(*it - L'0') > 9) {
 			it = input.erase(it);
 			changed = true;

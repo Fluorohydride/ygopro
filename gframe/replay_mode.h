@@ -29,6 +29,7 @@ private:
 
 public:
 	static Replay cur_replay;
+	static Replay* cur_yrp;
 	
 public:
 	static bool StartReplay(int skipturn, bool is_yrp);

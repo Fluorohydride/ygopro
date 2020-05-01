@@ -163,6 +163,10 @@ public:
 
 	//! Access the horizontal scrollbar
 	virtual IGUIScrollBar* getHorizontalScrollBar() const;
+
+	virtual void setDrawBackground(bool) {};
+
+	virtual bool isDrawBackgroundEnabled() const { return false; };
 #endif
 
 	//! Writes attributes of the object.

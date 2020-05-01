@@ -202,6 +202,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_YES: {
+				if(mainGame->dInfo.checkRematch) {
+					mainGame->HideElement(mainGame->wQuery);
+					CTOS_RematchResponse crr;
+					crr.rematch = true;
+					DuelClient::SendPacketToServer(CTOS_REMATCH_RESPONSE, crr);
+					break;
+				}
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
@@ -232,6 +239,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_NO: {
+				if(mainGame->dInfo.checkRematch) {
+					mainGame->HideElement(mainGame->wQuery);
+					CTOS_RematchResponse crr;
+					crr.rematch = false;
+					DuelClient::SendPacketToServer(CTOS_REMATCH_RESPONSE, crr);
+					break;
+				}
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
@@ -299,9 +313,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_OPTION_0:
-			case BUTTON_OPTION_1: 
-			case BUTTON_OPTION_2: 
-			case BUTTON_OPTION_3: 
+			case BUTTON_OPTION_1:
+			case BUTTON_OPTION_2:
+			case BUTTON_OPTION_3:
 			case BUTTON_OPTION_4: {
 				int step = mainGame->scrOption->isVisible() ? mainGame->scrOption->getPos() : 0;
 				selected_option = id - BUTTON_OPTION_0 + step;
@@ -997,15 +1011,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
-				SetShowMark(mcard, true);
-				ShowCardInfoInList(mcard, mainGame->btnCardSelect[id - BUTTON_CARD_0], mainGame->wCardSelect);
-				if(mcard->code) {
-					mainGame->ShowCardInfo(mcard->code);
-				} else {
-					if(mcard->cover)
-						mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
-					else
-						mainGame->ClearCardInfo(mcard->controler);
+				if(mcard) {
+					SetShowMark(mcard, true);
+					ShowCardInfoInList(mcard, mainGame->btnCardSelect[id - BUTTON_CARD_0], mainGame->wCardSelect);
+					if(mcard->code) {
+						mainGame->ShowCardInfo(mcard->code);
+					} else {
+						if(mcard->cover)
+							mainGame->ShowCardInfo(mcard->cover, false, ImageManager::imgType::COVER);
+						else
+							mainGame->ClearCardInfo(mcard->controler);
+					}
 				}
 			}
 			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
@@ -1465,8 +1481,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			irr::s32 x = pos.X;
 			irr::s32 y = pos.Y;
 			if(x < 300) {
-				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
-				irr::gui::IGUIElement* elem = root->getElementFromPoint(pos);
 				mainGame->stTip->setVisible(should_show_tip);
 				break;
 			}
@@ -1843,7 +1857,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case BUTTON_APPLY_RESTART: {
 				try {
-					gGameConfig->dpi_scale = (std::stoi(mainGame->gSettings.ebDpiScale->getText()) / 100.0);
+					gGameConfig->dpi_scale = static_cast<uint32_t>(std::stol(mainGame->gSettings.ebDpiScale->getText())) / 100.0;
 					mainGame->restart = true;
 					//mainGame->device->closeDevice();
 				} catch(...){}
@@ -1851,7 +1865,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case BUTTON_FPS_CAP: {
 				try {
-					gGameConfig->maxFPS = std::stoi(mainGame->gSettings.ebFPSCap->getText());
+					gGameConfig->maxFPS = static_cast<int32_t>(std::stol(mainGame->gSettings.ebFPSCap->getText()));
 				} catch (...) {
 					mainGame->gSettings.ebFPSCap->setText(fmt::to_wstring(gGameConfig->maxFPS).c_str());
 				}
@@ -1939,6 +1953,13 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				gGameConfig->showScopeLabel = mainGame->gSettings.chkShowScopeLabel->isChecked();
 				return true;
 			}
+			case CHECKBOX_VSYNC: {
+				gGameConfig->vsync = mainGame->gSettings.chkVSync->isChecked();
+#ifndef __ANDROID__
+				mainGame->driver->setVsync(gGameConfig->vsync);
+#endif
+				return true;
+			}
 			case CHECKBOX_SHOW_FPS: {
 				gGameConfig->showFPS = mainGame->gSettings.chkShowFPS->isChecked();
 				mainGame->fpsCounter->setVisible(gGameConfig->showFPS);
@@ -2005,6 +2026,29 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 					mainGame->ebChatInput->setText(L"");
 				}
 				return true;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_CHANGED: {
+			switch(id) {
+			case EDITBOX_NUMERIC: {
+				std::wstring tmp(event.GUIEvent.Caller->getText());
+				if(Utils::KeepOnlyDigits(tmp))
+					event.GUIEvent.Caller->setText(tmp.c_str());
+				break;
+			}
+			case EDITBOX_FPS_CAP: {
+				std::wstring tmp(event.GUIEvent.Caller->getText());
+				if(Utils::KeepOnlyDigits(tmp, true) || tmp.size() > 1) {
+					if(tmp.size()>1)
+						if(tmp[0] == L'-' && (tmp[1] != L'1' || tmp.size() != 2)) {
+							event.GUIEvent.Caller->setText(L"-");
+							break;
+						}
+					event.GUIEvent.Caller->setText(tmp.c_str());
+				}
+				break;
 			}
 			}
 			break;
@@ -2136,22 +2180,45 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		break;
 	}
 	case irr::EET_MOUSE_INPUT_EVENT: {
-		if (gGameConfig->ctrlClickIsRMB && event.MouseInput.Control) {
-			auto SimulateMouse = [&](irr::EMOUSE_INPUT_EVENT type) {
-				irr::SEvent simulated = event;
-				simulated.MouseInput.Event = type;
-				mainGame->device->postEventFromUser(simulated);
-				return true;
-			};
-			switch (event.MouseInput.Event) {
+		auto SimulateMouse = [device=mainGame->device, &event](irr::EMOUSE_INPUT_EVENT type) {
+			irr::SEvent simulated = event;
+			simulated.MouseInput.Event = type;
+			device->postEventFromUser(simulated);
+			return true;
+		};
+		switch (event.MouseInput.Event) {
+			case irr::EMIE_MOUSE_WHEEL: {
+				irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+				irr::gui::IGUIElement* elem = root->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
+				auto checkstatic = [](irr::gui::IGUIElement* elem) -> bool {
+					return elem && elem->getType() == irr::gui::EGUIET_STATIC_TEXT;
+				};
+				auto checkscroll = [&checkstatic](irr::gui::IGUIElement* elem) -> bool {
+					return elem && (elem->getType() == irr::gui::EGUIET_SCROLL_BAR) && checkstatic(elem->getParent());
+				};
+				auto checkbutton = [&checkscroll](irr::gui::IGUIElement* elem) -> bool {
+					return elem && (elem->getType() == irr::gui::EGUIET_BUTTON) && checkscroll(elem->getParent());
+				};
+				if(checkstatic(elem) || checkscroll(elem) || checkbutton(elem)) {
+					if(elem->OnEvent(event)) {
+						stopPropagation = true;
+						return true;
+					}
+				}
+				break;
+			}
+			default: break;
+		}
+		if(!gGameConfig->ctrlClickIsRMB || !event.MouseInput.Control)
+			break;
+		switch(event.MouseInput.Event) {
 #define REMAP(TYPE) case irr::EMIE_LMOUSE_##TYPE: return SimulateMouse(irr::EMIE_RMOUSE_##TYPE)
-				REMAP(PRESSED_DOWN);
-				REMAP(LEFT_UP);
-				REMAP(DOUBLE_CLICK);
-				REMAP(TRIPLE_CLICK);
+			REMAP(PRESSED_DOWN);
+			REMAP(LEFT_UP);
+			REMAP(DOUBLE_CLICK);
+			REMAP(TRIPLE_CLICK);
 #undef REMAP
 			default: break;
-			}
 		}
 		break;
 	}
@@ -2618,6 +2685,13 @@ void ClientField::SetResponseSelectedOption() const {
 	mainGame->HideElement(mainGame->wOptions, true);
 }
 void ClientField::CancelOrFinish() {
+	if(mainGame->dInfo.checkRematch) {
+		mainGame->HideElement(mainGame->wQuery);
+		CTOS_RematchResponse crr;
+		crr.rematch = false;
+		DuelClient::SendPacketToServer(CTOS_REMATCH_RESPONSE, crr);
+		return;
+	}
 	switch (mainGame->dInfo.curMsg) {
 	case MSG_WAITING: {
 		if (mainGame->wCardSelect->isVisible()) {

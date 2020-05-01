@@ -7,7 +7,7 @@
 namespace ygo {
 	bool ReplayMode::ReadReplayResponse() {
 		ReplayResponse res;
-		bool result = cur_replay.yrp->GetNextResponse(&res);
+		bool result = cur_yrp->GetNextResponse(&res);
 		if (result)
 			OCG_DuelSetResponse(pduel, res.response.data(), res.length);
 		return result;
@@ -15,22 +15,23 @@ namespace ygo {
 	int ReplayMode::OldReplayThread() {
 		mainGame->dInfo.isReplay = true;
 		mainGame->dInfo.isOldReplay = true;
-		if(!cur_replay.yrp) {
+		if(!cur_yrp) {
 			EndDuel();
 			return 0;
 		}
-		const ReplayHeader& rh = cur_replay.yrp->pheader;
+		const ReplayHeader& rh = cur_yrp->pheader;
 		mainGame->dInfo.isFirst = true;
 		mainGame->dInfo.isTeam1 = true;
-		mainGame->dInfo.isRelay = !!(cur_replay.params.duel_flags & DUEL_RELAY);
+		mainGame->dInfo.isRelay = !!(cur_yrp->params.duel_flags & DUEL_RELAY);
 		mainGame->dInfo.isSingleMode = !!(rh.flag & REPLAY_SINGLE_MODE);
+		mainGame->dInfo.isHandTest = !!(rh.flag & REPLAY_HAND_TEST);
 		mainGame->dInfo.compat_mode = false;
 		mainGame->dInfo.current_player[0] = 0;
 		mainGame->dInfo.current_player[1] = 0;
 		mainGame->dInfo.opponames.clear();
 		mainGame->dInfo.selfnames.clear();
-		mainGame->dInfo.team1 = ReplayMode::cur_replay.GetPlayersCount(0);
-		mainGame->dInfo.team2 = ReplayMode::cur_replay.GetPlayersCount(1);
+		mainGame->dInfo.team1 = ReplayMode::cur_yrp->GetPlayersCount(0);
+		mainGame->dInfo.team2 = ReplayMode::cur_yrp->GetPlayersCount(1);
 		if(!mainGame->dInfo.isRelay)
 			mainGame->dInfo.current_player[1] = mainGame->dInfo.team2 - 1;
 		if (!StartDuel()) {
@@ -40,6 +41,7 @@ namespace ygo {
 		mainGame->dInfo.isInDuel = true;
 		mainGame->dInfo.isStarted = true;
 		mainGame->dInfo.isOldReplay = true;
+		mainGame->dInfo.checkRematch = false;
 		mainGame->SetMessageWindow();
 		mainGame->dInfo.isCatchingUp = (skip_turn > 0);
 		is_continuing = true;
@@ -83,6 +85,7 @@ namespace ygo {
 					Pause(true, false);
 					mainGame->dInfo.isInDuel = true;
 					mainGame->dInfo.isStarted = true;
+					mainGame->dInfo.checkRematch = false;
 					mainGame->dInfo.isCatchingUp = false;
 					mainGame->dField.RefreshAllCards();
 					mainGame->gMutex.unlock();
@@ -100,18 +103,18 @@ namespace ygo {
 		return 0;
 	}
 	bool ReplayMode::StartDuel() {
-		const ReplayHeader& rh = cur_replay.yrp->pheader;
+		const ReplayHeader& rh = cur_yrp->pheader;
 		int seed = rh.seed;
-		auto names = ReplayMode::cur_replay.yrp->GetPlayerNames();
-		mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0));
-		mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + ReplayMode::cur_replay.yrp->GetPlayersCount(0), names.end());
+		auto names = ReplayMode::cur_yrp->GetPlayerNames();
+		mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + ReplayMode::cur_yrp->GetPlayersCount(0));
+		mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + ReplayMode::cur_yrp->GetPlayersCount(0), names.end());
 		randengine rnd(seed);
-		int start_lp = cur_replay.yrp->params.start_lp;
-		int start_hand = cur_replay.yrp->params.start_hand;
-		int draw_count = cur_replay.yrp->params.draw_count;
+		int start_lp = cur_yrp->params.start_lp;
+		int start_hand = cur_yrp->params.start_hand;
+		int draw_count = cur_yrp->params.draw_count;
 		OCG_Player team = { start_lp, start_hand, draw_count };
-		pduel = mainGame->SetupDuel({ (uint32_t)rnd(), cur_replay.yrp->params.duel_flags, team, team });
-		mainGame->dInfo.duel_params = cur_replay.yrp->params.duel_flags;
+		pduel = mainGame->SetupDuel({ (uint32_t)rnd(), cur_yrp->params.duel_flags, team, team });
+		mainGame->dInfo.duel_params = cur_yrp->params.duel_flags;
 		mainGame->dInfo.duel_field = mainGame->GetMasterRule(mainGame->dInfo.duel_params);
 		mainGame->SetPhaseButtons();
 		mainGame->dInfo.lp[0] = start_lp;
@@ -121,13 +124,13 @@ namespace ygo {
 		mainGame->dInfo.strLP[1] = fmt::to_wstring(mainGame->dInfo.lp[1]);
 		mainGame->dInfo.turn = 0;
 		if (!mainGame->dInfo.isSingleMode || (rh.flag & REPLAY_HAND_TEST)) {
-			auto rule_cards = cur_replay.yrp->GetRuleCards();
+			auto rule_cards = cur_yrp->GetRuleCards();
 			OCG_NewCardInfo card_info = { 0, 0, 0, 0, 0, 0, POS_FACEDOWN_DEFENSE };
 			for(auto card : rule_cards) {
 				card_info.code = card;
 				OCG_DuelNewCard(pduel, card_info);
 			}
-			auto decks = cur_replay.yrp->GetPlayerDecks();
+			auto decks = cur_yrp->GetPlayerDecks();
 			for(int i = 0; i < mainGame->dInfo.team1; i++) {
 				card_info.duelist = i;
 				card_info.loc = LOCATION_DECK;
@@ -164,7 +167,7 @@ namespace ygo {
 				mainGame->dField.Initial(1, decks[mainGame->dInfo.team1].main_deck.size(), decks[mainGame->dInfo.team1].extra_deck.size());
 			}
 		} else {
-			if(!mainGame->LoadScript(pduel, cur_replay.yrp->scriptname))
+			if(!mainGame->LoadScript(pduel, cur_yrp->scriptname))
 				return false;
 		}
 		OCG_StartDuel(pduel);

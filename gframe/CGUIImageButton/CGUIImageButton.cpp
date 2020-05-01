@@ -187,7 +187,6 @@ void CGUIImageButton::setScaleImage(bool scaleImage) {
 
 //! Returns whether the button scale the used images
 bool CGUIImageButton::isScalingImage() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return ScaleImage;
 }
 
@@ -502,7 +501,6 @@ void CGUIImageButton::setIsPushButton(bool isPushButton) {
 
 //! Returns if the button is currently pressed
 bool CGUIImageButton::isPressed() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Pressed;
 }
 
@@ -518,7 +516,6 @@ void CGUIImageButton::setPressed(bool pressed) {
 
 //! Returns whether the button is a push button
 bool CGUIImageButton::isPushButton() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return IsPushButton;
 }
 
@@ -531,13 +528,11 @@ void CGUIImageButton::setUseAlphaChannel(bool useAlphaChannel) {
 
 //! Returns if the alpha channel should be used for drawing images on the button
 bool CGUIImageButton::isAlphaChannelUsed() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return UseAlphaChannel;
 }
 
 
 bool CGUIImageButton::isDrawingBorder() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return DrawBorder;
 }
 

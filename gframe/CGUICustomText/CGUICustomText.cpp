@@ -54,29 +54,23 @@ CGUICustomText::~CGUICustomText() {
 }
 
 bool CGUICustomText::OnEvent(const SEvent & event) {
-	if(!TouchControl)
-		return IGUIElement::OnEvent(event);
 	if(isEnabled()) {
 		switch(event.EventType) {
-			case EET_MOUSE_INPUT_EVENT:
-			{
+			case EET_MOUSE_INPUT_EVENT:	{
 				switch(event.MouseInput.Event) {
-					case EMIE_LMOUSE_PRESSED_DOWN:
-					{
+					case EMIE_LMOUSE_PRESSED_DOWN: {
 						if(!was_pressed) {
 							was_pressed = true;
 							prev_position = core::position2di(event.MouseInput.X, event.MouseInput.Y);
 						}
 						break;
 					}
-					case EMIE_LMOUSE_LEFT_UP:
-					{
+					case EMIE_LMOUSE_LEFT_UP: {
 						was_pressed = false;
 						prev_position = core::position2di(0, 0);
 						break;
 					}
-					case EMIE_MOUSE_MOVED:
-					{
+					case EMIE_MOUSE_MOVED: {
 						if(was_pressed) {
 							if(scrText && scrText->isEnabled()) {
 								auto diff = prev_position.Y - event.MouseInput.Y;
@@ -85,6 +79,16 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 							}
 						}
 						break;
+					}
+					case EMIE_MOUSE_WHEEL: {
+						if(scrText && scrText->isEnabled()) {
+							if(event.MouseInput.Wheel < 0) {
+								scrText->setPos(scrText->getPos() + scrText->getSmallStep());
+							} else {
+								scrText->setPos(scrText->getPos() - scrText->getSmallStep());
+							}
+							return true;
+						}
 					}
 				}
 			}
@@ -277,7 +281,6 @@ video::SColor CGUICustomText::getBackgroundColor() const {
 
 //! Checks if background drawing is enabled
 bool CGUICustomText::isDrawBackgroundEnabled() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Background;
 }
 
@@ -290,7 +293,6 @@ void CGUICustomText::setDrawBorder(bool draw) {
 
 //! Checks if border drawing is enabled
 bool CGUICustomText::isDrawBorderEnabled() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return Border;
 }
 
@@ -324,7 +326,6 @@ void CGUICustomText::enableOverrideColor(bool enable) {
 
 
 bool CGUICustomText::isOverrideColorEnabled() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return OverrideColorEnabled;
 }
 
@@ -339,7 +340,6 @@ void CGUICustomText::setWordWrap(bool enable) {
 
 
 bool CGUICustomText::isWordWrapEnabled() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return WordWrap;
 }
 

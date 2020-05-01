@@ -32,13 +32,13 @@ Replay::Replay() {
 }
 Replay::~Replay() {
 }
-void Replay::BeginRecord(bool write) {
+void Replay::BeginRecord(bool write, path_string name) {
 	Reset();
 	if(fp.is_open())
 		fp.close();
 	is_recording = false;
 	if(write) {
-		fp.open("./replay/_LastReplay.yrpX", std::ofstream::binary);
+		fp.open(name, std::ofstream::binary);
 		if(!fp.is_open()) {
 			return;
 		}

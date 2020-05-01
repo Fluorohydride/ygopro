@@ -121,8 +121,10 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 	}*/
 	if(query.flag & QUERY_EQUIP_CARD) {
 		ClientCard* ecard = mainGame->dField.GetCard(mainGame->LocalPlayer(query.equip_card.controler), query.equip_card.location, query.equip_card.sequence);
-		equipTarget = ecard;
-		ecard->equipped.insert(this);
+		if(ecard) {
+			equipTarget = ecard;
+			ecard->equipped.insert(this);
+		}
 	}
 	if(query.flag & QUERY_TARGET_CARD) {
 		for(auto& card : query.target_cards) {
