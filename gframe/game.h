@@ -360,8 +360,11 @@ public:
 	irr::gui::CGUIImageButton* btnSettings;
 
 	irr::gui::IGUIWindow* updateWindow;
-	IProgressBar* updateProgress;
 	irr::gui::IGUIStaticText* updateProgressText;
+	IProgressBar* updateProgressTop;
+	irr::gui::IGUIStaticText* updateSubprogressText;
+	IProgressBar* updateProgressBottom;
+
 	//main menu
 	int mainMenuLeftX;
 	int mainMenuRightX;

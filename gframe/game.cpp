@@ -1474,13 +1474,20 @@ bool Game::Initialize() {
 #endif
 	//update window
 	updateWindow = env->addWindow(Scale(490, 200, 840, 340), true, L"");
-	updateProgress = new IProgressBar(env, Scale(5, 115, 335, 130), -1, updateWindow);
-	updateProgress->addBorder(1);
-	updateProgress->setProgress(0);
-	updateProgress->drop();
-	updateProgressText = env->addStaticText(L"", Scale(5, 5, 345, 110), false, true, updateWindow);
 	updateWindow->getCloseButton()->setVisible(false);
 	updateWindow->setVisible(false);
+	updateProgressText = env->addStaticText(L"", Scale(5, 5, 345, 90), false, true, updateWindow);
+	updateProgressTop = new IProgressBar(env, Scale(5, 60, 335, 85), -1, updateWindow);
+	updateProgressTop->addBorder(1);
+	updateProgressTop->setProgress(0);
+	updateProgressTop->setVisible(false);
+	updateProgressTop->drop();
+	updateSubprogressText = env->addStaticText(L"", Scale(5, 90, 345, 110), false, true, updateWindow);
+	updateProgressBottom = new IProgressBar(env, Scale(5, 115, 335, 130), -1, updateWindow);
+	updateProgressBottom->addBorder(1);
+	updateProgressBottom->setProgress(0);
+	updateProgressBottom->drop();
+
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -1873,7 +1880,8 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 			repo.second.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 			repo.second.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		}
-		updateProgress->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
+		updateProgressTop->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
+		updateProgressBottom->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		btnPSAD->setImage(imageManager.tCover[0]);
 		btnPSDD->setImage(imageManager.tCover[0]);
 		btnSettings->setImage(imageManager.tSettings);
@@ -3165,19 +3173,21 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload) {
 	Game* game = static_cast<Game*>(payload);
 	std::lock_guard<std::mutex> lk(game->gMutex);
-	game->updateProgress->setProgress(percentage);
+	game->updateProgressBottom->setProgress(percentage);
 	if(is_new)
 		game->updateProgressText->setText(fmt::format(L"Downloading {}\n({} of {})", BufferIO::DecodeUTF8s(filename), cur, tot).c_str());
 }
 void Game::UpdateUnzipBar(unzip_payload* payload) {
 	UnzipperPayload* unzipper = static_cast<UnzipperPayload*>(payload->payload);
-	Game* _game = static_cast<Game*>(unzipper->payload);
-	std::lock_guard<std::mutex> lk(_game->gMutex);
-	//unzipper->cur=current archive, unzipper->tot=total archives to extract
-	//Name 1: unzipper->filename (name of the archive)
-	//Progress bar 1: payload->cur/payload->tot * 100
-	//Name 2: payload->filename (name of the file being extracted)
-	//Progress bar 2: payload->percentage
+	Game* game = static_cast<Game*>(unzipper->payload);
+	std::lock_guard<std::mutex> lk(game->gMutex);
+	// current archive
+	game->updateProgressText->setText(fmt::format(L"Extracting {}\n({} of {})", Utils::ToUnicodeIfNeeded(unzipper->filename), unzipper->cur, unzipper->tot).c_str());
+	game->updateProgressTop->setVisible(true);
+	game->updateProgressTop->setProgress(payload->cur / payload->tot * 100);
+	// current file in archive
+	game->updateSubprogressText->setText(fmt::format(L"Current file: {}", Utils::ToUnicodeIfNeeded(payload->filename)).c_str());
+	game->updateProgressBottom->setProgress(payload->percentage);
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));
