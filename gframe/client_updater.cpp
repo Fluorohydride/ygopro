@@ -53,21 +53,20 @@ std::vector<DownloadInfo> update_urls;
 void* Lock = nullptr;
 
 const path_string& GetExePath() {
-	static path_string binarypath = EPRO_TEXT("");
-	if(binarypath.empty()) {
+	static path_string binarypath = []()->path_string {
 #ifdef _WIN32
 		TCHAR exepath[MAX_PATH];
 		GetModuleFileName(NULL, exepath, MAX_PATH);
-		binarypath = exepath;
+		return Utils::NormalizePath(exepath, false);
 #elif defined(__linux__) && !defined(__ANDROID__)
 		char buff[PATH_MAX];
 		ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
 		if(len != -1) {
 			buff[len] = '\0';
 		}
-		binarypath = buff;
+		return Utils::NormalizePath(buff, false);
 #endif
-	}
+	}();
 	return binarypath;
 }
 
