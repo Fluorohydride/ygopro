@@ -443,10 +443,12 @@ namespace ygo {
 	bool Utils::UnzipArchive(const path_string& input, unzip_callback callback, unzip_payload* payload, const path_string& dest) {
 		if(!filesystem)
 			return false;
+		CreatePath(dest, EPRO_TEXT("./"));
 		irr::io::IFileArchive* archive = nullptr;
 		if(!filesystem->addFileArchive(input.c_str(), false, false, irr::io::EFAT_ZIP, "", &archive))
 			return false;
 
+		archive->grab();
 		auto filelist = archive->getFileList();
 		auto count = filelist->getFileCount();
 
@@ -501,6 +503,7 @@ namespace ygo {
 			}
 		}
 		filesystem->removeFileArchive(archive);
+		archive->drop();
 		return true;
 	}
 }

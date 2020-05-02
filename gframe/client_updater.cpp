@@ -248,7 +248,6 @@ void StartUnzipper(unzip_callback callback, void* payload, const path_string& sr
 }
 
 bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
-	return true;
 	if(md5.size() < MD5_DIGEST_LENGTH)
 		return false;
 	uint8_t result[MD5_DIGEST_LENGTH];
