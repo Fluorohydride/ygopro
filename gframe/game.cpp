@@ -1680,15 +1680,15 @@ bool Game::MainLoop() {
 					discord.UpdatePresence(DiscordWrapper::DUEL);
 			}
 			if (showcardcode == 1 || showcardcode == 3)
-				gSoundManager->PlayBGM(SoundManager::BGM::WIN);
+				gSoundManager->PlayBGM(SoundManager::BGM::WIN, gGameConfig->loopMusic);
 			else if (showcardcode == 2)
-				gSoundManager->PlayBGM(SoundManager::BGM::LOSE);
+				gSoundManager->PlayBGM(SoundManager::BGM::LOSE, gGameConfig->loopMusic);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[0] <= dInfo.lp[1] / 2)
-				gSoundManager->PlayBGM(SoundManager::BGM::DISADVANTAGE);
+				gSoundManager->PlayBGM(SoundManager::BGM::DISADVANTAGE, gGameConfig->loopMusic);
 			else if (dInfo.lp[0] > 0 && dInfo.lp[0] >= dInfo.lp[1] * 2)
-				gSoundManager->PlayBGM(SoundManager::BGM::ADVANTAGE);
+				gSoundManager->PlayBGM(SoundManager::BGM::ADVANTAGE, gGameConfig->loopMusic);
 			else
-				gSoundManager->PlayBGM(SoundManager::BGM::DUEL);
+				gSoundManager->PlayBGM(SoundManager::BGM::DUEL, gGameConfig->loopMusic);
 			MATERIAL_GUARD(
 			DrawBackImage(imageManager.tBackGround, resized);
 			DrawBackGround();
@@ -1703,7 +1703,7 @@ bool Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
 			else
 				discord.UpdatePresence(DiscordWrapper::DECK);
-			gSoundManager->PlayBGM(SoundManager::BGM::DECK);
+			gSoundManager->PlayBGM(SoundManager::BGM::DECK, gGameConfig->loopMusic);
 			DrawBackImage(imageManager.tBackGround_deck, resized);
 			MATERIAL_GUARD(DrawDeckBd());
 		} else {
@@ -1711,7 +1711,7 @@ bool Game::MainLoop() {
 				discord.UpdatePresence(DiscordWrapper::IN_LOBBY);
 			else
 				discord.UpdatePresence(DiscordWrapper::MENU);
-			gSoundManager->PlayBGM(SoundManager::BGM::MENU);
+			gSoundManager->PlayBGM(SoundManager::BGM::MENU, gGameConfig->loopMusic);
 			DrawBackImage(imageManager.tBackGround_menu, resized);
 		}
 #ifndef __ANDROID__
