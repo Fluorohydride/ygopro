@@ -636,9 +636,9 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 	Items.clear();
 	Selected = -1;
 	TotalFolders = 0;
-	curRelPath = ygo::Utils::NormalizePath<path_string>(curRelPath.c_str()).c_str();
+	curRelPath = ygo::Utils::NormalizePath(curRelPath);
 	bool is_root = BaseIsRoot && curRelPath == basePath;
-	ygo::Utils::FindFiles(ygo::Utils::ToPathString(curRelPath.c_str()), [&](path_string _name, bool is_directory, void* payload) {
+	ygo::Utils::FindFiles(ygo::Utils::ToPathString(curRelPath), [&](path_string _name, bool is_directory, void* payload) {
 		auto name = ygo::Utils::ToUnicodeIfNeeded(_name);
 		if(name == L".")
 			return;
@@ -647,18 +647,18 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 				return;
 			}
 		}
-		if((filter && !filter(path_string(curRelPath.c_str()) + name, is_directory, payload)) || (!filter && !defaultFilter(path_string(curRelPath.c_str()) + name, is_directory, payload))) {
+		if((filter && !filter(curRelPath + name, is_directory, payload)) || (!filter && !defaultFilter(curRelPath + name, is_directory, payload))) {
 			return;
 		}
 		ListItem item;
-		item.reltext = ygo::Utils::NormalizePath(path_string(curRelPath.c_str()) + L"/" + name, false).c_str();
+		item.reltext = ygo::Utils::NormalizePath(curRelPath + L"/" + name, false);
 		if(is_directory) {
 			if(NativeDirectoryHandling)
 				TotalFolders++;
 			item.reltext += L"/";
 			name = L"[" + name + L"]";
 		}
-		item.text = name.c_str();
+		item.text = name;
 		item.icon = -1;
 		item.isDirectory = is_directory;
 		Items.push_back(item);
@@ -863,7 +863,7 @@ void CGUIFileSelectListBox::resetPath() {
 
 void CGUIFileSelectListBox::setWorkingPath(const path_string& newDirectory, bool setAsRoot) {
 	BaseIsRoot = setAsRoot;
-	basePath = ygo::Utils::NormalizePath(newDirectory).c_str();
+	basePath = ygo::Utils::NormalizePath(newDirectory);
 	curRelPath = basePath;
 	prevRelPath = curRelPath;
 	LoadFolderContents();
@@ -878,9 +878,11 @@ void CGUIFileSelectListBox::addFilteredExtensions(std::vector<path_string> exten
 	filter = nullptr;
 }
 
-bool CGUIFileSelectListBox::defaultFilter(path_string name, bool is_directory, void *) {
-	if(is_directory)
-		return true;
+bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory, void *) {
+	if(is_directory) {
+		auto elements = ygo::Utils::TokenizeString<std::wstring>(name, L"/");
+		return !(elements.size() && elements.back().size() && elements.back().front() == L'.' && elements.back() != L"..");
+	}
 	auto pos = name.find_last_of('.');
 	if(pos == path_string::npos)
 		return false;
