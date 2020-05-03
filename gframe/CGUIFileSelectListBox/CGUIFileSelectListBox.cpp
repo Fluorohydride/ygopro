@@ -604,7 +604,6 @@ void CGUIFileSelectListBox::setAutoScrollEnabled(bool scroll) {
 
 
 bool CGUIFileSelectListBox::isAutoScrollEnabled() const {
-	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return AutoScroll;
 }
 
