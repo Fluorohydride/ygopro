@@ -50,7 +50,7 @@ namespace porting {
 extern android_app* app_global;
 }
 #define ADDComboBox(...) (gGameConfig->native_mouse ? env->addComboBox(__VA_ARGS__): irr::gui::CGUICustomComboBox::addCustomComboBox(env, __VA_ARGS__))
-#define MATERIAL_GUARD(f) do {mainGame->driver->enableMaterial2D(true); f; mainGame->driver->enableMaterial2D(false);} while(false);
+#define MATERIAL_GUARD(f) do {driver->enableMaterial2D(true); f; driver->enableMaterial2D(false);} while(false);
 #else
 #define ADDComboBox(...) env->addComboBox(__VA_ARGS__)
 #define MATERIAL_GUARD(f) do {f;} while(false);
@@ -96,15 +96,15 @@ bool Game::Initialize() {
 #ifndef __ANDROID__
 	device->enableDragDrop(true, [](irr::core::vector2di pos, bool isFile) ->bool {
 		if(isFile) {
-			if(ygo::mainGame->dInfo.isInDuel || ygo::mainGame->dInfo.isInLobby || ygo::mainGame->is_siding
-			   || ygo::mainGame->wRoomListPlaceholder->isVisible() || ygo::mainGame->wLanWindow->isVisible()
-			   || ygo::mainGame->wCreateHost->isVisible() || ygo::mainGame->wHostPrepare->isVisible())
+			if(mainGame->dInfo.isInDuel || mainGame->dInfo.isInLobby || mainGame->is_siding
+			   || mainGame->wRoomListPlaceholder->isVisible() || mainGame->wLanWindow->isVisible()
+			   || mainGame->wCreateHost->isVisible() || mainGame->wHostPrepare->isVisible())
 				return false;
 			else
 				return true;
 		} else {
-			auto elem = ygo::mainGame->env->getRootGUIElement()->getElementFromPoint(pos);
-			if(elem && elem != ygo::mainGame->env->getRootGUIElement()) {
+			auto elem = mainGame->env->getRootGUIElement()->getElementFromPoint(pos);
+			if(elem && elem != mainGame->env->getRootGUIElement()) {
 				if(elem->hasType(irr::gui::EGUIET_EDIT_BOX) && elem->isEnabled())
 					return true;
 				return false;
@@ -112,7 +112,7 @@ bool Game::Initialize() {
 			irr::core::position2di convpos = mainGame->Resize(pos.X, pos.Y, true);
 			auto x = convpos.X;
 			auto y = convpos.Y;
-			if(ygo::mainGame->is_building && !ygo::mainGame->is_siding) {
+			if(mainGame->is_building && !mainGame->is_siding) {
 				if(x >= 314 && x <= 794) {
 					if((y >= 164 && y <= 435) || (y >= 466 && y <= 530) || (y >= 564 && y <= 628))
 						return true;
@@ -1549,8 +1549,8 @@ bool Game::MainLoop() {
 	while(!restart && device->run()) {
 		if(should_reload_skin) {
 			should_reload_skin = false;
-			if(Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected())) != gGameConfig->skin) {
-				gGameConfig->skin = Utils::ToPathString(mainGame->gSettings.cbCurrentSkin->getItem(mainGame->gSettings.cbCurrentSkin->getSelected()));
+			if(Utils::ToPathString(gSettings.cbCurrentSkin->getItem(gSettings.cbCurrentSkin->getSelected())) != gGameConfig->skin) {
+				gGameConfig->skin = Utils::ToPathString(gSettings.cbCurrentSkin->getItem(gSettings.cbCurrentSkin->getSelected()));
 				ApplySkin(gGameConfig->skin);
 			} else {
 				ApplySkin(EPRO_TEXT(""), true);
@@ -1979,7 +1979,7 @@ void Game::RefreshLFLists() {
 			cbDBLFList->setSelected(deckIndex);
 		}
 	}
-	deckBuilder.filterList = &gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()];
+	deckBuilder.filterList = &gdeckManager->_lfList[cbDBLFList->getSelected()];
 	cbFilterBanlist->setSelected(prevFilter);
 }
 void Game::RefreshAiDecks() {
@@ -2551,7 +2551,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 void Game::SetPhaseButtons() {
 	// reset master rule 4 phase button position
 	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	if (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
+	if (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
 		if (dInfo.duel_field >= 4) {
 			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
 			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
@@ -2635,10 +2635,10 @@ void Game::ReloadCBCardType() {
 }
 void Game::ReloadCBCardType2() {
 	cbCardType2->clear();
-	mainGame->cbCardType2->setEnabled(true);
+	cbCardType2->setEnabled(true);
 	switch (cbCardType->getSelected()) {
 	case 0:
-		mainGame->cbCardType2->setEnabled(false);
+		cbCardType2->setEnabled(false);
 		cbCardType2->addItem(gDataManager->GetSysString(1310).c_str(), 0);
 		break;
 	case 1:
@@ -2857,7 +2857,7 @@ void Game::OnResize() {
 																		 std::min<uint32>(Scale(450), stAbout->getTextWidth() + Scale(20))),
 												  std::min<uint32>(window_size.Height - waboutpos.UpperLeftCorner.Y,
 																   std::min<uint32>(stAbout->getTextHeight() + Scale(20), Scale(700)))));
-	wRoomListPlaceholder->setRelativePosition(irr::core::recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
+	wRoomListPlaceholder->setRelativePosition(irr::core::recti(0, 0, window_size.Width, window_size.Height));
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
 	SetCentered(wCommitsLog);
