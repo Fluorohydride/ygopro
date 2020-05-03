@@ -6,13 +6,6 @@ bool ygo::updater::StartUpdate(update_callback, void*, const path_string&) { ret
 bool ygo::updater::UpdateDownloaded() { return false; }
 void ygo::updater::StartUnzipper(unzip_callback callback, void* payload, const path_string&) {}
 #else
-#if defined(_WIN32)
-#define OSSTRING "Windows"
-#elif defined(__APPLE__)
-#define OSSTRING "Mac"
-#elif defined (__linux__) && !defined(__ANDROID__)
-#define OSSTRING "Linux"
-#endif
 #ifdef _WIN32
 #include <Windows.h>
 #include <tchar.h>
@@ -21,7 +14,7 @@ void ygo::updater::StartUnzipper(unzip_callback callback, void* payload, const p
 #include <unistd.h>
 #define _trename rename
 #define _tremove remove
-#endif
+#endif // _WIN32
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
 #include <thread>
@@ -30,9 +23,6 @@ void ygo::updater::StartUnzipper(unzip_callback callback, void* payload, const p
 #include <openssl/md5.h>
 #include "config.h"
 #include "utils.h"
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-#define USERAGENT "Edopro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)
 
 namespace ygo {
 
@@ -149,7 +139,7 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, reinterpret_cast<void*>(WriteCallback));
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 5L);
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, payload);
-	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, USERAGENT);
+	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, EDOPRO_USERAGENT);
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROXY, "*");
 	curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1);
 	curl_easy_setopt(curl_handle, CURLOPT_DNS_CACHE_TIMEOUT, 0);
