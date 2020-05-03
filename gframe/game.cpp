@@ -239,27 +239,28 @@ bool Game::Initialize() {
 	wAbout->setDraggable(false);
 	wAbout->setDrawTitlebar(false);
 	wAbout->setDrawBackground(false);
-	stAbout = env->addStaticText(L"Project Ignis: EDOPro\n"
-								 L"The bleeding-edge automatic duel simulator\n"
-								 L"\n"
-								 L"Copyright (C) 2020  Edoardo Lolletti (edo9300) and others\n"
-								 L"Card scripts and other assets by Project Ignis.\n"
-								 L"Licensed under the GNU AGPLv3 or later. See LICENSE for more details.\n"
-								 L"https://github.com/edo9300/ygopro\n"
-								 L"https://github.com/edo9300/ygopro-core\n"
-								 L"Assets may be distributed under their own licenses.\n"
-								 L"\n"
-								 L"Project Ignis:\n"
-								 L"ahtelel, AlphaKretin, AndreOliveiraMendes, Cybercatman, Dragon3989, DyXel, edo9300, "
-								 L"EerieCode, Gideon, Hatter, Hel, Icematoro, kevinlul, Larry126, LogicalNonsense, "
-								 L"NaimSantos, pyrQ, Sanct, senpaizuri, Steeldarkeagel, Tungnon, WolfOfWolves, Yamato\n"
-								 L"Default background: LogicalNonsense\n"
-								 L"Default fields: Icematoro\n"
-								 L"\n"
-								 L"Forked from Fluorohydride's YGOPro, maintainers DailyShana, mercury233.\n"
-								 L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
-								 L"This project is not affiliated with or endorsed by Shueisha or Konami.",
-								 Scale(10, 10, 440, 690), false, true, wAbout);
+	stAbout = irr::gui::CGUICustomText::addCustomText(L"Project Ignis: EDOPro\n"
+											L"The bleeding-edge automatic duel simulator\n"
+											L"\n"
+											L"Copyright (C) 2020  Edoardo Lolletti (edo9300) and others\n"
+											L"Card scripts and other assets by Project Ignis.\n"
+											L"Licensed under the GNU AGPLv3 or later. See LICENSE for more details.\n"
+											L"https://github.com/edo9300/ygopro\n"
+											L"https://github.com/edo9300/ygopro-core\n"
+											L"Assets may be distributed under their own licenses.\n"
+											L"\n"
+											L"Project Ignis:\n"
+											L"ahtelel, AlphaKretin, AndreOliveiraMendes, Cybercatman, Dragon3989, DyXel, edo9300, "
+											L"EerieCode, Gideon, Hatter, Hel, Icematoro, kevinlul, Larry126, LogicalNonsense, "
+											L"NaimSantos, pyrQ, Sanct, senpaizuri, Steeldarkeagel, Tungnon, WolfOfWolves, Yamato\n"
+											L"Default background: LogicalNonsense\n"
+											L"Default fields: Icematoro\n"
+											L"\n"
+											L"Forked from Fluorohydride's YGOPro, maintainers DailyShana, mercury233.\n"
+											L"Yu-Gi-Oh! is a trademark of Shueisha and Konami.\n"
+											L"This project is not affiliated with or endorsed by Shueisha or Konami.", false, env, wAbout, -1, Scale(10, 10, 440, 690));
+	((irr::gui::CGUICustomText*)stAbout)->enableScrollBar();
+	((irr::gui::CGUICustomText*)stAbout)->setWordWrap(true);
 	((irr::gui::CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
 	mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2040).c_str(), 3, true, true));
@@ -2851,6 +2852,11 @@ void Game::ReloadElementsStrings() {
 	ReloadCBCurrentSkin();
 }
 void Game::OnResize() {
+	const auto waboutpos = wAbout->getAbsolutePosition();
+	stAbout->setRelativePosition(irr::core::recti(0, 0, std::min<uint32>(window_size.Width - waboutpos.UpperLeftCorner.X,
+																		 std::min<uint32>(Scale(450), stAbout->getTextWidth() + Scale(20))),
+												  std::min<uint32>(window_size.Height - waboutpos.UpperLeftCorner.Y,
+																   std::min<uint32>(stAbout->getTextHeight() + Scale(20), Scale(700)))));
 	wRoomListPlaceholder->setRelativePosition(irr::core::recti(0, 0, mainGame->window_size.Width, mainGame->window_size.Height));
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
