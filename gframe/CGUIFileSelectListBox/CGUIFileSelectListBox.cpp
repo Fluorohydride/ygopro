@@ -861,7 +861,7 @@ void CGUIFileSelectListBox::resetPath() {
 	LoadFolderContents();
 }
 
-void CGUIFileSelectListBox::setWorkingPath(const path_string& newDirectory, bool setAsRoot) {
+void CGUIFileSelectListBox::setWorkingPath(const std::wstring& newDirectory, bool setAsRoot) {
 	BaseIsRoot = setAsRoot;
 	basePath = ygo::Utils::NormalizePath(newDirectory);
 	curRelPath = basePath;
@@ -873,7 +873,7 @@ void CGUIFileSelectListBox::addFilterFunction(callback* function) {
 	filter = function;
 }
 
-void CGUIFileSelectListBox::addFilteredExtensions(std::vector<path_string> extensions) {
+void CGUIFileSelectListBox::addFilteredExtensions(std::vector<std::wstring> extensions) {
 	filtered_extensions = extensions;
 	filter = nullptr;
 }
@@ -884,7 +884,7 @@ bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory, 
 		return !(elements.size() && elements.back().size() && elements.back().front() == L'.' && elements.back() != L"..");
 	}
 	auto pos = name.find_last_of('.');
-	if(pos == path_string::npos)
+	if(pos == std::wstring::npos)
 		return false;
 	auto extension = name.substr(pos + 1);
 	std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
