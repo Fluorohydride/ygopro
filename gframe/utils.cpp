@@ -146,10 +146,6 @@ namespace ygo {
 #endif
 	}
 
-	static inline bool CompareIgnoreCase(path_string a, path_string b) {
-		return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
-	};
-
 	std::vector<path_string> Utils::FindFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
 		std::vector<path_string> res;
 		FindFiles(path, [&res, extensions, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
@@ -171,7 +167,7 @@ namespace ygo {
 				res.push_back(name);
 			}
 		});
-		std::sort(res.begin(), res.end(), CompareIgnoreCase);
+		std::sort(res.begin(), res.end(), CompareIgnoreCase<path_string>);
 		return res;
 	}
 	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers, bool addparentpath) {
@@ -195,7 +191,7 @@ namespace ygo {
 				return;
 			}
 		});
-		std::sort(results.begin(), results.end(), CompareIgnoreCase);
+		std::sort(results.begin(), results.end(), CompareIgnoreCase<path_string>);
 		return results;
 	}
 	std::vector<int> Utils::FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {

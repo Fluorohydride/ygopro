@@ -32,7 +32,7 @@ CGUIFileSelectListBox::CGUIFileSelectListBox(IGUIEnvironment* environment, IGUIE
 	TotalItemHeight(0), ItemsIconWidth(0), Font(0), IconBank(0),
 	ScrollBar(0), selectTime(0), LastKeyTime(0), Selecting(false), DrawBack(drawBack),
 	MoveOverSelect(moveOverSelect), AutoScroll(true), HighlightWhenNotFocused(true),
-	filesystem(filesystem), basePath(0), curRelPath(0), TotalFolders(0), filter(0),
+	filesystem(filesystem), basePath{}, curRelPath{}, TotalFolders(0), filter(0),
 	NativeDirectoryHandling(false) {
 #ifdef _DEBUG
 	setDebugName("CGUIFileSelectListBox");
@@ -312,14 +312,14 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 						// dont change selection if the key buffer matches the current item
 						if(Selected > -1 && KeyBuffer.size() > 1) {
 							if(Items[Selected].text.size() >= KeyBuffer.size() &&
-							   KeyBuffer.equals_ignore_case(Items[Selected].text.subString(0, KeyBuffer.size())))
+							   ygo::Utils::EqualIgnoreCase(KeyBuffer, Items[Selected].text.substr(0, KeyBuffer.size())))
 								return true;
 						}
 
 						s32 current;
 						for(current = start + 1; current < (s32)Items.size(); ++current) {
 							if(Items[current].text.size() >= KeyBuffer.size()) {
-								if(KeyBuffer.equals_ignore_case(Items[current].text.subString(0, KeyBuffer.size()))) {
+								if(ygo::Utils::EqualIgnoreCase(KeyBuffer, Items[current].text.substr(0, KeyBuffer.size()))) {
 									if(Parent && Selected != current && !Selecting && !MoveOverSelect) {
 										SEvent e;
 										e.EventType = EET_GUI_EVENT;
@@ -335,7 +335,7 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 						}
 						for(current = 0; current <= start; ++current) {
 							if(Items[current].text.size() >= KeyBuffer.size()) {
-								if(KeyBuffer.equals_ignore_case(Items[current].text.subString(0, KeyBuffer.size()))) {
+								if(ygo::Utils::EqualIgnoreCase(KeyBuffer, Items[current].text.substr(0, KeyBuffer.size()))) {
 									if(Parent && Selected != current && !Selecting && !MoveOverSelect) {
 										Selected = current;
 										SEvent e;
@@ -604,6 +604,7 @@ void CGUIFileSelectListBox::setAutoScrollEnabled(bool scroll) {
 
 
 bool CGUIFileSelectListBox::isAutoScrollEnabled() const {
+	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 	return AutoScroll;
 }
 
@@ -635,7 +636,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 	Items.clear();
 	Selected = -1;
 	TotalFolders = 0;
-	curRelPath = ygo::Utils::NormalizePath(curRelPath.c_str()).c_str();
+	curRelPath = ygo::Utils::NormalizePath<path_string>(curRelPath.c_str()).c_str();
 	bool is_root = BaseIsRoot && curRelPath == basePath;
 	ygo::Utils::FindFiles(ygo::Utils::ToPathString(curRelPath.c_str()), [&](path_string _name, bool is_directory, void* payload) {
 		auto name = ygo::Utils::ToUnicodeIfNeeded(_name);
@@ -646,11 +647,11 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 				return;
 			}
 		}
-		if((filter && !filter(std::wstring(curRelPath.c_str()) + name, is_directory, payload)) || (!filter && !defaultFilter(std::wstring(curRelPath.c_str()) + name, is_directory, payload))) {
+		if((filter && !filter(path_string(curRelPath.c_str()) + name, is_directory, payload)) || (!filter && !defaultFilter(path_string(curRelPath.c_str()) + name, is_directory, payload))) {
 			return;
 		}
 		ListItem item;
-		item.reltext = ygo::Utils::NormalizePath(std::wstring(curRelPath.c_str()) + L"/" + name, false).c_str();
+		item.reltext = ygo::Utils::NormalizePath(path_string(curRelPath.c_str()) + L"/" + name, false).c_str();
 		if(is_directory) {
 			if(NativeDirectoryHandling)
 				TotalFolders++;
@@ -662,7 +663,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 		item.isDirectory = is_directory;
 		Items.push_back(item);
 	});
-	Items.sort();
+	std::sort(Items.begin(), Items.end());
 	recalculateItemHeight();
 }
 
@@ -856,11 +857,11 @@ void CGUIFileSelectListBox::refreshList() {
 
 void CGUIFileSelectListBox::resetPath() {
 	curRelPath = basePath;
-	prevRelPath = "";
+	prevRelPath.clear();
 	LoadFolderContents();
 }
 
-void CGUIFileSelectListBox::setWorkingPath(const std::wstring& newDirectory, bool setAsRoot) {
+void CGUIFileSelectListBox::setWorkingPath(const path_string& newDirectory, bool setAsRoot) {
 	BaseIsRoot = setAsRoot;
 	basePath = ygo::Utils::NormalizePath(newDirectory).c_str();
 	curRelPath = basePath;
@@ -872,18 +873,16 @@ void CGUIFileSelectListBox::addFilterFunction(callback* function) {
 	filter = function;
 }
 
-void CGUIFileSelectListBox::addFilteredExtensions(std::vector<std::wstring> extensions) {
+void CGUIFileSelectListBox::addFilteredExtensions(std::vector<path_string> extensions) {
 	filtered_extensions = extensions;
 	filter = nullptr;
 }
 
-bool CGUIFileSelectListBox::defaultFilter(std::wstring name, bool is_directory, void *) {
-	if (is_directory) {
-		auto elements = ygo::Utils::TokenizeString<std::wstring>(name, L"/");
-		return !(elements.size() && elements.back().size() && elements.back().front() == L'.' && elements.back() != L"..");
-	}
+bool CGUIFileSelectListBox::defaultFilter(path_string name, bool is_directory, void *) {
+	if(is_directory)
+		return true;
 	auto pos = name.find_last_of('.');
-	if(pos == std::wstring::npos)
+	if(pos == path_string::npos)
 		return false;
 	auto extension = name.substr(pos + 1);
 	std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);

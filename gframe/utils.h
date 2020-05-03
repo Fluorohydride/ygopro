@@ -55,6 +55,14 @@ namespace ygo {
 		static bool ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool KeepOnlyDigits(std::wstring& input, bool negative = false);
+		template<typename T>
+		static inline bool EqualIgnoreCase(const T& a, const T& b) {
+			return Utils::ToUpperNoAccents(a) == Utils::ToUpperNoAccents(b);
+		};
+		template<typename T>
+		static inline bool CompareIgnoreCase(const T& a, const T& b) {
+			return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
+		};
 	};
 
 template<typename T>

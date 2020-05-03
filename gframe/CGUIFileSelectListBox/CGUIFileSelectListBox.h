@@ -15,7 +15,7 @@
 #include <string>
 #include <functional>
 #include <IGUIListBox.h>
-#include <irrArray.h>
+#include "../utils.h"
 
 namespace irr {
 namespace io {
@@ -175,9 +175,9 @@ private:
 		ListItem() : icon(-1) {
 		}
 
-		core::stringw reltext;
+		std::wstring reltext;
 		bool isDirectory;
-		core::stringw text;
+		std::wstring text;
 		s32 icon;
 
 		// A multicolor extension
@@ -192,14 +192,14 @@ private:
 			if(isDirectory != other.isDirectory)
 				return false;
 
-			return reltext.equals_ignore_case(other.reltext);
+			return ygo::Utils::EqualIgnoreCase(reltext, other.reltext);
 		}
 
 		bool operator <(const struct ListItem& other) const {
 			if(isDirectory != other.isDirectory)
 				return isDirectory;
 
-			return reltext.lower_ignore_case(other.reltext);
+			return ygo::Utils::CompareIgnoreCase(reltext, other.reltext);
 		}
 	};
 
@@ -215,15 +215,15 @@ private:
 
 	void LoadFolderContents();
 
-	core::stringw basePath;
-	core::stringw prevRelPath;
-	core::stringw curRelPath;
+	std::wstring basePath;
+	std::wstring prevRelPath;
+	std::wstring curRelPath;
 	io::IFileSystem* filesystem;
 	callback* filter;
 	//std::function<bool(std::wstring, bool, void*)> filter;
 	std::vector<std::wstring> filtered_extensions;
 
-	core::array<ListItem> Items;
+	std::vector<ListItem> Items;
 	s32 Selected;
 	s32 ItemHeight;
 	s32 ItemHeightOverride;
@@ -234,7 +234,7 @@ private:
 	gui::IGUIScrollBar* ScrollBar;
 	u32 selectTime;
 	u32 LastKeyTime;
-	core::stringw KeyBuffer;
+	std::wstring KeyBuffer;
 	bool Selecting;
 	int TotalFolders;
 	bool BaseIsRoot;
