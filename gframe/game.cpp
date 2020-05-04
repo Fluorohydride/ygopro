@@ -3184,11 +3184,13 @@ void Game::UpdateUnzipBar(unzip_payload* payload) {
 	Game* game = static_cast<Game*>(unzipper->payload);
 	std::lock_guard<std::mutex> lk(game->gMutex);
 	// current archive
-	game->updateProgressText->setText(fmt::format(L"Extracting {}\n({} of {})", Utils::ToUnicodeIfNeeded(unzipper->filename), unzipper->cur, unzipper->tot).c_str());
-	game->updateProgressTop->setVisible(true);
-	game->updateProgressTop->setProgress(payload->cur / payload->tot * 100);
+	if(payload->is_new) {
+		game->updateProgressText->setText(fmt::format(L"Extracting {}\n({} of {})", Utils::ToUnicodeIfNeeded(unzipper->filename), unzipper->cur, unzipper->tot).c_str());
+		game->updateProgressTop->setVisible(true);
+		game->updateSubprogressText->setText(fmt::format(L"Current file: {}", Utils::ToUnicodeIfNeeded(payload->filename)).c_str());
+	}
+	game->updateProgressTop->setProgress(std::round((double)payload->cur / (double)payload->tot * 100));
 	// current file in archive
-	game->updateSubprogressText->setText(fmt::format(L"Current file: {}", Utils::ToUnicodeIfNeeded(payload->filename)).c_str());
 	game->updateProgressBottom->setProgress(payload->percentage);
 }
 void Game::PopulateResourcesDirectories() {

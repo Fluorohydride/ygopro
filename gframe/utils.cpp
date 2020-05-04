@@ -477,24 +477,25 @@ namespace ygo {
 					char buff[0x80000];
 					const int sz = sizeof(buff) / sizeof(*buff);
 					int r, rx = reader->getSize();
-					if(payload)
+					if(payload) {
 						payload->is_new = true;
+						payload->cur = i;
+						payload->percentage = 0;
+						payload->filename = filename.c_str();
+						callback(payload);
+						payload->is_new = false;
+					}
 					for(r = 0; r < rx; /**/) {
 						int wx = reader->read(buff, sz);
 						out.write(buff, wx);
 						r += wx;
 						cur_fullsize += wx;
 						if(callback && totsize) {
-							double fractiondownloaded = (double)cur_fullsize / (double)totsize;
+							double fractiondownloaded = (double)cur_fullsize / (double)rx;
 							percentage = std::round(fractiondownloaded * 100);
-							if(payload) {
-								payload->cur = i;
-								payload->percentage = percentage;
-								payload->filename = filename.c_str();
-							}
-							callback(payload);
 							if(payload)
-								payload->is_new = false;
+								payload->percentage = percentage;
+							callback(payload);
 						}
 					}
 					out.close();

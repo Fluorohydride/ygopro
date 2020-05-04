@@ -227,7 +227,7 @@ void Unzip(path_string src, void* payload, unzip_callback callback) {
 		uzpl.cur = i++;
 		auto name = src + ygo::Utils::ToPathString(file.name);
 		uzpl.filename = name.c_str();
-		ygo::Utils::UnzipArchive(src + ygo::Utils::ToPathString(file.name), callback, &cbpayload);
+		ygo::Utils::UnzipArchive(name, callback, &cbpayload);
 	}
 	Reboot();
 }
