@@ -60,9 +60,23 @@ const path_string& GetExePath() {
 	return binarypath;
 }
 
+const path_string& GetCorePath() {
+	static path_string binarypath = []()->path_string {
+#ifdef _WIN32
+		TCHAR exepath[MAX_PATH];
+		GetModuleFileName(NULL, exepath, MAX_PATH);
+		return Utils::GetFilePath(Utils::NormalizePath<path_string>(exepath, false)) + EPRO_TEXT("/ocgcore.dll");
+#endif
+	}();
+	return binarypath;
+}
+
 void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	_tremove((GetExePath() + EPRO_TEXT(".old")).c_str());
+#if !defined(__linux__)
+	_tremove((GetCorePath() + EPRO_TEXT(".old")).c_str());
+#endif
 #endif
 }
 
@@ -215,6 +229,9 @@ void Unzip(path_string src, void* payload, unzip_callback callback) {
 #if defined(_WIN32) || (defined(__LINUX__) && !defined(__ANDROID__))
 	auto pathstring = GetExePath() + EPRO_TEXT(".old");
 	_trename(GetExePath().c_str(), pathstring.c_str());
+#if !defined(__linux__)
+	_trename(GetCorePath().c_str(), (GetCorePath() + EPRO_TEXT(".old")).c_str());
+#endif
 #endif
 	unzip_payload cbpayload{};
 	UnzipperPayload uzpl;
