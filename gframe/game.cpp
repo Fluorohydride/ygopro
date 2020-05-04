@@ -1526,6 +1526,7 @@ bool Game::MainLoop() {
 	int fps = 0;
 	bool was_connected = false;
 	bool update_prompted = false;
+	bool unzip_started = false;
 #ifdef __ANDROID__
 	ogles2Solid = 0;
 	ogles2TrasparentAlpha = 0;
@@ -1781,7 +1782,8 @@ bool Game::MainLoop() {
 			gMutex.unlock();
 			update_prompted = true;
 		}
-		if(updater::UpdateDownloaded()) {
+		if(!unzip_started && updater::UpdateDownloaded()) {
+			unzip_started = true;
 			updater::StartUnzipper(Game::UpdateUnzipBar, mainGame);
 		}
 #ifndef __ANDROID__
