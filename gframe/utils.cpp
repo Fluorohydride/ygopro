@@ -1,6 +1,5 @@
 #include "utils.h"
-#include <IFileArchive.h>
-#include <IFileSystem.h>
+#include <cmath> // std::round
 #include <fstream>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -10,6 +9,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+#include <IFileArchive.h>
+#include <IFileSystem.h>
 #include "bufferio.h"
 
 namespace ygo {

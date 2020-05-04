@@ -65,7 +65,7 @@ const path_string& GetCorePath() {
 #ifdef _WIN32
 		TCHAR exepath[MAX_PATH];
 		GetModuleFileName(NULL, exepath, MAX_PATH);
-		return Utils::GetFilePath(Utils::NormalizePath<path_string>(exepath, false)) + EPRO_TEXT("/ocgcore.dll");
+		return Utils::GetFilePath(Utils::NormalizePath(exepath, false)) + EPRO_TEXT("/ocgcore.dll");
 #endif
 	}();
 	return binarypath;
