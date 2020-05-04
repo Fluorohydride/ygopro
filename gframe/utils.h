@@ -39,13 +39,13 @@ namespace ygo {
 		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		static irr::io::IReadFile* FindFileInArchives(const path_string& path, const path_string& name);
 		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);
-		static std::wstring GetFileExtension(std::wstring file);
-		static std::wstring GetFilePath(std::wstring file);
-		static std::wstring GetFileName(std::wstring file);
 		static std::string NormalizePath(std::string path, bool trailing_slash = true);
-		static std::string GetFileExtension(std::string file);
-		static std::string GetFilePath(std::string file);
-		static std::string GetFileName(std::string file);
+		template<typename T>
+		static T GetFileExtension(T file);
+		template<typename T>
+		static T GetFilePath(T file);
+		template<typename T>
+		static T GetFileName(T file, bool keepextension = false);
 
 		template<typename T>
 		static std::vector<T> TokenizeString(const T& input, const T& token);
@@ -65,6 +65,48 @@ namespace ygo {
 		};
 	};
 
+#define CHAR_T typename T::value_type
+#define CAST(c) static_cast<CHAR_T>(c)
+
+template<typename T>
+T Utils::GetFileExtension(T file) {
+	size_t dotpos = file.find_last_of(CAST('.'));
+	if(dotpos == T::npos)
+		return T();
+	T extension = file.substr(dotpos + 1);
+	std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
+	return extension;
+}
+
+template<typename T>
+T Utils::GetFilePath(T file) {
+	std::replace(file.begin(), file.end(), CAST('\\'), CAST('/'));
+	size_t slashpos = file.find_last_of(CAST('/'));
+	if(slashpos == T::npos)
+		return file;
+	T extension = file.substr(0, slashpos);
+	std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
+	return extension;
+}
+
+template<typename T>
+T Utils::GetFileName(T file, bool keepextension) {
+	std::replace(file.begin(), file.end(), CAST('\\'), CAST('/'));
+	size_t dashpos = file.find_last_of(CAST('/'));
+	if(dashpos == T::npos)
+		dashpos = 0;
+	else
+		dashpos++;
+	size_t dotpos = file.size();
+	if(!keepextension) {
+		dotpos = file.find_last_of(CAST('.'));
+		if(dotpos == T::npos)
+			dotpos = file.size();
+	}
+	T name = file.substr(dashpos, dotpos - dashpos);
+	return name;
+}
+
 template<typename T>
 inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
 	std::vector<T> res;
@@ -81,10 +123,8 @@ inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
 
 template<typename T>
 inline T Utils::ToUpperNoAccents(T input) {
-#define CHAR_T typename T::value_type
 	std::transform(input.begin(), input.end(), input.begin(), [](CHAR_T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
-#define CAST(c) static_cast<CHAR_T>(c)
 		if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
 			return CAST('A');
 		}

@@ -35,7 +35,7 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 	std::string filename;
 	if(len != -1) {
 		buff[len] = '\0';
-		filename = ygo::Utils::GetFileName(buff);
+		filename = ygo::Utils::GetFileName<path_string>(buff);
 	}
 	std::string param = fmt::format("bash -c \"cd {}; ./{} from_discord\"", workingDir, filename);
 #endif //_WIN32

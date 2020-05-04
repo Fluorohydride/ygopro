@@ -186,9 +186,9 @@ int main(int argc, char* argv[]) {
 #endif //__APPLE__
 	bool is_in_sys32 = false;
 #ifdef _WIN32
-	wchar_t* buffer;
+	TCHAR* buffer;
 	if((buffer = _tgetcwd(NULL, 0))) {
-		auto workdir = ygo::Utils::ToUpperNoAccents(ygo::Utils::GetFileName(buffer));
+		auto workdir = ygo::Utils::ToUpperNoAccents(ygo::Utils::GetFileName<path_string>(buffer));
 		is_in_sys32 = workdir == EPRO_TEXT("SYSTEM32");
 		free(buffer);
 	}
@@ -201,13 +201,13 @@ int main(int argc, char* argv[]) {
 #if !defined(_DEBUG)
 		} else {
 			if(!is_in_sys32) {
-				auto extension = ygo::Utils::GetFileExtension(argv[1]);
+				auto extension = ygo::Utils::GetFileExtension<path_string>(argv[1]);
 				is_in_sys32 = (extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua"));
 			}
 			if(is_in_sys32) {
 				TCHAR exepath[MAX_PATH];
 				GetModuleFileName(NULL, exepath, MAX_PATH);
-				auto path = ygo::Utils::GetFilePath(exepath);
+				auto path = ygo::Utils::GetFilePath<path_string>(exepath);
 				SetCurrentDirectory(path.c_str());
 			}
 #endif //_DEBUG
