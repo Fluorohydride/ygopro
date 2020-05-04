@@ -1,4 +1,4 @@
-# [Project Ignis](https://github.com/ProjectIgnis): EDOPro [![Build Status](https://travis-ci.org/edo9300/ygopro.svg?branch=master)](https://travis-ci.org/edo9300/ygopro)
+# [Project Ignis](https://github.com/ProjectIgnis): EDOPro [![Build Status](https://travis-ci.org/edo9300/edopro.svg?branch=master)](https://travis-ci.org/edo9300/edopro)
 
 The bleeding-edge automatic duel simulator, a fork of the [YGOPro client](https://github.com/Fluorohydride/ygopro).
 
@@ -17,7 +17,7 @@ We are not taking suggestions or feature requests and the issue tracker is not t
 
 Otherwise, pull requests are welcome! It might take some time for them to be evaluated since we are pretty swamped with a lot work to be done.
 
-Check out the [wiki](https://github.com/edo9300/ygopro/wiki/) for possibly outdated build instructions and a partial user manual.
+Check out the [wiki](https://github.com/edo9300/edopro/wiki/) for possibly outdated build instructions and a partial user manual.
 
 ## Project Ignis
 
@@ -33,6 +33,6 @@ This represents our vision for all of our projects and work and recognizes the c
 
 EDOPro is free/libre and open source software licensed under the GNU Affero General Public License, version 3 or later.
 Dependencies and resources may be provided under different licenses.
-Please see [LICENSE](https://github.com/edo9300/ygopro/blob/master/LICENSE) and [COPYING](https://github.com/edo9300/ygopro/blob/master/COPYING) for more details.
+Please see [LICENSE](https://github.com/edo9300/edopro/blob/master/LICENSE) and [COPYING](https://github.com/edo9300/edopro/blob/master/COPYING) for more details.
 
 Yu-Gi-Oh! is a trademark of Shueisha and Konami. This project is not affiliated with or endorsed by Shueisha or Konami.
