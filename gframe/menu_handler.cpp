@@ -561,7 +561,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					auto oldname = Utils::ToPathString(mainGame->lstReplayList->getListItem(prev_sel, true));
 					auto oldpath = oldname.substr(0, oldname.find_last_of(EPRO_TEXT("/"))) + EPRO_TEXT("/");
-					if(Replay::RenameReplay(oldname, oldpath + Utils::ToPathString(mainGame->ebRSName->getText()) + EPRO_TEXT(".yrpX"))) {
+					auto extension = oldname.substr(oldname.find_last_of(EPRO_TEXT(".")));
+					auto newname = Utils::ToPathString(mainGame->ebRSName->getText());
+					if (newname.rfind(extension) != newname.length() - extension.length()) {
+						newname += extension;
+					}
+					if(Replay::RenameReplay(oldname, oldpath + newname)) {
 						mainGame->lstReplayList->refreshList();
 					} else {
 						mainGame->PopupMessage(gDataManager->GetSysString(1365));
