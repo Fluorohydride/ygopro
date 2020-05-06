@@ -81,6 +81,9 @@ local ygopro_config=function(static_core)
 		includedirs { "/usr/local/include/irrlicht" }
 		linkoptions { "-Wl,-rpath ./" }
 		links { "fmt", "curl", "Cocoa.framework", "IOKit.framework", "OpenGL.framework", "Security.framework" }
+		if _OPTIONS["update-url"] then
+			links "crypto"
+		end
 		if static_core then
 			links "lua"
 		end
