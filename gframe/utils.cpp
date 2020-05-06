@@ -442,6 +442,8 @@ namespace ygo {
 	}
 
 	bool Utils::UnzipArchive(const path_string& input, unzip_callback callback, unzip_payload* payload, const path_string& dest) {
+		thread_local char buff[0x40000];
+		constexpr int buff_size = sizeof(buff) / sizeof(*buff);
 		if(!filesystem)
 			return false;
 		CreatePath(dest, EPRO_TEXT("./"));
@@ -475,8 +477,6 @@ namespace ygo {
 				auto reader = archive->createAndOpenFile(i);
 				if(reader) {
 					std::ofstream out(dest + EPRO_TEXT("/") + filename, std::ofstream::binary);
-					char buff[0x80000];
-					const int sz = sizeof(buff) / sizeof(*buff);
 					int r, rx = reader->getSize();
 					if(payload) {
 						payload->is_new = true;
@@ -487,7 +487,7 @@ namespace ygo {
 						payload->is_new = false;
 					}
 					for(r = 0; r < rx; /**/) {
-						int wx = reader->read(buff, sz);
+						int wx = reader->read(buff, buff_size);
 						out.write(buff, wx);
 						r += wx;
 						cur_fullsize += wx;

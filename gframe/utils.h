@@ -27,7 +27,7 @@ struct unzip_payload {
 	void* payload;
 };
 
-using unzip_callback = void(*)(unzip_payload* payload);
+using unzip_callback = std::function<void(unzip_payload* payload)>;
 
 namespace ygo {
 	class Utils {
