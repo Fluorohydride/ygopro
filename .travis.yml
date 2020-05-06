@@ -62,4 +62,4 @@ deploy:
   skip_cleanup: true
   script: bash ./ocgcore/travis/deploy.sh
   on:
-    repo: edo9300/ygopro
+    repo: edo9300/edopro
