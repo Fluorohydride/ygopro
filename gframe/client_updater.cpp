@@ -56,6 +56,8 @@ const path_string& GetExePath() {
 		}
 		// We could do NormalizePath but it returns the same thing anyway
 		return buff;
+#else
+		return EPRO_TEXT(""); // Unused on macOS
 #endif
 	}();
 	return binarypath;
@@ -67,6 +69,8 @@ const path_string& GetCorePath() {
 		TCHAR exepath[MAX_PATH];
 		GetModuleFileName(NULL, exepath, MAX_PATH);
 		return Utils::GetFilePath(Utils::NormalizePath(exepath, false)) + EPRO_TEXT("/ocgcore.dll");
+#else
+		return EPRO_TEXT(""); // Unused on POSIX
 #endif
 	}();
 	return binarypath;
