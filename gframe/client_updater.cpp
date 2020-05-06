@@ -54,7 +54,8 @@ const path_string& GetExePath() {
 		if(len != -1) {
 			buff[len] = '\0';
 		}
-		return Utils::NormalizePath(buff, false);
+		// We could do NormalizePath but it returns the same thing anyway
+		return buff;
 #endif
 	}();
 	return binarypath;
@@ -226,7 +227,7 @@ void Reboot() {
 }
 
 void Unzip(path_string src, void* payload, unzip_callback callback) {
-#if defined(_WIN32) || (defined(__LINUX__) && !defined(__ANDROID__))
+#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	auto pathstring = GetExePath() + EPRO_TEXT(".old");
 	_trename(GetExePath().c_str(), pathstring.c_str());
 #if !defined(__linux__)
