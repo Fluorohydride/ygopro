@@ -238,6 +238,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
+		if(!mainGame->dInfo.isStarted)
+			break;
 		ClientAnalyze(pdata, len - 1);
 		break;
 	}
