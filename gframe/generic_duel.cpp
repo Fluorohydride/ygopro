@@ -493,6 +493,7 @@ void GenericDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 void GenericDuel::RematchResult(DuelPlayer * dp, unsigned char rematch) {
 	if(seeking_rematch) {
 		if(!rematch) {
+			dp->type = NETPLAYER_TYPE_OBSERVER;
 			NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
 			duel_stage = DUEL_STAGE_END;
