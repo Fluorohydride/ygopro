@@ -1590,6 +1590,18 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(formatBuffer);
 								}
 							}
+							for(size_t i = 0; i < chains.size(); ++i) {
+								wchar_t formatBuffer[2048];
+								auto chit = chains[i];
+								if(mcard == chit.chain_card) {
+									myswprintf(formatBuffer, dataManager.GetSysString(216), i + 1);
+									str.append(L"\n").append(formatBuffer);
+								}
+								if(chit.target.find(mcard) != chit.target.end()) {
+									myswprintf(formatBuffer, dataManager.GetSysString(217), i + 1, dataManager.GetName(chit.chain_card->code));
+									str.append(L"\n").append(formatBuffer);
+								}
+							}
 							for(auto ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
 								myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
 								str.append(formatBuffer);
