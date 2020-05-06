@@ -230,8 +230,12 @@ namespace ygo {
 		return nullptr;
 	}
 	std::wstring Utils::NormalizePath(std::wstring path, bool trailing_slash) {
+		if(path.empty())
+			return path;
 		std::replace(path.begin(), path.end(), L'\\', L'/');
 		std::vector<std::wstring> paths = TokenizeString<std::wstring>(path, L"/");
+		if(path.front() == L'/')
+			paths.insert(paths.begin(), L"");
 		if(paths.empty())
 			return path;
 		std::wstring normalpath;
@@ -240,7 +244,7 @@ namespace ygo {
 			normalpath += L".";
 		}
 		for(auto it = paths.begin(); it != paths.end();) {
-			if((*it).empty()) {
+			if((*it).empty() && it != paths.begin()) {
 				it = paths.erase(it);
 				continue;
 			}
@@ -300,13 +304,17 @@ namespace ygo {
 		return name;
 	}
 	std::string Utils::NormalizePath(std::string path, bool trailing_slash) {
+		if(path.empty())
+			return path;
 		std::replace(path.begin(), path.end(), '\\', '/');
 		std::vector<std::string> paths = TokenizeString<std::string>(path, "/");
+		if(path.front() == '/')
+			paths.insert(paths.begin(), "");
 		if(paths.empty())
 			return path;
 		std::string normalpath;
 		for(auto it = paths.begin(); it != paths.end();) {
-			if((*it).empty()) {
+			if((*it).empty() && it != paths.begin()) {
 				it = paths.erase(it);
 				continue;
 			}
