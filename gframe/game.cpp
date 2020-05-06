@@ -1471,7 +1471,17 @@ void Game::ClearTextures() {
 	}
 	imageManager.ClearTexture();
 }
-void Game::CloseDuelWindow() {
+void Game::CloseGameButtons() {
+	btnChainIgnore->setVisible(false);
+	btnChainAlways->setVisible(false);
+	btnChainWhenAvail->setVisible(false);
+	btnCancelOrFinish->setVisible(false);
+	btnSpectatorSwap->setVisible(false);
+	btnShuffle->setVisible(false);
+	wSurrender->setVisible(false);
+}
+void Game::CloseGameWindow() {
+	CloseGameButtons();
 	for(auto wit = fadingList.begin(); wit != fadingList.end(); ++wit) {
 		if(wit->isFadein)
 			wit->autoFadeoutFrame = 1;
@@ -1481,34 +1491,32 @@ void Game::CloseDuelWindow() {
 	wANCard->setVisible(false);
 	wANNumber->setVisible(false);
 	wANRace->setVisible(false);
-	wCardImg->setVisible(false);
 	wCardSelect->setVisible(false);
 	wCardDisplay->setVisible(false);
 	wCmdMenu->setVisible(false);
 	wFTSelect->setVisible(false);
 	wHand->setVisible(false);
-	wInfos->setVisible(false);
 	wMessage->setVisible(false);
 	wOptions->setVisible(false);
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
-	wSurrender->setVisible(false);
 	wReplayControl->setVisible(false);
 	wReplaySave->setVisible(false);
 	stHintMsg->setVisible(false);
+	stTip->setVisible(false);
+}
+void Game::CloseDuelWindow() {
+	CloseGameWindow();
+	wCardImg->setVisible(false);
+	wInfos->setVisible(false);
+	wChat->setVisible(false);
 	btnSideOK->setVisible(false);
 	btnSideShuffle->setVisible(false);
 	btnSideSort->setVisible(false);
 	btnSideReload->setVisible(false);
 	btnLeaveGame->setVisible(false);
 	btnSpectatorSwap->setVisible(false);
-	btnChainIgnore->setVisible(false);
-	btnChainAlways->setVisible(false);
-	btnChainWhenAvail->setVisible(false);
-	btnCancelOrFinish->setVisible(false);
-	btnShuffle->setVisible(false);
-	wChat->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
 	lstHostList->clear();
