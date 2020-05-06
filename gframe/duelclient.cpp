@@ -376,7 +376,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wSort->setVisible(false);
 		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
-
 		mainGame->btnSideOK->setVisible(true);
 		mainGame->btnSideShuffle->setVisible(true);
 		mainGame->btnSideSort->setVisible(true);
