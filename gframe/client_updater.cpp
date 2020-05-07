@@ -75,7 +75,16 @@ void Reboot() {
 	STARTUPINFO si{ sizeof(STARTUPINFO) };
 	PROCESS_INFORMATION pi{};
 	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(" show_changelog");
-	CreateProcess(nullptr, (TCHAR*)pathstring.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
+	CreateProcess(nullptr,
+				  (TCHAR*)pathstring.c_str(),
+				  nullptr,
+				  nullptr,
+				  false,
+				  0,
+				  nullptr,
+				  EPRO_TEXT("./"),
+				  &si,
+				  &pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #elif defined(__APPLE__)
@@ -109,7 +118,13 @@ void DeleteOld() {
 
 ygo::ClientUpdater::lock_type GetLock() {
 #ifdef _WIN32
-	HANDLE hFile = CreateFile(EPRO_TEXT("./edopro_lock"), GENERIC_READ, 0, NULL, CREATE_ALWAYS, 0, NULL);
+	HANDLE hFile = CreateFile(EPRO_TEXT("./edopro_lock"),
+							  GENERIC_READ,
+							  0,
+							  nullptr,
+							  CREATE_ALWAYS,
+							  0,
+							  nullptr);
 	if(!hFile || hFile == INVALID_HANDLE_VALUE)
 		return nullptr;
 	DeleteOld();
@@ -206,14 +221,13 @@ void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_
 		cbpayload.previous_percent = -1;
 		std::vector<uint8_t> binmd5;
 		for(std::string::size_type i = 0; i < file.md5.length(); i += 2) {
-			uint8_t b = static_cast<uint8_t>(strtoul(file.md5.substr(i, 2).c_str(), nullptr, 16));
+			uint8_t b = static_cast<uint8_t>(std::stoul(file.md5.substr(i, 2), nullptr, 16));
 			binmd5.push_back(b);
 		}
-		{
-			std::ifstream file(name, std::ifstream::binary);
-			if(file.good() && CheckMd5({ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() }, binmd5))
-				continue;
-		}
+		std::ifstream tmpfile(name, std::ifstream::binary);
+		if(tmpfile.good() && CheckMd5({ std::istreambuf_iterator<char>(tmpfile),
+									  std::istreambuf_iterator<char>() }, binmd5))
+			continue;
 		std::vector<char> buffer;
 		if((curlPerform(file.url.c_str(), &buffer, &cbpayload) != CURLE_OK)
 		   || !CheckMd5(buffer, binmd5)
