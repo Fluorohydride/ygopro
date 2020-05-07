@@ -547,7 +547,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->lstReplayList->refreshList();
 					}
 				} else if(prev_operation == ACTION_UPDATE_PROMPT) {
-					updater::StartUpdate(Game::UpdateDownloadBar, mainGame);
+					gClientUpdater->StartUpdate(Game::UpdateDownloadBar, mainGame);
 					mainGame->PopupElement(mainGame->updateWindow);
 				}
 				prev_operation = 0;

@@ -1,19 +1,10 @@
 #include "client_updater.h"
-#ifndef UPDATE_URL
-void ygo::updater::CheckUpdates() {}
-bool ygo::updater::HasUpdate() { return false; }
-bool ygo::updater::StartUpdate(update_callback, void*, const path_string&) { return false; }
-bool ygo::updater::UpdateDownloaded() { return false; }
-void ygo::updater::StartUnzipper(unzip_callback callback, void* payload, const path_string&) {}
-#else
 #ifdef _WIN32
 #include <Windows.h>
 #include <tchar.h>
 #else
 #include <sys/file.h>
 #include <unistd.h>
-#define _trename rename
-#define _tremove remove
 #endif // _WIN32
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
@@ -23,64 +14,6 @@ void ygo::updater::StartUnzipper(unzip_callback callback, void* payload, const p
 #include <openssl/md5.h>
 #include "config.h"
 #include "utils.h"
-
-namespace ygo {
-
-namespace updater {
-
-std::atomic<bool> has_update{ false };
-std::atomic<bool> downloaded{ false };
-std::atomic<bool> downloading{ false };
-
-struct DownloadInfo {
-	std::string name;
-	std::string url;
-	std::string md5;
-};
-
-std::vector<DownloadInfo> update_urls;
-
-void* Lock = nullptr;
-
-void DeleteOld() {
-#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	_tremove((ygo::Utils::GetExePath() + EPRO_TEXT(".old")).c_str());
-#if !defined(__linux__)
-	_tremove((ygo::Utils::GetCorePath() + EPRO_TEXT(".old")).c_str());
-#endif
-#endif
-}
-
-void* GetLock() {
-#ifdef _WIN32
-	HANDLE hFile = CreateFile(EPRO_TEXT("./edopro_lock"), GENERIC_READ, 0, NULL, CREATE_ALWAYS, 0, NULL);
-	if(!hFile || hFile == INVALID_HANDLE_VALUE)
-		return nullptr;
-	DeleteOld();
-	return hFile;
-#else
-	size_t file = open("./edopro_lock", O_CREAT, S_IRWXU);
-	if(flock(file, LOCK_EX | LOCK_NB)) {
-		if(file)
-			close(file);
-		return nullptr;
-	}
-	DeleteOld();
-	return (void*)file;
-#endif
-	return nullptr;
-}
-
-void FreeLock() {
-#ifdef _WIN32
-	CloseHandle(Lock);
-	DeleteFile(EPRO_TEXT("./edopro_lock"));
-#else
-	flock(reinterpret_cast<uintptr_t>(Lock), LOCK_UN);
-	close(reinterpret_cast<uintptr_t>(Lock));
-	remove("./edopro_lock");
-#endif
-}
 
 struct Payload {
 	update_callback callback = nullptr;
@@ -136,50 +69,10 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	return res;
 }
 
-void CheckUpdate() {
-	std::vector<char> retrieved_data;
-	if(curlPerform(UPDATE_URL, &retrieved_data) != CURLE_OK)
-		return;
-	try {
-		nlohmann::json j = nlohmann::json::parse(retrieved_data);
-		if(!j.is_array())
-			return;
-		for(auto& asset : j) {
-			try {
-				auto url = asset["url"].get<std::string>();
-				auto name = asset["name"].get<std::string>();
-				auto md5 = asset["md5"].get<std::string>();
-				update_urls.push_back({ name, url, md5 });
-			}
-			catch(...) {}
-		}
-	}
-	catch(...) { update_urls.clear(); }
-	has_update = !!update_urls.size();
-}
-
-void CheckUpdates() {
-	if(!(Lock = GetLock()))
-		return;
-	update_urls.clear();
-	std::thread(CheckUpdate).detach();
-}
-
-bool HasUpdate() {
-	return has_update;
-}
-
-bool UpdateDownloaded() {
-	return downloaded;
-}
-
 void Reboot() {
 #ifdef _WIN32
-	STARTUPINFO si;
-	PROCESS_INFORMATION pi;
-	ZeroMemory(&si, sizeof(si));
-	si.cb = sizeof(si);
-	ZeroMemory(&pi, sizeof(pi));
+	STARTUPINFO si{ sizeof(STARTUPINFO) };
+	PROCESS_INFORMATION pi{};
 	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(" show_changelog");
 	CreateProcess(nullptr, (LPWSTR)pathstring.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
 	CloseHandle(pi.hProcess);
@@ -196,7 +89,58 @@ void Reboot() {
 	exit(0);
 }
 
-void Unzip(path_string src, void* payload, unzip_callback callback) {
+bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
+	if(md5.size() < MD5_DIGEST_LENGTH)
+		return false;
+	uint8_t result[MD5_DIGEST_LENGTH];
+	MD5((uint8_t*)buffer.data(), buffer.size(), result);
+	return memcmp(result, md5.data(), MD5_DIGEST_LENGTH) == 0;
+}
+
+void DeleteOld() {
+#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
+	ygo::Utils::FileDelete(ygo::Utils::GetExePath() + EPRO_TEXT(".old"));
+#if !defined(__linux__)
+	ygo::Utils::FileDelete(ygo::Utils::GetCorePath() + EPRO_TEXT(".old"));
+#endif
+#endif
+}
+
+ygo::ClientUpdater::lock_type GetLock() {
+#ifdef _WIN32
+	HANDLE hFile = CreateFile(EPRO_TEXT("./edopro_lock"), GENERIC_READ, 0, NULL, CREATE_ALWAYS, 0, NULL);
+	if(!hFile || hFile == INVALID_HANDLE_VALUE)
+		return nullptr;
+	DeleteOld();
+	return hFile;
+#else
+	size_t file = open("./edopro_lock", O_CREAT, S_IRWXU);
+	if(flock(file, LOCK_EX | LOCK_NB)) {
+		if(file)
+			close(file);
+		return 0;
+	}
+	DeleteOld();
+	return file;
+#endif
+	return 0;
+}
+
+void FreeLock(ygo::ClientUpdater::lock_type lock) {
+	if(!lock)
+		return;
+#ifdef _WIN32
+	CloseHandle(lock);
+#else
+	flock(lock, LOCK_UN);
+	close(lock);
+#endif
+	ygo::Utils::FileDelete(EPRO_TEXT("./edopro_lock"));
+}
+
+namespace ygo {
+
+void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callback) {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	auto& path = ygo::Utils::GetExePath();
 	ygo::Utils::FileMove(path, path + EPRO_TEXT(".old"));
@@ -221,19 +165,32 @@ void Unzip(path_string src, void* payload, unzip_callback callback) {
 	Reboot();
 }
 
-void StartUnzipper(unzip_callback callback, void* payload, const path_string& src) {
-	std::thread(Unzip, src, payload, callback).detach();
+void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const path_string& src) {
+#ifdef UPDATE_URL
+	if(Lock)
+		std::thread(&ClientUpdater::Unzip, this, src, payload, callback).detach();
+#endif
 }
 
-bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
-	if(md5.size() < MD5_DIGEST_LENGTH)
+void ClientUpdater::CheckUpdates() {
+#ifdef UPDATE_URL
+	if(Lock)
+		std::thread(&ClientUpdater::CheckUpdate, this).detach();
+#endif
+}
+
+bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const path_string& dest) {
+#ifdef UPDATE_URL
+	if(!has_update || downloading || !Lock)
 		return false;
-	uint8_t result[MD5_DIGEST_LENGTH];
-	MD5((uint8_t*)buffer.data(), buffer.size(), result);
-	return memcmp(result, md5.data(), MD5_DIGEST_LENGTH) == 0;
+	std::thread(&ClientUpdater::DownloadUpdate, this, dest, payload, callback).detach();
+	return true;
+#else
+	return false;
+#endif
 }
 
-void DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
+void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
 	downloading = true;
 	Payload cbpayload{};
 	cbpayload.callback = callback;
@@ -268,14 +225,37 @@ void DownloadUpdate(path_string dest_path, void* payload, update_callback callba
 	downloaded = true;
 }
 
-bool StartUpdate(update_callback callback, void* payload, const path_string& dest) {
-	if(!has_update || downloading)
-		return false;
-	std::thread(DownloadUpdate, dest, payload, callback).detach();
-	return true;
+void ClientUpdater::CheckUpdate() {
+	std::vector<char> retrieved_data;
+	if(curlPerform(UPDATE_URL, &retrieved_data) != CURLE_OK)
+		return;
+	try {
+		nlohmann::json j = nlohmann::json::parse(retrieved_data);
+		if(!j.is_array())
+			return;
+		for(auto& asset : j) {
+			try {
+				auto url = asset["url"].get<std::string>();
+				auto name = asset["name"].get<std::string>();
+				auto md5 = asset["md5"].get<std::string>();
+				update_urls.push_back({ name, url, md5 });
+			}
+			catch(...) {}
+		}
+	}
+	catch(...) { update_urls.clear(); }
+	has_update = !!update_urls.size();
 }
 
-};
-
-};
+ClientUpdater::ClientUpdater() {
+#ifdef UPDATE_URL
+	Lock = GetLock();
 #endif
+}
+
+ClientUpdater::~ClientUpdater() {
+#ifdef UPDATE_URL
+	FreeLock(Lock);
+#endif
+}
+};

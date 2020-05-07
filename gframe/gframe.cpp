@@ -33,6 +33,7 @@ ygo::SoundManager* ygo::gSoundManager = nullptr;
 ygo::GameConfig* ygo::gGameConfig = nullptr;
 ygo::RepoManager* ygo::gRepoManager = nullptr;
 ygo::DeckManager* ygo::gdeckManager = nullptr;
+ygo::ClientUpdater* ygo::gClientUpdater = nullptr;
 
 inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
@@ -222,7 +223,8 @@ int main(int argc, char* argv[]) {
 	setlocale(LC_CTYPE, "UTF-8");
 	evthread_use_pthreads();
 #endif //_WIN32
-	ygo::updater::CheckUpdates();
+	ygo::ClientUpdater updater;
+	ygo::gClientUpdater = &updater;
 	std::shared_ptr<ygo::DataHandler> data = nullptr;
 	try {
 		data = std::make_shared<ygo::DataHandler>();
@@ -238,6 +240,7 @@ int main(int argc, char* argv[]) {
 		Cleanup
 		return EXIT_FAILURE;
 	}
+	updater.CheckUpdates();
 #ifdef _WIN32
 	if(!data->configs->showConsole)
 		FreeConsole();

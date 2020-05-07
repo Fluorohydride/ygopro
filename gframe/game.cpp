@@ -1772,9 +1772,9 @@ bool Game::MainLoop() {
 			stACMessage->setText(gDataManager->GetSysString(1438).c_str());
 			PopupElement(wACMessage, 30);
 		}
-		if(!update_prompted && !(ygo::mainGame->dInfo.isInDuel || ygo::mainGame->dInfo.isInLobby || ygo::mainGame->is_siding
-			|| ygo::mainGame->wRoomListPlaceholder->isVisible() || ygo::mainGame->wLanWindow->isVisible()
-			|| ygo::mainGame->wCreateHost->isVisible() || ygo::mainGame->wHostPrepare->isVisible()) && updater::HasUpdate()) {
+		if(!update_prompted && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
+			|| wRoomListPlaceholder->isVisible() || wLanWindow->isVisible()
+			|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
 			gMutex.lock();
 			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
 			stQMessage->setText(L"A new update is available, do you want to download it?");
@@ -1782,9 +1782,9 @@ bool Game::MainLoop() {
 			gMutex.unlock();
 			update_prompted = true;
 		}
-		if(!unzip_started && updater::UpdateDownloaded()) {
+		if(!unzip_started && gClientUpdater->UpdateDownloaded()) {
 			unzip_started = true;
-			updater::StartUnzipper(Game::UpdateUnzipBar, mainGame);
+			gClientUpdater->StartUnzipper(Game::UpdateUnzipBar, mainGame);
 		}
 #ifndef __ANDROID__
 #ifdef __APPLE__
