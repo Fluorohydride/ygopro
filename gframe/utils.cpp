@@ -449,6 +449,43 @@ namespace ygo {
 		return true;
 	}
 
+	const path_string& Utils::GetExePath() {
+		static path_string binarypath = []()->path_string {
+#ifdef _WIN32
+			TCHAR exepath[MAX_PATH];
+			GetModuleFileName(NULL, exepath, MAX_PATH);
+			return Utils::NormalizePath<path_string>(exepath, false);
+#elif defined(__linux__) && !defined(__ANDROID__)
+			char buff[PATH_MAX];
+			ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
+			if(len != -1) {
+				buff[len] = '\0';
+			}
+			// We could do NormalizePath but it returns the same thing anyway
+			return buff;
+#else
+			return EPRO_TEXT(""); // Unused on macOS
+#endif
+		}();
+		return binarypath;
+	}
+
+	const path_string& Utils::GetExeFolder() {
+		static path_string binarypath = GetFilePath(GetExePath());
+		return binarypath;
+	}
+
+	const path_string& Utils::GetCorePath() {
+		static path_string binarypath = []()->path_string {
+#ifdef _WIN32
+			return GetExeFolder() + EPRO_TEXT("/ocgcore.dll");
+#else
+			return EPRO_TEXT(""); // Unused on POSIX
+#endif
+		}();
+		return binarypath;
+	}
+
 	bool Utils::UnzipArchive(const path_string& input, unzip_callback callback, unzip_payload* payload, const path_string& dest) {
 		thread_local char buff[0x40000];
 		constexpr int buff_size = sizeof(buff) / sizeof(*buff);

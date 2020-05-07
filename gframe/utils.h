@@ -69,6 +69,9 @@ namespace ygo {
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
 		static bool KeepOnlyDigits(std::wstring& input, bool negative = false);
+		static const path_string& GetExePath();
+		static const path_string& GetExeFolder();
+		static const path_string& GetCorePath();
 		static bool UnzipArchive(const path_string& input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, const path_string& dest = EPRO_TEXT("./"));
 	};
 

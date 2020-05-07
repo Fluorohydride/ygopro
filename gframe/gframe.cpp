@@ -206,10 +206,7 @@ int main(int argc, char* argv[]) {
 				is_in_sys32 = (extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua"));
 			}
 			if(is_in_sys32) {
-				TCHAR exepath[MAX_PATH];
-				GetModuleFileName(NULL, exepath, MAX_PATH);
-				auto path = ygo::Utils::GetFilePath(exepath);
-				SetCurrentDirectory(path.c_str());
+				SetCurrentDirectory(ygo::Utils::GetExeFolder().c_str());
 			}
 #endif //_DEBUG
 #endif //_WIN32

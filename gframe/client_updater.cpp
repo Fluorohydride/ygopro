@@ -42,45 +42,11 @@ std::vector<DownloadInfo> update_urls;
 
 void* Lock = nullptr;
 
-const path_string& GetExePath() {
-	static path_string binarypath = []()->path_string {
-#ifdef _WIN32
-		TCHAR exepath[MAX_PATH];
-		GetModuleFileName(NULL, exepath, MAX_PATH);
-		return Utils::NormalizePath(exepath, false);
-#elif defined(__linux__) && !defined(__ANDROID__)
-		char buff[PATH_MAX];
-		ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
-		if(len != -1) {
-			buff[len] = '\0';
-		}
-		// We could do NormalizePath but it returns the same thing anyway
-		return buff;
-#else
-		return EPRO_TEXT(""); // Unused on macOS
-#endif
-	}();
-	return binarypath;
-}
-
-const path_string& GetCorePath() {
-	static path_string binarypath = []()->path_string {
-#ifdef _WIN32
-		TCHAR exepath[MAX_PATH];
-		GetModuleFileName(NULL, exepath, MAX_PATH);
-		return Utils::GetFilePath(Utils::NormalizePath(exepath, false)) + EPRO_TEXT("/ocgcore.dll");
-#else
-		return EPRO_TEXT(""); // Unused on POSIX
-#endif
-	}();
-	return binarypath;
-}
-
 void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	_tremove((GetExePath() + EPRO_TEXT(".old")).c_str());
+	_tremove((ygo::Utils::GetExePath() + EPRO_TEXT(".old")).c_str());
 #if !defined(__linux__)
-	_tremove((GetCorePath() + EPRO_TEXT(".old")).c_str());
+	_tremove((ygo::Utils::GetCorePath() + EPRO_TEXT(".old")).c_str());
 #endif
 #endif
 }
@@ -214,7 +180,7 @@ void Reboot() {
 	ZeroMemory(&si, sizeof(si));
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi));
-	auto pathstring = GetExePath() + EPRO_TEXT(" show_changelog");
+	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(" show_changelog");
 	CreateProcess(nullptr, (LPWSTR)pathstring.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
@@ -232,10 +198,10 @@ void Reboot() {
 
 void Unzip(path_string src, void* payload, unzip_callback callback) {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	auto pathstring = GetExePath() + EPRO_TEXT(".old");
-	_trename(GetExePath().c_str(), pathstring.c_str());
+	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(".old");
+	_trename(ygo::Utils::GetExePath().c_str(), pathstring.c_str());
 #if !defined(__linux__)
-	_trename(GetCorePath().c_str(), (GetCorePath() + EPRO_TEXT(".old")).c_str());
+	_trename(ygo::Utils::GetCorePath().c_str(), (ygo::Utils::GetCorePath() + EPRO_TEXT(".old")).c_str());
 #endif
 #endif
 	unzip_payload cbpayload{};
