@@ -189,7 +189,7 @@ void Reboot() {
 #else
 	pid_t pid = fork();
 	if(pid == 0) {
-		execl(GetExePath().c_str(), "show_changelog", nullptr);
+		execl(ygo::Utils::GetExePath().c_str(), "show_changelog", nullptr);
 		exit(EXIT_FAILURE);
 	}
 #endif

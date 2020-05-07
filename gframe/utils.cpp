@@ -454,7 +454,7 @@ namespace ygo {
 #ifdef _WIN32
 			TCHAR exepath[MAX_PATH];
 			GetModuleFileName(NULL, exepath, MAX_PATH);
-			return Utils::NormalizePath<path_string>(exepath, false);
+			return Utils::NormalizePath(exepath, false);
 #elif defined(__linux__) && !defined(__ANDROID__)
 			char buff[PATH_MAX];
 			ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
