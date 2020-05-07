@@ -50,11 +50,14 @@ namespace ygo {
 		template<typename T>
 		static std::vector<T> TokenizeString(const T& input, const T& token);
 		template<typename T>
+		static std::vector<T> TokenizeString(const T& input, const typename T::value_type& token);
+		template<typename T>
 		static T ToUpperNoAccents(T input);
 		/** Returns true if and only if all tokens are contained in the input. */
 		static bool ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
 		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
-		static bool KeepOnlyDigits(std::wstring& input, bool negative = false);
+		template<typename T>
+		static bool KeepOnlyDigits(T& input, bool negative = false);
 		template<typename T>
 		static inline bool EqualIgnoreCase(const T& a, const T& b) {
 			return Utils::ToUpperNoAccents(a) == Utils::ToUpperNoAccents(b);
@@ -154,6 +157,20 @@ inline std::vector<T> Utils::TokenizeString(const T& input, const T& token) {
 }
 
 template<typename T>
+inline std::vector<T> Utils::TokenizeString(const T & input, const typename T::value_type & token) {
+	std::vector<T> res;
+	typename T::size_type pos1, pos2 = 0;
+	while((pos1 = input.find(token, pos2)) != T::npos) {
+		if(pos1 != pos2)
+			res.emplace_back(input.begin() + pos2, input.begin() + pos1);
+		pos2 = pos1 + 1;
+	}
+	if(pos2 != input.size())
+		res.emplace_back(input.begin() + pos2, input.end());
+	return res;
+}
+
+template<typename T>
 inline T Utils::ToUpperNoAccents(T input) {
 	std::transform(input.begin(), input.end(), input.begin(), [](CHAR_T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
@@ -179,21 +196,20 @@ inline T Utils::ToUpperNoAccents(T input) {
 			return CAST(std::towupper(c));
 		else
 			return CAST(std::toupper(c));
-#undef CAST
-#undef CHAR_T
 #undef IN_INTERVAL
 	});
 	return input;
 }
 
-inline bool Utils::KeepOnlyDigits(std::wstring& input, bool negative) {
+template<typename T>
+inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 	bool changed = false;
 	for (auto it = input.begin(); it != input.end();) {
-		if(*it == L'-' && negative && it == input.begin()) {
+		if(*it == CAST('-') && negative && it == input.begin()) {
 			it++;
 			continue;
 		}
-		if ((unsigned)(*it - L'0') > 9) {
+		if ((unsigned)(*it - CAST('0')) > 9) {
 			it = input.erase(it);
 			changed = true;
 			continue;
@@ -202,6 +218,8 @@ inline bool Utils::KeepOnlyDigits(std::wstring& input, bool negative) {
 	}
 	return changed;
 }
+#undef CAST
+#undef CHAR_T
 
 }
 
