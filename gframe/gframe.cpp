@@ -1,5 +1,6 @@
 #ifdef _WIN32
-#include <Tchar.h>
+#include <direct.h> //_getcwd
+#include <Tchar.h> //_tgetcwd
 #else
 #include <unistd.h>
 #endif
@@ -188,7 +189,7 @@ int main(int argc, char* argv[]) {
 #endif //__APPLE__
 	bool is_in_sys32 = false;
 #ifdef _WIN32
-	wchar_t* buffer;
+	TCHAR* buffer;
 	if((buffer = _tgetcwd(NULL, 0))) {
 		auto workdir = ygo::Utils::ToUpperNoAccents(ygo::Utils::GetFileName(buffer));
 		is_in_sys32 = workdir == EPRO_TEXT("SYSTEM32");

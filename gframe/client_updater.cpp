@@ -1,8 +1,8 @@
 #include "client_updater.h"
 #ifdef UPDATE_URL
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
-#include <tchar.h>
 #else
 #include <sys/file.h>
 #include <unistd.h>
@@ -75,7 +75,7 @@ void Reboot() {
 	STARTUPINFO si{ sizeof(STARTUPINFO) };
 	PROCESS_INFORMATION pi{};
 	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(" show_changelog");
-	CreateProcess(nullptr, (LPWSTR)pathstring.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
+	CreateProcess(nullptr, (TCHAR*)pathstring.c_str(), nullptr, nullptr, false, 0, nullptr, EPRO_TEXT("./"), &si, &pi);
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
 #elif defined(__APPLE__)
