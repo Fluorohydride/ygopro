@@ -198,10 +198,11 @@ void Reboot() {
 
 void Unzip(path_string src, void* payload, unzip_callback callback) {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(".old");
-	_trename(ygo::Utils::GetExePath().c_str(), pathstring.c_str());
+	auto& path = ygo::Utils::GetExePath();
+	ygo::Utils::FileMove(path, path + EPRO_TEXT(".old"));
 #if !defined(__linux__)
-	_trename(ygo::Utils::GetCorePath().c_str(), (ygo::Utils::GetCorePath() + EPRO_TEXT(".old")).c_str());
+	auto& corepath = ygo::Utils::GetExePath();
+	ygo::Utils::FileMove(corepath, corepath + EPRO_TEXT(".old"));
 #endif
 #endif
 	unzip_payload cbpayload{};

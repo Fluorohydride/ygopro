@@ -39,19 +39,12 @@ namespace ygo {
 		return true;
 	}
 	bool Utils::FileMove(const path_string& source, const path_string& destination) {
-		if(source == destination)
-			return false;
-		std::ifstream src(source, std::ios::binary);
-		if(!src.is_open())
-			return false;
-		std::ofstream dst(destination, std::ios::binary);
-		if(!dst.is_open())
-			return false;
-		dst << src.rdbuf();
-		src.close();
-		dst.close();
-		FileDelete(source);
-		return true;
+#ifdef _WIN32
+		return MoveFile(source.c_str(), destination.c_str());
+#else
+		return rename(source.c_str(), destination.c_str()) == 0;
+#endif
+		return false;
 	}
 	bool Utils::FileDelete(const path_string& source) {
 #ifdef _WIN32
