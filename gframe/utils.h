@@ -38,8 +38,8 @@ namespace ygo {
 		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1, bool addparentpath = true);
 		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
 		static irr::io::IReadFile* FindFileInArchives(const path_string& path, const path_string& name);
-		static std::wstring NormalizePath(std::wstring path, bool trailing_slash = true);
-		static std::string NormalizePath(std::string path, bool trailing_slash = true);
+		template<typename T>
+		static T NormalizePath(T path, bool trailing_slash = true);
 		template<typename T>
 		static T GetFileExtension(T file);
 		template<typename T>
@@ -67,6 +67,39 @@ namespace ygo {
 
 #define CHAR_T typename T::value_type
 #define CAST(c) static_cast<CHAR_T>(c)
+template<typename T>
+T Utils::NormalizePath(T path, bool trailing_slash) {
+	const T prev{ CAST('.'), CAST('.') };
+	const T cur{ CAST('.') };
+	constexpr auto slash = CAST('/');
+	std::replace(path.begin(), path.end(), CAST('\\'), slash);
+	auto paths = TokenizeString(path, slash);
+	if(paths.empty())
+		return path;
+	T normalpath;
+	for(auto it = paths.begin(); it != paths.end();) {
+		if(it->empty() && it != paths.begin()) {
+			it = paths.erase(it);
+			continue;
+		}
+		if((*it) == cur && it != paths.begin()) {
+			it = paths.erase(it);
+			continue;
+		}
+		if((*it) != prev && it != paths.begin() && (it + 1) != paths.end() && (*(it + 1)) == prev) {
+			it = paths.erase(paths.erase(it));
+			continue;
+		}
+		it++;
+	}
+	for(auto it = paths.begin(); it != (paths.end() - 1); it++) {
+		normalpath += *it + slash;
+	}
+	normalpath += paths.back();
+	if(trailing_slash)
+		normalpath += slash;
+	return normalpath;
+}
 
 template<typename T>
 T Utils::GetFileExtension(T file) {
@@ -79,7 +112,7 @@ T Utils::GetFileExtension(T file) {
 }
 
 template<typename T>
-T GetFilePath(T file) {
+T Utils::GetFilePath(T file) {
 	std::replace(file.begin(), file.end(), CAST('\\'), CAST('/'));
 	size_t slashpos = file.find_last_of(CAST('/'));
 	if(slashpos == T::npos)
