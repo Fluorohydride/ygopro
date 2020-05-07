@@ -1,4 +1,5 @@
 #include "client_updater.h"
+#ifdef UPDATE_URL
 #ifdef _WIN32
 #include <Windows.h>
 #include <tchar.h>
@@ -137,33 +138,8 @@ void FreeLock(ygo::ClientUpdater::lock_type lock) {
 #endif
 	ygo::Utils::FileDelete(EPRO_TEXT("./edopro_lock"));
 }
-
+#endif
 namespace ygo {
-
-void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callback) {
-#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	auto& path = ygo::Utils::GetExePath();
-	ygo::Utils::FileMove(path, path + EPRO_TEXT(".old"));
-#if !defined(__linux__)
-	auto& corepath = ygo::Utils::GetExePath();
-	ygo::Utils::FileMove(corepath, corepath + EPRO_TEXT(".old"));
-#endif
-#endif
-	unzip_payload cbpayload{};
-	UnzipperPayload uzpl;
-	uzpl.payload = payload;
-	uzpl.cur = -1;
-	uzpl.tot = static_cast<int>(update_urls.size());
-	cbpayload.payload = &uzpl;
-	int i = 1;
-	for(auto& file : update_urls) {
-		uzpl.cur = i++;
-		auto name = src + ygo::Utils::ToPathString(file.name);
-		uzpl.filename = name.c_str();
-		ygo::Utils::UnzipArchive(name, callback, &cbpayload);
-	}
-	Reboot();
-}
 
 void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const path_string& src) {
 #ifdef UPDATE_URL
@@ -188,6 +164,31 @@ bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const p
 #else
 	return false;
 #endif
+}
+#ifdef UPDATE_URL
+void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callback) {
+#if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
+	auto& path = ygo::Utils::GetExePath();
+	ygo::Utils::FileMove(path, path + EPRO_TEXT(".old"));
+#if !defined(__linux__)
+	auto& corepath = ygo::Utils::GetExePath();
+	ygo::Utils::FileMove(corepath, corepath + EPRO_TEXT(".old"));
+#endif
+#endif
+	unzip_payload cbpayload{};
+	UnzipperPayload uzpl;
+	uzpl.payload = payload;
+	uzpl.cur = -1;
+	uzpl.tot = static_cast<int>(update_urls.size());
+	cbpayload.payload = &uzpl;
+	int i = 1;
+	for(auto& file : update_urls) {
+		uzpl.cur = i++;
+		auto name = src + ygo::Utils::ToPathString(file.name);
+		uzpl.filename = name.c_str();
+		ygo::Utils::UnzipArchive(name, callback, &cbpayload);
+	}
+	Reboot();
 }
 
 void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
@@ -246,6 +247,7 @@ void ClientUpdater::CheckUpdate() {
 	catch(...) { update_urls.clear(); }
 	has_update = !!update_urls.size();
 }
+#endif
 
 ClientUpdater::ClientUpdater() {
 #ifdef UPDATE_URL
@@ -258,4 +260,5 @@ ClientUpdater::~ClientUpdater() {
 	FreeLock(Lock);
 #endif
 }
+
 };

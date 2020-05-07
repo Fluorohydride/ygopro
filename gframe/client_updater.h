@@ -1,10 +1,11 @@
 #ifndef CLIENT_UPDATER_H
 #define CLIENT_UPDATER_H
 
+#ifdef UPDATE_URL
 #include <vector>
 #include <atomic>
+#endif
 #include <functional>
-#include "text_types.h"
 #include "utils.h"
 
 struct UnzipperPayload {
@@ -22,15 +23,16 @@ class ClientUpdater {
 public:
 	ClientUpdater();
 	~ClientUpdater();
+	bool StartUpdate(update_callback callback, void* payload, const path_string& dest = EPRO_TEXT("./updates/"));
+	void StartUnzipper(unzip_callback callback, void* payload, const path_string& src = EPRO_TEXT("./updates/"));
+	void CheckUpdates();
+#ifdef UPDATE_URL
 	bool HasUpdate() {
 		return has_update;
 	}
 	bool UpdateDownloaded() {
 		return downloaded;
 	}
-	bool StartUpdate(update_callback callback, void* payload, const path_string& dest = EPRO_TEXT("./updates/"));
-	void StartUnzipper(unzip_callback callback, void* payload, const path_string& src = EPRO_TEXT("./updates/"));
-	void CheckUpdates();
 #ifdef _WIN32
 	using lock_type = void*;
 #else
@@ -50,6 +52,14 @@ private:
 	std::atomic<bool> has_update{ false };
 	std::atomic<bool> downloaded{ false };
 	std::atomic<bool> downloading{ false };
+#else
+	bool HasUpdate() {
+		return false;
+	}
+	bool UpdateDownloaded() {
+		return false;
+	}
+#endif
 };
 
 extern ClientUpdater* gClientUpdater;
