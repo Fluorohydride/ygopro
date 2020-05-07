@@ -79,14 +79,13 @@ T Utils::GetFileExtension(T file) {
 }
 
 template<typename T>
-T Utils::GetFilePath(T file) {
+T GetFilePath(T file) {
 	std::replace(file.begin(), file.end(), CAST('\\'), CAST('/'));
 	size_t slashpos = file.find_last_of(CAST('/'));
 	if(slashpos == T::npos)
-		return file;
-	T extension = file.substr(0, slashpos);
-	std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
-	return extension;
+		return T{ CAST('.'),CAST('/') };
+	T path = file.substr(0, slashpos + 1);
+	return path;
 }
 
 template<typename T>
