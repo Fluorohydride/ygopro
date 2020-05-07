@@ -73,7 +73,9 @@ int main(int argc, char* argv[]) {
 	ygo::game_info.no_shuffle_deck = false;
 	ygo::game_info.duel_rule = DEFAULT_DUEL_RULE;
 	ygo::game_info.time_limit = 180;
-	if(argc > 1) {
+	for (int i = 0; i < 3; ++i)
+		ygo::pre_seed[i] = (time_t)0;
+	if (argc > 1) {
 		ygo::aServerPort = atoi(argv[1]);
 		int lflist = atoi(argv[2]);
 		if(lflist < 0)
@@ -108,6 +110,10 @@ int main(int argc, char* argv[]) {
 		ygo::game_info.draw_count = atoi(argv[10]);
 		ygo::game_info.time_limit = atoi(argv[11]);
 		ygo::replay_mode = atoi(argv[12]);
+		for (int i = 13; (i < argc && i <= 15) ; ++i)
+		{
+			ygo::pre_seed[i - 13] = (time_t)atoi(argv[i]);
+		}
 	}
 	ygo::mainGame = &_game;
 	ygo::mainGame->MainServerLoop();

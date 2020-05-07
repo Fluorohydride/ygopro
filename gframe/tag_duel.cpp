@@ -504,6 +504,11 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.flag = REPLAY_TAG;
 	time_t seed = time(0);
 	rh.seed = seed;
+#ifdef YGOPRO_SERVER_MODE
+	if(pre_seed[0] > 0) {
+		seed = pre_seed[0];
+	}
+#endif
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
 	rnd.reset(seed);

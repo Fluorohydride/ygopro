@@ -535,6 +535,11 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.version = PRO_VERSION;
 	rh.flag = 0;
 	time_t seed = time(0);
+#ifdef YGOPRO_SERVER_MODE
+	if(pre_seed[duel_count] > 0) {
+		seed = pre_seed[duel_count];
+	}
+#endif
 	rh.seed = seed;
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
