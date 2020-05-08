@@ -224,16 +224,18 @@ void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_
 			uint8_t b = static_cast<uint8_t>(std::stoul(file.md5.substr(i, 2), nullptr, 16));
 			binmd5.push_back(b);
 		}
-		std::ifstream tmpfile(name, std::ifstream::binary);
-		if(tmpfile.good() && CheckMd5({ std::istreambuf_iterator<char>(tmpfile),
+		std::fstream stream;
+		stream.open(name, std::fstream::in | std::fstream::binary);
+		if(stream.good() && CheckMd5({ std::istreambuf_iterator<char>(stream),
 									  std::istreambuf_iterator<char>() }, binmd5))
 			continue;
+		stream.close();
 		std::vector<char> buffer;
 		if((curlPerform(file.url.c_str(), &buffer, &cbpayload) != CURLE_OK)
 		   || !CheckMd5(buffer, binmd5)
 		   || !ygo::Utils::CreatePath(name))
 			continue;
-		std::ofstream stream(name, std::ofstream::binary);
+		stream.open(name, std::fstream::out | std::fstream::trunc | std::ofstream::binary);
 		if(stream.good())
 			stream.write(buffer.data(), buffer.size());
 	}
@@ -253,7 +255,9 @@ void ClientUpdater::CheckUpdate() {
 				auto url = asset["url"].get<std::string>();
 				auto name = asset["name"].get<std::string>();
 				auto md5 = asset["md5"].get<std::string>();
-				update_urls.push_back({ name, url, md5 });
+				update_urls.emplace_back(std::move(name),
+										 std::move(url),
+										 std::move(md5));
 			}
 			catch(...) {}
 		}
