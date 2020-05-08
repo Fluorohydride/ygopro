@@ -1,113 +1,21 @@
-/*
-Minetest
-Copyright (C) 2014 celeron55, Perttu Ahola <celeron55@gmail.com>
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2.1 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-
 #ifndef __ANDROID__
 #error This file may only be compiled for android!
 #endif
 
 #include "porting_android.h"
 
+#include <jni.h>
 #include <irrlicht.h>
-#include <sstream>
-#include <exception>
-#include <cstdlib>
 #include <sys/stat.h>
 #include <fstream>
-#include <android/log.h>
 #include <vector>
 #include <unistd.h>
-#define LOGI(...) __android_log_print(ANDROID_LOG_DEBUG, "Edopro", __VA_ARGS__);
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "Edopro", __VA_ARGS__);
-#include <thread>
+#include "../log.h"
 #include "../bufferio.h"
 #include "../sound_manager.h"
 #include "../game_config.h"
 #include "../game.h"
 
-extern int main(int argc, char *argv[]);
-
-namespace porting {
-std::vector<std::string> GetExtraParameters() {
-	std::vector<std::string> ret;
-	ret.push_back("");//dummy arg 0
-
-	jobject me = app_global->activity->clazz;
-
-	jclass acl = jnienv->GetObjectClass(me); //class pointer of NativeActivity
-	jmethodID giid = jnienv->GetMethodID(acl, "getIntent", "()Landroid/content/Intent;");
-	jobject intent = jnienv->CallObjectMethod(me, giid); //Got our intent
-
-	jclass icl = jnienv->GetObjectClass(intent); //class pointer of Intent
-	jmethodID gseid = jnienv->GetMethodID(icl, "getStringArrayExtra", "(Ljava/lang/String;)[Ljava/lang/String;");
-
-	jobjectArray stringArrays = (jobjectArray)jnienv->CallObjectMethod(intent, gseid, jnienv->NewStringUTF("ARGUMENTS"));
-
-	int size = jnienv->GetArrayLength(stringArrays);
-
-	for(int i = 0; i < size; ++i) {
-		jstring string = (jstring)jnienv->GetObjectArrayElement(stringArrays, i);
-		const char* mayarray = jnienv->GetStringUTFChars(string, 0);
-		ret.push_back(mayarray);
-		jnienv->DeleteLocalRef(string);
-	}
-	return ret;
-}
-}
-
-void android_main(android_app *app) {
-	int retval = 0;
-	porting::app_global = app;
-	porting::initAndroid();
-	porting::initializePathsAndroid();
-
-	if(chdir(porting::working_directory.c_str()) != 0)
-		LOGE("failed to change directory");
-
-	auto strparams = porting::GetExtraParameters();
-	std::vector<const char*> params;
-
-	for(auto& param : strparams) {
-		params.push_back(param.c_str());
-	}
-
-	try {
-		app_dummy();
-		main(params.size(), (char**)params.data());
-	}
-	catch(std::exception &e) {
-		// 		errorstream << "Uncaught exception in main thread: " << e.what() << std::endl;
-		retval = -1;
-	}
-	catch(...) {
-		// errorstream << "Uncaught exception in main thread!" << std::endl;
-		retval = -1;
-	}
-
-	porting::cleanupAndroid();
-	// infostream << "Shutting down." << std::endl;
-	exit(retval);
-}
-
-/* handler for finished message box input */
-/* Intentionally NOT in namespace porting */
-/* TODO this doesn't work as expected, no idea why but there's a workaround   */
-/* for it right now */
 extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_TextEntry_putMessageBoxResult(
 		JNIEnv * env, jclass thiz, jstring textString) {
@@ -168,12 +76,37 @@ android_app* app_global = nullptr;
 JNIEnv*      jnienv = nullptr;
 jclass       nativeActivity;
 
+std::vector<std::string> GetExtraParameters() {
+	std::vector<std::string> ret;
+	ret.push_back("");//dummy arg 0
+
+	jobject me = app_global->activity->clazz;
+
+	jclass acl = jnienv->GetObjectClass(me); //class pointer of NativeActivity
+	jmethodID giid = jnienv->GetMethodID(acl, "getIntent", "()Landroid/content/Intent;");
+	jobject intent = jnienv->CallObjectMethod(me, giid); //Got our intent
+
+	jclass icl = jnienv->GetObjectClass(intent); //class pointer of Intent
+	jmethodID gseid = jnienv->GetMethodID(icl, "getStringArrayExtra", "(Ljava/lang/String;)[Ljava/lang/String;");
+
+	jobjectArray stringArrays = (jobjectArray)jnienv->CallObjectMethod(intent, gseid, jnienv->NewStringUTF("ARGUMENTS"));
+
+	int size = jnienv->GetArrayLength(stringArrays);
+
+	for(int i = 0; i < size; ++i) {
+		jstring string = (jstring)jnienv->GetObjectArrayElement(stringArrays, i);
+		const char* mayarray = jnienv->GetStringUTFChars(string, 0);
+		ret.push_back(mayarray);
+		jnienv->DeleteLocalRef(string);
+	}
+	return ret;
+}
+
 jclass findClass(std::string classname, JNIEnv* env = nullptr) {
 	env = env ? env : jnienv;
 	if(env == 0) {
 		return 0;
 	}
-
 	jclass nativeactivity = env->FindClass("android/app/NativeActivity");
 	jmethodID getClassLoader =
 		env->GetMethodID(nativeactivity, "getClassLoader",
@@ -196,21 +129,14 @@ void initAndroid() {
 	lJavaVMAttachArgs.version = JNI_VERSION_1_6;
 	lJavaVMAttachArgs.name = "Edopro NativeThread";
 	lJavaVMAttachArgs.group = nullptr;
-#ifdef NDEBUG
-	// This is a ugly hack as arm v7a non debuggable builds crash without this
-	// printf ... if someone finds out why please fix it!
-	// infostream << "Attaching native thread. " << std::endl;
-#endif
 	if(jvm->AttachCurrentThread(&jnienv, &lJavaVMAttachArgs) == JNI_ERR) {
-		// errorstream << "Failed to attach native thread to jvm" << std::endl;
+		LOGE("Couldn't attach current thread");
 		exit(-1);
 	}
-
 	nativeActivity = findClass("io/github/edo9300/edopro/EpNativeActivity");
-	if(nativeActivity == 0) {
-		// errorstream <<
-// 			"porting::initAndroid unable to find java native activity class" <<
-// 			std::endl;
+	if(!nativeActivity){
+		LOGE("Couldn't retrieve nativeActivity");
+		exit(-1);
 	}
 }
 
@@ -219,59 +145,25 @@ void cleanupAndroid() {
 	jvm->DetachCurrentThread();
 }
 
-static std::string javaStringToUTF8(jstring js) {
-	std::string str;
-	// Get string as a UTF-8 c-string
-	const char *c_str = jnienv->GetStringUTFChars(js, nullptr);
-	// Save it
-	str = c_str;
-	// And free the c-string
-	jnienv->ReleaseStringUTFChars(js, c_str);
-	return str;
-}
-
-// Calls static method if obj is NULL
-static std::string getAndroidPath(jclass cls, jobject obj, jclass cls_File,
-								  jmethodID mt_getAbsPath, const char *getter) {
-	// Get getter method
-	jmethodID mt_getter;
-	if(obj)
-		mt_getter = jnienv->GetMethodID(cls, getter,
-										"()Ljava/io/File;");
-	else
-		mt_getter = jnienv->GetStaticMethodID(cls, getter,
-											  "()Ljava/io/File;");
-
-	// Call getter
-	jobject ob_file;
-	if(obj)
-		ob_file = jnienv->CallObjectMethod(obj, mt_getter);
-	else
-		ob_file = jnienv->CallStaticObjectMethod(cls, mt_getter);
-
-	// Call getAbsolutePath
-	jstring js_path = (jstring)jnienv->CallObjectMethod(ob_file,
-														mt_getAbsPath);
-
-	return javaStringToUTF8(js_path);
+void readConfigs() {
+	std::string path = internal_storage + "/working_dir";
+	struct stat buffer;
+	if(stat(path.c_str(), &buffer) == 0) {
+		LOGI("working_dir found");
+		std::ifstream confs(path);
+		std::getline(confs, working_directory);
+		LOGI("Working directory: %s", working_directory.c_str());
+	}
+	if(working_directory.empty()) {
+		LOGI("working_dir not found");
+		exit(1);
+	}
+	working_directory += "/";
 }
 
 void initializePathsAndroid() {
-	// Get Environment class
-	jclass cls_Env = jnienv->FindClass("android/os/Environment");
-	// Get File class
-	jclass cls_File = jnienv->FindClass("java/io/File");
-	// Get getAbsolutePath method
-	jmethodID mt_getAbsPath = jnienv->GetMethodID(cls_File,
-												  "getAbsolutePath", "()Ljava/lang/String;");
-
-	//  	path_cache   = getAndroidPath(nativeActivity, app_global->activity->clazz,
-	// 			cls_File, mt_getAbsPath, "getCacheDir");
 	internal_storage = app_global->activity->internalDataPath;
-
 	readConfigs();
-	// 	path_user    = path_storage + DIR_DELIM + PROJECT_NAME_C;
-	// 	path_share   = path_storage + DIR_DELIM + PROJECT_NAME_C;
 }
 void displayKeyboard(bool pShow) {
 	// Attaches the current thread to the JVM.
@@ -357,6 +249,14 @@ void displayKeyboard(bool pShow) {
 	lJavaVM->DetachCurrentThread();
 }
 
+/**
+ * show text input dialog in java
+ * @param acceptButton text to display on accept button
+ * @param hint hint to show
+ * @param current initial value to display
+ * @param editType type of texfield
+ * (1==multiline text input; 2==single line text input; 3=password field)
+ */
 void showInputDialog(const std::string& acceptButton, const  std::string& hint,
 					 const std::string& current, int editType) {
 	jmethodID showdialog = jnienv->GetMethodID(nativeActivity, "showDialog",
@@ -393,58 +293,6 @@ void showComboBox(const std::vector<std::string>& list) {
 	jnienv->CallVoidMethod(app_global->activity->clazz, showbox, jlist);
 }
 
-float getDisplayDensity() {
-	static bool firstrun = true;
-	static float value = 0;
-
-	if(firstrun) {
-		jmethodID getDensity = jnienv->GetMethodID(nativeActivity, "getDensity",
-												   "()F");
-
-		if(getDensity == 0) {
-			assert("porting::getDisplayDensity unable to find java getDensity method" == 0);
-		}
-
-		value = jnienv->CallFloatMethod(app_global->activity->clazz, getDensity);
-		firstrun = false;
-	}
-	return value;
-}
-
-std::pair<int, int> getDisplaySize() {
-	static bool firstrun = true;
-	static std::pair<int, int> retval;
-
-	if(firstrun) {
-		jmethodID getDisplayWidth = jnienv->GetMethodID(nativeActivity,
-														"getDisplayWidth", "()I");
-
-		if(getDisplayWidth == 0) {
-			assert("porting::getDisplayWidth unable to find java getDisplayWidth method" == 0);
-		}
-
-		retval.first = jnienv->CallIntMethod(app_global->activity->clazz,
-											 getDisplayWidth);
-
-		jmethodID getDisplayHeight = jnienv->GetMethodID(nativeActivity,
-														 "getDisplayHeight", "()I");
-
-		if(getDisplayHeight == 0) {
-			assert("porting::getDisplayHeight unable to find java getDisplayHeight method" == 0);
-		}
-
-		retval.second = jnienv->CallIntMethod(app_global->activity->clazz,
-											  getDisplayHeight);
-
-		firstrun = false;
-	}
-	return retval;
-}
-
-/*
-* implementation from https://github.com/minetest/minetest/blob/02a23892f94d3c83a6bdc301defc0e7ade7e1c2b/src/gui/modalMenu.cpp#L116
-* with this patch applied to the engine https://github.com/minetest/minetest/blob/02a23892f94d3c83a6bdc301defc0e7ade7e1c2b/build/android/patches/irrlicht-touchcount.patch
-*/
 bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 	static irr::core::position2di m_pointer = irr::core::position2di(0, 0);
 	auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
@@ -502,6 +350,11 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 			stopPropagation = false;
 			return true;
 		}
+									
+		/*
+		* partial implementation from https://github.com/minetest/minetest/blob/02a23892f94d3c83a6bdc301defc0e7ade7e1c2b/src/gui/modalMenu.cpp#L116
+		* with this patch applied to the engine https://github.com/minetest/minetest/blob/02a23892f94d3c83a6bdc301defc0e7ade7e1c2b/build/android/patches/irrlicht-touchcount.patch
+		*/
 		case irr::EET_TOUCH_INPUT_EVENT: {
 			irr::SEvent translated;
 			memset(&translated, 0, sizeof(irr::SEvent));
@@ -586,22 +439,6 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 	return false;
 }
 
-void readConfigs() {
-	std::string path = internal_storage + "/working_dir";
-	struct stat buffer;
-	if(stat(path.c_str(), &buffer) == 0) {
-		LOGI("working_dir found");
-		std::ifstream confs(path);
-		std::getline(confs, working_directory);
-		LOGI("Working directory: %s", working_directory.c_str());
-	}
-	if(working_directory.empty()) {
-		LOGI("working_dir not found");
-		exit(1);
-	}
-	working_directory += "/";
-}
-
 int getLocalIP() {
 	jmethodID getIP = jnienv->GetMethodID(nativeActivity, "getLocalIpAddress",
 										  "()I");
@@ -646,8 +483,34 @@ const wchar_t* getTextFromClipboard() {
 		assert("porting::getTextFromClipboard unable to find java getClipboard method" == 0);
 	}
 	jstring js_clip = (jstring)jnienv->CallObjectMethod(app_global->activity->clazz, getClip);
-	text = BufferIO::DecodeUTF8s(javaStringToUTF8(js_clip));
+	const char *c_str = jnienv->GetStringUTFChars(js_clip, nullptr);
+	text = BufferIO::DecodeUTF8s(c_str);
+	jnienv->ReleaseStringUTFChars(js_clip, c_str);
 	return text.c_str();
 
 }
+}
+
+extern int main(int argc, char *argv[]);
+
+void android_main(android_app *app) {
+	int retval = 0;
+	porting::app_global = app;
+	porting::initAndroid();
+	porting::initializePathsAndroid();
+
+	if(chdir(porting::working_directory.c_str()) != 0)
+		LOGE("failed to change directory");
+
+	auto strparams = porting::GetExtraParameters();
+	std::vector<const char*> params;
+
+	for(auto& param : strparams) {
+		params.push_back(param.c_str());
+	}
+	app_dummy();
+	retval = main(params.size(), (char**)params.data());
+
+	porting::cleanupAndroid();
+	exit(retval);
 }
