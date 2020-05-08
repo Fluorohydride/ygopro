@@ -76,7 +76,7 @@ void Reboot() {
 	PROCESS_INFORMATION pi{};
 	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(" show_changelog");
 	CreateProcess(nullptr,
-				  (TCHAR*)pathstring.c_str(),
+		(TCHAR*)pathstring.c_str(),
 				  nullptr,
 				  nullptr,
 				  false,
@@ -255,9 +255,9 @@ void ClientUpdater::CheckUpdate() {
 				auto url = asset["url"].get<std::string>();
 				auto name = asset["name"].get<std::string>();
 				auto md5 = asset["md5"].get<std::string>();
-				update_urls.emplace_back(std::move(name),
+				update_urls.push_back(std::move(DownloadInfo{ std::move(name),
 										 std::move(url),
-										 std::move(md5));
+										 std::move(md5) }));
 			}
 			catch(...) {}
 		}
