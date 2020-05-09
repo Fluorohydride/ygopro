@@ -9,6 +9,7 @@
 #ifdef __ANDROID__
 #include "Android/COSAndroidOperator.h"
 #endif
+#include "client_updater.h"
 #include "game_config.h"
 #include "repo_manager.h"
 #include "image_downloader.h"
@@ -1473,6 +1474,22 @@ bool Game::Initialize() {
 #else
 	fpsCounter->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 #endif
+	//update window
+	updateWindow = env->addWindow(Scale(490, 200, 840, 340), true, L"");
+	updateWindow->getCloseButton()->setVisible(false);
+	updateWindow->setVisible(false);
+	updateProgressText = env->addStaticText(L"", Scale(5, 5, 345, 90), false, true, updateWindow);
+	updateProgressTop = new IProgressBar(env, Scale(5, 60, 335, 85), -1, updateWindow);
+	updateProgressTop->addBorder(1);
+	updateProgressTop->setProgress(0);
+	updateProgressTop->setVisible(false);
+	updateProgressTop->drop();
+	updateSubprogressText = env->addStaticText(L"", Scale(5, 90, 345, 110), false, true, updateWindow);
+	updateProgressBottom = new IProgressBar(env, Scale(5, 115, 335, 130), -1, updateWindow);
+	updateProgressBottom->addBorder(1);
+	updateProgressBottom->setProgress(0);
+	updateProgressBottom->drop();
+
 	hideChat = false;
 	hideChatTimer = 0;
 	delta_time = 0;
@@ -1510,6 +1527,8 @@ bool Game::MainLoop() {
 	float frame_counter = 0.0f;
 	int fps = 0;
 	bool was_connected = false;
+	bool update_prompted = false;
+	bool unzip_started = false;
 #ifdef __ANDROID__
 	ogles2Solid = 0;
 	ogles2TrasparentAlpha = 0;
@@ -1779,6 +1798,20 @@ bool Game::MainLoop() {
 			stACMessage->setText(gDataManager->GetSysString(1438).c_str());
 			PopupElement(wACMessage, 30);
 		}
+		if(!update_prompted && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
+			|| wRoomListPlaceholder->isVisible() || wLanWindow->isVisible()
+			|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
+			gMutex.lock();
+			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
+			stQMessage->setText(L"A new update is available, do you want to download it?");
+			PopupElement(wQuery);
+			gMutex.unlock();
+			update_prompted = true;
+		}
+		if(!unzip_started && gClientUpdater->UpdateDownloaded()) {
+			unzip_started = true;
+			gClientUpdater->StartUnzipper(Game::UpdateUnzipBar, mainGame);
+		}
 #ifndef __ANDROID__
 #ifdef __APPLE__
 		// Recent versions of macOS break OpenGL vsync while offscreen, resulting in
@@ -1875,6 +1908,8 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 			repo.second.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 			repo.second.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		}
+		updateProgressTop->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
+		updateProgressBottom->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 		btnPSAD->setImage(imageManager.tCover[0]);
 		btnPSDD->setImage(imageManager.tCover[0]);
 		btnSettings->setImage(imageManager.tSettings);
@@ -2861,6 +2896,7 @@ void Game::OnResize() {
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
 	SetCentered(wCommitsLog);
+	SetCentered(updateWindow);
 	wDeckEdit->setRelativePosition(Resize(309, 8, 605, 130));
 	cbDBLFList->setRelativePosition(Resize(80, 5, 220, 30));
 	cbDBDecks->setRelativePosition(Resize(80, 35, 220, 60));
@@ -3177,6 +3213,27 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 		if(type > 1)
 			std::cout << str << std::endl;
 	}
+}
+void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload) {
+	Game* game = static_cast<Game*>(payload);
+	std::lock_guard<std::mutex> lk(game->gMutex);
+	game->updateProgressBottom->setProgress(percentage);
+	if(is_new)
+		game->updateProgressText->setText(fmt::format(L"Downloading {}\n({} of {})", BufferIO::DecodeUTF8s(filename), cur, tot).c_str());
+}
+void Game::UpdateUnzipBar(unzip_payload* payload) {
+	UnzipperPayload* unzipper = static_cast<UnzipperPayload*>(payload->payload);
+	Game* game = static_cast<Game*>(unzipper->payload);
+	std::lock_guard<std::mutex> lk(game->gMutex);
+	// current archive
+	if(payload->is_new) {
+		game->updateProgressText->setText(fmt::format(L"Extracting {}\n({} of {})", Utils::ToUnicodeIfNeeded(unzipper->filename), unzipper->cur, unzipper->tot).c_str());
+		game->updateProgressTop->setVisible(true);
+		game->updateSubprogressText->setText(fmt::format(L"Current file: {}", Utils::ToUnicodeIfNeeded(payload->filename)).c_str());
+	}
+	game->updateProgressTop->setProgress(std::round((double)payload->cur / (double)payload->tot * 100));
+	// current file in archive
+	game->updateProgressBottom->setProgress(payload->percentage);
 }
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));

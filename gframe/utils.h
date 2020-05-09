@@ -13,14 +13,27 @@
 namespace irr {
 namespace io {
 class IFileArchive;
+class IFileSystem;
 class IReadFile;
 }
 }
+
+struct unzip_payload {
+	int percentage;
+	int cur;
+	int tot;
+	const path_char* filename;
+	bool is_new;
+	void* payload;
+};
+
+using unzip_callback = std::function<void(unzip_payload* payload)>;
 
 namespace ygo {
 	class Utils {
 	public:
 		static std::vector<irr::io::IFileArchive*> archives;
+		static irr::io::IFileSystem* filesystem;
 		static bool MakeDirectory(const path_string& path);
 		static bool FileCopy(const path_string& source, const path_string& destination);
 		static bool FileMove(const path_string& source, const path_string& destination);
@@ -66,6 +79,11 @@ namespace ygo {
 		static inline bool CompareIgnoreCase(const T& a, const T& b) {
 			return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
 		};
+		static bool CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
+		static const path_string& GetExePath();
+		static const path_string& GetExeFolder();
+		static const path_string& GetCorePath();
+		static bool UnzipArchive(const path_string& input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, const path_string& dest = EPRO_TEXT("./"));
 	};
 
 #define CHAR_T typename T::value_type

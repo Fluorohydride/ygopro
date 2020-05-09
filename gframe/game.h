@@ -225,6 +225,8 @@ public:
 	bool LoadScript(OCG_Duel pduel, const std::string& script_name);
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
+	static void UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload);
+	static void UpdateUnzipBar(unzip_payload* payload);
 
 	std::mutex gMutex;
 	std::mutex analyzeMutex;
@@ -356,6 +358,13 @@ public:
 	SettingsWindow gSettings;
 	irr::gui::IGUIWindow* wBtnSettings;
 	irr::gui::CGUIImageButton* btnSettings;
+
+	irr::gui::IGUIWindow* updateWindow;
+	irr::gui::IGUIStaticText* updateProgressText;
+	IProgressBar* updateProgressTop;
+	irr::gui::IGUIStaticText* updateSubprogressText;
+	IProgressBar* updateProgressBottom;
+
 	//main menu
 	int mainMenuLeftX;
 	int mainMenuRightX;

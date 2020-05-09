@@ -41,6 +41,11 @@ newoption {
 	value = "app_id_token",
 	description = "Discord App ID for rich presence"
 }
+newoption {
+	trigger = "update-url",
+	value = "url",
+	description = "API endpoint to check for updates from"
+}
 workspace "ygo"
 	location "build"
 	language "C++"

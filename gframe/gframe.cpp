@@ -1,5 +1,6 @@
 #ifdef _WIN32
-#include <Tchar.h>
+#include <direct.h> //_getcwd
+#include <Tchar.h> //_tgetcwd
 #else
 #include <unistd.h>
 #endif
@@ -11,6 +12,7 @@
 #include <IGUIWindow.h>
 #include <IGUIEnvironment.h>
 #include <ISceneManager.h>
+#include "client_updater.h"
 #include "config.h"
 #include "data_handler.h"
 #include "logging.h"
@@ -32,6 +34,7 @@ ygo::SoundManager* ygo::gSoundManager = nullptr;
 ygo::GameConfig* ygo::gGameConfig = nullptr;
 ygo::RepoManager* ygo::gRepoManager = nullptr;
 ygo::DeckManager* ygo::gdeckManager = nullptr;
+ygo::ClientUpdater* ygo::gClientUpdater = nullptr;
 
 inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
@@ -205,10 +208,7 @@ int main(int argc, char* argv[]) {
 				is_in_sys32 = (extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua"));
 			}
 			if(is_in_sys32) {
-				TCHAR exepath[MAX_PATH];
-				GetModuleFileName(NULL, exepath, MAX_PATH);
-				auto path = ygo::Utils::GetFilePath<path_string>(exepath);
-				SetCurrentDirectory(path.c_str());
+				SetCurrentDirectory(ygo::Utils::GetExeFolder().c_str());
 			}
 #endif //_DEBUG
 #endif //_WIN32
@@ -224,6 +224,8 @@ int main(int argc, char* argv[]) {
 	setlocale(LC_CTYPE, "UTF-8");
 	evthread_use_pthreads();
 #endif //_WIN32
+	ygo::ClientUpdater updater;
+	ygo::gClientUpdater = &updater;
 	std::shared_ptr<ygo::DataHandler> data = nullptr;
 	try {
 		data = std::make_shared<ygo::DataHandler>();
@@ -239,6 +241,7 @@ int main(int argc, char* argv[]) {
 		Cleanup
 		return EXIT_FAILURE;
 	}
+	updater.CheckUpdates();
 #ifdef _WIN32
 	if(!data->configs->showConsole)
 		FreeConsole();

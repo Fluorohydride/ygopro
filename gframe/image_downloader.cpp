@@ -135,7 +135,10 @@ void ImageDownloader::DownloadPic() {
 					fp.close();
 					if(res == CURLE_OK) {
 						ext = GetExtension(payload.header);
-						Utils::FileMove(name, dest_folder + ext);
+						if(!Utils::FileMove(name, dest_folder + ext)) {
+							Utils::FileDelete(name);
+							ext.clear();
+						}
 						break;
 					} else {
 						Utils::FileDelete(name);

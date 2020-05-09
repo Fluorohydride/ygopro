@@ -1,5 +1,5 @@
 #include "utils.h"
-#include <IFileArchive.h>
+#include <cmath> // std::round
 #include <fstream>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -9,10 +9,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+#include <IFileArchive.h>
+#include <IFileSystem.h>
 #include "bufferio.h"
 
 namespace ygo {
 	std::vector<irr::io::IFileArchive*> Utils::archives;
+	irr::io::IFileSystem* Utils::filesystem;
 
 	bool Utils::MakeDirectory(const path_string& path) {
 #ifdef _WIN32
@@ -36,19 +39,12 @@ namespace ygo {
 		return true;
 	}
 	bool Utils::FileMove(const path_string& source, const path_string& destination) {
-		if(source == destination)
-			return false;
-		std::ifstream src(source, std::ios::binary);
-		if(!src.is_open())
-			return false;
-		std::ofstream dst(destination, std::ios::binary);
-		if(!dst.is_open())
-			return false;
-		dst << src.rdbuf();
-		src.close();
-		dst.close();
-		FileDelete(source);
-		return true;
+#ifdef _WIN32
+		return MoveFile(source.c_str(), destination.c_str());
+#else
+		return rename(source.c_str(), destination.c_str()) == 0;
+#endif
+		return false;
 	}
 	bool Utils::FileDelete(const path_string& source) {
 #ifdef _WIN32
@@ -279,6 +275,132 @@ namespace ygo {
 		if (token.empty())
 			return true;
 		return (convertInputCasing ? ToUpperNoAccents(input) : input).find(convertTokenCasing ? ToUpperNoAccents(token) : token) != std::wstring::npos;
+	}
+	bool Utils::CreatePath(const path_string& path, const path_string& workingdir) {
+		std::vector<path_string> folders;
+		path_string temp;
+		for(int i = 0; i < (int)path.size(); i++) {
+			if(path[i] == EPRO_TEXT('/')) {
+				folders.push_back(temp);
+				temp.clear();
+			} else
+				temp += path[i];
+		}
+		temp.clear();
+		for(auto folder : folders) {
+			if(temp.empty() && !workingdir.empty())
+				temp = workingdir + EPRO_TEXT("/") + folder;
+			else
+				temp += EPRO_TEXT("/") + folder;
+			if(!MakeDirectory(temp.c_str()))
+				return false;
+		}
+		return true;
+	}
+
+	const path_string& Utils::GetExePath() {
+		static path_string binarypath = []()->path_string {
+#ifdef _WIN32
+			TCHAR exepath[MAX_PATH];
+			GetModuleFileName(NULL, exepath, MAX_PATH);
+			return Utils::NormalizePath<path_string>(exepath, false);
+#elif defined(__linux__) && !defined(__ANDROID__)
+			char buff[PATH_MAX];
+			ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
+			if(len != -1) {
+				buff[len] = '\0';
+			}
+			// We could do NormalizePath but it returns the same thing anyway
+			return buff;
+#else
+			return EPRO_TEXT(""); // Unused on macOS
+#endif
+		}();
+		return binarypath;
+	}
+
+	const path_string& Utils::GetExeFolder() {
+		static path_string binarypath = GetFilePath(GetExePath());
+		return binarypath;
+	}
+
+	const path_string& Utils::GetCorePath() {
+		static path_string binarypath = []()->path_string {
+#ifdef _WIN32
+			return GetExeFolder() + EPRO_TEXT("/ocgcore.dll");
+#else
+			return EPRO_TEXT(""); // Unused on POSIX
+#endif
+		}();
+		return binarypath;
+	}
+
+	bool Utils::UnzipArchive(const path_string& input, unzip_callback callback, unzip_payload* payload, const path_string& dest) {
+		thread_local char buff[0x40000];
+		constexpr int buff_size = sizeof(buff) / sizeof(*buff);
+		if(!filesystem)
+			return false;
+		CreatePath(dest, EPRO_TEXT("./"));
+		irr::io::IFileArchive* archive = nullptr;
+		if(!filesystem->addFileArchive(input.c_str(), false, false, irr::io::EFAT_ZIP, "", &archive))
+			return false;
+
+		archive->grab();
+		auto filelist = archive->getFileList();
+		auto count = filelist->getFileCount();
+
+		int totsize = 0;
+		int cur_fullsize = 0;
+
+		for(int i = 0; i < count; i++) {
+			totsize += filelist->getFileSize(i);
+		}
+
+		if(payload)
+			payload->tot = count;
+
+		for(int i = 0; i < count; i++) {
+			auto filename = path_string(filelist->getFullFileName(i).c_str());
+			bool isdir = filelist->isDirectory(i);
+			if(isdir)
+				CreatePath(filename + EPRO_TEXT("/"), dest);
+			else
+				CreatePath(filename, dest);
+			if(!isdir) {
+				int percentage = 0;
+				auto reader = archive->createAndOpenFile(i);
+				if(reader) {
+					std::ofstream out(dest + EPRO_TEXT("/") + filename, std::ofstream::binary);
+					int r, rx = reader->getSize();
+					if(payload) {
+						payload->is_new = true;
+						payload->cur = i;
+						payload->percentage = 0;
+						payload->filename = filename.c_str();
+						callback(payload);
+						payload->is_new = false;
+					}
+					for(r = 0; r < rx; /**/) {
+						int wx = reader->read(buff, buff_size);
+						out.write(buff, wx);
+						r += wx;
+						cur_fullsize += wx;
+						if(callback && totsize) {
+							double fractiondownloaded = (double)cur_fullsize / (double)rx;
+							percentage = std::round(fractiondownloaded * 100);
+							if(payload)
+								payload->percentage = percentage;
+							callback(payload);
+						}
+					}
+					out.close();
+					reader->drop();
+				}
+			}
+		}
+		filesystem->removeFileArchive(archive);
+		archive->drop();
+		return true;
 	}
 }
 

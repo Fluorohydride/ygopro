@@ -26,18 +26,9 @@ bool DiscordWrapper::Initialize(path_string workingDir) {
 #ifdef DISCORD_APP_ID
 #if defined(_WIN32) || defined(__linux__)
 #ifdef _WIN32
-	TCHAR exepath[MAX_PATH];
-	GetModuleFileName(nullptr, exepath, MAX_PATH);
-	path_string param = fmt::format(EPRO_TEXT("{} from_discord {}"), exepath, workingDir);
+	path_string param = fmt::format(EPRO_TEXT("\\\"{}\\\" from_discord \\\"{}\\\""), ygo::Utils::GetExePath(), workingDir);
 #elif defined(__linux__)
-	char buff[PATH_MAX];
-	ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
-	std::string filename;
-	if(len != -1) {
-		buff[len] = '\0';
-		filename = ygo::Utils::GetFileName<path_string>(buff);
-	}
-	std::string param = fmt::format("bash -c \"cd {}; ./{} from_discord\"", workingDir, filename);
+	std::string param = fmt::format("bash -c \"cd \\\"{}\\\"; \\\"{}\\\" from_discord\"", workingDir, ygo::Utils::GetExePath());
 #endif //_WIN32
 	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).c_str());
 #else

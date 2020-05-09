@@ -1,4 +1,5 @@
 #include <fmt/chrono.h>
+#include "client_updater.h"
 #include "game_config.h"
 #include "config.h"
 #include "menu_handler.h"
@@ -545,6 +546,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						mainGame->stReplayInfo->setText(L"");
 						mainGame->lstReplayList->refreshList();
 					}
+				} else if(prev_operation == ACTION_UPDATE_PROMPT) {
+					gClientUpdater->StartUpdate(Game::UpdateDownloadBar, mainGame);
+					mainGame->PopupElement(mainGame->updateWindow);
 				}
 				prev_operation = 0;
 				prev_sel = -1;
