@@ -9,8 +9,9 @@
 #include <IrrlichtDevice.h>
 #include <IGUIButton.h>
 #include <IGUIEditBox.h>
-#include <IGUIWindow.h>
 #include <IGUIStaticText.h>
+#include <IGUITabControl.h>
+#include <IGUIWindow.h>
 #include "discord_register.h"
 #include "discord_rpc.h"
 #include "game.h"
@@ -231,6 +232,10 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 		HIDE_AND_CHECK(game->wCustomRulesL)
 		HIDE_AND_CHECK(game->wCustomRulesR)
 		HIDE_AND_CHECK(game->wRoomListPlaceholder)
+		HIDE_AND_CHECK(game->wCardImg)
+		HIDE_AND_CHECK(game->wInfos)
+		HIDE_AND_CHECK(game->btnLeaveGame)
+		HIDE_AND_CHECK(game->wReplaySave)
 		game->device->setEventReceiver(&game->menuHandler);
 #undef HIDE_AND_CHECK
 	}
