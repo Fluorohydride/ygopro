@@ -1,6 +1,7 @@
 project "Irrlicht"
 	kind "StaticLib"
 	includedirs "include"
+	links "imm32"
 	dofile("defines.lua")
 	exceptionhandling "Off"
 	rtti "Off"
@@ -14,8 +15,3 @@ project "Irrlicht"
 		includedirs "$(DXSDK_DIR)Include"
 		libdirs "$(DXSDK_DIR)Lib/x86"
 
-	filter "action:vs*"
-		defines { "IRRLICHT_FAST_MATH", "UNICODE", "_UNICODE" }
-
-	filter "system:windows"
-		links "imm32"
