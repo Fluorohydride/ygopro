@@ -108,7 +108,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		int id = caller->getID();
 		if(mainGame->wRules->isVisible() && (id != BUTTON_RULE_OK && id != CHECKBOX_EXTRA_RULE && id != COMBOBOX_DUEL_RULE))
 			break;
-		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK)
+		if(mainGame->wMessage->isVisible() && id != BUTTON_MSG_OK && prev_operation != ACTION_UPDATE_PROMPT)
 			break;
 		if(mainGame->wCustomRulesR->isVisible() && id != BUTTON_CUSTOM_RULE_OK && ((id < CHECKBOX_OBSOLETE || id > INVERTED_PRIORITY) && id != COMBOBOX_DUEL_RULE))
 			break;
