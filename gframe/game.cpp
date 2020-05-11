@@ -1804,6 +1804,7 @@ bool Game::MainLoop() {
 			gMutex.lock();
 			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
 			stQMessage->setText(L"A new update is available, do you want to download it?");
+			SetCentered(wQuery);
 			PopupElement(wQuery);
 			gMutex.unlock();
 			update_prompted = true;

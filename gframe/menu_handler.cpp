@@ -555,6 +555,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_NO: {
+				if (prev_operation == ACTION_UPDATE_PROMPT) {
+					mainGame->wQuery->setRelativePosition(mainGame->ResizeWin(490, 200, 840, 340)); // from Game::OnResize
+				}
 				mainGame->HideElement(mainGame->wQuery);
 				prev_operation = 0;
 				prev_sel = -1;
