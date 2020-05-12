@@ -1803,7 +1803,7 @@ bool Game::MainLoop() {
 			|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
 			gMutex.lock();
 			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
-			stQMessage->setText(L"A new update is available, do you want to download it?");
+			stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(1460), gDataManager->GetSysString(1461)).c_str());
 			SetCentered(wQuery);
 			PopupElement(wQuery);
 			gMutex.unlock();
@@ -3220,7 +3220,11 @@ void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filen
 	std::lock_guard<std::mutex> lk(game->gMutex);
 	game->updateProgressBottom->setProgress(percentage);
 	if(is_new)
-		game->updateProgressText->setText(fmt::format(L"Downloading {}\n({} of {})", BufferIO::DecodeUTF8s(filename), cur, tot).c_str());
+		game->updateProgressText->setText(
+			fmt::format(L"{}\n{}",
+				fmt::format(gDataManager->GetSysString(1462), BufferIO::DecodeUTF8s(filename)),
+				fmt::format(gDataManager->GetSysString(1464), cur, tot)
+			).c_str());
 }
 void Game::UpdateUnzipBar(unzip_payload* payload) {
 	UnzipperPayload* unzipper = static_cast<UnzipperPayload*>(payload->payload);
@@ -3228,9 +3232,13 @@ void Game::UpdateUnzipBar(unzip_payload* payload) {
 	std::lock_guard<std::mutex> lk(game->gMutex);
 	// current archive
 	if(payload->is_new) {
-		game->updateProgressText->setText(fmt::format(L"Extracting {}\n({} of {})", Utils::ToUnicodeIfNeeded(unzipper->filename), unzipper->cur, unzipper->tot).c_str());
+		game->updateProgressText->setText(
+			fmt::format(L"{}\n{}",
+				fmt::format(gDataManager->GetSysString(1463), Utils::ToUnicodeIfNeeded(unzipper->filename)),
+				fmt::format(gDataManager->GetSysString(1464), unzipper->cur, unzipper->tot)
+			).c_str());
 		game->updateProgressTop->setVisible(true);
-		game->updateSubprogressText->setText(fmt::format(L"Current file: {}", Utils::ToUnicodeIfNeeded(payload->filename)).c_str());
+		game->updateSubprogressText->setText(fmt::format(gDataManager->GetSysString(1465), Utils::ToUnicodeIfNeeded(payload->filename)).c_str());
 	}
 	game->updateProgressTop->setProgress(std::round((double)payload->cur / (double)payload->tot * 100));
 	// current file in archive
