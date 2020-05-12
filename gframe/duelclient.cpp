@@ -1347,8 +1347,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			break;
 		}
 		case HINT_SKILL_REMOVE: {
-			if(mainGame->dField.skills[player])
-				delete mainGame->dField.skills[player];
+			auto& pcard = mainGame->dField.skills[player];
+			if(mainGame->dField.skills[player]) {
+				if(!mainGame->dInfo.isCatchingUp) {
+					mainGame->dField.FadeCard(pcard, 5, 20);
+					mainGame->WaitFrameSignal(20);
+					mainGame->gMutex.lock();
+					delete pcard;
+					mainGame->gMutex.unlock();
+					if(pcard == mainGame->dField.hovered_card)
+						mainGame->dField.hovered_card = 0;
+				} else
+					delete pcard;
+			}
 			break;
 		}
 		}
