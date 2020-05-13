@@ -57,7 +57,7 @@ extern android_app* app_global;
 #define MATERIAL_GUARD(f) do {f;} while(false);
 #endif
 
-unsigned short PRO_VERSION = 0x1350;
+unsigned short PRO_VERSION = 0x1351;
 
 namespace ygo {
 
@@ -248,6 +248,7 @@ bool Game::Initialize() {
 											L"https://github.com/edo9300/ygopro-core\n"
 											L"https://github.com/ProjectIgnis/CardScripts\n"
 											L"https://github.com/ProjectIgnis/BabelCDB\n"
+											L"https://github.com/ProjectIgnis/windbot\n"
                                             L"Software components licensed under the GNU AGPLv3 or later. See LICENSE for more details.\n"
 											L"Supporting resources and app icon are distributed under separate licenses in their subfolders.\n"
 											L"\n"
