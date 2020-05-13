@@ -2900,10 +2900,10 @@ void Game::ReloadElementsStrings() {
 }
 void Game::OnResize() {
 	const auto waboutpos = wAbout->getAbsolutePosition();
-	stAbout->setRelativePosition(irr::core::recti(0, 0, std::min<uint32>(window_size.Width - waboutpos.UpperLeftCorner.X,
-																		 std::min<uint32>(Scale(450), stAbout->getTextWidth() + Scale(20))),
+	stAbout->setRelativePosition(irr::core::recti(10, 10, std::min<uint32>(window_size.Width - waboutpos.UpperLeftCorner.X,
+																		 std::min<uint32>(Scale(440), stAbout->getTextWidth() + Scale(10))),
 												  std::min<uint32>(window_size.Height - waboutpos.UpperLeftCorner.Y,
-																   std::min<uint32>(stAbout->getTextHeight() + Scale(20), Scale(700)))));
+																   std::min<uint32>(stAbout->getTextHeight() + Scale(10), Scale(690)))));
 	wRoomListPlaceholder->setRelativePosition(irr::core::recti(0, 0, window_size.Width, window_size.Height));
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
