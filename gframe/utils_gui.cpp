@@ -1,6 +1,9 @@
 #include "utils_gui.h"
 #include <IrrlichtDevice.h>
 #include <ICursorControl.h>
+#include <fmt/chrono.h>
+#include <fmt/format.h>
+#include "text_types.h"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -30,9 +33,9 @@ void GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 	const auto driver = device->getVideoDriver();
 	const auto image = driver->createScreenShot();
 	if (image) { // In theory this should never be NULL
-		irr::c8 filename[64];
-		snprintf(filename, 64, "screenshots/ygopro_%u.png", device->getTimer()->getRealTime());
-		if (!driver->writeImageToFile(image, filename))
+		auto now = std::time(nullptr);
+		path_string filename(fmt::format(EPRO_TEXT("screenshots/ygopro_{:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now)).c_str());
+		if (!driver->writeImageToFile(image, filename.c_str()))
 			device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
 		image->drop();
 	}
