@@ -7,7 +7,7 @@ Independently-written client modules and the script engine are licensed under th
 Client modules modified from Fluorohydride are licensed under the GPLv3.
 See ocgcore/LICENSE for script engine license notices.
 
-Supporting assets may be distributed under their own licenses.
+Supporting resources may be distributed under their own licenses.
 Project Ignis: EDOPro itself is licensed under the AGPLv3 as follows.
 
 This program is free software: you can redistribute it and/or modify
@@ -48,7 +48,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-This project uses a modified Irrlicht <http://irrlicht.sourceforge.net/>
+This project uses a modified Irrlicht <https://github.com/edo9300/irrlicht1-8-4>
+Original at <http://irrlicht.sourceforge.net/>
 ------------------------------------------------------------------------
 The Irrlicht Engine License
 
@@ -101,7 +102,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 curl <https://github.com/curl/curl>
 -----------------------------------
-Copyright (c) 1996 - 2019, Daniel Stenberg, <daniel@haxx.se>, and many
+Copyright (c) 1996 - 2020, Daniel Stenberg, <daniel@haxx.se>, and many
 contributors, see the THANKS file.
 
 All rights reserved.
@@ -128,11 +129,16 @@ libgit2 <https://github.com/libgit2/libgit2>
 Licensed under the GPLv2 only with a linking exception. See notices/COPYING.libgit2
 
 
+OpenSSL <https://github.com/openssl/openssl/tree/OpenSSL_1_1_1-stable>
+----------------------------------------------------------------------
+Licensed under the OpenSSL License. See notices/LICENSE.openssl
+
+
 The following libraries are licensed under the MIT License.
 -----------------------------------------------------------
 {fmt} <https://github.com/fmtlib/fmt>: Copyright (c) 2012 - present, Victor Zverovich
-JSON for Modern C++ <https://github.com/nlohmann/json>: Copyright (c) 2013-2019 Niels Lohmann
-Discord RPC <https://github.com/discordapp/discord-rpc>: Copyright 2017 Discord, Inc.
+JSON for Modern C++ <https://github.com/nlohmann/json>: Copyright (c) 2013-2020 Niels Lohmann
+Discord RPC <https://github.com/edo9300/discord-rpc>: Copyright 2017 Discord, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
