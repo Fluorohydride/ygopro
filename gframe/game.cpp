@@ -699,7 +699,7 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnTabShowSettings, 2059);
 	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
 
-	gSettings.window = env->addWindow(Scale(180, 90, 840, 530), false, gDataManager->GetSysString(1273).c_str());
+	gSettings.window = env->addWindow(Scale(180, 85, 840, 535), false, gDataManager->GetSysString(1273).c_str());
 	defaultStrings.emplace_back(gSettings.window, 1273);
 	gSettings.window->setVisible(false);
 	auto sRect = gSettings.window->getClientRect();
