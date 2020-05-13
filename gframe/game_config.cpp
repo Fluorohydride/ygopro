@@ -101,6 +101,7 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_BOOL(saveHandTest)
 			DESERIALIZE_BOOL(discordIntegration)
 			DESERIALIZE_BOOL(loopMusic)
+			DESERIALIZE_BOOL(noClientUpdates)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
 #endif
@@ -287,6 +288,7 @@ bool GameConfig::Save(const path_char* filename)
 	SERIALIZE(loopMusic);
 	SERIALIZE(saveHandTest);
 	SERIALIZE(discordIntegration);
+	SERIALIZE(noClientUpdates);
 #ifdef __ANDROID__
 	conf_file << "native_keyboard = "    << native_keyboard << "\n";
 	conf_file << "native_mouse = "       << native_mouse << "\n";

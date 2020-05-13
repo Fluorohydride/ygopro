@@ -241,7 +241,8 @@ int main(int argc, char* argv[]) {
 		Cleanup
 		return EXIT_FAILURE;
 	}
-	updater.CheckUpdates();
+	if (!data->configs->noClientUpdates)
+		updater.CheckUpdates();
 #ifdef _WIN32
 	if(!data->configs->showConsole)
 		FreeConsole();

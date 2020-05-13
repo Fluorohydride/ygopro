@@ -81,6 +81,7 @@ struct SettingsWindow {
 	// end audio
 	irr::gui::IGUICheckBox* chkDiscordIntegration;
 	irr::gui::IGUICheckBox* chkHideHandsInReplays;
+	irr::gui::IGUICheckBox* chkUpdates;
 
 	void DisableAudio();
 };
