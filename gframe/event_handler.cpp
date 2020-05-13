@@ -1937,6 +1937,10 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				gGameConfig->quick_animation = mainGame->tabSettings.chkQuickAnimation->isChecked();
 				return true;
 			}
+			case CHECKBOX_ALTERNATIVE_PHASE_LAYOUT: {
+				gGameConfig->alternative_phase_layout = mainGame->tabSettings.chkAlternativePhaseLayout->isChecked();
+				return true;
+			}
 			case CHECKBOX_HIDE_ARCHETYPES: {
 				gGameConfig->chkHideSetname = mainGame->gSettings.chkHideSetname->isChecked();
 				mainGame->stSetName->setVisible(!gGameConfig->chkHideSetname);

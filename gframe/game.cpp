@@ -658,46 +658,49 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(tabSettings.chkIgnoreSpectators, 1291);
 	tabSettings.chkQuickAnimation = env->addCheckBox(gGameConfig->quick_animation, Scale(20, 80, 300, 105), tabPanel, CHECKBOX_QUICK_ANIMATION, gDataManager->GetSysString(1299).c_str());
 	defaultStrings.emplace_back(tabSettings.chkQuickAnimation, 1299);
-	tabSettings.chkHideChainButtons = env->addCheckBox(gGameConfig->chkHideHintButton, Scale(20, 110, 280, 135), tabPanel, CHECKBOX_CHAIN_BUTTONS, gDataManager->GetSysString(1355).c_str());
+	tabSettings.chkAlternativePhaseLayout = env->addCheckBox(gGameConfig->alternative_phase_layout, Scale(20, 110, 300, 135), tabPanel, CHECKBOX_ALTERNATIVE_PHASE_LAYOUT, gDataManager->GetSysString(1298).c_str());
+	defaultStrings.emplace_back(tabSettings.chkAlternativePhaseLayout, 1298);
+	tabSettings.chkHideChainButtons = env->addCheckBox(gGameConfig->chkHideHintButton, Scale(20, 140, 280, 165), tabPanel, CHECKBOX_CHAIN_BUTTONS, gDataManager->GetSysString(1355).c_str());
 	defaultStrings.emplace_back(tabSettings.chkHideChainButtons, 1355);
-	tabSettings.chkAutoChainOrder = env->addCheckBox(gGameConfig->chkAutoChain, Scale(20, 140, 280, 165), tabPanel, -1, gDataManager->GetSysString(1276).c_str());
+	tabSettings.chkAutoChainOrder = env->addCheckBox(gGameConfig->chkAutoChain, Scale(20, 170, 280, 195), tabPanel, -1, gDataManager->GetSysString(1276).c_str());
 	defaultStrings.emplace_back(tabSettings.chkAutoChainOrder, 1276);
-	tabSettings.chkNoChainDelay = env->addCheckBox(gGameConfig->chkWaitChain, Scale(20, 170, 280, 195), tabPanel, -1, gDataManager->GetSysString(1277).c_str());
+	tabSettings.chkNoChainDelay = env->addCheckBox(gGameConfig->chkWaitChain, Scale(20, 200, 280, 225), tabPanel, -1, gDataManager->GetSysString(1277).c_str());
 	defaultStrings.emplace_back(tabSettings.chkNoChainDelay, 1277);
 	// audio
-	tabSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(20, 200, 280, 225), tabPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).c_str());
+	tabSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(20, 230, 280, 255), tabPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).c_str());
 	defaultStrings.emplace_back(tabSettings.chkEnableSound, 2047);
-	tabSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).c_str(), Scale(20, 230, 80, 255), false, true, tabPanel);
+	tabSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).c_str(), Scale(20, 260, 80, 285), false, true, tabPanel);
 	defaultStrings.emplace_back(tabSettings.stSoundVolume, 2049);
-	tabSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 235, 280, 250), tabPanel, SCROLL_SOUND_VOLUME);
+	tabSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 265, 280, 280), tabPanel, SCROLL_SOUND_VOLUME);
 	tabSettings.scrSoundVolume->setMax(100);
 	tabSettings.scrSoundVolume->setMin(0);
 	tabSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
 	tabSettings.scrSoundVolume->setLargeStep(1);
 	tabSettings.scrSoundVolume->setSmallStep(1);
-	tabSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, Scale(20, 260, 280, 285), tabPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).c_str());
+	tabSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).c_str());
 	defaultStrings.emplace_back(tabSettings.chkEnableMusic, 2046);
-	tabSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).c_str(), Scale(20, 290, 80, 315), false, true, tabPanel);
+	tabSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).c_str(), Scale(20, 320, 80, 345), false, true, tabPanel);
 	defaultStrings.emplace_back(tabSettings.stMusicVolume, 2048);
-	tabSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 295, 280, 310), tabPanel, SCROLL_MUSIC_VOLUME);
+	tabSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_MUSIC_VOLUME);
 	tabSettings.scrMusicVolume->setMax(100);
 	tabSettings.scrMusicVolume->setMin(0);
 	tabSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
 	tabSettings.scrMusicVolume->setLargeStep(1);
 	tabSettings.scrMusicVolume->setSmallStep(1);
-	tabSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(20, 200, 280, 315), false, true, tabPanel);
+	tabSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(20, 230, 280, 345), false, true, tabPanel);
 	defaultStrings.emplace_back(tabSettings.stNoAudioBackend, 2058);
 	tabSettings.stNoAudioBackend->setVisible(false);
 	// end audio
-	tabSettings.chkMAutoPos = env->addCheckBox(gGameConfig->chkMAutoPos, Scale(20, 320, 280, 345), tabPanel, -1, gDataManager->GetSysString(1274).c_str());
+	tabSettings.chkMAutoPos = env->addCheckBox(gGameConfig->chkMAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, gDataManager->GetSysString(1274).c_str());
 	defaultStrings.emplace_back(tabSettings.chkMAutoPos, 1274);
-	tabSettings.chkSTAutoPos = env->addCheckBox(gGameConfig->chkSTAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, gDataManager->GetSysString(1278).c_str());
+	tabSettings.chkSTAutoPos = env->addCheckBox(gGameConfig->chkSTAutoPos, Scale(20, 380, 280, 405), tabPanel, -1, gDataManager->GetSysString(1278).c_str());
 	defaultStrings.emplace_back(tabSettings.chkSTAutoPos, 1278);
-	tabSettings.chkRandomPos = env->addCheckBox(gGameConfig->chkRandomPos, Scale(40, 380, 280, 405), tabPanel, -1, gDataManager->GetSysString(1275).c_str());
+	tabSettings.chkRandomPos = env->addCheckBox(gGameConfig->chkRandomPos, Scale(40, 410, 280, 435), tabPanel, -1, gDataManager->GetSysString(1275).c_str());
 	defaultStrings.emplace_back(tabSettings.chkRandomPos, 1275);
-	btnTabShowSettings = env->addButton(Scale(20, 410, 280, 435), tabPanel, BUTTON_SHOW_SETTINGS, gDataManager->GetSysString(2059).c_str());
+	// Check OnResize for button placement information
+	btnTabShowSettings = env->addButton(Scale(20, 445, 280, 470), tabPanel, BUTTON_SHOW_SETTINGS, gDataManager->GetSysString(2059).c_str());
 	defaultStrings.emplace_back(btnTabShowSettings, 2059);
-	/* padding = */ env->addStaticText(L"", Scale(20, 440, 280, 450), false, true, tabPanel, -1, false);
+	/* padding = */ env->addStaticText(L"", Scale(20, 475, 280, 485), false, true, tabPanel, -1, false);
 
 	gSettings.window = env->addWindow(Scale(180, 85, 840, 535), false, gDataManager->GetSysString(1273).c_str());
 	defaultStrings.emplace_back(gSettings.window, 1273);
@@ -2595,42 +2598,56 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 		return 2;
 }
 void Game::SetPhaseButtons() {
-	// reset master rule 4 phase button position
-	wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-	if (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
-		if (dInfo.duel_field >= 4) {
-			wPhase->setRelativePosition(Resize(480, 290, 855, 350));
-			btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
-			btnDP->setRelativePosition(Resize(0, 40, 50, 60));
-			btnSP->setRelativePosition(Resize(0, 40, 50, 60));
-			btnM1->setRelativePosition(Resize(160, 20, 210, 40));
-			btnBP->setRelativePosition(Resize(160, 20, 210, 40));
-			btnM2->setRelativePosition(Resize(160, 20, 210, 40));
-			btnEP->setRelativePosition(Resize(310, 0, 360, 20));
-		} else {
-			btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
-			btnDP->setRelativePosition(Resize(65, 0, 115, 20));
-			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
-			btnEP->setRelativePosition(Resize(260, 0, 310, 20));
-		}
-	} else {
+	if (gui_alternative_phase_layout) {
+		wPhase->setRelativePosition(Resize(940, 80, 990, 340));
 		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-		if (dInfo.duel_field >= 4) {
-			btnSP->setRelativePosition(Resize(0, 0, 50, 20));
-			btnM1->setRelativePosition(Resize(160, 0, 210, 20));
-			btnBP->setRelativePosition(Resize(160, 0, 210, 20));
-			btnM2->setRelativePosition(Resize(160, 0, 210, 20));
-		} else {
-			btnSP->setRelativePosition(Resize(65, 0, 115, 20));
-			btnM1->setRelativePosition(Resize(130, 0, 180, 20));
-			btnBP->setRelativePosition(Resize(195, 0, 245, 20));
-			btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+		btnSP->setRelativePosition(Resize(0, 40, 50, 60));
+		btnM1->setRelativePosition(Resize(0, 80, 50, 100));
+		btnBP->setRelativePosition(Resize(0, 120, 50, 140));
+		btnM2->setRelativePosition(Resize(0, 160, 50, 180));
+		btnEP->setRelativePosition(Resize(0, 200, 50, 220));
+		btnShuffle->setRelativePosition(Resize(0, 240, 50, 260));
+	}
+	else {
+		// reset master rule 4 phase button position
+		if (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
+			if (dInfo.duel_field >= 4) {
+				wPhase->setRelativePosition(Resize(480, 290, 855, 350));
+				btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
+				btnDP->setRelativePosition(Resize(0, 40, 50, 60));
+				btnSP->setRelativePosition(Resize(0, 40, 50, 60));
+				btnM1->setRelativePosition(Resize(160, 20, 210, 40));
+				btnBP->setRelativePosition(Resize(160, 20, 210, 40));
+				btnM2->setRelativePosition(Resize(160, 20, 210, 40));
+				btnEP->setRelativePosition(Resize(310, 0, 360, 20));
+			}
+			else {
+				btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
+				btnDP->setRelativePosition(Resize(65, 0, 115, 20));
+				btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+				btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+				btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+				btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+				btnEP->setRelativePosition(Resize(260, 0, 310, 20));
+			}
 		}
-		btnEP->setRelativePosition(Resize(320, 0, 370, 20));
-		btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
+		else {
+			wPhase->setRelativePosition(Resize(480, 310, 855, 330));
+			btnDP->setRelativePosition(Resize(0, 0, 50, 20));
+			if (dInfo.duel_field >= 4) {
+				btnSP->setRelativePosition(Resize(0, 0, 50, 20));
+				btnM1->setRelativePosition(Resize(160, 0, 210, 20));
+				btnBP->setRelativePosition(Resize(160, 0, 210, 20));
+				btnM2->setRelativePosition(Resize(160, 0, 210, 20));
+			} else {
+				btnSP->setRelativePosition(Resize(65, 0, 115, 20));
+				btnM1->setRelativePosition(Resize(130, 0, 180, 20));
+				btnBP->setRelativePosition(Resize(195, 0, 245, 20));
+				btnM2->setRelativePosition(Resize(260, 0, 310, 20));
+			}
+			btnEP->setRelativePosition(Resize(320, 0, 370, 20));
+			btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
+		}
 	}
 }
 void Game::SetMessageWindow() {
@@ -3026,9 +3043,9 @@ void Game::OnResize() {
 
 	auto tabsystemParentPos = tabSystem->getParent()->getAbsolutePosition();
 	tabSystem->setRelativePosition(irr::core::recti(0, 0, tabsystemParentPos.getWidth(), tabsystemParentPos.getHeight()));
-	tabSettings.scrSoundVolume->setRelativePosition(irr::core::recti(Scale(85), Scale(235), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(250)));
-	tabSettings.scrMusicVolume->setRelativePosition(irr::core::recti(Scale(85), Scale(295), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(310)));
-	btnTabShowSettings->setRelativePosition(irr::core::recti(Scale(20), Scale(415), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(435)));
+	tabSettings.scrSoundVolume->setRelativePosition(irr::core::recti(Scale(85), Scale(265), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(280)));
+	tabSettings.scrMusicVolume->setRelativePosition(irr::core::recti(Scale(85), Scale(325), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(340)));
+	btnTabShowSettings->setRelativePosition(irr::core::recti(Scale(20), Scale(445), std::min(tabSystem->getSubpanel()->getRelativePosition().getWidth() - 21, Scale(300)), Scale(470)));
 
 	SetCentered(gSettings.window);
 

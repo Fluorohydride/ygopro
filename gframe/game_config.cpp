@@ -102,6 +102,7 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_BOOL(discordIntegration)
 			DESERIALIZE_BOOL(loopMusic)
 			DESERIALIZE_BOOL(noClientUpdates)
+			DESERIALIZE_BOOL(alternative_phase_layout)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
 #endif
@@ -249,42 +250,43 @@ bool GameConfig::Save(const path_char* filename)
 	SERIALIZE(noShuffleDeck);
 	SERIALIZE(noCheckDeck);
 	SERIALIZE(hideHandsInReplays);
-	conf_file << "textfont = "           << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
-	conf_file << "numfont = "            << BufferIO::EncodeUTF8s(numfont) << "\n";
-	conf_file << "serverport = "         << BufferIO::EncodeUTF8s(serverport) << "\n";
-	conf_file << "lasthost = "           << BufferIO::EncodeUTF8s(lasthost) << "\n";
-	conf_file << "lastport = "           << BufferIO::EncodeUTF8s(lastport) << "\n";
-	conf_file << "botThrowRock = "       << botThrowRock << "\n";
-	conf_file << "botMute = "            << botMute << "\n";
+	conf_file << "textfont = "                 << BufferIO::EncodeUTF8s(textfont) << " " << std::to_string(textfontsize) << "\n";
+	conf_file << "numfont = "                  << BufferIO::EncodeUTF8s(numfont) << "\n";
+	conf_file << "serverport = "               << BufferIO::EncodeUTF8s(serverport) << "\n";
+	conf_file << "lasthost = "                 << BufferIO::EncodeUTF8s(lasthost) << "\n";
+	conf_file << "lastport = "                 << BufferIO::EncodeUTF8s(lastport) << "\n";
+	conf_file << "botThrowRock = "             << botThrowRock << "\n";
+	conf_file << "botMute = "                  << botMute << "\n";
 	SERIALIZE(lastBot);
-	conf_file << "lastServer = "         << BufferIO::EncodeUTF8s(lastServer) << "\n";
-	conf_file << "game_version = "       << game_version << "\n";
-	conf_file << "automonsterpos = "     << chkMAutoPos << "\n";
-	conf_file << "autospellpos = "       << chkSTAutoPos << "\n";
-	conf_file << "randompos = "          << chkRandomPos << "\n";
-	conf_file << "autochain = "          << chkAutoChain << "\n";
-	conf_file << "waitchain = "          << chkWaitChain << "\n";
-	conf_file << "mute_opponent = "      << chkIgnore1 << "\n";
-	conf_file << "mute_spectators = "    << chkIgnore2 << "\n";
-	conf_file << "hide_setname = "       << chkHideSetname << "\n";
-	conf_file << "hide_hint_button = "   << chkHideHintButton << "\n";
-	conf_file << "draw_field_spell = "   << draw_field_spell << "\n";
-	conf_file << "quick_animation = "    << quick_animation << "\n";
-	conf_file << "showFPS = "            << showFPS << "\n";
-	conf_file << "hidePasscodeScope = "  << hidePasscodeScope << "\n";
+	conf_file << "lastServer = "               << BufferIO::EncodeUTF8s(lastServer) << "\n";
+	conf_file << "game_version = "             << game_version << "\n";
+	conf_file << "automonsterpos = "           << chkMAutoPos << "\n";
+	conf_file << "autospellpos = "             << chkSTAutoPos << "\n";
+	conf_file << "randompos = "                << chkRandomPos << "\n";
+	conf_file << "autochain = "                << chkAutoChain << "\n";
+	conf_file << "waitchain = "                << chkWaitChain << "\n";
+	conf_file << "mute_opponent = "            << chkIgnore1 << "\n";
+	conf_file << "mute_spectators = "          << chkIgnore2 << "\n";
+	conf_file << "hide_setname = "             << chkHideSetname << "\n";
+	conf_file << "hide_hint_button = "         << chkHideHintButton << "\n";
+	conf_file << "draw_field_spell = "         << draw_field_spell << "\n";
+	conf_file << "quick_animation = "          << quick_animation << "\n";
+	SERIALIZE(alternative_phase_layout);
+	conf_file << "showFPS = "                  << showFPS << "\n";
+	conf_file << "hidePasscodeScope = "        << hidePasscodeScope << "\n";
 	SERIALIZE(showScopeLabel);
-	conf_file << "filterBot = "          << filterBot << "\n";
-	conf_file << "show_unofficial = "    << chkAnime << "\n";
-	conf_file << "ctrlClickIsRMB = "     << ctrlClickIsRMB << "\n";
-	conf_file << "dpi_scale = "          << std::to_string(dpi_scale) << "\n"; // Forces float to show decimals
-	conf_file << "skin = "            	 << Utils::ToUTF8IfNeeded(skin) << "\n";
-	conf_file << "language = "           << Utils::ToUTF8IfNeeded(locale) << "\n";
-	conf_file << "scale_background = "   << scale_background << "\n";
-	conf_file << "accurate_bg_resize = " << accurate_bg_resize << "\n";
-	conf_file << "enable_music = "       << enablemusic << "\n";
-	conf_file << "enable_sound = "       << enablesound << "\n";
-	conf_file << "music_volume = "       << musicVolume << "\n";
-	conf_file << "sound_volume = "       << soundVolume << "\n";
+	conf_file << "filterBot = "                << filterBot << "\n";
+	conf_file << "show_unofficial = "          << chkAnime << "\n";
+	conf_file << "ctrlClickIsRMB = "           << ctrlClickIsRMB << "\n";
+	conf_file << "dpi_scale = "                << std::to_string(dpi_scale) << "\n"; // Forces float to show decimals
+	conf_file << "skin = "            	       << Utils::ToUTF8IfNeeded(skin) << "\n";
+	conf_file << "language = "                 << Utils::ToUTF8IfNeeded(locale) << "\n";
+	conf_file << "scale_background = "         << scale_background << "\n";
+	conf_file << "accurate_bg_resize = "       << accurate_bg_resize << "\n";
+	conf_file << "enable_music = "             << enablemusic << "\n";
+	conf_file << "enable_sound = "             << enablesound << "\n";
+	conf_file << "music_volume = "             << musicVolume << "\n";
+	conf_file << "sound_volume = "             << soundVolume << "\n";
 	SERIALIZE(loopMusic);
 	SERIALIZE(saveHandTest);
 	SERIALIZE(discordIntegration);
