@@ -4,6 +4,7 @@ set -euo pipefail
 
 PICS_URL=${PICS_URL:-""}
 FIELDS_URL=${FIELDS_URL:-""}
+COVERS_URL=${COVERS_URL:-""}
 DISCORD_APP_ID=${DISCORD_APP_ID:-""}
 UPDATE_URL=${UPDATE_URL:-""}
 
