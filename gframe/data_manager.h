@@ -53,7 +53,7 @@ public:
 	void ClearLocaleTexts();
 	bool LoadLocaleDB(const path_string& file, bool usebuffer = false);
 	bool LoadDB(const path_string& file, bool usebuffer = false);
-	bool LoadDBFromBuffer(const std::vector<char>& buffer);
+	bool LoadDBFromBuffer(const std::vector<char>& buffer, const std::string& filename = "");
 	bool LoadStrings(const path_string& file);
 	bool LoadLocaleStrings(const path_string& file);
 	void ClearLocaleStrings();
@@ -108,7 +108,7 @@ private:
 	};
 	bool ParseDB(sqlite3* pDB);
 	bool ParseLocaleDB(sqlite3* pDB);
-	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = 0);
+	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
 	std::unordered_map<unsigned int, CardString> locales;
 	indexed_map<CardDataM*, CardString*> indexes;
 	LocaleStringHelper _counterStrings;

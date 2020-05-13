@@ -8,6 +8,8 @@ namespace ygo {
 
 const wchar_t* DataManager::unknown_string = L"???";
 
+std::string cur_database = "";
+
 void DataManager::ClearLocaleTexts() {
 	for(auto& val : indexes) {
 		val.second.second = nullptr;
@@ -17,24 +19,27 @@ void DataManager::ClearLocaleTexts() {
 	locales.clear();
 }
 
-bool DataManager::LoadLocaleDB(const path_string & file, bool usebuffer) {
+bool DataManager::LoadLocaleDB(const path_string& _file, bool usebuffer) {
 	sqlite3* pDB;
-	if(sqlite3_open_v2(Utils::ToUTF8IfNeeded(file).c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
+	cur_database = Utils::ToUTF8IfNeeded(_file);
+	if(sqlite3_open_v2(cur_database.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
 	return ParseLocaleDB(pDB);
 }
 
-bool DataManager::LoadDB(const path_string& file, bool usebuffer) {
+bool DataManager::LoadDB(const path_string& _file, bool usebuffer) {
+	cur_database = Utils::ToUTF8IfNeeded(_file);
 	if(usebuffer) {
-		std::ifstream db(file, std::ifstream::binary);
-		return LoadDBFromBuffer({ std::istreambuf_iterator<char>(db), std::istreambuf_iterator<char>() });
+		std::ifstream db(_file, std::ifstream::binary);
+		return LoadDBFromBuffer({ std::istreambuf_iterator<char>(db), std::istreambuf_iterator<char>() }, cur_database);
 	}
 	sqlite3* pDB;
-	if(sqlite3_open_v2(Utils::ToUTF8IfNeeded(file).c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
+	if(sqlite3_open_v2(cur_database.c_str(), &pDB, SQLITE_OPEN_READONLY, 0) != SQLITE_OK)
 		return Error(pDB);
 	return ParseDB(pDB);
 }
-bool DataManager::LoadDBFromBuffer(const std::vector<char>& buffer) {
+bool DataManager::LoadDBFromBuffer(const std::vector<char>& buffer, const std::string& filename) {
+	cur_database = filename;
 	sqlite3* pDB;
 	readonlymemvfs_init();
 	set_mem_db((void*)buffer.data(), buffer.size());
@@ -114,7 +119,7 @@ bool DataManager::ParseDB(sqlite3 * pDB) {
 	sqlite3_close(pDB);
 	return true;
 }
-bool DataManager::ParseLocaleDB(sqlite3 * pDB) {
+bool DataManager::ParseLocaleDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from texts ORDER BY texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
@@ -239,11 +244,11 @@ void DataManager::ClearLocaleStrings() {
 	_setnameStrings.ClearLocales();
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	auto error = sqlite3_errmsg(pDB);
+	std::string errorstring(fmt::format("Error when loading database ({}): {}", cur_database, sqlite3_errmsg(pDB)));
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);
-	ErrorLog(error);
+	ErrorLog(errorstring);
 	return false;
 }
 bool DataManager::GetData(uint32 code, CardData* pData) {
