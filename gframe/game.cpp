@@ -215,7 +215,6 @@ bool Game::Initialize() {
 	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
-	DragAcceptFiles(hWnd, TRUE);
 #endif
 	wCommitsLog = env->addWindow(Scale(0, 0, 500 + 10, 400 + 35 + 35), false, gDataManager->GetSysString(1209).c_str());
 	defaultStrings.emplace_back(wCommitsLog, 1209);
