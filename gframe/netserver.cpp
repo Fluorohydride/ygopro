@@ -181,6 +181,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 	}
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
+	static constexpr ClientVersion serverversion{ EXPAND_VERSION(CLIENT_VERSION) };
 	char* pdata = data;
 	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
@@ -233,9 +234,9 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		if(dp->game || duel_mode)
 			return;
 		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
-		if(pkt->info.handshake != SERVER_HANDSHAKE) {
-			VersionError scem{ ClientVersion{EXPAND_VERSION(CLIENT_VERSION)} };
-			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+		if((pkt->info.handshake != SERVER_HANDSHAKE || pkt->info.version != serverversion)) {
+			VersionError vererr{ serverversion };
+			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, vererr);
 			return;
 		}
 		duel_mode = new GenericDuel(pkt->info.team1, pkt->info.team2, !!(pkt->info.duel_flag & DUEL_RELAY), pkt->info.best_of);

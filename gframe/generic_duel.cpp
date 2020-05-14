@@ -163,7 +163,7 @@ void GenericDuel::Catchup(DuelPlayer * dp) {
 	observers.insert(dp);
 }
 void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
-	static constexpr ClientVersion serverversion = { EXPAND_VERSION(CLIENT_VERSION) };
+	static constexpr ClientVersion serverversion{ EXPAND_VERSION(CLIENT_VERSION) };
 	if(!is_creater) {
 		if(dp->game && dp->type != 0xff) {
 			JoinError scem{ JoinError::JERR_UNABLE };

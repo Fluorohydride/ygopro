@@ -12,6 +12,15 @@
 
 namespace ygo {
 
+struct ClientVersion {
+	struct {
+		uint8_t major;
+		uint8_t minor;
+	} client, core;
+};
+bool operator==(const ClientVersion& ver1, const ClientVersion& ver2);
+bool operator!=(const ClientVersion& ver1, const ClientVersion& ver2);
+
 struct HostInfo {
 	uint32_t lflist;
 	uint8_t rule;
@@ -23,7 +32,8 @@ struct HostInfo {
 	uint8_t start_hand;
 	uint8_t draw_count;
 	uint16_t time_limit;
-	uint64 handshake;
+	uint32_t handshake;
+	ClientVersion version;
 	int32_t team1;
 	int32_t team2;
 	int32_t best_of;
@@ -57,14 +67,6 @@ struct CTOS_CreateGame {
 	uint16_t pass[20];
 	char notes[200];
 };
-struct ClientVersion {
-	struct {
-		uint8_t major;
-		uint8_t minor;
-	} client, core;
-};
-bool operator==(const ClientVersion& ver1, const ClientVersion& ver2);
-bool operator!=(const ClientVersion& ver1, const ClientVersion& ver2);
 
 struct CTOS_JoinGame {
 	uint16_t version;
@@ -227,7 +229,7 @@ public:
 #define NETWORK_SERVER_ID	0x7428
 #define NETWORK_CLIENT_ID	0xdef6
 
-#define SERVER_HANDSHAKE 4680591157758091777
+#define SERVER_HANDSHAKE 4043399681u
 
 #define NETPLAYER_TYPE_PLAYER1		0
 #define NETPLAYER_TYPE_PLAYER2		1
