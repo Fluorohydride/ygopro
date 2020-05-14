@@ -32,6 +32,7 @@ struct HostInfo {
 	uint8_t start_hand;
 	uint8_t draw_count;
 	uint16_t time_limit;
+	uint32_t : 32; //padding to account for the previous 64 bit value
 	uint32_t handshake;
 	ClientVersion version;
 	int32_t team1;
@@ -124,6 +125,9 @@ struct JoinError {
 };
 struct VersionError {
 	ERROR_TYPE etype = ERROR_TYPE::VERERROR2;
+	char : 8; //padding to keep the client version in
+	char : 8; //the same place as the other error codes
+	char : 8;
 	enum JERR_TYPE : uint32_t {
 		JERR_UNABLE,
 		JERR_PASSWORD,
