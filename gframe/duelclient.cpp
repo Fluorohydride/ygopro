@@ -453,6 +453,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->btnHostConfirm->setEnabled(true);
+				mainGame->btnHostCancel->setEnabled(true);
 				if(_pkt->type == ERROR_TYPE::VERERROR2) {
 					auto& version = ((VersionError*)pdata)->version;
 					mainGame->PopupMessage(fmt::format(gDataManager->GetSysString(1423).c_str(),
@@ -473,8 +475,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 				} else {
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-					mainGame->btnJoinHost->setEnabled(true);
-					mainGame->btnJoinCancel->setEnabled(true);
 				}
 			} else {
 				event_base_loopbreak(client_base);
