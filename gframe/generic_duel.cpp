@@ -809,6 +809,7 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	case MSG_RETRY: {
 		SEND(nullptr);
 		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		match_result.push_back(2);
 		return_value = 2;
 		break;
 	}
