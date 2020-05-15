@@ -173,7 +173,7 @@ public:
 	void UpdateDuelParam();
 	void UpdateExtraRules(bool set = false);
 	int GetMasterRule(uint32 param, uint32 forbidden = 0, int* truerule = 0);
-	void SetPhaseButtons();
+	void SetPhaseButtons(bool visibility = false);
 	void SetMessageWindow();
 
 	bool HasFocus(irr::gui::EGUI_ELEMENT_TYPE type) const;

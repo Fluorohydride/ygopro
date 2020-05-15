@@ -2591,7 +2591,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 	else
 		return 2;
 }
-void Game::SetPhaseButtons() {
+void Game::SetPhaseButtons(bool visibility) {
 	if(gGameConfig->alternative_phase_layout) {
 		wPhase->setRelativePosition(Resize(940, 80, 990, 340));
 		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
@@ -2639,6 +2639,14 @@ void Game::SetPhaseButtons() {
 			btnEP->setRelativePosition(Resize(320, 0, 370, 20));
 			btnShuffle->setRelativePosition(Resize(0, 0, 50, 20));
 		}
+	}
+	if(visibility) {
+		btnDP->setVisible(gGameConfig->alternative_phase_layout || btnDP->isSubElement());
+		btnSP->setVisible(gGameConfig->alternative_phase_layout || btnSP->isSubElement());
+		btnM1->setVisible(gGameConfig->alternative_phase_layout || btnM1->isSubElement());
+		btnM2->setVisible(gGameConfig->alternative_phase_layout || btnM2->isSubElement());
+		btnBP->setVisible(gGameConfig->alternative_phase_layout || btnBP->isSubElement());
+		btnEP->setVisible(gGameConfig->alternative_phase_layout || btnEP->isSubElement());
 	}
 }
 void Game::SetMessageWindow() {
