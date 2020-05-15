@@ -2611,6 +2611,7 @@ void Game::SetPhaseButtons() {
 	}
 	else {
 		// reset master rule 4 phase button position
+		wPhase->setRelativePosition(Resize(480, 310, 855, 330));
 		if (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
 			if (dInfo.duel_field >= 4) {
 				wPhase->setRelativePosition(Resize(480, 290, 855, 350));
@@ -2633,7 +2634,6 @@ void Game::SetPhaseButtons() {
 			}
 		}
 		else {
-			wPhase->setRelativePosition(Resize(480, 310, 855, 330));
 			btnDP->setRelativePosition(Resize(0, 0, 50, 20));
 			if (dInfo.duel_field >= 4) {
 				btnSP->setRelativePosition(Resize(0, 0, 50, 20));
