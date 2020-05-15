@@ -4283,13 +4283,15 @@ void DuelClient::SendResponse() {
 			delete pcard;
 		mainGame->dField.limbo_temp.clear();
 		mainGame->dField.ClearCommandFlag();
-		if (mainGame->gui_alternative_phase_layout) {
+		if(mainGame->gui_alternative_phase_layout) {
 			mainGame->btnBP->setEnabled(false);
 			mainGame->btnM2->setEnabled(false);
 			mainGame->btnEP->setEnabled(false);
-		}
-		else {
-			mainGame->btnM2->setVisible(false);
+		} else {
+			if(msg == MSG_SELECT_BATTLECMD)
+				mainGame->btnM2->setVisible(false);
+			else
+				mainGame->btnBP->setVisible(false);
 			mainGame->btnEP->setVisible(false);
 		}
 		mainGame->btnShuffle->setVisible(false);
