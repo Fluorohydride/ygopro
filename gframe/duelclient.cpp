@@ -810,7 +810,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnSideReload->setVisible(false);
 		mainGame->wChat->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
-		mainGame->gui_alternative_phase_layout = gGameConfig->alternative_phase_layout;
 		mainGame->SetPhaseButtons();
 		mainGame->SetMessageWindow();
 		mainGame->dInfo.selfnames.clear();
@@ -2698,8 +2697,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_NEW_PHASE: {
 		PLAY_SOUND(SoundManager::SFX::PHASE);
 		uint16_t phase = BufferIO::Read<uint16_t>(pbuf);
-
-		if (mainGame->gui_alternative_phase_layout) {
+		if(gGameConfig->alternative_phase_layout) {
 			mainGame->btnDP->setVisible(true);
 			mainGame->btnDP->setPressed(false);
 			mainGame->btnDP->setEnabled(false);
@@ -2718,8 +2716,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->btnEP->setVisible(true);
 			mainGame->btnEP->setPressed(false);
 			mainGame->btnEP->setEnabled(false);
-		}
-		else {
+		} else {
 			mainGame->btnDP->setVisible(false);
 			mainGame->btnSP->setVisible(false);
 			mainGame->btnM1->setVisible(false);
@@ -2727,81 +2724,65 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->btnM2->setVisible(false);
 			mainGame->btnEP->setVisible(false);
 		}
-		
 		mainGame->btnShuffle->setVisible(false);
 		mainGame->showcarddif = 30;
 		mainGame->showcardp = 0;
 		switch (phase) {
 		case PHASE_DRAW:
 			event_string = gDataManager->GetSysString(20);
-
-			if (mainGame->gui_alternative_phase_layout) {
+			if(gGameConfig->alternative_phase_layout) {
 				mainGame->btnDP->setPressed(true);
 				mainGame->btnDP->setEnabled(false);
-			}
-			else {
+			} else {
 				mainGame->btnDP->setVisible(true);
 			}
-
 			mainGame->showcardcode = 4;
 			break;
 		case PHASE_STANDBY:
 			event_string = gDataManager->GetSysString(21);
-
-			if (mainGame->gui_alternative_phase_layout) {
+			if(gGameConfig->alternative_phase_layout) {
 				mainGame->btnSP->setPressed(true);
 				mainGame->btnSP->setEnabled(false);
-			}
-			else {
+			} else {
 				mainGame->btnSP->setVisible(true);
 			}
-
 			mainGame->showcardcode = 5;
 			break;
 		case PHASE_MAIN1:
 			event_string = gDataManager->GetSysString(22);
-
-			if (mainGame->gui_alternative_phase_layout) {
+			if(gGameConfig->alternative_phase_layout) {
 				mainGame->btnM1->setPressed(true);
 				mainGame->btnM1->setEnabled(false);
-			}
-			else {
+			} else {
 				mainGame->btnM1->setVisible(true);
 			}
-
 			mainGame->showcardcode = 6;
 			break;
 		case PHASE_BATTLE_START:
 			event_string = gDataManager->GetSysString(24);
-
-			if (!mainGame->gui_alternative_phase_layout) {
+			if(!gGameConfig->alternative_phase_layout) {
 				mainGame->btnBP->setVisible(true);
 			}
 			mainGame->btnBP->setPressed(true);
 			mainGame->btnBP->setEnabled(false);
-
 			mainGame->showcardcode = 7;
 			break;
 		case PHASE_MAIN2:
 			event_string = gDataManager->GetSysString(22);
-
-			if (!mainGame->gui_alternative_phase_layout) {
+			if(!gGameConfig->alternative_phase_layout) {
 				mainGame->btnM2->setVisible(true);
 			}
 			mainGame->btnM2->setPressed(true);
 			mainGame->btnM2->setEnabled(false);
-
 			mainGame->showcardcode = 8;
 			break;
 		case PHASE_END:
 			event_string = gDataManager->GetSysString(26);
-
-			if (!mainGame->gui_alternative_phase_layout) {
+			if (!gGameConfig->alternative_phase_layout) {
 				mainGame->btnEP->setVisible(true);
 			}
 			mainGame->btnEP->setPressed(true);
 			mainGame->btnEP->setEnabled(false);
-
 			mainGame->showcardcode = 9;
 			break;
 		}
@@ -4126,7 +4107,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dInfo.duel_field = mainGame->GetMasterRule(opts);
 			mainGame->dInfo.duel_params = opts;
 		}
-		mainGame->gui_alternative_phase_layout = gGameConfig->alternative_phase_layout;
 		mainGame->SetPhaseButtons();
 		uint32_t val = 0;
 		for(int i = 0; i < 2; ++i) {
@@ -4283,7 +4263,7 @@ void DuelClient::SendResponse() {
 			delete pcard;
 		mainGame->dField.limbo_temp.clear();
 		mainGame->dField.ClearCommandFlag();
-		if(mainGame->gui_alternative_phase_layout) {
+		if(gGameConfig->alternative_phase_layout) {
 			mainGame->btnBP->setEnabled(false);
 			mainGame->btnM2->setEnabled(false);
 			mainGame->btnEP->setEnabled(false);

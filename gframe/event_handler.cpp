@@ -1939,6 +1939,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			case CHECKBOX_ALTERNATIVE_PHASE_LAYOUT: {
 				gGameConfig->alternative_phase_layout = mainGame->tabSettings.chkAlternativePhaseLayout->isChecked();
+				mainGame->SetPhaseButtons();
 				return true;
 			}
 			case CHECKBOX_HIDE_ARCHETYPES: {

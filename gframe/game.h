@@ -560,7 +560,6 @@ public:
 	irr::gui::IGUIListBox* lstChatLog;
 	irr::gui::IGUIEditBox* ebChatInput;
 	//phase button
-	bool gui_alternative_phase_layout;
 	irr::gui::IGUIStaticText* wPhase;
 	irr::gui::IGUIButton* btnDP;
 	irr::gui::IGUIButton* btnSP;

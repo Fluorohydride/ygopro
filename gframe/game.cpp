@@ -2592,7 +2592,7 @@ int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
 		return 2;
 }
 void Game::SetPhaseButtons() {
-	if (gui_alternative_phase_layout) {
+	if(gGameConfig->alternative_phase_layout) {
 		wPhase->setRelativePosition(Resize(940, 80, 990, 340));
 		btnDP->setRelativePosition(Resize(0, 0, 50, 20));
 		btnSP->setRelativePosition(Resize(0, 40, 50, 60));
@@ -2601,12 +2601,11 @@ void Game::SetPhaseButtons() {
 		btnM2->setRelativePosition(Resize(0, 160, 50, 180));
 		btnEP->setRelativePosition(Resize(0, 200, 50, 220));
 		btnShuffle->setRelativePosition(Resize(0, 240, 50, 260));
-	}
-	else {
+	} else {
 		// reset master rule 4 phase button position
 		wPhase->setRelativePosition(Resize(480, 310, 855, 330));
-		if (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
-			if (dInfo.duel_field >= 4) {
+		if(dInfo.duel_params & DUEL_3_COLUMNS_FIELD) {
+			if(dInfo.duel_field >= 4) {
 				wPhase->setRelativePosition(Resize(480, 290, 855, 350));
 				btnShuffle->setRelativePosition(Resize(0, 40, 50, 60));
 				btnDP->setRelativePosition(Resize(0, 40, 50, 60));
@@ -2615,8 +2614,7 @@ void Game::SetPhaseButtons() {
 				btnBP->setRelativePosition(Resize(160, 20, 210, 40));
 				btnM2->setRelativePosition(Resize(160, 20, 210, 40));
 				btnEP->setRelativePosition(Resize(310, 0, 360, 20));
-			}
-			else {
+			} else {
 				btnShuffle->setRelativePosition(Resize(65, 0, 115, 20));
 				btnDP->setRelativePosition(Resize(65, 0, 115, 20));
 				btnSP->setRelativePosition(Resize(65, 0, 115, 20));
@@ -2625,10 +2623,9 @@ void Game::SetPhaseButtons() {
 				btnM2->setRelativePosition(Resize(260, 0, 310, 20));
 				btnEP->setRelativePosition(Resize(260, 0, 310, 20));
 			}
-		}
-		else {
+		} else {
 			btnDP->setRelativePosition(Resize(0, 0, 50, 20));
-			if (dInfo.duel_field >= 4) {
+			if(dInfo.duel_field >= 4) {
 				btnSP->setRelativePosition(Resize(0, 0, 50, 20));
 				btnM1->setRelativePosition(Resize(160, 0, 210, 20));
 				btnBP->setRelativePosition(Resize(160, 0, 210, 20));
