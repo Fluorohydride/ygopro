@@ -1,6 +1,7 @@
 #include "windbot.h"
 #include "utils.h"
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #else
 #include <unistd.h>
@@ -15,7 +16,7 @@
 namespace ygo {
 
 #if defined(_WIN32) || defined(__ANDROID__)
-int WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
+bool WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
 #else
 pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) const {
 #endif

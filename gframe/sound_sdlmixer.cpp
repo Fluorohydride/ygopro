@@ -1,3 +1,4 @@
+#ifdef YGOPRO_USE_SDL_MIXER
 #include "sound_sdlmixer.h"
 #define SDL_MAIN_HANDLED
 #include <stdexcept>
@@ -114,3 +115,5 @@ SoundMixer::~SoundMixer() {
 	Mix_CloseAudio();
 	die = false;
 }
+
+#endif //YGOPRO_USE_SDL_MIXER

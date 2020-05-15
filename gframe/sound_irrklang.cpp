@@ -1,3 +1,4 @@
+#ifdef YGOPRO_USE_IRRKLANG
 #include "sound_irrklang.h"
 #include <stdexcept>
 #include <irrKlang.h>
@@ -79,3 +80,4 @@ SoundIrrklang::~SoundIrrklang() {
 		soundEngine->drop();
 }
 
+#endif //YGOPRO_USE_IRRKLANG

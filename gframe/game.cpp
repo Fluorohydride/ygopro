@@ -1,19 +1,11 @@
 #include <sstream>
 #include <fstream>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#ifndef _WIN32
-#include <sys/types.h>
-#include <dirent.h>
-#endif
-#ifdef __ANDROID__
-#include "Android/COSAndroidOperator.h"
-#endif
+#include <irrlicht.h>
 #include "client_updater.h"
 #include "game_config.h"
 #include "repo_manager.h"
 #include "image_downloader.h"
-#include <irrlicht.h>
 #include "config.h"
 #include "game.h"
 #include "server_lobby.h"
@@ -45,6 +37,7 @@
 #include "custom_skin_enum.h"
 
 #ifdef __ANDROID__
+#include "Android/COSAndroidOperator.h"
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
 class android_app;
 namespace porting {
@@ -3240,7 +3233,7 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 			str = str.substr(0, pos);
 		game->AddDebugMsg(str);
 		if(type > 1)
-			std::cout << str << std::endl;
+			fmt::print("{}\n", str);
 	}
 }
 void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload) {
