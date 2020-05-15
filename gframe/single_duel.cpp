@@ -1460,7 +1460,8 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 	if(dp->type != last_response)
 		return;
 	players[last_response]->state = CTOS_RESPONSE;
-	time_elapsed = 0;
+	if(time_elapsed < 10)
+		time_elapsed = 0;
 }
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	char query_buffer[0x2000];
