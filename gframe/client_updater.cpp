@@ -118,19 +118,19 @@ void DeleteOld() {
 
 ygo::ClientUpdater::lock_type GetLock() {
 #ifdef _WIN32
-	HANDLE hFile = CreateFile(EPRO_TEXT("./edopro_lock"),
+	HANDLE hFile = CreateFile(EPRO_TEXT("./.edopro_lock"),
 							  GENERIC_READ,
 							  0,
 							  nullptr,
 							  CREATE_ALWAYS,
-							  0,
+							  FILE_ATTRIBUTE_HIDDEN,
 							  nullptr);
 	if(!hFile || hFile == INVALID_HANDLE_VALUE)
 		return nullptr;
 	DeleteOld();
 	return hFile;
 #else
-	size_t file = open("./edopro_lock", O_CREAT, S_IRWXU);
+	size_t file = open("./.edopro_lock", O_CREAT, S_IRWXU);
 	if(flock(file, LOCK_EX | LOCK_NB)) {
 		if(file)
 			close(file);
@@ -151,7 +151,7 @@ void FreeLock(ygo::ClientUpdater::lock_type lock) {
 	flock(lock, LOCK_UN);
 	close(lock);
 #endif
-	ygo::Utils::FileDelete(EPRO_TEXT("./edopro_lock"));
+	ygo::Utils::FileDelete(EPRO_TEXT("./.edopro_lock"));
 }
 #endif
 namespace ygo {
