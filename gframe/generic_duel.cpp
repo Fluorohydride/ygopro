@@ -194,12 +194,16 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 		dp->type = NETPLAYER_TYPE_OBSERVER;
 		dp->state = CTOS_LEAVE_GAME;
+		if(swapped)
+			std::swap(players.home, players.opposing);
 		ITERATE_PLAYERS(
 			STOC_HS_PlayerEnter scpe;
 			BufferIO::CopyWStr(dueler.player->name, scpe.name, 20);
 			scpe.pos = GetPos(dueler.player);
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
 		)
+		if(swapped)
+			std::swap(players.home, players.opposing);
 		NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 		if(seeking_rematch || duel_stage == DUEL_STAGE_SIDING) {
 			NetServer::SendPacketToPlayer(dp, STOC_WAITING_SIDE);
