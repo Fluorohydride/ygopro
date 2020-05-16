@@ -2999,9 +2999,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->overlayTarget = olcard2;
 					for (size_t i = 0; i < olcard1->overlayed.size(); ++i) {
 						olcard1->overlayed[i]->sequence = i;
-						if(!mainGame->dInfo.isReplay)
-							mainGame->gMutex.unlock();
 					}
+					if(!mainGame->dInfo.isReplay)
+						mainGame->gMutex.unlock();
 				} else {
 					mainGame->gMutex.lock();
 					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
