@@ -4320,9 +4320,10 @@ void DuelClient::BeginRefreshHost() {
 	remotes.clear();
 	hosts.clear();
 	event_base* broadev = event_base_new();
+	uint32_t addresses[8]{};
 #ifdef __ANDROID__
-	int ipaddr = porting::getLocalIP();
-	if(ipaddr == -1) {
+	addresses[0] = porting::getLocalIP();
+	if(addresses[0] == -1) {
 		return;
 	}
 #else
@@ -4331,6 +4332,11 @@ void DuelClient::BeginRefreshHost() {
 	hostent* host = gethostbyname(hname);
 	if(!host)
 		return;
+	for(int i = 0; i < 8; ++i) {
+		if(host->h_addr_list[i] == 0)
+			break;
+		addresses[i] = *(unsigned int*)host->h_addr_list[i];
+	}
 #endif
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
@@ -4356,40 +4362,24 @@ void DuelClient::BeginRefreshHost() {
 	sockTo.sin_port = htons(7920);
 	HostRequest hReq;
 	hReq.identifier = NETWORK_CLIENT_ID;
-#ifdef __ANDROID__
-	local.sin_addr.s_addr = ipaddr;
-	SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if(sSend == INVALID_SOCKET)
-		return;
-	BOOL opt = TRUE;
-	setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt,
-			   sizeof(BOOL));
-	if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
-		closesocket(sSend);
-		return;
-	}
-	sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0,
-		(sockaddr*)&sockTo, sizeof(sockaddr));
-	closesocket(sSend);
-#else
-	for(int i = 0; i < 8; ++i) {
-		if(host->h_addr_list[i] == 0)
+	for(int i = 0; i < 8 && addresses[i]; ++i) {
+		if(addresses[i] == 0)
 			break;
-		unsigned int local_addr = *(unsigned int*)host->h_addr_list[i];
-		local.sin_addr.s_addr = local_addr;
+		local.sin_addr.s_addr = addresses[i];
 		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if(sSend == INVALID_SOCKET)
-			break;
+			continue;
 		BOOL opt = TRUE;
-		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
+		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt,
+				   sizeof(BOOL));
 		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
 			closesocket(sSend);
-			break;
+			continue;
 		}
-		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
+		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0,
+			(sockaddr*)&sockTo, sizeof(sockaddr));
 		closesocket(sSend);
 	}
-#endif
 }
 int DuelClient::RefreshThread(event_base* broadev) {
 	event_base_dispatch(broadev);
