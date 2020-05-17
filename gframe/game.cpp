@@ -1818,6 +1818,14 @@ bool Game::MainLoop() {
 			PopupElement(wQuery);
 			gMutex.unlock();
 			update_prompted = true;
+		} else if (show_changelog) {
+			gMutex.lock();
+			menuHandler.prev_operation = ACTION_SHOW_CHANGELOG;
+			stQMessage->setText(gDataManager->GetSysString(1443).c_str());
+			SetCentered(wQuery);
+			PopupElement(wQuery);
+			gMutex.unlock();
+			show_changelog = false;
 		}
 		if(!unzip_started && gClientUpdater->UpdateDownloaded()) {
 			unzip_started = true;

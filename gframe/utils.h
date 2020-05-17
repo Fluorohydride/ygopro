@@ -84,6 +84,8 @@ namespace ygo {
 		static const path_string& GetExeFolder();
 		static const path_string& GetCorePath();
 		static bool UnzipArchive(const path_string& input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, const path_string& dest = EPRO_TEXT("./"));
+
+		static void SystemOpen(const path_string& url);
 	};
 
 #define CHAR_T typename T::value_type

@@ -27,6 +27,7 @@ bool exit_on_return = false;
 bool is_from_discord = false;
 bool open_file = false;
 path_string open_file_name = EPRO_TEXT("");
+bool show_changelog = false;
 ygo::Game* ygo::mainGame = nullptr;
 ygo::ImageDownloader* ygo::gImageDownloader = nullptr;
 ygo::DataManager* ygo::gDataManager = nullptr;
@@ -196,6 +197,9 @@ int main(int argc, char* argv[]) {
 		free(buffer);
 	}
 #endif
+	if (argc >= 2 && argv[1] == path_string(EPRO_TEXT("show_changelog"))) {
+		show_changelog = true;
+	}
 	if(argc >= 2 || is_in_sys32) {
 		if(!is_in_sys32 && argv[1] == path_string(EPRO_TEXT("from_discord"))) {
 			is_from_discord = true;
