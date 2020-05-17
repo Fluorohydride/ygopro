@@ -127,7 +127,6 @@ public:
 	void DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color);
 	void DrawBackGround();
 	void DrawLinkedZones(ClientCard* pcard);
-	bool CheckMutual(ClientCard* pcard, int mark);
 	void DrawCards();
 	void DrawCard(ClientCard* pcard);
 	void DrawShadowText(irr::gui::CGUITTFont* font, const irr::core::stringw& text, const irr::core::rect<irr::s32>& shadowposition, const irr::core::rect<irr::s32>& padding, irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::rect<irr::s32>* clip = nullptr);

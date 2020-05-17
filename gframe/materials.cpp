@@ -324,6 +324,16 @@ Materials::Materials() {
 	mSelField.DiffuseColor = 0xff000000;
 	mSelField.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
 	mSelField.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
+	mLinkedField.ColorMaterial = irr::video::ECM_NONE;
+	mLinkedField.AmbientColor = 0xffffffff;
+	mLinkedField.DiffuseColor = 0xff000000;
+	mLinkedField.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
+	mLinkedField.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
+	mMutualLinkedField.ColorMaterial = irr::video::ECM_NONE;
+	mMutualLinkedField.AmbientColor = 0xffffffff;
+	mMutualLinkedField.DiffuseColor = 0xff000000;
+	mMutualLinkedField.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
+	mMutualLinkedField.MaterialTypeParam = pack_textureBlendFunc(irr::video::EBF_SRC_ALPHA, irr::video::EBF_ONE_MINUS_SRC_ALPHA, irr::video::EMFN_MODULATE_1X, irr::video::EAS_VERTEX_COLOR);
 	mOutLine.ColorMaterial = irr::video::ECM_AMBIENT;
 	mOutLine.DiffuseColor = 0xff000000;
 	mOutLine.Thickness = 2;

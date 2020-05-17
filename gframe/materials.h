@@ -42,6 +42,8 @@ public:
 	irr::video::SMaterial mBackLine;
 	irr::video::SMaterial mOutLine;
 	irr::video::SMaterial mSelField;
+	irr::video::SMaterial mLinkedField;
+	irr::video::SMaterial mMutualLinkedField;
 	irr::video::SMaterial mTRTexture;
 	irr::video::SMaterial mATK;
 };

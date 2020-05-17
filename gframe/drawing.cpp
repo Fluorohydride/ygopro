@@ -223,10 +223,27 @@ void Game::DrawBackGround() {
 			}
 		}
 	}
+	auto setAlpha = [](irr::video::SMaterial& material, irr::video::SColor color) {
+		int endalpha = std::round(color.getAlpha() * (selFieldAlpha - 5.0) * (0.005));
+		material.DiffuseColor = endalpha << 24;
+		material.AmbientColor = color;
+	};
 	//current sel
 	if (dField.hovered_location != 0 && dField.hovered_location != 2 && dField.hovered_location != POSITION_HINT
 		&& !(dInfo.duel_field < 4 && dField.hovered_location == LOCATION_MZONE && dField.hovered_sequence > 4)
 		&& !(dInfo.duel_field != 3 && dInfo.duel_field != 5 && dField.hovered_location == LOCATION_SZONE && dField.hovered_sequence > 5)) {
+		setAlpha(matManager.mLinkedField, skin::DUELFIELD_LINKED_VAL);
+		setAlpha(matManager.mMutualLinkedField, skin::DUELFIELD_MUTUAL_LINKED_VAL);
+		selFieldAlpha += selFieldDAlpha * (float)delta_time * 60.0f / 1000.0f;
+		if(selFieldAlpha <= 5) {
+			selFieldAlpha = 5;
+			selFieldDAlpha = 10;
+		}
+		if(selFieldAlpha >= 205) {
+			selFieldAlpha = 205;
+			selFieldDAlpha = -10;
+		}
+		setAlpha(matManager.mSelField, skin::DUELFIELD_HOVERED_VAL);
 		irr::video::S3DVertex *vertex = nullptr;
 		if (dField.hovered_location == LOCATION_DECK)
 			vertex = matManager.vFieldDeck[dField.hovered_controler][speed];
@@ -249,24 +266,21 @@ void Game::DrawBackGround() {
 			vertex = matManager.vFieldRemove[dField.hovered_controler][field][speed];
 		else if (dField.hovered_location == LOCATION_EXTRA)
 			vertex = matManager.vFieldExtra[dField.hovered_controler][speed];
-		selFieldAlpha += selFieldDAlpha * (float)delta_time * 60.0f / 1000.0f;
-		if (selFieldAlpha <= 5) {
-			selFieldAlpha = 5;
-			selFieldDAlpha = 10;
-		}
-		if (selFieldAlpha >= 205) {
-			selFieldAlpha = 205;
-			selFieldDAlpha = -10;
-		}
 		if(!vertex)
 			return;
-		matManager.mSelField.AmbientColor = skin::DUELFIELD_HOVERED_VAL;
-		matManager.mSelField.DiffuseColor = (int)std::round(selFieldAlpha) << 24;
 		driver->setMaterial(matManager.mSelField);
 		driver->drawVertexPrimitiveList(vertex, 4, matManager.iRectangle, 2);
 	}
 }
 void Game::DrawLinkedZones(ClientCard* pcard) {
+	auto CheckMutual = [&](ClientCard* pcard, int mark)->bool {
+		driver->setMaterial(matManager.mLinkedField);
+		if(pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
+			driver->setMaterial(matManager.mMutualLinkedField);
+			return true;
+		}
+		return false;
+	};
 	int mark = pcard->link_marker;
 	ClientCard* pcard2;
 	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
@@ -386,16 +400,6 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 			driver->drawVertexPrimitiveList(&matManager.vFieldMzone[1 - dField.hovered_controler][2 - swap], 4, matManager.iRectangle, 2);
 		}
 	}
-}
-bool Game::CheckMutual(ClientCard* pcard, int mark) {
-	matManager.mSelField.AmbientColor = skin::DUELFIELD_LINKED_VAL;
-	driver->setMaterial(matManager.mSelField);
-	if (pcard && pcard->type & TYPE_LINK && pcard->link_marker & mark) {
-		matManager.mSelField.AmbientColor = skin::DUELFIELD_MUTUAL_LINKED_VAL;
-		driver->setMaterial(matManager.mSelField);
-		return true;
-	}
-	return false;
 }
 void Game::DrawCards() {
 	for(auto& pcard : dField.overlay_cards)
