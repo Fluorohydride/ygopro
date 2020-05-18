@@ -94,7 +94,7 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 			}
 		}
 	}
-	return false;
+	return IGUIElement::OnEvent(event);
 }
 
 
