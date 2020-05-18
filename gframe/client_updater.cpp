@@ -5,6 +5,7 @@
 #include <Windows.h>
 #else
 #include <sys/file.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #endif // _WIN32
 #include <curl/curl.h>
@@ -92,6 +93,9 @@ void Reboot() {
 #else
 	pid_t pid = fork();
 	if(pid == 0) {
+		struct stat fileStat;
+		stat(ygo::Utils::GetExePath().c_str(), &fileStat);
+		chmod(ygo::Utils::GetExePath().c_str(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
 		execl(ygo::Utils::GetExePath().c_str(), "show_changelog", nullptr);
 		exit(EXIT_FAILURE);
 	}
