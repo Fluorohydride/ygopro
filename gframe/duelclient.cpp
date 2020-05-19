@@ -409,6 +409,19 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.unlock();
 		break;
 	}
+	case STOC_DECK_COUNT: {
+		mainGame->gMutex.lock();
+		int deckc = BufferIO::ReadInt16(pdata);
+		int extrac = BufferIO::ReadInt16(pdata);
+		int sidec = BufferIO::ReadInt16(pdata);
+		mainGame->dField.Initial(0, deckc, extrac);
+		deckc = BufferIO::ReadInt16(pdata);
+		extrac = BufferIO::ReadInt16(pdata);
+		sidec = BufferIO::ReadInt16(pdata);
+		mainGame->dField.Initial(1, deckc, extrac);
+		mainGame->gMutex.unlock();
+		break;
+	}
 	case STOC_JOIN_GAME: {
 		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
 		std::wstring str;
@@ -1166,6 +1179,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->WaitFrameSignal(40);
 		mainGame->showcard = 0;
 		mainGame->gMutex.lock();
+		mainGame->dField.Clear();
 		int playertype = BufferIO::ReadInt8(pbuf);
 		mainGame->dInfo.isFirst =  (playertype & 0xf) ? false : true;
 		if(playertype & 0xf0)
@@ -2894,15 +2908,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int ct = BufferIO::ReadInt8(pbuf);
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
-		if (mainGame->dField.chains.size() > 1) {
-			if (mainGame->dField.last_chain)
-				mainGame->WaitFrameSignal(11);
-			for(int i = 0; i < 5; ++i) {
-				mainGame->dField.chains[ct - 1].solved = false;
-				mainGame->WaitFrameSignal(3);
-				mainGame->dField.chains[ct - 1].solved = true;
-				mainGame->WaitFrameSignal(3);
-			}
+		if(mainGame->dField.last_chain)
+			mainGame->WaitFrameSignal(11);
+		for(int i = 0; i < 5; ++i) {
+			mainGame->dField.chains[ct - 1].solved = false;
+			mainGame->WaitFrameSignal(3);
+			mainGame->dField.chains[ct - 1].solved = true;
+			mainGame->WaitFrameSignal(3);
 		}
 		mainGame->dField.last_chain = false;
 		return true;

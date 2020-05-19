@@ -285,6 +285,22 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 		(*oit)->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(*oit);
 	}
+	char deckbuff[12];
+	char* pbuf = deckbuff;
+	BufferIO::WriteInt16(pbuf, pdeck[0].main.size());
+	BufferIO::WriteInt16(pbuf, pdeck[0].extra.size());
+	BufferIO::WriteInt16(pbuf, pdeck[0].side.size());
+	BufferIO::WriteInt16(pbuf, pdeck[2].main.size());
+	BufferIO::WriteInt16(pbuf, pdeck[2].extra.size());
+	BufferIO::WriteInt16(pbuf, pdeck[2].side.size());
+	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
+	NetServer::ReSendToPlayer(players[1]);
+	char tempbuff[6];
+	memcpy(tempbuff, deckbuff, 6);
+	memcpy(deckbuff, deckbuff + 6, 6);
+	memcpy(deckbuff + 6, tempbuff, 6);
+	NetServer::SendBufferToPlayer(players[2], STOC_DECK_COUNT, deckbuff, 12);
+	NetServer::ReSendToPlayer(players[3]);
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
 	NetServer::ReSendToPlayer(players[2]);
 	hand_result[0] = 0;
