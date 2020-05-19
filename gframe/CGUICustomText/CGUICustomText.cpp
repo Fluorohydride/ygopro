@@ -74,11 +74,9 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 						if(was_pressed) {
 							if(scrText && scrText->isEnabled()) {
 								auto diff = prev_position.Y - event.MouseInput.Y;
-								if(diff) {
-									prev_position = core::position2di(event.MouseInput.X, event.MouseInput.Y);
-									scrText->setPos(scrText->getPos() + diff);
-									return true;
-								}
+								prev_position = core::position2di(event.MouseInput.X, event.MouseInput.Y);
+								scrText->setPos(scrText->getPos() + diff);
+								return true;
 							}
 						}
 						break;
