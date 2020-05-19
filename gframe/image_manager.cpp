@@ -247,10 +247,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
 }
 int ImageManager::LoadThumbThread() {
-	imageManager.tThumbLoadingMutex.lock();
-	imageManager.tThumbLoadingThreadRunning = !imageManager.tThumbLoadingCodes.empty();
-	imageManager.tThumbLoadingMutex.unlock();
-	while(imageManager.tThumbLoadingThreadRunning) {
+	while(true) {
 		imageManager.tThumbLoadingMutex.lock();
 		int code = imageManager.tThumbLoadingCodes.front();
 		imageManager.tThumbLoadingCodes.pop();
@@ -297,8 +294,11 @@ int ImageManager::LoadThumbThread() {
 		}
 		imageManager.tThumbLoadingMutex.lock();
 		imageManager.tThumbLoadingThreadRunning = !imageManager.tThumbLoadingCodes.empty();
+		if(!imageManager.tThumbLoadingThreadRunning)
+			break;
 		imageManager.tThumbLoadingMutex.unlock();
 	}
+	imageManager.tThumbLoadingMutex.unlock();
 	return 0;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
