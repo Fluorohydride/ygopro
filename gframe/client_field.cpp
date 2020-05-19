@@ -753,19 +753,19 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 	static const irr::core::vector3df facedown{ 0.0f, irr::core::PI, 0.0f };
 	static const irr::core::vector3df handfaceup{ -FIELD_ANGLE, 0.0f, 0.0f };
 	static const irr::core::vector3df handfacedown{ FIELD_ANGLE, irr::core::PI, 0.0f };
-	auto GetMiddleX = [](irr::video::S3DVertex pos[4])->float {
+	auto GetMiddleX = [](const irr::video::S3DVertex pos[4])->float {
 		return (pos[0].Pos.X + pos[1].Pos.X) / 2.0f;
 	};
-	auto GetMiddleY = [](irr::video::S3DVertex pos[4])->float {
+	auto GetMiddleY = [](const irr::video::S3DVertex pos[4])->float {
 		return (pos[0].Pos.Y + pos[2].Pos.Y) / 2.0f;
 	};
 	if(!pcard->location) return;
-	int controler = pcard->controler;
-	int sequence = pcard->sequence;
-	int location = pcard->location;
-	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
-	auto GetPos = [&](int location) -> irr::video::S3DVertex* {
+	const int& controler = pcard->overlayTarget ? pcard->overlayTarget->controler : pcard->controler;
+	const int& sequence = pcard->sequence;
+	const int& location = pcard->location;
+	const int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
+	const int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	auto GetPos = [&location,&controler,&speed,&sequence,&field,&pcard]()->const irr::video::S3DVertex* {
 		switch(location) {
 		case LOCATION_DECK:		return matManager.vFieldDeck[controler][speed];
 		case LOCATION_MZONE:	return matManager.vFieldMzone[controler][sequence];
@@ -775,18 +775,18 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 		case LOCATION_EXTRA:	return matManager.vFieldExtra[controler][speed];
 		case LOCATION_SKILL:	return matManager.vSkillZone[controler][field][speed];
 		case LOCATION_OVERLAY:
-			if(!pcard->overlayTarget || pcard->overlayTarget->controler > 1)
+			if(!pcard->overlayTarget || controler > 1)
 				return nullptr;
 			if(pcard->overlayTarget->location == LOCATION_MZONE)
-				return matManager.vFieldMzone[pcard->overlayTarget->controler][pcard->overlayTarget->sequence];
+				return matManager.vFieldMzone[controler][pcard->overlayTarget->sequence];
 			if(pcard->overlayTarget->location == LOCATION_SZONE)
-				return matManager.vFieldSzone[pcard->overlayTarget->controler][pcard->overlayTarget->sequence][field][speed];
+				return matManager.vFieldSzone[controler][pcard->overlayTarget->sequence][field][speed];
 		default: return nullptr;
 		}
 	};
 
 	if(location != LOCATION_HAND) {
-		irr::video::S3DVertex* pos = GetPos(location);
+		const auto pos = GetPos();
 		if(!pos)
 			return;
 		t->X = GetMiddleX(pos);
@@ -797,7 +797,9 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 				*r = (pcard->position & POS_DEFENSE) ? selfDEF : selfATK;
 			else
 				*r = (pcard->position & POS_DEFENSE) ? oppoDEF : oppoATK;
-		} else
+		} else if (location == LOCATION_OVERLAY)
+			*r = (pcard->overlayTarget->controler == 0) ? selfATK : oppoATK;
+		else
 			*r = (controler == 0) ? selfATK : oppoATK;
 		if(((location & (LOCATION_GRAVE | LOCATION_OVERLAY)) == 0) && ((location == LOCATION_DECK && deck_reversed == pcard->is_reversed) ||
 			(location != LOCATION_DECK && pcard->position & POS_FACEDOWN))) {
@@ -815,7 +817,7 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 				break;
 			}
 			case LOCATION_OVERLAY: {
-				if(pcard->overlayTarget->controler == 0)
+				if(controler == 0)
 					*t = { t->X - 0.12f + 0.06f * sequence, t->Y + 0.06f, 0.005f + pcard->sequence * 0.0001f };
 				else
 					*t = { t->X + 0.12f - 0.06f * sequence, t->Y - 0.06f, 0.005f + pcard->sequence * 0.0001f };
