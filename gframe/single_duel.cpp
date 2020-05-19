@@ -328,6 +328,20 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 		(*oit)->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(*oit);
 	}
+	char deckbuff[12];
+	char* pbuf = deckbuff;
+	BufferIO::WriteInt16(pbuf, pdeck[0].main.size());
+	BufferIO::WriteInt16(pbuf, pdeck[0].extra.size());
+	BufferIO::WriteInt16(pbuf, pdeck[0].side.size());
+	BufferIO::WriteInt16(pbuf, pdeck[1].main.size());
+	BufferIO::WriteInt16(pbuf, pdeck[1].extra.size());
+	BufferIO::WriteInt16(pbuf, pdeck[1].side.size());
+	NetServer::SendBufferToPlayer(players[0], STOC_DECK_COUNT, deckbuff, 12);
+	char tempbuff[6];
+	memcpy(tempbuff, deckbuff, 6);
+	memcpy(deckbuff, deckbuff + 6, 6);
+	memcpy(deckbuff + 6, tempbuff, 6);
+	NetServer::SendBufferToPlayer(players[1], STOC_DECK_COUNT, deckbuff, 12);
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
 	NetServer::ReSendToPlayer(players[1]);
 	hand_result[0] = 0;
@@ -589,7 +603,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			case 6:
 			case 7:
 			case 8:
-			case 9: {
+			case 9:
+			case 11: {
 				NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
 				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 					NetServer::ReSendToPlayer(*oit);
@@ -778,8 +793,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
-		case MSG_SORT_CARD:
-		case MSG_SORT_CHAIN: {
+		case MSG_SORT_CARD: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;

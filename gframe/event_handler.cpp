@@ -11,7 +11,6 @@
 #include "single_mode.h"
 #include "materials.h"
 #include "../ocgcore/common.h"
-#include <algorithm>
 
 namespace ygo {
 
@@ -320,6 +319,31 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				SetResponseSelectedOption();
 				break;
 			}
+			case BUTTON_ANNUMBER_1:
+			case BUTTON_ANNUMBER_2:
+			case BUTTON_ANNUMBER_3:
+			case BUTTON_ANNUMBER_4:
+			case BUTTON_ANNUMBER_5:
+			case BUTTON_ANNUMBER_6:
+			case BUTTON_ANNUMBER_7:
+			case BUTTON_ANNUMBER_8:
+			case BUTTON_ANNUMBER_9:
+			case BUTTON_ANNUMBER_10:
+			case BUTTON_ANNUMBER_11:
+			case BUTTON_ANNUMBER_12: {
+				soundManager.PlaySoundEffect(SOUND_BUTTON);
+				for(int i = 0; i < mainGame->cbANNumber->getItemCount(); ++i) {
+					if(id - BUTTON_ANNUMBER_1 + 1 == mainGame->cbANNumber->getItemData(i)) {
+						mainGame->cbANNumber->setSelected(i);
+						break;
+					}
+				}
+				for(int i = 0; i < 12; ++i) {
+					mainGame->btnANNumber[i]->setPressed(event.GUIEvent.Caller == mainGame->btnANNumber[i]);
+				}
+				mainGame->btnANNumberOK->setEnabled(true);
+				break;
+			}
 			case BUTTON_ANNUMBER_OK: {
 				soundManager.PlaySoundEffect(SOUND_BUTTON);
 				DuelClient::SetResponseI(mainGame->cbANNumber->getSelected());
@@ -614,7 +638,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CARD_4: {
 				if(mainGame->dInfo.isReplay)
 					break;
-				mainGame->stCardListTip->setVisible(false);
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_IDLECMD:
 				case MSG_SELECT_BATTLECMD:
@@ -711,7 +734,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (selected_cards.size() > 0) {
 						SetResponseSelectedCards();
 						ShowCancelOrFinishButton(0);
-						mainGame->HideElement(mainGame->wCardSelect, true);}
+						mainGame->HideElement(mainGame->wCardSelect, true);
+					}
 					break;
 				}
 				case MSG_SELECT_SUM: {
@@ -720,7 +744,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					ShowSelectSum(true);
 					break;
 				}
-				case MSG_SORT_CHAIN:
 				case MSG_SORT_CARD: {
 					int offset = mainGame->scrCardList->getPos() / 10;
 					int sel_seq = id - BUTTON_CARD_0 + offset;
@@ -760,7 +783,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CARD_SEL_OK: {
-				mainGame->stCardListTip->setVisible(false);
 				if(mainGame->dInfo.isReplay) {
 					mainGame->HideElement(mainGame->wCardSelect);
 					break;
@@ -1007,13 +1029,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4) {
+			if(id >= BUTTON_CARD_0 && id <= BUTTON_CARD_4 && mainGame->stCardListTip->isVisible()) {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
 				SetShowMark(mcard, false);
 				mainGame->stCardListTip->setVisible(false);
 			}
-			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4) {
+			if(id >= BUTTON_DISPLAY_0 && id <= BUTTON_DISPLAY_4 && mainGame->stCardListTip->isVisible()) {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
 				ClientCard* mcard = display_cards[id - BUTTON_DISPLAY_0 + pos];
 				SetShowMark(mcard, false);
@@ -2431,6 +2453,7 @@ void ClientField::CancelOrFinish() {
 		if(selected_cards.size() == 0) {
 			if(select_cancelable) {
 				DuelClient::SetResponseI(-1);
+				ShowCancelOrFinishButton(0);
 				if(mainGame->wCardSelect->isVisible())
 					mainGame->HideElement(mainGame->wCardSelect, true);
 				else
@@ -2477,7 +2500,6 @@ void ClientField::CancelOrFinish() {
 		}
 		break;
 	}
-	case MSG_SORT_CHAIN:
 	case MSG_SORT_CARD: {
 		if(mainGame->wCardSelect->isVisible()) {
 			DuelClient::SetResponseI(-1);

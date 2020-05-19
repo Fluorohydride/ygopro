@@ -2,7 +2,6 @@ solution "ygo"
     location "build"
     language "C++"
     objdir "obj"
-    startproject "ygopro"
 
     configurations { "Debug", "Release" }
 
@@ -42,17 +41,14 @@ solution "ygo"
         defines "NDEBUG"
         buildoptions "-march=native"
 
-    configuration { "Debug", "vs*" }
-        defines { "_ITERATOR_DEBUG_LEVEL=0" }
-
     configuration "Release"
         flags { "OptimizeSpeed" }
         targetdir "bin/release"
 
-    include "lua"
     include "ocgcore"
     include "gframe"
     if os.is("windows") then
+    include "lua"
     include "event"
     include "freetype"
     include "irrlicht"

@@ -126,7 +126,7 @@ void Game::DrawBackGround() {
 	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
 	driver->setMaterial(matManager.mBackLine);
 	//select field
-	if(dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD) {
+	if(dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD || dInfo.curMsg == MSG_HINT) {
 		float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};
 		unsigned int filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
@@ -392,7 +392,8 @@ void Game::DrawCard(ClientCard* pcard) {
 		matManager.mTexture.setTexture(0, imageManager.tAttack);
 		driver->setMaterial(matManager.mTexture);
 		irr::core::matrix4 atk;
-		atk.setTranslation(pcard->curPos + vector3df(0, -atkdy / 4.0f - 0.35f, 0.05f));
+		atk.setTranslation(pcard->curPos + vector3df(0, (pcard->controler == 0 ? -1 : 1) * (atkdy / 4.0f + 0.35f), 0.05f));
+		atk.setRotationRadians(vector3df(0, 0, pcard->controler == 0 ? 0 : 3.1415926f));
 		driver->setTransform(irr::video::ETS_WORLD, atk);
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	}
@@ -456,28 +457,26 @@ void Game::DrawMisc() {
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	if(dField.chains.size() > 1) {
-		for(size_t i = 0; i < dField.chains.size(); ++i) {
-			if(dField.chains[i].solved)
-				break;
-			matManager.mTRTexture.setTexture(0, imageManager.tChain);
-			matManager.mTRTexture.AmbientColor = 0xffffff00;
-			ic.setRotationRadians(act_rot);
-			ic.setTranslation(dField.chains[i].chain_pos);
-			driver->setMaterial(matManager.mTRTexture);
-			driver->setTransform(irr::video::ETS_WORLD, ic);
-			driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
-			it.setScale(0.6f);
-			it.setTranslation(dField.chains[i].chain_pos);
-			matManager.mTRTexture.setTexture(0, imageManager.tNumber);
-			matManager.vChainNum[0].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5));
-			matManager.vChainNum[1].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5));
-			matManager.vChainNum[2].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5 + 1));
-			matManager.vChainNum[3].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5 + 1));
-			driver->setMaterial(matManager.mTRTexture);
-			driver->setTransform(irr::video::ETS_WORLD, it);
-			driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
-		}
+	for(size_t i = 0; i < dField.chains.size(); ++i) {
+		if(dField.chains[i].solved)
+			break;
+		matManager.mTRTexture.setTexture(0, imageManager.tChain);
+		matManager.mTRTexture.AmbientColor = 0xffffff00;
+		ic.setRotationRadians(act_rot);
+		ic.setTranslation(dField.chains[i].chain_pos);
+		driver->setMaterial(matManager.mTRTexture);
+		driver->setTransform(irr::video::ETS_WORLD, ic);
+		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
+		it.setScale(0.6f);
+		it.setTranslation(dField.chains[i].chain_pos);
+		matManager.mTRTexture.setTexture(0, imageManager.tNumber);
+		matManager.vChainNum[0].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5));
+		matManager.vChainNum[1].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5));
+		matManager.vChainNum[2].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5 + 1));
+		matManager.vChainNum[3].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5 + 1));
+		driver->setMaterial(matManager.mTRTexture);
+		driver->setTransform(irr::video::ETS_WORLD, it);
+		driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
 	}
 	//finish button
 	if(btnCancelOrFinish->isVisible() && dField.select_ready)
@@ -959,7 +958,7 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	FadingUnit fu;
 	fu.fadingSize = win->getRelativePosition();
 	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
-		if(win == fit->guiFading && win != wOptions) // the size of wOptions is always setted by ClientField::ShowSelectOption before showing it
+		if(win == fit->guiFading && win != wOptions && win != wANNumber) // the size of wOptions is always setted by ClientField::ShowSelectOption before showing it
 			fu.fadingSize = fit->fadingSize;
 	irr::core::position2di center = fu.fadingSize.getCenter();
 	fu.fadingDiff.X = fu.fadingSize.getWidth() / 10;
@@ -1015,10 +1014,16 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(false);
 		dField.conti_selecting = false;
+		stCardListTip->setVisible(false);
+		for(auto& pcard : dField.selectable_cards)
+			dField.SetShowMark(pcard, false);
 	}
 	if(win == wCardDisplay) {
 		for(int i = 0; i < 5; ++i)
 			btnCardDisplay[i]->setDrawImage(false);
+		stCardListTip->setVisible(false);
+		for(auto& pcard : dField.display_cards)
+			dField.SetShowMark(pcard, false);
 	}
 	fadingList.push_back(fu);
 }

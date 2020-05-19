@@ -62,6 +62,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_JOIN_HOST: {
 				bot_mode = false;
+				mainGame->TrimText(mainGame->ebJoinHost);
+				mainGame->TrimText(mainGame->ebJoinPort);
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinHost->getText();
 				BufferIO::CopyWStr(pstr, ip, 16);
@@ -538,7 +540,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			case CHECKBOX_BOT_OLD_RULE: {
+			}
+			break;
+		}
+		case irr::gui::EGET_COMBO_BOX_CHANGED: {
+			switch(id) {
+			case COMBOBOX_BOT_RULE: {
 				mainGame->RefreshBot();
 				break;
 			}

@@ -15,7 +15,7 @@ public:
 	void ClearTexture();
 	void RemoveTexture(int code);
 	void ResizeTexture();
-	irr::video::ITexture* GetTextureFromFile(char* file, s32 width, s32 height);
+	irr::video::ITexture* GetTextureFromFile(const char* file, s32 width, s32 height);
 	irr::video::ITexture* GetTexture(int code, bool fit = false);
 	irr::video::ITexture* GetTextureThumb(int code);
 	irr::video::ITexture* GetTextureField(int code);

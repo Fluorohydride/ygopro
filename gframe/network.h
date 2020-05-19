@@ -185,6 +185,7 @@ public:
 #define STOC_TP_RESULT		0x6
 #define STOC_CHANGE_SIDE	0x7
 #define STOC_WAITING_SIDE	0x8
+#define STOC_DECK_COUNT		0x9
 #define STOC_CREATE_GAME	0x11
 #define STOC_JOIN_GAME		0x12
 #define STOC_TYPE_CHANGE	0x13

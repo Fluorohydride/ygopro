@@ -1,7 +1,6 @@
 #include "replay.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/common.h"
-#include <algorithm>
 #include "lzma/LzmaLib.h"
 
 namespace ygo {
