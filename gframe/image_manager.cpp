@@ -63,7 +63,12 @@ void ImageManager::ClearTexture() {
 	tMap[0].clear();
 	tMap[1].clear();
 	tThumb.clear();
+	tThumbLoadingMutex.lock();
 	tThumbLoading.clear();
+	while(!tThumbLoadingCodes.empty())
+		tThumbLoadingCodes.pop();
+	tThumbLoadingThreadRunning = false;
+	tThumbLoadingMutex.unlock();
 	tFields.clear();
 }
 void ImageManager::RemoveTexture(int code) {
@@ -271,7 +276,8 @@ int ImageManager::LoadThumbThread() {
 			if(img->getDimension() == irr::core::dimension2d<u32>(width, height)) {
 				img->grab();
 				imageManager.tThumbLoadingMutex.lock();
-				imageManager.tThumbLoading[code] = img;
+				if(imageManager.tThumbLoadingThreadRunning)
+					imageManager.tThumbLoading[code] = img;
 				imageManager.tThumbLoadingMutex.unlock();
 			} else {
 				irr::video::IImage *destimg = imageManager.driver->createImage(img->getColorFormat(), irr::core::dimension2d<u32>(width, height));
@@ -279,12 +285,14 @@ int ImageManager::LoadThumbThread() {
 				img->drop();
 				destimg->grab();
 				imageManager.tThumbLoadingMutex.lock();
-				imageManager.tThumbLoading[code] = destimg;
+				if(imageManager.tThumbLoadingThreadRunning)
+					imageManager.tThumbLoading[code] = destimg;
 				imageManager.tThumbLoadingMutex.unlock();
 			}
 		} else {
 			imageManager.tThumbLoadingMutex.lock();
-			imageManager.tThumbLoading[code] = NULL;
+			if(imageManager.tThumbLoadingThreadRunning)
+				imageManager.tThumbLoading[code] = NULL;
 			imageManager.tThumbLoadingMutex.unlock();
 		}
 		imageManager.tThumbLoadingMutex.lock();
@@ -317,6 +325,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		imageManager.tThumbLoadingMutex.lock();
 		tThumbLoadingCodes.push(code);
 		if(!tThumbLoadingThreadRunning) {
+			tThumbLoadingThreadRunning = true;
 			std::thread(LoadThumbThread).detach();
 		}
 		imageManager.tThumbLoadingMutex.unlock();
