@@ -1,5 +1,6 @@
 #ifdef YGOPRO_USE_IRRKLANG
 #include "sound_irrklang.h"
+#include "irrklang_dynamic_loader.h"
 #include <stdexcept>
 #include <irrKlang.h>
 #ifdef IRRKLANG_STATIC
@@ -7,7 +8,8 @@
 #endif
 
 SoundIrrklang::SoundIrrklang() {
-	soundEngine = irrklang::createIrrKlangDevice();
+	irrdyn::init();
+	soundEngine = irrdyn::createIrrKlangDevice();
 	if(!soundEngine) {
 		throw std::runtime_error("Failed to init irrklang device!");
 	}
@@ -78,6 +80,7 @@ SoundIrrklang::~SoundIrrklang() {
 		soundBGM->drop();
 	if(soundEngine)
 		soundEngine->drop();
+	irrdyn::close();
 }
 
 #endif //YGOPRO_USE_IRRKLANG
