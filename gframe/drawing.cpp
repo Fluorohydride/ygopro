@@ -457,7 +457,7 @@ void Game::DrawMisc() {
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	if(dField.chains.size() > 1) {
+	if(dField.chains.size() > 1 || dField.chains.size() == 1 && dField.chains[0].need_distinguish) {
 		for(size_t i = 0; i < dField.chains.size(); ++i) {
 			if(dField.chains[i].solved)
 				break;
