@@ -46,6 +46,7 @@ struct Config {
 	int enable_bot_mode;
 	int quick_animation;
 	int auto_save_replay;
+	int dont_draw_single_chain;
 	int prefer_expansion_script;
 	bool enable_sound;
 	bool enable_music;
@@ -282,6 +283,7 @@ public:
 	irr::gui::IGUICheckBox* chkWaitChain;
 	irr::gui::IGUICheckBox* chkQuickAnimation;
 	irr::gui::IGUICheckBox* chkAutoSaveReplay;
+	irr::gui::IGUICheckBox* chkDontDrawSingleChain;
 	irr::gui::IGUIWindow* tabSystem;
 	irr::gui::IGUIElement* elmTabSystemLast;
 	irr::gui::IGUIScrollBar* scrTabSystem;
@@ -723,6 +725,7 @@ extern Game* mainGame;
 #define SCROLL_TAB_SYSTEM			371
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
+#define CHECKBOX_DRAW_SINGLE_CHAIN	374
 
 #define DEFAULT_DUEL_RULE			5
 
