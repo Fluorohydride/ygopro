@@ -1438,6 +1438,7 @@ void SingleDuel::EndDuel() {
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
 	end_duel(pduel);
+	event_del(etimer);
 	pduel = 0;
 }
 void SingleDuel::WaitforResponse(int playerid) {
