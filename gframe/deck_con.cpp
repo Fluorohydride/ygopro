@@ -1034,6 +1034,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				deckManager.GetCategoryPath(catepath, mainGame->lstCategories->getSelected(), mainGame->lstCategories->getListItem(mainGame->lstCategories->getSelected()));
 				myswprintf(filepath, L"%ls/%ls.ydk", catepath, mainGame->lstDecks->getListItem(decksel));
 				deckManager.LoadDeck(filepath);
+				deckManager.LoadPack(filepath);
 				prev_deck = decksel;
 				break;
 			}

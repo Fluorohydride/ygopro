@@ -34,6 +34,7 @@ class DeckManager {
 public:
 	Deck current_deck;
 	std::vector<LFList> _lfList;
+	std::vector<code_pointer> pack;
 
 	void LoadLFListSingle(const char* path);
 	void LoadLFList();
@@ -47,6 +48,7 @@ public:
 	bool LoadDeck(irr::gui::IGUIComboBox* cbCategory, irr::gui::IGUIComboBox* cbDeck);
 	FILE* OpenDeckFile(const wchar_t * file, const char * mode);
 	bool LoadDeck(const wchar_t* file);
+	bool LoadPack(const wchar_t* file);
 	bool SaveDeck(Deck& deck, const wchar_t* file);
 	bool DeleteDeck(const wchar_t* file);
 	bool CreateCategory(const wchar_t* name);
