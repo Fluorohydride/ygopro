@@ -626,6 +626,11 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	RefreshExtra(0);
 	RefreshExtra(1);
 	start_duel(pduel, opt);
+	if(host_info.time_limit) {
+		time_elapsed = 0;
+		timeval timeout = { 1, 0 };
+		event_add(etimer, &timeout);
+	}
 	Process();
 }
 void SingleDuel::Process() {
@@ -1759,7 +1764,7 @@ void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 		if(time_limit[dp->type] >= time_elapsed)
 			time_limit[dp->type] -= time_elapsed;
 		else time_limit[dp->type] = 0;
-		event_del(etimer);
+		time_elapsed = 0;
 	}
 	Process();
 }
@@ -1784,6 +1789,7 @@ void SingleDuel::EndDuel() {
 		NetServer::ReSendToPlayer(*oit);
 #endif //YGOPRO_SERVER_MODE
 	end_duel(pduel);
+	event_del(etimer);
 	pduel = 0;
 }
 void SingleDuel::WaitforResponse(int playerid) {
@@ -1870,9 +1876,8 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 	if(dp->type != last_response)
 		return;
 	players[last_response]->state = CTOS_RESPONSE;
-	time_elapsed = 0;
-	timeval timeout = {1, 0};
-	event_add(etimer, &timeout);
+	if(time_elapsed < 10)
+		time_elapsed = 0;
 }
 #ifdef YGOPRO_SERVER_MODE
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
@@ -2182,7 +2187,10 @@ void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
 		sd->EndDuel();
 		sd->DuelEndProc();
 		event_del(sd->etimer);
+		return;
 	}
+	timeval timeout = { 1, 0 };
+	event_add(sd->etimer, &timeout);
 }
 
 }
