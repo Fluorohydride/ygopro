@@ -1878,7 +1878,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				break;
 			}
 			case CHECKBOX_DRAW_SINGLE_CHAIN: {
-				mainGame->gameConf.dont_draw_single_chain = mainGame->chkDontDrawSingleChain->isChecked() ? 1 : 0;
+				mainGame->gameConf.draw_single_chain = mainGame->chkDrawSingleChain->isChecked() ? 1 : 0;
 				return true;
 				break;
 			}
