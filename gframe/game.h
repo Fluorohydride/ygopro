@@ -181,6 +181,7 @@ public:
 	void SetWindowsIcon();
 	void SetWindowsScale(float scale);
 	void FlashWindow();
+	void takeScreenshot();
 	void SetCursor(ECURSOR_ICON icon);
 
 	std::mutex gMutex;
