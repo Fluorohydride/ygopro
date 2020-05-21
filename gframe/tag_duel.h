@@ -73,6 +73,9 @@ protected:
 	unsigned char turn_count;
 	unsigned short time_limit[2];
 	unsigned short time_elapsed;
+#ifdef YGOPRO_SERVER_MODE
+	unsigned short time_compensator;
+#endif
 };
 
 }

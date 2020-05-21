@@ -628,6 +628,9 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	start_duel(pduel, opt);
 	if(host_info.time_limit) {
 		time_elapsed = 0;
+#ifdef YGOPRO_SERVER_MODE
+		time_compensator = 60;
+#endif
 		timeval timeout = { 1, 0 };
 		event_add(etimer, &timeout);
 	}
@@ -1876,8 +1879,15 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 	if(dp->type != last_response)
 		return;
 	players[last_response]->state = CTOS_RESPONSE;
+#ifdef YGOPRO_SERVER_MODE
+	if(time_elapsed < 10 && time_elapsed <= time_compensator){
+		time_compensator -= time_elapsed;
+		time_elapsed = 0;
+	}
+#else
 	if(time_elapsed < 10)
 		time_elapsed = 0;
+#endif //YGOPRO_SERVER_MODE
 }
 #ifdef YGOPRO_SERVER_MODE
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache, DuelPlayer* dp)
