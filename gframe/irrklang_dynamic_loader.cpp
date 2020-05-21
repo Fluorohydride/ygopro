@@ -17,12 +17,16 @@ namespace irrdyn {
 
 void init() {
 #ifdef _WIN32
-	if(!(library = LoadLibrary(TEXT("irrKlang.dll"))))
+	if(!(library = LoadLibrary(TEXT("./irrKlang.dll"))))
 		return;
 	if(!(createdevice = (decltype(createdevice))GetProcAddress((HMODULE)library, CREATE_DEVICE_MSVC)))
 		createdevice = (decltype(createdevice))GetProcAddress((HMODULE)library, CREATE_DEVICE_GCC);
 #else
-	if(!(library = dlopen("irrKlang.dll", RTLD_NOW)))
+#ifdef __APPLE__
+	if(!(library = dlopen("./libIrrKlang.dll", RTLD_NOW)))
+#else
+	if(!(library = dlopen("./libIrrKlang.dylib", RTLD_NOW)))
+#endif
 	   return;
 	createdevice = (decltype(createdevice))dlsym(library, CREATE_DEVICE_GCC);
 #endif

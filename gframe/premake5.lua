@@ -29,12 +29,6 @@ local ygopro_config=function(static_core)
 			includedirs "../irrKlang/include"
 			files "sound_irrklang.*"
 			files "irrklang_dynamic_loader.*"
-			filter "system:windows"
-				libdirs "../irrKlang/lib/Win32-visualStudio"
-			filter "system:macosx"
-				libdirs "../irrKlang/bin/macosx-gcc/"
-			filter "system:linux"
-				libdirs "../irrKlang/bin/linux-gcc-64/"
 		end
 		if _OPTIONS["sound"]=="sdl-mixer" then
 			defines "YGOPRO_USE_SDL_MIXER"
