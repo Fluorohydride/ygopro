@@ -42,7 +42,15 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 	}
 	return false;
 #elif defined(__ANDROID__)
-	std::string param = fmt::format("Deck='{}' HostInfo='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}", BufferIO::EncodeUTF8s(pass).c_str(),BufferIO::EncodeUTF8s(deck).c_str(), port, version, BufferIO::EncodeUTF8s(name).c_str(), chat ? 1 : 0, hand);
+	std::string param = fmt::format(
+		"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
+		BufferIO::EncodeUTF8s(pass).c_str(),
+		BufferIO::EncodeUTF8s(deck).c_str(),
+		port,
+		version,
+		BufferIO::EncodeUTF8s(name).c_str(),
+		static_cast<int>(chat),
+		hand);
 	porting::launchWindbot(param);
 	return true;
 #else
@@ -60,7 +68,7 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 			std::string envPath = getenv("PATH") + (":" + executablePath);
 			setenv("PATH", envPath.c_str(), true);
 		}
-		execlp("mono", "WindBot.exe", "WindBot.exe", 
+		execlp("mono", "WindBot.exe", "WindBot.exe",
 			   argPass.c_str(), argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
 			hand ? argHand.c_str() : nullptr, nullptr);
 		auto message = fmt::format("Failed to start WindBot Ignite: {}", strerror(errno));
