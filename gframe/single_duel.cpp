@@ -629,7 +629,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(host_info.time_limit) {
 		time_elapsed = 0;
 #ifdef YGOPRO_SERVER_MODE
-		time_compensator = 60;
+		time_compensator = 120;
 #endif
 		timeval timeout = { 1, 0 };
 		event_add(etimer, &timeout);
