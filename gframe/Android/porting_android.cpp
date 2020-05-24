@@ -334,15 +334,12 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 		case irr::EET_SYSTEM_EVENT: {
 			switch(event.SystemEvent.AndroidCmd.Cmd) {
 				case APP_CMD_PAUSE: {
+					ygo::mainGame->SaveConfig();
 					ygo::gSoundManager->PauseMusic(true);
 					break;
 				}
 				case APP_CMD_RESUME: {
 					ygo::gSoundManager->PauseMusic(false);
-					break;
-				}
-				case APP_CMD_DESTROY: {
-					ygo::mainGame->SaveConfig();
 					break;
 				}
 				default: break;
