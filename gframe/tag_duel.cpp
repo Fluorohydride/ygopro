@@ -1968,6 +1968,10 @@ void TagDuel::TimeConfirm(DuelPlayer* dp) {
 		time_compensator[dp->type] -= time_elapsed;
 		time_elapsed = 0;
 	}
+	else {
+		time_limit[dp->type] -= time_elapsed;
+		time_elapsed = 0;
+	}
 #else
 	if(time_elapsed < 10)
 		time_elapsed = 0;
