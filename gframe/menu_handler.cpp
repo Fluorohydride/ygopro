@@ -837,7 +837,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case COMBOBOX_DUEL_RULE: {
 				auto combobox = static_cast<irr::gui::IGUIComboBox*>(event.GUIEvent.Caller);
-#define CHECK(MR) case (MR - 1): { mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB; mainGame->chkRules[13]->setChecked(false); goto remove; }
+#define CHECK(MR) case (MR - 1): { mainGame->duel_param = DUEL_MODE_MR##MR; mainGame->forbiddentypes = DUEL_MODE_MR##MR##_FORB;\
+									mainGame->chkRules[13]->setChecked(false); mainGame->ebStartHand->setText(L"5"); goto remove; }
 				switch (combobox->getSelected()) {
 				CHECK(1)
 				CHECK(2)
