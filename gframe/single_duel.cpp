@@ -629,7 +629,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(host_info.time_limit) {
 		time_elapsed = 0;
 #ifdef YGOPRO_SERVER_MODE
-		time_compensator = host_info.time_limit;
+		time_compensator[0] = host_info.time_limit;
+		time_compensator[1] = host_info.time_limit;
 #endif
 		timeval timeout = { 1, 0 };
 		event_add(etimer, &timeout);
@@ -1143,6 +1144,10 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 #endif
 			time_limit[0] = host_info.time_limit;
 			time_limit[1] = host_info.time_limit;
+#ifdef YGOPRO_SERVER_MODE
+			time_compensator[0] = host_info.time_limit;
+			time_compensator[1] = host_info.time_limit;
+#endif
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -1880,8 +1885,8 @@ void SingleDuel::TimeConfirm(DuelPlayer* dp) {
 		return;
 	players[last_response]->state = CTOS_RESPONSE;
 #ifdef YGOPRO_SERVER_MODE
-	if(time_elapsed < 10 && time_elapsed <= time_compensator){
-		time_compensator -= time_elapsed;
+	if(time_elapsed < 10 && time_elapsed <= time_compensator[dp->type]){
+		time_compensator[dp->type] -= time_elapsed;
 		time_elapsed = 0;
 	}
 #else
