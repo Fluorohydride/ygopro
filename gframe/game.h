@@ -149,6 +149,8 @@ public:
 	void AddDebugMsg(const char* msgbuf);
 	void ErrorLog(const char* msgbuf);
 	void ClearTextures();
+	void CloseGameButtons();
+	void CloseGameWindow();
 	void CloseDuelWindow();
 
 	int LocalPlayer(int player);
