@@ -1,5 +1,5 @@
 #include "utils_gui.h"
-#include <Irrlicht.h>
+#include <irrlicht.h>
 #include <ICursorControl.h>
 #include <fmt/chrono.h>
 #include <fmt/format.h>
