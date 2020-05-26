@@ -2,6 +2,7 @@
 #include <fstream>
 #include <curl/curl.h>
 #include <irrlicht.h>
+#include "utils_gui.h"
 #include "deck_manager.h"
 #include "logging.h"
 #include "utils.h"
@@ -89,20 +90,7 @@ DataHandler::DataHandler() {
 	configs = std::unique_ptr<GameConfig>(new GameConfig);
 	tmp_device = nullptr;
 #ifndef __ANDROID__
-	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
-	params.AntiAlias = configs->antialias;
-#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
-	if(configs->use_d3d)
-		params.DriverType = irr::video::EDT_DIRECT3D9;
-	else
-#endif
-		params.DriverType = irr::video::EDT_OPENGL;
-	params.WindowSize = irr::core::dimension2d<irr::u32>(1024 * configs->dpi_scale, 640 * configs->dpi_scale);
-	params.Vsync = configs->vsync;
-	tmp_device = irr::createDeviceEx(params);
-	if(!tmp_device) {
-		throw std::runtime_error("Failed to create Irrlicht Engine device!");
-	}
+	tmp_device = GUIUtils::CreateDevice(configs.get());
 #endif
 	filesystem = new irr::io::CFileSystem();
 	Utils::filesystem = filesystem;

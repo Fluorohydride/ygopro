@@ -1,15 +1,18 @@
 #include "utils_gui.h"
-#include <IrrlichtDevice.h>
+#include <Irrlicht.h>
 #include <ICursorControl.h>
 #include <fmt/chrono.h>
 #include <fmt/format.h>
+#include "game_config.h"
 #include "text_types.h"
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <vector>
 #include "logging.h"
-#elif defined(__linux__) && !defined(__ANDROID__)
+#elif defined(__ANDROID__)
+#include "Android/COSAndroidOperator.h"
+#elif defined(__linux__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #elif defined(__APPLE__)
@@ -17,6 +20,74 @@
 #endif
 
 namespace ygo {
+
+irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
+	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
+	params.AntiAlias = configs->antialias;
+#ifndef __ANDROID__
+#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
+	if(configs->use_d3d)
+		params.DriverType = irr::video::EDT_DIRECT3D9;
+	else
+#endif
+		params.DriverType = irr::video::EDT_OPENGL;
+	params.WindowSize = irr::core::dimension2d<irr::u32>(1024 * configs->dpi_scale, 640 * configs->dpi_scale);
+	params.Vsync = configs->vsync;
+#else
+	if(gGameConfig->use_d3d) {
+		params.DriverType = irr::video::EDT_OGLES1;
+	} else {
+		params.DriverType = irr::video::EDT_OGLES2;
+	}
+	params.PrivateData = porting::app_global;
+	params.Bits = 24;
+	params.ZBufferBits = 16;
+	params.AntiAlias = 0;
+	params.WindowSize = irr::core::dimension2du(0, 0);
+#endif
+	irr::IrrlichtDevice* device = irr::createDeviceEx(params);
+	if(!device) {
+		throw std::runtime_error("Failed to create Irrlicht Engine device!");
+	}
+	auto driver = device->getVideoDriver();
+#ifdef __ANDROID__
+	auto filesystem = device->getFileSystem();
+	// The Android assets file-system does not know which sub-directories it has (blame google).
+	// So we have to add all sub-directories in assets manually. Otherwise we could still open the files,
+	// but existFile checks will fail (which are for example needed by getFont).
+	for(int i = 0; i < filesystem->getFileArchiveCount(); ++i) {
+		auto archive = filesystem->getFileArchive(i);
+		if(archive->getType() == irr::io::EFAT_ANDROID_ASSET) {
+			archive->addDirectoryToFileList("media/");
+			break;
+		}
+}
+	irr::IOSOperator* Operator = new irr::COSAndroidOperator();
+	device->getGUIEnvironment()->setOSOperator(Operator);
+	Operator->drop();
+	if(driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT)) {
+		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	} else {
+		driver->setTextureCreationFlag(irr::video::ETCF_ALLOW_NON_POWER_2, true);
+		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	}
+#else
+	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+#endif
+	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
+	device->setWindowCaption(L"Project Ignis: EDOPro");
+	device->setResizable(true);
+#ifdef _WIN32
+	HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
+	HICON hSmallIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 16, 16, LR_DEFAULTCOLOR);
+	HICON hBigIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(1), IMAGE_ICON, 32, 32, LR_DEFAULTCOLOR);
+	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
+	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
+	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
+#endif
+	device->getLogger()->setLogLevel(irr::ELL_ERROR);
+	return device;
+}
 
 void GUIUtils::ChangeCursor(irr::IrrlichtDevice* device, /*irr::gui::ECURSOR_ICON*/ int _icon) {
 #ifndef __ANDROID__
@@ -43,50 +114,45 @@ void GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 #ifdef _WIN32
-	static RECT nonFullscreenSize;
-	static std::vector<RECT> monitors;
-	static bool maximized = false;
-	if(monitors.empty()) {
+	static WINDOWPLACEMENT nonFullscreenSize;
+	static LONG nonFullscreenStyle;
+	static constexpr LONG_PTR fullscreenStyle = WS_POPUP | WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+	static const std::vector<RECT> monitors = []() {
+		std::vector<RECT> ret;
 		EnumDisplayMonitors(0, 0, [](HMONITOR hMon, HDC hdc, LPRECT lprcMonitor, LPARAM pData) -> BOOL {
 			auto monitors = reinterpret_cast<std::vector<RECT>*>(pData);
 			monitors->push_back(*lprcMonitor);
 			return TRUE;
-		}, (LPARAM)&monitors);
-	}
+		}, (LPARAM)&ret);
+		return ret;
+	}();
 	fullscreen = !fullscreen;
 	const auto driver = device->getVideoDriver();
 	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
-	LONG_PTR style = WS_POPUP;
 	RECT clientSize = {};
 	if(fullscreen) {
-		if(GetWindowLong(hWnd, GWL_STYLE) & WS_MAXIMIZE) {
-			maximized = true;
-		}
-		GetWindowRect(hWnd, &nonFullscreenSize);
-		style = WS_SYSMENU | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-		for(auto& rect : monitors) {
-			POINT windowCenter = { (nonFullscreenSize.left + (nonFullscreenSize.right - nonFullscreenSize.left) / 2), (nonFullscreenSize.top + (nonFullscreenSize.bottom - nonFullscreenSize.top) / 2) };
+		GetWindowPlacement(hWnd, &nonFullscreenSize);
+		nonFullscreenStyle = GetWindowLong(hWnd, GWL_STYLE);
+		static RECT curSize;
+		GetWindowRect(hWnd, &curSize);
+		for(const auto& rect : monitors) {
+			POINT windowCenter = { (curSize.left + (curSize.right - curSize.left) / 2), (curSize.top + (curSize.bottom - curSize.top) / 2) };
 			if(PtInRect(&rect, windowCenter)) {
 				clientSize = rect;
 				break;
 			}
 		}
+		if(!SetWindowLongPtr(hWnd, GWL_STYLE, fullscreenStyle))
+			ErrorLog("Could not change window style.");
+
+		const auto width = clientSize.right - clientSize.left;
+		const auto height = clientSize.bottom - clientSize.top;
+
+		SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 	} else {
-		style = WS_THICKFRAME | WS_SYSMENU | WS_CAPTION | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-		clientSize = nonFullscreenSize;
-		if(maximized) {
-			style |= WS_MAXIMIZE;
-			maximized = false;
-		}
+		SetWindowPlacement(hWnd, &nonFullscreenSize);
+		SetWindowLongPtr(hWnd, GWL_STYLE, nonFullscreenStyle);
 	}
-
-	if(!SetWindowLongPtr(hWnd, GWL_STYLE, style))
-		ErrorLog("Could not change window style.");
-
-	const auto width = clientSize.right - clientSize.left;
-	const auto height = clientSize.bottom - clientSize.top;
-
-	SetWindowPos(hWnd, HWND_TOP, clientSize.left, clientSize.top, width, height, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 #elif defined(__linux__) && !defined(__ANDROID__)
 	struct {
 		unsigned long   flags;
