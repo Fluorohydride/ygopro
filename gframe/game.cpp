@@ -1472,43 +1472,22 @@ bool Game::MainLoop() {
 	bool was_connected = false;
 	bool update_prompted = false;
 	bool unzip_started = false;
-#ifdef __ANDROID__
-	ogles2Solid = 0;
-	ogles2TrasparentAlpha = 0;
-	ogles2BlendTexture = 0;
-	ogles2Solid = irr::video::EMT_SOLID;
-	ogles2TrasparentAlpha = irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
-	ogles2BlendTexture = irr::video::EMT_ONETEXTURE_BLEND;
-	matManager.mCard.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mTexture.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
-	matManager.mBackLine.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mSelField.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mLinkedField.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mMutualLinkedField.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	matManager.mOutLine.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2Solid;
-	matManager.mTRTexture.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2TrasparentAlpha;
-	matManager.mATK.MaterialType = (irr::video::E_MATERIAL_TYPE)ogles2BlendTexture;
-	if(!isNPOTSupported) {
-		matManager.mCard.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mCard.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mTexture.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mTexture.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mBackLine.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mBackLine.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mSelField.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mSelField.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mLinkedField.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mLinkedField.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mMutualLinkedField.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mMutualLinkedField.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mOutLine.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mOutLine.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mTRTexture.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mTRTexture.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mATK.TextureLayer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
-		matManager.mATK.TextureLayer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+	if(!driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT)) {
+		auto SetClamp = [](irr::video::SMaterialLayer layer[irr::video::MATERIAL_MAX_TEXTURES]) {
+			layer[0].TextureWrapU = irr::video::ETC_CLAMP_TO_EDGE;
+			layer[0].TextureWrapV = irr::video::ETC_CLAMP_TO_EDGE;
+		};
+		SetClamp(matManager.mCard.TextureLayer);
+		SetClamp(matManager.mTexture.TextureLayer);
+		SetClamp(matManager.mBackLine.TextureLayer);
+		SetClamp(matManager.mSelField.TextureLayer);
+		SetClamp(matManager.mLinkedField.TextureLayer);
+		SetClamp(matManager.mMutualLinkedField.TextureLayer);
+		SetClamp(matManager.mOutLine.TextureLayer);
+		SetClamp(matManager.mTRTexture.TextureLayer);
+		SetClamp(matManager.mATK.TextureLayer);
+		SetClamp(matManager.mCard.TextureLayer);
 	}
-#endif
 	if (gGameConfig->fullscreen) {
 		// Synchronize actual fullscreen state with config struct
 		bool currentlyFullscreen = false;

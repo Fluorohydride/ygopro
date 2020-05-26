@@ -15,12 +15,17 @@
 #else
 #include "../IrrlichtCommonIncludes/os.h"
 #endif
-#ifdef __ANDROID__
-#include "../game.h"
-#endif
 
 namespace irr {
 namespace gui {
+
+bool hasNPotSupport(irr::video::IVideoDriver* driver) {
+	auto check = [](irr::video::IVideoDriver* driver)->bool {
+		return driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT);
+	};
+	static const bool supported = check(driver);
+	return supported;
+}
 
 void Draw2DImageRotation(video::IVideoDriver* driver, video::ITexture* image, core::rect<s32> sourceRect,
 						 core::position2d<s32> position, core::position2d<s32> rotationPoint, f32 rotation, core::vector2df scale, bool useAlphaChannel, video::SColor color) {
@@ -62,19 +67,13 @@ void Draw2DImageRotation(video::IVideoDriver* driver, video::ITexture* image, co
 	material.Lighting = false;
 	material.ZWriteEnable = false;
 	material.TextureLayer[0].Texture = image;
-#if defined(__ANDROID__)
-	if(!ygo::mainGame->isNPOTSupported) {
+	if(!hasNPotSupport(driver)) {
 		material.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
 		material.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 	}
 	if(useAlphaChannel)
-		material.MaterialType = (video::E_MATERIAL_TYPE)ygo::mainGame->ogles2TrasparentAlpha;
-	else material.MaterialType = (video::E_MATERIAL_TYPE)ygo::mainGame->ogles2Solid;
-#else
-	if(useAlphaChannel)
 		material.MaterialType = irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
 	else material.MaterialType = irr::video::EMT_SOLID;
-#endif
 
 	driver->setMaterial(material);
 	driver->drawIndexedTriangleList(&vertices[0], 4, &indices[0], 2);
@@ -112,19 +111,13 @@ void Draw2DImageQuad(video::IVideoDriver* driver, video::ITexture* image, core::
 	material.Lighting = false;
 	material.ZWriteEnable = false;
 	material.TextureLayer[0].Texture = image;
-#if defined(__ANDROID__)
-	if(!ygo::mainGame->isNPOTSupported) {
+	if(!hasNPotSupport(driver)) {
 		material.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
 		material.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 	}
 	if(useAlphaChannel)
-		material.MaterialType = (video::E_MATERIAL_TYPE)ygo::mainGame->ogles2TrasparentAlpha;
-	else material.MaterialType = (video::E_MATERIAL_TYPE)ygo::mainGame->ogles2Solid;
-#else
-	if(useAlphaChannel)
 		material.MaterialType = irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL;
 	else material.MaterialType = irr::video::EMT_SOLID;
-#endif
 	driver->setMaterial(material);
 	driver->drawIndexedTriangleList(&vertices[0], 4, &indices[0], 2);
 	driver->setTransform(irr::video::ETS_PROJECTION, oldProjMat);

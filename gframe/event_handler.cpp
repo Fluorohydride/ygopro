@@ -17,7 +17,6 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "custom_skin_enum.h"
 #ifdef __ANDROID__
-#include <android_native_app_glue.h>
 #include "Android/porting_android.h"
 #endif
 #include <IrrlichtDevice.h>

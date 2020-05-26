@@ -1,9 +1,6 @@
 #ifndef GAME_H
 #define GAME_H
 
-#ifdef __ANDROID__
-#include <android_native_app_glue.h>
-#endif
 #include <unordered_map>
 #include <vector>
 #include <list>
@@ -670,16 +667,6 @@ public:
 	irr::gui::IGUIButton* btnJoinHost2;
 	irr::gui::IGUIButton* btnJoinCancel2;
 	irr::gui::IGUIStaticText* fpsCounter;
-
-#ifdef __ANDROID__
-	int glversion;
-	bool isPSEnabled;
-	bool isNPOTSupported;
-	irr::s32 ogles2Solid;
-	irr::s32 ogles2TrasparentAlpha;
-	irr::s32 ogles2BlendTexture;
-	Signal externalSignal;
-#endif
 	std::vector<std::pair<irr::gui::IGUIElement*, int32>> defaultStrings;
 };
 
