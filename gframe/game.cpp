@@ -38,10 +38,6 @@
 
 #ifdef __ANDROID__
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
-class android_app;
-namespace porting {
-extern android_app* app_global;
-}
 #define ADDComboBox(...) (gGameConfig->native_mouse ? env->addComboBox(__VA_ARGS__): irr::gui::CGUICustomComboBox::addCustomComboBox(env, __VA_ARGS__))
 #define MATERIAL_GUARD(f) do {driver->enableMaterial2D(true); f; driver->enableMaterial2D(false);} while(false);
 #else
@@ -121,9 +117,6 @@ bool Game::Initialize() {
 	dInfo = {};
 	memset(chatTiming, 0, sizeof(chatTiming));
 	driver = device->getVideoDriver();
-#ifdef __ANDROID__
-	isNPOTSupported = driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT);
-#endif
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial()) {
 		ErrorLog("Failed to load textures!");

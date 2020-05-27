@@ -12,6 +12,10 @@
 #include "logging.h"
 #elif defined(__ANDROID__)
 #include "Android/COSAndroidOperator.h"
+class android_app;
+namespace porting {
+extern android_app* app_global;
+}
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
