@@ -1008,22 +1008,29 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnHandTest, 1297);
 	btnHandTest->setVisible(false);
 	btnHandTest->setEnabled(coreloaded);
-	auto wHandTest = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(1297).c_str());
+	wHandTest = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(1297).c_str());
 	wHandTest->getCloseButton()->setVisible(false);
+	// wHandTest->setVisible(false);
+	defaultStrings.emplace_back(wHandTest, 1297);
 	auto nextHandTestRow = [this](int leftRail, int rightRail, bool increment = true) {
 		static int offset = 0;
 		if (increment) offset += 35;
 		return Scale(leftRail, offset, rightRail, offset + 25);
 	};
-	env->addCheckBox(true, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, L"No opponent");
-	env->addCheckBox(false, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, gDataManager->GetSysString(1230).c_str());
-	env->addStaticText(gDataManager->GetSysString(1232).c_str(), nextHandTestRow(10, 90), false, false, wHandTest);
-	env->addEditBox(L"5", nextHandTestRow(95, 175, false), true, wHandTest, EDITBOX_NUMERIC)->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);;
-	env->addStaticText(gDataManager->GetSysString(1236).c_str(), nextHandTestRow(10, 90), false, false, wHandTest);
-	ADDComboBox(nextHandTestRow(95, mainMenuWidth - 10, false), wHandTest);
-	env->addButton(nextHandTestRow(10, mainMenuWidth / 2 - 5), wHandTest, -1, gDataManager->GetSysString(1210).c_str()); // cancel
-	env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, -1, gDataManager->GetSysString(1215).c_str()); // start
-
+	chkHandTestNoOpponent = env->addCheckBox(true, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, L"No opponent");
+	chkHandTestNoShuffle = env->addCheckBox(false, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, gDataManager->GetSysString(1230).c_str());
+	defaultStrings.emplace_back(chkHandTestNoShuffle, 1230);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1232).c_str(), nextHandTestRow(10, 90), false, false, wHandTest);
+	defaultStrings.emplace_back(tmpptr, 1232);
+	ebHandTestStartHand = env->addEditBox(L"5", nextHandTestRow(95, 175, false), true, wHandTest, EDITBOX_NUMERIC);
+	ebHandTestStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).c_str(), nextHandTestRow(10, 90), false, false, wHandTest);
+	defaultStrings.emplace_back(tmpptr, 1236);
+	cbHandTestDuelRule = ADDComboBox(nextHandTestRow(95, mainMenuWidth - 10, false), wHandTest);
+	tmpptr = env->addButton(nextHandTestRow(10, mainMenuWidth / 2 - 5), wHandTest, -1, gDataManager->GetSysString(1210).c_str()); // cancel
+	defaultStrings.emplace_back(tmpptr, 1210);
+	tmpptr = env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, -1, gDataManager->GetSysString(1215).c_str()); // start
+	defaultStrings.emplace_back(tmpptr, 1215);
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
 	scrFilter->setLargeStep(DECK_SEARCH_SCROLL_STEP);

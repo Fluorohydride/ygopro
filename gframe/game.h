@@ -565,7 +565,14 @@ public:
 	irr::gui::IGUIStaticText* wDeckEdit;
 	irr::gui::IGUIComboBox* cbDBLFList;
 	irr::gui::IGUIComboBox* cbDBDecks;
+
 	irr::gui::IGUIButton* btnHandTest;
+	irr::gui::IGUIWindow* wHandTest;
+	irr::gui::IGUICheckBox* chkHandTestNoOpponent;
+	irr::gui::IGUICheckBox* chkHandTestNoShuffle;
+	irr::gui::IGUIEditBox* ebHandTestStartHand;
+	irr::gui::IGUIComboBox* cbHandTestDuelRule;
+
 	irr::gui::IGUIButton* btnClearDeck;
 	irr::gui::IGUIButton* btnSortDeck;
 	irr::gui::IGUIButton* btnShuffleDeck;
