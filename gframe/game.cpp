@@ -1010,7 +1010,7 @@ bool Game::Initialize() {
 	btnHandTest->setEnabled(coreloaded);
 	wHandTest = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(1297).c_str());
 	wHandTest->getCloseButton()->setVisible(false);
-	// wHandTest->setVisible(false);
+	wHandTest->setVisible(false);
 	defaultStrings.emplace_back(wHandTest, 1297);
 	auto nextHandTestRow = [this](int leftRail, int rightRail, bool increment = true) {
 		static int offset = 0;
@@ -1027,9 +1027,11 @@ bool Game::Initialize() {
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).c_str(), nextHandTestRow(10, 90), false, false, wHandTest);
 	defaultStrings.emplace_back(tmpptr, 1236);
 	cbHandTestDuelRule = ADDComboBox(nextHandTestRow(95, mainMenuWidth - 10, false), wHandTest);
-	tmpptr = env->addButton(nextHandTestRow(10, mainMenuWidth / 2 - 5), wHandTest, -1, gDataManager->GetSysString(1210).c_str()); // cancel
+	ReloadCBDuelRule(cbHandTestDuelRule);
+	cbHandTestDuelRule->setSelected(4);
+	tmpptr = env->addButton(nextHandTestRow(10, mainMenuWidth / 2 - 5), wHandTest, BUTTON_HAND_TEST_CANCEL, gDataManager->GetSysString(1210).c_str()); // cancel
 	defaultStrings.emplace_back(tmpptr, 1210);
-	tmpptr = env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, -1, gDataManager->GetSysString(1215).c_str()); // start
+	tmpptr = env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, BUTTON_HAND_TEST_START, gDataManager->GetSysString(1215).c_str()); // start
 	defaultStrings.emplace_back(tmpptr, 1215);
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
@@ -2722,15 +2724,16 @@ void Game::ReloadCBFilterRule() {
 	for (auto i = 1900; i <= 1904; ++i)
 		cbFilterRule->addItem(gDataManager->GetSysString(i).c_str());
 }
-void Game::ReloadCBDuelRule() {
-	cbDuelRule->clear();
-	cbDuelRule->addItem(gDataManager->GetSysString(1260).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1261).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1262).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1263).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1264).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1258).c_str());
-	cbDuelRule->addItem(gDataManager->GetSysString(1259).c_str());
+void Game::ReloadCBDuelRule(irr::gui::IGUIComboBox* cb) {
+	if (!cb) cb = cbDuelRule;
+	cb->clear();
+	cb->addItem(gDataManager->GetSysString(1260).c_str());
+	cb->addItem(gDataManager->GetSysString(1261).c_str());
+	cb->addItem(gDataManager->GetSysString(1262).c_str());
+	cb->addItem(gDataManager->GetSysString(1263).c_str());
+	cb->addItem(gDataManager->GetSysString(1264).c_str());
+	cb->addItem(gDataManager->GetSysString(1258).c_str());
+	cb->addItem(gDataManager->GetSysString(1259).c_str());
 }
 void Game::ReloadCBRule() {
 	cbRule->clear();
@@ -2820,6 +2823,10 @@ void Game::ReloadElementsStrings() {
 		ReloadCBDuelRule();
 		cbDuelRule->setSelected(prev);
 	}
+
+	prev = cbHandTestDuelRule->getSelected();
+	ReloadCBDuelRule(cbHandTestDuelRule);
+	cbHandTestDuelRule->setSelected(prev);
 
 	prev = cbRule->getSelected();
 	ReloadCBRule();

@@ -315,6 +315,7 @@ restart:
 			mainGame->btnRestartSingle->setVisible(false);
 			mainGame->wPhase->setVisible(false);
 			mainGame->deckBuilder.Initialize(false);
+			mainGame->wHandTest->setVisible(true);
 			mainGame->gMutex.unlock();
 		}
 	}

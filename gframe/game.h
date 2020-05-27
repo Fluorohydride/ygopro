@@ -182,7 +182,7 @@ public:
 	void ReloadCBAttribute();
 	void ReloadCBRace();
 	void ReloadCBFilterRule();
-	void ReloadCBDuelRule();
+	void ReloadCBDuelRule(irr::gui::IGUIComboBox* cb = nullptr);
 	void ReloadCBRule();
 	void ReloadCBCurrentSkin();
 	void ReloadCBCoreLogOutput();

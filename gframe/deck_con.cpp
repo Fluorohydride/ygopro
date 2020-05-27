@@ -152,11 +152,20 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_HAND_TEST: {
+				mainGame->PopupElement(mainGame->wHandTest);
+				break;
+			}
+			case BUTTON_HAND_TEST_START: {
 				Terminate(false);
 				open_file = true;
 				open_file_name = EPRO_TEXT("hand-test-mode");
 				SingleMode::singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
+				if (mainGame->wHandTest->isVisible()) mainGame->HideElement(mainGame->wHandTest);
+				break;
+			}
+			case BUTTON_HAND_TEST_CANCEL: {
+				mainGame->HideElement(mainGame->wHandTest);
 				break;
 			}
 			case BUTTON_CLEAR_DECK: {
