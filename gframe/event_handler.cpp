@@ -2004,7 +2004,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				return true;
 			}
 			case CHECKBOX_SAVE_HAND_TEST_REPLAY: {
-				gGameConfig->saveHandTest = mainGame->gSettings.chkSaveHandTest->isChecked();
+				gGameConfig->saveHandTest = static_cast<irr::gui::IGUICheckBox*>(event.GUIEvent.Caller)->isChecked();
 				return true;
 			}
 			case CHECKBOX_LOOP_MUSIC: {

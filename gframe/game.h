@@ -572,6 +572,7 @@ public:
 	irr::gui::IGUICheckBox* chkHandTestNoShuffle;
 	irr::gui::IGUIEditBox* ebHandTestStartHand;
 	irr::gui::IGUIComboBox* cbHandTestDuelRule;
+	irr::gui::IGUICheckBox* chkHandTestSaveReplay;
 
 	irr::gui::IGUIButton* btnClearDeck;
 	irr::gui::IGUIButton* btnSortDeck;

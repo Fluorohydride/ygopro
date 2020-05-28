@@ -709,8 +709,10 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(gSettings.stCoreLogOutput, 1998);
 	gSettings.cbCoreLogOutput = ADDComboBox(Scale(435, 125, 645, 150), sPanel, COMBOBOX_CORE_LOG_OUTPUT);
 	ReloadCBCoreLogOutput();
-	gSettings.chkSaveHandTest = env->addCheckBox(gGameConfig->saveHandTest, Scale(340, 155, 645, 180), sPanel, CHECKBOX_SAVE_HAND_TEST_REPLAY, gDataManager->GetSysString(2077).c_str());
-	defaultStrings.emplace_back(gSettings.chkSaveHandTest, 2077);
+#ifdef UPDATE_URL
+	gSettings.chkUpdates = env->addCheckBox(gGameConfig->noClientUpdates, Scale(340, 155, 645, 180), sPanel, -1, gDataManager->GetSysString(1466).c_str());
+	defaultStrings.emplace_back(gSettings.chkUpdates, 1466);
+#endif
 	// audio
 	gSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(340, 185, 645, 210), sPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).c_str());
 	defaultStrings.emplace_back(gSettings.chkEnableSound, 2047);
@@ -744,10 +746,6 @@ bool Game::Initialize() {
 #endif
 	gSettings.chkHideHandsInReplays = env->addCheckBox(gGameConfig->hideHandsInReplays, Scale(340, 365, 645, 390), sPanel, CHECKBOX_HIDE_HANDS_REPLAY, gDataManager->GetSysString(2080).c_str());
 	defaultStrings.emplace_back(gSettings.chkHideHandsInReplays, 2080);
-#ifdef UPDATE_URL
-	gSettings.chkUpdates = env->addCheckBox(gGameConfig->noClientUpdates, Scale(340, 395, 645, 420), sPanel, -1, gDataManager->GetSysString(1466).c_str());
-	defaultStrings.emplace_back(gSettings.chkUpdates, 1466);
-#endif
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
 	wBtnSettings->getCloseButton()->setVisible(false);
@@ -1029,6 +1027,8 @@ bool Game::Initialize() {
 	cbHandTestDuelRule = ADDComboBox(nextHandTestRow(95, mainMenuWidth - 10, false), wHandTest);
 	ReloadCBDuelRule(cbHandTestDuelRule);
 	cbHandTestDuelRule->setSelected(4);
+	chkHandTestSaveReplay = env->addCheckBox(gGameConfig->saveHandTest, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, CHECKBOX_SAVE_HAND_TEST_REPLAY, gDataManager->GetSysString(2077).c_str());
+	defaultStrings.emplace_back(chkHandTestSaveReplay, 2077);
 	tmpptr = env->addButton(nextHandTestRow(10, mainMenuWidth / 2 - 5), wHandTest, BUTTON_HAND_TEST_CANCEL, gDataManager->GetSysString(1210).c_str()); // cancel
 	defaultStrings.emplace_back(tmpptr, 1210);
 	tmpptr = env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, BUTTON_HAND_TEST_START, gDataManager->GetSysString(1215).c_str()); // start
