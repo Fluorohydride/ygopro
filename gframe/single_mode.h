@@ -16,11 +16,20 @@ private:
 	static bool is_restarting;
 
 public:
-	static bool StartPlay();
+	struct DuelOptions {
+		int startingLP = 8000;
+		int startingDrawCount = 5;
+		int drawCountPerTurn = 1;
+		int duelFlags = 0;
+		bool handTestNoOpponent = true;
+		bool handTestNoShuffle = false;
+	};
+
+	static bool StartPlay(const DuelOptions& duelOptions = DuelOptions());
 	static void StopPlay(bool is_exiting = false);
 	static void Restart();
 	static void SetResponse(unsigned char* resp, unsigned int len);
-	static int SinglePlayThread();
+	static int SinglePlayThread(const DuelOptions& duelOptions);
 	static bool SinglePlayAnalyze(CoreUtils::Packet packet);
 	
 	static void SinglePlayRefresh(int player, int location, int flag = 0x2f81fff);

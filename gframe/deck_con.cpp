@@ -124,6 +124,7 @@ void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->ClearCardInfo(0);
 	}
 	mainGame->btnHandTest->setVisible(false);
+	mainGame->wHandTest->setVisible(false);
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
 	mainGame->scrFilter->setVisible(false);
@@ -159,9 +160,31 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				Terminate(false);
 				open_file = true;
 				open_file_name = EPRO_TEXT("hand-test-mode");
+				SingleMode::DuelOptions options;
+				options.handTestNoOpponent = mainGame->chkHandTestNoOpponent->isChecked();
+				options.handTestNoShuffle = mainGame->chkHandTestNoShuffle->isChecked();
+				try {
+					options.startingDrawCount = std::stoi(mainGame->ebHandTestStartHand->getText());
+				} catch(...) {}
+#define CHECK(MR) case (MR - 1):{  options.duelFlags |= DUEL_MODE_MR##MR; break; }
+				switch (mainGame->cbHandTestDuelRule->getSelected()) {
+				CHECK(1)
+				CHECK(2)
+				CHECK(3)
+				CHECK(4)
+				CHECK(5)
+				case 5: {
+					options.duelFlags |= DUEL_MODE_SPEED;
+					break;
+				}
+				case 6: {
+					options.duelFlags |= DUEL_MODE_RUSH;
+					break;
+				}
+				}
+#undef CHECK
 				SingleMode::singleSignal.SetNoWait(false);
-				SingleMode::StartPlay();
-				if (mainGame->wHandTest->isVisible()) mainGame->HideElement(mainGame->wHandTest);
+				SingleMode::StartPlay(options);
 				break;
 			}
 			case BUTTON_HAND_TEST_CANCEL: {
