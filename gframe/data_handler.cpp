@@ -32,8 +32,8 @@ void DataHandler::LoadArchivesDB() {
 				continue;
 			buffer.resize(reader->getSize());
 			reader->read(buffer.data(), buffer.size());
-			reader->drop();
 			std::string filename(irr::core::stringc(reader->getFileName()).c_str()); //the zip loader stores the names as utf8
+			reader->drop();
 			dataManager->LoadDBFromBuffer(buffer, filename);
 		}
 	}
