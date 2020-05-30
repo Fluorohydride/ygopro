@@ -6,6 +6,7 @@
 #include <cwctype>
 #include <functional>
 #include <map>
+#include <memory> // unique_ptr
 #include <string>
 #include <vector>
 #include <mutex>
