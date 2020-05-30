@@ -3102,14 +3102,11 @@ std::vector<char> Game::LoadScript(const std::string& _name) {
 	path_string name = Utils::ToPathString(_name);
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives")) {
-			auto reader = Utils::FindFileInArchives(EPRO_TEXT("script/"), name);
-			if(!reader.reader)
+			auto lockedIrrFile = Utils::FindFileInArchives(EPRO_TEXT("script/"), name);
+			if(!lockedIrrFile)
 				continue;
-			buffer.resize(reader.reader->getSize());
-			bool readed = reader.reader->read(buffer.data(), buffer.size()) == buffer.size();
-			reader.reader->drop();
-			reader.lk->unlock();
-			if(readed)
+			buffer.resize(lockedIrrFile.reader->getSize());
+			if (lockedIrrFile.reader->read(buffer.data(), buffer.size()) == buffer.size())
 				return buffer;
 		} else {
 			script.open(path + name, std::ifstream::binary);

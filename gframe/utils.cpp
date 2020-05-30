@@ -206,7 +206,15 @@ namespace ygo {
 		}
 		return res;
 	}
-	Utils::locked_reader Utils::FindFileInArchives(const path_string& path, const path_string& name) {
+	Utils::MutexLockedIrrArchivedFile::~MutexLockedIrrArchivedFile() {
+		if (reader) {
+			reader->drop();
+		}
+		if (mutex) {
+			mutex->unlock();
+		}
+	}
+	Utils::MutexLockedIrrArchivedFile Utils::FindFileInArchives(const path_string& path, const path_string& name) {
 		for(auto& archive : archives) {
 			archive.lk->lock();
 			int res = -1;
@@ -215,11 +223,11 @@ namespace ygo {
 			if(res != -1) {
 				auto reader = archive.archive->createAndOpenFile(res);
 				if(reader)
-					return { reader, archive.lk.get() };
+					return MutexLockedIrrArchivedFile(archive.lk.get(), reader);
 			}
 			archive.lk->unlock();
 		}
-		return { nullptr, nullptr };
+		return MutexLockedIrrArchivedFile();
 	}
 	path_string Utils::ToPathString(const std::wstring& input) {
 #ifdef UNICODE

@@ -408,15 +408,17 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 				if(timestamp_id != source_timestamp_id.load())
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
 				irr::video::IImage* readerimg = nullptr;
-				path_string file(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension));
+				path_string file;
 				if(path == EPRO_TEXT("archives")) {
-					auto reader = Utils::FindFileInArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
-					if(!reader.reader)
+					auto lockedIrrFile = Utils::FindFileInArchives(
+						(type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"),
+						fmt::format(EPRO_TEXT("{}{}"), code, extension));
+					if(!lockedIrrFile)
 						continue;
-					file = reader.reader->getFileName().c_str();
-					readerimg = driver->createImageFromFile(reader.reader);
-					reader.reader->drop();
-					reader.lk->unlock();
+					file = lockedIrrFile.reader->getFileName().c_str();
+					readerimg = driver->createImageFromFile(lockedIrrFile.reader);
+				} else {
+					file = fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
 				}
 				if(width != _width || height != _height) {
 					width = _width;
@@ -440,7 +442,7 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 					if(readerimg) {
 						readerimg->drop();
 					}
-					return std::make_pair(img, Utils::ToPathString(file));
+					return std::make_pair(img, file);
 				}
 				if(timestamp_id != source_timestamp_id.load()) {
 					if(readerimg) {
@@ -552,13 +554,10 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 			for(auto& path : mainGame->field_dirs) {
 				for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 					if(path == EPRO_TEXT("archives")) {
-						auto reader = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
-						if(!reader.reader)
+						auto lockedIrrFile = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+						if (!lockedIrrFile)
 							continue;
-						img = driver->getTexture(reader.reader);
-						reader.reader->drop();
-						reader.lk->unlock();
-						if(img)
+						if ((img = driver->getTexture(lockedIrrFile.reader)))
 							break;
 					} else {
 						if((img = driver->getTexture(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension).c_str())))

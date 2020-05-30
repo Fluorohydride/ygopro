@@ -34,11 +34,24 @@ using unzip_callback = std::function<void(unzip_payload* payload)>;
 namespace ygo {
 	class Utils {
 	public:
-		class locked_reader {
+		// Mutex should already be locked if not nullptr and takes ownership of the IReadFile if not nullptr
+		// In C++17, use std::optional with lock_guard, since we have either file exists or not found (both nullptr)
+		class MutexLockedIrrArchivedFile {
 		public:
+			std::mutex* mutex;
 			irr::io::IReadFile* reader;
-			std::mutex* lk;
-			locked_reader(irr::io::IReadFile* file, std::mutex* mtx) :reader(file), lk(mtx) {}
+			MutexLockedIrrArchivedFile(std::mutex* mutex = nullptr, irr::io::IReadFile* reader = nullptr) noexcept : mutex(mutex), reader(reader) {}
+			MutexLockedIrrArchivedFile(const MutexLockedIrrArchivedFile& copyFrom) = delete;
+			MutexLockedIrrArchivedFile(MutexLockedIrrArchivedFile&& moveFrom) noexcept {
+				mutex = moveFrom.mutex;
+				reader = moveFrom.reader;
+				moveFrom.mutex = nullptr;
+				moveFrom.reader = nullptr;
+			}
+			~MutexLockedIrrArchivedFile(); // drops reader if not nullptr, then unlocks mutex if not nullptr
+			operator bool() const {
+				return reader;
+			}
 		};
 		class locked_archive {
 		public:
@@ -64,7 +77,7 @@ namespace ygo {
 		/** Returned subfolder names are prefixed by the provided path */
 		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1, bool addparentpath = true);
 		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
-		static locked_reader FindFileInArchives(const path_string& path, const path_string& name);
+		static MutexLockedIrrArchivedFile FindFileInArchives(const path_string& path, const path_string& name);
 		template<typename T>
 		static T NormalizePath(T path, bool trailing_slash = true);
 		template<typename T>
