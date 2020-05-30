@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 #include "text_types.h"
 
 namespace irr {
@@ -32,7 +33,19 @@ using unzip_callback = std::function<void(unzip_payload* payload)>;
 namespace ygo {
 	class Utils {
 	public:
-		static std::vector<irr::io::IFileArchive*> archives;
+		class locked_reader {
+		public:
+			irr::io::IReadFile* reader;
+			std::mutex* lk;
+			locked_reader(irr::io::IReadFile* file, std::mutex* mtx) :reader(file), lk(mtx) {}
+		};
+		class locked_archive {
+		public:
+			irr::io::IFileArchive* archive;
+			std::unique_ptr<std::mutex> lk;
+			locked_archive(irr::io::IFileArchive* file) :archive(file) { lk = std::unique_ptr<std::mutex>(new std::mutex); }
+		};
+		static std::vector<locked_archive> archives;
 		static irr::io::IFileSystem* filesystem;
 		static bool MakeDirectory(const path_string& path);
 		static bool FileCopy(const path_string& source, const path_string& destination);
@@ -50,7 +63,7 @@ namespace ygo {
 		/** Returned subfolder names are prefixed by the provided path */
 		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1, bool addparentpath = true);
 		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
-		static irr::io::IReadFile* FindFileInArchives(const path_string& path, const path_string& name);
+		static locked_reader FindFileInArchives(const path_string& path, const path_string& name);
 		template<typename T>
 		static T NormalizePath(T path, bool trailing_slash = true);
 		template<typename T>

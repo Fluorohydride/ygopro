@@ -357,11 +357,12 @@ bool ImageManager::imageScaleNNAA(irr::video::IImage *src, irr::video::IImage *d
 		}
 	return true;
 }
-irr::video::IImage* ImageManager::GetTextureImageFromFile(const irr::io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::io::IReadFile* archivefile) {
+irr::video::IImage* ImageManager::GetTextureImageFromFile(const irr::io::path& file, int width, int height, chrono_time timestamp_id, std::atomic<chrono_time>& source_timestamp_id, irr::video::IImage* archivefile) {
 	irr::video::IImage* srcimg = nullptr;
-	if(archivefile)
-		srcimg = driver->createImageFromFile(archivefile);
-	else
+	if(archivefile) {
+		archivefile->grab();
+		srcimg = archivefile;
+	} else
 		srcimg = driver->createImageFromFile(file);
 	if(srcimg == NULL || timestamp_id != source_timestamp_id.load()) {
 		if(srcimg)
@@ -427,24 +428,27 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 			for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
 				if(timestamp_id != source_timestamp_id.load())
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
-				irr::io::IReadFile* reader = nullptr;
+				irr::video::IImage* readerimg = nullptr;
+				std::wstring file(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension));
 				if(path == EPRO_TEXT("archives")) {
-					reader = Utils::FindFileInArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
-					if(!reader)
+					auto reader = Utils::FindFileInArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+					if(!reader.reader)
 						continue;
+					file = BufferIO::DecodeUTF8s(irr::core::stringc(reader.reader->getFileName()).c_str());
+					readerimg = driver->createImageFromFile(reader.reader);
+					reader.reader->drop();
+					reader.lk->unlock();
 				}
 				if(width != _width || height != _height) {
 					width = _width;
 					height = _height;
 				}
-				auto file = reader ? reader->getFileName().c_str() : fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension);
-				__repeat:
-				if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), reader))) {
+			__repeat:
+				if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), readerimg))) {
 					if(timestamp_id != source_timestamp_id.load()) {
 						img->drop();
-						if(reader) {
-							reader->drop();
-							reader = nullptr;
+						if(readerimg) {
+							readerimg->drop();
 						}
 						return std::make_pair(nullptr, EPRO_TEXT("fail"));
 					}
@@ -454,22 +458,19 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 						height = _height;
 						goto __repeat;
 					}
-					if(reader) {
-						reader->drop();
-						reader = nullptr;
+					if(readerimg) {
+						readerimg->drop();
 					}
 					return std::make_pair(img, Utils::ToPathString(file));
 				}
 				if(timestamp_id != source_timestamp_id.load()) {
-					if(reader) {
-						reader->drop();
-						reader = nullptr;
+					if(readerimg) {
+						readerimg->drop();
 					}
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
 				}
-				if(reader) {
-					reader->drop();
-					reader = nullptr;
+				if(readerimg) {
+					readerimg->drop();
 				}
 			}
 		}
@@ -571,13 +572,13 @@ irr::video::ITexture* ImageManager::GetTextureField(uint32_t code) {
 		} else {
 			for(auto& path : mainGame->field_dirs) {
 				for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
-					irr::io::IReadFile* reader = nullptr;
 					if(path == EPRO_TEXT("archives")) {
-						reader = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
-						if(!reader)
+						auto reader = Utils::FindFileInArchives(EPRO_TEXT("pics/field/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
+						if(!reader.reader)
 							continue;
-						img = driver->getTexture(reader);
-						reader->drop();
+						img = driver->getTexture(reader.reader);
+						reader.reader->drop();
+						reader.lk->unlock();
 						if(img)
 							break;
 					} else {

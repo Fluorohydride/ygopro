@@ -15,7 +15,7 @@
 #include "bufferio.h"
 
 namespace ygo {
-	std::vector<irr::io::IFileArchive*> Utils::archives;
+	std::vector<Utils::locked_archive> Utils::archives;
 	irr::io::IFileSystem* Utils::filesystem;
 
 	bool Utils::MakeDirectory(const path_string& path) {
@@ -206,18 +206,20 @@ namespace ygo {
 		}
 		return res;
 	}
-	irr::io::IReadFile* Utils::FindFileInArchives(const path_string& path, const path_string& name) {
+	Utils::locked_reader Utils::FindFileInArchives(const path_string& path, const path_string& name) {
 		for(auto& archive : archives) {
+			archive.lk->lock();
 			int res = -1;
-			auto list = archive->getFileList();
+			auto list = archive.archive->getFileList();
 			res = list->findFile((path + name).c_str());
 			if(res != -1) {
-				auto reader = archive->createAndOpenFile(res);
+				auto reader = archive.archive->createAndOpenFile(res);
 				if(reader)
-					return reader;
+					return { reader, archive.lk.get() };
 			}
+			archive.lk->unlock();
 		}
-		return nullptr;
+		return { nullptr, nullptr };
 	}
 	path_string Utils::ToPathString(const std::wstring& input) {
 #ifdef UNICODE
@@ -410,14 +412,14 @@ namespace ygo {
 		// system("start URL") opens a shell
 #else
 		auto pid = fork();
-		if (pid == 0) {
+		if(pid == 0) {
 #ifdef __APPLE__
 			execl("/usr/bin/open", "open", url.c_str(), NULL);
 #else
 			execl("/usr/bin/xdg-open", "xdg-open", url.c_str(), NULL);
 #endif
 			perror("Failed to open browser:");
-		} else if (pid < 0) {
+		} else if(pid < 0) {
 			perror("Failed to fork:");
 		}
 #endif

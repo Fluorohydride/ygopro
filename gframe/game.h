@@ -114,7 +114,6 @@ public:
 	bool MainLoop();
 	path_string NoSkinLabel();
 	bool ApplySkin(const path_string& skin, bool reload = false, bool firstrun = false);
-	void LoadZipArchives();
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshLFLists();
 	void RefreshAiDecks();

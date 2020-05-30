@@ -1906,15 +1906,6 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 		wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(40), Scale(700))));
 	return applied;
 }
-void Game::LoadZipArchives() {
-	irr::io::IFileArchive* tmp_archive = nullptr;
-	for(auto& file : Utils::FindFiles(EPRO_TEXT("./expansions/"), { EPRO_TEXT("zip") })) {
-		filesystem->addFileArchive((EPRO_TEXT("./expansions/") + file).c_str(), true, false, irr::io::EFAT_ZIP, "", &tmp_archive);
-		if(tmp_archive) {
-			Utils::archives.emplace_back(tmp_archive);
-		}
-	}
-}
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
@@ -3112,11 +3103,12 @@ std::vector<char> Game::LoadScript(const std::string& _name) {
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives")) {
 			auto reader = Utils::FindFileInArchives(EPRO_TEXT("script/"), name);
-			if(reader == nullptr)
+			if(!reader.reader)
 				continue;
-			buffer.resize(reader->getSize());
-			bool readed = reader->read(buffer.data(), buffer.size()) == buffer.size();
-			reader->drop();
+			buffer.resize(reader.reader->getSize());
+			bool readed = reader.reader->read(buffer.data(), buffer.size()) == buffer.size();
+			reader.reader->drop();
+			reader.lk->unlock();
 			if(readed)
 				return buffer;
 		} else {

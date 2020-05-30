@@ -25,9 +25,10 @@ void DataHandler::LoadDatabases() {
 void DataHandler::LoadArchivesDB() {
 	std::vector<char> buffer;
 	for(auto& archive : Utils::archives) {
-		auto files = Utils::FindFiles(archive, EPRO_TEXT(""), { EPRO_TEXT("cdb") }, 3);
+		std::lock_guard<std::mutex> lk(*archive.lk);
+		auto files = Utils::FindFiles(archive.archive, EPRO_TEXT(""), { EPRO_TEXT("cdb") }, 3);
 		for(auto& index : files) {
-			auto reader = archive->createAndOpenFile(index);
+			auto reader = archive.archive->createAndOpenFile(index);
 			if(reader == nullptr)
 				continue;
 			buffer.resize(reader->getSize());
