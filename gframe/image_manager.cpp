@@ -429,12 +429,12 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 				if(timestamp_id != source_timestamp_id.load())
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
 				irr::video::IImage* readerimg = nullptr;
-				std::wstring file(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension));
+				path_string file(fmt::format(EPRO_TEXT("{}{}{}"), path, code, extension));
 				if(path == EPRO_TEXT("archives")) {
 					auto reader = Utils::FindFileInArchives((type == ART) ? EPRO_TEXT("pics/") : EPRO_TEXT("pics/cover/"), fmt::format(EPRO_TEXT("{}{}"), code, extension));
 					if(!reader.reader)
 						continue;
-					file = BufferIO::DecodeUTF8s(irr::core::stringc(reader.reader->getFileName()).c_str());
+					file = reader.reader->getFileName().c_str();
 					readerimg = driver->createImageFromFile(reader.reader);
 					reader.reader->drop();
 					reader.lk->unlock();
