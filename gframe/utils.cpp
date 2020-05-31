@@ -15,7 +15,7 @@
 #include "bufferio.h"
 
 namespace ygo {
-	std::vector<Utils::locked_archive> Utils::archives;
+	std::vector<Utils::SynchronizedIrrArchive> Utils::archives;
 	irr::io::IFileSystem* Utils::filesystem;
 
 	bool Utils::MakeDirectory(const path_string& path) {
@@ -216,18 +216,18 @@ namespace ygo {
 	}
 	Utils::MutexLockedIrrArchivedFile Utils::FindFileInArchives(const path_string& path, const path_string& name) {
 		for(auto& archive : archives) {
-			archive.lk->lock();
+			archive.mutex->lock();
 			int res = -1;
 			auto list = archive.archive->getFileList();
 			res = list->findFile((path + name).c_str());
 			if(res != -1) {
 				auto reader = archive.archive->createAndOpenFile(res);
 				if(reader)
-					return MutexLockedIrrArchivedFile(archive.lk.get(), reader);
+					return MutexLockedIrrArchivedFile(archive.mutex.get(), reader); // drops reader and unlocks when done
 			}
-			archive.lk->unlock();
+			archive.mutex->unlock();
 		}
-		return MutexLockedIrrArchivedFile();
+		return MutexLockedIrrArchivedFile(); // file not found
 	}
 	path_string Utils::ToPathString(const std::wstring& input) {
 #ifdef UNICODE

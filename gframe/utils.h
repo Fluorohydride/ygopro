@@ -34,11 +34,19 @@ using unzip_callback = std::function<void(unzip_payload* payload)>;
 namespace ygo {
 	class Utils {
 	public:
+		// Irrlicht has only one handle open per archive, which does not support concurrency and is not thread-safe.
+		// Thus, we need to own a corresponding mutex that is also used for all files from this archive
+		class SynchronizedIrrArchive {
+		public:
+			std::unique_ptr<std::mutex> mutex;
+			irr::io::IFileArchive* archive;
+			SynchronizedIrrArchive(irr::io::IFileArchive* archive) : mutex(std::make_unique<std::mutex>()), archive(archive) {}
+		};
 		// Mutex should already be locked if not nullptr and takes ownership of the IReadFile if not nullptr
-		// In C++17, use std::optional with lock_guard, since we have either file exists or not found (both nullptr)
+		// In C++17, use std::optional, since we have either file exists or not found (both nullptr)
 		class MutexLockedIrrArchivedFile {
 		public:
-			std::mutex* mutex;
+			std::mutex* mutex; // from SynchronizedIrrArchive
 			irr::io::IReadFile* reader;
 			MutexLockedIrrArchivedFile(std::mutex* mutex = nullptr, irr::io::IReadFile* reader = nullptr) noexcept : mutex(mutex), reader(reader) {}
 			MutexLockedIrrArchivedFile(const MutexLockedIrrArchivedFile& copyFrom) = delete;
@@ -53,13 +61,7 @@ namespace ygo {
 				return reader;
 			}
 		};
-		class locked_archive {
-		public:
-			irr::io::IFileArchive* archive;
-			std::unique_ptr<std::mutex> lk;
-			locked_archive(irr::io::IFileArchive* file) :archive(file) { lk = std::unique_ptr<std::mutex>(new std::mutex); }
-		};
-		static std::vector<locked_archive> archives;
+		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
 		static bool MakeDirectory(const path_string& path);
 		static bool FileCopy(const path_string& source, const path_string& destination);
