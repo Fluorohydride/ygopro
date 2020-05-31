@@ -23,6 +23,7 @@ public:
 		int duelFlags = 0;
 		bool handTestNoOpponent = true;
 		bool handTestNoShuffle = false;
+		DuelOptions() {};
 	};
 
 	static bool StartPlay(const DuelOptions& duelOptions = DuelOptions());
