@@ -174,59 +174,38 @@ void ImageManager::RemoveTexture(uint32_t code) {
 		}
 	}
 }
-#define LOAD_LOOP(src, dest, index, type)for(auto it = src->begin(); it != src->end();) {\
-		if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {\
-			auto pair = it->second.get();\
-			if(pair.first) {\
-				if(pair.first->getDimension().Width != sizes[index].first || pair.first->getDimension().Height != sizes[index].second) {\
-					readd.push_back(it->first);\
-					dest[it->first] = nullptr;\
-					it = src->erase(it);\
-					continue;\
-				}\
-				dest[it->first] = driver->addTexture(pair.second.c_str(), pair.first);\
-				pair.first->drop();\
-			} else if(pair.second != EPRO_TEXT("wait for download"))\
-				dest[it->first] = nullptr;\
-			it = src->erase(it);\
-			continue;\
-		}\
-		it++;\
-	}\
-	for(auto& code : readd) {\
-		(*src)[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));\
-	}\
-	readd.clear();
 void ImageManager::RefreshCachedTextures() {
-	std::vector<int> readd;
-	LOAD_LOOP(loading_pics[0], tMap[0], 0, ART)
-	LOAD_LOOP(loading_pics[1], tMap[1], 1, ART)
-	LOAD_LOOP(loading_pics[2], tThumb, 2, THUMB)
-		for(auto it = loading_pics[3]->begin(); it != loading_pics[3]->end();) {
-			if(it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
+	auto StartLoad = [this](loading_map* src, texture_map& dest, int index, imgType type) {
+		std::vector<int> readd;
+		for (auto it = src->begin(); it != src->end();) {
+			if (it->second.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) {
 				auto pair = it->second.get();
-				if(pair.first) {
-					if(pair.first->getDimension().Width != sizes[1].first || pair.first->getDimension().Height != sizes[1].second) {
+				if (pair.first) {
+					if (pair.first->getDimension().Width != sizes[index].first || pair.first->getDimension().Height != sizes[index].second) {
 						readd.push_back(it->first);
-						tCovers[it->first] = nullptr;
-						it = loading_pics[3]->erase(it);
+						dest[it->first] = nullptr;
+						it = src->erase(it);
 						continue;
 					}
-					tCovers[it->first] = driver->addTexture(pair.second.c_str(), pair.first);
+					dest[it->first] = driver->addTexture(pair.second.c_str(), pair.first);
 					pair.first->drop();
-				} else if(pair.second != EPRO_TEXT("wait for download"))
-					tCovers[it->first] = nullptr;
-				it = loading_pics[3]->erase(it);
+				} else if (pair.second != EPRO_TEXT("wait for download")) {
+					dest[it->first] = nullptr;
+				}
+				it = src->erase(it);
 				continue;
 			}
 			it++;
 		}
-	for(auto& code : readd) {
-		(*loading_pics[3])[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, COVER, std::ref(sizes[1].first), std::ref(sizes[1].second), timestamp_id.load(), std::ref(timestamp_id));
-	}
-	readd.clear();
+		for (auto& code : readd) {
+			(*src)[code] = std::async(std::launch::async, &ImageManager::LoadCardTexture, this, code, type, std::ref(sizes[index].first), std::ref(sizes[index].second), timestamp_id.load(), std::ref(timestamp_id));
+		}
+	};
+	StartLoad(loading_pics[0], tMap[0], 0, ART);
+	StartLoad(loading_pics[1], tMap[1], 1, ART);
+	StartLoad(loading_pics[2], tThumb, 2, THUMB);
+	StartLoad(loading_pics[3], tCovers, 1, COVER);
 }
-#undef LOAD_LOOP
 void ImageManager::ClearFutureObjects(loading_map* map1, loading_map* map2, loading_map* map3, loading_map* map4) {
 	for(auto& map : { &map1, &map2, &map3 }) {
 		if(*map) {
