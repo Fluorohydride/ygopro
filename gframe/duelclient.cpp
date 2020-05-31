@@ -2924,11 +2924,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->ClearTarget();
 				pcard->is_showtarget = false;
 				pcard->is_showchaintarget = false;
-				ClientCard* olcard = mainGame->dField.GetCard(current.controler, current.location & (~LOCATION_OVERLAY) & 0xff, current.sequence);
 				if(mainGame->dInfo.isCatchingUp) {
 					if(!mainGame->dInfo.isReplay)
 						mainGame->gMutex.lock();
 					mainGame->dField.RemoveCard(previous.controler, previous.location, previous.sequence);
+					ClientCard* olcard = mainGame->dField.GetCard(current.controler, current.location & (~LOCATION_OVERLAY) & 0xff, current.sequence);
 					olcard->overlayed.push_back(pcard);
 					mainGame->dField.overlay_cards.insert(pcard);
 					pcard->overlayTarget = olcard;
@@ -2939,6 +2939,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				} else {
 					mainGame->gMutex.lock();
 					mainGame->dField.RemoveCard(previous.controler, previous.location, previous.sequence);
+					ClientCard* olcard = mainGame->dField.GetCard(current.controler, current.location & (~LOCATION_OVERLAY) & 0xff, current.sequence);
 					olcard->overlayed.push_back(pcard);
 					mainGame->dField.overlay_cards.insert(pcard);
 					mainGame->gMutex.unlock();
