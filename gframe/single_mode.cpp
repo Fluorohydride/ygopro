@@ -121,7 +121,7 @@ restart:
 		if (!duelOptions.handTestNoShuffle) {
 			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
 		}
-		auto LoadDeck = [&](int team) {
+		auto LoadDeck = [&](uint8 team) {
 			OCG_NewCardInfo card_info = { team, 0, 0, team, 0, 0, POS_FACEDOWN_DEFENSE };
 			card_info.loc = LOCATION_DECK;
 			last_replay.Write<uint32_t>(playerdeck.main.size(), false);
