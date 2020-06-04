@@ -291,6 +291,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
+				DuelClient::is_local_host = false;
 				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
 				} else {
@@ -309,6 +310,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						NetServer::StopServer();
 						break;
 					}
+					DuelClient::is_local_host = true;
 					mainGame->btnHostConfirm->setEnabled(false);
 					mainGame->btnHostCancel->setEnabled(false);
 					mainGame->gBot.Refresh(gGameConfig->filterBot * (mainGame->cbDuelRule->getSelected() + 1), gGameConfig->lastBot);

@@ -30,6 +30,7 @@ std::vector<unsigned char> DuelClient::response_buf;
 unsigned int DuelClient::watching = 0;
 unsigned char DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
+bool DuelClient::is_local_host = false;
 event_base* DuelClient::client_base = nullptr;
 bufferevent* DuelClient::client_bev = nullptr;
 std::vector<uint8_t> DuelClient::duel_client_read;
@@ -4483,7 +4484,7 @@ void DuelClient::ReplayPrompt(bool local_stream) {
 	mainGame->gMutex.unlock();
 	mainGame->replaySignal.Reset();
 	mainGame->replaySignal.Wait();
-	if(mainGame->saveReplay || !is_host) {
+	if(mainGame->saveReplay || !is_local_host) {
 		if(mainGame->saveReplay)
 			last_replay.SaveReplay(Utils::ToPathString(mainGame->ebRSName->getText()));
 		else last_replay.SaveReplay(EPRO_TEXT("_LastReplay"));

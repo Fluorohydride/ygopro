@@ -38,6 +38,7 @@ public:
 	static unsigned short temp_port;
 	static unsigned short temp_ver;
 	static bool try_needed;
+	static bool is_local_host;
 
 	static std::pair<unsigned int, unsigned short> ResolveServer(const std::wstring& address, const std::wstring& port);
 	static std::pair<unsigned int, unsigned short> ResolveServer(const std::wstring& address, int port);
