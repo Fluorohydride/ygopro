@@ -775,6 +775,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mouse_pos.set(event.DropEvent.X, event.DropEvent.Y);
 					is_draging = true;
 					draging_pointer = pointer;
+					GetHoveredCard();
 					if(hovered_pos == 3)
 						push_side(draging_pointer, hovered_seq + is_lastcard, true);
 					else {
