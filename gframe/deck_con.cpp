@@ -746,6 +746,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				std::wstringstream ss(Utils::ToUpperNoAccents<std::wstring>(event.DropEvent.Text));
 				std::wstring to;
+				int firstcode = 0;
 				while(std::getline(ss, to)) {
 					auto pos = to.find_first_not_of(L" \n\r\t");
 					if(pos != std::wstring::npos && pos != 0)
@@ -769,11 +770,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 					if(!pointer)
 						continue;
+					if(!firstcode)
+						firstcode = pointer->code;
 					mouse_pos.set(event.DropEvent.X, event.DropEvent.Y);
 					is_draging = true;
-					hovered_code = code;
 					draging_pointer = pointer;
-					GetHoveredCard();
 					if(hovered_pos == 3)
 						push_side(draging_pointer, hovered_seq + is_lastcard, true);
 					else {
@@ -781,6 +782,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 					is_draging = false;
 				}
+				if(firstcode)
+					mainGame->ShowCardInfo(firstcode);
 				return true;
 			}
 			case irr::DROP_END:	{
