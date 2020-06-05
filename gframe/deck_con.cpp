@@ -747,12 +747,18 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				std::wstringstream ss(Utils::ToUpperNoAccents<std::wstring>(event.DropEvent.Text));
 				std::wstring to;
 				while(std::getline(ss, to)) {
-					(to = to.substr(to.find_first_not_of(L" \n\r\t")));
-					to.erase(to.find_last_not_of(L" \n\r\t") + 1);
+					auto pos = to.find_first_not_of(L" \n\r\t");
+					if(pos != std::wstring::npos && pos != 0)
+						to.erase(to.begin(), to.begin() + pos);
+					pos = to.find_last_not_of(L" \n\r\t");
+					if(pos != std::wstring::npos) {
+						if(pos < to.size())
+							pos++;
+						to.erase(pos);
+					}
 					int code = BufferIO::GetVal(to.c_str());
 					CardDataC* pointer = nullptr;
-					if(code && (pointer = gDataManager->GetCardData(code))) {
-					} else {
+					if(!code || !(pointer = gDataManager->GetCardData(code))) {
 						for(auto& card : gDataManager->cards) {
 							auto name = Utils::ToUpperNoAccents<std::wstring>(card.second.GetStrings()->name);
 							if(name == to) {
@@ -769,9 +775,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					draging_pointer = pointer;
 					GetHoveredCard();
 					if(hovered_pos == 3)
-						push_side(draging_pointer, hovered_seq + is_lastcard);
+						push_side(draging_pointer, hovered_seq + is_lastcard, true);
 					else {
-						push_main(draging_pointer, hovered_seq) || push_extra(draging_pointer, hovered_seq + is_lastcard);
+						push_main(draging_pointer, hovered_seq, true) || push_extra(draging_pointer, hovered_seq + is_lastcard, true);
 					}
 					is_draging = false;
 				}
