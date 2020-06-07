@@ -166,10 +166,12 @@ void SGUITTGlyph::preload(u32 char_index, FT_Face face, video::IVideoDriver* dri
 	}
 
 	glyph_page = parent->getLastGlyphPageIndex();
-	u32 texture_side_length = page->texture_size.Width;
+	u32 texture_side_length = page->texture_size.Width - font_size;
+	u32 margin = font_size * 0.5;
+	u32 sprite_size = font_size * 1.5;
 	core::vector2di page_position(
-		(page->used_slots % (texture_side_length / font_size)) * font_size,
-		(page->used_slots / (texture_side_length / font_size)) * font_size
+		(s32)(page->used_slots % (s32)(texture_side_length / sprite_size)) * sprite_size + margin,
+		(s32)(page->used_slots / (s32)(texture_side_length / sprite_size)) * sprite_size + margin
 	);
 	source_rect.UpperLeftCorner = page_position;
 	source_rect.LowerRightCorner = core::vector2di(page_position.X + bits.width, page_position.Y + bits.rows);
@@ -495,7 +497,7 @@ CGUITTGlyphPage* CGUITTFont::createGlyphPage(const u8& pixel_mode) {
 
 	if(page) {
 		// Determine the number of glyph slots on the page and add it to the list of pages.
-		page->available_slots = (page_texture_size.Width / size) * (page_texture_size.Height / size);
+		page->available_slots = (u32)((page_texture_size.Width - size) / (u32)(size * 1.5)) * (u32)((page_texture_size.Height - size) / (u32)(size * 1.5));
 		Glyph_Pages.push_back(page);
 	}
 	return page;
