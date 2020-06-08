@@ -4,6 +4,7 @@
 
 #include "porting_android.h"
 
+#include <android_native_app_glue.h>
 #include <jni.h>
 #include <irrlicht.h>
 #include <sys/stat.h>
