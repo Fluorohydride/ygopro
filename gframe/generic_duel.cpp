@@ -1157,6 +1157,7 @@ void GenericDuel::AfterParsing(CoreUtils::Packet& packet, int& return_value, boo
 	case MSG_FLIPSUMMONED:
 	case MSG_NEW_PHASE:
 	case MSG_CHAINED:
+	case MSG_CHAIN_SOLVED:
 	case MSG_CHAIN_END: {
 		if(message == MSG_CHAIN_END){
 			PseudoRefreshDeck(0);
