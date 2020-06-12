@@ -698,9 +698,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					auto deck_string = event.KeyInput.Shift ? gdeckManager->ExportDeckCardNames(gdeckManager->current_deck) : gdeckManager->ExportDeckBase64(gdeckManager->current_deck);
 					if(deck_string) {
 						mainGame->device->getOSOperator()->copyToClipboard(deck_string);
-						mainGame->stACMessage->setText(L"Deck copied");
+						mainGame->stACMessage->setText(gDataManager->GetSysString(1368).c_str());
 					} else {
-						mainGame->stACMessage->setText(L"Deck not copied");
+						mainGame->stACMessage->setText(gDataManager->GetSysString(1369).c_str());
 					}
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
