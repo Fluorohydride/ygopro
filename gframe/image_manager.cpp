@@ -15,6 +15,7 @@ bool ImageManager::Initial() {
 	tUnknown = NULL;
 	tUnknownFit = NULL;
 	tUnknownThumb = NULL;
+	tBigPicture = NULL;
 	tLoading = NULL;
 	tThumbLoadingThreadRunning = false;
 	tAct = driver->getTexture("textures/act.png");
@@ -59,6 +60,10 @@ void ImageManager::ClearTexture() {
 	for(auto tit = tThumb.begin(); tit != tThumb.end(); ++tit) {
 		if(tit->second && tit->second != tLoading)
 			driver->removeTexture(tit->second);
+	}
+	if(tBigPicture != NULL) {
+		driver->removeTexture(tBigPicture);
+		tBigPicture = NULL;
 	}
 	tMap[0].clear();
 	tMap[1].clear();
@@ -245,6 +250,37 @@ irr::video::ITexture* ImageManager::GetTexture(int code, bool fit) {
 		return tit->second;
 	else
 		return mainGame->gameConf.use_image_scale ? (fit ? tUnknownFit : tUnknown) : GetTextureThumb(code);
+}
+irr::video::ITexture* ImageManager::GetBigPicture(int code, float zoom) {
+	if(code == 0)
+		return tUnknown;
+	if(tBigPicture != NULL) {
+		driver->removeTexture(tBigPicture);
+		tBigPicture = NULL;
+	}
+	irr::video::ITexture* texture;
+	char file[256];
+	sprintf(file, "expansions/pics/%d.jpg", code);
+	irr::video::IImage* srcimg = driver->createImageFromFile(file);
+	if(srcimg == NULL) {
+		sprintf(file, "pics/%d.jpg", code);
+		srcimg = driver->createImageFromFile(file);
+	}
+	if(srcimg == NULL) {
+		return tUnknown;
+	}
+	if(zoom == 1) {
+		texture = driver->addTexture(file, srcimg);
+	} else {
+		auto origsize = srcimg->getDimension();
+		video::IImage* destimg = driver->createImage(srcimg->getColorFormat(), irr::core::dimension2d<u32>(origsize.Width * zoom, origsize.Height * zoom));
+		imageScaleNNAA(srcimg, destimg);
+		texture = driver->addTexture(file, destimg);
+		destimg->drop();
+	}
+	srcimg->drop();
+	tBigPicture = texture;
+	return texture;
 }
 int ImageManager::LoadThumbThread() {
 	while(true) {
