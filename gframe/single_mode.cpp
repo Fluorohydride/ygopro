@@ -348,6 +348,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			int type = BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
 			/*uint64_t data = BufferIO::Read<uint64_t>(pbuf);*/
+			record = true;
 			if(player == 0 || type >= HINT_SKILL)
 				ANALYZE;
 			if(type > 0 && type < 6 && type != 4)
