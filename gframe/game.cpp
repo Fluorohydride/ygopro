@@ -2151,27 +2151,30 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	}
 }
 void Game::LoadServers() {
-	try {
-		for(auto& _config : { std::ref(gGameConfig->user_configs), std::ref(gGameConfig->configs) }) {
-			auto& config = _config.get();
+	for(auto& _config : { std::ref(gGameConfig->user_configs), std::ref(gGameConfig->configs) }) {
+		auto& config = _config.get();
+		try {
 			if(config.size() && config.at("servers").is_array()) {
-				for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
-					ServerInfo tmp_server;
-					tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
-					tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
-					tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
-					tmp_server.roomlistport = obj["roomlistport"].get<int>();
-					tmp_server.duelport = obj["duelport"].get<int>();
-					int i = serverChoice->addItem(tmp_server.name.c_str());
-					if(gGameConfig->lastServer == tmp_server.name)
-						serverChoice->setSelected(i);
-					ServerLobby::serversVector.push_back(std::move(tmp_server));
+				try {
+					for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
+						ServerInfo tmp_server;
+						tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
+						tmp_server.address = BufferIO::DecodeUTF8s(obj["address"].get<std::string>());
+						tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
+						tmp_server.roomlistport = obj["roomlistport"].get<int>();
+						tmp_server.duelport = obj["duelport"].get<int>();
+						int i = serverChoice->addItem(tmp_server.name.c_str());
+						if(gGameConfig->lastServer == tmp_server.name)
+							serverChoice->setSelected(i);
+						ServerLobby::serversVector.push_back(std::move(tmp_server));
+					}
+				}
+				catch(std::exception& e) {
+					ErrorLog(std::string("Exception occurred: ") + e.what());
 				}
 			}
 		}
-	}
-	catch(std::exception& e) {
-		ErrorLog(std::string("Exception occurred: ") + e.what());
+		catch(...) {}
 	}
 }
 void Game::ShowCardInfo(uint32 code, bool resize, ImageManager::imgType type) {

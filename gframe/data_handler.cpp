@@ -45,37 +45,42 @@ void DataHandler::LoadPicUrls() {
 		auto& config = _config.get();
 		try {
 			if(config.size() && config.at("urls").is_array()) {
-				for(auto& obj : config["urls"].get<std::vector<nlohmann::json>>()) {
-					auto type = obj["type"].get<std::string>();
-					if(obj["url"].get<std::string>() == "default") {
-						if(type == "pic") {
+				try {
+					for(auto& obj : config["urls"].get<std::vector<nlohmann::json>>()) {
+						auto type = obj["type"].get<std::string>();
+						if(obj["url"].get<std::string>() == "default") {
+							if(type == "pic") {
 #ifdef DEFAULT_PIC_URL
-							imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
+								imageDownloader->AddDownloadResource({ DEFAULT_PIC_URL, ImageDownloader::ART });
 #else
-							continue;
+								continue;
 #endif
-						} else if(type == "field") {
+							} else if(type == "field") {
 #ifdef DEFAULT_FIELD_URL
-							imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
+								imageDownloader->AddDownloadResource({ DEFAULT_FIELD_URL, ImageDownloader::FIELD });
 #else
-							continue;
+								continue;
 #endif
-						} else if(type == "cover") {
+							} else if(type == "cover") {
 #ifdef DEFAULT_COVER_URL
-							imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, ImageDownloader::COVER });
+								imageDownloader->AddDownloadResource({ DEFAULT_COVER_URL, ImageDownloader::COVER });
 #else
-							continue;
+								continue;
 #endif
+							}
+						} else {
+							imageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ?
+																	ImageDownloader::FIELD : (type == "pic") ?
+																	ImageDownloader::ART : ImageDownloader::COVER });
 						}
-					} else {
-						imageDownloader->AddDownloadResource({ obj["url"].get<std::string>(), type == "field" ? ImageDownloader::FIELD : (type == "pic") ? ImageDownloader::ART : ImageDownloader::COVER });
 					}
+				}
+				catch(std::exception& e) {
+					ErrorLog(std::string("Exception occurred: ") + e.what());
 				}
 			}
 		}
-		catch(std::exception& e) {
-			ErrorLog(std::string("Exception occurred: ") + e.what());
-		}
+		catch(...) {}
 	}
 }
 void DataHandler::LoadZipArchives() {
