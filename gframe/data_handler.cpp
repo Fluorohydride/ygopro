@@ -44,7 +44,7 @@ void DataHandler::LoadPicUrls() {
 	for(auto& _config : { std::ref(configs->user_configs), std::ref(configs->configs) }) {
 		auto& config = _config.get();
 		try {
-			if(config.size() && config["urls"].is_array()) {
+			if(config.size() && config.at("urls").is_array()) {
 				for(auto& obj : config["urls"].get<std::vector<nlohmann::json>>()) {
 					auto type = obj["type"].get<std::string>();
 					if(obj["url"].get<std::string>() == "default") {

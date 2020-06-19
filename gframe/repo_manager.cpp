@@ -117,7 +117,7 @@ std::map<std::string, int> RepoManager::GetRepoStatus() {
 	tmp_repo.field = obj[#field].get<cpptype>();
 void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 	try {
-		if(configs.size() && configs["repos"].is_array()) {
+		if(configs.size() && configs.at("repos").is_array()) {
 			for(auto& obj : configs["repos"].get<std::vector<nlohmann::json>>()) {
 				if(obj["should_read"].is_boolean() && !obj["should_read"].get<bool>())
 					continue;

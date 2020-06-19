@@ -2154,7 +2154,7 @@ void Game::LoadServers() {
 	try {
 		for(auto& _config : { std::ref(gGameConfig->user_configs), std::ref(gGameConfig->configs) }) {
 			auto& config = _config.get();
-			if(config.size() && config["servers"].is_array()) {
+			if(config.size() && config.at("servers").is_array()) {
 				for(auto& obj : config["servers"].get<std::vector<nlohmann::json>>()) {
 					ServerInfo tmp_server;
 					tmp_server.name = BufferIO::DecodeUTF8s(obj["name"].get<std::string>());
