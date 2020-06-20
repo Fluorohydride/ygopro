@@ -1358,8 +1358,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			auto& pcard = mainGame->dField.skills[player];
 			if(pcard) {
 				if(!mainGame->dInfo.isCatchingUp) {
-					mainGame->dField.FadeCard(pcard, 5, 20);
-					mainGame->WaitFrameSignal(20);
+					int frames = 20;
+					mainGame->gMutex.lock();
+					if(gGameConfig->quick_animation)
+						frames = 12;
+					mainGame->dField.FadeCard(pcard, 5, frames);
+					mainGame->gMutex.unlock();
+					mainGame->WaitFrameSignal(frames);
 					mainGame->gMutex.lock();
 					if(pcard == mainGame->dField.hovered_card)
 						mainGame->dField.hovered_card = nullptr;
@@ -2813,11 +2818,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(!mainGame->dInfo.isCatchingUp) {
 				mainGame->gMutex.lock();
 				mainGame->dField.AddCard(pcard, current.controler, current.location, current.sequence);
-				mainGame->gMutex.unlock();
 				pcard->UpdateDrawCoordinates(true);
 				pcard->curAlpha = 5;
-				mainGame->dField.FadeCard(pcard, 255, 20);
-				mainGame->WaitFrameSignal(20);
+				int frames = 20;
+				if(gGameConfig->quick_animation)
+					frames = 12;
+				mainGame->dField.FadeCard(pcard, 255, frames);
+				mainGame->gMutex.unlock();
+				mainGame->WaitFrameSignal(frames);
 			} else
 				mainGame->dField.AddCard(pcard, current.controler, current.location, current.sequence);
 		} else if (current.location == 0) {
@@ -2833,8 +2841,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			for(auto eqit = pcard->equipped.begin(); eqit != pcard->equipped.end(); ++eqit)
 				(*eqit)->equipTarget = 0;
 			if(!mainGame->dInfo.isCatchingUp) {
-				mainGame->dField.FadeCard(pcard, 5, 20);
-				mainGame->WaitFrameSignal(20);
+				int frames = 20;
+				mainGame->gMutex.lock();
+				if(gGameConfig->quick_animation)
+					frames = 12;
+				mainGame->dField.FadeCard(pcard, 5, frames);
+				mainGame->gMutex.unlock();
+				mainGame->WaitFrameSignal(frames);
 				mainGame->gMutex.lock();
 				if(pcard->location & LOCATION_OVERLAY) {
 					pcard->overlayTarget->overlayed.erase(pcard->overlayTarget->overlayed.begin() + pcard->sequence);
