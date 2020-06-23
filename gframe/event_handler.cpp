@@ -879,13 +879,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_CARD_SELECT: {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
+					auto& curcard = selectable_cards[i + pos];
+					auto& curstring = mainGame->stCardPos[i];
 					// draw selectable_cards[i + pos] in btnCardSelect[i]
-					mainGame->stCardPos[i]->enableOverrideColor(false);
+					curstring->enableOverrideColor(false);
 					// image
-					if(selectable_cards[i + pos]->code)
-						mainGame->imageLoading[mainGame->btnCardSelect[i]] = selectable_cards[i + pos]->code;
+					if(curcard->code)
+						mainGame->imageLoading[mainGame->btnCardSelect[i]] = curcard->code;
 					else if(conti_selecting)
-						mainGame->imageLoading[mainGame->btnCardSelect[i]] = selectable_cards[i + pos]->chain_code;
+						mainGame->imageLoading[mainGame->btnCardSelect[i]] = curcard->chain_code;
 					else
 						mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover[0]);
 					mainGame->btnCardSelect[i]->setRelativePosition(mainGame->Scale(30 + i * 125, 55, 30 + 120 + i * 125, 225));
@@ -897,43 +899,43 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						if(conti_selecting)
 							text = DataManager::unknown_string;
-						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
-							text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(selectable_cards[i + pos]->overlayTarget->location, selectable_cards[i + pos]->overlayTarget->sequence),
-								selectable_cards[i + pos]->overlayTarget->sequence + 1, selectable_cards[i + pos]->sequence + 1);
-						} else if(selectable_cards[i]->location != 0) {
-							text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(selectable_cards[i + pos]->location, selectable_cards[i + pos]->sequence),
-								selectable_cards[i + pos]->sequence + 1);
+						else if(curcard->location == LOCATION_OVERLAY) {
+							text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
+								curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
+						} else if(curcard->location != 0) {
+							text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+								curcard->sequence + 1);
 						}
 					}
-					mainGame->stCardPos[i]->setText(text.c_str());
+					curstring->setText(text.c_str());
 					// color
 					if(conti_selecting)
-						mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
-					else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY) {
-						if(selectable_cards[i + pos]->owner != selectable_cards[i + pos]->overlayTarget->controler)
-							mainGame->stCardPos[i]->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT_VAL);
-						if(selectable_cards[i + pos]->is_selected)
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
-						else if(selectable_cards[i + pos]->overlayTarget->controler)
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+						curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					else if(curcard->location == LOCATION_OVERLAY) {
+						if(curcard->owner != curcard->overlayTarget->controler)
+							curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT_VAL);
+						if(curcard->is_selected)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
+						else if(curcard->overlayTarget->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
 						else
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
-					} else if(selectable_cards[i + pos]->location == LOCATION_DECK || selectable_cards[i + pos]->location == LOCATION_EXTRA || selectable_cards[i + pos]->location == LOCATION_REMOVED) {
-						if(selectable_cards[i + pos]->position & POS_FACEDOWN)
-							mainGame->stCardPos[i]->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT_VAL);
-						if(selectable_cards[i + pos]->is_selected)
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
-						else if(selectable_cards[i + pos]->controler)
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					} else if(curcard->location == LOCATION_DECK || curcard->location == LOCATION_EXTRA || curcard->location == LOCATION_REMOVED) {
+						if(curcard->position & POS_FACEDOWN)
+							curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT_VAL);
+						if(curcard->is_selected)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
+						else if(curcard->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
 						else
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 					} else {
-						if(selectable_cards[i + pos]->is_selected)
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
-						else if(selectable_cards[i + pos]->controler)
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+						if(curcard->is_selected)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
+						else if(curcard->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
 						else
-							mainGame->stCardPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 					}
 				}
 				break;
@@ -941,42 +943,44 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case SCROLL_CARD_DISPLAY: {
 				int pos = mainGame->scrDisplayList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
+					auto& curcard = display_cards[i + pos];
+					auto& curstring = mainGame->stDisplayPos[i];
 					// draw display_cards[i + pos] in btnCardDisplay[i]
-					mainGame->stDisplayPos[i]->enableOverrideColor(false);
-					if(display_cards[i + pos]->code)
-						mainGame->imageLoading[mainGame->btnCardDisplay[i]] = display_cards[i + pos]->code;
+					curstring->enableOverrideColor(false);
+					if(curcard->code)
+						mainGame->imageLoading[mainGame->btnCardDisplay[i]] = curcard->code;
 					else
 						mainGame->btnCardDisplay[i]->setImage(mainGame->imageManager.tCover[0]);
 					mainGame->btnCardDisplay[i]->setRelativePosition(mainGame->Scale(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 					std::wstring text;
-					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
-						text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(display_cards[i + pos]->overlayTarget->location, display_cards[i + pos]->overlayTarget->sequence),
-							display_cards[i + pos]->overlayTarget->sequence + 1, display_cards[i + pos]->sequence + 1);
+					if(curcard->location == LOCATION_OVERLAY) {
+						text = fmt::format(L"{}[{}]({})", gDataManager->FormatLocation(curcard->overlayTarget->location, curcard->overlayTarget->sequence),
+							curcard->overlayTarget->sequence + 1, curcard->sequence + 1);
 					} else {
-						text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(display_cards[i + pos]->location, display_cards[i + pos]->sequence),
-							display_cards[i + pos]->sequence + 1);
+						text = fmt::format(L"{}[{}]", gDataManager->FormatLocation(curcard->location, curcard->sequence),
+							curcard->sequence + 1);
 					}
-					mainGame->stDisplayPos[i]->setText(text.c_str());
-					if(display_cards[i + pos]->location == LOCATION_OVERLAY) {
-						if(display_cards[i + pos]->owner != display_cards[i + pos]->overlayTarget->controler)
-							mainGame->stDisplayPos[i]->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT_VAL);
+					curstring->setText(text.c_str());
+					if(curcard->location == LOCATION_OVERLAY) {
+						if(curcard->owner != curcard->overlayTarget->controler)
+							curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_OVERLAY_TEXT_VAL);
 						// BackgroundColor: controller of the xyz monster
-						if(display_cards[i + pos]->overlayTarget->controler)
-							mainGame->stDisplayPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+						if(curcard->overlayTarget->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
 						else
-							mainGame->stDisplayPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
-					} else if(display_cards[i + pos]->location == LOCATION_EXTRA || display_cards[i + pos]->location == LOCATION_REMOVED) {
-						if(display_cards[i + pos]->position & POS_FACEDOWN)
-							mainGame->stDisplayPos[i]->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT_VAL);
-						if(display_cards[i + pos]->controler)
-							mainGame->stDisplayPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+					} else if(curcard->location == LOCATION_EXTRA || curcard->location == LOCATION_REMOVED) {
+						if(curcard->position & POS_FACEDOWN)
+							curstring->setOverrideColor(skin::DUELFIELD_CARD_SELECT_WINDOW_SET_TEXT_VAL);
+						if(curcard->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
 						else
-							mainGame->stDisplayPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 					} else {
-						if(display_cards[i + pos]->controler)
-							mainGame->stDisplayPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
+						if(curcard->controler)
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_OPPONENT_WINDOW_BACKGROUND_VAL);
 						else
-							mainGame->stDisplayPos[i]->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
+							curstring->setBackgroundColor(skin::DUELFIELD_CARD_SELF_WINDOW_BACKGROUND_VAL);
 					}
 				}
 				break;
