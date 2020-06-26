@@ -107,7 +107,7 @@ void GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 {
 	const auto driver = device->getVideoDriver();
 	const auto image = driver->createScreenShot();
-	if (image) { // In theory this should never be NULL
+	if (image) {
 		auto now = std::time(nullptr);
 		path_string filename(fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now)).c_str());
 		if (!driver->writeImageToFile(image, filename.c_str()))
