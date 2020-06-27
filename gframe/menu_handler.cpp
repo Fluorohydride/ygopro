@@ -965,7 +965,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 							ClickButton(mainGame->btnSingleMode);
 						ClickButton(mainGame->btnLoadSinglePlay);
 						return true;
-					} else if(mainGame->coreloaded && extension == L"yrpx" && !mainGame->wSinglePlay->isVisible()) {
+					} else if(mainGame->coreloaded && (extension == L"yrpx" || extension == L"yrp") && !mainGame->wSinglePlay->isVisible()) {
 						open_file = true;
 						open_file_name = Utils::ToPathString(to_open_file);
 						if(!mainGame->wReplay->isVisible())
