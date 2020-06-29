@@ -106,6 +106,8 @@ namespace ygo {
 		const ReplayHeader& rh = cur_yrp->pheader;
 		int seed = rh.seed;
 		auto names = ReplayMode::cur_yrp->GetPlayerNames();
+		mainGame->dInfo.selfnames.clear();
+		mainGame->dInfo.opponames.clear();
 		mainGame->dInfo.selfnames.insert(mainGame->dInfo.selfnames.end(), names.begin(), names.begin() + ReplayMode::cur_yrp->GetPlayersCount(0));
 		mainGame->dInfo.opponames.insert(mainGame->dInfo.opponames.end(), names.begin() + ReplayMode::cur_yrp->GetPlayersCount(0), names.end());
 		randengine rnd(seed);
