@@ -1511,9 +1511,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				} else if(hovered_location == LOCATION_SKILL) {
 					mcard = skills[hovered_controler];
 				} else {
-					if(mainGame->Resize(327, 8, 630, 51).isPointInside(mousepos))
+					const auto& self = mainGame->dInfo.isTeam1 ? mainGame->dInfo.selfnames : mainGame->dInfo.opponames;
+					const auto& oppo = mainGame->dInfo.isTeam1 ? mainGame->dInfo.opponames : mainGame->dInfo.selfnames;
+					if(mainGame->Resize(327, 8, 630, 51 + (23 * (self.size() - 1))).isPointInside(mousepos))
 						mplayer = 0;
-					else if(mainGame->Resize(689, 8, 991, 51).isPointInside(mousepos))
+					else if(mainGame->Resize(689, 8, 991, 51 + (23 * (oppo.size() - 1))).isPointInside(mousepos))
 						mplayer = 1;
 				}
 			}

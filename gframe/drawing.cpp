@@ -593,7 +593,11 @@ void Game::DrawMisc() {
 		driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
 	}
 	//lp bar
-	auto rectpos = ((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) ? Resize(327, 8, 630, 51) : Resize(689, 8, 991, 51);
+	const auto& self = dInfo.isTeam1 ? dInfo.selfnames : dInfo.opponames;
+	const auto& oppo = dInfo.isTeam1 ? dInfo.opponames : dInfo.selfnames;
+	auto rectpos = ((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) ?
+						Resize(327, 8, 630, 51 + (23 * (self.size() - 1))) :
+						Resize(689, 8, 991, 51 + (23 * (oppo.size() - 1)));
 	driver->draw2DRectangle(skin::DUELFIELD_TURNPLAYER_COLOR_VAL, rectpos);
 	driver->draw2DRectangleOutline(rectpos, skin::DUELFIELD_TURNPLAYER_OUTLINE_COLOR_VAL);
 	driver->draw2DImage(imageManager.tLPFrame, Resize(330, 10, 629, 30), irr::core::recti(0, 0, 200, 20), 0, 0, true);
@@ -654,12 +658,25 @@ void Game::DrawMisc() {
 
 	irr::core::recti p1size = Resize(335, 31, 629, 50);
 	irr::core::recti p2size = Resize(986, 31, 986, 50);
-	auto& self = dInfo.isTeam1 ? dInfo.selfnames : dInfo.opponames;
-	auto& oppo = dInfo.isTeam1 ? dInfo.opponames : dInfo.selfnames;
-	textFont->draw(self[dInfo.current_player[0]].c_str(), p1size, 0xffffffff, false, false, 0);
-	auto cld = textFont->getDimension(oppo[dInfo.current_player[1]]);
-	p2size.UpperLeftCorner.X -= cld.Width;
-	textFont->draw(oppo[dInfo.current_player[1]].c_str(), p2size, 0xffffffff, false, false, 0);
+	int i = 0;
+	for(const auto& player : self) {
+		if(i++== dInfo.current_player[0])
+			textFont->draw(player.c_str(), p1size, 0xffffffff, false, false, 0);
+		else
+			textFont->draw(player.c_str(), p1size, 0xff808080, false, false, 0);
+		p1size += irr::core::vector2di{ 0, p1size.getHeight() + ResizeY(4) };
+	}
+	i = 0;
+	const auto basecorner = p2size.UpperLeftCorner.X;
+	for(const auto& player : oppo) {
+		auto cld = textFont->getDimension(player);
+		p2size.UpperLeftCorner.X = basecorner - cld.Width;
+		if(i++ == dInfo.current_player[1])
+			textFont->draw(player.c_str(), p2size, 0xffffffff, false, false, 0);
+		else
+			textFont->draw(player.c_str(), p2size, 0xff808080, false, false, 0);
+		p2size += irr::core::vector2di{ 0, p2size.getHeight() + ResizeY(4) };
+	}
 	driver->draw2DRectangle(Resize(632, 10, 688, 30), 0x00000000, 0x00000000, 0xffffffff, 0xffffffff);
 	driver->draw2DRectangle(Resize(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	DrawShadowText(lpcFont, gDataManager->GetNumString(dInfo.turn).c_str(), Resize(635, 5, 685, 40), Resize(0, 0, 2, 0), skin::DUELFIELD_TURN_COUNT_VAL, 0x80000000, true);
