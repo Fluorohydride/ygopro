@@ -108,7 +108,7 @@ int GenericDuel::GetPos(DuelPlayer* dp) {
 	}
 	for(int i = 0; i < players.opposing.size(); i++) {
 		if(players.opposing[i].player == dp)
-			return i + players.home.size();
+			return i + players.home_size;
 	}
 	return -1;
 }
@@ -127,7 +127,7 @@ void GenericDuel::OrderPlayers(std::vector<duelist>& duelists, int offset) {
 			NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_CHANGE, scpc);
 			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
 			STOC_TypeChange sctc;
-			sctc.type = (duelists[i].player == host_player ? 0x10 : 0) | i;
+			sctc.type = (duelists[i].player == host_player ? 0x10 : 0) | (i + offset);
 			NetServer::SendPacketToPlayer(duelists[i].player, STOC_TYPE_CHANGE, sctc);
 			duelists[i].player->type = (i + offset);
 		}
