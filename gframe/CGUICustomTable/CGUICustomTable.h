@@ -236,6 +236,7 @@ private:
 	s32 ActiveTab;
 	EGUI_ORDERING_MODE CurrentOrdering;
 	s32 DrawFlags;
+	u32 selectTime;
 
 	gui::IGUIFont* OverrideFont;
 };

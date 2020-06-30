@@ -378,11 +378,14 @@ bool CGUIFileSelectListBox::OnEvent(const SEvent& event) {
 				switch(event.MouseInput.Event) {
 					case EMIE_MOUSE_WHEEL:
 						ScrollBar->setPos(ScrollBar->getPos() + (event.MouseInput.Wheel < 0 ? -1 : 1)*-ItemHeight / 2);
+						if(Selecting || MoveOverSelect)
+							selectNew(event.MouseInput.Y, true);
 						return true;
 
 					case EMIE_LMOUSE_PRESSED_DOWN:
 					{
 						Selecting = true;
+						selectNew(event.MouseInput.Y, true);
 						return true;
 					}
 
@@ -437,22 +440,32 @@ void CGUIFileSelectListBox::selectNew(s32 ypos, bool onlyHover) {
 	s32 oldSelected = Selected;
 
 	Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
-	if(Selected < 0 && !Items.empty())
-		Selected = 0;
+	if(Selected < 0 && !Items.empty()) {
+		if(onlyHover)
+			Selected = oldSelected;
+		else
+			Selected = 0;
+	}
 
 	recalculateScrollPos();
+	bool selagain = false;
 
-	bool selagain = Selected >= 0 && (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
-	prevRelPath = curRelPath;
-	selectTime = now;
-	if(selagain && Items[Selected].isDirectory && NativeDirectoryHandling) {
-		enterDirectory(Selected);
-		return;
+	if(!onlyHover) {
+		selagain = Selected >= 0 && (Selected == oldSelected && prevRelPath == curRelPath && now < selectTime + 500);
+		prevRelPath = curRelPath;
+		selectTime = now;
+		if(selagain && Items[Selected].isDirectory && NativeDirectoryHandling) {
+			enterDirectory(Selected);
+			return;
+		}
 	}
+
+	if(Selected != oldSelected)
+		selectTime = 0;
 
 	gui::EGUI_EVENT_TYPE eventType = selagain ? EGET_LISTBOX_SELECTED_AGAIN : EGET_LISTBOX_CHANGED;
 	// post the news
-	if(Parent && !onlyHover) {
+	if(Parent) {
 		SEvent event;
 		event.EventType = EET_GUI_EVENT;
 		event.GUIEvent.Caller = this;
