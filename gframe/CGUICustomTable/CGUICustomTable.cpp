@@ -34,7 +34,7 @@ CGUICustomTable::CGUICustomTable(IGUIEnvironment* environment, IGUIElement* pare
 	Clip(clip), DrawBack(drawBack), MoveOverSelect(moveOverSelect),
 	Selecting(false), CurrentResizedColumn(-1), ResizeStart(0), ResizableColumns(true),
 	ItemHeight(0), TotalItemHeight(0), TotalItemWidth(0), Selected(-1),
-	CellHeightPadding(5), CellWidthPadding(5), ActiveTab(-1),
+	CellHeightPadding(5), CellWidthPadding(5), ActiveTab(-1), selectTime(0),
 	CurrentOrdering(EGOM_NONE), DrawFlags(EGTDF_ROWS | EGTDF_COLUMNS | EGTDF_ACTIVE_ROW) {
 #ifdef _DEBUG
 	setDebugName("CGUICustomTable");
@@ -362,6 +362,8 @@ void CGUICustomTable::setSelected(s32 index) {
 	Selected = -1;
 	if(index >= 0 && index < (s32)Rows.size())
 		Selected = index;
+
+	selectTime = os::Timer::getTime();
 }
 
 
@@ -826,10 +828,10 @@ void CGUICustomTable::selectNew(s32 ypos, bool onlyHover) {
 	if(Selected != oldSelected)
 		selectTime = 0;
 
-	gui::EGUI_EVENT_TYPE eventType = selagain ? EGET_TABLE_CHANGED : EGET_TABLE_SELECTED_AGAIN;
+	gui::EGUI_EVENT_TYPE eventType = selagain ? EGET_TABLE_SELECTED_AGAIN : EGET_TABLE_CHANGED;
 
 	// post the news
-	if(Parent) {
+	if(Parent && (!onlyHover || !MoveOverSelect)) {
 		SEvent event;
 		event.EventType = EET_GUI_EVENT;
 		event.GUIEvent.Caller = this;
