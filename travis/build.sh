@@ -10,7 +10,7 @@ UPDATE_URL=${UPDATE_URL:-""}
 
 if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
     ./premake5 vs2017 --sound=sdl-mixer --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --covers=\"$COVERS_URL\" --discord=\"$DISCORD_APP_ID\" --update-url=\"$UPDATE_URL\"
-    "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln -t:ygoprodll
+    "$MSBUILD_PATH/msbuild.exe" -m -p:Configuration=$BUILD_CONFIG ./build/ygo.sln -t:ygoprodll -verbosity:minimal -p:EchoOff=true
 fi
 if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     ./premake5 gmake2 --vcpkg-root=$VCPKG_ROOT --sound=sdl-mixer --pics=\"$PICS_URL\" --fields=\"$FIELDS_URL\" --covers=\"$COVERS_URL\" --discord=\"$DISCORD_APP_ID\" --update-url=\"$UPDATE_URL\"
