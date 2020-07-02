@@ -69,15 +69,16 @@ public:
 
 	//! Checks if an override color is enabled
 	virtual bool isOverrideColorEnabled(void) const  _IRR_OVERRIDE_ { return false; };
-	virtual bool getClickShiftState() const	_IRR_OVERRIDE_ {
-		return false;
-	}
 
 	virtual bool getClickControlState() const _IRR_OVERRIDE_ {
 		return false;
 	}
 
 #endif
+	//! Get if the shift key was pressed in last EGET_BUTTON_CLICKED event
+	virtual bool getClickShiftState() const	_IRR_OVERRIDE_ {
+		return ClickShiftState;
+	}
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
 	virtual void setImage(video::ITexture* image = 0);
@@ -211,6 +212,7 @@ protected:
 	bool DrawBorder;
 	bool ScaleImage;
 
+	bool ClickShiftState;
 
 	bool isDrawImage;
 	bool isFixedSize;
