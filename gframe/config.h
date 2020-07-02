@@ -23,7 +23,7 @@ extern bool show_changelog;
 
 #define EDOPRO_VERSION_MAJOR 38
 #define EDOPRO_VERSION_MINOR 1
-#define EDOPRO_VERSION_PATCH 2
+#define EDOPRO_VERSION_PATCH 3
 #define EDOPRO_VERSION_CODENAME L"Hope Harbinger"
 #define CLIENT_VERSION (EDOPRO_VERSION_MAJOR & 0xff | ((EDOPRO_VERSION_MINOR & 0xff) << 8) | ((OCG_VERSION_MAJOR & 0xff) << 16) | ((OCG_VERSION_MINOR & 0xff) << 24))
 #define EXPAND_VERSION(ver) (ver) & 0xff, (((ver) >> 8) & 0xff), (((ver) >> 16) & 0xff), (((ver) >> 24) & 0xff)
