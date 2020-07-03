@@ -812,7 +812,6 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	char* pbufw, *pbuf = DATA;
 	switch (message) {
 	case MSG_RETRY: {
-		record = false;
 		if(retry_count++ < 2) {
 			STOC_Chat scc;
 			scc.player = 14;
@@ -1267,19 +1266,13 @@ int GenericDuel::Analyze(CoreUtils::Packet packet) {
 		last_select_packet = std::move(packetcpy);
 	} else if(had_hint)
 		last_select_hint.data.clear();
-	if(return_value != 3) {
-		if(last_response_buff.size()) {
-			last_replay.Write<uint8_t>(last_response_buff.size(), false);
-			last_replay.WriteData(last_response_buff.data(), last_response_buff.size());
-			last_response_buff.clear();
-		}
+	if(return_value != 3)
 		retry_count = 0;
-	}
 	return return_value;
 }
 void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
-	last_response_buff.clear();
-	BufferIO::insert_data(last_response_buff, pdata, len);
+	last_replay.Write<uint8_t>(len, false);
+	last_replay.WriteData(pdata, len);
 	OCG_DuelSetResponse(pduel, pdata, len);
 	GetAtPos(dp->type).player->state = 0xff;
 	if(host_info.time_limit) {
@@ -1294,11 +1287,6 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 void GenericDuel::EndDuel() {
 	if(!pduel)
 		return;
-	if(last_response_buff.size()) {
-		last_replay.Write<uint8_t>(last_response_buff.size(), false);
-		last_replay.WriteData(last_response_buff.data(), last_response_buff.size());
-		last_response_buff.clear();
-	}
 	last_replay.EndRecord(0x1000);
 	std::vector<unsigned char> oldreplay;
 	oldreplay.insert(oldreplay.end(),(unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
