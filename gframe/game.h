@@ -540,6 +540,13 @@ public:
 	irr::gui::IGUIButton* btnChainWhenAvail;
 	//cancel or finish
 	irr::gui::IGUIButton* btnCancelOrFinish;
+	//big picture
+	irr::gui::IGUIWindow* wBigCard;
+	irr::gui::IGUIImage* imgBigCard;
+	irr::gui::IGUIButton* btnBigCardOriginalSize;
+	irr::gui::IGUIButton* btnBigCardZoomIn;
+	irr::gui::IGUIButton* btnBigCardZoomOut;
+	irr::gui::IGUIButton* btnBigCardClose;
 };
 
 extern Game* mainGame;
@@ -728,6 +735,10 @@ extern Game* mainGame;
 #define CHECKBOX_MULTI_KEYWORDS		372
 #define CHECKBOX_PREFER_EXPANSION	373
 #define CHECKBOX_DRAW_SINGLE_CHAIN	374
+#define BUTTON_BIG_CARD_CLOSE		380
+#define BUTTON_BIG_CARD_ZOOM_IN		381
+#define BUTTON_BIG_CARD_ZOOM_OUT	382
+#define BUTTON_BIG_CARD_ORIG_SIZE	383
 
 #define DEFAULT_DUEL_RULE			5
 

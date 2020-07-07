@@ -731,6 +731,23 @@ bool Game::Initialize() {
 	//cancel or finish
 	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
 	btnCancelOrFinish->setVisible(false);
+	//big picture
+	wBigCard = env->addWindow(rect<s32>(0, 0, 0, 0), false, L"");
+	wBigCard->getCloseButton()->setVisible(false);
+	wBigCard->setDrawTitlebar(false);
+	wBigCard->setDrawBackground(false);
+	wBigCard->setVisible(false);
+	imgBigCard = env->addImage(rect<s32>(0, 0, 0, 0), wBigCard);
+	imgBigCard->setScaleImage(false);
+	imgBigCard->setUseAlphaChannel(true);
+	btnBigCardOriginalSize = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_BIG_CARD_ORIG_SIZE, dataManager.GetSysString(1443));
+	btnBigCardZoomIn = env->addButton(rect<s32>(205, 140, 295, 175), 0, BUTTON_BIG_CARD_ZOOM_IN, dataManager.GetSysString(1441));
+	btnBigCardZoomOut = env->addButton(rect<s32>(205, 180, 295, 215), 0, BUTTON_BIG_CARD_ZOOM_OUT, dataManager.GetSysString(1442));
+	btnBigCardClose = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_BIG_CARD_CLOSE, dataManager.GetSysString(1440));
+	btnBigCardOriginalSize->setVisible(false);
+	btnBigCardZoomIn->setVisible(false);
+	btnBigCardZoomOut->setVisible(false);
+	btnBigCardClose->setVisible(false);
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
@@ -1723,6 +1740,11 @@ void Game::OnResize() {
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnShuffle->setRelativePosition(Resize(205, 230, 295, 265));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
+
+	btnBigCardOriginalSize->setRelativePosition(Resize(205, 100, 295, 135));
+	btnBigCardZoomIn->setRelativePosition(Resize(205, 140, 295, 175));
+	btnBigCardZoomOut->setRelativePosition(Resize(205, 180, 295, 215));
+	btnBigCardClose->setRelativePosition(Resize(205, 230, 295, 265));
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
 	x = x * xScale;

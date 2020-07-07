@@ -1794,10 +1794,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
 				return true;
 			}
+			if(event.GUIEvent.Caller == mainGame->imgCard && mainGame->is_building && !mainGame->is_siding) {
+				mainGame->SetCursor(ECI_HAND);
+				return true;
+			}
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX) {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX || event.GUIEvent.Caller == mainGame->imgCard) {
 				mainGame->SetCursor(ECI_NORMAL);
 				return true;
 			}
