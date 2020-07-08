@@ -288,6 +288,9 @@ bool Game::Initialize() {
 	chkQuickAnimation = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_QUICK_ANIMATION, dataManager.GetSysString(1299));
 	chkQuickAnimation->setChecked(gameConf.quick_animation != 0);
 	posY += 30;
+	chkDrawSingleChain = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, CHECKBOX_DRAW_SINGLE_CHAIN, dataManager.GetSysString(1287));
+	chkDrawSingleChain->setChecked(gameConf.draw_single_chain != 0);
+	posY += 30;
 	chkAutoSaveReplay = env->addCheckBox(false, rect<s32>(posX, posY, posX + 260, posY + 25), tabHelper, -1, dataManager.GetSysString(1366));
 	chkAutoSaveReplay->setChecked(gameConf.auto_save_replay != 0);
 	elmTabHelperLast = chkAutoSaveReplay;
@@ -772,6 +775,23 @@ bool Game::Initialize() {
 	//cancel or finish
 	btnCancelOrFinish = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, dataManager.GetSysString(1295));
 	btnCancelOrFinish->setVisible(false);
+	//big picture
+	wBigCard = env->addWindow(rect<s32>(0, 0, 0, 0), false, L"");
+	wBigCard->getCloseButton()->setVisible(false);
+	wBigCard->setDrawTitlebar(false);
+	wBigCard->setDrawBackground(false);
+	wBigCard->setVisible(false);
+	imgBigCard = env->addImage(rect<s32>(0, 0, 0, 0), wBigCard);
+	imgBigCard->setScaleImage(false);
+	imgBigCard->setUseAlphaChannel(true);
+	btnBigCardOriginalSize = env->addButton(rect<s32>(205, 100, 295, 135), 0, BUTTON_BIG_CARD_ORIG_SIZE, dataManager.GetSysString(1443));
+	btnBigCardZoomIn = env->addButton(rect<s32>(205, 140, 295, 175), 0, BUTTON_BIG_CARD_ZOOM_IN, dataManager.GetSysString(1441));
+	btnBigCardZoomOut = env->addButton(rect<s32>(205, 180, 295, 215), 0, BUTTON_BIG_CARD_ZOOM_OUT, dataManager.GetSysString(1442));
+	btnBigCardClose = env->addButton(rect<s32>(205, 230, 295, 265), 0, BUTTON_BIG_CARD_CLOSE, dataManager.GetSysString(1440));
+	btnBigCardOriginalSize->setVisible(false);
+	btnBigCardZoomIn->setVisible(false);
+	btnBigCardZoomOut->setVisible(false);
+	btnBigCardClose->setVisible(false);
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
@@ -1165,6 +1185,7 @@ void Game::LoadConfig() {
 	gameConf.enable_bot_mode = 0;
 	gameConf.quick_animation = 0;
 	gameConf.auto_save_replay = 0;
+	gameConf.draw_single_chain = 0;
 	gameConf.prefer_expansion_script = 0;
 	gameConf.enable_sound = true;
 	gameConf.sound_volume = 0.5;
@@ -1247,6 +1268,8 @@ void Game::LoadConfig() {
 			gameConf.quick_animation = atoi(valbuf);
 		} else if(!strcmp(strbuf, "auto_save_replay")) {
 			gameConf.auto_save_replay = atoi(valbuf);
+		} else if(!strcmp(strbuf, "draw_single_chain")) {
+			gameConf.draw_single_chain = atoi(valbuf);
 		} else if(!strcmp(strbuf, "prefer_expansion_script")) {
 			gameConf.prefer_expansion_script = atoi(valbuf);
 		} else if(!strcmp(strbuf, "window_maximized")) {
@@ -1344,6 +1367,7 @@ void Game::SaveConfig() {
 	fprintf(fp, "bot_deck_path = %s\n", linebuf);
 	fprintf(fp, "quick_animation = %d\n", gameConf.quick_animation);
 	fprintf(fp, "auto_save_replay = %d\n", (chkAutoSaveReplay->isChecked() ? 1 : 0));
+	fprintf(fp, "draw_single_chain = %d\n", gameConf.draw_single_chain);
 	fprintf(fp, "prefer_expansion_script = %d\n", gameConf.prefer_expansion_script);
 	fprintf(fp, "window_maximized = %d\n", (gameConf.window_maximized ? 1 : 0));
 	fprintf(fp, "window_width = %d\n", gameConf.window_width);
@@ -1556,7 +1580,17 @@ void Game::ClearTextures() {
 	}
 	imageManager.ClearTexture();
 }
-void Game::CloseDuelWindow() {
+void Game::CloseGameButtons() {
+	btnChainIgnore->setVisible(false);
+	btnChainAlways->setVisible(false);
+	btnChainWhenAvail->setVisible(false);
+	btnCancelOrFinish->setVisible(false);
+	btnSpectatorSwap->setVisible(false);
+	btnShuffle->setVisible(false);
+	wSurrender->setVisible(false);
+}
+void Game::CloseGameWindow() {
+	CloseGameButtons();
 	for(auto wit = fadingList.begin(); wit != fadingList.end(); ++wit) {
 		if(wit->isFadein)
 			wit->autoFadeoutFrame = 1;
@@ -1566,34 +1600,32 @@ void Game::CloseDuelWindow() {
 	wANCard->setVisible(false);
 	wANNumber->setVisible(false);
 	wANRace->setVisible(false);
-	wCardImg->setVisible(false);
 	wCardSelect->setVisible(false);
 	wCardDisplay->setVisible(false);
 	wCmdMenu->setVisible(false);
 	wFTSelect->setVisible(false);
 	wHand->setVisible(false);
-	wInfos->setVisible(false);
 	wMessage->setVisible(false);
 	wOptions->setVisible(false);
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
-	wSurrender->setVisible(false);
 	wReplayControl->setVisible(false);
 	wReplaySave->setVisible(false);
 	stHintMsg->setVisible(false);
+	stTip->setVisible(false);
+}
+void Game::CloseDuelWindow() {
+	CloseGameWindow();
+	wCardImg->setVisible(false);
+	wInfos->setVisible(false);
+	wChat->setVisible(false);
 	btnSideOK->setVisible(false);
 	btnSideShuffle->setVisible(false);
 	btnSideSort->setVisible(false);
 	btnSideReload->setVisible(false);
 	btnLeaveGame->setVisible(false);
 	btnSpectatorSwap->setVisible(false);
-	btnChainIgnore->setVisible(false);
-	btnChainAlways->setVisible(false);
-	btnChainWhenAvail->setVisible(false);
-	btnCancelOrFinish->setVisible(false);
-	btnShuffle->setVisible(false);
-	wChat->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
 	lstHostList->clear();
@@ -1796,6 +1828,11 @@ void Game::OnResize() {
 	btnChainWhenAvail->setRelativePosition(Resize(205, 180, 295, 215));
 	btnShuffle->setRelativePosition(Resize(205, 230, 295, 265));
 	btnCancelOrFinish->setRelativePosition(Resize(205, 230, 295, 265));
+
+	btnBigCardOriginalSize->setRelativePosition(Resize(205, 100, 295, 135));
+	btnBigCardZoomIn->setRelativePosition(Resize(205, 140, 295, 175));
+	btnBigCardZoomOut->setRelativePosition(Resize(205, 180, 295, 215));
+	btnBigCardClose->setRelativePosition(Resize(205, 230, 295, 265));
 }
 recti Game::Resize(s32 x, s32 y, s32 x2, s32 y2) {
 	x = x * xScale;

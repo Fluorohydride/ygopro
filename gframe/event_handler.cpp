@@ -129,13 +129,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->dInfo.isStarted = false;
 					mainGame->dInfo.isFinished = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
-					mainGame->stTip->setVisible(false);
-					mainGame->wCardImg->setVisible(false);
-					mainGame->wInfos->setVisible(false);
-					mainGame->wPhase->setVisible(false);
-					mainGame->btnLeaveGame->setVisible(false);
-					mainGame->btnSpectatorSwap->setVisible(false);
-					mainGame->wChat->setVisible(false);
+					mainGame->CloseDuelWindow();
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
@@ -1459,8 +1453,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->chain_when_avail = false;
 				UpdateChainButtons();
 			}
-			if(mainGame->wSurrender->isVisible())
-				mainGame->HideElement(mainGame->wSurrender);
+			mainGame->HideElement(mainGame->wSurrender);
 			mainGame->wCmdMenu->setVisible(false);
 			if(mainGame->fadingList.size())
 				break;
@@ -1801,10 +1794,14 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 				mainGame->SetCursor(event.GUIEvent.Caller->isEnabled() ? ECI_IBEAM : ECI_NORMAL);
 				return true;
 			}
+			if(event.GUIEvent.Caller == mainGame->imgCard && mainGame->is_building && !mainGame->is_siding) {
+				mainGame->SetCursor(ECI_HAND);
+				return true;
+			}
 			break;
 		}
 		case irr::gui::EGET_ELEMENT_LEFT: {
-			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX) {
+			if(event.GUIEvent.Caller->getType() == EGUIET_EDIT_BOX || event.GUIEvent.Caller == mainGame->imgCard) {
 				mainGame->SetCursor(ECI_NORMAL);
 				return true;
 			}
@@ -1874,6 +1871,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event) {
 			}
 			case CHECKBOX_QUICK_ANIMATION: {
 				mainGame->gameConf.quick_animation = mainGame->chkQuickAnimation->isChecked() ? 1 : 0;
+				return true;
+				break;
+			}
+			case CHECKBOX_DRAW_SINGLE_CHAIN: {
+				mainGame->gameConf.draw_single_chain = mainGame->chkDrawSingleChain->isChecked() ? 1 : 0;
 				return true;
 				break;
 			}

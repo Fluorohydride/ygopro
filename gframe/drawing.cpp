@@ -452,31 +452,45 @@ void Game::DrawMisc() {
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.conti_act) {
-		im.setTranslation(vector3df((matManager.vFieldContiAct[0].X + matManager.vFieldContiAct[1].X) / 2,
-			(matManager.vFieldContiAct[0].Y + matManager.vFieldContiAct[2].Y) / 2, 0.03f));
+		irr::core::vector3df pos = vector3df((matManager.vFieldContiAct[0].X + matManager.vFieldContiAct[1].X) / 2,
+			(matManager.vFieldContiAct[0].Y + matManager.vFieldContiAct[2].Y) / 2, 0);
+		im.setRotationRadians(irr::core::vector3df(0, 0, 0));
+		for(auto cit = dField.conti_cards.begin(); cit != dField.conti_cards.end(); ++cit) {
+			im.setTranslation(pos);
+			driver->setTransform(irr::video::ETS_WORLD, im);
+			matManager.mCard.setTexture(0, imageManager.GetTexture((*cit)->code));
+			driver->setMaterial(matManager.mCard);
+			driver->drawVertexPrimitiveList(matManager.vCardFront, 4, matManager.iRectangle, 2);
+			pos.Z += 0.03f;
+		}
+		im.setTranslation(pos);
+		im.setRotationRadians(act_rot);
 		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->setMaterial(matManager.mTexture);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	for(size_t i = 0; i < dField.chains.size(); ++i) {
-		if(dField.chains[i].solved)
-			break;
-		matManager.mTRTexture.setTexture(0, imageManager.tChain);
-		matManager.mTRTexture.AmbientColor = 0xffffff00;
-		ic.setRotationRadians(act_rot);
-		ic.setTranslation(dField.chains[i].chain_pos);
-		driver->setMaterial(matManager.mTRTexture);
-		driver->setTransform(irr::video::ETS_WORLD, ic);
-		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
-		it.setScale(0.6f);
-		it.setTranslation(dField.chains[i].chain_pos);
-		matManager.mTRTexture.setTexture(0, imageManager.tNumber);
-		matManager.vChainNum[0].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5));
-		matManager.vChainNum[1].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5));
-		matManager.vChainNum[2].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5 + 1));
-		matManager.vChainNum[3].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5 + 1));
-		driver->setMaterial(matManager.mTRTexture);
-		driver->setTransform(irr::video::ETS_WORLD, it);
-		driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
+	if(dField.chains.size() > 1 || mainGame->gameConf.draw_single_chain) {
+		for(size_t i = 0; i < dField.chains.size(); ++i) {
+			if(dField.chains[i].solved)
+				break;
+			matManager.mTRTexture.setTexture(0, imageManager.tChain);
+			matManager.mTRTexture.AmbientColor = 0xffffff00;
+			ic.setRotationRadians(act_rot);
+			ic.setTranslation(dField.chains[i].chain_pos);
+			driver->setMaterial(matManager.mTRTexture);
+			driver->setTransform(irr::video::ETS_WORLD, ic);
+			driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
+			it.setScale(0.6f);
+			it.setTranslation(dField.chains[i].chain_pos);
+			matManager.mTRTexture.setTexture(0, imageManager.tNumber);
+			matManager.vChainNum[0].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5));
+			matManager.vChainNum[1].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5));
+			matManager.vChainNum[2].TCoords = vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5 + 1));
+			matManager.vChainNum[3].TCoords = vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5 + 1));
+			driver->setMaterial(matManager.mTRTexture);
+			driver->setTransform(irr::video::ETS_WORLD, it);
+			driver->drawVertexPrimitiveList(matManager.vChainNum, 4, matManager.iRectangle, 2);
+		}
 	}
 	//finish button
 	if(btnCancelOrFinish->isVisible() && dField.select_ready)
@@ -987,9 +1001,12 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 			btnCardDisplay[i]->setDrawImage(false);
 	}
 	win->setRelativePosition(irr::core::recti(center.X, center.Y, 0, 0));
+	win->setVisible(true);
 	fadingList.push_back(fu);
 }
 void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
+	if(!win->isVisible() && !set_action)
+		return;
 	FadingUnit fu;
 	fu.fadingSize = win->getRelativePosition();
 	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
@@ -1197,8 +1214,13 @@ void Game::DrawSearchResults() {
 	DrawShadowText(numFont, deckBuilder.result_string, Resize(875, 137, 935, 157), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
 	driver->draw2DRectangle(Resize(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
-	for(size_t i = 0; i < 7 && i + scrFilter->getPos() < deckBuilder.results.size(); ++i) {
+	for(size_t i = 0; i < 9 && i + scrFilter->getPos() < deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + scrFilter->getPos()];
+		if(i >= 7)
+		{
+			imageManager.GetTextureThumb(ptr->second.code);
+			break;
+		}
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, Resize(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
