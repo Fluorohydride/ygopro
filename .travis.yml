@@ -9,6 +9,7 @@ env:
   - DEPLOY_BRANCH=travis-$TRAVIS_OS_NAME
   - DEPLOY_DIR=deploy
   - MSBUILD_PATH="/c/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/MSBuild/15.0/Bin"
+  - DEPENDENCIES_BASE_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200711
 addons:
   apt:
     update: true
@@ -34,16 +35,16 @@ matrix:
     env:
     - VCPKG_ROOT=/c/vcpkg
     - VCPKG_DEFAULT_TRIPLET=x86-windows-static
-    - VCPKG_LIBS="lua[cpp] libevent sqlite3 bzip2 libjpeg-turbo libpng zlib curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_ZIP_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200709/installed_x86-windows-static.zip
+    - VCPKG_LIBS="lua[cpp] libevent sqlite3 bzip2 libjpeg-turbo libpng zlib curl openssl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
+    - VCPKG_CACHE_ZIP_URL=$DEPENDENCIES_BASE_URL/installed_x86-windows-static.zip
     - DXSDK_DIR=/c/d3d9sdk/
   - name: "Bionic GCC7"
     os: linux
     compiler: gcc
     env:
     - VCPKG_ROOT="$PWD/vcpkg"
-    - VCPKG_LIBS="libevent sqlite3 freetype irrlicht-rectclip curl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200709/installed_x64-linux.7z
+    - VCPKG_LIBS="freetype libevent sqlite3 irrlicht-rectclip curl openssl libgit2 fmt nlohmann-json sdl2-mixer[libflac,mpg123,libvorbis] discord-rpc-payload"
+    - VCPKG_CACHE_7Z_URL=$DEPENDENCIES_BASE_URL/installed_x64-linux.7z
   - name: "Mojave"
     os: osx
     osx_image: xcode11.3
@@ -51,8 +52,8 @@ matrix:
     - MACOSX_DEPLOYMENT_TARGET=10.11
     - SDKROOT="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk"
     - VCPKG_ROOT=./vcpkg
-    - VCPKG_LIBS="libevent sdl2-mixer-fixdynamic[libflac,mpg123,libvorbis] discord-rpc-payload"
-    - VCPKG_CACHE_7Z_URL=https://github.com/kevinlul/edopro-vcpkg-cache/releases/download/20200702/installed_x64-osx.7z
+    - VCPKG_LIBS="freetype libevent openssl libgit2 sdl2-mixer[core,libflac,mpg123,libvorbis] discord-rpc-payload"
+    - VCPKG_CACHE_7Z_URL=$DEPENDENCIES_BASE_URL/installed_x64-osx.7z
 before_install: ./travis/install-premake5.sh
 install: ./travis/dependencies.sh
 script: ./travis/build.sh
