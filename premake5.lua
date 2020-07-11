@@ -56,6 +56,7 @@ workspace "ygo"
 	configurations { "Debug", "Release" }
 
 	filter "system:windows"
+		systemversion "latest"
 		defines { "WIN32", "_WIN32", "NOMINMAX" }
 
 	if _OPTIONS["vcpkg-root"] then
