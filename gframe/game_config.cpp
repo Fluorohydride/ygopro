@@ -178,6 +178,8 @@ bool GameConfig::Load(const path_char* filename)
 			else if (type == "scale_background")
 				scale_background = !!std::stoi(str);
 #ifndef __ANDROID__
+			else if (type == "dotted_lines")
+				dotted_lines = !!std::stoi(str);
 			else if (type == "accurate_bg_resize")
 				accurate_bg_resize = !!std::stoi(str);
 #endif
@@ -282,6 +284,7 @@ bool GameConfig::Save(const path_char* filename)
 	conf_file << "skin = "            	       << Utils::ToUTF8IfNeeded(skin) << "\n";
 	conf_file << "language = "                 << Utils::ToUTF8IfNeeded(locale) << "\n";
 	conf_file << "scale_background = "         << scale_background << "\n";
+	conf_file << "dotted_lines = "             << dotted_lines << "\n";
 	conf_file << "accurate_bg_resize = "       << accurate_bg_resize << "\n";
 	conf_file << "enable_music = "             << enablemusic << "\n";
 	conf_file << "enable_sound = "             << enablesound << "\n";

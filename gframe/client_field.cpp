@@ -40,25 +40,26 @@ ClientField::ClientField() {
 		szone[p].resize(8, 0);
 	}
 }
-#define CLEAR_VECTOR(vec)for(auto& pcard : vec)\
-							delete pcard;\
-						vec.clear();\
-						vec.shrink_to_fit();
+
 void ClientField::Clear() {
+	auto ClearVector = [](auto& vec) {
+		for(auto& pcard : vec)
+			delete pcard;
+		vec = {};
+	};
 	for(int i = 0; i < 2; ++i) {
-		CLEAR_VECTOR(mzone[i]);
-		CLEAR_VECTOR(szone[i]);
+		ClearVector(mzone[i]);
+		ClearVector(szone[i]);
 		mzone[i].resize(7, 0);
 		szone[i].resize(8, 0);
-		CLEAR_VECTOR(deck[i]);
-		CLEAR_VECTOR(hand[i]);
-		CLEAR_VECTOR(grave[i]);
-		CLEAR_VECTOR(remove[i]);
-		CLEAR_VECTOR(extra[i]);
+		ClearVector(deck[i]);
+		ClearVector(hand[i]);
+		ClearVector(grave[i]);
+		ClearVector(remove[i]);
+		ClearVector(extra[i]);
 	}
-	CLEAR_VECTOR(limbo_temp);
-	for(auto& pcard : overlay_cards)
-		delete pcard;
+	ClearVector(limbo_temp);
+	ClearVector(overlay_cards);
 	if(skills[0]) {
 		delete skills[0];
 		skills[0] = nullptr;

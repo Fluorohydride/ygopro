@@ -8,106 +8,35 @@
 #include "CGUITTFont/CGUITTFont.h"
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "custom_skin_enum.h"
-#ifdef __ANDROID__
-#include <GLES/gl.h>
-#include <GLES/glext.h>
-#include <GLES/glplatform.h>
-#elif defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
 
 namespace ygo {
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color) {
-	if(false) {
-#if 0
-		float origin[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		float cv[4];
-		SColorf conv(color);
-		cv[3] = conv.getAlpha();
-		cv[0] = conv.getRed();
-		cv[1] = conv.getGreen();
-		cv[2] = conv.getBlue();
-		glLineWidth(width);
-		glLineStipple(1, linePatternGL);
-		if(strip)
-			glEnable(GL_LINE_STIPPLE);
-		glDisable(GL_TEXTURE_2D);
-		glMaterialfv(GL_FRONT, GL_AMBIENT, cv);
-		glBegin(GL_LINE_LOOP);
-		glVertex3fv((float*)&vec[0].Pos);
-		glVertex3fv((float*)&vec[1].Pos);
-		glVertex3fv((float*)&vec[3].Pos);
-		glVertex3fv((float*)&vec[2].Pos);
-		glEnd();
-		glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
-		glDisable(GL_LINE_STIPPLE);
-		glEnable(GL_TEXTURE_2D);
-#endif
-	} else {
-		if(driver->getDriverType() != irr::video::EDT_DIRECT3D9)
-			glLineWidth(width + 2);
-		driver->setMaterial(matManager.mOutLine);
-		if(strip) {
-			if(linePatternD3D < 15) {
-				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D + 1) / 15.0, color);
-				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D + 1) / 15.0, color);
-				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D + 1) / 15.0, color);
-				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D + 1) / 15.0, color);
-			} else {
-				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePatternD3D - 14) / 15.0, vec[1].Pos, color);
-				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePatternD3D - 14) / 15.0, vec[3].Pos, color);
-				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePatternD3D - 14) / 15.0, vec[2].Pos, color);
-				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePatternD3D - 14) / 15.0, vec[0].Pos, color);
-			}
-		} else {
-			driver->draw3DLine(vec[0].Pos, vec[1].Pos, color);
-			driver->draw3DLine(vec[1].Pos, vec[3].Pos, color);
-			driver->draw3DLine(vec[3].Pos, vec[2].Pos, color);
-			driver->draw3DLine(vec[2].Pos, vec[0].Pos, color);
+	driver->setMaterial(matManager.mOutLine);
+	if(strip && !gGameConfig->dotted_lines) {
+		int pattern = linePatternD3D - 14;
+		bool swap = false;
+		if(linePatternD3D < 15) {
+			pattern += 15;
+			swap = true;
 		}
-	}
-}
-#undef CONVERT_COLOR
-#undef CONVERT_ALPHA
-void Game::DrawSelectionLine(irr::gui::IGUIElement* element, int width, irr::video::SColor color) {
-	irr::core::recti pos = element->getAbsolutePosition();
-	float x1 = pos.UpperLeftCorner.X;
-	float x2 = pos.LowerRightCorner.X;
-	float y1 = pos.UpperLeftCorner.Y;
-	float y2 = pos.LowerRightCorner.Y;
-	float w = pos.getWidth();
-	float h = pos.getHeight();
-	if(linePatternD3D < 15) {
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y1 - 1 - width, x1 + (w * (linePatternD3D + 1) / 15.0) + 1 + width, y1 - 1));
-		driver->draw2DRectangle(color, irr::core::recti(x2 - (w * (linePatternD3D + 1) / 15.0) - 1 - width, y2 + 1, x2 + 1 + width, y2 + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y1 - 1 - width, x1 - 1, y2 - (h * (linePatternD3D + 1) / 15.0) + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x2 + 1, y1 + (h * (linePatternD3D + 1) / 15.0) - 1 - width, x2 + 1 + width, y2 + 1 + width));
+		auto drawLine = [&](const auto& pos1, const auto& pos2) -> void {
+			if(swap)
+				driver->draw3DLineW(pos1 + (pos2 - pos1) * (pattern) / 15.0, pos1, color, width);
+			else
+				driver->draw3DLineW(pos1, pos1 + (pos2 - pos1) * (pattern) / 15.0, color, width);
+		};
+		drawLine(vec[0].Pos, vec[1].Pos);
+		drawLine(vec[1].Pos, vec[3].Pos);
+		drawLine(vec[3].Pos, vec[2].Pos);
+		drawLine(vec[2].Pos, vec[0].Pos);
 	} else {
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width + (w * (linePatternD3D - 14) / 15.0), y1 - 1 - width, x2 + 1 + width, y1 - 1));
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y2 + 1, x2 - (w * (linePatternD3D - 14) / 15.0) + 1 + width, y2 + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x1 - 1 - width, y2 - (h * (linePatternD3D - 14) / 15.0) - 1 - width, x1 - 1, y2 + 1 + width));
-		driver->draw2DRectangle(color, irr::core::recti(x2 + 1, y1 - 1 - width, x2 + 1 + width, y1 + (h * (linePatternD3D - 14) / 15.0) + 1 + width));
+		std::vector<irr::core::vector3df> pos{ vec[0].Pos, vec[1].Pos, vec[3].Pos, vec[2].Pos };
+		driver->draw3DShapeW(pos.data(), pos.size(), color, width, strip ? linePatternGL : 0xffff);
 	}
 }
 void Game::DrawBackGround() {
 	static float selFieldAlpha = 255;
 	static float selFieldDAlpha = -10;
-//	matrix4 im = irr::core::IdentityMatrix;
-//	im.setTranslation(irr::core::vector3df(0, 0, -0.01f));
-//	driver->setTransform(irr::video::ETS_WORLD, im);
-	//dark shade
-//	matManager.mSelField.AmbientColor = 0xff000000;
-//	matManager.mSelField.DiffuseColor = 0xa0000000;
-//	driver->setMaterial(matManager.mSelField);
-//	for(int i = 0; i < 120; i += 4)
-//		driver->drawVertexPrimitiveList(&matManager.vFields[i], 4, matManager.iRectangle, 2);
-//	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
-//	driver->setMaterial(matManager.mBackLine);
-//	driver->drawVertexPrimitiveList(matManager.vBackLine, 76, matManager.iBackLine, 58, irr::video::EVT_STANDARD, irr::scene::EPT_LINES);
 	//draw field
 	//draw field spell card
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);

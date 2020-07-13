@@ -74,6 +74,7 @@ struct GameConfig
 	bool showScopeLabel = true;
 	bool filterBot = true;
 	bool scale_background = true;
+	bool dotted_lines = false;
 #ifdef __ANDROID__
 	bool accurate_bg_resize = true;
 	bool native_keyboard = false;
