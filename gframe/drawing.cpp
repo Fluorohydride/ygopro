@@ -21,7 +21,7 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 		}
 		auto drawLine = [&](const auto& pos1, const auto& pos2) -> void {
 			if(swap)
-				driver->draw3DLineW(pos1 + (pos2 - pos1) * (pattern) / 15.0, pos1, color, width);
+				driver->draw3DLineW(pos1 + (pos2 - pos1) * (pattern) / 15.0, pos2, color, width);
 			else
 				driver->draw3DLineW(pos1, pos1 + (pos2 - pos1) * (pattern) / 15.0, color, width);
 		};
