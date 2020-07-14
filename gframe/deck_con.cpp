@@ -1,4 +1,9 @@
 #include "game_config.h"
+#include <algorithm>
+#ifndef __ANDROID__
+#include <sstream>
+#endif
+#include <unordered_map>
 #include <irrlicht.h>
 #include "random_fwd.h"
 #include "config.h"
@@ -10,11 +15,6 @@
 #include "duelclient.h"
 #include "single_mode.h"
 #include "client_card.h"
-#ifndef __ANDROID__
-#include <sstream>
-#endif
-#include <algorithm>
-#include <unordered_map>
 
 namespace ygo {
 
@@ -153,8 +153,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_HAND_TEST: {
-				mainGame->PopupElement(mainGame->wHandTest);
-				break;
+				if (mainGame->btnHandTest->getClickShiftState()) {
+					mainGame->PopupElement(mainGame->wHandTest);
+					break;
+				}
+				// intentional case fallthrough
 			}
 			case BUTTON_HAND_TEST_START: {
 				Terminate(false);
@@ -189,6 +192,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HAND_TEST_CANCEL: {
 				mainGame->HideElement(mainGame->wHandTest);
+				mainGame->env->setFocus(mainGame->btnHandTest);
 				break;
 			}
 			case BUTTON_CLEAR_DECK: {
