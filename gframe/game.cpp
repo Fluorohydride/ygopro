@@ -734,7 +734,7 @@ bool Game::Initialize() {
 	gSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
 	gSettings.scrMusicVolume->setLargeStep(1);
 	gSettings.scrMusicVolume->setSmallStep(1);
-	gSettings.chkLoopMusic = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 305, 645, 330), sPanel, CHECKBOX_LOOP_MUSIC, gDataManager->GetSysString(2079).c_str());
+	gSettings.chkLoopMusic = env->addCheckBox(gGameConfig->loopMusic, Scale(340, 305, 645, 330), sPanel, CHECKBOX_LOOP_MUSIC, gDataManager->GetSysString(2079).c_str());
 	defaultStrings.emplace_back(gSettings.chkLoopMusic, 2079);
 	gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(340, 215, 645, 330), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stNoAudioBackend, 2058);
