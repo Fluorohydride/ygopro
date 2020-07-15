@@ -53,7 +53,7 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	last_replay.WriteData(resp, len);
 	OCG_DuelSetResponse(pduel, resp, len);
 }
-int SingleMode::SinglePlayThread(const DuelOptions& duelOptions) {
+int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
 	int opt = duelOptions.duelFlags;
 	std::string script_name = "";
 	auto InitReplay = [&]() {

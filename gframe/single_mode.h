@@ -30,7 +30,7 @@ public:
 	static void StopPlay(bool is_exiting = false);
 	static void Restart();
 	static void SetResponse(unsigned char* resp, unsigned int len);
-	static int SinglePlayThread(const DuelOptions& duelOptions);
+	static int SinglePlayThread(DuelOptions duelOptions);
 	static bool SinglePlayAnalyze(CoreUtils::Packet packet);
 	
 	static void SinglePlayRefresh(int player, int location, int flag = 0x2f81fff);
