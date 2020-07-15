@@ -112,6 +112,7 @@ struct DeckError {
 	} count;
 	uint32_t code;
 	DeckError(DERR_TYPE _type) :type(_type) {};
+	DeckError() {};
 };
 struct JoinError {
 	ERROR_TYPE etype = ERROR_TYPE::JOINERROR;
@@ -122,6 +123,7 @@ struct JoinError {
 	};
 	JERR_TYPE error;
 	JoinError(JERR_TYPE type) :error(type) {};
+	JoinError() {};
 };
 struct VersionError {
 	ERROR_TYPE etype = ERROR_TYPE::VERERROR2;
@@ -135,6 +137,7 @@ struct VersionError {
 	};
 	ClientVersion version;
 	VersionError(ClientVersion _version) :version(_version) {};
+	VersionError() {};
 };
 struct STOC_ErrorMsg {
 	ERROR_TYPE type;

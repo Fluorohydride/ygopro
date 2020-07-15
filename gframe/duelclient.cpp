@@ -319,6 +319,12 @@ int DuelClient::ClientThread() {
 	connect_state = 0;
 	return 0;
 }
+template<typename T>
+T getStruct(void* data, size_t len) {
+	T pkt{};
+	memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
+	return pkt;
+}
 void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	char* pdata = data;
 	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
@@ -331,10 +337,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_ERROR_MSG: {
-		STOC_ErrorMsg* _pkt = (STOC_ErrorMsg*)pdata;
-		switch(_pkt->type) {
+		auto _pkt = getStruct<STOC_ErrorMsg>(pdata, len);
+		switch(_pkt.type) {
 		case ERROR_TYPE::JOINERROR: {
-			JoinError* pkt = (JoinError*)pdata;
+			auto pkt = getStruct<JoinError>(pdata, len);
 			temp_ver = 0;
 			mainGame->gMutex.lock();
 			if(mainGame->isHostingOnline) {
@@ -351,7 +357,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnJoinCancel->setEnabled(true);
 			}
 			int stringid = 1406;
-			switch(pkt->error) {
+			switch(pkt.error) {
 				case JoinError::JERR_UNABLE:	stringid--;
 				case JoinError::JERR_PASSWORD:	stringid--;
 				case JoinError::JERR_REFUSED:	stringid--;
@@ -363,21 +369,21 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			break;
 		}
 		case ERROR_TYPE::DECKERROR: {
-			DeckError* pkt = (DeckError*)pdata;
+			auto pkt = getStruct<DeckError>(pdata, len);
 			mainGame->gMutex.lock();
 			int mainmin = 40, mainmax = 60, extramax = 15, sidemax = 15;
 			uint32_t code = 0, curcount = 0;
 			DeckError::DERR_TYPE flag = DeckError::NONE;
 			if(mainGame->dInfo.compat_mode) {
-				curcount = pkt->code;
-				code = pkt->code & 0xFFFFFFF;
-				flag = static_cast<DeckError::DERR_TYPE>(pkt->code >> 28);
+				curcount = pkt.code;
+				code = pkt.code & 0xFFFFFFF;
+				flag = static_cast<DeckError::DERR_TYPE>(pkt.code >> 28);
 			} else {
-				code = pkt->code;
-				flag = pkt->type;
-				mainmin = pkt->count.minimum;
-				mainmax = extramax = sidemax = pkt->count.maximum;
-				curcount = pkt->count.current;
+				code = pkt.code;
+				flag = pkt.type;
+				mainmin = pkt.count.minimum;
+				mainmax = extramax = sidemax = pkt.count.maximum;
+				curcount = pkt.count.current;
 			}
 			std::wstring text;
 			switch(flag) {
@@ -449,7 +455,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		case ERROR_TYPE::VERERROR:
 		case ERROR_TYPE::VERERROR2: {
-			if(temp_ver || (_pkt->type == ERROR_TYPE::VERERROR2)) {
+			if(temp_ver || (_pkt.type == ERROR_TYPE::VERERROR2)) {
 				temp_ver = 0;
 				mainGame->gMutex.lock();
 				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
@@ -457,13 +463,13 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->btnHostConfirm->setEnabled(true);
 				mainGame->btnHostCancel->setEnabled(true);
-				if(_pkt->type == ERROR_TYPE::VERERROR2) {
-					auto& version = ((VersionError*)pdata)->version;
+				if(_pkt.type == ERROR_TYPE::VERERROR2) {
+					auto& version = getStruct<VersionError>(pdata, len).version;
 					mainGame->PopupMessage(fmt::format(gDataManager->GetSysString(1423).c_str(),
 													   version.client.major, version.client.minor,
 													   version.core.major, version.core.minor));
 				} else {
-					mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411).c_str(), _pkt->code >> 12, (_pkt->code >> 4) & 0xff, _pkt->code & 0xf));
+					mainGame->PopupMessage(fmt::sprintf(gDataManager->GetSysString(1411).c_str(), _pkt.code >> 12, (_pkt.code >> 4) & 0xff, _pkt.code & 0xf));
 				}
 				mainGame->gMutex.unlock();
 				event_base_loopbreak(client_base);
@@ -480,7 +486,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				}
 			} else {
 				event_base_loopbreak(client_base);
-				temp_ver = _pkt->code;
+				temp_ver = _pkt.code;
 				try_needed = true;
 			}
 			break;
@@ -501,9 +507,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_HAND_RESULT: {
 		if(mainGame->dInfo.isCatchingUp)
 			break;
-		STOC_HandResult* pkt = (STOC_HandResult*)pdata;
+		auto pkt = getStruct<STOC_HandResult>(pdata, len);
 		mainGame->stHintMsg->setVisible(false);
-		mainGame->showcardcode = (pkt->res1 - 1) + ((pkt->res2 - 1) << 16);
+		mainGame->showcardcode = (pkt.res1 - 1) + ((pkt.res2 - 1) << 16);
 		mainGame->showcarddif = 50;
 		mainGame->showcardp = 0;
 		mainGame->showcard = 100;
@@ -562,31 +568,30 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_CREATE_GAME: {
-		STOC_CreateGame* pkt = (STOC_CreateGame*)pdata;
-		mainGame->dInfo.secret.game_id = pkt->gameid;
+		mainGame->dInfo.secret.game_id = getStruct<STOC_CreateGame>(pdata, len).gameid;
 		break;
 	}
 	case STOC_JOIN_GAME: {
 		temp_ver = 0;
-		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
+		auto pkt = getStruct<STOC_JoinGame>(pdata, len);
 		mainGame->dInfo.isInLobby = true;
-		mainGame->dInfo.compat_mode = pkt->info.handshake != SERVER_HANDSHAKE;
+		mainGame->dInfo.compat_mode = pkt.info.handshake != SERVER_HANDSHAKE;
 		if(mainGame->dInfo.compat_mode) {
-			pkt->info.duel_flag = 0;
-			pkt->info.forbiddentypes = 0;
-			pkt->info.extra_rules = 0;
-			pkt->info.best_of = 1;
-			pkt->info.team1 = 1;
-			pkt->info.team2 = 1;
-			if(pkt->info.mode == MODE_MATCH) {
-				pkt->info.best_of = 3;
+			pkt.info.duel_flag = 0;
+			pkt.info.forbiddentypes = 0;
+			pkt.info.extra_rules = 0;
+			pkt.info.best_of = 1;
+			pkt.info.team1 = 1;
+			pkt.info.team2 = 1;
+			if(pkt.info.mode == MODE_MATCH) {
+				pkt.info.best_of = 3;
 			}
-			if(pkt->info.mode == MODE_TAG) {
-				pkt->info.team1 = 2;
-				pkt->info.team2 = 2;
+			if(pkt.info.mode == MODE_TAG) {
+				pkt.info.team1 = 2;
+				pkt.info.team2 = 2;
 			}
-#define CHK(rule) case rule : pkt->info.duel_flag = DUEL_MODE_MR##rule;break;
-			switch(pkt->info.duel_rule) {
+#define CHK(rule) case rule : pkt.info.duel_flag = DUEL_MODE_MR##rule;break;
+			switch(pkt.info.duel_rule) {
 				CHK(1)
 				CHK(2)
 				CHK(3)
@@ -595,39 +600,39 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			}
 #undef CHK
 		}
-		mainGame->dInfo.duel_params = pkt->info.duel_flag;
-		mainGame->dInfo.isRelay = pkt->info.duel_flag & DUEL_RELAY;
-		pkt->info.duel_flag &= ~DUEL_RELAY;
-		mainGame->dInfo.team1 = pkt->info.team1;
-		mainGame->dInfo.team2 = pkt->info.team2;
-		mainGame->dInfo.best_of = pkt->info.best_of;
+		mainGame->dInfo.duel_params = pkt.info.duel_flag;
+		mainGame->dInfo.isRelay = pkt.info.duel_flag & DUEL_RELAY;
+		pkt.info.duel_flag &= ~DUEL_RELAY;
+		mainGame->dInfo.team1 = pkt.info.team1;
+		mainGame->dInfo.team2 = pkt.info.team2;
+		mainGame->dInfo.best_of = pkt.info.best_of;
 		std::wstring str, strR, strL;
-		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1226), gdeckManager->GetLFListName(pkt->info.lflist)));
-		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1225), gDataManager->GetSysString(1900 + pkt->info.rule)));
+		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1226), gdeckManager->GetLFListName(pkt.info.lflist)));
+		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1225), gDataManager->GetSysString(1900 + pkt.info.rule)));
 		if(mainGame->dInfo.compat_mode)
-			str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1227), gDataManager->GetSysString(1244 + pkt->info.mode)));
+			str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1227), gDataManager->GetSysString(1244 + pkt.info.mode)));
 		else {
 			str.append(fmt::format(L"{}{} {}{}\n", gDataManager->GetSysString(1227), gDataManager->GetSysString(1381), mainGame->dInfo.best_of, mainGame->dInfo.isRelay ? L" Relay" : L""));
 		}
-		if(pkt->info.time_limit) {
-			str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1237), pkt->info.time_limit));
+		if(pkt.info.time_limit) {
+			str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1237), pkt.info.time_limit));
 		}
 		str.append(L"==========\n");
-		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1231), pkt->info.start_lp));
-		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1232), pkt->info.start_hand));
-		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1233), pkt->info.draw_count));
+		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1231), pkt.info.start_lp));
+		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1232), pkt.info.start_hand));
+		str.append(fmt::format(L"{}{}\n", gDataManager->GetSysString(1233), pkt.info.draw_count));
 		int rule;
-		mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt->info.duel_flag, pkt->info.forbiddentypes, &rule);
+		mainGame->dInfo.duel_field = mainGame->GetMasterRule(pkt.info.duel_flag, pkt.info.forbiddentypes, &rule);
 		if(mainGame->dInfo.compat_mode)
-			rule = pkt->info.duel_rule;
-		if((pkt->info.duel_flag & DUEL_MODE_SPEED) == pkt->info.duel_flag) {
+			rule = pkt.info.duel_rule;
+		if((pkt.info.duel_flag & DUEL_MODE_SPEED) == pkt.info.duel_flag) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1258)));
-		} else if((pkt->info.duel_flag & DUEL_MODE_RUSH) == pkt->info.duel_flag) {
+		} else if((pkt.info.duel_flag & DUEL_MODE_RUSH) == pkt.info.duel_flag) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1259)));
 		} else if (rule == 6) {
 			uint32_t filter = 0x100;
 			for (int i = 0; filter && i < schkCustomRules; ++i, filter <<= 1)
-				if (pkt->info.duel_flag & filter) {
+				if (pkt.info.duel_flag & filter) {
 					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
 				}
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1630)));
@@ -636,14 +641,14 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		if(!mainGame->dInfo.compat_mode) {
 			for(int flag = SEALED_DUEL, i = 0; flag < DECK_LIMIT_20 + 1; flag = flag << 1, i++)
-				if(pkt->info.extra_rules & flag) {
+				if(pkt.info.extra_rules & flag) {
 					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1132 + i)));
 				}
 		}
-		if(pkt->info.no_check_deck) {
+		if(pkt.info.no_check_deck) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1229)));
 		}
-		if(pkt->info.no_shuffle_deck) {
+		if(pkt.info.no_shuffle_deck) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1230)));
 		}
 		static const std::map<unsigned int, unsigned int> MONSTER_TYPES = {
@@ -654,13 +659,13 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			{ TYPE_LINK, 1076 }
 		};
 		for (const auto pair : MONSTER_TYPES) {
-			if (pkt->info.forbiddentypes & pair.first) {
+			if (pkt.info.forbiddentypes & pair.first) {
 				strL += fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(pair.second));
 				strL += L"\n";
 			}
 		}
 		mainGame->gMutex.lock();
-		int x = (pkt->info.team1 + pkt->info.team2 >= 5) ? 60 : 0;
+		int x = (pkt.info.team1 + pkt.info.team2 >= 5) ? 60 : 0;
 		mainGame->btnHostPrepOB->setRelativePosition(mainGame->Scale<irr::s32>(10, 180 + x, 110, 205 + x));
 		mainGame->stHostPrepOB->setRelativePosition(mainGame->Scale<irr::s32>(10, 210 + x, 270, 230 + x));
 		mainGame->stHostPrepRule->setRelativePosition(mainGame->Scale<irr::s32>(280, 30, 460, 230 + x));
@@ -682,30 +687,30 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->stHostPrepDuelist[i]->setVisible(false);
 			mainGame->stHostPrepDuelist[i]->setText(L"");
 		}
-		for(int i = 0; i < pkt->info.team1; i++) {
+		for(int i = 0; i < pkt.info.team1; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
 			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<irr::s32>(10, 65 + i * 25, 30, 85 + i * 25));
 			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<irr::s32>(40, 65 + i * 25, 240, 85 + i * 25));
 			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<irr::s32>(250, 65 + i * 25, 270, 85 + i * 25));
 		}
-		for(int i = pkt->info.team1; i < pkt->info.team1 + pkt->info.team2; i++) {
+		for(int i = pkt.info.team1; i < pkt.info.team1 + pkt.info.team2; i++) {
 			mainGame->chkHostPrepReady[i]->setVisible(true);
 			mainGame->stHostPrepDuelist[i]->setVisible(true);
 			mainGame->btnHostPrepKick[i]->setRelativePosition(mainGame->Scale<irr::s32>(10, 10 + 65 + i * 25, 30, 10 + 85 + i * 25));
 			mainGame->stHostPrepDuelist[i]->setRelativePosition(mainGame->Scale<irr::s32>(40, 10 + 65 + i * 25, 240, 10 + 85 + i * 25));
 			mainGame->chkHostPrepReady[i]->setRelativePosition(mainGame->Scale<irr::s32>(250, 10 + 65 + i * 25, 270, 10 + 85 + i * 25));
 		}
-		mainGame->dInfo.selfnames.resize(pkt->info.team1);
-		mainGame->dInfo.opponames.resize(pkt->info.team2);
+		mainGame->dInfo.selfnames.resize(pkt.info.team1);
+		mainGame->dInfo.opponames.resize(pkt.info.team2);
 		mainGame->btnHostPrepReady->setVisible(true);
 		mainGame->btnHostPrepNotReady->setVisible(false);
-		mainGame->dInfo.time_limit = pkt->info.time_limit;
+		mainGame->dInfo.time_limit = pkt.info.time_limit;
 		mainGame->dInfo.time_left[0] = 0;
 		mainGame->dInfo.time_left[1] = 0;
 		mainGame->deckBuilder.filterList = 0;
 		for(auto lit = gdeckManager->_lfList.begin(); lit != gdeckManager->_lfList.end(); ++lit)
-			if(lit->hash == pkt->info.lflist)
+			if(lit->hash == pkt.info.lflist)
 				mainGame->deckBuilder.filterList = &(*lit);
 		if(mainGame->deckBuilder.filterList == 0)
 			mainGame->deckBuilder.filterList = &gdeckManager->_lfList[0];
@@ -717,7 +722,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		mainGame->RefreshDeck(mainGame->cbDeckSelect2);
 		mainGame->cbDeckSelect->setEnabled(true);
-		if (!mainGame->dInfo.compat_mode && pkt->info.extra_rules & DOUBLE_DECK) {
+		if (!mainGame->dInfo.compat_mode && pkt.info.extra_rules & DOUBLE_DECK) {
 			mainGame->cbDeckSelect2->setVisible(true);
 			mainGame->cbDeckSelect2->setEnabled(true);
 		} else {
@@ -741,9 +746,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
-		STOC_TypeChange* pkt = (STOC_TypeChange*)pdata;
-		selftype = pkt->type & 0xf;
-		is_host = ((pkt->type >> 4) & 0xf) != 0;
+		auto pkt = getStruct<STOC_TypeChange>(pdata, len);
+		selftype = pkt.type & 0xf;
+		is_host = ((pkt.type >> 4) & 0xf) != 0;
 		for(int i = 0; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
 			mainGame->btnHostPrepKick[i]->setVisible(is_host);
 		}
@@ -898,19 +903,19 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_TIME_LIMIT: {
-		STOC_TimeLimit* pkt = (STOC_TimeLimit*)pdata;
-		int lplayer = mainGame->LocalPlayer(pkt->player);
+		auto pkt = getStruct<STOC_TimeLimit>(pdata, len);
+		int lplayer = mainGame->LocalPlayer(pkt.player);
 		if(lplayer == 0)
 			DuelClient::SendPacketToServer(CTOS_TIME_CONFIRM);
 		mainGame->dInfo.time_player = lplayer;
-		mainGame->dInfo.time_left[lplayer] = pkt->left_time;
+		mainGame->dInfo.time_left[lplayer] = pkt.left_time;
 		break;
 	}
 	case STOC_CHAT: {
 		if(mainGame->dInfo.isCatchingUp && !mainGame->dInfo.isReplay)
 			break;
-		STOC_Chat* pkt = (STOC_Chat*)pdata;
-		int player = pkt->player;
+		auto pkt = getStruct<STOC_Chat>(pdata, len);
+		int player = pkt.player;
 		int type = -1;
 		if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
 			int team1 = mainGame->dInfo.team1;
@@ -942,7 +947,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			}
 		}
 		wchar_t msg[256];
-		BufferIO::CopyWStr(pkt->msg, msg, 256);
+		BufferIO::CopyWStr(pkt.msg, msg, 256);
 		mainGame->gMutex.lock();
 		mainGame->AddChatMsg(msg, player, type);
 		mainGame->gMutex.unlock();
@@ -950,26 +955,26 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_HS_PLAYER_ENTER: {
 		gSoundManager->PlaySoundEffect(SoundManager::SFX::PLAYER_ENTER);
-		STOC_HS_PlayerEnter* pkt = (STOC_HS_PlayerEnter*)pdata;
-		if(pkt->pos > 5)
+		auto pkt = getStruct<STOC_HS_PlayerEnter>(pdata, len);
+		if(pkt.pos > 5)
 			break;
 		wchar_t name[20];
-		BufferIO::CopyWStr(pkt->name, name, 20);
-		if(pkt->pos < mainGame->dInfo.team1)
-			mainGame->dInfo.selfnames[pkt->pos] = name;
+		BufferIO::CopyWStr(pkt.name, name, 20);
+		if(pkt.pos < mainGame->dInfo.team1)
+			mainGame->dInfo.selfnames[pkt.pos] = name;
 		else
-			mainGame->dInfo.opponames[pkt->pos - mainGame->dInfo.team1] = name;
+			mainGame->dInfo.opponames[pkt.pos - mainGame->dInfo.team1] = name;
 		mainGame->gMutex.lock();
-		mainGame->stHostPrepDuelist[pkt->pos]->setText(name);
+		mainGame->stHostPrepDuelist[pkt.pos]->setText(name);
 		mainGame->btnHostPrepStart->setVisible(is_host);
 		mainGame->btnHostPrepStart->setEnabled(is_host && CheckReady());
 		mainGame->gMutex.unlock();
 		break;
 	}
 	case STOC_HS_PLAYER_CHANGE: {
-		STOC_HS_PlayerChange* pkt = (STOC_HS_PlayerChange*)pdata;
-		unsigned char pos = (pkt->status >> 4) & 0xf;
-		unsigned char state = pkt->status & 0xf;
+		auto pkt = getStruct<STOC_HS_PlayerChange>(pdata, len);
+		unsigned char pos = (pkt.status >> 4) & 0xf;
+		unsigned char state = pkt.status & 0xf;
 		if(pos > 5)
 			break;
 		mainGame->gMutex.lock();
@@ -1014,8 +1019,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_HS_WATCH_CHANGE: {
-		STOC_HS_WatchChange* pkt = (STOC_HS_WatchChange*)pdata;
-		watching = pkt->watch_count;
+		auto pkt = getStruct<STOC_HS_WatchChange>(pdata, len);
+		watching = pkt.watch_count;
 		mainGame->gMutex.lock();
 		mainGame->stHostPrepOB->setText(fmt::format(L"{} {}", gDataManager->GetSysString(1253), watching).c_str());
 		mainGame->gMutex.unlock();
