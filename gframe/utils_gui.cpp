@@ -103,17 +103,22 @@ void GUIUtils::ChangeCursor(irr::IrrlichtDevice* device, /*irr::gui::ECURSOR_ICO
 #endif
 }
 
-void GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
+bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 {
 	const auto driver = device->getVideoDriver();
 	const auto image = driver->createScreenShot();
-	if (image) {
-		auto now = std::time(nullptr);
-		path_string filename(fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now)).c_str());
-		if (!driver->writeImageToFile(image, filename.c_str()))
-			device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
-		image->drop();
+	if (!image) {
+		return false;
 	}
+	auto now = std::time(nullptr);
+	path_string filename(fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now)).c_str());
+	if (!driver->writeImageToFile(image, filename.c_str())) {
+		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
+		image->drop();
+		return false;
+	}
+	image->drop();
+	return true;
 }
 
 void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {

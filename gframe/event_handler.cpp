@@ -2158,8 +2158,8 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			return true;
 		}
 		case irr::KEY_F12: {
-			if (!event.KeyInput.PressedDown)
-				GUIUtils::TakeScreenshot(mainGame->device);
+			if (!event.KeyInput.PressedDown && GUIUtils::TakeScreenshot(mainGame->device))
+				gSoundManager->PlaySoundEffect(SoundManager::SFX::ACTIVATE);
 			return true;
 		}
 		case irr::KEY_KEY_1: {
