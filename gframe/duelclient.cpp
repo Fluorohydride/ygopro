@@ -464,7 +464,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnHostConfirm->setEnabled(true);
 				mainGame->btnHostCancel->setEnabled(true);
 				if(_pkt.type == ERROR_TYPE::VERERROR2) {
-					auto& version = getStruct<VersionError>(pdata, len).version;
+					auto version = getStruct<VersionError>(pdata, len).version;
 					mainGame->PopupMessage(fmt::format(gDataManager->GetSysString(1423).c_str(),
 													   version.client.major, version.client.minor,
 													   version.core.major, version.core.minor));
