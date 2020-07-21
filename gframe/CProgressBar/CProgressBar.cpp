@@ -67,7 +67,7 @@ irr::core::recti IProgressBar::getAbsoluteRect(const irr::core::recti& relative,
 	//r.UpperLeftCorner.X += relative.UpperLeftCorner.X / resize_ratio.X;
 	r.LowerRightCorner.Y = (int)((r.UpperLeftCorner.Y + relative.getHeight()) / resize_ratio.Y);
 	r.LowerRightCorner.X = (int)((r.UpperLeftCorner.X + relative.getWidth()) / resize_ratio.X);
-	r.UpperLeftCorner.X += relative.UpperLeftCorner.X / resize_ratio.X;
+	r.UpperLeftCorner.X += (irr::s32)(relative.UpperLeftCorner.X / resize_ratio.X);
 	return r;
 }
 void IProgressBar::updateResizeRatio() {

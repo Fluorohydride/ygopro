@@ -303,7 +303,7 @@ public:
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
 	void PopulateLocales();
-	void ApplyLocale(int index, bool forced = false);
+	void ApplyLocale(uint32 index, bool forced = false);
 	std::vector<std::pair<path_string, std::vector<path_string>>> locales;
 	std::mutex popupCheck;
 	std::wstring queued_msg;

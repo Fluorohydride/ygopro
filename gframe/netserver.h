@@ -13,14 +13,14 @@ namespace ygo {
 class NetServer {
 private:
 	static std::unordered_map<bufferevent*, DuelPlayer> users;
-	static unsigned short server_port;
+	static uint16_t server_port;
 	static event_base* net_evbase;
 	static event* broadcast_ev;
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
 	static char net_server_read[0x20000];
 	static char net_server_write[0x20000];
-	static unsigned short last_sent;
+	static uint16_t last_sent;
 
 public:
 	static bool StartServer(unsigned short port);
@@ -57,10 +57,10 @@ public:
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		char* p = net_server_write;
-		BufferIO::Write<int16_t>(p, 1 + len);
-		BufferIO::Write<int8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, (uint16_t)(1 + len));
+		BufferIO::Write<uint8_t>(p, proto);
 		memcpy(p, buffer, len);
-		last_sent = len + 3;
+		last_sent = (uint16_t)(len + 3);
 		if(dp)
 			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}

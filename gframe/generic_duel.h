@@ -68,7 +68,7 @@ protected:
 	int GetCount(const std::vector<duelist>& players);
 	bool CheckFree(const std::vector<duelist>& players);
 	int GetFirstFree(int start = 0);
-	void SetAtPos(DuelPlayer* dp, int pos);
+	void SetAtPos(DuelPlayer* dp, size_t pos);
 	duelist& GetAtPos(int pos);
 	void Catchup(DuelPlayer* dp);
 	int GetPos(DuelPlayer* dp);

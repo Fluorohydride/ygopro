@@ -205,14 +205,14 @@ void Replay::ParseNames() {
 		opposing_count = 1;
 		return;
 	}
-	auto f = [this](size_t& count) {
+	auto f = [this](uint32_t& count) {
 		if(pheader.flag & REPLAY_NEWREPLAY)
 			count = Read<uint32_t>();
 		else if(pheader.flag & REPLAY_TAG)
 			count = 2;
 		else
 			count = 1;
-		for(int i = 0; i < count; i++) {
+		for(uint32_t i = 0; i < count; i++) {
 			wchar_t namebuf[20];
 			ReadName(namebuf);
 			players.push_back(namebuf);
@@ -239,7 +239,7 @@ void Replay::ParseDecks() {
 	decks.clear();
 	if(pheader.id != REPLAY_YRP1 || (pheader.flag & REPLAY_SINGLE_MODE && !(pheader.flag & REPLAY_HAND_TEST)))
 		return;
-	for(int i = 0; i < home_count + opposing_count; i++) {
+	for(uint32_t i = 0; i < home_count + opposing_count; i++) {
 		ReplayDeck tmp;
 		int main = Read<int32_t>();
 		for(int i = 0; i < main; ++i)

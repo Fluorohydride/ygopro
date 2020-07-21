@@ -1625,7 +1625,7 @@ bool Game::MainLoop() {
 		float remainder;
 		frame_counter = std::modf(frame_counter, &remainder);
 		delta_frames = std::round(remainder);
-		for(int i = 0; i < delta_frames; i++){
+		for(uint32 i = 0; i < delta_frames; i++){
 			linePatternD3D = (linePatternD3D + 1) % 30;
 			linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		}
@@ -1779,7 +1779,7 @@ bool Game::MainLoop() {
 		int fpsLimit = gGameConfig->maxFPS;
 		if(gGameConfig->maxFPS > 0 && !gGameConfig->vsync) {
 #endif
-			int delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
+			uint32 delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
 			if(delta > 0) {
 				auto t = timer->getRealTime();
 				while((timer->getRealTime() - t) < delta) {
@@ -3252,7 +3252,7 @@ void Game::PopulateLocales() {
 	}
 }
 
-void Game::ApplyLocale(int index, bool forced) {
+void Game::ApplyLocale(uint32 index, bool forced) {
 	static int previndex = 0;
 	if(index < 0 || index > locales.size())
 		return;

@@ -147,7 +147,7 @@ void ClientCard::UpdateInfo(const CoreUtils::Query& query) {
 		}
 	}
 	if(query.flag & QUERY_IS_PUBLIC) {
-		if(is_public != query.is_public && !mainGame->dInfo.isCatchingUp) {
+		if(is_public != !!query.is_public && !mainGame->dInfo.isCatchingUp) {
 			is_public = query.is_public;
 			mainGame->dField.MoveCard(this, 5);
 		} else

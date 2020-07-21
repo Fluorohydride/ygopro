@@ -13,14 +13,14 @@ bool operator!=(const ClientVersion& ver1, const ClientVersion& ver2) {
 
 
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
-unsigned short NetServer::server_port = 0;
+uint16_t NetServer::server_port = 0;
 event_base* NetServer::net_evbase = 0;
 event* NetServer::broadcast_ev = 0;
 evconnlistener* NetServer::listener = 0;
 DuelMode* NetServer::duel_mode = 0;
 char NetServer::net_server_read[0x20000];
 char NetServer::net_server_write[0x20000];
-unsigned short NetServer::last_sent = 0;
+uint16_t NetServer::last_sent = 0;
 
 bool NetServer::StartServer(unsigned short port) {
 	if(net_evbase)

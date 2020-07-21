@@ -119,8 +119,8 @@ private:
 	bool can_read;
 	std::vector<ReplayResponse> responses;
 	std::vector<std::wstring> players;
-	size_t home_count;
-	size_t opposing_count;
+	uint32_t home_count;
+	uint32_t opposing_count;
 	path_string replay_name;
 	ReplayDeckList decks;
 	std::vector<int> replay_custom_rule_cards;

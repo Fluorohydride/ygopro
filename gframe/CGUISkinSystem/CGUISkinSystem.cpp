@@ -380,7 +380,7 @@ bool CGUISkinSystem::loadCustomColors(gui::CImageGUISkin * skin) {
 	core::stringw wtmp = "Skin/Custom/";
 	core::array<const wchar_t*>* children = registry->listNodeChildren(L"", wtmp.c_str());
 	if(!children) return false;
-	for(int i = 0; i < children->size(); i++) {
+	for(u32 i = 0; i < children->size(); i++) {
 		core::stringw tmpchild = (*children)[i];
 		video::SColor color = registry->getValueAsColor((wtmp + tmpchild).c_str());
 		if(color.color) {

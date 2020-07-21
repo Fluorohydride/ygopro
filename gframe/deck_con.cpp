@@ -415,7 +415,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			auto caller = event.GUIEvent.Caller;
-			auto StartFilterIfLongerThan = [&](int length) {
+			auto StartFilterIfLongerThan = [&](size_t length) {
 				std::wstring filter = caller->getText();
 				if (filter.size() > length)
 					StartFilter();

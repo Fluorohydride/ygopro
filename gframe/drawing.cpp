@@ -212,7 +212,7 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 	};
 	int mark = pcard->link_marker;
 	ClientCard* pcard2;
-	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	uint32_t speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(dField.hovered_location == LOCATION_SZONE) {
 		int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 		if(dField.hovered_sequence > 4)

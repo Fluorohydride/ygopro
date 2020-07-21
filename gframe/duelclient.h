@@ -67,22 +67,22 @@ public:
 	static void SendResponse();
 	static void SendPacketToServer(unsigned char proto) {
 		duel_client_write.clear();
-		BufferIO::insert_value<int16_t>(duel_client_write, 1);
-		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		BufferIO::insert_value<uint16_t>(duel_client_write, 1);
+		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
 		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	template<typename ST>
 	static void SendPacketToServer(unsigned char proto, ST& st) {
 		duel_client_write.clear();
-		BufferIO::insert_value<int16_t>(duel_client_write, 1 + sizeof(ST));
-		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		BufferIO::insert_value<uint16_t>(duel_client_write, 1 + sizeof(ST));
+		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
 		BufferIO::insert_value<ST>(duel_client_write, st);
 		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
 		duel_client_write.clear();
-		BufferIO::insert_value<int16_t>(duel_client_write, 1 + len);
-		BufferIO::insert_value<int8_t>(duel_client_write, proto);
+		BufferIO::insert_value<uint16_t>(duel_client_write, (uint16_t)(1 + len));
+		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
 		BufferIO::insert_data(duel_client_write, buffer, len);
 		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}

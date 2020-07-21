@@ -123,10 +123,10 @@ public:
 	std::vector<int> ancard;
 	int hovered_controler;
 	int hovered_location;
-	size_t hovered_sequence;
+	uint32_t hovered_sequence;
 	int command_controler;
 	int command_location;
-	size_t command_sequence;
+	uint32_t command_sequence;
 	ClientCard* hovered_card;
 	int hovered_player;
 	ClientCard* clicked_card;

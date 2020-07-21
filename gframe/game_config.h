@@ -26,7 +26,7 @@ struct GameConfig
 	bool fullscreen = false;
 	bool showConsole = false;
 	unsigned int coreLogOutput = CORE_LOG_TO_CHAT | CORE_LOG_TO_FILE;
-	unsigned short antialias = 0;
+	uint8_t antialias = 0;
 	std::wstring serverport = L"7911";
 	unsigned char textfontsize = 12;
 	std::wstring lasthost = L"127.0.0.1";

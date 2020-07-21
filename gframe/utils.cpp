@@ -194,7 +194,7 @@ namespace ygo {
 	std::vector<int> Utils::FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
 		std::vector<int> res;
 		auto list = archive->getFileList();
-		for(int i = 0; i < list->getFileCount(); i++) {
+		for(irr::u32 i = 0; i < list->getFileCount(); i++) {
 			if(list->isDirectory(i))
 				continue;
 			path_string name = list->getFullFileName(i).c_str();
@@ -360,17 +360,16 @@ namespace ygo {
 		auto filelist = archive->getFileList();
 		auto count = filelist->getFileCount();
 
-		int totsize = 0;
-		int cur_fullsize = 0;
+		irr::u32 totsize = 0;
+		irr::u32 cur_fullsize = 0;
 
-		for(int i = 0; i < count; i++) {
+		for(irr::u32 i = 0; i < count; i++)
 			totsize += filelist->getFileSize(i);
-		}
 
 		if(payload)
 			payload->tot = count;
 
-		for(int i = 0; i < count; i++) {
+		for(irr::u32 i = 0; i < count; i++) {
 			auto filename = path_string(filelist->getFullFileName(i).c_str());
 			bool isdir = filelist->isDirectory(i);
 			if(isdir)
@@ -398,7 +397,7 @@ namespace ygo {
 						cur_fullsize += wx;
 						if(callback && totsize) {
 							double fractiondownloaded = (double)cur_fullsize / (double)rx;
-							percentage = std::round(fractiondownloaded * 100);
+							percentage = (int)std::round(fractiondownloaded * 100);
 							if(payload)
 								payload->percentage = percentage;
 							callback(payload);

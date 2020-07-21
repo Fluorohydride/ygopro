@@ -365,7 +365,7 @@ bool MessageBeRecorded(uint32_t message) {
 void QueryStream::Parse(char*& buff) {
 	uint32_t size = BufferIO::Read<uint32_t>(buff);
 	char* current = buff;
-	while((current - buff) < size) {
+	while((uint32_t)(current - buff) < size) {
 		queries.emplace_back(current);
 	}
 }

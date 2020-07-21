@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <wchar.h>
 
 class BufferIO {
 public:
@@ -74,7 +75,7 @@ public:
 				str[2] = ((*wsrc) & 0x3f) | 0x80;
 				str += 3;
 			} else {
-				if(sizeof(wchar_t) == 2) {
+#if	WCHAR_MAX == 0xffff
 					unsigned unicode = 0;
 					unicode |= (*wsrc++ & 0x3ff) << 10;
 					unicode |= *wsrc & 0x3ff;
@@ -83,12 +84,12 @@ public:
 					str[1] = ((unicode >> 12) & 0x3f) | 0x80;
 					str[2] = ((unicode >> 6) & 0x3f) | 0x80;
 					str[3] = ((unicode) & 0x3f) | 0x80;
-				} else {
+#else
 					str[0] = ((*wsrc >> 18) & 0x7) | 0xf0;
 					str[1] = ((*wsrc >> 12) & 0x3f) | 0x80;
 					str[2] = ((*wsrc >> 6) & 0x3f) | 0x80;
 					str[3] = ((*wsrc) & 0x3f) | 0x80;
-				}
+#endif
 				str += 4;
 			}
 			wsrc++;
@@ -111,14 +112,14 @@ public:
 				*wp = (((unsigned)p[0] & 0xf) << 12) | (((unsigned)p[1] & 0x3f) << 6) | ((unsigned)p[2] & 0x3f);
 				p += 3;
 			} else if((*p & 0xf8) == 0xf0) {
-				if(sizeof(wchar_t) == 2) {
+#if	WCHAR_MAX == 0xffff
 					unsigned unicode = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
 					unicode -= 0x10000;
 					*wp++ = (unicode >> 10) | 0xd800;
 					*wp = (unicode & 0x3ff) | 0xdc00;
-				} else {
+#else
 					*wp = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
-				}
+#endif
 				p += 4;
 			} else
 				p++;
@@ -136,10 +137,11 @@ public:
 	// UTF-8 to UTF-16/UTF-32
 	static std::wstring DecodeUTF8s(const std::string& source) {
 		thread_local std::vector<wchar_t> res;
-		if(sizeof(wchar_t) == 2)
+#if	WCHAR_MAX == 0xffff
 			res.reserve(source.size() * 2 + 1);
-		else
+#else
 			res.reserve(source.size() + 1);
+#endif
 		DecodeUTF8(source.c_str(), const_cast<wchar_t*>(res.data()));
 		return res.data();
 	}

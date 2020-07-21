@@ -17,7 +17,7 @@ void WindBotPanel::Refresh(int filterMasterRule, int lastIndex) {
 	int oldIndex = CurrentIndex();
 	int lastBot = oldIndex >= 0 ? oldIndex : lastIndex;
 	cbBotDeck->clear();
-	for (int i = 0; i < bots.size(); i++) {
+	for (size_t i = 0; i < bots.size(); i++) {
 		const auto& bot = bots[i];
 		if (filterMasterRule == 0 || bot.masterRules.find(filterMasterRule) != bot.masterRules.end()) {
 			int newIndex = cbBotDeck->addItem(bot.name.c_str(), i);

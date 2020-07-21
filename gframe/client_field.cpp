@@ -1163,7 +1163,7 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
 		UNARY_OP(OPCODE_NEG, -);
 		UNARY_OP(OPCODE_NOT, !);
 		BINARY_OP(OPCODE_BAND, &);
-		BINARY_OP(OPCODE_BOR, | );
+		BINARY_OP(OPCODE_BOR, |);
 		UNARY_OP(OPCODE_BNOT, ~);
 		BINARY_OP(OPCODE_BXOR, ^);
 		BINARY_OP(OPCODE_LSHIFT, <<);
