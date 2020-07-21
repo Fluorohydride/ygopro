@@ -91,6 +91,8 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 							return true;
 						}
 					}
+					default:
+						break;
 				}
 			}
 		}

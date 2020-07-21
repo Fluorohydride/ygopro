@@ -63,16 +63,18 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 		std::string argName = fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(name).c_str());
 		std::string argChat = fmt::format("Chat={}", chat);
 		std::string argHand = fmt::format("Hand={}", hand);
-		chdir("WindBot");
-		if (executablePath.length()) {
-			std::string envPath = getenv("PATH") + (":" + executablePath);
-			setenv("PATH", envPath.c_str(), true);
+		if(chdir("WindBot") == 0) {
+			if(executablePath.length()) {
+				std::string envPath = getenv("PATH") + (":" + executablePath);
+				setenv("PATH", envPath.c_str(), true);
+			}
+			execlp("mono", "WindBot.exe", "WindBot.exe",
+				   argPass.c_str(), argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
+				   hand ? argHand.c_str() : nullptr, nullptr);
 		}
-		execlp("mono", "WindBot.exe", "WindBot.exe",
-			   argPass.c_str(), argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
-			hand ? argHand.c_str() : nullptr, nullptr);
 		auto message = fmt::format("Failed to start WindBot Ignite: {}", strerror(errno));
-		chdir("..");
+		if(chdir("..") != 0)
+			ErrorLog(strerror(errno));
 		ErrorLog(message);
 		exit(EXIT_FAILURE);
 	}
