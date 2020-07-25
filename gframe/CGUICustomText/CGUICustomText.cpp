@@ -5,6 +5,7 @@
 #include <IGUIEnvironment.h>
 #include <IGUIScrollBar.h>
 #include <IGUIFont.h>
+#include <IGUIButton.h>
 #include <IVideoDriver.h>
 #include <rect.h>
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
@@ -95,6 +96,8 @@ bool CGUICustomText::OnEvent(const SEvent & event) {
 						break;
 				}
 			}
+			default:
+				break;
 		}
 	}
 	return IGUIElement::OnEvent(event);
@@ -127,6 +130,11 @@ void CGUICustomText::draw() {
 	if(Border) {
 		skin->draw3DSunkenPane(this, 0, true, false, frameRect, &AbsoluteClippingRect);
 		frameRect.UpperLeftCorner.X += skin->getSize(EGDS_TEXT_DISTANCE_X);
+	}
+
+	if(Parent && Parent->getType() == irr::gui::EGUIET_BUTTON && (((IGUIButton*)Parent)->isPressed())) {
+		frameRect.UpperLeftCorner.X += skin->getSize(EGDS_BUTTON_PRESSED_TEXT_OFFSET_X);
+		frameRect.UpperLeftCorner.Y += skin->getSize(EGDS_BUTTON_PRESSED_TEXT_OFFSET_Y);
 	}
 	auto now = os::Timer::getTime();
 	auto delta_time = now - prev_time;

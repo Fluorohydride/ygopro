@@ -567,6 +567,8 @@ public:
 	irr::gui::IGUIComboBox* cbDBDecks;
 
 	irr::gui::IGUIButton* btnHandTest;
+	irr::gui::IGUIButton* btnHandTestSettings;
+	irr::gui::IGUIStaticText* stHandTestSettings;
 	irr::gui::IGUIWindow* wHandTest;
 	irr::gui::IGUICheckBox* chkHandTestNoOpponent;
 	irr::gui::IGUICheckBox* chkHandTestNoShuffle;

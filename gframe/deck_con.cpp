@@ -83,6 +83,7 @@ void DeckBuilder::Initialize(bool refresh) {
 	mainGame->btnSideSort->setVisible(false);
 	mainGame->btnSideReload->setVisible(false);
 	mainGame->btnHandTest->setVisible(true);
+	mainGame->btnHandTestSettings->setVisible(true);
 	filterList = &gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()];
 	if(refresh) {
 		ClearSearch();
@@ -124,6 +125,7 @@ void DeckBuilder::Terminate(bool showmenu) {
 		mainGame->ClearCardInfo(0);
 	}
 	mainGame->btnHandTest->setVisible(false);
+	mainGame->btnHandTestSettings->setVisible(false);
 	mainGame->wHandTest->setVisible(false);
 	mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	mainGame->wACMessage->setVisible(false);
@@ -152,13 +154,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
-			case BUTTON_HAND_TEST: {
-				if (mainGame->btnHandTest->getClickShiftState()) {
-					mainGame->PopupElement(mainGame->wHandTest);
-					break;
-				}
-				// intentional case fallthrough
+			case BUTTON_HAND_TEST_SETTINGS: {
+				mainGame->PopupElement(mainGame->wHandTest);
+				break;
 			}
+			case BUTTON_HAND_TEST:
 			case BUTTON_HAND_TEST_START: {
 				Terminate(false);
 				open_file = true;
@@ -192,7 +192,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HAND_TEST_CANCEL: {
 				mainGame->HideElement(mainGame->wHandTest);
-				mainGame->env->setFocus(mainGame->btnHandTest);
+				mainGame->env->setFocus(mainGame->btnHandTestSettings);
 				break;
 			}
 			case BUTTON_CLEAR_DECK: {

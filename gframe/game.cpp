@@ -1006,6 +1006,18 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(btnHandTest, 1297);
 	btnHandTest->setVisible(false);
 	btnHandTest->setEnabled(coreloaded);
+
+	btnHandTestSettings = env->addButton(Scale(205, 140, 295, 180), 0, BUTTON_HAND_TEST_SETTINGS, L"");
+	btnHandTestSettings->setVisible(false);
+	btnHandTestSettings->setEnabled(coreloaded);
+
+	stHandTestSettings = irr::gui::CGUICustomText::addCustomText(gDataManager->GetSysString(1375).c_str(), false, env, btnHandTestSettings, -1, Scale(0, 0, 90, 40));
+	stHandTestSettings->setWordWrap(true);
+	stHandTestSettings->setVisible(false);
+	stHandTestSettings->setEnabled(coreloaded);
+	stHandTestSettings->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	defaultStrings.emplace_back(stHandTestSettings, 1375);
+	
 	wHandTest = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(1297).c_str());
 	wHandTest->getCloseButton()->setVisible(false);
 	wHandTest->setVisible(false);
@@ -1575,6 +1587,8 @@ bool Game::MainLoop() {
 						btnSingleMode->setEnabled(true);
 						btnCreateHost->setEnabled(true);
 						btnHandTest->setEnabled(true);
+						btnHandTestSettings->setEnabled(true);
+						stHandTestSettings->setEnabled(true);
 						lstReplayList->addFilteredExtensions({ L"yrp", L"yrpx" });
 					}
 					break;
@@ -2886,6 +2900,8 @@ void Game::OnResize() {
 	btnClearDeck->setRelativePosition(Resize(155, 95, 220, 120));
 	btnDeleteDeck->setRelativePosition(Resize(225, 95, 290, 120));
 	btnHandTest->setRelativePosition(Resize(205, 90, 295, 130));
+	btnHandTestSettings->setRelativePosition(Resize(205, 140, 295, 180));
+	stHandTestSettings->setRelativePosition(Resize(0, 0, 90, 40));
 	SetCentered(wHandTest);
 
 	wSort->setRelativePosition(Resize(930, 132, 1020, 156));
