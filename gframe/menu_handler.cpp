@@ -960,17 +960,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				ServerLobby::RefreshRooms();
 			break;
 		}
-		case irr::KEY_F10: {
-			HWND hWnd = reinterpret_cast<HWND>(mainGame->driver->getExposedVideoData().D3D9.HWnd);
-			RECT rect;
-			GetWindowRect(hWnd, &rect);
-			gGameConfig->customSize = true;
-			gGameConfig->windowWidth = mainGame->window_size.Width;
-			gGameConfig->windowHeight = mainGame->window_size.Height;
-			gGameConfig->windowOffX = rect.left;
-			gGameConfig->windowOffY = rect.top;
-			break;
-		}
 		default: break;
 		}
 		break;
