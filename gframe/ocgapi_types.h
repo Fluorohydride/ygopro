@@ -2,7 +2,7 @@
 #define OCGAPI_TYPES_H
 #include <stdint.h>
 
-#define OCG_VERSION_MAJOR 8
+#define OCG_VERSION_MAJOR 9
 #define OCG_VERSION_MINOR 0
 
 typedef enum OCG_LogTypes {
