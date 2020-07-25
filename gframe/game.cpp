@@ -1013,7 +1013,6 @@ bool Game::Initialize() {
 
 	stHandTestSettings = irr::gui::CGUICustomText::addCustomText(gDataManager->GetSysString(1375).c_str(), false, env, btnHandTestSettings, -1, Scale(0, 0, 90, 40));
 	stHandTestSettings->setWordWrap(true);
-	stHandTestSettings->setVisible(false);
 	stHandTestSettings->setEnabled(coreloaded);
 	stHandTestSettings->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	defaultStrings.emplace_back(stHandTestSettings, 1375);
