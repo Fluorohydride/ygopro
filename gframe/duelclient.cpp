@@ -347,8 +347,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) mainGame->HideElement(obj);
 				HIDE_AND_CHECK(mainGame->wCreateHost);
 				HIDE_AND_CHECK(mainGame->wRules);
-				HIDE_AND_CHECK(mainGame->wCustomRulesL);
-				HIDE_AND_CHECK(mainGame->wCustomRulesR);
+				HIDE_AND_CHECK(mainGame->wCustomRules);
 #undef HIDE_AND_CHECK
 				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 			} else {
@@ -477,8 +476,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 #define HIDE_AND_CHECK(obj) if(obj->isVisible()) mainGame->HideElement(obj);
 					HIDE_AND_CHECK(mainGame->wCreateHost);
 					HIDE_AND_CHECK(mainGame->wRules);
-					HIDE_AND_CHECK(mainGame->wCustomRulesL);
-					HIDE_AND_CHECK(mainGame->wCustomRulesR);
+					HIDE_AND_CHECK(mainGame->wCustomRules);
 #undef HIDE_AND_CHECK
 					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
 				} else {
@@ -629,6 +627,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1258)));
 		} else if((pkt.info.duel_flag & DUEL_MODE_RUSH) == pkt.info.duel_flag) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1259)));
+		} else if((pkt.info.duel_flag & DUEL_MODE_GOAT) == pkt.info.duel_flag) {
+			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1248)));
 		} else if (rule == 6) {
 			uint32_t filter = 0x100;
 			for (int i = 0; filter && i < schkCustomRules; ++i, filter <<= 1)
@@ -4327,6 +4327,8 @@ void DuelClient::SendResponse() {
 	} else if (!mainGame->dInfo.isReplay) {
 		if(replay_stream.size())
 			replay_stream.pop_back();
+		/*if(mainGame->dInfo.time_player == 0)
+			SendPacketToServer(CTOS_TIME_CONFIRM);*/
 		mainGame->dInfo.time_player = 2;
 		SendBufferToServer(CTOS_RESPONSE, response_buf.data(), response_buf.size());
 	}

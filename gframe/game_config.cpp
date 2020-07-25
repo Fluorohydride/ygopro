@@ -231,7 +231,7 @@ bool GameConfig::Save(const path_char* filename)
 	SERIALIZE(maxFPS);
 	conf_file << "fullscreen = "         << fullscreen << "\n";
 	SERIALIZE(showConsole);
-	conf_file << "antialias = "          << antialias << "\n";
+	conf_file << "antialias = "          << ((int)antialias) << "\n";
 	SERIALIZE(coreLogOutput);
 	conf_file << "nickname = "           << BufferIO::EncodeUTF8s(nickname) << "\n";
 	conf_file << "gamename = "           << BufferIO::EncodeUTF8s(gamename) << "\n";

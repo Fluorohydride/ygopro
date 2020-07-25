@@ -169,7 +169,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				try {
 					options.startingDrawCount = std::stoi(mainGame->ebHandTestStartHand->getText());
 				} catch(...) {}
-#define CHECK(MR) case (MR - 1):{  options.duelFlags |= DUEL_MODE_MR##MR; break; }
+#define CHECK(MR) case (MR - 1):{  options.duelFlags = DUEL_MODE_MR##MR; break; }
 				switch (mainGame->cbHandTestDuelRule->getSelected()) {
 				CHECK(1)
 				CHECK(2)
@@ -177,11 +177,15 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				CHECK(4)
 				CHECK(5)
 				case 5: {
-					options.duelFlags |= DUEL_MODE_SPEED;
+					options.duelFlags = DUEL_MODE_SPEED;
 					break;
 				}
 				case 6: {
-					options.duelFlags |= DUEL_MODE_RUSH;
+					options.duelFlags = DUEL_MODE_RUSH;
+					break;
+				}
+				case 7: {
+					options.duelFlags = DUEL_MODE_GOAT;
 					break;
 				}
 				}

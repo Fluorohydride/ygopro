@@ -420,11 +420,10 @@ public:
 	irr::gui::IGUIButton* btnRulesOK;
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
-	irr::gui::IGUICheckBox* chkCustomRules[7+12];
+	irr::gui::IGUICheckBox* chkCustomRules[7+12+8];
 #define schkCustomRules (sizeof(mainGame->chkCustomRules)/sizeof(irr::gui::IGUICheckBox*))
 	irr::gui::IGUICheckBox* chkTypeLimit[5];
-	irr::gui::IGUIWindow* wCustomRulesL;
-	irr::gui::IGUIWindow* wCustomRulesR;
+	irr::gui::IGUIWindow* wCustomRules;
 	irr::gui::IGUIButton* btnCustomRulesOK;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
