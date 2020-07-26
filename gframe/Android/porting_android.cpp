@@ -461,6 +461,20 @@ void launchWindbot(const std::string& args) {
 						   jargs);
 }
 
+void installUpdate(const std::string& args) {
+	jmethodID installUpdate = jnienv->GetMethodID(nativeActivity, "installUpdate",
+												  "(Ljava/lang/String;)V");
+
+	if(installUpdate == 0) {
+		assert("porting::installUpdate unable to find java installUpdate method" == 0);
+	}
+
+	jstring jargs = jnienv->NewStringUTF(args.c_str());
+
+	jnienv->CallVoidMethod(app_global->activity->clazz, installUpdate,
+						   jargs);
+}
+
 void setTextToClipboard(const wchar_t* text) {
 	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard",
 											"(Ljava/lang/String;)V");
