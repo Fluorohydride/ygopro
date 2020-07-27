@@ -69,6 +69,9 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFOFUNCTION, progress_callback);
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFODATA, payload2);
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 0L);
+#ifdef __ANDROID__
+	curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (porting::internal_storage + "/cacert.cer").c_str());
+#endif
 	CURLcode res = curl_easy_perform(curl_handle);
 	curl_easy_cleanup(curl_handle);
 	return res;
