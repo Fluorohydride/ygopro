@@ -23,7 +23,7 @@ struct SettingsPane {
 	irr::gui::IGUICheckBox* chkAlternativePhaseLayout;
 	irr::gui::IGUICheckBox* chkHideChainButtons;
 	irr::gui::IGUICheckBox* chkAutoChainOrder;
-	irr::gui::IGUICheckBox* chkNoChainDelay;
+	irr::gui::IGUICheckBox* chkDottedLines;
 	// audio
 	irr::gui::IGUICheckBox* chkEnableSound;
 	irr::gui::IGUIStaticText* stSoundVolume;
@@ -36,6 +36,7 @@ struct SettingsPane {
 	irr::gui::IGUICheckBox* chkMAutoPos;
 	irr::gui::IGUICheckBox* chkSTAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
+	irr::gui::IGUICheckBox* chkNoChainDelay;
 
 	void DisableAudio();
 };
