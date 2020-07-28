@@ -1814,9 +1814,9 @@ bool Game::MainLoop() {
 		int fpsLimit = gGameConfig->maxFPS;
 		if(gGameConfig->maxFPS > 0 && !gGameConfig->vsync) {
 #endif
-			uint32 delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
+			int64 delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
 			if(delta > 0) {
-				auto t = timer->getRealTime();
+				int64 t = timer->getRealTime();
 				while((timer->getRealTime() - t) < delta) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				}
