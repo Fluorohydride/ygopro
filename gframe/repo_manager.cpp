@@ -5,12 +5,10 @@
 
 #include "repo_manager.h"
 #include <fmt/format.h>
+#include "game_config.h"
 #include "logging.h"
 #include "utils.h"
 #include "libgit2.hpp"
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#endif
 
 namespace ygo {
 
@@ -193,8 +191,11 @@ void RepoManager::SetRepoPercentage(const std::string& path, int percent)
 
 RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 	git_libgit2_init();
-#ifdef __ANDROID__
-	git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, (porting::internal_storage + "/cacert.cer").c_str(), "/system/etc/security/cacerts");
+	if(gGameConfig->ssl_certificate_path.size())
+		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, gGameConfig->ssl_certificate_path.c_str(), "/system/etc/security/cacerts");
+#ifdef _WIN32
+	else
+		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, "SYSTEM", "");
 #endif
 	CommitHistory history;
 	try {

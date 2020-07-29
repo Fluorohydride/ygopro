@@ -19,6 +19,7 @@
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
+#include "game_config.h"
 
 struct Payload {
 	update_callback callback = nullptr;
@@ -69,8 +70,11 @@ CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFOFUNCTION, progress_callback);
 	curl_easy_setopt(curl_handle, CURLOPT_XFERINFODATA, payload2);
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROGRESS, 0L);
-#ifdef __ANDROID__
-	curl_easy_setopt(curl_handle, CURLOPT_CAINFO, (porting::internal_storage + "/cacert.cer").c_str());
+	if(ygo::gGameConfig->ssl_certificate_path.size())
+		curl_easy_setopt(curl_handle, CURLOPT_CAINFO, ygo::gGameConfig->ssl_certificate_path.c_str());
+#ifdef _WIN32
+	else
+		curl_easy_setopt(curl_handle, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
 #endif
 	CURLcode res = curl_easy_perform(curl_handle);
 	curl_easy_cleanup(curl_handle);

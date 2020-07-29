@@ -4,9 +4,7 @@
 #include <fmt/format.h>
 #include "logging.h"
 #include "utils.h"
-#ifdef __ANDROID__
-#include "Android/porting_android.h"
-#endif
+#include "game_config.h"
 
 namespace ygo {
 
@@ -127,8 +125,11 @@ void ImageDownloader::DownloadPic() {
 					curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
 					curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 					curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
-#ifdef __ANDROID__
-					curl_easy_setopt(curl, CURLOPT_CAINFO, (porting::internal_storage + "/cacert.cer").c_str());
+					if(gGameConfig->ssl_certificate_path.size())
+						curl_easy_setopt(curl, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.c_str());
+#ifdef _WIN32
+					else
+						curl_easy_setopt(curl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
 #endif
 					res = curl_easy_perform(curl);
 					curl_easy_cleanup(curl);
