@@ -20,6 +20,7 @@ struct GameConfig
 
 	bool use_d3d = true;
 	bool vsync = true;
+	std::string windowStruct = "";
 	float dpi_scale = 1.0f;
 	int maxFPS = 60;
 	int game_version = 0;

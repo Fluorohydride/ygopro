@@ -90,7 +90,6 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_UNSIGNED(startHand)
 			DESERIALIZE_UNSIGNED(drawCount)
 			DESERIALIZE_UNSIGNED(lastBot)
-#undef DESERIALIZE_UNSIGNED
 #define DESERIALIZE_BOOL(name) else if (type == #name) name = !!std::stoi(str);
 			DESERIALIZE_BOOL(relayDuel)
 			DESERIALIZE_BOOL(noCheckDeck)
@@ -105,8 +104,9 @@ bool GameConfig::Load(const path_char* filename)
 			DESERIALIZE_BOOL(alternative_phase_layout)
 #ifdef WIN32
 			DESERIALIZE_BOOL(showConsole)
+			else if (type == "windowStruct")
+				windowStruct = str;
 #endif
-#undef DESERIALIZE_BOOL
 			else if (type == "botThrowRock")
 				botThrowRock = !!std::stoi(str);
 			else if (type == "botMute")
@@ -206,6 +206,8 @@ bool GameConfig::Load(const path_char* filename)
 	}
 	return true;
 }
+#undef DESERIALIZE_UNSIGNED
+#undef DESERIALIZE_BOOL
 
 template<typename T>
 inline void Serialize(std::ofstream& conf_file, const char* name, T value) {
@@ -228,11 +230,12 @@ bool GameConfig::Save(const path_char* filename)
 	conf_file << "# Project Ignis: EDOPro system.conf\n";
 	conf_file << "# Overwritten on normal game exit\n";
 #define SERIALIZE(name) Serialize(conf_file, #name, name)
-	conf_file << "use_d3d = "            << use_d3d << "\n";
+	SERIALIZE(use_d3d);
 	SERIALIZE(vsync);
 	SERIALIZE(maxFPS);
-	conf_file << "fullscreen = "         << fullscreen << "\n";
+	SERIALIZE(fullscreen);
 	SERIALIZE(showConsole);
+	SERIALIZE(windowStruct);
 	conf_file << "antialias = "          << ((int)antialias) << "\n";
 	SERIALIZE(coreLogOutput);
 	conf_file << "nickname = "           << BufferIO::EncodeUTF8s(nickname) << "\n";

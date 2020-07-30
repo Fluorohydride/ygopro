@@ -10,6 +10,7 @@
 #include <Windows.h>
 #include <vector>
 #include "logging.h"
+#include "Base64.h"
 #elif defined(__ANDROID__)
 #include "Android/COSAndroidOperator.h"
 class android_app;
@@ -88,6 +89,11 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	HWND hWnd = reinterpret_cast<HWND>(driver->getExposedVideoData().D3D9.HWnd);
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
+	if(gGameConfig->windowStruct.size()) {
+		auto winstruct = base64_decode(gGameConfig->windowStruct.c_str(), gGameConfig->windowStruct.size());
+		if(winstruct.size() == sizeof(WINDOWPLACEMENT))
+			SetWindowPlacement(hWnd, (WINDOWPLACEMENT*)winstruct.data());
+	}
 #endif
 	device->getLogger()->setLogLevel(irr::ELL_ERROR);
 	return device;
