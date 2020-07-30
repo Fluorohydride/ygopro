@@ -39,11 +39,10 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	params.WindowSize = irr::core::dimension2d<irr::u32>((irr::u32)(1024 * configs->dpi_scale), (irr::u32)(640 * configs->dpi_scale));
 	params.Vsync = configs->vsync;
 #else
-	if(gGameConfig->use_d3d) {
-		params.DriverType = irr::video::EDT_OGLES1;
-	} else {
+	if(gGameConfig->use_d3d)
 		params.DriverType = irr::video::EDT_OGLES2;
-	}
+	else
+		params.DriverType = irr::video::EDT_OGLES1;
 	params.PrivateData = porting::app_global;
 	params.Bits = 24;
 	params.ZBufferBits = 16;
@@ -66,19 +65,14 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 			archive->addDirectoryToFileList("media/");
 			break;
 		}
-}
+	}
 	irr::IOSOperator* Operator = new irr::COSAndroidOperator();
 	device->getGUIEnvironment()->setOSOperator(Operator);
 	Operator->drop();
-	if(driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT)) {
-		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
-	} else {
+	if(!driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT))
 		driver->setTextureCreationFlag(irr::video::ETCF_ALLOW_NON_POWER_2, true);
-		driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
-	}
-#else
-	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 #endif
+	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	device->setWindowCaption(L"Project Ignis: EDOPro");
 	device->setResizable(true);

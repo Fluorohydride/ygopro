@@ -156,16 +156,15 @@ void CheckArguments(int argc, path_char* argv[]) {
 				break;
 			}
 		}
-#undef ELEM
 #undef PARAM_CHECK
 	}
 }
 
 
 #ifdef _WIN32
-#define Cleanup WSACleanup();
+#define Cleanup() WSACleanup()
 #else
-#define Cleanup
+#define Cleanup() ((void)0)
 #endif //_WIN32
 
 
@@ -197,7 +196,7 @@ int main(int argc, char* argv[]) {
 		free(buffer);
 	}
 #endif
-	if (argc >= 2 && argv[1] == path_string(EPRO_TEXT("show_changelog"))) {
+	if(argc >= 2 && argv[1] == path_string(EPRO_TEXT("show_changelog"))) {
 		show_changelog = true;
 	}
 	if(argc >= 2 || is_in_sys32) {
@@ -242,7 +241,7 @@ int main(int argc, char* argv[]) {
 	}
 	catch(std::exception e) {
 		ygo::ErrorLog(e.what());
-		Cleanup
+		Cleanup();
 		return EXIT_FAILURE;
 	}
 	if (!data->configs->noClientUpdates)
@@ -267,7 +266,7 @@ int main(int argc, char* argv[]) {
 			data->tmp_device = nullptr;
 		}
 		if(!ygo::mainGame->Initialize()) {
-			Cleanup
+			Cleanup();
 			return EXIT_FAILURE;
 		}
 		if(firstlaunch) {
@@ -287,6 +286,6 @@ int main(int argc, char* argv[]) {
 			data->tmp_device->getGUIEnvironment()->clear();
 		}
 	} while(reset);
-	Cleanup
+	Cleanup();
 	return EXIT_SUCCESS;
 }
