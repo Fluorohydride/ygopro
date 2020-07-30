@@ -1311,6 +1311,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (!(hovered_location & LOCATION_ONFIELD))
 					break;
 				unsigned int flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
+				if(hovered_location == LOCATION_MZONE && hovered_sequence == 5 || hovered_sequence == 6) {
+					if((flag & selectable_field) == 0 && selectable_field & 0x600000)
+						flag = 1 << ((11 - hovered_sequence) + (1 << 4));
+				}
 				if (flag & selectable_field) {
 					if (flag & selected_field) {
 						selected_field &= ~flag;
