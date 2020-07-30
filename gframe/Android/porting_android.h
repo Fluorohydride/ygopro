@@ -28,6 +28,8 @@ void launchWindbot(const std::string& args);
 
 void installUpdate(const std::string& args);
 
+void openUrl(const std::string& url);
+
 void setTextToClipboard(const wchar_t* text);
 
 const wchar_t* getTextFromClipboard();
