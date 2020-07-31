@@ -148,8 +148,7 @@ restart:
 		}
 		last_replay.Flush();
 		const char cmd[] = "Debug.ReloadFieldEnd()";
-		OCG_LoadScript(pduel, cmd, sizeof(cmd) - 1, " ");
-		loaded = true;
+		loaded = OCG_LoadScript(pduel, cmd, sizeof(cmd) - 1, " ");
 	} else {
 		if(open_file) {
 			script_name = Utils::ToUTF8IfNeeded(open_file_name);
@@ -171,12 +170,51 @@ restart:
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->dInfo.isHandTest = false;
 		open_file = false;
-		is_restarting = false;
 		last_replay.EndRecord();
 		new_replay.EndRecord();
-		mainGame->gMutex.lock();
-		mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
-		mainGame->gMutex.unlock();
+		if(is_restarting) {
+			mainGame->gMutex.lock();
+			mainGame->dInfo.isInDuel = false;
+			mainGame->dInfo.isStarted = false;
+			mainGame->dInfo.isSingleMode = false;
+			mainGame->dInfo.isHandTest = false;
+			mainGame->gMutex.unlock();
+			if(!hand_test) {
+				mainGame->closeDoneSignal.Reset();
+				mainGame->closeSignal.lock();
+				mainGame->closeDoneSignal.Wait();
+				mainGame->closeSignal.unlock();
+			}
+			mainGame->gMutex.lock();
+			mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
+			if(!hand_test) {
+				mainGame->ShowElement(mainGame->wSinglePlay);
+				mainGame->stTip->setVisible(false);
+			}
+			mainGame->SetMessageWindow();
+			mainGame->device->setEventReceiver(&mainGame->menuHandler);
+			mainGame->gMutex.unlock();
+			if(exit_on_return)
+				mainGame->device->closeDevice();
+			if(hand_test) {
+				mainGame->gMutex.lock();
+				mainGame->btnChainIgnore->setVisible(false);
+				mainGame->btnChainAlways->setVisible(false);
+				mainGame->btnChainWhenAvail->setVisible(false);
+				mainGame->btnCancelOrFinish->setVisible(false);
+				mainGame->btnShuffle->setVisible(false);
+				mainGame->wChat->setVisible(false);
+				mainGame->btnRestartSingle->setVisible(false);
+				mainGame->wPhase->setVisible(false);
+				mainGame->deckBuilder.Initialize(false);
+				mainGame->gMutex.unlock();
+			}
+		} else {
+			mainGame->gMutex.lock();
+			mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
+			mainGame->gMutex.unlock();
+		}
+		is_restarting = false;
 		return 0;
 	}
 	//OCG_SetAIPlayer(pduel, 1, TRUE);
