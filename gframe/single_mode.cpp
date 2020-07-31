@@ -217,7 +217,6 @@ restart:
 		is_restarting = false;
 		return 0;
 	}
-	//OCG_SetAIPlayer(pduel, 1, TRUE);
 	mainGame->gMutex.lock();
 	if(!hand_test && !is_restarting) {
 		mainGame->HideElement(mainGame->wSinglePlay);
@@ -241,29 +240,24 @@ restart:
 	mainGame->SetMessageWindow();
 	mainGame->device->setEventReceiver(&mainGame->dField);
 	mainGame->gMutex.unlock();
-	std::vector<uint8> duelBuffer;
 	is_closing = false;
 	is_continuing = true;
 	int engFlag = 0;
 	auto msg = CoreUtils::ParseMessages(pduel);
-	{
-		for(auto& message : msg.packets) {
-			is_continuing = SinglePlayAnalyze(message) && is_continuing;
-		}
-		if(!is_continuing)
-			goto end;
+	for(auto& message : msg.packets)
+		is_continuing = SinglePlayAnalyze(message) && is_continuing;
+	if(is_continuing) {
+		OCG_StartDuel(pduel);
+		do {
+			engFlag = OCG_DuelProcess(pduel);
+			msg = CoreUtils::ParseMessages(pduel);
+			for(auto& message : msg.packets) {
+				if(message.message == MSG_WIN && hand_test)
+					continue;
+				is_continuing = SinglePlayAnalyze(message) && is_continuing;
+			}
+		} while(is_continuing && engFlag && mainGame->dInfo.curMsg != MSG_WIN);
 	}
-	OCG_StartDuel(pduel);
-	do {
-		engFlag = OCG_DuelProcess(pduel);
-		msg = CoreUtils::ParseMessages(pduel);
-		for(auto& message : msg.packets) {
-			if(message.message == MSG_WIN && hand_test)
-				continue;
-			is_continuing = SinglePlayAnalyze(message) && is_continuing;
-		}
-	} while(is_continuing && engFlag && mainGame->dInfo.curMsg != MSG_WIN);
-	end :
 	OCG_DestroyDuel(pduel);
 	pduel = nullptr;
 	if(saveReplay && !is_restarting) {

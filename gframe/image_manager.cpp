@@ -385,23 +385,24 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 			height = _height;
 		}
 		auto file = gImageDownloader->GetDownloadPath(code, static_cast<ImageDownloader::imgType>(type));
-		__repeat2:
-		if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), nullptr))) {
-			if(timestamp_id != source_timestamp_id.load()) {
-				img->drop();
-				return std::make_pair(nullptr, EPRO_TEXT("fail"));
+		while(true) {
+			if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), nullptr))) {
+				if(timestamp_id != source_timestamp_id.load()) {
+					img->drop();
+					return std::make_pair(nullptr, EPRO_TEXT("fail"));
+				}
+				if(width != _width || height != _height) {
+					img->drop();
+					width = _width;
+					height = _height;
+					continue;
+				}
+				return std::make_pair(img, file);
 			}
-			if(width != _width || height != _height) {
-				img->drop();
-				width = _width;
-				height = _height;
-				goto __repeat2;
-			}
-			return std::make_pair(img, file);
+			break;
 		}
-		if(timestamp_id != source_timestamp_id.load()) {
+		if(timestamp_id != source_timestamp_id.load())
 			return std::make_pair(nullptr, EPRO_TEXT("fail"));
-		}
 	} else {
 		for(auto& path : (type == ART) ? mainGame->pic_dirs : mainGame->cover_dirs) {
 			for(auto extension : { EPRO_TEXT(".png"), EPRO_TEXT(".jpg") }) {
@@ -424,35 +425,33 @@ ImageManager::image_path ImageManager::LoadCardTexture(uint32_t code, imgType ty
 					width = _width;
 					height = _height;
 				}
-			__repeat:
-				if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), readerimg))) {
-					if(timestamp_id != source_timestamp_id.load()) {
-						img->drop();
-						if(readerimg) {
-							readerimg->drop();
+				while(true) {
+					if((img = GetTextureImageFromFile(file.c_str(), width, height, timestamp_id, std::ref(source_timestamp_id), readerimg))) {
+						if(timestamp_id != source_timestamp_id.load()) {
+							img->drop();
+							if(readerimg)
+								readerimg->drop();
+							return std::make_pair(nullptr, EPRO_TEXT("fail"));
 						}
-						return std::make_pair(nullptr, EPRO_TEXT("fail"));
+						if(width != _width || height != _height) {
+							img->drop();
+							width = _width;
+							height = _height;
+							continue;
+						}
+						if(readerimg)
+							readerimg->drop();
+						return std::make_pair(img, file);
 					}
-					if(width != _width || height != _height) {
-						img->drop();
-						width = _width;
-						height = _height;
-						goto __repeat;
-					}
-					if(readerimg) {
-						readerimg->drop();
-					}
-					return std::make_pair(img, file);
+					break;
 				}
 				if(timestamp_id != source_timestamp_id.load()) {
-					if(readerimg) {
+					if(readerimg)
 						readerimg->drop();
-					}
 					return std::make_pair(nullptr, EPRO_TEXT("fail"));
 				}
-				if(readerimg) {
+				if(readerimg)
 					readerimg->drop();
-				}
 			}
 		}
 	}
