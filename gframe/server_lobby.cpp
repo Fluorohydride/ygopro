@@ -276,6 +276,7 @@ void ServerLobby::JoinServer(bool host) {
 						return;
 					}
 				}
+				mainGame->wRoomPassword->setVisible(false);
 				mainGame->dInfo.secret.pass = BufferIO::EncodeUTF8s(mainGame->ebRPName->getText());
 			} else {
 				mainGame->dInfo.secret.pass = "";

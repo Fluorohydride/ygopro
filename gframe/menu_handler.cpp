@@ -171,7 +171,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_ROOMPASSWORD_OK: {
 				ServerLobby::JoinServer(false);
-				mainGame->wRoomPassword->setVisible(false);
 				break;
 			}
 			case BUTTON_ROOMPASSWORD_CANCEL: {
