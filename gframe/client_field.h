@@ -75,10 +75,10 @@ public:
 	std::vector<ClientCard*> display_cards;
 	std::vector<int> sort_list;
 	std::map<int64, int> player_desc_hints[2];
-	bool grave_act;
-	bool remove_act;
-	bool deck_act;
-	bool extra_act;
+	bool grave_act[2];
+	bool remove_act[2];
+	bool deck_act[2];
+	bool extra_act[2];
 	bool pzone_act[2];
 	bool conti_act;
 	bool chain_forced;

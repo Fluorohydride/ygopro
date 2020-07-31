@@ -456,50 +456,35 @@ void Game::DrawMisc() {
 	im.setRotationRadians(act_rot);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
-	if(dField.deck_act) {
-		im.setTranslation(irr::core::vector3df((matManager.vFieldDeck[0][speed][0].Pos.X + matManager.vFieldDeck[0][speed][1].Pos.X) / 2,
-			(matManager.vFieldDeck[0][speed][0].Pos.Y + matManager.vFieldDeck[0][speed][2].Pos.Y) / 2, dField.deck[0].size() * 0.01f + 0.02f));
+
+	auto drawact = [this, &im](irr::video::S3DVertex vertex[4], float zval) {
+		im.setTranslation(irr::core::vector3df((vertex[0].Pos.X + vertex[1].Pos.X) / 2,
+			(vertex[0].Pos.Y + vertex[2].Pos.Y) / 2, zval));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	};
+
+	int pzseq = dInfo.duel_field == 4 ? (speed) ? 1 : 0 : 6;
+	for(int p = 0; p < 2; p++) {
+		if(dField.deck_act[p])
+			drawact(matManager.vFieldDeck[p][speed], dField.deck[p].size() * 0.01f + 0.02f);
+		if(dField.grave_act[p])
+			drawact(matManager.vFieldGrave[p][field][speed], dField.grave[p].size() * 0.01f + 0.02f);
+		if(dField.remove_act[p])
+			drawact(matManager.vFieldRemove[p][field][speed], dField.remove[p].size() * 0.01f + 0.02f);
+		if(dField.extra_act[p])
+			drawact(matManager.vFieldExtra[p][speed], dField.extra[p].size() * 0.01f + 0.02f);
+		if(dField.pzone_act[p])
+			drawact(matManager.vFieldSzone[p][pzseq][field][speed], 0.03f);
 	}
-	if(dField.grave_act) {
-		im.setTranslation(irr::core::vector3df((matManager.vFieldGrave[0][field][speed][0].Pos.X + matManager.vFieldGrave[0][field][speed][1].Pos.X) / 2,
-			(matManager.vFieldGrave[0][field][speed][0].Pos.Y + matManager.vFieldGrave[0][field][speed][2].Pos.Y) / 2, dField.grave[0].size() * 0.01f + 0.02f));
-		driver->setTransform(irr::video::ETS_WORLD, im);
-		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
-	}
-	if(dField.remove_act) {
-		im.setTranslation(irr::core::vector3df((matManager.vFieldRemove[0][field][speed][0].Pos.X + matManager.vFieldRemove[0][field][speed][1].Pos.X) / 2,
-			(matManager.vFieldRemove[0][field][speed][0].Pos.Y + matManager.vFieldRemove[0][field][speed][2].Pos.Y) / 2, dField.remove[0].size() * 0.01f + 0.02f));
-		driver->setTransform(irr::video::ETS_WORLD, im);
-		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
-	}
-	if(dField.extra_act) {
-		im.setTranslation(irr::core::vector3df((matManager.vFieldExtra[0][speed][0].Pos.X + matManager.vFieldExtra[0][speed][1].Pos.X) / 2,
-			(matManager.vFieldExtra[0][speed][0].Pos.Y + matManager.vFieldExtra[0][speed][2].Pos.Y) / 2, dField.extra[0].size() * 0.01f + 0.02f));
-		driver->setTransform(irr::video::ETS_WORLD, im);
-		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
-	}
-	if(dField.pzone_act[0]) {
-		int seq = dInfo.duel_field == 4 ? (speed) ? 1 : 0 : 6;
-		im.setTranslation(irr::core::vector3df((matManager.vFieldSzone[0][seq][field][speed][0].Pos.X + matManager.vFieldSzone[0][seq][field][speed][1].Pos.X) / 2,
-			(matManager.vFieldSzone[0][seq][field][speed][0].Pos.Y + matManager.vFieldSzone[0][seq][field][speed][2].Pos.Y) / 2, 0.03f));
-		driver->setTransform(irr::video::ETS_WORLD, im);
-		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
-	}
-	if(dField.pzone_act[1]) {
-		int seq = dInfo.duel_field >= 4 ? (speed) ? 1 : 0 : 6;
-		im.setTranslation(irr::core::vector3df((matManager.vFieldSzone[1][seq][field][speed][0].Pos.X + matManager.vFieldSzone[1][seq][field][speed][1].Pos.X) / 2,
-			(matManager.vFieldSzone[1][seq][field][speed][0].Pos.Y + matManager.vFieldSzone[1][seq][field][speed][2].Pos.Y) / 2, 0.03f));
-		driver->setTransform(irr::video::ETS_WORLD, im);
-		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
-	}
+
 	if(dField.conti_act) {
 		im.setTranslation(irr::core::vector3df((matManager.vFieldContiAct[speed][0].X + matManager.vFieldContiAct[speed][1].X) / 2,
 			(matManager.vFieldContiAct[speed][0].Y + matManager.vFieldContiAct[speed][2].Y) / 2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
+
 	for(size_t i = 0; i < dField.chains.size(); ++i) {
 		if(dField.chains[i].solved)
 			break;
