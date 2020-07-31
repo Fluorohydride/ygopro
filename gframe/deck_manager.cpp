@@ -223,32 +223,16 @@ DeckError DeckManager::CheckDeck(Deck& deck, int lfhash, DuelAllowedCards allowe
 	return CheckCards(deck.side, curlist, list, allowedCards, ccount);
 }
 int DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec, int mainc2, int sidec2) {
-	std::vector<int> mainvect;
-	std::vector<int> sidevect;
-#ifndef __ANDROID__
-	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc);
-	dbuf += mainc;
-	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec);
-	dbuf += sidec;
-	mainvect.insert(mainvect.end(), dbuf, dbuf + mainc2);
-	dbuf += mainc2;
-	sidevect.insert(sidevect.end(), dbuf, dbuf + sidec2);
-#else
-	auto ins = [](std::vector<int>& vec, int* start, int* end) {
-		while(start != end) {
-			vec.push_back(*start);
-			start++;
-		}
+	std::vector<int> mainvect(mainc + mainc2);
+	std::vector<int> sidevect(sidec + sidec2);
+	auto copy = [&dbuf](int* vec, int count) {
+		memcpy(vec, dbuf, count * sizeof(int));
+		dbuf += count;
 	};
-	int* start = dbuf;
-	ins(mainvect, dbuf, dbuf + mainc);
-	dbuf += mainc;
-	ins(sidevect, dbuf, dbuf + sidec);
-	dbuf += sidec;
-	ins(mainvect, dbuf, dbuf + mainc2);
-	dbuf += mainc2;
-	ins(sidevect, dbuf, dbuf + sidec2);
-#endif
+	copy(&mainvect[0], mainc);
+	copy(&sidevect[0], sidec);
+	copy(&mainvect[mainc], mainc2);
+	copy(&sidevect[sidec], sidec2);
 	return LoadDeck(deck, mainvect, sidevect);
 }
 int DeckManager::LoadDeck(Deck& deck, std::vector<int> mainlist, std::vector<int> sidelist) {
@@ -404,22 +388,20 @@ bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, s
 }
 const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 	static std::wstring res;
-	auto decktbuf = [&res=res](const std::vector<CardDataC*>& src) {
-		static std::vector<int> cards;
-		cards.resize(src.size());
-		auto buf = cards.data();
+	auto decktobuf = [&res=res](const std::vector<CardDataC*>& src) {
+		static std::vector<int> cards(src.size());
 		for(size_t i = 0; i < src.size(); i++) {
-			buf[i] = src[i]->code;
+			cards[i] = src[i]->code;
 		}
-		res += base64_encode((uint8_t*)buf, cards.size() * 4) + L"!";
+		res += base64_encode((uint8_t*)cards.data(), cards.size() * 4) + L"!";
 	};
 	res = L"ydke://";
-	decktbuf(deck.main);
-	decktbuf(deck.extra);
-	decktbuf(deck.side);
+	decktobuf(deck.main);
+	decktobuf(deck.extra);
+	decktobuf(deck.side);
 	return res.data();
 }
-const wchar_t * DeckManager::ExportDeckCardNames(Deck deck) {
+const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	static std::wstring res;
 	res.clear();
 	std::sort(deck.main.begin(), deck.main.end(), ClientCard::deck_sort_lv);
