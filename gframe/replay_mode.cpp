@@ -31,6 +31,10 @@ bool ReplayMode::StartReplay(int skipturn, bool is_yrp) {
 	if(skip_turn < 0)
 		skip_turn = 0;
 	yrp = is_yrp;
+	is_swapping = false;
+	is_pausing = false;
+	is_paused = false;
+	is_restarting = false;
 	if(is_yrp) {
 		if(cur_replay.pheader.id == REPLAY_YRP1)
 			cur_yrp = &cur_replay;
