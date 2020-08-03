@@ -2744,7 +2744,7 @@ void Game::ReloadCBCardType2() {
 void Game::ReloadCBLimit() {
 	bool white = deckBuilder.filterList && deckBuilder.filterList->whitelist;
 	cbLimit->clear();
-	cbLimit->addItem(gDataManager->GetSysString(1310).c_str(), DeckBuilder::LIMITATION_FILTER_NONE);
+	cbLimit->addItem(gDataManager->GetSysString(white ? 1269 : 1310).c_str(), DeckBuilder::LIMITATION_FILTER_NONE);
 	cbLimit->addItem(gDataManager->GetSysString(1316).c_str(), DeckBuilder::LIMITATION_FILTER_BANNED);
 	cbLimit->addItem(gDataManager->GetSysString(1317).c_str(), DeckBuilder::LIMITATION_FILTER_LIMITED);
 	cbLimit->addItem(gDataManager->GetSysString(1318).c_str(), DeckBuilder::LIMITATION_FILTER_SEMI_LIMITED);
@@ -2765,7 +2765,7 @@ void Game::ReloadCBLimit() {
 		}
 	} else {
 		chkAnime->setEnabled(false);
-		cbLimit->addItem(gDataManager->GetSysString(1269).c_str(), DeckBuilder::LIMITATION_FILTER_ALL);
+		cbLimit->addItem(gDataManager->GetSysString(1310).c_str(), DeckBuilder::LIMITATION_FILTER_ALL);
 	}
 }
 void Game::ReloadCBAttribute() {
