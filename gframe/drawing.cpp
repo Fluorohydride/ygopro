@@ -1119,9 +1119,16 @@ void Game::WaitFrameSignal(int frame) {
 }
 void Game::DrawThumb(CardDataC* cp, irr::core::vector2di pos, LFList* lflist, bool drag, irr::core::recti* cliprect, bool load_image) {
 	auto code = cp->code;
-	auto lcode = cp->code;
-	if(!lflist->content.count(lcode) && cp->alias)
-		lcode = cp->alias;
+	unsigned int limitcode = cp->code;
+	auto flit = lflist->content.find(limitcode);
+	if(flit == lflist->content.end() && cp->alias)
+		flit = lflist->content.find(cp->alias);
+	int count = 3;
+	if(flit == lflist->content.end()) {
+		if(lflist->whitelist)
+			count = -1;
+	} else
+		count = flit->second;
 	irr::video::ITexture* img = load_image ? imageManager.GetTextureCard(code, ImageManager::THUMB) : imageManager.tUnknown;
 	if (img == NULL)
 		return; //NULL->getSize() will cause a crash
@@ -1136,18 +1143,17 @@ void Game::DrawThumb(CardDataC* cp, irr::core::vector2di pos, LFList* lflist, bo
 	}
 	driver->draw2DImage(img, dragloc, irr::core::recti(0, 0, size.Width, size.Height), cliprect);
 	if(!is_siding) {
-		if(lflist->content.count(lcode) || lflist->whitelist) {
-			switch(lflist->content[lcode]) {
-				case 0:
-					imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(0, 0, 64, 64), cliprect, 0, true);
-					break;
-				case 1:
-					imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(64, 0, 128, 64), cliprect, 0, true);
-					break;
-				case 2:
-					imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(0, 64, 64, 128), cliprect, 0, true);
-					break;
-			}
+		switch(count) {
+			case -1:
+			case 0:
+				imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(0, 0, 64, 64), cliprect, 0, true);
+				break;
+			case 1:
+				imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(64, 0, 128, 64), cliprect, 0, true);
+				break;
+			case 2:
+				imageManager.draw2DImageFilterScaled(imageManager.tLim, limitloc, irr::core::recti(0, 64, 64, 128), cliprect, 0, true);
+				break;
 		}
 #define IDX(scope,idx) case SCOPE_##scope:\
 							index = idx;\

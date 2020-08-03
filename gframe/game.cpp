@@ -1339,8 +1339,8 @@ bool Game::Initialize() {
 	//cbFilterMatchMode->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 	cbFilterBanlist->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
-	ReloadCBFilterRule();
 	RefreshLFLists();
+	ReloadCBFilterRule();
 
 	/*cbFilterMatchMode->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1227)).c_str());
 	cbFilterMatchMode->addItem(gDataManager->GetSysString(1244).c_str());
@@ -2742,23 +2742,30 @@ void Game::ReloadCBCardType2() {
 	}
 }
 void Game::ReloadCBLimit() {
+	bool white = deckBuilder.filterList && deckBuilder.filterList->whitelist;
 	cbLimit->clear();
-	cbLimit->addItem(gDataManager->GetSysString(1310).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1316).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1317).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1318).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1320).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1900).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1901).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1902).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1903).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1910).c_str());
-	cbLimit->addItem(gDataManager->GetSysString(1911).c_str());
-	if (chkAnime->isChecked()) {
-		cbLimit->addItem(gDataManager->GetSysString(1265).c_str());
-		cbLimit->addItem(gDataManager->GetSysString(1266).c_str());
-		cbLimit->addItem(gDataManager->GetSysString(1267).c_str());
-		cbLimit->addItem(gDataManager->GetSysString(1268).c_str());
+	cbLimit->addItem(gDataManager->GetSysString(1310).c_str(), DeckBuilder::LIMITATION_FILTER_NONE);
+	cbLimit->addItem(gDataManager->GetSysString(1316).c_str(), DeckBuilder::LIMITATION_FILTER_BANNED);
+	cbLimit->addItem(gDataManager->GetSysString(1317).c_str(), DeckBuilder::LIMITATION_FILTER_LIMITED);
+	cbLimit->addItem(gDataManager->GetSysString(1318).c_str(), DeckBuilder::LIMITATION_FILTER_SEMI_LIMITED);
+	cbLimit->addItem(gDataManager->GetSysString(1320).c_str(), DeckBuilder::LIMITATION_FILTER_UNLIMITED);
+	if(!white) {
+		chkAnime->setEnabled(true);
+		cbLimit->addItem(gDataManager->GetSysString(1900).c_str(), DeckBuilder::LIMITATION_FILTER_OCG);
+		cbLimit->addItem(gDataManager->GetSysString(1901).c_str(), DeckBuilder::LIMITATION_FILTER_TCG);
+		cbLimit->addItem(gDataManager->GetSysString(1902).c_str(), DeckBuilder::LIMITATION_FILTER_TCG_OCG);
+		cbLimit->addItem(gDataManager->GetSysString(1903).c_str(), DeckBuilder::LIMITATION_FILTER_PRERELEASE);
+		cbLimit->addItem(gDataManager->GetSysString(1910).c_str(), DeckBuilder::LIMITATION_FILTER_SPEED);
+		cbLimit->addItem(gDataManager->GetSysString(1911).c_str(), DeckBuilder::LIMITATION_FILTER_RUSH);
+		if(chkAnime->isChecked()) {
+			cbLimit->addItem(gDataManager->GetSysString(1265).c_str(), DeckBuilder::LIMITATION_FILTER_ANIME);
+			cbLimit->addItem(gDataManager->GetSysString(1266).c_str(), DeckBuilder::LIMITATION_FILTER_ILLEGAL);
+			cbLimit->addItem(gDataManager->GetSysString(1267).c_str(), DeckBuilder::LIMITATION_FILTER_VIDEOGAME);
+			cbLimit->addItem(gDataManager->GetSysString(1268).c_str(), DeckBuilder::LIMITATION_FILTER_CUSTOM);
+		}
+	} else {
+		chkAnime->setEnabled(false);
+		cbLimit->addItem(gDataManager->GetSysString(1269).c_str(), DeckBuilder::LIMITATION_FILTER_ALL);
 	}
 }
 void Game::ReloadCBAttribute() {

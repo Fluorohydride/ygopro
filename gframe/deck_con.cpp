@@ -447,10 +447,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
 				filterList = &gdeckManager->_lfList[mainGame->cbDBLFList->getSelected()];
-				if (filterList->whitelist) { // heuristic to help with restricted card pools
-					mainGame->chkAnime->setChecked(true);
-					mainGame->cbLimit->setSelected(4); // unlimited
-				}
+				mainGame->ReloadCBLimit();
 				StartFilter(true);
 				break;
 			}
@@ -958,7 +955,7 @@ bool DeckBuilder::FiltersChanged() {
 void DeckBuilder::StartFilter(bool force_refresh) {
 	filter_type = mainGame->cbCardType->getSelected();
 	filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-	filter_lm = static_cast<limitation_search_filters>(mainGame->cbLimit->getSelected());
+	filter_lm = static_cast<limitation_search_filters>(mainGame->cbLimit->getItemData(mainGame->cbLimit->getSelected()));
 	if(filter_type == 1) {
 		filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
 		filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
@@ -1005,16 +1002,16 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 		if(!term.empty()) {
 			size_t start = 0;
 			if(term.size() >= 2 && memcmp(L"!!", term.data(), sizeof(wchar_t) * 2) == 0) {
-				modif |= SEARCH_MODIFIER::SEARCH_MODIFIER_NEGATIVE_LOOKUP;
+				modif |= SEARCH_MODIFIER_NEGATIVE_LOOKUP;
 				start += 2;
 			}
 			if(term.size() + start >= 1) {
 				if(term[start] == L'@') {
-					modif |= SEARCH_MODIFIER::SEARCH_MODIFIER_ARCHETYPE_ONLY;
+					modif |= SEARCH_MODIFIER_ARCHETYPE_ONLY;
 					start++;
 				}
 				else if(term[start] == L'$') {
-					modif |= SEARCH_MODIFIER::SEARCH_MODIFIER_NAME_ONLY;
+					modif |= SEARCH_MODIFIER_NAME_ONLY;
 					start++;
 				}
 			}
@@ -1049,7 +1046,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 	mainGame->scrFilter->setPos(0);
 }
 bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std::vector<std::wstring>& tokens, const std::vector<unsigned int>& set_code) {
-	if(data->_data.type & TYPE_TOKEN  || data->_data.ot & SCOPE_HIDDEN || ((data->_data.ot & SCOPE_OFFICIAL) != data->_data.ot && !mainGame->chkAnime->isChecked()))
+	if(data->_data.type & TYPE_TOKEN  || data->_data.ot & SCOPE_HIDDEN || ((data->_data.ot & SCOPE_OFFICIAL) != data->_data.ot && (!mainGame->chkAnime->isChecked() && !filterList->whitelist)))
 		return false;
 	switch(filter_type) {
 	case 1: {
@@ -1106,50 +1103,83 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 		return false;
 	if(filter_marks && (data->_data.link_marker & filter_marks) != filter_marks)
 		return false;
-	if(filter_lm) {
+	if((filter_lm != LIMITATION_FILTER_NONE || filterList->whitelist) && filter_lm != LIMITATION_FILTER_ALL) {
 		unsigned int limitcode = data->_data.code;
 		auto flit = filterList->content.find(limitcode);
-		if(flit == filterList->content.end())
-			limitcode = data->_data.alias ? data->_data.alias : data->_data.code;
-		if(filter_lm <= LIMITATION_FILTER_SEMI_LIMITED && ((!filterList->content.count(limitcode) && !filterList->whitelist) || (filterList->content[limitcode] != filter_lm - 1)))
-			return false;
-		if(filter_lm == LIMITATION_FILTER_UNLIMITED) {
-			if(filterList->whitelist) {
-				if(!filterList->content.count(limitcode) || filterList->content[limitcode] < 3)
+		if(flit == filterList->content.end() && data->_data.alias)
+			flit = filterList->content.find(data->_data.alias);
+		int count = 3;
+		if(flit == filterList->content.end()) {
+			if(filterList->whitelist)
+				count = -1;
+		} else
+			count = flit->second;
+		switch(filter_lm) {
+			case LIMITATION_FILTER_BANNED:
+			case LIMITATION_FILTER_LIMITED:
+			case LIMITATION_FILTER_SEMI_LIMITED:
+				if(count != filter_lm - 1)
 					return false;
-			} else if(filterList->content.count(limitcode) && filterList->content[limitcode] < 3)
-				return false;
+				break;
+			case LIMITATION_FILTER_UNLIMITED:
+				if(count < 3)
+					return false;
+				break;
+			case LIMITATION_FILTER_OCG:
+				if(data->_data.ot != SCOPE_OCG)
+					return false;
+				break;
+			case LIMITATION_FILTER_TCG:
+				if(data->_data.ot != SCOPE_TCG)
+					return false;
+				break;
+			case LIMITATION_FILTER_TCG_OCG:
+				if(data->_data.ot != SCOPE_OCG_TCG)
+					return false;
+				break;
+			case LIMITATION_FILTER_PRERELEASE:
+				if(!(data->_data.ot & SCOPE_PRERELEASE))
+					return false;
+				break;
+			case LIMITATION_FILTER_SPEED:
+				if(!(data->_data.ot & SCOPE_SPEED))
+					return false;
+				break;
+			case LIMITATION_FILTER_RUSH:
+				if(!(data->_data.ot & SCOPE_RUSH))
+					return false;
+				break;
+			case LIMITATION_FILTER_ANIME:
+				if(data->_data.ot != SCOPE_ANIME)
+					return false;
+				break;
+			case LIMITATION_FILTER_ILLEGAL:
+				if(data->_data.ot != SCOPE_ILLEGAL)
+					return false;
+				break;
+			case LIMITATION_FILTER_VIDEOGAME:
+				if(data->_data.ot != SCOPE_VIDEO_GAME)
+					return false;
+				break;
+			case LIMITATION_FILTER_CUSTOM:
+				if(data->_data.ot != SCOPE_CUSTOM)
+					return false;
+				break;
+			default:
+				break;
 		}
-		if(filter_lm == LIMITATION_FILTER_OCG && data->_data.ot != SCOPE_OCG)
-			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG && data->_data.ot != SCOPE_TCG)
-			return false;
-		if(filter_lm == LIMITATION_FILTER_TCG_OCG && data->_data.ot != SCOPE_OCG_TCG)
-			return false;
-		if(filter_lm == LIMITATION_FILTER_PRERELEASE && !(data->_data.ot & SCOPE_PRERELEASE))
-			return false;
-		if (filter_lm == LIMITATION_FILTER_SPEED && !(data->_data.ot & SCOPE_SPEED))
-			return false;
-		if (filter_lm == LIMITATION_FILTER_RUSH && !(data->_data.ot & SCOPE_RUSH))
-			return false;
-		if(filter_lm == LIMITATION_FILTER_ANIME && data->_data.ot != SCOPE_ANIME)
-			return false;
-		if(filter_lm == LIMITATION_FILTER_ILLEGAL && data->_data.ot != SCOPE_ILLEGAL)
-			return false;
-		if(filter_lm == LIMITATION_FILTER_VIDEOGAME && data->_data.ot != SCOPE_VIDEO_GAME)
-			return false;
-		if(filter_lm == LIMITATION_FILTER_CUSTOM && data->_data.ot != SCOPE_CUSTOM)
+		if(filterList->whitelist && count < 0)
 			return false;
 	}
 	if(tokens.size()) {
-		const auto checkNeg = [negative = !!(modifier & SEARCH_MODIFIER::SEARCH_MODIFIER_NEGATIVE_LOOKUP)] (bool res) -> bool {
+		const auto checkNeg = [negative = !!(modifier & SEARCH_MODIFIER_NEGATIVE_LOOKUP)] (bool res) -> bool {
 			if(negative)
 				return !res;
 			return res;
 		};
-		if(modifier & SEARCH_MODIFIER::SEARCH_MODIFIER_NAME_ONLY) {
+		if(modifier & SEARCH_MODIFIER_NAME_ONLY) {
 			return checkNeg(Utils::ContainsSubstring(data->GetStrings()->name, tokens, true));
-		} else if(modifier & SEARCH_MODIFIER::SEARCH_MODIFIER_ARCHETYPE_ONLY) {
+		} else if(modifier & SEARCH_MODIFIER_ARCHETYPE_ONLY) {
 			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
 				return checkNeg(false);
 			return checkNeg(check_set_code(data->_data, set_code));
