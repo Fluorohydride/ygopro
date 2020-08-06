@@ -52,6 +52,7 @@ workspace "ygo"
 	objdir "obj"
 	startproject "ygopro"
 	staticruntime "on"
+	toolset "v141_xp"
 
 	configurations { "Debug", "Release" }
 
