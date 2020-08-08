@@ -98,6 +98,7 @@ struct GameConfig
 	int soundVolume = 20;
 	bool loopMusic = true;
 	bool noClientUpdates = false;
+	bool controller_input = false;
 	path_string skin = EPRO_TEXT("none");
 	path_string locale = EPRO_TEXT("English");
 	path_string working_directory = EPRO_TEXT("./");

@@ -2273,7 +2273,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 		break;
 	}
 	case irr::EET_JOYSTICK_INPUT_EVENT: {
-		if(!mainGame->device->isWindowFocused())
+		if(!gGameConfig->controller_input || !mainGame->device->isWindowFocused())
 			break;
 		auto& jevent = event.JoystickEvent;
 		irr::f32 moveHorizontal = 0.f; // Range is -1.f for full left to +1.f for full right
