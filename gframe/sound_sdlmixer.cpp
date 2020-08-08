@@ -10,7 +10,7 @@
 
 SoundMixer::SoundMixer() {
 	SDL_SetMainReady();
-	if(SDL_Init(SDL_INIT_AUDIO) < 0)
+	if(SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
 		throw std::runtime_error("Failed to init sdl audio device!");
 	int flags = MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_FLAC;
 	int initted = Mix_Init(flags);
