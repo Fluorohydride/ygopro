@@ -56,7 +56,10 @@ workspace "ygo"
 	objdir "obj"
 	startproject "ygopro"
 	staticruntime "on"
-	toolset "v141_xp"
+	filter "action:vs*"
+		toolset "v141_xp"
+
+	filter {}
 
 	configurations { "Debug", "Release" }
 
