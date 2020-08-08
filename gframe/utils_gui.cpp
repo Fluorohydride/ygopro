@@ -11,6 +11,7 @@
 #include <vector>
 #include "logging.h"
 #include "Base64.h"
+#include "IrrlichtCommonIncludes/CCursorControl.h"
 #elif defined(__ANDROID__)
 #include "Android/COSAndroidOperator.h"
 class android_app;
@@ -162,6 +163,7 @@ void GUIUtils::ToggleFullscreen(irr::IrrlichtDevice* device, bool& fullscreen) {
 		SetWindowPlacement(hWnd, &nonFullscreenSize);
 		SetWindowLongPtr(hWnd, GWL_STYLE, nonFullscreenStyle);
 	}
+	static_cast<irr::CCursorControl*>(device->getCursorControl())->updateBorderSize(fullscreen, true);
 #elif defined(__linux__) && !defined(__ANDROID__)
 	struct {
 		unsigned long   flags;
