@@ -23,6 +23,14 @@ local ygopro_config=function(static_core)
 	end
 	includedirs "../ocgcore"
 	links { "clzma", "freetype", "Irrlicht" }
+	if not _OPTIONS["no-joystick"] then
+		defines "YGOPRO_USE_JOYSTICK"
+		filter { "system:not windows", "configurations:Debug" }
+			links { "SDL2d" }
+		filter { "system:not windows", "configurations:Release" }
+			links { "SDL2" }
+		filter {}
+	end
 	if _OPTIONS["sound"] then
 		if _OPTIONS["sound"]=="irrklang" then
 			defines "YGOPRO_USE_IRRKLANG"

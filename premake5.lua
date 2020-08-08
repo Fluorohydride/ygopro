@@ -12,6 +12,10 @@ newoption {
 	}
 }
 newoption {
+	trigger = "no-joystick",
+	description = "Add base joystick compatibility (Requires SDL2)"
+}
+newoption {
 	trigger = "pics",
 	value = "url_template",
 	description = "Default URL for card images"

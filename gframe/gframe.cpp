@@ -18,6 +18,7 @@
 #include "logging.h"
 #include "game.h"
 #include "log.h"
+#include "joystick_wrapper.h"
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
@@ -36,6 +37,7 @@ ygo::GameConfig* ygo::gGameConfig = nullptr;
 ygo::RepoManager* ygo::gRepoManager = nullptr;
 ygo::DeckManager* ygo::gdeckManager = nullptr;
 ygo::ClientUpdater* ygo::gClientUpdater = nullptr;
+JWrapper* gJWrapper = nullptr;
 
 inline void TriggerEvent(irr::gui::IGUIElement* target, irr::gui::EGUI_EVENT_TYPE type) {
 	irr::SEvent event;
@@ -256,6 +258,7 @@ int main(int argc, char* argv[]) {
 		ygo::mainGame->gSettings.chkFullscreen->setChecked(ygo::gGameConfig->fullscreen);
 	});
 #endif
+	std::unique_ptr<JWrapper> joystick;
 	bool reset = false;
 	bool firstlaunch = true;
 	do {
@@ -270,6 +273,8 @@ int main(int argc, char* argv[]) {
 			return EXIT_FAILURE;
 		}
 		if(firstlaunch) {
+			joystick = std::unique_ptr<JWrapper>(new JWrapper(ygo::mainGame->device));
+			gJWrapper = joystick.get();
 			firstlaunch = false;
 			CheckArguments(argc, argv);
 		}

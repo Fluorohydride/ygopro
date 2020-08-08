@@ -35,6 +35,7 @@
 #include "logging.h"
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
+#include "joystick_wrapper.h"
 
 #ifdef __ANDROID__
 #include "CGUICustomComboBox/CGUICustomComboBox.h"
@@ -1637,6 +1638,7 @@ bool Game::MainLoop() {
 		delta_time = now - prev_time;
 		prev_time = now;
 		cur_time += delta_time;
+		gJWrapper->ProcessEvents();
 		bool resized = false;
 		auto size = driver->getScreenSize();
 #if defined (__linux__) && !defined(__ANDROID__)
