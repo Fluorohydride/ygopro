@@ -111,7 +111,7 @@ int DeckManager::TypeCount(std::vector<CardDataC*> cards, int type) {
 inline DeckError CheckCards(const std::vector<CardDataC*> &cards, LFList* curlist, std::unordered_map<uint32_t, int>* list,
 					  DuelAllowedCards allowedCards,
 					  std::unordered_map<int, int> &ccount,
-					  std::function<DeckError(CardDataC*)> additionalCheck = [](CardDataC*)->DeckError { return { DeckError::NONE }; }) {
+					  DeckError(*additionalCheck)(CardDataC*) = nullptr) {
 	DeckError ret{ DeckError::NONE };
 	for (const auto cit : cards) {
 		ret.code = cit->code;
@@ -139,7 +139,7 @@ inline DeckError CheckCards(const std::vector<CardDataC*> &cards, LFList* curlis
 		default:
 			break;
 		}
-		DeckError additional = additionalCheck(cit);
+		DeckError additional = additionalCheck ? additionalCheck(cit) : DeckError{ DeckError::NONE };
 		if (additional.type) {
 			return additional;
 		}
@@ -388,7 +388,7 @@ bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, s
 }
 const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 	static std::wstring res;
-	auto decktobuf = [&res=res](const std::vector<CardDataC*>& src) {
+	auto decktobuf = [&res=res](const auto& src) {
 		static std::vector<int> cards(src.size());
 		for(size_t i = 0; i < src.size(); i++) {
 			cards[i] = src[i]->code;
@@ -407,7 +407,7 @@ const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	std::sort(deck.main.begin(), deck.main.end(), ClientCard::deck_sort_lv);
 	std::sort(deck.extra.begin(), deck.extra.end(), ClientCard::deck_sort_lv);
 	std::sort(deck.side.begin(), deck.side.end(), ClientCard::deck_sort_lv);
-	auto serialize = [&res=res](const std::vector<CardDataC*>& list) {
+	auto serialize = [&res=res](const auto& list) {
 		uint32 prev = 0;
 		uint32 count = 0;
 		for(const auto& card : list) {

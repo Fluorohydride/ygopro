@@ -733,7 +733,7 @@ void imageScaleNNAAUnthreaded(irr::video::IImage *src, const irr::core::rect<irr
 }
 #ifdef __ANDROID__
 bool hasNPotSupport(irr::video::IVideoDriver* driver) {
-	auto check = [](irr::video::IVideoDriver* driver)->bool {
+	auto check = [](auto driver)->bool {
 		return driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT);
 	};
 	static const bool supported = check(driver);

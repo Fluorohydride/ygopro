@@ -226,7 +226,7 @@ bool check_skills(CardDataC* p1, CardDataC* p2) {
 	}
 	return is_skill(p2->type);
 }
-bool card_sorter(CardDataC* p1, CardDataC* p2, std::function<bool(CardDataC* p1, CardDataC* p2)> sortoop) {
+bool card_sorter(CardDataC* p1, CardDataC* p2, bool(*sortoop)(CardDataC* p1, CardDataC* p2)) {
 	if(check_either_skills(p1->type, p2->type))
 		return check_skills(p1, p2);
 	if((p1->type & 0x7) != (p2->type & 0x7))
@@ -239,7 +239,7 @@ bool card_sorter(CardDataC* p1, CardDataC* p2, std::function<bool(CardDataC* p1,
 	return p1->code < p2->code;
 }
 bool ClientCard::deck_sort_lv(CardDataC* p1, CardDataC* p2) {
-	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2) {
+	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2)->bool {
 		int type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
 		int type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
 		if(type1 != type2)
@@ -254,7 +254,7 @@ bool ClientCard::deck_sort_lv(CardDataC* p1, CardDataC* p2) {
 	});
 }
 bool ClientCard::deck_sort_atk(CardDataC* p1, CardDataC* p2) {
-	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2) {
+	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2)->bool {
 		if(p1->attack != p2->attack)
 			return p1->attack > p2->attack;
 		if(p1->defense != p2->defense)
@@ -269,7 +269,7 @@ bool ClientCard::deck_sort_atk(CardDataC* p1, CardDataC* p2) {
 	});
 }
 bool ClientCard::deck_sort_def(CardDataC* p1, CardDataC* p2) {
-	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2) {
+	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2)->bool {
 		if(p1->defense != p2->defense)
 			return p1->defense > p2->defense;
 		if(p1->attack != p2->attack)

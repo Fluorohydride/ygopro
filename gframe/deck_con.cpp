@@ -1302,33 +1302,31 @@ void DeckBuilder::pop_side(int seq) {
 bool DeckBuilder::check_limit(CardDataC* pointer) {
 	unsigned int limitcode = pointer->alias ? pointer->alias : pointer->code;
 	int found = 0;
-	std::unordered_set<int> limit_codes;
-	auto f=[&](int code, int alias){
-		if(filterList->content.find(code) != filterList->content.end())
-			limit_codes.insert(code);
-		else
-			limit_codes.insert(alias);
+	int limit = 3;
+	std::unordered_map<uint32_t, int>::iterator it;
+	auto f = [&](const auto pcard)->bool {
+		if((it = filterList->content.find(pcard->code)) != filterList->content.end())
+			limit = it->second;
+		else if(pcard->alias && (it = filterList->content.find(pcard->alias)) != filterList->content.end())
+			limit = it->second;
+		else if(filterList->whitelist)
+			limit = 0;
+		return limit > 0;
 	};
-	auto f2 = [&](std::vector<CardDataC*>& list) {
-		for(auto& it : list) {
-			if(it->code == limitcode || it->alias == limitcode) {
-				f(it->code, it->alias);
+	auto f2 = [&](const auto& list) {
+		for(auto& pcard : list) {
+			if(pcard->code == limitcode || pcard->alias == limitcode) {
+				if((it = filterList->content.find(pcard->code)) != filterList->content.end())
+					limit = std::min(limit, it->second);
+				else if((it = filterList->content.find(pcard->alias)) != filterList->content.end())
+					limit = std::min(limit, it->second);
 				found++;
 			}
+			if(limit <= found)
+				return false;
 		}
+		return true;
 	};
-	f(pointer->code, limitcode);
-	f2(gdeckManager->current_deck.main);
-	f2(gdeckManager->current_deck.extra);
-	f2(gdeckManager->current_deck.side);
-	int limit = 3;
-	for(int code : limit_codes) {
-		auto flit = filterList->content.find(code);
-		if(flit != filterList->content.end())
-			limit = std::min(limit,flit->second);
-	}
-	if(limit_codes.empty() && filterList->whitelist)
-		limit = 0;
-	return limit > found;
+	return f(pointer) && f2(gdeckManager->current_deck.main) && f2(gdeckManager->current_deck.extra) && f2(gdeckManager->current_deck.side);
 }
 }
