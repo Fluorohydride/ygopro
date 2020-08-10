@@ -96,7 +96,7 @@ protected:
 	int turn_count;
 	std::vector<char> match_result;
 	unsigned short time_limit[2];
-	unsigned short time_elapsed;
+	short grace_period;
 };
 
 }

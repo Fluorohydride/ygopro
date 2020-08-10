@@ -241,6 +241,8 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		}
 		duel_mode = new GenericDuel(pkt->info.team1, pkt->info.team2, !!(pkt->info.duel_flag & DUEL_RELAY), pkt->info.best_of);
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, GenericDuel::GenericTimer, duel_mode);
+		timeval timeout = { 1, 0 };
+		event_add(duel_mode->etimer, &timeout);
 		unsigned int hash = 1;
 		for(auto lfit = gdeckManager->_lfList.begin(); lfit != gdeckManager->_lfList.end(); ++lfit) {
 			if(pkt->info.lflist == lfit->hash) {

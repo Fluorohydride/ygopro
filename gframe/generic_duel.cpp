@@ -8,7 +8,7 @@ namespace ygo {
 
 ReplayStream GenericDuel::replay_stream;
 
-GenericDuel::GenericDuel(int team1, int team2, bool relay, int best_of) :relay(relay), best_of(best_of), match_kill(0), swapped(false){
+GenericDuel::GenericDuel(int team1, int team2, bool relay, int best_of) :relay(relay), best_of(best_of), match_kill(0), swapped(false), last_response(2){
 	players.home.resize(team1);
 	players.opposing.resize(team2);
 	players.home_size = team1;
@@ -280,6 +280,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 void GenericDuel::LeaveGame(DuelPlayer* dp) {
 	if(dp == host_player) {
 		EndDuel();
+		event_del(etimer);
 		NetServer::StopServer();
 	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 		observers.erase(dp);
@@ -328,6 +329,7 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 				IteratePlayersAndObs([](DuelPlayer* dueler) {
 					NetServer::ReSendToPlayer(dueler);
 				});
+				event_del(etimer);
 			}
 		}
 	}
@@ -1321,13 +1323,13 @@ void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 	last_replay.WriteData(pdata, len);
 	OCG_DuelSetResponse(pduel, pdata, len);
 	GetAtPos(dp->type).player->state = 0xff;
-	if(host_info.time_limit) {
+	/*if(host_info.time_limit) {
 		int resp_type = dp->type < players.home_size ? 0 : 1;
-		if(time_limit[resp_type] >= time_elapsed)
-			time_limit[resp_type] -= time_elapsed;
+		if(time_limit[resp_type] >= grace_period)
+			time_limit[resp_type] -= grace_period;
 		else time_limit[resp_type] = 0;
 		event_del(etimer);
-	}
+	}*/
 	Process();
 }
 void GenericDuel::EndDuel() {
@@ -1375,19 +1377,20 @@ void GenericDuel::WaitforResponse(int playerid) {
 		IteratePlayers([](duelist& dueler) {
 			NetServer::ReSendToPlayer(dueler.player);
 		});
-		cur_player[playerid]->state = CTOS_TIME_CONFIRM;
-	} else
-		cur_player[playerid]->state = CTOS_RESPONSE;
+		grace_period = 5;
+	}
+	cur_player[playerid]->state = CTOS_RESPONSE;
 }
 void GenericDuel::TimeConfirm(DuelPlayer* dp) {
-	if(host_info.time_limit == 0)
+	return;
+	/*if(host_info.time_limit == 0)
 		return;
 	if(dp != cur_player[last_response])
 		return;
 	cur_player[last_response]->state = CTOS_RESPONSE;
-	time_elapsed = 0;
+	grace_period = 0;
 	timeval timeout = {1, 0};
-	event_add(etimer, &timeout);
+	event_add(etimer, &timeout);*/
 }
 void GenericDuel::RefreshMzone(int player, int flag) {
 	RefreshLocation(player, flag, LOCATION_MZONE);
@@ -1478,22 +1481,29 @@ void GenericDuel::PseudoRefreshDeck(int player, int flag) {
 }
 void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 	GenericDuel* sd = static_cast<GenericDuel*>(arg);
-	sd->time_elapsed++;
-	if(sd->time_elapsed >= sd->time_limit[sd->last_response]) {
-		unsigned char wbuf[3];
-		uint32 player = sd->last_response;
-		wbuf[0] = MSG_WIN;
-		wbuf[1] = 1 - player;
-		wbuf[2] = 0x3;
-		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
-		auto& players = sd->players;
-		sd->IteratePlayers([](duelist& dueler) {
-			NetServer::ReSendToPlayer(dueler.player);
-		});
-		sd->replay_stream.emplace_back((char*)wbuf, 3);
-		sd->match_result.push_back(1 - player);
-		sd->DuelEndProc();
-		event_del(sd->etimer);
+	if(sd->last_response < 2 && sd->cur_player[sd->last_response]->state == CTOS_RESPONSE) {
+		if(sd->grace_period >= 0) {
+			//fmt::printf("Grace period, remaining %d\n", sd->grace_period);
+			sd->grace_period--;
+			return;
+		}
+		//fmt::printf("No more grace period, remaining %d\n", sd->time_limit[sd->last_response]);
+		sd->time_limit[sd->last_response]--;
+		if(sd->time_limit[sd->last_response] <= 0) {
+			unsigned char wbuf[3];
+			uint32 player = sd->last_response;
+			wbuf[0] = MSG_WIN;
+			wbuf[1] = 1 - player;
+			wbuf[2] = 0x3;
+			NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
+			auto& players = sd->players;
+			sd->IteratePlayers([](duelist& dueler) {
+				NetServer::ReSendToPlayer(dueler.player);
+			});
+			sd->replay_stream.emplace_back((char*)wbuf, 3);
+			sd->match_result.push_back(1 - player);
+			sd->DuelEndProc();
+		}
 	}
 }
 
