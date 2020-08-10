@@ -17,37 +17,56 @@ GenericDuel::GenericDuel(int team1, int team2, bool relay, int best_of) :relay(r
 }
 GenericDuel::~GenericDuel() {
 }
-#define ITERATE_PLAYERS(func)for(auto& dueler:players.home){\
-		if(dueler.player){\
-			func\
-		}\
-	}\
-	for(auto& dueler:players.opposing){\
-		if(dueler.player){\
-			func\
-		}\
+
+template<typename T>
+void GenericDuel::IteratePlayersAndObs(T func) {
+	for(auto& dlr : players.home) {
+		if(dlr.player)
+			func(dlr.player);
 	}
-#define ITERATE_PLAYERS_AND_OBS(func)for(auto& dlr:players.home){\
-		if(dlr.player){\
-			auto dueler = dlr.player;\
-			func\
-		}\
-	}\
-	for(auto& dlr:players.opposing){\
-		if(dlr.player){\
-			auto dueler = dlr.player;\
-			func\
-		}\
-	}\
-	for(auto& dueler:observers){\
-		func\
+	for(auto& dlr : players.opposing) {
+		if(dlr.player)
+			func(dlr.player);
 	}
+	for(auto& dueler : observers) {
+		func(dueler);
+	}
+}
+
+template<typename T>
+void GenericDuel::IteratePlayers(T func) {
+	for(auto& dueler : players.home) {
+		if(dueler.player)
+			func(dueler);
+	}
+	for(auto& dueler : players.opposing) {
+		if(dueler.player)
+			func(dueler);
+	}
+}
+
+bool GenericDuel::IteratePlayers(std::function<bool(duelist& dueler)> func) {
+	for(auto& dueler : players.home) {
+		if(dueler.player)
+			if(!func(dueler))
+				return false;
+	}
+	for(auto& dueler : players.opposing) {
+		if(dueler.player)
+			if(!func(dueler))
+				return false;
+	}
+	return true;
+}
+
 void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	STOC_Chat scc;
 	scc.player = dp->type;
 	unsigned short* msg = (unsigned short*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
-	ITERATE_PLAYERS_AND_OBS(NetServer::SendBufferToPlayer(dueler, STOC_CHAT, &scc, 4 + msglen * 2);)
+	IteratePlayersAndObs([&](DuelPlayer* dueler) {
+		NetServer::SendBufferToPlayer(dueler, STOC_CHAT, &scc, 4 + msglen * 2);
+	});
 }
 bool GenericDuel::CheckReady() {
 	bool ready1 = true, ready2 = true;
@@ -125,7 +144,9 @@ void GenericDuel::OrderPlayers(std::vector<duelist>& duelists, int offset) {
 			STOC_HS_PlayerChange scpc;
 			scpc.status = (uint8_t)((duelists[i].player->type << 4) | (i + offset));
 			NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_CHANGE, scpc);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+			IteratePlayersAndObs([](DuelPlayer* dueler) {
+				NetServer::ReSendToPlayer(dueler);
+			});
 			STOC_TypeChange sctc;
 			sctc.type = (uint8_t)((duelists[i].player == host_player ? 0x10 : 0) | (i + offset));
 			NetServer::SendPacketToPlayer(duelists[i].player, STOC_TYPE_CHANGE, sctc);
@@ -194,12 +215,12 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		dp->state = CTOS_LEAVE_GAME;
 		if(swapped)
 			std::swap(players.home, players.opposing);
-		ITERATE_PLAYERS(
+		IteratePlayers([&](duelist& dueler) {
 			STOC_HS_PlayerEnter scpe;
 			BufferIO::CopyWStr(dueler.player->name, scpe.name, 20);
 			scpe.pos = GetPos(dueler.player);
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_ENTER, scpe);
-		)
+		});
 		if(swapped)
 			std::swap(players.home, players.opposing);
 		NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
@@ -220,7 +241,9 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		BufferIO::CopyWStr(dp->name, scpe.name, 20);
 		scpe.pos = GetFirstFree();
 		NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_ENTER, scpe);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		SetAtPos(dp, scpe.pos);
 		dp->type = scpe.pos;
 		sctc.type |= scpe.pos;
@@ -231,11 +254,13 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		STOC_HS_WatchChange scwc;
 		scwc.watch_count = (uint16_t)observers.size();
 		NetServer::SendPacketToPlayer(nullptr, STOC_HS_WATCH_CHANGE, scwc);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 	}
 	NetServer::SendPacketToPlayer(dp, STOC_JOIN_GAME, scjg);
 	NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
-	ITERATE_PLAYERS(
+	IteratePlayers([&](duelist& dueler) {
 		STOC_HS_PlayerEnter scpe;
 		BufferIO::CopyWStr(dueler.player->name, scpe.name, 20);
 		scpe.pos = GetPos(dueler.player);
@@ -244,7 +269,8 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			STOC_HS_PlayerChange scpc;
 			scpc.status = (scpe.pos << 4) | PLAYERCHANGE_READY;
 			NetServer::SendPacketToPlayer(dp, STOC_HS_PLAYER_CHANGE, scpc);
-		})
+		}
+	});
 	if(observers.size()) {
 		STOC_HS_WatchChange scwc;
 		scwc.watch_count = (uint16_t)observers.size();
@@ -262,7 +288,9 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = (uint16_t)observers.size();
 			NetServer::SendPacketToPlayer(nullptr, STOC_HS_WATCH_CHANGE, scwc);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+			IteratePlayersAndObs([](DuelPlayer* dueler) {
+				NetServer::ReSendToPlayer(dueler);
+			});
 		}
 	} else {
 		auto type = dp->type;
@@ -272,13 +300,15 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 			GetAtPos(type).Clear();
 			scpc.status = (type << 4) | PLAYERCHANGE_LEAVE;
 			NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_CHANGE, scpc);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+			IteratePlayersAndObs([](DuelPlayer* dueler) {
+				NetServer::ReSendToPlayer(dueler);
+			});
 		} else {
 			if(duel_stage == DUEL_STAGE_SIDING || seeking_rematch) {
-				ITERATE_PLAYERS(
+				IteratePlayers([](duelist& dueler) {
 					if(!dueler.ready)
 						NetServer::SendPacketToPlayer(dueler.player, STOC_DUEL_START);
-				)
+				});
 			}
 			uint32 player = type < players.home_size ? 0 : 1;
 			if(duel_stage != DUEL_STAGE_END) {
@@ -288,12 +318,16 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 					wbuf[1] = 1 - player;
 					wbuf[2] = 0x4;
 					NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
-					ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+					IteratePlayersAndObs([](DuelPlayer* dueler) {
+						NetServer::ReSendToPlayer(dueler);
+					});
 					replay_stream.emplace_back((char*)wbuf, 3);
 					EndDuel();
 				}
 				NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
-				ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+				IteratePlayersAndObs([](DuelPlayer* dueler) {
+					NetServer::ReSendToPlayer(dueler);
+				});
 			}
 		}
 	}
@@ -312,9 +346,13 @@ void GenericDuel::ToDuelist(DuelPlayer* dp) {
 		STOC_HS_WatchChange scwc;
 		scwc.watch_count = (uint16_t)observers.size();
 		NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_ENTER, scpe);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		NetServer::SendPacketToPlayer(nullptr, STOC_HS_WATCH_CHANGE, scwc);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		STOC_TypeChange sctc;
 		sctc.type = (dp == host_player ? 0x10 : 0) | dp->type;
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
@@ -327,7 +365,9 @@ void GenericDuel::ToDuelist(DuelPlayer* dp) {
 		STOC_HS_PlayerChange scpc;
 		scpc.status = (dp->type << 4) | pos;
 		NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_CHANGE, scpc);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		STOC_TypeChange sctc;
 		sctc.type = (dp == host_player ? 0x10 : 0) | pos;
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
@@ -342,7 +382,9 @@ void GenericDuel::ToObserver(DuelPlayer* dp) {
 	STOC_HS_PlayerChange scpc;
 	scpc.status = (dp->type << 4) | PLAYERCHANGE_OBSERVE;
 	NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_CHANGE, scpc);
-	ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+	IteratePlayersAndObs([](DuelPlayer* dueler) {
+		NetServer::ReSendToPlayer(dueler);
+	});
 	GetAtPos(dp->type).Clear();
 	dp->type = NETPLAYER_TYPE_OBSERVER;
 	observers.insert(dp);
@@ -376,7 +418,9 @@ void GenericDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	STOC_HS_PlayerChange scpc;
 	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
 	NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_CHANGE, scpc);
-	ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+	IteratePlayersAndObs([](DuelPlayer* dueler) {
+		NetServer::ReSendToPlayer(dueler);
+	});
 }
 void GenericDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 	auto& dueler = GetAtPos(pos);
@@ -407,10 +451,10 @@ void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 			if(CheckReady()) {
 				auto& player =  match_result[match_result.size() - 1] == 0 ? players.opposing.front().player : players.home.front().player;
 				NetServer::SendPacketToPlayer(player, STOC_SELECT_TP);
-				ITERATE_PLAYERS(
+				IteratePlayers([&player](duelist& dueler) {
 					if(dueler.player != player)
 						dueler.player->state = 0xff;
-				)
+				});
 				player->state = CTOS_TP_RESULT;
 				duel_stage = DUEL_STAGE_FIRSTGO;
 			}
@@ -423,10 +467,12 @@ void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 void GenericDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
 		return;
-	ITERATE_PLAYERS(
-		if (!dueler.ready)
-			return;
-	)
+	if(!IteratePlayers(std::function<bool(duelist&)>([](auto& dueler)->bool {
+		if(!dueler.ready)
+			return false;
+		return true;
+	})))
+		return;
 	if(!CheckReady())
 		return;
 	OrderPlayers(players.home);
@@ -438,7 +484,9 @@ void GenericDuel::StartDuel(DuelPlayer* dp) {
 		players.opposing_iterator = players.opposing.end() - 1;
 	//NetServer::StopListen();
 	//NetServer::StopBroadcast();
-	ITERATE_PLAYERS(NetServer::SendPacketToPlayer(dueler.player, STOC_DUEL_START);)
+	IteratePlayers([](duelist& dueler) {
+		NetServer::SendPacketToPlayer(dueler.player, STOC_DUEL_START);
+	});
 	for(auto& obs : observers) {
 		obs->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(obs);
@@ -497,8 +545,11 @@ void GenericDuel::RematchResult(DuelPlayer * dp, unsigned char rematch) {
 		if(!rematch) {
 			dp->type = NETPLAYER_TYPE_OBSERVER;
 			NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+			IteratePlayersAndObs([](DuelPlayer* dueler) {
+				NetServer::ReSendToPlayer(dueler);
+			});
 			duel_stage = DUEL_STAGE_END;
+			event_del(etimer);
 			return;
 		}
 		dp->state = 0xff;
@@ -510,10 +561,10 @@ void GenericDuel::RematchResult(DuelPlayer * dp, unsigned char rematch) {
 			auto& player = match_result[match_result.size() - 1] == 0 ? players.opposing.front().player : players.home.front().player;
 			match_result.clear();
 			NetServer::SendPacketToPlayer(player, STOC_SELECT_TP);
-			ITERATE_PLAYERS(
+			IteratePlayers([&player](duelist& dueler) {
 				if(dueler.player != player)
 					dueler.player->state = 0xff;
-			)
+			});
 			player->state = CTOS_TP_RESULT;
 			duel_stage = DUEL_STAGE_FIRSTGO;
 		}
@@ -581,7 +632,9 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	OCG_Player team = { (int)host_info.start_lp, host_info.start_hand, host_info.draw_count };
 	pduel = mainGame->SetupDuel({ (uint32_t)rnd(), opt, team, team });
 	if(!host_info.no_shuffle_deck) {
-		ITERATE_PLAYERS(std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);)
+		IteratePlayers([&rnd](duelist& dueler) {
+			std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);
+		});
 	}
 	new_replay.Write<uint32_t>(opt);
 	last_replay.Write<uint32_t>(host_info.start_lp, false);
@@ -724,23 +777,23 @@ void GenericDuel::DuelEndProc() {
 	if(match_kill || (winc[0] >= minvictories || winc[1] >= minvictories) || (int)match_result.size() >= best_of) {
 		seeking_rematch = true;
 		NetServer::SendPacketToPlayer(nullptr, STOC_WAITING_REMATCH);
-		ITERATE_PLAYERS_AND_OBS(
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
 			NetServer::ReSendToPlayer(dueler);
-		)
+		});
 		NetServer::SendPacketToPlayer(nullptr, STOC_REMATCH);
-		ITERATE_PLAYERS(
+		IteratePlayers([](duelist& dueler) {
 			dueler.pdeck = dueler.odeck;
 			dueler.player->state = CTOS_REMATCH_RESPONSE;
 			dueler.ready = false;
 			NetServer::ReSendToPlayer(dueler.player);
-		)
+		});
 		duel_stage = DUEL_STAGE_BEGIN;
 	} else {
-		ITERATE_PLAYERS(
+		IteratePlayers([](duelist& dueler) {
 			dueler.ready = false;
 			dueler.player->state = CTOS_UPDATE_DECK;
 			NetServer::SendPacketToPlayer(dueler.player, STOC_CHANGE_SIDE);
-		)
+		});
 		for(auto& obs : observers)
 			NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
 		duel_stage = DUEL_STAGE_SIDING;
@@ -756,7 +809,9 @@ void GenericDuel::Surrender(DuelPlayer* dp) {
 		wbuf[1] = 1 - player;
 		wbuf[2] = 0;
 		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		replay_stream.emplace_back((char*)wbuf, 3);
 		match_result.push_back(1 - player);
 		DuelEndProc();
@@ -808,7 +863,9 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	switch (message) {
 	case MSG_RETRY: {
 		SEND(nullptr);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		match_result.push_back(2);
 		return_value = 2;
 		break;
@@ -832,10 +889,10 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		case 9:
 		case 11: {
 			SEND(nullptr);
-			ITERATE_PLAYERS_AND_OBS(
+			IteratePlayersAndObs([&](DuelPlayer* dueler) {
 				if(dueler != cur_player[player])
 					NetServer::ReSendToPlayer(dueler);
-			)
+			});
 			break;
 		}
 		case 10:
@@ -843,7 +900,9 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		case 202:
 		case 203: {
 			SEND(nullptr);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+			IteratePlayersAndObs([](DuelPlayer* dueler) {
+				NetServer::ReSendToPlayer(dueler);
+			});
 			break;
 		}
 		case 200: {
@@ -867,7 +926,9 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		player = BufferIO::Read<uint8_t>(pbuf);
 		type = BufferIO::Read<uint8_t>(pbuf);
 		SEND(nullptr);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		if(player > 1)
 			match_result.push_back(2);
 		else
@@ -967,15 +1028,19 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 			uint8_t location = BufferIO::Read<uint8_t>(pbuf);
 			if(location != LOCATION_DECK) {
 				SEND(nullptr);
-				ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-					packets_cache.emplace_back(TO_SEND_BUFFER);
+				IteratePlayersAndObs([](DuelPlayer* dueler) {
+					NetServer::ReSendToPlayer(dueler);
+				});
+				packets_cache.emplace_back(TO_SEND_BUFFER);
 			} else {
 				SEND(cur_player[player]);
 			}
 		} else {
 			SEND(nullptr);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
-				packets_cache.emplace_back(TO_SEND_BUFFER);
+			IteratePlayersAndObs([](DuelPlayer* dueler) {
+				NetServer::ReSendToPlayer(dueler);
+			});
+			packets_cache.emplace_back(TO_SEND_BUFFER);
 		}
 		break;
 	}
@@ -1018,7 +1083,9 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	case MSG_SET: {
 		BufferIO::Write<uint32_t>(pbuf, 0);
 		SEND(nullptr);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		packets_cache.emplace_back(TO_SEND_BUFFER);
 		break;
 	}
@@ -1081,13 +1148,17 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 	case MSG_MATCH_KILL: {
 		if(best_of > 1) {
 			SEND(nullptr);
-			ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+			IteratePlayersAndObs([](DuelPlayer* dueler) {
+				NetServer::ReSendToPlayer(dueler);
+			});
 		}
 		break;
 	}
 	default: {
 		SEND(nullptr);
-		ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+		IteratePlayersAndObs([](DuelPlayer* dueler) {
+			NetServer::ReSendToPlayer(dueler);
+		});
 		packets_cache.emplace_back(TO_SEND_BUFFER);
 		break;
 	}
@@ -1278,26 +1349,32 @@ void GenericDuel::EndDuel() {
 	newreplay.insert(newreplay.end(), new_replay.comp_data.begin(), new_replay.comp_data.end());
 
 	NetServer::SendBufferToPlayer(nullptr, STOC_NEW_REPLAY, newreplay.data(), newreplay.size());
-	ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+	IteratePlayersAndObs([](DuelPlayer* dueler) {
+		NetServer::ReSendToPlayer(dueler);
+	});
 
 	NetServer::SendBufferToPlayer(nullptr, STOC_REPLAY, oldreplay.data(), oldreplay.size());
-	ITERATE_PLAYERS_AND_OBS(NetServer::ReSendToPlayer(dueler);)
+	IteratePlayersAndObs([](DuelPlayer* dueler) {
+		NetServer::ReSendToPlayer(dueler);
+	});
 	OCG_DestroyDuel(pduel);
 	pduel = nullptr;
 }
 void GenericDuel::WaitforResponse(int playerid) {
 	last_response = playerid;
 	unsigned char msg = MSG_WAITING;
-	ITERATE_PLAYERS(
+	IteratePlayers([&](duelist& dueler) {
 		if(dueler.player != cur_player[playerid])
 			NetServer::SendPacketToPlayer(dueler.player, STOC_GAME_MSG, msg);
-	)
+	});
 	if(host_info.time_limit) {
 		STOC_TimeLimit sctl;
 		sctl.player = playerid;
 		sctl.left_time = time_limit[playerid];
 		NetServer::SendPacketToPlayer(nullptr, STOC_TIME_LIMIT, sctl);
-		ITERATE_PLAYERS(NetServer::ReSendToPlayer(dueler.player);)
+		IteratePlayers([](duelist& dueler) {
+			NetServer::ReSendToPlayer(dueler.player);
+		});
 		cur_player[playerid]->state = CTOS_TIME_CONFIRM;
 	} else
 		cur_player[playerid]->state = CTOS_RESPONSE;
@@ -1410,7 +1487,9 @@ void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 		wbuf[2] = 0x3;
 		NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, wbuf, 3);
 		auto& players = sd->players;
-		ITERATE_PLAYERS(NetServer::ReSendToPlayer(dueler.player);)
+		sd->IteratePlayers([](duelist& dueler) {
+			NetServer::ReSendToPlayer(dueler.player);
+		});
 		sd->replay_stream.emplace_back((char*)wbuf, 3);
 		sd->match_result.push_back(1 - player);
 		sd->DuelEndProc();

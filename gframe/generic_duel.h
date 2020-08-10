@@ -73,6 +73,11 @@ protected:
 	void Catchup(DuelPlayer* dp);
 	int GetPos(DuelPlayer* dp);
 	void OrderPlayers(std::vector<duelist>& players, int offset = 0);
+	template<typename T>
+	void IteratePlayersAndObs(T func);
+	template<typename T>
+	void IteratePlayers(T func);
+	bool IteratePlayers(std::function<bool(duelist& dueler)> func);
 	struct {
 		std::vector<duelist> home;
 		std::vector<duelist> opposing;
