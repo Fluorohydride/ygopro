@@ -23,9 +23,9 @@ void init() {
 		createdevice = (decltype(createdevice))GetProcAddress((HMODULE)library, CREATE_DEVICE_GCC);
 #else
 #ifdef __APPLE__
-	if(!(library = dlopen("./libIrrKlang.dll", RTLD_NOW)))
-#else
 	if(!(library = dlopen("./libIrrKlang.dylib", RTLD_NOW)))
+#else
+	if(!(library = dlopen("./libIrrKlang.so", RTLD_NOW)))
 #endif
 	   return;
 	createdevice = (decltype(createdevice))dlsym(library, CREATE_DEVICE_GCC);
