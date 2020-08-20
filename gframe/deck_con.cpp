@@ -558,6 +558,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		bool isroot = mainGame->env->getRootGUIElement()->getElementFromPoint(mouse_pos) == mainGame->env->getRootGUIElement();
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_PRESSED_DOWN: {
+			if(is_draging)
+				break;
 			if(!isroot)
 				break;
 			if(mainGame->wCategories->isVisible() || mainGame->wQuery->isVisible())
