@@ -55,7 +55,7 @@ public:
 	irr::core::vector3df curRot;
 	irr::core::vector3df dPos;
 	irr::core::vector3df dRot;
-	irr::f32 curAlpha;
+	irr::f32 curAlpha = 255;
 	irr::f32 dAlpha;
 	int32_t aniFrame;
 	bool is_moving;
@@ -116,7 +116,6 @@ public:
 	std::wstring lscstring;
 	std::wstring rscstring;
 
-	ClientCard();
 	void UpdateDrawCoordinates(bool setTrans = false);
 	void SetCode(uint32_t code);
 	void UpdateInfo(const CoreUtils::Query& query);

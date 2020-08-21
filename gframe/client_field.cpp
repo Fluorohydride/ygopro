@@ -112,7 +112,7 @@ void ClientField::Clear() {
 void ClientField::Initial(int player, int deckc, int extrac) {
 	ClientCard* pcard;
 	for(int i = 0; i < deckc; ++i) {
-		pcard = new ClientCard;
+		pcard = new ClientCard{};
 		deck[player].push_back(pcard);
 		pcard->owner = player;
 		pcard->controler = player;
@@ -122,7 +122,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->UpdateDrawCoordinates(true);
 	}
 	for(int i = 0; i < extrac; ++i) {
-		pcard = new ClientCard;
+		pcard = new ClientCard{};
 		extra[player].push_back(pcard);
 		pcard->owner = player;
 		pcard->controler = player;

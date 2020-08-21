@@ -5,55 +5,6 @@
 
 namespace ygo {
 
-ClientCard::ClientCard() {
-	curAlpha = 255;
-	dAlpha = 0;
-	aniFrame = 0;
-	is_moving = false;
-	refresh_on_stop = false;
-	is_fading = false;
-	is_hovered = false;
-	is_selectable = false;
-	is_selected = false;
-	is_showequip = false;
-	is_showtarget = false;
-	is_showchaintarget = false;
-	is_highlighting = false;
-	status = 0;
-	is_reversed = false;
-	is_public = false;
-	cmdFlag = 0;
-	code = 0;
-	cover = 0;
-	chain_code = 0;
-	location = 0;
-	type = 0;
-	alias = 0;
-	level = 0;
-	rank = 0;
-	link = 0;
-	race = 0;
-	attribute = 0;
-	attack = 0;
-	defense = 0;
-	base_attack = 0;
-	base_defense = 0;
-	lscale = 0;
-	rscale = 0;
-	link_marker = 0;
-	position = 0;
-	cHint = 0;
-	chValue = 0;
-	atkstring = L"";
-	defstring = L"";
-	lvstring = L"";
-	linkstring = L"";
-	rkstring = L"";
-	rscstring = L"";
-	lscstring = L"";
-	overlayTarget = 0;
-	equipTarget = 0;
-}
 void ClientCard::UpdateDrawCoordinates(bool setTrans) {
 	mainGame->dField.GetCardDrawCoordinates(this, &curPos, &curRot, setTrans);
 }
