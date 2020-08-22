@@ -2124,7 +2124,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				auto focus = static_cast<irr::gui::IGUIListBox*>(mainGame->env->getFocus());
 				int sel = focus->getSelected();
 				if(sel != -1) {
-					mainGame->device->getOSOperator()->copyToClipboard(focus->getListItem(sel));
+					mainGame->env->getOSOperator()->copyToClipboard(focus->getListItem(sel));
 					return true;
 				}
 			}

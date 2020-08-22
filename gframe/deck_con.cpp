@@ -736,7 +736,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(event.KeyInput.Control) {
 					auto deck_string = event.KeyInput.Shift ? gdeckManager->ExportDeckCardNames(gdeckManager->current_deck) : gdeckManager->ExportDeckBase64(gdeckManager->current_deck);
 					if(deck_string) {
-						mainGame->device->getOSOperator()->copyToClipboard(deck_string);
+						mainGame->env->getOSOperator()->copyToClipboard(deck_string);
 						mainGame->stACMessage->setText(gDataManager->GetSysString(1368).c_str());
 					} else {
 						mainGame->stACMessage->setText(gDataManager->GetSysString(1369).c_str());
@@ -747,7 +747,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			case irr::KEY_KEY_V: {
 				if(event.KeyInput.Control && !mainGame->HasFocus(irr::gui::EGUIET_EDIT_BOX)) {
-					const wchar_t* deck_string = mainGame->device->getOSOperator()->getTextFromClipboard();
+					const wchar_t* deck_string = mainGame->env->getOSOperator()->getTextFromClipboard();
 					if(deck_string && wcsncmp(L"ydke://", deck_string, sizeof(L"ydke://") / sizeof(wchar_t) - 1) == 0) {
 						gdeckManager->ImportDeckBase64(gdeckManager->current_deck, deck_string);
 					}
