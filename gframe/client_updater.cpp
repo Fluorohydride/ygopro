@@ -37,7 +37,7 @@ int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownl
 		int percentage = 0;
 		if(TotalToDownload > 0.0) {
 			double fractiondownloaded = (double)NowDownloaded / (double)TotalToDownload;
-			percentage = std::round(fractiondownloaded * 100);
+			percentage = (int)std::round(fractiondownloaded * 100);
 		}
 		if(percentage != payload->previous_percent) {
 			payload->callback(percentage, payload->current, payload->total, payload->filename, payload->is_new, payload->payload);
