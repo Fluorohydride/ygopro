@@ -1,13 +1,13 @@
 #include "game_config.h"
 #include <algorithm>
-#ifndef __ANDROID__
 #include <sstream>
-#endif
 #include <unordered_map>
+#include <fmt/format.h>
 #include <irrlicht.h>
 #include "random_fwd.h"
 #include "config.h"
 #include "deck_con.h"
+#include "utils.h"
 #include "data_manager.h"
 #include "deck_manager.h"
 #include "image_manager.h"

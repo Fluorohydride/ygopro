@@ -291,7 +291,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(i == 3)
 						mainGame->chkCustomRules[4]->setEnabled(set);
 				}
-				const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+				constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 				for (int i = 0; i < (sizeof(mainGame->chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i)
 						mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 				mainGame->PopupElement(mainGame->wCustomRules);
@@ -899,7 +899,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					if(i == 3)
 						mainGame->chkCustomRules[4]->setEnabled(set);
 				}
-				const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+				constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 				for(int i = 0; i < (sizeof(mainGame->chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i)
 					mainGame->chkTypeLimit[i]->setChecked(mainGame->forbiddentypes & limits[i]);
 				break;

@@ -1,3 +1,4 @@
+#include <fmt/format.h>
 #include "game_config.h"
 #include <irrlicht.h>
 #include "game.h"
@@ -356,7 +357,7 @@ void Game::DrawCards() {
 }
 void Game::DrawCard(ClientCard* pcard) {
 	if(pcard->aniFrame > 0) {
-		uint32 movetime = std::min<uint32_t>(delta_time, pcard->aniFrame);
+		uint32_t movetime = std::min<uint32_t>(delta_time, pcard->aniFrame);
 		if(pcard->is_moving) {
 			pcard->curPos += (pcard->dPos * movetime);
 			pcard->curRot += (pcard->dRot * movetime);
@@ -799,7 +800,7 @@ void Game::DrawGUI() {
 			}
 		} else if(fu.autoFadeoutFrame) {
 			fit++;
-			uint32 movetime = std::min((int32)delta_time, fu.autoFadeoutFrame);
+			uint32_t movetime = std::min<uint32_t>(delta_time, fu.autoFadeoutFrame);
 			fu.autoFadeoutFrame -= movetime;
 			fu.guiFading->setEnabled(fu.wasEnabled);
 			if(!fu.autoFadeoutFrame)

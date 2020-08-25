@@ -1,6 +1,8 @@
 #include <sstream>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 #include <irrlicht.h>
 #include "client_updater.h"
 #include "game_config.h"
@@ -371,7 +373,7 @@ bool Game::Initialize() {
 	}
 	tmpptr = env->addStaticText(gDataManager->GetSysString(1628).c_str(), rectsize(), false, false, crPanel);
 	defaultStrings.emplace_back(tmpptr, 1628);
-	const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+	constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 #define TYPECHK(id,stringid)\
 	chkTypeLimit[id] = env->addCheckBox(forbiddentypes & limits[id], rectsize(), crPanel, -1, fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).c_str());
 	TYPECHK(0, 1056);
@@ -1518,8 +1520,8 @@ bool Game::MainLoop() {
 	irr::core::dimension2d<irr::u32> prev_window_size;
 #endif
 	irr::ITimer* timer = device->getTimer();
-	uint32 cur_time = 0;
-	uint32 prev_time = timer->getRealTime();
+	uint32_t cur_time = 0;
+	uint32_t prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
 	int fps = 0;
 	bool was_connected = false;
@@ -1662,7 +1664,7 @@ bool Game::MainLoop() {
 		float remainder;
 		frame_counter = std::modf(frame_counter, &remainder);
 		delta_frames = std::round(remainder);
-		for(uint32 i = 0; i < delta_frames; i++){
+		for(uint32_t i = 0; i < delta_frames; i++){
 			linePatternD3D = (linePatternD3D + 1) % 30;
 			linePatternGL = (linePatternGL << 1) | (linePatternGL >> 15);
 		}
@@ -1739,7 +1741,7 @@ bool Game::MainLoop() {
 		}
 		gMutex.unlock();
 		if(signalFrame > 0) {
-			uint32 movetime = std::min((int)delta_time, signalFrame);
+			uint32_t movetime = std::min(delta_time, signalFrame);
 			signalFrame -= movetime;
 			if(!signalFrame)
 				frameSignal.Set();
@@ -1816,9 +1818,9 @@ bool Game::MainLoop() {
 		int fpsLimit = gGameConfig->maxFPS;
 		if(gGameConfig->maxFPS > 0 && !gGameConfig->vsync) {
 #endif
-			int64 delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
+			int64_t delta = std::round(fps * (1000.0f / fpsLimit) - cur_time);
 			if(delta > 0) {
-				int64 t = timer->getRealTime();
+				int64_t t = timer->getRealTime();
 				while((timer->getRealTime() - t) < delta) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 				}
@@ -2240,7 +2242,7 @@ void Game::LoadServers() {
 		catch(...) {}
 	}
 }
-void Game::ShowCardInfo(uint32 code, bool resize, ImageManager::imgType type) {
+void Game::ShowCardInfo(uint32_t code, bool resize, ImageManager::imgType type) {
 	static ImageManager::imgType prevtype = ImageManager::imgType::ART;
 	if(code == 0) {
 		ClearCardInfo(0);
@@ -2469,12 +2471,12 @@ void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
 	queued_caption = caption;
 	popupCheck.unlock();
 }
-uint8 Game::LocalPlayer(uint8 player) {
+uint8_t Game::LocalPlayer(uint8_t player) {
 	return dInfo.isFirst ? player : 1 - player;
 }
 void Game::UpdateDuelParam() {
 	ReloadCBDuelRule();
-	uint32 flag = 0;
+	uint32_t flag = 0;
 	for (int i = 0; i < schkCustomRules; ++i)
 		if (chkCustomRules[i]->isChecked()) {
 			if(i == 19)
@@ -2488,8 +2490,8 @@ void Game::UpdateDuelParam() {
 			else
 				flag |= 0x100U << i;
 		}
-	const uint32 limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
-	uint32 flag2 = 0;
+	constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
+	uint32_t flag2 = 0;
 	for (int i = 0; i < (sizeof(chkTypeLimit) / sizeof(irr::gui::IGUICheckBox*)); ++i) {
 		if (chkTypeLimit[i]->isChecked()) {
 			flag2 |= limits[i];
@@ -2569,7 +2571,7 @@ void Game::UpdateExtraRules(bool set) {
 			extra_rules |= flag;
 	}
 }
-int Game::GetMasterRule(uint32 param, uint32 forbiddentypes, int* truerule) {
+int Game::GetMasterRule(uint32_t param, uint32_t forbiddentypes, int* truerule) {
 	if(truerule)
 		*truerule = 0;
 #define CHECK(MR) case DUEL_MODE_MR##MR:{ if (truerule && forbiddentypes == DUEL_MODE_MR##MR##_FORB) *truerule = MR; break; }
@@ -2929,10 +2931,10 @@ void Game::ReloadElementsStrings() {
 }
 void Game::OnResize() {
 	const auto waboutpos = wAbout->getAbsolutePosition();
-	stAbout->setRelativePosition(irr::core::recti(10, 10, std::min<uint32>(window_size.Width - waboutpos.UpperLeftCorner.X,
-																		 std::min<uint32>(Scale(440), stAbout->getTextWidth() + Scale(10))),
-												  std::min<uint32>(window_size.Height - waboutpos.UpperLeftCorner.Y,
-																   std::min<uint32>(stAbout->getTextHeight() + Scale(10), Scale(690)))));
+	stAbout->setRelativePosition(irr::core::recti(10, 10, std::min<uint32_t>(window_size.Width - waboutpos.UpperLeftCorner.X,
+																		 std::min<uint32_t>(Scale(440), stAbout->getTextWidth() + Scale(10))),
+												  std::min<uint32_t>(window_size.Height - waboutpos.UpperLeftCorner.Y,
+																   std::min<uint32_t>(stAbout->getTextHeight() + Scale(10), Scale(690)))));
 	wRoomListPlaceholder->setRelativePosition(irr::core::recti(0, 0, window_size.Width, window_size.Height));
 	wMainMenu->setRelativePosition(ResizeWin(mainMenuLeftX, 200, mainMenuRightX, 450));
 	wBtnSettings->setRelativePosition(ResizeWin(0, 610, 30, 640));
@@ -3319,9 +3321,9 @@ void Game::PopulateLocales() {
 	}
 }
 
-void Game::ApplyLocale(uint32 index, bool forced) {
-	static int previndex = 0;
-	if(index < 0 || index > locales.size())
+void Game::ApplyLocale(size_t index, bool forced) {
+	static size_t previndex = 0;
+	if(index > locales.size())
 		return;
 	if(previndex == index && !forced)
 		return;

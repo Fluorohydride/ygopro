@@ -1,6 +1,7 @@
 #ifndef REPLAY_H
 #define REPLAY_H
 
+#include <memory> //std::unique_ptr
 #include "config.h"
 #include "core_utils.h"
 #include <ctime>

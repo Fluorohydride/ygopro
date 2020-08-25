@@ -1,9 +1,10 @@
 #ifndef DATAMANAGER_H
 #define DATAMANAGER_H
 
-#include "config.h"
-#include "client_card.h"
 #include <unordered_map>
+#include <cstdint>
+#include "utils.h"
+#include "client_card.h"
 
 struct sqlite3;
 struct sqlite3_stmt;
@@ -57,13 +58,13 @@ public:
 	bool LoadStrings(const path_string& file);
 	bool LoadLocaleStrings(const path_string& file);
 	void ClearLocaleStrings();
-	bool GetData(uint32 code, CardData* pData);
-	CardDataC* GetCardData(uint32 code);
-	bool GetString(uint32 code, CardString* pStr);
-	std::wstring GetName(uint32 code);
-	std::wstring GetText(uint32 code);
-	std::wstring GetDesc(uint64 strCode, bool compat);
-	std::wstring GetSysString(uint32 code);
+	bool GetData(uint32_t code, CardData* pData);
+	CardDataC* GetCardData(uint32_t code);
+	bool GetString(uint32_t code, CardString* pStr);
+	std::wstring GetName(uint32_t code);
+	std::wstring GetText(uint32_t code);
+	std::wstring GetDesc(uint64_t strCode, bool compat);
+	std::wstring GetSysString(uint32_t code);
 	std::wstring GetVictoryString(int code);
 	std::wstring GetCounterName(int code);
 	std::wstring GetSetName(int code);
@@ -74,14 +75,14 @@ public:
 	std::wstring FormatRace(int race, bool isSkill = false);
 	std::wstring FormatType(int type);
 	std::wstring FormatScope(int scope, bool hideOCGTCG = false);
-	std::wstring FormatSetName(unsigned long long setcode);
-	std::wstring FormatSetName(std::vector<uint16> setcodes);
+	std::wstring FormatSetName(uint64_t setcode);
+	std::wstring FormatSetName(std::vector<uint16_t> setcodes);
 	std::wstring FormatLinkMarker(int link_marker);
 
 	std::unordered_map<unsigned int, CardDataM> cards;
 
 	static const wchar_t* unknown_string;
-	static void CardReader(void* payload, int code, CardData* data);
+	static void CardReader(void* payload, uint32_t code, CardData* data);
 private:
 	template<typename T1, typename T2 = T1>
 	using indexed_map = std::map<unsigned int, std::pair<T1, T2>>;
@@ -109,7 +110,7 @@ private:
 	bool ParseDB(sqlite3* pDB);
 	bool ParseLocaleDB(sqlite3* pDB);
 	bool Error(sqlite3* pDB, sqlite3_stmt* pStmt = nullptr);
-	std::unordered_map<unsigned int, CardString> locales;
+	std::unordered_map<uint32_t, CardString> locales;
 	indexed_map<CardDataM*, CardString*> indexes;
 	LocaleStringHelper _counterStrings;
 	LocaleStringHelper _victoryStrings;

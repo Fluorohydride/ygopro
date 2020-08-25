@@ -1,6 +1,12 @@
 #include <stack>
+#include <fmt/format.h>
+#include "utils.h"
 #include "game_config.h"
-#include <irrlicht.h>
+#include <IGUIWindow.h>
+#include <IGUIStaticText.h>
+#include <IGUIScrollBar.h>
+#include <IGUIListBox.h>
+#include <IGUIEditBox.h>
 #include "client_field.h"
 #include "client_card.h"
 #include "duelclient.h"
@@ -109,9 +115,9 @@ void ClientField::Clear() {
 	deck_reversed = false;
 }
 #undef CLEAR_VECTOR
-void ClientField::Initial(int player, int deckc, int extrac) {
+void ClientField::Initial(uint8_t player, uint32_t deckc, uint32_t extrac) {
 	ClientCard* pcard;
-	for(int i = 0; i < deckc; ++i) {
+	for(uint32_t i = 0; i < deckc; ++i) {
 		pcard = new ClientCard{};
 		deck[player].push_back(pcard);
 		pcard->owner = player;
@@ -121,7 +127,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->position = POS_FACEDOWN_DEFENSE;
 		pcard->UpdateDrawCoordinates(true);
 	}
-	for(int i = 0; i < extrac; ++i) {
+	for(uint32_t i = 0; i < extrac; ++i) {
 		pcard = new ClientCard{};
 		extra[player].push_back(pcard);
 		pcard->owner = player;
@@ -132,7 +138,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->UpdateDrawCoordinates(true);
 	}
 }
-std::vector<ClientCard*>* ClientField::GetList(int location, int controler) {
+std::vector<ClientCard*>* ClientField::GetList(uint8_t location, uint8_t controler) {
 	switch(location) {
 	case LOCATION_DECK:
 		return &deck[controler];
@@ -158,26 +164,26 @@ std::vector<ClientCard*>* ClientField::GetList(int location, int controler) {
 	}
 	return nullptr;
 }
-ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
+ClientCard* ClientField::GetCard(uint8_t controler, uint8_t location, uint32_t sequence, uint32_t sub_seq) {
 	bool is_xyz = (location & LOCATION_OVERLAY) != 0;
 	auto lst = GetList(location & (~LOCATION_OVERLAY), controler);
 	if(!lst)
 		return 0;
 	if(is_xyz) {
-		if(sequence >= (int)lst->size())
+		if(sequence >= lst->size())
 			return 0;
 		ClientCard* scard = (*lst)[sequence];
-		if(scard && (int)scard->overlayed.size() > sub_seq)
+		if(scard && scard->overlayed.size() > sub_seq)
 			return scard->overlayed[sub_seq];
 		else
 			return 0;
 	} else {
-		if(sequence >= (int)lst->size())
+		if(sequence >= lst->size())
 			return 0;
 		return (*lst)[sequence];
 	}
 }
-void ClientField::AddCard(ClientCard* pcard, int controler, int location, int sequence) {
+void ClientField::AddCard(ClientCard* pcard, uint8_t controler, uint8_t location, uint32_t sequence) {
 	pcard->controler = controler;
 	pcard->location = location;
 	pcard->sequence = sequence;
@@ -245,7 +251,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	}
 	}
 }
-ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
+ClientCard* ClientField::RemoveCard(uint8_t controler, uint8_t location, uint32_t sequence) {
 	ClientCard* pcard = 0;
 	switch (location) {
 	case LOCATION_DECK: {
@@ -317,17 +323,17 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	pcard->location = 0;
 	return pcard;
 }
-void ClientField::UpdateCard(int controler, int location, int sequence, char* data, int len) {
+void ClientField::UpdateCard(uint8_t controler, uint8_t location, uint32_t sequence, char* data, uint32_t len) {
 	ClientCard* pcard = GetCard(controler, location, sequence);
 	if(pcard) {
 		if(mainGame->dInfo.compat_mode) {
-			len = BufferIO::Read<int32>(data);
+			len = BufferIO::Read<uint32_t>(data);
 		}
 		CoreUtils::Query query(data, mainGame->dInfo.compat_mode, len);
 		pcard->UpdateInfo(query);
 	}
 }
-void ClientField::UpdateFieldCard(int controler, int location, char* data, int len) {
+void ClientField::UpdateFieldCard(uint8_t controler, uint8_t location, char* data, uint32_t len) {
 	auto lst = GetList(location, controler);
 	if(!lst)
 		return;
@@ -602,7 +608,7 @@ void ClientField::ShowLocationCard() {
 	mainGame->btnDisplayOK->setVisible(true);
 	mainGame->PopupElement(mainGame->wCardDisplay);
 }
-void ClientField::ShowSelectOption(uint64 select_hint) {
+void ClientField::ShowSelectOption(uint64_t select_hint) {
 	selected_option = 0;
 	int count = select_options.size();
 	bool quickmode = true;// (count <= 5);
@@ -720,7 +726,7 @@ void ClientField::RefreshAllCards() {
 	for(auto& pcard : overlay_cards)
 		refresh(pcard);
 }
-void ClientField::GetChainDrawCoordinates(int controler, int location, int sequence, irr::core::vector3df* t) {
+void ClientField::GetChainDrawCoordinates(uint8_t controler, uint8_t location, uint32_t sequence, irr::core::vector3df* t) {
 	int field = (mainGame->dInfo.duel_field == 3 || mainGame->dInfo.duel_field == 5) ? 0 : 1;
 	int speed = (mainGame->dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if ((location & (~LOCATION_OVERLAY)) == LOCATION_HAND) {
@@ -882,8 +888,8 @@ void ClientField::GetCardDrawCoordinates(ClientCard* pcard, irr::core::vector3df
 		pcard->mTransform.setRotationRadians(*r);
 	}
 }
-void ClientField::MoveCard(ClientCard * pcard, int frame) {
-	float milliseconds = (float)frame * 1000.0f / 60.0f;
+void ClientField::MoveCard(ClientCard * pcard, float frame) {
+	float milliseconds = frame * 1000.0f / 60.0f;
 	irr::core::vector3df trans = pcard->curPos;
 	irr::core::vector3df rot = pcard->curRot;
 	GetCardDrawCoordinates(pcard, &trans, &rot);
@@ -914,8 +920,8 @@ void ClientField::MoveCard(ClientCard * pcard, int frame) {
 	pcard->refresh_on_stop = true;
 	pcard->aniFrame = milliseconds;
 }
-void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
-	float milliseconds = (float)frame * 1000.0f / 60.0f;
+void ClientField::FadeCard(ClientCard * pcard, float alpha, float frame) {
+	float milliseconds = frame * 1000.0f / 60.0f;
 	pcard->dAlpha = (alpha - pcard->curAlpha) / milliseconds;
 	pcard->is_fading = true;
 	pcard->aniFrame = milliseconds;
@@ -999,7 +1005,8 @@ bool ClientField::CheckSelectSum() {
 		}
 		return ret;
 	} else {
-		int mm = -1, mx = -1, max = 0, sumc = 0;
+		int mm = -1, mx = -1;
+		uint32_t max = 0, sumc = 0;
 		bool ret = false;
 		for (auto sit = selected_cards.begin(); sit != selected_cards.end(); ++sit) {
 			int op1 = (*sit)->opParam & 0xffff;
@@ -1024,10 +1031,10 @@ bool ClientField::CheckSelectSum() {
 		if (select_sumval <= max && select_sumval > max - mx)
 			ret = true;
 		for(auto sit = selable.begin(); sit != selable.end(); ++sit) {
-			int op1 = (*sit)->opParam & 0xffff;
-			int op2 = (*sit)->opParam >> 16;
-			int m = op1;
-			int sums = sumc;
+			uint16_t op1 = (*sit)->opParam & 0xffff;
+			uint16_t op2 = ((*sit)->opParam >> 16) & 0xffff;
+			uint16_t m = op1;
+			uint32_t sums = sumc;
 			sums += m;
 			int ms = mm;
 			if (ms == -1 || m < ms)
@@ -1099,7 +1106,7 @@ bool ClientField::check_sel_sum_s(const std::set<ClientCard*>& left, int index, 
 		return false;
 	if (index == (int)selected_cards.size()) {
 		if (acc == 0) {
-			int count = selected_cards.size() - must_select_count;
+			uint32_t count = selected_cards.size() - must_select_count;
 			return count >= select_min && count <= select_max;
 		}
 		check_sel_sum_t(left, acc);
@@ -1130,7 +1137,7 @@ void ClientField::check_sel_sum_t(const std::set<ClientCard*>& left, int acc) {
 		}
 	}
 }
-bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, int count) {
+bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc, uint32_t count) {
 	if (acc == 0)
 		return count >= select_min && count <= select_max;
 	if (acc < 0 || index == end)
@@ -1147,9 +1154,9 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 }
 #define BINARY_OP(opcode,op) case opcode: {\
 								if (stack.size() >= 2) {\
-									int rhs = stack.top();\
+									int64_t rhs = stack.top();\
 									stack.pop();\
-									int lhs = stack.top();\
+									int64_t lhs = stack.top();\
 									stack.pop();\
 									stack.push(lhs op rhs);\
 								}\
@@ -1157,7 +1164,7 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 							}
 #define UNARY_OP(opcode,op) case opcode: {\
 								if (stack.size() >= 1) {\
-									int val = stack.top();\
+									int64_t val = stack.top();\
 									stack.pop();\
 									stack.push(op val);\
 								}\
@@ -1168,8 +1175,8 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 								stack.push(cd->val);\
 								break;\
 							}
-static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
-	std::stack<int64> stack;
+static bool is_declarable(CardDataC* cd, const std::vector<uint64_t>& opcodes) {
+	std::stack<uint64_t> stack;
 	for(auto& opcode : opcodes) {
 		switch(opcode << (mainGame->dInfo.compat_mode ? 32 : 0)) {
 		BINARY_OP(OPCODE_ADD, +);
@@ -1200,8 +1207,8 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
 				int set_code = stack.top();
 				stack.pop();
 				bool res = false;
-				uint16 settype = set_code & 0xfff;
-				uint16 setsubtype = set_code & 0xf000;
+				uint16_t settype = set_code & 0xfff;
+				uint16_t setsubtype = set_code & 0xf000;
 				for(auto& sc : cd->setcodes) {
 					if((sc & 0xfff) == settype && (sc & 0xf000 & setsubtype) == setsubtype) {
 						res = true;
@@ -1229,7 +1236,7 @@ static bool is_declarable(CardDataC* cd, const std::vector<int64>& opcodes) {
 #undef GET_OP
 void ClientField::UpdateDeclarableList(bool refresh) {
 	auto pname = Utils::ToUpperNoAccents<std::wstring>(mainGame->ebANCard->getText());
-	int trycode = BufferIO::GetVal(pname.c_str());
+	uint32_t trycode = BufferIO::GetVal(pname.c_str());
 	auto cd = gDataManager->GetCardData(trycode);
 	if(cd && is_declarable(cd, declare_opcodes)) {
 		mainGame->lstANCard->clear();
@@ -1239,7 +1246,7 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 		return;
 	}
 	if(pname.empty() && !refresh) {
-		std::vector<int> cache;
+		std::vector<uint32_t> cache;
 		cache.swap(ancard);
 		int sel = mainGame->lstANCard->getSelected();
 		int selcode = (sel == -1) ? 0 : cache[sel];

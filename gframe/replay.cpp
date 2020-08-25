@@ -1,7 +1,10 @@
 #include "replay.h"
 #include <algorithm>
 #include <fstream>
+#include <fmt/format.h>
 #include "lzma/LzmaLib.h"
+#include "common.h"
+#include "utils.h"
 
 namespace ygo {
 ReplayPacket::ReplayPacket(const CoreUtils::Packet& packet) {

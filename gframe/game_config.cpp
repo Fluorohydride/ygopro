@@ -1,5 +1,7 @@
 #include "game_config.h"
 #include <fstream>
+#include "bufferio.h"
+#include "utils.h"
 #include "config.h"
 #include "logging.h"
 

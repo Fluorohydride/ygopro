@@ -2,6 +2,7 @@
 #include "netserver.h"
 #include "generic_duel.h"
 #include "sockets.h"
+#include "common.h"
 
 namespace ygo {
 bool operator==(const ClientVersion& ver1, const ClientVersion& ver2) {
@@ -49,8 +50,8 @@ bool NetServer::StartBroadcast() {
 	if(!net_evbase)
 		return false;
 	SOCKET udp = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	BOOL opt = TRUE;
-	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
+	socklen_t opt = true;
+	setsockopt(udp, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(socklen_t));
 	sockaddr_in addr;
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;

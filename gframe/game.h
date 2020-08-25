@@ -5,6 +5,8 @@
 #include <vector>
 #include <list>
 #include "config.h"
+#include "common.h"
+#include "mysignal.h"
 #include <SColor.h>
 #include <rect.h>
 #include <EGUIElementTypes.h>
@@ -17,6 +19,7 @@
 #include "ocgapi_types.h"
 #include "settings_window.h"
 
+struct unzip_payload;
 class CGUISkinSystem;
 class IProgressBar;
 namespace irr {
@@ -152,7 +155,7 @@ public:
 	void LoadGithubRepositories();
 	void UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo);
 	void LoadServers();
-	void ShowCardInfo(uint32 code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
+	void ShowCardInfo(uint32_t code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
 	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
 	void AddChatMsg(const std::wstring& msg, int player, int type);
@@ -163,10 +166,10 @@ public:
 	void CloseDuelWindow();
 	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
 
-	uint8 LocalPlayer(uint8 player);
+	uint8_t LocalPlayer(uint8_t player);
 	void UpdateDuelParam();
 	void UpdateExtraRules(bool set = false);
-	int GetMasterRule(uint32 param, uint32 forbidden = 0, int* truerule = 0);
+	int GetMasterRule(uint32_t param, uint32_t forbidden = 0, int* truerule = 0);
 	void SetPhaseButtons(bool visibility = false);
 	void SetMessageWindow();
 
@@ -243,8 +246,8 @@ public:
 	std::wstring chatMsg[8];
 	std::map<std::string, RepoGui> repoInfoGui;
 
-	uint32 delta_time;
-	uint32 delta_frames;
+	uint32_t delta_time;
+	uint32_t delta_frames;
 	int hideChatTimer;
 	bool hideChat;
 	float chatTiming[8];
@@ -252,10 +255,10 @@ public:
 	unsigned short linePatternD3D;
 	unsigned short linePatternGL;
 	float waitFrame;
-	int signalFrame;
-	int saveReplay;
+	uint32_t signalFrame;
+	bool saveReplay;
 	int showcard;
-	uint32 showcardcode;
+	uint32_t showcardcode;
 	float showcarddif;
 	float showcardp;
 	bool is_attacking;
@@ -277,8 +280,8 @@ public:
 	bool is_siding;
 	int forbiddentypes;
 	unsigned short extra_rules;
-	uint32 duel_param;
-	uint32 showingcard;
+	uint32_t duel_param;
+	uint32_t showingcard;
 	bool cardimagetextureloading;
 	float dpi_scale;
 
@@ -303,7 +306,7 @@ public:
 	std::vector<path_string> script_dirs;
 	std::vector<path_string> cores_to_load;
 	void PopulateLocales();
-	void ApplyLocale(uint32 index, bool forced = false);
+	void ApplyLocale(size_t index, bool forced = false);
 	std::vector<std::pair<path_string, std::vector<path_string>>> locales;
 	std::mutex popupCheck;
 	std::wstring queued_msg;
@@ -316,7 +319,7 @@ public:
 	irr::gui::CGUITTFont* numFont;
 	irr::gui::CGUITTFont* adFont;
 	irr::gui::CGUITTFont* lpcFont;
-	std::map<irr::gui::CGUIImageButton*, uint32> imageLoading;
+	std::map<irr::gui::CGUIImageButton*, uint32_t> imageLoading;
 	//card image
 	irr::gui::IGUIStaticText* wCardImg;
 	irr::gui::IGUIImage* imgCard;
@@ -674,7 +677,7 @@ public:
 	irr::gui::IGUIButton* btnJoinHost2;
 	irr::gui::IGUIButton* btnJoinCancel2;
 	irr::gui::IGUIStaticText* fpsCounter;
-	std::vector<std::pair<irr::gui::IGUIElement*, int32>> defaultStrings;
+	std::vector<std::pair<irr::gui::IGUIElement*, uint32_t>> defaultStrings;
 };
 
 extern Game* mainGame;

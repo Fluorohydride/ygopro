@@ -31,6 +31,9 @@ namespace ygo {
 	bool Utils::FileCopy(const path_string& source, const path_string& destination) {
 		if(source == destination)
 			return false;
+#ifdef _WIN32
+		return CopyFile(source.c_str(), destination.c_str(), false);
+#else
 		std::ifstream src(source, std::ios::binary);
 		if(!src.is_open())
 			return false;
@@ -41,6 +44,7 @@ namespace ygo {
 		src.close();
 		dst.close();
 		return true;
+#endif
 	}
 	bool Utils::FileMove(const path_string& source, const path_string& destination) {
 #ifdef _WIN32

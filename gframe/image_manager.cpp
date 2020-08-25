@@ -1,4 +1,8 @@
 #include "game_config.h"
+#include <fstream>
+#include <curl/curl.h>
+#include <fmt/format.h>
+#include "utils.h"
 #include <IImage.h>
 #include <IVideoDriver.h>
 #include <IrrlichtDevice.h>
@@ -6,8 +10,6 @@
 #include "image_manager.h"
 #include "image_downloader.h"
 #include "game.h"
-#include <fstream>
-#include <curl/curl.h>
 
 #define BASE_PATH EPRO_TEXT("./textures/")
 
@@ -761,7 +763,7 @@ irr::video::ITexture* ImageManager::guiScalingResizeCached(irr::video::ITexture 
 		return src;
 
 	// Calculate scaled texture name.
-	irr::io::path rectstr = fmt::sprintf(EPRO_TEXT("%d:%d:%d:%d:%d:%d"),
+	irr::io::path rectstr = fmt::format(EPRO_TEXT("{}:{}:{}:{}:{}:{}"),
 						 srcrect.UpperLeftCorner.X,
 						 srcrect.UpperLeftCorner.Y,
 						 srcrect.getWidth(),

@@ -1,3 +1,4 @@
+#include <fmt/format.h>
 #include "client_card.h"
 #include "game.h"
 #include "data_manager.h"
@@ -135,8 +136,8 @@ void ClientCard::ClearTarget() {
 	ownerTarget.clear();
 }
 bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
-	int32 cp1 = c1->overlayTarget ? c1->overlayTarget->controler : c1->controler;
-	int32 cp2 = c2->overlayTarget ? c2->overlayTarget->controler : c2->controler;
+	uint8_t cp1 = c1->overlayTarget ? c1->overlayTarget->controler : c1->controler;
+	uint8_t cp2 = c2->overlayTarget ? c2->overlayTarget->controler : c2->controler;
 	if(cp1 != cp2)
 		return cp1 < cp2;
 	if(c1->location != c2->location)

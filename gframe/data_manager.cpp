@@ -1,8 +1,11 @@
 #include "data_manager.h"
-#include "sqlite3.h"
 #include <fstream>
+#include <fmt/format.h>
+#include "sqlite3.h"
 #include "readonlymemvfs.h"
 #include "logging.h"
+#include "utils.h"
+#include "common.h"
 
 namespace ygo {
 
@@ -199,7 +202,7 @@ bool DataManager::LoadStrings(const path_string& file) {
 	string_file.close();
 	return true;
 }
-bool DataManager::LoadLocaleStrings(const path_string & file) {
+bool DataManager::LoadLocaleStrings(const path_string& file) {
 	std::ifstream string_file(file, std::ifstream::in);
 	if(!string_file.is_open())
 		return false;
@@ -251,7 +254,7 @@ bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
 	ErrorLog(errorstring);
 	return false;
 }
-bool DataManager::GetData(uint32 code, CardData* pData) {
+bool DataManager::GetData(uint32_t code, CardData* pData) {
 	auto cdit = cards.find(code);
 	if(cdit == cards.end())
 		return false;
@@ -259,13 +262,13 @@ bool DataManager::GetData(uint32 code, CardData* pData) {
 		*pData = *((CardData*)&cdit->second._data);
 	return true;
 }
-CardDataC* DataManager::GetCardData(uint32 code) {
+CardDataC* DataManager::GetCardData(uint32_t code) {
 	auto it = cards.find(code);
 	if(it != cards.end())
 		return &it->second._data;
 	return nullptr;
 }
-bool DataManager::GetString(uint32 code, CardString* pStr) {
+bool DataManager::GetString(uint32_t code, CardString* pStr) {
 	auto csit = cards.find(code);
 	if(csit == cards.end()) {
 		pStr->name = unknown_string;
@@ -275,21 +278,21 @@ bool DataManager::GetString(uint32 code, CardString* pStr) {
 	*pStr = *csit->second.GetStrings();
 	return true;
 }
-std::wstring DataManager::GetName(uint32 code) {
+std::wstring DataManager::GetName(uint32_t code) {
 	auto csit = cards.find(code);
 	if(csit == cards.end() || csit->second.GetStrings()->name.empty())
 		return unknown_string;
 	return csit->second.GetStrings()->name;
 }
-std::wstring DataManager::GetText(uint32 code) {
+std::wstring DataManager::GetText(uint32_t code) {
 	auto csit = cards.find(code);
 	if(csit == cards.end() || csit->second.GetStrings()->text.empty())
 		return unknown_string;
 	return csit->second.GetStrings()->text;
 }
-std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
-	uint32 code = 0;
-	uint32 stringid = 0;
+std::wstring DataManager::GetDesc(uint64_t strCode, bool compat) {
+	uint32_t code = 0;
+	uint32_t stringid = 0;
 	if(compat) {
 		if(strCode < 10000)
 			return GetSysString(strCode);
@@ -306,7 +309,7 @@ std::wstring DataManager::GetDesc(uint64 strCode, bool compat) {
 		return unknown_string;
 	return csit->second.GetStrings()->desc[stringid];
 }
-std::wstring DataManager::GetSysString(uint32 code) {
+std::wstring DataManager::GetSysString(uint32_t code) {
 	auto csit = _sysStrings.GetLocale(code);
 	if(!csit)
 		return unknown_string;
@@ -447,7 +450,7 @@ std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
 	}
 	return buffer;
 }
-std::wstring DataManager::FormatSetName(unsigned long long setcode) {
+std::wstring DataManager::FormatSetName(uint64_t setcode) {
 	std::wstring res;
 	for(int i = 0; i < 4; ++i) {
 		auto name = GetSetName((setcode >> i * 16) & 0xffff);
@@ -459,7 +462,7 @@ std::wstring DataManager::FormatSetName(unsigned long long setcode) {
 		return unknown_string;
 	return res;
 }
-std::wstring DataManager::FormatSetName(std::vector<uint16> setcodes) {
+std::wstring DataManager::FormatSetName(std::vector<uint16_t> setcodes) {
 	std::wstring res;
 	for(auto& setcode : setcodes) {
 		auto name = GetSetName(setcode);
@@ -491,7 +494,7 @@ std::wstring DataManager::FormatLinkMarker(int link_marker) {
 		res += L"[\u2198]";
 	return res;
 }
-void DataManager::CardReader(void* payload, int code, CardData* data) {
+void DataManager::CardReader(void* payload, uint32_t code, CardData* data) {
 	if(!static_cast<DataManager*>(payload)->GetData(code, (CardData*)data))
 		memset(data, 0, sizeof(CardData));
 }

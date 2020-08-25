@@ -1,11 +1,13 @@
+#include <algorithm>
+#include <fstream>
+#include <fmt/format.h>
 #include "network.h"
 #include "deck_manager.h"
 #include "data_manager.h"
 #include "game.h"
 #include <IGUIEditBox.h>
-#include <algorithm>
-#include <fstream>
 #include "Base64.h"
+#include "utils.h"
 
 namespace ygo {
 
@@ -42,7 +44,7 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 		pos = str.find(" ");
 		if(pos == std::string::npos)
 			continue;
-		uint32 code = 0;
+		uint32_t code = 0;
 		try { code = std::stoul(str.substr(0, pos)); }
 		catch(...){}
 		if(!code)
@@ -408,8 +410,8 @@ const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	std::sort(deck.extra.begin(), deck.extra.end(), ClientCard::deck_sort_lv);
 	std::sort(deck.side.begin(), deck.side.end(), ClientCard::deck_sort_lv);
 	auto serialize = [&res=res](const auto& list) {
-		uint32 prev = 0;
-		uint32 count = 0;
+		uint32_t prev = 0;
+		uint32_t count = 0;
 		for(const auto& card : list) {
 			auto code = card->code;
 			if(card->alias && abs((int)(card->alias - card->code)) < 10) {

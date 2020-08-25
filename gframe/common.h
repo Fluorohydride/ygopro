@@ -12,20 +12,6 @@
 #pragma warning(disable: 4244)
 #endif
 
-#include <cstdint>
-
-typedef uint64_t uint64;
-typedef uint32_t uint32;
-typedef uint16_t uint16;
-typedef uint8_t uint8;
-typedef uint8 byte;
-typedef void* ptr;
-typedef int64_t int64;
-typedef int32_t int32;
-typedef int16_t int16;
-typedef int8_t int8;
-typedef int32_t BOOL;
-
 #define MATCH_ALL(x,y) (((x)&(y))==(y))
 #define MATCH_ANY(x,y) ((x)&(y))
 #define ADD_BIT(x,y) ((x)|=(y))
@@ -34,14 +20,6 @@ typedef int32_t BOOL;
 #define OPERATION_SUCCESS 1
 #define OPERATION_FAIL 0
 #define OPERATION_CANCELED -1
-#define TRUE 1
-#define FALSE 0
-#ifndef NULL
-#define NULL 0
-#endif
-struct card_sort {
-	bool operator()(void* const & c1, void* const & c2) const;
-};
 
 //Locations
 #define LOCATION_DECK    0x01

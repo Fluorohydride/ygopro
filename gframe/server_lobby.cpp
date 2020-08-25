@@ -7,11 +7,13 @@
 #include <IGUIWindow.h>
 #include <ICursorControl.h>
 #include "server_lobby.h"
+#include <fmt/format.h>
+#include <curl/curl.h>
+#include "utils.h"
 #include "data_manager.h"
 #include "game.h"
 #include "duelclient.h"
 #include "logging.h"
-#include <curl/curl.h>
 #include "utils_gui.h"
 #include "custom_skin_enum.h"
 #include "game_config.h"

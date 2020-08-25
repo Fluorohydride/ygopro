@@ -121,18 +121,18 @@ restart:
 		if (!duelOptions.handTestNoShuffle) {
 			std::shuffle(playerdeck.main.begin(), playerdeck.main.end(), DuelClient::rnd);
 		}
-		auto LoadDeck = [&](uint8 team) {
+		auto LoadDeck = [&](uint8_t team) {
 			OCG_NewCardInfo card_info = { team, 0, 0, team, 0, 0, POS_FACEDOWN_DEFENSE };
 			card_info.loc = LOCATION_DECK;
 			last_replay.Write<uint32_t>(playerdeck.main.size(), false);
-			for (int32 i = (int32)playerdeck.main.size() - 1; i >= 0; --i) {
+			for (int32_t i = (int32_t)playerdeck.main.size() - 1; i >= 0; --i) {
 				card_info.code = playerdeck.main[i]->code;
 				OCG_DuelNewCard(pduel, card_info);
 				last_replay.Write<uint32_t>(playerdeck.main[i]->code, false);
 			}
 			card_info.loc = LOCATION_EXTRA;
 			last_replay.Write<uint32_t>(playerdeck.extra.size(), false);
-			for (int32 i = (int32)playerdeck.extra.size() - 1; i >= 0; --i) {
+			for (int32_t i = (int32_t)playerdeck.extra.size() - 1; i >= 0; --i) {
 				card_info.code = playerdeck.extra[i]->code;
 				OCG_DuelNewCard(pduel, card_info);
 				last_replay.Write<uint32_t>(playerdeck.extra[i]->code, false);
@@ -536,10 +536,10 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 	}
 	return is_continuing;
 }
-void SingleMode::SinglePlayRefresh(int player, int location, int flag) {
+void SingleMode::SinglePlayRefresh(uint8_t player, uint8_t location, uint32_t flag) {
 	std::vector<uint8_t> buffer;
-	uint32 len = 0;
-	auto buff = OCG_DuelQueryLocation(pduel, &len, { (uint32_t)flag, (uint8_t)player, (uint32_t)location });
+	uint32_t len = 0;
+	auto buff = OCG_DuelQueryLocation(pduel, &len, { flag, player, location });
 	if(len == 0)
 		return;
 	buffer.resize(buffer.size() + len);
@@ -551,10 +551,10 @@ void SingleMode::SinglePlayRefresh(int player, int location, int flag) {
 	buffer.insert(buffer.begin(), player);
 	replay_stream.emplace_back(MSG_UPDATE_DATA, (char*)buffer.data(), buffer.size());
 }
-void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
+void SingleMode::SinglePlayRefreshSingle(uint8_t player, uint8_t location, uint32_t sequence, uint32_t flag) {
 	std::vector<uint8_t> buffer;
-	uint32 len = 0;
-	auto buff = OCG_DuelQuery(pduel, &len, { (uint32_t)flag, (uint8_t)player, (uint32_t)location, (uint32_t)sequence });
+	uint32_t len = 0;
+	auto buff = OCG_DuelQuery(pduel, &len, { flag, player, location, sequence });
 	if(buff == nullptr)
 		return;
 	buffer.resize(buffer.size() + len);
@@ -567,7 +567,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 	buffer.insert(buffer.begin(), player);
 	replay_stream.emplace_back(MSG_UPDATE_CARD, (char*)buffer.data(), buffer.size());
 }
-void SingleMode::SinglePlayRefresh(int flag) {
+void SingleMode::SinglePlayRefresh(uint32_t flag) {
 	for(int p = 0; p < 2; p++)
 		for(int loc = LOCATION_HAND; loc != LOCATION_GRAVE; loc *= 2)
 			SinglePlayRefresh(p, loc, flag);

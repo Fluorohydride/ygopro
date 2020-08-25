@@ -121,8 +121,8 @@ namespace ygo {
 #define CAST(c) static_cast<CHAR_T>(c)
 template<typename T>
 T Utils::NormalizePath(T path, bool trailing_slash) {
-	const T prev{ CAST('.'), CAST('.') };
-	const T cur{ CAST('.') };
+	static const T prev{ CAST('.'), CAST('.') };
+	static const T cur{ CAST('.') };
 	constexpr auto slash = CAST('/');
 	std::replace(path.begin(), path.end(), CAST('\\'), slash);
 	auto paths = TokenizeString(path, slash);

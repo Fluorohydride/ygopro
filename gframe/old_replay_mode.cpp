@@ -1,4 +1,5 @@
 #include "replay_mode.h"
+#include <fmt/format.h>
 #include "duelclient.h"
 #include "game.h"
 #include "single_mode.h"
@@ -270,7 +271,7 @@ namespace ygo {
 		return true;
 	}
 	void ReplayMode::ReplayRefresh(int player, int location, int flag) {
-		uint32 len = 0;
+		uint32_t len = 0;
 		auto buff = OCG_DuelQueryLocation(pduel, &len, { (uint32_t)flag, (uint8_t)player, (uint32_t)location });
 		if(len == 0)
 			return;
@@ -282,7 +283,7 @@ namespace ygo {
 				ReplayRefresh(p, loc, flag);
 	}
 	void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
-		uint32 len = 0;
+		uint32_t len = 0;
 		auto buff = OCG_DuelQuery(pduel, &len, { (uint32_t)flag, (uint8_t)player, (uint32_t)location, (uint32_t)sequence });
 		if(buff == nullptr)
 			return;

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fmt/printf.h>
 #include <fmt/chrono.h>
 #if !defined(_WIN32) && !defined(__ANDROID__)
 #include <sys/types.h>
@@ -18,6 +19,7 @@
 #include "sound_manager.h"
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "progressivebuffer.h"
+#include "utils.h"
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
@@ -2214,7 +2216,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selected_cards.clear();
 		mainGame->dField.must_select_cards.clear();
 		mainGame->dField.selectsum_cards.clear();
-		for (int i = 0; i < mainGame->dField.must_select_count; ++i) {
+		for (uint32_t i = 0; i < mainGame->dField.must_select_count; ++i) {
 			uint32_t code = BufferIO::Read<uint32_t>(pbuf);
 			uint8_t c = mainGame->LocalPlayer(BufferIO::Read<uint8_t>(pbuf));
 			uint8_t l = BufferIO::Read<uint8_t>(pbuf);
@@ -4398,9 +4400,9 @@ void DuelClient::BeginRefreshHost() {
 		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if(sSend == INVALID_SOCKET)
 			continue;
-		BOOL opt = TRUE;
+		socklen_t opt = true;
 		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt,
-				   sizeof(BOOL));
+				   sizeof(socklen_t));
 		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
 			closesocket(sSend);
 			continue;

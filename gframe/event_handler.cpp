@@ -1,4 +1,7 @@
 #include <algorithm>
+#include <fmt/format.h>
+#include <fmt/printf.h>
+#include "utils.h"
 #include "game_config.h"
 #include "client_field.h"
 #include "math.h"
@@ -119,13 +122,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_SAVE: {
 				if(mainGame->ebRSName->getText()[0] == 0)
 					break;
-				mainGame->saveReplay = 1;
+				mainGame->saveReplay = true;
 				mainGame->HideElement(mainGame->wReplaySave);
 				mainGame->replaySignal.Set();
 				break;
 			}
 			case BUTTON_REPLAY_CANCEL: {
-				mainGame->saveReplay = 0;
+				mainGame->saveReplay = false;
 				mainGame->HideElement(mainGame->wReplaySave);
 				mainGame->replaySignal.Set();
 				break;
@@ -548,39 +551,39 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				selectable_cards.clear();
 				switch(command_location) {
 				case LOCATION_DECK: {
-					for(int32 i = (int32)deck[command_controler].size() - 1; i >= 0 ; --i)
+					for(uint32_t i = deck[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[command_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1000), deck[command_controler].size()).c_str());
 					break;
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
-					for(int32 i = 0; i < (int32)pcard->overlayed.size(); ++i)
-						selectable_cards.push_back(pcard->overlayed[i]);
+					for(auto& _pcard : pcard->overlayed)
+						selectable_cards.push_back(_pcard);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), pcard->overlayed.size()).c_str());
 					break;
 				}
 				case LOCATION_SZONE: {
 					ClientCard* pcard = szone[command_controler][command_sequence];
-					for (int32 i = 0; i < (int32)pcard->overlayed.size(); ++i)
-						selectable_cards.push_back(pcard->overlayed[i]);
+					for (auto& _pcard : pcard->overlayed)
+						selectable_cards.push_back(_pcard);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), pcard->overlayed.size()).c_str());
 					break;
 				}
 				case LOCATION_GRAVE: {
-					for(int32 i = (int32)grave[command_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)grave[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[command_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1004), grave[command_controler].size()).c_str());
 					break;
 				}
 				case LOCATION_REMOVED: {
-					for(int32 i = (int32)remove[command_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)remove[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[command_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1005), remove[command_controler].size()).c_str());
 					break;
 				}
 				case LOCATION_EXTRA: {
-					for(int32 i = (int32)extra[command_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)extra[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[command_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1006), extra[command_controler].size()).c_str());
 					break;
@@ -686,7 +689,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->stCardPos[id - BUTTON_CARD_0]->setBackgroundColor(skin::DUELFIELD_CARD_SELECTED_WINDOW_BACKGROUND_VAL);
 						selected_cards.push_back(command_card);
 					}
-					int sel = selected_cards.size();
+					auto sel = selected_cards.size();
 					if (sel >= select_max) {
 						SetResponseSelectedCards();
 						ShowCancelOrFinishButton(0);
@@ -744,10 +747,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						select_min--;
 						int sel = sort_list[sel_seq];
 						sort_list[sel_seq] = 0;
-						for(int i = 0; i < select_max; ++i)
+						for(uint32_t i = 0; i < select_max; ++i)
 							if(sort_list[i] > sel)
 								sort_list[i]--;
-						for(int i = 0; i < 5; ++i) {
+						for(uint32_t i = 0; i < 5; ++i) {
 							if(offset + i >= select_max)
 								break;
 							if(sort_list[offset + i]) {
@@ -760,7 +763,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->stCardPos[id - BUTTON_CARD_0]->setText(fmt::to_wstring(select_min).c_str());
 						if(select_min == select_max) {
 							unsigned char respbuf[64];
-							for(int i = 0; i < select_max; ++i)
+							for(uint32_t i = 0; i < select_max; ++i)
 								respbuf[i] = sort_list[i] - 1;
 							DuelClient::SetResponseB(respbuf, select_max);
 							mainGame->HideElement(mainGame->wCardSelect, true);
@@ -1116,7 +1119,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_DECK: {
 					if(deck[hovered_controler].size() == 0)
 						break;
-					for(int32 i = (int32)deck[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)deck[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[hovered_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1000), deck[hovered_controler].size()).c_str());
 					break;
@@ -1124,15 +1127,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_MZONE: {
 					if(!clicked_card || clicked_card->overlayed.size() == 0)
 						break;
-					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
-						selectable_cards.push_back(clicked_card->overlayed[i]);
+					for(auto& pcard : clicked_card->overlayed)
+						selectable_cards.push_back(pcard);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), clicked_card->overlayed.size()).c_str());
 					break;
 				}
 				case LOCATION_GRAVE: {
 					if(grave[hovered_controler].size() == 0)
 						break;
-					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1004), grave[hovered_controler].size()).c_str());
 					break;
@@ -1140,7 +1143,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_REMOVED: {
 					if(remove[hovered_controler].size() == 0)
 						break;
-					for(int32 i = (int32)remove[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)remove[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1005), remove[hovered_controler].size()).c_str());
 					break;
@@ -1148,7 +1151,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_EXTRA: {
 					if(extra[hovered_controler].size() == 0)
 						break;
-					for(int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1006), extra[hovered_controler].size()).c_str());
 					break;
@@ -1166,7 +1169,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_MZONE: {
 					if(!clicked_card || clicked_card->overlayed.size() == 0)
 						break;
-					for(int32 i = 0; i < (int32)clicked_card->overlayed.size(); ++i)
+					for(int32_t i = 0; i < (int32_t)clicked_card->overlayed.size(); ++i)
 						selectable_cards.push_back(clicked_card->overlayed[i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1007), clicked_card->overlayed.size()).c_str());
 					break;
@@ -1174,7 +1177,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_GRAVE: {
 					if(grave[hovered_controler].size() == 0)
 						break;
-					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1004), grave[hovered_controler].size()).c_str());
 					break;
@@ -1182,7 +1185,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_REMOVED: {
 					if (remove[hovered_controler].size() == 0)
 						break;
-					for (int32 i = (int32)remove[hovered_controler].size() - 1; i >= 0; --i)
+					for (int32_t i = (int32_t)remove[hovered_controler].size() - 1; i >= 0; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1005), remove[hovered_controler].size()).c_str());
 					break;
@@ -1190,7 +1193,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_EXTRA: {
 					if (extra[hovered_controler].size() == 0)
 						break;
-					for (int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0; --i)
+					for (int32_t i = (int32_t)extra[hovered_controler].size() - 1; i >= 0; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1006), extra[hovered_controler].size()).c_str());
 					break;
@@ -1312,7 +1315,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (!(hovered_location & LOCATION_ONFIELD))
 					break;
 				unsigned int flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
-				if(hovered_location == LOCATION_MZONE && hovered_sequence == 5 || hovered_sequence == 6) {
+				if(hovered_location == LOCATION_MZONE && (hovered_sequence == 5 || hovered_sequence == 6)) {
 					if((flag & selectable_field) == 0 && selectable_field & 0x600000)
 						flag = 1 << ((11 - hovered_sequence) + (1 << 4));
 				}
@@ -1383,7 +1386,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					clicked_card->is_selected = true;
 					selected_cards.push_back(clicked_card);
 				}
-				int min = selected_cards.size(), max = 0;
+				uint32_t min = selected_cards.size(), max = 0;
 				if (mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
 					max = selected_cards.size();
 				} else {
@@ -1634,8 +1637,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					else
 						player_name = oppo[mainGame->dInfo.current_player[mplayer]];
 					const auto& player_desc_hints = mainGame->dField.player_desc_hints[mplayer];
-					for(auto iter = player_desc_hints.begin(); iter != player_desc_hints.end(); ++iter) {
-						player_name.append(fmt::format(L"\n*{}", gDataManager->GetDesc(iter->first, mainGame->dInfo.compat_mode)));
+					for(const auto& hint : player_desc_hints) {
+						player_name.append(fmt::format(L"\n*{}", gDataManager->GetDesc(hint.first, mainGame->dInfo.compat_mode)));
 					}
 					should_show_tip = true;
 					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(player_name.c_str()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
@@ -2741,12 +2744,12 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 		mainGame->stCardListTip->setVisible(true);
 	}
 }
-int GetSuitableReturn(uint32 maxseq, size_t size) {
-	int bitvaluesize = maxseq;
-	int uint8size = (maxseq < 255) ? size * 8 : -1;
-	int uint16size = (maxseq < 65535) ? size * 16 : -1;
-	int uint32size = (maxseq < 4294967295) ? size * 32 : -1;
-	int res = std::min((uint32)bitvaluesize, std::min((uint32)uint8size, std::min((uint32)uint16size, (uint32)uint32size)));
+int GetSuitableReturn(uint32_t maxseq, size_t size) {
+	int32_t bitvaluesize = maxseq;
+	int32_t uint8size = (maxseq < 255) ? size * 8 : -1;
+	int32_t uint16size = (maxseq < 65535) ? size * 16 : -1;
+	int32_t uint32size = (maxseq < 4294967295) ? size * 32 : -1;
+	int32_t res = std::min<uint32_t>(bitvaluesize, std::min<uint32_t>(uint8size, std::min<uint32_t>(uint16size, uint32size)));
 	if(res == bitvaluesize)
 		return 1;
 	if(res == uint8size)
@@ -2763,7 +2766,7 @@ void ClientField::SetResponseSelectedCards() const {
 			unsigned int respbuf[] = { 1, selected_cards[0]->select_seq };
 			DuelClient::SetResponseB((char*)respbuf, sizeof(respbuf));
 		} else {
-			uint32 maxseq = 0;
+			uint32_t maxseq = 0;
 			size_t size = selected_cards.size();
 			for(auto& c : selected_cards) {
 				maxseq = std::max(maxseq, c->select_seq);
@@ -2771,30 +2774,30 @@ void ClientField::SetResponseSelectedCards() const {
 			ProgressiveBuffer ret;
 			switch(GetSuitableReturn(maxseq, size)) {
 				case 1: {
-					ret.at<int32>(0) = 3;
+					ret.at<int32_t>(0) = 3;
 					for(auto c : selected_cards)
 						ret.bitSet(c->select_seq + (sizeof(int) * 8));
 					break;
 				}
 				case 2:	{
-					ret.at<int32>(0) = 2;
-					ret.at<int32>(1) = size;
+					ret.at<int32_t>(0) = 2;
+					ret.at<int32_t>(1) = size;
 					for(size_t i = 0; i < size; ++i)
-						ret.at<int8>(i + 8) = selected_cards[i]->select_seq;
+						ret.at<int8_t>(i + 8) = selected_cards[i]->select_seq;
 					break;
 				}
 				case 3:	{
-					ret.at<int32>(0) = 1;
-					ret.at<int32>(1) = size;
+					ret.at<int32_t>(0) = 1;
+					ret.at<int32_t>(1) = size;
 					for(size_t i = 0; i < size; ++i)
-						ret.at<int16>(i + 4) = selected_cards[i]->select_seq;
+						ret.at<int16_t>(i + 4) = selected_cards[i]->select_seq;
 					break;
 				}
 				case 4:	{
-					ret.at<int32>(0) = 0;
-					ret.at<int32>(1) = size;
+					ret.at<int32_t>(0) = 0;
+					ret.at<int32_t>(1) = size;
 					for(size_t i = 0; i < size; ++i)
-						ret.at<int32>(i + 2) = selected_cards[i]->select_seq;
+						ret.at<int32_t>(i + 2) = selected_cards[i]->select_seq;
 					break;
 				}
 			}
