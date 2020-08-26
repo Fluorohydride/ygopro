@@ -1049,7 +1049,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	case STOC_REMATCH: {
 		mainGame->gMutex.lock();
 		mainGame->dInfo.checkRematch = true;
-		mainGame->stQMessage->setText((wchar_t*)gDataManager->GetSysString(1989).c_str());
+		mainGame->stQMessage->setText(gDataManager->GetSysString(1989).c_str());
 		mainGame->PopupElement(mainGame->wQuery);
 		mainGame->gMutex.unlock();
 		break;
@@ -1745,7 +1745,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		uint64_t desc = COMPAT_READ(uint32_t, uint64_t, pbuf);
 		mainGame->dField.highlighting_card = 0;
 		mainGame->gMutex.lock();
-		mainGame->stQMessage->setText((wchar_t*)gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).c_str());
+		mainGame->stQMessage->setText(gDataManager->GetDesc(desc, mainGame->dInfo.compat_mode).c_str());
 		mainGame->PopupElement(mainGame->wQuery);
 		mainGame->gMutex.unlock();
 		return false;
@@ -4422,7 +4422,7 @@ int DuelClient::RefreshThread(event_base* broadev) {
 	is_refreshing = false;
 	return 0;
 }
-void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
+void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 	if(events & EV_TIMEOUT) {
 		evutil_closesocket(fd);
 		event_base_loopbreak((event_base*)arg);

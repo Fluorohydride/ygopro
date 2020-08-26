@@ -105,7 +105,7 @@ void ServerLobby::FillOnlineRooms() {
 
 		roomListTable->addRow(index);
 		roomListTable->setCellData(index, 0, room.locked ? (void*)1 : nullptr);
-		roomListTable->setCellData(index, 1, (void*)&room);
+		roomListTable->setCellData(index, 1, &room);
 		roomListTable->setCellText(index, 1, gDataManager->GetSysString(room.info.rule + 1900).c_str());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
 			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).c_str() : L"",
@@ -168,7 +168,7 @@ int ServerLobby::GetRoomsThread() {
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 7L);
 	curl_easy_setopt(curl_handle, CURLOPT_TIMEOUT, 15L);
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void*)&retrieved_data);
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &retrieved_data);
 	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, EDOPRO_USERAGENT);
 
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROXY, "*"); 

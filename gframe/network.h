@@ -200,7 +200,7 @@ public:
 	DuelMode(): host_player(0), pduel(0), duel_stage(0) {}
 	virtual ~DuelMode() {}
 	virtual void Chat(DuelPlayer* dp, void* pdata, int32_t len) {}
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
+	virtual void JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) {}
 	virtual void LeaveGame(DuelPlayer* dp) {}
 	virtual void ToDuelist(DuelPlayer* dp) {}
 	virtual void ToObserver(DuelPlayer* dp) {}

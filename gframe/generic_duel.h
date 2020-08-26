@@ -15,7 +15,7 @@ public:
 	GenericDuel(int team1 = 1, int team2 = 1, bool relay = false, int best_of = 0);
 	virtual ~GenericDuel();
 	virtual void Chat(DuelPlayer* dp, void* pdata, int len);
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater);
+	virtual void JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater);
 	virtual void LeaveGame(DuelPlayer* dp);
 	virtual void ToDuelist(DuelPlayer* dp);
 	virtual void ToObserver(DuelPlayer* dp);

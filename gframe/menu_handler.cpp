@@ -662,7 +662,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(replay.GetTurnsCount())
 					repinfo.append(fmt::format(L"\n{}: {}", gDataManager->GetSysString(2009), replay.GetTurnsCount()));
 				mainGame->ebRepStartTurn->setText(L"1");
-				mainGame->stReplayInfo->setText((wchar_t*)repinfo.c_str());
+				mainGame->stReplayInfo->setText(repinfo.c_str());
 				mainGame->chkYrp->setChecked(false);
 				mainGame->chkYrp->setEnabled(has_yrp && mainGame->coreloaded);
 				break;

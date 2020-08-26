@@ -181,7 +181,7 @@ void GenericDuel::Catchup(DuelPlayer * dp) {
 	NetServer::SendPacketToPlayer(dp, STOC_CATCHUP, buf);
 	observers.insert(dp);
 }
-void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
+void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) {
 	static constexpr ClientVersion serverversion{ EXPAND_VERSION(CLIENT_VERSION) };
 	if(!is_creater) {
 		if(dp->game && dp->type != 0xff) {
@@ -189,7 +189,6 @@ void GenericDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 			return;
 		}
-		CTOS_JoinGame* pkt = (CTOS_JoinGame*)pdata;
 		if(pkt->version2 != serverversion) {
 			VersionError scem{ serverversion };
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
@@ -314,7 +313,7 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 			uint32_t player = type < players.home_size ? 0 : 1;
 			if(duel_stage != DUEL_STAGE_END) {
 				if(!seeking_rematch) {
-					unsigned char wbuf[3];
+					uint8_t wbuf[3];
 					wbuf[0] = MSG_WIN;
 					wbuf[1] = 1 - player;
 					wbuf[2] = 0x4;
@@ -1483,14 +1482,12 @@ void GenericDuel::GenericTimer(evutil_socket_t fd, short events, void* arg) {
 	GenericDuel* sd = static_cast<GenericDuel*>(arg);
 	if(sd->last_response < 2 && sd->cur_player[sd->last_response]->state == CTOS_RESPONSE) {
 		if(sd->grace_period >= 0) {
-			//fmt::printf("Grace period, remaining %d\n", sd->grace_period);
 			sd->grace_period--;
 			return;
 		}
-		//fmt::printf("No more grace period, remaining %d\n", sd->time_limit[sd->last_response]);
 		sd->time_limit[sd->last_response]--;
 		if(sd->time_limit[sd->last_response] <= 0) {
-			unsigned char wbuf[3];
+			uint8_t wbuf[3];
 			uint8_t player = sd->last_response;
 			wbuf[0] = MSG_WIN;
 			wbuf[1] = 1 - player;

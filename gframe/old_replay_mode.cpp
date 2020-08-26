@@ -270,21 +270,21 @@ namespace ygo {
 		}
 		return true;
 	}
-	void ReplayMode::ReplayRefresh(int player, int location, int flag) {
+	void ReplayMode::ReplayRefresh(uint8_t player, uint8_t location, uint32_t flag) {
 		uint32_t len = 0;
-		auto buff = OCG_DuelQueryLocation(pduel, &len, { (uint32_t)flag, (uint8_t)player, (uint32_t)location });
+		auto buff = OCG_DuelQueryLocation(pduel, &len, { flag, player, location });
 		if(len == 0)
 			return;
 		mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), location, (char*)buff);
 	}
-	void ReplayMode::ReplayRefresh(int flag) {
+	void ReplayMode::ReplayRefresh(uint32_t flag) {
 		for(int p = 0; p < 2; p++)
 			for(int loc = LOCATION_HAND; loc != LOCATION_GRAVE; loc *= 2)
 				ReplayRefresh(p, loc, flag);
 	}
-	void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int flag) {
+	void ReplayMode::ReplayRefreshSingle(uint8_t player, uint8_t location, uint32_t sequence, uint32_t flag) {
 		uint32_t len = 0;
-		auto buff = OCG_DuelQuery(pduel, &len, { (uint32_t)flag, (uint8_t)player, (uint32_t)location, (uint32_t)sequence });
+		auto buff = OCG_DuelQuery(pduel, &len, { flag, player, location, sequence });
 		if(buff == nullptr)
 			return;
 		mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)buff);

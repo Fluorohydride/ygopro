@@ -60,7 +60,7 @@ size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
 CURLcode curlPerform(const char* url, void* payload, void* payload2 = nullptr) {
 	CURL* curl_handle = curl_easy_init();
 	curl_easy_setopt(curl_handle, CURLOPT_URL, url);
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, reinterpret_cast<void*>(WriteCallback));
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 5L);
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, payload);
 	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, EDOPRO_USERAGENT);

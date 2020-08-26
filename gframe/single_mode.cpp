@@ -262,8 +262,8 @@ restart:
 	pduel = nullptr;
 	if(saveReplay && !is_restarting) {
 		last_replay.EndRecord(0x1000);
-		std::vector<unsigned char> oldreplay;
-		oldreplay.insert(oldreplay.end(), (unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
+		std::vector<uint8_t> oldreplay;
+		oldreplay.insert(oldreplay.end(), (uint8_t*)&last_replay.pheader, ((uint8_t*)&last_replay.pheader) + sizeof(ReplayHeader));
 		oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
 		new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), oldreplay.size()));
 		new_replay.EndRecord();
@@ -551,7 +551,7 @@ void SingleMode::SinglePlayRefresh(uint8_t player, uint8_t location, uint32_t fl
 	buffer.insert(buffer.begin(), player);
 	replay_stream.emplace_back(MSG_UPDATE_DATA, (char*)buffer.data(), buffer.size());
 }
-void SingleMode::SinglePlayRefreshSingle(uint8_t player, uint8_t location, uint32_t sequence, uint32_t flag) {
+void SingleMode::SinglePlayRefreshSingle(uint8_t player, uint8_t location, uint8_t sequence, uint32_t flag) {
 	std::vector<uint8_t> buffer;
 	uint32_t len = 0;
 	auto buff = OCG_DuelQuery(pduel, &len, { flag, player, location, sequence });
