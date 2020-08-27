@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-static constexpr char* base64_chars = {
+const char* base64_chars = {
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	"abcdefghijklmnopqrstuvwxyz"
 	"0123456789"
