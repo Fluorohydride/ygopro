@@ -391,17 +391,18 @@ bool DeckManager::SaveDeck(const path_string& name, std::vector<int> mainlist, s
 const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 	static std::wstring res;
 	auto decktobuf = [&res=res](const auto& src) {
-		static std::vector<int> cards(src.size());
+		static std::vector<int> cards;
+		cards.resize(src.size());
 		for(size_t i = 0; i < src.size(); i++) {
 			cards[i] = src[i]->code;
 		}
-		res += base64_encode((uint8_t*)cards.data(), cards.size() * 4) + L"!";
+		res += base64_encode((uint8_t*)cards.data(), cards.size() * 4) + L'!';
 	};
 	res = L"ydke://";
 	decktobuf(deck.main);
 	decktobuf(deck.extra);
 	decktobuf(deck.side);
-	return res.data();
+	return res.c_str();
 }
 const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	static std::wstring res;
@@ -453,7 +454,7 @@ const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	return res.c_str();
 }
 void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
-	static std::vector<uint8_t> deck_data;
+	std::vector<uint8_t> deck_data;
 	buffer += (sizeof(L"ydke://") / sizeof(wchar_t)) - 1;
 	auto buf = buffer;
 	size_t delimiters[3];
@@ -465,7 +466,7 @@ void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
 	}
 	if(delim != 3)
 		return;
-	deck_data = base64_decode(buf, wcslen(buf));
+	deck_data = base64_decode(buf, delimiters[0]);
 	auto tmpbuf = base64_decode(buf + delimiters[0] + 1, delimiters[1] - delimiters[0]);
 	deck_data.insert(deck_data.end(), tmpbuf.begin(), tmpbuf.end());
 	int mainc = deck_data.size() / 4;

@@ -796,7 +796,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							pos++;
 						to.erase(pos);
 					}
-					int code = BufferIO::GetVal(to.c_str());
+					uint32_t code = BufferIO::GetVal(to.c_str());
 					CardDataC* pointer = nullptr;
 					if(!code || !(pointer = gDataManager->GetCardData(code))) {
 						for(auto& card : gDataManager->cards) {

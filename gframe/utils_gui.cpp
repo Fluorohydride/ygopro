@@ -85,7 +85,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 	SendMessage(hWnd, WM_SETICON, ICON_SMALL, (long)hSmallIcon);
 	SendMessage(hWnd, WM_SETICON, ICON_BIG, (long)hBigIcon);
 	if(gGameConfig->windowStruct.size()) {
-		auto winstruct = base64_decode(gGameConfig->windowStruct.c_str(), gGameConfig->windowStruct.size());
+		auto winstruct = base64_decode(gGameConfig->windowStruct);
 		if(winstruct.size() == sizeof(WINDOWPLACEMENT))
 			SetWindowPlacement(hWnd, (WINDOWPLACEMENT*)winstruct.data());
 	}
