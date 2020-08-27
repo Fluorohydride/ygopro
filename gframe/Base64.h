@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 
-const char* base64_chars = {
+static const char* base64_chars = {
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	"abcdefghijklmnopqrstuvwxyz"
 	"0123456789"
@@ -79,6 +79,7 @@ T base64_encode(const uint8_t* buf, uint32_t bufLen) {
 
 template<typename R = std::vector<uint8_t>, typename T = wchar_t>
 R base64_decode(const T* encoded_string, size_t length_of_string) {
+	using valtype = typename R::value_type;
 	size_t pos = 0;
 
 	//
@@ -96,20 +97,20 @@ R base64_decode(const T* encoded_string, size_t length_of_string) {
 		auto pos_of_char_1 = pos_of_char(encoded_string[pos + 1]);
 		if(pos_of_char_0 == -1 || pos_of_char_1 == -1)
 			break;
-		ret.push_back(static_cast<R::value_type>((pos_of_char_0 << 2) + ((pos_of_char_1 & 0x30) >> 4)));
+		ret.push_back(static_cast<valtype>((pos_of_char_0 << 2) + ((pos_of_char_1 & 0x30) >> 4)));
 
 		if(static_cast<char>(encoded_string[pos + 2]) != '=' && static_cast<char>(encoded_string[pos + 2]) != '.') { // accept URL-safe base 64 strings, too, so check for '.' also.
 
 			auto pos_of_char_2 = pos_of_char(encoded_string[pos + 2]);
 			if(pos_of_char_2 == -1)
 				break;
-			ret.push_back(static_cast<R::value_type>(((pos_of_char_1 & 0x0f) << 4) + ((pos_of_char_2 & 0x3c) >> 2)));
+			ret.push_back(static_cast<valtype>(((pos_of_char_1 & 0x0f) << 4) + ((pos_of_char_2 & 0x3c) >> 2)));
 
 			if(static_cast<char>(encoded_string[pos + 3]) != '=' && static_cast<char>(encoded_string[pos + 3]) != '.') {
 				auto pos_of_char_3 = pos_of_char(encoded_string[pos + 3]);
 				if(pos_of_char_3 == -1)
 					break;
-				ret.push_back(static_cast<R::value_type>(((pos_of_char_2 & 0x03) << 6) + pos_of_char_3));
+				ret.push_back(static_cast<valtype>(((pos_of_char_2 & 0x03) << 6) + pos_of_char_3));
 			}
 		}
 		pos += 4;
