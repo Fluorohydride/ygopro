@@ -120,6 +120,6 @@ R base64_decode(const T* encoded_string, size_t length_of_string) {
 
 template<typename R = std::vector<uint8_t>, typename T = std::wstring>
 R base64_decode(const T& encoded_string) {
-	return base64_decode<T::value_type, R>(encoded_string.data(), encoded_string.size());
+	return base64_decode<R, T::value_type>(encoded_string.data(), encoded_string.size());
 }
 #endif //BASE64_H
