@@ -1369,7 +1369,7 @@ void GenericDuel::WaitforResponse(uint8_t playerid) {
 	if(host_info.time_limit) {
 		STOC_TimeLimit sctl;
 		sctl.player = playerid;
-		sctl.left_time = std::max<int32>(time_limit[playerid] - 5, 0);
+		sctl.left_time = std::max<int32_t>(time_limit[playerid] - 5, 0);
 		NetServer::SendPacketToPlayer(nullptr, STOC_TIME_LIMIT, sctl);
 		IteratePlayers([](duelist& dueler) {
 			NetServer::ReSendToPlayer(dueler.player);
