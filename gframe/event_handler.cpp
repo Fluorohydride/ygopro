@@ -1502,7 +1502,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			hovered_location = 0;
 			ClientCard* mcard = 0;
-			int mplayer = -1;
+			uint8_t mplayer = 2;
 			if(!panel || !panel->isVisible() || !panel->getRelativePosition().isPointInside(mousepos)) {
 				GetHoverField(x, y);
 				if(hovered_location & 0xe)
@@ -1534,7 +1534,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			if(hovered_location == LOCATION_HAND && (mainGame->dInfo.is_shuffling || mainGame->dInfo.curMsg == MSG_SHUFFLE_HAND))
 				mcard = 0;
-			if(mcard == 0 && mplayer < 0)
+			if(mcard == 0 && mplayer > 1)
 				should_show_tip = false;
 			else if(mcard == hovered_card && mplayer == hovered_player) {
 				if(mainGame->stTip->isVisible()) {
@@ -1628,7 +1628,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				hovered_card = mcard;
 			}
 			if(mplayer != hovered_player) {
-				if(mplayer >= 0) {
+				if(mplayer < 2) {
 					std::wstring player_name;
 					auto& self = mainGame->dInfo.isTeam1 ? mainGame->dInfo.selfnames : mainGame->dInfo.opponames;
 					auto& oppo = mainGame->dInfo.isTeam1 ? mainGame->dInfo.opponames : mainGame->dInfo.selfnames;
