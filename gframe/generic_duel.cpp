@@ -832,7 +832,7 @@ void GenericDuel::BeforeParsing(CoreUtils::Packet& packet, int& return_value, bo
 		RefreshSzone(1);
 		RefreshHand(0);
 		RefreshHand(1);
-		record_last = false;
+		record_last = true;
 		break;
 	}
 	case MSG_SELECT_CHAIN:
@@ -841,14 +841,14 @@ void GenericDuel::BeforeParsing(CoreUtils::Packet& packet, int& return_value, bo
 		RefreshMzone(1);
 		RefreshSzone(0);
 		RefreshSzone(1);
-		record_last = false;
+		record_last = true;
 		break;
 	}
 	case MSG_FLIPSUMMONING: {
 		pbuf += 4;
 		CoreUtils::loc_info info = CoreUtils::ReadLocInfo(pbuf, false);
 		RefreshSingle(info.controler, info.location, info.sequence);
-		record_last = false;
+		record_last = true;
 		break;
 	}
 	default:
@@ -1300,19 +1300,10 @@ int GenericDuel::Analyze(CoreUtils::Packet packet) {
 	BeforeParsing(packet, return_value, record, record_last);
 	Sending(packet, return_value, record, record_last);
 	AfterParsing(packet, return_value, record, record_last);
-	if(record) {
-		if(!record_last) {
-			new_replay.WritePacket(packetcpy);
-			new_replay.WriteStream(replay_stream);
-		} else {
-			new_replay.WriteStream(replay_stream);
-			new_replay.WritePacket(packetcpy);
-		}
-		new_replay.Flush();
-	} else {
-		new_replay.WriteStream(replay_stream);
-		new_replay.Flush();
-	}
+	if(record)
+		replay_stream.insert(record_last ? replay_stream.end() : replay_stream.begin(), std::move(packetcpy));
+	new_replay.WriteStream(replay_stream);
+	new_replay.Flush();
 	return return_value;
 }
 void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {

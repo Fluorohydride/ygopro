@@ -333,35 +333,6 @@ CoreUtils::PacketStream ParseMessages(OCG_Duel duel) {
 		return PacketStream();
 }
 
-bool MessageBeRecorded(uint32_t message) {
-	switch(message) {
-	case MSG_HINT:
-	case MSG_SELECT_BATTLECMD:
-	case MSG_SELECT_IDLECMD:
-	case MSG_SELECT_EFFECTYN:
-	case MSG_SELECT_YESNO:
-	case MSG_SELECT_OPTION:
-	case MSG_SELECT_CARD:
-	case MSG_SELECT_TRIBUTE:
-	case MSG_SELECT_UNSELECT_CARD:
-	case MSG_SELECT_CHAIN:
-	case MSG_SELECT_PLACE:
-	case MSG_SELECT_DISFIELD:
-	case MSG_SELECT_POSITION:
-	case MSG_SELECT_COUNTER:
-	case MSG_SELECT_SUM:
-	case MSG_SORT_CARD:
-	case MSG_SORT_CHAIN:
-	case MSG_ROCK_PAPER_SCISSORS:
-	case MSG_ANNOUNCE_RACE:
-	case MSG_ANNOUNCE_ATTRIB:
-	case MSG_ANNOUNCE_CARD:
-	case MSG_ANNOUNCE_NUMBER:
-		return false;
-	}
-	return true;
-}
-
 void QueryStream::Parse(char*& buff) {
 	uint32_t size = BufferIO::Read<uint32_t>(buff);
 	char* current = buff;

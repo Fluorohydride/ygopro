@@ -369,7 +369,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 	if(is_closing || !is_continuing)
 		return false;
 	mainGame->dInfo.curMsg = packet.message;
-	bool record = CoreUtils::MessageBeRecorded(packet.message);
+	bool record = true;
 	bool record_last = false;
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_RETRY:	{
@@ -386,7 +386,6 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			int type = BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
 			/*uint64_t data = BufferIO::Read<uint64_t>(pbuf);*/
-			record = true;
 			if(player == 0 || type >= HINT_SKILL)
 				ANALYZE;
 			if(type > 0 && type < 6 && type != 4)
@@ -451,11 +450,12 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		case MSG_ANNOUNCE_CARD:
 		case MSG_ANNOUNCE_NUMBER: {
 			record = false;
-			if(mainGame->dInfo.curMsg == MSG_SELECT_CHAIN) {
+			if(mainGame->dInfo.curMsg == MSG_SELECT_CHAIN || mainGame->dInfo.curMsg == MSG_NEW_TURN) {
 				SinglePlayRefresh(0, LOCATION_MZONE);
 				SinglePlayRefresh(1, LOCATION_MZONE);
 				SinglePlayRefresh(0, LOCATION_SZONE);
 				SinglePlayRefresh(1, LOCATION_SZONE);
+				record_last = true;
 			}
 			if(!ANALYZE) {
 				singleSignal.Reset();
@@ -524,16 +524,10 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 			break;
 		}
 	}
-	if(record) {
-		if(!record_last) {
-			new_replay.WritePacket(packet);
-			new_replay.WriteStream(replay_stream);
-		} else {
-			new_replay.WriteStream(replay_stream);
-			new_replay.WritePacket(packet);
-		}
-		new_replay.Flush();
-	}
+	if(record)
+		replay_stream.insert(record_last ? replay_stream.end() : replay_stream.begin(), std::move(packet));
+	new_replay.WriteStream(replay_stream);
+	new_replay.Flush();
 	return is_continuing;
 }
 void SingleMode::SinglePlayRefresh(uint8_t player, uint8_t location, uint32_t flag) {
