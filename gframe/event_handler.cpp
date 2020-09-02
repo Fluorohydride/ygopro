@@ -551,7 +551,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				selectable_cards.clear();
 				switch(command_location) {
 				case LOCATION_DECK: {
-					for(uint32_t i = deck[command_controler].size() - 1; i >= 0 ; --i)
+					for(int32_t i = (int32_t)deck[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[command_controler][i]);
 					mainGame->wCardSelect->setText(fmt::format(L"{}({})", gDataManager->GetSysString(1000), deck[command_controler].size()).c_str());
 					break;
