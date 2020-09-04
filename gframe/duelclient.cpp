@@ -2403,16 +2403,20 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 						panel_confirm.push_back(pcard);
 				}
 			} else {
-				if(!mainGame->dInfo.isReplay || (l & LOCATION_ONFIELD))
+				if(!mainGame->dInfo.isReplay || (l & LOCATION_ONFIELD) | (l & LOCATION_HAND && gGameConfig->hideHandsInReplays))
 					field_confirm.push_back(pcard);
 			}
 		}
 		if (field_confirm.size() > 0) {
+			std::map<ClientCard*, bool> public_status;
 			mainGame->WaitFrameSignal(5);
 			for(auto& pcard : field_confirm) {
-				c = pcard->controler;
 				l = pcard->location;
 				if (l == LOCATION_HAND) {
+					if(mainGame->dInfo.isReplay) {
+						public_status[pcard] = pcard->is_public;
+						pcard->is_public = true;
+					}
 					mainGame->dField.MoveCard(pcard, 5);
 					pcard->is_highlighting = true;
 				} else if (l == LOCATION_MZONE) {
@@ -2441,6 +2445,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else
 				mainGame->WaitFrameSignal(90);
 			for(auto& pcard : field_confirm) {
+				if(mainGame->dInfo.isReplay && pcard->location & LOCATION_HAND)
+					pcard->is_public = public_status[pcard];
 				mainGame->dField.MoveCard(pcard, 5);
 				pcard->is_highlighting = false;
 			}
