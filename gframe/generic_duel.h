@@ -21,7 +21,7 @@ public:
 	virtual void ToObserver(DuelPlayer* dp);
 	virtual void PlayerReady(DuelPlayer* dp, bool ready);
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos);
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len);
+	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, uint32_t len);
 	virtual void StartDuel(DuelPlayer* dp);
 	virtual void HandResult(DuelPlayer* dp, unsigned char res);
 	virtual void RematchResult(DuelPlayer* dp, unsigned char rematch);
@@ -61,7 +61,7 @@ protected:
 		bool ready;
 		Deck odeck;
 		Deck pdeck;
-		int deck_error;
+		uint32_t deck_error;
 		duelist() : player(0), ready(false), deck_error(0) {}
 		duelist(DuelPlayer* _player) : player(_player), ready(false), deck_error(0) {}
 		void Clear() { player = nullptr; ready = false; pdeck.clear(); deck_error = 0; }

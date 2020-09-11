@@ -1305,7 +1305,7 @@ bool DeckBuilder::check_limit(CardDataC* pointer) {
 	unsigned int limitcode = pointer->alias ? pointer->alias : pointer->code;
 	int found = 0;
 	int limit = 3;
-	std::unordered_map<uint32_t, int>::iterator it;
+	banlist_content_t::iterator it;
 	auto f = [&](const auto pcard)->bool {
 		if((it = filterList->content.find(pcard->code)) != filterList->content.end())
 			limit = it->second;

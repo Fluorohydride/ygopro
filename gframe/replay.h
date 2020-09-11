@@ -43,8 +43,10 @@ public:
 	std::vector<unsigned char> data;
 };
 
+using cardlist_type = std::vector<uint32_t>;
+
 struct ReplayDeck {
-	std::vector<int> main_deck, extra_deck;
+	cardlist_type main_deck, extra_deck;
 };
 
 using ReplayDeckList = std::vector<ReplayDeck>;

@@ -244,13 +244,10 @@ void Replay::ParseDecks() {
 		return;
 	for(uint32_t i = 0; i < home_count + opposing_count; i++) {
 		ReplayDeck tmp;
-		int main = Read<int32_t>();
-		for(int i = 0; i < main; ++i)
-			tmp.main_deck.push_back(Read<int32_t>());
-		std::vector<int> extra_deck;
-		int extra = Read<int32_t>();
-		for(int i = 0; i < extra; ++i)
-			tmp.extra_deck.push_back(Read<int32_t>());
+		for(uint32_t i = 0, main = Read<uint32_t>(); i < main; ++i)
+			tmp.main_deck.push_back(Read<uint32_t>());
+		for(uint32_t i = 0, extra = Read<uint32_t>(); i < extra; ++i)
+			tmp.extra_deck.push_back(Read<uint32_t>());
 		decks.push_back(tmp);
 	}
 	replay_custom_rule_cards.clear();

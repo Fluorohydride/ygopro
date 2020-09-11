@@ -168,7 +168,7 @@ GenericDuel::duelist& GenericDuel::GetAtPos(int pos) {
 		return players.opposing[pos - players.home_size];
 	}
 }
-void GenericDuel::Catchup(DuelPlayer * dp) {
+void GenericDuel::Catchup(DuelPlayer* dp) {
 	if(!pduel) {
 		observers.insert(dp);
 		return;
@@ -429,7 +429,7 @@ void GenericDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
 		return;
 	LeaveGame(dueler.player);
 }
-void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
+void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, uint32_t len) {
 	auto& dueler = GetAtPos(dp->type);
 	if(dp->type >= (players.home_size + players.opposing_size) || dueler.ready)
 		return;
@@ -443,10 +443,10 @@ void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, unsigned int len) {
 		return;
 	}
 	if(match_result.empty()) {
-		dueler.deck_error = gdeckManager->LoadDeck(dueler.pdeck, (int*)deckbuf, mainc, sidec);
+		dueler.deck_error = gdeckManager->LoadDeck(dueler.pdeck, (uint32_t*)deckbuf, mainc, sidec);
 		dueler.odeck = dueler.pdeck;
 	} else {
-		if(gdeckManager->LoadSide(dueler.pdeck, (int*)deckbuf, mainc, sidec)) {
+		if(gdeckManager->LoadSide(dueler.pdeck, (uint32_t*)deckbuf, mainc, sidec)) {
 			dueler.ready = true;
 			NetServer::SendPacketToPlayer(dp, STOC_DUEL_START);
 			if(CheckReady()) {
@@ -541,7 +541,7 @@ void GenericDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 		}
 	}
 }
-void GenericDuel::RematchResult(DuelPlayer * dp, unsigned char rematch) {
+void GenericDuel::RematchResult(DuelPlayer* dp, unsigned char rematch) {
 	if(seeking_rematch) {
 		if(!rematch) {
 			dp->type = NETPLAYER_TYPE_OBSERVER;
