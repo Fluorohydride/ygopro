@@ -38,8 +38,8 @@ public:
 	static void HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len);
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
 		char* p = net_server_write;
-		BufferIO::Write<int16_t>(p, 1);
-		BufferIO::Write<int8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, 1u);
+		BufferIO::Write<uint8_t>(p, proto);
 		last_sent = 3;
 		if(!dp)
 			return;
@@ -48,8 +48,8 @@ public:
 	template<typename ST>
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
 		char* p = net_server_write;
-		BufferIO::Write<int16_t>(p, 1 + sizeof(ST));
-		BufferIO::Write<int8_t>(p, proto);
+		BufferIO::Write<uint16_t>(p, 1u + sizeof(ST));
+		BufferIO::Write<uint8_t>(p, proto);
 		memcpy(p, &st, sizeof(ST));
 		last_sent = sizeof(ST) + 3;
 		if(dp)

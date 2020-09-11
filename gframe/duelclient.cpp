@@ -165,12 +165,12 @@ void DuelClient::StopClient(bool is_exiting) {
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	size_t len = evbuffer_get_length(input);
-	unsigned short packet_len = 0;
+	uint16_t packet_len = 0;
 	while(true) {
 		if(len < 2)
 			return;
 		evbuffer_copyout(input, &packet_len, 2);
-		if(len < (size_t)packet_len + 2)
+		if(len < packet_len + 2u)
 			return;
 		duel_client_read.resize(packet_len + 2);
 		evbuffer_remove(input, duel_client_read.data(), packet_len + 2);
