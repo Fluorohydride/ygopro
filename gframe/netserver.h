@@ -40,7 +40,7 @@ public:
 		char* p = net_server_write;
 		BufferIO::Write<uint16_t>(p, 1u);
 		BufferIO::Write<uint8_t>(p, proto);
-		last_sent = 3;
+		last_sent = 3u;
 		if(!dp)
 			return;
 		bufferevent_write(dp->bev, net_server_write, last_sent);
@@ -48,19 +48,19 @@ public:
 	template<typename ST>
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
 		char* p = net_server_write;
-		BufferIO::Write<uint16_t>(p, 1u + sizeof(ST));
+		BufferIO::Write<uint16_t>(p, static_cast<uint16_t>(1u + sizeof(ST)));
 		BufferIO::Write<uint8_t>(p, proto);
 		memcpy(p, &st, sizeof(ST));
-		last_sent = sizeof(ST) + 3;
+		last_sent = static_cast<uint16_t>(sizeof(ST) + 3u);
 		if(dp)
 			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		char* p = net_server_write;
-		BufferIO::Write<uint16_t>(p, (uint16_t)(1 + len));
+		BufferIO::Write<uint16_t>(p, static_cast<uint16_t>(1u + len));
 		BufferIO::Write<uint8_t>(p, proto);
 		memcpy(p, buffer, len);
-		last_sent = (uint16_t)(len + 3);
+		last_sent = static_cast<uint16_t>(len + 3u);
 		if(dp)
 			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
