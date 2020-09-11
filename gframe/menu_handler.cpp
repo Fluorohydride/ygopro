@@ -33,16 +33,16 @@ void UpdateDeck() {
 	char deckbuf[0xf000];
 	char* pdeck = deckbuf;
 	const auto totsize = gdeckManager->current_deck.main.size() + gdeckManager->current_deck.extra.size() + gdeckManager->current_deck.side.size();
-	if(totsize > (sizeof(deckbuf) - 2 * sizeof(int32_t)))
+	if(totsize > (sizeof(deckbuf) - 2 * sizeof(uint32_t)))
 		return;
-	BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.main.size() + gdeckManager->current_deck.extra.size());
-	BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.side.size());
+	BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.main.size() + gdeckManager->current_deck.extra.size());
+	BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.side.size());
 	for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.main[i]->code);
+		BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.main[i]->code);
 	for(size_t i = 0; i < gdeckManager->current_deck.extra.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.extra[i]->code);
+		BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.extra[i]->code);
 	for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i)
-		BufferIO::Write<int32_t>(pdeck, gdeckManager->current_deck.side[i]->code);
+		BufferIO::Write<uint32_t>(pdeck, gdeckManager->current_deck.side[i]->code);
 	DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 }
 void LoadReplay() {
