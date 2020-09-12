@@ -1029,12 +1029,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_NEW_REPLAY: {
-		char* prep = pdata;
-		memcpy(&last_replay.pheader, prep, sizeof(ReplayHeader));
-		prep += sizeof(ReplayHeader);
+		last_replay.pheader = getStruct<ReplayHeader>(pdata, len);
 		last_replay.comp_data.resize(len - sizeof(ReplayHeader) - 1);
-		memcpy(last_replay.comp_data.data(), prep, len - sizeof(ReplayHeader) - 1);
-		last_replay.comp_size = len - sizeof(ReplayHeader) - 1;
+		memcpy(last_replay.comp_data.data(), pdata + sizeof(ReplayHeader), len - sizeof(ReplayHeader) - 1);
 		break;
 	}
 	case STOC_CATCHUP: {
@@ -3966,7 +3963,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				if(loc.location & LOCATION_OVERLAY) {
 					auto olcard = mainGame->dField.GetCard(loc.controler, (loc.location & (~LOCATION_OVERLAY)) & 0xff, loc.sequence);
 					pcard = *(olcard->overlayed.begin() + loc.position);
-				}else
+				} else
 					pcard = mainGame->dField.GetCard(loc.controler, loc.location, loc.sequence);
 			}
 			if(!mainGame->dInfo.isCatchingUp) {

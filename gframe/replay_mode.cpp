@@ -11,7 +11,7 @@ namespace ygo {
 
 void* ReplayMode::pduel = 0;
 bool ReplayMode::yrp = false;
-Replay ReplayMode::cur_replay;
+Replay ReplayMode::cur_replay{};
 Replay* ReplayMode::cur_yrp = nullptr;
 bool ReplayMode::is_continuing = true;
 bool ReplayMode::is_closing = false;

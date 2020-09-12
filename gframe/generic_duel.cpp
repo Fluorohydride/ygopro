@@ -603,11 +603,10 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rh.id = REPLAY_YRP1;
 	rh.version = CLIENT_VERSION;
 	rh.flag = REPLAY_LUA64 | REPLAY_NEWREPLAY;
-	time_t seed = time(0);
-	rh.seed = seed;
+	rh.seed = static_cast<uint32_t>(time(0));
 	last_replay.BeginRecord(true, EPRO_TEXT("./replay/_LastReplay.yrp"));
 	last_replay.WriteHeader(rh);
-	randengine rnd(seed);
+	randengine rnd(rh.seed);
 	//records the replay with the new system
 	new_replay.BeginRecord();
 	rh.id = REPLAY_YRPX;
@@ -626,11 +625,11 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	}
 	replay_stream.clear();
 	time_limit[0] = time_limit[1] = host_info.time_limit ? (host_info.time_limit + 5) : 0;
-	int opt = host_info.duel_flag;
+	uint32_t opt = host_info.duel_flag;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
-	OCG_Player team = { (int)host_info.start_lp, host_info.start_hand, host_info.draw_count };
-	pduel = mainGame->SetupDuel({ (uint32_t)rnd(), opt, team, team });
+	OCG_Player team = { host_info.start_lp, host_info.start_hand, host_info.draw_count };
+	pduel = mainGame->SetupDuel({ rnd(), opt, team, team });
 	if(!host_info.no_shuffle_deck) {
 		IteratePlayers([&rnd](duelist& dueler) {
 			std::shuffle(dueler.pdeck.main.begin(), dueler.pdeck.main.end(), rnd);
@@ -1324,21 +1323,22 @@ void GenericDuel::EndDuel() {
 	if(!pduel)
 		return;
 	last_replay.EndRecord(0x1000);
-	std::vector<unsigned char> oldreplay;
-	oldreplay.insert(oldreplay.end(),(unsigned char*)&last_replay.pheader, ((unsigned char*)&last_replay.pheader) + sizeof(ReplayHeader));
-	oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
-
-	replay_stream.emplace_back(OLD_REPLAY_MODE, (char*)oldreplay.data(), sizeof(ReplayHeader) + last_replay.comp_size);
 
 	//in case of remaining packets, e.g. MSG_WIN
+	auto oldbuffer = last_replay.GetSerializedBuffer();
+
+	ReplayPacket tmp{};
+
+	tmp.message = OLD_REPLAY_MODE;
+	tmp.data.swap(oldbuffer);
+	replay_stream.push_back(std::move(tmp));
+
 	new_replay.WriteStream(replay_stream);
 	new_replay.EndRecord();
 
-	std::vector<unsigned char> newreplay;
-	newreplay.insert(newreplay.end(), (unsigned char*)&new_replay.pheader, ((unsigned char*)&new_replay.pheader) + sizeof(ReplayHeader));
-	newreplay.insert(newreplay.end(), new_replay.comp_data.begin(), new_replay.comp_data.end());
-
-	NetServer::SendBufferToPlayer(nullptr, STOC_NEW_REPLAY, newreplay.data(), newreplay.size());
+	auto newbuffer = new_replay.GetSerializedBuffer();
+	
+	NetServer::SendBufferToPlayer(nullptr, STOC_NEW_REPLAY, newbuffer.data(), newbuffer.size());
 	IteratePlayersAndObs([](DuelPlayer* dueler) {
 		NetServer::ReSendToPlayer(dueler);
 	});

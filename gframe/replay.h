@@ -24,24 +24,24 @@ namespace ygo {
 #define REPLAY_YRPX			0x58707279
 
 struct ReplayHeader {
-	unsigned int id;
-	unsigned int version;
-	unsigned int flag;
-	unsigned int seed;
-	unsigned int datasize;
-	unsigned int hash;
-	unsigned char props[8];
+	uint32_t id;
+	uint32_t version;
+	uint32_t flag;
+	uint32_t seed;
+	uint32_t datasize;
+	uint32_t hash;
+	uint8_t props[8];
 };
 
 class ReplayPacket {
 public:
 	ReplayPacket() {}
 	ReplayPacket(const CoreUtils::Packet& packet);
-	ReplayPacket(char* buf, int len);
-	ReplayPacket(int msg, char* buf, int len);
-	void Set(int msg, char* buf, int len);
-	int message;
-	std::vector<unsigned char> data;
+	ReplayPacket(char* buf, uint32_t len);
+	ReplayPacket(uint8_t msg, char* buf, uint32_t len);
+	void Set(uint8_t msg, char* buf, uint32_t len);
+	uint8_t message;
+	std::vector<uint8_t> data;
 };
 
 using cardlist_type = std::vector<uint32_t>;
@@ -61,48 +61,45 @@ public:
 
 class Replay {
 public:
-	Replay();
-	~Replay();
 	void BeginRecord(bool write = true, path_string name = EPRO_TEXT("./replay/_LastReplay.yrpX"));
 	void WriteStream(const ReplayStream& stream);
 	void WritePacket(const ReplayPacket& p);
-	template <typename  T>
+	template<typename T>
 	void Write(T data, bool flush = true);
 	void WritetoFile(const void* data, size_t size, bool flush);
 	void WriteHeader(ReplayHeader& header);
-	void WriteData(const void* data, unsigned int length, bool flush = true);
+	void WriteData(const void* data, size_t length, bool flush = true);
 	void Flush();
 	void EndRecord(size_t size = 0x20000);
 	void SaveReplay(const path_string& name);
 	bool OpenReplay(const path_string& name);
-	bool OpenReplayFromBuffer(std::vector<uint8_t> contents);
+	bool OpenReplayFromBuffer(std::vector<uint8_t>&& contents);
 	bool IsExportable();
 	static bool DeleteReplay(const path_string& name);
 	static bool RenameReplay(const path_string& oldname, const path_string& newname);
 	bool GetNextResponse(ReplayResponse* res);
 	const std::vector<std::wstring>& GetPlayerNames();
 	const ReplayDeckList& GetPlayerDecks();
-	const std::vector<int>& GetRuleCards();
-	ReplayStream packets_stream;
+	const std::vector<uint32_t>& GetRuleCards();
 	void Rewind();
 	void Reset();
 	int GetPlayersCount(int side);
 	int GetTurnsCount();
 	path_string GetReplayName();
 	std::unique_ptr<Replay> yrp;
-	ReplayHeader pheader;
 	std::vector<uint8_t> replay_data;
 	std::vector<uint8_t> comp_data;
-	size_t replay_size;
-	size_t comp_size;
+	std::vector<uint8_t> GetSerializedBuffer();
+	ReplayHeader pheader;
 	struct duel_parameters {
-		int start_lp;
-		int start_hand;
-		int draw_count;
-		int duel_flags;
+		uint32_t start_lp;
+		uint32_t start_hand;
+		uint32_t draw_count;
+		uint32_t duel_flags;
 	};
 	duel_parameters params;
 	std::string scriptname;
+	ReplayStream packets_stream;
 private:
 	bool ReadData(void* data, unsigned int length);
 	bool ReadData(std::vector<uint8_t>& data, unsigned int length);
@@ -127,7 +124,7 @@ private:
 	uint32_t opposing_count;
 	path_string replay_name;
 	ReplayDeckList decks;
-	std::vector<int> replay_custom_rule_cards;
+	std::vector<uint32_t> replay_custom_rule_cards;
 	std::vector<ReplayResponse>::iterator responses_iterator;
 	int turn_count;
 };

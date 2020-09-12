@@ -44,9 +44,9 @@ typedef struct OCG_CardData {
 }OCG_CardData;
 
 typedef struct OCG_Player {
-	int startingLP;
-	int startingDrawCount;
-	int drawCountPerTurn;
+	uint32_t startingLP;
+	uint32_t startingDrawCount;
+	uint32_t drawCountPerTurn;
 }OCG_Player;
 
 typedef void (*OCG_DataReader)(void* payload, uint32_t code, OCG_CardData* data);
@@ -56,7 +56,7 @@ typedef void (*OCG_LogHandler)(void* payload, const char* string, int type);
 
 typedef struct OCG_DuelOptions {
 	uint32_t seed;
-	int flags;
+	uint32_t flags;
 	OCG_Player team1;
 	OCG_Player team2;
 	OCG_DataReader cardReader;

@@ -54,7 +54,7 @@ void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
 	OCG_DuelSetResponse(pduel, resp, len);
 }
 int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
-	int opt = duelOptions.duelFlags;
+	uint32_t opt = duelOptions.duelFlags;
 	std::string script_name = "";
 	auto InitReplay = [&]() {
 		unsigned short buffer[20];
@@ -77,7 +77,7 @@ int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
 	is_continuing = false;
 	is_restarting = false;
 restart:
-	time_t seed = time(0);
+	uint32_t seed = static_cast<uint32_t>(time(0));;
 	DuelClient::rnd.seed(seed);
 	mainGame->dInfo.isSingleMode = true;
 	OCG_Player team = { duelOptions.startingLP, duelOptions.startingDrawCount, duelOptions.drawCountPerTurn };
@@ -85,7 +85,7 @@ restart:
 	if(hand_test) {
 		opt |= DUEL_ATTACK_FIRST_TURN;
 	}
-	pduel = mainGame->SetupDuel({ (uint32_t)DuelClient::rnd(), opt, team, team });
+	pduel = mainGame->SetupDuel({ DuelClient::rnd(), opt, team, team });
 	mainGame->dInfo.compat_mode = false;
 	mainGame->dInfo.lp[0] = duelOptions.startingLP;
 	mainGame->dInfo.lp[1] = duelOptions.startingLP;
@@ -142,8 +142,7 @@ restart:
 		if (duelOptions.handTestNoOpponent) {
 			last_replay.Write<uint32_t>(0, false);
 			last_replay.Write<uint32_t>(0, false);
-		}
-		else {
+		} else {
 			LoadDeck(1);
 		}
 		last_replay.Flush();
@@ -154,13 +153,11 @@ restart:
 			script_name = Utils::ToUTF8IfNeeded(open_file_name);
 			if(!mainGame->LoadScript(pduel, script_name)) {
 				script_name = Utils::ToUTF8IfNeeded(EPRO_TEXT("./puzzles/") + open_file_name);
-				if(!mainGame->LoadScript(pduel, script_name))
-					loaded = false;
+				loaded = mainGame->LoadScript(pduel, script_name);
 			}
 		} else {
 			script_name = BufferIO::EncodeUTF8s(mainGame->lstSinglePlayList->getListItem(mainGame->lstSinglePlayList->getSelected(), true));
-			if(!mainGame->LoadScript(pduel, script_name))
-				loaded = false;
+			loaded = mainGame->LoadScript(pduel, script_name);
 		}
 		InitReplay();
 	}
@@ -262,10 +259,11 @@ restart:
 	pduel = nullptr;
 	if(saveReplay && !is_restarting) {
 		last_replay.EndRecord(0x1000);
-		std::vector<uint8_t> oldreplay;
-		oldreplay.insert(oldreplay.end(), (uint8_t*)&last_replay.pheader, ((uint8_t*)&last_replay.pheader) + sizeof(ReplayHeader));
-		oldreplay.insert(oldreplay.end(), last_replay.comp_data.begin(), last_replay.comp_data.end());
-		new_replay.WritePacket(ReplayPacket(OLD_REPLAY_MODE, (char*)oldreplay.data(), oldreplay.size()));
+		auto oldbuffer = last_replay.GetSerializedBuffer();
+		ReplayPacket tmp{};
+		tmp.message = OLD_REPLAY_MODE;
+		tmp.data.swap(oldbuffer);
+		new_replay.WritePacket(tmp);
 		new_replay.EndRecord();
 	}
 	if(is_closing) {

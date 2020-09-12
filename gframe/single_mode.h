@@ -17,10 +17,10 @@ private:
 
 public:
 	struct DuelOptions {
-		int startingLP = 8000;
-		int startingDrawCount = 5;
-		int drawCountPerTurn = 1;
-		int duelFlags = 0;
+		uint32_t startingLP = 8000;
+		uint32_t startingDrawCount = 5;
+		uint32_t drawCountPerTurn = 1;
+		uint32_t duelFlags = 0;
 		bool handTestNoOpponent = true;
 		bool handTestNoShuffle = false;
 		DuelOptions() {};
