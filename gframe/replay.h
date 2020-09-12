@@ -18,6 +18,7 @@ namespace ygo {
 #define REPLAY_LUA64		0x10
 #define REPLAY_NEWREPLAY	0x20
 #define REPLAY_HAND_TEST	0x40
+#define REPLAY_DIRECT_SEED	0x80
 
 #define REPLAY_YRP1			0x31707279
 #define REPLAY_YRPX			0x58707279
