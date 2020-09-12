@@ -64,7 +64,7 @@ void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	scc.player = dp->type;
 	unsigned short* msg = (unsigned short*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
-	IteratePlayersAndObs([&](DuelPlayer* dueler) {
+	IteratePlayersAndObs([&scc,&msglen](DuelPlayer* dueler) {
 		NetServer::SendBufferToPlayer(dueler, STOC_CHAT, &scc, 4 + msglen * 2);
 	});
 }
@@ -214,7 +214,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) 
 		dp->state = CTOS_LEAVE_GAME;
 		if(swapped)
 			std::swap(players.home, players.opposing);
-		IteratePlayers([&](duelist& dueler) {
+		IteratePlayers([this,&dp](duelist& dueler) {
 			STOC_HS_PlayerEnter scpe;
 			BufferIO::CopyWStr(dueler.player->name, scpe.name, 20);
 			scpe.pos = GetPos(dueler.player);
@@ -259,7 +259,7 @@ void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) 
 	}
 	NetServer::SendPacketToPlayer(dp, STOC_JOIN_GAME, scjg);
 	NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
-	IteratePlayers([&](duelist& dueler) {
+	IteratePlayers([this,&dp](duelist& dueler) {
 		STOC_HS_PlayerEnter scpe;
 		BufferIO::CopyWStr(dueler.player->name, scpe.name, 20);
 		scpe.pos = GetPos(dueler.player);
@@ -729,16 +729,19 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	BufferIO::Write<uint16_t>(pbuf, OCG_DuelQueryCount(pduel, 0, LOCATION_EXTRA));
 	BufferIO::Write<uint16_t>(pbuf, OCG_DuelQueryCount(pduel, 1, LOCATION_DECK));
 	BufferIO::Write<uint16_t>(pbuf, OCG_DuelQueryCount(pduel, 1, LOCATION_EXTRA));
-	for (auto& dueler : players.home)
-		NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, startbuf, 18);
+	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, startbuf, 18);
+	for(auto& dueler : players.home)
+		NetServer::ReSendToPlayer(dueler.player);
 	startbuf[1] = 1;
+	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, startbuf, 18);
 	for(auto& dueler : players.opposing)
-		NetServer::SendBufferToPlayer(dueler.player, STOC_GAME_MSG, startbuf, 18);
+		NetServer::ReSendToPlayer(dueler.player);
 	if(!swapped)
 		startbuf[1] = 0x10;
 	else startbuf[1] = 0x11;
+	NetServer::SendBufferToPlayer(nullptr, STOC_GAME_MSG, startbuf, 18);
 	for(auto& obs : observers)
-		NetServer::SendBufferToPlayer(obs, STOC_GAME_MSG, startbuf, 18);
+		NetServer::ReSendToPlayer(obs);
 	packets_cache.emplace_back(startbuf, 18);
 	startbuf[1] = 0;
 	replay_stream.emplace_back(startbuf, 17);
@@ -793,8 +796,9 @@ void GenericDuel::DuelEndProc() {
 			dueler.player->state = CTOS_UPDATE_DECK;
 			NetServer::SendPacketToPlayer(dueler.player, STOC_CHANGE_SIDE);
 		});
+		NetServer::SendPacketToPlayer(nullptr, STOC_WAITING_SIDE);
 		for(auto& obs : observers)
-			NetServer::SendPacketToPlayer(obs, STOC_WAITING_SIDE);
+			NetServer::ReSendToPlayer(obs);
 		duel_stage = DUEL_STAGE_SIDING;
 	}
 }
@@ -888,8 +892,8 @@ void GenericDuel::Sending(CoreUtils::Packet& packet, int& return_value, bool& re
 		case 9:
 		case 11: {
 			SEND(nullptr);
-			IteratePlayersAndObs([&](DuelPlayer* dueler) {
-				if(dueler != cur_player[player])
+			IteratePlayersAndObs([&player=cur_player[player]](DuelPlayer* dueler) {
+				if(dueler != player)
 					NetServer::ReSendToPlayer(dueler);
 			});
 			break;
@@ -1294,7 +1298,6 @@ int GenericDuel::Analyze(CoreUtils::Packet packet) {
 	replay_stream.clear();
 	bool record = true;
 	bool record_last = false;
-	unsigned char message = packet.message;
 	auto packetcpy = packet;
 	BeforeParsing(packet, return_value, record, record_last);
 	Sending(packet, return_value, record, record_last);
@@ -1343,7 +1346,7 @@ void GenericDuel::EndDuel() {
 		NetServer::ReSendToPlayer(dueler);
 	});
 
-	NetServer::SendBufferToPlayer(nullptr, STOC_REPLAY, oldreplay.data(), oldreplay.size());
+	NetServer::SendPacketToPlayer(nullptr, STOC_REPLAY);
 	IteratePlayersAndObs([](DuelPlayer* dueler) {
 		NetServer::ReSendToPlayer(dueler);
 	});
@@ -1352,9 +1355,9 @@ void GenericDuel::EndDuel() {
 }
 void GenericDuel::WaitforResponse(uint8_t playerid) {
 	last_response = playerid;
-	unsigned char msg = MSG_WAITING;
-	IteratePlayers([&](duelist& dueler) {
-		if(dueler.player != cur_player[playerid])
+	IteratePlayers([&player=cur_player[playerid]](duelist& dueler) {
+		static const unsigned char msg = MSG_WAITING;
+		if(dueler.player != player)
 			NetServer::SendPacketToPlayer(dueler.player, STOC_GAME_MSG, msg);
 	});
 	if(host_info.time_limit) {
