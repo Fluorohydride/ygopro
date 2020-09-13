@@ -114,7 +114,12 @@ namespace ygo {
 		static const path_string& GetCorePath();
 		static bool UnzipArchive(const path_string& input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, const path_string& dest = EPRO_TEXT("./"));
 
-		static void SystemOpen(const path_string& url);
+		enum OpenType {
+			OPEN_URL,
+			OPEN_FILE
+		};
+
+		static void SystemOpen(const path_string& url, OpenType type = OPEN_URL);
 	};
 
 #define CHAR_T typename T::value_type

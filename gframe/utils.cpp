@@ -420,9 +420,9 @@ namespace ygo {
 		return true;
 	}
 
-	void Utils::SystemOpen(const path_string& url) {
+	void Utils::SystemOpen(const path_string& url, OpenType type) {
 #ifdef _WIN32
-		ShellExecute(NULL, EPRO_TEXT("open"), url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? filesystem->getAbsolutePath(url.c_str()).c_str() : url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 		// system("start URL") opens a shell
 #elif !defined(__ANDROID__)
 		auto pid = fork();
@@ -437,7 +437,10 @@ namespace ygo {
 			perror("Failed to fork:");
 		}
 #else
-		porting::openUrl(url);
+		if(type == OPEN_FILE)
+			porting::openFile(url);
+		else
+			porting::openUrl(url);
 #endif
 	}
 }

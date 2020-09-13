@@ -489,6 +489,20 @@ void openUrl(const std::string& url) {
 						   jargs);
 }
 
+void openFile(const std::string& url) {
+	jmethodID openFile = jnienv->GetMethodID(nativeActivity, "openFile",
+											"(Ljava/lang/String;)V");
+
+	if(openFile == 0) {
+		assert("porting::openFile unable to find java openFile method" == 0);
+	}
+
+	jstring jargs = jnienv->NewStringUTF(url.c_str());
+
+	jnienv->CallVoidMethod(app_global->activity->clazz, openFile,
+						   jargs);
+}
+
 void setTextToClipboard(const wchar_t* text) {
 	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard",
 											"(Ljava/lang/String;)V");

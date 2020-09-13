@@ -30,6 +30,8 @@ void installUpdate(const std::string& args);
 
 void openUrl(const std::string& url);
 
+void openFile(const std::string& file);
+
 void setTextToClipboard(const wchar_t* text);
 
 const wchar_t* getTextFromClipboard();
