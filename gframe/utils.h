@@ -66,6 +66,7 @@ namespace ygo {
 		static bool MakeDirectory(const path_string& path);
 		static bool FileCopy(const path_string& source, const path_string& destination);
 		static bool FileMove(const path_string& source, const path_string& destination);
+		static bool FileExists(const path_string& path);
 		static path_string ToPathString(const std::wstring& input);
 		static path_string ToPathString(const std::string& input);
 		static std::string ToUTF8IfNeeded(const path_string& input);

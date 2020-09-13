@@ -54,6 +54,17 @@ namespace ygo {
 #endif
 		return false;
 	}
+	bool Utils::FileExists(const path_string& path) {
+#ifdef _WIN32
+		auto dwAttrib = GetFileAttributes(path.c_str());
+		return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+#else
+		Stat sb;
+		if(stat(path.c_str(), &sb) == -1)
+			return false;
+		return S_ISREG(sb.st_mode) != 0;
+#endif
+	}
 	bool Utils::FileDelete(const path_string& source) {
 #ifdef _WIN32
 		return DeleteFile(source.c_str());

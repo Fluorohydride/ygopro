@@ -2262,16 +2262,25 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 			}
 			default: break;
 		}
-		if(!gGameConfig->ctrlClickIsRMB || !event.MouseInput.Control)
-			break;
-		switch(event.MouseInput.Event) {
+		if(gGameConfig->ctrlClickIsRMB && event.MouseInput.Control) {
+			switch(event.MouseInput.Event) {
 #define REMAP(TYPE) case irr::EMIE_LMOUSE_##TYPE: return SimulateMouse(irr::EMIE_RMOUSE_##TYPE)
-			REMAP(PRESSED_DOWN);
-			REMAP(LEFT_UP);
-			REMAP(DOUBLE_CLICK);
-			REMAP(TRIPLE_CLICK);
+				REMAP(PRESSED_DOWN);
+				REMAP(LEFT_UP);
+				REMAP(DOUBLE_CLICK);
+				REMAP(TRIPLE_CLICK);
 #undef REMAP
-			default: break;
+				default: break;
+			}
+		}
+		if(event.MouseInput.Event == irr::EMIE_LMOUSE_PRESSED_DOWN && mainGame->showingcard) {
+			irr::gui::IGUIElement* root = mainGame->env->getRootGUIElement();
+			irr::gui::IGUIElement* elem = root->getElementFromPoint({ event.MouseInput.X, event.MouseInput.Y });
+			if(elem == mainGame->stName) {
+				auto path = mainGame->FindScript(fmt::format(EPRO_TEXT("c{}.lua"), mainGame->showingcard));
+				if(path.size() && path != EPRO_TEXT("archive"))
+					Utils::SystemOpen(path, Utils::OPEN_FILE);
+			}
 		}
 		break;
 	}

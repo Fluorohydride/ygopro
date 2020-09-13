@@ -3207,6 +3207,20 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
+path_string Game::FindScript(const path_string& name) {
+	for(auto& path : script_dirs) {
+		if(path == EPRO_TEXT("archives")) {
+			return path;
+		} else {
+			auto tmp = path + name;
+			if(Utils::FileExists(tmp))
+				return tmp;
+		}
+	}
+	if(Utils::FileExists(name))
+		return name;
+	return EPRO_TEXT("");
+}
 std::vector<char> Game::LoadScript(const std::string& _name) {
 	std::vector<char> buffer;
 	std::ifstream script;
