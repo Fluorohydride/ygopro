@@ -9,6 +9,8 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+using Stat = struct stat;
+using Dirent = struct dirent;
 #endif
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
@@ -93,10 +95,10 @@ namespace ygo {
 		}
 		return true;
 #else
-		DIR * dir;
-		struct dirent * dirp = nullptr;
+		DIR* dir;
+		Dirent* dirp = nullptr;
 		if((dir = opendir(path.c_str())) != nullptr) {
-			struct stat fileStat;
+			Stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
 				stat((path + dirp->d_name).c_str(), &fileStat);
 				std::string name = dirp->d_name;
@@ -147,11 +149,11 @@ namespace ygo {
 			FindClose(fh);
 		}
 #else
-		DIR * dir;
-		struct dirent * dirp = nullptr;
+		DIR* dir;
+		Dirent* dirp = nullptr;
 		auto _path = NormalizePath(path);
 		if((dir = opendir(_path.c_str())) != nullptr) {
-			struct stat fileStat;
+			Stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
 				stat((_path + dirp->d_name).c_str(), &fileStat);
 				cb(dirp->d_name, !!S_ISDIR(fileStat.st_mode), payload);
