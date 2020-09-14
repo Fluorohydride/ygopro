@@ -451,7 +451,7 @@ namespace ygo {
 		}
 #else
 		if(type == OPEN_FILE)
-			porting::openFile(url);
+			porting::openFile(porting::working_directory + url);
 		else
 			porting::openUrl(url);
 #endif
