@@ -206,9 +206,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SORT_DECK: {
-				std::sort(gdeckManager->current_deck.main.begin(), gdeckManager->current_deck.main.end(), ClientCard::deck_sort_lv);
-				std::sort(gdeckManager->current_deck.extra.begin(), gdeckManager->current_deck.extra.end(), ClientCard::deck_sort_lv);
-				std::sort(gdeckManager->current_deck.side.begin(), gdeckManager->current_deck.side.end(), ClientCard::deck_sort_lv);
+				std::sort(gdeckManager->current_deck.main.begin(), gdeckManager->current_deck.main.end(), DataManager::deck_sort_lv);
+				std::sort(gdeckManager->current_deck.extra.begin(), gdeckManager->current_deck.extra.end(), DataManager::deck_sort_lv);
+				std::sort(gdeckManager->current_deck.side.begin(), gdeckManager->current_deck.side.end(), DataManager::deck_sort_lv);
 				break;
 			}
 			case BUTTON_SHUFFLE_DECK: {
@@ -1236,16 +1236,16 @@ void DeckBuilder::SortList() {
 	}
 	switch(mainGame->cbSortType->getSelected()) {
 	case 0:
-		std::sort(left, results.end(), ClientCard::deck_sort_lv);
+		std::sort(left, results.end(), DataManager::deck_sort_lv);
 		break;
 	case 1:
-		std::sort(left, results.end(), ClientCard::deck_sort_atk);
+		std::sort(left, results.end(), DataManager::deck_sort_atk);
 		break;
 	case 2:
-		std::sort(left, results.end(), ClientCard::deck_sort_def);
+		std::sort(left, results.end(), DataManager::deck_sort_def);
 		break;
 	case 3:
-		std::sort(left, results.end(), ClientCard::deck_sort_name);
+		std::sort(left, results.end(), DataManager::deck_sort_name);
 		break;
 	}
 }

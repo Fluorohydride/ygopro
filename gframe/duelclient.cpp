@@ -633,7 +633,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1248)));
 		} else if (rule == 6) {
 			uint32_t filter = 0x100;
-			for (int i = 0; filter && i < schkCustomRules; ++i, filter <<= 1)
+			for (int i = 0; filter && i < sizeofarr(mainGame->chkCustomRules); ++i, filter <<= 1)
 				if (pkt.info.duel_flag & filter) {
 					strR.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1631 + i)));
 				}

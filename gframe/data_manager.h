@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <cstdint>
 #include "utils.h"
-#include "client_card.h"
 
 struct sqlite3;
 struct sqlite3_stmt;
@@ -28,6 +27,43 @@ struct sqlite3_stmt;
 #define TYPE_ACTION      0x10000000
 
 namespace ygo {
+
+struct CardData {
+	uint32_t code;
+	uint32_t alias;
+	uint16_t* setcodes;
+	uint32_t type;
+	uint32_t level;
+	uint32_t attribute;
+	uint32_t race;
+	int32_t attack;
+	int32_t defense;
+	uint32_t lscale;
+	uint32_t rscale;
+	uint32_t link_marker;
+};
+struct CardDataC {
+	uint32_t code;
+	uint32_t alias;
+	uint16_t* setcodes_p;
+	uint32_t type;
+	uint32_t level;
+	uint32_t attribute;
+	uint32_t race;
+	int32_t attack;
+	int32_t defense;
+	uint32_t lscale;
+	uint32_t rscale;
+	uint32_t link_marker;
+	uint32_t ot;
+	uint32_t category;
+	std::vector<uint16_t> setcodes;
+};
+struct CardString {
+	std::wstring name;
+	std::wstring text;
+	std::wstring desc[16];
+};
 
 class CardDataM {
 public:
@@ -83,6 +119,10 @@ public:
 
 	static const wchar_t* unknown_string;
 	static void CardReader(void* payload, uint32_t code, CardData* data);
+	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_def(CardDataC* l1, CardDataC* l2);
+	static bool deck_sort_name(CardDataC* l1, CardDataC* l2);
 private:
 	template<typename T1, typename T2 = T1>
 	using indexed_map = std::map<uint32_t, std::pair<T1, T2>>;

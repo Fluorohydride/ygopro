@@ -11,43 +11,6 @@
 
 namespace ygo {
 
-struct CardData {
-	uint32_t code;
-	uint32_t alias;
-	uint16_t* setcodes;
-	uint32_t type;
-	uint32_t level;
-	uint32_t attribute;
-	uint32_t race;
-	int32_t attack;
-	int32_t defense;
-	uint32_t lscale;
-	uint32_t rscale;
-	uint32_t link_marker;
-};
-struct CardDataC {
-	uint32_t code;
-	uint32_t alias;
-	uint16_t* setcodes_p;
-	uint32_t type;
-	uint32_t level;
-	uint32_t attribute;
-	uint32_t race;
-	int32_t attack;
-	int32_t defense;
-	uint32_t lscale;
-	uint32_t rscale;
-	uint32_t link_marker;
-	uint32_t ot;
-	uint32_t category;
-	std::vector<uint16_t> setcodes;
-};
-struct CardString {
-	std::wstring name;
-	std::wstring text;
-	std::wstring desc[16];
-};
-
 class ClientCard {
 public:
 	irr::core::matrix4 mTransform;
@@ -121,17 +84,8 @@ public:
 	void UpdateInfo(const CoreUtils::Query& query);
 	void ClearTarget();
 	static bool client_card_sort(ClientCard* c1, ClientCard* c2);
-	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
-	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
-	static bool deck_sort_def(CardDataC* l1, CardDataC* l2);
-	static bool deck_sort_name(CardDataC* l1, CardDataC* l2);
 };
 
 }
-
-#define HINT_SKILL        200
-#define HINT_SKILL_COVER  201
-#define HINT_SKILL_FLIP   202
-#define HINT_SKILL_REMOVE 203
 
 #endif //CLIENT_CARD_H

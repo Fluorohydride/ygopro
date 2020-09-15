@@ -91,4 +91,9 @@ using OCG_Duel = void*;
 PacketStream ParseMessages(OCG_Duel duel);
 };
 
+#define HINT_SKILL        200
+#define HINT_SKILL_COVER  201
+#define HINT_SKILL_FLIP   202
+#define HINT_SKILL_REMOVE 203
+
 #endif

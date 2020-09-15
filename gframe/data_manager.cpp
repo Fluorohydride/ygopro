@@ -1,6 +1,7 @@
 #include "data_manager.h"
 #include <fstream>
 #include <fmt/format.h>
+#include "bufferio.h"
 #include "sqlite3.h"
 #include "readonlymemvfs.h"
 #include "logging.h"
@@ -497,6 +498,88 @@ std::wstring DataManager::FormatLinkMarker(uint32_t link_marker) {
 void DataManager::CardReader(void* payload, uint32_t code, CardData* data) {
 	if(!static_cast<DataManager*>(payload)->GetData(code, (CardData*)data))
 		memset(data, 0, sizeof(CardData));
+}
+bool is_skill(uint32_t type) {
+	return (type & (TYPE_SKILL | TYPE_ACTION));
+}
+bool check_both_skills(uint32_t type1, uint32_t type2) {
+	return is_skill(type1) && is_skill(type2);
+}
+bool check_either_skills(uint32_t type1, uint32_t type2) {
+	return is_skill(type1) || is_skill(type2);
+}
+bool check_skills(CardDataC* p1, CardDataC* p2) {
+	if(check_both_skills(p1->type, p2->type)) {
+		if((p1->type & 0xfffffff8) == (p2->type & 0xfffffff8)) {
+			return p1->code < p2->code;
+		} else {
+			return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+		}
+	}
+	return is_skill(p2->type);
+}
+bool card_sorter(CardDataC* p1, CardDataC* p2, bool(*sortoop)(CardDataC* p1, CardDataC* p2)) {
+	if(check_either_skills(p1->type, p2->type))
+		return check_skills(p1, p2);
+	if((p1->type & 0x7) != (p2->type & 0x7))
+		return (p1->type & 0x7) < (p2->type & 0x7);
+	if((p1->type & 0x7) == 1) {
+		return sortoop(p1, p2);
+	}
+	if((p1->type & 0xfffffff8) != (p2->type & 0xfffffff8))
+		return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+	return p1->code < p2->code;
+}
+bool DataManager::deck_sort_lv(CardDataC* p1, CardDataC* p2) {
+	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2)->bool {
+		int type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
+		int type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
+		if(type1 != type2)
+			return type1 < type2;
+		if(p1->level != p2->level)
+			return p1->level > p2->level;
+		if(p1->attack != p2->attack)
+			return p1->attack > p2->attack;
+		if(p1->defense != p2->defense)
+			return p1->defense > p2->defense;
+		return p1->code < p2->code;
+	});
+}
+bool DataManager::deck_sort_atk(CardDataC* p1, CardDataC* p2) {
+	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2)->bool {
+		if(p1->attack != p2->attack)
+			return p1->attack > p2->attack;
+		if(p1->defense != p2->defense)
+			return p1->defense > p2->defense;
+		if(p1->level != p2->level)
+			return p1->level > p2->level;
+		int type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
+		int type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
+		if(type1 != type2)
+			return type1 < type2;
+		return p1->code < p2->code;
+	});
+}
+bool DataManager::deck_sort_def(CardDataC* p1, CardDataC* p2) {
+	return card_sorter(p1, p2, [](CardDataC* p1, CardDataC* p2)->bool {
+		if(p1->defense != p2->defense)
+			return p1->defense > p2->defense;
+		if(p1->attack != p2->attack)
+			return p1->attack > p2->attack;
+		if(p1->level != p2->level)
+			return p1->level > p2->level;
+		int type1 = (p1->type & 0x48020c0) ? (p1->type & 0x48020c1) : (p1->type & 0x31);
+		int type2 = (p2->type & 0x48020c0) ? (p2->type & 0x48020c1) : (p2->type & 0x31);
+		if(type1 != type2)
+			return type1 < type2;
+		return p1->code < p2->code;
+	});
+}
+bool DataManager::deck_sort_name(CardDataC* p1, CardDataC* p2) {
+	int res = gDataManager->GetName(p1->code).compare(gDataManager->GetName(p2->code));
+	if(res != 0)
+		return res < 0;
+	return p1->code < p2->code;
 }
 
 }

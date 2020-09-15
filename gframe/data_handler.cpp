@@ -98,16 +98,15 @@ DataHandler::DataHandler() {
 	tmp_device = nullptr;
 #ifndef __ANDROID__
 	tmp_device = GUIUtils::CreateDevice(configs.get());
+#else
+	configs->working_directory = porting::working_directory;
+	configs->ssl_certificate_path = porting::internal_storage + "/cacert.cer";
 #endif
 	filesystem = new irr::io::CFileSystem();
 	Utils::filesystem = filesystem;
 	LoadZipArchives();
 	deckManager = std::unique_ptr<DeckManager>(new DeckManager());
 	gitManager = std::unique_ptr<RepoManager>(new RepoManager());
-#ifdef __ANDROID__
-	configs->working_directory = porting::working_directory;
-	configs->ssl_certificate_path = porting::internal_storage + "/cacert.cer";
-#endif
 	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume / 100.0, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic, configs->working_directory));
 	gitManager->LoadRepositoriesFromJson(configs->user_configs);
 	gitManager->LoadRepositoriesFromJson(configs->configs);

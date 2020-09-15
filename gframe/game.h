@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include "settings_window.h"
 #include "config.h"
 #include "common.h"
 #include "mysignal.h"
@@ -17,7 +18,6 @@
 #include "discord_wrapper.h"
 #include "windbot_panel.h"
 #include "ocgapi_types.h"
-#include "settings_window.h"
 
 struct unzip_payload;
 class CGUISkinSystem;
@@ -425,7 +425,6 @@ public:
 	irr::gui::IGUIComboBox* cbDuelRule;
 	irr::gui::IGUIButton* btnCustomRule;
 	irr::gui::IGUICheckBox* chkCustomRules[7+12+8];
-#define schkCustomRules (sizeof(mainGame->chkCustomRules)/sizeof(irr::gui::IGUICheckBox*))
 	irr::gui::IGUICheckBox* chkTypeLimit[5];
 	irr::gui::IGUIWindow* wCustomRules;
 	irr::gui::IGUIButton* btnCustomRulesOK;
@@ -439,6 +438,7 @@ public:
 	irr::gui::IGUIEditBox* ebHostNotes;
 	irr::gui::IGUIStaticText* stVersus;
 	irr::gui::IGUIStaticText* stBestof;
+#define sizeofarr(arr) (sizeof(arr)/sizeof(decltype(*arr)))
 	//host panel
 	irr::gui::IGUIWindow* wHostPrepare;
 	irr::gui::IGUIWindow* wHostPrepareR;

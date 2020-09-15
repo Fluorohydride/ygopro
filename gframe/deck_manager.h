@@ -5,7 +5,7 @@
 #include <vector>
 #include "network.h"
 #include "text_types.h"
-#include "client_card.h"
+#include "data_manager.h"
 
 namespace ygo {
 

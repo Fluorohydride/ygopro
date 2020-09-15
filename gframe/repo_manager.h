@@ -17,7 +17,6 @@
 
 // libgit2 forward declarations
 struct git_repository;
-struct git_cert;
 #if LIBGIT2_VER_MAJOR>0 || LIBGIT2_VER_MINOR>=99
 struct git_indexer_progress;
 #else

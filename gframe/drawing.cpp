@@ -3,12 +3,13 @@
 #include <irrlicht.h>
 #include "game.h"
 #include "materials.h"
-#include "image_manager.h"
+#include "client_card.h"
 #include "deck_manager.h"
 #include "duelclient.h"
 #include "CGUITTFont/CGUITTFont.h"
 #include "CGUIImageButton/CGUIImageButton.h"
 #include "custom_skin_enum.h"
+#include "image_manager.h"
 
 namespace ygo {
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, irr::video::SColor color) {

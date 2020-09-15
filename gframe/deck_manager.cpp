@@ -8,6 +8,7 @@
 #include <IGUIEditBox.h>
 #include "Base64.h"
 #include "utils.h"
+#include "client_card.h"
 
 namespace ygo {
 
@@ -407,9 +408,9 @@ const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	static std::wstring res;
 	res.clear();
-	std::sort(deck.main.begin(), deck.main.end(), ClientCard::deck_sort_lv);
-	std::sort(deck.extra.begin(), deck.extra.end(), ClientCard::deck_sort_lv);
-	std::sort(deck.side.begin(), deck.side.end(), ClientCard::deck_sort_lv);
+	std::sort(deck.main.begin(), deck.main.end(), DataManager::deck_sort_lv);
+	std::sort(deck.extra.begin(), deck.extra.end(), DataManager::deck_sort_lv);
+	std::sort(deck.side.begin(), deck.side.end(), DataManager::deck_sort_lv);
 	auto serialize = [&res=res](const auto& list) {
 		uint32_t prev = 0;
 		uint32_t count = 0;

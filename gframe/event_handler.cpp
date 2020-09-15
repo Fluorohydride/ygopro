@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "game_config.h"
 #include "client_field.h"
+#include "client_card.h"
 #include "math.h"
 #include "network.h"
 #include "game.h"
