@@ -5,6 +5,7 @@
 #include <path.h>
 #include <rect.h>
 #include <unordered_map>
+#include <map>
 #include <atomic>
 #include <future>
 #include <queue>
