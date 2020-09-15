@@ -60,12 +60,26 @@ protected:
 	public:
 		DuelPlayer* player;
 		bool ready;
-		Deck odeck;
-		Deck pdeck;
+		Deck odeck{};
+		Deck pdeck{};
 		uint32_t deck_error;
 		duelist() : player(0), ready(false), deck_error(0) {}
 		duelist(DuelPlayer* _player) : player(_player), ready(false), deck_error(0) {}
-		void Clear() { player = nullptr; ready = false; pdeck.clear(); deck_error = 0; }
+		void Clear() { player = nullptr; ready = false; pdeck.clear(); odeck.clear(); deck_error = 0; }
+		operator bool() const {
+			return !!player;
+		}
+		operator DuelPlayer*() const {
+			return player;
+		}
+		bool operator==(DuelPlayer* rhs) {
+			return rhs == player;
+		}
+		auto operator=(DuelPlayer* rhs) {
+			Clear();
+			player = rhs;
+			return *this;
+		}
 	};
 	bool CheckReady();
 	uint32_t GetCount(const std::vector<duelist>& players);
@@ -77,10 +91,13 @@ protected:
 	int GetPos(DuelPlayer* dp);
 	void OrderPlayers(std::vector<duelist>& players, int offset = 0);
 	template<typename T>
-	void IteratePlayersAndObs(T func);
+	inline void IteratePlayersAndObs(T func);
 	template<typename T>
-	void IteratePlayers(T func);
-	bool IteratePlayers(std::function<bool(duelist& dueler)> func);
+	inline void IteratePlayers(T func);
+	using iter_bool = std::function<bool(duelist&)>;
+	inline bool IteratePlayers(iter_bool func);
+	inline void ResendToAll();
+	inline void ResendToAll(DuelPlayer* except);
 	struct {
 		std::vector<duelist> home;
 		std::vector<duelist> opposing;
