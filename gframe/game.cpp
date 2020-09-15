@@ -53,7 +53,6 @@ uint16_t PRO_VERSION = 0x1351;
 namespace ygo {
 
 bool Game::Initialize() {
-	srand(time(0));
 	dpi_scale = gGameConfig->dpi_scale;
 	if(!device) {
 		try {
@@ -101,24 +100,8 @@ bool Game::Initialize() {
 	skinSystem = new CGUISkinSystem((gGameConfig->working_directory + EPRO_TEXT("./skin")).c_str(), device);
 	if(!skinSystem)
 		ErrorLog("Couldn't create skin system");
-	linePatternD3D = 0;
 	linePatternGL = 0x0f0f;
-	waitFrame = 0.0f;
-	signalFrame = 0;
-	showcard = 0;
-	is_attacking = false;
-	lpframe = 0;
-	lpcstring = L"";
-	always_chain = false;
-	ignore_chain = false;
-	chain_when_avail = false;
-	is_building = false;
-	showingcard = 0;
-	cardimagetextureloading = false;
-	menuHandler.prev_operation = 0;
 	menuHandler.prev_sel = -1;
-	dInfo = {};
-	memset(chatTiming, 0, sizeof(chatTiming));
 	driver = device->getVideoDriver();
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial()) {
@@ -1487,10 +1470,6 @@ bool Game::Initialize() {
 	updateProgressBottom->addBorder(1);
 	updateProgressBottom->setProgress(0);
 	updateProgressBottom->drop();
-
-	hideChat = false;
-	hideChatTimer = 0;
-	delta_time = 0;
 
 	Utils::CreateResourceFolders();
 

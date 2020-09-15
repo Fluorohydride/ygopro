@@ -258,6 +258,7 @@ int main(int argc, char* argv[]) {
 		ygo::mainGame->gSettings.chkFullscreen->setChecked(ygo::gGameConfig->fullscreen);
 	});
 #endif
+	srand(time(0));
 	std::unique_ptr<JWrapper> joystick;
 	bool reset = false;
 	bool firstlaunch = true;
