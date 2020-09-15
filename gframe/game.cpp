@@ -2172,10 +2172,6 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		grepo->commit_history_partial = grepo->commit_history_full;
 		return;
 	}
-	script_dirs.insert(script_dirs.begin(), Utils::ToPathString(repo->script_path));
-	auto script_subdirs = Utils::FindSubfolders(Utils::ToPathString(repo->script_path));
-	script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
-	pic_dirs.insert(pic_dirs.begin(), Utils::ToPathString(repo->pics_path));
 	std::string text;
 	std::for_each(repo->commit_history_full.begin(), repo->commit_history_full.end(), [&text](const std::string& n) { if(n.size()) { text += n + "\n\n"; }});
 	if(text.size())
@@ -2205,14 +2201,19 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	}
 	grepo->history_button1->setEnabled(true);
 	grepo->history_button2->setEnabled(true);
-	if(repo->has_core) {
-		cores_to_load.insert(cores_to_load.begin(), Utils::ToPathString(repo->core_path));
-	}
-	auto data_path = Utils::ToPathString(repo->data_path);
-	auto lflist_path = Utils::ToPathString(repo->lflist_path);
-	if (gdeckManager->LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || gdeckManager->LoadLFListFolder(lflist_path)) {
-		gdeckManager->RefreshLFList();
-		RefreshLFLists();
+	if(!repo->is_language) {
+		script_dirs.insert(script_dirs.begin(), Utils::ToPathString(repo->script_path));
+		auto script_subdirs = Utils::FindSubfolders(Utils::ToPathString(repo->script_path));
+		script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
+		pic_dirs.insert(pic_dirs.begin(), Utils::ToPathString(repo->pics_path));
+		if(repo->has_core)
+			cores_to_load.insert(cores_to_load.begin(), Utils::ToPathString(repo->core_path));
+		auto data_path = Utils::ToPathString(repo->data_path);
+		auto lflist_path = Utils::ToPathString(repo->lflist_path);
+		if(gdeckManager->LoadLFListSingle(data_path + EPRO_TEXT("lflist.conf")) || gdeckManager->LoadLFListFolder(lflist_path)) {
+			gdeckManager->RefreshLFList();
+			RefreshLFLists();
+		}
 	}
 }
 void Game::LoadServers() {
