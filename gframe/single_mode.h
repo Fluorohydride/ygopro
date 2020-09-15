@@ -29,7 +29,7 @@ public:
 	static bool StartPlay(const DuelOptions& duelOptions = DuelOptions());
 	static void StopPlay(bool is_exiting = false);
 	static void Restart();
-	static void SetResponse(unsigned char* resp, unsigned int len);
+	static void SetResponse(void* resp, uint32_t len);
 	static int SinglePlayThread(DuelOptions duelOptions);
 	static bool SinglePlayAnalyze(CoreUtils::Packet packet);
 	

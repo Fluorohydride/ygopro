@@ -23,7 +23,7 @@ private:
 	static uint16_t last_sent;
 
 public:
-	static bool StartServer(unsigned short port);
+	static bool StartServer(uint16_t port);
 	static bool StartBroadcast();
 	static void StopServer();
 	static void StopBroadcast();
@@ -35,8 +35,8 @@ public:
 	static void ServerEchoEvent(bufferevent* bev, short events, void* ctx);
 	static int ServerThread();
 	static void DisconnectPlayer(DuelPlayer* dp);
-	static void HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len);
-	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
+	static void HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len);
+	static void SendPacketToPlayer(DuelPlayer* dp, uint8_t proto) {
 		char* p = net_server_write;
 		BufferIO::Write<uint16_t>(p, 1u);
 		BufferIO::Write<uint8_t>(p, proto);
@@ -46,7 +46,7 @@ public:
 		bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 	template<typename ST>
-	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
+	static void SendPacketToPlayer(DuelPlayer* dp, uint8_t proto, ST& st) {
 		char* p = net_server_write;
 		BufferIO::Write<uint16_t>(p, static_cast<uint16_t>(1u + sizeof(ST)));
 		BufferIO::Write<uint8_t>(p, proto);
@@ -55,7 +55,7 @@ public:
 		if(dp)
 			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
-	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
+	static void SendBufferToPlayer(DuelPlayer* dp, uint8_t proto, void* buffer, size_t len) {
 		char* p = net_server_write;
 		BufferIO::Write<uint16_t>(p, static_cast<uint16_t>(1u + len));
 		BufferIO::Write<uint8_t>(p, proto);

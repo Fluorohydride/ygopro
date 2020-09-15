@@ -24,13 +24,11 @@ ImageDownloader::~ImageDownloader() {
 void ImageDownloader::AddDownloadResource(PicSource src) {
 	pic_urls.push_back(src);
 }
-#define PNG_HEADER 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a
+static constexpr uint8_t pngheader[] = { 0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a };
+static constexpr uint8_t jpgheader[] = { 0xff, 0xd8, 0xff };
 #define PNG_FILE 1
-#define JPG_HEADER 0xff, 0xd8, 0xff
 #define JPG_FILE 2
-int CheckImageHeader(char* header) {
-	static unsigned char pngheader[] = { PNG_HEADER }; //png header
-	static unsigned char jpgheader[] = { JPG_HEADER }; //jpg header
+int CheckImageHeader(void* header) {
 	if(!memcmp(pngheader, header, sizeof(pngheader))) {
 		return PNG_FILE;
 	} else if(!memcmp(jpgheader, header, sizeof(jpgheader))) {

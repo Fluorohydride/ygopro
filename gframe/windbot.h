@@ -24,7 +24,7 @@ struct WindBot {
 #endif
 
 	// Can be made static
-	unsigned int version;
+	uint32_t version;
 	path_string executablePath;
 };
 

@@ -7,9 +7,9 @@ struct DiscordUser;
 class DiscordWrapper {
 public:
 	struct DiscordSecret {
-		unsigned int game_id;
-		unsigned int server_address;
-		unsigned short server_port;
+		uint32_t game_id;
+		uint32_t server_address;
+		uint16_t server_port;
 		std::string pass;
 	};
 	enum PresenceType {

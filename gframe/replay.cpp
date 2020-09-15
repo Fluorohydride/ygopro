@@ -124,7 +124,7 @@ bool Replay::OpenReplayFromBuffer(std::vector<uint8_t>&& contents) {
 	} else {
 		ParseStream();
 	}
-	return can_read;
+	return true;
 }
 bool Replay::IsExportable() {
 	auto& deck = (yrp != nullptr) ? yrp->GetPlayerDecks() : decks;
@@ -251,11 +251,11 @@ void Replay::ParseDecks() {
 bool Replay::ReadNextPacket(ReplayPacket* packet) {
 	if(!can_read)
 		return false;
-	unsigned char message = (unsigned char)Read<int8_t>();
+	uint8_t message = Read<uint8_t>();
 	if(!can_read)
 		return false;
 	packet->message = message;
-	int len = Read<uint32_t>();
+	uint32_t len = Read<uint32_t>();
 	if(!can_read)
 		return false;
 	return ReadData(packet->data, len);
@@ -294,7 +294,7 @@ void Replay::ParseStream() {
 bool Replay::ReadName(wchar_t* data) {
 	if(!is_replaying || !can_read)
 		return false;
-	unsigned short buffer[20];
+	uint16_t buffer[20];
 	if(!ReadData(buffer, 40))
 		return false;
 	BufferIO::CopyWStr(buffer, data, 20);
@@ -336,7 +336,7 @@ std::vector<uint8_t> Replay::GetSerializedBuffer() {
 	serialized.insert(serialized.end(), comp_data.begin(), comp_data.end());
 	return serialized;
 }
-bool Replay::ReadData(void* data, unsigned int length) {
+bool Replay::ReadData(void* data, uint32_t length) {
 	if(!is_replaying || !can_read)
 		return false;
 	if((replay_data.size() - data_position) < length) {
@@ -348,7 +348,7 @@ bool Replay::ReadData(void* data, unsigned int length) {
 	data_position += length;
 	return true;
 }
-bool Replay::ReadData(std::vector<uint8_t>& data, unsigned int length) {
+bool Replay::ReadData(std::vector<uint8_t>& data, uint32_t length) {
 	if(!is_replaying || !can_read)
 		return false;
 	if((replay_data.size() - data_position) < length) {

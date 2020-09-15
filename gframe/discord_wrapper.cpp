@@ -89,7 +89,7 @@ void DiscordWrapper::UpdatePresence(PresenceType type) {
 		case DUEL_STARTED:
 		case DECK_SIDING: {
 			auto count = ygo::DuelClient::GetPlayersCount();
-			discordPresence.partySize = std::max(1, count.first + count.second);
+			discordPresence.partySize = std::max(1u, count.first + count.second);
 			discordPresence.partyMax = ygo::mainGame->dInfo.team1 + ygo::mainGame->dInfo.team2 + ygo::DuelClient::GetSpectatorsCount() + 1;
 			if(presence == IN_LOBBY) {
 				discordPresence.details = "Hosting a Duel";

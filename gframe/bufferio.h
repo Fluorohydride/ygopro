@@ -98,7 +98,7 @@ public:
 		return str - pstr;
 	}
 	// UTF-8 to UTF-16/UTF-32
-	static int DecodeUTF8(const char * src, wchar_t * wstr) {
+	static int DecodeUTF8(const char* src, wchar_t * wstr) {
 		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
@@ -106,19 +106,19 @@ public:
 				*wp = *p;
 				p++;
 			} else if((*p & 0xe0) == 0xc0) {
-				*wp = (((unsigned)p[0] & 0x1f) << 6) | ((unsigned)p[1] & 0x3f);
+				*wp = (((wchar_t)p[0] & 0x1f) << 6) | ((wchar_t)p[1] & 0x3f);
 				p += 2;
 			} else if((*p & 0xf0) == 0xe0) {
-				*wp = (((unsigned)p[0] & 0xf) << 12) | (((unsigned)p[1] & 0x3f) << 6) | ((unsigned)p[2] & 0x3f);
+				*wp = (((wchar_t)p[0] & 0xf) << 12) | (((wchar_t)p[1] & 0x3f) << 6) | ((wchar_t)p[2] & 0x3f);
 				p += 3;
 			} else if((*p & 0xf8) == 0xf0) {
 #if	WCHAR_MAX == 0xffff
-					unsigned unicode = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
+					uint32_t unicode = (((uint32_t)p[0] & 0x7) << 18) | (((uint32_t)p[1] & 0x3f) << 12) | (((uint32_t)p[2] & 0x3f) << 6) | ((uint32_t)p[3] & 0x3f);
 					unicode -= 0x10000;
 					*wp++ = (unicode >> 10) | 0xd800;
 					*wp = (unicode & 0x3ff) | 0xdc00;
 #else
-					*wp = (((unsigned)p[0] & 0x7) << 18) | (((unsigned)p[1] & 0x3f) << 12) | (((unsigned)p[2] & 0x3f) << 6) | ((unsigned)p[3] & 0x3f);
+					*wp = (((uint32_t)p[0] & 0x7) << 18) | (((uint32_t)p[1] & 0x3f) << 12) | (((uint32_t)p[2] & 0x3f) << 6) | ((uint32_t)p[3] & 0x3f);
 #endif
 				p += 4;
 			} else
@@ -145,8 +145,8 @@ public:
 		DecodeUTF8(source.c_str(), const_cast<wchar_t*>(res.data()));
 		return res.data();
 	}
-	static int GetVal(const wchar_t* pstr) {
-		int ret = 0;
+	static uint32_t GetVal(const wchar_t* pstr) {
+		uint32_t ret = 0;
 		while(*pstr >= L'0' && *pstr <= L'9') {
 			ret = ret * 10 + (*pstr - L'0');
 			pstr++;

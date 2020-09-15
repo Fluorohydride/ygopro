@@ -50,7 +50,7 @@ bool DataManager::LoadDBFromBuffer(const std::vector<char>& buffer, const std::s
 		return Error(pDB);
 	return ParseDB(pDB);
 }
-bool DataManager::ParseDB(sqlite3 * pDB) {
+bool DataManager::ParseDB(sqlite3* pDB) {
 	sqlite3_stmt* pStmt;
 	const char* sql = "select * from datas,texts where datas.id=texts.id ORDER BY texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
@@ -321,20 +321,20 @@ std::wstring DataManager::GetVictoryString(int code) {
 		return unknown_string;
 	return csit;
 }
-std::wstring DataManager::GetCounterName(int code) {
+std::wstring DataManager::GetCounterName(uint32_t code) {
 	auto csit = _counterStrings.GetLocale(code);
 	if(!csit)
 		return unknown_string;
 	return csit;
 }
-std::wstring DataManager::GetSetName(int code) {
+std::wstring DataManager::GetSetName(uint32_t code) {
 	auto csit = _setnameStrings.GetLocale(code);
 	if(!csit)
 		return L"";
 	return csit;
 }
-std::vector<unsigned int> DataManager::GetSetCode(std::vector<std::wstring>& setname) {
-	std::vector<unsigned int> res;
+std::vector<uint32_t> DataManager::GetSetCode(std::vector<std::wstring>& setname) {
+	std::vector<uint32_t> res;
 	for(auto& string : _setnameStrings.map) {
 		if(string.second.first.empty())
 			continue;
@@ -358,7 +358,7 @@ std::wstring DataManager::GetNumString(int num, bool bracket) {
 		return fmt::to_wstring(num);
 	return fmt::format(L"({})", num);
 }
-std::wstring DataManager::FormatLocation(int location, int sequence) {
+std::wstring DataManager::FormatLocation(uint32_t location, int sequence) {
 	if(location == 0x8) {
 		if(sequence < 5)
 			return GetSysString(1003);
@@ -367,7 +367,7 @@ std::wstring DataManager::FormatLocation(int location, int sequence) {
 		else
 			return GetSysString(1009);
 	}
-	unsigned filter = 1;
+	uint32_t filter = 1;
 	int i = 1000;
 	for(; filter != 0x100 && filter != location; filter <<= 1)
 		++i;
@@ -376,9 +376,9 @@ std::wstring DataManager::FormatLocation(int location, int sequence) {
 	else
 		return unknown_string;
 }
-std::wstring DataManager::FormatAttribute(int attribute) {
+std::wstring DataManager::FormatAttribute(uint32_t attribute) {
 	std::wstring res;
-	unsigned filter = 1;
+	uint32_t filter = 1;
 	int i = 1010;
 	for(; filter != 0x80; filter <<= 1, ++i) {
 		if(attribute & filter) {
@@ -391,9 +391,9 @@ std::wstring DataManager::FormatAttribute(int attribute) {
 		return unknown_string;
 	return res;
 }
-std::wstring DataManager::FormatRace(int race, bool isSkill) {
+std::wstring DataManager::FormatRace(uint32_t race, bool isSkill) {
 	std::wstring res;
-	unsigned filter = 1;
+	uint32_t filter = 1;
 	for(int i = isSkill ? 2100 : 1020; filter != 0x2000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			if(!res.empty())
@@ -405,7 +405,7 @@ std::wstring DataManager::FormatRace(int race, bool isSkill) {
 		return unknown_string;
 	return res;
 }
-std::wstring DataManager::FormatType(int type) {
+std::wstring DataManager::FormatType(uint32_t type) {
 	std::wstring res;
 	if(type & TYPE_SKILL)
 		res += GetSysString(1077);
@@ -415,7 +415,7 @@ std::wstring DataManager::FormatType(int type) {
 		res += GetSysString(1078);
 	}
 	int i = 1050;
-	for(unsigned filter = 1; filter != TYPE_SKILL; filter <<= 1, ++i) {
+	for(uint32_t filter = 1; filter != TYPE_SKILL; filter <<= 1, ++i) {
 		if(type & filter) {
 			if(!res.empty())
 				res += L"|";
@@ -426,7 +426,7 @@ std::wstring DataManager::FormatType(int type) {
 		return unknown_string;
 	return res;
 }
-std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
+std::wstring DataManager::FormatScope(uint32_t scope, bool hideOCGTCG) {
 	static const std::map<int, int> SCOPES = {
 		{SCOPE_OCG, 1900},
 		{SCOPE_TCG, 1901},
@@ -443,7 +443,7 @@ std::wstring DataManager::FormatScope(int scope, bool hideOCGTCG) {
 	for (const auto& tuple : SCOPES) {
 		if (scope & tuple.first) {
 			if (!buffer.empty()) {
-				buffer += L"/";
+				buffer += L'/';
 			}
 			buffer += GetSysString(tuple.second);
 		}
@@ -474,7 +474,7 @@ std::wstring DataManager::FormatSetName(std::vector<uint16_t> setcodes) {
 		return unknown_string;
 	return res;
 }
-std::wstring DataManager::FormatLinkMarker(int link_marker) {
+std::wstring DataManager::FormatLinkMarker(uint32_t link_marker) {
 	std::wstring res;
 	if(link_marker & LINK_MARKER_TOP_LEFT)
 		res += L"[\u2196]";

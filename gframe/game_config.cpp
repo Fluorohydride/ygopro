@@ -135,9 +135,9 @@ bool GameConfig::Load(const path_char* filename)
 			else if (type == "roompass")
 				roompass = BufferIO::DecodeUTF8s(str);
 			else if (type == "game_version") {
-				int version = std::stoi(str);
+				uint16_t version = static_cast<uint16_t>(std::stoul(str));
 				if (version) {
-					PRO_VERSION = std::stoi(str);
+					PRO_VERSION = version;
 					game_version = PRO_VERSION;
 				}
 			}

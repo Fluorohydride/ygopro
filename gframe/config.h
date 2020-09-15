@@ -3,7 +3,7 @@
 
 #include "text_types.h"
 
-extern unsigned short PRO_VERSION;
+extern uint16_t PRO_VERSION;
 extern bool exit_on_return;
 extern bool is_from_discord;
 extern bool open_file;

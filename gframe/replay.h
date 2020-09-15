@@ -101,8 +101,8 @@ public:
 	std::string scriptname;
 	ReplayStream packets_stream;
 private:
-	bool ReadData(void* data, unsigned int length);
-	bool ReadData(std::vector<uint8_t>& data, unsigned int length);
+	bool ReadData(void* data, uint32_t length);
+	bool ReadData(std::vector<uint8_t>& data, uint32_t length);
 	template <typename  T>
 	T Read();
 	bool ReadNextResponse(ReplayResponse* res);

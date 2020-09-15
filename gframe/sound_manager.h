@@ -58,7 +58,7 @@ public:
 	void RefreshChantsList();
 	void PlaySoundEffect(SFX sound);
 	void PlayBGM(BGM scene, bool loop = true);
-	bool PlayChant(CHANT chant, unsigned int code);
+	bool PlayChant(CHANT chant, uint32_t code);
 	void SetSoundVolume(double volume);
 	void SetMusicVolume(double volume);
 	void EnableSounds(bool enable);
@@ -70,7 +70,7 @@ public:
 
 private:
 	std::vector<std::string> BGMList[8];
-	std::map<std::pair<CHANT, unsigned int>, std::string> ChantsList;
+	std::map<std::pair<CHANT, uint32_t>, std::string> ChantsList;
 	int bgm_scene = -1;
 	randengine rnd;
 	std::unique_ptr<SoundBackend> mixer;

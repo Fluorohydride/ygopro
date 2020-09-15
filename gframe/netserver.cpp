@@ -23,7 +23,7 @@ char NetServer::net_server_read[0x20000];
 char NetServer::net_server_write[0x20000];
 uint16_t NetServer::last_sent = 0;
 
-bool NetServer::StartServer(unsigned short port) {
+bool NetServer::StartServer(uint16_t port) {
 	if(net_evbase)
 		return false;
 	net_evbase = event_base_new();
@@ -125,7 +125,7 @@ void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
 	size_t len = evbuffer_get_length(input);
-	unsigned short packet_len = 0;
+	uint16_t packet_len = 0;
 	while(true) {
 		if(len < 2)
 			return;
@@ -187,10 +187,10 @@ T getStruct(void* data, size_t len) {
 	memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
 	return pkt;
 }
-void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
+void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, uint32_t len) {
 	static constexpr ClientVersion serverversion{ EXPAND_VERSION(CLIENT_VERSION) };
 	char* pdata = data;
-	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
+	uint8_t pktType = BufferIO::Read<uint8_t>(pdata);
 	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
 	switch(pktType) {
@@ -250,7 +250,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, GenericDuel::GenericTimer, duel_mode);
 		timeval timeout = { 1, 0 };
 		event_add(duel_mode->etimer, &timeout);
-		unsigned int hash = 1;
+		uint32_t hash = 1;
 		for(auto lfit = gdeckManager->_lfList.begin(); lfit != gdeckManager->_lfList.end(); ++lfit) {
 			if(pkt.info.lflist == lfit->hash) {
 				hash = pkt.info.lflist;

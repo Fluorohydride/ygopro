@@ -19,10 +19,10 @@ namespace ygo {
 
 class DuelClient {
 private:
-	static unsigned int connect_state;
-	static std::vector<unsigned char> response_buf;
-	static unsigned int watching;
-	static unsigned char selftype;
+	static uint32_t connect_state;
+	static std::vector<uint8_t> response_buf;
+	static uint32_t watching;
+	static uint8_t selftype;
 	static bool is_host;
 	static event_base* client_base;
 	static bufferevent* client_bev;
@@ -34,27 +34,26 @@ private:
 	static bool is_swapping;
 public:
 	static randengine rnd;
-	static unsigned int temp_ip;
-	static unsigned short temp_port;
-	static unsigned short temp_ver;
+	static uint32_t temp_ip;
+	static uint16_t temp_port;
+	static uint16_t temp_ver;
 	static bool try_needed;
 	static bool is_local_host;
 
-	static std::pair<unsigned int, unsigned short> ResolveServer(const std::wstring& address, const std::wstring& port);
-	static std::pair<unsigned int, unsigned short> ResolveServer(const std::wstring& address, int port);
-	static bool StartClient(unsigned int ip, unsigned short port, unsigned int gameid = 0, bool create_game = true);
+	static std::pair<uint32_t, uint16_t> ResolveServer(const std::wstring& address, const std::wstring& port);
+	static std::pair<uint32_t, uint16_t> ResolveServer(const std::wstring& address, int port);
+	static bool StartClient(uint32_t ip, uint16_t port, uint32_t gameid = 0, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
 	static void StopClient(bool is_exiting = false);
 	static void ClientRead(bufferevent* bev, void* ctx);
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
-	static void HandleSTOCPacketLan(char* data, unsigned int len);
+	static void HandleSTOCPacketLan(char* data, uint32_t len);
 	static bool CheckReady();
-	static void SetPlayersCount();
-	static std::pair<int, int> GetPlayersCount();
+	static std::pair<uint32_t, uint32_t> GetPlayersCount();
 	static ReplayStream replay_stream;
 	static Replay last_replay;
-	static int ClientAnalyze(char* msg, unsigned int len);
+	static int ClientAnalyze(char* msg, uint32_t len);
 	static int GetSpectatorsCount() {
 		return watching;
 	};
@@ -63,23 +62,23 @@ public:
 		return !!connect_state;
 	};
 	static void SetResponseI(int respI);
-	static void SetResponseB(void* respB, unsigned int len);
+	static void SetResponseB(void* respB, uint32_t len);
 	static void SendResponse();
-	static void SendPacketToServer(unsigned char proto) {
+	static void SendPacketToServer(uint8_t proto) {
 		duel_client_write.clear();
 		BufferIO::insert_value<uint16_t>(duel_client_write, 1);
 		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
 		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	template<typename ST>
-	static void SendPacketToServer(unsigned char proto, ST& st) {
+	static void SendPacketToServer(uint8_t proto, ST& st) {
 		duel_client_write.clear();
 		BufferIO::insert_value<uint16_t>(duel_client_write, 1 + sizeof(ST));
 		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
 		BufferIO::insert_value<ST>(duel_client_write, st);
 		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
-	static void SendBufferToServer(unsigned char proto, void* buffer, size_t len) {
+	static void SendBufferToServer(uint8_t proto, void* buffer, size_t len) {
 		duel_client_write.clear();
 		BufferIO::insert_value<uint16_t>(duel_client_write, (uint16_t)(1 + len));
 		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
@@ -93,7 +92,7 @@ protected:
 	static bool is_refreshing;
 	static int match_kill;
 	static event* resp_event;
-	static std::set<unsigned int> remotes;
+	static std::set<uint32_t> remotes;
 public:
 	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();

@@ -100,7 +100,7 @@ void Game::DrawBackGround() {
 	//select field
 	if((dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD || dInfo.curMsg == MSG_HINT) && dField.selectable_field) {
 		irr::video::SColor outline_color = skin::DUELFIELD_SELECTABLE_FIELD_OUTLINE_VAL;
-		unsigned int filter = 0x1;
+		uint32_t filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.selectable_field & filter)
 				DrawSelectionLine(matManager.vFieldMzone[0][i], !(dField.selected_field & filter), 2, outline_color);
@@ -124,7 +124,7 @@ void Game::DrawBackGround() {
 	//disabled field
 	{
 		irr::video::SColor disabled_color = skin::DUELFIELD_DISABLED_FIELD_COLOR_VAL;
-		unsigned int filter = 0x1;
+		uint32_t filter = 0x1;
 		for (int i = 0; i < 7; ++i, filter <<= 1) {
 			if (dField.disabled_field & filter) {
 				driver->draw3DLine(matManager.vFieldMzone[0][i][0].Pos, matManager.vFieldMzone[0][i][3].Pos, disabled_color);
@@ -965,7 +965,7 @@ void Game::DrawSpec() {
 		hideChatTimer--;
 	}
 	for(int i = 0; i < 8; ++i) {
-		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
+		static uint32_t chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
 										   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
 		if(chatTiming[i] > 0.0f) {
 			chatTiming[i] -= (float)delta_time * 60.0f / 1000.0f;
@@ -1120,7 +1120,7 @@ void Game::WaitFrameSignal(int frame) {
 }
 void Game::DrawThumb(CardDataC* cp, irr::core::vector2di pos, LFList* lflist, bool drag, irr::core::recti* cliprect, bool load_image) {
 	auto code = cp->code;
-	unsigned int limitcode = cp->code;
+	uint32_t limitcode = cp->code;
 	auto flit = lflist->content.find(limitcode);
 	if(flit == lflist->content.end() && cp->alias)
 		flit = lflist->content.find(cp->alias);
@@ -1131,8 +1131,8 @@ void Game::DrawThumb(CardDataC* cp, irr::core::vector2di pos, LFList* lflist, bo
 	} else
 		count = flit->second;
 	irr::video::ITexture* img = load_image ? imageManager.GetTextureCard(code, ImageManager::THUMB) : imageManager.tUnknown;
-	if (img == NULL)
-		return; //NULL->getSize() will cause a crash
+	if (!img)
+		return;
 	irr::core::dimension2du size = img->getOriginalSize();
 	irr::core::recti dragloc = Resize(pos.X, pos.Y, pos.X + CARD_THUMB_WIDTH, pos.Y + CARD_THUMB_HEIGHT);
 	irr::core::recti limitloc = Resize(pos.X, pos.Y, pos.X + 20, pos.Y + 20);

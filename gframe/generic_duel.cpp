@@ -62,7 +62,7 @@ bool GenericDuel::IteratePlayers(std::function<bool(duelist& dueler)> func) {
 void GenericDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
 	STOC_Chat scc;
 	scc.player = dp->type;
-	unsigned short* msg = (unsigned short*)pdata;
+	uint16_t* msg = (uint16_t*)pdata;
 	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
 	IteratePlayersAndObs([&scc,&msglen](DuelPlayer* dueler) {
 		NetServer::SendBufferToPlayer(dueler, STOC_CHAT, &scc, 4 + msglen * 2);
@@ -92,8 +92,8 @@ bool GenericDuel::CheckReady() {
 	}
 	return ready1 && ready2;
 }
-int GenericDuel::GetCount(const std::vector<duelist>& players) {
-	int res = 0;
+uint32_t GenericDuel::GetCount(const std::vector<duelist>& players) {
+	uint32_t res = 0;
 	for(auto& dueler : players) {
 		if(dueler.player)
 			res++;
@@ -161,7 +161,7 @@ void GenericDuel::SetAtPos(DuelPlayer* dp, size_t pos) {
 		players.opposing[pos - players.home.size()] = duelist(dp);
 	}
 }
-GenericDuel::duelist& GenericDuel::GetAtPos(int pos) {
+GenericDuel::duelist& GenericDuel::GetAtPos(uint8_t pos) {
 	if(pos < players.home_size) {
 		return players.home[pos];
 	} else {
@@ -423,7 +423,7 @@ void GenericDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 		NetServer::ReSendToPlayer(dueler);
 	});
 }
-void GenericDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
+void GenericDuel::PlayerKick(DuelPlayer* dp, uint8_t pos) {
 	auto& dueler = GetAtPos(pos);
 	if(pos > 5 || dp != host_player || dp == dueler.player || !dueler.player)
 		return;
@@ -500,7 +500,7 @@ void GenericDuel::StartDuel(DuelPlayer* dp) {
 	players.opposing.front().player->state = CTOS_HAND_RESULT;
 	duel_stage = DUEL_STAGE_FINGER;
 }
-void GenericDuel::HandResult(DuelPlayer* dp, unsigned char res) {
+void GenericDuel::HandResult(DuelPlayer* dp, uint8_t res) {
 	if(res > 3 || dp->state != CTOS_HAND_RESULT)
 		return;
 	if(dp->type == 0)
@@ -541,7 +541,7 @@ void GenericDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 		}
 	}
 }
-void GenericDuel::RematchResult(DuelPlayer* dp, unsigned char rematch) {
+void GenericDuel::RematchResult(DuelPlayer* dp, uint8_t rematch) {
 	if(seeking_rematch) {
 		if(!rematch) {
 			dp->type = NETPLAYER_TYPE_OBSERVER;
@@ -571,7 +571,7 @@ void GenericDuel::RematchResult(DuelPlayer* dp, unsigned char rematch) {
 		}
 	}
 }
-void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
+void GenericDuel::TPResult(DuelPlayer* dp, uint8_t tp) {
 	if(dp->state != CTOS_TP_RESULT)
 		return;
 	duel_stage = DUEL_STAGE_DUELING;
@@ -642,7 +642,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.Write<uint32_t>(opt, false);
 	last_replay.Flush();
 	//
-	std::vector<unsigned int> extracards;
+	std::vector<uint32_t> extracards;
 	if(host_info.extra_rules & SEALED_DUEL)
 		extracards.push_back(511005092);
 	if(host_info.extra_rules & BOOSTER_DUEL)
@@ -672,7 +672,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		card_info.code = extracards[i];
 		OCG_DuelNewCard(pduel, card_info);
 	}
-	for(int32_t j = 0; j < (int32_t)players.home.size(); j++) {
+	for(uint32_t j = 0; j < (int32_t)players.home.size(); j++) {
 		auto& dueler = players.home[j];
 		card_info.duelist = j;
 		card_info.loc = LOCATION_DECK;
@@ -755,7 +755,7 @@ void GenericDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 }
 void GenericDuel::Process() {
 	std::vector<uint8_t> duelBuffer;
-	unsigned int engFlag = 0, message_len = 0;
+	uint32_t engFlag = 0;
 	int stop = 0;
 	do {
 		engFlag = OCG_DuelProcess(pduel);
@@ -806,7 +806,7 @@ void GenericDuel::Surrender(DuelPlayer* dp) {
 	/*if((players.home.size() + players.opposing.size()) != 2 || (players.home.front().player != dp && players.opposing.front().player != dp) || !pduel)
 		return;*/
 	if(pduel) {
-		unsigned char wbuf[3];
+		uint8_t wbuf[3];
 		uint32_t player = dp->type < players.home_size ? 0 : 1;
 		wbuf[0] = MSG_WIN;
 		wbuf[1] = 1 - player;
@@ -1308,7 +1308,7 @@ int GenericDuel::Analyze(CoreUtils::Packet packet) {
 	new_replay.Flush();
 	return return_value;
 }
-void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
+void GenericDuel::GetResponse(DuelPlayer* dp, void* pdata, uint32_t len) {
 	last_replay.Write<uint8_t>(len, false);
 	last_replay.WriteData(pdata, len);
 	OCG_DuelSetResponse(pduel, pdata, len);
@@ -1356,7 +1356,7 @@ void GenericDuel::EndDuel() {
 void GenericDuel::WaitforResponse(uint8_t playerid) {
 	last_response = playerid;
 	IteratePlayers([&player=cur_player[playerid]](duelist& dueler) {
-		static const unsigned char msg = MSG_WAITING;
+		static const uint8_t msg = MSG_WAITING;
 		if(dueler.player != player)
 			NetServer::SendPacketToPlayer(dueler.player, STOC_GAME_MSG, msg);
 	});

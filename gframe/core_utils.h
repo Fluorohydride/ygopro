@@ -22,7 +22,7 @@ public:
 		data.insert(data.begin(), (uint8_t)message);
 	};
 	uint8_t message;
-	std::vector<unsigned char> data;
+	std::vector<uint8_t> data;
 };
 class PacketStream {
 public:

@@ -45,7 +45,7 @@ public:
 	void GetHoveredCard();
 	bool FiltersChanged();
 	void FilterCards(bool force_refresh = false);
-	bool CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std::vector<std::wstring>& tokens, const std::vector<unsigned int>& setcode);
+	bool CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std::vector<std::wstring>& tokens, const std::vector<uint32_t>& setcode);
 	void StartFilter(bool force_refresh = false);
 	void ClearFilter();
 	void ClearSearch();
@@ -60,25 +60,25 @@ public:
 	bool check_limit(CardDataC* pointer);
 #define DECLARE_WITH_CACHE(type, name) type name;\
 										type prev_##name;
-	DECLARE_WITH_CACHE(long long, filter_effect)
-	DECLARE_WITH_CACHE(unsigned int, filter_type)
-	DECLARE_WITH_CACHE(unsigned int, filter_type2)
-	DECLARE_WITH_CACHE(unsigned int, filter_attrib)
-	DECLARE_WITH_CACHE(unsigned int, filter_race)
-	DECLARE_WITH_CACHE(unsigned int, filter_atktype)
-	DECLARE_WITH_CACHE(int, filter_atk)
-	DECLARE_WITH_CACHE(unsigned int, filter_deftype)
-	DECLARE_WITH_CACHE(int, filter_def)
-	DECLARE_WITH_CACHE(unsigned int, filter_lvtype)
-	DECLARE_WITH_CACHE(unsigned int, filter_lv)
-	DECLARE_WITH_CACHE(unsigned int, filter_scltype)
-	DECLARE_WITH_CACHE(unsigned int, filter_scl)
-	DECLARE_WITH_CACHE(unsigned int, filter_marks)
+	DECLARE_WITH_CACHE(uint64_t, filter_effect)
+	DECLARE_WITH_CACHE(uint32_t, filter_type)
+	DECLARE_WITH_CACHE(uint32_t, filter_type2)
+	DECLARE_WITH_CACHE(uint32_t, filter_attrib)
+	DECLARE_WITH_CACHE(uint32_t, filter_race)
+	DECLARE_WITH_CACHE(uint32_t, filter_atktype)
+	DECLARE_WITH_CACHE(int32_t, filter_atk)
+	DECLARE_WITH_CACHE(uint32_t, filter_deftype)
+	DECLARE_WITH_CACHE(int32_t, filter_def)
+	DECLARE_WITH_CACHE(uint32_t, filter_lvtype)
+	DECLARE_WITH_CACHE(uint32_t, filter_lv)
+	DECLARE_WITH_CACHE(uint32_t, filter_scltype)
+	DECLARE_WITH_CACHE(uint32_t, filter_scl)
+	DECLARE_WITH_CACHE(uint32_t, filter_marks)
 	DECLARE_WITH_CACHE(limitation_search_filters, filter_lm)
 #undef DECLARE_WITH_CACHE
 
 	irr::core::position2di mouse_pos;
-	int hovered_code;
+	uint32_t hovered_code;
 	int hovered_pos;
 	int hovered_seq;
 	int is_lastcard;

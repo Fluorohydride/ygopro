@@ -89,10 +89,10 @@ struct DuelInfo {
 	std::vector<std::wstring> opponames;
 	std::wstring strLP[2];
 	std::wstring vic_string;
-	unsigned char player_type;
-	unsigned char time_player;
-	unsigned short time_limit;
-	unsigned short time_left[2];
+	uint8_t player_type;
+	uint8_t time_player;
+	uint16_t time_limit;
+	uint16_t time_left[2];
 	DiscordWrapper::DiscordSecret secret;
 	bool isReplaySwapped;
 };
@@ -253,8 +253,8 @@ public:
 	bool hideChat;
 	float chatTiming[8];
 	int chatType[8];
-	unsigned short linePatternD3D;
-	unsigned short linePatternGL;
+	uint16_t linePatternD3D;
+	uint16_t linePatternGL;
 	float waitFrame;
 	uint32_t signalFrame;
 	bool saveReplay;
@@ -279,8 +279,8 @@ public:
 
 	bool is_building;
 	bool is_siding;
-	int forbiddentypes;
-	unsigned short extra_rules;
+	uint32_t forbiddentypes;
+	uint16_t extra_rules;
 	uint32_t duel_param;
 	uint32_t showingcard;
 	bool cardimagetextureloading;

@@ -80,7 +80,7 @@ void LoadReplay() {
 	mainGame->dField.Clear();
 	mainGame->HideElement(mainGame->wReplay);
 	mainGame->device->setEventReceiver(&mainGame->dField);
-	unsigned int start_turn;
+	int start_turn;
 	try { start_turn = std::stoi(mainGame->ebRepStartTurn->getText());  }
 	catch(...) { start_turn = 0; }
 	if(start_turn == 1)
@@ -307,9 +307,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(mainGame->isHostingOnline) {
 					ServerLobby::JoinServer(true);
 				} else {
-					unsigned int host_port;
+					uint16_t host_port;
 					try {
-						host_port = std::stoi(mainGame->ebHostPort->getText());
+						host_port = static_cast<uint16_t>(std::stoul(mainGame->ebHostPort->getText()));
 					}
 					catch(...) {
 						break;

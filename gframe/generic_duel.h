@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <cstdint>
+#include <set>
 #include "config.h"
 #include "network.h"
 #include "replay.h"
@@ -20,16 +21,16 @@ public:
 	virtual void ToDuelist(DuelPlayer* dp);
 	virtual void ToObserver(DuelPlayer* dp);
 	virtual void PlayerReady(DuelPlayer* dp, bool ready);
-	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos);
+	virtual void PlayerKick(DuelPlayer* dp, uint8_t pos);
 	virtual void UpdateDeck(DuelPlayer* dp, void* pdata, uint32_t len);
 	virtual void StartDuel(DuelPlayer* dp);
-	virtual void HandResult(DuelPlayer* dp, unsigned char res);
-	virtual void RematchResult(DuelPlayer* dp, unsigned char rematch);
-	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
+	virtual void HandResult(DuelPlayer* dp, uint8_t res);
+	virtual void RematchResult(DuelPlayer* dp, uint8_t rematch);
+	virtual void TPResult(DuelPlayer* dp, uint8_t tp);
 	virtual void Process();
 	virtual void Surrender(DuelPlayer* dp);
 	virtual int Analyze(CoreUtils::Packet packet);
-	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
+	virtual void GetResponse(DuelPlayer* dp, void* pdata, uint32_t len);
 	virtual void TimeConfirm(DuelPlayer* dp);
 	virtual void EndDuel();
 
@@ -67,11 +68,11 @@ protected:
 		void Clear() { player = nullptr; ready = false; pdeck.clear(); deck_error = 0; }
 	};
 	bool CheckReady();
-	int GetCount(const std::vector<duelist>& players);
+	uint32_t GetCount(const std::vector<duelist>& players);
 	bool CheckFree(const std::vector<duelist>& players);
 	int GetFirstFree(int start = 0);
 	void SetAtPos(DuelPlayer* dp, size_t pos);
-	duelist& GetAtPos(int pos);
+	duelist& GetAtPos(uint8_t pos);
 	void Catchup(DuelPlayer* dp);
 	int GetPos(DuelPlayer* dp);
 	void OrderPlayers(std::vector<duelist>& players, int offset = 0);
@@ -83,7 +84,7 @@ protected:
 	struct {
 		std::vector<duelist> home;
 		std::vector<duelist> opposing;
-		int home_size, opposing_size;
+		uint32_t home_size, opposing_size;
 		std::vector<duelist>::iterator home_iterator, opposing_iterator;
 	} players;
 	DuelPlayer* cur_player[2];
@@ -94,9 +95,9 @@ protected:
 	Replay new_replay;
 	bool relay;
 	int best_of;
-	int match_kill;
-	int turn_count;
-	std::vector<char> match_result;
+	uint32_t match_kill;
+	uint32_t turn_count;
+	std::vector<uint8_t> match_result;
 	uint16_t time_limit[2];
 	int16_t grace_period;
 };

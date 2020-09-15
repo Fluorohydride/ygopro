@@ -762,7 +762,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						sort_list[sel_seq] = select_min;
 						mainGame->stCardPos[id - BUTTON_CARD_0]->setText(fmt::to_wstring(select_min).c_str());
 						if(select_min == select_max) {
-							unsigned char respbuf[64];
+							uint8_t respbuf[64];
 							for(uint32_t i = 0; i < select_max; ++i)
 								respbuf[i] = sort_list[i] - 1;
 							DuelClient::SetResponseB(respbuf, select_max);
@@ -1314,7 +1314,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case MSG_SELECT_DISFIELD: {
 				if (!(hovered_location & LOCATION_ONFIELD))
 					break;
-				unsigned int flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
+				uint32_t flag = 1 << (hovered_sequence + (hovered_controler << 4) + ((hovered_location == LOCATION_MZONE) ? 0 : 8));
 				if(hovered_location == LOCATION_MZONE && (hovered_sequence == 5 || hovered_sequence == 6)) {
 					if((flag & selectable_field) == 0 && selectable_field & 0x600000)
 						flag = 1 << ((11 - hovered_sequence) + (1 << 4));
@@ -1327,7 +1327,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						selected_field |= flag;
 						select_min--;
 						if (select_min == 0) {
-							unsigned char respbuf[80];
+							uint8_t respbuf[80];
 							int filter = 1;
 							int p = 0;
 							for (int i = 0; i < 7; ++i, filter <<= 1) {
@@ -1439,7 +1439,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					clicked_card->is_selectable = false;
 				select_counter_count--;
 				if (select_counter_count == 0) {
-					unsigned short int respbuf[32];
+					uint16_t respbuf[32];
 					for(size_t i = 0; i < selectable_cards.size(); ++i)
 						respbuf[i] = (selectable_cards[i]->opParam >> 16) - (selectable_cards[i]->opParam & 0xffff);
 					mainGame->stHintMsg->setVisible(false);
@@ -1613,7 +1613,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								str.append(fmt::format(L"\n*{}", gDataManager->GetDesc(iter->first, mainGame->dInfo.compat_mode)));
 							}
 							should_show_tip = true;
-							irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(str.c_str()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
+							auto dtip = mainGame->textFont->getDimension(str.c_str()) + mainGame->Scale(irr::core::dimension2d<uint32_t>(10, 10));
 							mainGame->stTip->setRelativePosition(irr::core::recti(mousepos.X - mainGame->Scale(10) - dtip.Width, mousepos.Y - mainGame->Scale(10) - dtip.Height, mousepos.X - mainGame->Scale(10), mousepos.Y - mainGame->Scale(10)));
 							mainGame->stTip->setText(str.c_str());
 						}
@@ -1641,7 +1641,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						player_name.append(fmt::format(L"\n*{}", gDataManager->GetDesc(hint.first, mainGame->dInfo.compat_mode)));
 					}
 					should_show_tip = true;
-					irr::core::dimension2d<unsigned int> dtip = mainGame->textFont->getDimension(player_name.c_str()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
+					auto dtip = mainGame->textFont->getDimension(player_name.c_str()) + mainGame->Scale(irr::core::dimension2d<uint32_t>(10, 10));
 					mainGame->stTip->setRelativePosition(irr::core::recti(mousepos.X - mainGame->Scale(10) - dtip.Width, mousepos.Y + mainGame->Scale(10), mousepos.X - mainGame->Scale(10), mousepos.Y + mainGame->Scale(10) + dtip.Height));
 					mainGame->stTip->setText(player_name.c_str());
 				}
@@ -2047,7 +2047,7 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 					break;
 				const wchar_t* input = mainGame->ebChatInput->getText();
 				if(input[0]) {
-					unsigned short msgbuf[256];
+					uint16_t msgbuf[256];
 					int len = BufferIO::CopyWStr(input, msgbuf, 256);
 					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
 					mainGame->ebChatInput->setText(L"");
@@ -2743,7 +2743,7 @@ void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* e
 		irr::s32 x = (ePos.UpperLeftCorner.X + ePos.LowerRightCorner.X) / 2;
 		irr::s32 y = ePos.LowerRightCorner.Y;
 		mainGame->stCardListTip->setText(str.c_str());
-		irr::core::dimension2d<unsigned int> dTip = mainGame->guiFont->getDimension(mainGame->stCardListTip->getText()) + mainGame->Scale(irr::core::dimension2d<unsigned int>(10, 10));
+		auto dTip = mainGame->guiFont->getDimension(mainGame->stCardListTip->getText()) + mainGame->Scale(irr::core::dimension2d<uint32_t>(10, 10));
 		irr::s32 w = dTip.Width / 2;
 		if(x - w < mainGame->Scale(10))
 			x = w + mainGame->Scale(10);
@@ -2772,7 +2772,7 @@ int GetSuitableReturn(uint32_t maxseq, size_t size) {
 void ClientField::SetResponseSelectedCards() const {
 	if (!mainGame->dInfo.compat_mode) {
 		if(mainGame->dInfo.curMsg == MSG_SELECT_UNSELECT_CARD) {
-			unsigned int respbuf[] = { 1, selected_cards[0]->select_seq };
+			uint32_t respbuf[] = { 1, selected_cards[0]->select_seq };
 			DuelClient::SetResponseB((char*)respbuf, sizeof(respbuf));
 		} else {
 			uint32_t maxseq = 0;

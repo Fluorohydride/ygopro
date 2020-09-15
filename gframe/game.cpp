@@ -48,7 +48,7 @@
 #define MATERIAL_GUARD(f) do {f;} while(false);
 #endif
 
-unsigned short PRO_VERSION = 0x1351;
+uint16_t PRO_VERSION = 0x1351;
 
 namespace ygo {
 
@@ -2834,7 +2834,7 @@ void Game::ReloadElementsStrings() {
 		elem.first->setText(gDataManager->GetSysString(elem.second).c_str());
 	}
 
-	unsigned int nullLFlist = gdeckManager->_lfList.size() - 1;
+	uint32_t nullLFlist = gdeckManager->_lfList.size() - 1;
 	gdeckManager->_lfList[nullLFlist].listName = gDataManager->GetSysString(1442);
 	auto prev = cbDBLFList->getSelected();
 	cbDBLFList->removeItem(nullLFlist);
@@ -3252,11 +3252,11 @@ bool Game::LoadScript(OCG_Duel pduel, const std::string& script_name) {
 	return buf.size() && OCG_LoadScript(pduel, buf.data(), buf.size(), script_name.c_str());
 }
 OCG_Duel Game::SetupDuel(OCG_DuelOptions opts) {
-	opts.cardReader = (OCG_DataReader)&DataManager::CardReader;
-	opts.payload1 = &*(gDataManager);
-	opts.scriptReader = (OCG_ScriptReader)&ScriptReader;
+	opts.cardReader = (OCG_DataReader)DataManager::CardReader;
+	opts.payload1 = gDataManager;
+	opts.scriptReader = (OCG_ScriptReader)ScriptReader;
 	opts.payload2 = this;
-	opts.logHandler = (OCG_LogHandler)&MessageHandler;
+	opts.logHandler = (OCG_LogHandler)MessageHandler;
 	opts.payload3 = this;
 	OCG_Duel pduel = nullptr;
 	OCG_CreateDuel(&pduel, opts);

@@ -264,7 +264,7 @@ inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 			it++;
 			continue;
 		}
-		if ((unsigned)(*it - CAST('0')) > 9) {
+		if ((uint32_t)(*it - CAST('0')) > 9) {
 			it = input.erase(it);
 			changed = true;
 			continue;

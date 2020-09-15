@@ -27,10 +27,10 @@
 #define DEFAULT_DUEL_RULE 5
 namespace ygo {
 
-unsigned DuelClient::connect_state = 0;
-std::vector<unsigned char> DuelClient::response_buf;
-unsigned int DuelClient::watching = 0;
-unsigned char DuelClient::selftype = 0;
+uint32_t DuelClient::connect_state = 0;
+std::vector<uint8_t> DuelClient::response_buf;
+uint32_t DuelClient::watching = 0;
+uint8_t DuelClient::selftype = 0;
 bool DuelClient::is_host = false;
 bool DuelClient::is_local_host = false;
 event_base* DuelClient::client_base = nullptr;
@@ -49,18 +49,18 @@ bool DuelClient::is_swapping = false;
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
 std::vector<HostPacket> DuelClient::hosts;
-std::set<unsigned int> DuelClient::remotes;
+std::set<uint32_t> DuelClient::remotes;
 event* DuelClient::resp_event = 0;
 
-unsigned int DuelClient::temp_ip = 0;
-unsigned short DuelClient::temp_port = 0;
-unsigned short DuelClient::temp_ver = 0;
+uint32_t DuelClient::temp_ip = 0;
+uint16_t DuelClient::temp_port = 0;
+uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
-std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wstring& address, const std::wstring& _port) {
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(const std::wstring& address, const std::wstring& _port) {
 	char ip[20];
 	BufferIO::CopyWStr(address.c_str(), ip, 16);
-	unsigned int remote_addr = htonl(inet_addr(ip));
+	uint32_t remote_addr = htonl(inet_addr(ip));
 	if(remote_addr == -1) {
 		char hostname[100];
 		char port[6];
@@ -82,14 +82,14 @@ std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wst
 			remote_addr = htonl(inet_addr(ip));
 		}
 	}
-	return { remote_addr, (unsigned short)std::stoi(_port) };
+	return { remote_addr, (uint16_t)std::stoi(_port) };
 }
 
-std::pair<unsigned int, unsigned short> DuelClient::ResolveServer(const std::wstring & address, int port) {
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(const std::wstring & address, int port) {
 	return DuelClient::ResolveServer(address, std::to_wstring(port));
 }
 
-bool DuelClient::StartClient(unsigned int ip, unsigned short port, unsigned int gameid, bool create_game) {
+bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {
 	if(connect_state)
 		return false;
 	sockaddr_in sin;
@@ -327,9 +327,9 @@ T getStruct(void* data, size_t len) {
 	memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
 	return pkt;
 }
-void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
+void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 	char* pdata = data;
-	unsigned char pktType = BufferIO::Read<uint8_t>(pdata);
+	uint8_t pktType = BufferIO::Read<uint8_t>(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
 		if(mainGame->analyzeMutex.try_lock()){
@@ -653,7 +653,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(pkt.info.no_shuffle_deck) {
 			str.append(fmt::format(L"*{}\n", gDataManager->GetSysString(1230)));
 		}
-		static const std::map<unsigned int, unsigned int> MONSTER_TYPES = {
+		static const std::map<uint32_t, uint32_t> MONSTER_TYPES = {
 			{ TYPE_FUSION, 1056 },
 			{ TYPE_SYNCHRO, 1063 },
 			{ TYPE_XYZ, 1073 },
@@ -975,8 +975,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_HS_PLAYER_CHANGE: {
 		auto pkt = getStruct<STOC_HS_PlayerChange>(pdata, len);
-		unsigned char pos = (pkt.status >> 4) & 0xf;
-		unsigned char state = pkt.status & 0xf;
+		uint8_t pos = (pkt.status >> 4) & 0xf;
+		uint8_t state = pkt.status & 0xf;
 		if(pos > 5)
 			break;
 		mainGame->gMutex.lock();
@@ -1071,8 +1071,8 @@ bool DuelClient::CheckReady() {
 	}
 	return ready1 && ready2;
 }
-std::pair<int, int> DuelClient::GetPlayersCount() {
-	int count1 = 0, count2 = 0;
+std::pair<uint32_t, uint32_t> DuelClient::GetPlayersCount() {
+	uint32_t count1 = 0, count2 = 0;
 	for(int i = 0; i < mainGame->dInfo.team1; i++) {
 		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
 			count1++;
@@ -1087,7 +1087,7 @@ std::pair<int, int> DuelClient::GetPlayersCount() {
 }
 #define COMPAT_READ(val1,val2,buf) (mainGame->dInfo.compat_mode) ? BufferIO::Read<val1>(buf) : BufferIO::Read<val2>(buf)
 #define PLAY_SOUND(sound) if (!mainGame->dInfo.isCatchingUp) gSoundManager->PlaySoundEffect(sound)
-int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
+int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 	char* pbuf = msg;
 	if(!mainGame->dInfo.isReplay) {
 		mainGame->dInfo.curMsg = BufferIO::Read<uint8_t>(pbuf);
@@ -1266,9 +1266,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		case HINT_ZONE: {
 			if(player == 1)
 				data = (data >> 16) | (data << 16);
-			for(unsigned filter = 0x1; filter != 0; filter <<= 1) {
+			for(uint32_t filter = 0x1; filter != 0; filter <<= 1) {
 				std::wstring str;
-				if(unsigned s = filter & data) {
+				if(uint32_t s = filter & data) {
 					if(s & 0x60) {
 						str += gDataManager->GetSysString(1081);
 						data &= ~0x600000;
@@ -2014,7 +2014,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		}
 		mainGame->dField.selectable_field = ~flag;
 		mainGame->dField.selected_field = 0;
-		unsigned char respbuf[64];
+		uint8_t respbuf[64];
 		bool pzone = false;
 		std::wstring text;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE) {
@@ -2041,7 +2041,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				respbuf[1] = ((1 << res) & 0x7f007f) ? LOCATION_MZONE : LOCATION_SZONE;
 				respbuf[2] = (res%16) - (2 * (respbuf[1] - LOCATION_MZONE));
 			} else {
-				unsigned int filter;
+				uint32_t filter;
 				if(mainGame->dField.selectable_field & 0x7f) {
 					respbuf[0] = mainGame->LocalPlayer(0);
 					respbuf[1] = LOCATION_MZONE;
@@ -4276,7 +4276,7 @@ void DuelClient::SetResponseI(int respI) {
 	response_buf.resize(sizeof(int));
 	memcpy(response_buf.data(), &respI, sizeof(int));
 }
-void DuelClient::SetResponseB(void* respB, unsigned int len) {
+void DuelClient::SetResponseB(void* respB, uint32_t len) {
 	response_buf.resize(len);
 	memcpy(response_buf.data(), respB, len);
 }
@@ -4369,7 +4369,7 @@ void DuelClient::BeginRefreshHost() {
 	for(int i = 0; i < 8; ++i) {
 		if(host->h_addr_list[i] == 0)
 			break;
-		addresses[i] = *(unsigned int*)host->h_addr_list[i];
+		addresses[i] = *(uint32_t*)host->h_addr_list[i];
 	}
 #endif
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -4436,7 +4436,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 		socklen_t sz = sizeof(sockaddr_in);
 		char buf[256];
 		/*int ret = */recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
-		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
+		uint32_t ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
 		if(!is_closing && pHP->identifier == NETWORK_SERVER_ID && remotes.find(ipaddr) == remotes.end() ) {
 			mainGame->gMutex.lock();

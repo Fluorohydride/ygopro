@@ -46,7 +46,7 @@ void SingleMode::Restart() {
 	StopPlay();
 	is_restarting = true;
 }
-void SingleMode::SetResponse(unsigned char* resp, unsigned int len) {
+void SingleMode::SetResponse(void* resp, uint32_t len) {
 	if(!pduel)
 		return;
 	last_replay.Write<uint8_t>(len, false);
@@ -57,7 +57,7 @@ int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
 	uint32_t opt = duelOptions.duelFlags;
 	std::string script_name = "";
 	auto InitReplay = [&]() {
-		unsigned short buffer[20];
+		uint16_t buffer[20];
 		BufferIO::CopyWStr(mainGame->dInfo.selfnames[0].c_str(), buffer, 20);
 		last_replay.WriteData(buffer, 40, false);
 		new_replay.WriteData(buffer, 40, false);
