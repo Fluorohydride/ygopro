@@ -56,7 +56,7 @@ void GenericDuel::ResendToAll() {
 
 void GenericDuel::ResendToAll(DuelPlayer* except) {
 	IteratePlayersAndObs([&except](DuelPlayer* dueler) {
-		if(except != except)
+		if(except != dueler)
 			NetServer::ReSendToPlayer(dueler);
 	});
 }
