@@ -1085,8 +1085,6 @@ std::pair<uint32_t, uint32_t> DuelClient::GetPlayersCount() {
 	}
 	return { count1, count2 };
 }
-#define COMPAT_READ(val1,val2,buf) (mainGame->dInfo.compat_mode) ? BufferIO::Read<val1>(buf) : BufferIO::Read<val2>(buf)
-#define PLAY_SOUND(sound) if (!mainGame->dInfo.isCatchingUp) gSoundManager->PlaySoundEffect(sound)
 template<typename T1, typename T2>
 inline T2 CompatRead(char*& p) {
 	if(mainGame->dInfo.compat_mode)
