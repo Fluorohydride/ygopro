@@ -1086,7 +1086,7 @@ std::pair<uint32_t, uint32_t> DuelClient::GetPlayersCount() {
 	return { count1, count2 };
 }
 template<typename T1, typename T2>
-inline T2 CompatRead(char*& p) {
+inline T2 CompatRead(char*& buf) {
 	if(mainGame->dInfo.compat_mode)
 		return static_cast<T2>(BufferIO::Read<T1>(buf));
 	return BufferIO::Read<T2>(buf);
