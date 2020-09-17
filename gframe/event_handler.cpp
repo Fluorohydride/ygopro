@@ -2316,14 +2316,18 @@ void ClientField::SetShowMark(ClientCard* pcard, bool enable) {
 }
 void ClientField::ShowCardInfoInList(ClientCard* pcard, irr::gui::IGUIElement* element, irr::gui::IGUIElement* parent) {
 	std::wstring str(L"");
+	wchar_t formatBuffer[2048];
 	if(pcard->code) {
 		str.append(dataManager.GetName(pcard->code));
+	}
+	if(pcard->overlayTarget) {
+		myswprintf(formatBuffer, dataManager.GetSysString(225), dataManager.GetName(pcard->overlayTarget->code), pcard->overlayTarget->sequence + 1);
+		str.append(L"\n").append(formatBuffer);
 	}
 	if((pcard->status & STATUS_PROC_COMPLETE)
 		&& (pcard->type & (TYPE_RITUAL | TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK | TYPE_SPSUMMON)))
 		str.append(L"\n").append(dataManager.GetSysString(224));
 	for(size_t i = 0; i < chains.size(); ++i) {
-		wchar_t formatBuffer[2048];
 		auto chit = chains[i];
 		if(pcard == chit.chain_card) {
 			myswprintf(formatBuffer, dataManager.GetSysString(216), i + 1);
