@@ -1690,7 +1690,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_SELECT_PLACE:
 	case MSG_SELECT_DISFIELD: {
 		int selecting_player = BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_min = count > 0 ? count : 1;
+		mainGame->dField.select_ready = false;
+		mainGame->dField.select_cancelable = count == 0;
 		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
 		if(selecting_player == mainGame->LocalPlayer(1))
 			mainGame->dField.selectable_field = (mainGame->dField.selectable_field >> 16) | (mainGame->dField.selectable_field << 16);
@@ -1764,6 +1767,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			SetResponseB(respbuf, 3);
 			DuelClient::SendResponse();
 			return true;
+		}
+		if(mainGame->dField.select_cancelable) {
+			mainGame->dField.ShowCancelOrFinishButton(1);
 		}
 		return false;
 	}
