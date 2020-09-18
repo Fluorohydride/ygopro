@@ -201,10 +201,10 @@ bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const p
 #ifdef UPDATE_URL
 void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callback) {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	auto& path = ygo::Utils::GetExePath();
+	auto path = ygo::Utils::GetExePath();
 	ygo::Utils::FileMove(path, fmt::format(EPRO_TEXT("{}.old"), path));
 #if !defined(__linux__)
-	auto& corepath = ygo::Utils::GetCorePath();
+	auto corepath = ygo::Utils::GetCorePath();
 	ygo::Utils::FileMove(corepath, fmt::format(EPRO_TEXT("{}.old"), path));
 #endif
 #endif

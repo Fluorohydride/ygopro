@@ -37,10 +37,10 @@ namespace ygo {
 #ifdef _WIN32
 		return CopyFile(source.data(), destination.data(), false);
 #else
-		std::ifstream src(source, std::ios::binary);
+		std::ifstream src(source.data(), std::ios::binary);
 		if(!src.is_open())
 			return false;
-		std::ofstream dst(destination, std::ios::binary);
+		std::ofstream dst(destination.data(), std::ios::binary);
 		if(!dst.is_open())
 			return false;
 		dst << src.rdbuf();
@@ -231,7 +231,7 @@ namespace ygo {
 			archive.mutex->lock();
 			int res = -1;
 			auto list = archive.archive->getFileList();
-			res = list->findFile(fmt::format((EPRO_TEXT("{}{}"), path, name)).c_str());
+			res = list->findFile(fmt::format(EPRO_TEXT("{}{}"), path, name).c_str());
 			if(res != -1) {
 				auto reader = archive.archive->createAndOpenFile(res);
 				if(reader)
