@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstring>
 #include <wchar.h>
+#include "text_types.h"
 
 class BufferIO {
 public:
@@ -128,21 +129,21 @@ public:
 		*wp = 0;
 		return wp - wstr;
 	}
-	static std::string EncodeUTF8s(const std::wstring& source) {
+	static std::string EncodeUTF8s(epro_wstringview source) {
 		thread_local std::vector<char> res;
 		res.reserve(source.size() * 4 + 1);
-		EncodeUTF8(source.c_str(), const_cast<char*>(res.data()));
+		EncodeUTF8(source.data(), const_cast<char*>(res.data()));
 		return res.data();
 	}
 	// UTF-8 to UTF-16/UTF-32
-	static std::wstring DecodeUTF8s(const std::string& source) {
+	static std::wstring DecodeUTF8s(epro_stringview source) {
 		thread_local std::vector<wchar_t> res;
 #if	WCHAR_MAX == 0xffff
 			res.reserve(source.size() * 2 + 1);
 #else
 			res.reserve(source.size() + 1);
 #endif
-		DecodeUTF8(source.c_str(), const_cast<wchar_t*>(res.data()));
+		DecodeUTF8(source.data(), const_cast<wchar_t*>(res.data()));
 		return res.data();
 	}
 	static uint32_t GetVal(const wchar_t* pstr) {

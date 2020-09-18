@@ -81,7 +81,7 @@ struct DuelInfo {
 	int duel_field;
 	int duel_params;
 	int turn;
-	short curMsg;
+	uint8_t curMsg;
 	int team1;
 	int team2;
 	int best_of;
@@ -131,7 +131,7 @@ public:
 	void DrawMisc();
 	void DrawStatus(ClientCard* pcard);
 	void DrawPendScale(ClientCard* pcard);
-	void DrawStackIndicator(const std::wstring& text, irr::video::S3DVertex* v, bool opponent);
+	void DrawStackIndicator(epro_wstringview text, irr::video::S3DVertex* v, bool opponent);
 	void DrawGUI();
 	void DrawSpec();
 	void DrawBackImage(irr::video::ITexture* texture, bool resized);
@@ -158,13 +158,13 @@ public:
 	void ShowCardInfo(uint32_t code, bool resize = false, ImageManager::imgType type = ImageManager::imgType::ART);
 	void RefreshCardInfoTextPositions();
 	void ClearCardInfo(int player = 0);
-	void AddChatMsg(const std::wstring& msg, int player, int type);
-	void AddLog(const std::wstring& msg, int param = 0);
+	void AddChatMsg(epro_wstringview msg, int player, int type);
+	void AddLog(epro_wstringview msg, int param = 0);
 	void ClearChatMsg();
-	void AddDebugMsg(const std::string& msg);
+	void AddDebugMsg(epro_stringview msg);
 	void ClearTextures();
 	void CloseDuelWindow();
-	void PopupMessage(const std::wstring& text, const std::wstring& caption = L"");
+	void PopupMessage(epro_wstringview text, epro_wstringview caption = L"");
 
 	uint8_t LocalPlayer(uint8_t player);
 	void UpdateDuelParam();
@@ -219,8 +219,8 @@ public:
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
 	OCG_Duel SetupDuel(OCG_DuelOptions opts);
 	path_string FindScript(const path_string& script_name);
-	std::vector<char> LoadScript(const std::string& script_name);
-	bool LoadScript(OCG_Duel pduel, const std::string& script_name);
+	std::vector<char> LoadScript(epro_stringview script_name);
+	bool LoadScript(OCG_Duel pduel, epro_stringview script_name);
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
 	static void MessageHandler(void* payload, const char* string, int type);
 	static void UpdateDownloadBar(int percentage, int cur, int tot, const char* filename, bool is_new, void* payload);

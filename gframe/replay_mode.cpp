@@ -148,7 +148,7 @@ void ReplayMode::EndDuel() {
 	if(!is_closing) {
 		mainGame->actionSignal.Reset();
 		mainGame->gMutex.lock();
-		mainGame->stMessage->setText(gDataManager->GetSysString(1501).c_str());
+		mainGame->stMessage->setText(gDataManager->GetSysString(1501).data());
 		if(mainGame->wCardSelect->isVisible())
 			mainGame->HideElement(mainGame->wCardSelect);
 		mainGame->PopupElement(mainGame->wMessage);
@@ -237,7 +237,7 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				mainGame->gMutex.unlock();
 			}
 			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(gDataManager->GetSysString(1434).c_str());
+			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();

@@ -160,7 +160,7 @@ void RepoManager::LoadRepositoriesFromJson(const nlohmann::json& configs) {
 				}
 			}
 			catch(std::exception& e) {
-				ErrorLog(std::string("Exception occurred: ") + e.what());
+				ErrorLog(fmt::format("Exception occurred: {}", e.what()));
 			}
 		}
 	}

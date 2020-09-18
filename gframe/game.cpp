@@ -97,7 +97,7 @@ bool Game::Initialize() {
 	if(!(ocgcore = LoadOCGcore(gGameConfig->working_directory + EPRO_TEXT("./"))) && !(ocgcore = LoadOCGcore(gGameConfig->working_directory + EPRO_TEXT("./expansions/"))))
 		coreloaded = false;
 #endif
-	skinSystem = new CGUISkinSystem((gGameConfig->working_directory + EPRO_TEXT("./skin")).c_str(), device);
+	skinSystem = new CGUISkinSystem((gGameConfig->working_directory + EPRO_TEXT("./skin")).data(), device);
 	if(!skinSystem)
 		ErrorLog("Couldn't create skin system");
 	linePatternGL = 0x0f0f;
@@ -114,10 +114,10 @@ bool Game::Initialize() {
 		discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();
 	env = device->getGUIEnvironment();
-	numFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(16), {});
-	adFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(12), {});
-	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.c_str(), Scale(48), {});
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->textfont.c_str(), Scale(gGameConfig->textfontsize), {});
+	numFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.data(), Scale(16), {});
+	adFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.data(), Scale(12), {});
+	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->numfont.data(), Scale(48), {});
+	guiFont = irr::gui::CGUITTFont::createTTFont(env, gGameConfig->textfont.data(), Scale(gGameConfig->textfontsize), {});
 	textFont = guiFont;
 	if(!numFont || !textFont || !adFont || !lpcFont || !guiFont) {
 		ErrorLog("Failed to load font(s)!");
@@ -127,7 +127,7 @@ bool Game::Initialize() {
 		gGameConfig->skin = NoSkinLabel();
 	}
 	smgr = device->getSceneManager();
-	wCommitsLog = env->addWindow(Scale(0, 0, 500 + 10, 400 + 35 + 35), false, gDataManager->GetSysString(1209).c_str());
+	wCommitsLog = env->addWindow(Scale(0, 0, 500 + 10, 400 + 35 + 35), false, gDataManager->GetSysString(1209).data());
 	defaultStrings.emplace_back(wCommitsLog, 1209);
 	wCommitsLog->setVisible(false);
 	wCommitsLog->getCloseButton()->setEnabled(false);
@@ -138,13 +138,13 @@ bool Game::Initialize() {
 #ifdef __ANDROID__
 	((irr::gui::CGUICustomText*)stCommitLog)->setTouchControl(!gGameConfig->native_mouse);
 #endif
-	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, gDataManager->GetSysString(1211).c_str());
+	btnCommitLogExit = env->addButton(Scale(215, 435, 285, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXIT, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnCommitLogExit, 1211);
-	chkCommitLogExpand = env->addCheckBox(false, Scale(295, 435, 500, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXPAND, gDataManager->GetSysString(1447).c_str());
+	chkCommitLogExpand = env->addCheckBox(false, Scale(295, 435, 500, 460), wCommitsLog, BUTTON_REPO_CHANGELOG_EXPAND, gDataManager->GetSysString(1447).data());
 	defaultStrings.emplace_back(chkCommitLogExpand, 1447);
 	mTopMenu = irr::gui::CGUICustomMenu::addCustomMenu(env);
-	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2045).c_str(), 1, true, true));
-	mAbout = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(1970).c_str(), 2, true, true));
+	mRepositoriesInfo = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2045).data(), 1, true, true));
+	mAbout = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(1970).data(), 2, true, true));
 	wAbout = env->addWindow(Scale(0, 0, 450, 700), false, L"", mAbout);
 	wAbout->getCloseButton()->setVisible(false);
 	wAbout->setDraggable(false);
@@ -177,7 +177,7 @@ bool Game::Initialize() {
 	((irr::gui::CGUICustomText*)stAbout)->setWordWrap(true);
 	((irr::gui::CGUICustomContextMenu*)mAbout)->addItem(wAbout, -1);
 	wAbout->setRelativePosition(irr::core::recti(0, 0, std::min(Scale(450), stAbout->getTextWidth() + Scale(20)), std::min(stAbout->getTextHeight() + Scale(20), Scale(700))));
-	mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2040).c_str(), 3, true, true));
+	mVersion = mTopMenu->getSubMenu(mTopMenu->addItem(gDataManager->GetSysString(2040).data(), 3, true, true));
 	wVersion = env->addWindow(Scale(0, 0, 300, 135), false, L"", mVersion);
 	wVersion->getCloseButton()->setVisible(false);
 	wVersion->setDraggable(false);
@@ -186,139 +186,139 @@ bool Game::Initialize() {
 	auto formatVersion = []() {
 		return fmt::format(L"Project Ignis: EDOPro | {}.{}.{} \"{}\"", EDOPRO_VERSION_MAJOR, EDOPRO_VERSION_MINOR, EDOPRO_VERSION_PATCH, EDOPRO_VERSION_CODENAME);
 	};
-	stVersion = env->addStaticText(formatVersion().c_str(), Scale(10, 10, 290, 35), false, false, wVersion);
+	stVersion = env->addStaticText(formatVersion().data(), Scale(10, 10, 290, 35), false, false, wVersion);
 	int titleWidth = stVersion->getTextWidth();
 	stVersion->setRelativePosition(irr::core::recti(Scale(10), Scale(10), titleWidth + Scale(10), Scale(35)));
 	stCoreVersion = env->addStaticText(L"", Scale(10, 40, 500, 65), false, false, wVersion);
 	RefreshUICoreVersion();
 	stExpectedCoreVersion = env->addStaticText(
-		GetLocalizedExpectedCore().c_str(),
+		GetLocalizedExpectedCore().data(),
 		Scale(10, 70, 290, 95), false, true, wVersion);
 	stCompatVersion = env->addStaticText(
-		GetLocalizedCompatVersion().c_str(),
+		GetLocalizedCompatVersion().data(),
 		Scale(10, 100, 290, 125), false, true, wVersion);
 	((irr::gui::CGUICustomContextMenu*)mVersion)->addItem(wVersion, -1);
 	//main menu
 	int mainMenuWidth = std::max(280, static_cast<int>(titleWidth / dpi_scale + 15));
 	mainMenuLeftX = 510 - mainMenuWidth / 2;
 	mainMenuRightX = 510 + mainMenuWidth / 2;
-	wMainMenu = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, formatVersion().c_str());
+	wMainMenu = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, formatVersion().data());
 	wMainMenu->getCloseButton()->setVisible(false);
 	//wMainMenu->setVisible(!is_from_discord);
 #define OFFSET(x1, y1, x2, y2) Scale(10, 30 + offset, mainMenuWidth - 10, 60 + offset)
 	int offset = 0;
-	btnOnlineMode = env->addButton(OFFSET(10, 30, 270, 60), wMainMenu, BUTTON_ONLINE_MULTIPLAYER, gDataManager->GetSysString(2042).c_str());
+	btnOnlineMode = env->addButton(OFFSET(10, 30, 270, 60), wMainMenu, BUTTON_ONLINE_MULTIPLAYER, gDataManager->GetSysString(2042).data());
 	defaultStrings.emplace_back(btnOnlineMode, 2042);
 	offset += 35;
-	btnLanMode = env->addButton(OFFSET(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, gDataManager->GetSysString(1200).c_str());
+	btnLanMode = env->addButton(OFFSET(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, gDataManager->GetSysString(1200).data());
 	defaultStrings.emplace_back(btnLanMode, 1200);
 	offset += 35;
-	btnSingleMode = env->addButton(OFFSET(10, 65, 270, 95), wMainMenu, BUTTON_SINGLE_MODE, gDataManager->GetSysString(1201).c_str());
+	btnSingleMode = env->addButton(OFFSET(10, 65, 270, 95), wMainMenu, BUTTON_SINGLE_MODE, gDataManager->GetSysString(1201).data());
 	defaultStrings.emplace_back(btnSingleMode, 1201);
 	offset += 35;
-	btnReplayMode = env->addButton(OFFSET(10, 100, 270, 130), wMainMenu, BUTTON_REPLAY_MODE, gDataManager->GetSysString(1202).c_str());
+	btnReplayMode = env->addButton(OFFSET(10, 100, 270, 130), wMainMenu, BUTTON_REPLAY_MODE, gDataManager->GetSysString(1202).data());
 	defaultStrings.emplace_back(btnReplayMode, 1202);
 	offset += 35;
-	btnDeckEdit = env->addButton(OFFSET(10, 135, 270, 165), wMainMenu, BUTTON_DECK_EDIT, gDataManager->GetSysString(1204).c_str());
+	btnDeckEdit = env->addButton(OFFSET(10, 135, 270, 165), wMainMenu, BUTTON_DECK_EDIT, gDataManager->GetSysString(1204).data());
 	defaultStrings.emplace_back(btnDeckEdit, 1204);
 	offset += 35;
-	btnModeExit = env->addButton(OFFSET(10, 170, 270, 200), wMainMenu, BUTTON_MODE_EXIT, gDataManager->GetSysString(1210).c_str());
+	btnModeExit = env->addButton(OFFSET(10, 170, 270, 200), wMainMenu, BUTTON_MODE_EXIT, gDataManager->GetSysString(1210).data());
 	defaultStrings.emplace_back(btnModeExit, 1210);
 	offset += 35;
 #undef OFFSET
 	btnSingleMode->setEnabled(coreloaded);
 	//lan mode
-	wLanWindow = env->addWindow(Scale(220, 100, 800, 520), false, gDataManager->GetSysString(1200).c_str());
+	wLanWindow = env->addWindow(Scale(220, 100, 800, 520), false, gDataManager->GetSysString(1200).data());
 	defaultStrings.emplace_back(wLanWindow, 1200);
 	wLanWindow->getCloseButton()->setVisible(false);
 	wLanWindow->setVisible(false);
-	irr::gui::IGUIElement* tmpptr = env->addStaticText(gDataManager->GetSysString(1220).c_str(), Scale(10, 30, 220, 50), false, false, wLanWindow);
+	irr::gui::IGUIElement* tmpptr = env->addStaticText(gDataManager->GetSysString(1220).data(), Scale(10, 30, 220, 50), false, false, wLanWindow);
 	defaultStrings.emplace_back(tmpptr, 1220);
-	ebNickName = env->addEditBox(gGameConfig->nickname.c_str(), Scale(110, 25, 450, 50), true, wLanWindow, EDITBOX_NICKNAME);
+	ebNickName = env->addEditBox(gGameConfig->nickname.data(), Scale(110, 25, 450, 50), true, wLanWindow, EDITBOX_NICKNAME);
 	ebNickName->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	lstHostList = env->addListBox(Scale(10, 60, 570, 320), wLanWindow, LISTBOX_LAN_HOST, true);
 	lstHostList->setItemHeight(Scale(18));
-	btnLanRefresh = env->addButton(Scale(240, 325, 340, 350), wLanWindow, BUTTON_LAN_REFRESH, gDataManager->GetSysString(1217).c_str());
+	btnLanRefresh = env->addButton(Scale(240, 325, 340, 350), wLanWindow, BUTTON_LAN_REFRESH, gDataManager->GetSysString(1217).data());
 	defaultStrings.emplace_back(btnLanRefresh, 1217);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1221).c_str(), Scale(10, 360, 220, 380), false, false, wLanWindow);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1221).data(), Scale(10, 360, 220, 380), false, false, wLanWindow);
 	defaultStrings.emplace_back(tmpptr, 1221);
-	ebJoinHost = env->addEditBox(gGameConfig->lasthost.c_str(), Scale(110, 355, 350, 380), true, wLanWindow);
+	ebJoinHost = env->addEditBox(gGameConfig->lasthost.data(), Scale(110, 355, 350, 380), true, wLanWindow);
 	ebJoinHost->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebJoinPort = env->addEditBox(gGameConfig->lastport.c_str(), Scale(360, 355, 420, 380), true, wLanWindow, EDITBOX_PORT_BOX);
+	ebJoinPort = env->addEditBox(gGameConfig->lastport.data(), Scale(360, 355, 420, 380), true, wLanWindow, EDITBOX_PORT_BOX);
 	ebJoinPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1222).c_str(), Scale(10, 390, 220, 410), false, false, wLanWindow);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1222).data(), Scale(10, 390, 220, 410), false, false, wLanWindow);
 	defaultStrings.emplace_back(tmpptr, 1222);
-	ebJoinPass = env->addEditBox(gGameConfig->roompass.c_str(), Scale(110, 385, 420, 410), true, wLanWindow);
+	ebJoinPass = env->addEditBox(gGameConfig->roompass.data(), Scale(110, 385, 420, 410), true, wLanWindow);
 	ebJoinPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnJoinHost = env->addButton(Scale(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, gDataManager->GetSysString(1223).c_str());
+	btnJoinHost = env->addButton(Scale(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, gDataManager->GetSysString(1223).data());
 	defaultStrings.emplace_back(btnJoinHost, 1223);
-	btnJoinCancel = env->addButton(Scale(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, gDataManager->GetSysString(1212).c_str());
+	btnJoinCancel = env->addButton(Scale(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, gDataManager->GetSysString(1212).data());
 	defaultStrings.emplace_back(btnJoinCancel, 1212);
-	btnCreateHost = env->addButton(Scale(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, gDataManager->GetSysString(1224).c_str());
+	btnCreateHost = env->addButton(Scale(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, gDataManager->GetSysString(1224).data());
 	defaultStrings.emplace_back(btnCreateHost, 1224);
 	btnCreateHost->setEnabled(coreloaded);
 	//create host
-	wCreateHost = env->addWindow(Scale(320, 100, 700, 520), false, gDataManager->GetSysString(1224).c_str());
+	wCreateHost = env->addWindow(Scale(320, 100, 700, 520), false, gDataManager->GetSysString(1224).data());
 	defaultStrings.emplace_back(wCreateHost, 1224);
 	wCreateHost->getCloseButton()->setVisible(false);
 	wCreateHost->setVisible(false);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1226).c_str(), Scale(20, 30, 220, 50), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1226).data(), Scale(20, 30, 220, 50), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1226);
 	cbHostLFList = ADDComboBox(Scale(140, 25, 300, 50), wCreateHost, COMBOBOX_HOST_LFLIST);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1225).c_str(), Scale(20, 60, 220, 80), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1225).data(), Scale(20, 60, 220, 80), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1225);
 	cbRule = ADDComboBox(Scale(140, 55, 300, 80), wCreateHost);
 	ReloadCBRule();
 	cbRule->setSelected(gGameConfig->lastallowedcards);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1227).c_str(), Scale(20, 90, 220, 110), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1227).data(), Scale(20, 90, 220, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1227);
-#define WStr(i) fmt::to_wstring<int>(i).c_str()
+#define WStr(i) fmt::to_wstring<int>(i).data()
 	ebTeam1 = env->addEditBox(WStr(gGameConfig->team1count), Scale(140, 85, 170, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	auto vsstring = env->addStaticText(gDataManager->GetSysString(1380).c_str(), Scale(175, 85, 195, 110), false, false, wCreateHost);
+	auto vsstring = env->addStaticText(gDataManager->GetSysString(1380).data(), Scale(175, 85, 195, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(vsstring, 1380);
 	vsstring->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebTeam2 = env->addEditBox(WStr(gGameConfig->team2count), Scale(200, 85, 230, 110), true, wCreateHost, EDITBOX_TEAM_COUNT);
 	ebTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	vsstring = env->addStaticText(gDataManager->GetSysString(1381).c_str(), Scale(235, 85, 280, 110), false, false, wCreateHost);
+	vsstring = env->addStaticText(gDataManager->GetSysString(1381).data(), Scale(235, 85, 280, 110), false, false, wCreateHost);
 	defaultStrings.emplace_back(vsstring, 1381);
 	vsstring->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	ebBestOf = env->addEditBox(WStr(gGameConfig->bestOf), Scale(285, 85, 315, 110), true, wCreateHost, EDITBOX_NUMERIC);
 	ebBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnRelayMode = env->addButton(Scale(325, 85, 370, 110), wCreateHost, -1, gDataManager->GetSysString(1247).c_str());
+	btnRelayMode = env->addButton(Scale(325, 85, 370, 110), wCreateHost, -1, gDataManager->GetSysString(1247).data());
 	defaultStrings.emplace_back(btnRelayMode, 1247);
 	btnRelayMode->setIsPushButton(true);
 	btnRelayMode->setPressed(gGameConfig->relayDuel);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1237).c_str(), Scale(20, 120, 320, 140), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1237).data(), Scale(20, 120, 320, 140), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1237);
 	ebTimeLimit = env->addEditBox(WStr(gGameConfig->timeLimit), Scale(140, 115, 220, 140), true, wCreateHost, EDITBOX_NUMERIC);
 	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1228).c_str(), Scale(20, 150, 320, 170), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1228).data(), Scale(20, 150, 320, 170), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1228);
-	btnRuleCards = env->addButton(Scale(260, 325, 370, 350), wCreateHost, BUTTON_RULE_CARDS, gDataManager->GetSysString(1625).c_str());
+	btnRuleCards = env->addButton(Scale(260, 325, 370, 350), wCreateHost, BUTTON_RULE_CARDS, gDataManager->GetSysString(1625).data());
 	defaultStrings.emplace_back(btnRuleCards, 1625);
 	wRules = env->addWindow(Scale(630, 100, 1000, 310), false, L"");
 	wRules->getCloseButton()->setVisible(false);
 	wRules->setDrawTitlebar(false);
 	wRules->setDraggable(true);
 	wRules->setVisible(false);
-	btnRulesOK = env->addButton(Scale(135, 175, 235, 200), wRules, BUTTON_RULE_OK, gDataManager->GetSysString(1211).c_str());
+	btnRulesOK = env->addButton(Scale(135, 175, 235, 200), wRules, BUTTON_RULE_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnRulesOK, 1211);
 	for(int i = 0; i < sizeofarr(chkRules); ++i) {
-		chkRules[i] = env->addCheckBox(false, Scale(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, CHECKBOX_EXTRA_RULE, gDataManager->GetSysString(1132 + i).c_str());
+		chkRules[i] = env->addCheckBox(false, Scale(10 + (i % 2) * 150, 10 + (i / 2) * 20, 200 + (i % 2) * 120, 30 + (i / 2) * 20), wRules, CHECKBOX_EXTRA_RULE, gDataManager->GetSysString(1132 + i).data());
 		defaultStrings.emplace_back(chkRules[i], 1132 + i);
 	}
 	extra_rules = gGameConfig->lastExtraRules;
 	UpdateExtraRules(true);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).c_str(), Scale(20, 180, 220, 200), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).data(), Scale(20, 180, 220, 200), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1236);
 	cbDuelRule = ADDComboBox(Scale(140, 175, 300, 200), wCreateHost, COMBOBOX_DUEL_RULE);
 	duel_param = gGameConfig->lastDuelParam;
 	forbiddentypes = gGameConfig->lastDuelForbidden;
-	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, gDataManager->GetSysString(1626).c_str());
+	btnCustomRule = env->addButton(Scale(305, 175, 370, 200), wCreateHost, BUTTON_CUSTOM_RULE, gDataManager->GetSysString(1626).data());
 	defaultStrings.emplace_back(btnCustomRule, 1626);
 
-	wCustomRules = env->addWindow(Scale(0, 0, 450, 330), false, gDataManager->GetSysString(1630).c_str());
+	wCustomRules = env->addWindow(Scale(0, 0, 450, 330), false, gDataManager->GetSysString(1630).data());
 	defaultStrings.emplace_back(wCustomRules, 1630);
 	wCustomRules->getCloseButton()->setVisible(false);
 	wCustomRules->setDrawTitlebar(true);
@@ -336,7 +336,7 @@ bool Game::Initialize() {
 		return ret;
 	};
 
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1629).c_str(), rectsize(), false, false, crPanel);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1629).data(), rectsize(), false, false, crPanel);
 	defaultStrings.emplace_back(tmpptr, 1629);
 
 	for(int i = 0; i < sizeofarr(chkCustomRules); ++i) {
@@ -351,14 +351,14 @@ bool Game::Initialize() {
 			set = duel_param & 0x100U << (i - 3);
 		else
 			set = duel_param & 0x100U << i;
-		chkCustomRules[i] = env->addCheckBox(set, rectsize(), crPanel, CHECKBOX_OBSOLETE + i, gDataManager->GetSysString(1631 + i).c_str());
+		chkCustomRules[i] = env->addCheckBox(set, rectsize(), crPanel, CHECKBOX_OBSOLETE + i, gDataManager->GetSysString(1631 + i).data());
 		defaultStrings.emplace_back(chkCustomRules[i], 1631 + i);
 	}
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1628).c_str(), rectsize(), false, false, crPanel);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1628).data(), rectsize(), false, false, crPanel);
 	defaultStrings.emplace_back(tmpptr, 1628);
 	constexpr uint32_t limits[] = { TYPE_FUSION, TYPE_SYNCHRO, TYPE_XYZ, TYPE_PENDULUM, TYPE_LINK };
 #define TYPECHK(id,stringid)\
-	chkTypeLimit[id] = env->addCheckBox(forbiddentypes & limits[id], rectsize(), crPanel, -1, fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).c_str());
+	chkTypeLimit[id] = env->addCheckBox(forbiddentypes & limits[id], rectsize(), crPanel, -1, fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).data());
 	TYPECHK(0, 1056);
 	TYPECHK(1, 1063);
 	TYPECHK(2, 1073);
@@ -367,58 +367,58 @@ bool Game::Initialize() {
 #undef TYPECHK
 
 	UpdateDuelParam();
-	btnCustomRulesOK = env->addButton(Scale(175, 290, 275, 315), wCustomRules, BUTTON_CUSTOM_RULE_OK, gDataManager->GetSysString(1211).c_str());
+	btnCustomRulesOK = env->addButton(Scale(175, 290, 275, 315), wCustomRules, BUTTON_CUSTOM_RULE_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnCustomRulesOK, 1211);
 
 
-	chkNoCheckDeck = env->addCheckBox(gGameConfig->noCheckDeck, Scale(20, 210, 170, 230), wCreateHost, -1, gDataManager->GetSysString(1229).c_str());
+	chkNoCheckDeck = env->addCheckBox(gGameConfig->noCheckDeck, Scale(20, 210, 170, 230), wCreateHost, -1, gDataManager->GetSysString(1229).data());
 	defaultStrings.emplace_back(chkNoCheckDeck, 1229);
-	chkNoShuffleDeck = env->addCheckBox(gGameConfig->noShuffleDeck, Scale(180, 210, 360, 230), wCreateHost, -1, gDataManager->GetSysString(1230).c_str());
+	chkNoShuffleDeck = env->addCheckBox(gGameConfig->noShuffleDeck, Scale(180, 210, 360, 230), wCreateHost, -1, gDataManager->GetSysString(1230).data());
 	defaultStrings.emplace_back(chkNoShuffleDeck, 1230);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1231).c_str(), Scale(20, 240, 320, 260), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1231).data(), Scale(20, 240, 320, 260), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1231);
 	ebStartLP = env->addEditBox(WStr(gGameConfig->startLP), Scale(140, 235, 220, 260), true, wCreateHost, EDITBOX_NUMERIC);
 	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1232).c_str(), Scale(20, 270, 320, 290), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1232).data(), Scale(20, 270, 320, 290), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1232);
 	ebStartHand = env->addEditBox(WStr(gGameConfig->startHand), Scale(140, 265, 220, 290), true, wCreateHost, EDITBOX_NUMERIC);
 	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1233).c_str(), Scale(20, 300, 320, 320), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1233).data(), Scale(20, 300, 320, 320), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1233);
 	ebDrawCount = env->addEditBox(WStr(gGameConfig->drawCount), Scale(140, 295, 220, 320), true, wCreateHost, EDITBOX_NUMERIC);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1234).c_str(), Scale(10, 330, 220, 350), false, false, wCreateHost);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1234).data(), Scale(10, 330, 220, 350), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1234);
-	ebServerName = env->addEditBox(gGameConfig->gamename.c_str(), Scale(110, 325, 250, 350), true, wCreateHost);
+	ebServerName = env->addEditBox(gGameConfig->gamename.data(), Scale(110, 325, 250, 350), true, wCreateHost);
 	ebServerName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
- 	tmpptr = env->addStaticText(gDataManager->GetSysString(1235).c_str(), Scale(10, 360, 220, 380), false, false, wCreateHost);
+ 	tmpptr = env->addStaticText(gDataManager->GetSysString(1235).data(), Scale(10, 360, 220, 380), false, false, wCreateHost);
 	defaultStrings.emplace_back(tmpptr, 1235);
 	ebServerPass = env->addEditBox(L"", Scale(110, 355, 250, 380), true, wCreateHost);
 	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnHostConfirm = env->addButton(Scale(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, gDataManager->GetSysString(1211).c_str());
+	btnHostConfirm = env->addButton(Scale(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnHostConfirm, 1211);
-	btnHostCancel = env->addButton(Scale(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, gDataManager->GetSysString(1212).c_str());
+	btnHostCancel = env->addButton(Scale(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, gDataManager->GetSysString(1212).data());
 	defaultStrings.emplace_back(btnHostCancel, 1212);
-	stHostPort = env->addStaticText(gDataManager->GetSysString(1238).c_str(), Scale(10, 390, 220, 410), false, false, wCreateHost);
+	stHostPort = env->addStaticText(gDataManager->GetSysString(1238).data(), Scale(10, 390, 220, 410), false, false, wCreateHost);
 	defaultStrings.emplace_back(stHostPort, 1238);
-	ebHostPort = env->addEditBox(gGameConfig->serverport.c_str(), Scale(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
+	ebHostPort = env->addEditBox(gGameConfig->serverport.data(), Scale(110, 385, 250, 410), true, wCreateHost, EDITBOX_PORT_BOX);
 	ebHostPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stHostNotes = env->addStaticText(gDataManager->GetSysString(2024).c_str(), Scale(10, 390, 220, 410), false, false, wCreateHost);
+	stHostNotes = env->addStaticText(gDataManager->GetSysString(2024).data(), Scale(10, 390, 220, 410), false, false, wCreateHost);
 	defaultStrings.emplace_back(stHostNotes, 2024);
 	stHostNotes->setVisible(false);
 	ebHostNotes = env->addEditBox(L"", Scale(110, 385, 250, 410), true, wCreateHost);
 	ebHostNotes->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebHostNotes->setVisible(false);
 	//host(single)
-	wHostPrepare = env->addWindow(Scale(270, 120, 750, 440), false, gDataManager->GetSysString(1250).c_str());
+	wHostPrepare = env->addWindow(Scale(270, 120, 750, 440), false, gDataManager->GetSysString(1250).data());
 	defaultStrings.emplace_back(wHostPrepare, 1250);
 	wHostPrepare->getCloseButton()->setVisible(false);
 	wHostPrepare->setVisible(false);
-	wHostPrepareR = env->addWindow(Scale(750, 120, 950, 440), false, gDataManager->GetSysString(1625).c_str());
+	wHostPrepareR = env->addWindow(Scale(750, 120, 950, 440), false, gDataManager->GetSysString(1625).data());
 	defaultStrings.emplace_back(wHostPrepareR, 1625);
 	wHostPrepareR->getCloseButton()->setVisible(false);
 	wHostPrepareR->setVisible(false);
-	wHostPrepareL = env->addWindow(Scale(70, 120, 270, 440), false, gDataManager->GetSysString(1628).c_str());
+	wHostPrepareL = env->addWindow(Scale(70, 120, 270, 440), false, gDataManager->GetSysString(1628).data());
 	defaultStrings.emplace_back(wHostPrepareL, 1628);
 	wHostPrepareL->getCloseButton()->setVisible(false);
 	wHostPrepareL->setVisible(false);
@@ -437,9 +437,9 @@ bool Game::Initialize() {
 #ifdef __ANDROID__
 	((irr::gui::CGUICustomText*)stHostPrepRuleL)->setTouchControl(!gGameConfig->native_mouse);
 #endif
-	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, gDataManager->GetSysString(1251).c_str());
+	btnHostPrepDuelist = env->addButton(Scale(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, gDataManager->GetSysString(1251).data());
 	defaultStrings.emplace_back(btnHostPrepDuelist, 1251);
-	btnHostPrepWindBot = env->addButton(Scale(170, 30, 270, 55), wHostPrepare, BUTTON_HP_AI_TOGGLE, gDataManager->GetSysString(2050).c_str());
+	btnHostPrepWindBot = env->addButton(Scale(170, 30, 270, 55), wHostPrepare, BUTTON_HP_AI_TOGGLE, gDataManager->GetSysString(2050).data());
 	defaultStrings.emplace_back(btnHostPrepWindBot, 2050);
 	for(int i = 0; i < 6; ++i) {
 		btnHostPrepKick[i] = env->addButton(Scale(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_HP_KICK, L"X");
@@ -447,41 +447,41 @@ bool Game::Initialize() {
 		chkHostPrepReady[i] = env->addCheckBox(false, Scale(250, 65 + i * 25, 270, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
 		chkHostPrepReady[i]->setEnabled(false);
 	}
-	gBot.window = env->addWindow(Scale(750, 120, 960, 360), false, gDataManager->GetSysString(2051).c_str());
+	gBot.window = env->addWindow(Scale(750, 120, 960, 360), false, gDataManager->GetSysString(2051).data());
 	defaultStrings.emplace_back(gBot.window, 2051);
 	gBot.window->getCloseButton()->setVisible(false);
 	gBot.window->setVisible(false);
 	gBot.deckProperties = env->addStaticText(L"", Scale(10, 25, 200, 100), true, true, gBot.window);
-	gBot.chkThrowRock = env->addCheckBox(gGameConfig->botThrowRock, Scale(10, 105, 200, 130), gBot.window, -1, gDataManager->GetSysString(2052).c_str());
+	gBot.chkThrowRock = env->addCheckBox(gGameConfig->botThrowRock, Scale(10, 105, 200, 130), gBot.window, -1, gDataManager->GetSysString(2052).data());
 	defaultStrings.emplace_back(gBot.chkThrowRock, 2052);
-	gBot.chkMute = env->addCheckBox(gGameConfig->botMute, Scale(10, 135, 200, 160), gBot.window, -1, gDataManager->GetSysString(2053).c_str());
+	gBot.chkMute = env->addCheckBox(gGameConfig->botMute, Scale(10, 135, 200, 160), gBot.window, -1, gDataManager->GetSysString(2053).data());
 	defaultStrings.emplace_back(gBot.chkMute, 2053);
 	gBot.cbBotDeck = ADDComboBox(Scale(10, 165, 200, 190), gBot.window, COMBOBOX_BOT_DECK);
-	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, gDataManager->GetSysString(2054).c_str());
+	gBot.btnAdd = env->addButton(Scale(10, 200, 200, 225), gBot.window, BUTTON_BOT_ADD, gDataManager->GetSysString(2054).data());
 	defaultStrings.emplace_back(gBot.btnAdd, 2054);
-	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, gDataManager->GetSysString(1252).c_str());
+	btnHostPrepOB = env->addButton(Scale(10, 180, 110, 205), wHostPrepare, BUTTON_HP_OBSERVER, gDataManager->GetSysString(1252).data());
 	defaultStrings.emplace_back(btnHostPrepOB, 1252);
-	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", gDataManager->GetSysString(1253)).c_str(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
+	stHostPrepOB = env->addStaticText(fmt::format(L"{} 0", gDataManager->GetSysString(1253)).data(), Scale(10, 210, 270, 230), false, false, wHostPrepare);
 	defaultStrings.emplace_back(stHostPrepOB, 1253);
 	stHostPrepRule = irr::gui::CGUICustomText::addCustomText(L"", false, env, wHostPrepare, -1, Scale(280, 30, 460, 270));
 #ifdef __ANDROID__
 	((irr::gui::CGUICustomText*)stHostPrepRule)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stHostPrepRule->setWordWrap(true);
-	stDeckSelect = env->addStaticText(gDataManager->GetSysString(1254).c_str(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
+	stDeckSelect = env->addStaticText(gDataManager->GetSysString(1254).data(), Scale(10, 235, 110, 255), false, false, wHostPrepare);
 	defaultStrings.emplace_back(stDeckSelect, 1254);
 	cbDeckSelect = ADDComboBox(Scale(120, 230, 270, 255), wHostPrepare);
 	cbDeckSelect->setMaxSelectionRows(10);
 	cbDeckSelect2 = ADDComboBox(Scale(280, 230, 430, 255), wHostPrepare);
 	cbDeckSelect2->setMaxSelectionRows(10);
-	btnHostPrepReady = env->addButton(Scale(170, 180, 270, 205), wHostPrepare, BUTTON_HP_READY, gDataManager->GetSysString(1218).c_str());
+	btnHostPrepReady = env->addButton(Scale(170, 180, 270, 205), wHostPrepare, BUTTON_HP_READY, gDataManager->GetSysString(1218).data());
 	defaultStrings.emplace_back(btnHostPrepReady, 1218);
-	btnHostPrepNotReady = env->addButton(Scale(170, 180, 270, 205), wHostPrepare, BUTTON_HP_NOTREADY, gDataManager->GetSysString(1219).c_str());
+	btnHostPrepNotReady = env->addButton(Scale(170, 180, 270, 205), wHostPrepare, BUTTON_HP_NOTREADY, gDataManager->GetSysString(1219).data());
 	defaultStrings.emplace_back(btnHostPrepNotReady, 1219);
 	btnHostPrepNotReady->setVisible(false);
-	btnHostPrepStart = env->addButton(Scale(230, 280, 340, 305), wHostPrepare, BUTTON_HP_START, gDataManager->GetSysString(1215).c_str());
+	btnHostPrepStart = env->addButton(Scale(230, 280, 340, 305), wHostPrepare, BUTTON_HP_START, gDataManager->GetSysString(1215).data());
 	defaultStrings.emplace_back(btnHostPrepStart, 1215);
-	btnHostPrepCancel = env->addButton(Scale(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, gDataManager->GetSysString(1210).c_str());
+	btnHostPrepCancel = env->addButton(Scale(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, gDataManager->GetSysString(1210).data());
 	defaultStrings.emplace_back(btnHostPrepCancel, 1210);
 	//img
 	wCardImg = env->addStaticText(L"", Scale(1, 1, 1 + CARD_IMG_WIDTH + 20, 1 + CARD_IMG_HEIGHT + 18), true, false, 0, -1, true);
@@ -517,7 +517,7 @@ bool Game::Initialize() {
 	wInfos = irr::gui::CGUICustomTabControl::addCustomTabControl(env, Scale(1, 275, 301, 639), 0, true);
 	wInfos->setVisible(false);
 	//info
-	irr::gui::IGUITab* tabInfo = wInfos->addTab(gDataManager->GetSysString(1270).c_str());
+	irr::gui::IGUITab* tabInfo = wInfos->addTab(gDataManager->GetSysString(1270).data());
 	defaultStrings.emplace_back(tabInfo, 1270);
 	stName = irr::gui::CGUICustomText::addCustomText(L"", true, env, tabInfo, -1, Scale(10, 10, 287, 32));
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -558,49 +558,49 @@ bool Game::Initialize() {
 	((irr::gui::CGUICustomText*)stText)->enableScrollBar();
 	stText->setWordWrap(true);
 	//log
-	tabLog =  wInfos->addTab(gDataManager->GetSysString(1271).c_str());
+	tabLog =  wInfos->addTab(gDataManager->GetSysString(1271).data());
 	defaultStrings.emplace_back(tabLog, 1271);
 	lstLog = env->addListBox(Scale(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(Scale(18));
-	btnClearLog = env->addButton(Scale(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, gDataManager->GetSysString(1272).c_str());
+	btnClearLog = env->addButton(Scale(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, gDataManager->GetSysString(1272).data());
 	defaultStrings.emplace_back(btnClearLog, 1272);
-	btnExpandLog = env->addButton(Scale(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, gDataManager->GetSysString(2043).c_str());
+	btnExpandLog = env->addButton(Scale(40, 300, 140, 325), tabLog, BUTTON_EXPAND_INFOBOX, gDataManager->GetSysString(2043).data());
 	defaultStrings.emplace_back(btnExpandLog, 2043);
 	//chat
-	tabChat = wInfos->addTab(gDataManager->GetSysString(1279).c_str());
+	tabChat = wInfos->addTab(gDataManager->GetSysString(1279).data());
 	defaultStrings.emplace_back(tabChat, 1279);
 	lstChat = env->addListBox(Scale(10, 10, 290, 290), tabChat, -1, false);
 	lstChat->setItemHeight(Scale(18));
-	btnClearChat = env->addButton(Scale(160, 300, 260, 325), tabChat, BUTTON_CLEAR_CHAT, gDataManager->GetSysString(1282).c_str());
+	btnClearChat = env->addButton(Scale(160, 300, 260, 325), tabChat, BUTTON_CLEAR_CHAT, gDataManager->GetSysString(1282).data());
 	defaultStrings.emplace_back(btnClearChat, 1282);
-	btnExpandChat = env->addButton(Scale(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, gDataManager->GetSysString(2043).c_str());
+	btnExpandChat = env->addButton(Scale(40, 300, 140, 325), tabChat, BUTTON_EXPAND_INFOBOX, gDataManager->GetSysString(2043).data());
 	defaultStrings.emplace_back(btnExpandChat, 2043);
 	//system
-	irr::gui::IGUITab* _tabSystem = wInfos->addTab(gDataManager->GetSysString(1273).c_str());
+	irr::gui::IGUITab* _tabSystem = wInfos->addTab(gDataManager->GetSysString(1273).data());
 	defaultStrings.emplace_back(_tabSystem, 1273);
 	tabSystem = irr::gui::Panel::addPanel(env, _tabSystem, -1, Scale(0, 0, wInfos->getRelativePosition().getWidth() + 1, wInfos->getRelativePosition().getHeight()), true, false);
 	auto tabPanel = tabSystem->getSubpanel();
-	tabSettings.chkIgnoreOpponents = env->addCheckBox(gGameConfig->chkIgnore1, Scale(20, 20, 280, 45), tabPanel, -1, gDataManager->GetSysString(1290).c_str());
+	tabSettings.chkIgnoreOpponents = env->addCheckBox(gGameConfig->chkIgnore1, Scale(20, 20, 280, 45), tabPanel, -1, gDataManager->GetSysString(1290).data());
 	defaultStrings.emplace_back(tabSettings.chkIgnoreOpponents, 1290);
-	tabSettings.chkIgnoreSpectators = env->addCheckBox(gGameConfig->chkIgnore2, Scale(20, 50, 280, 75), tabPanel, -1, gDataManager->GetSysString(1291).c_str());
+	tabSettings.chkIgnoreSpectators = env->addCheckBox(gGameConfig->chkIgnore2, Scale(20, 50, 280, 75), tabPanel, -1, gDataManager->GetSysString(1291).data());
 	defaultStrings.emplace_back(tabSettings.chkIgnoreSpectators, 1291);
-	tabSettings.chkQuickAnimation = env->addCheckBox(gGameConfig->quick_animation, Scale(20, 80, 300, 105), tabPanel, CHECKBOX_QUICK_ANIMATION, gDataManager->GetSysString(1299).c_str());
+	tabSettings.chkQuickAnimation = env->addCheckBox(gGameConfig->quick_animation, Scale(20, 80, 300, 105), tabPanel, CHECKBOX_QUICK_ANIMATION, gDataManager->GetSysString(1299).data());
 	defaultStrings.emplace_back(tabSettings.chkQuickAnimation, 1299);
-	tabSettings.chkAlternativePhaseLayout = env->addCheckBox(gGameConfig->alternative_phase_layout, Scale(20, 110, 300, 135), tabPanel, CHECKBOX_ALTERNATIVE_PHASE_LAYOUT, gDataManager->GetSysString(1298).c_str());
+	tabSettings.chkAlternativePhaseLayout = env->addCheckBox(gGameConfig->alternative_phase_layout, Scale(20, 110, 300, 135), tabPanel, CHECKBOX_ALTERNATIVE_PHASE_LAYOUT, gDataManager->GetSysString(1298).data());
 	defaultStrings.emplace_back(tabSettings.chkAlternativePhaseLayout, 1298);
-	tabSettings.chkHideChainButtons = env->addCheckBox(gGameConfig->chkHideHintButton, Scale(20, 140, 280, 165), tabPanel, CHECKBOX_CHAIN_BUTTONS, gDataManager->GetSysString(1355).c_str());
+	tabSettings.chkHideChainButtons = env->addCheckBox(gGameConfig->chkHideHintButton, Scale(20, 140, 280, 165), tabPanel, CHECKBOX_CHAIN_BUTTONS, gDataManager->GetSysString(1355).data());
 	defaultStrings.emplace_back(tabSettings.chkHideChainButtons, 1355);
-	tabSettings.chkAutoChainOrder = env->addCheckBox(gGameConfig->chkAutoChain, Scale(20, 170, 280, 195), tabPanel, -1, gDataManager->GetSysString(1276).c_str());
+	tabSettings.chkAutoChainOrder = env->addCheckBox(gGameConfig->chkAutoChain, Scale(20, 170, 280, 195), tabPanel, -1, gDataManager->GetSysString(1276).data());
 	defaultStrings.emplace_back(tabSettings.chkAutoChainOrder, 1276);
-	tabSettings.chkDottedLines = env->addCheckBox(gGameConfig->dotted_lines, Scale(20, 200, 280, 225), tabPanel, CHECKBOX_DOTTED_LINES, gDataManager->GetSysString(1376).c_str());
+	tabSettings.chkDottedLines = env->addCheckBox(gGameConfig->dotted_lines, Scale(20, 200, 280, 225), tabPanel, CHECKBOX_DOTTED_LINES, gDataManager->GetSysString(1376).data());
 	defaultStrings.emplace_back(tabSettings.chkDottedLines, 1376);
 #ifdef __ANDROID__
 	tabSettings.chkDottedLines->setEnabled(false);
 #endif
 	// audio
-	tabSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(20, 230, 280, 255), tabPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).c_str());
+	tabSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(20, 230, 280, 255), tabPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).data());
 	defaultStrings.emplace_back(tabSettings.chkEnableSound, 2047);
-	tabSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).c_str(), Scale(20, 260, 80, 285), false, true, tabPanel);
+	tabSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).data(), Scale(20, 260, 80, 285), false, true, tabPanel);
 	defaultStrings.emplace_back(tabSettings.stSoundVolume, 2049);
 	tabSettings.scrSoundVolume = env->addScrollBar(true, Scale(85, 265, 280, 280), tabPanel, SCROLL_SOUND_VOLUME);
 	tabSettings.scrSoundVolume->setMax(100);
@@ -608,9 +608,9 @@ bool Game::Initialize() {
 	tabSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
 	tabSettings.scrSoundVolume->setLargeStep(1);
 	tabSettings.scrSoundVolume->setSmallStep(1);
-	tabSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).c_str());
+	tabSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, Scale(20, 290, 280, 315), tabPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).data());
 	defaultStrings.emplace_back(tabSettings.chkEnableMusic, 2046);
-	tabSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).c_str(), Scale(20, 320, 80, 345), false, true, tabPanel);
+	tabSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).data(), Scale(20, 320, 80, 345), false, true, tabPanel);
 	defaultStrings.emplace_back(tabSettings.stMusicVolume, 2048);
 	tabSettings.scrMusicVolume = env->addScrollBar(true, Scale(85, 325, 280, 340), tabPanel, SCROLL_MUSIC_VOLUME);
 	tabSettings.scrMusicVolume->setMax(100);
@@ -618,34 +618,34 @@ bool Game::Initialize() {
 	tabSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
 	tabSettings.scrMusicVolume->setLargeStep(1);
 	tabSettings.scrMusicVolume->setSmallStep(1);
-	tabSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(20, 230, 280, 345), false, true, tabPanel);
+	tabSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).data(), Scale(20, 230, 280, 345), false, true, tabPanel);
 	defaultStrings.emplace_back(tabSettings.stNoAudioBackend, 2058);
 	tabSettings.stNoAudioBackend->setVisible(false);
 	// end audio
-	tabSettings.chkMAutoPos = env->addCheckBox(gGameConfig->chkMAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, gDataManager->GetSysString(1274).c_str());
+	tabSettings.chkMAutoPos = env->addCheckBox(gGameConfig->chkMAutoPos, Scale(20, 350, 280, 375), tabPanel, -1, gDataManager->GetSysString(1274).data());
 	defaultStrings.emplace_back(tabSettings.chkMAutoPos, 1274);
-	tabSettings.chkSTAutoPos = env->addCheckBox(gGameConfig->chkSTAutoPos, Scale(20, 380, 280, 405), tabPanel, -1, gDataManager->GetSysString(1278).c_str());
+	tabSettings.chkSTAutoPos = env->addCheckBox(gGameConfig->chkSTAutoPos, Scale(20, 380, 280, 405), tabPanel, -1, gDataManager->GetSysString(1278).data());
 	defaultStrings.emplace_back(tabSettings.chkSTAutoPos, 1278);
-	tabSettings.chkRandomPos = env->addCheckBox(gGameConfig->chkRandomPos, Scale(40, 410, 280, 435), tabPanel, -1, gDataManager->GetSysString(1275).c_str());
+	tabSettings.chkRandomPos = env->addCheckBox(gGameConfig->chkRandomPos, Scale(40, 410, 280, 435), tabPanel, -1, gDataManager->GetSysString(1275).data());
 	defaultStrings.emplace_back(tabSettings.chkRandomPos, 1275);
-	tabSettings.chkNoChainDelay = env->addCheckBox(gGameConfig->chkWaitChain, Scale(20, 440, 280, 465), tabPanel, -1, gDataManager->GetSysString(1277).c_str());
+	tabSettings.chkNoChainDelay = env->addCheckBox(gGameConfig->chkWaitChain, Scale(20, 440, 280, 465), tabPanel, -1, gDataManager->GetSysString(1277).data());
 	defaultStrings.emplace_back(tabSettings.chkNoChainDelay, 1277);
 	// Check OnResize for button placement information
-	btnTabShowSettings = env->addButton(Scale(20, 475, 280, 500), tabPanel, BUTTON_SHOW_SETTINGS, gDataManager->GetSysString(2059).c_str());
+	btnTabShowSettings = env->addButton(Scale(20, 475, 280, 500), tabPanel, BUTTON_SHOW_SETTINGS, gDataManager->GetSysString(2059).data());
 	defaultStrings.emplace_back(btnTabShowSettings, 2059);
 	/* padding = */ env->addStaticText(L"", Scale(20, 505, 280, 515), false, true, tabPanel, -1, false);
 
-	gSettings.window = env->addWindow(Scale(180, 85, 840, 535), false, gDataManager->GetSysString(1273).c_str());
+	gSettings.window = env->addWindow(Scale(180, 85, 840, 535), false, gDataManager->GetSysString(1273).data());
 	defaultStrings.emplace_back(gSettings.window, 1273);
 	gSettings.window->setVisible(false);
 	auto sRect = gSettings.window->getClientRect();
 	gSettings.panel = irr::gui::Panel::addPanel(env, gSettings.window, -1, sRect, true, false);
 	auto sPanel = gSettings.panel->getSubpanel();
-	gSettings.chkShowScopeLabel = env->addCheckBox(gGameConfig->showScopeLabel, Scale(15, 5, 320, 30), sPanel, CHECKBOX_SHOW_SCOPE_LABEL, gDataManager->GetSysString(2076).c_str());
+	gSettings.chkShowScopeLabel = env->addCheckBox(gGameConfig->showScopeLabel, Scale(15, 5, 320, 30), sPanel, CHECKBOX_SHOW_SCOPE_LABEL, gDataManager->GetSysString(2076).data());
 	defaultStrings.emplace_back(gSettings.chkShowScopeLabel, 2076);
-	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(15, 35, 320, 60), sPanel, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).c_str());
+	gSettings.chkShowFPS = env->addCheckBox(gGameConfig->showFPS, Scale(15, 35, 320, 60), sPanel, CHECKBOX_SHOW_FPS, gDataManager->GetSysString(1445).data());
 	defaultStrings.emplace_back(gSettings.chkShowFPS, 1445);
-	gSettings.chkFullscreen = env->addCheckBox(gGameConfig->fullscreen, Scale(15, 65, 320, 90), sPanel, CHECKBOX_FULLSCREEN, gDataManager->GetSysString(2060).c_str());
+	gSettings.chkFullscreen = env->addCheckBox(gGameConfig->fullscreen, Scale(15, 65, 320, 90), sPanel, CHECKBOX_FULLSCREEN, gDataManager->GetSysString(2060).data());
 	defaultStrings.emplace_back(gSettings.chkFullscreen, 2060);
 #ifdef __ANDROID__
 	gSettings.chkFullscreen->setChecked(true);
@@ -653,77 +653,77 @@ bool Game::Initialize() {
 #elif defined(__APPLE__)
 	gSettings.chkFullscreen->setEnabled(false);
 #endif
-	gSettings.chkScaleBackground = env->addCheckBox(gGameConfig->scale_background, Scale(15, 95, 320, 120), sPanel, CHECKBOX_SCALE_BACKGROUND, gDataManager->GetSysString(2061).c_str());
+	gSettings.chkScaleBackground = env->addCheckBox(gGameConfig->scale_background, Scale(15, 95, 320, 120), sPanel, CHECKBOX_SCALE_BACKGROUND, gDataManager->GetSysString(2061).data());
 	defaultStrings.emplace_back(gSettings.chkScaleBackground, 2061);
-	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gGameConfig->accurate_bg_resize, Scale(15, 125, 320, 150), sPanel, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, gDataManager->GetSysString(2062).c_str());
+	gSettings.chkAccurateBackgroundResize = env->addCheckBox(gGameConfig->accurate_bg_resize, Scale(15, 125, 320, 150), sPanel, CHECKBOX_ACCURATE_BACKGROUND_RESIZE, gDataManager->GetSysString(2062).data());
 	defaultStrings.emplace_back(gSettings.chkAccurateBackgroundResize, 2062);
 #ifdef __ANDROID__
 	gSettings.chkAccurateBackgroundResize->setChecked(true);
 	gSettings.chkAccurateBackgroundResize->setEnabled(false);
 #endif
-	gSettings.chkHideSetname = env->addCheckBox(gGameConfig->chkHideSetname, Scale(15, 155, 320, 180), sPanel, CHECKBOX_HIDE_ARCHETYPES, gDataManager->GetSysString(1354).c_str());
+	gSettings.chkHideSetname = env->addCheckBox(gGameConfig->chkHideSetname, Scale(15, 155, 320, 180), sPanel, CHECKBOX_HIDE_ARCHETYPES, gDataManager->GetSysString(1354).data());
 	defaultStrings.emplace_back(gSettings.chkHideSetname, 1354);
-	gSettings.chkHidePasscodeScope = env->addCheckBox(gGameConfig->hidePasscodeScope, Scale(15, 185, 320, 210), sPanel, CHECKBOX_HIDE_PASSCODE_SCOPE, gDataManager->GetSysString(2063).c_str());
+	gSettings.chkHidePasscodeScope = env->addCheckBox(gGameConfig->hidePasscodeScope, Scale(15, 185, 320, 210), sPanel, CHECKBOX_HIDE_PASSCODE_SCOPE, gDataManager->GetSysString(2063).data());
 	defaultStrings.emplace_back(gSettings.chkHidePasscodeScope, 2063);
-	gSettings.chkDrawFieldSpells = env->addCheckBox(gGameConfig->draw_field_spell, Scale(15, 215, 320, 240), sPanel, CHECKBOX_DRAW_FIELD_SPELLS, gDataManager->GetSysString(2068).c_str());
+	gSettings.chkDrawFieldSpells = env->addCheckBox(gGameConfig->draw_field_spell, Scale(15, 215, 320, 240), sPanel, CHECKBOX_DRAW_FIELD_SPELLS, gDataManager->GetSysString(2068).data());
 	defaultStrings.emplace_back(gSettings.chkDrawFieldSpells, 2068);
-	gSettings.chkFilterBot = env->addCheckBox(gGameConfig->filterBot, Scale(15, 245, 320, 270), sPanel, CHECKBOX_FILTER_BOT, gDataManager->GetSysString(2069).c_str());
+	gSettings.chkFilterBot = env->addCheckBox(gGameConfig->filterBot, Scale(15, 245, 320, 270), sPanel, CHECKBOX_FILTER_BOT, gDataManager->GetSysString(2069).data());
 	defaultStrings.emplace_back(gSettings.chkFilterBot, 2069);
-	gSettings.stCurrentSkin = env->addStaticText(gDataManager->GetSysString(2064).c_str(), Scale(15, 275, 90, 300), false, true, sPanel);
+	gSettings.stCurrentSkin = env->addStaticText(gDataManager->GetSysString(2064).data(), Scale(15, 275, 90, 300), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stCurrentSkin, 2064);
 	gSettings.cbCurrentSkin = ADDComboBox(Scale(95, 275, 320, 300), sPanel, COMBOBOX_CURRENT_SKIN);
 	ReloadCBCurrentSkin();
-	gSettings.btnReloadSkin = env->addButton(Scale(15, 305, 320, 330), sPanel, BUTTON_RELOAD_SKIN, gDataManager->GetSysString(2066).c_str());
+	gSettings.btnReloadSkin = env->addButton(Scale(15, 305, 320, 330), sPanel, BUTTON_RELOAD_SKIN, gDataManager->GetSysString(2066).data());
 	defaultStrings.emplace_back(gSettings.btnReloadSkin, 2066);
-	gSettings.stCurrentLocale = env->addStaticText(gDataManager->GetSysString(2067).c_str(), Scale(15, 335, 90, 360), false, true, sPanel);
+	gSettings.stCurrentLocale = env->addStaticText(gDataManager->GetSysString(2067).data(), Scale(15, 335, 90, 360), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stCurrentLocale, 2067);
 	PopulateLocales();
 	gSettings.cbCurrentLocale = ADDComboBox(Scale(95, 335, 320, 360), sPanel, COMBOBOX_CURRENT_LOCALE);
 	int selectedLocale = gSettings.cbCurrentLocale->addItem(L"English");
 	for(auto& _locale : locales) {
 		auto& locale = _locale.first;
-		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).c_str());
+		auto itemIndex = gSettings.cbCurrentLocale->addItem(Utils::ToUnicodeIfNeeded(locale).data());
 		if(gGameConfig->locale == locale) {
 			selectedLocale = itemIndex;
 		}
 	}
 	gSettings.cbCurrentLocale->setSelected(selectedLocale);
-	gSettings.stDpiScale = env->addStaticText(gDataManager->GetSysString(2070).c_str(), Scale(15, 365, 90, 390), false, false, sPanel);
+	gSettings.stDpiScale = env->addStaticText(gDataManager->GetSysString(2070).data(), Scale(15, 365, 90, 390), false, false, sPanel);
 	defaultStrings.emplace_back(gSettings.stDpiScale, 2070);
 	gSettings.ebDpiScale = env->addEditBox(WStr(gGameConfig->dpi_scale * 100), Scale(95, 365, 150, 390), true, sPanel, EDITBOX_NUMERIC);
 	env->addStaticText(L"%", Scale(155, 365, 170, 390), false, false, sPanel);
 	gSettings.ebDpiScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	gSettings.btnRestart = env->addButton(Scale(175, 365, 320, 390), sPanel, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).c_str());
+	gSettings.btnRestart = env->addButton(Scale(175, 365, 320, 390), sPanel, BUTTON_APPLY_RESTART, gDataManager->GetSysString(2071).data());
 	defaultStrings.emplace_back(gSettings.btnRestart, 2071);
 
-	gSettings.stAntiAlias = env->addStaticText(gDataManager->GetSysString(2075).c_str(), Scale(340, 5, 545, 30), false, true, sPanel);
+	gSettings.stAntiAlias = env->addStaticText(gDataManager->GetSysString(2075).data(), Scale(340, 5, 545, 30), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stAntiAlias, 2075);
 	gSettings.ebAntiAlias = env->addEditBox(WStr(gGameConfig->antialias), Scale(550, 5, 645, 30), true, sPanel, EDITBOX_NUMERIC);
-	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(340, 35, 645, 60), sPanel, CHECKBOX_VSYNC, gDataManager->GetSysString(2073).c_str());
+	gSettings.chkVSync = env->addCheckBox(gGameConfig->vsync, Scale(340, 35, 645, 60), sPanel, CHECKBOX_VSYNC, gDataManager->GetSysString(2073).data());
 	defaultStrings.emplace_back(gSettings.chkVSync, 2073);
-	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).c_str(), Scale(340, 65, 545, 90), false, true, sPanel);
+	gSettings.stFPSCap = env->addStaticText(gDataManager->GetSysString(2074).data(), Scale(340, 65, 545, 90), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stFPSCap, 2074);
 	gSettings.ebFPSCap = env->addEditBox(WStr(gGameConfig->maxFPS), Scale(550, 65, 600, 90), true, sPanel, EDITBOX_FPS_CAP);
-	gSettings.btnFPSCap = env->addButton(Scale(605, 65, 645, 90), sPanel, BUTTON_FPS_CAP, gDataManager->GetSysString(1211).c_str());
+	gSettings.btnFPSCap = env->addButton(Scale(605, 65, 645, 90), sPanel, BUTTON_FPS_CAP, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(gSettings.btnFPSCap, 1211);
-	gSettings.chkShowConsole = env->addCheckBox(gGameConfig->showConsole, Scale(340, 95, 645, 120), sPanel, -1, gDataManager->GetSysString(2072).c_str());
+	gSettings.chkShowConsole = env->addCheckBox(gGameConfig->showConsole, Scale(340, 95, 645, 120), sPanel, -1, gDataManager->GetSysString(2072).data());
 	defaultStrings.emplace_back(gSettings.chkShowConsole, 2072);
 #ifndef _WIN32
 	gSettings.chkShowConsole->setChecked(false);
 	gSettings.chkShowConsole->setEnabled(false);
 #endif
-	gSettings.stCoreLogOutput = env->addStaticText(gDataManager->GetSysString(1998).c_str(), Scale(340, 125, 430, 150), false, true, sPanel);
+	gSettings.stCoreLogOutput = env->addStaticText(gDataManager->GetSysString(1998).data(), Scale(340, 125, 430, 150), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stCoreLogOutput, 1998);
 	gSettings.cbCoreLogOutput = ADDComboBox(Scale(435, 125, 645, 150), sPanel, COMBOBOX_CORE_LOG_OUTPUT);
 	ReloadCBCoreLogOutput();
 #ifdef UPDATE_URL
-	gSettings.chkUpdates = env->addCheckBox(gGameConfig->noClientUpdates, Scale(340, 155, 645, 180), sPanel, -1, gDataManager->GetSysString(1466).c_str());
+	gSettings.chkUpdates = env->addCheckBox(gGameConfig->noClientUpdates, Scale(340, 155, 645, 180), sPanel, -1, gDataManager->GetSysString(1466).data());
 	defaultStrings.emplace_back(gSettings.chkUpdates, 1466);
 #endif
 	// audio
-	gSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(340, 185, 645, 210), sPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).c_str());
+	gSettings.chkEnableSound = env->addCheckBox(gGameConfig->enablesound, Scale(340, 185, 645, 210), sPanel, CHECKBOX_ENABLE_SOUND, gDataManager->GetSysString(2047).data());
 	defaultStrings.emplace_back(gSettings.chkEnableSound, 2047);
-	gSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).c_str(), Scale(340, 215, 400, 240), false, true, sPanel);
+	gSettings.stSoundVolume = env->addStaticText(gDataManager->GetSysString(2049).data(), Scale(340, 215, 400, 240), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stSoundVolume, 2049);
 	gSettings.scrSoundVolume = env->addScrollBar(true, Scale(405, 215, 645, 235), sPanel, SCROLL_SOUND_VOLUME);
 	gSettings.scrSoundVolume->setMax(100);
@@ -731,9 +731,9 @@ bool Game::Initialize() {
 	gSettings.scrSoundVolume->setPos(gGameConfig->soundVolume);
 	gSettings.scrSoundVolume->setLargeStep(1);
 	gSettings.scrSoundVolume->setSmallStep(1);
-	gSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, Scale(340, 245, 645, 270), sPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).c_str());
+	gSettings.chkEnableMusic = env->addCheckBox(gGameConfig->enablemusic, Scale(340, 245, 645, 270), sPanel, CHECKBOX_ENABLE_MUSIC, gDataManager->GetSysString(2046).data());
 	defaultStrings.emplace_back(gSettings.chkEnableMusic, 2046);
-	gSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).c_str(), Scale(340, 275, 400, 300), false, true, sPanel);
+	gSettings.stMusicVolume = env->addStaticText(gDataManager->GetSysString(2048).data(), Scale(340, 275, 400, 300), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stMusicVolume, 2048);
 	gSettings.scrMusicVolume = env->addScrollBar(true, Scale(405, 275, 645, 295), sPanel, SCROLL_MUSIC_VOLUME);
 	gSettings.scrMusicVolume->setMax(100);
@@ -741,17 +741,17 @@ bool Game::Initialize() {
 	gSettings.scrMusicVolume->setPos(gGameConfig->musicVolume);
 	gSettings.scrMusicVolume->setLargeStep(1);
 	gSettings.scrMusicVolume->setSmallStep(1);
-	gSettings.chkLoopMusic = env->addCheckBox(gGameConfig->loopMusic, Scale(340, 305, 645, 330), sPanel, CHECKBOX_LOOP_MUSIC, gDataManager->GetSysString(2079).c_str());
+	gSettings.chkLoopMusic = env->addCheckBox(gGameConfig->loopMusic, Scale(340, 305, 645, 330), sPanel, CHECKBOX_LOOP_MUSIC, gDataManager->GetSysString(2079).data());
 	defaultStrings.emplace_back(gSettings.chkLoopMusic, 2079);
-	gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).c_str(), Scale(340, 215, 645, 330), false, true, sPanel);
+	gSettings.stNoAudioBackend = env->addStaticText(gDataManager->GetSysString(2058).data(), Scale(340, 215, 645, 330), false, true, sPanel);
 	defaultStrings.emplace_back(gSettings.stNoAudioBackend, 2058);
 	gSettings.stNoAudioBackend->setVisible(false);
 	// end audio
 #ifdef DISCORD_APP_ID
-	gSettings.chkDiscordIntegration = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 335, 645, 360), sPanel, CHECKBOX_DISCORD_INTEGRATION, gDataManager->GetSysString(2078).c_str());
+	gSettings.chkDiscordIntegration = env->addCheckBox(gGameConfig->discordIntegration, Scale(340, 335, 645, 360), sPanel, CHECKBOX_DISCORD_INTEGRATION, gDataManager->GetSysString(2078).data());
 	defaultStrings.emplace_back(gSettings.chkDiscordIntegration, 2078);
 #endif
-	gSettings.chkHideHandsInReplays = env->addCheckBox(gGameConfig->hideHandsInReplays, Scale(340, 365, 645, 390), sPanel, CHECKBOX_HIDE_HANDS_REPLAY, gDataManager->GetSysString(2080).c_str());
+	gSettings.chkHideHandsInReplays = env->addCheckBox(gGameConfig->hideHandsInReplays, Scale(340, 365, 645, 390), sPanel, CHECKBOX_HIDE_HANDS_REPLAY, gDataManager->GetSysString(2080).data());
 	defaultStrings.emplace_back(gSettings.chkHideHandsInReplays, 2080);
 
 	wBtnSettings = env->addWindow(Scale(0, 610, 30, 640));
@@ -765,7 +765,7 @@ bool Game::Initialize() {
 	btnSettings->setImageSize(dimBtnSettings.getSize());
 	btnSettings->setImage(imageManager.tSettings);
 	//log
-	tabRepositories = wInfos->addTab(gDataManager->GetSysString(2045).c_str());
+	tabRepositories = wInfos->addTab(gDataManager->GetSysString(2045).data());
 	defaultStrings.emplace_back(tabRepositories, 2045);
 	mTabRepositories = irr::gui::CGUICustomContextMenu::addCustomContextMenu(env, tabRepositories, -1, Scale(1, 275, 301, 639));
 	mTabRepositories->grab();
@@ -785,12 +785,12 @@ bool Game::Initialize() {
 	wFTSelect = env->addWindow(Scale(550, 240, 780, 340), false, L"");
 	wFTSelect->getCloseButton()->setVisible(false);
 	wFTSelect->setVisible(false);
-	btnFirst = env->addButton(Scale(10, 30, 220, 55), wFTSelect, BUTTON_FIRST, gDataManager->GetSysString(100).c_str());
+	btnFirst = env->addButton(Scale(10, 30, 220, 55), wFTSelect, BUTTON_FIRST, gDataManager->GetSysString(100).data());
 	defaultStrings.emplace_back(btnFirst, 100);
-	btnSecond = env->addButton(Scale(10, 60, 220, 85), wFTSelect, BUTTON_SECOND, gDataManager->GetSysString(101).c_str());
+	btnSecond = env->addButton(Scale(10, 60, 220, 85), wFTSelect, BUTTON_SECOND, gDataManager->GetSysString(101).data());
 	defaultStrings.emplace_back(btnSecond, 101);
 	//message (310)
-	wMessage = env->addWindow(Scale(510 - 175, 200, 510 + 175, 340), false, gDataManager->GetSysString(1216).c_str());
+	wMessage = env->addWindow(Scale(510 - 175, 200, 510 + 175, 340), false, gDataManager->GetSysString(1216).data());
 	defaultStrings.emplace_back(wMessage, 1216);
 	wMessage->getCloseButton()->setVisible(false);
 	wMessage->setVisible(false);
@@ -800,7 +800,7 @@ bool Game::Initialize() {
 	((irr::gui::CGUICustomText*)stMessage)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	btnMsgOK = env->addButton(Scale(130, 105, 220, 130), wMessage, BUTTON_MSG_OK, gDataManager->GetSysString(1211).c_str());
+	btnMsgOK = env->addButton(Scale(130, 105, 220, 130), wMessage, BUTTON_MSG_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnMsgOK, 1211);
 	//auto fade message (310)
 	wACMessage = env->addWindow(Scale(490, 240, 840, 300), false, L"");
@@ -818,7 +818,7 @@ bool Game::Initialize() {
 		stACMessage->setOverrideColor(tmp_color);
 	stACMessage->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//yes/no (310)
-	wQuery = env->addWindow(Scale(490, 200, 840, 340), false, gDataManager->GetSysString(560).c_str());
+	wQuery = env->addWindow(Scale(490, 200, 840, 340), false, gDataManager->GetSysString(560).data());
 	defaultStrings.emplace_back(wQuery, 560);
 	wQuery->getCloseButton()->setVisible(false);
 	wQuery->setVisible(false);
@@ -828,9 +828,9 @@ bool Game::Initialize() {
 	((irr::gui::CGUICustomText*)stQMessage)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stQMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	btnYes = env->addButton(Scale(100, 105, 150, 130), wQuery, BUTTON_YES, gDataManager->GetSysString(1213).c_str());
+	btnYes = env->addButton(Scale(100, 105, 150, 130), wQuery, BUTTON_YES, gDataManager->GetSysString(1213).data());
 	defaultStrings.emplace_back(btnYes, 1213);
-	btnNo = env->addButton(Scale(200, 105, 250, 130), wQuery, BUTTON_NO, gDataManager->GetSysString(1214).c_str());
+	btnNo = env->addButton(Scale(200, 105, 250, 130), wQuery, BUTTON_NO, gDataManager->GetSysString(1214).data());
 	defaultStrings.emplace_back(btnNo, 1214);
 	//options (310)
 	wOptions = env->addWindow(Scale(490, 200, 840, 340), false, L"");
@@ -842,11 +842,11 @@ bool Game::Initialize() {
 	((irr::gui::CGUICustomText*)stOptions)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	stOptions->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	btnOptionOK = env->addButton(Scale(130, 105, 220, 130), wOptions, BUTTON_OPTION_OK, gDataManager->GetSysString(1211).c_str());
+	btnOptionOK = env->addButton(Scale(130, 105, 220, 130), wOptions, BUTTON_OPTION_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnOptionOK, 1211);
-	btnOptionp = env->addButton(Scale(20, 105, 60, 130), wOptions, BUTTON_OPTION_PREV, gDataManager->GetSysString(1432).c_str());
+	btnOptionp = env->addButton(Scale(20, 105, 60, 130), wOptions, BUTTON_OPTION_PREV, gDataManager->GetSysString(1432).data());
 	defaultStrings.emplace_back(btnOptionp, 1432);
-	btnOptionn = env->addButton(Scale(290, 105, 330, 130), wOptions, BUTTON_OPTION_NEXT, gDataManager->GetSysString(1433).c_str());
+	btnOptionn = env->addButton(Scale(290, 105, 330, 130), wOptions, BUTTON_OPTION_NEXT, gDataManager->GetSysString(1433).data());
 	defaultStrings.emplace_back(btnOptionn, 1433);
 	for(int i = 0; i < 5; ++i) {
 		btnOption[i] = env->addButton(Scale(10, 30 + 40 * i, 340, 60 + 40 * i), wOptions, BUTTON_OPTION_0 + i, L"");
@@ -856,7 +856,7 @@ bool Game::Initialize() {
 	scrOption->setSmallStep(1);
 	scrOption->setMin(0);
 	//pos select
-	wPosSelect = env->addWindow(Scale(340, 200, 935, 410), false, gDataManager->GetSysString(561).c_str());
+	wPosSelect = env->addWindow(Scale(340, 200, 935, 410), false, gDataManager->GetSysString(561).data());
 	defaultStrings.emplace_back(wPosSelect, 561);
 	wPosSelect->getCloseButton()->setVisible(false);
 	wPosSelect->setVisible(false);
@@ -887,7 +887,7 @@ bool Game::Initialize() {
 	}
 	scrCardList = env->addScrollBar(true, Scale(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
 	scrCardList->setLargeStep(scrCardList->getMax());
-	btnSelectOK = env->addButton(Scale(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, gDataManager->GetSysString(1211).c_str());
+	btnSelectOK = env->addButton(Scale(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnSelectOK, 1211);
 	//card display
 	wCardDisplay = env->addWindow(Scale(320, 100, 1000, 400), false, L"");
@@ -901,7 +901,7 @@ bool Game::Initialize() {
 		btnCardDisplay[i]->setImageSize(imgsize);
 	}
 	scrDisplayList = env->addScrollBar(true, Scale(30, 235, 650, 255), wCardDisplay, SCROLL_CARD_DISPLAY);
-	btnDisplayOK = env->addButton(Scale(300, 265, 380, 290), wCardDisplay, BUTTON_CARD_DISP_OK, gDataManager->GetSysString(1211).c_str());
+	btnDisplayOK = env->addButton(Scale(300, 265, 380, 290), wCardDisplay, BUTTON_CARD_DISP_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnDisplayOK, 1211);
 	//announce number
 	wANNumber = env->addWindow(Scale(550, 200, 780, 295), false, L"");
@@ -909,7 +909,7 @@ bool Game::Initialize() {
 	wANNumber->setVisible(false);
 	cbANNumber =  ADDComboBox(Scale(40, 30, 190, 50), wANNumber, -1);
 	cbANNumber->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnANNumberOK = env->addButton(Scale(80, 60, 150, 85), wANNumber, BUTTON_ANNUMBER_OK, gDataManager->GetSysString(1211).c_str());
+	btnANNumberOK = env->addButton(Scale(80, 60, 150, 85), wANNumber, BUTTON_ANNUMBER_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnANNumberOK, 1211);
 	//announce card
 	wANCard = env->addWindow(Scale(430, 170, 840, 370), false, L"");
@@ -918,24 +918,24 @@ bool Game::Initialize() {
 	ebANCard = env->addEditBox(L"", Scale(20, 25, 390, 45), true, wANCard, EDITBOX_ANCARD);
 	ebANCard->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	lstANCard = env->addListBox(Scale(20, 50, 390, 160), wANCard, LISTBOX_ANCARD, true);
-	btnANCardOK = env->addButton(Scale(60, 165, 350, 190), wANCard, BUTTON_ANCARD_OK, gDataManager->GetSysString(1211).c_str());
+	btnANCardOK = env->addButton(Scale(60, 165, 350, 190), wANCard, BUTTON_ANCARD_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnANCardOK, 1211);
 	//announce attribute
-	wANAttribute = env->addWindow(Scale(500, 200, 830, 285), false, gDataManager->GetSysString(562).c_str());
+	wANAttribute = env->addWindow(Scale(500, 200, 830, 285), false, gDataManager->GetSysString(562).data());
 	defaultStrings.emplace_back(wANAttribute, 562);
 	wANAttribute->getCloseButton()->setVisible(false);
 	wANAttribute->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 7; filter <<= 1, ++i)
 		chkAttribute[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 80, 25 + (i / 4) * 25, 90 + (i % 4) * 80, 50 + (i / 4) * 25),
-										   wANAttribute, CHECK_ATTRIBUTE, gDataManager->FormatAttribute(filter).c_str());
+										   wANAttribute, CHECK_ATTRIBUTE, gDataManager->FormatAttribute(filter).data());
 	//announce race
-	wANRace = env->addWindow(Scale(480, 200, 850, 410), false, gDataManager->GetSysString(563).c_str());
+	wANRace = env->addWindow(Scale(480, 200, 850, 410), false, gDataManager->GetSysString(563).data());
 	defaultStrings.emplace_back(wANRace, 563);
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 25; filter <<= 1, ++i)
 		chkRace[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
-									  wANRace, CHECK_RACE, gDataManager->FormatRace(filter).c_str());
+									  wANRace, CHECK_RACE, gDataManager->FormatRace(filter).data());
 	//selection hint
 	stHintMsg = env->addStaticText(L"", Scale(500, 60, 820, 90), true, false, 0, -1, false);
 	stHintMsg->setBackgroundColor(skin::DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR_VAL);
@@ -949,67 +949,67 @@ bool Game::Initialize() {
 	wCmdMenu->setDrawTitlebar(false);
 	wCmdMenu->setVisible(false);
 	wCmdMenu->getCloseButton()->setVisible(false);
-	btnActivate = env->addButton(Scale(1, 1, 99, 21), wCmdMenu, BUTTON_CMD_ACTIVATE, gDataManager->GetSysString(1150).c_str());
+	btnActivate = env->addButton(Scale(1, 1, 99, 21), wCmdMenu, BUTTON_CMD_ACTIVATE, gDataManager->GetSysString(1150).data());
 	defaultStrings.emplace_back(btnActivate, 1150);
-	btnSummon = env->addButton(Scale(1, 22, 99, 42), wCmdMenu, BUTTON_CMD_SUMMON, gDataManager->GetSysString(1151).c_str());
+	btnSummon = env->addButton(Scale(1, 22, 99, 42), wCmdMenu, BUTTON_CMD_SUMMON, gDataManager->GetSysString(1151).data());
 	defaultStrings.emplace_back(btnSummon, 1151);
-	btnSPSummon = env->addButton(Scale(1, 43, 99, 63), wCmdMenu, BUTTON_CMD_SPSUMMON, gDataManager->GetSysString(1152).c_str());
+	btnSPSummon = env->addButton(Scale(1, 43, 99, 63), wCmdMenu, BUTTON_CMD_SPSUMMON, gDataManager->GetSysString(1152).data());
 	defaultStrings.emplace_back(btnSPSummon, 1152);
-	btnMSet = env->addButton(Scale(1, 64, 99, 84), wCmdMenu, BUTTON_CMD_MSET, gDataManager->GetSysString(1153).c_str());
+	btnMSet = env->addButton(Scale(1, 64, 99, 84), wCmdMenu, BUTTON_CMD_MSET, gDataManager->GetSysString(1153).data());
 	defaultStrings.emplace_back(btnMSet, 1153);
-	btnSSet = env->addButton(Scale(1, 85, 99, 105), wCmdMenu, BUTTON_CMD_SSET, gDataManager->GetSysString(1153).c_str());
+	btnSSet = env->addButton(Scale(1, 85, 99, 105), wCmdMenu, BUTTON_CMD_SSET, gDataManager->GetSysString(1153).data());
 	defaultStrings.emplace_back(btnSSet, 1153);
-	btnRepos = env->addButton(Scale(1, 106, 99, 126), wCmdMenu, BUTTON_CMD_REPOS, gDataManager->GetSysString(1154).c_str());
+	btnRepos = env->addButton(Scale(1, 106, 99, 126), wCmdMenu, BUTTON_CMD_REPOS, gDataManager->GetSysString(1154).data());
 	defaultStrings.emplace_back(btnRepos, 1154);
-	btnAttack = env->addButton(Scale(1, 127, 99, 147), wCmdMenu, BUTTON_CMD_ATTACK, gDataManager->GetSysString(1157).c_str());
+	btnAttack = env->addButton(Scale(1, 127, 99, 147), wCmdMenu, BUTTON_CMD_ATTACK, gDataManager->GetSysString(1157).data());
 	defaultStrings.emplace_back(btnAttack, 1157);
-	btnShowList = env->addButton(Scale(1, 148, 99, 168), wCmdMenu, BUTTON_CMD_SHOWLIST, gDataManager->GetSysString(1158).c_str());
+	btnShowList = env->addButton(Scale(1, 148, 99, 168), wCmdMenu, BUTTON_CMD_SHOWLIST, gDataManager->GetSysString(1158).data());
 	defaultStrings.emplace_back(btnShowList, 1158);
-	btnOperation = env->addButton(Scale(1, 169, 99, 189), wCmdMenu, BUTTON_CMD_ACTIVATE, gDataManager->GetSysString(1161).c_str());
+	btnOperation = env->addButton(Scale(1, 169, 99, 189), wCmdMenu, BUTTON_CMD_ACTIVATE, gDataManager->GetSysString(1161).data());
 	defaultStrings.emplace_back(btnOperation, 1161);
-	btnReset = env->addButton(Scale(1, 190, 99, 210), wCmdMenu, BUTTON_CMD_RESET, gDataManager->GetSysString(1162).c_str());
+	btnReset = env->addButton(Scale(1, 190, 99, 210), wCmdMenu, BUTTON_CMD_RESET, gDataManager->GetSysString(1162).data());
 	defaultStrings.emplace_back(btnReset, 1162);
 	//deck edit
 	wDeckEdit = env->addStaticText(L"", Scale(309, 5, 605, 130), true, false, 0, -1, true);
 	wDeckEdit->setVisible(false);
-	stBanlist = env->addStaticText(gDataManager->GetSysString(1300).c_str(), Scale(10, 9, 100, 29), false, false, wDeckEdit);
+	stBanlist = env->addStaticText(gDataManager->GetSysString(1300).data(), Scale(10, 9, 100, 29), false, false, wDeckEdit);
 	defaultStrings.emplace_back(stBanlist, 1300);
 	cbDBLFList = ADDComboBox(Scale(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBLFLIST);
 	cbDBLFList->setMaxSelectionRows(10);
-	stDeck = env->addStaticText(gDataManager->GetSysString(1301).c_str(), Scale(10, 39, 100, 59), false, false, wDeckEdit);
+	stDeck = env->addStaticText(gDataManager->GetSysString(1301).data(), Scale(10, 39, 100, 59), false, false, wDeckEdit);
 	defaultStrings.emplace_back(stDeck, 1301);
 	cbDBDecks = ADDComboBox(Scale(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	cbDBDecks->setMaxSelectionRows(15);
 
-	btnSaveDeck = env->addButton(Scale(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, gDataManager->GetSysString(1302).c_str());
+	btnSaveDeck = env->addButton(Scale(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, gDataManager->GetSysString(1302).data());
 	defaultStrings.emplace_back(btnSaveDeck, 1302);
-	btnRenameDeck = env->addButton(Scale(5, 65, 75, 90), wDeckEdit, BUTTON_RENAME_DECK, gDataManager->GetSysString(1362).c_str());
+	btnRenameDeck = env->addButton(Scale(5, 65, 75, 90), wDeckEdit, BUTTON_RENAME_DECK, gDataManager->GetSysString(1362).data());
 	defaultStrings.emplace_back(btnRenameDeck, 1362);
 	ebDeckname = env->addEditBox(L"", Scale(80, 65, 220, 90), true, wDeckEdit, EDITBOX_DECK_NAME);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnSaveDeckAs = env->addButton(Scale(225, 65, 290, 90), wDeckEdit, BUTTON_SAVE_DECK_AS, gDataManager->GetSysString(1303).c_str());
+	btnSaveDeckAs = env->addButton(Scale(225, 65, 290, 90), wDeckEdit, BUTTON_SAVE_DECK_AS, gDataManager->GetSysString(1303).data());
 	defaultStrings.emplace_back(btnSaveDeckAs, 1303);
-	btnShuffleDeck = env->addButton(Scale(5, 95, 75, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, gDataManager->GetSysString(1307).c_str());
+	btnShuffleDeck = env->addButton(Scale(5, 95, 75, 120), wDeckEdit, BUTTON_SHUFFLE_DECK, gDataManager->GetSysString(1307).data());
 	defaultStrings.emplace_back(btnShuffleDeck, 1307);
-	btnSortDeck = env->addButton(Scale(80, 95, 145, 120), wDeckEdit, BUTTON_SORT_DECK, gDataManager->GetSysString(1305).c_str());
+	btnSortDeck = env->addButton(Scale(80, 95, 145, 120), wDeckEdit, BUTTON_SORT_DECK, gDataManager->GetSysString(1305).data());
 	defaultStrings.emplace_back(btnSortDeck, 1305);
-	btnClearDeck = env->addButton(Scale(155, 95, 220, 120), wDeckEdit, BUTTON_CLEAR_DECK, gDataManager->GetSysString(1304).c_str());
+	btnClearDeck = env->addButton(Scale(155, 95, 220, 120), wDeckEdit, BUTTON_CLEAR_DECK, gDataManager->GetSysString(1304).data());
 	defaultStrings.emplace_back(btnClearDeck, 1304);
-	btnDeleteDeck = env->addButton(Scale(225, 95, 290, 120), wDeckEdit, BUTTON_DELETE_DECK, gDataManager->GetSysString(1308).c_str());
+	btnDeleteDeck = env->addButton(Scale(225, 95, 290, 120), wDeckEdit, BUTTON_DELETE_DECK, gDataManager->GetSysString(1308).data());
 	defaultStrings.emplace_back(btnDeleteDeck, 1308);
-	btnSideOK = env->addButton(Scale(510, 40, 820, 80), 0, BUTTON_SIDE_OK, gDataManager->GetSysString(1334).c_str());
+	btnSideOK = env->addButton(Scale(510, 40, 820, 80), 0, BUTTON_SIDE_OK, gDataManager->GetSysString(1334).data());
 	defaultStrings.emplace_back(btnSideOK, 1334);
 	btnSideOK->setVisible(false);
-	btnSideShuffle = env->addButton(Scale(310, 100, 370, 130), 0, BUTTON_SHUFFLE_DECK, gDataManager->GetSysString(1307).c_str());
+	btnSideShuffle = env->addButton(Scale(310, 100, 370, 130), 0, BUTTON_SHUFFLE_DECK, gDataManager->GetSysString(1307).data());
 	defaultStrings.emplace_back(btnSideShuffle, 1307);
 	btnSideShuffle->setVisible(false);
-	btnSideSort = env->addButton(Scale(375, 100, 435, 130), 0, BUTTON_SORT_DECK, gDataManager->GetSysString(1305).c_str());
+	btnSideSort = env->addButton(Scale(375, 100, 435, 130), 0, BUTTON_SORT_DECK, gDataManager->GetSysString(1305).data());
 	defaultStrings.emplace_back(btnSideSort, 1305);
 	btnSideSort->setVisible(false);
-	btnSideReload = env->addButton(Scale(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, gDataManager->GetSysString(1309).c_str());
+	btnSideReload = env->addButton(Scale(440, 100, 500, 130), 0, BUTTON_SIDE_RELOAD, gDataManager->GetSysString(1309).data());
 	defaultStrings.emplace_back(btnSideReload, 1309);
 	btnSideReload->setVisible(false);
-	btnHandTest = env->addButton(Scale(205, 90, 295, 130), 0, BUTTON_HAND_TEST, gDataManager->GetSysString(1297).c_str());
+	btnHandTest = env->addButton(Scale(205, 90, 295, 130), 0, BUTTON_HAND_TEST, gDataManager->GetSysString(1297).data());
 	defaultStrings.emplace_back(btnHandTest, 1297);
 	btnHandTest->setVisible(false);
 	btnHandTest->setEnabled(coreloaded);
@@ -1018,13 +1018,13 @@ bool Game::Initialize() {
 	btnHandTestSettings->setVisible(false);
 	btnHandTestSettings->setEnabled(coreloaded);
 
-	stHandTestSettings = irr::gui::CGUICustomText::addCustomText(gDataManager->GetSysString(1375).c_str(), false, env, btnHandTestSettings, -1, Scale(0, 0, 90, 40));
+	stHandTestSettings = irr::gui::CGUICustomText::addCustomText(gDataManager->GetSysString(1375).data(), false, env, btnHandTestSettings, -1, Scale(0, 0, 90, 40));
 	stHandTestSettings->setWordWrap(true);
 	stHandTestSettings->setEnabled(coreloaded);
 	stHandTestSettings->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	defaultStrings.emplace_back(stHandTestSettings, 1375);
 	
-	wHandTest = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(1297).c_str());
+	wHandTest = env->addWindow(Scale(mainMenuLeftX, 200, mainMenuRightX, 450), false, gDataManager->GetSysString(1297).data());
 	wHandTest->getCloseButton()->setVisible(false);
 	wHandTest->setVisible(false);
 	defaultStrings.emplace_back(wHandTest, 1297);
@@ -1033,24 +1033,24 @@ bool Game::Initialize() {
 		if (increment) offset += 35;
 		return Scale(leftRail, offset, rightRail, offset + 25);
 	};
-	chkHandTestNoOpponent = env->addCheckBox(true, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, gDataManager->GetSysString(2081).c_str());
+	chkHandTestNoOpponent = env->addCheckBox(true, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, gDataManager->GetSysString(2081).data());
 	defaultStrings.emplace_back(chkHandTestNoOpponent, 2081);
-	chkHandTestNoShuffle = env->addCheckBox(false, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, gDataManager->GetSysString(1230).c_str());
+	chkHandTestNoShuffle = env->addCheckBox(false, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, -1, gDataManager->GetSysString(1230).data());
 	defaultStrings.emplace_back(chkHandTestNoShuffle, 1230);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1232).c_str(), nextHandTestRow(10, 90), false, false, wHandTest);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1232).data(), nextHandTestRow(10, 90), false, false, wHandTest);
 	defaultStrings.emplace_back(tmpptr, 1232);
 	ebHandTestStartHand = env->addEditBox(L"5", nextHandTestRow(95, 175, false), true, wHandTest, EDITBOX_NUMERIC);
 	ebHandTestStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).c_str(), nextHandTestRow(10, 90), false, false, wHandTest);
+	tmpptr = env->addStaticText(gDataManager->GetSysString(1236).data(), nextHandTestRow(10, 90), false, false, wHandTest);
 	defaultStrings.emplace_back(tmpptr, 1236);
 	cbHandTestDuelRule = ADDComboBox(nextHandTestRow(95, mainMenuWidth - 10, false), wHandTest);
 	ReloadCBDuelRule(cbHandTestDuelRule);
 	cbHandTestDuelRule->setSelected(4);
-	chkHandTestSaveReplay = env->addCheckBox(gGameConfig->saveHandTest, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, CHECKBOX_SAVE_HAND_TEST_REPLAY, gDataManager->GetSysString(2077).c_str());
+	chkHandTestSaveReplay = env->addCheckBox(gGameConfig->saveHandTest, nextHandTestRow(10, mainMenuWidth - 10), wHandTest, CHECKBOX_SAVE_HAND_TEST_REPLAY, gDataManager->GetSysString(2077).data());
 	defaultStrings.emplace_back(chkHandTestSaveReplay, 2077);
-	tmpptr = env->addButton(nextHandTestRow(10, mainMenuWidth / 2 - 5), wHandTest, BUTTON_HAND_TEST_CANCEL, gDataManager->GetSysString(1210).c_str()); // cancel
+	tmpptr = env->addButton(nextHandTestRow(10, mainMenuWidth / 2 - 5), wHandTest, BUTTON_HAND_TEST_CANCEL, gDataManager->GetSysString(1210).data()); // cancel
 	defaultStrings.emplace_back(tmpptr, 1210);
-	tmpptr = env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, BUTTON_HAND_TEST_START, gDataManager->GetSysString(1215).c_str()); // start
+	tmpptr = env->addButton(nextHandTestRow(mainMenuWidth / 2 + 5, mainMenuWidth - 10, false), wHandTest, BUTTON_HAND_TEST_START, gDataManager->GetSysString(1215).data()); // start
 	defaultStrings.emplace_back(tmpptr, 1215);
 	//
 	scrFilter = env->addScrollBar(false, Scale(999, 161, 1019, 629), 0, SCROLL_FILTER);
@@ -1066,74 +1066,74 @@ bool Game::Initialize() {
 	//filters
 	wFilter = env->addStaticText(L"", Scale(610, 5, 1020, 130), true, false, 0, -1, true);
 	wFilter->setVisible(false);
-	stCategory = env->addStaticText(gDataManager->GetSysString(1311).c_str(), Scale(10, 5, 70, 25), false, false, wFilter);
+	stCategory = env->addStaticText(gDataManager->GetSysString(1311).data(), Scale(10, 5, 70, 25), false, false, wFilter);
 	defaultStrings.emplace_back(stCategory, 1311);
 	cbCardType = ADDComboBox(Scale(60, 3, 120, 23), wFilter, COMBOBOX_MAINTYPE);
 	ReloadCBCardType();
 	cbCardType2 = ADDComboBox(Scale(130, 3, 190, 23), wFilter, COMBOBOX_SECONDTYPE);
 	cbCardType2->setMaxSelectionRows(20);
-	cbCardType2->addItem(gDataManager->GetSysString(1310).c_str(), 0);
-	chkAnime = env->addCheckBox(gGameConfig->chkAnime, Scale(10, 96, 150, 118), wFilter, CHECKBOX_SHOW_ANIME, gDataManager->GetSysString(1999).c_str());
+	cbCardType2->addItem(gDataManager->GetSysString(1310).data(), 0);
+	chkAnime = env->addCheckBox(gGameConfig->chkAnime, Scale(10, 96, 150, 118), wFilter, CHECKBOX_SHOW_ANIME, gDataManager->GetSysString(1999).data());
 	defaultStrings.emplace_back(chkAnime, 1999);
-	stLimit = env->addStaticText(gDataManager->GetSysString(1315).c_str(), Scale(205, 5, 280, 25), false, false, wFilter);
+	stLimit = env->addStaticText(gDataManager->GetSysString(1315).data(), Scale(205, 5, 280, 25), false, false, wFilter);
 	defaultStrings.emplace_back(stLimit, 1315);
 	cbLimit = ADDComboBox(Scale(260, 3, 390, 23), wFilter, COMBOBOX_OTHER_FILT);
 	cbLimit->setMaxSelectionRows(10);
 	ReloadCBLimit();
-	stAttribute = env->addStaticText(gDataManager->GetSysString(1319).c_str(), Scale(10, 28, 70, 48), false, false, wFilter);
+	stAttribute = env->addStaticText(gDataManager->GetSysString(1319).data(), Scale(10, 28, 70, 48), false, false, wFilter);
 	defaultStrings.emplace_back(stAttribute, 1319);
 	cbAttribute = ADDComboBox(Scale(60, 26, 190, 46), wFilter, COMBOBOX_OTHER_FILT);
 	cbAttribute->setMaxSelectionRows(10);
 	ReloadCBAttribute();
-	stRace = env->addStaticText(gDataManager->GetSysString(1321).c_str(), Scale(10, 51, 70, 71), false, false, wFilter);
+	stRace = env->addStaticText(gDataManager->GetSysString(1321).data(), Scale(10, 51, 70, 71), false, false, wFilter);
 	cbRace = ADDComboBox(Scale(60, 49, 190, 69), wFilter, COMBOBOX_OTHER_FILT);
 	cbRace->setMaxSelectionRows(10);
 	ReloadCBRace();
-	stAttack = env->addStaticText(gDataManager->GetSysString(1322).c_str(), Scale(205, 28, 280, 48), false, false, wFilter);
+	stAttack = env->addStaticText(gDataManager->GetSysString(1322).data(), Scale(205, 28, 280, 48), false, false, wFilter);
 	defaultStrings.emplace_back(stAttack, 1322);
 	ebAttack = env->addEditBox(L"", Scale(260, 26, 340, 46), true, wFilter, EDITBOX_ATTACK);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stDefense = env->addStaticText(gDataManager->GetSysString(1323).c_str(), Scale(205, 51, 280, 71), false, false, wFilter);
+	stDefense = env->addStaticText(gDataManager->GetSysString(1323).data(), Scale(205, 51, 280, 71), false, false, wFilter);
 	defaultStrings.emplace_back(stDefense, 1323);
 	ebDefense = env->addEditBox(L"", Scale(260, 49, 340, 69), true, wFilter, EDITBOX_DEFENSE);
 	ebDefense->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stStar = env->addStaticText(gDataManager->GetSysString(1324).c_str(), Scale(10, 74, 80, 94), false, false, wFilter);
+	stStar = env->addStaticText(gDataManager->GetSysString(1324).data(), Scale(10, 74, 80, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stStar, 1324);
 	ebStar = env->addEditBox(L"", Scale(60, 72, 100, 92), true, wFilter, EDITBOX_STAR);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stScale = env->addStaticText(gDataManager->GetSysString(1336).c_str(), Scale(110, 74, 150, 94), false, false, wFilter);
+	stScale = env->addStaticText(gDataManager->GetSysString(1336).data(), Scale(110, 74, 150, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stScale, 1336);
 	ebScale = env->addEditBox(L"", Scale(150, 72, 190, 92), true, wFilter, EDITBOX_SCALE);
 	ebScale->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	stSearch = env->addStaticText(gDataManager->GetSysString(1325).c_str(), Scale(205, 74, 280, 94), false, false, wFilter);
+	stSearch = env->addStaticText(gDataManager->GetSysString(1325).data(), Scale(205, 74, 280, 94), false, false, wFilter);
 	defaultStrings.emplace_back(stSearch, 1325);
 	ebCardName = env->addEditBox(L"", Scale(260, 72, 390, 92), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnEffectFilter = env->addButton(Scale(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, gDataManager->GetSysString(1326).c_str());
+	btnEffectFilter = env->addButton(Scale(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, gDataManager->GetSysString(1326).data());
 	defaultStrings.emplace_back(btnEffectFilter, 1326);
-	btnStartFilter = env->addButton(Scale(260, 96, 390, 118), wFilter, BUTTON_START_FILTER, gDataManager->GetSysString(1327).c_str());
+	btnStartFilter = env->addButton(Scale(260, 96, 390, 118), wFilter, BUTTON_START_FILTER, gDataManager->GetSysString(1327).data());
 	defaultStrings.emplace_back(btnStartFilter, 1327);
-	btnClearFilter = env->addButton(Scale(205, 96, 255, 118), wFilter, BUTTON_CLEAR_FILTER, gDataManager->GetSysString(1304).c_str());
+	btnClearFilter = env->addButton(Scale(205, 96, 255, 118), wFilter, BUTTON_CLEAR_FILTER, gDataManager->GetSysString(1304).data());
 	defaultStrings.emplace_back(btnClearFilter, 1304);
 	wCategories = env->addWindow(Scale(450, 60, 1000, 270), false, L"");
 	wCategories->getCloseButton()->setVisible(false);
 	wCategories->setDrawTitlebar(false);
 	wCategories->setDraggable(false);
 	wCategories->setVisible(false);
-	btnCategoryOK = env->addButton(Scale(200, 175, 300, 200), wCategories, BUTTON_CATEGORY_OK, gDataManager->GetSysString(1211).c_str());
+	btnCategoryOK = env->addButton(Scale(200, 175, 300, 200), wCategories, BUTTON_CATEGORY_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnCategoryOK, 1211);
 	for(int i = 0; i < 32; ++i) {
-		chkCategory[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 130, 10 + (i / 4) * 20, 140 + (i % 4) * 130, 30 + (i / 4) * 20), wCategories, -1, gDataManager->GetSysString(1100 + i).c_str());
+		chkCategory[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 130, 10 + (i / 4) * 20, 140 + (i % 4) * 130, 30 + (i / 4) * 20), wCategories, -1, gDataManager->GetSysString(1100 + i).data());
 		defaultStrings.emplace_back(chkCategory[i], 1100 + i);
 	}
-	btnMarksFilter = env->addButton(Scale(155, 96, 240, 118), wFilter, BUTTON_MARKS_FILTER, gDataManager->GetSysString(1374).c_str());
+	btnMarksFilter = env->addButton(Scale(155, 96, 240, 118), wFilter, BUTTON_MARKS_FILTER, gDataManager->GetSysString(1374).data());
 	defaultStrings.emplace_back(btnMarksFilter, 1374);
 	wLinkMarks = env->addWindow(Scale(700, 30, 820, 150), false, L"");
 	wLinkMarks->getCloseButton()->setVisible(false);
 	wLinkMarks->setDrawTitlebar(false);
 	wLinkMarks->setDraggable(false);
 	wLinkMarks->setVisible(false);
-	btnMarksOK = env->addButton(Scale(45, 45, 75, 75), wLinkMarks, BUTTON_MARKERS_OK, gDataManager->GetSysString(1211).c_str());
+	btnMarksOK = env->addButton(Scale(45, 45, 75, 75), wLinkMarks, BUTTON_MARKERS_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnMarksOK, 1211);
 	btnMark[0] = env->addButton(Scale(10, 10, 40, 40), wLinkMarks, -1, L"\u2196");
 	btnMark[1] = env->addButton(Scale(45, 10, 75, 40), wLinkMarks, -1, L"\u2191");
@@ -1146,7 +1146,7 @@ bool Game::Initialize() {
 	for(int i=0;i<8;i++)
 		btnMark[i]->setIsPushButton(true);
 	//replay window
-	wReplay = env->addWindow(Scale(220, 100, 800, 520), false, gDataManager->GetSysString(1202).c_str());
+	wReplay = env->addWindow(Scale(220, 100, 800, 520), false, gDataManager->GetSysString(1202).data());
 	defaultStrings.emplace_back(wReplay, 1202);
 	wReplay->getCloseButton()->setVisible(false);
 	wReplay->setVisible(false);
@@ -1154,35 +1154,35 @@ bool Game::Initialize() {
 	lstReplayList->setWorkingPath(L"./replay", true);
 	lstReplayList->addFilteredExtensions(coreloaded ? std::vector<std::wstring>{L"yrp", L"yrpx"} : std::vector<std::wstring>{ L"yrpx" });
 	lstReplayList->setItemHeight(Scale(18));
-	btnLoadReplay = env->addButton(Scale(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, gDataManager->GetSysString(1348).c_str());
+	btnLoadReplay = env->addButton(Scale(470, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, gDataManager->GetSysString(1348).data());
 	defaultStrings.emplace_back(btnLoadReplay, 1348);
 	btnLoadReplay->setEnabled(false);
-	btnDeleteReplay = env->addButton(Scale(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, gDataManager->GetSysString(1361).c_str());
+	btnDeleteReplay = env->addButton(Scale(360, 355, 460, 380), wReplay, BUTTON_DELETE_REPLAY, gDataManager->GetSysString(1361).data());
 	defaultStrings.emplace_back(btnDeleteReplay, 1361);
 	btnDeleteReplay->setEnabled(false);
-	btnRenameReplay = env->addButton(Scale(360, 385, 460, 410), wReplay, BUTTON_RENAME_REPLAY, gDataManager->GetSysString(1362).c_str());
+	btnRenameReplay = env->addButton(Scale(360, 385, 460, 410), wReplay, BUTTON_RENAME_REPLAY, gDataManager->GetSysString(1362).data());
 	defaultStrings.emplace_back(btnRenameReplay, 1362);
 	btnRenameReplay->setEnabled(false);
-	btnReplayCancel = env->addButton(Scale(470, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, gDataManager->GetSysString(1347).c_str());
+	btnReplayCancel = env->addButton(Scale(470, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, gDataManager->GetSysString(1347).data());
 	defaultStrings.emplace_back(btnReplayCancel, 1347);
- 	tmpptr = env->addStaticText(gDataManager->GetSysString(1349).c_str(), Scale(360, 30, 570, 50), false, true, wReplay);
+ 	tmpptr = env->addStaticText(gDataManager->GetSysString(1349).data(), Scale(360, 30, 570, 50), false, true, wReplay);
 	defaultStrings.emplace_back(tmpptr, 1349);
 	stReplayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wReplay, -1, Scale(360, 60, 570, 350));
 	stReplayInfo->setWordWrap(true);
 #ifdef __ANDROID__
 	((irr::gui::CGUICustomText*)stReplayInfo)->setTouchControl(!gGameConfig->native_mouse);
 #endif
-	btnExportDeck = env->addButton(Scale(470, 325, 570, 350), wReplay, BUTTON_EXPORT_DECK, gDataManager->GetSysString(1358).c_str());
+	btnExportDeck = env->addButton(Scale(470, 325, 570, 350), wReplay, BUTTON_EXPORT_DECK, gDataManager->GetSysString(1358).data());
 	defaultStrings.emplace_back(btnExportDeck, 1358);
 	btnExportDeck->setEnabled(false);
-	chkYrp = env->addCheckBox(false, Scale(360, 250, 560, 270), wReplay, -1, gDataManager->GetSysString(1356).c_str());
+	chkYrp = env->addCheckBox(false, Scale(360, 250, 560, 270), wReplay, -1, gDataManager->GetSysString(1356).data());
 	defaultStrings.emplace_back(chkYrp, 1356);
- 	tmpptr = env->addStaticText(gDataManager->GetSysString(1353).c_str(), Scale(360, 275, 570, 295), false, true, wReplay);
+ 	tmpptr = env->addStaticText(gDataManager->GetSysString(1353).data(), Scale(360, 275, 570, 295), false, true, wReplay);
 	defaultStrings.emplace_back(tmpptr, 1353);
 	ebRepStartTurn = env->addEditBox(L"", Scale(360, 300, 460, 320), true, wReplay, -1);
 	ebRepStartTurn->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//single play window
-	wSinglePlay = env->addWindow(Scale(220, 100, 800, 520), false, gDataManager->GetSysString(1201).c_str());
+	wSinglePlay = env->addWindow(Scale(220, 100, 800, 520), false, gDataManager->GetSysString(1201).data());
 	defaultStrings.emplace_back(wSinglePlay, 1201);
 	wSinglePlay->getCloseButton()->setVisible(false);
 	wSinglePlay->setVisible(false);
@@ -1190,12 +1190,12 @@ bool Game::Initialize() {
 	lstSinglePlayList->setItemHeight(Scale(18));
 	lstSinglePlayList->setWorkingPath(L"./puzzles", true);
 	lstSinglePlayList->addFilteredExtensions({L"lua"});
-	btnLoadSinglePlay = env->addButton(Scale(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, gDataManager->GetSysString(1357).c_str());
+	btnLoadSinglePlay = env->addButton(Scale(460, 355, 570, 380), wSinglePlay, BUTTON_LOAD_SINGLEPLAY, gDataManager->GetSysString(1357).data());
 	defaultStrings.emplace_back(btnLoadSinglePlay, 1357);
 	btnLoadSinglePlay->setEnabled(false);
-	btnSinglePlayCancel = env->addButton(Scale(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, gDataManager->GetSysString(1210).c_str());
+	btnSinglePlayCancel = env->addButton(Scale(460, 385, 570, 410), wSinglePlay, BUTTON_CANCEL_SINGLEPLAY, gDataManager->GetSysString(1210).data());
 	defaultStrings.emplace_back(btnSinglePlayCancel, 1210);
- 	tmpptr = env->addStaticText(gDataManager->GetSysString(1352).c_str(), Scale(360, 30, 570, 50), false, true, wSinglePlay);
+ 	tmpptr = env->addStaticText(gDataManager->GetSysString(1352).data(), Scale(360, 30, 570, 50), false, true, wSinglePlay);
 	defaultStrings.emplace_back(tmpptr, 1352);
 	stSinglePlayInfo = irr::gui::CGUICustomText::addCustomText(L"", false, env, wSinglePlay, -1, Scale(360, 60, 570, 350));
 	((irr::gui::CGUICustomText*)stSinglePlayInfo)->enableScrollBar();
@@ -1204,32 +1204,32 @@ bool Game::Initialize() {
 	((irr::gui::CGUICustomText*)stSinglePlayInfo)->setTouchControl(!gGameConfig->native_mouse);
 #endif
 	//replay save
-	wReplaySave = env->addWindow(Scale(510, 200, 820, 320), false, gDataManager->GetSysString(1340).c_str());
+	wReplaySave = env->addWindow(Scale(510, 200, 820, 320), false, gDataManager->GetSysString(1340).data());
 	defaultStrings.emplace_back(wReplaySave, 1340);
 	wReplaySave->getCloseButton()->setVisible(false);
 	wReplaySave->setVisible(false);
- 	tmpptr = env->addStaticText(gDataManager->GetSysString(1342).c_str(), Scale(20, 25, 290, 45), false, false, wReplaySave);
+ 	tmpptr = env->addStaticText(gDataManager->GetSysString(1342).data(), Scale(20, 25, 290, 45), false, false, wReplaySave);
 	defaultStrings.emplace_back(tmpptr, 1342);
 	ebRSName =  env->addEditBox(L"", Scale(20, 50, 290, 70), true, wReplaySave, EDITBOX_REPLAY_NAME);
 	ebRSName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnRSYes = env->addButton(Scale(70, 80, 140, 105), wReplaySave, BUTTON_REPLAY_SAVE, gDataManager->GetSysString(1341).c_str());
+	btnRSYes = env->addButton(Scale(70, 80, 140, 105), wReplaySave, BUTTON_REPLAY_SAVE, gDataManager->GetSysString(1341).data());
 	defaultStrings.emplace_back(btnRSYes, 1341);
-	btnRSNo = env->addButton(Scale(170, 80, 240, 105), wReplaySave, BUTTON_REPLAY_CANCEL, gDataManager->GetSysString(1212).c_str());
+	btnRSNo = env->addButton(Scale(170, 80, 240, 105), wReplaySave, BUTTON_REPLAY_CANCEL, gDataManager->GetSysString(1212).data());
 	defaultStrings.emplace_back(btnRSNo, 1212);
 	//replay control
 	wReplayControl = env->addStaticText(L"", Scale(205, 118, 295, 273), true, false, 0, -1, true);
 	wReplayControl->setVisible(false);
-	btnReplayStart = env->addButton(Scale(5, 5, 85, 25), wReplayControl, BUTTON_REPLAY_START, gDataManager->GetSysString(1343).c_str());
+	btnReplayStart = env->addButton(Scale(5, 5, 85, 25), wReplayControl, BUTTON_REPLAY_START, gDataManager->GetSysString(1343).data());
 	defaultStrings.emplace_back(btnReplayStart, 1343);
-	btnReplayPause = env->addButton(Scale(5, 5, 85, 25), wReplayControl, BUTTON_REPLAY_PAUSE, gDataManager->GetSysString(1344).c_str());
+	btnReplayPause = env->addButton(Scale(5, 5, 85, 25), wReplayControl, BUTTON_REPLAY_PAUSE, gDataManager->GetSysString(1344).data());
 	defaultStrings.emplace_back(btnReplayPause, 1344);
-	btnReplayStep = env->addButton(Scale(5, 30, 85, 50), wReplayControl, BUTTON_REPLAY_STEP, gDataManager->GetSysString(1345).c_str());
+	btnReplayStep = env->addButton(Scale(5, 30, 85, 50), wReplayControl, BUTTON_REPLAY_STEP, gDataManager->GetSysString(1345).data());
 	defaultStrings.emplace_back(btnReplayStep, 1345);
-	btnReplayUndo = env->addButton(Scale(5, 55, 85, 75), wReplayControl, BUTTON_REPLAY_UNDO, gDataManager->GetSysString(1360).c_str());
+	btnReplayUndo = env->addButton(Scale(5, 55, 85, 75), wReplayControl, BUTTON_REPLAY_UNDO, gDataManager->GetSysString(1360).data());
 	defaultStrings.emplace_back(btnReplayUndo, 1360);
-	btnReplaySwap = env->addButton(Scale(5, 80, 85, 100), wReplayControl, BUTTON_REPLAY_SWAP, gDataManager->GetSysString(1346).c_str());
+	btnReplaySwap = env->addButton(Scale(5, 80, 85, 100), wReplayControl, BUTTON_REPLAY_SWAP, gDataManager->GetSysString(1346).data());
 	defaultStrings.emplace_back(btnReplaySwap, 1346);
-	btnReplayExit = env->addButton(Scale(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_EXIT, gDataManager->GetSysString(1347).c_str());
+	btnReplayExit = env->addButton(Scale(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_EXIT, gDataManager->GetSysString(1347).data());
 	defaultStrings.emplace_back(btnReplayExit, 1347);
 	//chat
 	wChat = env->addWindow(Scale(305, 615, 1020, 640), false, L"");
@@ -1240,15 +1240,15 @@ bool Game::Initialize() {
 	ebChatInput = env->addEditBox(L"", Scale(3, 2, 710, 22), true, wChat, EDITBOX_CHAT);
 	ebChatInput->setAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 	//swap
-	btnSpectatorSwap = env->addButton(Scale(205, 100, 295, 135), 0, BUTTON_REPLAY_SWAP, gDataManager->GetSysString(1346).c_str());
+	btnSpectatorSwap = env->addButton(Scale(205, 100, 295, 135), 0, BUTTON_REPLAY_SWAP, gDataManager->GetSysString(1346).data());
 	defaultStrings.emplace_back(btnSpectatorSwap, 1346);
 	btnSpectatorSwap->setVisible(false);
 	//chain buttons
-	btnChainIgnore = env->addButton(Scale(205, 100, 295, 135), 0, BUTTON_CHAIN_IGNORE, gDataManager->GetSysString(1292).c_str());
+	btnChainIgnore = env->addButton(Scale(205, 100, 295, 135), 0, BUTTON_CHAIN_IGNORE, gDataManager->GetSysString(1292).data());
 	defaultStrings.emplace_back(btnChainIgnore, 1292);
-	btnChainAlways = env->addButton(Scale(205, 140, 295, 175), 0, BUTTON_CHAIN_ALWAYS, gDataManager->GetSysString(1293).c_str());
+	btnChainAlways = env->addButton(Scale(205, 140, 295, 175), 0, BUTTON_CHAIN_ALWAYS, gDataManager->GetSysString(1293).data());
 	defaultStrings.emplace_back(btnChainAlways, 1293);
-	btnChainWhenAvail = env->addButton(Scale(205, 180, 295, 215), 0, BUTTON_CHAIN_WHENAVAIL, gDataManager->GetSysString(1294).c_str());
+	btnChainWhenAvail = env->addButton(Scale(205, 180, 295, 215), 0, BUTTON_CHAIN_WHENAVAIL, gDataManager->GetSysString(1294).data());
 	defaultStrings.emplace_back(btnChainWhenAvail, 1294);
 	btnChainIgnore->setIsPushButton(true);
 	btnChainAlways->setIsPushButton(true);
@@ -1257,18 +1257,18 @@ bool Game::Initialize() {
 	btnChainAlways->setVisible(false);
 	btnChainWhenAvail->setVisible(false);
 	//shuffle
-	btnShuffle = env->addButton(Scale(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, gDataManager->GetSysString(1307).c_str());
+	btnShuffle = env->addButton(Scale(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, gDataManager->GetSysString(1307).data());
 	defaultStrings.emplace_back(btnShuffle, 1307);
 	btnShuffle->setVisible(false);
 	//cancel or finish
-	btnCancelOrFinish = env->addButton(Scale(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, gDataManager->GetSysString(1295).c_str());
+	btnCancelOrFinish = env->addButton(Scale(205, 230, 295, 265), 0, BUTTON_CANCEL_OR_FINISH, gDataManager->GetSysString(1295).data());
 	defaultStrings.emplace_back(btnCancelOrFinish, 1295);
 	btnCancelOrFinish->setVisible(false);
 	//leave/surrender/exit
 	btnLeaveGame = env->addButton(Scale(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
 	//restart single
-	btnRestartSingle = env->addButton(Scale(205, 90, 295, 165), 0, BUTTON_RESTART_SINGLE, gDataManager->GetSysString(1366).c_str());
+	btnRestartSingle = env->addButton(Scale(205, 90, 295, 165), 0, BUTTON_RESTART_SINGLE, gDataManager->GetSysString(1366).data());
 	defaultStrings.emplace_back(btnRestartSingle, 1366);
 	btnRestartSingle->setVisible(false);
 	//tip
@@ -1300,19 +1300,19 @@ bool Game::Initialize() {
 	auto roomlistcolor = skin::ROOMLIST_TEXTS_COLOR_VAL;
 
 	//server choice dropdownlist
-	irr::gui::IGUIStaticText* statictext = env->addStaticText(gDataManager->GetSysString(2041).c_str(), Scale(10, 30, 110, 50), false, false, wRoomListPlaceholder, -1, false); // 2041 = Server:
+	irr::gui::IGUIStaticText* statictext = env->addStaticText(gDataManager->GetSysString(2041).data(), Scale(10, 30, 110, 50), false, false, wRoomListPlaceholder, -1, false); // 2041 = Server:
 	defaultStrings.emplace_back(statictext, 2041);
 	statictext->setOverrideColor(roomlistcolor);
 	serverChoice = ADDComboBox(Scale(90, 25, 385, 50), wRoomListPlaceholder, SERVER_CHOICE);
 
 	//online nickname
-	statictext = env->addStaticText(gDataManager->GetSysString(1220).c_str(), Scale(10, 60, 110, 80), false, false, wRoomListPlaceholder, -1, false); // 1220 = Nickname:
+	statictext = env->addStaticText(gDataManager->GetSysString(1220).data(), Scale(10, 60, 110, 80), false, false, wRoomListPlaceholder, -1, false); // 1220 = Nickname:
 	defaultStrings.emplace_back(statictext, 1220);
 	statictext->setOverrideColor(roomlistcolor);
-	ebNickNameOnline = env->addEditBox(gGameConfig->nickname.c_str(), Scale(90, 55, 275, 80), true, wRoomListPlaceholder, EDITBOX_NICKNAME);
+	ebNickNameOnline = env->addEditBox(gGameConfig->nickname.data(), Scale(90, 55, 275, 80), true, wRoomListPlaceholder, EDITBOX_NICKNAME);
 
 	//top right host online game button
-	btnCreateHost2 = env->addButton(Scale(904, 25, 1014, 50), wRoomListPlaceholder, BUTTON_CREATE_HOST2, gDataManager->GetSysString(1224).c_str());
+	btnCreateHost2 = env->addButton(Scale(904, 25, 1014, 50), wRoomListPlaceholder, BUTTON_CREATE_HOST2, gDataManager->GetSysString(1224).data());
 	defaultStrings.emplace_back(btnCreateHost2, 1224);
 	btnCreateHost2->setAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
@@ -1327,15 +1327,15 @@ bool Game::Initialize() {
 	RefreshLFLists();
 	ReloadCBFilterRule();
 
-	/*cbFilterMatchMode->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1227)).c_str());
-	cbFilterMatchMode->addItem(gDataManager->GetSysString(1244).c_str());
-	cbFilterMatchMode->addItem(gDataManager->GetSysString(1245).c_str());
-	cbFilterMatchMode->addItem(gDataManager->GetSysString(1246).c_str());*/
+	/*cbFilterMatchMode->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1227)).data());
+	cbFilterMatchMode->addItem(gDataManager->GetSysString(1244).data());
+	cbFilterMatchMode->addItem(gDataManager->GetSysString(1245).data());
+	cbFilterMatchMode->addItem(gDataManager->GetSysString(1246).data());*/
 	//Scale(392, 55, 532, 80)
 	ebOnlineTeam1 = env->addEditBox(L"0", Scale(140 + (392 - 140), 55, 170 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam1->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam1->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
-	stVersus = env->addStaticText(gDataManager->GetSysString(1380).c_str(), Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
+	stVersus = env->addStaticText(gDataManager->GetSysString(1380).data(), Scale(175 + (392 - 140), 55, 195 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	defaultStrings.emplace_back(stVersus, 1380);
 	stVersus->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stVersus->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
@@ -1343,7 +1343,7 @@ bool Game::Initialize() {
 	ebOnlineTeam2 = env->addEditBox(L"0", Scale(200 + (392 - 140), 55, 230 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_TEAM_COUNT);
 	ebOnlineTeam2->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineTeam2->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
-	stBestof = env->addStaticText(gDataManager->GetSysString(1381).c_str(), Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
+	stBestof = env->addStaticText(gDataManager->GetSysString(1381).data(), Scale(235 + (392 - 140), 55, 280 + (392 - 140), 80), true, false, wRoomListPlaceholder);
 	defaultStrings.emplace_back(stBestof, 1381);
 	stBestof->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	stBestof->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
@@ -1351,13 +1351,13 @@ bool Game::Initialize() {
 	ebOnlineBestOf = env->addEditBox(L"0", Scale(285 + (392 - 140), 55, 315 + (392 - 140), 80), true, wRoomListPlaceholder, EDITBOX_NUMERIC);
 	ebOnlineBestOf->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	ebOnlineBestOf->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
-	btnFilterRelayMode = env->addButton(Scale(325 + (392 - 140), 55, 370 + (392 - 140), 80), wRoomListPlaceholder, BUTTON_FILTER_RELAY, gDataManager->GetSysString(1247).c_str());
+	btnFilterRelayMode = env->addButton(Scale(325 + (392 - 140), 55, 370 + (392 - 140), 80), wRoomListPlaceholder, BUTTON_FILTER_RELAY, gDataManager->GetSysString(1247).data());
 	defaultStrings.emplace_back(btnFilterRelayMode, 1247);
 	btnFilterRelayMode->setIsPushButton(true);
 	btnFilterRelayMode->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//filter rooms textbox
-	ebRoomNameText = env->addStaticText(gDataManager->GetSysString(2021).c_str(), Scale(572, 30, 682, 50), false, false, wRoomListPlaceholder); //2021 = Filter:
+	ebRoomNameText = env->addStaticText(gDataManager->GetSysString(2021).data(), Scale(572, 30, 682, 50), false, false, wRoomListPlaceholder); //2021 = Filter:
 	defaultStrings.emplace_back(ebRoomNameText, 2021);
 	ebRoomNameText->setOverrideColor(roomlistcolor);
 	ebRoomName = env->addEditBox(L"", Scale(642, 25, 782, 50), true, wRoomListPlaceholder, EDIT_ONLINE_ROOM_NAME); //filter textbox
@@ -1366,13 +1366,13 @@ bool Game::Initialize() {
 	ebRoomName->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//show locked rooms checkbox
-	chkShowPassword = irr::gui::CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 1024, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, gDataManager->GetSysString(1994).c_str());
+	chkShowPassword = irr::gui::CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 55, 1024, 80), wRoomListPlaceholder, CHECK_SHOW_LOCKED_ROOMS, gDataManager->GetSysString(1994).data());
 	defaultStrings.emplace_back(chkShowPassword, 1994);
 	((irr::gui::CGUICustomCheckBox*)chkShowPassword)->setColor(roomlistcolor);
 	chkShowPassword->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
 
 	//show active rooms checkbox
-	chkShowActiveRooms = irr::gui::CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 1024, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, gDataManager->GetSysString(1985).c_str());
+	chkShowActiveRooms = irr::gui::CGUICustomCheckBox::addCustomCheckBox(false, env, Scale(642, 85, 1024, 110), wRoomListPlaceholder, CHECK_SHOW_ACTIVE_ROOMS, gDataManager->GetSysString(1985).data());
 	defaultStrings.emplace_back(chkShowActiveRooms, 1985);
 	((irr::gui::CGUICustomCheckBox*)chkShowActiveRooms)->setColor(roomlistcolor);
 	chkShowActiveRooms->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_UPPERLEFT);
@@ -1382,13 +1382,13 @@ bool Game::Initialize() {
 	roomListTable->setResizableColumns(true);
 	//roomListTable->setAlignment(EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_LOWERRIGHT);
 	roomListTable->addColumn(L" ");//lock
-	roomListTable->addColumn(gDataManager->GetSysString(1225).c_str());//Allowed Cards:
-	roomListTable->addColumn(gDataManager->GetSysString(1227).c_str());//Duel Mode:
-	roomListTable->addColumn(gDataManager->GetSysString(1236).c_str());//master rule
-	roomListTable->addColumn(gDataManager->GetSysString(1226).c_str());//Forbidden List:
-	roomListTable->addColumn(gDataManager->GetSysString(2030).c_str());//Players:
-	roomListTable->addColumn(gDataManager->GetSysString(2024).c_str());//Notes:
-	roomListTable->addColumn(gDataManager->GetSysString(1988).c_str());//Status
+	roomListTable->addColumn(gDataManager->GetSysString(1225).data());//Allowed Cards:
+	roomListTable->addColumn(gDataManager->GetSysString(1227).data());//Duel Mode:
+	roomListTable->addColumn(gDataManager->GetSysString(1236).data());//master rule
+	roomListTable->addColumn(gDataManager->GetSysString(1226).data());//Forbidden List:
+	roomListTable->addColumn(gDataManager->GetSysString(2030).data());//Players:
+	roomListTable->addColumn(gDataManager->GetSysString(2024).data());//Notes:
+	roomListTable->addColumn(gDataManager->GetSysString(1988).data());//Status
 	roomListTable->setColumnWidth(0, Scale(30));  // lock
 	roomListTable->setColumnWidth(1, Scale(110)); // Allowed Cards:
 	roomListTable->setColumnWidth(2, Scale(150)); // Duel Mode:
@@ -1407,7 +1407,7 @@ bool Game::Initialize() {
 	roomListTable->setColumnOrdering(7, irr::gui::EGCO_FLIP_ASCENDING_DESCENDING);
 
 	//refresh button center bottom
-	btnLanRefresh2 = env->addButton(Scale(462, 640 - 10 - 25 - 25 - 5, 562, 640 - 10 - 25 - 5), wRoomListPlaceholder, BUTTON_LAN_REFRESH2, gDataManager->GetSysString(1217).c_str());
+	btnLanRefresh2 = env->addButton(Scale(462, 640 - 10 - 25 - 25 - 5, 562, 640 - 10 - 25 - 5), wRoomListPlaceholder, BUTTON_LAN_REFRESH2, gDataManager->GetSysString(1217).data());
 	defaultStrings.emplace_back(btnLanRefresh2, 1217);
 	btnLanRefresh2->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
 
@@ -1416,19 +1416,19 @@ bool Game::Initialize() {
 	wRoomPassword->getCloseButton()->setVisible(false);
 	wRoomPassword->setVisible(false);
 	wRoomPassword->setAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
- 	tmpptr = env->addStaticText(gDataManager->GetSysString(2038).c_str(), Scale(20, 25, 290, 45), false, false, wRoomPassword);
+ 	tmpptr = env->addStaticText(gDataManager->GetSysString(2038).data(), Scale(20, 25, 290, 45), false, false, wRoomPassword);
 	defaultStrings.emplace_back(tmpptr, 2038);
 	ebRPName = env->addEditBox(L"", Scale(20, 50, 290, 70), true, wRoomPassword, -1);
 	ebRPName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnRPYes = env->addButton(Scale(70, 80, 140, 105), wRoomPassword, BUTTON_ROOMPASSWORD_OK, gDataManager->GetSysString(1211).c_str());
+	btnRPYes = env->addButton(Scale(70, 80, 140, 105), wRoomPassword, BUTTON_ROOMPASSWORD_OK, gDataManager->GetSysString(1211).data());
 	defaultStrings.emplace_back(btnRPYes, 1211);
-	btnRPNo = env->addButton(Scale(170, 80, 240, 105), wRoomPassword, BUTTON_ROOMPASSWORD_CANCEL, gDataManager->GetSysString(1212).c_str());
+	btnRPNo = env->addButton(Scale(170, 80, 240, 105), wRoomPassword, BUTTON_ROOMPASSWORD_CANCEL, gDataManager->GetSysString(1212).data());
 	defaultStrings.emplace_back(btnRPNo, 1212);
 
 	//join cancel buttons
-	btnJoinHost2 = env->addButton(Scale(1024 - 10 - 110, 640 - 20 - 25 - 25 - 5, 1024 - 10, 640 - 20 - 25 - 5), wRoomListPlaceholder, BUTTON_JOIN_HOST2, gDataManager->GetSysString(1223).c_str());
+	btnJoinHost2 = env->addButton(Scale(1024 - 10 - 110, 640 - 20 - 25 - 25 - 5, 1024 - 10, 640 - 20 - 25 - 5), wRoomListPlaceholder, BUTTON_JOIN_HOST2, gDataManager->GetSysString(1223).data());
 	defaultStrings.emplace_back(btnJoinHost2, 1223);
-	btnJoinCancel2 = env->addButton(Scale(1024 - 10 - 110, 640 - 20 - 25, 1024 - 10, 640 - 20), wRoomListPlaceholder, BUTTON_JOIN_CANCEL2, gDataManager->GetSysString(1212).c_str());
+	btnJoinCancel2 = env->addButton(Scale(1024 - 10 - 110, 640 - 20 - 25, 1024 - 10, 640 - 20), wRoomListPlaceholder, BUTTON_JOIN_CANCEL2, gDataManager->GetSysString(1212).data());
 	defaultStrings.emplace_back(btnJoinCancel2, 1212);
 	btnJoinHost2->setAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
 	btnJoinCancel2->setAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_LOWERRIGHT);
@@ -1441,7 +1441,7 @@ bool Game::Initialize() {
 	env->setFocus(wMainMenu);
 #ifdef YGOPRO_BUILD_DLL
 	if(!coreloaded) {
-		stMessage->setText(gDataManager->GetSysString(1430).c_str());
+		stMessage->setText(gDataManager->GetSysString(1430).data());
 		PopupElement(wMessage);
 	}
 #endif
@@ -1569,7 +1569,7 @@ bool Game::MainLoop() {
 					} else {
 						Utils::MakeDirectory(EPRO_TEXT("./config/languages/") + langpath);
 						locales.emplace_back(langpath, std::vector<path_string>{ data_path });
-						gSettings.cbCurrentLocale->addItem(BufferIO::DecodeUTF8s(repo->language).c_str());
+						gSettings.cbCurrentLocale->addItem(BufferIO::DecodeUTF8s(repo->language).data());
 					}
 				}
 			}
@@ -1604,7 +1604,7 @@ bool Game::MainLoop() {
 				HideElement(wMessage);
 			RefreshUICoreVersion();
 			env->setFocus(stACMessage);
-			stACMessage->setText(fmt::format(gDataManager->GetSysString(1431).c_str(), corename).c_str());
+			stACMessage->setText(fmt::format(gDataManager->GetSysString(1431).data(), corename).data());
 			PopupElement(wACMessage, 30);
 			coreJustLoaded = false;
 		}
@@ -1728,11 +1728,11 @@ bool Game::MainLoop() {
 		if(waitFrame >= 0.0f) {
 			waitFrame += (float)delta_time * 60.0f / 1000.0f;;
 			if((int)std::round(waitFrame) % 90 == 0) {
-				stHintMsg->setText(gDataManager->GetSysString(1390).c_str());
+				stHintMsg->setText(gDataManager->GetSysString(1390).data());
 			} else if((int)std::round(waitFrame) % 90 == 30) {
-				stHintMsg->setText(gDataManager->GetSysString(1391).c_str());
+				stHintMsg->setText(gDataManager->GetSysString(1391).data());
 			} else if((int)std::round(waitFrame) % 90 == 60) {
-				stHintMsg->setText(gDataManager->GetSysString(1392).c_str());
+				stHintMsg->setText(gDataManager->GetSysString(1392).data());
 			}
 		}
 		driver->endScene();
@@ -1746,7 +1746,7 @@ bool Game::MainLoop() {
 		}
 		popupCheck.lock();
 		if(queued_msg.size()){
-			env->addMessageBox(queued_caption.c_str(),queued_msg.c_str());
+			env->addMessageBox(queued_caption.data(),queued_msg.data());
 			queued_msg.clear();
 			queued_caption.clear();
 		}
@@ -1755,12 +1755,12 @@ bool Game::MainLoop() {
 		if(discord.connected && !was_connected) {
 			was_connected = true;
 			env->setFocus(stACMessage);
-			stACMessage->setText(gDataManager->GetSysString(1437).c_str());
+			stACMessage->setText(gDataManager->GetSysString(1437).data());
 			PopupElement(wACMessage, 30);
 		} else if(!discord.connected && was_connected) {
 			was_connected = false;
 			env->setFocus(stACMessage);
-			stACMessage->setText(gDataManager->GetSysString(1438).c_str());
+			stACMessage->setText(gDataManager->GetSysString(1438).data());
 			PopupElement(wACMessage, 30);
 		}
 		if(!update_prompted && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
@@ -1768,7 +1768,7 @@ bool Game::MainLoop() {
 			|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
 			gMutex.lock();
 			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
-			stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(1460), gDataManager->GetSysString(1461)).c_str());
+			stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(1460), gDataManager->GetSysString(1461)).data());
 			SetCentered(wQuery);
 			PopupElement(wQuery);
 			gMutex.unlock();
@@ -1776,7 +1776,7 @@ bool Game::MainLoop() {
 		} else if (show_changelog) {
 			gMutex.lock();
 			menuHandler.prev_operation = ACTION_SHOW_CHANGELOG;
-			stQMessage->setText(gDataManager->GetSysString(1443).c_str());
+			stQMessage->setText(gDataManager->GetSysString(1443).data());
 			SetCentered(wQuery);
 			PopupElement(wQuery);
 			gMutex.unlock();
@@ -1807,7 +1807,7 @@ bool Game::MainLoop() {
 		}
 #endif
 		while(cur_time >= 1000) {
-			fpsCounter->setText(fmt::format(gDataManager->GetSysString(1444), fps).c_str());
+			fpsCounter->setText(fmt::format(gDataManager->GetSysString(1444), fps).data());
 			fps = 0;
 			cur_time -= 1000;
 			if(dInfo.time_player == 0 || dInfo.time_player == 1)
@@ -1902,7 +1902,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 		skin::ResetDefaults();
 		imageManager.ResetTextures();
 	} else {
-		if(skinSystem->applySkin(prev_skin.c_str())) {
+		if(skinSystem->applySkin(prev_skin.data())) {
 #define CLR(val1,val2,val3,val4) irr::video::SColor(val1,val2,val3,val4)
 #define DECLR(what,val) skin::what##_VAL = skinSystem->getCustomColor(skin::what,val);
 #include "custom_skin_enum.inl"
@@ -1953,7 +1953,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 	cbDeck->clear();
 	for(auto& file : Utils::FindFiles(EPRO_TEXT("./deck/"), { EPRO_TEXT("ydk") })) {
-		cbDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).c_str());
+		cbDeck->addItem(Utils::ToUnicodeIfNeeded(file.substr(0, file.size() - 4)).data());
 	}
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(gGameConfig->lastdeck == cbDeck->getItem(i)) {
@@ -1969,11 +1969,11 @@ void Game::RefreshLFLists() {
 	cbDBLFList->setSelected(0);
 	auto prevFilter = std::max(0, cbFilterBanlist->getSelected());
 	cbFilterBanlist->clear();
-	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).c_str());
+	cbFilterBanlist->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1226)).data());
 	for (auto &list : gdeckManager->_lfList) {
-		auto hostIndex = cbHostLFList->addItem(list.listName.c_str(), list.hash);
-		auto deckIndex = cbDBLFList->addItem(list.listName.c_str(), list.hash);
-		cbFilterBanlist->addItem(list.listName.c_str(), list.hash);
+		auto hostIndex = cbHostLFList->addItem(list.listName.data(), list.hash);
+		auto deckIndex = cbDBLFList->addItem(list.listName.data(), list.hash);
+		cbFilterBanlist->addItem(list.listName.data(), list.hash);
 		if (gGameConfig->lastlflist == list.hash) {
 			cbHostLFList->setSelected(hostIndex);
 			cbDBLFList->setSelected(deckIndex);
@@ -2014,7 +2014,7 @@ void Game::RefreshAiDecks() {
 						bot.executablePath = EPRO_TEXT("");
 					}
 #endif
-					gBot.bots.push_back(bot);
+					gBot.bots.push_back(std::move(bot));
 				}
 			}
 		}
@@ -2085,14 +2085,14 @@ Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
 	a->setDraggable(false);
 	a->setDrawTitlebar(false);
 	a->setDrawBackground(false);
-	env->addStaticText(name.c_str(), Scale(5, 5, 90 + 295, 20 + 5), false, false, a);
+	env->addStaticText(name.data(), Scale(5, 5, 90 + 295, 20 + 5), false, false, a);
 	auto& grepo = repoInfoGui[repo->repo_path];
 	grepo.progress1 = new IProgressBar(env, Scale(5, 20 + 15, 170 + 295, 20 + 30), -1, a);
 	grepo.progress1->addBorder(1);
 	grepo.progress1->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 	grepo.progress1->drop();
 	((irr::gui::CGUICustomContextMenu*)mRepositoriesInfo)->addItem(a, -1);
-	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, gDataManager->GetSysString(1443).c_str());
+	grepo.history_button1 = env->addButton(Scale(90 + 295, 0, 170 + 295, 20 + 5), a, BUTTON_REPO_CHANGELOG, gDataManager->GetSysString(1443).data());
 	defaultStrings.emplace_back(grepo.history_button1, 1443);
 	grepo.history_button1->setEnabled(repo->ready);
 
@@ -2101,13 +2101,13 @@ Game::RepoGui* Game::AddGithubRepositoryStatusWindow(const GitRepo* repo) {
 	b->setDraggable(false);
 	b->setDrawTitlebar(false);
 	b->setDrawBackground(false);
-	env->addStaticText(name.c_str(), Scale(5, 5, 300, 20 + 5), false, false, b);
+	env->addStaticText(name.data(), Scale(5, 5, 300, 20 + 5), false, false, b);
 	grepo.progress2 = new IProgressBar(env, Scale(5, 20 + 15, 300 - 5, 20 + 30), -1, b);
 	grepo.progress2->addBorder(1);
 	grepo.progress2->setColors(skin::PROGRESSBAR_FILL_COLOR_VAL, skin::PROGRESSBAR_EMPTY_COLOR_VAL);
 	grepo.progress2->drop();
 	((irr::gui::CGUICustomContextMenu*)mTabRepositories)->addItem(b, -1);
-	grepo.history_button2 = env->addButton(Scale(200, 5, 300 - 5, 20 + 10), b, BUTTON_REPO_CHANGELOG, gDataManager->GetSysString(1443).c_str());
+	grepo.history_button2 = env->addButton(Scale(200, 5, 300 - 5, 20 + 10), b, BUTTON_REPO_CHANGELOG, gDataManager->GetSysString(1443).data());
 	defaultStrings.emplace_back(grepo.history_button2, 1443);
 	grepo.history_button2->setEnabled(repo->ready);
 	return &grepo;
@@ -2136,17 +2136,17 @@ void Game::LoadGithubRepositories() {
 }
 void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	if(repo->error.size()) {
-		ErrorLog("The repo " + repo->url + " couldn't be cloned");
-		ErrorLog("Error: " + repo->error);
-		grepo->history_button1->setText(gDataManager->GetSysString(1434).c_str());
+		ErrorLog(fmt::format("The repo {} couldn't be cloned", repo->url));
+		ErrorLog(fmt::format("Error: {}", repo->error));
+		grepo->history_button1->setText(gDataManager->GetSysString(1434).data());
 		defaultStrings.emplace_back(grepo->history_button1, 1434);
 		grepo->history_button1->setEnabled(true);
-		grepo->history_button2->setText(gDataManager->GetSysString(1434).c_str());
+		grepo->history_button2->setText(gDataManager->GetSysString(1434).data());
 		defaultStrings.emplace_back(grepo->history_button2, 1434);
 		grepo->history_button2->setEnabled(true);
 		grepo->commit_history_full = fmt::format(L"{}\n{}",
-												fmt::format(gDataManager->GetSysString(1435).c_str(), BufferIO::DecodeUTF8s(repo->url).c_str()).c_str(),
-												fmt::format(gDataManager->GetSysString(1436).c_str(), BufferIO::DecodeUTF8s(repo->error).c_str()).c_str()
+												fmt::format(gDataManager->GetSysString(1435), BufferIO::DecodeUTF8s(repo->url)),
+												fmt::format(gDataManager->GetSysString(1436), BufferIO::DecodeUTF8s(repo->error))
 		);
 		grepo->commit_history_partial = grepo->commit_history_full;
 		return;
@@ -2169,13 +2169,13 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 		}
 	} else {
 		if(repo->warning.size()) {
-			grepo->history_button1->setText(gDataManager->GetSysString(1448).c_str());
+			grepo->history_button1->setText(gDataManager->GetSysString(1448).data());
 			grepo->commit_history_partial = fmt::format(L"{}\n{}\n\n{}",
 				gDataManager->GetSysString(1449),
 				gDataManager->GetSysString(1450),
-				BufferIO::DecodeUTF8s(repo->warning)).c_str();
+				BufferIO::DecodeUTF8s(repo->warning)).data();
 		} else {
-			grepo->commit_history_partial = gDataManager->GetSysString(1446);
+			grepo->commit_history_partial = gDataManager->GetSysString(1446).data();
 		}
 	}
 	grepo->history_button1->setEnabled(true);
@@ -2208,14 +2208,14 @@ void Game::LoadServers() {
 						tmp_server.roomaddress = BufferIO::DecodeUTF8s(obj["roomaddress"].get<std::string>());
 						tmp_server.roomlistport = obj["roomlistport"].get<int>();
 						tmp_server.duelport = obj["duelport"].get<int>();
-						int i = serverChoice->addItem(tmp_server.name.c_str());
+						int i = serverChoice->addItem(tmp_server.name.data());
 						if(gGameConfig->lastServer == tmp_server.name)
 							serverChoice->setSelected(i);
 						ServerLobby::serversVector.push_back(std::move(tmp_server));
 					}
 				}
 				catch(std::exception& e) {
-					ErrorLog(std::string("Exception occurred: ") + e.what());
+					ErrorLog(fmt::format("Exception occurred: {}", e.what()));
 				}
 			}
 		}
@@ -2247,8 +2247,8 @@ void Game::ShowCardInfo(uint32_t code, bool resize, ImageManager::imgType type) 
 	auto tmp_code = code;
 	if(cd->alias && (cd->alias - code < CARD_ARTWORK_VERSIONS_OFFSET || code - cd->alias < CARD_ARTWORK_VERSIONS_OFFSET))
 		tmp_code = cd->alias;
-	stName->setText(gDataManager->GetName(tmp_code).c_str());
-	stPasscodeScope->setText(fmt::format(L"[{:08}] {}", tmp_code, gDataManager->FormatScope(cd->ot)).c_str());
+	stName->setText(gDataManager->GetName(tmp_code).data());
+	stPasscodeScope->setText(fmt::format(L"[{:08}] {}", tmp_code, gDataManager->FormatScope(cd->ot)).data());
 	stSetName->setText(L"");
 	auto setcodes = cd->setcodes;
 	if (cd->alias) {
@@ -2257,10 +2257,10 @@ void Game::ShowCardInfo(uint32_t code, bool resize, ImageManager::imgType type) 
 			setcodes = data->setcodes;
 	}
 	if (setcodes.size()) {
-		stSetName->setText((gDataManager->GetSysString(1329) + gDataManager->FormatSetName(setcodes)).c_str());
+		stSetName->setText(fmt::format(L"{}{}", gDataManager->GetSysString(1329), gDataManager->FormatSetName(setcodes)).data());
 	}
 	if(cd->type & TYPE_MONSTER) {
-		stInfo->setText(fmt::format(L"[{}] {} {}", gDataManager->FormatType(cd->type), gDataManager->FormatAttribute(cd->attribute), gDataManager->FormatRace(cd->race)).c_str());
+		stInfo->setText(fmt::format(L"[{}] {} {}", gDataManager->FormatType(cd->type), gDataManager->FormatAttribute(cd->attribute), gDataManager->FormatRace(cd->race)).data());
 		std::wstring text;
 		if(cd->type & TYPE_LINK){
 			if(cd->attack < 0)
@@ -2282,21 +2282,21 @@ void Game::ShowCardInfo(uint32_t code, bool resize, ImageManager::imgType type) 
 		if(cd->type & TYPE_PENDULUM) {
 			text.append(fmt::format(L"   {}/{}", cd->lscale, cd->rscale));
 		}
-		stDataInfo->setText(text.c_str());
+		stDataInfo->setText(text.data());
 	} else {
 		if(cd->type & TYPE_SKILL) { // TYPE_SKILL created by hints
 			// Hack: Race encodes the character for now
-			stInfo->setText(fmt::format(L"[{}|{}]", gDataManager->FormatRace(cd->race, true), gDataManager->FormatType(cd->type)).c_str());
+			stInfo->setText(fmt::format(L"[{}|{}]", gDataManager->FormatRace(cd->race, true), gDataManager->FormatType(cd->type)).data());
 		} else {
-			stInfo->setText(fmt::format(L"[{}]", gDataManager->FormatType(cd->type)).c_str());
+			stInfo->setText(fmt::format(L"[{}]", gDataManager->FormatType(cd->type)).data());
 		}
 		if(cd->type & TYPE_LINK) {
-			stDataInfo->setText(fmt::format(L"LINK {}   {}", cd->level, gDataManager->FormatLinkMarker(cd->link_marker)).c_str());
+			stDataInfo->setText(fmt::format(L"LINK {}   {}", cd->level, gDataManager->FormatLinkMarker(cd->link_marker)).data());
 		} else
 			stDataInfo->setText(L"");
 	}
 	RefreshCardInfoTextPositions();
-	stText->setText(gDataManager->GetText(code).c_str());
+	stText->setText(gDataManager->GetText(code).data());
 }
 void Game::RefreshCardInfoTextPositions() {
 	const int xLeft = Scale(15);
@@ -2325,7 +2325,7 @@ void Game::ClearCardInfo(int player) {
 	cardimagetextureloading = false;
 	showingcard = 0;
 }
-void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
+void Game::AddChatMsg(epro_wstringview msg, int player, int type) {
 	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
@@ -2334,35 +2334,36 @@ void Game::AddChatMsg(const std::wstring& msg, int player, int type) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200.0f;
 	chatType[0] = player;
+	epro_wstringview sender = L"";
 	if(type == 0) {
 		gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
-		chatMsg[0].append(dInfo.selfnames[player]);
+		sender = dInfo.selfnames[player];
 	} else if(type == 1) {
 		gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
-		chatMsg[0].append(dInfo.opponames[player]);
+		sender = dInfo.opponames[player];
 	} else if(type == 2) {
 		switch(player) {
 		case 7: //local name
-			chatMsg[0].append(ebNickName->getText());
+			sender = ebNickName->getText();
 			break;
 		case 8: //system custom message, no prefix.
 			gSoundManager->PlaySoundEffect(SoundManager::SFX::CHAT);
-			chatMsg[0].append(gDataManager->GetSysString(1439).c_str());
+			sender = gDataManager->GetSysString(1439);
 			break;
 		case 9: //error message
-			chatMsg[0].append(gDataManager->GetSysString(1440).c_str());
+			sender = gDataManager->GetSysString(1440);
 			break;
 		default: //from watcher or unknown
 			if(player < 11 || player > 19)
-				chatMsg[0].append(gDataManager->GetSysString(1441).c_str());
+				sender = gDataManager->GetSysString(1441);
 		}
 	}
-	chatMsg[0].append(L": ").append(msg);
-	lstChat->addItem(chatMsg[0].c_str());
+	chatMsg[0] = fmt::format(L"{}: {}", sender, msg);
+	lstChat->addItem(chatMsg[0].data());
 }
-void Game::AddLog(const std::wstring& msg, int param) {
+void Game::AddLog(epro_wstringview msg, int param) {
 	logParam.push_back(param);
-	lstLog->addItem(msg.c_str());
+	lstLog->addItem(msg.data());
 	if(!env->hasFocus(lstLog)) {
 		lstLog->setSelected(-1);
 	}
@@ -2372,7 +2373,7 @@ void Game::ClearChatMsg() {
 		chatTiming[i] = 0;
 	}
 }
-void Game::AddDebugMsg(const std::string& msg) {
+void Game::AddDebugMsg(epro_stringview msg) {
 	if (gGameConfig->coreLogOutput & CORE_LOG_TO_CHAT)
 		AddChatMsg(BufferIO::DecodeUTF8s(msg), 9, 2);
 	if (gGameConfig->coreLogOutput & CORE_LOG_TO_FILE)
@@ -2445,10 +2446,10 @@ void Game::CloseDuelWindow() {
 	showingcard = 0;
 	closeDoneSignal.Set();
 }
-void Game::PopupMessage(const std::wstring& text,const std::wstring& caption) {
+void Game::PopupMessage(epro_wstringview text, epro_wstringview caption) {
 	popupCheck.lock();
-	queued_msg = text;
-	queued_caption = caption;
+	queued_msg = text.data();
+	queued_caption = caption.data();
 	popupCheck.unlock();
 }
 uint8_t Game::LocalPlayer(uint8_t player) {
@@ -2505,7 +2506,7 @@ void Game::UpdateDuelParam() {
 	CHECK(5)
 #undef CHECK
 	default: {
-		cbDuelRule->addItem(gDataManager->GetSysString(1630).c_str());
+		cbDuelRule->addItem(gDataManager->GetSysString(1630).data());
 		cbDuelRule->setSelected(8);
 		break;
 	}
@@ -2652,7 +2653,7 @@ void Game::RefreshUICoreVersion() {
 		auto label = corename.length()
 			? fmt::format(gDataManager->GetSysString(2013), major, minor, corename)
 			: fmt::format(gDataManager->GetSysString(2010), major, minor);
-		stCoreVersion->setText(label.c_str());
+		stCoreVersion->setText(label.data());
 	} else {
 		stCoreVersion->setText(L"");
 	}
@@ -2669,14 +2670,14 @@ std::wstring Game::GetLocalizedCompatVersion() {
 void Game::ReloadCBSortType() {
 	cbSortType->clear();
 	for (int i = 1370; i <= 1373; i++)
-		cbSortType->addItem(gDataManager->GetSysString(i).c_str());
+		cbSortType->addItem(gDataManager->GetSysString(i).data());
 }
 void Game::ReloadCBCardType() {
 	cbCardType->clear();
-	cbCardType->addItem(gDataManager->GetSysString(1310).c_str());
-	cbCardType->addItem(gDataManager->GetSysString(1312).c_str());
-	cbCardType->addItem(gDataManager->GetSysString(1313).c_str());
-	cbCardType->addItem(gDataManager->GetSysString(1314).c_str());
+	cbCardType->addItem(gDataManager->GetSysString(1310).data());
+	cbCardType->addItem(gDataManager->GetSysString(1312).data());
+	cbCardType->addItem(gDataManager->GetSysString(1313).data());
+	cbCardType->addItem(gDataManager->GetSysString(1314).data());
 }
 void Game::ReloadCBCardType2() {
 	cbCardType2->clear();
@@ -2684,115 +2685,115 @@ void Game::ReloadCBCardType2() {
 	switch (cbCardType->getSelected()) {
 	case 0:
 		cbCardType2->setEnabled(false);
-		cbCardType2->addItem(gDataManager->GetSysString(1310).c_str(), 0);
+		cbCardType2->addItem(gDataManager->GetSysString(1310).data(), 0);
 		break;
 	case 1:
-		cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
-		cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_MONSTER + TYPE_NORMAL);
-		cbCardType2->addItem(gDataManager->GetSysString(1055).c_str(), TYPE_MONSTER + TYPE_EFFECT);
-		cbCardType2->addItem(gDataManager->GetSysString(1056).c_str(), TYPE_MONSTER + TYPE_FUSION);
-		cbCardType2->addItem(gDataManager->GetSysString(1057).c_str(), TYPE_MONSTER + TYPE_RITUAL);
-		cbCardType2->addItem(gDataManager->GetSysString(1063).c_str(), TYPE_MONSTER + TYPE_SYNCHRO);
-		cbCardType2->addItem(gDataManager->GetSysString(1073).c_str(), TYPE_MONSTER + TYPE_XYZ);
-		cbCardType2->addItem(gDataManager->GetSysString(1074).c_str(), TYPE_MONSTER + TYPE_PENDULUM);
-		cbCardType2->addItem(gDataManager->GetSysString(1076).c_str(), TYPE_MONSTER + TYPE_LINK);
-		cbCardType2->addItem(gDataManager->GetSysString(1075).c_str(), TYPE_MONSTER + TYPE_SPSUMMON);
-		cbCardType2->addItem((gDataManager->GetSysString(1054) + L"|" + gDataManager->GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
-		cbCardType2->addItem((gDataManager->GetSysString(1054) + L"|" + gDataManager->GetSysString(1074)).c_str(), TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
-		cbCardType2->addItem((gDataManager->GetSysString(1063) + L"|" + gDataManager->GetSysString(1062)).c_str(), TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
-		cbCardType2->addItem(gDataManager->GetSysString(1062).c_str(), TYPE_MONSTER + TYPE_TUNER);
-		cbCardType2->addItem(gDataManager->GetSysString(1061).c_str(), TYPE_MONSTER + TYPE_GEMINI);
-		cbCardType2->addItem(gDataManager->GetSysString(1060).c_str(), TYPE_MONSTER + TYPE_UNION);
-		cbCardType2->addItem(gDataManager->GetSysString(1059).c_str(), TYPE_MONSTER + TYPE_SPIRIT);
-		cbCardType2->addItem(gDataManager->GetSysString(1071).c_str(), TYPE_MONSTER + TYPE_FLIP);
-		cbCardType2->addItem(gDataManager->GetSysString(1072).c_str(), TYPE_MONSTER + TYPE_TOON);
+		cbCardType2->addItem(gDataManager->GetSysString(1080).data(), 0);
+		cbCardType2->addItem(gDataManager->GetSysString(1054).data(), TYPE_MONSTER + TYPE_NORMAL);
+		cbCardType2->addItem(gDataManager->GetSysString(1055).data(), TYPE_MONSTER + TYPE_EFFECT);
+		cbCardType2->addItem(gDataManager->GetSysString(1056).data(), TYPE_MONSTER + TYPE_FUSION);
+		cbCardType2->addItem(gDataManager->GetSysString(1057).data(), TYPE_MONSTER + TYPE_RITUAL);
+		cbCardType2->addItem(gDataManager->GetSysString(1063).data(), TYPE_MONSTER + TYPE_SYNCHRO);
+		cbCardType2->addItem(gDataManager->GetSysString(1073).data(), TYPE_MONSTER + TYPE_XYZ);
+		cbCardType2->addItem(gDataManager->GetSysString(1074).data(), TYPE_MONSTER + TYPE_PENDULUM);
+		cbCardType2->addItem(gDataManager->GetSysString(1076).data(), TYPE_MONSTER + TYPE_LINK);
+		cbCardType2->addItem(gDataManager->GetSysString(1075).data(), TYPE_MONSTER + TYPE_SPSUMMON);
+		cbCardType2->addItem(fmt::format(L"{}|{}", gDataManager->GetSysString(1054), gDataManager->GetSysString(1062)).data(), TYPE_MONSTER + TYPE_NORMAL + TYPE_TUNER);
+		cbCardType2->addItem(fmt::format(L"{}|{}", gDataManager->GetSysString(1054), gDataManager->GetSysString(1074)).data(), TYPE_MONSTER + TYPE_NORMAL + TYPE_PENDULUM);
+		cbCardType2->addItem(fmt::format(L"{}|{}", gDataManager->GetSysString(1063), gDataManager->GetSysString(1062)).data(), TYPE_MONSTER + TYPE_SYNCHRO + TYPE_TUNER);
+		cbCardType2->addItem(gDataManager->GetSysString(1062).data(), TYPE_MONSTER + TYPE_TUNER);
+		cbCardType2->addItem(gDataManager->GetSysString(1061).data(), TYPE_MONSTER + TYPE_GEMINI);
+		cbCardType2->addItem(gDataManager->GetSysString(1060).data(), TYPE_MONSTER + TYPE_UNION);
+		cbCardType2->addItem(gDataManager->GetSysString(1059).data(), TYPE_MONSTER + TYPE_SPIRIT);
+		cbCardType2->addItem(gDataManager->GetSysString(1071).data(), TYPE_MONSTER + TYPE_FLIP);
+		cbCardType2->addItem(gDataManager->GetSysString(1072).data(), TYPE_MONSTER + TYPE_TOON);
 		break;
 	case 2:
-		cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
-		cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_SPELL);
-		cbCardType2->addItem(gDataManager->GetSysString(1066).c_str(), TYPE_SPELL + TYPE_QUICKPLAY);
-		cbCardType2->addItem(gDataManager->GetSysString(1067).c_str(), TYPE_SPELL + TYPE_CONTINUOUS);
-		cbCardType2->addItem(gDataManager->GetSysString(1057).c_str(), TYPE_SPELL + TYPE_RITUAL);
-		cbCardType2->addItem(gDataManager->GetSysString(1068).c_str(), TYPE_SPELL + TYPE_EQUIP);
-		cbCardType2->addItem(gDataManager->GetSysString(1069).c_str(), TYPE_SPELL + TYPE_FIELD);
-		cbCardType2->addItem(gDataManager->GetSysString(1076).c_str(), TYPE_SPELL + TYPE_LINK);
+		cbCardType2->addItem(gDataManager->GetSysString(1080).data(), 0);
+		cbCardType2->addItem(gDataManager->GetSysString(1054).data(), TYPE_SPELL);
+		cbCardType2->addItem(gDataManager->GetSysString(1066).data(), TYPE_SPELL + TYPE_QUICKPLAY);
+		cbCardType2->addItem(gDataManager->GetSysString(1067).data(), TYPE_SPELL + TYPE_CONTINUOUS);
+		cbCardType2->addItem(gDataManager->GetSysString(1057).data(), TYPE_SPELL + TYPE_RITUAL);
+		cbCardType2->addItem(gDataManager->GetSysString(1068).data(), TYPE_SPELL + TYPE_EQUIP);
+		cbCardType2->addItem(gDataManager->GetSysString(1069).data(), TYPE_SPELL + TYPE_FIELD);
+		cbCardType2->addItem(gDataManager->GetSysString(1076).data(), TYPE_SPELL + TYPE_LINK);
 		break;
 	case 3:
-		cbCardType2->addItem(gDataManager->GetSysString(1080).c_str(), 0);
-		cbCardType2->addItem(gDataManager->GetSysString(1054).c_str(), TYPE_TRAP);
-		cbCardType2->addItem(gDataManager->GetSysString(1067).c_str(), TYPE_TRAP + TYPE_CONTINUOUS);
-		cbCardType2->addItem(gDataManager->GetSysString(1070).c_str(), TYPE_TRAP + TYPE_COUNTER);
+		cbCardType2->addItem(gDataManager->GetSysString(1080).data(), 0);
+		cbCardType2->addItem(gDataManager->GetSysString(1054).data(), TYPE_TRAP);
+		cbCardType2->addItem(gDataManager->GetSysString(1067).data(), TYPE_TRAP + TYPE_CONTINUOUS);
+		cbCardType2->addItem(gDataManager->GetSysString(1070).data(), TYPE_TRAP + TYPE_COUNTER);
 		break;
 	}
 }
 void Game::ReloadCBLimit() {
 	bool white = deckBuilder.filterList && deckBuilder.filterList->whitelist;
 	cbLimit->clear();
-	cbLimit->addItem(gDataManager->GetSysString(white ? 1269 : 1310).c_str(), DeckBuilder::LIMITATION_FILTER_NONE);
-	cbLimit->addItem(gDataManager->GetSysString(1316).c_str(), DeckBuilder::LIMITATION_FILTER_BANNED);
-	cbLimit->addItem(gDataManager->GetSysString(1317).c_str(), DeckBuilder::LIMITATION_FILTER_LIMITED);
-	cbLimit->addItem(gDataManager->GetSysString(1318).c_str(), DeckBuilder::LIMITATION_FILTER_SEMI_LIMITED);
-	cbLimit->addItem(gDataManager->GetSysString(1320).c_str(), DeckBuilder::LIMITATION_FILTER_UNLIMITED);
+	cbLimit->addItem(gDataManager->GetSysString(white ? 1269 : 1310).data(), DeckBuilder::LIMITATION_FILTER_NONE);
+	cbLimit->addItem(gDataManager->GetSysString(1316).data(), DeckBuilder::LIMITATION_FILTER_BANNED);
+	cbLimit->addItem(gDataManager->GetSysString(1317).data(), DeckBuilder::LIMITATION_FILTER_LIMITED);
+	cbLimit->addItem(gDataManager->GetSysString(1318).data(), DeckBuilder::LIMITATION_FILTER_SEMI_LIMITED);
+	cbLimit->addItem(gDataManager->GetSysString(1320).data(), DeckBuilder::LIMITATION_FILTER_UNLIMITED);
 	if(!white) {
 		chkAnime->setEnabled(true);
-		cbLimit->addItem(gDataManager->GetSysString(1900).c_str(), DeckBuilder::LIMITATION_FILTER_OCG);
-		cbLimit->addItem(gDataManager->GetSysString(1901).c_str(), DeckBuilder::LIMITATION_FILTER_TCG);
-		cbLimit->addItem(gDataManager->GetSysString(1902).c_str(), DeckBuilder::LIMITATION_FILTER_TCG_OCG);
-		cbLimit->addItem(gDataManager->GetSysString(1903).c_str(), DeckBuilder::LIMITATION_FILTER_PRERELEASE);
-		cbLimit->addItem(gDataManager->GetSysString(1910).c_str(), DeckBuilder::LIMITATION_FILTER_SPEED);
-		cbLimit->addItem(gDataManager->GetSysString(1911).c_str(), DeckBuilder::LIMITATION_FILTER_RUSH);
+		cbLimit->addItem(gDataManager->GetSysString(1900).data(), DeckBuilder::LIMITATION_FILTER_OCG);
+		cbLimit->addItem(gDataManager->GetSysString(1901).data(), DeckBuilder::LIMITATION_FILTER_TCG);
+		cbLimit->addItem(gDataManager->GetSysString(1902).data(), DeckBuilder::LIMITATION_FILTER_TCG_OCG);
+		cbLimit->addItem(gDataManager->GetSysString(1903).data(), DeckBuilder::LIMITATION_FILTER_PRERELEASE);
+		cbLimit->addItem(gDataManager->GetSysString(1910).data(), DeckBuilder::LIMITATION_FILTER_SPEED);
+		cbLimit->addItem(gDataManager->GetSysString(1911).data(), DeckBuilder::LIMITATION_FILTER_RUSH);
 		if(chkAnime->isChecked()) {
-			cbLimit->addItem(gDataManager->GetSysString(1265).c_str(), DeckBuilder::LIMITATION_FILTER_ANIME);
-			cbLimit->addItem(gDataManager->GetSysString(1266).c_str(), DeckBuilder::LIMITATION_FILTER_ILLEGAL);
-			cbLimit->addItem(gDataManager->GetSysString(1267).c_str(), DeckBuilder::LIMITATION_FILTER_VIDEOGAME);
-			cbLimit->addItem(gDataManager->GetSysString(1268).c_str(), DeckBuilder::LIMITATION_FILTER_CUSTOM);
+			cbLimit->addItem(gDataManager->GetSysString(1265).data(), DeckBuilder::LIMITATION_FILTER_ANIME);
+			cbLimit->addItem(gDataManager->GetSysString(1266).data(), DeckBuilder::LIMITATION_FILTER_ILLEGAL);
+			cbLimit->addItem(gDataManager->GetSysString(1267).data(), DeckBuilder::LIMITATION_FILTER_VIDEOGAME);
+			cbLimit->addItem(gDataManager->GetSysString(1268).data(), DeckBuilder::LIMITATION_FILTER_CUSTOM);
 		}
 	} else {
 		chkAnime->setEnabled(false);
-		cbLimit->addItem(gDataManager->GetSysString(1310).c_str(), DeckBuilder::LIMITATION_FILTER_ALL);
+		cbLimit->addItem(gDataManager->GetSysString(1310).data(), DeckBuilder::LIMITATION_FILTER_ALL);
 	}
 }
 void Game::ReloadCBAttribute() {
 	cbAttribute->clear();
-	cbAttribute->addItem(gDataManager->GetSysString(1310).c_str(), 0);
+	cbAttribute->addItem(gDataManager->GetSysString(1310).data(), 0);
 	for (int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(gDataManager->FormatAttribute(filter).c_str(), filter);
+		cbAttribute->addItem(gDataManager->FormatAttribute(filter).data(), filter);
 }
 void Game::ReloadCBRace() {
 	cbRace->clear();
-	cbRace->addItem(gDataManager->GetSysString(1310).c_str(), 0);
+	cbRace->addItem(gDataManager->GetSysString(1310).data(), 0);
 	for (int filter = 0x1; filter != 0x2000000; filter <<= 1)
-		cbRace->addItem(gDataManager->FormatRace(filter).c_str(), filter);
+		cbRace->addItem(gDataManager->FormatRace(filter).data(), filter);
 }
 void Game::ReloadCBFilterRule() {
 	cbFilterRule->clear();
-	cbFilterRule->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1225)).c_str());
+	cbFilterRule->addItem(fmt::format(L"[{}]", gDataManager->GetSysString(1225)).data());
 	for (auto i = 1900; i <= 1904; ++i)
-		cbFilterRule->addItem(gDataManager->GetSysString(i).c_str());
+		cbFilterRule->addItem(gDataManager->GetSysString(i).data());
 }
 void Game::ReloadCBDuelRule(irr::gui::IGUIComboBox* cb) {
 	if (!cb) cb = cbDuelRule;
 	cb->clear();
-	cb->addItem(gDataManager->GetSysString(1260).c_str());
-	cb->addItem(gDataManager->GetSysString(1261).c_str());
-	cb->addItem(gDataManager->GetSysString(1262).c_str());
-	cb->addItem(gDataManager->GetSysString(1263).c_str());
-	cb->addItem(gDataManager->GetSysString(1264).c_str());
-	cb->addItem(gDataManager->GetSysString(1258).c_str());
-	cb->addItem(gDataManager->GetSysString(1259).c_str());
-	cb->addItem(gDataManager->GetSysString(1248).c_str());
+	cb->addItem(gDataManager->GetSysString(1260).data());
+	cb->addItem(gDataManager->GetSysString(1261).data());
+	cb->addItem(gDataManager->GetSysString(1262).data());
+	cb->addItem(gDataManager->GetSysString(1263).data());
+	cb->addItem(gDataManager->GetSysString(1264).data());
+	cb->addItem(gDataManager->GetSysString(1258).data());
+	cb->addItem(gDataManager->GetSysString(1259).data());
+	cb->addItem(gDataManager->GetSysString(1248).data());
 }
 void Game::ReloadCBRule() {
 	cbRule->clear();
 	for (auto i = 1900; i <= 1904; ++i)
-		cbRule->addItem(gDataManager->GetSysString(i).c_str());
+		cbRule->addItem(gDataManager->GetSysString(i).data());
 }
 void Game::ReloadCBCurrentSkin() {
 	gSettings.cbCurrentSkin->clear();
-	int selectedSkin = gSettings.cbCurrentSkin->addItem(gDataManager->GetSysString(2065).c_str());
+	int selectedSkin = gSettings.cbCurrentSkin->addItem(gDataManager->GetSysString(2065).data());
 	auto skins = skinSystem->listSkins();
 	for (int i = skins.size() - 1; i >= 0; i--) {
-		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).c_str());
+		auto itemIndex = gSettings.cbCurrentSkin->addItem(Utils::ToUnicodeIfNeeded(skins[i].c_str()).data());
 		if (gGameConfig->skin == skins[i].c_str())
 			selectedSkin = itemIndex;
 	}
@@ -2801,7 +2802,7 @@ void Game::ReloadCBCurrentSkin() {
 void Game::ReloadCBCoreLogOutput() {
 	gSettings.cbCoreLogOutput->clear();
 	for (int i = CORE_LOG_NONE; i <= 3; i++) {
-		auto itemIndex = gSettings.cbCoreLogOutput->addItem(gDataManager->GetSysString(2000 + i).c_str(), i);
+		auto itemIndex = gSettings.cbCoreLogOutput->addItem(gDataManager->GetSysString(2000 + i).data(), i);
 		if (gGameConfig->coreLogOutput == i) {
 			gSettings.cbCoreLogOutput->setSelected(itemIndex);
 		}
@@ -2811,18 +2812,18 @@ void Game::ReloadElementsStrings() {
 	ShowCardInfo(showingcard, true);
 
 	for(auto& elem : defaultStrings) {
-		elem.first->setText(gDataManager->GetSysString(elem.second).c_str());
+		elem.first->setText(gDataManager->GetSysString(elem.second).data());
 	}
 
 	uint32_t nullLFlist = gdeckManager->_lfList.size() - 1;
-	gdeckManager->_lfList[nullLFlist].listName = gDataManager->GetSysString(1442);
+	gdeckManager->_lfList[nullLFlist].listName = gDataManager->GetSysString(1442).data();
 	auto prev = cbDBLFList->getSelected();
 	cbDBLFList->removeItem(nullLFlist);
-	cbDBLFList->addItem(gdeckManager->_lfList[nullLFlist].listName.c_str(), gdeckManager->_lfList[nullLFlist].hash);
+	cbDBLFList->addItem(gdeckManager->_lfList[nullLFlist].listName.data(), gdeckManager->_lfList[nullLFlist].hash);
 	cbDBLFList->setSelected(prev);
 	prev = cbHostLFList->getSelected();
 	cbHostLFList->removeItem(nullLFlist);
-	cbHostLFList->addItem(gdeckManager->_lfList[nullLFlist].listName.c_str(), gdeckManager->_lfList[nullLFlist].hash);
+	cbHostLFList->addItem(gdeckManager->_lfList[nullLFlist].listName.data(), gdeckManager->_lfList[nullLFlist].hash);
 	cbHostLFList->setSelected(prev);
 
 	prev = cbSortType->getSelected();
@@ -2850,13 +2851,13 @@ void Game::ReloadElementsStrings() {
 	cbRace->setSelected(prev);
 
 	if(is_building) {
-		btnLeaveGame->setText(gDataManager->GetSysString(1306).c_str());
+		btnLeaveGame->setText(gDataManager->GetSysString(1306).data());
 	} else if(!dInfo.isReplay && !dInfo.isSingleMode && dInfo.player_type < (dInfo.team1 + dInfo.team2)) {
-		btnLeaveGame->setText(gDataManager->GetSysString(1351).c_str());
+		btnLeaveGame->setText(gDataManager->GetSysString(1351).data());
 	} else if(dInfo.player_type == 7) {
-		btnLeaveGame->setText(gDataManager->GetSysString(1350).c_str());
+		btnLeaveGame->setText(gDataManager->GetSysString(1350).data());
 	} else if(dInfo.isSingleMode) {
-		btnLeaveGame->setText(gDataManager->GetSysString(1210).c_str());
+		btnLeaveGame->setText(gDataManager->GetSysString(1210).data());
 	}
 
 	prev = cbFilterRule->getSelected();
@@ -2883,23 +2884,23 @@ void Game::ReloadElementsStrings() {
 	ReloadCBCoreLogOutput();
 	gSettings.cbCoreLogOutput->setSelected(prev);
 
-	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(1, gDataManager->GetSysString(1225).c_str());
-	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(2, gDataManager->GetSysString(1227).c_str());
-	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(3, gDataManager->GetSysString(1236).c_str());
-	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(4, gDataManager->GetSysString(1226).c_str());
-	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(5, gDataManager->GetSysString(2030).c_str());
-	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(6, gDataManager->GetSysString(2024).c_str());
-	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(7, gDataManager->GetSysString(1988).c_str());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(1, gDataManager->GetSysString(1225).data());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(2, gDataManager->GetSysString(1227).data());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(3, gDataManager->GetSysString(1236).data());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(4, gDataManager->GetSysString(1226).data());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(5, gDataManager->GetSysString(2030).data());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(6, gDataManager->GetSysString(2024).data());
+	((irr::gui::CGUICustomTable*)roomListTable)->setColumnText(7, gDataManager->GetSysString(1988).data());
 	roomListTable->setColumnWidth(0, roomListTable->getColumnWidth(0));
 
-	mTopMenu->setItemText(0, gDataManager->GetSysString(2045).c_str()); //mRepositoriesInfo
-	mTopMenu->setItemText(1, gDataManager->GetSysString(1970).c_str()); //mAbout
-	mTopMenu->setItemText(2, gDataManager->GetSysString(2040).c_str()); //mVersion
+	mTopMenu->setItemText(0, gDataManager->GetSysString(2045).data()); //mRepositoriesInfo
+	mTopMenu->setItemText(1, gDataManager->GetSysString(1970).data()); //mAbout
+	mTopMenu->setItemText(2, gDataManager->GetSysString(2040).data()); //mVersion
 	RefreshUICoreVersion();
-	stExpectedCoreVersion->setText(GetLocalizedExpectedCore().c_str());
-	stCompatVersion->setText(GetLocalizedCompatVersion().c_str());
+	stExpectedCoreVersion->setText(GetLocalizedExpectedCore().data());
+	stCompatVersion->setText(GetLocalizedCompatVersion().data());
 
-#define TYPECHK(id,stringid) chkTypeLimit[id]->setText(fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).c_str());
+#define TYPECHK(id,stringid) chkTypeLimit[id]->setText(fmt::sprintf(gDataManager->GetSysString(1627), gDataManager->GetSysString(stringid)).data());
 	TYPECHK(0, 1056);
 	TYPECHK(1, 1063);
 	TYPECHK(2, 1073);
@@ -3155,7 +3156,7 @@ void Game::ValidateName(irr::gui::IGUIElement* obj) {
 	for(auto& forbid : chars)
 		text.erase(std::remove(text.begin(), text.end(), forbid), text.end());
 	if(text.size() != wcslen(obj->getText()))
-		obj->setText(text.c_str());
+		obj->setText(text.data());
 }
 std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	std::ifstream infile(Utils::ToPathString(script_name), std::ifstream::in);
@@ -3201,7 +3202,7 @@ path_string Game::FindScript(const path_string& name) {
 		return name;
 	return EPRO_TEXT("");
 }
-std::vector<char> Game::LoadScript(const std::string& _name) {
+std::vector<char> Game::LoadScript(epro_stringview _name) {
 	std::vector<char> buffer;
 	std::ifstream script;
 	path_string name = Utils::ToPathString(_name);
@@ -3227,9 +3228,9 @@ std::vector<char> Game::LoadScript(const std::string& _name) {
 	buffer.insert(buffer.begin(), std::istreambuf_iterator<char>(script), std::istreambuf_iterator<char>());
 	return buffer;
 }
-bool Game::LoadScript(OCG_Duel pduel, const std::string& script_name) {
+bool Game::LoadScript(OCG_Duel pduel, epro_stringview script_name) {
 	auto buf = LoadScript(script_name);
-	return buf.size() && OCG_LoadScript(pduel, buf.data(), buf.size(), script_name.c_str());
+	return buf.size() && OCG_LoadScript(pduel, buf.data(), buf.size(), script_name.data());
 }
 OCG_Duel Game::SetupDuel(OCG_DuelOptions opts) {
 	opts.cardReader = (OCG_DataReader)DataManager::CardReader;
@@ -3269,7 +3270,7 @@ void Game::UpdateDownloadBar(int percentage, int cur, int tot, const char* filen
 			fmt::format(L"{}\n{}",
 				fmt::format(gDataManager->GetSysString(1462), BufferIO::DecodeUTF8s(filename)),
 				fmt::format(gDataManager->GetSysString(1464), cur, tot)
-			).c_str());
+			).data());
 }
 void Game::UpdateUnzipBar(unzip_payload* payload) {
 	UnzipperPayload* unzipper = static_cast<UnzipperPayload*>(payload->payload);
@@ -3281,9 +3282,9 @@ void Game::UpdateUnzipBar(unzip_payload* payload) {
 			fmt::format(L"{}\n{}",
 				fmt::format(gDataManager->GetSysString(1463), Utils::ToUnicodeIfNeeded(unzipper->filename)),
 				fmt::format(gDataManager->GetSysString(1464), unzipper->cur, unzipper->tot)
-			).c_str());
+			).data());
 		game->updateProgressTop->setVisible(true);
-		game->updateSubprogressText->setText(fmt::format(gDataManager->GetSysString(1465), Utils::ToUnicodeIfNeeded(payload->filename)).c_str());
+		game->updateSubprogressText->setText(fmt::format(gDataManager->GetSysString(1465), Utils::ToUnicodeIfNeeded(payload->filename)).data());
 	}
 	game->updateProgressTop->setProgress(std::round((double)payload->cur / (double)payload->tot * 100));
 	// current file in archive

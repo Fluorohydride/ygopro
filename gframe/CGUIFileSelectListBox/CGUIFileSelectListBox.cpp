@@ -650,7 +650,7 @@ void CGUIFileSelectListBox::LoadFolderContents() {
 	TotalFolders = 0;
 	curRelPath = ygo::Utils::NormalizePath(curRelPath);
 	bool is_root = BaseIsRoot && curRelPath == basePath;
-	ygo::Utils::FindFiles(ygo::Utils::ToPathString(curRelPath), [&](path_string _name, bool is_directory, void* payload) {
+	ygo::Utils::FindFiles(ygo::Utils::ToPathString(curRelPath), [&](path_stringview _name, bool is_directory, void* payload) {
 		auto name = ygo::Utils::ToUnicodeIfNeeded(_name);
 		if(name == L".")
 			return;

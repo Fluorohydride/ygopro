@@ -17,24 +17,25 @@ using Dirent = struct dirent;
 #endif
 #include <IFileArchive.h>
 #include <IFileSystem.h>
+#include <fmt/format.h>
 #include "bufferio.h"
 
 namespace ygo {
 	std::vector<Utils::SynchronizedIrrArchive> Utils::archives;
 	irr::io::IFileSystem* Utils::filesystem;
 
-	bool Utils::MakeDirectory(const path_string& path) {
+	bool Utils::MakeDirectory(path_stringview path) {
 #ifdef _WIN32
-		return CreateDirectory(path.c_str(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
+		return CreateDirectory(path.data(), NULL) || ERROR_ALREADY_EXISTS == GetLastError();
 #else
 		return !mkdir(&path[0], 0777) || errno == EEXIST;
 #endif
 	}
-	bool Utils::FileCopy(const path_string& source, const path_string& destination) {
+	bool Utils::FileCopy(path_stringview source, path_stringview destination) {
 		if(source == destination)
 			return false;
 #ifdef _WIN32
-		return CopyFile(source.c_str(), destination.c_str(), false);
+		return CopyFile(source.data(), destination.data(), false);
 #else
 		std::ifstream src(source, std::ios::binary);
 		if(!src.is_open())
@@ -48,48 +49,44 @@ namespace ygo {
 		return true;
 #endif
 	}
-	bool Utils::FileMove(const path_string& source, const path_string& destination) {
+	bool Utils::FileMove(path_stringview source, path_stringview destination) {
 #ifdef _WIN32
-		return MoveFile(source.c_str(), destination.c_str());
+		return MoveFile(source.data(), destination.data());
 #else
-		return rename(source.c_str(), destination.c_str()) == 0;
+		return rename(source.data(), destination.data()) == 0;
 #endif
 		return false;
 	}
-	bool Utils::FileExists(const path_string& path) {
+	bool Utils::FileExists(path_stringview path) {
 #ifdef _WIN32
-		auto dwAttrib = GetFileAttributes(path.c_str());
+		auto dwAttrib = GetFileAttributes(path.data());
 		return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 #else
 		Stat sb;
-		if(stat(path.c_str(), &sb) == -1)
+		if(stat(path.data(), &sb) == -1)
 			return false;
 		return S_ISREG(sb.st_mode) != 0;
 #endif
 	}
-	bool Utils::FileDelete(const path_string& source) {
+	bool Utils::FileDelete(path_stringview source) {
 #ifdef _WIN32
-		return DeleteFile(source.c_str());
+		return DeleteFile(source.data());
 #else
-		return remove(source.c_str()) == 0;
+		return remove(source.data()) == 0;
 #endif
 	}
-	bool Utils::ClearDirectory(const path_string& path) {
+	bool Utils::ClearDirectory(path_stringview path) {
 #ifdef _WIN32
 		WIN32_FIND_DATA fdata;
-		HANDLE fh = FindFirstFile((path + EPRO_TEXT("*.*")).c_str(), &fdata);
+		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), path).c_str(), &fdata);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
-				path_string name = fdata.cFileName;
-				if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
-					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
-						continue;
-					}
-					DeleteDirectory(path + name + EPRO_TEXT("/"));
-					continue;
-				} else {
-					FileDelete(path + name);
-				}
+				path_stringview name = fdata.cFileName;
+				if(fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY
+				   && name != EPRO_TEXT("..") && name != EPRO_TEXT("."))
+					DeleteDirectory(fmt::format(EPRO_TEXT("{}{}/"), path, name));
+				else
+					FileDelete(fmt::format(EPRO_TEXT("{}{}"),path, name));
 			} while(FindNextFile(fh, &fdata));
 			FindClose(fh);
 		}
@@ -97,32 +94,27 @@ namespace ygo {
 #else
 		DIR* dir;
 		Dirent* dirp = nullptr;
-		if((dir = opendir(path.c_str())) != nullptr) {
+		if((dir = opendir(path.data())) != nullptr) {
 			Stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
-				stat((path + dirp->d_name).c_str(), &fileStat);
-				std::string name = dirp->d_name;
-				if(S_ISDIR(fileStat.st_mode)) {
-					if(name == ".." || name == ".") {
-						continue;
-					}
-					DeleteDirectory(path + name + "/");
-					continue;
-				} else {
-					FileDelete(path + name);
-				}
+				path_stringview name = dirp->d_name;
+				stat(fmt::format("{}{}", path, name).c_str(), &fileStat);
+				if(S_ISDIR(fileStat.st_mode) && name != ".." && name != ".")
+					DeleteDirectory(fmt::format("{}{}/", path, name));
+				else
+					FileDelete(fmt::format("{}{}", path, name));
 			}
 			closedir(dir);
 		}
 		return true;
 #endif
 	}
-	bool Utils::DeleteDirectory(const path_string& source) {
+	bool Utils::DeleteDirectory(path_stringview source) {
 		ClearDirectory(source);
 #ifdef _WIN32
-		return RemoveDirectory(source.c_str());
+		return RemoveDirectory(source.data());
 #else
-		return rmdir(source.c_str()) == 0;
+		return rmdir(source.data()) == 0;
 #endif
 	}
 	void Utils::CreateResourceFolders() {
@@ -138,10 +130,10 @@ namespace ygo {
 		MakeDirectory(EPRO_TEXT("screenshots"));
 	}
 
-	void Utils::FindFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload) {
+	void Utils::FindFiles(path_stringview path, const std::function<void(path_stringview, bool, void*)>& cb, void* payload) {
 #ifdef _WIN32
 		WIN32_FIND_DATA fdataw;
-		HANDLE fh = FindFirstFile((NormalizePath(path) + EPRO_TEXT("*.*")).c_str(), &fdataw);
+		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), NormalizePath<path_string>(path.data())).data(), &fdataw);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				cb(fdataw.cFileName, !!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY), payload);
@@ -151,11 +143,11 @@ namespace ygo {
 #else
 		DIR* dir;
 		Dirent* dirp = nullptr;
-		auto _path = NormalizePath(path);
-		if((dir = opendir(_path.c_str())) != nullptr) {
+		auto _path = NormalizePath<path_string>(path.data());
+		if((dir = opendir(_path.data())) != nullptr) {
 			Stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
-				stat((_path + dirp->d_name).c_str(), &fileStat);
+				stat(fmt::format("{}{}",_path, dirp->d_name).data(), &fileStat);
 				cb(dirp->d_name, !!S_ISDIR(fileStat.st_mode), payload);
 			}
 			closedir(dir);
@@ -163,47 +155,47 @@ namespace ygo {
 #endif
 	}
 
-	std::vector<path_string> Utils::FindFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
+	std::vector<path_string> Utils::FindFiles(path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers) {
 		std::vector<path_string> res;
-		FindFiles(path, [&res, extensions, path, subdirectorylayers](path_string name, bool isdir, void* payload) {
+		FindFiles(path, [&res, extensions, path, subdirectorylayers](path_stringview name, bool isdir, void* payload) {
 			if(isdir) {
 				if(subdirectorylayers) {
 					if(name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 						return;
 					}
-					std::vector<path_string> res2 = FindFiles(path + name + EPRO_TEXT("/"), extensions, subdirectorylayers - 1);
-					for(auto&file : res2) {
-						file = name + EPRO_TEXT("/") + file;
+					std::vector<path_string> res2 = FindFiles(fmt::format(EPRO_TEXT("{}{}/"), path, name), extensions, subdirectorylayers - 1);
+					for(auto& file : res2) {
+						file = fmt::format(EPRO_TEXT("{}/{}"), name, file);
 					}
-					res.insert(res.end(), res2.begin(), res2.end());
+					res.insert(res.end(), std::make_move_iterator(res2.begin()), std::make_move_iterator(res2.end()));
 				}
 				return;
 			} else {
-				if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension(name)) == extensions.end())
+				if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<path_string>(name.data())) == extensions.end())
 					return;
-				res.push_back(name);
+				res.push_back(name.data());
 			}
 		});
 		std::sort(res.begin(), res.end(), CompareIgnoreCase<path_string>);
 		return res;
 	}
-	std::vector<path_string> Utils::FindSubfolders(const path_string& path, int subdirectorylayers, bool addparentpath) {
+	std::vector<path_string> Utils::FindSubfolders(path_stringview path, int subdirectorylayers, bool addparentpath) {
 		std::vector<path_string> results;
-		FindFiles(path, [&results, path, subdirectorylayers, addparentpath](path_string name, bool isdir, void* payload) {
+		FindFiles(path, [&results, path, subdirectorylayers, addparentpath](path_stringview name, bool isdir, void* payload) {
 			if (isdir) {
 				if (name == EPRO_TEXT("..") || name == EPRO_TEXT(".")) {
 					return;
 				}
 				if(addparentpath)
-					results.push_back(path + name + EPRO_TEXT("/"));
+					results.push_back(fmt::format(EPRO_TEXT("{}{}/"), path, name));
 				else
-					results.push_back(name);
+					results.push_back(name.data());
 				if (subdirectorylayers > 1) {
-					auto subresults = FindSubfolders(path + name + EPRO_TEXT("/"), subdirectorylayers - 1, false);
+					auto subresults = FindSubfolders(fmt::format(EPRO_TEXT("{}{}/"), path, name), subdirectorylayers - 1, false);
 					for (auto& folder : subresults) {
-						folder = name + EPRO_TEXT("/") + folder;
+						folder = fmt::format(EPRO_TEXT("{}/{}"), name, folder);
 					}
-					results.insert(results.end(), subresults.begin(), subresults.end());
+					results.insert(results.end(), std::make_move_iterator(subresults.begin()), std::make_move_iterator(subresults.end()));
 				}
 				return;
 			}
@@ -211,16 +203,16 @@ namespace ygo {
 		std::sort(results.begin(), results.end(), CompareIgnoreCase<path_string>);
 		return results;
 	}
-	std::vector<int> Utils::FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers) {
+	std::vector<int> Utils::FindFiles(irr::io::IFileArchive* archive, path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers) {
 		std::vector<int> res;
 		auto list = archive->getFileList();
 		for(irr::u32 i = 0; i < list->getFileCount(); i++) {
 			if(list->isDirectory(i))
 				continue;
-			path_string name = list->getFullFileName(i).c_str();
-			if(std::count(name.begin(), name.end(), '/') > subdirectorylayers)
+			path_stringview name = list->getFullFileName(i).c_str();
+			if(std::count(name.begin(), name.end(), EPRO_TEXT('/')) > subdirectorylayers)
 				continue;
-			if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension(name)) == extensions.end())
+			if(extensions.size() && std::find(extensions.begin(), extensions.end(), Utils::GetFileExtension<path_string>(name.data())) == extensions.end())
 				continue;
 			res.push_back(i);
 		}
@@ -234,12 +226,12 @@ namespace ygo {
 			mutex->unlock();
 		}
 	}
-	Utils::MutexLockedIrrArchivedFile Utils::FindFileInArchives(const path_string& path, const path_string& name) {
+	Utils::MutexLockedIrrArchivedFile Utils::FindFileInArchives(path_stringview path, path_stringview name) {
 		for(auto& archive : archives) {
 			archive.mutex->lock();
 			int res = -1;
 			auto list = archive.archive->getFileList();
-			res = list->findFile((path + name).c_str());
+			res = list->findFile(fmt::format((EPRO_TEXT("{}{}"), path, name)).c_str());
 			if(res != -1) {
 				auto reader = archive.archive->createAndOpenFile(res);
 				if(reader)
@@ -249,43 +241,14 @@ namespace ygo {
 		}
 		return MutexLockedIrrArchivedFile(); // file not found
 	}
-	path_string Utils::ToPathString(const std::wstring& input) {
-#ifdef UNICODE
-		return input;
-#else
-		return BufferIO::EncodeUTF8s(input);
-#endif
-	}
-	path_string Utils::ToPathString(const std::string& input) {
-#ifdef UNICODE
-		return BufferIO::DecodeUTF8s(input);
-#else
-		return input;
-#endif
-	}
-	std::string Utils::ToUTF8IfNeeded(const path_string& input) {
-#ifdef UNICODE
-		return BufferIO::EncodeUTF8s(input);
-#else
-		return input;
-#endif
-	}
-	std::wstring Utils::ToUnicodeIfNeeded(const path_string & input) {
-#ifdef UNICODE
-		return input;
-#else
-		return BufferIO::DecodeUTF8s(input);
-#endif
-	}
-	bool Utils::ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
+	bool Utils::ContainsSubstring(epro_wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing, bool convertTokenCasing) {
 		static std::vector<std::wstring> alttokens;
 		static std::wstring casedinput;
-		auto string = &input;
 		if (input.empty() || tokens.empty())
 			return false;
 		if(convertInputCasing) {
-			casedinput = ToUpperNoAccents(input);
-			string = &casedinput;
+			casedinput = ToUpperNoAccents<std::wstring>(input.data());
+			input = casedinput;
 		}
 		if (convertTokenCasing) {
 			alttokens.clear();
@@ -294,20 +257,25 @@ namespace ygo {
 		}
 		std::size_t pos1, pos2 = 0;
 		for (auto& token : convertTokenCasing ? alttokens : tokens) {
-			if ((pos1 = string->find(token, pos2)) == std::wstring::npos)
+			if ((pos1 = input.find(token, pos2)) == epro_wstringview::npos)
 				return false;
 			pos2 = pos1 + token.size();
 		}
 		return true;
 	}
-	bool Utils::ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing, bool convertTokenCasing) {
+	bool Utils::ContainsSubstring(epro_wstringview input, epro_wstringview token, bool convertInputCasing, bool convertTokenCasing) {
 		if (input.empty() && !token.empty())
 			return false;
 		if (token.empty())
 			return true;
-		return (convertInputCasing ? ToUpperNoAccents(input) : input).find(convertTokenCasing ? ToUpperNoAccents(token) : token) != std::wstring::npos;
+		if(convertInputCasing) {
+			return ToUpperNoAccents<std::wstring>(input.data()).find(convertTokenCasing ? ToUpperNoAccents<std::wstring>(token.data()).data() : token.data()) != std::wstring::npos;
+		} else {
+			return input.find(convertTokenCasing ? ToUpperNoAccents<std::wstring>(token.data()).data() : token.data()) != epro_wstringview::npos;
+		}
+		//return (convertInputCasing ? ToUpperNoAccents<std::wstring>(input.data()) : input).find(convertTokenCasing ? ToUpperNoAccents<std::wstring>(token.data()) : token) != std::wstring::npos;
 	}
-	bool Utils::CreatePath(const path_string& path, const path_string& workingdir) {
+	bool Utils::CreatePath(path_stringview path, path_stringview workingdir) {
 		std::vector<path_string> folders;
 		path_string temp;
 		for(int i = 0; i < (int)path.size(); i++) {
@@ -319,17 +287,17 @@ namespace ygo {
 		}
 		temp.clear();
 		for(auto folder : folders) {
-			if(temp.empty() && !workingdir.empty())
-				temp = workingdir + EPRO_TEXT("/") + folder;
+			if(temp.empty() && workingdir.size())
+				temp = fmt::format(EPRO_TEXT("{}/{}"),workingdir, folder);
 			else
 				temp += EPRO_TEXT("/") + folder;
-			if(!MakeDirectory(temp.c_str()))
+			if(!MakeDirectory(temp.data()))
 				return false;
 		}
 		return true;
 	}
 
-	const path_string& Utils::GetExePath() {
+	path_stringview Utils::GetExePath() {
 		static path_string binarypath = []()->path_string {
 #ifdef _WIN32
 			TCHAR exepath[MAX_PATH];
@@ -350,15 +318,15 @@ namespace ygo {
 		return binarypath;
 	}
 
-	const path_string& Utils::GetExeFolder() {
-		static path_string binarypath = GetFilePath(GetExePath());
+	path_stringview Utils::GetExeFolder() {
+		static path_string binarypath = GetFilePath<path_string>(GetExePath().data());
 		return binarypath;
 	}
 
-	const path_string& Utils::GetCorePath() {
+	path_stringview Utils::GetCorePath() {
 		static path_string binarypath = []()->path_string {
 #ifdef _WIN32
-			return GetExeFolder() + EPRO_TEXT("/ocgcore.dll");
+			return fmt::format(EPRO_TEXT("{}/ocgcore.dll"), GetExeFolder());
 #else
 			return EPRO_TEXT(""); // Unused on POSIX
 #endif
@@ -366,14 +334,14 @@ namespace ygo {
 		return binarypath;
 	}
 
-	bool Utils::UnzipArchive(const path_string& input, unzip_callback callback, unzip_payload* payload, const path_string& dest) {
+	bool Utils::UnzipArchive(path_stringview input, unzip_callback callback, unzip_payload* payload, path_stringview dest) {
 		thread_local char buff[0x40000];
 		constexpr int buff_size = sizeof(buff) / sizeof(*buff);
 		if(!filesystem)
 			return false;
 		CreatePath(dest, EPRO_TEXT("./"));
 		irr::io::IFileArchive* archive = nullptr;
-		if(!filesystem->addFileArchive(input.c_str(), false, false, irr::io::EFAT_ZIP, "", &archive))
+		if(!filesystem->addFileArchive(input.data(), false, false, irr::io::EFAT_ZIP, "", &archive))
 			return false;
 
 		archive->grab();
@@ -390,23 +358,23 @@ namespace ygo {
 			payload->tot = count;
 
 		for(irr::u32 i = 0; i < count; i++) {
-			auto filename = path_string(filelist->getFullFileName(i).c_str());
+			path_stringview filename = filelist->getFullFileName(i).c_str();
 			bool isdir = filelist->isDirectory(i);
 			if(isdir)
-				CreatePath(filename + EPRO_TEXT("/"), dest);
+				CreatePath(fmt::format(EPRO_TEXT("{}/"), filename), dest);
 			else
 				CreatePath(filename, dest);
 			if(!isdir) {
 				int percentage = 0;
 				auto reader = archive->createAndOpenFile(i);
 				if(reader) {
-					std::ofstream out(dest + EPRO_TEXT("/") + filename, std::ofstream::binary);
+					std::ofstream out(fmt::format(EPRO_TEXT("{}/{}") , dest, filename), std::ofstream::binary);
 					int r, rx = reader->getSize();
 					if(payload) {
 						payload->is_new = true;
 						payload->cur = i;
 						payload->percentage = 0;
-						payload->filename = filename.c_str();
+						payload->filename = filename.data();
 						callback(payload);
 						payload->is_new = false;
 					}
@@ -433,17 +401,17 @@ namespace ygo {
 		return true;
 	}
 
-	void Utils::SystemOpen(const path_string& url, OpenType type) {
+	void Utils::SystemOpen(path_stringview url, OpenType type) {
 #ifdef _WIN32
-		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? filesystem->getAbsolutePath(url.c_str()).c_str() : url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? filesystem->getAbsolutePath(url.data()).c_str() : url.data(), NULL, NULL, SW_SHOWNORMAL);
 		// system("start URL") opens a shell
 #elif !defined(__ANDROID__)
 		auto pid = fork();
 		if(pid == 0) {
 #ifdef __APPLE__
-			execl("/usr/bin/open", "open", url.c_str(), NULL);
+			execl("/usr/bin/open", "open", url.data(), NULL);
 #else
-			execl("/usr/bin/xdg-open", "xdg-open", url.c_str(), NULL);
+			execl("/usr/bin/xdg-open", "xdg-open", url.data(), NULL);
 #endif
 			perror("Failed to open browser:");
 		} else if(pid < 0) {

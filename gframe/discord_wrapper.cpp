@@ -212,7 +212,7 @@ void DiscordWrapper::OnJoin(const char* secret, void* payload) {
 		host.pass = json["pass"].get<std::string>();
 	}
 	catch(std::exception& e) {
-		ygo::ErrorLog(std::string("Exception occurred: ") + e.what());
+		ygo::ErrorLog(fmt::format("Exception occurred: {}", e.what()));
 		return;
 	}
 	game->isHostingOnline = true;

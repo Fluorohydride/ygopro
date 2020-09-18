@@ -58,10 +58,10 @@ int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
 	std::string script_name = "";
 	auto InitReplay = [&]() {
 		uint16_t buffer[20];
-		BufferIO::CopyWStr(mainGame->dInfo.selfnames[0].c_str(), buffer, 20);
+		BufferIO::CopyWStr(mainGame->dInfo.selfnames[0].data(), buffer, 20);
 		last_replay.WriteData(buffer, 40, false);
 		new_replay.WriteData(buffer, 40, false);
-		BufferIO::CopyWStr(mainGame->dInfo.opponames[0].c_str(), buffer, 20);
+		BufferIO::CopyWStr(mainGame->dInfo.opponames[0].data(), buffer, 20);
 		last_replay.WriteData(buffer, 40, false);
 		new_replay.WriteData(buffer, 40, false);
 		last_replay.Write<uint32_t>(duelOptions.startingLP, false);
@@ -69,7 +69,7 @@ int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
 		last_replay.Write<uint32_t>(duelOptions.drawCountPerTurn, false);
 		last_replay.Write<uint32_t>(opt, false);
 		last_replay.Write<uint16_t>((uint16_t)script_name.size(), false);
-		last_replay.WriteData(script_name.c_str(), script_name.size(), false);
+		last_replay.WriteData(script_name.data(), script_name.size(), false);
 		last_replay.Flush();
 		new_replay.Write<uint32_t>(opt);
 	};
@@ -224,7 +224,7 @@ restart:
 	mainGame->wCardImg->setVisible(true);
 	mainGame->wInfos->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);
-	mainGame->btnLeaveGame->setText(gDataManager->GetSysString(1210).c_str());
+	mainGame->btnLeaveGame->setText(gDataManager->GetSysString(1210).data());
 	mainGame->btnRestartSingle->setVisible(true);
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.Clear();
@@ -279,8 +279,8 @@ restart:
 	if(saveReplay && !was_restarting) {
 		auto now = std::time(nullptr);
 		mainGame->gMutex.lock();
-		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).c_str());
-		mainGame->wReplaySave->setText(gDataManager->GetSysString(1340).c_str());
+		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).data());
+		mainGame->wReplaySave->setText(gDataManager->GetSysString(1340).data());
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.unlock();
 		mainGame->replaySignal.Reset();
@@ -372,7 +372,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_RETRY:	{
 			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(gDataManager->GetSysString(1434).c_str());
+			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.unlock();
 			mainGame->actionSignal.Reset();

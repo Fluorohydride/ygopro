@@ -106,26 +106,26 @@ void ServerLobby::FillOnlineRooms() {
 		roomListTable->addRow(index);
 		roomListTable->setCellData(index, 0, room.locked ? (void*)1 : nullptr);
 		roomListTable->setCellData(index, 1, &room);
-		roomListTable->setCellText(index, 1, gDataManager->GetSysString(room.info.rule + 1900).c_str());
+		roomListTable->setCellText(index, 1, gDataManager->GetSysString(room.info.rule + 1900).data());
 		roomListTable->setCellText(index, 2, fmt::format(L"[{}vs{}]{}{}", room.info.team1, room.info.team2,
-			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).c_str() : L"",
-			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").c_str());
+			(room.info.best_of > 1) ? fmt::format(L" (best of {})", room.info.best_of).data() : L"",
+			(room.info.duel_flag & DUEL_RELAY) ? L" (Relay)" : L"").data());
 		int rule;
 		mainGame->GetMasterRule(room.info.duel_flag & ~DUEL_RELAY, room.info.forbiddentypes, &rule);
 		if(rule == 6)
 			roomListTable->setCellText(index, 3, "Custom");
 		else
-			roomListTable->setCellText(index, 3, fmt::format(L"MR {}", (rule == 0) ? 3 : rule).c_str());
-		roomListTable->setCellText(index, 4, (banlist.size()) ? banlist.c_str() : L"???");
+			roomListTable->setCellText(index, 3, fmt::format(L"MR {}", (rule == 0) ? 3 : rule).data());
+		roomListTable->setCellText(index, 4, (banlist.size()) ? banlist.data() : L"???");
 		std::wstring players;
 		for(auto& player : room.players) {
 			players.append(player).append(L", ");
 		}
 		if(players.size())
 			players.resize(players.size() - 2);
-		roomListTable->setCellText(index, 5, players.c_str());
-		roomListTable->setCellText(index, 6, room.description.c_str());
-		roomListTable->setCellText(index, 7, room.started ? gDataManager->GetSysString(1986).c_str() : gDataManager->GetSysString(1987).c_str());
+		roomListTable->setCellText(index, 5, players.data());
+		roomListTable->setCellText(index, 6, room.description.data());
+		roomListTable->setCellText(index, 7, room.started ? gDataManager->GetSysString(1986).data() : gDataManager->GetSysString(1987).data());
 
 
 		if(room.started)
@@ -161,9 +161,9 @@ int ServerLobby::GetRoomsThread() {
 	std::string retrieved_data;
 	curl_handle = curl_easy_init();
 	if(mainGame->chkShowActiveRooms->isChecked()) {
-		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).c_str());
+		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).data());
 	} else {
-		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).c_str());
+		curl_easy_setopt(curl_handle, CURLOPT_URL, fmt::format("http://{}:{}/api/getrooms", BufferIO::EncodeUTF8s(serverInfo.roomaddress), serverInfo.roomlistport).data());
 	}
 	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
 	curl_easy_setopt(curl_handle, CURLOPT_CONNECTTIMEOUT, 7L);
@@ -174,7 +174,7 @@ int ServerLobby::GetRoomsThread() {
 	curl_easy_setopt(curl_handle, CURLOPT_NOPROXY, "*"); 
 	curl_easy_setopt(curl_handle, CURLOPT_DNS_CACHE_TIMEOUT, 0);
 	if(gGameConfig->ssl_certificate_path.size())
-		curl_easy_setopt(curl_handle, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.c_str());
+		curl_easy_setopt(curl_handle, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.data());
 #ifdef _WIN32
 	else
 		curl_easy_setopt(curl_handle, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
@@ -289,7 +289,7 @@ void ServerLobby::JoinServer(bool host) {
 		}
 	}
 	catch(std::exception& e) {
-		ErrorLog(std::string("Exception occurred: ") + e.what());
+		ErrorLog(fmt::format("Exception occurred: {}", e.what()));
 	}
 }
 

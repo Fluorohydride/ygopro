@@ -1,7 +1,9 @@
 #ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
 #include <direct.h> //_getcwd
 #include <Tchar.h> //_tgetcwd
 #else
+#define _tmain main
 #include <unistd.h>
 #endif
 #include <event2/thread.h>
@@ -170,11 +172,7 @@ void CheckArguments(int argc, path_char* argv[]) {
 #endif //_WIN32
 
 
-#ifdef UNICODE
-int wmain(int argc, wchar_t* argv[]) {
-#else
-int main(int argc, char* argv[]) {
-#endif
+int _tmain(int argc, path_char* argv[]) {
 #ifdef __APPLE__
 	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 	CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
@@ -191,7 +189,7 @@ int main(int argc, char* argv[]) {
 #endif //__APPLE__
 	bool is_in_sys32 = false;
 #ifdef _WIN32
-	TCHAR* buffer;
+	path_char* buffer;
 	if((buffer = _tgetcwd(NULL, 0))) {
 		auto workdir = ygo::Utils::ToUpperNoAccents(ygo::Utils::GetFileName<path_string>(buffer));
 		is_in_sys32 = workdir == EPRO_TEXT("SYSTEM32");
@@ -213,7 +211,7 @@ int main(int argc, char* argv[]) {
 				is_in_sys32 = (extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua"));
 			}
 			if(is_in_sys32) {
-				SetCurrentDirectory(ygo::Utils::GetExeFolder().c_str());
+				SetCurrentDirectory(ygo::Utils::GetExeFolder().data());
 			}
 #endif //_DEBUG
 #endif //_WIN32

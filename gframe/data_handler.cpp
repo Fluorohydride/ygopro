@@ -76,7 +76,7 @@ void DataHandler::LoadPicUrls() {
 					}
 				}
 				catch(std::exception& e) {
-					ErrorLog(std::string("Exception occurred: ") + e.what());
+					ErrorLog(fmt::format("Exception occurred: {}", e.what()));
 				}
 			}
 		}

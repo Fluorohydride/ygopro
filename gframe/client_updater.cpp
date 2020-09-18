@@ -85,7 +85,7 @@ void Reboot() {
 #ifdef _WIN32
 	STARTUPINFO si{ sizeof(STARTUPINFO) };
 	PROCESS_INFORMATION pi{};
-	auto pathstring = ygo::Utils::GetExePath() + EPRO_TEXT(" show_changelog");
+	auto pathstring = fmt::format(EPRO_TEXT("{} show_changelog"), ygo::Utils::GetExePath());
 	CreateProcess(nullptr,
 		(TCHAR*)pathstring.c_str(),
 				  nullptr,
@@ -104,9 +104,9 @@ void Reboot() {
 	pid_t pid = fork();
 	if(pid == 0) {
 		struct stat fileStat;
-		stat(ygo::Utils::GetExePath().c_str(), &fileStat);
-		chmod(ygo::Utils::GetExePath().c_str(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
-		execl(ygo::Utils::GetExePath().c_str(), "show_changelog", nullptr);
+		stat(ygo::Utils::GetExePath().data(), &fileStat);
+		chmod(ygo::Utils::GetExePath().data(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
+		execl(ygo::Utils::GetExePath().data(), "show_changelog", nullptr);
 		exit(EXIT_FAILURE);
 	}
 #endif
@@ -123,9 +123,9 @@ bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) 
 
 void DeleteOld() {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
-	ygo::Utils::FileDelete(ygo::Utils::GetExePath() + EPRO_TEXT(".old"));
+	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT(".old"), ygo::Utils::GetExePath()));
 #if !defined(__linux__)
-	ygo::Utils::FileDelete(ygo::Utils::GetCorePath() + EPRO_TEXT(".old"));
+	ygo::Utils::FileDelete(fmt::format(EPRO_TEXT(".old"), ygo::Utils::GetCorePath()));
 #endif
 #endif
 }
@@ -202,10 +202,10 @@ bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const p
 void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callback) {
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	auto& path = ygo::Utils::GetExePath();
-	ygo::Utils::FileMove(path, path + EPRO_TEXT(".old"));
+	ygo::Utils::FileMove(path, fmt::format(EPRO_TEXT("{}.old"), path));
 #if !defined(__linux__)
-	auto& corepath = ygo::Utils::GetExePath();
-	ygo::Utils::FileMove(corepath, corepath + EPRO_TEXT(".old"));
+	auto& corepath = ygo::Utils::GetCorePath();
+	ygo::Utils::FileMove(corepath, fmt::format(EPRO_TEXT("{}.old"), path));
 #endif
 #endif
 	unzip_payload cbpayload{};

@@ -17,6 +17,11 @@
 #include "../game_config.h"
 #include "../game.h"
 
+#define JPARAMS(args)  "(" args ")"
+#define JSTRING "Ljava/lang/String;"
+#define JINT "I"
+#define JVOID "V"
+
 extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_TextEntry_putMessageBoxResult(
 		JNIEnv * env, jclass thiz, jstring textString) {
@@ -258,18 +263,17 @@ void displayKeyboard(bool pShow) {
  * @param editType type of texfield
  * (1==multiline text input; 2==single line text input; 3=password field)
  */
-void showInputDialog(const std::string& acceptButton, const  std::string& hint,
-					 const std::string& current, int editType) {
-	jmethodID showdialog = jnienv->GetMethodID(nativeActivity, "showDialog",
-											   "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V");
+void showInputDialog(path_stringview acceptButton, path_stringview hint,
+					 path_stringview current, int editType) {
+	jmethodID showdialog = jnienv->GetMethodID(nativeActivity, "showDialog", JPARAMS(JSTRING JSTRING JSTRING JINT)JVOID);
 
 	if(showdialog == 0) {
 		assert("porting::showInputDialog unable to find java show dialog method" == 0);
 	}
 
-	jstring jacceptButton = jnienv->NewStringUTF(acceptButton.c_str());
-	jstring jhint = jnienv->NewStringUTF(hint.c_str());
-	jstring jcurrent = jnienv->NewStringUTF(current.c_str());
+	jstring jacceptButton = jnienv->NewStringUTF(acceptButton.data());
+	jstring jhint = jnienv->NewStringUTF(hint.data());
+	jstring jcurrent = jnienv->NewStringUTF(current.data());
 	jint    jeditType = editType;
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, showdialog,
@@ -438,8 +442,7 @@ bool transformEvent(const irr::SEvent & event, bool& stopPropagation) {
 }
 
 int getLocalIP() {
-	jmethodID getIP = jnienv->GetMethodID(nativeActivity, "getLocalIpAddress",
-										  "()I");
+	jmethodID getIP = jnienv->GetMethodID(nativeActivity, "getLocalIpAddress", JPARAMS()JINT);
 	if(getIP == 0) {
 		assert("porting::getLocalIP unable to find java getLocalIpAddress method" == 0);
 	}
@@ -447,88 +450,40 @@ int getLocalIP() {
 	return value;
 }
 
-void launchWindbot(const std::string& args) {
-	jmethodID launchwindbot = jnienv->GetMethodID(nativeActivity, "launchWindbot",
-												  "(Ljava/lang/String;)V");
-
-	if(launchwindbot == 0) {
-		assert("porting::launchWindbot unable to find java launchWindbot method" == 0);
-	}
-
-	jstring jargs = jnienv->NewStringUTF(args.c_str());
-
-	jnienv->CallVoidMethod(app_global->activity->clazz, launchwindbot,
-						   jargs);
+#define JAVAVOIDSTRINGMETHOD(name)\
+void name(path_stringview arg) {\
+jmethodID name = jnienv->GetMethodID(nativeActivity, #name, JPARAMS(JSTRING)JVOID);\
+if(name == 0) assert("porting::" #name " unable to find java " #name " method" == 0);\
+jstring jargs = jnienv->NewStringUTF(arg.data());\
+jnienv->CallVoidMethod(app_global->activity->clazz, name, jargs);\
 }
 
-void installUpdate(const std::string& args) {
-	jmethodID installUpdate = jnienv->GetMethodID(nativeActivity, "installUpdate",
-												  "(Ljava/lang/String;)V");
+JAVAVOIDSTRINGMETHOD(launchWindbot)
+JAVAVOIDSTRINGMETHOD(installUpdate)
+JAVAVOIDSTRINGMETHOD(openUrl)
+JAVAVOIDSTRINGMETHOD(openFile)
 
-	if(installUpdate == 0) {
-		assert("porting::installUpdate unable to find java installUpdate method" == 0);
-	}
-
-	jstring jargs = jnienv->NewStringUTF(args.c_str());
-
-	jnienv->CallVoidMethod(app_global->activity->clazz, installUpdate,
-						   jargs);
-}
-
-void openUrl(const std::string& url) {
-	jmethodID openUrl = jnienv->GetMethodID(nativeActivity, "openUrl",
-											"(Ljava/lang/String;)V");
-
-	if(openUrl == 0) {
-		assert("porting::openUrl unable to find java openUrl method" == 0);
-	}
-
-	jstring jargs = jnienv->NewStringUTF(url.c_str());
-
-	jnienv->CallVoidMethod(app_global->activity->clazz, openUrl,
-						   jargs);
-}
-
-void openFile(const std::string& url) {
-	jmethodID openFile = jnienv->GetMethodID(nativeActivity, "openFile",
-											"(Ljava/lang/String;)V");
-
-	if(openFile == 0) {
-		assert("porting::openFile unable to find java openFile method" == 0);
-	}
-
-	jstring jargs = jnienv->NewStringUTF(url.c_str());
-
-	jnienv->CallVoidMethod(app_global->activity->clazz, openFile,
-						   jargs);
-}
-
-void setTextToClipboard(const wchar_t* text) {
-	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard",
-											"(Ljava/lang/String;)V");
-
-	if(setClip == 0) {
+void setTextToClipboard(epro_wstringview text) {
+	jmethodID setClip = jnienv->GetMethodID(nativeActivity, "setClipboard", JPARAMS(JSTRING)JVOID);
+	if(setClip == 0)
 		assert("porting::setTextToClipboard unable to find java setClipboard method" == 0);
-	}
-	jstring jargs = jnienv->NewStringUTF(BufferIO::EncodeUTF8s(text).c_str());
+	jstring jargs = jnienv->NewStringUTF(BufferIO::EncodeUTF8s(text).data());
 
 	jnienv->CallVoidMethod(app_global->activity->clazz, setClip, jargs);
 }
 
 const wchar_t* getTextFromClipboard() {
 	static std::wstring text;
-	jmethodID getClip = jnienv->GetMethodID(nativeActivity, "getClipboard",
-											"()Ljava/lang/String;");
-	if(getClip == 0) {
+	jmethodID getClip = jnienv->GetMethodID(nativeActivity, "getClipboard", JPARAMS()JSTRING);
+	if(getClip == 0)
 		assert("porting::getTextFromClipboard unable to find java getClipboard method" == 0);
-	}
 	jstring js_clip = (jstring)jnienv->CallObjectMethod(app_global->activity->clazz, getClip);
 	const char *c_str = jnienv->GetStringUTFChars(js_clip, nullptr);
 	text = BufferIO::DecodeUTF8s(c_str);
 	jnienv->ReleaseStringUTFChars(js_clip, c_str);
 	return text.c_str();
-
 }
+
 }
 
 extern int main(int argc, char *argv[]);

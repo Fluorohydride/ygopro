@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include "../text_types.h"
 #include <IEventReceiver.h> //irr::SEvent
 
 namespace irr {
@@ -24,15 +25,15 @@ void showComboBox(const std::vector<std::string>& list);
 
 int getLocalIP();
 
-void launchWindbot(const std::string& args);
+void launchWindbot(path_stringview args);
 
-void installUpdate(const std::string& args);
+void installUpdate(path_stringview args);
 
-void openUrl(const std::string& url);
+void openUrl(path_stringview url);
 
-void openFile(const std::string& file);
+void openFile(path_stringview file);
 
-void setTextToClipboard(const wchar_t* text);
+void setTextToClipboard(epro_wstringview text);
 
 const wchar_t* getTextFromClipboard();
 }

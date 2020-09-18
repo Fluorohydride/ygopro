@@ -1,11 +1,11 @@
 #ifndef LOGGING_H
 #define LOGGING_H
 
-#include <string>
+#include "text_types.h"
 
 namespace ygo {
 
-void ErrorLog(const std::string& msg);
+void ErrorLog(epro_stringview msg);
 
 }
 

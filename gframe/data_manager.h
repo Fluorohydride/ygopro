@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <cstdint>
+#include "text_types.h"
 #include "utils.h"
 
 struct sqlite3;
@@ -97,16 +98,16 @@ public:
 	bool GetData(uint32_t code, CardData* pData);
 	CardDataC* GetCardData(uint32_t code);
 	bool GetString(uint32_t code, CardString* pStr);
-	std::wstring GetName(uint32_t code);
-	std::wstring GetText(uint32_t code);
-	std::wstring GetDesc(uint64_t strCode, bool compat);
-	std::wstring GetSysString(uint32_t code);
-	std::wstring GetVictoryString(int code);
-	std::wstring GetCounterName(uint32_t code);
-	std::wstring GetSetName(uint32_t code);
+	epro_wstringview GetName(uint32_t code);
+	epro_wstringview GetText(uint32_t code);
+	epro_wstringview GetDesc(uint64_t strCode, bool compat);
+	epro_wstringview GetSysString(uint32_t code);
+	epro_wstringview GetVictoryString(int code);
+	epro_wstringview GetCounterName(uint32_t code);
+	epro_wstringview GetSetName(uint32_t code);
 	std::vector<uint32_t> GetSetCode(std::vector<std::wstring>& setname);
 	std::wstring GetNumString(int num, bool bracket = false);
-	std::wstring FormatLocation(uint32_t location, int sequence);
+	epro_wstringview FormatLocation(uint32_t location, int sequence);
 	std::wstring FormatAttribute(uint32_t attribute);
 	std::wstring FormatRace(uint32_t race, bool isSkill = false);
 	std::wstring FormatType(uint32_t type);

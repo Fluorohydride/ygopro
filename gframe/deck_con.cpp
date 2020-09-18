@@ -77,7 +77,7 @@ void DeckBuilder::Initialize(bool refresh) {
 	mainGame->wFilter->setVisible(true);
 	mainGame->wSort->setVisible(true);
 	mainGame->btnLeaveGame->setVisible(true);
-	mainGame->btnLeaveGame->setText(gDataManager->GetSysString(1306).c_str());
+	mainGame->btnLeaveGame->setText(gDataManager->GetSysString(1306).data());
 	mainGame->btnSideOK->setVisible(false);
 	mainGame->btnSideShuffle->setVisible(false);
 	mainGame->btnSideSort->setVisible(false);
@@ -222,7 +222,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_SAVE_DECK: {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel >= 0 && gdeckManager->SaveDeck(gdeckManager->current_deck, Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)))) {
-					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).c_str());
+					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
 				break;
@@ -239,7 +239,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					}
 				}
 				if(sel >= 0) {
-					mainGame->stACMessage->setText(gDataManager->GetSysString(1339).c_str());
+					mainGame->stACMessage->setText(gDataManager->GetSysString(1339).data());
 					mainGame->PopupElement(mainGame->wACMessage, 30);
 					break;
 				} else {
@@ -247,7 +247,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
 				if(gdeckManager->SaveDeck(gdeckManager->current_deck, Utils::ToPathString(dname))) {
-					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).c_str());
+					mainGame->stACMessage->setText(gDataManager->GetSysString(1335).data());
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
 				break;
@@ -257,7 +257,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(sel == -1)
 					break;
 				mainGame->gMutex.lock();
-				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->cbDBDecks->getItem(sel), gDataManager->GetSysString(1337)).c_str());
+				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->cbDBDecks->getItem(sel), gDataManager->GetSysString(1337)).data());
 				mainGame->PopupElement(mainGame->wQuery);
 				mainGame->gMutex.unlock();
 				prev_operation = id;
@@ -271,7 +271,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 					if(i == sel)continue;
 					if(!wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
-						mainGame->stACMessage->setText(gDataManager->GetSysString(1339).c_str());
+						mainGame->stACMessage->setText(gDataManager->GetSysString(1339).data());
 						mainGame->PopupElement(mainGame->wACMessage, 30);
 						return false;
 					}
@@ -280,7 +280,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->removeItem(sel);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->addItem(dname));
 				} else {
-					mainGame->stACMessage->setText(gDataManager->GetSysString(1364).c_str());
+					mainGame->stACMessage->setText(gDataManager->GetSysString(1364).data());
 					mainGame->PopupElement(mainGame->wACMessage, 30);
 				}
 				break;
@@ -353,7 +353,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						mainGame->cbDBDecks->setSelected(sel);
 						if(sel != -1)
 							gdeckManager->LoadDeck(Utils::ToPathString(mainGame->cbDBDecks->getItem(sel)));
-						mainGame->stACMessage->setText(gDataManager->GetSysString(1338).c_str());
+						mainGame->stACMessage->setText(gDataManager->GetSysString(1338).data());
 						mainGame->PopupElement(mainGame->wACMessage, 20);
 						prev_deck = sel;
 					}
@@ -737,9 +737,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					auto deck_string = event.KeyInput.Shift ? gdeckManager->ExportDeckCardNames(gdeckManager->current_deck) : gdeckManager->ExportDeckBase64(gdeckManager->current_deck);
 					if(deck_string) {
 						mainGame->env->getOSOperator()->copyToClipboard(deck_string);
-						mainGame->stACMessage->setText(gDataManager->GetSysString(1368).c_str());
+						mainGame->stACMessage->setText(gDataManager->GetSysString(1368).data());
 					} else {
-						mainGame->stACMessage->setText(gDataManager->GetSysString(1369).c_str());
+						mainGame->stACMessage->setText(gDataManager->GetSysString(1369).data());
 					}
 					mainGame->PopupElement(mainGame->wACMessage, 20);
 				}
@@ -796,7 +796,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 							pos++;
 						to.erase(pos);
 					}
-					uint32_t code = BufferIO::GetVal(to.c_str());
+					uint32_t code = BufferIO::GetVal(to.data());
 					CardDataC* pointer = nullptr;
 					if(!code || !(pointer = gDataManager->GetCardData(code))) {
 						for(auto& card : gDataManager->cards) {
@@ -830,7 +830,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(to_open_deck.size()) {
 					if(Utils::GetFileExtension(to_open_deck) == L"ydk" && gdeckManager->LoadDeck(Utils::ToPathString(to_open_deck))) {
 						auto name = Utils::GetFileName(to_open_deck);
-						mainGame->ebDeckname->setText(name.c_str());
+						mainGame->ebDeckname->setText(name.data());
 						mainGame->cbDBDecks->setSelected(-1);
 					}
 					to_open_deck.clear();
@@ -993,7 +993,7 @@ void DeckBuilder::FilterCards(bool force_refresh) {
 			it++;
 	}
 	for(const auto& term : searchterms) {
-		int trycode = BufferIO::GetVal(term.c_str());
+		int trycode = BufferIO::GetVal(term.data());
 		CardDataC* data = nullptr;
 		if(trycode && (data = gDataManager->GetCardData(trycode))) {
 			searched_terms[term] = { data };
@@ -1229,7 +1229,7 @@ void DeckBuilder::ClearFilter() {
 void DeckBuilder::SortList() {
 	auto left = results.begin();
 	for(auto it = results.begin(); it != results.end(); ++it) {
-		if(searched_terms.find(Utils::ToUpperNoAccents(gDataManager->GetName((*it)->code))) != searched_terms.end()) {
+		if(searched_terms.find(Utils::ToUpperNoAccents<std::wstring>(gDataManager->GetName((*it)->code).data())) != searched_terms.end()) {
 			std::iter_swap(left, it);
 			++left;
 		}

@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <mutex>
+#include "bufferio.h"
 #include "text_types.h"
 
 namespace irr {
@@ -63,24 +64,24 @@ namespace ygo {
 		};
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
-		static bool MakeDirectory(const path_string& path);
-		static bool FileCopy(const path_string& source, const path_string& destination);
-		static bool FileMove(const path_string& source, const path_string& destination);
-		static bool FileExists(const path_string& path);
-		static path_string ToPathString(const std::wstring& input);
-		static path_string ToPathString(const std::string& input);
-		static std::string ToUTF8IfNeeded(const path_string& input);
-		static std::wstring ToUnicodeIfNeeded(const path_string& input);
-		static bool FileDelete(const path_string& source);
-		static bool ClearDirectory(const path_string& path);
-		static bool DeleteDirectory(const path_string& source);
+		static bool MakeDirectory(path_stringview path);
+		static bool FileCopy(path_stringview source, path_stringview destination);
+		static bool FileMove(path_stringview source, path_stringview destination);
+		static bool FileExists(path_stringview path);
+		static inline path_string ToPathString(epro_wstringview input);
+		static inline path_string ToPathString(epro_stringview input);
+		static inline std::string ToUTF8IfNeeded(path_stringview input);
+		static inline std::wstring ToUnicodeIfNeeded(path_stringview input);
+		static bool FileDelete(path_stringview source);
+		static bool ClearDirectory(path_stringview path);
+		static bool DeleteDirectory(path_stringview source);
 		static void CreateResourceFolders();
-		static void FindFiles(const path_string& path, const std::function<void(path_string, bool, void*)>& cb, void* payload = nullptr);
-		static std::vector<path_string> FindFiles(const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
+		static void FindFiles(path_stringview path, const std::function<void(path_stringview, bool, void*)>& cb, void* payload = nullptr);
+		static std::vector<path_string> FindFiles(path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers = 0);
 		/** Returned subfolder names are prefixed by the provided path */
-		static std::vector<path_string> FindSubfolders(const path_string& path, int subdirectorylayers = 1, bool addparentpath = true);
-		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, const path_string& path, std::vector<path_string> extensions, int subdirectorylayers = 0);
-		static MutexLockedIrrArchivedFile FindFileInArchives(const path_string& path, const path_string& name);
+		static std::vector<path_string> FindSubfolders(path_stringview path, int subdirectorylayers = 1, bool addparentpath = true);
+		static std::vector<int> FindFiles(irr::io::IFileArchive* archive, path_stringview path, const std::vector<path_stringview>& extensions, int subdirectorylayers = 0);
+		static MutexLockedIrrArchivedFile FindFileInArchives(path_stringview path, path_stringview name);
 		template<typename T>
 		static T NormalizePath(T path, bool trailing_slash = true);
 		template<typename T>
@@ -91,36 +92,43 @@ namespace ygo {
 		static T GetFileName(T file, bool keepextension = false);
 
 		template<typename T>
-		static std::vector<T> TokenizeString(const T& input, const T& token);
+		static inline std::vector<T> TokenizeString(const T& input, const T& token);
 		template<typename T>
-		static std::vector<T> TokenizeString(const T& input, const typename T::value_type& token);
+		static inline std::vector<T> TokenizeString(const T& input, const typename T::value_type& token);
+		template<typename T>
+		static T ToUpperChar(T c);
 		template<typename T>
 		static T ToUpperNoAccents(T input);
 		/** Returns true if and only if all tokens are contained in the input. */
-		static bool ContainsSubstring(const std::wstring& input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
-		static bool ContainsSubstring(const std::wstring& input, const std::wstring& token, bool convertInputCasing = false, bool convertTokenCasing = false);
+		static bool ContainsSubstring(epro_wstringview input, const std::vector<std::wstring>& tokens, bool convertInputCasing = false, bool convertTokenCasing = false);
+		static bool ContainsSubstring(epro_wstringview input, epro_wstringview token, bool convertInputCasing = false, bool convertTokenCasing = false);
 		template<typename T>
 		static bool KeepOnlyDigits(T& input, bool negative = false);
 		template<typename T>
 		static inline bool EqualIgnoreCase(const T& a, const T& b) {
-			return Utils::ToUpperNoAccents(a) == Utils::ToUpperNoAccents(b);
+			return std::equal(a.begin(), a.end(), b.begin(), b.end(), [](const T::value_type& _a, const T::value_type& _b) {
+				return ToUpperChar(_a) == ToUpperChar(_b);
+			});
 		};
 		template<typename T>
 		static inline bool CompareIgnoreCase(const T& a, const T& b) {
-			return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
+			return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), [](const T::value_type& _a, const T::value_type& _b) {
+				return ToUpperChar(_a) < ToUpperChar(_b);
+			});
+			//return Utils::ToUpperNoAccents(a) < Utils::ToUpperNoAccents(b);
 		};
-		static bool CreatePath(const path_string& path, const path_string& workingdir = EPRO_TEXT("./"));
-		static const path_string& GetExePath();
-		static const path_string& GetExeFolder();
-		static const path_string& GetCorePath();
-		static bool UnzipArchive(const path_string& input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, const path_string& dest = EPRO_TEXT("./"));
+		static bool CreatePath(path_stringview path, path_stringview workingdir = EPRO_TEXT("./"));
+		static path_stringview GetExePath();
+		static path_stringview GetExeFolder();
+		static path_stringview GetCorePath();
+		static bool UnzipArchive(path_stringview input, unzip_callback callback = nullptr, unzip_payload* payload = nullptr, path_stringview dest = EPRO_TEXT("./"));
 
 		enum OpenType {
 			OPEN_URL,
 			OPEN_FILE
 		};
 
-		static void SystemOpen(const path_string& url, OpenType type = OPEN_URL);
+		static void SystemOpen(path_stringview url, OpenType type = OPEN_URL);
 	};
 
 #define CHAR_T typename T::value_type
@@ -226,33 +234,36 @@ inline std::vector<T> Utils::TokenizeString(const T & input, const typename T::v
 }
 
 template<typename T>
-inline T Utils::ToUpperNoAccents(T input) {
-	std::transform(input.begin(), input.end(), input.begin(), [](CHAR_T c) {
+static T Utils::ToUpperChar(T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
-		if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
-			return CAST('A');
-		}
-		if (IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
-			return CAST('E');
-		}
-		if (IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
-			return CAST('I');
-		}
-		if (IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
-			return CAST('O');
-		}
-		if (IN_INTERVAL(217, 220) || IN_INTERVAL(249, 252)) {
-			return CAST('U');
-		}
-		if (c == 209 || c == 241) {
-			return CAST('N');
-		}
-		if (std::is_same<CHAR_T, wchar_t>::value)
-			return CAST(std::towupper(c));
-		else
-			return CAST(std::toupper(c));
+	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+		return static_cast<T>('A');
+	}
+	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
+		return static_cast<T>('E');
+	}
+	if(IN_INTERVAL(200, 203) || IN_INTERVAL(232, 235)) {
+		return static_cast<T>('I');
+	}
+	if(IN_INTERVAL(210, 214) || IN_INTERVAL(242, 246)) {
+		return static_cast<T>('O');
+	}
+	if(IN_INTERVAL(217, 220) || IN_INTERVAL(249, 252)) {
+		return static_cast<T>('U');
+	}
+	if(c == 209 || c == 241) {
+		return static_cast<T>('N');
+	}
+	if(std::is_same<T, wchar_t>::value)
+		return static_cast<T>(std::towupper(c));
+	else
+		return static_cast<T>(std::toupper(c));
 #undef IN_INTERVAL
-	});
+}
+
+template<typename T>
+inline T Utils::ToUpperNoAccents(T input) {
+	std::transform(input.begin(), input.end(), input.begin(), ToUpperChar<CHAR_T>);
 	return input;
 }
 
@@ -275,6 +286,35 @@ inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 }
 #undef CAST
 #undef CHAR_T
+
+path_string Utils::ToPathString(epro_wstringview input) {
+#ifdef UNICODE
+	return input.data();
+#else
+	return BufferIO::EncodeUTF8s(input);
+#endif
+}
+path_string Utils::ToPathString(epro_stringview input) {
+#ifdef UNICODE
+	return BufferIO::DecodeUTF8s(input);
+#else
+	return input.data();
+#endif
+}
+std::string Utils::ToUTF8IfNeeded(path_stringview input) {
+#ifdef UNICODE
+	return BufferIO::EncodeUTF8s(input);
+#else
+	return input.data();
+#endif
+}
+std::wstring Utils::ToUnicodeIfNeeded(path_stringview input) {
+#ifdef UNICODE
+	return input.data();
+#else
+	return BufferIO::DecodeUTF8s(input);
+#endif
+}
 
 }
 
