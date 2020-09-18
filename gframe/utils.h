@@ -234,7 +234,7 @@ inline std::vector<T> Utils::TokenizeString(const T & input, const typename T::v
 }
 
 template<typename T>
-static T Utils::ToUpperChar(T c) {
+T Utils::ToUpperChar(T c) {
 #define IN_INTERVAL(start, end) (c >= start && c <= end)
 	if(IN_INTERVAL(192, 197) || IN_INTERVAL(224, 229)) {
 		return static_cast<T>('A');
