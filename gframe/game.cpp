@@ -2174,7 +2174,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 			grepo->commit_history_partial = fmt::format(L"{}\n{}\n\n{}",
 				gDataManager->GetSysString(1449),
 				gDataManager->GetSysString(1450),
-				BufferIO::DecodeUTF8s(repo->warning)).data();
+				BufferIO::DecodeUTF8s(repo->warning));
 		} else {
 			grepo->commit_history_partial = gDataManager->GetSysString(1446).data();
 		}
