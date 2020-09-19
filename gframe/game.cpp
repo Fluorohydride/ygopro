@@ -2184,7 +2184,7 @@ void Game::UpdateRepoInfo(const GitRepo* repo, RepoGui* grepo) {
 	if(!repo->is_language) {
 		script_dirs.insert(script_dirs.begin(), Utils::ToPathString(repo->script_path));
 		auto script_subdirs = Utils::FindSubfolders(Utils::ToPathString(repo->script_path));
-		script_dirs.insert(script_dirs.begin(), script_subdirs.begin(), script_subdirs.end());
+		script_dirs.insert(script_dirs.begin(), std::make_move_iterator(script_subdirs.begin()), std::make_move_iterator(script_subdirs.end()));
 		pic_dirs.insert(pic_dirs.begin(), Utils::ToPathString(repo->pics_path));
 		if(repo->has_core)
 			cores_to_load.insert(cores_to_load.begin(), Utils::ToPathString(repo->core_path));
@@ -3294,11 +3294,11 @@ void Game::UpdateUnzipBar(unzip_payload* payload) {
 void Game::PopulateResourcesDirectories() {
 	script_dirs.push_back(EPRO_TEXT("./expansions/script/"));
 	auto expansions_subdirs = Utils::FindSubfolders(EPRO_TEXT("./expansions/script/"));
-	script_dirs.insert(script_dirs.end(), expansions_subdirs.begin(), expansions_subdirs.end());
+	script_dirs.insert(script_dirs.end(), std::make_move_iterator(expansions_subdirs.begin()), std::make_move_iterator(expansions_subdirs.end()));
 	script_dirs.push_back(EPRO_TEXT("archives"));
 	script_dirs.push_back(EPRO_TEXT("./script/"));
 	auto script_subdirs = Utils::FindSubfolders(EPRO_TEXT("./script/"));
-	script_dirs.insert(script_dirs.end(), script_subdirs.begin(), script_subdirs.end());
+	script_dirs.insert(script_dirs.end(), std::make_move_iterator(script_subdirs.begin()), std::make_move_iterator(script_subdirs.end()));
 	pic_dirs.push_back(EPRO_TEXT("./expansions/pics/"));
 	pic_dirs.push_back(EPRO_TEXT("archives"));
 	pic_dirs.push_back(EPRO_TEXT("./pics/"));
