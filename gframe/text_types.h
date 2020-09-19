@@ -7,7 +7,7 @@ namespace nonstd {
 namespace sv_lite {
 template<typename T>
 inline fmt::basic_string_view<T> to_string_view(const nonstd::basic_string_view<T>& s) {
-	return s.data();
+	return { s.data(), s.size() };
 }
 }
 }
