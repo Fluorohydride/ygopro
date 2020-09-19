@@ -1458,6 +1458,7 @@ bool Game::Initialize() {
 	updateWindow = env->addWindow(Scale(490, 200, 840, 340), true, L"");
 	updateWindow->getCloseButton()->setVisible(false);
 	updateWindow->setVisible(false);
+	updateWindow->setDrawTitlebar(false);
 	updateProgressText = env->addStaticText(L"", Scale(5, 5, 345, 90), false, true, updateWindow);
 	updateProgressTop = new IProgressBar(env, Scale(5, 60, 335, 85), -1, updateWindow);
 	updateProgressTop->addBorder(1);

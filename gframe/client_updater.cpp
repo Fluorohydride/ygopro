@@ -21,6 +21,12 @@
 #endif
 #include "game_config.h"
 
+struct WritePayload {
+	std::vector<char>* outbuffer = nullptr;
+	std::fstream* outfstream = nullptr;
+	MD5_CTX* md5context = nullptr;
+};
+
 struct Payload {
 	update_callback callback = nullptr;
 	int current = 1;
@@ -50,10 +56,17 @@ int progress_callback(void* ptr, curl_off_t TotalToDownload, curl_off_t NowDownl
 
 size_t WriteCallback(char *contents, size_t size, size_t nmemb, void *userp) {
 	size_t realsize = size * nmemb;
-	auto buff = static_cast<std::vector<char>*>(userp);
-	size_t prev_size = buff->size();
-	buff->resize(prev_size + realsize);
-	memcpy((char*)buff->data() + prev_size, contents, realsize);
+	auto payload = static_cast<WritePayload*>(userp);
+	auto buff = payload->outbuffer;
+	if(buff) {
+		size_t prev_size = buff->size();
+		buff->resize(prev_size + realsize);
+		memcpy((char*)buff->data() + prev_size, contents, realsize);
+	}
+	if(payload->outfstream)
+		payload->outfstream->write(contents, realsize);
+	if(payload->md5context)
+		MD5_Update(payload->md5context, contents, realsize);
 	return realsize;
 }
 
@@ -113,12 +126,17 @@ void Reboot() {
 	exit(0);
 }
 
-bool CheckMd5(const std::vector<char>& buffer, const std::vector<uint8_t>& md5) {
-	if(md5.size() < MD5_DIGEST_LENGTH)
-		return false;
+bool CheckMd5(std::fstream& instream, uint8_t md5[MD5_DIGEST_LENGTH]) {
+	MD5_CTX context{};
+	MD5_Init(&context);
+	std::array<char, 512> buff;
+	while(!instream.eof()) {
+		instream.read(buff.data(), buff.size());
+		MD5_Update(&context, buff.data(), static_cast<size_t>(instream.gcount()));
+	}
 	uint8_t result[MD5_DIGEST_LENGTH];
-	MD5((uint8_t*)buffer.data(), buffer.size(), result);
-	return memcmp(result, md5.data(), MD5_DIGEST_LENGTH) == 0;
+	MD5_Final(result, &context);
+	return memcmp(result, md5, MD5_DIGEST_LENGTH) == 0;
 }
 
 void DeleteOld() {
@@ -232,40 +250,57 @@ void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_
 	cbpayload.payload = payload;
 	int i = 1;
 	for(auto& file : update_urls) {
-		auto name = dest_path + EPRO_TEXT("/") + ygo::Utils::ToPathString(file.name);
+		auto name = fmt::format(EPRO_TEXT("{}/{}{}"), dest_path, ygo::Utils::ToPathString(file.name),
 #ifdef __ANDROID__
-		name += ".apk";
+								".apk"
+#else
+								EPRO_TEXT("")
 #endif
+		);
 		cbpayload.current = i++;
 		cbpayload.filename = file.name.data();
 		cbpayload.is_new = true;
 		cbpayload.previous_percent = -1;
-		std::vector<uint8_t> binmd5;
-		for(std::string::size_type i = 0; i < file.md5.length(); i += 2) {
-			uint8_t b = static_cast<uint8_t>(std::stoul(file.md5.substr(i, 2), nullptr, 16));
-			binmd5.push_back(b);
+		std::array<uint8_t, MD5_DIGEST_LENGTH> binmd5;
+		if(file.md5.size() != binmd5.size() * 2)
+			continue;
+		for(size_t i = 0; i < binmd5.size(); i ++) {
+			uint8_t b = static_cast<uint8_t>(std::stoul(file.md5.substr(i * 2, 2), nullptr, 16));
+			binmd5[i] = b;
 		}
 		std::fstream stream;
 		stream.open(name, std::fstream::in | std::fstream::binary);
-		if(stream.good() && CheckMd5({ std::istreambuf_iterator<char>(stream),
-									  std::istreambuf_iterator<char>() }, binmd5))
+		if(stream.good() && CheckMd5(stream, binmd5.data()))
 			continue;
 		stream.close();
-		std::vector<char> buffer;
-		if((curlPerform(file.url.c_str(), &buffer, &cbpayload) != CURLE_OK)
-		   || !CheckMd5(buffer, binmd5)
-		   || !ygo::Utils::CreatePath(name))
+		if(!ygo::Utils::CreatePath(name))
 			continue;
 		stream.open(name, std::fstream::out | std::fstream::trunc | std::ofstream::binary);
-		if(stream.good())
-			stream.write(buffer.data(), buffer.size());
+		if(!stream.good())
+			continue;
+		WritePayload wpayload;
+		wpayload.outfstream = &stream;
+		MD5_CTX context{};
+		wpayload.md5context = &context;
+		MD5_Init(wpayload.md5context);
+		if(curlPerform(file.url.c_str(), &wpayload, &cbpayload) != CURLE_OK)
+			continue;
+		uint8_t md5[MD5_DIGEST_LENGTH]{};
+		MD5_Final(md5, &context);
+		if(memcmp(md5, binmd5.data(), MD5_DIGEST_LENGTH) != 0) {
+			stream.close();
+			Utils::FileDelete(name);
+			continue;
+		}
 	}
 	downloaded = true;
 }
 
 void ClientUpdater::CheckUpdate() {
+	WritePayload payload{};
 	std::vector<char> retrieved_data;
-	if(curlPerform(UPDATE_URL, &retrieved_data) != CURLE_OK)
+	payload.outbuffer = &retrieved_data;
+	if(curlPerform(UPDATE_URL, &payload) != CURLE_OK)
 		return;
 	try {
 		nlohmann::json j = nlohmann::json::parse(retrieved_data);
