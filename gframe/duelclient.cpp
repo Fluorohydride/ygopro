@@ -57,7 +57,7 @@ uint16_t DuelClient::temp_port = 0;
 uint16_t DuelClient::temp_ver = 0;
 bool DuelClient::try_needed = false;
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(const std::wstring& address, const std::wstring& _port) {
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro_wstringview address, epro_wstringview _port) {
 	char ip[20];
 	BufferIO::CopyWStr(address.data(), ip, 16);
 	uint32_t remote_addr = htonl(inet_addr(ip));
@@ -77,16 +77,16 @@ std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(const std::wstring& addr
 		if(status != 0) {
 			throw std::runtime_error("Host not resolved");
 		} else {
-			sockaddr_in * sin = ((struct sockaddr_in *)answer->ai_addr);
+			sockaddr_in* sin = ((sockaddr_in*)answer->ai_addr);
 			evutil_inet_ntop(AF_INET, &(sin->sin_addr), ip, 20);
 			remote_addr = htonl(inet_addr(ip));
 		}
 	}
-	return { remote_addr, (uint16_t)std::stoi(_port) };
+	return { remote_addr, (uint16_t)std::stoi(_port.data()) };
 }
 
-std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(const std::wstring & address, int port) {
-	return DuelClient::ResolveServer(address, std::to_wstring(port));
+std::pair<uint32_t, uint16_t> DuelClient::ResolveServer(epro_wstringview address, int port) {
+	return DuelClient::ResolveServer(address, fmt::to_wstring(port));
 }
 
 bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool create_game) {
@@ -4367,7 +4367,7 @@ void DuelClient::BeginRefreshHost() {
 	remotes.clear();
 	hosts.clear();
 	event_base* broadev = event_base_new();
-	uint32_t addresses[8]{};
+	decltype(in_addr::s_addr) addresses[8]{};
 #ifdef __ANDROID__
 	addresses[0] = porting::getLocalIP();
 	if(addresses[0] == -1) {
@@ -4377,13 +4377,11 @@ void DuelClient::BeginRefreshHost() {
 	char hname[256];
 	gethostname(hname, 256);
 	hostent* host = gethostbyname(hname);
-	if(!host)
+	if(!host || host->h_addrtype != AF_INET)
 		return;
-	for(int i = 0; i < 8; ++i) {
-		if(host->h_addr_list[i] == 0)
-			break;
-		addresses[i] = *(uint32_t*)host->h_addr_list[i];
-	}
+	auto list = reinterpret_cast<in_addr**>(host->h_addr_list);
+	for(int i = 0; i < 8 && list[i] != 0; ++i)
+		addresses[i] = list[i]->s_addr;
 #endif
 	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
@@ -4409,10 +4407,10 @@ void DuelClient::BeginRefreshHost() {
 	sockTo.sin_port = htons(7920);
 	HostRequest hReq;
 	hReq.identifier = NETWORK_CLIENT_ID;
-	for(int i = 0; i < 8 && addresses[i]; ++i) {
-		if(addresses[i] == 0)
+	for(const auto& address : addresses) {
+		if(address == 0)
 			break;
-		local.sin_addr.s_addr = addresses[i];
+		local.sin_addr.s_addr = address;
 		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if(sSend == INVALID_SOCKET)
 			continue;

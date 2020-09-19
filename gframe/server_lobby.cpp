@@ -259,7 +259,7 @@ void ServerLobby::JoinServer(bool host) {
 	mainGame->ebNickName->setText(mainGame->ebNickNameOnline->getText());
 	auto selected = mainGame->serverChoice->getSelected();
 	if (selected < 0) return;
-	ServerInfo server = serversVector[selected];
+	const ServerInfo& server = serversVector[selected];
 	try {
 		auto serverinfo = DuelClient::ResolveServer(server.address, server.duelport);
 		if(host) {

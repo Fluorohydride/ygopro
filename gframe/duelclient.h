@@ -40,8 +40,8 @@ public:
 	static bool try_needed;
 	static bool is_local_host;
 
-	static std::pair<uint32_t, uint16_t> ResolveServer(const std::wstring& address, const std::wstring& port);
-	static std::pair<uint32_t, uint16_t> ResolveServer(const std::wstring& address, int port);
+	static std::pair<uint32_t, uint16_t> ResolveServer(epro_wstringview address, epro_wstringview port);
+	static std::pair<uint32_t, uint16_t> ResolveServer(epro_wstringview address, int port);
 	static bool StartClient(uint32_t ip, uint16_t port, uint32_t gameid = 0, bool create_game = true);
 	static void ConnectTimeout(evutil_socket_t fd, short events, void* arg);
 	static void StopClient(bool is_exiting = false);
