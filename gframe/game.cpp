@@ -3189,18 +3189,18 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-path_string Game::FindScript(const path_string& name) {
+path_string Game::FindScript(path_stringview name) {
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives") && Utils::FindFileInArchives(EPRO_TEXT("script/"), name)) {
 			return path;
 		} else {
-			auto tmp = path + name;
+			auto tmp = path + name.data();
 			if(Utils::FileExists(tmp))
 				return tmp;
 		}
 	}
 	if(Utils::FileExists(name))
-		return name;
+		return name.data();
 	return EPRO_TEXT("");
 }
 std::vector<char> Game::LoadScript(epro_stringview _name) {

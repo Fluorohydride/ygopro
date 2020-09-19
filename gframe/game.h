@@ -218,7 +218,7 @@ public:
 	
 	std::wstring ReadPuzzleMessage(const std::wstring& script_name);
 	OCG_Duel SetupDuel(OCG_DuelOptions opts);
-	path_string FindScript(const path_string& script_name);
+	path_string FindScript(path_stringview script_name);
 	std::vector<char> LoadScript(epro_stringview script_name);
 	bool LoadScript(OCG_Duel pduel, epro_stringview script_name);
 	static int ScriptReader(void* payload, OCG_Duel duel, const char* name);
