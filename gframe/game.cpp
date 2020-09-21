@@ -1681,8 +1681,7 @@ bool Game::MainLoop() {
 			DrawCards();
 			DrawMisc();
 			smgr->drawAll();
-			driver->setMaterial(irr::video::IdentityMaterial);
-			driver->clearZBuffer();)
+			driver->setMaterial(irr::video::IdentityMaterial);)
 		} else if(is_building) {
 
 			if(is_siding)

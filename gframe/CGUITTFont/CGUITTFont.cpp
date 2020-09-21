@@ -68,6 +68,13 @@ scene::SMesh CGUITTFont::shared_plane_;
 //
 
 video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVideoDriver* driver) const {
+	auto GetData = [](auto* image)->void* {
+#if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
+		image->getData();
+#else
+		image->lock();
+#endif
+	};
 	// Determine what our texture size should be.
 	// Add 1 because textures are inclusive-exclusive.
 	core::dimension2du d(bits.width + 1, bits.rows + 1);
@@ -85,7 +92,7 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 
 			// Load the monochrome data in.
 			const u32 image_pitch = image->getPitch() / sizeof(u16);
-			u16* image_data = (u16*)image->lock();
+			u16* image_data = (u16*)GetData(image);
 			u8* glyph_data = bits.buffer;
 			for(u32 y = 0; y < bits.rows; ++y) {
 				u16* row = image_data;
@@ -98,7 +105,6 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 				}
 				image_data += image_pitch;
 			}
-			image->unlock();
 			break;
 		}
 
@@ -111,7 +117,7 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 			// Load the grayscale data in.
 			const float gray_count = static_cast<float>(bits.num_grays);
 			const u32 image_pitch = image->getPitch() / sizeof(u32);
-			u32* image_data = (u32*)image->lock();
+			u32* image_data = (u32*)GetData(image);
 			u8* glyph_data = bits.buffer;
 			for(u32 y = 0; y < bits.rows; ++y) {
 				u8* row = glyph_data;
@@ -121,7 +127,6 @@ video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVide
 				}
 				glyph_data += bits.pitch;
 			}
-			image->unlock();
 			break;
 		}
 		default:
