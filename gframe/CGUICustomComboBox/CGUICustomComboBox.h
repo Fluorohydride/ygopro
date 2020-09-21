@@ -6,15 +6,15 @@
 #define __C_GUI_CUSTOM_COMBO_BOX_H_INCLUDED__
 
 #include <IrrCompileConfig.h>
-#ifndef _IRR_OVERRIDE_
-#define _IRR_OVERRIDE_
-#endif
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include <IGUIComboBox.h>
 #include <IGUIStaticText.h>
 #include <irrString.h>
 #include <irrArray.h>
+#ifndef _IRR_OVERRIDE_
+#define _IRR_OVERRIDE_
+#endif
 
 namespace irr {
 namespace gui {

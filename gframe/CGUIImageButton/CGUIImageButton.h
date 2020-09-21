@@ -6,13 +6,13 @@
 #define __C_GUI_BUTTON_H_INCLUDED__
 
 #include <IrrCompileConfig.h>
-#ifndef _IRR_OVERRIDE_
-#define _IRR_OVERRIDE_
-#endif
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include <IGUIButton.h>
 #include <SColor.h>
+#ifndef _IRR_OVERRIDE_
+#define _IRR_OVERRIDE_
+#endif
 
 namespace irr {
 namespace video {
@@ -81,16 +81,16 @@ public:
 	}
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
-	virtual void setImage(video::ITexture* image = 0);
+	virtual void setImage(video::ITexture* image = 0) _IRR_OVERRIDE_;
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
-	virtual void setImage(video::ITexture* image, const core::rect<s32>& pos);
+	virtual void setImage(video::ITexture* image, const core::rect<s32>& pos) _IRR_OVERRIDE_;
 
 	//! Sets an image which should be displayed on the button when it is in pressed state.
-	virtual void setPressedImage(video::ITexture* image = 0);
+	virtual void setPressedImage(video::ITexture* image = 0) _IRR_OVERRIDE_;
 
 	//! Sets an image which should be displayed on the button when it is in pressed state.
-	virtual void setPressedImage(video::ITexture* image, const core::rect<s32>& pos);
+	virtual void setPressedImage(video::ITexture* image, const core::rect<s32>& pos) _IRR_OVERRIDE_;
 
 	//! Sets the sprite bank used by the button
 	virtual void setSpriteBank(IGUISpriteBank* bank = 0) _IRR_OVERRIDE_;
@@ -167,13 +167,13 @@ public:
 	//! Reads attributes of the element
 	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options) _IRR_OVERRIDE_;
 
-	virtual void setDrawImage(bool b);
+	void setDrawImage(bool b);
 
-	virtual void setImageRotation(f32 r);
+	void setImageRotation(f32 r);
 
-	virtual void setImageScale(core::vector2df s);
+	void setImageScale(core::vector2df s);
 
-	virtual void setImageSize(core::dimension2di s);
+	void setImageSize(core::dimension2di s);
 
 protected:
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9

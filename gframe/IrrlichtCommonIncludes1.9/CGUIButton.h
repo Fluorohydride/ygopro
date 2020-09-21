@@ -49,16 +49,16 @@ public:
 	virtual void setImage(EGUI_BUTTON_IMAGE_STATE state, video::ITexture* image = 0, const core::rect<s32>& sourceRect = core::rect<s32>(0, 0, 0, 0))  _IRR_OVERRIDE_;
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
-	virtual void setImage(video::ITexture* image = 0);
+	virtual void setImage(video::ITexture* image = 0) _IRR_OVERRIDE_;
 
 	//! Sets an image which should be displayed on the button when it is in normal state.
-	virtual void setImage(video::ITexture* image, const core::rect<s32>& pos);
+	virtual void setImage(video::ITexture* image, const core::rect<s32>& pos) _IRR_OVERRIDE_;
 
 	//! Sets an image which should be displayed on the button when it is in pressed state.
-	virtual void setPressedImage(video::ITexture* image = 0);
+	virtual void setPressedImage(video::ITexture* image = 0) _IRR_OVERRIDE_;
 
 	//! Sets an image which should be displayed on the button when it is in pressed state.
-	virtual void setPressedImage(video::ITexture* image, const core::rect<s32>& pos);
+	virtual void setPressedImage(video::ITexture* image, const core::rect<s32>& pos) _IRR_OVERRIDE_;
 
 	//! Sets the sprite bank used by the button
 	virtual void setSpriteBank(IGUISpriteBank* bank = 0) _IRR_OVERRIDE_;
@@ -122,14 +122,6 @@ public:
 
 	//! Reads attributes of the element
 	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options) _IRR_OVERRIDE_;
-
-	virtual void setDrawImage(bool b);
-
-	virtual void setImageRotation(f32 r);
-
-	virtual void setImageScale(core::vector2df s);
-
-	virtual void setImageSize(core::dimension2di s);
 
 protected:
 	void drawSprite(EGUI_BUTTON_STATE state, u32 startTime, const core::position2di& center);

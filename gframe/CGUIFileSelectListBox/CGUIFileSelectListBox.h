@@ -6,15 +6,15 @@
 #define __C_GUI_FILE_SELECT_LIST_BOX_H_INCLUDED__
 
 #include <IrrCompileConfig.h>
-#ifndef _IRR_OVERRIDE_
-#define _IRR_OVERRIDE_
-#endif
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include <vector>
 #include <string>
 #include <functional>
 #include <IGUIListBox.h>
+#ifndef _IRR_OVERRIDE_
+#define _IRR_OVERRIDE_
+#endif
 #include "../utils.h"
 
 namespace irr {
@@ -45,9 +45,9 @@ public:
 
 	//! returns string of a list item. the id may be a value from 0 to itemCount-1
 
-	virtual const wchar_t* getListItem(u32 id) const;
+	virtual const wchar_t* getListItem(u32 id) const _IRR_OVERRIDE_;
 
-	virtual const wchar_t* getListItem(u32 id, bool relativepath) const;
+	const wchar_t* getListItem(u32 id, bool relativepath) const;
 
 	//! adds an list item, returns id of item
 	virtual u32 addItem(const wchar_t* text) _IRR_OVERRIDE_;
@@ -56,7 +56,7 @@ public:
 	virtual void clear() _IRR_OVERRIDE_;
 
 	//! returns id of selected item. returns -1 if no item is selected.
-	virtual s32 getSelected() const;
+	virtual s32 getSelected() const _IRR_OVERRIDE_;
 
 	//! sets the selected item. Set this to -1 if no item should be selected
 	virtual void setSelected(s32 id) _IRR_OVERRIDE_;
@@ -81,7 +81,7 @@ public:
 	virtual s32 getIcon(u32 id) const _IRR_OVERRIDE_;
 
 	//! removes an item from the list
-	virtual void removeItem(u32 id);
+	virtual void removeItem(u32 id) _IRR_OVERRIDE_;
 
 	//! get the the id of the item at the given absolute coordinates
 	virtual s32 getItemAt(s32 xpos, s32 ypos) const _IRR_OVERRIDE_;
@@ -90,28 +90,28 @@ public:
 	//! the built-in-font by default. A sprite can be displayed in front of every list item.
 	//! An icon is an index within the icon sprite bank. Several default icons are available in the
 	//! skin through getIcon
-	virtual void setSpriteBank(IGUISpriteBank* bank);
+	virtual void setSpriteBank(IGUISpriteBank* bank) _IRR_OVERRIDE_;
 
 	//! set whether the listbox should scroll to newly selected items
-	virtual void setAutoScrollEnabled(bool scroll);
+	virtual void setAutoScrollEnabled(bool scroll) _IRR_OVERRIDE_;
 
 	//! returns true if automatic scrolling is enabled, false if not.
-	virtual bool isAutoScrollEnabled() const;
+	virtual bool isAutoScrollEnabled() const _IRR_OVERRIDE_;
 
 	//! Update the position and size of the listbox, and update the scrollbar
-	virtual void updateAbsolutePosition();
+	virtual void updateAbsolutePosition() _IRR_OVERRIDE_;
 
 	//! Writes attributes of the element.
-	virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const;
+	virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const _IRR_OVERRIDE_;
 
 	//! Reads attributes of the element
-	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
+	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options) _IRR_OVERRIDE_;
 
 	//! set all item colors at given index to color
-	virtual void setItemOverrideColor(u32 index, video::SColor color);
+	virtual void setItemOverrideColor(u32 index, video::SColor color) _IRR_OVERRIDE_;
 
 	//! set all item colors of specified type at given index to color
-	virtual void setItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType, video::SColor color);
+	virtual void setItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType, video::SColor color) _IRR_OVERRIDE_;
 
 	//! clear all item colors at index
 	virtual void clearItemOverrideColor(u32 index) _IRR_OVERRIDE_;
@@ -120,10 +120,10 @@ public:
 	virtual void clearItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) _IRR_OVERRIDE_;
 
 	//! has the item at index its color overwritten?
-	virtual bool hasItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
+	virtual bool hasItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const _IRR_OVERRIDE_;
 
 	//! return the overwrite color at given item index.
-	virtual video::SColor getItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const;
+	virtual video::SColor getItemOverrideColor(u32 index, EGUI_LISTBOX_COLOR colorType) const _IRR_OVERRIDE_;
 
 	//! return the default color which is used for the given colorType
 	virtual video::SColor getItemDefaultColor(EGUI_LISTBOX_COLOR colorType) const _IRR_OVERRIDE_;

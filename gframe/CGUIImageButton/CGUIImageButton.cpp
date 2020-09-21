@@ -20,7 +20,7 @@ namespace irr {
 namespace gui {
 
 bool hasNPotSupport(irr::video::IVideoDriver* driver) {
-	auto check = [](irr::video::IVideoDriver* driver)->bool {
+	auto check = [](auto driver)->bool {
 		return driver->queryFeature(irr::video::EVDF_TEXTURE_NPOT);
 	};
 	static const bool supported = check(driver);

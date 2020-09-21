@@ -9,6 +9,9 @@
 #ifdef _IRR_COMPILE_WITH_GUI_
 
 #include <IGUICheckBox.h>
+#ifndef _IRR_OVERRIDE_
+#define _IRR_OVERRIDE_
+#endif
 
 namespace irr {
 namespace gui {
@@ -22,10 +25,10 @@ public:
 	static IGUICheckBox* addCustomCheckBox(bool checked, IGUIEnvironment* environment, core::rect<s32> rectangle, IGUIElement* parent = 0, s32 id = -1, const wchar_t* text = 0);
 
 	//! set if box is checked
-	virtual void setChecked(bool checked);
+	virtual void setChecked(bool checked) _IRR_OVERRIDE_;
 
 	//! returns if box is checked
-	virtual bool isChecked() const;
+	virtual bool isChecked() const _IRR_OVERRIDE_;
 
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
 
@@ -45,18 +48,18 @@ public:
 #endif
 
 	//! called if an event happened.
-	virtual bool OnEvent(const SEvent& event);
+	virtual bool OnEvent(const SEvent& event) _IRR_OVERRIDE_;
 
 	//! draws the element and its children
-	virtual void draw();
+	virtual void draw() _IRR_OVERRIDE_;
 
 	//! Writes attributes of the element.
-	virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const;
+	virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const _IRR_OVERRIDE_;
 
 	//! Reads attributes of the element
-	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
+	virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options) _IRR_OVERRIDE_;
 
-	virtual void setColor(video::SColor color);
+	void setColor(video::SColor color);
 
 private:
 
