@@ -135,6 +135,10 @@ local function vcpkgStaticTriplet(prj)
 	premake.w('<VcpkgTriplet Condition="\'$(Platform)\'==\'x64\'">x64-windows-static</VcpkgTriplet>')
 end
 
+local function disableWinXPWarnings(prj)
+	premake.w('<XPDeprecationWarning>false</XPDeprecationWarning>')
+end
+
 local function vcpkgStaticTriplet202006(prj)
 	premake.w('<VcpkgEnabled>true</VcpkgEnabled>')
     premake.w('<VcpkgUseStatic>true</VcpkgUseStatic>')
@@ -146,6 +150,7 @@ require('vstudio')
 premake.override(premake.vstudio.vc2010.elements, "globals", function(base, prj)
 	local calls = base(prj)
 	table.insertafter(calls, premake.vstudio.vc2010.targetPlatformVersionGlobal, vcpkgStaticTriplet)
+	table.insertafter(calls, premake.vstudio.vc2010.targetPlatformVersionGlobal, disableWinXPWarnings)
 	table.insertafter(calls, premake.vstudio.vc2010.globals, vcpkgStaticTriplet202006)
 	return calls
 end)
