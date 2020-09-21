@@ -70,9 +70,9 @@ scene::SMesh CGUITTFont::shared_plane_;
 video::IImage* SGUITTGlyph::createGlyphImage(const FT_Bitmap& bits, video::IVideoDriver* driver) const {
 	auto GetData = [](auto* image)->void* {
 #if IRRLICHT_VERSION_MAJOR==1 && IRRLICHT_VERSION_MINOR==9
-		image->getData();
+		return image->getData();
 #else
-		image->lock();
+		return image->lock();
 #endif
 	};
 	// Determine what our texture size should be.
