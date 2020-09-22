@@ -1681,9 +1681,9 @@ bool Game::MainLoop() {
 			DrawCards();
 			DrawMisc();
 			smgr->drawAll();
-			driver->setMaterial(irr::video::IdentityMaterial);)
+			driver->setMaterial(irr::video::IdentityMaterial);
+			driver->clearZBuffer();)//Without this, "animations" are drawn behind everything
 		} else if(is_building) {
-
 			if(is_siding)
 				discord.UpdatePresence(DiscordWrapper::DECK_SIDING);
 			else
