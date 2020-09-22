@@ -925,17 +925,21 @@ bool Game::Initialize() {
 	defaultStrings.emplace_back(wANAttribute, 562);
 	wANAttribute->getCloseButton()->setVisible(false);
 	wANAttribute->setVisible(false);
-	for(int filter = 0x1, i = 0; i < 7; filter <<= 1, ++i)
+	for(int i = 0; i < 7; ++i) {
 		chkAttribute[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 80, 25 + (i / 4) * 25, 90 + (i % 4) * 80, 50 + (i / 4) * 25),
-										   wANAttribute, CHECK_ATTRIBUTE, gDataManager->FormatAttribute(filter).data());
+										   wANAttribute, CHECK_ATTRIBUTE, gDataManager->GetSysString(1010 + i).data());
+		defaultStrings.emplace_back(chkAttribute[i], 1010 + i);
+	}
 	//announce race
 	wANRace = env->addWindow(Scale(480, 200, 850, 410), false, gDataManager->GetSysString(563).data());
 	defaultStrings.emplace_back(wANRace, 563);
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
-	for(int filter = 0x1, i = 0; i < 25; filter <<= 1, ++i)
+	for(int i = 0; i < 25; ++i) {
 		chkRace[i] = env->addCheckBox(false, Scale(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
-									  wANRace, CHECK_RACE, gDataManager->FormatRace(filter).data());
+									  wANRace, CHECK_RACE, gDataManager->GetSysString(1020 + i).data());
+		defaultStrings.emplace_back(chkRace[i], 1020 + i);
+	}
 	//selection hint
 	stHintMsg = env->addStaticText(L"", Scale(500, 60, 820, 90), true, false, 0, -1, false);
 	stHintMsg->setBackgroundColor(skin::DUELFIELD_TOOLTIP_TEXT_BACKGROUND_COLOR_VAL);
