@@ -1097,7 +1097,7 @@ inline void Play(SoundManager::SFX sound) {
 }
 inline bool PlayChant(SoundManager::CHANT sound, uint32_t code) {
 	if(!mainGame->dInfo.isCatchingUp)
-		return PlayChant(sound, code);
+		return gSoundManager->PlayChant(sound, code);
 	return true;
 }
 int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
