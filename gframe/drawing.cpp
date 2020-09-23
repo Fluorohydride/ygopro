@@ -1347,8 +1347,8 @@ void Game::DrawDeckBd() {
 			textFont->draw(_buffer.data(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
 			textFont->draw(_buffer.data(), Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
 			buffer = gDataManager->FormatType(ptr->type);
-			textFont->draw(_buffer.data(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
-			textFont->draw(_buffer.data(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
+			textFont->draw(buffer.data(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
+			textFont->draw(buffer.data(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
 			buffer = L"";
 		}
 		auto scope = gDataManager->FormatScope(ptr->ot, true);
