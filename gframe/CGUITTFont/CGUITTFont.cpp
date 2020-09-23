@@ -526,6 +526,12 @@ void CGUITTFont::setFontHinting(const bool enable, const bool enable_auto_hintin
 void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
 	if(!Driver)
 		return;
+	drawustring(text.c_str(), position, color, hcenter, vcenter, clip);
+}
+
+void CGUITTFont::drawustring(const core::ustring& utext, const core::rect<s32>& position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
+	if(!Driver)
+		return;
 
 	// Clear the glyph pages of their render information.
 	clearGlyphPages();
@@ -536,7 +542,7 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 
 	// Determine offset positions.
 	if(hcenter || vcenter) {
-		textDimension = getDimension(text.c_str());
+		textDimension = getDimension(utext);
 
 		if(hcenter)
 			offset.X = ((position.getWidth() - textDimension.Width) >> 1) + offset.X;
@@ -544,9 +550,6 @@ void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position
 		if(vcenter)
 			offset.Y = ((position.getHeight() - textDimension.Height) >> 1) + offset.Y;
 	}
-
-	// Convert to a unicode string.
-	core::ustring utext(text);
 
 	// Set up our render map.
 	std::unordered_set<CGUITTGlyphPage*> Render_Map;

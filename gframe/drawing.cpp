@@ -443,11 +443,16 @@ void Game::DrawCard(ClientCard* pcard) {
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 	}
 }
-void Game::DrawShadowText(irr::gui::CGUITTFont* font, const irr::core::stringw& text, const irr::core::rect<irr::s32>& shadowposition, const irr::core::rect<irr::s32>& padding, irr::video::SColor color, irr::video::SColor shadowcolor, bool hcenter, bool vcenter, const irr::core::rect<irr::s32>* clip) {
-	irr::core::recti position(shadowposition.UpperLeftCorner.X + padding.UpperLeftCorner.X, shadowposition.UpperLeftCorner.Y + padding.UpperLeftCorner.Y,
+void DrawShadowTextPos(irr::gui::CGUITTFont* font, const irr::core::ustring& text, const irr::core::recti& shadowposition, const irr::core::recti& mainposition,
+					   irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::recti* clip = nullptr) {
+	font->drawustring(text, shadowposition, shadowcolor, hcenter, vcenter, clip);
+	font->drawustring(text, mainposition, color, hcenter, vcenter, clip);
+}
+inline void DrawShadowText(irr::gui::CGUITTFont* font, const irr::core::ustring& text, const irr::core::recti& shadowposition, const irr::core::recti& padding,
+					irr::video::SColor color = 0xffffffff, irr::video::SColor shadowcolor = 0xff000000, bool hcenter = false, bool vcenter = false, const irr::core::recti* clip = nullptr) {
+	const irr::core::recti position(shadowposition.UpperLeftCorner.X + padding.UpperLeftCorner.X, shadowposition.UpperLeftCorner.Y + padding.UpperLeftCorner.Y,
 						 shadowposition.LowerRightCorner.X + padding.LowerRightCorner.X, shadowposition.LowerRightCorner.Y + padding.LowerRightCorner.Y);
-	font->draw(text, shadowposition, shadowcolor, hcenter, vcenter, clip);
-	font->draw(text, position, color, hcenter, vcenter, clip);
+	DrawShadowTextPos(font, text, shadowposition, position, color, shadowcolor, hcenter, vcenter, clip);
 }
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
@@ -1120,7 +1125,7 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = (gGameConfig->quick_animation && frame >= 12) ? 12 * 1000 / 60 : frame * 1000 / 60;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, bool drag, irr::core::recti* cliprect, bool load_image) {
+void Game::DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, bool drag, const irr::core::recti* cliprect, bool load_image) {
 	auto code = cp->code;
 	uint32_t limitcode = cp->code;
 	auto flit = lflist->content.find(limitcode);
@@ -1183,184 +1188,202 @@ void Game::DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, 
 #undef IDX
 	}
 }
-void Game::DrawDeckBd() {
-	std::wstring buffer;
-	//main deck
 #define SKCOLOR(what) skin::DECK_WINDOW_##what##_VAL
 #define DECKCOLOR(what) SKCOLOR(what##_TOP_LEFT), SKCOLOR(what##_TOP_RIGHT), SKCOLOR(what##_BOTTOM_LEFT), SKCOLOR(what##_BOTTOM_RIGHT)
 #define	DRAWRECT(what,...) driver->draw2DRectangle(Resize(__VA_ARGS__), DECKCOLOR(what));
-	DRAWRECT(MAIN_INFO, 310, 137, 797, 157);
-	driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
-	textFont->draw(gDataManager->GetSysString(1330).data(), Resize(314, 136, 409, 156), 0xff000000, false, true);
-	textFont->draw(gDataManager->GetSysString(1330).data(), Resize(315, 137, 410, 157), 0xffffffff, false, true);
-	if(is_siding) {
-		buffer = fmt::format(L"{} ({})", gdeckManager->current_deck.main.size(),  gdeckManager->pre_deck.main.size());
-	} else {
-		buffer = fmt::to_wstring(gdeckManager->current_deck.main.size());
-	}
-	numFont->draw(buffer.data(), Resize(379, 137, 439, 157), 0xff000000, false, true);
-	numFont->draw(buffer.data(), Resize(380, 138, 440, 158), 0xffffffff, false, true);
-	DRAWRECT(MAIN, 310, 160, 797, 436);
-	irr::core::recti mainpos = Resize(310, 137, 797, 157);
-	buffer = fmt::format(L"{} {} {} {} {} {}", gDataManager->GetSysString(1312), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_MONSTER),
-		gDataManager->GetSysString(1313), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_SPELL),
-		gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_TRAP));
-	irr::core::dimension2du mainDeckTypeSize = textFont->getDimension(buffer);
-	textFont->draw(buffer.data(), irr::core::recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 5, mainpos.UpperLeftCorner.Y,
-		mainpos.LowerRightCorner.X, mainpos.LowerRightCorner.Y), 0xff000000, false, true);
-	textFont->draw(buffer.data(), irr::core::recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 4, mainpos.UpperLeftCorner.Y + 1,
-		mainpos.LowerRightCorner.X + 1, mainpos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
-	driver->draw2DRectangleOutline(Resize(309, 159, 797, 436));
-	int lx;
-	float dx;
-	if(gdeckManager->current_deck.main.size() <= 40) {
-		dx = 436.0f / 9;
-		lx = 10;
-	} else {
-		lx = (gdeckManager->current_deck.main.size() - 41) / 4 + 11;
-		dx = 436.0f / (lx - 1);
-	}
-	for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i) {
-		DrawThumb(gdeckManager->current_deck.main[i], irr::core::vector2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
-		if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
+void Game::DrawDeckBd() {
+	//std::wstring buffer;
+	const auto GetDeckSizeStr = [&is_siding = is_siding](const std::vector<CardDataC*>& deck, const std::vector<CardDataC*>& pre_deck)->irr::core::ustring {
+		if(is_siding)
+			return fmt::format(L"{} ({})", deck.size(), pre_deck.size());
+		return fmt::to_wstring(deck.size());
+	};
+	//main deck
+	{
+		DRAWRECT(MAIN_INFO, 310, 137, 797, 157);
+		driver->draw2DRectangleOutline(Resize(309, 136, 797, 157));
+
+		DrawShadowText(textFont, gDataManager->GetSysString(1330).data(), Resize(314, 136, 409, 156), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		const auto main_deck_size_str = GetDeckSizeStr(gdeckManager->current_deck.main, gdeckManager->pre_deck.main);
+		DrawShadowText(numFont, main_deck_size_str, Resize(379, 137, 439, 157), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		const auto main_types_count_str = fmt::format(L"{} {} {} {} {} {}",
+													  gDataManager->GetSysString(1312), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_MONSTER),
+													  gDataManager->GetSysString(1313), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_SPELL),
+													  gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.main, TYPE_TRAP));
+
+		const auto mainpos = Resize(310, 137, 797, 157);
+		const auto mainDeckTypeSize = textFont->getDimension(main_types_count_str);
+		const auto pos = irr::core::recti(mainpos.LowerRightCorner.X - mainDeckTypeSize.Width - 5, mainpos.UpperLeftCorner.Y,
+										  mainpos.LowerRightCorner.X, mainpos.LowerRightCorner.Y);
+
+		DrawShadowText(textFont, main_types_count_str, pos, { 1, 1, 1, 1 }, 0xffffffff, 0xff000000, false, true);
+
+		DRAWRECT(MAIN, 310, 160, 797, 436);
+		driver->draw2DRectangleOutline(Resize(309, 159, 797, 436));
+
+		const int lx = (gdeckManager->current_deck.main.size() > 40) ? ((gdeckManager->current_deck.main.size() - 41) / 4 + 11) : 10;
+		const float dx = 436.0f / (lx - 1);
+
+		for(size_t i = 0; i < gdeckManager->current_deck.main.size(); ++i) {
+			DrawThumb(gdeckManager->current_deck.main[i], irr::core::vector2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
+			if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == (int)i)
+				driver->draw2DRectangleOutline(Resize(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
+		}
 	}
 	//extra deck
-	DRAWRECT(EXTRA_INFO, 310, 440, 797, 460);
-	driver->draw2DRectangleOutline(Resize(309, 439, 797, 460));
-	textFont->draw(gDataManager->GetSysString(1331).data(), Resize(314, 439, 409, 459), 0xff000000, false, true);
-	textFont->draw(gDataManager->GetSysString(1331).data(), Resize(315, 440, 410, 460), 0xffffffff, false, true);
-	if(is_siding) {
-		buffer = fmt::format(L"{} ({})", gdeckManager->current_deck.extra.size(), gdeckManager->pre_deck.extra.size());
-	} else {
-		buffer = fmt::to_wstring(gdeckManager->current_deck.extra.size());
-	}
-	numFont->draw(buffer.data(), Resize(379, 440, 439, 460), 0xff000000, false, true);
-	numFont->draw(buffer.data(), Resize(380, 441, 440, 461), 0xffffffff, false, true);
-	irr::core::recti extrapos = Resize(310, 440, 797, 460);
-	buffer = fmt::format(L"{} {} {} {} {} {} {} {}", gDataManager->GetSysString(1056), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_FUSION),
-		gDataManager->GetSysString(1073), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_XYZ),
-		gDataManager->GetSysString(1063), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_SYNCHRO),
-		gDataManager->GetSysString(1076), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_LINK));
-	irr::core::dimension2du extraDeckTypeSize = textFont->getDimension(buffer);
-	textFont->draw(buffer.data(), irr::core::recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
-		extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y), 0xff000000, false, true);
-	textFont->draw(buffer.data(), irr::core::recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 4, extrapos.UpperLeftCorner.Y + 1,
-		extrapos.LowerRightCorner.X + 1, extrapos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
-	DRAWRECT(EXTRA, 310, 463, 797, 533);
-	driver->draw2DRectangleOutline(Resize(309, 462, 797, 533));
-	if(gdeckManager->current_deck.extra.size() <= 10)
-		dx = 436.0f / 9;
-	else dx = 436.0f / (gdeckManager->current_deck.extra.size() - 1);
-	for(size_t i = 0; i < gdeckManager->current_deck.extra.size(); ++i) {
-		DrawThumb(gdeckManager->current_deck.extra[i], irr::core::vector2di(314 + i * dx, 466), deckBuilder.filterList);
-		if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531));
+	{
+		DRAWRECT(EXTRA_INFO, 310, 440, 797, 460);
+		driver->draw2DRectangleOutline(Resize(309, 439, 797, 460));
+
+		DrawShadowText(textFont, gDataManager->GetSysString(1331).data(), Resize(314, 439, 409, 459), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		const auto extra_deck_size_str = GetDeckSizeStr(gdeckManager->current_deck.extra, gdeckManager->pre_deck.extra);
+		DrawShadowText(numFont, extra_deck_size_str, Resize(379, 440, 439, 460), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		const auto extra_types_count_str = fmt::format(L"{} {} {} {} {} {} {} {}",
+													   gDataManager->GetSysString(1056), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_FUSION),
+													   gDataManager->GetSysString(1073), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_XYZ),
+													   gDataManager->GetSysString(1063), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_SYNCHRO),
+													   gDataManager->GetSysString(1076), gdeckManager->TypeCount(gdeckManager->current_deck.extra, TYPE_LINK));
+
+		const auto extrapos = Resize(310, 440, 797, 460);
+		const auto extraDeckTypeSize = textFont->getDimension(extra_types_count_str);
+		const auto pos = irr::core::recti(extrapos.LowerRightCorner.X - extraDeckTypeSize.Width - 5, extrapos.UpperLeftCorner.Y,
+										  extrapos.LowerRightCorner.X, extrapos.LowerRightCorner.Y);
+
+		DrawShadowText(textFont, extra_types_count_str, pos, { 1, 1, 1, 1 }, 0xffffffff, 0xff000000, false, true);
+
+		DRAWRECT(EXTRA, 310, 463, 797, 533);
+		driver->draw2DRectangleOutline(Resize(309, 462, 797, 533));
+
+		const float dx = (gdeckManager->current_deck.extra.size() <= 10) ? (436.0f / 9.0f) : (436.0f / (gdeckManager->current_deck.extra.size() - 1));
+
+		for(size_t i = 0; i < gdeckManager->current_deck.extra.size(); ++i) {
+			DrawThumb(gdeckManager->current_deck.extra[i], irr::core::vector2di(314 + i * dx, 466), deckBuilder.filterList);
+			if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == (int)i)
+				driver->draw2DRectangleOutline(Resize(313 + i * dx, 465, 359 + i * dx, 531));
+		}
 	}
 	//side deck
-	DRAWRECT(SIDE_INFO, 310, 537, 797, 557);
-	driver->draw2DRectangleOutline(Resize(309, 536, 797, 557));
-	textFont->draw(gDataManager->GetSysString(1332).data(), Resize(314, 536, 409, 556), 0xff000000, false, true);
-	textFont->draw(gDataManager->GetSysString(1332).data(), Resize(315, 537, 410, 557), 0xffffffff, false, true);
-	if(is_siding) {
-		buffer = fmt::format(L"{} ({})", gdeckManager->current_deck.side.size(), gdeckManager->pre_deck.side.size());
-	} else {
-		buffer = fmt::to_wstring(gdeckManager->current_deck.side.size());
-	}
-	numFont->draw(buffer.data(), Resize(379, 536, 439, 556), 0xff000000, false, true);
-	numFont->draw(buffer.data(), Resize(380, 537, 440, 557), 0xffffffff, false, true);
-	irr::core::recti sidepos = Resize(310, 537, 797, 557);
-	buffer = fmt::format(L"{} {} {} {} {} {}", gDataManager->GetSysString(1312), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_MONSTER),
-		gDataManager->GetSysString(1313), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_SPELL),
-		gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_TRAP));
-	irr::core::dimension2du sideDeckTypeSize = textFont->getDimension(buffer);
-	textFont->draw(buffer.data(), irr::core::recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 5, sidepos.UpperLeftCorner.Y,
-		sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y), 0xff000000, false, true);
-	textFont->draw(buffer.data(), irr::core::recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 4, sidepos.UpperLeftCorner.Y + 1,
-		sidepos.LowerRightCorner.X + 1, sidepos.LowerRightCorner.Y + 1), 0xffffffff, false, true);
-	DRAWRECT(SIDE, 310, 560, 797, 630);
-	driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));
-	if(gdeckManager->current_deck.side.size() <= 10)
-		dx = 436.0f / 9;
-	else dx = 436.0f / (gdeckManager->current_deck.side.size() - 1);
-	for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i) {
-		DrawThumb(gdeckManager->current_deck.side[i], irr::core::vector2di(314 + i * dx, 564), deckBuilder.filterList);
-		if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629));
+	{
+		DRAWRECT(SIDE_INFO, 310, 537, 797, 557);
+		driver->draw2DRectangleOutline(Resize(309, 536, 797, 557));
+
+		DrawShadowText(textFont, gDataManager->GetSysString(1332).data(), Resize(314, 536, 409, 556), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		const auto side_deck_size_str = GetDeckSizeStr(gdeckManager->current_deck.side, gdeckManager->pre_deck.side);
+		DrawShadowText(numFont, side_deck_size_str, Resize(379, 536, 439, 556), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		const auto side_types_count_str = fmt::format(L"{} {} {} {} {} {}",
+													  gDataManager->GetSysString(1312), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_MONSTER),
+													  gDataManager->GetSysString(1313), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_SPELL),
+													  gDataManager->GetSysString(1314), gdeckManager->TypeCount(gdeckManager->current_deck.side, TYPE_TRAP));
+
+		const auto sidepos = Resize(310, 537, 797, 557);
+		const auto sideDeckTypeSize = textFont->getDimension(side_types_count_str);
+		const auto pos = irr::core::recti(sidepos.LowerRightCorner.X - sideDeckTypeSize.Width - 5, sidepos.UpperLeftCorner.Y,
+										  sidepos.LowerRightCorner.X, sidepos.LowerRightCorner.Y);
+
+		DrawShadowText(textFont, side_types_count_str, pos, { 1, 1, 1, 1 }, 0xffffffff, 0xff000000, false, true);
+		DRAWRECT(SIDE, 310, 560, 797, 630);
+		driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));
+
+		const float dx = (gdeckManager->current_deck.extra.size() <= 10) ? (436.0f / 9.0f) : (436.0f / (gdeckManager->current_deck.extra.size() - 1));
+
+		for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i) {
+			DrawThumb(gdeckManager->current_deck.side[i], irr::core::vector2di(314 + i * dx, 564), deckBuilder.filterList);
+			if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == (int)i)
+				driver->draw2DRectangleOutline(Resize(313 + i * dx, 563, 359 + i * dx, 629));
+		}
 	}
 	//search result
-	DRAWRECT(SEARCH_RESULT_INFO, 805, 137, 915, 157);
-	driver->draw2DRectangleOutline(Resize(804, 136, 915, 157));
-	textFont->draw(gDataManager->GetSysString(1333).data(), Resize(809, 136, 914, 156), 0xff000000, false, true);
-	textFont->draw(gDataManager->GetSysString(1333).data(), Resize(810, 137, 915, 157), 0xffffffff, false, true);
-	auto size = textFont->getDimension(gDataManager->GetSysString(1333).data()).Width + ResizeX(5);
-	numFont->draw(deckBuilder.result_string.data(), irr::core::recti(ResizeX(809) + size, ResizeY(136), ResizeX(809) + size + 10, ResizeY(156)), 0xff000000, false, true);
-	numFont->draw(deckBuilder.result_string.data(), irr::core::recti(ResizeX(809) + size, ResizeY(137), ResizeX(809) + size + 10, ResizeY(157)), 0xffffffff, false, true);
-	DRAWRECT(SEARCH_RESULT, 805, 160, 1020, 630);
-	driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
-	int prev_pos = deckBuilder.scroll_pos;
-	deckBuilder.scroll_pos = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
-	bool draw_thumb = std::abs(prev_pos - deckBuilder.scroll_pos) < (10.0f * 60.0f / 1000.0f) * delta_time;
-	int card_position = deckBuilder.scroll_pos;
-	const int height_offset = (scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
-	irr::core::recti rect = Resize(805, 160, 1020, 630);
-	//loads the thumb of one card before and one after to make the scroll smoother
-	int i = (card_position > 0) ? -1 : 0;
-	for(; i < 9 && (i + card_position) < (int)deckBuilder.results.size(); ++i) {
-		auto ptr = deckBuilder.results[i + card_position];
-		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
-			driver->draw2DRectangle(skin::DECK_WINDOW_HOVERED_CARD_RESULT_VAL, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
-		DrawThumb(ptr, irr::core::vector2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect, draw_thumb);
-		if(ptr->type & TYPE_MONSTER) {
-			auto _buffer = gDataManager->GetName(ptr->code);
-			textFont->draw(_buffer.data(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
-			textFont->draw(_buffer.data(), Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
-			if (ptr->type & TYPE_LINK) {
-				buffer = fmt::format(L"{}/{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race));
-				textFont->draw(buffer.data(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
-				textFont->draw(buffer.data(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-				if(ptr->attack < 0)
-					buffer = L"?/Link " + fmt::format(L"{}	", ptr->level);
-				else
-					buffer = fmt::format(L"{}/Link {}	", ptr->attack, ptr->level);
+	{
+		DRAWRECT(SEARCH_RESULT_INFO, 805, 137, 915, 157);
+		driver->draw2DRectangleOutline(Resize(804, 136, 915, 157));
+
+		DrawShadowText(textFont, gDataManager->GetSysString(1333).data(), Resize(809, 136, 914, 156), Resize(1, 1, 1, 1), 0xffffffff, 0xff000000, false, true);
+
+		const auto size = textFont->getDimension(gDataManager->GetSysString(1333).data()).Width + ResizeX(5);
+		const auto pos = irr::core::recti(ResizeX(809) + size, ResizeY(136), ResizeX(809) + size + 10, ResizeY(156));
+		DrawShadowText(numFont, deckBuilder.result_string, pos, Resize(0, 1, 0, 1), 0xffffffff, 0xff000000, false, true);
+
+		DRAWRECT(SEARCH_RESULT, 805, 160, 1020, 630);
+		driver->draw2DRectangleOutline(Resize(804, 159, 1020, 630));
+
+		const int prev_pos = deckBuilder.scroll_pos;
+		deckBuilder.scroll_pos = floor(scrFilter->getPos() / DECK_SEARCH_SCROLL_STEP);
+
+		const bool draw_thumb = std::abs(prev_pos - deckBuilder.scroll_pos) < (10.0f * 60.0f / 1000.0f) * delta_time;
+		const int card_position = deckBuilder.scroll_pos;
+		const int height_offset = (scrFilter->getPos() % DECK_SEARCH_SCROLL_STEP) * -1.f * 0.65f;
+		const irr::core::recti rect = Resize(805, 160, 1020, 630);
+
+		//loads the thumb of one card before and one after to make the scroll smoother
+		int i = (card_position > 0) ? -1 : 0;
+		for(; i < 9 && (i + card_position) < deckBuilder.results.size(); ++i) {
+			auto ptr = deckBuilder.results[i + card_position];
+			if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == i)
+				driver->draw2DRectangle(skin::DECK_WINDOW_HOVERED_CARD_RESULT_VAL, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
+			DrawThumb(ptr, irr::core::vector2di(810, height_offset + 165 + i * 66), deckBuilder.filterList, false, &rect, draw_thumb);
+			if(ptr->type & TYPE_MONSTER) {
+				DrawShadowTextPos(textFont, gDataManager->GetName(ptr->code).data(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66),
+								  Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
+				if(ptr->type & TYPE_LINK) {
+					DrawShadowTextPos(textFont, fmt::format(L"{}/{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race)),
+									  Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66),
+									  Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
+				} else {
+					const wchar_t* form = L"\u2605";
+					if(ptr->type & TYPE_XYZ) form = L"\u2606";
+					DrawShadowTextPos(textFont, fmt::format(L"{}/{} {}{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race), form, ptr->level),
+									  Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66),
+									  Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
+				}
 			} else {
-				const wchar_t* form = L"\u2605";
-				if(ptr->type & TYPE_XYZ) form = L"\u2606";
-				buffer = fmt::format(L"{}/{} {}{}", gDataManager->FormatAttribute(ptr->attribute), gDataManager->FormatRace(ptr->race), form, ptr->level);
-				textFont->draw(buffer.data(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
-				textFont->draw(buffer.data(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-				if(ptr->attack < 0 && ptr->defense < 0)
-					buffer = L"?/?";
-				else if(ptr->attack < 0)
-					buffer = fmt::format(L"?/{}", ptr->defense);
-				else if(ptr->defense < 0)
-					buffer = fmt::format(L"{}/?", ptr->attack);
-				else
-					buffer = fmt::format(L"{}/{}", ptr->attack, ptr->defense);
+				DrawShadowTextPos(textFont, gDataManager->GetName(ptr->code).data(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66),
+								  Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
+				DrawShadowTextPos(textFont, gDataManager->FormatType(ptr->type), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66),
+								  Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
 			}
-			if(ptr->type & TYPE_PENDULUM) {
-				buffer.append(fmt::format(L" {}/{}", ptr->lscale, ptr->rscale));
-			}
-			buffer.append(L" ");
-		} else {
-			auto _buffer = gDataManager->GetName(ptr->code);
-			textFont->draw(_buffer.data(), Resize(859, height_offset + 164 + i * 66, 955, height_offset + 185 + i * 66), 0xff000000, false, false, &rect);
-			textFont->draw(_buffer.data(), Resize(860, height_offset + 165 + i * 66, 955, height_offset + 185 + i * 66), 0xffffffff, false, false, &rect);
-			buffer = gDataManager->FormatType(ptr->type);
-			textFont->draw(buffer.data(), Resize(859, height_offset + 186 + i * 66, 955, height_offset + 207 + i * 66), 0xff000000, false, false, &rect);
-			textFont->draw(buffer.data(), Resize(860, height_offset + 187 + i * 66, 955, height_offset + 207 + i * 66), 0xffffffff, false, false, &rect);
-			buffer = L"";
+			auto GetScopeString = [&ptr]()->std::wstring {
+				auto scope = gDataManager->FormatScope(ptr->ot, true);
+				if(ptr->type & TYPE_MONSTER) {
+					std::wstring buffer;
+					if(ptr->type & TYPE_LINK) {
+						if(ptr->attack < 0)
+							buffer = L"?/Link " + fmt::format(L"{}	", ptr->level);
+						else
+							buffer = fmt::format(L"{}/Link {}	", ptr->attack, ptr->level);
+					} else {
+						if(ptr->attack < 0 && ptr->defense < 0)
+							buffer = L"?/?";
+						else if(ptr->attack < 0)
+							buffer = fmt::format(L"?/{}", ptr->defense);
+						else if(ptr->defense < 0)
+							buffer = fmt::format(L"{}/?", ptr->attack);
+						else
+							buffer = fmt::format(L"{}/{}", ptr->attack, ptr->defense);
+					}
+					if(ptr->type & TYPE_PENDULUM)
+						buffer.append(fmt::format(L" {}/{}", ptr->lscale, ptr->rscale));
+					if(!scope.empty())
+						return fmt::format(L"{} [{}]", buffer, scope);
+					return buffer;
+				}
+				if(!scope.empty())
+					return fmt::format(L"[{}]", scope);
+				return L"";
+			};
+			DrawShadowTextPos(textFont, GetScopeString(), Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66),
+							  Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, 0xff000000, false, false, &rect);
 		}
-		auto scope = gDataManager->FormatScope(ptr->ot, true);
-		if (!scope.empty()) buffer += fmt::format(L"[{}]", scope);
-		textFont->draw(buffer.data(), Resize(859, height_offset + 208 + i * 66, 955, height_offset + 229 + i * 66), 0xff000000, false, false, &rect);
-		textFont->draw(buffer.data(), Resize(860, height_offset + 209 + i * 66, 955, height_offset + 229 + i * 66), 0xffffffff, false, false, &rect);
 	}
-	if(deckBuilder.is_draging) {
+	if(deckBuilder.is_draging)
 		DrawThumb(deckBuilder.draging_pointer, irr::core::vector2di(deckBuilder.dragx - Scale(CARD_THUMB_WIDTH / 2), deckBuilder.dragy - Scale(CARD_THUMB_HEIGHT / 2)), deckBuilder.filterList, true);
-	}
+}
 #undef DRAWRECT
 #undef DECKCOLOR
 #undef SKCOLOR
-}
 }

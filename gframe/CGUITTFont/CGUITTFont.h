@@ -223,6 +223,10 @@ public:
 					  video::SColor color, bool hcenter = false, bool vcenter = false,
 					  const core::rect<s32>* clip = 0);
 
+	virtual void drawustring(const core::ustring& text, const core::rect<s32>& position,
+					  video::SColor color, bool hcenter = false, bool vcenter = false,
+					  const core::rect<s32>* clip = 0);
+
 	//! Returns the dimension of a character produced by this font.
 	virtual core::dimension2d<u32> getCharDimension(const wchar_t ch) const;
 
