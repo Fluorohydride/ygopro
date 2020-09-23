@@ -1322,7 +1322,7 @@ void Game::DrawDeckBd() {
 
 		//loads the thumb of one card before and one after to make the scroll smoother
 		int i = (card_position > 0) ? -1 : 0;
-		for(; i < 9 && (i + card_position) < deckBuilder.results.size(); ++i) {
+		for(; i < 9 && (i + card_position) < (int)deckBuilder.results.size(); ++i) {
 			auto ptr = deckBuilder.results[i + card_position];
 			if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == i)
 				driver->draw2DRectangle(skin::DECK_WINDOW_HOVERED_CARD_RESULT_VAL, Resize(806, height_offset + 164 + i * 66, 1019, height_offset + 230 + i * 66), &rect);
@@ -1353,9 +1353,9 @@ void Game::DrawDeckBd() {
 					std::wstring buffer;
 					if(ptr->type & TYPE_LINK) {
 						if(ptr->attack < 0)
-							buffer = L"?/Link " + fmt::format(L"{}	", ptr->level);
+							buffer = fmt::format(L"?/Link {}\t", ptr->level);
 						else
-							buffer = fmt::format(L"{}/Link {}	", ptr->attack, ptr->level);
+							buffer = fmt::format(L"{}/Link {}\t", ptr->attack, ptr->level);
 					} else {
 						if(ptr->attack < 0 && ptr->defense < 0)
 							buffer = L"?/?";
