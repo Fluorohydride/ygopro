@@ -22,7 +22,6 @@
 #include "log.h"
 #include "joystick_wrapper.h"
 #ifdef __APPLE__
-#import <CoreFoundation/CoreFoundation.h>
 #include "osx_menu.h"
 #endif
 
@@ -130,7 +129,7 @@ void CheckArguments(int argc, path_char* argv[]) {
 			if(open_file)
 				ClickButton(ygo::mainGame->btnLoadSinglePlay);
 			break;
-		} else if(argc == 2 && path_string(argv[1]).size() >= 4) {
+		} else if(argc == 2 && path_stringview(argv[1]).size() >= 4) {
 			parameter = argv[1];
 			auto extension = ygo::Utils::GetFileExtension(parameter);
 			if(extension == EPRO_TEXT("ydk")) {
@@ -173,54 +172,17 @@ void CheckArguments(int argc, path_char* argv[]) {
 
 
 int _tmain(int argc, path_char* argv[]) {
-#ifdef __APPLE__
-	CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-	CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
-	CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
-	CFRelease(bundle_url);
-	CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
-	CFRelease(bundle_base_url);
-#ifdef MAC_OS_DISCORD_LAUNCHER
-	system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+#if !defined(_DEBUG) && !defined(__ANDROID__)
+	auto dest = ygo::Utils::GetExeFolder();
+	if(argc >= 2 && argv[1] == EPRO_TEXT("from_discord"_sv))
+		dest = argv[2];
+	ygo::Utils::ChangeDirectory(dest);
 #endif
-	chdir(CFStringGetCStringPtr(path, kCFStringEncodingUTF8));
-	CFRelease(path);
-	CFRelease(bundle_path);
-#endif //__APPLE__
-	bool is_in_sys32 = false;
-#ifdef _WIN32
-	path_char* buffer;
-	if((buffer = _tgetcwd(NULL, 0))) {
-		auto workdir = ygo::Utils::ToUpperNoAccents(ygo::Utils::GetFileName<path_string>(buffer));
-		is_in_sys32 = workdir == EPRO_TEXT("SYSTEM32");
-		free(buffer);
-	}
-#endif
-	if(argc >= 2 && argv[1] == path_string(EPRO_TEXT("show_changelog"))) {
+	if(argc >= 2 && argv[1] == EPRO_TEXT("show_changelog"_sv))
 		show_changelog = true;
-	}
-	if(argc >= 2 || is_in_sys32) {
-		if(!is_in_sys32 && argv[1] == path_string(EPRO_TEXT("from_discord"))) {
-			is_from_discord = true;
-#if defined(_WIN32)
-			SetCurrentDirectory(argv[2]);
-#if !defined(_DEBUG)
-		} else {
-			if(!is_in_sys32) {
-				auto extension = ygo::Utils::GetFileExtension<path_string>(argv[1]);
-				is_in_sys32 = (extension == EPRO_TEXT("ydk") || extension == EPRO_TEXT("yrp") || extension == EPRO_TEXT("yrpx") || extension == EPRO_TEXT("lua"));
-			}
-			if(is_in_sys32) {
-				SetCurrentDirectory(ygo::Utils::GetExeFolder().data());
-			}
-#endif //_DEBUG
-#endif //_WIN32
-		}
-	}
 #ifdef _WIN32
-	WORD wVersionRequested;
+	const WORD wVersionRequested = MAKEWORD(2, 2);
 	WSADATA wsaData;
-	wVersionRequested = MAKEWORD(2, 2);
 	WSAStartup(wVersionRequested, &wsaData);
 	evthread_use_windows_threads();
 #else
