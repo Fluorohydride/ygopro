@@ -363,13 +363,13 @@ bool DeckManager::SaveDeck(Deck& deck, const path_string& name) {
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
 	for(auto card : deck.main)
-		deckfile << std::to_string(card->code) << "\n";
+		deckfile << fmt::to_string(card->code) << "\n";
 	deckfile << "#extra\n";
 	for(auto card : deck.extra)
-		deckfile << std::to_string(card->code) << "\n";
+		deckfile << fmt::to_string(card->code) << "\n";
 	deckfile << "!side\n";
 	for(auto card : deck.side)
-		deckfile << std::to_string(card->code) << "\n";
+		deckfile << fmt::to_string(card->code) << "\n";
 	deckfile.close();
 	return true;
 }
@@ -379,13 +379,13 @@ bool DeckManager::SaveDeck(const path_string& name, cardlist_type mainlist, card
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
 	for(auto card : mainlist)
-		deckfile << std::to_string(card) << "\n";
+		deckfile << fmt::to_string(card) << "\n";
 	deckfile << "#extra\n";
 	for(auto card : extralist)
-		deckfile << std::to_string(card) << "\n";
+		deckfile << fmt::to_string(card) << "\n";
 	deckfile << "!side\n";
 	for(auto card : sidelist)
-		deckfile << std::to_string(card) << "\n";
+		deckfile << fmt::to_string(card) << "\n";
 	deckfile.close();
 	return true;
 }

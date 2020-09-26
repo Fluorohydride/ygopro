@@ -44,8 +44,8 @@
 #undef CREATE_CLONE
 
 #ifdef _WIN32
-void* OpenLibrary(const path_string& path) {
-	return LoadLibrary((path + CORENAME).c_str());
+void* OpenLibrary(path_stringview path) {
+	return LoadLibrary(fmt::format("{}" CORENAME, path).data());
 }
 #define CloseLibrary(core) FreeLibrary((HMODULE)core)
 
@@ -53,16 +53,16 @@ void* OpenLibrary(const path_string& path) {
 
 #else
 
-void* OpenLibrary(const path_string& path) {
+void* OpenLibrary(path_stringview path) {
 #ifdef __ANDROID__
 	void* lib = nullptr;
-	const auto dest_dir = porting::internal_storage + EPRO_TEXT("/libocgcore.so");
-	ygo::Utils::FileCopy(path + CORENAME, dest_dir);
-	lib = dlopen(dest_dir.c_str(), RTLD_LAZY);
+	const auto dest_dir = porting::internal_storage + "/libocgcore.so";
+	ygo::Utils::FileCopy(fmt::format("{}" CORENAME, path), dest_dir);
+	lib = dlopen(dest_dir.data(), RTLD_LAZY);
 	ygo::Utils::FileDelete(dest_dir);
 	return lib;
 #else
-	return dlopen((path + CORENAME).c_str(), RTLD_LAZY);
+	return dlopen(fmt::format("{}" CORENAME, path).data(), RTLD_LAZY);
 #endif
 }
 
@@ -98,7 +98,7 @@ bool check_api_version() {
 #define LOAD_FUNCTION(x) x = GetFunction(newcore, x);\
 		if(!x){ UnloadCore(newcore); return nullptr; }
 
-void* LoadOCGcore(const path_string& path) {
+void* LoadOCGcore(path_stringview path) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;
@@ -156,7 +156,7 @@ void UnloadCore(void* handle) {
 			return nullptr;\
 		}
 
-void* ChangeOCGcore(const path_string& path, void* handle) {
+void* ChangeOCGcore(path_stringview path, void* handle) {
 	void* newcore = OpenLibrary(path);
 	if(!newcore)
 		return nullptr;

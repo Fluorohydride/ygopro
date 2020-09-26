@@ -338,9 +338,9 @@ std::vector<uint32_t> DataManager::GetSetCode(std::vector<std::wstring>& setname
 	for(auto& string : _setnameStrings.map) {
 		if(string.second.first.empty())
 			continue;
-		auto str = Utils::ToUpperNoAccents(string.second.second.size() ? string.second.second : string.second.first);
+		const auto str = Utils::ToUpperNoAccents(string.second.second.size() ? string.second.second : string.second.first);
 		if(str.find(L'|') != std::wstring::npos){
-			for(auto& name : Utils::TokenizeString<std::wstring>(Utils::ToUpperNoAccents(str), L"|")) {
+			for(auto& name : Utils::TokenizeString<std::wstring>(str, L"|")) {
 				if(Utils::ContainsSubstring(name, setname)) {
 					res.push_back(string.first);
 					break;

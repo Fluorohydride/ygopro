@@ -1235,8 +1235,7 @@ static bool is_declarable(CardDataC* cd, const std::vector<uint64_t>& opcodes) {
 #undef UNARY_OP_OP
 #undef GET_OP
 void ClientField::UpdateDeclarableList(bool refresh) {
-	auto pname = Utils::ToUpperNoAccents<std::wstring>(mainGame->ebANCard->getText());
-	uint32_t trycode = BufferIO::GetVal(pname.data());
+	uint32_t trycode = BufferIO::GetVal(mainGame->ebANCard->getText());
 	auto cd = gDataManager->GetCardData(trycode);
 	if(cd && is_declarable(cd, declare_opcodes)) {
 		mainGame->lstANCard->clear();
@@ -1245,6 +1244,7 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 		ancard.push_back(trycode);
 		return;
 	}
+	const auto pname = Utils::ToUpperNoAccents<std::wstring>(mainGame->ebANCard->getText());
 	if(pname.empty() && !refresh) {
 		std::vector<uint32_t> cache;
 		cache.swap(ancard);
@@ -1268,7 +1268,7 @@ void ClientField::UpdateDeclarableList(bool refresh) {
 	ancard.clear();
 	for(auto& card : gDataManager->cards) {
 		auto strings = card.second.GetStrings();
-		auto name = Utils::ToUpperNoAccents<std::wstring>(strings->name);
+		auto name = Utils::ToUpperNoAccents(strings->name);
 		if(Utils::ContainsSubstring(name, pname)) {
 			//datas.alias can be double card names or alias
 			if(is_declarable(&card.second._data, declare_opcodes)) {

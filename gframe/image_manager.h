@@ -52,7 +52,7 @@ public:
 		delete loading_pics[3];
 	}
 	bool Initial();
-	void ChangeTextures(const path_string& path);
+	void ChangeTextures(path_stringview path);
 	void ResetTextures();
 	void SetDevice(irr::IrrlichtDevice* dev);
 	void ClearTexture(bool resize = false);

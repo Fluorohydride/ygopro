@@ -1179,15 +1179,16 @@ bool DeckBuilder::CheckCard(CardDataM* data, SEARCH_MODIFIER modifier, const std
 				return !res;
 			return res;
 		};
+		const auto strings = data->GetStrings();
 		if(modifier & SEARCH_MODIFIER_NAME_ONLY) {
-			return checkNeg(Utils::ContainsSubstring(data->GetStrings()->name, tokens, true));
+			return checkNeg(Utils::ContainsSubstring(strings->name, tokens, true));
 		} else if(modifier & SEARCH_MODIFIER_ARCHETYPE_ONLY) {
-			if(set_code.empty() && tokens.size() > 0 && tokens.front() != L"")
+			if(set_code.empty() && tokens.size() > 0 && tokens.front().size())
 				return checkNeg(false);
 			return checkNeg(check_set_code(data->_data, set_code));
 		} else {
-			return checkNeg((set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(data->GetStrings()->name, tokens, true)
-					|| Utils::ContainsSubstring(data->GetStrings()->text, tokens, true));
+			return checkNeg((set_code.size() && check_set_code(data->_data, set_code)) || Utils::ContainsSubstring(strings->name, tokens, true)
+					|| Utils::ContainsSubstring(strings->text, tokens, true));
 		}
 	}
 	return true;

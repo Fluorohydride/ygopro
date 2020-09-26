@@ -85,10 +85,10 @@ bool ImageManager::Initial() {
 #define GET(obj,fun1,fun2,fallback) obj=fun1; if(!obj) obj=fun2; if(!obj) obj=fallback;
 #define GET_TEXTURE_SIZED(obj,path,w,h) GET(obj,GTFF(path,".png",w,h),GTFF(path,".jpg",w,h),def_##obj)
 #define GET_TEXTURE(obj,path) GET(obj,driver->getTexture(X(path ".png")),driver->getTexture(X(path ".jpg")),def_##obj)
-void ImageManager::ChangeTextures(const path_string & _path) {
+void ImageManager::ChangeTextures(path_stringview _path) {
 	if(_path == textures_path)
 		return;
-	textures_path = _path;
+	textures_path = _path.data();
 	GET_TEXTURE_SIZED(tUnknown, "unknown", 177, 254)
 	GET_TEXTURE(tAct, "act")
 	GET_TEXTURE(tAttack, "attack")
@@ -234,7 +234,7 @@ void ImageManager::RefreshCovers() {
 	GET_TEXTURE_SIZED(tCover[1], "cover2")
 #undef X
 #define X(x) (textures_path + EPRO_TEXT(x)).c_str()
-	if(textures_path != path_string(BASE_PATH)) {
+	if(textures_path != BASE_PATH) {
 		GET(tmp_cover, GetTextureFromFile(X("cover.png"), sizes[1].first, sizes[1].second), GetTextureFromFile(X("cover.jpg"), sizes[1].first, sizes[1].second))
 		if(tmp_cover){
 			tCover[0] = tmp_cover;
@@ -362,7 +362,7 @@ irr::video::IImage* ImageManager::GetTextureImageFromFile(const irr::io::path& f
 		return destimg;
 	}
 }
-irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path & file, int width, int height) {
+irr::video::ITexture* ImageManager::GetTextureFromFile(const irr::io::path& file, int width, int height) {
 	auto img = GetTextureImageFromFile(file, width, height, timestamp_id.load(), std::ref(timestamp_id));
 	if(img) {
 		auto texture = driver->addTexture(file, img);

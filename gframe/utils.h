@@ -72,6 +72,7 @@ namespace ygo {
 		static inline path_string ToPathString(epro_stringview input);
 		static inline std::string ToUTF8IfNeeded(path_stringview input);
 		static inline std::wstring ToUnicodeIfNeeded(path_stringview input);
+		static bool ChangeDirectory(path_stringview newpath);
 		static bool FileDelete(path_stringview source);
 		static bool ClearDirectory(path_stringview path);
 		static bool DeleteDirectory(path_stringview source);

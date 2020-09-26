@@ -21,7 +21,7 @@
 DiscordWrapper::DiscordWrapper(): connected(false){
 }
 
-bool DiscordWrapper::Initialize(path_string workingDir) {
+bool DiscordWrapper::Initialize(path_stringview workingDir) {
 #ifdef DISCORD_APP_ID
 #if defined(_WIN32) || defined(__linux__)
 #ifdef _WIN32

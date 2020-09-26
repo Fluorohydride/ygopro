@@ -7,8 +7,8 @@
 #include "text_types.h"
 bool ReloadCore(void* handle);
 void UnloadCore(void *handle);
-void* LoadOCGcore(const path_string& path);
-void* ChangeOCGcore(const path_string& path, void* handle);
+void* LoadOCGcore(path_stringview path);
+void* ChangeOCGcore(path_stringview path, void* handle);
 
 #define X(type,name,...) extern type(*name)(__VA_ARGS__);
 #include "ocgcore_functions.inl"

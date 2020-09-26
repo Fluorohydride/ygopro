@@ -1056,14 +1056,14 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 bool DuelClient::CheckReady() {
 	bool ready1 = false, ready2 = false;
 	for(int i = 0; i < mainGame->dInfo.team1; i++) {
-		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+		if(mainGame->stHostPrepDuelist[i]->getText()[0]) {
 			ready1 = mainGame->chkHostPrepReady[i]->isChecked();
 		} else if(!mainGame->dInfo.isRelay) {
 			return false;
 		}
 	}
 	for(int i = mainGame->dInfo.team1; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
-		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+		if(mainGame->stHostPrepDuelist[i]->getText()[0]) {
 			ready2 = mainGame->chkHostPrepReady[i]->isChecked();
 		} else if(!mainGame->dInfo.isRelay) {
 			return false;
@@ -1074,12 +1074,12 @@ bool DuelClient::CheckReady() {
 std::pair<uint32_t, uint32_t> DuelClient::GetPlayersCount() {
 	uint32_t count1 = 0, count2 = 0;
 	for(int i = 0; i < mainGame->dInfo.team1; i++) {
-		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+		if(mainGame->stHostPrepDuelist[i]->getText()[0]) {
 			count1++;
 		}
 	}
 	for(int i = mainGame->dInfo.team1; i < mainGame->dInfo.team1 + mainGame->dInfo.team2; i++) {
-		if(std::wstring(mainGame->stHostPrepDuelist[i]->getText()).size()) {
+		if(mainGame->stHostPrepDuelist[i]->getText()[0]) {
 			count2++;
 		}
 	}
@@ -1308,7 +1308,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 							break;
 						++seq;
 					}
-					str += L"(" + fmt::to_wstring(seq) + L")";
+					str += fmt::format(L"({})", seq);
 					mainGame->AddLog(fmt::format(gDataManager->GetSysString(1510), str));
 				}
 			}
@@ -3812,7 +3812,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		std::wstring text(gDataManager->GetSysString(1624));
 		for (int i = 0; i < count; ++i) {
 			uint8_t res = BufferIO::Read<uint8_t>(pbuf);
-			text += L"[" + fmt::to_wstring(res) + L"]";
+			text += fmt::format(L"[{}]", res);
 		}
 		mainGame->gMutex.lock();
 		mainGame->AddLog(text);
@@ -4398,10 +4398,10 @@ void DuelClient::BeginRefreshHost() {
 	event_add(resp_event, &timeout);
 	std::thread(RefreshThread, broadev).detach();
 	//send request
-	SOCKADDR_IN local;
+	sockaddr_in local;
 	local.sin_family = AF_INET;
 	local.sin_port = htons(7922);
-	SOCKADDR_IN sockTo;
+	sockaddr_in sockTo;
 	sockTo.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	sockTo.sin_family = AF_INET;
 	sockTo.sin_port = htons(7920);

@@ -154,7 +154,7 @@ void Game::DrawBackGround() {
 			}
 		}
 	}
-	auto setAlpha = [](irr::video::SMaterial& material, irr::video::SColor color) {
+	auto setAlpha = [](irr::video::SMaterial& material, const irr::video::SColor& color) {
 		int endalpha = std::round(color.getAlpha() * (selFieldAlpha - 5.0) * (0.005));
 		material.DiffuseColor = endalpha << 24;
 		material.AmbientColor = color;
@@ -187,9 +187,8 @@ void Game::DrawBackGround() {
 		} else if(dField.hovered_location == LOCATION_SZONE) {
 			vertex = matManager.vFieldSzone[dField.hovered_controler][dField.hovered_sequence][field][speed];
 			ClientCard* pcard = dField.szone[dField.hovered_controler][dField.hovered_sequence];
-			if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP)) {
+			if(pcard && (pcard->type & TYPE_LINK) && (pcard->position & POS_FACEUP))
 				DrawLinkedZones(pcard);
-			}
 		}
 		else if (dField.hovered_location == LOCATION_GRAVE)
 			vertex = matManager.vFieldGrave[dField.hovered_controler][field][speed];
@@ -212,9 +211,9 @@ void Game::DrawLinkedZones(ClientCard* pcard) {
 		}
 		return false;
 	};
-	int mark = pcard->link_marker;
+	const int mark = pcard->link_marker;
 	ClientCard* pcard2;
-	uint32_t speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	const uint32_t speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	if(dField.hovered_location == LOCATION_SZONE) {
 		int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
 		if(dField.hovered_sequence > 4)
@@ -469,8 +468,8 @@ inline void DrawShadowText(irr::gui::CGUITTFont* font, const T& text, const irr:
 }
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
-	int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
-	int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
+	const int field = (dInfo.duel_field == 3 || dInfo.duel_field == 5) ? 0 : 1;
+	const int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot.Z += (1.2f / 1000.0f) * delta_time;
 	im.setRotationRadians(act_rot);
@@ -506,17 +505,18 @@ void Game::DrawMisc() {
 	}
 
 	for(size_t i = 0; i < dField.chains.size(); ++i) {
-		if(dField.chains[i].solved)
+		const auto& chain = dField.chains[i];
+		if(chain.solved)
 			break;
 		matManager.mTRTexture.setTexture(0, imageManager.tChain);
 		matManager.mTRTexture.AmbientColor = 0xffffff00;
 		ic.setRotationRadians(act_rot);
-		ic.setTranslation(dField.chains[i].chain_pos);
+		ic.setTranslation(chain.chain_pos);
 		driver->setMaterial(matManager.mTRTexture);
 		driver->setTransform(irr::video::ETS_WORLD, ic);
 		driver->drawVertexPrimitiveList(matManager.vSymbol, 4, matManager.iRectangle, 2);
 		it.setScale(0.6f);
-		it.setTranslation(dField.chains[i].chain_pos);
+		it.setTranslation(chain.chain_pos);
 		matManager.mTRTexture.setTexture(0, imageManager.tNumber);
 		matManager.vChainNum[0].TCoords = irr::core::vector2df(0.19375f * (i % 5), 0.2421875f * (i / 5));
 		matManager.vChainNum[1].TCoords = irr::core::vector2df(0.19375f * (i % 5 + 1), 0.2421875f * (i / 5));
@@ -529,7 +529,7 @@ void Game::DrawMisc() {
 	//lp bar
 	const auto& self = dInfo.isTeam1 ? dInfo.selfnames : dInfo.opponames;
 	const auto& oppo = dInfo.isTeam1 ? dInfo.opponames : dInfo.selfnames;
-	auto rectpos = ((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) ?
+	const auto rectpos = ((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) ?
 						Resize(327, 8, 630, 51 + (23 * (self.size() - 1))) :
 						Resize(689, 8, 991, 51 + (23 * (oppo.size() - 1)));
 	driver->draw2DRectangle(skin::DUELFIELD_TURNPLAYER_COLOR_VAL, rectpos);
@@ -539,23 +539,23 @@ void Game::DrawMisc() {
 
 #define SKCOLOR(what) skin::LPBAR_##what##_VAL
 #define RECTCOLOR(what) SKCOLOR(what##_TOP_LEFT), SKCOLOR(what##_TOP_RIGHT), SKCOLOR(what##_BOTTOM_LEFT), SKCOLOR(what##_BOTTOM_RIGHT)
-#define	DRAWRECT(what,clip) driver->draw2DRectangleClip(rectpos, RECTCOLOR(what),nullptr,clip);
+#define	DRAWRECT(rect_pos,what,clip) driver->draw2DRectangleClip(rect_pos, RECTCOLOR(what),nullptr,clip);
 	if(dInfo.lp[0]) {
-		auto rectpos = Resize(335, 12, 625, 28);
+		const auto rectpos = Resize(335, 12, 625, 28);
 		if(dInfo.lp[0] < dInfo.startlp) {
 			auto cliprect = Resize(335, 12, 335 + 290 * dInfo.lp[0] / dInfo.startlp, 28);
-			DRAWRECT(1, &cliprect)
+			DRAWRECT(rectpos, 1, &cliprect)
 		} else {
-			DRAWRECT(1, nullptr)
+			DRAWRECT(rectpos, 1, nullptr)
 		}
 	}
 	if(dInfo.lp[1] > 0) {
-		auto rectpos = Resize(696, 12, 986, 28);
+		const auto rectpos = Resize(696, 12, 986, 28);
 		if(dInfo.lp[1] < dInfo.startlp) {
 			auto cliprect = Resize(986 - 290 * dInfo.lp[1] / dInfo.startlp, 12, 986, 28);
-			DRAWRECT(2, &cliprect)
+			DRAWRECT(rectpos, 2, &cliprect)
 		} else {
-			DRAWRECT(2, nullptr)
+			DRAWRECT(rectpos, 2, nullptr)
 		}
 	}
 	
@@ -578,11 +578,11 @@ void Game::DrawMisc() {
 	if(!dInfo.isReplay && !dInfo.isSingleMode && dInfo.player_type < 7 && dInfo.time_limit) {
 		auto rectpos = Resize(525, 34, 625, 44);
 		auto cliprect = Resize(525, 34, 525 + dInfo.time_left[0] * 100 / dInfo.time_limit, 44);
-		DRAWRECT(1, &cliprect)
+		DRAWRECT(rectpos, 1, &cliprect)
 		driver->draw2DRectangleOutline(rectpos, skin::TIMEBAR_1_OUTLINE_VAL);
 		rectpos = Resize(695, 34, 795, 44);
 		cliprect = Resize(795 - dInfo.time_left[1] * 100 / dInfo.time_limit, 34, 795, 44);
-		DRAWRECT(2, &cliprect)
+		DRAWRECT(rectpos, 2, &cliprect)
 		driver->draw2DRectangleOutline(rectpos, skin::TIMEBAR_2_OUTLINE_VAL);
 	}
 
@@ -634,7 +634,8 @@ void Game::DrawMisc() {
 				DrawPendScale(pcard);
 		}
 		if (dField.extra[p].size()) {
-			DrawStackIndicator(gDataManager->GetNumString(dField.extra[p].size()) + ((dField.extra_p_count[p] > 0) ? gDataManager->GetNumString(dField.extra_p_count[p], true) : L""), matManager.vFieldExtra[p][speed], (p == 1));
+			const auto str = (dField.extra_p_count[p]) ? fmt::format(L"{}({})", dField.extra[p].size(), dField.extra_p_count[p]) : fmt::format(L"{}", dField.extra[p].size());
+			DrawStackIndicator(str, matManager.vFieldExtra[p][speed], (p == 1));
 		}
 		if (dField.deck[p].size())
 			DrawStackIndicator(gDataManager->GetNumString(dField.deck[p].size()), matManager.vFieldDeck[p][speed], (p == 1));
@@ -644,7 +645,8 @@ void Game::DrawMisc() {
 			DrawStackIndicator(gDataManager->GetNumString(dField.remove[p].size()), matManager.vFieldRemove[p][field][speed], (p == 1));
 	}
 }
-/*Draws the stats of a card based on its relative position
+/*
+Draws the stats of a card based on its relative position
 */
 void Game::DrawStatus(ClientCard* pcard) {
 	auto getcoords = [collisionmanager=device->getSceneManager()->getSceneCollisionManager()](const irr::core::vector3df& pos3d) {
@@ -721,15 +723,17 @@ void Game::DrawPendScale(ClientCard* pcard) {
 	DrawShadowText(adFont, scale, irr::core::recti(coords.X - (12 * swap), coords.Y, coords.X + (12 * (1 - swap)), coords.Y - 800),
 				   Resize(1, 1, 1, 1), skin::DUELFIELD_CARD_PSCALE_VAL, 0xff000000, true);
 }
-/*Draws the text in the middle of the bottom side of the zone
+/*
+Draws the text in the middle of the bottom side of the zone
 */
 void Game::DrawStackIndicator(epro_wstringview text, irr::video::S3DVertex* v, bool opponent) {
 	const irr::core::ustring utext(text.data(), text.size());
-	int width = textFont->getDimension(utext).Width / 2, height = textFont->getDimension(utext).Height / 2;
-	float x0 = (v[0].Pos.X + v[1].Pos.X) / 2;
+	const auto dim = textFont->getDimension(utext) / 2;
+	//int width = dim.Width / 2, height = dim.Height / 2;
+	float x0 = (v[0].Pos.X + v[1].Pos.X) / 2.0f;
 	float y0 = (opponent) ? v[0].Pos.Y : v[2].Pos.Y;
 	auto coords = device->getSceneManager()->getSceneCollisionManager()->getScreenCoordinatesFrom3DPosition({ x0, y0, 0 });
-	DrawShadowText(numFont, utext, irr::core::recti(coords.X - width, coords.Y - height, coords.X + width, coords.Y + height),
+	DrawShadowText(numFont, utext, irr::core::recti(coords.X - dim.Width, coords.Y - dim.Height, coords.X + dim.Width, coords.Y + dim.Height),
 				   Resize(0, 1, 0, 1), skin::DUELFIELD_STACK_VAL, 0xff000000);
 }
 void Game::DrawGUI() {

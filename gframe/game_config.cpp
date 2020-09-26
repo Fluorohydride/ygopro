@@ -1,5 +1,6 @@
 #include "game_config.h"
 #include <fstream>
+#include <fmt/format.h>
 #include "bufferio.h"
 #include "utils.h"
 #include "config.h"
@@ -219,7 +220,7 @@ inline void Serialize(std::ofstream& conf_file, const char* name, T value) {
 }
 template<>
 inline void Serialize(std::ofstream& conf_file, const char* name, float value) {
-	conf_file << name << " = " << std::to_string(value) << "\n"; // Forces float to show decimals
+	conf_file << name << " = " << fmt::to_string(value) << "\n"; // Forces float to show decimals
 }
 template<>
 inline void Serialize(std::ofstream& conf_file, const char* name, std::wstring value) {

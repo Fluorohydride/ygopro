@@ -26,4 +26,6 @@ using path_string = std::basic_string<path_char>;
 using path_stringview = nonstd::basic_string_view<path_char>;
 using epro_stringview = nonstd::basic_string_view<char>;
 using epro_wstringview = nonstd::basic_string_view<wchar_t>;
+
+using namespace nonstd::literals;
 #endif /* TEXT_TYPES_H_ */

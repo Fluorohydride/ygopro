@@ -12,6 +12,9 @@
 using Stat = struct stat;
 using Dirent = struct dirent;
 #endif
+#ifdef __APPLE__
+#import <CoreFoundation/CoreFoundation.h>
+#endif
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
 #endif
@@ -66,6 +69,13 @@ namespace ygo {
 		if(stat(path.data(), &sb) == -1)
 			return false;
 		return S_ISREG(sb.st_mode) != 0;
+#endif
+	}
+	bool Utils::ChangeDirectory(path_stringview newpath) {
+#ifdef _WIN32
+		return SetCurrentDirectory(newpath.data());
+#else
+		return chdir(newpath.data()) == 0;
 #endif
 	}
 	bool Utils::FileDelete(path_stringview source) {
@@ -306,20 +316,37 @@ namespace ygo {
 #elif defined(__linux__) && !defined(__ANDROID__)
 			char buff[PATH_MAX];
 			ssize_t len = ::readlink("/proc/self/exe", buff, sizeof(buff) - 1);
-			if(len != -1) {
+			if(len != -1)
 				buff[len] = '\0';
-			}
-			// We could do NormalizePath but it returns the same thing anyway
 			return buff;
+#elif defined(__APPLE__)
+			CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+			CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
+			CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
+			CFRelease(bundle_url);
+			CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
+			CFRelease(bundle_base_url);
+			/*
+			#ifdef MAC_OS_DISCORD_LAUNCHER
+				system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+			#endif
+			*/
+			path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
+			CFRelease(path);
+			CFRelease(bundle_path);
+			return res;
 #else
-			return EPRO_TEXT(""); // Unused on macOS
+			return EPRO_TEXT(""); // Unused on Android
 #endif
 		}();
 		return binarypath;
 	}
 
 	path_stringview Utils::GetExeFolder() {
-		static path_string binarypath = GetFilePath<path_string>(GetExePath().data());
+		static path_string binarypath = GetFilePath([]()->path_string {
+			const auto tmp = GetExePath();
+			return path_string{ tmp.data(), tmp.size() };
+		}());
 		return binarypath;
 	}
 
@@ -419,7 +446,7 @@ namespace ygo {
 		}
 #else
 		if(type == OPEN_FILE)
-			porting::openFile(porting::working_directory + url);
+			porting::openFile(fmt::format("{}{}", porting::working_directory, url));
 		else
 			porting::openUrl(url);
 #endif

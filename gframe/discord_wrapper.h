@@ -28,7 +28,7 @@ public:
 		TERMINATE
 	};
 	DiscordWrapper();
-	bool Initialize(path_string workingDir);
+	bool Initialize(path_stringview workingDir);
 	void UpdatePresence(PresenceType type);
 	bool connected;
 	void Check();

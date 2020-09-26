@@ -46,9 +46,9 @@ void WindBotPanel::UpdateDescription() {
 		for (auto rule : bot.masterRules) {
 			if (mr.size())
 				mr.append(L",");
-			mr.append(std::to_wstring(rule));
+			mr.append(fmt::to_wstring(rule));
 		}
-		params << fmt::format(gDataManager->GetSysString(2057), mr.c_str());
+		params << fmt::format(gDataManager->GetSysString(2057), mr);
 		params << L"\n";
 	}
 	deckProperties->setText(params.str().c_str());
