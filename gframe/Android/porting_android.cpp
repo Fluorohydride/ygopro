@@ -472,7 +472,7 @@ void android_main(android_app *app) {
 	int retval = 0;
 	porting::app_global = app;
 	porting::initAndroid();
-	internal_storage = app_global->activity->internalDataPath
+	internal_storage = app->activity->internalDataPath;
 
 	auto strparams = porting::GetExtraParameters();
 	std::vector<const char*> params;

@@ -52,7 +52,7 @@ public:
 		ATTACK,
 		ACTIVATE
 	};
-	SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const path_string& working_directory);
+	SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, path_stringview working_directory);
 	bool IsUsable();
 	void RefreshBGMList();
 	void RefreshChantsList();

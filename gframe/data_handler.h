@@ -25,7 +25,7 @@ class DataHandler {
 	void LoadPicUrls();
 
 public:
-	DataHandler();
+	DataHandler(path_stringview working_dir);
 	~DataHandler();
 	irr::IrrlichtDevice* tmp_device;
 	std::unique_ptr<DeckManager> deckManager = nullptr;

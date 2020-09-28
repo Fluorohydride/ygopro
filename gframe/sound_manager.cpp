@@ -11,7 +11,7 @@
 #endif
 
 namespace ygo {
-SoundManager::SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, const path_string& working_directory) {
+SoundManager::SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, path_stringview working_directory) {
 #ifdef BACKEND
 	working_dir = Utils::ToUTF8IfNeeded(working_directory);
 	soundsEnabled = sounds_enabled;
