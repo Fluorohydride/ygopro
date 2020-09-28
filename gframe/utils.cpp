@@ -26,6 +26,7 @@ using Dirent = struct dirent;
 namespace ygo {
 	std::vector<Utils::SynchronizedIrrArchive> Utils::archives;
 	irr::io::IFileSystem* Utils::filesystem;
+	path_string Utils::working_dir;
 
 	bool Utils::MakeDirectory(path_stringview path) {
 #ifdef _WIN32
@@ -88,7 +89,7 @@ namespace ygo {
 	bool Utils::ClearDirectory(path_stringview path) {
 #ifdef _WIN32
 		WIN32_FIND_DATA fdata;
-		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), path).c_str(), &fdata);
+		HANDLE fh = FindFirstFile(fmt::format(EPRO_TEXT("{}*.*"), path).data(), &fdata);
 		if(fh != INVALID_HANDLE_VALUE) {
 			do {
 				path_stringview name = fdata.cFileName;
@@ -108,7 +109,7 @@ namespace ygo {
 			Stat fileStat;
 			while((dirp = readdir(dir)) != nullptr) {
 				path_stringview name = dirp->d_name;
-				stat(fmt::format("{}{}", path, name).c_str(), &fileStat);
+				stat(fmt::format("{}{}", path, name).data(), &fileStat);
 				if(S_ISDIR(fileStat.st_mode) && name != ".." && name != ".")
 					DeleteDirectory(fmt::format("{}{}/", path, name));
 				else
@@ -241,7 +242,7 @@ namespace ygo {
 			archive.mutex->lock();
 			int res = -1;
 			auto list = archive.archive->getFileList();
-			res = list->findFile(fmt::format(EPRO_TEXT("{}{}"), path, name).c_str());
+			res = list->findFile(fmt::format(EPRO_TEXT("{}{}"), path, name).data());
 			if(res != -1) {
 				auto reader = archive.archive->createAndOpenFile(res);
 				if(reader)
@@ -335,8 +336,6 @@ namespace ygo {
 			CFRelease(path);
 			CFRelease(bundle_path);
 			return res;
-#else
-			return EPRO_TEXT(""); // Unused on Android
 #endif
 		}();
 		return binarypath;
@@ -344,8 +343,7 @@ namespace ygo {
 
 	path_stringview Utils::GetExeFolder() {
 		static path_string binarypath = GetFilePath([]()->path_string {
-			const auto tmp = GetExePath();
-			return path_string{ tmp.data(), tmp.size() };
+			return GetExePath().to_string();
 		}());
 		return binarypath;
 	}
@@ -430,7 +428,7 @@ namespace ygo {
 
 	void Utils::SystemOpen(path_stringview url, OpenType type) {
 #ifdef _WIN32
-		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? filesystem->getAbsolutePath(url.data()).c_str() : url.data(), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, url).data() : url.data(), NULL, NULL, SW_SHOWNORMAL);
 		// system("start URL") opens a shell
 #elif !defined(__ANDROID__)
 		auto pid = fork();
@@ -446,7 +444,7 @@ namespace ygo {
 		}
 #else
 		if(type == OPEN_FILE)
-			porting::openFile(fmt::format("{}{}", porting::working_directory, url));
+			porting::openFile(fmt::format("{}/{}", working_dir, url));
 		else
 			porting::openUrl(url);
 #endif

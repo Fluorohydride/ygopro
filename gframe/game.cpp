@@ -105,7 +105,7 @@ bool Game::Initialize() {
 	if(!(ocgcore = LoadOCGcore(gGameConfig->working_directory + EPRO_TEXT("./"))) && !(ocgcore = LoadOCGcore(gGameConfig->working_directory + EPRO_TEXT("./expansions/"))))
 		coreloaded = false;
 #endif
-	skinSystem = new CGUISkinSystem((gGameConfig->working_directory + EPRO_TEXT("./skin")).data(), device);
+	skinSystem = new CGUISkinSystem(fmt::format(EPRO_TEXT("{}/skin"), Utils::working_dir).data(), device);
 	if(!skinSystem)
 		ErrorLog("Couldn't create skin system");
 	linePatternGL = 0x0f0f;
@@ -117,7 +117,7 @@ bool Game::Initialize() {
 		return false;
 	}
 	RefreshAiDecks();
-	discord.Initialize(filesystem->getWorkingDirectory().c_str());
+	discord.Initialize();
 	if(gGameConfig->discordIntegration)
 		discord.UpdatePresence(DiscordWrapper::INITIALIZE);
 	PopulateResourcesDirectories();

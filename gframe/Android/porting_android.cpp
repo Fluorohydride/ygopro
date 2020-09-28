@@ -151,26 +151,6 @@ void cleanupAndroid() {
 	jvm->DetachCurrentThread();
 }
 
-void readConfigs() {
-	std::string path = internal_storage + "/working_dir";
-	struct stat buffer;
-	if(stat(path.c_str(), &buffer) == 0) {
-		LOGI("working_dir found");
-		std::ifstream confs(path);
-		std::getline(confs, working_directory);
-		LOGI("Working directory: %s", working_directory.c_str());
-	}
-	if(working_directory.empty()) {
-		LOGI("working_dir not found");
-		exit(1);
-	}
-	working_directory += "/";
-}
-
-void initializePathsAndroid() {
-	internal_storage = app_global->activity->internalDataPath;
-	readConfigs();
-}
 void displayKeyboard(bool pShow) {
 	// Attaches the current thread to the JVM.
 	jint lResult;
@@ -492,10 +472,7 @@ void android_main(android_app *app) {
 	int retval = 0;
 	porting::app_global = app;
 	porting::initAndroid();
-	porting::initializePathsAndroid();
-
-	if(chdir(porting::working_directory.c_str()) != 0)
-		LOGE("failed to change directory");
+	internal_storage = app_global->activity->internalDataPath
 
 	auto strparams = porting::GetExtraParameters();
 	std::vector<const char*> params;

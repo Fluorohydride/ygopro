@@ -64,6 +64,7 @@ namespace ygo {
 		};
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
+		static path_string working_dir;
 		static bool MakeDirectory(path_stringview path);
 		static bool FileCopy(path_stringview source, path_stringview destination);
 		static bool FileMove(path_stringview source, path_stringview destination);

@@ -92,22 +92,22 @@ void DataHandler::LoadZipArchives() {
 		}
 	}
 }
-DataHandler::DataHandler() {
+DataHandler::DataHandler(path_stringview working_dir) {
 	configs = std::unique_ptr<GameConfig>(new GameConfig);
 	gGameConfig = configs.get();
 	tmp_device = nullptr;
 #ifndef __ANDROID__
 	tmp_device = GUIUtils::CreateDevice(configs.get());
 #else
-	configs->working_directory = porting::working_directory;
-	configs->ssl_certificate_path = porting::internal_storage + "/cacert.cer";
+	configs->ssl_certificate_path = fmt::format("{}/cacert.cer", porting::internal_storage);
 #endif
 	filesystem = new irr::io::CFileSystem();
 	Utils::filesystem = filesystem;
+	Utils::working_dir = { working_dir.data(), working_dir.size() };
 	LoadZipArchives();
 	deckManager = std::unique_ptr<DeckManager>(new DeckManager());
 	gitManager = std::unique_ptr<RepoManager>(new RepoManager());
-	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume / 100.0, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic, configs->working_directory));
+	sounds = std::unique_ptr<SoundManager>(new SoundManager(configs->soundVolume / 100.0, configs->musicVolume / 100.0, configs->enablesound, configs->enablemusic, working_dir));
 	gitManager->LoadRepositoriesFromJson(configs->user_configs);
 	gitManager->LoadRepositoriesFromJson(configs->configs);
 	dataManager = std::unique_ptr<DataManager>(new DataManager());

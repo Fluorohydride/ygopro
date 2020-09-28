@@ -179,12 +179,17 @@ inline void Startup() {
 #endif //_WIN32
 
 int _tmain(int argc, path_char* argv[]) {
-#if !defined(_DEBUG) && !defined(__ANDROID__)
-	auto dest = ygo::Utils::GetExeFolder();
-	if(argc >= 2 && argv[1] == EPRO_TEXT("from_discord"_sv))
+	path_stringview dest{};
+	int skipped = 0;
+	if(argc >= 2 && (argv[1] == EPRO_TEXT("from_discord"_sv) || argv[1] == EPRO_TEXT("-C"_sv))) {
 		dest = argv[2];
-	ygo::Utils::ChangeDirectory(dest);
-#endif
+		skipped = 2;
+	} else
+		dest = ygo::Utils::GetExeFolder();
+	if(!ygo::Utils::ChangeDirectory(dest)) {
+		ygo::ErrorLog("failed to change directory");
+		fmt::print("failed to change directory\n");
+	}
 	if(argc >= 2 && argv[1] == EPRO_TEXT("show_changelog"_sv))
 		show_changelog = true;
 	Startup();
@@ -195,7 +200,7 @@ int _tmain(int argc, path_char* argv[]) {
 	ygo::gClientUpdater = &updater;
 	std::shared_ptr<ygo::DataHandler> data = nullptr;
 	try {
-		data = std::make_shared<ygo::DataHandler>();
+		data = std::make_shared<ygo::DataHandler>(dest);
 		ygo::gImageDownloader = data->imageDownloader.get();
 		ygo::gDataManager = data->dataManager.get();
 		ygo::gSoundManager = data->sounds.get();
@@ -239,7 +244,7 @@ int _tmain(int argc, path_char* argv[]) {
 			joystick = std::unique_ptr<JWrapper>(new JWrapper(ygo::mainGame->device));
 			gJWrapper = joystick.get();
 			firstlaunch = false;
-			CheckArguments(argc, argv);
+			CheckArguments(argc - skipped, argv + skipped);
 		}
 		reset = ygo::mainGame->MainLoop();
 		if(reset) {

@@ -17,7 +17,6 @@ namespace porting {
 extern android_app* app_global;
 
 extern std::string internal_storage;
-extern std::string working_directory;
 
 bool transformEvent(const irr::SEvent& event, bool& stopPropagation);
 

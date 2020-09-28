@@ -101,7 +101,6 @@ struct GameConfig
 	bool controller_input = false;
 	path_string skin = EPRO_TEXT("none");
 	path_string locale = EPRO_TEXT("English");
-	path_string working_directory = EPRO_TEXT("./");
 	std::string ssl_certificate_path = "";
 
 	nlohmann::json configs;

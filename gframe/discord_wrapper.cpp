@@ -21,14 +21,16 @@
 DiscordWrapper::DiscordWrapper(): connected(false){
 }
 
-bool DiscordWrapper::Initialize(path_stringview workingDir) {
+#ifdef _WIN32
+#define formatstr EPRO_TEXT("\\\"{0}\\\" from_discord \\\"{1}\\\"")
+#else
+#define formatstr EPRO_TEXT("bash -c \"cd \\\"{1}\\\"; \\\"{0}\\\" from_discord\"")
+#endif
+
+bool DiscordWrapper::Initialize() {
 #ifdef DISCORD_APP_ID
 #if defined(_WIN32) || defined(__linux__)
-#ifdef _WIN32
-	path_string param = fmt::format(EPRO_TEXT("\\\"{}\\\" from_discord \\\"{}\\\""), ygo::Utils::GetExePath(), workingDir);
-#elif defined(__linux__)
-	std::string param = fmt::format("bash -c \"cd \\\"{}\\\"; \\\"{}\\\" from_discord\"", workingDir, ygo::Utils::GetExePath());
-#endif //_WIN32
+	path_string param = fmt::format(formatstr, ygo::Utils::GetExePath(), ygo::Utils::working_dir);
 	Discord_Register(DISCORD_APP_ID, ygo::Utils::ToUTF8IfNeeded(param).c_str());
 #else
 	RegisterURL(DISCORD_APP_ID);
