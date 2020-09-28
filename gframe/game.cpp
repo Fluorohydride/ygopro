@@ -47,6 +47,10 @@
 #define EnableMaterial2D(enable) ((void)0);
 #endif
 
+uint16_t PRO_VERSION = 0x1351;
+
+namespace ygo {
+
 template<typename... Args>
 inline irr::gui::IGUIComboBox* AddComboBox(irr::gui::IGUIEnvironment* env, Args&&... args) {
 #ifdef __ANDROID__
@@ -55,10 +59,6 @@ inline irr::gui::IGUIComboBox* AddComboBox(irr::gui::IGUIEnvironment* env, Args&
 #endif
 	return env->addComboBox(std::forward<Args>(args)...);
 }
-
-uint16_t PRO_VERSION = 0x1351;
-
-namespace ygo {
 
 bool Game::Initialize() {
 	dpi_scale = gGameConfig->dpi_scale;
@@ -102,7 +102,7 @@ bool Game::Initialize() {
 	filesystem = device->getFileSystem();
 	coreloaded = true;
 #ifdef YGOPRO_BUILD_DLL
-	if(!(ocgcore = LoadOCGcore(gGameConfig->working_directory + EPRO_TEXT("./"))) && !(ocgcore = LoadOCGcore(gGameConfig->working_directory + EPRO_TEXT("./expansions/"))))
+	if(!(ocgcore = LoadOCGcore(Utils::working_dir)) && !(ocgcore = LoadOCGcore(fmt::format(EPRO_TEXT("{}/expansions/"), Utils::working_dir))))
 		coreloaded = false;
 #endif
 	skinSystem = new CGUISkinSystem(fmt::format(EPRO_TEXT("{}/skin"), Utils::working_dir).data(), device);
@@ -1594,7 +1594,7 @@ bool Game::MainLoop() {
 		if(!dInfo.isStarted && cores_to_load.size() && gRepoManager->GetUpdatingReposNumber() == 0) {
 			for(auto& path : cores_to_load) {
 				void* ncore = nullptr;
-				if((ncore = ChangeOCGcore(gGameConfig->working_directory + path, ocgcore))) {
+				if((ncore = ChangeOCGcore(Utils::working_dir + path, ocgcore))) {
 					corename = Utils::ToUnicodeIfNeeded(path);
 					coreJustLoaded = true;
 					ocgcore = ncore;

@@ -336,6 +336,8 @@ namespace ygo {
 			CFRelease(path);
 			CFRelease(bundle_path);
 			return res;
+#else
+			return EPRO_TEXT("");
 #endif
 		}();
 		return binarypath;
