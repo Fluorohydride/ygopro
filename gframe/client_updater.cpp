@@ -191,7 +191,7 @@ namespace ygo {
 void ClientUpdater::StartUnzipper(unzip_callback callback, void* payload, const path_string& src) {
 #ifdef UPDATE_URL
 #ifdef __ANDROID__
-	porting::installUpdate(porting::working_directory + src + update_urls.front().name + ".apk");
+	porting::installUpdate(fmt::format("{}{}{}.apk",Utils::working_dir, src, update_urls.front().name));
 #else
 	if(Lock)
 		std::thread(&ClientUpdater::Unzip, this, src, payload, callback).detach();
