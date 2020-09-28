@@ -57,80 +57,79 @@ inline void SetCheckbox(irr::gui::IGUICheckBox* chk, bool state) {
 	TriggerEvent(chk, irr::gui::EGET_CHECKBOX_CHANGED);
 }
 
+#define PARAM_CHECK(x) ((wchar_t)argv[i][1] == (wchar_t)x)
+#define RUN_IF(x,expr) (PARAM_CHECK(x)) {i++; if(i < argc) {expr;} continue;}
+#define SET_TXT(elem) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).data())
 
 void CheckArguments(int argc, path_char* argv[]) {
 	bool keep_on_return = false;
 	for(int i = 1; i < argc; ++i) {
-		path_string parameter(argv[i]);
-#define PARAM_CHECK(x) if(parameter == EPRO_TEXT(x))
-#define RUN_IF(x,y) PARAM_CHECK(x) {i++; if(i < argc) {y;} continue;}
-#define SET_TXT(elem) ygo::mainGame->elem->setText(ygo::Utils::ToUnicodeIfNeeded(argv[i]).c_str())
-		// Extra database
-		RUN_IF("-e", ygo::gDataManager->LoadDB(argv[i]))
-		// Nickname
-		else RUN_IF("-n", SET_TXT(ebNickName))
-		// Host address
-		else RUN_IF("-h", SET_TXT(ebJoinHost))
-		// Host Port
-		else RUN_IF("-p", SET_TXT(ebJoinPort))
-		// Host password
-		else RUN_IF("-w", SET_TXT(ebJoinPass))
-#undef RUN_IF
-#undef SET_TXT
-		else PARAM_CHECK("-k") { // Keep on return
-			exit_on_return = false;
-			keep_on_return = true;
-		} else PARAM_CHECK("-m") { // Mute
-			SetCheckbox(ygo::mainGame->tabSettings.chkEnableSound, false);
-			SetCheckbox(ygo::mainGame->tabSettings.chkEnableMusic, false);
-		} else PARAM_CHECK("-d") { // Deck
-			++i;
-			if(i + 1 < argc) { // select deck
-				ygo::gGameConfig->lastdeck = ygo::Utils::ToUnicodeIfNeeded(argv[i]);
-				continue;
-			} else { // open deck
+		if((wchar_t)argv[i][0] == '-' && argv[i][1]) {
+			// Extra database
+			if RUN_IF('e', ygo::gDataManager->LoadDB(argv[i]))
+				// Nickname
+			else if RUN_IF('n', SET_TXT(ebNickName))
+				// Host address
+			else if RUN_IF('h', SET_TXT(ebJoinHost))
+				// Host Port
+			else if RUN_IF('p', SET_TXT(ebJoinPort))
+				// Host password
+			else if RUN_IF('w', SET_TXT(ebJoinPass))
+			else if(PARAM_CHECK('k')) { // Keep on return
+				exit_on_return = false;
+				keep_on_return = true;
+			} else if(PARAM_CHECK('m')) { // Mute
+				SetCheckbox(ygo::mainGame->tabSettings.chkEnableSound, false);
+				SetCheckbox(ygo::mainGame->tabSettings.chkEnableMusic, false);
+			} else if(PARAM_CHECK('d')) { // Deck
+				++i;
+				if(i + 1 < argc) { // select deck
+					ygo::gGameConfig->lastdeck = ygo::Utils::ToUnicodeIfNeeded(argv[i]);
+					continue;
+				} else { // open deck
+					exit_on_return = !keep_on_return;
+					if(i < argc) {
+						open_file = true;
+						open_file_name = argv[i];
+					}
+					ClickButton(ygo::mainGame->btnDeckEdit);
+					break;
+				}
+			} else if(PARAM_CHECK('c')) { // Create host
 				exit_on_return = !keep_on_return;
+				ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
+				ClickButton(ygo::mainGame->btnHostConfirm);
+				break;
+			} else if(PARAM_CHECK('j')) { // Join host
+				exit_on_return = !keep_on_return;
+				ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
+				ClickButton(ygo::mainGame->btnJoinHost);
+				break;
+			} else if(PARAM_CHECK('r')) { // Replay
+				exit_on_return = !keep_on_return;
+				++i;
 				if(i < argc) {
 					open_file = true;
 					open_file_name = argv[i];
 				}
-				ClickButton(ygo::mainGame->btnDeckEdit);
+				ClickButton(ygo::mainGame->btnReplayMode);
+				if(open_file)
+					ClickButton(ygo::mainGame->btnLoadReplay);
+				break;
+			} else if(PARAM_CHECK('s')) { // Single
+				exit_on_return = !keep_on_return;
+				++i;
+				if(i < argc) {
+					open_file = true;
+					open_file_name = argv[i];
+				}
+				ClickButton(ygo::mainGame->btnSingleMode);
+				if(open_file)
+					ClickButton(ygo::mainGame->btnLoadSinglePlay);
 				break;
 			}
-		} else PARAM_CHECK("-c") { // Create host
-			exit_on_return = !keep_on_return;
-			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
-			ClickButton(ygo::mainGame->btnHostConfirm);
-			break;
-		} else PARAM_CHECK("-j") { // Join host
-			exit_on_return = !keep_on_return;
-			ygo::mainGame->HideElement(ygo::mainGame->wMainMenu);
-			ClickButton(ygo::mainGame->btnJoinHost);
-			break;
-		} else PARAM_CHECK("-r") { // Replay
-			exit_on_return = !keep_on_return;
-			++i;
-			if(i < argc) {
-				open_file = true;
-				open_file_name = argv[i];
-			}
-			ClickButton(ygo::mainGame->btnReplayMode);
-			if(open_file)
-				ClickButton(ygo::mainGame->btnLoadReplay);
-			break;
-		} else PARAM_CHECK("-s") { // Single
-			exit_on_return = !keep_on_return;
-			++i;
-			if(i < argc) {
-				open_file = true;
-				open_file_name = argv[i];
-			}
-			ClickButton(ygo::mainGame->btnSingleMode);
-			if(open_file)
-				ClickButton(ygo::mainGame->btnLoadSinglePlay);
-			break;
-		} else if(argc == 2 && path_stringview(argv[1]).size() >= 4) {
-			parameter = argv[1];
+		} else if(argc == 2 && argv[1][0] && argv[1][1] && argv[1][2] && argv[1][3]) {
+			path_string parameter = argv[1];
 			auto extension = ygo::Utils::GetFileExtension(parameter);
 			if(extension == EPRO_TEXT("ydk")) {
 				open_file = true;
@@ -159,17 +158,25 @@ void CheckArguments(int argc, path_char* argv[]) {
 				break;
 			}
 		}
-#undef PARAM_CHECK
 	}
 }
+#undef RUN_IF
+#undef SET_TXT
+#undef PARAM_CHECK
 
 
 #ifdef _WIN32
 #define Cleanup() WSACleanup()
+inline void Startup() {
+	const WORD wVersionRequested = MAKEWORD(2, 2);
+	WSADATA wsaData;
+	WSAStartup(wVersionRequested, &wsaData);
+	evthread_use_windows_threads();
+}
 #else
 #define Cleanup() ((void)0)
+#define Startup() evthread_use_pthreads()
 #endif //_WIN32
-
 
 int _tmain(int argc, path_char* argv[]) {
 #if !defined(_DEBUG) && !defined(__ANDROID__)
@@ -180,14 +187,9 @@ int _tmain(int argc, path_char* argv[]) {
 #endif
 	if(argc >= 2 && argv[1] == EPRO_TEXT("show_changelog"_sv))
 		show_changelog = true;
-#ifdef _WIN32
-	const WORD wVersionRequested = MAKEWORD(2, 2);
-	WSADATA wsaData;
-	WSAStartup(wVersionRequested, &wsaData);
-	evthread_use_windows_threads();
-#else
+	Startup();
+#ifndef _WIN32
 	setlocale(LC_CTYPE, "UTF-8");
-	evthread_use_pthreads();
 #endif //_WIN32
 	ygo::ClientUpdater updater;
 	ygo::gClientUpdater = &updater;
