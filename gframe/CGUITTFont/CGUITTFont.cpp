@@ -526,7 +526,7 @@ void CGUITTFont::setFontHinting(const bool enable, const bool enable_auto_hintin
 void CGUITTFont::draw(const core::stringw& text, const core::rect<s32>& position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
 	if(!Driver)
 		return;
-	drawustring(text.c_str(), position, color, hcenter, vcenter, clip);
+	drawustring(text, position, color, hcenter, vcenter, clip);
 }
 
 void CGUITTFont::drawustring(const core::ustring& utext, const core::rect<s32>& position, video::SColor color, bool hcenter, bool vcenter, const core::rect<s32>* clip) {
