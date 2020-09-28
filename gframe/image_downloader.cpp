@@ -120,11 +120,11 @@ void ImageDownloader::DownloadPic() {
 				CURLcode res;
 				curl = curl_easy_init();
 				if(curl) {
-					curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).c_str());
+					curl_easy_setopt(curl, CURLOPT_URL, fmt::format(src.url, code).data());
 					curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
 					curl_easy_setopt(curl, CURLOPT_WRITEDATA, &payload);
 					if(gGameConfig->ssl_certificate_path.size())
-						curl_easy_setopt(curl, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.c_str());
+						curl_easy_setopt(curl, CURLOPT_CAINFO, gGameConfig->ssl_certificate_path.data());
 #ifdef _WIN32
 					else
 						curl_easy_setopt(curl, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);

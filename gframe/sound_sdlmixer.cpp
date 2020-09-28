@@ -40,7 +40,7 @@ bool SoundMixer::PlayMusic(const std::string& name, bool loop) {
 		Mix_HaltMusic();
 		Mix_FreeMusic(music);
 	}
-	music = Mix_LoadMUS(name.c_str());
+	music = Mix_LoadMUS(name.data());
 	if(music) {
 		if(Mix_PlayMusic(music, loop ? -1 : 0) == -1) {
 			Mix_FreeMusic(music);
@@ -54,7 +54,7 @@ bool SoundMixer::PlayMusic(const std::string& name, bool loop) {
 	return true;
 }
 bool SoundMixer::PlaySound(const std::string& name) {
-	auto chunk = Mix_LoadWAV(name.c_str());
+	auto chunk = Mix_LoadWAV(name.data());
 	if(chunk) {
 		auto channel = Mix_PlayChannel(-1, chunk, 0);
 		if(channel == -1) {

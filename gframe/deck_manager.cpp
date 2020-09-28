@@ -13,6 +13,7 @@
 namespace ygo {
 
 bool DeckManager::LoadLFListSingle(const path_string& path) {
+	static const char key[] = "$whitelist";
 	bool loaded = false;
 	std::ifstream infile(path, std::ifstream::in);
 	if(!infile.is_open())
@@ -23,23 +24,21 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 	while(std::getline(infile, str)) {
 		auto pos = str.find_first_of("\n\r");
 		if(str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
+			str.erase(pos);
 		if(str.empty() || str[0] == '#')
 			continue;
 		if(str[0] == '!') {
 			if(lflist.hash)
 				_lfList.push_back(lflist);
-			lflist.listName = BufferIO::DecodeUTF8s(str.substr(1));
+			lflist.listName = BufferIO::DecodeUTF8s({ str.data() + 1, str.size() - 1 });
 			lflist.content.clear();
 			lflist.hash = 0x7dfcee6a;
 			lflist.whitelist = false;
 			loaded = true;
 			continue;
 		}
-		const std::string key("$whitelist");
-		if(str.substr(0, key.size()) == key) {
+		if(str.rfind(key, 0) == 0)
 			lflist.whitelist = true;
-		}
 		if(!lflist.hash)
 			continue;
 		pos = str.find(" ");
@@ -50,7 +49,7 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 		catch(...){}
 		if(!code)
 			continue;
-		str = str.substr(pos + 1);
+		str.erase(0, pos + 1);
 		str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
 		pos = str.find(" ");
 		if(pos == std::string::npos)
@@ -101,7 +100,9 @@ LFList* DeckManager::GetLFList(uint32_t lfhash) {
 }
 epro_wstringview DeckManager::GetLFListName(uint32_t lfhash) {
 	auto lflist = GetLFList(lfhash);
-	return lflist ? lflist->listName.c_str() : gDataManager->unknown_string;
+	if(lflist)
+		return lflist->listName;
+	return gDataManager->unknown_string;
 }
 int DeckManager::TypeCount(std::vector<CardDataC*> cards, uint32_t type) {
 	int count = 0;
@@ -277,7 +278,7 @@ bool LoadCardList(const path_string& name, cardlist_type* mainlist = nullptr, ca
 	while(std::getline(deck, str)) {
 		auto pos = str.find_first_of("\n\r");
 		if(str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
+			str.erase(pos);
 		if(str.empty() || str[0] == '#')
 			continue;
 		if(str[0] == '!') {
@@ -336,7 +337,7 @@ bool DeckManager::LoadSide(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint32_t 
 bool DeckManager::LoadDeck(const path_string& file, Deck* deck) {
 	cardlist_type mainlist;
 	cardlist_type sidelist;
-	if(!LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file.c_str()), &mainlist, &sidelist)) {
+	if(!LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file), &mainlist, &sidelist)) {
 		if(!LoadCardList(file, &mainlist, &sidelist))
 			return false;
 	}
@@ -349,8 +350,8 @@ bool DeckManager::LoadDeck(const path_string& file, Deck* deck) {
 bool DeckManager::LoadDeckDouble(const path_string& file, const path_string& file2, Deck* deck) {
 	cardlist_type mainlist;
 	cardlist_type sidelist;
-	LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file.c_str()), &mainlist, &sidelist);
-	LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file2.c_str()), &mainlist, &sidelist);
+	LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file), &mainlist, &sidelist);
+	LoadCardList(fmt::format(EPRO_TEXT("./deck/{}.ydk"), file2), &mainlist, &sidelist);
 	if(deck)
 		LoadDeck(*deck, mainlist, sidelist);
 	else
@@ -358,7 +359,7 @@ bool DeckManager::LoadDeckDouble(const path_string& file, const path_string& fil
 	return true;
 }
 bool DeckManager::SaveDeck(Deck& deck, const path_string& name) {
-	std::ofstream deckfile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name.c_str()), std::ofstream::out);
+	std::ofstream deckfile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name), std::ofstream::out);
 	if(!deckfile.is_open())
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
@@ -374,7 +375,7 @@ bool DeckManager::SaveDeck(Deck& deck, const path_string& name) {
 	return true;
 }
 bool DeckManager::SaveDeck(const path_string& name, cardlist_type mainlist, cardlist_type extralist, cardlist_type sidelist) {
-	std::ofstream deckfile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name.c_str()), std::ofstream::out);
+	std::ofstream deckfile(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name), std::ofstream::out);
 	if(!deckfile.is_open())
 		return false;
 	deckfile << "#created by " << BufferIO::EncodeUTF8s(mainGame->ebNickName->getText()) << "\n#main\n";
@@ -403,7 +404,7 @@ const wchar_t* DeckManager::ExportDeckBase64(Deck& deck) {
 	decktobuf(deck.main);
 	decktobuf(deck.extra);
 	decktobuf(deck.side);
-	return res.c_str();
+	return res.data();
 }
 const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 	static std::wstring res;
@@ -452,7 +453,7 @@ const wchar_t* DeckManager::ExportDeckCardNames(Deck deck) {
 		res.append(L"Side Deck:\n");
 		serialize(deck.side);
 	}
-	return res.c_str();
+	return res.data();
 }
 void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
 	std::vector<uint8_t> deck_data;
@@ -477,7 +478,7 @@ void DeckManager::ImportDeckBase64(Deck& deck, const wchar_t* buffer) {
 	LoadDeck(deck, (uint32_t*)deck_data.data(), mainc, sidec);
 }
 bool DeckManager::DeleteDeck(Deck& deck, const path_string& name) {
-	return Utils::FileDelete(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name.c_str()));
+	return Utils::FileDelete(fmt::format(EPRO_TEXT("./deck/{}.ydk"), name));
 }
 bool DeckManager::RenameDeck(const path_string& oldname, const path_string& newname) {
 	return Utils::FileMove(EPRO_TEXT("./deck/") + oldname + EPRO_TEXT(".ydk"), EPRO_TEXT("./deck/") + newname + EPRO_TEXT(".ydk"));

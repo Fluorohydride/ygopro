@@ -30,7 +30,7 @@ bool SoundIrrklang::PlayMusic(const std::string& name, bool loop) {
 	if(!soundBGM || soundBGM->getSoundSource()->getName() != name) {
 		StopMusic();
 		if(soundEngine) {
-			soundBGM = soundEngine->play2D(name.c_str(), loop, true, true);
+			soundBGM = soundEngine->play2D(name.data(), loop, true, true);
 			if(!soundBGM)
 				return false;
 			soundBGM->setVolume((irrklang::ik_f32)bgmVolume);
@@ -40,7 +40,7 @@ bool SoundIrrklang::PlayMusic(const std::string& name, bool loop) {
 	return true;
 }
 bool SoundIrrklang::PlaySound(const std::string& name) {
-	auto sfx = soundEngine->play2D(name.c_str(), false, true);
+	auto sfx = soundEngine->play2D(name.data(), false, true);
 	if(!sfx)
 		return false;
 	sfx->setVolume((irrklang::ik_f32)sfxVolume);

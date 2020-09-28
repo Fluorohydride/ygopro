@@ -63,10 +63,10 @@ void SoundManager::RefreshBGMList() {
 }
 void SoundManager::RefreshBGMDir(path_string path, BGM scene) {
 #ifdef BACKEND
-	for(auto& file : Utils::FindFiles(EPRO_TEXT("./sound/BGM/") + path, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
-		auto conv = Utils::ToUTF8IfNeeded(path + EPRO_TEXT("/") + file);
+	for(auto& file : Utils::FindFiles(fmt::format(EPRO_TEXT("./sound/BGM/{}"), path), { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
+		auto conv = Utils::ToUTF8IfNeeded(fmt::format(EPRO_TEXT("{}/{}"), path, file));
 		BGMList[BGM::ALL].push_back(conv);
-		BGMList[scene].push_back(conv);
+		BGMList[scene].push_back(std::move(conv));
 	}
 #endif
 }
@@ -82,12 +82,13 @@ void SoundManager::RefreshChantsList() {
 		const path_string searchPath = EPRO_TEXT("./sound/") + chantType.second;
 		Utils::MakeDirectory(searchPath);
 		for (auto& file : Utils::FindFiles(searchPath, { EPRO_TEXT("mp3"), EPRO_TEXT("ogg"), EPRO_TEXT("wav"), EPRO_TEXT("flac") })) {
-			auto scode = Utils::GetFileName(searchPath + EPRO_TEXT("/") + file);
+			const auto filepath = fmt::format(EPRO_TEXT("{}/{}"), searchPath, file);
+			auto scode = Utils::GetFileName(file);
 			try {
 				uint32_t code = static_cast<uint32_t>(std::stoul(scode));
 				auto key = std::make_pair(chantType.first, code);
 				if (code && !ChantsList.count(key))
-					ChantsList[key] = working_dir + "/" + Utils::ToUTF8IfNeeded(searchPath + EPRO_TEXT("/") + file);
+					ChantsList[key] = fmt::format("{}/{}", working_dir, Utils::ToUTF8IfNeeded(fmt::format(EPRO_TEXT("{}/{}"), searchPath, file)));
 			}
 			catch (...) {
 				continue;
@@ -125,7 +126,7 @@ void SoundManager::PlaySoundEffect(SFX sound) {
 		{CHAT, "./sound/chatmessage.wav"}
 	};
 	if (!soundsEnabled) return;
-	mixer->PlaySound(working_dir + "/" + fx.at(sound));
+	mixer->PlaySound(fmt::format("{}/{}", working_dir, fx.at(sound)));
 #endif
 }
 void SoundManager::PlayBGM(BGM scene, bool loop) {
@@ -135,7 +136,7 @@ void SoundManager::PlayBGM(BGM scene, bool loop) {
 	if(musicEnabled && (scene != bgm_scene || !mixer->MusicPlaying()) && count > 0) {
 		bgm_scene = scene;
 		int bgm = (std::uniform_int_distribution<>(0, count - 1))(rnd);
-		std::string BGMName = working_dir + "/./sound/BGM/" + list[bgm];
+		const std::string BGMName = fmt::format("{}/./sound/BGM/{}", working_dir, list[bgm]);
 		mixer->PlayMusic(BGMName, loop);
 	}
 #endif

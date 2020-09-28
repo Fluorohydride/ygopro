@@ -90,7 +90,7 @@ irr::IrrlichtDevice* GUIUtils::CreateDevice(GameConfig* configs) {
 			SetWindowPlacement(hWnd, (WINDOWPLACEMENT*)winstruct.data());
 	}
 #endif
-	device->getLogger()->setLogLevel(irr::ELL_ERROR);
+	device->getLogger()->setLogLevel(irr::ELL_NONE);
 	return device;
 }
 
@@ -112,8 +112,8 @@ bool GUIUtils::TakeScreenshot(irr::IrrlichtDevice* device)
 		return false;
 	}
 	auto now = std::time(nullptr);
-	path_string filename(fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now)).c_str());
-	if (!driver->writeImageToFile(image, filename.c_str())) {
+	path_string filename = fmt::format(EPRO_TEXT("screenshots/EDOPro {:%Y-%m-%d %H-%M-%S}.png"), *std::localtime(&now));
+	if(!driver->writeImageToFile(image, { filename.data(), filename.size() })) {
 		device->getLogger()->log(L"Failed to take screenshot.", irr::ELL_WARNING);
 		image->drop();
 		return false;

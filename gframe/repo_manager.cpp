@@ -192,7 +192,7 @@ void RepoManager::SetRepoPercentage(const std::string& path, int percent)
 RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 	git_libgit2_init();
 	if(gGameConfig->ssl_certificate_path.size())
-		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, gGameConfig->ssl_certificate_path.c_str(), "/system/etc/security/cacerts");
+		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, gGameConfig->ssl_certificate_path.data(), "/system/etc/security/cacerts");
 #ifdef _WIN32
 	else
 		git_libgit2_opts(GIT_OPT_SET_SSL_CERT_LOCATIONS, "SYSTEM", "");
@@ -237,8 +237,8 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 		const std::string& url = _repo.url;
 		const std::string& path = _repo.repo_path;
 		FetchCbPayload payload{this, path};
-		if(DoesRepoExist(path.c_str())) {
-			auto repo = Git::MakeUnique(git_repository_open_ext, path.c_str(),
+		if(DoesRepoExist(path.data())) {
+			auto repo = Git::MakeUnique(git_repository_open_ext, path.data(),
 			                            GIT_REPOSITORY_OPEN_NO_SEARCH, nullptr);
 			auto walker = Git::MakeUnique(git_revwalk_new, repo.get());
 			git_revwalk_sorting(walker.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
@@ -270,7 +270,7 @@ RepoManager::CommitHistory RepoManager::CloneOrUpdateTask(GitRepo _repo) {
 			git_clone_options cloneOpts = GIT_CLONE_OPTIONS_INIT;
 			cloneOpts.fetch_opts.callbacks.transfer_progress = &RepoManager::FetchCb;
 			cloneOpts.fetch_opts.callbacks.payload = &payload;
-			auto repo = Git::MakeUnique(git_clone, url.c_str(), path.c_str(), &cloneOpts);
+			auto repo = Git::MakeUnique(git_clone, url.data(), path.data(), &cloneOpts);
 			auto walker = Git::MakeUnique(git_revwalk_new, repo.get());
 			git_revwalk_sorting(walker.get(), GIT_SORT_TOPOLOGICAL | GIT_SORT_TIME);
 			QueryFullHistory(repo.get(), walker.get());

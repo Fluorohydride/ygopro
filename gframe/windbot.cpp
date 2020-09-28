@@ -23,11 +23,11 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 #ifdef _WIN32
 	auto args = fmt::format(
 		L"./WindBot/WindBot.exe HostInfo=\"{}\" Deck=\"{}\" Port={} Version={} name=\"[AI] {}\" Chat={} {}",
-		pass.c_str(),
-		deck.c_str(),
+		pass,
+		deck,
 		port,
 		version,
-		name.c_str(),
+		name,
 		chat,
 		hand ? fmt::format(L"Hand={}", hand) : L"");
 	STARTUPINFO si = {};
@@ -35,7 +35,7 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	if (CreateProcess(NULL, (TCHAR*)Utils::ToPathString(args).c_str(), NULL, NULL, FALSE, 0, NULL, executablePath.c_str(), &si, &pi)) {
+	if (CreateProcess(NULL, (TCHAR*)Utils::ToPathString(args).data(), NULL, NULL, FALSE, 0, NULL, executablePath.data(), &si, &pi)) {
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 		return true;
@@ -44,11 +44,11 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 #elif defined(__ANDROID__)
 	std::string param = fmt::format(
 		"HostInfo='{}' Deck='{}' Port={} Version={} Name='[AI] {}' Chat={} Hand={}",
-		BufferIO::EncodeUTF8s(pass).c_str(),
-		BufferIO::EncodeUTF8s(deck).c_str(),
+		BufferIO::EncodeUTF8s(pass),
+		BufferIO::EncodeUTF8s(deck),
 		port,
 		version,
-		BufferIO::EncodeUTF8s(name).c_str(),
+		BufferIO::EncodeUTF8s(name),
 		static_cast<int>(chat),
 		hand);
 	porting::launchWindbot(param);
@@ -56,21 +56,21 @@ pid_t WindBot::Launch(int port, const std::wstring& pass, bool chat, int hand) c
 #else
 	pid_t pid = fork();
 	if (pid == 0) {
-		std::string argPass = fmt::format("HostInfo={}", BufferIO::EncodeUTF8s(pass).c_str());
-		std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck).c_str());
+		std::string argPass = fmt::format("HostInfo={}", BufferIO::EncodeUTF8s(pass));
+		std::string argDeck = fmt::format("Deck={}", BufferIO::EncodeUTF8s(deck));
 		std::string argPort = fmt::format("Port={}", port);
 		std::string argVersion = fmt::format("Version={}", version);
-		std::string argName = fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(name).c_str());
+		std::string argName = fmt::format("name=[AI] {}", BufferIO::EncodeUTF8s(name));
 		std::string argChat = fmt::format("Chat={}", chat);
 		std::string argHand = fmt::format("Hand={}", hand);
 		if(chdir("WindBot") == 0) {
 			if(executablePath.length()) {
 				std::string envPath = getenv("PATH") + (":" + executablePath);
-				setenv("PATH", envPath.c_str(), true);
+				setenv("PATH", envPath.data(), true);
 			}
 			execlp("mono", "WindBot.exe", "WindBot.exe",
-				   argPass.c_str(), argDeck.c_str(), argPort.c_str(), argVersion.c_str(), argName.c_str(), argChat.c_str(),
-				   hand ? argHand.c_str() : nullptr, nullptr);
+				   argPass.data(), argDeck.data(), argPort.data(), argVersion.data(), argName.data(), argChat.data(),
+				   hand ? argHand.data() : nullptr, nullptr);
 		}
 		auto message = fmt::format("Failed to start WindBot Ignite: {}", strerror(errno));
 		if(chdir("..") != 0)

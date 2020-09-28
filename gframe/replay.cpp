@@ -89,7 +89,7 @@ void Replay::EndRecord(size_t size) {
 	is_recording = false;
 }
 void Replay::SaveReplay(const path_string& name) {
-	std::ofstream replay_file(fmt::format(EPRO_TEXT("./replay/{}.yrpX"), name.c_str()), std::ofstream::binary);
+	std::ofstream replay_file(fmt::format(EPRO_TEXT("./replay/{}.yrpX"), name), std::ofstream::binary);
 	if(!replay_file.is_open())
 		return;
 	replay_file.write((char*)&pheader, sizeof(pheader));
