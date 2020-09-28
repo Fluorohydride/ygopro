@@ -290,7 +290,7 @@ inline bool Utils::KeepOnlyDigits(T& input, bool negative) {
 
 path_string Utils::ToPathString(epro_wstringview input) {
 #ifdef UNICODE
-	return input.data();
+	return { input.data(), input.size() };
 #else
 	return BufferIO::EncodeUTF8s(input);
 #endif
@@ -299,19 +299,19 @@ path_string Utils::ToPathString(epro_stringview input) {
 #ifdef UNICODE
 	return BufferIO::DecodeUTF8s(input);
 #else
-	return input.data();
+	return { input.data(), input.size() };
 #endif
 }
 std::string Utils::ToUTF8IfNeeded(path_stringview input) {
 #ifdef UNICODE
 	return BufferIO::EncodeUTF8s(input);
 #else
-	return input.data();
+	return { input.data(), input.size() };
 #endif
 }
 std::wstring Utils::ToUnicodeIfNeeded(path_stringview input) {
 #ifdef UNICODE
-	return input.data();
+	return { input.data(), input.size() };
 #else
 	return BufferIO::DecodeUTF8s(input);
 #endif
