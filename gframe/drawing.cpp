@@ -1311,7 +1311,7 @@ void Game::DrawDeckBd() {
 		DRAWRECT(SIDE, 310, 560, 797, 630);
 		driver->draw2DRectangleOutline(Resize(309, 559, 797, 630));
 
-		const float dx = (gdeckManager->current_deck.extra.size() <= 10) ? (436.0f / 9.0f) : (436.0f / (gdeckManager->current_deck.extra.size() - 1));
+		const float dx = (gdeckManager->current_deck.side.size() <= 10) ? (436.0f / 9.0f) : (436.0f / (gdeckManager->current_deck.side.size() - 1));
 
 		for(size_t i = 0; i < gdeckManager->current_deck.side.size(); ++i) {
 			DrawThumb(gdeckManager->current_deck.side[i], irr::core::vector2di(314 + i * dx, 564), deckBuilder.filterList);
