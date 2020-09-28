@@ -1209,6 +1209,27 @@ bool ClientField::CheckSelectSum() {
 		return ret;
 	}
 }
+bool ClientField::CheckSelectTribute() {
+	std::set<ClientCard*> selable;
+	for(auto sit = selectsum_all.begin(); sit != selectsum_all.end(); ++sit) {
+		(*sit)->is_selectable = false;
+		(*sit)->is_selected = false;
+		selable.insert(*sit);
+	}
+	for(size_t i = 0; i < selected_cards.size(); ++i) {
+		selected_cards[i]->is_selectable = true;
+		selected_cards[i]->is_selected = true;
+		selable.erase(selected_cards[i]);
+	}
+	selectsum_cards.clear();
+	bool ret = check_sel_sum_trib_s(selable, 0, 0);
+	selectable_cards.clear();
+	for(auto sit = selectsum_cards.begin(); sit != selectsum_cards.end(); ++sit) {
+		(*sit)->is_selectable = true;
+		selectable_cards.push_back(*sit);
+	}
+	return ret;
+}
 bool ClientField::check_min(const std::set<ClientCard*>& left, std::set<ClientCard*>::const_iterator index, int min, int max) {
 	if (index == left.end())
 		return false;
@@ -1271,6 +1292,52 @@ bool ClientField::check_sum(std::set<ClientCard*>::const_iterator index, std::se
 	return (acc > l1 && check_sum(index, end, acc - l1, count + 1))
 	       || (l2 > 0 && acc > l2 && check_sum(index, end, acc - l2, count + 1))
 	       || check_sum(index, end, acc, count);
+}
+bool ClientField::check_sel_sum_trib_s(const std::set<ClientCard*>& left, int index, int acc) {
+	if(acc > select_max)
+		return false;
+	if(index == (int)selected_cards.size()) {
+		check_sel_sum_trib_t(left, acc);
+		return acc >= select_min && acc <= select_max;
+	}
+	int l = selected_cards[index]->opParam;
+	int l1 = l & 0xffff;
+	int l2 = l >> 16;
+	bool res1 = false, res2 = false;
+	res1 = check_sel_sum_trib_s(left, index + 1, acc + l1);
+	if(l2 > 0)
+		res2 = check_sel_sum_trib_s(left, index + 1, acc + l2);
+	return res1 || res2;
+}
+void ClientField::check_sel_sum_trib_t(const std::set<ClientCard*>& left, int acc) {
+	for(auto sit = left.begin(); sit != left.end(); ++sit) {
+		if(selectsum_cards.find(*sit) != selectsum_cards.end())
+			continue;
+		std::set<ClientCard*> testlist(left);
+		testlist.erase(*sit);
+		int l = (*sit)->opParam;
+		int l1 = l & 0xffff;
+		int l2 = l >> 16;
+		if(check_sum_trib(testlist.begin(), testlist.end(), acc + l1)
+			|| (l2 > 0 && check_sum_trib(testlist.begin(), testlist.end(), acc + l2))) {
+			selectsum_cards.insert(*sit);
+		}
+	}
+}
+bool ClientField::check_sum_trib(std::set<ClientCard*>::const_iterator index, std::set<ClientCard*>::const_iterator end, int acc) {
+	if(acc >= select_min && acc <= select_max)
+		return true;
+	if(acc > select_max || index == end)
+		return false;
+	int l = (*index)->opParam;
+	int l1 = l & 0xffff;
+	int l2 = l >> 16;
+	if((acc + l1 >= select_min && acc + l1 <= select_max) || (acc + l2 >= select_min && acc + l2 <= select_max))
+		return true;
+	++index;
+	return check_sum_trib(index, end, acc + l1)
+		|| check_sum_trib(index, end, acc + l2)
+		|| check_sum_trib(index, end, acc);
 }
 template <class T>
 static bool is_declarable(T const& cd, const std::vector<int>& opcode) {
