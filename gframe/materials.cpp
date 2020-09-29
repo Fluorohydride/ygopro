@@ -278,15 +278,15 @@ Materials::Materials() {
 	SetS3DVertex(vFieldSzone[1][7][1][1], 1.1f, -0.1f, 0.3f, -1.3f, 0, 1, 0, 0, 0, 0);
 
 	//conti_act
-	vFieldContiAct[0][0] = irr::core::vector3df(-0.8f, 0.1f, 0.0f);
-	vFieldContiAct[0][1] = irr::core::vector3df(0.0f, 0.1f, 0.0f);
-	vFieldContiAct[0][2] = irr::core::vector3df(-0.8f, 1.3f, 0.0f);
-	vFieldContiAct[0][3] = irr::core::vector3df(0.0f, 1.3f, 0.0f);
+	vFieldContiAct[0][0].set(-0.8f, 0.1f, 0.0f);
+	vFieldContiAct[0][1].set(0.0f, 0.1f, 0.0f);
+	vFieldContiAct[0][2].set(-0.8f, 1.3f, 0.0f);
+	vFieldContiAct[0][3].set(0.0f, 1.3f, 0.0f);
 	//conti_act speed
-	vFieldContiAct[1][0] = irr::core::vector3df(0.3f, 0.1f, 0.0f);
-	vFieldContiAct[1][1] = irr::core::vector3df(1.1f, 0.1f, 0.0f);
-	vFieldContiAct[1][2] = irr::core::vector3df(0.3f, 1.3f, 0.0f);
-	vFieldContiAct[1][3] = irr::core::vector3df(1.1f, 1.3f, 0.0f);
+	vFieldContiAct[1][0].set(0.3f, 0.1f, 0.0f);
+	vFieldContiAct[1][1].set(1.1f, 0.1f, 0.0f);
+	vFieldContiAct[1][2].set(0.3f, 1.3f, 0.0f);
+	vFieldContiAct[1][3].set(1.1f, 1.3f, 0.0f);
 
 	//skill card zone
 	SetS3DVertex(vSkillZone[0][0][0], 0.0f, 1.4f, -0.8f, 2.6f, 0, 1, 0, 0, 0, 0);
