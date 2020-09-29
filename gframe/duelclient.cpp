@@ -4102,9 +4102,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 				ClientCard* pcard = *cit;
 				if(!mainGame->dInfo.compat_mode) {
 					pcard->code = BufferIO::Read<uint32_t>(pbuf);
-					/*uint32_t position =*/BufferIO::Read<uint32_t>(pbuf);
+					pcard->position = BufferIO::Read<uint32_t>(pbuf);
 				} else {
-					pcard->code = BufferIO::Read<uint32_t>(pbuf) & 0x7fffffff;
+					const auto flag = BufferIO::Read<uint32_t>(pbuf);
+					pcard->code = flag & 0x7fffffff;
+					pcard->position = flag & 0x80000000 ? POS_FACEUP : POS_FACEDOWN;
 				}
 				pcard->UpdateDrawCoordinates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
@@ -4115,9 +4117,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 				ClientCard* pcard = *cit;
 				if(!mainGame->dInfo.compat_mode) {
 					pcard->code = BufferIO::Read<uint32_t>(pbuf);
-					/*uint32_t position =*/BufferIO::Read<uint32_t>(pbuf);
+					pcard->position = BufferIO::Read<uint32_t>(pbuf);
 				} else {
-					pcard->code = BufferIO::Read<uint32_t>(pbuf) & 0x7fffffff;
+					const auto flag = BufferIO::Read<uint32_t>(pbuf);
+					pcard->code = flag & 0x7fffffff;
+					pcard->position = flag & 0x80000000 ? POS_FACEUP : POS_FACEDOWN;
 				}
 				pcard->UpdateDrawCoordinates();
 				if(player == 0) pcard->curPos.Y += 2.0f;
