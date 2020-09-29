@@ -420,7 +420,7 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		}
 		case MSG_SELECT_BATTLECMD:
 		case MSG_SELECT_IDLECMD: {
-			record_last = true;
+			record = false;
 			SinglePlayRefresh();
 			if(!ANALYZE) {
 				singleSignal.Reset();
