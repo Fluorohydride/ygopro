@@ -3924,7 +3924,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			pcard->desc_hints[value]++;
 		} else if(chtype == CHINT_DESC_REMOVE) {
 			pcard->desc_hints[value]--;
-			if(pcard->desc_hints[value] == 0)
+			if(pcard->desc_hints[value] <= 0)
 				pcard->desc_hints.erase(value);
 		} else {
 			pcard->cHint = chtype;
@@ -3956,7 +3956,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			player_desc_hints[value]++;
 		} else if(chtype == PHINT_DESC_REMOVE) {
 			player_desc_hints[value]--;
-			if(player_desc_hints[value] == 0)
+			if(player_desc_hints[value] <= 0)
 				player_desc_hints.erase(value);
 		}
 		return true;
