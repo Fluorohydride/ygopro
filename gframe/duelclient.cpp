@@ -3331,12 +3331,12 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		for(uint32_t i = 0; i < count; ++i) {
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - i);
 			const auto code = BufferIO::Read<uint32_t>(pbuf);
-			if(!mainGame->dField.deck_reversed || code) {
-				if(!mainGame->dInfo.compat_mode) {
-					/*uint32_t position = BufferIO::Read<uint32_t>(pbuf);*/
+			if(!mainGame->dInfo.compat_mode) {
+				/*uint32_t position =*/BufferIO::Read<uint32_t>(pbuf);
+				if(!mainGame->dField.deck_reversed || code)
 					pcard->SetCode(code);
-				} else
-					pcard->SetCode(code & 0x7fffffff);
+			} else if(!mainGame->dField.deck_reversed || code) {
+				pcard->SetCode(code & 0x7fffffff);
 			}
 		}
 		for(uint32_t i = 0; i < count; ++i) {
