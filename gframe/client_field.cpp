@@ -29,6 +29,7 @@ ClientField::ClientField() {
 	conti_act = false;
 	deck_reversed = false;
 	conti_selecting = false;
+	cant_check_grave = false;
 	for(int p = 0; p < 2; ++p) {
 		mzone[p].resize(7, 0);
 		szone[p].resize(8, 0);
@@ -93,6 +94,7 @@ void ClientField::Clear() {
 	pzone_act[1] = false;
 	conti_act = false;
 	deck_reversed = false;
+	cant_check_grave = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
 	ClientCard* pcard;
@@ -384,6 +386,18 @@ void ClientField::ClearChainSelect() {
 }
 // needs to be synchronized with EGET_SCROLL_BAR_CHANGED
 void ClientField::ShowSelectCard(bool buttonok, bool chain) {
+	if(cant_check_grave) {
+		bool has_card_in_grave = false;
+		for(size_t i = 0; i < selectable_cards.size(); ++i) {
+			if(selectable_cards[i]->location == LOCATION_GRAVE) {
+				has_card_in_grave = true;
+				break;
+			}
+		}
+		if(has_card_in_grave) {
+			std::random_shuffle(selectable_cards.begin(), selectable_cards.end());
+		}
+	}
 	int startpos;
 	size_t ct;
 	if(selectable_cards.size() <= 5) {
@@ -410,6 +424,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 			wchar_t formatBuffer[2048];
 			if(conti_selecting)
 				myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+			else if(cant_check_grave && selectable_cards[i]->location == LOCATION_GRAVE)
+				myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i]->location, 0));
 			else if(selectable_cards[i]->location == LOCATION_OVERLAY)
 				myswprintf(formatBuffer, L"%ls[%d](%d)", 
 					dataManager.FormatLocation(selectable_cards[i]->overlayTarget->location, selectable_cards[i]->overlayTarget->sequence),

@@ -3625,7 +3625,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int chtype = BufferIO::ReadInt8(pbuf);
 		int value = BufferIO::ReadInt32(pbuf);
 		auto& player_desc_hints = mainGame->dField.player_desc_hints[player];
-		if(chtype == PHINT_DESC_ADD) {
+		if(value == CARD_QUESTION && player == 0) {
+			if(chtype == PHINT_DESC_ADD) {
+				mainGame->dField.cant_check_grave = true;
+			} else if(chtype == PHINT_DESC_REMOVE) {
+				mainGame->dField.cant_check_grave = false;
+			}
+		}
+		else if(chtype == PHINT_DESC_ADD) {
 			player_desc_hints[value]++;
 		} else if(chtype == PHINT_DESC_REMOVE) {
 			player_desc_hints[value]--;

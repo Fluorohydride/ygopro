@@ -81,6 +81,7 @@ public:
 	bool last_chain;
 	bool deck_reversed;
 	bool conti_selecting;
+	bool cant_check_grave;
 
 	ClientField();
 	void Clear();
@@ -150,5 +151,6 @@ public:
 //special cards
 #define CARD_MARINE_DOLPHIN	78734254
 #define CARD_TWINKLE_MOSS	13857930
+#define CARD_QUESTION		38723936
 
 #endif //CLIENT_FIELD_H

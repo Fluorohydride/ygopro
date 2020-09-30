@@ -889,6 +889,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						if(conti_selecting)
 							myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+						else if(cant_check_grave && selectable_cards[i]->location == LOCATION_GRAVE)
+							myswprintf(formatBuffer, L"%ls", dataManager.FormatLocation(selectable_cards[i]->location, 0));
 						else if(selectable_cards[i + pos]->location == LOCATION_OVERLAY)
 							myswprintf(formatBuffer, L"%ls[%d](%d)",
 								dataManager.FormatLocation(selectable_cards[i + pos]->overlayTarget->location, selectable_cards[i + pos]->overlayTarget->sequence),
@@ -1189,6 +1191,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_GRAVE: {
 					if(grave[hovered_controler].size() == 0)
 						break;
+					if(cant_check_grave)
+						break;
 					ShowMenu(COMMAND_LIST, x, y);
 					break;
 				}
@@ -1238,6 +1242,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case LOCATION_GRAVE: {
 					int command_flag = 0;
 					if(grave[hovered_controler].size() == 0)
+						break;
+					if(cant_check_grave)
 						break;
 					for(size_t i = 0; i < grave[hovered_controler].size(); ++i)
 						command_flag |= grave[hovered_controler][i]->cmdFlag;
@@ -1731,6 +1737,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				display_cards.clear();
 				switch(event.KeyInput.Key) {
 					case irr::KEY_F1:
+						if(cant_check_grave)
+							break;
 						loc_id = 1004;
 						for(auto it = grave[0].rbegin(); it != grave[0].rend(); ++it)
 							display_cards.push_back(*it);
@@ -1755,6 +1763,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 						break;
 					case irr::KEY_F5:
+						if(cant_check_grave)
+							break;
 						loc_id = 1004;
 						for(auto it = grave[1].rbegin(); it != grave[1].rend(); ++it)
 							display_cards.push_back(*it);
