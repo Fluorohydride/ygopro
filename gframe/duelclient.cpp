@@ -3396,7 +3396,6 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->WaitFrameSignal(30);
 			mainGame->lpframe = 10;
 			mainGame->WaitFrameSignal(11);
-			mainGame->gMutex.lock();
 			mainGame->lpcstring = L"";
 		}
 		LockIf();
