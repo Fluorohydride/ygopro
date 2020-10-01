@@ -233,10 +233,10 @@ uint32_t DeckManager::LoadDeck(Deck& deck, uint32_t* dbuf, uint32_t mainc, uint3
 		memcpy(vec, dbuf, count * sizeof(uint32_t));
 		dbuf += count;
 	};
-	copy(&mainvect[0], mainc);
-	copy(&sidevect[0], sidec);
-	copy(&mainvect[mainc], mainc2);
-	copy(&sidevect[sidec], sidec2);
+	copy(mainvect.data(), mainc);
+	copy(sidevect.data(), sidec);
+	copy(mainvect.data() + mainc, mainc2);
+	copy(sidevect.data() + sidec, sidec2);
 	return LoadDeck(deck, mainvect, sidevect);
 }
 uint32_t DeckManager::LoadDeck(Deck& deck, cardlist_type mainlist, cardlist_type sidelist) {
