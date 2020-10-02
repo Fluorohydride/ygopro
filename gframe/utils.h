@@ -62,6 +62,7 @@ namespace ygo {
 				return reader;
 			}
 		};
+		static void SetThreadName(epro_stringview name);
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
 		static path_string working_dir;
