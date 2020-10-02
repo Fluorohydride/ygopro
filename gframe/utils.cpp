@@ -15,6 +15,7 @@ using Dirent = struct dirent;
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
 #include <mach-o/dyld.h>
+#include <CoreServices/CoreServices.h>
 #endif
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
@@ -323,9 +324,9 @@ namespace ygo {
 			return buff;
 #elif defined(__APPLE__)
 			CFStringRef uti;
-			if(CFURLCopyResourcePropertyForKey(bundleUrl, kCFURLTypeIdentifierKey, &uti, NULL) &&
+			CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+			if(CFURLCopyResourcePropertyForKey(bundle_url, kCFURLTypeIdentifierKey, &uti, NULL) &&
 			   uti && UTTypeConformsTo(uti, kUTTypeApplicationBundle)) { //program is launched as a bundle
-				CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
 				CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
 				CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
 				CFRelease(bundle_url);
@@ -350,7 +351,7 @@ namespace ygo {
 				};
 				char buff[PATH_MAX];
 				uint32_t bufsize = PATH_MAX;
-				if(_NSGetExecutablePath(buf, &bufsize) == 0)
+				if(_NSGetExecutablePath(buff, &bufsize) == 0)
 					return FindRootFolder(buff);
 				return "./";
 			}
