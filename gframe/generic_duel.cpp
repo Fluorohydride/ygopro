@@ -297,7 +297,7 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 			NetServer::SendPacketToPlayer(nullptr, STOC_HS_PLAYER_CHANGE, scpc);
 			ResendToAll();
 		} else {
-			if(duel_stage == DUEL_STAGE_SIDING || seeking_rematch) {
+			if(duel_stage == DUEL_STAGE_SIDING) {
 				NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_START);
 				IteratePlayers([](duelist& dueler) {
 					if(!dueler.ready)
