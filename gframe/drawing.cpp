@@ -783,7 +783,10 @@ void Game::DrawGUI() {
 							for(int i = 0; i < 5; ++i)
 								btnCardDisplay[i]->setDrawImage(true);
 						}
+						const auto prevfocused = env->getFocus();
 						env->setFocus(fu.guiFading);
+						if(prevfocused && (prevfocused->getType() == irr::gui::EGUIET_EDIT_BOX))
+							env->setFocus(prevfocused);
 					} else
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				}
@@ -1136,7 +1139,10 @@ void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 	element->getParent()->bringToFront(element);
 	if(!is_building)
 		dField.panel = element;
+	const auto prevfocused = env->getFocus();
 	env->setFocus(element);
+	if(prevfocused && (prevfocused->getType() == irr::gui::EGUIET_EDIT_BOX))
+		env->setFocus(prevfocused);
 	if(!hideframe)
 		ShowElement(element);
 	else ShowElement(element, hideframe);
