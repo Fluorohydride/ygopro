@@ -14,6 +14,7 @@ using Dirent = struct dirent;
 #endif
 #ifdef __APPLE__
 #import <CoreFoundation/CoreFoundation.h>
+#include <mach-o/dyld.h>
 #endif
 #ifdef __ANDROID__
 #include "Android/porting_android.h"
@@ -321,21 +322,38 @@ namespace ygo {
 				buff[len] = '\0';
 			return buff;
 #elif defined(__APPLE__)
-			CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-			CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
-			CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
-			CFRelease(bundle_url);
-			CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
-			CFRelease(bundle_base_url);
-			/*
-			#ifdef MAC_OS_DISCORD_LAUNCHER
-				system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
-			#endif
-			*/
-			path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
-			CFRelease(path);
-			CFRelease(bundle_path);
-			return res;
+			CFStringRef uti;
+			if(CFURLCopyResourcePropertyForKey(bundleUrl, kCFURLTypeIdentifierKey, &uti, NULL) &&
+			   uti && UTTypeConformsTo(uti, kUTTypeApplicationBundle)) { //program is launched as a bundle
+				CFURLRef bundle_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+				CFStringRef bundle_path = CFURLCopyFileSystemPath(bundle_url, kCFURLPOSIXPathStyle);
+				CFURLRef bundle_base_url = CFURLCreateCopyDeletingLastPathComponent(NULL, bundle_url);
+				CFRelease(bundle_url);
+				CFStringRef path = CFURLCopyFileSystemPath(bundle_base_url, kCFURLPOSIXPathStyle);
+				CFRelease(bundle_base_url);
+				/*
+				#ifdef MAC_OS_DISCORD_LAUNCHER
+					system(fmt::format("open {}/Contents/MacOS/discord-launcher.app --args random", CFStringGetCStringPtr(bundle_path, kCFStringEncodingUTF8)).c_str());
+				#endif
+				*/
+				path_string res = CFStringGetCStringPtr(path, kCFStringEncodingUTF8);
+				CFRelease(path);
+				CFRelease(bundle_path);
+				return res;
+			} else { //program is launched standalone
+				auto FindRootFolder = [](const std::string& path)->std::string {//check if it's a binary launched from an app bundle
+					auto pos = path.find(".app/");
+					if(pos != std::string::npos) {
+						return GetFilePath(path.substr(0, pos + 4));
+					}
+					return path;
+				};
+				char buff[PATH_MAX];
+				uint32_t bufsize = PATH_MAX;
+				if(_NSGetExecutablePath(buf, &bufsize) == 0)
+					return FindRootFolder(buff);
+				return "./";
+			}
 #else
 			return EPRO_TEXT("");
 #endif
