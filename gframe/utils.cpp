@@ -6,6 +6,7 @@
 #include <Windows.h>
 #include <shellapi.h> // ShellExecute
 #else
+#define _GNU_SOURCE
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
