@@ -2252,7 +2252,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			mainGame->dField.selectsum_all.push_back(pcard);
 		}
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
-		std::wstring text = fmt::format(L"{}({)", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode), mainGame->dField.select_sumval);
+		std::wstring text = fmt::format(L"{}({})", gDataManager->GetDesc(select_hint ? select_hint : 560, mainGame->dInfo.compat_mode), mainGame->dField.select_sumval);
 		select_hint = 0;
 		mainGame->wCardSelect->setText(text.data());
 		mainGame->stHintMsg->setText(text.data());
