@@ -62,7 +62,12 @@ namespace ygo {
 				return reader;
 			}
 		};
-		static void SetThreadName(epro_stringview name);
+		template<std::size_t N>
+		static constexpr void SetThreadName(char const (&s)[N]) {
+			static_assert(N <= 16, "Thread name on posix can't be more than 16 bytes!");
+			InternalSetThreadName(s);
+		}
+		
 		static std::vector<SynchronizedIrrArchive> archives;
 		static irr::io::IFileSystem* filesystem;
 		static path_string working_dir;
@@ -132,6 +137,9 @@ namespace ygo {
 		};
 
 		static void SystemOpen(path_stringview url, OpenType type = OPEN_URL);
+
+	private:
+		static void InternalSetThreadName(const char* name);
 	};
 
 #define CHAR_T typename T::value_type

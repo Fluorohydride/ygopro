@@ -64,13 +64,13 @@ namespace ygo {
 	irr::io::IFileSystem* Utils::filesystem;
 	path_string Utils::working_dir;
 
-	void Utils::SetThreadName(epro_stringview name) {
+	void Utils::InternalSetThreadName(const char* name) {
 #ifdef _WIN32
-		WindowsWeirdStuff::NameThread(name.data());
+		WindowsWeirdStuff::NameThread(name);
 #elif defined(__linux__)
-		pthread_setname_np(pthread_self(), name.data());
+		pthread_setname_np(pthread_self(), name);
 #elif defined(__APPLE__)
-		pthread_setname_np(name.data());
+		pthread_setname_np(name);
 #endif
 	}
 
