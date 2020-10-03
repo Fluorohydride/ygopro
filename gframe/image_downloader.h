@@ -50,8 +50,6 @@ private:
 	std::vector<downloadParam> downloading;
 	std::pair<std::atomic<int>, std::atomic<int>> sizes[3];
 	std::mutex pic_download;
-	std::mutex field_download;
-	std::mutex mtx;
 	std::condition_variable cv;
 	std::atomic<bool> stop_threads;
 	std::vector<PicSource> pic_urls;

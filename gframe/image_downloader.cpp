@@ -68,22 +68,19 @@ void ImageDownloader::DownloadPic() {
 	path_string name;// = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
 	path_string ext;
 	while(!stop_threads) {
-		if(to_download.size() == 0) {
-			std::unique_lock<std::mutex> lck(mtx);
+		std::unique_lock<std::mutex> lck(pic_download);
+		while(to_download.size() == 0) {
+			if(stop_threads)
+				return;
 			cv.wait(lck);
 		}
-		pic_download.lock();
-		if(to_download.size() == 0) {
-			pic_download.unlock();
-			continue;
-		}
-		auto file = to_download.front();
+		auto file = std::move(to_download.front());
 		to_download.pop();
 		auto type = file.type;
 		auto code = file.code;
 		downloading_images[type][file.code].status = DOWNLOADING;
 		downloading.push_back(std::move(file));
-		pic_download.unlock();
+		lck.unlock();
 		name = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
 		if(type == THUMB)
 			type = ART;
@@ -145,25 +142,23 @@ void ImageDownloader::DownloadPic() {
 				}
 			}
 		}
-		pic_download.lock();
+		lck.lock();
 		if(ext.size()) {
 			map[code].status = DOWNLOADED;
 			map[code].path = dest_folder + ext;
 		} else
 			map[code].status = DOWNLOAD_ERROR;
-		pic_download.unlock();
 	}
 }
 void ImageDownloader::AddToDownloadQueue(uint32_t code, imgType type) {
 	if(type == THUMB)
 		type = ART;
 	int index = static_cast<int>(type);
-	pic_download.lock();
+	std::lock_guard<std::mutex> lck(pic_download);
 	if(downloading_images[index].find(code) == downloading_images[index].end()) {
 		downloading_images[index][code].status = DOWNLOADING;
 		to_download.push(downloadParam{ code, type, NONE, EPRO_TEXT("") });
 	}
-	pic_download.unlock();
 	cv.notify_one();
 }
 ImageDownloader::downloadStatus ImageDownloader::GetDownloadStatus(uint32_t code, imgType type) {
