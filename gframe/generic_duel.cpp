@@ -413,7 +413,7 @@ void GenericDuel::PlayerKick(DuelPlayer* dp, uint8_t pos) {
 	auto& dueler = GetAtPos(pos);
 	if(dp != host_player || dueler == dp || !dueler)
 		return;
-	LeaveGame(dp);
+	LeaveGame(dueler);
 }
 void GenericDuel::UpdateDeck(DuelPlayer* dp, void* pdata, uint32_t len) {
 	if(dp->type >= (players.home_size + players.opposing_size))
