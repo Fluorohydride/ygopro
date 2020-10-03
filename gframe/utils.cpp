@@ -68,9 +68,9 @@ namespace ygo {
 #ifdef _WIN32
 		WindowsWeirdStuff::NameThread(name.data());
 #elif defined(__linux__)
-		ppthread_setname_np(pthread_self(), name.data());
+		pthread_setname_np(pthread_self(), name.data());
 #elif defined(__APPLE__)
-		ppthread_setname_np(name.data());
+		pthread_setname_np(name.data());
 #endif
 	}
 
