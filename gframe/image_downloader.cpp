@@ -64,6 +64,7 @@ const path_char* GetExtension(char* header) {
 	return EPRO_TEXT("");
 }
 void ImageDownloader::DownloadPic() {
+	Utils::SetThreadName("PicDownloader");
 	path_string dest_folder;// = fmt::format(EPRO_TEXT("./pics/{}"), code);
 	path_string name;// = fmt::format(EPRO_TEXT("./pics/temp/{}"), code);
 	path_string ext;

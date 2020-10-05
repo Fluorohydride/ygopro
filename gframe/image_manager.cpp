@@ -209,6 +209,7 @@ void ImageManager::RefreshCachedTextures() {
 	StartLoad(loading_pics[3], tCovers, 1, COVER);
 }
 void ImageManager::ClearFutureObjects(loading_map* map1, loading_map* map2, loading_map* map3, loading_map* map4) {
+	Utils::SetThreadName("ImgObjsClear");
 	for(auto& map : { &map1, &map2, &map3 }) {
 		if(*map) {
 			for(auto it = (*map)->begin(); it != (*map)->end();) {

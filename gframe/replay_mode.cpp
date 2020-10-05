@@ -70,6 +70,7 @@ void ReplayMode::Pause(bool is_pause, bool is_step) {
 	}
 }
 int ReplayMode::ReplayThread() {
+	Utils::SetThreadName("ReplayMode");
 	mainGame->dInfo.isReplay = true;
 	const ReplayHeader& rh = cur_replay.pheader;
 	mainGame->dInfo.isFirst = true;

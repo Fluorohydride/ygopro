@@ -54,6 +54,7 @@ void SingleMode::SetResponse(void* resp, uint32_t len) {
 	OCG_DuelSetResponse(pduel, resp, len);
 }
 int SingleMode::SinglePlayThread(DuelOptions duelOptions) {
+	Utils::SetThreadName("SinglePlay");
 	uint32_t opt = duelOptions.duelFlags;
 	std::string script_name = "";
 	auto InitReplay = [&]() {

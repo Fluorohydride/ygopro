@@ -146,6 +146,7 @@ void ServerLobby::FillOnlineRooms() {
 	mainGame->roomListTable->setActiveColumn(mainGame->roomListTable->getActiveColumn(), true);
 }
 int ServerLobby::GetRoomsThread() {
+	Utils::SetThreadName("RoomlistFetch");
 	auto selected = mainGame->serverChoice->getSelected();
 	if (selected < 0) return 0;
 	ServerInfo serverInfo = serversVector[selected];

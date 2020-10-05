@@ -14,6 +14,7 @@ namespace ygo {
 		return result;
 	}
 	int ReplayMode::OldReplayThread() {
+		Utils::SetThreadName("OldReplay");
 		mainGame->dInfo.isReplay = true;
 		mainGame->dInfo.isOldReplay = true;
 		if(!cur_yrp) {
@@ -178,8 +179,6 @@ namespace ygo {
 		return true;
 	}
 
-#define DATA (char*)(packet.data.data() + sizeof(uint8_t))
-
 	bool ReplayMode::ReplayAnalyze(CoreUtils::Packet packet) {
 		if(packet.message == MSG_SELECT_BATTLECMD || packet.message == MSG_SELECT_IDLECMD || packet.message == MSG_SELECT_CHAIN)
 			ReplayRefresh();
@@ -210,7 +209,7 @@ namespace ygo {
 		}
 		if(!ReplayAnalyze(ReplayPacket((char*)packet.data.data(), (int)(packet.data.size() - sizeof(uint8_t)))))
 			return false;
-		char* pbuf = DATA;
+		char* pbuf = (char*)(packet.data.data() + sizeof(uint8_t));
 		int player;
 		switch(mainGame->dInfo.curMsg) {
 			case MSG_SHUFFLE_DECK: {

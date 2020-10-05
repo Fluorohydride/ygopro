@@ -218,6 +218,7 @@ bool ClientUpdater::StartUpdate(update_callback callback, void* payload, const p
 }
 #ifdef UPDATE_URL
 void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callback) {
+	Utils::SetThreadName("Unzip");
 #if defined(_WIN32) || (defined(__linux__) && !defined(__ANDROID__))
 	auto path = ygo::Utils::GetExePath();
 	ygo::Utils::FileMove(path, fmt::format(EPRO_TEXT("{}.old"), path));
@@ -243,6 +244,7 @@ void ClientUpdater::Unzip(path_string src, void* payload, unzip_callback callbac
 }
 
 void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_callback callback) {
+	Utils::SetThreadName("Updater");
 	downloading = true;
 	Payload cbpayload{};
 	cbpayload.callback = callback;
@@ -297,6 +299,7 @@ void ClientUpdater::DownloadUpdate(path_string dest_path, void* payload, update_
 }
 
 void ClientUpdater::CheckUpdate() {
+	Utils::SetThreadName("CheckUpdate");
 	WritePayload payload{};
 	std::vector<char> retrieved_data;
 	payload.outbuffer = &retrieved_data;

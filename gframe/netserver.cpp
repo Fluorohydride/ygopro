@@ -148,6 +148,7 @@ void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 	}
 }
 int NetServer::ServerThread() {
+	Utils::SetThreadName("GameServer");
 	event_base_dispatch(net_evbase);
 	for(auto bit = users.begin(); bit != users.end(); ++bit) {
 		bufferevent_disable(bit->first, EV_READ);
