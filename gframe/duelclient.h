@@ -6,6 +6,8 @@
 #include <deque>
 #include <set>
 #include <atomic>
+#include <thread>
+#include <mutex>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
