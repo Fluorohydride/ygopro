@@ -23,7 +23,7 @@ public:
 		val.wait(_Lck);
 	}
 	void SetNoWait(bool nowait) {
-		if(_nowait = nowait)
+		if((_nowait = nowait) == true)
 			Set();
 	}
 private:
