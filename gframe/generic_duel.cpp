@@ -272,14 +272,24 @@ void GenericDuel::JoinGame(DuelPlayer* dp, CTOS_JoinGame* pkt, bool is_creater) 
 	}
 }
 void GenericDuel::LeaveGame(DuelPlayer* dp) {
-	if(dp == host_player) {
-		EndDuel();
-		event_del(etimer);
-		NetServer::StopServer();
-	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
-		observers.erase(dp);
+	auto HostLeft = [this, &dp]()->bool {
+		if(dp == host_player) {
+			EndDuel();
+			if(duel_stage != DUEL_STAGE_BEGIN || seeking_rematch) {
+				NetServer::SendPacketToPlayer(nullptr, STOC_DUEL_END);
+				ResendToAll();
+			}
+			event_del(etimer);
+			NetServer::StopServer();
+			return true;
+		}
+		return false;
+	};
+	if(dp->type >= (players.home_size + players.opposing_size)) {
+		if(HostLeft())
+			return;
 		NetServer::DisconnectPlayer(dp);
-		if(duel_stage == DUEL_STAGE_BEGIN) {
+		if(observers.erase(dp)) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = (uint16_t)observers.size();
 			NetServer::SendPacketToPlayer(nullptr, STOC_HS_WATCH_CHANGE, scwc);
@@ -288,9 +298,9 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 	} else {
 		auto type = dp->type;
 		NetServer::DisconnectPlayer(dp);
-		if(dp->type >= (players.home_size + players.opposing_size))
-			return;
 		if(duel_stage == DUEL_STAGE_BEGIN && !seeking_rematch) {
+			if(HostLeft())
+				return;
 			STOC_HS_PlayerChange scpc;
 			GetAtPos(type).Clear();
 			scpc.status = (type << 4) | PLAYERCHANGE_LEAVE;
@@ -320,6 +330,7 @@ void GenericDuel::LeaveGame(DuelPlayer* dp) {
 				ResendToAll();
 				event_del(etimer);
 			}
+			NetServer::StopServer();
 		}
 	}
 }
@@ -537,6 +548,7 @@ void GenericDuel::RematchResult(DuelPlayer* dp, uint8_t rematch) {
 			ResendToAll();
 			duel_stage = DUEL_STAGE_END;
 			event_del(etimer);
+			NetServer::StopServer();
 			return;
 		}
 		dp->state = 0xff;
@@ -805,7 +817,7 @@ void GenericDuel::Surrender(DuelPlayer* dp) {
 }
 #define DATA (char*)(packet.data.data() + sizeof(uint8_t))
 #define TO_SEND_BUFFER (char*)packet.data.data(), packet.data.size()
-#define SEND(to) NetServer::SendBufferToPlayer(to, STOC_GAME_MSG, TO_SEND_BUFFER);
+#define SEND(to) NetServer::SendBufferToPlayer(to, STOC_GAME_MSG, TO_SEND_BUFFER)
 void GenericDuel::BeforeParsing(CoreUtils::Packet& packet, int& return_value, bool& record, bool& record_last) {
 	char* pbuf = DATA;
 	switch(packet.message) {

@@ -45,6 +45,11 @@ randengine DuelClient::rnd;
 ReplayStream DuelClient::replay_stream;
 Replay DuelClient::last_replay;
 bool DuelClient::is_swapping = false;
+std::atomic<bool> DuelClient::stop_threads{ true };
+std::deque<std::vector<uint8_t>> DuelClient::to_analyze;
+std::mutex DuelClient::to_analyze_mutex;
+std::thread DuelClient::parsing_thread;
+std::condition_variable DuelClient::cv;
 
 bool DuelClient::is_refreshing = false;
 int DuelClient::match_kill = 0;
@@ -123,11 +128,13 @@ bool DuelClient::StartClient(uint32_t ip, uint16_t port, uint32_t gameid, bool c
 	mainGame->dInfo.secret.server_address = ip;
 	mainGame->dInfo.isCatchingUp = false;
 	mainGame->dInfo.checkRematch = false;
+	stop_threads = false;
+	parsing_thread = std::thread(DuelClient::ParserThread);
 	std::thread(ClientThread).detach();
 	return true;
 }
 void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
-	if(connect_state == 0x7)
+	if(connect_state & 0x7)
 		return;
 	if(!is_closing && !exit_on_return) {
 		temp_ver = 0;
@@ -148,10 +155,13 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 	event_base_loopbreak(client_base);
 }
 void DuelClient::StopClient(bool is_exiting) {
-	if(connect_state != 0x7)
+	if((connect_state & 0x7) == 0)
 		return;
 	is_closing = is_exiting || exit_on_return;
+	to_analyze_mutex.lock();
+	to_analyze.clear();
 	event_base_loopbreak(client_base);
+	to_analyze_mutex.unlock();
 #if !defined(_WIN32) && !defined(__ANDROID__)
 	for(auto& pid : mainGame->gBot.windbotsPids) {
 		kill(pid, SIGKILL);
@@ -179,6 +189,9 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 		len = evbuffer_get_length(input);
 	}
 }
+
+#define INTERNAL_HANDLE_CONNECTION_END 0
+
 void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
 		bool create_game = (size_t)ctx != 0;
@@ -186,7 +199,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		BufferIO::CopyWStr(mainGame->ebNickName->getText(), cspi.name, 20);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
 		if(create_game) {
-#define TOI(what,from, def) try { what = std::stoi(from);  }\
+#define TOI(what, from, def) try { what = std::stoi(from);  }\
 catch(...) { what = def; }
 			CTOS_CreateGame cscg;
 			mainGame->dInfo.secret.game_id = 0;
@@ -235,102 +248,200 @@ catch(...) { what = def; }
 		connect_state |= 0x2;
 	} else if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		bufferevent_disable(bev, EV_READ);
-		if(!is_closing) {
-			mainGame->dInfo.isInLobby = false;
-			if(connect_state == 0x1) {
-				temp_ver = 0;
-				mainGame->gMutex.lock();
-				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-				mainGame->btnJoinHost->setEnabled(true);
-				mainGame->btnJoinCancel->setEnabled(true);
-				if(mainGame->isHostingOnline) {
-					if(!mainGame->wCreateHost->isVisible() && !mainGame->wRoomListPlaceholder->isVisible())
-						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
-				} else {
-					if(!mainGame->wLanWindow->isVisible())
-						mainGame->ShowElement(mainGame->wLanWindow);
-				}
-				mainGame->PopupMessage(gDataManager->GetSysString(1400));
-				mainGame->gMutex.unlock();
-				if(exit_on_return)
-					mainGame->device->closeDevice();
-			} else {
-				if(!mainGame->dInfo.isInDuel && !mainGame->is_building) {
-					mainGame->gMutex.lock();
-					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-					mainGame->btnJoinHost->setEnabled(true);
-					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->HideElement(mainGame->wCreateHost);
-					mainGame->HideElement(mainGame->wHostPrepare);
-					mainGame->HideElement(mainGame->wHostPrepareL);
-					mainGame->HideElement(mainGame->wHostPrepareR);
-					mainGame->HideElement(mainGame->gBot.window);
-					if(mainGame->isHostingOnline) {
-						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
-					} else {
-						mainGame->ShowElement(mainGame->wLanWindow);
-					}
-					mainGame->wChat->setVisible(false);
-					if(events & BEV_EVENT_EOF)
-						mainGame->PopupMessage(gDataManager->GetSysString(1401));
-					else mainGame->PopupMessage(gDataManager->GetSysString(1402));
-					mainGame->gMutex.unlock();
-				} else {
-					gSoundManager->StopSounds();
-					if(mainGame->dInfo.isStarted) {
-						ReplayPrompt(true);
-					}
-					std::unique_lock<std::mutex> lock(mainGame->gMutex);
-					mainGame->PopupMessage(gDataManager->GetSysString(1502));
-					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-					mainGame->btnJoinHost->setEnabled(true);
-					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->stTip->setVisible(false);
-					mainGame->stHintMsg->setVisible(false);
-					mainGame->closeDuelWindow = true;
-					mainGame->closeDoneSignal.Wait(lock);
-					mainGame->dInfo.checkRematch = false;
-					mainGame->dInfo.isInDuel = false;
-					mainGame->dInfo.isStarted = false;
-					mainGame->dField.Clear();
-					mainGame->is_building = false;
-					mainGame->device->setEventReceiver(&mainGame->menuHandler);
-					if(mainGame->isHostingOnline) {
-						mainGame->ShowElement(mainGame->wRoomListPlaceholder);
-					} else {
-						mainGame->ShowElement(mainGame->wLanWindow);
-					}
-					mainGame->SetMessageWindow();
-				}
-			}
+		if((connect_state & 0x100) == 0 && !is_closing) {
+			std::vector<uint8_t> tmp;
+			tmp.resize(2);
+			tmp[0] = INTERNAL_HANDLE_CONNECTION_END;
+			tmp[1] = (events & BEV_EVENT_ERROR) == 0;
+			to_analyze_mutex.lock();
+			to_analyze.push_back(std::move(tmp));
+			to_analyze_mutex.unlock();
 		}
 		event_base_loopexit(client_base, 0);
 	}
 }
+
 int DuelClient::ClientThread() {
+	Utils::SetThreadName("ClientThread");
 	event_base_dispatch(client_base);
 	bufferevent_free(client_bev);
 	event_base_free(client_base);
 	client_bev = 0;
 	client_base = 0;
 	connect_state = 0;
+	to_analyze_mutex.lock();
+	stop_threads = true;
+	cv.notify_all();
+	to_analyze_mutex.unlock();
+	parsing_thread.join();
+	event_base_loopbreak(client_base);
 	return 0;
 }
+
 template<typename T>
 T getStruct(void* data, size_t len) {
 	T pkt{};
 	memcpy(&pkt, data, std::min<size_t>(sizeof(T), len));
 	return pkt;
 }
+
+void DuelClient::ParserThread() {
+	Utils::SetThreadName("ParserThread");
+	while(true) {
+		std::unique_lock<std::mutex> lck(to_analyze_mutex);
+		while(to_analyze.size() == 0) {
+			if(stop_threads)
+				return;
+			cv.wait(lck);
+		}
+		auto pkt = std::move(to_analyze.front());
+		to_analyze.pop_front();
+		lck.unlock();
+		HandleSTOCPacketLan2((char*)pkt.data(), pkt.size());
+	}
+}
+
 void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
+	uint8_t pktType = static_cast<uint8_t>(data[0]);
+	if(pktType == STOC_DUEL_END)
+		connect_state |= 0x100;
+	if(pktType != STOC_CHAT) {
+		std::vector<uint8_t> tmpvec{};
+		tmpvec.resize(len);
+		memcpy(tmpvec.data(), data, len);
+		to_analyze_mutex.lock();
+		to_analyze.emplace_back(std::move(tmpvec));
+		to_analyze_mutex.unlock();
+		cv.notify_one();
+		return;
+	}
+	if(mainGame->dInfo.isCatchingUp)
+		return;
+	char* pdata = data + 1;
+	switch(pktType) {
+		case STOC_CHAT: {
+			auto pkt = getStruct<STOC_Chat>(pdata, len);
+			int player = pkt.player;
+			int type = -1;
+			if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
+				int team1 = mainGame->dInfo.team1;
+				int team2 = mainGame->dInfo.team2;
+				if((mainGame->dInfo.isTeam1 && !mainGame->dInfo.isFirst) ||
+					(!mainGame->dInfo.isTeam1 && mainGame->dInfo.isFirst)) {
+					std::swap(team1, team2);
+				}
+				if(player >= team1) {
+					player -= team1;
+					type = 1;
+				} else {
+					type = 0;
+				}
+				if((!mainGame->dInfo.isFirst && mainGame->dInfo.isTeam1) ||
+					(mainGame->dInfo.isFirst && !mainGame->dInfo.isTeam1))
+					type = 1 - type;
+				if(((type == 1 && mainGame->dInfo.isTeam1) || (type == 0 && !mainGame->dInfo.isTeam1)) && mainGame->tabSettings.chkIgnoreOpponents->isChecked())
+					return;
+			} else {
+				type = 2;
+				if(player == 8) { //system custom message.
+					if(mainGame->tabSettings.chkIgnoreOpponents->isChecked())
+						return;
+				} else if(player < 11 || player > 19) {
+					if(mainGame->tabSettings.chkIgnoreSpectators->isChecked())
+						return;
+					player = 10;
+				}
+			}
+			wchar_t msg[256];
+			BufferIO::CopyWStr(pkt.msg, msg, 256);
+			mainGame->gMutex.lock();
+			mainGame->AddChatMsg(msg, player, type);
+			mainGame->gMutex.unlock();
+			break;
+		}
+	}
+}
+
+
+void DuelClient::HandleSTOCPacketLan2(char* data, uint32_t len) {
 	char* pdata = data;
 	uint8_t pktType = BufferIO::Read<uint8_t>(pdata);
 	switch(pktType) {
-	case STOC_GAME_MSG: {
-		if(mainGame->analyzeMutex.try_lock()){
-			ClientAnalyze(pdata, len - 1);
-			mainGame->analyzeMutex.unlock();
+	case INTERNAL_HANDLE_CONNECTION_END: {
+		bool iseof = !!BufferIO::Read<uint8_t>(pdata);
+		mainGame->dInfo.isInLobby = false;
+		if(connect_state & 0x1) {
+			temp_ver = 0;
+			mainGame->gMutex.lock();
+			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+			mainGame->btnJoinHost->setEnabled(true);
+			mainGame->btnJoinCancel->setEnabled(true);
+			if(mainGame->isHostingOnline) {
+				if(!mainGame->wCreateHost->isVisible() && !mainGame->wRoomListPlaceholder->isVisible())
+					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+			} else {
+				if(!mainGame->wLanWindow->isVisible())
+					mainGame->ShowElement(mainGame->wLanWindow);
+			}
+			mainGame->PopupMessage(gDataManager->GetSysString(1400));
+			mainGame->gMutex.unlock();
+			if(exit_on_return)
+				mainGame->device->closeDevice();
+		} else {
+			if(!mainGame->dInfo.isInDuel && !mainGame->is_building) {
+				mainGame->gMutex.lock();
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->HideElement(mainGame->wCreateHost);
+				mainGame->HideElement(mainGame->wHostPrepare);
+				mainGame->HideElement(mainGame->wHostPrepareL);
+				mainGame->HideElement(mainGame->wHostPrepareR);
+				mainGame->HideElement(mainGame->gBot.window);
+				if(mainGame->isHostingOnline) {
+					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				} else {
+					mainGame->ShowElement(mainGame->wLanWindow);
+				}
+				mainGame->wChat->setVisible(false);
+				if(iseof)
+					mainGame->PopupMessage(gDataManager->GetSysString(1401));
+				else mainGame->PopupMessage(gDataManager->GetSysString(1402));
+				mainGame->gMutex.unlock();
+			} else {
+				gSoundManager->StopSounds();
+				if(mainGame->dInfo.isStarted) {
+					ReplayPrompt(true);
+				}
+				std::unique_lock<std::mutex> lock(mainGame->gMutex);
+				mainGame->PopupMessage(gDataManager->GetSysString(1502));
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->stTip->setVisible(false);
+				mainGame->stHintMsg->setVisible(false);
+				mainGame->closeDuelWindow = true;
+				mainGame->closeDoneSignal.Wait(lock);
+				mainGame->dInfo.checkRematch = false;
+				mainGame->dInfo.isInDuel = false;
+				mainGame->dInfo.isStarted = false;
+				mainGame->dField.Clear();
+				mainGame->is_building = false;
+				mainGame->device->setEventReceiver(&mainGame->menuHandler);
+				if(mainGame->isHostingOnline) {
+					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				} else {
+					mainGame->ShowElement(mainGame->wLanWindow);
+				}
+				mainGame->SetMessageWindow();
+			}
 		}
+		break;
+	}
+	case STOC_GAME_MSG: {
+		mainGame->analyzeMutex.lock();
+		ClientAnalyze(pdata, len - 1);
+		mainGame->analyzeMutex.unlock();
 		break;
 	}
 	case STOC_ERROR_MSG: {
@@ -361,6 +472,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 			if(stringid < 1406)
 				mainGame->PopupMessage(gDataManager->GetSysString(stringid));
 			mainGame->gMutex.unlock();
+			connect_state |= 0x100;
 			event_base_loopbreak(client_base);
 			break;
 		}
@@ -451,6 +563,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 		}
 		case ERROR_TYPE::VERERROR:
 		case ERROR_TYPE::VERERROR2: {
+			connect_state |= 0x100;
 			if(temp_ver || (_pkt.type == ERROR_TYPE::VERERROR2)) {
 				temp_ver = 0;
 				mainGame->gMutex.lock();
@@ -902,48 +1015,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 			DuelClient::SendPacketToServer(CTOS_TIME_CONFIRM);
 		mainGame->dInfo.time_player = lplayer;
 		mainGame->dInfo.time_left[lplayer] = pkt.left_time;
-		break;
-	}
-	case STOC_CHAT: {
-		if(mainGame->dInfo.isCatchingUp && !mainGame->dInfo.isReplay)
-			break;
-		auto pkt = getStruct<STOC_Chat>(pdata, len);
-		int player = pkt.player;
-		int type = -1;
-		if(player < mainGame->dInfo.team1 + mainGame->dInfo.team2) {
-			int team1 = mainGame->dInfo.team1;
-			int team2 = mainGame->dInfo.team2;
-			if((mainGame->dInfo.isTeam1 && !mainGame->dInfo.isFirst) ||
-				(!mainGame->dInfo.isTeam1 && mainGame->dInfo.isFirst)) {
-				std::swap(team1, team2);
-			}
-			if(player >= team1) {
-				player -= team1;
-				type = 1;
-			} else {
-				type = 0;
-			}
-			if((!mainGame->dInfo.isFirst && mainGame->dInfo.isTeam1) ||
-				(mainGame->dInfo.isFirst && !mainGame->dInfo.isTeam1))
-				type = 1 - type;
-			if(((type == 1 && mainGame->dInfo.isTeam1) || (type == 0 && !mainGame->dInfo.isTeam1)) && mainGame->tabSettings.chkIgnoreOpponents->isChecked())
-				break;
-		} else {
-			type = 2;
-			if(player == 8) { //system custom message.
-				if(mainGame->tabSettings.chkIgnoreOpponents->isChecked())
-					break;
-			} else if(player < 11 || player > 19) {
-				if(mainGame->tabSettings.chkIgnoreSpectators->isChecked())
-					break;
-				player = 10;
-			}
-		}
-		wchar_t msg[256];
-		BufferIO::CopyWStr(pkt.msg, msg, 256);
-		mainGame->gMutex.lock();
-		mainGame->AddChatMsg(msg, player, type);
-		mainGame->gMutex.unlock();
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {
@@ -4233,6 +4304,7 @@ void DuelClient::BeginRefreshHost() {
 	}
 }
 int DuelClient::RefreshThread(event_base* broadev) {
+	Utils::SetThreadName("RefreshThread");
 	event_base_dispatch(broadev);
 	evutil_socket_t fd;
 	event_get_assignment(resp_event, 0, &fd, 0, 0, 0);

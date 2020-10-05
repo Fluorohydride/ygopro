@@ -3,7 +3,9 @@
 
 #include "config.h"
 #include <vector>
+#include <deque>
 #include <set>
+#include <atomic>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -32,6 +34,11 @@ private:
 	static uint64_t select_hint;
 	static std::wstring event_string;
 	static bool is_swapping;
+	static std::atomic<bool> stop_threads;
+	static std::deque<std::vector<uint8_t>> to_analyze;
+	static std::mutex to_analyze_mutex;
+	static std::thread parsing_thread;
+	static std::condition_variable cv;
 public:
 	static randengine rnd;
 	static uint32_t temp_ip;
@@ -49,6 +56,8 @@ public:
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread();
 	static void HandleSTOCPacketLan(char* data, uint32_t len);
+	static void HandleSTOCPacketLan2(char* data, uint32_t len);
+	static void ParserThread();
 	static bool CheckReady();
 	static std::pair<uint32_t, uint32_t> GetPlayersCount();
 	static ReplayStream replay_stream;
@@ -65,6 +74,8 @@ public:
 	static void SetResponseB(void* respB, uint32_t len);
 	static void SendResponse();
 	static void SendPacketToServer(uint8_t proto) {
+		if(!client_bev)
+			return;
 		duel_client_write.clear();
 		BufferIO::insert_value<uint16_t>(duel_client_write, 1);
 		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
@@ -72,6 +83,8 @@ public:
 	}
 	template<typename ST>
 	static void SendPacketToServer(uint8_t proto, ST& st) {
+		if(!client_bev)
+			return;
 		duel_client_write.clear();
 		BufferIO::insert_value<uint16_t>(duel_client_write, 1 + sizeof(ST));
 		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
@@ -79,6 +92,8 @@ public:
 		bufferevent_write(client_bev, duel_client_write.data(), duel_client_write.size());
 	}
 	static void SendBufferToServer(uint8_t proto, void* buffer, size_t len) {
+		if(!client_bev)
+			return;
 		duel_client_write.clear();
 		BufferIO::insert_value<uint16_t>(duel_client_write, (uint16_t)(1 + len));
 		BufferIO::insert_value<uint8_t>(duel_client_write, proto);
