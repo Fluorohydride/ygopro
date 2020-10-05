@@ -1736,13 +1736,13 @@ bool Game::MainLoop() {
 		if(cardimagetextureloading) {
 			ShowCardInfo(showingcard);
 		}
-		gMutex.unlock();
 		if(signalFrame > 0) {
 			uint32_t movetime = std::min(delta_time, signalFrame);
 			signalFrame -= movetime;
 			if(!signalFrame)
 				frameSignal.Set();
 		}
+		gMutex.unlock();
 		if(waitFrame >= 0.0f) {
 			waitFrame += (float)delta_time * 60.0f / 1000.0f;;
 			if((int)std::round(waitFrame) % 90 == 0) {
@@ -1754,17 +1754,15 @@ bool Game::MainLoop() {
 			}
 		}
 		driver->endScene();
-		if(!closeSignal.try_lock())
+		if(closeDuelWindow)
 			CloseDuelWindow();
-		else
-			closeSignal.unlock();
 		if (DuelClient::try_needed) {
 			DuelClient::try_needed = false;
 			DuelClient::StartClient(DuelClient::temp_ip, DuelClient::temp_port, dInfo.secret.game_id, false);
 		}
 		popupCheck.lock();
-		if(queued_msg.size()){
-			env->addMessageBox(queued_caption.data(),queued_msg.data());
+		if(queued_msg.size()) {
+			env->addMessageBox(queued_caption.data(), queued_msg.data());
 			queued_msg.clear();
 			queued_caption.clear();
 		}
@@ -2462,6 +2460,7 @@ void Game::CloseDuelWindow() {
 	stTip->setText(L"");
 	cardimagetextureloading = false;
 	showingcard = 0;
+	closeDuelWindow = false;
 	closeDoneSignal.Set();
 }
 void Game::PopupMessage(epro_wstringview text, epro_wstringview caption) {

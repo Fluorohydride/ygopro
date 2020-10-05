@@ -146,33 +146,25 @@ void ReplayMode::EndDuel() {
 		pduel = nullptr;
 	}
 	if(!is_closing) {
-		mainGame->actionSignal.Reset();
-		mainGame->gMutex.lock();
+		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->stMessage->setText(gDataManager->GetSysString(1501).data());
 		if(mainGame->wCardSelect->isVisible())
 			mainGame->HideElement(mainGame->wCardSelect);
 		mainGame->PopupElement(mainGame->wMessage);
-		mainGame->gMutex.unlock();
-		mainGame->actionSignal.Wait();
-		mainGame->gMutex.lock();
+		mainGame->actionSignal.Wait(lock);
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isReplay = false;
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->dInfo.isHandTest = false;
 		mainGame->dInfo.isOldReplay = false;
-		mainGame->gMutex.unlock();
-		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.lock();
-		mainGame->closeDoneSignal.Wait();
-		mainGame->closeSignal.unlock();
-		mainGame->gMutex.lock();
+		mainGame->closeDuelWindow = true;
+		mainGame->closeDoneSignal.Wait(lock);
 		mainGame->ShowElement(mainGame->wReplay);
 		mainGame->SetMessageWindow();
 		mainGame->stTip->setVisible(false);
 		gSoundManager->StopSounds();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->gMutex.unlock();
 		if(exit_on_return)
 			mainGame->device->closeDevice();
 	}
@@ -222,9 +214,8 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 		if(is_restarting)
 			return true;
 		if(is_swapping) {
-			mainGame->gMutex.lock();
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->dField.ReplaySwap();
-			mainGame->gMutex.unlock();
 			is_swapping = false;
 		}
 		bool pauseable = true;
@@ -236,12 +227,10 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.unlock();
 			}
-			mainGame->gMutex.lock();
+			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
+			mainGame->actionSignal.Wait(lock);
 			return false;
 		}
 		case MSG_WIN: {
@@ -323,8 +312,8 @@ bool ReplayMode::ReplayAnalyze(ReplayPacket p) {
 			}
 			if(is_pausing) {
 				is_paused = true;
-				mainGame->actionSignal.Reset();
-				mainGame->actionSignal.Wait();
+				std::unique_lock<std::mutex> lock(mainGame->gMutex);
+				mainGame->actionSignal.Wait(lock);
 				is_paused = false;
 			}
 		}

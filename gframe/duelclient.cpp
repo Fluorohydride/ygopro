@@ -280,19 +280,15 @@ catch(...) { what = def; }
 					if(mainGame->dInfo.isStarted) {
 						ReplayPrompt(true);
 					}
-					mainGame->gMutex.lock();
+					std::unique_lock<std::mutex> lock(mainGame->gMutex);
 					mainGame->PopupMessage(gDataManager->GetSysString(1502));
 					mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->stTip->setVisible(false);
 					mainGame->stHintMsg->setVisible(false);
-					mainGame->gMutex.unlock();
-					mainGame->closeDoneSignal.Reset();
-					mainGame->closeSignal.lock();
-					mainGame->closeDoneSignal.Wait();
-					mainGame->closeSignal.unlock();
-					mainGame->gMutex.lock();
+					mainGame->closeDuelWindow = true;
+					mainGame->closeDoneSignal.Wait(lock);
 					mainGame->dInfo.checkRematch = false;
 					mainGame->dInfo.isInDuel = false;
 					mainGame->dInfo.isStarted = false;
@@ -305,7 +301,6 @@ catch(...) { what = def; }
 						mainGame->ShowElement(mainGame->wLanWindow);
 					}
 					mainGame->SetMessageWindow();
-					mainGame->gMutex.unlock();
 				}
 			}
 		}
@@ -855,46 +850,42 @@ void DuelClient::HandleSTOCPacketLan(char* data, uint32_t len) {
 	}
 	case STOC_DUEL_END: {
 		gSoundManager->StopSounds();
-		mainGame->gMutex.lock();
-		if(mainGame->dInfo.player_type < 7)
-			mainGame->btnLeaveGame->setVisible(false);
-		mainGame->btnSpectatorSwap->setVisible(false);
-		mainGame->btnChainIgnore->setVisible(false);
-		mainGame->btnChainAlways->setVisible(false);
-		mainGame->btnChainWhenAvail->setVisible(false);
-		mainGame->stMessage->setText(gDataManager->GetSysString(1500).data());
-		mainGame->btnCancelOrFinish->setVisible(false);
-		if(mainGame->wQuery->isVisible())
-			mainGame->HideElement(mainGame->wQuery);
-		mainGame->PopupElement(mainGame->wMessage);
-		mainGame->gMutex.unlock();
-		mainGame->actionSignal.Reset();
-		mainGame->actionSignal.Wait();
-		mainGame->closeDoneSignal.Reset();
-		mainGame->closeSignal.lock();
-		mainGame->closeDoneSignal.Wait();
-		mainGame->closeSignal.unlock();
-		mainGame->gMutex.lock();
-		mainGame->dInfo.isInLobby = false;
-		mainGame->dInfo.checkRematch = false;
-		mainGame->dInfo.isInDuel = false;
-		mainGame->dInfo.isStarted = false;
-		mainGame->dField.Clear();
-		mainGame->is_building = false;
-		mainGame->is_siding = false;
-		mainGame->wDeckEdit->setVisible(false);
-		mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-		mainGame->btnJoinHost->setEnabled(true);
-		mainGame->btnJoinCancel->setEnabled(true);
-		mainGame->stTip->setVisible(false);
-		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		if(mainGame->isHostingOnline) {
-			mainGame->ShowElement(mainGame->wRoomListPlaceholder);
-		} else {
-			mainGame->ShowElement(mainGame->wLanWindow);
+		{
+			std::unique_lock<std::mutex> lock(mainGame->gMutex);
+			if(mainGame->dInfo.player_type < 7)
+				mainGame->btnLeaveGame->setVisible(false);
+			mainGame->btnSpectatorSwap->setVisible(false);
+			mainGame->btnChainIgnore->setVisible(false);
+			mainGame->btnChainAlways->setVisible(false);
+			mainGame->btnChainWhenAvail->setVisible(false);
+			mainGame->stMessage->setText(gDataManager->GetSysString(1500).data());
+			mainGame->btnCancelOrFinish->setVisible(false);
+			if(mainGame->wQuery->isVisible())
+				mainGame->HideElement(mainGame->wQuery);
+			mainGame->PopupElement(mainGame->wMessage);
+			mainGame->actionSignal.Wait(lock);
+			mainGame->closeDuelWindow = true;
+			mainGame->closeDoneSignal.Wait(lock);
+			mainGame->dInfo.isInLobby = false;
+			mainGame->dInfo.checkRematch = false;
+			mainGame->dInfo.isInDuel = false;
+			mainGame->dInfo.isStarted = false;
+			mainGame->dField.Clear();
+			mainGame->is_building = false;
+			mainGame->is_siding = false;
+			mainGame->wDeckEdit->setVisible(false);
+			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+			mainGame->btnJoinHost->setEnabled(true);
+			mainGame->btnJoinCancel->setEnabled(true);
+			mainGame->stTip->setVisible(false);
+			mainGame->device->setEventReceiver(&mainGame->menuHandler);
+			if(mainGame->isHostingOnline) {
+				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+			} else {
+				mainGame->ShowElement(mainGame->wLanWindow);
+			}
+			mainGame->SetMessageWindow();
 		}
-		mainGame->SetMessageWindow();
-		mainGame->gMutex.unlock();
 		event_base_loopbreak(client_base);
 		if(exit_on_return)
 			mainGame->device->closeDevice();
@@ -1150,45 +1141,42 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
 		if(!mainGame->dInfo.compat_mode) {
-			mainGame->gMutex.lock();
+			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
+			mainGame->actionSignal.Wait(lock);
 			return true;
 		} else {
 			gSoundManager->StopSounds();
-			mainGame->gMutex.lock();
-			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
-			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
-			mainGame->closeDoneSignal.Reset();
-			mainGame->closeSignal.lock();
-			mainGame->closeDoneSignal.Wait();
-			mainGame->closeSignal.unlock();
-			ReplayPrompt(true);
-			mainGame->gMutex.lock();
-			mainGame->dField.Clear();
-			mainGame->dInfo.isInLobby = false;
-			mainGame->dInfo.isInDuel = false;
-			mainGame->dInfo.checkRematch = false;
-			mainGame->dInfo.isStarted = false;
-			mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
-			mainGame->btnJoinHost->setEnabled(true);
-			mainGame->btnJoinCancel->setEnabled(true);
-			mainGame->stTip->setVisible(false);
-			gSoundManager->StopSounds();
-			mainGame->device->setEventReceiver(&mainGame->menuHandler);
-			if(mainGame->isHostingOnline) {
-				mainGame->ShowElement(mainGame->wRoomListPlaceholder);
-			} else {
-				mainGame->ShowElement(mainGame->wLanWindow);
+			{
+				std::unique_lock<std::mutex> lock(mainGame->gMutex);
+				mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
+				mainGame->PopupElement(mainGame->wMessage);
+				mainGame->actionSignal.Wait(lock);
+				mainGame->closeDuelWindow = true;
+				mainGame->closeDoneSignal.Wait(lock);
+				lock.unlock();
+				ReplayPrompt(true);
+				lock.lock();
+				mainGame->dField.Clear();
+				mainGame->dInfo.isInLobby = false;
+				mainGame->dInfo.isInDuel = false;
+				mainGame->dInfo.checkRematch = false;
+				mainGame->dInfo.isStarted = false;
+				mainGame->btnCreateHost->setEnabled(mainGame->coreloaded);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->stTip->setVisible(false);
+				gSoundManager->StopSounds();
+				mainGame->device->setEventReceiver(&mainGame->menuHandler);
+				if(mainGame->isHostingOnline) {
+					mainGame->ShowElement(mainGame->wRoomListPlaceholder);
+				} else {
+					mainGame->ShowElement(mainGame->wLanWindow);
+				}
+				mainGame->SetMessageWindow();
 			}
-			mainGame->SetMessageWindow();
-			mainGame->gMutex.unlock();
+			connect_state |= 0x100;
 			event_base_loopbreak(client_base);
 			if(exit_on_return)
 				mainGame->device->closeDevice();
@@ -1207,12 +1195,10 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			break;
 		}
 		case HINT_MESSAGE: {
-			mainGame->gMutex.lock();
+			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->stMessage->setText(gDataManager->GetDesc(data, mainGame->dInfo.compat_mode).data());
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
+			mainGame->actionSignal.Wait(lock);
 			break;
 		}
 		case HINT_SELECTMSG: {
@@ -2463,13 +2449,11 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		}
 		if (panel_confirm.size()) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
-			mainGame->gMutex.lock();
+			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->dField.selectable_cards = panel_confirm;
 			mainGame->wCardSelect->setText(fmt::sprintf(gDataManager->GetSysString(208), panel_confirm.size()).data());
 			mainGame->dField.ShowSelectCard(true);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
+			mainGame->actionSignal.Wait(lock);
 		}
 		return true;
 	}
@@ -4333,7 +4317,7 @@ void DuelClient::ReplayPrompt(bool local_stream) {
 		last_replay.EndRecord();
 	}
 	replay_stream.clear();
-	mainGame->gMutex.lock();
+	std::unique_lock<std::mutex> lock(mainGame->gMutex);
 	mainGame->wPhase->setVisible(false);
 	if(mainGame->dInfo.player_type < 7)
 		mainGame->btnLeaveGame->setVisible(false);
@@ -4345,9 +4329,7 @@ void DuelClient::ReplayPrompt(bool local_stream) {
 	mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).data());
 	mainGame->wReplaySave->setText(gDataManager->GetSysString(1340).data());
 	mainGame->PopupElement(mainGame->wReplaySave);
-	mainGame->gMutex.unlock();
-	mainGame->replaySignal.Reset();
-	mainGame->replaySignal.Wait();
+	mainGame->replaySignal.Wait(lock);
 	if(mainGame->saveReplay || !is_local_host) {
 		if(mainGame->saveReplay)
 			last_replay.SaveReplay(Utils::ToPathString(mainGame->ebRSName->getText()));

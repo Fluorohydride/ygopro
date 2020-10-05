@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <list>
+#include <atomic>
 #include "settings_window.h"
 #include "config.h"
 #include "common.h"
@@ -230,7 +231,7 @@ public:
 	Signal frameSignal;
 	Signal actionSignal;
 	Signal replaySignal;
-	std::mutex closeSignal;
+	std::atomic<bool> closeDuelWindow{ false };
 	Signal closeDoneSignal;
 	DuelInfo dInfo;
 	DiscordWrapper discord;

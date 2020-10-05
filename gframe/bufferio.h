@@ -60,7 +60,7 @@ public:
 		return l;
 	}
 	// UTF-16/UTF-32 to UTF-8
-	static int EncodeUTF8(const wchar_t * wsrc, char * str) {
+	static int EncodeUTF8(const wchar_t* wsrc, char* str) {
 		char* pstr = str;
 		while(*wsrc != 0) {
 			if(*wsrc < 0x80) {
@@ -99,7 +99,7 @@ public:
 		return str - pstr;
 	}
 	// UTF-8 to UTF-16/UTF-32
-	static int DecodeUTF8(const char* src, wchar_t * wstr) {
+	static int DecodeUTF8(const char* src, wchar_t* wstr) {
 		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {

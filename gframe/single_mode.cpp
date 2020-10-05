@@ -169,20 +169,16 @@ restart:
 		open_file = false;
 		last_replay.EndRecord();
 		new_replay.EndRecord();
+		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		if(is_restarting) {
-			mainGame->gMutex.lock();
 			mainGame->dInfo.isInDuel = false;
 			mainGame->dInfo.isStarted = false;
 			mainGame->dInfo.isSingleMode = false;
 			mainGame->dInfo.isHandTest = false;
-			mainGame->gMutex.unlock();
 			if(!hand_test) {
-				mainGame->closeDoneSignal.Reset();
-				mainGame->closeSignal.lock();
-				mainGame->closeDoneSignal.Wait();
-				mainGame->closeSignal.unlock();
+				mainGame->closeDuelWindow = true;
+				mainGame->closeDoneSignal.Wait(lock);
 			}
-			mainGame->gMutex.lock();
 			mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
 			if(!hand_test) {
 				mainGame->ShowElement(mainGame->wSinglePlay);
@@ -190,11 +186,7 @@ restart:
 			}
 			mainGame->SetMessageWindow();
 			mainGame->device->setEventReceiver(&mainGame->menuHandler);
-			mainGame->gMutex.unlock();
-			if(exit_on_return)
-				mainGame->device->closeDevice();
 			if(hand_test) {
-				mainGame->gMutex.lock();
 				mainGame->btnChainIgnore->setVisible(false);
 				mainGame->btnChainAlways->setVisible(false);
 				mainGame->btnChainWhenAvail->setVisible(false);
@@ -204,13 +196,11 @@ restart:
 				mainGame->btnRestartSingle->setVisible(false);
 				mainGame->wPhase->setVisible(false);
 				mainGame->deckBuilder.Initialize(false);
-				mainGame->gMutex.unlock();
 			}
-		} else {
-			mainGame->gMutex.lock();
+			if(exit_on_return)
+				mainGame->device->closeDevice();
+		} else
 			mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
-			mainGame->gMutex.unlock();
-		}
 		is_restarting = false;
 		return 0;
 	}
@@ -278,13 +268,11 @@ restart:
 	bool was_restarting = is_restarting;
 	if(saveReplay && !was_restarting) {
 		auto now = std::time(nullptr);
-		mainGame->gMutex.lock();
+		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->ebRSName->setText(fmt::format(L"{:%Y-%m-%d %H-%M-%S}", *std::localtime(&now)).data());
 		mainGame->wReplaySave->setText(gDataManager->GetSysString(1340).data());
 		mainGame->PopupElement(mainGame->wReplaySave);
-		mainGame->gMutex.unlock();
-		mainGame->replaySignal.Reset();
-		mainGame->replaySignal.Wait();
+		mainGame->replaySignal.Wait(lock);
 		if(mainGame->saveReplay)
 			new_replay.SaveReplay(Utils::ToPathString(mainGame->ebRSName->getText()));
 	}
@@ -295,7 +283,7 @@ restart:
 	mainGame->gMutex.unlock();
 	if(!is_closing) {
 		if(was_restarting || hand_test) {
-			mainGame->gMutex.lock();
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			for(auto wit = mainGame->fadingList.begin(); wit != mainGame->fadingList.end(); ++wit) {
 				if(wit->isFadein)
 					wit->autoFadeoutFrame = 1;
@@ -313,23 +301,18 @@ restart:
 			mainGame->wPosSelect->setVisible(false);
 			mainGame->wQuery->setVisible(false);
 			mainGame->stHintMsg->setVisible(false);
-			mainGame->gMutex.unlock();
 			if(was_restarting)
 				goto restart;
 		}
-		mainGame->gMutex.lock();
+		std::unique_lock<std::mutex> lock(mainGame->gMutex);
 		mainGame->dInfo.isInDuel = false;
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
 		mainGame->dInfo.isHandTest = false;
-		mainGame->gMutex.unlock();
 		if(!hand_test) {
-			mainGame->closeDoneSignal.Reset();
-			mainGame->closeSignal.lock();
-			mainGame->closeDoneSignal.Wait();
-			mainGame->closeSignal.unlock();
+			mainGame->closeDuelWindow = true;
+			mainGame->closeDoneSignal.Wait(lock);
 		}
-		mainGame->gMutex.lock();
 		mainGame->btnLeaveGame->setRelativePosition(mainGame->Resize(205, 5, 295, 80));
 		if(!hand_test) {
 			mainGame->ShowElement(mainGame->wSinglePlay);
@@ -337,11 +320,7 @@ restart:
 		}
 		mainGame->SetMessageWindow();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->gMutex.unlock();
-		if(exit_on_return)
-			mainGame->device->closeDevice();
 		if(hand_test) {
-			mainGame->gMutex.lock();
 			mainGame->btnChainIgnore->setVisible(false);
 			mainGame->btnChainAlways->setVisible(false);
 			mainGame->btnChainWhenAvail->setVisible(false);
@@ -351,17 +330,21 @@ restart:
 			mainGame->btnRestartSingle->setVisible(false);
 			mainGame->wPhase->setVisible(false);
 			mainGame->deckBuilder.Initialize(false);
-			mainGame->gMutex.unlock();
 		}
+		if(exit_on_return)
+			mainGame->device->closeDevice();
 	}
 	open_file = false;
 	return 0;
 }
 
-#define ANALYZE DuelClient::ClientAnalyze((char*)packet.data.data(), packet.data.size())
-#define DATA (char*)(packet.data.data() + sizeof(uint8_t))
-
 bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
+	auto Analyze = [&packet]()->bool {
+		return DuelClient::ClientAnalyze((char*)packet.data.data(), packet.data.size());
+	};
+	auto Data = [&packet]()->char* {
+		return (char*)(packet.data.data() + sizeof(uint8_t));
+	};
 	int player;
 	replay_stream.clear();
 	if(is_closing || !is_continuing)
@@ -371,27 +354,25 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 	bool record_last = false;
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_RETRY:	{
-			mainGame->gMutex.lock();
+			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->stMessage->setText(gDataManager->GetSysString(1434).data());
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
+			mainGame->actionSignal.Wait(lock);
 			return false;
 		}
 		case MSG_HINT: {
-			char* pbuf = DATA;
+			char* pbuf = Data();
 			int type = BufferIO::Read<uint8_t>(pbuf);
 			int player = BufferIO::Read<uint8_t>(pbuf);
 			/*uint64_t data = BufferIO::Read<uint64_t>(pbuf);*/
 			if(player == 0 || type >= HINT_SKILL)
-				ANALYZE;
+				Analyze();
 			if(type > 0 && type < 6 && type != 4)
 				record = false;
 			break;
 		}
 		case MSG_AI_NAME: {
-			char* pbuf = DATA;
+			char* pbuf = Data();
 			int len = BufferIO::Read<uint16_t>(pbuf);
 			char* begin = pbuf;
 			pbuf += len + 1;
@@ -404,28 +385,24 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		case MSG_SHOW_HINT: {
 			char msgbuf[1024];
 			wchar_t msg[1024];
-			char* pbuf = DATA;
+			char* pbuf = Data();
 			int len = BufferIO::Read<uint16_t>(pbuf);
 			char* begin = pbuf;
 			pbuf += len + 1;
 			memcpy(msgbuf, begin, len + 1);
 			BufferIO::DecodeUTF8(msgbuf, msg);
-			mainGame->gMutex.lock();
+			std::unique_lock<std::mutex> lock(mainGame->gMutex);
 			mainGame->stMessage->setText(msg);
 			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->gMutex.unlock();
-			mainGame->actionSignal.Reset();
-			mainGame->actionSignal.Wait();
+			mainGame->actionSignal.Wait(lock);
 			break;
 		}
 		case MSG_SELECT_BATTLECMD:
 		case MSG_SELECT_IDLECMD: {
 			record = false;
 			SinglePlayRefresh();
-			if(!ANALYZE) {
-				singleSignal.Reset();
+			if(!Analyze())
 				singleSignal.Wait();
-			}
 			break;
 		}
 		case MSG_SELECT_EFFECTYN:
@@ -455,18 +432,16 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 				SinglePlayRefresh(1, LOCATION_SZONE);
 				record_last = true;
 			}
-			if(!ANALYZE) {
-				singleSignal.Reset();
+			if(!Analyze())
 				singleSignal.Wait();
-			}
 			break;
 		}
 		default: {
-			ANALYZE;
+			Analyze();
 			break;
 		}
 	}
-	char* pbuf = DATA;
+	char* pbuf = Data();
 	switch(mainGame->dInfo.curMsg) {
 		case MSG_SHUFFLE_DECK: {
 			player = BufferIO::Read<uint8_t>(pbuf);
@@ -516,9 +491,8 @@ bool SingleMode::SinglePlayAnalyze(CoreUtils::Packet packet) {
 		}
 		case MSG_RELOAD_FIELD: {
 			SinglePlayReload();
-			mainGame->gMutex.lock();
+			std::lock_guard<std::mutex> lock(mainGame->gMutex);
 			mainGame->dField.RefreshAllCards();
-			mainGame->gMutex.unlock();
 			break;
 		}
 	}
