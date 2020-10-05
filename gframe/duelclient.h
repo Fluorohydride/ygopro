@@ -8,6 +8,7 @@
 #include <atomic>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
