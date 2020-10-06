@@ -498,7 +498,7 @@ namespace ygo {
 		ShellExecute(NULL, EPRO_TEXT("open"), (type == OPEN_FILE) ? fmt::format(EPRO_TEXT("{}/{}"), working_dir, url).data() : url.data(), NULL, NULL, SW_SHOWNORMAL);
 		// system("start URL") opens a shell
 #elif !defined(__ANDROID__)
-		auto pid = fork();
+		auto pid = vfork();
 		if(pid == 0) {
 #ifdef __APPLE__
 			execl("/usr/bin/open", "open", url.data(), NULL);
