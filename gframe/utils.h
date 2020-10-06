@@ -33,35 +33,42 @@ struct unzip_payload {
 using unzip_callback = std::function<void(unzip_payload* payload)>;
 
 namespace ygo {
+	// Irrlicht has only one handle open per archive, which does not support concurrency and is not thread-safe.
+	// Thus, we need to own a corresponding mutex that is also used for all files from this archive
+	class SynchronizedIrrArchive {
+	public:
+		std::unique_ptr<std::mutex> mutex;
+		irr::io::IFileArchive* archive;
+		SynchronizedIrrArchive(irr::io::IFileArchive* archive) : mutex(std::make_unique<std::mutex>()), archive(archive) {}
+	};
+	// Mutex should already be locked if not nullptr and takes ownership of the IReadFile if not nullptr
+	// In C++17, use std::optional, since we have either file exists or not found (both nullptr)
+	class MutexLockedIrrArchivedFile {
+	public:
+		std::mutex* mutex; // from SynchronizedIrrArchive
+		irr::io::IReadFile* reader;
+		MutexLockedIrrArchivedFile(std::mutex* mutex = nullptr, irr::io::IReadFile* reader = nullptr) noexcept : mutex(mutex), reader(reader) {}
+		MutexLockedIrrArchivedFile(const MutexLockedIrrArchivedFile& copyFrom) = delete;
+		MutexLockedIrrArchivedFile(MutexLockedIrrArchivedFile&& moveFrom) noexcept {
+			mutex = moveFrom.mutex;
+			reader = moveFrom.reader;
+			moveFrom.mutex = nullptr;
+			moveFrom.reader = nullptr;
+		}
+		MutexLockedIrrArchivedFile& operator= (MutexLockedIrrArchivedFile&& moveFrom) noexcept {
+			mutex = moveFrom.mutex;
+			reader = moveFrom.reader;
+			moveFrom.mutex = nullptr;
+			moveFrom.reader = nullptr;
+			return *this;
+		}
+		~MutexLockedIrrArchivedFile(); // drops reader if not nullptr, then unlocks mutex if not nullptr
+		operator bool() const {
+			return reader;
+		}
+	};
 	class Utils {
 	public:
-		// Irrlicht has only one handle open per archive, which does not support concurrency and is not thread-safe.
-		// Thus, we need to own a corresponding mutex that is also used for all files from this archive
-		class SynchronizedIrrArchive {
-		public:
-			std::unique_ptr<std::mutex> mutex;
-			irr::io::IFileArchive* archive;
-			SynchronizedIrrArchive(irr::io::IFileArchive* archive) : mutex(std::make_unique<std::mutex>()), archive(archive) {}
-		};
-		// Mutex should already be locked if not nullptr and takes ownership of the IReadFile if not nullptr
-		// In C++17, use std::optional, since we have either file exists or not found (both nullptr)
-		class MutexLockedIrrArchivedFile {
-		public:
-			std::mutex* mutex; // from SynchronizedIrrArchive
-			irr::io::IReadFile* reader;
-			MutexLockedIrrArchivedFile(std::mutex* mutex = nullptr, irr::io::IReadFile* reader = nullptr) noexcept : mutex(mutex), reader(reader) {}
-			MutexLockedIrrArchivedFile(const MutexLockedIrrArchivedFile& copyFrom) = delete;
-			MutexLockedIrrArchivedFile(MutexLockedIrrArchivedFile&& moveFrom) noexcept {
-				mutex = moveFrom.mutex;
-				reader = moveFrom.reader;
-				moveFrom.mutex = nullptr;
-				moveFrom.reader = nullptr;
-			}
-			~MutexLockedIrrArchivedFile(); // drops reader if not nullptr, then unlocks mutex if not nullptr
-			operator bool() const {
-				return reader;
-			}
-		};
 		template<std::size_t N>
 		static constexpr void SetThreadName(char const (&s)[N]) {
 			static_assert(N <= 16, "Thread name on posix can't be more than 16 bytes!");

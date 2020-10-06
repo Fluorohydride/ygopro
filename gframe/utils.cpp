@@ -62,7 +62,7 @@ void NameThread(const char* threadName, DWORD dwThreadID = ((DWORD)-1)) {
 #endif
 
 namespace ygo {
-	std::vector<Utils::SynchronizedIrrArchive> Utils::archives;
+	std::vector<SynchronizedIrrArchive> Utils::archives;
 	irr::io::IFileSystem* Utils::filesystem;
 	path_string Utils::working_dir;
 
@@ -277,7 +277,7 @@ namespace ygo {
 		}
 		return res;
 	}
-	Utils::MutexLockedIrrArchivedFile::~MutexLockedIrrArchivedFile() {
+	MutexLockedIrrArchivedFile::~MutexLockedIrrArchivedFile() {
 		if (reader) {
 			reader->drop();
 		}
@@ -285,7 +285,7 @@ namespace ygo {
 			mutex->unlock();
 		}
 	}
-	Utils::MutexLockedIrrArchivedFile Utils::FindFileInArchives(path_stringview path, path_stringview name) {
+	MutexLockedIrrArchivedFile Utils::FindFileInArchives(path_stringview path, path_stringview name) {
 		for(auto& archive : archives) {
 			archive.mutex->lock();
 			int res = -1;

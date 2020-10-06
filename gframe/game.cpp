@@ -3201,10 +3201,14 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	}
 	return BufferIO::DecodeUTF8s(res);
 }
-path_string Game::FindScript(path_stringview name) {
+path_string Game::FindScript(path_stringview name, MutexLockedIrrArchivedFile* retarchive) {
 	for(auto& path : script_dirs) {
-		if(path == EPRO_TEXT("archives") && Utils::FindFileInArchives(EPRO_TEXT("script/"), name)) {
-			return path;
+		if(path == EPRO_TEXT("archives")) {
+			if(auto tmp = Utils::FindFileInArchives(EPRO_TEXT("script/"), name)) {
+				if(retarchive)
+					*retarchive = std::move(tmp);
+				return path;
+			}
 		} else {
 			auto tmp = path + name.data();
 			if(Utils::FileExists(tmp))
@@ -3216,10 +3220,10 @@ path_string Game::FindScript(path_stringview name) {
 	return EPRO_TEXT("");
 }
 std::vector<char> Game::LoadScript(epro_stringview _name) {
-	std::vector<char> buffer;
-	std::ifstream script;
-	path_string name = Utils::ToPathString(_name);
-	for(auto& path : script_dirs) {
+	MutexLockedIrrArchivedFile tmp;
+	auto path = FindScript(Utils::ToPathString(_name), &tmp);
+	if(path.size()) {
+		std::vector<char> buffer;
 		if(path == EPRO_TEXT("archives")) {
 			if(tmp) {
 				buffer.resize(tmp.reader->getSize());
@@ -3227,18 +3231,14 @@ std::vector<char> Game::LoadScript(epro_stringview _name) {
 					return buffer;
 			}
 		} else {
-			script.open(path + name, std::ifstream::binary);
-			if(script.is_open())
-				break;
+			std::ifstream script(path, std::ifstream::binary);
+			if(script.is_open()) {
+				buffer.insert(buffer.begin(), std::istreambuf_iterator<char>(script), std::istreambuf_iterator<char>());
+				return buffer;
+			}
 		}
 	}
-	if(!script.is_open()) {
-		script.open(name, std::ifstream::binary);
-		if(!script.is_open())
-			return buffer;
-	}
-	buffer.insert(buffer.begin(), std::istreambuf_iterator<char>(script), std::istreambuf_iterator<char>());
-	return buffer;
+	return {};
 }
 bool Game::LoadScript(OCG_Duel pduel, epro_stringview script_name) {
 	auto buf = LoadScript(script_name);
