@@ -608,11 +608,11 @@ void ClientField::ShowLocationCard() {
 	mainGame->btnDisplayOK->setVisible(true);
 	mainGame->PopupElement(mainGame->wCardDisplay);
 }
-void ClientField::ShowSelectOption(uint64_t select_hint) {
+void ClientField::ShowSelectOption(uint64_t select_hint, bool should_lock) {
+	std::unique_lock<std::mutex> lock = (should_lock ? std::unique_lock<std::mutex>(mainGame->gMutex) : std::unique_lock<std::mutex>());
 	selected_option = 0;
 	int count = select_options.size();
 	bool quickmode = true;// (count <= 5);
-	mainGame->gMutex.lock();
 	for(auto option : select_options) {
 		if(mainGame->guiFont->getDimension(gDataManager->GetDesc(option, mainGame->dInfo.compat_mode).data()).Width > 310) {
 			quickmode = false;
@@ -655,7 +655,6 @@ void ClientField::ShowSelectOption(uint64_t select_hint) {
 	}
 	mainGame->wOptions->setText(gDataManager->GetDesc(select_hint ? select_hint : 555, mainGame->dInfo.compat_mode).data());
 	mainGame->PopupElement(mainGame->wOptions);
-	mainGame->gMutex.unlock();
 }
 void ClientField::ReplaySwap() {
 	auto reset = [](ClientCard* pcard)->void {

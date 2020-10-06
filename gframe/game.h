@@ -138,7 +138,7 @@ public:
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
 	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
-	void WaitFrameSignal(int frame);
+	void WaitFrameSignal(int frame, std::unique_lock<std::mutex>& _lck);
 	void DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, bool drag = false, const irr::core::recti* cliprect = nullptr, bool loadimage = true);
 	void DrawDeckBd();
 	void SaveConfig();
@@ -227,7 +227,6 @@ public:
 	static void UpdateUnzipBar(unzip_payload* payload);
 
 	std::mutex gMutex;
-	std::mutex analyzeMutex;
 	Signal frameSignal;
 	Signal actionSignal;
 	Signal replaySignal;

@@ -27,6 +27,8 @@ struct sqlite3_stmt;
 #define TYPE_SKILL       0x8000000
 #define TYPE_ACTION      0x10000000
 
+struct OCG_CardData;
+
 namespace ygo {
 
 struct CardData {
@@ -119,7 +121,7 @@ public:
 	std::unordered_map<uint32_t, CardDataM> cards;
 
 	static const wchar_t* unknown_string;
-	static void CardReader(void* payload, uint32_t code, CardData* data);
+	static void CardReader(void* payload, uint32_t code, OCG_CardData* data);
 	static bool deck_sort_lv(CardDataC* l1, CardDataC* l2);
 	static bool deck_sort_atk(CardDataC* l1, CardDataC* l2);
 	static bool deck_sort_def(CardDataC* l1, CardDataC* l2);

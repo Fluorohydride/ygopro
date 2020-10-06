@@ -1147,10 +1147,9 @@ void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 		ShowElement(element);
 	else ShowElement(element, hideframe);
 }
-void Game::WaitFrameSignal(int frame) {
-	std::unique_lock<std::mutex> lock(mainGame->gMutex);
+void Game::WaitFrameSignal(int frame, std::unique_lock<std::mutex>& _lck) {
 	signalFrame = (gGameConfig->quick_animation && frame >= 12) ? 12 * 1000 / 60 : frame * 1000 / 60;
-	frameSignal.Wait(lock);
+	frameSignal.Wait(_lck);
 }
 void Game::DrawThumb(CardDataC* cp, irr::core::position2di pos, LFList* lflist, bool drag, const irr::core::recti* cliprect, bool load_image) {
 	auto code = cp->code;

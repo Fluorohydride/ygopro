@@ -1511,7 +1511,7 @@ bool Game::MainLoop() {
 	bool last_resize = false;
 	irr::core::dimension2d<irr::u32> prev_window_size;
 #endif
-	irr::ITimer* timer = device->getTimer();
+	const irr::ITimer* timer = device->getTimer();
 	uint32_t cur_time = 0;
 	uint32_t prev_time = timer->getRealTime();
 	float frame_counter = 0.0f;
@@ -1742,7 +1742,6 @@ bool Game::MainLoop() {
 			if(!signalFrame)
 				frameSignal.Set();
 		}
-		gMutex.unlock();
 		if(waitFrame >= 0.0f) {
 			waitFrame += (float)delta_time * 60.0f / 1000.0f;;
 			if((int)std::round(waitFrame) % 90 == 0) {
@@ -1754,6 +1753,7 @@ bool Game::MainLoop() {
 			}
 		}
 		driver->endScene();
+		gMutex.unlock();
 		if(closeDuelWindow)
 			CloseDuelWindow();
 		if (DuelClient::try_needed) {
@@ -1782,20 +1782,18 @@ bool Game::MainLoop() {
 		if(!update_prompted && !(dInfo.isInDuel || dInfo.isInLobby || is_siding
 			|| wRoomListPlaceholder->isVisible() || wLanWindow->isVisible()
 			|| wCreateHost->isVisible() || wHostPrepare->isVisible()) && gClientUpdater->HasUpdate()) {
-			gMutex.lock();
+			std::lock_guard<std::mutex> lock(gMutex);
 			menuHandler.prev_operation = ACTION_UPDATE_PROMPT;
 			stQMessage->setText(fmt::format(L"{}\n{}", gDataManager->GetSysString(1460), gDataManager->GetSysString(1461)).data());
 			SetCentered(wQuery);
 			PopupElement(wQuery);
-			gMutex.unlock();
 			update_prompted = true;
 		} else if (show_changelog) {
-			gMutex.lock();
+			std::lock_guard<std::mutex> lock(gMutex);
 			menuHandler.prev_operation = ACTION_SHOW_CHANGELOG;
 			stQMessage->setText(gDataManager->GetSysString(1443).data());
 			SetCentered(wQuery);
 			PopupElement(wQuery);
-			gMutex.unlock();
 			show_changelog = false;
 		}
 		if(!unzip_started && gClientUpdater->UpdateDownloaded()) {
@@ -1836,9 +1834,7 @@ bool Game::MainLoop() {
 	discord.UpdatePresence(DiscordWrapper::TERMINATE);
 	replaySignal.SetNoWait(true);
 	frameSignal.SetNoWait(true);
-	analyzeMutex.lock();
 	DuelClient::StopClient(true);
-	analyzeMutex.unlock();
 	ClearTextures();
 	if(dInfo.isSingleMode)
 		SingleMode::StopPlay(true);
@@ -1924,7 +1920,7 @@ bool Game::ApplySkin(const path_string& skinname, bool reload, bool firstrun) {
 #include "custom_skin_enum.inl"
 #undef DECLR
 #undef CLR
-		imageManager.ChangeTextures(EPRO_TEXT("./skin/") + prev_skin + EPRO_TEXT("/textures/"));
+			imageManager.ChangeTextures(fmt::format(EPRO_TEXT("./skin/{}/textures/"), prev_skin));
 		} else {
 			applied = false;
 			auto skin = env->createSkin(irr::gui::EGST_WINDOWS_METALLIC);
@@ -3225,12 +3221,11 @@ std::vector<char> Game::LoadScript(epro_stringview _name) {
 	path_string name = Utils::ToPathString(_name);
 	for(auto& path : script_dirs) {
 		if(path == EPRO_TEXT("archives")) {
-			auto lockedIrrFile = Utils::FindFileInArchives(EPRO_TEXT("script/"), name);
-			if(!lockedIrrFile)
-				continue;
-			buffer.resize(lockedIrrFile.reader->getSize());
-			if (lockedIrrFile.reader->read(buffer.data(), buffer.size()) == buffer.size())
-				return buffer;
+			if(tmp) {
+				buffer.resize(tmp.reader->getSize());
+				if(tmp.reader->read(buffer.data(), buffer.size()) == buffer.size())
+					return buffer;
+			}
 		} else {
 			script.open(path + name, std::ifstream::binary);
 			if(script.is_open())
@@ -3250,11 +3245,11 @@ bool Game::LoadScript(OCG_Duel pduel, epro_stringview script_name) {
 	return buf.size() && OCG_LoadScript(pduel, buf.data(), buf.size(), script_name.data());
 }
 OCG_Duel Game::SetupDuel(OCG_DuelOptions opts) {
-	opts.cardReader = (OCG_DataReader)DataManager::CardReader;
+	opts.cardReader = DataManager::CardReader;
 	opts.payload1 = gDataManager;
-	opts.scriptReader = (OCG_ScriptReader)ScriptReader;
+	opts.scriptReader = ScriptReader;
 	opts.payload2 = this;
-	opts.logHandler = (OCG_LogHandler)MessageHandler;
+	opts.logHandler = MessageHandler;
 	opts.payload3 = this;
 	OCG_Duel pduel = nullptr;
 	OCG_CreateDuel(&pduel, opts);

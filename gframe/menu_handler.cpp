@@ -449,10 +449,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstReplayList->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.lock();
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
 				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->lstReplayList->getListItem(sel), gDataManager->GetSysString(1363)).data());
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				prev_sel = sel;
 				break;
@@ -461,11 +460,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->lstReplayList->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.lock();
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
 				mainGame->wReplaySave->setText(gDataManager->GetSysString(1362).data());
 				mainGame->ebRSName->setText(mainGame->lstReplayList->getListItem(sel));
 				mainGame->PopupElement(mainGame->wReplaySave);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				prev_sel = sel;
 				break;

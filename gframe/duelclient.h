@@ -39,6 +39,7 @@ private:
 	static bool is_swapping;
 	static std::atomic<bool> stop_threads;
 	static std::deque<std::vector<uint8_t>> to_analyze;
+	static std::mutex analyzeMutex;
 	static std::mutex to_analyze_mutex;
 	static std::thread parsing_thread;
 	static std::condition_variable cv;

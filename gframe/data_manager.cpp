@@ -494,7 +494,7 @@ std::wstring DataManager::FormatLinkMarker(uint32_t link_marker) {
 		res += L"[\u2198]";
 	return res;
 }
-void DataManager::CardReader(void* payload, uint32_t code, CardData* data) {
+void DataManager::CardReader(void* payload, uint32_t code, OCG_CardData* data) {
 	if(!static_cast<DataManager*>(payload)->GetData(code, (CardData*)data))
 		memset(data, 0, sizeof(CardData));
 }

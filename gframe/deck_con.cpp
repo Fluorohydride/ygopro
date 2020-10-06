@@ -256,10 +256,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int sel = mainGame->cbDBDecks->getSelected();
 				if(sel == -1)
 					break;
-				mainGame->gMutex.lock();
+				std::lock_guard<std::mutex> lock(mainGame->gMutex);
 				mainGame->stQMessage->setText(fmt::format(L"{}\n{}", mainGame->cbDBDecks->getItem(sel), gDataManager->GetSysString(1337)).data());
 				mainGame->PopupElement(mainGame->wQuery);
-				mainGame->gMutex.unlock();
 				prev_operation = id;
 				break;
 			}
