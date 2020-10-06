@@ -2005,7 +2005,8 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
 			if(mainGame->tabSettings.chkNoChainDelay->isChecked() && !mainGame->ignore_chain) {
-				mainGame->WaitFrameSignal(20, std::unique_lock<std::mutex>(mainGame->gMutex));
+				std::unique_lock<std::mutex> tmp(mainGame->gMutex);
+				mainGame->WaitFrameSignal(20, tmp);
 			}
 			DuelClient::SendResponse();
 			return true;
