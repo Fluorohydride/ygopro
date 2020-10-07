@@ -114,11 +114,11 @@ void Reboot() {
 #elif defined(__APPLE__)
 	system("open -b io.github.edo9300.ygoprodll --args show_changelog");
 #else
+	struct stat fileStat;
 	stat(ygo::Utils::GetExePath().data(), &fileStat);
 	chmod(ygo::Utils::GetExePath().data(), fileStat.st_mode | S_IXUSR | S_IXGRP | S_IXOTH);
 	pid_t pid = vfork();
 	if(pid == 0) {
-		struct stat fileStat;
 		execl(ygo::Utils::GetExePath().data(), "show_changelog", nullptr);
 		exit(EXIT_FAILURE);
 	}
