@@ -24,7 +24,7 @@
 
 extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_TextEntry_putMessageBoxResult(
-		JNIEnv * env, jclass thiz, jstring textString) {
+		JNIEnv* env, jclass thiz, jstring textString, jboolean send_enter) {
 		if(porting::app_global->userData) {
 			auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
 			auto irrenv = device->getGUIEnvironment();
@@ -33,6 +33,7 @@ extern "C" {
 				auto editbox = static_cast<irr::gui::IGUIEditBox*>(element);
 				const char* text = env->GetStringUTFChars(textString, nullptr);
 				auto wtext = BufferIO::DecodeUTF8s(text);
+				env->DeleteLocalRef(textString);
 				editbox->setText(wtext.c_str());
 				irrenv->removeFocus(editbox);
 				irrenv->setFocus(editbox->getParent());
@@ -42,19 +43,20 @@ extern "C" {
 				changeEvent.GUIEvent.Element = 0;
 				changeEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_CHANGED;
 				editbox->getParent()->OnEvent(changeEvent);
-				irr::SEvent enterEvent;
-				enterEvent.EventType = irr::EET_GUI_EVENT;
-				enterEvent.GUIEvent.Caller = editbox;
-				enterEvent.GUIEvent.Element = 0;
-				enterEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_ENTER;
-				editbox->getParent()->OnEvent(enterEvent);
-				env->DeleteLocalRef(textString);
+				if(send_enter) {
+					irr::SEvent enterEvent;
+					enterEvent.EventType = irr::EET_GUI_EVENT;
+					enterEvent.GUIEvent.Caller = editbox;
+					enterEvent.GUIEvent.Element = 0;
+					enterEvent.GUIEvent.EventType = irr::gui::EGET_EDITBOX_ENTER;
+					editbox->getParent()->OnEvent(enterEvent);
+				}
 			}
 		}
 	}
 
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_putComboBoxResult(
-		JNIEnv * env, jclass thiz, jint index) {
+		JNIEnv* env, jclass thiz, jint index) {
 		if(porting::app_global->userData) {
 			auto device = static_cast<irr::IrrlichtDevice*>(porting::app_global->userData);
 			auto irrenv = device->getGUIEnvironment();
