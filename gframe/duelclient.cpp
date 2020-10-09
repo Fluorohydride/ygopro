@@ -3872,7 +3872,7 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 		const auto pcount = CompatRead<uint8_t, uint32_t>(pbuf);
 		const auto hcount = CompatRead<uint8_t, uint32_t>(pbuf);
 		const auto topcode = BufferIO::Read<uint32_t>(pbuf);
-		auto MatchPile = [player](auto& pile, uint32_t count, uint8_t location) {
+		auto MatchPile = [player,&pcount](auto& pile, uint32_t count, uint8_t location) {
 			if(pile.size() > count) {
 				for(auto cit = pile.begin() + count; cit != pile.end(); cit++)
 					delete *cit;
@@ -3883,7 +3883,14 @@ int DuelClient::ClientAnalyze(char* msg, uint32_t len) {
 					ccard->controler = player;
 					ccard->location = location;
 					ccard->sequence = pile.size();
+					ccard->position = POS_FACEDOWN;
 					pile.push_back(ccard);
+				}
+			}
+			if(location == LOCATION_EXTRA && pcount) {
+				auto i = pcount;
+				for(auto it = pile.rbegin(); i > 0 && it != pile.rend(); it++, i--) {
+					(*it)->position = POS_FACEUP;
 				}
 			}
 		};
