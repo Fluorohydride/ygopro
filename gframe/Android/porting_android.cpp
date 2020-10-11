@@ -17,10 +17,22 @@
 #include "../game_config.h"
 #include "../game.h"
 
-#define JPARAMS(args)  "(" args ")"
+#define JPARAMS(...)  "(" __VA_ARGS__ ")"
 #define JSTRING "Ljava/lang/String;"
 #define JINT "I"
 #define JVOID "V"
+
+#define JstringtoC(type, rettype, ...)\
+std::rettype JstringtoC##type(JNIEnv* env, const jstring& jnistring) {\
+	const size_t len = env->GetStringUTFLength(jnistring);\
+	const char* text = env->GetStringUTFChars(jnistring, nullptr);\
+	std::rettype res __VA_ARGS__({text, len});\
+	env->ReleaseStringUTFChars(jnistring, text);\
+	return res;\
+}
+
+JstringtoC(W, wstring, = BufferIO::DecodeUTF8s)
+JstringtoC(A, string)
 
 extern "C" {
 	JNIEXPORT void JNICALL Java_io_github_edo9300_edopro_EpNativeActivity_putMessageBoxResult(
@@ -31,10 +43,7 @@ extern "C" {
 			auto element = irrenv->getFocus();
 			if(element && element->getType() == irr::gui::EGUIET_EDIT_BOX) {
 				auto editbox = static_cast<irr::gui::IGUIEditBox*>(element);
-				const char* text = env->GetStringUTFChars(textString, nullptr);
-				auto wtext = BufferIO::DecodeUTF8s(text);
-				env->DeleteLocalRef(textString);
-				editbox->setText(wtext.c_str());
+				editbox->setText(JstringtoCW(env, textString).c_str());
 				irrenv->removeFocus(editbox);
 				irrenv->setFocus(editbox->getParent());
 				irr::SEvent changeEvent;
@@ -103,9 +112,7 @@ std::vector<std::string> GetExtraParameters() {
 
 	for(int i = 0; i < size; ++i) {
 		jstring string = (jstring)jnienv->GetObjectArrayElement(stringArrays, i);
-		const char* mayarray = jnienv->GetStringUTFChars(string, 0);
-		ret.push_back(mayarray);
-		jnienv->DeleteLocalRef(string);
+		ret.push_back(JstringtoCA(jnienv, string));
 	}
 	return ret;
 }
@@ -452,9 +459,7 @@ const wchar_t* getTextFromClipboard() {
 	if(getClip == 0)
 		assert("porting::getTextFromClipboard unable to find java getClipboard method" == 0);
 	jstring js_clip = (jstring)jnienv->CallObjectMethod(app_global->activity->clazz, getClip);
-	const char *c_str = jnienv->GetStringUTFChars(js_clip, nullptr);
-	text = BufferIO::DecodeUTF8s(c_str);
-	jnienv->ReleaseStringUTFChars(js_clip, c_str);
+	text = JstringtoCW(jnienv, js_clip);
 	return text.c_str();
 }
 
