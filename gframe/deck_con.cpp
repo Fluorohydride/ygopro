@@ -902,6 +902,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				ClientToScreen(mainGame->hWnd, &pt);
 				SetCursorPos(pt.x, pt.y);
 #endif
+				soundManager.PlaySoundEffect(SOUND_CARD_DROP);
 				break;
 			}
 			if(!mainGame->scrFilter->isVisible())
