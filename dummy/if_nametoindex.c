@@ -2,6 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-unsigned int if_nametoindex(const char *ifname) {
+unsigned long __stdcall if_nametoindex(const char *ifname) {
 	return 0;
 }
