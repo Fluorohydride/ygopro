@@ -24,19 +24,6 @@
 #include "Android/porting_android.h"
 #endif
 
-#ifdef _WIN32
-//temp workaround for libevent
-extern "C" unsigned int if_nametoindex(const char *ifname) {
-	if(strcmp(ifname, "eth0") != 0) {
-		errno = EINVAL;
-		return 0;
-	}
-
-	return 1;
-}
-
-#endif
-
 #define DEFAULT_DUEL_RULE 5
 namespace ygo {
 

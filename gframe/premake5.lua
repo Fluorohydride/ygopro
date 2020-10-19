@@ -73,6 +73,7 @@ local ygopro_config=function(static_core)
 		files "ygopro.rc"
 		includedirs { "../freetype/include", "../irrlicht/include" }
 		dofile("../irrlicht/defines.lua")
+		links { "if_nametoindex" }
 		links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32", "wldap32", "crypt32", "advapi32", "rpcrt4", "ole32", "winhttp" }
 
 	filter { "system:windows", "action:vs*" }
@@ -141,6 +142,11 @@ end
 include "lzma/."
 if _OPTIONS["sound"]=="sfml" then
 	include "../sfAudio"
+end
+if os.istarget("windows") then
+project "if_nametoindex"
+	kind "StaticLib"
+	files { "../dummy/if_nametoindex.c" }
 end
 project "ygopro"
 	targetname "ygopro"
