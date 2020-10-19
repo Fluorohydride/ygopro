@@ -25,6 +25,7 @@ local ygopro_config=function(static_core)
 	links { "clzma", "freetype", "Irrlicht" }
 	filter "system:macosx"
 		links { "iconv" }
+	filter {}
 	if not _OPTIONS["no-joystick"] then
 		defines "YGOPRO_USE_JOYSTICK"
 		filter { "system:not windows", "configurations:Debug" }
