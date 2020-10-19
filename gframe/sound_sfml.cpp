@@ -1,4 +1,4 @@
-#ifndef YGOPRO_USE_SFML
+#ifdef YGOPRO_USE_SFML
 #include "sound_sfml.h"
 #include <sfAudio/Music.hpp>
 #include <sfAudio/Sound.hpp>
