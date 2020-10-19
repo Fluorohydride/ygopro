@@ -1,5 +1,8 @@
+#ifndef YGOPRO_USE_SFML
 #include "sound_sfml.h"
-#include <SFML/Audio.hpp>
+#include <sfAudio/Music.hpp>
+#include <sfAudio/Sound.hpp>
+#include <sfAudio/SoundBuffer.hpp>
 #include <iostream>
 
 SoundSFML::SoundSFML() = default;
@@ -7,14 +10,14 @@ SoundSFML::~SoundSFML() = default;
 
 void SoundSFML::SetSoundVolume(double volume)
 {
-	sound_volume = volume * 100;
+	sound_volume = (float)(volume * 100);
 	for (auto& sound: sounds)
 		sound->setVolume(sound_volume);
 }
 
 void SoundSFML::SetMusicVolume(double volume)
 {
-	music_volume = volume * 100;
+	music_volume = (float)(volume * 100);
 	if (music)
 		music->setVolume(music_volume);
 }
@@ -89,9 +92,10 @@ bool SoundSFML::MusicPlaying()
 void SoundSFML::Tick()
 {
 	for (auto it = sounds.begin(); it != sounds.end();) {
-		if (!(*it)->getStatus() == sf::SoundSource::Status::Playing)
+		if ((*it)->getStatus() != sf::SoundSource::Status::Playing)
 			it = sounds.erase(it);
 		else
 			it++;
 	}
 }
+#endif //YGOPRO_USE_SFML

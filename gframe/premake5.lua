@@ -3,7 +3,7 @@ local ygopro_config=function(static_core)
 	cppdialect "C++14"
 	rtti "Off"
 	files { "**.cpp", "**.cc", "**.c", "**.h", "**.hpp" }
-	excludes { "lzma/**", "sound_sdlmixer.*", "sound_irrklang.*", "irrklang_dynamic_loader.*", "Android/**" }
+	excludes { "lzma/**", "sound_sdlmixer.*", "sound_irrklang.*", "irrklang_dynamic_loader.*", "sound_sfml.*", "sfAudio/**", "Android/**" }
 
 	defines "CURL_STATICLIB"
 	if _OPTIONS["pics"] then
@@ -54,8 +54,11 @@ local ygopro_config=function(static_core)
 		end
 		if _OPTIONS["sound"]=="sfml" then
 			defines "YGOPRO_USE_SFML"
-                        files "sound_sfml.*"
-                        links { "sfml-audio", "sfml-system" }
+			files "sound_sfml.*"
+			includedirs "../sfAudio/include"
+			links { "sfAudio" }
+			filter "system:not windows"
+				links { "FLAC", "vorbisfile", "vorbis", "ogg", "openAL" }
 		end
 	end
 
@@ -130,6 +133,9 @@ local ygopro_config=function(static_core)
 end
 
 include "lzma/."
+if _OPTIONS["sound"]=="sfml" then
+	include "../sfAudio"
+end
 project "ygopro"
 	targetname "ygopro"
 	if _OPTIONS["prebuilt-core"] then
