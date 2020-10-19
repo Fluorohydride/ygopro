@@ -29,6 +29,8 @@ local ygopro_config=function(static_core)
 			links { "SDL2d" }
 		filter { "system:not windows", "configurations:Release" }
 			links { "SDL2" }
+		filter "system:macosx"
+			links { "iconv", "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
 		filter {}
 	end
 	if _OPTIONS["sound"] then
@@ -59,6 +61,8 @@ local ygopro_config=function(static_core)
 			links { "sfAudio" }
 			filter "system:not windows"
 				links { "FLAC", "vorbisfile", "vorbis", "ogg", "openal" }
+			filter "system:macosx"
+				links { "CoreAudio.framework", "AudioToolbox.framework" }
 		end
 	end
 
