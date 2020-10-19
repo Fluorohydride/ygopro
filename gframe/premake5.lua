@@ -23,6 +23,8 @@ local ygopro_config=function(static_core)
 	end
 	includedirs "../ocgcore"
 	links { "clzma", "freetype", "Irrlicht" }
+	filter "system:macosx"
+		links { "iconv" }
 	if not _OPTIONS["no-joystick"] then
 		defines "YGOPRO_USE_JOYSTICK"
 		filter { "system:not windows", "configurations:Debug" }
@@ -30,7 +32,7 @@ local ygopro_config=function(static_core)
 		filter { "system:not windows", "configurations:Release" }
 			links { "SDL2" }
 		filter "system:macosx"
-			links { "iconv", "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
+			links { "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
 		filter {}
 	end
 	if _OPTIONS["sound"] then
@@ -52,7 +54,7 @@ local ygopro_config=function(static_core)
 			filter "system:not windows"
 				links { "SDL2_mixer", "FLAC", "mpg123", "vorbisfile", "vorbis", "ogg" }
 			filter "system:macosx"
-				links { "iconv", "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
+				links { "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
 		end
 		if _OPTIONS["sound"]=="sfml" then
 			defines "YGOPRO_USE_SFML"
