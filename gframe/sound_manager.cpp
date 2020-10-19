@@ -8,6 +8,9 @@
 #elif defined(YGOPRO_USE_SDL_MIXER)
 #include "sound_sdlmixer.h"
 #define BACKEND SoundMixer
+#elif defined(YGOPRO_USE_SFML)
+#include "sound_sfml.h"
+#define BACKEND SoundSFML
 #endif
 
 namespace ygo {

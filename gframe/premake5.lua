@@ -52,6 +52,11 @@ local ygopro_config=function(static_core)
 			filter "system:macosx"
 				links { "iconv", "CoreAudio.framework", "AudioToolbox.framework", "CoreVideo.framework", "ForceFeedback.framework", "Carbon.framework" }
 		end
+		if _OPTIONS["sound"]=="sfml" then
+			defines "YGOPRO_USE_SFML"
+                        files "sound_sfml.*"
+                        links { "sfml-audio", "sfml-system" }
+		end
 	end
 
 	filter "system:windows"

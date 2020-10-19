@@ -8,7 +8,8 @@ newoption {
 	description = "Choose sound backend",
 	allowed = {
 		{ "irrklang",  "irrklang" },
-		{ "sdl-mixer",  "SDL2-mixer" }
+		{ "sdl-mixer",  "SDL2-mixer" },
+		{ "sfml",  "SFML" }
 	}
 }
 newoption {
