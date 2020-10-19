@@ -58,7 +58,7 @@ local ygopro_config=function(static_core)
 			includedirs "../sfAudio/include"
 			links { "sfAudio" }
 			filter "system:not windows"
-				links { "FLAC", "vorbisfile", "vorbis", "ogg", "openAL" }
+				links { "FLAC", "vorbisfile", "vorbis", "ogg", "openal" }
 		end
 	end
 
