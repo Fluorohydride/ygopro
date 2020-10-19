@@ -16,6 +16,7 @@
 namespace ygo {
 SoundManager::SoundManager(double sounds_volume, double music_volume, bool sounds_enabled, bool music_enabled, path_stringview working_directory) {
 #ifdef BACKEND
+	fmt::print("Using: " STR(BACKEND)" for audio playback.\n");
 	working_dir = Utils::ToUTF8IfNeeded(working_directory);
 	soundsEnabled = sounds_enabled;
 	musicEnabled = music_enabled;
@@ -25,6 +26,7 @@ SoundManager::SoundManager(double sounds_volume, double music_volume, bool sound
 		mixer->SetSoundVolume(sounds_volume);
 	}
 	catch(...) {
+		fmt::print("Failed to initialize audio backend.\n");
 		succesfully_initied = soundsEnabled = musicEnabled = false;
 		return;
 	}
