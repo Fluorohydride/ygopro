@@ -15,15 +15,15 @@ class SoundSFML : public SoundBackend {
 public:
 	SoundSFML();
 	~SoundSFML();
-	void SetSoundVolume(double volume);
-	void SetMusicVolume(double volume);
-	bool PlayMusic(const std::string& name, bool loop);
-	bool PlaySound(const std::string& name);
-	void StopSounds();
-	void StopMusic();
-	void PauseMusic(bool pause);
-	bool MusicPlaying();
-	void Tick();
+	virtual void SetSoundVolume(double volume) override;
+	virtual void SetMusicVolume(double volume) override;
+	virtual bool PlayMusic(const std::string& name, bool loop) override;
+	virtual bool PlaySound(const std::string& name) override;
+	virtual void StopSounds() override;
+	virtual void StopMusic() override;
+	virtual void PauseMusic(bool pause) override;
+	virtual bool MusicPlaying() override;
+	virtual void Tick() override;
 private:
 	std::unique_ptr<sf::Music> music;
 	std::vector<std::unique_ptr<sf::Sound>> sounds;

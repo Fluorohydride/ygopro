@@ -25,6 +25,12 @@ SoundManager::SoundManager(double sounds_volume, double music_volume, bool sound
 		mixer->SetMusicVolume(music_volume);
 		mixer->SetSoundVolume(sounds_volume);
 	}
+	catch(const std::runtime_error& e) {
+		fmt::print("Failed to initialize audio backend:\n");
+		fmt::print(e.what());
+		succesfully_initied = soundsEnabled = musicEnabled = false;
+		return;
+	}
 	catch(...) {
 		fmt::print("Failed to initialize audio backend.\n");
 		succesfully_initied = soundsEnabled = musicEnabled = false;

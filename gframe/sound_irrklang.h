@@ -12,21 +12,21 @@ class SoundIrrklang : public SoundBackend {
 public:
 	SoundIrrklang();
 	~SoundIrrklang();
-	void SetSoundVolume(double volume);
-	void SetMusicVolume(double volume);
-	bool PlayMusic(const std::string& name, bool loop);
-	bool PlaySound(const std::string& name);
-	void StopSounds();
-	void StopMusic();
-	void PauseMusic(bool pause);
-	bool MusicPlaying();
-	void Tick();
+	virtual void SetSoundVolume(double volume) override;
+	virtual void SetMusicVolume(double volume) override;
+	virtual bool PlayMusic(const std::string& name, bool loop) override;
+	virtual bool PlaySound(const std::string& name) override;
+	virtual void StopSounds() override;
+	virtual void StopMusic() override;
+	virtual void PauseMusic(bool pause) override;
+	virtual bool MusicPlaying() override;
+	virtual void Tick() override;
 private:
 	irrklang::ISoundEngine* soundEngine;
 	irrklang::ISound* soundBGM;
 	std::vector<irrklang::ISound*> sounds;
-	double sfxVolume = 1.0;
-	double bgmVolume = 1.0;
+	double sfxVolume;
+	double bgmVolume;
 };
 
 #endif //SOUND_IRRKLANG_H

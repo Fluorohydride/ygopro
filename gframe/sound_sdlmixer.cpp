@@ -8,21 +8,24 @@
 #include <thread>
 #include <atomic>
 
-SoundMixer::SoundMixer() {
+SoundMixer::SoundMixer() : music(nullptr), sound_volume(0), music_volume(0) {
 	SDL_SetMainReady();
 	if(SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
-		throw std::runtime_error("Failed to init sdl audio device!");
+		throw std::runtime_error(fmt::sprintf("Failed to init sdl audio device!\SDL_InitSubSystem: {}\n", SDL_GetError()));
 	int flags = MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_FLAC;
 	int initted = Mix_Init(flags);
-	fmt::printf("MIX_INIT_OGG: %s\n", initted&MIX_INIT_OGG ? "true" : "false");
-	fmt::printf("MIX_INIT_MP3: %s\n", initted&MIX_INIT_MP3 ? "true" : "false");
-	fmt::printf("MIX_INIT_FLAC: %s\n", initted&MIX_INIT_FLAC ? "true" : "false");
+	fmt::print("MIX_INIT_OGG: {}\n", !!(initted & MIX_INIT_OGG));
+	fmt::print("MIX_INIT_MP3: {}\n", !!(initted & MIX_INIT_MP3));
+	fmt::print("MIX_INIT_FLAC: {}\n", !!(initted & MIX_INIT_FLAC));
 	if((initted&flags) != flags) {
+		Mix_Quit();
+		SDL_QuitSubSystem(SDL_INIT_AUDIO);
 		throw std::runtime_error("Not all flags set");
 	}
 	if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) == -1) {
-		fmt::printf("Mix_OpenAudio: %s\n", Mix_GetError());
-		throw std::runtime_error("Cannot open channels");
+		Mix_Quit();
+		SDL_QuitSubSystem(SDL_INIT_AUDIO);
+		throw std::runtime_error(fmt::sprintf("Cannot open channels\nMix_OpenAudio: {}\n", SDL_GetError()));
 	}
 }
 void SoundMixer::SetSoundVolume(double volume) {
@@ -113,6 +116,8 @@ SoundMixer::~SoundMixer() {
 	if(music)
 		Mix_FreeMusic(music);
 	Mix_CloseAudio();
+	Mix_Quit();
+	SDL_QuitSubSystem(SDL_INIT_AUDIO);
 	die = false;
 }
 

@@ -26,6 +26,7 @@ JWrapper::JWrapper(irr::IrrlichtDevice* _device) {
 JWrapper::~JWrapper() {
 	if(gamecontroller)
 		SDL_GameControllerClose(gamecontroller);
+	SDL_QuitSubSystem(SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER);
 }
 
 void JWrapper::ProcessEvents() {

@@ -4,8 +4,8 @@
 #include <sfAudio/Sound.hpp>
 #include <sfAudio/SoundBuffer.hpp>
 
-SoundSFML::SoundSFML() {
-	music = std::unique_ptr<sf::Music>(new sf::Music());
+SoundSFML::SoundSFML() :
+	music(new sf::Music()), music_volume(0.0f), sound_volume(0.0f) {
 };
 SoundSFML::~SoundSFML() = default;
 

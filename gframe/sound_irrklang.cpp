@@ -7,13 +7,11 @@
 #include "../ikpmp3/ikpMP3.h"
 #endif
 
-SoundIrrklang::SoundIrrklang() {
+SoundIrrklang::SoundIrrklang() :
+	soundEngine(nullptr), soundBGM(nullptr), sfxVolume(0.0), bgmVolume(0.0) {
 	irrdyn::init();
-	soundEngine = irrdyn::createIrrKlangDevice();
-	if(!soundEngine) {
+	if(!(soundEngine = irrdyn::createIrrKlangDevice()))
 		throw std::runtime_error("Failed to init irrklang device!");
-	}
-	soundBGM = nullptr;
 #ifdef IRRKLANG_STATIC
 	irrklang::ikpMP3Init(soundEngine);
 #endif
