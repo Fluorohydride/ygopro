@@ -581,17 +581,15 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wReplaySave);
 				if(prev_operation == BUTTON_RENAME_REPLAY) {
 					auto oldname = Utils::ToPathString(mainGame->lstReplayList->getListItem(prev_sel, true));
-					auto oldpath = oldname.substr(0, oldname.find_last_of(EPRO_TEXT("/"))) + EPRO_TEXT("/");
-					auto extension = oldname.substr(oldname.find_last_of(EPRO_TEXT(".")));
+					auto oldpath = Utils::GetFilePath(oldname);
+					auto extension = Utils::GetFileExtension(oldname, false);
 					auto newname = Utils::ToPathString(mainGame->ebRSName->getText());
-					if (newname.rfind(extension) != newname.length() - extension.length()) {
+					if (Utils::GetFileExtension(newname, false) != extension)
 						newname += extension;
-					}
-					if(Replay::RenameReplay(oldname, oldpath + newname)) {
+					if(Replay::RenameReplay(oldname, oldpath + newname))
 						mainGame->lstReplayList->refreshList();
-					} else {
+					else
 						mainGame->PopupMessage(gDataManager->GetSysString(1365));
-					}
 				}
 				prev_operation = 0;
 				prev_sel = -1;

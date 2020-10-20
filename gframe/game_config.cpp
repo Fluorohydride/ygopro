@@ -41,9 +41,9 @@ bool GameConfig::Load(const path_char* filename)
 		return false;
 	std::string str;
 	while (std::getline(conf_file, str)) {
-		auto pos = str.find_first_of("\n\r");
-		if (str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
+		auto pos = str.find('\r');
+		if(str.size() && pos != std::string::npos)
+			str.erase(pos);
 		if (str.empty() || str.at(0) == '#') {
 			continue;
 		}
@@ -51,7 +51,7 @@ bool GameConfig::Load(const path_char* filename)
 		if (pos == std::wstring::npos)
 			continue;
 		auto type = str.substr(0, pos - 1);
-		str = str.substr(pos + 2);
+		str.erase(0, pos + 2);
 		try {
 			if (type == "antialias")
 				antialias = std::stoi(str);

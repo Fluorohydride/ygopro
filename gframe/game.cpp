@@ -1577,11 +1577,11 @@ bool Game::MainLoop() {
 						return Utils::ToUpperNoAccents(locale.first) == lang;
 					});
 					if(it != locales.end()) {
-						it->second.push_back(data_path);
+						it->second.push_back(std::move(data_path));
 						ReloadElementsStrings();
 					} else {
 						Utils::MakeDirectory(EPRO_TEXT("./config/languages/") + langpath);
-						locales.emplace_back(langpath, std::vector<path_string>{ data_path });
+						locales.emplace_back(std::move(langpath), std::vector<path_string>{ std::move(data_path) });
 						gSettings.cbCurrentLocale->addItem(BufferIO::DecodeUTF8s(repo->language).data());
 					}
 				}
@@ -3175,20 +3175,20 @@ std::wstring Game::ReadPuzzleMessage(const std::wstring& script_name) {
 	std::string res = "";
 	size_t start = std::string::npos;
 	bool stop = false;
-	while(std::getline(infile, str) && !stop) {
-		auto pos = str.find_first_of("\n\r");
+	while(!stop && std::getline(infile, str)) {
+		auto pos = str.find('\r');
 		if(str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
+			str.erase(pos);
 		bool was_empty = str.empty();
 		if(start == std::string::npos) {
 			start = str.find("--[[message");
 			if(start == std::string::npos)
 				continue;
-			str = str.substr(start + 11);
+			str.erase(0, start + 11);
 		}
 		size_t end = str.find("]]");
 		if(end != std::string::npos) {
-			str = str.substr(0, end);
+			str.erase(end);
 			stop = true;
 		}
 		if(str.empty() && !was_empty)
@@ -3263,9 +3263,9 @@ void Game::MessageHandler(void* payload, const char* string, int type) {
 	std::stringstream ss(string);
 	std::string str;
 	while(std::getline(ss, str)) {
-		auto pos = str.find_first_of("\n\r");
+		auto pos = str.find('\r');
 		if(str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
+			str.erase(pos);
 		game->AddDebugMsg(str);
 		if(type > 1)
 			fmt::print("{}\n", str);

@@ -172,18 +172,18 @@ bool DataManager::LoadStrings(const path_string& file) {
 		return false;
 	std::string str;
 	while(std::getline(string_file, str)) {
-		auto pos = str.find_first_of("\n\r");
+		auto pos = str.find('\r');
 		if(str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
+			str.erase(pos);
 		if(str.empty() || str.at(0) != '!') {
 			continue;
 		}
 		pos = str.find(' ');
 		auto type = str.substr(1, pos - 1);
-		str = str.substr(pos + 1);
+		str.erase(0, pos + 1);
 		pos = str.find(' ');
 		auto value = str.substr(0, pos);
-		str = str.substr(pos + 1);
+		str.erase(0, pos + 1);
 		try {
 			if(type == "system") {
 				_sysStrings.SetMain(std::stoi(value), BufferIO::DecodeUTF8s(str));
@@ -209,18 +209,18 @@ bool DataManager::LoadLocaleStrings(const path_string& file) {
 		return false;
 	std::string str;
 	while(std::getline(string_file, str)) {
-		auto pos = str.find_first_of("\n\r");
+		auto pos = str.find('\r');
 		if(str.size() && pos != std::string::npos)
-			str = str.substr(0, pos);
+			str.erase(pos);
 		if(str.empty() || str.at(0) != '!') {
 			continue;
 		}
 		pos = str.find(' ');
 		auto type = str.substr(1, pos - 1);
-		str = str.substr(pos + 1);
+		str.erase(0, pos + 1);
 		pos = str.find(' ');
 		auto value = str.substr(0, pos);
-		str = str.substr(pos + 1);
+		str.erase(0, pos + 1);
 		try {
 			if(type == "system") {
 				_sysStrings.SetLocale(std::stoi(value), BufferIO::DecodeUTF8s(str));

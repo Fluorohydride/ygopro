@@ -239,7 +239,7 @@ void Replay::ParseDecks() {
 			tmp.main_deck.push_back(Read<uint32_t>());
 		for(uint32_t i = 0, extra = Read<uint32_t>(); i < extra && can_read; ++i)
 			tmp.extra_deck.push_back(Read<uint32_t>());
-		decks.push_back(tmp);
+		decks.push_back(std::move(tmp));
 	}
 	replay_custom_rule_cards.clear();
 	if(pheader.flag & REPLAY_NEWREPLAY && !(pheader.flag & REPLAY_HAND_TEST)) {

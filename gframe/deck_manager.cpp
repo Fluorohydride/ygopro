@@ -22,7 +22,7 @@ bool DeckManager::LoadLFListSingle(const path_string& path) {
 	lflist.hash = 0;
 	std::string str;
 	while(std::getline(infile, str)) {
-		auto pos = str.find_first_of("\n\r");
+		auto pos = str.find('\r');
 		if(str.size() && pos != std::string::npos)
 			str.erase(pos);
 		if(str.empty() || str[0] == '#')

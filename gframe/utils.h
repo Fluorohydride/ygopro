@@ -100,7 +100,7 @@ namespace ygo {
 		template<typename T>
 		static T NormalizePath(T path, bool trailing_slash = true);
 		template<typename T>
-		static T GetFileExtension(T file);
+		static T GetFileExtension(T file, bool convert_case = true);
 		template<typename T>
 		static T GetFilePath(T file);
 		template<typename T>
@@ -186,12 +186,13 @@ T Utils::NormalizePath(T path, bool trailing_slash) {
 }
 
 template<typename T>
-T Utils::GetFileExtension(T file) {
+T Utils::GetFileExtension(T file, bool convert_case) {
 	size_t dotpos = file.find_last_of(CAST('.'));
 	if(dotpos == T::npos)
 		return T();
 	T extension = file.substr(dotpos + 1);
-	std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
+	if(convert_case)
+		std::transform(extension.begin(), extension.end(), extension.begin(), ::towlower);
 	return extension;
 }
 
