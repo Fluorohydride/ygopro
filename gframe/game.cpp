@@ -497,7 +497,7 @@ bool Game::Initialize() {
 	wCardImg->setVisible(false);
 	imgCard = env->addImage(Scale(10, 9, 10 + CARD_IMG_WIDTH, 9 + CARD_IMG_HEIGHT), wCardImg);
 	imgCard->setImage(imageManager.tCover[0]);
-	imgCard->setScaleImage(true);
+	imgCard->setScaleImage(false);
 	imgCard->setUseAlphaChannel(true);
 	//phase
 	wPhase = env->addStaticText(L"", Scale(480, 310, 855, 330));
@@ -2253,7 +2253,6 @@ void Game::ShowCardInfo(uint32_t code, bool resize, ImageManager::imgType type) 
 	if(shouldrefresh == 2)
 		cardimagetextureloading = true;
 	imgCard->setImage(img);
-	imgCard->setScaleImage(true);
 	if(!cd)
 		return;
 	auto tmp_code = code;
@@ -2394,7 +2393,6 @@ void Game::AddDebugMsg(epro_stringview msg) {
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);
 	imgCard->setImage(imageManager.tCover[0]);
-	imgCard->setScaleImage(true);
 	btnPSAU->setImage();
 	btnPSDU->setImage();
 	for(int i=0; i<=4; ++i) {

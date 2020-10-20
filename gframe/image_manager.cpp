@@ -29,7 +29,7 @@ bool ImageManager::Initial() {
 		tCover[1] = tCover[0];
 		def_tCover[1] = tCover[1];
 	}
-	GET_TEXTURE_SIZED(tUnknown, "unknown", 177, 254)
+	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
 	GET_TEXTURE(tAct, "act")
 	GET_TEXTURE(tAttack, "attack")
 	GET_TEXTURE(tChain, "chain")
@@ -89,7 +89,7 @@ void ImageManager::ChangeTextures(path_stringview _path) {
 	if(_path == textures_path)
 		return;
 	textures_path = _path.data();
-	GET_TEXTURE_SIZED(tUnknown, "unknown", 177, 254)
+	GET_TEXTURE_SIZED(tUnknown, "unknown", CARD_IMG_WIDTH, CARD_IMG_HEIGHT)
 	GET_TEXTURE(tAct, "act")
 	GET_TEXTURE(tAttack, "attack")
 	GET_TEXTURE(tChain, "chain")
@@ -135,9 +135,6 @@ void ImageManager::ChangeTextures(path_stringview _path) {
 void ImageManager::ResetTextures() {
 	ChangeTextures(BASE_PATH);
 }
-#undef GET_TEXTURE
-#undef GET_TEXTURE_SIZED
-#undef X
 void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	device = dev;
 	driver = dev->getVideoDriver();
@@ -155,6 +152,9 @@ void ImageManager::ClearTexture(bool resize) {
 		sizes[1].second = CARD_IMG_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
 		sizes[2].first = CARD_THUMB_WIDTH * mainGame->window_scale.X * gGameConfig->dpi_scale;
 		sizes[2].second = CARD_THUMB_HEIGHT * mainGame->window_scale.Y * gGameConfig->dpi_scale;
+		const auto s1 = CARD_IMG_WIDTH * mainGame->window_scale.X;
+		const auto s2 = CARD_IMG_HEIGHT * mainGame->window_scale.Y;
+		GET_TEXTURE_SIZED(tUnknown, "unknown", s1, s2)
 		RefreshCovers();
 	}
 	if(!resize) {
@@ -166,6 +166,9 @@ void ImageManager::ClearTexture(bool resize) {
 	f(tFields);
 	f(tCovers);
 }
+#undef GET_TEXTURE
+#undef GET_TEXTURE_SIZED
+#undef X
 void ImageManager::RemoveTexture(uint32_t code) {
 	for(auto map : { &tMap[0], &tMap[1] }) {
 		auto tit = map->find(code);
