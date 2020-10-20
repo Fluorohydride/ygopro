@@ -26,9 +26,6 @@ extern bool show_changelog;
 #else
 #define OSSTRING "Android"
 #endif
-// Double macro to convert the macro-defined int to a character literal
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
 #define EDOPRO_USERAGENT "EDOPro-" OSSTRING "-" STR(EDOPRO_VERSION_MAJOR) "." STR(EDOPRO_VERSION_MINOR) "." STR(EDOPRO_VERSION_PATCH)
 
 #endif

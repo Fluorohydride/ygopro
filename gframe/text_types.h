@@ -11,6 +11,9 @@ inline fmt::basic_string_view<T> to_string_view(const nonstd::basic_string_view<
 }
 }
 }
+// Double macro to convert the macro-defined int to a character literal
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
 #ifdef UNICODE
 #ifndef EPRO_TEXT
 #define EPRO_TEXT(x) L##x
