@@ -54,8 +54,11 @@ uint16_t PRO_VERSION = 0x1351;
 
 namespace ygo {
 
+#ifndef _MSC_VER
+#define __forceinline __attribute__((always_inline))
+#endif
 template<typename... Args>
-inline irr::gui::IGUIComboBox* AddComboBox(irr::gui::IGUIEnvironment* env, Args&&... args) {
+__forceinline irr::gui::IGUIComboBox* AddComboBox(irr::gui::IGUIEnvironment* env, Args&&... args) {
 #ifdef __ANDROID__
 	if(!gGameConfig->native_mouse)
 		return irr::gui::CGUICustomComboBox::addCustomComboBox(env, std::forward<Args>(args)...);
