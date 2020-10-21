@@ -1845,8 +1845,11 @@ bool ClientField::OnCommonEvent(const irr::SEvent& event, bool& stopPropagation)
 				mainGame->btnExpandLog->setText(mainGame->infosExpanded ? gDataManager->GetSysString(2044).data() : gDataManager->GetSysString(2043).data());
 				mainGame->btnExpandChat->setText(mainGame->infosExpanded ? gDataManager->GetSysString(2044).data() : gDataManager->GetSysString(2043).data());
 				mainGame->wInfos->setRelativePosition(mainGame->Resize(1, 275, mainGame->infosExpanded ? 1023 : 301, 639));
-				mainGame->lstLog->setRelativePosition(mainGame->Resize(10, 10, mainGame->infosExpanded ? 1012 : 290, 290));
-				mainGame->lstChat->setRelativePosition(mainGame->Resize(10, 10, mainGame->infosExpanded ? 1012 : 290, 290));
+				const auto expandSize = mainGame->Resize(40, 300 - mainGame->Scale(7), 140, 325 - mainGame->Scale(7));
+				auto lstsSize = mainGame->Resize(10, 10, mainGame->infosExpanded ? 1012 : 290, 0);
+				lstsSize.LowerRightCorner.Y = expandSize.UpperLeftCorner.Y - mainGame->Scale(10);
+				mainGame->lstLog->setRelativePosition(lstsSize);
+				mainGame->lstChat->setRelativePosition(lstsSize);
 				return true;
 			}
 			case BUTTON_REPO_CHANGELOG:	{
