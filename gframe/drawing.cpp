@@ -450,7 +450,7 @@ inline void DrawShadowTextPos(irr::gui::CGUITTFont* font, const T& text, const i
 }
 //We don't want multiple function signatures per argument combination
 #ifndef _MSC_VER
-#define __forceinline __attribute__((always_inline))
+#define __forceinline __attribute__((always_inline)) inline
 #endif
 template<typename... Args>
 __forceinline void DrawShadowTextPos(irr::gui::CGUITTFont* font, epro_wstringview text, Args&&... args) {

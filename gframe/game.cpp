@@ -55,7 +55,7 @@ uint16_t PRO_VERSION = 0x1351;
 namespace ygo {
 
 #ifndef _MSC_VER
-#define __forceinline __attribute__((always_inline))
+#define __forceinline __attribute__((always_inline)) inline
 #endif
 template<typename... Args>
 __forceinline irr::gui::IGUIComboBox* AddComboBox(irr::gui::IGUIEnvironment* env, Args&&... args) {
