@@ -480,8 +480,13 @@ void Game::DrawMisc() {
 	const int speed = (dInfo.duel_params & DUEL_3_COLUMNS_FIELD) ? 1 : 0;
 	irr::core::matrix4 im, ic, it;
 	act_rot += (1.2f / 1000.0f) * delta_time;
-	if(act_rot >= twoPI)
+	if(act_rot >= twoPI) {
 		act_rot -= twoPI;
+		//double branch to account for random instances where the value increases too much
+		if(act_rot >= twoPI) {
+			act_rot = fmod(act_rot, twoPI);
+		}
+	}
 	SetZRotation(im);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
